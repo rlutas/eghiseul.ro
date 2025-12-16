@@ -1,8 +1,9 @@
 # Sprint 1: Authentication & Users
 
-**Status:** 🔄 În progres
+**Status:** ✅ Complete
 **Durată:** 2 săptămâni
 **Data start:** 2025-12-16
+**Data finalizare:** 2025-12-16
 
 ---
 
