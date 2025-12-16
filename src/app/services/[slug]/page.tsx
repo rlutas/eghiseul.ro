@@ -176,7 +176,7 @@ export default async function ServiceDetailPage({
         }}
       />
 
-      <main className="min-h-screen bg-neutral-50">
+      <main className="min-h-screen bg-neutral-50 pt-16">
         {/* Breadcrumb */}
         <div className="bg-white border-b border-neutral-200">
           <div className="container mx-auto px-4 py-4">

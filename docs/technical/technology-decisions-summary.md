@@ -112,6 +112,27 @@ Delete original image
 | **Frontend** | Next.js 14+ | React ecosystem, SSR, SEO |
 | **Backend** | Supabase (Phase 1) | Fast MVP, built-in features |
 | **Database** | PostgreSQL (via Supabase) | Standard, RLS for multi-tenancy |
+
+### Database Connection Info
+
+**Project Reference:** `llbwmitdrppomeptqlue`
+**Region:** West EU (London)
+**Dashboard:** https://supabase.com/dashboard/project/llbwmitdrppomeptqlue
+
+**Running Migrations:**
+```bash
+# Using Supabase CLI (recommended - project already linked)
+supabase db push
+
+# Manual: Copy SQL to Supabase Dashboard > SQL Editor
+```
+
+**Migration Files Location:** `supabase/migrations/`
+
+**Applied Migrations:**
+- `001_initial_schema.sql` - Base tables (profiles, partners, etc.)
+- `002_services_orders.sql` - Services, service_options, orders tables
+- `003_fix_rls_recursion.sql` - Fixed RLS infinite recursion with SECURITY DEFINER functions
 | **File Storage** | Supabase Storage → AWS S3 | Start simple, optimize later |
 | **OCR** | AWS Textract | Privacy, GDPR, zero retention |
 | **KYC** | AWS Rekognition (Phase 1) → Veriff (Phase 2) | Cost-effective, then premium |

@@ -13,7 +13,7 @@ export function HeroSection() {
         }} />
       </div>
 
-      <div className="relative container mx-auto px-4 py-16 lg:py-24">
+      <div className="relative container mx-auto px-4 pt-24 pb-16 lg:pt-32 lg:pb-24">
         <div className="max-w-3xl mx-auto text-center">
           {/* Headline */}
           <h1 className="text-4xl font-bold tracking-tight text-neutral-900 sm:text-5xl lg:text-6xl">
