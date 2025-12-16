@@ -24,7 +24,7 @@ Public endpoints (no auth required):
 - `POST /api/webhooks/stripe`
 
 Admin-only endpoints:
-- `PATCH /api/orders/[id]/status`
+- `PATCH /api/orders/[id]` (status updates)
 
 ---
 
@@ -61,10 +61,12 @@ Retrieve all active services available for purchase.
         "category": "identitate",
         "basePrice": 7.00,
         "currency": "RON",
-        "processingTime": "10 zile lucratoare",
         "isActive": true,
-        "popularity": 150,
-        "thumbnail": "https://cdn.eghiseul.ro/services/ci.jpg",
+        "isFeatured": false,
+        "requiresKyc": true,
+        "estimatedDays": 10,
+        "urgentAvailable": true,
+        "urgentDays": 3,
         "createdAt": "2025-01-15T10:00:00Z",
         "updatedAt": "2025-01-15T10:00:00Z"
       }
