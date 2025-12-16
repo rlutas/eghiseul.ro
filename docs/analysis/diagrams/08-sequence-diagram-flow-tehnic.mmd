@@ -1,0 +1,50 @@
+sequenceDiagram
+    participant C as Client
+    participant F as Frontend
+    participant B as Backend API
+    participant S as Stripe
+    participant O as Olbio Facturi
+    participant E as Email Service
+    participant A as Admin
+
+    C->>F: Acceseaza formular
+    F->>C: Afiseaza Pas 1
+
+    loop Fiecare Pas
+        C->>F: Completeaza date
+        F->>F: Validare client-side
+        F->>C: Afiseaza pas urmator
+    end
+
+    C->>F: Submit formular complet
+    F->>B: POST /orders
+    B->>B: Validare server-side
+    B->>B: Generare Contract PDF
+    B->>B: Generare Nr. Contract
+
+    B->>S: Creare Payment Intent
+    S->>C: 3D Secure daca necesar
+    C->>S: Confirma plata
+    S->>B: Webhook: payment_succeeded
+
+    B->>O: Generare Factura
+    O->>B: Factura PDF
+
+    par Notificari Paralele
+        B->>E: Email confirmare client
+        E->>C: Email cu contract + factura
+        B->>A: Notificare Slack/Dashboard
+    end
+
+    B->>F: Redirect pagina succes
+    F->>C: Afiseaza confirmare + rezumat
+
+    Note over A: Procesare manuala/automata
+
+    A->>B: Update status: In procesare
+    B->>E: Email notificare client
+
+    A->>B: Update status: Finalizat
+    B->>B: Ataseaza document final
+    B->>E: Email cu document
+    E->>C: Primeste documentul

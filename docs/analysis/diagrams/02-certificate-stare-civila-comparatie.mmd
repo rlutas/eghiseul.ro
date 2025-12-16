@@ -1,0 +1,18 @@
+flowchart TB
+    subgraph CN["CERTIFICAT NASTERE - 7 pasi"]
+        CN1[1. Contact] --> CN2[2. Date Personale + Minor/Adult]
+        CN2 --> CN3[3. Serviciu + Destinatie]
+        CN3 --> CN4[4. KYC Documente]
+        CN4 --> CN5[5. Semnatura]
+        CN5 --> CN6[6. Optiuni + Livrare]
+        CN6 --> CN7[7. Facturare + Plata]
+    end
+
+    subgraph CC["CERTIFICAT CASATORIE - 7 pasi"]
+        CC1[1. Contact] --> CC2[2. Serviciu + Date Casatorie]
+        CC2 --> CC3[3. Livrare]
+        CC3 --> CC4[4. KYC Documente]
+        CC4 --> CC5[5. Semnatura]
+        CC5 --> CC6[6. Facturare]
+        CC6 --> CC7[7. Plata]
+    end

@@ -1,0 +1,125 @@
+flowchart TB
+    Start([Firma comanda caziere pentru angajati]) --> Step1
+
+    subgraph Step1["PAS 1: DATE FIRMA"]
+        S1A[CUI Firma *]
+        S1A --> S1B{Verificare ANAF}
+        S1B --> S1C[Auto-fill: Nume firma, Adresa, etc]
+        S1C --> S1D[Email contact firma *]
+        S1D --> S1E[Telefon *]
+        S1E --> S1F[Persoana contact *]
+    end
+
+    Step1 --> Step2
+
+    subgraph Step2["PAS 2: TIP COMANDA"]
+        S2A{Cati angajati?}
+        S2A -->|1 angajat| SingleMode
+        S2A -->|2-10 angajati| ManualMode
+        S2A -->|10+ angajati| BulkMode
+    end
+
+    subgraph SingleMode["MOD SINGUR"]
+        SM1[Introduce date angajat]
+        SM1 --> SM2[Upload CI angajat]
+        SM2 --> SM3[OCR extrage date]
+    end
+
+    subgraph ManualMode["MOD MANUAL 2-10"]
+        MM1[Adauga angajat 1]
+        MM1 --> MM2[Upload CI]
+        MM2 --> MM3[OCR extrage]
+        MM3 --> MM4{Mai adaugi?}
+        MM4 -->|Da| MM5[Adauga angajat N]
+        MM4 -->|Nu| MM6[Lista completa]
+        MM5 --> MM2
+    end
+
+    subgraph BulkMode["MOD BULK 10+"]
+        BM1[Download template Excel]
+        BM2[Completeaza: Nume, CNP, etc]
+        BM3[Upload Excel completat]
+        BM4[Validare date]
+        BM4 --> BM5{Erori?}
+        BM5 -->|Da| BM6[Afiseaza erori, corecteaza]
+        BM5 -->|Nu| BM7[Lista validata]
+        BM6 --> BM3
+    end
+
+    SingleMode --> Step3
+    ManualMode --> Step3
+    BulkMode --> Step3
+
+    subgraph Step3["PAS 3: KYC ANGAJATI"]
+        S3A{Cine face KYC?}
+        S3A -->|Firma trimite documente| FirmaKYC
+        S3A -->|Angajatii fac individual| IndividualKYC
+    end
+
+    subgraph FirmaKYC["KYC VIA FIRMA"]
+        FK1[Upload CI pentru fiecare angajat]
+        FK2[Selfie nu e necesar - firma raspunde]
+        FK3[Declaratie pe proprie raspundere firma]
+    end
+
+    subgraph IndividualKYC["KYC INDIVIDUAL"]
+        IK1[Generare link unic per angajat]
+        IK2[Trimite email fiecarui angajat]
+        IK3[Angajatul face KYC: CI + Selfie]
+        IK4[Status: X/N completat]
+        IK4 --> IK5{Toti au completat?}
+        IK5 -->|Nu| IK6[Reminder email]
+        IK5 -->|Da| IK7[KYC complet]
+        IK6 --> IK4
+    end
+
+    FirmaKYC --> Step4
+    IndividualKYC --> Step4
+
+    subgraph Step4["PAS 4: OPTIUNI"]
+        S4A[Tip cazier: Judiciar / Fiscal / Auto]
+        S4B{Urgenta pentru toti?}
+        S4B -->|Da| S4C[+100 RON x N angajati]
+        S4B -->|Nu| S4D[Standard]
+        S4E{Traducere?}
+        S4E -->|Da| S4F[Limba + pret x N]
+        S4E -->|Nu| S4G[Fara]
+    end
+
+    Step4 --> Step5
+
+    subgraph Step5["PAS 5: REZUMAT COMANDA"]
+        S5A[Lista angajati cu servicii]
+        S5B[Angajat 1: Cazier JUD + Urgenta = 350 RON]
+        S5C[Angajat 2: Cazier JUD = 250 RON]
+        S5D[...]
+        S5E[TOTAL: X.XXX RON]
+        S5F{Discount volum?}
+        S5F -->|5+ caziere| S5G[-5% discount]
+        S5F -->|10+ caziere| S5H[-10% discount]
+        S5F -->|20+ caziere| S5I[-15% discount]
+    end
+
+    Step5 --> Step6
+
+    subgraph Step6["PAS 6: LIVRARE"]
+        S6A{Livrare documente}
+        S6A -->|Electronic| S6B[Email individual per angajat]
+        S6A -->|Centralizat| S6C[Toate pe email firma]
+        S6A -->|Fizic| S6D[Curier la adresa firma]
+
+        S6E{SMS notificari?}
+        S6E -->|Da| S6F[+5 RON per angajat]
+        S6E -->|Nu| S6G[Doar email]
+    end
+
+    Step6 --> Step7
+
+    subgraph Step7["PAS 7: CONTRACT + PLATA"]
+        S7A[Contract prestari servicii B2B]
+        S7B[Semnatura reprezentant legal]
+        S7C[Factura pe firma]
+        S7D[Plata: Card / Transfer bancar]
+    end
+
+    Step7 --> Success([Confirmare + Tracking per angajat])

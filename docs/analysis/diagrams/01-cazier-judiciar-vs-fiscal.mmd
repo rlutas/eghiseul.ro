@@ -1,0 +1,17 @@
+flowchart TB
+    subgraph CJ["CAZIER JUDICIAR - 7 pasi"]
+        CJ1[1. Date Contact] --> CJ2[2. Date Personale + Motiv]
+        CJ2 --> CJ3[3. Optiuni Serviciu]
+        CJ3 --> CJ4[4. KYC Documente]
+        CJ4 --> CJ5[5. Semnatura Contract]
+        CJ5 --> CJ6[6. Livrare]
+        CJ6 --> CJ7[7. Facturare + Plata]
+    end
+
+    subgraph CF["CAZIER FISCAL - 6 pasi"]
+        CF1[1. Date Contact] --> CF2[2. Date Personale]
+        CF2 --> CF3[3. Serviciu + Motiv]
+        CF3 --> CF4[4. Livrare]
+        CF4 --> CF5[5. KYC + Semnatura]
+        CF5 --> CF6[6. Facturare + Plata]
+    end

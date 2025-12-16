@@ -1,0 +1,146 @@
+flowchart TB
+    Start([Selecteaza: Cazier Judiciar]) --> Step1
+
+    subgraph Step1["PAS 1: CONTACT + IDENTIFICARE"]
+        S1A[Email *] --> S1B[Telefon *]
+        S1B --> S1C[Nume complet *]
+        S1C --> S1D[Upload CI sau Pasaport *]
+        S1D --> S1E{OCR Processing}
+        S1E --> S1F[Extrage: CNP, Nume, Data nastere, Adresa]
+        S1F --> S1G{Act expirat?}
+        S1G -->|Da| S1H[EROARE: Actul este expirat]
+        S1G -->|Nu| S1I[Date pre-completate]
+    end
+
+    S1H --> S1D
+    Step1 --> Step2
+
+    subgraph Step2["PAS 2: DATE PERSONALE - confirmare"]
+        S2A[CNP - pre-filled, editable]
+        S2B[Nume complet - pre-filled]
+        S2C[Data nastere - pre-filled]
+        S2D[Locul nasterii *]
+        S2E[Prenume mama *]
+        S2F[Prenume tata *]
+        S2G[Motiv solicitare *]
+        S2H{Cetatean strain?}
+        S2H -->|Da| S2I[Date suplimentare strain]
+        S2H -->|Nu| S2J[Continua]
+    end
+
+    subgraph ExtraStrain["DATE CETATEAN STRAIN"]
+        ES1[Numar pasaport *]
+        ES2[Tara emitere *]
+        ES3[Viza/permis sedere]
+        ES4[Adresa in Romania *]
+    end
+
+    S2I --> ExtraStrain
+    ExtraStrain --> Step3
+    S2J --> Step3
+
+    subgraph Step3["PAS 3: OPTIUNI SERVICIU"]
+        S3A{Regim procesare}
+        S3A -->|Urgenta| S3B[+100 RON - 24-48h]
+        S3A -->|Standard| S3C[Inclus - 3-5 zile]
+
+        S3D{Traducere autorizata?}
+        S3D -->|Da| S3E[Selecteaza limba din 9]
+        S3D -->|Nu| S3F[Fara traducere]
+
+        S3E --> S3G{Legalizare traducere?}
+        S3G -->|Da| S3H[+99 RON]
+        S3G -->|Nu| S3I[Doar traducere]
+
+        S3J{Apostila Haga?}
+        S3J -->|Da| S3K[+238 RON]
+        S3J -->|Nu| S3L[Fara apostila]
+
+        S3K --> S3M[Selecteaza tara destinatie]
+    end
+
+    Step3 --> Step4
+
+    subgraph Step4["PAS 4: CROSS-SELL"]
+        S4A[73% din clienti comanda si...]
+        S4B[Certificat de Integritate Comportamentala]
+        S4C[Doar +150 RON impreuna]
+        S4D{Adauga?}
+        S4D -->|Da| S4E[Adaugat in cos]
+        S4D -->|Nu, multumesc| S4F[Continua]
+    end
+
+    Step4 --> Step5
+
+    subgraph Step5["PAS 5: VERIFICARE IDENTITATE KYC"]
+        S5A{Ai cont cu KYC valid?}
+        S5A -->|Da| S5B[KYC verificat - skip]
+        S5A -->|Nu| S5C[Fa un selfie cu actul in mana]
+        S5C --> S5D[Verifica: fata vizibila + act lizibil]
+        S5D --> S5E{Validare OK?}
+        S5E -->|Nu| S5F[Repeta selfie]
+        S5E -->|Da| S5G[KYC complet]
+        S5F --> S5C
+    end
+
+    Step5 --> Step6
+
+    subgraph Step6["PAS 6: COS CUMPARATURI"]
+        S6A[Rezumat comanda]
+        S6B[Cazier Judiciar: 250 RON]
+        S6C[Urgenta: +100 RON]
+        S6D[Traducere EN: +178.50 RON]
+        S6E[Apostila: +238 RON]
+        S6F[Cert Integritate: +150 RON]
+        S6G[SUBTOTAL: 916.50 RON]
+
+        S6H{Ce faci?}
+        S6H -->|Finalizeaza| Checkout
+        S6H -->|Mai adaug| AddMore
+    end
+
+    subgraph AddMore["ADAUGA ALT SERVICIU"]
+        AM1{Pentru cine?}
+        AM1 -->|Aceeasi persoana| AM2[Pre-fill toate datele]
+        AM1 -->|Alta persoana| AM3[Date noi]
+        AM2 --> AM4[Selecteaza serviciu nou]
+        AM3 --> AM5[Incepe flow nou]
+        AM4 --> AM6[Doar intrebari specifice]
+    end
+
+    AM6 --> Step6
+    AM5 --> Start
+
+    subgraph Checkout["PAS 7: CHECKOUT"]
+        CH1[Livrare: Electronic / Fizic]
+        CH1 -->|Fizic RO| CH2[+25 RON Fan Curier]
+        CH1 -->|Fizic INT| CH3[+100/200 RON Posta/DHL]
+        CH1 -->|Electronic| CH4[Doar email]
+
+        CH5{SMS notificari?}
+        CH5 -->|Da| CH6[+5 RON]
+        CH5 -->|Nu| CH7[Doar email]
+
+        CH8[Vizualizeaza contract]
+        CH9[Semnatura electronica *]
+        CH10[Accept T and C *]
+    end
+
+    Checkout --> Step8
+
+    subgraph Step8["PAS 8: FACTURARE"]
+        S8A{Tip factura}
+        S8A -->|Persoana fizica| S8B[Nume, CNP, Adresa]
+        S8A -->|Firma PJ| S8C[CUI -> auto-fill]
+        S8D[Cupon reducere?]
+    end
+
+    Step8 --> Step9
+
+    subgraph Step9["PAS 9: PLATA"]
+        S9A[TOTAL: XXX RON]
+        S9B[Card Stripe]
+        S9C[3D Secure daca necesar]
+    end
+
+    Step9 --> Success([EMAIL: Confirmare + Contract + Factura])

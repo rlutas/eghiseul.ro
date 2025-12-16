@@ -1,0 +1,71 @@
+flowchart TB
+    Start([Client acceseaza serviciul]) --> P1
+
+    subgraph P1["PAS 1: DATE CONTACT"]
+        P1A[Email *] --> P1B[Telefon *]
+    end
+
+    P1 --> P2
+
+    subgraph P2["PAS 2: DATE PERSONALE"]
+        P2A[Nume Complet *]
+        P2B[CNP *]
+        P2C{Tip Certificat}
+        P2C -->|Nastere| P2D{Minor/Adult?}
+        P2D -->|Adult| P2E[Intrebari Stare Civila]
+        P2D -->|Minor| P2F[Date Parinti]
+        P2C -->|Casatorie| P2G[Data Casatorie + Nume Sot]
+        P2C -->|Celibat| P2H[Oficiu Stare Civila]
+        P2I[Nume Tata *]
+        P2J[Nume Mama *]
+        P2K[Loc Nastere *]
+    end
+
+    P2 --> P3
+
+    subgraph P3["PAS 3: DESTINATIE si OPTIUNI"]
+        P3A[Tara Utilizare *]
+        P3B[Scop Obtinere *]
+        P3C{Extras Multilingv?}
+        P3C -->|Da| P3D[Nu necesita traducere!]
+        P3C -->|Nu| P3E{Traducere?}
+        P3E -->|Da| P3F[Selecteaza Limba - 20 optiuni]
+        P3G{Apostila Haga?}
+        P3H{Cross-sell?}
+        P3H -->|Nastere| P3I[+ Multilingv? +399]
+        P3H -->|Celibat| P3J[+ Cert. Nastere? +999]
+    end
+
+    P3 --> P4
+
+    subgraph P4["PAS 4: VERIFICARE IDENTITATE"]
+        P4A[Upload CI *]
+        P4B[Selfie cu CI *]
+        P4C{Minor?}
+        P4C -->|Da| P4D[Upload CI Parinti *]
+        P4E[Vechiul Certificat - optional]
+    end
+
+    P4 --> P5
+
+    subgraph P5["PAS 5: LIVRARE si CONTRACT"]
+        P5A{Tip Livrare}
+        P5A -->|Electronic| P5B[Email]
+        P5A -->|Fizic RO| P5C[Fan Curier +25]
+        P5A -->|Fizic Strain| P5D[Posta +100 / DHL +200]
+        P5E[Adresa Livrare]
+        P5F[Semnatura Contract *]
+        P5G[Accept TandC *]
+    end
+
+    P5 --> P6
+
+    subgraph P6["PAS 6: FACTURARE si PLATA"]
+        P6A[Tip: PF / PJ]
+        P6B[Date Facturare]
+        P6C[Rezumat Comanda]
+        P6D[Cupon]
+        P6E[Plata Stripe]
+    end
+
+    P6 --> Success([Confirmare + Contract pe Email])

@@ -1,0 +1,87 @@
+flowchart TB
+    subgraph GuestVsLogged["GUEST VS CONT"]
+        Start([Client nou]) --> Choice{Ai cont?}
+        Choice -->|Nu| GuestFlow
+        Choice -->|Da| LoginFlow
+    end
+
+    subgraph GuestFlow["FLOW GUEST"]
+        G1[Completeaza comanda ca guest]
+        G1 --> G2[La final: Creeaza cont? Email deja introdus]
+        G2 -->|Da| G3[Seteaza parola]
+        G2 -->|Nu| G4[Continua fara cont]
+        G3 --> G5[Cont creat + KYC salvat]
+    end
+
+    subgraph LoginFlow["FLOW LOGAT"]
+        L1[Login: Email + Parola]
+        L1 --> L2{Magic link?}
+        L2 -->|Da| L3[Trimite link pe email]
+        L2 -->|Nu| L4[Parola]
+        L3 --> L5[Click link = logat]
+        L4 --> L5
+        L5 --> L6[Dashboard cont]
+    end
+
+    subgraph Dashboard["DASHBOARD CONT"]
+        D1[Bine ai venit, Ion!]
+
+        subgraph MyData["DATELE MELE"]
+            MD1[Nume: Ion Popescu]
+            MD2[Email: ion@email.com]
+            MD3[Telefon: 07xx xxx xxx]
+            MD4[CNP: 185xxxxxxxxxx]
+            MD5[Adresa: Str. X, Nr. Y]
+            MD6[Modifica date]
+        end
+
+        subgraph MyKYC["KYC STATUS"]
+            KYC1{KYC Status}
+            KYC1 -->|Valid| KYC2[Verificat - expira in 180 zile]
+            KYC1 -->|Expirat| KYC3[Reverifica identitatea]
+            KYC1 -->|Niciodata| KYC4[Completeaza KYC]
+            KYC2 --> KYC5[CI: ****1234]
+            KYC2 --> KYC6[Verificat la: 15.12.2024]
+        end
+
+        subgraph MyOrders["COMENZILE MELE"]
+            O1[Comanda #1234 - Cazier JUD - Finalizat]
+            O2[Comanda #1235 - Cert Nastere - In procesare]
+            O3[Comanda #1236 - Extras CF - Platit]
+            O4[Vezi toate comenzile]
+        end
+
+        subgraph MyDocs["DOCUMENTELE MELE"]
+            DOC1[Cazier Judiciar - 10.12.2024 - Descarca]
+            DOC2[Factura #1234 - Descarca]
+            DOC3[Contract #1234 - Descarca]
+        end
+
+        subgraph QuickActions["ACTIUNI RAPIDE"]
+            QA1[Comanda noua - date pre-completate]
+            QA2[Recomanda serviciu - primesti 10%]
+            QA3[Solicita factura]
+        end
+    end
+
+    subgraph KYCProcess["PROCES KYC"]
+        KP1[Pasul 1: Upload CI]
+        KP1 --> KP2[OCR extrage date]
+        KP2 --> KP3[Verifica expirare]
+        KP3 --> KP4[Pasul 2: Selfie cu CI]
+        KP4 --> KP5[AI verifica: fata = poza CI?]
+        KP5 -->|Match| KP6[KYC VALID 180 zile]
+        KP5 -->|No match| KP7[Repeta sau contact suport]
+    end
+
+    subgraph BenefitsLoggedIn["BENEFICII CONT"]
+        B1[Date pre-completate la comenzi noi]
+        B2[KYC salvat - nu repeti de fiecare data]
+        B3[Istoric comenzi si documente]
+        B4[Notificari personalizate]
+        B5[Discount client fidel]
+        B6[Recomanda si castiga]
+    end
+
+    L6 --> Dashboard
+    G5 --> Dashboard

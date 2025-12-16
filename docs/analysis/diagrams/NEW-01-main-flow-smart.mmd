@@ -1,0 +1,124 @@
+flowchart TB
+    Start([Client acceseaza site]) --> Auth{Are cont?}
+
+    Auth -->|Da| Login[Login]
+    Auth -->|Nu| Guest[Continua ca guest]
+
+    Login --> CheckKYC{KYC valid?}
+    Guest --> SelectService
+
+    CheckKYC -->|Da| SelectService[Selecteaza Serviciu]
+    CheckKYC -->|Nu| SelectService
+
+    SelectService --> ServiceType{Tip serviciu}
+
+    ServiceType -->|Cazier JUD/FISC/AUTO| CaziereFlow
+    ServiceType -->|Certificate Stare Civila| CertificateFlow
+    ServiceType -->|Extras CF / Cert Const| BusinessFlow
+
+    subgraph CaziereFlow["FLOW CAZIERE"]
+        C1[Selecteaza tip cazier]
+        C1 --> C2{Pentru cine?}
+        C2 -->|Pentru mine PF| PersonalFlow
+        C2 -->|Pentru firma PJ| CompanyFlow
+    end
+
+    subgraph PersonalFlow["FLOW PERSONAL"]
+        PF1[Date Contact: Email, Telefon, Nume]
+        PF1 --> PF2[Upload CI/Pasaport]
+        PF2 --> PF3{OCR Extract}
+        PF3 --> PF4[Verifica expirare act]
+        PF4 -->|Expirat| PF4E[Eroare: Act expirat]
+        PF4 -->|Valid| PF5[Pre-fill: CNP, Nume, Adresa]
+        PF5 --> PF6[Confirma/Editeaza date]
+        PF6 --> PF7{Cetatean strain?}
+        PF7 -->|Da| PF8[Date extra: Pasaport, Viza, Tara]
+        PF7 -->|Nu| Options
+        PF8 --> Options
+    end
+
+    subgraph CompanyFlow["FLOW FIRMA - BULK"]
+        CF1[Date Firma: CUI, Nume, Email]
+        CF1 --> CF2{Cati angajati?}
+        CF2 -->|1| SingleEmployee
+        CF2 -->|2+| BulkEmployees
+
+        SingleEmployee[Date angajat + Upload CI]
+        BulkEmployees[Upload lista sau adauga manual]
+
+        SingleEmployee --> Options
+        BulkEmployees --> BulkKYC[KYC per angajat]
+        BulkKYC --> Options
+    end
+
+    subgraph Options["OPTIUNI SERVICIU"]
+        O1{Urgenta?}
+        O1 -->|Da| O1Y[+100 RON / 24-48h]
+        O1 -->|Nu| O1N[Standard 3-5 zile]
+        O1Y --> O2
+        O1N --> O2
+
+        O2{Traducere?}
+        O2 -->|Da| O2Y[Selecteaza limba]
+        O2 -->|Nu| O3
+        O2Y --> O2L{Legalizare?}
+        O2L -->|Da| O2LY[+99 RON]
+        O2L -->|Nu| O3
+        O2LY --> O3
+
+        O3{Apostila Haga?}
+        O3 -->|Da| O3Y[+238 RON + Tara]
+        O3 -->|Nu| CrossSell
+        O3Y --> CrossSell
+    end
+
+    subgraph CrossSell["CROSS-SELL"]
+        CS1{Recomandam}
+        CS1 -->|Cazier JUD| CS2[+ Cert Integritate +150]
+        CS1 -->|Cazier FISC| CS3[+ Cazier Judiciar +150]
+        CS1 -->|Cert Nastere| CS4[+ Multilingv +399]
+        CS2 --> KYCStep
+        CS3 --> KYCStep
+        CS4 --> KYCStep
+    end
+
+    CrossSell --> KYCStep
+
+    subgraph KYCStep["VERIFICARE IDENTITATE"]
+        K1{User logat cu KYC valid?}
+        K1 -->|Da| K1Y[Skip - folosim KYC existent]
+        K1 -->|Nu| K2{A incarcat CI la pas 2?}
+        K2 -->|Da| K3[Doar Selfie cu CI]
+        K2 -->|Nu| K4[Upload CI + Selfie]
+        K1Y --> AddToCart
+        K3 --> AddToCart
+        K4 --> AddToCart
+    end
+
+    subgraph AddToCart["ADAUGA IN COS"]
+        ATC1[Rezumat serviciu + pret]
+        ATC1 --> ATC2{Ce faci?}
+        ATC2 -->|Checkout| Checkout
+        ATC2 -->|Adauga alt serviciu| AnotherService
+    end
+
+    subgraph AnotherService["ALT SERVICIU"]
+        AS1{Pentru aceeasi persoana?}
+        AS1 -->|Da| AS2[Pre-fill date existente]
+        AS1 -->|Nu| AS3[Date noi persoana]
+        AS2 --> AS4[Doar intrebari specifice serviciului nou]
+        AS3 --> SelectService
+        AS4 --> Options
+    end
+
+    subgraph Checkout["CHECKOUT"]
+        CH1[Rezumat Cos]
+        CH1 --> CH2[Optiuni Livrare]
+        CH2 --> CH3[Optiuni Extra: SMS +5 RON]
+        CH3 --> CH4[Contract + Semnatura]
+        CH4 --> CH5[Facturare PF/PJ]
+        CH5 --> CH6[Plata Stripe]
+        CH6 --> Success
+    end
+
+    Success([Confirmare + Email Contract + Factura])

@@ -1,0 +1,17 @@
+flowchart LR
+    subgraph Actual["ACTUAL: 4 flow-uri diferite"]
+        A1[Caziere - 6-7 pasi]
+        A2[Stare Civila - 7 pasi]
+        A3[Business - 5-6 pasi]
+        A4[Rovinieta - 3 pasi]
+    end
+
+    subgraph Propus["PROPUS: 2 flow-uri standard"]
+        P1[Flow cu KYC - 6 pasi]
+        P2[Flow fara KYC - 4 pasi]
+    end
+
+    A1 --> P1
+    A2 --> P1
+    A3 --> P2
+    A4 --> P2

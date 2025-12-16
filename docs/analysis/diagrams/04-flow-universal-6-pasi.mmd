@@ -1,0 +1,40 @@
+flowchart TB
+    subgraph Step1["PAS 1: IDENTIFICARE"]
+        S1A[Email] --> S1B[Telefon]
+        S1B --> S1C[Nume Complet]
+    end
+
+    subgraph Step2["PAS 2: DATE SERVICIU"]
+        S2A[Date specifice serviciului]
+        S2B[Motiv solicitare]
+        S2C[Destinatie / Tara utilizare]
+    end
+
+    subgraph Step3["PAS 3: OPTIUNI"]
+        S3A[Regim procesare]
+        S3B[Traduceri]
+        S3C[Apostila]
+        S3D[Cross-sell]
+    end
+
+    subgraph Step4["PAS 4: KYC"]
+        S4A[Upload Document]
+        S4B[Selfie Verificare]
+        S4C[Documente Extra]
+    end
+
+    subgraph Step5["PAS 5: LIVRARE si CONTRACT"]
+        S5A[Metoda Livrare]
+        S5B[Adresa]
+        S5C[Semnatura Electronica]
+        S5D[Accept TandC]
+    end
+
+    subgraph Step6["PAS 6: PLATA"]
+        S6A[Rezumat Comanda]
+        S6B[Facturare PF/PJ]
+        S6C[Cupon Reducere]
+        S6D[Plata Card]
+    end
+
+    Step1 --> Step2 --> Step3 --> Step4 --> Step5 --> Step6

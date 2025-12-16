@@ -1,0 +1,117 @@
+flowchart TB
+    Start([Selecteaza: Certificat de Nastere]) --> Step1
+
+    subgraph Step1["PAS 1: PENTRU CINE?"]
+        S1A{Certificatul este pentru:}
+        S1A -->|Mine adult| AdultFlow
+        S1A -->|Copilul meu minor| MinorFlow
+        S1A -->|Alta persoana adulta| AltaPersoana
+    end
+
+    subgraph AdultFlow["FLOW ADULT - PENTRU MINE"]
+        AF1[Date contact: Email, Telefon]
+        AF1 --> AF2[Upload CI *]
+        AF2 --> AF3[OCR: extrage CNP, Nume, etc]
+        AF3 --> AF4{Act expirat?}
+        AF4 -->|Da| AF5[Eroare]
+        AF4 -->|Nu| AF6[Date pre-completate]
+    end
+
+    subgraph MinorFlow["FLOW MINOR - PENTRU COPIL"]
+        MF1[Date contact parinte: Email, Telefon]
+        MF1 --> MF2[Upload CI parinte *]
+        MF2 --> MF3[Date copil: Nume, CNP]
+        MF3 --> MF4[Upload certificat nastere vechi - optional]
+    end
+
+    subgraph AltaPersoana["FLOW ALTA PERSOANA"]
+        AP1[Date solicitant: Email, Telefon]
+        AP1 --> AP2[Upload CI solicitant]
+        AP2 --> AP3[Date beneficiar: Nume, CNP]
+        AP3 --> AP4[Relatie cu beneficiarul *]
+        AP4 --> AP5[Imputernicire necesara]
+    end
+
+    AdultFlow --> Step2
+    MinorFlow --> Step2
+    AltaPersoana --> Step2
+
+    subgraph Step2["PAS 2: DATE SPECIFICE CERTIFICAT"]
+        S2A[Locul nasterii *]
+        S2B[Prenume mama *]
+        S2C[Prenume tata *]
+        S2D[Localitatea oficiului stare civila *]
+        S2E{Stare civila actuala}
+        S2E --> S2F[Casatorit?]
+        S2E --> S2G[Divortat?]
+        S2E --> S2H[Vaduv?]
+        S2I[Tara unde va fi folosit *]
+        S2J[Scopul obtinerii *]
+    end
+
+    Step2 --> Step3
+
+    subgraph Step3["PAS 3: OPTIUNI"]
+        S3A{Extras Multilingv?}
+        S3A -->|Da - recomandat UE| S3B[NU necesita traducere/apostila!]
+        S3A -->|Nu - certificat standard| S3C[Continua cu optiuni]
+
+        S3C --> S3D{Traducere?}
+        S3D -->|Da| S3E[Alege din 20 limbi]
+        S3D -->|Nu| S3F[Fara traducere]
+
+        S3E --> S3G{Legalizare traducere?}
+        S3G -->|Da| S3H[+99 RON]
+        S3G -->|Nu| S3I[Doar traducere]
+
+        S3H --> S3J{Apostila traducere?}
+        S3J -->|Da| S3K[+83.30 RON Camera Notarilor]
+        S3J -->|Nu| S3L[Fara apostila traducere]
+
+        S3M{Apostila Haga certificat?}
+        S3M -->|Da| S3N[+238 RON]
+        S3M -->|Nu| S3O[Fara apostila]
+    end
+
+    Step3 --> Step4
+
+    subgraph Step4["PAS 4: CROSS-SELL"]
+        S4A{Recomandam:}
+        S4A -->|Certificat standard| S4B[+ Extras Multilingv +399 RON]
+        S4A -->|Multilingv| S4C[+ Duplicat certificat +790 RON]
+        S4D{Adauga?}
+        S4D -->|Da| S4E[Adaugat]
+        S4D -->|Nu| S4F[Continua]
+    end
+
+    Step4 --> Step5
+
+    subgraph Step5["PAS 5: KYC"]
+        S5A{User cu KYC valid?}
+        S5A -->|Da| S5B[Skip KYC]
+        S5A -->|Nu| S5C{A incarcat CI?}
+        S5C -->|Da| S5D[Doar selfie cu CI]
+        S5C -->|Nu| S5E[Upload CI + Selfie]
+
+        S5F{Este pentru minor?}
+        S5F -->|Da| S5G[Upload CI ambii parinti]
+        S5F -->|Nu| S5H[Continua]
+    end
+
+    Step5 --> Step6
+
+    subgraph Step6["PAS 6: COS + CHECKOUT"]
+        S6A[Rezumat comanda]
+        S6B{Mai adaugi servicii?}
+        S6B -->|Da| S6C[Selecteaza alt serviciu]
+        S6B -->|Nu| S6D[Checkout]
+
+        S6D --> S6E[Livrare: Electronic / Fizic]
+        S6E --> S6F{SMS notificari? +5 RON}
+        S6F --> S6G[Contract + Semnatura]
+        S6G --> S6H[Facturare PF/PJ]
+        S6H --> S6I[Plata Stripe]
+    end
+
+    S6C --> Start
+    Step6 --> Success([Confirmare + Email])

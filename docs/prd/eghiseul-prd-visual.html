@@ -1,0 +1,1250 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>eGhiseul.ro - PRD v2.0</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #64748b;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        header .version {
+            background: rgba(255,255,255,0.2);
+            padding: 5px 15px;
+            border-radius: 20px;
+            display: inline-block;
+            font-size: 0.9rem;
+        }
+
+        /* Navigation */
+        nav {
+            background: var(--card-bg);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 10px;
+            z-index: 100;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        nav a {
+            color: var(--primary);
+            text-decoration: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+        }
+
+        nav a:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Sections */
+        section {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+        }
+
+        section h2 {
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+            padding-bottom: 10px;
+            margin-bottom: 25px;
+            font-size: 1.8rem;
+        }
+
+        section h3 {
+            color: var(--text);
+            margin: 25px 0 15px 0;
+            font-size: 1.3rem;
+        }
+
+        /* Cards */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .card {
+            background: var(--bg);
+            border-radius: 10px;
+            padding: 20px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .card.success { border-left-color: var(--success); }
+        .card.warning { border-left-color: var(--warning); }
+        .card.danger { border-left-color: var(--danger); }
+
+        .card h4 {
+            margin-bottom: 10px;
+            color: var(--text);
+        }
+
+        .card p {
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 0.95rem;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--primary);
+            color: white;
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background: var(--bg);
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .badge-p0 { background: #fee2e2; color: #dc2626; }
+        .badge-p1 { background: #fef3c7; color: #d97706; }
+        .badge-p2 { background: #dbeafe; color: #2563eb; }
+        .badge-new { background: #dcfce7; color: #16a34a; }
+
+        /* Flow diagrams */
+        .flow-box {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 25px;
+            border-radius: 10px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.85rem;
+            overflow-x: auto;
+            white-space: pre;
+            line-height: 1.4;
+        }
+
+        /* Mermaid diagrams */
+        .mermaid {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        /* Highlight boxes */
+        .highlight {
+            background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .highlight.success {
+            background: linear-gradient(135deg, #dcfce7 0%, #d1fae5 100%);
+        }
+
+        .highlight.warning {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+        }
+
+        /* Step indicators */
+        .steps {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .step {
+            flex: 1;
+            min-width: 150px;
+            text-align: center;
+            padding: 15px;
+            background: var(--bg);
+            border-radius: 10px;
+            position: relative;
+        }
+
+        .step-number {
+            width: 35px;
+            height: 35px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px auto;
+            font-weight: bold;
+        }
+
+        .step-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .step-desc {
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+
+        /* Comparison table */
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .comparison-col {
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .comparison-col.old {
+            background: #fef2f2;
+            border: 2px solid #fecaca;
+        }
+
+        .comparison-col.new {
+            background: #f0fdf4;
+            border: 2px solid #bbf7d0;
+        }
+
+        .comparison-col h4 {
+            margin-bottom: 15px;
+        }
+
+        /* Comments area */
+        .comments {
+            background: #fffbeb;
+            border: 2px dashed #fbbf24;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .comments h4 {
+            color: #d97706;
+            margin-bottom: 10px;
+        }
+
+        .comments textarea {
+            width: 100%;
+            min-height: 100px;
+            border: 1px solid #fbbf24;
+            border-radius: 5px;
+            padding: 10px;
+            font-family: inherit;
+            resize: vertical;
+        }
+
+        /* Print styles */
+        @media print {
+            nav { display: none; }
+            section { break-inside: avoid; }
+            .comments { display: none; }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            header h1 { font-size: 1.8rem; }
+            .comparison { grid-template-columns: 1fr; }
+            nav ul { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>eGhiseul.ro</h1>
+        <p>Product Requirements Document</p>
+        <span class="version">Versiune 2.0 | Decembrie 2024</span>
+    </header>
+
+    <div class="container">
+        <nav>
+            <ul>
+                <li><a href="#overview">Overview</a></li>
+                <li><a href="#whats-new">Ce e Nou</a></li>
+                <li><a href="#flow">Flow Smart</a></li>
+                <li><a href="#cart">Cart System</a></li>
+                <li><a href="#pj">PJ Bulk</a></li>
+                <li><a href="#services">Servicii</a></li>
+                <li><a href="#features">Features</a></li>
+                <li><a href="#timeline">Timeline</a></li>
+                <li><a href="#questions">Intrebari</a></li>
+            </ul>
+        </nav>
+
+        <!-- OVERVIEW -->
+        <section id="overview">
+            <h2>Overview</h2>
+
+            <div class="highlight">
+                <h4>Ce este eGhiseul.ro?</h4>
+                <p>Platforma digitala care simplifica accesul la documente si servicii guvernamentale pentru cetatenii romani, in special cei din diaspora.</p>
+            </div>
+
+            <div class="comparison">
+                <div class="comparison-col old">
+                    <h4>Platforma Actuala</h4>
+                    <ul>
+                        <li>WordPress + WPForms</li>
+                        <li>Comenzi in Google Sheets</li>
+                        <li>Contracte manuale</li>
+                        <li>KYC problematic</li>
+                        <li>Fara cos cumparaturi</li>
+                    </ul>
+                </div>
+                <div class="comparison-col new">
+                    <h4>Platforma Noua</h4>
+                    <ul>
+                        <li>Next.js + Node.js</li>
+                        <li>Admin Dashboard centralizat</li>
+                        <li>Contracte automate</li>
+                        <li>KYC cu OCR + persistent</li>
+                        <li>Cart + multi-serviciu</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>Servicii Active (12)</h3>
+            <table>
+                <tr>
+                    <th>Serviciu</th>
+                    <th>Pret</th>
+                    <th>Comenzi</th>
+                    <th>KYC</th>
+                </tr>
+                <tr>
+                    <td>Cazier Judiciar</td>
+                    <td>250 RON</td>
+                    <td>1.288</td>
+                    <td>Da</td>
+                </tr>
+                <tr>
+                    <td>Certificat Casatorie</td>
+                    <td>1.190 RON</td>
+                    <td>604</td>
+                    <td>Da</td>
+                </tr>
+                <tr>
+                    <td>Cazier Auto</td>
+                    <td>199-349 RON</td>
+                    <td>809</td>
+                    <td>Da + Permis</td>
+                </tr>
+                <tr>
+                    <td>Cazier Fiscal</td>
+                    <td>250 RON</td>
+                    <td>167</td>
+                    <td>Da</td>
+                </tr>
+                <tr>
+                    <td>Certificat Nastere</td>
+                    <td>1.190 RON</td>
+                    <td>109</td>
+                    <td>Da</td>
+                </tr>
+                <tr>
+                    <td>Extras Multilingv Nastere</td>
+                    <td>799 RON</td>
+                    <td>82</td>
+                    <td>Da</td>
+                </tr>
+                <tr>
+                    <td>Certificat Celibat</td>
+                    <td>699 RON</td>
+                    <td>67</td>
+                    <td>Da</td>
+                </tr>
+                <tr>
+                    <td>Extras Carte Funciara</td>
+                    <td>79-249 RON</td>
+                    <td>34</td>
+                    <td>Nu</td>
+                </tr>
+                <tr>
+                    <td>Extras Multilingv Casatorie</td>
+                    <td>799 RON</td>
+                    <td>32</td>
+                    <td>Da</td>
+                </tr>
+                <tr>
+                    <td>Certificat Integritate</td>
+                    <td>250 RON</td>
+                    <td>30</td>
+                    <td>Da</td>
+                </tr>
+                <tr>
+                    <td>Certificat Constatator</td>
+                    <td>119-499 RON</td>
+                    <td>5</td>
+                    <td>Nu</td>
+                </tr>
+                <tr>
+                    <td>Rovinieta</td>
+                    <td>variabil</td>
+                    <td>-</td>
+                    <td>Nu</td>
+                </tr>
+            </table>
+            <p><strong>Total comenzi: ~3.200+</strong></p>
+
+            <div class="comments">
+                <h4>Note / Comentarii</h4>
+                <textarea placeholder="Adauga notite sau sugestii aici..."></textarea>
+            </div>
+        </section>
+
+        <!-- WHAT'S NEW -->
+        <section id="whats-new">
+            <h2>Ce e Nou in v2.0</h2>
+
+            <div class="card-grid">
+                <div class="card success">
+                    <h4>OCR-First</h4>
+                    <p>Upload CI la pasul 1, extragem automat CNP, nume, adresa. Verificam daca actul e expirat.</p>
+                    <span class="badge badge-new">NOU</span>
+                </div>
+                <div class="card success">
+                    <h4>KYC Persistent</h4>
+                    <p>KYC salvat 180 zile in cont. La comenzi noi, skip complet daca e valid.</p>
+                    <span class="badge badge-new">NOU</span>
+                </div>
+                <div class="card success">
+                    <h4>Cart System</h4>
+                    <p>Adauga multiple servicii in cos. Checkout unic pentru tot. Pre-fill pentru aceeasi persoana.</p>
+                    <span class="badge badge-new">NOU</span>
+                </div>
+                <div class="card success">
+                    <h4>Smart Pre-fill</h4>
+                    <p>Alt serviciu pentru aceeasi persoana = 0 campuri de completat, doar intrebari specifice.</p>
+                    <span class="badge badge-new">NOU</span>
+                </div>
+                <div class="card success">
+                    <h4>PJ Bulk Orders</h4>
+                    <p>Firme comanda pentru N angajati. Template Excel. Discount volum 5-20%.</p>
+                    <span class="badge badge-new">NOU</span>
+                </div>
+                <div class="card success">
+                    <h4>SMS Notificari</h4>
+                    <p>Optional +5 RON. SMS la fiecare schimbare status: plata, document gata, expediat, livrat.</p>
+                    <span class="badge badge-new">NOU</span>
+                </div>
+            </div>
+
+            <h3>Comparatie v1 vs v2</h3>
+            <table>
+                <tr>
+                    <th>Aspect</th>
+                    <th>v1.0 (vechi)</th>
+                    <th>v2.0 (nou)</th>
+                </tr>
+                <tr>
+                    <td>Upload CI</td>
+                    <td>Pas 4 (KYC)</td>
+                    <td><strong>Pas 1 (pentru OCR)</strong></td>
+                </tr>
+                <tr>
+                    <td>Completare date</td>
+                    <td>Manual toate</td>
+                    <td><strong>Pre-fill automat din OCR</strong></td>
+                </tr>
+                <tr>
+                    <td>KYC</td>
+                    <td>La fiecare comanda</td>
+                    <td><strong>O data, salvat 180 zile</strong></td>
+                </tr>
+                <tr>
+                    <td>Multi-serviciu</td>
+                    <td>Nu exista</td>
+                    <td><strong>Cos cumparaturi</strong></td>
+                </tr>
+                <tr>
+                    <td>Aceeasi persoana</td>
+                    <td>Repeta tot</td>
+                    <td><strong>Pre-fill complet, skip KYC</strong></td>
+                </tr>
+                <tr>
+                    <td>PJ bulk</td>
+                    <td>Nu exista</td>
+                    <td><strong>Excel + discount volum</strong></td>
+                </tr>
+                <tr>
+                    <td>SMS</td>
+                    <td>Nu exista</td>
+                    <td><strong>Optional +5 RON</strong></td>
+                </tr>
+            </table>
+
+            <div class="comments">
+                <h4>Note / Comentarii</h4>
+                <textarea placeholder="Ce parere ai despre noile features?"></textarea>
+            </div>
+        </section>
+
+        <!-- FLOW -->
+        <section id="flow">
+            <h2>Flow Smart v2.0</h2>
+
+            <h3>Cei 6 Pasi</h3>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-title">Contact + CI</div>
+                    <div class="step-desc">Email, telefon, upload CI pentru OCR</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-title">Date Pre-fill</div>
+                    <div class="step-desc">CNP, nume din OCR, confirma si completeaza</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-title">Optiuni</div>
+                    <div class="step-desc">Urgenta, traducere, apostila</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <div class="step-title">Cross-sell</div>
+                    <div class="step-desc">Servicii recomandate</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">5</div>
+                    <div class="step-title">KYC</div>
+                    <div class="step-desc">Selfie (skip daca valid)</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">6</div>
+                    <div class="step-title">Cos</div>
+                    <div class="step-desc">Adauga sau checkout</div>
+                </div>
+            </div>
+
+            <h3>Flow Detaliat - Cazier Judiciar</h3>
+            <div class="mermaid">
+flowchart TB
+    Start([Selecteaza Cazier]) --> Step1
+
+    subgraph Step1["PAS 1: CONTACT + CI"]
+        S1A[Email] --> S1B[Telefon]
+        S1B --> S1C[Upload CI]
+        S1C --> S1D{OCR}
+        S1D --> S1E{Expirat?}
+        S1E -->|Da| S1F[Eroare]
+        S1E -->|Nu| S1G[Pre-fill date]
+    end
+
+    Step1 --> Step2
+
+    subgraph Step2["PAS 2: DATE PERSONALE"]
+        S2A[CNP pre-filled]
+        S2B[Nume pre-filled]
+        S2C[Loc nastere]
+        S2D[Parinti]
+        S2E{Strain?}
+        S2E -->|Da| S2F[Date extra]
+        S2E -->|Nu| S2G[OK]
+    end
+
+    Step2 --> Step3
+
+    subgraph Step3["PAS 3: OPTIUNI"]
+        S3A{Urgenta?}
+        S3A -->|Da| S3B[+100 RON]
+        S3A -->|Nu| S3C[Standard]
+        S3D{Traducere?}
+        S3E{Apostila?}
+    end
+
+    Step3 --> Step4
+
+    subgraph Step4["PAS 4: CROSS-SELL"]
+        S4A[Cert Integritate +150 RON]
+        S4B{Adauga?}
+    end
+
+    Step4 --> Step5
+
+    subgraph Step5["PAS 5: KYC"]
+        S5A{KYC valid?}
+        S5A -->|Da| S5B[Skip]
+        S5A -->|Nu| S5C[Selfie]
+    end
+
+    Step5 --> Step6
+
+    subgraph Step6["PAS 6: COS"]
+        S6A{Actiune?}
+        S6A -->|Checkout| S6B[Finalizeaza]
+        S6A -->|Mai adaug| S6C[Alt serviciu]
+    end
+            </div>
+
+            <h3>Flow Vizual ASCII</h3>
+            <div class="flow-box">
+PAS 1: CONTACT + UPLOAD CI
+┌─────────────────────────────────────────────────────────────┐
+│  Email: [_______________________]                           │
+│  Telefon: [_______________________]                         │
+│                                                             │
+│  Upload CI sau Pasaport:                                    │
+│  ┌─────────────────────────────────────────────────────┐   │
+│  │  📷 Trage fisierul aici                             │   │
+│  │     Vom extrage automat datele                      │   │
+│  └─────────────────────────────────────────────────────┘   │
+│                                                             │
+│  ⚠️ Verificam daca actul este expirat                       │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+PAS 2: DATE PRE-COMPLETATE (din OCR)
+┌─────────────────────────────────────────────────────────────┐
+│  ✅ Am extras datele din CI                                 │
+│                                                             │
+│  CNP: [1850315123456___________] ✓ extras                   │
+│  Nume: [POPESCU ION______________] ✓ extras                 │
+│  Loc nastere: [Bucuresti___________]                        │
+│  Prenume mama: [Maria_______________]                       │
+│  Prenume tata: [Gheorghe____________]                       │
+│                                                             │
+│  □ Sunt cetatean strain                                     │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+PAS 3: OPTIUNI SERVICIU
+┌─────────────────────────────────────────────────────────────┐
+│  REGIM:  ○ Standard (3-5 zile)  ● Urgenta +100 RON          │
+│                                                             │
+│  TRADUCERE: ☑ Da                                            │
+│  Limba: [▼ Engleza - 178.50 RON]                            │
+│  □ + Legalizare (+99 RON)                                   │
+│                                                             │
+│  APOSTILA: ☑ Da (+238 RON)                                  │
+│  Tara: [▼ Germania]                                         │
+│                                                             │
+│  SUBTOTAL: 766.50 RON                                       │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+PAS 4: CROSS-SELL
+┌─────────────────────────────────────────────────────────────┐
+│  💡 73% din clienti au nevoie si de:                        │
+│                                                             │
+│  CERTIFICAT DE INTEGRITATE                                  │
+│  Pret normal: 250 RON → Impreuna: doar 150 RON              │
+│                                                             │
+│  ✓ Folosim aceleasi date                                    │
+│  ✓ KYC deja facut                                           │
+│                                                             │
+│  [+ Adauga 150 RON]     [Nu, multumesc]                     │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+PAS 5: KYC VERIFICARE
+┌─────────────────────────────────────────────────────────────┐
+│  DACA user cu KYC valid:                                    │
+│  ┌─────────────────────────────────────────────────────┐   │
+│  │  ✅ Identitate verificata anterior                   │   │
+│  │  KYC valid pana la: 15 Iunie 2025                   │   │
+│  │  [Continua →]                                       │   │
+│  └─────────────────────────────────────────────────────┘   │
+│                                                             │
+│  ALTFEL:                                                    │
+│  ┌─────────────────────────────────────────────────────┐   │
+│  │  📷 Fa un selfie cu CI in mana                      │   │
+│  └─────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+PAS 6: ADAUGA IN COS
+┌─────────────────────────────────────────────────────────────┐
+│  ✅ Serviciu configurat!                                    │
+│                                                             │
+│  Cazier Judiciar - Ion Popescu                              │
+│  • Urgenta +100 │ Traducere EN +178.50 │ Apostila +238      │
+│  SUBTOTAL: 766.50 RON                                       │
+│                                                             │
+│  [🛒 Adauga si continua cumparaturile]                      │
+│  [💳 Adauga si finalizeaza comanda]                         │
+└─────────────────────────────────────────────────────────────┘</div>
+
+            <div class="comments">
+                <h4>Note / Comentarii despre Flow</h4>
+                <textarea placeholder="Ce ai schimba la flow?"></textarea>
+            </div>
+        </section>
+
+        <!-- CART -->
+        <section id="cart">
+            <h2>Cart System</h2>
+
+            <div class="highlight">
+                <h4>Cum functioneaza cosul</h4>
+                <ul>
+                    <li>Adaugi un serviciu configurat in cos</li>
+                    <li>Poti adauga alt serviciu sau checkout</li>
+                    <li>Daca e pentru aceeasi persoana → date pre-completate, KYC skip</li>
+                    <li>Daca e pentru alta persoana → flow complet nou</li>
+                    <li>Checkout unic pentru tot cosul</li>
+                </ul>
+            </div>
+
+            <h3>Exemplu Cos</h3>
+            <div class="flow-box">
+🛒 COSUL TAU                                           3 servicii
+═══════════════════════════════════════════════════════════════════
+
+┌─────────────────────────────────────────────────────────────────┐
+│ 1. Cazier Judiciar - ION POPESCU                                │
+│    Urgenta + Traducere EN + Apostila DE                         │
+│    Subtotal:                                       766.50 RON   │
+│                                         [Modifica] [🗑️ Sterge]  │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│ 2. Certificat Integritate - ION POPESCU                         │
+│    (Cross-sell discount aplicat)                                │
+│    Subtotal:                                       150.00 RON   │
+│                                                    [🗑️ Sterge]  │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│ 3. Cazier Judiciar - MARIA POPESCU                              │
+│    Standard, fara traducere                                     │
+│    Subtotal:                                       250.00 RON   │
+│                                         [Modifica] [🗑️ Sterge]  │
+└─────────────────────────────────────────────────────────────────┘
+
+═══════════════════════════════════════════════════════════════════
+SUBTOTAL:                                          1.166,50 RON
+═══════════════════════════════════════════════════════════════════
+
+[+ Adauga alt serviciu]
+Pentru cine?
+• Ion Popescu (date salvate) ← pre-fill complet
+• Maria Popescu (date salvate) ← pre-fill complet
+• Alta persoana (date noi)
+
+                              [Finalizeaza comanda →]</div>
+
+            <h3>Checkout</h3>
+            <div class="flow-box">
+CHECKOUT
+═══════════════════════════════════════════════════════════════════
+
+LIVRARE
+○ Electronic (email)                                      Gratuit
+● Fizic + Electronic
+  ○ Romania Fan Curier (2-3 zile)                        +25 RON
+  ○ International Posta (7-10 zile)                     +100 RON
+  ● International DHL (1-3 zile)                        +200 RON
+
+Adresa: Musterstrasse 123, 10115 Berlin, Germany
+
+───────────────────────────────────────────────────────────────────
+
+SMS NOTIFICARI
+☑ Vreau SMS cu statusul comenzii                          +5 RON
+  • Confirmare plata
+  • Document obtinut
+  • Expediat + AWB
+  • Livrat
+
+───────────────────────────────────────────────────────────────────
+
+CONTRACT
+[📄 Vizualizeaza contract PDF]
+Semnatura: ~~~~~~~~~~~~~~~~~~~~~~~~
+☑ Accept Termenii si Conditiile
+
+───────────────────────────────────────────────────────────────────
+
+FACTURARE
+○ Persoana fizica    ● Persoana juridica
+CUI: [RO12345678] ✓ EDIGITALIZARE SRL
+
+CUPON: [WELCOME10] ✓ -10% aplicat
+
+═══════════════════════════════════════════════════════════════════
+Subtotal servicii:                                  1.166,50 RON
+Livrare DHL:                                         +200,00 RON
+SMS notificari:                                        +5,00 RON
+Discount -10%:                                       -137,15 RON
+───────────────────────────────────────────────────────────────────
+TOTAL DE PLATA:                                    1.234,35 RON
+═══════════════════════════════════════════════════════════════════
+
+                         [💳 Plateste 1.234,35 RON]</div>
+
+            <div class="comments">
+                <h4>Note / Comentarii despre Cart</h4>
+                <textarea placeholder="Ce parere ai despre sistemul de cos?"></textarea>
+            </div>
+        </section>
+
+        <!-- PJ BULK -->
+        <section id="pj">
+            <h2>PJ Bulk - Comenzi Firme</h2>
+
+            <div class="highlight warning">
+                <h4>Scenariul</h4>
+                <p>O firma HR vrea sa comande caziere judiciare pentru 25 de angajati noi. Cum facem asta eficient?</p>
+            </div>
+
+            <h3>Flow Firma</h3>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-title">Date Firma</div>
+                    <div class="step-desc">CUI → auto-fill nume, adresa</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-title">Nr. Angajati</div>
+                    <div class="step-desc">1 / 2-10 / 10+</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-title">Date Angajati</div>
+                    <div class="step-desc">Manual sau Excel</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <div class="step-title">KYC</div>
+                    <div class="step-desc">Firma upload sau link individual</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">5</div>
+                    <div class="step-title">Optiuni</div>
+                    <div class="step-desc">Urgenta, traducere pt toti</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">6</div>
+                    <div class="step-title">Plata</div>
+                    <div class="step-desc">Discount volum aplicat</div>
+                </div>
+            </div>
+
+            <h3>Discount Volum</h3>
+            <table>
+                <tr>
+                    <th>Nr. Angajati</th>
+                    <th>Discount</th>
+                    <th>Pret/Cazier</th>
+                    <th>Exemplu 25 ang.</th>
+                </tr>
+                <tr>
+                    <td>1-4</td>
+                    <td>0%</td>
+                    <td>250 RON</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td>5-9</td>
+                    <td>5%</td>
+                    <td>237.50 RON</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td>10-19</td>
+                    <td>10%</td>
+                    <td>225 RON</td>
+                    <td>-</td>
+                </tr>
+                <tr style="background: #dcfce7;">
+                    <td><strong>20-49</strong></td>
+                    <td><strong>15%</strong></td>
+                    <td><strong>212.50 RON</strong></td>
+                    <td><strong>5.312,50 RON</strong></td>
+                </tr>
+                <tr>
+                    <td>50+</td>
+                    <td>20%</td>
+                    <td>200 RON</td>
+                    <td>-</td>
+                </tr>
+            </table>
+            <p><strong>Economie pentru 25 angajati: 937,50 RON</strong> (fata de pret individual)</p>
+
+            <h3>KYC pentru Angajati</h3>
+            <div class="card-grid">
+                <div class="card">
+                    <h4>Optiunea 1: Firma uploadeaza</h4>
+                    <p>Firma uploadeaza CI pentru fiecare angajat. Selfie nu e necesar - firma raspunde legal.</p>
+                </div>
+                <div class="card">
+                    <h4>Optiunea 2: Link individual</h4>
+                    <p>Generam link unic per angajat. Angajatul face KYC: CI + Selfie. Firma vede status.</p>
+                </div>
+            </div>
+
+            <div class="comments">
+                <h4>Note / Comentarii despre PJ Bulk</h4>
+                <textarea placeholder="Discounturile sunt OK? KYC cum preferi?"></textarea>
+            </div>
+        </section>
+
+        <!-- SERVICES -->
+        <section id="services">
+            <h2>Detalii Servicii</h2>
+
+            <h3>Cross-sell Map</h3>
+            <div class="mermaid">
+graph LR
+    CJ[Cazier Judiciar<br>250 RON] <-->|+150 RON| CIC[Cert Integritate<br>250 RON]
+    CN[Cert Nastere<br>1190 RON] -->|+399 RON| MN[Multilingv Nastere<br>799 RON]
+    MN -->|+790 RON| CN
+    CC[Cert Casatorie<br>1190 RON] -->|+399 RON| MC[Multilingv Casatorie<br>799 RON]
+    CEL[Cert Celibat<br>699 RON] -->|+999 RON| CN
+
+    CF[Cazier Fiscal] -.-|LIPSA| X1[???]
+    CA[Cazier Auto] -.-|LIPSA| X2[???]
+            </div>
+
+            <div class="highlight warning">
+                <h4>Oportunitate</h4>
+                <p>Cazier Fiscal si Cazier Auto nu au cross-sell definit. Propuneri?</p>
+                <ul>
+                    <li>Cazier Fiscal + Cazier Judiciar bundle?</li>
+                    <li>Cazier Auto + Cazier Judiciar pentru soferi profesionisti?</li>
+                </ul>
+            </div>
+
+            <h3>Preturi Traduceri</h3>
+            <table>
+                <tr>
+                    <th>Tier</th>
+                    <th>Limbi</th>
+                    <th>Pret</th>
+                </tr>
+                <tr>
+                    <td>Standard</td>
+                    <td>Engleza, Franceza, Germana, Italiana, Maghiara</td>
+                    <td>178.50 RON</td>
+                </tr>
+                <tr>
+                    <td>Mediu</td>
+                    <td>Portugheza, Spaniola, Olandeza, Ucraineana</td>
+                    <td>238 RON</td>
+                </tr>
+                <tr>
+                    <td>Avansat</td>
+                    <td>Rusa, Bulgara, Croata, Ceha, Slovaca</td>
+                    <td>297.50 RON</td>
+                </tr>
+                <tr>
+                    <td>Premium</td>
+                    <td>Suedeza, Greaca, Poloneza</td>
+                    <td>357 RON</td>
+                </tr>
+                <tr>
+                    <td>Specialty</td>
+                    <td>Finlandeza, Daneza, Latina</td>
+                    <td>416.50 RON</td>
+                </tr>
+            </table>
+
+            <div class="comments">
+                <h4>Note / Comentarii despre Servicii</h4>
+                <textarea placeholder="Ce cross-sell ar merge? Preturile sunt OK?"></textarea>
+            </div>
+        </section>
+
+        <!-- FEATURES -->
+        <section id="features">
+            <h2>Features - Prioritizare</h2>
+
+            <h3>P0 - Must Have (MVP)</h3>
+            <div class="card-grid">
+                <div class="card">
+                    <span class="badge badge-p0">P0</span>
+                    <h4>Cart System</h4>
+                    <p>Adauga multiple servicii, checkout unic, pre-fill pentru aceeasi persoana</p>
+                </div>
+                <div class="card">
+                    <span class="badge badge-p0">P0</span>
+                    <h4>OCR Pre-fill</h4>
+                    <p>Upload CI devreme, extrage CNP/nume/adresa, check expirare</p>
+                </div>
+                <div class="card">
+                    <span class="badge badge-p0">P0</span>
+                    <h4>KYC Persistent</h4>
+                    <p>Salvat 180 zile in cont, skip la comenzi noi</p>
+                </div>
+                <div class="card">
+                    <span class="badge badge-p0">P0</span>
+                    <h4>Admin Dashboard</h4>
+                    <p>Comenzi, statusuri, upload documente, notificari</p>
+                </div>
+                <div class="card">
+                    <span class="badge badge-p0">P0</span>
+                    <h4>Contracte Automate</h4>
+                    <p>Generare PDF, numerotare, stocare 10 ani</p>
+                </div>
+                <div class="card">
+                    <span class="badge badge-p0">P0</span>
+                    <h4>Plati Stripe</h4>
+                    <p>Card, 3D Secure, facturare PF/PJ</p>
+                </div>
+            </div>
+
+            <h3>P1 - Important</h3>
+            <div class="card-grid">
+                <div class="card">
+                    <span class="badge badge-p1">P1</span>
+                    <h4>SMS Notificari</h4>
+                    <p>+5 RON optional, status updates</p>
+                </div>
+                <div class="card">
+                    <span class="badge badge-p1">P1</span>
+                    <h4>PJ Bulk</h4>
+                    <p>Excel upload, discount volum, KYC management</p>
+                </div>
+                <div class="card">
+                    <span class="badge badge-p1">P1</span>
+                    <h4>Conturi Utilizatori</h4>
+                    <p>Login, istoric, date salvate</p>
+                </div>
+                <div class="card">
+                    <span class="badge badge-p1">P1</span>
+                    <h4>API Parteneri</h4>
+                    <p>REST API, webhooks, documentatie</p>
+                </div>
+            </div>
+
+            <h3>P2 - Nice to Have</h3>
+            <div class="card-grid">
+                <div class="card">
+                    <span class="badge badge-p2">P2</span>
+                    <h4>Face Matching AI</h4>
+                    <p>Selfie vs poza din CI</p>
+                </div>
+                <div class="card">
+                    <span class="badge badge-p2">P2</span>
+                    <h4>Loyalty Program</h4>
+                    <p>Puncte, referral, discounturi</p>
+                </div>
+            </div>
+
+            <div class="comments">
+                <h4>Note / Comentarii despre Prioritizare</h4>
+                <textarea placeholder="Ai schimba prioritatile?"></textarea>
+            </div>
+        </section>
+
+        <!-- TIMELINE -->
+        <section id="timeline">
+            <h2>Timeline</h2>
+
+            <table>
+                <tr>
+                    <th>Faza</th>
+                    <th>Durata</th>
+                    <th>Deliverables</th>
+                </tr>
+                <tr>
+                    <td><strong>Faza 1: MVP</strong></td>
+                    <td>10-12 sapt</td>
+                    <td>
+                        Auth, Engine servicii (6 pasi), Cart system, OCR + Pre-fill, 3 servicii live,
+                        KYC + KYC persistent, Plati Stripe, Contracte PDF, Admin dashboard, Email notifications
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>Faza 2: Full + PJ</strong></td>
+                    <td>6-8 sapt</td>
+                    <td>
+                        Toate 12 serviciile, Cross-sell complet, SMS notificari, PJ bulk + discount,
+                        Conturi utilizatori, Status public
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>Faza 3: Growth</strong></td>
+                    <td>4-6 sapt</td>
+                    <td>
+                        API parteneri, Loyalty / Referral, Rapoarte avansate, AI improvements
+                    </td>
+                </tr>
+            </table>
+
+            <h3>Echipa Necesara</h3>
+            <table>
+                <tr>
+                    <th>Rol</th>
+                    <th>Nr.</th>
+                    <th>Alocare</th>
+                </tr>
+                <tr>
+                    <td>Full-stack Developer</td>
+                    <td>2</td>
+                    <td>100%</td>
+                </tr>
+                <tr>
+                    <td>Frontend Developer</td>
+                    <td>1</td>
+                    <td>100%</td>
+                </tr>
+                <tr>
+                    <td>Designer UI/UX</td>
+                    <td>1</td>
+                    <td>50%</td>
+                </tr>
+                <tr>
+                    <td>Product Manager</td>
+                    <td>1</td>
+                    <td>50%</td>
+                </tr>
+                <tr>
+                    <td>QA</td>
+                    <td>1</td>
+                    <td>50%</td>
+                </tr>
+            </table>
+
+            <div class="comments">
+                <h4>Note / Comentarii despre Timeline</h4>
+                <textarea placeholder="E realistic? Ce ai schimba?"></textarea>
+            </div>
+        </section>
+
+        <!-- QUESTIONS -->
+        <section id="questions">
+            <h2>Intrebari pentru Discutie</h2>
+
+            <div class="card-grid">
+                <div class="card warning">
+                    <h4>1. Servicii MVP</h4>
+                    <p>Care 3 servicii lansam primul?</p>
+                    <p><em>Propunere: Cazier Judiciar, Cert. Nastere, Extras CF</em></p>
+                </div>
+                <div class="card warning">
+                    <h4>2. KYC Valabilitate</h4>
+                    <p>180 zile e OK sau mai mult/putin?</p>
+                </div>
+                <div class="card warning">
+                    <h4>3. SMS Pret</h4>
+                    <p>5 RON e OK sau ar trebui inclus?</p>
+                </div>
+                <div class="card warning">
+                    <h4>4. PJ KYC</h4>
+                    <p>Firma uploadeaza CI sau angajatii fac individual?</p>
+                </div>
+                <div class="card warning">
+                    <h4>5. Discount Volum</h4>
+                    <p>Pragurile 5/10/15/20% sunt OK?</p>
+                </div>
+                <div class="card warning">
+                    <h4>6. Cross-sell Lipsa</h4>
+                    <p>Ce adaugam pentru Cazier Fiscal/Auto?</p>
+                </div>
+                <div class="card warning">
+                    <h4>7. OCR Provider</h4>
+                    <p>OpenAI Vision, AWS Textract, sau altul?</p>
+                </div>
+                <div class="card warning">
+                    <h4>8. Conturi - P0 sau P1?</h4>
+                    <p>Conturile utilizatori trebuie in MVP?</p>
+                </div>
+            </div>
+
+            <div class="comments">
+                <h4>Raspunsuri si Decizii</h4>
+                <textarea placeholder="Noteaza deciziile luate in sedinta..." style="min-height: 200px;"></textarea>
+            </div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer style="text-align: center; padding: 40px; color: var(--text-light);">
+            <p>eGhiseul.ro PRD v2.0 | Decembrie 2024</p>
+            <p>Diagrame Mermaid disponibile in: <code>/docs/analysis/diagrams/</code></p>
+        </footer>
+    </div>
+
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            flowchart: {
+                curve: 'basis'
+            }
+        });
+    </script>
+</body>
+</html>

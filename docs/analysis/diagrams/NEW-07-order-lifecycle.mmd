@@ -1,0 +1,83 @@
+stateDiagram-v2
+    [*] --> CartAdded: Serviciu adaugat in cos
+
+    CartAdded --> CheckoutStarted: Incepe checkout
+    CartAdded --> CartAbandoned: Paraseste site
+
+    CartAbandoned --> CartAdded: Email reminder 24h
+
+    CheckoutStarted --> ContractSigned: Semneaza contract
+    ContractSigned --> PaymentPending: Asteapta plata
+
+    PaymentPending --> PaymentFailed: Plata esuata
+    PaymentPending --> Paid: Plata reusita
+
+    PaymentFailed --> PaymentPending: Retry plata
+    PaymentFailed --> Abandoned: 3 incercari esuate
+
+    Paid --> Processing: Admin preia comanda
+
+    Processing --> DocumentRequested: Solicitat la institutie
+    Processing --> NeedsInfo: Lipsa informatii
+
+    NeedsInfo --> Processing: Client completeaza
+
+    DocumentRequested --> DocumentReceived: Primit de la institutie
+
+    DocumentReceived --> InTranslation: Necesita traducere
+    DocumentReceived --> ReadyForApostille: Necesita apostila
+    DocumentReceived --> QualityCheck: Fara traducere/apostila
+
+    InTranslation --> TranslationDone: Traducere finalizata
+    TranslationDone --> TranslationLegalized: Legalizare
+    TranslationDone --> ReadyForApostille: Direct apostila
+    TranslationDone --> QualityCheck: Fara apostila
+
+    TranslationLegalized --> TranslationApostilled: Apostila traducere
+    TranslationLegalized --> ReadyForApostille: Doar apostila document
+
+    ReadyForApostille --> Apostilled: Apostilat
+
+    Apostilled --> QualityCheck: Verificare finala
+    TranslationApostilled --> QualityCheck: Verificare finala
+
+    QualityCheck --> ReadyForDelivery: OK
+    QualityCheck --> Processing: Problema - refacere
+
+    ReadyForDelivery --> SentElectronic: Email trimis
+    ReadyForDelivery --> SentPhysical: Colet expediat
+
+    SentElectronic --> Completed: Client confirma primire
+    SentPhysical --> InTransit: La curier
+
+    InTransit --> Delivered: Livrat
+    Delivered --> Completed: Confirmat
+
+    Completed --> [*]
+
+    note right of Paid
+        SMS: Comanda confirmata
+        Email: Contract + Factura
+    end note
+
+    note right of Processing
+        SMS: In procesare
+        ETA: 3-5 zile
+    end note
+
+    note right of DocumentReceived
+        SMS: Document obtinut
+    end note
+
+    note right of ReadyForDelivery
+        SMS: Gata de expediere
+    end note
+
+    note right of SentPhysical
+        SMS: AWB tracking
+    end note
+
+    note right of Completed
+        SMS: Finalizat!
+        Email: Feedback request
+    end note

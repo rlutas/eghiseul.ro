@@ -1,0 +1,24 @@
+stateDiagram-v2
+    [*] --> Draft: Formular inceput
+    Draft --> Pending: Formular completat
+    Pending --> PaymentFailed: Plata esuata
+    PaymentFailed --> Pending: Reincearca
+    Pending --> Paid: Plata reusita
+    Paid --> Processing: Admin preia
+    Processing --> DocumentReady: Document obtinut
+    DocumentReady --> InTranslation: Necesita traducere
+    InTranslation --> ReadyForApostille: Tradus
+    DocumentReady --> ReadyForApostille: Nu necesita traducere
+    ReadyForApostille --> Apostilled: Apostilat
+    Apostilled --> ReadyForDelivery: Gata de expediere
+    DocumentReady --> ReadyForDelivery: Fara traducere/apostila
+    ReadyForDelivery --> Shipped: Expediat
+    Shipped --> Delivered: Livrat
+    ReadyForDelivery --> Completed: Doar electronic
+    Delivered --> Completed: Confirmat
+    Completed --> [*]
+
+    Processing --> Rejected: Problema documente
+    Rejected --> Processing: Client retrimite
+    Rejected --> Refunded: Rambursare
+    Refunded --> [*]

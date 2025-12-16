@@ -1,0 +1,96 @@
+flowchart TB
+    subgraph Cart["COS CUMPARATURI"]
+        CartHeader[Cosul tau - 3 servicii]
+
+        subgraph Item1["SERVICIU 1"]
+            I1A[Cazier Judiciar - Ion Popescu]
+            I1B[Urgenta: Da]
+            I1C[Traducere: Engleza]
+            I1D[Apostila: Germania]
+            I1E[Subtotal: 766.50 RON]
+            I1F[Sterge | Modifica]
+        end
+
+        subgraph Item2["SERVICIU 2"]
+            I2A[Cert. Integritate - Ion Popescu]
+            I2B[Cross-sell de la Cazier]
+            I2C[Subtotal: 150 RON]
+            I2D[Sterge]
+        end
+
+        subgraph Item3["SERVICIU 3"]
+            I3A[Cazier Judiciar - Maria Popescu]
+            I3B[Alta persoana din aceeasi comanda]
+            I3C[Standard, fara traducere]
+            I3D[Subtotal: 250 RON]
+            I3E[Sterge | Modifica]
+        end
+
+        CartTotal[SUBTOTAL: 1.166,50 RON]
+
+        CartActions{Ce faci?}
+        CartActions -->|Adauga serviciu| AddService
+        CartActions -->|Checkout| Checkout
+    end
+
+    subgraph AddService["ADAUGA SERVICIU NOU"]
+        AS1[Selecteaza serviciu]
+        AS2{Pentru cine?}
+        AS2 -->|Ion Popescu| AS3[Date pre-completate]
+        AS2 -->|Maria Popescu| AS4[Date pre-completate]
+        AS2 -->|Persoana noua| AS5[Introduce date noi]
+        AS3 --> AS6[Doar optiuni specifice]
+        AS4 --> AS6
+        AS5 --> AS7[Flow complet]
+    end
+
+    AddService --> Cart
+
+    subgraph Checkout["CHECKOUT"]
+        CH1[Rezumat final]
+
+        subgraph Delivery["LIVRARE"]
+            D1{Livrare documente}
+            D1 -->|Toate electronic| D2[Email separat per document]
+            D1 -->|Toate fizic| D3[Un singur colet]
+            D1 -->|Mixt| D4[Unele email, unele fizic]
+        end
+
+        subgraph Extras["OPTIUNI EXTRA"]
+            E1{SMS notificari?}
+            E1 -->|Da| E2[+5 RON per serviciu = +15 RON]
+            E1 -->|Nu| E3[Doar email gratuit]
+        end
+
+        subgraph Contract["CONTRACT"]
+            C1[Vizualizeaza contract]
+            C2[Contract include toate serviciile]
+            C3[Semnatura electronica]
+            C4[Accept T and C]
+        end
+
+        subgraph Billing["FACTURARE"]
+            B1{Tip factura}
+            B1 -->|PF| B2[O factura - Ion Popescu]
+            B1 -->|PJ| B3[O factura - pe firma]
+            B4[Cupon reducere?]
+        end
+
+        subgraph Payment["PLATA"]
+            P1[TOTAL: 1.191,50 RON]
+            P2[Livrare: +25 RON]
+            P3[SMS: +15 RON]
+            P4[GRAND TOTAL: 1.231,50 RON]
+            P5[Plata card Stripe]
+        end
+    end
+
+    Checkout --> Success([CONFIRMARE])
+
+    subgraph Success["SUCCES"]
+        S1[Email confirmare]
+        S2[Contract PDF semnat]
+        S3[Factura PDF]
+        S4[Link tracking comenzi]
+        S5[ETA per serviciu]
+    end
