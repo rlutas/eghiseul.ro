@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server';
+import { createPublicClient } from '@/lib/supabase/public';
 import { ServiceCard } from '@/components/services/service-card';
 import { ServiceCardSkeleton } from '@/components/services/service-card-skeleton';
 import { Button } from '@/components/ui/button';
@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { Service } from '@/types/services';
 
 async function getFeaturedServices(): Promise<Service[]> {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
 
   const { data, error } = await supabase
     .from('services')

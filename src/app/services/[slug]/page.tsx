@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { createClient } from '@/lib/supabase/server';
+import { createPublicClient } from '@/lib/supabase/public';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -39,7 +39,7 @@ export const dynamicParams = true;
 
 // Fetch service data
 async function getService(slug: string): Promise<{ service: Service; options: ServiceOption[] } | null> {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
 
   // Get service
   const { data: service, error: serviceError } = await supabase
