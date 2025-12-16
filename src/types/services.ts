@@ -37,13 +37,14 @@ export interface ServiceOption {
   id: string;
   service_id: string;
   name: string;
-  code: string;
   description: string | null;
   option_type: 'addon' | 'select' | 'input' | 'checkbox';
   price_modifier: number;
   is_required: boolean;
-  choices: OptionChoice[] | null;
+  is_active: boolean;
+  choices: unknown | null;
   display_order: number;
+  created_at: string;
 }
 
 // Option Choice
