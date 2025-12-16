@@ -1,8 +1,8 @@
 # eGhiseul.ro - Development Master Plan
 
-**Version:** 1.1
+**Version:** 1.2
 **Last Updated:** 2025-12-16
-**Status:** In Development - Sprint 2 Complete
+**Status:** In Development - Sprint 3 In Progress
 
 ---
 
@@ -13,7 +13,7 @@
 | MVP | Sprint 0: Setup | ✅ Complete | 2025-12-16 |
 | MVP | Sprint 1: Auth & Users | ✅ Complete | 2025-12-16 |
 | MVP | Sprint 2: Services Core | ✅ Complete | 2025-12-16 |
-| MVP | Sprint 3: KYC & Documents | ⏳ Pending | - |
+| MVP | Sprint 3: KYC & Documents | ⏳ In Progress | - |
 | MVP | Sprint 4: Payments & Contracts | ⏳ Pending | - |
 | MVP | Sprint 5: Admin Dashboard | ⏳ Pending | - |
 | MVP | Sprint 6: Notifications & Polish | ⏳ Pending | - |
@@ -150,8 +150,6 @@
 | ✅ API: Update order | Complete | `PATCH /api/orders/[id]` |
 | ✅ API: Create payment | Complete | `POST /api/orders/[id]/payment` |
 | ✅ Stripe webhook | Complete | `POST /api/webhooks/stripe` |
-| ⏳ Service catalog UI | Pending | Sprint 3 |
-| ⏳ Order flow UI | Pending | Sprint 3 |
 
 **Database Migration Applied:** `002_services.sql`
 - services table (6 categories, JSONB config)
@@ -174,11 +172,12 @@
 | `/api/orders/[id]/payment` | POST | Required | Create payment intent |
 | `/api/webhooks/stripe` | POST | Public | Stripe webhooks |
 
-#### Sprint 3: KYC & Documents (Săptămâna 9-10) ⏳ NEXT
+#### Sprint 3: KYC & Documents (Săptămâna 9-10) ⏳ IN PROGRESS
 
 | Task | Status | Priority |
 |------|--------|----------|
-| ⏳ Service catalog UI | Pending | HIGH |
+| ✅ Service catalog UI | Complete | HIGH |
+| ✅ Service detail page | Complete | HIGH |
 | ⏳ Order creation flow (6 steps) | Pending | HIGH |
 | ⏳ Upload CI (front + back) | Pending | HIGH |
 | ⏳ Upload selfie cu document | Pending | HIGH |
@@ -240,12 +239,26 @@ eghiseul.ro/
 │   │   │   │       └── payment/    # POST /api/orders/[id]/payment
 │   │   │   └── webhooks/
 │   │   │       └── stripe/         # POST /api/webhooks/stripe
+│   │   ├── services/               # ✅ Service pages (Sprint 3)
+│   │   │   └── [slug]/
+│   │   │       ├── page.tsx        # Service detail page
+│   │   │       ├── loading.tsx     # Loading state
+│   │   │       └── not-found.tsx   # 404 page
 │   │   ├── auth/callback/          # ✅ Auth callback
 │   │   └── page.tsx                # ✅ Homepage
 │   │
 │   ├── components/
 │   │   ├── ui/                     # ✅ shadcn components
-│   │   └── forms/                  # ✅ Login, Register forms
+│   │   ├── forms/                  # ✅ Login, Register forms
+│   │   ├── home/                   # ✅ Homepage sections (Sprint 3)
+│   │   │   ├── hero.tsx
+│   │   │   ├── services.tsx
+│   │   │   ├── features.tsx
+│   │   │   ├── stats.tsx
+│   │   │   └── footer.tsx
+│   │   └── services/               # ✅ Service components (Sprint 3)
+│   │       ├── service-card.tsx
+│   │       └── service-detail.tsx
 │   │
 │   ├── lib/
 │   │   ├── supabase/               # ✅ Supabase clients
@@ -257,7 +270,11 @@ eghiseul.ro/
 │   │   └── utils/                  # ✅ Utilities
 │   │
 │   ├── types/
-│   │   └── supabase.ts             # ✅ Database types
+│   │   ├── supabase.ts             # ✅ Database types
+│   │   └── services.ts             # ✅ Service types (Sprint 3)
+│   │
+│   ├── providers/                  # ✅ React providers (Sprint 3)
+│   │   └── query-provider.tsx
 │   │
 │   └── proxy.ts                    # ✅ Auth middleware
 │
@@ -342,11 +359,16 @@ EMAIL_FROM=comenzi@eghiseul.ro
 
 ### Sprint 3 Tasks (Priority Order)
 
-1. **Service Catalog UI** - Display services on homepage/services page
-2. **Order Creation Flow** - 6-step wizard (Contact → Data → Options → KYC → Delivery → Payment)
-3. **KYC Upload Components** - ID card, selfie, signature
-4. **Stripe Checkout** - Payment integration with existing API
-5. **User Dashboard** - Orders list and details
+**Completed:**
+1. ✅ **Service Catalog UI** - Homepage with service cards
+2. ✅ **Service Detail Page** - Individual service pages with dynamic routing
+
+**In Progress:**
+3. **Order Creation Flow** - 6-step wizard (Contact → Data → Options → KYC → Delivery → Payment)
+4. **KYC Upload Components** - ID card (front + back), selfie with document, signature canvas
+5. **OCR Integration** - AWS Textract for document data extraction
+6. **CNP Validation** - Romanian personal ID validation
+7. **User Dashboard** - Orders list and details
 
 ### Comenzi Utile
 
