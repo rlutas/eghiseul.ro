@@ -1,0 +1,334 @@
+/**
+ * eGhiseul.ro Color System Implementation
+ * Romanian Government Services Platform
+ *
+ * Based on: docs/design/color-system-analysis.md
+ * WCAG 2.1 AA Compliant
+ * Romanian Flag-Inspired Identity
+ */
+
+/* ============================================
+   LIGHT MODE (Default)
+   ============================================ */
+
+:root {
+  /* ===== RADIUS ===== */
+  --radius: 0.625rem; /* 10px - modern but professional */
+
+  /* ===== BRAND COLORS ===== */
+  /* Primary Blue - Romanian Government Blue */
+  --color-primary: oklch(0.35 0.18 264);            /* #003380 */
+  --color-primary-foreground: oklch(1 0 0);         /* White */
+
+  /* Primary Blue Scale */
+  --color-blue-50: oklch(0.97 0.02 264);            /* #E6F0FF */
+  --color-blue-100: oklch(0.93 0.05 264);           /* #CCE1FF */
+  --color-blue-200: oklch(0.85 0.08 264);           /* #99C3FF */
+  --color-blue-300: oklch(0.75 0.12 264);           /* #66A5FF */
+  --color-blue-400: oklch(0.65 0.15 264);           /* #3387FF */
+  --color-blue-500: oklch(0.58 0.18 264);           /* #0066FF */
+  --color-blue-600: oklch(0.50 0.17 264);           /* #0052CC */
+  --color-blue-700: oklch(0.42 0.18 264);           /* #003D99 */
+  --color-blue-800: oklch(0.35 0.18 264);           /* #003380 - PRIMARY */
+  --color-blue-900: oklch(0.30 0.18 264);           /* #002B7F - Flag Blue */
+
+  /* ===== SEMANTIC COLORS ===== */
+
+  /* Success - Legal/Verified/Approved */
+  --color-success: oklch(0.48 0.15 152);            /* #0F7A3E */
+  --color-success-foreground: oklch(1 0 0);         /* White */
+  --color-success-bg: oklch(0.95 0.05 152);         /* #E8F5E9 */
+
+  /* Success Green Scale */
+  --color-green-50: oklch(0.95 0.05 152);           /* #E8F5E9 */
+  --color-green-500: oklch(0.58 0.18 152);          /* #16A34A */
+  --color-green-600: oklch(0.48 0.15 152);          /* #0F7A3E */
+  --color-green-700: oklch(0.38 0.12 152);          /* #0A5A2E */
+
+  /* Warning - Important Notices */
+  --color-warning: oklch(0.80 0.15 87);             /* #F5B800 */
+  --color-warning-foreground: oklch(0.15 0 0);      /* Dark gray */
+  --color-warning-bg: oklch(0.98 0.03 87);          /* #FFFBEB */
+
+  /* Warning Yellow Scale */
+  --color-yellow-50: oklch(0.98 0.03 87);           /* #FFFBEB */
+  --color-yellow-500: oklch(0.80 0.15 87);          /* #F5B800 - Romanian Gold */
+  --color-yellow-600: oklch(0.72 0.14 87);          /* #D99F00 */
+
+  /* Error - Destructive Actions */
+  --color-error: oklch(0.52 0.22 29);               /* #B91C1C */
+  --color-error-foreground: oklch(1 0 0);           /* White */
+  --color-error-bg: oklch(0.97 0.05 29);            /* #FEF2F2 */
+
+  /* Error Red Scale */
+  --color-red-50: oklch(0.97 0.05 29);              /* #FEF2F2 */
+  --color-red-500: oklch(0.62 0.25 29);             /* #EF4444 */
+  --color-red-600: oklch(0.58 0.24 29);             /* #DC2626 */
+  --color-red-700: oklch(0.52 0.22 29);             /* #B91C1C */
+
+  /* Info - Informational */
+  --color-info: oklch(0.55 0.18 264);               /* Blue variant */
+  --color-info-foreground: oklch(1 0 0);            /* White */
+  --color-info-bg: oklch(0.95 0.05 264);            /* Light blue */
+
+  /* ===== BACKGROUNDS ===== */
+  --color-background: oklch(1 0 0);                 /* #FFFFFF - White */
+  --color-surface: oklch(0.99 0 0);                 /* #F9FAFB - Gray-50 */
+  --color-surface-secondary: oklch(0.97 0 0);       /* #F3F4F6 - Gray-100 */
+
+  /* ===== TEXT/FOREGROUND ===== */
+  --color-foreground: oklch(0.15 0 0);              /* #111827 - Gray-900 */
+  --color-foreground-muted: oklch(0.52 0 0);        /* #6B7280 - Gray-500 */
+  --color-foreground-subtle: oklch(0.68 0 0);       /* #9CA3AF - Gray-400 */
+
+  /* ===== NEUTRAL GRAY SCALE ===== */
+  --color-white: oklch(1 0 0);                      /* #FFFFFF */
+  --color-gray-50: oklch(0.99 0 0);                 /* #F9FAFB */
+  --color-gray-100: oklch(0.97 0 0);                /* #F3F4F6 */
+  --color-gray-200: oklch(0.93 0 0);                /* #E5E7EB */
+  --color-gray-300: oklch(0.86 0 0);                /* #D1D5DB */
+  --color-gray-400: oklch(0.68 0 0);                /* #9CA3AF */
+  --color-gray-500: oklch(0.52 0 0);                /* #6B7280 */
+  --color-gray-600: oklch(0.40 0 0);                /* #4B5563 */
+  --color-gray-700: oklch(0.31 0 0);                /* #374151 */
+  --color-gray-800: oklch(0.22 0 0);                /* #1F2937 */
+  --color-gray-900: oklch(0.15 0 0);                /* #111827 */
+  --color-black: oklch(0 0 0);                      /* #000000 */
+
+  /* ===== INTERACTIVE ELEMENTS ===== */
+  --color-border: oklch(0.93 0 0);                  /* #E5E7EB - Gray-200 */
+  --color-border-hover: oklch(0.86 0 0);            /* #D1D5DB - Gray-300 */
+  --color-input: oklch(0.93 0 0);                   /* #E5E7EB - Input borders */
+  --color-ring: oklch(0.35 0.18 264);               /* #003380 - Focus ring (primary) */
+
+  /* ===== ACCENTS ===== */
+  --color-accent: oklch(0.80 0.15 87);              /* #F5B800 - Romanian Gold */
+  --color-accent-foreground: oklch(0.15 0 0);       /* Dark text on gold */
+
+  /* ===== CARDS & POPOVERS ===== */
+  --color-card: oklch(1 0 0);                       /* White */
+  --color-card-foreground: oklch(0.15 0 0);         /* Gray-900 */
+  --color-card-border: oklch(0.93 0 0);             /* Gray-200 */
+
+  --color-popover: oklch(1 0 0);                    /* White */
+  --color-popover-foreground: oklch(0.15 0 0);      /* Gray-900 */
+
+  /* ===== SECONDARY COLORS ===== */
+  --color-secondary: oklch(0.97 0 0);               /* Gray-100 */
+  --color-secondary-foreground: oklch(0.15 0 0);    /* Gray-900 */
+
+  /* ===== MUTED ELEMENTS ===== */
+  --color-muted: oklch(0.97 0 0);                   /* Gray-100 */
+  --color-muted-foreground: oklch(0.52 0 0);        /* Gray-500 */
+
+  /* ===== DESTRUCTIVE ===== */
+  --color-destructive: oklch(0.52 0.22 29);         /* #B91C1C */
+  --color-destructive-foreground: oklch(1 0 0);     /* White */
+
+  /* ===== CHARTS (for dashboards) ===== */
+  --color-chart-1: oklch(0.646 0.222 41.116);       /* Orange */
+  --color-chart-2: oklch(0.6 0.118 184.704);        /* Cyan */
+  --color-chart-3: oklch(0.398 0.07 227.392);       /* Blue */
+  --color-chart-4: oklch(0.828 0.189 84.429);       /* Yellow */
+  --color-chart-5: oklch(0.769 0.188 70.08);        /* Amber */
+
+  /* ===== SIDEBAR (admin areas) ===== */
+  --color-sidebar: oklch(0.985 0 0);                /* Very light gray */
+  --color-sidebar-foreground: oklch(0.15 0 0);      /* Gray-900 */
+  --color-sidebar-primary: oklch(0.35 0.18 264);    /* Primary blue */
+  --color-sidebar-primary-foreground: oklch(1 0 0); /* White */
+  --color-sidebar-accent: oklch(0.97 0 0);          /* Gray-100 */
+  --color-sidebar-accent-foreground: oklch(0.15 0 0); /* Gray-900 */
+  --color-sidebar-border: oklch(0.93 0 0);          /* Gray-200 */
+  --color-sidebar-ring: oklch(0.68 0 0);            /* Gray-400 */
+}
+
+/* ============================================
+   DARK MODE
+   ============================================ */
+
+.dark {
+  /* ===== BRAND COLORS (adjusted for dark) ===== */
+  --color-primary: oklch(0.60 0.20 264);            /* Lighter blue for dark */
+  --color-primary-foreground: oklch(0.15 0 0);      /* Dark text */
+
+  /* ===== SEMANTIC COLORS (adjusted) ===== */
+  --color-success: oklch(0.60 0.18 152);            /* Lighter green */
+  --color-success-foreground: oklch(0.15 0 0);
+  --color-success-bg: oklch(0.25 0.08 152);
+
+  --color-warning: oklch(0.85 0.18 87);             /* Lighter gold */
+  --color-warning-foreground: oklch(0.15 0 0);
+  --color-warning-bg: oklch(0.25 0.08 87);
+
+  --color-error: oklch(0.65 0.25 29);               /* Lighter red */
+  --color-error-foreground: oklch(1 0 0);
+  --color-error-bg: oklch(0.25 0.08 29);
+
+  --color-info: oklch(0.65 0.20 264);               /* Lighter blue */
+  --color-info-foreground: oklch(0.15 0 0);
+  --color-info-bg: oklch(0.25 0.08 264);
+
+  /* ===== BACKGROUNDS ===== */
+  --color-background: oklch(0.15 0 0);              /* #111827 - Gray-900 */
+  --color-surface: oklch(0.20 0 0);                 /* Between 900-800 */
+  --color-surface-secondary: oklch(0.25 0 0);       /* Lighter surface */
+
+  /* ===== TEXT/FOREGROUND ===== */
+  --color-foreground: oklch(0.97 0 0);              /* #F3F4F6 - Almost white */
+  --color-foreground-muted: oklch(0.68 0 0);        /* Gray-400 */
+  --color-foreground-subtle: oklch(0.52 0 0);       /* Gray-500 */
+
+  /* ===== INTERACTIVE ELEMENTS ===== */
+  --color-border: oklch(0.31 0 0);                  /* Gray-700 */
+  --color-border-hover: oklch(0.40 0 0);            /* Gray-600 */
+  --color-input: oklch(0.25 0 0);                   /* Slightly lighter than surface */
+  --color-ring: oklch(0.60 0.20 264);               /* Lighter blue for focus */
+
+  /* ===== ACCENTS ===== */
+  --color-accent: oklch(0.85 0.18 87);              /* Lighter gold for dark */
+  --color-accent-foreground: oklch(0.15 0 0);
+
+  /* ===== CARDS & POPOVERS ===== */
+  --color-card: oklch(0.20 0 0);                    /* Dark surface */
+  --color-card-foreground: oklch(0.97 0 0);         /* Light text */
+  --color-card-border: oklch(0.31 0 0);             /* Gray-700 */
+
+  --color-popover: oklch(0.20 0 0);                 /* Dark surface */
+  --color-popover-foreground: oklch(0.97 0 0);      /* Light text */
+
+  /* ===== SECONDARY COLORS ===== */
+  --color-secondary: oklch(0.25 0 0);               /* Dark gray */
+  --color-secondary-foreground: oklch(0.97 0 0);    /* Light text */
+
+  /* ===== MUTED ELEMENTS ===== */
+  --color-muted: oklch(0.25 0 0);                   /* Dark gray */
+  --color-muted-foreground: oklch(0.68 0 0);        /* Muted light text */
+
+  /* ===== DESTRUCTIVE ===== */
+  --color-destructive: oklch(0.65 0.25 29);         /* Lighter red for dark */
+  --color-destructive-foreground: oklch(1 0 0);
+
+  /* ===== CHARTS (adjusted for dark) ===== */
+  --color-chart-1: oklch(0.488 0.243 264.376);      /* Purple */
+  --color-chart-2: oklch(0.696 0.17 162.48);        /* Cyan */
+  --color-chart-3: oklch(0.769 0.188 70.08);        /* Amber */
+  --color-chart-4: oklch(0.627 0.265 303.9);        /* Magenta */
+  --color-chart-5: oklch(0.645 0.246 16.439);       /* Orange */
+
+  /* ===== SIDEBAR (dark mode) ===== */
+  --color-sidebar: oklch(0.20 0 0);                 /* Dark surface */
+  --color-sidebar-foreground: oklch(0.97 0 0);      /* Light text */
+  --color-sidebar-primary: oklch(0.488 0.243 264.376); /* Lighter blue */
+  --color-sidebar-primary-foreground: oklch(0.97 0 0);
+  --color-sidebar-accent: oklch(0.25 0 0);          /* Slightly lighter */
+  --color-sidebar-accent-foreground: oklch(0.97 0 0);
+  --color-sidebar-border: oklch(0.31 0 0);          /* Gray-700 */
+  --color-sidebar-ring: oklch(0.52 0 0);            /* Gray-500 */
+}
+
+/* ============================================
+   THEME INTEGRATION (@theme inline)
+   For Tailwind v4 compatibility
+   ============================================ */
+
+@theme inline {
+  /* Map custom properties to Tailwind theme */
+  --color-background: var(--color-background);
+  --color-foreground: var(--color-foreground);
+  --color-primary: var(--color-primary);
+  --color-primary-foreground: var(--color-primary-foreground);
+  --color-secondary: var(--color-secondary);
+  --color-secondary-foreground: var(--color-secondary-foreground);
+  --color-muted: var(--color-muted);
+  --color-muted-foreground: var(--color-muted-foreground);
+  --color-accent: var(--color-accent);
+  --color-accent-foreground: var(--color-accent-foreground);
+  --color-destructive: var(--color-destructive);
+  --color-destructive-foreground: var(--color-destructive-foreground);
+  --color-border: var(--color-border);
+  --color-input: var(--color-input);
+  --color-ring: var(--color-ring);
+  --color-card: var(--color-card);
+  --color-card-foreground: var(--color-card-foreground);
+  --color-popover: var(--color-popover);
+  --color-popover-foreground: var(--color-popover-foreground);
+
+  /* Semantic colors */
+  --color-success: var(--color-success);
+  --color-warning: var(--color-warning);
+  --color-error: var(--color-error);
+  --color-info: var(--color-info);
+
+  /* Chart colors */
+  --color-chart-1: var(--color-chart-1);
+  --color-chart-2: var(--color-chart-2);
+  --color-chart-3: var(--color-chart-3);
+  --color-chart-4: var(--color-chart-4);
+  --color-chart-5: var(--color-chart-5);
+
+  /* Sidebar colors */
+  --color-sidebar: var(--color-sidebar);
+  --color-sidebar-foreground: var(--color-sidebar-foreground);
+  --color-sidebar-primary: var(--color-sidebar-primary);
+  --color-sidebar-primary-foreground: var(--color-sidebar-primary-foreground);
+  --color-sidebar-accent: var(--color-sidebar-accent);
+  --color-sidebar-accent-foreground: var(--color-sidebar-accent-foreground);
+  --color-sidebar-border: var(--color-sidebar-border);
+  --color-sidebar-ring: var(--color-sidebar-ring);
+
+  /* Radius tokens */
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+}
+
+/* ============================================
+   BASE STYLES
+   ============================================ */
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+/* ============================================
+   USAGE EXAMPLES (comment out in production)
+   ============================================ */
+
+/*
+Example 1: Primary Button
+<button class="bg-[--color-primary] text-[--color-primary-foreground]">
+  Vezi Servicii
+</button>
+
+Example 2: Success Badge
+<span class="bg-[--color-success] text-[--color-success-foreground]">
+  100% Legal
+</span>
+
+Example 3: Romanian Flag Gradient Hero
+<section class="bg-gradient-to-br from-[--color-blue-50] via-white to-[--color-yellow-50]">
+  Hero content
+</section>
+
+Example 4: Trust Icon with Semantic Colors
+<Lock class="text-[--color-primary]" />
+<Shield class="text-[--color-success]" />
+<Zap class="text-[--color-warning]" />
+
+Example 5: Card with Romanian Accent
+<div class="border-l-4 border-[--color-accent] bg-[--color-card]">
+  Featured content
+</div>
+*/
