@@ -150,9 +150,12 @@ const adminPaths = ['/admin']
 | 2025-12-16 | .env.local configurat | ✅ |
 | 2025-12-16 | Supabase clients create | ✅ |
 | 2025-12-16 | Middleware setup | ✅ |
-| 2025-12-16 | DB migration profiles | 🔄 |
-| - | Auth pages | ⏳ |
-| - | Testing | ⏳ |
+| 2025-12-16 | DB migration profiles | ✅ |
+| 2025-12-16 | Auth pages (login, register, forgot) | ✅ |
+| 2025-12-16 | Account page | ✅ |
+| 2025-12-16 | Build test passed | ✅ |
+| - | Run SQL migration in Supabase | ⏳ |
+| - | End-to-end testing | ⏳ |
 
 ---
 
