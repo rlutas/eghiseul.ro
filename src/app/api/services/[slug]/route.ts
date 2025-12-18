@@ -61,12 +61,13 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       metaDescription: service.meta_description,
       options: options?.map(opt => ({
         id: opt.id,
+        code: opt.code,
         name: opt.name,
         description: opt.description,
-        type: opt.option_type,
-        priceModifier: parseFloat(String(opt.price_modifier)),
+        type: opt.price_type,
+        price: parseFloat(String(opt.price)),
         isRequired: opt.is_required,
-        choices: opt.choices,
+        config: opt.config,
         displayOrder: opt.display_order
       })) || [],
       createdAt: service.created_at,

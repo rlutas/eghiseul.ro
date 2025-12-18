@@ -8,377 +8,301 @@
 ## TL;DR - Quick Colors
 
 ```tsx
-// Primary Actions (CTAs, Main Buttons)
-className="bg-[#003380] text-white hover:bg-[#003D99]"
+// Primary Actions (CTAs, Main Buttons) - Gold
+className="bg-primary-500 hover:bg-primary-600 text-secondary-900"
 
-// Success/Legal Badges
-className="bg-[#0F7A3E] text-white"
+// Secondary/Nav (Headers, Text) - Navy
+className="bg-secondary-900 text-white"
 
-// Romanian Gold Accent (use sparingly)
-className="border-l-4 border-[#F5B800]"
+// Success/Legal Badges - Green
+className="bg-success-500 text-white"
 
 // Error/Destructive
-className="bg-[#B91C1C] text-white"
+className="bg-red-600 text-white"
 
 // Text Colors
-className="text-gray-900"              // Primary text
-className="text-gray-600"              // Secondary text
-className="text-gray-400"              // Subtle text
+className="text-secondary-900"        // Primary text (Navy)
+className="text-neutral-600"          // Secondary text
+className="text-neutral-500"          // Subtle text
 ```
 
 ---
 
-## Color Tokens (CSS Variables)
+## Brand Color Tokens (HEX Values)
 
-### Primary Colors
+### Primary Colors - Gold (#ECB95F)
 ```css
---color-primary: #003380            /* Romanian Blue */
---color-success: #0F7A3E            /* Legal Green */
---color-warning: #F5B800            /* Romanian Gold */
---color-error: #B91C1C              /* Alert Red */
+--primary-50: #FDF8E8;
+--primary-100: #FBF0CC;
+--primary-200: #F7E199;
+--primary-300: #F3D266;
+--primary-400: #EFC43D;
+--primary-500: #ECB95F;   /* Base Gold */
+--primary-600: #D4A24A;
+--primary-700: #B8893C;
+--primary-800: #9A702F;
+--primary-900: #7C5A26;
+--primary-950: #5E4319;
 ```
 
-### Usage in Components
-```tsx
-// Use CSS variables for theme support
-<button className="bg-primary text-primary-foreground">
-  Click Me
-</button>
+### Secondary Colors - Navy (#06101F)
+```css
+--secondary-50: #E8EDF5;
+--secondary-100: #D1DBE9;
+--secondary-200: #A3B7D4;
+--secondary-300: #7593BE;
+--secondary-400: #4A6FA6;
+--secondary-500: #2A4B7A;
+--secondary-600: #1E3A5F;
+--secondary-700: #142947;
+--secondary-800: #0C1A2F;
+--secondary-900: #06101F;   /* Base Navy */
+--secondary-950: #030810;
+```
 
-// Or direct hex for specific control
-<button className="bg-[#003380] text-white">
-  Click Me
-</button>
+### Neutral Colors - Grays
+```css
+--neutral-50: #F9FAFB;
+--neutral-100: #F3F4F6;
+--neutral-200: #E5E7EB;
+--neutral-300: #D1D5DB;
+--neutral-400: #9CA3AF;
+--neutral-500: #6B7280;
+--neutral-600: #4B5563;
+--neutral-700: #374151;
+--neutral-800: #1F2937;
+--neutral-900: #111827;
 ```
 
 ---
 
-## Common Patterns
+## Usage in Components
 
-### 1. Hero Section with Romanian Identity
+### 1. Primary CTA Button (Gold)
 ```tsx
-<section className="bg-gradient-to-br from-blue-50 via-white to-yellow-50">
-  <h1 className="text-gray-900">
-    Obtine Acte Oficiale{' '}
-    <span className="text-[#003380]">Rapid si Legal</span>
-  </h1>
-</section>
-```
-
-**Result:** Subtle Romanian flag gradient (blue → white → yellow)
-
-### 2. Primary CTA Button
-```tsx
-<Button className="bg-[#003380] hover:bg-[#003D99] text-white px-8 py-6">
-  Vezi Toate Serviciile
+<Button className="bg-primary-500 hover:bg-primary-600 text-secondary-900 font-bold px-6 py-3 rounded-xl shadow-[0_4px_12px_rgba(236,185,95,0.25)]">
+  Comandă Acum
   <ArrowRight className="ml-2" />
 </Button>
 ```
 
-**Contrast:** 10.58:1 (AAA compliant)
-
-### 3. Trust Badges with Semantic Colors
+### 2. Secondary Button (Navy)
 ```tsx
-<div className="flex gap-6">
-  {/* Security - Blue */}
-  <div className="flex items-center gap-2">
-    <Lock className="h-5 w-5 text-[#003380]" />
-    <span className="text-gray-600">Date Securizate</span>
-  </div>
-
-  {/* Legal - Green */}
-  <div className="flex items-center gap-2">
-    <Shield className="h-5 w-5 text-[#0F7A3E]" />
-    <span className="text-gray-600">100% Legal</span>
-  </div>
-
-  {/* Speed - Gold */}
-  <div className="flex items-center gap-2">
-    <Zap className="h-5 w-5 text-[#F5B800]" />
-    <span className="text-gray-600">24-48 ore</span>
-  </div>
-</div>
+<Button className="bg-secondary-900 hover:bg-secondary-800 text-white font-bold px-6 py-3 rounded-xl">
+  Vezi Toate Serviciile
+</Button>
 ```
 
-### 4. Success Badge
+### 3. Ghost/Outline Button
 ```tsx
-<Badge className="bg-[#0F7A3E] text-white">
-  Verificat
-</Badge>
+<Button variant="outline" className="border-2 border-neutral-200 text-secondary-700 hover:bg-neutral-50">
+  Autentificare
+</Button>
 ```
 
-**Contrast:** 5.12:1 (AA compliant)
-
-### 5. Warning/Important Notice
+### 4. Service Card with Gold Accent
 ```tsx
-<div className="border-l-4 border-[#F5B800] bg-yellow-50 p-4">
-  <p className="text-gray-900">
-    Document important
-  </p>
-</div>
-```
-
-### 6. Error Message
-```tsx
-<div className="bg-red-50 border border-red-200 rounded-lg p-4">
-  <p className="text-[#B91C1C] flex items-center gap-2">
-    <AlertCircle className="h-5 w-5" />
-    Eroare la procesare
-  </p>
-</div>
-```
-
-### 7. Card with Romanian Accent
-```tsx
-<Card className="border-t-4 border-[#003380]">
+<Card className="border-l-4 border-l-primary-500 border-t border-r border-b border-neutral-200 hover:shadow-lg transition-all">
   <CardHeader>
-    <CardTitle>Cazier Fiscal</CardTitle>
+    <div className="w-14 h-14 bg-primary-100 rounded-xl flex items-center justify-center text-primary-600">
+      <FileText className="h-6 w-6" />
+    </div>
+    <CardTitle className="text-secondary-900">Cazier Fiscal</CardTitle>
   </CardHeader>
-  <CardContent>
-    Content here
-  </CardContent>
 </Card>
 ```
 
-### 8. Featured Service with Gold Highlight
+### 5. Badge Styles
 ```tsx
-<div className="relative">
-  {/* Gold corner ribbon */}
-  <div className="absolute top-4 right-4 bg-[#F5B800] text-gray-900 px-3 py-1 rounded-full text-sm font-medium">
-    Popular
-  </div>
+// Urgent Badge (Gold)
+<Badge className="bg-primary-500 text-secondary-900 font-bold">
+  <Zap className="h-3 w-3 mr-1" />
+  Urgent
+</Badge>
 
-  <Card>
-    {/* Service content */}
-  </Card>
+// Popular Badge
+<Badge className="bg-primary-500 text-secondary-900 font-bold">
+  Popular
+</Badge>
+
+// New Badge (Green)
+<Badge className="bg-success-500 text-white">
+  NOU
+</Badge>
+```
+
+### 6. Trust Badges
+```tsx
+<div className="flex items-center gap-1.5">
+  <Clock className="w-4 h-4 text-primary-500" />
+  <span className="text-neutral-600 text-sm font-medium">Livrare 24-48h</span>
 </div>
 ```
 
 ---
 
-## Color Contrast Matrix
+## Page Sections
 
-| Color | Background | Ratio | WCAG | Use Case |
-|-------|-----------|-------|------|----------|
-| #003380 (Primary) | White | 10.58:1 | AAA | Primary buttons, text |
-| #0F7A3E (Success) | White | 5.12:1 | AA | Success badges |
-| #F5B800 (Warning) | Gray-900 | 4.8:1 | AA | Accents on dark |
-| #B91C1C (Error) | White | 5.94:1 | AA | Error messages |
-| #111827 (Text) | White | 15.05:1 | AAA | Body text |
-| #6B7280 (Muted) | White | 4.61:1 | AA | Secondary text |
+### Hero Section
+```tsx
+<section className="bg-gradient-to-b from-secondary-900 to-[#0C1A2F]">
+  <h1 className="text-white text-3xl lg:text-5xl font-extrabold">
+    Cazier Judiciar și Documente Oficiale –{' '}
+    <span className="text-primary-500">Fără Cozi, Livrare 24-48h</span>
+  </h1>
+</section>
+```
 
-All combinations meet WCAG AA standards minimum.
+### Header/Navigation
+```tsx
+<header className="bg-white shadow-sm">
+  <nav>
+    <Link className="text-secondary-700 hover:text-secondary-900 hover:bg-neutral-50 px-4 py-2 rounded-lg">
+      Acasă
+    </Link>
+    <Button className="bg-primary-500 hover:bg-primary-600 text-secondary-900 font-bold rounded-xl">
+      Începe Acum
+    </Button>
+  </nav>
+</header>
+```
+
+### Footer
+```tsx
+<footer className="bg-secondary-900 text-white">
+  <h3 className="text-white font-bold">Servicii</h3>
+  <Link className="text-white/70 hover:text-primary-500">
+    Cazier Judiciar
+  </Link>
+</footer>
+```
+
+---
+
+## Form Elements
+
+### Input
+```tsx
+<Input
+  className="border-neutral-300 focus:border-primary-500 focus:ring-primary-500"
+  placeholder="Email"
+/>
+```
+
+### Radio/Checkbox Selection
+```tsx
+<label className={cn(
+  "p-4 rounded-xl border-2 cursor-pointer transition-all",
+  selected
+    ? "border-primary-500 bg-primary-50"
+    : "border-neutral-200 hover:border-neutral-300"
+)}>
+```
+
+---
+
+## Text Color Usage
+
+| Use Case | Class | Color |
+|----------|-------|-------|
+| Page titles, headings | `text-secondary-900` | Navy #06101F |
+| Body text | `text-neutral-700` | Gray #374151 |
+| Secondary text | `text-neutral-600` | Gray #4B5563 |
+| Muted/placeholder | `text-neutral-500` | Gray #6B7280 |
+| Links/accent | `text-primary-600` | Gold #D4A24A |
+| Error text | `text-red-600` | Red |
+| Success text | `text-green-600` | Green |
+
+---
+
+## Responsive Patterns
+
+### Mobile-First Typography
+```tsx
+// Headings scale up at breakpoints
+<h1 className="text-2xl sm:text-3xl lg:text-5xl">
+<h2 className="text-xl sm:text-2xl lg:text-4xl">
+<p className="text-sm sm:text-base lg:text-lg">
+```
+
+### Mobile-First Spacing
+```tsx
+// Padding scales up
+<section className="py-12 sm:py-16 lg:py-24">
+<div className="px-4 sm:px-6">
+<div className="gap-4 sm:gap-6 lg:gap-8">
+```
+
+### Mobile-First Touch Targets
+```tsx
+// Minimum 44px touch targets on mobile
+<Button className="h-11 sm:h-12">
+<Link className="min-h-[44px] py-3">
+```
+
+---
+
+## Icon Sizes
+
+| Device | Size | Class |
+|--------|------|-------|
+| Mobile | 14-16px | `w-3.5 h-3.5` or `w-4 h-4` |
+| Desktop | 16-20px | `w-4 h-4` or `w-5 h-5` |
+
+```tsx
+<Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary-500" />
+```
+
+---
+
+## Shadow Utilities
+
+### Gold Glow (Primary Buttons)
+```tsx
+shadow-[0_4px_12px_rgba(236,185,95,0.25)]
+hover:shadow-[0_6px_16px_rgba(236,185,95,0.35)]
+```
+
+### Subtle Elevation (Cards)
+```tsx
+shadow-sm hover:shadow-lg transition-shadow
+```
+
+### Large Elevation (Modals, Services Box)
+```tsx
+shadow-2xl
+```
 
 ---
 
 ## Don'ts
 
-❌ Don't use bright flag red (#CE1126) as primary color
-❌ Don't use bright yellow (#FCD116) as background
-❌ Don't overuse Romanian gold (use sparingly)
-❌ Don't rely on color alone (always add icons/text)
-❌ Don't use generic Tailwind blue (#2563eb) - use Romanian blue (#003380)
+- Don't use pure black (#000000) for text - use secondary-900 (#06101F)
+- Don't use bright/saturated colors as backgrounds
+- Don't make gold buttons too small - ensure 44px+ touch targets
+- Don't use gold (#ECB95F) for large text blocks
+- Don't forget hover states on interactive elements
 
 ---
 
-## Component-Specific Guidelines
+## Component Color Mapping
 
-### Buttons
-```tsx
-// Primary
-<Button className="bg-[#003380] hover:bg-[#003D99] text-white">
-
-// Secondary
-<Button variant="outline" className="border-[#003380] text-[#003380] hover:bg-blue-50">
-
-// Success
-<Button className="bg-[#0F7A3E] hover:bg-[#0A5A2E] text-white">
-
-// Destructive
-<Button className="bg-[#B91C1C] hover:bg-red-800 text-white">
-```
-
-### Badges
-```tsx
-// Default
-<Badge className="bg-[#003380] text-white">
-
-// Success
-<Badge className="bg-[#0F7A3E] text-white">
-
-// Warning
-<Badge className="bg-[#F5B800] text-gray-900">
-
-// Outline
-<Badge variant="outline" className="border-[#003380] text-[#003380]">
-```
-
-### Form Inputs
-```tsx
-<Input
-  className="
-    border-gray-300
-    focus:border-[#003380]
-    focus:ring-[#003380]
-    focus:ring-2
-  "
-/>
-```
-
-### Links
-```tsx
-<Link className="text-[#003380] hover:text-[#003D99] underline">
-  Vezi detalii
-</Link>
-```
-
----
-
-## Icon Color Semantics
-
-| Icon Type | Color | Hex | Meaning |
-|-----------|-------|-----|---------|
-| Lock, Shield (Security) | Blue | #003380 | Trust, protection |
-| CheckCircle, Shield (Legal) | Green | #0F7A3E | Verified, legal |
-| Zap, Clock (Speed) | Gold | #F5B800 | Fast, premium |
-| AlertCircle, XCircle | Red | #B91C1C | Error, warning |
-
-```tsx
-// Example
-<Lock className="text-[#003380]" />       // Security
-<Shield className="text-[#0F7A3E]" />     // Legal
-<Zap className="text-[#F5B800]" />        // Speed
-<AlertCircle className="text-[#B91C1C]" />// Error
-```
-
----
-
-## Gradients
-
-### 1. Romanian Flag Gradient (Subtle)
-```tsx
-className="bg-gradient-to-br from-blue-50 via-white to-yellow-50"
-```
-
-### 2. Blue Gradient (Hero)
-```tsx
-className="bg-gradient-to-br from-[#003380] to-[#0066FF]"
-```
-
-### 3. Success Gradient
-```tsx
-className="bg-gradient-to-r from-green-50 to-emerald-50"
-```
-
----
-
-## Dark Mode
-
-Colors automatically adjust via CSS variables when `.dark` class is applied:
-
-```tsx
-// This automatically adapts to dark mode
-<Button className="bg-primary text-primary-foreground">
-  Click Me
-</Button>
-```
-
-**Light Mode:** bg-[#003380] (dark blue)
-**Dark Mode:** bg-[lighter blue for contrast]
-
----
-
-## Accessibility Checklist
-
-- [ ] Text contrast ratio ≥ 4.5:1 (AA)
-- [ ] Large text contrast ≥ 3:1 (AA)
-- [ ] Focus states clearly visible
-- [ ] Color not used as only indicator
-- [ ] Icons paired with text labels
-- [ ] Tested with color blindness simulator
-
----
-
-## When to Use Each Color
-
-### Romanian Blue (#003380)
-- Primary CTAs
-- Main navigation
-- Links
-- Active states
-- Focus rings
-- Headers (optional)
-
-### Success Green (#0F7A3E)
-- Success messages
-- Legal badges
-- Verification marks
-- Completed states
-- "Official" indicators
-
-### Romanian Gold (#F5B800)
-- Featured items (sparingly)
-- Premium badges
-- Important highlights
-- Speed/efficiency indicators
-- **Use < 5% of page area**
-
-### Alert Red (#B91C1C)
-- Error messages
-- Destructive actions
-- Urgent deadlines
-- Validation errors
-- Cancel buttons
-
-### Neutral Gray
-- Body text (Gray-900)
-- Secondary text (Gray-600)
-- Disabled states (Gray-400)
-- Borders (Gray-200)
-- Backgrounds (Gray-50)
-
----
-
-## Testing Your Implementation
-
-```bash
-# 1. Visual contrast test
-# Use browser dev tools to check contrast ratios
-
-# 2. Color blindness simulation
-# Chrome DevTools > Rendering > Emulate vision deficiencies
-
-# 3. Dark mode test
-# Toggle .dark class on <html> element
-
-# 4. Accessibility audit
-# Lighthouse > Accessibility score
-```
+| Component | Background | Text | Border |
+|-----------|-----------|------|--------|
+| Primary Button | primary-500 | secondary-900 | - |
+| Secondary Button | secondary-900 | white | - |
+| Outline Button | transparent | secondary-700 | neutral-200 |
+| Card | white | secondary-900 | neutral-200 |
+| Card Accent | - | - | primary-500 (left) |
+| Badge (urgent) | primary-500 | secondary-900 | - |
+| Badge (new) | success-500 | white | - |
+| Input | white | secondary-900 | neutral-300 |
+| Input Focus | white | secondary-900 | primary-500 |
 
 ---
 
 ## Resources
 
-- **Full Analysis:** `/docs/design/color-system-analysis.md`
-- **Implementation CSS:** `/docs/design/color-system-implementation.css`
-- **Contrast Checker:** https://webaim.org/resources/contrastchecker/
-- **Romanian Flag Colors:** #002B7F, #FCD116, #CE1126
-
----
-
-## Questions?
-
-**Q: Can I use Tailwind's blue-600?**
-A: No, use Romanian blue (#003380) instead for brand consistency.
-
-**Q: When should I use gold (#F5B800)?**
-A: Sparingly. Only for featured items, premium badges, or important highlights. Should cover less than 5% of any page.
-
-**Q: Do I need to use CSS variables or hex codes?**
-A: CSS variables (`bg-primary`) are preferred for automatic dark mode support. Use hex codes when you need specific control.
-
-**Q: What about Romanian flag red?**
-A: Avoid as primary color. Only use for errors/destructive actions, and use the darker variant (#B91C1C) for better readability.
-
-**Q: How do I make Romanian identity more prominent?**
-A: Use the blue-to-yellow gradient in hero sections, add gold accents to featured services, and use the blue-green-gold trio for trust badges.
+- **globals.css:** `/src/app/globals.css` - CSS variables
+- **Tailwind Config:** `/tailwind.config.ts` - Extended colors
+- **Color Palette:** Primary Gold #ECB95F, Secondary Navy #06101F

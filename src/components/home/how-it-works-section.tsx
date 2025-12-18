@@ -1,104 +1,106 @@
-import { Button } from '@/components/ui/button';
-import { ArrowRight, Search, Upload, CreditCard, CheckCircle } from 'lucide-react';
+import { ClipboardList, CreditCard, FileCheck, Truck, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 
-interface ProcessStepProps {
-  number: string;
-  title: string;
-  description: string;
-  icon: React.ReactNode;
-}
-
-function ProcessStep({ number, title, description, icon }: ProcessStepProps) {
-  return (
-    <div className="relative flex flex-col items-center text-center space-y-4">
-      {/* Step Number Circle */}
-      <div className="relative z-10 w-20 h-20 bg-blue-600 rounded-full flex flex-col items-center justify-center text-white shadow-lg">
-        <div className="text-xs font-semibold uppercase tracking-wide opacity-80">Pasul</div>
-        <div className="text-2xl font-bold">{number}</div>
-      </div>
-
-      {/* Icon */}
-      <div className="w-12 h-12 bg-white border-2 border-blue-200 rounded-lg flex items-center justify-center text-blue-600">
-        {icon}
-      </div>
-
-      {/* Title */}
-      <h3 className="text-lg font-bold text-neutral-900">
-        {title}
-      </h3>
-
-      {/* Description */}
-      <p className="text-sm text-neutral-600 leading-relaxed max-w-[200px]">
-        {description}
-      </p>
-    </div>
-  );
-}
+const steps = [
+  {
+    number: '01',
+    icon: ClipboardList,
+    title: 'Completezi formularul',
+    description: 'Alegi serviciul dorit și completezi datele necesare în doar 2 minute',
+    color: 'bg-primary-100 text-primary-600',
+  },
+  {
+    number: '02',
+    icon: CreditCard,
+    title: 'Plătești online securizat',
+    description: 'Plată rapidă prin card sau transfer bancar, cu factură fiscală',
+    color: 'bg-info-100 text-info-600',
+  },
+  {
+    number: '03',
+    icon: FileCheck,
+    title: 'Noi procesăm cererea',
+    description: 'Echipa noastră depune documentele și gestionează tot procesul',
+    color: 'bg-success-100 text-success-600',
+  },
+  {
+    number: '04',
+    icon: Truck,
+    title: 'Primești documentul',
+    description: 'Livrare prin curier sau email în 24-48h, în toată România',
+    color: 'bg-warning-100 text-warning-600',
+  },
+];
 
 export function HowItWorksSection() {
   return (
-    <section id="cum-functioneaza" className="py-16 lg:py-24 bg-neutral-50">
-      <div className="container mx-auto px-4">
-        {/* Section Heading */}
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-neutral-900 sm:text-4xl">
-            Cum Functioneaza?
+    <section id="cum-functioneaza" className="py-16 lg:py-24 bg-white">
+      <div className="container mx-auto px-4 max-w-[1100px]">
+        {/* Header */}
+        <div className="text-center mb-12 lg:mb-16">
+          <span className="inline-block px-4 py-1.5 bg-primary-100 text-primary-700 text-sm font-semibold rounded-full mb-4">
+            Proces simplu
+          </span>
+          <h2 className="text-2xl lg:text-4xl font-extrabold text-secondary-900 mb-4">
+            Cum funcționează?
           </h2>
-          <p className="mt-4 text-lg text-neutral-600">
-            4 pasi simpli pentru a-ti obtine documentele oficiale
+          <p className="text-lg text-neutral-600 max-w-2xl mx-auto">
+            4 pași simpli pentru a obține documentele de care ai nevoie
           </p>
         </div>
 
-        {/* Steps Timeline */}
-        <div className="max-w-5xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 relative">
-            {/* Connection Line (desktop only) */}
-            <div
-              className="hidden md:block absolute top-10 left-[12%] right-[12%] h-0.5 bg-blue-200"
-              style={{ zIndex: 0 }}
-            />
+        {/* Steps */}
+        <div className="relative">
+          {/* Connection Line - Desktop */}
+          <div className="hidden lg:block absolute top-20 left-[10%] right-[10%] h-0.5 bg-neutral-200" />
 
-            {/* Step 1 */}
-            <ProcessStep
-              number="1"
-              title="Alege Serviciul"
-              description="Selecteaza documentul oficial de care ai nevoie din catalogul nostru"
-              icon={<Search className="h-6 w-6" />}
-            />
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-6">
+            {steps.map((step, index) => (
+              <div key={index} className="relative">
+                {/* Step Card */}
+                <div className="bg-neutral-50 rounded-2xl p-6 h-full border border-neutral-100 hover:border-primary-200 hover:shadow-lg transition-all duration-300">
+                  {/* Number Circle */}
+                  <div className="relative z-10 w-12 h-12 bg-primary-500 rounded-full flex items-center justify-center mb-6 shadow-[0_4px_12px_rgba(236,185,95,0.3)]">
+                    <span className="text-secondary-900 font-extrabold text-lg">
+                      {step.number}
+                    </span>
+                  </div>
 
-            {/* Step 2 */}
-            <ProcessStep
-              number="2"
-              title="Completeaza Datele"
-              description="Incarca actele necesare si completeaza formularul online"
-              icon={<Upload className="h-6 w-6" />}
-            />
+                  {/* Icon */}
+                  <div className={`w-14 h-14 ${step.color} rounded-xl flex items-center justify-center mb-4`}>
+                    <step.icon className="w-7 h-7" />
+                  </div>
 
-            {/* Step 3 */}
-            <ProcessStep
-              number="3"
-              title="Plateste Securizat"
-              description="Efectueaza plata prin card sau transfer bancar"
-              icon={<CreditCard className="h-6 w-6" />}
-            />
+                  {/* Content */}
+                  <h3 className="text-lg font-bold text-secondary-900 mb-2">
+                    {step.title}
+                  </h3>
+                  <p className="text-neutral-600 text-sm leading-relaxed">
+                    {step.description}
+                  </p>
+                </div>
 
-            {/* Step 4 */}
-            <ProcessStep
-              number="4"
-              title="Primesti Documentul"
-              description="Documentul oficial iti este livrat prin email in 24-48 ore"
-              icon={<CheckCircle className="h-6 w-6" />}
-            />
+                {/* Arrow - Mobile */}
+                {index < steps.length - 1 && (
+                  <div className="flex justify-center my-4 lg:hidden">
+                    <ArrowRight className="w-6 h-6 text-primary-500 rotate-90" />
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
         </div>
 
         {/* CTA */}
         <div className="mt-12 text-center">
-          <Button asChild size="lg" className="bg-blue-600 hover:bg-blue-700 text-white px-8">
-            <Link href="#servicii">
-              Incepe Acum
-              <ArrowRight className="ml-2 h-5 w-5" />
+          <Button
+            asChild
+            className="bg-primary-500 hover:bg-primary-600 text-secondary-900 font-bold px-8 py-6 text-lg rounded-xl shadow-[0_6px_14px_rgba(236,185,95,0.35)] hover:shadow-[0_10px_20px_rgba(236,185,95,0.45)] hover:-translate-y-0.5 transition-all duration-200"
+          >
+            <Link href="/#servicii">
+              Alege serviciul dorit
+              <ArrowRight className="ml-2 w-5 h-5" />
             </Link>
           </Button>
         </div>

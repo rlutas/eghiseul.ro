@@ -80,7 +80,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     }
 
     // Calculate estimated completion
-    const createdAt = new Date(order.created_at)
+    const createdAt = order.created_at ? new Date(order.created_at) : new Date()
     const estimatedDays = order.services?.estimated_days || 5
     const estimatedCompletion = new Date(createdAt.getTime() + estimatedDays * 24 * 60 * 60 * 1000)
 
@@ -106,18 +106,18 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         tax: 0,
         total: parseFloat(String(order.total_price))
       },
-      selectedOptions: order.options || [],
+      selectedOptions: order.selected_options || [],
       customerData: order.customer_data,
       deliveryMethod: order.delivery_method,
       deliveryAddress: order.delivery_address,
       paymentStatus: order.payment_status,
-      paymentIntentId: order.stripe_payment_intent,
+      paymentIntentId: order.stripe_payment_intent_id,
       contractUrl: order.contract_url,
       finalDocumentUrl: order.final_document_url,
       createdAt: order.created_at,
       updatedAt: order.updated_at,
       estimatedCompletion: estimatedCompletion.toISOString(),
-      statusHistory: order.status_history || []
+      internalNotes: order.internal_status_notes || null
     }
 
     return NextResponse.json({

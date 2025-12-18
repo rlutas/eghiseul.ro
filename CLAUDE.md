@@ -10,18 +10,138 @@ Platformă digitală pentru România, în proces de reconstrucție din WordPress
 - Multiple servicii integrate (12 servicii)
 - Scalabilitate pentru expansiune
 
+---
+
+## DOCUMENTATION MAINTENANCE GUIDE
+
+### When to Update Documentation
+
+**ALWAYS update documentation when:**
+1. Adding new API endpoints → Update `docs/technical/api/`
+2. Changing database schema → Update `docs/technical/database/`
+3. Completing sprint tasks → Update `DEVELOPMENT_MASTER_PLAN.md`
+4. Adding new features → Create spec in `docs/technical/specs/`
+5. Modifying services → Update relevant service doc in `docs/sprints/services/`
+
+### Documentation Update Checklist
+
+```markdown
+After completing any feature:
+[ ] Update DEVELOPMENT_MASTER_PLAN.md with status
+[ ] Document new APIs in docs/technical/api/
+[ ] Update sprint docs if applicable
+[ ] Add/update TypeScript types in src/types/
+[ ] Update this CLAUDE.md if new patterns established
+```
+
+### Key Files to Track
+
+| File | Purpose | Update When |
+|------|---------|-------------|
+| `DEVELOPMENT_MASTER_PLAN.md` | Sprint progress, task tracking | After completing tasks |
+| `docs/technical/api/*.md` | API documentation | New/modified endpoints |
+| `docs/technical/specs/*.md` | Feature specifications | Planning new features |
+| `docs/sprints/sprint-*.md` | Sprint details | During sprint work |
+| `src/types/*.ts` | TypeScript interfaces | Schema changes |
+
+---
+
 ## Tech Stack
 
 ```
-Frontend:   Next.js 14+ (TypeScript, Tailwind, shadcn/ui)
-Backend:    Supabase (PostgreSQL, Auth, Real-time)
-Storage:    AWS S3 (contracts, KYC documents)
-OCR:        GEMINI AI SEND TO AI TO EXTRACT
-Payments:   Stripe
-SMS:        SMSLink.ro
+Frontend:   Next.js 16+ (TypeScript, Tailwind v4, shadcn/ui)
+Backend:    Supabase (PostgreSQL, Auth, Real-time, RLS)
+Storage:    AWS S3 (contracts, KYC documents, eu-central-1)
+AI/OCR:     Google Gemini 2.0 Flash Exp (document extraction)
+AI/KYC:     Google Gemini 1.5 Flash (face matching, validation)
+Payments:   Stripe (card, Apple Pay, Google Pay)
+SMS:        SMSLink.ro (provider românesc)
 Email:      Resend
-Invoicing:  SmartBill
+Invoicing:  SmartBill (e-factura compliant)
 ```
+
+---
+
+## CURRENT IMPLEMENTATION STATUS
+
+### Completed Features (Sprint 0-3)
+
+#### Authentication System
+- **Files**: `src/app/(auth)/`, `src/lib/supabase/`
+- **Features**: Login, Register, Password Reset, Session Management
+- **Database**: `profiles` table with RLS
+
+#### Services & Orders API
+- **Files**: `src/app/api/services/`, `src/app/api/orders/`
+- **Features**: CRUD for services, orders, payments
+- **Database**: `services`, `service_options`, `orders`, `order_history` tables
+
+#### AI-Powered OCR System
+- **Files**: `src/lib/services/document-ocr.ts`, `src/app/api/ocr/extract/`
+- **Model**: Google Gemini 2.0 Flash Exp
+- **Supports**: CI front, CI back, Passport
+- **Extracts**: CNP, name, birth date, full Romanian address (Jud., Str., Nr., Bl., Sc., Et., Ap.)
+- **Docs**: `docs/technical/api/ocr-kyc-api.md`
+
+#### KYC Validation System
+- **Files**: `src/lib/services/kyc-validation.ts`, `src/app/api/kyc/validate/`
+- **Model**: Google Gemini 1.5 Flash
+- **Features**: Document validation, face matching, confidence scores
+- **Docs**: `docs/technical/api/ocr-kyc-api.md`
+
+#### Order Wizard (6 Steps)
+- **Files**: `src/components/orders/`, `src/providers/order-wizard-provider.tsx`
+- **Steps**: Contact → Personal Data → Options → KYC → Delivery → Review
+- **Features**:
+  - ID scanning with auto-fill
+  - CNP validation with checksum
+  - Electronic signature
+  - Smart KYC (reuse documents from Step 2 in Step 4)
+
+### In Progress (Sprint 3+)
+
+- [ ] User data persistence (save for logged users)
+- [ ] Account creation offer at order end
+- [ ] Order auto-save with order ID
+- [ ] Bank transfer payment option
+- [ ] S3 document upload
+- [ ] User orders dashboard
+
+---
+
+## DOCUMENTATION STRUCTURE
+
+```
+docs/
+├── technical/
+│   ├── api/
+│   │   ├── services-api.md         # Services & Orders API
+│   │   └── ocr-kyc-api.md          # OCR & KYC AI API (NEW)
+│   ├── specs/
+│   │   ├── user-data-persistence.md    # User data saving feature
+│   │   └── order-autosave-system.md    # Auto-save & support system
+│   ├── database/
+│   │   └── services-schema.md      # Database schema docs
+│   └── technology-decisions-summary.md
+├── sprints/
+│   ├── sprint-0-setup.md
+│   ├── sprint-1-auth.md
+│   ├── sprint-2-services.md
+│   ├── sprint-3-kyc-documents.md
+│   └── services/                   # Service-specific docs
+├── prd/
+│   └── eghiseul-prd.md            # Product Requirements
+├── security/
+│   └── security-architecture.md
+├── legal/
+│   └── compliance-research.md
+├── design/
+│   └── *.md                       # UI/UX designs
+└── testing/
+    └── *.md                       # Test documentation
+```
+
+---
 
 ## Agent Categories (60 agents)
 
@@ -125,87 +245,112 @@ Invoicing:  SmartBill
 | `context-manager` | Shared state and information sync |
 | `team-communicator` | Team updates and communication |
 
+---
+
 ## Development Phases
 
-### Phase 0: Planning & Research (CURRENT)
-**Active agents**: research-analyst, market-researcher, competitive-analyst, legal-advisor, system-designer, prd-writer
+### Phase 0: Planning & Research ✅ COMPLETE
 **Output**: PRD, tech stack decisions, compliance research, architecture docs
 
-### Phase 1: Foundation Setup
-**Active agents**: system-designer, database-planner, api-designer, security-auditor
+### Phase 1: Foundation Setup ✅ COMPLETE
 **Output**: Database schema, API specs, auth system, security architecture
 
-### Phase 2: Core Development
-**Active agents**: code-reviewer, test-strategist, ui-designer, ux-reviewer
-**Output**: Auth, multi-tenancy, file upload, first 3 services
+### Phase 2: Core Development ✅ COMPLETE
+**Output**: Auth, Services API, Orders API
 
-### Phase 3: Integration & Polish
-**Active agents**: stripe-expert, payment-integration, performance-optimizer, seo-optimizer
-**Output**: Payments, invoicing, KYC, notifications
+### Phase 3: KYC & Documents ⏳ IN PROGRESS
+**Active agents**: ui-designer, api-documenter, feature-spec-writer, system-designer
+**Output**: OCR, KYC validation, order wizard, user data persistence
 
-### Phase 4: Launch Prep
-**Active agents**: security-auditor, technical-writer, deployment-troubleshooter
-**Output**: Security audit, documentation, production deploy
+### Phase 4: Payments & Contracts ⏳ PENDING
+**Active agents**: stripe-expert, payment-integration, performance-optimizer
+**Output**: Stripe checkout, bank transfers, invoicing, contracts
 
-## Agent Collaboration Rules
+### Phase 5: Admin Dashboard ⏳ PENDING
+**Active agents**: ui-designer, dashboard-planner
+**Output**: Admin panel, order management, statistics
 
-### Sequential Chains (output depends on prior agent)
-```
-research-analyst → product-manager → prd-writer → feature-spec-writer
-market-researcher → competitive-analyst → product-manager
-system-designer → api-designer → database-planner
-ui-designer → ux-reviewer → code-reviewer
-```
-
-### Parallel Teams (independent work)
-```
-[research-analyst, market-researcher, trend-analyst] → aggregate findings
-[ui-designer, api-designer, database-planner] → different system parts
-[security-auditor, performance-optimizer, test-strategist] → quality checks
-```
-
-### Orchestration Pattern
-```
-1. agent-organizer receives task
-2. Decomposes into subtasks
-3. Assigns to appropriate agents
-4. context-manager maintains shared state
-5. agent-organizer aggregates results
-```
-
-## Documentation Structure
-
-```
-docs/
-├── business/           # Market analysis, competitor research
-├── prd/               # Product Requirements Documents
-├── services/          # 12 service specifications
-├── technical/         # Architecture, API, tech stack
-├── security/          # Security architecture, checklists
-├── legal/             # GDPR, compliance, contracts
-├── analysis/          # Feature analysis, flows
-├── design/            # UI/UX designs, wireframes
-├── planning/          # Roadmaps, sprints
-└── legacy/            # WordPress reference
-```
+---
 
 ## Quick Reference
 
-| Task | Agent(s) to Use |
-|------|-----------------|
-| New PRD | `prd-writer` → `product-manager` |
-| API design | `api-designer` → `api-documenter` |
-| Database schema | `database-planner` → `sql-expert` |
-| Market research | `market-researcher` + `competitive-analyst` |
-| Security review | `security-auditor` → `best-practice-finder` |
-| UI components | `ui-designer` + `design-system-builder` |
-| Code quality | `code-reviewer` + `test-strategist` |
-| Performance | `performance-optimizer` + `analytics-setup` |
-| Legal/GDPR | `legal-advisor` + `terms-writer` |
+| Task | Agent(s) to Use | Output Location |
+|------|-----------------|-----------------|
+| New PRD | `prd-writer` | `docs/prd/` |
+| API design | `api-designer` → `api-documenter` | `docs/technical/api/` |
+| Feature spec | `feature-spec-writer` | `docs/technical/specs/` |
+| Database schema | `database-planner` → `sql-expert` | `docs/technical/database/` |
+| Security review | `security-auditor` | `docs/security/` |
+| UI components | `ui-designer` | `docs/design/` |
+| Code quality | `code-reviewer` | Review comments |
 
-## Files to Track
+---
 
-- **DEVELOPMENT_MASTER_PLAN.md** - Sprint checklists, progress tracking
-- **docs/prd/eghiseul-prd.md** - Product requirements
-- **docs/technical/technology-decisions-summary.md** - Tech stack decisions
-- **docs/services/README.md** - Service catalog (12 services)
+## API Endpoints Summary
+
+### Public Endpoints
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/services` | GET | List all services |
+| `/api/services/[slug]` | GET | Service details |
+| `/api/ocr/extract` | GET | OCR health check |
+| `/api/kyc/validate` | GET | KYC health check |
+
+### Protected Endpoints (Auth Required)
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/orders` | GET, POST | List/Create orders |
+| `/api/orders/[id]` | GET, PATCH | Order details/update |
+| `/api/orders/[id]/payment` | POST | Create payment intent |
+| `/api/ocr/extract` | POST | Extract data from ID |
+| `/api/kyc/validate` | POST | Validate KYC documents |
+
+### Webhooks
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/webhooks/stripe` | POST | Stripe payment webhooks |
+
+---
+
+## Common Commands
+
+```bash
+# Development
+npm run dev              # Start dev server (localhost:3000)
+npm run build            # Production build
+npm run lint             # Run ESLint
+
+# Database
+npx supabase db push     # Push migrations
+npx supabase gen types typescript --local > src/types/supabase.ts
+
+# Testing APIs
+curl http://localhost:3000/api/services
+curl http://localhost:3000/api/ocr/extract      # Health check
+curl http://localhost:3000/api/kyc/validate     # Health check
+```
+
+---
+
+## Environment Variables
+
+```env
+# Required
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+GOOGLE_AI_API_KEY=           # For OCR & KYC
+STRIPE_SECRET_KEY=
+
+# Optional (for full functionality)
+AWS_ACCESS_KEY_ID=
+AWS_SECRET_ACCESS_KEY=
+AWS_S3_BUCKET_DOCUMENTS=
+RESEND_API_KEY=
+SMARTBILL_API_KEY=
+SMSLINK_API_KEY=
+```
+
+---
+
+**Last Updated:** 2025-12-17
+**Version:** 2.0

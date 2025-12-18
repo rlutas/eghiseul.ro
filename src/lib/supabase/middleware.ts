@@ -35,15 +35,20 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  // Protected routes
-  const protectedPaths = ['/account', '/orders', '/kyc', '/admin']
+  // Protected routes - require authentication
+  // Note: /orders/new is PUBLIC (guest checkout allowed)
+  const protectedPaths = ['/account', '/kyc', '/admin']
   const isProtectedPath = protectedPaths.some(path =>
     request.nextUrl.pathname.startsWith(path)
   )
 
-  if (isProtectedPath && !user) {
+  // /orders is protected EXCEPT /orders/new (allows guest orders)
+  const isOrdersPath = request.nextUrl.pathname.startsWith('/orders') &&
+    !request.nextUrl.pathname.startsWith('/orders/new')
+
+  if ((isProtectedPath || isOrdersPath) && !user) {
     const url = request.nextUrl.clone()
-    url.pathname = '/login'
+    url.pathname = '/auth/login'
     url.searchParams.set('redirect', request.nextUrl.pathname)
     return NextResponse.redirect(url)
   }
