@@ -354,9 +354,10 @@ export function OrderWizardProvider({ children }: { children: ReactNode }) {
 
   const nextStep = useCallback(() => {
     if (canGoNext) {
-      // Generate Order ID when moving from Step 1 (contact) to Step 2 (personal)
+      // Generate Order ID when moving from Step 2 (personal) to Step 3 (options)
+      // At this point we have: email, phone, name, CNP, address
       if (
-        state.currentStep === 'contact' &&
+        state.currentStep === 'personal' &&
         !state.friendlyOrderId &&
         hasValidContactData(state.contactData)
       ) {

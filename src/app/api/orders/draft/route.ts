@@ -86,10 +86,11 @@ export async function POST(request: NextRequest) {
     }
 
     // Create the draft order
+    // Use friendly_order_id as order_number for drafts (unique)
     const { data: order, error: orderError } = await supabase
       .from('orders')
       .insert({
-        order_number: 'DRAFT', // Will be replaced when finalized
+        order_number: friendlyOrderId, // Use friendly ID as order_number for uniqueness
         friendly_order_id: friendlyOrderId,
         user_id: user?.id || null,
         service_id: data.service_id,
@@ -132,7 +133,7 @@ export async function POST(request: NextRequest) {
         const { data: retryOrder, error: retryError } = await supabase
           .from('orders')
           .insert({
-            order_number: 'DRAFT',
+            order_number: newFriendlyOrderId, // Use new friendly ID as order_number
             friendly_order_id: newFriendlyOrderId,
             user_id: user?.id || null,
             service_id: data.service_id,

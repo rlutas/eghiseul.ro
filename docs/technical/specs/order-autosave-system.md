@@ -1,7 +1,7 @@
 # Order Auto-Save & Support System
 
-**Version:** 1.1
-**Status:** Partially Implemented
+**Version:** 1.2
+**Status:** Phase 1 Complete
 **Created:** 2025-12-17
 **Updated:** 2025-12-18
 **Sprint:** Sprint 3 - Order Management Enhancement
@@ -10,17 +10,32 @@
 
 | Feature | Status | Notes |
 |---------|--------|-------|
-| Order ID Generation | ✅ Complete | `lib/order-id.ts` |
+| Order ID Generation | ✅ Complete | `lib/order-id.ts` - Generated at Step 2→3 transition |
 | Friendly Order ID DB Column | ✅ Complete | `migrations/008_friendly_order_id.sql` |
-| Draft API Endpoint | ✅ Complete | `api/orders/draft/route.ts` |
+| Draft API (POST) | ✅ Complete | `api/orders/draft/route.ts` - Create draft |
+| Draft API (PATCH) | ✅ Complete | `api/orders/draft/route.ts` - Update draft |
+| Draft API (GET) | ✅ Complete | `api/orders/draft/route.ts` - Retrieve by friendly_order_id |
 | Auto-Save (Debounced) | ✅ Complete | 500ms debounce in provider |
 | localStorage Backup | ✅ Complete | Offline resilience |
 | Save Status UI | ✅ Complete | `components/orders/save-status.tsx` |
 | Order ID Display | ✅ Complete | `components/orders/order-id-display.tsx` |
+| Wizard Integration | ✅ Complete | Order ID shown in header + sidebar |
 | Bank Transfer Flow | ⏳ Pending | Phase 2 |
 | Magic Links Recovery | ⏳ Pending | Phase 2 |
 | Support Dashboard | ⏳ Pending | Phase 2 |
 | Abandoned Order Emails | ⏳ Pending | Phase 2 |
+
+### Key Implementation Details
+
+**Order ID Generation Timing:**
+- Order ID is generated ONLY when clicking "Continue" from Step 2 (Personal Data) to Step 3 (Options)
+- This ensures we have valid contact data (email + phone) before creating a draft
+- Prevents creation of empty/abandoned draft orders
+
+**Auto-Save Trigger:**
+- Auto-save only activates after Order ID exists (post Step 2)
+- Uses 500ms debounce after field changes
+- Parallel localStorage backup for offline resilience
 
 ---
 
@@ -52,11 +67,11 @@ The Order Auto-Save & Support System provides resilience, recovery, and support 
 
 ### Key Features
 
-- Unique order IDs generated at wizard start
-- Real-time auto-save with offline backup
-- Support team lookup and order continuation
-- Bank transfer as alternative payment method
-- Order recovery via email magic links
+- Unique order IDs generated at Step 2→3 transition (after contact + personal data)
+- Real-time auto-save with offline backup (500ms debounce)
+- Support team lookup and order continuation (via friendly_order_id)
+- Bank transfer as alternative payment method (Phase 2)
+- Order recovery via email magic links (Phase 2)
 - Complete audit trail
 
 ---

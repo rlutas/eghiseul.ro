@@ -264,8 +264,8 @@
 - **Electronic Signature**: Canvas-based signature with terms acceptance
 - **Multi-document Support**: CI front/back and passport (OCR ready)
 - **Romanian Address Parsing**: Full support for Jud., Mun., Str., Nr., Bl., Sc., Et., Ap.
-- **Order ID System**: Human-readable IDs (ORD-YYYYMMDD-XXXXX) for customer communication
-- **Auto-Save System**: Debounced save (500ms) to prevent data loss
+- **Order ID System**: Human-readable IDs (ORD-YYYYMMDD-XXXXX) generated at Step 2→3 transition
+- **Auto-Save System**: Debounced save (500ms) to prevent data loss, only active after Step 2
 - **localStorage Backup**: Offline resilience, data preserved even without network
 - **Save Status Indicator**: Real-time feedback showing "Salvat acum X sec"
 
