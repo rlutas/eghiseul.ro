@@ -1,15 +1,17 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { ArrowLeft, ArrowRight, Save, Loader2, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Loader2, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { useOrderWizard } from '@/providers/order-wizard-provider';
 import { WizardProgress } from './wizard-progress';
 import { PriceSidebar } from './price-sidebar';
+import { SaveStatus } from './save-status';
+import { OrderIdDisplay, OrderIdBadge } from './order-id-display';
 import { Service, ServiceOption } from '@/types/services';
 
-// Step Components (will be created separately)
+// Step Components
 import { ContactStep } from './steps/contact-step';
 import { PersonalDataStep } from './steps/personal-data-step';
 import { OptionsStep } from './steps/options-step';
@@ -40,40 +42,32 @@ export function OrderWizard({ initialService, initialOptions }: OrderWizardProps
     goToStep,
     nextStep,
     prevStep,
-    canGoNext,
-    canGoPrev,
     isFirstStep,
     isLastStep,
     setService,
-    saveDraft,
+    initializeOrder,
+    saveDraftNow,
     submitOrder,
     priceBreakdown,
+    clearSaveError,
   } = useOrderWizard();
 
   const [showExitDialog, setShowExitDialog] = useState(false);
   const [stepValid, setStepValid] = useState(false);
 
-  // Initialize service data
+  // Initialize service data and generate order ID
   useEffect(() => {
     if (initialService && !state.service) {
       setService(initialService, initialOptions);
     }
   }, [initialService, initialOptions, setService, state.service]);
 
-  // URL sync is handled by OrderWizardProvider - removed duplicate to prevent infinite loop
-
-  // Handle beforeunload for dirty form
+  // Initialize order ID when service is set
   useEffect(() => {
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (state.isDirty) {
-        e.preventDefault();
-        e.returnValue = '';
-      }
-    };
-
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, [state.isDirty]);
+    if (state.service && !state.friendlyOrderId) {
+      initializeOrder();
+    }
+  }, [state.service, state.friendlyOrderId, initializeOrder]);
 
   // Render current step
   const renderStep = () => {
@@ -103,8 +97,9 @@ export function OrderWizard({ initialService, initialOptions }: OrderWizardProps
     }
   };
 
-  const handleSaveDraft = async () => {
-    await saveDraft();
+  const handleRetry = () => {
+    clearSaveError();
+    saveDraftNow();
   };
 
   if (!state.service) {
@@ -118,14 +113,32 @@ export function OrderWizard({ initialService, initialOptions }: OrderWizardProps
   return (
     <>
       <div className="container mx-auto px-4 py-8 max-w-[1200px]">
-        {/* Header */}
+        {/* Header with Order ID */}
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-secondary-900 mb-2">
-            Comandă {state.service.name}
-          </h1>
-          <p className="text-neutral-600">
-            Completează informațiile necesare pentru a plasa comanda
-          </p>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+            <div>
+              <h1 className="text-2xl font-bold text-secondary-900 mb-1">
+                Comandă {state.service.name}
+              </h1>
+              <p className="text-neutral-600">
+                Completează informațiile necesare pentru a plasa comanda
+              </p>
+            </div>
+
+            {/* Order ID Display - Desktop */}
+            {state.friendlyOrderId && (
+              <div className="hidden sm:block">
+                <OrderIdDisplay orderId={state.friendlyOrderId} />
+              </div>
+            )}
+          </div>
+
+          {/* Order ID Display - Mobile */}
+          {state.friendlyOrderId && (
+            <div className="sm:hidden">
+              <OrderIdBadge orderId={state.friendlyOrderId} />
+            </div>
+          )}
         </div>
 
         {/* Progress Indicator */}
@@ -155,22 +168,14 @@ export function OrderWizard({ initialService, initialOptions }: OrderWizardProps
                       {state.currentStep === 'review' && 'Verificare & Plată'}
                     </h2>
                   </div>
-                  {state.isDirty && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={handleSaveDraft}
-                      disabled={state.isLoading}
-                      className="text-neutral-600"
-                    >
-                      {state.isLoading ? (
-                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                      ) : (
-                        <Save className="h-4 w-4 mr-2" />
-                      )}
-                      Salvează Draft
-                    </Button>
-                  )}
+
+                  {/* Save Status Indicator */}
+                  <SaveStatus
+                    isSaving={state.isSaving}
+                    lastSavedAt={state.lastSavedAt}
+                    error={state.saveError}
+                    onRetry={handleRetry}
+                  />
                 </div>
               </CardHeader>
 
@@ -182,7 +187,7 @@ export function OrderWizard({ initialService, initialOptions }: OrderWizardProps
                   <Button
                     variant="outline"
                     onClick={prevStep}
-                    disabled={isFirstStep || state.isLoading}
+                    disabled={isFirstStep || state.isSaving}
                     className="gap-2"
                   >
                     <ArrowLeft className="h-4 w-4" />
@@ -199,10 +204,10 @@ export function OrderWizard({ initialService, initialOptions }: OrderWizardProps
 
                     <Button
                       onClick={handleNext}
-                      disabled={!stepValid || state.isLoading}
+                      disabled={!stepValid || state.isSaving}
                       className="gap-2 bg-primary-500 hover:bg-primary-600 text-secondary-900 font-semibold"
                     >
-                      {state.isLoading && (
+                      {state.isSaving && (
                         <Loader2 className="h-4 w-4 animate-spin" />
                       )}
                       {isLastStep ? (
@@ -221,12 +226,40 @@ export function OrderWizard({ initialService, initialOptions }: OrderWizardProps
                 </div>
               </div>
             </Card>
+
+            {/* Support Message */}
+            {state.friendlyOrderId && (
+              <div className="mt-4 p-4 bg-blue-50 border border-blue-100 rounded-lg">
+                <p className="text-sm text-blue-800">
+                  💬 <strong>Ai nevoie de ajutor?</strong> Contactează-ne și
+                  menționează codul comenzii tale:{' '}
+                  <code className="bg-blue-100 px-1.5 py-0.5 rounded font-mono font-semibold">
+                    {state.friendlyOrderId}
+                  </code>
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Price Sidebar */}
           <div className="lg:col-span-1">
             <div className="sticky top-24">
               <PriceSidebar />
+
+              {/* Order Summary in Sidebar */}
+              {state.friendlyOrderId && (
+                <Card className="mt-4 border border-neutral-200">
+                  <CardContent className="p-4">
+                    <p className="text-xs text-muted-foreground mb-2">
+                      Salvează acest cod pentru a continua mai târziu:
+                    </p>
+                    <OrderIdBadge
+                      orderId={state.friendlyOrderId}
+                      className="w-full justify-center"
+                    />
+                  </CardContent>
+                </Card>
+              )}
             </div>
           </div>
         </div>
@@ -240,12 +273,22 @@ export function OrderWizard({ initialService, initialOptions }: OrderWizardProps
             <AlertDialogDescription>
               Ai modificări nesalvate. Dorești să salvezi ca draft înainte de a
               părăsi pagina?
+              {state.friendlyOrderId && (
+                <>
+                  <br />
+                  <br />
+                  Poți reveni oricând folosind codul:{' '}
+                  <code className="bg-muted px-1.5 py-0.5 rounded font-mono font-semibold">
+                    {state.friendlyOrderId}
+                  </code>
+                </>
+              )}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Rămân aici</AlertDialogCancel>
             <AlertDialogAction
-              onClick={handleSaveDraft}
+              onClick={saveDraftNow}
               className="bg-primary-500 text-secondary-900"
             >
               Salvează și ieși

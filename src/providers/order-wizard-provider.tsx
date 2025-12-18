@@ -23,8 +23,13 @@ import {
   SignatureData,
   DeliverySelection,
   PriceBreakdown,
+  DraftOrderCache,
 } from '@/types/orders';
 import { Service, ServiceOption } from '@/types/services';
+import { generateOrderId, getDraftStorageKey } from '@/lib/order-id';
+
+// Cache version for migrations
+const CACHE_VERSION = 1;
 
 // Initial State
 const initialState: OrderWizardState = {
@@ -40,10 +45,13 @@ const initialState: OrderWizardState = {
   signatureData: {},
   deliverySelection: {},
   orderId: null,
+  friendlyOrderId: null,
   isDirty: false,
+  isSaving: false,
   lastSavedAt: null,
   isLoading: false,
   error: null,
+  saveError: null,
 };
 
 // Reducer
@@ -143,26 +151,46 @@ function orderWizardReducer(
         orderId: action.payload,
       };
 
+    case 'SET_FRIENDLY_ORDER_ID':
+      return {
+        ...state,
+        friendlyOrderId: action.payload,
+      };
+
+    case 'SET_ORDER_IDS':
+      return {
+        ...state,
+        orderId: action.payload.orderId,
+        friendlyOrderId: action.payload.friendlyOrderId,
+      };
+
     case 'SAVE_START':
       return {
         ...state,
-        isLoading: true,
-        error: null,
+        isSaving: true,
+        saveError: null,
       };
 
     case 'SAVE_SUCCESS':
       return {
         ...state,
-        isLoading: false,
+        isSaving: false,
         isDirty: false,
         lastSavedAt: action.payload,
+        saveError: null,
       };
 
     case 'SAVE_ERROR':
       return {
         ...state,
-        isLoading: false,
-        error: action.payload,
+        isSaving: false,
+        saveError: action.payload,
+      };
+
+    case 'CLEAR_SAVE_ERROR':
+      return {
+        ...state,
+        saveError: null,
       };
 
     case 'MARK_DIRTY':
@@ -170,6 +198,25 @@ function orderWizardReducer(
         ...state,
         isDirty: true,
       };
+
+    case 'RESTORE_FROM_CACHE': {
+      const cache = action.payload;
+      return {
+        ...state,
+        orderId: cache.orderId,
+        friendlyOrderId: cache.friendlyOrderId,
+        currentStep: cache.currentStep,
+        stepNumber: cache.stepNumber,
+        contactData: cache.data.contact || {},
+        personalData: cache.data.personal || {},
+        selectedOptions: cache.data.options || [],
+        kycDocuments: cache.data.kyc || {},
+        signatureData: cache.data.signature || {},
+        deliverySelection: cache.data.delivery || {},
+        lastSavedAt: cache.lastSavedAt,
+        isDirty: false,
+      };
+    }
 
     case 'RESET':
       return initialState;
@@ -201,12 +248,32 @@ interface OrderWizardContextType {
   // Price
   priceBreakdown: PriceBreakdown;
   // Actions
+  initializeOrder: () => void;
   saveDraft: () => Promise<void>;
+  saveDraftNow: () => Promise<void>;
   submitOrder: () => Promise<void>;
   resetWizard: () => void;
+  clearSaveError: () => void;
 }
 
 const OrderWizardContext = createContext<OrderWizardContextType | null>(null);
+
+// Debounce utility
+function debounce<T extends (...args: unknown[]) => unknown>(
+  func: T,
+  wait: number
+): (...args: Parameters<T>) => void {
+  let timeoutId: NodeJS.Timeout | null = null;
+
+  return (...args: Parameters<T>) => {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
+    timeoutId = setTimeout(() => {
+      func(...args);
+    }, wait);
+  };
+}
 
 // Provider Component
 export function OrderWizardProvider({ children }: { children: ReactNode }) {
@@ -217,6 +284,7 @@ export function OrderWizardProvider({ children }: { children: ReactNode }) {
   // Track if we're syncing from URL to prevent loops
   const isUrlSyncRef = useRef(false);
   const initialSyncDoneRef = useRef(false);
+  const saveAbortControllerRef = useRef<AbortController | null>(null);
 
   // Sync step from URL on mount only (once)
   useEffect(() => {
@@ -232,17 +300,16 @@ export function OrderWizardProvider({ children }: { children: ReactNode }) {
         if (step && step.id !== state.currentStep) {
           isUrlSyncRef.current = true;
           dispatch({ type: 'SET_STEP', payload: step.id });
-          // Reset flag after dispatch
           setTimeout(() => { isUrlSyncRef.current = false; }, 0);
         }
       }
     }
-  }, []); // Empty deps - run only once on mount
+  }, []);
 
   // Update URL when step changes (but not when syncing from URL)
   const updateURL = useCallback(
     (stepNumber: number) => {
-      if (isUrlSyncRef.current) return; // Don't update URL if we're syncing from it
+      if (isUrlSyncRef.current) return;
 
       const params = new URLSearchParams(window.location.search);
       params.set('step', stepNumber.toString());
@@ -332,17 +399,91 @@ export function OrderWizardProvider({ children }: { children: ReactNode }) {
     };
   }, [state.service, state.selectedOptions, state.deliverySelection]);
 
-  // Save draft
-  const saveDraft = useCallback(async () => {
-    dispatch({ type: 'SAVE_START' });
+  // Initialize order with a new friendly order ID
+  const initializeOrder = useCallback(() => {
+    if (state.friendlyOrderId) return; // Already initialized
+
+    const newOrderId = generateOrderId();
+    dispatch({ type: 'SET_FRIENDLY_ORDER_ID', payload: newOrderId });
+
+    // Check localStorage for existing draft
+    if (typeof window !== 'undefined') {
+      const cacheKey = getDraftStorageKey(newOrderId);
+      const cached = localStorage.getItem(cacheKey);
+      if (cached) {
+        try {
+          const cacheData: DraftOrderCache = JSON.parse(cached);
+          if (cacheData.version === CACHE_VERSION) {
+            dispatch({ type: 'RESTORE_FROM_CACHE', payload: cacheData });
+          }
+        } catch {
+          // Invalid cache, ignore
+        }
+      }
+    }
+  }, [state.friendlyOrderId]);
+
+  // Save to localStorage (immediate, no network)
+  const saveToLocalStorage = useCallback(() => {
+    if (!state.friendlyOrderId || !state.serviceSlug) return;
+
+    const cacheData: DraftOrderCache = {
+      orderId: state.orderId,
+      friendlyOrderId: state.friendlyOrderId,
+      serviceSlug: state.serviceSlug,
+      currentStep: state.currentStep,
+      stepNumber: state.stepNumber,
+      data: {
+        contact: state.contactData,
+        personal: state.personalData,
+        options: state.selectedOptions,
+        kyc: state.kycDocuments,
+        signature: state.signatureData,
+        delivery: state.deliverySelection,
+      },
+      lastSavedAt: new Date().toISOString(),
+      version: CACHE_VERSION,
+    };
+
     try {
-      const response = await fetch('/api/orders', {
-        method: state.orderId ? 'PATCH' : 'POST',
+      const cacheKey = getDraftStorageKey(state.friendlyOrderId);
+      localStorage.setItem(cacheKey, JSON.stringify(cacheData));
+    } catch (error) {
+      console.warn('Failed to save to localStorage:', error);
+    }
+  }, [state]);
+
+  // Save draft to server
+  const saveDraftToServer = useCallback(async () => {
+    if (!state.service || !state.friendlyOrderId) return;
+
+    // Cancel any pending save
+    if (saveAbortControllerRef.current) {
+      saveAbortControllerRef.current.abort();
+    }
+    saveAbortControllerRef.current = new AbortController();
+
+    dispatch({ type: 'SAVE_START' });
+
+    try {
+      // First save to localStorage (immediate, offline resilience)
+      saveToLocalStorage();
+
+      // Then save to server
+      const endpoint = state.orderId
+        ? '/api/orders/draft'
+        : '/api/orders/draft';
+      const method = state.orderId ? 'PATCH' : 'POST';
+
+      const response = await fetch(endpoint, {
+        method,
         headers: { 'Content-Type': 'application/json' },
+        signal: saveAbortControllerRef.current.signal,
         body: JSON.stringify({
           id: state.orderId,
-          service_id: state.service?.id,
-          status: 'draft',
+          friendly_order_id: state.friendlyOrderId,
+          service_id: state.service.id,
+          current_step: state.currentStep,
           customer_data: {
             contact: state.contactData,
             personal: state.personalData,
@@ -361,24 +502,69 @@ export function OrderWizardProvider({ children }: { children: ReactNode }) {
       }
 
       const data = await response.json();
-      if (data.data?.order?.id && !state.orderId) {
-        dispatch({ type: 'SET_ORDER_ID', payload: data.data.order.id });
+
+      // Update state with server response
+      if (data.data?.order) {
+        if (data.data.order.id && !state.orderId) {
+          dispatch({
+            type: 'SET_ORDER_IDS',
+            payload: {
+              orderId: data.data.order.id,
+              friendlyOrderId: data.data.order.friendly_order_id || state.friendlyOrderId,
+            },
+          });
+        }
       }
+
       dispatch({ type: 'SAVE_SUCCESS', payload: new Date().toISOString() });
     } catch (error) {
+      if (error instanceof Error && error.name === 'AbortError') {
+        // Save was cancelled, don't show error
+        return;
+      }
+
+      console.error('Auto-save failed:', error);
       dispatch({
         type: 'SAVE_ERROR',
-        payload: error instanceof Error ? error.message : 'Save failed',
+        payload: error instanceof Error ? error.message : 'Salvarea a eșuat',
       });
     }
-  }, [state, priceBreakdown]);
+  }, [state, priceBreakdown, saveToLocalStorage]);
+
+  // Debounced save (500ms after typing stops)
+  const debouncedSave = useMemo(
+    () => debounce(saveDraftToServer, 500),
+    [saveDraftToServer]
+  );
+
+  // Public save functions
+  const saveDraft = useCallback(async () => {
+    debouncedSave();
+  }, [debouncedSave]);
+
+  const saveDraftNow = useCallback(async () => {
+    await saveDraftToServer();
+  }, [saveDraftToServer]);
+
+  // Auto-save when data changes (debounced)
+  useEffect(() => {
+    if (!state.isDirty || !state.service || !state.friendlyOrderId) return;
+    debouncedSave();
+  }, [state.isDirty, state.service, state.friendlyOrderId, debouncedSave]);
+
+  // Also save to localStorage immediately on any change (for offline resilience)
+  useEffect(() => {
+    if (state.isDirty && state.friendlyOrderId) {
+      saveToLocalStorage();
+    }
+  }, [state.isDirty, state.friendlyOrderId, saveToLocalStorage]);
 
   // Submit order
   const submitOrder = useCallback(async () => {
     dispatch({ type: 'SAVE_START' });
     try {
       // First save the order
-      await saveDraft();
+      await saveDraftNow();
 
       // Then create payment intent
       if (!state.orderId) {
@@ -405,23 +591,25 @@ export function OrderWizardProvider({ children }: { children: ReactNode }) {
         payload: error instanceof Error ? error.message : 'Submit failed',
       });
     }
-  }, [state.orderId, saveDraft]);
+  }, [state.orderId, saveDraftNow]);
 
   // Reset wizard
   const resetWizard = useCallback(() => {
+    // Clear localStorage
+    if (state.friendlyOrderId) {
+      try {
+        localStorage.removeItem(getDraftStorageKey(state.friendlyOrderId));
+      } catch {
+        // Ignore
+      }
+    }
     dispatch({ type: 'RESET' });
+  }, [state.friendlyOrderId]);
+
+  // Clear save error
+  const clearSaveError = useCallback(() => {
+    dispatch({ type: 'CLEAR_SAVE_ERROR' });
   }, []);
-
-  // Auto-save draft every 30 seconds when dirty
-  useEffect(() => {
-    if (!state.isDirty || !state.service) return;
-
-    const timer = setTimeout(() => {
-      saveDraft();
-    }, 30000);
-
-    return () => clearTimeout(timer);
-  }, [state.isDirty, state.service, saveDraft]);
 
   // Handle browser back button
   useEffect(() => {
@@ -442,6 +630,19 @@ export function OrderWizardProvider({ children }: { children: ReactNode }) {
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
+  // Warn on page unload if dirty
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (state.isDirty && state.friendlyOrderId) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [state.isDirty, state.friendlyOrderId]);
+
   const value: OrderWizardContextType = {
     state,
     goToStep,
@@ -459,9 +660,12 @@ export function OrderWizardProvider({ children }: { children: ReactNode }) {
     updateSignature,
     updateDelivery,
     priceBreakdown,
+    initializeOrder,
     saveDraft,
+    saveDraftNow,
     submitOrder,
     resetWizard,
+    clearSaveError,
   };
 
   return (

@@ -154,11 +154,14 @@ export interface OrderWizardState {
   deliverySelection: Partial<DeliverySelection>;
 
   // Order Metadata
-  orderId: string | null;
+  orderId: string | null;           // Database UUID
+  friendlyOrderId: string | null;   // Human-readable ID (ORD-YYYYMMDD-XXXXX)
   isDirty: boolean;
+  isSaving: boolean;                // Is currently saving
   lastSavedAt: string | null;
   isLoading: boolean;
   error: string | null;
+  saveError: string | null;         // Separate error for save operations
 }
 
 // Wizard Actions
@@ -174,11 +177,34 @@ export type OrderWizardAction =
   | { type: 'UPDATE_SIGNATURE'; payload: Partial<SignatureData> }
   | { type: 'UPDATE_DELIVERY'; payload: Partial<DeliverySelection> }
   | { type: 'SET_ORDER_ID'; payload: string }
+  | { type: 'SET_FRIENDLY_ORDER_ID'; payload: string }
+  | { type: 'SET_ORDER_IDS'; payload: { orderId: string; friendlyOrderId: string } }
   | { type: 'SAVE_START' }
   | { type: 'SAVE_SUCCESS'; payload: string }
   | { type: 'SAVE_ERROR'; payload: string }
+  | { type: 'CLEAR_SAVE_ERROR' }
   | { type: 'MARK_DIRTY' }
+  | { type: 'RESTORE_FROM_CACHE'; payload: DraftOrderCache }
   | { type: 'RESET' };
+
+// Local Storage Cache Schema
+export interface DraftOrderCache {
+  orderId: string | null;
+  friendlyOrderId: string;
+  serviceSlug: string;
+  currentStep: WizardStep;
+  stepNumber: number;
+  data: {
+    contact?: Partial<ContactData>;
+    personal?: Partial<PersonalData>;
+    options?: SelectedOption[];
+    kyc?: Partial<KYCDocuments>;
+    signature?: Partial<SignatureData>;
+    delivery?: Partial<DeliverySelection>;
+  };
+  lastSavedAt: string;
+  version: number;
+}
 
 // Order Status from API
 export type OrderStatus =

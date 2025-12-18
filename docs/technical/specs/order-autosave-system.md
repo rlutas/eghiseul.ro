@@ -1,9 +1,26 @@
 # Order Auto-Save & Support System
 
-**Version:** 1.0
-**Status:** Design Complete
+**Version:** 1.1
+**Status:** Partially Implemented
 **Created:** 2025-12-17
+**Updated:** 2025-12-18
 **Sprint:** Sprint 3 - Order Management Enhancement
+
+## Implementation Status
+
+| Feature | Status | Notes |
+|---------|--------|-------|
+| Order ID Generation | ✅ Complete | `lib/order-id.ts` |
+| Friendly Order ID DB Column | ✅ Complete | `migrations/008_friendly_order_id.sql` |
+| Draft API Endpoint | ✅ Complete | `api/orders/draft/route.ts` |
+| Auto-Save (Debounced) | ✅ Complete | 500ms debounce in provider |
+| localStorage Backup | ✅ Complete | Offline resilience |
+| Save Status UI | ✅ Complete | `components/orders/save-status.tsx` |
+| Order ID Display | ✅ Complete | `components/orders/order-id-display.tsx` |
+| Bank Transfer Flow | ⏳ Pending | Phase 2 |
+| Magic Links Recovery | ⏳ Pending | Phase 2 |
+| Support Dashboard | ⏳ Pending | Phase 2 |
+| Abandoned Order Emails | ⏳ Pending | Phase 2 |
 
 ---
 

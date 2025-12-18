@@ -146,6 +146,8 @@ export type Database = {
           kyc_rejection_reason: string | null
           kyc_verified_at: string | null
           kyc_verified_by: string | null
+          friendly_order_id: string | null
+          abandoned_email_sent_at: string | null
           options_price: number | null
           order_number: string
           paid_at: string | null
@@ -197,6 +199,8 @@ export type Database = {
           kyc_rejection_reason?: string | null
           kyc_verified_at?: string | null
           kyc_verified_by?: string | null
+          friendly_order_id?: string | null
+          abandoned_email_sent_at?: string | null
           options_price?: number | null
           order_number: string
           paid_at?: string | null
@@ -248,6 +252,8 @@ export type Database = {
           kyc_rejection_reason?: string | null
           kyc_verified_at?: string | null
           kyc_verified_by?: string | null
+          friendly_order_id?: string | null
+          abandoned_email_sent_at?: string | null
           options_price?: number | null
           order_number?: string
           paid_at?: string | null

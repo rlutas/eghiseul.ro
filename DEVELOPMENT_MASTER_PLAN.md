@@ -1,8 +1,8 @@
 # eGhiseul.ro - Development Master Plan
 
-**Version:** 1.6
+**Version:** 1.7
 **Last Updated:** 2025-12-18
-**Status:** In Development - Sprint 3 (85% Complete) - Testing Complete
+**Status:** In Development - Sprint 3 (90% Complete) - Order ID & Auto-Save Implemented
 
 ---
 
@@ -205,7 +205,7 @@
 | `/api/orders/[id]/payment` | POST | Required | Create payment intent |
 | `/api/webhooks/stripe` | POST | Public | Stripe webhooks |
 
-#### Sprint 3: KYC & Documents (Săptămâna 9-10) ⏳ IN PROGRESS (85%)
+#### Sprint 3: KYC & Documents (Săptămâna 9-10) ⏳ IN PROGRESS (90%)
 
 | Task | Status | Priority | Files |
 |------|--------|----------|-------|
@@ -227,6 +227,11 @@
 | ✅ Security Rate Limiting | Complete | HIGH | `lib/security/rate-limiter.ts` |
 | ✅ Audit Logging | Complete | HIGH | `migrations/006_audit_logs.sql` |
 | ✅ Production Security Guide | Complete | HIGH | `docs/deployment/PRODUCTION_SECURITY_SETUP.md` |
+| ✅ **Order ID System** | **NEW** | HIGH | `lib/order-id.ts`, `migrations/008_friendly_order_id.sql` |
+| ✅ **Auto-Save (debounced)** | **NEW** | HIGH | `providers/order-wizard-provider.tsx` |
+| ✅ **Draft API Endpoint** | **NEW** | HIGH | `api/orders/draft/route.ts` |
+| ✅ **Save Status UI** | **NEW** | MEDIUM | `components/orders/save-status.tsx` |
+| ✅ **localStorage Backup** | **NEW** | MEDIUM | Offline resilience for drafts |
 | ⏳ Passport UI Support | Partial | LOW | OCR ready, UI pending |
 | ⏳ S3 storage integration | Pending | HIGH | AWS S3 upload (next priority) |
 | ⏳ User orders dashboard | Pending | MEDIUM | `app/(customer)/orders/*` |
@@ -239,6 +244,9 @@
 | `/api/ocr/extract` | POST | Extract data from ID/passport (Gemini 2.0 Flash Exp) |
 | `/api/kyc/validate` | GET | KYC validation service health check |
 | `/api/kyc/validate` | POST | Validate KYC documents (Gemini 1.5 Flash) |
+| `/api/orders/draft` | GET | Retrieve draft order by friendly_order_id |
+| `/api/orders/draft` | POST | Create new draft order with unique ID |
+| `/api/orders/draft` | PATCH | Update existing draft order |
 
 **Order Wizard Steps Implemented:**
 1. **Contact Step** - Email, phone, preferred contact method
@@ -256,6 +264,10 @@
 - **Electronic Signature**: Canvas-based signature with terms acceptance
 - **Multi-document Support**: CI front/back and passport (OCR ready)
 - **Romanian Address Parsing**: Full support for Jud., Mun., Str., Nr., Bl., Sc., Et., Ap.
+- **Order ID System**: Human-readable IDs (ORD-YYYYMMDD-XXXXX) for customer communication
+- **Auto-Save System**: Debounced save (500ms) to prevent data loss
+- **localStorage Backup**: Offline resilience, data preserved even without network
+- **Save Status Indicator**: Real-time feedback showing "Salvat acum X sec"
 
 **Technical Specifications Created (Sprint 3):**
 1. **User Data Persistence** (`docs/technical/specs/user-data-persistence.md`)
