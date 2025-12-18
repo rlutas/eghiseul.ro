@@ -2,7 +2,7 @@
 
 **Version:** 1.7
 **Last Updated:** 2025-12-18
-**Status:** In Development - Sprint 3 (90% Complete) - Order ID & Auto-Save Implemented
+**Status:** In Development - Sprint 3 (95% Complete) - Order ID, Auto-Save & GDPR Cleanup Implemented
 
 ---
 
@@ -232,6 +232,9 @@
 | ✅ **Draft API Endpoint** | **NEW** | HIGH | `api/orders/draft/route.ts` |
 | ✅ **Save Status UI** | **NEW** | MEDIUM | `components/orders/save-status.tsx` |
 | ✅ **localStorage Backup** | **NEW** | MEDIUM | Offline resilience for drafts |
+| ✅ **Admin Order Lookup API** | **NEW** | HIGH | `api/admin/orders/lookup/route.ts` |
+| ✅ **GDPR Auto-Cleanup** | **NEW** | CRITICAL | `migrations/009_draft_auto_cleanup.sql` |
+| ✅ **Admin Cleanup API** | **NEW** | HIGH | `api/admin/cleanup/route.ts` |
 | ⏳ Passport UI Support | Partial | LOW | OCR ready, UI pending |
 | ⏳ S3 storage integration | Pending | HIGH | AWS S3 upload (next priority) |
 | ⏳ User orders dashboard | Pending | MEDIUM | `app/(customer)/orders/*` |
@@ -247,6 +250,16 @@
 | `/api/orders/draft` | GET | Retrieve draft order by friendly_order_id |
 | `/api/orders/draft` | POST | Create new draft order with unique ID |
 | `/api/orders/draft` | PATCH | Update existing draft order |
+| `/api/admin/orders/lookup` | GET | Admin: Look up order by friendly_order_id (NEW) |
+| `/api/admin/cleanup` | GET | Admin: Get cleanup status and pending drafts (NEW) |
+| `/api/admin/cleanup` | POST | Admin: Run cleanup of expired drafts (NEW) |
+
+**GDPR Data Retention Policy (NEW):**
+- Draft orders are **anonymized after 7 days** if not completed
+- Personal data removed: name, CNP, address, email, phone, KYC documents
+- Metadata preserved for analytics: service type, price, county (anonymized)
+- Migration: `009_draft_auto_cleanup.sql`
+- Manual cleanup: POST `/api/admin/cleanup`
 
 **Order Wizard Steps Implemented:**
 1. **Contact Step** - Email, phone, preferred contact method

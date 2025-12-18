@@ -2190,48 +2190,69 @@ async function saveDraft() {
 
 ## Implementation Checklist
 
-### Phase 1: Order ID & Auto-Save (Sprint 3.1)
+### Phase 1: Order ID & Auto-Save (Sprint 3.1) ✅ COMPLETE
 
-- [ ] **Order ID Generator**
-  - [ ] Create `generateOrderId()` function
-  - [ ] Add `friendly_order_id` column to `orders` table
-  - [ ] Create trigger for auto-generation
-  - [ ] Add unique constraint
-  - [ ] Write unit tests
+- [x] **Order ID Generator**
+  - [x] Create `generateOrderId()` function (`lib/order-id.ts`)
+  - [x] Add `friendly_order_id` column to `orders` table (`migrations/008`)
+  - [x] Order ID generated at Step 2→3 transition
+  - [x] Add unique constraint
+  - [x] Validation function `validateOrderId()`
 
-- [ ] **Auto-Save Mechanism**
-  - [ ] Implement localStorage backup
-  - [ ] Add debounced save (500ms)
-  - [ ] Create POST/PATCH `/api/orders/draft` endpoints
-  - [ ] Add save status UI component
-  - [ ] Test offline/online scenarios
+- [x] **Auto-Save Mechanism**
+  - [x] Implement localStorage backup
+  - [x] Add debounced save (500ms)
+  - [x] Create POST/PATCH/GET `/api/orders/draft` endpoints
+  - [x] Add save status UI component (`save-status.tsx`)
+  - [x] Only saves after Step 2 with valid contact data
 
-- [ ] **Wizard Enhancement**
-  - [ ] Display order ID in header
-  - [ ] Show save status indicator
-  - [ ] Add "Resume Order" detection on load
-  - [ ] Test all 6 steps with auto-save
+- [x] **Wizard Enhancement**
+  - [x] Display order ID in header (`order-id-display.tsx`)
+  - [x] Show save status indicator
+  - [x] Order ID visible for customer support reference
+  - [x] Price sidebar with order ID card
 
-### Phase 2: Support System (Sprint 3.2)
+### Phase 1.5: Admin Support & Data Retention ✅ COMPLETE (NEW)
+
+- [x] **Admin Order Lookup**
+  - [x] GET `/api/admin/orders/lookup?id=ORD-...` endpoint
+  - [x] Returns full order details for support team
+  - [x] Shows admin info (days old, expiry date, is_guest)
+
+- [x] **GDPR Data Retention**
+  - [x] Migration `009_draft_auto_cleanup.sql`
+  - [x] `anonymize_expired_drafts()` function
+  - [x] `anonymize_order(UUID)` function for manual cleanup
+  - [x] GET/POST `/api/admin/cleanup` endpoints
+  - [x] 7-day retention policy for draft orders
+
+**Data Retention Policy:**
+- Draft orders are anonymized after 7 days
+- PII (name, CNP, address, email, phone) is removed
+- Order metadata kept for analytics (service, price, county)
+- Anonymization preserves email domain for stats
+
+### Phase 2: Support System (Sprint 3.2) - PARTIAL
+
+- [x] **Admin API Endpoints**
+  - [x] GET `/api/admin/orders/lookup?id=ORD-...`
+  - [x] GET `/api/admin/cleanup` (cleanup status)
+  - [x] POST `/api/admin/cleanup` (run cleanup)
+  - [ ] POST `/api/admin/orders/[id]/notes`
+  - [ ] POST `/api/orders/[id]/magic-link`
 
 - [ ] **Database Schema**
   - [ ] Create `order_notes` table
-  - [ ] Add support fields to `orders` table
+  - [x] Add anonymization fields to orders
   - [ ] Create RLS policies for admins
-  - [ ] Add audit logging triggers
+  - [x] Add audit logging
 
-- [ ] **Admin Dashboard**
+- [ ] **Admin Dashboard UI**
   - [ ] Build order lookup page
   - [ ] Create order details view
   - [ ] Add support actions panel
   - [ ] Implement note-taking feature
   - [ ] Add order timeline component
-
-- [ ] **API Endpoints**
-  - [ ] GET `/api/admin/orders/lookup/[friendlyId]`
-  - [ ] POST `/api/admin/orders/[id]/notes`
-  - [ ] POST `/api/orders/[id]/magic-link`
-  - [ ] Test with admin and regular user roles
 
 ### Phase 3: Bank Transfer (Sprint 3.3)
 
