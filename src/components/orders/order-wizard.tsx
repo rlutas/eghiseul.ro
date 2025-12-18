@@ -45,29 +45,25 @@ export function OrderWizard({ initialService, initialOptions }: OrderWizardProps
     isFirstStep,
     isLastStep,
     setService,
-    initializeOrder,
     saveDraftNow,
     submitOrder,
     priceBreakdown,
     clearSaveError,
+    canSaveToServer,
   } = useOrderWizard();
 
   const [showExitDialog, setShowExitDialog] = useState(false);
   const [stepValid, setStepValid] = useState(false);
 
-  // Initialize service data and generate order ID
+  // Initialize service data
   useEffect(() => {
     if (initialService && !state.service) {
       setService(initialService, initialOptions);
     }
   }, [initialService, initialOptions, setService, state.service]);
 
-  // Initialize order ID when service is set
-  useEffect(() => {
-    if (state.service && !state.friendlyOrderId) {
-      initializeOrder();
-    }
-  }, [state.service, state.friendlyOrderId, initializeOrder]);
+  // Note: Order ID is now automatically generated when contact data is valid
+  // (email + phone) - see OrderWizardProvider
 
   // Render current step
   const renderStep = () => {
@@ -169,13 +165,15 @@ export function OrderWizard({ initialService, initialOptions }: OrderWizardProps
                     </h2>
                   </div>
 
-                  {/* Save Status Indicator */}
-                  <SaveStatus
-                    isSaving={state.isSaving}
-                    lastSavedAt={state.lastSavedAt}
-                    error={state.saveError}
-                    onRetry={handleRetry}
-                  />
+                  {/* Save Status Indicator - only show when we can save to server */}
+                  {canSaveToServer && (
+                    <SaveStatus
+                      isSaving={state.isSaving}
+                      lastSavedAt={state.lastSavedAt}
+                      error={state.saveError}
+                      onRetry={handleRetry}
+                    />
+                  )}
                 </div>
               </CardHeader>
 
