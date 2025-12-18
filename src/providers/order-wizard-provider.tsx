@@ -354,10 +354,20 @@ export function OrderWizardProvider({ children }: { children: ReactNode }) {
 
   const nextStep = useCallback(() => {
     if (canGoNext) {
+      // Generate Order ID when moving from Step 1 (contact) to Step 2 (personal)
+      if (
+        state.currentStep === 'contact' &&
+        !state.friendlyOrderId &&
+        hasValidContactData(state.contactData)
+      ) {
+        const newOrderId = generateOrderId();
+        dispatch({ type: 'SET_FRIENDLY_ORDER_ID', payload: newOrderId });
+      }
+
       dispatch({ type: 'NEXT_STEP' });
       updateURL(state.stepNumber + 1);
     }
-  }, [canGoNext, state.stepNumber, updateURL]);
+  }, [canGoNext, state.stepNumber, state.currentStep, state.friendlyOrderId, state.contactData, updateURL]);
 
   const prevStep = useCallback(() => {
     if (canGoPrev) {
@@ -416,18 +426,8 @@ export function OrderWizardProvider({ children }: { children: ReactNode }) {
     };
   }, [state.service, state.selectedOptions, state.deliverySelection]);
 
-  // Generate order ID when we have valid contact data (only once)
-  useEffect(() => {
-    if (
-      !hasGeneratedOrderIdRef.current &&
-      !state.friendlyOrderId &&
-      hasValidContactData(state.contactData)
-    ) {
-      hasGeneratedOrderIdRef.current = true;
-      const newOrderId = generateOrderId();
-      dispatch({ type: 'SET_FRIENDLY_ORDER_ID', payload: newOrderId });
-    }
-  }, [state.contactData, state.friendlyOrderId]);
+  // Order ID is generated when moving from Step 1 to Step 2 (via generateOrderIdOnStepTransition)
+  // NOT automatically when contact data becomes valid
 
   // Save to localStorage (immediate, no network) - only with valid contact data
   const saveToLocalStorage = useCallback(() => {

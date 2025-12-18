@@ -111,6 +111,20 @@ export async function POST(request: NextRequest) {
     if (orderError) {
       console.error('Draft creation error:', orderError);
 
+      // Handle missing column error (migration not applied yet)
+      if (orderError.message?.includes('friendly_order_id') || orderError.code === '42703') {
+        return NextResponse.json(
+          {
+            success: false,
+            error: {
+              code: 'MIGRATION_REQUIRED',
+              message: 'Database migration required. Please run migration 008_friendly_order_id.sql',
+            },
+          },
+          { status: 500 }
+        );
+      }
+
       // Handle unique constraint violation (duplicate friendly_order_id)
       if (orderError.code === '23505') {
         // Retry with a new ID
