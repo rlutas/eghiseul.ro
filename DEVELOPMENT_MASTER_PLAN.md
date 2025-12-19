@@ -282,6 +282,7 @@
 - **Auto-Save System**: Debounced save (500ms) to prevent data loss, only active after Step 2
 - **Duplicate Prevention**: POST /api/orders/draft checks for existing order before insert
 - **Romanian Name Validation**: Supports cedilla (Ş,Ţ) and comma-below (Ș,Ț) diacritics, hyphens for compound names
+- **Flexible Document Validation**: Supports old CI (serie+6 cifre), new CI (9 chars combined), passport (9 digits)
 - **localStorage Backup**: Offline resilience, data preserved even without network
 - **Save Status Indicator**: Real-time feedback showing "Salvat acum X sec"
 
