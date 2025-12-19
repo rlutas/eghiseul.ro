@@ -79,9 +79,15 @@ Invoicing:  SmartBill (e-factura compliant)
 #### AI-Powered OCR System
 - **Files**: `src/lib/services/document-ocr.ts`, `src/app/api/ocr/extract/`
 - **Model**: Google Gemini 2.0 Flash Exp
-- **Supports**: CI front, CI back, Passport
-- **Extracts**: CNP, name, birth date, full Romanian address (Jud., Str., Nr., Bl., Sc., Et., Ap.)
-- **Docs**: `docs/technical/api/ocr-kyc-api.md`
+- **Supports**: CI Vechi (old ID), CI Nou (new ID), Passport, Certificat Atestare Domiciliu
+- **Extracts**: CNP, name, birth date, full Romanian address (Jud., Str., Nr., Bl., Sc., Et., Ap.), MRZ
+- **Features**:
+  - Auto-detect document type
+  - Expiry validation (special case for birth certificate requests)
+  - Cross-validation between ID and address certificate
+- **Docs**:
+  - `docs/technical/api/ocr-kyc-api.md`
+  - `docs/technical/specs/romanian-document-handling.md` (NEW)
 
 #### KYC Validation System
 - **Files**: `src/lib/services/kyc-validation.ts`, `src/app/api/kyc/validate/`
@@ -100,9 +106,13 @@ Invoicing:  SmartBill (e-factura compliant)
 
 ### In Progress (Sprint 3+)
 
+- [x] Order auto-save with order ID (ORD-YYYYMMDD-XXXXX format)
+- [x] Romanian document handling (CI vechi, CI nou, Passport)
+- [x] Certificat Atestare Domiciliu support
+- [x] Document expiry validation
+- [x] GDPR auto-cleanup (7-day draft anonymization)
 - [ ] User data persistence (save for logged users)
 - [ ] Account creation offer at order end
-- [ ] Order auto-save with order ID
 - [ ] Bank transfer payment option
 - [ ] S3 document upload
 - [ ] User orders dashboard
@@ -118,8 +128,9 @@ docs/
 │   │   ├── services-api.md         # Services & Orders API
 │   │   └── ocr-kyc-api.md          # OCR & KYC AI API (NEW)
 │   ├── specs/
-│   │   ├── user-data-persistence.md    # User data saving feature
-│   │   └── order-autosave-system.md    # Auto-save & support system
+│   │   ├── user-data-persistence.md       # User data saving feature
+│   │   ├── order-autosave-system.md       # Auto-save & support system
+│   │   └── romanian-document-handling.md  # CI/Passport/Certificate handling (NEW)
 │   ├── database/
 │   │   └── services-schema.md      # Database schema docs
 │   └── technology-decisions-summary.md
@@ -302,8 +313,16 @@ docs/
 | `/api/orders` | GET, POST | List/Create orders |
 | `/api/orders/[id]` | GET, PATCH | Order details/update |
 | `/api/orders/[id]/payment` | POST | Create payment intent |
+| `/api/orders/draft` | GET, POST, PATCH | Draft order CRUD |
 | `/api/ocr/extract` | POST | Extract data from ID |
 | `/api/kyc/validate` | POST | Validate KYC documents |
+
+### Admin Endpoints
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/admin/orders/lookup` | GET | Lookup order by ID |
+| `/api/admin/orders/list` | GET | List orders by status |
+| `/api/admin/cleanup` | GET, POST | GDPR cleanup status/run |
 
 ### Webhooks
 | Endpoint | Method | Description |
@@ -352,5 +371,5 @@ SMSLINK_API_KEY=
 
 ---
 
-**Last Updated:** 2025-12-17
-**Version:** 2.0
+**Last Updated:** 2025-12-18
+**Version:** 2.1
