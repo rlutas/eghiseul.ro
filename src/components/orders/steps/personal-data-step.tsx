@@ -61,11 +61,14 @@ const personalDataSchema = z.object({
   first_name: z.string()
     .min(2, 'Prenumele trebuie să aibă cel puțin 2 caractere')
     .max(50, 'Prenumele poate avea maxim 50 caractere')
-    .regex(/^[a-zA-ZăâîșțĂÂÎȘȚ\s-]+$/, 'Prenumele poate conține doar litere'),
+    // Include all Romanian diacritics (both comma-below and cedilla variants)
+    // Also include common foreign characters for names (É, Ö, Ü, etc.)
+    .regex(/^[a-zA-ZăâîșțĂÂÎȘȚşŞţŢéÉèÈêÊëËöÖüÜáÁíÍóÓúÚñÑ\s'-]+$/, 'Prenumele poate conține doar litere'),
   last_name: z.string()
     .min(2, 'Numele trebuie să aibă cel puțin 2 caractere')
     .max(50, 'Numele poate avea maxim 50 caractere')
-    .regex(/^[a-zA-ZăâîșțĂÂÎȘȚ\s-]+$/, 'Numele poate conține doar litere'),
+    // Include all Romanian diacritics (both comma-below and cedilla variants)
+    .regex(/^[a-zA-ZăâîșțĂÂÎȘȚşŞţŢéÉèÈêÊëËöÖüÜáÁíÍóÓúÚñÑ\s'-]+$/, 'Numele poate conține doar litere'),
   birth_date: z.string().min(1, 'Data nașterii este obligatorie'),
   birth_place: z.string()
     .min(2, 'Locul nașterii este obligatoriu')
