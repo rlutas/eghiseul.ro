@@ -85,7 +85,67 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create the draft order
+    // Check if order with this friendly_order_id already exists (to prevent duplicates)
+    if (data.friendly_order_id) {
+      const { data: existingOrder } = await supabase
+        .from('orders')
+        .select('id, friendly_order_id, status')
+        .eq('friendly_order_id', data.friendly_order_id)
+        .single();
+
+      if (existingOrder) {
+        // Order already exists - update it instead of creating duplicate
+        const { data: updatedOrder, error: updateError } = await supabase
+          .from('orders')
+          .update({
+            customer_data: data.customer_data || {},
+            selected_options: data.selected_options || [],
+            kyc_documents: data.kyc_documents || {},
+            delivery_method: data.delivery_method || null,
+            delivery_address: data.delivery_address || null,
+            base_price: data.base_price || 0,
+            options_price: data.options_price || 0,
+            delivery_price: data.delivery_price || 0,
+            total_price: data.total_price || 0,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', existingOrder.id)
+          .select()
+          .single();
+
+        if (updateError) {
+          console.error('Draft update error (on POST):', updateError);
+          return NextResponse.json(
+            {
+              success: false,
+              error: {
+                code: 'DATABASE_ERROR',
+                message: 'Failed to update draft order',
+              },
+            },
+            { status: 500 }
+          );
+        }
+
+        return NextResponse.json(
+          {
+            success: true,
+            data: {
+              order: {
+                id: updatedOrder.id,
+                friendly_order_id: updatedOrder.friendly_order_id,
+                status: updatedOrder.status,
+                current_step: data.current_step || 'contact',
+                last_saved_at: updatedOrder.updated_at,
+              },
+            },
+          },
+          { status: 200 } // 200 for update, not 201
+        );
+      }
+    }
+
+    // Create the draft order (only if it doesn't exist)
     // Use friendly_order_id as order_number for drafts (unique)
     const { data: order, error: orderError } = await supabase
       .from('orders')
