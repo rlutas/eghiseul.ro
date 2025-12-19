@@ -50,14 +50,23 @@ const personalDataSchema = z.object({
     .refine((val) => validateCNP(val).valid, {
       message: 'CNP invalid - verifică cifrele introduse',
     }),
+  // Document series - optional for passports, required for CI
+  // Old CI: 2 letters (e.g., "MZ")
+  // New CI: can be empty if number contains combined format
+  // Passport: empty (no series)
   ci_series: z.string()
-    .min(2, 'Seria trebuie să aibă 2 caractere')
-    .max(2, 'Seria trebuie să aibă 2 caractere')
-    .regex(/^[A-Z]{2}$/, 'Seria trebuie să conțină 2 litere mari'),
+    .max(2, 'Seria poate avea maxim 2 caractere')
+    .regex(/^([A-Z]{2})?$/, 'Seria trebuie să conțină 2 litere mari sau să fie goală')
+    .optional()
+    .or(z.literal('')),
+  // Document number - flexible format:
+  // Old CI: 6 digits (e.g., "123456")
+  // New CI: 7 digits (e.g., "1006780") or combined 9 chars (e.g., "MB1006780")
+  // Passport: 9 digits (e.g., "057472789")
   ci_number: z.string()
-    .min(6, 'Numărul trebuie să aibă 6 cifre')
-    .max(6, 'Numărul trebuie să aibă 6 cifre')
-    .regex(/^\d{6}$/, 'Numărul trebuie să conțină 6 cifre'),
+    .min(6, 'Numărul trebuie să aibă cel puțin 6 caractere')
+    .max(9, 'Numărul poate avea maxim 9 caractere')
+    .regex(/^[A-Z0-9]{6,9}$/, 'Numărul trebuie să conțină 6-9 cifre sau caractere (ex: 123456, MB1006780, 057472789)'),
   first_name: z.string()
     .min(2, 'Prenumele trebuie să aibă cel puțin 2 caractere')
     .max(50, 'Prenumele poate avea maxim 50 caractere')
@@ -775,12 +784,13 @@ export function PersonalDataStep({ onValidChange }: PersonalDataStepProps) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-secondary-900 font-medium">
-                    Seria CI <span className="text-red-500">*</span>
+                    Serie document
+                    <span className="text-neutral-500 text-xs font-normal ml-1">(opțional pt pașaport)</span>
                   </FormLabel>
                   <FormControl>
                     <Input
                       {...field}
-                      placeholder="ex: XV"
+                      placeholder="ex: XV (gol pt pașaport)"
                       maxLength={2}
                       className="font-mono text-lg tracking-wider uppercase bg-white placeholder:text-neutral-400"
                       onChange={(e) => {
@@ -800,18 +810,18 @@ export function PersonalDataStep({ onValidChange }: PersonalDataStepProps) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-secondary-900 font-medium">
-                    Număr CI <span className="text-red-500">*</span>
+                    Număr document <span className="text-red-500">*</span>
                   </FormLabel>
                   <FormControl>
                     <Input
                       {...field}
                       type="text"
-                      inputMode="numeric"
-                      placeholder="ex: 517628"
-                      maxLength={6}
-                      className="font-mono text-lg tracking-wider bg-white placeholder:text-neutral-400"
+                      placeholder="ex: 517628 / MB1006780 / 057472789"
+                      maxLength={9}
+                      className="font-mono text-lg tracking-wider uppercase bg-white placeholder:text-neutral-400"
                       onChange={(e) => {
-                        const value = e.target.value.replace(/\D/g, '').slice(0, 6);
+                        // Allow letters and digits for new CI combined format and passport
+                        const value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 9);
                         field.onChange(value);
                       }}
                     />
