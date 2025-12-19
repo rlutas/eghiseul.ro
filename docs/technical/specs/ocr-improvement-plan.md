@@ -380,8 +380,90 @@ Week 3:
 
 ---
 
+## Integration with Modular Architecture
+
+The OCR system integrates with the modular verification architecture. OCR is only used when the service has `personalKyc.enabled: true` in its verification config.
+
+### How OCR Fits in the Module System
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    PersonalKYCModule                            │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  ┌─────────────────┐     ┌─────────────────┐                   │
+│  │ DocumentUploader │────▶│   OCR Service   │                   │
+│  └─────────────────┘     └────────┬────────┘                   │
+│                                   │                             │
+│                                   ▼                             │
+│  ┌─────────────────────────────────────────────────────────┐   │
+│  │                  OCR Result                              │   │
+│  │  • documentType: 'ci_nou_front'                         │   │
+│  │  • requiresAdditionalDocuments: true                    │   │
+│  │  • extractedData: { cnp, name, ... }                    │   │
+│  │  • expiryValidation: { isExpired, allowedForService }   │   │
+│  └────────────────────────────┬────────────────────────────┘   │
+│                               │                                 │
+│              ┌────────────────┼────────────────┐               │
+│              ▼                ▼                ▼               │
+│  ┌────────────────┐  ┌────────────────┐  ┌────────────────┐   │
+│  │ Request Back   │  │ Request Cert   │  │ Auto-fill Form │   │
+│  │ (if CI Nou)    │  │ Domiciliu      │  │                │   │
+│  └────────────────┘  └────────────────┘  └────────────────┘   │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Service-Specific OCR Behavior
+
+The OCR system checks service config to determine behavior:
+
+```typescript
+// In useDocumentOCR hook
+const processDocument = async (file: File, serviceConfig: ServiceVerificationConfig) => {
+  const result = await extractFromDocument(base64, mimeType);
+
+  // Check expiry based on service rules
+  const expiryValidation = validateDocumentExpiry(
+    result.extractedData.expiryDate,
+    serviceConfig.personalKyc.expiredDocumentAllowed
+  );
+
+  // Determine if additional docs needed
+  const needsMoreDocs =
+    (result.documentType === 'ci_nou_front' || result.documentType === 'passport') &&
+    serviceConfig.personalKyc.requireAddressCertificate !== 'never';
+
+  return {
+    ...result,
+    expiryValidation,
+    requiresAdditionalDocuments: needsMoreDocs,
+    requiredDocuments: getRequiredDocuments(result.documentType, serviceConfig),
+  };
+};
+```
+
+### Services Using OCR
+
+| Service | OCR Enabled | Document Types | Notes |
+|---------|-------------|----------------|-------|
+| Cazier Fiscal | ✅ | CI, Passport | Full KYC |
+| Cazier Judiciar | ✅ | CI, Passport | Full KYC + citizenship flows |
+| Certificat Naștere | ✅ | CI, Passport | Allows expired docs |
+| Certificat Căsătorie | ✅ | CI, Passport | Full KYC |
+| Certificat Celibat | ✅ | CI, Passport | Full KYC |
+| Certificat Integritate | ✅ | CI, Passport | Full KYC |
+| Extras Multilingv | ✅ | CI, Passport | Full KYC |
+| Certificat Constatator | ❌ | - | Company only |
+| Extras Carte Funciară | ❌ | - | Property only |
+| Rovinieta | ❌ | - | Vehicle only |
+
+---
+
 ## Related Documentation
 
 - [Romanian Document Handling](./romanian-document-handling.md)
+- [Service Verification Requirements](./service-verification-requirements.md)
+- [Modular Verification Architecture](./modular-verification-architecture.md)
 - [OCR & KYC API](../api/ocr-kyc-api.md)
 - [Order Auto-Save System](./order-autosave-system.md)
