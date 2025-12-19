@@ -250,9 +250,10 @@
 | `/api/orders/draft` | GET | Retrieve draft order by friendly_order_id |
 | `/api/orders/draft` | POST | Create new draft order with unique ID |
 | `/api/orders/draft` | PATCH | Update existing draft order |
-| `/api/admin/orders/lookup` | GET | Admin: Look up order by friendly_order_id (NEW) |
-| `/api/admin/cleanup` | GET | Admin: Get cleanup status and pending drafts (NEW) |
-| `/api/admin/cleanup` | POST | Admin: Run cleanup of expired drafts (NEW) |
+| `/api/admin/orders/lookup` | GET | Admin: Look up order by friendly_order_id |
+| `/api/admin/orders/list` | GET | Admin: List all orders by status |
+| `/api/admin/cleanup` | GET | Admin: Get cleanup status and pending drafts |
+| `/api/admin/cleanup` | POST | Admin: Run cleanup of expired drafts |
 
 **GDPR Data Retention Policy (NEW):**
 - Draft orders are **anonymized after 7 days** if not completed
@@ -279,6 +280,8 @@
 - **Romanian Address Parsing**: Full support for Jud., Mun., Str., Nr., Bl., Sc., Et., Ap.
 - **Order ID System**: Human-readable IDs (ORD-YYYYMMDD-XXXXX) generated at Step 2→3 transition
 - **Auto-Save System**: Debounced save (500ms) to prevent data loss, only active after Step 2
+- **Duplicate Prevention**: POST /api/orders/draft checks for existing order before insert
+- **Romanian Name Validation**: Supports cedilla (Ş,Ţ) and comma-below (Ș,Ț) diacritics, hyphens for compound names
 - **localStorage Backup**: Offline resilience, data preserved even without network
 - **Save Status Indicator**: Real-time feedback showing "Salvat acum X sec"
 
