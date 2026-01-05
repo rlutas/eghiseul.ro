@@ -44,12 +44,17 @@ export function PriceSidebarModular({ service }: PriceSidebarModularProps) {
           </div>
 
           {/* Selected Options */}
-          {state.selectedOptions.map((option, index) => (
-            <div key={index} className="flex justify-between text-sm">
-              <span className="text-neutral-600">{option.optionName}</span>
-              <span className="font-medium">+{option.priceModifier * option.quantity} RON</span>
-            </div>
-          ))}
+          {state.selectedOptions.map((option, index) => {
+            const price = typeof option.priceModifier === 'number' && !isNaN(option.priceModifier)
+              ? option.priceModifier
+              : 0;
+            return (
+              <div key={index} className="flex justify-between text-sm">
+                <span className="text-neutral-600">{option.optionName}</span>
+                <span className="font-medium">+{price * (option.quantity || 1)} RON</span>
+              </div>
+            );
+          })}
 
           {/* Delivery */}
           {state.delivery.method && state.delivery.price > 0 && (

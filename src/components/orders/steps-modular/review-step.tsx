@@ -192,15 +192,20 @@ export function ReviewStepModular({ onValidChange }: ReviewStepProps) {
                   </Button>
                 </div>
                 <div className="space-y-1 text-sm">
-                  {state.selectedOptions.map((opt) => (
-                    <div key={opt.optionId} className="flex justify-between text-neutral-600">
-                      <span>
-                        {opt.optionName}
-                        {opt.quantity > 1 && ` x${opt.quantity}`}
-                      </span>
-                      <span className="font-medium">+{opt.priceModifier * opt.quantity} RON</span>
-                    </div>
-                  ))}
+                  {state.selectedOptions.map((opt) => {
+                    const price = typeof opt.priceModifier === 'number' && !isNaN(opt.priceModifier)
+                      ? opt.priceModifier
+                      : 0;
+                    return (
+                      <div key={opt.optionId} className="flex justify-between text-neutral-600">
+                        <span>
+                          {opt.optionName}
+                          {opt.quantity > 1 && ` x${opt.quantity}`}
+                        </span>
+                        <span className="font-medium">+{price * (opt.quantity || 1)} RON</span>
+                      </div>
+                    );
+                  })}
                 </div>
               </CardContent>
             </Card>

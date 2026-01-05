@@ -46,7 +46,8 @@ import { generateOrderId, getDraftStorageKey } from '@/lib/order-id';
 
 // Cache version for migrations
 // v3: Added clientType to cache for proper step reconstruction
-const CACHE_VERSION = 3;
+// v4: Fix priceModifier undefined bug (was using option.price_modifier instead of option.price)
+const CACHE_VERSION = 4;
 
 // ============================================================================
 // STATE INITIALIZATION
@@ -790,7 +791,13 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
     const service = serviceRef.current;
     const basePrice = service?.base_price ?? 0;
     const optionsPrice = state.selectedOptions.reduce(
-      (sum, opt) => sum + opt.priceModifier * opt.quantity,
+      (sum, opt) => {
+        // Defensive: handle undefined/NaN priceModifier from old cached data
+        const price = typeof opt.priceModifier === 'number' && !isNaN(opt.priceModifier)
+          ? opt.priceModifier
+          : 0;
+        return sum + price * (opt.quantity || 1);
+      },
       0
     );
     const deliveryPrice = state.delivery.price ?? 0;
