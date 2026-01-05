@@ -143,6 +143,33 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
   const [ciBackScan, setCiBackScan] = useState<ScanState>(initialScanState);
   const [showScanSection, setShowScanSection] = useState(true);
   const [localities, setLocalities] = useState<string[]>([]);
+  const [cnpInfo, setCnpInfo] = useState<string | null>(null);
+
+  // Helper function to clean locality names from prefixes (sat, com., comună, etc.)
+  const cleanLocalityName = useCallback((name: string): string => {
+    if (!name) return name;
+
+    const prefixes = [
+      /^sat\.\s*/i,
+      /^sat\s+/i,
+      /^com\.\s*/i,
+      /^com\s+/i,
+      /^comună\s+/i,
+      /^comuna\s+/i,
+      /^oraș\s+/i,
+      /^oras\s+/i,
+      /^mun\.\s*/i,
+      /^mun\s+/i,
+      /^municipiul\s+/i,
+    ];
+
+    let cleaned = name.trim();
+    for (const prefix of prefixes) {
+      cleaned = cleaned.replace(prefix, '');
+    }
+
+    return cleaned.trim();
+  }, []);
 
   // Handle file select and OCR
   const handleFileSelect = useCallback(async (
@@ -213,23 +240,7 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
           documentType: ocr.documentType || type,
           isExpired: ocr.isExpired || false,
           requiresAddressCertificate: ocr.requiresAddressCertificate || false,
-          // Address (if available from CI vechi or certificate)
-          ...(extracted.address && {
-            address: {
-              // Convert county abbreviation (SM) to full name (Satu Mare) for Select dropdown
-              county: getCountyName(extracted.address.county) || '',
-              city: extracted.address.city || '',
-              sector: extracted.address.sector,
-              street: extracted.address.street || '',
-              streetType: extracted.address.streetType,
-              number: extracted.address.number || '',
-              building: extracted.address.building,
-              staircase: extracted.address.staircase,
-              floor: extracted.address.floor,
-              apartment: extracted.address.apartment,
-              postalCode: extracted.address.postalCode,
-            },
-          }),
+          // Note: Address will be filled separately using fillAddressFields
           fatherName: extracted.fatherName || personalKyc?.fatherName,
           motherName: extracted.motherName || personalKyc?.motherName,
           // Add to uploaded documents
@@ -258,6 +269,12 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
           ],
         });
 
+        // Fill address fields using the helper (handles county conversion, city cleaning, etc.)
+        if (extracted.address) {
+          console.log('Address found in OCR:', JSON.stringify(extracted.address, null, 2));
+          fillAddressFields(extracted.address);
+        }
+
         setState(prev => ({ ...prev, scanning: false, progress: 100, success: true }));
       } else {
         console.warn('OCR extraction failed or low confidence:', {
@@ -278,7 +295,7 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
         error: error instanceof Error ? error.message : 'Eroare la procesare document',
       }));
     }
-  }, [personalKyc, updatePersonalKyc]);
+  }, [personalKyc, updatePersonalKyc, fillAddressFields]);
 
   // Reset scan
   const resetScan = useCallback((type: 'ci_front' | 'ci_back') => {
@@ -300,24 +317,120 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
     updatePersonalKyc({ cnp: cleanCNP });
 
     // Auto-fill birth date from CNP if valid
-    if (cleanCNP.length === 13 && validateCNP(cleanCNP).valid) {
-      const birthDate = extractBirthDateFromCNP(cleanCNP);
-      if (birthDate) {
+    if (cleanCNP.length === 13) {
+      const result = validateCNP(cleanCNP);
+      if (result.valid && result.data) {
+        setCnpInfo(`${result.data.gender === 'male' ? 'Bărbat' : 'Femeie'}, ${result.data.age} ani`);
+        const birthDate = result.data.birthDate;
         updatePersonalKyc({
           birthDate: birthDate.toISOString().split('T')[0],
         });
+      } else {
+        setCnpInfo(result.errors[0] || 'CNP invalid');
       }
+    } else {
+      setCnpInfo(null);
     }
   }, [updatePersonalKyc]);
 
-  // Handle county change - update localities list
+  // Handle county change - update localities list with smart city matching
   const handleCountyChange = useCallback((countyName: string) => {
-    updatePersonalKyc({
-      address: { ...personalKyc?.address, county: countyName, city: '' }
-    });
     const countyLocalities = getLocalitiesForCounty(countyName);
     setLocalities(countyLocalities);
-  }, [personalKyc?.address, updatePersonalKyc]);
+
+    // Try to match current city in new localities list
+    const currentCity = personalKyc?.address?.city || '';
+    let newCity = '';
+
+    if (currentCity && countyLocalities.length > 0) {
+      // First check exact match
+      if (countyLocalities.includes(currentCity)) {
+        newCity = currentCity;
+      } else {
+        // Clean the city name and try again
+        const cleanedCity = cleanLocalityName(currentCity);
+        if (countyLocalities.includes(cleanedCity)) {
+          newCity = cleanedCity;
+        } else {
+          // Try partial match
+          const matchingLocality = countyLocalities.find(
+            loc => loc.toLowerCase().includes(cleanedCity.toLowerCase()) ||
+                   cleanedCity.toLowerCase().includes(loc.toLowerCase())
+          );
+          if (matchingLocality) {
+            newCity = matchingLocality;
+          }
+        }
+      }
+    }
+
+    updatePersonalKyc({
+      address: { ...personalKyc?.address, county: countyName, city: newCity }
+    });
+  }, [personalKyc?.address, updatePersonalKyc, cleanLocalityName]);
+
+  // Helper function to fill address fields from OCR data
+  const fillAddressFields = useCallback((addr: {
+    county?: string;
+    city?: string;
+    sector?: string;
+    street?: string;
+    streetType?: string;
+    number?: string;
+    building?: string;
+    staircase?: string;
+    floor?: string;
+    apartment?: string;
+    postalCode?: string;
+  }) => {
+    console.log('fillAddressFields called with:', addr);
+
+    const updates: Partial<typeof personalKyc> = {};
+    const addressUpdates: Partial<NonNullable<typeof personalKyc>['address']> = {
+      ...personalKyc?.address,
+    };
+
+    // County - convert abbreviations like "SM" → "Satu Mare"
+    if (addr.county) {
+      const countyName = getCountyName(addr.county);
+      console.log('County mapping:', addr.county, '→', countyName);
+      if (countyName && COUNTY_NAMES.includes(countyName)) {
+        addressUpdates.county = countyName;
+        // Load localities for this county
+        const countyLocalities = getLocalitiesForCounty(countyName);
+        setLocalities(countyLocalities);
+      }
+    }
+
+    // City - for București, include sector; clean prefixes for villages
+    if (addr.city) {
+      let cityName = addr.city;
+      const countyMatch = findCounty(addr.county);
+
+      if (addr.sector && (countyMatch?.name === 'București' || addr.city?.toLowerCase().includes('bucurești'))) {
+        cityName = `București, Sector ${addr.sector}`;
+      } else {
+        cityName = cleanLocalityName(cityName);
+        console.log('City cleaned:', addr.city, '→', cityName);
+      }
+      addressUpdates.city = cityName;
+    }
+
+    // Street - include streetType if provided
+    if (addr.street) {
+      addressUpdates.street = addr.streetType
+        ? `${addr.streetType} ${addr.street}`
+        : addr.street;
+    }
+    if (addr.number) addressUpdates.number = addr.number;
+    if (addr.building) addressUpdates.building = addr.building;
+    if (addr.staircase) addressUpdates.staircase = addr.staircase;
+    if (addr.floor) addressUpdates.floor = addr.floor;
+    if (addr.apartment) addressUpdates.apartment = addr.apartment;
+    if (addr.postalCode) addressUpdates.postalCode = addr.postalCode;
+
+    updatePersonalKyc({ address: addressUpdates });
+  }, [personalKyc?.address, updatePersonalKyc, cleanLocalityName]);
 
   // Initialize localities when component loads (for restored data)
   useEffect(() => {
@@ -646,7 +759,7 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
           {cnpValidation.valid && personalKyc.cnp.length === 13 && (
             <p className="text-sm text-green-600 flex items-center gap-1">
               <CheckCircle className="h-4 w-4" />
-              CNP valid
+              {cnpInfo || 'CNP valid'}
             </p>
           )}
           <p className="text-sm text-neutral-500 flex items-start gap-1">
@@ -1003,6 +1116,20 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
             placeholder="010101"
             className="bg-white placeholder:text-neutral-400"
           />
+        </div>
+      </div>
+
+      {/* Security Info Box */}
+      <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+        <div className="flex gap-3">
+          <Info className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
+          <div className="text-sm text-blue-800">
+            <p className="font-medium mb-1">Datele tale sunt în siguranță</p>
+            <p className="text-blue-700">
+              Informațiile personale sunt criptate și folosite exclusiv pentru procesarea comenzii.
+              Nu le distribuim către terți.
+            </p>
+          </div>
         </div>
       </div>
     </div>
