@@ -380,6 +380,133 @@ curl http://localhost:3000/api/kyc/validate     # Health check
 
 ---
 
+## Database Operations & Migrations
+
+### CRITICAL RULE: NEVER ASK USER TO RUN MIGRATIONS MANUALLY
+
+Claude Code MUST run all database migrations and operations itself. NEVER tell the user to:
+- Run SQL manually in Supabase dashboard
+- Execute migration files themselves
+- Use psql or any database client
+
+All database operations are done via Supabase REST API with the service role key.
+
+### Supabase Connection Details
+
+```
+URL:  https://llbwmitdrppomeptqlue.supabase.co
+Key:  Read from .env.local → SUPABASE_SERVICE_ROLE_KEY
+```
+
+The service role key is stored in `.env.local` - read it using the Read tool before making database calls.
+
+### Step-by-Step: Running a Migration
+
+1. **Read the migration SQL file** (e.g., `supabase/migrations/014_xxx.sql`)
+2. **Read the service role key** from `.env.local`
+3. **Break down the SQL** into individual REST API calls
+4. **Execute each operation** via curl
+
+### Common Operations
+
+**1. Get service ID by slug (for foreign keys):**
+```bash
+curl -s "https://llbwmitdrppomeptqlue.supabase.co/rest/v1/services?slug=eq.cazier-judiciar-persoana-fizica&select=id" \
+  -H "apikey: SERVICE_ROLE_KEY" \
+  -H "Authorization: Bearer SERVICE_ROLE_KEY"
+# Returns: [{"id":"uuid-here"}]
+```
+
+**2. Insert service_options:**
+```bash
+curl -s "https://llbwmitdrppomeptqlue.supabase.co/rest/v1/service_options" \
+  -H "apikey: SERVICE_ROLE_KEY" \
+  -H "Authorization: Bearer SERVICE_ROLE_KEY" \
+  -H "Content-Type: application/json" \
+  -H "Prefer: return=representation" \
+  -X POST \
+  -d '[{
+    "service_id": "UUID_FROM_STEP_1",
+    "code": "URGENTA",
+    "name": "Procesare Urgentă",
+    "description": "Obținere în 2 zile lucrătoare în loc de 5 zile.",
+    "price": 99.00,
+    "is_active": true,
+    "is_required": false,
+    "display_order": 1
+  }]'
+```
+
+**3. Update existing record:**
+```bash
+curl -s "https://llbwmitdrppomeptqlue.supabase.co/rest/v1/services?slug=eq.cazier-fiscal" \
+  -H "apikey: SERVICE_ROLE_KEY" \
+  -H "Authorization: Bearer SERVICE_ROLE_KEY" \
+  -H "Content-Type: application/json" \
+  -X PATCH \
+  -d '{"price": 150.00}'
+```
+
+**4. Upsert (insert or update on conflict):**
+```bash
+curl -s "https://llbwmitdrppomeptqlue.supabase.co/rest/v1/service_options" \
+  -H "apikey: SERVICE_ROLE_KEY" \
+  -H "Authorization: Bearer SERVICE_ROLE_KEY" \
+  -H "Content-Type: application/json" \
+  -H "Prefer: resolution=merge-duplicates,return=representation" \
+  -X POST \
+  -d '[{"service_id": "...", "code": "URGENTA", "name": "Updated Name", ...}]'
+```
+
+**5. Delete records:**
+```bash
+curl -s "https://llbwmitdrppomeptqlue.supabase.co/rest/v1/TABLE?id=eq.UUID" \
+  -H "apikey: SERVICE_ROLE_KEY" \
+  -H "Authorization: Bearer SERVICE_ROLE_KEY" \
+  -X DELETE
+```
+
+**6. Read all data from table:**
+```bash
+curl -s "https://llbwmitdrppomeptqlue.supabase.co/rest/v1/services?select=*" \
+  -H "apikey: SERVICE_ROLE_KEY" \
+  -H "Authorization: Bearer SERVICE_ROLE_KEY"
+```
+
+### Table Schemas (Quick Reference)
+
+**services:**
+- `id` (uuid), `slug` (text), `name` (text), `category` (text), `price` (numeric)
+- `description` (text), `features` (jsonb), `verification_config` (jsonb)
+
+**service_options:**
+- `id` (uuid), `service_id` (uuid FK), `code` (text), `name` (text)
+- `description` (text), `price` (numeric), `is_active` (bool), `is_required` (bool), `display_order` (int)
+- UNIQUE constraint on (service_id, code)
+
+**orders:**
+- `id` (uuid), `order_number` (text), `service_id` (uuid FK), `user_id` (uuid FK)
+- `status` (text), `form_data` (jsonb), `documents` (jsonb)
+
+### Important Notes
+
+1. **Service role key bypasses RLS** - it has full database access
+2. **Always use Prefer: return=representation** for INSERT/PATCH to see results
+3. **For ON CONFLICT** (upsert), use `Prefer: resolution=merge-duplicates`
+4. **REST API converts column names** - use snake_case (e.g., `is_active`, not `isActive`)
+5. **JSON arrays for batch inserts** - wrap single objects in `[{...}]`
+
+### Migration File Convention
+
+Migration files in `supabase/migrations/` follow the pattern:
+- `001_initial_schema.sql`
+- `010_verification_config.sql`
+- `014_cazier_judiciar_options.sql`
+
+When creating new migrations, increment the number and save the file even if running via REST API (for documentation).
+
+---
+
 ## Environment Variables
 
 ```env
@@ -400,5 +527,5 @@ SMSLINK_API_KEY=
 
 ---
 
-**Last Updated:** 2025-01-05
-**Version:** 2.2
+**Last Updated:** 2026-01-05
+**Version:** 2.3
