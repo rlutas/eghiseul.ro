@@ -7,6 +7,9 @@ export type ServiceCategory =
   | 'auto'
   | 'personale';
 
+// Import verification config type
+import type { ServiceVerificationConfig } from './verification-modules';
+
 // Service Entity
 export interface Service {
   id: string;
@@ -25,6 +28,7 @@ export interface Service {
   urgent_available: boolean;
   urgent_days: number | null;
   config: ServiceConfig | null;
+  verification_config: ServiceVerificationConfig | null;  // NEW: Modular verification configuration
   meta_title: string | null;
   meta_description: string | null;
   created_at: string;
@@ -54,7 +58,7 @@ export interface OptionChoice {
   price_modifier: number;
 }
 
-// Service Configuration (JSONB)
+// Service Configuration (JSONB) - Legacy config
 export interface ServiceConfig {
   processing_steps?: string[];
   required_fields?: string[];
@@ -63,6 +67,9 @@ export interface ServiceConfig {
   icon?: string;
   color?: string;
 }
+
+// Re-export verification module types for convenience
+export type { ServiceVerificationConfig } from './verification-modules';
 
 // Delivery Method
 export interface DeliveryMethod {

@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:infocazier.ro)",
+      "Bash(npm install:*)",
+      "Bash(curl:*)",
+      "WebSearch",
+      "Bash(mv:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(npx tsc:*)",
+      "WebFetch(domain:eghiseul.ro)"
+    ]
+  }
+}

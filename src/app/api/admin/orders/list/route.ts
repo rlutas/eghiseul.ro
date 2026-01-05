@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
       email: (o.customer_data as { contact?: { email?: string } })?.contact?.email || 'N/A',
       total_price: o.total_price,
       created_at: o.created_at,
-      age_hours: Math.floor((Date.now() - new Date(o.created_at).getTime()) / (1000 * 60 * 60)),
+      age_hours: o.created_at ? Math.floor((Date.now() - new Date(o.created_at).getTime()) / (1000 * 60 * 60)) : 0,
     }));
 
     return NextResponse.json({

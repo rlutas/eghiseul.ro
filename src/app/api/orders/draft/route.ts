@@ -1,39 +1,46 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { z } from 'zod';
 import { generateOrderId, validateOrderId } from '@/lib/order-id';
 
-// Validation schema for draft order
-const draftOrderSchema = z.object({
-  friendly_order_id: z.string().optional(),
-  service_id: z.string().uuid(),
-  current_step: z.string().optional(),
-  customer_data: z.object({
-    contact: z.object({
-      email: z.string().email().optional(),
-      phone: z.string().optional(),
-      preferredContact: z.string().optional(),
-    }).optional(),
-    personal: z.object({
-      firstName: z.string().optional(),
-      lastName: z.string().optional(),
-      cnp: z.string().optional(),
-      idCardSeries: z.string().optional(),
-      idCardNumber: z.string().optional(),
-      birthDate: z.string().optional(),
-      address: z.any().optional(),
-    }).optional(),
-  }).optional(),
-  selected_options: z.array(z.any()).optional(),
-  kyc_documents: z.any().optional(),
-  delivery_method: z.any().optional(),
-  delivery_address: z.any().optional(),
-  signature: z.string().optional(),
-  base_price: z.number().optional(),
-  options_price: z.number().optional(),
-  delivery_price: z.number().optional(),
-  total_price: z.number().optional(),
-});
+// Draft order data interface (minimal validation, flexible structure)
+interface DraftOrderData {
+  id?: string;
+  friendly_order_id?: string;
+  service_id: string;
+  current_step?: string;
+  customer_data?: Record<string, unknown>;
+  selected_options?: unknown[];
+  kyc_documents?: unknown;
+  delivery_method?: unknown;
+  delivery_address?: unknown;
+  signature?: string | null;
+  base_price?: number;
+  options_price?: number;
+  delivery_price?: number;
+  total_price?: number;
+}
+
+// Simple validation function
+function validateDraftData(data: unknown): { valid: boolean; data?: DraftOrderData; error?: string } {
+  if (!data || typeof data !== 'object') {
+    return { valid: false, error: 'Invalid request body' };
+  }
+
+  const obj = data as Record<string, unknown>;
+
+  // Only service_id is required
+  if (!obj.service_id || typeof obj.service_id !== 'string') {
+    return { valid: false, error: 'service_id is required and must be a string' };
+  }
+
+  // UUID format check for service_id
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  if (!uuidRegex.test(obj.service_id)) {
+    return { valid: false, error: 'service_id must be a valid UUID' };
+  }
+
+  return { valid: true, data: obj as DraftOrderData };
+}
 
 /**
  * POST /api/orders/draft - Create a new draft order
@@ -50,16 +57,15 @@ export async function POST(request: NextRequest) {
 
     // Parse and validate request body
     const body = await request.json();
-    const validation = draftOrderSchema.safeParse(body);
+    const validation = validateDraftData(body);
 
-    if (!validation.success) {
+    if (!validation.valid || !validation.data) {
       return NextResponse.json(
         {
           success: false,
           error: {
             code: 'VALIDATION_ERROR',
-            message: 'Invalid draft data',
-            details: validation.error.flatten().fieldErrors,
+            message: validation.error || 'Invalid draft data',
           },
         },
         { status: 400 }
@@ -147,25 +153,31 @@ export async function POST(request: NextRequest) {
 
     // Create the draft order (only if it doesn't exist)
     // Use friendly_order_id as order_number for drafts (unique)
+
+    // Prepare insert data
+    const insertData = {
+      order_number: friendlyOrderId, // Use friendly ID as order_number for uniqueness
+      friendly_order_id: friendlyOrderId,
+      user_id: user?.id || null,
+      service_id: data.service_id,
+      status: 'draft',
+      customer_data: data.customer_data || {},
+      selected_options: data.selected_options || [],
+      kyc_documents: data.kyc_documents || {},
+      delivery_method: data.delivery_method || null,
+      delivery_address: data.delivery_address || null,
+      base_price: data.base_price || 0,
+      options_price: data.options_price || 0,
+      delivery_price: data.delivery_price || 0,
+      total_price: data.total_price || 0,
+      payment_status: 'unpaid',
+    };
+
+    console.log('Attempting to insert draft order with data:', JSON.stringify(insertData, null, 2));
+
     const { data: order, error: orderError } = await supabase
       .from('orders')
-      .insert({
-        order_number: friendlyOrderId, // Use friendly ID as order_number for uniqueness
-        friendly_order_id: friendlyOrderId,
-        user_id: user?.id || null,
-        service_id: data.service_id,
-        status: 'draft',
-        customer_data: data.customer_data || {},
-        selected_options: data.selected_options || [],
-        kyc_documents: data.kyc_documents || {},
-        delivery_method: data.delivery_method || null,
-        delivery_address: data.delivery_address || null,
-        base_price: data.base_price || 0,
-        options_price: data.options_price || 0,
-        delivery_price: data.delivery_price || 0,
-        total_price: data.total_price || 0,
-        payment_status: 'unpaid',
-      })
+      .insert(insertData)
       .select()
       .single();
 
@@ -270,13 +282,16 @@ export async function POST(request: NextRequest) {
       { status: 201 }
     );
   } catch (error) {
-    console.error('Unexpected error:', error);
+    console.error('Unexpected error in POST /api/orders/draft:', error);
+    console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace');
+    console.error('Error details:', JSON.stringify(error, Object.getOwnPropertyNames(error)));
     return NextResponse.json(
       {
         success: false,
         error: {
           code: 'INTERNAL_ERROR',
-          message: 'An unexpected error occurred',
+          message: error instanceof Error ? error.message : 'An unexpected error occurred',
+          details: error instanceof Error ? { name: error.name, stack: error.stack } : undefined,
         },
       },
       { status: 500 }
@@ -437,13 +452,16 @@ export async function PATCH(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Unexpected error:', error);
+    console.error('Unexpected error in PATCH /api/orders/draft:', error);
+    console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace');
+    console.error('Error details:', JSON.stringify(error, Object.getOwnPropertyNames(error)));
     return NextResponse.json(
       {
         success: false,
         error: {
           code: 'INTERNAL_ERROR',
-          message: 'An unexpected error occurred',
+          message: error instanceof Error ? error.message : 'An unexpected error occurred',
+          details: error instanceof Error ? { name: error.name, stack: error.stack } : undefined,
         },
       },
       { status: 500 }
@@ -556,13 +574,16 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Unexpected error:', error);
+    console.error('Unexpected error in GET /api/orders/draft:', error);
+    console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace');
+    console.error('Error details:', JSON.stringify(error, Object.getOwnPropertyNames(error)));
     return NextResponse.json(
       {
         success: false,
         error: {
           code: 'INTERNAL_ERROR',
-          message: 'An unexpected error occurred',
+          message: error instanceof Error ? error.message : 'An unexpected error occurred',
+          details: error instanceof Error ? { name: error.name, stack: error.stack } : undefined,
         },
       },
       { status: 500 }

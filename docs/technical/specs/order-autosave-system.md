@@ -1,9 +1,9 @@
 # Order Auto-Save & Support System
 
-**Version:** 1.2
+**Version:** 1.3
 **Status:** Phase 1 Complete
 **Created:** 2025-12-17
-**Updated:** 2025-12-18
+**Updated:** 2026-01-05
 **Sprint:** Sprint 3 - Order Management Enhancement
 
 ## Implementation Status
@@ -16,10 +16,12 @@
 | Draft API (PATCH) | ✅ Complete | `api/orders/draft/route.ts` - Update draft |
 | Draft API (GET) | ✅ Complete | `api/orders/draft/route.ts` - Retrieve by friendly_order_id |
 | Auto-Save (Debounced) | ✅ Complete | 500ms debounce in provider |
-| localStorage Backup | ✅ Complete | Offline resilience |
+| localStorage Backup | ✅ Complete | Offline resilience, cache v3 |
 | Save Status UI | ✅ Complete | `components/orders/save-status.tsx` |
 | Order ID Display | ✅ Complete | `components/orders/order-id-display.tsx` |
 | Wizard Integration | ✅ Complete | Order ID shown in header + sidebar |
+| Cache Restore Flow | ✅ Complete | `clientType` saved, steps rebuilt on restore |
+| Progress Bar Init | ✅ Complete | `isInitialized` flag prevents flash of incorrect state |
 | Bank Transfer Flow | ⏳ Pending | Phase 2 |
 | Magic Links Recovery | ⏳ Pending | Phase 2 |
 | Support Dashboard | ⏳ Pending | Phase 2 |
@@ -206,20 +208,115 @@ ORD-20251217-A3B2C
 **Local Storage Schema**:
 ```typescript
 // localStorage key: `order_draft_${orderId}`
-interface DraftOrderCache {
-  orderId: string;
+interface ModularDraftCache {
+  orderId: string | null;
+  friendlyOrderId: string;
   serviceSlug: string;
-  currentStep: WizardStep;
-  stepNumber: number;
+  currentStepId: ModularStepId;       // Step identifier (e.g., 'contact', 'personal-data')
+  currentStepNumber: number;
+  clientType?: ClientType | null;     // 'PF' | 'PJ' - CRITICAL for step reconstruction
   data: {
-    contact?: Partial<ContactData>;
-    personal?: Partial<PersonalData>;
-    options?: SelectedOption[];
-    kyc?: Partial<KYCDocuments>;
-    delivery?: Partial<DeliverySelection>;
+    contact?: ContactData;
+    personalKyc?: PersonalKYCState | null;
+    companyKyc?: CompanyKYCState | null;
+    property?: PropertyState | null;
+    vehicle?: VehicleState | null;
+    signature?: SignatureState | null;
+    selectedOptions?: SelectedOptionState[];
+    delivery?: DeliveryState;
   };
-  lastSavedAt: string; // ISO timestamp
-  version: number; // schema version for migrations
+  lastSavedAt: string;                // ISO timestamp
+  version: number;                    // Current: 3 (for cache migrations)
+}
+```
+
+**Cache Version History**:
+| Version | Date | Changes |
+|---------|------|---------|
+| 1 | 2025-12-17 | Initial cache structure |
+| 2 | 2025-12-18 | Added modular wizard state fields |
+| 3 | 2026-01-05 | Added `clientType` for proper step reconstruction |
+
+**Important**: When `clientType` is not in cache, the wizard cannot properly rebuild conditional steps (e.g., CompanyKYC for PJ, PersonalKYC context). Version 3 ensures this field is always saved.
+
+### Cache Restore & Initialization Flow
+
+When a user returns to an in-progress order, the wizard must properly restore state and rebuild conditional steps.
+
+**Initialization Sequence**:
+```
+1. Page loads
+2. INIT_SERVICE dispatches → steps built (without clientType)
+3. serviceSlug is now set
+4. Cache restore effect runs (depends on serviceSlug)
+5. If cache found:
+   - RESTORE_FROM_CACHE dispatches
+   - clientType is restored
+   - Steps are rebuilt with clientType
+   - isInitialized = true
+6. If no cache:
+   - MARK_INITIALIZED dispatches
+   - isInitialized = true
+7. visibleSteps computed with correct clientType
+8. Progress bar renders with correct completed steps
+```
+
+**The `isInitialized` Flag**:
+
+The wizard state includes an `isInitialized: boolean` flag that prevents the progress bar from rendering with incorrect data before cache restoration completes.
+
+```typescript
+// In ModularWizardState
+isInitialized: boolean;  // true after cache check is complete
+
+// In provider - cache restore effect
+useEffect(() => {
+  // ... try to restore from cache
+  if (cacheFound) {
+    dispatch({ type: 'RESTORE_FROM_CACHE', payload: cacheData });
+    // isInitialized set to true in reducer
+  } else {
+    dispatch({ type: 'MARK_INITIALIZED' });
+  }
+}, [state.serviceSlug]);
+```
+
+**Progress Bar Loading State**:
+
+While `isInitialized` is false, the wizard shows a skeleton loader instead of the progress bar:
+
+```tsx
+{state.isInitialized ? (
+  <WizardProgress steps={visibleSteps} currentStepId={state.currentStepId} />
+) : (
+  <ProgressBarSkeleton />  // Animated loading placeholder
+)}
+```
+
+This prevents the "flash" of incorrect progress (e.g., showing step 1 as current when user was actually on step 3).
+
+**Step Reconstruction on Restore**:
+
+When `RESTORE_FROM_CACHE` runs, it must rebuild steps with the saved `clientType`:
+
+```typescript
+case 'RESTORE_FROM_CACHE': {
+  const cache = action.payload;
+  const restoredClientType = cache.clientType ?? null;
+
+  // Rebuild steps with clientType for correct conditional steps
+  let steps = state.steps;
+  if (state.verificationConfig && restoredClientType) {
+    steps = buildWizardSteps(state.verificationConfig, restoredClientType);
+  }
+
+  return {
+    ...state,
+    clientType: restoredClientType,
+    steps,
+    // ... other restored fields
+    isInitialized: true,
+  };
 }
 ```
 

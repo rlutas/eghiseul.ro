@@ -41,6 +41,7 @@ After completing any feature:
 | `DEVELOPMENT_MASTER_PLAN.md` | Sprint progress, task tracking | After completing tasks |
 | `docs/technical/api/*.md` | API documentation | New/modified endpoints |
 | `docs/technical/specs/*.md` | Feature specifications | Planning new features |
+| `docs/technical/specs/modular-wizard-guide.md` | **Modular wizard usage** | When adding new services |
 | `docs/sprints/sprint-*.md` | Sprint details | During sprint work |
 | `src/types/*.ts` | TypeScript interfaces | Schema changes |
 
@@ -95,26 +96,51 @@ Invoicing:  SmartBill (e-factura compliant)
 - **Features**: Document validation, face matching, confidence scores
 - **Docs**: `docs/technical/api/ocr-kyc-api.md`
 
-#### Order Wizard (6 Steps)
-- **Files**: `src/components/orders/`, `src/providers/order-wizard-provider.tsx`
-- **Steps**: Contact → Personal Data → Options → KYC → Delivery → Review
-- **Features**:
-  - ID scanning with auto-fill
-  - CNP validation with checksum
-  - Electronic signature
-  - Smart KYC (reuse documents from Step 2 in Step 4)
+#### Order Wizard - Modular System (ACTIVE)
+- **URL**: `/comanda/[service-slug]` (ex: `/comanda/cazier-fiscal`)
+- **Provider**: `src/providers/modular-wizard-provider.tsx`
+- **Main Component**: `src/components/orders/modular-order-wizard.tsx`
+- **Architecture**: Dynamic step builder based on service `verification_config` (JSONB)
+- **Core Steps**: Contact → [Dynamic Modules] → Options → Delivery → Review
+- **Available Modules**:
+  - `client-type`: PF/PJ selection
+  - `personal-data`: Personal KYC (name, CNP, address)
+  - `company-data`: Company KYC (CUI validation via InfoCUI)
+  - `property-data`: Property data (Carte Funciară)
+  - `vehicle-data`: Vehicle data (Rovinieta)
+  - `kyc-documents`: Document upload + OCR
+  - `signature`: Electronic signature canvas
+- **Key Files**:
+  - `src/app/comanda/[service]/page.tsx` - Order page
+  - `src/lib/verification-modules/step-builder.ts` - Dynamic step generation
+  - `src/lib/verification-modules/registry.ts` - Module component mapping
+  - `src/components/orders/modules/` - Module implementations
+  - `src/components/orders/steps-modular/` - Core steps (contact, options, delivery, review)
+- **Docs**: `docs/technical/specs/modular-wizard-guide.md` (HOW TO ADD NEW SERVICES)
 
-### In Progress (Sprint 3+)
+#### Legacy Order Wizard (DEPRECATED - to be removed)
+- **URL**: `/orders/new?service=xxx`
+- **Files**: `src/providers/order-wizard-provider.tsx`, `src/components/orders/order-wizard.tsx`
+- **Status**: Kept for reference, will be deleted after testing modular wizard
+
+### Completed (Sprint 3) ✅
 
 - [x] Order auto-save with order ID (ORD-YYYYMMDD-XXXXX format)
 - [x] Romanian document handling (CI vechi, CI nou, Passport)
 - [x] Certificat Atestare Domiciliu support
 - [x] Document expiry validation
 - [x] GDPR auto-cleanup (7-day draft anonymization)
+- [x] Modular Verification System (dynamic wizard based on service config)
+- [x] InfoCUI company validation integration
+
+### In Progress (Sprint 4)
+
+- [ ] S3 document upload (HIGH PRIORITY)
+- [ ] Order submission API (HIGH PRIORITY)
+- [ ] Stripe payment flow completion
 - [ ] User data persistence (save for logged users)
 - [ ] Account creation offer at order end
 - [ ] Bank transfer payment option
-- [ ] S3 document upload
 - [ ] User orders dashboard
 
 ---
@@ -130,7 +156,9 @@ docs/
 │   ├── specs/
 │   │   ├── user-data-persistence.md       # User data saving feature
 │   │   ├── order-autosave-system.md       # Auto-save & support system
-│   │   └── romanian-document-handling.md  # CI/Passport/Certificate handling (NEW)
+│   │   ├── romanian-document-handling.md  # CI/Passport/Certificate handling
+│   │   ├── modular-verification-architecture.md  # Modular wizard system (NEW)
+│   │   └── service-verification-requirements.md  # Service requirements matrix (NEW)
 │   ├── database/
 │   │   └── services-schema.md      # Database schema docs
 │   └── technology-decisions-summary.md
@@ -269,13 +297,14 @@ docs/
 ### Phase 2: Core Development ✅ COMPLETE
 **Output**: Auth, Services API, Orders API
 
-### Phase 3: KYC & Documents ⏳ IN PROGRESS
-**Active agents**: ui-designer, api-documenter, feature-spec-writer, system-designer
-**Output**: OCR, KYC validation, order wizard, user data persistence
+### Phase 3: KYC & Documents ✅ COMPLETE
+**Completed agents**: ui-designer, api-documenter, feature-spec-writer, system-designer
+**Output**: OCR, KYC validation, modular wizard system, InfoCUI integration, security hardening
 
-### Phase 4: Payments & Contracts ⏳ PENDING
+### Phase 4: Payments & Contracts ⏳ IN PROGRESS
 **Active agents**: stripe-expert, payment-integration, performance-optimizer
-**Output**: Stripe checkout, bank transfers, invoicing, contracts
+**Output**: S3 upload, order submission, Stripe checkout, bank transfers, invoicing, contracts
+**Started**: 2025-01-05
 
 ### Phase 5: Admin Dashboard ⏳ PENDING
 **Active agents**: ui-designer, dashboard-planner
@@ -371,5 +400,5 @@ SMSLINK_API_KEY=
 
 ---
 
-**Last Updated:** 2025-12-18
-**Version:** 2.1
+**Last Updated:** 2025-01-05
+**Version:** 2.2

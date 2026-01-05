@@ -45,7 +45,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Run the anonymization function
-    const { data, error } = await supabase.rpc('anonymize_expired_drafts');
+    // Note: This function may not exist in types if migration hasn't been run
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error } = await (supabase.rpc as any)('anonymize_expired_drafts');
 
     if (error) {
       // If function doesn't exist, migration hasn't been applied
@@ -76,7 +78,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Extract results
-    const result = data?.[0] || { anonymized_count: 0, order_ids: [] };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const result = (data as any)?.[0] || { anonymized_count: 0, order_ids: [] };
 
     // Log the cleanup action
     try {
@@ -171,9 +174,9 @@ export async function GET(request: NextRequest) {
           orders: pendingDrafts?.map((d) => ({
             id: d.friendly_order_id,
             created_at: d.created_at,
-            days_old: Math.floor(
-              (Date.now() - new Date(d.created_at).getTime()) / (1000 * 60 * 60 * 24)
-            ),
+            days_old: d.created_at
+              ? Math.floor((Date.now() - new Date(d.created_at).getTime()) / (1000 * 60 * 60 * 24))
+              : 0,
           })),
         },
         stats: {

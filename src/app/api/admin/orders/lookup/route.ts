@@ -67,7 +67,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Calculate time since creation for admin info
-    const createdAt = new Date(order.created_at);
+    const createdAt = order.created_at ? new Date(order.created_at) : new Date();
     const now = new Date();
     const hoursSinceCreation = Math.floor((now.getTime() - createdAt.getTime()) / (1000 * 60 * 60));
     const daysSinceCreation = Math.floor(hoursSinceCreation / 24);
@@ -87,9 +87,9 @@ export async function GET(request: NextRequest) {
           selected_options: order.selected_options,
           kyc_documents: order.kyc_documents ? {
             // Don't expose raw document URLs in admin API for security
-            hasIdFront: !!order.kyc_documents.idFront,
-            hasIdBack: !!order.kyc_documents.idBack,
-            hasSelfie: !!order.kyc_documents.selfie,
+            hasIdFront: !!(order.kyc_documents as Record<string, unknown>)?.idFront,
+            hasIdBack: !!(order.kyc_documents as Record<string, unknown>)?.idBack,
+            hasSelfie: !!(order.kyc_documents as Record<string, unknown>)?.selfie,
           } : null,
           delivery_method: order.delivery_method,
           delivery_address: order.delivery_address,

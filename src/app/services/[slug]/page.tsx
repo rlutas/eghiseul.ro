@@ -443,7 +443,7 @@ export default async function ServiceDetailPage({
                       className="w-full h-14 bg-primary-500 hover:bg-primary-600 text-secondary-900 font-bold text-lg rounded-xl shadow-[0_4px_14px_rgba(236,185,95,0.4)] hover:shadow-[0_6px_20px_rgba(236,185,95,0.5)] hover:-translate-y-0.5 transition-all mt-4"
                       size="lg"
                     >
-                      <Link href={`/orders/new?service=${service.slug}`}>
+                      <Link href={`/comanda/${service.slug}`}>
                         Comandă Acum
                         <ArrowRight className="ml-2 h-5 w-5" />
                       </Link>
@@ -1090,7 +1090,7 @@ export default async function ServiceDetailPage({
                   asChild
                   className="bg-primary-500 hover:bg-primary-600 text-secondary-900 font-bold px-8 py-6 text-lg rounded-xl shadow-[0_6px_14px_rgba(236,185,95,0.35)] hover:shadow-[0_10px_20px_rgba(236,185,95,0.45)] hover:-translate-y-0.5 transition-all duration-200"
                 >
-                  <Link href={`/orders/new?service=${service.slug}`}>
+                  <Link href={`/comanda/${service.slug}`}>
                     Comandă Acum
                     <ArrowRight className="ml-2 w-5 h-5" />
                   </Link>
