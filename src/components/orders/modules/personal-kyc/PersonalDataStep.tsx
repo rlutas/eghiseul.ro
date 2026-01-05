@@ -39,6 +39,7 @@ import {
 import type { PersonalKYCConfig, CitizenshipType, DocumentType } from '@/types/verification-modules';
 import { validateCNP, extractBirthDateFromCNP } from '@/lib/validations/cnp';
 import { cn } from '@/lib/utils';
+import { COUNTY_NAMES, getLocalitiesForCounty, getCountyName, findCounty } from '@/lib/data/romania-counties';
 
 // Minimal ID Card Front Illustration (Gold theme)
 function IdCardFrontIllustration({ className }: { className?: string }) {
@@ -141,6 +142,7 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
   const [ciFrontScan, setCiFrontScan] = useState<ScanState>(initialScanState);
   const [ciBackScan, setCiBackScan] = useState<ScanState>(initialScanState);
   const [showScanSection, setShowScanSection] = useState(true);
+  const [localities, setLocalities] = useState<string[]>([]);
 
   // Handle file select and OCR
   const handleFileSelect = useCallback(async (
@@ -214,7 +216,8 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
           // Address (if available from CI vechi or certificate)
           ...(extracted.address && {
             address: {
-              county: extracted.address.county || '',
+              // Convert county abbreviation (SM) to full name (Satu Mare) for Select dropdown
+              county: getCountyName(extracted.address.county) || '',
               city: extracted.address.city || '',
               sector: extracted.address.sector,
               street: extracted.address.street || '',
@@ -306,6 +309,23 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
       }
     }
   }, [updatePersonalKyc]);
+
+  // Handle county change - update localities list
+  const handleCountyChange = useCallback((countyName: string) => {
+    updatePersonalKyc({
+      address: { ...personalKyc?.address, county: countyName, city: '' }
+    });
+    const countyLocalities = getLocalitiesForCounty(countyName);
+    setLocalities(countyLocalities);
+  }, [personalKyc?.address, updatePersonalKyc]);
+
+  // Initialize localities when component loads (for restored data)
+  useEffect(() => {
+    if (personalKyc?.address?.county) {
+      const countyLocalities = getLocalitiesForCounty(personalKyc.address.county);
+      setLocalities(countyLocalities);
+    }
+  }, [personalKyc?.address?.county]);
 
   // Validate form
   const isFormValid = useCallback(() => {
@@ -819,31 +839,57 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
             <Label htmlFor="county" className="text-secondary-900 font-medium">
               Județ <span className="text-red-500">*</span>
             </Label>
-            <Input
-              id="county"
-              type="text"
+            <Select
               value={personalKyc.address.county}
-              onChange={(e) => updatePersonalKyc({
-                address: { ...personalKyc.address, county: e.target.value }
-              })}
-              placeholder="ex: București"
-              className="bg-white placeholder:text-neutral-400"
-            />
+              onValueChange={handleCountyChange}
+            >
+              <SelectTrigger id="county" className="bg-white">
+                <SelectValue placeholder="— Selectează județul —" />
+              </SelectTrigger>
+              <SelectContent className="max-h-[300px]">
+                {COUNTY_NAMES.map((county) => (
+                  <SelectItem key={county} value={county}>
+                    {county}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <div className="space-y-2">
             <Label htmlFor="city" className="text-secondary-900 font-medium">
               Localitate <span className="text-red-500">*</span>
             </Label>
-            <Input
-              id="city"
-              type="text"
-              value={personalKyc.address.city}
-              onChange={(e) => updatePersonalKyc({
-                address: { ...personalKyc.address, city: e.target.value }
-              })}
-              placeholder="ex: București"
-              className="bg-white placeholder:text-neutral-400"
-            />
+            {localities.length > 0 ? (
+              <Select
+                value={personalKyc.address.city}
+                onValueChange={(value) => updatePersonalKyc({
+                  address: { ...personalKyc.address, city: value }
+                })}
+              >
+                <SelectTrigger id="city" className="bg-white">
+                  <SelectValue placeholder="— Selectează localitatea —" />
+                </SelectTrigger>
+                <SelectContent className="max-h-[300px]">
+                  {localities.map((locality) => (
+                    <SelectItem key={locality} value={locality}>
+                      {locality}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            ) : (
+              <Input
+                id="city"
+                type="text"
+                value={personalKyc.address.city}
+                onChange={(e) => updatePersonalKyc({
+                  address: { ...personalKyc.address, city: e.target.value }
+                })}
+                placeholder="Selectează mai întâi județul"
+                className="bg-white placeholder:text-neutral-400"
+                disabled={!personalKyc.address.county}
+              />
+            )}
           </div>
         </div>
 
