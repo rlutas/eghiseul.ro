@@ -318,13 +318,15 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
     if (!personalKyc.lastName.trim()) return false;
     if (!personalKyc.birthDate) return false;
 
-    // Check document requirements
-    if (config.acceptedDocuments.length > 0 && personalKyc.uploadedDocuments.length === 0) {
+    // Check document requirements (with defensive checks)
+    const acceptedDocs = config?.acceptedDocuments ?? [];
+    const uploadedDocs = personalKyc?.uploadedDocuments ?? [];
+    if (acceptedDocs.length > 0 && uploadedDocs.length === 0) {
       return false;
     }
 
     // Check if expired document is allowed
-    if (personalKyc.isExpired && !config.expiredDocumentAllowed) {
+    if (personalKyc?.isExpired && !config?.expiredDocumentAllowed) {
       return false;
     }
 
@@ -555,7 +557,7 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
       )}
 
       {/* Expired Document Warning */}
-      {personalKyc.isExpired && !config.expiredDocumentAllowed && (
+      {personalKyc.isExpired && !config?.expiredDocumentAllowed && (
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
@@ -564,16 +566,16 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
         </Alert>
       )}
 
-      {personalKyc.isExpired && config.expiredDocumentAllowed && (
+      {personalKyc.isExpired && config?.expiredDocumentAllowed && (
         <Alert className="border-yellow-200 bg-yellow-50 text-yellow-800">
           <AlertCircle className="h-4 w-4 text-yellow-600" />
           <AlertDescription>
-            {config.expiredDocumentMessage || 'Documentul tău este expirat, dar este acceptat pentru acest serviciu.'}
+            {config?.expiredDocumentMessage || 'Documentul tău este expirat, dar este acceptat pentru acest serviciu.'}
           </AlertDescription>
         </Alert>
       )}
 
-      {personalKyc.requiresAddressCertificate && config.requireAddressCertificate !== 'never' && (
+      {personalKyc.requiresAddressCertificate && config?.requireAddressCertificate !== 'never' && (
         <Alert className="border-blue-200 bg-blue-50 text-blue-800">
           <AlertCircle className="h-4 w-4 text-blue-600" />
           <AlertDescription>
@@ -773,7 +775,7 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
         </div>
 
         {/* Parent Names (if required) */}
-        {config.parentDataRequired && (
+        {config?.parentDataRequired && (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t">
             <div className="space-y-2">
               <Label htmlFor="fatherName" className="text-secondary-900 font-medium">
