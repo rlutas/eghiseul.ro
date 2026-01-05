@@ -94,7 +94,7 @@ export function OptionsStep({ onValidChange }: OptionsStepProps) {
         option_id: option.id,
         option_name: option.name,
         quantity: 1,
-        price_modifier: option.price_modifier,
+        price_modifier: option.price,
       };
       updateSelectedOptions([...selectedOptions, newOption]);
     }
@@ -180,7 +180,7 @@ export function OptionsStep({ onValidChange }: OptionsStepProps) {
                     : 'bg-neutral-100 text-neutral-700'
                 )}
               >
-                +{option.price_modifier} RON
+                +{option.price} RON
               </span>
               {isUrgent && (
                 <span className="text-xs text-amber-700 bg-amber-100 px-2 py-0.5 rounded">

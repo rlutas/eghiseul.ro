@@ -417,7 +417,7 @@ export default async function CazierJudiciarPFPage() {
                           <p className="text-xs lg:text-sm text-neutral-600 mb-3 flex-1">{option.description}</p>
                         )}
                         <span className="font-bold text-primary-600 text-base lg:text-lg mt-auto">
-                          +{option.price_modifier} RON
+                          +{option.price} RON
                         </span>
                       </div>
                     </CardContent>

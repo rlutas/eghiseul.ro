@@ -40,22 +40,26 @@ export interface Service {
 export interface ServiceOption {
   id: string;
   service_id: string;
+  code: string;
   name: string;
   description: string | null;
-  option_type: 'addon' | 'select' | 'input' | 'checkbox';
-  price_modifier: number;
+  price: number;
+  price_type?: 'fixed' | 'percentage';
   is_required: boolean;
   is_active: boolean;
-  choices: unknown | null;
+  max_quantity?: number;
+  config?: Record<string, unknown> | null;
   display_order: number;
+  icon?: string;
   created_at: string;
+  updated_at?: string;
 }
 
-// Option Choice
+// Option Choice (for select-type options)
 export interface OptionChoice {
   value: string;
   label: string;
-  price_modifier: number;
+  price: number;
 }
 
 // Service Configuration (JSONB) - Legacy config
