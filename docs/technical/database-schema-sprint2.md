@@ -580,6 +580,166 @@ DROP FUNCTION IF EXISTS log_order_status_change();
 
 ---
 
-**Status:** ✅ Ready for Testing
-**Next Step:** Run migration in Supabase development environment
+## Sprint 3-4 Schema Updates (Addendum)
+
+> **Added:** 2026-01-07
+> **Migrations:** 006-015
+
+### New Tables
+
+#### 1. audit_logs (Migration 006)
+
+Security audit logging for PII access.
+
+```sql
+CREATE TABLE audit_logs (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES profiles(id),
+  action VARCHAR(100) NOT NULL,
+  resource_type VARCHAR(50) NOT NULL,
+  resource_id UUID,
+  timestamp TIMESTAMPTZ DEFAULT NOW(),
+  ip_address INET,
+  metadata JSONB DEFAULT '{}',
+  success BOOLEAN DEFAULT TRUE
+);
+```
+
+**Indexes:** user_id, timestamp DESC
+**RLS:** Admin-only access
+
+#### 2. user_saved_data (Migration 015)
+
+Store user's saved personal/company data for prefill.
+
+```sql
+CREATE TABLE user_saved_data (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+  data_type VARCHAR(50) NOT NULL, -- 'personal', 'company', 'address'
+  data JSONB NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(user_id, data_type)
+);
+```
+
+#### 3. kyc_verifications (Migration 015)
+
+Track KYC verification status per user.
+
+```sql
+CREATE TABLE kyc_verifications (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+  status VARCHAR(20) DEFAULT 'pending', -- pending, valid, expired, rejected
+  verified_at TIMESTAMPTZ,
+  expires_at TIMESTAMPTZ, -- 180 days after verification
+  document_hashes JSONB, -- hashes of uploaded docs (not PII)
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+#### 4. billing_profiles (Migration 015)
+
+Store billing information for PF/PJ invoicing.
+
+```sql
+CREATE TABLE billing_profiles (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+  profile_type VARCHAR(10) NOT NULL, -- 'pf' or 'pj'
+  name VARCHAR(255) NOT NULL,
+  -- PF fields
+  cnp VARCHAR(13),
+  -- PJ fields
+  cui VARCHAR(20),
+  reg_com VARCHAR(50),
+  -- Common fields
+  address TEXT,
+  is_default BOOLEAN DEFAULT false,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+### Modified Tables
+
+#### orders (Multiple migrations)
+
+New columns added:
+
+| Column | Migration | Type | Purpose |
+|--------|-----------|------|---------|
+| `friendly_order_id` | 008 | VARCHAR(20) | Human-readable ID: ORD-YYYYMMDD-XXXXX |
+| `session_id` | 009 | UUID | For guest order tracking |
+| `anonymized_at` | 009 | TIMESTAMPTZ | GDPR cleanup tracking |
+
+#### services (Migration 010)
+
+New column:
+
+| Column | Type | Purpose |
+|--------|------|---------|
+| `verification_config` | JSONB | Module configuration for modular wizard |
+
+Example `verification_config`:
+
+```json
+{
+  "modules": ["client-type", "personal-data", "kyc-documents", "signature"],
+  "kyc_required": true,
+  "document_types": ["ci_front", "ci_back", "selfie"],
+  "personal_data_fields": ["cnp", "full_name", "address"]
+}
+```
+
+#### profiles (Migration 015)
+
+New columns:
+
+| Column | Type | Purpose |
+|--------|------|---------|
+| `birth_date` | DATE | For prefill |
+| `birth_place` | VARCHAR(255) | For prefill |
+
+### Encrypted Columns (Migration 007)
+
+PII encryption using pgcrypto AES-256:
+
+| Table | Encrypted Column | Original Column |
+|-------|------------------|-----------------|
+| orders | `encrypted_cnp` | customer_data.personal.cnp |
+| orders | `encrypted_ci_series` | customer_data.personal.ci_series |
+| orders | `encrypted_ci_number` | customer_data.personal.ci_number |
+
+**Functions:**
+- `encrypt_pii(plaintext TEXT)` → BYTEA
+- `decrypt_pii(ciphertext BYTEA)` → TEXT
+- `mask_cnp(cnp TEXT)` → TEXT (returns: 1***********3456)
+
+### GDPR Cleanup (Migration 009)
+
+Automated cleanup of draft orders older than 7 days:
+
+```sql
+CREATE OR REPLACE FUNCTION anonymize_stale_drafts()
+  -- Anonymizes customer_data in drafts older than 7 days
+  -- Triggered by cron or /api/admin/cleanup endpoint
+```
+
+### Service Options (Migration 014)
+
+New service options for Cazier Judiciar:
+
+| Code | Name | Price |
+|------|------|-------|
+| URGENTA | Procesare Urgentă | 99.00 RON |
+| TRADUCERE_EN | Traducere Engleză | 150.00 RON |
+| APOSTILA | Apostilă Haga | 238.00 RON |
+
+---
+
+**Status:** ✅ Deployed to Production
+**Last Migration:** 015_user_data_persistence.sql
+**Documentation Updated:** 2026-01-07
 **Owner:** Development Team

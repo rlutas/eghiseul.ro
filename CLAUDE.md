@@ -14,6 +14,8 @@ Platformă digitală pentru România, în proces de reconstrucție din WordPress
 
 ## DOCUMENTATION MAINTENANCE GUIDE
 
+> **Quick Start:** Vezi `docs/README.md` pentru navigarea completă a documentației.
+
 ### When to Update Documentation
 
 **ALWAYS update documentation when:**
@@ -22,6 +24,7 @@ Platformă digitală pentru România, în proces de reconstrucție din WordPress
 3. Completing sprint tasks → Update `DEVELOPMENT_MASTER_PLAN.md`
 4. Adding new features → Create spec in `docs/technical/specs/`
 5. Modifying services → Update relevant service doc in `docs/sprints/services/`
+6. Fixing security issues → Update `docs/security/SECURITY_AUDIT_SUMMARY.md`
 
 ### Documentation Update Checklist
 
@@ -32,6 +35,7 @@ After completing any feature:
 [ ] Update sprint docs if applicable
 [ ] Add/update TypeScript types in src/types/
 [ ] Update this CLAUDE.md if new patterns established
+[ ] Update docs/README.md if new files created
 ```
 
 ### Key Files to Track
@@ -39,11 +43,21 @@ After completing any feature:
 | File | Purpose | Update When |
 |------|---------|-------------|
 | `DEVELOPMENT_MASTER_PLAN.md` | Sprint progress, task tracking | After completing tasks |
+| `docs/README.md` | **Documentation index** | When adding new docs |
 | `docs/technical/api/*.md` | API documentation | New/modified endpoints |
 | `docs/technical/specs/*.md` | Feature specifications | Planning new features |
 | `docs/technical/specs/modular-wizard-guide.md` | **Modular wizard usage** | When adding new services |
 | `docs/sprints/sprint-*.md` | Sprint details | During sprint work |
+| `docs/security/SECURITY_AUDIT_SUMMARY.md` | Security status | After security fixes |
 | `src/types/*.ts` | TypeScript interfaces | Schema changes |
+
+### Documentation by Role
+
+| Role | Start Here | Key Docs |
+|------|------------|----------|
+| **Developer** | `CLAUDE.md` | `docs/technical/api/`, `docs/technical/specs/` |
+| **Product** | `docs/prd/eghiseul-prd.md` | `DEVELOPMENT_MASTER_PLAN.md` |
+| **Security** | `docs/security/README.md` | `docs/security/SECURITY_AUDIT_SUMMARY.md` |
 
 ---
 
@@ -528,4 +542,4 @@ SMSLINK_API_KEY=
 ---
 
 **Last Updated:** 2026-01-05
-**Version:** 2.3
+**Version:** 2.4

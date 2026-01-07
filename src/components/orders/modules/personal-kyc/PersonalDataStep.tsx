@@ -171,6 +171,71 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
     return cleaned.trim();
   }, []);
 
+  // Helper function to fill address fields from OCR data
+  const fillAddressFields = useCallback((addr: {
+    county?: string;
+    city?: string;
+    sector?: string;
+    street?: string;
+    streetType?: string;
+    number?: string;
+    building?: string;
+    staircase?: string;
+    floor?: string;
+    apartment?: string;
+    postalCode?: string;
+  }) => {
+    console.log('fillAddressFields called with:', addr);
+
+    const addressUpdates: NonNullable<typeof personalKyc>['address'] = {
+      county: personalKyc?.address?.county || '',
+      city: personalKyc?.address?.city || '',
+      street: personalKyc?.address?.street || '',
+      number: personalKyc?.address?.number || '',
+    };
+
+    // County - convert abbreviations like "SM" → "Satu Mare"
+    if (addr.county) {
+      const countyName = getCountyName(addr.county);
+      console.log('County mapping:', addr.county, '→', countyName);
+      if (countyName && COUNTY_NAMES.includes(countyName)) {
+        addressUpdates.county = countyName;
+        // Load localities for this county
+        const countyLocalities = getLocalitiesForCounty(countyName);
+        setLocalities(countyLocalities);
+      }
+    }
+
+    // City - for București, include sector; clean prefixes for villages
+    if (addr.city) {
+      let cityName = addr.city;
+      const countyMatch = findCounty(addr.county);
+
+      if (addr.sector && (countyMatch?.name === 'București' || addr.city?.toLowerCase().includes('bucurești'))) {
+        cityName = `București, Sector ${addr.sector}`;
+      } else {
+        cityName = cleanLocalityName(cityName);
+        console.log('City cleaned:', addr.city, '→', cityName);
+      }
+      addressUpdates.city = cityName;
+    }
+
+    // Street - include streetType if provided
+    if (addr.street) {
+      addressUpdates.street = addr.streetType
+        ? `${addr.streetType} ${addr.street}`
+        : addr.street;
+    }
+    if (addr.number) addressUpdates.number = addr.number;
+    if (addr.building) addressUpdates.building = addr.building;
+    if (addr.staircase) addressUpdates.staircase = addr.staircase;
+    if (addr.floor) addressUpdates.floor = addr.floor;
+    if (addr.apartment) addressUpdates.apartment = addr.apartment;
+    if (addr.postalCode) addressUpdates.postalCode = addr.postalCode;
+
+    updatePersonalKyc({ address: addressUpdates });
+  }, [personalKyc?.address, updatePersonalKyc, cleanLocalityName]);
+
   // Handle file select and OCR
   const handleFileSelect = useCallback(async (
     type: 'ci_front' | 'ci_back',
@@ -367,69 +432,6 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
     updatePersonalKyc({
       address: { ...personalKyc?.address, county: countyName, city: newCity }
     });
-  }, [personalKyc?.address, updatePersonalKyc, cleanLocalityName]);
-
-  // Helper function to fill address fields from OCR data
-  const fillAddressFields = useCallback((addr: {
-    county?: string;
-    city?: string;
-    sector?: string;
-    street?: string;
-    streetType?: string;
-    number?: string;
-    building?: string;
-    staircase?: string;
-    floor?: string;
-    apartment?: string;
-    postalCode?: string;
-  }) => {
-    console.log('fillAddressFields called with:', addr);
-
-    const updates: Partial<typeof personalKyc> = {};
-    const addressUpdates: Partial<NonNullable<typeof personalKyc>['address']> = {
-      ...personalKyc?.address,
-    };
-
-    // County - convert abbreviations like "SM" → "Satu Mare"
-    if (addr.county) {
-      const countyName = getCountyName(addr.county);
-      console.log('County mapping:', addr.county, '→', countyName);
-      if (countyName && COUNTY_NAMES.includes(countyName)) {
-        addressUpdates.county = countyName;
-        // Load localities for this county
-        const countyLocalities = getLocalitiesForCounty(countyName);
-        setLocalities(countyLocalities);
-      }
-    }
-
-    // City - for București, include sector; clean prefixes for villages
-    if (addr.city) {
-      let cityName = addr.city;
-      const countyMatch = findCounty(addr.county);
-
-      if (addr.sector && (countyMatch?.name === 'București' || addr.city?.toLowerCase().includes('bucurești'))) {
-        cityName = `București, Sector ${addr.sector}`;
-      } else {
-        cityName = cleanLocalityName(cityName);
-        console.log('City cleaned:', addr.city, '→', cityName);
-      }
-      addressUpdates.city = cityName;
-    }
-
-    // Street - include streetType if provided
-    if (addr.street) {
-      addressUpdates.street = addr.streetType
-        ? `${addr.streetType} ${addr.street}`
-        : addr.street;
-    }
-    if (addr.number) addressUpdates.number = addr.number;
-    if (addr.building) addressUpdates.building = addr.building;
-    if (addr.staircase) addressUpdates.staircase = addr.staircase;
-    if (addr.floor) addressUpdates.floor = addr.floor;
-    if (addr.apartment) addressUpdates.apartment = addr.apartment;
-    if (addr.postalCode) addressUpdates.postalCode = addr.postalCode;
-
-    updatePersonalKyc({ address: addressUpdates });
   }, [personalKyc?.address, updatePersonalKyc, cleanLocalityName]);
 
   // Initialize localities when component loads (for restored data)

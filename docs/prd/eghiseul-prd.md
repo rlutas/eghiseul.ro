@@ -1,8 +1,12 @@
 # eGhiseul.ro - Product Requirements Document
 
-**Version:** 1.0
-**Date:** 15 Decembrie 2024
+**Version:** 2.0
+**Date:** 7 Ianuarie 2026
 **Author:** Product Team
+
+> **Update History:**
+> - v2.0 (2026-01-07): Updated tech stack (Google Gemini for OCR/KYC), modular wizard architecture
+> - v1.0 (2024-12-15): Initial PRD
 
 ## Product overview
 
@@ -122,27 +126,35 @@ eGhiseul.ro este o platforma digitala care simplifica accesul la documente si se
 
 ## Functional requirements
 
-### FR-1: Servicii si comenzi (P0)
+### FR-1: Servicii si comenzi (P0) ✅ IMPLEMENTED
 
-| ID | Requirement | Priority |
-|----|-------------|----------|
-| FR-1.1 | Sistem modular pentru 12+ servicii | P0 |
-| FR-1.2 | Flow standardizat 6 pasi (Contact > Date > Optiuni > KYC > Livrare > Plata) | P0 |
-| FR-1.3 | Configurare serviciu: pret, campuri, optiuni, KYC required | P0 |
-| FR-1.4 | Cross-sell intre servicii (Cazier + CIC, Certificate + Multilingv) | P0 |
-| FR-1.5 | Optiuni: urgenta, traducere (20 limbi), apostila | P0 |
-| FR-1.6 | Calcul pret dinamic bazat pe selectii | P0 |
+> **Implementation:** Modular Wizard System at `/comanda/[service-slug]`
+> See `docs/technical/specs/modular-wizard-guide.md` for architecture.
 
-### FR-2: KYC - Know Your Customer (P0)
+| ID | Requirement | Priority | Status |
+|----|-------------|----------|--------|
+| FR-1.1 | Sistem modular pentru 12+ servicii | P0 | ✅ Done (via `verification_config` JSONB) |
+| FR-1.2 | Flow dinamic bazat pe configurația serviciului | P0 | ✅ Done (Modular Wizard) |
+| FR-1.3 | Configurare serviciu: pret, campuri, optiuni, KYC required | P0 | ✅ Done |
+| FR-1.4 | Cross-sell intre servicii (Cazier + CIC, Certificate + Multilingv) | P0 | ⏳ Sprint 5 |
+| FR-1.5 | Optiuni: urgenta, traducere (20 limbi), apostila | P0 | ✅ Done |
+| FR-1.6 | Calcul pret dinamic bazat pe selectii | P0 | ✅ Done |
 
-| ID | Requirement | Priority |
-|----|-------------|----------|
-| FR-2.1 | Upload act identitate (CI/Pasaport) - max 2 fisiere | P0 |
-| FR-2.2 | Upload selfie cu document in mana | P0 |
-| FR-2.3 | Semnatura electronica (canvas) | P0 |
-| FR-2.4 | Upload documente suplimentare (permis auto, acte parinti) | P0 |
-| FR-2.5 | Validare format si marime fisiere | P0 |
-| FR-2.6 | Stocare securizata documente (S3 encrypted) | P0 |
+### FR-2: KYC - Know Your Customer (P0) ✅ IMPLEMENTED
+
+> **Implementation:** Google Gemini 1.5 Flash via `/api/kyc/validate`
+> See `docs/technical/api/ocr-kyc-api.md` for API documentation.
+
+| ID | Requirement | Priority | Status |
+|----|-------------|----------|--------|
+| FR-2.1 | Upload act identitate (CI/Pasaport) - max 2 fisiere | P0 | ✅ Done |
+| FR-2.2 | Upload selfie cu document in mana | P0 | ✅ Done |
+| FR-2.3 | Semnatura electronica (canvas) | P0 | ✅ Done |
+| FR-2.4 | Upload documente suplimentare (permis auto, acte parinti) | P0 | ✅ Done |
+| FR-2.5 | Validare format si marime fisiere | P0 | ✅ Done |
+| FR-2.6 | Stocare securizata documente (S3 encrypted) | P0 | ⏳ Sprint 4 |
+| FR-2.7 | Face matching între ID și selfie | P0 | ✅ Done |
+| FR-2.8 | Confidence scores pentru validare | P0 | ✅ Done |
 
 ### FR-3: Plati si facturare (P0)
 
@@ -228,16 +240,21 @@ eGhiseul.ro este o platforma digitala care simplifica accesul la documente si se
 | FR-10.5 | Salvare cos (localStorage + server daca logat) | P1 |
 | FR-10.6 | Email reminder cos abandonat (24h) | P1 |
 
-### FR-11: OCR si Smart Pre-fill (P0)
+### FR-11: OCR si Smart Pre-fill (P0) ✅ IMPLEMENTED
 
-| ID | Requirement | Priority |
-|----|-------------|----------|
-| FR-11.1 | Upload CI/Pasaport la inceputul flow-ului | P0 |
-| FR-11.2 | OCR extragere date: CNP, Nume, Adresa | P0 |
-| FR-11.3 | Verificare expirare act identitate | P0 |
-| FR-11.4 | Pre-completare automata campuri formular | P0 |
-| FR-11.5 | Calcul data nastere din CNP | P0 |
-| FR-11.6 | Detectie tip document (CI vs Pasaport) | P1 |
+> **Implementation:** Google Gemini 2.0 Flash Exp via `/api/ocr/extract`
+> See `docs/technical/api/ocr-kyc-api.md` for API documentation.
+
+| ID | Requirement | Priority | Status |
+|----|-------------|----------|--------|
+| FR-11.1 | Upload CI/Pasaport la inceputul flow-ului | P0 | ✅ Done |
+| FR-11.2 | OCR extragere date: CNP, Nume, Adresa completă (Jud, Str, Nr, Bl, Sc, Et, Ap) | P0 | ✅ Done |
+| FR-11.3 | Verificare expirare act identitate | P0 | ✅ Done |
+| FR-11.4 | Pre-completare automata campuri formular | P0 | ✅ Done |
+| FR-11.5 | Calcul data nastere din CNP | P0 | ✅ Done |
+| FR-11.6 | Detectie tip document (CI vechi, CI nou, Pasaport, Certificat Atestare) | P0 | ✅ Done |
+| FR-11.7 | MRZ extraction din Pasaport | P0 | ✅ Done |
+| FR-11.8 | Cross-validation CI + Certificat Atestare Domiciliu | P0 | ✅ Done |
 
 ### FR-12: KYC Persistent (P0)
 
@@ -294,64 +311,45 @@ eGhiseul.ro este o platforma digitala care simplifica accesul la documente si se
 | API | Integrari externe |
 | User dashboard | Pentru clienti cu cont - acces rapid |
 
-### Core experience - Smart Flow v2.0
+### Core experience - Modular Wizard System
+
+> **Implementation Note (2026-01):** The original "Smart Flow v2.0" has been replaced with a
+> **Modular Wizard System** that dynamically generates steps based on service configuration.
+> See `docs/technical/specs/modular-wizard-guide.md` for implementation details.
 
 **Principii cheie:**
-1. **OCR-First** - Upload CI devreme, extrage date automat
-2. **KYC o singura data** - Salvat 180 zile in cont
-3. **Cart System** - Adauga multiple servicii
+1. **OCR-First** - Upload CI devreme, extrage date automat (Google Gemini 2.0 Flash)
+2. **KYC o singura data** - Salvat 180 zile in cont (Google Gemini 1.5 Flash validation)
+3. **Modular Steps** - Fiecare serviciu definește modulele necesare în `verification_config`
 4. **Smart Pre-fill** - Aceeasi persoana = 0 campuri noi
-5. **PJ Bulk** - Firme comanda pentru N angajati
+5. **InfoCUI Integration** - Validare CUI cu auto-fill date firmă
+
+**Arhitectura Modular Wizard:**
 
 ```
-FLOW SMART - 6 PASI + CART
+URL: /comanda/[service-slug]
 
-PAS 1: CONTACT + UPLOAD CI
-├── Email *
-├── Telefon *
-├── Upload CI/Pasaport * → OCR extract
-└── Verificare expirare act
+CORE STEPS (toate serviciile):
+├── Contact Step (email, telefon)
+├── [DYNAMIC MODULES] ← din verification_config
+├── Options Step (urgenta, traducere, apostila)
+├── Delivery Step (electronic/fizic)
+└── Review Step (sumar + plata)
 
-PAS 2: DATE PRE-COMPLETATE (din OCR)
-├── CNP (extras automat)
-├── Nume complet (extras automat)
-├── Data nastere (calculat din CNP)
-├── Loc nastere (de completat)
-├── Prenume parinti (de completat)
-├── Motiv solicitare
-└── [Optional] Date cetatean strain
+AVAILABLE MODULES:
+├── client-type      → Selectie PF/PJ
+├── personal-data    → Date personale + adresa
+├── company-data     → Date firma (CUI validation via InfoCUI)
+├── property-data    → Date proprietate (Carte Funciara)
+├── vehicle-data     → Date vehicul (Rovinieta)
+├── kyc-documents    → Upload CI + Selfie + OCR extraction
+└── signature        → Semnatura electronica canvas
 
-PAS 3: OPTIUNI SERVICIU
-├── Regim procesare (standard/urgenta +100 RON)
-├── Traducere (20 limbi, 5 tiers)
-│   └── Legalizare traducere (+99 RON)
-├── Apostila Haga (+238 RON)
-└── Subtotal actualizat real-time
-
-PAS 4: CROSS-SELL
-├── Banner contextual (ex: +Cert Integritate +150 RON)
-├── Highlight: folosim aceleasi date
-└── One-click add to cart
-
-PAS 5: KYC VERIFICARE
-├── Daca user logat cu KYC valid → SKIP
-├── Daca CI uploadat la pas 1 → doar Selfie
-└── Altfel → Upload CI + Selfie
-
-PAS 6: ADAUGA IN COS
-├── Rezumat serviciu configurat
-├── [Checkout] → Finalizeaza
-└── [+ Alt serviciu] → Reincepe flow
-    ├── Aceeasi persoana → Pre-fill complet
-    └── Alta persoana → Date noi
-
-CHECKOUT (dupa cos)
-├── Livrare (electronic / fizic RO / fizic INT)
-├── SMS Notificari (optional +5 RON)
-├── Contract + Semnatura electronica
-├── Facturare PF/PJ
-├── Cupon reducere
-└── Plata Stripe
+EXAMPLE: Cazier Judiciar PF
+verification_config: {
+  "modules": ["client-type", "personal-data", "kyc-documents", "signature"]
+}
+→ Generates: Contact → Client Type → Personal Data → KYC → Signature → Options → Delivery → Review
 ```
 
 ### Service-specific variations
@@ -420,16 +418,18 @@ Maria locuieste in Germania de 5 ani si are nevoie de un cazier judiciar cu apos
 
 ### Integration points
 
-| System | Purpose | Priority |
-|--------|---------|----------|
-| **Stripe** | Plati card, 3D Secure | P0 |
-| **Olbio** | Facturare automata | P0 |
-| **AWS S3** | Stocare documente | P0 |
-| **SendGrid/Resend** | Email transactional | P0 |
-| **infocui.ro** | Validare CUI firme | P0 |
-| **Fan Curier API** | Livrare Romania | P1 |
-| **DHL API** | Livrare internationala | P1 |
-| **Twilio** | SMS notificari | P2 |
+| System | Purpose | Priority | Status |
+|--------|---------|----------|--------|
+| **Stripe** | Plati card, 3D Secure | P0 | ✅ Integrated |
+| **SmartBill** | Facturare automata (e-factura compliant) | P0 | ⏳ Sprint 4 |
+| **AWS S3** | Stocare documente (eu-central-1) | P0 | ⏳ Sprint 4 |
+| **Resend** | Email transactional | P0 | ✅ Configured |
+| **Google Gemini 2.0 Flash** | OCR document extraction | P0 | ✅ Integrated |
+| **Google Gemini 1.5 Flash** | KYC face matching & validation | P0 | ✅ Integrated |
+| **InfoCUI.ro** | Validare CUI firme (via eghiseul.ro API) | P0 | ✅ Integrated |
+| **SMSLink.ro** | SMS notificari (provider românesc) | P1 | ⏳ Sprint 5 |
+| **Fan Curier API** | Livrare Romania | P1 | ⏳ Planned |
+| **DHL API** | Livrare internationala | P1 | ⏳ Planned |
 
 ### Data storage and privacy
 

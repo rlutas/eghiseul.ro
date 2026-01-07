@@ -1,188 +1,98 @@
 # Security Quick Reference - Developers
 
-**Last Updated:** 2025-12-17
-**Critical Status:** IMMEDIATE ACTION REQUIRED
+**Last Updated:** 2026-01-07
+**Critical Status:** PARTIALLY RESOLVED - Remaining items in progress
 
 ---
 
 ## Critical Vulnerabilities Summary
 
-### STOP - Do Not Deploy Without These Fixes
+### Fixed Issues ✅
 
-1. **OCR Endpoint is Public (CVSS 9.3)**
+1. **~~OCR Endpoint is Public (CVSS 9.3)~~** ✅ FIXED (2025-12-17)
    - File: `src/app/api/ocr/extract/route.ts`
-   - Issue: Anyone can extract PII from ID cards
-   - Fix: Add authentication check (see code below)
+   - **Fix Applied:** Origin validation + rate limiting (10 req/min guest, 30 req/min auth)
+   - Files: `src/lib/security/rate-limiter.ts`
 
-2. **CNP Stored Unencrypted (CVSS 9.8)**
-   - Table: `orders.customer_data`
-   - Issue: Romanian SSN in plaintext
-   - Fix: Implement pgcrypto encryption
+2. **CNP Stored Unencrypted (CVSS 9.8)** ✅ DEPLOYED (2025-12-17)
+   - Table: `orders.encrypted_cnp`, `orders.encrypted_ci_series`, `orders.encrypted_ci_number`
+   - **Fix Applied:** AES-256 encryption via pgcrypto (migration 007)
+   - Files: `supabase/migrations/007_pii_encryption.sql`, `src/lib/security/pii-encryption.ts`
 
-3. **No Audit Logging (CVSS 8.7)**
-   - Issue: Cannot detect breaches
-   - Fix: Log all PII access
+3. **~~No Audit Logging (CVSS 8.7)~~** ✅ FIXED (2025-12-17)
+   - **Fix Applied:** Comprehensive audit logging with PII sanitization
+   - Files: `src/lib/security/audit-logger.ts`, `supabase/migrations/006_audit_logs.sql`
+
+### Remaining Issues
+
+- **Google AI DPA:** Verification pending (CRIT-002)
+- **Data Retention:** RTBF implementation pending (HIGH-001, HIGH-002)
 
 ---
 
 ## Quick Fixes (Copy-Paste Ready)
 
-### 1. Secure OCR Endpoint (30 minutes)
+### 1. OCR Endpoint Security ✅ IMPLEMENTED
+
+The OCR endpoint is now secured with origin validation and rate limiting:
 
 ```typescript
-// File: src/app/api/ocr/extract/route.ts
+// File: src/app/api/ocr/extract/route.ts - ALREADY IMPLEMENTED
 
-import { createClient } from '@/lib/supabase/server';
-import { NextRequest, NextResponse } from 'next/server';
+import { rateLimit } from '@/lib/security/rate-limiter';
+import { auditLog } from '@/lib/security/audit-logger';
 
-export async function POST(request: NextRequest) {
-  // 1. AUTHENTICATION (CRITICAL)
-  const supabase = await createClient();
-  const { data: { user }, error } = await supabase.auth.getUser();
+// Security implemented:
+// 1. Origin validation - only eghiseul.ro domains allowed
+// 2. Rate limiting - 10 req/min (guest), 30 req/min (authenticated)
+// 3. Audit logging - all requests logged (no PII)
 
-  if (error || !user) {
-    return NextResponse.json(
-      { error: 'Authentication required' },
-      { status: 401 }
-    );
-  }
-
-  // 2. RATE LIMITING (TODO: Implement proper rate limiting)
-  // For now, check session timestamp
-
-  // 3. Continue with existing OCR logic
-  const body = await request.json();
-  // ... rest of code
-}
+// Guest checkout supported - hard auth not required
+// External abuse blocked by origin + rate limiting
 ```
 
-### 2. Add Audit Logging (1 hour)
+### 2. Audit Logging ✅ IMPLEMENTED
 
-**Step 1: Create table**
-
-```sql
--- File: supabase/migrations/006_audit_logs.sql
-
-CREATE TABLE audit_logs (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID REFERENCES profiles(id),
-  action VARCHAR(100) NOT NULL,
-  resource_type VARCHAR(50) NOT NULL,
-  resource_id UUID,
-  timestamp TIMESTAMPTZ DEFAULT NOW(),
-  ip_address INET,
-  metadata JSONB DEFAULT '{}',
-  success BOOLEAN DEFAULT TRUE
-);
-
-CREATE INDEX idx_audit_logs_user_id ON audit_logs(user_id);
-CREATE INDEX idx_audit_logs_timestamp ON audit_logs(timestamp DESC);
-
-ALTER TABLE audit_logs ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Users view own logs"
-  ON audit_logs FOR SELECT
-  USING (auth.uid() = user_id);
-```
-
-**Step 2: Create helper**
+Audit logging is fully implemented. See `src/lib/security/audit-logger.ts`:
 
 ```typescript
-// File: src/lib/audit/logger.ts
+// File: src/lib/security/audit-logger.ts - ALREADY IMPLEMENTED
 
-import { createClient } from '@/lib/supabase/server';
+import { auditLog } from '@/lib/security/audit-logger';
 
-export async function auditLog({
-  userId,
-  action,
-  resourceType,
-  resourceId,
-  metadata = {},
-  request,
-}: {
-  userId?: string;
-  action: string;
-  resourceType: string;
-  resourceId?: string;
-  metadata?: Record<string, any>;
-  request?: Request;
-}) {
-  const supabase = createClient();
-
-  // CRITICAL: Never log PII
-  const sanitized = { ...metadata };
-  delete sanitized.cnp;
-  delete sanitized.ci_series;
-  delete sanitized.ci_number;
-  delete sanitized.password;
-
-  await supabase.from('audit_logs').insert({
-    user_id: userId,
-    action,
-    resource_type: resourceType,
-    resource_id: resourceId,
-    ip_address: request?.headers.get('x-forwarded-for') || request?.headers.get('x-real-ip'),
-    metadata: sanitized,
-  });
-}
-```
-
-**Step 3: Use in endpoints**
-
-```typescript
-// Add to any endpoint accessing PII
+// Usage example (already integrated in OCR, KYC, Orders):
 await auditLog({
-  userId: user.id,
-  action: 'ocr_extract',
+  userId: user?.id,
+  action: 'ocr_extract_success',
   resourceType: 'kyc_document',
   metadata: {
     document_type: 'ci_front',
     confidence: 98,
-    // NO CNP, NO NAMES
+    // PII automatically sanitized - CNP, names never logged
   },
   request,
 });
 ```
 
-### 3. Implement Rate Limiting (2 hours)
+**Database:** `supabase/migrations/006_audit_logs.sql` (deployed)
+
+### 3. Rate Limiting ✅ IMPLEMENTED
+
+Rate limiting is fully implemented. See `src/lib/security/rate-limiter.ts`:
 
 ```typescript
-// File: src/lib/rate-limit.ts
+// File: src/lib/security/rate-limiter.ts - ALREADY IMPLEMENTED
 
-const RATE_LIMIT_WINDOW = 60000; // 1 minute
-const RATE_LIMIT_MAX = 5; // 5 requests
+import { rateLimit } from '@/lib/security/rate-limiter';
 
-// In-memory store (use Redis in production)
-const rateLimitStore = new Map<string, { count: number; resetAt: number }>();
+// Usage (already integrated in OCR endpoint):
+const result = await rateLimit(identifier, {
+  guestLimit: 10,      // 10 req/min for guests
+  authLimit: 30        // 30 req/min for authenticated users
+});
 
-export async function rateLimit(identifier: string): Promise<{ success: boolean }> {
-  const now = Date.now();
-  const record = rateLimitStore.get(identifier);
-
-  if (!record || now > record.resetAt) {
-    // New window
-    rateLimitStore.set(identifier, {
-      count: 1,
-      resetAt: now + RATE_LIMIT_WINDOW,
-    });
-    return { success: true };
-  }
-
-  if (record.count >= RATE_LIMIT_MAX) {
-    return { success: false };
-  }
-
-  record.count++;
-  return { success: true };
-}
-
-// Usage:
-const result = await rateLimit(user.id);
 if (!result.success) {
-  return NextResponse.json(
-    { error: 'Rate limit exceeded' },
-    { status: 429 }
-  );
+  return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 });
 }
 ```
 

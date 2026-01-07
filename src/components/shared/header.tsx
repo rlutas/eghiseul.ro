@@ -2,11 +2,20 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { Menu, X, Phone, ChevronDown } from 'lucide-react';
+import { usePathname, useRouter } from 'next/navigation';
+import { Menu, X, Phone, User, Settings, FileText, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
+import { createClient } from '@/lib/supabase/client';
+import type { User as SupabaseUser } from '@supabase/supabase-js';
 
 const navLinks = [
   { href: '/', label: 'Acasă', type: 'route' as const },
@@ -29,7 +38,31 @@ const smoothScrollToSection = (sectionId: string) => {
 export function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [user, setUser] = useState<SupabaseUser | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const pathname = usePathname();
+  const router = useRouter();
+
+  // Check auth state
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setUser(user);
+      setIsLoading(false);
+    });
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+    return () => subscription.unsubscribe();
+  }, []);
+
+  // Handle logout
+  const handleLogout = async () => {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.push('/');
+    router.refresh();
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -39,6 +72,9 @@ export function Header() {
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  const userInitials = user?.user_metadata?.first_name?.[0]?.toUpperCase() ||
+                       user?.email?.[0]?.toUpperCase() || 'U';
 
   const isActiveLink = (link: typeof navLinks[number]) => {
     if (link.type === 'route') {
@@ -132,21 +168,71 @@ export function Header() {
               ))}
             </nav>
 
-            {/* Desktop Auth Buttons */}
+            {/* Desktop Auth Buttons / User Menu */}
             <div className="hidden lg:flex items-center gap-3">
-              <Button
-                variant="ghost"
-                asChild
-                className="text-secondary-700 hover:text-secondary-900 hover:bg-neutral-100 font-semibold"
-              >
-                <Link href="/auth/login">Autentificare</Link>
-              </Button>
-              <Button
-                asChild
-                className="bg-primary-500 hover:bg-primary-600 text-secondary-900 font-bold px-6 rounded-xl shadow-[0_6px_14px_rgba(236,185,95,0.35)] hover:shadow-[0_10px_20px_rgba(236,185,95,0.45)] hover:-translate-y-0.5 transition-all duration-200"
-              >
-                <Link href="/auth/register">Începe Acum</Link>
-              </Button>
+              {isLoading ? (
+                <div className="w-9 h-9 rounded-full bg-neutral-100 animate-pulse" />
+              ) : user ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className="flex items-center gap-2 p-1.5 rounded-full hover:bg-neutral-100 transition-colors">
+                      <div className="w-9 h-9 rounded-full bg-primary-500 flex items-center justify-center">
+                        <span className="text-sm font-bold text-secondary-900">{userInitials}</span>
+                      </div>
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56">
+                    <div className="px-3 py-2 border-b border-neutral-100">
+                      <p className="text-sm font-semibold text-secondary-900">
+                        {user.user_metadata?.first_name || 'Utilizator'}
+                      </p>
+                      <p className="text-xs text-neutral-500 truncate">{user.email}</p>
+                    </div>
+                    <DropdownMenuItem asChild className="cursor-pointer">
+                      <Link href="/account" className="flex items-center gap-2">
+                        <User className="w-4 h-4" />
+                        Contul meu
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild className="cursor-pointer">
+                      <Link href="/account" className="flex items-center gap-2">
+                        <FileText className="w-4 h-4" />
+                        Comenzile mele
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild className="cursor-pointer">
+                      <Link href="/account/settings" className="flex items-center gap-2">
+                        <Settings className="w-4 h-4" />
+                        Setări
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      onClick={handleLogout}
+                      className="cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50"
+                    >
+                      <LogOut className="w-4 h-4 mr-2" />
+                      Deconectare
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <>
+                  <Button
+                    variant="ghost"
+                    asChild
+                    className="text-secondary-700 hover:text-secondary-900 hover:bg-neutral-100 font-semibold"
+                  >
+                    <Link href="/auth/login">Autentificare</Link>
+                  </Button>
+                  <Button
+                    asChild
+                    className="bg-primary-500 hover:bg-primary-600 text-secondary-900 font-bold px-6 rounded-xl shadow-[0_6px_14px_rgba(236,185,95,0.35)] hover:shadow-[0_10px_20px_rgba(236,185,95,0.45)] hover:-translate-y-0.5 transition-all duration-200"
+                  >
+                    <Link href="/auth/register">Începe Acum</Link>
+                  </Button>
+                </>
+              )}
             </div>
 
             {/* Mobile Menu Button */}
@@ -223,31 +309,69 @@ export function Header() {
                     </a>
                   </div>
 
-                  {/* Mobile Auth Buttons */}
+                  {/* Mobile Auth Buttons / User Info */}
                   <div className="p-4 space-y-3 border-t border-neutral-200">
-                    <Button
-                      variant="outline"
-                      asChild
-                      className="w-full border-2 border-neutral-200 h-12 text-secondary-700 font-semibold rounded-xl hover:bg-neutral-50"
-                    >
-                      <Link
-                        href="/auth/login"
-                        onClick={() => setIsMobileMenuOpen(false)}
-                      >
-                        Autentificare
-                      </Link>
-                    </Button>
-                    <Button
-                      asChild
-                      className="w-full bg-primary-500 hover:bg-primary-600 text-secondary-900 font-bold h-12 rounded-xl shadow-[0_6px_14px_rgba(236,185,95,0.35)]"
-                    >
-                      <Link
-                        href="/auth/register"
-                        onClick={() => setIsMobileMenuOpen(false)}
-                      >
-                        Începe Acum
-                      </Link>
-                    </Button>
+                    {user ? (
+                      <>
+                        <div className="flex items-center gap-3 p-3 bg-primary-50 rounded-xl mb-3">
+                          <div className="w-10 h-10 rounded-full bg-primary-500 flex items-center justify-center">
+                            <span className="font-bold text-secondary-900">{userInitials}</span>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-semibold text-secondary-900 truncate">
+                              {user.user_metadata?.first_name || 'Utilizator'}
+                            </p>
+                            <p className="text-xs text-neutral-500 truncate">{user.email}</p>
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                          <Link
+                            href="/account"
+                            onClick={() => setIsMobileMenuOpen(false)}
+                            className="flex items-center justify-center gap-2 px-3 py-2.5 text-sm font-medium text-secondary-700 bg-neutral-100 rounded-xl"
+                          >
+                            <User className="w-4 h-4" />
+                            Cont
+                          </Link>
+                          <button
+                            onClick={() => {
+                              handleLogout();
+                              setIsMobileMenuOpen(false);
+                            }}
+                            className="flex items-center justify-center gap-2 px-3 py-2.5 text-sm font-medium text-red-600 bg-red-50 rounded-xl"
+                          >
+                            <LogOut className="w-4 h-4" />
+                            Ieșire
+                          </button>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <Button
+                          variant="outline"
+                          asChild
+                          className="w-full border-2 border-neutral-200 h-12 text-secondary-700 font-semibold rounded-xl hover:bg-neutral-50"
+                        >
+                          <Link
+                            href="/auth/login"
+                            onClick={() => setIsMobileMenuOpen(false)}
+                          >
+                            Autentificare
+                          </Link>
+                        </Button>
+                        <Button
+                          asChild
+                          className="w-full bg-primary-500 hover:bg-primary-600 text-secondary-900 font-bold h-12 rounded-xl shadow-[0_6px_14px_rgba(236,185,95,0.35)]"
+                        >
+                          <Link
+                            href="/auth/register"
+                            onClick={() => setIsMobileMenuOpen(false)}
+                          >
+                            Începe Acum
+                          </Link>
+                        </Button>
+                      </>
+                    )}
                   </div>
                 </div>
               </SheetContent>

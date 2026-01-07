@@ -1,5 +1,16 @@
 # eGhiseul - Smart Flow v2.0
 
+> **ARCHIVED: 2026-01-07**
+>
+> This document describes a proposed "Smart Flow v2.0" system that was **never implemented**.
+> The actual implementation uses the **Modular Wizard System** instead.
+>
+> See current implementation: `docs/technical/specs/modular-wizard-guide.md`
+>
+> This document is kept for historical reference only.
+
+---
+
 ## Principii de design
 
 ### 1. OCR-First

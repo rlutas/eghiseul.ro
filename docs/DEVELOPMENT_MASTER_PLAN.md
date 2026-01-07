@@ -1,8 +1,8 @@
 # eGhiseul.ro - Development Master Plan
 
-**Version:** 1.8
-**Last Updated:** 2025-01-05
-**Status:** Sprint 3 Complete - Modular Wizard System Implemented | Sprint 4 Ready to Start
+**Version:** 2.0
+**Last Updated:** 2026-01-06
+**Status:** Sprint 3 Complete | Sprint 4 Planning (User Data Persistence)
 
 ---
 
@@ -116,6 +116,7 @@
 | **OCR Research** | `docs/technical/ocr-services-privacy-research.md` | ✅ Complete |
 | **Backend Comparison** | `docs/technical/supabase-vs-nestjs-comparison.md` | ✅ Complete |
 | **User Data Persistence** | `docs/technical/specs/user-data-persistence.md` | ✅ Complete |
+| **User Data Persistence - Implementation** | `docs/technical/specs/user-data-persistence-implementation.md` | ✅ NEW |
 | **Order Auto-Save System** | `docs/technical/specs/order-autosave-system.md` | ✅ Complete |
 
 ### Testing Documentation
@@ -319,6 +320,15 @@
 - **localStorage Backup**: Offline resilience, data preserved even without network
 - **Save Status Indicator**: Real-time feedback showing "Salvat acum X sec"
 
+**Bug Fixes & Updates (2026-01-05):**
+- **Fixed**: NaN prices in order summary - updated ServiceOption interface to use `price` instead of `price_modifier`
+- **Fixed**: Cache version bumped to 4 to invalidate stale localStorage data with undefined priceModifier
+- **Fixed**: County/Locality dropdowns restored with auto-populate from romania-counties.ts
+- **Fixed**: "Cannot access fillAddressFields before initialization" - reordered useCallback hooks
+- **Updated**: Cazier Judiciar prices: PF=250 RON, PJ=300 RON (hub service + sub-services)
+- **Added**: Service options for Cazier Judiciar (urgență, traducere, apostilă, copie suplimentară)
+- **Added**: Smart city matching in OCR - cleans prefixes (sat, com., mun.) and matches localities
+
 **Technical Specifications Created (Sprint 3):**
 1. **User Data Persistence** (`docs/technical/specs/user-data-persistence.md`)
    - Pre-fill data for logged-in users from previous orders
@@ -344,13 +354,13 @@
 | ⏳ Generare contract PDF | Pending | - |
 | ⏳ SmartBill facturare | Pending | - |
 | ⏳ **Order auto-save implementation** | Pending | `order-autosave-system.md` |
-| ⏳ **User data persistence** | Pending | `user-data-persistence.md` |
+| ✅ **User data persistence** | Complete | `user-data-persistence.md` |
 
 **New Features (From Sprint 3 Specs):**
 - Bank transfer with reference code (PAY-YYYYMMDD-XXXXX)
 - Admin confirmation for bank payments
-- Guest-to-customer conversion flow
-- KYC document reuse from previous orders
+- ✅ Guest-to-customer conversion flow (SaveDataModal after order)
+- ✅ KYC document reuse from previous orders (via prefill API)
 
 #### Sprint 5: Admin Dashboard (Săptămâna 13-14) ⏳ PENDING
 
@@ -735,12 +745,20 @@ curl http://localhost:3000/api/kyc/validate     # KYC health check
 - **Address Parsing**: Full Romanian format (Jud., Mun., Str., Bl., Sc., Et., Ap.)
 - **Documentation**: `docs/technical/api/ocr-kyc-api.md`
 
-### User Data Persistence (Planned)
+### User Data Persistence (Ready to Implement)
 - **Pre-fill**: Logged-in users get data from previous orders
 - **Conversion**: Guests can create account at order completion
-- **KYC Reuse**: Valid KYC documents (12 months) are reused
+- **KYC Reuse**: Valid KYC documents are reused (no re-upload)
 - **Billing**: Support for persoană fizică and juridică (ANAF CUI)
-- **Specification**: `docs/technical/specs/user-data-persistence.md`
+- **Full Spec**: `docs/technical/specs/user-data-persistence.md`
+- **Implementation Guide**: `docs/technical/specs/user-data-persistence-implementation.md` ✅ NEW
+
+**Implementation Phases:**
+1. Phase 1: Database Migration (015) - Tables: `user_saved_data`, `kyc_verifications`, `billing_profiles`
+2. Phase 2: Pre-fill API - `GET /api/user/prefill-data`
+3. Phase 3: Guest-to-Customer - `POST /api/auth/register-from-order`
+4. Phase 4: Wizard Integration - Pre-fill logic, "Already Verified" UI
+5. Phase 5: SaveDataModal - Post-order account creation modal
 
 ### Order Auto-Save System (Planned)
 - **Order ID**: Format ORD-YYYYMMDD-XXXXX
@@ -753,6 +771,48 @@ curl http://localhost:3000/api/kyc/validate     # KYC health check
 ---
 
 ## SESSION LOG
+
+### Session: 2026-01-06 - User Data Persistence Planning
+
+**Completed This Session:**
+1. ✅ **Analyzed Codebase for User Data Persistence**
+   - Reviewed existing spec (`user-data-persistence.md`) - 2000+ lines
+   - Identified missing database tables: `user_saved_data`, `kyc_verifications`, `billing_profiles`
+   - Identified missing API endpoints: prefill-data, register-from-order
+   - Reviewed current wizard provider state
+
+2. ✅ **Created Implementation Roadmap**
+   - Created `docs/technical/specs/user-data-persistence-implementation.md`
+   - Defined 6 implementation phases with priorities
+   - Included database migration SQL (015_user_data_persistence.sql)
+   - Included API endpoint implementations
+   - Included SaveDataModal component code
+
+3. ✅ **Updated Documentation**
+   - Added implementation guide to documentation index
+   - Updated User Data Persistence section with phases
+   - Updated DEVELOPMENT_MASTER_PLAN version to 2.0
+
+**Feature Summary - User Data Persistence:**
+
+| Component | Status | Priority |
+|-----------|--------|----------|
+| Full Spec | ✅ Complete | - |
+| Implementation Guide | ✅ NEW | - |
+| Database Migration | ❌ To Build | P0 |
+| Pre-fill API | ❌ To Build | P0 |
+| Register from Order API | ❌ To Build | P0 |
+| Wizard Pre-fill Integration | ❌ To Build | P0 |
+| SaveDataModal | ❌ To Build | P0 |
+| KYC Reuse UI | ❌ To Build | P1 |
+
+**Next Steps:**
+1. Create and run database migration 015
+2. Build pre-fill API endpoint
+3. Build register-from-order API endpoint
+4. Integrate pre-fill into wizard provider
+
+---
 
 ### Session: 2025-12-17 (Evening) - Security & Encryption
 
@@ -914,7 +974,7 @@ curl http://localhost:3000/api/kyc/validate     # KYC health check
 
 ---
 
-**Document Status:** ✅ Updated (v1.8)
-**Last Modified:** 2025-01-05
-**Next Review:** Sprint 4 kickoff
+**Document Status:** ✅ Updated (v2.0)
+**Last Modified:** 2026-01-06
+**Next Review:** After User Data Persistence Implementation
 **Owner:** Development Team

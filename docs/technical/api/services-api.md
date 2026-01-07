@@ -651,14 +651,21 @@ Update the status of an order. Admin-only endpoint.
 
 Create a Stripe payment intent for an order.
 
-**Endpoint**: `POST /api/payments/create-intent`
+**Endpoint**: `POST /api/orders/[id]/payment`
 **Auth**: Required (user token)
+
+> **Note:** Path changed from `/api/payments/create-intent` to `/api/orders/[id]/payment` in Sprint 3.
+
+#### Path Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| id | string | Yes | Order UUID |
 
 #### Request Body
 
 ```json
 {
-  "orderId": "uuid",
   "returnUrl": "https://eghiseul.ro/orders/uuid"
 }
 ```
@@ -1168,7 +1175,217 @@ curl https://eghiseul.ro/api/orders \
 
 ---
 
+---
+
+## Additional Endpoints (Sprint 3-4)
+
+### 9. Draft Order (Auto-Save)
+
+Manage draft orders for wizard auto-save functionality.
+
+**Endpoint**: `GET /api/orders/draft`
+**Auth**: Optional (uses session for guests, user_id for authenticated)
+
+#### Response: 200 OK
+
+```json
+{
+  "success": true,
+  "data": {
+    "draft": {
+      "id": "uuid",
+      "friendly_order_id": "ORD-20260107-XXXXX",
+      "service_id": "uuid",
+      "form_data": { ... },
+      "current_step": 2,
+      "created_at": "...",
+      "updated_at": "..."
+    }
+  }
+}
+```
+
+**Endpoint**: `POST /api/orders/draft`
+**Auth**: Optional
+
+Create or update draft order.
+
+```json
+{
+  "service_id": "uuid",
+  "form_data": { ... },
+  "current_step": 2
+}
+```
+
+---
+
+### 10. Company Validation (InfoCUI)
+
+Validate Romanian company CUI and retrieve company data.
+
+**Endpoint**: `POST /api/company/validate`
+**Auth**: None (rate limited)
+
+#### Request Body
+
+```json
+{
+  "cui": "12345678"
+}
+```
+
+#### Response: 200 OK
+
+```json
+{
+  "success": true,
+  "data": {
+    "company": {
+      "cui": "12345678",
+      "name": "FIRMA SRL",
+      "registrationNumber": "J40/1234/2020",
+      "address": "Str. Exemplu nr. 10, București",
+      "isActive": true,
+      "vatPayer": true
+    }
+  }
+}
+```
+
+---
+
+### 11. User Prefill Data
+
+Get saved user data for form pre-filling (authenticated users only).
+
+**Endpoint**: `GET /api/user/prefill-data`
+**Auth**: Required
+
+#### Response: 200 OK
+
+```json
+{
+  "success": true,
+  "data": {
+    "personal": {
+      "firstName": "Ion",
+      "lastName": "Popescu",
+      "cnp": "1850101123456",
+      "email": "ion@example.com",
+      "phone": "+40712345678"
+    },
+    "address": {
+      "county": "București",
+      "locality": "Sector 1",
+      "street": "Str. Exemplu",
+      "number": "10"
+    },
+    "kycValid": true,
+    "kycExpiresAt": "2026-07-01T00:00:00Z"
+  }
+}
+```
+
+---
+
+### 12. Admin Order Lookup
+
+Lookup order by friendly ID for support.
+
+**Endpoint**: `GET /api/admin/orders/lookup?id=ORD-20260107-XXXXX`
+**Auth**: Required (admin role)
+
+#### Response: 200 OK
+
+```json
+{
+  "success": true,
+  "data": {
+    "order": {
+      "id": "uuid",
+      "friendly_order_id": "ORD-20260107-XXXXX",
+      "status": "processing",
+      "customer": { ... },
+      "created_at": "..."
+    }
+  }
+}
+```
+
+---
+
+### 13. Admin Order List
+
+List orders with filters for admin dashboard.
+
+**Endpoint**: `GET /api/admin/orders/list`
+**Auth**: Required (admin role)
+
+#### Query Parameters
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| status | string | Filter by status |
+| service_id | uuid | Filter by service |
+| from | date | Start date |
+| to | date | End date |
+| limit | number | Results per page (default: 50) |
+| offset | number | Pagination offset |
+
+---
+
+### 14. GDPR Cleanup
+
+Admin endpoint for GDPR data cleanup operations.
+
+**Endpoint**: `GET /api/admin/cleanup`
+**Auth**: Required (admin role)
+
+Returns cleanup status and pending items.
+
+**Endpoint**: `POST /api/admin/cleanup`
+**Auth**: Required (admin role)
+
+Trigger manual cleanup (anonymizes drafts older than 7 days).
+
+---
+
+### 15. Register from Order
+
+Create account from completed order (guest checkout conversion).
+
+**Endpoint**: `POST /api/auth/register-from-order`
+**Auth**: None
+
+#### Request Body
+
+```json
+{
+  "order_id": "uuid",
+  "email": "user@example.com",
+  "password": "securePassword123"
+}
+```
+
+---
+
+## Related Documentation
+
+- **OCR & KYC API**: See `docs/technical/api/ocr-kyc-api.md`
+- **Modular Wizard Guide**: See `docs/technical/specs/modular-wizard-guide.md`
+
+---
+
 ## Changelog
+
+### v1.1.0 (2026-01-07)
+- Added draft order endpoints
+- Added company validation (InfoCUI)
+- Added user prefill data endpoint
+- Added admin endpoints (lookup, list, cleanup)
+- Added register-from-order endpoint
+- Fixed payment endpoint path: `/api/orders/[id]/payment`
 
 ### v1.0.0 (2025-12-16)
 - Initial API design

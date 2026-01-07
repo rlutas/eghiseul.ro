@@ -22,20 +22,27 @@ Serviciu de obținere cazier judiciar online de la Poliția Română. Formular c
 | Tip Client | Preț |
 |------------|------|
 | Persoană Fizică | 250,00 RON |
-| Persoană Juridică | 250,00 RON |
+| Persoană Juridică | 300,00 RON |
 
 ### Regim Procesare
 | Regim | Preț | Timp |
 |-------|------|------|
 | Standard | +0 RON | 3-5 zile lucrătoare |
-| Urgent | +100,00 RON | 1-2 zile lucrătoare |
-| Extins (cetățeni străini) | 119,00 RON | 7-15 zile lucrătoare |
+| Urgent | +99,00 RON | 1-2 zile lucrătoare |
+| Extins (cetățeni străini) | +119,00 RON | 7-15 zile lucrătoare |
 
-### Servicii Adiționale
+### Servicii Adiționale (Implementate în DB)
 | Serviciu | Preț | Timp extra |
 |----------|------|------------|
-| Traducere Autorizată | +178,50 RON | +1-2 zile |
-| Apostilă Haga | +238,00 RON | +1 zi |
+| Procesare Urgentă | +99,00 RON | -3 zile |
+| Traducere Legalizată Engleză | +80,00 RON | +2 zile |
+| Apostilă de la Haga | +150,00 RON | +3 zile |
+| Copie Suplimentară | +30,00 RON | - |
+
+### Servicii Adiționale (Planificate)
+| Serviciu | Preț | Timp extra |
+|----------|------|------------|
+| Traducere Autorizată (alte limbi) | +178,50 RON | +1-2 zile |
 | Legalizare Traducere | +99,00 RON | - |
 | Apostilă Camera Notarilor | +83,30 RON | - |
 
@@ -208,5 +215,6 @@ Serviciu de obținere cazier judiciar online de la Poliția Română. Formular c
 
 | Data | Modificare |
 |------|------------|
+| 2026-01-05 | Actualizat prețuri în DB: PF=250 RON, PJ=300 RON. Adăugat opțiuni suplimentare (urgență, traducere, apostilă, copie) |
 | 2025-12-15 | Adăugat analiză competitori și recomandări |
 | 2024-12-15 | Documentat din WPForms JSON |

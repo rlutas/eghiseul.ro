@@ -15,6 +15,7 @@ import {
   useEffect,
   useMemo,
   useRef,
+  useState,
   ReactNode,
 } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
@@ -195,7 +196,39 @@ type ModularWizardAction =
   | { type: 'MARK_DIRTY' }
   | { type: 'MARK_INITIALIZED' }
   | { type: 'RESTORE_FROM_CACHE'; payload: ModularDraftCache }
+  | { type: 'PREFILL_FROM_PROFILE'; payload: UserPrefillData }
   | { type: 'RESET' };
+
+// ============================================================================
+// PREFILL DATA TYPE
+// ============================================================================
+
+interface UserPrefillData {
+  personal: {
+    cnp: string;
+    firstName: string;
+    lastName: string;
+    birthDate: string;
+    birthPlace: string;
+    phone: string;
+    address: AddressState | null;
+  };
+  contact: {
+    email: string;
+    phone: string;
+    preferredContact: string;
+  };
+  kyc_documents: Record<string, {
+    id: string;
+    file_url: string;
+    verified_at: string;
+    expires_at: string | null;
+    is_expiring_soon: boolean;
+    is_expired: boolean;
+  }>;
+  kyc_verified: boolean;
+  has_valid_kyc: boolean;
+}
 
 // ============================================================================
 // CACHE TYPE
@@ -500,6 +533,39 @@ function modularWizardReducer(
       };
     }
 
+    case 'PREFILL_FROM_PROFILE': {
+      const prefill = action.payload;
+
+      // Build contact data from prefill
+      const newContact = {
+        ...state.contact,
+        email: prefill.contact.email || state.contact.email,
+        phone: prefill.contact.phone || prefill.personal.phone || state.contact.phone,
+        preferredContact: (prefill.contact.preferredContact as 'email' | 'phone' | 'whatsapp') || state.contact.preferredContact,
+      };
+
+      // Build personal KYC data if module is active
+      let newPersonalKyc = state.personalKyc;
+      if (state.personalKyc) {
+        newPersonalKyc = {
+          ...state.personalKyc,
+          firstName: prefill.personal.firstName || state.personalKyc.firstName,
+          lastName: prefill.personal.lastName || state.personalKyc.lastName,
+          cnp: prefill.personal.cnp || state.personalKyc.cnp,
+          birthDate: prefill.personal.birthDate || state.personalKyc.birthDate,
+          birthPlace: prefill.personal.birthPlace || state.personalKyc.birthPlace,
+          address: prefill.personal.address || state.personalKyc.address,
+        };
+      }
+
+      return {
+        ...state,
+        contact: newContact,
+        personalKyc: newPersonalKyc,
+        // Don't mark as dirty - this is initial load, not user edit
+      };
+    }
+
     case 'RESET':
       return initialState;
 
@@ -551,9 +617,12 @@ interface ModularWizardContextType {
   submitOrder: () => Promise<void>;
   resetWizard: () => void;
   clearError: () => void;
+  loadPrefillData: () => Promise<void>;
 
   // State checks
   canSaveToServer: boolean;
+  isPrefilled: boolean;
+  prefillData: UserPrefillData | null;
 }
 
 interface PriceBreakdown {
@@ -608,6 +677,11 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
   const isUrlSyncRef = useRef(false);
   const initialSyncDoneRef = useRef(false);
   const saveAbortControllerRef = useRef<AbortController | null>(null);
+
+  // Prefill data state
+  const [prefillData, setPrefillData] = useState<UserPrefillData | null>(null);
+  const [isPrefilled, setIsPrefilled] = useState(false);
+  const prefillLoadedRef = useRef(false);
 
   // Check if we can save to server
   const canSaveToServer = useMemo(() => {
@@ -1032,6 +1106,44 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
     dispatch({ type: 'CLEAR_ERROR' });
   }, []);
 
+  // Load prefill data from user profile
+  const loadPrefillData = useCallback(async () => {
+    if (prefillLoadedRef.current) return;
+
+    try {
+      const response = await fetch('/api/user/prefill-data');
+
+      if (!response.ok) {
+        // User not logged in or error - that's fine, just skip prefill
+        return;
+      }
+
+      const result = await response.json();
+
+      if (result.success && result.data) {
+        const data = result.data as UserPrefillData;
+        setPrefillData(data);
+        setIsPrefilled(true);
+        prefillLoadedRef.current = true;
+
+        // Dispatch prefill action to update wizard state
+        dispatch({ type: 'PREFILL_FROM_PROFILE', payload: data });
+
+        console.log('Prefill data loaded from profile');
+      }
+    } catch (error) {
+      // Silent fail - user just won't get prefill
+      console.warn('Failed to load prefill data:', error);
+    }
+  }, []);
+
+  // Auto-load prefill data when service is initialized
+  useEffect(() => {
+    if (state.serviceSlug && !prefillLoadedRef.current && state.isInitialized) {
+      loadPrefillData();
+    }
+  }, [state.serviceSlug, state.isInitialized, loadPrefillData]);
+
   // Handle browser back button
   useEffect(() => {
     const handlePopState = () => {
@@ -1092,7 +1204,10 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
     submitOrder,
     resetWizard,
     clearError,
+    loadPrefillData,
     canSaveToServer,
+    isPrefilled,
+    prefillData,
   };
 
   return (

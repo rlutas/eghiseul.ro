@@ -57,24 +57,28 @@
 
 | Status | Descriere |
 |--------|-----------|
-| ⏳ Pending | Așteaptă flow de la client |
-| 📝 Draft | În lucru |
-| ✅ Complete | Documentat complet |
+| ✅ Complete | Documentat complet (flow, prețuri, validări) |
+| 📝 Draft | Informații de bază documentate |
+| ⏳ Pending | Așteaptă flow detaliat |
 
 ### Progress
 
-- [ ] SRV-001 Cazier Fiscal - ⏳
-- [ ] SRV-002 Cazier Judiciar - ⏳
-- [ ] SRV-003 Cazier Auto - ⏳
-- [ ] SRV-010 Certificat Naștere - ⏳
-- [ ] SRV-011 Certificat Căsătorie - ⏳
-- [ ] SRV-012 Certificat Celibat - ⏳
-- [ ] SRV-013 Certificat Integritate - ⏳
-- [ ] SRV-020 Extras Multilingv Naștere - ⏳
-- [ ] SRV-021 Extras Multilingv Căsătorie - ⏳
-- [ ] SRV-030 Certificat Constatator - ⏳
-- [ ] SRV-031 Extras Carte Funciară - ⏳
-- [ ] SRV-040 Rovinieta - ⏳
+| Serviciu | Status | Note |
+|----------|--------|------|
+| SRV-001 Cazier Fiscal | ✅ Complete | Flow complet, 28 motive, KYC |
+| SRV-002 Cazier Judiciar | ✅ Complete | PF/PJ, competitori, bundle CIC |
+| SRV-003 Cazier Auto | 📝 Draft | De actualizat cu modular wizard |
+| SRV-010 Certificat Naștere | 📝 Draft | De actualizat |
+| SRV-011 Certificat Căsătorie | 📝 Draft | De actualizat |
+| SRV-012 Certificat Celibat | 📝 Draft | De actualizat |
+| SRV-013 Certificat Integritate | 📝 Draft | De actualizat |
+| SRV-020 Extras Multilingv Naștere | 📝 Draft | De actualizat |
+| SRV-021 Extras Multilingv Căsătorie | 📝 Draft | De actualizat |
+| SRV-030 Certificat Constatator | ✅ Complete | Flow, validări ONRC, scopuri |
+| SRV-031 Extras Carte Funciară | ✅ Complete | 5 tipuri, urgență, localități |
+| SRV-040 Rovinieta | 📝 Draft | Platformă separată, de integrat |
+
+**Actualizat:** 2026-01-07
 
 ---
 

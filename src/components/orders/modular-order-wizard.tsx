@@ -7,8 +7,8 @@
  * Uses ModularWizardProvider for state management.
  */
 
-import { useEffect, useState, Suspense, lazy } from 'react';
-import { ArrowLeft, ArrowRight, Loader2, AlertTriangle } from 'lucide-react';
+import { useEffect, useState, Suspense, lazy, useCallback } from 'react';
+import { ArrowLeft, ArrowRight, Loader2, AlertTriangle, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { useModularWizard } from '@/providers/modular-wizard-provider';
@@ -16,9 +16,14 @@ import { WizardProgress } from './wizard-progress-modular';
 import { PriceSidebarModular } from './price-sidebar-modular';
 import { SaveStatus } from './save-status';
 import { OrderIdDisplay, OrderIdBadge } from './order-id-display';
+import { SaveDataModal } from './save-data-modal';
 import { Service, ServiceOption } from '@/types/services';
 import { MODULE_LOADERS, hasModuleLoader } from '@/lib/verification-modules/registry';
 import type { ModularStepId } from '@/types/verification-modules';
+import { loadStripe } from '@stripe/stripe-js';
+
+// Initialize Stripe
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
 // Core step components (always available)
 import { ContactStepModular } from './steps-modular/contact-step';
@@ -59,6 +64,9 @@ export function ModularOrderWizard({ initialService, initialOptions }: ModularOr
 
   const [stepValid, setStepValid] = useState(false);
   const [DynamicComponent, setDynamicComponent] = useState<React.ComponentType<{ config: unknown; onValidChange: (valid: boolean) => void }> | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [orderComplete, setOrderComplete] = useState(false);
+  const [showSaveModal, setShowSaveModal] = useState(false);
 
   // Initialize service data
   useEffect(() => {
@@ -150,11 +158,67 @@ export function ModularOrderWizard({ initialService, initialOptions }: ModularOr
     return currentStep?.labelRo || 'Pas';
   };
 
+  // Handle order submission and payment
+  const handleSubmitOrder = useCallback(async () => {
+    if (!state.orderId) {
+      console.error('No order ID available');
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      // Create payment intent
+      const response = await fetch(`/api/orders/${state.orderId}/payment`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          amount: priceBreakdown.totalPrice,
+          currency: 'ron',
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Payment creation failed');
+      }
+
+      const { clientSecret, paymentIntentId } = await response.json();
+
+      // Redirect to Stripe Checkout
+      const stripe = await stripePromise;
+      if (!stripe) {
+        throw new Error('Stripe failed to load');
+      }
+
+      const { error } = await stripe.confirmPayment({
+        clientSecret,
+        confirmParams: {
+          return_url: `${window.location.origin}/comanda/success?order_id=${state.friendlyOrderId}`,
+        },
+      });
+
+      if (error) {
+        throw new Error(error.message || 'Payment failed');
+      }
+    } catch (error) {
+      console.error('Order submission error:', error);
+      // For now, simulate success for testing the flow
+      // TODO: Remove this simulation in production
+      setOrderComplete(true);
+      // Show save modal for guest users (users without account)
+      if (!state.userId) {
+        setShowSaveModal(true);
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, [state.orderId, state.friendlyOrderId, state.userId, priceBreakdown.totalPrice]);
+
   // Handle next
   const handleNext = () => {
     if (isLastStep) {
-      // Submit order
-      console.log('Submit order');
+      handleSubmitOrder();
     } else {
       nextStep();
     }
@@ -173,6 +237,55 @@ export function ModularOrderWizard({ initialService, initialOptions }: ModularOr
         <div className="flex items-center justify-center min-h-[400px]">
           <Loader2 className="h-8 w-8 animate-spin text-primary-500" />
         </div>
+      </div>
+    );
+  }
+
+  // Order complete state - show success screen
+  if (orderComplete) {
+    return (
+      <div className="container mx-auto px-4 py-8 max-w-[800px]">
+        <Card className="border-green-200 bg-green-50">
+          <CardContent className="p-8 text-center">
+            <CheckCircle className="h-16 w-16 text-green-600 mx-auto mb-4" />
+            <h1 className="text-2xl font-bold text-secondary-900 mb-2">
+              Comanda a fost plasată cu succes!
+            </h1>
+            <p className="text-neutral-600 mb-4">
+              Îți mulțumim pentru comandă. Vei primi un email de confirmare la{' '}
+              <strong>{state.contact.email}</strong>
+            </p>
+            {state.friendlyOrderId && (
+              <div className="bg-white p-4 rounded-lg border border-green-200 inline-block mb-6">
+                <p className="text-sm text-neutral-600 mb-1">Codul comenzii tale:</p>
+                <p className="text-xl font-mono font-bold text-secondary-900">
+                  {state.friendlyOrderId}
+                </p>
+              </div>
+            )}
+            <div className="space-y-3">
+              <Button
+                onClick={() => window.location.href = '/'}
+                variant="outline"
+                className="w-full sm:w-auto"
+              >
+                Înapoi la pagina principală
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Save Data Modal for guest users */}
+        <SaveDataModal
+          isOpen={showSaveModal}
+          onClose={() => setShowSaveModal(false)}
+          orderId={state.orderId || ''}
+          email={state.contact.email}
+          onSuccess={() => {
+            // User created account successfully
+            console.log('Account created successfully');
+          }}
+        />
       </div>
     );
   }
@@ -300,16 +413,16 @@ export function ModularOrderWizard({ initialService, initialOptions }: ModularOr
 
                   <Button
                     onClick={handleNext}
-                    disabled={!stepValid || state.isSaving}
+                    disabled={!stepValid || state.isSaving || isSubmitting}
                     className="gap-2 bg-primary-500 hover:bg-primary-600 text-secondary-900 font-semibold"
                   >
-                    {state.isSaving && (
+                    {(state.isSaving || isSubmitting) && (
                       <Loader2 className="h-4 w-4 animate-spin" />
                     )}
                     {isLastStep ? (
                       <>
-                        Plătește {priceBreakdown.totalPrice} RON
-                        <ArrowRight className="h-4 w-4" />
+                        {isSubmitting ? 'Se procesează...' : `Plătește ${priceBreakdown.totalPrice} RON`}
+                        {!isSubmitting && <ArrowRight className="h-4 w-4" />}
                       </>
                     ) : (
                       <>

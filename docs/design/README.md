@@ -53,15 +53,9 @@ export default function MyPage() {
 - **[Color System Guide](./color-system.md)** - Complete color system overview
   - Brand colors (Gold, Navy, Neutrals)
   - Semantic colors (Success, Warning, Error, Info)
-  - Component color mappings
-  - Accessibility guidelines
+  - All color shades (50-950) with Hex/OKLCH values
+  - Accessibility guidelines and contrast ratios
   - Dark mode support
-
-- **[Color Palette Reference](./color-palette-reference.md)** - Visual color scales
-  - All color shades (50-950)
-  - Hex/OKLCH values
-  - Accessibility contrast ratios
-  - Component-specific combinations
 
 - **[Component Color Guide](./component-color-guide.md)** - Ready-to-use examples
   - Buttons, cards, forms
@@ -264,6 +258,8 @@ For design system questions or suggestions:
 
 ---
 
-**Version:** 1.0.0
-**Last Updated:** 2025-12-16
+**Version:** 1.1.0
+**Last Updated:** 2026-01-07
 **Maintained by:** eGhiseul.ro Design Team
+
+> **Note:** Color system consolidated from 8 files to 2 master documents (color-system.md and component-color-guide.md) on 2026-01-07.
