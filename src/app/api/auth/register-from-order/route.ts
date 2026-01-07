@@ -107,11 +107,12 @@ export async function POST(request: Request) {
     }
 
     // Validate email matches order email (if order has an email)
+    const customerData = order.customer_data as Record<string, unknown> | null;
     const orderEmail =
-      order.customer_data?.contact?.email ||
-      order.customer_data?.email;
+      (customerData?.contact as Record<string, unknown>)?.email ||
+      customerData?.email;
 
-    if (orderEmail && orderEmail.toLowerCase() !== email.toLowerCase()) {
+    if (orderEmail && String(orderEmail).toLowerCase() !== email.toLowerCase()) {
       return NextResponse.json(
         {
           error: 'Email mismatch',
@@ -122,11 +123,9 @@ export async function POST(request: Request) {
     }
 
     // Extract user metadata from order
-    const personal = order.customer_data?.personal || order.customer_data?.personalKyc || {};
-    const firstName =
-      personal.firstName || personal.first_name || '';
-    const lastName =
-      personal.lastName || personal.last_name || '';
+    const personal = (customerData?.personal || customerData?.personalKyc || {}) as Record<string, unknown>;
+    const firstName = String(personal?.firstName || personal?.first_name || '');
+    const lastName = String(personal?.lastName || personal?.last_name || '');
 
     // Create auth user via Supabase Auth
     const { data: authData, error: authError } = await supabase.auth.signUp({
@@ -216,7 +215,9 @@ export async function POST(request: Request) {
     // Check if email confirmation is required
     const requiresEmailConfirmation = !authData.session;
 
-    return NextResponse.json({
+    // If we have a session, user is auto-authenticated
+    // Return session info so client can set cookies properly
+    const responseData: Record<string, unknown> = {
       success: true,
       message: requiresEmailConfirmation
         ? 'Cont creat cu succes! Verifică email-ul pentru confirmare.'
@@ -226,8 +227,17 @@ export async function POST(request: Request) {
         email: authData.user.email,
         verificationSent: requiresEmailConfirmation,
         orderLinked: true,
+        // Include session if available (user can be auto-authenticated)
+        isAuthenticated: !!authData.session,
       },
-    });
+    };
+
+    // Create response with session cookie if available
+    const response = NextResponse.json(responseData);
+
+    // If session exists, it's automatically set by Supabase client
+    // The client just needs to refresh the auth state
+    return response;
   } catch (error) {
     console.error('Register from order error:', error);
     return NextResponse.json(

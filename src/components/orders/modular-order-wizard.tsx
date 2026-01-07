@@ -265,6 +265,12 @@ export function ModularOrderWizard({ initialService, initialOptions }: ModularOr
             )}
             <div className="space-y-3">
               <Button
+                onClick={() => window.location.href = `/comanda/status?order=${state.friendlyOrderId}&email=${encodeURIComponent(state.contact.email)}`}
+                className="w-full sm:w-auto bg-primary-500 hover:bg-primary-600 text-secondary-900"
+              >
+                Verifică Statusul Comenzii
+              </Button>
+              <Button
                 onClick={() => window.location.href = '/'}
                 variant="outline"
                 className="w-full sm:w-auto"

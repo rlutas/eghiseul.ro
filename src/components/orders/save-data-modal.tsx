@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   Dialog,
   DialogContent,
@@ -12,7 +13,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Check, Sparkles, Loader2, AlertCircle } from 'lucide-react';
+import { Check, Sparkles, Loader2, AlertCircle, User } from 'lucide-react';
 
 interface SaveDataModalProps {
   isOpen: boolean;
@@ -35,6 +36,7 @@ export function SaveDataModal({
   email,
   onSuccess,
 }: SaveDataModalProps) {
+  const router = useRouter();
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [acceptedTerms, setAcceptedTerms] = useState(false);
@@ -42,6 +44,8 @@ export function SaveDataModal({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [needsEmailConfirmation, setNeedsEmailConfirmation] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -90,6 +94,14 @@ export function SaveDataModal({
         return;
       }
 
+      // Check if user is auto-authenticated or needs email confirmation
+      if (result.data?.isAuthenticated) {
+        setIsAuthenticated(true);
+        setNeedsEmailConfirmation(false);
+      } else {
+        setNeedsEmailConfirmation(true);
+      }
+
       setSuccess(true);
       onSuccess?.();
     } catch (err) {
@@ -100,8 +112,49 @@ export function SaveDataModal({
     }
   };
 
-  // Success state
-  if (success) {
+  // Navigate to account page
+  const handleGoToAccount = () => {
+    router.push('/account');
+    onClose();
+  };
+
+  // Success state - authenticated user
+  if (success && isAuthenticated) {
+    return (
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-green-600">
+              <User className="h-5 w-5" />
+              Bine ai venit!
+            </DialogTitle>
+            <DialogDescription className="pt-2">
+              Contul tău a fost creat cu succes și ești deja autentificat.
+              <br />
+              <br />
+              Acum poți:
+              <ul className="mt-2 space-y-1 list-disc list-inside text-sm">
+                <li>Completa comenzi viitoare mai rapid</li>
+                <li>Vedea istoricul comenzilor tale</li>
+                <li>Gestiona documentele KYC verificate</li>
+              </ul>
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex gap-2 mt-4">
+            <Button onClick={handleGoToAccount} className="flex-1">
+              Mergi la Contul Meu
+            </Button>
+            <Button variant="outline" onClick={onClose}>
+              Rămân aici
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
+  // Success state - needs email confirmation
+  if (success && needsEmailConfirmation) {
     return (
       <Dialog open={isOpen} onOpenChange={onClose}>
         <DialogContent className="sm:max-w-md">

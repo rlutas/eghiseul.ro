@@ -706,15 +706,23 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
   const isFirstStep = currentStepIndex === 0;
   const isLastStep = currentStepIndex === visibleSteps.length - 1;
 
-  // URL update
+  // URL update with order ID for conversion tracking
   const updateURL = useCallback(
-    (stepNumber: number) => {
+    (stepNumber: number, orderId?: string | null) => {
       if (isUrlSyncRef.current) return;
       const params = new URLSearchParams(window.location.search);
       params.set('step', stepNumber.toString());
+
+      // Include order ID in URL for conversion tracking (from step 2 onwards)
+      if (orderId) {
+        params.set('order', orderId);
+      } else if (state.friendlyOrderId && stepNumber > 1) {
+        params.set('order', state.friendlyOrderId);
+      }
+
       router.replace(`${pathname}?${params.toString()}`, { scroll: false });
     },
-    [pathname, router]
+    [pathname, router, state.friendlyOrderId]
   );
 
   // Restore from localStorage on mount
@@ -795,18 +803,21 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
 
   const nextStep = useCallback(() => {
     if (canGoNext) {
+      let orderId = state.friendlyOrderId;
+
       // Generate Order ID when moving past contact step with valid data
       if (
         state.currentStepId === 'contact' &&
         !state.friendlyOrderId &&
         hasValidContactData(state.contact)
       ) {
-        const newOrderId = generateOrderId();
-        dispatch({ type: 'SET_FRIENDLY_ORDER_ID', payload: newOrderId });
+        orderId = generateOrderId();
+        dispatch({ type: 'SET_FRIENDLY_ORDER_ID', payload: orderId });
       }
 
       dispatch({ type: 'NEXT_STEP' });
-      updateURL(currentStepIndex + 2);
+      // Pass order ID to URL for conversion tracking
+      updateURL(currentStepIndex + 2, orderId);
     }
   }, [canGoNext, state.currentStepId, state.friendlyOrderId, state.contact, currentStepIndex, updateURL]);
 
@@ -1026,10 +1037,14 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
     }
   }, [state, priceBreakdown, saveToLocalStorage, canSaveToServer]);
 
-  // Debounced save
+  // Use ref for save function to avoid recreating debounce on every state change
+  const saveDraftToServerRef = useRef(saveDraftToServer);
+  saveDraftToServerRef.current = saveDraftToServer;
+
+  // Debounced save - stable function that uses ref
   const debouncedSave = useMemo(
-    () => debounce(saveDraftToServer, 500),
-    [saveDraftToServer]
+    () => debounce(() => saveDraftToServerRef.current(), 500),
+    [] // Empty deps - function is now stable
   );
 
   // Public save functions
@@ -1047,7 +1062,8 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
       return;
     }
     debouncedSave();
-  }, [state.isDirty, canSaveToServer, state.friendlyOrderId, debouncedSave]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.isDirty, canSaveToServer, state.friendlyOrderId]); // debouncedSave is now stable via ref
 
   // Save to localStorage immediately
   useEffect(() => {
