@@ -402,6 +402,7 @@ export interface ModularWizardState {
   // Order metadata
   orderId: string | null;
   friendlyOrderId: string | null;
+  userId: string | null;
   isDirty: boolean;
   isSaving: boolean;
   lastSavedAt: string | null;

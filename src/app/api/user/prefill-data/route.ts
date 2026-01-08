@@ -38,7 +38,9 @@ export async function GET() {
     }
 
     // Fetch saved data (addresses, contacts)
-    const { data: savedData, error: savedDataError } = await supabase
+    // Table not yet in generated types - TODO: regenerate Supabase types
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: savedData, error: savedDataError } = await (supabase as any)
       .from('user_saved_data')
       .select('*')
       .eq('user_id', user.id)
@@ -49,7 +51,9 @@ export async function GET() {
     }
 
     // Fetch active KYC documents
-    const { data: kycDocs, error: kycError } = await supabase
+    // Table not yet in generated types - TODO: regenerate Supabase types
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: kycDocs, error: kycError } = await (supabase as any)
       .from('kyc_verifications')
       .select('*')
       .eq('user_id', user.id)
@@ -61,7 +65,9 @@ export async function GET() {
     }
 
     // Fetch billing profiles
-    const { data: billingProfiles, error: billingError } = await supabase
+    // Table not yet in generated types - TODO: regenerate Supabase types
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: billingProfiles, error: billingError } = await (supabase as any)
       .from('billing_profiles')
       .select('*')
       .eq('user_id', user.id)
@@ -110,45 +116,53 @@ export async function GET() {
     }
 
     // Find default address and contact from saved data
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const defaultAddress = savedData?.find(
-      (d) => d.data_type === 'address' && d.is_default
+      (d: any) => d.data_type === 'address' && d.is_default
     );
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const defaultContact = savedData?.find(
-      (d) => d.data_type === 'contact' && d.is_default
+      (d: any) => d.data_type === 'contact' && d.is_default
     );
-    const allAddresses = savedData?.filter((d) => d.data_type === 'address') || [];
-    const allContacts = savedData?.filter((d) => d.data_type === 'contact') || [];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const allAddresses = savedData?.filter((d: any) => d.data_type === 'address') || [];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const allContacts = savedData?.filter((d: any) => d.data_type === 'contact') || [];
 
     // Build response
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const profileAny = profile as any;
     const response = {
       success: true,
       data: {
         // Personal data from profile
         personal: {
-          cnp: profile?.cnp || '',
-          firstName: profile?.first_name || '',
-          lastName: profile?.last_name || '',
-          birthDate: profile?.birth_date || '',
-          birthPlace: profile?.birth_place || '',
-          phone: profile?.phone || '',
+          cnp: profileAny?.cnp || '',
+          firstName: profileAny?.first_name || '',
+          lastName: profileAny?.last_name || '',
+          birthDate: profileAny?.birth_date || '',
+          birthPlace: profileAny?.birth_place || '',
+          phone: profileAny?.phone || '',
           // Default address
           address: defaultAddress?.data || null,
         },
         // Contact data
         contact: {
-          email: profile?.email || user.email || '',
-          phone: profile?.phone || '',
+          email: profileAny?.email || user.email || '',
+          phone: profileAny?.phone || '',
           preferredContact: defaultContact?.data?.preferred_contact || 'email',
         },
         // All saved addresses
-        savedAddresses: allAddresses.map((a) => ({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        savedAddresses: allAddresses.map((a: any) => ({
           id: a.id,
           label: a.label,
           data: a.data,
           is_default: a.is_default,
         })),
         // All saved contacts
-        savedContacts: allContacts.map((c) => ({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        savedContacts: allContacts.map((c: any) => ({
           id: c.id,
           label: c.label,
           data: c.data,
@@ -156,13 +170,14 @@ export async function GET() {
         })),
         // KYC documents
         kyc_documents: kycDocuments,
-        kyc_verified: profile?.kyc_verified || false,
+        kyc_verified: profileAny?.kyc_verified || false,
         has_valid_kyc: Object.entries(kycDocuments).some(
           ([docType, doc]) => !doc.is_expired && docType !== 'selfie'
         ),
         // Billing profiles
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         billing_profiles:
-          billingProfiles?.map((bp) => ({
+          billingProfiles?.map((bp: any) => ({
             id: bp.id,
             type: bp.type,
             label: bp.label,
@@ -170,8 +185,8 @@ export async function GET() {
             is_default: bp.is_default,
           })) || [],
         // Metadata
-        profile_created_at: profile?.created_at,
-        profile_updated_at: profile?.updated_at,
+        profile_created_at: profileAny?.created_at,
+        profile_updated_at: profileAny?.updated_at,
       },
     };
 

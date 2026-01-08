@@ -162,6 +162,7 @@ const initialState: ModularWizardState = {
 
   orderId: null,
   friendlyOrderId: null,
+  userId: null,
   isDirty: false,
   isSaving: false,
   lastSavedAt: null,

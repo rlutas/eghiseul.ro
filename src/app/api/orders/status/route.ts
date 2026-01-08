@@ -81,9 +81,11 @@ export async function GET(request: NextRequest) {
     }
 
     // Validate email matches order
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const customerData = order.customer_data as any;
     const orderEmail =
-      order.customer_data?.contact?.email ||
-      order.customer_data?.email;
+      customerData?.contact?.email ||
+      customerData?.email;
 
     if (!orderEmail || orderEmail.toLowerCase() !== email.toLowerCase()) {
       return NextResponse.json(
@@ -103,6 +105,9 @@ export async function GET(request: NextRequest) {
       .order('created_at', { ascending: true });
 
     // Return order details (sanitized for public view)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const deliveryMethod = order.delivery_method as any;
+
     return NextResponse.json({
       success: true,
       data: {
@@ -113,9 +118,9 @@ export async function GET(request: NextRequest) {
         updatedAt: order.updated_at,
         service: order.service,
         delivery: {
-          method: order.delivery_method?.type || null,
-          methodName: order.delivery_method?.name || null,
-          estimatedDays: order.delivery_method?.estimated_days || null,
+          method: deliveryMethod?.type || null,
+          methodName: deliveryMethod?.name || null,
+          estimatedDays: deliveryMethod?.estimated_days || null,
         },
         pricing: {
           basePrice: order.base_price,
@@ -123,7 +128,8 @@ export async function GET(request: NextRequest) {
           deliveryPrice: order.delivery_price,
           totalPrice: order.total_price,
         },
-        timeline: (history || []).map((h) => ({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        timeline: (history || []).map((h: any) => ({
           status: h.status,
           note: h.note,
           createdAt: h.created_at,

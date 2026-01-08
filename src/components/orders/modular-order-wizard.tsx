@@ -63,7 +63,8 @@ export function ModularOrderWizard({ initialService, initialOptions }: ModularOr
   } = useModularWizard();
 
   const [stepValid, setStepValid] = useState(false);
-  const [DynamicComponent, setDynamicComponent] = useState<React.ComponentType<{ config: unknown; onValidChange: (valid: boolean) => void }> | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [DynamicComponent, setDynamicComponent] = useState<React.ComponentType<any> | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderComplete, setOrderComplete] = useState(false);
   const [showSaveModal, setShowSaveModal] = useState(false);

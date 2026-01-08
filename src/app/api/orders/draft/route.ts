@@ -39,7 +39,7 @@ function validateDraftData(data: unknown): { valid: boolean; data?: DraftOrderDa
     return { valid: false, error: 'service_id must be a valid UUID' };
   }
 
-  return { valid: true, data: obj as DraftOrderData };
+  return { valid: true, data: obj as unknown as DraftOrderData };
 }
 
 /**
@@ -101,20 +101,22 @@ export async function POST(request: NextRequest) {
 
       if (existingOrder) {
         // Order already exists - update it instead of creating duplicate
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const updatePayload: any = {
+          customer_data: data.customer_data || {},
+          selected_options: data.selected_options || [],
+          kyc_documents: data.kyc_documents || {},
+          delivery_method: data.delivery_method || null,
+          delivery_address: data.delivery_address || null,
+          base_price: data.base_price || 0,
+          options_price: data.options_price || 0,
+          delivery_price: data.delivery_price || 0,
+          total_price: data.total_price || 0,
+          updated_at: new Date().toISOString(),
+        };
         const { data: updatedOrder, error: updateError } = await supabase
           .from('orders')
-          .update({
-            customer_data: data.customer_data || {},
-            selected_options: data.selected_options || [],
-            kyc_documents: data.kyc_documents || {},
-            delivery_method: data.delivery_method || null,
-            delivery_address: data.delivery_address || null,
-            base_price: data.base_price || 0,
-            options_price: data.options_price || 0,
-            delivery_price: data.delivery_price || 0,
-            total_price: data.total_price || 0,
-            updated_at: new Date().toISOString(),
-          })
+          .update(updatePayload)
           .eq('id', existingOrder.id)
           .select()
           .single();
@@ -155,7 +157,8 @@ export async function POST(request: NextRequest) {
     // Use friendly_order_id as order_number for drafts (unique)
 
     // Prepare insert data
-    const insertData = {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const insertData: any = {
       order_number: friendlyOrderId, // Use friendly ID as order_number for uniqueness
       friendly_order_id: friendlyOrderId,
       user_id: user?.id || null,
@@ -202,25 +205,27 @@ export async function POST(request: NextRequest) {
       if (orderError.code === '23505') {
         // Retry with a new ID
         const newFriendlyOrderId = generateOrderId();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const retryInsertData: any = {
+          order_number: newFriendlyOrderId, // Use new friendly ID as order_number
+          friendly_order_id: newFriendlyOrderId,
+          user_id: user?.id || null,
+          service_id: data.service_id,
+          status: 'draft',
+          customer_data: data.customer_data || {},
+          selected_options: data.selected_options || [],
+          kyc_documents: data.kyc_documents || {},
+          delivery_method: data.delivery_method || null,
+          delivery_address: data.delivery_address || null,
+          base_price: data.base_price || 0,
+          options_price: data.options_price || 0,
+          delivery_price: data.delivery_price || 0,
+          total_price: data.total_price || 0,
+          payment_status: 'unpaid',
+        };
         const { data: retryOrder, error: retryError } = await supabase
           .from('orders')
-          .insert({
-            order_number: newFriendlyOrderId, // Use new friendly ID as order_number
-            friendly_order_id: newFriendlyOrderId,
-            user_id: user?.id || null,
-            service_id: data.service_id,
-            status: 'draft',
-            customer_data: data.customer_data || {},
-            selected_options: data.selected_options || [],
-            kyc_documents: data.kyc_documents || {},
-            delivery_method: data.delivery_method || null,
-            delivery_address: data.delivery_address || null,
-            base_price: data.base_price || 0,
-            options_price: data.options_price || 0,
-            delivery_price: data.delivery_price || 0,
-            total_price: data.total_price || 0,
-            payment_status: 'unpaid',
-          })
+          .insert(retryInsertData)
           .select()
           .single();
 

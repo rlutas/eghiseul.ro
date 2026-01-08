@@ -117,7 +117,7 @@ export function getAllModules(): ModuleRegistryEntry[] {
  */
 export type ModuleComponentLoader = () => Promise<{
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  default: ComponentType<{ config: any }>;
+  default: ComponentType<any>;
 }>;
 
 /**

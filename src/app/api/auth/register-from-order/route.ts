@@ -187,7 +187,8 @@ export async function POST(request: Request) {
     // Try to migrate order data to profile
     // This might fail if the function doesn't exist yet, so we handle it gracefully
     try {
-      const { error: migrateError } = await supabase.rpc('migrate_order_to_profile', {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error: migrateError } = await (supabase as any).rpc('migrate_order_to_profile', {
         p_order_id: orderId,
         p_user_id: authData.user.id,
       });
