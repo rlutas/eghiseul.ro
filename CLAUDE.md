@@ -166,13 +166,17 @@ docs/
 ├── technical/
 │   ├── api/
 │   │   ├── services-api.md         # Services & Orders API
-│   │   └── ocr-kyc-api.md          # OCR & KYC AI API (NEW)
+│   │   └── ocr-kyc-api.md          # OCR & KYC AI API
 │   ├── specs/
 │   │   ├── user-data-persistence.md       # User data saving feature
 │   │   ├── order-autosave-system.md       # Auto-save & support system
 │   │   ├── romanian-document-handling.md  # CI/Passport/Certificate handling
-│   │   ├── modular-verification-architecture.md  # Modular wizard system (NEW)
-│   │   └── service-verification-requirements.md  # Service requirements matrix (NEW)
+│   │   ├── modular-verification-architecture.md  # Modular wizard system
+│   │   └── service-verification-requirements.md  # Service requirements matrix
+│   ├── debugging/
+│   │   ├── draft-save-500-error-fix.md    # Draft save error debugging
+│   │   ├── APPLY_MIGRATION_013.md         # Migration guide
+│   │   └── typescript-build-fixes-2026-01-08.md  # TypeScript build fixes (NEW)
 │   ├── database/
 │   │   └── services-schema.md      # Database schema docs
 │   └── technology-decisions-summary.md
@@ -541,5 +545,5 @@ SMSLINK_API_KEY=
 
 ---
 
-**Last Updated:** 2026-01-05
-**Version:** 2.4
+**Last Updated:** 2026-01-08
+**Version:** 2.5

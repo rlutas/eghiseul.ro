@@ -1,8 +1,8 @@
 # eGhiseul.ro - Development Master Plan
 
-**Version:** 2.0
-**Last Updated:** 2026-01-06
-**Status:** Sprint 3 Complete | Sprint 4 Planning (User Data Persistence)
+**Version:** 2.1
+**Last Updated:** 2026-01-08
+**Status:** Sprint 3 Complete | Sprint 4 In Progress (User Data Persistence)
 
 ---
 
@@ -122,8 +122,18 @@
 ### Testing Documentation
 | Document | Locație | Status |
 |----------|---------|--------|
-| **Test Plan** | `docs/testing/TEST_PLAN.md` | ✅ Complete (NEW) |
-| **Test Results 2025-12-18** | `docs/testing/TEST_RESULTS_2025-12-18.md` | ✅ Complete (NEW) |
+| **Test Plan** | `docs/testing/TEST_PLAN.md` | ✅ Complete |
+| **Test Results 2025-12-18** | `docs/testing/TEST_RESULTS_2025-12-18.md` | ✅ Complete |
+| **Testing README** | `docs/testing/README.md` | ✅ Updated 2026-01-07 |
+| **E2E Visual Report** | `tests/docs/VISUAL_TEST_REPORT.md` | ✅ Updated 2026-01-07 |
+| **Playwright E2E** | `tests/README.md` | ✅ Updated 2026-01-07 |
+
+### Debugging Documentation
+| Document | Locație | Status |
+|----------|---------|--------|
+| **Draft Save 500 Error** | `docs/technical/debugging/draft-save-500-error-fix.md` | ✅ Complete |
+| **Migration 013 Guide** | `docs/technical/debugging/APPLY_MIGRATION_013.md` | ✅ Complete |
+| **TypeScript Build Fixes** | `docs/technical/debugging/typescript-build-fixes-2026-01-08.md` | ✅ NEW |
 
 ---
 
