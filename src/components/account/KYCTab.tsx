@@ -30,6 +30,7 @@ import { cn } from '@/lib/utils';
 import { useKycStatus, type KycStatus } from '@/hooks/useKycStatus';
 import { useAddresses } from '@/hooks/useAddresses';
 import { useBillingProfiles } from '@/hooks/useBillingProfiles';
+import { uploadToS3, getS3DownloadUrl, isS3Url } from '@/lib/aws/upload-client';
 import type { ExtractedIdData } from '@/components/shared/IdScanner';
 
 interface KYCTabProps {
@@ -93,7 +94,34 @@ export default function KYCTab({ className }: KYCTabProps) {
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [expandedDoc, setExpandedDoc] = useState<string | null>(null);
+  const [resolvedUrls, setResolvedUrls] = useState<Record<string, string>>({});
   const fileInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
+
+  // Resolve S3 URL when document is expanded
+  const resolveDocumentUrl = useCallback(async (docId: string, fileUrl: string) => {
+    // Skip if already resolved or if it's a data URL
+    if (resolvedUrls[docId] || fileUrl.startsWith('data:')) {
+      return;
+    }
+
+    // Check if it's an S3 URL that needs presigning
+    if (isS3Url(fileUrl)) {
+      try {
+        // Extract key from S3 URL
+        const url = new URL(fileUrl);
+        const key = url.pathname.substring(1); // Remove leading /
+        const presignedUrl = await getS3DownloadUrl(key);
+        setResolvedUrls(prev => ({ ...prev, [docId]: presignedUrl }));
+      } catch (err) {
+        console.error('Failed to resolve S3 URL:', err);
+        // Fall back to original URL (will fail to load, but shows something)
+        setResolvedUrls(prev => ({ ...prev, [docId]: fileUrl }));
+      }
+    } else {
+      // Not an S3 URL, use as-is
+      setResolvedUrls(prev => ({ ...prev, [docId]: fileUrl }));
+    }
+  }, [resolvedUrls]);
 
   // Get document by type (handle aliases like ci_nou_front -> ci_front)
   const getDocumentByType = useCallback((type: DocumentTypeKey) => {
@@ -112,7 +140,7 @@ export default function KYCTab({ className }: KYCTabProps) {
     setSaveSuccess(false);
 
     try {
-      // Create base64 preview
+      // Create base64 for OCR (still needed for image processing)
       const reader = new FileReader();
       const base64Promise = new Promise<string>((resolve, reject) => {
         reader.onload = () => resolve(reader.result as string);
@@ -122,11 +150,32 @@ export default function KYCTab({ className }: KYCTabProps) {
       const dataUrl = await base64Promise;
       const base64 = dataUrl.split(',')[1];
 
+      // Generate a verification ID for this upload session
+      const verificationId = `kyc-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+
+      // Upload to S3 first (if S3 is configured)
+      let fileUrl = dataUrl; // Fallback to data URL
+      let fileKey: string | undefined;
+
+      try {
+        const s3Result = await uploadToS3({
+          category: 'kyc',
+          file,
+          documentType: type,
+          verificationId,
+        });
+        fileUrl = s3Result.url;
+        fileKey = s3Result.key;
+      } catch (s3Error) {
+        // S3 not configured or failed - fall back to data URL
+        console.warn('S3 upload failed, using data URL:', s3Error);
+      }
+
       // For ID documents (front/back), run OCR
       if (type === 'ci_front' || type === 'ci_back') {
         setProcessingOcr(type);
 
-        // Call OCR API
+        // Call OCR API (still uses base64 for processing)
         const ocrResponse = await fetch('/api/ocr/extract', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -150,10 +199,11 @@ export default function KYCTab({ className }: KYCTabProps) {
           throw new Error(`Nu am putut citi documentul. Asigură-te că imaginea este clară.`);
         }
 
-        // Save KYC document with extracted data
+        // Save KYC document with S3 URL
         await saveDocument({
           documentType: type,
-          fileUrl: dataUrl,
+          fileUrl,
+          fileKey,
           fileSize: file.size,
           mimeType: file.type,
           extractedData: ocr.extractedData,
@@ -169,7 +219,8 @@ export default function KYCTab({ className }: KYCTabProps) {
         // For selfie, just save without OCR
         await saveDocument({
           documentType: 'selfie',
-          fileUrl: dataUrl,
+          fileUrl,
+          fileKey,
           fileSize: file.size,
           mimeType: file.type,
           extractedData: {},
@@ -369,7 +420,12 @@ export default function KYCTab({ className }: KYCTabProps) {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => setExpandedDoc(isExpanded ? null : doc.id)}
+                  onClick={() => {
+                    if (!isExpanded && doc.fileUrl) {
+                      resolveDocumentUrl(doc.id, doc.fileUrl);
+                    }
+                    setExpandedDoc(isExpanded ? null : doc.id);
+                  }}
                   className="h-8 w-8 p-0"
                 >
                   {isExpanded ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -461,11 +517,17 @@ export default function KYCTab({ className }: KYCTabProps) {
               {/* Document image */}
               {doc.fileUrl && (
                 <div className="relative h-32 bg-white rounded-lg overflow-hidden border border-neutral-200">
-                  <img
-                    src={doc.fileUrl}
-                    alt={config.label}
-                    className="w-full h-full object-contain"
-                  />
+                  {resolvedUrls[doc.id] || doc.fileUrl.startsWith('data:') ? (
+                    <img
+                      src={resolvedUrls[doc.id] || doc.fileUrl}
+                      alt={config.label}
+                      className="w-full h-full object-contain"
+                    />
+                  ) : (
+                    <div className="flex items-center justify-center h-full">
+                      <Loader2 className="w-6 h-6 text-neutral-400 animate-spin" />
+                    </div>
+                  )}
                 </div>
               )}
 

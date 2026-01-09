@@ -149,7 +149,7 @@ Invoicing:  SmartBill (e-factura compliant)
 
 ### In Progress (Sprint 4)
 
-- [ ] S3 document upload (HIGH PRIORITY)
+- [x] S3 document upload ✅ (see AWS S3 section below)
 - [x] Order submission API (`/api/orders/[id]/submit`) ✅
 - [ ] Stripe payment flow completion
 - [x] User data persistence (save for logged users) ✅
@@ -373,6 +373,9 @@ docs/
 | `/api/user/addresses/[id]` | PATCH, DELETE | Address update/delete |
 | `/api/user/billing-profiles` | GET, POST | Billing profiles CRUD |
 | `/api/user/billing-profiles/[id]` | PATCH, DELETE | Profile update/delete |
+| `/api/upload` | POST | Get presigned S3 upload URL |
+| `/api/upload` | GET | S3 configuration health check |
+| `/api/upload/download` | GET | Get presigned S3 download URL |
 
 ### Admin Endpoints
 | Endpoint | Method | Description |
@@ -535,25 +538,100 @@ When creating new migrations, increment the number and save the file even if run
 
 ---
 
+## AWS S3 Document Storage
+
+### Overview
+
+All documents (KYC, contracts, orders, invoices) are stored in AWS S3 with presigned URLs for secure access.
+
+- **Region:** eu-central-1 (Frankfurt)
+- **Bucket:** eghiseul-documents
+- **Encryption:** AES-256 server-side encryption
+- **Setup Guide:** `docs/deployment/AWS_S3_SETUP.md`
+
+### Folder Structure
+
+```
+eghiseul-documents/
+├── kyc/{user_id}/{verification_id}/      # KYC documents (90 day validity)
+│   ├── ci_front.jpg
+│   ├── ci_back.jpg
+│   └── selfie.jpg
+├── orders/{year}/{month}/{order_id}/     # Order documents
+│   ├── uploads/
+│   └── signature/
+├── contracts/{year}/{month}/{contract}/  # Generated contracts
+├── invoices/{year}/{month}/              # Invoices
+├── final/{year}/{month}/{order_id}/      # Delivered documents
+├── templates/                            # Document templates
+└── temp/                                 # Auto-deleted after 24h
+```
+
+### Key Files
+
+| File | Purpose |
+|------|---------|
+| `src/lib/aws/s3.ts` | Server-side S3 operations |
+| `src/lib/aws/upload-client.ts` | Client-side upload via presigned URLs |
+| `src/app/api/upload/route.ts` | Generate presigned upload URLs |
+| `src/app/api/upload/download/route.ts` | Generate presigned download URLs |
+| `docs/deployment/AWS_S3_SETUP.md` | Complete setup guide |
+
+### Usage Example
+
+```typescript
+// Client-side upload
+import { uploadToS3 } from '@/lib/aws/upload-client';
+
+const result = await uploadToS3({
+  category: 'kyc',
+  file: selectedFile,
+  documentType: 'ci_front',
+  verificationId: 'kyc-xxx',
+});
+// result: { key: 'kyc/user-id/kyc-xxx/ci_front.jpg', url: 's3://...' }
+
+// Server-side operations
+import { uploadKycDocument, getDownloadUrl } from '@/lib/aws/s3';
+
+const { key, url } = await uploadKycDocument(userId, verificationId, 'ci_front', base64Data);
+const downloadUrl = await getDownloadUrl(key, 900); // 15 min expiry
+```
+
+### Lifecycle Rules
+
+| Prefix | Retention | Purpose |
+|--------|-----------|---------|
+| `temp/` | 24 hours | Temporary uploads |
+| `kyc/` | 7 years | KYC compliance |
+| `contracts/` | 10 years | Legal requirement |
+| `invoices/` | 10 years | Fiscal compliance |
+
+---
+
 ## Environment Variables
 
 ```env
-# Required
+# Required - Core
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=   # For server-side operations
 GOOGLE_AI_API_KEY=           # For OCR & KYC
 STRIPE_SECRET_KEY=
 
+# Required - AWS S3 (for document storage)
+AWS_REGION=eu-central-1
+AWS_ACCESS_KEY_ID=           # IAM user credentials
+AWS_SECRET_ACCESS_KEY=       # IAM user credentials
+AWS_S3_BUCKET_DOCUMENTS=eghiseul-documents
+
 # Optional (for full functionality)
-AWS_ACCESS_KEY_ID=
-AWS_SECRET_ACCESS_KEY=
-AWS_S3_BUCKET_DOCUMENTS=
-RESEND_API_KEY=
-SMARTBILL_API_KEY=
-SMSLINK_API_KEY=
+RESEND_API_KEY=              # Email delivery
+SMARTBILL_API_KEY=           # E-factura integration
+SMSLINK_API_KEY=             # SMS notifications
 ```
 
 ---
 
 **Last Updated:** 2026-01-09
-**Version:** 2.6
+**Version:** 2.7
