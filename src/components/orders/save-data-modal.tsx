@@ -13,7 +13,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Check, Sparkles, Loader2, AlertCircle, User } from 'lucide-react';
+import { Check, Sparkles, Loader2, AlertCircle, User, Shield, MapPin, FileText, CreditCard } from 'lucide-react';
 
 interface SaveDataModalProps {
   isOpen: boolean;
@@ -41,6 +41,7 @@ export function SaveDataModal({
   const [confirmPassword, setConfirmPassword] = useState('');
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [acceptedPrivacy, setAcceptedPrivacy] = useState(false);
+  const [saveKycData, setSaveKycData] = useState(true); // Pre-checked to save KYC data
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
@@ -84,6 +85,7 @@ export function SaveDataModal({
           password,
           acceptedTerms,
           acceptedPrivacy,
+          saveKycData,
         }),
       });
 
@@ -130,16 +132,44 @@ export function SaveDataModal({
             </DialogTitle>
             <DialogDescription className="pt-2">
               Contul tău a fost creat cu succes și ești deja autentificat.
-              <br />
-              <br />
-              Acum poți:
-              <ul className="mt-2 space-y-1 list-disc list-inside text-sm">
-                <li>Completa comenzi viitoare mai rapid</li>
-                <li>Vedea istoricul comenzilor tale</li>
-                <li>Gestiona documentele KYC verificate</li>
-              </ul>
             </DialogDescription>
           </DialogHeader>
+
+          {/* Migrated data summary */}
+          <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-4 my-4">
+            <h4 className="font-semibold text-green-800 text-sm mb-3">
+              Date salvate în contul tău:
+            </h4>
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-sm text-green-700">
+                <CreditCard className="h-4 w-4 flex-shrink-0" />
+                <span>Date personale (CNP, nume)</span>
+                <Check className="h-4 w-4 ml-auto text-green-500" />
+              </div>
+              <div className="flex items-center gap-2 text-sm text-green-700">
+                <MapPin className="h-4 w-4 flex-shrink-0" />
+                <span>Adresă de domiciliu</span>
+                <Check className="h-4 w-4 ml-auto text-green-500" />
+              </div>
+              {saveKycData && (
+                <div className="flex items-center gap-2 text-sm text-green-700">
+                  <Shield className="h-4 w-4 flex-shrink-0" />
+                  <span>Documente KYC verificate</span>
+                  <Check className="h-4 w-4 ml-auto text-green-500" />
+                </div>
+              )}
+              <div className="flex items-center gap-2 text-sm text-green-700">
+                <FileText className="h-4 w-4 flex-shrink-0" />
+                <span>Profil de facturare</span>
+                <Check className="h-4 w-4 ml-auto text-green-500" />
+              </div>
+            </div>
+          </div>
+
+          <p className="text-sm text-muted-foreground">
+            La următoarea comandă, datele vor fi completate automat!
+          </p>
+
           <div className="flex gap-2 mt-4">
             <Button onClick={handleGoToAccount} className="flex-1">
               Mergi la Contul Meu
@@ -165,18 +195,18 @@ export function SaveDataModal({
             </DialogTitle>
             <DialogDescription className="pt-2">
               Am trimis un email de verificare la <strong>{email}</strong>.
-              <br />
-              <br />
               Te rugăm să confirmi adresa de email pentru a-ți activa contul.
-              După confirmare, vei putea:
-              <ul className="mt-2 space-y-1 list-disc list-inside text-sm">
-                <li>Completa comenzi viitoare mai rapid</li>
-                <li>Vedea istoricul comenzilor tale</li>
-                <li>Folosi documentele KYC verificate</li>
-              </ul>
             </DialogDescription>
           </DialogHeader>
-          <Button onClick={onClose} className="w-full mt-4">
+          <div className="text-sm text-muted-foreground">
+            După confirmare, vei putea:
+            <ul className="mt-2 space-y-1 list-disc list-inside">
+              <li>Completa comenzi viitoare mai rapid</li>
+              <li>Vedea istoricul comenzilor tale</li>
+              <li>Folosi documentele KYC verificate</li>
+            </ul>
+          </div>
+          <Button onClick={onClose} className="w-full mt-2">
             Am înțeles
           </Button>
         </DialogContent>
@@ -253,6 +283,31 @@ export function SaveDataModal({
               autoComplete="new-password"
               disabled={isLoading}
             />
+          </div>
+
+          {/* KYC Data Checkbox */}
+          <div className="bg-primary/5 border border-primary/20 rounded-lg p-3">
+            <div className="flex items-start space-x-3">
+              <Checkbox
+                id="saveKyc"
+                checked={saveKycData}
+                onCheckedChange={(checked) => setSaveKycData(checked === true)}
+                disabled={isLoading}
+                className="mt-0.5"
+              />
+              <label
+                htmlFor="saveKyc"
+                className="cursor-pointer"
+              >
+                <div className="flex items-center gap-2">
+                  <Shield className="h-4 w-4 text-primary" />
+                  <span className="text-sm font-medium">Salvează documentele KYC verificate</span>
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Nu va mai trebui să scanezi actele la comenzile viitoare (valabil 90 zile)
+                </p>
+              </label>
+            </div>
           </div>
 
           {/* Checkboxes */}

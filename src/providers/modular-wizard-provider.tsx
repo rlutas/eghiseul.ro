@@ -29,6 +29,7 @@ import type {
   PropertyState,
   VehicleState,
   SignatureState,
+  BillingState,
   SelectedOptionState,
   DeliveryState,
   AddressState,
@@ -112,6 +113,14 @@ function createInitialSignatureState(): SignatureState {
   };
 }
 
+function createInitialBillingState(): BillingState {
+  return {
+    source: 'self',
+    type: 'persoana_fizica',
+    isValid: false,
+  };
+}
+
 function createInitialAddressState(): AddressState {
   return {
     county: '',
@@ -156,6 +165,7 @@ const initialState: ModularWizardState = {
   property: null,
   vehicle: null,
   signature: null,
+  billing: createInitialBillingState(),
 
   selectedOptions: [],
   delivery: createInitialDeliveryState(),
@@ -186,9 +196,10 @@ type ModularWizardAction =
   | { type: 'UPDATE_PROPERTY'; payload: Partial<PropertyState> }
   | { type: 'UPDATE_VEHICLE'; payload: Partial<VehicleState> }
   | { type: 'UPDATE_SIGNATURE'; payload: Partial<SignatureState> }
+  | { type: 'UPDATE_BILLING'; payload: Partial<BillingState> }
   | { type: 'UPDATE_OPTIONS'; payload: SelectedOptionState[] }
   | { type: 'UPDATE_DELIVERY'; payload: Partial<DeliveryState> }
-  | { type: 'SET_ORDER_IDS'; payload: { orderId: string; friendlyOrderId: string } }
+  | { type: 'SET_ORDER_IDS'; payload: { orderId: string | null; friendlyOrderId: string } }
   | { type: 'SET_FRIENDLY_ORDER_ID'; payload: string }
   | { type: 'SAVE_START' }
   | { type: 'SAVE_SUCCESS'; payload: string }
@@ -198,7 +209,8 @@ type ModularWizardAction =
   | { type: 'MARK_INITIALIZED' }
   | { type: 'RESTORE_FROM_CACHE'; payload: ModularDraftCache }
   | { type: 'PREFILL_FROM_PROFILE'; payload: UserPrefillData }
-  | { type: 'RESET' };
+  | { type: 'RESET' }
+  | { type: 'START_NEW_ORDER'; payload: { friendlyOrderId: string } };
 
 // ============================================================================
 // PREFILL DATA TYPE
@@ -249,6 +261,7 @@ interface ModularDraftCache {
     property?: PropertyState | null;
     vehicle?: VehicleState | null;
     signature?: SignatureState | null;
+    billing?: BillingState | null;
     selectedOptions?: SelectedOptionState[];
     delivery?: DeliveryState;
   };
@@ -434,6 +447,15 @@ function modularWizardReducer(
         isDirty: true,
       };
 
+    case 'UPDATE_BILLING':
+      return {
+        ...state,
+        billing: state.billing
+          ? { ...state.billing, ...action.payload }
+          : { ...createInitialBillingState(), ...action.payload },
+        isDirty: true,
+      };
+
     case 'UPDATE_OPTIONS':
       return {
         ...state,
@@ -526,6 +548,7 @@ function modularWizardReducer(
         property: cache.data.property ?? state.property,
         vehicle: cache.data.vehicle ?? state.vehicle,
         signature: cache.data.signature ?? state.signature,
+        billing: cache.data.billing ?? state.billing,
         selectedOptions: cache.data.selectedOptions || [],
         delivery: cache.data.delivery || createInitialDeliveryState(),
         lastSavedAt: cache.lastSavedAt,
@@ -570,6 +593,31 @@ function modularWizardReducer(
     case 'RESET':
       return initialState;
 
+    case 'START_NEW_ORDER': {
+      // Keep service info but reset all form data
+      const config = state.verificationConfig;
+      const steps = config ? buildWizardSteps(config) : state.steps;
+
+      return {
+        ...initialState,
+        // Keep service configuration
+        serviceSlug: state.serviceSlug,
+        serviceId: state.serviceId,
+        verificationConfig: state.verificationConfig,
+        steps,
+        // Initialize modules based on config
+        personalKyc: config?.personalKyc.enabled ? createInitialPersonalKYCState() : null,
+        companyKyc: config?.companyKyc.enabled ? createInitialCompanyKYCState() : null,
+        property: config?.propertyVerification.enabled ? createInitialPropertyState() : null,
+        vehicle: config?.vehicleVerification.enabled ? createInitialVehicleState() : null,
+        signature: config?.signature.enabled ? createInitialSignatureState() : null,
+        // Set new order ID
+        friendlyOrderId: action.payload.friendlyOrderId,
+        // Mark as initialized
+        isInitialized: true,
+      };
+    }
+
     default:
       return state;
   }
@@ -606,6 +654,7 @@ interface ModularWizardContextType {
   updateProperty: (data: Partial<PropertyState>) => void;
   updateVehicle: (data: Partial<VehicleState>) => void;
   updateSignature: (data: Partial<SignatureState>) => void;
+  updateBilling: (data: Partial<BillingState>) => void;
   updateOptions: (options: SelectedOptionState[]) => void;
   updateDelivery: (data: Partial<DeliveryState>) => void;
 
@@ -617,6 +666,7 @@ interface ModularWizardContextType {
   saveDraftNow: () => Promise<void>;
   submitOrder: () => Promise<void>;
   resetWizard: () => void;
+  startNewOrder: () => void;
   clearError: () => void;
   loadPrefillData: () => Promise<void>;
 
@@ -864,6 +914,10 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
     dispatch({ type: 'UPDATE_SIGNATURE', payload: data });
   }, []);
 
+  const updateBilling = useCallback((data: Partial<BillingState>) => {
+    dispatch({ type: 'UPDATE_BILLING', payload: data });
+  }, []);
+
   const updateOptions = useCallback((options: SelectedOptionState[]) => {
     dispatch({ type: 'UPDATE_OPTIONS', payload: options });
   }, []);
@@ -918,6 +972,7 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
         property: state.property,
         vehicle: state.vehicle,
         signature: state.signature,
+        billing: state.billing,
         selectedOptions: state.selectedOptions,
         delivery: state.delivery,
       },
@@ -959,6 +1014,7 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
       if (state.companyKyc) customerData.company = state.companyKyc;
       if (state.property) customerData.property = state.property;
       if (state.vehicle) customerData.vehicle = state.vehicle;
+      if (state.billing) customerData.billing = state.billing;
 
       const response = await fetch('/api/orders/draft', {
         method,
@@ -1006,6 +1062,26 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         console.error('Save draft error:', response.status, errorData);
+
+        // Handle case where order is no longer a draft (was submitted)
+        // Clear orderId so next save creates a fresh draft
+        if (response.status === 400 && errorData.error?.code === 'INVALID_STATUS') {
+          console.warn('Order is no longer a draft - clearing orderId for fresh draft');
+          const newFriendlyOrderId = `ORD-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
+          dispatch({
+            type: 'SET_ORDER_IDS',
+            payload: {
+              orderId: null,
+              friendlyOrderId: newFriendlyOrderId,
+            },
+          });
+          // Reset saving state first, then mark dirty to trigger new save
+          dispatch({ type: 'SAVE_SUCCESS', payload: new Date().toISOString() });
+          // Mark dirty AFTER save_success so it triggers auto-save with new ID
+          dispatch({ type: 'MARK_DIRTY' });
+          return;
+        }
+
         throw new Error(errorData.error?.message || `Salvarea a eșuat (${response.status})`);
       }
 
@@ -1118,6 +1194,35 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
     dispatch({ type: 'RESET' });
   }, [state.friendlyOrderId]);
 
+  // Start a new order (keeps service, resets form data)
+  const startNewOrder = useCallback(() => {
+    // Remove old draft from localStorage
+    if (state.friendlyOrderId) {
+      try {
+        localStorage.removeItem(getDraftStorageKey(state.friendlyOrderId));
+      } catch {
+        // Ignore
+      }
+    }
+
+    // Generate new order ID
+    const newOrderId = generateOrderId();
+
+    // Reset form but keep service
+    dispatch({ type: 'START_NEW_ORDER', payload: { friendlyOrderId: newOrderId } });
+
+    // Reset URL to step 1
+    const params = new URLSearchParams(window.location.search);
+    params.set('step', '1');
+    params.delete('order');
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+
+    // Reset prefill tracking so it can load again if needed
+    prefillLoadedRef.current = false;
+    setIsPrefilled(false);
+    setPrefillData(null);
+  }, [state.friendlyOrderId, pathname, router]);
+
   // Clear error
   const clearError = useCallback(() => {
     dispatch({ type: 'CLEAR_ERROR' });
@@ -1213,6 +1318,7 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
     updateProperty,
     updateVehicle,
     updateSignature,
+    updateBilling,
     updateOptions,
     updateDelivery,
     priceBreakdown,
@@ -1220,6 +1326,7 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
     saveDraftNow,
     submitOrder,
     resetWizard,
+    startNewOrder,
     clearError,
     loadPrefillData,
     canSaveToServer,

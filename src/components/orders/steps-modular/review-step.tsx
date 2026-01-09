@@ -172,6 +172,58 @@ export function ReviewStepModular({ onValidChange }: ReviewStepProps) {
             </CardContent>
           </Card>
 
+          {/* Billing */}
+          {state.billing && (
+            <Card className="border-neutral-200">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <h4 className="font-medium text-secondary-900 flex items-center gap-2">
+                    <CreditCard className="h-4 w-4 text-neutral-500" />
+                    Date Facturare
+                  </h4>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => goToStep('billing')}
+                    className="text-primary-600 hover:text-primary-700"
+                  >
+                    <Edit className="h-3 w-3 mr-1" />
+                    Editează
+                  </Button>
+                </div>
+                <div className="space-y-1 text-sm text-neutral-600">
+                  {state.billing.type === 'persoana_fizica' ? (
+                    <>
+                      <p>
+                        <strong>Tip:</strong> Persoană Fizică
+                      </p>
+                      <p>
+                        <strong>Nume:</strong> {state.billing.firstName} {state.billing.lastName}
+                      </p>
+                      {state.billing.cnp && (
+                        <p>
+                          <strong>CNP:</strong> ****{state.billing.cnp.slice(-4)}
+                        </p>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      <p>
+                        <strong>Tip:</strong> Persoană Juridică
+                      </p>
+                      <p>
+                        <strong>CUI:</strong> {state.billing.cui}
+                      </p>
+                      <p>
+                        <strong>Denumire:</strong> {state.billing.companyName}
+                      </p>
+                    </>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           {/* Selected Options */}
           {state.selectedOptions.length > 0 && (
             <Card className="border-neutral-200">

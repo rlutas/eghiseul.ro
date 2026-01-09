@@ -78,6 +78,12 @@ const ALL_STEPS: Record<ModularStepId, Omit<ModularStep, 'number' | 'condition'>
     labelRo: 'Livrare',
     moduleType: 'core',
   },
+  'billing': {
+    id: 'billing',
+    label: 'Billing',
+    labelRo: 'Facturare',
+    moduleType: 'billing',
+  },
   'review': {
     id: 'review',
     label: 'Review',
@@ -202,7 +208,13 @@ export function buildWizardSteps(
     number: stepNumber++,
   });
 
-  // Step 7: Review (always present)
+  // Step 7: Billing (always present - invoice selection)
+  steps.push({
+    ...ALL_STEPS['billing'],
+    number: stepNumber++,
+  });
+
+  // Step 8: Review (always present)
   steps.push({
     ...ALL_STEPS['review'],
     number: stepNumber++,

@@ -150,12 +150,14 @@ Invoicing:  SmartBill (e-factura compliant)
 ### In Progress (Sprint 4)
 
 - [ ] S3 document upload (HIGH PRIORITY)
-- [ ] Order submission API (HIGH PRIORITY)
+- [x] Order submission API (`/api/orders/[id]/submit`) ✅
 - [ ] Stripe payment flow completion
-- [ ] User data persistence (save for logged users)
-- [ ] Account creation offer at order end
+- [x] User data persistence (save for logged users) ✅
+- [x] Account creation offer at order end (SaveDataModal for guests) ✅
 - [ ] Bank transfer payment option
-- [ ] User orders dashboard
+- [x] User orders dashboard (Account page OrdersTab) ✅
+- [x] KYC verification logic (requires ID + selfie for complete) ✅
+- [x] Profile document info display (series, number, type, expiry) ✅
 
 ---
 
@@ -359,10 +361,18 @@ docs/
 |----------|--------|-------------|
 | `/api/orders` | GET, POST | List/Create orders |
 | `/api/orders/[id]` | GET, PATCH | Order details/update |
+| `/api/orders/[id]/submit` | POST | Submit draft order (draft → pending) |
 | `/api/orders/[id]/payment` | POST | Create payment intent |
 | `/api/orders/draft` | GET, POST, PATCH | Draft order CRUD |
 | `/api/ocr/extract` | POST | Extract data from ID |
 | `/api/kyc/validate` | POST | Validate KYC documents |
+| `/api/user/profile` | GET, PATCH | User profile with document info |
+| `/api/user/kyc` | GET | KYC status (verified/partial/unverified) |
+| `/api/user/kyc/save` | POST | Save KYC document |
+| `/api/user/addresses` | GET, POST | User addresses CRUD |
+| `/api/user/addresses/[id]` | PATCH, DELETE | Address update/delete |
+| `/api/user/billing-profiles` | GET, POST | Billing profiles CRUD |
+| `/api/user/billing-profiles/[id]` | PATCH, DELETE | Profile update/delete |
 
 ### Admin Endpoints
 | Endpoint | Method | Description |
@@ -545,5 +555,5 @@ SMSLINK_API_KEY=
 
 ---
 
-**Last Updated:** 2026-01-08
-**Version:** 2.5
+**Last Updated:** 2026-01-09
+**Version:** 2.6

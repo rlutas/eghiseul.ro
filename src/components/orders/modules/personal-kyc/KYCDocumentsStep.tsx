@@ -99,8 +99,12 @@ const MAX_FILE_SIZE = 10 * 1024 * 1024;
 const ACCEPTED_TYPES = ['image/jpeg', 'image/jpg', 'image/png'];
 
 export default function KYCDocumentsStep({ config, onValidChange }: KYCDocumentsStepProps) {
-  const { state, updatePersonalKyc } = useModularWizard();
+  const { state, updatePersonalKyc, isPrefilled, prefillData } = useModularWizard();
   const personalKyc = state.personalKyc;
+
+  // Check if user has valid KYC from their account
+  const hasValidAccountKyc = isPrefilled && prefillData?.has_valid_kyc;
+  const [showReuploadOption, setShowReuploadOption] = useState(false);
 
   const [uploads, setUploads] = useState<Record<KYCDocType, UploadState>>({
     selfie: { ...initialUploadState },
@@ -143,6 +147,11 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
   const isValid = useCallback(() => {
     if (!personalKyc) return false;
 
+    // If user has valid KYC from account and not showing reupload, automatically valid
+    if (hasValidAccountKyc && !showReuploadOption) {
+      return true;
+    }
+
     // Check selfie if required
     if (config.selfieRequired) {
       const hasSelfie = personalKyc.uploadedDocuments.some(d => d.type === 'selfie');
@@ -156,7 +165,7 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
     }
 
     return true;
-  }, [personalKyc, config]);
+  }, [personalKyc, config, hasValidAccountKyc, showReuploadOption]);
 
   // Notify parent of validation changes
   useEffect(() => {
@@ -560,6 +569,64 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
 
   return (
     <div className="space-y-6">
+      {/* KYC Already Verified Banner */}
+      {hasValidAccountKyc && !showReuploadOption && (
+        <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-6">
+          <div className="flex gap-4">
+            <div className="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center flex-shrink-0">
+              <FileCheck className="h-6 w-6 text-green-600" />
+            </div>
+            <div className="flex-1">
+              <h3 className="font-semibold text-green-800 text-lg">
+                Documente deja verificate
+              </h3>
+              <p className="text-sm text-green-700 mt-1">
+                Avem deja documentele tale KYC verificate în cont.
+                Poți continua direct la pasul următor fără a încărca documente noi.
+              </p>
+              <div className="flex items-center gap-4 mt-4">
+                <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-green-100 text-green-800 rounded-full text-sm font-medium">
+                  <CheckCircle className="w-4 h-4" />
+                  Identitate verificată
+                </span>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowReuploadOption(true)}
+                  className="text-green-700 hover:text-green-800 hover:bg-green-100"
+                >
+                  Încarcă documente noi
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Reupload notice */}
+      {hasValidAccountKyc && showReuploadOption && (
+        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+          <div className="flex gap-3 items-center">
+            <Info className="h-5 w-5 text-blue-600 flex-shrink-0" />
+            <div className="flex-1">
+              <p className="text-sm text-blue-800">
+                Încarci documente noi care vor înlocui verificarea existentă.
+              </p>
+            </div>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowReuploadOption(false)}
+              className="text-blue-700 hover:text-blue-800"
+            >
+              Anulează
+            </Button>
+          </div>
+        </div>
+      )}
+
       {/* Already uploaded documents from Step 3 */}
       {idDocsCount > 0 && (
         <Card className="border-green-200 bg-green-50">
@@ -603,11 +670,11 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
         </Card>
       )}
 
-      {/* Selfie Section */}
-      {showSelfie && renderUploadCard('selfie')}
+      {/* Selfie Section - only show if reupload selected or no valid KYC */}
+      {showSelfie && (!hasValidAccountKyc || showReuploadOption) && renderUploadCard('selfie')}
 
-      {/* Certificate Section */}
-      {showCertificate && renderUploadCard('certificat_domiciliu')}
+      {/* Certificate Section - only show if reupload selected or no valid KYC */}
+      {showCertificate && (!hasValidAccountKyc || showReuploadOption) && renderUploadCard('certificat_domiciliu')}
 
       {/* Info Banner */}
       <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">

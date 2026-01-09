@@ -1,8 +1,8 @@
 # eGhiseul.ro - Development Master Plan
 
-**Version:** 2.1
-**Last Updated:** 2026-01-08
-**Status:** Sprint 3 Complete | Sprint 4 In Progress (User Data Persistence)
+**Version:** 2.4
+**Last Updated:** 2026-01-09
+**Status:** Sprint 4 In Progress | KYC Verification & Profile ✅ Implemented
 
 ---
 
@@ -353,7 +353,7 @@
    - Bank transfer payment flow
    - Magic links for order recovery (JWT, 7-day expiry)
 
-#### Sprint 4: Payments & Contracts (Săptămâna 11-12) ⏳ PENDING
+#### Sprint 4: Payments & Contracts (Săptămâna 11-12) ⏳ IN PROGRESS
 
 | Task | Status | Spec Reference |
 |------|--------|----------------|
@@ -365,12 +365,28 @@
 | ⏳ SmartBill facturare | Pending | - |
 | ⏳ **Order auto-save implementation** | Pending | `order-autosave-system.md` |
 | ✅ **User data persistence** | Complete | `user-data-persistence.md` |
+| ✅ **Account management tabs** | Complete | Profile, KYC, Addresses, Billing tabs |
+| ✅ **KYC selfie with ID** | Complete | IdScanner with selfie_with_id support |
+| ✅ **Duplicate prevention** | Complete | Addresses & billing profiles dedup |
+| ✅ **Billing Step in Wizard** | Complete | `billing-step.tsx` - PF/PJ selection |
+| ✅ **Security: IDOR Fix** | Complete | `security-audit-admin-client.md` |
+| ✅ **Security: Email Bypass Fix** | Complete | register-from-order hardened |
+| ✅ **Security: Ownership Verification** | Complete | Draft PATCH requires email match |
+| ✅ **KYC Document Persistence** | Complete | Saves to kyc_verifications on account creation |
 
 **New Features (From Sprint 3 Specs):**
 - Bank transfer with reference code (PAY-YYYYMMDD-XXXXX)
 - Admin confirmation for bank payments
 - ✅ Guest-to-customer conversion flow (SaveDataModal after order)
 - ✅ KYC document reuse from previous orders (via prefill API)
+- ✅ Billing step with 3 options: "Facturează pe mine", "Altă persoană fizică", "Persoană juridică"
+
+**User Account Management (✅ COMPLETE - 2026-01-08):**
+- Profile tab with ID scan + OCR auto-fill + KYC save
+- KYC tab with proper flow: front (required), back (optional), selfie with ID
+- Addresses tab with duplicate prevention
+- Billing profiles tab with CNP-based deduplication
+- Header fixed (removed duplicate navigation bar)
 
 #### Sprint 5: Admin Dashboard (Săptămâna 13-14) ⏳ PENDING
 
@@ -984,7 +1000,177 @@ curl http://localhost:3000/api/kyc/validate     # KYC health check
 
 ---
 
-**Document Status:** ✅ Updated (v2.0)
-**Last Modified:** 2026-01-06
-**Next Review:** After User Data Persistence Implementation
+### Session: 2026-01-08 - User Account Management Complete
+
+**Completed This Session:**
+
+1. ✅ **Profile Tab - ID Scanner Integration**
+   - Added IdScanner component to ProfileTab
+   - OCR extraction auto-fills: firstName, lastName, CNP, birthDate, birthPlace
+   - Documents saved to KYC verification system
+   - "Scanează act" button alongside edit mode
+   - Files: `src/components/account/ProfileTab.tsx`
+
+2. ✅ **KYC Tab - Selfie with ID Support**
+   - Extended IdScanner to support `showSelfieWithId` prop
+   - Created SelfieWithIdIllustration SVG component
+   - Added selfie upload handler (stores image, no OCR)
+   - Third step after front/back scan
+   - KYCTab uses `showSelfieWithId={true}`
+   - Files: `src/components/shared/IdScanner.tsx`, `src/components/account/KYCTab.tsx`
+
+3. ✅ **Billing Tab - Duplicate Prevention**
+   - Added `findDuplicateAddress()` helper (matches street, number, city)
+   - Added `findDuplicateBillingProfile()` helper (matches CNP)
+   - Now updates existing entries instead of creating duplicates
+   - Files: `src/components/account/KYCTab.tsx`
+
+4. ✅ **Header Fix**
+   - Removed duplicate navigation bar from customer layout
+   - Fixed gray bar appearing under main header
+   - Files: `src/app/(customer)/layout.tsx`
+
+5. ✅ **Testing**
+   - Build passed successfully
+   - Playwright: 129 tests passed (Mobile Safari)
+   - Some pre-existing Chromium timeout issues
+
+**Files Modified:**
+- `src/components/account/ProfileTab.tsx` - Added ID scanner integration
+- `src/components/account/KYCTab.tsx` - Added selfie, duplicate prevention
+- `src/components/shared/IdScanner.tsx` - Extended for selfie with ID
+- `src/app/(customer)/layout.tsx` - Fixed duplicate header
+- `src/hooks/useAddresses.ts` - Added update function
+- `src/hooks/useBillingProfiles.ts` - Added update function
+
+**Status When Completed:**
+- Sprint 4: 40% complete
+- User Account Management: ✅ Complete
+- Ready for: Payment flows, S3 upload, order submission
+
+---
+
+### Session: 2026-01-08 (Part 2) - Billing Step & Security Fixes
+
+**Completed This Session:**
+
+1. ✅ **Billing Step Implementation**
+   - New step in wizard between Delivery and Review
+   - Three billing options: "Facturează pe mine" (self), "Altă persoană fizică", "Persoană juridică"
+   - Auto-populates data from scanned ID for "self" option
+   - CUI validation via InfoCUI API for companies
+   - Files:
+     - `src/components/orders/steps-modular/billing-step.tsx` (NEW)
+     - `src/types/verification-modules.ts` (BillingState, BillingType, BillingSource)
+     - `src/lib/verification-modules/step-builder.ts` (added billing step)
+     - `src/lib/verification-modules/registry.ts` (added billing module)
+     - `src/providers/modular-wizard-provider.tsx` (billing state management)
+     - `src/components/orders/modular-order-wizard.tsx` (billing rendering)
+     - `src/components/orders/steps-modular/review-step.tsx` (billing display)
+
+2. ✅ **Security Vulnerabilities Fixed**
+   - **IDOR in draft GET**: Orders without ownership info now denied
+   - **Email bypass in register-from-order**: Requires order email before registration
+   - **Ownership in draft PATCH**: Guest orders require email match for updates
+   - **KYC persistence**: Documents saved to kyc_verifications on account creation
+   - **Billing profile creation**: Auto-creates PF billing profile from order data
+   - Files:
+     - `src/app/api/orders/draft/route.ts`
+     - `src/app/api/auth/register-from-order/route.ts`
+   - Docs:
+     - `docs/technical/specs/security-audit-admin-client.md`
+     - `docs/technical/specs/user-data-flow-analysis.md`
+
+3. ✅ **Documentation Updates**
+   - Updated `docs/technical/specs/modular-wizard-guide.md` with billing step
+   - Updated `docs/technical/specs/user-data-flow-analysis.md` with fixes
+   - Updated this file with Sprint 4 progress
+
+**Interconnections:**
+```
+Billing Step Flow:
+PersonalDataStep (OCR) → BillingState.prefillFromId → BillingStep
+    ↓                                                      ↓
+  Address                                          billing: { source, type, ... }
+    ↓                                                      ↓
+ReviewStep displays                              Saved to orders.customer_data.billing
+    ↓                                                      ↓
+Order Submission                            → billing_profiles table (on account creation)
+```
+
+**Status When Completed:**
+- Sprint 4: 50% complete
+- Billing Step: ✅ Complete
+- Security Fixes: ✅ Complete
+- Ready for: Payment flows, S3 upload, Stripe integration
+
+---
+
+---
+
+### Session: 2026-01-09 - KYC Verification Logic & Profile Improvements
+
+**Completed This Session:**
+
+1. ✅ **KYC Verification Logic Fix**
+   - KYC now requires BOTH ID front AND selfie for "verified" status
+   - Added new "partial" status for incomplete KYC (has ID but no selfie)
+   - Updated `/api/user/kyc/route.ts` to check document types
+   - Updated `useKycStatus` hook with new flags: `isPartial`, `hasFrontId`, `hasSelfie`, `hasAllRequired`
+   - Files: `src/app/api/user/kyc/route.ts`, `src/hooks/useKycStatus.ts`
+
+2. ✅ **Account Page Sidebar KYC Status**
+   - Sidebar now shows actual KYC status based on documents (not just `kyc_verified` flag)
+   - Shows "KYC Verificat" (green), "KYC Incomplet" (amber), or "KYC Neverificat" (yellow)
+   - Displays specific missing document (e.g., "Lipsește selfie-ul")
+   - Files: `src/app/(customer)/account/page.tsx`
+
+3. ✅ **Profile Document Info Display**
+   - Profile tab now shows document info from KYC verification:
+     - Tip Document (CI Vechi / CI Nou)
+     - Serie / Număr
+     - Valabil Până La
+   - Updated `/api/user/profile` GET to fetch KYC documents and extract info
+   - Files: `src/app/api/user/profile/route.ts`, `src/components/account/ProfileTab.tsx`
+
+4. ✅ **Order Submit - Profile Data Sync**
+   - Order submission now saves phone, birth_date, birth_place to user profile
+   - Updates existing profile with any missing data from order
+   - Files: `src/app/api/orders/[id]/submit/route.ts`
+
+5. ✅ **KYC Tab UI Improvements**
+   - Shows correct status badge: "Incomplet - lipsește selfie"
+   - Shows "Necesar" badge on selfie requirement
+   - Document list with clear status indicators
+
+**Files Modified:**
+- `src/app/api/user/kyc/route.ts` - Document type checking, new status calculation
+- `src/app/api/user/profile/route.ts` - Added document info from KYC
+- `src/app/api/orders/[id]/submit/route.ts` - Profile data sync on submit
+- `src/app/(customer)/account/page.tsx` - Sidebar KYC status calculation
+- `src/hooks/useKycStatus.ts` - New status flags
+- `src/components/account/KYCTab.tsx` - Status display improvements
+- `src/components/account/ProfileTab.tsx` - Document info display
+
+**KYC Status Logic:**
+```
+Documents Present     | Status
+--------------------- | --------
+None                 | unverified
+ID front only        | partial
+Selfie only          | partial
+ID front + Selfie    | verified (or expiring/expired based on date)
+```
+
+**Status When Completed:**
+- Sprint 4: 55% complete
+- KYC verification: ✅ Complete
+- Profile improvements: ✅ Complete
+- Ready for: Payment flows, S3 upload, Stripe integration
+
+---
+
+**Document Status:** ✅ Updated (v2.4)
+**Last Modified:** 2026-01-09
+**Next Review:** After Sprint 4 Payment Integration
 **Owner:** Development Team

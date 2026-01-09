@@ -206,6 +206,7 @@ export type ModularStepId =
   | 'kyc-documents'     // Document upload + OCR
   | 'signature'         // Signature canvas
   | 'delivery'          // Delivery selection
+  | 'billing'           // Billing profile (PF/PJ)
   | 'review';           // Final review
 
 export type ClientType = 'PF' | 'PJ' | null;
@@ -216,7 +217,7 @@ export interface ModularStep {
   labelRo: string;  // Romanian label
   number: number;
   condition?: (state: ModularWizardState) => boolean;
-  moduleType: 'core' | 'personalKyc' | 'companyKyc' | 'property' | 'vehicle' | 'signature';
+  moduleType: 'core' | 'personalKyc' | 'companyKyc' | 'property' | 'vehicle' | 'signature' | 'billing';
 }
 
 // ============================================================================
@@ -352,6 +353,41 @@ export interface VehicleState {
 }
 
 /**
+ * Billing Module State
+ * Used for invoice generation (PF or PJ)
+ */
+export type BillingType = 'persoana_fizica' | 'persoana_juridica';
+
+export type BillingSource = 'self' | 'other_pf' | 'company';
+
+export interface BillingState {
+  // Selection
+  source: BillingSource;  // 'self' = use data from ID, 'other_pf' = another person, 'company' = PJ
+  type: BillingType;
+
+  // Persoană Fizică fields
+  firstName?: string;
+  lastName?: string;
+  cnp?: string;
+  address?: string;
+
+  // Persoană Juridică fields
+  companyName?: string;
+  cui?: string;
+  regCom?: string;
+  companyAddress?: string;
+  bankName?: string;
+  bankIban?: string;
+  contactPerson?: string;
+  contactPhone?: string;
+  contactEmail?: string;
+
+  // Validation
+  isValid: boolean;
+  cuiVerified?: boolean;
+}
+
+/**
  * Signature Module State
  */
 export interface SignatureState {
@@ -394,6 +430,7 @@ export interface ModularWizardState {
   property: PropertyState | null;
   vehicle: VehicleState | null;
   signature: SignatureState | null;
+  billing: BillingState | null;
 
   // Options & Delivery (always present)
   selectedOptions: SelectedOptionState[];
@@ -469,6 +506,17 @@ export interface SignatureModuleProps extends ModuleBaseProps {
   config: SignatureConfig;
   state: SignatureState;
   onUpdate: (state: Partial<SignatureState>) => void;
+}
+
+export interface BillingModuleProps extends ModuleBaseProps {
+  state: BillingState;
+  onUpdate: (state: Partial<BillingState>) => void;
+  prefillFromId?: {
+    firstName?: string;
+    lastName?: string;
+    cnp?: string;
+    address?: string;
+  };
 }
 
 // ============================================================================

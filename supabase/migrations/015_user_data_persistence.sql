@@ -77,24 +77,28 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_billing_default
   WHERE is_default = TRUE;
 
 -- =============================================
--- RLS POLICIES
+-- RLS POLICIES (Idempotent - drop if exists first)
 -- =============================================
 
 -- 5. RLS for user_saved_data
 ALTER TABLE user_saved_data ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can view own saved data" ON user_saved_data;
 CREATE POLICY "Users can view own saved data"
   ON user_saved_data FOR SELECT
   USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can insert own saved data" ON user_saved_data;
 CREATE POLICY "Users can insert own saved data"
   ON user_saved_data FOR INSERT
   WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can update own saved data" ON user_saved_data;
 CREATE POLICY "Users can update own saved data"
   ON user_saved_data FOR UPDATE
   USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can delete own saved data" ON user_saved_data;
 CREATE POLICY "Users can delete own saved data"
   ON user_saved_data FOR DELETE
   USING (auth.uid() = user_id);
@@ -102,19 +106,23 @@ CREATE POLICY "Users can delete own saved data"
 -- 6. RLS for kyc_verifications
 ALTER TABLE kyc_verifications ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can view own KYC" ON kyc_verifications;
 CREATE POLICY "Users can view own KYC"
   ON kyc_verifications FOR SELECT
   USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can insert own KYC" ON kyc_verifications;
 CREATE POLICY "Users can insert own KYC"
   ON kyc_verifications FOR INSERT
   WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can update own KYC" ON kyc_verifications;
 CREATE POLICY "Users can update own KYC"
   ON kyc_verifications FOR UPDATE
   USING (auth.uid() = user_id);
 
 -- Admins can view all KYC documents
+DROP POLICY IF EXISTS "Admins can view all KYC" ON kyc_verifications;
 CREATE POLICY "Admins can view all KYC"
   ON kyc_verifications FOR SELECT
   USING (
@@ -128,18 +136,22 @@ CREATE POLICY "Admins can view all KYC"
 -- 7. RLS for billing_profiles
 ALTER TABLE billing_profiles ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can view own billing profiles" ON billing_profiles;
 CREATE POLICY "Users can view own billing profiles"
   ON billing_profiles FOR SELECT
   USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can insert own billing profiles" ON billing_profiles;
 CREATE POLICY "Users can insert own billing profiles"
   ON billing_profiles FOR INSERT
   WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can update own billing profiles" ON billing_profiles;
 CREATE POLICY "Users can update own billing profiles"
   ON billing_profiles FOR UPDATE
   USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can delete own billing profiles" ON billing_profiles;
 CREATE POLICY "Users can delete own billing profiles"
   ON billing_profiles FOR DELETE
   USING (auth.uid() = user_id);
@@ -259,18 +271,21 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- =============================================
--- AUTO-UPDATE TIMESTAMPS
+-- AUTO-UPDATE TIMESTAMPS (Idempotent)
 -- =============================================
 
 -- 10. Triggers for updated_at
+DROP TRIGGER IF EXISTS user_saved_data_updated_at ON user_saved_data;
 CREATE TRIGGER user_saved_data_updated_at
   BEFORE UPDATE ON user_saved_data
   FOR EACH ROW EXECUTE FUNCTION update_updated_at();
 
+DROP TRIGGER IF EXISTS kyc_verifications_updated_at ON kyc_verifications;
 CREATE TRIGGER kyc_verifications_updated_at
   BEFORE UPDATE ON kyc_verifications
   FOR EACH ROW EXECUTE FUNCTION update_updated_at();
 
+DROP TRIGGER IF EXISTS billing_profiles_updated_at ON billing_profiles;
 CREATE TRIGGER billing_profiles_updated_at
   BEFORE UPDATE ON billing_profiles
   FOR EACH ROW EXECUTE FUNCTION update_updated_at();

@@ -81,6 +81,12 @@ export const MODULE_REGISTRY: Record<ModularStepId, ModuleRegistryEntry> = {
     labelRo: 'Livrare',
     componentPath: '@/components/orders/steps/delivery-step',
   },
+  'billing': {
+    stepId: 'billing',
+    label: 'Billing',
+    labelRo: 'Facturare',
+    componentPath: '@/components/orders/steps-modular/billing-step',
+  },
   'review': {
     stepId: 'review',
     label: 'Review',
@@ -132,6 +138,7 @@ export const MODULE_LOADERS: Partial<Record<ModularStepId, ModuleComponentLoader
   'vehicle-data': () => import('@/components/orders/modules/vehicle/VehicleDataStep'),
   'kyc-documents': () => import('@/components/orders/modules/personal-kyc/KYCDocumentsStep'),
   'signature': () => import('@/components/orders/modules/signature/SignatureStep'),
+  'billing': () => import('@/components/orders/steps-modular/billing-step'),
 };
 
 /**

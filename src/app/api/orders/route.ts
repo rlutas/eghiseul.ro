@@ -231,8 +231,8 @@ export async function GET(request: NextRequest) {
     const offset = parseInt(searchParams.get('offset') || '0')
 
     // Validate status if provided
-    type OrderStatus = 'pending' | 'processing' | 'document_ready' | 'delivered' | 'completed' | 'rejected'
-    const validStatuses: OrderStatus[] = ['pending', 'processing', 'document_ready', 'delivered', 'completed', 'rejected']
+    type OrderStatus = 'pending' | 'pending_payment' | 'processing' | 'document_ready' | 'delivered' | 'completed' | 'rejected' | 'cancelled'
+    const validStatuses: OrderStatus[] = ['pending', 'pending_payment', 'processing', 'document_ready', 'delivered', 'completed', 'rejected', 'cancelled']
     const status = statusParam && validStatuses.includes(statusParam as OrderStatus)
       ? statusParam as OrderStatus
       : null
@@ -276,21 +276,27 @@ export async function GET(request: NextRequest) {
     // Transform orders
     const transformedOrders = orders?.map(order => {
       const createdDate = order.created_at ? new Date(order.created_at) : new Date()
+      // Use friendly_order_id if available, otherwise generate from order_number
+      const orderNumber = order.friendly_order_id ||
+        `ORD-${createdDate.getFullYear()}-${String(order.order_number).padStart(7, '0')}`
       return {
         id: order.id,
-        orderNumber: `ORD-${createdDate.getFullYear()}-${String(order.order_number).padStart(7, '0')}`,
-      service: order.services ? {
-        id: order.services.id,
-        slug: order.services.slug,
-        name: order.services.name,
-        category: order.services.category
-      } : null,
-      status: order.status,
-      totalAmount: parseFloat(String(order.total_price)),
-      currency: 'RON',
-      paymentStatus: order.payment_status,
-      createdAt: order.created_at,
-      updatedAt: order.updated_at
+        orderNumber,
+        friendly_order_id: order.friendly_order_id,
+        service: order.services ? {
+          id: order.services.id,
+          slug: order.services.slug,
+          name: order.services.name,
+          category: order.services.category
+        } : null,
+        status: order.status,
+        totalAmount: parseFloat(String(order.total_price)),
+        total_price: parseFloat(String(order.total_price)),
+        currency: 'RON',
+        paymentStatus: order.payment_status,
+        createdAt: order.created_at,
+        created_at: order.created_at,
+        updatedAt: order.updated_at
       }
     }) || []
 

@@ -32,7 +32,31 @@ Module Components               → Componentele individuale pentru fiecare pas
 | **Signature** | `signature` | Semnătură electronică pe canvas | Servicii care necesită semnătură |
 | **Options** | `options` | Opțiuni suplimentare (urgență, traduceri) | ÎNTOTDEAUNA (obligatoriu) |
 | **Delivery** | `delivery` | Metodă livrare, adresă | ÎNTOTDEAUNA (obligatoriu) |
+| **Billing** | `billing` | Date facturare PF/PJ | ÎNTOTDEAUNA (obligatoriu) |
 | **Review** | `review` | Rezumat și confirmare termeni | ÎNTOTDEAUNA (obligatoriu) |
+
+### Billing Step (NOU - 2026-01-08)
+
+Pasul de facturare oferă 3 opțiuni:
+
+1. **"Facturează pe mine"** (source: `self`)
+   - Auto-populează datele din actul de identitate scanat
+   - Câmpuri: firstName, lastName, cnp, address
+   - Tip: `persoana_fizica`
+
+2. **"Altă persoană fizică"** (source: `other_pf`)
+   - Introducere manuală date persoană
+   - Câmpuri: firstName, lastName, cnp, address
+   - Tip: `persoana_fizica`
+
+3. **"Persoană juridică"** (source: `company`)
+   - Validare CUI prin InfoCUI API
+   - Câmpuri: cui, companyName, regCom, companyAddress, bankName, bankIban
+   - Tip: `persoana_juridica`
+
+**Fișiere relevante:**
+- `src/components/orders/steps-modular/billing-step.tsx` - Componentă UI
+- `src/types/verification-modules.ts` - BillingState, BillingType, BillingSource
 
 ## Cum Adaugi un Serviciu Nou
 

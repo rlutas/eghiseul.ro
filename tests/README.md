@@ -34,7 +34,8 @@ tests/
 │   │   ├── register.spec.ts        # Teste pagina înregistrare
 │   │   └── forgot-password.spec.ts # Teste resetare parolă
 │   ├── orders/
-│   │   └── wizard.spec.ts          # Teste wizard comandă
+│   │   ├── wizard.spec.ts          # Teste wizard comandă
+│   │   └── full-order-flow.spec.ts # ✨ NEW: E2E complet cazier judiciar
 │   ├── services/
 │   │   └── service-detail.spec.ts  # Teste pagini servicii
 │   └── homepage.spec.ts            # Teste homepage

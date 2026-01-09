@@ -65,8 +65,8 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       )
     }
 
-    // Verify user owns this order
-    if (order.user_id !== user.id) {
+    // Verify user owns this order (or order has no user assigned)
+    if (order.user_id && order.user_id !== user.id) {
       return NextResponse.json(
         {
           success: false,
@@ -77,6 +77,14 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         },
         { status: 403 }
       )
+    }
+
+    // Link order to user if not already linked
+    if (!order.user_id) {
+      await supabase
+        .from('orders')
+        .update({ user_id: user.id })
+        .eq('id', id)
     }
 
     // Check if already paid

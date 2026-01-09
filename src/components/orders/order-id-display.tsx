@@ -1,6 +1,6 @@
 'use client';
 
-import { Copy, Check, HelpCircle } from 'lucide-react';
+import { Copy, Check, HelpCircle, RefreshCw } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
@@ -16,6 +16,8 @@ interface OrderIdDisplayProps {
   className?: string;
   showCopyButton?: boolean;
   showHelpText?: boolean;
+  showClearButton?: boolean;
+  onClear?: () => void;
 }
 
 export function OrderIdDisplay({
@@ -23,6 +25,8 @@ export function OrderIdDisplay({
   className,
   showCopyButton = true,
   showHelpText = true,
+  showClearButton = false,
+  onClear,
 }: OrderIdDisplayProps) {
   const [copied, setCopied] = useState(false);
 
@@ -66,6 +70,26 @@ export function OrderIdDisplay({
             <Copy className="h-3.5 w-3.5" />
           )}
         </Button>
+      )}
+
+      {showClearButton && onClear && (
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onClear}
+                className="h-7 w-7 p-0 text-orange-600 hover:text-orange-700 hover:bg-orange-50"
+              >
+                <RefreshCw className="h-3.5 w-3.5" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="bottom">
+              <p className="text-sm">Începe o comandă nouă</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       )}
 
       {showHelpText && (

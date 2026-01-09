@@ -2,9 +2,10 @@
 
 **Feature ID:** FEAT-004
 **Parent Spec:** `docs/technical/specs/user-data-persistence.md`
-**Status:** Ready to Implement
+**Status:** ✅ Partially Implemented (Account Management Complete)
 **Created:** 2026-01-06
-**Priority:** P0 (Next Major Feature)
+**Updated:** 2026-01-08
+**Priority:** P0 (Account Management ✅ | Pre-fill ⏳)
 
 ---
 
@@ -37,16 +38,27 @@ Acest document este ghidul de implementare pentru funcționalitatea "User Data P
 
 | Component | Status | Priority |
 |-----------|--------|----------|
-| `user_saved_data` table | ❌ Missing | P0 |
-| `kyc_verifications` table | ❌ Missing | P0 |
-| `billing_profiles` table | ❌ Missing | P1 |
-| `GET /api/user/prefill-data` | ❌ Missing | P0 |
-| `POST /api/auth/register-from-order` | ❌ Missing | P0 |
-| Pre-fill logic in wizard | ❌ Missing | P0 |
-| SaveDataModal component | ❌ Missing | P0 |
-| KYC "Already Verified" UI | ❌ Missing | P1 |
-| Account data management pages | ❌ Missing | P2 |
-| GDPR export/delete | ❌ Missing | P2 |
+| `user_saved_data` table | ✅ Exists (via migration 015) | P0 |
+| `kyc_verifications` table | ✅ Exists (via migration 015) | P0 |
+| `billing_profiles` table | ✅ Exists (via migration 015) | P1 |
+| `GET /api/user/prefill-data` | ✅ Exists | P0 |
+| `POST /api/auth/register-from-order` | ✅ Exists | P0 |
+| Pre-fill logic in wizard | ⏳ Pending | P0 |
+| SaveDataModal component | ✅ Exists | P0 |
+| KYC "Already Verified" UI | ✅ Implemented in Account KYC Tab | P1 |
+| Account data management pages | ✅ Complete (Profile, KYC, Addresses, Billing) | P2 |
+| GDPR export/delete | ⏳ Pending | P2 |
+
+### Account Management (✅ COMPLETE - 2026-01-08)
+
+| Component | Status | Notes |
+|-----------|--------|-------|
+| Profile Tab | ✅ Complete | ID scan with OCR, auto-fill, save to KYC |
+| KYC Tab | ✅ Complete | Front (required), back (optional), selfie with ID |
+| Addresses Tab | ✅ Complete | Multiple addresses, duplicate prevention |
+| Billing Tab | ✅ Complete | PF/PJ profiles, CNP-based deduplication |
+| IdScanner Component | ✅ Extended | Added `showSelfieWithId` prop |
+| Duplicate Prevention | ✅ Complete | Addresses by (street, number, city), billing by CNP |
 
 ---
 
@@ -830,5 +842,6 @@ Week 3:
 
 ---
 
-**Document Version:** 1.0
-**Last Updated:** 2026-01-06
+**Document Version:** 1.1
+**Last Updated:** 2026-01-08
+**Completed Features:** Account Management (Profile, KYC, Addresses, Billing tabs)

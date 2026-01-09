@@ -1,7 +1,7 @@
 # Documentație eGhiseul.ro
 
-**Ultima actualizare:** 2026-01-07
-**Status proiect:** Sprint 4 (Payments & Contracts)
+**Ultima actualizare:** 2026-01-09
+**Status proiect:** Sprint 4 (Payments & Contracts) - KYC & Profile Complete
 **Fișier principal:** `../DEVELOPMENT_MASTER_PLAN.md`
 
 ---
@@ -41,7 +41,11 @@ docs/
 │   │   ├── service-verification-requirements.md
 │   │   ├── order-autosave-system.md
 │   │   ├── romanian-document-handling.md
-│   │   └── user-data-persistence.md
+│   │   ├── user-data-persistence.md
+│   │   ├── user-data-persistence-implementation.md  ← Implementation details
+│   │   ├── user-data-flow-analysis.md       ← Data flow gaps & fixes
+│   │   ├── security-audit-admin-client.md   ← Security vulnerabilities fixed
+│   │   └── draft-error-recovery.md          ← Error handling & auto-recovery
 │   ├── database/
 │   │   └── database-schema-sprint2.md       ← Schema + Sprint 3-4 addendum
 │   └── technology-decisions-summary.md
@@ -220,12 +224,20 @@ docs/
 ### Protected (Auth Required)
 - `POST /api/orders` - Create order
 - `GET/PATCH /api/orders/[id]` - Order details/update
+- `POST /api/orders/[id]/submit` - Submit draft order
 - `POST /api/orders/[id]/payment` - Create payment
 - `GET/POST/PATCH /api/orders/draft` - Draft CRUD
 - `POST /api/ocr/extract` - OCR extraction
 - `POST /api/kyc/validate` - KYC validation
 - `POST /api/company/validate` - InfoCUI validation
 - `GET /api/user/prefill-data` - User saved data
+- `GET/PATCH /api/user/profile` - User profile with document info
+- `GET /api/user/kyc` - KYC status (verified/partial/unverified)
+- `POST /api/user/kyc/save` - Save KYC document
+- `GET/POST /api/user/addresses` - User addresses
+- `PATCH/DELETE /api/user/addresses/[id]` - Address update/delete
+- `GET/POST /api/user/billing-profiles` - Billing profiles
+- `PATCH/DELETE /api/user/billing-profiles/[id]` - Profile update/delete
 
 ### Admin
 - `GET /api/admin/orders/lookup` - Lookup by order number
@@ -240,6 +252,7 @@ docs/
 | Fișier | Scop |
 |--------|------|
 | `src/providers/modular-wizard-provider.tsx` | State wizard |
+| `src/components/orders/steps-modular/billing-step.tsx` | Billing PF/PJ |
 | `src/lib/verification-modules/step-builder.ts` | Dynamic steps |
 | `src/lib/services/document-ocr.ts` | Gemini OCR |
 | `src/lib/services/kyc-validation.ts` | Gemini KYC |
@@ -251,4 +264,4 @@ docs/
 
 **Pentru tracking dezvoltare:** Vezi [`../DEVELOPMENT_MASTER_PLAN.md`](../DEVELOPMENT_MASTER_PLAN.md)
 
-**Ultima actualizare:** 2026-01-07
+**Ultima actualizare:** 2026-01-09

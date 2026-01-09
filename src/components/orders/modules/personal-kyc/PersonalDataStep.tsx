@@ -35,6 +35,7 @@ import {
   User,
   MapPin,
   Calendar,
+  Shield,
 } from 'lucide-react';
 import type { PersonalKYCConfig, CitizenshipType, DocumentType } from '@/types/verification-modules';
 import { validateCNP, extractBirthDateFromCNP } from '@/lib/validations/cnp';
@@ -136,8 +137,11 @@ const initialScanState: ScanState = {
 };
 
 export default function PersonalDataStep({ config, onValidChange }: PersonalDataStepProps) {
-  const { state, updatePersonalKyc } = useModularWizard();
+  const { state, updatePersonalKyc, isPrefilled, prefillData } = useModularWizard();
   const personalKyc = state.personalKyc;
+
+  // Check if we have valid KYC from user's account
+  const hasValidKycFromAccount = isPrefilled && prefillData?.has_valid_kyc;
 
   const [ciFrontScan, setCiFrontScan] = useState<ScanState>(initialScanState);
   const [ciBackScan, setCiBackScan] = useState<ScanState>(initialScanState);
@@ -459,9 +463,10 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
     if (!personalKyc.birthDate) return false;
 
     // Check document requirements (with defensive checks)
+    // Skip document requirement if user has valid KYC from their account
     const acceptedDocs = config?.acceptedDocuments ?? [];
     const uploadedDocs = personalKyc?.uploadedDocuments ?? [];
-    if (acceptedDocs.length > 0 && uploadedDocs.length === 0) {
+    if (acceptedDocs.length > 0 && uploadedDocs.length === 0 && !hasValidKycFromAccount) {
       return false;
     }
 
@@ -471,7 +476,7 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
     }
 
     return true;
-  }, [personalKyc, config]);
+  }, [personalKyc, config, hasValidKycFromAccount]);
 
   // Notify parent when validity changes
   useEffect(() => {
@@ -627,6 +632,32 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
 
   return (
     <div className="space-y-8">
+      {/* Prefilled Data Banner */}
+      {isPrefilled && (personalKyc?.firstName || personalKyc?.cnp) && (
+        <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-4">
+          <div className="flex gap-3">
+            <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center flex-shrink-0">
+              <CheckCircle className="h-5 w-5 text-green-600" />
+            </div>
+            <div className="flex-1">
+              <p className="font-semibold text-green-800">
+                Date preluate din contul tău
+              </p>
+              <p className="text-sm text-green-700 mt-1">
+                Am completat automat datele din profilul tău salvat.
+                {hasValidKycFromAccount && ' Documentele KYC sunt deja verificate!'}
+              </p>
+              {hasValidKycFromAccount && (
+                <div className="flex items-center gap-2 mt-2 text-xs text-green-600">
+                  <FileCheck className="w-4 h-4" />
+                  KYC verificat - poți sări peste pasul de scanare
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ID Scan Section */}
       {showScanSection && (
         <div className="space-y-4">

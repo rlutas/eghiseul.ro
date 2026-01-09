@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { generateOrderId, validateOrderId } from '@/lib/order-id';
 
 // Draft order data interface (minimal validation, flexible structure)
@@ -51,6 +52,7 @@ function validateDraftData(data: unknown): { valid: boolean; data?: DraftOrderDa
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient();
+    const adminClient = createAdminClient();
 
     // Get user if authenticated (optional for drafts)
     const { data: { user } } = await supabase.auth.getUser();
@@ -92,15 +94,31 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if order with this friendly_order_id already exists (to prevent duplicates)
+    // Use admin client to bypass RLS for guest orders
     if (data.friendly_order_id) {
-      const { data: existingOrder } = await supabase
+      const { data: existingOrder } = await adminClient
         .from('orders')
         .select('id, friendly_order_id, status')
         .eq('friendly_order_id', data.friendly_order_id)
         .single();
 
       if (existingOrder) {
-        // Order already exists - update it instead of creating duplicate
+        // Order already exists - check if it's still a draft
+        if (existingOrder.status !== 'draft') {
+          // Order is no longer a draft - can't update via draft endpoint
+          return NextResponse.json(
+            {
+              success: false,
+              error: {
+                code: 'INVALID_STATUS',
+                message: 'Can only update draft orders',
+              },
+            },
+            { status: 400 }
+          );
+        }
+
+        // Order is a draft - update it instead of creating duplicate
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const updatePayload: any = {
           customer_data: data.customer_data || {},
@@ -114,7 +132,7 @@ export async function POST(request: NextRequest) {
           total_price: data.total_price || 0,
           updated_at: new Date().toISOString(),
         };
-        const { data: updatedOrder, error: updateError } = await supabase
+        const { data: updatedOrder, error: updateError } = await adminClient
           .from('orders')
           .update(updatePayload)
           .eq('id', existingOrder.id)
@@ -178,7 +196,7 @@ export async function POST(request: NextRequest) {
 
     console.log('Attempting to insert draft order with data:', JSON.stringify(insertData, null, 2));
 
-    const { data: order, error: orderError } = await supabase
+    const { data: order, error: orderError } = await adminClient
       .from('orders')
       .insert(insertData)
       .select()
@@ -223,7 +241,7 @@ export async function POST(request: NextRequest) {
           total_price: data.total_price || 0,
           payment_status: 'unpaid',
         };
-        const { data: retryOrder, error: retryError } = await supabase
+        const { data: retryOrder, error: retryError } = await adminClient
           .from('orders')
           .insert(retryInsertData)
           .select()
@@ -312,6 +330,7 @@ export async function POST(request: NextRequest) {
 export async function PATCH(request: NextRequest) {
   try {
     const supabase = await createClient();
+    const adminClient = createAdminClient();
 
     // Get user if authenticated
     const { data: { user } } = await supabase.auth.getUser();
@@ -332,8 +351,8 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
-    // Build query to find the order
-    let query = supabase.from('orders').select('*');
+    // Build query to find the order (use admin client to bypass RLS)
+    let query = adminClient.from('orders').select('*');
 
     if (body.id) {
       query = query.eq('id', body.id);
@@ -356,14 +375,44 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
-    // Verify ownership for authenticated users
-    if (user && existingOrder.user_id && existingOrder.user_id !== user.id) {
+    // SECURITY: Verify ownership for ALL orders (not just authenticated users)
+    const existingCustomerData = existingOrder.customer_data as { contact?: { email?: string } } | null;
+    const existingEmail = existingCustomerData?.contact?.email?.toLowerCase();
+    const requestEmail = (body.customer_data?.contact?.email as string)?.toLowerCase();
+
+    let canUpdate = false;
+
+    if (user && existingOrder.user_id === user.id) {
+      // Authenticated user updating their own order
+      canUpdate = true;
+    } else if (user && !existingOrder.user_id) {
+      // Authenticated user claiming an unclaimed order - allow (will link on save)
+      canUpdate = true;
+    } else if (!user && !existingOrder.user_id) {
+      // Guest updating guest order - verify email matches OR this is the first email entry
+      if (!existingEmail) {
+        // No email stored yet - allow update (first time entering contact)
+        canUpdate = true;
+      } else if (requestEmail && requestEmail === existingEmail) {
+        // Email matches - allow update
+        canUpdate = true;
+      } else {
+        // Email mismatch - deny
+        console.warn(`Draft update denied: email mismatch for order ${existingOrder.friendly_order_id}`);
+        canUpdate = false;
+      }
+    } else if (user && existingOrder.user_id && existingOrder.user_id !== user.id) {
+      // Authenticated user trying to update someone else's order
+      canUpdate = false;
+    }
+
+    if (!canUpdate) {
       return NextResponse.json(
         {
           success: false,
           error: {
             code: 'FORBIDDEN',
-            message: 'You do not have permission to update this order',
+            message: 'Nu ai permisiunea să modifici această comandă',
           },
         },
         { status: 403 }
@@ -422,8 +471,8 @@ export async function PATCH(request: NextRequest) {
       updateData.user_id = user.id;
     }
 
-    // Update the order
-    const { data: order, error: updateError } = await supabase
+    // Update the order (use admin client to bypass RLS)
+    const { data: order, error: updateError } = await adminClient
       .from('orders')
       .update(updateData)
       .eq('id', existingOrder.id)
@@ -484,6 +533,7 @@ export async function PATCH(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     const supabase = await createClient();
+    const adminClient = createAdminClient();
 
     const { searchParams } = new URL(request.url);
     const friendlyOrderId = searchParams.get('id');
@@ -505,8 +555,8 @@ export async function GET(request: NextRequest) {
     // Get user if authenticated
     const { data: { user } } = await supabase.auth.getUser();
 
-    // Fetch the order
-    const { data: order, error: orderError } = await supabase
+    // Fetch the order (use admin client to bypass RLS for guest orders)
+    const { data: order, error: orderError } = await adminClient
       .from('orders')
       .select(`
         *,
@@ -535,13 +585,33 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Verify ownership
+    // Verify ownership - SECURITY: Must verify identity for all orders
     // Cast customer_data to expected shape for type checking
     const customerData = order.customer_data as { contact?: { email?: string } } | null;
-    const isOwner =
-      (user && order.user_id === user.id) ||
-      (email && customerData?.contact?.email === email) ||
-      (!order.user_id && !customerData?.contact?.email);
+    const orderEmail = customerData?.contact?.email?.toLowerCase();
+
+    // Ownership rules:
+    // 1. Authenticated user owns their orders (user_id matches)
+    // 2. Guest with email can access orders with matching email
+    // 3. Orders without email require the request to include a matching email
+    //    (prevents IDOR attack where anyone can access orders by guessing ID)
+
+    let isOwner = false;
+
+    if (user && order.user_id === user.id) {
+      // Authenticated user accessing their own order
+      isOwner = true;
+    } else if (orderEmail && email && email.toLowerCase() === orderEmail) {
+      // Guest accessing order with matching email
+      isOwner = true;
+    } else if (!order.user_id && !orderEmail) {
+      // Order has no owner info - this is a fresh draft
+      // SECURITY: Deny access unless this is the original session
+      // The client should store order ID locally and handle recreation
+      // Returning 403 prevents IDOR attacks
+      console.warn(`Draft access denied: order ${order.friendly_order_id} has no ownership info`);
+      isOwner = false;
+    }
 
     if (!isOwner) {
       return NextResponse.json(
@@ -549,7 +619,7 @@ export async function GET(request: NextRequest) {
           success: false,
           error: {
             code: 'FORBIDDEN',
-            message: 'You do not have permission to view this order',
+            message: 'Email requis pentru a accesa comanda. Verifică datele și încearcă din nou.',
           },
         },
         { status: 403 }

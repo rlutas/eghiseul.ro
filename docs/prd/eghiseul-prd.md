@@ -1,10 +1,11 @@
 # eGhiseul.ro - Product Requirements Document
 
-**Version:** 2.0
-**Date:** 7 Ianuarie 2026
+**Version:** 2.1
+**Date:** 8 Ianuarie 2026
 **Author:** Product Team
 
 > **Update History:**
+> - v2.1 (2026-01-08): User account management complete (Profile, KYC, Addresses, Billing tabs), selfie with ID flow
 > - v2.0 (2026-01-07): Updated tech stack (Google Gemini for OCR/KYC), modular wizard architecture
 > - v1.0 (2024-12-15): Initial PRD
 
@@ -147,14 +148,21 @@ eGhiseul.ro este o platforma digitala care simplifica accesul la documente si se
 
 | ID | Requirement | Priority | Status |
 |----|-------------|----------|--------|
-| FR-2.1 | Upload act identitate (CI/Pasaport) - max 2 fisiere | P0 | ✅ Done |
-| FR-2.2 | Upload selfie cu document in mana | P0 | ✅ Done |
+| FR-2.1 | Upload act identitate (CI/Pasaport) față - obligatoriu | P0 | ✅ Done |
+| FR-2.1b | Upload act identitate spate - opțional pentru CI nou | P0 | ✅ Done |
+| FR-2.2 | Upload selfie cu actul de identitate în mână vizibil | P0 | ✅ Done |
 | FR-2.3 | Semnatura electronica (canvas) | P0 | ✅ Done |
 | FR-2.4 | Upload documente suplimentare (permis auto, acte parinti) | P0 | ✅ Done |
 | FR-2.5 | Validare format si marime fisiere | P0 | ✅ Done |
 | FR-2.6 | Stocare securizata documente (S3 encrypted) | P0 | ⏳ Sprint 4 |
 | FR-2.7 | Face matching între ID și selfie | P0 | ✅ Done |
 | FR-2.8 | Confidence scores pentru validare | P0 | ✅ Done |
+
+**KYC Flow Details (2026-01-08):**
+- **Step 1:** Fotografiază fața actului de identitate (obligatoriu)
+- **Step 2:** Fotografiază spatele actului (opțional - pentru CI cu NFC)
+- **Step 3:** Realizează un selfie ținând actul în mână vizibil
+- **AI Validation:** Face matching între selfie și fotografia din act
 
 ### FR-3: Plati si facturare (P0)
 
@@ -256,15 +264,24 @@ eGhiseul.ro este o platforma digitala care simplifica accesul la documente si se
 | FR-11.7 | MRZ extraction din Pasaport | P0 | ✅ Done |
 | FR-11.8 | Cross-validation CI + Certificat Atestare Domiciliu | P0 | ✅ Done |
 
-### FR-12: KYC Persistent (P0)
+### FR-12: KYC Persistent (P0) ✅ IMPLEMENTED
 
-| ID | Requirement | Priority |
-|----|-------------|----------|
-| FR-12.1 | KYC salvat in cont utilizator | P0 |
-| FR-12.2 | Valabilitate KYC: 180 zile | P0 |
-| FR-12.3 | Skip KYC daca valid la comanda noua | P0 |
-| FR-12.4 | Notificare expirare KYC | P1 |
-| FR-12.5 | Re-verificare KYC la expirare | P1 |
+> **Implementation:** User account management with KYC tab
+> See `src/components/account/KYCTab.tsx` for implementation.
+
+| ID | Requirement | Priority | Status |
+|----|-------------|----------|--------|
+| FR-12.1 | KYC salvat in cont utilizator | P0 | ✅ Done |
+| FR-12.2 | Valabilitate KYC: 90 zile | P0 | ✅ Done |
+| FR-12.3 | Skip KYC daca valid la comanda noua | P0 | ✅ Done |
+| FR-12.4 | Notificare expirare KYC (30 zile înainte) | P1 | ✅ Done |
+| FR-12.5 | Re-verificare KYC la expirare | P1 | ✅ Done |
+
+**Account Management Features (2026-01-08):**
+- **Profile Tab:** ID scan with OCR auto-fill, save to KYC
+- **KYC Tab:** View verification status, documents, expiry
+- **Addresses Tab:** Multiple addresses with deduplication
+- **Billing Tab:** PF/PJ profiles with CNP-based deduplication
 
 ### FR-13: SMS Notificari (P1)
 
