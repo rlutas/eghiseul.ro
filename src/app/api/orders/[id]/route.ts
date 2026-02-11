@@ -1,6 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 
+// Calculate business days (skip weekends)
+function addBusinessDays(startDate: Date, days: number): Date {
+  const result = new Date(startDate)
+
+  // Start from next business day
+  result.setDate(result.getDate() + 1)
+  while (result.getDay() === 0 || result.getDay() === 6) {
+    result.setDate(result.getDate() + 1)
+  }
+
+  // Add business days
+  let addedDays = 0
+  while (addedDays < days) {
+    result.setDate(result.getDate() + 1)
+    // Skip weekends (0 = Sunday, 6 = Saturday)
+    if (result.getDay() !== 0 && result.getDay() !== 6) {
+      addedDays++
+    }
+  }
+
+  return result
+}
+
 interface RouteParams {
   params: Promise<{ id: string }>
 }
@@ -79,14 +102,36 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       )
     }
 
-    // Calculate estimated completion
+    // Fetch order history for timeline
+    const { data: history } = await supabase
+      .from('order_history')
+      .select('id, event_type, notes, new_value, created_at')
+      .eq('order_id', order.id)
+      .order('created_at', { ascending: true })
+
+    // Calculate estimated completion using business days
     const createdAt = order.created_at ? new Date(order.created_at) : new Date()
-    const estimatedDays = order.services?.estimated_days || 5
-    const estimatedCompletion = new Date(createdAt.getTime() + estimatedDays * 24 * 60 * 60 * 1000)
+    const baseServiceDays = order.services?.estimated_days || 5
+
+    // Check if order has urgent processing option
+    const hasUrgent = (order.selected_options as Array<{ option_name?: string }> || [])
+      .some(opt => opt.option_name?.toLowerCase().includes('urgent'))
+
+    // Urgent reduces processing time, but add buffer for safety
+    const processingDays = hasUrgent ? Math.max(2, Math.ceil(baseServiceDays / 2)) : baseServiceDays
+    const bufferDays = 2 // Add 2 days buffer for safety
+    const totalBusinessDays = processingDays + bufferDays
+
+    // Calculate estimated completion with business days only
+    const estimatedCompletion = addBusinessDays(createdAt, totalBusinessDays)
+
+    // Use friendly_order_id from DB if available, otherwise construct from order_number
+    const displayOrderNumber = order.friendly_order_id ||
+      `ORD-${createdAt.getFullYear()}-${String(order.order_number).padStart(7, '0')}`
 
     const transformedOrder = {
       id: order.id,
-      orderNumber: `ORD-${createdAt.getFullYear()}-${String(order.order_number).padStart(7, '0')}`,
+      orderNumber: displayOrderNumber,
       userId: order.user_id,
       service: order.services ? {
         id: order.services.id,
@@ -120,10 +165,61 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       internalNotes: order.internal_status_notes || null
     }
 
+    // Build timeline from history - extract status from new_value when available
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const timeline = (history || []).map((h: any) => {
+      const newValue = h.new_value as { status?: string; payment_status?: string } | null
+
+      // Determine status to show based on event type
+      let status = newValue?.status || h.event_type
+      if (h.event_type === 'payment_confirmed') {
+        status = 'payment_confirmed'
+      } else if (h.event_type === 'order_created' || h.event_type === 'draft_created') {
+        status = 'order_created'
+      }
+
+      return {
+        id: h.id,
+        status,
+        event: h.event_type,
+        note: h.notes,
+        createdAt: h.created_at,
+      }
+    })
+
+    // Add initial order creation if not in timeline
+    if (timeline.length === 0 || !timeline.find(t => t.event === 'order_created' || t.event === 'draft_created')) {
+      timeline.unshift({
+        id: 'initial',
+        status: 'order_created',
+        event: 'order_created',
+        note: 'Comanda a fost plasată',
+        createdAt: order.created_at,
+      })
+    }
+
+    // Add payment confirmed if paid but not in timeline
+    if (order.payment_status === 'paid' && !timeline.find(t => t.event === 'payment_confirmed')) {
+      const insertIndex = timeline.findIndex(t => t.event !== 'order_created' && t.event !== 'draft_created')
+      const paymentEvent = {
+        id: 'payment',
+        status: 'payment_confirmed',
+        event: 'payment_confirmed',
+        note: 'Plata a fost confirmată',
+        createdAt: order.updated_at || order.created_at,
+      }
+      if (insertIndex === -1) {
+        timeline.push(paymentEvent)
+      } else {
+        timeline.splice(insertIndex, 0, paymentEvent)
+      }
+    }
+
     return NextResponse.json({
       success: true,
       data: {
-        order: transformedOrder
+        order: transformedOrder,
+        timeline
       }
     })
   } catch (error) {

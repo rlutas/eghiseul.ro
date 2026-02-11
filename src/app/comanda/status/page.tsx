@@ -27,17 +27,39 @@ import {
   Home,
 } from 'lucide-react';
 
-// Order status mapping
+// Order status mapping - complete workflow
 const STATUS_CONFIG: Record<string, { label: string; color: string; icon: typeof Clock }> = {
+  // Order lifecycle
+  order_created: { label: 'Comandă plasată', color: 'bg-blue-100 text-blue-800', icon: FileText },
   draft: { label: 'Ciornă', color: 'bg-gray-100 text-gray-800', icon: FileText },
+  pending: { label: 'În așteptarea plății', color: 'bg-yellow-100 text-yellow-800', icon: CreditCard },
   pending_payment: { label: 'În așteptarea plății', color: 'bg-yellow-100 text-yellow-800', icon: CreditCard },
+
+  // Payment statuses
+  payment_confirmed: { label: 'Plată confirmată', color: 'bg-green-100 text-green-800', icon: CheckCircle },
   payment_received: { label: 'Plată primită', color: 'bg-green-100 text-green-800', icon: CheckCircle },
+
+  // Processing workflow
   processing: { label: 'În procesare', color: 'bg-blue-100 text-blue-800', icon: Package },
   pending_documents: { label: 'Așteptăm documente', color: 'bg-orange-100 text-orange-800', icon: FileText },
-  submitted: { label: 'Trimis la autorități', color: 'bg-indigo-100 text-indigo-800', icon: Truck },
+  documents_prepared: { label: 'Documente pregătite', color: 'bg-indigo-100 text-indigo-800', icon: FileText },
+  submitted_to_authority: { label: 'Depus la autorități', color: 'bg-indigo-100 text-indigo-800', icon: Truck },
+  at_authority: { label: 'La autorități', color: 'bg-purple-100 text-purple-800', icon: Clock },
+  released: { label: 'Eliberat de autorități', color: 'bg-teal-100 text-teal-800', icon: CheckCircle },
+  at_translation: { label: 'La traducere', color: 'bg-cyan-100 text-cyan-800', icon: FileText },
+  translation_complete: { label: 'Traducere finalizată', color: 'bg-cyan-100 text-cyan-800', icon: CheckCircle },
+  ready_for_delivery: { label: 'Pregătit pentru livrare', color: 'bg-emerald-100 text-emerald-800', icon: Package },
+  shipped: { label: 'Expediat', color: 'bg-blue-100 text-blue-800', icon: Truck },
+  delivered: { label: 'Livrat', color: 'bg-green-100 text-green-800', icon: CheckCircle },
+
+  // Final statuses
   completed: { label: 'Finalizat', color: 'bg-green-100 text-green-800', icon: CheckCircle },
   cancelled: { label: 'Anulat', color: 'bg-red-100 text-red-800', icon: AlertCircle },
   refunded: { label: 'Rambursat', color: 'bg-gray-100 text-gray-800', icon: CreditCard },
+
+  // Legacy/fallback
+  submitted: { label: 'Trimis la autorități', color: 'bg-indigo-100 text-indigo-800', icon: Truck },
+  status_changed: { label: 'Status actualizat', color: 'bg-gray-100 text-gray-800', icon: Clock },
 };
 
 interface OrderData {
@@ -65,6 +87,7 @@ interface OrderData {
   };
   timeline: Array<{
     status: string;
+    event: string;
     note: string | null;
     createdAt: string;
   }>;
@@ -179,7 +202,7 @@ function OrderStatusContent() {
                   id="orderCode"
                   value={orderCode}
                   onChange={(e) => setOrderCode(e.target.value.toUpperCase())}
-                  placeholder="ORD-20260107-XXXXX"
+                  placeholder="E-260112-XXXXX"
                   disabled={isLoading}
                 />
               </div>
@@ -233,8 +256,28 @@ function OrderStatusContent() {
                     {orderData.orderCode}
                   </CardTitle>
                 </div>
-                <div className={`px-3 py-1.5 rounded-full text-sm font-medium ${getStatusConfig(orderData.status).color}`}>
-                  {getStatusConfig(orderData.status).label}
+                <div className="flex flex-col items-end gap-2">
+                  {/* Payment Status Badge */}
+                  {orderData.paymentStatus === 'paid' ? (
+                    <div className="px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 flex items-center gap-1">
+                      <CheckCircle className="h-3 w-3" />
+                      Plată confirmată
+                    </div>
+                  ) : orderData.paymentStatus === 'awaiting_verification' ? (
+                    <div className="px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 flex items-center gap-1">
+                      <Clock className="h-3 w-3" />
+                      Verificare plată
+                    </div>
+                  ) : orderData.paymentStatus !== 'paid' && (
+                    <div className="px-3 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800 flex items-center gap-1">
+                      <CreditCard className="h-3 w-3" />
+                      Neplătit
+                    </div>
+                  )}
+                  {/* Order Status Badge */}
+                  <div className={`px-3 py-1.5 rounded-full text-sm font-medium ${getStatusConfig(orderData.status).color}`}>
+                    {getStatusConfig(orderData.status).label}
+                  </div>
                 </div>
               </div>
             </CardHeader>

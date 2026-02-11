@@ -1220,7 +1220,7 @@ Create or update draft order.
 
 ---
 
-### 10. Company Validation (InfoCUI)
+### 10. Company Validation (ANAF API)
 
 Validate Romanian company CUI and retrieve company data.
 
@@ -1381,7 +1381,7 @@ Create account from completed order (guest checkout conversion).
 
 ### v1.1.0 (2026-01-07)
 - Added draft order endpoints
-- Added company validation (InfoCUI)
+- Added company validation (ANAF API)
 - Added user prefill data endpoint
 - Added admin endpoints (lookup, list, cleanup)
 - Added register-from-order endpoint

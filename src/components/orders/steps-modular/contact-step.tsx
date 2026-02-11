@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Mail, Phone, MessageCircle } from 'lucide-react';
+import { Mail, Phone, MessageCircle, CheckCircle, Pencil, User } from 'lucide-react';
 import {
   Form,
   FormControl,
@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Button } from '@/components/ui/button';
 import { useModularWizard } from '@/providers/modular-wizard-provider';
 
 const contactSchema = z.object({
@@ -35,14 +36,48 @@ interface ContactStepProps {
   onValidChange: (valid: boolean) => void;
 }
 
+// Helper to format phone from various formats to +40 7XX XXX XXX
+function formatPhoneForDisplay(phone: string | undefined): string {
+  if (!phone) return '+40 ';
+
+  const digits = phone.replace(/\D/g, '');
+
+  // Handle Romanian phone numbers
+  if (digits.startsWith('40') && digits.length >= 11) {
+    // Already has country code: 40712345678
+    return '+' + digits.slice(0, 2) + ' ' + digits.slice(2, 5) + ' ' + digits.slice(5, 8) + ' ' + digits.slice(8, 11);
+  } else if (digits.startsWith('07') && digits.length === 10) {
+    // Local format: 0712345678
+    return '+40 ' + digits.slice(1, 4) + ' ' + digits.slice(4, 7) + ' ' + digits.slice(7, 10);
+  } else if (digits.startsWith('7') && digits.length === 9) {
+    // Without 0: 712345678
+    return '+40 ' + digits.slice(0, 3) + ' ' + digits.slice(3, 6) + ' ' + digits.slice(6, 9);
+  }
+
+  // Fallback: just format what we have
+  if (digits.length >= 2) {
+    return '+' + digits.slice(0, 2) + ' ' + (digits.length > 2 ? digits.slice(2) : '');
+  }
+
+  return '+40 ';
+}
+
 export function ContactStepModular({ onValidChange }: ContactStepProps) {
-  const { state, updateContact } = useModularWizard();
+  const { state, updateContact, isPrefilled } = useModularWizard();
+  const [showEditMode, setShowEditMode] = useState(false);
+
+  // Check if we have valid prefilled contact data
+  const formattedPhone = formatPhoneForDisplay(state.contact.phone);
+  const hasValidPrefilledData = isPrefilled &&
+    state.contact.email &&
+    state.contact.email.includes('@') &&
+    formattedPhone.length >= 15; // +40 7XX XXX XXX = 16 chars
 
   const form = useForm<ContactFormData>({
     resolver: zodResolver(contactSchema),
     defaultValues: {
       email: state.contact.email || '',
-      phone: state.contact.phone || '+40 ',
+      phone: formattedPhone,
       preferredContact: state.contact.preferredContact || 'email',
     },
     mode: 'onChange',
@@ -50,10 +85,14 @@ export function ContactStepModular({ onValidChange }: ContactStepProps) {
 
   const { isValid } = form.formState;
 
-  // Update parent validity
+  // Update parent validity - if prefilled and valid, mark as valid immediately
   useEffect(() => {
-    onValidChange(isValid);
-  }, [isValid, onValidChange]);
+    if (hasValidPrefilledData && !showEditMode) {
+      onValidChange(true);
+    } else {
+      onValidChange(isValid);
+    }
+  }, [isValid, onValidChange, hasValidPrefilledData, showEditMode]);
 
   // Update context when form changes
   useEffect(() => {
@@ -75,6 +114,80 @@ export function ContactStepModular({ onValidChange }: ContactStepProps) {
     if (digits.length <= 8) return '+' + digits.slice(0, 2) + ' ' + digits.slice(2, 5) + ' ' + digits.slice(5);
     return '+' + digits.slice(0, 2) + ' ' + digits.slice(2, 5) + ' ' + digits.slice(5, 8) + ' ' + digits.slice(8, 11);
   };
+
+  // Compact prefilled view
+  if (hasValidPrefilledData && !showEditMode) {
+    return (
+      <div className="space-y-6">
+        {/* Prefilled Banner */}
+        <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-4">
+          <div className="flex gap-3">
+            <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center flex-shrink-0">
+              <CheckCircle className="h-5 w-5 text-green-600" />
+            </div>
+            <div className="flex-1">
+              <p className="font-semibold text-green-800">
+                Date preluate din contul tău
+              </p>
+              <p className="text-sm text-green-700 mt-1">
+                Te vom contacta pe datele de mai jos. Poți continua sau modifica dacă e nevoie.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Contact Summary Card */}
+        <div className="bg-white border border-neutral-200 rounded-xl p-6 space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="font-semibold text-secondary-900 flex items-center gap-2">
+              <User className="w-5 h-5 text-primary-500" />
+              Date de Contact
+            </h3>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setShowEditMode(true)}
+            >
+              <Pencil className="w-4 h-4 mr-2" />
+              Modifică
+            </Button>
+          </div>
+
+          <div className="grid gap-4">
+            <div className="flex items-center gap-3 p-3 bg-neutral-50 rounded-lg">
+              <Mail className="w-5 h-5 text-primary-500" />
+              <div>
+                <p className="text-sm text-neutral-500">Email</p>
+                <p className="font-medium text-secondary-900">{state.contact.email}</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 p-3 bg-neutral-50 rounded-lg">
+              <Phone className="w-5 h-5 text-primary-500" />
+              <div>
+                <p className="text-sm text-neutral-500">Telefon</p>
+                <p className="font-medium text-secondary-900">{formattedPhone}</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 p-3 bg-neutral-50 rounded-lg">
+              <MessageCircle className="w-5 h-5 text-primary-500" />
+              <div>
+                <p className="text-sm text-neutral-500">Metoda preferată</p>
+                <p className="font-medium text-secondary-900 capitalize">
+                  {state.contact.preferredContact === 'email' ? 'Email' :
+                   state.contact.preferredContact === 'phone' ? 'Telefon' :
+                   state.contact.preferredContact === 'whatsapp' ? 'WhatsApp' :
+                   'Email'}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <Form {...form}>

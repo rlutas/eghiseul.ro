@@ -157,7 +157,7 @@ Serviciu de obținere extras de carte funciară online pentru imobile din Român
 |------|-----|-------------|----------|
 | tip_client | enum | Da | PF / PJ |
 | nume_prenume | string | Da (PF) | - |
-| cui | string | Da (PJ) | Validare infocui.ro |
+| cui | string | Da (PJ) | Validare ANAF API |
 | nume_firma | string | Da (PJ) | Auto-completat |
 | adresa_facturare | object | Da | Adresă completă |
 
@@ -183,7 +183,7 @@ Serviciu de obținere extras de carte funciară online pentru imobile din Român
 
 1. **Localități condiționale**: Lista de localități se încarcă bazat pe județul selectat
 2. **Identificare imobil**: Serviciile de identificare pot dura până la 5 zile lucrătoare
-3. **CUI auto-completare**: La introducere CUI se preiau automat datele firmei (infocui.ro)
+3. **CUI auto-completare**: La introducere CUI se preiau automat datele firmei (ANAF API)
 4. **Urgență**: Disponibilă doar pentru extras standard (nu pentru identificare)
 5. **WhatsApp delivery**: Opțional, documentul se trimite și pe WhatsApp
 6. **Extras suplimentar**: Permite comandarea a 2 extrase în aceeași comandă
@@ -203,7 +203,7 @@ Serviciu de obținere extras de carte funciară online pentru imobile din Român
 |--------|------|
 | Stripe | Procesare plată |
 | Olbio | Emitere factură |
-| infocui.ro | Validare CUI |
+| ANAF API | Validare CUI |
 | ANCPI / e-Terra | Obținere extras CF |
 | WhatsApp API | Livrare opțională |
 | Email | Confirmare + livrare |

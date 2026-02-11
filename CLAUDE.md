@@ -70,9 +70,11 @@ Storage:    AWS S3 (contracts, KYC documents, eu-central-1)
 AI/OCR:     Google Gemini 2.0 Flash Exp (document extraction)
 AI/KYC:     Google Gemini 1.5 Flash (face matching, validation)
 Payments:   Stripe (card, Apple Pay, Google Pay)
+Company:    ANAF API (free, official CUI validation)
+Courier:    Fan Courier (RO domestic) ✅ + Sameday (RO domestic, awaiting credentials) ⚠️
 SMS:        SMSLink.ro (provider românesc)
 Email:      Resend
-Invoicing:  SmartBill (e-factura compliant)
+Invoicing:  Oblio (e-factura compliant)
 ```
 
 ---
@@ -110,18 +112,25 @@ Invoicing:  SmartBill (e-factura compliant)
 - **Features**: Document validation, face matching, confidence scores
 - **Docs**: `docs/technical/api/ocr-kyc-api.md`
 
+#### Dual Profile System (PF + PJ)
+- **Files**: `src/components/account/ProfileTab.tsx`, `src/components/account/CompanyProfileSection.tsx`
+- **Features**: PF/PJ sub-tabs in account profile, company profile CRUD, company KYC document upload
+- **API Changes**: `/api/user/profile` returns company data, `/api/user/prefill-data` returns company + billing_profiles, `/api/user/kyc/save` accepts PJ doc types
+- **Wizard**: Company data auto-prefills from saved profile in modular wizard
+
 #### Order Wizard - Modular System (ACTIVE)
 - **URL**: `/comanda/[service-slug]` (ex: `/comanda/cazier-fiscal`)
 - **Provider**: `src/providers/modular-wizard-provider.tsx`
 - **Main Component**: `src/components/orders/modular-order-wizard.tsx`
 - **Architecture**: Dynamic step builder based on service `verification_config` (JSONB)
-- **Core Steps**: Contact → [Dynamic Modules] → Options → Delivery → Review
+- **Core Steps**: Contact → [Dynamic Modules (e.g. company-data → company-documents)] → Options → Delivery → Review
 - **Available Modules**:
   - `client-type`: PF/PJ selection
   - `personal-data`: Personal KYC (name, CNP, address)
-  - `company-data`: Company KYC (CUI validation via InfoCUI)
+  - `company-data`: Company KYC (CUI validation via ANAF API)
   - `property-data`: Property data (Carte Funciară)
   - `vehicle-data`: Vehicle data (Rovinieta)
+  - `company-documents`: Company document upload (Cert. Inregistrare, Cert. Constatator)
   - `kyc-documents`: Document upload + OCR
   - `signature`: Electronic signature canvas
 - **Key Files**:
@@ -129,6 +138,7 @@ Invoicing:  SmartBill (e-factura compliant)
   - `src/lib/verification-modules/step-builder.ts` - Dynamic step generation
   - `src/lib/verification-modules/registry.ts` - Module component mapping
   - `src/components/orders/modules/` - Module implementations
+  - `src/components/orders/modules/company-kyc/CompanyDocumentsStep.tsx` - PJ document upload
   - `src/components/orders/steps-modular/` - Core steps (contact, options, delivery, review)
 - **Docs**: `docs/technical/specs/modular-wizard-guide.md` (HOW TO ADD NEW SERVICES)
 
@@ -139,25 +149,51 @@ Invoicing:  SmartBill (e-factura compliant)
 
 ### Completed (Sprint 3) ✅
 
-- [x] Order auto-save with order ID (ORD-YYYYMMDD-XXXXX format)
+- [x] Order auto-save with order ID (E-YYMMDD-XXXXX format, 14 chars)
 - [x] Romanian document handling (CI vechi, CI nou, Passport)
 - [x] Certificat Atestare Domiciliu support
 - [x] Document expiry validation
 - [x] GDPR auto-cleanup (7-day draft anonymization)
 - [x] Modular Verification System (dynamic wizard based on service config)
-- [x] InfoCUI company validation integration
+- [x] ANAF API company validation integration (free, official)
 
-### In Progress (Sprint 4)
+### In Progress (Sprint 4) - 85% Complete
+
+> **Note:** Sprint progress reflects functional features. Additional work needed:
+> - Comprehensive testing (E2E, edge cases)
+> - Error handling improvements
+> - UI polish and UX refinements
+> - Performance optimization
+> - Security hardening
 
 - [x] S3 document upload ✅ (see AWS S3 section below)
 - [x] Order submission API (`/api/orders/[id]/submit`) ✅
-- [ ] Stripe payment flow completion
+- [x] Stripe payment checkout UI ✅ (PaymentElement with Apple/Google Pay)
 - [x] User data persistence (save for logged users) ✅
 - [x] Account creation offer at order end (SaveDataModal for guests) ✅
-- [ ] Bank transfer payment option
+- [x] Bank transfer payment option ✅ (with proof upload)
 - [x] User orders dashboard (Account page OrdersTab) ✅
 - [x] KYC verification logic (requires ID + selfie for complete) ✅
 - [x] Profile document info display (series, number, type, expiry) ✅
+- [x] Profile/KYC data sync (hide scanner when KYC exists) ✅
+- [x] Duplicate prevention for addresses/billing profiles ✅
+- [ ] Oblio invoicing integration (automatic after payment)
+- [x] Admin payment verification endpoint ✅
+- [x] Order timeline in account page ✅ (same as public status page)
+- [x] Estimated delivery with business days calculation ✅ (skips weekends, +2 day buffer)
+- [x] Stripe billing address fix ✅ (PF/PJ address now sent correctly)
+- [x] Wizard reset after order completion ✅ (clears localStorage + verifies draft status)
+- [x] GA4 purchase tracking ✅ (on payment success)
+- [x] Dual Profile System (PF + PJ) ✅ (CompanyProfileSection, PF/PJ sub-tabs in ProfileTab, wizard prefill)
+- [x] ANAF API real integration ✅ (fixed ECONNRESET, uses https module for GET)
+- [x] Company document upload step for PJ orders ✅ (company-documents wizard module)
+- [x] File upload fix for macOS ✅ (hidden input + ref.click() pattern across all upload components)
+- [x] Sameday courier integration (code complete, awaiting API credentials) ✅
+- [x] Multi-provider delivery UI (Fan Courier + Sameday side-by-side) ✅
+- [x] Locker selector redesign (scrollable card list with distance sorting) ✅
+- [x] Delivery timing note (documents issued before shipping) ✅
+- [x] Delivery state persistence across wizard navigation ✅
+- [ ] Email notifications (payment confirmation, invoice)
 
 ---
 
@@ -174,7 +210,8 @@ docs/
 │   │   ├── order-autosave-system.md       # Auto-save & support system
 │   │   ├── romanian-document-handling.md  # CI/Passport/Certificate handling
 │   │   ├── modular-verification-architecture.md  # Modular wizard system
-│   │   └── service-verification-requirements.md  # Service requirements matrix
+│   │   ├── service-verification-requirements.md  # Service requirements matrix
+│   │   └── delivery-system-architecture.md       # Courier integration & delivery (NEW)
 │   ├── debugging/
 │   │   ├── draft-save-500-error-fix.md    # Draft save error debugging
 │   │   ├── APPLY_MIGRATION_013.md         # Migration guide
@@ -319,7 +356,7 @@ docs/
 
 ### Phase 3: KYC & Documents ✅ COMPLETE
 **Completed agents**: ui-designer, api-documenter, feature-spec-writer, system-designer
-**Output**: OCR, KYC validation, modular wizard system, InfoCUI integration, security hardening
+**Output**: OCR, KYC validation, modular wizard system, ANAF company validation, security hardening
 
 ### Phase 4: Payments & Contracts ⏳ IN PROGRESS
 **Active agents**: stripe-expert, payment-integration, performance-optimizer
@@ -362,13 +399,16 @@ docs/
 | `/api/orders` | GET, POST | List/Create orders |
 | `/api/orders/[id]` | GET, PATCH | Order details/update |
 | `/api/orders/[id]/submit` | POST | Submit draft order (draft → pending) |
-| `/api/orders/[id]/payment` | POST | Create payment intent |
+| `/api/orders/[id]/payment` | POST | Create Stripe payment intent |
+| `/api/orders/[id]/confirm-payment` | POST | Manual payment confirmation (webhook fallback) |
+| `/api/orders/[id]/bank-transfer` | POST | Submit bank transfer proof |
 | `/api/orders/draft` | GET, POST, PATCH | Draft order CRUD |
 | `/api/ocr/extract` | POST | Extract data from ID |
 | `/api/kyc/validate` | POST | Validate KYC documents |
-| `/api/user/profile` | GET, PATCH | User profile with document info |
+| `/api/user/profile` | GET, PATCH | User profile with document info + company profile data (PF/PJ) |
+| `/api/user/prefill-data` | GET | Prefill data for wizard (includes company data + billing_profiles) |
 | `/api/user/kyc` | GET | KYC status (verified/partial/unverified) |
-| `/api/user/kyc/save` | POST | Save KYC document |
+| `/api/user/kyc/save` | POST | Save KYC document (PF: ci_front/ci_back/selfie, PJ: company_registration_cert/company_statement_cert) |
 | `/api/user/addresses` | GET, POST | User addresses CRUD |
 | `/api/user/addresses/[id]` | PATCH, DELETE | Address update/delete |
 | `/api/user/billing-profiles` | GET, POST | Billing profiles CRUD |
@@ -377,11 +417,24 @@ docs/
 | `/api/upload` | GET | S3 configuration health check |
 | `/api/upload/download` | GET | Get presigned S3 download URL |
 
+### Courier Endpoints (NEW)
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/courier/quote` | GET | Get shipping quotes (Fan Courier, etc.) |
+| `/api/courier/localities` | GET | Get counties/cities for autocomplete |
+| `/api/courier/localities` | POST | Validate address |
+| `/api/courier/streets` | GET | Get streets for locality (autocomplete) |
+| `/api/courier/pickup-points` | GET | Get FANbox/EasyBox locker locations |
+| `/api/courier/track` | GET | Track shipment by AWB |
+| `/api/courier/track` | POST | Track multiple AWBs |
+| `/api/courier/ship` | POST | Create shipment (generate AWB) |
+
 ### Admin Endpoints
 | Endpoint | Method | Description |
 |----------|--------|-------------|
 | `/api/admin/orders/lookup` | GET | Lookup order by ID |
 | `/api/admin/orders/list` | GET | List orders by status |
+| `/api/admin/orders/[id]/verify-payment` | POST | Verify bank transfer payment |
 | `/api/admin/cleanup` | GET, POST | GDPR cleanup status/run |
 
 ### Webhooks
@@ -554,9 +607,11 @@ All documents (KYC, contracts, orders, invoices) are stored in AWS S3 with presi
 ```
 eghiseul-documents/
 ├── kyc/{user_id}/{verification_id}/      # KYC documents (90 day validity)
-│   ├── ci_front.jpg
-│   ├── ci_back.jpg
-│   └── selfie.jpg
+│   ├── ci_front.jpg                     # PF: ID card front
+│   ├── ci_back.jpg                      # PF: ID card back
+│   ├── selfie.jpg                       # PF: face match selfie
+│   ├── company_registration_cert.pdf    # PJ: certificat inregistrare
+│   └── company_statement_cert.pdf       # PJ: certificat constatator
 ├── orders/{year}/{month}/{order_id}/     # Order documents
 │   ├── uploads/
 │   └── signature/
@@ -625,13 +680,31 @@ AWS_ACCESS_KEY_ID=           # IAM user credentials
 AWS_SECRET_ACCESS_KEY=       # IAM user credentials
 AWS_S3_BUCKET_DOCUMENTS=eghiseul-documents
 
+# Required - Fan Courier (for domestic shipping)
+FANCOURIER_USERNAME=         # selfAWB login username
+FANCOURIER_PASSWORD=         # Must quote if contains # character
+FANCOURIER_CLIENT_ID=        # Client ID from /reports/branches
+
+# Required - Sameday (for domestic shipping) - awaiting valid credentials
+SAMEDAY_USERNAME=            # API client username
+SAMEDAY_PASSWORD=            # API client password
+SAMEDAY_USE_DEMO=false       # true = demo API
+
+# Required - Oblio (for invoicing)
+OBLIO_CLIENT_ID=             # Oblio account email
+OBLIO_CLIENT_SECRET=         # API key from Oblio settings
+OBLIO_COMPANY_CIF=           # Company CIF for invoices
+OBLIO_SERIES_NAME=EGH        # Invoice series name
+
+# Required - Stripe webhook
+STRIPE_WEBHOOK_SECRET=       # From Stripe Dashboard > Webhooks
+
 # Optional (for full functionality)
 RESEND_API_KEY=              # Email delivery
-SMARTBILL_API_KEY=           # E-factura integration
 SMSLINK_API_KEY=             # SMS notifications
 ```
 
 ---
 
-**Last Updated:** 2026-01-09
-**Version:** 2.7
+**Last Updated:** 2026-02-10
+**Version:** 3.0

@@ -1412,7 +1412,7 @@ Authorization: Bearer YOUR_API_KEY
 
 ---
 
-#### **Option C: infocui.ro (PLANNED) - ALTERNATIVE**
+#### **Option C: infocui.ro (DEPRECATED) - REPLACED BY ANAF API**
 
 **Pros:**
 - Romanian service

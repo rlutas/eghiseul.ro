@@ -19,6 +19,7 @@ import {
   ReactNode,
 } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
+import { createClient } from '@/lib/supabase/client';
 import type {
   ModularWizardState,
   ModularStep,
@@ -34,6 +35,7 @@ import type {
   DeliveryState,
   AddressState,
   ClientType,
+  UploadedDocumentState,
 } from '@/types/verification-modules';
 import { DEFAULT_DISABLED_CONFIG } from '@/types/verification-modules';
 import { Service, ServiceOption } from '@/types/services';
@@ -49,7 +51,8 @@ import { generateOrderId, getDraftStorageKey } from '@/lib/order-id';
 // Cache version for migrations
 // v3: Added clientType to cache for proper step reconstruction
 // v4: Fix priceModifier undefined bug (was using option.price_modifier instead of option.price)
-const CACHE_VERSION = 4;
+// v5: Added company document uploads (uploadedDocuments) to CompanyKYCState
+const CACHE_VERSION = 5;
 
 // ============================================================================
 // STATE INITIALIZATION
@@ -87,6 +90,7 @@ function createInitialCompanyKYCState(): CompanyKYCState {
     address: createInitialAddressState(),
     isActive: false,
     validationStatus: 'pending',
+    uploadedDocuments: [],
   };
 }
 
@@ -193,6 +197,7 @@ type ModularWizardAction =
   | { type: 'UPDATE_CONTACT'; payload: Partial<ModularWizardState['contact']> }
   | { type: 'UPDATE_PERSONAL_KYC'; payload: Partial<PersonalKYCState> }
   | { type: 'UPDATE_COMPANY_KYC'; payload: Partial<CompanyKYCState> }
+  | { type: 'UPDATE_COMPANY_KYC_DOCS'; payload: UploadedDocumentState[] }
   | { type: 'UPDATE_PROPERTY'; payload: Partial<PropertyState> }
   | { type: 'UPDATE_VEHICLE'; payload: Partial<VehicleState> }
   | { type: 'UPDATE_SIGNATURE'; payload: Partial<SignatureState> }
@@ -225,12 +230,28 @@ interface UserPrefillData {
     birthPlace: string;
     phone: string;
     address: AddressState | null;
+    // Document info from KYC
+    documentSeries?: string;
+    documentNumber?: string;
+    documentExpiry?: string;
+    documentType?: string | null;
   };
   contact: {
     email: string;
     phone: string;
     preferredContact: string;
   };
+  // Company data from profile
+  company?: {
+    cui: string;
+    name: string;
+    type: string;
+    registrationNumber: string;
+    address: string;
+    isActive: boolean;
+    vatPayer: boolean;
+    verified: boolean;
+  } | null;
   kyc_documents: Record<string, {
     id: string;
     file_url: string;
@@ -238,6 +259,13 @@ interface UserPrefillData {
     expires_at: string | null;
     is_expiring_soon: boolean;
     is_expired: boolean;
+  }>;
+  billing_profiles: Array<{
+    id: string;
+    type: string;
+    label: string;
+    billing_data: Record<string, unknown>;
+    is_default: boolean;
   }>;
   kyc_verified: boolean;
   has_valid_kyc: boolean;
@@ -420,6 +448,15 @@ function modularWizardReducer(
         isDirty: true,
       };
 
+    case 'UPDATE_COMPANY_KYC_DOCS':
+      return {
+        ...state,
+        companyKyc: state.companyKyc
+          ? { ...state.companyKyc, uploadedDocuments: action.payload }
+          : null,
+        isDirty: true,
+      };
+
     case 'UPDATE_PROPERTY':
       return {
         ...state,
@@ -579,6 +616,28 @@ function modularWizardReducer(
           birthDate: prefill.personal.birthDate || state.personalKyc.birthDate,
           birthPlace: prefill.personal.birthPlace || state.personalKyc.birthPlace,
           address: prefill.personal.address || state.personalKyc.address,
+          // Document info from KYC
+          documentSeries: prefill.personal.documentSeries || state.personalKyc.documentSeries,
+          documentNumber: prefill.personal.documentNumber || state.personalKyc.documentNumber,
+          documentExpiry: prefill.personal.documentExpiry || state.personalKyc.documentExpiry,
+          documentType: (prefill.personal.documentType as PersonalKYCState['documentType']) || state.personalKyc.documentType,
+        };
+      }
+
+      // Build company KYC data if module is active and company data available
+      let newCompanyKyc = state.companyKyc;
+      if (state.companyKyc && prefill.company) {
+        newCompanyKyc = {
+          ...state.companyKyc,
+          cui: prefill.company.cui || state.companyKyc.cui,
+          companyName: prefill.company.name || state.companyKyc.companyName,
+          companyType: prefill.company.type || state.companyKyc.companyType,
+          registrationNumber: prefill.company.registrationNumber || state.companyKyc.registrationNumber,
+          isActive: prefill.company.isActive,
+          validationStatus: prefill.company.verified ? 'valid' : state.companyKyc.validationStatus,
+          address: prefill.company.address
+            ? { ...state.companyKyc.address, street: prefill.company.address }
+            : state.companyKyc.address,
         };
       }
 
@@ -586,6 +645,7 @@ function modularWizardReducer(
         ...state,
         contact: newContact,
         personalKyc: newPersonalKyc,
+        companyKyc: newCompanyKyc,
         // Don't mark as dirty - this is initial load, not user edit
       };
     }
@@ -651,6 +711,7 @@ interface ModularWizardContextType {
   updateContact: (data: Partial<ModularWizardState['contact']>) => void;
   updatePersonalKyc: (data: Partial<PersonalKYCState>) => void;
   updateCompanyKyc: (data: Partial<CompanyKYCState>) => void;
+  updateCompanyKycDocuments: (docs: UploadedDocumentState[]) => void;
   updateProperty: (data: Partial<PropertyState>) => void;
   updateVehicle: (data: Partial<VehicleState>) => void;
   updateSignature: (data: Partial<SignatureState>) => void;
@@ -784,31 +845,63 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
     cacheRestoredRef.current = true;
 
     // Try to find existing draft in localStorage
-    let cacheFound = false;
-    try {
-      // Look for any draft for this service
-      const keys = Object.keys(localStorage).filter(k => k.startsWith('order_draft_'));
-      for (const key of keys) {
-        const cached = localStorage.getItem(key);
-        if (cached) {
-          const cacheData = JSON.parse(cached) as ModularDraftCache;
-          // Check if it's for this service and has valid version
-          if (cacheData.serviceSlug === state.serviceSlug && cacheData.version === CACHE_VERSION) {
-            console.log('Restoring draft from localStorage:', cacheData.friendlyOrderId);
-            dispatch({ type: 'RESTORE_FROM_CACHE', payload: cacheData });
-            cacheFound = true;
-            return;
+    const restoreDraft = async () => {
+      try {
+        // Look for any draft for this service
+        const keys = Object.keys(localStorage).filter(k => k.startsWith('order_draft_'));
+        for (const key of keys) {
+          const cached = localStorage.getItem(key);
+          if (cached) {
+            const cacheData = JSON.parse(cached) as ModularDraftCache;
+            // Check if it's for this service and has valid version
+            if (cacheData.serviceSlug === state.serviceSlug && cacheData.version === CACHE_VERSION) {
+              // Verify with server that this order is still a draft (only for logged-in users)
+              if (cacheData.friendlyOrderId) {
+                try {
+                  const supabase = createClient();
+                  const { data: { session } } = await supabase.auth.getSession();
+
+                  if (session) {
+                    const response = await fetch(`/api/orders/draft?id=${encodeURIComponent(cacheData.friendlyOrderId)}`);
+                    if (response.ok) {
+                      const data = await response.json();
+                      // If order exists but is NOT a draft anymore, clear cache and start fresh
+                      if (data.data?.order?.status && data.data.order.status !== 'draft') {
+                        console.log('Order is no longer a draft, clearing cache:', cacheData.friendlyOrderId);
+                        localStorage.removeItem(key);
+                        dispatch({ type: 'MARK_INITIALIZED' });
+                        return;
+                      }
+                    } else if (response.status === 404) {
+                      // Order not found - clear stale cache
+                      console.log('Draft not found on server, clearing cache:', cacheData.friendlyOrderId);
+                      localStorage.removeItem(key);
+                      dispatch({ type: 'MARK_INITIALIZED' });
+                      return;
+                    }
+                  }
+                  // Guest users: skip server verify, restore directly from localStorage
+                } catch (fetchError) {
+                  console.warn('Failed to verify draft status:', fetchError);
+                  // On network error, still try to restore from cache
+                }
+              }
+
+              console.log('Restoring draft from localStorage:', cacheData.friendlyOrderId);
+              dispatch({ type: 'RESTORE_FROM_CACHE', payload: cacheData });
+              return;
+            }
           }
         }
+      } catch (error) {
+        console.warn('Failed to restore from localStorage:', error);
       }
-    } catch (error) {
-      console.warn('Failed to restore from localStorage:', error);
-    }
 
-    // No cache found, mark as initialized anyway
-    if (!cacheFound) {
+      // No cache found, mark as initialized anyway
       dispatch({ type: 'MARK_INITIALIZED' });
-    }
+    };
+
+    restoreDraft();
   }, [state.serviceSlug]);
 
   // Sync step from URL on mount - but verify data exists
@@ -888,7 +981,14 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
 
   const setClientType = useCallback((type: ClientType) => {
     dispatch({ type: 'SET_CLIENT_TYPE', payload: type });
-  }, []);
+    // When switching to PJ, re-apply prefill so company data gets filled
+    if (type === 'PJ' && prefillData?.company) {
+      // Use setTimeout to ensure SET_CLIENT_TYPE creates companyKyc first
+      setTimeout(() => {
+        dispatch({ type: 'PREFILL_FROM_PROFILE', payload: prefillData });
+      }, 0);
+    }
+  }, [prefillData]);
 
   const updateContact = useCallback((data: Partial<ModularWizardState['contact']>) => {
     dispatch({ type: 'UPDATE_CONTACT', payload: data });
@@ -900,6 +1000,10 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
 
   const updateCompanyKyc = useCallback((data: Partial<CompanyKYCState>) => {
     dispatch({ type: 'UPDATE_COMPANY_KYC', payload: data });
+  }, []);
+
+  const updateCompanyKycDocuments = useCallback((docs: UploadedDocumentState[]) => {
+    dispatch({ type: 'UPDATE_COMPANY_KYC_DOCS', payload: docs });
   }, []);
 
   const updateProperty = useCallback((data: Partial<PropertyState>) => {
@@ -1029,6 +1133,7 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
           selected_options: state.selectedOptions.map(opt => ({
             option_id: opt.optionId,
             option_name: opt.optionName,
+            option_description: opt.optionDescription || '',
             quantity: opt.quantity,
             price_modifier: opt.priceModifier,
           })),
@@ -1042,6 +1147,14 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
             mimeType: doc.mimeType,
             uploadedAt: doc.uploadedAt,
             // Exclude base64 to keep payload small
+          })) || null,
+          company_documents: state.companyKyc?.uploadedDocuments?.map(doc => ({
+            id: doc.id,
+            type: doc.type,
+            fileName: doc.fileName,
+            fileSize: doc.fileSize,
+            mimeType: doc.mimeType,
+            uploadedAt: doc.uploadedAt,
           })) || null,
           delivery_method: state.delivery.method ? {
             type: state.delivery.method,
@@ -1228,15 +1341,19 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
     dispatch({ type: 'CLEAR_ERROR' });
   }, []);
 
-  // Load prefill data from user profile
+  // Load prefill data from user profile (only for authenticated users)
   const loadPrefillData = useCallback(async () => {
     if (prefillLoadedRef.current) return;
 
     try {
+      // Check auth first to avoid unnecessary 401 errors in console
+      const supabase = createClient();
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return; // Guest user — skip prefill
+
       const response = await fetch('/api/user/prefill-data');
 
       if (!response.ok) {
-        // User not logged in or error - that's fine, just skip prefill
         return;
       }
 
@@ -1315,6 +1432,7 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
     updateContact,
     updatePersonalKyc,
     updateCompanyKyc,
+    updateCompanyKycDocuments,
     updateProperty,
     updateVehicle,
     updateSignature,

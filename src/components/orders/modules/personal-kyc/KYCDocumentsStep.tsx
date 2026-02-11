@@ -495,7 +495,6 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
           <div
             onDrop={(e) => handleDrop(type, e)}
             onDragOver={(e) => e.preventDefault()}
-            className="relative"
           >
             <input
               ref={type === 'selfie' ? selfieInputRef : certInputRef}
@@ -507,9 +506,12 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
                 if (file) handleFileSelect(type, file);
                 e.target.value = ''; // Reset input
               }}
-              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+              className="hidden"
             />
-            <div className="border border-neutral-200 rounded-lg p-6 text-center hover:bg-neutral-50 transition-colors">
+            <div
+              onClick={() => (type === 'selfie' ? selfieInputRef : certInputRef).current?.click()}
+              className="border border-neutral-200 rounded-lg p-6 text-center hover:bg-neutral-50 transition-colors cursor-pointer"
+            >
               <div className="flex justify-center gap-2 mb-2">
                 <Camera className="w-6 h-6 text-neutral-400" />
                 <Upload className="w-6 h-6 text-neutral-400" />

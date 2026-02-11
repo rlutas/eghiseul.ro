@@ -20,11 +20,7 @@ import { SaveDataModal } from './save-data-modal';
 import { Service, ServiceOption } from '@/types/services';
 import { MODULE_LOADERS, hasModuleLoader } from '@/lib/verification-modules/registry';
 import type { ModularStepId } from '@/types/verification-modules';
-import { loadStripe } from '@stripe/stripe-js';
 import { createClient } from '@/lib/supabase/client';
-
-// Initialize Stripe
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
 // Core step components (always available)
 import { ContactStepModular } from './steps-modular/contact-step';
@@ -130,6 +126,7 @@ export function ModularOrderWizard({ initialService, initialOptions }: ModularOr
       case 'kyc-documents':
         return state.verificationConfig.personalKyc;
       case 'company-data':
+      case 'company-documents':
         return state.verificationConfig.companyKyc;
       case 'property-data':
         return state.verificationConfig.propertyVerification;
@@ -169,13 +166,13 @@ export function ModularOrderWizard({ initialService, initialOptions }: ModularOr
     return <StepLoading />;
   };
 
-  // Get step label
+  // Get current visible step info (label and renumbered step number)
+  const currentVisibleStep = visibleSteps.find(s => s.id === state.currentStepId);
   const getStepLabel = () => {
-    const currentStep = visibleSteps.find(s => s.id === state.currentStepId);
-    return currentStep?.labelRo || 'Pas';
+    return currentVisibleStep?.labelRo || 'Pas';
   };
 
-  // Handle order submission and payment
+  // Handle order submission - redirect to checkout page
   const handleSubmitOrder = useCallback(async () => {
     if (!state.orderId) {
       console.error('No order ID available');
@@ -185,7 +182,7 @@ export function ModularOrderWizard({ initialService, initialOptions }: ModularOr
     setIsSubmitting(true);
 
     try {
-      // First, submit the order (change status from 'draft' to 'pending_payment')
+      // Submit the order (change status from 'draft' to 'pending_payment')
       const submitResponse = await fetch(`/api/orders/${state.orderId}/submit`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -197,60 +194,18 @@ export function ModularOrderWizard({ initialService, initialOptions }: ModularOr
       if (!submitResponse.ok) {
         const submitError = await submitResponse.json();
         console.error('Order submission failed:', submitError);
-        // Continue anyway to show success (for testing)
+        // Show error to user instead of silently continuing
+        setIsSubmitting(false);
+        return;
       }
 
-      // Try to create payment intent (might fail if Stripe not configured)
-      try {
-        const response = await fetch(`/api/orders/${state.orderId}/payment`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            amount: priceBreakdown.totalPrice,
-            currency: 'ron',
-          }),
-        });
-
-        if (response.ok) {
-          const { clientSecret } = await response.json();
-
-          // Redirect to Stripe Checkout
-          const stripe = await stripePromise;
-          if (stripe && clientSecret) {
-            const { error } = await stripe.confirmPayment({
-              clientSecret,
-              confirmParams: {
-                return_url: `${window.location.origin}/comanda/success?order_id=${state.friendlyOrderId}`,
-              },
-            });
-
-            if (error) {
-              console.error('Stripe payment error:', error.message);
-            }
-          }
-        }
-      } catch (paymentError) {
-        console.error('Payment processing error:', paymentError);
-        // Payment failed, but order was submitted - show success anyway
-      }
-
-      // Show success screen
-      setOrderComplete(true);
-      // Show save modal only for guest users (not authenticated)
-      if (isAuthenticated === false) {
-        setShowSaveModal(true);
-      }
+      // Redirect to checkout page for payment method selection
+      window.location.href = `/comanda/checkout/${state.orderId}`;
     } catch (error) {
       console.error('Order submission error:', error);
-      // Still show success for now (payment will be handled separately)
-      setOrderComplete(true);
-      if (isAuthenticated === false) {
-        setShowSaveModal(true);
-      }
-    } finally {
       setIsSubmitting(false);
     }
-  }, [state.orderId, state.friendlyOrderId, isAuthenticated, priceBreakdown.totalPrice]);
+  }, [state.orderId, priceBreakdown.totalPrice]);
 
   // Handle next
   const handleNext = () => {
@@ -437,7 +392,7 @@ export function ModularOrderWizard({ initialService, initialOptions }: ModularOr
               <div className="flex items-center justify-between min-h-[40px]">
                 <div className="flex items-center gap-3">
                   <span className="flex items-center justify-center w-7 h-7 rounded-full bg-primary-500 text-secondary-900 font-bold text-xs">
-                    {state.currentStepNumber}
+                    {currentVisibleStep?.number ?? state.currentStepNumber}
                   </span>
                   <h2 className="text-base font-semibold text-secondary-900 leading-none">
                     {getStepLabel()}

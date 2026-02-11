@@ -91,6 +91,7 @@ export function OptionsStepModular({ onValidChange }: OptionsStepProps) {
       const newOption = {
         optionId: option.id,
         optionName: option.name,
+        optionDescription: option.description || '',
         quantity: 1,
         priceModifier: option.price,
       };

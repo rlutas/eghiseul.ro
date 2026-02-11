@@ -45,6 +45,12 @@ export const MODULE_REGISTRY: Record<ModularStepId, ModuleRegistryEntry> = {
     labelRo: 'Date Firmă',
     componentPath: '@/components/orders/modules/company-kyc/CompanyDataStep',
   },
+  'company-documents': {
+    stepId: 'company-documents',
+    label: 'Company Documents',
+    labelRo: 'Documente Firmă',
+    componentPath: '@/components/orders/modules/company-kyc/CompanyDocumentsStep',
+  },
   'property-data': {
     stepId: 'property-data',
     label: 'Property Data',
@@ -137,6 +143,7 @@ export const MODULE_LOADERS: Partial<Record<ModularStepId, ModuleComponentLoader
   'property-data': () => import('@/components/orders/modules/property/PropertyDataStep'),
   'vehicle-data': () => import('@/components/orders/modules/vehicle/VehicleDataStep'),
   'kyc-documents': () => import('@/components/orders/modules/personal-kyc/KYCDocumentsStep'),
+  'company-documents': () => import('@/components/orders/modules/company-kyc/CompanyDocumentsStep'),
   'signature': () => import('@/components/orders/modules/signature/SignatureStep'),
   'billing': () => import('@/components/orders/steps-modular/billing-step'),
 };

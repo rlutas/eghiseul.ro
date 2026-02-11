@@ -268,7 +268,7 @@ BIROU NOTARIAL, NOTAR PUBLIC
 |--------|------|
 | Stripe | Procesare plată |
 | Olbio | Emitere factură |
-| infocui.ro | Validare CUI + tip entitate |
+| ANAF API | Validare CUI + tip entitate |
 | ONRC / Recom | Obținere certificat |
 | WhatsApp API | Livrare opțională |
 | Email | Confirmare + livrare |

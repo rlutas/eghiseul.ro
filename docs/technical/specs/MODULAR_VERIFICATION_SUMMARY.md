@@ -224,7 +224,7 @@ A dynamic order wizard system that adapts its steps and verification requirement
 
 ### Pending
 - ⏳ Migration of remaining 5 services
-- ⏳ External API integrations (infocui.ro, ANCPI)
+- ⏳ External API integrations (ANAF API, ANCPI)
 - ⏳ Admin UI for configuration management
 - ⏳ Automated tests for each service flow
 
@@ -281,7 +281,7 @@ A dynamic order wizard system that adapts its steps and verification requirement
 
 ### Short Term (Sprint 4)
 1. Add remaining 5 services
-2. Implement infocui.ro integration
+2. Implement ANAF API integration (free, official)
 3. Add property validation (ANCPI)
 4. Create admin configuration UI
 

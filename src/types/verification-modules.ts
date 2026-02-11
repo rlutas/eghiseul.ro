@@ -18,6 +18,8 @@ export type DocumentType =
   | 'residence_permit'     // Permis de rezidență
   | 'registration_cert'    // Certificat de înregistrare
   | 'selfie'               // Selfie for face matching
+  | 'company_registration_cert'  // PJ: Certificat de Înregistrare (CUI)
+  | 'company_statement_cert'     // PJ: Certificat Constatator (ONRC)
   | 'unknown';
 
 export type CitizenshipType = 'romanian' | 'european' | 'foreign';
@@ -32,6 +34,7 @@ export type CitizenshipType = 'romanian' | 'european' | 'foreign';
  */
 export interface PersonalKYCConfig {
   enabled: boolean;
+  condition?: string;  // e.g., "client_type == 'PF'" to only show for PF
 
   // Document requirements
   acceptedDocuments: DocumentType[];
@@ -86,6 +89,10 @@ export interface CompanyKYCConfig {
 
   // Special handling for specific entity types
   specialRules: CompanySpecialRule[];
+
+  // Company document requirements
+  documentsRequired: boolean;
+  requiredDocuments: ('company_registration_cert' | 'company_statement_cert')[];
 }
 
 export interface CompanySpecialRule {
@@ -204,6 +211,7 @@ export type ModularStepId =
   | 'vehicle-data'      // Vehicle data entry
   | 'options'           // Service options
   | 'kyc-documents'     // Document upload + OCR
+  | 'company-documents' // Company document upload (cert inregistrare / cert constatator)
   | 'signature'         // Signature canvas
   | 'delivery'          // Delivery selection
   | 'billing'           // Billing profile (PF/PJ)
@@ -217,7 +225,7 @@ export interface ModularStep {
   labelRo: string;  // Romanian label
   number: number;
   condition?: (state: ModularWizardState) => boolean;
-  moduleType: 'core' | 'personalKyc' | 'companyKyc' | 'property' | 'vehicle' | 'signature' | 'billing';
+  moduleType: 'core' | 'personalKyc' | 'companyKyc' | 'companyDocuments' | 'property' | 'vehicle' | 'signature' | 'billing';
 }
 
 // ============================================================================
@@ -310,6 +318,7 @@ export interface CompanyKYCState {
   validationStatus: 'pending' | 'valid' | 'invalid' | 'blocked';
   validationMessage?: string;
   autoCompleteData?: CompanyAutoCompleteData;
+  uploadedDocuments: UploadedDocumentState[];
 }
 
 export interface CompanyAutoCompleteData {
@@ -452,6 +461,7 @@ export interface ModularWizardState {
 export interface SelectedOptionState {
   optionId: string;
   optionName: string;
+  optionDescription?: string;
   quantity: number;
   priceModifier: number;
 }
@@ -462,6 +472,31 @@ export interface DeliveryState {
   price: number;
   estimatedDays: number;
   address?: AddressState;
+  // Courier-specific fields (Fan Courier, Sameday, etc.)
+  courierProvider?: string; // 'fancourier', 'sameday', etc.
+  courierService?: string; // 'Standard', 'FANbox', etc.
+  courierQuote?: {
+    provider: string;
+    providerName: string;
+    service: string;
+    serviceName: string;
+    price: number;
+    priceWithVAT: number;
+    vat: number;
+    currency: string;
+    estimatedDays: number;
+    breakdown?: {
+      basePrice?: number;
+      fuelCost?: number;
+      extraKmCost?: number;
+      insuranceCost?: number;
+      optionsCost?: number;
+    };
+    // Locker info (when locker delivery selected)
+    lockerId?: string;
+    lockerName?: string;
+    lockerAddress?: string;
+  };
 }
 
 // ============================================================================
@@ -549,6 +584,8 @@ export const DEFAULT_DISABLED_CONFIG: ServiceVerificationConfig = {
     allowedTypes: [],
     blockedTypes: [],
     specialRules: [],
+    documentsRequired: false,
+    requiredDocuments: [],
   },
   propertyVerification: {
     enabled: false,
@@ -627,6 +664,8 @@ export const COMPANY_ONLY_CONFIG: Partial<ServiceVerificationConfig> = {
         message: 'Pentru PFA/II/IF se eliberează certificat constatator pe persoană fizică.',
       },
     ],
+    documentsRequired: true,
+    requiredDocuments: ['company_registration_cert'],
   },
   signature: {
     enabled: false,

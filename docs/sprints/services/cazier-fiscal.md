@@ -288,7 +288,7 @@ Serviciu de obținere cazier fiscal online de la ANAF. Clientul încarcă actul 
 |--------|------|
 | Stripe | Procesare plată |
 | Olbio | Emitere factură |
-| infocui.ro | Validare CUI |
+| ANAF API | Validare CUI |
 | ANAF | Obținere cazier fiscal |
 | Email | Confirmare + livrare |
 | Curier | Livrare fizică |

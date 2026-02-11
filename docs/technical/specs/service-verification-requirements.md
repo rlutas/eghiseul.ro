@@ -4,8 +4,8 @@
 
 This document defines the verification requirements for each service on eghiseul.ro. The verification system is **modular** - each service can enable/disable verification components based on its specific needs.
 
-**Last Updated:** 2025-12-19
-**Version:** 1.0
+**Last Updated:** 2026-02-10
+**Version:** 1.1
 
 ---
 
@@ -13,25 +13,27 @@ This document defines the verification requirements for each service on eghiseul
 
 ### Quick Reference Table
 
-| Service | KYC Personal | KYC Company | Signature | Selfie | Parents Docs | Property Data | Vehicle Data |
-|---------|--------------|-------------|-----------|--------|--------------|---------------|--------------|
-| Cazier Fiscal | ✅ | ❌ | ✅ | ✅ | ❌ | ❌ | ❌ |
-| Cazier Judiciar | ✅ | ⚡ PJ only | ✅ | ✅ | ❌ | ❌ | ❌ |
-| Cazier Auto | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
-| Certificat Naștere | ✅ | ❌ | ✅ | ✅ | ⚡ Minor | ❌ | ❌ |
-| Certificat Căsătorie | ✅ | ❌ | ✅ | ✅ | ❌ | ❌ | ❌ |
-| Certificat Celibat | ✅ | ❌ | ✅ | ✅ | ❌ | ❌ | ❌ |
-| Certificat Integritate | ✅ | ❌ | ✅ | ✅ | ❌ | ❌ | ❌ |
-| Certificat Constatator | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| Extras Carte Funciară | ❌ | ⚡ Optional | ❌ | ❌ | ❌ | ✅ | ❌ |
-| Extras Multilingv Naștere | ✅ | ❌ | ✅ | ✅ | ⚡ Minor | ❌ | ❌ |
-| Extras Multilingv Căsătorie | ✅ | ❌ | ✅ | ✅ | ❌ | ❌ | ❌ |
-| Rovinieta | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
+| Service | KYC Personal | KYC Company | Company Docs | Signature | Selfie | Parents Docs | Property Data | Vehicle Data |
+|---------|--------------|-------------|--------------|-----------|--------|--------------|---------------|--------------|
+| Cazier Fiscal | ✅ | ❌ | ❌ | ✅ | ✅ | ❌ | ❌ | ❌ |
+| Cazier Judiciar | ✅ | ⚡ PJ only | ❌ | ✅ | ✅ | ❌ | ❌ | ❌ |
+| Cazier Auto | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
+| Certificat Naștere | ✅ | ❌ | ❌ | ✅ | ✅ | ⚡ Minor | ❌ | ❌ |
+| Certificat Căsătorie | ✅ | ❌ | ❌ | ✅ | ✅ | ❌ | ❌ | ❌ |
+| Certificat Celibat | ✅ | ❌ | ❌ | ✅ | ✅ | ❌ | ❌ | ❌ |
+| Certificat Integritate | ✅ | ❌ | ❌ | ✅ | ✅ | ❌ | ❌ | ❌ |
+| Certificat Constatator | ❌ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| Extras Carte Funciară | ❌ | ⚡ Optional | ❌ | ❌ | ❌ | ❌ | ✅ | ❌ |
+| Extras Multilingv Naștere | ✅ | ❌ | ❌ | ✅ | ✅ | ⚡ Minor | ❌ | ❌ |
+| Extras Multilingv Căsătorie | ✅ | ❌ | ❌ | ✅ | ✅ | ❌ | ❌ | ❌ |
+| Rovinieta | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
 
 **Legend:**
 - ✅ Required
 - ⚡ Conditional (depends on client type/scenario)
 - ❌ Not required
+
+> **Note:** The "Company Docs" column indicates whether the service requires company document uploads (e.g., Certificat de Inregistrare, Certificat Constatator). This column only applies to PJ orders and is controlled by the `companyKyc.documentsRequired` configuration field.
 
 ---
 
@@ -99,7 +101,7 @@ verification:
   company_kyc:
     enabled: true
     condition: "client_type == 'PJ'"
-    validation: infocui.ro
+    validation: ANAF API (free, official)
     blocked_types:
       - ASOCIAȚIE
       - FUNDAȚIE
@@ -173,7 +175,7 @@ verification:
 
 ### 4. Certificat Constatator ONRC (SRV-030)
 
-**Verification Type:** Company Verification Only (NO Personal KYC)
+**Verification Type:** Company Verification Only (NO Personal KYC) + Company Document Upload
 
 ```yaml
 service: certificat-constatator
@@ -184,7 +186,7 @@ verification:
   company_kyc:
     enabled: true
     required: true
-    validation: infocui.ro + ONRC
+    validation: ANAF API + ONRC
     fields:
       - cui_cif
       - nume_firma      # Auto-completed
@@ -212,15 +214,21 @@ verification:
 
     block_message: "Pentru acest tip de entitate nu se poate elibera certificat constatator de la ONRC!"
 
+    # Company document uploads (PJ only)
+    documents_required: true
+    required_documents:
+      - company_registration_cert   # Certificat de Înregistrare (CUI)
+
   signature_required: false
   selfie_required: false
 ```
 
 **Flow Steps:**
 1. Contact Data + CUI
-2. Document Type Selection
-3. Billing Data
-4. Payment
+2. Company Documents Upload (Certificat de Inregistrare)
+3. Document Type Selection
+4. Billing Data
+5. Payment
 
 ---
 
@@ -398,7 +406,7 @@ interface CompanyKYCConfig {
   condition?: string;  // e.g., "client_type == 'PJ'"
 
   // CUI validation
-  validation: 'infocui' | 'onrc' | 'none';
+  validation: 'infocui' | 'onrc' | 'manual';
   autoComplete: boolean;  // Auto-fill company data from CUI
 
   // Entity type rules
@@ -410,10 +418,25 @@ interface CompanyKYCConfig {
   specialRules: {
     types: string[];
     message: string;
-    action: 'warn' | 'block' | 'redirect';
+    action: 'allow' | 'warn' | 'block' | 'redirect';
   }[];
+
+  // Company document uploads (PJ only)
+  documentsRequired: boolean;  // Whether company documents must be uploaded
+  requiredDocuments: ('company_registration_cert' | 'company_statement_cert')[];
+  // company_registration_cert = Certificat de Înregistrare (CUI document)
+  // company_statement_cert    = Certificat Constatator (ONRC extract)
 }
 ```
+
+When `documentsRequired` is `true`, a **"Documente Firma"** step (`company-documents`) is automatically inserted into the wizard after the **"Date Firma"** step. This step is only shown when the client type is **PJ**. The `requiredDocuments` array controls which document types the user must upload.
+
+**Available company document types:**
+
+| Type | Romanian Name | Description |
+|------|---------------|-------------|
+| `company_registration_cert` | Certificat de Inregistrare | Official CUI registration document from ONRC |
+| `company_statement_cert` | Certificat Constatator | Company status extract from ONRC |
 
 ### 3. Property Verification Component
 
@@ -522,7 +545,7 @@ UPDATE services SET verification_config = '{
 }'::jsonb
 WHERE slug = 'cazier-fiscal';
 
--- Example for Certificat Constatator
+-- Example for Certificat Constatator (with company document uploads)
 UPDATE services SET verification_config = '{
   "personal_kyc": {
     "enabled": false
@@ -531,7 +554,9 @@ UPDATE services SET verification_config = '{
     "enabled": true,
     "validation": "infocui",
     "auto_complete": true,
-    "blocked_types": ["ASOCIAȚIE", "FUNDAȚIE", "ONG"]
+    "blocked_types": ["ASOCIAȚIE", "FUNDAȚIE", "ONG"],
+    "documents_required": true,
+    "required_documents": ["company_registration_cert"]
   },
   "property_verification": {
     "enabled": false
@@ -557,48 +582,133 @@ function buildOrderSteps(service: Service): OrderStep[] {
   // Step 1: Always have contact
   steps.push({ id: 'contact', component: ContactStep });
 
-  // Step 2: Personal data (if personal KYC enabled)
+  // Step 1b: Client Type selection (if enabled)
+  if (config.clientTypeSelection?.enabled) {
+    steps.push({ id: 'client-type', component: ClientTypeStep });
+  }
+
+  // Step 2: Company data (if company KYC enabled, for PJ)
+  if (config.companyKyc.enabled) {
+    steps.push({ id: 'company', component: CompanyDataStep });
+
+    // Step 2b: Company documents (if required for PJ)
+    // Only shown when clientType === 'PJ' and documentsRequired is true
+    if (config.companyKyc.documentsRequired) {
+      steps.push({ id: 'company-documents', component: CompanyDocumentsStep });
+    }
+  }
+
+  // Step 3: Personal data (if personal KYC enabled)
   if (config.personalKyc.enabled) {
     steps.push({ id: 'personal', component: PersonalDataStep });
   }
 
-  // Step 2b: Company data (if company KYC enabled)
-  if (config.companyKyc.enabled) {
-    steps.push({ id: 'company', component: CompanyDataStep });
-  }
-
-  // Step 2c: Property data (if property verification enabled)
+  // Step 3b: Property data (if property verification enabled)
   if (config.propertyVerification.enabled) {
     steps.push({ id: 'property', component: PropertyDataStep });
   }
 
-  // Step 2d: Vehicle data (if vehicle verification enabled)
+  // Step 3c: Vehicle data (if vehicle verification enabled)
   if (config.vehicleVerification.enabled) {
     steps.push({ id: 'vehicle', component: VehicleDataStep });
   }
 
-  // Step 3: Service options
+  // Step 4: Service options
   steps.push({ id: 'options', component: ServiceOptionsStep });
 
-  // Step 4: KYC documents (if personal KYC with docs)
+  // Step 5: KYC documents (if personal KYC with docs)
   if (config.personalKyc.enabled && config.personalKyc.acceptedDocuments.length > 0) {
     steps.push({ id: 'kyc', component: KYCDocumentsStep });
   }
 
-  // Step 5: Signature (if required)
-  if (config.personalKyc.signatureRequired) {
+  // Step 6: Signature (if required)
+  if (config.signature.enabled && config.signature.required) {
     steps.push({ id: 'signature', component: SignatureStep });
   }
 
-  // Step 6: Delivery
+  // Step 7: Delivery
   steps.push({ id: 'delivery', component: DeliveryStep });
 
-  // Step 7: Review & Payment
+  // Step 8: Billing
+  steps.push({ id: 'billing', component: BillingStep });
+
+  // Step 9: Review & Payment
   steps.push({ id: 'review', component: ReviewStep });
 
   return steps;
 }
 ```
+
+> **Important:** The `company-documents` step has a runtime condition: it is only visible when `state.clientType === 'PJ'`. This means for services with `clientTypeSelection` enabled (PF/PJ), the step automatically appears or hides based on the user's selection. For company-only services (like Certificat Constatator), the step is always shown since the client type is implicitly PJ.
+
+---
+
+## Company Document Upload Flow
+
+When a service has `companyKyc.documentsRequired: true`, the wizard inserts a **"Documente Firma"** step immediately after the **"Date Firma"** (company data) step. This step is only visible for PJ client types.
+
+### How It Works
+
+1. The `step-builder.ts` checks `verificationConfig.companyKyc.documentsRequired` when building steps.
+2. If `true`, a `company-documents` step is added with a runtime condition: `state.clientType === 'PJ'`.
+3. The step renders upload fields for each document type listed in `requiredDocuments`.
+4. Uploaded documents are stored in S3 under `kyc/{user_id}/{verification_id}/` with the document type as filename.
+
+### Configuration Example
+
+To enable company document uploads for a service, set the following in `verification_config`:
+
+```json
+{
+  "company_kyc": {
+    "enabled": true,
+    "validation": "infocui",
+    "auto_complete": true,
+    "documents_required": true,
+    "required_documents": ["company_registration_cert"]
+  }
+}
+```
+
+To require both Certificat de Inregistrare and Certificat Constatator:
+
+```json
+{
+  "company_kyc": {
+    "enabled": true,
+    "validation": "infocui",
+    "auto_complete": true,
+    "documents_required": true,
+    "required_documents": ["company_registration_cert", "company_statement_cert"]
+  }
+}
+```
+
+### Preset: COMPANY_ONLY_CONFIG
+
+The `COMPANY_ONLY_CONFIG` preset in `src/types/verification-modules.ts` includes company document uploads by default:
+
+```typescript
+export const COMPANY_ONLY_CONFIG: Partial<ServiceVerificationConfig> = {
+  companyKyc: {
+    enabled: true,
+    validation: 'infocui',
+    autoComplete: true,
+    // ...entity type rules...
+    documentsRequired: true,
+    requiredDocuments: ['company_registration_cert'],
+  },
+};
+```
+
+### Key Files
+
+| File | Purpose |
+|------|---------|
+| `src/types/verification-modules.ts` | `CompanyKYCConfig` interface with `documentsRequired` and `requiredDocuments` fields |
+| `src/lib/verification-modules/step-builder.ts` | Inserts `company-documents` step when `documentsRequired` is true |
+| `src/providers/modular-wizard-provider.tsx` | Manages `companyKyc.uploadedDocuments` state |
+| `src/lib/aws/s3.ts` | S3 upload for PJ document types (`company_registration_cert`, `company_statement_cert`) |
 
 ---
 
@@ -607,6 +717,7 @@ function buildOrderSteps(service: Service): OrderStep[] {
 - [Romanian Document Handling](./romanian-document-handling.md) - Document types and OCR
 - [OCR Improvement Plan](./ocr-improvement-plan.md) - OCR system improvements
 - [Document Comparison Table](./document-comparison-table.md) - Quick reference
+- [Modular Wizard Guide](./modular-wizard-guide.md) - How to add new services to the wizard
 
 ---
 
@@ -621,21 +732,24 @@ function buildOrderSteps(service: Service): OrderStep[] {
 - ✅ Create `PersonalDataStep` component - Personal KYC with OCR
 - ✅ Create `KYCDocumentsStep` component - Document upload & validation
 - ✅ Create `CompanyDataStep` component - CUI validation ready
+- ✅ Create `CompanyDocumentsStep` component - PJ document uploads (Cert. Inregistrare, Cert. Constatator)
 - ✅ Create `PropertyDataStep` component - Carte Funciară data
 - ✅ Create `VehicleDataStep` component - Auto/Rovinieta data
 - ✅ Create `SignatureStep` component - Electronic signature
+- ✅ Create `BillingStep` component - PF/PJ invoice data
 - ✅ Create ModularWizardProvider - Dynamic step builder
 
 ### Phase 3: Validation ⏳ IN PROGRESS
-- ⏳ Implement CUI validation (infocui.ro) - API ready, UI integration pending
+- ✅ Implement CUI validation (ANAF API) - Integrated and working
 - ⏳ Implement property validation (ANCPI) - Manual validation for now
 - ⏳ Implement vehicle validation - Basic format validation implemented
 - ✅ OCR integrated with component system - Gemini 2.0 Flash
+- ✅ Company document uploads for PJ orders - S3 storage integrated
 
 ### Phase 4: Testing ⏳ PENDING
 - ⏳ Test each service flow - Manual testing in progress
 - ⏳ Test conditional fields - Company KYC condition support implemented
 - ⏳ Test edge cases (blocked company types, expired docs)
 
-**Last Updated:** 2025-12-19
+**Last Updated:** 2026-02-10
 **Status:** Production-ready foundation, external integrations pending

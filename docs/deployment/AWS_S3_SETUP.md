@@ -103,6 +103,12 @@ aws s3api put-public-access-block \
 
 ### Create Custom Policy
 
+**Option A: Full Access (Recommended for simplicity)**
+
+Attach the AWS managed policy `AmazonS3FullAccess` to the IAM user. This is the simplest approach and works reliably with presigned URLs.
+
+**Option B: Custom Restrictive Policy**
+
 ```json
 {
   "Version": "2012-10-17",
@@ -116,30 +122,19 @@ aws s3api put-public-access-block \
         "s3:DeleteObject",
         "s3:ListBucket",
         "s3:GetObjectVersion",
-        "s3:DeleteObjectVersion"
+        "s3:DeleteObjectVersion",
+        "s3:HeadObject"
       ],
       "Resource": [
         "arn:aws:s3:::eghiseul-documents",
         "arn:aws:s3:::eghiseul-documents/*"
       ]
-    },
-    {
-      "Sid": "S3PresignedURLs",
-      "Effect": "Allow",
-      "Action": [
-        "s3:PutObject",
-        "s3:GetObject"
-      ],
-      "Resource": "arn:aws:s3:::eghiseul-documents/*",
-      "Condition": {
-        "StringEquals": {
-          "s3:x-amz-server-side-encryption": "AES256"
-        }
-      }
     }
   ]
 }
 ```
+
+**⚠️ Important:** Do NOT add conditions requiring `s3:x-amz-server-side-encryption` header. This causes signature mismatch errors with presigned URLs. The bucket's default encryption (SSE-S3) handles encryption automatically.
 
 Save policy as: `eghiseul-s3-documents-policy`
 
@@ -386,17 +381,33 @@ if (!ALLOWED_TYPES.includes(contentType)) {
 }
 ```
 
-### 3. Use Server-Side Encryption
+### 3. Server-Side Encryption
 
-Always include encryption header:
+**Important:** The bucket has SSE-S3 (AES-256) enabled by default. Do NOT include the `ServerSideEncryption` header when generating presigned URLs, as this causes signature mismatch errors.
 
 ```typescript
+// ✅ CORRECT - For presigned URLs (client uploads)
+// Let bucket default encryption handle it
 const command = new PutObjectCommand({
   Bucket: bucket,
   Key: key,
+  ContentType: contentType,
+  Metadata: metadata,
+  // NO ServerSideEncryption here - bucket default handles it
+});
+
+// ✅ CORRECT - For direct server uploads
+// Can include encryption header
+const command = new PutObjectCommand({
+  Bucket: bucket,
+  Key: key,
+  Body: buffer,
+  ContentType: contentType,
   ServerSideEncryption: 'AES256',
 });
 ```
+
+**Why:** When the bucket has default encryption enabled, including `ServerSideEncryption` in presigned URL generation causes IAM policy condition mismatches and 403 Forbidden errors.
 
 ### 4. Audit Access
 
@@ -417,7 +428,19 @@ aws s3api put-bucket-logging \
 
 ## Troubleshooting
 
-### Access Denied
+### 403 Forbidden on Upload (Presigned URLs)
+
+This is the most common issue. Check in order:
+
+1. **IAM policy not attached:** Go to IAM > Users > eghiseul-app > Permissions. Ensure `AmazonS3FullAccess` or custom policy is attached.
+
+2. **Encryption header mismatch:** Do NOT include `ServerSideEncryption` in presigned URL generation. The bucket handles encryption automatically.
+
+3. **Incorrect credentials:** Verify `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` in `.env.local`
+
+4. **Wrong bucket name:** Verify `AWS_S3_BUCKET_DOCUMENTS` matches the actual bucket name
+
+### Access Denied (Other)
 
 1. Check IAM policy is attached to user
 2. Verify bucket name in policy matches actual bucket
@@ -428,6 +451,7 @@ aws s3api put-bucket-logging \
 1. Verify CORS configuration on bucket
 2. Check AllowedOrigins includes your domain
 3. Clear browser cache and retry
+4. Ensure `AllowedMethods` includes `PUT` for uploads
 
 ### Presigned URL Expired
 

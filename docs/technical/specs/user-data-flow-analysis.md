@@ -173,7 +173,7 @@ is_default BOOLEAN
   contactPerson?: string;
   contactEmail?: string;
   contactPhone?: string;
-  // From InfoCUI API:
+  // From ANAF API:
   caen?: string;
   bankAccount?: string;
   bankName?: string;
@@ -228,7 +228,7 @@ is_default BOOLEAN
 2. Options:
    - "Facturează pe mine (PF)" - use data from ID
    - "Facturează pe altcineva (PF)" - manual entry
-   - "Facturează pe firmă (PJ)" - CUI lookup via InfoCUI API
+   - "Facturează pe firmă (PJ)" - CUI lookup via ANAF API
 3. **NEW:** Create `billing_profiles` record
 
 #### GAP 4: Data Not Migrated on Account Creation
@@ -267,7 +267,7 @@ if (migrateError) {
 2. **Add Billing Step**
    - New step between Delivery and Review
    - Three options: "Sunt eu (PF)", "Altcineva (PF)", "Firmă (PJ)"
-   - For PJ: CUI input + InfoCUI API call
+   - For PJ: CUI input + ANAF API call
    - Create `billing_profiles` record on order completion
 
 ### Phase 2: Fix Data Migration
@@ -330,7 +330,7 @@ if (migrateError) {
 2. **Billing Step** (Required for payment)
    - Create billing step component
    - Add to wizard flow
-   - InfoCUI integration for PJ
+   - ANAF API integration for PJ
 
 3. **KYC Persistence** (Required for account)
    - S3 upload on document scan
@@ -370,7 +370,7 @@ if (migrateError) {
 Added billing step before payment with three options:
 - **"Facturează pe mine"** - Auto-fills data from scanned ID
 - **"Altă persoană fizică"** - Manual entry for another person
-- **"Persoană juridică"** - Company billing with CUI validation via InfoCUI API
+- **"Persoană juridică"** - Company billing with CUI validation via ANAF API
 
 **Files Created:**
 - `src/components/orders/steps-modular/billing-step.tsx` - Billing step UI component

@@ -1,10 +1,15 @@
 # eGhiseul.ro - Product Requirements Document
 
-**Version:** 2.1
-**Date:** 8 Ianuarie 2026
+**Version:** 2.6
+**Date:** 12 Ianuarie 2026
 **Author:** Product Team
 
 > **Update History:**
+> - v2.6 (2026-01-12): **Courier Integration System** - Fan Courier API (quotes, AWB, tracking), ANAF API address validation, modular delivery step architecture, delivery configuration per service, complete delivery system spec
+> - v2.5 (2026-01-12): Order timeline in account page, business days estimation, Stripe billing address fix, wizard reset after order completion, CNP masking in Stripe, Sprint 4 at 80% (features done, testing/polish pending)
+> - v2.4 (2026-01-12): Short Order ID format (E-YYMMDD-XXXXX), Stripe webhook fixes, payment confirmation fallback, GA4 purchase tracking, option descriptions, Sprint 4 at 75%
+> - v2.3 (2026-01-09): Profile/KYC sync (hide scanner when KYC exists), duplicate prevention, fixed OCR field mapping, Sprint 4 at 65%
+> - v2.2 (2026-01-09): AWS S3 integration complete, order submission API, billing step, Sprint 4 at 60%
 > - v2.1 (2026-01-08): User account management complete (Profile, KYC, Addresses, Billing tabs), selfie with ID flow
 > - v2.0 (2026-01-07): Updated tech stack (Google Gemini for OCR/KYC), modular wizard architecture
 > - v1.0 (2024-12-15): Initial PRD
@@ -154,7 +159,7 @@ eGhiseul.ro este o platforma digitala care simplifica accesul la documente si se
 | FR-2.3 | Semnatura electronica (canvas) | P0 | ✅ Done |
 | FR-2.4 | Upload documente suplimentare (permis auto, acte parinti) | P0 | ✅ Done |
 | FR-2.5 | Validare format si marime fisiere | P0 | ✅ Done |
-| FR-2.6 | Stocare securizata documente (S3 encrypted) | P0 | ⏳ Sprint 4 |
+| FR-2.6 | Stocare securizata documente (S3 encrypted) | P0 | ✅ Done |
 | FR-2.7 | Face matching între ID și selfie | P0 | ✅ Done |
 | FR-2.8 | Confidence scores pentru validare | P0 | ✅ Done |
 
@@ -164,16 +169,24 @@ eGhiseul.ro este o platforma digitala care simplifica accesul la documente si se
 - **Step 3:** Realizează un selfie ținând actul în mână vizibil
 - **AI Validation:** Face matching între selfie și fotografia din act
 
-### FR-3: Plati si facturare (P0)
+### FR-3: Plati si facturare (P0) ⏳ IN PROGRESS
 
-| ID | Requirement | Priority |
-|----|-------------|----------|
-| FR-3.1 | Integrare Stripe (card, 3D Secure) | P0 |
-| FR-3.2 | Suport PF si PJ (tax ID ro_tin) | P0 |
-| FR-3.3 | Integrare Olbio pentru facturi automate | P0 |
-| FR-3.4 | Cupoane de reducere | P0 |
-| FR-3.5 | Email confirmare plata cu factura | P0 |
-| FR-3.6 | Plata manuala (transfer bancar) - admin only | P1 |
+> **Implementation:** Stripe integrated, billing step complete. Oblio pending.
+
+| ID | Requirement | Priority | Status |
+|----|-------------|----------|--------|
+| FR-3.1 | Integrare Stripe (card, 3D Secure) | P0 | ✅ Done (payment intent creation) |
+| FR-3.2 | Suport PF si PJ (tax ID ro_tin) | P0 | ✅ Done (BillingStep component) |
+| FR-3.3 | Integrare Oblio pentru facturi automate | P0 | ⏳ Sprint 4 |
+| FR-3.4 | Cupoane de reducere | P0 | ⏳ Sprint 5 |
+| FR-3.5 | Email confirmare plata cu factura | P0 | ⏳ Sprint 4 |
+| FR-3.6 | Plata manuala (transfer bancar) - admin only | P1 | ⏳ Sprint 5 |
+
+**Billing Step Features (2026-01-08):**
+- 3 billing options: "Facturează pe mine", "Altă persoană fizică", "Persoană juridică"
+- Auto-populates from scanned ID for "self" option
+- CUI validation via ANAF API (free, official) for companies
+- CNP-based deduplication for billing profiles
 
 ### FR-4: Contracte si documente legale (P0)
 
@@ -207,25 +220,134 @@ eGhiseul.ro este o platforma digitala care simplifica accesul la documente si se
 | FR-6.4 | Notificare admin la comanda noua | P0 |
 | FR-6.5 | SMS notificari (optional) | P1 |
 
-### FR-7: Livrare (P0)
+### FR-7: Livrare Modulară (P0) - IN DEVELOPMENT
 
-| ID | Requirement | Priority |
-|----|-------------|----------|
-| FR-7.1 | Livrare electronica (email cu document) | P0 |
-| FR-7.2 | Livrare fizica Romania (Fan Curier +25 RON) | P0 |
-| FR-7.3 | Livrare internationala Posta Romana (+100 RON) | P0 |
-| FR-7.4 | Livrare internationala DHL (+200 RON) | P0 |
-| FR-7.5 | Tracking livrare | P1 |
+> **Specificație completă:** `docs/technical/specs/delivery-system-architecture.md`
 
-### FR-8: Conturi utilizatori (P1)
+#### FR-7.1: Configurare per Serviciu
 
-| ID | Requirement | Priority |
-|----|-------------|----------|
-| FR-8.1 | Inregistrare cu email | P1 |
-| FR-8.2 | Login cu email/parola sau magic link | P1 |
-| FR-8.3 | Istoric comenzi | P1 |
-| FR-8.4 | Date pre-completate | P1 |
-| FR-8.5 | KYC salvat si reutilizabil | P1 |
+Fiecare serviciu are configurație proprie de livrare:
+
+| Serviciu | PDF | Fizic | Note |
+|----------|-----|-------|------|
+| Cazier Judiciar PF | ✅ Obligatoriu | Opțional | PDF gratuit, fizic extra |
+| Certificate Stare Civilă | Opțional | ✅ Obligatoriu | Original necesar |
+| Extras Carte Funciară | ✅ Doar PDF | ❌ | Document digital |
+| Cazier Fiscal | ✅ Obligatoriu | Opțional | PDF gratuit |
+
+#### FR-7.2: Metode de Livrare
+
+| ID | Requirement | Priority | Status |
+|----|-------------|----------|--------|
+| FR-7.2.1 | PDF pe email (instant, gratuit) | P0 | ✅ Done |
+| FR-7.2.2 | Livrare fizică România - Fan Courier | P0 | 🔄 In Progress |
+| FR-7.2.3 | Livrare fizică România - Sameday | P1 | ⏳ Planned |
+| FR-7.2.4 | Livrare internațională - DHL | P1 | ⏳ Planned |
+| FR-7.2.5 | Livrare internațională - UPS | P2 | ⏳ Planned |
+| FR-7.2.6 | Livrare internațională - FedEx | P2 | ⏳ Planned |
+| FR-7.2.7 | Livrare în locker (FANbox/Easybox) | P1 | ⏳ Planned |
+
+#### FR-7.3: Funcționalități Livrare
+
+| ID | Requirement | Priority | Status |
+|----|-------------|----------|--------|
+| FR-7.3.1 | Prețuri în timp real de la curier API | P0 | ✅ Done (Fan Courier) |
+| FR-7.3.2 | Validare adresă ANAF API | P0 | ✅ Done |
+| FR-7.3.3 | Autocomplete județ/localitate | P0 | ✅ Done |
+| FR-7.3.4 | Breakdown preț (bază + taxe + TVA) | P0 | ✅ Done |
+| FR-7.3.5 | Estimare dată livrare | P0 | ✅ Done |
+| FR-7.3.6 | Generare AWB din admin (1-click) | P0 | ⏳ Sprint 5 |
+| FR-7.3.7 | Tracking în timp real | P1 | ⏳ Sprint 5 |
+| FR-7.3.8 | Notificare client la expediere | P1 | ⏳ Sprint 5 |
+| FR-7.3.9 | Tracking în contul clientului | P1 | ⏳ Sprint 5 |
+
+#### FR-7.4: Flow Customer
+
+```
+1. Alege metoda: PDF / Fizic
+2. Dacă Fizic → România / Internațional
+3. România → Fan Courier (cu logo)
+   - Introduce adresă (autocomplete)
+   - Validare adresă ANAF API
+   - Preț real-time de la Fan Courier
+   - Breakdown: bază + zonă + TVA
+   - Estimare livrare (zile lucrătoare)
+4. Internațional → DHL/UPS/FedEx
+   - Selectare țară
+   - Introduce adresă
+   - Preț de la provider
+5. Confirmare și continuare
+```
+
+#### FR-7.5: Flow Admin
+
+```
+1. Comandă cu status "Document obținut"
+2. Admin vede buton "Generează AWB Fan Courier"
+3. Click → API call → AWB generat
+4. Status comandă → "Expediat"
+5. Client notificat cu AWB și link tracking
+6. Tracking se actualizează automat
+7. La livrare → status "Livrat"
+```
+
+#### FR-7.6: Courier API Integration Status
+
+| Provider | Quote | AWB | Track | Locker | Status |
+|----------|-------|-----|-------|--------|--------|
+| Fan Courier | ✅ | ✅ | ✅ | ✅ | Implemented |
+| Sameday | ⏳ | ⏳ | ⏳ | ⏳ | Planned |
+| DHL | ⏳ | ⏳ | ⏳ | - | Planned |
+| UPS | ⏳ | ⏳ | ⏳ | - | Planned |
+| FedEx | ⏳ | ⏳ | ⏳ | - | Planned |
+
+### FR-8: Conturi utilizatori (P1) ✅ IMPLEMENTED
+
+> **Implementation:** Full account management at `/account` with 5 tabs.
+
+| ID | Requirement | Priority | Status |
+|----|-------------|----------|--------|
+| FR-8.1 | Inregistrare cu email | P1 | ✅ Done |
+| FR-8.2 | Login cu email/parola sau magic link | P1 | ✅ Done |
+| FR-8.3 | Istoric comenzi | P1 | ✅ Done (Orders tab) |
+| FR-8.4 | Date pre-completate | P1 | ✅ Done (prefill API) |
+| FR-8.5 | KYC salvat si reutilizabil | P1 | ✅ Done (90 days validity) |
+
+**Account Tabs Implemented (2026-01-08):**
+- **Profile:** Personal data + ID scan with OCR auto-fill
+- **KYC:** Verification status, documents, expiry dates
+- **Addresses:** Multiple addresses with deduplication
+- **Billing:** PF/PJ profiles with CNP-based deduplication
+- **Orders:** Order history with status tracking
+
+### FR-8b: Order Auto-Save System ✅ IMPLEMENTED
+
+> **Implementation:** Debounced auto-save with unique order IDs.
+> See `docs/technical/specs/order-autosave-system.md` for details.
+
+| ID | Requirement | Priority | Status |
+|----|-------------|----------|--------|
+| FR-8b.1 | Unique Order ID (E-YYMMDD-XXXXX format) | P0 | ✅ Done (v2.4) |
+| FR-8b.2 | Auto-save draft (debounced 500ms) | P0 | ✅ Done |
+| FR-8b.3 | localStorage backup (offline resilience) | P0 | ✅ Done |
+| FR-8b.4 | Save status indicator ("Salvat acum X sec") | P0 | ✅ Done |
+| FR-8b.5 | Admin order lookup by ID | P0 | ✅ Done |
+| FR-8b.6 | GDPR auto-cleanup (7 days) | P0 | ✅ Done |
+| FR-8b.7 | Order submission API | P0 | ✅ Done |
+| FR-8b.8 | Payment confirmation fallback (webhook backup) | P0 | ✅ Done (v2.4) |
+
+**Order ID Format (2026-01-12):**
+- New format: `E-YYMMDD-XXXXX` (14 chars) - e.g., `E-260112-ABC12`
+- Legacy format still supported: `ORD-YYYYMMDD-XXXXX` (19 chars)
+- E = eGhiseul prefix, YYMMDD = date, XXXXX = Base32 random code
+
+**Order Flow (2026-01-09):**
+1. Draft created at Step 2→3 transition with unique ID
+2. Auto-save on every step change (debounced)
+3. localStorage backup for offline recovery
+4. Submit via `/api/orders/[id]/submit` → status: `pending`
+5. Payment via Stripe (webhook or manual confirmation fallback)
+6. Abandoned drafts anonymized after 7 days (GDPR)
 
 ### FR-9: API pentru parteneri (P1)
 
@@ -339,7 +461,7 @@ eGhiseul.ro este o platforma digitala care simplifica accesul la documente si se
 2. **KYC o singura data** - Salvat 180 zile in cont (Google Gemini 1.5 Flash validation)
 3. **Modular Steps** - Fiecare serviciu definește modulele necesare în `verification_config`
 4. **Smart Pre-fill** - Aceeasi persoana = 0 campuri noi
-5. **InfoCUI Integration** - Validare CUI cu auto-fill date firmă
+5. **ANAF API Integration** (free, official) - Validare CUI cu auto-fill date firmă
 
 **Arhitectura Modular Wizard:**
 
@@ -356,7 +478,7 @@ CORE STEPS (toate serviciile):
 AVAILABLE MODULES:
 ├── client-type      → Selectie PF/PJ
 ├── personal-data    → Date personale + adresa
-├── company-data     → Date firma (CUI validation via InfoCUI)
+├── company-data     → Date firma (CUI validation via ANAF API)
 ├── property-data    → Date proprietate (Carte Funciara)
 ├── vehicle-data     → Date vehicul (Rovinieta)
 ├── kyc-documents    → Upload CI + Selfie + OCR extraction
@@ -438,15 +560,27 @@ Maria locuieste in Germania de 5 ani si are nevoie de un cazier judiciar cu apos
 | System | Purpose | Priority | Status |
 |--------|---------|----------|--------|
 | **Stripe** | Plati card, 3D Secure | P0 | ✅ Integrated |
-| **SmartBill** | Facturare automata (e-factura compliant) | P0 | ⏳ Sprint 4 |
-| **AWS S3** | Stocare documente (eu-central-1) | P0 | ⏳ Sprint 4 |
+| **Oblio** | Facturare automata (e-factura compliant) | P0 | ⏳ Sprint 4 |
+| **AWS S3** | Stocare documente (eu-central-1) | P0 | ✅ Integrated |
 | **Resend** | Email transactional | P0 | ✅ Configured |
 | **Google Gemini 2.0 Flash** | OCR document extraction | P0 | ✅ Integrated |
 | **Google Gemini 1.5 Flash** | KYC face matching & validation | P0 | ✅ Integrated |
-| **InfoCUI.ro** | Validare CUI firme (via eghiseul.ro API) | P0 | ✅ Integrated |
+| **ANAF API** | Validare CUI firme + Adrese (free, official) | P0 | ✅ Integrated |
 | **SMSLink.ro** | SMS notificari (provider românesc) | P1 | ⏳ Sprint 5 |
-| **Fan Curier API** | Livrare Romania | P1 | ⏳ Planned |
-| **DHL API** | Livrare internationala | P1 | ⏳ Planned |
+| **Fan Courier API** | Livrare România (quotes, AWB, tracking, FANbox) | P0 | ✅ Implemented |
+| **Sameday API** | Livrare România alternativă + Easybox | P1 | ⏳ Planned |
+| **DHL API** | Livrare internațională (Express) | P1 | ⏳ Planned |
+| **UPS API** | Livrare internațională alternativă | P2 | ⏳ Planned |
+| **FedEx API** | Livrare internațională alternativă | P2 | ⏳ Planned |
+
+**AWS S3 Storage (2026-01-09):**
+- **Region:** eu-central-1 (Frankfurt)
+- **Bucket:** eghiseul-documents
+- **Encryption:** SSE-S3 (AES-256) at rest, TLS 1.3 in transit
+- **Access:** Presigned URLs (15 min expiry)
+- **Security Rating:** ⭐⭐⭐⭐ (8/10)
+- **Folder Structure:** `kyc/`, `orders/`, `contracts/`, `invoices/`, `final/`, `temp/`
+- **Lifecycle:** 7 years KYC, 10 years contracts, 24h temp files
 
 ### Data storage and privacy
 
@@ -1096,3 +1230,77 @@ Maria locuieste in Germania de 5 ani si are nevoie de un cazier judiciar cu apos
 - Auto-apply based on quantity
 - Show savings vs individual price
 - Discount reflected in total
+
+---
+
+## Implementation Progress
+
+### Sprint Summary (as of 2026-01-09)
+
+| Sprint | Status | Completion | Key Deliverables |
+|--------|--------|------------|------------------|
+| Sprint 0: Setup | ✅ Complete | 100% | Next.js 16, Supabase, AWS config |
+| Sprint 1: Auth | ✅ Complete | 100% | Login, register, sessions, profiles |
+| Sprint 2: Services | ✅ Complete | 100% | Services API, Orders API, options |
+| Sprint 3: KYC & Documents | ✅ Complete | 100% | OCR (Gemini), KYC, modular wizard |
+| Sprint 4: Payments & Contracts | ⏳ In Progress | **65%** | S3, billing step, order submission, profile/KYC sync |
+| Sprint 5: Admin Dashboard | ⏳ Pending | 0% | - |
+| Sprint 6: Notifications | ⏳ Pending | 0% | - |
+
+### Sprint 4 Details (Current)
+
+**Completed (65%):**
+- ✅ AWS S3 document storage (presigned URLs, AES-256)
+- ✅ Order submission API (`/api/orders/[id]/submit`)
+- ✅ Billing step (PF/PJ selection, ANAF API validation)
+- ✅ KYC verification logic (ID + selfie required)
+- ✅ Profile document info display (series, number, type, expiry)
+- ✅ User account management (5 tabs)
+- ✅ Order auto-save with unique IDs
+- ✅ Profile/KYC data synchronization (hide scanner when KYC exists)
+- ✅ Duplicate prevention for addresses/billing profiles on ID scan
+
+**Remaining (35%):**
+- ⏳ Stripe checkout completion
+- ⏳ Oblio invoicing integration
+- ⏳ Contract PDF generation
+- ⏳ Bank transfer payment option
+- ⏳ Email notifications
+
+### Feature Completion by Category
+
+| Category | Completed | Total | % |
+|----------|-----------|-------|---|
+| Authentication | 8 | 8 | 100% |
+| Services & Orders | 12 | 12 | 100% |
+| KYC & OCR | 16 | 16 | 100% |
+| Payments | 2 | 6 | 33% |
+| Contracts | 0 | 6 | 0% |
+| User Accounts | 10 | 10 | 100% |
+| Admin Dashboard | 2 | 10 | 20% |
+| Notifications | 0 | 6 | 0% |
+| **Total** | **52** | **74** | **70%** |
+
+### API Endpoints Implemented
+
+**Total: 25+ endpoints**
+
+| Category | Endpoints |
+|----------|-----------|
+| Services | `GET /api/services`, `GET /api/services/[slug]` |
+| Orders | `POST/GET /api/orders`, `GET/PATCH /api/orders/[id]`, `POST /api/orders/[id]/submit`, `POST /api/orders/[id]/payment` |
+| Draft | `GET/POST/PATCH /api/orders/draft` |
+| OCR/KYC | `POST /api/ocr/extract`, `POST /api/kyc/validate` |
+| User | `GET/PATCH /api/user/profile`, `GET/POST /api/user/kyc/save`, `GET /api/user/kyc` |
+| Addresses | `GET/POST /api/user/addresses`, `PATCH/DELETE /api/user/addresses/[id]` |
+| Billing | `GET/POST /api/user/billing-profiles`, `PATCH/DELETE /api/user/billing-profiles/[id]` |
+| Upload | `POST /api/upload`, `GET /api/upload/download` |
+| Admin | `GET /api/admin/orders/lookup`, `GET /api/admin/orders/list`, `GET/POST /api/admin/cleanup` |
+| Company | `POST /api/company/validate` |
+| Webhooks | `POST /api/webhooks/stripe` |
+
+---
+
+**Document maintained by:** Product Team
+**Last sync with codebase:** 2026-01-09
+**Next review:** After Sprint 4 completion

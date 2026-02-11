@@ -32,7 +32,6 @@ import type { PropertyVerificationConfig } from '@/types/verification-modules';
 import {
   Tooltip,
   TooltipContent,
-  TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 
@@ -192,8 +191,7 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
                 <Label htmlFor="cadastral">
                   Număr Cadastral {config.fields.cadastral.required && <span className="text-red-500">*</span>}
                 </Label>
-                <TooltipProvider>
-                  <Tooltip>
+                <Tooltip>
                     <TooltipTrigger type="button">
                       <HelpCircle className="h-4 w-4 text-muted-foreground" />
                     </TooltipTrigger>
@@ -204,7 +202,6 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
                       </p>
                     </TooltipContent>
                   </Tooltip>
-                </TooltipProvider>
               </div>
               <Input
                 id="cadastral"
@@ -223,8 +220,7 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
                 <Label htmlFor="carteFunciara">
                   Număr Carte Funciară {config.fields.carteFunciara.required && <span className="text-red-500">*</span>}
                 </Label>
-                <TooltipProvider>
-                  <Tooltip>
+                <Tooltip>
                     <TooltipTrigger type="button">
                       <HelpCircle className="h-4 w-4 text-muted-foreground" />
                     </TooltipTrigger>
@@ -235,7 +231,6 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
                       </p>
                     </TooltipContent>
                   </Tooltip>
-                </TooltipProvider>
               </div>
               <Input
                 id="carteFunciara"

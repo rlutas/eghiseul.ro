@@ -60,6 +60,7 @@ export async function uploadToS3(options: UploadOptions): Promise<UploadResult> 
   const { uploadUrl, key, bucket } = data;
 
   // Step 2: Upload file directly to S3
+  // Note: Don't include encryption header - bucket has SSE-S3 enabled by default
   const uploadResponse = await fetch(uploadUrl, {
     method: 'PUT',
     headers: {

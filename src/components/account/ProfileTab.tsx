@@ -28,11 +28,13 @@ import {
   Scan,
   FileText,
   Hash,
+  Building2,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { validateCNP } from '@/lib/validations/cnp';
 import IdScanner, { type ExtractedIdData, type UploadedDocument, type OcrResult } from '@/components/shared/IdScanner';
 import { useKycStatus } from '@/hooks/useKycStatus';
+import CompanyProfileSection, { type CompanyProfile } from './CompanyProfileSection';
 
 interface ProfileData {
   id: string;
@@ -49,7 +51,11 @@ interface ProfileData {
   documentNumber?: string;
   documentType?: string;
   documentExpiry?: string;
+  // Company profile
+  companyProfile?: CompanyProfile | null;
 }
+
+type ProfileSubTab = 'pf' | 'pj';
 
 interface ProfileTabProps {
   initialData?: ProfileData;
@@ -66,8 +72,19 @@ export default function ProfileTab({ initialData, className }: ProfileTabProps) 
   const [editData, setEditData] = useState<Partial<ProfileData>>({});
   const [showScanner, setShowScanner] = useState(false);
   const [scanSuccess, setScanSuccess] = useState(false);
+  const [activeSubTab, setActiveSubTab] = useState<ProfileSubTab>('pf');
 
-  const { saveDocument, isVerified: kycIsVerified, isPartial: kycIsPartial, hasSelfie } = useKycStatus();
+  const {
+    saveDocument,
+    isVerified: kycIsVerified,
+    isPartial: kycIsPartial,
+    hasSelfie,
+    hasFrontId,
+    documents: kycDocuments
+  } = useKycStatus();
+
+  // Check if we have ID data from KYC (no need to scan again)
+  const hasKycIdData = hasFrontId || (kycDocuments && kycDocuments.length > 0);
 
   // Fetch profile data if not provided
   useEffect(() => {
@@ -205,6 +222,34 @@ export default function ProfileTab({ initialData, className }: ProfileTabProps) 
     setIsEditing(true); // Switch to edit mode to show the filled data
   }, [saveDocument]);
 
+  // Handle company profile save
+  const handleCompanySave = useCallback(async (companyData: CompanyProfile) => {
+    const response = await fetch('/api/user/profile', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        companyCui: companyData.cui,
+        companyName: companyData.name,
+        companyType: companyData.type,
+        companyRegistrationNumber: companyData.registrationNumber,
+        companyAddress: companyData.address,
+        companyIsActive: companyData.isActive,
+        companyVatPayer: companyData.vatPayer,
+      }),
+    });
+
+    const result = await response.json();
+    if (!response.ok) {
+      throw new Error(result.error || 'Failed to save company profile');
+    }
+
+    // Update local profile state with returned company data
+    setProfile(prev => prev ? {
+      ...prev,
+      companyProfile: result.data.companyProfile,
+    } : null);
+  }, []);
+
   if (isLoading) {
     return (
       <div className={cn('flex items-center justify-center py-12', className)}>
@@ -226,6 +271,44 @@ export default function ProfileTab({ initialData, className }: ProfileTabProps) 
 
   return (
     <div className={cn('space-y-6', className)}>
+      {/* PF/PJ Sub-tab Toggle */}
+      <div className="flex gap-1 p-1 bg-neutral-100 rounded-xl w-fit">
+        <button
+          onClick={() => setActiveSubTab('pf')}
+          className={cn(
+            'flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all',
+            activeSubTab === 'pf'
+              ? 'bg-white text-secondary-900 shadow-sm'
+              : 'text-neutral-500 hover:text-secondary-900'
+          )}
+        >
+          <User className="w-4 h-4" />
+          Persoană Fizică
+        </button>
+        <button
+          onClick={() => setActiveSubTab('pj')}
+          className={cn(
+            'flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all',
+            activeSubTab === 'pj'
+              ? 'bg-white text-secondary-900 shadow-sm'
+              : 'text-neutral-500 hover:text-secondary-900'
+          )}
+        >
+          <Building2 className="w-4 h-4" />
+          Persoană Juridică
+        </button>
+      </div>
+
+      {/* PJ Tab - Company Profile */}
+      {activeSubTab === 'pj' && (
+        <CompanyProfileSection
+          companyProfile={profile?.companyProfile ?? null}
+          onSave={handleCompanySave}
+        />
+      )}
+
+      {/* PF Tab - Personal Profile (existing content) */}
+      {activeSubTab === 'pf' && <>
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -236,14 +319,17 @@ export default function ProfileTab({ initialData, className }: ProfileTabProps) 
         </div>
         {!isEditing ? (
           <div className="flex gap-2">
-            <Button
-              variant="outline"
-              onClick={() => setShowScanner(true)}
-              className="bg-primary-50 hover:bg-primary-100 border-primary-200"
-            >
-              <Scan className="w-4 h-4 mr-2" />
-              Scanează act
-            </Button>
+            {/* Only show scanner if no KYC ID data exists */}
+            {!hasKycIdData && (
+              <Button
+                variant="outline"
+                onClick={() => setShowScanner(true)}
+                className="bg-primary-50 hover:bg-primary-100 border-primary-200"
+              >
+                <Scan className="w-4 h-4 mr-2" />
+                Scanează act
+              </Button>
+            )}
             <Button
               variant="outline"
               onClick={handleStartEdit}
@@ -254,15 +340,18 @@ export default function ProfileTab({ initialData, className }: ProfileTabProps) 
           </div>
         ) : (
           <div className="flex gap-2">
-            <Button
-              variant="outline"
-              onClick={() => setShowScanner(true)}
-              disabled={isSaving}
-              className="bg-primary-50 hover:bg-primary-100 border-primary-200"
-            >
-              <Scan className="w-4 h-4 mr-2" />
-              Scanează
-            </Button>
+            {/* Only show scanner in edit mode if no KYC ID data exists */}
+            {!hasKycIdData && (
+              <Button
+                variant="outline"
+                onClick={() => setShowScanner(true)}
+                disabled={isSaving}
+                className="bg-primary-50 hover:bg-primary-100 border-primary-200"
+              >
+                <Scan className="w-4 h-4 mr-2" />
+                Scanează
+              </Button>
+            )}
             <Button
               variant="outline"
               onClick={handleCancelEdit}
@@ -338,6 +427,16 @@ export default function ProfileTab({ initialData, className }: ProfileTabProps) 
           <CheckCircle className="h-4 w-4" />
           <AlertDescription>
             Datele au fost completate din actul scanat. Verifică și salvează modificările.
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {/* Info message when profile data comes from KYC */}
+      {hasKycIdData && !isEditing && !success && !scanSuccess && (
+        <Alert className="border-primary-200 bg-primary-50 text-primary-800">
+          <CheckCircle className="h-4 w-4" />
+          <AlertDescription>
+            Datele profilului sunt sincronizate cu documentele încărcate la verificarea identității (KYC).
           </AlertDescription>
         </Alert>
       )}
@@ -586,13 +685,16 @@ export default function ProfileTab({ initialData, className }: ProfileTabProps) 
             kycIsVerified ? 'text-green-600' : kycIsPartial ? 'text-amber-600' : 'text-yellow-600'
           )}>
             {kycIsVerified
-              ? 'Documentele tale au fost verificate cu succes.'
+              ? 'Documentele tale au fost verificate cu succes. Datele profilului sunt sincronizate.'
               : kycIsPartial && !hasSelfie
-              ? 'Lipsește selfie-ul cu actul de identitate.'
-              : 'Scanează actul de identitate în secțiunea KYC pentru verificare.'}
+              ? 'Lipsește selfie-ul cu actul de identitate. Mergi la secțiunea Documente Verificate.'
+              : hasFrontId
+              ? 'Act identitate încărcat. Adaugă selfie-ul în secțiunea Documente Verificate.'
+              : 'Scanează actul de identitate în secțiunea Documente Verificate pentru verificare.'}
           </p>
         </div>
       </div>
+      </>}
     </div>
   );
 }

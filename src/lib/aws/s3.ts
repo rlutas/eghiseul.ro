@@ -52,7 +52,9 @@ export type KycDocumentType =
   | 'ci_nou_back'   // New ID card back
   | 'passport'      // Passport
   | 'selfie'        // Selfie alone
-  | 'selfie_with_id'; // Selfie holding ID
+  | 'selfie_with_id' // Selfie holding ID
+  | 'company_registration_cert'  // Certificat de Inregistrare
+  | 'company_statement_cert';    // Certificat Constatator
 
 export interface UploadOptions {
   contentType: string;
@@ -167,11 +169,12 @@ export async function getUploadUrl(
 ): Promise<UploadResult> {
   const { contentType, metadata = {}, expiresIn = 900 } = options;
 
+  // Note: Don't include ServerSideEncryption here - it causes signature mismatch
+  // with IAM policy conditions. Bucket has SSE-S3 enabled by default.
   const command = new PutObjectCommand({
     Bucket: BUCKET,
     Key: key,
     ContentType: contentType,
-    ServerSideEncryption: 'AES256',
     Metadata: metadata,
   });
 

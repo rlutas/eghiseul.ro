@@ -10,7 +10,7 @@
  * 3. "Facturează pe firmă" - Company billing with CUI validation (PJ)
  */
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import {
   User,
   Users,
@@ -61,7 +61,7 @@ const BILLING_OPTIONS: BillingOption[] = [
 ];
 
 export default function BillingStepModular({ onValidChange }: BillingStepProps) {
-  const { state, updateBilling } = useModularWizard();
+  const { state, updateBilling, prefillData } = useModularWizard();
   const { billing, personalKyc } = state;
 
   // CUI validation state
@@ -69,8 +69,13 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
   const [cuiError, setCuiError] = useState<string | null>(null);
   const [cuiSuccess, setCuiSuccess] = useState(billing?.cuiVerified ?? false);
 
-  // Get prefill data from personal KYC
-  const prefillFromId = personalKyc ? {
+  // Check for saved PJ billing profile to auto-fill
+  const savedPjProfile = prefillData?.billing_profiles?.find(
+    (bp: { type: string; billing_data?: Record<string, unknown> }) => bp.type === 'persoana_juridica'
+  );
+
+  // Get prefill data from personal KYC (memoized to avoid new object refs each render)
+  const prefillFromId = useMemo(() => personalKyc ? {
     firstName: personalKyc.firstName,
     lastName: personalKyc.lastName,
     cnp: personalKyc.cnp,
@@ -82,7 +87,12 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
       personalKyc.address?.city,
       personalKyc.address?.county,
     ].filter(Boolean).join(', '),
-  } : undefined;
+  } : undefined, [
+    personalKyc?.firstName, personalKyc?.lastName, personalKyc?.cnp,
+    personalKyc?.address?.street, personalKyc?.address?.number,
+    personalKyc?.address?.building, personalKyc?.address?.apartment,
+    personalKyc?.address?.city, personalKyc?.address?.county,
+  ]);
 
   // Initialize billing with self data if available and source is 'self'
   useEffect(() => {
@@ -98,33 +108,43 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
     }
   }, [billing?.source, billing?.firstName, prefillFromId, updateBilling]);
 
-  // Validate step
+  // Extract primitive billing values to avoid effect re-triggers from object reference changes
+  const billingSource = billing?.source;
+  const billingFirstName = billing?.firstName;
+  const billingLastName = billing?.lastName;
+  const billingCnp = billing?.cnp;
+  const billingCuiVerified = billing?.cuiVerified;
+  const billingCompanyName = billing?.companyName;
+  const billingCui = billing?.cui;
+  const billingIsValid = billing?.isValid;
+
+  // Validate step (uses primitives to prevent infinite update loops)
   useEffect(() => {
-    if (!billing) {
+    if (!billingSource) {
       onValidChange(false);
       return;
     }
 
     let isValid = false;
 
-    if (billing.source === 'self') {
+    if (billingSource === 'self') {
       // Self: must have name and CNP (pre-filled from ID)
-      isValid = Boolean(billing.firstName && billing.lastName && billing.cnp);
-    } else if (billing.source === 'other_pf') {
+      isValid = Boolean(billingFirstName && billingLastName && billingCnp);
+    } else if (billingSource === 'other_pf') {
       // Other PF: must have name and CNP
-      isValid = Boolean(billing.firstName && billing.lastName && billing.cnp);
-    } else if (billing.source === 'company') {
+      isValid = Boolean(billingFirstName && billingLastName && billingCnp);
+    } else if (billingSource === 'company') {
       // Company: must have verified CUI and company name
-      isValid = Boolean(billing.cuiVerified && billing.companyName && billing.cui);
+      isValid = Boolean(billingCuiVerified && billingCompanyName && billingCui);
     }
 
     // Update billing validity
-    if (billing.isValid !== isValid) {
+    if (billingIsValid !== isValid) {
       updateBilling({ isValid });
     }
 
     onValidChange(isValid);
-  }, [billing, onValidChange, updateBilling]);
+  }, [billingSource, billingFirstName, billingLastName, billingCnp, billingCuiVerified, billingCompanyName, billingCui, billingIsValid, onValidChange, updateBilling]);
 
   // Handle source selection
   const handleSourceSelect = useCallback((source: BillingSource) => {
@@ -167,7 +187,10 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
       setCuiSuccess(false);
       setCuiError(null);
     } else if (source === 'company') {
-      // Switch to company mode
+      // Switch to company mode - auto-fill from saved PJ billing profile if available
+      const pjData = savedPjProfile?.billing_data as Record<string, string> | undefined;
+      const hasSavedPj = pjData?.cui && pjData?.companyName;
+
       updateBilling({
         source,
         type: 'persoana_juridica',
@@ -176,14 +199,19 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
         lastName: undefined,
         cnp: undefined,
         address: undefined,
-        // Initialize company fields
-        companyName: billing?.companyName || '',
-        cui: billing?.cui || '',
-        regCom: billing?.regCom || '',
-        companyAddress: billing?.companyAddress || '',
-        cuiVerified: false,
-        isValid: false,
+        // Initialize company fields from saved profile or empty
+        companyName: pjData?.companyName || billing?.companyName || '',
+        cui: pjData?.cui || billing?.cui || '',
+        regCom: pjData?.regCom || billing?.regCom || '',
+        companyAddress: pjData?.address || billing?.companyAddress || '',
+        cuiVerified: !!hasSavedPj,
+        isValid: !!hasSavedPj,
       });
+
+      if (hasSavedPj) {
+        setCuiSuccess(true);
+        setCuiError(null);
+      }
     }
   }, [billing, prefillFromId, updateBilling]);
 
@@ -219,7 +247,7 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || 'Eroare la validarea CUI');
+        throw new Error(errorData.error?.message || errorData.error || 'Eroare la validarea CUI');
       }
 
       const data = await response.json();
@@ -387,6 +415,14 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
       {selectedSource === 'company' && (
         <div className="space-y-4 p-4 bg-neutral-50 rounded-xl">
           <h4 className="font-medium text-secondary-900">Date facturare (persoană juridică)</h4>
+
+          {/* Auto-fill notice from saved PJ profile */}
+          {savedPjProfile && cuiSuccess && (
+            <div className="flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded-lg text-sm text-green-700">
+              <CheckCircle className="w-4 h-4 shrink-0" />
+              Date preluate automat din profilul de firmă salvat
+            </div>
+          )}
 
           {/* CUI with validation */}
           <div className="space-y-2">

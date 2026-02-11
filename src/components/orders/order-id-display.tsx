@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button';
 import {
   Tooltip,
   TooltipContent,
-  TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
@@ -73,41 +72,37 @@ export function OrderIdDisplay({
       )}
 
       {showClearButton && onClear && (
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={onClear}
-                className="h-7 w-7 p-0 text-orange-600 hover:text-orange-700 hover:bg-orange-50"
-              >
-                <RefreshCw className="h-3.5 w-3.5" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="bottom">
-              <p className="text-sm">Începe o comandă nouă</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onClear}
+              className="h-7 w-7 p-0 text-orange-600 hover:text-orange-700 hover:bg-orange-50"
+            >
+              <RefreshCw className="h-3.5 w-3.5" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="bottom">
+            <p className="text-sm">Începe o comandă nouă</p>
+          </TooltipContent>
+        </Tooltip>
       )}
 
       {showHelpText && (
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
-                <HelpCircle className="h-3.5 w-3.5 text-muted-foreground" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="bottom" className="max-w-xs">
-              <p className="text-sm">
-                Acest cod identifică unic comanda ta. Păstrează-l pentru a putea
-                continua comanda mai târziu sau pentru a contacta suportul.
-              </p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+              <HelpCircle className="h-3.5 w-3.5 text-muted-foreground" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="bottom" className="max-w-xs">
+            <p className="text-sm">
+              Acest cod identifică unic comanda ta. Păstrează-l pentru a putea
+              continua comanda mai târziu sau pentru a contacta suportul.
+            </p>
+          </TooltipContent>
+        </Tooltip>
       )}
     </div>
   );

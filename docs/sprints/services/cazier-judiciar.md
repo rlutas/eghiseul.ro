@@ -69,7 +69,7 @@ Serviciu de obținere cazier judiciar online de la Poliția Română. Formular c
 | **PF Cetățean Român** | Buletin/Pașaport + Selfie KYC |
 | **PF Cetățean European** | Pașaport/CI + Permis rezidență + Selfie |
 | **PF Cetățean Străin** | Pașaport + Permis ședere + Certificat înregistrare + Selfie |
-| **Persoană Juridică** | CUI (validare infocui.ro) + KYC reprezentant |
+| **Persoană Juridică** | CUI (validare ANAF API) + KYC reprezentant |
 
 ## User Flow (7 pași)
 

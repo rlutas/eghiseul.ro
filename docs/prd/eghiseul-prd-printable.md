@@ -290,7 +290,7 @@
 | Olbio | Facturi | P0 |
 | AWS S3 | Documente | P0 |
 | SendGrid | Email | P0 |
-| infocui.ro | Validare CUI | P0 |
+| ANAF API | Validare CUI (free, official) | P0 |
 | Fan Curier | Livrare RO | P1 |
 | DHL | Livrare int. | P1 |
 

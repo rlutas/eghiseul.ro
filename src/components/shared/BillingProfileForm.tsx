@@ -5,7 +5,7 @@
  *
  * Reusable form for creating/editing billing profiles.
  * Supports both Persoană Fizică (PF) and Persoană Juridică (PJ).
- * Includes CUI validation via InfoCUI API for companies.
+ * Includes CUI validation via ANAF API for companies.
  *
  * Used in:
  * - Account page (BillingTab)
@@ -57,9 +57,6 @@ export interface BillingData {
   companyAddress?: string;
   bankName?: string;
   bankIban?: string;
-  contactPerson?: string;
-  contactPhone?: string;
-  contactEmail?: string;
 }
 
 export interface BillingProfileFormProps {
@@ -154,7 +151,7 @@ export default function BillingProfileForm({
     setCuiSuccess(false);
 
     try {
-      const response = await fetch('/api/infocui/validate', {
+      const response = await fetch('/api/company/validate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ cui }),
@@ -162,25 +159,25 @@ export default function BillingProfileForm({
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || 'Eroare la validarea CUI');
+        throw new Error(errorData.error?.message || errorData.error || 'Eroare la validarea CUI');
       }
 
       const data = await response.json();
 
-      if (data.success && data.company) {
-        // Auto-fill company data
+      if (data.success && data.data) {
+        // Auto-fill company data from ANAF
         onChange({
           ...value,
-          label: value.label || data.company.name || '',
+          label: value.label || data.data.name || '',
           type: 'persoana_juridica',
-          companyName: data.company.name || value.companyName,
-          cui: data.company.cui || value.cui,
-          regCom: data.company.regCom || value.regCom,
-          companyAddress: data.company.address || value.companyAddress,
+          companyName: data.data.name || value.companyName,
+          cui: data.data.cui || value.cui,
+          regCom: data.data.registrationNumber || value.regCom,
+          companyAddress: data.data.address || value.companyAddress,
         } as BillingData);
         setCuiSuccess(true);
       } else {
-        throw new Error(data.error || 'CUI invalid sau firmă inactivă');
+        throw new Error(data.error?.message || 'CUI invalid sau firmă inactivă');
       }
     } catch (error) {
       console.error('CUI validation error:', error);
@@ -479,51 +476,6 @@ export default function BillingProfileForm({
             </div>
           </div>
 
-          {/* Contact Person */}
-          <div className="pt-4 border-t space-y-4">
-            <h4 className="font-medium text-secondary-900">Persoană de contact</h4>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="contactPerson" className="text-secondary-900 font-medium">
-                  Nume
-                </Label>
-                <Input
-                  id="contactPerson"
-                  type="text"
-                  value={value.contactPerson || ''}
-                  onChange={(e) => updateField('contactPerson', e.target.value)}
-                  placeholder="Ion Popescu"
-                  className="bg-white"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="contactPhone" className="text-secondary-900 font-medium">
-                  Telefon
-                </Label>
-                <Input
-                  id="contactPhone"
-                  type="tel"
-                  value={value.contactPhone || ''}
-                  onChange={(e) => updateField('contactPhone', e.target.value)}
-                  placeholder="0712345678"
-                  className="bg-white"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="contactEmail" className="text-secondary-900 font-medium">
-                  Email
-                </Label>
-                <Input
-                  id="contactEmail"
-                  type="email"
-                  value={value.contactEmail || ''}
-                  onChange={(e) => updateField('contactEmail', e.target.value)}
-                  placeholder="contact@firma.ro"
-                  className="bg-white"
-                />
-              </div>
-            </div>
-          </div>
         </>
       )}
 

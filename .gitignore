@@ -44,6 +44,10 @@ next-env.d.ts
 /supabase/.branches
 /supabase/.temp
 
+# API Token Caches
+.fancourier-token.json
+.sameday-token.json
+
 # Logs
 logs
 *.log

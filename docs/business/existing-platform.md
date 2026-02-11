@@ -11,7 +11,7 @@
 | Tracking | Google Tag Manager | GTM-KJBL8FVZ |
 | Analytics | GA4 | Purchase tracking |
 | Comenzi | Google Sheets | Manual, per serviciu |
-| Company Lookup | infocui.ro API | Validare CUI |
+| Company Lookup | ANAF API (free, official) | Validare CUI |
 
 ## Servicii Existente
 
@@ -42,7 +42,7 @@
 - WhatsApp support pe erori plată
 ```
 
-### CUI Validation (infocui.ro)
+### CUI Validation (ANAF API)
 ```
 - Lookup automat date firmă
 - Pre-completare: nume, adresă, cod înmatriculare, stare
@@ -77,5 +77,5 @@
 ⚠️ **ATENȚIE**: Chei live în functions.php - de migrat în environment variables!
 
 - Stripe Live: `sk_live_51OFE2w...` (EDIGITALIZARE SRL)
-- infocui.ro: `dc780fcbe30e7fc2601df79720b70d2cf73a8825`
+- infocui.ro (deprecated, replaced by ANAF API): `dc780fcbe30e7fc2601df79720b70d2cf73a8825`
 - GTM: `GTM-KJBL8FVZ`

@@ -4,8 +4,8 @@
 
 This document describes the modular architecture for verification components in the eghiseul.ro platform. Each service can enable/disable different verification modules based on its requirements.
 
-**Last Updated:** 2025-12-19
-**Version:** 1.0
+**Last Updated:** 2026-02-10
+**Version:** 1.1
 
 ---
 
@@ -39,25 +39,25 @@ This document describes the modular architecture for verification components in 
 │                         VERIFICATION MODULES                                 │
 │                                                                             │
 │  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐             │
-│  │  PERSONAL KYC   │  │   COMPANY KYC   │  │    PROPERTY     │             │
+│  │  PERSONAL KYC   │  │   COMPANY KYC   │  │  COMPANY DOCS   │             │
 │  │     MODULE      │  │     MODULE      │  │     MODULE      │             │
 │  ├─────────────────┤  ├─────────────────┤  ├─────────────────┤             │
-│  │ • ID Upload     │  │ • CUI Input     │  │ • Județ Select  │             │
-│  │ • OCR Extract   │  │ • Auto-complete │  │ • Localitate    │             │
-│  │ • Selfie KYC    │  │ • Type Validate │  │ • Nr. CF        │             │
-│  │ • Signature     │  │ • Block Rules   │  │ • Nr. Cadastral │             │
-│  │ • Expiry Check  │  │                 │  │                 │             │
+│  │ • ID Upload     │  │ • CUI Input     │  │ • Cert. Înreg.  │             │
+│  │ • OCR Extract   │  │ • Auto-complete │  │ • Cert. Const.  │             │
+│  │ • Selfie KYC    │  │ • Type Validate │  │ • PDF/Image     │             │
+│  │ • Signature     │  │ • Block Rules   │  │ • Drag & Drop   │             │
+│  │ • Expiry Check  │  │                 │  │ • KYC Bypass     │             │
 │  └─────────────────┘  └─────────────────┘  └─────────────────┘             │
 │                                                                             │
-│  ┌─────────────────┐  ┌─────────────────┐                                  │
-│  │    VEHICLE      │  │    SIGNATURE    │                                  │
-│  │     MODULE      │  │     MODULE      │                                  │
-│  ├─────────────────┤  ├─────────────────┤                                  │
-│  │ • Plate Number  │  │ • Canvas Draw   │                                  │
-│  │ • Category      │  │ • Touch Support │                                  │
-│  │ • VIN           │  │ • Save as Image │                                  │
-│  │ • Period        │  │                 │                                  │
-│  └─────────────────┘  └─────────────────┘                                  │
+│  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐             │
+│  │    PROPERTY     │  │    VEHICLE      │  │    SIGNATURE    │             │
+│  │     MODULE      │  │     MODULE      │  │     MODULE      │             │
+│  ├─────────────────┤  ├─────────────────┤  ├─────────────────┤             │
+│  │ • Județ Select  │  │ • Plate Number  │  │ • Canvas Draw   │             │
+│  │ • Localitate    │  │ • Category      │  │ • Touch Support │             │
+│  │ • Nr. CF        │  │ • VIN           │  │ • Save as Image │             │
+│  │ • Nr. Cadastral │  │ • Period        │  │                 │             │
+│  └─────────────────┘  └─────────────────┘  └─────────────────┘             │
 └─────────────────────────────────────────────────────────────────────────────┘
                                  │
                                  │ Module outputs
@@ -69,6 +69,7 @@ This document describes the modular architecture for verification components in 
 │    contact: { email, phone },                                               │
 │    personalData: { cnp, name, birthDate, ... },                            │
 │    companyData: { cui, name, address, type },                              │
+│    companyDocuments: { uploadedDocuments: [...] },                          │
 │    propertyData: { judet, localitate, nrCF, ... },                         │
 │    vehicleData: { plateNumber, category, ... },                            │
 │    kycDocuments: { ... },                                                  │
@@ -172,13 +173,13 @@ src/components/orders/modules/
 │   ├── CompanyKYCModule.tsx
 │   ├── components/
 │   │   ├── CUIInput.tsx            # CUI input with validation
-│   │   ├── CompanyAutoComplete.tsx # Auto-fill from infocui.ro
+│   │   ├── CompanyAutoComplete.tsx # Auto-fill from ANAF API
 │   │   ├── EntityTypeValidator.tsx # Check allowed/blocked types
 │   │   ├── CompanyDetails.tsx      # Display company info
 │   │   └── BlockedEntityWarning.tsx # Show blocked message
 │   ├── hooks/
 │   │   ├── useCUIValidation.ts     # CUI format validation
-│   │   ├── useInfoCUI.ts           # infocui.ro API hook
+│   │   ├── useInfoCUI.ts           # ANAF API hook
 │   │   └── useEntityTypeRules.ts   # Type blocking rules
 │   └── types.ts
 ```
@@ -211,7 +212,112 @@ interface CompanyKYCModuleConfig {
 
 ---
 
-### 3. Property Verification Module
+### 3. Company Documents Module
+
+**Purpose:** Upload and validate company documents (Certificat de Inregistrare, Certificat Constatator) for PJ orders
+
+**Visibility Condition:** Only shown when `clientType === 'PJ'` AND `companyKyc.documentsRequired === true`
+
+**Step Order:** Placed after `company-data`, before `personal-data`
+
+**Components:**
+
+```
+src/components/orders/modules/
+├── company-kyc/
+│   ├── CompanyDataStep.tsx           # Company CUI validation (existing)
+│   ├── CompanyDocumentsStep.tsx       # Company document upload (NEW)
+```
+
+**Configuration:**
+
+The Company Documents module is controlled through the `CompanyKYCConfig` interface (extended with document fields):
+
+```typescript
+interface CompanyKYCConfig {
+  enabled: boolean;
+  condition?: string;
+
+  // CUI validation
+  validation: 'infocui' | 'onrc' | 'manual';
+  autoComplete: boolean;
+
+  // Entity type rules
+  allowedTypes: string[];
+  blockedTypes: string[];
+  blockMessage?: string;
+  specialRules: CompanySpecialRule[];
+
+  // Company document requirements (controls company-documents step)
+  documentsRequired: boolean;
+  requiredDocuments: ('company_registration_cert' | 'company_statement_cert')[];
+}
+```
+
+**Document Types:**
+
+| Type | Romanian Name | Description |
+|------|---------------|-------------|
+| `company_registration_cert` | Certificat de Inregistrare | Document issued by the Trade Registry containing the CUI |
+| `company_statement_cert` | Certificat Constatator | Certificate of facts issued by ONRC |
+
+**State:**
+
+Company documents are stored within `CompanyKYCState.uploadedDocuments`:
+
+```typescript
+interface CompanyKYCState {
+  cui: string;
+  companyName: string;
+  companyType: string;
+  registrationNumber: string;
+  address: AddressState;
+  isActive: boolean;
+  validationStatus: 'pending' | 'valid' | 'invalid' | 'blocked';
+  validationMessage?: string;
+  autoCompleteData?: CompanyAutoCompleteData;
+  uploadedDocuments: UploadedDocumentState[];  // Company documents stored here
+}
+```
+
+**Reducer Action:**
+
+```typescript
+// Dedicated action for updating company documents
+{ type: 'UPDATE_COMPANY_KYC_DOCS'; payload: UploadedDocumentState[] }
+```
+
+The provider exposes `updateCompanyKycDocuments(docs)` for the component to use.
+
+**Features:**
+- Drag-and-drop file upload with click fallback
+- Accepts JPEG, PNG, and PDF (max 10MB)
+- Image preview with modal zoom
+- PDF file display with filename
+- Progress indicator during upload
+- Per-document error handling
+- Verified company KYC bypass: if user has verified company docs in their profile, the step auto-validates and shows a "Documents already verified" banner with an option to re-upload
+- Progress summary showing completion status for each required document
+
+**Draft Save:**
+
+When saving to the server, company documents metadata is included under the `company_documents` key:
+
+```typescript
+company_documents: state.companyKyc?.uploadedDocuments?.map(doc => ({
+  id: doc.id,
+  type: doc.type,
+  fileName: doc.fileName,
+  fileSize: doc.fileSize,
+  mimeType: doc.mimeType,
+  uploadedAt: doc.uploadedAt,
+  // base64 excluded from draft saves to keep payload small
+})) || null,
+```
+
+---
+
+### 4. Property Verification Module
 
 **Purpose:** Collect property/land data for CF services
 
@@ -262,7 +368,7 @@ interface PropertyModuleConfig {
 
 ---
 
-### 4. Vehicle Verification Module
+### 5. Vehicle Verification Module
 
 **Purpose:** Collect vehicle data for auto services
 
@@ -310,7 +416,7 @@ interface VehicleModuleConfig {
 
 ---
 
-### 5. Signature Module
+### 6. Signature Module
 
 **Purpose:** Capture electronic signature
 
@@ -341,6 +447,7 @@ All modules are registered in a central registry:
 
 import { PersonalKYCModule } from '@/components/orders/modules/personal-kyc';
 import { CompanyKYCModule } from '@/components/orders/modules/company-kyc';
+import { CompanyDocumentsModule } from '@/components/orders/modules/company-kyc/CompanyDocumentsStep';
 import { PropertyModule } from '@/components/orders/modules/property-verification';
 import { VehicleModule } from '@/components/orders/modules/vehicle-verification';
 import { SignatureModule } from '@/components/orders/modules/signature';
@@ -355,6 +462,11 @@ export const ModuleRegistry = {
     component: CompanyKYCModule,
     stepId: 'company-kyc',
     stepName: 'Date Firmă',
+  },
+  companyDocuments: {
+    component: CompanyDocumentsModule,
+    stepId: 'company-documents',
+    stepName: 'Documente Firmă',
   },
   propertyVerification: {
     component: PropertyModule,
@@ -425,6 +537,16 @@ export function buildOrderSteps(
         ? (state) => evaluateCondition(config.companyKyc.condition!, state)
         : undefined,
     });
+
+    // 3b. Company Documents (if documents required for PJ)
+    if (config.companyKyc.documentsRequired) {
+      steps.push({
+        id: ModuleRegistry.companyDocuments.stepId,
+        name: ModuleRegistry.companyDocuments.stepName,
+        component: ModuleRegistry.companyDocuments.component,
+        condition: (state) => state.clientType === 'PJ',
+      });
+    }
   }
 
   // 4. Property Verification
@@ -542,6 +664,8 @@ const certificatConstatatorConfig: ServiceVerificationConfig = {
         message: 'Pentru PFA/II/IF se eliberează certificat constatator pe persoană fizică.',
       },
     ],
+    documentsRequired: true,
+    requiredDocuments: ['company_registration_cert'],
   },
 
   propertyVerification: { enabled: false },
@@ -630,6 +754,7 @@ interface OrderWizardContextValue {
   setContactData: (data: ContactData) => void;
   setPersonalKYCData: (data: PersonalKYCData) => void;
   setCompanyKYCData: (data: CompanyKYCData) => void;
+  updateCompanyKycDocuments: (docs: UploadedDocumentState[]) => void;
   setPropertyData: (data: PropertyData) => void;
   setVehicleData: (data: VehicleData) => void;
   setSignature: (signature: string) => void;
@@ -659,6 +784,8 @@ src/
 │   ├── modules/
 │   │   ├── personal-kyc/
 │   │   ├── company-kyc/
+│   │   │   ├── CompanyDataStep.tsx           # CUI input & ANAF validation
+│   │   │   └── CompanyDocumentsStep.tsx      # Company document upload (PJ)
 │   │   ├── property-verification/
 │   │   ├── vehicle-verification/
 │   │   └── signature/
@@ -705,7 +832,12 @@ src/
    - `src/components/orders/modules/personal-kyc/KYCDocumentsStep.tsx`
 2. ✅ CompanyKYCModule (CUI validation ready)
    - `src/components/orders/modules/company-kyc/CompanyDataStep.tsx`
-3. ✅ SignatureModule
+3. ✅ CompanyDocumentsModule (PJ document upload)
+   - `src/components/orders/modules/company-kyc/CompanyDocumentsStep.tsx`
+   - Supports `company_registration_cert` and `company_statement_cert`
+   - Conditional on `clientType === 'PJ'` and `companyKyc.documentsRequired`
+   - Registered in `MODULE_REGISTRY` and `MODULE_LOADERS`
+4. ✅ SignatureModule
    - `src/components/orders/modules/signature/SignatureStep.tsx`
 
 ### Phase 3: Extended Modules ✅ COMPLETE
@@ -719,8 +851,8 @@ src/
 2. ✅ Migrate service configurations (Cazier Fiscal, Extras CF, Certificat Constatator, etc.)
 3. ⏳ Create admin UI for module configuration - Pending Sprint 5
 
-**Implementation Date:** 2025-12-19
-**Sprint:** Sprint 3 - KYC & Documents
+**Implementation Date:** 2025-12-19 (initial), 2026-02-10 (company-documents module)
+**Sprint:** Sprint 3 - KYC & Documents, Sprint 4 - Payments & Contracts
 
 ---
 

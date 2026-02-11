@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { stripe } from '@/lib/stripe'
 import { createClient } from '@supabase/supabase-js'
 import Stripe from 'stripe'
+import { createInvoiceFromOrder } from '@/lib/oblio'
 
 // Use service role for webhook handler (bypasses RLS)
 const supabaseAdmin = createClient(
@@ -82,7 +83,26 @@ async function handlePaymentSucceeded(paymentIntent: Stripe.PaymentIntent) {
     return
   }
 
-  const { error } = await supabaseAdmin
+  // 1. Fetch full order data for invoice (with service name)
+  const { data: order, error: fetchError } = await supabaseAdmin
+    .from('orders')
+    .select('*, services(name)')
+    .eq('id', orderId)
+    .single()
+
+  if (fetchError || !order) {
+    console.error('Failed to fetch order for invoice:', fetchError)
+    throw fetchError || new Error('Order not found')
+  }
+
+  // Check idempotency - don't process if already paid
+  if (order.payment_status === 'paid' && order.invoice_number) {
+    console.log(`Order ${orderId} already processed, skipping`)
+    return
+  }
+
+  // 2. Update order status to paid
+  const { error: updateError } = await supabaseAdmin
     .from('orders')
     .update({
       payment_status: 'paid',
@@ -91,12 +111,78 @@ async function handlePaymentSucceeded(paymentIntent: Stripe.PaymentIntent) {
     })
     .eq('id', orderId)
 
-  if (error) {
-    console.error('Failed to update order after payment:', error)
-    throw error
+  if (updateError) {
+    console.error('Failed to update order after payment:', updateError)
+    throw updateError
   }
 
   console.log(`Order ${orderId} marked as paid and processing`)
+
+  // 3. Create Oblio invoice
+  try {
+    // Get service name from joined relation
+    const serviceName = (order.services as { name: string } | null)?.name || 'Serviciu eGhiseul';
+
+    const invoice = await createInvoiceFromOrder(
+      {
+        id: order.id,
+        order_number: order.order_number ?? undefined,
+        friendly_order_id: order.friendly_order_id ?? undefined,
+        service_name: serviceName,
+        base_price: order.base_price ?? undefined,
+        total_price: order.total_price,
+        selected_options: order.selected_options as Array<{ code?: string; name: string; price: number }> | undefined,
+        delivery_method: order.delivery_method ?? undefined,
+        delivery_price: order.delivery_price ?? undefined,
+        customer_data: order.customer_data as Record<string, unknown> | undefined,
+      },
+      'Card'
+    )
+
+    // 4. Update order with invoice info
+    const { error: invoiceUpdateError } = await supabaseAdmin
+      .from('orders')
+      .update({
+        invoice_number: invoice.invoiceNumber,
+        invoice_url: invoice.pdfUrl,
+        invoice_issued_at: invoice.createdAt,
+      })
+      .eq('id', orderId)
+
+    if (invoiceUpdateError) {
+      console.error('Failed to store invoice info:', invoiceUpdateError)
+      // Don't throw - order is paid, invoice can be created manually
+    } else {
+      console.log(`Invoice ${invoice.invoiceNumber} created for order ${orderId}`)
+    }
+
+    // 5. Add to order history
+    await supabaseAdmin.from('order_history').insert({
+      order_id: orderId,
+      event_type: 'payment_confirmed',
+      notes: `Card payment confirmed. Invoice: ${invoice.invoiceNumber}`,
+      new_value: JSON.stringify({
+        payment_status: 'paid',
+        invoice_number: invoice.invoiceNumber,
+        stripe_payment_intent: paymentIntent.id,
+      }),
+    })
+  } catch (invoiceError) {
+    // Log error but don't fail - payment is confirmed
+    console.error('Failed to create Oblio invoice:', invoiceError)
+
+    // Still add to order history
+    await supabaseAdmin.from('order_history').insert({
+      order_id: orderId,
+      event_type: 'payment_confirmed',
+      notes: 'Card payment confirmed. Invoice creation failed - manual action required.',
+      new_value: JSON.stringify({
+        payment_status: 'paid',
+        stripe_payment_intent: paymentIntent.id,
+        invoice_error: invoiceError instanceof Error ? invoiceError.message : 'Unknown error',
+      }),
+    })
+  }
 }
 
 async function handlePaymentFailed(paymentIntent: Stripe.PaymentIntent) {
@@ -119,7 +205,7 @@ async function handleChargeRefunded(charge: Stripe.Charge) {
   const { data: order } = await supabaseAdmin
     .from('orders')
     .select('id')
-    .eq('stripe_payment_intent', paymentIntentId)
+    .eq('stripe_payment_intent_id', paymentIntentId)
     .single()
 
   if (!order) {

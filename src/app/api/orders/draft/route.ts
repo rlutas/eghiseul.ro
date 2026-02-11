@@ -141,12 +141,15 @@ export async function POST(request: NextRequest) {
 
         if (updateError) {
           console.error('Draft update error (on POST):', updateError);
+          console.error('Draft update error details (on POST):', JSON.stringify(updateError, null, 2));
+          console.error('Update payload was:', JSON.stringify(updatePayload, null, 2));
           return NextResponse.json(
             {
               success: false,
               error: {
                 code: 'DATABASE_ERROR',
                 message: 'Failed to update draft order',
+                details: updateError.message || updateError.code || 'Unknown database error',
               },
             },
             { status: 500 }
@@ -481,12 +484,15 @@ export async function PATCH(request: NextRequest) {
 
     if (updateError) {
       console.error('Draft update error:', updateError);
+      console.error('Draft update error details:', JSON.stringify(updateError, null, 2));
+      console.error('Update data was:', JSON.stringify(updateData, null, 2));
       return NextResponse.json(
         {
           success: false,
           error: {
             code: 'DATABASE_ERROR',
             message: 'Failed to update draft order',
+            details: updateError.message || updateError.code || 'Unknown database error',
           },
         },
         { status: 500 }

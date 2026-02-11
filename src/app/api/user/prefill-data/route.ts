@@ -129,6 +129,22 @@ export async function GET() {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const allContacts = savedData?.filter((d: any) => d.data_type === 'contact') || [];
 
+    // Extract document info from KYC (series, number, expiry)
+    let documentSeries = '';
+    let documentNumber = '';
+    let documentExpiry = '';
+    let documentType: string | null = null;
+
+    // Find the front ID document (ci_front or ci_nou_front)
+    const frontIdDoc = kycDocuments['ci_front'] || kycDocuments['ci_nou_front'] || kycDocuments['passport'];
+    if (frontIdDoc && frontIdDoc.extracted_data) {
+      const extracted = frontIdDoc.extracted_data as Record<string, unknown>;
+      documentSeries = (extracted.series as string) || '';
+      documentNumber = (extracted.number as string) || '';
+      documentExpiry = (extracted.expiryDate as string) || '';
+      documentType = (extracted.documentType as string) || Object.keys(kycDocuments).find(k => k.includes('ci')) || null;
+    }
+
     // Build response
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const profileAny = profile as any;
@@ -145,7 +161,23 @@ export async function GET() {
           phone: profileAny?.phone || '',
           // Default address
           address: defaultAddress?.data || null,
+          // Document info from KYC
+          documentSeries,
+          documentNumber,
+          documentExpiry,
+          documentType,
         },
+        // Company data from profile (for PJ orders)
+        company: profileAny?.company_cui ? {
+          cui: profileAny.company_cui,
+          name: profileAny.company_name || '',
+          type: profileAny.company_type || '',
+          registrationNumber: profileAny.company_registration_number || '',
+          address: profileAny.company_address || '',
+          isActive: profileAny.company_is_active || false,
+          vatPayer: profileAny.company_vat_payer || false,
+          verified: profileAny.company_verified || false,
+        } : null,
         // Contact data
         contact: {
           email: profileAny?.email || user.email || '',

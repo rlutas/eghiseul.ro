@@ -7,7 +7,7 @@
  * Each document type (ID front, ID back, Selfie) shown separately.
  */
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import {
@@ -25,6 +25,8 @@ import {
   User,
   CreditCard,
   RefreshCw,
+  Building2,
+  FileText,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useKycStatus, type KycStatus } from '@/hooks/useKycStatus';
@@ -67,6 +69,26 @@ const DOCUMENT_TYPES = {
 
 type DocumentTypeKey = keyof typeof DOCUMENT_TYPES;
 
+// Company document types
+const COMPANY_DOCUMENT_TYPES = {
+  company_registration_cert: {
+    label: 'Certificat de Înregistrare',
+    shortLabel: 'Cert. Înreg.',
+    description: 'CUI, denumire firmă',
+    icon: FileText,
+    color: 'purple',
+  },
+  company_statement_cert: {
+    label: 'Certificat Constatator',
+    shortLabel: 'Cert. Const.',
+    description: 'Date firmă actualizate',
+    icon: FileText,
+    color: 'purple',
+  },
+} as const;
+
+type CompanyDocTypeKey = keyof typeof COMPANY_DOCUMENT_TYPES;
+
 export default function KYCTab({ className }: KYCTabProps) {
   const {
     status,
@@ -89,13 +111,30 @@ export default function KYCTab({ className }: KYCTabProps) {
   const { addresses, create: createAddress, update: updateAddress } = useAddresses();
   const { profiles, createFromIdData: createBillingFromId, update: updateBillingProfile } = useBillingProfiles();
 
-  const [uploadingType, setUploadingType] = useState<DocumentTypeKey | null>(null);
+  const [uploadingType, setUploadingType] = useState<DocumentTypeKey | CompanyDocTypeKey | null>(null);
   const [processingOcr, setProcessingOcr] = useState<DocumentTypeKey | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [expandedDoc, setExpandedDoc] = useState<string | null>(null);
   const [resolvedUrls, setResolvedUrls] = useState<Record<string, string>>({});
   const fileInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
+  const [hasCompanyProfile, setHasCompanyProfile] = useState(false);
+
+  // Check if user has a company profile
+  useEffect(() => {
+    async function checkCompanyProfile() {
+      try {
+        const response = await fetch('/api/user/profile');
+        if (response.ok) {
+          const result = await response.json();
+          setHasCompanyProfile(!!result.data?.companyProfile);
+        }
+      } catch {
+        // Ignore - company section just won't show
+      }
+    }
+    checkCompanyProfile();
+  }, []);
 
   // Resolve S3 URL when document is expanded
   const resolveDocumentUrl = useCallback(async (docId: string, fileUrl: string) => {
@@ -238,6 +277,60 @@ export default function KYCTab({ className }: KYCTabProps) {
     } finally {
       setUploadingType(null);
       setProcessingOcr(null);
+    }
+  }, [saveDocument, refreshKyc]);
+
+  // Handle company document upload (no OCR - manual admin review)
+  const handleCompanyDocUpload = useCallback(async (type: CompanyDocTypeKey, file: File) => {
+    setUploadError(null);
+    setSaveSuccess(false);
+    setUploadingType(type);
+
+    try {
+      const verificationId = `company-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+
+      // Upload to S3
+      let fileUrl: string;
+      let fileKey: string | undefined;
+
+      try {
+        const s3Result = await uploadToS3({
+          category: 'kyc',
+          file,
+          documentType: type,
+          verificationId,
+        });
+        fileUrl = s3Result.url;
+        fileKey = s3Result.key;
+      } catch {
+        // Fallback to data URL
+        const reader = new FileReader();
+        const dataUrlPromise = new Promise<string>((resolve, reject) => {
+          reader.onload = () => resolve(reader.result as string);
+          reader.onerror = reject;
+        });
+        reader.readAsDataURL(file);
+        fileUrl = await dataUrlPromise;
+      }
+
+      // Save to KYC verifications (no OCR, manual review)
+      await saveDocument({
+        documentType: type,
+        fileUrl,
+        fileKey,
+        fileSize: file.size,
+        mimeType: file.type,
+        extractedData: {},
+      });
+
+      setSaveSuccess(true);
+      await refreshKyc();
+      setTimeout(() => setSaveSuccess(false), 3000);
+    } catch (err) {
+      console.error('Company doc upload error:', err);
+      setUploadError(err instanceof Error ? err.message : 'Eroare la încărcare');
+    } finally {
+      setUploadingType(null);
     }
   }, [saveDocument, refreshKyc]);
 
@@ -442,9 +535,10 @@ export default function KYCTab({ className }: KYCTabProps) {
                     }
                     e.target.value = '';
                   }}
-                  className="hidden"
+                  className="sr-only"
                 />
                 <Button
+                  type="button"
                   variant="ghost"
                   size="sm"
                   onClick={() => fileInputRefs.current[type]?.click()}
@@ -468,9 +562,10 @@ export default function KYCTab({ className }: KYCTabProps) {
                     }
                     e.target.value = '';
                   }}
-                  className="hidden"
+                  className="sr-only"
                 />
                 <Button
+                  type="button"
                   variant="outline"
                   size="sm"
                   onClick={() => fileInputRefs.current[type]?.click()}
@@ -557,6 +652,105 @@ export default function KYCTab({ className }: KYCTabProps) {
             </div>
           </div>
         )}
+      </div>
+    );
+  };
+
+  // Render company document row (simpler than personal - no OCR, no expand)
+  const renderCompanyDocRow = (type: CompanyDocTypeKey) => {
+    const config = COMPANY_DOCUMENT_TYPES[type];
+    const doc = documents.find(d => d.documentType === type);
+    const isUploading = uploadingType === type;
+    const IconComponent = config.icon;
+
+    return (
+      <div key={type} className="border-b border-neutral-100 last:border-b-0">
+        <div className="flex items-center gap-3 p-3">
+          <div className={cn(
+            'w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0',
+            doc ? 'bg-green-100' : 'bg-neutral-100'
+          )}>
+            {isUploading ? (
+              <Loader2 className="w-5 h-5 text-primary-500 animate-spin" />
+            ) : doc ? (
+              <CheckCircle className="w-5 h-5 text-green-600" />
+            ) : (
+              <IconComponent className="w-5 h-5 text-neutral-500" />
+            )}
+          </div>
+
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2">
+              <span className="font-medium text-secondary-900 text-sm">{config.label}</span>
+            </div>
+            <p className="text-xs text-neutral-500">{config.description}</p>
+          </div>
+
+          <div className="flex items-center gap-2 flex-shrink-0">
+            {doc ? (
+              <>
+                <span className="text-xs font-medium px-2 py-1 rounded bg-green-100 text-green-700">
+                  Încărcat
+                </span>
+                <input
+                  type="file"
+                  ref={el => { fileInputRefs.current[type] = el; }}
+                  accept="image/jpeg,image/jpg,image/png,application/pdf"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) handleCompanyDocUpload(type, file);
+                    e.target.value = '';
+                  }}
+                  className="sr-only"
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => fileInputRefs.current[type]?.click()}
+                  disabled={isUploading}
+                  className="h-8 w-8 p-0"
+                >
+                  <RefreshCw className="w-4 h-4" />
+                </Button>
+              </>
+            ) : (
+              <>
+                <input
+                  type="file"
+                  ref={el => { fileInputRefs.current[type] = el; }}
+                  accept="image/jpeg,image/jpg,image/png,application/pdf"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) handleCompanyDocUpload(type, file);
+                    e.target.value = '';
+                  }}
+                  className="sr-only"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => fileInputRefs.current[type]?.click()}
+                  disabled={isUploading}
+                  className="h-8 text-xs"
+                >
+                  {isUploading ? (
+                    <>
+                      <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+                      ...
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="w-3 h-3 mr-1" />
+                      Încarcă
+                    </>
+                  )}
+                </Button>
+              </>
+            )}
+          </div>
+        </div>
       </div>
     );
   };
@@ -666,6 +860,25 @@ export default function KYCTab({ className }: KYCTabProps) {
           {renderDocumentRow('selfie')}
         </div>
       </div>
+
+      {/* Company Documents Section (only if user has company profile) */}
+      {hasCompanyProfile && (
+        <div className="bg-white rounded-2xl border border-neutral-200 overflow-hidden">
+          <div className="px-4 py-3 border-b border-neutral-100 bg-neutral-50">
+            <h4 className="font-semibold text-secondary-900 flex items-center gap-2 text-sm">
+              <Building2 className="w-4 h-4 text-primary-500" />
+              Documente Firmă
+            </h4>
+            <p className="text-xs text-neutral-500 mt-0.5">
+              Încarcă documentele firmei pentru verificare (revizia admin)
+            </p>
+          </div>
+          <div>
+            {renderCompanyDocRow('company_registration_cert')}
+            {renderCompanyDocRow('company_statement_cert')}
+          </div>
+        </div>
+      )}
 
       {/* Info Box */}
       <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">

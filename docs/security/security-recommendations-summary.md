@@ -275,7 +275,7 @@ Payments: Stripe
 Invoicing: Olbio
 Email: SendGrid or AWS SES
 SMS: Twilio (optional)
-Company Lookup: infocui.ro
+Company Lookup: ANAF API (free, official)
 Virus Scanning: ClamAV or commercial
 ```
 

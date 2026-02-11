@@ -8,7 +8,7 @@
  * Design matches the old wizard for consistency.
  */
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useModularWizard } from '@/providers/modular-wizard-provider';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -142,6 +142,9 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
 
   // Check if we have valid KYC from user's account
   const hasValidKycFromAccount = isPrefilled && prefillData?.has_valid_kyc;
+
+  const ciFrontInputRef = useRef<HTMLInputElement>(null);
+  const ciBackInputRef = useRef<HTMLInputElement>(null);
 
   const [ciFrontScan, setCiFrontScan] = useState<ScanState>(initialScanState);
   const [ciBackScan, setCiBackScan] = useState<ScanState>(initialScanState);
@@ -578,18 +581,22 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
             )}
           </div>
         ) : (
-          <div className="relative">
+          <div>
             <input
+              ref={type === 'ci_front' ? ciFrontInputRef : ciBackInputRef}
               type="file"
               accept="image/jpeg,image/jpg,image/png"
               onChange={(e) => {
                 const file = e.target.files?.[0];
                 if (file) handleFileSelect(type, file);
               }}
-              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+              className="hidden"
               disabled={scanState.scanning}
             />
-            <div className="border-2 border-dashed border-primary-300 rounded-lg p-3 text-center hover:border-primary-500 hover:bg-primary-50/50 transition-all cursor-pointer group">
+            <div
+              onClick={() => !scanState.scanning && (type === 'ci_front' ? ciFrontInputRef : ciBackInputRef).current?.click()}
+              className="border-2 border-dashed border-primary-300 rounded-lg p-3 text-center hover:border-primary-500 hover:bg-primary-50/50 transition-all cursor-pointer group"
+            >
               {/* Show illustration */}
               <div className="mb-3 opacity-80 group-hover:opacity-100 transition-opacity">
                 {type === 'ci_front' ? (

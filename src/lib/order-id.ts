@@ -1,12 +1,14 @@
 /**
  * Order ID Generator
  *
- * Generates human-readable order IDs in format: ORD-YYYYMMDD-XXXXX
- * - ORD: Fixed prefix for order identification
- * - YYYYMMDD: Date of order creation
+ * Generates human-readable order IDs in format: E-YYMMDD-XXXXX
+ * - E: Fixed prefix for eGhiseul
+ * - YYMMDD: Date of order creation (short year)
  * - XXXXX: 5-character alphanumeric code (Base32, excludes ambiguous chars)
  *
- * Example: ORD-20251218-A3B2C
+ * Example: E-260112-A3B2C
+ *
+ * Legacy format (still supported for search): ORD-YYYYMMDD-XXXXX
  */
 
 // Base32 character set (excludes: I, O, 0, 1 to avoid confusion)
@@ -14,13 +16,14 @@ const BASE32_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 
 /**
  * Generate a unique order ID
- * Format: ORD-YYYYMMDD-XXXXX
+ * Format: E-YYMMDD-XXXXX (14 chars total)
  */
 export function generateOrderId(): string {
-  const date = new Date()
-    .toISOString()
-    .slice(0, 10)
-    .replace(/-/g, ''); // YYYYMMDD
+  const now = new Date();
+  const yy = String(now.getFullYear()).slice(-2); // Last 2 digits of year
+  const mm = String(now.getMonth() + 1).padStart(2, '0');
+  const dd = String(now.getDate()).padStart(2, '0');
+  const date = `${yy}${mm}${dd}`; // YYMMDD
 
   // Generate 5 random Base32 characters
   let code = '';
@@ -29,7 +32,7 @@ export function generateOrderId(): string {
     code += BASE32_CHARS[randomIndex];
   }
 
-  return `ORD-${date}-${code}`;
+  return `E-${date}-${code}`;
 }
 
 /**
@@ -53,8 +56,29 @@ export function generatePaymentReference(): string {
 
 /**
  * Validate an order ID format
+ * Supports both new format (E-YYMMDD-XXXXX) and legacy format (ORD-YYYYMMDD-XXXXX)
  */
 export function validateOrderId(orderId: string): boolean {
+  // New format: E-YYMMDD-XXXXX (14 chars)
+  const newPattern = /^E-\d{6}-[ABCDEFGHJKLMNPQRSTUVWXYZ23456789]{5}$/;
+  // Legacy format: ORD-YYYYMMDD-XXXXX (19 chars)
+  const legacyPattern = /^ORD-\d{8}-[ABCDEFGHJKLMNPQRSTUVWXYZ23456789]{5}$/;
+
+  return newPattern.test(orderId) || legacyPattern.test(orderId);
+}
+
+/**
+ * Check if order ID is in new short format
+ */
+export function isShortOrderId(orderId: string): boolean {
+  const pattern = /^E-\d{6}-[ABCDEFGHJKLMNPQRSTUVWXYZ23456789]{5}$/;
+  return pattern.test(orderId);
+}
+
+/**
+ * Check if order ID is in legacy format
+ */
+export function isLegacyOrderId(orderId: string): boolean {
   const pattern = /^ORD-\d{8}-[ABCDEFGHJKLMNPQRSTUVWXYZ23456789]{5}$/;
   return pattern.test(orderId);
 }
@@ -69,16 +93,26 @@ export function validatePaymentReference(ref: string): boolean {
 
 /**
  * Extract date from order ID
+ * Supports both new format (E-YYMMDD-XXXXX) and legacy format (ORD-YYYYMMDD-XXXXX)
  */
 export function extractDateFromOrderId(orderId: string): Date | null {
   if (!validateOrderId(orderId)) return null;
 
-  const dateStr = orderId.slice(4, 12); // YYYYMMDD
-  const year = parseInt(dateStr.slice(0, 4), 10);
-  const month = parseInt(dateStr.slice(4, 6), 10) - 1;
-  const day = parseInt(dateStr.slice(6, 8), 10);
-
-  return new Date(year, month, day);
+  if (isShortOrderId(orderId)) {
+    // New format: E-YYMMDD-XXXXX
+    const dateStr = orderId.slice(2, 8); // YYMMDD
+    const year = 2000 + parseInt(dateStr.slice(0, 2), 10);
+    const month = parseInt(dateStr.slice(2, 4), 10) - 1;
+    const day = parseInt(dateStr.slice(4, 6), 10);
+    return new Date(year, month, day);
+  } else {
+    // Legacy format: ORD-YYYYMMDD-XXXXX
+    const dateStr = orderId.slice(4, 12); // YYYYMMDD
+    const year = parseInt(dateStr.slice(0, 4), 10);
+    const month = parseInt(dateStr.slice(4, 6), 10) - 1;
+    const day = parseInt(dateStr.slice(6, 8), 10);
+    return new Date(year, month, day);
+  }
 }
 
 /**

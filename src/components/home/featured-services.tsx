@@ -18,7 +18,7 @@ async function getFeaturedServices(): Promise<Service[]> {
     .limit(6);
 
   if (error) {
-    console.error('Error fetching featured services:', error);
+    console.error('Error fetching featured services:', JSON.stringify(error, null, 2), error.message, error.code);
     return [];
   }
 

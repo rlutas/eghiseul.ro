@@ -78,7 +78,7 @@ This document defines the security architecture for eGhiseul.ro, a platform hand
 3. **API Endpoints**: Injection attacks, authentication bypass, rate limit abuse
 4. **Payment Flow**: Man-in-the-middle, card testing, fraud
 5. **File Storage**: Unauthorized access, data exfiltration, ransomware
-6. **Third-Party Integrations**: Supply chain attacks (Stripe, Olbio, infocui.ro)
+6. **Third-Party Integrations**: Supply chain attacks (Stripe, Oblio, ANAF API)
 
 ---
 

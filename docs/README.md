@@ -1,8 +1,36 @@
 # Documentație eGhiseul.ro
 
-**Ultima actualizare:** 2026-01-09
-**Status proiect:** Sprint 4 (Payments & Contracts) - KYC & Profile Complete
+**Ultima actualizare:** 2026-01-14
+**Status proiect:** Sprint 4 (Payments & Contracts) - Fan Courier Integration Complete
 **Fișier principal:** `../DEVELOPMENT_MASTER_PLAN.md`
+
+---
+
+## ✅ SESIUNE COMPLETATĂ - 2026-01-14
+
+**Ce s-a făcut în această sesiune:**
+1. ✅ Street autocomplete din Fan Courier API (`/api/courier/streets`)
+2. ✅ Fix mapping API - câmpul `street` în loc de `name`, adăugat `type` prefix
+3. ✅ Filter pentru străzi invalide (fără nume)
+4. ✅ UI cu search + dropdown + opțiune "introdu manual"
+5. ✅ Documentație completă actualizată
+
+**Screenshots:**
+- `.playwright-mcp/delivery-step-test-2026-01-13.png` - Localities test
+- `.playwright-mcp/street-autocomplete-working.png` - Streets test
+
+**Fan Courier Integration - COMPLET:**
+- ✅ Dropdown județe (42 județe)
+- ✅ Dropdown localități din Fan Courier API
+- ✅ Dropdown străzi cu search (până la 1000 per localitate)
+- ✅ Radio buttons pentru opțiuni livrare
+- ✅ Preț livrare cu TVA și detalii breakdown
+- ✅ Rezumat comandă se actualizează automat
+
+**De făcut (opțional):**
+- [ ] Caching localități/străzi pentru performanță
+
+**Documentație:** `docs/technical/specs/fan-courier-integration.md`
 
 ---
 
@@ -13,6 +41,8 @@
 | **Ce am de făcut** | [`../DEVELOPMENT_MASTER_PLAN.md`](../DEVELOPMENT_MASTER_PLAN.md) |
 | **Cum funcționează API-ul** | [`technical/api/`](technical/api/) |
 | **Cum adaug un serviciu nou** | [`technical/specs/modular-wizard-guide.md`](technical/specs/modular-wizard-guide.md) |
+| **Plăți & Facturare (Stripe + Oblio)** | [`technical/specs/stripe-oblio-payment-invoicing.md`](technical/specs/stripe-oblio-payment-invoicing.md) |
+| **Livrări & Curierat (Fan Courier)** | [`technical/specs/delivery-system-architecture.md`](technical/specs/delivery-system-architecture.md) |
 | **Ce servicii avem** | [`sprints/services/`](sprints/services/) |
 | **Cerințele produsului** | [`prd/eghiseul-prd.md`](prd/eghiseul-prd.md) |
 | **Probleme de securitate** | [`security/SECURITY_AUDIT_SUMMARY.md`](security/SECURITY_AUDIT_SUMMARY.md) |
@@ -37,6 +67,8 @@ docs/
 │   │   └── ocr-kyc-api.md       ← OCR (Gemini 2.0) + KYC (Gemini 1.5)
 │   ├── specs/
 │   │   ├── modular-wizard-guide.md          ← ⭐ CUM ADAUGI SERVICII NOI
+│   │   ├── stripe-oblio-payment-invoicing.md ← ⭐ PLĂȚI + FACTURARE (NEW)
+│   │   ├── delivery-system-architecture.md   ← ⭐ DELIVERY SYSTEM (Courier integration)
 │   │   ├── modular-verification-architecture.md
 │   │   ├── service-verification-requirements.md
 │   │   ├── order-autosave-system.md
@@ -45,7 +77,9 @@ docs/
 │   │   ├── user-data-persistence-implementation.md  ← Implementation details
 │   │   ├── user-data-flow-analysis.md       ← Data flow gaps & fixes
 │   │   ├── security-audit-admin-client.md   ← Security vulnerabilities fixed
-│   │   └── draft-error-recovery.md          ← Error handling & auto-recovery
+│   │   ├── draft-error-recovery.md          ← Error handling & auto-recovery
+│   │   ├── fan-courier-integration.md       ← ⭐ FAN COURIER API
+│   │   └── dual-profile-system.md           ← Dual Profile System (PF + PJ company support)
 │   ├── database/
 │   │   └── database-schema-sprint2.md       ← Schema + Sprint 3-4 addendum
 │   └── technology-decisions-summary.md
@@ -69,6 +103,8 @@ docs/
 │   ├── SECURITY_QUICK_REFERENCE.md ← Quick fixes pentru devs
 │   ├── SECURITY_IMPLEMENTATION_CHECKLIST.md ← Task list
 │   ├── SECURITY_AUDIT_REPORT_2025-12-17.md ← Audit complet
+│   ├── S3_SECURITY_ASSESSMENT.md ← ⭐ AWS S3 Security Audit
+│   ├── S3_SECURITY_SUMMARY.md   ← Quick reference S3
 │   ├── security-architecture.md ← Arhitectură detaliată
 │   └── security-recommendations-summary.md
 │
@@ -80,6 +116,7 @@ docs/
 │   └── SERVICES-PAGE-DESIGN.md
 │
 ├── deployment/                  ← Deployment & DevOps
+│   ├── AWS_S3_SETUP.md          ← ⭐ Ghid complet S3
 │   ├── DATABASE_MIGRATIONS.md   ← Cum rulezi migrații
 │   └── PRODUCTION_SECURITY_SETUP.md
 │
@@ -99,6 +136,13 @@ docs/
 │
 ├── business/                    ← Business Docs
 │   └── existing-platform.md     ← Reference WordPress
+│
+├── fancourier/                  ← Fan Courier API Documentation
+│   ├── RO_FANCourier_API_130825.pdf
+│   └── API FANCourier RO.postman_collection.json
+│
+├── sameday/                     ← Sameday Courier API Documentation
+│   └── descarca-documentatia-api.pdf
 │
 ├── archive/                     ← Documente arhivate
 │   ├── README.md
@@ -120,6 +164,8 @@ docs/
 | [`technical/specs/modular-wizard-guide.md`](technical/specs/modular-wizard-guide.md) | Sistem wizard modular | Când adaugi servicii noi |
 | [`technical/api/services-api.md`](technical/api/services-api.md) | API Documentation | Când lucrezi cu endpoints |
 | [`technical/api/ocr-kyc-api.md`](technical/api/ocr-kyc-api.md) | OCR & KYC APIs | Când lucrezi cu documente/AI |
+| [`technical/specs/delivery-system-architecture.md`](technical/specs/delivery-system-architecture.md) | Delivery System | Arhitectură sistem livrări |
+| [`technical/specs/fan-courier-integration.md`](technical/specs/fan-courier-integration.md) | Fan Courier API | Când lucrezi cu livrări |
 | [`security/SECURITY_QUICK_REFERENCE.md`](security/SECURITY_QUICK_REFERENCE.md) | Securitate rapid | Code patterns sigure |
 
 ### Pentru Product / Management
@@ -162,9 +208,10 @@ docs/
 | **Backend** | Supabase (PostgreSQL, Auth, RLS) | ✅ Active |
 | **AI/OCR** | Google Gemini 2.0 Flash Exp | ✅ Integrated |
 | **AI/KYC** | Google Gemini 1.5 Flash | ✅ Integrated |
-| **Storage** | AWS S3 (eu-central-1) | 🔄 Sprint 4 |
+| **Storage** | AWS S3 (eu-central-1) | ✅ Active |
 | **Payments** | Stripe | 🔄 Sprint 4 |
-| **Company Validation** | InfoCUI.ro | ✅ Integrated |
+| **Courier (RO)** | Fan Courier API v2.0 | ✅ Integrated |
+| **Company Validation** | ANAF API (free, official) | ✅ Integrated |
 
 ---
 
@@ -229,7 +276,9 @@ docs/
 - `GET/POST/PATCH /api/orders/draft` - Draft CRUD
 - `POST /api/ocr/extract` - OCR extraction
 - `POST /api/kyc/validate` - KYC validation
-- `POST /api/company/validate` - InfoCUI validation
+- `POST /api/company/validate` - ANAF API company validation
+- `GET /api/courier/quote` - Courier price quotes (Fan Courier)
+- `GET /api/courier/pickup-points` - FANbox lockers list
 - `GET /api/user/prefill-data` - User saved data
 - `GET/PATCH /api/user/profile` - User profile with document info
 - `GET /api/user/kyc` - KYC status (verified/partial/unverified)
@@ -238,6 +287,9 @@ docs/
 - `PATCH/DELETE /api/user/addresses/[id]` - Address update/delete
 - `GET/POST /api/user/billing-profiles` - Billing profiles
 - `PATCH/DELETE /api/user/billing-profiles/[id]` - Profile update/delete
+- `POST /api/upload` - Get presigned S3 upload URL
+- `GET /api/upload` - S3 health check
+- `GET /api/upload/download` - Get presigned S3 download URL
 
 ### Admin
 - `GET /api/admin/orders/lookup` - Lookup by order number
@@ -258,10 +310,12 @@ docs/
 | `src/lib/services/kyc-validation.ts` | Gemini KYC |
 | `src/lib/security/rate-limiter.ts` | Rate limiting |
 | `src/lib/security/audit-logger.ts` | Audit logging |
+| `src/lib/services/courier/fancourier.ts` | Fan Courier API v2.0 |
+| `src/components/orders/steps-modular/delivery-step.tsx` | Delivery selection UI |
 | `supabase/migrations/` | DB migrations |
 
 ---
 
 **Pentru tracking dezvoltare:** Vezi [`../DEVELOPMENT_MASTER_PLAN.md`](../DEVELOPMENT_MASTER_PLAN.md)
 
-**Ultima actualizare:** 2026-01-09
+**Ultima actualizare:** 2026-02-11

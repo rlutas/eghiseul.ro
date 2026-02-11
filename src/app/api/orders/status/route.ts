@@ -1,5 +1,11 @@
-import { createClient } from '@/lib/supabase/server';
+import { createClient as createServiceClient } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';
+
+// Service role client to bypass RLS for public order status lookup
+const getServiceClient = () => createServiceClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 
 /**
  * GET /api/orders/status
@@ -40,7 +46,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const supabase = await createClient();
+    const supabase = getServiceClient();
 
     // Look up order by friendly_order_id and email
     // Use lowercase comparison for email to handle case sensitivity
@@ -100,13 +106,61 @@ export async function GET(request: NextRequest) {
     // Get order status history for timeline
     const { data: history } = await supabase
       .from('order_history')
-      .select('id, status, note, created_at, created_by')
+      .select('id, event_type, notes, new_value, created_at, changed_by')
       .eq('order_id', order.id)
       .order('created_at', { ascending: true });
 
     // Return order details (sanitized for public view)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const deliveryMethod = order.delivery_method as any;
+
+    // Build timeline from history - extract status from new_value when available
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const timeline = (history || []).map((h: any) => {
+      const newValue = h.new_value as { status?: string; payment_status?: string } | null;
+
+      // Determine status to show based on event type
+      let status = newValue?.status || h.event_type;
+      if (h.event_type === 'payment_confirmed') {
+        status = 'payment_confirmed';
+      } else if (h.event_type === 'order_created' || h.event_type === 'draft_created') {
+        status = 'order_created';
+      }
+
+      return {
+        status,
+        event: h.event_type,
+        note: h.notes,
+        createdAt: h.created_at,
+      };
+    });
+
+    // Add initial order creation if not in timeline
+    if (timeline.length === 0 || !timeline.find(t => t.event === 'order_created' || t.event === 'draft_created')) {
+      timeline.unshift({
+        status: 'order_created',
+        event: 'order_created',
+        note: 'Comanda a fost plasată',
+        createdAt: order.created_at,
+      });
+    }
+
+    // Add payment confirmed if paid but not in timeline
+    if (order.payment_status === 'paid' && !timeline.find(t => t.event === 'payment_confirmed')) {
+      // Find where to insert - after order created
+      const insertIndex = timeline.findIndex(t => t.event !== 'order_created' && t.event !== 'draft_created');
+      const paymentEvent = {
+        status: 'payment_confirmed',
+        event: 'payment_confirmed',
+        note: 'Plata a fost confirmată',
+        createdAt: order.updated_at || order.created_at,
+      };
+      if (insertIndex === -1) {
+        timeline.push(paymentEvent);
+      } else {
+        timeline.splice(insertIndex, 0, paymentEvent);
+      }
+    }
 
     return NextResponse.json({
       success: true,
@@ -128,12 +182,7 @@ export async function GET(request: NextRequest) {
           deliveryPrice: order.delivery_price,
           totalPrice: order.total_price,
         },
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        timeline: (history || []).map((h: any) => ({
-          status: h.status,
-          note: h.note,
-          createdAt: h.created_at,
-        })),
+        timeline,
       },
     });
   } catch (error) {

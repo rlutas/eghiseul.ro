@@ -42,6 +42,12 @@ const ALL_STEPS: Record<ModularStepId, Omit<ModularStep, 'number' | 'condition'>
     labelRo: 'Date Firmă',
     moduleType: 'companyKyc',
   },
+  'company-documents': {
+    id: 'company-documents',
+    label: 'Company Documents',
+    labelRo: 'Documente Firmă',
+    moduleType: 'companyDocuments',
+  },
   'property-data': {
     id: 'property-data',
     label: 'Property Data',
@@ -121,8 +127,8 @@ export function buildWizardSteps(
 
   // Determine which modules to show based on clientType
   const hasClientTypeSelection = verificationConfig.clientTypeSelection?.enabled;
-  const showPersonalData = verificationConfig.personalKyc.enabled &&
-    (!hasClientTypeSelection || clientType === 'PF' || clientType === 'PJ'); // PJ also needs personal data for representative
+  const personalKycCondition = verificationConfig.personalKyc.condition;
+  const showPersonalData = verificationConfig.personalKyc.enabled;
   const showCompanyData = verificationConfig.companyKyc.enabled &&
     (!hasClientTypeSelection || clientType === 'PJ');
 
@@ -141,6 +147,23 @@ export function buildWizardSteps(
     }
 
     steps.push(companyStep);
+
+    // Company Documents (if documents required for PJ)
+    if (verificationConfig.companyKyc.documentsRequired) {
+      const companyDocsStep: ModularStep = {
+        ...ALL_STEPS['company-documents'],
+        number: stepNumber++,
+      };
+
+      // Same condition pattern as company-data step
+      if (hasClientTypeSelection) {
+        companyDocsStep.condition = (state: ModularWizardState) => state.clientType === 'PJ';
+      } else if (verificationConfig.companyKyc.condition) {
+        companyDocsStep.condition = createConditionFunction(verificationConfig.companyKyc.condition);
+      }
+
+      steps.push(companyDocsStep);
+    }
   }
 
   // Step 3: Personal Data (if personal KYC enabled)
@@ -150,10 +173,11 @@ export function buildWizardSteps(
       number: stepNumber++,
     };
 
-    // For PJ, label changes to "Date Reprezentant"
-    if (hasClientTypeSelection) {
+    // Apply condition: use config condition if set, otherwise show for both PF and PJ
+    if (personalKycCondition) {
+      personalStep.condition = createConditionFunction(personalKycCondition);
+    } else if (hasClientTypeSelection) {
       personalStep.condition = (state: ModularWizardState) => {
-        // Always show for PF, show for PJ with different context
         return state.clientType === 'PF' || state.clientType === 'PJ';
       };
     }
@@ -184,14 +208,26 @@ export function buildWizardSteps(
   });
 
   // Step 4: KYC Documents (if personal KYC with documents)
+  // Must share the same condition as personal-data step since KYC docs verify personal identity
   if (
     verificationConfig.personalKyc.enabled &&
     verificationConfig.personalKyc.acceptedDocuments.length > 0
   ) {
-    steps.push({
+    const kycStep: ModularStep = {
       ...ALL_STEPS['kyc-documents'],
       number: stepNumber++,
-    });
+    };
+
+    // Apply same condition as personal-data step
+    if (personalKycCondition) {
+      kycStep.condition = createConditionFunction(personalKycCondition);
+    } else if (hasClientTypeSelection) {
+      kycStep.condition = (state: ModularWizardState) => {
+        return state.clientType === 'PF' || state.clientType === 'PJ';
+      };
+    }
+
+    steps.push(kycStep);
   }
 
   // Step 5: Signature (if required)

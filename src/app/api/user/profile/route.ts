@@ -26,6 +26,15 @@ export async function PATCH(request: Request) {
       birthDate,
       birthPlace,
       phone,
+      // Company profile fields
+      companyCui,
+      companyName,
+      companyType,
+      companyRegistrationNumber,
+      companyAddress,
+      companyIsActive,
+      companyVatPayer,
+      companyVerified,
     } = body;
 
     // Build update object with only provided fields
@@ -40,6 +49,16 @@ export async function PATCH(request: Request) {
     if (birthDate !== undefined) updates.birth_date = birthDate;
     if (birthPlace !== undefined) updates.birth_place = birthPlace;
     if (phone !== undefined) updates.phone = phone;
+
+    // Company fields
+    if (companyCui !== undefined) updates.company_cui = companyCui;
+    if (companyName !== undefined) updates.company_name = companyName;
+    if (companyType !== undefined) updates.company_type = companyType;
+    if (companyRegistrationNumber !== undefined) updates.company_registration_number = companyRegistrationNumber;
+    if (companyAddress !== undefined) updates.company_address = companyAddress;
+    if (companyIsActive !== undefined) updates.company_is_active = companyIsActive;
+    if (companyVatPayer !== undefined) updates.company_vat_payer = companyVatPayer;
+    if (companyVerified !== undefined) updates.company_verified = companyVerified;
 
     const { data, error } = await supabase
       .from('profiles')
@@ -60,6 +79,51 @@ export async function PATCH(request: Request) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const profileData = data as any;
 
+    // Auto-create/update PJ billing profile when company data is saved
+    if (companyCui && companyName) {
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { data: existingPjProfile } = await (supabase as any)
+          .from('billing_profiles')
+          .select('id')
+          .eq('user_id', user.id)
+          .eq('type', 'persoana_juridica')
+          .maybeSingle();
+
+        const billingData = {
+          companyName,
+          cui: companyCui,
+          regCom: companyRegistrationNumber || '',
+          address: companyAddress || '',
+        };
+
+        if (existingPjProfile) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          await (supabase as any)
+            .from('billing_profiles')
+            .update({
+              billing_data: billingData,
+              label: companyName,
+              updated_at: new Date().toISOString(),
+            })
+            .eq('id', existingPjProfile.id);
+        } else {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          await (supabase as any)
+            .from('billing_profiles')
+            .insert({
+              user_id: user.id,
+              type: 'persoana_juridica',
+              label: companyName,
+              billing_data: billingData,
+              is_default: false,
+            });
+        }
+      } catch (billingError) {
+        console.error('Failed to auto-create PJ billing profile:', billingError);
+      }
+    }
+
     return NextResponse.json({
       success: true,
       data: {
@@ -72,6 +136,17 @@ export async function PATCH(request: Request) {
         birthPlace: profileData.birth_place,
         phone: profileData.phone,
         kycVerified: profileData.kyc_verified,
+        // Company profile
+        companyProfile: profileData.company_cui ? {
+          cui: profileData.company_cui,
+          name: profileData.company_name,
+          type: profileData.company_type,
+          registrationNumber: profileData.company_registration_number,
+          address: profileData.company_address,
+          isActive: profileData.company_is_active,
+          vatPayer: profileData.company_vat_payer,
+          verified: profileData.company_verified,
+        } : null,
       },
     });
   } catch (error) {
@@ -134,11 +209,18 @@ export async function GET() {
     if (kycDocs && kycDocs.length > 0) {
       const kycDoc = kycDocs[0];
       const extractedData = kycDoc.extracted_data || {};
-      documentSeries = extractedData.documentSeries || null;
-      documentNumber = extractedData.documentNumber || null;
-      documentType = kycDoc.document_type === 'ci_nou_front' ? 'CI Nou' :
-                     kycDoc.document_type === 'ci_front' ? 'CI Vechi' :
-                     extractedData.documentType || null;
+
+      // OCR returns 'series' and 'number', not 'documentSeries'/'documentNumber'
+      documentSeries = extractedData.series || extractedData.documentSeries || null;
+      documentNumber = extractedData.number || extractedData.documentNumber || null;
+
+      // Determine document type label
+      // Note: ci_front = old format, ci_nou_front = new format, but both are "Carte de Identitate"
+      documentType = kycDoc.document_type === 'ci_nou_front' ? 'Carte de Identitate (nou)' :
+                     kycDoc.document_type === 'ci_front' ? 'Carte de Identitate' :
+                     kycDoc.document_type === 'passport' ? 'Pașaport' :
+                     extractedData.documentType || 'Document Identitate';
+
       documentExpiry = extractedData.expiryDate || kycDoc.expires_at || null;
     }
 
@@ -165,6 +247,17 @@ export async function GET() {
         documentNumber,
         documentType,
         documentExpiry,
+        // Company profile
+        companyProfile: profileData.company_cui ? {
+          cui: profileData.company_cui,
+          name: profileData.company_name,
+          type: profileData.company_type,
+          registrationNumber: profileData.company_registration_number,
+          address: profileData.company_address,
+          isActive: profileData.company_is_active,
+          vatPayer: profileData.company_vat_payer,
+          verified: profileData.company_verified,
+        } : null,
       },
     });
   } catch (error) {

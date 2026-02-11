@@ -92,7 +92,7 @@ Example: /comanda/cazier-judiciar-persoana-fizica
 |--------|-----------|---------|
 | `client-type` | `ClientTypeStep` | PF/PJ selection |
 | `personal-data` | `PersonalDataStep` | Name, CNP, address with county/locality dropdowns |
-| `company-data` | `CompanyDataStep` | CUI validation via InfoCUI API |
+| `company-data` | `CompanyDataStep` | CUI validation via ANAF API |
 | `property-data` | `PropertyDataStep` | Carte Funciară property details |
 | `vehicle-data` | `VehicleDataStep` | Rovinieta vehicle information |
 | `kyc-documents` | `KycDocumentsStep` | ID upload + OCR + selfie |
@@ -181,7 +181,7 @@ Sprint 3 transforms the backend foundation into a customer-facing platform. This
 - ~~AWS Rekognition~~ → **Google Gemini 1.5 Flash** for KYC validation
 - Client-side canvas for electronic signature
 - **Modular Wizard System** with dynamic step generation
-- InfoCUI integration for company validation
+- ANAF API company validation (free, official)
 - Responsive UI supporting mobile devices (70%+ of traffic)
 - GDPR-compliant data handling throughout
 
@@ -1602,7 +1602,7 @@ export const OrderWizardProvider = ({ children }) => {
 2. **KYC Provider**: AWS Rekognition → Google Gemini 1.5 Flash (simpler integration)
 3. **Wizard Architecture**: Fixed 6-step → Modular Wizard (better extensibility)
 4. **URL Pattern**: `/orders/new?service=x` → `/comanda/[slug]` (SEO-friendly)
-5. **Company Validation**: Added InfoCUI integration for PJ orders
+5. **Company Validation**: Added ANAF API integration (free, official) for PJ orders
 
 ### Metrics Achieved
 

@@ -323,6 +323,12 @@ For comprehensive information, see:
    - File: `docs/legal/compliance-research.md`
    - Legal requirements and retention schedules
 
+5. **S3 Security Assessment** (NEW - 2026-01-09)
+   - File: `docs/security/S3_SECURITY_ASSESSMENT.md` (Romanian)
+   - Comprehensive S3 security analysis with GDPR considerations
+   - File: `docs/security/S3_SECURITY_SUMMARY.md` (English)
+   - Quick reference with priority actions and checklists
+
 ---
 
 ## Contact & Support

@@ -25,9 +25,10 @@ Module Components               → Componentele individuale pentru fiecare pas
 | **Contact** | `contact` | Email, telefon, preferință contact | ÎNTOTDEAUNA (obligatoriu) |
 | **Client Type** | `client-type` | Selectare PF / PJ | Servicii care suportă ambele tipuri |
 | **Personal Data** | `personal-data` | Nume, CNP, adresă, date document | Când serviciul necesită KYC personal |
-| **Company Data** | `company-data` | CUI, denumire firmă, validare InfoCUI | Pentru servicii PJ sau când e nevoie de date firmă |
+| **Company Data** | `company-data` | CUI, denumire firmă, validare ANAF API | Pentru servicii PJ sau când e nevoie de date firmă |
 | **Property Data** | `property-data` | Județ, localitate, nr. cadastral | Extras CF, servicii imobiliare |
 | **Vehicle Data** | `vehicle-data` | Nr. înmatriculare, categorie | Rovinieta, servicii auto |
+| **Company Documents** | `company-documents` | Upload certificat înregistrare, certificat constatator | Servicii PJ care necesită documente firmă |
 | **KYC Documents** | `kyc-documents` | Upload CI, selfie, certificate | Servicii care necesită verificare identitate |
 | **Signature** | `signature` | Semnătură electronică pe canvas | Servicii care necesită semnătură |
 | **Options** | `options` | Opțiuni suplimentare (urgență, traduceri) | ÎNTOTDEAUNA (obligatoriu) |
@@ -50,13 +51,112 @@ Pasul de facturare oferă 3 opțiuni:
    - Tip: `persoana_fizica`
 
 3. **"Persoană juridică"** (source: `company`)
-   - Validare CUI prin InfoCUI API
+   - Validare CUI prin ANAF API (gratis, oficial)
    - Câmpuri: cui, companyName, regCom, companyAddress, bankName, bankIban
    - Tip: `persoana_juridica`
 
 **Fișiere relevante:**
 - `src/components/orders/steps-modular/billing-step.tsx` - Componentă UI
 - `src/types/verification-modules.ts` - BillingState, BillingType, BillingSource
+
+### Company Documents Step (NOU - 2026-02-10)
+
+Pasul de documente firmă permite încărcarea documentelor companiei necesare pentru serviciile PJ. Apare doar pentru clienți de tip Persoană Juridică și se inserează automat **după** pasul `company-data` și **înainte** de `personal-data`.
+
+**Condiții de vizibilitate:**
+- `clientType === 'PJ'` (selectat la pasul Tip Client)
+- `companyKyc.documentsRequired === true` (configurat în `verification_config`)
+
+**Module type:** `companyDocuments`
+
+**Documente suportate:**
+
+| Cod | Denumire | Descriere |
+|-----|----------|-----------|
+| `company_registration_cert` | Certificat de Inregistrare | Document emis de Registrul Comertului cu CUI-ul firmei |
+| `company_statement_cert` | Certificat Constatator | Certificat constatator emis de ONRC |
+
+**Funcționalități principale:**
+
+1. **Drag & drop file upload**
+   - Formate acceptate: JPEG, PNG, PDF
+   - Dimensiune maximă: 10MB per fișier
+   - Previzualizare inline pentru imagini
+   - Afișare info fișier (nume, tip) pentru PDF-uri
+
+2. **Banner "Deja verificat"**
+   - Apare pentru utilizatori logați care au deja documente firmă verificate în cont
+   - Permite continuarea la pasul următor fără reîncărcare
+   - Opțiune de reîncărcare documente noi (înlocuiește verificarea existentă)
+
+3. **Sumar progres**
+   - Afișează vizual care documente cerute sunt deja încărcate
+   - Indicator numeric/check per document
+
+**Configurare `companyKyc` în `verification_config`:**
+
+```json
+{
+  "companyKyc": {
+    "enabled": true,
+    "condition": "client_type == 'PJ'",
+    "validation": "infocui",
+    "autoComplete": true,
+    "allowedTypes": ["SRL", "SA", "PFA"],
+    "blockedTypes": [],
+    "specialRules": [],
+    "documentsRequired": true,
+    "requiredDocuments": ["company_registration_cert"]
+  }
+}
+```
+
+Câmpuri relevante pentru acest pas:
+
+| Câmp | Tip | Descriere |
+|------|-----|-----------|
+| `documentsRequired` | `boolean` | Dacă `true`, pasul `company-documents` este adăugat în wizard |
+| `requiredDocuments` | `('company_registration_cert' \| 'company_statement_cert')[]` | Lista documentelor obligatorii |
+
+**Tipuri TypeScript:**
+
+```typescript
+// CompanyKYCConfig (câmpuri noi)
+interface CompanyKYCConfig {
+  // ... câmpuri existente
+  documentsRequired: boolean;
+  requiredDocuments: ('company_registration_cert' | 'company_statement_cert')[];
+}
+
+// CompanyKYCState (câmp pentru documente)
+interface CompanyKYCState {
+  // ... câmpuri existente
+  uploadedDocuments: UploadedDocumentState[];
+}
+
+// UploadedDocumentState (partajat cu KYC personal)
+interface UploadedDocumentState {
+  id: string;
+  type: DocumentType;
+  fileName: string;
+  fileSize: number;
+  mimeType: string;
+  uploadedAt: string;
+  base64?: string;
+  s3Key?: string;
+}
+```
+
+**Validare pas:**
+- Dacă utilizatorul are documente verificate și nu a ales reîncărcarea, pasul este valid automat
+- Altfel, toate documentele din `requiredDocuments` trebuie încărcate
+
+**Fișiere relevante:**
+- `src/components/orders/modules/company-kyc/CompanyDocumentsStep.tsx` - Componenta UI
+- `src/types/verification-modules.ts` - CompanyKYCConfig, CompanyKYCState, UploadedDocumentState
+- `src/lib/verification-modules/step-builder.ts` - Logica de inserare pas (după `company-data`)
+- `src/lib/verification-modules/registry.ts` - Înregistrare modul și dynamic loader
+- `src/providers/modular-wizard-provider.tsx` - `updateCompanyKycDocuments` action
 
 ## Cum Adaugi un Serviciu Nou
 
@@ -131,10 +231,12 @@ interface ServiceVerificationConfig {
   companyKyc: {
     enabled: boolean;
     condition?: string;  // ex: "client_type == 'PJ'"
-    validation: 'infocui' | 'onrc' | 'manual';
+    validation: 'infocui' | 'onrc' | 'manual';  // 'infocui' uses ANAF API (free)
     autoComplete: boolean;
     allowedTypes: string[];
     blockedTypes: string[];
+    documentsRequired: boolean;  // Activează pasul company-documents
+    requiredDocuments: ('company_registration_cert' | 'company_statement_cert')[];
   };
 
   // Verificare Imobil
@@ -196,7 +298,7 @@ interface ServiceVerificationConfig {
   "companyKyc": {
     "enabled": true,
     "condition": "client_type == 'PJ'",
-    "validation": "infocui",
+    "validation": "infocui",      // Uses ANAF API (free, official)
     "autoComplete": true
   },
   "signature": { "enabled": true, "required": true }
@@ -204,7 +306,9 @@ interface ServiceVerificationConfig {
 ```
 
 **Pași pentru PF:** Contact → Tip Client → Date Personale → Opțiuni → KYC → Semnătură → Livrare → Review
-**Pași pentru PJ:** Contact → Tip Client → Date Firmă → Date Reprezentant → Opțiuni → KYC → Semnătură → Livrare → Review
+**Pași pentru PJ:** Contact → Tip Client → Date Firmă → Documente Firmă → Date Reprezentant → Opțiuni → KYC → Semnătură → Livrare → Review
+
+> **Notă:** Pasul "Documente Firmă" apare doar dacă `companyKyc.documentsRequired === true`.
 
 ### Extras Carte Funciară
 
@@ -261,6 +365,11 @@ export function buildWizardSteps(
   // Company - pentru PJ
   if (config.companyKyc.enabled && clientType === 'PJ') {
     steps.push({ id: 'company-data', ... });
+
+    // Company Documents - dacă PJ și documentsRequired
+    if (config.companyKyc.documentsRequired) {
+      steps.push({ id: 'company-documents', condition: state => state.clientType === 'PJ', ... });
+    }
   }
 
   // Personal - dacă enabled
@@ -369,7 +478,7 @@ src/
 │   │   └── review-step.tsx
 │   └── modules/                            # Module specializate
 │       ├── personal-kyc/
-│       ├── company-kyc/
+│       ├── company-kyc/                    # CompanyDataStep + CompanyDocumentsStep
 │       ├── property/
 │       ├── vehicle/
 │       ├── signature/
@@ -386,5 +495,5 @@ src/
 
 ---
 
-**Actualizat:** 2025-01-05
-**Versiune:** 1.0
+**Actualizat:** 2026-02-10
+**Versiune:** 1.1
