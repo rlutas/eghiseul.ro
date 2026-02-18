@@ -1,36 +1,33 @@
 # Documentație eGhiseul.ro
 
-**Ultima actualizare:** 2026-01-14
-**Status proiect:** Sprint 4 (Payments & Contracts) - Fan Courier Integration Complete
+**Ultima actualizare:** 2026-02-18
+**Status proiect:** Sprint 4 (97%) / Sprint 5 (97%) - Number Registry System Implemented
 **Fișier principal:** `../DEVELOPMENT_MASTER_PLAN.md`
 
 ---
 
-## ✅ SESIUNE COMPLETATĂ - 2026-01-14
+## ✅ SESIUNE COMPLETATĂ - 2026-02-18
 
-**Ce s-a făcut în această sesiune:**
-1. ✅ Street autocomplete din Fan Courier API (`/api/courier/streets`)
-2. ✅ Fix mapping API - câmpul `street` în loc de `name`, adăugat `type` prefix
-3. ✅ Filter pentru străzi invalide (fără nume)
-4. ✅ UI cu search + dropdown + opțiune "introdu manual"
-5. ✅ Documentație completă actualizată
+**Ce s-a făcut recent (18 Februarie 2026):**
+1. ✅ Number Registry System - complete (tables, RPC functions, API endpoints, admin UI tab)
+2. ✅ Replaced legacy `increment_document_counter` with `allocate_number` (atomic, with reuse logic)
+3. ✅ Fixed imputernicire `document_number` bug (was storing contract number)
+4. ✅ `contract-prestari` no longer consumes Barou numbers
+5. ✅ Admin "Registru Numere" tab: ranges management, registry journal, manual entry, void, CSV export
+6. ✅ Backfilled 9 historical registry entries from existing order_documents
 
-**Screenshots:**
-- `.playwright-mcp/delivery-step-test-2026-01-13.png` - Localities test
-- `.playwright-mcp/street-autocomplete-working.png` - Streets test
+**Sesiuni anterioare:**
+- ✅ Multi-signature document generation (client drawn + company/lawyer predefined PNG)
+- ✅ Contract preview in wizard (signature step shows pre-filled contract HTML)
+- ✅ Contract legal validity system (IP, UA, timestamp, SHA-256 hash, consent)
+- ✅ Client document downloads (presigned S3 URLs)
+- ✅ Template fixes (imputernicire, cerere-pf, cerere-pj, CLIENT_DETAILS_BLOCK, TERMEN_LIVRARE)
 
-**Fan Courier Integration - COMPLET:**
-- ✅ Dropdown județe (42 județe)
-- ✅ Dropdown localități din Fan Courier API
-- ✅ Dropdown străzi cu search (până la 1000 per localitate)
-- ✅ Radio buttons pentru opțiuni livrare
-- ✅ Preț livrare cu TVA și detalii breakdown
-- ✅ Rezumat comandă se actualizează automat
-
-**De făcut (opțional):**
-- [ ] Caching localități/străzi pentru performanță
-
-**Documentație:** `docs/technical/specs/fan-courier-integration.md`
+**De făcut (remaining):**
+- [ ] Oblio invoicing integration
+- [ ] Email notifications
+- [ ] Revenue charts (recharts)
+- [ ] Audit logging for admin actions
 
 ---
 
@@ -42,7 +39,17 @@
 | **Cum funcționează API-ul** | [`technical/api/`](technical/api/) |
 | **Cum adaug un serviciu nou** | [`technical/specs/modular-wizard-guide.md`](technical/specs/modular-wizard-guide.md) |
 | **Plăți & Facturare (Stripe + Oblio)** | [`technical/specs/stripe-oblio-payment-invoicing.md`](technical/specs/stripe-oblio-payment-invoicing.md) |
-| **Livrări & Curierat (Fan Courier)** | [`technical/specs/delivery-system-architecture.md`](technical/specs/delivery-system-architecture.md) |
+| **Livrări & Curierat (Overview)** | [`technical/specs/delivery-system-architecture.md`](technical/specs/delivery-system-architecture.md) |
+| **Sameday API (EasyBox, AWB)** | [`technical/specs/sameday-api-integration.md`](technical/specs/sameday-api-integration.md) |
+| **AWB Generation & Tracking** | [`technical/specs/awb-generation-tracking.md`](technical/specs/awb-generation-tracking.md) |
+| **Admin Panel (Overview)** | [`admin/README.md`](admin/README.md) |
+| **Admin Panel Architecture** | [`admin/architecture.md`](admin/architecture.md) |
+| **Admin Workflow Design** | [`admin/workflow-design.md`](admin/workflow-design.md) |
+| **Document Generation System** | [`technical/specs/admin-document-system.md`](technical/specs/admin-document-system.md) |
+| **Number Registry (Barou)** | [`technical/specs/number-registry-system.md`](technical/specs/number-registry-system.md) |
+| **Contract Preview (Wizard)** | [`src/app/api/contracts/preview/route.ts`](../src/app/api/contracts/preview/route.ts) |
+| **RBAC & Permissions** | [`admin/rbac-permissions.md`](admin/rbac-permissions.md) |
+| **Security Audit** | [`admin/security-audit.md`](admin/security-audit.md) |
 | **Ce servicii avem** | [`sprints/services/`](sprints/services/) |
 | **Cerințele produsului** | [`prd/eghiseul-prd.md`](prd/eghiseul-prd.md) |
 | **Probleme de securitate** | [`security/SECURITY_AUDIT_SUMMARY.md`](security/SECURITY_AUDIT_SUMMARY.md) |
@@ -52,11 +59,32 @@
 
 ---
 
+## Admin Panel
+
+Documentația completă pentru panoul de administrare, inclusiv arhitectura, RBAC, și securitatea.
+
+| Document | Scop |
+|----------|------|
+| [`admin/README.md`](admin/README.md) | Admin Panel Overview & Index |
+| [`admin/architecture.md`](admin/architecture.md) | Admin Panel Architecture Spec |
+| [`admin/rbac-permissions.md`](admin/rbac-permissions.md) | RBAC & Permissions System |
+| [`admin/security-audit.md`](admin/security-audit.md) | Security Audit |
+| [`admin/workflow-design.md`](admin/workflow-design.md) | Order Processing Workflow (status flow, DOCX templates, document generation, multi-signature) |
+
+---
+
 ## Structură Completă
 
 ```
 docs/
 ├── README.md                    ← Ești aici (index principal)
+│
+├── admin/                       ← Admin Panel
+│   ├── README.md                ← Admin Panel Overview & Index
+│   ├── architecture.md          ← Admin Panel Architecture Spec
+│   ├── rbac-permissions.md      ← RBAC & Permissions System
+│   ├── security-audit.md        ← Security Audit
+│   └── workflow-design.md       ← Order Processing Workflow Design
 │
 ├── prd/                         ← Product Requirements
 │   └── eghiseul-prd.md          ← PRD v2.0 (actualizat Jan 2026)
@@ -76,10 +104,15 @@ docs/
 │   │   ├── user-data-persistence.md
 │   │   ├── user-data-persistence-implementation.md  ← Implementation details
 │   │   ├── user-data-flow-analysis.md       ← Data flow gaps & fixes
-│   │   ├── security-audit-admin-client.md   ← Security vulnerabilities fixed
+│   │   ├── security-audit-admin-client.md   ← (Moved → admin/security-audit.md)
 │   │   ├── draft-error-recovery.md          ← Error handling & auto-recovery
 │   │   ├── fan-courier-integration.md       ← ⭐ FAN COURIER API
-│   │   └── dual-profile-system.md           ← Dual Profile System (PF + PJ company support)
+│   │   ├── sameday-api-integration.md      ← ⭐ SAMEDAY API (EasyBox, AWB, Tracking)
+│   │   ├── dual-profile-system.md           ← Dual Profile System (PF + PJ company support)
+│   │   ├── awb-generation-tracking.md       ← ⭐ AWB GENERATION & TRACKING
+│   │   ├── admin-document-system.md         ← ⭐ DOCUMENT GENERATION SYSTEM (multi-signature)
+│   │   ├── number-registry-system.md       ← ⭐ NUMBER REGISTRY (Barou ranges, journal, allocations)
+│   │   └── admin-panel-architecture.md      ← (Moved → admin/architecture.md)
 │   ├── database/
 │   │   └── database-schema-sprint2.md       ← Schema + Sprint 3-4 addendum
 │   └── technology-decisions-summary.md
@@ -165,7 +198,12 @@ docs/
 | [`technical/api/services-api.md`](technical/api/services-api.md) | API Documentation | Când lucrezi cu endpoints |
 | [`technical/api/ocr-kyc-api.md`](technical/api/ocr-kyc-api.md) | OCR & KYC APIs | Când lucrezi cu documente/AI |
 | [`technical/specs/delivery-system-architecture.md`](technical/specs/delivery-system-architecture.md) | Delivery System | Arhitectură sistem livrări |
-| [`technical/specs/fan-courier-integration.md`](technical/specs/fan-courier-integration.md) | Fan Courier API | Când lucrezi cu livrări |
+| [`technical/specs/fan-courier-integration.md`](technical/specs/fan-courier-integration.md) | Fan Courier API | Când lucrezi cu livrări Fan Courier |
+| [`technical/specs/sameday-api-integration.md`](technical/specs/sameday-api-integration.md) | Sameday API | Cand lucrezi cu livrari Sameday / EasyBox |
+| [`technical/specs/admin-document-system.md`](technical/specs/admin-document-system.md) | Document Generation | Cand lucrezi cu generarea documentelor admin |
+| [`technical/specs/number-registry-system.md`](technical/specs/number-registry-system.md) | Number Registry (Barou) | Cand lucrezi cu numere contracte/imputerniciri Barou |
+| `src/lib/documents/signature-inserter.ts` | Signature Embedding | Cand lucrezi cu semnatura electronica in DOCX (multi-signature: client, company, lawyer) |
+| `src/app/api/contracts/preview/route.ts` | Contract Preview API | Cand lucrezi cu preview-ul contractului in wizard |
 | [`security/SECURITY_QUICK_REFERENCE.md`](security/SECURITY_QUICK_REFERENCE.md) | Securitate rapid | Code patterns sigure |
 
 ### Pentru Product / Management
@@ -196,7 +234,8 @@ docs/
 | Sprint 1 | ✅ Complete | Authentication system | [`sprint-1-auth.md`](sprints/sprint-1-auth.md) |
 | Sprint 2 | ✅ Complete | Services & Orders API | [`sprint-2-services.md`](sprints/sprint-2-services.md) |
 | Sprint 3 | ✅ Complete | KYC, OCR, Modular Wizard | [`sprint-3-kyc-documents.md`](sprints/sprint-3-kyc-documents.md) |
-| Sprint 4 | 🔄 Active | Payments, S3, Contracts | `DEVELOPMENT_MASTER_PLAN.md` |
+| Sprint 4 | 🔄 Active (95%) | Payments, S3, Contracts, Document Generation, Multi-Signature | `DEVELOPMENT_MASTER_PLAN.md` |
+| Sprint 5 | 🔄 Active (95%) | Admin Dashboard, RBAC, Workflow, Document System | `DEVELOPMENT_MASTER_PLAN.md` |
 
 ---
 
@@ -211,6 +250,7 @@ docs/
 | **Storage** | AWS S3 (eu-central-1) | ✅ Active |
 | **Payments** | Stripe | 🔄 Sprint 4 |
 | **Courier (RO)** | Fan Courier API v2.0 | ✅ Integrated |
+| **Courier (RO)** | Sameday API v3.1 (EasyBox) | ✅ Integrated |
 | **Company Validation** | ANAF API (free, official) | ✅ Integrated |
 
 ---
@@ -268,6 +308,9 @@ docs/
 - `GET /api/ocr/extract` - OCR health check
 - `GET /api/kyc/validate` - KYC health check
 
+### Public (No Auth)
+- `POST /api/contracts/preview` - Generate contract preview HTML from wizard data
+
 ### Protected (Auth Required)
 - `POST /api/orders` - Create order
 - `GET/PATCH /api/orders/[id]` - Order details/update
@@ -294,8 +337,20 @@ docs/
 ### Admin
 - `GET /api/admin/orders/lookup` - Lookup by order number
 - `GET /api/admin/orders/list` - List by status
+- `GET /api/admin/orders/[id]` - Order detail with documents & option statuses
+- `POST /api/admin/orders/[id]/verify-payment` - Verify bank transfer payment
+- `POST /api/admin/orders/[id]/process` - Transition order status (validated state machine)
+- `POST /api/admin/orders/[id]/generate-document` - Generate DOCX (contract, imputernicire, cerere)
+- `POST /api/admin/orders/[id]/generate-awb` - Generate AWB for order
+- `GET /api/admin/orders/[id]/awb-label` - Download AWB label PDF
+- `POST /api/admin/orders/[id]/cancel-awb` - Cancel AWB
+- `GET/PATCH /api/admin/settings` - Admin settings (company_data, lawyer_data, document_counters)
 - `GET/POST /api/admin/cleanup` - GDPR cleanup
 - `POST /api/auth/register-from-order` - Convert guest to user
+
+### Tracking
+- `GET /api/orders/[id]/tracking` - Get order tracking timeline
+- `POST /api/cron/update-tracking` - Cron: Update all active shipments
 
 ---
 
@@ -311,11 +366,24 @@ docs/
 | `src/lib/security/rate-limiter.ts` | Rate limiting |
 | `src/lib/security/audit-logger.ts` | Audit logging |
 | `src/lib/services/courier/fancourier.ts` | Fan Courier API v2.0 |
+| `src/lib/services/courier/sameday.ts` | Sameday API v3.1 (EasyBox, AWB) |
 | `src/components/orders/steps-modular/delivery-step.tsx` | Delivery selection UI |
+| `src/components/orders/tracking-timeline.tsx` | Tracking timeline component |
+| `src/app/admin/layout.tsx` | Admin layout with sidebar |
+| `src/app/admin/orders/[id]/page.tsx` | Admin order detail with AWB + ProcessingSection |
+| `src/lib/documents/generator.ts` | Document generation (docxtemplater + multi-signature embedding) |
+| `src/lib/documents/signature-inserter.ts` | Multi-signature PNG injection into DOCX via DrawingML (client, company, lawyer + stamp) |
+| `src/components/orders/modules/signature/ContractPreview.tsx` | Live contract preview in wizard |
+| `src/app/api/contracts/preview/route.ts` | Contract preview API (DOCX-to-HTML) |
+| `src/templates/cazier-judiciar/*.docx` | DOCX templates for cazier judiciar |
+| `src/app/api/admin/orders/[id]/process/route.ts` | Status transition API |
+| `src/app/api/admin/orders/[id]/generate-document/route.ts` | Document generation API |
+| `src/lib/aws/s3.ts` | S3 operations (generateContractKey, uploadFile) |
+| `src/templates/shared/*.docx` | Shared DOCX templates |
 | `supabase/migrations/` | DB migrations |
 
 ---
 
 **Pentru tracking dezvoltare:** Vezi [`../DEVELOPMENT_MASTER_PLAN.md`](../DEVELOPMENT_MASTER_PLAN.md)
 
-**Ultima actualizare:** 2026-02-11
+**Ultima actualizare:** 2026-02-18
