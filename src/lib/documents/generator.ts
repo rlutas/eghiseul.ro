@@ -287,10 +287,10 @@ function buildPlaceholderData(ctx: DocumentContext) {
     // Document numbers
     NRCONTRACT: contractNum ? String(contractNum).padStart(6, '0') : '',
     IMPUTERNICIRE_NR: impNum ? String(impNum).padStart(6, '0') : '',
-    IMPUTERNICIRE_SERIA: ctx.lawyer?.imputernicire_series || 'SM',
+    IMPUTERNICIRE_SERIA: ctx.document_numbers?.imputernicire_series || ctx.lawyer?.imputernicire_series || 'SM',
 
     // Aliases for imputernicire template (user-created template uses short names)
-    SERIE: ctx.lawyer?.imputernicire_series || 'SM',
+    SERIE: ctx.document_numbers?.imputernicire_series || ctx.lawyer?.imputernicire_series || 'SM',
     NRDELEGATIE: impNum ? String(impNum).padStart(6, '0') : '',
     CLIENT: ctx.client.name,
     MOTIV: ctx.motiv_solicitare || 'Interes personal',

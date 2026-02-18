@@ -323,6 +323,41 @@ export async function autoGenerateOrderDocuments(
     }
   }
 
+  // Auto-allocate delegation number for the order (even though imputernicire is generated later by admin)
+  // This ensures the delegation number appears in the registry journal immediately
+  try {
+    // Check if a delegation number already exists for this order
+    const { data: existingDelegation } = await adminClient.rpc('find_existing_number', {
+      p_order_id: orderId,
+      p_type: 'delegation',
+    });
+
+    if (!existingDelegation || existingDelegation.length === 0) {
+      const { data: delegationResult, error: delegationError } = await adminClient.rpc('allocate_number', {
+        p_type: 'delegation',
+        p_order_id: orderId,
+        p_client_name: clientData.name,
+        p_client_email: clientData.email || null,
+        p_client_cnp: clientData.cnp || null,
+        p_client_cui: clientData.cui || null,
+        p_service_type: order.services?.name || '',
+        p_amount: lawyerData.fee || null,
+        p_source: 'platform',
+        p_created_by: generatedBy,
+      });
+
+      if (delegationError) {
+        console.error('Failed to auto-allocate delegation number:', delegationError);
+        // Don't fail the whole submission - delegation can be allocated later
+      } else {
+        console.log(`Auto-allocated delegation number: ${delegationResult[0]?.allocated_series || 'SM'}${String(delegationResult[0]?.allocated_number).padStart(6, '0')} for order ${orderId}`);
+      }
+    }
+  } catch (err) {
+    console.error('Error auto-allocating delegation number:', err);
+    // Non-fatal - delegation can be allocated manually later
+  }
+
   // Log to order_history
   if (results.length > 0) {
     await adminClient.from('order_history').insert({
