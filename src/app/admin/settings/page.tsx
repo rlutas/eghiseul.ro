@@ -2737,7 +2737,7 @@ function NumberRegistryTab() {
   const [rangesLoading, setRangesLoading] = useState(true);
 
   // Registry journal
-  const [registryEntries, setRegistryEntries] = useState<NumberRegistryEntry[]>([]);
+  const [registryEntries, setRegistryEntries] = useState<(NumberRegistryEntry & { friendly_order_id?: string | null })[]>([]);
   const [registryLoading, setRegistryLoading] = useState(true);
   const [pagination, setPagination] = useState({ page: 1, per_page: 50, total: 0, total_pages: 0 });
 
@@ -2911,6 +2911,23 @@ function NumberRegistryTab() {
     } catch { toast.error('Eroare de retea'); }
   };
 
+  const handleActivateRange = async (rangeId: string) => {
+    try {
+      const res = await fetch(`/api/admin/settings/number-ranges/${rangeId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'active' }),
+      });
+      const json = await res.json();
+      if (json.success) {
+        toast.success('Interval reactivat');
+        fetchRanges();
+      } else {
+        toast.error(json.error || 'Eroare');
+      }
+    } catch { toast.error('Eroare de retea'); }
+  };
+
   // ── Helpers ────────────────────────────────────────────────
 
   function getProgressColor(percent: number): string {
@@ -2998,6 +3015,11 @@ function NumberRegistryTab() {
                     {range.status === 'active' && (
                       <Button variant="ghost" size="sm" onClick={() => handleArchiveRange(range.id)}>
                         Arhiveaza
+                      </Button>
+                    )}
+                    {range.status === 'archived' && (
+                      <Button variant="ghost" size="sm" onClick={() => handleActivateRange(range.id)}>
+                        Activeaza
                       </Button>
                     )}
                   </div>
@@ -3099,6 +3121,7 @@ function NumberRegistryTab() {
                       <th className="py-2 px-2 font-medium">Serviciu</th>
                       <th className="py-2 px-2 font-medium">Suma</th>
                       <th className="py-2 px-2 font-medium">Sursa</th>
+                      <th className="py-2 px-2 font-medium">Comanda</th>
                       <th className="py-2 px-2 font-medium">Actiuni</th>
                     </tr>
                   </thead>
@@ -3132,6 +3155,13 @@ function NumberRegistryTab() {
                              entry.source === 'manual' ? 'Manual' :
                              entry.source === 'voided' ? 'Anulat' : 'Rezervat'}
                           </Badge>
+                        </td>
+                        <td className="py-2 px-2">
+                          {entry.friendly_order_id ? (
+                            <a href={`/admin/orders/${entry.order_id}`} className="text-blue-600 hover:underline text-xs font-mono">
+                              {entry.friendly_order_id}
+                            </a>
+                          ) : '-'}
                         </td>
                         <td className="py-2 px-2">
                           {!entry.voided_at && (

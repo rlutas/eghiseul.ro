@@ -72,14 +72,23 @@ export async function PATCH(
     }
 
     if (status !== undefined) {
-      // Status can only be changed to 'archived'
-      if (status !== 'archived') {
+      // Status can be changed to 'archived' or 'active'
+      if (status !== 'archived' && status !== 'active') {
         return NextResponse.json(
-          { success: false, error: 'Statusul poate fi schimbat doar in "archived"' },
+          { success: false, error: 'Statusul poate fi schimbat doar in "archived" sau "active"' },
           { status: 400 }
         );
       }
-      updatePayload.status = 'archived';
+
+      // If reactivating, verify the range isn't exhausted
+      if (status === 'active' && currentRange.next_number > currentRange.range_end) {
+        return NextResponse.json(
+          { success: false, error: 'Intervalul este epuizat si nu poate fi reactivat' },
+          { status: 400 }
+        );
+      }
+
+      updatePayload.status = status;
     }
 
     // Apply update

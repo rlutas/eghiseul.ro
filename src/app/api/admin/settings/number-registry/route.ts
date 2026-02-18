@@ -122,9 +122,34 @@ export async function GET(request: NextRequest) {
     const total = countResult.count || 0;
     const totalPages = Math.ceil(total / perPage);
 
+    const data = dataResult.data || [];
+
+    // Enrich entries with friendly_order_id from orders table
+    const orderIds = data
+      .filter((e: any) => e.order_id)
+      .map((e: any) => e.order_id);
+
+    let orderMap: Record<string, string> = {};
+    if (orderIds.length > 0) {
+      const { data: orders } = await adminClient
+        .from('orders')
+        .select('id, friendly_order_id')
+        .in('id', orderIds);
+      if (orders) {
+        orderMap = Object.fromEntries(
+          orders.map((o: any) => [o.id, o.friendly_order_id])
+        );
+      }
+    }
+
+    const enrichedData = data.map((entry: any) => ({
+      ...entry,
+      friendly_order_id: entry.order_id ? (orderMap[entry.order_id] || null) : null,
+    }));
+
     return NextResponse.json({
       success: true,
-      data: dataResult.data || [],
+      data: enrichedData,
       pagination: {
         page,
         per_page: perPage,

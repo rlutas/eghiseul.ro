@@ -124,6 +124,24 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // Enrich entries with friendly_order_id from orders table
+    const orderIds = (entries || [])
+      .filter((e: AnyClient) => e.order_id)
+      .map((e: AnyClient) => e.order_id);
+
+    let orderMap: Record<string, string> = {};
+    if (orderIds.length > 0) {
+      const { data: orders } = await adminClient
+        .from('orders')
+        .select('id, friendly_order_id')
+        .in('id', orderIds);
+      if (orders) {
+        orderMap = Object.fromEntries(
+          orders.map((o: AnyClient) => [o.id, o.friendly_order_id])
+        );
+      }
+    }
+
     // Generate CSV
     const CSV_HEADERS = [
       'Nr',
@@ -156,7 +174,7 @@ export async function GET(request: NextRequest) {
       escapeCsvField(entry.description),
       escapeCsvField(entry.amount),
       escapeCsvField(SOURCE_LABELS[entry.source] || entry.source),
-      escapeCsvField(entry.order_id),
+      escapeCsvField(entry.order_id ? (orderMap[entry.order_id] || '') : ''),
       escapeCsvField(entry.voided_at ? 'Da' : ''),
       escapeCsvField(entry.void_reason),
     ]);
