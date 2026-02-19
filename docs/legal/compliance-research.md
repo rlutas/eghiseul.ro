@@ -265,10 +265,10 @@ Even if not legally mandatory yet, appointing DPO demonstrates compliance commit
 
 ## 2. Romanian Contract Law
 
-### 2.1 Electronic Signature Legal Validity (Law 455/2001)
+### 2.1 Electronic Signature Legal Validity (Law 214/2024)
 
 #### Legal Framework
-- **Law 455/2001** on electronic signatures (aligned with eIDAS Regulation 910/2014)
+- **Law 214/2024** on electronic signatures (aligned with eIDAS Regulation 910/2014)
 - **eIDAS Regulation** - EU-wide recognition of electronic signatures
 - **Civil Code** (Law 287/2009) - contracts, proof requirements
 
@@ -324,7 +324,7 @@ Under Romanian jurisprudence, Simple Electronic Signatures are stronger when:
 
 **Short-term (MVP):**
 - Continue with SES (canvas signature)
-- Add explicit consent: "I agree to use electronic signature with legal validity per Law 455/2001"
+- Add explicit consent: "I agree to use electronic signature with legal validity per Law 214/2024"
 - Strengthen audit trail: Browser fingerprint, session recording metadata (not content)
 - Add to T&C: "By signing electronically, you acknowledge this has same legal effect as handwritten signature and waive any challenge based solely on electronic format"
 
@@ -1595,7 +1595,7 @@ GDPR allows free flow of personal data within EU/EEA:
 5. **Pricing** (all-inclusive, currency, VAT)
 6. **Payment** (Stripe, when charged, refund policy)
 7. **KYC Requirements** (ID upload, selfie, why needed)
-8. **Electronic Signatures** (legal validity per Law 455/2001, consent to use)
+8. **Electronic Signatures** (legal validity per Law 214/2024, consent to use)
 9. **Power of Attorney** (customer authorizes eGhiseul.ro to act as representative)
 10. **Service Timeline** (standard, urgent, delays)
 11. **Delivery** (electronic, physical, customer responsibility for address accuracy)

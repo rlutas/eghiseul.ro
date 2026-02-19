@@ -142,10 +142,34 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    const enrichedData = data.map((entry: any) => ({
-      ...entry,
-      friendly_order_id: entry.order_id ? (orderMap[entry.order_id] || null) : null,
-    }));
+    // Enrich entries with linked document info
+    const docIds = data
+      .map((e: any) => e.order_document_id)
+      .filter((id: string | null) => id !== null);
+
+    let docMap = new Map<string, { s3_key: string; file_name: string; type: string }>();
+    if (docIds.length > 0) {
+      const uniqueDocIds = [...new Set(docIds)];
+      const { data: docs } = await adminClient
+        .from('order_documents')
+        .select('id, s3_key, file_name, type')
+        .in('id', uniqueDocIds);
+
+      if (docs) {
+        docMap = new Map(docs.map((d: any) => [d.id, d]));
+      }
+    }
+
+    const enrichedData = data.map((entry: any) => {
+      const doc = entry.order_document_id ? docMap.get(entry.order_document_id) : null;
+      return {
+        ...entry,
+        friendly_order_id: entry.order_id ? (orderMap[entry.order_id] || null) : null,
+        document_s3_key: doc?.s3_key || null,
+        document_file_name: doc?.file_name || null,
+        document_type: doc?.type || null,
+      };
+    });
 
     return NextResponse.json({
       success: true,

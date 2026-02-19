@@ -188,6 +188,13 @@ export function ModularOrderWizard({ initialService, initialOptions }: ModularOr
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           total_price: priceBreakdown.totalPrice,
+          signature_base64: state.signature?.signatureBase64 || null,
+          consent: {
+            termsAccepted: state.consent.termsAccepted,
+            privacyAccepted: state.consent.privacyAccepted,
+            signatureConsent: state.signature?.termsAccepted || false,
+            withdrawalWaiver: state.consent.withdrawalWaiver,
+          },
         }),
       });
 
@@ -205,7 +212,7 @@ export function ModularOrderWizard({ initialService, initialOptions }: ModularOr
       console.error('Order submission error:', error);
       setIsSubmitting(false);
     }
-  }, [state.orderId, priceBreakdown.totalPrice]);
+  }, [state.orderId, priceBreakdown.totalPrice, state.signature?.signatureBase64, state.signature?.termsAccepted, state.consent]);
 
   // Handle next
   const handleNext = () => {

@@ -45,6 +45,8 @@ export interface ClientData {
   address?: string;
   ci_series?: string;
   ci_number?: string;
+  document_issued_by?: string;
+  document_issue_date?: string;
   company_name?: string;
   company_reg?: string;
   company_address?: string;
@@ -55,8 +57,18 @@ export interface ClientData {
   previous_name?: string;
   birth_date?: string;
   birth_county?: string;
-  address_parts?: { county?: string; city?: string; street?: string; number?: string; building?: string; apartment?: string };
+  birth_country?: string;
+  address_parts?: { county?: string; city?: string; sector?: string; street?: string; number?: string; building?: string; staircase?: string; floor?: string; apartment?: string; postalCode?: string };
   company_address_parts?: { county?: string; city?: string; street?: string; number?: string; building?: string; apartment?: string };
+}
+
+export interface SelectedOption {
+  option_id?: string;
+  option_name?: string;
+  optionName?: string;
+  quantity?: number;
+  price_modifier?: number;
+  priceModifier?: number;
 }
 
 export interface DocumentContext {
@@ -75,6 +87,8 @@ export interface DocumentContext {
     urgent_days?: number | null;
     urgent_available?: boolean | null;
   };
+  /** Selected service options for this order (e.g., urgent processing) */
+  selected_options?: SelectedOption[];
   document_numbers?: {
     contract_number?: number;
     contract_series?: string | null;
@@ -123,47 +137,102 @@ function loadTemplate(serviceSlug: string, templateName: string): Buffer {
 
 /**
  * Build a formatted client details block for contracts section 1.2.
- * PJ: company name, CUI, sediu
- * PF: full name, CNP, CI, address
+ * Uses proper Romanian legal identification format:
+ * PF: name, CI details, CNP, domiciliu (structured address)
+ * PJ: company name, CUI, Nr. Reg. Com., sediu, reprezentant with CI/CNP
  */
 function buildClientDetailsBlock(client: ClientData): string {
+  const parts: string[] = [];
+
   if (client.is_pj) {
-    const parts = [client.company_name || 'N/A'];
+    // PJ format: company details + legal representative
+    parts.push(client.company_name || client.name);
     if (client.cui) parts.push(`CUI: ${client.cui}`);
     if (client.company_reg) parts.push(`Nr. Reg. Com.: ${client.company_reg}`);
-    if (client.company_address) parts.push(`cu sediul în: ${client.company_address}`);
-    if (client.email) parts.push(`email: ${client.email}`);
-    if (client.phone) parts.push(`telefon: ${client.phone}`);
-    return parts.join(', ');
+    if (client.company_address) parts.push(`cu sediul în ${client.company_address}`);
+    // Representative with CI details
+    const repName = `${client.firstName || ''} ${client.lastName || ''}`.trim();
+    if (repName) {
+      let repText = `reprezentată prin ${repName}`;
+      if (client.ci_series && client.ci_number) {
+        repText += `, legitimat/ă cu CI seria ${client.ci_series} nr. ${client.ci_number}`;
+        if (client.document_issued_by) repText += `, emisă de ${client.document_issued_by}`;
+      }
+      if (client.cnp) repText += `, CNP ${client.cnp}`;
+      parts.push(repText);
+    }
+  } else {
+    // PF format: proper legal identification
+    parts.push(client.name || `${client.firstName || ''} ${client.lastName || ''}`.trim());
+
+    // CI details
+    if (client.ci_series && client.ci_number) {
+      let ciText = `legitimat/ă cu CI seria ${client.ci_series} nr. ${client.ci_number}`;
+      if (client.document_issued_by) ciText += `, emisă de ${client.document_issued_by}`;
+      parts.push(ciText);
+    }
+
+    // CNP
+    if (client.cnp) parts.push(`CNP ${client.cnp}`);
+
+    // Structured address from ID card (preferred) or fallback to flat address
+    const ap = client.address_parts;
+    if (ap) {
+      const addrParts: string[] = [];
+      if (ap.street) addrParts.push(`Str. ${ap.street}`);
+      if (ap.number) addrParts.push(`Nr. ${ap.number}`);
+      if (ap.building) addrParts.push(`Bl. ${ap.building}`);
+      if (ap.staircase) addrParts.push(`Sc. ${ap.staircase}`);
+      if (ap.floor) addrParts.push(`Et. ${ap.floor}`);
+      if (ap.apartment) addrParts.push(`Ap. ${ap.apartment}`);
+      if (ap.city) addrParts.push(`Localitatea ${ap.city}`);
+      if (ap.county) addrParts.push(`Jud. ${ap.county}`);
+      if (addrParts.length > 0) {
+        parts.push(`cu domiciliul în ${addrParts.join(', ')}`);
+      }
+    } else if (client.address) {
+      parts.push(`cu domiciliul în ${client.address}`);
+    }
   }
-  const parts = [client.name || 'N/A'];
-  if (client.cnp) parts.push(`CNP: ${client.cnp}`);
-  if (client.ci_series && client.ci_number) parts.push(`CI seria ${client.ci_series} nr. ${client.ci_number}`);
-  if (client.address) parts.push(`domiciliat/ă în: ${client.address}`);
-  if (client.email) parts.push(`email: ${client.email}`);
-  if (client.phone) parts.push(`telefon: ${client.phone}`);
+
   return parts.join(', ');
 }
 
 /**
- * Build delivery terms text for the specific service ordered.
+ * Check if the order has an urgent option selected.
  */
-function buildDeliveryTerms(order: DocumentContext['order']): string {
+function hasUrgentOption(selectedOptions?: SelectedOption[]): boolean {
+  if (!selectedOptions || selectedOptions.length === 0) return false;
+  return selectedOptions.some(opt => {
+    const name = (opt.option_name || opt.optionName || '').toLowerCase();
+    return name.includes('urgent');
+  });
+}
+
+/**
+ * Build delivery terms text for the specific service ordered.
+ * Only shows the relevant term (urgent or standard) based on selected options.
+ */
+function buildDeliveryTerms(order: DocumentContext['order'], selectedOptions?: SelectedOption[]): string {
   const estimated = order.estimated_days;
   const urgent = order.urgent_days;
   const urgentAvailable = order.urgent_available;
+  const isUrgent = hasUrgentOption(selectedOptions);
 
   if (!estimated && !urgent) {
     return 'Termenul de livrare va fi comunicat de prestator.';
   }
 
   const parts: string[] = [];
-  if (urgentAvailable && urgent) {
-    parts.push(`Urgent: ${urgent === 1 ? '1 zi lucrătoare' : `${urgent} zile lucrătoare`}`);
+
+  if (isUrgent && urgentAvailable && urgent) {
+    // Client selected urgent: show only urgent term
+    parts.push(`${urgent === 1 ? '1 zi lucrătoare' : `${urgent} zile lucrătoare`} (procesare urgentă)`);
+  } else if (estimated) {
+    // Standard processing
+    parts.push(`${estimated === 1 ? '1 zi lucrătoare' : `${estimated} zile lucrătoare`}`);
   }
-  if (estimated) {
-    parts.push(`Standard: ${estimated === 1 ? '1 zi lucrătoare' : `${estimated} zile lucrătoare`}`);
-  }
+
   parts.push('Pentru situații care necesită verificări suplimentare, termenul poate fi prelungit cu până la 10 zile lucrătoare.');
   return parts.join('\n');
 }
@@ -188,6 +257,29 @@ function buildInstitutie(serviceSlug?: string): string {
 }
 
 /**
+ * Build a CI/ID document info string: "seria XX nr. YYYYYY, emisă de ZZZZ"
+ */
+function buildCIInfo(client: ClientData): string {
+  if (!client.ci_series && !client.ci_number) return '';
+  const parts: string[] = [];
+  if (client.ci_series) parts.push(`seria ${client.ci_series}`);
+  if (client.ci_number) parts.push(`nr. ${client.ci_number}`);
+  if (client.document_issued_by) parts.push(`emisă de ${client.document_issued_by}`);
+  return parts.join(' ');
+}
+
+/**
+ * Build selected options list as readable text.
+ */
+function buildOptionsText(selectedOptions?: SelectedOption[]): string {
+  if (!selectedOptions || selectedOptions.length === 0) return '';
+  return selectedOptions
+    .map(opt => opt.option_name || opt.optionName || '')
+    .filter(Boolean)
+    .join(', ');
+}
+
+/**
  * Build the full placeholder data object from the document context.
  */
 function buildPlaceholderData(ctx: DocumentContext) {
@@ -206,6 +298,17 @@ function buildPlaceholderData(ctx: DocumentContext) {
   const ap = ctx.client.address_parts;
   const cap = ctx.client.company_address_parts;
 
+  // Determine if urgent option was selected
+  const isUrgent = hasUrgentOption(ctx.selected_options);
+
+  // Build estimated days string for the selected processing type
+  const estimatedDays = ctx.order.estimated_days;
+  const urgentDays = ctx.order.urgent_days;
+  const activeDays = (isUrgent && ctx.order.urgent_available && urgentDays) ? urgentDays : estimatedDays;
+  const activeDaysText = activeDays
+    ? (activeDays === 1 ? '1 zi lucrătoare' : `${activeDays} zile lucrătoare`)
+    : '';
+
   return {
     // Client data
     NUMECLIENT: ctx.client.name,
@@ -221,6 +324,17 @@ function buildPlaceholderData(ctx: DocumentContext) {
     CLIENT_COMPANY_REG: ctx.client.company_reg || '',
     CLIENT_COMPANY_ADDRESS: ctx.client.company_address || '',
 
+    // CI document details (issued by)
+    CLIENT_ISSUED_BY: ctx.client.document_issued_by || '',
+    CLIENT_ISSUE_DATE: ctx.client.document_issue_date || '',
+    EMIS_DE: ctx.client.document_issued_by || '',
+    DATA_EMITERE_CI: ctx.client.document_issue_date || '',
+    // CI full info: "seria XX nr. YYYYYY, emisă de ZZZZ"
+    CLIENT_CI_INFO: buildCIInfo(ctx.client),
+    // Aliases for CI - templates may use SERIE_CI/NUMAR_CI
+    SERIE_CI: ctx.client.ci_series || '',
+    NUMAR_CI: ctx.client.ci_number || '',
+
     // Client name parts (for cerere-eliberare-pf)
     CLIENT_FIRSTNAME: ctx.client.firstName || '',
     CLIENT_LASTNAME: ctx.client.lastName || '',
@@ -233,14 +347,34 @@ function buildPlaceholderData(ctx: DocumentContext) {
     CLIENT_BIRTH_MONTH: birthDate.month,
     CLIENT_BIRTH_DAY: birthDate.day,
     CLIENT_BIRTH_COUNTY: ctx.client.birth_county || '',
+    CLIENT_BIRTH_PLACE: ctx.client.birth_county || '',
+    CLIENT_BIRTH_COUNTRY: ctx.client.birth_country || 'ROMANIA',
 
     // Client address parts (structured)
     CLIENT_COUNTY: ap?.county || '',
     CLIENT_CITY: ap?.city || '',
+    CLIENT_SECTOR: ap?.sector || '',
     CLIENT_STREET: ap?.street || '',
     CLIENT_STREET_NR: ap?.number || '',
     CLIENT_BUILDING: ap?.building || '',
+    CLIENT_STAIRCASE: ap?.staircase || '',
+    CLIENT_FLOOR: ap?.floor || '',
     CLIENT_APARTMENT: ap?.apartment || '',
+    CLIENT_POSTAL_CODE: ap?.postalCode || '',
+
+    // Address aliases (templates may use short names)
+    JUDET: ap?.county || '',
+    LOCALITATE: ap?.city || '',
+    SECTOR: ap?.sector || '',
+    STRADA: ap?.street || '',
+    NR: ap?.number || '',
+    BL: ap?.building || '',
+    SC: ap?.staircase || '',
+    ET: ap?.floor || '',
+    AP: ap?.apartment || '',
+    COD_POSTAL: ap?.postalCode || '',
+    DOMICILIU: ctx.client.address || '',
+    ADRESA: ctx.client.address || '',
 
     // Company address parts (structured)
     CLIENT_COMPANY_CITY: cap?.city || '',
@@ -313,12 +447,23 @@ function buildPlaceholderData(ctx: DocumentContext) {
     // Conditional flags (for docxtemplater conditionals)
     isPJ: ctx.client.is_pj,
     isPF: !ctx.client.is_pj,
+    isUrgent,
+    isStandard: !isUrgent,
+
+    // Selected options
+    OPTIUNI_SELECTATE: buildOptionsText(ctx.selected_options),
+    hasUrgent: isUrgent,
+
+    // Terms / deadlines - only the relevant one based on selected options
+    TERMEN_ZILE: activeDaysText,
+    TERMEN_STANDARD: estimatedDays ? (estimatedDays === 1 ? '1 zi lucrătoare' : `${estimatedDays} zile lucrătoare`) : '',
+    TERMEN_URGENT: (ctx.order.urgent_available && urgentDays) ? (urgentDays === 1 ? '1 zi lucrătoare' : `${urgentDays} zile lucrătoare`) : '',
 
     // Compound: beneficiary details block for contracts
     CLIENT_DETAILS_BLOCK: buildClientDetailsBlock(ctx.client),
 
-    // Compound: delivery terms for the specific service
-    TERMEN_LIVRARE: buildDeliveryTerms(ctx.order),
+    // Compound: delivery terms for the specific service (only relevant term shown)
+    TERMEN_LIVRARE: buildDeliveryTerms(ctx.order, ctx.selected_options),
   };
 }
 

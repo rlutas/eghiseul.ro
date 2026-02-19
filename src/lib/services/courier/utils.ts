@@ -462,3 +462,29 @@ export function getCountyCode(name: string): string | undefined {
     (c) => c.name.toLowerCase() === normalized
   )?.code;
 }
+
+// ============================================================================
+// Courier Provider Detection
+// ============================================================================
+
+/**
+ * Extract courier provider code from delivery_method JSON.
+ * The delivery_method.name typically contains provider info like
+ * "Fan Courier - Standard" or "Sameday - EasyBox".
+ */
+export function extractCourierProviderFromDeliveryMethod(
+  deliveryMethod: { name?: string; type?: string } | null | undefined
+): 'fancourier' | 'sameday' | null {
+  if (!deliveryMethod?.name) return null;
+
+  const name = deliveryMethod.name.toLowerCase();
+
+  if (name.includes('fan courier') || name.includes('fancourier') || name.includes('fanbox')) {
+    return 'fancourier';
+  }
+  if (name.includes('sameday') || name.includes('easybox')) {
+    return 'sameday';
+  }
+
+  return null;
+}

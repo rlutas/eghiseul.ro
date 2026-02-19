@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
+import { requirePermission } from '@/lib/admin/permissions';
 
 /**
  * GET /api/admin/orders/lookup - Look up order by friendly_order_id
@@ -7,8 +9,6 @@ import { createClient } from '@/lib/supabase/server';
  * This endpoint is for admin/support team to help customers
  * Query params:
  * - id: friendly_order_id (e.g., ORD-20251218-A3B2C)
- *
- * TODO: Add proper admin authentication when admin roles are implemented
  */
 export async function GET(request: NextRequest) {
   try {
@@ -30,15 +30,31 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Get current user to verify admin role
-    const { data: { user } } = await supabase.auth.getUser();
+    // Verify authentication
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
 
-    // TODO: Add admin role check when profiles table has role column
-    // For now, allow any authenticated user (for development)
-    // In production, this should check: user.role === 'admin'
+    if (authError || !user) {
+      return NextResponse.json(
+        { success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } },
+        { status: 401 }
+      );
+    }
+
+    // Check permission
+    try {
+      await requirePermission(user.id, 'orders.view');
+    } catch (error) {
+      if (error instanceof Response) return error;
+      throw error;
+    }
+
+    const adminClient = createAdminClient();
 
     // Fetch the order with service details
-    const { data: order, error: orderError } = await supabase
+    const { data: order, error: orderError } = await adminClient
       .from('orders')
       .select(`
         *,

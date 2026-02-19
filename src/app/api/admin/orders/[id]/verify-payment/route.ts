@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { requirePermission } from '@/lib/admin/permissions';
 import { createInvoiceFromOrder } from '@/lib/oblio';
 
 interface RouteParams {
@@ -42,18 +43,12 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    // Check if user is admin
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .single();
-
-    if (profile?.role !== 'admin') {
-      return NextResponse.json(
-        { success: false, error: 'Admin access required' },
-        { status: 403 }
-      );
+    // Check permission
+    try {
+      await requirePermission(user.id, 'payments.verify');
+    } catch (error) {
+      if (error instanceof Response) return error;
+      throw error;
     }
 
     // Fetch order with service name
@@ -104,7 +99,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       await supabase.from('order_history').insert({
         order_id: id,
         event_type: 'payment_rejected',
-        notes: notes || 'Payment proof rejected by admin',
+        notes: notes || 'Dovada de plata respinsa de admin',
         changed_by: user.id,
         new_value: JSON.stringify({
           payment_status: 'failed',
@@ -187,8 +182,8 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       order_id: id,
       event_type: 'payment_verified',
       notes: invoice
-        ? `Bank transfer verified by admin. Invoice: ${invoice.invoiceNumber}`
-        : `Bank transfer verified by admin. Invoice creation failed: ${invoiceError}`,
+        ? `Transfer bancar verificat de admin. Factura: ${invoice.invoiceNumber}`
+        : `Transfer bancar verificat de admin. Crearea facturii a esuat: ${invoiceError}`,
       changed_by: user.id,
       new_value: JSON.stringify({
         payment_status: 'paid',

@@ -30,7 +30,7 @@ Module Components               → Componentele individuale pentru fiecare pas
 | **Vehicle Data** | `vehicle-data` | Nr. înmatriculare, categorie | Rovinieta, servicii auto |
 | **Company Documents** | `company-documents` | Upload certificat înregistrare, certificat constatator | Servicii PJ care necesită documente firmă |
 | **KYC Documents** | `kyc-documents` | Upload CI, selfie, certificate | Servicii care necesită verificare identitate |
-| **Signature** | `signature` | Semnătură electronică pe canvas | Servicii care necesită semnătură |
+| **Signature** | `signature` | Previzualizare contract + semnătură electronică pe canvas | Servicii care necesită semnătură |
 | **Options** | `options` | Opțiuni suplimentare (urgență, traduceri) | ÎNTOTDEAUNA (obligatoriu) |
 | **Delivery** | `delivery` | Metodă livrare, adresă | ÎNTOTDEAUNA (obligatoriu) |
 | **Billing** | `billing` | Date facturare PF/PJ | ÎNTOTDEAUNA (obligatoriu) |
@@ -158,6 +158,60 @@ interface UploadedDocumentState {
 - `src/lib/verification-modules/registry.ts` - Înregistrare modul și dynamic loader
 - `src/providers/modular-wizard-provider.tsx` - `updateCompanyKycDocuments` action
 
+### Signature Step with Contract Preview (NOU - 2026-02-17)
+
+Pasul de semnatura afiseaza o previzualizare live a contractului complet (contract-complet.docx) convertit in HTML, urmata de un canvas pentru semnatura electronica.
+
+**Flux:**
+1. La intrarea pe pas, se face POST `/api/contracts/preview` cu datele din wizard (contact, personalData, companyData, billing, preturi)
+2. API-ul genereaza DOCX din template-ul `contract-complet.docx` folosind `docxtemplater`, apoi il converteste in HTML cu `mammoth`
+3. HTML-ul este post-procesat pentru a insera placeholdere vizuale pentru semnaturi (client, prestator, avocat)
+4. Cand utilizatorul deseneaza semnatura pe canvas, aceasta inlocuieste live placeholderele `SEMNATURA_CLIENT` din preview
+
+**Tipuri de semnaturi in contract:**
+- `SEMNATURA_CLIENT` (3 aparitii) - semnatura desenata de client pe canvas
+- `SEMNATURA_PRESTATOR` (1 aparitie) - semnatura predefinita a firmei (din S3, configurata in admin)
+- `SEMNATURA_AVOCAT` (1 aparitie) - semnatura predefinita a avocatului (din S3, configurata in admin)
+
+In preview, semnaturile prestatorului si avocatului apar ca placeholdere statice ("Semnatura prestator", "Semnatura avocat"). Semnaturile reale sunt inserate doar la generarea finala a documentelor de catre admin (POST `/api/admin/orders/[id]/generate-document`).
+
+**API Contract Preview:**
+
+```
+POST /api/contracts/preview (fara autentificare - accesibil si pentru guests)
+Body: {
+  serviceSlug, serviceName, contact, personalData?,
+  companyData?, billing?, totalPrice, servicePrice,
+  orderId?, friendlyOrderId?
+}
+Response: { success: true, html: "<div>..." }
+```
+
+**Configurare `signature` in `verification_config`:**
+
+```json
+{
+  "signature": {
+    "enabled": true,
+    "required": true,
+    "termsAcceptanceRequired": true
+  }
+}
+```
+
+**Validare pas:**
+- Daca `required === true`, semnatura trebuie desenata pe canvas
+- Daca `termsAcceptanceRequired === true`, checkbox-ul "Am citit si accept contractele" trebuie bifat
+
+**Fisiere relevante:**
+- `src/components/orders/modules/signature/SignatureStep.tsx` - Componenta principala (canvas + termeni)
+- `src/components/orders/modules/signature/ContractPreview.tsx` - Previzualizare contract HTML
+- `src/app/api/contracts/preview/route.ts` - API generare preview (mammoth DOCX-to-HTML)
+- `src/templates/shared/contract-complet.docx` - Template DOCX cu toate contractele combinate
+- `src/lib/documents/generator.ts` - Generator DOCX cu suport multi-semnatura
+- `src/lib/documents/signature-inserter.ts` - Inserare imagini semnatura in DOCX (DrawingML)
+- `src/types/verification-modules.ts` - SignatureConfig, SignatureState
+
 ## Cum Adaugi un Serviciu Nou
 
 ### Pasul 1: Definește verification_config în Supabase
@@ -257,6 +311,7 @@ interface ServiceVerificationConfig {
   signature: {
     enabled: boolean;
     required: boolean;
+    termsAcceptanceRequired: boolean;  // Require checkbox acceptance of contracts
   };
 }
 ```
@@ -481,7 +536,7 @@ src/
 │       ├── company-kyc/                    # CompanyDataStep + CompanyDocumentsStep
 │       ├── property/
 │       ├── vehicle/
-│       ├── signature/
+│       ├── signature/                    # SignatureStep + ContractPreview
 │       └── client-type/
 ├── lib/verification-modules/
 │   ├── registry.ts                         # Registry module
@@ -495,5 +550,5 @@ src/
 
 ---
 
-**Actualizat:** 2026-02-10
-**Versiune:** 1.1
+**Actualizat:** 2026-02-17
+**Versiune:** 1.2

@@ -113,6 +113,8 @@ export async function autoGenerateOrderDocuments(
     address: formatAddress(personal.address),
     ci_series: personal.documentSeries || personal.ci_series || '',
     ci_number: personal.documentNumber || personal.ci_number || '',
+    document_issued_by: personal.documentIssuedBy || personal.issuedBy || '',
+    document_issue_date: personal.documentIssueDate || personal.issueDate || '',
     company_name: company.companyName || billing.companyName || '',
     company_reg: company.registrationNumber || '',
     company_address: formatAddress(company.address) || billing.companyAddress || '',
@@ -122,10 +124,14 @@ export async function autoGenerateOrderDocuments(
     previous_name: personal.previousName || '',
     birth_date: personal.birthDate || '',
     birth_county: personal.birthPlace || personal.birthCounty || '',
+    birth_country: personal.birthCountry || 'ROMANIA',
     address_parts: personalAddress ? {
       county: personalAddress.county, city: personalAddress.city,
+      sector: personalAddress.sector,
       street: personalAddress.street, number: personalAddress.number,
-      building: personalAddress.building, apartment: personalAddress.apartment,
+      building: personalAddress.building, staircase: personalAddress.staircase,
+      floor: personalAddress.floor, apartment: personalAddress.apartment,
+      postalCode: personalAddress.postalCode,
     } : undefined,
     company_address_parts: companyAddress ? {
       county: companyAddress.county, city: companyAddress.city,
@@ -133,6 +139,9 @@ export async function autoGenerateOrderDocuments(
       building: companyAddress.building, apartment: companyAddress.apartment,
     } : undefined,
   };
+
+  // Extract selected options from order
+  const selectedOptions = (order.selected_options as Array<{ option_id?: string; option_name?: string; optionName?: string; quantity?: number; price_modifier?: number; priceModifier?: number }>) || [];
 
   const serviceSlug = order.services?.slug || 'cazier-judiciar';
 
@@ -224,6 +233,7 @@ export async function autoGenerateOrderDocuments(
           urgent_days: order.services?.urgent_days,
           urgent_available: order.services?.urgent_available,
         },
+        selected_options: selectedOptions,
         document_numbers: documentNumbers,
         motiv_solicitare: 'Interes personal',
         client_ip: clientIp,
@@ -295,6 +305,17 @@ export async function autoGenerateOrderDocuments(
           .from('number_registry')
           .update({ order_document_id: insertedDoc.id })
           .eq('id', documentNumbers.registry_ids.contract);
+      }
+
+      // Catch-all: link any unlinked contract registry entry for this order
+      // This handles the reuse path where find_existing_number was used but no registry_id was stored
+      if (insertedDoc?.id && template === 'contract-asistenta') {
+        await adminClient
+          .from('number_registry')
+          .update({ order_document_id: insertedDoc.id })
+          .eq('order_id', orderId)
+          .eq('type', 'contract')
+          .is('order_document_id', null);
       }
 
       results.push({

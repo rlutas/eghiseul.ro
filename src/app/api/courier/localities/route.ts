@@ -67,6 +67,7 @@ export async function GET(request: NextRequest) {
       const provider = searchParams.get('provider');
 
       // Use Fan Courier API for delivery addresses (better AWB compatibility)
+      // Also fetch postal codes from Sameday (Fan Courier doesn't provide them)
       if (provider === 'fancourier') {
         try {
           const courierProvider = getCourierProvider('fancourier');
@@ -74,6 +75,28 @@ export async function GET(request: NextRequest) {
             throw new Error('getLocalities not implemented');
           }
           const localities = await courierProvider.getLocalities(county);
+
+          // Try to enrich with postal codes from Sameday
+          try {
+            const samedayProvider = getCourierProvider('sameday');
+            if (samedayProvider.getLocalities) {
+              const samedayLocalities = await samedayProvider.getLocalities(county);
+              const postalMap = new Map<string, string>();
+              for (const loc of samedayLocalities) {
+                if (loc.postalCode) {
+                  postalMap.set(loc.name.toLowerCase(), loc.postalCode);
+                }
+              }
+              // Merge postal codes into Fan Courier localities
+              for (const loc of localities) {
+                if (!loc.postalCode) {
+                  loc.postalCode = postalMap.get(loc.name.toLowerCase());
+                }
+              }
+            }
+          } catch {
+            // Sameday postal code enrichment is optional
+          }
 
           // Sort alphabetically
           localities.sort((a, b) => a.name.localeCompare(b.name, 'ro'));

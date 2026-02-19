@@ -361,7 +361,7 @@ export async function GET() {
   return NextResponse.json({
     status: hasApiKey ? 'ready' : 'not_configured',
     service: 'Document OCR',
-    provider: 'Google Gemini 2.0 Flash Exp',
+    provider: 'Google Gemini 2.5 Flash',
     supportedDocuments: ['ci_front', 'ci_back', 'passport'],
     features: [
       'Auto-detect document type',

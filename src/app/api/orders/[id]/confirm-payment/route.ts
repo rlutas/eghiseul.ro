@@ -99,7 +99,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     await supabaseAdmin.from('order_history').insert({
       order_id: orderId,
       event_type: 'payment_confirmed',
-      notes: `Payment confirmed via manual check. Stripe PaymentIntent: ${paymentIntentId}`,
+      notes: `Plata confirmata prin verificare manuala. Stripe PaymentIntent: ${paymentIntentId}`,
       new_value: JSON.stringify({
         payment_status: 'paid',
         stripe_payment_intent: paymentIntentId,

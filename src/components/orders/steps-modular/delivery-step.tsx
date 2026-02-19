@@ -56,17 +56,35 @@ const SENDER_LOCATION = {
 };
 
 // =============================================================================
-// DELIVERY MARKUP CONFIGURATION
+// DELIVERY CONFIGURATION
 // =============================================================================
+
 // Markup percentage applied to courier prices (to cover costs, taxes, etc.)
 // 15% = 0.15, 20% = 0.20, etc.
 const DELIVERY_MARKUP_PERCENTAGE = 0.15; // 15% markup
+
+// Toggle which locker services to show in the UI
+// Set to false to hide a locker option (functionality preserved, just hidden)
+const ENABLED_LOCKERS = {
+  fanbox: true,    // FANbox (Fan Courier)
+  easybox: true,   // EasyBox (Sameday) — enabled
+};
 
 /**
  * Apply markup to a price and round to 2 decimals
  */
 function applyMarkup(price: number): number {
   return Math.round((price * (1 + DELIVERY_MARKUP_PERCENTAGE)) * 100) / 100;
+}
+
+/**
+ * Check if a locker quote should be shown based on ENABLED_LOCKERS config
+ */
+function isLockerEnabled(quote: CourierQuote): boolean {
+  if (quote.provider === 'sameday') return ENABLED_LOCKERS.easybox;
+  // Fan Courier locker (FANbox)
+  if (quote.serviceName.toLowerCase().includes('fanbox')) return ENABLED_LOCKERS.fanbox;
+  return true; // Show non-locker quotes always
 }
 
 // Delivery type
@@ -122,7 +140,7 @@ function getLockerBrandName(quote: CourierQuote): string {
 interface UserCoordinates {
   lat: number;
   lng: number;
-  source: 'geolocation' | 'geocoded';
+  source: 'geolocation' | 'geocoded' | 'geocoded_street';
 }
 
 /**
@@ -178,12 +196,13 @@ const addressSchema = z.object({
   street: z.string().min(2, 'Strada este obligatorie'),
   number: z.string().min(1, 'Numărul este obligatoriu'),
   building: z.string().optional(),
+  staircase: z.string().optional(),
+  floor: z.string().optional(),
   apartment: z.string().optional(),
   city: z.string().min(2, 'Localitatea este obligatorie'),
   county: z.string().min(1, 'Județul este obligatoriu'),
   postalCode: z.string()
-    .length(6, 'Codul poștal trebuie să aibă 6 cifre')
-    .regex(/^\d{6}$/, 'Codul poștal trebuie să conțină doar cifre'),
+    .regex(/^\d{6}$/, 'Codul poștal trebuie să aibă 6 cifre'),
 });
 
 type AddressFormData = z.infer<typeof addressSchema>;
@@ -226,6 +245,7 @@ export function DeliveryStepModular({ onValidChange }: DeliveryStepProps) {
     id: string;
     name: string;
     county: string;
+    postalCode?: string;
   }
   const [localities, setLocalities] = useState<LocalityItem[]>([]);
   const [loadingLocalities, setLoadingLocalities] = useState(false);
@@ -252,6 +272,8 @@ export function DeliveryStepModular({ onValidChange }: DeliveryStepProps) {
       street: delivery.address?.street || '',
       number: delivery.address?.number || '',
       building: delivery.address?.building || '',
+      staircase: delivery.address?.staircase || '',
+      floor: delivery.address?.floor || '',
       apartment: delivery.address?.apartment || '',
       city: delivery.address?.city || '',
       county: delivery.address?.county || '',
@@ -263,6 +285,8 @@ export function DeliveryStepModular({ onValidChange }: DeliveryStepProps) {
   const { isValid: isAddressValid } = form.formState;
   const watchedCounty = form.watch('county');
   const watchedCity = form.watch('city');
+  const watchedStreet = form.watch('street');
+  const watchedNumber = form.watch('number');
 
   // Fetch quotes when address is valid
   // preferredService: if provided, re-select that service instead of cheapest (used on remount)
@@ -300,7 +324,11 @@ export function DeliveryStepModular({ onValidChange }: DeliveryStepProps) {
           priceWithVAT: applyMarkup(quote.priceWithVAT),
         }));
 
-        const sortedQuotes = quotesWithMarkup.sort(
+        // Filter out disabled locker services, then sort by price
+        const visibleQuotes = quotesWithMarkup.filter((q: CourierQuote) =>
+          !isLockerQuote(q) || isLockerEnabled(q)
+        );
+        const sortedQuotes = visibleQuotes.sort(
           (a: CourierQuote, b: CourierQuote) => a.priceWithVAT - b.priceWithVAT
         );
         setQuotes(sortedQuotes);
@@ -316,7 +344,7 @@ export function DeliveryStepModular({ onValidChange }: DeliveryStepProps) {
             setShowLockerSelector(true);
             const provider = getLockerProvider(preferred);
             if (county) {
-              getUserLocation().then((coords) => {
+              getDeliveryLocation(delivery.address?.street, delivery.address?.number).then((coords) => {
                 fetchLockers(county, coords, provider);
               });
             }
@@ -335,8 +363,46 @@ export function DeliveryStepModular({ onValidChange }: DeliveryStepProps) {
     }
   }, [delivery.courierProvider]);
 
-  // Get user's geolocation for distance calculation
-  const getUserLocation = useCallback((): Promise<UserCoordinates | null> => {
+  // Get delivery location coordinates by geocoding the delivery address
+  // Tries full address first (street + city), falls back to city-only, then browser geolocation
+  const getDeliveryLocation = useCallback(async (street?: string, number?: string): Promise<UserCoordinates | null> => {
+    const city = watchedCity;
+    const county = watchedCounty;
+
+    if (city && county) {
+      // Build query — include street if available for more precise geocoding
+      const streetPart = street && street.length >= 2
+        ? `${street}${number ? ` ${number}` : ''}, `
+        : '';
+      const fullQuery = `${streetPart}${city}, ${county}, Romania`;
+      const cityQuery = `${city}, ${county}, Romania`;
+
+      // Try full address first, then fall back to city-only
+      const queries = streetPart ? [fullQuery, cityQuery] : [cityQuery];
+
+      for (const query of queries) {
+        try {
+          const response = await fetch(
+            `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1&countrycodes=ro`,
+            { headers: { 'User-Agent': 'eghiseul.ro/1.0' } }
+          );
+          const data = await response.json();
+          if (data?.[0]) {
+            const coords: UserCoordinates = {
+              lat: parseFloat(data[0].lat),
+              lng: parseFloat(data[0].lon),
+              source: streetPart && query === fullQuery ? 'geocoded_street' : 'geocoded',
+            };
+            setUserCoordinates(coords);
+            return coords;
+          }
+        } catch {
+          // Try next query or fall through
+        }
+      }
+    }
+
+    // Fallback: browser geolocation
     return new Promise((resolve) => {
       if (!navigator.geolocation) {
         resolve(null);
@@ -359,10 +425,10 @@ export function DeliveryStepModular({ onValidChange }: DeliveryStepProps) {
           setGettingLocation(false);
           resolve(null);
         },
-        { timeout: 5000, maximumAge: 300000 } // 5s timeout, cache for 5 min
+        { timeout: 5000, maximumAge: 300000 }
       );
     });
-  }, []);
+  }, [watchedCity, watchedCounty]);
 
   // Fetch localities for selected county from Fan Courier API
   const fetchLocalities = useCallback(async (county: string) => {
@@ -508,27 +574,51 @@ export function DeliveryStepModular({ onValidChange }: DeliveryStepProps) {
     }
   }, []);
 
-  // Fetch localities when county changes
+  // Fetch localities when county changes & reset locker selection
   useEffect(() => {
     if (physicalRegion === 'romania' && watchedCounty) {
       fetchLocalities(watchedCounty);
-      // Only reset city/street when the user changes county, not on initial mount
+      // Reset dependent fields when county changes (not on initial mount)
       if (!isInitialMount.current) {
-        form.setValue('city', '');
-        form.setValue('street', '');
+        form.setValue('city', '', { shouldValidate: false });
+        form.setValue('street', '', { shouldValidate: false });
+        form.setValue('number', '', { shouldValidate: false });
+        form.setValue('building', '', { shouldValidate: false });
+        form.setValue('staircase', '', { shouldValidate: false });
+        form.setValue('floor', '', { shouldValidate: false });
+        form.setValue('apartment', '', { shouldValidate: false });
+        form.setValue('postalCode', '', { shouldValidate: false });
+        form.clearErrors(['city', 'street', 'number', 'postalCode']);
         setStreets([]);
+        // Reset locker selection — old lockers are for the previous county
+        setSelectedLocker(null);
+        setLockers([]);
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [watchedCounty, physicalRegion]);
 
-  // Fetch streets when locality changes
+  // Fetch streets when locality changes + auto-fill postal code
   useEffect(() => {
     if (physicalRegion === 'romania' && watchedCounty && watchedCity) {
       fetchStreets(watchedCounty, watchedCity);
-      // Only reset street when the user changes city, not on initial mount
+      // Reset dependent fields when city changes (not on initial mount)
       if (!isInitialMount.current) {
-        form.setValue('street', '');
+        form.setValue('street', '', { shouldValidate: false });
+        form.setValue('number', '', { shouldValidate: false });
+        form.setValue('building', '', { shouldValidate: false });
+        form.setValue('staircase', '', { shouldValidate: false });
+        form.setValue('floor', '', { shouldValidate: false });
+        form.setValue('apartment', '', { shouldValidate: false });
+        form.clearErrors(['street', 'number', 'postalCode']);
+
+        // Auto-fill postal code from locality data (enriched with Sameday postal codes)
+        const selected = localities.find((l) => l.name === watchedCity);
+        if (selected?.postalCode) {
+          form.setValue('postalCode', selected.postalCode, { shouldValidate: true, shouldDirty: true });
+        } else {
+          form.setValue('postalCode', '', { shouldValidate: false });
+        }
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -545,7 +635,66 @@ export function DeliveryStepModular({ onValidChange }: DeliveryStepProps) {
       return () => clearTimeout(timer);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [watchedCounty, watchedCity, physicalRegion, fetchQuotes]);
+  }, [watchedCounty, watchedCity, physicalRegion]);
+
+  // Re-fetch lockers when county/city changes and a locker service is selected
+  useEffect(() => {
+    if (
+      !isInitialMount.current &&
+      physicalRegion === 'romania' &&
+      watchedCounty &&
+      watchedCity &&
+      selectedQuote &&
+      isLockerQuote(selectedQuote) &&
+      showLockerSelector
+    ) {
+      const provider = getLockerProvider(selectedQuote);
+      // Reset old locker selection since location changed
+      setSelectedLocker(null);
+      getDeliveryLocation(watchedStreet, watchedNumber).then((coords) => {
+        fetchLockers(watchedCounty, coords, provider);
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [watchedCounty, watchedCity]);
+
+  // Re-sort lockers when street/number changes (debounced to avoid excessive Nominatim calls)
+  useEffect(() => {
+    if (
+      !isInitialMount.current &&
+      showLockerSelector &&
+      lockers.length > 0 &&
+      watchedStreet &&
+      watchedStreet.length >= 3 &&
+      watchedCounty &&
+      watchedCity
+    ) {
+      const timer = setTimeout(() => {
+        getDeliveryLocation(watchedStreet, watchedNumber).then((coords) => {
+          if (coords) {
+            setLockers((prev) => {
+              const updated = prev.map((locker) => {
+                if (locker.lat && locker.lng) {
+                  const distance = calculateDistance(coords.lat, coords.lng, locker.lat, locker.lng);
+                  return { ...locker, distance };
+                }
+                return locker;
+              });
+              updated.sort((a, b) => {
+                if (a.distance === undefined && b.distance === undefined) return 0;
+                if (a.distance === undefined) return 1;
+                if (b.distance === undefined) return -1;
+                return a.distance - b.distance;
+              });
+              return updated;
+            });
+          }
+        });
+      }, 1000); // 1 second debounce (Nominatim rate limit: 1 req/sec)
+      return () => clearTimeout(timer);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [watchedStreet, watchedNumber]);
 
   // Clear initial mount flag after first render cycle
   useEffect(() => {
@@ -636,6 +785,8 @@ export function DeliveryStepModular({ onValidChange }: DeliveryStepProps) {
             street: value.street || '',
             number: value.number || '',
             building: value.building,
+            staircase: value.staircase,
+            floor: value.floor,
             apartment: value.apartment,
             city: value.city || '',
             county: value.county || '',
@@ -901,7 +1052,7 @@ export function DeliveryStepModular({ onValidChange }: DeliveryStepProps) {
             </h4>
 
             <Form {...form}>
-              <form className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <form className="grid grid-cols-2 gap-3 sm:gap-4">
                 {/* County */}
                 <FormField
                   control={form.control}
@@ -966,7 +1117,8 @@ export function DeliveryStepModular({ onValidChange }: DeliveryStepProps) {
                   )}
                 />
 
-                {/* Street - Autocomplete input */}
+                {/* Street + Number row */}
+                <div className="col-span-2 grid grid-cols-[1fr_80px] sm:grid-cols-[1fr_100px] gap-3 sm:gap-4">
                 <FormField
                   control={form.control}
                   name="street"
@@ -979,7 +1131,7 @@ export function DeliveryStepModular({ onValidChange }: DeliveryStepProps) {
                       .slice(0, 50);
 
                     return (
-                      <FormItem className="sm:col-span-2">
+                      <FormItem>
                         <FormLabel>Strada <span className="text-red-500">*</span></FormLabel>
                         {loadingStreets ? (
                           <div className="flex items-center gap-2 h-10 px-3 py-2 border rounded-md bg-neutral-50">
@@ -1049,13 +1201,13 @@ export function DeliveryStepModular({ onValidChange }: DeliveryStepProps) {
                   }}
                 />
 
-                {/* Number & Building */}
+                {/* Number */}
                 <FormField
                   control={form.control}
                   name="number"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Număr <span className="text-red-500">*</span></FormLabel>
+                      <FormLabel>Nr. <span className="text-red-500">*</span></FormLabel>
                       <FormControl>
                         <Input {...field} placeholder="Nr." />
                       </FormControl>
@@ -1063,20 +1215,70 @@ export function DeliveryStepModular({ onValidChange }: DeliveryStepProps) {
                     </FormItem>
                   )}
                 />
+                </div>{/* end street+number row */}
 
-                <FormField
-                  control={form.control}
-                  name="building"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Bloc / Scara / Etaj / Ap.</FormLabel>
-                      <FormControl>
-                        <Input {...field} placeholder="Bl., Sc., Et., Ap." />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                {/* Building / Staircase / Floor / Apartment row */}
+                <div className="col-span-2 grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+                  {/* Bloc */}
+                  <FormField
+                    control={form.control}
+                    name="building"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Bloc</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="A1" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Scară */}
+                  <FormField
+                    control={form.control}
+                    name="staircase"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Scară</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="B" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Etaj */}
+                  <FormField
+                    control={form.control}
+                    name="floor"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Etaj</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="3" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Apartament */}
+                  <FormField
+                    control={form.control}
+                    name="apartment"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Apartament</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="45" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>{/* end building details row */}
 
                 {/* Postal Code */}
                 <FormField
@@ -1147,7 +1349,7 @@ export function DeliveryStepModular({ onValidChange }: DeliveryStepProps) {
                             }
                             setShowLockerSelector(true);
                             if (watchedCounty) {
-                              const userLoc = userCoordinates || await getUserLocation();
+                              const userLoc = userCoordinates || await getDeliveryLocation(watchedStreet, watchedNumber);
                               fetchLockers(watchedCounty, userLoc, newProvider);
                             }
                           } else {
@@ -1363,8 +1565,8 @@ export function DeliveryStepModular({ onValidChange }: DeliveryStepProps) {
                     </div>
                   )}
 
-                  {/* Price Breakdown Info */}
-                  {selectedQuote?.breakdown && (
+                  {/* Price Breakdown Info (only for standard delivery, not lockers) */}
+                  {selectedQuote?.breakdown && !isLockerQuote(selectedQuote) && (
                     <div className="p-3 rounded-lg bg-neutral-50 border border-neutral-200 text-xs text-neutral-600">
                       <div className="flex items-center gap-1 mb-2">
                         <Info className="w-3.5 h-3.5" />

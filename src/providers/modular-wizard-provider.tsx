@@ -36,6 +36,7 @@ import type {
   AddressState,
   ClientType,
   UploadedDocumentState,
+  ConsentState,
 } from '@/types/verification-modules';
 import { DEFAULT_DISABLED_CONFIG } from '@/types/verification-modules';
 import { Service, ServiceOption } from '@/types/services';
@@ -46,7 +47,7 @@ import {
   getVisibleSteps,
   renumberSteps,
 } from '@/lib/verification-modules/step-builder';
-import { generateOrderId, getDraftStorageKey } from '@/lib/order-id';
+import { generateOrderId, getDraftStorageKey, validateOrderId } from '@/lib/order-id';
 
 // Cache version for migrations
 // v3: Added clientType to cache for proper step reconstruction
@@ -181,6 +182,11 @@ const initialState: ModularWizardState = {
   isSaving: false,
   lastSavedAt: null,
   error: null,
+  consent: {
+    termsAccepted: false,
+    privacyAccepted: false,
+    withdrawalWaiver: false,
+  },
   isInitialized: false,
 };
 
@@ -204,6 +210,7 @@ type ModularWizardAction =
   | { type: 'UPDATE_BILLING'; payload: Partial<BillingState> }
   | { type: 'UPDATE_OPTIONS'; payload: SelectedOptionState[] }
   | { type: 'UPDATE_DELIVERY'; payload: Partial<DeliveryState> }
+  | { type: 'UPDATE_CONSENT'; payload: Partial<ConsentState> }
   | { type: 'SET_ORDER_IDS'; payload: { orderId: string | null; friendlyOrderId: string } }
   | { type: 'SET_FRIENDLY_ORDER_ID'; payload: string }
   | { type: 'SAVE_START' }
@@ -507,6 +514,12 @@ function modularWizardReducer(
         isDirty: true,
       };
 
+    case 'UPDATE_CONSENT':
+      return {
+        ...state,
+        consent: { ...state.consent, ...action.payload },
+      };
+
     case 'SET_ORDER_IDS':
       return {
         ...state,
@@ -718,6 +731,7 @@ interface ModularWizardContextType {
   updateBilling: (data: Partial<BillingState>) => void;
   updateOptions: (options: SelectedOptionState[]) => void;
   updateDelivery: (data: Partial<DeliveryState>) => void;
+  updateConsent: (data: Partial<ConsentState>) => void;
 
   // Price
   priceBreakdown: PriceBreakdown;
@@ -855,6 +869,12 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
             const cacheData = JSON.parse(cached) as ModularDraftCache;
             // Check if it's for this service and has valid version
             if (cacheData.serviceSlug === state.serviceSlug && cacheData.version === CACHE_VERSION) {
+              // Validate order ID format before restoring
+              if (cacheData.friendlyOrderId && !validateOrderId(cacheData.friendlyOrderId)) {
+                console.warn('Invalid order ID in cache, clearing:', cacheData.friendlyOrderId);
+                localStorage.removeItem(key);
+                continue;
+              }
               // Verify with server that this order is still a draft (only for logged-in users)
               if (cacheData.friendlyOrderId) {
                 try {
@@ -1030,6 +1050,10 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
     dispatch({ type: 'UPDATE_DELIVERY', payload: data });
   }, []);
 
+  const updateConsent = useCallback((data: Partial<ConsentState>) => {
+    dispatch({ type: 'UPDATE_CONSENT', payload: data });
+  }, []);
+
   // Price calculation
   const priceBreakdown = useMemo((): PriceBreakdown => {
     const service = serviceRef.current;
@@ -1056,7 +1080,7 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
       totalPrice,
       currency: service?.currency ?? 'RON',
     };
-  }, [state.selectedOptions, state.delivery]);
+  }, [state.serviceId, state.selectedOptions, state.delivery]);
 
   // Save to localStorage
   const saveToLocalStorage = useCallback(() => {
@@ -1176,11 +1200,15 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
         const errorData = await response.json().catch(() => ({}));
         console.error('Save draft error:', response.status, errorData);
 
-        // Handle case where order is no longer a draft (was submitted)
-        // Clear orderId so next save creates a fresh draft
-        if (response.status === 400 && errorData.error?.code === 'INVALID_STATUS') {
-          console.warn('Order is no longer a draft - clearing orderId for fresh draft');
-          const newFriendlyOrderId = `ORD-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
+        // Handle recoverable 400 errors by generating a fresh draft
+        const errorCode = errorData.error?.code;
+        if (response.status === 400 && (
+          errorCode === 'INVALID_STATUS' ||
+          errorCode === 'INVALID_ORDER_ID' ||
+          errorCode === 'VALIDATION_ERROR'
+        )) {
+          console.warn('Draft save failed with', errorCode, '- generating fresh order ID');
+          const newFriendlyOrderId = generateOrderId();
           dispatch({
             type: 'SET_ORDER_IDS',
             payload: {
@@ -1439,6 +1467,7 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
     updateBilling,
     updateOptions,
     updateDelivery,
+    updateConsent,
     priceBreakdown,
     saveDraft,
     saveDraftNow,

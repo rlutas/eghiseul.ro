@@ -128,8 +128,14 @@ export type Database = {
           delivery_address: Json | null
           delivery_method: string | null
           delivery_price: number | null
+          delivery_tracking_events: Json | null
+          delivery_tracking_last_update: string | null
           delivery_tracking_number: string | null
+          delivery_tracking_status: string | null
           delivery_tracking_url: string | null
+          courier_provider: string | null
+          courier_service: string | null
+          courier_quote: Json | null
           discount_amount: number | null
           encrypted_ci_number: string | null
           encrypted_ci_series: string | null
@@ -181,8 +187,14 @@ export type Database = {
           delivery_address?: Json | null
           delivery_method?: string | null
           delivery_price?: number | null
+          delivery_tracking_events?: Json | null
+          delivery_tracking_last_update?: string | null
           delivery_tracking_number?: string | null
+          delivery_tracking_status?: string | null
           delivery_tracking_url?: string | null
+          courier_provider?: string | null
+          courier_service?: string | null
+          courier_quote?: Json | null
           discount_amount?: number | null
           encrypted_ci_number?: string | null
           encrypted_ci_series?: string | null
@@ -234,8 +246,14 @@ export type Database = {
           delivery_address?: Json | null
           delivery_method?: string | null
           delivery_price?: number | null
+          delivery_tracking_events?: Json | null
+          delivery_tracking_last_update?: string | null
           delivery_tracking_number?: string | null
+          delivery_tracking_status?: string | null
           delivery_tracking_url?: string | null
+          courier_provider?: string | null
+          courier_service?: string | null
+          courier_quote?: Json | null
           discount_amount?: number | null
           encrypted_ci_number?: string | null
           encrypted_ci_series?: string | null
@@ -320,6 +338,7 @@ export type Database = {
           id: string
           kyc_verified: boolean | null
           last_name: string | null
+          permissions: Json | null
           phone: string | null
           role: string | null
           two_factor_enabled: boolean | null
@@ -333,6 +352,7 @@ export type Database = {
           id: string
           kyc_verified?: boolean | null
           last_name?: string | null
+          permissions?: Json | null
           phone?: string | null
           role?: string | null
           two_factor_enabled?: boolean | null
@@ -346,6 +366,7 @@ export type Database = {
           id?: string
           kyc_verified?: boolean | null
           last_name?: string | null
+          permissions?: Json | null
           phone?: string | null
           role?: string | null
           two_factor_enabled?: boolean | null

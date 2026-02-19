@@ -1,33 +1,72 @@
 # Documentație eGhiseul.ro
 
-**Ultima actualizare:** 2026-02-18
-**Status proiect:** Sprint 4 (97%) / Sprint 5 (97%) - Number Registry System Implemented
+**Ultima actualizare:** 2026-02-19
+**Status proiect:** Sprint 4 (98%) / Sprint 5 (98%) - CLIENT_DETAILS_BLOCK Legal Format + KYC Confidence Tracking
 **Fișier principal:** `../DEVELOPMENT_MASTER_PLAN.md`
+**Sesiune recap:** [`SESSION_RECAP.md`](SESSION_RECAP.md) - **Citeste asta daca revii dupa pauza**
 
 ---
 
-## ✅ SESIUNE COMPLETATĂ - 2026-02-18
+## ✅ SESIUNE COMPLETATA - 18-19 Februarie 2026
 
-**Ce s-a făcut recent (18 Februarie 2026):**
+> **Pentru detalii complete, citeste [`SESSION_RECAP.md`](SESSION_RECAP.md)**
+
+**Ce s-a facut recent (19 Februarie 2026):**
+1. ✅ CLIENT_DETAILS_BLOCK rescris cu format legal complet (PF: CI seria, CNP, domiciliu; PJ: firma + CUI + reprezentant cu CI)
+2. ✅ KYC confidence tracking per document (CI front, CI back, selfie, face match) cu display in admin
+3. ✅ Human review flagging cand confidence < 70%
+4. ✅ Contract preview foloseste acelasi format legal
+
+**Sesiune 3 (18 Feb):**
+1. ✅ Registry moved to own page `/admin/registru` (dedicated sidebar item, no longer tab in settings)
+2. ✅ Registry-document linking bug fixed: `order_document_id` now properly set for reused numbers
+3. ✅ Registry table shows document download icons (FileDown) next to numbers
+4. ✅ CSV export includes "Document" column with linked filename
+5. ✅ Add User (invite) button for super_admin on Users page
+6. ✅ CLIENT_BIRTH_PLACE and CLIENT_BIRTH_COUNTRY template placeholders added
+7. ✅ Date formatting fixed: birth date/expiry no longer show time portion
+8. ✅ TVA 21% unified across all components (OrderSummaryCard fixed)
+9. ✅ Timeline events added: `order_submitted`, `document_generation_failed`
+10. ✅ Status page prices fixed with `.toFixed(2)` formatting
+11. ✅ File input reset in PersonalDataStep after upload
+12. ✅ Signature card empty state fixed
+
+**Sesiune 2 (18 Feb):**
+1. ✅ KYC face matching fix: `getIDDocument()` type matching + API payload fix for reference image
+2. ✅ DocumentType extended with `ci_front`/`ci_back` variants
+3. ✅ KYC documents now upload to S3 at submission (not just base64 in DB)
+4. ✅ KYC step shows thumbnail previews of uploaded ID documents
+5. ✅ OCR street prefix removal (no more "Strada Salcamilor" duplication)
+6. ✅ Admin order detail: personal data in compact 2-col grid, address as separate fields in 3-col grid
+7. ✅ Admin billing data now shows PF details (not just empty)
+8. ✅ Admin payment method shows "Stripe (card)" with Stripe dashboard link
+9. ✅ Admin documents visible in pending status
+10. ✅ Admin `extractKycDocKeys` fixed for array format
+11. ✅ Review step: individual option prices shown, TVA corrected to 21%, full breakdown
+12. ✅ Success/status pages: dynamic processing time, VAT 21% breakdown
+13. ✅ Contract generator v1.2: CI "emis de" info in CLIENT_DETAILS_BLOCK, 20+ new placeholders
+14. ✅ Number registry: table now grouped by order (contract + delegation on same row)
+15. ✅ Number registry: CSV export remains flat
+
+**Sesiune 1 (18 Feb):**
 1. ✅ Number Registry System - complete (tables, RPC functions, API endpoints, admin UI tab)
 2. ✅ Replaced legacy `increment_document_counter` with `allocate_number` (atomic, with reuse logic)
-3. ✅ Fixed imputernicire `document_number` bug (was storing contract number)
-4. ✅ `contract-prestari` no longer consumes Barou numbers
-5. ✅ Admin "Registru Numere" tab: ranges management, registry journal, manual entry, void, CSV export
-6. ✅ Backfilled 9 historical registry entries from existing order_documents
+3. ✅ Gemini model upgrade: both OCR and KYC upgraded to `gemini-2.5-flash`
+4. ✅ Multi-signature document generation (client drawn + company/lawyer predefined PNG)
+5. ✅ Contract preview in wizard (signature step shows pre-filled contract HTML)
+6. ✅ Contract legal validity system (IP, UA, timestamp, SHA-256 hash, consent)
+7. ✅ Client document downloads (presigned S3 URLs)
+8. ✅ Template fixes (imputernicire, cerere-pf, cerere-pj, CLIENT_DETAILS_BLOCK, TERMEN_LIVRARE)
 
-**Sesiuni anterioare:**
-- ✅ Multi-signature document generation (client drawn + company/lawyer predefined PNG)
-- ✅ Contract preview in wizard (signature step shows pre-filled contract HTML)
-- ✅ Contract legal validity system (IP, UA, timestamp, SHA-256 hash, consent)
-- ✅ Client document downloads (presigned S3 URLs)
-- ✅ Template fixes (imputernicire, cerere-pf, cerere-pj, CLIENT_DETAILS_BLOCK, TERMEN_LIVRARE)
-
-**De făcut (remaining):**
-- [ ] Oblio invoicing integration
-- [ ] Email notifications
-- [ ] Revenue charts (recharts)
+**De făcut (remaining - Sprint 6):**
+- [ ] Oblio invoicing integration (e-factura)
+- [ ] Email notifications (Resend) for status changes
+- [ ] SMS notifications (SMSLink.ro)
+- [ ] Revenue charts (recharts) in admin dashboard
 - [ ] Audit logging for admin actions
+- [ ] Post-order delivery request
+- [ ] Stripe-Invoice reconciliation for accounting
+- [ ] Date formatting fixes in admin (Romanian locale)
 
 ---
 
@@ -35,6 +74,8 @@
 
 | Caut informații despre... | Mergi la... |
 |--------------------------|-------------|
+| **Recap sesiune (citeste prima data!)** | [`SESSION_RECAP.md`](SESSION_RECAP.md) |
+| **Status curent (ce merge, ce nu)** | [`STATUS_CURRENT.md`](STATUS_CURRENT.md) |
 | **Ce am de făcut** | [`../DEVELOPMENT_MASTER_PLAN.md`](../DEVELOPMENT_MASTER_PLAN.md) |
 | **Cum funcționează API-ul** | [`technical/api/`](technical/api/) |
 | **Cum adaug un serviciu nou** | [`technical/specs/modular-wizard-guide.md`](technical/specs/modular-wizard-guide.md) |
@@ -56,6 +97,7 @@
 | **Design sistem culori** | [`design/color-system.md`](design/color-system.md) |
 | **Cum rulez migrații** | [`../CLAUDE.md`](../CLAUDE.md#database-operations--migrations) |
 | **Conformitate GDPR** | [`legal/compliance-research.md`](legal/compliance-research.md) |
+| **Backlog / Features viitoare** | [`../DEVELOPMENT_MASTER_PLAN.md`](../DEVELOPMENT_MASTER_PLAN.md#backlog--future-features) |
 
 ---
 
@@ -78,6 +120,8 @@ Documentația completă pentru panoul de administrare, inclusiv arhitectura, RBA
 ```
 docs/
 ├── README.md                    ← Ești aici (index principal)
+├── SESSION_RECAP.md             ← ⭐ CITESTE ASTA PRIMA DATA (recap sesiune 18-19 Feb)
+├── STATUS_CURRENT.md            ← Status curent: ce merge, probleme, backlog, testing checklist
 │
 ├── admin/                       ← Admin Panel
 │   ├── README.md                ← Admin Panel Overview & Index
@@ -92,7 +136,7 @@ docs/
 ├── technical/                   ← Documentație Tehnică
 │   ├── api/
 │   │   ├── services-api.md      ← Services, Orders, Draft, Admin APIs
-│   │   └── ocr-kyc-api.md       ← OCR (Gemini 2.0) + KYC (Gemini 1.5)
+│   │   └── ocr-kyc-api.md       ← OCR + KYC (both Gemini 2.5 Flash)
 │   ├── specs/
 │   │   ├── modular-wizard-guide.md          ← ⭐ CUM ADAUGI SERVICII NOI
 │   │   ├── stripe-oblio-payment-invoicing.md ← ⭐ PLĂȚI + FACTURARE (NEW)
@@ -234,8 +278,9 @@ docs/
 | Sprint 1 | ✅ Complete | Authentication system | [`sprint-1-auth.md`](sprints/sprint-1-auth.md) |
 | Sprint 2 | ✅ Complete | Services & Orders API | [`sprint-2-services.md`](sprints/sprint-2-services.md) |
 | Sprint 3 | ✅ Complete | KYC, OCR, Modular Wizard | [`sprint-3-kyc-documents.md`](sprints/sprint-3-kyc-documents.md) |
-| Sprint 4 | 🔄 Active (95%) | Payments, S3, Contracts, Document Generation, Multi-Signature | `DEVELOPMENT_MASTER_PLAN.md` |
-| Sprint 5 | 🔄 Active (95%) | Admin Dashboard, RBAC, Workflow, Document System | `DEVELOPMENT_MASTER_PLAN.md` |
+| Sprint 4 | 🔄 Active (98%) | Payments, S3, Contracts, Document Generation, Multi-Signature, KYC S3 Upload, Review Pricing | `DEVELOPMENT_MASTER_PLAN.md` |
+| Sprint 5 | 🔄 Active (98%) | Admin Dashboard, RBAC, Workflow, Document System, Number Registry, Admin UI Polish | `DEVELOPMENT_MASTER_PLAN.md` |
+| Sprint 6 | ⏳ Pending | Notifications, Polish, Post-Order Delivery, Stripe Reconciliation, Oblio | `DEVELOPMENT_MASTER_PLAN.md` |
 
 ---
 
@@ -245,8 +290,8 @@ docs/
 |-------|------------|--------|
 | **Frontend** | Next.js 16+, Tailwind v4, shadcn/ui | ✅ Active |
 | **Backend** | Supabase (PostgreSQL, Auth, RLS) | ✅ Active |
-| **AI/OCR** | Google Gemini 2.0 Flash Exp | ✅ Integrated |
-| **AI/KYC** | Google Gemini 1.5 Flash | ✅ Integrated |
+| **AI/OCR** | Google Gemini 2.5 Flash | ✅ Integrated |
+| **AI/KYC** | Google Gemini 2.5 Flash | ✅ Integrated |
 | **Storage** | AWS S3 (eu-central-1) | ✅ Active |
 | **Payments** | Stripe | 🔄 Sprint 4 |
 | **Courier (RO)** | Fan Courier API v2.0 | ✅ Integrated |
@@ -386,4 +431,4 @@ docs/
 
 **Pentru tracking dezvoltare:** Vezi [`../DEVELOPMENT_MASTER_PLAN.md`](../DEVELOPMENT_MASTER_PLAN.md)
 
-**Ultima actualizare:** 2026-02-18
+**Ultima actualizare:** 2026-02-19

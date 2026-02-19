@@ -74,7 +74,7 @@ let cachedTokenExpiry: Date | null = null;
 
 // Auth failure cooldown — avoid hammering the API when credentials are invalid
 // Use globalThis to survive Next.js HMR (module-level vars reset on hot reload)
-const AUTH_FAILURE_COOLDOWN_MS = 5 * 60 * 1000; // 5 minutes
+const AUTH_FAILURE_COOLDOWN_MS = 30 * 1000; // 30 seconds (short: credentials may change)
 const globalForSameday = globalThis as typeof globalThis & {
   _samedayAuthFailedAt?: Date | null;
 };
@@ -85,6 +85,12 @@ function getAuthFailedAt(): Date | null {
 
 function setAuthFailedAt(date: Date | null): void {
   globalForSameday._samedayAuthFailedAt = date;
+}
+
+// Reset stale cooldown on module load (credentials may have changed via env update)
+if (getAuthFailedAt()) {
+  console.log('[Sameday] Clearing stale auth cooldown from previous session');
+  setAuthFailedAt(null);
 }
 
 function loadTokenFromFile(): TokenCache | null {
@@ -175,6 +181,11 @@ interface SamedayCity {
 let countyCache: SamedayCounty[] | null = null;
 const cityCache: Map<number, SamedayCity[]> = new Map(); // countyId -> cities
 
+// Cache for OOH/locker locations (refreshed every 24 hours)
+let lockerCache: ServicePoint[] | null = null;
+let lockerCacheTimestamp: number = 0;
+const LOCKER_CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours
+
 /**
  * Normalize string for fuzzy matching (remove diacritics, lowercase)
  */
@@ -258,14 +269,14 @@ export class SamedayProvider implements CourierProvider {
         headers: {
           'X-AUTH-USERNAME': username,
           'X-AUTH-PASSWORD': password,
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: JSON.stringify({ remember_me: 1 }),
+        body: 'remember_me=1&_format=json',
       });
 
       if (!response.ok) {
         setAuthFailedAt(new Date());
-        console.warn(`[Sameday] Auth failed (${response.status}), cooldown for 5 min. Using mock data.`);
+        console.warn(`[Sameday] Auth failed (${response.status}), cooldown for 30s. Using mock data.`);
         throw new AuthenticationError('sameday', `HTTP ${response.status}: ${response.statusText}`);
       }
 
@@ -280,10 +291,12 @@ export class SamedayProvider implements CourierProvider {
       setAuthFailedAt(null);
 
       const token = data.token;
-      // Parse expire_at (format: "2024-09-24 12:54")
-      const expiresAt = data.expire_at
-        ? new Date(data.expire_at.replace(' ', 'T') + ':00')
-        : new Date(Date.now() + 12 * 60 * 60 * 1000);
+      // Parse expire_at_utc (preferred) or expire_at (format: "2024-09-24 12:54")
+      const expiresAt = data.expire_at_utc
+        ? new Date(data.expire_at_utc.replace(' ', 'T') + ':00Z')
+        : data.expire_at
+          ? new Date(data.expire_at.replace(' ', 'T') + ':00')
+          : new Date(Date.now() + 12 * 60 * 60 * 1000);
 
       updateTokenCache(token, expiresAt);
       console.log('[Sameday] New token obtained, expires:', expiresAt.toISOString());
@@ -505,109 +518,13 @@ export class SamedayProvider implements CourierProvider {
 
   /**
    * Get shipping quotes for Sameday services.
-   * Sameday has no direct tariff/estimate endpoint in the demo API,
-   * so we use configured base prices. Actual costs are confirmed at AWB creation.
+   * Note: Sameday API has no public estimate/tariff endpoint.
+   * Prices shown are base estimates; actual cost is determined at AWB creation.
    */
   async getQuotes(request: QuoteRequest): Promise<ShippingQuote[]> {
-    if (!this.isApiAvailable()) {
-      return this.getMockQuotes(request);
-    }
-
-    try {
-      // Try the estimate endpoint first (may not be available on demo)
-      const quotes = await this.getEstimateQuotes(request);
-      if (quotes.length > 0) return quotes;
-    } catch {
-      // Estimate failed — may have triggered auth cooldown (e.g. 401 token issue)
-    }
-
-    // Re-check: if the estimate failure triggered cooldown, use mock quotes
-    // (EasyBox can't work without a functional API for locker data)
-    if (!this.isApiAvailable()) {
-      return this.getMockQuotes(request);
-    }
-
-    // Fallback: return base-price quotes (API is available but estimate endpoint missing)
+    // Note: Sameday API has no public estimate/tariff endpoint.
+    // Prices shown are base estimates; actual cost is determined at AWB creation.
     return this.getBasePriceQuotes(request);
-  }
-
-  /**
-   * Try POST /api/awb/estimate for real pricing
-   */
-  private async getEstimateQuotes(request: QuoteRequest): Promise<ShippingQuote[]> {
-    const countyId = await this.resolveCountyId(request.recipient.county);
-    const cityId = countyId ? await this.resolveCityId(request.recipient.city, countyId) : null;
-
-    if (!countyId || !cityId) {
-      return [];
-    }
-
-    const totalWeight = request.packages.reduce(
-      (sum, pkg) => sum + pkg.weight * pkg.quantity,
-      0
-    );
-
-    const quotes: ShippingQuote[] = [];
-
-    // Try Standard 24H estimate
-    for (const svc of [
-      { id: SAMEDAY_SERVICES.STANDARD_24H, name: 'Standard 24H', code: 'STANDARD_24H' },
-      { id: SAMEDAY_SERVICES.LOCKER_NEXTDAY, name: 'EasyBox (Locker)', code: 'LOCKER_NEXTDAY' },
-    ]) {
-      try {
-        const body = {
-          pickupPoint: null, // Will use default
-          service: String(svc.id),
-          packageType: totalWeight <= 1 ? '1' : '0',
-          packageNumber: '1',
-          packageWeight: String(totalWeight),
-          awbPayment: '1',
-          cashOnDelivery: request.cod ? String(request.cod) : '0',
-          insuredValue: '0',
-          awbRecipient: {
-            county: String(countyId),
-            city: String(cityId),
-          },
-          parcels: request.packages.map((pkg) => ({
-            weight: String(pkg.weight),
-            width: String(pkg.width || 22),
-            length: String(pkg.length || 30),
-            height: String(pkg.height || 1),
-          })),
-        };
-
-        const data = await this.apiRequest<{
-          awbCost?: number;
-          amount?: number;
-          cost?: number;
-        }>('/api/awb/estimate', {
-          method: 'POST',
-          body: JSON.stringify(body),
-        });
-
-        const cost = data.awbCost || data.amount || data.cost;
-        if (cost && cost > 0) {
-          const vat = cost * 0.19;
-          quotes.push({
-            provider: 'sameday',
-            providerName: 'Sameday',
-            service: svc.code,
-            serviceName: svc.name,
-            price: cost,
-            priceWithVAT: cost + vat,
-            vat,
-            currency: 'RON',
-            estimatedDays: 1,
-            pickupAvailable: svc.id !== SAMEDAY_SERVICES.LOCKER_NEXTDAY,
-            lockerAvailable: svc.id === SAMEDAY_SERVICES.LOCKER_NEXTDAY,
-          });
-        }
-      } catch {
-        // Estimate not available for this service, skip
-      }
-    }
-
-    return quotes;
   }
 
   /**
@@ -766,6 +683,8 @@ export class SamedayProvider implements CourierProvider {
                   request.recipient.street,
                   request.recipient.streetNo ? `Nr. ${request.recipient.streetNo}` : '',
                   request.recipient.building ? `Bl. ${request.recipient.building}` : '',
+                  request.recipient.entrance ? `Sc. ${request.recipient.entrance}` : '',
+                  request.recipient.floor ? `Et. ${request.recipient.floor}` : '',
                   request.recipient.apartment ? `Ap. ${request.recipient.apartment}` : '',
                 ]
                   .filter(Boolean)
@@ -837,20 +756,28 @@ export class SamedayProvider implements CourierProvider {
 
   /**
    * Track a shipment using GET /api/client/status-sync
+   *
+   * Note: The status-sync endpoint requires startTimestamp and endTimestamp
+   * with a MAXIMUM 2-hour interval (per official docs). It is designed for
+   * batch polling of recent status changes, not historical lookups.
+   * We always include a public tracking URL as fallback.
    */
   async trackShipment(awb: string): Promise<TrackingInfo> {
+    const trackingUrl = `https://sameday.ro/#awb=${awb}`;
+
     if (!this.isApiAvailable()) {
-      return this.getMockTracking(awb);
+      return { ...this.getMockTracking(awb), trackingUrl };
     }
 
     try {
-      // Use a wide time range to capture all events
+      // status-sync requires a max 2-hour window per official API docs
       const endDate = new Date();
-      const startDate = new Date();
-      startDate.setDate(startDate.getDate() - 30);
+      const startDate = new Date(endDate.getTime() - 2 * 60 * 60 * 1000); // 2 hours ago
 
       const params = new URLSearchParams({
         'awb[]': awb,
+        startTimestamp: String(Math.floor(startDate.getTime() / 1000)),
+        endTimestamp: String(Math.floor(endDate.getTime() / 1000)),
       });
 
       const data = await this.apiRequest<{
@@ -869,7 +796,16 @@ export class SamedayProvider implements CourierProvider {
       }>(`/api/client/status-sync?${params}`);
 
       if (!data.data || data.data.length === 0) {
-        throw new CourierError('AWB not found', 'AWB_NOT_FOUND', 'sameday');
+        // No recent updates in the 2-hour window — return minimal info with tracking URL
+        return {
+          awb,
+          provider: 'sameday',
+          status: 'pending',
+          statusDescription: 'Verifică statusul pe sameday.ro',
+          events: [],
+          lastUpdate: new Date().toISOString(),
+          trackingUrl,
+        };
       }
 
       const trackingData = data.data[0];
@@ -896,10 +832,11 @@ export class SamedayProvider implements CourierProvider {
         events,
         lastUpdate: new Date().toISOString(),
         actualDelivery: status === 'delivered' ? latestEvent?.date : undefined,
+        trackingUrl,
       };
     } catch (error) {
       console.error('[Sameday] Tracking error:', error);
-      return this.getMockTracking(awb);
+      return { ...this.getMockTracking(awb), trackingUrl };
     }
   }
 
@@ -979,11 +916,26 @@ export class SamedayProvider implements CourierProvider {
    * Get EasyBox locker locations via GET /api/client/ooh-locations
    */
   async getServicePoints(city: string, county?: string): Promise<ServicePoint[]> {
-    if (!this.isApiAvailable()) {
+    if (!this.hasCredentials()) {
       return [];
     }
 
+    // Force-clear auth cooldown — it may have been set by unrelated
+    // endpoint failures (e.g. estimate 405), not actual auth issues
+    setAuthFailedAt(null);
+
     try {
+      // Check cache first
+      const now = Date.now();
+      if (lockerCache && (now - lockerCacheTimestamp) < LOCKER_CACHE_TTL) {
+        const filteredPoints = lockerCache.filter((point) => {
+          const matchesCity = city === '*' || normalizeForMatch(point.city).includes(normalizeForMatch(city));
+          const matchesCounty = !county || normalizeForMatch(point.county || '').includes(normalizeForMatch(county)) || normalizeForMatch(county).includes(normalizeForMatch(point.county || ''));
+          return matchesCity && matchesCounty;
+        });
+        return filteredPoints;
+      }
+
       // Fetch all locker locations (oohType=0 for EasyBox only)
       const allLockers: ServicePoint[] = [];
       let page = 1;
@@ -994,6 +946,7 @@ export class SamedayProvider implements CourierProvider {
           countPerPage: '500',
           page: String(page),
           listingType: '0', // 0=lockers only, 1=lockers+PUDOs
+          countryCode: 'RO',
         });
 
         const data = await this.apiRequest<{
@@ -1042,21 +995,25 @@ export class SamedayProvider implements CourierProvider {
         page++;
       } while (page <= totalPages);
 
+      // Store in cache (all lockers, unfiltered)
+      lockerCache = allLockers;
+      lockerCacheTimestamp = Date.now();
+
       // Filter by city/county
       const filteredPoints = allLockers.filter((point) => {
         const matchesCity =
           city === '*' ||
-          point.city.toLowerCase().includes(city.toLowerCase());
+          normalizeForMatch(point.city).includes(normalizeForMatch(city));
         const matchesCounty =
           !county ||
-          (point.county || '').toLowerCase().includes(county.toLowerCase()) ||
-          county.toLowerCase().includes((point.county || '').toLowerCase());
+          normalizeForMatch(point.county || '').includes(normalizeForMatch(county)) ||
+          normalizeForMatch(county).includes(normalizeForMatch(point.county || ''));
         return matchesCity && matchesCounty;
       });
 
       return filteredPoints;
-    } catch {
-      // Expected when credentials are invalid/expired — silently fall back
+    } catch (err) {
+      console.error('[Sameday] getServicePoints error:', err instanceof Error ? err.message : err);
       return [];
     }
   }
@@ -1066,32 +1023,8 @@ export class SamedayProvider implements CourierProvider {
   // ============================================================================
 
   private getMockQuotes(request: QuoteRequest): ShippingQuote[] {
-    const totalWeight = request.packages.reduce(
-      (sum, pkg) => sum + pkg.weight * pkg.quantity,
-      0
-    );
-
-    const basePrice = 14 + totalWeight * 4;
-    const codFee = request.cod ? 4 : 0;
-    const standardPrice = basePrice + codFee;
-    const standardVat = standardPrice * 0.19;
-
-    // Only offer Standard 24H in mock mode — EasyBox requires real API for locker data
-    return [
-      {
-        provider: 'sameday',
-        providerName: 'Sameday',
-        service: 'STANDARD_24H',
-        serviceName: 'Standard 24H',
-        price: standardPrice,
-        priceWithVAT: standardPrice + standardVat,
-        vat: standardVat,
-        currency: 'RON',
-        estimatedDays: 1,
-        pickupAvailable: true,
-        breakdown: { basePrice, codFee },
-      },
-    ];
+    // Mock mode uses the same base price formula as getBasePriceQuotes
+    return this.getBasePriceQuotes(request);
   }
 
   private getMockTracking(awb: string): TrackingInfo {

@@ -1,14 +1,29 @@
 # Delivery System Architecture
 
-**Version:** 2.0
-**Date:** 10 Februarie 2026
-**Status:** Fan Courier Live, Sameday awaiting credentials
+**Version:** 2.1
+**Date:** 13 Februarie 2026
+**Status:** Fan Courier Live, Sameday Live, UX Improvements Complete
 
 ---
 
 ## Overview
 
 Sistemul de livrare pentru eGhiseul.ro este complet modular, permițând configurarea per serviciu a opțiunilor de livrare disponibile. Fiecare document poate avea cerințe diferite de livrare.
+
+### Recent Improvements (Feb 13, 2026)
+
+**Performance Optimizations:**
+- FANbox 24-hour server-side cache (reduces API load, faster responses)
+
+**UX Enhancements:**
+- Postal code auto-fill from Sameday data (99.6% locality coverage)
+- Smart form field reset on county/city change (prevents invalid addresses)
+- Mobile-optimized 2-column layout (better screen utilization)
+
+**Technical Details:**
+- Form validation improvements (no premature red errors)
+- Street-level geocoding for accurate locker distance sorting
+- Delivery state persistence across wizard navigation
 
 ---
 
@@ -484,68 +499,203 @@ interface OrderDeliveryData {
 | Provider | Status | Type | Features |
 |----------|--------|------|----------|
 | **Fan Courier** | ✅ Live | Romania | Quotes, AWB, Tracking, FANbox |
-| **Sameday** | ⚠️ Code ready, credentials issue | Romania | Quotes, AWB, Tracking, EasyBox |
+| **Sameday** | ✅ Live | Romania | Quotes, AWB, Tracking, EasyBox (6073 lockers) |
 | **DHL** | ⏳ Planned | International | Quotes, AWB, Tracking |
 | **UPS** | ⏳ Planned | International | Quotes, AWB, Tracking |
 | **FedEx** | ⏳ Planned | International | Quotes, AWB, Tracking |
 
 ### 7.1 Sameday Integration Details
 
-**Code status:** Fully implemented (`src/lib/services/courier/sameday.ts`, ~1137 lines)
-- Authentication, quotes (estimate + base price fallback), AWB creation, tracking, EasyBox lockers
+**Status:** LIVE with production credentials (as of Feb 2026)
+
+**Account:** `edigitalizareAPI` on production API (`api.sameday.ro`)
+- Authentication: Token-based, 14-day validity
+- 6073 EasyBox lockers available
+- 21 services available
+
+**Confirmed service IDs:**
+- Service ID 7: Standard 24H (livrare la adresa)
+- Service ID 15: Locker NextDay (livrare in EasyBox)
+- Service ID 57: PUDO NextDay (livrare in punct fix)
+
+**Implementation:** `src/lib/services/courier/sameday.ts` (~1137 lines)
+- Authentication, quotes (base price fallback), AWB creation, tracking, EasyBox lockers
 - Multi-provider UI in delivery step (both couriers shown side-by-side)
 - Mock data fallback when API unavailable
 
-**Credential issue (Feb 2026):**
-The current account (`r.lutas@yahoo.com`) authenticates successfully (returns a token), but the token is **rejected with 401** on all subsequent API calls (counties, estimates, lockers). This indicates the account does not have API client permissions — it's likely a web portal account, not an API-enabled client account.
+**Known limitation:** The estimate endpoint returns 405 on this account, so pricing falls back to base price quotes. This is working as designed.
 
-**What to request from Sameday:**
-See section 7.2 below.
+### 7.2 Sameday Configuration
 
-### 7.2 Sameday API Credentials Request
-
-Contact: **app.support@sameday.ro** or your designated Sameday sales agent.
-
-**Email template:**
-
-> Bună ziua,
->
-> Suntem eGhișeul.ro SRL și dorim să integrăm serviciile Sameday în platforma noastră.
->
-> Avem nevoie de:
->
-> 1. **Cont API client** pentru mediul de producție (`api.sameday.ro`) — contul curent (`r.lutas@yahoo.com`) se autentifică dar token-ul returnat primește 401 pe toate endpoint-urile (counties, estimate, ooh-locations). Credem că nu are permisiuni de client API.
->
-> 2. **Cont de test/sandbox** pentru mediul demo (`sameday-api.demo.zitec.com`) — credențialele demo publice (`sameday`/`DH32ghf732gq`) nu mai funcționează (403 Forbidden).
->
-> 3. **Punct de ridicare (pickup point)** configurat pe contul API — avem nevoie de pickup point ID pentru a genera AWB-uri.
->
-> 4. **Servicii activate pe cont:**
->    - Standard 24H (service ID 7) — livrare la adresă
->    - Locker Nextday (service ID 15) — livrare în EasyBox
->    - PUDO Nextday (service ID 57) — livrare în punct fix (opțional)
->
-> 5. **Persoană de contact** asociată punctului de ridicare.
->
-> Date firmă:
-> - Denumire: eGhișeul.ro SRL
-> - CUI: [completează]
-> - Adresă punct de ridicare: [completează adresa reală de expediție]
-> - Persoană contact: [nume], [telefon]
->
-> Tipul coletelor: documente oficiale (greutate ~0.1-0.5 kg, tip plic/envelope).
->
-> Vă mulțumim!
-
-**After receiving credentials, update:**
 ```env
 # .env.local
-SAMEDAY_USERNAME=<new_username>
-SAMEDAY_PASSWORD=<new_password>
-SAMEDAY_USE_DEMO=false
+SAMEDAY_USERNAME=edigitalizareAPI
+SAMEDAY_PASSWORD=<password>
+SAMEDAY_USE_DEMO=false    # false = production (api.sameday.ro)
 ```
 
-### 7.3 Delivery Timing Rules
+### 7.3 Locker Distance Sorting (Street-Level Geocoding)
+
+**Status:** ✅ Live (Feb 2026)
+
+Locker locations (EasyBox and FANbox) are sorted by distance from the customer's delivery address using street-level geocoding for maximum accuracy.
+
+**Geocoding Strategy (3-tier fallback):**
+
+1. **Street-level geocoding** (preferred)
+   - Builds full address query: "Strada [street] [number], [city], [county], Romania"
+   - Uses Nominatim OpenStreetMap API (free, 1 req/sec limit)
+   - Provides most accurate distance sorting (especially in large cities)
+   - Example: "Strada Minerva 45, Baia Mare, Maramureș, Romania"
+
+2. **City-level geocoding** (fallback)
+   - If street not found by Nominatim, falls back to "city, county, Romania"
+   - Sorts from city center (less accurate in large cities like București, Cluj)
+   - Difference from street-level: ~400m in small cities, 2-5km in large cities
+
+3. **Browser geolocation** (last resort)
+   - If geocoding fails completely, uses navigator.geolocation API
+   - User must grant permission
+   - Most accurate for current location, but not suitable for delivery planning
+
+**Implementation Details:**
+
+- **File:** `src/components/orders/steps-modular/delivery-step.tsx`
+- **Function:** `getDeliveryLocation(county, city, street?, number?)`
+- **Return:** `{ lat, lng, source: 'geocoded_street' | 'geocoded_city' | 'gps' }`
+- **Re-sort trigger:** 1-second debounced effect when street field changes (min 3 characters)
+- **Rate limiting:** Respects Nominatim 1 req/sec limit with debounce
+- **Caching:** Locker coordinates cached after initial county fetch (no redundant API calls)
+
+**User Experience:**
+
+1. Customer selects county + city → lockers load, sorted by city center distance
+2. Customer types street name → after 1 second, lockers re-sort by street-level distance
+3. Distance badge updates: "0.4 km" instead of "2.1 km" for nearby lockers
+4. No visible loading state (seamless re-sort in background)
+
+**Performance:**
+
+- Nominatim query: ~200-400ms
+- Distance recalculation: ~10ms (6073 EasyBox lockers)
+- Debounce: 1 second (prevents excessive API calls while typing)
+
+### 7.4 FANbox 24-Hour Cache
+
+**Status:** ✅ Live (Feb 2026)
+
+FANbox locker locations are cached server-side for 24 hours to improve performance and reduce API calls.
+
+**Implementation Details:**
+
+- **File:** `src/lib/services/courier/fancourier.ts`
+- **Cache Variables:**
+  - `fanboxCache`: Stores locker data (array)
+  - `fanboxCacheTimestamp`: Last fetch timestamp (Date)
+  - `FANBOX_CACHE_TTL`: 24 hours (86400000 ms)
+- **Pattern:** Same module-level caching as Sameday EasyBox
+- **Behavior:**
+  - First request to `/api/courier/pickup-points?provider=fancourier` fetches from API
+  - Subsequent requests within 24h use cached data
+  - Cache expires after 24h, next request refreshes
+  - Cache is shared across all users (server-level)
+
+**Benefits:**
+
+- Reduces Fan Courier API load (locker locations change rarely)
+- Faster response times for customers (no API roundtrip)
+- Consistent with Sameday EasyBox caching strategy
+
+### 7.5 Postal Code Auto-Fill
+
+**Status:** ✅ Live (Feb 2026)
+
+When a customer selects a city, the postal code field auto-fills from Sameday's locality data (238/239 Romanian localities have postal codes).
+
+**Implementation Details:**
+
+- **File:** `src/app/api/courier/localities/route.ts`
+- **Process:**
+  1. Fetch Fan Courier localities (counties + cities)
+  2. Enrich with Sameday postal codes via cross-reference
+  3. Return augmented `LocalityItem[]` with `postalCode?: string`
+- **Frontend:** `src/components/orders/steps-modular/delivery-step.tsx`
+  - `watchedCity` useEffect triggers after field reset
+  - Auto-fills postal code if available
+  - User can override if needed
+
+**Coverage:**
+
+- 238 out of 239 Sameday localities have postal codes (99.6% coverage)
+- Major cities and towns all covered
+- Rural areas may require manual entry
+
+**User Experience:**
+
+1. Customer selects county (e.g., "Cluj")
+2. Customer selects city (e.g., "Cluj-Napoca")
+3. Postal code auto-fills (e.g., "400001")
+4. Customer can edit if auto-filled value is incorrect
+
+### 7.6 Form Field Reset on Location Change
+
+**Status:** ✅ Live (Feb 2026)
+
+Address form fields intelligently reset when the user changes location to prevent invalid combinations.
+
+**Reset Behavior:**
+
+**County Change:**
+- Resets: city, street, number, building, postalCode
+- Clears validation errors for dependent fields
+- Uses `form.setValue(..., { shouldValidate: false })` to prevent premature red errors
+
+**City Change:**
+- Resets: street, number, building
+- Auto-fills postal code from Sameday data
+- Preserves county selection
+
+**Implementation:**
+
+- **File:** `src/components/orders/steps-modular/delivery-step.tsx`
+- **Pattern:** React Hook Form with controlled resets
+- **Timing:** Reset happens before auto-fill to avoid race conditions
+
+**Benefits:**
+
+- Prevents invalid address combinations (e.g., wrong street for city)
+- Clean UX: no red error messages on fields not yet filled
+- Smooth workflow: user doesn't need to manually clear dependent fields
+
+### 7.7 Mobile Layout Improvements
+
+**Status:** ✅ Live (Feb 2026)
+
+Delivery address form optimized for mobile with compact 2-column layout.
+
+**Layout Changes:**
+
+```tsx
+// Before: Single column on mobile
+grid-cols-1 sm:grid-cols-2
+
+// After: Always 2 columns (better mobile space usage)
+grid-cols-2
+
+// Specific rows:
+- County + City: 2 columns (equal width)
+- Street + Number: grid-cols-[1fr_80px] sm:grid-cols-[1fr_100px]
+- Building + Postal Code: 2 columns (equal width)
+```
+
+**Benefits:**
+
+- Better mobile screen utilization
+- Reduced scrolling on small screens
+- Street + Number on same row (intuitive grouping)
+- Matches typical Romanian address format
+
+### 7.8 Delivery Timing Rules
 
 All physical deliveries follow these rules:
 
@@ -554,13 +704,34 @@ All physical deliveries follow these rules:
 - Documentele eliberate vineri sau în weekend vor fi **expediate luni**
 - Termenele afișate (1-2 zile lucrătoare) sunt ale curierului, calculate de la momentul expedierii
 
-### 7.4 Price Markup
+### 7.9 Price Markup
 
 A **15% markup** is applied to all courier prices (configurable in `delivery-step.tsx`):
 ```
 DELIVERY_MARKUP_PERCENTAGE = 0.15
 Displayed price = API price × 1.15
 ```
+
+### 7.10 Troubleshooting
+
+#### Environment Variable Quoting Issue
+
+**Symptom:** Sameday API returns 0 results or HTTP 403 Forbidden, while direct Node.js test scripts work fine.
+
+**Root cause:** If `SAMEDAY_PASSWORD` contains special characters like `#`, Next.js's `.env.local` parser treats `#` as a comment delimiter, truncating the password.
+
+**Example:**
+```env
+# WRONG - password truncated to "Lp7k"
+SAMEDAY_PASSWORD=Lp7k#Qg2
+
+# CORRECT - wrapped in quotes
+SAMEDAY_PASSWORD="Lp7k#Qg2"
+```
+
+**Fix:** Always wrap passwords containing special characters (`#`, `$`, spaces, etc.) in double quotes in `.env.local`.
+
+**Applies to:** `FANCOURIER_PASSWORD`, `SAMEDAY_PASSWORD`, any env var with special characters.
 
 ---
 
@@ -572,10 +743,10 @@ FANCOURIER_USERNAME=your_username
 FANCOURIER_PASSWORD=your_password
 FANCOURIER_CLIENT_ID=your_client_id
 
-# Sameday (Romania) ⚠️ Needs valid API credentials
-SAMEDAY_USERNAME=         # API client username (NOT web portal)
-SAMEDAY_PASSWORD=         # API client password
-SAMEDAY_USE_DEMO=false    # true = demo API, false = production
+# Sameday (Romania) ✅ Live
+SAMEDAY_USERNAME=         # Production API username (edigitalizareAPI)
+SAMEDAY_PASSWORD=         # Production API password
+SAMEDAY_USE_DEMO=false    # false = production (api.sameday.ro)
 
 # DHL (International - planned)
 DHL_API_KEY=
@@ -611,8 +782,12 @@ SENDER_POSTAL_CODE="XXXXXX"
 - [x] Address autocomplete component (county → city → street cascading)
 - [x] Real-time price calculator component (15% markup, both providers)
 - [x] Courier selector with logos (Fan Courier + Sameday side-by-side)
-- [x] Locker/FANbox/EasyBox selector (scrollable card list with distance sorting)
+- [x] Locker/FANbox/EasyBox selector (scrollable card list with street-level distance sorting)
 - [x] Delivery timing note (documents issued before shipping, business days)
+- [x] FANbox 24-hour server-side cache (performance optimization)
+- [x] Postal code auto-fill from Sameday data (238/239 localities)
+- [x] Form field reset on county/city change (prevents invalid addresses)
+- [x] Mobile layout improvements (2-column grid, street+number grouping)
 - [ ] International address form
 
 ### Phase 3: Admin Dashboard
@@ -629,7 +804,7 @@ SENDER_POSTAL_CODE="XXXXXX"
 - [ ] SMS integration for delivery updates
 
 ### Phase 5: Additional Couriers
-- [x] Sameday integration (code complete, awaiting valid API credentials)
+- [x] Sameday integration (production live, 6073 EasyBox lockers, 21 services)
 - [ ] DHL integration
 - [ ] UPS integration
 - [ ] FedEx integration

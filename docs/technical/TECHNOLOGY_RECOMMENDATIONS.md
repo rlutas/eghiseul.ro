@@ -309,7 +309,7 @@ if (transactionValue > 500 || userRiskScore > threshold) {
 - **Qualified Electronic Signature (QES):** Highest legal value (equivalent to handwritten)
 
 **Romanian Specifics:**
-- Law 455/2001 on electronic signatures (updated for eIDAS)
+- Law 214/2024 on electronic signatures (updated for eIDAS)
 - Canvas signatures are valid BUT can be challenged in court
 - For high-value contracts, consider AES or QES
 

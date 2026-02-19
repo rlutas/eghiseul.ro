@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import {
   CheckCircle,
   User,
@@ -20,21 +20,24 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { useModularWizard } from '@/providers/modular-wizard-provider';
-import { cn } from '@/lib/utils';
+
 
 interface ReviewStepProps {
   onValidChange: (valid: boolean) => void;
 }
 
 export function ReviewStepModular({ onValidChange }: ReviewStepProps) {
-  const { state, priceBreakdown, goToStep } = useModularWizard();
-  const [termsAccepted, setTermsAccepted] = useState(false);
-  const [privacyAccepted, setPrivacyAccepted] = useState(false);
+  const { state, service, priceBreakdown, goToStep, updateConsent } = useModularWizard();
+  const { termsAccepted, privacyAccepted, withdrawalWaiver } = state.consent;
 
-  // Validate step
+  const setTermsAccepted = (v: boolean) => updateConsent({ termsAccepted: v });
+  const setPrivacyAccepted = (v: boolean) => updateConsent({ privacyAccepted: v });
+  const setWithdrawalWaiver = (v: boolean) => updateConsent({ withdrawalWaiver: v });
+
+  // Validate step - all three checkboxes required
   useEffect(() => {
-    onValidChange(termsAccepted && privacyAccepted);
-  }, [termsAccepted, privacyAccepted, onValidChange]);
+    onValidChange(termsAccepted && privacyAccepted && withdrawalWaiver);
+  }, [termsAccepted, privacyAccepted, withdrawalWaiver, onValidChange]);
 
   return (
     <div className="space-y-6">
@@ -164,8 +167,14 @@ export function ReviewStepModular({ onValidChange }: ReviewStepProps) {
                 {state.delivery.address?.street && (
                   <p className="flex items-start gap-2">
                     <MapPin className="h-3.5 w-3.5 mt-0.5 flex-shrink-0" />
-                    {state.delivery.address.street} {state.delivery.address.number},
-                    {state.delivery.address.city}, {state.delivery.address.county}
+                    <span>
+                      {state.delivery.address.street} {state.delivery.address.number}
+                      {state.delivery.address.building ? `, Bl. ${state.delivery.address.building}` : ''}
+                      {state.delivery.address.staircase ? `, Sc. ${state.delivery.address.staircase}` : ''}
+                      {state.delivery.address.floor ? `, Et. ${state.delivery.address.floor}` : ''}
+                      {state.delivery.address.apartment ? `, Ap. ${state.delivery.address.apartment}` : ''}
+                      , {state.delivery.address.city}, {state.delivery.address.county}
+                    </span>
                   </p>
                 )}
               </div>
@@ -276,33 +285,76 @@ export function ReviewStepModular({ onValidChange }: ReviewStepProps) {
 
         <Card className="border-primary-200 bg-primary-50/30">
           <CardContent className="p-4 space-y-2">
+            {/* Service base price */}
             <div className="flex justify-between text-sm">
-              <span className="text-neutral-600">Preț serviciu</span>
-              <span>{priceBreakdown.basePrice} RON</span>
+              <span className="text-neutral-600">
+                {service?.name || 'Serviciu de bază'}
+              </span>
+              <span>{priceBreakdown.basePrice.toFixed(2)} RON</span>
             </div>
 
-            {priceBreakdown.optionsPrice > 0 && (
+            {/* Individual options with prices */}
+            {state.selectedOptions.map((opt) => {
+              const price = typeof opt.priceModifier === 'number' && !isNaN(opt.priceModifier)
+                ? opt.priceModifier
+                : 0;
+              const totalOptPrice = price * (opt.quantity || 1);
+              return (
+                <div key={opt.optionId} className="flex justify-between text-sm">
+                  <span className="text-neutral-600">
+                    {opt.optionName}
+                    {opt.quantity > 1 && ` x${opt.quantity}`}
+                  </span>
+                  <span>+{totalOptPrice.toFixed(2)} RON</span>
+                </div>
+              );
+            })}
+
+            {/* Delivery */}
+            {priceBreakdown.deliveryPrice > 0 && (
               <div className="flex justify-between text-sm">
-                <span className="text-neutral-600">Opțiuni</span>
-                <span>+{priceBreakdown.optionsPrice} RON</span>
+                <span className="text-neutral-600">
+                  {state.delivery.methodName || 'Livrare'}
+                </span>
+                <span>+{priceBreakdown.deliveryPrice.toFixed(2)} RON</span>
               </div>
             )}
 
-            {priceBreakdown.deliveryPrice > 0 && (
-              <div className="flex justify-between text-sm">
-                <span className="text-neutral-600">Livrare</span>
-                <span>+{priceBreakdown.deliveryPrice} RON</span>
-              </div>
-            )}
+            <Separator />
+
+            {/* Subtotal without TVA */}
+            {(() => {
+              const tvaRate = 0.21;
+              const totalWithTva = priceBreakdown.totalPrice;
+              const subtotalWithoutTva = totalWithTva / (1 + tvaRate);
+              const tvaAmount = totalWithTva - subtotalWithoutTva;
+
+              return (
+                <>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-neutral-600">Subtotal (fără TVA)</span>
+                    <span>{subtotalWithoutTva.toFixed(2)} RON</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-neutral-600">TVA 21%</span>
+                    <span>{tvaAmount.toFixed(2)} RON</span>
+                  </div>
+                </>
+              );
+            })()}
 
             <Separator />
 
             <div className="flex justify-between items-center pt-2">
               <span className="font-semibold text-secondary-900">Total</span>
               <span className="text-2xl font-bold text-primary-600">
-                {priceBreakdown.totalPrice} RON
+                {priceBreakdown.totalPrice.toFixed(2)} RON
               </span>
             </div>
+
+            <p className="text-xs text-neutral-500 text-right">
+              Prețurile includ TVA 21%
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -354,6 +406,20 @@ export function ReviewStepModular({ onValidChange }: ReviewStepProps) {
                 Politicii de Confidențialitate
               </a>
               . <span className="text-red-500">*</span>
+            </span>
+          </label>
+
+          {/* Withdrawal Waiver (OUG 34/2014 Art. 16) */}
+          <label className="flex items-start gap-3 cursor-pointer group">
+            <Checkbox
+              checked={withdrawalWaiver}
+              onCheckedChange={(checked) => setWithdrawalWaiver(checked === true)}
+              className="mt-0.5"
+            />
+            <span className="text-sm text-neutral-600 group-hover:text-neutral-900">
+              Solicit executarea imediată a serviciului și renunț la dreptul de
+              retragere de 14 zile prevăzut de OUG 34/2014, art. 16 lit. (a).{' '}
+              <span className="text-red-500">*</span>
             </span>
           </label>
         </div>

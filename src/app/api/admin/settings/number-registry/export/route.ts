@@ -142,6 +142,25 @@ export async function GET(request: NextRequest) {
       }
     }
 
+    // Enrich entries with linked document file names
+    const docIds = (entries || [])
+      .map((e: AnyClient) => e.order_document_id)
+      .filter((id: string | null) => id !== null);
+
+    let docMap: Record<string, string> = {};
+    if (docIds.length > 0) {
+      const uniqueDocIds = [...new Set(docIds)];
+      const { data: docs } = await adminClient
+        .from('order_documents')
+        .select('id, file_name')
+        .in('id', uniqueDocIds);
+      if (docs) {
+        docMap = Object.fromEntries(
+          docs.map((d: AnyClient) => [d.id, d.file_name])
+        );
+      }
+    }
+
     // Generate CSV
     const CSV_HEADERS = [
       'Nr',
@@ -159,6 +178,7 @@ export async function GET(request: NextRequest) {
       'Comanda',
       'Anulat',
       'Motiv Anulare',
+      'Document',
     ];
 
     const rows = (entries || []).map((entry: AnyClient) => [
@@ -177,6 +197,7 @@ export async function GET(request: NextRequest) {
       escapeCsvField(entry.order_id ? (orderMap[entry.order_id] || '') : ''),
       escapeCsvField(entry.voided_at ? 'Da' : ''),
       escapeCsvField(entry.void_reason),
+      escapeCsvField(entry.order_document_id ? (docMap[entry.order_document_id] || '') : ''),
     ]);
 
     // UTF-8 BOM for Excel compatibility + header + data rows

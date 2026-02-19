@@ -43,6 +43,7 @@ export type DocumentCategory =
   | 'invoices'      // Generated invoices
   | 'final'         // Final delivered documents
   | 'templates'     // Document templates
+  | 'signatures'    // Company/lawyer signatures and stamps
   | 'temp';         // Temporary files (auto-deleted)
 
 export type KycDocumentType =
@@ -109,8 +110,9 @@ export function generateOrderKey(
 }
 
 /**
- * Generate S3 key for contracts
+ * Generate S3 key for contracts (legacy)
  * Pattern: contracts/{year}/{month}/{contract_number}/{filename}
+ * @deprecated Use generateDocumentKey() for new documents
  */
 export function generateContractKey(
   contractNumber: string,
@@ -120,6 +122,33 @@ export function generateContractKey(
   const year = now.getFullYear();
   const month = String(now.getMonth() + 1).padStart(2, '0');
   return `contracts/${year}/${month}/${contractNumber}/${filename}`;
+}
+
+/**
+ * Generate S3 key for generated documents, organized by order.
+ * Pattern: orders/{friendly_order_id}/{subfolder}/{filename}
+ *
+ * Subfolder mapping:
+ * - contract_prestari, contract_asistenta, contract_complet → contracte/
+ * - imputernicire → imputerniciri/
+ * - cerere_eliberare_pf, cerere_eliberare_pj → cereri/
+ * - anything else → documente/
+ */
+export function generateDocumentKey(
+  friendlyOrderId: string,
+  docType: string,
+  fileName: string,
+): string {
+  const subfolderMap: Record<string, string> = {
+    contract_prestari: 'contracte',
+    contract_asistenta: 'contracte',
+    contract_complet: 'contracte',
+    imputernicire: 'imputerniciri',
+    cerere_eliberare_pf: 'cereri',
+    cerere_eliberare_pj: 'cereri',
+  };
+  const subfolder = subfolderMap[docType] || 'documente';
+  return `orders/${friendlyOrderId}/${subfolder}/${fileName}`;
 }
 
 /**
@@ -145,6 +174,19 @@ export function generateFinalDocumentKey(
   const year = now.getFullYear();
   const month = String(now.getMonth() + 1).padStart(2, '0');
   return `final/${year}/${month}/${orderId}/${filename}`;
+}
+
+/**
+ * Generate S3 key for signatures and stamps
+ * Pattern: signatures/{type}/{filename}
+ * Types: company_signature, lawyer_signature, lawyer_stamp
+ */
+export function generateSignatureKey(
+  signatureType: string,
+  extension: string = 'png'
+): string {
+  const timestamp = Date.now();
+  return `signatures/${signatureType}/${timestamp}.${extension}`;
 }
 
 /**
@@ -537,6 +579,35 @@ export async function listOrderDocuments(orderId: string): Promise<FileInfo[]> {
 
   const prefix = `orders/${year}/${month}/${orderId}/`;
   return listFiles(prefix);
+}
+
+// ============================================================================
+// Client Signature Helper
+// ============================================================================
+
+/**
+ * Get client signature as base64 from S3 key (new) or inline base64 (legacy).
+ * Returns undefined if no signature is available.
+ */
+export async function getClientSignatureBase64(
+  customerData: Record<string, unknown>
+): Promise<string | undefined> {
+  // New path: signature stored in S3
+  if (customerData.signature_s3_key) {
+    try {
+      const buf = await downloadFile(customerData.signature_s3_key as string);
+      return buf.toString('base64');
+    } catch (e) {
+      console.error('Failed to download client signature from S3:', e);
+    }
+  }
+  // Legacy fallback: base64 stored inline in JSONB
+  if (customerData.signature_base64) {
+    const raw = customerData.signature_base64 as string;
+    // Strip data URI prefix if present
+    return raw.replace(/^data:[^;]+;base64,/, '');
+  }
+  return undefined;
 }
 
 // ============================================================================

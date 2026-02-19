@@ -225,6 +225,13 @@ function mapTrackingStatus(eventId: string): TrackingStatus {
 }
 
 // ============================================================================
+// FANbox Cache (module-level, survives component remounts)
+// ============================================================================
+let fanboxCache: ServicePoint[] | null = null;
+let fanboxCacheTimestamp: number = 0;
+const FANBOX_CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours
+
+// ============================================================================
 // Fan Courier Provider Class - API v2.0
 // ============================================================================
 
@@ -1009,57 +1016,68 @@ export class FanCourierProvider implements CourierProvider {
     }
 
     try {
-      // Get FANbox points
-      const fanboxData = await this.apiRequest<{
-        status: string;
-        data: Array<{
-          id: string;
-          name: string;
-          routingLocation: string;
-          description: string;
-          address: {
-            locality: string;
-            county: string;
-            street: string;
-            streetNo: string;
-            zipCode: string;
-          };
-          latitude: string;
-          longitude: string;
-          schedule: Array<{ firstHour: string; secondHour: string }>;
-          drawer: Array<{ type: string; number: number }>;
-        }>;
-      }>('/reports/pickup-points?type=fanbox');
+      // Use cached data if available and fresh
+      let allPoints: ServicePoint[];
 
-      // Filter by city/county
-      // Use '*' to get all points (no city filter)
-      const filteredPoints = fanboxData.data.filter((point) => {
-        const matchesCity = city === '*' || stripDiacritics(point.address.locality).toLowerCase().includes(stripDiacritics(city).toLowerCase());
-        const matchesCounty = !county || stripDiacritics(point.address.county).toLowerCase().includes(stripDiacritics(county).toLowerCase())
-          || stripDiacritics(county).toLowerCase().includes(stripDiacritics(point.address.county).toLowerCase());
+      if (fanboxCache && (Date.now() - fanboxCacheTimestamp) < FANBOX_CACHE_TTL) {
+        allPoints = fanboxCache;
+      } else {
+        // Fetch all FANbox points from API
+        const fanboxData = await this.apiRequest<{
+          status: string;
+          data: Array<{
+            id: string;
+            name: string;
+            routingLocation: string;
+            description: string;
+            address: {
+              locality: string;
+              county: string;
+              street: string;
+              streetNo: string;
+              zipCode: string;
+            };
+            latitude: string;
+            longitude: string;
+            schedule: Array<{ firstHour: string; secondHour: string }>;
+            drawer: Array<{ type: string; number: number }>;
+          }>;
+        }>('/reports/pickup-points?type=fanbox');
+
+        allPoints = fanboxData.data.map((point) => ({
+          id: point.id,
+          type: 'locker' as const,
+          name: point.name,
+          address: `${point.address.street} ${point.address.streetNo}`,
+          city: point.address.locality,
+          county: point.address.county,
+          country: 'RO',
+          postalCode: point.address.zipCode,
+          coordinates: point.latitude && point.longitude
+            ? {
+                lat: parseFloat(point.latitude),
+                lng: parseFloat(point.longitude),
+              }
+            : undefined,
+          openingHours: point.schedule[0]
+            ? `${point.schedule[0].firstHour} - ${point.schedule[0].secondHour}`
+            : undefined,
+          provider: 'fancourier',
+        }));
+
+        // Cache for 24 hours
+        fanboxCache = allPoints;
+        fanboxCacheTimestamp = Date.now();
+        console.log(`[FanCourier] Cached ${allPoints.length} FANbox locations (24h TTL)`);
+      }
+
+      // Filter by city/county from cached data
+      return allPoints.filter((point) => {
+        const matchesCity = city === '*' || stripDiacritics(point.city).toLowerCase().includes(stripDiacritics(city).toLowerCase());
+        const matchesCounty = !county || stripDiacritics(point.county || '').toLowerCase().includes(stripDiacritics(county).toLowerCase())
+          || stripDiacritics(county).toLowerCase().includes(stripDiacritics(point.county || '').toLowerCase());
         return matchesCity && matchesCounty;
       });
-
-      return filteredPoints.map((point) => ({
-        id: point.id,
-        type: 'locker' as const,
-        name: point.name,
-        address: `${point.address.street} ${point.address.streetNo}`,
-        city: point.address.locality,
-        county: point.address.county,
-        country: 'RO',
-        postalCode: point.address.zipCode,
-        coordinates: point.latitude && point.longitude
-          ? {
-              lat: parseFloat(point.latitude),
-              lng: parseFloat(point.longitude),
-            }
-          : undefined,
-        openingHours: point.schedule[0]
-          ? `${point.schedule[0].firstHour} - ${point.schedule[0].secondHour}`
-          : undefined,
-        provider: 'fancourier',
-      }));
     } catch (error) {
       console.error('[FanCourier] Get service points error:', error);
       return [];

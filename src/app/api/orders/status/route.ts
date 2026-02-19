@@ -65,12 +65,16 @@ export async function GET(request: NextRequest) {
         total_price,
         payment_status,
         delivery_method,
+        delivery_tracking_number,
         customer_data,
+        selected_options,
         service:services(
           id,
           name,
           slug,
-          category
+          category,
+          estimated_days,
+          urgent_days
         )
       `)
       .or(`friendly_order_id.eq.${orderCode},order_number.eq.${orderCode}`)
@@ -102,6 +106,14 @@ export async function GET(request: NextRequest) {
         { status: 403 }
       );
     }
+
+    // Fetch client-visible documents
+    const { data: documents } = await supabase
+      .from('order_documents')
+      .select('id, type, file_name, file_size, document_number, created_at')
+      .eq('order_id', order.id)
+      .eq('visible_to_client', true)
+      .order('created_at', { ascending: true });
 
     // Get order status history for timeline
     const { data: history } = await supabase
@@ -162,27 +174,78 @@ export async function GET(request: NextRequest) {
       }
     }
 
+    // Transform documents for client display
+    const DOC_TYPE_LABELS: Record<string, string> = {
+      contract_complet: 'Contract',
+      contract_prestari: 'Contract Prestări Servicii',
+      contract_asistenta: 'Contract Asistență Juridică',
+      imputernicire: 'Împuternicire',
+      cerere_eliberare_pf: 'Cerere Eliberare PF',
+      cerere_eliberare_pj: 'Cerere Eliberare PJ',
+    };
+
+    const clientDocuments = (documents || []).map(doc => ({
+      id: doc.id,
+      type: doc.type,
+      label: DOC_TYPE_LABELS[doc.type] || doc.type,
+      fileName: doc.file_name,
+      fileSize: doc.file_size,
+      documentNumber: doc.document_number,
+      createdAt: doc.created_at,
+    }));
+
+    // Determine if order has urgent processing option
+    const selectedOptions = (order.selected_options as Array<{ optionName?: string; option_name?: string; priceModifier?: number; quantity?: number }>) || [];
+    const hasUrgent = selectedOptions.some(
+      opt => (opt.optionName || opt.option_name || '').toLowerCase().includes('urgent')
+    );
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const serviceData = order.service as any;
+    const estimatedDays = serviceData?.estimated_days || null;
+    const urgentDays = serviceData?.urgent_days || null;
+    const processingDays = hasUrgent && urgentDays ? urgentDays : (estimatedDays || null);
+
+    // VAT calculation (21% included in price)
+    const VAT_RATE = 0.21;
+    const totalPrice = parseFloat(String(order.total_price || 0));
+    const subtotalWithoutVat = Math.round((totalPrice / (1 + VAT_RATE)) * 100) / 100;
+    const vatAmount = Math.round((totalPrice - subtotalWithoutVat) * 100) / 100;
+
     return NextResponse.json({
       success: true,
       data: {
+        id: order.id,
         orderCode: order.friendly_order_id || order.order_number,
         status: order.status,
         paymentStatus: order.payment_status,
         createdAt: order.created_at,
         updatedAt: order.updated_at,
-        service: order.service,
+        service: serviceData,
+        selectedOptions: selectedOptions.map(opt => ({
+          optionName: opt.optionName || opt.option_name || '',
+          priceModifier: opt.priceModifier || 0,
+          quantity: opt.quantity || 1,
+        })),
+        processingDays,
+        hasUrgent,
         delivery: {
           method: deliveryMethod?.type || null,
           methodName: deliveryMethod?.name || null,
           estimatedDays: deliveryMethod?.estimated_days || null,
+          trackingNumber: order.delivery_tracking_number || null,
         },
         pricing: {
           basePrice: order.base_price,
           optionsPrice: order.options_price,
           deliveryPrice: order.delivery_price,
+          subtotalWithoutVat,
+          vatAmount,
+          vatRate: VAT_RATE,
           totalPrice: order.total_price,
         },
         timeline,
+        documents: clientDocuments,
       },
     });
   } catch (error) {

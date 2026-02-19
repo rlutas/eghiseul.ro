@@ -26,6 +26,7 @@ import {
   FileText,
   Home,
 } from 'lucide-react';
+import TrackingTimeline from '@/components/orders/tracking-timeline';
 
 // Order status mapping - complete workflow
 const STATUS_CONFIG: Record<string, { label: string; color: string; icon: typeof Clock }> = {
@@ -57,12 +58,33 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; icon: typeof
   cancelled: { label: 'Anulat', color: 'bg-red-100 text-red-800', icon: AlertCircle },
   refunded: { label: 'Rambursat', color: 'bg-gray-100 text-gray-800', icon: CreditCard },
 
+  // Document events
+  document_generated: { label: 'Documente generate', color: 'bg-blue-100 text-blue-800', icon: FileText },
+
   // Legacy/fallback
   submitted: { label: 'Trimis la autorități', color: 'bg-indigo-100 text-indigo-800', icon: Truck },
   status_changed: { label: 'Status actualizat', color: 'bg-gray-100 text-gray-800', icon: Clock },
 };
 
+interface OrderDocument {
+  id: string;
+  type: string;
+  label: string;
+  fileName: string;
+  fileSize: number | null;
+  documentNumber: string | null;
+  createdAt: string;
+}
+
+interface SelectedOption {
+  optionName?: string;
+  option_name?: string;
+  priceModifier?: number;
+  quantity?: number;
+}
+
 interface OrderData {
+  id: string;
   orderCode: string;
   status: string;
   paymentStatus: string;
@@ -73,16 +95,25 @@ interface OrderData {
     name: string;
     slug: string;
     category: string;
+    estimated_days?: number | null;
+    urgent_days?: number | null;
   };
+  selectedOptions?: SelectedOption[];
+  processingDays?: number | null;
+  hasUrgent?: boolean;
   delivery: {
     method: string | null;
     methodName: string | null;
     estimatedDays: number | null;
+    trackingNumber: string | null;
   };
   pricing: {
     basePrice: number;
     optionsPrice: number;
     deliveryPrice: number;
+    subtotalWithoutVat?: number;
+    vatAmount?: number;
+    vatRate?: number;
     totalPrice: number;
   };
   timeline: Array<{
@@ -91,6 +122,7 @@ interface OrderData {
     note: string | null;
     createdAt: string;
   }>;
+  documents?: OrderDocument[];
 }
 
 function OrderStatusContent() {
@@ -285,11 +317,33 @@ function OrderStatusContent() {
               {/* Service Info */}
               <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
                 <Package className="h-5 w-5 text-muted-foreground" />
-                <div>
+                <div className="flex-1">
                   <p className="font-medium">{orderData.service?.name || 'Serviciu'}</p>
-                  <p className="text-sm text-muted-foreground">
+                  {/* Selected options */}
+                  {orderData.selectedOptions && orderData.selectedOptions.length > 0 && (
+                    <div className="mt-1 space-y-0.5">
+                      {orderData.selectedOptions.map((opt, idx) => (
+                        <p key={idx} className="text-sm text-muted-foreground">
+                          + {opt.optionName || opt.option_name || 'Opțiune'}
+                          {(opt.quantity || 1) > 1 && ` x${opt.quantity}`}
+                        </p>
+                      ))}
+                    </div>
+                  )}
+                  <p className="text-sm text-muted-foreground mt-1">
                     Comandat pe {formatDate(orderData.createdAt)}
                   </p>
+                  {/* Processing time */}
+                  {orderData.processingDays && (
+                    <p className="text-sm text-muted-foreground">
+                      Timp estimat procesare: {orderData.processingDays} zile lucrătoare
+                      {orderData.hasUrgent && (
+                        <span className="ml-1 text-xs text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded">
+                          urgent
+                        </span>
+                      )}
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -312,24 +366,41 @@ function OrderStatusContent() {
               <div className="border-t pt-4">
                 <div className="flex justify-between text-sm mb-1">
                   <span className="text-muted-foreground">Serviciu</span>
-                  <span>{orderData.pricing.basePrice} RON</span>
+                  <span>{Number(orderData.pricing.basePrice).toFixed(2)} RON</span>
                 </div>
                 {orderData.pricing.optionsPrice > 0 && (
                   <div className="flex justify-between text-sm mb-1">
                     <span className="text-muted-foreground">Opțiuni</span>
-                    <span>+{orderData.pricing.optionsPrice} RON</span>
+                    <span>+{Number(orderData.pricing.optionsPrice).toFixed(2)} RON</span>
                   </div>
                 )}
                 {orderData.pricing.deliveryPrice > 0 && (
                   <div className="flex justify-between text-sm mb-1">
                     <span className="text-muted-foreground">Livrare</span>
-                    <span>+{orderData.pricing.deliveryPrice} RON</span>
+                    <span>+{Number(orderData.pricing.deliveryPrice).toFixed(2)} RON</span>
                   </div>
+                )}
+                {/* VAT breakdown */}
+                {orderData.pricing.subtotalWithoutVat != null && orderData.pricing.vatAmount != null && (
+                  <>
+                    <div className="flex justify-between text-sm mb-1 text-muted-foreground border-t pt-2 mt-2">
+                      <span>Subtotal fără TVA</span>
+                      <span>{Number(orderData.pricing.subtotalWithoutVat).toFixed(2)} RON</span>
+                    </div>
+                    <div className="flex justify-between text-sm mb-1 text-muted-foreground">
+                      <span>TVA 21%</span>
+                      <span>{Number(orderData.pricing.vatAmount).toFixed(2)} RON</span>
+                    </div>
+                  </>
                 )}
                 <div className="flex justify-between font-semibold text-lg border-t pt-2 mt-2">
                   <span>Total</span>
-                  <span>{orderData.pricing.totalPrice} RON</span>
+                  <span>{Number(orderData.pricing.totalPrice).toFixed(2)} RON</span>
                 </div>
+                {/* Show VAT included note if no breakdown */}
+                {orderData.pricing.subtotalWithoutVat == null && (
+                  <p className="text-xs text-muted-foreground mt-1">(TVA 21% inclus)</p>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -372,6 +443,68 @@ function OrderStatusContent() {
                       </div>
                     );
                   })}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Courier Tracking */}
+          {orderData.delivery.trackingNumber && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Truck className="h-5 w-5" />
+                  Urmarire Colet
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <TrackingTimeline
+                  orderId={orderData.id}
+                  email={email}
+                  autoRefresh={true}
+                />
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Documents */}
+          {orderData.documents && orderData.documents.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <FileText className="h-5 w-5" />
+                  Documente
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  {orderData.documents.map((doc) => (
+                    <div
+                      key={doc.id}
+                      className="flex items-center gap-3 p-3 rounded-lg bg-muted/50"
+                    >
+                      <FileText className="h-5 w-5 text-muted-foreground" />
+                      <div className="flex-1">
+                        <p className="font-medium text-sm">{doc.label}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {doc.documentNumber && `Nr. ${doc.documentNumber} · `}
+                          {formatDate(doc.createdAt)}
+                        </p>
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          window.open(
+                            `/api/orders/${orderData.id}/documents/${doc.id}/preview?email=${encodeURIComponent(email)}`,
+                            '_blank'
+                          );
+                        }}
+                      >
+                        Vizualizează
+                      </Button>
+                    </div>
+                  ))}
                 </div>
               </CardContent>
             </Card>

@@ -111,6 +111,8 @@ export async function POST(
       address: formatAddress(personal.address),
       ci_series: personal.documentSeries || personal.ci_series || '',
       ci_number: personal.documentNumber || personal.ci_number || '',
+      document_issued_by: personal.documentIssuedBy || personal.issuedBy || '',
+      document_issue_date: personal.documentIssueDate || personal.issueDate || '',
       company_name: company.companyName || billing.companyName || '',
       company_reg: company.registrationNumber || '',
       company_address: formatAddress(company.address) || billing.companyAddress || '',
@@ -120,10 +122,14 @@ export async function POST(
       previous_name: personal.previousName || '',
       birth_date: personal.birthDate || '',
       birth_county: personal.birthPlace || personal.birthCounty || '',
+      birth_country: personal.birthCountry || 'ROMANIA',
       address_parts: personalAddress ? {
         county: personalAddress.county, city: personalAddress.city,
+        sector: personalAddress.sector,
         street: personalAddress.street, number: personalAddress.number,
-        building: personalAddress.building, apartment: personalAddress.apartment,
+        building: personalAddress.building, staircase: personalAddress.staircase,
+        floor: personalAddress.floor, apartment: personalAddress.apartment,
+        postalCode: personalAddress.postalCode,
       } : undefined,
       company_address_parts: companyAddress ? {
         county: companyAddress.county, city: companyAddress.city,
@@ -131,6 +137,9 @@ export async function POST(
         building: companyAddress.building, apartment: companyAddress.apartment,
       } : undefined,
     };
+
+    // Extract selected options from order
+    const selectedOptions = (order.selected_options as Array<{ option_id?: string; option_name?: string; optionName?: string; quantity?: number; price_modifier?: number; priceModifier?: number }>) || [];
 
     // Allocate document numbers via number_registry system
     let documentNumbers: any = {};
@@ -248,6 +257,7 @@ export async function POST(
         urgent_days: order.services?.urgent_days,
         urgent_available: order.services?.urgent_available,
       },
+      selected_options: selectedOptions,
       document_numbers: documentNumbers,
       motiv_solicitare: body.motiv_solicitare || 'Interes personal',
       client_ip: cd.signature_metadata?.ip_address || 'N/A',
@@ -359,6 +369,21 @@ export async function POST(
         .from('number_registry')
         .update({ order_document_id: insertedDoc.id })
         .eq('id', registryId);
+    }
+
+    // Catch-all: also handle reused numbers that weren't linked via registry_ids
+    if (insertedDoc?.id) {
+      const docType2 = template === 'imputernicire' ? 'delegation' :
+                       ['contract-asistenta', 'contract-complet'].includes(template) ? 'contract' : null;
+
+      if (docType2) {
+        await (adminClient as any)
+          .from('number_registry')
+          .update({ order_document_id: insertedDoc.id })
+          .eq('order_id', orderId)
+          .eq('type', docType2)
+          .is('order_document_id', null);
+      }
     }
 
     // Now clean up previous versions of this document type (safe — new row already exists)

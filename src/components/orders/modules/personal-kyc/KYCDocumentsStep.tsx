@@ -36,7 +36,7 @@ import {
   FileCheck,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import type { PersonalKYCConfig, DocumentType, UploadedDocumentState } from '@/types/verification-modules';
+import type { PersonalKYCConfig, DocumentType, UploadedDocumentState, KYCValidationResults } from '@/types/verification-modules';
 
 interface KYCDocumentsStepProps {
   config: PersonalKYCConfig;
@@ -137,6 +137,7 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
   // Check if we have ID document (for face matching reference)
   const getIDDocument = useCallback(() => {
     return personalKyc?.uploadedDocuments.find(doc =>
+      doc.type === 'ci_front' ||
       doc.type === 'ci_vechi' ||
       doc.type === 'ci_nou_front' ||
       doc.type === 'passport'
@@ -254,19 +255,40 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                  idImage: idDoc.base64,
-                  selfieImage: base64,
+                  mode: 'single',
+                  documentType: 'selfie',
+                  imageBase64: base64,
                   mimeType: file.type,
+                  referenceImageBase64: idDoc.base64,
+                  referenceMimeType: idDoc.mimeType || 'image/jpeg',
                 }),
               });
 
               if (response.ok) {
                 const data = await response.json();
-                if (data.success && data.data?.faceMatch) {
+                const validation = data.data?.validation;
+                if (data.success && validation?.extractedData?.faceMatch !== undefined) {
+                  const matched = validation.extractedData.faceMatch === true;
+                  const confidenceRaw = validation.extractedData.faceMatchConfidence || 0;
+                  const validationConfidence = validation.confidence || 0;
+
                   setFaceMatchResult({
-                    matched: data.data.faceMatch.matched,
-                    confidence: data.data.faceMatch.confidence,
+                    matched,
+                    confidence: confidenceRaw / 100,
                   });
+
+                  // Persist KYC validation results to wizard state
+                  const existingValidation = personalKyc?.kycValidation || {};
+                  const updatedValidation: KYCValidationResults = {
+                    ...existingValidation,
+                    selfie: {
+                      valid: matched && validationConfidence >= 50,
+                      confidence: validationConfidence,
+                      faceMatch: matched,
+                      faceMatchConfidence: confidenceRaw,
+                    },
+                  };
+                  updatePersonalKyc({ kycValidation: updatedValidation });
                 }
               }
             } catch {
@@ -648,7 +670,26 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
                     className="flex items-center justify-between p-3 bg-white rounded-lg border border-green-200"
                   >
                     <div className="flex items-center gap-3">
-                      <CheckCircle className="h-4 w-4 text-green-600" />
+                      {doc.base64 ? (
+                        <div
+                          className="w-[80px] h-[56px] rounded border border-green-200 overflow-hidden cursor-pointer flex-shrink-0 hover:ring-2 hover:ring-primary-300 transition-all"
+                          onClick={() =>
+                            setPreviewModal({
+                              open: true,
+                              type: null,
+                              url: `data:${doc.mimeType};base64,${doc.base64}`,
+                            })
+                          }
+                        >
+                          <img
+                            src={`data:${doc.mimeType};base64,${doc.base64}`}
+                            alt={getDocumentLabel(doc.type)}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      ) : (
+                        <CheckCircle className="h-4 w-4 text-green-600 flex-shrink-0" />
+                      )}
                       <div>
                         <p className="font-medium text-sm">{getDocumentLabel(doc.type)}</p>
                         <p className="text-xs text-muted-foreground">{doc.fileName}</p>
@@ -762,7 +803,7 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
           >
             <div className="flex items-center justify-between p-4 border-b">
               <h3 className="font-semibold text-secondary-900">
-                {previewModal.type && DOCUMENT_CONFIG[previewModal.type].title}
+                {previewModal.type ? DOCUMENT_CONFIG[previewModal.type].title : 'Previzualizare Document'}
               </h3>
               <Button
                 variant="ghost"
@@ -791,6 +832,8 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
 // Helper function to get document label
 function getDocumentLabel(type: DocumentType): string {
   const labels: Record<string, string> = {
+    ci_front: 'Carte Identitate (față)',
+    ci_back: 'Carte Identitate (verso)',
     ci_vechi: 'CI Vechi',
     ci_nou_front: 'CI Nou (față)',
     ci_nou_back: 'CI Nou (verso)',

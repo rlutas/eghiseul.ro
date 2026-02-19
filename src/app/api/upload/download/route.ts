@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { getDownloadUrl } from '@/lib/aws/s3';
 
 /**
@@ -36,17 +37,46 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Validate that the user has access to this file
-    // KYC documents: must contain user ID in path
-    // Order documents: could check order ownership
-    const isKycFile = key.startsWith('kyc/');
-    const isUserFile = key.includes(`/${user.id}/`);
+    // Check if user is admin (can access all files)
+    const adminClient = createAdminClient();
+    const { data: profile } = await (adminClient as any)
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single();
 
-    if (isKycFile && !isUserFile) {
-      return NextResponse.json(
-        { error: 'Access denied to this file' },
-        { status: 403 }
-      );
+    const isAdmin = profile && ['super_admin', 'manager', 'operator', 'contabil', 'avocat', 'employee'].includes(profile.role);
+
+    // Validate that the user has access to this file
+    if (!isAdmin) {
+      const isKycFile = key.startsWith('kyc/');
+      const isUserFile = key.includes(`/${user.id}/`);
+      const isDocumentFile = key.startsWith('contracts/') || key.startsWith('orders/');
+
+      if (isKycFile && !isUserFile) {
+        return NextResponse.json(
+          { error: 'Access denied to this file' },
+          { status: 403 }
+        );
+      }
+
+      // For document files (contracts/ or orders/ prefix), verify ownership via order_documents
+      if (isDocumentFile && !isUserFile) {
+        const { data: doc } = await (adminClient as any)
+          .from('order_documents')
+          .select('id, order_id, orders!inner(user_id)')
+          .eq('s3_key', key)
+          .eq('visible_to_client', true)
+          .single();
+
+        const orderUserId = (doc?.orders as any)?.user_id;
+        if (!doc || orderUserId !== user.id) {
+          return NextResponse.json(
+            { error: 'Access denied to this file' },
+            { status: 403 }
+          );
+        }
+      }
     }
 
     // Generate presigned download URL

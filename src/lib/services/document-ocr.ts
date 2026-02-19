@@ -1,5 +1,5 @@
 /**
- * Document OCR Service using Google Gemini 2.0 Flash Exp
+ * Document OCR Service using Google Gemini 2.5 Flash
  *
  * Extracts data from Romanian ID cards and passports using AI vision.
  * Supports:
@@ -9,8 +9,9 @@
 
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-// Initialize Gemini AI with the 2.0 Flash Experimental model for better OCR
+// Initialize Gemini AI with the 2.5 Flash model for OCR
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY || '');
+const GEMINI_MODEL = 'gemini-2.5-flash';
 
 export type DocumentType = 'ci_front' | 'ci_back' | 'passport' | 'unknown';
 
@@ -67,8 +68,7 @@ export async function extractFromCIFront(
   imageBase64: string,
   mimeType: string
 ): Promise<OCRResult> {
-  // Use gemini-2.0-flash-exp for better OCR capabilities
-  const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+  const model = genAI.getGenerativeModel({ model: GEMINI_MODEL });
 
   const prompt = `Analizează această imagine a unei cărți de identitate românești (față) și extrage TOATE datele vizibile.
 
@@ -189,7 +189,7 @@ export async function extractFromCIBack(
   imageBase64: string,
   mimeType: string
 ): Promise<OCRResult> {
-  const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+  const model = genAI.getGenerativeModel({ model: GEMINI_MODEL });
 
   const prompt = `Analizează această imagine a unei cărți de identitate românești (verso/spate) și extrage adresa de domiciliu.
 
@@ -288,7 +288,7 @@ export async function extractFromPassport(
   imageBase64: string,
   mimeType: string
 ): Promise<OCRResult> {
-  const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+  const model = genAI.getGenerativeModel({ model: GEMINI_MODEL });
 
   const prompt = `Analizează această imagine a unui pașaport și extrage toate datele vizibile.
 
@@ -374,7 +374,7 @@ export async function extractFromDocument(
   imageBase64: string,
   mimeType: string
 ): Promise<OCRResult> {
-  const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+  const model = genAI.getGenerativeModel({ model: GEMINI_MODEL });
 
   const detectPrompt = `Analizează această imagine și determină ce tip de document este.
 

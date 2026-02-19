@@ -160,7 +160,7 @@ async function handlePaymentSucceeded(paymentIntent: Stripe.PaymentIntent) {
     await supabaseAdmin.from('order_history').insert({
       order_id: orderId,
       event_type: 'payment_confirmed',
-      notes: `Card payment confirmed. Invoice: ${invoice.invoiceNumber}`,
+      notes: `Plata cu cardul confirmata. Factura: ${invoice.invoiceNumber}`,
       new_value: JSON.stringify({
         payment_status: 'paid',
         invoice_number: invoice.invoiceNumber,
@@ -175,7 +175,7 @@ async function handlePaymentSucceeded(paymentIntent: Stripe.PaymentIntent) {
     await supabaseAdmin.from('order_history').insert({
       order_id: orderId,
       event_type: 'payment_confirmed',
-      notes: 'Card payment confirmed. Invoice creation failed - manual action required.',
+      notes: 'Plata cu cardul confirmata. Crearea facturii a esuat - actiune manuala necesara.',
       new_value: JSON.stringify({
         payment_status: 'paid',
         stripe_payment_intent: paymentIntent.id,

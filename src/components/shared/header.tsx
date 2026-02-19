@@ -56,14 +56,6 @@ export function Header() {
     return () => subscription.unsubscribe();
   }, []);
 
-  // Handle logout
-  const handleLogout = async () => {
-    const supabase = createClient();
-    await supabase.auth.signOut();
-    router.push('/');
-    router.refresh();
-  };
-
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
@@ -72,6 +64,19 @@ export function Header() {
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Hide header on admin routes (after all hooks)
+  if (pathname.startsWith('/admin')) {
+    return null;
+  }
+
+  // Handle logout
+  const handleLogout = async () => {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.push('/');
+    router.refresh();
+  };
 
   const userInitials = user?.user_metadata?.first_name?.[0]?.toUpperCase() ||
                        user?.email?.[0]?.toUpperCase() || 'U';

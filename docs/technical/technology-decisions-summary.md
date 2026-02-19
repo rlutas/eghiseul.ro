@@ -226,7 +226,7 @@ supabase db push
 - [x] ANAF API for CUI validation
 - [x] Local SMS provider (SMSLink.ro)
 - [x] Local courier (Fan Courier)
-- [x] Romanian electronic signature validity (Law 455/2001)
+- [x] Romanian electronic signature validity (Law 214/2024)
 
 ---
 

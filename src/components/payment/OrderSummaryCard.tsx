@@ -102,7 +102,7 @@ export function OrderSummaryCard({
 
         {/* VAT Note */}
         <p className="text-xs text-neutral-500 text-center">
-          Prețurile includ TVA 19%
+          Prețurile includ TVA 21%
         </p>
       </CardContent>
     </Card>

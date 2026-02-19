@@ -37,7 +37,7 @@ import {
   Calendar,
   Shield,
 } from 'lucide-react';
-import type { PersonalKYCConfig, CitizenshipType, DocumentType } from '@/types/verification-modules';
+import type { PersonalKYCConfig, CitizenshipType, DocumentType, KYCValidationResults } from '@/types/verification-modules';
 import { validateCNP, extractBirthDateFromCNP } from '@/lib/validations/cnp';
 import { cn } from '@/lib/utils';
 import { COUNTY_NAMES, getLocalitiesForCounty, getCountyName, findCounty } from '@/lib/data/romania-counties';
@@ -227,11 +227,10 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
       addressUpdates.city = cityName;
     }
 
-    // Street - include streetType if provided
+    // Street - use only the street name (streetType is the prefix like "Strada", "Aleea", etc.
+    // which is already shown as the form field label, so we avoid duplication)
     if (addr.street) {
-      addressUpdates.street = addr.streetType
-        ? `${addr.streetType} ${addr.street}`
-        : addr.street;
+      addressUpdates.street = addr.street;
     }
     if (addr.number) addressUpdates.number = addr.number;
     if (addr.building) addressUpdates.building = addr.building;
@@ -341,6 +340,22 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
               processedAt: new Date().toISOString(),
             },
           ],
+          // Update kycValidation with per-document confidence
+          kycValidation: {
+            ...personalKyc?.kycValidation,
+            ...(type === 'ci_front' ? {
+              ciFront: {
+                valid: ocr.success && (ocr.confidence || 0) >= 50,
+                confidence: ocr.confidence || 0,
+              },
+            } : {}),
+            ...(type === 'ci_back' ? {
+              ciBack: {
+                valid: ocr.success && (ocr.confidence || 0) >= 50,
+                confidence: ocr.confidence || 0,
+              },
+            } : {}),
+          } as KYCValidationResults,
         });
 
         // Fill address fields using the helper (handles county conversion, city cleaning, etc.)
@@ -589,6 +604,7 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
               onChange={(e) => {
                 const file = e.target.files?.[0];
                 if (file) handleFileSelect(type, file);
+                e.target.value = '';
               }}
               className="hidden"
               disabled={scanState.scanning}

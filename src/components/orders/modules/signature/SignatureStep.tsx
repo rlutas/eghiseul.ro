@@ -9,8 +9,6 @@
 import { useCallback, useRef, useState, useEffect } from 'react';
 import { useModularWizard } from '@/providers/modular-wizard-provider';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import {
   Card,
@@ -21,6 +19,7 @@ import {
 } from '@/components/ui/card';
 import { PenLine, AlertCircle, Trash2, Download } from 'lucide-react';
 import type { SignatureConfig } from '@/types/verification-modules';
+import ContractPreview from './ContractPreview';
 
 interface SignatureStepProps {
   config: SignatureConfig;
@@ -159,18 +158,10 @@ export default function SignatureStep({ config, onValidChange }: SignatureStepPr
     link.click();
   }, []);
 
-  // Handle terms acceptance
-  const handleTermsChange = useCallback((checked: boolean) => {
-    updateSignature?.({ termsAccepted: checked });
-  }, [updateSignature]);
-
-  // Validate form
+  // Validate form - only check signature (terms handled in review step)
   const isFormValid = useCallback(() => {
     if (!signature) return false;
-
     if (config.required && !hasSignature) return false;
-    if (config.termsAcceptanceRequired && !signature.termsAccepted) return false;
-
     return true;
   }, [signature, config, hasSignature]);
 
@@ -192,6 +183,9 @@ export default function SignatureStep({ config, onValidChange }: SignatureStepPr
 
   return (
     <div className="space-y-6">
+      {/* Contract Preview */}
+      <ContractPreview />
+
       {/* Signature Canvas */}
       <Card>
         <CardHeader>
@@ -250,64 +244,12 @@ export default function SignatureStep({ config, onValidChange }: SignatureStepPr
         </CardContent>
       </Card>
 
-      {/* Terms Acceptance */}
-      {config.termsAcceptanceRequired && (
-        <Card>
-          <CardContent className="py-6">
-            <div className="flex items-start gap-3">
-              <Checkbox
-                id="terms"
-                checked={signature.termsAccepted}
-                onCheckedChange={(checked) => handleTermsChange(checked as boolean)}
-              />
-              <div className="grid gap-1.5 leading-none">
-                <Label
-                  htmlFor="terms"
-                  className="text-sm font-medium leading-relaxed cursor-pointer"
-                >
-                  Accept termenii și condițiile serviciului
-                </Label>
-                <p className="text-sm text-muted-foreground">
-                  Prin semnarea electronică, confirm că datele furnizate sunt corecte și
-                  accept{' '}
-                  <a
-                    href="/termeni"
-                    target="_blank"
-                    className="text-primary hover:underline"
-                  >
-                    Termenii și Condițiile
-                  </a>{' '}
-                  și{' '}
-                  <a
-                    href="/confidentialitate"
-                    target="_blank"
-                    className="text-primary hover:underline"
-                  >
-                    Politica de Confidențialitate
-                  </a>
-                  .
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Validation Messages */}
+      {/* Validation Message */}
       {!hasSignature && config.required && (
         <Alert>
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
             Semnătura ta este obligatorie pentru a continua.
-          </AlertDescription>
-        </Alert>
-      )}
-
-      {!signature.termsAccepted && config.termsAcceptanceRequired && hasSignature && (
-        <Alert>
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>
-            Trebuie să accepți termenii și condițiile pentru a continua.
           </AlertDescription>
         </Alert>
       )}

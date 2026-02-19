@@ -211,7 +211,7 @@ Customer requests deletion of:
 - ✅ KYC (ID + selfie) before signature
 - ✅ Audit trail (IP, timestamp, device)
 - ✅ Immediate copy to customer (email PDF)
-- ✅ T&C clause: Customer acknowledges legal validity per Law 455/2001
+- ✅ T&C clause: Customer acknowledges legal validity per Law 214/2024
 
 **Future:** Integrate AdES for contracts >500 RON (Adobe Sign, DocuSign, Namirial)
 

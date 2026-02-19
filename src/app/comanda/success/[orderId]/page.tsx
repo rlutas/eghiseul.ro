@@ -17,6 +17,14 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 
+interface SelectedOption {
+  optionName?: string;
+  option_name?: string;
+  optionDescription?: string;
+  priceModifier?: number;
+  quantity?: number;
+}
+
 interface OrderData {
   id: string;
   order_number: string;
@@ -30,6 +38,17 @@ interface OrderData {
   status: string;
   invoice_number?: string;
   invoice_url?: string;
+  processing_days?: number | null;
+  selected_options?: SelectedOption[];
+  breakdown?: {
+    basePrice: number;
+    optionsPrice: number;
+    deliveryPrice: number;
+    subtotalWithoutVat: number;
+    vatAmount: number;
+    vatRate: number;
+    total: number;
+  };
   customer_data?: {
     contact?: {
       email?: string;
@@ -124,6 +143,9 @@ export default function SuccessPage() {
           status: apiOrder.status || 'draft',
           invoice_number: apiOrder.invoiceNumber,
           invoice_url: apiOrder.invoiceUrl,
+          processing_days: apiOrder.processingDays || null,
+          selected_options: apiOrder.selectedOptions || [],
+          breakdown: apiOrder.breakdown || null,
           customer_data: apiOrder.customerData,
         };
 
@@ -147,19 +169,29 @@ export default function SuccessPage() {
 
     // Check if gtag is available
     if (typeof window !== 'undefined' && window.gtag) {
+      // Build items array: main service + options
+      const gaItems = [
+        {
+          item_id: order.service_id || order.id,
+          item_name: order.service_name,
+          item_category: order.service_category || 'Documente',
+          price: order.breakdown?.basePrice || order.total_price,
+          quantity: 1,
+        },
+        ...(order.selected_options || []).map((opt, idx) => ({
+          item_id: `option-${idx}`,
+          item_name: opt.optionName || opt.option_name || 'Opțiune',
+          item_category: 'Opțiuni',
+          price: (opt.priceModifier || 0) * (opt.quantity || 1),
+          quantity: opt.quantity || 1,
+        })),
+      ];
+
       window.gtag('event', 'purchase', {
         transaction_id: order.friendly_order_id || order.id,
         value: order.total_price,
         currency: 'RON',
-        items: [
-          {
-            item_id: order.service_id || order.id,
-            item_name: order.service_name,
-            item_category: order.service_category || 'Documente',
-            price: order.total_price,
-            quantity: 1,
-          },
-        ],
+        items: gaItems,
       });
 
       setPurchaseTracked(true);
@@ -312,6 +344,16 @@ export default function SuccessPage() {
     );
   }
 
+  // Build processing time text from service data
+  const processingDays = order.processing_days;
+  const processingTimeText = processingDays
+    ? `Procesăm documentul în ${processingDays} zile lucrătoare`
+    : 'Procesăm documentul cât mai curând posibil';
+
+  // Collect all ordered services/options for display
+  const selectedOptions = order.selected_options || [];
+  const hasOptions = selectedOptions.length > 0;
+
   // Payment successful state
   return (
     <div className="min-h-screen bg-neutral-50">
@@ -337,6 +379,71 @@ export default function SuccessPage() {
               <p className="text-xl font-mono font-bold text-green-800">
                 {orderNumber}
               </p>
+            </div>
+
+            {/* Ordered Services Summary */}
+            <div className="text-left mb-6">
+              <h3 className="font-semibold text-secondary-900 mb-3 flex items-center gap-2">
+                <FileText className="h-4 w-4 text-green-600" />
+                Servicii comandate
+              </h3>
+              <div className="bg-neutral-50 rounded-lg border border-neutral-200 p-4 space-y-2">
+                {/* Main service */}
+                <div className="flex justify-between text-sm">
+                  <span className="text-neutral-700">{order.service_name}</span>
+                  {order.breakdown && (
+                    <span className="font-medium">{order.breakdown.basePrice} RON</span>
+                  )}
+                </div>
+                {/* Selected options */}
+                {hasOptions && selectedOptions.map((opt, idx) => {
+                  const optName = opt.optionName || opt.option_name || 'Opțiune';
+                  const price = (opt.priceModifier || 0) * (opt.quantity || 1);
+                  return (
+                    <div key={idx} className="flex justify-between text-sm">
+                      <span className="text-neutral-600">
+                        + {optName}
+                        {(opt.quantity || 1) > 1 && ` x${opt.quantity}`}
+                      </span>
+                      {price > 0 && (
+                        <span className="font-medium">+{price} RON</span>
+                      )}
+                    </div>
+                  );
+                })}
+                {/* Delivery price if present */}
+                {order.breakdown && order.breakdown.deliveryPrice > 0 && (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-neutral-600">Livrare</span>
+                    <span className="font-medium">+{order.breakdown.deliveryPrice} RON</span>
+                  </div>
+                )}
+                {/* VAT and total */}
+                {order.breakdown && (
+                  <>
+                    <Separator className="my-2" />
+                    <div className="flex justify-between text-sm text-neutral-500">
+                      <span>Subtotal fără TVA</span>
+                      <span>{order.breakdown.subtotalWithoutVat} RON</span>
+                    </div>
+                    <div className="flex justify-between text-sm text-neutral-500">
+                      <span>TVA 21%</span>
+                      <span>{order.breakdown.vatAmount} RON</span>
+                    </div>
+                    <div className="flex justify-between font-semibold text-secondary-900 pt-1">
+                      <span>Total</span>
+                      <span>{order.breakdown.total} RON</span>
+                    </div>
+                  </>
+                )}
+                {/* Fallback if no breakdown */}
+                {!order.breakdown && (
+                  <div className="flex justify-between font-semibold text-secondary-900 border-t pt-2 mt-2">
+                    <span>Total</span>
+                    <span>{order.total_price} RON (TVA 21% inclus)</span>
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Invoice Download */}
@@ -377,7 +484,7 @@ export default function SuccessPage() {
                     <FileText className="h-4 w-4 text-primary-600" />
                   </div>
                   <p className="text-neutral-600">
-                    Procesăm documentul în 2-5 zile lucrătoare
+                    {processingTimeText}
                   </p>
                 </div>
                 <div className="flex items-start gap-3">

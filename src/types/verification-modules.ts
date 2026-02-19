@@ -10,6 +10,8 @@
 // ============================================================================
 
 export type DocumentType =
+  | 'ci_front'             // CI front (from OCR auto-detect)
+  | 'ci_back'              // CI back (from OCR auto-detect)
   | 'ci_vechi'             // Old Romanian ID (has address on front)
   | 'ci_nou_front'         // New Romanian ID front
   | 'ci_nou_back'          // New Romanian ID back
@@ -269,6 +271,30 @@ export interface PersonalKYCState {
   isExpired: boolean;
   expiryAllowed: boolean;
   requiresAddressCertificate: boolean;
+
+  // KYC validation results (from AI)
+  kycValidation?: KYCValidationResults;
+}
+
+/**
+ * Per-document KYC validation result from AI
+ */
+export interface KYCDocumentValidation {
+  valid: boolean;
+  confidence: number; // 0-100
+}
+
+/**
+ * Aggregated KYC validation results
+ * Stores per-document AI confidence and face match result
+ */
+export interface KYCValidationResults {
+  ciFront?: KYCDocumentValidation;
+  ciBack?: KYCDocumentValidation;
+  selfie?: KYCDocumentValidation & {
+    faceMatch: boolean;
+    faceMatchConfidence: number; // 0-100
+  };
 }
 
 export interface AddressState {
@@ -454,8 +480,17 @@ export interface ModularWizardState {
   lastSavedAt: string | null;
   error: string | null;
 
+  // Consent state (set by review step, persisted for submission)
+  consent: ConsentState;
+
   // Initialization flag (true after cache check is complete)
   isInitialized: boolean;
+}
+
+export interface ConsentState {
+  termsAccepted: boolean;
+  privacyAccepted: boolean;
+  withdrawalWaiver: boolean;
 }
 
 export interface SelectedOptionState {

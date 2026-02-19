@@ -1,6 +1,6 @@
 # AWS S3 Setup Guide - eGhiseul.ro
 
-**Last Updated:** 2026-01-09
+**Last Updated:** 2026-02-17
 **Region:** eu-central-1 (Frankfurt)
 **Bucket:** eghiseul-documents
 
@@ -194,6 +194,16 @@ Automatically manage document retention and cleanup.
 
 1. Go to S3 bucket > **Management** > **Create lifecycle rule**
 
+### Lifecycle Rules Summary
+
+| Prefix | Standard-IA | Glacier | Expiration | Legal Basis |
+|--------|-------------|---------|------------|-------------|
+| `contracts/` | 30 days | 1 year | 10 years | Law 16/1996 (National Archives) |
+| `orders/` | 90 days | 1 year | 10 years | Follows contract retention |
+| `invoices/` | 30 days | 1 year | 10 years | Law 82/1991 (Accounting) |
+| `kyc/` | 30 days | 1 year | 3 years | GDPR data minimization |
+| `temp/` | - | - | 1 day | Cleanup |
+
 ### Rule 1: Temporary Uploads Cleanup
 
 ```
@@ -208,7 +218,7 @@ Lifecycle rule actions:
    - Days after objects become noncurrent: 1
 ```
 
-### Rule 2: KYC Document Retention (90 days active, then archive)
+### Rule 2: KYC Document Retention (3 years - GDPR data minimization)
 
 ```
 Rule name: kyc-lifecycle
@@ -216,14 +226,14 @@ Rule scope: Limit to prefix: kyc/
 
 Lifecycle rule actions:
 ✅ Transition current versions of objects
-   - Standard-IA: 90 days
+   - Standard-IA: 30 days
    - Glacier Instant Retrieval: 365 days
 
 ✅ Expire current versions of objects
-   - Days: 2555 (7 years - legal requirement)
+   - Days: 1095 (3 years - GDPR data minimization)
 ```
 
-### Rule 3: Contracts Retention (10 years)
+### Rule 3: Contracts Retention (10 years - Law 16/1996)
 
 ```
 Rule name: contracts-lifecycle
@@ -235,7 +245,101 @@ Lifecycle rule actions:
    - Glacier Instant Retrieval: 365 days
 
 ✅ Expire current versions of objects
-   - Days: 3650 (10 years)
+   - Days: 3650 (10 years - Law 16/1996 National Archives)
+```
+
+### Rule 4: Orders Retention (10 years)
+
+```
+Rule name: orders-lifecycle
+Rule scope: Limit to prefix: orders/
+
+Lifecycle rule actions:
+✅ Transition current versions of objects
+   - Standard-IA: 90 days
+   - Glacier Instant Retrieval: 365 days
+
+✅ Expire current versions of objects
+   - Days: 3650 (10 years - follows contract retention)
+```
+
+### Rule 5: Invoices Retention (10 years - Law 82/1991)
+
+```
+Rule name: invoices-lifecycle
+Rule scope: Limit to prefix: invoices/
+
+Lifecycle rule actions:
+✅ Transition current versions of objects
+   - Standard-IA: 30 days
+   - Glacier Instant Retrieval: 365 days
+
+✅ Expire current versions of objects
+   - Days: 3650 (10 years - Law 82/1991 Accounting)
+```
+
+### AWS CLI - Apply All Lifecycle Rules
+
+```bash
+aws s3api put-bucket-lifecycle-configuration \
+  --bucket eghiseul-documents \
+  --lifecycle-configuration '{
+    "Rules": [
+      {
+        "ID": "cleanup-temp-uploads",
+        "Status": "Enabled",
+        "Filter": { "Prefix": "temp/" },
+        "Expiration": { "Days": 1 },
+        "NoncurrentVersionExpiration": { "NoncurrentDays": 1 }
+      },
+      {
+        "ID": "kyc-lifecycle",
+        "Status": "Enabled",
+        "Filter": { "Prefix": "kyc/" },
+        "Transitions": [
+          { "Days": 30, "StorageClass": "STANDARD_IA" },
+          { "Days": 365, "StorageClass": "GLACIER_IR" }
+        ],
+        "Expiration": { "Days": 1095 }
+      },
+      {
+        "ID": "contracts-lifecycle",
+        "Status": "Enabled",
+        "Filter": { "Prefix": "contracts/" },
+        "Transitions": [
+          { "Days": 30, "StorageClass": "STANDARD_IA" },
+          { "Days": 365, "StorageClass": "GLACIER_IR" }
+        ],
+        "Expiration": { "Days": 3650 }
+      },
+      {
+        "ID": "orders-lifecycle",
+        "Status": "Enabled",
+        "Filter": { "Prefix": "orders/" },
+        "Transitions": [
+          { "Days": 90, "StorageClass": "STANDARD_IA" },
+          { "Days": 365, "StorageClass": "GLACIER_IR" }
+        ],
+        "Expiration": { "Days": 3650 }
+      },
+      {
+        "ID": "invoices-lifecycle",
+        "Status": "Enabled",
+        "Filter": { "Prefix": "invoices/" },
+        "Transitions": [
+          { "Days": 30, "StorageClass": "STANDARD_IA" },
+          { "Days": 365, "StorageClass": "GLACIER_IR" }
+        ],
+        "Expiration": { "Days": 3650 }
+      }
+    ]
+  }'
+```
+
+### Verify Lifecycle Configuration
+
+```bash
+aws s3api get-bucket-lifecycle-configuration --bucket eghiseul-documents
 ```
 
 ---
@@ -313,37 +417,47 @@ eghiseul-documents/
 │           ├── selfie.jpg        # Selfie with ID
 │           └── metadata.json     # OCR results, validation data
 │
-├── orders/                       # Order-related documents
-│   └── {year}/
+├── orders/                       # Order-related documents (NEW structure)
+│   ├── {friendly_order_id}/      # e.g. E-260216-12345 (generated documents)
+│   │   ├── contracte/            # Contracts
+│   │   │   ├── contract-prestari-E-260216-12345.docx
+│   │   │   └── contract-asistenta-E-260216-12345.docx
+│   │   ├── imputerniciri/        # Powers of attorney
+│   │   │   └── imputernicire-E-260216-12345.docx
+│   │   ├── cereri/               # Application forms
+│   │   │   └── cerere-eliberare-pf-E-260216-12345.docx
+│   │   └── documente/            # Fallback for other document types
+│   │
+│   └── {year}/                   # Legacy path (customer uploads & signatures)
 │       └── {month}/
 │           └── {order_id}/
 │               ├── uploads/      # Customer uploaded files
 │               │   └── {filename}
-│               ├── signature.png # Electronic signature
+│               ├── signature/
+│               │   └── signature.png # Electronic signature (uploaded at submission)
 │               └── metadata.json
 │
-├── contracts/                    # Generated contracts
-│   └── {year}/
-│       └── {month}/
+├── contracts/                    # Generated contracts (LEGACY -- @deprecated)
+│   └── {year}/                   # Old path from generateContractKey()
+│       └── {month}/              # Still accessible for backwards compatibility
 │           └── {contract_number}/
-│               ├── contract.pdf
-│               ├── contract_signed.pdf
-│               └── metadata.json
+│               └── *.docx
+│
+├── signatures/                   # Predefined signatures (company/lawyer)
+│   ├── company_signature/
+│   │   └── {timestamp}.png
+│   ├── lawyer_signature/
+│   │   └── {timestamp}.png
+│   └── lawyer_stamp/
+│       └── {timestamp}.png
 │
 ├── invoices/                     # Generated invoices
 │   └── {year}/
 │       └── {month}/
 │           └── {invoice_number}.pdf
 │
-├── final-documents/              # Delivered documents
-│   └── {year}/
-│       └── {month}/
-│           └── {order_id}/
-│               ├── cazier_fiscal.pdf
-│               ├── extras_cf.pdf
-│               └── metadata.json
-│
 ├── templates/                    # Document templates
+│   ├── custom/                   # Admin-uploaded custom templates
 │   ├── contracts/
 │   │   ├── contract_pf_v1.docx
 │   │   └── contract_pj_v1.docx
@@ -353,6 +467,23 @@ eghiseul-documents/
 └── temp/                         # Temporary files (auto-deleted after 24h)
     └── {upload_id}/
 ```
+
+**Key generation functions (`src/lib/aws/s3.ts`):**
+
+| Function | Pattern | Status |
+|----------|---------|--------|
+| `generateDocumentKey(friendlyOrderId, docType, fileName)` | `orders/{friendlyOrderId}/{subfolder}/{fileName}` | Current |
+| `generateContractKey(fileName, reference)` | `contracts/{year}/{month}/{reference}/{fileName}` | @deprecated |
+| `generateSignatureKey(signatureType)` | `signatures/{signatureType}/{timestamp}.png` | Current |
+
+**Subfolder mapping for `generateDocumentKey()`:**
+
+| Document Type Prefix | Subfolder |
+|---------------------|-----------|
+| `contract-` | `contracte/` |
+| `imputernicire` | `imputerniciri/` |
+| `cerere-` | `cereri/` |
+| Other | `documente/` |
 
 ---
 

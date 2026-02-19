@@ -31,9 +31,13 @@ export async function GET(request: NextRequest) {
       providerCodes.map(async (code) => {
         try {
           const provider = getCourierProvider(code);
-          if (!provider.getServicePoints) return [];
-          return provider.getServicePoints(city || '*', county || undefined);
-        } catch {
+          if (!provider.getServicePoints) {
+            return [];
+          }
+          const points = await provider.getServicePoints(city || '*', county || undefined);
+          return points;
+        } catch (err) {
+          console.error(`[Pickup Points] Provider ${code} error:`, err instanceof Error ? err.message : err);
           return [];
         }
       })

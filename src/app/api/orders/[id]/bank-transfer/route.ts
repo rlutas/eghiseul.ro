@@ -100,7 +100,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     await supabase.from('order_history').insert({
       order_id: id,
       event_type: 'payment_proof_submitted',
-      notes: 'Customer submitted bank transfer payment proof',
+      notes: 'Client a trimis dovada de plata prin transfer bancar',
       new_value: JSON.stringify({
         payment_method: 'bank_transfer',
         payment_status: 'awaiting_verification',

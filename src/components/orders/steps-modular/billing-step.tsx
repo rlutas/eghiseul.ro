@@ -39,7 +39,8 @@ interface BillingOption {
   icon: React.ComponentType<{ className?: string }>;
 }
 
-const BILLING_OPTIONS: BillingOption[] = [
+// Billing options for PF orders (personal)
+const PF_BILLING_OPTIONS: BillingOption[] = [
   {
     source: 'self',
     label: 'Facturează pe mine',
@@ -60,9 +61,26 @@ const BILLING_OPTIONS: BillingOption[] = [
   },
 ];
 
+// Billing options for PJ orders (company) — company first, "pe mine" hidden
+const PJ_BILLING_OPTIONS: BillingOption[] = [
+  {
+    source: 'company',
+    label: 'Facturează pe firmă',
+    description: 'Folosește datele firmei introduse anterior',
+    icon: Building2,
+  },
+  {
+    source: 'other_pf',
+    label: 'Persoană fizică',
+    description: 'Facturează pe o persoană fizică',
+    icon: User,
+  },
+];
+
 export default function BillingStepModular({ onValidChange }: BillingStepProps) {
   const { state, updateBilling, prefillData } = useModularWizard();
-  const { billing, personalKyc } = state;
+  const { billing, personalKyc, companyKyc, clientType } = state;
+  const isPJOrder = clientType === 'PJ';
 
   // CUI validation state
   const [cuiLoading, setCuiLoading] = useState(false);
@@ -94,9 +112,42 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
     personalKyc?.address?.city, personalKyc?.address?.county,
   ]);
 
-  // Initialize billing with self data if available and source is 'self'
+  // For PJ orders: auto-default to 'company' billing and prefill from companyKyc
+  const companyKycCui = companyKyc?.cui;
+  const companyKycName = companyKyc?.companyName;
   useEffect(() => {
-    if (billing?.source === 'self' && prefillFromId && !billing?.firstName) {
+    if (isPJOrder && companyKycName && billing?.source === 'self' && !billing?.companyName) {
+      // Build address string from companyKyc address object
+      const addr = companyKyc?.address;
+      const companyAddr = addr
+        ? [addr.street, addr.number ? `Nr. ${addr.number}` : null, addr.city, addr.county]
+            .filter(Boolean).join(', ')
+        : companyKyc?.autoCompleteData?.address || '';
+
+      updateBilling({
+        source: 'company',
+        type: 'persoana_juridica',
+        companyName: companyKycName,
+        cui: companyKycCui || '',
+        regCom: companyKyc?.registrationNumber || '',
+        companyAddress: companyAddr,
+        cuiVerified: companyKyc?.validationStatus === 'valid',
+        isValid: companyKyc?.validationStatus === 'valid' && !!companyKycName && !!companyKycCui,
+        // Clear PF fields
+        firstName: undefined,
+        lastName: undefined,
+        cnp: undefined,
+        address: undefined,
+      });
+      if (companyKyc?.validationStatus === 'valid') {
+        setCuiSuccess(true);
+      }
+    }
+  }, [isPJOrder, companyKycCui, companyKycName, billing?.source, billing?.companyName, companyKyc, updateBilling]);
+
+  // Initialize billing with self data if available and source is 'self' (PF orders)
+  useEffect(() => {
+    if (!isPJOrder && billing?.source === 'self' && prefillFromId && !billing?.firstName) {
       updateBilling({
         firstName: prefillFromId.firstName,
         lastName: prefillFromId.lastName,
@@ -106,7 +157,7 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
         isValid: Boolean(prefillFromId.firstName && prefillFromId.lastName && prefillFromId.cnp),
       });
     }
-  }, [billing?.source, billing?.firstName, prefillFromId, updateBilling]);
+  }, [isPJOrder, billing?.source, billing?.firstName, prefillFromId, updateBilling]);
 
   // Extract primitive billing values to avoid effect re-triggers from object reference changes
   const billingSource = billing?.source;
@@ -187,8 +238,18 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
       setCuiSuccess(false);
       setCuiError(null);
     } else if (source === 'company') {
-      // Switch to company mode - auto-fill from saved PJ billing profile if available
+      // Switch to company mode
+      // Priority: 1) companyKyc from wizard step 3, 2) saved PJ profile, 3) empty
       const pjData = savedPjProfile?.billing_data as Record<string, string> | undefined;
+
+      // Build address from companyKyc
+      const kycAddr = companyKyc?.address;
+      const companyKycAddr = kycAddr
+        ? [kycAddr.street, kycAddr.number ? `Nr. ${kycAddr.number}` : null, kycAddr.city, kycAddr.county]
+            .filter(Boolean).join(', ')
+        : companyKyc?.autoCompleteData?.address || '';
+
+      const hasCompanyKyc = companyKyc?.cui && companyKyc?.companyName;
       const hasSavedPj = pjData?.cui && pjData?.companyName;
 
       updateBilling({
@@ -199,21 +260,21 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
         lastName: undefined,
         cnp: undefined,
         address: undefined,
-        // Initialize company fields from saved profile or empty
-        companyName: pjData?.companyName || billing?.companyName || '',
-        cui: pjData?.cui || billing?.cui || '',
-        regCom: pjData?.regCom || billing?.regCom || '',
-        companyAddress: pjData?.address || billing?.companyAddress || '',
-        cuiVerified: !!hasSavedPj,
-        isValid: !!hasSavedPj,
+        // Prefill: companyKyc > saved profile > empty
+        companyName: companyKyc?.companyName || pjData?.companyName || billing?.companyName || '',
+        cui: companyKyc?.cui || pjData?.cui || billing?.cui || '',
+        regCom: companyKyc?.registrationNumber || pjData?.regCom || billing?.regCom || '',
+        companyAddress: companyKycAddr || pjData?.address || billing?.companyAddress || '',
+        cuiVerified: !!(hasCompanyKyc && companyKyc?.validationStatus === 'valid') || !!hasSavedPj,
+        isValid: !!(hasCompanyKyc && companyKyc?.validationStatus === 'valid') || !!hasSavedPj,
       });
 
-      if (hasSavedPj) {
+      if ((hasCompanyKyc && companyKyc?.validationStatus === 'valid') || hasSavedPj) {
         setCuiSuccess(true);
         setCuiError(null);
       }
     }
-  }, [billing, prefillFromId, updateBilling]);
+  }, [billing, prefillFromId, companyKyc, updateBilling]);
 
   // Update field
   const updateField = useCallback((field: keyof BillingState, value: string) => {
@@ -275,7 +336,8 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
     }
   }, [billing, updateBilling]);
 
-  const selectedSource = billing?.source || 'self';
+  const selectedSource = billing?.source || (isPJOrder ? 'company' : 'self');
+  const billingOptions = isPJOrder ? PJ_BILLING_OPTIONS : PF_BILLING_OPTIONS;
 
   return (
     <div className="space-y-8">
@@ -286,8 +348,11 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
           Date pentru facturare
         </h3>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          {BILLING_OPTIONS.map((option) => {
+        <div className={cn(
+          'grid grid-cols-1 gap-4',
+          billingOptions.length === 3 ? 'sm:grid-cols-3' : 'sm:grid-cols-2'
+        )}>
+          {billingOptions.map((option) => {
             const Icon = option.icon;
             const isSelected = selectedSource === option.source;
 
@@ -416,11 +481,15 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
         <div className="space-y-4 p-4 bg-neutral-50 rounded-xl">
           <h4 className="font-medium text-secondary-900">Date facturare (persoană juridică)</h4>
 
-          {/* Auto-fill notice from saved PJ profile */}
-          {savedPjProfile && cuiSuccess && (
+          {/* Auto-fill notice */}
+          {cuiSuccess && (
             <div className="flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded-lg text-sm text-green-700">
               <CheckCircle className="w-4 h-4 shrink-0" />
-              Date preluate automat din profilul de firmă salvat
+              {isPJOrder && companyKyc?.companyName
+                ? 'Date preluate automat din datele firmei introduse anterior'
+                : savedPjProfile
+                  ? 'Date preluate automat din profilul de firmă salvat'
+                  : 'CUI valid - date completate automat'}
             </div>
           )}
 

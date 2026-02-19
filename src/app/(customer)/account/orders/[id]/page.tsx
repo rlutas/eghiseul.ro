@@ -30,6 +30,17 @@ import {
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { cn } from '@/lib/utils';
+import TrackingTimeline from '@/components/orders/tracking-timeline';
+
+interface OrderDocument {
+  id: string;
+  type: string;
+  label: string;
+  fileName: string;
+  fileSize: number | null;
+  documentNumber: string | null;
+  createdAt: string;
+}
 
 interface TimelineEvent {
   id: string;
@@ -128,6 +139,7 @@ interface OrderData {
   } | null;
   paymentStatus: string;
   paymentIntentId: string | null;
+  deliveryTrackingNumber: string | null;
   contractUrl: string | null;
   finalDocumentUrl: string | null;
   createdAt: string;
@@ -195,8 +207,10 @@ export default function OrderDetailPage() {
 
   const [order, setOrder] = useState<OrderData | null>(null);
   const [timeline, setTimeline] = useState<TimelineEvent[]>([]);
+  const [orderDocuments, setOrderDocuments] = useState<OrderDocument[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [downloadingDoc, setDownloadingDoc] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchOrder = async () => {
@@ -211,6 +225,9 @@ export default function OrderDetailPage() {
         setOrder(data.data.order);
         if (data.data.timeline) {
           setTimeline(data.data.timeline);
+        }
+        if (data.data.documents) {
+          setOrderDocuments(data.data.documents);
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Eroare la încărcarea comenzii');
@@ -248,6 +265,21 @@ export default function OrderDetailPage() {
 
   const getTimelineConfig = (status: string) => {
     return TIMELINE_STATUS_CONFIG[status] || { label: status, color: 'bg-neutral-100 text-neutral-800', icon: Clock };
+  };
+
+  const handleDocumentDownload = async (doc: OrderDocument) => {
+    setDownloadingDoc(doc.id);
+    try {
+      const response = await fetch(`/api/orders/${orderId}/documents/${doc.id}/download`);
+      const data = await response.json();
+      if (data.success && data.data?.url) {
+        window.open(data.data.url, '_blank');
+      }
+    } catch (err) {
+      console.error('Document download error:', err);
+    } finally {
+      setDownloadingDoc(null);
+    }
   };
 
   // Loading state
@@ -569,6 +601,18 @@ export default function OrderDetailPage() {
             </div>
           )}
 
+          {/* Courier Tracking */}
+          {order.deliveryTrackingNumber && (
+            <div className="bg-white rounded-2xl border border-neutral-200 overflow-hidden">
+              <div className="p-4 border-b border-neutral-100 bg-neutral-50">
+                <h4 className="font-semibold text-secondary-900">Urmarire Colet</h4>
+              </div>
+              <div className="p-5">
+                <TrackingTimeline orderId={order.id} autoRefresh={true} />
+              </div>
+            </div>
+          )}
+
           {/* Billing Data */}
           {order.customerData?.billing && (
             <div className="bg-white rounded-2xl border border-neutral-200 overflow-hidden">
@@ -814,7 +858,42 @@ export default function OrderDetailPage() {
           </div>
 
           {/* Documents */}
-          {(order.contractUrl || order.finalDocumentUrl) && (
+          {orderDocuments.length > 0 && (
+            <div className="bg-white rounded-2xl border border-neutral-200 overflow-hidden">
+              <div className="p-4 border-b border-neutral-100 bg-neutral-50">
+                <h4 className="font-semibold text-secondary-900">Documente</h4>
+              </div>
+              <div className="p-4 space-y-2">
+                {orderDocuments.map((doc) => (
+                  <button
+                    key={doc.id}
+                    onClick={() => handleDocumentDownload(doc)}
+                    disabled={downloadingDoc === doc.id}
+                    className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-neutral-50 transition-colors group text-left"
+                  >
+                    <div className="w-10 h-10 rounded-lg bg-neutral-100 flex items-center justify-center group-hover:bg-primary-100 transition-colors">
+                      <FileText className="w-5 h-5 text-neutral-500 group-hover:text-primary-600" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-secondary-900">{doc.label}</p>
+                      <p className="text-xs text-neutral-500">
+                        {doc.documentNumber && `Nr. ${doc.documentNumber} · `}
+                        {formatDate(doc.createdAt)}
+                      </p>
+                    </div>
+                    {downloadingDoc === doc.id ? (
+                      <Loader2 className="w-5 h-5 text-neutral-400 animate-spin" />
+                    ) : (
+                      <Download className="w-5 h-5 text-neutral-400" />
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Legacy document URLs (fallback) */}
+          {orderDocuments.length === 0 && (order.contractUrl || order.finalDocumentUrl) && (
             <div className="bg-white rounded-2xl border border-neutral-200 overflow-hidden">
               <div className="p-4 border-b border-neutral-100 bg-neutral-50">
                 <h4 className="font-semibold text-secondary-900">Documente</h4>
@@ -837,7 +916,6 @@ export default function OrderDetailPage() {
                     <Download className="w-5 h-5 text-neutral-400" />
                   </a>
                 )}
-
                 {order.finalDocumentUrl && (
                   <a
                     href={order.finalDocumentUrl}

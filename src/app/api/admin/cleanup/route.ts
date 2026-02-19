@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { requirePermission } from '@/lib/admin/permissions';
 
 /**
  * POST /api/admin/cleanup - Run cleanup of expired draft orders
@@ -23,12 +24,17 @@ export async function POST(request: NextRequest) {
     const cronSecret = request.headers.get('x-cron-secret');
     const expectedSecret = process.env.CRON_SECRET;
 
-    // If CRON_SECRET is set, verify it for automated calls
-    if (expectedSecret && cronSecret !== expectedSecret) {
-      // If no cron secret, check for admin user
-      const { data: { user } } = await supabase.auth.getUser();
+    // If valid cron secret is provided, skip auth check
+    const isCronCall = expectedSecret && cronSecret === expectedSecret;
 
-      if (!user) {
+    if (!isCronCall) {
+      // Manual call: require admin authentication + permission
+      const {
+        data: { user },
+        error: authError,
+      } = await supabase.auth.getUser();
+
+      if (authError || !user) {
         return NextResponse.json(
           {
             success: false,
@@ -41,7 +47,12 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      // TODO: Check if user is admin when roles are implemented
+      try {
+        await requirePermission(user.id, 'settings.manage');
+      } catch (error) {
+        if (error instanceof Response) return error;
+        throw error;
+      }
     }
 
     // Run the anonymization function
@@ -132,6 +143,27 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     const supabase = await createClient();
+
+    // Verify authentication
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      return NextResponse.json(
+        { success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } },
+        { status: 401 }
+      );
+    }
+
+    // Check permission
+    try {
+      await requirePermission(user.id, 'settings.manage');
+    } catch (error) {
+      if (error instanceof Response) return error;
+      throw error;
+    }
 
     // Count pending expired drafts
     const { data: pendingDrafts, error: pendingError } = await supabase

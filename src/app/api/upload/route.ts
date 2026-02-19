@@ -5,6 +5,7 @@ import {
   generateKycKey,
   generateOrderKey,
   generateTempKey,
+  generateSignatureKey,
   generateFileId,
   isAllowedFileType,
   getExtensionFromContentType,
@@ -24,6 +25,8 @@ interface UploadRequest {
   verificationId?: string;
   // For order uploads
   orderId?: string;
+  // For signature uploads
+  signatureType?: string;
 }
 
 /**
@@ -63,12 +66,13 @@ export async function POST(request: NextRequest) {
       documentType,
       verificationId,
       orderId,
+      signatureType,
     } = body;
 
     // Validate category
-    if (!category || !['kyc', 'orders', 'temp'].includes(category)) {
+    if (!category || !['kyc', 'orders', 'temp', 'signatures', 'templates'].includes(category)) {
       return NextResponse.json(
-        { error: 'Invalid category. Must be kyc, orders, or temp' },
+        { error: 'Invalid category. Must be kyc, orders, temp, signatures, or templates' },
         { status: 400 }
       );
     }
@@ -82,9 +86,11 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate file type
-    const allowedTypes = category === 'kyc'
-      ? ['image/jpeg', 'image/png', 'image/webp']
-      : ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
+    const allowedTypes = category === 'templates'
+      ? ['application/vnd.openxmlformats-officedocument.wordprocessingml.document']
+      : (category === 'kyc' || category === 'signatures')
+        ? ['image/jpeg', 'image/png', 'image/webp']
+        : ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
 
     if (!isAllowedFileType(contentType, allowedTypes)) {
       return NextResponse.json(
@@ -125,6 +131,21 @@ export async function POST(request: NextRequest) {
         }
         const orderFilename = filename || `${generateFileId()}.${extension}`;
         key = generateOrderKey(orderId, orderFilename);
+        break;
+
+      case 'signatures':
+        if (!signatureType || !['company_signature', 'lawyer_signature', 'lawyer_stamp'].includes(signatureType)) {
+          return NextResponse.json(
+            { error: 'signatureType is required for signature uploads. Must be company_signature, lawyer_signature, or lawyer_stamp' },
+            { status: 400 }
+          );
+        }
+        key = generateSignatureKey(signatureType, extension);
+        break;
+
+      case 'templates':
+        const templateName = filename || `template-${generateFileId()}.docx`;
+        key = `templates/custom/${templateName}`;
         break;
 
       case 'temp':

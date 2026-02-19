@@ -210,6 +210,9 @@ export interface TrackingInfo {
   // Timestamps
   lastUpdate: string;
 
+  // Tracking URL (public link for end users)
+  trackingUrl?: string;
+
   // Raw response
   rawResponse?: unknown;
 }

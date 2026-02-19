@@ -53,15 +53,16 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  // Admin routes - check for admin role
-  if (request.nextUrl.pathname.startsWith('/admin') && user) {
+  // Admin routes - check for admin/employee role
+  // Skip middleware role check for public admin routes (e.g. invite accept)
+  if (request.nextUrl.pathname.startsWith('/admin') && !request.nextUrl.pathname.startsWith('/admin/invite') && user) {
     const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)
       .single()
 
-    if (profile?.role !== 'admin') {
+    if (!profile?.role || !['super_admin', 'manager', 'operator', 'contabil', 'avocat', 'employee'].includes(profile.role)) {
       const url = request.nextUrl.clone()
       url.pathname = '/'
       return NextResponse.redirect(url)
