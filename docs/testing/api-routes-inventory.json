@@ -1,0 +1,475 @@
+[
+  {
+    "path": "/api/admin/cleanup",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "file": "src/app/api/admin/cleanup/route.ts"
+  },
+  {
+    "path": "/api/admin/dashboard/activity",
+    "methods": [
+      "GET"
+    ],
+    "file": "src/app/api/admin/dashboard/activity/route.ts"
+  },
+  {
+    "path": "/api/admin/dashboard/stats",
+    "methods": [
+      "GET"
+    ],
+    "file": "src/app/api/admin/dashboard/stats/route.ts"
+  },
+  {
+    "path": "/api/admin/invite/accept",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "file": "src/app/api/admin/invite/accept/route.ts"
+  },
+  {
+    "path": "/api/admin/orders/[id]",
+    "methods": [
+      "GET"
+    ],
+    "file": "src/app/api/admin/orders/[id]/route.ts"
+  },
+  {
+    "path": "/api/admin/orders/[id]/awb-label",
+    "methods": [
+      "GET"
+    ],
+    "file": "src/app/api/admin/orders/[id]/awb-label/route.ts"
+  },
+  {
+    "path": "/api/admin/orders/[id]/cancel-awb",
+    "methods": [
+      "POST"
+    ],
+    "file": "src/app/api/admin/orders/[id]/cancel-awb/route.ts"
+  },
+  {
+    "path": "/api/admin/orders/[id]/generate-awb",
+    "methods": [
+      "POST"
+    ],
+    "file": "src/app/api/admin/orders/[id]/generate-awb/route.ts"
+  },
+  {
+    "path": "/api/admin/orders/[id]/generate-document",
+    "methods": [
+      "POST"
+    ],
+    "file": "src/app/api/admin/orders/[id]/generate-document/route.ts"
+  },
+  {
+    "path": "/api/admin/orders/[id]/preview-document",
+    "methods": [
+      "GET"
+    ],
+    "file": "src/app/api/admin/orders/[id]/preview-document/route.ts"
+  },
+  {
+    "path": "/api/admin/orders/[id]/process",
+    "methods": [
+      "POST"
+    ],
+    "file": "src/app/api/admin/orders/[id]/process/route.ts"
+  },
+  {
+    "path": "/api/admin/orders/[id]/verify-payment",
+    "methods": [
+      "POST"
+    ],
+    "file": "src/app/api/admin/orders/[id]/verify-payment/route.ts"
+  },
+  {
+    "path": "/api/admin/orders/list",
+    "methods": [
+      "GET"
+    ],
+    "file": "src/app/api/admin/orders/list/route.ts"
+  },
+  {
+    "path": "/api/admin/orders/lookup",
+    "methods": [
+      "GET"
+    ],
+    "file": "src/app/api/admin/orders/lookup/route.ts"
+  },
+  {
+    "path": "/api/admin/settings",
+    "methods": [
+      "GET",
+      "PATCH"
+    ],
+    "file": "src/app/api/admin/settings/route.ts"
+  },
+  {
+    "path": "/api/admin/settings/number-ranges",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "file": "src/app/api/admin/settings/number-ranges/route.ts"
+  },
+  {
+    "path": "/api/admin/settings/number-ranges/[id]",
+    "methods": [
+      "PATCH"
+    ],
+    "file": "src/app/api/admin/settings/number-ranges/[id]/route.ts"
+  },
+  {
+    "path": "/api/admin/settings/number-registry",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "file": "src/app/api/admin/settings/number-registry/route.ts"
+  },
+  {
+    "path": "/api/admin/settings/number-registry/[id]/void",
+    "methods": [
+      "POST"
+    ],
+    "file": "src/app/api/admin/settings/number-registry/[id]/void/route.ts"
+  },
+  {
+    "path": "/api/admin/settings/number-registry/export",
+    "methods": [
+      "GET"
+    ],
+    "file": "src/app/api/admin/settings/number-registry/export/route.ts"
+  },
+  {
+    "path": "/api/admin/settings/services",
+    "methods": [
+      "GET",
+      "PATCH"
+    ],
+    "file": "src/app/api/admin/settings/services/route.ts"
+  },
+  {
+    "path": "/api/admin/users/customers",
+    "methods": [
+      "GET"
+    ],
+    "file": "src/app/api/admin/users/customers/route.ts"
+  },
+  {
+    "path": "/api/admin/users/customers/[id]",
+    "methods": [
+      "GET",
+      "PATCH"
+    ],
+    "file": "src/app/api/admin/users/customers/[id]/route.ts"
+  },
+  {
+    "path": "/api/admin/users/employees",
+    "methods": [
+      "GET"
+    ],
+    "file": "src/app/api/admin/users/employees/route.ts"
+  },
+  {
+    "path": "/api/admin/users/employees/[id]",
+    "methods": [
+      "DELETE",
+      "PATCH"
+    ],
+    "file": "src/app/api/admin/users/employees/[id]/route.ts"
+  },
+  {
+    "path": "/api/admin/users/invitations",
+    "methods": [
+      "GET"
+    ],
+    "file": "src/app/api/admin/users/invitations/route.ts"
+  },
+  {
+    "path": "/api/admin/users/invitations/[id]",
+    "methods": [
+      "DELETE"
+    ],
+    "file": "src/app/api/admin/users/invitations/[id]/route.ts"
+  },
+  {
+    "path": "/api/admin/users/invite",
+    "methods": [
+      "POST"
+    ],
+    "file": "src/app/api/admin/users/invite/route.ts"
+  },
+  {
+    "path": "/api/auth/register-from-order",
+    "methods": [
+      "POST"
+    ],
+    "file": "src/app/api/auth/register-from-order/route.ts"
+  },
+  {
+    "path": "/api/company/validate",
+    "methods": [
+      "GET",
+      "HEAD",
+      "POST"
+    ],
+    "file": "src/app/api/company/validate/route.ts"
+  },
+  {
+    "path": "/api/contracts/preview",
+    "methods": [
+      "POST"
+    ],
+    "file": "src/app/api/contracts/preview/route.ts"
+  },
+  {
+    "path": "/api/courier/localities",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "file": "src/app/api/courier/localities/route.ts"
+  },
+  {
+    "path": "/api/courier/pickup-points",
+    "methods": [
+      "GET"
+    ],
+    "file": "src/app/api/courier/pickup-points/route.ts"
+  },
+  {
+    "path": "/api/courier/quote",
+    "methods": [
+      "GET"
+    ],
+    "file": "src/app/api/courier/quote/route.ts"
+  },
+  {
+    "path": "/api/courier/ship",
+    "methods": [
+      "POST"
+    ],
+    "file": "src/app/api/courier/ship/route.ts"
+  },
+  {
+    "path": "/api/courier/streets",
+    "methods": [
+      "GET"
+    ],
+    "file": "src/app/api/courier/streets/route.ts"
+  },
+  {
+    "path": "/api/courier/track",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "file": "src/app/api/courier/track/route.ts"
+  },
+  {
+    "path": "/api/cron/update-tracking",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "file": "src/app/api/cron/update-tracking/route.ts"
+  },
+  {
+    "path": "/api/kyc/validate",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "file": "src/app/api/kyc/validate/route.ts"
+  },
+  {
+    "path": "/api/ocr/extract",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "file": "src/app/api/ocr/extract/route.ts"
+  },
+  {
+    "path": "/api/orders",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "file": "src/app/api/orders/route.ts"
+  },
+  {
+    "path": "/api/orders/[id]",
+    "methods": [
+      "GET",
+      "PATCH"
+    ],
+    "file": "src/app/api/orders/[id]/route.ts"
+  },
+  {
+    "path": "/api/orders/[id]/bank-transfer",
+    "methods": [
+      "POST"
+    ],
+    "file": "src/app/api/orders/[id]/bank-transfer/route.ts"
+  },
+  {
+    "path": "/api/orders/[id]/confirm-payment",
+    "methods": [
+      "POST"
+    ],
+    "file": "src/app/api/orders/[id]/confirm-payment/route.ts"
+  },
+  {
+    "path": "/api/orders/[id]/documents/[docId]/download",
+    "methods": [
+      "GET"
+    ],
+    "file": "src/app/api/orders/[id]/documents/[docId]/download/route.ts"
+  },
+  {
+    "path": "/api/orders/[id]/documents/[docId]/preview",
+    "methods": [
+      "GET"
+    ],
+    "file": "src/app/api/orders/[id]/documents/[docId]/preview/route.ts"
+  },
+  {
+    "path": "/api/orders/[id]/payment",
+    "methods": [
+      "POST"
+    ],
+    "file": "src/app/api/orders/[id]/payment/route.ts"
+  },
+  {
+    "path": "/api/orders/[id]/submit",
+    "methods": [
+      "POST"
+    ],
+    "file": "src/app/api/orders/[id]/submit/route.ts"
+  },
+  {
+    "path": "/api/orders/[id]/tracking",
+    "methods": [
+      "GET"
+    ],
+    "file": "src/app/api/orders/[id]/tracking/route.ts"
+  },
+  {
+    "path": "/api/orders/draft",
+    "methods": [
+      "GET",
+      "PATCH",
+      "POST"
+    ],
+    "file": "src/app/api/orders/draft/route.ts"
+  },
+  {
+    "path": "/api/orders/status",
+    "methods": [
+      "GET"
+    ],
+    "file": "src/app/api/orders/status/route.ts"
+  },
+  {
+    "path": "/api/services",
+    "methods": [
+      "GET"
+    ],
+    "file": "src/app/api/services/route.ts"
+  },
+  {
+    "path": "/api/services/[slug]",
+    "methods": [
+      "GET"
+    ],
+    "file": "src/app/api/services/[slug]/route.ts"
+  },
+  {
+    "path": "/api/upload",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "file": "src/app/api/upload/route.ts"
+  },
+  {
+    "path": "/api/upload/download",
+    "methods": [
+      "GET"
+    ],
+    "file": "src/app/api/upload/download/route.ts"
+  },
+  {
+    "path": "/api/user/addresses",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "file": "src/app/api/user/addresses/route.ts"
+  },
+  {
+    "path": "/api/user/addresses/[id]",
+    "methods": [
+      "DELETE",
+      "PATCH"
+    ],
+    "file": "src/app/api/user/addresses/[id]/route.ts"
+  },
+  {
+    "path": "/api/user/billing-profiles",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "file": "src/app/api/user/billing-profiles/route.ts"
+  },
+  {
+    "path": "/api/user/billing-profiles/[id]",
+    "methods": [
+      "DELETE",
+      "PATCH"
+    ],
+    "file": "src/app/api/user/billing-profiles/[id]/route.ts"
+  },
+  {
+    "path": "/api/user/kyc",
+    "methods": [
+      "GET"
+    ],
+    "file": "src/app/api/user/kyc/route.ts"
+  },
+  {
+    "path": "/api/user/kyc/save",
+    "methods": [
+      "POST"
+    ],
+    "file": "src/app/api/user/kyc/save/route.ts"
+  },
+  {
+    "path": "/api/user/prefill-data",
+    "methods": [
+      "GET"
+    ],
+    "file": "src/app/api/user/prefill-data/route.ts"
+  },
+  {
+    "path": "/api/user/profile",
+    "methods": [
+      "GET",
+      "PATCH"
+    ],
+    "file": "src/app/api/user/profile/route.ts"
+  },
+  {
+    "path": "/api/webhooks/stripe",
+    "methods": [
+      "POST"
+    ],
+    "file": "src/app/api/webhooks/stripe/route.ts"
+  }
+]

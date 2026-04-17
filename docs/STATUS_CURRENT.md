@@ -17,12 +17,12 @@
 
 ### 2. Catalog Servicii & Landing Pages
 - **Homepage** - Hero, services grid, features, stats, footer
-- **Service catalog** - 12 servicii documentate (4 complete, 8 draft)
+- **Service catalog** - 12 servicii documentate (9 active in DB, 3 draft/planificate)
 - **Service detail pages** - Detalii, preturi, FAQ per serviciu
 - **Category-based URLs** - `/servicii/[category]/[slug]`
 
 ### 3. Wizard Modular de Comanda
-- **URL pattern:** `/comanda/[service-slug]` (ex: `/comanda/cazier-judiciar-pf`)
+- **URL pattern:** `/comanda/[service-slug]` (ex: `/comanda/cazier-judiciar-persoana-fizica`)
 - **Dynamic step generation** - Steps se adapteaza pe baza `verification_config` JSONB
 - **Core steps:** Contact, Options, Delivery, Billing, Review
 - **Dynamic modules:** Client Type, Personal KYC, Company KYC, Company Documents, Property, Vehicle, Signature
@@ -225,7 +225,7 @@
 **Pre-requisite:** Service "Cazier Judiciar PF" active in DB.
 
 ```
-[ ] 1.1  Navigate to /comanda/cazier-judiciar-pf
+[ ] 1.1  Navigate to /comanda/cazier-judiciar-persoana-fizica
 [ ] 1.2  CONTACT STEP: Enter email, phone, select contact method
          - Verify validation (email format, phone format)
 [ ] 1.3  CLIENT TYPE STEP: Select "Persoana Fizica"

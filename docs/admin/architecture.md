@@ -1499,7 +1499,8 @@ CREATE INDEX idx_admin_activity_action ON admin_activity_log(action);
 | Endpoint | Method | Description |
 |----------|--------|-------------|
 | `/api/admin/dashboard/stats` | GET | Dashboard statistics |
-| `/api/admin/orders` | GET | List orders with filters |
+| `/api/admin/orders/list` | GET | List orders with filters |
+| `/api/admin/orders/lookup` | GET | Lookup order by code/email |
 | `/api/admin/orders/[id]` | GET | Order details |
 | `/api/admin/orders/[id]` | PATCH | Update order status |
 | `/api/admin/orders/[id]/notes` | GET, POST | Order notes |
@@ -1507,7 +1508,10 @@ CREATE INDEX idx_admin_activity_action ON admin_activity_log(action);
 | `/api/admin/orders/[id]/awb-label` | GET | Download AWB label |
 | `/api/admin/orders/[id]/cancel-awb` | POST | Cancel AWB |
 | `/api/admin/orders/[id]/verify-payment` | POST | Verify bank transfer (exists) |
-| `/api/admin/users` | GET | List users |
+| `/api/admin/users/customers` | GET | List customers |
+| `/api/admin/users/employees` | GET | List employees |
+| `/api/admin/users/invitations` | GET | List pending invitations |
+| `/api/admin/users/invite` | POST | Invite new employee |
 | `/api/admin/users/[id]` | GET | User details |
 | `/api/admin/users/[id]` | PATCH | Update user (role, block) |
 | `/api/admin/settings/services` | GET, PATCH | Services config |

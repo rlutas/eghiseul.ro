@@ -532,7 +532,7 @@ s3://eghiseul-kyc-documents/
 
 - [ ] `app/api/kyc/upload/route.ts` - Document upload endpoint
 - [ ] `app/api/kyc/presigned-url/route.ts` - S3 presigned URL generation
-- [ ] `app/api/kyc/verify/route.ts` - Document verification endpoint
+- [ ] `app/api/kyc/validate/route.ts` - Document verification endpoint
 - [ ] `app/api/kyc/ocr/route.ts` - OCR processing endpoint
 - [ ] `app/api/kyc/documents/[id]/route.ts` - Document CRUD
 

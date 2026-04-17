@@ -293,7 +293,7 @@ interface KYCValidationResults {
 ### Daca vrei sa testezi (QA)
 
 1. `npm run dev` - porneste serverul local pe `localhost:3000`
-2. Mergi la `/comanda/cazier-judiciar-pf` si parcurge flow-ul complet
+2. Mergi la `/comanda/cazier-judiciar-persoana-fizica` si parcurge flow-ul complet
 3. Logheaza-te ca admin (`serviciiseonethut@gmail.com`, role: `super_admin`)
 4. Verifica `/admin/orders/[id]` - date personale, KYC confidence, documente
 5. Verifica `/admin/registru` - pagina noua cu tabel si export
