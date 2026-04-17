@@ -86,8 +86,8 @@ export function FeaturedServicesSkeleton() {
           <div className="inline-block px-4 py-1.5 bg-primary-100 rounded-full mb-4">
             <div className="h-4 w-24 bg-primary-200 rounded animate-pulse" />
           </div>
-          <div className="h-10 w-80 bg-neutral-200 rounded mx-auto mb-4 animate-pulse" />
-          <div className="h-6 w-96 bg-neutral-200 rounded mx-auto animate-pulse" />
+          <div className="h-10 w-80 max-w-full bg-neutral-200 rounded mx-auto mb-4 animate-pulse" />
+          <div className="h-6 w-96 max-w-full bg-neutral-200 rounded mx-auto animate-pulse" />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">

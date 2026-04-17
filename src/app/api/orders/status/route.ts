@@ -66,6 +66,7 @@ export async function GET(request: NextRequest) {
         payment_status,
         delivery_method,
         delivery_tracking_number,
+        estimated_completion_date,
         customer_data,
         selected_options,
         service:services(
@@ -229,6 +230,9 @@ export async function GET(request: NextRequest) {
         })),
         processingDays,
         hasUrgent,
+        estimatedCompletionDate: order.estimated_completion_date
+          ? new Date(order.estimated_completion_date).toISOString()
+          : null,
         delivery: {
           method: deliveryMethod?.type || null,
           methodName: deliveryMethod?.name || null,

@@ -43,7 +43,7 @@ interface KYCDocumentsStepProps {
   onValidChange: (valid: boolean) => void;
 }
 
-type KYCDocType = 'selfie' | 'certificat_domiciliu';
+type KYCDocType = 'selfie' | 'certificat_domiciliu' | 'residence_permit';
 
 interface UploadState {
   file: File | null;
@@ -91,6 +91,16 @@ const DOCUMENT_CONFIG: Record<
       'Evită reflexiile și umbrele',
     ],
   },
+  residence_permit: {
+    title: 'Permis de Ședere / Certificat de Înregistrare',
+    description: 'Necesar pentru cetățeni străini. Fotografiați documentul complet.',
+    icon: CreditCard,
+    tips: [
+      'Fotografiați documentul complet (față + verso)',
+      'Asigură-te că datele sunt citibile',
+      'Evită reflexiile și umbrele',
+    ],
+  },
 };
 
 // Max file size: 10MB
@@ -109,6 +119,7 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
   const [uploads, setUploads] = useState<Record<KYCDocType, UploadState>>({
     selfie: { ...initialUploadState },
     certificat_domiciliu: { ...initialUploadState },
+    residence_permit: { ...initialUploadState },
   });
 
   const [previewModal, setPreviewModal] = useState<{
@@ -128,6 +139,7 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
 
   const selfieInputRef = useRef<HTMLInputElement>(null);
   const certInputRef = useRef<HTMLInputElement>(null);
+  const permitInputRef = useRef<HTMLInputElement>(null);
 
   // Get uploaded documents
   const getDocumentByType = useCallback((type: DocumentType): UploadedDocumentState | undefined => {
@@ -163,6 +175,12 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
     if (personalKyc.requiresAddressCertificate && config.requireAddressCertificate !== 'never') {
       const hasCertificate = personalKyc.uploadedDocuments.some(d => d.type === 'certificat_domiciliu');
       if (!hasCertificate) return false;
+    }
+
+    // Check for residence permit if citizenship is non-romanian
+    if (personalKyc.citizenship && personalKyc.citizenship !== 'romanian') {
+      const hasPermit = personalKyc.uploadedDocuments.some(d => d.type === 'residence_permit');
+      if (!hasPermit) return false;
     }
 
     return true;
@@ -519,7 +537,7 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
             onDragOver={(e) => e.preventDefault()}
           >
             <input
-              ref={type === 'selfie' ? selfieInputRef : certInputRef}
+              ref={type === 'selfie' ? selfieInputRef : type === 'residence_permit' ? permitInputRef : certInputRef}
               type="file"
               accept="image/jpeg,image/jpg,image/png"
               capture={type === 'selfie' ? 'user' : undefined}
@@ -531,7 +549,7 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
               className="hidden"
             />
             <div
-              onClick={() => (type === 'selfie' ? selfieInputRef : certInputRef).current?.click()}
+              onClick={() => (type === 'selfie' ? selfieInputRef : type === 'residence_permit' ? permitInputRef : certInputRef).current?.click()}
               className="border border-neutral-200 rounded-lg p-6 text-center hover:bg-neutral-50 transition-colors cursor-pointer"
             >
               <div className="flex justify-center gap-2 mb-2">
@@ -585,10 +603,11 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
   // Check which sections to show
   const showSelfie = config.selfieRequired;
   const showCertificate = personalKyc.requiresAddressCertificate && config.requireAddressCertificate !== 'never';
+  const showResidencePermit = personalKyc.citizenship && personalKyc.citizenship !== 'romanian';
 
   // Count uploaded documents (from Step 3)
   const idDocsCount = personalKyc.uploadedDocuments.filter(d =>
-    d.type !== 'selfie' && d.type !== 'certificat_domiciliu'
+    d.type !== 'selfie' && d.type !== 'certificat_domiciliu' && d.type !== 'residence_permit'
   ).length;
 
   return (
@@ -663,7 +682,7 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
           <CardContent>
             <div className="space-y-2">
               {personalKyc.uploadedDocuments
-                .filter(d => d.type !== 'selfie' && d.type !== 'certificat_domiciliu')
+                .filter(d => d.type !== 'selfie' && d.type !== 'certificat_domiciliu' && d.type !== 'residence_permit')
                 .map(doc => (
                   <div
                     key={doc.id}
@@ -719,6 +738,9 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
       {/* Certificate Section - only show if reupload selected or no valid KYC */}
       {showCertificate && (!hasValidAccountKyc || showReuploadOption) && renderUploadCard('certificat_domiciliu')}
 
+      {/* Residence Permit Section - only show for non-romanian citizens */}
+      {showResidencePermit && (!hasValidAccountKyc || showReuploadOption) && renderUploadCard('residence_permit')}
+
       {/* Info Banner */}
       <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
         <div className="flex gap-3">
@@ -734,52 +756,45 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
       </div>
 
       {/* Progress Summary */}
-      {(showSelfie || showCertificate) && (
+      {(showSelfie || showCertificate || showResidencePermit) && (
         <div className="flex items-center justify-center gap-4 py-4">
-          {showSelfie && (
-            <div className="flex items-center gap-2">
-              <div
-                className={cn(
-                  'w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold',
-                  getDocumentByType('selfie')
-                    ? 'bg-green-500 text-white'
-                    : 'bg-neutral-200 text-neutral-500'
-                )}
-              >
-                {getDocumentByType('selfie') ? (
-                  <CheckCircle className="w-5 h-5" />
-                ) : (
-                  '1'
-                )}
-              </div>
-              <span className="text-sm text-neutral-600">Selfie</span>
-            </div>
-          )}
-          {showSelfie && showCertificate && (
-            <div className={cn(
-              'w-8 h-0.5',
-              getDocumentByType('selfie') ? 'bg-green-500' : 'bg-neutral-200'
-            )} />
-          )}
-          {showCertificate && (
-            <div className="flex items-center gap-2">
-              <div
-                className={cn(
-                  'w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold',
-                  getDocumentByType('certificat_domiciliu')
-                    ? 'bg-green-500 text-white'
-                    : 'bg-neutral-200 text-neutral-500'
-                )}
-              >
-                {getDocumentByType('certificat_domiciliu') ? (
-                  <CheckCircle className="w-5 h-5" />
-                ) : (
-                  showSelfie ? '2' : '1'
-                )}
-              </div>
-              <span className="text-sm text-neutral-600">Certificat</span>
-            </div>
-          )}
+          {(() => {
+            // Build ordered list of progress items
+            const items: { type: DocumentType; label: string }[] = [];
+            if (showSelfie) items.push({ type: 'selfie', label: 'Selfie' });
+            if (showCertificate) items.push({ type: 'certificat_domiciliu', label: 'Certificat' });
+            if (showResidencePermit) items.push({ type: 'residence_permit', label: 'Permis Ședere' });
+
+            return items.map((item, idx) => {
+              const uploaded = !!getDocumentByType(item.type);
+              const prevUploaded = idx > 0 ? !!getDocumentByType(items[idx - 1].type) : false;
+              return (
+                <div key={item.type} className="flex items-center gap-2">
+                  {idx > 0 && (
+                    <div className={cn(
+                      'w-8 h-0.5 mr-2',
+                      prevUploaded ? 'bg-green-500' : 'bg-neutral-200'
+                    )} />
+                  )}
+                  <div
+                    className={cn(
+                      'w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold',
+                      uploaded
+                        ? 'bg-green-500 text-white'
+                        : 'bg-neutral-200 text-neutral-500'
+                    )}
+                  >
+                    {uploaded ? (
+                      <CheckCircle className="w-5 h-5" />
+                    ) : (
+                      String(idx + 1)
+                    )}
+                  </div>
+                  <span className="text-sm text-neutral-600">{item.label}</span>
+                </div>
+              );
+            });
+          })()}
         </div>
       )}
 

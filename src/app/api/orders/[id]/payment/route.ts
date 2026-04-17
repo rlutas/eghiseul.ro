@@ -19,6 +19,11 @@ interface OrderWithService {
   order_number: string
   friendly_order_id: string | null
   total_price: number
+  base_price: number | null
+  options_price: number | null
+  delivery_price: number | null
+  coupon_code: string | null
+  discount_amount: number | null
   payment_status: string
   stripe_payment_intent_id: string | null
   created_at: string
@@ -80,7 +85,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     const { data, error: orderError } = await serviceClient
       .from('orders')
       .select(`
-        id, user_id, order_number, friendly_order_id, total_price, payment_status, stripe_payment_intent_id, created_at, customer_data,
+        id, user_id, order_number, friendly_order_id, total_price, base_price, options_price, delivery_price, coupon_code, discount_amount, payment_status, stripe_payment_intent_id, created_at, customer_data,
         services (
           name
         )
@@ -152,6 +157,70 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       })
     }
 
+    // ── Server-side coupon re-validation ──────────────────────────
+    // Recompute subtotal from server-stored values (never trust draft total_price blindly)
+    // and re-validate the coupon before charging. If invalid, strip it.
+    let finalTotalPrice = parseFloat(String(order.total_price))
+
+    if (order.coupon_code) {
+      const subtotal =
+        parseFloat(String(order.base_price ?? 0)) +
+        parseFloat(String(order.options_price ?? 0)) +
+        parseFloat(String(order.delivery_price ?? 0))
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: couponRow } = await (serviceClient as any)
+        .from('coupons')
+        .select('*')
+        .ilike('code', order.coupon_code.trim())
+        .eq('is_active', true)
+        .maybeSingle()
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const coupon = couponRow as any
+      const now = new Date()
+      const isValid =
+        !!coupon &&
+        (coupon.max_uses === null || coupon.times_used < coupon.max_uses) &&
+        (!coupon.valid_from || new Date(coupon.valid_from) <= now) &&
+        (!coupon.valid_until || new Date(coupon.valid_until) >= now) &&
+        subtotal >= Number(coupon.min_amount || 0)
+
+      if (isValid) {
+        let discount = 0
+        if (coupon.discount_type === 'percentage') {
+          discount = (subtotal * Number(coupon.discount_value)) / 100
+        } else {
+          discount = Number(coupon.discount_value)
+        }
+        discount = Math.min(discount, subtotal)
+        discount = Math.round(discount * 100) / 100
+        finalTotalPrice = Math.max(0, Math.round((subtotal - discount) * 100) / 100)
+
+        // Persist re-validated amounts (in case the draft stored stale values)
+        await serviceClient
+          .from('orders')
+          .update({
+            total_price: finalTotalPrice,
+            discount_amount: discount,
+          })
+          .eq('id', id)
+      } else {
+        // Coupon became invalid (expired / usage cap reached / min subtotal no longer met).
+        // Strip it and charge full subtotal.
+        finalTotalPrice = subtotal
+        await serviceClient
+          .from('orders')
+          .update({
+            coupon_code: null,
+            discount_amount: 0,
+            total_price: finalTotalPrice,
+          })
+          .eq('id', id)
+        console.warn(`Coupon ${order.coupon_code} rejected at payment for order ${id}`)
+      }
+    }
+
     // Create new payment intent
     // Use friendly_order_id directly (e.g., ORD-20260112-EWG22)
     const orderNumber = order.friendly_order_id || order.order_number
@@ -196,7 +265,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     } : undefined
 
     const paymentIntent = await createPaymentIntent(
-      parseFloat(String(order.total_price)),
+      finalTotalPrice,
       {
         orderId: order.id,
         orderNumber,

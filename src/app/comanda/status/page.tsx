@@ -101,6 +101,7 @@ interface OrderData {
   selectedOptions?: SelectedOption[];
   processingDays?: number | null;
   hasUrgent?: boolean;
+  estimatedCompletionDate?: string | null;
   delivery: {
     method: string | null;
     methodName: string | null;
@@ -334,7 +335,21 @@ function OrderStatusContent() {
                     Comandat pe {formatDate(orderData.createdAt)}
                   </p>
                   {/* Processing time */}
-                  {orderData.processingDays && (
+                  {orderData.estimatedCompletionDate ? (
+                    <p className="text-sm text-muted-foreground">
+                      Estimat: {new Intl.DateTimeFormat('ro-RO', {
+                        weekday: 'long',
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric',
+                      }).format(new Date(orderData.estimatedCompletionDate))}
+                      {orderData.hasUrgent && (
+                        <span className="ml-1 text-xs text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded">
+                          urgent
+                        </span>
+                      )}
+                    </p>
+                  ) : orderData.processingDays && (
                     <p className="text-sm text-muted-foreground">
                       Timp estimat procesare: {orderData.processingDays} zile lucrătoare
                       {orderData.hasUrgent && (
@@ -353,7 +368,7 @@ function OrderStatusContent() {
                   <Truck className="h-5 w-5 text-muted-foreground" />
                   <div>
                     <p className="font-medium">{orderData.delivery.methodName}</p>
-                    {orderData.delivery.estimatedDays && (
+                    {!orderData.estimatedCompletionDate && orderData.delivery.estimatedDays && (
                       <p className="text-sm text-muted-foreground">
                         Timp estimat: {orderData.delivery.estimatedDays} zile lucrătoare
                       </p>

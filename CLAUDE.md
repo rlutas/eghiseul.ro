@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project: eghiseul.ro
 
-Platforma digitala pentru Romania - servicii publice digitalizate (12 servicii). Rebuild complet din WordPress, arhitectura API-first.
+Platforma digitala pentru Romania - servicii publice digitalizate (9 servicii active in DB; 12 planificate in catalog). Rebuild complet din WordPress, arhitectura API-first.
 
 ---
 

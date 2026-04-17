@@ -163,6 +163,14 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     const subtotalWithoutVat = Math.round((totalAmount / (1 + VAT_RATE)) * 100) / 100
     const vatAmount = Math.round((totalAmount - subtotalWithoutVat) * 100) / 100
 
+    // Prefer the persisted estimated_completion_date (computed with the
+    // holiday/cutoff-aware calculator at submission/payment time). Fall back
+    // to the legacy on-the-fly calculation for orders created before the
+    // migration.
+    const persistedEstimate = order.estimated_completion_date
+      ? new Date(order.estimated_completion_date).toISOString()
+      : null
+
     const transformedOrder = {
       id: order.id,
       orderNumber: displayOrderNumber,
@@ -201,7 +209,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       finalDocumentUrl: order.final_document_url,
       createdAt: order.created_at,
       updatedAt: order.updated_at,
-      estimatedCompletion: estimatedCompletion.toISOString(),
+      estimatedCompletion: persistedEstimate ?? estimatedCompletion.toISOString(),
+      estimatedCompletionDate: persistedEstimate,
       processingDays,
       internalNotes: order.internal_status_notes || null
     }

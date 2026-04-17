@@ -36,8 +36,10 @@ import {
   MapPin,
   Calendar,
   Shield,
+  Globe,
 } from 'lucide-react';
 import type { PersonalKYCConfig, CitizenshipType, DocumentType, KYCValidationResults } from '@/types/verification-modules';
+import { APOSTILA_COUNTRIES } from '@/config/apostila-countries';
 import { validateCNP, extractBirthDateFromCNP } from '@/lib/validations/cnp';
 import { cn } from '@/lib/utils';
 import { COUNTY_NAMES, getLocalitiesForCounty, getCountyName, findCounty } from '@/lib/data/romania-counties';
@@ -135,6 +137,13 @@ const initialScanState: ScanState = {
   success: false,
   preview: null,
 };
+
+// Countries list for foreign citizen birth country dropdown.
+// Romania at top, then all apostila countries excluding Romania.
+const BIRTH_COUNTRIES = [
+  'România',
+  ...APOSTILA_COUNTRIES.filter((c) => c !== 'România'),
+] as const;
 
 export default function PersonalDataStep({ config, onValidChange }: PersonalDataStepProps) {
   const { state, updatePersonalKyc, isPrefilled, prefillData } = useModularWizard();
@@ -491,6 +500,15 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
     // Check if expired document is allowed
     if (personalKyc?.isExpired && !config?.expiredDocumentAllowed) {
       return false;
+    }
+
+    // Foreign citizen extra fields validation
+    if (personalKyc.citizenship !== 'romanian') {
+      if (!personalKyc.foreignData?.birthCity?.trim()) return false;
+      if (!personalKyc.foreignData?.birthCountry) return false;
+      if (personalKyc.foreignData?.hasRomanianAddress === false && !personalKyc.foreignData?.foreignAddress?.trim()) {
+        return false;
+      }
     }
 
     return true;
@@ -968,6 +986,131 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
             </Select>
           </div>
         </div>
+
+        {/* Foreign Citizen Extra Fields (when citizenship is european or foreign) */}
+        {personalKyc.citizenship !== 'romanian' && (
+          <div className="space-y-4 rounded-xl border-2 border-amber-200 bg-amber-50/50 p-4">
+            <div className="flex items-center gap-2 text-amber-900">
+              <Globe className="h-5 w-5 text-amber-600" />
+              <h4 className="font-semibold text-sm">Date suplimentare cetățean străin</h4>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="foreignBirthCity" className="text-secondary-900 font-medium">
+                  Localitatea Nașterii <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="foreignBirthCity"
+                  type="text"
+                  value={personalKyc.foreignData?.birthCity || ''}
+                  onChange={(e) => updatePersonalKyc({
+                    foreignData: {
+                      birthCity: e.target.value,
+                      birthCountry: personalKyc.foreignData?.birthCountry || '',
+                      hasRomanianAddress: personalKyc.foreignData?.hasRomanianAddress ?? true,
+                      foreignAddress: personalKyc.foreignData?.foreignAddress,
+                    }
+                  })}
+                  placeholder="Orașul sau comuna de naștere"
+                  className="bg-white placeholder:text-neutral-400"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="foreignBirthCountry" className="text-secondary-900 font-medium">
+                  Țara Nașterii <span className="text-red-500">*</span>
+                </Label>
+                <select
+                  id="foreignBirthCountry"
+                  value={personalKyc.foreignData?.birthCountry || ''}
+                  onChange={(e) => updatePersonalKyc({
+                    foreignData: {
+                      birthCity: personalKyc.foreignData?.birthCity || '',
+                      birthCountry: e.target.value,
+                      hasRomanianAddress: personalKyc.foreignData?.hasRomanianAddress ?? true,
+                      foreignAddress: personalKyc.foreignData?.foreignAddress,
+                    }
+                  })}
+                  className="h-10 w-full rounded-md border border-neutral-200 bg-white px-3 text-sm transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
+                >
+                  <option value="">Selectați țara</option>
+                  {BIRTH_COUNTRIES.map((c) => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Romanian address toggle */}
+            <div className="space-y-3">
+              <Label className="text-secondary-900 font-medium">
+                Am domiciliu în România
+              </Label>
+              <div className="grid grid-cols-2 gap-3">
+                {[
+                  { value: true, label: 'Da' },
+                  { value: false, label: 'Nu' },
+                ].map((opt) => (
+                  <label
+                    key={String(opt.value)}
+                    className={cn(
+                      'flex cursor-pointer items-center justify-center rounded-xl border-2 p-3 text-center text-sm font-medium transition-all duration-200',
+                      (personalKyc.foreignData?.hasRomanianAddress ?? true) === opt.value
+                        ? 'border-primary-500 bg-primary-50 shadow-sm'
+                        : 'border-neutral-200 hover:border-primary-300 hover:bg-neutral-50'
+                    )}
+                  >
+                    <input
+                      type="radio"
+                      name="hasRomanianAddress"
+                      value={String(opt.value)}
+                      checked={(personalKyc.foreignData?.hasRomanianAddress ?? true) === opt.value}
+                      onChange={() => updatePersonalKyc({
+                        foreignData: {
+                          birthCity: personalKyc.foreignData?.birthCity || '',
+                          birthCountry: personalKyc.foreignData?.birthCountry || '',
+                          hasRomanianAddress: opt.value,
+                          foreignAddress: personalKyc.foreignData?.foreignAddress,
+                        }
+                      })}
+                      className="sr-only"
+                    />
+                    {opt.label}
+                  </label>
+                ))}
+              </div>
+              {personalKyc.foreignData?.hasRomanianAddress === true && (
+                <p className="text-xs text-neutral-500">
+                  Completează adresa din secțiunea de mai jos.
+                </p>
+              )}
+            </div>
+
+            {/* Foreign address (when no Romanian address) */}
+            {personalKyc.foreignData?.hasRomanianAddress === false && (
+              <div className="space-y-2">
+                <Label htmlFor="foreignAddress" className="text-secondary-900 font-medium">
+                  Adresa din străinătate <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="foreignAddress"
+                  type="text"
+                  value={personalKyc.foreignData?.foreignAddress || ''}
+                  onChange={(e) => updatePersonalKyc({
+                    foreignData: {
+                      birthCity: personalKyc.foreignData?.birthCity || '',
+                      birthCountry: personalKyc.foreignData?.birthCountry || '',
+                      hasRomanianAddress: false,
+                      foreignAddress: e.target.value,
+                    }
+                  })}
+                  placeholder="Adresa completă din țara de domiciliu"
+                  className="bg-white placeholder:text-neutral-400"
+                />
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Parent Names (if required) */}
         {config?.parentDataRequired && (

@@ -5,6 +5,7 @@ import { logAudit, getAuditContext } from '@/lib/security/audit-logger';
 import { createHash } from 'crypto';
 import { autoGenerateOrderDocuments } from '@/lib/documents/auto-generate';
 import { uploadOrderSignature, uploadBase64 } from '@/lib/aws/s3';
+import { computeEstimatedCompletionISO } from '@/lib/delivery-estimate-helper';
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -30,9 +31,10 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     const body = await request.json().catch(() => ({}));
 
     // Fetch the order (use admin client to bypass RLS)
+    // Include service fields so we can compute the estimated completion date.
     const { data: order, error: orderError } = await adminClient
       .from('orders')
-      .select('*')
+      .select('*, services(estimated_days, urgent_days, urgent_available)')
       .eq('id', id)
       .single();
 
@@ -81,6 +83,25 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     const auditCtx = getAuditContext(request);
     const now = new Date().toISOString();
 
+    // Compute estimated completion (holiday/cutoff-aware). Done at submission
+    // so the customer sees a concrete date on the status/account pages even
+    // before Stripe webhook fires. The webhook will overwrite only if this
+    // field is NULL (see confirm-payment), so we keep it stable once set.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const svc = (order as any).services as {
+      estimated_days?: number | null;
+      urgent_days?: number | null;
+      urgent_available?: boolean | null;
+    } | null;
+    const estimatedCompletionISO = computeEstimatedCompletionISO({
+      placedAt: new Date(now),
+      serviceDays: svc?.estimated_days ?? null,
+      urgentDays: svc?.urgent_days ?? null,
+      urgentAvailable: svc?.urgent_available ?? null,
+      selectedOptions: (order.selected_options as Array<Record<string, unknown>> | null) ?? null,
+      deliveryMethod: order.delivery_method ?? null,
+    });
+
     // Build update object
     // Use 'pending' status (valid in database constraint)
     const updateData: Record<string, unknown> = {
@@ -88,6 +109,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       updated_at: now,
       submitted_at: now,
       contract_signed_at: now,
+      ...(estimatedCompletionISO ? { estimated_completion_date: estimatedCompletionISO } : {}),
     };
 
     // Update user profile with order data (phone, personal info)

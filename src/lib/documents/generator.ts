@@ -86,6 +86,13 @@ export interface DocumentContext {
     estimated_days?: number | null;
     urgent_days?: number | null;
     urgent_available?: boolean | null;
+    /**
+     * Estimated completion timestamp (ISO string, UTC). Computed by the
+     * delivery calculator at submission time and stored on
+     * `orders.estimated_completion_date`. When present, rendered into the
+     * `{{ESTIMATED_DATE}}` placeholder; otherwise the placeholder stays blank.
+     */
+    estimated_completion_date?: string | null;
   };
   /** Selected service options for this order (e.g., urgent processing) */
   selected_options?: SelectedOption[];
@@ -250,6 +257,7 @@ function buildInstitutie(serviceSlug?: string): string {
     'certificat-nastere': 'OFICIUL DE STARE CIVILĂ',
     'certificat-casatorie': 'OFICIUL DE STARE CIVILĂ',
     'certificat-celibat': 'OFICIUL DE STARE CIVILĂ',
+    'certificat-integritate-comportamentala': 'IPJ SATU MARE - CAZIER JUDICIAR',
     'extras-carte-funciara': 'OCPI SATU MARE',
     'certificat-constatator': 'ONRC SATU MARE',
   };
@@ -458,6 +466,17 @@ function buildPlaceholderData(ctx: DocumentContext) {
     TERMEN_ZILE: activeDaysText,
     TERMEN_STANDARD: estimatedDays ? (estimatedDays === 1 ? '1 zi lucrătoare' : `${estimatedDays} zile lucrătoare`) : '',
     TERMEN_URGENT: (ctx.order.urgent_available && urgentDays) ? (urgentDays === 1 ? '1 zi lucrătoare' : `${urgentDays} zile lucrătoare`) : '',
+
+    // Concrete estimated completion date — computed by delivery-calculator at
+    // submission time. Formatted long-form in Romanian when available.
+    ESTIMATED_DATE: ctx.order.estimated_completion_date
+      ? new Date(ctx.order.estimated_completion_date).toLocaleDateString('ro-RO', {
+          weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
+        })
+      : '',
+    ESTIMATED_DATE_ISO: ctx.order.estimated_completion_date
+      ? new Date(ctx.order.estimated_completion_date).toISOString().slice(0, 10)
+      : '',
 
     // Compound: beneficiary details block for contracts
     CLIENT_DETAILS_BLOCK: buildClientDetailsBlock(ctx.client),

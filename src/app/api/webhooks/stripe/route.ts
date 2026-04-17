@@ -3,6 +3,7 @@ import { stripe } from '@/lib/stripe'
 import { createClient } from '@supabase/supabase-js'
 import Stripe from 'stripe'
 import { createInvoiceFromOrder } from '@/lib/oblio'
+import { computeEstimatedCompletionISO } from '@/lib/delivery-estimate-helper'
 
 // Use service role for webhook handler (bypasses RLS)
 const supabaseAdmin = createClient(
@@ -14,25 +15,61 @@ export async function POST(request: NextRequest) {
   const body = await request.text()
   const signature = request.headers.get('stripe-signature')
 
-  // If webhook secret is configured, verify signature
+  // Verify webhook signature. In production, both the secret and the header are mandatory.
+  // In development, the secret can be omitted to allow testing without `stripe listen`.
+  // Recommended dev setup: stripe listen --forward-to localhost:3000/api/webhooks/stripe
   let event: Stripe.Event
 
-  if (process.env.STRIPE_WEBHOOK_SECRET && signature) {
-    try {
-      event = stripe.webhooks.constructEvent(
-        body,
-        signature,
-        process.env.STRIPE_WEBHOOK_SECRET
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET
+  const isProduction = process.env.NODE_ENV === 'production'
+
+  if (isProduction && !webhookSecret) {
+    console.error('Webhook fatal: STRIPE_WEBHOOK_SECRET is not set in production')
+    return NextResponse.json(
+      { error: 'Webhook not configured' },
+      { status: 400 }
+    )
+  }
+
+  if (isProduction && !signature) {
+    console.error('Webhook rejected: missing stripe-signature header in production')
+    return NextResponse.json(
+      { error: 'Missing stripe-signature header' },
+      { status: 400 }
+    )
+  }
+
+  if (webhookSecret) {
+    // When the secret is configured, signature is mandatory (in every environment)
+    if (!signature) {
+      console.error('Webhook rejected: missing stripe-signature header')
+      return NextResponse.json(
+        { error: 'Missing stripe-signature header' },
+        { status: 400 }
       )
+    }
+    try {
+      event = stripe.webhooks.constructEvent(body, signature, webhookSecret)
     } catch (err) {
-      console.error('Webhook signature verification failed:', err)
+      console.error('Webhook signature verification failed:', err instanceof Error ? err.message : err)
       return NextResponse.json(
         { error: 'Webhook signature verification failed' },
         { status: 400 }
       )
     }
   } else {
-    // In development without webhook secret, parse event directly
+    // Dev-only bypass: secret is unset and we are not in production (guard at line 25 enforces this).
+    // Still require a stripe-signature header so that unsigned probes cannot hit our handler.
+    // For local work, run `stripe listen --forward-to localhost:3000/api/webhooks/stripe`
+    // (the CLI signs each event using a test key).
+    if (!signature) {
+      console.warn('[WEBHOOK SECURITY] Dev bypass active but no stripe-signature header — rejecting')
+      return NextResponse.json(
+        { error: 'Missing stripe-signature header' },
+        { status: 400 }
+      )
+    }
+    console.warn('[WEBHOOK SECURITY] Running without signature verification — dev only')
     try {
       event = JSON.parse(body) as Stripe.Event
     } catch (err) {
@@ -83,10 +120,10 @@ async function handlePaymentSucceeded(paymentIntent: Stripe.PaymentIntent) {
     return
   }
 
-  // 1. Fetch full order data for invoice (with service name)
+  // 1. Fetch full order data for invoice (with service name + estimate fields)
   const { data: order, error: fetchError } = await supabaseAdmin
     .from('orders')
-    .select('*, services(name)')
+    .select('*, services(name, estimated_days, urgent_days, urgent_available)')
     .eq('id', orderId)
     .single()
 
@@ -101,13 +138,34 @@ async function handlePaymentSucceeded(paymentIntent: Stripe.PaymentIntent) {
     return
   }
 
+  // Compute estimated completion date using the holiday/cutoff-aware calculator.
+  // Anchored to "now" (payment success time) since paid_at is set here.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const svc = (order as any).services as {
+    estimated_days?: number | null
+    urgent_days?: number | null
+    urgent_available?: boolean | null
+  } | null
+  const estimatedCompletionISO = computeEstimatedCompletionISO({
+    placedAt: new Date(),
+    serviceDays: svc?.estimated_days ?? null,
+    urgentDays: svc?.urgent_days ?? null,
+    urgentAvailable: svc?.urgent_available ?? null,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    selectedOptions: ((order as any).selected_options as Array<Record<string, unknown>> | null) ?? null,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    deliveryMethod: (order as any).delivery_method ?? null,
+  })
+
   // 2. Update order status to paid
+  const paidAtNow = new Date().toISOString()
   const { error: updateError } = await supabaseAdmin
     .from('orders')
     .update({
       payment_status: 'paid',
       status: 'processing',
-      updated_at: new Date().toISOString()
+      updated_at: paidAtNow,
+      ...(estimatedCompletionISO ? { estimated_completion_date: estimatedCompletionISO } : {}),
     })
     .eq('id', orderId)
 
@@ -117,6 +175,33 @@ async function handlePaymentSucceeded(paymentIntent: Stripe.PaymentIntent) {
   }
 
   console.log(`Order ${orderId} marked as paid and processing`)
+
+  // 2b. Increment coupon usage if one was applied.
+  // Idempotency is provided by the early return on line 135 (checks invoice_number):
+  // coupon increment only runs when invoice_number is null (i.e. first-time payment webhook).
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const couponCode = (order as any).coupon_code as string | null
+  if (couponCode) {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: coupon } = await (supabaseAdmin as any)
+        .from('coupons')
+        .select('id, times_used')
+        .ilike('code', couponCode.trim())
+        .maybeSingle()
+      if (coupon) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await (supabaseAdmin as any)
+          .from('coupons')
+          .update({ times_used: (coupon.times_used || 0) + 1 })
+          .eq('id', coupon.id)
+        console.log(`Incremented usage for coupon ${couponCode} (order ${orderId})`)
+      }
+    } catch (couponErr) {
+      // Don't fail the payment flow if coupon tracking fails
+      console.error('Failed to increment coupon usage:', couponErr)
+    }
+  }
 
   // 3. Create Oblio invoice
   try {

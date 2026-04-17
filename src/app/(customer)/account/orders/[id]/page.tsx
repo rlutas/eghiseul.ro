@@ -145,6 +145,7 @@ interface OrderData {
   createdAt: string;
   updatedAt: string;
   estimatedCompletion: string;
+  estimatedCompletionDate: string | null;
   internalNotes: string | null;
 }
 
@@ -566,7 +567,16 @@ export default function OrderDetailPage() {
                     <p className="font-medium text-secondary-900">
                       {order.deliveryMethod.name || order.deliveryMethod.type || 'Standard'}
                     </p>
-                    {order.deliveryMethod.estimated_days != null && order.deliveryMethod.estimated_days > 0 && (
+                    {order.estimatedCompletionDate ? (
+                      <p className="text-xs text-neutral-400">
+                        Estimat: {new Intl.DateTimeFormat('ro-RO', {
+                          weekday: 'long',
+                          day: 'numeric',
+                          month: 'long',
+                          year: 'numeric',
+                        }).format(new Date(order.estimatedCompletionDate))}
+                      </p>
+                    ) : order.deliveryMethod.estimated_days != null && order.deliveryMethod.estimated_days > 0 && (
                       <p className="text-xs text-neutral-400">
                         Estimat: {order.deliveryMethod.estimated_days} zile lucrătoare
                       </p>

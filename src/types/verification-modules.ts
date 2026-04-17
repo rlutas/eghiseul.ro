@@ -257,6 +257,14 @@ export interface PersonalKYCState {
   // Address (from CI vechi or Certificat Domiciliu)
   address: AddressState;
 
+  // Foreign citizen data (when citizenship is 'european' or 'foreign')
+  foreignData?: {
+    birthCity: string;
+    birthCountry: string;
+    hasRomanianAddress: boolean;
+    foreignAddress?: string;
+  };
+
   // Parent data
   fatherName?: string;
   motherName?: string;
@@ -483,8 +491,21 @@ export interface ModularWizardState {
   // Consent state (set by review step, persisted for submission)
   consent: ConsentState;
 
+  // Applied coupon (set in review step, validated server-side on checkout)
+  coupon: CouponState | null;
+
   // Initialization flag (true after cache check is complete)
   isInitialized: boolean;
+}
+
+/**
+ * Applied coupon state (client-side only — final validation happens server-side).
+ */
+export interface CouponState {
+  code: string;
+  discountAmount: number; // RON
+  discountType: 'percentage' | 'fixed';
+  discountValue: number;
 }
 
 export interface ConsentState {
@@ -499,6 +520,34 @@ export interface SelectedOptionState {
   optionDescription?: string;
   quantity: number;
   priceModifier: number;
+  // Option code (e.g. 'cetatean_strain', 'urgenta') — used by downstream
+  // logic (delivery calculator, admin) to recognize the option by its
+  // stable DB code rather than by name matching.
+  code?: string;
+  // System-toggled flag options (e.g. `cetatean_strain`) are not
+  // user-selected from the Options step — the wizard auto-adds them based
+  // on upstream data (citizenship, client type, etc.). The Options step
+  // renders these as read-only info cards with an "Aplicat automat" badge.
+  isAutoApplied?: boolean;
+  // Cross-service bundling metadata (optional)
+  // When set, this option belongs to a bundled (addon) service, not the primary service
+  bundledFor?: {
+    // The optionId of the parent cross-service addon (e.g. id of addon_cazier_judiciar)
+    parentOptionId: string;
+    // Slug of the bundled service the option belongs to (e.g. "cazier-judiciar")
+    bundledServiceSlug: string;
+    // Original option code on the bundled service (e.g. "apostila_haga")
+    bundledOptionCode: string;
+  };
+  // Free-form metadata captured from the Options step.
+  // Currently used for:
+  //   - language: authorized translation language (when `traducere` is selected)
+  //   - country: destination country for apostilla (when `apostila_haga` or
+  //     `apostila_notari` is selected; shared across both)
+  metadata?: {
+    language?: string;
+    country?: string;
+  };
 }
 
 export interface DeliveryState {

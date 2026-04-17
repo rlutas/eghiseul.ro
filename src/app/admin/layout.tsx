@@ -15,6 +15,7 @@ import {
   X,
   Shield,
   BookOpen,
+  Ticket,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -40,6 +41,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/admin/orders', label: 'Comenzi', icon: ClipboardList, permission: 'orders.view' },
   { href: '/admin/registru', label: 'Registru', icon: BookOpen, permission: 'settings.manage' },
+  { href: '/admin/coupons', label: 'Cupoane', icon: Ticket, permission: 'settings.manage' },
   { href: '/admin/users', label: 'Utilizatori', icon: Users, permission: 'users.manage' },
   { href: '/admin/settings', label: 'Setari', icon: Settings, permission: 'settings.manage' },
 ];

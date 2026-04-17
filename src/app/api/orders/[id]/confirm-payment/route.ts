@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { stripe } from '@/lib/stripe';
+import { computeEstimatedCompletionISO } from '@/lib/delivery-estimate-helper';
 
 // Service role client for bypassing RLS
 const supabaseAdmin = createClient(
@@ -26,10 +27,10 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
   try {
     const { id: orderId } = await params;
 
-    // Fetch order
+    // Fetch order (include service fields for estimate computation)
     const { data: order, error: fetchError } = await supabaseAdmin
       .from('orders')
-      .select('*, services(name)')
+      .select('*, services(name, estimated_days, urgent_days, urgent_available)')
       .eq('id', orderId)
       .single();
 
@@ -77,13 +78,32 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       }, { status: 400 });
     }
 
+    // Compute estimated completion date (holiday/cutoff-aware) if not set yet.
+    // Anchored to now since this endpoint sets the order to paid.
+    const svc = order.services as {
+      estimated_days?: number | null;
+      urgent_days?: number | null;
+      urgent_available?: boolean | null;
+    } | null;
+    const estimatedCompletionISO = order.estimated_completion_date
+      ? null
+      : computeEstimatedCompletionISO({
+          placedAt: new Date(),
+          serviceDays: svc?.estimated_days ?? null,
+          urgentDays: svc?.urgent_days ?? null,
+          urgentAvailable: svc?.urgent_available ?? null,
+          selectedOptions: (order.selected_options as Array<Record<string, unknown>> | null) ?? null,
+          deliveryMethod: order.delivery_method ?? null,
+        });
+
     // Payment succeeded - update order
     const { error: updateError } = await supabaseAdmin
       .from('orders')
       .update({
         payment_status: 'paid',
         status: order.status === 'pending' || order.status === 'draft' ? 'processing' : order.status,
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
+        ...(estimatedCompletionISO ? { estimated_completion_date: estimatedCompletionISO } : {}),
       })
       .eq('id', orderId);
 

@@ -256,6 +256,7 @@ export async function POST(
         estimated_days: order.services?.estimated_days,
         urgent_days: order.services?.urgent_days,
         urgent_available: order.services?.urgent_available,
+        estimated_completion_date: order.estimated_completion_date ?? null,
       },
       selected_options: selectedOptions,
       document_numbers: documentNumbers,

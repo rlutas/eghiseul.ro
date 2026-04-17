@@ -19,6 +19,8 @@ interface DraftOrderData {
   options_price?: number;
   delivery_price?: number;
   total_price?: number;
+  coupon_code?: string | null;
+  discount_amount?: number;
 }
 
 // Simple validation function
@@ -130,6 +132,8 @@ export async function POST(request: NextRequest) {
           options_price: data.options_price || 0,
           delivery_price: data.delivery_price || 0,
           total_price: data.total_price || 0,
+          coupon_code: data.coupon_code ?? null,
+          discount_amount: data.discount_amount || 0,
           updated_at: new Date().toISOString(),
         };
         const { data: updatedOrder, error: updateError } = await adminClient
@@ -194,6 +198,8 @@ export async function POST(request: NextRequest) {
       options_price: data.options_price || 0,
       delivery_price: data.delivery_price || 0,
       total_price: data.total_price || 0,
+      coupon_code: data.coupon_code ?? null,
+      discount_amount: data.discount_amount || 0,
       payment_status: 'unpaid',
     };
 
@@ -467,6 +473,12 @@ export async function PATCH(request: NextRequest) {
     }
     if (body.total_price !== undefined) {
       updateData.total_price = body.total_price;
+    }
+    if (body.coupon_code !== undefined) {
+      updateData.coupon_code = body.coupon_code;
+    }
+    if (body.discount_amount !== undefined) {
+      updateData.discount_amount = body.discount_amount;
     }
 
     // Associate with user if they're now authenticated

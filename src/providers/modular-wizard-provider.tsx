@@ -187,6 +187,7 @@ const initialState: ModularWizardState = {
     privacyAccepted: false,
     withdrawalWaiver: false,
   },
+  coupon: null,
   isInitialized: false,
 };
 
@@ -211,6 +212,8 @@ type ModularWizardAction =
   | { type: 'UPDATE_OPTIONS'; payload: SelectedOptionState[] }
   | { type: 'UPDATE_DELIVERY'; payload: Partial<DeliveryState> }
   | { type: 'UPDATE_CONSENT'; payload: Partial<ConsentState> }
+  | { type: 'APPLY_COUPON'; payload: { code: string; discountAmount: number; discountType: 'percentage' | 'fixed'; discountValue: number } }
+  | { type: 'CLEAR_COUPON' }
   | { type: 'SET_ORDER_IDS'; payload: { orderId: string | null; friendlyOrderId: string } }
   | { type: 'SET_FRIENDLY_ORDER_ID'; payload: string }
   | { type: 'SAVE_START' }
@@ -520,6 +523,25 @@ function modularWizardReducer(
         consent: { ...state.consent, ...action.payload },
       };
 
+    case 'APPLY_COUPON':
+      return {
+        ...state,
+        coupon: {
+          code: action.payload.code,
+          discountAmount: action.payload.discountAmount,
+          discountType: action.payload.discountType,
+          discountValue: action.payload.discountValue,
+        },
+        isDirty: true,
+      };
+
+    case 'CLEAR_COUPON':
+      return {
+        ...state,
+        coupon: null,
+        isDirty: true,
+      };
+
     case 'SET_ORDER_IDS':
       return {
         ...state,
@@ -732,6 +754,10 @@ interface ModularWizardContextType {
   updateOptions: (options: SelectedOptionState[]) => void;
   updateDelivery: (data: Partial<DeliveryState>) => void;
   updateConsent: (data: Partial<ConsentState>) => void;
+
+  // Coupon
+  applyCoupon: (payload: { code: string; discountAmount: number; discountType: 'percentage' | 'fixed'; discountValue: number }) => void;
+  clearCoupon: () => void;
 
   // Price
   priceBreakdown: PriceBreakdown;
@@ -1054,6 +1080,17 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
     dispatch({ type: 'UPDATE_CONSENT', payload: data });
   }, []);
 
+  const applyCoupon = useCallback(
+    (payload: { code: string; discountAmount: number; discountType: 'percentage' | 'fixed'; discountValue: number }) => {
+      dispatch({ type: 'APPLY_COUPON', payload });
+    },
+    []
+  );
+
+  const clearCoupon = useCallback(() => {
+    dispatch({ type: 'CLEAR_COUPON' });
+  }, []);
+
   // Price calculation
   const priceBreakdown = useMemo((): PriceBreakdown => {
     const service = serviceRef.current;
@@ -1069,8 +1106,21 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
       0
     );
     const deliveryPrice = state.delivery.price ?? 0;
-    const discountAmount = 0; // TODO: Apply promo codes
-    const totalPrice = basePrice + optionsPrice + deliveryPrice - discountAmount;
+
+    // Coupon discount (client-side only; server always re-validates before charging)
+    const subtotal = basePrice + optionsPrice + deliveryPrice;
+    let discountAmount = 0;
+    if (state.coupon) {
+      if (state.coupon.discountType === 'percentage') {
+        discountAmount = (subtotal * state.coupon.discountValue) / 100;
+      } else {
+        discountAmount = state.coupon.discountAmount || state.coupon.discountValue;
+      }
+      // Cap at subtotal so totalPrice never goes negative
+      discountAmount = Math.min(discountAmount, subtotal);
+      discountAmount = Math.round(discountAmount * 100) / 100;
+    }
+    const totalPrice = Math.max(0, subtotal - discountAmount);
 
     return {
       basePrice,
@@ -1080,7 +1130,7 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
       totalPrice,
       currency: service?.currency ?? 'RON',
     };
-  }, [state.serviceId, state.selectedOptions, state.delivery]);
+  }, [state.serviceId, state.selectedOptions, state.delivery, state.coupon]);
 
   // Save to localStorage
   const saveToLocalStorage = useCallback(() => {
@@ -1144,6 +1194,20 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
       if (state.vehicle) customerData.vehicle = state.vehicle;
       if (state.billing) customerData.billing = state.billing;
 
+      // Cross-service bundling metadata (e.g. "cazier-judiciar" bundled onto
+      // "certificat-integritate-comportamentala"). Unique list of bundled
+      // service slugs, derived from selectedOptions with bundledFor set.
+      const bundledServices = Array.from(
+        new Set(
+          state.selectedOptions
+            .map(opt => opt.bundledFor?.bundledServiceSlug)
+            .filter((slug): slug is string => typeof slug === 'string')
+        )
+      );
+      if (bundledServices.length > 0) {
+        customerData.bundled_services = bundledServices;
+      }
+
       const response = await fetch('/api/orders/draft', {
         method,
         headers: { 'Content-Type': 'application/json' },
@@ -1160,6 +1224,23 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
             option_description: opt.optionDescription || '',
             quantity: opt.quantity,
             price_modifier: opt.priceModifier,
+            // Stable option code (e.g. 'cetatean_strain', 'urgenta') — used
+            // by delivery-estimate-helper and admin/backoffice.
+            code: opt.code,
+            // System-toggled flag (e.g. cetățean străin auto-applied from
+            // citizenship selection). Persisted for audit / admin visibility.
+            is_auto_applied: opt.isAutoApplied ?? undefined,
+            // Preserve cross-service bundling metadata for admin/backoffice
+            bundled_for: opt.bundledFor
+              ? {
+                  parent_option_id: opt.bundledFor.parentOptionId,
+                  bundled_service_slug: opt.bundledFor.bundledServiceSlug,
+                  bundled_option_code: opt.bundledFor.bundledOptionCode,
+                }
+              : undefined,
+            // Free-form metadata captured from the Options step
+            // (e.g. translation language, apostila destination country).
+            metadata: opt.metadata,
           })),
           // For drafts, only save document metadata (not base64 data)
           // Full documents will be uploaded to S3 at final submission
@@ -1193,6 +1274,8 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
           options_price: priceBreakdown.optionsPrice,
           delivery_price: priceBreakdown.deliveryPrice,
           total_price: priceBreakdown.totalPrice,
+          coupon_code: state.coupon?.code ?? null,
+          discount_amount: priceBreakdown.discountAmount,
         }),
       });
 
@@ -1411,6 +1494,60 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
     }
   }, [state.serviceSlug, state.isInitialized, loadPrefillData]);
 
+  // ────────────────────────────────────────────────────────────────────
+  // Cetățean Străin auto-toggle
+  // ────────────────────────────────────────────────────────────────────
+  // When the user changes the citizenship dropdown on the Personal Data
+  // step, we auto-toggle the `cetatean_strain` service option (if the
+  // service exposes one). This is a SYSTEM-toggled option, not a user-
+  // selected add-on — the Options step renders it as read-only.
+  //
+  // Logic:
+  //   citizenship === 'romanian' OR null  → option REMOVED
+  //   citizenship === 'european' / 'foreign' (non-romanian) → option ADDED
+  // If the service doesn't have a `cetatean_strain` option, this is a
+  // no-op for services that don't need the flow.
+  useEffect(() => {
+    const citizenship = state.personalKyc?.citizenship;
+    if (!citizenship) return;
+
+    const option = serviceOptionsRef.current.find(
+      (o) => o.code === 'cetatean_strain' && o.is_active
+    );
+    // Service doesn't offer this option — skip entirely (don't strip any
+    // existing cetatean_strain either, as it would only exist via the same
+    // mechanism).
+    if (!option) return;
+
+    const alreadySelected = state.selectedOptions.some(
+      (o) => o.optionId === option.id
+    );
+    const shouldBeSelected =
+      citizenship !== 'romanian' && citizenship !== undefined;
+
+    if (shouldBeSelected && !alreadySelected) {
+      const newOpt: SelectedOptionState = {
+        optionId: option.id,
+        optionName: option.name,
+        optionDescription: option.description || '',
+        quantity: 1,
+        priceModifier: option.price,
+        code: option.code,
+        isAutoApplied: true,
+      };
+      dispatch({
+        type: 'UPDATE_OPTIONS',
+        payload: [...state.selectedOptions, newOpt],
+      });
+    } else if (!shouldBeSelected && alreadySelected) {
+      dispatch({
+        type: 'UPDATE_OPTIONS',
+        payload: state.selectedOptions.filter((o) => o.optionId !== option.id),
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.personalKyc?.citizenship, state.serviceId]);
+
   // Handle browser back button
   useEffect(() => {
     const handlePopState = () => {
@@ -1468,6 +1605,8 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
     updateOptions,
     updateDelivery,
     updateConsent,
+    applyCoupon,
+    clearCoupon,
     priceBreakdown,
     saveDraft,
     saveDraftNow,

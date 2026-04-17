@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import {
   CheckCircle,
   User,
@@ -14,9 +14,13 @@ import {
   Edit,
   Package,
   FileText,
+  Ticket,
+  X,
+  Loader2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { useModularWizard } from '@/providers/modular-wizard-provider';
@@ -27,8 +31,56 @@ interface ReviewStepProps {
 }
 
 export function ReviewStepModular({ onValidChange }: ReviewStepProps) {
-  const { state, service, priceBreakdown, goToStep, updateConsent } = useModularWizard();
+  const { state, service, priceBreakdown, goToStep, updateConsent, applyCoupon, clearCoupon } = useModularWizard();
   const { termsAccepted, privacyAccepted, withdrawalWaiver } = state.consent;
+
+  // Coupon input state
+  const [couponInput, setCouponInput] = useState('');
+  const [couponLoading, setCouponLoading] = useState(false);
+  const [couponError, setCouponError] = useState<string | null>(null);
+
+  const handleApplyCoupon = async () => {
+    const code = couponInput.trim().toUpperCase();
+    if (!code) {
+      setCouponError('Introdu un cod de cupon');
+      return;
+    }
+    setCouponLoading(true);
+    setCouponError(null);
+    try {
+      // Subtotal = sum before discount (service base + options + delivery)
+      const subtotal =
+        priceBreakdown.basePrice + priceBreakdown.optionsPrice + priceBreakdown.deliveryPrice;
+
+      const res = await fetch('/api/coupons/validate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code, subtotal }),
+      });
+      const json = await res.json();
+      if (res.ok && json.success && json.data?.valid) {
+        applyCoupon({
+          code: json.data.coupon.code,
+          discountAmount: json.data.discount,
+          discountType: json.data.coupon.discount_type,
+          discountValue: Number(json.data.coupon.discount_value),
+        });
+        setCouponInput('');
+      } else {
+        setCouponError(json.error || 'Cupon invalid');
+      }
+    } catch {
+      setCouponError('Eroare de retea');
+    } finally {
+      setCouponLoading(false);
+    }
+  };
+
+  const handleRemoveCoupon = () => {
+    clearCoupon();
+    setCouponInput('');
+    setCouponError(null);
+  };
 
   const setTermsAccepted = (v: boolean) => updateConsent({ termsAccepted: v });
   const setPrivacyAccepted = (v: boolean) => updateConsent({ privacyAccepted: v });
@@ -320,6 +372,19 @@ export function ReviewStepModular({ onValidChange }: ReviewStepProps) {
               </div>
             )}
 
+            {/* Applied coupon (discount line) */}
+            {state.coupon && priceBreakdown.discountAmount > 0 && (
+              <div className="flex justify-between text-sm">
+                <span className="text-green-700 flex items-center gap-1">
+                  <Ticket className="h-3.5 w-3.5" />
+                  Cupon {state.coupon.code}
+                </span>
+                <span className="font-medium text-green-700">
+                  -{priceBreakdown.discountAmount.toFixed(2)} RON
+                </span>
+              </div>
+            )}
+
             <Separator />
 
             {/* Subtotal without TVA */}
@@ -355,6 +420,78 @@ export function ReviewStepModular({ onValidChange }: ReviewStepProps) {
             <p className="text-xs text-neutral-500 text-right">
               Prețurile includ TVA 21%
             </p>
+          </CardContent>
+        </Card>
+
+        {/* Coupon input */}
+        <Card className="mt-3 border-neutral-200">
+          <CardContent className="p-4">
+            {state.coupon ? (
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-sm">
+                  <Ticket className="h-4 w-4 text-green-600" />
+                  <span className="text-neutral-600">Cupon aplicat:</span>
+                  <code className="rounded bg-green-50 border border-green-200 px-2 py-0.5 text-sm font-bold text-green-800">
+                    {state.coupon.code}
+                  </code>
+                  <span className="text-sm text-green-700">
+                    (-{priceBreakdown.discountAmount.toFixed(2)} RON)
+                  </span>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleRemoveCoupon}
+                  className="text-neutral-500 hover:text-red-600"
+                >
+                  <X className="h-4 w-4" />
+                  Elimina
+                </Button>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <label className="flex items-center gap-2 text-sm font-medium text-secondary-900">
+                  <Ticket className="h-4 w-4 text-primary-500" />
+                  Aplica cod cupon
+                </label>
+                <div className="flex gap-2">
+                  <Input
+                    value={couponInput}
+                    onChange={(e) => {
+                      setCouponInput(e.target.value.toUpperCase());
+                      setCouponError(null);
+                    }}
+                    placeholder="Ex: WELCOME10"
+                    className="font-mono uppercase"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleApplyCoupon();
+                      }
+                    }}
+                    disabled={couponLoading}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleApplyCoupon}
+                    disabled={couponLoading || !couponInput.trim()}
+                  >
+                    {couponLoading ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Verifica...
+                      </>
+                    ) : (
+                      'Aplica'
+                    )}
+                  </Button>
+                </div>
+                {couponError && (
+                  <p className="text-xs text-red-600">{couponError}</p>
+                )}
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>

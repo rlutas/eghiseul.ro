@@ -318,7 +318,19 @@ export function isFinalStatus(status: TrackingStatus): boolean {
 // ============================================================================
 
 /**
- * Calculate estimated delivery date from business days
+ * Calculate estimated delivery date from business days.
+ *
+ * @deprecated Use {@link import('@/lib/delivery-calculator').calculateEstimatedCompletion}
+ * instead. This implementation:
+ *   - skips weekends only (no Romanian public holidays)
+ *   - has no 12:00 Romania-local noon cutoff
+ *   - ignores per-option delivery impact and courier transit times
+ *
+ * The new calculator in `src/lib/delivery-calculator.ts` accepts the full
+ * context (service baseDays, options, courier, placedAt) and returns an ISO
+ * completion date suitable for persistence into
+ * `orders.estimated_completion_date`. Migrate remaining consumers of this
+ * helper opportunistically; new code MUST use the new module.
  */
 export function calculateEstimatedDelivery(businessDays: number): Date {
   const result = new Date();
