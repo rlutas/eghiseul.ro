@@ -10,6 +10,10 @@ import { KYCValidationResult } from '@/types/orders';
 
 // Initialize Gemini AI
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY || '');
+// NOTE: face matching needs the full Flash model — `flash-lite` returned
+// false negatives on legitimate matches in real-world testing (selfie quality
+// flagged as "uncertain" → faceMatchConfidence ~30% on identical persons).
+// OCR (document-ocr.ts) keeps `flash-lite` because text extraction is robust there.
 const GEMINI_MODEL = 'gemini-2.5-flash';
 
 // Re-export the type for convenience

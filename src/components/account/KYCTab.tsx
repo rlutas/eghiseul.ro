@@ -34,6 +34,8 @@ import { useAddresses } from '@/hooks/useAddresses';
 import { useBillingProfiles } from '@/hooks/useBillingProfiles';
 import { uploadToS3, getS3DownloadUrl, isS3Url } from '@/lib/aws/upload-client';
 import type { ExtractedIdData } from '@/components/shared/IdScanner';
+import { compressImage, compressedToFile, ImageCompressionError, type CompressedImage } from '@/lib/images/compress';
+import { runFaceMatch, fetchImageAsBase64 } from '@/lib/kyc/face-match';
 
 interface KYCTabProps {
   className?: string;
@@ -119,6 +121,9 @@ export default function KYCTab({ className }: KYCTabProps) {
   const [resolvedUrls, setResolvedUrls] = useState<Record<string, string>>({});
   const fileInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
   const [hasCompanyProfile, setHasCompanyProfile] = useState(false);
+  // Cache last-uploaded CI front in memory so a subsequent selfie upload in the
+  // same session can be face-matched without a round-trip to S3.
+  const ciFrontCacheRef = useRef<{ base64: string; mimeType: string } | null>(null);
 
   // Check if user has a company profile
   useEffect(() => {
@@ -179,15 +184,29 @@ export default function KYCTab({ className }: KYCTabProps) {
     setSaveSuccess(false);
 
     try {
-      // Create base64 for OCR (still needed for image processing)
-      const reader = new FileReader();
-      const base64Promise = new Promise<string>((resolve, reject) => {
+      // Compress + decode (EXIF-safe). Reduces 3-7MB phone photos to ~250KB JPEG.
+      let compressed: CompressedImage | undefined;
+      let uploadFile: File = file;
+      try {
+        compressed = await compressImage(file);
+        console.log(`[KYC] ${type}: ${(compressed.sizeBefore/1024/1024).toFixed(1)}MB → ${(compressed.sizeAfter/1024).toFixed(0)}KB`);
+        uploadFile = compressedToFile(compressed, file);
+      } catch (e) {
+        if (e instanceof ImageCompressionError) {
+          // HEIC or decode failure: fall through with raw file (server-side fallback can normalize)
+          console.warn('Image compression skipped:', e.code);
+        } else {
+          throw e;
+        }
+      }
+
+      const dataUrl = compressed?.dataUrl ?? await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
         reader.onload = () => resolve(reader.result as string);
         reader.onerror = reject;
+        reader.readAsDataURL(file);
       });
-      reader.readAsDataURL(file);
-      const dataUrl = await base64Promise;
-      const base64 = dataUrl.split(',')[1];
+      const base64 = compressed?.base64 ?? dataUrl.split(',')[1];
 
       // Generate a verification ID for this upload session
       const verificationId = `kyc-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
@@ -199,7 +218,7 @@ export default function KYCTab({ className }: KYCTabProps) {
       try {
         const s3Result = await uploadToS3({
           category: 'kyc',
-          file,
+          file: uploadFile,
           documentType: type,
           verificationId,
         });
@@ -208,6 +227,14 @@ export default function KYCTab({ className }: KYCTabProps) {
       } catch (s3Error) {
         // S3 not configured or failed - fall back to data URL
         console.warn('S3 upload failed, using data URL:', s3Error);
+      }
+
+      const finalSize = compressed?.sizeAfter ?? file.size;
+      const finalMime = compressed?.mimeType ?? file.type;
+
+      // Cache CI front for in-session face match against subsequent selfie upload
+      if (type === 'ci_front' && compressed) {
+        ciFrontCacheRef.current = { base64: compressed.base64, mimeType: compressed.mimeType };
       }
 
       // For ID documents (front/back), run OCR
@@ -221,7 +248,7 @@ export default function KYCTab({ className }: KYCTabProps) {
           body: JSON.stringify({
             mode: 'specific',
             imageBase64: base64,
-            mimeType: file.type,
+            mimeType: finalMime,
             documentType: type,
           }),
         });
@@ -243,8 +270,8 @@ export default function KYCTab({ className }: KYCTabProps) {
           documentType: type,
           fileUrl,
           fileKey,
-          fileSize: file.size,
-          mimeType: file.type,
+          fileSize: finalSize,
+          mimeType: finalMime,
           extractedData: ocr.extractedData,
           validationResult: { confidence: ocr.confidence, issues: ocr.issues },
           documentExpiry: ocr.extractedData?.expiryDate,
@@ -255,14 +282,53 @@ export default function KYCTab({ className }: KYCTabProps) {
           await autoCreateUserData(ocr.extractedData);
         }
       } else {
-        // For selfie, just save without OCR
+        // For selfie: face match against the user's CI front before saving.
+        // Use the in-session cache if available, else fall back to the stored
+        // S3 image (previous session). If no CI is on file, save without
+        // validation (admin will see the missing reference).
+        let faceMatchValidation: Record<string, unknown> = {};
+
+        let reference = ciFrontCacheRef.current;
+        if (!reference) {
+          const ciDoc = documents.find((d) => d.documentType === 'ci_front' || d.documentType === 'ci_nou_front');
+          if (ciDoc?.fileUrl) {
+            const resolved = isS3Url(ciDoc.fileUrl) ? await getS3DownloadUrl(ciDoc.fileUrl) : ciDoc.fileUrl;
+            reference = await fetchImageAsBase64(resolved);
+          }
+        }
+
+        if (reference) {
+          const faceMatch = await runFaceMatch({
+            selfieBase64: base64,
+            selfieMimeType: finalMime,
+            referenceBase64: reference.base64,
+            referenceMimeType: reference.mimeType,
+          });
+          if (faceMatch.ok) {
+            console.log(`[KYC] selfie face match: ${faceMatch.matched ? 'MATCH' : 'NO MATCH'} (confidence ${faceMatch.faceMatchConfidence}%)`);
+            faceMatchValidation = {
+              faceMatch: faceMatch.matched,
+              faceMatchConfidence: faceMatch.faceMatchConfidence,
+              validationConfidence: faceMatch.validationConfidence,
+              valid: faceMatch.valid,
+              issues: faceMatch.issues,
+            };
+            if (!faceMatch.matched) {
+              setUploadError('Fața din selfie nu corespunde cu cea de pe cartea de identitate. Te rugăm să încerci o selfie clară, ținând CI-ul lângă față.');
+            }
+          } else {
+            console.warn('[KYC] face match unavailable:', faceMatch.error);
+          }
+        }
+
         await saveDocument({
           documentType: 'selfie',
           fileUrl,
           fileKey,
-          fileSize: file.size,
-          mimeType: file.type,
-          extractedData: {},
+          fileSize: finalSize,
+          mimeType: finalMime,
+          extractedData: faceMatchValidation,
+          validationResult: faceMatchValidation,
         });
       }
 
@@ -278,7 +344,7 @@ export default function KYCTab({ className }: KYCTabProps) {
       setUploadingType(null);
       setProcessingOcr(null);
     }
-  }, [saveDocument, refreshKyc]);
+  }, [saveDocument, refreshKyc, documents]);
 
   // Handle company document upload (no OCR - manual admin review)
   const handleCompanyDocUpload = useCallback(async (type: CompanyDocTypeKey, file: File) => {

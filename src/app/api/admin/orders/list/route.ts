@@ -64,14 +64,17 @@ export async function GET(request: NextRequest) {
         created_at,
         services(name, slug)
       `,
-        { count: 'exact' }
+        { count: 'estimated' }
       )
       .order('created_at', { ascending: false })
       .range(page * limit, (page + 1) * limit - 1);
 
-    // Apply status filter
+    // Apply status filter: 'all' excludes drafts (customer-side abandoned carts);
+    // an explicit status param can still target any value including 'draft'.
     if (status && status !== 'all') {
       query = query.eq('status', status);
+    } else {
+      query = query.neq('status', 'draft');
     }
 
     // Apply search filter (server-side)

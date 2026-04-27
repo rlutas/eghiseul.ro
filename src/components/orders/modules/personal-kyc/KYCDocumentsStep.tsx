@@ -37,6 +37,8 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { PersonalKYCConfig, DocumentType, UploadedDocumentState, KYCValidationResults } from '@/types/verification-modules';
+import { compressImage } from '@/lib/images/compress';
+import { runFaceMatch } from '@/lib/kyc/face-match';
 
 interface KYCDocumentsStepProps {
   config: PersonalKYCConfig;
@@ -247,70 +249,46 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
       }));
 
       try {
-        // Read file as base64
-        const reader = new FileReader();
-        const base64Promise = new Promise<string>((resolve, reject) => {
-          reader.onload = () => {
-            const result = reader.result as string;
-            resolve(result.split(',')[1]); // Remove data:image/... prefix
-          };
-          reader.onerror = reject;
-        });
-        reader.readAsDataURL(file);
-        const base64 = await base64Promise;
+        // Compress + decode (EXIF-safe). Reduces 3-7MB phone photos to ~250KB JPEG.
+        const compressed = await compressImage(file);
+        console.log(`[KYC] ${type}: ${(compressed.sizeBefore/1024/1024).toFixed(1)}MB → ${(compressed.sizeAfter/1024).toFixed(0)}KB`);
+        const base64 = compressed.base64;
 
         setUploads((prev) => ({
           ...prev,
           [type]: { ...prev[type], progress: 50 },
         }));
 
-        // For selfie, perform face matching with ID document
+        // For selfie, perform face matching with ID document via shared util
         if (type === 'selfie' && config.selfieRequired) {
           const idDoc = getIDDocument();
           if (idDoc?.base64) {
-            try {
-              const response = await fetch('/api/kyc/validate', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  mode: 'single',
-                  documentType: 'selfie',
-                  imageBase64: base64,
-                  mimeType: file.type,
-                  referenceImageBase64: idDoc.base64,
-                  referenceMimeType: idDoc.mimeType || 'image/jpeg',
-                }),
+            const result = await runFaceMatch({
+              selfieBase64: base64,
+              selfieMimeType: compressed.mimeType,
+              referenceBase64: idDoc.base64,
+              referenceMimeType: idDoc.mimeType || 'image/jpeg',
+            });
+
+            if (result.ok) {
+              setFaceMatchResult({
+                matched: result.matched,
+                confidence: result.faceMatchConfidence / 100,
               });
 
-              if (response.ok) {
-                const data = await response.json();
-                const validation = data.data?.validation;
-                if (data.success && validation?.extractedData?.faceMatch !== undefined) {
-                  const matched = validation.extractedData.faceMatch === true;
-                  const confidenceRaw = validation.extractedData.faceMatchConfidence || 0;
-                  const validationConfidence = validation.confidence || 0;
-
-                  setFaceMatchResult({
-                    matched,
-                    confidence: confidenceRaw / 100,
-                  });
-
-                  // Persist KYC validation results to wizard state
-                  const existingValidation = personalKyc?.kycValidation || {};
-                  const updatedValidation: KYCValidationResults = {
-                    ...existingValidation,
-                    selfie: {
-                      valid: matched && validationConfidence >= 50,
-                      confidence: validationConfidence,
-                      faceMatch: matched,
-                      faceMatchConfidence: confidenceRaw,
-                    },
-                  };
-                  updatePersonalKyc({ kycValidation: updatedValidation });
-                }
-              }
-            } catch {
-              console.log('Face matching skipped');
+              const existingValidation = personalKyc?.kycValidation || {};
+              const updatedValidation: KYCValidationResults = {
+                ...existingValidation,
+                selfie: {
+                  valid: result.valid,
+                  confidence: result.validationConfidence,
+                  faceMatch: result.matched,
+                  faceMatchConfidence: result.faceMatchConfidence,
+                },
+              };
+              updatePersonalKyc({ kycValidation: updatedValidation });
+            } else {
+              console.warn('Face matching skipped:', result.error);
             }
           }
         }
@@ -325,8 +303,8 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
           id: crypto.randomUUID(),
           type: type,
           fileName: file.name,
-          fileSize: file.size,
-          mimeType: file.type,
+          fileSize: compressed.sizeAfter,
+          mimeType: compressed.mimeType,
           uploadedAt: new Date().toISOString(),
           base64,
         };

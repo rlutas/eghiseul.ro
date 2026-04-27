@@ -109,11 +109,15 @@ export function sanitizeMetadata(data: Record<string, unknown>): Record<string, 
   const sanitized: Record<string, unknown> = {};
 
   for (const [key, value] of Object.entries(data)) {
-    // Skip sensitive fields
+    // Skip sensitive fields. Comparison list MUST be all-lowercase because
+    // key is normalized via toLowerCase() before lookup — a mixed-case entry
+    // here silently fails to match. (Bug found via test 2026-04-27: prior
+    // 'imageBase64' entry never matched 'imagebase64', leaving raw base64
+    // images in audit logs.)
     if ([
       'cnp', 'ci_series', 'ci_number', 'first_name', 'last_name',
       'address', 'phone', 'email', 'birth_date', 'birth_place',
-      'imageBase64', 'image', 'signature', 'password'
+      'imagebase64', 'image', 'signature', 'password'
     ].includes(key.toLowerCase())) {
       sanitized[key] = '[REDACTED]';
       continue;

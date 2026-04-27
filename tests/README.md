@@ -1,275 +1,204 @@
-# Tests - eGhiseul.ro
+# Tests — eGhiseul.ro
 
-Acest director conține testele E2E (End-to-End) pentru platforma eGhiseul.ro.
+Comprehensive test infrastructure: unit, integration, E2E, and smoke tests.
+Goal: every behavior change has a test that fails first, then passes once shipped.
 
-## Quick Start
-
-```bash
-# Instalare dependențe
-npm install
-
-# Rulare toate testele (doar Chromium)
-npx playwright test --project=chromium
-
-# Rulare teste specifice
-npx playwright test e2e/homepage.spec.ts --project=chromium
-npx playwright test e2e/api/ --project=chromium
-
-# Rulare cu UI interactiv
-npx playwright test --ui
-
-# Vezi raportul HTML
-npx playwright show-report
-```
-
-## Structura Teste
+## Layout
 
 ```
 tests/
-├── e2e/
+├── unit/                                          245 unit tests, ~900ms
 │   ├── api/
-│   │   └── services-api.spec.ts    # Teste API endpoints
-│   ├── auth/
-│   │   ├── login.spec.ts           # Teste pagina login
-│   │   ├── register.spec.ts        # Teste pagina înregistrare
-│   │   └── forgot-password.spec.ts # Teste resetare parolă
-│   ├── orders/
-│   │   ├── wizard.spec.ts          # Teste wizard comandă
-│   │   └── full-order-flow.spec.ts # ✨ NEW: E2E complet cazier judiciar
-│   ├── services/
-│   │   └── service-detail.spec.ts  # Teste pagini servicii
-│   └── homepage.spec.ts            # Teste homepage
-├── screenshots/                     # Screenshots manuale
-├── docs/
-│   └── VISUAL_TEST_REPORT.md       # Raport testare vizuală
-├── playwright.config.ts            # Configurare Playwright
-├── package.json
-└── README.md
+│   │   ├── orders-confirm-payment.test.ts         (11) /api/orders/[id]/confirm-payment
+│   │   └── webhooks-stripe.test.ts                (8)  /api/webhooks/stripe security
+│   └── lib/
+│       ├── admin/permissions.test.ts              (37) RBAC role + JSONB + implied
+│       ├── delivery-calculator.test.ts            (43) holidays, noon cutoff, courier matrix
+│       ├── images/compress.test.ts                (9)  HEIC reject + compressedToFile
+│       ├── kyc/face-match.test.ts                 (10) runFaceMatch + fetchImageAsBase64
+│       ├── security/audit-logger.test.ts          (32) GDPR PII redaction + DB persistence
+│       ├── security/rate-limiter.test.ts          (14) windowing + IP extraction
+│       ├── services/kyc-validation.test.ts        (13) Gemini orchestration (CIFront/Back/Selfie)
+│       ├── stripe.test.ts                         (18) payment intent + customer + CNP masking
+│       └── validations/cnp.test.ts                (50) checksum + gender×century + edge dates
+├── integration/                                   Real DB/API/Gemini, opt-in via RUN_INTEGRATION=1
+│   ├── kyc-face-match.test.mjs                    (3) end-to-end Gemini face match
+│   └── order-submit.test.mjs                      (6) draft → patch → submit → DB invariants + audit trail
+├── e2e/                                           Playwright browser automation — separate runner
+│   ├── auth/, smoke/, wizard/, orders/, services/, api/
+└── reports/                                       Output (JUnit XML, HTML, screenshots) — gitignored
 ```
 
----
+Plus `scripts/api-smoke-test.mjs` — standalone HTTP smoke harness with summary table (~17 endpoints).
 
-## 🧪 Testare Manuală Completă (2026-01-07)
+## Quick reference
 
-### Test 1: End-to-End Wizard (fără document real)
+| Command | Runs | Speed | Needs |
+|---------|------|-------|-------|
+| `npm test` | All 245 unit tests | ~900ms | nothing |
+| `npm run test:watch` | Unit tests in watch mode | live | nothing |
+| `npm run test:ui` | Vitest UI dashboard | live | nothing |
+| `npm run test:unit` | Just `tests/unit/**` | ~900ms | nothing |
+| `npm run test:integration` | `tests/integration/**` (real Gemini, DB) | 20-60s | dev server on :3000, GEMINI key |
+| `npm run test:smoke` | `scripts/api-smoke-test.mjs` | ~10s | dev server on :3000 |
+| `npm run test:e2e` | Playwright (multi-browser) | 1-5min | dev server (auto-starts) |
+| `npm run test:all` | unit + smoke | ~15s | dev server on :3000 |
 
-**Data:** 2026-01-07 (dimineața)
-**Order Code:** `ORD-20260107-D7NYZ`
-**Email Test:** `test.complet@eghiseul.ro`
+## Adding a test (TDD discipline)
 
-| Step | Nume | Status | Observații |
-|------|------|--------|------------|
-| 1 | Date Contact | ✅ PASS | Email + telefon validate |
-| 2 | Tip Client | ✅ PASS | PF selectat, single save verificat |
-| 3 | Date Personale | ✅ PASS | CNP valid, adresă completă (config modificat) |
-| 4 | Opțiuni | ✅ PASS | Skip opțional funcționează |
-| 5 | Semnătură | ✅ PASS | Canvas + termeni |
-| 6 | Livrare | ✅ PASS | Email (PDF) selectat |
-| 7 | Finalizare | ✅ PASS | Review + plată simulată |
+1. **Write the failing test first.** Don't write code, then test — that proves nothing.
+2. **Run it.** It must fail because the code doesn't exist yet (or fails for the expected reason).
+3. **Write the minimum code** to make it pass.
+4. **Refactor** with confidence — the test catches regressions.
 
-### Test 2: OCR cu Document Real + Creare Cont ✨ NEW
+Example for a new lib helper:
 
-**Data:** 2026-01-07 (după-amiaza)
-**Order Code:** `ORD-20260107-D7NYZ` (refolosit)
-**Document:** Carte de identitate reală
+```ts
+// tests/unit/lib/foo/bar.test.ts
+import { describe, expect, it } from 'vitest';
+import { bar } from '@/lib/foo/bar';
 
-| Componentă | Status | Detalii |
-|------------|--------|---------|
-| **OCR Extraction** | ✅ PERFECT | Date extrase 100% corect din CI real |
-| **Auto-fill Formular** | ✅ PASS | Toate câmpurile populate automat |
-| **County Mapping** | ✅ PASS | `SM` → `Satu Mare` corect |
-| **Address Parsing** | ✅ PASS | Stradă, nr, ap separate corect |
-| **Selfie Upload** | ✅ PASS | KYC complet |
-| **Account Creation** | ✅ PASS | Cont creat cu succes |
-| **Auto-Login** | ⚠️ PARTIAL | Necesită confirmare email (Supabase setting) |
-
-**Date Extrase din CI:**
-```
-CNP: 2920220303478 ✅ valid
-Serie/Nr: SM 833828
-Nume: TARȚA ANA-GABRIELA
-Data nașterii: 1992-02-20
-Locul nașterii: Jud.SM Orș.Negrești-Oaș
-Valabil până: 2031-08-03
-Județ: Satu Mare
-Localitate: Satu Mare
-Adresă: Pța. Jean Calvin nr.1 ap.28
+describe('bar', () => {
+  it('returns frob when given baz', () => {
+    expect(bar('baz')).toBe('frob');
+  });
+});
 ```
 
-**Screenshot:** `28-ocr-success-real-id.png`, `29-order-complete-account-created.png`
-
-### Bug-uri Rezolvate în Această Sesiune
-
-| Bug | Descriere | Fix |
-|-----|-----------|-----|
-| ~~Multiple saves Step 2~~ | La click "Continuă" se salvau 3-4 request-uri | Fixed cu useRef pattern pentru debounce |
-| ~~URL fără order ID~~ | URL nu includea order ID pentru conversion tracking | Fixed - acum `?step=X&order=ORD-XXX` |
-| ~~Auto-auth după creare cont~~ | După creare cont din order, utilizatorul nu era autentificat | Fixed - refresh auth state |
-
-### Funcționalități Testate OK
-
-- ✅ URL tracking cu step și order ID
-- ✅ Order ID display în header
-- ✅ Auto-save indicator ("Salvat acum X sec")
-- ✅ Save Modal pentru guest users
-- ✅ Order Status Page (`/comanda/status`)
-- ✅ Lookup comandă cu cod + email
-- ✅ Error handling pentru email greșit
-- ✅ **OCR cu document real** (CI românesc)
-- ✅ **Auto-fill din OCR** (toate câmpurile)
-- ✅ **County/Locality mapping** (SM → Satu Mare)
-- ✅ **Creare cont din comandă** (register-from-order API)
-
----
-
-## ⚠️ Probleme Cunoscute
-
-### ~~1. OCR Document Upload (Step 3)~~ ✅ REZOLVAT
-- **Status:** ✅ TESTAT CU SUCCES cu document real
-- **Rezultat:** OCR funcționează perfect, extrage toate datele din CI
-
-### 2. Auto-Login După Creare Cont
-- **Problema:** Utilizatorul nu este logat automat după crearea contului
-- **Cauza:** Supabase are **email confirmation enabled**
-- **Impact:** Utilizatorul trebuie să confirme email-ul înainte de login
-- **Soluție:** Dezactivează email confirmation în Supabase pentru auto-login, sau păstrează pentru securitate
-
-### 3. Stripe Payment (Step 7)
-- **Problema:** Payment API returnează 401 (Stripe nu e configurat local)
-- **Impact:** Plata nu se procesează real
-- **Observație:** Codul are fallback pentru testing care simulează succes
-- **Pentru producție:** Configurează Stripe keys în `.env.local`
-
-### 3. Selectori Playwright
-- **Problema:** Unele teste automate eșuează din cauza selectorilor
-- **Impact:** 31% din testele automate fail
-- **Cauză:** DOM s-a schimbat, selectori nu mai corespund
-- **Fix necesar:** Update selectori în spec files
-
----
-
-## 🔮 Teste Viitoare Recomandate
-
-### Priority 1 - Critice
-- [x] ~~Test cu document ID real (poză CI)~~ ✅ DONE (2026-01-07)
-- [ ] Test plată Stripe (mod test)
-- [x] ~~Test creare cont din order (register-from-order API)~~ ✅ DONE (2026-01-07)
-- [ ] Test restaurare comandă din localStorage
-
-### Priority 2 - Importante
-- [ ] Test Persoană Juridică (PJ flow)
-- [ ] Test opțiuni suplimentare (urgență, traducere)
-- [ ] Test livrare curier/poștă
-- [ ] Test validation errors (CNP invalid, email invalid)
-
-### Priority 3 - Nice to Have
-- [ ] Test responsive (mobile view)
-- [ ] Test multiple browsers (Firefox, Safari)
-- [ ] Performance testing (load time)
-- [ ] Accessibility testing
-
----
-
-## Rezultate Teste Automate
-
-| Categorie | Trecut | Total | Status |
-|-----------|--------|-------|--------|
-| Homepage | 13 | 13 | ✅ 100% |
-| API | 8 | 8 | ✅ 100% |
-| Login | 10 | 10 | ✅ 100% |
-| Register | 5 | 9 | ⚠️ 56% |
-| Forgot Password | 4 | 7 | ⚠️ 57% |
-| Services | 10 | 12 | ⚠️ 83% |
-| Wizard | 7 | 24 | ⚠️ 29% |
-| **Total** | **57** | **83** | **69%** |
-
-> **Notă**: Multe teste din categoriile cu procent mai mic eșuează din cauza selectorilor care nu se potrivesc exact cu DOM-ul actual, nu din cauza bug-urilor în aplicație.
-
-## Teste API
-
-Endpoint-urile testate:
-
-| Endpoint | Metodă | Test |
-|----------|--------|------|
-| `/api/services` | GET | ✅ Lista servicii |
-| `/api/services/[slug]` | GET | ✅ Detalii serviciu |
-| `/api/services/[slug]` | GET | ✅ 404 pentru slug invalid |
-| `/api/ocr/extract` | GET | ✅ Health check |
-| `/api/kyc/validate` | GET | ✅ Health check |
-| `/api/orders/draft` | POST | ✅ Creare draft |
-| `/api/orders/draft` | GET | ✅ Necesită autentificare |
-| `/api/orders/status` | GET | ✅ Public (cod + email) |
-| `/api/user/prefill-data` | GET | ✅ Necesită autentificare |
-
-## Wizard Steps Testate
-
-| Step | Nume | Status |
-|------|------|--------|
-| 1 | Date Contact | ✅ Testat |
-| 2 | Tip Client | ✅ Testat |
-| 3 | Date Personale | ✅ Testat (necesită upload document) |
-| 4 | Opțiuni | ✅ Testat |
-| 5 | Documente KYC | ✅ Testat (necesită selfie) |
-| 6 | Semnătură | ✅ Testat |
-| 7 | Livrare | ✅ Testat |
-| 8 | Finalizare | ✅ Testat |
-
-## Pagini Noi
-
-| Pagină | URL | Descriere |
-|--------|-----|-----------|
-| Order Status | `/comanda/status` | Verificare status comandă fără cont (cod + email) |
-
-## CNP Test Valid
-
-Pentru testarea validării CNP, folosește:
-
-```
-CNP: 1850101400017
-- Bărbat (1)
-- Născut: 01.01.1985
-- Județul: București (40)
-- Cifra de control: 7 (validă)
-```
-
-## Configurare
-
-### playwright.config.ts
-
-- **baseURL**: `http://localhost:3000`
-- **Browsere**: Chromium, Firefox, WebKit
-- **Timeout**: 30 secunde per test
-- **Retries**: 0 în development, 2 în CI
-- **Screenshots**: Doar la eșec
-
-### Cerințe
-
-- Node.js 18+
-- Server de development pornit (`npm run dev` în root)
-- Playwright browsers instalate (`npx playwright install`)
-
-## Debugging
+Run only that file while iterating:
 
 ```bash
-# Mod headed (vezi browser-ul)
-npx playwright test --headed
-
-# Pas cu pas
-npx playwright test --debug
-
-# Filtrare după nume test
-npx playwright test -g "should display"
-
-# Un singur fișier
-npx playwright test e2e/homepage.spec.ts
+npx vitest tests/unit/lib/foo/bar.test.ts
 ```
 
-## Screenshots
+## Test categories
 
-Screenshots-urile de la testarea manuală sunt în:
-- `tests/screenshots/` - Screenshots locale
-- `.playwright-mcp/` - Screenshots din Playwright MCP
+### Unit (`tests/unit/`) — fast, isolated
 
-## Raport Complet
+- No network, no DB, no real APIs
+- Mock external dependencies with `vi.stubGlobal('fetch', vi.fn())` etc.
+- Browser APIs (DOM, canvas) need `// @vitest-environment jsdom` at top of file
+- One assertion per behavior, descriptive names ("returns X when Y"), avoid "and"
 
-Vezi [docs/VISUAL_TEST_REPORT.md](./docs/VISUAL_TEST_REPORT.md) pentru raportul complet de testare vizuală cu toate screenshots-urile și verificările.
+### Integration (`tests/integration/`) — real services, opt-in
+
+- Hits real `/api/*` endpoints on `http://localhost:3000` (override via `TEST_BASE_URL`)
+- May call real Gemini, real Stripe test mode, real Supabase
+- Skipped by default (`describe.runIf(process.env.RUN_INTEGRATION === '1')`)
+- Run before releases or when touching auth/payment/KYC code
+
+For KYC face-match testing, image paths default to operator's local Downloads;
+override per environment with `KYC_TEST_CI`, `KYC_TEST_SELFIE_OK`, `KYC_TEST_SELFIE_WRONG`.
+
+### E2E (`tests/e2e/`) — Playwright
+
+- Real browser, real UI, real wizard flow
+- Configured for Chromium + Firefox + WebKit + Mobile Chrome + Mobile Safari
+- Auto-starts dev server (`webServer` block in `playwright.config.ts`)
+- Use for: page renders, navigation, form submission, click paths
+- Don't use for: pure logic (use unit), slow data validation (use integration)
+
+### Smoke (`scripts/api-smoke-test.mjs`) — production health check
+
+- Hits ~17 critical endpoints with expected status checks
+- Designed to run against staging or production with `BASE_URL=https://...`
+- Exit code 0 = all green, 1 = any failure
+
+## Bug fix workflow
+
+1. **Reproduce in a test first.** Write the smallest failing test that demonstrates the bug.
+   - Pure logic bug → unit test
+   - API behavior bug → integration test
+   - User-flow bug → E2E test
+2. Confirm it fails for the *right reason* (the bug, not a typo).
+3. Fix the code.
+4. Confirm the test passes.
+5. Run the relevant suite (`npm test`) to confirm no regression.
+6. Commit test + fix together.
+
+The test stays forever as a regression guard.
+
+## Environment variables
+
+| Var | Purpose | Default |
+|-----|---------|---------|
+| `RUN_INTEGRATION` | Enable integration tests (real APIs) | unset |
+| `TEST_BASE_URL` | Base URL for integration/smoke targets | `http://localhost:3000` |
+| `BASE_URL` | (Playwright only) base URL for E2E | `http://localhost:3000` |
+| `CI` | Sets retries=2, workers=1, JUnit reporter | unset |
+| `KYC_TEST_CI` | Path to test CI image | local Downloads |
+| `KYC_TEST_SELFIE_OK` | Path to matching selfie | local Downloads |
+| `KYC_TEST_SELFIE_WRONG` | Path to mismatched selfie | local Downloads |
+
+## What's covered today (2026-04-27)
+
+### 🔴 Security (well-covered)
+| Area | Unit | Integration | E2E | Smoke |
+|------|:----:|:-----------:|:---:|:-----:|
+| RBAC permissions | ✅ 37 tests | — | — | ✅ admin guard |
+| CNP validation (checksum, dates, county) | ✅ 50 tests | — | — | — |
+| Audit logging (GDPR PII redaction) | ✅ 32 tests | — | — | — |
+| Rate limiting | ✅ 14 tests | — | — | — |
+
+### 💳 Payment (well-covered)
+| Area | Unit | Integration | E2E | Smoke |
+|------|:----:|:-----------:|:---:|:-----:|
+| Stripe payment intent (cents, customer, CNP mask) | ✅ 18 tests | — | — | — |
+| Stripe webhook signature (rejection paths) | ✅ 8 tests | — | — | ✅ unsigned 400 |
+| Confirm-payment fallback | ✅ 11 tests | — | — | — |
+
+### 📦 Business critical
+| Area | Unit | Integration | E2E | Smoke |
+|------|:----:|:-----------:|:---:|:-----:|
+| Delivery calculator (holidays, cutoff, courier matrix) | ✅ 43 tests | — | — | — |
+| KYC face match orchestration | ✅ 10 tests | ✅ 2 (real Gemini) | — | — |
+| KYC validation services (CI/selfie via Gemini) | ✅ 13 tests | — | — | — |
+| Image compression | ✅ 9 tests | — | — | — |
+
+### 🌐 UI / Routes
+| Area | Unit | Integration | E2E | Smoke |
+|------|:----:|:-----------:|:---:|:-----:|
+| Auth flows (login/register/forgot) | — | — | ✅ 3 specs | — |
+| Wizard PF flow + UI elements | — | — | ✅ 2 specs | — |
+| Public/services routes | — | — | ✅ 5 specs | ✅ harness |
+| Order flow E2E | — | — | ✅ 2 specs | — |
+| OCR extraction | — | — | — | ✅ |
+
+### ⚪ Gaps (not yet covered — TODO future rounds)
+| Area | Why important | Priority |
+|------|---------------|----------|
+| `documents/generator.ts` (DOCX templating) | Risk: blank/malformed contracts sent to clients | 🟠 HIGH |
+| `services/courier/sameday.ts` + `fancourier.ts` | API integration, real shipment errors | 🟠 HIGH |
+| `lib/oblio/invoice.ts` | Invoice creation on payment success | 🟠 HIGH |
+| Order submit `/api/orders/[id]/submit` (full integration) | Auto-doc generation + audit + email | 🟠 HIGH |
+| Admin order processing E2E | 32 admin endpoints, status transitions | 🟡 MEDIUM |
+| User CRUD (addresses, billing-profiles) | Data integrity | 🟡 MEDIUM |
+| `services/infocui.ts` (CUI ANAF validation) | Company orders | 🟡 MEDIUM |
+| Coupon validation (extend script to test) | Already covered via `scripts/test-coupons.mjs` | 🟢 LOW |
+| Cetățean străin flow (extend script to test) | Already covered via `scripts/test-cetatean-strain.mjs` | 🟢 LOW |
+
+### 🐛 Bugs found by these tests (and fixed)
+1. **`audit-logger.ts:115` PII redaction case bug** — list contained `'imageBase64'` (mixed case) but comparison used `key.toLowerCase()`, so `imageBase64` field was never redacted. Raw base64 of CI/selfie was leaking into audit logs. Fixed via lowercase entry. **Critical for GDPR.**
+2. **`order_history.event_type` CHECK constraint missing 6 values** — caught by `tests/integration/order-submit.test.mjs`. The submit endpoint and 5 other endpoints insert audit events (`order_submitted`, `payment_rejected`, `payment_verified`, `tracking_update`, `payment_proof_submitted`, `document_generation_failed`) that violate the existing CHECK constraint. The INSERTs are wrapped in try/catch in callers, so the constraint violations did not surface as user-visible errors but **silently truncated the audit trail** (consent snapshot, IP, document hash for submitted orders; payment verification decisions; tracking transitions). Fixed via migration `035_order_history_event_types.sql`. **Critical for legal/GDPR compliance.**
+
+## Migrating existing scripts to proper tests
+
+`scripts/test-*.mjs` were ad-hoc verification harnesses. Going forward, new
+verification belongs in `tests/integration/` so it runs via `npm run test:integration`
+in CI. Legacy scripts kept for one-off CLI debugging.
+
+## Pre-commit / CI (future)
+
+Recommended GitHub Actions:
+
+```yaml
+# .github/workflows/test.yml (NOT YET CREATED)
+- name: Lint
+  run: npm run lint
+- name: Unit tests
+  run: npm test
+- name: Build
+  run: npm run build
+```
+
+Integration + E2E reserved for nightly or pre-release runs (slow + need secrets).

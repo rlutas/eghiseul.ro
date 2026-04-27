@@ -43,6 +43,7 @@ import { APOSTILA_COUNTRIES } from '@/config/apostila-countries';
 import { validateCNP, extractBirthDateFromCNP } from '@/lib/validations/cnp';
 import { cn } from '@/lib/utils';
 import { COUNTY_NAMES, getLocalitiesForCounty, getCountyName, findCounty } from '@/lib/data/romania-counties';
+import { compressImage } from '@/lib/images/compress';
 
 // Minimal ID Card Front Illustration (Gold theme)
 function IdCardFrontIllustration({ className }: { className?: string }) {
@@ -260,19 +261,14 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
     setState(prev => ({ ...prev, scanning: true, progress: 0, error: null }));
 
     try {
-      // Create preview
-      const reader = new FileReader();
-      const previewPromise = new Promise<string>((resolve, reject) => {
-        reader.onload = () => resolve(reader.result as string);
-        reader.onerror = reject;
-      });
-      reader.readAsDataURL(file);
-      const preview = await previewPromise;
+      // Compress + decode (EXIF-safe). Reduces 3-7MB phone photos to ~250KB JPEG.
+      const compressed = await compressImage(file);
+      console.log(`[KYC] ${type}: ${(compressed.sizeBefore/1024/1024).toFixed(1)}MB → ${(compressed.sizeAfter/1024).toFixed(0)}KB`);
 
+      const preview = compressed.dataUrl;
       setState(prev => ({ ...prev, preview, progress: 20 }));
 
-      // Extract base64
-      const base64 = preview.split(',')[1];
+      const base64 = compressed.base64;
       setState(prev => ({ ...prev, progress: 40 }));
 
       // Call OCR API
@@ -283,7 +279,7 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
         body: JSON.stringify({
           mode: 'specific',
           imageBase64: base64,
-          mimeType: file.type,
+          mimeType: compressed.mimeType,
           documentType: docType,
         }),
       });
@@ -331,8 +327,8 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
               id: crypto.randomUUID(),
               type: ocr.documentType || type,
               fileName: file.name,
-              fileSize: file.size,
-              mimeType: file.type,
+              fileSize: compressed.sizeAfter,
+              mimeType: compressed.mimeType,
               uploadedAt: new Date().toISOString(),
               base64,
             },

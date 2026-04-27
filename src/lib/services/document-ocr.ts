@@ -11,7 +11,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 
 // Initialize Gemini AI with the 2.5 Flash model for OCR
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY || '');
-const GEMINI_MODEL = 'gemini-2.5-flash';
+const GEMINI_MODEL = 'gemini-2.5-flash-lite';
 
 export type DocumentType = 'ci_front' | 'ci_back' | 'passport' | 'unknown';
 

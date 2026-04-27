@@ -26,6 +26,7 @@ import {
   Info,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { compressImage } from '@/lib/images/compress';
 
 // Types
 export interface ExtractedAddress {
@@ -241,19 +242,14 @@ export default function IdScanner({
     setState(prev => ({ ...prev, scanning: true, progress: 0, error: null }));
 
     try {
-      // Create preview
-      const reader = new FileReader();
-      const previewPromise = new Promise<string>((resolve, reject) => {
-        reader.onload = () => resolve(reader.result as string);
-        reader.onerror = reject;
-      });
-      reader.readAsDataURL(file);
-      const preview = await previewPromise;
+      // Compress + decode (EXIF-safe). Reduces 3-7MB phone photos to ~250KB JPEG.
+      const compressed = await compressImage(file);
+      console.log(`[IdScanner] ${type}: ${(compressed.sizeBefore/1024/1024).toFixed(1)}MB → ${(compressed.sizeAfter/1024).toFixed(0)}KB`);
 
+      const preview = compressed.dataUrl;
       setState(prev => ({ ...prev, preview, progress: 20 }));
 
-      // Extract base64
-      const base64 = preview.split(',')[1];
+      const base64 = compressed.base64;
       setState(prev => ({ ...prev, progress: 40 }));
 
       // Call OCR API
@@ -264,7 +260,7 @@ export default function IdScanner({
         body: JSON.stringify({
           mode: 'specific',
           imageBase64: base64,
-          mimeType: file.type,
+          mimeType: compressed.mimeType,
           documentType: docType,
         }),
       });
@@ -291,8 +287,8 @@ export default function IdScanner({
           id: crypto.randomUUID(),
           type: ocr.documentType || type,
           fileName: file.name,
-          fileSize: file.size,
-          mimeType: file.type,
+          fileSize: compressed.sizeAfter,
+          mimeType: compressed.mimeType,
           uploadedAt: new Date().toISOString(),
           base64,
         };
@@ -378,27 +374,22 @@ export default function IdScanner({
     setSelfieScan(prev => ({ ...prev, scanning: true, progress: 0, error: null }));
 
     try {
-      // Create preview
-      const reader = new FileReader();
-      const previewPromise = new Promise<string>((resolve, reject) => {
-        reader.onload = () => resolve(reader.result as string);
-        reader.onerror = reject;
-      });
-      reader.readAsDataURL(file);
-      const preview = await previewPromise;
+      // Compress + decode (EXIF-safe). Reduces 3-7MB phone photos to ~250KB JPEG.
+      const compressed = await compressImage(file);
+      console.log(`[IdScanner] selfie: ${(compressed.sizeBefore/1024/1024).toFixed(1)}MB → ${(compressed.sizeAfter/1024).toFixed(0)}KB`);
 
+      const preview = compressed.dataUrl;
       setSelfieScan(prev => ({ ...prev, preview, progress: 50 }));
 
-      // Extract base64
-      const base64 = preview.split(',')[1];
+      const base64 = compressed.base64;
 
       // Create new document entry for selfie
       const newDoc: UploadedDocument = {
         id: crypto.randomUUID(),
         type: 'selfie_with_id',
         fileName: file.name,
-        fileSize: file.size,
-        mimeType: file.type,
+        fileSize: compressed.sizeAfter,
+        mimeType: compressed.mimeType,
         uploadedAt: new Date().toISOString(),
         base64,
       };

@@ -1,8 +1,58 @@
 # eGhiseul.ro - Status Curent
 
-**Data:** 2026-02-19
-**Sprint-uri active:** Sprint 4 (98%) / Sprint 5 (98%)
-**Sprint urmator:** Sprint 6 (Notifications & Polish)
+**Data:** 2026-04-27 (ultima update; doc original 2026-02-19)
+**Sprint-uri completate:** Sprint 0-6 ✅ (toate live pe main)
+**Aliniere cu cazierjudiciaronline.com:** complet (11 faze A-L, vezi `docs/IMPLEMENTATION_COMPLETE_2026-04-16.md`)
+**Performance + image compression:** 2026-04-27 ✅ (vezi `docs/session-logs/2026-04-27-performance-image-compression.md`)
+**Sprint pendinte:** Notifications efective (email Resend, SMS SMSLink, Oblio invoicing — toate cu credentiale neconfig)
+
+---
+
+## Schimbări recente (2026-04-27)
+
+### Performance dev mode (10x recovery)
+- `package.json` — `dev` script forțează `next dev --turbopack` (Next.js 16 default era webpack când nu e specificat explicit)
+- `src/app/api/admin/orders/list/route.ts` — `count: 'estimated'` + exclude `status='draft'` din default `'all'` (90 drafts în DB cu unul de 4.8MB customer_data — toate erau încărcate la fiecare admin/orders)
+- Rezultat live: PATCH /api/orders/draft 58s → 200-2500ms; admin/orders/list 25-39s → ~3-5s; navigare wizard 1-3s → 200-450ms
+
+### Gemini model: hibrid OCR vs KYC (decizie după testare cu poze reale)
+- `src/lib/services/document-ocr.ts:14` → `gemini-2.5-flash-lite` (OCR rapid, 1.9-3.5s, confidence 98%)
+- `src/lib/services/kyc-validation.ts:13` → `gemini-2.5-flash` (face match precis, 6-10s, confidence 92-98%)
+- **De ce nu lite și pe KYC:** test cu Stefania-Rodica selfie + CI propriu → flash-lite returna fals negativ („nu pot confirma cu certitudine"); flash returnează corect match=true 92%. Test cu Alexandra selfie + Stefania CI → ambele detectează corect mismatch, dar flash dă detalii și pe document type + name mismatch.
+- Test rerunnable via `scripts/test-kyc-face-match.mjs` (necesită 3 imagini reale + dev server pe :3000)
+
+### KYC face match — util reutilizabil + paritate wizard ↔ cont
+- NOU `src/lib/kyc/face-match.ts` — `runFaceMatch()` + `fetchImageAsBase64()` cu threshold standard `valid = matched && validationConfidence >= 50`
+- Wizard (`personal-kyc/KYCDocumentsStep.tsx`) folosește utilul; refactor a redus codul duplicat cu ~20 linii
+- **Cont (`account/KYCTab.tsx`) — gap închis:** anterior selfie se salva FĂRĂ face match („For selfie, just save without OCR"). Acum la selfie upload: cache CI front în-sesiune SAU fetch din S3 → `runFaceMatch()` → blochează cu mesaj UI dacă mismatch. Loophole-ul „CI cu A + selfie cu B" e închis.
+- Validat: ambele cazuri (match real + mismatch real) trec corect prin `scripts/test-kyc-face-match.mjs`
+- Componentă reutilizabilă pentru OCR ID scan: `src/components/shared/IdScanner.tsx` (folosită de ProfileTab cont, cu compresie deja integrată)
+
+### Image compression client-side
+- NOU: `src/lib/images/compress.ts` — util cu EXIF orientation (`createImageBitmap` cu `imageOrientation: 'from-image'`), OffscreenCanvas + canvas fallback, target 1600px / JPEG q=0.85
+- Aplicat în 4 componente customer-facing (6 puncte FileReader): `IdScanner.tsx`, `personal-kyc/PersonalDataStep.tsx`, `personal-kyc/KYCDocumentsStep.tsx`, `account/KYCTab.tsx`
+- KYCTab are fallback gracios la fișier brut dacă compresia eșuează (HEIC, browser vechi)
+- Verificat live: CI iPhone 5MB → 207KB pe S3 (95% reducere)
+- Fișiere LEGACY (`steps/personal-data-step.tsx`, `steps/kyc-step.tsx`) NEatinse — orfane, planificate pentru ștergere
+
+### Test infrastructure complet (TDD-ready, 245 unit tests + 8 integration live)
+- **Vitest 4** + `npm test`, `test:watch`, `test:ui`, `test:unit`, `test:integration`, `test:e2e`, `test:smoke`, `test:all`
+- **245 unit tests** acoperă: RBAC permissions (37), CNP validation (50), audit logger GDPR (32), rate limiter (14), Stripe payment intent (18), Stripe webhook security (8), confirm-payment (11), delivery calculator (43), KYC face match util (10), KYC validation services (13), image compression (9)
+- **8 integration tests** opt-in cu `RUN_INTEGRATION=1`: KYC face match real Gemini (3) + order submit pipeline real DB (6 — draft → patch → submit → audit trail)
+- **2 BUG-URI CRITICAL găsite prin TDD + fix-uite:**
+  1. `audit-logger.ts:115` — `imageBase64` field nu era redactat în logs (case bug). GDPR-critical, fix-uit cu comentariu istoric.
+  2. `order_history.event_type` CHECK constraint — 6 event_types folosite în cod (`order_submitted`, `payment_rejected`, `payment_verified`, `tracking_update`, `payment_proof_submitted`, `document_generation_failed`) erau rejected silent → audit trail trunchiat. Fix: `supabase/migrations/035_order_history_event_types.sql`. Critical pentru legal/audit.
+- **`.github/workflows/test.yml`** — CI pe push/PR (lint + tsc + 245 tests + build production), reports uploaded ca artifact
+- **`tests/README.md`** — guide TDD complet cu layout, quick reference, workflow bug fix, gaps prioritizate
+- Playwright E2E (13 specs existente) accesibile prin `npm run test:e2e`
+
+### Gap-uri vizibile pentru viitor (în `tests/README.md`)
+- 🟠 HIGH: `documents/generator.ts` (DOCX), `services/courier/{sameday,fancourier}.ts`, `lib/oblio/invoice.ts`, order submit integration
+- 🟡 MEDIUM: 32 admin endpoint-uri, user CRUD (addresses, billing-profiles), CUI validation
+- 🟢 LOW: coupons + cetățean străin (deja există ad-hoc scripts în `scripts/test-*.mjs`)
+
+### Bug NON-CRITICAL identificat (recomandare pentru viitor)
+- Success page după Stripe redirect poate primi 404 tranzitoriu de la `/api/orders/[id]` în dev mode (Supabase auth fetch flake), aruncă error înainte să ajungă la fallback `confirm-payment`. Pe local: `stripe listen --forward-to localhost:3000/api/webhooks/stripe` rezolvă problema (webhook-ul reală marchează order-ul paid imediat). Robusteață suplimentară: în `src/app/comanda/success/[orderId]/page.tsx:100-130` ar trebui apelat confirm-payment direct când `redirect_status='succeeded'`, indiferent dacă GET-ul a reușit.
 
 ---
 
