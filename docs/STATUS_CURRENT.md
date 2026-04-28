@@ -53,6 +53,18 @@
 - 🟡 MEDIUM: 32 admin endpoint-uri, user CRUD (addresses, billing-profiles), CUI validation
 - 🟢 LOW: coupons + cetățean străin (deja există ad-hoc scripts în `scripts/test-*.mjs`)
 
+### ⚠️ Security: rotire cheie Supabase pendentă (acțiune manuală)
+- 2026-04-28: GitHub Secret Scanning Alert #1 a detectat `SUPABASE_SERVICE_ROLE_KEY` hardcodată în `scripts/run-migration-021.ts` (commit `6b5d85b`, Feb 11). Fișierul a fost șters (commit `549912d`).
+- **TODO USER:** rotire cheie pe https://supabase.com/dashboard/project/llbwmitdrppomeptqlue/settings/api → Reset service_role key. Apoi update Vercel env vars + `.env.local` + restart dev. Apoi close GitHub alert #1.
+- Cheia veche rămâne în git history pentru totdeauna — DOAR rotirea o invalidează.
+- Scan complet codbase: niciun alt secret leaked detectat (Stripe, AWS, alte JWT-uri).
+
+### Next.js 16 — proxy.ts (era middleware.ts)
+- 2026-04-28 (commit `3eeeeae`): `src/middleware.ts` → `src/proxy.ts` per noua convenție Next.js 16.
+- Funcția redenumită: `middleware()` → `proxy()`. `config.matcher` neschimbat.
+- `@/lib/supabase/middleware.ts` (helper Supabase intern) rămâne neschimbat.
+- Dev server pornește acum fără warning de deprecation.
+
 ### Bug NON-CRITICAL identificat (recomandare pentru viitor)
 - Success page după Stripe redirect poate primi 404 tranzitoriu de la `/api/orders/[id]` în dev mode (Supabase auth fetch flake), aruncă error înainte să ajungă la fallback `confirm-payment`. Pe local: `stripe listen --forward-to localhost:3000/api/webhooks/stripe` rezolvă problema (webhook-ul reală marchează order-ul paid imediat). Robusteață suplimentară: în `src/app/comanda/success/[orderId]/page.tsx:100-130` ar trebui apelat confirm-payment direct când `redirect_status='succeeded'`, indiferent dacă GET-ul a reușit.
 

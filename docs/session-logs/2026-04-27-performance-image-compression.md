@@ -825,6 +825,103 @@ GitHub Actions v5 + Node 22 LTS + FORCE_JAVASCRIPT_ACTIONS_TO_NODE24=true
 
 ---
 
+## Etapa 16 — Security: leaked SUPABASE_SERVICE_ROLE_KEY (FĂCUT 2026-04-28)
+
+**Trigger:** GitHub Secret Scanning Alert #1 — userul a primit notificare că o cheie Supabase service_role era publică.
+
+**Cauză:** `scripts/run-migration-021.ts` (commit `6b5d85b`, 11 februarie) avea:
+
+```ts
+const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY ||
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9....';  // ← hardcoded fallback
+```
+
+Cheia fallback era de fapt cheia reală service_role (cu acces complet bypass-RLS la DB), commit-uită direct pe repo public. Live ~2.5 luni.
+
+**Investigație:**
+- Scan complet pe `eyJ.*\.eyJ.*` în `**/*.ts,*.mjs,*.js` → DOAR un fișier afectat
+- Scan pe `sk_live`, `sk_test`, `AKIA...` (Stripe + AWS) → niciun match
+- `scripts/run-migration-031..033.mjs` (untracked) → curate
+
+**Fix aplicat (commit `549912d`):**
+- `git rm scripts/run-migration-021.ts` — script obsolet (migration 021 deja aplicată; suntem la 035)
+- Commit message documentează clar follow-up-urile critice
+
+**Acțiuni follow-up critice (NU pot fi făcute din cod, transmise userului):**
+1. **Rotire cheie pe Supabase Dashboard** — `Settings → API → Reset service_role key`. Asta invalidează cheia veche imediat, indiferent că rămâne în git history.
+2. Update Vercel env vars (production + preview + development)
+3. Update `.env.local` cu noua cheie + restart `npm run dev`
+4. Închide GitHub alert #1 ca „Revoked"
+
+**Notă importantă:** ștergerea fișierului din working tree NU șterge cheia din git history. Singura soluție permanentă este rotirea cheii pe Supabase. Scrub-ul history (BFG / git filter-repo + force-push) e destructiv pentru main public, NEREcomandat odată ce cheia e rotită — devine inutil.
+
+---
+
+## Etapa 17 — Migrare middleware.ts → proxy.ts (Next.js 16) (FĂCUT 2026-04-28)
+
+**Trigger:** Dev server arăta avertisment la pornire:
+```
+⚠ The "middleware" file convention is deprecated. Please use "proxy" instead.
+```
+
+**Sursă oficială:** https://nextjs.org/docs/messages/middleware-to-proxy
+
+> Renaming clarifies that the feature acts as a network proxy at the edge, distinguishing it from Express-style middleware. Next.js wants to discourage overuse via the new name.
+
+**Schimbare aplicată (commit `3eeeeae`):**
+```bash
+git mv src/middleware.ts src/proxy.ts
+# History preserved (89% similarity)
+```
+
+```diff
+- export async function middleware(request: NextRequest) {
++ export async function proxy(request: NextRequest) {
+    return await updateSession(request)
+  }
+```
+
+`config.matcher` neschimbat — funcționează la fel.
+
+**Important:** `@/lib/supabase/middleware.ts` (helper Supabase intern, NU file convention Next.js) rămâne neschimbat — DOAR fișierul top-level `src/middleware.ts` era deprecat.
+
+**Verificat:**
+- `npx tsc --noEmit` → exit 0
+- `npm test` → 596/596 ✓
+- `npm run build` → output afișează `ƒ Proxy (Middleware)` (Next.js detectează noua convenție) și ZERO warnings deprecation
+- Auth/RBAC behavior identic — același `updateSession()` call
+
+---
+
+## Stare absolut finală 2026-04-28 (commit-uri push-uite în această sesiune)
+
+```
+b2c17fb  ci: add full env stub set for production build
+2bfa64f  chore(lint): clean up tech debt — 198 → 3 informational warnings
+516156d  ci: force Node 24 for all JavaScript actions
+243ee21  docs: comprehensive testing guide + final coverage audit
+549912d  security: remove obsolete migration-021 script with leaked SERVICE_ROLE_KEY
+3eeeeae  chore: migrate middleware.ts → proxy.ts (Next.js 16 convention)
+```
+
+**Stare cod:**
+- 596 unit + 8 integration + 13 E2E + 17 smoke teste, toate verzi
+- 0 erori TypeScript, 0 erori ESLint (3 informational React Compiler externe)
+- CI verde cu lint/tsc/tests/build BLOCKING pe push + PR
+- GitHub Actions v5, Node 22 LTS, FORCE_JAVASCRIPT_ACTIONS_TO_NODE24=true
+- Next.js 16 conventions: `proxy.ts` (era `middleware.ts`)
+
+**Stare security:**
+- ⚠️ Cheia Supabase service_role leaked în history (Feb 11) **AȘTEAPTĂ ROTIRE de către user pe Supabase Dashboard** — nu poate fi făcută din cod
+- Niciun alt secret detectat (Stripe, AWS, JWT-uri ad-hoc)
+
+**Documentație:**
+- `docs/testing/COMPREHENSIVE_GUIDE.md` (NOU, 345 linii)
+- `tests/README.md` actualizat cu starea finală
+- Acest log cu 17 etape complete
+
+---
+
 ## Următorii pași recomandați (NEFĂCUTE — separate)
 
 - **Cleanup drafts vechi:** există 90 drafts în DB. Migration `032_add_estimated_completion.sql` și logica GDPR cleanup (7 zile) ar trebui să le ardă, dar drafts > 7 zile încă există. Verifică `/api/admin/cleanup` cron.
