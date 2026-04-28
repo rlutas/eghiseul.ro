@@ -81,7 +81,7 @@ describe('GET /api/user/addresses', () => {
   });
 
   it('scopes query to the authenticated user_id and data_type=address', async () => {
-    let capturedFilters: { field: string; value: string }[] = [];
+    const capturedFilters: { field: string; value: string }[] = [];
 
     fromMock.mockReturnValue({
       select: vi.fn().mockReturnValue({
@@ -342,7 +342,7 @@ describe('DELETE /api/user/addresses/[id]', () => {
   });
 
   it('scopes DELETE by both id AND user_id (IDOR protection)', async () => {
-    let capturedFilters: { field: string; value: string }[] = [];
+    const capturedFilters: { field: string; value: string }[] = [];
 
     fromMock.mockReturnValue({
       delete: vi.fn().mockReturnValue({

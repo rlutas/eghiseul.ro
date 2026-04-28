@@ -117,7 +117,7 @@ describe('POST /api/cron/update-tracking — only queries active shipments', () 
   it('filters by tracking_number IS NOT NULL AND status IN active list', async () => {
     vi.stubEnv('CRON_SECRET', 'secret123');
 
-    let capturedFilter: string[] = [];
+    const capturedFilter: string[] = [];
     persistentFrom.mockReturnValue({
       select: vi.fn().mockReturnValue({
         not: vi.fn((field: string, op: string) => {

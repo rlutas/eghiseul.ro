@@ -255,7 +255,7 @@ describe('DELETE /api/user/billing-profiles/[id]', () => {
   });
 
   it('scopes DELETE by id AND user_id (IDOR protection)', async () => {
-    let capturedFilters: { field: string; value: string }[] = [];
+    const capturedFilters: { field: string; value: string }[] = [];
 
     fromMock.mockReturnValue({
       delete: vi.fn().mockReturnValue({
