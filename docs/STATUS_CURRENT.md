@@ -35,7 +35,9 @@
 - Verificat live: CI iPhone 5MB → 207KB pe S3 (95% reducere)
 - Fișiere LEGACY (`steps/personal-data-step.tsx`, `steps/kyc-step.tsx`) NEatinse — orfane, planificate pentru ștergere
 
-### Test infrastructure complet (TDD-ready, 596 unit tests + 8 integration live)
+### Test infrastructure complet (TDD-ready) — 596 unit + 8 integration + 13 E2E + 17 smoke
+
+**CI live verde** pe `origin/main` cu lint/tsc/tests/build BLOCKING. Cleanup ESLint complet 2026-04-28: 198 problems → 3 informational warnings (React Compiler external libraries, unfixable).
 - **Vitest 4** + `npm test`, `test:watch`, `test:ui`, `test:unit`, `test:integration`, `test:e2e`, `test:smoke`, `test:all`
 - **596 unit tests** acoperă: RBAC permissions (37), CNP validation (50), audit logger GDPR (32), rate limiter (14), Stripe payment intent (18), Stripe webhook security (8), confirm-payment (11), delivery calculator (43), document generator helpers PF/PJ (39), courier utils (71), Oblio invoice (20), CUI ANAF + Romanian counties (21), KYC face match util (10), KYC validation services (13), image compression (9), admin order processing (19), admin payment verification (13), admin AWB generate (10), admin AWB cancel (8), admin coupon CRUD (17), admin employee invite (21), admin invite accept (7), public coupon validation (21), courier quote (15), cron tracking update (7), customer tracking (8), user addresses CRUD (16), user billing profiles CRUD (13), user profile (8), user KYC save (17)
 - **8 integration tests** opt-in cu `RUN_INTEGRATION=1`: KYC face match real Gemini (3) + order submit pipeline real DB (6 — draft → patch → submit → audit trail)

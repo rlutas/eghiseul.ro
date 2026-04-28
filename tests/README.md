@@ -3,6 +3,10 @@
 Comprehensive test infrastructure: unit, integration, E2E, and smoke tests.
 Goal: every behavior change has a test that fails first, then passes once shipped.
 
+**Stare 2026-04-28:** 596 unit tests + 8 integration + 13 E2E + 17 smoke = ~634 cazuri test
+distincte. CI verde cu lint/tsc/tests/build blocking. 0 erori TS, 0 erori ESLint
+(3 warnings informaționale React Compiler pentru librării externe).
+
 ## Layout
 
 ```

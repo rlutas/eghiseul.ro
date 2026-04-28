@@ -200,7 +200,8 @@ docs/
 ├── legal/                       ← GDPR & Compliance
 │   └── compliance-research.md   ← Cercetare GDPR/ANSPDCP
 │
-├── testing/                     ← Test Plans
+├── testing/                     ← Test Plans + Guide
+│   ├── COMPREHENSIVE_GUIDE.md   ← ⭐ Ghid complet testare (Vitest + Playwright + smoke), TDD workflow, CI flow
 │   ├── TEST_PLAN.md
 │   └── MODULAR_VERIFICATION_TEST_PLAN.md
 │
