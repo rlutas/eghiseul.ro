@@ -1,4 +1,5 @@
 'use client';
+/* eslint-disable @next/next/no-img-element -- preview thumbnails use data URLs / dynamic S3 sources, Image component does not apply */
 
 import { useEffect, useState, useCallback } from 'react';
 import {

@@ -19,12 +19,12 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
-          node-version: 20
+          node-version: 22
           cache: 'npm'
 
       - name: Install dependencies
@@ -33,10 +33,9 @@ jobs:
         run: npm install --no-audit --no-fund
 
       - name: Lint
-        # Lint is informational while we burn down pre-existing tech debt
-        # (hundreds of `Unexpected any` errors throughout the codebase).
-        # Tests + tsc still BLOCK the build on any failure.
-        continue-on-error: true
+        # Tech debt cleaned up 2026-04-28: 198 problems → 3 informational
+        # warnings (React Compiler "incompatible library" notes for external
+        # deps, unfixable). Lint now blocks CI on any new error.
         run: npm run lint
 
       - name: Type check
@@ -49,7 +48,7 @@ jobs:
 
       - name: Upload test reports
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: test-reports
           path: tests/reports/
@@ -64,12 +63,12 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
-          node-version: 20
+          node-version: 22
           cache: 'npm'
 
       - name: Install dependencies

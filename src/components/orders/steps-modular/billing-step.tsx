@@ -105,6 +105,7 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
       personalKyc.address?.city,
       personalKyc.address?.county,
     ].filter(Boolean).join(', '),
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   } : undefined, [
     personalKyc?.firstName, personalKyc?.lastName, personalKyc?.cnp,
     personalKyc?.address?.street, personalKyc?.address?.number,
@@ -274,6 +275,7 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
         setCuiError(null);
       }
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [billing, prefillFromId, companyKyc, updateBilling]);
 
   // Update field

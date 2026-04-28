@@ -62,6 +62,7 @@ export async function POST(
     const adminClient = createAdminClient();
 
     // Get current order
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: order, error: orderError } = await (adminClient as any)
       .from('orders')
       .select('id, status, selected_options, customer_data')
@@ -89,6 +90,7 @@ export async function POST(
     }
 
     // Update order status
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { error: updateError } = await (adminClient as any)
       .from('orders')
       .update({
@@ -105,6 +107,7 @@ export async function POST(
     }
 
     // Log to order_history
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     await (adminClient as any)
       .from('order_history')
       .insert({
@@ -119,6 +122,7 @@ export async function POST(
     // If action involves file upload, store document reference
     if (actionData?.file_key && actionData?.file_name) {
       const docType = action === 'upload_received' ? 'document_received' : 'document_final';
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await (adminClient as any)
         .from('order_documents')
         .insert({
@@ -133,6 +137,7 @@ export async function POST(
 
     // Handle option completion
     if (action === 'complete_option' && actionData?.option_code) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await (adminClient as any)
         .from('order_option_status')
         .update({

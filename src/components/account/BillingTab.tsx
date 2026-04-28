@@ -38,10 +38,8 @@ interface BillingTabProps {
 export default function BillingTab({ className, prefillFromId }: BillingTabProps) {
   const {
     profiles,
-    defaultProfile,
     isLoading,
     error,
-    refresh,
     create,
     update,
     remove,

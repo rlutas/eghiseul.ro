@@ -39,6 +39,7 @@ export async function GET(
     const adminClient = createAdminClient();
 
     // Fetch full order with service join
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: order, error: orderError } = await (adminClient as any)
       .from('orders')
       .select(`
@@ -56,6 +57,7 @@ export async function GET(
     }
 
     // Fetch order history / timeline
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: history } = await (adminClient as any)
       .from('order_history')
       .select('id, event_type, notes, new_value, created_at')
@@ -64,6 +66,7 @@ export async function GET(
 
     // Fetch order documents (contracts, cereri, documents received, etc.)
     // Order by created_at DESC so the latest version of each type comes first
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: documents } = await (adminClient as any)
       .from('order_documents')
       .select('*')
@@ -71,6 +74,7 @@ export async function GET(
       .order('created_at', { ascending: false });
 
     // Fetch order option statuses (extras: traducere, apostila, etc.)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: optionStatuses } = await (adminClient as any)
       .from('order_option_status')
       .select('*')

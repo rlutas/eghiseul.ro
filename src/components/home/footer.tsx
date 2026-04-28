@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Mail, Phone, MapPin, Shield, Clock, FileText } from 'lucide-react';
+import { Mail, Phone, Shield, Clock, FileText } from 'lucide-react';
 
 const services = [
   { name: 'Cazier Judiciar', href: '/services/cazier-judiciar' },

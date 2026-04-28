@@ -10,6 +10,7 @@
  * Or import in your test framework
  */
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const SUPABASE_URL = 'https://llbwmitdrppomeptqlue.supabase.co';
 const API_BASE = 'http://localhost:3000';
 

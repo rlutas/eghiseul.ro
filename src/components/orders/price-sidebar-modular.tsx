@@ -6,9 +6,8 @@
  * Shows price breakdown based on selected options.
  */
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Badge } from '@/components/ui/badge';
 import { useModularWizard } from '@/providers/modular-wizard-provider';
 import { Service } from '@/types/services';
 import { Shield, Truck, CheckCircle } from 'lucide-react';

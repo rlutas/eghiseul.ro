@@ -68,6 +68,7 @@ export function PaymentProofUpload({
           type: file.type,
         });
         onUploadComplete(result.key);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (err) {
         const message = 'Eroare la încărcare. Te rugăm să încerci din nou.';
         setError(message);
@@ -122,6 +123,7 @@ export function PaymentProofUpload({
             {uploadedFile.type === 'application/pdf' ? (
               <FileText className="h-5 w-5 text-green-600" />
             ) : (
+              // eslint-disable-next-line jsx-a11y/alt-text
               <Image className="h-5 w-5 text-green-600" />
             )}
           </div>

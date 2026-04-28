@@ -62,6 +62,7 @@ export async function POST(
     const adminClient = createAdminClient();
 
     // Fetch order with service
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: order, error: orderError } = await (adminClient as any)
       .from('orders')
       .select('*, services(id, name, slug, base_price, estimated_days, urgent_days, urgent_available)')
@@ -73,11 +74,13 @@ export async function POST(
     }
 
     // Fetch company and lawyer data from admin_settings
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: settings } = await (adminClient as any)
       .from('admin_settings')
       .select('key, value')
       .in('key', ['company_data', 'lawyer_data']);
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const settingsMap: Record<string, any> = {};
     for (const s of settings || []) {
       settingsMap[s.key] = s.value;
@@ -142,7 +145,8 @@ export async function POST(
     const selectedOptions = (order.selected_options as Array<{ option_id?: string; option_name?: string; optionName?: string; quantity?: number; price_modifier?: number; priceModifier?: number }>) || [];
 
     // Allocate document numbers via number_registry system
-    let documentNumbers: any = {};
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const documentNumbers: any = {};
 
     if (template === 'contract-prestari') {
       // Contract prestari does NOT consume a Barou number
@@ -152,6 +156,7 @@ export async function POST(
 
     if (['contract-asistenta', 'contract-complet'].includes(template)) {
       // Check for existing number (regeneration reuse)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { data: existing } = await (adminClient as any).rpc('find_existing_number', {
         p_order_id: orderId,
         p_type: 'contract',
@@ -161,6 +166,7 @@ export async function POST(
         documentNumbers.contract_number = existing[0].existing_number;
         documentNumbers.contract_series = existing[0].existing_series;
       } else {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const { data: allocated, error: allocError } = await (adminClient as any).rpc('allocate_number', {
           p_type: 'contract',
           p_order_id: orderId,
@@ -192,6 +198,7 @@ export async function POST(
 
     if (template === 'imputernicire') {
       // Check for existing delegation number (regeneration reuse)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { data: existing } = await (adminClient as any).rpc('find_existing_number', {
         p_order_id: orderId,
         p_type: 'delegation',
@@ -202,6 +209,7 @@ export async function POST(
         documentNumbers.imputernicire_number = existing[0].existing_number;
         documentNumbers.imputernicire_series = existing[0].existing_series || 'SM';
       } else {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const { data: allocated, error: allocError } = await (adminClient as any).rpc('allocate_number', {
           p_type: 'delegation',
           p_order_id: orderId,
@@ -231,6 +239,7 @@ export async function POST(
       }
 
       // Also fetch the contract number from this order for cross-reference in template
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { data: contractEntry } = await (adminClient as any).rpc('find_existing_number', {
         p_order_id: orderId,
         p_type: 'contract',
@@ -322,6 +331,7 @@ export async function POST(
     }
 
     // Insert new DB row FIRST (before deleting old ones, to prevent data loss on failure)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: insertedDoc, error: insertError } = await (adminClient as any)
       .from('order_documents')
       .insert({
@@ -366,6 +376,7 @@ export async function POST(
     // Link document back to registry entry
     const registryId = documentNumbers.registry_ids?.contract || documentNumbers.registry_ids?.delegation;
     if (registryId && insertedDoc?.id) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await (adminClient as any)
         .from('number_registry')
         .update({ order_document_id: insertedDoc.id })
@@ -378,6 +389,7 @@ export async function POST(
                        ['contract-asistenta', 'contract-complet'].includes(template) ? 'contract' : null;
 
       if (docType2) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         await (adminClient as any)
           .from('number_registry')
           .update({ order_document_id: insertedDoc.id })
@@ -388,6 +400,7 @@ export async function POST(
     }
 
     // Now clean up previous versions of this document type (safe — new row already exists)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: existingDocs } = await (adminClient as any)
       .from('order_documents')
       .select('id, s3_key')
@@ -406,6 +419,7 @@ export async function POST(
       );
       // Delete old DB rows
       const oldIds = existingDocs.map((doc: { id: string }) => doc.id);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await (adminClient as any)
         .from('order_documents')
         .delete()
@@ -413,6 +427,7 @@ export async function POST(
     }
 
     // Log to order_history
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     await (adminClient as any)
       .from('order_history')
       .insert({

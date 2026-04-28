@@ -24,7 +24,6 @@ import type {
   ModularWizardState,
   ModularStep,
   ModularStepId,
-  ServiceVerificationConfig,
   PersonalKYCState,
   CompanyKYCState,
   PropertyState,
@@ -317,6 +316,7 @@ function modularWizardReducer(
 ): ModularWizardState {
   switch (action.type) {
     case 'INIT_SERVICE': {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { service, options } = action.payload;
       const verificationConfig = service.verification_config ?? DEFAULT_DISABLED_CONFIG;
       const steps = buildWizardSteps(verificationConfig);
@@ -1130,6 +1130,7 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
       totalPrice,
       currency: service?.currency ?? 'RON',
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.serviceId, state.selectedOptions, state.delivery, state.coupon]);
 
   // Save to localStorage

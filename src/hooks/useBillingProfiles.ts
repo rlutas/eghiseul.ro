@@ -7,6 +7,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { BillingData, BillingType } from '@/components/shared/BillingProfileForm';
 import type { ExtractedIdData } from '@/components/shared/IdScanner';
 

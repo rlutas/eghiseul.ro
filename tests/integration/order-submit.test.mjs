@@ -134,7 +134,7 @@ describe.runIf(SHOULD_RUN)('Order submit integration', () => {
   it('returns 200 success with status=pending in the response', () => {
     expect(ctx.submitResponse.status).toBe(200);
     expect(ctx.submitJson.success).toBe(true);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     expect(/** @type {any} */ (ctx.submitJson).data.order.status).toBe('pending');
   });
 

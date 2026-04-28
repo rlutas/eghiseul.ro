@@ -52,6 +52,7 @@ test.describe('Login Page', () => {
 
     // Form should show validation (button disabled or error message)
     // Either the button is disabled or an error is shown
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const hasValidation = await page.locator('[class*="error"], [class*="invalid"]').count() > 0 ||
                          await submitButton.isDisabled();
 

@@ -361,6 +361,7 @@ export function DeliveryStepModular({ onValidChange }: DeliveryStepProps) {
     } finally {
       setLoadingQuotes(false);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [delivery.courierProvider]);
 
   // Get delivery location coordinates by geocoding the delivery address

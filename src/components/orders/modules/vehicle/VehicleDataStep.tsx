@@ -27,6 +27,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Car, AlertCircle, CheckCircle, ExternalLink } from 'lucide-react';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { VehicleVerificationConfig, ServiceVerificationConfig } from '@/types/verification-modules';
 
 interface VehicleDataStepProps {

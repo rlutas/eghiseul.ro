@@ -8,7 +8,7 @@ import {
   DocumentType,
 } from '@/lib/services/document-ocr';
 import { checkRateLimit, getClientIP, RATE_LIMITS } from '@/lib/security/rate-limiter';
-import { logAudit, getAuditContext, sanitizeMetadata } from '@/lib/security/audit-logger';
+import { logAudit, getAuditContext } from '@/lib/security/audit-logger';
 import { createClient } from '@/lib/supabase/server';
 
 export const runtime = 'nodejs';

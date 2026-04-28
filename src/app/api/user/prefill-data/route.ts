@@ -116,12 +116,14 @@ export async function GET() {
     }
 
     // Find default address and contact from saved data
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     const defaultAddress = savedData?.find(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (d: any) => d.data_type === 'address' && d.is_default
     );
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     const defaultContact = savedData?.find(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (d: any) => d.data_type === 'contact' && d.is_default
     );
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -207,8 +209,9 @@ export async function GET() {
           ([docType, doc]) => !doc.is_expired && docType !== 'selfie'
         ),
         // Billing profiles
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+         
         billing_profiles:
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           billingProfiles?.map((bp: any) => ({
             id: bp.id,
             type: bp.type,

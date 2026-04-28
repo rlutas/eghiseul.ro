@@ -214,7 +214,7 @@ function isHolidayISO(iso: string): boolean {
   if (process.env.NODE_ENV !== 'production') {
     const y = parseInt(iso.slice(0, 4), 10)
     if (y > LATEST_HOLIDAY_YEAR) {
-      // eslint-disable-next-line no-console
+       
       console.warn(
         `[delivery-calculator] Holiday list outdated — extend ROMANIAN_HOLIDAYS_2026_2028 for year ${y}`
       )

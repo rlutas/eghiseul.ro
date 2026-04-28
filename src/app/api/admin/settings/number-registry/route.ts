@@ -126,7 +126,9 @@ export async function GET(request: NextRequest) {
 
     // Enrich entries with friendly_order_id from orders table
     const orderIds = data
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .filter((e: any) => e.order_id)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .map((e: any) => e.order_id);
 
     let orderMap: Record<string, string> = {};
@@ -137,6 +139,7 @@ export async function GET(request: NextRequest) {
         .in('id', orderIds);
       if (orders) {
         orderMap = Object.fromEntries(
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           orders.map((o: any) => [o.id, o.friendly_order_id])
         );
       }
@@ -144,6 +147,7 @@ export async function GET(request: NextRequest) {
 
     // Enrich entries with linked document info
     const docIds = data
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .map((e: any) => e.order_document_id)
       .filter((id: string | null) => id !== null);
 
@@ -156,10 +160,12 @@ export async function GET(request: NextRequest) {
         .in('id', uniqueDocIds);
 
       if (docs) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         docMap = new Map(docs.map((d: any) => [d.id, d]));
       }
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const enrichedData = data.map((entry: any) => {
       const doc = entry.order_document_id ? docMap.get(entry.order_document_id) : null;
       return {

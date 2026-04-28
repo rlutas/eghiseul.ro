@@ -350,7 +350,7 @@ export function getImplementedProviders(): CourierCode[] {
 // Default Export
 // ============================================================================
 
-export default {
+const courierFactory = {
   getCourierProvider,
   getCourierProviderInfo,
   getAllProviderInfos,
@@ -366,3 +366,5 @@ export default {
   getImplementedProviders,
   COURIER_PROVIDERS,
 };
+
+export default courierFactory;

@@ -38,6 +38,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     }
 
     // Verify email matches order contact email
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const orderEmail = (order.customer_data as Record<string, any>)?.contact?.email;
     if (!orderEmail || orderEmail.toLowerCase() !== email.toLowerCase()) {
       return new NextResponse('Access denied', { status: 403 });

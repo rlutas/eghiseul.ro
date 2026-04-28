@@ -19,6 +19,9 @@ export function validateCNP(cnp: string): { valid: boolean; error?: string; data
   }
 
   const digits = cleanCNP.split('').map(Number)
+   
+   
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [s, a1, a2, l1, l2, z1, z2, j1, j2, n1, n2, n3, c] = digits
 
   // Validate sex/century digit (1-8)

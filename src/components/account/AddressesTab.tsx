@@ -30,10 +30,8 @@ interface AddressesTabProps {
 export default function AddressesTab({ className }: AddressesTabProps) {
   const {
     addresses,
-    defaultAddress,
     isLoading,
     error,
-    refresh,
     create,
     update,
     remove,

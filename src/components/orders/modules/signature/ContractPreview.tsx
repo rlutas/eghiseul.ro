@@ -19,6 +19,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { FileText, Loader2, AlertCircle, ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const SIGNATURE_PLACEHOLDER_HTML = '<div class="sig-placeholder">Semnătura va apărea aici</div>';
 const SIGNATURE_PLACEHOLDER_REGEX = /<div class="sig-placeholder">Semnătura va apărea aici<\/div>/g;
 
@@ -101,6 +102,7 @@ export default function ContractPreview() {
     }
 
     fetchPreview();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // When the user draws a signature, replace placeholders with the actual image

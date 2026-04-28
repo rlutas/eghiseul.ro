@@ -82,11 +82,13 @@ export async function POST(request: NextRequest) {
 
     // Fetch company and lawyer data from admin_settings
     const adminClient = createAdminClient();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: settings } = await (adminClient as any)
       .from('admin_settings')
       .select('key, value')
       .in('key', ['company_data', 'lawyer_data']);
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const settingsMap: Record<string, any> = {};
     for (const s of settings || []) {
       settingsMap[s.key] = s.value;

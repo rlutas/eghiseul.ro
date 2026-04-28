@@ -140,6 +140,7 @@ export async function POST(request: NextRequest) {
 /**
  * GET /api/admin/cleanup - Get cleanup status and pending drafts
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function GET(request: NextRequest) {
   try {
     const supabase = await createClient();

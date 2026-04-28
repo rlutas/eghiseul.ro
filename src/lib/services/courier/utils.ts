@@ -219,6 +219,7 @@ export function normalizeRomanianPhone(phone: string): string {
  */
 export function normalizeTrackingStatus(
   providerStatus: string,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   provider: string
 ): TrackingStatus {
   const status = providerStatus.toLowerCase();

@@ -113,6 +113,7 @@ export async function oblioRequest<T>(
   const { endpoint, method = 'GET', body } = options;
 
   const token = await getOblioToken();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const config = getConfig();
 
   const url = `${OBLIO_BASE_URL}${endpoint}`;

@@ -39,6 +39,7 @@ export async function GET(request: NextRequest) {
 
     // Check if user is admin (can access all files)
     const adminClient = createAdminClient();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: profile } = await (adminClient as any)
       .from('profiles')
       .select('role')
@@ -62,6 +63,7 @@ export async function GET(request: NextRequest) {
 
       // For document files (contracts/ or orders/ prefix), verify ownership via order_documents
       if (isDocumentFile && !isUserFile) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const { data: doc } = await (adminClient as any)
           .from('order_documents')
           .select('id, order_id, orders!inner(user_id)')
@@ -69,6 +71,7 @@ export async function GET(request: NextRequest) {
           .eq('visible_to_client', true)
           .single();
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const orderUserId = (doc?.orders as any)?.user_id;
         if (!doc || orderUserId !== user.id) {
           return NextResponse.json(

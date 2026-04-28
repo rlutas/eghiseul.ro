@@ -112,7 +112,7 @@ export function FinalCTASection() {
               4.9/5 din 391 recenzii pe Google
             </p>
             <p className="text-white/50 text-sm mt-1">
-              „Cel mai rapid mod de a obține documente oficiale!" — Client verificat
+              „Cel mai rapid mod de a obține documente oficiale!&rdquo; — Client verificat
             </p>
           </div>
         </div>

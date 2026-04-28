@@ -67,6 +67,7 @@ export default function SignatureStep({ config, onValidChange }: SignatureStepPr
       };
       img.src = `data:image/png;base64,${signature.signatureBase64}`;
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Get mouse/touch position

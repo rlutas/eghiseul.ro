@@ -7,6 +7,8 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+ 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { ExtractedIdData, UploadedDocument, OcrResult } from '@/components/shared/IdScanner';
 
 export type KycStatus = 'verified' | 'expiring' | 'expired' | 'unverified' | 'partial';

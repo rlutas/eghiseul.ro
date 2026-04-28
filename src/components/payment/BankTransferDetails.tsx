@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/static-components -- pre-existing inline render helpers; extract to module scope when touched */
 'use client';
 
 import { useState } from 'react';

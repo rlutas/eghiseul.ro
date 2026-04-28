@@ -1,4 +1,4 @@
-import { Check, Clock, Zap, Shield, ArrowRight } from 'lucide-react';
+import { Check, Clock, Shield, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 

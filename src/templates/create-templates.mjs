@@ -5,7 +5,6 @@
  * Creates template DOCX files in src/templates/cazier-judiciar/
  * These are minimal templates - replace with the actual formatted templates.
  */
-import Docxtemplater from 'docxtemplater';
 import PizZip from 'pizzip';
 import { writeFileSync, mkdirSync } from 'fs';
 import { join, dirname } from 'path';

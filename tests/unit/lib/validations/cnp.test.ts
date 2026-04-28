@@ -193,6 +193,7 @@ describe('validateCNP — county code errors', () => {
     ['46', 'București Sector 6'],
     ['51', 'Călărași'],
     ['52', 'Giurgiu'],
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   ])('accepts county code "%s" (%s)', (code, _name) => {
     const r = validateCNP(craftWithCounty(code));
     expect(r.valid).toBe(true);

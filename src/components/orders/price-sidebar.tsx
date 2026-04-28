@@ -14,6 +14,7 @@ export function PriceSidebar() {
   }
 
   const { service, selectedOptions, deliverySelection } = state;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { basePrice, optionsPrice, deliveryPrice, discountAmount, totalPrice, currency } =
     priceBreakdown;
 

@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { createPublicClient } from '@/lib/supabase/public';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import {
   ArrowRight,
   Clock,
@@ -18,7 +18,6 @@ import {
   User,
   Scale,
   Home as HomeIcon,
-  Star,
   Phone,
   Mail,
 } from 'lucide-react';
@@ -134,9 +133,11 @@ export default async function ServiceDetailPage({
   }
 
   const { service, options } = data;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const icon = categoryIcons[service.category] || <FileText className="h-8 w-8" />;
 
   // Parse processing steps from config
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const processingSteps = (service.config as { processing_steps?: string[] })?.processing_steps || [
     'Completează formularul online cu datele tale',
     'Încarcă documentele necesare (CI)',
@@ -1168,7 +1169,7 @@ export default async function ServiceDetailPage({
                   4.9/5 din 391 recenzii pe Google
                 </p>
                 <p className="text-white/50 text-sm mt-1">
-                  „Cel mai rapid mod de a obține documente oficiale!" — Client verificat
+                  „Cel mai rapid mod de a obține documente oficiale!&rdquo; — Client verificat
                 </p>
               </div>
             </div>

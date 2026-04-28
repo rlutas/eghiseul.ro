@@ -24,7 +24,6 @@ import {
   CreditCard,
   ArrowLeft,
   FileText,
-  Home,
 } from 'lucide-react';
 import TrackingTimeline from '@/components/orders/tracking-timeline';
 

@@ -95,6 +95,7 @@ interface DeliveryStepProps {
 }
 
 export function DeliveryStep({ onValidChange }: DeliveryStepProps) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { state, updateDelivery, updateSignature, priceBreakdown } = useOrderWizard();
   const { service, deliverySelection, signatureData, personalData } = state;
 

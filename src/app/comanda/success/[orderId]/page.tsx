@@ -160,6 +160,7 @@ export default function SuccessPage() {
     if (orderId) {
       fetchOrder();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [orderId, paymentIntent]);
 
   // GA4 Purchase Tracking

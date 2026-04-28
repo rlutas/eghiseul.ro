@@ -20,9 +20,7 @@ interface StripeCheckoutFormProps {
 
 export function StripeCheckoutForm({
   orderId,
-  orderNumber,
   amount,
-  onSuccess,
   onError,
 }: StripeCheckoutFormProps) {
   const stripe = useStripe();
@@ -56,6 +54,7 @@ export function StripeCheckoutForm({
         setErrorMessage(message);
         onError?.(message);
       }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
       const message = 'A apărut o eroare neașteptată. Te rugăm să încerci din nou.';
       setErrorMessage(message);

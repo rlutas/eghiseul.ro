@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect -- pre-existing pattern, refactor when touched */
 'use client';
 
 /**
@@ -23,9 +24,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { MapPin, Globe } from 'lucide-react';
+import {Globe } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { COUNTY_NAMES, getLocalitiesForCounty, getCountyName, findCounty } from '@/lib/data/romania-counties';
+import { COUNTY_NAMES, getLocalitiesForCounty } from '@/lib/data/romania-counties';
 
 export interface AddressData {
   label?: string;

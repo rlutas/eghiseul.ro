@@ -1,4 +1,5 @@
 'use client';
+/* eslint-disable @next/next/no-img-element -- preview thumbnails use data URLs / dynamic S3 sources, Image component does not apply */
 
 /**
  * KYCTab Component
@@ -18,8 +19,6 @@ import {
   Scan,
   Loader2,
   Upload,
-  Camera,
-  X,
   Eye,
   EyeOff,
   User,
@@ -29,6 +28,7 @@ import {
   FileText,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { useKycStatus, type KycStatus } from '@/hooks/useKycStatus';
 import { useAddresses } from '@/hooks/useAddresses';
 import { useBillingProfiles } from '@/hooks/useBillingProfiles';
@@ -93,7 +93,6 @@ type CompanyDocTypeKey = keyof typeof COMPANY_DOCUMENT_TYPES;
 
 export default function KYCTab({ className }: KYCTabProps) {
   const {
-    status,
     expiresAt,
     daysUntilExpiry,
     isVerified,
@@ -344,6 +343,7 @@ export default function KYCTab({ className }: KYCTabProps) {
       setUploadingType(null);
       setProcessingOcr(null);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [saveDocument, refreshKyc, documents]);
 
   // Handle company document upload (no OCR - manual admin review)

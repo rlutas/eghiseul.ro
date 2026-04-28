@@ -3,7 +3,6 @@ import {
   validateKYCDocument,
   validateCompleteKYC,
   KYCValidationRequest,
-  KYCValidationResult,
 } from '@/lib/services/kyc-validation';
 
 export const runtime = 'nodejs';

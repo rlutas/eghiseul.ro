@@ -6,6 +6,7 @@
  */
 
 import type { ComponentType } from 'react';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { ModularStepId, ModuleBaseProps } from '@/types/verification-modules';
 
 // Module component types

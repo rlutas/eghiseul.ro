@@ -119,7 +119,7 @@ export async function GET(request: NextRequest) {
 /**
  * Enrich customer profiles with their order counts.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 async function enrichWithOrderCounts(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   adminClient: any,

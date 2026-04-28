@@ -13,7 +13,6 @@ import {
   Plus,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
 import { useOrderWizard } from '@/providers/order-wizard-provider';
 import { SelectedOption } from '@/types/orders';
 import { ServiceOption } from '@/types/services';

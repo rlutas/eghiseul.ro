@@ -1,4 +1,5 @@
 'use client';
+/* eslint-disable @next/next/no-img-element -- preview thumbnails use data URLs / dynamic S3 sources, Image component does not apply */
 
 /**
  * IdScanner Component
@@ -13,7 +14,6 @@
 
 import { useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import {
   Loader2,
   CheckCircle,

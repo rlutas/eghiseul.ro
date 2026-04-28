@@ -321,6 +321,7 @@ export function OrderWizardProvider({ children }: { children: ReactNode }) {
         }
       }
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Update URL when step changes (but not when syncing from URL)

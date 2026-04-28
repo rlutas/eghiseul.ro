@@ -849,6 +849,7 @@ export class SamedayProvider implements CourierProvider {
   // Pickup
   // ============================================================================
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async schedulePickup(_request: PickupRequest): Promise<PickupResponse> {
     // Sameday handles pickup scheduling through their platform
     return {
@@ -857,6 +858,7 @@ export class SamedayProvider implements CourierProvider {
     };
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async cancelPickup(_pickupId: string): Promise<boolean> {
     return false;
   }

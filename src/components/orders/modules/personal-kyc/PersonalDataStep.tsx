@@ -1,4 +1,5 @@
 'use client';
+/* eslint-disable @next/next/no-img-element -- preview thumbnails use data URLs / dynamic S3 sources, Image component does not apply */
 
 /**
  * PersonalDataStep Component
@@ -35,12 +36,12 @@ import {
   User,
   MapPin,
   Calendar,
-  Shield,
   Globe,
 } from 'lucide-react';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { PersonalKYCConfig, CitizenshipType, DocumentType, KYCValidationResults } from '@/types/verification-modules';
 import { APOSTILA_COUNTRIES } from '@/config/apostila-countries';
-import { validateCNP, extractBirthDateFromCNP } from '@/lib/validations/cnp';
+import { validateCNP } from '@/lib/validations/cnp';
 import { cn } from '@/lib/utils';
 import { COUNTY_NAMES, getLocalitiesForCounty, getCountyName, findCounty } from '@/lib/data/romania-counties';
 import { compressImage } from '@/lib/images/compress';
