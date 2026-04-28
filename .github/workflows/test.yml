@@ -78,9 +78,24 @@ jobs:
       - name: Build
         run: npm run build
         env:
-          # Build needs Supabase env to validate types — provide dummy values
-          # for CI so the build doesn't crash on missing env. Real env must be
-          # configured per environment in Vercel.
+          # Build evaluates module-level code (e.g. `new Stripe(...)`) when
+          # collecting page data, so all env vars consumed at module init
+          # must have a non-empty value. Real values are configured per
+          # environment in Vercel.
           NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
           NEXT_PUBLIC_SUPABASE_ANON_KEY: dummy-anon-key-for-build-only
           SUPABASE_SERVICE_ROLE_KEY: dummy-service-role-for-build-only
+          STRIPE_SECRET_KEY: sk_test_dummy_for_build_only
+          STRIPE_WEBHOOK_SECRET: whsec_dummy_for_build_only
+          GOOGLE_AI_API_KEY: dummy-google-ai-key-for-build
+          AWS_REGION: eu-central-1
+          AWS_ACCESS_KEY_ID: dummy
+          AWS_SECRET_ACCESS_KEY: dummy
+          AWS_S3_BUCKET_DOCUMENTS: dummy-bucket
+          OBLIO_CLIENT_ID: dummy
+          OBLIO_CLIENT_SECRET: dummy
+          OBLIO_COMPANY_CIF: '0'
+          OBLIO_SERIES_NAME: EGH
+          CRON_SECRET: dummy
+          RESEND_API_KEY: dummy
+          SMSLINK_API_KEY: dummy
