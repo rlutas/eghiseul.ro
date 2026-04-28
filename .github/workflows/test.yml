@@ -11,6 +11,12 @@ concurrency:
   group: test-${{ github.ref }}
   cancel-in-progress: true
 
+# Opt every JavaScript-based action into Node.js 24 right away — by June 2026
+# the runner forces it anyway, and some actions (e.g. actions/upload-artifact@v5)
+# don't yet ship a Node 24 build of their own.
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
+
 jobs:
   lint-and-unit:
     name: Lint + Unit Tests
