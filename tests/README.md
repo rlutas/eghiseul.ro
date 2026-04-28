@@ -7,17 +7,34 @@ Goal: every behavior change has a test that fails first, then passes once shippe
 
 ```
 tests/
-├── unit/                                          245 unit tests, ~900ms
+├── unit/                                          568 unit tests, ~1-2s
 │   ├── api/
+│   │   ├── admin-cancel-awb.test.ts               (8)  /api/admin/orders/[id]/cancel-awb — graceful degradation
+│   │   ├── admin-coupons.test.ts                  (17) /api/admin/coupons — list/create/PATCH/DELETE
+│   │   ├── admin-generate-awb.test.ts             (10) /api/admin/orders/[id]/generate-awb — idempotency, locker delivery
+│   │   ├── admin-invite.test.ts                   (21) /api/admin/users/invite — RBAC, email validation, duplicate detection
+│   │   ├── admin-orders-process.test.ts           (19) /api/admin/orders/[id]/process — status transitions
+│   │   ├── admin-verify-payment.test.ts           (13) /api/admin/orders/[id]/verify-payment — bank transfer admin flow
+│   │   ├── coupons-validate.test.ts               (21) /api/coupons/validate — public coupon flow
+│   │   ├── courier-quote.test.ts                  (15) /api/courier/quote — multi-provider pricing
+│   │   ├── cron-update-tracking.test.ts           (7)  /api/cron/update-tracking — CRON_SECRET + filter logic
 │   │   ├── orders-confirm-payment.test.ts         (11) /api/orders/[id]/confirm-payment
+│   │   ├── orders-tracking.test.ts                (8)  /api/orders/[id]/tracking — access control + cache TTL
+│   │   ├── user-addresses.test.ts                 (16) /api/user/addresses — CRUD with IDOR protection
+│   │   ├── user-billing-profiles.test.ts          (13) /api/user/billing-profiles — PF/PJ types
+│   │   ├── user-kyc-save.test.ts                  (17) /api/user/kyc/save — versioning + expiry logic
+│   │   ├── user-profile.test.ts                   (8)  /api/user/profile — PATCH/GET, snake_case mapping
 │   │   └── webhooks-stripe.test.ts                (8)  /api/webhooks/stripe security
 │   └── lib/
 │       ├── admin/permissions.test.ts              (37) RBAC role + JSONB + implied
 │       ├── delivery-calculator.test.ts            (43) holidays, noon cutoff, courier matrix
+│       ├── documents/generator.test.ts            (39) PF/PJ legal block, delivery terms, institutions
 │       ├── images/compress.test.ts                (9)  HEIC reject + compressedToFile
 │       ├── kyc/face-match.test.ts                 (10) runFaceMatch + fetchImageAsBase64
+│       ├── oblio/invoice.test.ts                  (20) PF/PJ invoice, vatPayer logic, line items
 │       ├── security/audit-logger.test.ts          (32) GDPR PII redaction + DB persistence
 │       ├── security/rate-limiter.test.ts          (14) windowing + IP extraction
+│       ├── services/courier-utils.test.ts         (71) packages, address, phone, tracking, VAT, counties
 │       ├── services/kyc-validation.test.ts        (13) Gemini orchestration (CIFront/Back/Selfie)
 │       ├── stripe.test.ts                         (18) payment intent + customer + CNP masking
 │       └── validations/cnp.test.ts                (50) checksum + gender×century + edge dates
@@ -35,10 +52,10 @@ Plus `scripts/api-smoke-test.mjs` — standalone HTTP smoke harness with summary
 
 | Command | Runs | Speed | Needs |
 |---------|------|-------|-------|
-| `npm test` | All 245 unit tests | ~900ms | nothing |
+| `npm test` | All 568 unit tests | ~1-2s | nothing |
 | `npm run test:watch` | Unit tests in watch mode | live | nothing |
 | `npm run test:ui` | Vitest UI dashboard | live | nothing |
-| `npm run test:unit` | Just `tests/unit/**` | ~900ms | nothing |
+| `npm run test:unit` | Just `tests/unit/**` | ~1-2s | nothing |
 | `npm run test:integration` | `tests/integration/**` (real Gemini, DB) | 20-60s | dev server on :3000, GEMINI key |
 | `npm run test:smoke` | `scripts/api-smoke-test.mjs` | ~10s | dev server on :3000 |
 | `npm run test:e2e` | Playwright (multi-browser) | 1-5min | dev server (auto-starts) |
@@ -151,9 +168,42 @@ The test stays forever as a regression guard.
 | Area | Unit | Integration | E2E | Smoke |
 |------|:----:|:-----------:|:---:|:-----:|
 | Delivery calculator (holidays, cutoff, courier matrix) | ✅ 43 tests | — | — | — |
+| Document generator (PF/PJ legal block, delivery terms) | ✅ 39 tests | — | — | — |
+| Courier utils (package, address, phone, tracking, VAT) | ✅ 71 tests | — | — | — |
+| Oblio invoice (PF/PJ, vatPayer, line items) | ✅ 20 tests | — | — | — |
 | KYC face match orchestration | ✅ 10 tests | ✅ 2 (real Gemini) | — | — |
 | KYC validation services (CI/selfie via Gemini) | ✅ 13 tests | — | — | — |
 | Image compression | ✅ 9 tests | — | — | — |
+
+### 🛡️ Admin endpoints
+| Area | Unit | Integration | E2E | Smoke |
+|------|:----:|:-----------:|:---:|:-----:|
+| Order processing (status transitions, doc upload) | ✅ 19 tests | — | — | ✅ |
+| Bank transfer payment verification (approve/reject) | ✅ 13 tests | — | — | — |
+| AWB generation (FAN/Sameday, idempotency, locker) | ✅ 10 tests | — | — | — |
+| AWB cancellation (graceful courier-fail degradation) | ✅ 8 tests | — | — | — |
+| Coupon CRUD (admin list/create/PATCH/DELETE) | ✅ 17 tests | — | — | — |
+| Employee invite (RBAC + email validation + dup-check) | ✅ 21 tests | — | — | — |
+| RBAC enforcement on admin routes | ✅ via `permissions.ts` (37) | — | — | ✅ guard |
+
+### 🚚 Courier integration (A-Z)
+| Area | Unit | Integration | E2E | Smoke |
+|------|:----:|:-----------:|:---:|:-----:|
+| Multi-provider quote `/api/courier/quote` | ✅ 15 tests | — | — | ✅ |
+| Admin AWB generation (idempotency + locker) | ✅ 10 tests | — | — | — |
+| Admin AWB cancellation (graceful) | ✅ 8 tests | — | — | — |
+| Cron tracking refresh (CRON_SECRET + active filter) | ✅ 7 tests | — | — | — |
+| Customer tracking display (cache + final-status skip) | ✅ 8 tests | — | — | — |
+| Provider utils (packages, address, phone, status norm) | ✅ 71 tests | — | — | — |
+
+### 👤 User CRUD
+| Area | Unit | Integration | E2E | Smoke |
+|------|:----:|:-----------:|:---:|:-----:|
+| User addresses (list/create/update/delete + IDOR) | ✅ 16 tests | — | — | — |
+| User billing profiles (PF/PJ types + IDOR) | ✅ 13 tests | — | — | — |
+| User profile (PATCH/GET, snake_case mapping) | ✅ 8 tests | — | — | — |
+| User KYC save (versioning, expiry, document types) | ✅ 17 tests | — | — | — |
+| Public coupon validation (rate limit + business rules) | ✅ 21 tests | — | — | — |
 
 ### 🌐 UI / Routes
 | Area | Unit | Integration | E2E | Smoke |
@@ -167,15 +217,11 @@ The test stays forever as a regression guard.
 ### ⚪ Gaps (not yet covered — TODO future rounds)
 | Area | Why important | Priority |
 |------|---------------|----------|
-| `documents/generator.ts` (DOCX templating) | Risk: blank/malformed contracts sent to clients | 🟠 HIGH |
-| `services/courier/sameday.ts` + `fancourier.ts` | API integration, real shipment errors | 🟠 HIGH |
-| `lib/oblio/invoice.ts` | Invoice creation on payment success | 🟠 HIGH |
-| Order submit `/api/orders/[id]/submit` (full integration) | Auto-doc generation + audit + email | 🟠 HIGH |
-| Admin order processing E2E | 32 admin endpoints, status transitions | 🟡 MEDIUM |
-| User CRUD (addresses, billing-profiles) | Data integrity | 🟡 MEDIUM |
-| `services/infocui.ts` (CUI ANAF validation) | Company orders | 🟡 MEDIUM |
-| Coupon validation (extend script to test) | Already covered via `scripts/test-coupons.mjs` | 🟢 LOW |
-| Cetățean străin flow (extend script to test) | Already covered via `scripts/test-cetatean-strain.mjs` | 🟢 LOW |
+| Sameday + FanCourier provider class internals (auth, getQuotes, createShipment HTTP payloads) | Internals not directly tested — covered indirectly via routes | 🟠 HIGH (integration with API mock) |
+| Admin doc-generation `/api/admin/orders/[id]/generate-document` | DOCX templating already covered for helpers; route still untested | 🟡 MEDIUM |
+| Admin invite accept `/api/admin/invite/accept` | Token consumption + profile creation | 🟡 MEDIUM |
+| `services/infocui.ts` (CUI ANAF validation) | 795 lines, complex ANAF API parsing | 🟡 MEDIUM |
+| Cetățean străin flow | Currently covered ad-hoc in `scripts/test-cetatean-strain.mjs` | 🟢 LOW (migrate) |
 
 ### 🐛 Bugs found by these tests (and fixed)
 1. **`audit-logger.ts:115` PII redaction case bug** — list contained `'imageBase64'` (mixed case) but comparison used `key.toLowerCase()`, so `imageBase64` field was never redacted. Raw base64 of CI/selfie was leaking into audit logs. Fixed via lowercase entry. **Critical for GDPR.**

@@ -410,6 +410,229 @@ Total CI surface: ~283 distinct test cases
 
 ---
 
+## Etapa 9 — Round 5 — HIGH gap coverage (FĂCUT 2026-04-28)
+
+Coverage pentru ariile HIGH-priority din matrix-ul gap analysis:
+
+### Documents generator helpers (39 tests)
+- 6 helpers exportate ca named exports din `src/lib/documents/generator.ts` pentru testabilitate (modificare minimă, nu schimbă runtime): `buildClientDetailsBlock`, `hasUrgentOption`, `buildDeliveryTerms`, `buildInstitutie`, `buildCIInfo`, `buildOptionsText`
+- Tests acoperă: PF format (CI seria, CNP, domiciliu structurat cu Bl/Sc/Et/Ap), PJ format (companie + CUI + Reg.Com + reprezentant cu CI/CNP), urgent option detection (snake_case + camelCase variants), delivery terms cu pluralizare RO (1 zi vs N zile, urgent vs standard, urgent_available=false fallback, 10-day extension disclaimer), 11 mapări instituție pe slug (cazier-judiciar → IPJ Satu Mare, etc.)
+
+### Courier utils (71 tests)
+- `src/lib/services/courier/utils.ts` — pure helpers folosite de Sameday + FanCourier
+- Acoperite: package math (weight × quantity, volumetric L*W*H/divisor, chargeable max), address formatting (single line + multiline cu Bl/Sc/Et/Ap în RO), Romanian phone validation + normalization (mobile + landline, +40 vs 0 prefix tolerance, spaces/dashes stripped), tracking status normalization (livrat/delivered/predat → delivered, plecat/sosit → in_transit, etc.), VAT add/extract cu rate custom, formatPriceRON, 42 counties (41 + București), county code lookup case-insensitive, courier provider detection din delivery_method (Fan/Sameday/EasyBox/FANbox)
+
+### Oblio invoice (20 tests)
+- `src/lib/oblio/invoice.ts:createInvoiceFromOrder` — flow PF + PJ
+- Acoperite: PF client (firstName + lastName, CNP ca cif, save=false), PJ client (companyName, CUI ca cif, regCom ca rc, save=true), **vatPayer logic** (CUI cu prefix `RO` → true, fără → false), product line items (main service + options + delivery — cu code = friendly_order_id), delivery skip când 0 sau undefined, payment method (Card default vs Transfer bancar), formatInvoiceNumber pad 4 digits, return shape StoredInvoice cu invoiceNumber + pdfUrl
+- Mock pattern: `vi.hoisted` pentru `oblioRequest` + `getOblioConfig` (evită env var requirements la import)
+
+**Total Round 5: 130 tests noi, 0 erori TS, toate verzi în ~250ms.**
+
+### Stare finală 2026-04-28
+
+```
+Test Files  14 passed | 2 skipped (16)
+     Tests  375 passed | 10 skipped (385)
+  Duration  ~1s
+```
+
+| Categorie | Status post-Round-5 |
+|-----------|---------------------|
+| 🔴 Security (RBAC, CNP, audit, rate-limit) | ✅ acoperit |
+| 💳 Payment (Stripe, webhook, confirm, Oblio) | ✅ acoperit |
+| 📦 Business critical (delivery, documents, courier utils, KYC, compression) | ✅ acoperit |
+| 🌐 UI / Routes E2E | ✅ acoperit prin Playwright existing |
+| ⚪ Admin endpoints (32 routes) | ❌ HIGH gap rămas |
+| ⚪ User CRUD (addresses, billing) | ❌ MEDIUM gap rămas |
+| ⚪ Sameday + FanCourier full API client | ❌ HIGH (integration) |
+
+Gap-urile rămase sunt în `tests/README.md` cu prioritate clară.
+
+---
+
+## Etapa 10 — Round 6 — Admin endpoints + User CRUD (FĂCUT 2026-04-28)
+
+Coverage pe routes critice care lipseau (state mutations + IDOR protection):
+
+### `/api/admin/orders/[id]/process` — status transitions (19 tests)
+- Auth: 401 fără user, 401 pe auth error, 403 fără `orders.manage`, verifică permission corectă
+- Validation: 400 acțiune lipsă, 400 acțiune necunoscută, 404 order missing
+- Status transitions: rejects invalid (paid → completed), rejects skip (paid → submitted), all 6 valid transitions tested via `it.each`, writes order_history, 500 pe DB update fail
+- Document upload: stores reference in order_documents, sets visible_to_client correct (received=false, final=true)
+
+### `/api/coupons/validate` — public coupon flow (21 tests)
+- Body validation (Zod schema): malformed JSON, missing code, negative subtotal, code > 50 chars
+- Lookup: 404 not found, 500 on DB error, **uppercases code before lookup** (case-insensitive)
+- Time window: rejects valid_from in future, rejects expired, accepts in window
+- Usage limit: rejects max_uses reached, accepts unlimited (null), accepts under max
+- Min amount: rejects below threshold, accepts at exactly threshold
+- Discount calculation: percentage 10% of 250 → 25 RON, fixed 50 off → 200 RON, **caps at subtotal (never negative)**, rounds to 2 decimals, returns full coupon metadata
+- **Rate limiting**: 30 requests/min per IP, returns 429 + Retry-After header
+
+### `/api/user/addresses` — CRUD with IDOR protection (16 tests)
+- GET: 401 no auth, returns mapped records (flattens .data), scopes by user_id + data_type='address', 500 on DB error
+- POST: 401 no auth, creates with default label "Adresă nouă", **unsets other defaults BEFORE insert when isDefault=true** (data integrity), 500 on insert error
+- PATCH: 401 no auth, **404 when address belongs to different user** (IDOR protection), updates and returns flattened response
+- DELETE: 401 no auth, **scopes by both id AND user_id** (IDOR), success message, 500 on DB error
+
+### `/api/admin/orders/[id]/verify-payment` — bank transfer admin flow (13 tests)
+- Auth: 400 invalid action, 400 not approve/reject, 401 no user, 403 missing `payments.verify`, **uses different permission than orders.manage**
+- Order checks: 404 not found, **400 when not in awaiting_verification status** (idempotency: prevents double-rejecting paid orders)
+- REJECT path: marks payment_status='failed' + verified_by, writes payment_rejected event with admin notes, falls back to default note, 500 on DB fail, **does NOT call Oblio** (no invoice for rejected payment — explicit assertion)
+
+**Total Round 6: 69 tests noi, 0 erori TS, toate verzi în ~250ms.**
+
+### Stare finală 2026-04-28 după Round 6
+
+```
+Test Files  18 passed | 2 skipped (20)
+     Tests  444 passed | 10 skipped (454)
+  Duration  ~1s
+```
+
+| Categorie | Status post-Round-6 |
+|-----------|---------------------|
+| 🔴 Security (RBAC, CNP, audit, rate-limit) | ✅ acoperit |
+| 💳 Payment (Stripe, webhook, confirm, Oblio, bank verify) | ✅ acoperit |
+| 📦 Business critical (delivery, documents, courier, KYC) | ✅ acoperit |
+| 🛡️ Admin endpoints (process orders, verify payments) | ✅ acoperit (pattern) |
+| 👤 User CRUD (addresses) | ✅ acoperit |
+| 🌐 UI E2E | ✅ acoperit (Playwright) |
+| ⚪ Sameday + FanCourier full API client | ❌ HIGH (integration) |
+| ⚪ User CRUD: billing-profiles, profile, KYC save | ❌ MEDIUM (same pattern) |
+| ⚪ Admin coupon CRUD, user invite | ❌ MEDIUM |
+
+Pattern stabilit pentru endpoint-uri admin: mock supabase server + admin clients, mock requirePermission, tests pe auth/validation/business logic/error paths.
+
+---
+
+## Etapa 11 — Round 7 — Courier A-Z + remaining user CRUD (FĂCUT 2026-04-28)
+
+User cerere: „vreau sa facem sameday +fancorurier si sa fie de la a la z de la optinere pret in admin generare awb extragere tracking, trackingul il aratam pe istoric comanda etc. si fa restu testelor".
+
+### `/api/courier/quote` (15 tests)
+Multi-provider pricing: 4 missing-param branches (it.each), single-provider mode, multi-provider mode, getAllQuotes, weight forwarding (default 0.5kg vs custom), COD amount, country default, provider error mapping (PROVIDER_ERROR vs QUOTE_ERROR).
+
+### `/api/admin/orders/[id]/generate-awb` (10 tests)
+- Auth: 401, 403 RBAC, 404 not-found
+- Idempotency: **400 AWB_EXISTS** when delivery_tracking_number already set
+- Provider derivation: `courier_provider` column wins over delivery_method parse fallback
+- 400 NO_COURIER (email/personal pickup), 400 NO_ADDRESS (no locker + missing fields)
+- 400 INVALID_PROVIDER on credentials missing
+- Locker delivery (lockerId set) → proceeds despite empty address (success path)
+
+### `/api/admin/orders/[id]/cancel-awb` (8 tests)
+- Auth + 404 + 400 NO_AWB + 400 NO_PROVIDER
+- Successful cancel: clears tracking fields + reverts status to `document_ready`
+- **Graceful degradation**: courier API throws → still clears tracking, returns 200 with `cancelWarning`
+- 500 UPDATE_FAILED on DB error
+
+### `/api/cron/update-tracking` (7 tests)
+- 500 when CRON_SECRET not configured (server misconfig)
+- 401 missing/wrong/non-Bearer auth
+- 200 with empty summary when no active shipments
+- **Critical filter check**: `delivery_tracking_status IN (pending, picked_up, in_transit, out_for_delivery)` AND `tracking_number IS NOT NULL` (never re-polls final states delivered/returned/cancelled — otherwise would loop forever)
+
+### `/api/orders/[id]/tracking` — customer-facing display (8 tests)
+- 404 not found
+- Access control: 401 guest on user-owned order, 403 wrong user, allowed for owner, allowed for admin
+- Guest with matching email param: allowed
+- **Cache TTL 30 min**: recent update → no provider call (cache hit)
+- **Final status (delivered)**: even if 7 days stale, NO refresh (would waste API calls forever)
+
+### `/api/user/billing-profiles` (13 tests)
+Mirror of addresses pattern + PF/PJ-specific:
+- GET list cu mapare flat (companyName, cui flatten din billing_data)
+- POST: 400 când type lipsă, 400 când type invalid (nu e PF/PJ)
+- Default label depinde de type: `Profil personal` pt PF, `Profil firmă` pt PJ
+- billing_data NU primește type/label (separare clean)
+- Unset other defaults BEFORE insert
+- PATCH/DELETE cu IDOR protection (id+user_id scoping)
+
+**Total Round 7: 61 tests noi, 0 erori TS, toate verzi în ~1.5s.**
+
+### Stare finală 2026-04-28 după Round 7
+
+```
+Test Files  24 passed | 2 skipped (26)
+     Tests  505 passed | 10 skipped (515)
+  Duration  ~1-2s
+```
+
+**Stare per categorie:**
+
+| Categorie | Status post-Round-7 |
+|-----------|---------------------|
+| 🔴 Security (RBAC, CNP, audit, rate-limit) | ✅ |
+| 💳 Payment (Stripe + webhook + confirm + Oblio + bank verify) | ✅ |
+| 📦 Business critical (delivery, documents, KYC) | ✅ |
+| 🛡️ Admin endpoints (process, verify-payment, AWB generate/cancel) | ✅ |
+| 🚚 **Courier A-Z** (quote → AWB → tracking → cron refresh) | ✅ NOU |
+| 👤 User CRUD (addresses + billing-profiles) | ✅ |
+| 🌐 UI E2E | ✅ Playwright existing |
+| ⚪ Provider class internals (Sameday/FanCourier auth + HTTP) | indirect prin routes |
+| ⚪ User profile, KYC save, admin coupon CRUD, user invite | LOW priority — pattern stabilit |
+
+---
+
+## Etapa 12 — Round 8 — Gap-uri MEDIUM rămase (FĂCUT 2026-04-28)
+
+User cerere: "vreau sa impelmentez mai departe sa actualezi docs si in tests te rog si peste tot si sa avem toate testele puse pla punct corect."
+
+### `/api/admin/coupons` CRUD (17 tests)
+- GET list cu paginare, search ilike, **clamps limit la 200** (defensive),  uses `settings.manage` (NOT orders.manage)
+- POST create cu Zod validation: code uppercase + trim, **percentage 1-100 strict**, unique constraint 23505 → 400, returns 201
+- PATCH/DELETE: 401/403 sentry checks (full chains in larger module)
+
+### `/api/admin/users/invite` (21 tests)
+- Auth: 401/403, **uses `users.manage` (NOT settings.manage)** — different concern
+- Email validation: 5 invalid format cases via it.each
+- Permissions object validation: rejects keys not in `ALL_PERMISSIONS` (uses real exports via `vi.importActual`)
+- Role validation: 5 valid roles (employee/avocat/manager/operator/contabil), rejects super_admin
+- Duplicate detection: 409 if existing role is admin, allows customer→employee promotion
+- **Email lowercased** before lookup (case-insensitive match)
+
+### `/api/user/profile` (8 tests)
+- PATCH/GET, 401 auth, **PATCH semantics** (only provided fields update — undefined fields NOT overwritten)
+- camelCase API → snake_case DB column mapping (firstName→first_name, etc.)
+- Company fields → company_* columns (companyVatPayer→company_vat_payer)
+- Security: scoped by user.id (cannot patch others)
+- 500 on DB error
+- GET also queries kyc_verifications table for document info
+
+### `/api/user/kyc/save` (17 tests)
+- Auth: 401, validation: 400 missing documentType/fileUrl, 9 valid document types via it.each, rejects unknown
+- **Versioning**: deactivates existing same-type docs (is_active=false) BEFORE inserting new
+- **Expiry logic**: uses documentExpiry when provided, else falls back to KYC_VALIDITY_DAYS (90 days from now), tested with ±60s tolerance
+- 500 on insert error
+
+**Total Round 8: 63 tests noi, 0 erori TS, toate verzi în ~1.5s.**
+
+### Stare finală 2026-04-28 după Round 8
+
+```
+Test Files  28 passed | 2 skipped (30)
+     Tests  568 passed | 10 skipped (578)
+  Duration  ~1-2s
+```
+
+**Coverage matrix completă:**
+
+| Categorie | Status |
+|-----------|--------|
+| 🔴 Security (RBAC, CNP, audit, rate-limit) | ✅ |
+| 💳 Payment (Stripe + webhook + confirm + Oblio + bank verify) | ✅ |
+| 📦 Business critical (delivery, documents, KYC, image) | ✅ |
+| 🛡️ Admin endpoints (process, AWB gen/cancel, verify-payment, **coupon CRUD, invite**) | ✅ |
+| 🚚 Courier A-Z (quote → AWB → tracking → cron refresh) | ✅ |
+| 👤 User CRUD (addresses + billing + **profile + KYC save**) | ✅ |
+| 🌐 UI E2E | ✅ Playwright existing |
+| ⚪ Provider class internals (Sameday/FanCourier HTTP) | indirect via routes |
+| ⚪ Admin doc-generation route, invite accept, infocui (CUI ANAF) | LOW priority gaps |
+
+---
+
 ## Următorii pași recomandați (NEFĂCUTE — separate)
 
 - **Cleanup drafts vechi:** există 90 drafts în DB. Migration `032_add_estimated_completion.sql` și logica GDPR cleanup (7 zile) ar trebui să le ardă, dar drafts > 7 zile încă există. Verifică `/api/admin/cleanup` cron.

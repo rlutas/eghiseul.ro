@@ -148,7 +148,7 @@ function loadTemplate(serviceSlug: string, templateName: string): Buffer {
  * PF: name, CI details, CNP, domiciliu (structured address)
  * PJ: company name, CUI, Nr. Reg. Com., sediu, reprezentant with CI/CNP
  */
-function buildClientDetailsBlock(client: ClientData): string {
+export function buildClientDetailsBlock(client: ClientData): string {
   const parts: string[] = [];
 
   if (client.is_pj) {
@@ -208,7 +208,7 @@ function buildClientDetailsBlock(client: ClientData): string {
 /**
  * Check if the order has an urgent option selected.
  */
-function hasUrgentOption(selectedOptions?: SelectedOption[]): boolean {
+export function hasUrgentOption(selectedOptions?: SelectedOption[]): boolean {
   if (!selectedOptions || selectedOptions.length === 0) return false;
   return selectedOptions.some(opt => {
     const name = (opt.option_name || opt.optionName || '').toLowerCase();
@@ -220,7 +220,7 @@ function hasUrgentOption(selectedOptions?: SelectedOption[]): boolean {
  * Build delivery terms text for the specific service ordered.
  * Only shows the relevant term (urgent or standard) based on selected options.
  */
-function buildDeliveryTerms(order: DocumentContext['order'], selectedOptions?: SelectedOption[]): string {
+export function buildDeliveryTerms(order: DocumentContext['order'], selectedOptions?: SelectedOption[]): string {
   const estimated = order.estimated_days;
   const urgent = order.urgent_days;
   const urgentAvailable = order.urgent_available;
@@ -247,7 +247,7 @@ function buildDeliveryTerms(order: DocumentContext['order'], selectedOptions?: S
 /**
  * Map service slug to institution name for imputernicire avocatiala.
  */
-function buildInstitutie(serviceSlug?: string): string {
+export function buildInstitutie(serviceSlug?: string): string {
   const map: Record<string, string> = {
     'cazier-judiciar': 'IPJ SATU MARE - CAZIER JUDICIAR',
     'cazier-judiciar-persoana-fizica': 'IPJ SATU MARE - CAZIER JUDICIAR',
@@ -267,7 +267,7 @@ function buildInstitutie(serviceSlug?: string): string {
 /**
  * Build a CI/ID document info string: "seria XX nr. YYYYYY, emisă de ZZZZ"
  */
-function buildCIInfo(client: ClientData): string {
+export function buildCIInfo(client: ClientData): string {
   if (!client.ci_series && !client.ci_number) return '';
   const parts: string[] = [];
   if (client.ci_series) parts.push(`seria ${client.ci_series}`);
@@ -279,7 +279,7 @@ function buildCIInfo(client: ClientData): string {
 /**
  * Build selected options list as readable text.
  */
-function buildOptionsText(selectedOptions?: SelectedOption[]): string {
+export function buildOptionsText(selectedOptions?: SelectedOption[]): string {
   if (!selectedOptions || selectedOptions.length === 0) return '';
   return selectedOptions
     .map(opt => opt.option_name || opt.optionName || '')
