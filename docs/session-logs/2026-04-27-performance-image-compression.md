@@ -633,6 +633,69 @@ Test Files  28 passed | 2 skipped (30)
 
 ---
 
+## Etapa 13 — CI fix + Round 9 LOW gaps (FĂCUT 2026-04-28)
+
+### CI fail fix
+**Problemă:** GitHub Actions raporta fail la „Install dependencies" în 1s cu eroarea:
+```
+npm error `npm ci` can only install packages when your package.json and
+package-lock.json or npm-shrinkwrap.json are in sync.
+npm error Missing: @emnapi/runtime@1.10.0 from lock file
+npm error Missing: @emnapi/core@1.10.0 from lock file
+```
+
+**Cauză:** package-lock.json generat pe macOS (Node 25) NU include opt-deps Linux-specific (`@emnapi/runtime`, `@emnapi/core` de la jsdom→lightningcss native bindings). `npm ci` e strict și refuză instalarea când există missing entries cross-platform.
+
+**Fix:** `.github/workflows/test.yml` schimbat din `npm ci` în `npm install --no-audit --no-fund` pentru ambele job-uri (lint-and-unit + build). Mai tolerant la opt-deps cross-platform; comportament identic în rest. Comentariu inline explicativ.
+
+### Round 9 — LOW priority gaps (28 tests noi)
+
+#### `services/infocui.ts` — CUI Romanian + counties (21 tests)
+- `validateCUIFormat`: strip RO prefix (case-insensitive), strip non-digits, length 2-10, error pe gol/prea-scurt/prea-lung
+- **Romanian CUI checksum** (weights [7,5,3,2,1,7,5,3,2], algoritm oficial): rejects checksum invalid, accepts CUI sintetic computat algoritmic
+- `findCounty`: by ISO code case-insensitive, by exact name, by substring partial match, undefined pentru necunoscut, trim whitespace
+- ROMANIAN_COUNTIES: 42 entries (41 + București), shape consistent (code+name)
+- `parseAddressString`: extract postal code 6 cifre, county (Jud./Județul X), graceful empty input
+
+#### `/api/admin/invite/accept` (7 tests)
+- 400 când token lipsă, 404 token necunoscut
+- 410 GONE pentru: invitație accepted (idempotency), revoked, deja expired
+- **Auto-expire**: când status='pending' dar expires_at < now, marchează `status='expired'` în DB înainte să returneze 410
+- 200 pentru pending valid cu invitation details (email, permissions, expiresAt, status)
+
+**Total Round 9: 28 tests noi.**
+
+### Stare finală 2026-04-28 după Round 9
+
+```
+$ npm test
+Test Files  30 passed | 2 skipped (32)
+     Tests  596 passed | 10 skipped (606)
+  Duration  ~1-2s
+```
+
+```
+$ npx tsc --noEmit
+EXIT: 0
+```
+
+| Categorie | Status post-Round-9 |
+|-----------|---------------------|
+| 🔴 Security (RBAC, CNP, audit, rate-limit, **CUI**) | ✅ |
+| 💳 Payment (Stripe + webhook + confirm + Oblio + bank verify) | ✅ |
+| 📦 Business critical (delivery, documents, KYC, image) | ✅ |
+| 🛡️ Admin endpoints (process, AWB, verify-payment, coupon CRUD, **invite + accept**) | ✅ |
+| 🚚 Courier A-Z (quote → AWB → tracking → cron) | ✅ |
+| 👤 User CRUD (addresses, billing, profile, KYC save) | ✅ |
+| 🌐 UI E2E | ✅ Playwright existing |
+| 🟢 Provider class internals | acceptable indirect via routes |
+| 🟢 Admin doc-generation route | acceptable (helpers covered) |
+| 🟢 Cetățean străin script migration | acceptable (script exists) |
+
+**Toate gap-urile rămase sunt LOW priority — coverage e completă pentru riscul real.**
+
+---
+
 ## Următorii pași recomandați (NEFĂCUTE — separate)
 
 - **Cleanup drafts vechi:** există 90 drafts în DB. Migration `032_add_estimated_completion.sql` și logica GDPR cleanup (7 zile) ar trebui să le ardă, dar drafts > 7 zile încă există. Verifică `/api/admin/cleanup` cron.

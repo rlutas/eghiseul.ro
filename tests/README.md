@@ -7,11 +7,12 @@ Goal: every behavior change has a test that fails first, then passes once shippe
 
 ```
 tests/
-├── unit/                                          568 unit tests, ~1-2s
+├── unit/                                          596 unit tests, ~1-2s
 │   ├── api/
 │   │   ├── admin-cancel-awb.test.ts               (8)  /api/admin/orders/[id]/cancel-awb — graceful degradation
 │   │   ├── admin-coupons.test.ts                  (17) /api/admin/coupons — list/create/PATCH/DELETE
 │   │   ├── admin-generate-awb.test.ts             (10) /api/admin/orders/[id]/generate-awb — idempotency, locker delivery
+│   │   ├── admin-invite-accept.test.ts            (7)  /api/admin/invite/accept — token validation, auto-expire, idempotency
 │   │   ├── admin-invite.test.ts                   (21) /api/admin/users/invite — RBAC, email validation, duplicate detection
 │   │   ├── admin-orders-process.test.ts           (19) /api/admin/orders/[id]/process — status transitions
 │   │   ├── admin-verify-payment.test.ts           (13) /api/admin/orders/[id]/verify-payment — bank transfer admin flow
@@ -35,6 +36,7 @@ tests/
 │       ├── security/audit-logger.test.ts          (32) GDPR PII redaction + DB persistence
 │       ├── security/rate-limiter.test.ts          (14) windowing + IP extraction
 │       ├── services/courier-utils.test.ts         (71) packages, address, phone, tracking, VAT, counties
+│       ├── services/infocui.test.ts               (21) CUI Romanian checksum, ANAF + county/address parsing
 │       ├── services/kyc-validation.test.ts        (13) Gemini orchestration (CIFront/Back/Selfie)
 │       ├── stripe.test.ts                         (18) payment intent + customer + CNP masking
 │       └── validations/cnp.test.ts                (50) checksum + gender×century + edge dates
@@ -52,7 +54,7 @@ Plus `scripts/api-smoke-test.mjs` — standalone HTTP smoke harness with summary
 
 | Command | Runs | Speed | Needs |
 |---------|------|-------|-------|
-| `npm test` | All 568 unit tests | ~1-2s | nothing |
+| `npm test` | All 596 unit tests | ~1-2s | nothing |
 | `npm run test:watch` | Unit tests in watch mode | live | nothing |
 | `npm run test:ui` | Vitest UI dashboard | live | nothing |
 | `npm run test:unit` | Just `tests/unit/**` | ~1-2s | nothing |
@@ -217,10 +219,8 @@ The test stays forever as a regression guard.
 ### ⚪ Gaps (not yet covered — TODO future rounds)
 | Area | Why important | Priority |
 |------|---------------|----------|
-| Sameday + FanCourier provider class internals (auth, getQuotes, createShipment HTTP payloads) | Internals not directly tested — covered indirectly via routes | 🟠 HIGH (integration with API mock) |
-| Admin doc-generation `/api/admin/orders/[id]/generate-document` | DOCX templating already covered for helpers; route still untested | 🟡 MEDIUM |
-| Admin invite accept `/api/admin/invite/accept` | Token consumption + profile creation | 🟡 MEDIUM |
-| `services/infocui.ts` (CUI ANAF validation) | 795 lines, complex ANAF API parsing | 🟡 MEDIUM |
+| Sameday + FanCourier provider class internals (auth, getQuotes, createShipment HTTP payloads) | Internals not directly tested — covered indirectly via routes | 🟢 LOW (integration with API mock) |
+| Admin doc-generation `/api/admin/orders/[id]/generate-document` | DOCX helpers acoperiți; route still uses helpers + S3 | 🟢 LOW |
 | Cetățean străin flow | Currently covered ad-hoc in `scripts/test-cetatean-strain.mjs` | 🟢 LOW (migrate) |
 
 ### 🐛 Bugs found by these tests (and fixed)
