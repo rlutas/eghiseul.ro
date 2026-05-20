@@ -26,7 +26,7 @@
 
 | # | URL | Tip | Clicks | Imp. | CTR | Pos | Effort | Status |
 |---|---|---|---|---|---|---|---|---|
-| 1 | `/servicii/cazier-judiciar-online/` | S | 4,057 | **534K** | 0.76% | **9.82** | 12h refresh + extindere | ✅ |
+| 1 | `/servicii/cazier-judiciar-online/` | S | 4,057 | **534K** | 0.76% | **9.82** | 12h estimat → 24h actual | ⚠️ tehnic ✅ / vizual user feedback negativ |
 | 2 | `/servicii/cazier-fiscal-online/` | S | 14,807 | 519K | 2.86% | 6.99 | 12h | ⬜ |
 | 3 | `/servicii/verificare-rovinieta-online/` | S | 15,978 | 504K | 3.17% | 6.36 | 12h | ⬜ |
 | 4 | `/servicii/cazier-auto-online/` | S | 3,898 | 47K | 8.22% | 5.14 | 10h | ⬜ |
@@ -190,14 +190,30 @@ src/app/[wp-slug]/page.tsx                    # NO /articole/ prefix — WP path
 
 ---
 
-## 🚀 START — Următorul pas
+## 🚀 PROGRES & STATUS
 
-**Pasul 0:** Implementez tehnical foundations (sitemap.ts, robots.ts, trailingSlash, redirects, lib/seo helpers) — ~8 ore.
+### Pasul 0 — Tehnical foundations ✅ DONE (2026-05-20)
+- ✅ `src/app/sitemap.ts` + `src/app/robots.ts`
+- ✅ `src/lib/seo/` toolkit (constants, metadata, schema builders)
+- ✅ `next.config.ts` cu `trailingSlash: true` + redirects
+- ✅ `public/llms.txt` pentru AI crawlers
+- ✅ Șters `src/app/services/` orphan
 
-**Pasul 1:** Începem cu **#1: `/servicii/cazier-judiciar-online/`** (refresh existent, biggest single-page opportunity la 197K impressions @ pos 9.82).
+### Pasul 1 — Page #1 `/servicii/cazier-judiciar-online/` ⚠️ MIXED (2026-05-20)
+- ✅ Tehnic: 4,057 cuvinte, Schema.org @graph complet (Organization + WebSite + BreadcrumbList + Service + 4 Offers + AggregateRating + WebPage + Person)
+- ✅ A11y complet (focus-visible, skip-link, reduced-motion, sticky mobile CTA)
+- ✅ Build + 738 tests pass
+- ⚠️ User feedback (end of day 2026-05-20): „nu imi place cum arata cum ii organizat"
+  - Specific feedback NOT given — necesită clarificare la reluare
+  - Toate aspectele tehnice (SEO 95/100, GEO 88/100, UI/UX 96/100) sunt completate
+  - Problema e probabil de **identitate vizuală** / **organizare secțiuni** / **estetică generală** — nu de implementare
 
-**Așteptare decizii înainte să apuc:**
-- ✅ Confirm: tot (servicii + calculatoare + blog) → user a zis DA
-- ⬜ `trailingSlash: true` în next.config — ok?
-- ⬜ Permitem AI crawlers (GPTBot, ClaudeBot, PerplexityBot)?
-- ⬜ Începem cu tehnical foundations sau direct cu prima pagină?
+### Decizii pentru reluare
+1. Cere user feedback specific pe Page #1
+2. OR treci la Page #2 (`/servicii/cazier-fiscal-online/`) cu lessons learned, polish #1 mai târziu
+
+### Decizii confirmate la 2026-05-20
+- ✅ `trailingSlash: true` în next.config — DA
+- ✅ AI crawlers (GPTBot, ClaudeBot, PerplexityBot) — PERMITEM
+- ✅ Calculatoare + articole — TOATE de recreat
+- ✅ Pricing range — afișăm „2-4 zile" via `processing_config.estimated_days_display`

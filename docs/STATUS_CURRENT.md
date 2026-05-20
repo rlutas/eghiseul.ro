@@ -1,15 +1,76 @@
 # eGhiseul.ro - Status Curent
 
-**Data:** 2026-05-20 (ultima update)
-**Sprint-uri completate:** Sprint 0-6 ✅ (toate live pe main)
-**Aliniere cu cazierjudiciaronline.com:** complet (11 faze A-L + pricing realignment 2026-05-20)
-**Wizard redesign (Step 1+2 merge, summary unificat, 5 bug fixes):** 2026-04-29 ✅
-**Performance + image compression:** 2026-04-27 ✅
-**Sprint pendinte:** Notifications efective (email Resend, SMS SMSLink, Oblio invoicing — toate cu credentiale neconfig)
+**Data:** 2026-05-20 (sesiune SEO + rebuild Page #1)
+**Sprint-uri completate:** Sprint 0-6 ✅
+**SEO master plan + rebuild queue:** ✅ (`docs/seo/SEO-MASTER-PLAN-2026-05-20.md` + `docs/seo/REBUILD-QUEUE.md`)
+**Page #1 (cazier-judiciar-online) rebuild:** ✅ tehnic, ⚠️ user feedback: vizual needs another pass
+**Aliniere cu cazierjudiciaronline.com:** complet (11 faze A-L + pricing realignment + entity blocking + international courier)
+**Wizard redesign + foreign citizen flow:** 2026-04-29 ✅
+**Sprint pendinte:** Notifications (Resend/SMSLink/Oblio), restul 46 pagini rebuild queue, city pages
 
 ---
 
-## ✅ SESIUNE 2026-05-20 — Pricing realignment + entity blocking + international courier
+## ⚠️ SESIUNE 2026-05-20 (continuare) — SEO foundation + Page #1 rebuild
+
+**Detalii complete:** `docs/session-logs/2026-05-20-seo-cazier-judiciar-rebuild.md`
+
+### Ce s-a făcut
+
+**SEO Master Plan + Rebuild Queue** — GSC 16 luni analizat (1.43M clicks, 26M impressions). 47 pagini prioritizate în 5 batch-uri (~332h total). City pages plan separat (15 orașe, ~30-45h).
+
+**Premisa CORECTĂ:** WP live, Next.js în dev. Obiectiv: la lansare să **EGALEZE și BATEM** pozițiile WP curente. Zero pierdere trafic la cutover.
+
+**Tehnical foundations (Pasul 0):** `src/app/sitemap.ts` (dynamic), `src/app/robots.ts` (allow AI crawlers), `src/lib/seo/` toolkit (constants + metadata + schema builders), `next.config.ts` cu `trailingSlash: true` + redirects, `public/llms.txt`, șters `src/app/services/` orphan.
+
+**Page #1 — `/servicii/cazier-judiciar-online/`** rewrite complet (5 iterații):
+- 4,057 cuvinte (era 800)
+- Schema.org @graph complet: Organization + WebSite + BreadcrumbList + Service + 4 Offers + AggregateRating (432, 4.9★) + WebPage + Person (reviewedBy)
+- 17 FAQ în **6 categorii color-coded** (Procesare/Prețuri/Documente/Utilizare/Diaspora/Altele)
+- 30 use cases în 6 categorii color-coded
+- Specimen image WebP (1.1MB → 176KB)
+- Tabel comparativ "Online vs Ghișeu" (corectat: nu mai e "10 RON timbru", program ghișeu marcat "restrâns")
+- Pricing transparent table cu add-ons
+- Reviews section cu 6 testimoniale (avatare gradient + featured card span 2x2)
+- "De Ce eGhișeul" — 6 differentiators color-coded cu vertical accent bars
+- Editorial note + dateModified
+- Sticky mobile CTA bar
+- 3 tabele convertite responsive (mobile cards vs desktop tables)
+- a11y complet: focus-visible, skip-link, reduced-motion, aria-labels, touch targets 48px+
+- Migration 038: `processing_config.estimated_days_display = "2-4 zile lucrătoare"` + `formatEstimatedDays()` helper
+
+**Bug fixes critice:**
+- Lucide icon components nu pot trece ca prop Server→Client → refactor cu string icon registry
+- OCR: păstrăm `gemini-2.5-flash-lite` (era OK la user) dar adăugăm `parseGeminiOCRResponse()` helper care bubble raw text pe failure
+
+### ⚠️ User feedback la sfârșit de zi
+
+> „nu imi place cum arata cum ii organizat"
+
+Pagina e tehnic completă (SEO 95/100, GEO 88/100, UI/UX 96/100, build green, 738/748 tests pass), DAR user nemulțumit de **organizarea + aspectul vizual**. Specific feedback nedat — necesită clarificare la următoarea sesiune.
+
+**Posibile direcții de re-explorat:**
+- Ordine secțiuni (reviews mai sus? comparison table mai jos?)
+- Densitate informație (prea lung? prea încărcat?)
+- Stil vizual (prea „template" Tailwind? lipsesc imagini reale?)
+- Hero layout (asimetric? mai puțin text?)
+- Typography hierarchy diferită
+- Brand identity mai distinctiv (nu „default Next.js look")
+
+### Următorul pas
+
+Decizie strategică de luat la reluare:
+1. **Polish Page #1 încă** (cu feedback specific user) — 8-12h
+2. **Treci la Page #2** (cazier-fiscal-online) cu lessons learned, polish #1 mai târziu — recommended
+3. **Restart Page #1 de la zero** cu o estetică nouă (alt design system, alt pattern)
+
+### Competitori (analiză agent)
+
+- **caziere.ro** — outranks us pe „cazier judiciar online" DAR pagină tehnic slabă (SPA, no SSR, no Schema, `lang="en"`, hidden pricing, 5 FAQ în accordion). Brand domain match e atu-ul lor.
+- **cazierjudiciaronline.com** — threat real. 12+ city pages programmatic (Buc/Cluj/TM/IS/BV/SB/CT/CV/OD/AD/GL/SM/TGM). ~20-30% originalitate per oraș.
+
+---
+
+## ✅ SESIUNE 2026-05-20 (dimineața) — Pricing realignment + entity blocking + international courier
 
 - **Pricing realignment (DB migration 036)** — `cazier-judiciar PF/PJ` base 250→**198 RON**, urgent total 350→**278 RON** (urgenta uplift 100→80). `cazier-auto` aliniat la judiciar (198/278). `cazier-fiscal` base 250→**198 RON** și `urgenta` deactivat (doar tier simplu). Toate add-on-urile rămân neschimbate (traducere 178.50, apostila haga 238, apostila notari 83.30, legalizare 99, verificare expert 49, copii suplimentare 25). Rationale: undercut cazierjudiciaronline.com (250/350) pe entry tier, păstrăm margine pe add-ons.
 - **Entity type detection PJ (DB migration 037)** — port complet din `cazierjudiciaronline/Step2PersonalData.tsx:24-92`. PFA / Întreprindere Individuală / Întreprindere Familială / Cabinet medical/avocat / Birou Notarial / Executor Judecătoresc / Medic Specialist sunt acum **BLOCATE** în flow-ul PJ (cazier-judiciar PJ, cazier-fiscal, umbrella cazier-judiciar) — UI sugerează switch la flow PF. ONG-urile (Asociație / Fundație / Federație / Sindicat / Parohie / Biserică / Mănăstire) primesc WARNING (extras Registrul Asociațiilor + încheiere motivată — extra docs). Pattern matching word-boundary (regex `(^|[^A-ZĂÂÎȘȚ0-9])PATTERN([^A-ZĂÂÎȘȚ0-9]|$)`) — „EDITII SRL" NU mai face fals-pozitiv pe „II", „MEDIATIF SRL" NU pe „IF", etc.
