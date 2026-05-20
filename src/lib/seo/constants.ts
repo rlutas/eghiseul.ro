@@ -1,0 +1,89 @@
+/**
+ * SEO Constants — single source of truth pentru URL-uri canonice.
+ *
+ * `HARDCODED_SERVICE_SLUGS` = URL-urile WP păstrate literal în Next.js sub
+ * `src/app/servicii/[slug]/` ca foldere cu pagini hand-tuned (Schema rich,
+ * conținut 3000+ cuvinte, FAQ ample, internal linking).
+ *
+ * Adaugă aici slug-ul WP **înainte** să faci `src/app/servicii/[slug]/page.tsx`.
+ * Sitemap-ul se regenerează automat din această listă.
+ *
+ * Sursa: GSC export 2026-05-20 (pagini cu > 100 click-uri / 16 luni).
+ */
+
+export const BASE_URL = 'https://eghiseul.ro';
+
+/** Service pages with hand-tuned SEO content (folder per WP URL). */
+export const HARDCODED_SERVICE_SLUGS = [
+  'cazier-judiciar-online',
+  'cazier-fiscal-online',
+  'cazier-auto-online',
+  'verificare-rovinieta-online',
+  'eliberare-certificat-de-nastere',
+  'eliberare-certificat-de-casatorie',
+  'eliberare-certificat-de-celibat',
+  'extras-de-carte-funciara',
+  'certificat-constatator-online',
+  'certificat-de-integritate-comportamentala',
+  'extras-multilingv-certificat-nastere',
+  'extras-multilingv-certificat-casatorie',
+] as const;
+
+export type HardcodedServiceSlug = (typeof HARDCODED_SERVICE_SLUGS)[number];
+
+/** Calculator pages (ported from WP /calculator/*). */
+export const HARDCODED_CALCULATOR_SLUGS = [
+  'calculator-impozit-auto',
+  'varsta-pensionare',
+  'salariu',
+  'pensie-invaliditate',
+  'calculator-indemnizatie-crestere-copil',
+  'tva',
+  'termene-judiciare',
+  'calculator-procente',
+  'reabilitare',
+  'taxa-judiciara-de-timbru',
+] as const;
+
+/** Tools pages (ported from WP /tools/*). */
+export const HARDCODED_TOOL_SLUGS = [
+  'verificare-rovinieta-online',
+] as const;
+
+/**
+ * Blog articles at WP root path (no /articole/ prefix — preserves backlinks).
+ */
+export const HARDCODED_ARTICLE_SLUGS = [
+  'tabel-varsta-pensionare-anticipata-femei',
+  'cum-aflam-numarul-carte-functionara-si-nr-cadastral',
+  'anii-lucrati-in-strainatate-se-pun-la-pensie-in-romania',
+  'ghid-complet-certificat-de-integritate-comportamentala',
+  'informatii-cazier-auto-online',
+  'amenda-rovinieta-2025-tarife-plata-online-ghid-complet',
+  'cum-vor-arata-documentele-de-stare-civila-2025',
+  'taxa-cazier-judiciar',
+  'eliberare-certificat-constatator-onrc-ghid',
+  'valabilitate-extras-de-carte-funciara',
+  'cele-4-tipuri-de-certificat-constatator-online',
+  'totul-despre-cartea-funciara-colectiva',
+  'cazier-judiciar-vs-certificat-integritate-comportamentala',
+  'importanta-extras-de-carte-funciara-colectiva',
+  'extras-de-carte-funciara-pentru-casa-verde',
+] as const;
+
+/** Organization-wide metadata for Schema.org Organization node. */
+export const ORGANIZATION = {
+  name: 'eGhișeul.ro',
+  legalName: 'RapidCert SRL',
+  url: BASE_URL,
+  logo: `${BASE_URL}/logo.png`,
+  contactPoint: {
+    telephone: '+40-770-194-101',
+    contactType: 'customer service',
+    areaServed: 'RO',
+    availableLanguage: ['Romanian', 'English'],
+  },
+  sameAs: [
+    // populate when available
+  ],
+} as const;
