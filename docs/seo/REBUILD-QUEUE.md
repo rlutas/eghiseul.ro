@@ -26,7 +26,7 @@
 
 | # | URL | Tip | Clicks | Imp. | CTR | Pos | Effort | Status |
 |---|---|---|---|---|---|---|---|---|
-| 1 | `/servicii/cazier-judiciar-online/` | S | 4,057 | **534K** | 0.76% | **9.82** | 12h refresh + extindere | ⬜ |
+| 1 | `/servicii/cazier-judiciar-online/` | S | 4,057 | **534K** | 0.76% | **9.82** | 12h refresh + extindere | ✅ |
 | 2 | `/servicii/cazier-fiscal-online/` | S | 14,807 | 519K | 2.86% | 6.99 | 12h | ⬜ |
 | 3 | `/servicii/verificare-rovinieta-online/` | S | 15,978 | 504K | 3.17% | 6.36 | 12h | ⬜ |
 | 4 | `/servicii/cazier-auto-online/` | S | 3,898 | 47K | 8.22% | 5.14 | 10h | ⬜ |
