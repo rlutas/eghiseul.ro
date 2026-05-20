@@ -22,7 +22,7 @@ import {
   Baby,
   Gavel,
 } from 'lucide-react';
-import { Service, ServiceOption } from '@/types/services';
+import { Service, ServiceOption, formatEstimatedDays } from '@/types/services';
 import { Footer } from '@/components/home/footer';
 import { ServiceFAQ } from '@/components/services/service-faq';
 
@@ -248,7 +248,7 @@ export default async function CazierJudiciarPFPage() {
                     </li>
                     <li className="flex items-center gap-2">
                       <CheckCircle className="w-4 h-4 text-primary-500 flex-shrink-0" />
-                      Primești documentul în {service.estimated_days} zile
+                      Primești documentul în {formatEstimatedDays(service)}
                     </li>
                   </ul>
                 </div>
@@ -323,7 +323,7 @@ export default async function CazierJudiciarPFPage() {
                         <Clock className="h-5 w-5 text-green-600" />
                       </div>
                       <div>
-                        <p className="font-semibold text-secondary-900 text-sm">Livrare în {service.estimated_days} zile</p>
+                        <p className="font-semibold text-secondary-900 text-sm">Livrare în {formatEstimatedDays(service)}</p>
                         <p className="text-xs text-neutral-500">Zile lucrătoare</p>
                       </div>
                     </div>
@@ -337,7 +337,7 @@ export default async function CazierJudiciarPFPage() {
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between gap-2">
                             <p className="font-bold text-secondary-900 text-sm">Urgent: {service.urgent_days} zile</p>
-                            <span className="text-xs font-bold text-white bg-primary-600 px-2 py-1 rounded-lg">+99 RON</span>
+                            <span className="text-xs font-bold text-white bg-primary-600 px-2 py-1 rounded-lg">+80 RON</span>
                           </div>
                         </div>
                       </div>
@@ -502,7 +502,7 @@ export default async function CazierJudiciarPFPage() {
                 {
                   step: 4,
                   title: 'Primești Documentul',
-                  desc: `În ${service.estimated_days} zile primești cazierul pe email + curier.`,
+                  desc: `În ${formatEstimatedDays(service)} primești cazierul pe email + curier.`,
                   icon: CheckCircle,
                 },
               ].map((item, index) => (
@@ -594,7 +594,7 @@ export default async function CazierJudiciarPFPage() {
             },
             {
               q: 'Câte zile durează procesarea?',
-              a: `${service.estimated_days} zile lucrătoare în mod standard. ${service.urgent_days} zile cu opțiunea Urgență (+99 RON).`,
+              a: `${formatEstimatedDays(service)} în mod standard. ${service.urgent_days} zile cu opțiunea Urgență (+80 RON).`,
             },
             {
               q: 'Pot cere cazier pentru altcineva?',
@@ -630,7 +630,7 @@ export default async function CazierJudiciarPFPage() {
                 Gata să obții Cazierul Judiciar?
               </h2>
               <p className="text-lg text-white/80 mb-8 max-w-xl mx-auto">
-                Completează formularul în 5 minute și primești documentul în {service.estimated_days} zile.
+                Completează formularul în 5 minute și primești documentul în {formatEstimatedDays(service)}.
               </p>
 
               {/* CTA Buttons */}

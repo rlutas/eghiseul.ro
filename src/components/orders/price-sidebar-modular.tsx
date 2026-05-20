@@ -74,7 +74,8 @@ export function PriceSidebarModular({ service }: PriceSidebarModularProps) {
           <div className="min-w-0">
             <p className="text-xs text-neutral-500">Timp estimat livrare</p>
             <p className="text-sm font-semibold text-secondary-900 leading-tight">
-              {service.estimated_days} zile lucrătoare
+              {service.processing_config?.estimated_days_display
+                ?? `${service.estimated_days} zile lucrătoare`}
             </p>
           </div>
         </CardContent>

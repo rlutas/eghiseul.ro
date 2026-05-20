@@ -39,7 +39,7 @@ import {
 const PAGE_PATH = '/servicii/cazier-judiciar-online/';
 const TITLE = 'Cazier Judiciar Online 2026 — Obține Rapid Fără Drumuri (198 RON)';
 const DESCRIPTION =
-  'Obține cazierul judiciar online în 5-7 zile lucrătoare, fără deplasări. ' +
+  'Obține cazierul judiciar online în 2-4 zile lucrătoare, fără deplasări. ' +
   'Persoane fizice și juridice. 198 RON cu TVA inclus. Plată securizată Stripe. ' +
   'Document oficial de la Poliția Română (Lege 290/2004).';
 
@@ -65,7 +65,7 @@ const jsonLdGraph = buildServicePageGraph({
   ],
   offers: [
     {
-      name: 'Cazier Judiciar — Persoană Fizică (Standard 5-7 zile)',
+      name: 'Cazier Judiciar — Persoană Fizică (Standard 2-4 zile)',
       price: 198,
       url: `${BASE_URL}/servicii/cazier-judiciar-online/persoana-fizica/`,
     },
@@ -75,7 +75,7 @@ const jsonLdGraph = buildServicePageGraph({
       url: `${BASE_URL}/servicii/cazier-judiciar-online/persoana-fizica/`,
     },
     {
-      name: 'Cazier Judiciar — Persoană Juridică (Standard 5-7 zile)',
+      name: 'Cazier Judiciar — Persoană Juridică (Standard 2-4 zile)',
       price: 198,
       url: `${BASE_URL}/servicii/cazier-judiciar-online/persoana-juridica/`,
     },
@@ -166,7 +166,7 @@ const USE_CASE_CATEGORIES = [
 const FAQ_ITEMS = [
   {
     q: 'Cât durează obținerea cazierului judiciar online?',
-    a: 'Procesarea standard durează între 5 și 7 zile lucrătoare de la momentul plății. Termenul include preluarea cererii de către Poliție, eliberarea documentului oficial și transmiterea către tine pe email. Dacă alegi opțiunea urgentă (+80 RON), termenul scade la 1-2 zile lucrătoare. Documentele depuse vineri după ora 14:00 sau în weekend intră în prelucrare luni dimineața.',
+    a: 'Procesarea standard durează între 2 și 4 zile lucrătoare de la momentul plății. Termenul include preluarea cererii de către Poliție, eliberarea documentului oficial și transmiterea către tine pe email. Dacă alegi opțiunea urgentă (+80 RON), termenul scade la 1-2 zile lucrătoare. Documentele depuse vineri după ora 14:00 sau în weekend intră în prelucrare luni dimineața.',
   },
   {
     q: 'Care este prețul cazierului judiciar online în 2026?',
@@ -284,13 +284,13 @@ export default function CazierJudiciarHubPage() {
                 Document oficial emis de <strong className="text-primary-500">Poliția Română</strong> conform
                 Legii 290/2004. Procesare 100% online pentru{' '}
                 <strong className="text-primary-500">persoane fizice și juridice</strong> —{' '}
-                <strong className="text-primary-500">198 RON</strong> cu TVA inclus, livrat în 5-7 zile lucrătoare.
+                <strong className="text-primary-500">198 RON</strong> cu TVA inclus, livrat în 2-4 zile lucrătoare.
               </p>
 
               <div className="flex flex-wrap justify-center gap-3 mb-8">
                 <div className="flex items-center gap-2 text-white/80 bg-white/5 px-4 py-2 rounded-full">
                   <Clock className="w-4 h-4 text-primary-500" />
-                  <span className="text-sm font-medium">5-7 zile standard / 1-2 zile urgent</span>
+                  <span className="text-sm font-medium">2-4 zile standard / 1-2 zile urgent</span>
                 </div>
                 <div className="flex items-center gap-2 text-white/80 bg-white/5 px-4 py-2 rounded-full">
                   <Shield className="w-4 h-4 text-primary-500" />
@@ -530,7 +530,7 @@ export default function CazierJudiciarHubPage() {
                 Cum Funcționează — 4 Pași Simpli
               </h2>
               <p className="text-neutral-600">
-                Procesul complet durează 5-7 zile lucrătoare. Tu petreci 5 minute, restul facem noi.
+                Procesul complet durează 2-4 zile lucrătoare. Tu petreci 5 minute, restul facem noi.
               </p>
             </div>
 
@@ -603,7 +603,7 @@ export default function CazierJudiciarHubPage() {
                   <tbody>
                     <tr className="border-b border-neutral-200">
                       <td className="py-3 text-neutral-700">Cazier PF — Standard</td>
-                      <td className="py-3 text-neutral-600">5-7 zile lucrătoare</td>
+                      <td className="py-3 text-neutral-600">2-4 zile lucrătoare</td>
                       <td className="py-3 text-right font-bold text-secondary-900">198 RON</td>
                     </tr>
                     <tr className="border-b border-neutral-200">
@@ -613,7 +613,7 @@ export default function CazierJudiciarHubPage() {
                     </tr>
                     <tr className="border-b border-neutral-200">
                       <td className="py-3 text-neutral-700">Cazier PJ — Standard</td>
-                      <td className="py-3 text-neutral-600">5-7 zile lucrătoare</td>
+                      <td className="py-3 text-neutral-600">2-4 zile lucrătoare</td>
                       <td className="py-3 text-right font-bold text-secondary-900">198 RON</td>
                     </tr>
                     <tr className="border-b border-neutral-200">

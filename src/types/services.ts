@@ -29,11 +29,31 @@ export interface Service {
   urgent_days: number | null;
   config: ServiceConfig | null;
   verification_config: ServiceVerificationConfig | null;  // NEW: Modular verification configuration
+  /**
+   * Optional per-service processing metadata (JSONB).
+   * Currently used by price sidebar to display a range string
+   * (`estimated_days_display`) instead of the single `estimated_days` number.
+   */
+  processing_config?: {
+    estimated_days_display?: string;
+    [key: string]: unknown;
+  } | null;
   meta_title: string | null;
   meta_description: string | null;
   created_at: string;
   updated_at: string;
   options?: ServiceOption[];
+}
+
+/**
+ * Format the estimated delivery time for display.
+ * Prefers the custom `estimated_days_display` range from `processing_config`
+ * (e.g., "2-4 zile lucrătoare") when set, otherwise falls back to the
+ * single `estimated_days` number (e.g., "3 zile lucrătoare").
+ */
+export function formatEstimatedDays(service: Pick<Service, 'estimated_days' | 'processing_config'>): string {
+  return service.processing_config?.estimated_days_display
+    ?? `${service.estimated_days} zile lucrătoare`;
 }
 
 // Service Option Entity
