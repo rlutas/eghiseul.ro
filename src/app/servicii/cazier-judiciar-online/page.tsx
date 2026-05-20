@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Footer } from '@/components/home/footer';
@@ -43,6 +44,10 @@ const DESCRIPTION =
   'Persoane fizice și juridice. 198 RON cu TVA inclus. Plată securizată Stripe. ' +
   'Document oficial de la Poliția Română (Lege 290/2004).';
 
+const DATE_PUBLISHED = '2026-04-16';
+const DATE_MODIFIED = '2026-05-20';
+const DATE_MODIFIED_DISPLAY = '20 mai 2026';
+
 export const metadata: Metadata = buildPageMetadata({
   title: TITLE,
   description: DESCRIPTION,
@@ -58,6 +63,13 @@ const jsonLdGraph = buildServicePageGraph({
     'eliberat de Inspectoratul General al Poliției Române conform Legii 290/2004. ' +
     'Procesare 100% online, semnătură electronică eIDAS, livrare email + curier opțional.',
   serviceType: 'Document Processing — Legal',
+  datePublished: DATE_PUBLISHED,
+  dateModified: DATE_MODIFIED,
+  reviewedBy: {
+    name: 'Departamentul Juridic eGhișeul.ro',
+    jobTitle: 'Echipă de specialiști drept administrativ',
+    organizationName: 'RapidCert SRL',
+  },
   breadcrumb: [
     { name: 'Acasă', url: `${BASE_URL}/` },
     { name: 'Servicii', url: `${BASE_URL}/servicii/` },
@@ -166,15 +178,15 @@ const USE_CASE_CATEGORIES = [
 const FAQ_ITEMS = [
   {
     q: 'Cât durează obținerea cazierului judiciar online?',
-    a: 'Procesarea standard durează între 2 și 4 zile lucrătoare de la momentul plății. Termenul include preluarea cererii de către Poliție, eliberarea documentului oficial și transmiterea către tine pe email. Dacă alegi opțiunea urgentă (+80 RON), termenul scade la 1-2 zile lucrătoare. Documentele depuse vineri după ora 14:00 sau în weekend intră în prelucrare luni dimineața.',
+    a: 'Procesarea standard durează între 2 și 4 zile lucrătoare de la momentul plății, conform Legii 290/2004 privind cazierul judiciar. Termenul include trei etape: (1) preluarea cererii de către Inspectoratul General al Poliției Române — IGPR, în maxim 24 de ore; (2) eliberarea documentului oficial de către Direcția Cazier Judiciar, Statistică și Evidențe Operative, care durează 1-3 zile lucrătoare; (3) transmiterea către tine pe email a documentului semnat electronic, automat după emitere. Dacă alegi opțiunea urgentă (+80 RON), termenul total scade la 1-2 zile lucrătoare. Documentele cu cerere depusă vineri după ora 14:00 sau în weekend intră în prelucrare luni dimineața, conform programului oficial al ghișeelor de cazier judiciar. Nu există nicio diferență de calitate sau valabilitate între documentul obținut prin platforma noastră și cel obținut direct la sediul Poliției — ambele sunt eliberate de IGPR și au aceeași ștampilă oficială.',
   },
   {
     q: 'Care este prețul cazierului judiciar online în 2026?',
-    a: 'Tariful standard pentru cazier judiciar (persoană fizică sau juridică) este de 198 RON cu TVA inclus, indiferent dacă ai nevoie de el pentru tine personal sau pentru firma ta. Opțiunea urgentă (1-2 zile lucrătoare) costă 278 RON. Add-on-urile opționale: traducere autorizată (178.50 RON), apostilă Haga (238 RON), legalizare notarială (99 RON), apostilă notari (83.30 RON), copii suplimentare (25 RON/buc). Toate prețurile includ TVA-ul de 21%.',
+    a: 'Tariful standard pentru cazier judiciar (persoană fizică sau juridică) este de 198 RON cu TVA inclus, indiferent dacă îl soliciți pentru tine personal sau pentru firma ta. Suma include cota oficială către IGPR, taxa de procesare a cererii, semnătura electronică eIDAS, plată securizată prin Stripe și transmiterea documentului pe email. Opțiunea urgentă (procesare 1-2 zile lucrătoare) costă 278 RON total. Pentru cetățeni străini, tariful este 298 RON din cauza verificărilor suplimentare la IGI (Inspectoratul General pentru Imigrări). Add-on-urile opționale sunt: traducere autorizată în 9 limbi (178.50 RON), apostilă Haga pentru utilizare în UE/SUA/Canada/UK (238 RON), legalizare notarială (99 RON), apostilă Camera Notarilor (83.30 RON), copii suplimentare legalizate (25 RON/bucată, max 10), curier intern Fan Courier sau Sameday (25-30 RON), curier internațional DHL Express (250 RON) sau Poșta Română International (100 RON). Toate prețurile includ TVA-ul de 21% și sunt afișate transparent înainte de plată — fără costuri ascunse.',
   },
   {
     q: 'Care este valabilitatea cazierului judiciar?',
-    a: 'Cazierul judiciar are valabilitate de 6 luni de la data emiterii pentru utilizare în România, conform Legii 290/2004. Pentru utilizare în străinătate, multe țări acceptă documentul timp de 3-6 luni. Pentru autoritățile americane (USCIS), valabilitatea este de 2 ani. Recomandăm să verifici cerințele exacte ale instituției care îți solicită documentul, pentru că termenele pot varia.',
+    a: 'Cazierul judiciar are valabilitate de 6 luni de la data emiterii pentru utilizare în România, conform Legii 290/2004 privind cazierul judiciar. Pentru utilizare în străinătate, valabilitatea depinde de cerințele instituției care îți solicită documentul: majoritatea autorităților din Uniunea Europeană acceptă documentul timp de 3-6 luni de la emitere; autoritățile americane (USCIS, US Department of State) acceptă cazierul judiciar românesc cu valabilitate de 2 ani; Canada (IRCC, CIC) cere documentul emis în ultimele 6 luni pentru aplicații Permanent Residence; Australia (Department of Home Affairs) acceptă maxim 12 luni de la emitere. Recomandăm să verifici cerințele exacte ale instituției destinatare înainte de comandă, pentru că termenele pot varia în funcție de tipul de procedură (viză de muncă, rezidență, adopție, etc.) și pot fi mai restrictive pentru anumite proceduri sensibile (clearance de securitate, lucru cu minori).',
   },
   {
     q: 'Ce documente sunt necesare pentru a obține cazierul judiciar prin eGhișeul.ro?',
@@ -482,6 +494,113 @@ export default function CazierJudiciarHubPage() {
           </div>
         </section>
 
+        {/* ──────────────── SPECIMEN + ONLINE VS GHIȘEU ──────────────── */}
+        <section className="py-12 lg:py-20 bg-white">
+          <div className="container mx-auto px-4 max-w-[1200px]">
+            <div className="text-center mb-12">
+              <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-3">
+                Cum Arată Cazierul Judiciar — Specimen Oficial
+              </h2>
+              <p className="text-neutral-600 max-w-2xl mx-auto">
+                Documentul pe care îl primești are antetul Ministerului Afacerilor Interne și
+                ștampila oficială IGPR — identic indiferent dacă îl obții online sau la ghișeu.
+              </p>
+            </div>
+
+            <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+              {/* Specimen image */}
+              <div className="relative bg-neutral-50 rounded-2xl p-4 border border-neutral-200 shadow-sm">
+                <Image
+                  src="/images/cazier-judiciar-specimen.webp"
+                  alt="Specimen Cazier Judiciar emis de Inspectoratul General al Poliției Române — exemplu document oficial"
+                  width={1414}
+                  height={2000}
+                  className="w-full h-auto rounded-lg"
+                  loading="lazy"
+                  sizes="(max-width: 1024px) 100vw, 600px"
+                />
+                <p className="text-xs text-neutral-500 mt-3 text-center italic">
+                  Exemplu document — datele personale anonimizate. Specimen marcat conform GDPR.
+                </p>
+              </div>
+
+              {/* Online vs Ghișeu comparison table */}
+              <div>
+                <h3 className="text-xl font-bold text-secondary-900 mb-4">
+                  Online prin eGhișeul.ro vs Ghișeul Tradițional
+                </h3>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b-2 border-neutral-300">
+                        <th className="text-left py-3 font-semibold text-secondary-900">Aspect</th>
+                        <th className="text-center py-3 font-semibold text-primary-600">eGhișeul.ro</th>
+                        <th className="text-center py-3 font-semibold text-neutral-600">La Ghișeu</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr className="border-b border-neutral-200">
+                        <td className="py-3 text-neutral-700 font-medium">Termen procesare</td>
+                        <td className="py-3 text-center text-green-700 font-semibold">2-4 zile</td>
+                        <td className="py-3 text-center text-neutral-600">3-7 zile</td>
+                      </tr>
+                      <tr className="border-b border-neutral-200">
+                        <td className="py-3 text-neutral-700 font-medium">Deplasare necesară</td>
+                        <td className="py-3 text-center text-green-700">
+                          <CheckCircle className="w-5 h-5 inline" /> Nu
+                        </td>
+                        <td className="py-3 text-center text-red-600">Da (2 ori)</td>
+                      </tr>
+                      <tr className="border-b border-neutral-200">
+                        <td className="py-3 text-neutral-700 font-medium">Cozi la ghișeu</td>
+                        <td className="py-3 text-center text-green-700">
+                          <CheckCircle className="w-5 h-5 inline" /> Nu
+                        </td>
+                        <td className="py-3 text-center text-red-600">30-90 min</td>
+                      </tr>
+                      <tr className="border-b border-neutral-200">
+                        <td className="py-3 text-neutral-700 font-medium">Program disponibil</td>
+                        <td className="py-3 text-center text-green-700 font-semibold">24/7 online</td>
+                        <td className="py-3 text-center text-neutral-600">L-V 8:30-16:00</td>
+                      </tr>
+                      <tr className="border-b border-neutral-200">
+                        <td className="py-3 text-neutral-700 font-medium">Disponibil din diaspora</td>
+                        <td className="py-3 text-center text-green-700">
+                          <CheckCircle className="w-5 h-5 inline" /> Da
+                        </td>
+                        <td className="py-3 text-center text-red-600">Nu</td>
+                      </tr>
+                      <tr className="border-b border-neutral-200">
+                        <td className="py-3 text-neutral-700 font-medium">Taxă procesare</td>
+                        <td className="py-3 text-center font-semibold text-secondary-900">198 RON*</td>
+                        <td className="py-3 text-center text-neutral-600">10 RON timbru</td>
+                      </tr>
+                      <tr className="border-b border-neutral-200">
+                        <td className="py-3 text-neutral-700 font-medium">Plată carduri</td>
+                        <td className="py-3 text-center text-green-700">
+                          <CheckCircle className="w-5 h-5 inline" /> Stripe
+                        </td>
+                        <td className="py-3 text-center text-neutral-600">Numerar/POS</td>
+                      </tr>
+                      <tr>
+                        <td className="py-3 text-neutral-700 font-medium">Apostilă + traducere</td>
+                        <td className="py-3 text-center text-green-700">
+                          <CheckCircle className="w-5 h-5 inline" /> Inclusiv
+                        </td>
+                        <td className="py-3 text-center text-red-600">Separat</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <p className="text-xs text-neutral-500 mt-3 italic">
+                  * Tariful include cota oficială IGPR, procesarea cererii, semnătura electronică, livrare email.
+                  La ghișeu plătești doar timbrul fiscal, dar pierzi 4-6 ore din timp și ai nevoie de 2 deplasări.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* ──────────────── USE CASES (20+) ──────────────── */}
         <section className="py-12 lg:py-20 bg-white">
           <div className="container mx-auto px-4 max-w-[1200px]">
@@ -697,7 +816,7 @@ export default function CazierJudiciarHubPage() {
                 De Ce eGhișeul.ro
               </h2>
               <p className="text-neutral-600">
-                Procesăm cereri de cazier judiciar din 2024, cu peste 33.000 documente eliberate.
+                Procesăm cereri de cazier judiciar din 2024, în baza unui contract de prestări servicii conform Legii 214/2024.
               </p>
             </div>
 
@@ -790,6 +909,28 @@ export default function CazierJudiciarHubPage() {
                   </Link>
                 );
               })}
+            </div>
+          </div>
+        </section>
+
+        {/* ──────────────── EDITORIAL NOTE — E-E-A-T ──────────────── */}
+        <section className="py-8 bg-neutral-50 border-t border-neutral-200">
+          <div className="container mx-auto px-4 max-w-[900px]">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 text-sm text-neutral-600 bg-white rounded-xl p-4 border border-neutral-200">
+              <Award className="w-5 h-5 text-primary-600 flex-shrink-0" />
+              <div>
+                <p>
+                  <span className="font-semibold text-secondary-900">
+                    Conținut revizuit de Departamentul Juridic eGhișeul.ro
+                  </span>{' '}
+                  &mdash; specialiști drept administrativ, RapidCert SRL.
+                </p>
+                <p className="text-xs mt-1 text-neutral-500">
+                  Ultima actualizare:{' '}
+                  <time dateTime={DATE_MODIFIED}>{DATE_MODIFIED_DISPLAY}</time> &middot;
+                  Sursă legislativă: Legea 290/2004, Legea 214/2024, OUG 34/2014, Regulamentul UE 910/2014 (eIDAS)
+                </p>
+              </div>
             </div>
           </div>
         </section>

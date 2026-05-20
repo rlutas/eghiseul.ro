@@ -182,3 +182,88 @@ describe('buildArticlePageGraph', () => {
     expect(types).toEqual(['Organization', 'WebSite', 'BreadcrumbList', 'Article']);
   });
 });
+
+describe('buildServicePageGraph — editorial metadata (E-E-A-T / GEO)', () => {
+  const base = {
+    slug: 'x',
+    name: 'X',
+    description: 'd',
+    breadcrumb: [],
+    offers: [{ name: 'Standard', price: 198 }],
+  };
+
+  it('adds WebPage node when dateModified provided', () => {
+    const graph = buildServicePageGraph({ ...base, dateModified: '2026-05-20' });
+    const types = graph['@graph'].map((n) => n['@type']);
+    expect(types).toContain('WebPage');
+    const webPage = graph['@graph'].find((n) => n['@type'] === 'WebPage') as Record<string, unknown>;
+    expect(webPage.dateModified).toBe('2026-05-20');
+  });
+
+  it('adds Person node when reviewedBy provided', () => {
+    const graph = buildServicePageGraph({
+      ...base,
+      dateModified: '2026-05-20',
+      reviewedBy: {
+        name: 'Departamentul Juridic',
+        jobTitle: 'Specialiști drept administrativ',
+        organizationName: 'RapidCert SRL',
+      },
+    });
+    const types = graph['@graph'].map((n) => n['@type']);
+    expect(types).toContain('Person');
+    expect(types).toContain('WebPage');
+
+    const person = graph['@graph'].find((n) => n['@type'] === 'Person') as Record<string, unknown>;
+    expect(person.name).toBe('Departamentul Juridic');
+    expect(person.jobTitle).toBe('Specialiști drept administrativ');
+    expect(person.worksFor).toEqual({
+      '@type': 'Organization',
+      name: 'RapidCert SRL',
+    });
+  });
+
+  it('Person stable @id slug', () => {
+    const graph = buildServicePageGraph({
+      ...base,
+      reviewedBy: { name: 'Departamentul Juridic eGhișeul.ro' },
+    });
+    const person = graph['@graph'].find((n) => n['@type'] === 'Person') as Record<string, unknown>;
+    // Diacritics + spaces collapsed to hyphens
+    expect(person['@id']).toContain('#person-departamentul-juridic-egh');
+  });
+
+  it('WebPage.reviewedBy links to Person via @id', () => {
+    const graph = buildServicePageGraph({
+      ...base,
+      dateModified: '2026-05-20',
+      reviewedBy: { name: 'X Reviewer' },
+    });
+    const webPage = graph['@graph'].find((n) => n['@type'] === 'WebPage') as Record<string, unknown>;
+    expect(webPage.reviewedBy).toBeDefined();
+    expect((webPage.reviewedBy as { '@id': string })['@id']).toContain('#person-x-reviewer');
+    expect(webPage.lastReviewed).toBe('2026-05-20');
+  });
+
+  it('skips WebPage/Person nodes when no editorial metadata', () => {
+    const graph = buildServicePageGraph(base);
+    const types = graph['@graph'].map((n) => n['@type']);
+    expect(types).not.toContain('WebPage');
+    expect(types).not.toContain('Person');
+    // Graph stays at 4 nodes (Org + Website + Breadcrumb + Service)
+    expect(graph['@graph']).toHaveLength(4);
+  });
+
+  it('Breadcrumb gets a stable @id when included in service graph', () => {
+    const graph = buildServicePageGraph({
+      ...base,
+      slug: 'cazier-judiciar-online',
+      breadcrumb: [
+        { name: 'Acasă', url: `${BASE_URL}/` },
+        { name: 'Cazier', url: `${BASE_URL}/servicii/cazier-judiciar-online/` },
+      ],
+    });
+    const breadcrumb = graph['@graph'].find((n) => n['@type'] === 'BreadcrumbList') as Record<string, unknown>;
+    expect(breadcrumb['@id']).toBe(`${BASE_URL}/servicii/cazier-judiciar-online/#breadcrumb`);
+  });
+});

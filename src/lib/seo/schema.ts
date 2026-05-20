@@ -37,6 +37,19 @@ export interface ServiceSchemaInput {
   offers: ServiceOfferInput[];
   aggregateRating?: { ratingValue: number; reviewCount: number };
   breadcrumb: BreadcrumbItem[];
+  /**
+   * Optional editorial review metadata — boosts E-E-A-T signal (Author/Reviewer)
+   * for AI Overviews and Google quality raters. If provided, emits a WebPage
+   * node with dateModified + reviewedBy linking to a Person node.
+   */
+  reviewedBy?: {
+    name: string;
+    jobTitle?: string;
+    url?: string;
+    organizationName?: string;
+  };
+  dateModified?: string; // ISO 8601 — e.g. '2026-05-20'
+  datePublished?: string; // ISO 8601
 }
 
 export function organizationNode() {
@@ -114,16 +127,64 @@ export function serviceNode(input: ServiceSchemaInput) {
   };
 }
 
+function personNode(input: NonNullable<ServiceSchemaInput['reviewedBy']>) {
+  const slug = input.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  return {
+    '@type': 'Person',
+    '@id': `${BASE_URL}/#person-${slug}`,
+    name: input.name,
+    ...(input.jobTitle ? { jobTitle: input.jobTitle } : {}),
+    ...(input.url ? { url: input.url } : {}),
+    ...(input.organizationName
+      ? { worksFor: { '@type': 'Organization', name: input.organizationName } }
+      : { worksFor: { '@id': `${BASE_URL}/#organization` } }),
+  };
+}
+
+function webPageNode(input: ServiceSchemaInput) {
+  const url = `${BASE_URL}/servicii/${input.slug}/`;
+  return {
+    '@type': 'WebPage',
+    '@id': `${url}#webpage`,
+    url,
+    name: input.name,
+    description: input.description,
+    inLanguage: 'ro-RO',
+    isPartOf: { '@id': `${BASE_URL}/#website` },
+    primaryImageOfPage: undefined, // can be added when OG image canonical
+    ...(input.datePublished ? { datePublished: input.datePublished } : {}),
+    ...(input.dateModified ? { dateModified: input.dateModified } : {}),
+    ...(input.reviewedBy
+      ? {
+          reviewedBy: {
+            '@id': `${BASE_URL}/#person-${input.reviewedBy.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}`,
+          },
+          lastReviewed: input.dateModified ?? input.datePublished,
+        }
+      : {}),
+    breadcrumb: { '@id': `${url}#breadcrumb` },
+    about: { '@id': `${url}#service` },
+  };
+}
+
 /** Standalone Service page: returns the full @graph array. */
 export function buildServicePageGraph(input: ServiceSchemaInput) {
+  const graph: Record<string, unknown>[] = [
+    organizationNode(),
+    websiteNode(),
+    { ...breadcrumbNode(input.breadcrumb), '@id': `${BASE_URL}/servicii/${input.slug}/#breadcrumb` },
+    serviceNode(input),
+  ];
+  // Add WebPage node when we have editorial metadata to expose
+  if (input.dateModified || input.datePublished || input.reviewedBy) {
+    graph.push(webPageNode(input));
+  }
+  if (input.reviewedBy) {
+    graph.push(personNode(input.reviewedBy));
+  }
   return {
     '@context': 'https://schema.org',
-    '@graph': [
-      organizationNode(),
-      websiteNode(),
-      breadcrumbNode(input.breadcrumb),
-      serviceNode(input),
-    ],
+    '@graph': graph,
   };
 }
 
