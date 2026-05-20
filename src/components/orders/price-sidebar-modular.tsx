@@ -3,14 +3,17 @@
 /**
  * Price Sidebar for Modular Wizard
  *
- * Shows price breakdown based on selected options.
+ * Wraps the canonical <OrderSummaryCard> so the wizard sidebar and the checkout
+ * page render the SAME visual + breakdown. Adds wizard-specific extras
+ * (estimated delivery + trust badges) below the card.
  */
 
 import { Card, CardContent } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
 import { useModularWizard } from '@/providers/modular-wizard-provider';
 import { Service } from '@/types/services';
-import { Shield, Truck, CheckCircle } from 'lucide-react';
+import { Shield, CheckCircle, Clock } from 'lucide-react';
+import { OrderSummaryCard } from '@/components/payment';
+import { normalizeOrderOptions } from '@/lib/orders/normalize';
 
 interface PriceSidebarModularProps {
   service: Service;
@@ -19,84 +22,75 @@ interface PriceSidebarModularProps {
 export function PriceSidebarModular({ service }: PriceSidebarModularProps) {
   const { state, priceBreakdown } = useModularWizard();
 
+  // Append client type suffix to service name when applicable (e.g.
+  // "Cazier Judiciar" → "Cazier Judiciar PF" / "PJ"). Driven by service config
+  // — services that don't offer a client-type selection stay unchanged.
+  const showsClientType =
+    !!state.verificationConfig?.clientTypeSelection?.enabled;
+  const serviceName =
+    showsClientType && state.clientType
+      ? `${service.name} ${state.clientType}`
+      : service.name;
+
+  // Normalize wizard's live selectedOptions through the same canonical helper
+  // used by the API + checkout page, so the rendered list is identical.
+  const options = normalizeOrderOptions(state.selectedOptions).map((opt) => ({
+    name: opt.quantity > 1 ? `${opt.name} × ${opt.quantity}` : opt.name,
+    price: opt.total,
+  }));
+
+  const VAT_RATE = 0.21;
+  const subtotalWithoutVat =
+    Math.round((priceBreakdown.totalPrice / (1 + VAT_RATE)) * 100) / 100;
+  const vatAmount =
+    Math.round((priceBreakdown.totalPrice - subtotalWithoutVat) * 100) / 100;
+
   return (
-    <Card className="border border-neutral-200 shadow-sm overflow-hidden !p-0 !gap-0">
-      <div className="bg-secondary-900 text-white py-3 px-4">
-        <h3 className="text-base font-semibold">Rezumat Comandă</h3>
-      </div>
+    <div className="space-y-3">
+      <OrderSummaryCard
+        orderNumber={state.friendlyOrderId || ''}
+        serviceName={serviceName}
+        basePrice={priceBreakdown.basePrice}
+        options={options}
+        deliveryMethod={
+          state.delivery.method && state.delivery.price >= 0
+            ? state.delivery.methodName || state.delivery.method
+            : undefined
+        }
+        deliveryPrice={state.delivery.price}
+        totalPrice={priceBreakdown.totalPrice}
+        subtotalWithoutVat={subtotalWithoutVat}
+        vatAmount={vatAmount}
+        couponCode={state.coupon?.code ?? null}
+        discountAmount={priceBreakdown.discountAmount}
+      />
 
-      <CardContent className="p-4 space-y-3">
-        {/* Service Name */}
-        <div>
-          <h3 className="font-semibold text-secondary-900 text-sm">{service.name}</h3>
-          <p className="text-xs text-neutral-500 mt-0.5">{service.short_description}</p>
-        </div>
-
-        <Separator />
-
-        {/* Price Breakdown */}
-        <div className="space-y-2">
-          {/* Base Price */}
-          <div className="flex justify-between text-sm">
-            <span className="text-neutral-600">Preț serviciu</span>
-            <span className="font-medium">{priceBreakdown.basePrice} RON</span>
-          </div>
-
-          {/* Selected Options */}
-          {state.selectedOptions.map((option, index) => {
-            const price = typeof option.priceModifier === 'number' && !isNaN(option.priceModifier)
-              ? option.priceModifier
-              : 0;
-            return (
-              <div key={index} className="flex justify-between text-sm">
-                <span className="text-neutral-600">{option.optionName}</span>
-                <span className="font-medium">+{price * (option.quantity || 1)} RON</span>
-              </div>
-            );
-          })}
-
-          {/* Delivery */}
-          {state.delivery.method && state.delivery.price > 0 && (
-            <div className="flex justify-between text-sm">
-              <span className="text-neutral-600 flex items-center gap-1">
-                <Truck className="h-3 w-3" />
-                {state.delivery.methodName}
-              </span>
-              <span className="font-medium">+{state.delivery.price} RON</span>
-            </div>
-          )}
-        </div>
-
-        <Separator />
-
-        {/* Total */}
-        <div className="flex justify-between items-center">
-          <span className="font-semibold text-secondary-900">Total</span>
-          <span className="text-2xl font-bold text-primary-600">
-            {priceBreakdown.totalPrice} RON
+      {/* Estimated delivery */}
+      <Card className="bg-white border-neutral-200">
+        <CardContent className="p-3.5 flex items-start gap-3">
+          <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary-50 shrink-0">
+            <Clock className="h-3.5 w-3.5 text-primary-600" />
           </span>
-        </div>
-
-        {/* Estimated Delivery */}
-        <div className="bg-neutral-50 rounded-lg p-3">
-          <p className="text-xs text-neutral-500 mb-1">Timp estimat livrare</p>
-          <p className="text-sm font-semibold text-secondary-900">
-            {service.estimated_days} zile lucrătoare
-          </p>
-        </div>
-
-        {/* Trust Badges */}
-        <div className="space-y-2 pt-2">
-          <div className="flex items-center gap-2 text-sm text-neutral-600">
-            <Shield className="h-4 w-4 text-green-500" />
-            <span>Plată securizată 100%</span>
+          <div className="min-w-0">
+            <p className="text-xs text-neutral-500">Timp estimat livrare</p>
+            <p className="text-sm font-semibold text-secondary-900 leading-tight">
+              {service.estimated_days} zile lucrătoare
+            </p>
           </div>
-          <div className="flex items-center gap-2 text-sm text-neutral-600">
-            <CheckCircle className="h-4 w-4 text-green-500" />
-            <span>Garanție rambursare</span>
-          </div>
+        </CardContent>
+      </Card>
+
+      {/* Trust badges */}
+      <div className="space-y-2 px-1">
+        <div className="flex items-center gap-2 text-xs text-neutral-600">
+          <Shield className="h-3.5 w-3.5 text-emerald-500" />
+          <span>Plată securizată 100%</span>
         </div>
-      </CardContent>
-    </Card>
+        <div className="flex items-center gap-2 text-xs text-neutral-600">
+          <CheckCircle className="h-3.5 w-3.5 text-emerald-500" />
+          <span>Garanție rambursare</span>
+        </div>
+      </div>
+    </div>
   );
 }

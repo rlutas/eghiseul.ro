@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { normalizeOrderOptions } from '@/lib/orders/normalize'
 
 // Calculate business days (skip weekends)
 function addBusinessDays(startDate: Date, days: number): Date {
@@ -159,6 +160,9 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     const basePrice = order.services ? parseFloat(String(order.services.base_price)) : 0
     const optionsPrice = parseFloat(String(order.options_price || 0))
     const deliveryPrice = parseFloat(String(order.delivery_price || 0))
+    const orderRow = order as typeof order & { coupon_code?: string | null }
+    const discountAmount = parseFloat(String(order.discount_amount || 0))
+    const couponCode = orderRow.coupon_code ?? null
     // Prices are VAT-inclusive: subtotal = total / (1 + VAT_RATE)
     const subtotalWithoutVat = Math.round((totalAmount / (1 + VAT_RATE)) * 100) / 100
     const vatAmount = Math.round((totalAmount - subtotalWithoutVat) * 100) / 100
@@ -171,14 +175,27 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       ? new Date(order.estimated_completion_date).toISOString()
       : null
 
+    // Append client-type suffix to the service display name when the order has
+    // a clientType saved (PF/PJ). Single source of truth for "Cazier Judiciar
+    // PF" vs "Cazier Judiciar PJ" rendering across checkout / Oblio / Stripe.
+    const orderRowMeta = order as typeof order & { client_type?: string | null }
+    const clientType = orderRowMeta.client_type || null
+    const baseServiceName = order.services?.name || ''
+    const serviceDisplayName =
+      clientType && (clientType === 'PF' || clientType === 'PJ')
+        ? `${baseServiceName} ${clientType}`
+        : baseServiceName
+
     const transformedOrder = {
       id: order.id,
       orderNumber: displayOrderNumber,
       userId: order.user_id,
+      clientType,
       service: order.services ? {
         id: order.services.id,
         slug: order.services.slug,
-        name: order.services.name,
+        name: serviceDisplayName,
+        baseName: baseServiceName,
         description: order.services.description,
         category: order.services.category,
         basePrice: parseFloat(String(order.services.base_price)),
@@ -192,12 +209,17 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         basePrice,
         optionsPrice,
         deliveryPrice,
+        discountAmount,
+        couponCode,
         subtotalWithoutVat,
         vatAmount,
         vatRate: VAT_RATE,
         total: totalAmount,
       },
       selectedOptions: order.selected_options || [],
+      // Canonical normalized options used by checkout summary, Oblio, Stripe.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      options: normalizeOrderOptions(order.selected_options as any[] | null),
       customerData: order.customer_data,
       deliveryMethod: order.delivery_method,
       deliveryAddress: order.delivery_address,

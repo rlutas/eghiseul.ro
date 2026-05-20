@@ -1,13 +1,56 @@
 # Documentație eGhiseul.ro
 
-**Ultima actualizare:** 2026-02-19
-**Status proiect:** Sprint 4 (98%) / Sprint 5 (98%) - CLIENT_DETAILS_BLOCK Legal Format + KYC Confidence Tracking
-**Fișier principal:** `../DEVELOPMENT_MASTER_PLAN.md`
-**Sesiune recap:** [`SESSION_RECAP.md`](SESSION_RECAP.md) - **Citeste asta daca revii dupa pauza**
+**Ultima actualizare:** 2026-04-29
+**Status proiect:** Sprint 6 (~98% complet) — Wizard redesign (Step 1+2 merge, summary unificat), Performance 10x, KYC security, 596 unit tests, CI verde
+**Fișier principal:** [`DEVELOPMENT_MASTER_PLAN.md`](DEVELOPMENT_MASTER_PLAN.md)
+**Status curent:** [`STATUS_CURRENT.md`](STATUS_CURRENT.md) — **citeste primul daca revii dupa pauza**
+**Recap sesiune curentă:** [`session-logs/2026-04-29-wizard-redesign.md`](session-logs/2026-04-29-wizard-redesign.md)
+**Sesiune anterioară:** [`session-logs/2026-04-27-performance-image-compression.md`](session-logs/2026-04-27-performance-image-compression.md)
+**Testing guide:** [`testing/COMPREHENSIVE_GUIDE.md`](testing/COMPREHENSIVE_GUIDE.md)
 
 ---
 
-## ✅ SESIUNE COMPLETATA - 18-19 Februarie 2026
+## ✅ SESIUNE 2026-04-29 — Wizard redesign (Step 1+2 merge, summary unificat)
+
+**Step 1 (Contact) merged cu Tip Client** · eliminat step separat; adăugat citizenship toggle (PF only — Romanian / Foreign cu EU vs non-EU sub-pick) + purpose dropdown cu 219 motive prioritizate (cazier-judiciar/fiscal/auto/integritate); PhoneInput cu country picker. Eliminat `preferredContact`.
+
+**Step 2 (Date Personale)** · mode picker Scan vs Manual, CNP live preview (`summarizeCNP`), country list filtered EU/non-EU, Adresa România required pentru străini, OCR progress fake-anim 40→68%.
+
+**Summary unificat** · `OrderSummaryCard.tsx` rescris ca single source of truth (sidebar wizard + checkout + status). `lib/orders/normalize.ts` canonical option shape. `breakdown.couponCode` + `apiOrder.options` în API.
+
+**Bug fixes** · `crypto.randomUUID` fallback pentru HTTP/mobile (`lib/random-id.ts`); CNP UTC drift (off-by-one); motiv dropdown clipping (React Portal); emojis → lucide. CNP-derived auto-fill birthDate + județ.
+
+**Stripe + Oblio** · per-line metadata pe PaymentIntent (`line_N_name/price/code` + `couponCode` + `discountAmount`); description rich; Oblio TVA 19→21%.
+
+**DB persistence** · `customer_data.contact.{citizenship, foreignType, purpose}` (zero migration — JSONB existent). Admin order detail afișează Cetățenie + Motivul.
+
+**Cleanup** · eliminate 2 opțiuni deprecate (`verificare_expert`, `copii_suplimentare`) din UI + auto-clean drafts vechi.
+
+---
+
+## ✅ SESIUNE 2026-04-27/28 — Performance + KYC Security + Test Infrastructure
+
+**Etapa 1 — Turbopack dev mode** · `next dev --turbopack` în `package.json`. PATCH `/api/orders/draft` 58s → 200-2500ms.
+
+**Etapa 2 — Admin list optimization** · `count='estimated'` (no `COUNT(*)` cost) + exclude `status=draft` din default. GET admin/orders/list 25-39s → 3-5s.
+
+**Etapa 3 — Image compression client-side** · `src/lib/images/compress.ts` (EXIF orientation, target 1600px, q=0.85, fallback canvas). 5MB CI → 207 KB. Aplicat în `IdScanner`, `PersonalDataStep`, `KYCDocumentsStep`, `KYCTab`.
+
+**Etapa 4 — Gemini model hibrid** · OCR: `gemini-2.5-flash-lite` (~1.9s, 98% confidence). KYC face-match: `gemini-2.5-flash` (~6-10s, acurat) — flash-lite dădea fals negativ.
+
+**Etapa 5 — KYC util reutilizabil** · `src/lib/kyc/face-match.ts` cu `runFaceMatch()`. **Security gap închis:** `KYCTab.tsx` (account page) acum face face-match la selfie upload (anterior salvea direct fără validare).
+
+**Etapa 6 — Test infrastructure** · 596 unit tests (Vitest 4) + 8 integration (real Gemini/DB) + 13 E2E (Playwright) + 17 smoke. CI: lint + tsc + tests + build, verde pe `main`.
+
+**Etapa 7 — TDD bug hunting** · 2 GDPR-critical bugs găsite și fixate cu test-first: audit-logger PII redaction (`'imageBase64'` lowercase mismatch) + `order_history` CHECK constraint missing event_types (migration 035).
+
+**Etapa 8 — Next.js 16 migration** · `src/middleware.ts` → `src/proxy.ts` (convenția Next.js 16, elimină warning-ul deprecated).
+
+**⚠️ ALERT pendent:** Rotire `SUPABASE_SERVICE_ROLE_KEY` — cheia leaked în history (commit Feb 11), fișier șters dar cheia rămâne în git history. Manual pe https://supabase.com/dashboard → Vercel → `.env.local`.
+
+---
+
+## ✅ SESIUNE 18-19 Februarie 2026
 
 > **Pentru detalii complete, citeste [`SESSION_RECAP.md`](SESSION_RECAP.md)**
 

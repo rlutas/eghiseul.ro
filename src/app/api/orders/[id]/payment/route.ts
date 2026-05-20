@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createClient as createServiceClient } from '@supabase/supabase-js'
 import { createPaymentIntent } from '@/lib/stripe'
+import { normalizeOrderOptions } from '@/lib/orders/normalize'
 
 // Service role client for bypassing RLS (for guest orders)
 const getServiceClient = () => createServiceClient(
@@ -22,8 +23,11 @@ interface OrderWithService {
   base_price: number | null
   options_price: number | null
   delivery_price: number | null
+  delivery_method: string | null
   coupon_code: string | null
   discount_amount: number | null
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  selected_options: any[] | null
   payment_status: string
   stripe_payment_intent_id: string | null
   created_at: string
@@ -85,7 +89,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     const { data, error: orderError } = await serviceClient
       .from('orders')
       .select(`
-        id, user_id, order_number, friendly_order_id, total_price, base_price, options_price, delivery_price, coupon_code, discount_amount, payment_status, stripe_payment_intent_id, created_at, customer_data,
+        id, user_id, order_number, friendly_order_id, total_price, base_price, options_price, delivery_price, delivery_method, coupon_code, discount_amount, selected_options, payment_status, stripe_payment_intent_id, created_at, customer_data,
         services (
           name
         )
@@ -264,16 +268,65 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       ...(!isCompany && personal?.cnp && { cnp: personal.cnp }),
     } : undefined
 
+    // ── Build per-line metadata + rich description ────────────────
+    // Stripe PaymentIntent has no native line_items, but `description` and
+    // `metadata` are visible in the dashboard and on receipt emails. We
+    // surface each option as `line_<n>_*` metadata keys + a humanized text
+    // breakdown in the description so accounting can see them clearly.
+    const normalizedOptions = normalizeOrderOptions(order.selected_options)
+    const lineMetadata: Record<string, string> = {
+      orderId: order.id,
+      orderNumber,
+      userId: user?.id || 'guest',
+      serviceName,
+      basePrice: parseFloat(String(order.base_price ?? 0)).toFixed(2),
+    }
+    let lineIdx = 1
+    // Service line
+    lineMetadata[`line_${lineIdx}_name`] = serviceName.slice(0, 250)
+    lineMetadata[`line_${lineIdx}_price`] = parseFloat(String(order.base_price ?? 0)).toFixed(2)
+    lineIdx++
+    for (const opt of normalizedOptions) {
+      if (lineIdx > 20) break // Stripe metadata cap is 50 keys total — leave headroom
+      const safeName = opt.name.slice(0, 250)
+      lineMetadata[`line_${lineIdx}_name`] = safeName
+      lineMetadata[`line_${lineIdx}_price`] = opt.total.toFixed(2)
+      if (opt.code) lineMetadata[`line_${lineIdx}_code`] = opt.code.slice(0, 40)
+      lineIdx++
+    }
+    if (order.delivery_price && order.delivery_price > 0 && lineIdx <= 20) {
+      lineMetadata[`line_${lineIdx}_name`] = `Livrare: ${(order.delivery_method || 'Standard').slice(0, 200)}`
+      lineMetadata[`line_${lineIdx}_price`] = parseFloat(String(order.delivery_price)).toFixed(2)
+      lineIdx++
+    }
+    if (order.coupon_code && order.discount_amount && Number(order.discount_amount) > 0) {
+      lineMetadata.couponCode = String(order.coupon_code).slice(0, 40)
+      lineMetadata.discountAmount = parseFloat(String(order.discount_amount)).toFixed(2)
+    }
+
+    // Description shown on Stripe receipt + dashboard.
+    const descriptionParts: string[] = [`${serviceName} (${orderNumber})`]
+    for (const opt of normalizedOptions) {
+      descriptionParts.push(`+ ${opt.name}: ${opt.total.toFixed(2)} RON`)
+    }
+    if (order.delivery_price && order.delivery_price > 0) {
+      descriptionParts.push(
+        `+ Livrare ${order.delivery_method || 'Standard'}: ${parseFloat(String(order.delivery_price)).toFixed(2)} RON`
+      )
+    }
+    if (order.coupon_code && order.discount_amount && Number(order.discount_amount) > 0) {
+      descriptionParts.push(
+        `Cupon ${order.coupon_code}: −${parseFloat(String(order.discount_amount)).toFixed(2)} RON`
+      )
+    }
+    // Stripe description max 1000 chars.
+    const description = descriptionParts.join(' | ').slice(0, 999)
+
     const paymentIntent = await createPaymentIntent(
       finalTotalPrice,
+      lineMetadata,
       {
-        orderId: order.id,
-        orderNumber,
-        userId: user?.id || 'guest',
-        serviceName,
-      },
-      {
-        description: `${serviceName} - ${orderNumber}`,
+        description,
         customer: stripeCustomer,
         receiptEmail: contact?.email,
       }

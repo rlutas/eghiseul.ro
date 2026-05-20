@@ -310,7 +310,7 @@ async function main() {
   const results = [];
   // Run sequentially to avoid hammering dev server; fast enough for < 30s.
   for (const t of tests) {
-    // eslint-disable-next-line no-await-in-loop
+     
     const r = await runTest(t);
     results.push(r);
     printResult(r);

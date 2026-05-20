@@ -5,3 +5,4 @@ export { StripeCheckoutForm } from './StripeCheckoutForm';
 export { BankTransferDetails } from './BankTransferDetails';
 export { PaymentProofUpload } from './PaymentProofUpload';
 export { OrderSummaryCard } from './OrderSummaryCard';
+export { CouponInput } from './CouponInput';

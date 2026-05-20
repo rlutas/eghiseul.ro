@@ -462,6 +462,13 @@ export interface ModularWizardState {
     email: string;
     phone: string;
     preferredContact: 'email' | 'phone' | 'whatsapp';
+    /** Citizenship — only meaningful for PF clients. Default: 'romanian'. */
+    citizenship?: 'romanian' | 'foreign';
+    /** Sub-type of foreign citizenship for procedural routing. */
+    foreignType?: 'eu' | 'non-eu';
+    /** "Motivul solicitării" / purpose of the request — applies to services
+     * that require it (cazier judiciar, fiscal, auto, integritate). */
+    purpose?: string;
   };
 
   // Client type (PF = Persoana Fizică, PJ = Persoana Juridică)

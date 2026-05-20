@@ -38,7 +38,6 @@ const ENHANCEMENT_EXTRAS = new Set<string>([
   'apostila_haga',
   'apostila_notari',
   'legalizare',
-  'verificare_expert',
 ]);
 
 const categoryLabels: Record<ServiceCategory, string> = {

@@ -4,7 +4,16 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Mail, Phone, MessageCircle, CheckCircle, Pencil, User } from 'lucide-react';
+import {
+  Mail,
+  Phone,
+  CheckCircle,
+  Pencil,
+  User,
+  Building2,
+  Globe,
+  Flag,
+} from 'lucide-react';
 import {
   Form,
   FormControl,
@@ -15,19 +24,69 @@ import {
   FormDescription,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Button } from '@/components/ui/button';
 import { useModularWizard } from '@/providers/modular-wizard-provider';
+import { PhoneInput } from '@/components/shared/PhoneInput';
+import { SearchableSelect } from '@/components/shared/SearchableSelect';
+import { cn } from '@/lib/utils';
+import type { ClientType } from '@/types/verification-modules';
+import { getCountriesForForeignType } from '@/config/countries';
+import {
+  MOTIV_CAZIER_OPTIONS,
+  MOTIV_CAZIER_FISCAL_OPTIONS,
+  MOTIV_CAZIER_AUTO_OPTIONS,
+  MOTIV_INTEGRITATE_OPTIONS,
+} from '@/config/motiv-options';
+
+/** Map service slug → which "Motiv" list to surface (if any). */
+function getPurposeOptionsForService(slug: string | null): readonly string[] | null {
+  if (!slug) return null;
+  if (slug.includes('cazier-judiciar')) return MOTIV_CAZIER_OPTIONS;
+  if (slug.includes('cazier-fiscal')) return MOTIV_CAZIER_FISCAL_OPTIONS;
+  if (slug.includes('cazier-auto')) return MOTIV_CAZIER_AUTO_OPTIONS;
+  if (slug.includes('integritate')) return MOTIV_INTEGRITATE_OPTIONS;
+  return null;
+}
+
+/** Most-frequently picked motives, surfaced at the top of the dropdown. */
+function getPurposePriorityForService(slug: string | null): readonly string[] {
+  if (!slug) return [];
+  if (slug.includes('cazier-judiciar')) {
+    return [
+      'ANGAJARE',
+      'ADOPȚIE',
+      'VIZĂ',
+      'EMIGRARE',
+      'CĂSĂTORIE',
+      'CONCURS/EXAMEN',
+      'ALTE MOTIVE',
+    ];
+  }
+  if (slug.includes('cazier-fiscal')) {
+    return ['Angajare', 'Dosar', 'Licitație', 'Bancă', 'Alte motive'];
+  }
+  if (slug.includes('cazier-auto')) {
+    return ['LOCUL DE MUNCĂ', 'INTERES PERSONAL', 'ALTE MOTIVE'];
+  }
+  if (slug.includes('integritate')) {
+    return ['ANGAJARE', 'ADOPȚIE', 'CONCURS', 'VOLUNTARIAT'];
+  }
+  return [];
+}
+
+// Phone validation: international E.164-ish format. We accept any number that
+// starts with + followed by 8-15 digits/spaces — react-international-phone
+// gives us back values like "+40712345678".
+const PHONE_REGEX = /^\+[1-9]\d{6,14}$/;
 
 const contactSchema = z.object({
   email: z.string().email('Introdu o adresă de email validă'),
   phone: z
     .string()
-    .regex(
-      /^\+40\s?7[0-9]{2}\s?[0-9]{3}\s?[0-9]{3}$/,
-      'Format valid: +40 7XX XXX XXX'
-    ),
-  preferredContact: z.enum(['email', 'phone', 'whatsapp']),
+    .min(1, 'Introdu numărul de telefon')
+    .refine((v) => PHONE_REGEX.test(v.replace(/\s+/g, '')), {
+      message: 'Număr de telefon invalid',
+    }),
 });
 
 type ContactFormData = z.infer<typeof contactSchema>;
@@ -36,107 +95,133 @@ interface ContactStepProps {
   onValidChange: (valid: boolean) => void;
 }
 
-// Helper to format phone from various formats to +40 7XX XXX XXX
-function formatPhoneForDisplay(phone: string | undefined): string {
-  if (!phone) return '+40 ';
-
-  const digits = phone.replace(/\D/g, '');
-
-  // Handle Romanian phone numbers
-  if (digits.startsWith('40') && digits.length >= 11) {
-    // Already has country code: 40712345678
-    return '+' + digits.slice(0, 2) + ' ' + digits.slice(2, 5) + ' ' + digits.slice(5, 8) + ' ' + digits.slice(8, 11);
-  } else if (digits.startsWith('07') && digits.length === 10) {
-    // Local format: 0712345678
-    return '+40 ' + digits.slice(1, 4) + ' ' + digits.slice(4, 7) + ' ' + digits.slice(7, 10);
-  } else if (digits.startsWith('7') && digits.length === 9) {
-    // Without 0: 712345678
-    return '+40 ' + digits.slice(0, 3) + ' ' + digits.slice(3, 6) + ' ' + digits.slice(6, 9);
-  }
-
-  // Fallback: just format what we have
-  if (digits.length >= 2) {
-    return '+' + digits.slice(0, 2) + ' ' + (digits.length > 2 ? digits.slice(2) : '');
-  }
-
-  return '+40 ';
-}
-
 export function ContactStepModular({ onValidChange }: ContactStepProps) {
-  const { state, updateContact, isPrefilled } = useModularWizard();
+  const {
+    state,
+    updateContact,
+    updatePersonalKyc,
+    setClientType,
+    isPrefilled,
+    priceBreakdown,
+  } = useModularWizard();
   const [showEditMode, setShowEditMode] = useState(false);
 
-  // Check if we have valid prefilled contact data
-  const formattedPhone = formatPhoneForDisplay(state.contact.phone);
-  const hasValidPrefilledData = isPrefilled &&
+  // Whether the service requires a client type (PF/PJ) selection.
+  const requiresClientType =
+    !!state.verificationConfig?.clientTypeSelection?.enabled;
+
+  // Whether to show citizenship toggle. Only relevant for PF (companies are
+  // by definition Romanian legal entities here).
+  const showsCitizenship = state.clientType === 'PF';
+  const citizenship = state.contact.citizenship ?? 'romanian';
+  const isForeign = citizenship === 'foreign';
+
+  // Service-specific purpose / motivul solicitării. Drop-down only.
+  const purposeOptions = getPurposeOptionsForService(state.serviceSlug);
+  const purposePriority = getPurposePriorityForService(state.serviceSlug);
+  const showsPurpose =
+    !!purposeOptions && state.clientType === 'PF';
+  const purpose = state.contact.purpose ?? '';
+
+  const clientTypeOptions =
+    state.verificationConfig?.clientTypeSelection?.options ?? [
+      { value: 'PF' as const, label: 'Persoană Fizică', description: 'Pentru persoane fizice' },
+      { value: 'PJ' as const, label: 'Persoană Juridică', description: 'Pentru companii și firme' },
+    ];
+
+  const hasValidPrefilledData =
+    isPrefilled &&
     state.contact.email &&
     state.contact.email.includes('@') &&
-    formattedPhone.length >= 15; // +40 7XX XXX XXX = 16 chars
+    typeof state.contact.phone === 'string' &&
+    state.contact.phone.replace(/\s+/g, '').length >= 8;
 
   const form = useForm<ContactFormData>({
     resolver: zodResolver(contactSchema),
     defaultValues: {
       email: state.contact.email || '',
-      phone: formattedPhone,
-      preferredContact: state.contact.preferredContact || 'email',
+      phone: state.contact.phone || '+40',
     },
     mode: 'onChange',
   });
 
-  const { isValid } = form.formState;
+  const { isValid: formIsValid } = form.formState;
 
-  // Update parent validity - if prefilled and valid, mark as valid immediately
+  // Step validity:
+  //   contact valid + (if required) client type + (if shown) purpose chosen
+  //   + foreign birth fields when foreign citizenship picked.
+  const purposeOk = !showsPurpose || !!purpose;
+  const foreignBirthOk =
+    !isForeign ||
+    (!!state.personalKyc?.foreignData?.birthCity?.trim() &&
+      !!state.personalKyc?.foreignData?.birthCountry);
+  const isStepValid =
+    formIsValid &&
+    (!requiresClientType || !!state.clientType) &&
+    purposeOk &&
+    foreignBirthOk;
+
   useEffect(() => {
     if (hasValidPrefilledData && !showEditMode) {
-      onValidChange(true);
+      onValidChange(
+        (!requiresClientType || !!state.clientType) &&
+          purposeOk &&
+          foreignBirthOk
+      );
     } else {
-      onValidChange(isValid);
+      onValidChange(isStepValid);
     }
-  }, [isValid, onValidChange, hasValidPrefilledData, showEditMode]);
+  }, [
+    isStepValid,
+    onValidChange,
+    hasValidPrefilledData,
+    showEditMode,
+    requiresClientType,
+    state.clientType,
+    purposeOk,
+    foreignBirthOk,
+  ]);
 
-  // Update context when form changes
+  // Sync form changes back to wizard state.
   useEffect(() => {
     const subscription = form.watch((value) => {
       updateContact({
         email: value.email,
         phone: value.phone,
-        preferredContact: value.preferredContact,
       });
     });
     return () => subscription.unsubscribe();
   }, [form, updateContact]);
 
-  // Auto-format phone number
-  const formatPhone = (value: string) => {
-    const digits = value.replace(/\D/g, '');
-    if (digits.length <= 2) return '+' + digits;
-    if (digits.length <= 5) return '+' + digits.slice(0, 2) + ' ' + digits.slice(2);
-    if (digits.length <= 8) return '+' + digits.slice(0, 2) + ' ' + digits.slice(2, 5) + ' ' + digits.slice(5);
-    return '+' + digits.slice(0, 2) + ' ' + digits.slice(2, 5) + ' ' + digits.slice(5, 8) + ' ' + digits.slice(8, 11);
+  const handleClientTypeSelect = (type: ClientType) => {
+    setClientType(type);
   };
 
-  // Compact prefilled view
+  const getClientTypeIcon = (type: ClientType) =>
+    type === 'PF' ? User : Building2;
+
+  // ── Compact prefilled view ───────────────────────────────────────────
   if (hasValidPrefilledData && !showEditMode) {
     return (
       <div className="space-y-6">
-        {/* Prefilled Banner */}
-        <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-4">
+        {/* Prefilled banner */}
+        <div className="bg-gradient-to-r from-emerald-50 to-emerald-50/50 border border-emerald-200 rounded-xl p-4">
           <div className="flex gap-3">
-            <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center flex-shrink-0">
-              <CheckCircle className="h-5 w-5 text-green-600" />
+            <div className="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center flex-shrink-0">
+              <CheckCircle className="h-5 w-5 text-emerald-600" />
             </div>
             <div className="flex-1">
-              <p className="font-semibold text-green-800">
+              <p className="font-semibold text-emerald-800">
                 Date preluate din contul tău
               </p>
-              <p className="text-sm text-green-700 mt-1">
+              <p className="text-sm text-emerald-700 mt-1">
                 Te vom contacta pe datele de mai jos. Poți continua sau modifica dacă e nevoie.
               </p>
             </div>
           </div>
         </div>
 
-        {/* Contact Summary Card */}
+        {/* Contact summary */}
         <div className="bg-white border border-neutral-200 rounded-xl p-6 space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="font-semibold text-secondary-900 flex items-center gap-2">
@@ -154,41 +239,87 @@ export function ContactStepModular({ onValidChange }: ContactStepProps) {
             </Button>
           </div>
 
-          <div className="grid gap-4">
+          <div className="grid gap-3">
             <div className="flex items-center gap-3 p-3 bg-neutral-50 rounded-lg">
               <Mail className="w-5 h-5 text-primary-500" />
-              <div>
-                <p className="text-sm text-neutral-500">Email</p>
-                <p className="font-medium text-secondary-900">{state.contact.email}</p>
+              <div className="min-w-0">
+                <p className="text-xs text-neutral-500">Email</p>
+                <p className="font-medium text-secondary-900 truncate">
+                  {state.contact.email}
+                </p>
               </div>
             </div>
 
             <div className="flex items-center gap-3 p-3 bg-neutral-50 rounded-lg">
               <Phone className="w-5 h-5 text-primary-500" />
-              <div>
-                <p className="text-sm text-neutral-500">Telefon</p>
-                <p className="font-medium text-secondary-900">{formattedPhone}</p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3 p-3 bg-neutral-50 rounded-lg">
-              <MessageCircle className="w-5 h-5 text-primary-500" />
-              <div>
-                <p className="text-sm text-neutral-500">Metoda preferată</p>
-                <p className="font-medium text-secondary-900 capitalize">
-                  {state.contact.preferredContact === 'email' ? 'Email' :
-                   state.contact.preferredContact === 'phone' ? 'Telefon' :
-                   state.contact.preferredContact === 'whatsapp' ? 'WhatsApp' :
-                   'Email'}
+              <div className="min-w-0">
+                <p className="text-xs text-neutral-500">Telefon</p>
+                <p className="font-medium text-secondary-900 truncate">
+                  {state.contact.phone}
                 </p>
               </div>
             </div>
           </div>
         </div>
+
+        {/* Client Type still required even when contact is prefilled */}
+        {requiresClientType && (
+          <ClientTypeSelector
+            options={clientTypeOptions}
+            selectedType={state.clientType}
+            onSelect={handleClientTypeSelect}
+            getIcon={getClientTypeIcon}
+            basePrice={priceBreakdown.basePrice}
+          />
+        )}
+
+        {/* Citizenship + Purpose also required when contact is prefilled */}
+        {showsCitizenship && (
+          <>
+            <CitizenshipToggle
+              citizenship={citizenship}
+              foreignType={state.contact.foreignType ?? 'eu'}
+              onChange={(c, ft) =>
+                updateContact({
+                  citizenship: c,
+                  foreignType: c === 'foreign' ? ft : undefined,
+                })
+              }
+            />
+            {isForeign && (
+              <ForeignBirthFields
+                birthCity={state.personalKyc?.foreignData?.birthCity ?? ''}
+                birthCountry={state.personalKyc?.foreignData?.birthCountry ?? ''}
+                foreignType={state.contact.foreignType}
+                onChange={(birthCity, birthCountry) => {
+                  updatePersonalKyc({
+                    foreignData: {
+                      birthCity,
+                      birthCountry,
+                      hasRomanianAddress:
+                        state.personalKyc?.foreignData?.hasRomanianAddress ?? true,
+                      foreignAddress:
+                        state.personalKyc?.foreignData?.foreignAddress,
+                    },
+                  });
+                }}
+              />
+            )}
+          </>
+        )}
+        {showsPurpose && purposeOptions && (
+          <PurposeSelect
+            options={purposeOptions}
+            priorityOptions={purposePriority}
+            value={purpose}
+            onChange={(v) => updateContact({ purpose: v })}
+          />
+        )}
       </div>
     );
   }
 
+  // ── Editable form ────────────────────────────────────────────────────
   return (
     <Form {...form}>
       <form className="space-y-6">
@@ -208,7 +339,7 @@ export function ContactStepModular({ onValidChange }: ContactStepProps) {
                     {...field}
                     type="email"
                     placeholder="email@exemplu.ro"
-                    className="pl-10"
+                    className="pl-10 h-11"
                   />
                 </div>
               </FormControl>
@@ -220,7 +351,7 @@ export function ContactStepModular({ onValidChange }: ContactStepProps) {
           )}
         />
 
-        {/* Phone */}
+        {/* Phone with country code dropdown */}
         <FormField
           control={form.control}
           name="phone"
@@ -230,94 +361,425 @@ export function ContactStepModular({ onValidChange }: ContactStepProps) {
                 Număr de Telefon <span className="text-red-500">*</span>
               </FormLabel>
               <FormControl>
-                <div className="relative">
-                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400" />
-                  <Input
-                    {...field}
-                    type="tel"
-                    placeholder="+40 7XX XXX XXX"
-                    className="pl-10"
-                    onChange={(e) => {
-                      const formatted = formatPhone(e.target.value);
-                      field.onChange(formatted);
-                    }}
-                  />
-                </div>
+                <PhoneInput
+                  value={field.value}
+                  onChange={field.onChange}
+                  error={form.formState.errors.phone?.message}
+                />
               </FormControl>
               <FormDescription>
                 Te vom contacta în caz de nelămuriri
               </FormDescription>
-              <FormMessage />
+              {!form.formState.errors.phone && <FormMessage />}
             </FormItem>
           )}
         />
 
-        {/* Preferred Contact Method */}
-        <FormField
-          control={form.control}
-          name="preferredContact"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-secondary-900 font-medium">
-                Metodă Preferată de Contact
-              </FormLabel>
-              <FormControl>
-                <RadioGroup
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                  className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2"
-                >
-                  <label
-                    className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${
-                      field.value === 'email'
-                        ? 'border-primary-500 bg-primary-50'
-                        : 'border-neutral-200 hover:border-neutral-300'
-                    }`}
-                  >
-                    <RadioGroupItem value="email" className="sr-only" />
-                    <Mail className={`h-5 w-5 ${field.value === 'email' ? 'text-primary-600' : 'text-neutral-400'}`} />
-                    <div>
-                      <p className="font-medium text-secondary-900">Email</p>
-                      <p className="text-xs text-neutral-500">Răspuns în 24h</p>
-                    </div>
-                  </label>
+        {/* Tip Client (PF/PJ) — only when service requires it */}
+        {requiresClientType && (
+          <ClientTypeSelector
+            options={clientTypeOptions}
+            selectedType={state.clientType}
+            onSelect={handleClientTypeSelect}
+            getIcon={getClientTypeIcon}
+            basePrice={priceBreakdown.basePrice}
+          />
+        )}
 
-                  <label
-                    className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${
-                      field.value === 'phone'
-                        ? 'border-primary-500 bg-primary-50'
-                        : 'border-neutral-200 hover:border-neutral-300'
-                    }`}
-                  >
-                    <RadioGroupItem value="phone" className="sr-only" />
-                    <Phone className={`h-5 w-5 ${field.value === 'phone' ? 'text-primary-600' : 'text-neutral-400'}`} />
-                    <div>
-                      <p className="font-medium text-secondary-900">Telefon</p>
-                      <p className="text-xs text-neutral-500">L-V, 9-18</p>
-                    </div>
-                  </label>
+        {/* Citizenship — only for PF clients */}
+        {showsCitizenship && (
+          <>
+            <CitizenshipToggle
+              citizenship={citizenship}
+              foreignType={state.contact.foreignType ?? 'eu'}
+              onChange={(c, ft) =>
+                updateContact({
+                  citizenship: c,
+                  foreignType: c === 'foreign' ? ft : undefined,
+                })
+              }
+            />
+            {isForeign && (
+              <ForeignBirthFields
+                birthCity={state.personalKyc?.foreignData?.birthCity ?? ''}
+                birthCountry={state.personalKyc?.foreignData?.birthCountry ?? ''}
+                foreignType={state.contact.foreignType}
+                onChange={(birthCity, birthCountry) => {
+                  updatePersonalKyc({
+                    foreignData: {
+                      birthCity,
+                      birthCountry,
+                      hasRomanianAddress:
+                        state.personalKyc?.foreignData?.hasRomanianAddress ?? true,
+                      foreignAddress:
+                        state.personalKyc?.foreignData?.foreignAddress,
+                    },
+                  });
+                }}
+              />
+            )}
+          </>
+        )}
 
-                  <label
-                    className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${
-                      field.value === 'whatsapp'
-                        ? 'border-primary-500 bg-primary-50'
-                        : 'border-neutral-200 hover:border-neutral-300'
-                    }`}
-                  >
-                    <RadioGroupItem value="whatsapp" className="sr-only" />
-                    <MessageCircle className={`h-5 w-5 ${field.value === 'whatsapp' ? 'text-primary-600' : 'text-neutral-400'}`} />
-                    <div>
-                      <p className="font-medium text-secondary-900">WhatsApp</p>
-                      <p className="text-xs text-neutral-500">Rapid și simplu</p>
-                    </div>
-                  </label>
-                </RadioGroup>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        {/* Purpose / Motivul solicitării — only for cazier-type services + PF */}
+        {showsPurpose && purposeOptions && (
+          <PurposeSelect
+            options={purposeOptions}
+            priorityOptions={purposePriority}
+            value={purpose}
+            onChange={(v) => updateContact({ purpose: v })}
+          />
+        )}
       </form>
     </Form>
+  );
+}
+
+// ──────────────────────────────────────────────────────────────────────────
+// Citizenship toggle (Romanian / Foreign with EU vs non-EU sub-pick)
+// ──────────────────────────────────────────────────────────────────────────
+
+interface CitizenshipToggleProps {
+  citizenship: 'romanian' | 'foreign';
+  foreignType: 'eu' | 'non-eu';
+  onChange: (citizenship: 'romanian' | 'foreign', foreignType: 'eu' | 'non-eu') => void;
+}
+
+function CitizenshipToggle({
+  citizenship,
+  foreignType,
+  onChange,
+}: CitizenshipToggleProps) {
+  return (
+    <div className="space-y-3">
+      <div>
+        <p className="text-secondary-900 font-medium text-sm">
+          Cetățenia ta <span className="text-red-500">*</span>
+        </p>
+        <p className="text-xs text-neutral-500 mt-0.5 leading-snug">
+          Selectează dacă ești cetățean român sau străin — fluxul de procesare diferă (cetățenii străini necesită verificări suplimentare).
+        </p>
+      </div>
+
+      <div className="grid grid-cols-2 gap-2.5 sm:gap-3">
+        {/* Romanian */}
+        <button
+          type="button"
+          onClick={() => onChange('romanian', foreignType)}
+          aria-pressed={citizenship === 'romanian'}
+          className={cn(
+            'group relative flex items-center gap-2.5 rounded-xl border-2 p-3 sm:p-4 text-left transition-all duration-200',
+            citizenship === 'romanian'
+              ? 'border-primary-500 bg-primary-50 shadow-sm'
+              : 'border-neutral-200 bg-white hover:border-primary-300 hover:bg-primary-50/30'
+          )}
+        >
+          <span
+            className={cn(
+              'flex h-9 w-9 items-center justify-center rounded-xl shrink-0 transition-colors',
+              citizenship === 'romanian' ? 'bg-primary-100' : 'bg-neutral-100'
+            )}
+          >
+            <Flag
+              className={cn(
+                'h-4 w-4',
+                citizenship === 'romanian' ? 'text-primary-600' : 'text-neutral-500'
+              )}
+            />
+          </span>
+          <span className="text-sm font-semibold text-secondary-900 leading-tight">
+            Cetățean român
+          </span>
+          {citizenship === 'romanian' && (
+            <span className="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500 text-white shadow-sm">
+              <CheckCircle className="h-3 w-3" />
+            </span>
+          )}
+        </button>
+
+        {/* Foreign */}
+        <button
+          type="button"
+          onClick={() => onChange('foreign', foreignType)}
+          aria-pressed={citizenship === 'foreign'}
+          className={cn(
+            'group relative flex items-center gap-2.5 rounded-xl border-2 p-3 sm:p-4 text-left transition-all duration-200',
+            citizenship === 'foreign'
+              ? 'border-primary-500 bg-primary-50 shadow-sm'
+              : 'border-neutral-200 bg-white hover:border-primary-300 hover:bg-primary-50/30'
+          )}
+        >
+          <span
+            className={cn(
+              'flex h-9 w-9 items-center justify-center rounded-xl shrink-0 transition-colors',
+              citizenship === 'foreign' ? 'bg-primary-100' : 'bg-neutral-100'
+            )}
+          >
+            <Globe
+              className={cn(
+                'h-4 w-4',
+                citizenship === 'foreign' ? 'text-primary-600' : 'text-neutral-500'
+              )}
+            />
+          </span>
+          <span className="text-sm font-semibold text-secondary-900 leading-tight">
+            Cetățean străin
+          </span>
+          {citizenship === 'foreign' && (
+            <span className="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500 text-white shadow-sm">
+              <CheckCircle className="h-3 w-3" />
+            </span>
+          )}
+        </button>
+      </div>
+
+      {/* Helper hint shown only when "Cetățean străin" is picked */}
+      {citizenship === 'foreign' && (
+        <p className="text-xs text-neutral-600 leading-snug -mt-1">
+          Marchează această opțiune dacă nu ești născut în România dar ai
+          permis de rezidență sau de ședere.
+        </p>
+      )}
+
+      {/* Sub-pick: EU vs non-EU when foreign */}
+      {citizenship === 'foreign' && (
+        <div className="rounded-xl border border-amber-200 bg-amber-50/60 p-3 space-y-2">
+          <p className="text-xs text-amber-800 font-medium">
+            Tipul cetățeniei străine:
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {(['eu', 'non-eu'] as const).map((ft) => (
+              <button
+                key={ft}
+                type="button"
+                onClick={() => onChange('foreign', ft)}
+                aria-pressed={foreignType === ft}
+                className={cn(
+                  'rounded-lg border-2 px-3 py-2.5 text-sm font-medium transition-colors text-center',
+                  foreignType === ft
+                    ? 'border-amber-400 bg-white text-amber-900'
+                    : 'border-amber-200 bg-white/60 text-amber-700 hover:border-amber-300'
+                )}
+              >
+                {ft === 'eu' ? 'Născut în Uniunea Europeană' : 'Născut în afara UE'}
+              </button>
+            ))}
+          </div>
+          <p className="text-[11px] text-amber-700 mt-1 leading-snug">
+            Procesarea durează 7-15 zile lucrătoare pentru cetățenii străini.
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ──────────────────────────────────────────────────────────────────────────
+// Foreign birth fields (Localitatea + Țara Nașterii) — step 1 inline block.
+// Renders inside the citizenship section when user picks "Cetățean străin".
+// Country dropdown is filtered by EU/non-EU selection.
+// ──────────────────────────────────────────────────────────────────────────
+
+interface ForeignBirthFieldsProps {
+  birthCity: string;
+  birthCountry: string;
+  foreignType: 'eu' | 'non-eu' | undefined;
+  onChange: (birthCity: string, birthCountry: string) => void;
+}
+
+function ForeignBirthFields({
+  birthCity,
+  birthCountry,
+  foreignType,
+  onChange,
+}: ForeignBirthFieldsProps) {
+  const countries = getCountriesForForeignType(foreignType);
+  return (
+    <div className="rounded-xl border border-amber-200 bg-amber-50/30 p-3 sm:p-4 space-y-3">
+      <p className="text-sm font-medium text-amber-900">
+        Date despre naștere
+      </p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="space-y-1.5">
+          <label
+            htmlFor="contact-birth-city"
+            className="block text-sm font-medium text-secondary-900"
+          >
+            Localitatea Nașterii <span className="text-red-500">*</span>
+          </label>
+          <input
+            id="contact-birth-city"
+            type="text"
+            value={birthCity}
+            onChange={(e) => onChange(e.target.value, birthCountry)}
+            placeholder="Orașul sau comuna de naștere"
+            className="h-11 w-full rounded-lg border border-neutral-300 bg-white px-3 text-sm placeholder:text-neutral-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
+          />
+        </div>
+        <div className="space-y-1.5">
+          <label
+            htmlFor="contact-birth-country"
+            className="block text-sm font-medium text-secondary-900"
+          >
+            Țara Nașterii <span className="text-red-500">*</span>
+          </label>
+          <select
+            id="contact-birth-country"
+            value={birthCountry}
+            onChange={(e) => onChange(birthCity, e.target.value)}
+            className="h-11 w-full rounded-lg border border-neutral-300 bg-white px-3 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
+          >
+            <option value="">Selectați țara</option>
+            {countries.map((c) => (
+              <option key={c} value={c}>
+                {c}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ──────────────────────────────────────────────────────────────────────────
+// Purpose / Motivul solicitării (searchable dropdown)
+// ──────────────────────────────────────────────────────────────────────────
+
+interface PurposeSelectProps {
+  options: readonly string[];
+  priorityOptions?: readonly string[];
+  value: string;
+  onChange: (value: string) => void;
+}
+
+function PurposeSelect({
+  options,
+  priorityOptions,
+  value,
+  onChange,
+}: PurposeSelectProps) {
+  return (
+    <div className="space-y-2">
+      <div>
+        <p className="text-secondary-900 font-medium text-sm">
+          Motivul solicitării <span className="text-red-500">*</span>
+        </p>
+        <p className="text-xs text-neutral-500 mt-0.5 leading-snug">
+          Acest motiv apare scris pe documentul eliberat. Cele mai frecvente sunt afișate primele — sau caută în listă.
+        </p>
+      </div>
+      <SearchableSelect
+        options={options}
+        priorityOptions={priorityOptions}
+        value={value}
+        onChange={onChange}
+        placeholder="Selectează motivul (ex: Angajare, Adopție, Vize)"
+      />
+    </div>
+  );
+}
+
+// ──────────────────────────────────────────────────────────────────────────
+// Client Type sub-component
+// ──────────────────────────────────────────────────────────────────────────
+
+interface ClientTypeOption {
+  value: ClientType;
+  label: string;
+  description?: string;
+}
+
+interface ClientTypeSelectorProps {
+  options: ClientTypeOption[];
+  selectedType: ClientType | undefined;
+  onSelect: (type: ClientType) => void;
+  getIcon: (type: ClientType) => React.ComponentType<{ className?: string }>;
+  basePrice?: number;
+}
+
+function ClientTypeSelector({
+  options,
+  selectedType,
+  onSelect,
+  getIcon,
+  basePrice,
+}: ClientTypeSelectorProps) {
+  return (
+    <div className="space-y-3">
+      <div>
+        <p className="text-secondary-900 font-medium text-sm">
+          Pentru cine soliciți acest serviciu? <span className="text-red-500">*</span>
+        </p>
+        <p className="text-xs text-neutral-500 mt-0.5 leading-snug">
+          Alege <span className="font-medium text-secondary-700">Persoană Fizică</span> dacă ai nevoie de document pentru tine personal, sau <span className="font-medium text-secondary-700">Persoană Juridică</span> dacă îl soliciți pentru firma ta.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-2 gap-2.5 sm:gap-3">
+        {options.map((option) => {
+          const Icon = getIcon(option.value);
+          const isSelected = selectedType === option.value;
+
+          return (
+            <button
+              key={option.value}
+              type="button"
+              onClick={() => onSelect(option.value)}
+              aria-pressed={isSelected}
+              className={cn(
+                'group relative flex flex-col items-center gap-1.5 sm:gap-2 rounded-xl border-2 p-3 sm:p-4 text-center transition-all duration-200',
+                isSelected
+                  ? 'border-primary-500 bg-primary-50 shadow-sm'
+                  : 'border-neutral-200 bg-white hover:border-primary-300 hover:bg-primary-50/30'
+              )}
+            >
+              <span
+                className={cn(
+                  'flex h-9 w-9 sm:h-11 sm:w-11 items-center justify-center rounded-xl transition-colors',
+                  isSelected
+                    ? 'bg-primary-100'
+                    : 'bg-neutral-100 group-hover:bg-primary-100/60'
+                )}
+              >
+                <Icon
+                  className={cn(
+                    'h-4 w-4 sm:h-5 sm:w-5 transition-colors',
+                    isSelected
+                      ? 'text-primary-600'
+                      : 'text-neutral-500 group-hover:text-primary-600'
+                  )}
+                />
+              </span>
+              <div className="min-w-0 w-full">
+                <p className="text-sm font-semibold text-secondary-900 leading-tight">
+                  {option.label}
+                </p>
+                {option.description && (
+                  <p className="hidden sm:block text-[11px] text-neutral-500 mt-0.5 leading-snug">
+                    {option.description}
+                  </p>
+                )}
+                {typeof basePrice === 'number' && basePrice > 0 && (
+                  <p
+                    className={cn(
+                      'mt-1 sm:mt-1.5 text-sm font-bold tabular-nums',
+                      isSelected ? 'text-primary-600' : 'text-secondary-900'
+                    )}
+                  >
+                    {basePrice.toFixed(0)} RON
+                  </p>
+                )}
+              </div>
+              {isSelected && (
+                <span className="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500 text-white shadow-sm">
+                  <CheckCircle className="h-3 w-3" />
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+    </div>
   );
 }

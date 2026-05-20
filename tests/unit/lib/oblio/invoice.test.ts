@@ -176,7 +176,7 @@ describe('createInvoiceFromOrder — products / line items', () => {
       price: 250,
       measuringUnit: 'buc',
       currency: 'RON',
-      vatPercentage: 19,
+      vatPercentage: 21,
       vatIncluded: true,
       quantity: 1,
       productType: 'Serviciu',

@@ -23,57 +23,69 @@ export function WizardProgress({ steps, currentStepId, onStepClick }: WizardProg
 
   return (
     <div className="w-full">
-      {/* Desktop Progress */}
-      <div className="hidden md:flex items-center justify-between">
-        {steps.map((step, index) => {
-          const isCompleted = index < currentIndex;
-          const isCurrent = step.id === currentStepId;
-          const isClickable = isCompleted && onStepClick;
+      {/* Desktop Progress — continuous track behind, no per-step connectors */}
+      <div className="hidden md:block relative px-5">
+        {/* Track (full width behind circles) */}
+        <div
+          className="absolute top-5 left-10 right-10 h-0.5 bg-neutral-200 -translate-y-1/2"
+          aria-hidden="true"
+        />
+        {/* Progress fill */}
+        <div
+          className="absolute top-5 left-10 h-0.5 bg-emerald-500 -translate-y-1/2 transition-all duration-300"
+          style={{
+            width:
+              steps.length > 1
+                ? `calc((100% - 5rem) * ${currentIndex / (steps.length - 1)})`
+                : '0%',
+          }}
+          aria-hidden="true"
+        />
 
-          return (
-            <div key={step.id} className="flex items-center flex-1">
-              {/* Step Circle */}
-              <div className="flex flex-col items-center">
+        <div className="relative flex items-start justify-between">
+          {steps.map((step) => {
+            const isCompleted = steps.findIndex((s) => s.id === step.id) < currentIndex;
+            const isCurrent = step.id === currentStepId;
+            const isClickable = isCompleted && onStepClick;
+
+            return (
+              <div
+                key={step.id}
+                className="flex flex-col items-center"
+              >
                 <button
                   type="button"
                   onClick={() => isClickable && onStepClick(step.id)}
                   disabled={!isClickable}
                   className={cn(
-                    'w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm transition-all',
-                    isCompleted && 'bg-green-500 text-white cursor-pointer hover:bg-green-600',
-                    isCurrent && 'bg-primary-500 text-secondary-900 ring-4 ring-primary-100',
-                    !isCompleted && !isCurrent && 'bg-neutral-200 text-neutral-500',
+                    'relative z-10 w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm transition-all bg-white',
+                    isCompleted &&
+                      'bg-emerald-500 text-white cursor-pointer hover:bg-emerald-600 ring-4 ring-white',
+                    isCurrent &&
+                      'bg-primary-500 text-secondary-900 ring-4 ring-primary-100',
+                    !isCompleted && !isCurrent &&
+                      'bg-neutral-100 text-neutral-500 ring-4 ring-white',
                     isClickable && 'cursor-pointer'
                   )}
                 >
-                  {isCompleted ? (
-                    <Check className="h-5 w-5" />
-                  ) : (
-                    step.number
-                  )}
+                  {isCompleted ? <Check className="h-5 w-5" /> : step.number}
                 </button>
                 <span
                   className={cn(
-                    'mt-2 text-xs font-medium text-center max-w-[80px]',
-                    isCurrent ? 'text-secondary-900' : 'text-neutral-500'
+                    'mt-2 text-xs font-medium whitespace-nowrap',
+                    isCurrent
+                      ? 'text-secondary-900'
+                      : isCompleted
+                      ? 'text-emerald-600'
+                      : 'text-neutral-500'
                   )}
                 >
                   {step.labelRo}
                 </span>
               </div>
-
-              {/* Connector Line */}
-              {index < steps.length - 1 && (
-                <div
-                  className={cn(
-                    'flex-1 h-0.5 mx-2',
-                    index < currentIndex ? 'bg-green-500' : 'bg-neutral-200'
-                  )}
-                />
-              )}
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
 
       {/* Mobile Progress */}

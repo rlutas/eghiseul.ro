@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { ArrowLeft, Loader2, AlertCircle, ShieldCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -15,7 +15,9 @@ import {
   BankTransferDetails,
   PaymentProofUpload,
   OrderSummaryCard,
+  CouponInput,
 } from '@/components/payment';
+import { cn } from '@/lib/utils';
 
 interface OrderData {
   id: string;
@@ -29,6 +31,10 @@ interface OrderData {
   selected_options?: Array<{ name: string; price: number }>;
   delivery_method?: string;
   delivery_price?: number;
+  subtotal_without_vat?: number;
+  vat_amount?: number;
+  coupon_code?: string | null;
+  discount_amount?: number;
   customer_data?: {
     contact?: {
       email?: string;
@@ -51,66 +57,81 @@ export default function CheckoutPage() {
   const [isSubmittingBankTransfer, setIsSubmittingBankTransfer] = useState(false);
   const [bankTransferProofKey, setBankTransferProofKey] = useState<string | null>(null);
 
-  // Fetch order data
-  useEffect(() => {
-    const fetchOrder = async () => {
-      try {
-        const response = await fetch(`/api/orders/${orderId}`);
-        if (!response.ok) {
-          throw new Error('Comanda nu a fost găsită');
-        }
-        const data = await response.json();
-
-        if (!data.success || !data.data?.order) {
-          throw new Error('Date invalide');
-        }
-
-        const apiOrder = data.data.order;
-
-        // Check if already paid
-        if (apiOrder.paymentStatus === 'paid') {
-          router.push(`/comanda/success/${orderId}`);
-          return;
-        }
-
-        // Transform selected options to expected format
-        const transformedOptions = (apiOrder.selectedOptions || []).map((opt: { name?: string; option_name?: string; price?: number; option_price?: number }) => ({
-          name: opt.name || opt.option_name || 'Opțiune',
-          price: typeof opt.price === 'number' ? opt.price : (typeof opt.option_price === 'number' ? opt.option_price : 0),
-        })).filter((opt: { name: string; price: number }) => opt.price > 0);
-
-        // Transform API response to expected format
-        const orderData: OrderData = {
-          id: apiOrder.id,
-          order_number: apiOrder.orderNumber,
-          friendly_order_id: apiOrder.orderNumber,
-          service_name: apiOrder.service?.name || 'Serviciu',
-          base_price: apiOrder.breakdown?.basePrice || apiOrder.totalAmount,
-          total_price: apiOrder.totalAmount,
-          payment_status: apiOrder.paymentStatus || 'unpaid',
-          status: apiOrder.status || 'draft',
-          selected_options: transformedOptions,
-          delivery_method: typeof apiOrder.deliveryMethod === 'object'
-            ? apiOrder.deliveryMethod?.name
-            : apiOrder.deliveryMethod,
-          delivery_price: typeof apiOrder.deliveryMethod === 'object'
-            ? apiOrder.deliveryMethod?.price || 0
-            : (apiOrder.deliveryAddress?.price || 0),
-          customer_data: apiOrder.customerData,
-        };
-
-        setOrder(orderData);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Eroare la încărcarea comenzii');
-      } finally {
-        setIsLoading(false);
+  // Fetch order data — extracted as a callback so we can re-fetch after
+  // applying / removing a coupon (which mutates total_price server-side).
+  const fetchOrder = useCallback(async () => {
+    try {
+      const response = await fetch(`/api/orders/${orderId}`);
+      if (!response.ok) {
+        throw new Error('Comanda nu a fost găsită');
       }
-    };
+      const data = await response.json();
 
+      if (!data.success || !data.data?.order) {
+        throw new Error('Date invalide');
+      }
+
+      const apiOrder = data.data.order;
+
+      if (apiOrder.paymentStatus === 'paid') {
+        router.push(`/comanda/success/${orderId}`);
+        return;
+      }
+
+      const canonical = (apiOrder.options || []) as Array<{
+        name: string;
+        total: number;
+        quantity: number;
+      }>;
+      const transformedOptions = canonical.map((opt) => ({
+        name: opt.quantity > 1 ? `${opt.name} × ${opt.quantity}` : opt.name,
+        price: opt.total,
+      }));
+
+      const orderData: OrderData = {
+        id: apiOrder.id,
+        order_number: apiOrder.orderNumber,
+        friendly_order_id: apiOrder.orderNumber,
+        service_name: apiOrder.service?.name || 'Serviciu',
+        base_price: apiOrder.breakdown?.basePrice || apiOrder.totalAmount,
+        total_price: apiOrder.totalAmount,
+        payment_status: apiOrder.paymentStatus || 'unpaid',
+        status: apiOrder.status || 'draft',
+        selected_options: transformedOptions,
+        delivery_method: typeof apiOrder.deliveryMethod === 'object'
+          ? apiOrder.deliveryMethod?.name
+          : apiOrder.deliveryMethod,
+        delivery_price: typeof apiOrder.deliveryMethod === 'object'
+          ? apiOrder.deliveryMethod?.price || 0
+          : (apiOrder.breakdown?.deliveryPrice || 0),
+        subtotal_without_vat: apiOrder.breakdown?.subtotalWithoutVat,
+        vat_amount: apiOrder.breakdown?.vatAmount,
+        coupon_code: apiOrder.breakdown?.couponCode || null,
+        discount_amount: apiOrder.breakdown?.discountAmount || 0,
+        customer_data: apiOrder.customerData,
+      };
+
+      setOrder(orderData);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Eroare la încărcarea comenzii');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [orderId, router]);
+
+  useEffect(() => {
     if (orderId) {
       fetchOrder();
     }
-  }, [orderId, router]);
+  }, [orderId, fetchOrder]);
+
+  // Called after a coupon is applied/removed: order total changed, so the
+  // existing PaymentIntent (cancelled server-side) must be regenerated.
+  // Setting clientSecret to null triggers the create-intent useEffect.
+  const handleCouponChange = useCallback(async () => {
+    setClientSecret(null);
+    await fetchOrder();
+  }, [fetchOrder]);
 
   // Create payment intent when card is selected
   useEffect(() => {
@@ -209,31 +230,24 @@ export default function CheckoutPage() {
   const orderNumber = order.friendly_order_id || `ORD-${order.order_number}`;
 
   return (
-    <div className="min-h-screen bg-neutral-50">
-      {/* Header */}
-      <div className="bg-white border-b border-neutral-200">
-        <div className="container mx-auto px-4 py-4 max-w-5xl">
-          <div className="flex items-center gap-4">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => router.back()}
-              className="text-neutral-600"
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Înapoi
-            </Button>
-            <Separator orientation="vertical" className="h-6" />
-            <h1 className="text-lg font-semibold text-secondary-900">
-              Finalizare Comandă
-            </h1>
-          </div>
+    <div className="min-h-screen bg-neutral-50/40 pb-28 lg:pb-0">
+      {/* Main Content — breadcrumb + grid combined, no separate sub-header bar */}
+      <div className="container mx-auto px-4 pt-3 pb-8 lg:pt-6 max-w-5xl">
+        <div className="mb-4 flex items-center gap-2 text-sm">
+          <button
+            type="button"
+            onClick={() => router.back()}
+            className="inline-flex items-center gap-1 text-neutral-600 hover:text-secondary-900 transition-colors"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            <span>Înapoi</span>
+          </button>
+          <span className="text-neutral-300">/</span>
+          <h1 className="text-sm font-semibold text-secondary-900">
+            Finalizare Comandă
+          </h1>
         </div>
-      </div>
-
-      {/* Main Content */}
-      <div className="container mx-auto px-4 py-8 max-w-5xl">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
           {/* Payment Section */}
           <div className="lg:col-span-2 space-y-6">
             {/* Error Alert */}
@@ -258,7 +272,7 @@ export default function CheckoutPage() {
             </Card>
 
             {/* Payment Form based on selected method */}
-            <Card>
+            <Card id="payment-form-anchor" className="scroll-mt-4">
               <CardHeader>
                 <CardTitle className="text-lg">
                   {paymentMethod === 'card'
@@ -323,7 +337,7 @@ export default function CheckoutPage() {
           </div>
 
           {/* Order Summary Sidebar */}
-          <div className="space-y-6">
+          <div className="space-y-4 lg:sticky lg:top-4 lg:self-start">
             <OrderSummaryCard
               orderNumber={orderNumber}
               serviceName={order.service_name}
@@ -332,16 +346,30 @@ export default function CheckoutPage() {
               deliveryMethod={order.delivery_method}
               deliveryPrice={order.delivery_price}
               totalPrice={order.total_price}
+              subtotalWithoutVat={order.subtotal_without_vat}
+              vatAmount={order.vat_amount}
+              couponCode={order.coupon_code}
+              discountAmount={order.discount_amount}
+            />
+
+            {/* Coupon input — apply/remove discount before payment */}
+            <CouponInput
+              orderId={order.id}
+              appliedCode={order.coupon_code}
+              appliedDiscount={order.discount_amount}
+              onChange={handleCouponChange}
             />
 
             {/* Security Badges */}
-            <Card className="bg-green-50 border-green-200">
-              <CardContent className="p-4">
+            <Card className="bg-emerald-50 border-emerald-200">
+              <CardContent className="p-3.5">
                 <div className="flex items-center gap-3">
-                  <ShieldCheck className="h-8 w-8 text-green-600" />
+                  <ShieldCheck className="h-7 w-7 text-emerald-600 shrink-0" />
                   <div>
-                    <p className="font-medium text-green-800">Plată Securizată</p>
-                    <p className="text-sm text-green-700">
+                    <p className="text-sm font-medium text-emerald-800">
+                      Plată Securizată
+                    </p>
+                    <p className="text-xs text-emerald-700">
                       Datele tale sunt protejate prin criptare SSL
                     </p>
                   </div>
@@ -349,6 +377,36 @@ export default function CheckoutPage() {
               </CardContent>
             </Card>
           </div>
+        </div>
+      </div>
+
+      {/* Sticky bottom bar — mobile only */}
+      <div
+        className={cn(
+          'lg:hidden fixed bottom-0 inset-x-0 z-40 border-t border-neutral-200 bg-white/95 backdrop-blur',
+          'shadow-[0_-4px_20px_-8px_rgba(0,0,0,0.08)]'
+        )}
+      >
+        <div className="container mx-auto max-w-5xl px-4 py-3 flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-[11px] uppercase tracking-wide text-neutral-500">
+              Total de plată
+            </p>
+            <p className="text-lg font-bold text-primary-600 tabular-nums leading-tight">
+              {order.total_price.toFixed(2)} RON
+            </p>
+          </div>
+          <Button
+            type="button"
+            onClick={() => {
+              const form =
+                document.querySelector<HTMLElement>('#payment-form-anchor');
+              form?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }}
+            className="h-11 px-5 bg-primary-500 hover:bg-primary-600 text-secondary-900 font-semibold"
+          >
+            {paymentMethod === 'card' ? 'Completează plata' : 'Vezi detalii'}
+          </Button>
         </div>
       </div>
     </div>

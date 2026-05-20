@@ -111,19 +111,14 @@ export function buildWizardSteps(
   const steps: ModularStep[] = [];
   let stepNumber = 1;
 
-  // Step 1: Contact (always present)
+  // Step 1: Contact (always present).
+  // Note: Tip Client (PF/PJ) is now rendered INSIDE the contact step when
+  // verificationConfig.clientTypeSelection.enabled is true — the standalone
+  // 'client-type' step has been removed to reduce wizard friction.
   steps.push({
     ...ALL_STEPS['contact'],
     number: stepNumber++,
   });
-
-  // Step 1b: Client Type Selection (if enabled)
-  if (verificationConfig.clientTypeSelection?.enabled) {
-    steps.push({
-      ...ALL_STEPS['client-type'],
-      number: stepNumber++,
-    });
-  }
 
   // Determine which modules to show based on clientType
   const hasClientTypeSelection = verificationConfig.clientTypeSelection?.enabled;

@@ -606,12 +606,23 @@ function modularWizardReducer(
         steps = buildWizardSteps(state.verificationConfig, restoredClientType);
       }
 
+      // Guard: if the cached step ID is no longer in the visible step list
+      // (e.g. legacy 'client-type' step which was merged into contact), fall
+      // back to 'contact' so the wizard doesn't render a blank loading screen.
+      const cachedStepStillExists = steps.some(
+        (s) => s.id === cache.currentStepId
+      );
+      const safeStepId = cachedStepStillExists ? cache.currentStepId : 'contact';
+      const safeStepNumber = cachedStepStillExists
+        ? cache.currentStepNumber
+        : 1;
+
       return {
         ...state,
         orderId: cache.orderId,
         friendlyOrderId: cache.friendlyOrderId,
-        currentStepId: cache.currentStepId,
-        currentStepNumber: cache.currentStepNumber,
+        currentStepId: safeStepId,
+        currentStepNumber: safeStepNumber,
         clientType: restoredClientType,
         steps,
         contact: cache.data.contact || state.contact,

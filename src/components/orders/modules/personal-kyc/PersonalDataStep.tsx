@@ -29,6 +29,7 @@ import {
   Camera,
   Upload,
   Scan,
+  Pencil,
   X,
   FileCheck,
   Info,
@@ -36,15 +37,15 @@ import {
   User,
   MapPin,
   Calendar,
-  Globe,
 } from 'lucide-react';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import type { PersonalKYCConfig, CitizenshipType, DocumentType, KYCValidationResults } from '@/types/verification-modules';
-import { APOSTILA_COUNTRIES } from '@/config/apostila-countries';
-import { validateCNP } from '@/lib/validations/cnp';
+import type { PersonalKYCConfig, DocumentType, KYCValidationResults } from '@/types/verification-modules';
+import { getCountriesForForeignType } from '@/config/countries';
+import { validateCNP, summarizeCNP } from '@/lib/validations/cnp';
 import { cn } from '@/lib/utils';
 import { COUNTY_NAMES, getLocalitiesForCounty, getCountyName, findCounty } from '@/lib/data/romania-counties';
 import { compressImage } from '@/lib/images/compress';
+import { randomId } from '@/lib/random-id';
 
 // Minimal ID Card Front Illustration (Gold theme)
 function IdCardFrontIllustration({ className }: { className?: string }) {
@@ -140,12 +141,8 @@ const initialScanState: ScanState = {
   preview: null,
 };
 
-// Countries list for foreign citizen birth country dropdown.
-// Romania at top, then all apostila countries excluding Romania.
-const BIRTH_COUNTRIES = [
-  'România',
-  ...APOSTILA_COUNTRIES.filter((c) => c !== 'România'),
-] as const;
+// Birth country lists are now derived per-render from
+// state.contact.foreignType using getCountriesForForeignType().
 
 export default function PersonalDataStep({ config, onValidChange }: PersonalDataStepProps) {
   const { state, updatePersonalKyc, isPrefilled, prefillData } = useModularWizard();
@@ -162,6 +159,23 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
   const [showScanSection, setShowScanSection] = useState(true);
   const [localities, setLocalities] = useState<string[]>([]);
   const [cnpInfo, setCnpInfo] = useState<string | null>(null);
+
+  // Mode picker: 'choice' shows the Scan-vs-Manual landing card.
+  // The user's existing data shortcuts the picker — if they're returning to
+  // the step with data already filled, we skip the picker and show the form.
+  // For foreign citizens we skip CI scan entirely (CI doesn't apply); they
+  // upload passport at step 4 KYC instead and fill data manually here.
+  const hasExistingData =
+    !!state.personalKyc?.cnp ||
+    !!state.personalKyc?.firstName ||
+    !!state.personalKyc?.uploadedDocuments?.length;
+  const isForeignCitizen =
+    state.contact.citizenship === 'foreign' ||
+    state.personalKyc?.citizenship !== undefined &&
+      state.personalKyc?.citizenship !== 'romanian';
+  const [mode, setMode] = useState<'choice' | 'scan' | 'manual'>(
+    isForeignCitizen ? 'manual' : hasExistingData ? 'scan' : 'choice'
+  );
 
   // Helper function to clean locality names from prefixes (sat, com., comună, etc.)
   const cleanLocalityName = useCallback((name: string): string => {
@@ -262,28 +276,74 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
     setState(prev => ({ ...prev, scanning: true, progress: 0, error: null }));
 
     try {
-      // Compress + decode (EXIF-safe). Reduces 3-7MB phone photos to ~250KB JPEG.
-      const compressed = await compressImage(file);
-      console.log(`[KYC] ${type}: ${(compressed.sizeBefore/1024/1024).toFixed(1)}MB → ${(compressed.sizeAfter/1024).toFixed(0)}KB`);
+      // PDF branch — Gemini accepts application/pdf natively. Skip image
+      // compression (it's already a small vector format) and pass through.
+      const isPdf = file.type === 'application/pdf' ||
+        file.name.toLowerCase().endsWith('.pdf');
 
-      const preview = compressed.dataUrl;
+      let base64: string;
+      let preview: string;
+      let mimeType: string;
+      let sizeAfter: number;
+
+      if (isPdf) {
+        // Read PDF as base64 directly.
+        const buf = await file.arrayBuffer();
+        const bytes = new Uint8Array(buf);
+        let binary = '';
+        for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
+        base64 = btoa(binary);
+        mimeType = 'application/pdf';
+        // Use a generic PDF placeholder for preview (no inline image).
+        preview = '';
+        sizeAfter = file.size;
+        console.log(`[KYC] ${type}: PDF ${(file.size/1024).toFixed(0)}KB`);
+      } else {
+        // Image branch: compress + decode (EXIF-safe).
+        const compressed = await compressImage(file);
+        console.log(`[KYC] ${type}: ${(compressed.sizeBefore/1024/1024).toFixed(1)}MB → ${(compressed.sizeAfter/1024).toFixed(0)}KB`);
+        base64 = compressed.base64;
+        mimeType = compressed.mimeType;
+        preview = compressed.dataUrl;
+        sizeAfter = compressed.sizeAfter;
+      }
+
+      // Synthesize a `compressed`-shaped object so downstream code stays the same.
+      const compressed = { base64, mimeType, dataUrl: preview, sizeAfter, sizeBefore: file.size };
+
       setState(prev => ({ ...prev, preview, progress: 20 }));
-
-      const base64 = compressed.base64;
       setState(prev => ({ ...prev, progress: 40 }));
 
-      // Call OCR API
+      // Call OCR API.
+      // Gemini extraction takes ~2-10s. Without fake-progress the bar would
+      // freeze at 40% the entire time and feel broken — so we creep it
+      // forward asymptotically toward 68% while the request is in flight.
       const docType = type === 'ci_front' ? 'ci_front' : 'ci_back';
-      const response = await fetch('/api/ocr/extract', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          mode: 'specific',
-          imageBase64: base64,
-          mimeType: compressed.mimeType,
-          documentType: docType,
-        }),
-      });
+
+      const fakeProgressInterval = setInterval(() => {
+        setState(prev => {
+          if (!prev.scanning) return prev;
+          // Approach 68 asymptotically — never reach 70 until the response is back.
+          const next = prev.progress + Math.max(0.5, (68 - prev.progress) * 0.08);
+          return { ...prev, progress: Math.min(68, next) };
+        });
+      }, 200);
+
+      let response: Response;
+      try {
+        response = await fetch('/api/ocr/extract', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            mode: 'specific',
+            imageBase64: base64,
+            mimeType: compressed.mimeType,
+            documentType: docType,
+          }),
+        });
+      } finally {
+        clearInterval(fakeProgressInterval);
+      }
 
       setState(prev => ({ ...prev, progress: 70 }));
 
@@ -325,7 +385,7 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             ...(personalKyc?.uploadedDocuments || []).filter((d: any) => d.type !== type),
             {
-              id: crypto.randomUUID(),
+              id: randomId(),
               type: ocr.documentType || type,
               fileName: file.name,
               fileSize: compressed.sizeAfter,
@@ -408,19 +468,37 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
     }
   }, [personalKyc, updatePersonalKyc]);
 
-  // Handle CNP change with validation
+  // Handle CNP change with validation + auto-fill of derivable fields
   const handleCNPChange = useCallback((value: string) => {
     const cleanCNP = value.replace(/\D/g, '').slice(0, 13);
     updatePersonalKyc({ cnp: cleanCNP });
 
-    // Auto-fill birth date from CNP if valid
     if (cleanCNP.length === 13) {
       const result = validateCNP(cleanCNP);
-      if (result.valid && result.data) {
+      const summary = summarizeCNP(cleanCNP);
+      if (result.valid && result.data && summary) {
         setCnpInfo(`${result.data.gender === 'male' ? 'Bărbat' : 'Femeie'}, ${result.data.age} ani`);
-        const birthDate = result.data.birthDate;
+
+        // Format birth date as local YYYY-MM-DD without UTC drift.
+        // toISOString() converts to UTC and on Europe/Bucharest (UTC+2/+3)
+        // shifts the date back one day for midnight-local timestamps —
+        // which is why CNP 192...07.02 was rendering as 01.07 in the input.
+        const d = result.data.birthDate;
+        const yyyy = d.getFullYear();
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const dd = String(d.getDate()).padStart(2, '0');
+        const localDate = `${yyyy}-${mm}-${dd}`;
+
+        // Auto-fill birthDate + birthPlace (county). Don't overwrite if user
+        // already has a more specific value (e.g. populated by OCR).
         updatePersonalKyc({
-          birthDate: birthDate.toISOString().split('T')[0],
+          birthDate: localDate,
+          // Locul nașterii — only set if currently empty so we don't
+          // clobber a more specific OCR-extracted city.
+          birthPlace:
+            personalKyc?.birthPlace && personalKyc.birthPlace.trim().length > 0
+              ? personalKyc.birthPlace
+              : summary.county,
         });
       } else {
         setCnpInfo(result.errors[0] || 'CNP invalid');
@@ -428,7 +506,7 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
     } else {
       setCnpInfo(null);
     }
-  }, [updatePersonalKyc]);
+  }, [updatePersonalKyc, personalKyc?.birthPlace]);
 
   // Handle county change - update localities list with smart city matching
   const handleCountyChange = useCallback((countyName: string) => {
@@ -475,12 +553,46 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
     }
   }, [personalKyc?.address?.county]);
 
+  // Sync citizenship from step 1 (contact) → personal-kyc citizenship.
+  // The dedicated <Select> for citizenship was removed from this step; the
+  // user picks it earlier in the contact step. Mapping:
+  //   contact.citizenship === 'romanian'                              → 'romanian'
+  //   contact.citizenship === 'foreign' && foreignType === 'eu'       → 'european'
+  //   contact.citizenship === 'foreign' && foreignType === 'non-eu'   → 'foreign'
+  useEffect(() => {
+    if (!personalKyc) return;
+    const c = state.contact.citizenship;
+    if (!c) return; // not yet set — keep existing
+    let target: 'romanian' | 'european' | 'foreign' = 'romanian';
+    if (c === 'foreign') {
+      target = state.contact.foreignType === 'non-eu' ? 'foreign' : 'european';
+    }
+    if (personalKyc.citizenship !== target) {
+      updatePersonalKyc({ citizenship: target });
+    }
+  }, [
+    state.contact.citizenship,
+    state.contact.foreignType,
+    personalKyc,
+    updatePersonalKyc,
+  ]);
+
   // Validate form
   const isFormValid = useCallback(() => {
     if (!personalKyc) return false;
 
-    const cnpValidation = validateCNP(personalKyc.cnp);
-    if (!cnpValidation.valid) return false;
+    // CNP is mandatory for Romanian citizens; foreign citizens typically don't
+    // have one (they use passport / EU residence card instead). For foreign,
+    // we only validate CNP if it's filled — empty is fine.
+    const isForeignCitizen = personalKyc.citizenship !== 'romanian';
+    if (!isForeignCitizen) {
+      const cnpValidation = validateCNP(personalKyc.cnp);
+      if (!cnpValidation.valid) return false;
+    } else if (personalKyc.cnp && personalKyc.cnp.length > 0) {
+      // Optional but if filled, must be valid (no garbage data accepted).
+      const cnpValidation = validateCNP(personalKyc.cnp);
+      if (!cnpValidation.valid) return false;
+    }
 
     if (!personalKyc.firstName.trim()) return false;
     if (!personalKyc.lastName.trim()) return false;
@@ -499,12 +611,31 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
       return false;
     }
 
-    // Foreign citizen extra fields validation
+    // Foreign citizen extra fields validation:
+    //   1. Localitatea nașterii (birthCity) — collected at step 1
+    //   2. Țara nașterii (birthCountry) — collected at step 1
+    //   3. Domicile address — split based on hasRomanianAddress toggle:
+    //        - "Da" → Romanian address (street + city + county) is required
+    //        - "Nu" → foreignData.foreignAddress + foreignData.birthCountry required
+    //          (we re-use birthCountry as the country-of-domicile when foreign)
     if (personalKyc.citizenship !== 'romanian') {
       if (!personalKyc.foreignData?.birthCity?.trim()) return false;
       if (!personalKyc.foreignData?.birthCountry) return false;
-      if (personalKyc.foreignData?.hasRomanianAddress === false && !personalKyc.foreignData?.foreignAddress?.trim()) {
-        return false;
+
+      const hasRomanianAddress =
+        personalKyc.foreignData?.hasRomanianAddress ?? true;
+      if (hasRomanianAddress) {
+        // Living in Romania → require local address (where the document gets delivered).
+        if (
+          !personalKyc.address?.street?.trim() ||
+          !personalKyc.address?.city?.trim() ||
+          !personalKyc.address?.county?.trim()
+        ) {
+          return false;
+        }
+      } else {
+        // Living abroad → require foreign address text + country picked.
+        if (!personalKyc.foreignData?.foreignAddress?.trim()) return false;
       }
     }
 
@@ -591,16 +722,37 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
 
         {hasUpload ? (
           <div className="relative aspect-[3/2] bg-neutral-100 rounded-lg overflow-hidden">
-            <img
-              src={scanState.preview || (existingDoc?.base64 ? `data:${existingDoc.mimeType};base64,${existingDoc.base64}` : '')}
-              alt={title}
-              className="w-full h-full object-contain"
-            />
+            {(() => {
+              // Detect PDF — Gemini accepts it but we can't render <img> for PDFs.
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              const docMime = (existingDoc as any)?.mimeType as string | undefined;
+              const isPdfUpload =
+                docMime === 'application/pdf' ||
+                (scanState.preview === '' && !existingDoc); // PDF newly uploaded → empty preview
+              if (isPdfUpload) {
+                return (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-neutral-50 text-neutral-700">
+                    <FileCheck className="h-10 w-10 text-primary-500 mb-2" />
+                    <p className="text-sm font-medium">Document PDF încărcat</p>
+                    <p className="text-xs text-neutral-500 mt-0.5">
+                      Datele se extrag în câteva secunde
+                    </p>
+                  </div>
+                );
+              }
+              return (
+                <img
+                  src={scanState.preview || (existingDoc?.base64 ? `data:${existingDoc.mimeType};base64,${existingDoc.base64}` : '')}
+                  alt={title}
+                  className="w-full h-full object-contain"
+                />
+              );
+            })()}
             {scanState.scanning && (
               <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center">
                 <Loader2 className="w-8 h-8 text-white animate-spin mb-2" />
                 <span className="text-white text-sm font-medium">
-                  Scanare... {scanState.progress}%
+                  Scanare... {Math.round(scanState.progress)}%
                 </span>
               </div>
             )}
@@ -615,7 +767,7 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
             <input
               ref={type === 'ci_front' ? ciFrontInputRef : ciBackInputRef}
               type="file"
-              accept="image/jpeg,image/jpg,image/png"
+              accept="image/jpeg,image/jpg,image/png,application/pdf"
               onChange={(e) => {
                 const file = e.target.files?.[0];
                 if (file) handleFileSelect(type, file);
@@ -645,7 +797,7 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
                 </span>
               </div>
               <p className="text-xs text-neutral-500 mt-2">
-                JPG sau PNG, max 10MB
+                JPG, PNG sau PDF, max 10MB
               </p>
             </div>
           </div>
@@ -696,8 +848,112 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
         </div>
       )}
 
+      {/* Mode picker landing — shown only when user hasn't picked yet */}
+      {mode === 'choice' && (
+        <div className="space-y-4">
+          <div className="text-center space-y-1">
+            <h3 className="text-lg font-semibold text-secondary-900">
+              Cum vrei să completezi datele?
+            </h3>
+            <p className="text-sm text-neutral-500">
+              Alege cum este mai simplu pentru tine — datele finale sunt aceleași.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 gap-2.5 sm:gap-3 mt-3">
+            <button
+              type="button"
+              onClick={() => {
+                setMode('scan');
+                setShowScanSection(true);
+              }}
+              className="group relative flex flex-col items-center gap-2 sm:gap-3 rounded-xl border-2 border-primary-500 bg-primary-50/40 p-3 sm:p-5 text-center transition-all hover:bg-primary-50 hover:shadow-sm"
+            >
+              <span className="absolute -top-2 left-1/2 -translate-x-1/2 rounded-full bg-primary-500 px-2 py-0.5 text-[9px] sm:text-[10px] font-bold text-white uppercase tracking-wide whitespace-nowrap">
+                Recomandat
+              </span>
+              <span className="flex h-11 w-11 sm:h-14 sm:w-14 items-center justify-center rounded-xl sm:rounded-2xl bg-primary-100">
+                <Scan className="h-5 w-5 sm:h-7 sm:w-7 text-primary-600" />
+              </span>
+              <div>
+                <p className="text-sm sm:text-base font-semibold text-secondary-900 leading-tight">
+                  Scanează actul
+                </p>
+                <p className="hidden sm:block text-xs text-neutral-500 mt-1 leading-snug">
+                  Extragem automat datele în câteva secunde. Tot ce trebuie să faci e să faci o poză.
+                </p>
+                <p className="sm:hidden text-[11px] text-neutral-500 mt-1 leading-snug">
+                  Date extrase automat
+                </p>
+              </div>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setMode('manual');
+                setShowScanSection(false);
+              }}
+              className="group flex flex-col items-center gap-2 sm:gap-3 rounded-xl border-2 border-neutral-200 bg-white p-3 sm:p-5 text-center transition-all hover:border-neutral-300 hover:bg-neutral-50"
+            >
+              <span className="flex h-11 w-11 sm:h-14 sm:w-14 items-center justify-center rounded-xl sm:rounded-2xl bg-neutral-100 group-hover:bg-neutral-200">
+                <Pencil className="h-5 w-5 sm:h-7 sm:w-7 text-neutral-600" />
+              </span>
+              <div>
+                <p className="text-sm sm:text-base font-semibold text-secondary-900 leading-tight">
+                  Completez manual
+                </p>
+                <p className="hidden sm:block text-xs text-neutral-500 mt-1 leading-snug">
+                  Tastez datele eu. Va trebui să încarc actul la pasul 4.
+                </p>
+                <p className="sm:hidden text-[11px] text-neutral-500 mt-1 leading-snug">
+                  Tastez eu datele
+                </p>
+              </div>
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Manual mode notice */}
+      {mode === 'manual' && (
+        <div className="rounded-xl border border-amber-200 bg-amber-50 p-3 flex items-start gap-3">
+          <Info className="h-4 w-4 text-amber-700 mt-0.5 shrink-0" />
+          <div className="flex-1 text-sm">
+            <p className="text-amber-900 font-medium leading-snug">
+              {isForeignCitizen
+                ? 'Completează datele manual'
+                : 'Completezi manual datele.'}
+            </p>
+            <p className="text-amber-800 text-xs mt-0.5 leading-snug">
+              {isForeignCitizen ? (
+                <>
+                  La pasul 4 va trebui să încarci 3 documente: <strong>pașaportul deschis</strong>,
+                  un <strong>selfie cu pașaportul</strong>, și <strong>permisul de
+                  rezidență / certificatul de înregistrare fiscală</strong>.
+                </>
+              ) : (
+                <>
+                  La pasul 4 va trebui să încarci o poză a actului de identitate (obligatoriu pentru verificare).
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMode('scan');
+                      setShowScanSection(true);
+                    }}
+                    className="ml-1 underline font-medium hover:text-amber-900"
+                  >
+                    Schimbă pe scanare automată
+                  </button>
+                </>
+              )}
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* ID Scan Section */}
-      {showScanSection && (
+      {mode === 'scan' && showScanSection && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 text-secondary-900">
@@ -708,7 +964,10 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
               type="button"
               variant="ghost"
               size="sm"
-              onClick={() => setShowScanSection(false)}
+              onClick={() => {
+                setShowScanSection(false);
+                setMode('manual');
+              }}
               className="text-neutral-500 text-xs"
             >
               Completez manual
@@ -750,8 +1009,8 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
         </div>
       )}
 
-      {/* Manual Entry Link */}
-      {!showScanSection && (
+      {/* Manual Entry Link — only when in scan mode without scan section visible */}
+      {mode === 'scan' && !showScanSection && (
         <div className="text-center">
           <Button
             type="button"
@@ -765,6 +1024,9 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
           </Button>
         </div>
       )}
+
+      {/* Form fields — hidden on landing screen until user picks a mode */}
+      {mode !== 'choice' && <>
 
       {/* Expired Document Warning */}
       {personalKyc.isExpired && !config?.expiredDocumentAllowed && (
@@ -803,7 +1065,12 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
 
         <div className="space-y-2">
           <Label htmlFor="cnp" className="text-secondary-900 font-medium">
-            CNP (Cod Numeric Personal) <span className="text-red-500">*</span>
+            CNP (Cod Numeric Personal){' '}
+            {personalKyc.citizenship === 'romanian' ? (
+              <span className="text-red-500">*</span>
+            ) : (
+              <span className="text-xs font-normal text-neutral-500">(opțional pentru cetățeni străini)</span>
+            )}
           </Label>
           <div className="relative">
             <Input
@@ -813,7 +1080,7 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
               maxLength={13}
               value={personalKyc.cnp}
               onChange={(e) => handleCNPChange(e.target.value)}
-              placeholder="1234567890123"
+              placeholder={personalKyc.citizenship === 'romanian' ? '1234567890123' : 'Lasă gol dacă nu ai CNP'}
               className={cn(
                 'font-mono text-lg tracking-wider pr-10 bg-white placeholder:text-neutral-400',
                 cnpValidation.valid && personalKyc.cnp.length === 13 && 'border-green-500 focus-visible:ring-green-500',
@@ -833,12 +1100,39 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
               {cnpValidation.errors[0]}
             </p>
           )}
-          {cnpValidation.valid && personalKyc.cnp.length === 13 && (
-            <p className="text-sm text-green-600 flex items-center gap-1">
-              <CheckCircle className="h-4 w-4" />
-              {cnpInfo || 'CNP valid'}
-            </p>
-          )}
+          {cnpValidation.valid && personalKyc.cnp.length === 13 && (() => {
+            const summary = summarizeCNP(personalKyc.cnp);
+            if (!summary) {
+              return (
+                <p className="text-sm text-green-600 flex items-center gap-1">
+                  <CheckCircle className="h-4 w-4" />
+                  {cnpInfo || 'CNP valid'}
+                </p>
+              );
+            }
+            return (
+              <div className="rounded-lg border border-green-200 bg-green-50 px-3 py-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
+                <span className="flex items-center gap-1 text-green-700 font-medium">
+                  <CheckCircle className="h-4 w-4" />
+                  Date extrase din CNP:
+                </span>
+                <span className="inline-flex items-center gap-1.5 text-green-800">
+                  <Calendar className="h-3.5 w-3.5 text-green-600" />
+                  <span className="font-medium tabular-nums">{summary.birthDate}</span>
+                </span>
+                <span className="text-green-300">•</span>
+                <span className="text-green-800 font-medium">{summary.gender}</span>
+                {summary.county && (
+                  <>
+                    <span className="text-green-300">•</span>
+                    <span className="text-green-800">
+                      Jud. <span className="font-medium">{summary.county}</span>
+                    </span>
+                  </>
+                )}
+              </div>
+            );
+          })()}
           <p className="text-sm text-neutral-500 flex items-start gap-1">
             <Info className="h-4 w-4 mt-0.5 flex-shrink-0" />
             CNP-ul se găsește pe cartea de identitate
@@ -933,19 +1227,24 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
             </div>
             <p className="text-xs text-neutral-500">Se completează automat din CNP</p>
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="birthPlace" className="text-secondary-900 font-medium">
-              Locul Nașterii
-            </Label>
-            <Input
-              id="birthPlace"
-              type="text"
-              value={personalKyc.birthPlace}
-              onChange={(e) => updatePersonalKyc({ birthPlace: e.target.value })}
-              placeholder="ex: București"
-              className="bg-white placeholder:text-neutral-400"
-            />
-          </div>
+          {/* Locul Nașterii — only for Romanian citizens.
+              For foreign citizens, the city of birth + country are collected
+              at step 1 (Contact) under "Date despre naștere". Don't ask twice. */}
+          {personalKyc.citizenship === 'romanian' && (
+            <div className="space-y-2">
+              <Label htmlFor="birthPlace" className="text-secondary-900 font-medium">
+                Locul Nașterii
+              </Label>
+              <Input
+                id="birthPlace"
+                type="text"
+                value={personalKyc.birthPlace}
+                onChange={(e) => updatePersonalKyc({ birthPlace: e.target.value })}
+                placeholder="ex: București"
+                className="bg-white placeholder:text-neutral-400"
+              />
+            </div>
+          )}
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -964,150 +1263,14 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
               />
             </div>
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="citizenship" className="text-secondary-900 font-medium">
-              Cetățenie
-            </Label>
-            <Select
-              value={personalKyc.citizenship}
-              onValueChange={(value: CitizenshipType) => updatePersonalKyc({ citizenship: value })}
-            >
-              <SelectTrigger id="citizenship">
-                <SelectValue placeholder="Selectează cetățenia" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="romanian">Română</SelectItem>
-                <SelectItem value="european">UE / SEE</SelectItem>
-                <SelectItem value="foreign">Non-UE</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          {/* Cetățenie picker removed — handled at step 1 (Contact).
+              The state is synced via useEffect above based on
+              state.contact.citizenship + foreignType. */}
         </div>
 
-        {/* Foreign Citizen Extra Fields (when citizenship is european or foreign) */}
-        {personalKyc.citizenship !== 'romanian' && (
-          <div className="space-y-4 rounded-xl border-2 border-amber-200 bg-amber-50/50 p-4">
-            <div className="flex items-center gap-2 text-amber-900">
-              <Globe className="h-5 w-5 text-amber-600" />
-              <h4 className="font-semibold text-sm">Date suplimentare cetățean străin</h4>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="foreignBirthCity" className="text-secondary-900 font-medium">
-                  Localitatea Nașterii <span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  id="foreignBirthCity"
-                  type="text"
-                  value={personalKyc.foreignData?.birthCity || ''}
-                  onChange={(e) => updatePersonalKyc({
-                    foreignData: {
-                      birthCity: e.target.value,
-                      birthCountry: personalKyc.foreignData?.birthCountry || '',
-                      hasRomanianAddress: personalKyc.foreignData?.hasRomanianAddress ?? true,
-                      foreignAddress: personalKyc.foreignData?.foreignAddress,
-                    }
-                  })}
-                  placeholder="Orașul sau comuna de naștere"
-                  className="bg-white placeholder:text-neutral-400"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="foreignBirthCountry" className="text-secondary-900 font-medium">
-                  Țara Nașterii <span className="text-red-500">*</span>
-                </Label>
-                <select
-                  id="foreignBirthCountry"
-                  value={personalKyc.foreignData?.birthCountry || ''}
-                  onChange={(e) => updatePersonalKyc({
-                    foreignData: {
-                      birthCity: personalKyc.foreignData?.birthCity || '',
-                      birthCountry: e.target.value,
-                      hasRomanianAddress: personalKyc.foreignData?.hasRomanianAddress ?? true,
-                      foreignAddress: personalKyc.foreignData?.foreignAddress,
-                    }
-                  })}
-                  className="h-10 w-full rounded-md border border-neutral-200 bg-white px-3 text-sm transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
-                >
-                  <option value="">Selectați țara</option>
-                  {BIRTH_COUNTRIES.map((c) => (
-                    <option key={c} value={c}>{c}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            {/* Romanian address toggle */}
-            <div className="space-y-3">
-              <Label className="text-secondary-900 font-medium">
-                Am domiciliu în România
-              </Label>
-              <div className="grid grid-cols-2 gap-3">
-                {[
-                  { value: true, label: 'Da' },
-                  { value: false, label: 'Nu' },
-                ].map((opt) => (
-                  <label
-                    key={String(opt.value)}
-                    className={cn(
-                      'flex cursor-pointer items-center justify-center rounded-xl border-2 p-3 text-center text-sm font-medium transition-all duration-200',
-                      (personalKyc.foreignData?.hasRomanianAddress ?? true) === opt.value
-                        ? 'border-primary-500 bg-primary-50 shadow-sm'
-                        : 'border-neutral-200 hover:border-primary-300 hover:bg-neutral-50'
-                    )}
-                  >
-                    <input
-                      type="radio"
-                      name="hasRomanianAddress"
-                      value={String(opt.value)}
-                      checked={(personalKyc.foreignData?.hasRomanianAddress ?? true) === opt.value}
-                      onChange={() => updatePersonalKyc({
-                        foreignData: {
-                          birthCity: personalKyc.foreignData?.birthCity || '',
-                          birthCountry: personalKyc.foreignData?.birthCountry || '',
-                          hasRomanianAddress: opt.value,
-                          foreignAddress: personalKyc.foreignData?.foreignAddress,
-                        }
-                      })}
-                      className="sr-only"
-                    />
-                    {opt.label}
-                  </label>
-                ))}
-              </div>
-              {personalKyc.foreignData?.hasRomanianAddress === true && (
-                <p className="text-xs text-neutral-500">
-                  Completează adresa din secțiunea de mai jos.
-                </p>
-              )}
-            </div>
-
-            {/* Foreign address (when no Romanian address) */}
-            {personalKyc.foreignData?.hasRomanianAddress === false && (
-              <div className="space-y-2">
-                <Label htmlFor="foreignAddress" className="text-secondary-900 font-medium">
-                  Adresa din străinătate <span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  id="foreignAddress"
-                  type="text"
-                  value={personalKyc.foreignData?.foreignAddress || ''}
-                  onChange={(e) => updatePersonalKyc({
-                    foreignData: {
-                      birthCity: personalKyc.foreignData?.birthCity || '',
-                      birthCountry: personalKyc.foreignData?.birthCountry || '',
-                      hasRomanianAddress: false,
-                      foreignAddress: e.target.value,
-                    }
-                  })}
-                  placeholder="Adresa completă din țara de domiciliu"
-                  className="bg-white placeholder:text-neutral-400"
-                />
-              </div>
-            )}
-          </div>
-        )}
+        {/* Foreign-citizen birth fields moved to step 1 (Contact). Domicile
+            toggle (Am domiciliu în România?) lives in the Address section
+            below and gates Romanian vs foreign-address rendering. */}
 
         {/* Parent Names (if required) */}
         {config?.parentDataRequired && (
@@ -1149,6 +1312,137 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
           <h3 className="font-semibold">Adresă de Domiciliu</h3>
         </div>
 
+        {/* Romanian-domicile toggle — only for foreign citizens. Renders
+            ABOVE the address fields and gates Romanian vs foreign rendering.
+            Romanian citizens skip this and see Romanian fields directly. */}
+        {personalKyc.citizenship !== 'romanian' && (
+          <div className="rounded-xl border border-amber-200 bg-amber-50/40 p-3 sm:p-4 space-y-3">
+            <div>
+              <p className="text-secondary-900 font-medium text-sm">
+                Am domiciliu în România? <span className="text-red-500">*</span>
+              </p>
+              <p className="text-xs text-neutral-500 mt-0.5 leading-snug">
+                Dacă ai un domiciliu în România, completează adresa de mai jos.
+                Dacă nu, completează adresa din străinătate.
+              </p>
+            </div>
+            <div className="grid grid-cols-2 gap-2.5 sm:gap-3">
+              {[
+                { value: true, label: 'Da' },
+                { value: false, label: 'Nu' },
+              ].map((opt) => {
+                const checked =
+                  (personalKyc.foreignData?.hasRomanianAddress ?? true) ===
+                  opt.value;
+                return (
+                  <button
+                    key={String(opt.value)}
+                    type="button"
+                    onClick={() =>
+                      updatePersonalKyc({
+                        foreignData: {
+                          birthCity: personalKyc.foreignData?.birthCity || '',
+                          birthCountry:
+                            personalKyc.foreignData?.birthCountry || '',
+                          hasRomanianAddress: opt.value,
+                          foreignAddress:
+                            personalKyc.foreignData?.foreignAddress,
+                        },
+                      })
+                    }
+                    aria-pressed={checked}
+                    className={cn(
+                      'rounded-xl border-2 px-3 py-2.5 text-center text-sm font-semibold transition-colors',
+                      checked
+                        ? 'border-primary-500 bg-primary-50 text-secondary-900 shadow-sm'
+                        : 'border-neutral-200 bg-white text-neutral-700 hover:border-primary-300'
+                    )}
+                  >
+                    {opt.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Foreign address fields (when "Nu" is picked) — replaces the
+            Romanian address grid below. */}
+        {personalKyc.citizenship !== 'romanian' &&
+          personalKyc.foreignData?.hasRomanianAddress === false && (
+            <div className="space-y-3 rounded-xl border border-neutral-200 bg-white p-3 sm:p-4">
+              <div className="space-y-1.5">
+                <Label
+                  htmlFor="foreignCountry"
+                  className="text-secondary-900 font-medium"
+                >
+                  Țara de domiciliu <span className="text-red-500">*</span>
+                </Label>
+                <select
+                  id="foreignCountry"
+                  value={personalKyc.foreignData?.birthCountry || ''}
+                  onChange={(e) =>
+                    updatePersonalKyc({
+                      foreignData: {
+                        birthCity: personalKyc.foreignData?.birthCity || '',
+                        birthCountry: e.target.value,
+                        hasRomanianAddress: false,
+                        foreignAddress:
+                          personalKyc.foreignData?.foreignAddress,
+                      },
+                    })
+                  }
+                  className="h-11 w-full rounded-lg border border-neutral-300 bg-white px-3 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
+                >
+                  <option value="">Selectați țara</option>
+                  {getCountriesForForeignType(state.contact.foreignType).map(
+                    (c) => (
+                      <option key={c} value={c}>
+                        {c}
+                      </option>
+                    )
+                  )}
+                </select>
+              </div>
+              <div className="space-y-1.5">
+                <Label
+                  htmlFor="foreignAddress"
+                  className="text-secondary-900 font-medium"
+                >
+                  Adresa completă din străinătate{' '}
+                  <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="foreignAddress"
+                  type="text"
+                  value={personalKyc.foreignData?.foreignAddress || ''}
+                  onChange={(e) =>
+                    updatePersonalKyc({
+                      foreignData: {
+                        birthCity: personalKyc.foreignData?.birthCity || '',
+                        birthCountry:
+                          personalKyc.foreignData?.birthCountry || '',
+                        hasRomanianAddress: false,
+                        foreignAddress: e.target.value,
+                      },
+                    })
+                  }
+                  placeholder="Stradă, număr, oraș, cod poștal"
+                  className="bg-white placeholder:text-neutral-400"
+                />
+              </div>
+            </div>
+          )}
+
+        {/* Romanian address grid — shown when:
+              - Romanian citizen (default)
+              - OR foreign citizen with hasRomanianAddress === true (default)
+            Hidden only when foreign + explicitly hasRomanianAddress === false. */}
+        {!(
+          personalKyc.citizenship !== 'romanian' &&
+          personalKyc.foreignData?.hasRomanianAddress === false
+        ) && (
+        <>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="county" className="text-secondary-900 font-medium">
@@ -1319,7 +1613,10 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
             className="bg-white placeholder:text-neutral-400"
           />
         </div>
+        </>
+        )}
       </div>
+      {/* /Address Section */}
 
       {/* Security Info Box */}
       <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
@@ -1334,6 +1631,9 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
           </div>
         </div>
       </div>
+
+      </>}
+      {/* /Form fields conditional */}
     </div>
   );
 }

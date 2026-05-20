@@ -39,13 +39,14 @@ import { cn } from '@/lib/utils';
 import type { PersonalKYCConfig, DocumentType, UploadedDocumentState, KYCValidationResults } from '@/types/verification-modules';
 import { compressImage } from '@/lib/images/compress';
 import { runFaceMatch } from '@/lib/kyc/face-match';
+import { randomId } from '@/lib/random-id';
 
 interface KYCDocumentsStepProps {
   config: PersonalKYCConfig;
   onValidChange: (valid: boolean) => void;
 }
 
-type KYCDocType = 'selfie' | 'certificat_domiciliu' | 'residence_permit';
+type KYCDocType = 'selfie' | 'certificat_domiciliu' | 'residence_permit' | 'passport';
 
 interface UploadState {
   file: File | null;
@@ -75,12 +76,22 @@ const DOCUMENT_CONFIG: Record<
 > = {
   selfie: {
     title: 'Selfie cu Document',
-    description: 'Selfie ținând cartea de identitate lângă față',
+    description: 'Selfie ținând documentul de identitate lângă față',
     icon: User,
     tips: [
-      'Ține documentul lângă față',
+      'Ține documentul (CI sau pașaport) lângă față',
       'Asigură-te că fața ta este vizibilă clar',
       'Iluminare bună, fără umbre pe față',
+    ],
+  },
+  passport: {
+    title: 'Pașaport (deschis — ambele pagini vizibile)',
+    description: 'Încarcă o poză cu pașaportul DESCHIS — pagina cu datele personale + pagina opusă trebuie să fie ambele vizibile.',
+    icon: FileText,
+    tips: [
+      'Pașaportul deschis la pagina cu fotografia',
+      'Ambele pagini complet vizibile',
+      'Datele clare, fără reflexii',
     ],
   },
   certificat_domiciliu: {
@@ -94,8 +105,8 @@ const DOCUMENT_CONFIG: Record<
     ],
   },
   residence_permit: {
-    title: 'Permis de Ședere / Certificat de Înregistrare',
-    description: 'Necesar pentru cetățeni străini. Fotografiați documentul complet.',
+    title: 'Permis Rezidență / Certificat de Înregistrare Fiscală',
+    description: 'Necesar pentru cetățeni străini. Permisul de ședere/rezidență sau certificatul fiscal.',
     icon: CreditCard,
     tips: [
       'Fotografiați documentul complet (față + verso)',
@@ -122,6 +133,7 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
     selfie: { ...initialUploadState },
     certificat_domiciliu: { ...initialUploadState },
     residence_permit: { ...initialUploadState },
+    passport: { ...initialUploadState },
   });
 
   const [previewModal, setPreviewModal] = useState<{
@@ -142,6 +154,7 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
   const selfieInputRef = useRef<HTMLInputElement>(null);
   const certInputRef = useRef<HTMLInputElement>(null);
   const permitInputRef = useRef<HTMLInputElement>(null);
+  const passportInputRef = useRef<HTMLInputElement>(null);
 
   // Get uploaded documents
   const getDocumentByType = useCallback((type: DocumentType): UploadedDocumentState | undefined => {
@@ -167,20 +180,37 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
       return true;
     }
 
-    // Check selfie if required
-    if (config.selfieRequired) {
+    const isForeign =
+      !!personalKyc.citizenship && personalKyc.citizenship !== 'romanian';
+
+    // Foreign citizens require: passport + selfie + residence_permit.
+    // The standard CI scan section is skipped at step 2 for them, so the
+    // passport is uploaded here.
+    if (isForeign) {
+      const hasPassport = personalKyc.uploadedDocuments.some(
+        (d) => d.type === 'passport'
+      );
+      if (!hasPassport) return false;
+    }
+
+    // Check selfie if required (Romanian) or always for foreign (selfie cu pașaport).
+    if (config.selfieRequired || isForeign) {
       const hasSelfie = personalKyc.uploadedDocuments.some(d => d.type === 'selfie');
       if (!hasSelfie) return false;
     }
 
-    // Check for address certificate if required
-    if (personalKyc.requiresAddressCertificate && config.requireAddressCertificate !== 'never') {
+    // Check for address certificate if required (Romanian-citizen path only).
+    if (
+      !isForeign &&
+      personalKyc.requiresAddressCertificate &&
+      config.requireAddressCertificate !== 'never'
+    ) {
       const hasCertificate = personalKyc.uploadedDocuments.some(d => d.type === 'certificat_domiciliu');
       if (!hasCertificate) return false;
     }
 
-    // Check for residence permit if citizenship is non-romanian
-    if (personalKyc.citizenship && personalKyc.citizenship !== 'romanian') {
+    // Residence permit / fiscal cert — required for foreign citizens.
+    if (isForeign) {
       const hasPermit = personalKyc.uploadedDocuments.some(d => d.type === 'residence_permit');
       if (!hasPermit) return false;
     }
@@ -301,7 +331,7 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
 
         // Create document record
         const newDoc: UploadedDocumentState = {
-          id: crypto.randomUUID(),
+          id: randomId(),
           type: type,
           fileName: file.name,
           fileSize: compressed.sizeAfter,
@@ -517,9 +547,17 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
             onDragOver={(e) => e.preventDefault()}
           >
             <input
-              ref={type === 'selfie' ? selfieInputRef : type === 'residence_permit' ? permitInputRef : certInputRef}
+              ref={
+                type === 'selfie'
+                  ? selfieInputRef
+                  : type === 'residence_permit'
+                  ? permitInputRef
+                  : type === 'passport'
+                  ? passportInputRef
+                  : certInputRef
+              }
               type="file"
-              accept="image/jpeg,image/jpg,image/png"
+              accept="image/jpeg,image/jpg,image/png,application/pdf"
               capture={type === 'selfie' ? 'user' : undefined}
               onChange={(e) => {
                 const file = e.target.files?.[0];
@@ -529,7 +567,16 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
               className="hidden"
             />
             <div
-              onClick={() => (type === 'selfie' ? selfieInputRef : type === 'residence_permit' ? permitInputRef : certInputRef).current?.click()}
+              onClick={() =>
+                (type === 'selfie'
+                  ? selfieInputRef
+                  : type === 'residence_permit'
+                  ? permitInputRef
+                  : type === 'passport'
+                  ? passportInputRef
+                  : certInputRef
+                ).current?.click()
+              }
               className="border border-neutral-200 rounded-lg p-6 text-center hover:bg-neutral-50 transition-colors cursor-pointer"
             >
               <div className="flex justify-center gap-2 mb-2">
@@ -581,9 +628,18 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
   }
 
   // Check which sections to show
-  const showSelfie = config.selfieRequired;
-  const showCertificate = personalKyc.requiresAddressCertificate && config.requireAddressCertificate !== 'never';
-  const showResidencePermit = personalKyc.citizenship && personalKyc.citizenship !== 'romanian';
+  const isForeignCitizen =
+    !!personalKyc.citizenship && personalKyc.citizenship !== 'romanian';
+  // Foreign citizens get passport + selfie + residence_permit (3-doc flow,
+  // matching cazierjudiciaronline.com). They skip the certificat_domiciliu
+  // requirement (which is Romanian-CI-specific).
+  const showPassport = isForeignCitizen;
+  const showSelfie = config.selfieRequired || isForeignCitizen;
+  const showCertificate =
+    !isForeignCitizen &&
+    personalKyc.requiresAddressCertificate &&
+    config.requireAddressCertificate !== 'never';
+  const showResidencePermit = isForeignCitizen;
 
   // Count uploaded documents (from Step 3)
   const idDocsCount = personalKyc.uploadedDocuments.filter(d =>
@@ -712,6 +768,9 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
         </Card>
       )}
 
+      {/* Passport Section — foreign citizens (replaces CI scan from step 2) */}
+      {showPassport && (!hasValidAccountKyc || showReuploadOption) && renderUploadCard('passport')}
+
       {/* Selfie Section - only show if reupload selected or no valid KYC */}
       {showSelfie && (!hasValidAccountKyc || showReuploadOption) && renderUploadCard('selfie')}
 
@@ -736,11 +795,12 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
       </div>
 
       {/* Progress Summary */}
-      {(showSelfie || showCertificate || showResidencePermit) && (
+      {(showPassport || showSelfie || showCertificate || showResidencePermit) && (
         <div className="flex items-center justify-center gap-4 py-4">
           {(() => {
             // Build ordered list of progress items
             const items: { type: DocumentType; label: string }[] = [];
+            if (showPassport) items.push({ type: 'passport', label: 'Pașaport' });
             if (showSelfie) items.push({ type: 'selfie', label: 'Selfie' });
             if (showCertificate) items.push({ type: 'certificat_domiciliu', label: 'Certificat' });
             if (showResidencePermit) items.push({ type: 'residence_permit', label: 'Permis Ședere' });

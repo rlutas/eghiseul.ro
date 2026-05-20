@@ -1,10 +1,29 @@
 # eGhiseul.ro - Status Curent
 
-**Data:** 2026-04-27 (ultima update; doc original 2026-02-19)
+**Data:** 2026-04-29 (ultima update; doc original 2026-02-19)
 **Sprint-uri completate:** Sprint 0-6 ✅ (toate live pe main)
 **Aliniere cu cazierjudiciaronline.com:** complet (11 faze A-L, vezi `docs/IMPLEMENTATION_COMPLETE_2026-04-16.md`)
+**Wizard redesign (Step 1+2 merge, summary unificat, 5 bug fixes):** 2026-04-29 ✅ (vezi `docs/session-logs/2026-04-29-wizard-redesign.md`)
 **Performance + image compression:** 2026-04-27 ✅ (vezi `docs/session-logs/2026-04-27-performance-image-compression.md`)
 **Sprint pendinte:** Notifications efective (email Resend, SMS SMSLink, Oblio invoicing — toate cu credentiale neconfig)
+
+---
+
+## ✅ SESIUNE 2026-04-29 — Wizard redesign + foreign citizen flow
+
+- **Step 1 (Contact) merge-uit cu Tip Client** — eliminat step separat. Adăugat citizenship toggle (PF only — Romanian / Foreign cu sub-pick EU vs non-EU) + purpose dropdown cu 219 motive (cazier-judiciar/fiscal/auto/integritate) cu priority ordering (cele frecvente primele cu badge). Eliminat `preferredContact`. Phone migrat la `PhoneInput` cu country picker (react-international-phone). NOU `<ForeignBirthFields>` (Localitatea + Țara nașterii, filter EU/non-EU) randat above motivul + helper hint sub butonul „Cetățean străin".
+- **Step 2 (Date Personale) refactor** — mode picker Scan vs Manual (2 carduri mobile-first), CNP live preview (`summarizeCNP` chip cu data nașterii + sex + județ), country dropdown filtrat EU/non-EU (`getCountriesForForeignType`), OCR progress fake-anim 40→68% (era stuck la 40% pe durata fetch-ului). Pentru străini: mode auto-skip la `manual`, CNP devenit OPȚIONAL, „Locul Nașterii" hidden (deja la step 1), toggle „Am domiciliu în România? Da/Nu" cu validation split (Da → grid românesc; Nu → country + foreignAddress).
+- **Step 4 (KYC) — flux complet pentru cetățeni străini** — 3 sloturi noi (Pașaport deschis / Selfie cu document / Permis rezidență sau Cert. înreg. fiscală). Doc type nou `passport`. Românii păstrează fluxul existing (CI scan + selfie + cert domiciliu). Toate documentele pentru străini mandatory.
+- **Order summary unificat** — `OrderSummaryCard.tsx` rescris ca single source of truth (sidebar wizard + checkout + status page); `lib/orders/normalize.ts` produce canonical `OrderOptionLine` din 3 forme (camelCase wizard / snake_case DB / legacy admin); breakdown cu opțiuni + coupon + TVA 21%. Suffix „Cazier Judiciar PF/PJ" pe nume serviciu (factură legală). API extins cu `apiOrder.options` + `breakdown.couponCode`.
+- **Coupon input pe pagina de checkout** — NOU `src/app/api/orders/[id]/coupon/route.ts` (POST/DELETE) și `src/components/payment/CouponInput.tsx`. POST validează codul, recalculează `total_price`, persistă `coupon_code` + `discount_amount`, **anulează PaymentIntent-ul Stripe existent** (`paymentIntents.cancel`) ca să se genereze unul nou cu suma corectă. Refuză operația dacă `payment_status === 'paid'`. Integrat în sidebar checkout sub `OrderSummaryCard` cu `clientSecret = null` + refetch order la apply/remove.
+- **PDF support pe upload-uri ID** — `accept` extins la `application/pdf`. PDF-uri citite via `arrayBuffer().toString(base64)` fără compresie; imaginile rămân pe `compressImage()`. Gemini OCR acceptă nativ `application/pdf`. Preview placeholder card pentru PDF (FileCheck icon + „Document PDF încărcat").
+- **Country list — corecții oficiale** — „Olanda" → **„Țările de Jos"** (per Romanian MAE post-2020 Dutch rebrand). Verificat contra europa.eu official EU member states (27 post-Brexit). Re-sortat în `COUNTRIES` + `EU_COUNTRIES`.
+- **Layout & navigation** — wizard progress redesign (track continuu fără conectori segmentați), mobile sticky CTA bar, scroll-to-top la transition, eliminat card redundant „Codul comenzii", gap fix top.
+- **Bug fixes** — `crypto.randomUUID` fallback pentru HTTP/IP local mobile (`lib/random-id.ts` cu RFC4122 v4 manual + Math.random); CNP date off-by-one (UTC drift în `extractBirthDateFromCNP`); CNP-derived auto-fill (birthDate + birthPlace=județ); motiv dropdown clipping (React Portal escape din `overflow-hidden`); emojis → lucide icons everywhere.
+- **Stripe + Oblio** — PaymentIntent metadata îmbogățit cu `line_N_name/price/code` per produs + `couponCode` + `discountAmount` (audit financiar Stripe ↔ Oblio); descriere Stripe rich. Oblio TVA 19% → 21% (aliniere RO).
+- **DB persistence (zero migration)** — `customer_data.contact.{citizenship, foreignType, purpose}` + `customer_data.personal.foreignData.{birthCity, birthCountry, hasRomanianAddress, foreignAddress}` + `uploadedDocuments[].type='passport'` salvat automat prin pipeline-ul existent (JSONB schema-less). Admin order detail afișează acum **Cetățenie** + **Motivul solicitării** + toate documentele inclusiv `passport`.
+- **Test coverage** — 17 unit tests noi pentru `validateForeignKyc()` (`tests/unit/lib/validations/foreign-citizen.test.ts`) → **total 645 unit tests** (era 628). NOU `tests/e2e/wizard/foreign-citizen-flow.spec.ts` cu 5 Playwright teste pe chromium (toate pass): tile vizibil, helper hint, country filter EU/non-EU, panel border amber, hint dispare la switch back.
+- **Cleanup** — eliminate 2 opțiuni deprecate din UI + drafts auto-cleanup (`verificare_expert`, `copii_suplimentare`).
 
 ---
 
@@ -35,7 +54,7 @@
 - Verificat live: CI iPhone 5MB → 207KB pe S3 (95% reducere)
 - Fișiere LEGACY (`steps/personal-data-step.tsx`, `steps/kyc-step.tsx`) NEatinse — orfane, planificate pentru ștergere
 
-### Test infrastructure complet (TDD-ready) — 596 unit + 8 integration + 13 E2E + 17 smoke
+### Test infrastructure complet (TDD-ready) — 645 unit + 8 integration + 13+5 E2E + 17 smoke
 
 **CI live verde** pe `origin/main` cu lint/tsc/tests/build BLOCKING. Cleanup ESLint complet 2026-04-28: 198 problems → 3 informational warnings (React Compiler external libraries, unfixable).
 - **Vitest 4** + `npm test`, `test:watch`, `test:ui`, `test:unit`, `test:integration`, `test:e2e`, `test:smoke`, `test:all`

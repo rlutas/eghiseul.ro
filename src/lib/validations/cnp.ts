@@ -269,6 +269,32 @@ export function formatCNP(cnp: string): string {
 }
 
 /**
+ * Build a human-friendly summary line from a CNP. Returns null if invalid.
+ * Used for the live preview chip below the CNP input.
+ *
+ * Example: "02.07.1992 · Bărbat · Jud. Satu Mare"
+ */
+export function summarizeCNP(cnp: string): {
+  birthDate: string;
+  gender: string;
+  county: string;
+  countyCode: string;
+} | null {
+  const result = validateCNP(cnp);
+  if (!result.valid || !result.data) return null;
+  const d = result.data.birthDate;
+  const dd = String(d.getDate()).padStart(2, '0');
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const yyyy = d.getFullYear();
+  return {
+    birthDate: `${dd}.${mm}.${yyyy}`,
+    gender: result.data.gender === 'male' ? 'Bărbat' : 'Femeie',
+    county: COUNTY_CODES[result.data.countyCode] || '',
+    countyCode: result.data.countyCode,
+  };
+}
+
+/**
  * Mask CNP for display (show only first and last 4 digits)
  */
 export function maskCNP(cnp: string): string {

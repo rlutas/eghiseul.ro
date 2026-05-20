@@ -6,6 +6,7 @@
  */
 
 import { oblioRequest, getOblioConfig } from './client';
+import { normalizeOrderOptions } from '@/lib/orders/normalize';
 import type {
   OblioInvoiceInput,
   OblioInvoiceResponse,
@@ -14,6 +15,9 @@ import type {
   OblioCollect,
   StoredInvoice,
 } from './types';
+
+// Romanian VAT rate (changed from 19% to 21% in 2026).
+const RO_VAT_RATE = 21;
 
 // ============================================================================
 // Invoice Creation
@@ -43,11 +47,10 @@ interface OrderForInvoice {
   service_name: string;
   base_price?: number;
   total_price: number;
-  selected_options?: Array<{
-    code?: string;
-    name: string;
-    price: number;
-  }>;
+  // Accepts any of the historical/current shapes — normalizeOrderOptions
+  // handles wizard camelCase, DB snake_case, and legacy {name, price}.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  selected_options?: any[];
   delivery_method?: string;
   delivery_price?: number;
   customer_data?: {
@@ -142,27 +145,26 @@ export async function createInvoiceFromOrder(
     price: order.base_price || order.total_price,
     measuringUnit: 'buc',
     currency: 'RON',
-    vatPercentage: 19,
+    vatPercentage: RO_VAT_RATE,
     vatIncluded: true,
     quantity: 1,
     productType: 'Serviciu',
   });
 
-  // Add options as separate line items
-  if (order.selected_options?.length) {
-    for (const option of order.selected_options) {
-      products.push({
-        name: option.name,
-        code: option.code,
-        price: option.price,
-        measuringUnit: 'buc',
-        currency: 'RON',
-        vatPercentage: 19,
-        vatIncluded: true,
-        quantity: 1,
-        productType: 'Serviciu',
-      });
-    }
+  // Add options as separate line items (canonical normalization handles all shapes)
+  const normalizedOptions = normalizeOrderOptions(order.selected_options);
+  for (const option of normalizedOptions) {
+    products.push({
+      name: option.name,
+      code: option.code,
+      price: option.unitPrice,
+      measuringUnit: 'buc',
+      currency: 'RON',
+      vatPercentage: RO_VAT_RATE,
+      vatIncluded: true,
+      quantity: option.quantity,
+      productType: 'Serviciu',
+    });
   }
 
   // Add delivery as separate line item if applicable
@@ -172,7 +174,7 @@ export async function createInvoiceFromOrder(
       price: order.delivery_price,
       measuringUnit: 'buc',
       currency: 'RON',
-      vatPercentage: 19,
+      vatPercentage: RO_VAT_RATE,
       vatIncluded: true,
       quantity: 1,
       productType: 'Serviciu',

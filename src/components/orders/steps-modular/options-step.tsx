@@ -7,13 +7,9 @@ import {
   Scale,
   BookOpen,
   Clock,
-  Copy,
-  CheckCircle2,
   ShieldCheck,
   Globe,
   Info,
-  Minus,
-  Plus,
   ChevronDown,
   ChevronUp,
   Package,
@@ -21,7 +17,6 @@ import {
   Layers,
   CheckCircle,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useModularWizard } from '@/providers/modular-wizard-provider';
 import { ServiceOption } from '@/types/services';
@@ -49,8 +44,6 @@ const CODE_ICONS: Record<string, React.ComponentType<{ className?: string }>> = 
   legalizare: Scale,
   apostila_notari: BookOpen,
   urgenta: Clock,
-  copii_suplimentare: Copy,
-  verificare_expert: CheckCircle2,
 };
 
 // Hint text displayed under the option name (kept short — ~1 line).
@@ -60,8 +53,6 @@ const CODE_HINTS: Record<string, string> = {
   legalizare: 'Legalizare document tradus',
   apostila_notari: 'Apostilă pe documentul legalizat',
   urgenta: 'Eliberare prioritară',
-  copii_suplimentare: 'Exemplare suplimentare',
-  verificare_expert: 'Revizuire dosar de un expert',
 };
 
 // Codes that belong to the "extras internaționale" dependency chain.
@@ -69,6 +60,9 @@ const EXTRAS_CODES = ['apostila_haga', 'traducere', 'legalizare', 'apostila_nota
 
 // Auto-applied system flags — rendered as read-only info cards, not toggles.
 const AUTO_APPLIED_CODES = new Set(['cetatean_strain']);
+
+// Codes hidden from UI (deprecated — kept in DB for historical orders).
+const HIDDEN_CODES = new Set(['verificare_expert', 'copii_suplimentare']);
 
 // ────────────────────────────────────────────────────────────────────────────
 // Helpers
@@ -135,10 +129,6 @@ export function OptionsStepModular({ onValidChange }: OptionsStepProps) {
     () => serviceOptions.filter(isCrossServiceOption),
     [serviceOptions]
   );
-
-  // "Other" options — not part of extras, not auto-applied, not cross-service.
-  // Currently: verificare_expert, copii_suplimentare (rendered in the bottom group).
-  const otherCodes = ['verificare_expert', 'copii_suplimentare'];
 
   // ──────────────────────────────────────────────────────────────────────────
   // Selection helpers
@@ -345,19 +335,19 @@ export function OptionsStepModular({ onValidChange }: OptionsStepProps) {
     }
   }, [hasCetateanStrain, optionsByCode, selectedOptions, commit]);
 
-  // Quantity helper (copii_suplimentare).
-  const updateQuantity = useCallback(
-    (optionId: string, delta: number) => {
+  // Sweep deprecated codes from draft selections (one-time, on mount/sync).
+  useEffect(() => {
+    const hasDeprecated = selectedOptions.some(
+      (o) => o.code && HIDDEN_CODES.has(o.code) && !o.bundledFor
+    );
+    if (hasDeprecated) {
       commit(
-        selectedOptions.map((opt) =>
-          opt.optionId === optionId
-            ? { ...opt, quantity: Math.max(1, opt.quantity + delta) }
-            : opt
+        selectedOptions.filter(
+          (o) => !(o.code && HIDDEN_CODES.has(o.code) && !o.bundledFor)
         )
       );
-    },
-    [selectedOptions, commit]
-  );
+    }
+  }, [selectedOptions, commit]);
 
   // ──────────────────────────────────────────────────────────────────────────
   // Render
@@ -378,9 +368,6 @@ export function OptionsStepModular({ onValidChange }: OptionsStepProps) {
 
   const urgenta = optionsByCode.get('urgenta');
   const hasExtras = EXTRAS_CODES.some((c) => optionsByCode.has(c));
-  const otherOptions = otherCodes
-    .map((c) => optionsByCode.get(c))
-    .filter((o): o is ServiceOption => !!o);
 
   return (
     <div className="space-y-8">
@@ -389,10 +376,11 @@ export function OptionsStepModular({ onValidChange }: OptionsStepProps) {
       {/* ────────────────────────────────────────────────────────────── */}
       {urgenta && !hasCetateanStrain && (
         <section className="space-y-3">
-          <div className="flex items-center gap-2">
-            <Clock className="h-5 w-5 text-primary-500" />
-            <h3 className="font-semibold text-secondary-900">Procesare Rapidă</h3>
-          </div>
+          <SectionHeader
+            icon={Clock}
+            title="Procesare Rapidă"
+            subtitle="Reducere semnificativă a timpului de eliberare"
+          />
           <OptionCard
             icon={CODE_ICONS[urgenta.code] ?? Clock}
             name={urgenta.name}
@@ -409,13 +397,22 @@ export function OptionsStepModular({ onValidChange }: OptionsStepProps) {
       {/* ────────────────────────────────────────────────────────────── */}
       {hasCetateanStrain && (
         <section className="space-y-3">
-          <div className="flex items-center gap-2">
-            <Globe className="h-5 w-5 text-amber-600" />
-            <h3 className="font-semibold text-secondary-900">Cetățean Străin — Procesare 7-15 zile lucrătoare</h3>
+          <div className="flex items-start gap-3 border-b border-amber-100 pb-2.5">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-amber-100 shrink-0">
+              <Globe className="h-4.5 w-4.5 text-amber-700" />
+            </div>
+            <div className="flex-1 min-w-0 pt-0.5">
+              <h3 className="text-base font-semibold text-secondary-900 leading-tight">
+                Cetățean Străin — Procesare 7-15 zile lucrătoare
+              </h3>
+              <p className="text-xs text-neutral-500 mt-0.5">
+                Procesarea urgentă nu este disponibilă pentru cetățeni străini
+              </p>
+            </div>
           </div>
           <div className="rounded-xl border-2 border-amber-300 bg-amber-50 p-4">
             <div className="flex gap-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-100">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-amber-100">
                 <Globe className="h-5 w-5 text-amber-700" />
               </div>
               <div className="flex-1 min-w-0">
@@ -423,7 +420,7 @@ export function OptionsStepModular({ onValidChange }: OptionsStepProps) {
                   Comanda dumneavoastră necesită verificări suplimentare la I.G.I.
                 </p>
                 <p className="text-xs text-amber-600 mt-1">
-                  Procesarea urgentă nu este disponibilă pentru cetățeni străini.
+                  Termenul standard este de 7-15 zile lucrătoare.
                 </p>
               </div>
             </div>
@@ -436,9 +433,18 @@ export function OptionsStepModular({ onValidChange }: OptionsStepProps) {
       {/* ────────────────────────────────────────────────────────────── */}
       {autoAppliedSelections.length > 0 && (
         <section className="space-y-3">
-          <div className="flex items-center gap-2">
-            <Globe className="h-5 w-5 text-amber-500" />
-            <h3 className="font-semibold text-secondary-900">Cetățean Străin</h3>
+          <div className="flex items-start gap-3 border-b border-amber-100 pb-2.5">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-amber-100 shrink-0">
+              <Globe className="h-4.5 w-4.5 text-amber-700" />
+            </div>
+            <div className="flex-1 min-w-0 pt-0.5">
+              <h3 className="text-base font-semibold text-secondary-900 leading-tight">
+                Cetățean Străin
+              </h3>
+              <p className="text-xs text-neutral-500 mt-0.5">
+                Verificare suplimentară aplicată automat
+              </p>
+            </div>
           </div>
           <div className="space-y-3">
             {autoAppliedSelections.map((opt) => (
@@ -447,7 +453,7 @@ export function OptionsStepModular({ onValidChange }: OptionsStepProps) {
                 className="relative rounded-xl border-2 border-amber-300 bg-amber-50 p-4"
               >
                 <div className="flex gap-3">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-100">
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-amber-100">
                     <Globe className="h-5 w-5 text-amber-700" />
                   </div>
                   <div className="flex-1 min-w-0">
@@ -462,7 +468,7 @@ export function OptionsStepModular({ onValidChange }: OptionsStepProps) {
                       <p className="mt-1 text-sm text-amber-800">{opt.optionDescription}</p>
                     )}
                     <div className="mt-2 flex flex-wrap items-center gap-2">
-                      <span className="rounded bg-amber-200 px-2 py-0.5 text-sm font-bold text-amber-900">
+                      <span className="rounded-lg bg-amber-200 px-2.5 py-1 text-sm font-bold text-amber-900 tabular-nums">
                         +{formatPrice(opt.priceModifier)} RON
                       </span>
                       <button
@@ -486,12 +492,11 @@ export function OptionsStepModular({ onValidChange }: OptionsStepProps) {
       {/* ────────────────────────────────────────────────────────────── */}
       {hasExtras && (
         <section className="space-y-3">
-          <div className="flex items-center gap-2">
-            <Stamp className="h-5 w-5 text-primary-500" />
-            <h3 className="font-semibold text-secondary-900">
-              Opțiuni suplimentare{serviceDisplayName ? ` ${serviceDisplayName}` : ''}
-            </h3>
-          </div>
+          <SectionHeader
+            icon={Stamp}
+            title={`Opțiuni suplimentare${serviceDisplayName ? ` ${serviceDisplayName}` : ''}`}
+            subtitle="Apostilă, traducere și legalizare pentru utilizare în străinătate"
+          />
           <div className="space-y-3">
             {/* 1. Apostila Haga */}
             {apostilaHaga && (
@@ -591,12 +596,11 @@ export function OptionsStepModular({ onValidChange }: OptionsStepProps) {
       {/* ────────────────────────────────────────────────────────────── */}
       {crossServiceOptions.length > 0 && (
         <section className="space-y-3">
-          <div className="flex items-center gap-2">
-            <Layers className="h-5 w-5 text-primary-600" />
-            <h3 className="font-semibold text-secondary-900">
-              Adaugă Serviciu Suplimentar
-            </h3>
-          </div>
+          <SectionHeader
+            icon={Layers}
+            title="Adaugă Serviciu Suplimentar"
+            subtitle="Combină mai multe servicii într-o singură comandă cu plată consolidată"
+          />
           <div className="space-y-3">
             {crossServiceOptions.map((option) => (
               <CrossServiceAddonCard
@@ -608,76 +612,6 @@ export function OptionsStepModular({ onValidChange }: OptionsStepProps) {
                 onUpdateOptions={commit}
               />
             ))}
-          </div>
-        </section>
-      )}
-
-      {/* ────────────────────────────────────────────────────────────── */}
-      {/* Alte Opțiuni — verificare_expert + copii_suplimentare           */}
-      {/* ────────────────────────────────────────────────────────────── */}
-      {otherOptions.length > 0 && (
-        <section className="space-y-3">
-          <div className="flex items-center gap-2">
-            <ShieldCheck className="h-5 w-5 text-primary-500" />
-            <h3 className="font-semibold text-secondary-900">Alte Opțiuni</h3>
-          </div>
-          <div className="space-y-3">
-            {otherOptions.map((opt) => {
-              const Icon = CODE_ICONS[opt.code] ?? ShieldCheck;
-              const selected = isCodeSelected(opt.code);
-              const data = findByCode(opt.code);
-              const showQuantity = opt.code === 'copii_suplimentare' && selected;
-
-              return (
-                <div key={opt.id} className="space-y-2">
-                  <OptionCard
-                    icon={Icon}
-                    name={opt.name}
-                    hint={opt.description || CODE_HINTS[opt.code] || ''}
-                    price={opt.price}
-                    selected={selected}
-                    onClick={() => toggleByCode(opt)}
-                  />
-                  {showQuantity && data && (
-                    <div className="rounded-lg border border-primary-200 bg-primary-50/60 px-4 py-3">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium text-secondary-900">
-                          Cantitate:
-                        </span>
-                        <div className="flex items-center gap-2">
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            className="h-8 w-8 p-0"
-                            onClick={() => updateQuantity(data.optionId, -1)}
-                            disabled={data.quantity <= 1}
-                          >
-                            <Minus className="h-4 w-4" />
-                          </Button>
-                          <span className="w-8 text-center font-semibold">
-                            {data.quantity}
-                          </span>
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            className="h-8 w-8 p-0"
-                            onClick={() => updateQuantity(data.optionId, 1)}
-                            disabled={
-                              typeof opt.max_quantity === 'number' &&
-                              data.quantity >= opt.max_quantity
-                            }
-                          >
-                            <Plus className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
           </div>
         </section>
       )}
@@ -742,6 +676,30 @@ export function OptionsStepModular({ onValidChange }: OptionsStepProps) {
 // PRESENTATIONAL SUB-COMPONENTS
 // ════════════════════════════════════════════════════════════════════════════
 
+interface SectionHeaderProps {
+  icon: React.ComponentType<{ className?: string }>;
+  title: string;
+  subtitle?: string;
+}
+
+function SectionHeader({ icon: Icon, title, subtitle }: SectionHeaderProps) {
+  return (
+    <div className="flex items-start gap-3 border-b border-neutral-100 pb-2.5">
+      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary-50 shrink-0">
+        <Icon className="h-4.5 w-4.5 text-primary-600" />
+      </div>
+      <div className="flex-1 min-w-0 pt-0.5">
+        <h3 className="text-base font-semibold text-secondary-900 leading-tight">
+          {title}
+        </h3>
+        {subtitle && (
+          <p className="text-xs text-neutral-500 mt-0.5">{subtitle}</p>
+        )}
+      </div>
+    </div>
+  );
+}
+
 interface OptionCardProps {
   icon: React.ComponentType<{ className?: string }>;
   name: string;
@@ -768,42 +726,66 @@ function OptionCard({
       disabled={disabled}
       aria-pressed={selected}
       className={cn(
-        'flex w-full cursor-pointer items-center gap-3 rounded-xl border-2 p-4 text-left transition-all duration-200',
+        'group flex w-full cursor-pointer items-center gap-3 rounded-xl border-2 p-4 text-left transition-all duration-200',
         disabled
-          ? 'opacity-40 cursor-not-allowed border-neutral-200 bg-white'
+          ? 'opacity-50 cursor-not-allowed border-neutral-200 bg-neutral-50/40'
           : selected
           ? 'border-primary-500 bg-primary-50 shadow-sm'
-          : 'border-neutral-200 hover:border-primary-300 hover:bg-neutral-50'
+          : 'border-neutral-200 bg-white hover:border-primary-300 hover:bg-primary-50/30'
       )}
     >
       <div
         className={cn(
-          'flex h-10 w-10 items-center justify-center rounded-xl shrink-0',
-          selected && !disabled ? 'bg-primary-100' : 'bg-neutral-100'
+          'flex h-11 w-11 items-center justify-center rounded-xl shrink-0 transition-colors',
+          disabled
+            ? 'bg-neutral-100'
+            : selected
+            ? 'bg-primary-100'
+            : 'bg-neutral-100 group-hover:bg-primary-100/60'
         )}
       >
         <Icon
           className={cn(
-            'h-5 w-5',
-            selected && !disabled ? 'text-primary-600' : 'text-neutral-400'
+            'h-5 w-5 transition-colors',
+            disabled
+              ? 'text-neutral-400'
+              : selected
+              ? 'text-primary-600'
+              : 'text-neutral-500 group-hover:text-primary-600'
           )}
         />
       </div>
       <div className="flex-1 min-w-0">
-        <div className="flex items-baseline justify-between gap-2">
-          <span className="text-sm font-semibold text-secondary-900">{name}</span>
-          <span
-            className={cn(
-              'text-sm font-bold shrink-0',
-              selected && !disabled ? 'text-primary-600' : 'text-neutral-400'
-            )}
-          >
-            +{formatPrice(price)}
-          </span>
-        </div>
-        <p className="text-[11px] text-neutral-500 mt-0.5">{hint}</p>
+        <p className="text-sm font-semibold text-secondary-900 leading-tight">{name}</p>
+        <p className="text-xs text-neutral-500 mt-0.5 leading-snug">{hint}</p>
       </div>
+      <PriceChip price={price} selected={selected} disabled={disabled} />
     </button>
+  );
+}
+
+interface PriceChipProps {
+  price: number;
+  selected: boolean;
+  disabled?: boolean;
+  size?: 'sm' | 'md';
+}
+
+function PriceChip({ price, selected, disabled = false, size = 'md' }: PriceChipProps) {
+  return (
+    <span
+      className={cn(
+        'shrink-0 rounded-lg font-bold tabular-nums transition-colors whitespace-nowrap',
+        size === 'sm' ? 'px-2 py-0.5 text-xs' : 'px-2.5 py-1 text-sm',
+        disabled
+          ? 'bg-neutral-100 text-neutral-400'
+          : selected
+          ? 'bg-primary-100 text-primary-700'
+          : 'bg-neutral-100 text-neutral-700 group-hover:bg-primary-100/70 group-hover:text-primary-700'
+      )}
+    >
+      +{formatPrice(price)} RON
+    </span>
   );
 }
 
@@ -981,10 +963,10 @@ function CrossServiceAddonCard({
   return (
     <div
       className={cn(
-        'rounded-xl border-2 transition-all duration-200',
+        'group rounded-xl border-2 transition-all duration-200',
         isSelected
           ? 'border-primary-500 bg-primary-50/50 shadow-sm'
-          : 'border-neutral-200 hover:border-primary-300'
+          : 'border-neutral-200 bg-white hover:border-primary-300 hover:bg-primary-50/30'
       )}
     >
       {/* Parent toggle — matches OptionCard style */}
@@ -996,32 +978,22 @@ function CrossServiceAddonCard({
         <div className="flex items-center gap-3">
           <div
             className={cn(
-              'flex h-10 w-10 items-center justify-center rounded-xl shrink-0',
-              isSelected ? 'bg-primary-100' : 'bg-neutral-100'
+              'flex h-11 w-11 items-center justify-center rounded-xl shrink-0 transition-colors',
+              isSelected ? 'bg-primary-100' : 'bg-neutral-100 group-hover:bg-primary-100/60'
             )}
           >
             <ShieldCheck
               className={cn(
-                'h-5 w-5',
-                isSelected ? 'text-primary-600' : 'text-neutral-400'
+                'h-5 w-5 transition-colors',
+                isSelected ? 'text-primary-600' : 'text-neutral-500 group-hover:text-primary-600'
               )}
             />
           </div>
           <div className="flex-1 min-w-0">
-            <div className="flex items-baseline justify-between gap-2">
-              <span className="text-sm font-semibold text-secondary-900">
-                {option.name}
-              </span>
-              <span
-                className={cn(
-                  'text-sm font-bold shrink-0',
-                  isSelected ? 'text-primary-600' : 'text-neutral-400'
-                )}
-              >
-                +{formatPrice(option.price)}
-              </span>
-            </div>
-            <p className="text-[11px] text-neutral-500 mt-0.5">
+            <p className="text-sm font-semibold text-secondary-900 leading-tight">
+              {option.name}
+            </p>
+            <p className="text-xs text-neutral-500 mt-0.5 leading-snug">
               {option.description || 'Serviciu suplimentar bundluit în aceeași comandă'}
             </p>
             <div className="mt-2 flex items-center gap-2">
@@ -1041,6 +1013,7 @@ function CrossServiceAddonCard({
               </span>
             </div>
           </div>
+          <PriceChip price={option.price} selected={isSelected} />
         </div>
       </button>
 
@@ -1073,48 +1046,43 @@ function CrossServiceAddonCard({
                     type="button"
                     onClick={() => toggleBundled(bundled)}
                     className={cn(
-                      'flex w-full items-center gap-3 rounded-lg border p-3 text-left transition-all duration-200',
+                      'group/inner flex w-full items-center gap-3 rounded-lg border p-3 text-left transition-all duration-200',
                       selected
                         ? 'border-primary-500 bg-primary-50'
-                        : 'border-neutral-200 bg-white hover:border-primary-300'
+                        : 'border-neutral-200 bg-white hover:border-primary-300 hover:bg-primary-50/30'
                     )}
                   >
                     <div
                       className={cn(
-                        'flex h-8 w-8 items-center justify-center rounded-lg shrink-0',
-                        selected ? 'bg-primary-100' : 'bg-neutral-100'
+                        'flex h-9 w-9 items-center justify-center rounded-lg shrink-0 transition-colors',
+                        selected
+                          ? 'bg-primary-100'
+                          : 'bg-neutral-100 group-hover/inner:bg-primary-100/60'
                       )}
                     >
                       <BIcon
                         className={cn(
-                          'h-4 w-4',
-                          selected ? 'text-primary-600' : 'text-neutral-400'
+                          'h-4 w-4 transition-colors',
+                          selected
+                            ? 'text-primary-600'
+                            : 'text-neutral-500 group-hover/inner:text-primary-600'
                         )}
                       />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-baseline justify-between gap-2">
-                        <span className="text-sm font-medium text-secondary-900">
-                          {bundled.name}
-                        </span>
-                        <span
-                          className={cn(
-                            'text-sm font-bold shrink-0',
-                            selected ? 'text-primary-600' : 'text-neutral-400'
-                          )}
-                        >
-                          +{formatPrice(bundled.price)}
-                        </span>
-                      </div>
+                      <p className="text-sm font-medium text-secondary-900 leading-tight">
+                        {bundled.name}
+                      </p>
                       {bundled.description && (
-                        <p className="text-xs text-neutral-500 mt-0.5">
+                        <p className="text-xs text-neutral-500 mt-0.5 leading-snug">
                           {bundled.description}
                         </p>
                       )}
                     </div>
+                    <PriceChip price={bundled.price} selected={selected} size="sm" />
                     <div
                       className={cn(
-                        'w-4 h-4 rounded border flex items-center justify-center shrink-0',
+                        'w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-colors',
                         selected
                           ? 'bg-primary-500 border-primary-500'
                           : 'border-neutral-300 bg-white'

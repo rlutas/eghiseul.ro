@@ -27,6 +27,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { compressImage } from '@/lib/images/compress';
+import { randomId } from '@/lib/random-id';
 
 // Types
 export interface ExtractedAddress {
@@ -284,7 +285,7 @@ export default function IdScanner({
 
         // Create new document entry
         const newDoc: UploadedDocument = {
-          id: crypto.randomUUID(),
+          id: randomId(),
           type: ocr.documentType || type,
           fileName: file.name,
           fileSize: compressed.sizeAfter,
@@ -385,7 +386,7 @@ export default function IdScanner({
 
       // Create new document entry for selfie
       const newDoc: UploadedDocument = {
-        id: crypto.randomUUID(),
+        id: randomId(),
         type: 'selfie_with_id',
         fileName: file.name,
         fileSize: compressed.sizeAfter,

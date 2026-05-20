@@ -602,6 +602,25 @@ export default function AdminOrderDetailPage() {
             {!contact?.email && !contact?.phone && (
               <p className="text-sm text-muted-foreground">Nicio informatie de contact.</p>
             )}
+            {/* Citizenship + foreign type (PF only). Surfaced for admin
+                triage — foreign citizens have a different processing SLA. */}
+            {contact?.citizenship && (
+              <InfoRow
+                label="Cetatenie"
+                value={
+                  contact.citizenship === 'romanian'
+                    ? 'Cetatean roman'
+                    : contact.foreignType === 'eu'
+                    ? 'Cetatean strain — UE'
+                    : contact.foreignType === 'non-eu'
+                    ? 'Cetatean strain — Non-UE'
+                    : 'Cetatean strain'
+                }
+              />
+            )}
+            {contact?.purpose && (
+              <InfoRow label="Motivul solicitarii" value={String(contact.purpose)} />
+            )}
           </CardContent>
         </Card>
 

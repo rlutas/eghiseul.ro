@@ -8,7 +8,7 @@
  * Uses ModularWizardProvider for state management.
  */
 
-import { useEffect, useState, Suspense, useCallback } from 'react';
+import { useEffect, useState, Suspense, useCallback, useRef } from 'react';
 import { ArrowLeft, ArrowRight, Loader2, AlertTriangle, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -225,6 +225,27 @@ export function ModularOrderWizard({ initialService, initialOptions }: ModularOr
       nextStep();
     }
   };
+
+  // Scroll to top of page on step change.
+  // Critical for mobile UX — without this the user lands at the bottom of the
+  // previous step's content after pressing Continuă and has to scroll up
+  // manually to see the new step's header + progress indicator.
+  const isInitialMount = useRef(true);
+  useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+    if (typeof window !== 'undefined') {
+      // 'instant' on mobile (avoid the smooth-scroll jank during fast taps);
+      // smooth on desktop where animation reads as polished.
+      const isMobile = window.innerWidth < 1024;
+      window.scrollTo({
+        top: 0,
+        behavior: isMobile ? 'auto' : 'smooth',
+      });
+    }
+  }, [state.currentStepId]);
 
   // Handle retry save
   const handleRetry = () => {
@@ -491,21 +512,9 @@ export function ModularOrderWizard({ initialService, initialOptions }: ModularOr
         <div className="lg:col-span-1">
           <div className="lg:sticky lg:top-28">
             <PriceSidebarModular service={initialService} />
-
-            {/* Order Summary in Sidebar */}
-            {state.friendlyOrderId && (
-              <Card className="mt-4 border border-neutral-200">
-                <CardContent className="p-4">
-                  <p className="text-xs text-muted-foreground mb-2">
-                    Salvează acest cod pentru a continua mai târziu:
-                  </p>
-                  <OrderIdBadge
-                    orderId={state.friendlyOrderId}
-                    className="w-full justify-center"
-                  />
-                </CardContent>
-              </Card>
-            )}
+            {/* Order code is shown twice already (top-right header + Rezumat
+                comandă chip). The redundant footer card was removed for
+                cleaner mobile layout. */}
           </div>
         </div>
       </div>

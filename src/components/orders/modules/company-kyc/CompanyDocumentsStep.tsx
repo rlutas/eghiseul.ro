@@ -28,6 +28,7 @@ import {
   Building2,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { randomId } from '@/lib/random-id';
 import type { CompanyKYCConfig, UploadedDocumentState } from '@/types/verification-modules';
 
 interface CompanyDocumentsStepProps {
@@ -212,7 +213,7 @@ export default function CompanyDocumentsStep({ config, onValidChange }: CompanyD
 
         // Create document record
         const newDoc: UploadedDocumentState = {
-          id: crypto.randomUUID(),
+          id: randomId(),
           type: type,
           fileName: file.name,
           fileSize: file.size,
