@@ -1,11 +1,14 @@
 # Documentație eGhiseul.ro
 
-**Ultima actualizare:** 2026-04-29
-**Status proiect:** Sprint 6 (~98% complet) — Wizard redesign (Step 1+2 merge, summary unificat), Performance 10x, KYC security, 596 unit tests, CI verde
+**Ultima actualizare:** 2026-05-20
+**Status proiect:** Sprint 6 + SEO Pre-Launch Phase. **47 pagini de rebuilt pentru migrare WP→Next.js** (vezi `seo/REBUILD-QUEUE.md`). Page #1 (cazier-judiciar-online) tehnic complete dar **user feedback negativ pe vizual** — necesită revizitare.
 **Fișier principal:** [`DEVELOPMENT_MASTER_PLAN.md`](DEVELOPMENT_MASTER_PLAN.md)
 **Status curent:** [`STATUS_CURRENT.md`](STATUS_CURRENT.md) — **citeste primul daca revii dupa pauza**
-**Recap sesiune curentă:** [`session-logs/2026-04-29-wizard-redesign.md`](session-logs/2026-04-29-wizard-redesign.md)
-**Sesiune anterioară:** [`session-logs/2026-04-27-performance-image-compression.md`](session-logs/2026-04-27-performance-image-compression.md)
+**Plan SEO master:** [`seo/SEO-MASTER-PLAN-2026-05-20.md`](seo/SEO-MASTER-PLAN-2026-05-20.md)
+**Rebuild queue (47 pagini):** [`seo/REBUILD-QUEUE.md`](seo/REBUILD-QUEUE.md)
+**City pages plan:** [`seo/CITY-PAGES-PLAN.md`](seo/CITY-PAGES-PLAN.md)
+**Sesiune curentă (2026-05-20):** [`session-logs/2026-05-20-seo-cazier-judiciar-rebuild.md`](session-logs/2026-05-20-seo-cazier-judiciar-rebuild.md) — **citește aici unde am rămas**
+**Sesiune anterioară (2026-04-29):** [`session-logs/2026-04-29-wizard-redesign.md`](session-logs/2026-04-29-wizard-redesign.md)
 **Testing guide:** [`testing/COMPREHENSIVE_GUIDE.md`](testing/COMPREHENSIVE_GUIDE.md)
 
 ---
