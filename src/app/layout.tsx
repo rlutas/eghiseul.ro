@@ -77,6 +77,10 @@ export default function RootLayout({
         )}
       </head>
       <body className={`${inter.variable} font-sans antialiased`} suppressHydrationWarning>
+        {/* Skip-to-content link for keyboard / screen-reader users. Hidden until focused. */}
+        <a href="#main-content" className="skip-to-content">
+          Sari la conținut
+        </a>
         <QueryProvider>
           <Header />
           {children}

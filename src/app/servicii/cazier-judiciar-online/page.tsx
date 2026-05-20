@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Footer } from '@/components/home/footer';
 import { ServiceFAQ } from '@/components/services/service-faq';
 import { buildPageMetadata, buildServicePageGraph, BASE_URL } from '@/lib/seo';
+import { cn } from '@/lib/utils';
 import {
   ArrowRight,
   User,
@@ -262,7 +263,7 @@ export default function CazierJudiciarHubPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdGraph) }}
       />
 
-      <main className="min-h-screen bg-neutral-50 -mt-16 lg:-mt-[112px]">
+      <main id="main-content" className="min-h-screen bg-neutral-50 -mt-16 lg:-mt-[112px] pb-24 lg:pb-0">
         {/* ──────────────── HERO ──────────────── */}
         <section className="relative overflow-hidden bg-gradient-to-b from-secondary-900 to-[#0C1A2F] pt-24 lg:pt-36 pb-16 lg:pb-24">
           <div className="absolute inset-0 opacity-5">
@@ -527,12 +528,14 @@ export default function CazierJudiciarHubPage() {
                 </p>
               </div>
 
-              {/* Online vs Ghișeu comparison table */}
+              {/* Online vs Ghișeu comparison — table on desktop, stacked cards on mobile */}
               <div>
                 <h3 className="text-xl font-bold text-secondary-900 mb-4">
                   Online prin eGhișeul.ro vs Ghișeul Tradițional
                 </h3>
-                <div className="overflow-x-auto">
+
+                {/* Desktop: table */}
+                <div className="hidden sm:block">
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="border-b-2 border-neutral-300">
@@ -542,58 +545,63 @@ export default function CazierJudiciarHubPage() {
                       </tr>
                     </thead>
                     <tbody>
-                      <tr className="border-b border-neutral-200">
-                        <td className="py-3 text-neutral-700 font-medium">Termen procesare</td>
-                        <td className="py-3 text-center text-green-700 font-semibold">2-4 zile</td>
-                        <td className="py-3 text-center text-neutral-600">3-7 zile</td>
-                      </tr>
-                      <tr className="border-b border-neutral-200">
-                        <td className="py-3 text-neutral-700 font-medium">Deplasare necesară</td>
-                        <td className="py-3 text-center text-green-700">
-                          <CheckCircle className="w-5 h-5 inline" /> Nu
-                        </td>
-                        <td className="py-3 text-center text-red-600">Da (2 ori)</td>
-                      </tr>
-                      <tr className="border-b border-neutral-200">
-                        <td className="py-3 text-neutral-700 font-medium">Cozi la ghișeu</td>
-                        <td className="py-3 text-center text-green-700">
-                          <CheckCircle className="w-5 h-5 inline" /> Nu
-                        </td>
-                        <td className="py-3 text-center text-red-600">30-90 min</td>
-                      </tr>
-                      <tr className="border-b border-neutral-200">
-                        <td className="py-3 text-neutral-700 font-medium">Program disponibil</td>
-                        <td className="py-3 text-center text-green-700 font-semibold">24/7 online</td>
-                        <td className="py-3 text-center text-neutral-600">Program restrâns**</td>
-                      </tr>
-                      <tr className="border-b border-neutral-200">
-                        <td className="py-3 text-neutral-700 font-medium">Disponibil din diaspora</td>
-                        <td className="py-3 text-center text-green-700">
-                          <CheckCircle className="w-5 h-5 inline" /> Da
-                        </td>
-                        <td className="py-3 text-center text-red-600">Nu</td>
-                      </tr>
-                      <tr className="border-b border-neutral-200">
-                        <td className="py-3 text-neutral-700 font-medium">Taxă oficială</td>
-                        <td className="py-3 text-center font-semibold text-secondary-900">198 RON*</td>
-                        <td className="py-3 text-center text-neutral-600">Gratuit</td>
-                      </tr>
-                      <tr className="border-b border-neutral-200">
-                        <td className="py-3 text-neutral-700 font-medium">Plată carduri</td>
-                        <td className="py-3 text-center text-green-700">
-                          <CheckCircle className="w-5 h-5 inline" /> Stripe
-                        </td>
-                        <td className="py-3 text-center text-neutral-600">Numerar/POS</td>
-                      </tr>
-                      <tr>
-                        <td className="py-3 text-neutral-700 font-medium">Apostilă + traducere</td>
-                        <td className="py-3 text-center text-green-700">
-                          <CheckCircle className="w-5 h-5 inline" /> Inclusiv
-                        </td>
-                        <td className="py-3 text-center text-red-600">Separat</td>
-                      </tr>
+                      {[
+                        { label: 'Termen procesare', us: '2-4 zile', them: '3-7 zile', usWin: true },
+                        { label: 'Deplasare necesară', us: 'Nu', them: 'Da (2 ori)', usWin: true },
+                        { label: 'Cozi la ghișeu', us: 'Nu', them: '30-90 min', usWin: true },
+                        { label: 'Program disponibil', us: '24/7 online', them: 'Program restrâns**', usWin: true },
+                        { label: 'Disponibil din diaspora', us: 'Da', them: 'Nu', usWin: true },
+                        { label: 'Taxă oficială', us: '198 RON*', them: 'Gratuit', usWin: false },
+                        { label: 'Plată carduri', us: 'Stripe', them: 'Numerar/POS', usWin: true },
+                        { label: 'Apostilă + traducere', us: 'Inclusiv', them: 'Separat', usWin: true },
+                      ].map((row, i) => (
+                        <tr key={i} className="border-b border-neutral-200 last:border-0">
+                          <td className="py-3 text-neutral-700 font-medium">{row.label}</td>
+                          <td className={cn(
+                            'py-3 text-center font-semibold',
+                            row.usWin ? 'text-green-700' : 'text-secondary-900',
+                          )}>
+                            {row.usWin && row.us === 'Nu' ? <CheckCircle className="w-5 h-5 inline mr-1" aria-hidden="true" /> : null}
+                            {row.us}
+                          </td>
+                          <td className={cn(
+                            'py-3 text-center',
+                            row.usWin ? 'text-red-600' : 'text-neutral-600',
+                          )}>
+                            {row.them}
+                          </td>
+                        </tr>
+                      ))}
                     </tbody>
                   </table>
+                </div>
+
+                {/* Mobile: stacked compact cards (no horizontal scroll) */}
+                <div className="sm:hidden space-y-2.5">
+                  {[
+                    { label: 'Termen procesare', us: '2-4 zile', them: '3-7 zile' },
+                    { label: 'Deplasare', us: 'Nu — totul online', them: 'Da (2 ori la sediu)' },
+                    { label: 'Cozi', us: 'Fără așteptare', them: '30-90 min' },
+                    { label: 'Program', us: '24/7 online', them: 'Restrâns**' },
+                    { label: 'Diaspora', us: 'Disponibil', them: 'Nu se poate' },
+                    { label: 'Taxă oficială', us: '198 RON*', them: 'Gratuit' },
+                    { label: 'Plată', us: 'Stripe (carduri)', them: 'Numerar/POS' },
+                    { label: 'Apostilă + traducere', us: 'Inclusiv', them: 'Separat' },
+                  ].map((row, i) => (
+                    <div key={i} className="bg-neutral-50 rounded-lg p-3 border border-neutral-200">
+                      <p className="text-xs font-semibold text-secondary-900 mb-2">{row.label}</p>
+                      <div className="grid grid-cols-2 gap-2 text-xs">
+                        <div>
+                          <p className="text-[10px] text-primary-600 font-bold uppercase tracking-wide mb-0.5">eGhișeul</p>
+                          <p className="text-green-700 font-semibold">{row.us}</p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-neutral-500 font-bold uppercase tracking-wide mb-0.5">La Ghișeu</p>
+                          <p className="text-neutral-600">{row.them}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
                 <p className="text-xs text-neutral-500 mt-3 italic leading-relaxed">
                   * Tariful include serviciul nostru complet: preluare cerere, semnătură electronică eIDAS,
@@ -716,9 +724,29 @@ export default function CazierJudiciarHubPage() {
               </p>
             </div>
 
-            <div className="bg-neutral-50 rounded-2xl p-6 lg:p-8 border border-neutral-200">
+            {(() => {
+              const PRICING_BASE = [
+                { service: 'Cazier PF — Standard', termen: '2-4 zile lucrătoare', pret: '198 RON' },
+                { service: 'Cazier PF — Urgent', termen: '1-2 zile lucrătoare', pret: '278 RON' },
+                { service: 'Cazier PJ — Standard', termen: '2-4 zile lucrătoare', pret: '198 RON' },
+                { service: 'Cazier PJ — Urgent', termen: '1-2 zile lucrătoare', pret: '278 RON' },
+                { service: 'Cetățean Străin', termen: '7-15 zile lucrătoare', pret: '298 RON' },
+              ];
+              const PRICING_ADDONS = [
+                { name: 'Traducere Autorizată', sub: '9 limbi disponibile', desc: 'Utilizare în străinătate', pret: '178.50 RON' },
+                { name: 'Apostilă Haga', sub: '90+ țări', desc: 'Țări Convenția Haga (UE, SUA, UK, Canada)', pret: '238 RON' },
+                { name: 'Legalizare Notarială', desc: 'Acte legalizate', pret: '99 RON' },
+                { name: 'Apostilă Notari', sub: 'Camera Notarilor', desc: 'Variantă alternativă apostilă', pret: '83.30 RON' },
+                { name: 'Copii Suplimentare', sub: 'max. 10', desc: 'Per copie legalizată', pret: '25 RON / buc' },
+                { name: 'Curier România', sub: 'Fan / Sameday', desc: 'Original fizic 1-3 zile', pret: '25-30 RON', icon: Truck },
+                { name: 'Curier Internațional', sub: 'DHL Express / Poșta Română', desc: 'Livrare în diaspora', pret: '100-250 RON', icon: Globe },
+              ];
+              return (
+            <div className="bg-neutral-50 rounded-2xl p-5 sm:p-6 lg:p-8 border border-neutral-200">
               <h3 className="font-bold text-secondary-900 mb-4 text-lg">Servicii de Bază</h3>
-              <div className="overflow-x-auto">
+
+              {/* Desktop: table */}
+              <div className="hidden sm:block">
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-neutral-300">
@@ -728,39 +756,36 @@ export default function CazierJudiciarHubPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    <tr className="border-b border-neutral-200">
-                      <td className="py-3 text-neutral-700">Cazier PF — Standard</td>
-                      <td className="py-3 text-neutral-600">2-4 zile lucrătoare</td>
-                      <td className="py-3 text-right font-bold text-secondary-900">198 RON</td>
-                    </tr>
-                    <tr className="border-b border-neutral-200">
-                      <td className="py-3 text-neutral-700">Cazier PF — Urgent</td>
-                      <td className="py-3 text-neutral-600">1-2 zile lucrătoare</td>
-                      <td className="py-3 text-right font-bold text-secondary-900">278 RON</td>
-                    </tr>
-                    <tr className="border-b border-neutral-200">
-                      <td className="py-3 text-neutral-700">Cazier PJ — Standard</td>
-                      <td className="py-3 text-neutral-600">2-4 zile lucrătoare</td>
-                      <td className="py-3 text-right font-bold text-secondary-900">198 RON</td>
-                    </tr>
-                    <tr className="border-b border-neutral-200">
-                      <td className="py-3 text-neutral-700">Cazier PJ — Urgent</td>
-                      <td className="py-3 text-neutral-600">1-2 zile lucrătoare</td>
-                      <td className="py-3 text-right font-bold text-secondary-900">278 RON</td>
-                    </tr>
-                    <tr>
-                      <td className="py-3 text-neutral-700">Cetățean Străin</td>
-                      <td className="py-3 text-neutral-600">7-15 zile lucrătoare</td>
-                      <td className="py-3 text-right font-bold text-secondary-900">298 RON</td>
-                    </tr>
+                    {PRICING_BASE.map((row, i) => (
+                      <tr key={i} className="border-b border-neutral-200 last:border-0">
+                        <td className="py-3 text-neutral-700">{row.service}</td>
+                        <td className="py-3 text-neutral-600">{row.termen}</td>
+                        <td className="py-3 text-right font-bold text-secondary-900 tabular-nums">{row.pret}</td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
+              </div>
+
+              {/* Mobile: stacked cards (no horizontal scroll) */}
+              <div className="sm:hidden space-y-2.5">
+                {PRICING_BASE.map((row, i) => (
+                  <div key={i} className="flex items-center justify-between gap-3 bg-white rounded-lg p-3 border border-neutral-200">
+                    <div className="min-w-0">
+                      <p className="font-semibold text-secondary-900 text-sm">{row.service}</p>
+                      <p className="text-xs text-neutral-500">{row.termen}</p>
+                    </div>
+                    <p className="font-bold text-secondary-900 text-base tabular-nums whitespace-nowrap">{row.pret}</p>
+                  </div>
+                ))}
               </div>
 
               <h3 className="font-bold text-secondary-900 mb-4 text-lg mt-8">
                 Opționale (Add-on-uri)
               </h3>
-              <div className="overflow-x-auto">
+
+              {/* Desktop: table */}
+              <div className="hidden sm:block">
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-neutral-300">
@@ -770,49 +795,47 @@ export default function CazierJudiciarHubPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    <tr className="border-b border-neutral-200">
-                      <td className="py-3 text-neutral-700">Traducere Autorizată (9 limbi)</td>
-                      <td className="py-3 text-neutral-600">Utilizare în străinătate</td>
-                      <td className="py-3 text-right font-bold text-secondary-900">178.50 RON</td>
-                    </tr>
-                    <tr className="border-b border-neutral-200">
-                      <td className="py-3 text-neutral-700">Apostilă Haga</td>
-                      <td className="py-3 text-neutral-600">Țări Convenția Haga (90+)</td>
-                      <td className="py-3 text-right font-bold text-secondary-900">238 RON</td>
-                    </tr>
-                    <tr className="border-b border-neutral-200">
-                      <td className="py-3 text-neutral-700">Legalizare Notarială</td>
-                      <td className="py-3 text-neutral-600">Acte legalizate</td>
-                      <td className="py-3 text-right font-bold text-secondary-900">99 RON</td>
-                    </tr>
-                    <tr className="border-b border-neutral-200">
-                      <td className="py-3 text-neutral-700">Apostilă Notari (Camera Notarilor)</td>
-                      <td className="py-3 text-neutral-600">Variantă alternativă apostilă</td>
-                      <td className="py-3 text-right font-bold text-secondary-900">83.30 RON</td>
-                    </tr>
-                    <tr className="border-b border-neutral-200">
-                      <td className="py-3 text-neutral-700">Copii Suplimentare (max. 10)</td>
-                      <td className="py-3 text-neutral-600">Per copie legalizată</td>
-                      <td className="py-3 text-right font-bold text-secondary-900">25 RON / buc</td>
-                    </tr>
-                    <tr className="border-b border-neutral-200">
-                      <td className="py-3 text-neutral-700">
-                        <Truck className="inline w-4 h-4 mr-1" /> Curier România (Fan/Sameday)
-                      </td>
-                      <td className="py-3 text-neutral-600">Original fizic 1-3 zile</td>
-                      <td className="py-3 text-right font-bold text-secondary-900">25-30 RON</td>
-                    </tr>
-                    <tr>
-                      <td className="py-3 text-neutral-700">
-                        <Globe className="inline w-4 h-4 mr-1" /> Curier Internațional
-                      </td>
-                      <td className="py-3 text-neutral-600">DHL Express / Poșta Română</td>
-                      <td className="py-3 text-right font-bold text-secondary-900">100-250 RON</td>
-                    </tr>
+                    {PRICING_ADDONS.map((row, i) => {
+                      const Icon = row.icon;
+                      return (
+                        <tr key={i} className="border-b border-neutral-200 last:border-0">
+                          <td className="py-3 text-neutral-700">
+                            {Icon ? <Icon className="inline w-4 h-4 mr-1" aria-hidden="true" /> : null}
+                            {row.name}
+                            {row.sub ? <span className="text-neutral-500"> ({row.sub})</span> : null}
+                          </td>
+                          <td className="py-3 text-neutral-600">{row.desc}</td>
+                          <td className="py-3 text-right font-bold text-secondary-900 tabular-nums">{row.pret}</td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
+
+              {/* Mobile: stacked cards for addons */}
+              <div className="sm:hidden space-y-2.5">
+                {PRICING_ADDONS.map((row, i) => {
+                  const Icon = row.icon;
+                  return (
+                    <div key={i} className="flex items-center justify-between gap-3 bg-white rounded-lg p-3 border border-neutral-200">
+                      <div className="min-w-0 flex-1">
+                        <p className="font-semibold text-secondary-900 text-sm flex items-center gap-1.5">
+                          {Icon ? <Icon className="w-4 h-4 flex-shrink-0" aria-hidden="true" /> : null}
+                          <span className="truncate">{row.name}</span>
+                        </p>
+                        <p className="text-xs text-neutral-500 leading-tight mt-0.5">
+                          {row.sub ? <>{row.sub} &middot; </> : null}{row.desc}
+                        </p>
+                      </div>
+                      <p className="font-bold text-secondary-900 text-sm tabular-nums whitespace-nowrap">{row.pret}</p>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
+              );
+            })()}
           </div>
         </section>
 
@@ -1124,6 +1147,33 @@ export default function CazierJudiciarHubPage() {
           </div>
         </section>
       </main>
+
+      {/* ──────────────── STICKY MOBILE CTA BAR ──────────────── */}
+      {/* Long page (4,000+ words) — mobile users need always-visible CTA. Desktop shows the inline CTAs. */}
+      <div
+        className="fixed bottom-0 left-0 right-0 z-40 lg:hidden bg-white border-t border-neutral-200 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] safe-area-bottom"
+        role="region"
+        aria-label="Acțiuni rapide cazier judiciar"
+      >
+        <div className="grid grid-cols-2 gap-2 p-3">
+          <Link
+            href="/servicii/cazier-judiciar-online/persoana-fizica/"
+            className="flex items-center justify-center gap-2 px-3 py-3 bg-primary-500 hover:bg-primary-600 text-secondary-900 font-bold rounded-lg text-sm transition-colors min-h-[48px]"
+            aria-label="Comandă cazier judiciar pentru persoană fizică, 198 RON"
+          >
+            <User className="w-4 h-4" aria-hidden="true" />
+            <span>PF — 198 RON</span>
+          </Link>
+          <Link
+            href="/servicii/cazier-judiciar-online/persoana-juridica/"
+            className="flex items-center justify-center gap-2 px-3 py-3 bg-secondary-900 hover:bg-secondary-800 text-white font-bold rounded-lg text-sm transition-colors min-h-[48px]"
+            aria-label="Comandă cazier judiciar pentru firmă (persoană juridică), 198 RON"
+          >
+            <Building2 className="w-4 h-4" aria-hidden="true" />
+            <span>PJ — 198 RON</span>
+          </Link>
+        </div>
+      </div>
 
       <Footer />
     </>

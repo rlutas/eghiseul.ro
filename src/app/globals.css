@@ -450,4 +450,46 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  /* ========================================
+     Accessibility — Focus States
+     Visible focus rings for keyboard navigation.
+     Browser defaults aren't visible enough on dark gradients.
+     ======================================== */
+  *:focus-visible {
+    outline: 2px solid var(--primary-500);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  /* Skip-to-content link (hidden until keyboard-focused) */
+  .skip-to-content {
+    position: absolute;
+    left: -9999px;
+    top: 0;
+    z-index: 9999;
+    padding: 0.75rem 1.25rem;
+    background: var(--primary-500);
+    color: var(--secondary-900);
+    font-weight: 600;
+    text-decoration: none;
+    border-radius: 0 0 8px 0;
+  }
+  .skip-to-content:focus-visible {
+    left: 0;
+    outline-offset: -2px;
+  }
+
+  /* ========================================
+     Accessibility — Reduced Motion
+     Honors user OS-level preference for reduced motion.
+     ======================================== */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
 }
