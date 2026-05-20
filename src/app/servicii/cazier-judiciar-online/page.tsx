@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Footer } from '@/components/home/footer';
-import { ServiceFAQ } from '@/components/services/service-faq';
+import { ServiceFAQ, type FAQ, type FAQCategory } from '@/components/services/service-faq';
 import { buildPageMetadata, buildServicePageGraph, BASE_URL } from '@/lib/seo';
 import { cn } from '@/lib/utils';
 import {
@@ -111,6 +111,9 @@ const USE_CASE_CATEGORIES = [
   {
     icon: Briefcase,
     title: 'Pentru Angajare',
+    iconBg: 'bg-primary-100',
+    iconColor: 'text-primary-600',
+    borderHover: 'hover:border-primary-300',
     cases: [
       'Angajare în sectorul public sau privat (obligatoriu pentru posturi din administrație, MAI, Justiție)',
       'Posturi cu acces la informații clasificate (necesită cazier judiciar curat)',
@@ -122,6 +125,9 @@ const USE_CASE_CATEGORIES = [
   {
     icon: Plane,
     title: 'Pentru Vize și Imigrare',
+    iconBg: 'bg-blue-100',
+    iconColor: 'text-blue-600',
+    borderHover: 'hover:border-blue-300',
     cases: [
       'Viză de muncă în SUA, Canada, Australia, Marea Britanie',
       'Rezidență permanentă în țări non-UE (Canada PR, Australia skilled migration)',
@@ -133,6 +139,9 @@ const USE_CASE_CATEGORIES = [
   {
     icon: Heart,
     title: 'Pentru Adopție și Familie',
+    iconBg: 'bg-rose-100',
+    iconColor: 'text-rose-600',
+    borderHover: 'hover:border-rose-300',
     cases: [
       'Adopție națională sau internațională (DGASPC + tribunal)',
       'Tutelă sau curatelă pentru minori',
@@ -143,6 +152,9 @@ const USE_CASE_CATEGORIES = [
   {
     icon: Shield,
     title: 'Pentru Permise și Autorizații',
+    iconBg: 'bg-purple-100',
+    iconColor: 'text-purple-600',
+    borderHover: 'hover:border-purple-300',
     cases: [
       'Permis de port-armă (vânătoare, autoapărare)',
       'Autorizație de detectiv particular',
@@ -154,6 +166,9 @@ const USE_CASE_CATEGORIES = [
   {
     icon: GraduationCap,
     title: 'Pentru Studii și Profesii Reglementate',
+    iconBg: 'bg-teal-100',
+    iconColor: 'text-teal-600',
+    borderHover: 'hover:border-teal-300',
     cases: [
       'Înscriere la Colegiul Medicilor, Stomatologilor, Farmaciștilor',
       'Înscriere la Barou (Uniunea Națională a Barourilor)',
@@ -165,6 +180,9 @@ const USE_CASE_CATEGORIES = [
   {
     icon: Building2,
     title: 'Pentru Firme și Asociații',
+    iconBg: 'bg-green-100',
+    iconColor: 'text-green-600',
+    borderHover: 'hover:border-green-300',
     cases: [
       'Înființare firmă cu administrator străin',
       'Acces la fonduri europene (cazier obligatoriu pentru beneficiar)',
@@ -176,75 +194,101 @@ const USE_CASE_CATEGORIES = [
 ];
 
 // =============================================================================
-// FAQ (15+ items — răspunsuri 50-150 cuvinte)
+// FAQ (15+ items — răspunsuri 50-150 cuvinte, grupate pe categorii)
 // =============================================================================
 
-const FAQ_ITEMS = [
+const FAQ_CATEGORIES: FAQCategory[] = [
+  { key: 'procesare', label: 'Procesare & Termene', icon: 'Timer', color: 'gold' },
+  { key: 'pret', label: 'Prețuri & Plată', icon: 'CircleDollarSign', color: 'green' },
+  { key: 'documente', label: 'Documente & Date', icon: 'FileSignature', color: 'blue' },
+  { key: 'utilizare', label: 'Utilizare & Valabilitate', icon: 'Shield', color: 'purple' },
+  { key: 'strainatate', label: 'Pentru Diaspora & Străinătate', icon: 'Plane', color: 'teal' },
+  { key: 'altele', label: 'Alte Întrebări', icon: 'HelpCircle', color: 'rose' },
+];
+
+const FAQ_ITEMS: FAQ[] = [
   {
+    category: 'procesare',
     q: 'Cât durează obținerea cazierului judiciar online?',
     a: 'Procesarea standard durează între 2 și 4 zile lucrătoare de la momentul plății, conform Legii 290/2004 privind cazierul judiciar. Termenul include trei etape: (1) preluarea cererii de către Inspectoratul General al Poliției Române — IGPR, în maxim 24 de ore; (2) eliberarea documentului oficial de către Direcția Cazier Judiciar, Statistică și Evidențe Operative, care durează 1-3 zile lucrătoare; (3) transmiterea către tine pe email a documentului semnat electronic, automat după emitere. Dacă alegi opțiunea urgentă (+80 RON), termenul total scade la 1-2 zile lucrătoare. Documentele cu cerere depusă vineri după ora 14:00 sau în weekend intră în prelucrare luni dimineața, conform programului oficial al ghișeelor de cazier judiciar. Nu există nicio diferență de calitate sau valabilitate între documentul obținut prin platforma noastră și cel obținut direct la sediul Poliției — ambele sunt eliberate de IGPR și au aceeași ștampilă oficială.',
   },
   {
+    category: 'pret',
     q: 'Care este prețul cazierului judiciar online în 2026?',
     a: 'Tariful standard pentru cazier judiciar (persoană fizică sau juridică) este de 198 RON cu TVA inclus, indiferent dacă îl soliciți pentru tine personal sau pentru firma ta. Suma include cota oficială către IGPR, taxa de procesare a cererii, semnătura electronică eIDAS, plată securizată prin Stripe și transmiterea documentului pe email. Opțiunea urgentă (procesare 1-2 zile lucrătoare) costă 278 RON total. Pentru cetățeni străini, tariful este 298 RON din cauza verificărilor suplimentare la IGI (Inspectoratul General pentru Imigrări). Add-on-urile opționale sunt: traducere autorizată în 9 limbi (178.50 RON), apostilă Haga pentru utilizare în UE/SUA/Canada/UK (238 RON), legalizare notarială (99 RON), apostilă Camera Notarilor (83.30 RON), copii suplimentare legalizate (25 RON/bucată, max 10), curier intern Fan Courier sau Sameday (25-30 RON), curier internațional DHL Express (250 RON) sau Poșta Română International (100 RON). Toate prețurile includ TVA-ul de 21% și sunt afișate transparent înainte de plată — fără costuri ascunse.',
   },
   {
+    category: 'utilizare',
     q: 'Care este valabilitatea cazierului judiciar?',
     a: 'Cazierul judiciar are valabilitate de 6 luni de la data emiterii pentru utilizare în România, conform Legii 290/2004 privind cazierul judiciar. Pentru utilizare în străinătate, valabilitatea depinde de cerințele instituției care îți solicită documentul: majoritatea autorităților din Uniunea Europeană acceptă documentul timp de 3-6 luni de la emitere; autoritățile americane (USCIS, US Department of State) acceptă cazierul judiciar românesc cu valabilitate de 2 ani; Canada (IRCC, CIC) cere documentul emis în ultimele 6 luni pentru aplicații Permanent Residence; Australia (Department of Home Affairs) acceptă maxim 12 luni de la emitere. Recomandăm să verifici cerințele exacte ale instituției destinatare înainte de comandă, pentru că termenele pot varia în funcție de tipul de procedură (viză de muncă, rezidență, adopție, etc.) și pot fi mai restrictive pentru anumite proceduri sensibile (clearance de securitate, lucru cu minori).',
   },
   {
+    category: 'documente',
     q: 'Ce documente sunt necesare pentru a obține cazierul judiciar prin eGhișeul.ro?',
     a: 'Pentru persoane fizice ai nevoie de: carte de identitate (CI) sau pașaport (poză față + verso), un selfie pentru verificare KYC, semnătură electronică (o desenezi în wizard) și datele tale de contact. Pentru persoane juridice (firme): CUI-ul firmei (din care preluăm automat datele prin ANAF), datele administratorului/reprezentantului legal, semnătura. Cetățenii străini au nevoie de pașaport (ambele pagini), selfie și permis de rezidență sau certificat de înregistrare fiscală.',
   },
   {
+    category: 'strainatate',
     q: 'Pot obține cazier judiciar online dacă locuiesc în străinătate?',
     a: 'Da, serviciul eGhișeul.ro este destinat în special românilor din diaspora. Tot ce ai nevoie este o conexiune la internet, actul de identitate românesc (CI sau pașaport) și o adresă de email validă. Documentul ți-l trimitem pe email în format PDF semnat electronic. Dacă ai nevoie de original fizic, îl trimitem prin curier internațional (DHL Express — 250 RON, 1-3 zile lucrătoare; Poșta Română International — 100 RON, 7-15 zile).',
   },
   {
+    category: 'procesare',
     q: 'Trebuie să mă deplasez la Poliție sau la altă instituție?',
     a: 'Nu, întregul proces este 100% online. eGhișeul.ro este împuternicit prin contract de prestări servicii să obțină cazierul în numele tău, conform Legii 214/2024 privind semnătura electronică și OUG 34/2014. Documentul îți este eliberat de Inspectoratul General al Poliției Române (IGPR) sau Parchet, exact ca în varianta clasică, dar fără deplasare, fără cozi și fără program redus.',
   },
   {
+    category: 'utilizare',
     q: 'Cazierul judiciar online este același document ca cel obținut la ghișeu?',
     a: 'Da, este exact același document oficial emis de Poliția Română conform Legii 290/2004 privind cazierul judiciar. Conține aceleași informații, aceeași semnătură și ștampilă oficială, și are aceeași valabilitate legală — atât în România cât și în străinătate. Singura diferență este că noi îți primim cererea online, o procesăm și îți trimitem documentul fără să fie nevoie să mergi personal.',
   },
   {
+    category: 'utilizare',
     q: 'Ce conține cazierul judiciar?',
     a: 'Documentul atestă existența sau lipsa antecedentelor penale ale persoanei (fizice sau juridice) la nivel național. Dacă nu există condamnări înregistrate, cazierul menționează „NU FIGUREAZĂ" — varianta cel mai des întâlnită. Dacă există condamnări definitive, acestea sunt enumerate cu detalii: instanța care a pronunțat sentința, articolele de lege încălcate, pedeapsa aplicată. Hotărârile cu termen de reabilitare împlinit nu mai apar.',
   },
   {
+    category: 'altele',
     q: 'Pot obține cazier judiciar dacă am condamnări?',
     a: 'Da. Cazierul judiciar se eliberează oricărei persoane care îl solicită, indiferent dacă există sau nu antecedente penale. Faptul că ai condamnări nu te împiedică să obții documentul — el doar le va menționa. Pentru anumite condamnări mai vechi, dacă termenul de reabilitare s-a împlinit (5-10 ani de la executarea pedepsei, în funcție de gravitatea infracțiunii), acestea nu mai apar pe cazier conform Legii 290/2004.',
   },
   {
+    category: 'strainatate',
     q: 'Pot folosi cazierul judiciar în străinătate?',
     a: 'Da, dar majoritatea țărilor solicită apostilare sau legalizare suplimentară. Pentru țările membre ale Convenției de la Haga (90+ țări, inclusiv toată UE, SUA, UK, Canada), e nevoie de apostilă Haga (+238 RON la noi). Pentru țările non-Haga, e nevoie de supralegalizare la Ambasadă. De asemenea, multe țări cer cazierul tradus oficial — oferim traducere autorizată în 9 limbi (Engleză UK/US/AUS, Franceză, Italiană, Spaniolă, Portugheză, Germană, Olandeză) pentru 178.50 RON.',
   },
   {
+    category: 'pret',
     q: 'Cum se face plata și cât de sigură este?',
     a: 'Plata se face online prin Stripe — același procesator folosit de Apple, Google, Amazon — cu suport pentru carduri Visa/Mastercard, Apple Pay și Google Pay. Datele tale de card nu trec niciodată prin serverele noastre; merg direct la Stripe (certificat PCI DSS Level 1). Comunicarea este criptată SSL/TLS 1.3. Primești factură fiscală pe email imediat după plată, conform legislației române (Lege 227/2015).',
   },
   {
+    category: 'pret',
     q: 'Pot anula sau obține restituire?',
     a: 'Da. Conform OUG 34/2014, ai dreptul de retragere în 14 zile de la momentul plății, fără să justifici motivul. Dacă procesarea cazierului nu a început încă (de obicei în primele câteva ore), restituirea este 100%. După ce cererea ajunge la Poliție, taxele oficiale (care reprezintă majoritatea sumei) nu mai pot fi recuperate, dar restul îți este returnat în 14 zile pe cardul folosit la plată.',
   },
   {
+    category: 'altele',
     q: 'Care este diferența dintre cazier judiciar și certificat de integritate comportamentală?',
     a: 'Cazierul judiciar atestă lipsa condamnărilor penale și se obține de la Poliție/Parchet. Certificatul de integritate comportamentală atestă lipsa comportamentelor de hărțuire, abuz sau violență față de minori și se obține de la Inspectoratul General al Poliției Române — Direcția Cazier Judiciar. Sunt documente diferite, cu utilizări diferite. Adesea sunt cerute împreună pentru profesii ce implică contact cu copii (educație, asistență socială, medicină pediatrică). Vezi serviciul nostru dedicat: <a href="/servicii/certificat-de-integritate-comportamentala/">certificat de integritate</a>.',
   },
   {
+    category: 'altele',
     q: 'Eliberez cazier pentru o firmă (persoană juridică) — ce ar trebui să știu?',
     a: 'Pentru persoane juridice, cazierul judiciar atestă lipsa sancțiunilor penale ale firmei (nu ale administratorului — pentru asta există o cerere separată). E necesar pentru licitații publice (Legea 98/2016), accesare fonduri europene, parteneriate strategice. Important: pentru PFA, ÎI și ÎF, cazierul se eliberează pe persoana fizică titulară, nu pe entitate (din motive de regim fiscal). Sistemul nostru detectează automat și te redirecționează la fluxul corect.',
   },
   {
+    category: 'pret',
     q: 'Acceptați plata cu cardul firmei pentru o cerere personală?',
     a: 'Da, plata se poate face cu orice card valid (personal sau corporate). Factura va fi emisă pe titularul comenzii — pentru o cerere personală, factura va fi pe persoana fizică; pentru o cerere de firmă, factura va fi pe firmă. Datele de facturare le specifici la finalul wizard-ului, înainte de plată. Dacă ai nevoie de factură pe firmă pentru o cerere personală (excepțional), contactează-ne și te ajutăm.',
   },
   {
+    category: 'documente',
     q: 'Documentul se livrează doar pe email sau și pe hârtie?',
     a: 'Standard, primești documentul în format PDF semnat electronic pe email — perfect valabil legal conform Regulamentului UE 910/2014 (eIDAS). Dacă ai nevoie de exemplarul fizic original cu ștampila Poliției, îl trimitem prin curier. Avem 4 opțiuni: Fan Courier standard (~25 RON), Sameday EasyBox (~30 RON), DHL Express International (250 RON, 1-3 zile), Poșta Română International (100 RON, 7-15 zile).',
   },
   {
+    category: 'documente',
     q: 'Am pierdut sau am uitat să descarc documentul. Pot să-l descarc din nou?',
     a: 'Da. După plată, primești email cu link permanent către documentul tău. Dacă ai cont creat la noi (recomandat), poți accesa istoricul comenzilor și redescărca oricând documentele primite. Dacă ai folosit checkout fără cont și ai pierdut email-ul, contactează-ne pe contact@eghiseul.ro cu datele de identificare și îți retrimitem documentul (verificăm identitatea înainte de retransmitere, pentru securitate).',
   },
@@ -630,22 +674,25 @@ export default function CazierJudiciarHubPage() {
               </p>
             </div>
 
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {USE_CASE_CATEGORIES.map((category, idx) => {
                 const Icon = category.icon;
                 return (
                   <div
                     key={idx}
-                    className="bg-neutral-50 rounded-xl p-6 border border-neutral-200 hover:border-primary-300 hover:shadow-md transition-all"
+                    className={cn(
+                      'bg-white rounded-2xl p-6 border-2 border-neutral-200 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200',
+                      category.borderHover,
+                    )}
                   >
-                    <div className="w-12 h-12 bg-primary-500/10 rounded-lg flex items-center justify-center mb-4">
-                      <Icon className="w-6 h-6 text-primary-600" />
+                    <div className={cn('w-12 h-12 rounded-xl flex items-center justify-center mb-4', category.iconBg)}>
+                      <Icon className={cn('w-6 h-6', category.iconColor)} aria-hidden="true" />
                     </div>
                     <h3 className="text-lg font-bold text-secondary-900 mb-3">{category.title}</h3>
                     <ul className="space-y-2">
                       {category.cases.map((useCase, i) => (
-                        <li key={i} className="flex items-start gap-2 text-sm text-neutral-700">
-                          <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                        <li key={i} className="flex items-start gap-2 text-sm text-neutral-700 leading-relaxed">
+                          <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" aria-hidden="true" />
                           <span>{useCase}</span>
                         </li>
                       ))}
@@ -860,72 +907,114 @@ export default function CazierJudiciarHubPage() {
               </p>
             </div>
 
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-              {[
+            {(() => {
+              const REVIEWS = [
                 {
                   quote: 'Am avut nevoie urgent de cazier judiciar pentru un job în Germania. L-am primit pe email în 2 zile, fără să mă deplasez deloc. Recomand!',
                   author: 'Maria P.',
+                  initials: 'MP',
                   city: 'Cluj-Napoca',
                   scenario: 'Job străinătate',
+                  avatarBg: 'bg-gradient-to-br from-rose-400 to-rose-600',
                 },
                 {
                   quote: 'Proces simplu și rapid. Pentru firmă am avut nevoie de cazier pentru licitație și am primit totul în 3 zile. Documentul oficial cu ștampila Poliției.',
                   author: 'Andrei M.',
+                  initials: 'AM',
                   city: 'București',
                   scenario: 'Licitație publică',
+                  avatarBg: 'bg-gradient-to-br from-blue-400 to-blue-600',
                 },
                 {
                   quote: 'Trăiesc în Italia de 5 ani și am avut nevoie de cazier pentru rezidență. Am completat formularul, am plătit și am primit documentul în 4 zile prin DHL.',
                   author: 'Cristina R.',
+                  initials: 'CR',
                   city: 'Torino, Italia',
                   scenario: 'Rezidență UE',
+                  avatarBg: 'bg-gradient-to-br from-emerald-400 to-emerald-600',
+                  featured: true,
                 },
                 {
                   quote: 'Suportul este foarte rapid — am avut o întrebare despre traducere și mi-au răspuns în 20 de minute. Au făcut și apostila pentru SUA, totul perfect.',
                   author: 'Vlad S.',
+                  initials: 'VS',
                   city: 'Iași',
                   scenario: 'Viză SUA',
+                  avatarBg: 'bg-gradient-to-br from-purple-400 to-purple-600',
                 },
                 {
                   quote: 'Am ales opțiunea urgentă pentru că aveam un termen strict pentru un dosar. Am primit cazierul a doua zi. Foarte profesionist.',
                   author: 'Ioana D.',
+                  initials: 'ID',
                   city: 'Timișoara',
                   scenario: 'Procesare urgentă',
+                  avatarBg: 'bg-gradient-to-br from-amber-400 to-amber-600',
                 },
                 {
                   quote: 'Cea mai bună soluție pentru cei care nu au timp să stea la cozi. Am terminat tot în 5 minute, apoi am uitat de el — a venit pe email la timp.',
                   author: 'Dan T.',
+                  initials: 'DT',
                   city: 'Brașov',
                   scenario: 'Angajare',
+                  avatarBg: 'bg-gradient-to-br from-teal-400 to-teal-600',
                 },
-              ].map((review, i) => (
+              ];
+              return (
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {REVIEWS.map((review, i) => (
                 <div
                   key={i}
-                  className="bg-white/5 border border-white/10 rounded-xl p-5 backdrop-blur"
+                  className={cn(
+                    'relative bg-white/[0.06] hover:bg-white/[0.09] border rounded-2xl p-5 backdrop-blur transition-colors',
+                    review.featured
+                      ? 'border-primary-500/40 sm:col-span-2 lg:col-span-1 lg:row-span-2 ring-2 ring-primary-500/10'
+                      : 'border-white/10 hover:border-white/20',
+                  )}
                 >
+                  {review.featured && (
+                    <span className="absolute -top-2.5 right-4 inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide px-2 py-1 rounded-full bg-primary-500 text-secondary-900">
+                      <Star className="w-3 h-3 fill-current" aria-hidden="true" />
+                      Recenzie verificată
+                    </span>
+                  )}
+
                   <div className="flex items-center gap-0.5 mb-3">
                     {[1, 2, 3, 4, 5].map((s) => (
                       <Star
                         key={s}
                         className="w-4 h-4 fill-primary-500 text-primary-500"
+                        aria-hidden="true"
                       />
                     ))}
                   </div>
-                  <p className="text-white/90 text-sm leading-relaxed mb-4">
+
+                  <p className={cn(
+                    'text-white/90 leading-relaxed mb-5',
+                    review.featured ? 'text-base' : 'text-sm',
+                  )}>
                     &ldquo;{review.quote}&rdquo;
                   </p>
-                  <div className="flex items-center justify-between pt-3 border-t border-white/10">
-                    <div>
-                      <p className="font-semibold text-white text-sm">{review.author}</p>
-                      <p className="text-xs text-white/50">{review.city}</p>
+
+                  <div className="flex items-center gap-3 pt-3 border-t border-white/10">
+                    <div className={cn(
+                      'flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-md',
+                      review.avatarBg,
+                    )} aria-hidden="true">
+                      {review.initials}
                     </div>
-                    <span className="text-xs px-2 py-1 rounded-full bg-primary-500/20 text-primary-500">
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-white text-sm truncate">{review.author}</p>
+                      <p className="text-xs text-white/50 truncate">{review.city}</p>
+                    </div>
+                    <span className="hidden sm:inline-block text-[10px] px-2 py-1 rounded-full bg-primary-500/20 text-primary-500 whitespace-nowrap">
                       {review.scenario}
                     </span>
                   </div>
                 </div>
               ))}
             </div>
+              );
+            })()}
 
             <div className="mt-10 text-center">
               <p className="text-white/60 text-sm">
@@ -948,46 +1037,78 @@ export default function CazierJudiciarHubPage() {
               </p>
             </div>
 
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {[
                 {
                   icon: Award,
                   title: 'Document Oficial',
                   desc: 'Cazier emis de Inspectoratul General al Poliției Române (IGPR), identic cu cel obținut la ghișeu — aceeași valabilitate, aceeași ștampilă.',
+                  iconBg: 'bg-primary-100',
+                  iconColor: 'text-primary-600',
+                  hoverBorder: 'hover:border-primary-300',
+                  accent: 'before:bg-primary-500',
                 },
                 {
                   icon: Lock,
                   title: 'Plată 100% Securizată',
                   desc: 'Procesator Stripe (PCI DSS Level 1) — același folosit de Apple, Amazon, Google. Suport carduri, Apple Pay, Google Pay.',
+                  iconBg: 'bg-blue-100',
+                  iconColor: 'text-blue-600',
+                  hoverBorder: 'hover:border-blue-300',
+                  accent: 'before:bg-blue-500',
                 },
                 {
                   icon: Gavel,
                   title: 'Conform Legislației',
                   desc: 'Procesare conform Legii 290/2004 (cazier), Legii 214/2024 (semnătură electronică), Regulamentului UE 910/2014 (eIDAS).',
+                  iconBg: 'bg-purple-100',
+                  iconColor: 'text-purple-600',
+                  hoverBorder: 'hover:border-purple-300',
+                  accent: 'before:bg-purple-500',
                 },
                 {
                   icon: Users,
                   title: 'Suport Real, 7 zile/săpt.',
                   desc: 'Echipă disponibilă pe email și telefon, răspuns garantat sub 4 ore. Răspundem la întrebări și în weekend.',
+                  iconBg: 'bg-green-100',
+                  iconColor: 'text-green-600',
+                  hoverBorder: 'hover:border-green-300',
+                  accent: 'before:bg-green-500',
                 },
                 {
                   icon: Globe,
                   title: 'Disponibil din Diaspora',
                   desc: 'Procesăm cereri pentru cetățeni români din UE, SUA, Canada, UK, Australia. Curier internațional disponibil — DHL Express sau Poșta Română.',
+                  iconBg: 'bg-teal-100',
+                  iconColor: 'text-teal-600',
+                  hoverBorder: 'hover:border-teal-300',
+                  accent: 'before:bg-teal-500',
                 },
                 {
                   icon: Shield,
                   title: 'GDPR & Confidențialitate',
                   desc: 'Date personale prelucrate conform Regulamentului UE 2016/679. Documentele de identitate șterse automat după eliberarea cazierului.',
+                  iconBg: 'bg-rose-100',
+                  iconColor: 'text-rose-600',
+                  hoverBorder: 'hover:border-rose-300',
+                  accent: 'before:bg-rose-500',
                 },
               ].map((item, i) => {
                 const Icon = item.icon;
                 return (
-                  <div key={i} className="bg-white rounded-xl p-6 border border-neutral-200 text-center">
-                    <div className="inline-flex w-14 h-14 bg-primary-100 rounded-2xl items-center justify-center mb-4">
-                      <Icon className="w-7 h-7 text-primary-600" />
+                  <div
+                    key={i}
+                    className={cn(
+                      'relative bg-white rounded-2xl p-6 border-2 border-neutral-200 transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5',
+                      'before:absolute before:left-0 before:top-6 before:bottom-6 before:w-1 before:rounded-r-full',
+                      item.hoverBorder,
+                      item.accent,
+                    )}
+                  >
+                    <div className={cn('inline-flex w-12 h-12 rounded-xl items-center justify-center mb-4', item.iconBg)}>
+                      <Icon className={cn('w-6 h-6', item.iconColor)} aria-hidden="true" />
                     </div>
-                    <h3 className="font-bold text-secondary-900 mb-2">{item.title}</h3>
+                    <h3 className="font-bold text-secondary-900 mb-2 text-lg">{item.title}</h3>
                     <p className="text-sm text-neutral-600 leading-relaxed">{item.desc}</p>
                   </div>
                 );
@@ -1074,7 +1195,11 @@ export default function CazierJudiciarHubPage() {
         </section>
 
         {/* ──────────────── FAQ (15+ items) ──────────────── */}
-        <ServiceFAQ faqs={FAQ_ITEMS} title="Întrebări Frecvente despre Cazierul Judiciar" />
+        <ServiceFAQ
+          faqs={FAQ_ITEMS}
+          categories={FAQ_CATEGORIES}
+          title="Întrebări Frecvente despre Cazierul Judiciar"
+        />
 
         {/* ──────────────── FINAL CTA ──────────────── */}
         <section className="relative py-16 lg:py-24 bg-gradient-to-b from-secondary-900 to-[#0C1A2F] overflow-hidden">
