@@ -38,6 +38,7 @@ Platforma digitala pentru Romania - servicii publice digitalizate (9 servicii ac
 | **PRD** | `docs/prd/eghiseul-prd.md` |
 | **Agenti & orchestrare** | `docs/agents/` |
 | **Backlog & features viitoare** | `docs/DEVELOPMENT_MASTER_PLAN.md` (sectiunea BACKLOG) |
+| **Referință produs (sister project)** | `/Users/raul/Projects/cazierjudiciaronline.com` — Next.js, sister project, single-tenant flow. Folosește-l ca SURSĂ pentru paritate UX/pricing/features când vine cerința „fă ca acolo". Are detectEntityType pentru PFA/II/IF în `src/components/form/steps/Step2PersonalData.tsx:24-92`, CUI lookup prin infocui.ro în `src/app/api/cui-lookup/route.ts`, courier internațional în `src/components/form/steps/Step4Options.tsx`. NU porta cod orbește — cazierjudiciaronline e single-tenant, noi suntem multi-service multi-tenant. |
 
 ---
 

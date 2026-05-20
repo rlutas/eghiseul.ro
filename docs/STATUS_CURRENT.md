@@ -30,11 +30,21 @@
 supabase/migrations/036_pricing_realignment_2026-05-20.sql            NOU
 supabase/migrations/037_cazier_pj_entity_blocking.sql                 NOU
 src/lib/services/entity-type-detection.ts                             NOU
+src/lib/services/document-ocr.ts                                      (flash-lite → flash + parseGeminiOCRResponse helper + raw text capture)
 src/components/orders/modules/company-kyc/CompanyDataStep.tsx         (word-boundary matching)
 src/components/orders/steps-modular/delivery-step.tsx                 (international flow: DHL + Poșta RO)
 src/types/verification-modules.ts                                     (AddressState.country?)
+CLAUDE.md                                                             (link la /Users/raul/Projects/cazierjudiciaronline.com pentru viitorii agenți)
 tests/unit/lib/services/entity-type-detection.test.ts                 NOU (50 tests)
+tests/unit/lib/services/document-ocr-parse.test.ts                    NOU (14 tests)
+tests/unit/types/address-state.test.ts                                NOU (6 tests)
 ```
+
+**Test suite total: 715 passed / 725** (10 integration skipped — opt-in cu RUN_INTEGRATION=1).
+
+### Bug fix — OCR 0% confidence regression
+
+User raportat: poză CI clară, OCR throw `„Nu am putut extrage datele din document (încredere: 0%)"`. Root cause: `gemini-2.5-flash-lite` (folosit pt OCR pe motiv de viteză 2s vs 14s) generează **false-negatives** pe text dens (CNP/MRZ). Același commit care a făcut downgrade-ul nota explicit că flash-lite e nesigur pe vision tasks — dar avertismentul a fost aplicat doar la face-matching, nu și la OCR. **Fix:** flip `GEMINI_MODEL = 'gemini-2.5-flash'` (full, nu lite) + helper nou `parseGeminiOCRResponse()` care bubble raw Gemini text în `issues[]` ca `[gemini-raw]: ...` (debugging nu mai e orb pe failure-uri viitoare).
 
 ---
 

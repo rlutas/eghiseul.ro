@@ -5,13 +5,22 @@
  * Supports:
  * - Carte de Identitate (CI) - front and back
  * - Passport (Romanian and other EU)
+ *
+ * Model choice: `gemini-2.5-flash` (NOT flash-lite). The lite variant was
+ * tried for speed (~2s vs ~14s) but produces frequent false-negatives on
+ * dense ID text (CNP/MRZ digits at ~25-30px after compression), returning
+ * `{ success: false, confidence: 0 }` on perfectly clear photos. The same
+ * regression applies to face-matching — both stay on full flash.
+ *
+ * On JSON-parse failure we now bubble up the raw Gemini text in `issues[]`
+ * so production debugging isn't blind.
  */
 
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
 // Initialize Gemini AI with the 2.5 Flash model for OCR
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY || '');
-const GEMINI_MODEL = 'gemini-2.5-flash-lite';
+const GEMINI_MODEL = 'gemini-2.5-flash';
 
 export type DocumentType = 'ci_front' | 'ci_back' | 'passport' | 'unknown';
 
@@ -157,25 +166,7 @@ Răspunde în acest format JSON:
 
     const response = await result.response;
     const text = response.text();
-
-    // Extract JSON from response
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      return createErrorResult('ci_front', 'Nu s-a putut procesa documentul');
-    }
-
-    const parsed = JSON.parse(jsonMatch[0]);
-    return {
-      success: parsed.success ?? false,
-      documentType: 'ci_front',
-      confidence: parsed.confidence ?? 0,
-      extractedData: {
-        ...parsed.extractedData,
-        documentType: 'ci_front',
-      },
-      issues: parsed.issues ?? [],
-      suggestions: parsed.suggestions ?? [],
-    };
+    return parseGeminiOCRResponse(text, 'ci_front');
   } catch (error) {
     console.error('CI Front OCR error:', error);
     return createErrorResult('ci_front', 'Eroare la procesarea documentului');
@@ -257,24 +248,7 @@ Răspunde în acest format JSON:
 
     const response = await result.response;
     const text = response.text();
-
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      return createErrorResult('ci_back', 'Nu s-a putut procesa documentul');
-    }
-
-    const parsed = JSON.parse(jsonMatch[0]);
-    return {
-      success: parsed.success ?? false,
-      documentType: 'ci_back',
-      confidence: parsed.confidence ?? 0,
-      extractedData: {
-        ...parsed.extractedData,
-        documentType: 'ci_back',
-      },
-      issues: parsed.issues ?? [],
-      suggestions: parsed.suggestions ?? [],
-    };
+    return parseGeminiOCRResponse(text, 'ci_back');
   } catch (error) {
     console.error('CI Back OCR error:', error);
     return createErrorResult('ci_back', 'Eroare la procesarea documentului');
@@ -343,24 +317,7 @@ Răspunde în acest format JSON:
 
     const response = await result.response;
     const text = response.text();
-
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      return createErrorResult('passport', 'Nu s-a putut procesa documentul');
-    }
-
-    const parsed = JSON.parse(jsonMatch[0]);
-    return {
-      success: parsed.success ?? false,
-      documentType: 'passport',
-      confidence: parsed.confidence ?? 0,
-      extractedData: {
-        ...parsed.extractedData,
-        documentType: 'passport',
-      },
-      issues: parsed.issues ?? [],
-      suggestions: parsed.suggestions ?? [],
-    };
+    return parseGeminiOCRResponse(text, 'passport');
   } catch (error) {
     console.error('Passport OCR error:', error);
     return createErrorResult('passport', 'Eroare la procesarea documentului');
@@ -481,16 +438,78 @@ export async function extractFromCIBothSides(
 }
 
 /**
- * Helper to create error result
+ * Helper to create error result. When `rawGeminiText` is provided we include
+ * a truncated copy in `issues[]` so production logs/console actually show
+ * what the model said instead of silently returning confidence: 0.
  */
-function createErrorResult(documentType: DocumentType, message: string): OCRResult {
+function createErrorResult(
+  documentType: DocumentType,
+  message: string,
+  rawGeminiText?: string,
+): OCRResult {
+  const issues = [message];
+  if (rawGeminiText) {
+    const trimmed = rawGeminiText.trim().slice(0, 500);
+    issues.push(`[gemini-raw]: ${trimmed}`);
+  }
   return {
     success: false,
     documentType,
     confidence: 0,
     extractedData: { documentType },
-    issues: [message],
+    issues,
     suggestions: ['Verificați conexiunea și încercați din nou'],
+  };
+}
+
+/**
+ * Parse Gemini's free-form response into an OCRResult.
+ *
+ * Gemini sometimes wraps JSON in markdown fences or prepends a sentence
+ * even when the prompt says "no markdown". We grab the first complete
+ * JSON object (`{...}`) we can find. On failure we bubble the raw text
+ * up to the caller's `issues[]` for debugging.
+ */
+export function parseGeminiOCRResponse(
+  rawText: string,
+  documentType: DocumentType,
+): OCRResult {
+  const jsonMatch = rawText.match(/\{[\s\S]*\}/);
+  if (!jsonMatch) {
+    return createErrorResult(
+      documentType,
+      'Nu s-a putut procesa documentul',
+      rawText,
+    );
+  }
+
+  let parsed: {
+    success?: boolean;
+    confidence?: number;
+    extractedData?: Record<string, unknown>;
+    issues?: string[];
+    suggestions?: string[];
+  };
+  try {
+    parsed = JSON.parse(jsonMatch[0]);
+  } catch {
+    return createErrorResult(
+      documentType,
+      'Răspuns AI invalid (JSON malformat)',
+      rawText,
+    );
+  }
+
+  return {
+    success: parsed.success ?? false,
+    documentType,
+    confidence: parsed.confidence ?? 0,
+    extractedData: {
+      ...(parsed.extractedData as ExtractedPersonalData | undefined),
+      documentType,
+    },
+    issues: parsed.issues ?? [],
+    suggestions: parsed.suggestions ?? [],
   };
 }
 
