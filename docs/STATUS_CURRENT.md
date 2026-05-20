@@ -42,9 +42,11 @@ tests/unit/types/address-state.test.ts                                NOU (6 tes
 
 **Test suite total: 715 passed / 725** (10 integration skipped — opt-in cu RUN_INTEGRATION=1).
 
-### Bug fix — OCR 0% confidence regression
+### Hardening — OCR debugging (post-mortem dintr-o eroare punctuală)
 
-User raportat: poză CI clară, OCR throw `„Nu am putut extrage datele din document (încredere: 0%)"`. Root cause: `gemini-2.5-flash-lite` (folosit pt OCR pe motiv de viteză 2s vs 14s) generează **false-negatives** pe text dens (CNP/MRZ). Același commit care a făcut downgrade-ul nota explicit că flash-lite e nesigur pe vision tasks — dar avertismentul a fost aplicat doar la face-matching, nu și la OCR. **Fix:** flip `GEMINI_MODEL = 'gemini-2.5-flash'` (full, nu lite) + helper nou `parseGeminiOCRResponse()` care bubble raw Gemini text în `issues[]` ca `[gemini-raw]: ...` (debugging nu mai e orb pe failure-uri viitoare).
+User raportat o eroare punctuală: poză CI clară, OCR throw „Nu am putut extrage datele (încredere: 0%)". **NU e modelul** (`gemini-2.5-flash-lite` merge bine în restul cazurilor) — a fost o ratare punctuală pe acea poză specifică (compresie, hiccup Gemini, sau parser greedy care lua bracketul greșit).
+
+**Hardening aplicat (model NESCHIMBAT, rămâne `flash-lite`):** helper nou `parseGeminiOCRResponse()` care bubble raw Gemini text în `issues[]` ca `[gemini-raw]: ...` (truncat la 500 chars). Refactorizat cele 3 extractoare (`extractFromCIFront`, `extractFromCIBack`, `extractFromPassport`) să folosească același helper — nu mai sunt 3 copii ale parse logic. Următoarea oară când o poză eșuează, vezi în consolă exact ce a spus Gemini → debug nu mai e orb.
 
 ---
 

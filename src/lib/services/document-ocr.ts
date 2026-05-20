@@ -1,26 +1,25 @@
 /**
- * Document OCR Service using Google Gemini 2.5 Flash
+ * Document OCR Service using Google Gemini 2.5 Flash Lite
  *
  * Extracts data from Romanian ID cards and passports using AI vision.
  * Supports:
  * - Carte de Identitate (CI) - front and back
  * - Passport (Romanian and other EU)
  *
- * Model choice: `gemini-2.5-flash` (NOT flash-lite). The lite variant was
- * tried for speed (~2s vs ~14s) but produces frequent false-negatives on
- * dense ID text (CNP/MRZ digits at ~25-30px after compression), returning
- * `{ success: false, confidence: 0 }` on perfectly clear photos. The same
- * regression applies to face-matching — both stay on full flash.
+ * Model choice: `gemini-2.5-flash-lite` (~2s, vs ~14s for full flash).
+ * Confirmed working in production by the team; the speed win matters for
+ * the wizard UX and lite is reliable enough for ID cards.
  *
- * On JSON-parse failure we now bubble up the raw Gemini text in `issues[]`
- * so production debugging isn't blind.
+ * On JSON-parse failure we bubble up the raw Gemini text in `issues[]`
+ * so production debugging isn't blind — useful when a specific photo
+ * trips up the model (rare, but happens).
  */
 
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-// Initialize Gemini AI with the 2.5 Flash model for OCR
+// Initialize Gemini AI with the 2.5 Flash Lite model for OCR
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY || '');
-const GEMINI_MODEL = 'gemini-2.5-flash';
+const GEMINI_MODEL = 'gemini-2.5-flash-lite';
 
 export type DocumentType = 'ci_front' | 'ci_back' | 'passport' | 'unknown';
 

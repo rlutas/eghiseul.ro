@@ -186,38 +186,30 @@ MOD  docs/STATUS_CURRENT.md
 
 ---
 
-## 8. Patch — OCR 0% confidence regression (post-lunch)
+## 8. Patch — OCR debugging hardening (post-lunch)
 
-User reported: clear ID photo, OCR throws `"Nu am putut extrage datele
-din document (încredere: 0%)"`. Root cause diagnosed by Explore agent:
+User reported a one-off failure: clear ID photo, OCR threw `"Nu am putut
+extrage datele din document (încredere: 0%)"`. Initial Explore-agent
+diagnosis pointed at `gemini-2.5-flash-lite` being too weak. **User
+corrected:** flash-lite actually works fine in their production usage —
+this was a one-off ratare punctuală on that specific photo (possible
+causes: compression artifact, transient Gemini hiccup, or our greedy
+regex grabbing the wrong `}`).
 
-1. **Primary:** `GEMINI_MODEL = 'gemini-2.5-flash-lite'` (in `document-ocr.ts:14`)
-   was the wrong model for ID OCR. It was downgraded for speed (2s vs 14s)
-   in a prior commit but the same commit message itself flagged that the
-   lite variant gives false-negatives on vision tasks (the team applied
-   the warning to face-matching but missed OCR).
-2. **Secondary:** JSON-parse failure path didn't surface the raw Gemini
-   text, so failures were silent — couldn't tell if the model said
-   `"can't read"` or returned malformed JSON.
-3. **Tertiary (not patched yet):** Compression defaults (1600px / q=0.85)
-   may reduce CNP/MRZ legibility on phone photos for borderline cases.
-   Considered but not changed — flip back to flash already restores OCR
-   quality; revisit if user still sees confidence dips.
+**Model kept at `gemini-2.5-flash-lite`** (confirmed working). Only
+hardened the debug path so future one-offs aren't silent:
 
-### Fix applied
-
-- **`src/lib/services/document-ocr.ts:23`** — flip `GEMINI_MODEL` to
-  `'gemini-2.5-flash'` (full, not lite). Comment block updated explaining
-  rationale + the prior regression history.
 - **NEW `parseGeminiOCRResponse(rawText, documentType)`** — exported pure
   function that handles the JSON extraction in one place. Refactored the
   three extractors (`extractFromCIFront`, `extractFromCIBack`,
   `extractFromPassport`) to call this helper instead of triplicating the
   parse logic. On parse failure, raw text (truncated to 500 chars) is
-  bubbled into `issues[]` as `[gemini-raw]: ...` — production logs +
-  React console no longer go dark.
+  bubbled into `issues[]` as `[gemini-raw]: ...` — next time a specific
+  photo fails the console shows what Gemini actually said.
 - **`createErrorResult`** signature extended with optional `rawGeminiText`
   parameter; backward compatible (existing callers unchanged).
+- Header comment in `document-ocr.ts` clarified — explicitly notes that
+  flash-lite is the confirmed working model + the speed reason.
 
 ### Tests added
 
