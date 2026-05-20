@@ -29,6 +29,11 @@ import {
   AlertTriangle,
 } from 'lucide-react';
 import type { CompanyKYCConfig, CompanyAutoCompleteData } from '@/types/verification-modules';
+import {
+  detectEntityType,
+  entityTypeMessage,
+  matchesAnyWord,
+} from '@/lib/services/entity-type-detection';
 
 interface CompanyDataStepProps {
   config: CompanyKYCConfig;
@@ -84,24 +89,31 @@ export default function CompanyDataStep({ config, onValidChange }: CompanyDataSt
         if (data.success && data.data) {
           const companyData: CompanyAutoCompleteData = data.data;
 
-          // Check if company type is allowed
-          const companyType = companyData.type?.toUpperCase() || '';
-          const isBlocked = config.blockedTypes.some(blocked =>
-            companyType.includes(blocked.toUpperCase())
-          );
+          // Word-boundary matching against the full company NAME (not just the
+          // parsed type) so "EDITII SRL" doesn't false-positive on "II", and
+          // "BIROU NOTARIAL X" is correctly flagged even if `type` is empty.
+          const upperName = (companyData.name || '').toUpperCase();
+          const detected = detectEntityType(companyData.name || '');
+
+          // Config-driven block list (DB verification_config.blockedTypes)
+          const isBlocked = matchesAnyWord(upperName, config.blockedTypes);
 
           if (isBlocked) {
+            const msg =
+              entityTypeMessage(detected) ||
+              config.blockMessage ||
+              'Tipul de entitate nu este acceptat pentru acest serviciu.';
             updateCompanyKyc?.({
               validationStatus: 'blocked',
-              validationMessage: config.blockMessage || `Tipul de entitate "${companyType}" nu este acceptat.`,
+              validationMessage: msg,
             });
-            setError(config.blockMessage || `Tipul de entitate "${companyType}" nu este acceptat.`);
+            setError(msg);
             return;
           }
 
-          // Check for special rules
-          const specialRule = config.specialRules.find(rule =>
-            rule.entityTypes.some(et => companyType.includes(et.toUpperCase()))
+          // Config-driven special rules (DB verification_config.specialRules)
+          const specialRule = config.specialRules.find((rule) =>
+            matchesAnyWord(upperName, rule.entityTypes),
           );
 
           if (specialRule) {
@@ -115,6 +127,10 @@ export default function CompanyDataStep({ config, onValidChange }: CompanyDataSt
             } else if (specialRule.action === 'warn') {
               setWarning(specialRule.message);
             }
+          } else if (detected === 'ong') {
+            // Fallback: even if config didn't list ONG, surface the extra-docs
+            // requirement so the user knows what to bring.
+            setWarning(entityTypeMessage('ong')!);
           }
 
           // Auto-fill company data

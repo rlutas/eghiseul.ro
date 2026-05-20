@@ -317,6 +317,9 @@ export interface AddressState {
   floor?: string;
   apartment?: string;
   postalCode?: string;
+  // Set only for international shipping destinations (DHL Express,
+  // Poșta Română International). Free-text — no enforced country list.
+  country?: string;
 }
 
 export interface UploadedDocumentState {

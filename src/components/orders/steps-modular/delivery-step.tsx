@@ -63,6 +63,37 @@ const SENDER_LOCATION = {
 // 15% = 0.15, 20% = 0.20, etc.
 const DELIVERY_MARKUP_PERCENTAGE = 0.15; // 15% markup
 
+// =============================================================================
+// INTERNATIONAL COURIERS (fixed price, no live quote)
+// =============================================================================
+// Ported from cazierjudiciaronline.com config/addons.ts (DHL 250, Posta 100).
+// Pricing aligned with theirs — we simply route to a manual fulfillment
+// pipeline (no AWB integration); user pays at checkout.
+const INTERNATIONAL_COURIERS = [
+  {
+    provider: 'dhl_intl',
+    name: 'DHL Express International',
+    price: 250,
+    estimatedDays: '1-3 zile lucrătoare',
+    logo: '/images/couriers/dhl.svg',
+    description: 'Livrare rapidă oriunde în lume',
+    badge: 'Rapid',
+    color: 'yellow',
+  },
+  {
+    provider: 'posta_intl',
+    name: 'Poșta Română International',
+    price: 100,
+    estimatedDays: '7-15 zile lucrătoare',
+    logo: '/images/couriers/posta-romana.svg',
+    description: 'Livrare standard, preț redus',
+    badge: 'Economic',
+    color: 'blue',
+  },
+] as const;
+
+type InternationalProvider = (typeof INTERNATIONAL_COURIERS)[number]['provider'];
+
 // Toggle which locker services to show in the UI
 // Set to false to hide a locker option (functionality preserved, just hidden)
 const ENABLED_LOCKERS = {
@@ -207,6 +238,21 @@ const addressSchema = z.object({
 
 type AddressFormData = z.infer<typeof addressSchema>;
 
+// International address — no county code, free-text country.
+const internationalAddressSchema = z.object({
+  street: z.string().min(2, 'Strada este obligatorie'),
+  city: z.string().min(2, 'Localitatea este obligatorie'),
+  postalCode: z.string().min(2, 'Codul poștal este obligatoriu'),
+  country: z.string().min(2, 'Țara este obligatorie'),
+  recipientName: z.string().min(2, 'Numele destinatarului este obligatoriu'),
+  recipientPhone: z
+    .string()
+    .min(8, 'Telefonul este obligatoriu')
+    .regex(/^[+0-9\s\-()]+$/, 'Telefon invalid'),
+});
+
+type InternationalAddressFormData = z.infer<typeof internationalAddressSchema>;
+
 interface DeliveryStepProps {
   onValidChange: (valid: boolean) => void;
 }
@@ -281,6 +327,27 @@ export function DeliveryStepModular({ onValidChange }: DeliveryStepProps) {
     },
     mode: 'onChange',
   });
+
+  // International shipping (DHL / Poșta Română Internațional)
+  const [intlProvider, setIntlProvider] = useState<InternationalProvider | null>(
+    (delivery.courierProvider === 'dhl_intl' || delivery.courierProvider === 'posta_intl')
+      ? (delivery.courierProvider as InternationalProvider)
+      : null,
+  );
+
+  const intlForm = useForm<InternationalAddressFormData>({
+    resolver: zodResolver(internationalAddressSchema),
+    defaultValues: {
+      street: delivery.address?.street || '',
+      city: delivery.address?.city || '',
+      postalCode: delivery.address?.postalCode || '',
+      country: delivery.address?.country || '',
+      recipientName: '',
+      recipientPhone: '',
+    },
+    mode: 'onChange',
+  });
+  const isIntlAddressValid = intlForm.formState.isValid;
 
   const { isValid: isAddressValid } = form.formState;
   const watchedCounty = form.watch('county');
@@ -736,10 +803,12 @@ export function DeliveryStepModular({ onValidChange }: DeliveryStepProps) {
         // Standard delivery needs full address
         onValidChange(isAddressValid && selectedQuoteService !== null);
       }
+    } else if (deliveryType === 'physical' && physicalRegion === 'international') {
+      onValidChange(intlProvider !== null && isIntlAddressValid);
     } else {
       onValidChange(false);
     }
-  }, [deliveryType, physicalRegion, isAddressValid, selectedQuoteService, selectedQuote, selectedLockerId, onValidChange]);
+  }, [deliveryType, physicalRegion, isAddressValid, selectedQuoteService, selectedQuote, selectedLockerId, intlProvider, isIntlAddressValid, onValidChange]);
 
   // Update context when selections change
   useEffect(() => {
@@ -798,6 +867,54 @@ export function DeliveryStepModular({ onValidChange }: DeliveryStepProps) {
     });
     return () => subscription.unsubscribe();
   }, [form, updateDelivery, physicalRegion]);
+
+  // International: sync selection + address to context
+  useEffect(() => {
+    if (physicalRegion !== 'international' || !intlProvider) return;
+    const courier = INTERNATIONAL_COURIERS.find((c) => c.provider === intlProvider);
+    if (!courier) return;
+
+    const subscription = intlForm.watch((value) => {
+      updateDelivery({
+        method: 'courier',
+        methodName: courier.name,
+        price: courier.price,
+        estimatedDays: 0, // free-text range stored in methodName; numeric used for SLA only
+        courierProvider: courier.provider,
+        courierService: courier.name,
+        courierQuote: undefined,
+        address: {
+          street: value.street || '',
+          number: '', // not used for international
+          city: value.city || '',
+          county: '', // not used for international
+          postalCode: value.postalCode || '',
+          country: value.country || '',
+        },
+      });
+    });
+
+    // Also push current values immediately so price flows even before next keystroke
+    const v = intlForm.getValues();
+    updateDelivery({
+      method: 'courier',
+      methodName: courier.name,
+      price: courier.price,
+      estimatedDays: 0,
+      courierProvider: courier.provider,
+      courierService: courier.name,
+      courierQuote: undefined,
+      address: {
+        street: v.street || '',
+        number: '',
+        city: v.city || '',
+        county: '',
+        postalCode: v.postalCode || '',
+        country: v.country || '',
+      },
+    });
+    return () => subscription.unsubscribe();
+  }, [physicalRegion, intlProvider, intlForm, updateDelivery]);
 
   // Handle email selection
   const handleEmailSelect = () => {
@@ -982,21 +1099,26 @@ export function DeliveryStepModular({ onValidChange }: DeliveryStepProps) {
               </div>
             </div>
 
-            {/* International Option (Coming Soon) */}
-            <div className="relative p-6 rounded-xl border-2 border-neutral-200 bg-neutral-50 cursor-not-allowed opacity-60">
+            {/* International Option */}
+            <div
+              onClick={() => handleRegionSelect('international')}
+              className="relative p-6 rounded-xl border-2 border-neutral-200 hover:border-primary-300 cursor-pointer transition-all hover:shadow-md group"
+            >
               <div className="flex items-center gap-4">
                 <div className="w-16 h-16 rounded-lg bg-white border border-neutral-200 flex items-center justify-center">
-                  <Globe className="w-8 h-8 text-neutral-400" />
+                  <Globe className="w-8 h-8 text-primary-500" />
                 </div>
                 <div className="flex-1">
                   <h4 className="font-semibold text-secondary-900 text-lg">Internațional</h4>
                   <p className="text-sm text-neutral-500 mt-1">
-                    DHL, UPS, FedEx
+                    DHL Express sau Poșta Română International
                   </p>
-                  <div className="mt-2">
-                    <span className="text-xs px-2 py-0.5 rounded bg-neutral-200 text-neutral-600">În curând</span>
+                  <div className="flex items-center gap-2 mt-2 flex-wrap">
+                    <span className="text-xs px-2 py-0.5 rounded bg-yellow-100 text-yellow-700">DHL — 250 RON</span>
+                    <span className="text-xs px-2 py-0.5 rounded bg-blue-100 text-blue-700">Poșta RO — 100 RON</span>
                   </div>
                 </div>
+                <ChevronRight className="w-5 h-5 text-neutral-400 group-hover:text-primary-500 transition-colors" />
               </div>
             </div>
           </div>
@@ -1613,6 +1735,184 @@ export function DeliveryStepModular({ onValidChange }: DeliveryStepProps) {
                 </div>
               )}
             </div>
+          )}
+        </div>
+      )}
+
+      {/* Step 3: International Delivery */}
+      {deliveryType === 'physical' && physicalRegion === 'international' && (
+        <div className="space-y-6">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              setPhysicalRegion(null);
+              setIntlProvider(null);
+            }}
+            className="text-neutral-500 hover:text-neutral-700 -ml-2"
+          >
+            <ArrowLeft className="w-4 h-4 mr-1" />
+            Înapoi
+          </Button>
+
+          <div>
+            <h3 className="font-semibold text-secondary-900 flex items-center gap-2 mb-1">
+              <Globe className="h-5 w-5 text-primary-500" />
+              Livrare Internațională
+            </h3>
+            <p className="text-sm text-neutral-500">
+              Alege transportatorul și completează adresa destinatarului.
+            </p>
+          </div>
+
+          {/* Courier selection */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {INTERNATIONAL_COURIERS.map((c) => {
+              const isSelected = intlProvider === c.provider;
+              const borderClass = isSelected
+                ? c.color === 'yellow'
+                  ? 'border-yellow-500 bg-yellow-50'
+                  : 'border-blue-500 bg-blue-50'
+                : 'border-neutral-200 hover:border-primary-300';
+              return (
+                <div
+                  key={c.provider}
+                  onClick={() => setIntlProvider(c.provider)}
+                  className={cn(
+                    'p-4 rounded-xl border-2 cursor-pointer transition-all hover:shadow-md',
+                    borderClass,
+                  )}
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <Globe className={cn(
+                        'w-5 h-5',
+                        c.color === 'yellow' ? 'text-yellow-600' : 'text-blue-600',
+                      )} />
+                      <span className="font-semibold text-secondary-900 text-sm">{c.name}</span>
+                    </div>
+                    <span className={cn(
+                      'text-xs px-2 py-0.5 rounded',
+                      c.color === 'yellow'
+                        ? 'bg-yellow-100 text-yellow-700'
+                        : 'bg-blue-100 text-blue-700',
+                    )}>
+                      {c.badge}
+                    </span>
+                  </div>
+                  <p className="text-xs text-neutral-600 mb-2">{c.description}</p>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-neutral-500 inline-flex items-center gap-1">
+                      <Clock className="w-3 h-3" />
+                      {c.estimatedDays}
+                    </span>
+                    <span className="font-bold text-secondary-900">{c.price} RON</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* International address form */}
+          {intlProvider && (
+            <Form {...intlForm}>
+              <form className="space-y-4">
+                <h4 className="font-medium text-secondary-900 text-sm mt-2">Adresa de livrare</h4>
+
+                <FormField
+                  control={intlForm.control}
+                  name="recipientName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Nume destinatar *</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Ion Popescu" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={intlForm.control}
+                  name="recipientPhone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Telefon destinatar *</FormLabel>
+                      <FormControl>
+                        <Input placeholder="+49 30 12345678" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={intlForm.control}
+                  name="street"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Stradă & număr *</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Hauptstraße 25" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <FormField
+                    control={intlForm.control}
+                    name="city"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Localitate *</FormLabel>
+                        <FormControl>
+                          <Input placeholder="München" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={intlForm.control}
+                    name="postalCode"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Cod poștal *</FormLabel>
+                        <FormControl>
+                          <Input placeholder="80331" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <FormField
+                  control={intlForm.control}
+                  name="country"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Țara *</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Germania" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="flex items-start gap-2 p-3 rounded-lg bg-amber-50 border border-amber-200 text-xs text-amber-800">
+                  <Info className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                  <div>
+                    Prețul afișat acoperă livrarea în majoritatea țărilor europene.
+                    Pentru destinații extra-europene, te vom contacta dacă apare un cost suplimentar.
+                  </div>
+                </div>
+              </form>
+            </Form>
           )}
         </div>
       )}

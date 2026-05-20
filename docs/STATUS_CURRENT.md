@@ -1,11 +1,40 @@
 # eGhiseul.ro - Status Curent
 
-**Data:** 2026-04-29 (ultima update; doc original 2026-02-19)
+**Data:** 2026-05-20 (ultima update)
 **Sprint-uri completate:** Sprint 0-6 ✅ (toate live pe main)
-**Aliniere cu cazierjudiciaronline.com:** complet (11 faze A-L, vezi `docs/IMPLEMENTATION_COMPLETE_2026-04-16.md`)
-**Wizard redesign (Step 1+2 merge, summary unificat, 5 bug fixes):** 2026-04-29 ✅ (vezi `docs/session-logs/2026-04-29-wizard-redesign.md`)
-**Performance + image compression:** 2026-04-27 ✅ (vezi `docs/session-logs/2026-04-27-performance-image-compression.md`)
+**Aliniere cu cazierjudiciaronline.com:** complet (11 faze A-L + pricing realignment 2026-05-20)
+**Wizard redesign (Step 1+2 merge, summary unificat, 5 bug fixes):** 2026-04-29 ✅
+**Performance + image compression:** 2026-04-27 ✅
 **Sprint pendinte:** Notifications efective (email Resend, SMS SMSLink, Oblio invoicing — toate cu credentiale neconfig)
+
+---
+
+## ✅ SESIUNE 2026-05-20 — Pricing realignment + entity blocking + international courier
+
+- **Pricing realignment (DB migration 036)** — `cazier-judiciar PF/PJ` base 250→**198 RON**, urgent total 350→**278 RON** (urgenta uplift 100→80). `cazier-auto` aliniat la judiciar (198/278). `cazier-fiscal` base 250→**198 RON** și `urgenta` deactivat (doar tier simplu). Toate add-on-urile rămân neschimbate (traducere 178.50, apostila haga 238, apostila notari 83.30, legalizare 99, verificare expert 49, copii suplimentare 25). Rationale: undercut cazierjudiciaronline.com (250/350) pe entry tier, păstrăm margine pe add-ons.
+- **Entity type detection PJ (DB migration 037)** — port complet din `cazierjudiciaronline/Step2PersonalData.tsx:24-92`. PFA / Întreprindere Individuală / Întreprindere Familială / Cabinet medical/avocat / Birou Notarial / Executor Judecătoresc / Medic Specialist sunt acum **BLOCATE** în flow-ul PJ (cazier-judiciar PJ, cazier-fiscal, umbrella cazier-judiciar) — UI sugerează switch la flow PF. ONG-urile (Asociație / Fundație / Federație / Sindicat / Parohie / Biserică / Mănăstire) primesc WARNING (extras Registrul Asociațiilor + încheiere motivată — extra docs). Pattern matching word-boundary (regex `(^|[^A-ZĂÂÎȘȚ0-9])PATTERN([^A-ZĂÂÎȘȚ0-9]|$)`) — „EDITII SRL" NU mai face fals-pozitiv pe „II", „MEDIATIF SRL" NU pe „IF", etc.
+- **CompanyDataStep refactor** — substring matching → word-boundary matching via `matchesAnyWord()` din `@/lib/services/entity-type-detection`. Block/warn logic citește din `verification_config.companyKyc.blockedTypes` + `specialRules` (DB) PLUS fallback automat pentru ONG-uri detectate prin name pattern (nu doar prin `type` returnat de ANAF — care e adesea gol pentru entități non-SRL).
+- **NOU `src/lib/services/entity-type-detection.ts`** — util reutilizabil: `detectEntityType(name)`, `matchesAnyWord()`, `entityTypeMessage()`, `PFA_II_IF_PATTERNS`, `ONG_PATTERNS`. **50 unit tests** (`tests/unit/lib/services/entity-type-detection.test.ts`) acoperă: variante PFA cu/fără puncte, intreprindere individuală cu diacritice, cabinet medical/avocat, birou notarial/executor, ONG variants, false-positive guards (EDITII / MEDIATIF / FACABINET / LIGAMENT / CONSILIA / SINDICATEMENT), diacritice (Ț/Ț/Ă), edge cases.
+- **Courier internațional** — activat „Internațional" în `delivery-step.tsx` (era „În curând"). 2 transportatori cu preț fix (port din `cazierjudiciaronline/config/addons.ts`):
+  - **DHL Express International** — 250 RON, 1-3 zile lucrătoare
+  - **Poșta Română International** — 100 RON, 7-15 zile lucrătoare
+  - Form internațional: nume + telefon destinatar + stradă + localitate + cod poștal + țara (free-text, nu dropdown — clienții cunosc exact destinația). Validation zod separat de form-ul Romania.
+  - **AWB manual** — nu există integrare API pentru DHL/Poșta Internațional; comanda merge în coadă de procesare manuală (similar cu cazierjudiciar.online). Banner info în UI: „Pentru destinații extra-europene te contactăm dacă apare cost suplimentar".
+  - `AddressState` extins cu `country?: string` (folosit doar pentru livrare internațională).
+- **Unit tests** — total **708** (era 645): +50 entity detection + 13 normalize existing (verificat). Toate trec.
+- **Lucruri verificate că AU PARITATE deja** (no work needed): `APOSTILA_COUNTRIES` (90 țări) deja portate în `src/config/apostila-countries.ts`. `TRANSLATION_LANGUAGES` (9 limbi) deja portate în `src/config/translation-languages.ts`. Ambele integrate în `options-step.tsx`. CUI lookup folosește ANAF (mai autoritativ decât infocui.ro folosit de cazierjudiciaronline) — cu auto-fill name, type, registration, address, isActive, vatPayer.
+
+### Fișiere noi/modificate (Sesiune 2026-05-20)
+
+```
+supabase/migrations/036_pricing_realignment_2026-05-20.sql            NOU
+supabase/migrations/037_cazier_pj_entity_blocking.sql                 NOU
+src/lib/services/entity-type-detection.ts                             NOU
+src/components/orders/modules/company-kyc/CompanyDataStep.tsx         (word-boundary matching)
+src/components/orders/steps-modular/delivery-step.tsx                 (international flow: DHL + Poșta RO)
+src/types/verification-modules.ts                                     (AddressState.country?)
+tests/unit/lib/services/entity-type-detection.test.ts                 NOU (50 tests)
+```
 
 ---
 
