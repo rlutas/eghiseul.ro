@@ -12,14 +12,21 @@ interface FAQ {
 interface ServiceFAQProps {
   faqs: FAQ[];
   title?: string;
+  /** When true (default for ≥10 FAQs), render as 2 columns on lg+ screens. */
+  twoColumns?: boolean;
 }
 
-export function ServiceFAQ({ faqs, title = 'Întrebări Frecvente' }: ServiceFAQProps) {
+export function ServiceFAQ({ faqs, title = 'Întrebări Frecvente', twoColumns }: ServiceFAQProps) {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
+  // Auto-enable 2 columns for long FAQ sections unless caller forces single
+  const useTwoCols = twoColumns ?? faqs.length >= 10;
 
   return (
     <section className="py-12 lg:py-20 bg-neutral-50">
-      <div className="container mx-auto px-4 max-w-[900px]">
+      <div className={cn(
+        'container mx-auto px-4',
+        useTwoCols ? 'max-w-[1200px]' : 'max-w-[900px]',
+      )}>
         {/* Header */}
         <div className="text-center mb-12">
           <span className="inline-block px-4 py-1.5 bg-primary-100 text-primary-700 text-sm font-semibold rounded-full mb-4">
@@ -33,13 +40,16 @@ export function ServiceFAQ({ faqs, title = 'Întrebări Frecvente' }: ServiceFAQ
           </p>
         </div>
 
-        {/* FAQ List - Accordion */}
-        <div className="space-y-3">
+        {/* FAQ List - Accordion (1 or 2 columns) */}
+        <div className={cn(
+          'gap-3',
+          useTwoCols ? 'grid grid-cols-1 lg:grid-cols-2' : 'space-y-3',
+        )}>
           {faqs.map((faq, index) => (
             <div
               key={index}
               className={cn(
-                'bg-white rounded-2xl border transition-all duration-300',
+                'bg-white rounded-2xl border transition-all duration-300 h-fit',
                 openIndex === index
                   ? 'border-primary-300 shadow-lg'
                   : 'border-neutral-200 hover:border-primary-200'
@@ -62,7 +72,7 @@ export function ServiceFAQ({ faqs, title = 'Întrebări Frecvente' }: ServiceFAQ
               <div
                 className={cn(
                   'overflow-hidden transition-all duration-300',
-                  openIndex === index ? 'max-h-96' : 'max-h-0'
+                  openIndex === index ? 'max-h-[800px]' : 'max-h-0'
                 )}
               >
                 <p className="px-6 pb-5 text-neutral-600 leading-relaxed">
