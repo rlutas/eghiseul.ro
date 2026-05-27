@@ -27,7 +27,7 @@ interface SignatureStepProps {
 }
 
 export default function SignatureStep({ config, onValidChange }: SignatureStepProps) {
-  const { state, updateSignature } = useModularWizard();
+  const { state, updateSignature, updateConsent } = useModularWizard();
   const signature = state.signature;
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -130,7 +130,19 @@ export default function SignatureStep({ config, onValidChange }: SignatureStepPr
       signatureBase64: base64,
       signedAt: new Date().toISOString(),
     });
-  }, [updateSignature]);
+
+    // Signing IS the act of giving consent (Legea 214/2024 / eIDAS Art. 25).
+    // Auto-record T&C + Privacy + 14-day withdrawal waiver so the backend
+    // audit trail (signature_metadata.consent) stays granular even though
+    // the UI no longer shows three separate checkboxes (Review step dropped
+    // on 2026-05-27). The checkout page reminds the user before payment
+    // and refusing to pay is the way to "uncheck".
+    updateConsent?.({
+      termsAccepted: true,
+      privacyAccepted: true,
+      withdrawalWaiver: true,
+    });
+  }, [updateSignature, updateConsent]);
 
   // Clear signature
   const handleClear = useCallback(() => {
@@ -146,7 +158,15 @@ export default function SignatureStep({ config, onValidChange }: SignatureStepPr
       signatureBase64: '',
       signedAt: '',
     });
-  }, [updateSignature]);
+
+    // Mirror the auto-consent set in handleEnd: clearing the signature
+    // withdraws the consent it implied. The user must re-sign to consent again.
+    updateConsent?.({
+      termsAccepted: false,
+      privacyAccepted: false,
+      withdrawalWaiver: false,
+    });
+  }, [updateSignature, updateConsent]);
 
   // Download signature
   const handleDownload = useCallback(() => {

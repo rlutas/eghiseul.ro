@@ -40,6 +40,16 @@ export function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [user, setUser] = useState<SupabaseUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  // Defer mounting Radix portals/triggers to after hydration. Radix
+  // generates aria-controls IDs with React.useId(); when ANY component
+  // higher up in the tree renders a different number of useId() calls on
+  // the server vs the client (which happens with auth-gated UIs even
+  // though our initial isLoading/user values match), the sequential IDs
+  // drift and the Sheet trigger throws a hydration mismatch warning. The
+  // skeleton below renders identical markup on the server so the layout
+  // doesn't shift; only the real Radix root mounts client-side.
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => setHydrated(true), []);
   const pathname = usePathname();
   const router = useRouter();
 
@@ -240,7 +250,25 @@ export function Header() {
               )}
             </div>
 
-            {/* Mobile Menu Button */}
+            {/* Mobile Menu Button.
+                SSR placeholder: a plain button with the same look/size so
+                the layout doesn't shift on hydration. The real Radix Sheet
+                mounts client-side after `hydrated` flips — see the
+                hydration-mismatch note at the top of this component for
+                the why. The placeholder is non-interactive (no `Sheet`
+                wrapping it) but that's fine: it's only visible for ~1
+                frame on first paint. */}
+            {!hydrated && (
+              <Button
+                variant="ghost"
+                size="icon"
+                aria-label="Deschide meniul"
+                className="lg:hidden hover:bg-primary-50"
+              >
+                <Menu className="h-6 w-6 text-secondary-900" />
+              </Button>
+            )}
+            {hydrated && (
             <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
               <SheetTrigger asChild className="lg:hidden">
                 <Button
@@ -381,6 +409,7 @@ export function Header() {
                 </div>
               </SheetContent>
             </Sheet>
+            )}
           </div>
         </div>
       </header>

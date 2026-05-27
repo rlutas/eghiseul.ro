@@ -46,6 +46,17 @@ interface DashboardStats {
   pendingPayments: number;
   totalOrders: number;
   totalCustomers: number;
+  // Abandoned cart funnel (added 2026-05-27 — auto-abandon + recovery cron)
+  abandonedToday: number;
+  abandoned30d: number;
+  recoveryEmailsSent30d: number;
+  recoveryRecovered30d: number;
+  recoveryRatePercent: number;
+  // Sandbox cohort size — surfaces test-mode orders leaking into live.
+  testOrdersTotal: number;
+  // Breakdowns rendered as horizontal bar charts on the dashboard.
+  statusDistribution: Array<{ status: string; count: number }>;
+  serviceBreakdown: Array<{ slug: string; name: string; count: number; revenue: number }>;
 }
 
 interface ActivityItem {
@@ -85,6 +96,7 @@ interface RecentOrder {
 const STATUS_CONFIG: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline'; className?: string }> = {
   draft: { label: 'Ciorna', variant: 'secondary' },
   pending: { label: 'In asteptare', variant: 'outline' },
+  abandoned: { label: 'Abandonata', variant: 'secondary', className: 'bg-neutral-200 text-neutral-700' },
   paid: { label: 'Platita', variant: 'default', className: 'bg-green-600' },
   processing: { label: 'In procesare', variant: 'default', className: 'bg-blue-600' },
   document_ready: { label: 'Document gata', variant: 'default', className: 'bg-indigo-600' },
@@ -229,27 +241,36 @@ export default function AdminDashboardPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
+      {/* Header — match cazierjudiciaronline.com layout: title + subtitle
+          on the left, "Total (all time)" stat + refresh button on the right. */}
+      <div className="flex items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold">Dashboard</h1>
-          <p className="text-muted-foreground">
-            Bine ai venit in panoul de administrare eGhiseul.ro
+          <p className="mt-1 text-sm text-slate-500">
+            Privire generală asupra comenzilor și veniturilor
           </p>
         </div>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={refreshAll}
-          disabled={refreshing}
-        >
-          {refreshing ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            <RefreshCw className="h-4 w-4" />
-          )}
-          Actualizeaza
-        </Button>
+        <div className="flex items-center gap-4">
+          <div className="text-right text-xs text-slate-500 hidden md:block">
+            <div className="uppercase tracking-wide">Total (all time)</div>
+            <div className="text-sm font-semibold text-slate-900 tabular-nums">
+              {stats ? `${stats.totalOrders} comenzi · ${formatRON(stats.revenueMonth)} RON luna` : '—'}
+            </div>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={refreshAll}
+            disabled={refreshing}
+          >
+            {refreshing ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <RefreshCw className="h-4 w-4" />
+            )}
+            Actualizeaza
+          </Button>
+        </div>
       </div>
 
       {/* Row 1: Stats Cards */}
@@ -387,6 +408,182 @@ export default function AdminDashboardPage() {
             </CardContent>
           </Card>
         </Link>
+      </div>
+
+      {/* ─────────────────────────────────────────────────────────────────────
+          Coșuri Abandonate — funnel for the recovery-email pipeline added
+          2026-05-27. The auto-abandon cron flips pending → abandoned at 30 min;
+          the recovery cron then mails a coupon. This card shows whether the
+          pipeline is moving + how well it's converting.
+      ──────────────────────────────────────────────────────────────────────── */}
+      <Card className="py-4">
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="text-base">Coșuri abandonate (ultimele 30 zile)</CardTitle>
+              <p className="mt-0.5 text-xs text-muted-foreground">
+                Funnel-ul recovery: comenzi neplătite în 30 min → email cu cupon 10% → revenire la plată.
+              </p>
+            </div>
+            <Link
+              href="/admin/orders?status=abandoned"
+              className="text-xs font-medium text-primary-600 hover:underline whitespace-nowrap"
+            >
+              Vezi lista →
+            </Link>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {statsLoading ? (
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              <Skeleton className="h-20" />
+              <Skeleton className="h-20" />
+              <Skeleton className="h-20" />
+              <Skeleton className="h-20" />
+            </div>
+          ) : (
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              <div className="rounded-lg border border-neutral-200 bg-neutral-50/50 p-3">
+                <p className="text-xs text-muted-foreground">Abandonate astăzi</p>
+                <p className="mt-1 text-2xl font-bold tabular-nums">
+                  {stats?.abandonedToday ?? 0}
+                </p>
+                <p className="mt-0.5 text-[11px] text-muted-foreground">flip auto la 30 min</p>
+              </div>
+              <div className="rounded-lg border border-neutral-200 bg-neutral-50/50 p-3">
+                <p className="text-xs text-muted-foreground">Total 30 zile</p>
+                <p className="mt-1 text-2xl font-bold tabular-nums">
+                  {stats?.abandoned30d ?? 0}
+                </p>
+                <p className="mt-0.5 text-[11px] text-muted-foreground">comenzi neplătite</p>
+              </div>
+              <div className="rounded-lg border border-blue-200 bg-blue-50/40 p-3">
+                <p className="text-xs text-blue-800/80">Emailuri trimise</p>
+                <p className="mt-1 text-2xl font-bold tabular-nums text-blue-900">
+                  {stats?.recoveryEmailsSent30d ?? 0}
+                </p>
+                <p className="mt-0.5 text-[11px] text-blue-700/80">
+                  cu cupon RECOVERY 10% / 48h
+                </p>
+              </div>
+              <div className="rounded-lg border border-emerald-200 bg-emerald-50/40 p-3">
+                <p className="text-xs text-emerald-800/80">Recuperate</p>
+                <p className="mt-1 text-2xl font-bold tabular-nums text-emerald-900">
+                  {stats?.recoveryRecovered30d ?? 0}
+                </p>
+                <p className="mt-0.5 text-[11px] text-emerald-700/80">
+                  rate: {stats?.recoveryRatePercent ?? 0}%
+                </p>
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* ─────────────────────────────────────────────────────────────────────
+          Breakdowns row — status distribution + service-level revenue. Same
+          horizontal bar chart pattern as cazierjudiciaronline.com's admin
+          dashboard so operators familiar with that view recognize this one.
+      ──────────────────────────────────────────────────────────────────────── */}
+      <div className="grid gap-6 lg:grid-cols-2">
+        <Card className="py-4">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base">Distribuție pe status (30 zile)</CardTitle>
+            <p className="mt-0.5 text-xs text-muted-foreground">
+              Câte comenzi sunt în fiecare status — sortate descrescător.
+            </p>
+          </CardHeader>
+          <CardContent>
+            {statsLoading ? (
+              <div className="space-y-2">
+                <Skeleton className="h-6" />
+                <Skeleton className="h-6" />
+                <Skeleton className="h-6" />
+              </div>
+            ) : !stats?.statusDistribution?.length ? (
+              <p className="text-sm text-muted-foreground">Nu sunt comenzi în ultimele 30 zile.</p>
+            ) : (
+              <div className="space-y-2">
+                {(() => {
+                  const maxCount = Math.max(...stats.statusDistribution.map((s) => s.count), 1);
+                  return stats.statusDistribution.map((row) => {
+                    const cfg = STATUS_CONFIG[row.status] ?? {
+                      label: row.status,
+                      variant: 'outline' as const,
+                    };
+                    return (
+                      <div key={row.status} className="flex items-center gap-3 text-sm">
+                        <div className="w-32 shrink-0">
+                          <Badge variant={cfg.variant} className={cfg.className}>
+                            {cfg.label}
+                          </Badge>
+                        </div>
+                        <div
+                          className="h-5 rounded bg-primary-100 transition-all"
+                          style={{ width: `${Math.max((row.count / maxCount) * 100, 2)}%` }}
+                          role="progressbar"
+                          aria-valuenow={row.count}
+                          aria-valuemin={0}
+                          aria-valuemax={maxCount}
+                          aria-label={`${cfg.label}: ${row.count} comenzi`}
+                        />
+                        <span className="ml-auto shrink-0 text-sm font-medium tabular-nums">
+                          {row.count}
+                        </span>
+                      </div>
+                    );
+                  });
+                })()}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card className="py-4">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base">Servicii (luna curentă)</CardTitle>
+            <p className="mt-0.5 text-xs text-muted-foreground">
+              Câte comenzi și ce revenue per serviciu — sortate după venit.
+            </p>
+          </CardHeader>
+          <CardContent>
+            {statsLoading ? (
+              <div className="space-y-2">
+                <Skeleton className="h-6" />
+                <Skeleton className="h-6" />
+                <Skeleton className="h-6" />
+              </div>
+            ) : !stats?.serviceBreakdown?.length ? (
+              <p className="text-sm text-muted-foreground">Nicio comandă plătită luna asta.</p>
+            ) : (
+              <div className="space-y-2">
+                {(() => {
+                  const maxRev = Math.max(...stats.serviceBreakdown.map((s) => s.revenue), 1);
+                  return stats.serviceBreakdown.map((row) => (
+                    <div key={row.slug} className="flex items-center gap-3 text-sm">
+                      <div className="w-40 shrink-0 truncate" title={row.name}>
+                        {row.name}
+                      </div>
+                      <div
+                        className="h-5 rounded bg-emerald-100 transition-all"
+                        style={{ width: `${Math.max((row.revenue / maxRev) * 100, 2)}%` }}
+                        role="progressbar"
+                        aria-valuenow={row.revenue}
+                        aria-valuemin={0}
+                        aria-valuemax={maxRev}
+                        aria-label={`${row.name}: ${row.count} comenzi, ${row.revenue} RON`}
+                      />
+                      <div className="ml-auto shrink-0 text-right text-xs">
+                        <p className="font-medium tabular-nums">{formatRON(row.revenue)} RON</p>
+                        <p className="text-muted-foreground tabular-nums">{row.count} comenzi</p>
+                      </div>
+                    </div>
+                  ));
+                })()}
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
 
       {/* Row 2: Recent Orders + Activity Feed */}

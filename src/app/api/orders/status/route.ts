@@ -59,6 +59,7 @@ export async function GET(request: NextRequest) {
         status,
         created_at,
         updated_at,
+        paid_at,
         base_price,
         options_price,
         delivery_price,
@@ -222,6 +223,8 @@ export async function GET(request: NextRequest) {
         paymentStatus: order.payment_status,
         createdAt: order.created_at,
         updatedAt: order.updated_at,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        paidAt: (order as any).paid_at as string | null,
         service: serviceData,
         selectedOptions: selectedOptions.map(opt => ({
           optionName: opt.optionName || opt.option_name || '',

@@ -64,11 +64,21 @@ export interface ClientData {
 
 export interface SelectedOption {
   option_id?: string;
+  optionId?: string;
   option_name?: string;
   optionName?: string;
+  /** Stable code (e.g. 'urgenta', 'apostila_haga'). Used by the delivery
+   *  calculator to assign per-step business days. */
+  code?: string | null;
   quantity?: number;
   price_modifier?: number;
   priceModifier?: number;
+  /** Cross-service bundling — when present, the option is a child of a
+   *  parent option (e.g. an Apostilă Haga picked under the secondary
+   *  "Certificat Integritate" service). Rendered indented in the contract's
+   *  services breakdown. */
+  bundledFor?: { parentOptionId?: string } | null;
+  bundled_for?: { parent_option_id?: string } | null;
 }
 
 export interface DocumentContext {
@@ -96,6 +106,16 @@ export interface DocumentContext {
   };
   /** Selected service options for this order (e.g., urgent processing) */
   selected_options?: SelectedOption[];
+  /** Per-step delivery breakdown — sum of base processing + each document
+   *  add-on (traducere/legalizare/apostilă*) the customer picked. Computed
+   *  by `estimateFromSelectedOptions` at submission time and passed in so
+   *  the generator can render `{{TERMEN_LIVRARE_DETALIAT}}` without
+   *  reaching back into the delivery calculator at template-build time. */
+  delivery_estimate?: {
+    minDays: number;
+    maxDays: number;
+    breakdown: Array<{ step: string; minDays: number; maxDays: number }>;
+  } | null;
   document_numbers?: {
     contract_number?: number;
     contract_series?: string | null;
@@ -217,6 +237,57 @@ export function hasUrgentOption(selectedOptions?: SelectedOption[]): boolean {
 }
 
 /**
+ * Detailed delivery breakdown for the contract — sums the per-step business
+ * days for the main service + every document add-on the customer selected
+ * (traducere, legalizare, apostilă Haga, apostilă Notari). Bundled add-ons
+ * picked under a secondary service share the same processing slot, so
+ * duplicates are collapsed by the calculator.
+ *
+ * Output sample:
+ *   Termen estimat: 5-7 zile lucrătoare
+ *
+ *   • Procesare urgentă: 1-2 zile
+ *   • Traducere: 1-2 zile
+ *   • Legalizare: 1 zi
+ *   • Apostilă Haga: 1 zi
+ *   • Apostilă Notari: 1 zi
+ *
+ *   Pentru situații care necesită verificări suplimentare, termenul poate fi prelungit cu până la 10 zile lucrătoare.
+ *
+ * The plain-text format renders cleanly in DOCX templates via the
+ * `{{TERMEN_LIVRARE_DETALIAT}}` placeholder.
+ */
+export function buildDeliveryTermsDetailed(
+  order: DocumentContext['order'],
+  selectedOptions: SelectedOption[] | undefined,
+  estimate: { minDays: number; maxDays: number; breakdown: Array<{ step: string; minDays: number; maxDays: number }> } | null
+): string {
+  if (!estimate || estimate.breakdown.length === 0) {
+    // Fallback to the legacy single-line term when we don't have a full
+    // breakdown (e.g. service with no delivery-calculator coverage).
+    return buildDeliveryTerms(order, selectedOptions);
+  }
+
+  const fmtDays = (min: number, max: number): string => {
+    if (min === max) return min === 1 ? '1 zi' : `${min} zile`;
+    return `${min}-${max} zile`;
+  };
+
+  const lines: string[] = [];
+  const totalLabel = fmtDays(estimate.minDays, estimate.maxDays) + ' lucrătoare';
+  lines.push(`Termen estimat: ${totalLabel}`);
+  lines.push('');
+  for (const step of estimate.breakdown) {
+    lines.push(`• ${step.step}: ${fmtDays(step.minDays, step.maxDays)}`);
+  }
+  lines.push('');
+  lines.push(
+    'Pentru situații care necesită verificări suplimentare, termenul poate fi prelungit cu până la 10 zile lucrătoare.'
+  );
+  return lines.join('\n');
+}
+
+/**
  * Build delivery terms text for the specific service ordered.
  * Only shows the relevant term (urgent or standard) based on selected options.
  */
@@ -288,6 +359,108 @@ export function buildOptionsText(selectedOptions?: SelectedOption[]): string {
 }
 
 /**
+ * Strip the marketing "(adaugă în aceeași comandă)" suffix from option names
+ * before printing them in the contract. Mirrors the same normalization the
+ * UI uses (see `lib/orders/normalize.ts`) so the customer sees consistent
+ * names across the order summary, the contract and the admin order detail.
+ */
+function stripSecondaryServiceSuffix(name: string): string {
+  return name
+    .replace(/\s*\([^()]*\(adaugă în aceeași comandă\)\)\s*$/i, '')
+    .replace(/\s*\(adaugă în aceeași comandă\)\s*$/i, '')
+    .trim();
+}
+
+function formatRon(value: number): string {
+  return `${value.toFixed(2)} RON`;
+}
+
+/**
+ * Build a structured services breakdown for the contract — mirrors what the
+ * customer saw in the order summary at checkout. Main service first, then
+ * each top-level option indented under it, then each bundled "secondary
+ * service" with its own options nested further.
+ *
+ * Output is plain text (no Markdown) — designed to render cleanly in a DOCX
+ * template via `{{SERVICII_DETALIATE}}`. Example for a fully-loaded cazier
+ * judiciar order:
+ *
+ *   Cazier Judiciar PF                                 198.00 RON
+ *     • Procesare Urgentă                              +80.00 RON
+ *     • Apostilă de la Haga                           +198.00 RON
+ *     • Traducere Autorizată                          +178.50 RON
+ *     • Legalizare Notarială                           +99.00 RON
+ *     • Apostilă Notari                                +83.30 RON
+ *   Certificat Integritate (serviciu secundar)        +100.00 RON
+ *     • Apostilă de la Haga                           +198.00 RON
+ *     • Traducere Autorizată                          +178.50 RON
+ *
+ *   Total comandă                                   1 233.30 RON
+ */
+export function buildServicesBreakdown(
+  serviceName: string,
+  basePrice: number,
+  selectedOptions: SelectedOption[] | undefined,
+  totalPrice: number
+): string {
+  const lines: string[] = [];
+
+  // Header — main service.
+  lines.push(`${serviceName} ${formatRon(basePrice)}`);
+
+  if (selectedOptions && selectedOptions.length > 0) {
+    // Identify top-level vs bundled options.
+    const getOptionId = (o: SelectedOption) =>
+      o.optionId ?? o.option_id ?? undefined;
+    const getParentId = (o: SelectedOption) =>
+      o.bundledFor?.parentOptionId ?? o.bundled_for?.parent_option_id ?? undefined;
+    const getPrice = (o: SelectedOption) =>
+      (o.priceModifier ?? o.price_modifier ?? 0) * (o.quantity ?? 1);
+    const getName = (o: SelectedOption) =>
+      stripSecondaryServiceSuffix(o.optionName ?? o.option_name ?? '');
+
+    const topLevel = selectedOptions.filter((o) => !getParentId(o));
+    const childrenByParent = new Map<string, SelectedOption[]>();
+    for (const o of selectedOptions) {
+      const pid = getParentId(o);
+      if (pid) {
+        const list = childrenByParent.get(pid) ?? [];
+        list.push(o);
+        childrenByParent.set(pid, list);
+      }
+    }
+
+    // Top-level options that have NO children = main-service add-ons (e.g.
+    // urgenta, apostila on the cazier itself).
+    // Top-level options that DO have children = secondary services.
+    const directAddons = topLevel.filter(
+      (o) => !(getOptionId(o) && (childrenByParent.get(getOptionId(o)!)?.length ?? 0) > 0)
+    );
+    const subServices = topLevel.filter(
+      (o) => getOptionId(o) && (childrenByParent.get(getOptionId(o)!)?.length ?? 0) > 0
+    );
+
+    for (const opt of directAddons) {
+      lines.push(`  • ${getName(opt)} +${formatRon(getPrice(opt))}`);
+    }
+
+    for (const sub of subServices) {
+      lines.push(
+        `${getName(sub)} (serviciu secundar) +${formatRon(getPrice(sub))}`
+      );
+      const kids = childrenByParent.get(getOptionId(sub)!) ?? [];
+      for (const kid of kids) {
+        lines.push(`  • ${getName(kid)} +${formatRon(getPrice(kid))}`);
+      }
+    }
+  }
+
+  lines.push('');
+  lines.push(`Total comandă ${formatRon(totalPrice)}`);
+  return lines.join('\n');
+}
+
+/**
  * Build the full placeholder data object from the document context.
  */
 function buildPlaceholderData(ctx: DocumentContext) {
@@ -347,8 +520,11 @@ function buildPlaceholderData(ctx: DocumentContext) {
     CLIENT_FIRSTNAME: ctx.client.firstName || '',
     CLIENT_LASTNAME: ctx.client.lastName || '',
     CLIENT_PREVIOUS_NAME: ctx.client.previous_name || '',
-    CLIENT_FATHER_NAME: ctx.client.father_name || '',
-    CLIENT_MOTHER_NAME: ctx.client.mother_name || '',
+    // Default to "-" so the printed cerere shows a visible dash when parent
+    // names aren't collected. Step 2 (cazier judiciar PF) stopped asking for
+    // these on 2026-05-27 — see auto-generate.ts for the upstream layer.
+    CLIENT_FATHER_NAME: ctx.client.father_name || '-',
+    CLIENT_MOTHER_NAME: ctx.client.mother_name || '-',
 
     // Birth date parts
     CLIENT_BIRTH_YEAR: birthDate.year,
@@ -483,6 +659,23 @@ function buildPlaceholderData(ctx: DocumentContext) {
 
     // Compound: delivery terms for the specific service (only relevant term shown)
     TERMEN_LIVRARE: buildDeliveryTerms(ctx.order, ctx.selected_options),
+
+    // Detailed services + delivery breakdown — match the order summary the
+    // customer saw at checkout. SERVICII_DETALIATE includes main service,
+    // its add-ons (indented), secondary services (Certificat Integritate),
+    // and their nested add-ons, plus the total. TERMEN_LIVRARE_DETALIAT
+    // shows the per-step day breakdown from the delivery calculator.
+    SERVICII_DETALIATE: buildServicesBreakdown(
+      ctx.order.service_name,
+      ctx.order.service_price,
+      ctx.selected_options,
+      ctx.order.total_price
+    ),
+    TERMEN_LIVRARE_DETALIAT: buildDeliveryTermsDetailed(
+      ctx.order,
+      ctx.selected_options,
+      ctx.delivery_estimate ?? null
+    ),
   };
 }
 

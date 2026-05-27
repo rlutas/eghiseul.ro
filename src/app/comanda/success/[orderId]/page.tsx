@@ -16,6 +16,8 @@ import {
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { OrderSummaryCard } from '@/components/payment';
+import { estimateFromSelectedOptions } from '@/lib/delivery-calculator';
 
 interface SelectedOption {
   optionName?: string;
@@ -23,6 +25,23 @@ interface SelectedOption {
   optionDescription?: string;
   priceModifier?: number;
   quantity?: number;
+  /** Stable code (urgenta, apostila_haga, etc.) — feeds the delivery
+   *  calculator + lets the summary group bundled rows. */
+  code?: string;
+  optionId?: string;
+  option_id?: string;
+  bundledFor?: { parentOptionId?: string } | null;
+  bundled_for?: { parent_option_id?: string } | null;
+}
+
+/** Shape matching the API's normalized `options` array — same as the wizard
+ *  sidebar + checkout page use to render the unified summary. */
+interface NormalizedOption {
+  optionId?: string;
+  name: string;
+  total: number;
+  quantity: number;
+  bundledForParentId?: string;
 }
 
 interface OrderData {
@@ -40,6 +59,18 @@ interface OrderData {
   invoice_url?: string;
   processing_days?: number | null;
   selected_options?: SelectedOption[];
+  /** Normalized options (with optionId + bundledForParentId) — feeds the
+   *  shared OrderSummaryCard so the success page matches wizard + checkout
+   *  visually (nested secondary services, stripped marketing suffixes). */
+  options_normalized?: NormalizedOption[];
+  /** Service's base processing days from the catalog — feeds the delivery
+   *  calculator on top of selected add-ons. */
+  service_estimated_days?: number;
+  client_type?: string | null;
+  delivery_method?: string;
+  delivery_price?: number;
+  coupon_code?: string | null;
+  discount_amount?: number;
   breakdown?: {
     basePrice: number;
     optionsPrice: number;
@@ -53,6 +84,8 @@ interface OrderData {
     contact?: {
       email?: string;
     };
+    personal?: { cnp?: string };
+    company?: { cui?: string };
   };
 }
 
@@ -130,6 +163,15 @@ export default function SuccessPage() {
         }
 
         // Transform API response to expected format
+        const cd = (apiOrder.customerData ?? {}) as {
+          personal?: { cnp?: string };
+          company?: { cui?: string };
+          client_type?: string;
+        };
+        const inferredClientType =
+          cd.client_type ||
+          (cd.company?.cui ? 'PJ' : cd.personal?.cnp ? 'PF' : null);
+
         const orderData: OrderData = {
           id: apiOrder.id,
           order_number: apiOrder.orderNumber,
@@ -137,6 +179,9 @@ export default function SuccessPage() {
           service_name: apiOrder.service?.name || 'Serviciu',
           service_id: apiOrder.service?.id,
           service_category: apiOrder.service?.category,
+          service_estimated_days:
+            apiOrder.service?.estimatedDays ?? apiOrder.service?.estimated_days,
+          client_type: inferredClientType,
           total_price: apiOrder.totalAmount,
           payment_status: apiOrder.paymentStatus || 'unpaid',
           payment_method: apiOrder.paymentMethod,
@@ -145,6 +190,17 @@ export default function SuccessPage() {
           invoice_url: apiOrder.invoiceUrl,
           processing_days: apiOrder.processingDays || null,
           selected_options: apiOrder.selectedOptions || [],
+          options_normalized: apiOrder.options || [],
+          delivery_method:
+            typeof apiOrder.deliveryMethod === 'object'
+              ? apiOrder.deliveryMethod?.name
+              : apiOrder.deliveryMethod,
+          delivery_price:
+            typeof apiOrder.deliveryMethod === 'object'
+              ? apiOrder.deliveryMethod?.price || 0
+              : apiOrder.breakdown?.deliveryPrice || 0,
+          coupon_code: apiOrder.breakdown?.couponCode || null,
+          discount_amount: apiOrder.breakdown?.discountAmount || 0,
           breakdown: apiOrder.breakdown || null,
           customer_data: apiOrder.customerData,
         };
@@ -345,15 +401,43 @@ export default function SuccessPage() {
     );
   }
 
-  // Build processing time text from service data
-  const processingDays = order.processing_days;
-  const processingTimeText = processingDays
-    ? `Procesăm documentul în ${processingDays} zile lucrătoare`
-    : 'Procesăm documentul cât mai curând posibil';
+  // Build the real processing window by summing the per-step business days
+  // for everything the customer ordered — same calculator the wizard
+  // sidebar + checkout sidebar use. Was previously hardcoded to
+  // `service.estimated_days` which ignored apostila/traducere/legalizare
+  // and showed e.g. "în 2 zile" for an order that actually takes 5-7.
+  const rawSelectedOptions = (order.selected_options ?? []) as SelectedOption[];
+  const deliveryEstimate = estimateFromSelectedOptions({
+    selectedOptions: rawSelectedOptions.map((o) => ({
+      code: o.code ?? null,
+      optionName: o.optionName || o.option_name,
+      bundledFor:
+        o.bundledFor ??
+        (o.bundled_for
+          ? { parentOptionId: o.bundled_for.parent_option_id }
+          : null),
+    })),
+    baseDays: order.service_estimated_days,
+    courier: order.delivery_method ?? null,
+    includeCourierLeg: !!order.delivery_method,
+  });
+  const processingTimeText =
+    deliveryEstimate.minDays === deliveryEstimate.maxDays
+      ? `Procesăm documentul în ${deliveryEstimate.minDays} zile lucrătoare`
+      : `Procesăm documentul în ${deliveryEstimate.minDays}-${deliveryEstimate.maxDays} zile lucrătoare`;
 
-  // Collect all ordered services/options for display
-  const selectedOptions = order.selected_options || [];
-  const hasOptions = selectedOptions.length > 0;
+  // Normalized options for the shared OrderSummaryCard — names already
+  // stripped of the "(adaugă în aceeași comandă)" marketing suffix, and
+  // optionId + bundledForParentId carried through for parent/child nesting.
+  const summaryOptions = (order.options_normalized ?? []).map((opt) => ({
+    name: opt.quantity > 1 ? `${opt.name} × ${opt.quantity}` : opt.name,
+    price: opt.total,
+    optionId: opt.optionId,
+    bundledForParentId: opt.bundledForParentId,
+  }));
+  const serviceNameWithType = order.client_type
+    ? `${order.service_name} ${order.client_type}`
+    : order.service_name;
 
   // Payment successful state
   return (
@@ -382,69 +466,27 @@ export default function SuccessPage() {
               </p>
             </div>
 
-            {/* Ordered Services Summary */}
+            {/* Ordered Services Summary — same OrderSummaryCard used on
+                /comanda + /comanda/checkout so the customer sees the
+                identical itemized breakdown all the way through the funnel. */}
             <div className="text-left mb-6">
               <h3 className="font-semibold text-secondary-900 mb-3 flex items-center gap-2">
                 <FileText className="h-4 w-4 text-green-600" />
                 Servicii comandate
               </h3>
-              <div className="bg-neutral-50 rounded-lg border border-neutral-200 p-4 space-y-2">
-                {/* Main service */}
-                <div className="flex justify-between text-sm">
-                  <span className="text-neutral-700">{order.service_name}</span>
-                  {order.breakdown && (
-                    <span className="font-medium">{order.breakdown.basePrice} RON</span>
-                  )}
-                </div>
-                {/* Selected options */}
-                {hasOptions && selectedOptions.map((opt, idx) => {
-                  const optName = opt.optionName || opt.option_name || 'Opțiune';
-                  const price = (opt.priceModifier || 0) * (opt.quantity || 1);
-                  return (
-                    <div key={idx} className="flex justify-between text-sm">
-                      <span className="text-neutral-600">
-                        + {optName}
-                        {(opt.quantity || 1) > 1 && ` x${opt.quantity}`}
-                      </span>
-                      {price > 0 && (
-                        <span className="font-medium">+{price} RON</span>
-                      )}
-                    </div>
-                  );
-                })}
-                {/* Delivery price if present */}
-                {order.breakdown && order.breakdown.deliveryPrice > 0 && (
-                  <div className="flex justify-between text-sm">
-                    <span className="text-neutral-600">Livrare</span>
-                    <span className="font-medium">+{order.breakdown.deliveryPrice} RON</span>
-                  </div>
-                )}
-                {/* VAT and total */}
-                {order.breakdown && (
-                  <>
-                    <Separator className="my-2" />
-                    <div className="flex justify-between text-sm text-neutral-500">
-                      <span>Subtotal fără TVA</span>
-                      <span>{order.breakdown.subtotalWithoutVat} RON</span>
-                    </div>
-                    <div className="flex justify-between text-sm text-neutral-500">
-                      <span>TVA 21%</span>
-                      <span>{order.breakdown.vatAmount} RON</span>
-                    </div>
-                    <div className="flex justify-between font-semibold text-secondary-900 pt-1">
-                      <span>Total</span>
-                      <span>{order.breakdown.total} RON</span>
-                    </div>
-                  </>
-                )}
-                {/* Fallback if no breakdown */}
-                {!order.breakdown && (
-                  <div className="flex justify-between font-semibold text-secondary-900 border-t pt-2 mt-2">
-                    <span>Total</span>
-                    <span>{order.total_price} RON (TVA 21% inclus)</span>
-                  </div>
-                )}
-              </div>
+              <OrderSummaryCard
+                orderNumber={orderNumber}
+                serviceName={serviceNameWithType}
+                basePrice={order.breakdown?.basePrice ?? 0}
+                options={summaryOptions}
+                deliveryMethod={order.delivery_method}
+                deliveryPrice={order.delivery_price}
+                totalPrice={order.breakdown?.total ?? order.total_price}
+                subtotalWithoutVat={order.breakdown?.subtotalWithoutVat}
+                vatAmount={order.breakdown?.vatAmount}
+                couponCode={order.coupon_code}
+                discountAmount={order.discount_amount}
+              />
             </div>
 
             {/* Invoice Download */}

@@ -112,6 +112,23 @@ export function StripeCheckoutForm({
         <Lock className="h-3 w-3" />
         <span>Plată securizată prin Stripe · SSL 256-bit</span>
       </div>
+
+      {/* Legal consent — implicit at payment time. The Review step (with the
+          three explicit checkboxes) was dropped on 2026-05-27; signing the
+          contract on the previous step already recorded consent in
+          signature_metadata.consent. This notice ensures the customer sees
+          the legal terms again before paying. */}
+      <p className="text-[11px] leading-relaxed text-center text-neutral-500">
+        Prin click pe „Plătește" confirmi că ai citit{' '}
+        <a href="/termeni" target="_blank" rel="noopener" className="underline hover:text-primary-600">
+          Termenii și Condițiile
+        </a>
+        {' '}și{' '}
+        <a href="/confidentialitate" target="_blank" rel="noopener" className="underline hover:text-primary-600">
+          Politica de Confidențialitate
+        </a>
+        , și soliciti executarea imediată a serviciului — renunțând la dreptul de retragere de 14 zile (OUG 34/2014, art. 16 lit. a). Semnătura electronică aplicată anterior are valoare juridică conform Legii nr. 214/2024 și Regulamentului UE 910/2014 (eIDAS).
+      </p>
     </form>
   );
 }

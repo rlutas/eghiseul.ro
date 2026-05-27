@@ -130,3 +130,177 @@ export async function createPaymentIntent(
 export async function retrievePaymentIntent(paymentIntentId: string) {
   return stripe.paymentIntents.retrieve(paymentIntentId)
 }
+
+// ─── Embedded Checkout Session ───────────────────────────────────────────────
+//
+// Replaces PaymentIntent + Elements for the customer-facing flow so the
+// Stripe Dashboard shows individual line items (base service + each addon +
+// delivery + coupon discount) instead of one lump-sum charge. UX stays
+// inline via @stripe/react-stripe-js's `EmbeddedCheckout`.
+
+export interface EmbeddedCheckoutOptions {
+  customer?: CustomerData;
+  receiptEmail?: string;
+  description?: string;
+  /** Line items built via buildStripeLineItems(). */
+  lineItems: Array<{
+    price_data: {
+      currency: 'ron';
+      product_data: {
+        name: string;
+        description?: string;
+        metadata?: Record<string, string>;
+      };
+      unit_amount: number;
+    };
+    quantity: 1;
+  }>;
+  /** Top-level metadata for the Session itself. */
+  sessionMetadata: Record<string, string>;
+  /** Metadata mirrored onto the PaymentIntent created by the Session. */
+  paymentIntentMetadata: Record<string, string>;
+  /** URL Stripe redirects to after the embedded flow completes. */
+  returnUrl: string;
+  /** Optional coupon — created on Stripe side as a one-off amount_off. */
+  couponDiscount?: {
+    code: string;
+    amountRon: number;
+  };
+}
+
+/**
+ * Creates a Stripe Checkout Session in embedded ui_mode. The returned
+ * `client_secret` is what `<EmbeddedCheckoutProvider>` expects on the
+ * client side.
+ */
+export async function createEmbeddedCheckoutSession(
+  opts: EmbeddedCheckoutOptions
+): Promise<Stripe.Checkout.Session> {
+  let customerId: string | undefined;
+  if (opts.customer) {
+    const customer = await getOrCreateCustomer(opts.customer);
+    customerId = customer.id;
+  }
+
+  // Build the one-off discount when a coupon is present. We create the
+  // coupon synchronously so it carries the order's actual discount amount,
+  // independent of any percent-off promo configured in the Stripe dashboard.
+  let discounts: Array<{ coupon: string }> | undefined;
+  if (opts.couponDiscount && opts.couponDiscount.amountRon > 0) {
+    const stripeCoupon = await stripe.coupons.create({
+      amount_off: Math.round(opts.couponDiscount.amountRon * 100),
+      currency: 'ron',
+      duration: 'once',
+      name: `Cupon ${opts.couponDiscount.code}`,
+      metadata: { code: opts.couponDiscount.code },
+    });
+    discounts = [{ coupon: stripeCoupon.id }];
+  }
+
+  return stripe.checkout.sessions.create({
+    ui_mode: 'embedded',
+    mode: 'payment',
+    line_items: opts.lineItems,
+    customer: customerId,
+    return_url: opts.returnUrl,
+    automatic_tax: { enabled: false },
+    payment_method_types: ['card'],
+    billing_address_collection: 'auto',
+    metadata: opts.sessionMetadata,
+    payment_intent_data: {
+      description: opts.description,
+      metadata: opts.paymentIntentMetadata,
+      receipt_email: opts.receiptEmail ?? opts.customer?.email,
+    },
+    ...(discounts ? { discounts } : {}),
+  });
+}
+
+export async function retrieveCheckoutSession(sessionId: string) {
+  return stripe.checkout.sessions.retrieve(sessionId);
+}
+
+// ─── Refunds + extra payments for "Modifică comandă" ─────────────────────────
+
+export interface CreateRefundInput {
+  /** The original PaymentIntent id captured for the order. */
+  paymentIntentId: string;
+  /** Amount to refund in RON (helper converts to bani). */
+  amountRon: number;
+  /** Optional reason — surfaces on the Stripe dashboard + receipt email. */
+  reason?: 'duplicate' | 'fraudulent' | 'requested_by_customer';
+  /** Anything you want carried into the Stripe refund metadata: order ref,
+   *  admin email, free-form admin reason, etc. */
+  metadata?: Record<string, string>;
+}
+
+/**
+ * Create a partial or full refund against an existing PaymentIntent. Used
+ * by the admin "Modifică" dialog when the new total is lower than what the
+ * customer originally paid.
+ */
+export async function createRefund(input: CreateRefundInput): Promise<Stripe.Refund> {
+  const amountBani = Math.round(input.amountRon * 100);
+  if (amountBani <= 0) {
+    throw new Error('Refund amount must be positive');
+  }
+  return stripe.refunds.create({
+    payment_intent: input.paymentIntentId,
+    amount: amountBani,
+    reason: input.reason ?? 'requested_by_customer',
+    metadata: input.metadata,
+  });
+}
+
+export interface CreateExtraPaymentInput {
+  /** Extra amount the customer owes after modification (RON). */
+  amountRon: number;
+  /** Order id — used both for metadata + the receipt description. */
+  orderId: string;
+  /** Friendly order code (e.g. E-260527-A2XJ9) shown in receipt. */
+  orderNumber: string;
+  /** Human-readable summary of what's being added (used in description). */
+  changesDescription: string;
+  /** Optional Stripe customer id from the original purchase — reuse so
+   *  the customer sees saved cards on the Elements form. */
+  stripeCustomerId?: string | null;
+  /** Customer email for the receipt fallback. */
+  receiptEmail?: string;
+  /** Carried into the Stripe metadata so the webhook can apply
+   *  additional_paid_amount when this PaymentIntent settles. */
+  metadata?: Record<string, string>;
+}
+
+/**
+ * Create a NEW PaymentIntent for the extra amount owed after an admin
+ * modification. The admin copies the client_secret-derived URL and shares
+ * it with the customer (email + WhatsApp). The webhook later increments
+ * `orders.additional_paid_amount` when this intent settles.
+ */
+export async function createExtraPaymentIntent(
+  input: CreateExtraPaymentInput
+): Promise<Stripe.PaymentIntent> {
+  const amountBani = Math.round(input.amountRon * 100);
+  if (amountBani <= 0) {
+    throw new Error('Extra payment amount must be positive');
+  }
+  const description =
+    `Plată suplimentară comanda ${input.orderNumber} — ${input.changesDescription}`.slice(0, 999);
+
+  const metadata: Record<string, string> = {
+    purpose: 'extra_charge',
+    orderId: input.orderId,
+    orderNumber: input.orderNumber,
+    ...(input.metadata ?? {}),
+  };
+
+  return stripe.paymentIntents.create({
+    amount: amountBani,
+    currency: 'ron',
+    description,
+    metadata,
+    customer: input.stripeCustomerId ?? undefined,
+    receipt_email: input.receiptEmail,
+    automatic_payment_methods: { enabled: true },
+  });
+}

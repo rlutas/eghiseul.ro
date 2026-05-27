@@ -16,6 +16,7 @@ import {
   Lock,
   Layers,
   CheckCircle,
+  Check,
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useModularWizard } from '@/providers/modular-wizard-provider';
@@ -616,54 +617,9 @@ export function OptionsStepModular({ onValidChange }: OptionsStepProps) {
         </section>
       )}
 
-      {/* ────────────────────────────────────────────────────────────── */}
-      {/* Summary                                                         */}
-      {/* ────────────────────────────────────────────────────────────── */}
-      <div className="bg-neutral-50 rounded-xl p-4 border border-neutral-200">
-        <div className="flex items-start gap-3">
-          <Info className="h-5 w-5 text-neutral-500 shrink-0 mt-0.5" />
-          <div className="flex-1">
-            <h4 className="font-medium text-secondary-900 mb-1">Rezumat Selecții</h4>
-            {selectedOptions.length === 0 ? (
-              <p className="text-sm text-neutral-600">
-                Nu ai selectat nicio opțiune suplimentară. Poți continua cu prețul de
-                bază de {priceBreakdown.basePrice} RON.
-              </p>
-            ) : (
-              <div className="space-y-1">
-                {selectedOptions.map((opt) => (
-                  <div
-                    key={opt.optionId}
-                    className="flex items-center justify-between text-sm"
-                  >
-                    <span
-                      className={cn(
-                        'text-neutral-700',
-                        opt.bundledFor && 'pl-3 text-neutral-500 text-xs'
-                      )}
-                    >
-                      {opt.bundledFor ? '↳ ' : ''}
-                      {opt.optionName}
-                      {opt.quantity > 1 && ` x${opt.quantity}`}
-                      {opt.metadata?.language ? ` — ${opt.metadata.language}` : ''}
-                      {opt.metadata?.country ? ` — ${opt.metadata.country}` : ''}
-                    </span>
-                    <span className="font-medium text-secondary-900">
-                      +{formatPrice(opt.priceModifier * opt.quantity)} RON
-                    </span>
-                  </div>
-                ))}
-                <div className="pt-2 mt-2 border-t border-neutral-200 flex items-center justify-between text-sm font-semibold">
-                  <span className="text-neutral-700">Total opțiuni:</span>
-                  <span className="text-primary-600">
-                    +{formatPrice(priceBreakdown.optionsPrice)} RON
-                  </span>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
+      {/* "Rezumat Selecții" block removed 2026-05-27 — sticky OrderSummaryCard
+          on the right shows the same breakdown across every wizard step, no
+          need to duplicate it at the bottom of Step 3. */}
 
       <p className="text-sm text-center text-neutral-500">
         Opțiunile sunt opționale. Poți continua fără a selecta nimic.
@@ -919,12 +875,20 @@ function CrossServiceAddonCard({
   }, [isSelected, bundledSlug, bundledOptions.length]);
   /* eslint-enable react-hooks/set-state-in-effect */
 
+  // BUG fix (2026-05-27): the selection check has to use the same synthetic
+  // id that `toggleBundled` writes, `bundled:<parent.id>:<bundled.id>`.
+  // The previous version compared against `bundled.id` directly, so it
+  // always returned false — the row would briefly flash yellow on hover
+  // but never stay highlighted after clicking, even though the option
+  // was correctly added to selectedOptions and showed up in the summary.
   const isBundledSelected = useCallback(
-    (bundledOptionId: string) =>
-      selectedOptions.some(
+    (bundledOptionId: string) => {
+      const syntheticId = `bundled:${option.id}:${bundledOptionId}`;
+      return selectedOptions.some(
         (o) =>
-          o.bundledFor?.parentOptionId === option.id && o.optionId === bundledOptionId
-      ),
+          o.bundledFor?.parentOptionId === option.id && o.optionId === syntheticId
+      );
+    },
     [selectedOptions, option.id]
   );
 
@@ -990,15 +954,20 @@ function CrossServiceAddonCard({
             />
           </div>
           <div className="flex-1 min-w-0">
+            {/* Strip the "(adaugă în aceeași comandă)" disclaimer from the
+                option name — it's marketing copy stuck on the DB row and
+                makes the title noisy in the wizard + the order summary. The
+                short "Serviciu secundar" badge below already conveys the
+                same meaning, less awkwardly. */}
             <p className="text-sm font-semibold text-secondary-900 leading-tight">
-              {option.name}
+              {option.name.replace(/\s*\(adaugă în aceeași comandă\)\s*$/i, '').trim()}
             </p>
             <p className="text-xs text-neutral-500 mt-0.5 leading-snug">
               {option.description || 'Serviciu suplimentar bundluit în aceeași comandă'}
             </p>
             <div className="mt-2 flex items-center gap-2">
               <Badge className="bg-primary-500 text-white hover:bg-primary-500">
-                Pachet
+                Serviciu secundar
               </Badge>
               <span className="text-xs text-neutral-500">
                 {isSelected ? (
@@ -1045,10 +1014,16 @@ function CrossServiceAddonCard({
                     key={bundled.id}
                     type="button"
                     onClick={() => toggleBundled(bundled)}
+                    aria-pressed={selected}
                     className={cn(
-                      'group/inner flex w-full items-center gap-3 rounded-lg border p-3 text-left transition-all duration-200',
+                      'group/inner flex w-full cursor-pointer items-center gap-3 rounded-lg border-2 p-3 text-left transition-all duration-200',
                       selected
-                        ? 'border-primary-500 bg-primary-50'
+                        // Same visual contract as the top-level OptionCard:
+                        // 2px primary border + full primary-50 fill +
+                        // shadow lift. Anything lighter (1px border, /30
+                        // tint, no shadow) reads identically to the hover
+                        // state and users can't tell selection persisted.
+                        ? 'border-primary-500 bg-primary-50 shadow-sm'
                         : 'border-neutral-200 bg-white hover:border-primary-300 hover:bg-primary-50/30'
                     )}
                   >
@@ -1080,16 +1055,12 @@ function CrossServiceAddonCard({
                       )}
                     </div>
                     <PriceChip price={bundled.price} selected={selected} size="sm" />
-                    <div
-                      className={cn(
-                        'w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-colors',
-                        selected
-                          ? 'bg-primary-500 border-primary-500'
-                          : 'border-neutral-300 bg-white'
-                      )}
-                    >
-                      {selected && <CheckCircle className="w-3 h-3 text-white" />}
-                    </div>
+                    {/* No separate checkbox/radio indicator on the right —
+                        the row itself becomes yellow (border + bg) when
+                        selected, matching the top-level OptionCard style.
+                        A standalone empty circle on the right misled users
+                        into thinking the option wasn't selected even when
+                        the row was clearly highlighted. */}
                   </button>
                 );
               })}

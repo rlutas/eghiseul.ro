@@ -82,6 +82,23 @@ export async function extractFromCIFront(
 
 IMPORTANT: Răspunde DOAR în format JSON valid, fără markdown, fără explicații.
 
+ORIENTARE IMAGINII: Dacă imaginea pare rotită (poză făcută în mod portrait deși CI-ul este landscape), analizează conținutul ca și cum ar fi rotit corect. Cărțile de identitate românești au întotdeauna orientare landscape (lățime > înălțime). Ignoră elementele care nu fac parte din CI (degete, suprafețe, fundal).
+
+⚠️ DIACRITICE ROMÂNEȘTI (CRITIC): Limba română folosește DOAR aceste 5 caractere speciale:
+  • ă (a cu breve)            — NU confunda cu å, ä, â
+  • â (a cu circumflex)       — la mijlocul cuvintelor: "România", "câmp"
+  • î (i cu circumflex)       — la început/sfârșit: "în", "începe"
+  • ș (s cu virgulă dedesubt) — sau forma veche ş (cedilla); NICIODATĂ š sau č
+  • ț (t cu virgulă dedesubt) — sau forma veche ţ (cedilla); NICIODATĂ ť
+
+Greșelile frecvente ale OCR-urilor pe care le INTERZIC:
+  ✗ "š", "č", "ž" — aceste caractere NU EXISTĂ în română
+  ✗ "Băbăcești"  → corect: "Băbășești" (s cu virgulă, nu č)
+  ✗ "Medieșu"   → ok; dar NU "Medieşu" cu cedilla la s (Unicode modern: ș)
+  ✗ "Mănăstirea" cu "ă" peste tot — uneori e "Mănăștirea" (cu ș)
+
+Dacă vezi un caracter ambiguu (semn jos sub s/t), e ÎNTOTDEAUNA virgulă, niciodată cedilă-cu-cârlig sau caron.
+
 Cărțile de identitate românești pot fi de 2 tipuri:
 1. Format vechi (pre-2009): Are adresa de domiciliu pe FAȚĂ
 2. Format nou (post-2009): Are adresa pe VERSO (spatele cardului)
@@ -107,7 +124,7 @@ Pentru ADRESĂ (dacă există pe față), parsează în componente:
 - Strada (fără "Str."/"Bd.")
 - Număr, Bloc, Scară, Etaj, Apartament
 
-Pentru MRZ, extrage textul complet din fiecare linie.
+Pentru MRZ, extrage textul complet din fiecare linie. MRZ-ul nu conține diacritice (e ASCII) — îl extragi exact așa cum apare.
 
 Analizează calitatea imaginii și identifică tipul de CI (vechi sau nou).
 
@@ -184,6 +201,10 @@ export async function extractFromCIBack(
   const prompt = `Analizează această imagine a unei cărți de identitate românești (verso/spate) și extrage adresa de domiciliu.
 
 IMPORTANT: Răspunde DOAR în format JSON valid, fără markdown, fără explicații.
+
+ORIENTARE: Dacă poza e făcută portrait dar CI-ul e landscape, analizează ca și cum ar fi rotit corect. Ignoră elementele care nu fac parte din CI (degete, suprafețe, fundal).
+
+⚠️ DIACRITICE: limba română folosește DOAR ă, â, î, ș (s cu virgulă dedesubt), ț (t cu virgulă dedesubt). Caracterele š, č, ž NU EXISTĂ în română. Dacă vezi un semn jos sub s/t, e ÎNTOTDEAUNA virgulă (ș/ț), niciodată caron sau cedilă-cu-cârlig. Exemplu: "Băbășești" (corect), NU "Băbăcești". MRZ-ul este ASCII fără diacritice.
 
 Formatul adresei pe buletinele românești poate fi:
 - Urban: "Jud. CLUJ, Mun. CLUJ-NAPOCA, Str. MIHAI EMINESCU, Nr. 10, Bl. A1, Sc. 2, Et. 3, Ap. 15"

@@ -1,11 +1,17 @@
 'use client';
 
-import { Package, Truck, Tag, Receipt, TicketPercent } from 'lucide-react';
+import { Truck, Receipt, TicketPercent } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface OrderOption {
   name: string;
   price: number;
+  /** Stable option id used to nest bundled children under their parent. */
+  optionId?: string;
+  /** If set, this option is bundled under another (e.g. add-ons attached to
+   *  a Certificat Integritate sub-service). The renderer indents it under
+   *  the parent identified by optionId. */
+  bundledForParentId?: string;
 }
 
 interface OrderSummaryCardProps {
@@ -61,50 +67,151 @@ export function OrderSummaryCard({
             <span className="leading-none truncate">Rezumat comandă</span>
           </CardTitle>
           {orderNumber && (
-            <span className="inline-flex items-center rounded-md border border-primary-200/70 bg-white px-2 py-1 text-[11px] font-mono text-neutral-600 shrink-0 truncate max-w-[140px]">
+            <span
+              className="inline-flex items-center rounded-md border border-primary-200/70 bg-white px-2 py-1 text-[11px] font-mono text-neutral-600 shrink-0 whitespace-nowrap"
+              title={orderNumber}
+            >
               {orderNumber}
             </span>
           )}
         </div>
       </CardHeader>
       <CardContent className="p-4 space-y-3">
-        {/* Service */}
-        <div className="flex items-start justify-between gap-3">
-          <div className="flex items-start gap-2.5 min-w-0">
-            <Package className="h-4 w-4 text-neutral-400 mt-0.5 shrink-0" />
-            <div className="min-w-0">
-              <p className="text-sm font-medium text-secondary-900 leading-snug">
-                {serviceName}
-              </p>
-              <p className="text-xs text-neutral-500">Serviciu de bază</p>
-            </div>
-          </div>
-          <p className="text-sm font-semibold text-secondary-900 shrink-0 tabular-nums">
-            {fmt(basePrice)} RON
-          </p>
-        </div>
-
-        {/* Options */}
-        {options.length > 0 && (
-          <div className="space-y-2 border-t border-neutral-100 pt-3">
-            {options.map((option, index) => (
-              <div
-                key={index}
-                className="flex items-start justify-between gap-3"
-              >
-                <div className="flex items-start gap-2.5 min-w-0">
-                  <Tag className="h-3.5 w-3.5 text-neutral-400 mt-1 shrink-0" />
-                  <p className="text-sm text-secondary-800 leading-snug min-w-0">
-                    {option.name}
+        {/* Service + its options (nested) — bundled sub-services with their
+            own add-ons render as a separate group below. The visual tree:
+              Cazier Judiciar PF                 198 RON
+                ↳ Procesare Urgentă             +80 RON
+                ↳ Apostilă de la Haga          +238 RON
+              Certificat Integritate           +100 RON
+                ↳ Apostilă de la Haga          +238 RON
+                ↳ Traducere Autorizată         +178.50 RON
+            The vertical primary-100 rule makes the parent→child relationship
+            unambiguous in both groups. */}
+        {(() => {
+          // Top-level options (no bundledForParentId) belong to the main
+          // service. Bundled options nest under their respective parent.
+          const topLevel = options.filter((o) => !o.bundledForParentId);
+          const childrenByParent = new Map<string, OrderOption[]>();
+          for (const o of options) {
+            if (o.bundledForParentId) {
+              const list = childrenByParent.get(o.bundledForParentId) ?? [];
+              list.push(o);
+              childrenByParent.set(o.bundledForParentId, list);
+            }
+          }
+          // A top-level option is treated as a "sub-service" group when it
+          // has bundled children pointing to it. Everything else is a direct
+          // add-on of the main service. (Procesare Urgentă, Apostilă, etc.
+          // for plain Cazier Judiciar = direct main-service add-ons.)
+          const subServices = topLevel.filter(
+            (o) => o.optionId && (childrenByParent.get(o.optionId)?.length ?? 0) > 0
+          );
+          const mainAddons = topLevel.filter(
+            (o) => !(o.optionId && (childrenByParent.get(o.optionId)?.length ?? 0) > 0)
+          );
+          // Bundled options whose declared parent isn't in the list anymore
+          // (legacy/edge case) — render at the bottom so they don't disappear.
+          const orphans = options.filter(
+            (o) =>
+              o.bundledForParentId &&
+              !topLevel.some((p) => p.optionId === o.bundledForParentId)
+          );
+          return (
+            <>
+              {/* Main service block — base price + its direct add-ons nested. */}
+              <div className="space-y-1.5">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-secondary-900 leading-snug">
+                      {serviceName}
+                    </p>
+                    <p className="text-xs text-neutral-500">Serviciu de bază</p>
+                  </div>
+                  <p className="text-sm font-semibold text-secondary-900 shrink-0 tabular-nums">
+                    {fmt(basePrice)} RON
                   </p>
                 </div>
-                <p className="text-sm text-secondary-800 shrink-0 tabular-nums">
-                  +{fmt(option.price)} RON
-                </p>
+                {mainAddons.length > 0 && (
+                  <div className="pl-3 ml-1 border-l-2 border-primary-100 space-y-1 pt-1">
+                    {mainAddons.map((opt, idx) => (
+                      <div
+                        key={opt.optionId || `m-${idx}`}
+                        className="flex items-start justify-between gap-3"
+                      >
+                        <p className="text-xs text-neutral-700 leading-snug min-w-0">
+                          {opt.name}
+                        </p>
+                        <p className="text-xs text-neutral-700 shrink-0 tabular-nums">
+                          +{fmt(opt.price)} RON
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
-            ))}
-          </div>
-        )}
+
+              {/* Bundled sub-services — each is its own block with the same
+                  visual treatment as the main service: name + price on top,
+                  nested children under a primary-100 vertical rule. */}
+              {subServices.map((sub, idx) => {
+                const kids = (sub.optionId && childrenByParent.get(sub.optionId)) || [];
+                return (
+                  <div
+                    key={sub.optionId || `sub-${idx}`}
+                    className="space-y-1.5 border-t border-neutral-100 pt-3"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-secondary-900 leading-snug">
+                          {sub.name}
+                        </p>
+                        <p className="text-xs text-neutral-500">Serviciu secundar</p>
+                      </div>
+                      <p className="text-sm font-semibold text-secondary-900 shrink-0 tabular-nums">
+                        +{fmt(sub.price)} RON
+                      </p>
+                    </div>
+                    {kids.length > 0 && (
+                      <div className="pl-3 ml-1 border-l-2 border-primary-100 space-y-1 pt-1">
+                        {kids.map((kid, kidIdx) => (
+                          <div
+                            key={kid.optionId || `sk-${idx}-${kidIdx}`}
+                            className="flex items-start justify-between gap-3"
+                          >
+                            <p className="text-xs text-neutral-700 leading-snug min-w-0">
+                              {kid.name}
+                            </p>
+                            <p className="text-xs text-neutral-700 shrink-0 tabular-nums">
+                              +{fmt(kid.price)} RON
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+
+              {orphans.length > 0 && (
+                <div className="border-t border-neutral-100 pt-3 space-y-1">
+                  {orphans.map((kid, kidIdx) => (
+                    <div
+                      key={kid.optionId || `o-${kidIdx}`}
+                      className="flex items-start justify-between gap-3"
+                    >
+                      <p className="text-sm text-secondary-800 leading-snug min-w-0">
+                        {kid.name}
+                      </p>
+                      <p className="text-sm text-secondary-800 shrink-0 tabular-nums">
+                        +{fmt(kid.price)} RON
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </>
+          );
+        })()}
 
         {/* Delivery */}
         {deliveryMethod && (

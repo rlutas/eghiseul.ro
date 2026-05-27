@@ -1,13 +1,22 @@
 # Documentație eGhiseul.ro
 
-**Ultima actualizare:** 2026-05-20
+**Ultima actualizare:** 2026-05-27 (admin parity overhaul + abandoned cart system)
 **Status proiect:** Sprint 6 + SEO Pre-Launch Phase. **47 pagini de rebuilt pentru migrare WP→Next.js** (vezi `seo/REBUILD-QUEUE.md`). Page #1 (cazier-judiciar-online) tehnic complete dar **user feedback negativ pe vizual** — necesită revizitare.
 **Fișier principal:** [`DEVELOPMENT_MASTER_PLAN.md`](DEVELOPMENT_MASTER_PLAN.md)
 **Status curent:** [`STATUS_CURRENT.md`](STATUS_CURRENT.md) — **citeste primul daca revii dupa pauza**
 **Plan SEO master:** [`seo/SEO-MASTER-PLAN-2026-05-20.md`](seo/SEO-MASTER-PLAN-2026-05-20.md)
 **Rebuild queue (47 pagini):** [`seo/REBUILD-QUEUE.md`](seo/REBUILD-QUEUE.md)
 **City pages plan:** [`seo/CITY-PAGES-PLAN.md`](seo/CITY-PAGES-PLAN.md)
-**Sesiune curentă (2026-05-20):** [`session-logs/2026-05-20-seo-cazier-judiciar-rebuild.md`](session-logs/2026-05-20-seo-cazier-judiciar-rebuild.md) — **citește aici unde am rămas**
+**Sesiune curentă (2026-05-27 PM):** [`session-logs/2026-05-27-admin-parity-overhaul.md`](session-logs/2026-05-27-admin-parity-overhaul.md) — **citește aici unde am rămas** (admin shell port, coșuri abandonate, dashboard extins)
+**Sesiune (2026-05-27 AM):** [`session-logs/2026-05-27-step2-simplification.md`](session-logs/2026-05-27-step2-simplification.md) — Step 2 redesign, contract DOCX, delivery calculator
+**Parity matrix sister project:** [`admin/PARITY-MATRIX.md`](admin/PARITY-MATRIX.md) — feature-by-feature vs cazierjudiciaronline.com
+**Handbook coșuri abandonate:** [`admin/abandoned-carts.md`](admin/abandoned-carts.md)
+**Handbook Modifică comandă:** [`admin/modify-order.md`](admin/modify-order.md)
+**Handbook Storno + Reemite Oblio:** [`admin/storno-reemite.md`](admin/storno-reemite.md)
+**Handbook Auto-Finalize cron (curier):** [`admin/auto-finalize-cron.md`](admin/auto-finalize-cron.md)
+**Gap docs secundare (Cazier+Integritate):** [`admin/secondary-service-documents.md`](admin/secondary-service-documents.md)
+**🚀 DEPLOY CHECKLIST:** [`deployment/DEPLOY-CHECKLIST.md`](deployment/DEPLOY-CHECKLIST.md) — **citește înainte de cutover**
+**Sesiune anterioară (2026-05-20):** [`session-logs/2026-05-20-seo-cazier-judiciar-rebuild.md`](session-logs/2026-05-20-seo-cazier-judiciar-rebuild.md)
 **Sesiune anterioară (2026-04-29):** [`session-logs/2026-04-29-wizard-redesign.md`](session-logs/2026-04-29-wizard-redesign.md)
 **Testing guide:** [`testing/COMPREHENSIVE_GUIDE.md`](testing/COMPREHENSIVE_GUIDE.md)
 

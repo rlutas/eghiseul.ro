@@ -13,9 +13,9 @@ import {
   LogOut,
   Menu,
   X,
-  Shield,
   BookOpen,
   Ticket,
+  UserX,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -40,6 +40,7 @@ interface NavItem {
 const NAV_ITEMS: NavItem[] = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/admin/orders', label: 'Comenzi', icon: ClipboardList, permission: 'orders.view' },
+  { href: '/admin/orders?status=abandoned', label: 'Abandonuri', icon: UserX, permission: 'orders.view' },
   { href: '/admin/registru', label: 'Registru', icon: BookOpen, permission: 'settings.manage' },
   { href: '/admin/coupons', label: 'Cupoane', icon: Ticket, permission: 'settings.manage' },
   { href: '/admin/users', label: 'Utilizatori', icon: Users, permission: 'users.manage' },
@@ -187,34 +188,47 @@ export default function AdminLayout({
           />
         )}
 
-        {/* Sidebar */}
+        {/* Sidebar — dark slate-900 to match cazierjudiciaronline.com admin
+            shell so operators who work on both platforms see the same chrome.
+            Active item: bg-slate-800 text-white. Idle: text-slate-400 with
+            hover lifting to white. */}
         <aside
           className={cn(
-            'fixed inset-y-0 left-0 z-50 flex w-64 flex-col bg-white border-r border-gray-200 transition-transform duration-200 lg:static lg:translate-x-0',
+            'fixed inset-y-0 left-0 z-50 flex w-64 flex-col bg-slate-900 text-white transition-transform duration-200 lg:static lg:translate-x-0',
             sidebarOpen ? 'translate-x-0' : '-translate-x-full'
           )}
         >
           {/* Logo */}
-          <div className="flex h-14 items-center justify-between border-b px-4">
+          <div className="flex h-16 items-center justify-between border-b border-slate-800 px-4">
             <Link href="/admin" className="flex items-center gap-2">
-              <Shield className="h-5 w-5 text-primary" />
-              <span className="font-semibold text-lg">eGhiseul Admin</span>
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-500 text-sm font-bold text-secondary-900">
+                eG
+              </div>
+              <span className="text-sm font-semibold">eGhișeul.ro</span>
             </Link>
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              className="lg:hidden"
+            <button
               onClick={() => setSidebarOpen(false)}
+              className="lg:hidden text-slate-400 hover:text-white"
+              aria-label="Inchide meniul"
             >
-              <X className="h-4 w-4" />
-            </Button>
+              <X className="h-5 w-5" />
+            </button>
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 overflow-y-auto p-3 space-y-1">
+          <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
             {visibleNavItems.map((item) => {
-              const isActive = pathname === item.href ||
-                (item.href !== '/admin' && pathname.startsWith(item.href));
+              // Active match — Abandonuri lives at /admin/orders?status=abandoned
+              // (no separate page yet, parity with sister achieved via query
+              // param). Match on the exact href with the query string so it
+              // highlights only on that filtered view.
+              const isActive = (() => {
+                if (item.href.includes('?')) {
+                  return typeof window !== 'undefined' && window.location.search.includes(item.href.split('?')[1] ?? '');
+                }
+                if (item.href === '/admin') return pathname === '/admin';
+                return pathname.startsWith(item.href);
+              })();
               return (
                 <Link
                   key={item.href}
@@ -223,62 +237,57 @@ export default function AdminLayout({
                   className={cn(
                     'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
                     isActive
-                      ? 'bg-primary/10 text-primary'
-                      : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                      ? 'bg-slate-800 text-white'
+                      : 'text-slate-400 hover:bg-slate-800/50 hover:text-white'
                   )}
                 >
-                  <item.icon className="h-4 w-4" />
+                  <item.icon className="h-5 w-5 shrink-0" />
                   {item.label}
                 </Link>
               );
             })}
           </nav>
 
-          {/* User info & logout */}
-          <div className="border-t p-3">
+          {/* User info & logout — slate palette to fit the dark sidebar. */}
+          <div className="border-t border-slate-800 p-3">
             <div className="flex items-center gap-3 rounded-lg px-3 py-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10">
-                <span className="text-xs font-medium text-primary">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-700 text-slate-100">
+                <span className="text-xs font-medium">
                   {user.email?.charAt(0).toUpperCase()}
                 </span>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="truncate text-sm font-medium">{user.email}</p>
-                <p className="text-xs text-muted-foreground capitalize">{user.role?.replace('_', ' ')}</p>
+                <p className="truncate text-sm font-medium text-slate-100">{user.email}</p>
+                <p className="text-xs text-slate-400 capitalize">{user.role?.replace('_', ' ')}</p>
               </div>
             </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="w-full justify-start gap-2 mt-1 text-gray-600"
+            <button
               onClick={handleLogout}
+              className="mt-1 flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-400 transition-colors hover:bg-slate-800/50 hover:text-white"
             >
-              <LogOut className="h-4 w-4" />
+              <LogOut className="h-5 w-5" />
               Deconectare
-            </Button>
+            </button>
           </div>
         </aside>
 
         {/* Main content */}
         <div className="flex flex-1 flex-col overflow-hidden">
-          {/* Top bar */}
-          <header className="flex h-14 items-center gap-4 border-b bg-white px-4 lg:px-6">
+          {/* Top bar — mobile only (sister project pattern). On desktop the
+              sidebar carries the brand so we don't need a duplicate header. */}
+          <header className="flex h-16 items-center border-b bg-white px-4 lg:hidden">
             <Button
               variant="ghost"
-              size="icon-sm"
-              className="lg:hidden"
+              size="icon"
               onClick={() => setSidebarOpen(true)}
             >
               <Menu className="h-5 w-5" />
             </Button>
-            <div className="flex-1" />
-            <span className="text-sm text-muted-foreground">
-              Panou administrare
-            </span>
+            <span className="ml-3 text-sm font-semibold">Admin Panel</span>
           </header>
 
           {/* Page content */}
-          <main className="flex-1 overflow-y-auto p-4 lg:p-6">
+          <main className="flex-1 overflow-auto p-4 lg:p-6">
             {children}
           </main>
         </div>

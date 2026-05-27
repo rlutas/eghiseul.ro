@@ -1,12 +1,821 @@
 # eGhiseul.ro - Status Curent
 
-**Data:** 2026-05-20 (sesiune SEO + rebuild Page #1)
+**Data:** 2026-05-27 (sesiune admin parity overhaul + coșuri abandonate)
+**Detalii:**
+- Dimineață: Step 2 simplification → `docs/session-logs/2026-05-27-step2-simplification.md`
+- După-amiază: admin parity + abandoned carts → `docs/session-logs/2026-05-27-admin-parity-overhaul.md`
+
+**Sesiune anterioară:** 2026-05-20 (SEO + rebuild Page #1)
 **Sprint-uri completate:** Sprint 0-6 ✅
 **SEO master plan + rebuild queue:** ✅ (`docs/seo/SEO-MASTER-PLAN-2026-05-20.md` + `docs/seo/REBUILD-QUEUE.md`)
 **Page #1 (cazier-judiciar-online) rebuild:** ✅ tehnic, ⚠️ user feedback: vizual needs another pass
-**Aliniere cu cazierjudiciaronline.com:** complet (11 faze A-L + pricing realignment + entity blocking + international courier)
+**Aliniere cu cazierjudiciaronline.com:** ✅ 11 faze + Step 2 + admin shell + dashboard + coșuri abandonate. Pendent: buton Modifică, Storno+Reemite Oblio. Vezi [`docs/admin/PARITY-MATRIX.md`](admin/PARITY-MATRIX.md).
 **Wizard redesign + foreign citizen flow:** 2026-04-29 ✅
-**Sprint pendinte:** Notifications (Resend/SMSLink/Oblio), restul 46 pagini rebuild queue, city pages
+**Sprint pendinte:** Notifications full pipeline (cron-uri operational, DNS Resend de configurat), restul 46 pagini rebuild queue, city pages, P0 admin features (buton Modifică, Storno Oblio, health-check cron)
+**Tests:** **928** unit tests passing (era 749 azi-dimineață; **+179 într-o zi**)
+
+---
+
+## ✅ SESIUNE 2026-05-27 SEARA — Stripe Embedded Checkout + Cron auto-finalize + UX polish
+
+**Stripe Embedded Checkout (refactor major)**
+- Migration 044: `orders.stripe_checkout_session_id` (înlocuiește dependența pe `payment_intent_id`).
+- `src/lib/stripe-line-items.ts` — helpers puri pentru construit `line_items` (cazier + opțiuni + livrare + cupon ca discount nativ Stripe). 12 teste.
+- `createEmbeddedCheckoutSession` în `src/lib/stripe.ts` cu line_items + coupon discount nativ → în Stripe Dashboard apar linii separate (Cazier Judiciar, Procesare Urgentă, Traducere, Apostila, Livrare DHL, Cupon RECUPEREAZA) ca în sister project.
+- `/api/orders/[id]/payment` rescris să creeze Checkout Session în loc de PaymentIntent.
+- `EmbeddedCheckoutBlock` component nou înlocuiește `StripeProvider + StripeCheckoutForm`.
+- Webhook handler nou pentru `checkout.session.completed`.
+
+**Cron auto-finalize delivered**
+- Migration 045: `orders.shipped_at TIMESTAMPTZ` + index parțial + backfill din `order_history`.
+- `src/lib/courier/auto-finalize.ts` — threshold-uri per curier (Sameday 5z, FAN 7z, DHL 14z, Poșta 30z, default 10z) + flag `isBlocked` la 2× threshold. 10 teste.
+- `/api/cron/auto-finalize-delivered` — tranziție shipped → completed în bulk + audit cu `changed_by='system-cron'`. Schedule zilnic 06:00 UTC. 10 teste integration.
+- Handbook complet: [`docs/admin/auto-finalize-cron.md`](admin/auto-finalize-cron.md).
+
+**UX polish**
+- Buton „Marchează livrat" pe AWB card (1-click shipped → completed direct din admin order detail).
+- `HelpContactCard` (WhatsApp + telefon) pe `/comanda/status` — citește din env `NEXT_PUBLIC_SUPPORT_PHONE` + `NEXT_PUBLIC_SUPPORT_WHATSAPP_URL`.
+- Self-cancel UI (30 min după plată) cu countdown live + două-pași confirmation pe `/comanda/status`.
+
+## Arhitectura paritate cu sister projects
+
+eghiseul.ro este **platforma-părinte (umbrella)** care va găzdui multiple servicii (cazier judiciar/fiscal/auto, certificat integritate/casatorie/celibat/nastere, extras carte funciară, certificat constatator, etc.) într-un singur catalog dinamic.
+
+Sister projects `cazierjudiciaronline.com` și `ecazier.ro` sunt **single-tenant per service type**, optimizate pentru convertire pe un domeniu de tip „cazier-only" (multi-tenant source code, instanțe separate). Acolo, comenzile au flag-uri boolean explicite per addon (`order.traducere`, `order.apostila_haga`, etc.). Aici la eghiseul.ro folosim JSONB generic `selected_options` cu coduri (`urgenta`, `apostila_haga`, etc.) — flexibil pentru cataloage mari fără migrations per addon.
+
+**Principiu:** paritate **vizuală + UX + termen + facturare** cu sister projects, implementare internă diferită ca model de date. Customer journey identic, scaling intern diferit.
+
+📋 **Parity matrix completă:** [`docs/admin/PARITY-MATRIX.md`](admin/PARITY-MATRIX.md) — feature-by-feature comparison + priorități (P0/P1/P2) + estimări de implementare + referințe la sister docs originale.
+
+---
+
+## ✅ SESIUNE 2026-05-27 — Step 2 simplification (cazier judiciar PF)
+
+**Detalii complete:** `docs/session-logs/2026-05-27-step2-simplification.md`
+
+Feedback user: customers se pierdeau între Step 2 (date personale) și Step 3 (verification). Step 2 cerea prea multe câmpuri vizibile vs `cazierjudiciaronline.com` care cere doar CNP.
+
+**Modificări:**
+
+1. **DB migration 039** (`supabase/migrations/039_cazier_judiciar_step2_simplification.sql`) — pentru `cazier-judiciar`:
+   - `personalKyc.parentDataRequired: true → false` (drops prenume mamă + tată)
+   - `personalKyc.requireAddressCertificate: 'ci_nou_passport' → 'never'` (drops „Adresă de Domiciliu" block)
+
+2. **UI scan mode** (`src/components/orders/modules/personal-kyc/PersonalDataStep.tsx`):
+   - `hideExtractedFields = mode === 'scan' && ciFrontScan.success` — după scan reușit user-ul vede DOAR CNP + banner derivat (data, sex, județ). Toate câmpurile extrase (nume, prenume, serie/număr CI, valabilitate, locul nașterii) sunt ascunse. Datele se salvează silent în `customer_data.personal`. Dacă OCR greșește → operatorul corectează din admin.
+   - Manual mode rămâne full form (fără părinți, fără adresă).
+   - Address section gated: `requireAddressCertificate === 'never' && citizenship === 'romanian'` → ascuns. Cetățeni străini văd în continuare.
+
+3. **Admin order detail** (`src/app/admin/orders/[id]/page.tsx`):
+   - Adăugat „Județ nastere (din CNP)" derivat la display time prin `getCountyFromCNP(personal.cnp)`. Apare lângă „Locul nasterii (localitate)" care vine din OCR sau manual.
+   - Single source of truth: CNP-ul pentru județ, OCR/manual pentru localitate.
+
+**Sister project referință:** `/Users/raul/Projects/cazierjudiciaronline.com/src/components/form/steps/Step2PersonalData.tsx` (900 linii, ultra-light). Filosofia: CNP e suficient pentru cerere, restul vine de pe CI sau se completează la admin.
+
+**Notă incident:** Un PATCH greșit a setat temporar `verification_config = null` pentru `cazier-judiciar` în timpul aplicării. Restaurat în aceeași sesiune cu config-ul complet reconstruit din migration 011 + 037 + 039.
+
+### TODO follow-up
+- Verificat pe celelalte cazier services (fiscal, auto, integritate) dacă echipa vrea același tratament
+- Clarificat cu echipa juridică dacă adresa e necesară pe cererea oficială MJ (dacă da, o cerem la Step delivery/billing)
+
+### Update 09:45 — Bugfix birthDate
+
+OCR uneori întoarce `birthDate: null` (CI cu reflexie pe foto). În scan mode câmpul e ascuns deci user nu putea completa → „Continuă" disabled. Fix: derivăm `birthDate` din CNP în 2 locuri (OCR success branch + useEffect safety net pentru draft-uri vechi).
+
+### Update 09:55 — Combined consent checkbox
+
+3 checkbox-uri → 1 checkbox combinat la Step Review. Inspirat din `cazierjudiciaronline.com/src/components/form/steps/Step5Contract.tsx`. Auto-bifat când există semnătură (semnătura electronică = consimțământ conform Legii 214/2024). Backend audit log păstrează cele 3 flag-uri separate.
+
+### Update 10:15 — Review step eliminat din wizard
+
+8 pași → 7 pași. Review step redundant pentru că sticky order summary apare pe fiecare pas + cuponul e pe checkout. Semnătura auto-setează consimțământul (T&C + Privacy + waiver). Pe checkout, sub butonul „Plătește" apare note legal mic. Backend audit trail neschimbat. Fix și truncation pe order ID badge. Fallback `-` pentru prenume tată/mamă pe cerere generată (template DOCX încă are câmpurile).
+
+### Verificat order E-260527-4WV2A
+
+Inspecție DB: ✅ Toate datele importante salvate. Personal complet (nume, CNP, birthDate derivat din CNP ca fallback OCR, birthPlace din OCR, serie/număr CI, valabilitate, adresă auto-fill din OCR CI verso). KYC docs ✓, signature S3 + metadata cu cele 3 flag-uri consent ✓, payment intent ✓, total_price 278 RON ✓. Minor: Stripe webhook update fields (paid_at, payment_method) and Oblio invoice nu rulează pe local dev (timing/local).
+
+### Tests update
+
+**762 unit tests passing** (+24 față de începutul sesiunii). Adăugate:
+- `tests/unit/lib/verification-modules/step-builder.test.ts` (4 teste) — regression guard pentru eliminarea Review step + structura wizard cazier judiciar PF
+- `tests/unit/lib/validations/cnp-birthdate-derive.test.ts` (7 teste) — derivarea YYYY-MM-DD din CNP (fallback când OCR returnează `birthDate: null`)
+- `tests/unit/lib/data/locality-fuzzy-match.test.ts` (13 teste) — canonicalizare localitate post-OCR pentru fixare diacritice românești (case real: „Băbăcești" → „Babasesti" în Satu Mare)
+
+### Update 10:30 — Fix hydration mismatch (Sheet aria-controls)
+
+Console warning pe orice pagină din Radix Sheet (`aria-controls` ID diferă SSR vs client). Fix cu `hydrated` state în Header — render placeholder Button pe SSR, mount Sheet real client-side.
+
+### Update 10:35 — OCR diacritice românești + locality canonicalization
+
+User reportă: Gemini a returnat „Băbăcești" în loc de „Băbășești" (s-cu-virgulă confundat cu č). Plus: poze portrait cu elemente extra ar putea încurca OCR-ul.
+
+Fix în 2 layere:
+1. **Prompt Gemini** (CI față + verso) — secțiuni noi: ORIENTARE (cer rotație mentală pentru poze portrait) + DIACRITICE (enumeră cele 5 caractere RO valide, interzice explicit `š`/`č`/`ž` cu exemple)
+2. **Post-processing** `src/lib/data/locality-fuzzy-match.ts` — fuzzy match contra listei oficiale de localități per județ. Exact match când doar diacriticele diferă; Levenshtein ≤ 2 pentru OCR slips; refuză când candidați tie. Aplicat în `PersonalDataStep.fillAddressFields`.
+
+### Update 10:45 — Options step UX overhaul
+
+5 fix-uri raportate de user pe pagina /comanda:
+
+1. **Checkbox-uri invizibile** la opțiuni bundled (sub Certificat Integritate): `CheckCircle` din lucide are propriul cerc + iconul `w-3 h-3 text-white` pe fundal galben → vizual gol. Înlocuit cu `Check` plain `w-4 h-4 strokeWidth=3` pe casetă `w-5 h-5` cu `border-2`. Acum se vede clar.
+2. **„Rezumat Selecții" la baza Step Options** — duplica sticky sidebar. **Șters complet.**
+3. **Bundled options apăreau flat** în sticky summary (Apostila Haga listată de 2 ori: o dată pentru Cazier Judiciar, o dată pentru Certificat Integritate sub-service). Acum **indentate sub parent** cu linie vertical primary-100 + text mai mic.
+4. **Delivery time static** la „2-4 zile lucrătoare" indiferent de urgenta. Acum **dinamic**: când user are `urgenta` (fără bundledFor — adică pentru serviciul principal), apare „1-2 zile lucrătoare" + label „⚡ Procesare urgentă activată".
+5. **Iconițe per-rând** (Tag, Package) — eliminate. Summary mai curat, vertical mai compact.
+
+Pass-through: `OrderSummaryCard` acceptă acum `optionId` + `bundledForParentId`. Atât `price-sidebar-modular.tsx` (wizard) cât și `checkout/[orderId]/page.tsx` (post-wizard) propagă metadata.
+
+### Update 19:30 — Layout polish iterativ admin order detail (multiple user feedback rounds)
+
+User feedback iterative pe layout-ul `/admin/orders/[id]`. Toate modificările aplicate într-o serie de iterații:
+
+**1. Badge contrast fix** (request: „sa fie textul cu alb in buton ca nu e veizibl"):
+- `text-white` adăugat explicit la TOATE badge-urile colorate de status: paid, processing, documents_generated, submitted_to_institution, **document_received**, extras_in_progress, kyc_approved, document_ready, shipped, in_progress, completed, standby, cancellation_requested, delivered
+- `PaymentStatusBadge`: „Plătită" + „Eșuată" cu `text-white`
+- Adăugate statusuri lipsă din `STATUS_CONFIG`: standby, cancellation_requested, delivered, abandoned
+
+**2. Câmpuri adresă goale ascunse** (request: „n-ar trebui sa fie vizibile campurile goale"):
+- Bl, Sc, Et, Ap, Cod poștal apar acum DOAR când sunt completate
+- Curățenie vizuală majoră pentru clienții care au doar Str + Nr
+
+**3. Generează AWB fuzionat în Livrare card** (request: „nu putem sa punem butonul in sectiunea lvirare"):
+- `AwbSection` refactorizat să returneze fragment (fără `<Card>` wrapper)
+- Embedded inside Livrare card sub adresa de livrare cu Separator
+- Email/PDF orders: AwbSection returnează null
+- AWB Generat: mini-panel verde cu număr + Print + Tracking + Anulează
+- Generează AWB: doar buton + eroare dacă există
+
+**4. Lățime carduri documente + responsive grid** (request: „cand secitunile de mai sus is mai mari" + „posibil sa fie 4 documente pentru cazier auto"):
+- Documente mutat din coloana dreaptă a ROW 1 → **full-width row** sub ROW 1
+- Inner grid `grid-cols-1 sm:grid-cols-2 lg:grid-cols-3` — flow natural pentru 2/3/4 documente (cazier auto: CI fata + verso + permis fata + verso)
+
+**5. Contract + Facturare carduri noi** (request: „pe cazierjudiciaronline.com m-ai avem secitunea asta cu contractul semnat" + „la date facturare fa le fel cca pe cazierjudiciaronline.com"):
+- **ROW 2** restructurat: [Facturare | Contract] (2-col)
+- **Facturare** rewrite stil InfoRow (clean ca sister): Tip factură / Nume / CUI(PJ) / Nr. Reg. Com.(PJ) / Strada / Oraș / Județ / Cod poștal
+- **Slot Nr. factură Oblio** — afișează „—" până la emitere, apoi link clickabil către Oblio PDF
+- **Contract** nou card cu: Semnat (Da/Nu) / Data semnare / IP semnare / Browser (user agent) / SHA-256 PDF — citește din `customer_data.signature_metadata`
+- **ROW 3** dedicat: Plata full-width
+
+**6. Bonuri din iterațiile anterioare aceleași sesiuni:**
+- Cost livrare 0.00 RON ascuns pentru Email/PDF orders
+- KYC merged în Documente card (badge OCR % + Match % inline pe fiecare poză, banner manual review)
+- Duplicat „Livrare" card eliminat când nu există curier
+
+**Tests:** 896 passing. **Type-check clean.** Layout `/admin/orders/[id]` complet aliniat cu sister project + îmbunătățiri proprii (responsive, modular, KYC inline).
+
+### Update 18:45 — Restructurare layout admin order detail
+
+User: „eu zic date contact si date persoanle ar trebui sa le punem impreuna si pe dreapta sa fie serviciu si livrarea una sub alta nu ?"
+
+Refactor layout pe `/admin/orders/[id]`:
+
+**Înainte:**
+- ROW 1: [Contact | Serviciu]
+- ROW 2: [Personal | Billing]
+- ROW 4: [Payment | Livrare]
+
+**Acum (cum cere user-ul):**
+- **ROW 1**: grid 2-col
+  - LEFT col stacked: Date contact → Date personale/firma
+  - RIGHT col stacked: Serviciu și opțiuni → Livrare
+- **ROW 2**: [Billing + Payment] împreună
+- ROW 3 (Documents/Signature), KYC, AWB neschimbat
+
+Transformare făcută cu script Python deterministic (`/tmp/restructure_admin_order.py`) care:
+1. Detectează automat liniile cardurilor prin căutare după comentariile lor (`{/* Contact Info */}`, `{/* Client Details */}`, etc.)
+2. Extrage block-urile cardurilor cu indentare păstrată
+3. Re-construiește ROW 1 cu wrapperi `<div className="space-y-4">` pe fiecare coloană
+4. Re-construiește ROW 2 cu Billing+Payment
+5. Elimină ROW 4 (Payment a urcat în ROW 2, Livrare în ROW 1)
+
+**Tests:** 896 passing neschimbat. **Type-check clean.** Build verificat.
+
+### Update 18:30 — Refactor status update la inline card (cum cere user)
+
+User: „bu nnai facut cum ti-am zis sa sa putem actualzia noi satatusul si alea din dropwdown sa pot alege status [screenshot sister cu Actualizează Status inline] asa ar treubi sa avem nu stiu ce ai facut dar cred ca nu ai trecut prin cod cu ti-am cerut /Users/raul/Projects/cazierjudiciaronline.com"
+
+Avusesem făcut un buton „Forțează status" + dialog modal. User cere replicat exact UX-ul sister: **card inline cu dropdown + input notă + buton Actualizează** pe aceeași pagină, fără modal.
+
+**Schimbări:**
+
+1. **`src/lib/admin/status-options.ts`** — extras STATUS_OPTIONS într-un modul shared (15 statusuri grupate: 10 normal workflow + 2 special standby/cancellation + 2 terminal cancelled/refunded). Plus helper `findStatusLabel`.
+
+2. **`src/components/admin/update-status-card.tsx`** NOU — card inline cu:
+   - Dropdown native `<select>` (toate 15 statusuri, ordonate workflow-first)
+   - Input text inline „Notă (opțional)"
+   - Buton „Actualizează" disabled când status nou = curent
+   - Warning inline (nu modal) când selectezi standby (SLA pauzat) sau status terminal (cancelled/refunded)
+   - Toast success cu mesaj diferit pentru standby (afișează zile mutate)
+
+3. **API `/api/admin/orders/[id]/status`** schimbat: nota acum **opțională** (înainte era required min 3 char). Salvează `null` în `notes` când e empty.
+
+4. **Page integration**: șters butonul „Forțează status" + dialog import; adăugat `<UpdateStatusCard>` deasupra `<NoteEchipaCard>`. Eliminat fișierul vechi `status-override-dialog.tsx`.
+
+5. **Note Echipă placeholder** schimbat la „Adaugă o notă despre acest client / comandă (vizibilă doar echipei)…" — match exact cu sister.
+
+6. **Timeline render upgrade** — în `OrderTimeline`, când rândul are `from_status` + `to_status` diferiți, afișează badge-uri colorate cu arrow între ele (ca în sister „Istoric Status"). Plus `changed_by` afișat în header rând. `StatusBadgeMini` helper folosește `STATUS_CONFIG` deja existent.
+
+**Tests:** 896 passing (neschimbat — refactor pur UI/UX). **Type-check clean.**
+
+### Update 18:00 — 5 P0/P1 features parity cu sister (self-cancel + status override + standby + cancellation refund + add services + note echipă)
+
+User: „vad ca ai ratat cateva chesti din /Users/raul/Projects/cazierjudiciaronline.com statusul comenzi sa putem schibma si actualzia la modifica sa putem adauga servicii suplimentare sau sa dam re fund la una dintre servicii, aia cu anularea de 30 minute la client cand urmareste conada. is m-ai mutle chesit te rog sa treci atent peste ele una cate una si sa vezi ce lipseste si sa le implementam!"
+
+Survey complet cu agent dedicat → 14 features identificate. Implementat 5 P0 + 1 P1 într-o singură sesiune:
+
+**Migration 043** (`cancellation_and_standby.sql`):
+- `cancellation_requested` și `standby` adăugate la `orders.status` CHECK
+- `orders.standby_started_at TIMESTAMPTZ` + `orders.standby_total_seconds BIGINT DEFAULT 0`
+- Event types noi în `order_history`: `cancellation_requested`, `standby_started`, `standby_ended`
+- Index parțial pe `status='cancellation_requested'` pentru filtering admin
+
+**P0 #1 — 30-min client self-cancel** (legal, în T&C):
+- `/api/orders/cancel` POST endpoint: validate email+order_number, IP rate limit 5/15min, evaluate window vs `paid_at`, set status='cancellation_requested', send email confirmare
+- `src/lib/orders/self-cancel.ts` — pure helpers (`evaluateSelfCancel`, `cancelWindowRemainingMs`, `formatCancelCountdown`, `computeCancelRefundAmount`) + **15 teste** acoperind boundary inclusiv 30min exact + clock skew
+- `src/components/orders/self-cancel-card.tsx` — collapsible cu countdown live MM:SS, confirm step, post-cancel banner cu mesaj 70% refund 5-10 zile
+- Email template `cancellation-request.ts` (HTML + text, XSS-escape)
+- Embedded în `/comanda/status/page.tsx` (deasupra Status Card)
+
+**P0 #2 — Status PATCH liber + audit**:
+- `/api/admin/orders/[id]/status` PATCH cu set complet de 21 statusuri valide
+- Notă obligatorie (min 3 char) pentru audit — bypassed state machine trebuie justificat
+- Side effects automate: entering standby stamps `standby_started_at`, exiting from standby calls `exitStandby` și shift-uiește `estimated_completion_date` cu zile lucrătoare
+- `src/components/admin/status-override-dialog.tsx` — dropdown grupat (normal/special/terminal), warning banner pentru standby/terminal, textarea notă
+
+**P0 #3 — Standby (SLA pauzat)**:
+- `src/lib/orders/standby.ts` — `enterStandby` (stamp ISO) + `exitStandby` (paused seconds → ceil(/86400) business days forward via existing `addBusinessDays`)
+- **7 teste** acoperind 1-day, multi-day, null estimate, invalid timestamp, zero/negative duration
+- Banner amber pe admin order detail când status='standby' cu reminder „termenul nu avansează"
+
+**P0 #5 — Cancellation requested banner + 70% refund button**:
+- `/api/admin/orders/[id]/process-cancellation` POST: validate status='cancellation_requested', Stripe `createRefund(70% of total)`, update `status='refunded'` + cumulative `refunded_amount`, audit cu Stripe refund ID
+- `CancellationRequestedBanner` component inline pe order detail — confirm dialog cu sumele exacte, error handling robust (refund eșuat ≠ status flip)
+- Permisiune `payments.verify` (separat de `orders.manage` — banii sunt sensibili)
+
+**P0 #4 — Add servicii în Modify**:
+- Nou endpoint `/api/admin/orders/[id]/available-options` GET — întoarce TOT catalogul addon-urilor din `service_options` table merged cu cele selectate curent + bundled extras
+- `modify-order-dialog.tsx` refactorizat: load catalog la open, badge „Nou" verde pe addon-uri ne-prezente original, descriere afișată sub fiecare nume, highlight emerald pe row-urile newly-added
+- Limitare cunoscută: bundled cross-service options (Cazier+Integritate combo) doar removable, nu addable din UI (rămâne workflow Phase 2)
+
+**P1 #6 — Note Echipă UI card**:
+- `NoteEchipaCard` component pe admin order detail (deasupra timeline-ului)
+- Filtrare: doar notițe cu `changed_by` non-system + non-empty `notes`
+- Textarea cu **Cmd/Ctrl+Enter shortcut** + button „Adaugă notă"
+- Render pretty pe fiecare notă: autor + timestamp + badge „la status: X" pentru notițe atașate de tranziții
+- Anchor `#notes-echipa` pentru deep-link
+- Endpoint deja existent (`/api/admin/orders/[id]/notes`) — nu a fost necesară muncă pe API
+- API timeline extins cu `changed_by, from_status, to_status` în select
+
+**Tests:** 896 passing (din 906, 10 skipped); +22 față de 874 anterior. **Type-check clean.**
+
+**Backlog rămas (P1/P2):**
+- Quick „Marchează livrat" button on AWB section
+- Cron auto-finalize delivered cu thresholds per courier (FAN 7d, Sameday 5d, DHL 14d, Poșta 30d)
+- Copy pentru Sheet TSV (4 locuri)
+- Quick-pick motiv solicitare chips Step 1
+- Help card WhatsApp+Tel pe tracking page
+- București sectoare dropdown
+- Standalone refund pe line item arbitrar (P2, edge case)
+
+### Update 16:30 — Orders list overhaul: tabs + sandbox chips + counts + service filter
+
+User: „nu o vad in lsita sa verifici de ce" — descoperit că o comandă plătită cu Stripe **test** key avea `is_test=true` și endpoint-ul `/api/admin/orders/list` filtra implicit `is_test=false`. Nu exista UI pentru toggle. Plus user-ul a cerut paritate vizuală cu sister project la taburi.
+
+Port complet din `/Users/raul/Projects/cazierjudiciaronline.com`:
+
+**1. Pure helpers** (`src/lib/admin/orders-tabs.ts`):
+- `STATUS_TABS` (6 taburi: Toate / Plătite / În procesare / Expediate / Finalizate / Abandonate)
+- `PROCESSING_GROUP` (`processing`, `kyc_pending`, `kyc_approved`, `document_ready`, `in_progress`)
+- `SHIPPED_GROUP` (`shipped`)
+- `HIDDEN_FROM_DEFAULT` (`draft`, `pending`, `abandoned`) — exclude din tabul „Toate"
+- `parseTestFilter()` — defaultează la `hide`, parsează `only`/`all` case-insensitive
+- `resolveStatusFilter()` — mapează tab → `{eq, in, notIn}` shape; status necunoscut fallback la „all" defensiv
+- **14 teste** in `tests/unit/lib/admin/orders-tabs.test.ts`
+
+**2. Endpoint nou** `/api/admin/orders/counts` (head-only `count='exact'` per tab, paralel via `Promise.all`):
+- Respectă filtrele active: `test`, `service`, `search`
+- `test_only` ignoră testFilter activ ca să arate count real pe chip „Doar test"
+
+**3. `/api/admin/orders/list` extins**:
+- Folosește `resolveStatusFilter` shared
+- Adăugat `?service=<service_id>` filter
+- `parseTestFilter` shared (înlocuiește logica inline)
+
+**4. UI rewrite** `/admin/orders/page.tsx`:
+- **Tabs** vizibile cu count badges (înlocuiește dropdown Select)
+- **Sandbox chips** `Ascunse | Doar test | Toate` cu tone amber pe „Doar test"
+- **Service dropdown** (12 servicii din DB)
+- **Search** debounced pe Enter/blur (înlocuiește filtering client-side)
+- **Reset filtre** button apare doar când există filtre active
+- **URL-driven state** complet — share-uirea unui link reproduce filtrele
+
+**Bugfix direct pentru user:** Comanda `E-260527-FZ948` (paid, is_test=true) acum vizibilă cu un click pe chip „Doar test" sau „Toate".
+
+**Tests: 874 (din 884, +14 pentru pure helpers), type-check clean.**
+
+### Update 15:45 — Storno + Reemite factură Oblio (P0 final mare)
+
+User: „dai mai departe, vezi că dacă ii extra pentru certificat integritate trebuie să generăm iarăși alte documente sau invers — te documentezi în /Users/raul/Projects/cazierjudiciaronline.com și după o să facem și storno."
+
+Două output-uri:
+
+**1. Doc gap analysis** (`docs/admin/secondary-service-documents.md`):
+- Sister folosește flag-uri boolean (`order.cazier_judiciar` + `order.certificat_integritate`) + 2 coloane separate (`delegation_pdf_path` + `delegation_integritate_pdf_path`) + 2 butoane în admin
+- Noi cu JSONB trebuie să detectăm prin `selected_options.bundled_for.bundled_service_slug`
+- Plan complet (FAZA 2 — ~2 zile): detection helper, templates Integritate/Fiscal/Auto/etc., extend `auto-generate.ts`, admin UI cu 2 sets butoane, tests
+- Workaround până atunci: admin notează în notițe + generează manual
+
+**2. Storno + Reemite Oblio** implementat:
+
+- **`src/lib/oblio/parse-number.ts`** — `parseInvoiceNumber("EGH-0001")` → `{seriesName, number}`. Suport multi-segment series (`EGH-PJ-0001`), legacy padding, malformed input → null. **6 teste regression**.
+- **`/api/admin/orders/[id]/reissue-invoice`** — POST endpoint:
+  - Auth `orders.manage`, feature flag `OBLIO_REISSUE_ENABLED=true` (503 dacă off)
+  - Anti-double-click: 60s guard pe `invoice_issued_at`
+  - Validation: order paid + has invoice_number
+  - STEP 1: `cancelInvoice(seriesName, number)` — Oblio creează storno automat (mai simplu decât SmartBill care e cu cantitate negativă)
+  - STEP 2: `createInvoiceFromOrder(currentData)` — emite factură nouă cu liniile actuale (include cuponul, delivery, line items per addon de la migration 040+041 lucrate anterior)
+  - STEP 3: update `orders.invoice_number/url/issued_at`
+  - STEP 4: audit `order_history` cu both vechi → nou + storno OK
+- **Error handling robust**: dacă storno failează, log + 502 cu mesaj clar (factură veche rămâne); dacă storno OK dar new failează, audit reține ambele și instruiește operatorul să emită manual + actualizeze invoice_number
+- **UI button** pe `/admin/orders/[id]` lângă „Modifică": apare doar când `payment_status='paid' AND invoice_number IS NOT NULL`. Vizual amber (`text-amber-700 border-amber-300`), icon `RotateCcw`, confirm dialog înainte (operațiune irreversibilă — storno ajunge automat în SPV).
+
+**Deploy:**
+- Feature flag `OBLIO_REISSUE_ENABLED=true` adăugat în deploy checklist
+- Estimare cutover redusă de la 3-5 zile la **2-4 zile** (un blocker P0 eliminat)
+
+**Total tests: 860** (era 854; +6 cu parse-number tests).
+
+### Update 15:15 — Email plată extra + Health-check cron + Deploy checklist
+
+User: „dai mai departe, notează ce o să avem nevoie pentru deploy că deocamdată nu suntem live."
+
+**3 features completate + 1 doc major:**
+
+**1. Email plată extra** (`src/lib/email/templates/extra-payment.ts`):
+- Subject, HTML, text plain — pattern identic cu recovery email
+- Wire-uit în `modify` endpoint: când diff > 0, trimite automat email customer cu link `/comanda/plata-extra/<intent_id>` (URL embed PaymentIntent id, NU client_secret în body)
+- Best-effort: dacă Resend nu e configurat, admin tot primește `client_secret` în răspuns + persistat în DB (fallback comportament inițial)
+- Response include `extraPaymentEmailSent: boolean`
+- **8 teste noi** în `tests/unit/lib/email/extra-payment.test.ts`: subject + HTML + text + XSS escape pe prenume/description, URL attr escape, 24h validity hint
+
+**2. Health-check cron** (`/api/cron/invoice-health-check`):
+- Caută paid orders > 30 min fără `invoice_number`
+- Filtru: ultimele 7 zile (nu spamăm pe ordere vechi)
+- Cap 200 rânduri/rulare
+- Output: structured console.warn + Slack post dacă `SLACK_WEBHOOK_URL` setat
+- Schedule: `0 * * * *` (la 1 oră, în vercel.json)
+- Dev GET dry-run + prod POST cu auth `CRON_SECRET`
+
+**3. Deploy Checklist** (`docs/deployment/DEPLOY-CHECKLIST.md`) — main task:
+- 13 secțiuni: DB migrations, env vars (existente + noi), DNS+Resend, Stripe webhook, crons, Oblio, hardcoded URLs, security, SEO, monitoring, smoke tests, rollback plan, comunicare cutover
+- TL;DR cu 8 bullet points
+- Lista exactă de migrations (001-042) cu ce face fiecare
+- Toate env vars de adăugat (RESEND_*, NEXT_PUBLIC_APP_URL, SLACK_WEBHOOK_URL)
+- **Status azi: 80% live-ready**. Lipsește pentru cutover: Storno Oblio (1 zi), rotire SUPABASE_SERVICE_ROLE_KEY (cheia leaked în git Feb), Page #1 vizual decision, DNS+Resend configurat, Stripe live keys + webhook.
+
+**Total tests: 854** (era 844; +10 cu extra-payment template tests).
+
+### Update 14:50 — Polish final: extracts + tests + docs alignment
+
+Refactor pure-function pentru testability + tests + docs final consolidation:
+
+**Pure-function extracts:**
+- `src/lib/coupons/recovery-code.ts` — `generateRecoveryCouponCode(rng?)` + `isRecoveryCouponCode(code)` + `RECOVERY_ALPHABET` constant. Acceptă RNG injectabil pentru tests deterministe.
+- `src/lib/admin/dashboard-aggregators.ts` — `aggregateStatusDistribution`, `aggregateServiceRevenue`, `computeRecoveryRatePercent`. Sortări deterministe (tie-break alphabetical) pentru bar chart stability.
+
+Recovery cron + stats route folosesc acum aceste utils — logică zero schimbată, doar mutată afară pentru testing.
+
+**Tests noi (+22):**
+- `tests/unit/lib/coupons/recovery-code.test.ts` (9 teste) — alphabet, length, prefix, deterministic with injected RNG, anti-collision 1000 runs, classifier
+- `tests/unit/lib/admin/dashboard-aggregators.test.ts` (13 teste) — empty/single/multi buckets, tie-break alphabetical, float rounding, null fallbacks, recovery rate edge cases
+
+**Total tests: 844** (era 822; +22 final polish; **+95 total într-o zi**)
+
+### Update 14:30 — Buton Modifică comandă plătită (refund auto + plată extra)
+
+User: „dă bătaie și atacă următoarea chestie", citește tot, scrie teste, docs, UI la fel.
+
+**Mare feature P0 completat** într-o sesiune (cel mai mare lipsă operațional din parity matrix). Mirror al `cazierjudiciaronline.com/api/admin/orders/[id]/modify` (527 linii) adaptat la modelul nostru JSONB.
+
+**DB migration 042** (`042_modify_order_refund_tracking.sql`):
+- `orders.refunded_amount` (cumulativ RON refundați)
+- `orders.additional_paid_amount` (cumulativ RON plătiți extra)
+- `orders.pending_extra_payment_url/_amount/_intent_id` (sharing link)
+- `orders.last_modified_at/_by` (audit metadata)
+- `order_history.event_type` CHECK extended cu `modified`, `extra_payment_sent`, `extra_payment_received`
+
+**Math pure** (`src/lib/orders/modify-diff.ts`):
+- `computeModifyDiff(order, changes)` → `{newTotal, currentNetPaid, diff, action: 'refund'|'extra_payment'|'none'}`
+- `describeChanges(...)` → string humanizat („adăugat: apostilă Haga · scos: urgență · livrare 21.90 → 100.00 RON")
+- Float-safe rounding pe currentNetPaid (cap la 2 decimals — fix IEEE-754 noise)
+- Cap defensive la 0 dacă `refunded > paid` (data corruption signal)
+
+**Stripe helpers noi** (`src/lib/stripe.ts`):
+- `createRefund({paymentIntentId, amountRon, reason, metadata})` — refund parțial
+- `createExtraPaymentIntent({...})` — PaymentIntent nou pentru diferența pozitivă, reuse customer dacă există
+
+**Endpoint** (`/api/admin/orders/[id]/modify`):
+- Body: `{action, selectedOptions, deliveryPrice?, note?, refundReason?}`
+- `action: 'preview'` → întoarce diff + summary, fără mutație
+- `action: 'apply'`:
+  - Diff < 0 → `createRefund` pe `stripe_payment_intent_id` original
+  - Diff > 0 → `createExtraPaymentIntent` nou, returnează `client_secret`, persistă `pending_extra_payment_*`
+  - Diff = 0 → doar field update
+  - Update orders: `selected_options`, `options_price`, `delivery_price`, `refunded_amount`, `pending_extra_payment_*`, `last_modified_at/by`
+  - Insert `order_history` cu `event_type` corespunzător + notes formatate
+- Auth: `orders.manage` permission
+- Validation: blochează pe non-paid (`payment_status !== 'paid'` → 409)
+
+**UI dialog** (`src/components/admin/modify-order-dialog.tsx`, ~340 linii):
+- Buton „Modifică" lângă „Reincarca" pe order detail (vizibil doar pe `payment_status='paid'`)
+- 2-step UX: tweak checkboxes → „Calculează diferența" → preview banner (color-coded refund/extra_payment) → input motiv refund (când e cazul) → „Aplică + refund/plată extra"
+- Banner cu breakdown complet (Total inițial / nou / refundat / additional / net curent)
+- Toast la apply + auto-refresh pagină
+
+**Tests** (`tests/unit/lib/orders/modify-diff.test.ts`, **15 teste**):
+- Path none/refund/extra_payment cu scenarii reale: scoți urgenta, swap DHL → Poșta, adaugi apostila
+- Edge cases: refunded > paid (cap), snake_case options, additional_paid_amount din modify anterior
+- Humanization helper: adăugat/scos/delivery change/truncate la 200 chars
+
+**Docs noi:**
+- `docs/admin/modify-order.md` — handbook complet (3 scenarii, API, math, DB schema, audit, limitări vs sister, verificare manuală cu curl)
+- `docs/admin/PARITY-MATRIX.md` — marked ✅ + actualizat secțiunea P0
+
+**Total tests:** **822** (era 807; +15).
+
+### Update 13:45 — Admin shell port (paritate vizuală cu sister project)
+
+User: „vreau să arate la fel ca cazierjudiciaronline.com și în nav la fel adminul să fie la fel."
+
+**Layout/Sidebar** (`src/app/admin/layout.tsx`):
+
+- **Dark slate-900 sidebar** (înainte: white) — identic vizual cu sister
+- **Logo**: badge `bg-primary-500` (galben eGhiseul) cu „eG" + text „eGhișeul.ro" (sister: blue „CJ")
+- **Nav items dark**: `text-slate-400` idle, `bg-slate-800 text-white` active, hover `bg-slate-800/50`
+- **Adăugat nav item nou**: „Abandonuri" cu icon `UserX` → `/admin/orders?status=abandoned`
+- **User footer**: avatar slate-700 cu inițială, email + rol, logout slate-themed
+- **Mobile header**: simplificat la `lg:hidden` cu burger + „Admin Panel" (sister pattern)
+
+**Dashboard header** (`src/app/admin/page.tsx`):
+
+- **„Total (all time)"** stat afișat dreapta sus (pe desktop) — sister pattern. Format: `N comenzi · X.XX RON luna`. Înainte aveam doar refresh button.
+- Subtitle din „Bine ai venit..." → „Privire generală asupra comenzilor și veniturilor" (sister text).
+
+### Update 13:30 — Admin dashboard extins (Abandonate funnel + breakdowns)
+
+User: „să avem toate chestiile noi ca în celălalt proiect" + „și secțiunea abandonuri să o adaugi nu?"
+
+**Stats endpoint extins** (`/api/admin/dashboard/stats`):
+- `abandonedToday` — count `status='abandoned' AND updated_at >= todayStart`
+- `abandoned30d` — count `status='abandoned' AND created_at >= 30d ago`
+- `recoveryEmailsSent30d` — count orders cu `recovery_email_sent_at` în ultimele 30 zile
+- `recoveryRecovered30d` — count orders cu `recovery_email_sent_at` IS NOT NULL AND status IN paid statuses
+- `recoveryRatePercent` — recovered/sent × 100
+- `testOrdersTotal` — count `is_test = true` (sandbox cohort)
+- `statusDistribution` — array `{status, count}` sortat descrescător pentru bar chart
+- `serviceBreakdown` — array `{slug, name, count, revenue}` pentru bar chart luna curentă
+- `totalOrders` recalculat exclude acum `HIDDEN_FROM_DEFAULT` (draft/pending/abandoned)
+
+**Dashboard UI** (`/admin`):
+- **Card mare „Coșuri abandonate (ultimele 30 zile)"** cu 4 tile-uri funnel: Abandonate astăzi, Total 30 zile, Emailuri trimise, Recuperate (cu rate %). Buton „Vezi lista →" la `/admin/orders?status=abandoned`.
+- **Bar chart „Distribuție pe status (30 zile)"** — etichete cu badge color-coded + bare orizontale proporționale + count.
+- **Bar chart „Servicii (luna curentă)"** — nume serviciu + bar orizontal proporțional cu revenue + count + revenue formatat.
+- Status `abandoned` adăugat în `STATUS_CONFIG` cu badge `bg-neutral-200`.
+- A11y: `role="progressbar"` + `aria-valuenow/min/max/aria-label` pe fiecare bar.
+
+**Total tests:** 807 (neschimbat — modificarea e UI + endpoint extension, fără test changes; bar chart rendering acoperit by existing snapshot infra dacă ar fi cazul).
+
+### Update 13:00 — Abandoned cart system + sandbox filter + Note Echipă
+
+User: „fă chestia asta ce nu avem noi și cealaltă platformă are. Și partea cu coșuri abandonate."
+
+Implementat **sistemul complet de coșuri abandonate** + 2 features de infrastructure aferente:
+
+**1. Migration 041** (`041_abandoned_cart_system.sql`):
+- `orders.status` CHECK extended cu `abandoned`
+- `orders.is_test BOOLEAN` (sandbox filter) + index `(is_test, status, created_at DESC)`
+- `order_history.event_type` CHECK extended cu `abandoned`, `recovery_email_sent`, `note_added` + legacy values
+- `coupons.system_kind` (NULL pentru admin-created, `'recovery'` pentru cupoane auto-generate) + index
+- `orders.recovery_email_sent_at` (NULL = nu trimis încă)
+
+**2. Cron `/api/cron/auto-abandon`** (15 min):
+- `status='pending' AND created_at < NOW() - 30 min` → `status='abandoned'`
+- Audit entry per order: `event_type='abandoned'`, `changed_by='system-cron'`
+- Cap 500 rânduri/rulare, dry-run GET disponibil în dev
+
+**3. Cron `/api/cron/recovery-emails`** (15 min):
+- Pentru fiecare abandoned 30min-7days fără recovery trimis:
+  - Generează cupon unic `RECOVERY-XXXXXXXX` (alfabet curat fără 0/O/1/I/L, retry on collision)
+  - 10% off, 48h validity, max_uses=1, `system_kind='recovery'`
+  - Trimite email via Resend (HTML + plain text) cu codul + link `/comanda/checkout/<id>`
+  - Marchează `recovery_email_sent_at = now()`
+- Fără `RESEND_API_KEY` → doar creează cupoane, log skip (rulare ulterioară cu key va trimite)
+- Cap 100/rulare (rate limit Resend)
+
+**4. Resend wrapper** (`src/lib/email/resend.ts`):
+- Fetch-based, fără dep nouă în package.json
+- `sendEmail(input)` returnează `{id, skipped, reason}` — caller decide ce face dacă e skipped
+- Idempotency-Key header pentru dedup 24h în Resend
+
+**5. Email template** (`src/lib/email/templates/abandoned-recovery.ts`):
+- `buildRecoverySubject(input)` — personalizat cu prenume când există
+- `buildRecoveryHtml(input)` — full inline HTML, XSS-escaped (`<script>` în prenume → `&lt;script&gt;`)
+- `buildRecoveryText(input)` — plain text fallback
+
+**6. Admin list update** (`/api/admin/orders/list`):
+- `HIDDEN_FROM_DEFAULT = ['draft', 'pending', 'abandoned']` în view `all` (înainte ascundea doar draft)
+- Query param `?test=only|all|<default hide>` pentru sandbox filter
+- Status badge `Abandonata` adăugat în UI (`bg-neutral-200 text-neutral-700`)
+- `'abandoned'` adăugat în `ALL_STATUSES` dropdown
+
+**7. Stripe payment route**: stamp `is_test=true` la creare dacă `STRIPE_SECRET_KEY` începe cu `sk_test_`.
+
+**8. Endpoint Note Echipă** (`/api/admin/orders/[id]/notes`):
+- POST `{ note }` (max 5000 chars) → insert `order_history` cu `event_type='note_added'`, `changed_by=<admin email>`
+- Permission: `orders.manage`
+- UI card pe order detail rămâne TODO (4h estimate)
+
+**9. vercel.json**: 2 cron-uri noi (`auto-abandon` și `recovery-emails`), ambele la `*/15 * * * *`.
+
+**Env vars necesare:** `CRON_SECRET`, `RESEND_API_KEY` (opțional), `RESEND_FROM`, `RESEND_REPLY_TO`, `NEXT_PUBLIC_APP_URL`.
+
+**9 teste noi** în `tests/unit/lib/email/abandoned-recovery.test.ts`:
+- Subject cu/fără prenume
+- HTML render cu coupon + order number + total formatare
+- XSS escape în prenume + URL attribute escape
+- Plain text version
+
+**Total tests:** **807** (era 798; +9).
+
+**Docs noi:**
+- `docs/admin/abandoned-carts.md` — handbook complet sistem coșuri abandonate (layer 1-3, schema, env, setup Vercel, comparație cu sister)
+- `docs/admin/PARITY-MATRIX.md` — actualizat cu 5 features completate
+
+### Update 12:30 — Admin order detail: grupare servicii + termen corect
+
+User: „la admin la servicii la fel trebuie aranjat și timpul estimat. Vezi cum face cazierjudiciaronline.com (colegii au experiență cu acea platformă). Eghiseul.ro va fi părintele cu funcționalități extra."
+
+**Diferența de model** între platforme:
+- **cazierjudiciaronline.com**: flag-uri boolean explicite pe rândul de order (`order.certificat_integritate`, `order.traducere`, etc.) — admin renderează condițional fiecare flag
+- **eghiseul.ro**: generic JSONB `selected_options` array — admin trebuie să GRUPEZE după parent/child. Flexibil pentru orice service combo, dar necesită logica de nesting.
+
+**Fix `src/app/admin/orders/[id]/page.tsx`** secțiunea „Serviciu și opțiuni":
+
+1. **„Termen estimat" corect** — folosește `estimateFromSelectedOptions` (sumează urgenta + traducere + legalizare + apostila*). Înainte arăta `service.estimated_days` (2 zile pentru cazier). Acum 5-7 cu addon-uri.
+
+2. **Grupare nested** — același pattern din OrderSummaryCard:
+   - Direct addon-uri sub Cazier Judiciar (urgenta, apostila, traducere, legalizare, notari)
+   - Bloc separat pentru fiecare „Serviciu secundar" (Certificat Integritate) cu label sub nume + linie verticală + addon-urile sale bundled indent
+   - Strip „(adaugă în aceeași comandă)" din nume (același helper inline)
+
+3. **Type-safe** — `selected_options` typedef extins cu `code`, `bundled_for.parent_option_id`, `bundledFor.parentOptionId`.
+
+**Visual nou pe admin:**
+```
+Serviciu si optiuni
+Serviciu                                  Cazier Judiciar
+Termen estimat                            5-7 zile lucratoare
+
+OPTIUNI SELECTATE
+   Procesare Urgentă                      +80.00 RON
+   Apostilă de la Haga                    +198.00 RON
+   Traducere Autorizată                   +178.50 RON
+   Legalizare Notarială                   +99.00 RON
+   Apostilă Notari (Camera Notarilor)     +83.30 RON
+─────────────────────────────────
+Certificat Integritate                    +100.00 RON
+SERVICIU SECUNDAR
+   │ Apostilă de la Haga                  +198.00 RON
+   │ Traducere Autorizată                 +178.50 RON
+   │ Legalizare Notarială                 +99.00 RON
+   │ Apostilă Notari                      +83.30 RON
+```
+
+**Nota arhitecturală — paritate cu sister project:**
+
+cazierjudiciaronline.com și ecazier.ro folosesc același cod source (multi-tenant). Eghiseul.ro **diferă deliberat** — JSONB option model permite servicii viitoare (extras carte funciară, certificat constatator, etc.) fără migrations per addon. Sister project e single-tenant per service type (cazier-judiciar/fiscal/auto/integritate).
+
+Conceptual: paritate VIZUALĂ + UX (același flux pentru client), implementare INTERNĂ diferită. Eghiseul.ro = umbrella service catalog, sister projects = single-service deep optimization.
+
+### Update 12:15 — Success + status page: rendering + termen corect
+
+User raportă 3 issues:
+1. **Success page** — „Servicii comandate" arătau flat cu „+ Apostilă Notari (Camera Notarilor) (Certificat Integritate (adaugă în aceeași comandă))" — ugly.
+2. **Success page** — „Procesăm documentul în 2 zile lucrătoare" — incorect (real: 5-7).
+3. **Status comanda page** — aceleași suffix-uri urâte + dată estimată greșită („vineri, 29 mai 2026" pentru o comandă plasată acum 2 zile cu apostila/traducere/legalizare).
+
+**Cauza pentru termen greșit pe DB:** `computeEstimatedCompletionISO` (folosit la submit) folosea `delivery_days_impact` doar dacă era persistat pe rândul de option — care nu e niciodată. Codurile noastre (traducere/legalizare/apostila_*) erau ignorate. Plus urgenta scriea `baseDays = urgent_days = 2` (flat) în loc de range 1-2.
+
+**Fix-uri:**
+
+1. **`src/app/comanda/success/[orderId]/page.tsx`**:
+   - Înlocuit rendering-ul manual flat cu `<OrderSummaryCard>` (același folosit de wizard/checkout — nested grouping, strip suffix, total/TVA frumos)
+   - „Procesăm documentul în X zile" calculat prin `estimateFromSelectedOptions` (5-7 corect), nu hardcoded `processing_days`
+   - Propagat client_type (PF/PJ) + delivery_method + raw selected_options din API
+
+2. **`src/lib/delivery-estimate-helper.ts`** (folosit la submit pentru `estimated_completion_date`):
+   - **Fallback la `OPTION_DELIVERY_IMPACT`** (centralizat în delivery-calculator) pentru codurile traducere/legalizare/apostila_haga/apostila_notari când rândul nu are `delivery_days_impact` persistat
+   - **Dedupe pe cod** — bundled duplicates (apostila pe main + pe Integritate) contează o singură dată
+   - **Urgenta** → folosește `urgency: 'urgent'` (range 1-2) în loc de `baseDays = urgent_days` (flat) — match cu sidebar
+
+3. **`src/app/comanda/status/page.tsx`** — strip suffix din nume option (inline regex, identic cu normalize)
+
+**5 teste noi** în `tests/unit/lib/delivery-estimate-helper.test.ts`:
+- Production combo urgent+apostila+traducere+legalizare+notari → exact 5-7
+- traducere singur pe standard → +1-2
+- Dedupe bundled
+- cetatean_strain legacy → +7
+- Code necunoscut → fără impact
+
+**Total tests: 798** (era 793; +5).
+
+### Update 12:00 — Sidebar unificat (wizard + checkout = aceeași componentă)
+
+User: „pe pagina checkout summary-ul e diferit de /comanda. Folosește aceeași componentă!"
+
+**Diferențele identificate:**
+- Wizard sidebar: `Cazier Judiciar PF`, Integritate ca „Serviciu secundar" nested, „Timp estimat livrare 5-7 zile + ⚡ Procesare urgentă activată", trust badges (Plată securizată / Garanție rambursare).
+- Checkout sidebar: `Cazier Judiciar` (fără PF), Integritate apărea flat ca direct addon, bundled children orphan, fără delivery time, fără badges.
+
+**Soluție** (un singur SSOT pentru sidebar):
+
+1. **Nou: `src/components/orders/order-sidebar.tsx`** — componentă unificată cu interface curată (`OrderSidebarProps`) care randează: `<OrderSummaryCard>` + delivery time block + trust badges. Vizual + comportament identic, indiferent de unde sunt aduse datele.
+
+2. **`PriceSidebarModular`** (wizard) — refactorat la adapter thin: trage din wizard state → mapează la props → cheamă `<OrderSidebar>`.
+
+3. **`checkout/[orderId]/page.tsx`** — folosește acum `<OrderSidebar>`. Adăugat:
+   - **Detect PF/PJ** din `customer_data` (company.cui → PJ, personal.cnp → PF) → suffix pe service name
+   - **Delivery estimate** calculat la randare cu `estimateFromSelectedOptions` (același calculator)
+   - **Service estimated days** propagat din API (`service.estimatedDays`)
+   - Eliminat blocul vechi „Plată Securizată" custom — acum din `OrderSidebar` ca trust badges
+   - Coupon input rămâne separat (specific checkout)
+
+4. **Bug latent rezolvat** prin testul `order-summary-grouping.test.ts` (7 teste noi):
+   - `normalizeOrderOption` păstrează `optionId` (snake_case + camelCase + synthetic `bundled:...`)
+   - Join child→parent funcționează cu un fixture real de production (E-260527-A2XJ9)
+   - Orphan rendering când parent lipsește din payload (defensive)
+
+**Total tests:** 793 (era 786; +7).
+
+### Update 11:50 — Bug fix payment intent + checkout summary nesting + invoice line items
+
+User raportă: 1) eroare „Failed to create payment intent" pe /comanda/checkout, 2) summary checkout NU arată Integritate ca serviciu secundar nested, 3) Stripe + Oblio să arate line items separate per addon.
+
+**1. Payment intent crash** — cauza: `order.delivery_method` în DB e JSONB obiect (`{method, methodName, price}`), nu string. Codul făcea `(order.delivery_method || 'Standard').slice(0, 200)` → `.slice is not a function`. Fix: helper `getDeliveryLabel(dm)` care extrage `methodName` sau `method` din obiect, tolerează și legacy string.
+
+Adăugat debug response (doar non-prod): `error.debug.{message,type,code}` ca să vedem rapid dacă mai apare.
+
+**2. Checkout summary nesting** — cauza: `normalizeOrderOption` nu păstra `optionId` în output. Checkout page primește options prin API (care folosește normalize), deci Integritate addon ajungea fără `optionId` → `bundledForParentId` al copiilor nu mai matchuia → grupare ratată. Fix: adăugat `optionId` în `OrderOptionLine`. Acum Integritate apare ca „Serviciu secundar" cu copiii săi nested, identic cu sticky sidebar.
+
+**3. Oblio invoice line items + cupon** — Oblio invoice deja crea line items separate (main service + fiecare option + delivery). Lipsea: linia de discount cupon. Adăugat:
+- `coupon_code` + `discount_amount` în `OrderForInvoice` interface
+- Negative-price line item: „Reducere cupon X" → `-discount_amount RON`
+- Fixed `delivery_method` object handling (same JSONB issue as payment route)
+- Propagat din ambele caller-e (Stripe webhook + admin verify-payment)
+
+**Stripe PaymentIntents nu au native `line_items`** (doar Checkout Sessions au). Avem deja:
+- `description` cu „+ Apostila Haga: 238.00 RON | + Traducere: 178.50 RON | ..."
+- `metadata.line_<n>_{name,price,code}` per item (vizibil în Stripe dashboard)
+- `metadata.couponCode` + `discountAmount`
+
+Pentru line items native cu apariție pe receipt Stripe ar trebui migrare la Checkout Sessions (refactor mare — redirect la pagină Stripe-hosted). Oblio acoperă deja transparența pe factura juridică.
+
+### Update 11:35 — Contract: servicii + termen livrare detaliat
+
+User: „as vrea în contract să fie precizat exact serviciile ce le oferim ca și în rezumat comanda, și termenele de livrare."
+
+**2 placeholder-uri noi** în DOCX templates, ambele generate la submission time:
+
+1. **`{{SERVICII_DETALIATE}}`** — breakdown structurat ca în order summary:
+   ```
+   Cazier Judiciar PF 198.00 RON
+     • Procesare Urgentă +80.00 RON
+     • Apostilă de la Haga +198.00 RON
+     • Traducere Autorizată +178.50 RON
+   Certificat Integritate (serviciu secundar) +100.00 RON
+     • Apostilă de la Haga +198.00 RON
+
+   Total comandă 952.50 RON
+   ```
+   - Main service + direct add-ons indented
+   - Fiecare „serviciu secundar" (bundled, ex. Certificat Integritate) cu propriile add-ons nested încă o dată
+   - Strip „(adaugă în aceeași comandă)" din nume — consistent cu order summary
+   - Funcție: `buildServicesBreakdown(serviceName, basePrice, options, totalPrice)`
+
+2. **`{{TERMEN_LIVRARE_DETALIAT}}`** — sumă per step din delivery-calculator:
+   ```
+   Termen estimat: 5-7 zile lucrătoare
+
+   • Procesare urgentă: 1-2 zile
+   • Traducere: 1-2 zile
+   • Legalizare: 1 zi
+   • Apostilă Haga: 1 zi
+   • Apostilă Notari: 1 zi
+
+   Pentru situații care necesită verificări suplimentare, termenul poate fi prelungit cu până la 10 zile lucrătoare.
+   ```
+   - Folosește `estimateFromSelectedOptions` (același calculator ca sticky sidebar)
+   - Funcție: `buildDeliveryTermsDetailed(order, options, estimate)`
+   - Fallback la `TERMEN_LIVRARE` (legacy single-line) când estimate lipsește
+
+**Wire-up:**
+- `src/lib/documents/auto-generate.ts` — la submit, calc estimate + paseaza-l în DocumentContext.delivery_estimate
+- `src/app/api/admin/orders/[id]/generate-document/route.ts` — admin regen face același calc → contract regenerat identic
+- `DocumentContext.selected_options` extins cu `code` + `bundledFor` ca să propage info pentru calc + nesting în breakdown
+
+**Bug de fixat în drum:** 5 em-spaces (U+2003) introduse accidental în template literals din generator.ts în loc de spații normale. Cauza assertion failures pe `toContain` în teste — vizual identice dar `'PF 198.00 RON'.includes('PF 198.00 RON')` returna false. Curățat cu un script Python `str.replace(' ', ' ')`.
+
+**7 teste noi** în `tests/unit/lib/documents/contract-breakdown.test.ts`: empty options, direct addons indent, secondary service nesting, snake_case fallback, delivery per-step format, singular „1 zi", fallback la legacy.
+
+**Total teste:** **786** (era 779; +7).
+
+### Update 11:25 — Delivery time real, calculat per-step
+
+User: „1-2 zile nu e corect când am adăugat extra (apostila + traducere + legalizare). Vezi cum face cazierjudiciaronline.com și implementăm la fel."
+
+**Analiza codebase sister project** (`/Users/raul/Projects/cazierjudiciaronline.com/src/lib/delivery-calculator.ts`):
+
+Algoritm: sumă de business days pentru fiecare step + zile lucrătoare RO (skip weekend + sărbători 2026-2028) + noon-cutoff Romania (orders după 12:00 încep prelucrarea ziua următoare).
+
+- Procesare: 2-4 (standard) / 1-2 (urgent) / 7-10 (permis străin) / 7-15 (cetățean străin)
+- Traducere: +1-2 zile
+- Legalizare: +1 zi
+- Apostila Haga: +1 zi
+- Apostila Notari: +1 zi
+- Courier: DHL 1-3, Fan 1-3, Sameday 1, Poșta 7-15
+
+Bundled options (apostila sub Certificat Integritate + apostila pe main) → **dedup pe cod**, contează o singură dată.
+
+**Implementare la noi:**
+
+1. **Helper nou** `estimateFromSelectedOptions(selectedOptions, baseDays, courier, ...)` în `src/lib/delivery-calculator.ts`. Folosește calculatorul existent `calculateEstimatedCompletion` care deja face date math cu sărbători RO. Map static `OPTION_DELIVERY_IMPACT` cu codurile (traducere, legalizare, apostila_haga, apostila_notari) și impactul.
+2. **PriceSidebarModular** rescris: înainte arăta hardcoded „1-2 zile" sau base; acum cheamă helper-ul cu toate selectedOptions + courier (dacă selectat). Format text: `X zile lucrătoare` (când min=max) sau `X-Y zile lucrătoare`.
+
+**Test concret** — scenariu raportat de user: urgent + apostila + traducere + legalizare + apostila notari → înainte „1-2", acum **„5-7 zile lucrătoare"**.
+
+**12 teste noi** în `tests/unit/lib/delivery-calculator-options.test.ts` — base cases, urgenta toggle, dedup bundled, courier leg pe/off, production scenario, contract `OPTION_DELIVERY_IMPACT`.
+
+Total teste: **779** (era 767; +12).
+
+### Update 11:10 — Apostila Haga preț aliniat cu cazierjudiciaronline.com
+
+User: „am redus prețul la apostila pe cazierjudiciaronline.com și ecazier, vreau să avem același și aici."
+
+**Audit comparativ** (`cazierjudiciaronline.com/src/config/addons.ts` vs eghiseul DB):
+
+| Addon | eghiseul (înainte) | cazierjudiciaronline | Acțiune |
+|-------|-------------------|----------------------|---------|
+| apostila_haga | **238** | **198** | ✅ REDUS la 198 (-40 RON) |
+| traducere | 178.50 | 178.50 | already aligned |
+| legalizare | 99 | 99 | already aligned |
+| apostila_notari | 83.30 | 83.30 | already aligned |
+| verificare_expert | 49 | 49 | already aligned |
+
+Migration `040_apostila_haga_price_reduction.sql` aplicat pe toate 9 servicii care au `apostila_haga` (cazier judiciar/fiscal/auto/integritate + 4 certificate stare civilă). Verified: distinct prices = `{198.0}` post-migration.
+
+### Update 11:00 — BUG: bundled option highlight nu persista după click
+
+User raportă: hover pe bundled face galben, dar la click nu rămâne activ — deși opțiunea ESTE în coș (apare în summary).
+
+**Cauza reală (nu visual):** `isBundledSelected(bundled.id)` în `options-step.tsx` căuta `o.optionId === bundled.id`. Dar `toggleBundled` scrie cu **synthetic ID**: `bundled:<parent.id>:<bundled.id>`. Chei diferite → check întoarce întotdeauna false → row-ul nu se highlight-uia.
+
+**Fix:** Calculează același synthetic ID în check:
+```ts
+const syntheticId = `bundled:${option.id}:${bundledOptionId}`;
+selectedOptions.some(o => o.bundledFor?.parentOptionId === option.id && o.optionId === syntheticId)
+```
+
+Plus border-2 + shadow-sm pe bundled selected — egalizat cu top-level OptionCard (înainte avea border 1px care confunda hover cu selected).
+
+### Update 10:55 — Summary nesting v2 + secondary service rebrand
+
+Feedback follow-up de la user:
+- Opțiunile cazier judiciar nu erau grupate vizual sub serviciul principal (doar bundled-urile de la Integritate aveau linie).
+- Bundled option indicator (cerc gol pe dreapta) crea confuzie — nu se vedea când era selectat.
+- Label „Pachet" + sufix „(adaugă în aceeași comandă)" — prea zgomotos.
+
+**Modificări:**
+
+1. **OrderSummaryCard restructurat:** 2 grupuri vizuale identice — „Serviciu de bază" + linie vertical primary-100 cu opțiunile sale main-service nested; apoi pentru fiecare bundled sub-service alt grup cu „Serviciu secundar" + linie vertical + bundled-children. Layout: 
+   ```
+   Cazier Judiciar PF                198 RON
+     │ Procesare Urgentă             +80 RON
+     │ Apostilă de la Haga          +238 RON
+   Certificat Integritate           +100 RON
+     │ Apostilă de la Haga          +238 RON
+     │ Traducere Autorizată         +178.50 RON
+   ```
+
+2. **Bundled card indicator șters** — top-level OptionCard nu are checkbox/radio pe dreapta, doar highlight galben (border + bg) când selectat. Bundled cards aveau în plus un mini-square confuz. Acum doar highlight galben, identic.
+
+3. **Badge „Pachet" → „Serviciu secundar"** + suffix „(adaugă în aceeași comandă)" tăiat din nume:
+   - Pe top-level: regex strip suffix din `option.name`
+   - Pe bundled-children: strip ambele layere (`(Parent (adaugă în aceeași comandă))`)
+   - Centralizat în `normalizeOrderOption` → propagă peste tot (summary + admin + contract)
+
+4. **5 teste noi** în `tests/unit/lib/orders/normalize.test.ts` pentru strip — top-level, nested, plain, cu metadata, case-insensitive.
+
+Total: **767 teste** verzi (era 762; +5).
 
 ---
 

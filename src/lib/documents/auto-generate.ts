@@ -119,8 +119,11 @@ export async function autoGenerateOrderDocuments(
     company_reg: company.registrationNumber || '',
     company_address: formatAddress(company.address) || billing.companyAddress || '',
     is_pj: isPJ,
-    father_name: personal.fatherName || '',
-    mother_name: personal.motherName || '',
+    // Step 2 (cazier judiciar PF) no longer collects parent names since
+    // 2026-05-27. The DOCX template still references them, so fall back to
+    // "-" to print a clean dash on the cerere instead of an empty line.
+    father_name: personal.fatherName || '-',
+    mother_name: personal.motherName || '-',
     previous_name: personal.previousName || '',
     birth_date: personal.birthDate || '',
     birth_county: personal.birthPlace || personal.birthCounty || '',
@@ -141,9 +144,35 @@ export async function autoGenerateOrderDocuments(
   };
 
   // Extract selected options from order
-  const selectedOptions = (order.selected_options as Array<{ option_id?: string; option_name?: string; optionName?: string; quantity?: number; price_modifier?: number; priceModifier?: number }>) || [];
+  const selectedOptions = (order.selected_options as Array<{ option_id?: string; option_name?: string; optionName?: string; code?: string; quantity?: number; price_modifier?: number; priceModifier?: number; bundledFor?: { parentOptionId?: string } | null; bundled_for?: { parent_option_id?: string } | null }>) || [];
 
   const serviceSlug = order.services?.slug || 'cazier-judiciar';
+
+  // Compute the per-step delivery breakdown so the contract template can show
+  // a real timeline (e.g. "5-7 zile lucrătoare" instead of just "2-4"). The
+  // helper dedupes bundled add-ons that share the parent's processing slot.
+  const deliveryEstimate = (() => {
+    try {
+      const baseDays = order.services?.estimated_days ?? undefined;
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { estimateFromSelectedOptions } = require('@/lib/delivery-calculator') as typeof import('@/lib/delivery-calculator');
+      return estimateFromSelectedOptions({
+        selectedOptions: selectedOptions.map((o) => ({
+          code: o.code ?? null,
+          optionName: o.option_name || o.optionName,
+          bundledFor: o.bundledFor ?? (o.bundled_for ? { parentOptionId: o.bundled_for.parent_option_id } : null),
+        })),
+        baseDays,
+        // The contract is generated at submission time, BEFORE the order
+        // ships, so we include the courier leg when known.
+        courier: (cd.delivery as { method?: string } | undefined)?.method ?? null,
+        orderDate: order.created_at ? new Date(order.created_at) : undefined,
+      });
+    } catch (err) {
+      console.warn('[auto-generate] delivery estimate failed:', err);
+      return null;
+    }
+  })();
 
   // Get client signature from S3 (new) or inline base64 (legacy)
   const clientSignatureBase64 = await getClientSignatureBase64(cd);
@@ -235,6 +264,13 @@ export async function autoGenerateOrderDocuments(
           estimated_completion_date: order.estimated_completion_date ?? null,
         },
         selected_options: selectedOptions,
+        delivery_estimate: deliveryEstimate
+          ? {
+              minDays: deliveryEstimate.minDays,
+              maxDays: deliveryEstimate.maxDays,
+              breakdown: deliveryEstimate.breakdown,
+            }
+          : null,
         document_numbers: documentNumbers,
         motiv_solicitare: 'Interes personal',
         client_ip: clientIp,

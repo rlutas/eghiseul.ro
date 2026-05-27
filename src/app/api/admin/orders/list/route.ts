@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { requirePermission } from '@/lib/admin/permissions';
+import { parseTestFilter, resolveStatusFilter } from '@/lib/admin/orders-tabs';
 
 /**
  * GET /api/admin/orders/list - List all orders (for admin)
@@ -41,8 +42,14 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const status = searchParams.get('status') || 'all';
     const search = searchParams.get('search') || '';
+    const service = searchParams.get('service') || '';
     const page = parseInt(searchParams.get('page') || '0', 10);
     const limit = parseInt(searchParams.get('limit') || '25', 10);
+    // Sandbox/test filter (parity with cazierjudiciaronline.com):
+    //   ?test=only → only test orders (Stripe test-mode)
+    //   ?test=all  → both test + live
+    //   anything else (default = "hide") → live only (is_test=false)
+    const testFilter = parseTestFilter(searchParams.get('test'));
 
     // Build query
     let query = adminClient
@@ -60,6 +67,7 @@ export async function GET(request: NextRequest) {
         courier_service,
         delivery_tracking_number,
         delivery_method,
+        is_test,
         customer_data,
         created_at,
         services(name, slug)
@@ -69,12 +77,32 @@ export async function GET(request: NextRequest) {
       .order('created_at', { ascending: false })
       .range(page * limit, (page + 1) * limit - 1);
 
-    // Apply status filter: 'all' excludes drafts (customer-side abandoned carts);
-    // an explicit status param can still target any value including 'draft'.
-    if (status && status !== 'all') {
-      query = query.eq('status', status);
-    } else {
-      query = query.neq('status', 'draft');
+    // Apply status filter via the shared resolver — supports tab values
+    // (paid/processing/shipped/completed/abandoned) plus the all + debug
+    // statuses (draft/pending/etc).
+    const statusShape = resolveStatusFilter(status);
+    if (statusShape.eq) {
+      query = query.eq('status', statusShape.eq);
+    } else if (statusShape.in) {
+      query = query.filter('status', 'in', `(${statusShape.in.map((s) => `"${s}"`).join(',')})`);
+    } else if (statusShape.notIn) {
+      query = query.not('status', 'in', `(${statusShape.notIn.map((s) => `"${s}"`).join(',')})`);
+    }
+
+    // Sandbox/test filter — three-state chip group: hide | only | all.
+    if (testFilter === 'only') {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      query = (query as any).eq('is_test', true);
+    } else if (testFilter === 'hide') {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      query = (query as any).eq('is_test', false);
+    }
+    // 'all' → no filter
+
+    // Service filter — exact match on service_id (UUID). The UI passes the
+    // service id from the services dropdown.
+    if (service) {
+      query = query.eq('service_id', service);
     }
 
     // Apply search filter (server-side)

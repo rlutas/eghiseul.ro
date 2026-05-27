@@ -60,7 +60,7 @@ export async function GET(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: history } = await (adminClient as any)
       .from('order_history')
-      .select('id, event_type, notes, new_value, created_at')
+      .select('id, event_type, notes, new_value, created_at, changed_by, from_status, to_status')
       .eq('order_id', orderId)
       .order('created_at', { ascending: true });
 

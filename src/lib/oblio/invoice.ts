@@ -51,8 +51,16 @@ interface OrderForInvoice {
   // handles wizard camelCase, DB snake_case, and legacy {name, price}.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   selected_options?: any[];
-  delivery_method?: string;
+  // delivery_method may be a string (legacy) or an object `{method,methodName,price,...}`
+  // (current shape stored as JSONB) — the renderer handles both.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  delivery_method?: any;
   delivery_price?: number;
+  /** Coupon code applied at checkout — used as the discount line item name. */
+  coupon_code?: string | null;
+  /** Discount amount in RON. Rendered as a negative-price line so the
+   *  invoice total matches the charged amount. */
+  discount_amount?: number | null;
   customer_data?: {
     contact?: {
       firstName?: string;
@@ -167,11 +175,45 @@ export async function createInvoiceFromOrder(
     });
   }
 
-  // Add delivery as separate line item if applicable
+  // Add delivery as separate line item if applicable.
+  // `delivery_method` is a JSONB blob in the DB (often `{method, methodName,
+  // price, ...}`); we normalize both shapes here for a clean line.
+  const deliveryLabel = (() => {
+    const dm = order.delivery_method;
+    if (!dm) return 'Standard';
+    if (typeof dm === 'string') return dm;
+    if (typeof dm === 'object' && dm !== null) {
+      const obj = dm as Record<string, unknown>;
+      return String(obj.methodName ?? obj.method ?? 'Standard');
+    }
+    return 'Standard';
+  })();
   if (order.delivery_price && order.delivery_price > 0) {
     products.push({
-      name: `Livrare: ${order.delivery_method || 'Standard'}`,
+      name: `Livrare: ${deliveryLabel}`,
       price: order.delivery_price,
+      measuringUnit: 'buc',
+      currency: 'RON',
+      vatPercentage: RO_VAT_RATE,
+      vatIncluded: true,
+      quantity: 1,
+      productType: 'Serviciu',
+    });
+  }
+
+  // Add coupon discount as a negative-price line item so the invoice shows
+  // the reduction transparently (Oblio displays it as "Reducere cupon" with
+  // a minus). The total still matches `order.total_price` (post-discount).
+  if (
+    typeof order.discount_amount === 'number' &&
+    order.discount_amount > 0
+  ) {
+    products.push({
+      name: order.coupon_code
+        ? `Reducere cupon ${order.coupon_code}`
+        : 'Reducere aplicată',
+      code: order.coupon_code || undefined,
+      price: -Math.abs(order.discount_amount),
       measuringUnit: 'buc',
       currency: 'RON',
       vatPercentage: RO_VAT_RATE,

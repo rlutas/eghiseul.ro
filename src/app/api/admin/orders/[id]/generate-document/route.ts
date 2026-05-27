@@ -120,8 +120,12 @@ export async function POST(
       company_reg: company.registrationNumber || '',
       company_address: formatAddress(company.address) || billing.companyAddress || '',
       is_pj: isPJ,
-      father_name: personal.fatherName || '',
-      mother_name: personal.motherName || '',
+      // Step 2 (cazier judiciar PF) no longer asks for parent names since
+      // 2026-05-27 — the official cerere template still has those fields
+      // though. Fill with "-" so the printed form shows a clean dash instead
+      // of an empty line that an inspector might mistake for missing data.
+      father_name: personal.fatherName || '-',
+      mother_name: personal.motherName || '-',
       previous_name: personal.previousName || '',
       birth_date: personal.birthDate || '',
       birth_county: personal.birthPlace || personal.birthCounty || '',
@@ -142,7 +146,30 @@ export async function POST(
     };
 
     // Extract selected options from order
-    const selectedOptions = (order.selected_options as Array<{ option_id?: string; option_name?: string; optionName?: string; quantity?: number; price_modifier?: number; priceModifier?: number }>) || [];
+    const selectedOptions = (order.selected_options as Array<{ option_id?: string; option_name?: string; optionName?: string; code?: string; quantity?: number; price_modifier?: number; priceModifier?: number; bundledFor?: { parentOptionId?: string } | null; bundled_for?: { parent_option_id?: string } | null }>) || [];
+
+    // Per-step delivery breakdown for the contract — same helper used at
+    // submission time so admin-triggered regeneration produces identical
+    // wording. Hidden behind a try/catch because the calculator is optional;
+    // legacy services without a baseDays still get the fallback term text.
+    const deliveryEstimate = (() => {
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const { estimateFromSelectedOptions } = require('@/lib/delivery-calculator') as typeof import('@/lib/delivery-calculator');
+        return estimateFromSelectedOptions({
+          selectedOptions: selectedOptions.map((o) => ({
+            code: o.code ?? null,
+            optionName: o.option_name || o.optionName,
+            bundledFor: o.bundledFor ?? (o.bundled_for ? { parentOptionId: o.bundled_for.parent_option_id } : null),
+          })),
+          baseDays: order.services?.estimated_days ?? undefined,
+          courier: (cd.delivery as { method?: string } | undefined)?.method ?? null,
+          orderDate: order.created_at ? new Date(order.created_at) : undefined,
+        });
+      } catch {
+        return null;
+      }
+    })();
 
     // Allocate document numbers via number_registry system
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -268,6 +295,13 @@ export async function POST(
         estimated_completion_date: order.estimated_completion_date ?? null,
       },
       selected_options: selectedOptions,
+      delivery_estimate: deliveryEstimate
+        ? {
+            minDays: deliveryEstimate.minDays,
+            maxDays: deliveryEstimate.maxDays,
+            breakdown: deliveryEstimate.breakdown,
+          }
+        : null,
       document_numbers: documentNumbers,
       motiv_solicitare: body.motiv_solicitare || 'Interes personal',
       client_ip: cd.signature_metadata?.ip_address || 'N/A',

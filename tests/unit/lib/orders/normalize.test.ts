@@ -103,6 +103,57 @@ describe('normalizeOrderOption', () => {
   });
 });
 
+describe('normalizeOrderOption — strip secondary-service marketing suffix (2026-05-27)', () => {
+  // Cross-service add-ons in the catalog carry a marketing parenthetical
+  // ("(adaugă în aceeași comandă)") so users know what they're picking in
+  // the options grid. The normalizer trims it everywhere downstream — the
+  // suffix is noise in the order summary, the contract, and the admin view.
+
+  it('strips the top-level parenthetical from a sub-service name', () => {
+    const o = normalizeOrderOption({
+      option_name: 'Certificat Integritate (adaugă în aceeași comandă)',
+      price_modifier: 100,
+    });
+    expect(o.name).toBe('Certificat Integritate');
+  });
+
+  it('strips the nested parent wrapper from a bundled child name', () => {
+    // Real DB shape: bundled-child rows append the parent's display name in
+    // parens AROUND the marketing suffix. Both layers go.
+    const o = normalizeOrderOption({
+      option_name: 'Apostila de la Haga (Certificat Integritate (adaugă în aceeași comandă))',
+      price_modifier: 238,
+    });
+    expect(o.name).toBe('Apostila de la Haga');
+  });
+
+  it('leaves plain names alone (no parenthetical = no change)', () => {
+    expect(
+      normalizeOrderOption({ option_name: 'Procesare Urgentă', price_modifier: 80 }).name
+    ).toBe('Procesare Urgentă');
+  });
+
+  it('preserves metadata after stripping the marketing suffix', () => {
+    // Strip runs before metadata is appended, so the country/language
+    // annotation still renders correctly.
+    const o = normalizeOrderOption({
+      option_name: 'Apostilă de la Haga (adaugă în aceeași comandă)',
+      price_modifier: 238,
+      metadata: { country: 'Argentina' },
+    });
+    expect(o.name).toBe('Apostilă de la Haga — Argentina');
+  });
+
+  it('is case-insensitive on the marketing string', () => {
+    // Some catalog rows use slightly different casing.
+    const o = normalizeOrderOption({
+      option_name: 'X (Adaugă în Aceeași Comandă)',
+      price_modifier: 50,
+    });
+    expect(o.name).toBe('X');
+  });
+});
+
 describe('normalizeOrderOptions', () => {
   it('filters out zero-price options by default', () => {
     const list = normalizeOrderOptions([

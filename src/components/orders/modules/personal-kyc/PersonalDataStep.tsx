@@ -44,6 +44,7 @@ import { getCountriesForForeignType } from '@/config/countries';
 import { validateCNP, summarizeCNP } from '@/lib/validations/cnp';
 import { cn } from '@/lib/utils';
 import { COUNTY_NAMES, getLocalitiesForCounty, getCountyName, findCounty } from '@/lib/data/romania-counties';
+import { fuzzyMatchLocality } from '@/lib/data/locality-fuzzy-match';
 import { compressImage } from '@/lib/images/compress';
 import { randomId } from '@/lib/random-id';
 
@@ -177,6 +178,17 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
     isForeignCitizen ? 'manual' : hasExistingData ? 'scan' : 'choice'
   );
 
+  // In scan mode we hide the WHOLE form (CNP, serie/număr, nume, prenume,
+  // birthDate, birthPlace, expiry). The customer only sees:
+  //   1. The scan upload zones (CI față / verso)
+  //   2. After a successful scan: the green "Date extrase" summary card —
+  //      read-only, no inputs.
+  // Rationale: removes Step 2 friction entirely. OCR fills state silently;
+  // if Gemini misreads anything the operator corrects it from
+  // /admin/orders/[id] (matches cazierjudiciaronline.com behavior).
+  // Manual mode keeps the full form so the customer can type everything.
+  const hideExtractedFields = mode === 'scan';
+
   // Helper function to clean locality names from prefixes (sat, com., comună, etc.)
   const cleanLocalityName = useCallback((name: string): string => {
     if (!name) return name;
@@ -247,6 +259,15 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
         cityName = `București, Sector ${addr.sector}`;
       } else {
         cityName = cleanLocalityName(cityName);
+        // Canonicalize against the official locality list — fixes the most
+        // common OCR mistake on Romanian diacritics (e.g. "Băbăcești" ←
+        // misread "ș" — gets fuzzy-matched to "Băbășești" from the SM list).
+        // No-op when the input is already canonical or county is unknown.
+        const fuzzy = fuzzyMatchLocality(cityName, addr.county || addressUpdates.county);
+        if (fuzzy.kind !== 'none' && fuzzy.canonical !== cityName) {
+          console.log('Locality fuzzy-matched:', cityName, '→', fuzzy.canonical, `(${fuzzy.kind}, distance=${fuzzy.distance})`);
+          cityName = fuzzy.canonical;
+        }
         console.log('City cleaned:', addr.city, '→', cityName);
       }
       addressUpdates.city = cityName;
@@ -362,12 +383,26 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
       if (ocr?.success && ocr.confidence >= 50) {
         const extracted = ocr.extractedData;
 
+        // OCR sometimes can't read the birth date on the CI (glare, low res).
+        // The CNP already encodes it, so derive when OCR returned null.
+        // Without this fallback isFormValid() blocks "Continuă" because
+        // birthDate is required.
+        let birthDateValue = convertDateFormat(extracted.birthDate) || personalKyc?.birthDate || '';
+        if (!birthDateValue) {
+          const cnpForDerive = extracted.cnp || personalKyc?.cnp || '';
+          const cnpRes = validateCNP(cnpForDerive);
+          if (cnpRes.valid && cnpRes.data) {
+            const d = cnpRes.data.birthDate;
+            birthDateValue = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+          }
+        }
+
         // Update state with extracted data
         updatePersonalKyc({
           firstName: extracted.firstName || personalKyc?.firstName || '',
           lastName: extracted.lastName || personalKyc?.lastName || '',
           cnp: extracted.cnp || personalKyc?.cnp || '',
-          birthDate: convertDateFormat(extracted.birthDate) || personalKyc?.birthDate || '',
+          birthDate: birthDateValue,
           birthPlace: extracted.birthPlace || personalKyc?.birthPlace || '',
           documentSeries: extracted.series || personalKyc?.documentSeries || '',
           documentNumber: extracted.number || personalKyc?.documentNumber || '',
@@ -552,6 +587,22 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
       setLocalities(countyLocalities);
     }
   }, [personalKyc?.address?.county]);
+
+  // Auto-derive birthDate from CNP whenever it's missing but the CNP is valid.
+  // Covers cases where: (a) OCR couldn't read the date from a glary photo,
+  // (b) the user resumes a draft saved before this auto-derive existed,
+  // (c) the user typed CNP via paste/autocomplete without a key event.
+  // The CNP encodes day+month+year+sex+county — birthDate is fully derivable.
+  useEffect(() => {
+    if (!personalKyc || personalKyc.birthDate) return;
+    const cnpRes = validateCNP(personalKyc.cnp || '');
+    if (!cnpRes.valid || !cnpRes.data) return;
+    const d = cnpRes.data.birthDate;
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    updatePersonalKyc({ birthDate: `${yyyy}-${mm}-${dd}` });
+  }, [personalKyc, updatePersonalKyc]);
 
   // Sync citizenship from step 1 (contact) → personal-kyc citizenship.
   // The dedicated <Select> for citizenship was removed from this step; the
@@ -1058,11 +1109,17 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
 
       {/* CNP Section */}
       <div className="space-y-4">
+        {/* "Identificare" header + CNP input — hidden in scan mode.
+            OCR fills CNP into state silently; the read-only summary card below
+            surfaces the result. Manual mode keeps the full input visible. */}
+        {!hideExtractedFields && (
         <div className="flex items-center gap-2 text-secondary-900">
           <CreditCard className="h-5 w-5 text-primary-500" />
           <h3 className="font-semibold">Identificare</h3>
         </div>
+        )}
 
+        {!hideExtractedFields && (
         <div className="space-y-2">
           <Label htmlFor="cnp" className="text-secondary-900 font-medium">
             CNP (Cod Numeric Personal){' '}
@@ -1100,6 +1157,14 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
               {cnpValidation.errors[0]}
             </p>
           )}
+        </div>
+        )}
+
+        {/* "Date extrase" summary card — renders whenever the CNP is valid.
+            In manual mode it appears under the CNP input; in scan mode it
+            appears after a successful scan as the SOLE proof to the customer
+            that their data was captured. */}
+        <div className="space-y-2">
           {cnpValidation.valid && personalKyc.cnp.length === 13 && (() => {
             const summary = summarizeCNP(personalKyc.cnp);
             if (!summary) {
@@ -1110,36 +1175,69 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
                 </p>
               );
             }
+            // Combine CNP-derived județ with OCR-extracted localitate
+            // (e.g. "Mun. Urziceni" from CI + "Ialomița" from CNP code 21).
+            // When OCR didn't run (manual mode pre-fill, or scan still pending)
+            // we show only the județ. Strip any "Jud. XX " prefix the OCR may
+            // have included so we don't end up with "Jud. IL Mun. Urziceni".
+            const ocrLocality = (personalKyc.birthPlace || '')
+              .replace(/^Jud\.\s*[A-ZĂÂÎȘȚ]{1,3}\s*/i, '')
+              .replace(/^Județ\s+[A-ZĂÂÎȘȚa-zăâîșț]+\s*/i, '')
+              .trim();
+            const fullName = [personalKyc.lastName, personalKyc.firstName]
+              .filter(Boolean)
+              .join(' ')
+              .trim();
             return (
-              <div className="rounded-lg border border-green-200 bg-green-50 px-3 py-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
-                <span className="flex items-center gap-1 text-green-700 font-medium">
+              <div className="rounded-lg border border-green-200 bg-green-50 px-3 py-2.5 text-sm space-y-1.5">
+                <div className="flex items-center gap-1 text-green-700 font-medium">
                   <CheckCircle className="h-4 w-4" />
-                  Date extrase din CNP:
-                </span>
-                <span className="inline-flex items-center gap-1.5 text-green-800">
-                  <Calendar className="h-3.5 w-3.5 text-green-600" />
-                  <span className="font-medium tabular-nums">{summary.birthDate}</span>
-                </span>
-                <span className="text-green-300">•</span>
-                <span className="text-green-800 font-medium">{summary.gender}</span>
-                {summary.county && (
-                  <>
-                    <span className="text-green-300">•</span>
-                    <span className="text-green-800">
-                      Jud. <span className="font-medium">{summary.county}</span>
-                    </span>
-                  </>
+                  Date extrase{fullName ? '' : ' din CNP'}:
+                </div>
+                {fullName && (
+                  <div className="text-green-900 font-semibold text-base leading-tight">
+                    {fullName}
+                  </div>
                 )}
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                  <span className="inline-flex items-center gap-1.5 text-green-800">
+                    <Calendar className="h-3.5 w-3.5 text-green-600" />
+                    <span className="font-medium tabular-nums">{summary.birthDate}</span>
+                  </span>
+                  <span className="text-green-300">•</span>
+                  <span className="text-green-800 font-medium">{summary.gender}</span>
+                  {(ocrLocality || summary.county) && (
+                    <>
+                      <span className="text-green-300">•</span>
+                      <span className="text-green-800 inline-flex items-center gap-1">
+                        <MapPin className="h-3.5 w-3.5 text-green-600" />
+                        {ocrLocality && (
+                          <span className="font-medium">{ocrLocality}</span>
+                        )}
+                        {ocrLocality && summary.county && <span>,</span>}
+                        {summary.county && (
+                          <span>
+                            Jud. <span className="font-medium">{summary.county}</span>
+                          </span>
+                        )}
+                      </span>
+                    </>
+                  )}
+                </div>
               </div>
             );
           })()}
-          <p className="text-sm text-neutral-500 flex items-start gap-1">
-            <Info className="h-4 w-4 mt-0.5 flex-shrink-0" />
-            CNP-ul se găsește pe cartea de identitate
-          </p>
+          {!hideExtractedFields && (
+            <p className="text-sm text-neutral-500 flex items-start gap-1">
+              <Info className="h-4 w-4 mt-0.5 flex-shrink-0" />
+              CNP-ul se găsește pe cartea de identitate
+            </p>
+          )}
         </div>
 
-        {/* Document Series and Number */}
+        {/* Document Series and Number — hidden in scan mode
+            (OCR populated them; admin corrects if needed). */}
+        {!hideExtractedFields && (
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="docSeries" className="text-secondary-900 font-medium">
@@ -1171,9 +1269,12 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
             />
           </div>
         </div>
+        )}
       </div>
 
-      {/* Personal Info Section */}
+      {/* Personal Info Section — hidden after successful scan; OCR fills it
+          silently and admin verifies/corrects from the order detail page. */}
+      {!hideExtractedFields && (
       <div className="space-y-4">
         <div className="flex items-center gap-2 text-secondary-900">
           <User className="h-5 w-5 text-primary-500" />
@@ -1304,8 +1405,20 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
           </div>
         )}
       </div>
+      )}
+      {/* /Personal Info Section */}
 
-      {/* Address Section */}
+      {/* Address Section
+          Hidden entirely when the service config says
+          requireAddressCertificate === 'never' AND citizenship === 'romanian'.
+          Romanian citizens fall under this rule for services that don't need
+          the domiciliu on the official form (e.g. cazier judiciar, migration
+          039). Foreign citizens always see the section because we still need
+          either a Romanian or a foreign address for the order. */}
+      {!(
+        config?.requireAddressCertificate === 'never' &&
+        personalKyc.citizenship === 'romanian'
+      ) && (
       <div className="space-y-4">
         <div className="flex items-center gap-2 text-secondary-900">
           <MapPin className="h-5 w-5 text-primary-500" />
@@ -1616,6 +1729,7 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
         </>
         )}
       </div>
+      )}
       {/* /Address Section */}
 
       {/* Security Info Box */}

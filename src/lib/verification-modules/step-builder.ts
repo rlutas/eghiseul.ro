@@ -240,14 +240,14 @@ export function buildWizardSteps(
   });
 
   // Step 7: Billing (always present - invoice selection)
+  // Last step in the wizard — submitting transitions the user to the
+  // standalone /comanda/checkout/[id] page where they pay. The Review step
+  // was dropped on 2026-05-27: the sticky order summary is visible on every
+  // wizard step (and the checkout page) and the consent checkbox now lives
+  // on the checkout page right above "Plătește". Signing already records
+  // consent in signature_metadata.consent for the legal trail.
   steps.push({
     ...ALL_STEPS['billing'],
-    number: stepNumber++,
-  });
-
-  // Step 8: Review (always present)
-  steps.push({
-    ...ALL_STEPS['review'],
     number: stepNumber++,
   });
 

@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createClient as createServiceClient } from '@supabase/supabase-js'
-import { createPaymentIntent } from '@/lib/stripe'
+import { createEmbeddedCheckoutSession } from '@/lib/stripe'
+import { buildStripeLineItems, buildPaymentIntentDescription } from '@/lib/stripe-line-items'
 import { normalizeOrderOptions } from '@/lib/orders/normalize'
 
 // Service role client for bypassing RLS (for guest orders)
@@ -23,7 +24,11 @@ interface OrderWithService {
   base_price: number | null
   options_price: number | null
   delivery_price: number | null
-  delivery_method: string | null
+  // delivery_method is a JSONB column — usually an object
+  // `{ method, methodName, price, ... }` but legacy rows may have a plain
+  // string. The renderer normalizes both shapes via `getDeliveryLabel()`.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  delivery_method: any
   coupon_code: string | null
   discount_amount: number | null
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -294,8 +299,21 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       if (opt.code) lineMetadata[`line_${lineIdx}_code`] = opt.code.slice(0, 40)
       lineIdx++
     }
+    // `delivery_method` is a JSONB blob — extract a human-readable label
+    // (`methodName` for couriers, otherwise the `method` slug, falling back
+    // to "Standard" if neither is set or the column is the legacy string).
+    const getDeliveryLabel = (dm: unknown): string => {
+      if (!dm) return 'Standard'
+      if (typeof dm === 'string') return dm
+      if (typeof dm === 'object' && dm !== null) {
+        const obj = dm as Record<string, unknown>
+        return String(obj.methodName ?? obj.method ?? 'Standard')
+      }
+      return 'Standard'
+    }
+    const deliveryLabel = getDeliveryLabel(order.delivery_method)
     if (order.delivery_price && order.delivery_price > 0 && lineIdx <= 20) {
-      lineMetadata[`line_${lineIdx}_name`] = `Livrare: ${(order.delivery_method || 'Standard').slice(0, 200)}`
+      lineMetadata[`line_${lineIdx}_name`] = `Livrare: ${deliveryLabel.slice(0, 200)}`
       lineMetadata[`line_${lineIdx}_price`] = parseFloat(String(order.delivery_price)).toFixed(2)
       lineIdx++
     }
@@ -304,60 +322,120 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       lineMetadata.discountAmount = parseFloat(String(order.discount_amount)).toFixed(2)
     }
 
-    // Description shown on Stripe receipt + dashboard.
-    const descriptionParts: string[] = [`${serviceName} (${orderNumber})`]
-    for (const opt of normalizedOptions) {
-      descriptionParts.push(`+ ${opt.name}: ${opt.total.toFixed(2)} RON`)
-    }
-    if (order.delivery_price && order.delivery_price > 0) {
-      descriptionParts.push(
-        `+ Livrare ${order.delivery_method || 'Standard'}: ${parseFloat(String(order.delivery_price)).toFixed(2)} RON`
-      )
-    }
-    if (order.coupon_code && order.discount_amount && Number(order.discount_amount) > 0) {
-      descriptionParts.push(
-        `Cupon ${order.coupon_code}: −${parseFloat(String(order.discount_amount)).toFixed(2)} RON`
-      )
-    }
-    // Stripe description max 1000 chars.
-    const description = descriptionParts.join(' | ').slice(0, 999)
+    // Build Checkout Session line items + description.
+    // The line_items end up in the Stripe Dashboard checkout summary —
+    // operators see each addon individually instead of one lump charge.
+    const description = buildPaymentIntentDescription({
+      serviceName,
+      orderNumber,
+      options: normalizedOptions.map((o) => ({ name: o.name, total: o.total })),
+      deliveryLabel: order.delivery_price && order.delivery_price > 0 ? deliveryLabel : undefined,
+      deliveryPriceRon: order.delivery_price ? Number(order.delivery_price) : undefined,
+      couponCode: order.coupon_code || undefined,
+      discountAmount: order.discount_amount ? Number(order.discount_amount) : undefined,
+    })
 
-    const paymentIntent = await createPaymentIntent(
-      finalTotalPrice,
-      lineMetadata,
-      {
-        description,
-        customer: stripeCustomer,
-        receiptEmail: contact?.email,
-      }
-    )
+    const lineItems = buildStripeLineItems({
+      serviceName,
+      // The Stripe line items represent the GROSS prices (before coupon).
+      // The coupon is applied as a Stripe `discounts` entry on the Session
+      // so the customer sees "Subtotal − Cupon X = Total" in the embedded
+      // checkout, mirroring the order summary.
+      basePrice: Number(order.base_price ?? 0),
+      options: normalizedOptions.map((o) => ({
+        name: o.name,
+        code: o.code,
+        total: o.total,
+        optionId: o.optionId,
+      })),
+      delivery: order.delivery_price && order.delivery_price > 0
+        ? { label: deliveryLabel, priceRon: Number(order.delivery_price) }
+        : null,
+    })
 
-    // Update order with payment intent ID
-    await serviceClient
+    // Origin for return_url — has to be absolute. Falls back to localhost
+    // for dev when NEXT_PUBLIC_APP_URL isn't set.
+    const origin = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+
+    const session = await createEmbeddedCheckoutSession({
+      customer: stripeCustomer,
+      receiptEmail: contact?.email,
+      description,
+      lineItems,
+      sessionMetadata: {
+        orderId: order.id,
+        orderNumber,
+        userId: user?.id || 'guest',
+      },
+      paymentIntentMetadata: lineMetadata,
+      returnUrl: `${origin}/comanda/success/${order.id}?session_id={CHECKOUT_SESSION_ID}`,
+      ...(order.coupon_code && order.discount_amount && Number(order.discount_amount) > 0
+        ? {
+            couponDiscount: {
+              code: order.coupon_code,
+              amountRon: Number(order.discount_amount),
+            },
+          }
+        : {}),
+    })
+
+    // Flag the order as sandbox/test when the Stripe key is a test key.
+    // Used by the admin list to hide synthetic / dev orders from the live
+    // operational view (chips: Ascunse / Doar test / Toate).
+    const isTestKey = !!process.env.STRIPE_SECRET_KEY?.startsWith('sk_test_')
+    if (isTestKey) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (serviceClient as any)
+        .from('orders')
+        .update({ is_test: true })
+        .eq('id', id)
+    }
+
+    // Stash the session id so the webhook + Modify flow can correlate.
+    // The PaymentIntent id will be filled in by the webhook on
+    // `checkout.session.completed`.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (serviceClient as any)
       .from('orders')
       .update({
-        stripe_payment_intent_id: paymentIntent.id,
-        updated_at: new Date().toISOString()
+        stripe_checkout_session_id: session.id,
+        updated_at: new Date().toISOString(),
       })
       .eq('id', id)
 
     return NextResponse.json({
       success: true,
       data: {
-        paymentIntentId: paymentIntent.id,
-        clientSecret: paymentIntent.client_secret,
-        amount: paymentIntent.amount,
-        currency: paymentIntent.currency
-      }
+        // Embedded Checkout uses the session's client_secret, not the
+        // PaymentIntent's. The frontend swaps from <Elements> to
+        // <EmbeddedCheckoutProvider> on the back of this.
+        sessionId: session.id,
+        clientSecret: session.client_secret,
+        amount: Math.round(finalTotalPrice * 100),
+        currency: 'ron',
+      },
     })
   } catch (error) {
-    console.error('Payment intent creation error:', error)
+    // Log enough detail (Stripe error fields) for ops to diagnose without
+    // leaking internals to the client. The customer just sees the generic
+    // PAYMENT_ERROR — dev gets a debug field for quick triage.
+    const err = error as Error & { type?: string; code?: string; statusCode?: number; raw?: unknown }
+    console.error('Payment intent creation error:', {
+      message: err.message,
+      type: err.type,
+      code: err.code,
+      statusCode: err.statusCode,
+      raw: err.raw,
+    })
     return NextResponse.json(
       {
         success: false,
         error: {
           code: 'PAYMENT_ERROR',
-          message: 'Failed to create payment intent'
+          message: 'Failed to create payment intent',
+          ...(process.env.NODE_ENV !== 'production' && {
+            debug: { message: err.message, type: err.type, code: err.code },
+          }),
         }
       },
       { status: 500 }

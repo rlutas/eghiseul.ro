@@ -164,6 +164,7 @@ export type Database = {
           refunded_at: string | null
           selected_options: Json | null
           service_id: string | null
+          shipped_at: string | null
           status: string | null
           stripe_charge_id: string | null
           stripe_payment_intent_id: string | null
@@ -223,6 +224,7 @@ export type Database = {
           refunded_at?: string | null
           selected_options?: Json | null
           service_id?: string | null
+          shipped_at?: string | null
           status?: string | null
           stripe_charge_id?: string | null
           stripe_payment_intent_id?: string | null
@@ -282,6 +284,7 @@ export type Database = {
           refunded_at?: string | null
           selected_options?: Json | null
           service_id?: string | null
+          shipped_at?: string | null
           status?: string | null
           stripe_charge_id?: string | null
           stripe_payment_intent_id?: string | null

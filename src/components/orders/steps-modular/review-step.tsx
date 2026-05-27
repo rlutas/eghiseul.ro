@@ -82,14 +82,34 @@ export function ReviewStepModular({ onValidChange }: ReviewStepProps) {
     setCouponError(null);
   };
 
-  const setTermsAccepted = (v: boolean) => updateConsent({ termsAccepted: v });
-  const setPrivacyAccepted = (v: boolean) => updateConsent({ privacyAccepted: v });
-  const setWithdrawalWaiver = (v: boolean) => updateConsent({ withdrawalWaiver: v });
+  // Combined-consent UX (2026-05-27, aligned with cazierjudiciaronline.com):
+  // We show ONE checkbox that bundles T&C + Privacy + the 14-day withdrawal
+  // waiver. Internally we keep the three legal flags separate on
+  // `state.consent` so the audit log + contract metadata stay granular
+  // (required by Law 214/2024 / OUG 34/2014 for the legal trail).
+  const acceptAll = termsAccepted && privacyAccepted && withdrawalWaiver;
+  const setAcceptAll = (v: boolean) =>
+    updateConsent({ termsAccepted: v, privacyAccepted: v, withdrawalWaiver: v });
 
-  // Validate step - all three checkboxes required
+  // Auto-tick the combined consent the moment the user has finished the
+  // signature step. The signature itself already counts as an expression of
+  // consent (Legea 214/2024 / eIDAS), so making the customer re-confirm the
+  // same thing on the next screen is friction without legal value. The
+  // checkbox remains editable — if they untick it, validation blocks payment.
+  const hasSignature = !!state.signature?.signatureBase64;
   useEffect(() => {
-    onValidChange(termsAccepted && privacyAccepted && withdrawalWaiver);
-  }, [termsAccepted, privacyAccepted, withdrawalWaiver, onValidChange]);
+    if (hasSignature && !acceptAll) {
+      setAcceptAll(true);
+    }
+    // We don't re-run when acceptAll changes — only when signature lands —
+    // otherwise an unticking the box would immediately re-tick it.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hasSignature]);
+
+  // Validate step — single combined consent gates "Plătește".
+  useEffect(() => {
+    onValidChange(acceptAll);
+  }, [acceptAll, onValidChange]);
 
   return (
     <div className="space-y-6">
@@ -505,58 +525,38 @@ export function ReviewStepModular({ onValidChange }: ReviewStepProps) {
           Termeni și Condiții
         </h3>
 
-        <div className="space-y-3">
-          {/* Terms */}
+        <div className="rounded-lg border bg-muted/20 p-4">
           <label className="flex items-start gap-3 cursor-pointer group">
             <Checkbox
-              checked={termsAccepted}
-              onCheckedChange={(checked) => setTermsAccepted(checked === true)}
-              className="mt-0.5"
+              checked={acceptAll}
+              onCheckedChange={(checked) => setAcceptAll(checked === true)}
+              className="mt-0.5 shrink-0"
             />
-            <span className="text-sm text-neutral-600 group-hover:text-neutral-900">
-              Am citit și sunt de acord cu{' '}
+            <span className="text-sm leading-relaxed text-neutral-700 group-hover:text-neutral-900">
+              <span className="text-red-500">*</span> Am citit și sunt de acord cu{' '}
               <a
                 href="/termeni"
                 target="_blank"
+                rel="noopener"
                 className="text-primary-600 hover:underline font-medium"
               >
                 Termenii și Condițiile
-              </a>{' '}
-              de utilizare a serviciului. <span className="text-red-500">*</span>
-            </span>
-          </label>
-
-          {/* Privacy */}
-          <label className="flex items-start gap-3 cursor-pointer group">
-            <Checkbox
-              checked={privacyAccepted}
-              onCheckedChange={(checked) => setPrivacyAccepted(checked === true)}
-              className="mt-0.5"
-            />
-            <span className="text-sm text-neutral-600 group-hover:text-neutral-900">
-              Sunt de acord cu prelucrarea datelor personale conform{' '}
+              </a>
+              {' '}și{' '}
               <a
                 href="/confidentialitate"
                 target="_blank"
+                rel="noopener"
                 className="text-primary-600 hover:underline font-medium"
               >
-                Politicii de Confidențialitate
+                Politica de Confidențialitate
               </a>
-              . <span className="text-red-500">*</span>
-            </span>
-          </label>
-
-          {/* Withdrawal Waiver (OUG 34/2014 Art. 16) */}
-          <label className="flex items-start gap-3 cursor-pointer group">
-            <Checkbox
-              checked={withdrawalWaiver}
-              onCheckedChange={(checked) => setWithdrawalWaiver(checked === true)}
-              className="mt-0.5"
-            />
-            <span className="text-sm text-neutral-600 group-hover:text-neutral-900">
-              Solicit executarea imediată a serviciului și renunț la dreptul de
-              retragere de 14 zile prevăzut de OUG 34/2014, art. 16 lit. (a).{' '}
-              <span className="text-red-500">*</span>
+              . Solicit executarea imediată a serviciului și renunț la dreptul de retragere de 14 zile (OUG 34/2014, art. 16 lit. a). Accept că semnătura electronică simplă aplicată prin platformă are valoare juridică conform Legii nr. 214/2024 și Regulamentului UE 910/2014 (eIDAS).
+              {hasSignature && (
+                <span className="block mt-1.5 text-xs text-green-700">
+                  ✓ Bifat automat la semnare — poți debifa dacă vrei să retragi consimțământul.
+                </span>
+              )}
             </span>
           </label>
         </div>

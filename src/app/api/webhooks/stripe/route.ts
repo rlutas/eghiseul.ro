@@ -84,6 +84,14 @@ export async function POST(request: NextRequest) {
   // Handle the event
   try {
     switch (event.type) {
+      case 'checkout.session.completed': {
+        // Embedded Checkout fires this when payment succeeds — same business
+        // effect as payment_intent.succeeded (which still fires too but we
+        // handle the session first since it carries the order linkage).
+        const session = event.data.object as Stripe.Checkout.Session
+        await handleCheckoutSessionCompleted(session)
+        break
+      }
       case 'payment_intent.succeeded': {
         const paymentIntent = event.data.object as Stripe.PaymentIntent
         await handlePaymentSucceeded(paymentIntent)
@@ -110,6 +118,44 @@ export async function POST(request: NextRequest) {
       { error: 'Webhook handler failed' },
       { status: 500 }
     )
+  }
+}
+
+// Embedded Checkout fires `checkout.session.completed` BEFORE the
+// `payment_intent.succeeded` event lands. We stash the PaymentIntent id +
+// orderId back on the order row so the subsequent PI webhook can correlate.
+// The actual order-fulfilled work (invoice, status flip, etc.) is still
+// done by handlePaymentSucceeded because that path is already idempotent.
+async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) {
+  const orderId = session.metadata?.orderId
+  if (!orderId) {
+    console.error('[stripe webhook] checkout.session.completed without orderId metadata')
+    return
+  }
+  const paymentIntentId =
+    typeof session.payment_intent === 'string'
+      ? session.payment_intent
+      : session.payment_intent?.id
+
+  if (paymentIntentId) {
+    await supabaseAdmin
+      .from('orders')
+      .update({ stripe_payment_intent_id: paymentIntentId })
+      .eq('id', orderId)
+  }
+
+  // If the session is already in "complete" payment_status, run the full
+  // fulfilment path now (don't wait for the PI event — saves a few seconds
+  // and prevents the order sitting in `paid_pending` if PI webhook is slow).
+  if (session.payment_status === 'paid' && paymentIntentId) {
+    const stripe = (await import('stripe')).default
+    const client = new stripe(process.env.STRIPE_SECRET_KEY!)
+    const pi = await client.paymentIntents.retrieve(paymentIntentId)
+    // Carry orderId forward via metadata so handlePaymentSucceeded finds it.
+    if (!pi.metadata?.orderId) {
+      pi.metadata = { ...(pi.metadata || {}), orderId }
+    }
+    await handlePaymentSucceeded(pi)
   }
 }
 
@@ -219,6 +265,8 @@ async function handlePaymentSucceeded(paymentIntent: Stripe.PaymentIntent) {
         selected_options: order.selected_options as Array<{ code?: string; name: string; price: number }> | undefined,
         delivery_method: order.delivery_method ?? undefined,
         delivery_price: order.delivery_price ?? undefined,
+        coupon_code: order.coupon_code ?? null,
+        discount_amount: order.discount_amount ?? null,
         customer_data: order.customer_data as Record<string, unknown> | undefined,
       },
       'Card'

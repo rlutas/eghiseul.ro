@@ -13,6 +13,7 @@
 
 import {
   calculateEstimatedCompletion,
+  OPTION_DELIVERY_IMPACT,
   type DeliveryEstimate,
   type DeliveryEstimateParams,
 } from '@/lib/delivery-calculator';
@@ -30,6 +31,11 @@ export interface SelectedOptionLike {
   // only urgency from the option name.
   delivery_days_impact?: number;
   deliveryDaysImpact?: number;
+  /** Cross-service bundling marker — when set, the option shares the
+   *  parent's processing slot, so the dedupe-by-code logic in mapOptions
+   *  keeps the timeline honest. */
+  bundled_for?: { parent_option_id?: string } | null;
+  bundledFor?: { parentOptionId?: string } | null;
 }
 
 /**
@@ -140,21 +146,58 @@ function resolveBaseDays(input: ComputeEstimateInput): number | undefined {
  */
 function mapOptions(options?: SelectedOptionLike[] | null): DeliveryEstimateParams['options'] {
   if (!options || options.length === 0) return [];
+
+  // Bundled add-ons share the parent's processing slot — dedupe by code
+  // so each document step (traducere/legalizare/apostila*) counts once.
+  const seenCodes = new Set<string>();
+
   return options
     .filter((opt) => !isUrgentOption(opt))
+    .filter((opt) => {
+      // Drop duplicates by code; OPTION_DELIVERY_IMPACT keys are unique so
+      // we can use the code as the dedupe key. Options without a code fall
+      // through (legacy rows with explicit impact still render).
+      const code = (opt.code ?? '').toString().toLowerCase();
+      if (code && OPTION_DELIVERY_IMPACT[code]) {
+        if (seenCodes.has(code)) return false;
+        seenCodes.add(code);
+      }
+      return true;
+    })
     .map((opt) => {
       const explicitImpact = opt.delivery_days_impact ?? opt.deliveryDaysImpact;
-      // Fallback to code-based impact when the order row doesn't carry an
-      // explicit impact number (the wizard doesn't persist this today).
+      // Code-based lookup (centralized table in delivery-calculator) — fills
+      // in traducere/legalizare/apostila_haga/apostila_notari when the order
+      // row doesn't persist `delivery_days_impact`. Without this the
+      // submission-time estimate was way too short ("2 zile" for an order
+      // that actually takes 5-7).
+      const code = (opt.code ?? '').toString().toLowerCase();
+      const codeImpact = OPTION_DELIVERY_IMPACT[code];
       const inferredImpact =
         explicitImpact ??
         (isCetateanStrainOption(opt) ? CETATEAN_STRAIN_EXTRA_DAYS : undefined);
+      const inferredRange = !explicitImpact && codeImpact
+        ? { minDays: codeImpact.minDays, maxDays: codeImpact.maxDays }
+        : null;
       return {
         name: opt.option_name ?? opt.optionName ?? opt.code ?? 'Opțiune',
-        deliveryDaysImpact: inferredImpact,
+        ...(inferredRange ?? { deliveryDaysImpact: inferredImpact }),
       };
     })
-    .filter((o) => typeof o.deliveryDaysImpact === 'number' && o.deliveryDaysImpact !== 0);
+    // Keep entries with either a numeric impact OR an explicit min/max
+    // range — both shapes are valid `DeliveryEstimateParams.options`.
+    .filter((o) => {
+      const oo = o as {
+        deliveryDaysImpact?: number;
+        minDays?: number;
+        maxDays?: number;
+      };
+      return (
+        (typeof oo.deliveryDaysImpact === 'number' && oo.deliveryDaysImpact !== 0) ||
+        (typeof oo.minDays === 'number' && oo.minDays > 0) ||
+        (typeof oo.maxDays === 'number' && oo.maxDays > 0)
+      );
+    });
 }
 
 // ─── Public API ───────────────────────────────────────────────────────────────
@@ -171,12 +214,19 @@ export function computeOrderEstimate(input: ComputeEstimateInput): {
   estimate: DeliveryEstimate;
   estimatedCompletionISO: string | null;
 } {
-  const baseDays = resolveBaseDays(input);
+  // When urgenta is picked, use the "urgent" urgency mode (1-2 zile RANGE)
+  // instead of the service's flat urgentDays — this matches what the wizard
+  // sidebar shows the customer via `estimateFromSelectedOptions`. Without
+  // this alignment, the DB-persisted date (used by status page) was 1 day
+  // ahead of what the customer was promised at checkout.
+  const urgentSelected = hasUrgentSelection(input.selectedOptions);
+  const baseDays = urgentSelected ? undefined : resolveBaseDays(input);
   const courier = normalizeCourierCode(input.deliveryMethod);
   const orderDate = typeof input.placedAt === 'string' ? new Date(input.placedAt) : input.placedAt;
 
   const estimate = calculateEstimatedCompletion({
     baseDays,
+    urgency: urgentSelected ? 'urgent' : 'standard',
     options: mapOptions(input.selectedOptions),
     courier,
     orderDate,

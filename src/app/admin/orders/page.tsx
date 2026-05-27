@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useState, useCallback, useMemo } from 'react';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import {
   Table,
   TableBody,
@@ -13,13 +13,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   Search,
@@ -28,36 +22,29 @@ import {
   ChevronRight,
   Package,
   Truck,
+  X as XIcon,
 } from 'lucide-react';
+import { STATUS_TABS, type OrdersCounts } from '@/lib/admin/orders-tabs';
 
-// Order status configuration
-const STATUS_CONFIG: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline'; className?: string }> = {
-  draft: { label: 'Ciorna', variant: 'secondary' },
-  pending: { label: 'In asteptare', variant: 'outline' },
-  paid: { label: 'Platita', variant: 'default', className: 'bg-green-600' },
-  processing: { label: 'In procesare', variant: 'default', className: 'bg-blue-600' },
+const STATUS_CONFIG: Record<
+  string,
+  { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline'; className?: string }
+> = {
+  draft: { label: 'Ciornă', variant: 'secondary' },
+  pending: { label: 'În așteptare', variant: 'outline' },
+  abandoned: { label: 'Abandonată', variant: 'secondary', className: 'bg-neutral-200 text-neutral-700' },
+  paid: { label: 'Plătită', variant: 'default', className: 'bg-green-600 text-white' },
+  processing: { label: 'În procesare', variant: 'default', className: 'bg-blue-600 text-white' },
   kyc_pending: { label: 'KYC Pending', variant: 'outline' },
-  kyc_approved: { label: 'KYC Aprobat', variant: 'default', className: 'bg-green-600' },
+  kyc_approved: { label: 'KYC Aprobat', variant: 'default', className: 'bg-green-600 text-white' },
   kyc_rejected: { label: 'KYC Respins', variant: 'destructive' },
-  document_ready: { label: 'Document gata', variant: 'default', className: 'bg-indigo-600' },
-  shipped: { label: 'Expediata', variant: 'default', className: 'bg-purple-600' },
-  in_progress: { label: 'In lucru', variant: 'default', className: 'bg-blue-600' },
-  completed: { label: 'Finalizata', variant: 'default', className: 'bg-green-700' },
-  cancelled: { label: 'Anulata', variant: 'destructive' },
-  refunded: { label: 'Rambursata', variant: 'destructive' },
+  document_ready: { label: 'Document gata', variant: 'default', className: 'bg-indigo-600 text-white' },
+  shipped: { label: 'Expediată', variant: 'default', className: 'bg-purple-600 text-white' },
+  in_progress: { label: 'În lucru', variant: 'default', className: 'bg-blue-600 text-white' },
+  completed: { label: 'Finalizată', variant: 'default', className: 'bg-green-700 text-white' },
+  cancelled: { label: 'Anulată', variant: 'destructive' },
+  refunded: { label: 'Rambursată', variant: 'destructive' },
 };
-
-const ALL_STATUSES = [
-  'all',
-  'pending',
-  'paid',
-  'processing',
-  'document_ready',
-  'shipped',
-  'completed',
-  'cancelled',
-  'draft',
-];
 
 interface OrderRow {
   id: string;
@@ -67,6 +54,7 @@ interface OrderRow {
   total_price: number;
   payment_status: string | null;
   payment_method: string | null;
+  is_test: boolean | null;
   courier_provider: string | null;
   courier_service: string | null;
   delivery_tracking_number: string | null;
@@ -79,69 +67,93 @@ interface OrderRow {
       lastName?: string;
       name?: string;
     };
-    personalData?: {
-      firstName?: string;
-      lastName?: string;
-    };
-    personal?: {
-      firstName?: string;
-      lastName?: string;
-    };
-    companyData?: {
-      companyName?: string;
-    };
-    company?: {
-      companyName?: string;
-    };
-    billing?: {
-      type?: string;
-      companyName?: string;
-    };
+    personalData?: { firstName?: string; lastName?: string };
+    personal?: { firstName?: string; lastName?: string };
+    companyData?: { companyName?: string };
+    company?: { companyName?: string };
+    billing?: { type?: string; companyName?: string };
   } | null;
   created_at: string | null;
-  services: {
-    name: string;
-    slug: string;
-  } | null;
+  services: { name: string; slug: string } | null;
 }
+
+interface ServiceOption {
+  id: string;
+  slug: string;
+  name: string;
+}
+
+const PAGE_SIZE = 25;
 
 export default function AdminOrdersPage() {
   const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
+
+  const urlStatus = searchParams.get('status') || 'all';
+  const urlTest = (searchParams.get('test') as 'hide' | 'only' | 'all' | null) || 'hide';
+  const urlService = searchParams.get('service') || 'all';
+  const urlSearch = searchParams.get('search') || '';
+  const urlPage = Math.max(0, parseInt(searchParams.get('page') || '0', 10));
+
   const [orders, setOrders] = useState<OrderRow[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState(searchParams.get('status') || 'all');
-  const [page, setPage] = useState(0);
   const [totalCount, setTotalCount] = useState(0);
-  const PAGE_SIZE = 25;
+  const [counts, setCounts] = useState<OrdersCounts | null>(null);
+  const [services, setServices] = useState<ServiceOption[]>([]);
+  // Local-only search input — debounced into the URL on Enter or blur.
+  const [searchInput, setSearchInput] = useState(urlSearch);
+
+  const updateParams = useCallback(
+    (patch: Record<string, string | null>) => {
+      const params = new URLSearchParams(searchParams.toString());
+      for (const [k, v] of Object.entries(patch)) {
+        if (v === null || v === '' || v === 'all' || (k === 'test' && v === 'hide')) {
+          params.delete(k);
+        } else {
+          params.set(k, v);
+        }
+      }
+      // Any filter change resets pagination.
+      if (Object.keys(patch).some((k) => k !== 'page')) params.delete('page');
+      const qs = params.toString();
+      router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+    },
+    [pathname, router, searchParams]
+  );
+
+  const hasActiveFilters =
+    urlStatus !== 'all' ||
+    urlService !== 'all' ||
+    urlSearch !== '' ||
+    urlTest !== 'hide';
+
+  const buildQuery = useCallback(() => {
+    const params = new URLSearchParams();
+    if (urlStatus !== 'all') params.set('status', urlStatus);
+    if (urlService !== 'all') params.set('service', urlService);
+    if (urlSearch) params.set('search', urlSearch);
+    if (urlTest !== 'hide') params.set('test', urlTest);
+    params.set('page', String(urlPage));
+    params.set('limit', String(PAGE_SIZE));
+    return params.toString();
+  }, [urlStatus, urlService, urlSearch, urlTest, urlPage]);
 
   const fetchOrders = useCallback(async () => {
     setLoading(true);
     try {
-      const params = new URLSearchParams();
-      if (statusFilter && statusFilter !== 'all') {
-        params.set('status', statusFilter);
-      }
-      params.set('page', String(page));
-      params.set('limit', String(PAGE_SIZE));
-
-      const res = await fetch(`/api/admin/orders/list?${params.toString()}`);
+      const res = await fetch(`/api/admin/orders/list?${buildQuery()}`);
       const json = await res.json();
-
       if (!res.ok || !json.success) {
         console.error('Error fetching orders:', json.error);
         return;
       }
-
-      // Cast properly - Supabase returns the join as an array or object
       const typedOrders = (json.data || []).map((row: Record<string, unknown>) => ({
         ...row,
         services: Array.isArray(row.services)
           ? (row.services[0] as { name: string; slug: string } | null) || null
           : (row.services as { name: string; slug: string } | null),
       })) as OrderRow[];
-
       setOrders(typedOrders);
       setTotalCount(json.total || 0);
     } catch (err) {
@@ -149,79 +161,154 @@ export default function AdminOrdersPage() {
     } finally {
       setLoading(false);
     }
-  }, [page, statusFilter]);
+  }, [buildQuery]);
 
   useEffect(() => {
     fetchOrders();
   }, [fetchOrders]);
 
-  // Handle search - filter client-side for simplicity
-  const filteredOrders = searchQuery
-    ? orders.filter((o) => {
-        const q = searchQuery.toLowerCase();
-        const orderNum = (o.friendly_order_id || o.order_number || '').toLowerCase();
-        const email = (o.customer_data?.contact?.email || '').toLowerCase();
-        const name = getCustomerName(o).toLowerCase();
-        const awb = (o.delivery_tracking_number || '').toLowerCase();
-        return orderNum.includes(q) || email.includes(q) || name.includes(q) || awb.includes(q);
+  // Counts depend on test/service/search — but NOT on status (because the
+  // count is per-tab, so the active tab shouldn't constrain it).
+  useEffect(() => {
+    const p = new URLSearchParams();
+    if (urlTest !== 'hide') p.set('test', urlTest);
+    if (urlService !== 'all') p.set('service', urlService);
+    if (urlSearch) p.set('search', urlSearch);
+    const qs = p.toString();
+    fetch(qs ? `/api/admin/orders/counts?${qs}` : '/api/admin/orders/counts')
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.success) setCounts(d.data as OrdersCounts);
       })
-    : orders;
+      .catch(() => {});
+  }, [urlTest, urlService, urlSearch]);
 
-  const totalPages = Math.ceil(totalCount / PAGE_SIZE);
+  // Load service options once for the dropdown.
+  useEffect(() => {
+    fetch('/api/services')
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.success || d.data) {
+          const list = (d.data || []) as Array<{ id: string; slug: string; name: string }>;
+          setServices(list.map((s) => ({ id: s.id, slug: s.slug, name: s.name })));
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
+
+  const resetFilters = () => {
+    setSearchInput('');
+    router.replace(pathname, { scroll: false });
+  };
+
+  const activeTabLabel = useMemo(() => {
+    const tab = STATUS_TABS.find((t) => t.value === urlStatus);
+    return tab?.label || (urlStatus !== 'all' ? urlStatus : 'Toate');
+  }, [urlStatus]);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Comenzi</h1>
-          <p className="text-sm text-muted-foreground">
-            {totalCount} comenzi in total
+          <h1 className="text-2xl font-bold text-slate-900">Comenzi</h1>
+          <p className="mt-0.5 text-sm text-slate-500">
+            {totalCount === 0 ? 'Niciun rezultat' : `${totalCount} ${totalCount === 1 ? 'rezultat' : 'rezultate'}`}
+            {hasActiveFilters && <span className="ml-1">pentru „{activeTabLabel}"{urlSearch ? ` · „${urlSearch}"` : ''}</span>}
           </p>
         </div>
         <Button variant="outline" size="sm" onClick={fetchOrders} disabled={loading}>
-          <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
-          Reincarca
+          <RefreshCw className={`mr-1 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+          Reîncarcă
         </Button>
       </div>
 
-      {/* Filters */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-        <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            placeholder="Cauta dupa nr. comanda, email, nume, AWB..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9"
-          />
-        </div>
-        <Select
-          value={statusFilter}
-          onValueChange={(val) => {
-            setStatusFilter(val);
-            setPage(0);
-            // Update URL params
-            const params = new URLSearchParams(searchParams.toString());
-            if (val === 'all') {
-              params.delete('status');
-            } else {
-              params.set('status', val);
-            }
-            router.replace(`/admin/orders?${params.toString()}`);
+      {/* Tabs + Service dropdown + Search */}
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+        <Tabs
+          value={urlStatus}
+          onValueChange={(v) => {
+            if (typeof v === 'string') updateParams({ status: v });
           }}
         >
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Filtreaza status" />
-          </SelectTrigger>
-          <SelectContent>
-            {ALL_STATUSES.map((s) => (
-              <SelectItem key={s} value={s}>
-                {s === 'all' ? 'Toate statusurile' : STATUS_CONFIG[s]?.label || s}
-              </SelectItem>
+          <TabsList>
+            {STATUS_TABS.map((tab) => {
+              const count = counts ? counts[tab.countKey] : null;
+              return (
+                <TabsTrigger key={tab.value} value={tab.value}>
+                  {tab.label}
+                  {count !== null && count !== undefined && (
+                    <span className="ml-1.5 rounded bg-slate-200 px-1.5 py-0.5 text-[10px] font-semibold text-slate-700 tabular-nums">
+                      {count}
+                    </span>
+                  )}
+                </TabsTrigger>
+              );
+            })}
+          </TabsList>
+        </Tabs>
+
+        <div className="flex flex-1 gap-2 lg:justify-end">
+          <select
+            aria-label="Filtrare după serviciu"
+            value={urlService}
+            onChange={(e) => updateParams({ service: e.target.value })}
+            className="h-9 rounded-md border border-slate-300 bg-white px-2 text-sm text-slate-700 focus:border-slate-400 focus:outline-none"
+          >
+            <option value="all">Toate serviciile</option>
+            {services.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.name}
+              </option>
             ))}
-          </SelectContent>
-        </Select>
+          </select>
+          <div className="relative w-full max-w-xs lg:w-64">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder="Caută nr. comandă, email, AWB…"
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') updateParams({ search: searchInput });
+              }}
+              onBlur={() => {
+                if (searchInput !== urlSearch) updateParams({ search: searchInput });
+              }}
+              className="pl-9"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Quick chips row: Sandbox + Reset */}
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="text-[11px] font-medium uppercase tracking-wide text-slate-400">Test:</span>
+        <SandboxChip active={urlTest === 'hide'} label="Ascunse" onClick={() => updateParams({ test: 'hide' })} />
+        <SandboxChip
+          active={urlTest === 'only'}
+          label="Doar test"
+          count={counts?.test_only}
+          tone="warn"
+          onClick={() => updateParams({ test: urlTest === 'only' ? 'hide' : 'only' })}
+        />
+        <SandboxChip
+          active={urlTest === 'all'}
+          label="Toate"
+          onClick={() => updateParams({ test: urlTest === 'all' ? 'hide' : 'all' })}
+        />
+
+        {hasActiveFilters && (
+          <button
+            type="button"
+            onClick={resetFilters}
+            className="ml-auto inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+          >
+            <XIcon className="h-3 w-3" />
+            Reset filtre
+          </button>
+        )}
       </div>
 
       {/* Table */}
@@ -229,20 +316,19 @@ export default function AdminOrdersPage() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Nr. Comanda</TableHead>
+              <TableHead>Nr. Comandă</TableHead>
               <TableHead>Client</TableHead>
               <TableHead>Serviciu</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead>Plata</TableHead>
+              <TableHead>Plată</TableHead>
               <TableHead>Curier</TableHead>
               <TableHead>AWB</TableHead>
               <TableHead className="text-right">Total</TableHead>
-              <TableHead>Data</TableHead>
+              <TableHead>Dată</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {loading ? (
-              // Skeleton loading rows
               Array.from({ length: 8 }).map((_, i) => (
                 <TableRow key={i}>
                   {Array.from({ length: 9 }).map((_, j) => (
@@ -252,23 +338,28 @@ export default function AdminOrdersPage() {
                   ))}
                 </TableRow>
               ))
-            ) : filteredOrders.length === 0 ? (
+            ) : orders.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
-                  {searchQuery
-                    ? 'Nicio comanda gasita pentru cautarea ta.'
-                    : 'Nicio comanda in aceasta categorie.'}
+                <TableCell colSpan={9} className="py-8 text-center text-muted-foreground">
+                  {hasActiveFilters ? 'Niciun rezultat pentru filtrele active.' : 'Nicio comandă în această categorie.'}
                 </TableCell>
               </TableRow>
             ) : (
-              filteredOrders.map((order) => (
+              orders.map((order) => (
                 <TableRow
                   key={order.id}
                   className="cursor-pointer"
                   onClick={() => router.push(`/admin/orders/${order.id}`)}
                 >
                   <TableCell className="font-mono text-sm font-medium">
-                    {order.friendly_order_id || order.order_number}
+                    <div className="flex items-center gap-1.5">
+                      {order.friendly_order_id || order.order_number}
+                      {order.is_test && (
+                        <span className="inline-flex items-center rounded border border-amber-300 bg-amber-50 px-1 py-0 text-[9px] font-semibold uppercase tracking-wide text-amber-700">
+                          Test
+                        </span>
+                      )}
+                    </div>
                   </TableCell>
                   <TableCell>
                     <div className="flex flex-col">
@@ -292,7 +383,7 @@ export default function AdminOrdersPage() {
                   </TableCell>
                   <TableCell>
                     {order.delivery_tracking_number ? (
-                      <span className="font-mono text-xs text-green-700 bg-green-50 px-1.5 py-0.5 rounded">
+                      <span className="rounded bg-green-50 px-1.5 py-0.5 font-mono text-xs text-green-700">
                         {order.delivery_tracking_number}
                       </span>
                     ) : (
@@ -322,25 +413,25 @@ export default function AdminOrdersPage() {
       {totalPages > 1 && (
         <div className="flex items-center justify-between">
           <p className="text-sm text-muted-foreground">
-            Pagina {page + 1} din {totalPages}
+            Pagina {urlPage + 1} din {totalPages}
           </p>
           <div className="flex gap-2">
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setPage((p) => Math.max(0, p - 1))}
-              disabled={page === 0}
+              onClick={() => updateParams({ page: String(Math.max(0, urlPage - 1)) })}
+              disabled={urlPage === 0}
             >
               <ChevronLeft className="h-4 w-4" />
-              Inapoi
+              Înapoi
             </Button>
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
-              disabled={page >= totalPages - 1}
+              onClick={() => updateParams({ page: String(Math.min(totalPages - 1, urlPage + 1)) })}
+              disabled={urlPage >= totalPages - 1}
             >
-              Inainte
+              Înainte
               <ChevronRight className="h-4 w-4" />
             </Button>
           </div>
@@ -351,6 +442,37 @@ export default function AdminOrdersPage() {
 }
 
 // Helper components
+
+function SandboxChip({
+  active,
+  label,
+  count,
+  tone,
+  onClick,
+}: {
+  active: boolean;
+  label: string;
+  count?: number;
+  tone?: 'warn';
+  onClick: () => void;
+}) {
+  const base =
+    'inline-flex items-center gap-1 rounded-md border px-2 py-1 text-xs font-medium transition-colors';
+  const activeCls = tone === 'warn'
+    ? 'border-amber-300 bg-amber-50 text-amber-900'
+    : 'border-slate-400 bg-slate-100 text-slate-900';
+  const idleCls = 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50';
+  return (
+    <button type="button" onClick={onClick} className={`${base} ${active ? activeCls : idleCls}`}>
+      {label}
+      {count !== undefined && count !== null && (
+        <span className="rounded bg-slate-200 px-1 py-0 text-[10px] font-semibold tabular-nums text-slate-700">
+          {count}
+        </span>
+      )}
+    </button>
+  );
+}
 
 function getCustomerName(order: OrderRow): string {
   const cd = order.customer_data;
@@ -379,29 +501,26 @@ function StatusBadge({ status }: { status: string }) {
 
 function PaymentBadge({ status, method }: { status: string | null; method: string | null }) {
   if (!status || status === 'pending') {
-    return <span className="text-xs text-muted-foreground">Neplatita</span>;
+    return <span className="text-xs text-muted-foreground">Neplătită</span>;
   }
   if (status === 'paid' || status === 'succeeded') {
     return (
-      <Badge variant="default" className="bg-green-600">
+      <Badge variant="default" className="bg-green-600 text-white">
         {method === 'bank_transfer' ? 'Transfer' : 'Card'}
       </Badge>
     );
   }
   if (status === 'failed') {
-    return <Badge variant="destructive">Esuata</Badge>;
+    return <Badge variant="destructive" className="text-white">Eșuată</Badge>;
   }
   return <span className="text-xs text-muted-foreground">{status}</span>;
 }
 
 function CourierBadge({ provider }: { provider: string | null }) {
-  if (!provider) {
-    return <span className="text-xs text-muted-foreground">-</span>;
-  }
-
+  if (!provider) return <span className="text-xs text-muted-foreground">-</span>;
   if (provider === 'fancourier') {
     return (
-      <span className="inline-flex items-center gap-1 text-xs font-medium text-orange-700 bg-orange-50 px-1.5 py-0.5 rounded">
+      <span className="inline-flex items-center gap-1 rounded bg-orange-50 px-1.5 py-0.5 text-xs font-medium text-orange-700">
         <Truck className="h-3 w-3" />
         Fan Courier
       </span>
@@ -409,7 +528,7 @@ function CourierBadge({ provider }: { provider: string | null }) {
   }
   if (provider === 'sameday') {
     return (
-      <span className="inline-flex items-center gap-1 text-xs font-medium text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded">
+      <span className="inline-flex items-center gap-1 rounded bg-blue-50 px-1.5 py-0.5 text-xs font-medium text-blue-700">
         <Package className="h-3 w-3" />
         Sameday
       </span>

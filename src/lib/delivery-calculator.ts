@@ -435,3 +435,80 @@ export function calculateEstimatedCompletion(
     breakdown,
   }
 }
+
+// ─── Selected-options helper ─────────────────────────────────────────────────
+
+/**
+ * Per-option-code time impact in business days. Mirrors the static breakdown
+ * in cazierjudiciaronline.com's `delivery-calculator.ts` so the two products
+ * give customers the same estimate when ordering the same combo.
+ *
+ * Notes:
+ *  - Bundled add-ons (apostila/traducere/legalizare under "Certificat
+ *    Integritate" sub-service) process in parallel with the main service —
+ *    we deduplicate by code so each step counts at most once.
+ *  - `urgenta` is treated as the urgency switch (not added separately).
+ *  - `verificare_expert`, `copii_suplimentare` and other consultative
+ *    add-ons don't change the timeline — omitted from the map.
+ */
+export const OPTION_DELIVERY_IMPACT: Record<
+  string,
+  { name: string; minDays: number; maxDays: number }
+> = {
+  traducere: { name: 'Traducere', minDays: 1, maxDays: 2 },
+  legalizare: { name: 'Legalizare', minDays: 1, maxDays: 1 },
+  apostila_haga: { name: 'Apostilă Haga', minDays: 1, maxDays: 1 },
+  apostila_notari: { name: 'Apostilă Notari', minDays: 1, maxDays: 1 },
+}
+
+export type SelectedOptionForEstimate = {
+  code?: string | null
+  optionName?: string
+  /** Bundled add-ons share the same processing slot as the parent service. */
+  bundledFor?: { parentOptionId?: string } | null
+}
+
+/**
+ * Build a DeliveryEstimate from the wizard's `selectedOptions`. Hides the
+ * timeline math from the UI layer — callers just hand over the array and a
+ * `baseDays` fallback for the main service.
+ *
+ *   - "urgenta" without `bundledFor` → urgency: 'urgent' (overrides baseDays)
+ *   - Each document add-on (traducere/legalizare/apostila_haga/apostila_notari)
+ *     adds its own step; same code seen twice (e.g. main + bundled secondary
+ *     service) counts once.
+ *   - Courier passed through unchanged.
+ */
+export function estimateFromSelectedOptions(params: {
+  selectedOptions: readonly SelectedOptionForEstimate[]
+  baseDays?: number
+  courier?: CourierCode | string | null
+  orderDate?: Date
+  includeCourierLeg?: boolean
+}): DeliveryEstimate {
+  const codes = new Set<string>()
+  let isUrgent = false
+  for (const o of params.selectedOptions || []) {
+    if (!o.code) continue
+    if (o.code === 'urgenta' && !o.bundledFor) {
+      isUrgent = true
+      continue
+    }
+    if (OPTION_DELIVERY_IMPACT[o.code]) codes.add(o.code)
+  }
+
+  const options = Array.from(codes).map((code) => ({
+    name: OPTION_DELIVERY_IMPACT[code].name,
+    minDays: OPTION_DELIVERY_IMPACT[code].minDays,
+    maxDays: OPTION_DELIVERY_IMPACT[code].maxDays,
+  }))
+
+  return calculateEstimatedCompletion({
+    baseDays: isUrgent ? undefined : params.baseDays,
+    urgency: isUrgent ? 'urgent' : 'standard',
+    options,
+    courier: params.courier,
+    orderDate: params.orderDate,
+    includeCourierLeg: params.includeCourierLeg,
+  })
+}

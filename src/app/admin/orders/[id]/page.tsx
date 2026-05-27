@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { toast } from 'sonner';
@@ -10,6 +10,12 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { getCountyFromCNP } from '@/lib/validations/cnp';
+import { estimateFromSelectedOptions } from '@/lib/delivery-calculator';
+import { ModifyOrderDialog } from '@/components/admin/modify-order-dialog';
+import { UpdateStatusCard } from '@/components/admin/update-status-card';
 import {
   ArrowLeft,
   User,
@@ -23,6 +29,7 @@ import {
   ExternalLink,
   XCircle,
   AlertTriangle,
+  AlertCircle,
   Package,
   CheckCircle2,
   Clock,
@@ -42,6 +49,8 @@ import {
   PenLine,
   Eye,
   Download,
+  Pencil,
+  RotateCcw,
 } from 'lucide-react';
 
 // ---------- Types ----------
@@ -64,6 +73,9 @@ interface OrderDetail {
   payment_method: string | null;
   stripe_payment_intent_id: string | null;
   paid_at: string | null;
+  invoice_number: string | null;
+  invoice_url: string | null;
+  invoice_issued_at: string | null;
   courier_provider: string | null;
   courier_service: string | null;
   courier_quote: AnyObj | null;
@@ -79,6 +91,17 @@ interface OrderDetail {
     quantity?: number;
     price_modifier?: number;
     option_description?: string;
+    /** Stable code (e.g. 'urgenta', 'apostila_haga') — feeds the delivery
+     *  calculator and lets the bundled-children join up to a parent. */
+    code?: string;
+    /** Cross-service bundling marker — when set, this row belongs under the
+     *  referenced parent option in the grouped admin view. */
+    bundled_for?: {
+      parent_option_id?: string;
+      bundled_service_slug?: string;
+      bundled_option_code?: string;
+    } | null;
+    bundledFor?: { parentOptionId?: string } | null;
   }> | null;
   kyc_documents: AnyObj | null;
   documents: AnyObj | null;
@@ -101,6 +124,9 @@ interface TimelineEvent {
   notes: string | null;
   new_value: AnyObj | null;
   created_at: string | null;
+  changed_by?: string | null;
+  from_status?: string | null;
+  to_status?: string | null;
 }
 
 interface OrderDocument {
@@ -136,21 +162,25 @@ interface OrderOptionStatus {
 const STATUS_CONFIG: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline'; className?: string }> = {
   draft: { label: 'Ciorna', variant: 'secondary' },
   pending: { label: 'In asteptare', variant: 'outline' },
-  paid: { label: 'Platita', variant: 'default', className: 'bg-green-600' },
-  processing: { label: 'In procesare', variant: 'default', className: 'bg-blue-600' },
-  documents_generated: { label: 'Documente generate', variant: 'default', className: 'bg-blue-500' },
-  submitted_to_institution: { label: 'Depusa la institutie', variant: 'default', className: 'bg-orange-600' },
-  document_received: { label: 'Document primit', variant: 'default', className: 'bg-teal-600' },
-  extras_in_progress: { label: 'Traducere / Apostila', variant: 'default', className: 'bg-amber-600' },
+  paid: { label: 'Platita', variant: 'default', className: 'bg-green-600 text-white' },
+  processing: { label: 'In procesare', variant: 'default', className: 'bg-blue-600 text-white' },
+  documents_generated: { label: 'Documente generate', variant: 'default', className: 'bg-blue-500 text-white' },
+  submitted_to_institution: { label: 'Depusa la institutie', variant: 'default', className: 'bg-orange-600 text-white' },
+  document_received: { label: 'Document primit', variant: 'default', className: 'bg-teal-600 text-white' },
+  extras_in_progress: { label: 'Traducere / Apostila', variant: 'default', className: 'bg-amber-600 text-white' },
   kyc_pending: { label: 'KYC Pending', variant: 'outline' },
-  kyc_approved: { label: 'KYC Aprobat', variant: 'default', className: 'bg-green-600' },
+  kyc_approved: { label: 'KYC Aprobat', variant: 'default', className: 'bg-green-600 text-white' },
   kyc_rejected: { label: 'KYC Respins', variant: 'destructive' },
-  document_ready: { label: 'Gata de expediere', variant: 'default', className: 'bg-indigo-600' },
-  shipped: { label: 'Expediata', variant: 'default', className: 'bg-purple-600' },
-  in_progress: { label: 'In lucru', variant: 'default', className: 'bg-blue-600' },
-  completed: { label: 'Finalizata', variant: 'default', className: 'bg-green-700' },
+  document_ready: { label: 'Gata de expediere', variant: 'default', className: 'bg-indigo-600 text-white' },
+  shipped: { label: 'Expediata', variant: 'default', className: 'bg-purple-600 text-white' },
+  in_progress: { label: 'In lucru', variant: 'default', className: 'bg-blue-600 text-white' },
+  completed: { label: 'Finalizata', variant: 'default', className: 'bg-green-700 text-white' },
   cancelled: { label: 'Anulata', variant: 'destructive' },
   refunded: { label: 'Rambursata', variant: 'destructive' },
+  standby: { label: 'In asteptare client', variant: 'default', className: 'bg-amber-500 text-white' },
+  cancellation_requested: { label: 'Anulare solicitata', variant: 'default', className: 'bg-red-500 text-white' },
+  delivered: { label: 'Livrata', variant: 'default', className: 'bg-emerald-600 text-white' },
+  abandoned: { label: 'Abandonata', variant: 'secondary' },
 };
 
 // ---------- Helpers ----------
@@ -332,6 +362,7 @@ export default function AdminOrderDetailPage() {
 
   // AWB state
   const [generating, setGenerating] = useState(false);
+  const [modifyDialogOpen, setModifyDialogOpen] = useState(false);
   const [awbError, setAwbError] = useState<string | null>(null);
   const [cancelling, setCancelling] = useState(false);
   const [downloading, setDownloading] = useState(false);
@@ -460,6 +491,29 @@ export default function AdminOrderDetailPage() {
     }
   };
 
+  // Quick-flip from `shipped` → `completed` straight from the AWB card —
+  // saves operators a trip through the Update Status dropdown for the
+  // common end-of-shipment confirmation.
+  const handleMarkDelivered = async () => {
+    if (!order) return;
+    try {
+      const res = await fetch(`/api/admin/orders/${order.id}/process`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'complete' }),
+      });
+      const json = await res.json();
+      if (!res.ok || !json.success) {
+        toast.error(json.error?.message ?? 'Eroare la marcare livrat');
+        return;
+      }
+      toast.success('Comanda marcată ca livrată');
+      fetchOrder();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Eroare de rețea');
+    }
+  };
+
   // ---------- Loading / Error States ----------
 
   if (loading) {
@@ -561,14 +615,97 @@ export default function AdminOrderDetailPage() {
             </div>
           </div>
         </div>
-        <Button variant="outline" size="sm" onClick={fetchOrder}>
-          <RefreshCw className="h-4 w-4" />
-          Reincarca
-        </Button>
+        <div className="flex items-center gap-2">
+          {/* Modify button — only available on paid orders. Hidden on
+              draft/pending/abandoned where the customer can still finish
+              checkout or hasn't paid yet. Mirrors sister UX. */}
+          {order.payment_status === 'paid' && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setModifyDialogOpen(true)}
+            >
+              <Pencil className="h-4 w-4" />
+              Modifică
+            </Button>
+          )}
+          {/* Storno + Reemite — available only when there's already an
+              invoice issued. After admin runs Modify, the existing Oblio
+              invoice no longer matches the new line items; this button
+              emits a stornare + a fresh corrective invoice in one call.
+              Shows a confirmation dialog because it's irreversible (storno
+              gets submitted in SPV). */}
+          {order.payment_status === 'paid' && order.invoice_number && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={async () => {
+                if (
+                  !confirm(
+                    `Sigur stornezi factura ${order.invoice_number} și emiți una nouă cu liniile curente? Operația este irreversibilă (stornarea ajunge automat în SPV).`
+                  )
+                ) {
+                  return;
+                }
+                try {
+                  const res = await fetch(`/api/admin/orders/${order.id}/reissue-invoice`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({}),
+                  });
+                  const json = await res.json();
+                  if (!res.ok || !json.success) {
+                    toast.error(json.error?.message ?? 'Reemiterea a eșuat');
+                    return;
+                  }
+                  toast.success(
+                    `Storno OK. Factură nouă: ${json.data.newInvoice.invoiceNumber}`
+                  );
+                  fetchOrder();
+                } catch (err) {
+                  toast.error(err instanceof Error ? err.message : 'Reemiterea a eșuat');
+                }
+              }}
+              className="text-amber-700 border-amber-300 hover:bg-amber-50"
+            >
+              <RotateCcw className="h-4 w-4" />
+              Storno + Reemite
+            </Button>
+          )}
+          <Button variant="outline" size="sm" onClick={fetchOrder}>
+            <RefreshCw className="h-4 w-4" />
+            Reincarca
+          </Button>
+        </div>
       </div>
 
-      {/* ROW 1: Contact + Serviciu */}
+      {/* Cancellation requested banner — shown when a customer self-cancelled
+          within the 30-min window (or admin set this status manually). One
+          click processes the Stripe refund (70%) and flips to 'refunded'. */}
+      {order.status === 'cancellation_requested' && (
+        <CancellationRequestedBanner order={order} onProcessed={fetchOrder} />
+      )}
+
+      {/* Standby banner — shown when SLA is paused. Reminds operators that
+          the deadline isn't ticking down. */}
+      {order.status === 'standby' && (
+        <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
+          <div className="flex items-center gap-2 font-semibold">
+            <RefreshCw className="h-4 w-4" />
+            SLA pauzat — comanda este în „standby"
+          </div>
+          <p className="mt-1 text-xs">
+            Termenul de livrare nu avansează. Folosește butonul „Forțează status" pentru a relua
+            comanda când blocajul cu clientul este rezolvat.
+          </p>
+        </div>
+      )}
+
+      {/* ROW 1: Date contact + Date personale (left) | Serviciu + Livrare (right).
+                 Stacked cards within each column per user-requested layout. */}
       <div className="grid gap-4 lg:grid-cols-2">
+        {/* LEFT column — contact info on top, personal/company data below */}
+        <div className="space-y-4">
         {/* Contact Info */}
         <Card>
           <CardHeader className="pb-3">
@@ -623,51 +760,6 @@ export default function AdminOrderDetailPage() {
             )}
           </CardContent>
         </Card>
-
-        {/* Service & Options */}
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base flex items-center gap-2">
-              <FileText className="h-4 w-4" />
-              Serviciu si optiuni
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <InfoRow label="Serviciu" value={order.services?.name || 'N/A'} />
-            {order.services?.estimated_days && (
-              <InfoRow label="Termen estimat" value={`${order.services.estimated_days} zile lucratoare`} />
-            )}
-            {order.selected_options && order.selected_options.length > 0 && (
-              <>
-                <Separator className="my-2" />
-                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Optiuni selectate</p>
-                {order.selected_options.map((opt, i) => (
-                  <div key={i} className="flex items-start justify-between gap-2 text-sm">
-                    <div>
-                      <span className="font-medium">{opt.option_name}</span>
-                      {(opt.quantity || 1) > 1 && <span className="text-muted-foreground"> x{opt.quantity}</span>}
-                    </div>
-                    {opt.price_modifier ? (
-                      <span className="font-medium shrink-0">+{opt.price_modifier.toFixed(2)} RON</span>
-                    ) : null}
-                  </div>
-                ))}
-              </>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* PROCESSING SECTION - RIGHT AFTER CONTACT & SERVICE */}
-      <ProcessingSection
-        order={order}
-        documents={orderDocuments}
-        optionStatuses={optionStatuses}
-        onStatusChange={fetchOrder}
-      />
-
-      {/* ROW 2: Personal/Company Data + Billing */}
-      <div className="grid gap-4 lg:grid-cols-2">
         {/* Client Details (PF or PJ) */}
         <Card>
           <CardHeader className="pb-3">
@@ -725,8 +817,17 @@ export default function AdminOrderDetailPage() {
                   )}
                   {personal.birthPlace && (
                     <div>
-                      <span className="text-muted-foreground text-xs">Locul nasterii</span>
+                      <span className="text-muted-foreground text-xs">Locul nasterii (localitate)</span>
                       <p className="font-medium">{personal.birthPlace}</p>
+                    </div>
+                  )}
+                  {/* Judetul nasterii derivat din CNP — autoritar (codul 7-8 din CNP).
+                      OCR poate da "Mun. Bucuresti Sec. 1" la localitate; CNP da
+                      "Bucuresti S.1" la judet, care e ce intra pe cerere. */}
+                  {personal.cnp && getCountyFromCNP(personal.cnp) && (
+                    <div>
+                      <span className="text-muted-foreground text-xs">Judet nastere (din CNP)</span>
+                      <p className="font-medium">{getCountyFromCNP(personal.cnp)}</p>
                     </div>
                   )}
                   {personal.birthDate && (
@@ -767,32 +868,45 @@ export default function AdminOrderDetailPage() {
                     <Separator className="my-2" />
                     <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Adresa domiciliu</p>
                     <div className="grid grid-cols-3 gap-x-4 gap-y-1.5 text-sm">
+                      {/* Each address field renders only when populated —
+                          empty Bl/Sc/Et/Ap/Cod postal cells were noisy on
+                          most orders where the customer only had Str+Nr. */}
                       {personal.address.street && (
                         <div className="col-span-2">
                           <span className="text-muted-foreground text-xs">Str</span>
                           <p className="font-medium">{personal.address.street}</p>
                         </div>
                       )}
-                      <div>
-                        <span className="text-muted-foreground text-xs">Nr</span>
-                        <p className="font-medium">{personal.address.number || '-'}</p>
-                      </div>
-                      <div>
-                        <span className="text-muted-foreground text-xs">Bl</span>
-                        <p className="font-medium">{personal.address.building || '-'}</p>
-                      </div>
-                      <div>
-                        <span className="text-muted-foreground text-xs">Sc</span>
-                        <p className="font-medium">{personal.address.staircase || '-'}</p>
-                      </div>
-                      <div>
-                        <span className="text-muted-foreground text-xs">Et</span>
-                        <p className="font-medium">{personal.address.floor || '-'}</p>
-                      </div>
-                      <div>
-                        <span className="text-muted-foreground text-xs">Ap</span>
-                        <p className="font-medium">{personal.address.apartment || '-'}</p>
-                      </div>
+                      {personal.address.number && (
+                        <div>
+                          <span className="text-muted-foreground text-xs">Nr</span>
+                          <p className="font-medium">{personal.address.number}</p>
+                        </div>
+                      )}
+                      {personal.address.building && (
+                        <div>
+                          <span className="text-muted-foreground text-xs">Bl</span>
+                          <p className="font-medium">{personal.address.building}</p>
+                        </div>
+                      )}
+                      {personal.address.staircase && (
+                        <div>
+                          <span className="text-muted-foreground text-xs">Sc</span>
+                          <p className="font-medium">{personal.address.staircase}</p>
+                        </div>
+                      )}
+                      {personal.address.floor && (
+                        <div>
+                          <span className="text-muted-foreground text-xs">Et</span>
+                          <p className="font-medium">{personal.address.floor}</p>
+                        </div>
+                      )}
+                      {personal.address.apartment && (
+                        <div>
+                          <span className="text-muted-foreground text-xs">Ap</span>
+                          <p className="font-medium">{personal.address.apartment}</p>
+                        </div>
+                      )}
                       {personal.address.city && (
                         <div>
                           <span className="text-muted-foreground text-xs">Localitatea</span>
@@ -805,10 +919,12 @@ export default function AdminOrderDetailPage() {
                           <p className="font-medium">{personal.address.county}</p>
                         </div>
                       )}
-                      <div>
-                        <span className="text-muted-foreground text-xs">Cod postal</span>
-                        <p className="font-medium">{personal.address.postalCode || personal.address.postal_code || '-'}</p>
-                      </div>
+                      {(personal.address.postalCode || personal.address.postal_code) && (
+                        <div>
+                          <span className="text-muted-foreground text-xs">Cod postal</span>
+                          <p className="font-medium">{personal.address.postalCode || personal.address.postal_code}</p>
+                        </div>
+                      )}
                     </div>
                   </>
                 )}
@@ -828,101 +944,280 @@ export default function AdminOrderDetailPage() {
             )}
           </CardContent>
         </Card>
-
-        {/* Billing / Facturare */}
+        </div>
+        {/* RIGHT column — service+options on top, delivery info below */}
+        <div className="space-y-4">
+        {/* Service & Options — grouped to match what the customer saw in
+            the order summary (main service + nested add-ons + each
+            "Serviciu secundar" like Certificat Integritate with its own
+            indented add-ons). Same shape used on /comanda, /comanda/checkout
+            and the success page so admin reads the order the same way the
+            customer placed it. */}
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-base flex items-center gap-2">
-              <Receipt className="h-4 w-4" />
-              Date facturare
+              <FileText className="h-4 w-4" />
+              Serviciu si optiuni
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            {billing ? (
-              <>
-                <InfoRow label="Tip" value={billing.type === 'persoana_juridica' ? 'Persoana Juridica' : 'Persoana Fizica'} />
-                {billing.type === 'persoana_juridica' ? (
-                  <>
-                    {billing.companyName && <InfoRow label="Firma" value={billing.companyName} />}
-                    {billing.cui && <InfoRow label="CUI" value={billing.cui} mono />}
-                    {(billing.regCom || billing.registrationNumber) && (
-                      <InfoRow label="Nr. Reg. Com." value={billing.regCom || billing.registrationNumber} mono />
+            <InfoRow label="Serviciu" value={order.services?.name || 'N/A'} />
+            {/* Real per-step delivery estimate (sums urgenta + traducere +
+                legalizare + apostila*) so admin sees the same window the
+                customer was promised. Falls back to `service.estimated_days`
+                if the calculator returns nothing (no recognized add-ons). */}
+            {(() => {
+              const rawOpts = (order.selected_options ?? []).map((o) => ({
+                code: o.code ?? null,
+                optionName: o.option_name,
+                bundledFor:
+                  o.bundledFor ??
+                  (o.bundled_for
+                    ? { parentOptionId: o.bundled_for.parent_option_id }
+                    : null),
+              }));
+              const courier =
+                typeof order.delivery_method === 'object'
+                  ? (order.delivery_method as { method?: string } | null)?.method ?? null
+                  : (order.delivery_method as string | null) ?? null;
+              const est = estimateFromSelectedOptions({
+                selectedOptions: rawOpts,
+                baseDays: order.services?.estimated_days ?? undefined,
+                courier,
+                includeCourierLeg: !!courier,
+              });
+              const label = est.minDays === est.maxDays
+                ? `${est.minDays} zile lucratoare`
+                : `${est.minDays}-${est.maxDays} zile lucratoare`;
+              return <InfoRow label="Termen estimat" value={label} />;
+            })()}
+            {order.selected_options && order.selected_options.length > 0 && (() => {
+              // Split into main-service add-ons vs secondary-service groups.
+              // A row is a "secondary service" if other rows reference it
+              // via `bundled_for.parent_option_id`. The marketing suffix
+              // "(adaugă în aceeași comandă)" is stripped from display so
+              // names stay readable (it's still in the DB row for audit).
+              const stripSuffix = (name: string | undefined) =>
+                (name ?? '')
+                  .replace(/\s*\([^()]*\(adaugă în aceeași comandă\)\)\s*$/i, '')
+                  .replace(/\s*\(adaugă în aceeași comandă\)\s*$/i, '')
+                  .trim();
+              const opts = order.selected_options;
+              const childrenByParent = new Map<string, typeof opts>();
+              for (const o of opts) {
+                const parentId =
+                  o.bundled_for?.parent_option_id ?? o.bundledFor?.parentOptionId;
+                if (parentId) {
+                  const list = childrenByParent.get(parentId) ?? [];
+                  list.push(o);
+                  childrenByParent.set(parentId, list);
+                }
+              }
+              const topLevel = opts.filter(
+                (o) => !(o.bundled_for?.parent_option_id ?? o.bundledFor?.parentOptionId)
+              );
+              const directAddons = topLevel.filter(
+                (o) => !(o.option_id && (childrenByParent.get(o.option_id)?.length ?? 0) > 0)
+              );
+              const subServices = topLevel.filter(
+                (o) => o.option_id && (childrenByParent.get(o.option_id)?.length ?? 0) > 0
+              );
+              const renderRow = (opt: (typeof opts)[number], indented = false) => (
+                <div
+                  key={opt.option_id ?? opt.option_name}
+                  className={`flex items-start justify-between gap-2 text-sm ${
+                    indented ? 'pl-3 ml-1 border-l-2 border-primary-100 text-muted-foreground' : ''
+                  }`}
+                >
+                  <div>
+                    <span className={indented ? '' : 'font-medium'}>{stripSuffix(opt.option_name)}</span>
+                    {(opt.quantity || 1) > 1 && (
+                      <span className="text-muted-foreground"> x{opt.quantity}</span>
                     )}
-                    {billing.companyAddress && (
-                      <>
-                        <Separator className="my-2" />
-                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Adresa facturare</p>
-                        <p className="text-sm">{typeof billing.companyAddress === 'string' ? billing.companyAddress : formatAddress(billing.companyAddress)}</p>
-                      </>
-                    )}
-                  </>
-                ) : (
-                  <>
-                    {/* PF billing - show personal data as billing info */}
-                    <Separator className="my-2" />
-                    {personal ? (
-                      <div className="grid grid-cols-2 gap-x-6 gap-y-1.5 text-sm">
-                        {personal.lastName && (
+                  </div>
+                  {opt.price_modifier ? (
+                    <span className={indented ? 'shrink-0' : 'font-medium shrink-0'}>
+                      +{opt.price_modifier.toFixed(2)} RON
+                    </span>
+                  ) : null}
+                </div>
+              );
+              return (
+                <>
+                  <Separator className="my-2" />
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                    Optiuni selectate
+                  </p>
+                  {directAddons.map((opt) => renderRow(opt))}
+                  {subServices.map((sub) => {
+                    const kids = (sub.option_id && childrenByParent.get(sub.option_id)) || [];
+                    return (
+                      <div key={sub.option_id} className="space-y-1.5 mt-1">
+                        <div className="flex items-start justify-between gap-2 text-sm pt-1 border-t border-neutral-100">
                           <div>
-                            <span className="text-muted-foreground text-xs">Nume</span>
-                            <p className="font-medium">{personal.lastName}</p>
+                            <span className="font-semibold">{stripSuffix(sub.option_name)}</span>
+                            <p className="text-[11px] text-muted-foreground uppercase tracking-wide">
+                              Serviciu secundar
+                            </p>
                           </div>
-                        )}
-                        {personal.firstName && (
-                          <div>
-                            <span className="text-muted-foreground text-xs">Prenume</span>
-                            <p className="font-medium">{personal.firstName}</p>
-                          </div>
-                        )}
-                        {personal.cnp && (
-                          <div>
-                            <span className="text-muted-foreground text-xs">CNP</span>
-                            <p className="font-mono font-medium">{personal.cnp}</p>
-                          </div>
-                        )}
-                        {personal.address && typeof personal.address === 'object' && (
-                          <div className="col-span-2 mt-1">
-                            <span className="text-muted-foreground text-xs">Adresa</span>
-                            <p className="font-medium">{formatAddress(personal.address) || '-'}</p>
-                          </div>
-                        )}
-                        {personal.address && typeof personal.address === 'string' && (
-                          <div className="col-span-2 mt-1">
-                            <span className="text-muted-foreground text-xs">Adresa</span>
-                            <p className="font-medium">{personal.address}</p>
-                          </div>
-                        )}
+                          {sub.price_modifier ? (
+                            <span className="font-semibold shrink-0">
+                              +{sub.price_modifier.toFixed(2)} RON
+                            </span>
+                          ) : null}
+                        </div>
+                        {kids.map((kid) => renderRow(kid, true))}
                       </div>
-                    ) : (
-                      <p className="text-sm text-muted-foreground">Date personale indisponibile.</p>
-                    )}
-                  </>
-                )}
-              </>
-            ) : (
-              <p className="text-sm text-muted-foreground">Nicio informatie de facturare.</p>
-            )}
+                    );
+                  })}
+                </>
+              );
+            })()}
           </CardContent>
         </Card>
-      </div>
-
-      {/* ROW 3: Client Uploaded Documents + Signature */}
-      {(allClientDocs.length > 0 || signature?.signatureBase64) && (
+        {/* Delivery Address */}
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-base flex items-center gap-2">
+              <MapPin className="h-4 w-4" />
+              Livrare
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {deliveryMethodParsed && (
+              <InfoRow label="Metoda" value={deliveryMethodParsed.name || deliveryMethodParsed.type || 'N/A'} />
+            )}
+            {/* Hide cost row for free delivery (Email/PDF) — showing
+                "0.00 RON" is just noise. */}
+            {deliveryMethodParsed?.price !== undefined &&
+              Number(deliveryMethodParsed.price) > 0 && (
+                <InfoRow
+                  label="Cost livrare"
+                  value={`${Number(deliveryMethodParsed.price).toFixed(2)} RON`}
+                />
+              )}
+            {detectedCourierProvider && (
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-muted-foreground">Curier</span>
+                <span className="flex items-center gap-1.5">
+                  <CourierIcon provider={detectedCourierProvider} />
+                  <span className="font-medium">
+                    {detectedCourierProvider === 'fancourier' ? 'Fan Courier' :
+                     detectedCourierProvider === 'sameday' ? 'Sameday' : detectedCourierProvider}
+                  </span>
+                </span>
+              </div>
+            )}
+            {isLockerDelivery && courierQuote?.lockerName && (
+              <>
+                <Separator className="my-2" />
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Locker</p>
+                <InfoRow label="Punct" value={courierQuote.lockerName} />
+                {courierQuote?.lockerAddress && (
+                  <p className="text-sm text-muted-foreground">{courierQuote.lockerAddress}</p>
+                )}
+              </>
+            )}
+            {order.delivery_address && !isLockerDelivery && (
+              <>
+                <Separator className="my-2" />
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Adresa livrare</p>
+                <div className="text-sm space-y-1">
+                  {order.delivery_address.street && (
+                    <p className="font-medium">
+                      {[
+                        order.delivery_address.street && `${order.delivery_address.street}${order.delivery_address.number ? `, Nr. ${order.delivery_address.number}` : ''}`,
+                        order.delivery_address.building && `Bl. ${order.delivery_address.building}`,
+                        order.delivery_address.staircase && `Sc. ${order.delivery_address.staircase}`,
+                        order.delivery_address.floor && `Et. ${order.delivery_address.floor}`,
+                        order.delivery_address.apartment && `Ap. ${order.delivery_address.apartment}`,
+                      ].filter(Boolean).join(', ')}
+                    </p>
+                  )}
+                  <p className="text-muted-foreground">
+                    {[
+                      order.delivery_address.city,
+                      order.delivery_address.county && `Jud. ${order.delivery_address.county}`,
+                      order.delivery_address.postalCode || order.delivery_address.postal_code,
+                    ].filter(Boolean).join(', ')}
+                  </p>
+                </div>
+              </>
+            )}
+            {!order.delivery_address && !isLockerDelivery && !deliveryMethodParsed && (
+              <p className="text-sm text-muted-foreground">Nicio informatie de livrare.</p>
+            )}
+            {/* AWB controls nested inside the Livrare card so the operator
+                doesn't have to scroll to a separate section. Renders the
+                "Genereaza AWB" button when courier is set but no AWB yet,
+                or the AWB number + Print/Tracking/Cancel buttons once
+                generated. Returns null for email/PDF orders. */}
+            <AwbSection
+              order={order}
+              hasCourier={hasCourier}
+              hasAwb={hasAwb}
+              isLockerDelivery={isLockerDelivery}
+              deliveryMethodParsed={deliveryMethodParsed}
+              courierQuote={courierQuote}
+              detectedCourierProvider={detectedCourierProvider}
+              generating={generating}
+              awbError={awbError}
+              cancelling={cancelling}
+              downloading={downloading}
+              onGenerateAwb={handleGenerateAwb}
+              onPrintLabel={handlePrintLabel}
+              onCancelAwb={handleCancelAwb}
+              onCopyAwb={handleCopyAwb}
+              onMarkDelivered={handleMarkDelivered}
+            />
+          </CardContent>
+        </Card>
+        </div>
+      </div>
+
+      {/* ROW 3: Client Uploaded Documents + KYC inline + Signature.
+          KYC verification badges are rendered per-document (OCR % and
+          face-match %) instead of in a separate card — so the operator
+          sees the confidence right next to the photo it applies to. */}
+      {(allClientDocs.length > 0 || signature?.signatureBase64) && (
+        (() => {
+          const kycByType = extractKycByDocType(order.customer_data);
+          const reviewNeeded = needsKycReview(kycByType);
+          return (
+        <Card className={reviewNeeded ? 'border-yellow-300 bg-yellow-50/30' : ''}>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base flex items-center gap-2">
               <Upload className="h-4 w-4" />
-              Documente incarcate de client
+              Documente încărcate de client
+              {Object.keys(kycByType).length > 0 && (
+                <span className="ml-1 inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-medium text-slate-700">
+                  <Shield className="h-3 w-3" />
+                  KYC
+                </span>
+              )}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {reviewNeeded && (
+              <Alert className="bg-yellow-50 border-yellow-300">
+                <AlertTriangle className="h-4 w-4 text-yellow-700" />
+                <AlertDescription className="text-yellow-800 text-sm font-medium">
+                  Verificare KYC necesită revizuire manuală — confidence sub 70% pe cel puțin un
+                  document sau face-match.
+                </AlertDescription>
+              </Alert>
+            )}
+
+
+
+
+            <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
               {allClientDocs.map((doc, i) => (
-                <ClientDocumentCard key={`${doc.type}-${i}`} doc={doc} />
+                <ClientDocumentCard key={`${doc.type}-${i}`} doc={doc} kyc={kycByType[doc.type]} />
               ))}
             </div>
             {allClientDocs.length === 0 && (
-              <p className="text-sm text-muted-foreground">Niciun document incarcat de client.</p>
+              <p className="text-sm text-muted-foreground">Niciun document încărcat de client.</p>
             )}
 
             {/* Signature */}
@@ -950,13 +1245,122 @@ export default function AdminOrderDetailPage() {
             )}
           </CardContent>
         </Card>
+          );
+        })()
       )}
 
-      {/* KYC Verification Results */}
-      <KYCVerificationCard customerData={order.customer_data} />
+      {/* PROCESSING SECTION - RIGHT AFTER CONTACT & SERVICE */}
+      <ProcessingSection
+        order={order}
+        documents={orderDocuments}
+        optionStatuses={optionStatuses}
+        onStatusChange={fetchOrder}
+      />
 
-      {/* ROW 4: Payment + Delivery Address */}
+      {/* ROW 2: Facturare + Contract semnat */}
       <div className="grid gap-4 lg:grid-cols-2">
+        {/* Facturare — clean InfoRow style matching sister project. Includes
+            Oblio invoice number row with a link when the invoice has been
+            issued (paid orders). */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base flex items-center gap-2">
+              <Receipt className="h-4 w-4" />
+              Facturare
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-1">
+            {(() => {
+              const isPJBilling = billing?.type === 'persoana_juridica';
+              const tipFactura = isPJBilling ? 'Persoana Juridica' : 'Persoana Fizica';
+              const nume = isPJBilling
+                ? billing?.companyName || ''
+                : [personal?.lastName, personal?.firstName].filter(Boolean).join(' ');
+              const addrObj = isPJBilling
+                ? typeof billing?.companyAddress === 'object'
+                  ? billing.companyAddress
+                  : null
+                : typeof personal?.address === 'object'
+                  ? personal.address
+                  : null;
+              const addrStr = isPJBilling
+                ? typeof billing?.companyAddress === 'string'
+                  ? billing.companyAddress
+                  : ''
+                : typeof personal?.address === 'string'
+                  ? personal.address
+                  : '';
+
+              const strada = addrObj
+                ? [
+                    addrObj.street,
+                    addrObj.number && `nr. ${addrObj.number}`,
+                    addrObj.building && `bl. ${addrObj.building}`,
+                    addrObj.staircase && `sc. ${addrObj.staircase}`,
+                    addrObj.floor && `et. ${addrObj.floor}`,
+                    addrObj.apartment && `ap. ${addrObj.apartment}`,
+                  ]
+                    .filter(Boolean)
+                    .join(', ')
+                : addrStr;
+
+              return (
+                <>
+                  <InfoRow label="Tip factură" value={tipFactura} />
+                  {nume && <InfoRow label="Nume" value={nume} />}
+                  {isPJBilling && billing?.cui && <InfoRow label="CUI" value={billing.cui} mono />}
+                  {isPJBilling && (billing?.regCom || billing?.registrationNumber) && (
+                    <InfoRow
+                      label="Nr. Reg. Com."
+                      value={billing.regCom || billing.registrationNumber}
+                      mono
+                    />
+                  )}
+                  {strada && <InfoRow label="Strada" value={strada} />}
+                  {addrObj?.city && <InfoRow label="Oraș" value={addrObj.city} />}
+                  {addrObj?.county && <InfoRow label="Județ" value={addrObj.county} />}
+                  {(addrObj?.postalCode || addrObj?.postal_code) && (
+                    <InfoRow label="Cod poștal" value={addrObj.postalCode || addrObj.postal_code} />
+                  )}
+                  <Separator className="my-1.5" />
+                  {/* Oblio invoice slot — shows "—" until the invoice is
+                      issued, then displays the invoice number with a link
+                      to the Oblio PDF. */}
+                  {order.invoice_number && order.invoice_url ? (
+                    <div className="flex items-center justify-between gap-4 text-sm">
+                      <span className="text-muted-foreground">Nr. factură Oblio</span>
+                      <Link
+                        href={order.invoice_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="font-mono text-primary hover:underline"
+                      >
+                        {order.invoice_number} ↗
+                      </Link>
+                    </div>
+                  ) : order.invoice_number ? (
+                    <InfoRow label="Nr. factură Oblio" value={order.invoice_number} mono />
+                  ) : (
+                    <InfoRow label="Nr. factură Oblio" value="—" />
+                  )}
+                  {!billing && !personal && (
+                    <p className="text-sm text-muted-foreground">Nicio informație de facturare.</p>
+                  )}
+                </>
+              );
+            })()}
+          </CardContent>
+        </Card>
+
+        {/* Contract semnat — legal validity audit: signature timestamp,
+            signing IP, browser user agent, SHA-256 of the contract PDF.
+            Hidden when the contract hasn't been signed yet. */}
+        <ContractSignedCard customerData={order.customer_data} />
+      </div>
+
+      {/* ROW 3: Plata (full width — it's information-dense and reads better
+          on a single row with all line-item rows visible at once). */}
+      <div>
         {/* Payment */}
         <Card>
           <CardHeader className="pb-3">
@@ -1044,95 +1448,23 @@ export default function AdminOrderDetailPage() {
             )}
           </CardContent>
         </Card>
-
-        {/* Delivery Address */}
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base flex items-center gap-2">
-              <MapPin className="h-4 w-4" />
-              Livrare
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {deliveryMethodParsed && (
-              <InfoRow label="Metoda" value={deliveryMethodParsed.name || deliveryMethodParsed.type || 'N/A'} />
-            )}
-            {deliveryMethodParsed?.price !== undefined && (
-              <InfoRow label="Cost livrare" value={`${Number(deliveryMethodParsed.price).toFixed(2)} RON`} />
-            )}
-            {detectedCourierProvider && (
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">Curier</span>
-                <span className="flex items-center gap-1.5">
-                  <CourierIcon provider={detectedCourierProvider} />
-                  <span className="font-medium">
-                    {detectedCourierProvider === 'fancourier' ? 'Fan Courier' :
-                     detectedCourierProvider === 'sameday' ? 'Sameday' : detectedCourierProvider}
-                  </span>
-                </span>
-              </div>
-            )}
-            {isLockerDelivery && courierQuote?.lockerName && (
-              <>
-                <Separator className="my-2" />
-                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Locker</p>
-                <InfoRow label="Punct" value={courierQuote.lockerName} />
-                {courierQuote?.lockerAddress && (
-                  <p className="text-sm text-muted-foreground">{courierQuote.lockerAddress}</p>
-                )}
-              </>
-            )}
-            {order.delivery_address && !isLockerDelivery && (
-              <>
-                <Separator className="my-2" />
-                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Adresa livrare</p>
-                <div className="text-sm space-y-1">
-                  {order.delivery_address.street && (
-                    <p className="font-medium">
-                      {[
-                        order.delivery_address.street && `${order.delivery_address.street}${order.delivery_address.number ? `, Nr. ${order.delivery_address.number}` : ''}`,
-                        order.delivery_address.building && `Bl. ${order.delivery_address.building}`,
-                        order.delivery_address.staircase && `Sc. ${order.delivery_address.staircase}`,
-                        order.delivery_address.floor && `Et. ${order.delivery_address.floor}`,
-                        order.delivery_address.apartment && `Ap. ${order.delivery_address.apartment}`,
-                      ].filter(Boolean).join(', ')}
-                    </p>
-                  )}
-                  <p className="text-muted-foreground">
-                    {[
-                      order.delivery_address.city,
-                      order.delivery_address.county && `Jud. ${order.delivery_address.county}`,
-                      order.delivery_address.postalCode || order.delivery_address.postal_code,
-                    ].filter(Boolean).join(', ')}
-                  </p>
-                </div>
-              </>
-            )}
-            {!order.delivery_address && !isLockerDelivery && !deliveryMethodParsed && (
-              <p className="text-sm text-muted-foreground">Nicio informatie de livrare.</p>
-            )}
-          </CardContent>
-        </Card>
       </div>
 
-      {/* AWB Section */}
-      <AwbSection
-        order={order}
-        hasCourier={hasCourier}
-        hasAwb={hasAwb}
-        isLockerDelivery={isLockerDelivery}
-        deliveryMethodParsed={deliveryMethodParsed}
-        courierQuote={courierQuote}
-        detectedCourierProvider={detectedCourierProvider}
-        generating={generating}
-        awbError={awbError}
-        cancelling={cancelling}
-        downloading={downloading}
-        onGenerateAwb={handleGenerateAwb}
-        onPrintLabel={handlePrintLabel}
-        onCancelAwb={handleCancelAwb}
-        onCopyAwb={handleCopyAwb}
+
+      {/* Inline Update Status card — the everyday admin tool for changing
+          an order's status. Optional note, single click apply. Matches the
+          sister project's UX (Actualizează Status card). */}
+      <UpdateStatusCard
+        orderId={order.id}
+        currentStatus={order.status || 'draft'}
+        onUpdated={fetchOrder}
       />
+
+      {/* Note Echipă — internal admin notes (Cmd+Enter to submit). Shows
+          only human notes (filters out system-* changed_by). Each note
+          attached to a status transition gets a small badge showing the
+          status it was attached to. */}
+      <NoteEchipaCard orderId={order.id} timeline={timeline} onAdded={fetchOrder} />
 
       {/* Order Timeline */}
       <Card>
@@ -1168,13 +1500,320 @@ export default function AdminOrderDetailPage() {
           {JSON.stringify(order.customer_data, null, 2)}
         </pre>
       </details>
+
+      {/* Modify dialog — invoked by the "Modifică" header button. State + open
+          flag live on the page so we can refresh the order data after a
+          successful apply. */}
+      <ModifyOrderDialog
+        open={modifyDialogOpen}
+        onOpenChange={setModifyDialogOpen}
+        orderId={order.id}
+        orderNumber={displayOrderNumber}
+        initialOptions={(order.selected_options ?? []) as Parameters<typeof ModifyOrderDialog>[0]['initialOptions']}
+        initialDeliveryPrice={Number(order.delivery_price ?? 0)}
+        onApplied={fetchOrder}
+      />
+
+    </div>
+  );
+}
+
+// ---------- Note Echipă Card ----------
+
+function NoteEchipaCard({
+  orderId,
+  timeline,
+  onAdded,
+}: {
+  orderId: string;
+  timeline: TimelineEvent[];
+  onAdded: () => void;
+}) {
+  const [draft, setDraft] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Filter rules (mirrors sister):
+  //   - keep entries authored by a real admin (not system-*)
+  //   - keep both pure notes (note_added) AND status transitions that came
+  //     with a meaningful note attached
+  const visibleNotes = useMemo(
+    () =>
+      timeline.filter((t: TimelineEvent) => {
+        const by = (t.changed_by || '').toLowerCase();
+        if (by.startsWith('system')) return false;
+        if (t.event_type === 'note_added' && (t.notes || '').trim()) return true;
+        if ((t.notes || '').trim().length > 0) return true;
+        return false;
+      }),
+    [timeline]
+  );
+
+  const submit = async () => {
+    const text = draft.trim();
+    if (text.length < 1) return;
+    setSubmitting(true);
+    setError(null);
+    try {
+      const res = await fetch(`/api/admin/orders/${orderId}/notes`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ note: text }),
+      });
+      const json = await res.json();
+      if (!res.ok || !json.success) {
+        setError(json.error?.message || 'Eroare la salvare');
+        return;
+      }
+      setDraft('');
+      onAdded();
+    } catch {
+      setError('Eroare de rețea');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const onKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    // Cmd+Enter or Ctrl+Enter submits.
+    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+      e.preventDefault();
+      submit();
+    }
+  };
+
+  return (
+    <Card id="notes-echipa">
+      <CardHeader className="pb-3">
+        <CardTitle className="text-base flex items-center gap-2">
+          <PenLine className="h-4 w-4" />
+          Note Echipă
+          {visibleNotes.length > 0 && (
+            <span className="text-xs font-normal text-muted-foreground">
+              ({visibleNotes.length})
+            </span>
+          )}
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        {visibleNotes.length === 0 ? (
+          <p className="text-sm text-muted-foreground">Nicio notă încă. Prima ta notă apare aici.</p>
+        ) : (
+          <ul className="space-y-2.5">
+            {visibleNotes.map((n) => (
+              <li
+                key={n.id}
+                className="rounded-md border border-amber-100 bg-amber-50/40 p-2.5 text-sm"
+              >
+                <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                  <span className="font-medium text-slate-700">{n.changed_by || 'admin'}</span>
+                  <span>·</span>
+                  <span>{n.created_at ? new Date(n.created_at).toLocaleString('ro-RO') : '—'}</span>
+                  {n.event_type !== 'note_added' && n.to_status && (
+                    <span className="rounded bg-slate-200 px-1.5 py-0 text-[10px] font-semibold tracking-wide text-slate-700">
+                      la status: {n.to_status}
+                    </span>
+                  )}
+                </div>
+                <p className="mt-1 whitespace-pre-wrap text-slate-900">{n.notes}</p>
+              </li>
+            ))}
+          </ul>
+        )}
+
+        <div className="space-y-2 border-t border-slate-100 pt-3">
+          <Label htmlFor="note-textarea" className="text-xs font-medium text-slate-600">
+            Adaugă notă (Cmd/Ctrl+Enter pentru salvare rapidă)
+          </Label>
+          <Textarea
+            id="note-textarea"
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            onKeyDown={onKeyDown}
+            placeholder="Adaugă o notă despre acest client / comandă (vizibilă doar echipei)…"
+            rows={3}
+            className="resize-none text-sm"
+            maxLength={5000}
+          />
+          {error && <p className="text-xs text-red-600">{error}</p>}
+          <div className="flex justify-end">
+            <Button size="sm" onClick={submit} disabled={submitting || draft.trim().length === 0}>
+              {submitting ? 'Se salvează…' : 'Adaugă notă'}
+            </Button>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+// ---------- Cancellation Requested Banner ----------
+
+function CancellationRequestedBanner({
+  order,
+  onProcessed,
+}: {
+  order: OrderDetail;
+  onProcessed: () => void;
+}) {
+  const [processing, setProcessing] = useState(false);
+  const totalRon = Number(order.total_price || 0);
+  const refundAmountRon = Math.round(totalRon * 0.7 * 100) / 100;
+
+  const processRefund = async () => {
+    if (
+      !confirm(
+        `Procesezi refund 70% (${refundAmountRon.toFixed(
+          2
+        )} RON din ${totalRon.toFixed(2)} RON) și marchezi comanda ca 'refunded'?\n\nOperația trimite cererea automat la Stripe.`
+      )
+    ) {
+      return;
+    }
+    setProcessing(true);
+    try {
+      const res = await fetch(`/api/admin/orders/${order.id}/process-cancellation`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      const json = await res.json();
+      if (!res.ok || !json.success) {
+        toast.error(json.error || 'Refund eșuat');
+        return;
+      }
+      toast.success(`Refund procesat: ${json.refundAmountRon.toFixed(2)} RON (${json.refundId})`);
+      onProcessed();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Eroare rețea');
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  return (
+    <div className="rounded-lg border-2 border-red-200 bg-red-50 p-4">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <div className="flex items-center gap-2 font-semibold text-red-900">
+            <AlertCircle className="h-5 w-5" />
+            Cerere de anulare — refund 70% în așteptare
+          </div>
+          <p className="mt-1 text-sm text-red-800">
+            Clientul a solicitat anularea în termenul de 30 minute. Procesarea acestui buton va
+            iniția refund-ul Stripe ({refundAmountRon.toFixed(2)} RON din {totalRon.toFixed(2)}{' '}
+            RON) și va marca comanda ca <code>refunded</code>.
+          </p>
+          <p className="mt-1 text-xs text-red-700">
+            Diferența de 30% (~{(totalRon - refundAmountRon).toFixed(2)} RON) rămâne reținută per
+            policy (acoperă comisioanele Stripe + procesarea începută).
+          </p>
+        </div>
+        <Button
+          variant="destructive"
+          size="sm"
+          onClick={processRefund}
+          disabled={processing}
+          className="shrink-0 text-white"
+        >
+          {processing ? 'Se procesează…' : `Procesează refund ${refundAmountRon.toFixed(2)} RON`}
+        </Button>
+      </div>
     </div>
   );
 }
 
 // ---------- Client Document Card ----------
 
-function ClientDocumentCard({ doc }: { doc: { type: string; label: string; s3Key?: string; base64?: string; fileName?: string } }) {
+// ---------- KYC helpers (merged into the Documents card) ----------
+
+// Maps every KYC document type to its validation info from customer_data.
+// Returns `{ confidence, valid, faceMatch?, faceMatchConfidence? }` if any
+// AI verification ran on it; null otherwise.
+export interface KycPerDoc {
+  confidence: number;
+  valid: boolean;
+  faceMatch?: boolean;
+  faceMatchConfidence?: number;
+}
+
+function extractKycByDocType(customerData: AnyObj | null): Record<string, KycPerDoc> {
+  if (!customerData) return {};
+  const personal = customerData.personalData || customerData.personal;
+  if (!personal) return {};
+  const kyc = personal.kycValidation as {
+    ciFront?: { valid: boolean; confidence: number };
+    ciBack?: { valid: boolean; confidence: number };
+    selfie?: { valid: boolean; confidence: number; faceMatch: boolean; faceMatchConfidence: number };
+  } | undefined;
+  const ocrResults = personal.ocrResults as Array<{
+    documentType: string;
+    success: boolean;
+    confidence: number;
+  }> | undefined;
+
+  const ciFront =
+    kyc?.ciFront ??
+    (() => {
+      const o = ocrResults?.find(
+        (r) =>
+          r.documentType === 'ci_front' || r.documentType === 'ci_vechi' || r.documentType === 'ci_nou_front'
+      );
+      return o ? { valid: o.success, confidence: o.confidence } : undefined;
+    })();
+  const ciBack =
+    kyc?.ciBack ??
+    (() => {
+      const o = ocrResults?.find(
+        (r) => r.documentType === 'ci_back' || r.documentType === 'ci_nou_back'
+      );
+      return o ? { valid: o.success, confidence: o.confidence } : undefined;
+    })();
+  const selfie = kyc?.selfie;
+
+  const out: Record<string, KycPerDoc> = {};
+  if (ciFront) {
+    out['ci_front'] = { confidence: ciFront.confidence, valid: ciFront.valid };
+    out['ci_vechi'] = out['ci_front'];
+    out['ci_nou_front'] = out['ci_front'];
+  }
+  if (ciBack) {
+    out['ci_back'] = { confidence: ciBack.confidence, valid: ciBack.valid };
+    out['ci_nou_back'] = out['ci_back'];
+  }
+  if (selfie) {
+    out['selfie'] = {
+      confidence: selfie.confidence,
+      valid: selfie.valid,
+      faceMatch: selfie.faceMatch,
+      faceMatchConfidence: selfie.faceMatchConfidence,
+    };
+  }
+  return out;
+}
+
+const KYC_LOW_CONFIDENCE = 70;
+
+function kycConfidenceClass(c: number): string {
+  if (c >= 80) return 'bg-green-100 text-green-700';
+  if (c >= 60) return 'bg-yellow-100 text-yellow-700';
+  return 'bg-red-100 text-red-700';
+}
+
+function needsKycReview(byType: Record<string, KycPerDoc>): boolean {
+  for (const k of Object.values(byType)) {
+    if (k.confidence < KYC_LOW_CONFIDENCE) return true;
+    if (k.faceMatchConfidence !== undefined && k.faceMatchConfidence < KYC_LOW_CONFIDENCE) return true;
+  }
+  return false;
+}
+
+function ClientDocumentCard({
+  doc,
+  kyc,
+}: {
+  doc: { type: string; label: string; s3Key?: string; base64?: string; fileName?: string };
+  kyc?: KycPerDoc;
+}) {
   const [downloading, setDownloading] = useState(false);
 
   const handlePreview = async () => {
@@ -1225,8 +1864,33 @@ function ClientDocumentCard({ doc }: { doc: { type: string; label: string; s3Key
       <div className="min-w-0 flex-1">
         <p className="text-sm font-medium">{doc.label}</p>
         <p className="text-xs text-muted-foreground mt-0.5">
-          {doc.s3Key ? 'Stocat in S3' : doc.base64 ? 'Disponibil local' : 'Neincarcat'}
+          {doc.s3Key ? 'Stocat în S3' : doc.base64 ? 'Disponibil local' : 'Neîncărcat'}
         </p>
+        {/* AI validation result + confidence — shown inline so the admin
+            doesn't have to scroll to a separate "Verificare KYC" card. */}
+        {kyc && (
+          <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+            {kyc.valid ? (
+              <CheckCircle2 className="h-3.5 w-3.5 text-green-600" />
+            ) : (
+              <XCircle className="h-3.5 w-3.5 text-red-600" />
+            )}
+            <Badge
+              variant="secondary"
+              className={`h-5 text-[10px] font-mono px-1.5 ${kycConfidenceClass(kyc.confidence)}`}
+            >
+              OCR {Math.round(kyc.confidence)}%
+            </Badge>
+            {kyc.faceMatchConfidence !== undefined && (
+              <Badge
+                variant="secondary"
+                className={`h-5 text-[10px] font-mono px-1.5 ${kycConfidenceClass(kyc.faceMatchConfidence)}`}
+              >
+                {kyc.faceMatch ? 'Match' : 'No match'} {Math.round(kyc.faceMatchConfidence)}%
+              </Badge>
+            )}
+          </div>
+        )}
       </div>
       {(doc.s3Key || doc.base64) && (
         <Button size="sm" variant="ghost" className="h-7 text-xs shrink-0" onClick={handlePreview} disabled={downloading}>
@@ -1661,6 +2325,7 @@ interface AwbSectionProps {
   onPrintLabel: () => void;
   onCancelAwb: () => void;
   onCopyAwb: () => void;
+  onMarkDelivered?: () => void;
 }
 
 function AwbSection({
@@ -1668,7 +2333,6 @@ function AwbSection({
   hasCourier,
   hasAwb,
   isLockerDelivery,
-  deliveryMethodParsed,
   courierQuote,
   detectedCourierProvider,
   generating,
@@ -1679,48 +2343,29 @@ function AwbSection({
   onPrintLabel,
   onCancelAwb,
   onCopyAwb,
+  onMarkDelivered,
 }: AwbSectionProps) {
+  // Nested inside the Livrare card — returns just the inner section
+  // (separator + title + content) without an outer Card wrapper.
+  // Email/PDF orders have no courier → render nothing.
   if (!hasCourier) {
-    return (
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base flex items-center gap-2">
-            <Truck className="h-4 w-4" />
-            Livrare
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground">
-            {deliveryMethodParsed?.type === 'email'
-              ? 'Livrare prin email - nu necesita AWB'
-              : 'Niciun curier configurat pentru aceasta comanda.'}
-          </p>
-        </CardContent>
-      </Card>
-    );
+    return null;
   }
 
-  const providerName =
-    detectedCourierProvider === 'fancourier' ? 'Fan Courier' :
-    detectedCourierProvider === 'sameday' ? 'Sameday' :
-    detectedCourierProvider || '';
-
-  const serviceName = courierQuote?.serviceName || order.courier_service || '';
-
   if (hasAwb) {
+    const canMarkDelivered = order.status === 'shipped';
     return (
-      <Card className="border-green-200 bg-green-50/30">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base flex items-center gap-2 text-green-800">
-            <CheckCircle2 className="h-5 w-5 text-green-600" />
+      <>
+        <Separator className="my-2" />
+        <div className="rounded-md border border-green-200 bg-green-50/30 p-3 space-y-3">
+          <div className="flex items-center gap-2 text-sm font-semibold text-green-800">
+            <CheckCircle2 className="h-4 w-4 text-green-600" />
             AWB Generat
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
+          </div>
           <div className="flex flex-wrap items-center gap-3">
             <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">AWB:</span>
-              <span className="font-mono text-lg font-bold text-green-800">
+              <span className="text-xs text-muted-foreground">AWB:</span>
+              <span className="font-mono text-base font-bold text-green-800">
                 {order.delivery_tracking_number}
               </span>
               <Button variant="ghost" size="icon-sm" onClick={onCopyAwb} title="Copiaza AWB">
@@ -1731,14 +2376,6 @@ function AwbSection({
               <Badge variant="secondary" className="capitalize">{order.delivery_tracking_status}</Badge>
             )}
           </div>
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <CourierIcon provider={detectedCourierProvider} />
-            <span>{providerName}{serviceName ? ` - ${serviceName}` : ''}</span>
-            {isLockerDelivery && courierQuote?.lockerName && (
-              <Badge variant="outline" className="ml-1">Locker: {courierQuote.lockerName}</Badge>
-            )}
-          </div>
-          <Separator />
           <div className="flex flex-wrap gap-2">
             <Button variant="outline" size="sm" onClick={onPrintLabel} disabled={downloading}>
               {downloading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Printer className="h-4 w-4" />}
@@ -1752,30 +2389,42 @@ function AwbSection({
                 </Link>
               </Button>
             )}
-            <Button variant="outline" size="sm" className="text-destructive hover:text-destructive hover:bg-destructive/10" onClick={onCancelAwb} disabled={cancelling}>
+            {/* Quick "Marchează livrat" — one-click flip from shipped to
+                completed (1 click vs going through the dropdown). Hidden
+                once the order has moved past shipped. */}
+            {canMarkDelivered && onMarkDelivered && (
+              <Button
+                size="sm"
+                className="bg-green-600 hover:bg-green-700 text-white"
+                onClick={onMarkDelivered}
+              >
+                <CheckCircle2 className="h-4 w-4" />
+                Marchează livrat
+              </Button>
+            )}
+            <Button
+              variant="outline"
+              size="sm"
+              className="text-destructive hover:text-destructive hover:bg-destructive/10"
+              onClick={onCancelAwb}
+              disabled={cancelling}
+            >
               {cancelling ? <Loader2 className="h-4 w-4 animate-spin" /> : <XCircle className="h-4 w-4" />}
               Anuleaza AWB
             </Button>
           </div>
-        </CardContent>
-      </Card>
+          {isLockerDelivery && courierQuote?.lockerName && (
+            <p className="text-xs text-muted-foreground">Locker: {courierQuote.lockerName}</p>
+          )}
+        </div>
+      </>
     );
   }
 
   return (
-    <Card>
-      <CardHeader className="pb-3">
-        <CardTitle className="text-base flex items-center gap-2">
-          <Truck className="h-4 w-4" />
-          Genereaza AWB
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="flex items-center gap-2 text-sm">
-          <CourierIcon provider={detectedCourierProvider} />
-          <span className="font-medium">{providerName}</span>
-          {serviceName && <span className="text-muted-foreground">- {serviceName}</span>}
-        </div>
+    <>
+      <Separator className="my-2" />
+      <div className="space-y-3">
         {awbError && (
           <Alert variant="destructive">
             <AlertTriangle className="h-4 w-4" />
@@ -1783,141 +2432,12 @@ function AwbSection({
             <AlertDescription>{awbError}</AlertDescription>
           </Alert>
         )}
-        <Button onClick={onGenerateAwb} disabled={generating}>
+        <Button onClick={onGenerateAwb} disabled={generating} className="text-white">
           {generating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Truck className="h-4 w-4" />}
           {awbError ? 'Incearca din nou' : 'Genereaza AWB'}
         </Button>
-      </CardContent>
-    </Card>
-  );
-}
-
-// ---------- KYC Verification Card ----------
-
-function KYCVerificationCard({ customerData }: { customerData: AnyObj | null }) {
-  if (!customerData) return null;
-
-  const personal = customerData.personalData || customerData.personal;
-  if (!personal) return null;
-
-  const kycValidation = personal.kycValidation as {
-    ciFront?: { valid: boolean; confidence: number };
-    ciBack?: { valid: boolean; confidence: number };
-    selfie?: { valid: boolean; confidence: number; faceMatch: boolean; faceMatchConfidence: number };
-  } | undefined;
-
-  // Also check ocrResults as a fallback for confidence data
-  const ocrResults = personal.ocrResults as Array<{
-    documentType: string;
-    success: boolean;
-    confidence: number;
-  }> | undefined;
-
-  // Build validation data from kycValidation or fallback to ocrResults
-  const ciFront = kycValidation?.ciFront || (() => {
-    const ocr = ocrResults?.find(r => r.documentType === 'ci_front' || r.documentType === 'ci_vechi' || r.documentType === 'ci_nou_front');
-    return ocr ? { valid: ocr.success, confidence: ocr.confidence } : undefined;
-  })();
-
-  const ciBack = kycValidation?.ciBack || (() => {
-    const ocr = ocrResults?.find(r => r.documentType === 'ci_back' || r.documentType === 'ci_nou_back');
-    return ocr ? { valid: ocr.success, confidence: ocr.confidence } : undefined;
-  })();
-
-  const selfie = kycValidation?.selfie;
-
-  // Nothing to display if no validation data exists
-  if (!ciFront && !ciBack && !selfie) return null;
-
-  // Determine if manual review is needed
-  const LOW_CONFIDENCE_THRESHOLD = 70;
-  const needsReview =
-    (ciFront && ciFront.confidence < LOW_CONFIDENCE_THRESHOLD) ||
-    (ciBack && ciBack.confidence < LOW_CONFIDENCE_THRESHOLD) ||
-    (selfie && selfie.confidence < LOW_CONFIDENCE_THRESHOLD) ||
-    (selfie && selfie.faceMatchConfidence < LOW_CONFIDENCE_THRESHOLD);
-
-  function getConfidenceColor(confidence: number): string {
-    if (confidence >= 80) return 'text-green-700';
-    if (confidence >= 60) return 'text-yellow-700';
-    return 'text-red-700';
-  }
-
-  function getConfidenceBg(confidence: number): string {
-    if (confidence >= 80) return 'bg-green-100';
-    if (confidence >= 60) return 'bg-yellow-100';
-    return 'bg-red-100';
-  }
-
-  function renderValidationRow(label: string, data: { valid: boolean; confidence: number } | undefined) {
-    if (!data) return null;
-    const icon = data.valid ? (
-      <CheckCircle2 className="h-4 w-4 text-green-600" />
-    ) : (
-      <XCircle className="h-4 w-4 text-red-600" />
-    );
-    return (
-      <div className="flex items-center justify-between py-1.5">
-        <div className="flex items-center gap-2 text-sm">
-          {icon}
-          <span>{label}</span>
-        </div>
-        <Badge
-          variant="secondary"
-          className={`text-xs font-mono ${getConfidenceBg(data.confidence)} ${getConfidenceColor(data.confidence)}`}
-        >
-          {Math.round(data.confidence)}%
-        </Badge>
       </div>
-    );
-  }
-
-  return (
-    <Card className={needsReview ? 'border-yellow-300 bg-yellow-50/30' : ''}>
-      <CardHeader className="pb-3">
-        <CardTitle className="text-base flex items-center gap-2">
-          <Shield className="h-4 w-4" />
-          Verificare KYC
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-2">
-        {needsReview && (
-          <Alert className="bg-yellow-50 border-yellow-300 mb-3">
-            <AlertTriangle className="h-4 w-4 text-yellow-700" />
-            <AlertDescription className="text-yellow-800 text-sm font-medium">
-              Verificare KYC necesita revizuire manuala
-              {selfie && selfie.faceMatchConfidence < LOW_CONFIDENCE_THRESHOLD && (
-                <span> - Potrivire fata: {Math.round(selfie.faceMatchConfidence)}%</span>
-              )}
-            </AlertDescription>
-          </Alert>
-        )}
-
-        {renderValidationRow('CI Fata', ciFront)}
-        {renderValidationRow('CI Verso', ciBack)}
-        {selfie && (
-          <>
-            {renderValidationRow('Selfie', { valid: selfie.valid, confidence: selfie.confidence })}
-            <div className="flex items-center justify-between py-1.5">
-              <div className="flex items-center gap-2 text-sm">
-                {selfie.faceMatch ? (
-                  <CheckCircle2 className="h-4 w-4 text-green-600" />
-                ) : (
-                  <XCircle className="h-4 w-4 text-red-600" />
-                )}
-                <span>Potrivire fata</span>
-              </div>
-              <Badge
-                variant="secondary"
-                className={`text-xs font-mono ${getConfidenceBg(selfie.faceMatchConfidence)} ${getConfidenceColor(selfie.faceMatchConfidence)}`}
-              >
-                {Math.round(selfie.faceMatchConfidence)}%
-              </Badge>
-            </div>
-          </>
-        )}
-      </CardContent>
-    </Card>
+    </>
   );
 }
 
@@ -1937,8 +2457,8 @@ function InfoRow({ label, value, icon, mono = false }: { label: string; value: s
 
 function PaymentStatusBadge({ status }: { status: string | null }) {
   if (!status || status === 'pending') return <Badge variant="outline">In asteptare</Badge>;
-  if (status === 'paid' || status === 'succeeded') return <Badge variant="default" className="bg-green-600">Platita</Badge>;
-  if (status === 'failed') return <Badge variant="destructive">Esuata</Badge>;
+  if (status === 'paid' || status === 'succeeded') return <Badge variant="default" className="bg-green-600 text-white">Platita</Badge>;
+  if (status === 'failed') return <Badge variant="destructive" className="text-white">Esuata</Badge>;
   if (status === 'processing') return <Badge variant="secondary">Se proceseaza</Badge>;
   if (status === 'awaiting_verification') return <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">Asteapta verificare</Badge>;
   return <Badge variant="outline">{status}</Badge>;
@@ -2000,15 +2520,100 @@ function OrderTimeline({ timeline, orderCreatedAt }: { timeline: TimelineEvent[]
               <Icon className="h-3.5 w-3.5" />
             </div>
             <div className="flex-1 min-w-0 pt-0.5">
-              <div className="flex items-baseline gap-2">
+              <div className="flex items-baseline gap-2 flex-wrap">
                 <span className="text-sm font-medium">{config.label}</span>
                 <span className="text-xs text-muted-foreground">{formatDate(event.created_at)}</span>
+                {event.changed_by && (
+                  <span className="text-xs text-muted-foreground">· {event.changed_by}</span>
+                )}
               </div>
-              {event.notes && <p className="text-sm text-muted-foreground mt-0.5">{event.notes}</p>}
+              {/* Status badges with arrow — only when this row carries a
+                  real transition (from_status → to_status). */}
+              {event.from_status && event.to_status && event.from_status !== event.to_status && (
+                <div className="mt-1 flex items-center gap-2 flex-wrap">
+                  <StatusBadgeMini status={event.from_status} />
+                  <span className="text-muted-foreground">→</span>
+                  <StatusBadgeMini status={event.to_status} />
+                </div>
+              )}
+              {event.notes && <p className="text-sm text-muted-foreground mt-1">{event.notes}</p>}
             </div>
           </div>
         );
       })}
     </div>
+  );
+}
+
+// Small colored status pill used in the timeline transitions.
+// ---------- Contract Signed Card ----------
+
+function ContractSignedCard({ customerData }: { customerData: AnyObj | null }) {
+  const meta = customerData?.signature_metadata as
+    | {
+        signed_at?: string;
+        ip_address?: string;
+        user_agent?: string;
+        document_hash?: string;
+      }
+    | undefined;
+
+  // Hide the card entirely when there's no signature yet — keeps the layout
+  // tidy for in-progress orders.
+  if (!meta?.signed_at) {
+    return (
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base flex items-center gap-2">
+            <FileText className="h-4 w-4" />
+            Contract
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground">Contract nesemnat încă.</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <Card>
+      <CardHeader className="pb-3">
+        <CardTitle className="text-base flex items-center gap-2">
+          <FileText className="h-4 w-4" />
+          Contract
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-1">
+        <InfoRow label="Semnat" value="Da" />
+        <InfoRow label="Data semnare" value={formatDate(meta.signed_at)} />
+        {meta.ip_address && <InfoRow label="IP semnare" value={meta.ip_address} mono />}
+        {meta.user_agent && (
+          <div className="py-1.5 border-b">
+            <span className="text-sm text-muted-foreground">Browser</span>
+            <p className="text-xs text-foreground mt-1 break-all leading-relaxed">
+              {meta.user_agent}
+            </p>
+          </div>
+        )}
+        {meta.document_hash && (
+          <div className="py-1.5">
+            <span className="text-sm text-muted-foreground">SHA-256 PDF</span>
+            <p className="text-[10px] font-mono text-foreground mt-1 break-all">
+              {meta.document_hash}
+            </p>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+function StatusBadgeMini({ status }: { status: string }) {
+  const cfg = STATUS_CONFIG[status] || { label: status, variant: 'outline' as const };
+  return (
+    <Badge variant={cfg.variant} className={`text-xs px-2 py-0.5 ${cfg.className || ''}`}>
+      {cfg.label}
+    </Badge>
   );
 }

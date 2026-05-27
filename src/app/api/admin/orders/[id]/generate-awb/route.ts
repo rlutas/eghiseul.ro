@@ -276,6 +276,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         courier_provider: courierProviderCode,
         courier_service: courierService || null,
         status: 'shipped',
+        shipped_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       })
       .eq('id', id);

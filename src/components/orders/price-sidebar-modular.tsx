@@ -1,19 +1,17 @@
 'use client';
 
 /**
- * Price Sidebar for Modular Wizard
- *
- * Wraps the canonical <OrderSummaryCard> so the wizard sidebar and the checkout
- * page render the SAME visual + breakdown. Adds wizard-specific extras
- * (estimated delivery + trust badges) below the card.
+ * Wizard sidebar — thin adapter that maps live wizard state onto the shared
+ * <OrderSidebar> component used on both /comanda (this) and
+ * /comanda/checkout/[id]. Anything visual lives in OrderSidebar so the two
+ * pages stay in lockstep.
  */
 
-import { Card, CardContent } from '@/components/ui/card';
 import { useModularWizard } from '@/providers/modular-wizard-provider';
 import { Service } from '@/types/services';
-import { Shield, CheckCircle, Clock } from 'lucide-react';
-import { OrderSummaryCard } from '@/components/payment';
 import { normalizeOrderOptions } from '@/lib/orders/normalize';
+import { estimateFromSelectedOptions } from '@/lib/delivery-calculator';
+import { OrderSidebar } from './order-sidebar';
 
 interface PriceSidebarModularProps {
   service: Service;
@@ -33,11 +31,21 @@ export function PriceSidebarModular({ service }: PriceSidebarModularProps) {
       : service.name;
 
   // Normalize wizard's live selectedOptions through the same canonical helper
-  // used by the API + checkout page, so the rendered list is identical.
-  const options = normalizeOrderOptions(state.selectedOptions).map((opt) => ({
-    name: opt.quantity > 1 ? `${opt.name} × ${opt.quantity}` : opt.name,
-    price: opt.total,
-  }));
+  // used by the API + checkout page so the rendered list is identical
+  // regardless of which surface the customer is on. Carry optionId +
+  // bundledForParentId so OrderSummaryCard can group bundled children under
+  // their parent secondary service.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const rawSelected = state.selectedOptions as any[];
+  const options = normalizeOrderOptions(rawSelected).map((opt, idx) => {
+    const raw = rawSelected[idx] || {};
+    return {
+      name: opt.quantity > 1 ? `${opt.name} × ${opt.quantity}` : opt.name,
+      price: opt.total,
+      optionId: opt.optionId ?? raw.optionId ?? raw.option_id,
+      bundledForParentId: opt.bundledForParentId,
+    };
+  });
 
   const VAT_RATE = 0.21;
   const subtotalWithoutVat =
@@ -45,53 +53,49 @@ export function PriceSidebarModular({ service }: PriceSidebarModularProps) {
   const vatAmount =
     Math.round((priceBreakdown.totalPrice - subtotalWithoutVat) * 100) / 100;
 
+  // Delivery estimate — full math via the shared calculator. Sums per-step
+  // business days: base processing (or "urgent" if the user toggled it) +
+  // each document add-on (traducere/legalizare/apostila*) + courier leg.
+  // Bundled add-ons share the parent's processing slot (deduped by code).
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const hasUrgentaMain = state.selectedOptions.some(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (o: any) => o.code === 'urgenta' && !o.bundledFor
+  );
+  const courierCode = (state.delivery.method as string | undefined) || null;
+  const estimate = estimateFromSelectedOptions({
+    selectedOptions:
+      state.selectedOptions as unknown as Parameters<
+        typeof estimateFromSelectedOptions
+      >[0]['selectedOptions'],
+    baseDays: service.estimated_days,
+    courier: courierCode,
+    includeCourierLeg: !!courierCode,
+  });
+  const deliveryTimeText: string =
+    estimate.minDays === estimate.maxDays
+      ? `${estimate.minDays} zile lucrătoare`
+      : `${estimate.minDays}-${estimate.maxDays} zile lucrătoare`;
+
   return (
-    <div className="space-y-3">
-      <OrderSummaryCard
-        orderNumber={state.friendlyOrderId || ''}
-        serviceName={serviceName}
-        basePrice={priceBreakdown.basePrice}
-        options={options}
-        deliveryMethod={
-          state.delivery.method && state.delivery.price >= 0
-            ? state.delivery.methodName || state.delivery.method
-            : undefined
-        }
-        deliveryPrice={state.delivery.price}
-        totalPrice={priceBreakdown.totalPrice}
-        subtotalWithoutVat={subtotalWithoutVat}
-        vatAmount={vatAmount}
-        couponCode={state.coupon?.code ?? null}
-        discountAmount={priceBreakdown.discountAmount}
-      />
-
-      {/* Estimated delivery */}
-      <Card className="bg-white border-neutral-200">
-        <CardContent className="p-3.5 flex items-start gap-3">
-          <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary-50 shrink-0">
-            <Clock className="h-3.5 w-3.5 text-primary-600" />
-          </span>
-          <div className="min-w-0">
-            <p className="text-xs text-neutral-500">Timp estimat livrare</p>
-            <p className="text-sm font-semibold text-secondary-900 leading-tight">
-              {service.processing_config?.estimated_days_display
-                ?? `${service.estimated_days} zile lucrătoare`}
-            </p>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Trust badges */}
-      <div className="space-y-2 px-1">
-        <div className="flex items-center gap-2 text-xs text-neutral-600">
-          <Shield className="h-3.5 w-3.5 text-emerald-500" />
-          <span>Plată securizată 100%</span>
-        </div>
-        <div className="flex items-center gap-2 text-xs text-neutral-600">
-          <CheckCircle className="h-3.5 w-3.5 text-emerald-500" />
-          <span>Garanție rambursare</span>
-        </div>
-      </div>
-    </div>
+    <OrderSidebar
+      orderNumber={state.friendlyOrderId || ''}
+      serviceName={serviceName}
+      basePrice={priceBreakdown.basePrice}
+      options={options}
+      deliveryMethod={
+        state.delivery.method && state.delivery.price >= 0
+          ? state.delivery.methodName || state.delivery.method
+          : undefined
+      }
+      deliveryPrice={state.delivery.price}
+      totalPrice={priceBreakdown.totalPrice}
+      subtotalWithoutVat={subtotalWithoutVat}
+      vatAmount={vatAmount}
+      couponCode={state.coupon?.code ?? null}
+      discountAmount={priceBreakdown.discountAmount}
+      deliveryTimeText={deliveryTimeText}
+      urgencyActive={hasUrgentaMain}
+    />
   );
 }

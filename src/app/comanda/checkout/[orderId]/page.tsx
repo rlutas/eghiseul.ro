@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
-import { ArrowLeft, Loader2, AlertCircle, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, Loader2, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -10,13 +10,13 @@ import { Separator } from '@/components/ui/separator';
 import {
   PaymentMethodSelector,
   PaymentMethod,
-  StripeProvider,
-  StripeCheckoutForm,
   BankTransferDetails,
   PaymentProofUpload,
-  OrderSummaryCard,
   CouponInput,
 } from '@/components/payment';
+import { EmbeddedCheckoutBlock } from '@/components/payment/EmbeddedCheckoutBlock';
+import { OrderSidebar } from '@/components/orders/order-sidebar';
+import { estimateFromSelectedOptions } from '@/lib/delivery-calculator';
 import { cn } from '@/lib/utils';
 
 interface OrderData {
@@ -28,7 +28,17 @@ interface OrderData {
   total_price: number;
   payment_status: string;
   status: string;
-  selected_options?: Array<{ name: string; price: number }>;
+  selected_options?: Array<{ name: string; price: number; optionId?: string; bundledForParentId?: string; code?: string }>;
+  /** Raw selected_options from DB (for delivery-calculator) — kept separate
+   *  from the UI-shaped `selected_options` because the calculator needs
+   *  `code` + `bundledFor` (parent ref) which aren't in the display shape. */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  raw_selected_options?: any[];
+  /** Picked client type (PF/PJ) — appended to the service name for
+   *  cazier-judiciar so the checkout sidebar matches the wizard sidebar. */
+  client_type?: string | null;
+  /** Service's base estimated days — feeds the delivery-time calculator. */
+  service_estimated_days?: number;
   delivery_method?: string;
   delivery_price?: number;
   subtotal_without_vat?: number;
@@ -78,26 +88,58 @@ export default function CheckoutPage() {
         return;
       }
 
+      // The API's normalized `options` shape has bundling metadata that we
+      // forward to OrderSummaryCard so bundled add-ons render nested under
+      // their parent sub-service. Falling back to `selected_options` on the
+      // raw row covers older orders that pre-date the normalized payload.
       const canonical = (apiOrder.options || []) as Array<{
+        optionId?: string;
+        option_id?: string;
         name: string;
         total: number;
         quantity: number;
+        bundledForParentId?: string;
+        bundled_for_parent_id?: string;
+        bundledFor?: { parentOptionId?: string };
       }>;
       const transformedOptions = canonical.map((opt) => ({
         name: opt.quantity > 1 ? `${opt.name} × ${opt.quantity}` : opt.name,
         price: opt.total,
+        optionId: opt.optionId || opt.option_id,
+        bundledForParentId:
+          opt.bundledForParentId ||
+          opt.bundled_for_parent_id ||
+          opt.bundledFor?.parentOptionId,
       }));
+
+      // Detect PF/PJ from customer_data so the service name matches what the
+      // wizard sidebar showed (e.g. "Cazier Judiciar PF"). Falls back to no
+      // suffix when the service doesn't expose a client-type selector.
+      const cd = (apiOrder.customerData ?? {}) as {
+        personal?: { cnp?: string };
+        company?: { cui?: string };
+        billing?: { type?: string };
+        client_type?: string;
+      };
+      const inferredClientType =
+        cd.client_type ||
+        (cd.company?.cui ? 'PJ' : cd.personal?.cnp ? 'PF' : null);
 
       const orderData: OrderData = {
         id: apiOrder.id,
         order_number: apiOrder.orderNumber,
         friendly_order_id: apiOrder.orderNumber,
         service_name: apiOrder.service?.name || 'Serviciu',
+        client_type: inferredClientType,
+        service_estimated_days: apiOrder.service?.estimatedDays ?? apiOrder.service?.estimated_days,
         base_price: apiOrder.breakdown?.basePrice || apiOrder.totalAmount,
         total_price: apiOrder.totalAmount,
         payment_status: apiOrder.paymentStatus || 'unpaid',
         status: apiOrder.status || 'draft',
         selected_options: transformedOptions,
+        // Keep the unshaped options around so the delivery calculator can
+        // read `code` + `bundledFor` — these don't appear on the UI shape.
+        raw_selected_options: apiOrder.options,
         delivery_method: typeof apiOrder.deliveryMethod === 'object'
           ? apiOrder.deliveryMethod?.name
           : apiOrder.deliveryMethod,
@@ -282,16 +324,13 @@ export default function CheckoutPage() {
               </CardHeader>
               <CardContent>
                 {paymentMethod === 'card' ? (
-                  // Stripe Payment Form
+                  // Stripe Embedded Checkout — replaces the old PaymentIntent
+                  // + Elements form. Line items render in the Stripe Dashboard
+                  // checkout summary (one row per addon + delivery + coupon),
+                  // matching cazierjudiciaronline.com's UX. Stays inline via
+                  // iframe so the customer doesn't leave the page.
                   clientSecret ? (
-                    <StripeProvider clientSecret={clientSecret}>
-                      <StripeCheckoutForm
-                        orderId={orderId}
-                        orderNumber={orderNumber}
-                        amount={order.total_price}
-                        onError={(err) => setError(err)}
-                      />
-                    </StripeProvider>
+                    <EmbeddedCheckoutBlock clientSecret={clientSecret} />
                   ) : (
                     <div className="flex items-center justify-center py-8">
                       <Loader2 className="h-6 w-6 animate-spin text-primary-500" />
@@ -336,21 +375,58 @@ export default function CheckoutPage() {
             </Card>
           </div>
 
-          {/* Order Summary Sidebar */}
+          {/* Order Summary Sidebar — uses the same <OrderSidebar> as the
+              wizard so /comanda and /comanda/checkout look identical:
+              same nested layout, same delivery estimate, same badges. */}
           <div className="space-y-4 lg:sticky lg:top-4 lg:self-start">
-            <OrderSummaryCard
-              orderNumber={orderNumber}
-              serviceName={order.service_name}
-              basePrice={order.base_price}
-              options={order.selected_options}
-              deliveryMethod={order.delivery_method}
-              deliveryPrice={order.delivery_price}
-              totalPrice={order.total_price}
-              subtotalWithoutVat={order.subtotal_without_vat}
-              vatAmount={order.vat_amount}
-              couponCode={order.coupon_code}
-              discountAmount={order.discount_amount}
-            />
+            {(() => {
+              // Compute delivery estimate from raw options (need `code` +
+              // `bundledFor` which the UI-shaped list doesn't carry).
+              const baseDays = order.service_estimated_days;
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              const rawOpts = (order.raw_selected_options ?? []) as any[];
+              const hasUrgent = rawOpts.some(
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                (o: any) => o.code === 'urgenta' && !o.bundledForParentId && !o.bundledFor
+              );
+              const est = estimateFromSelectedOptions({
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                selectedOptions: rawOpts.map((o: any) => ({
+                  code: o.code ?? null,
+                  optionName: o.name,
+                  bundledFor: o.bundledForParentId
+                    ? { parentOptionId: o.bundledForParentId }
+                    : o.bundledFor ?? null,
+                })),
+                baseDays,
+                courier: order.delivery_method ?? null,
+                includeCourierLeg: !!order.delivery_method,
+              });
+              const deliveryTimeText =
+                est.minDays === est.maxDays
+                  ? `${est.minDays} zile lucrătoare`
+                  : `${est.minDays}-${est.maxDays} zile lucrătoare`;
+              const serviceName = order.client_type
+                ? `${order.service_name} ${order.client_type}`
+                : order.service_name;
+              return (
+                <OrderSidebar
+                  orderNumber={orderNumber}
+                  serviceName={serviceName}
+                  basePrice={order.base_price}
+                  options={order.selected_options}
+                  deliveryMethod={order.delivery_method}
+                  deliveryPrice={order.delivery_price}
+                  totalPrice={order.total_price}
+                  subtotalWithoutVat={order.subtotal_without_vat}
+                  vatAmount={order.vat_amount}
+                  couponCode={order.coupon_code}
+                  discountAmount={order.discount_amount}
+                  deliveryTimeText={deliveryTimeText}
+                  urgencyActive={hasUrgent}
+                />
+              );
+            })()}
 
             {/* Coupon input — apply/remove discount before payment */}
             <CouponInput
@@ -359,23 +435,6 @@ export default function CheckoutPage() {
               appliedDiscount={order.discount_amount}
               onChange={handleCouponChange}
             />
-
-            {/* Security Badges */}
-            <Card className="bg-emerald-50 border-emerald-200">
-              <CardContent className="p-3.5">
-                <div className="flex items-center gap-3">
-                  <ShieldCheck className="h-7 w-7 text-emerald-600 shrink-0" />
-                  <div>
-                    <p className="text-sm font-medium text-emerald-800">
-                      Plată Securizată
-                    </p>
-                    <p className="text-xs text-emerald-700">
-                      Datele tale sunt protejate prin criptare SSL
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
           </div>
         </div>
       </div>

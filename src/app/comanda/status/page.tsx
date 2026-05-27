@@ -13,6 +13,8 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { SelfCancelCard } from '@/components/orders/self-cancel-card';
+import { HelpContactCard } from '@/components/orders/help-contact-card';
 import {
   Loader2,
   Search,
@@ -89,6 +91,7 @@ interface OrderData {
   paymentStatus: string;
   createdAt: string;
   updatedAt: string;
+  paidAt: string | null;
   service: {
     id: string;
     name: string;
@@ -278,6 +281,22 @@ function OrderStatusContent() {
       {/* Order Details */}
       {orderData && (
         <div className="space-y-6">
+          {/* Self-cancel card — shown only when status='paid' and within
+              the 30-min window. Hidden after cancellation or window expiry. */}
+          <SelfCancelCard
+            orderCode={orderData.orderCode}
+            email={email}
+            status={orderData.status}
+            paidAt={orderData.paidAt}
+            totalRon={orderData.pricing?.totalPrice ?? 0}
+            onCancelled={() => handleSearch(orderCode, email)}
+          />
+
+          {/* Help contact card — WhatsApp + phone, first touchpoint when the
+              customer is confused. Always rendered above the status details
+              to match sister project UX. */}
+          <HelpContactCard />
+
           {/* Status Card */}
           <Card>
             <CardHeader className="pb-3">
@@ -319,15 +338,28 @@ function OrderStatusContent() {
                 <Package className="h-5 w-5 text-muted-foreground" />
                 <div className="flex-1">
                   <p className="font-medium">{orderData.service?.name || 'Serviciu'}</p>
-                  {/* Selected options */}
+                  {/* Selected options — strip the "(adaugă în aceeași comandă)"
+                      marketing suffix and the parent-service wrapper that
+                      bundled rows carry, matching the rest of the funnel
+                      (wizard sidebar / checkout / success page).
+                      Helper inline because importing the centralized one
+                      from `lib/orders/normalize` would pull in the full
+                      pricing pipeline — overkill for a single text trim. */}
                   {orderData.selectedOptions && orderData.selectedOptions.length > 0 && (
                     <div className="mt-1 space-y-0.5">
-                      {orderData.selectedOptions.map((opt, idx) => (
-                        <p key={idx} className="text-sm text-muted-foreground">
-                          + {opt.optionName || opt.option_name || 'Opțiune'}
-                          {(opt.quantity || 1) > 1 && ` x${opt.quantity}`}
-                        </p>
-                      ))}
+                      {orderData.selectedOptions.map((opt, idx) => {
+                        const rawName = opt.optionName || opt.option_name || 'Opțiune';
+                        const cleanName = rawName
+                          .replace(/\s*\([^()]*\(adaugă în aceeași comandă\)\)\s*$/i, '')
+                          .replace(/\s*\(adaugă în aceeași comandă\)\s*$/i, '')
+                          .trim();
+                        return (
+                          <p key={idx} className="text-sm text-muted-foreground">
+                            + {cleanName}
+                            {(opt.quantity || 1) > 1 && ` x${opt.quantity}`}
+                          </p>
+                        );
+                      })}
                     </div>
                   )}
                   <p className="text-sm text-muted-foreground mt-1">

@@ -156,6 +156,11 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
           selected_options: order.selected_options as Array<{ code?: string; name: string; price: number }> | undefined,
           delivery_method: order.delivery_method ?? undefined,
           delivery_price: order.delivery_price ?? undefined,
+          // Coupon fields exist on the row (selected via `*`) but aren't in
+          // the generated Supabase type — cast through unknown to avoid the
+          // type widener while keeping the runtime behavior correct.
+          coupon_code: (order as unknown as { coupon_code?: string | null }).coupon_code ?? null,
+          discount_amount: (order as unknown as { discount_amount?: number | null }).discount_amount ?? null,
           customer_data: order.customer_data as Record<string, unknown> | undefined,
         },
         'Transfer bancar'

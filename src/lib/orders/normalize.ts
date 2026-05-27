@@ -15,6 +15,11 @@
  * everywhere downstream (Oblio invoicing, Stripe metadata, summary cards).
  */
 export interface OrderOptionLine {
+  /** Option id — the raw `option_id` / `optionId` from the wizard state.
+   *  Needed by callers that group bundled children under their parent
+   *  (e.g. OrderSummaryCard nesting). May be a synthetic id like
+   *  `bundled:<parent.id>:<bundled.id>` for cross-service add-ons. */
+  optionId?: string;
   /** Stable code (e.g. 'apostila_haga'). May be undefined for legacy rows. */
   code?: string;
   /** Display name. Includes appended metadata (language/country) if present. */
@@ -64,10 +69,35 @@ function parseNumber(value: unknown, fallback = 0): number {
   return fallback;
 }
 
+/**
+ * Strip the marketing disclaimer "(adaugă în aceeași comandă)" that lives on
+ * cross-service add-on rows in the DB. It's necessary in the catalog row so
+ * users understand the bundle in the options picker, but it's redundant
+ * noise in the order summary and on the printed contract. We trim it
+ * everywhere that goes through the canonical normalizer.
+ *
+ * Handles two shapes:
+ *   1. Top-level parent service: "Certificat Integritate (adaugă în aceeași comandă)"
+ *      → "Certificat Integritate"
+ *   2. Nested bundled child: "Apostila de la Haga (Certificat Integritate (adaugă în aceeași comandă))"
+ *      → "Apostila de la Haga"
+ *      (the bundled child is already visually nested under its parent in the
+ *      summary, so the parent name doesn't need to be repeated in the label)
+ */
+function stripSecondaryServiceSuffix(name: string): string {
+  // Pass 1 — nested form first (more specific): drop the entire outer
+  // parenthetical that contains the marketing string.
+  let out = name.replace(/\s*\([^()]*\(adaugă în aceeași comandă\)\)\s*$/i, '');
+  // Pass 2 — bare top-level form.
+  out = out.replace(/\s*\(adaugă în aceeași comandă\)\s*$/i, '');
+  return out.trim();
+}
+
 function appendMetadataToName(name: string, metadata?: { language?: string; country?: string } | null): string {
-  if (!metadata) return name;
+  const clean = stripSecondaryServiceSuffix(name);
+  if (!metadata) return clean;
   const parts = [metadata.language, metadata.country].filter(Boolean);
-  return parts.length ? `${name} — ${parts.join(' · ')}` : name;
+  return parts.length ? `${clean} — ${parts.join(' · ')}` : clean;
 }
 
 /** Normalize a single raw option into the canonical shape. */
@@ -87,6 +117,7 @@ export function normalizeOrderOption(raw: RawOption): OrderOptionLine {
     raw.bundledFor?.parentOptionId ?? raw.bundled_for?.parent_option_id ?? undefined;
 
   return {
+    optionId: raw.optionId ?? raw.option_id ?? undefined,
     code: raw.code,
     name: appendMetadataToName(baseName, raw.metadata ?? undefined),
     description,
