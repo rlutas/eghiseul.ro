@@ -1243,31 +1243,55 @@ export default function AdminOrderDetailPage() {
             idDocumentType === 'ci_nou' ? 'CI nou electronic (cu cip)' :
             idDocumentType === 'passport' ? 'Pașaport' :
             null;
+          const adminVerifiedAt = personalData?.adminVerifiedAt as string | undefined;
+          const adminVerifiedBy = personalData?.adminVerifiedBy as string | undefined;
           return (
-        <Card className={reviewNeeded || crossValWarnings.length > 0 ? 'border-yellow-300 bg-yellow-50/30' : ''}>
+        <Card className={
+          adminVerifiedAt
+            ? 'border-green-300 bg-green-50/30'
+            : (reviewNeeded || crossValWarnings.length > 0)
+              ? 'border-yellow-300 bg-yellow-50/30'
+              : ''
+        }>
           <CardHeader className="pb-3">
-            <CardTitle className="text-base flex items-center gap-2 flex-wrap">
-              <Upload className="h-4 w-4" />
-              Documente încărcate de client
-              {idTypeLabel && (
-                <span className="ml-1 inline-flex items-center gap-1 rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-medium text-blue-800 border border-blue-200">
-                  <CreditCard className="h-3 w-3" />
-                  {idTypeLabel}
-                </span>
-              )}
-              {Object.keys(kycByType).length > 0 && (
-                <span className="ml-1 inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-medium text-slate-700">
-                  <Shield className="h-3 w-3" />
-                  KYC
-                </span>
-              )}
-              {crossValWarnings.length > 0 && (
-                <span className="ml-1 inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-medium text-amber-900 border border-amber-300">
-                  <AlertTriangle className="h-3 w-3" />
-                  {crossValWarnings.length} {crossValWarnings.length === 1 ? 'avertisment' : 'avertismente'}
-                </span>
-              )}
-            </CardTitle>
+            <div className="flex items-start justify-between gap-3">
+              <CardTitle className="text-base flex items-center gap-2 flex-wrap">
+                <Upload className="h-4 w-4" />
+                Documente încărcate de client
+                {idTypeLabel && (
+                  <span className="ml-1 inline-flex items-center gap-1 rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-medium text-blue-800 border border-blue-200">
+                    <CreditCard className="h-3 w-3" />
+                    {idTypeLabel}
+                  </span>
+                )}
+                {Object.keys(kycByType).length > 0 && (
+                  <span className="ml-1 inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-medium text-slate-700">
+                    <Shield className="h-3 w-3" />
+                    KYC
+                  </span>
+                )}
+                {crossValWarnings.length > 0 && !adminVerifiedAt && (
+                  <span className="ml-1 inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-medium text-amber-900 border border-amber-300">
+                    <AlertTriangle className="h-3 w-3" />
+                    {crossValWarnings.length} {crossValWarnings.length === 1 ? 'avertisment' : 'avertismente'}
+                  </span>
+                )}
+                {adminVerifiedAt && (
+                  <span className="ml-1 inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-medium text-green-800 border border-green-300">
+                    <CheckCircle2 className="h-3 w-3" />
+                    Verificat manual
+                  </span>
+                )}
+              </CardTitle>
+
+              {/* Verify / Unverify button */}
+              <VerifyDocumentsButton
+                orderId={order.id}
+                verifiedAt={adminVerifiedAt}
+                verifiedBy={adminVerifiedBy}
+                onChange={fetchOrder}
+              />
+            </div>
           </CardHeader>
           <CardContent className="space-y-4">
             {crossValWarnings.length > 0 && (
@@ -1910,6 +1934,102 @@ const RERUNNABLE_OCR_TYPES = new Set([
   'ci_front', 'ci_back', 'ci_nou_front', 'ci_nou_back', 'ci_vechi',
   'passport', 'passport_opened', 'ro_cei_reader_pdf',
 ]);
+
+/**
+ * "Marchează verificat" — small action surface on the documents card header.
+ * Toggles between two states:
+ *   - Not verified: shows a green "Marchează verificat" button
+ *   - Verified:     shows a muted "Verificat de ... la ..." chip + an
+ *                   inline "Retrage" link to undo the verification
+ *
+ * Calls /api/admin/orders/[id]/verify-documents (POST to verify, DELETE
+ * to clear). Parent re-fetches via `onChange` after each transition.
+ */
+function VerifyDocumentsButton({
+  orderId,
+  verifiedAt,
+  verifiedBy,
+  onChange,
+}: {
+  orderId: string;
+  verifiedAt?: string;
+  verifiedBy?: string;
+  onChange: () => void;
+}) {
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleVerify = async () => {
+    setSubmitting(true);
+    try {
+      const res = await fetch(`/api/admin/orders/${orderId}/verify-documents`, { method: 'POST' });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        toast.error(data.error || 'Marcaj eșuat');
+        return;
+      }
+      toast.success('Documente marcate verificate');
+      onChange();
+    } catch {
+      toast.error('Eroare la marcaj');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleClear = async () => {
+    if (!confirm('Retragi marcajul de verificare manuală?')) return;
+    setSubmitting(true);
+    try {
+      const res = await fetch(`/api/admin/orders/${orderId}/verify-documents`, { method: 'DELETE' });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        toast.error(data.error || 'Retragere eșuată');
+        return;
+      }
+      toast.success('Marcaj retras');
+      onChange();
+    } catch {
+      toast.error('Eroare la retragere');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  if (verifiedAt) {
+    return (
+      <div className="flex flex-col items-end gap-1 text-xs">
+        <span className="text-green-700 flex items-center gap-1 font-medium">
+          <CheckCircle2 className="h-3.5 w-3.5" />
+          Verificat
+        </span>
+        <span className="text-muted-foreground text-[10px]" title={verifiedBy ? `Admin id: ${verifiedBy}` : undefined}>
+          la {formatDate(verifiedAt)}
+        </span>
+        <button
+          type="button"
+          onClick={handleClear}
+          disabled={submitting}
+          className="text-[10px] underline text-muted-foreground hover:text-red-600 disabled:opacity-50"
+        >
+          Retrage
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <Button
+      size="sm"
+      variant="outline"
+      className="h-8 text-xs border-green-300 text-green-700 hover:bg-green-50 hover:border-green-400 hover:text-green-800 shrink-0"
+      onClick={handleVerify}
+      disabled={submitting}
+    >
+      {submitting ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : <CheckCircle2 className="h-3 w-3 mr-1" />}
+      Marchează verificat
+    </Button>
+  );
+}
 
 function ClientDocumentCard({
   doc,
