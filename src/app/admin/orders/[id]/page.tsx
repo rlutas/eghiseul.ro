@@ -14,6 +14,13 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { getCountyFromCNP } from '@/lib/validations/cnp';
 import { estimateFromSelectedOptions } from '@/lib/delivery-calculator';
+import {
+  crossValidateExtractedData,
+  type CrossValidationWarning,
+  type ExtractedPersonalData,
+  type ExtractedCINouBack,
+  type ExtractedROCEIReader,
+} from '@/lib/services/document-ocr';
 import { ModifyOrderDialog } from '@/components/admin/modify-order-dialog';
 import { UpdateStatusCard } from '@/components/admin/update-status-card';
 import {
@@ -268,6 +275,33 @@ function formatDateLong(d: string | null) {
   });
 }
 
+/**
+ * Compute cross-validation warnings from a customer_data blob.
+ *
+ * Returns warnings (severity='warning') when the same field has different
+ * values across CI front, eCI back MRZ, and RO CEI Reader PDF scans —
+ * indicates either OCR drift or a real data mismatch (different person,
+ * wrong PDF uploaded, etc.).
+ *
+ * Empty array means everything matches OR there's not enough data to compare.
+ */
+function computeOcrCrossValidationWarnings(cd: AnyObj | null): CrossValidationWarning[] {
+  if (!cd) return [];
+  const personal = cd.personalData || cd.personal;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const ocrResults: Array<{ documentType: string; extractedData: any }> | undefined = personal?.ocrResults;
+  if (!ocrResults || ocrResults.length === 0) return [];
+
+  const byType = (type: string) =>
+    ocrResults.find((r) => r.documentType === type)?.extractedData;
+
+  return crossValidateExtractedData({
+    ci_front: byType('ci_front') as ExtractedPersonalData | undefined,
+    ci_nou_back: byType('ci_nou_back') as ExtractedCINouBack | undefined,
+    ro_cei_reader_pdf: byType('ro_cei_reader_pdf') as ExtractedROCEIReader | undefined,
+  });
+}
+
 /** Extract all client-uploaded documents from customer_data */
 function extractClientDocuments(cd: AnyObj | null): Array<{ type: string; label: string; s3Key?: string; base64?: string; fileName?: string }> {
   if (!cd) return [];
@@ -276,6 +310,15 @@ function extractClientDocuments(cd: AnyObj | null): Array<{ type: string; label:
   const DOC_LABELS: Record<string, string> = {
     ci_front: 'CI - Fata',
     ci_back: 'CI - Verso',
+    ci_vechi: 'CI vechi - Fata',
+    ci_nou_front: 'CI nou - Fata',
+    ci_nou_back: 'CI nou - Verso (data emit. + SPCEP + MRZ)',
+    passport: 'Pasaport',
+    passport_opened: 'Pasaport - pagina cu foto',
+    ro_cei_reader_pdf: 'PDF RO CEI Reader (dovada domiciliu)',
+    certificat_domiciliu: 'Certificat domiciliu',
+    residence_permit: 'Permis rezidenta',
+    registration_cert: 'Certificat inregistrare',
     selfie: 'Selfie verificare',
     company_registration_cert: 'Certificat Inregistrare',
     company_statement_cert: 'Certificat Constatator',
@@ -322,6 +365,15 @@ function extractKycDocKeys(kycDocs: AnyObj | null): Array<{ type: string; label:
   const DOC_LABELS: Record<string, string> = {
     ci_front: 'CI - Fata',
     ci_back: 'CI - Verso',
+    ci_vechi: 'CI vechi - Fata',
+    ci_nou_front: 'CI nou - Fata',
+    ci_nou_back: 'CI nou - Verso (data emit. + SPCEP + MRZ)',
+    passport: 'Pasaport',
+    passport_opened: 'Pasaport - pagina cu foto',
+    ro_cei_reader_pdf: 'PDF RO CEI Reader (dovada domiciliu)',
+    certificat_domiciliu: 'Certificat domiciliu',
+    residence_permit: 'Permis rezidenta',
+    registration_cert: 'Certificat inregistrare',
     selfie: 'Selfie verificare',
     company_registration_cert: 'Certificat Inregistrare',
     company_statement_cert: 'Certificat Constatator',
@@ -1183,21 +1235,59 @@ export default function AdminOrderDetailPage() {
         (() => {
           const kycByType = extractKycByDocType(order.customer_data);
           const reviewNeeded = needsKycReview(kycByType);
+          const crossValWarnings = computeOcrCrossValidationWarnings(order.customer_data);
+          const personalData = order.customer_data?.personalData || order.customer_data?.personal;
+          const idDocumentType = personalData?.idDocumentType as 'ci_vechi' | 'ci_nou' | 'passport' | null | undefined;
+          const idTypeLabel =
+            idDocumentType === 'ci_vechi' ? 'CI vechi (fără cip)' :
+            idDocumentType === 'ci_nou' ? 'CI nou electronic (cu cip)' :
+            idDocumentType === 'passport' ? 'Pașaport' :
+            null;
           return (
-        <Card className={reviewNeeded ? 'border-yellow-300 bg-yellow-50/30' : ''}>
+        <Card className={reviewNeeded || crossValWarnings.length > 0 ? 'border-yellow-300 bg-yellow-50/30' : ''}>
           <CardHeader className="pb-3">
-            <CardTitle className="text-base flex items-center gap-2">
+            <CardTitle className="text-base flex items-center gap-2 flex-wrap">
               <Upload className="h-4 w-4" />
               Documente încărcate de client
+              {idTypeLabel && (
+                <span className="ml-1 inline-flex items-center gap-1 rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-medium text-blue-800 border border-blue-200">
+                  <CreditCard className="h-3 w-3" />
+                  {idTypeLabel}
+                </span>
+              )}
               {Object.keys(kycByType).length > 0 && (
                 <span className="ml-1 inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-medium text-slate-700">
                   <Shield className="h-3 w-3" />
                   KYC
                 </span>
               )}
+              {crossValWarnings.length > 0 && (
+                <span className="ml-1 inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-medium text-amber-900 border border-amber-300">
+                  <AlertTriangle className="h-3 w-3" />
+                  {crossValWarnings.length} {crossValWarnings.length === 1 ? 'avertisment' : 'avertismente'}
+                </span>
+              )}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
+            {crossValWarnings.length > 0 && (
+              <Alert className="bg-amber-50 border-amber-300">
+                <AlertTriangle className="h-4 w-4 text-amber-700" />
+                <AlertTitle className="text-amber-900 text-sm font-semibold">
+                  Cross-validation: datele nu se potrivesc între scanări
+                </AlertTitle>
+                <AlertDescription className="text-amber-800 text-sm">
+                  <ul className="list-disc list-inside space-y-1 mt-2">
+                    {crossValWarnings.map((w, i) => (
+                      <li key={i}>{w.message}</li>
+                    ))}
+                  </ul>
+                  <p className="text-xs text-amber-700 mt-2 italic">
+                    Verifică manual documentele înainte de procesare. Mismatches pot însemna OCR slab, document greșit urcat, sau identitate diferită.
+                  </p>
+                </AlertDescription>
+              </Alert>
+            )}
             {reviewNeeded && (
               <Alert className="bg-yellow-50 border-yellow-300">
                 <AlertTriangle className="h-4 w-4 text-yellow-700" />
