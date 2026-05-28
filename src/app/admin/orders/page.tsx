@@ -23,6 +23,7 @@ import {
   Package,
   Truck,
   X as XIcon,
+  Receipt,
 } from 'lucide-react';
 import { STATUS_TABS, type OrdersCounts } from '@/lib/admin/orders-tabs';
 
@@ -232,10 +233,33 @@ export default function AdminOrdersPage() {
             {hasActiveFilters && <span className="ml-1">pentru „{activeTabLabel}”{urlSearch ? ` · „${urlSearch}”` : ''}</span>}
           </p>
         </div>
-        <Button variant="outline" size="sm" onClick={fetchOrders} disabled={loading}>
-          <RefreshCw className={`mr-1 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
-          Reîncarcă
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              // Reuses current filter state from URL — same logic as fetchOrders.
+              const params = new URLSearchParams();
+              if (urlStatus !== 'all') params.set('status', urlStatus);
+              if (urlService !== 'all') params.set('service', urlService);
+              if (urlSearch) params.set('search', urlSearch);
+              if (urlTest !== 'hide') params.set('test', urlTest);
+              const qs = params.toString();
+              const url = qs ? `/api/admin/orders/export?${qs}` : '/api/admin/orders/export';
+              // Hard navigation → triggers download via Content-Disposition.
+              window.location.href = url;
+            }}
+            disabled={loading || totalCount === 0}
+            title="Descarcă comenzile filtrate ca TSV (Google Sheets / Excel)"
+          >
+            <Receipt className="mr-1 h-4 w-4" />
+            Export
+          </Button>
+          <Button variant="outline" size="sm" onClick={fetchOrders} disabled={loading}>
+            <RefreshCw className={`mr-1 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+            Reîncarcă
+          </Button>
+        </div>
       </div>
 
       {/* Tabs + Service dropdown + Search */}
