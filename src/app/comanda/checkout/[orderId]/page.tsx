@@ -14,7 +14,9 @@ import {
   PaymentProofUpload,
   CouponInput,
 } from '@/components/payment';
-import { EmbeddedCheckoutBlock } from '@/components/payment/EmbeddedCheckoutBlock';
+// EmbeddedCheckoutBlock removed 2026-05-28 — switched to hosted Stripe Checkout
+// (redirect-based). Keeping the component file for now in case we ever revisit
+// the embedded UX for a different flow.
 import { OrderSidebar } from '@/components/orders/order-sidebar';
 import { estimateFromSelectedOptions } from '@/lib/delivery-calculator';
 import { cn } from '@/lib/utils';
@@ -60,7 +62,7 @@ export default function CheckoutPage() {
   const errorFromUrl = searchParams.get('error');
 
   const [order, setOrder] = useState<OrderData | null>(null);
-  const [clientSecret, setClientSecret] = useState<string | null>(null);
+  // clientSecret removed — hosted checkout uses session.url, set on demand via handleCardCheckout
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('card');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(errorFromUrl);
@@ -167,42 +169,49 @@ export default function CheckoutPage() {
     }
   }, [orderId, fetchOrder]);
 
-  // Called after a coupon is applied/removed: order total changed, so the
-  // existing PaymentIntent (cancelled server-side) must be regenerated.
-  // Setting clientSecret to null triggers the create-intent useEffect.
+  // Coupon change → re-fetch order so the total + summary update. There's
+  // no PaymentIntent to invalidate any more (hosted Checkout creates a
+  // session only on Pay click).
   const handleCouponChange = useCallback(async () => {
-    setClientSecret(null);
     await fetchOrder();
   }, [fetchOrder]);
 
-  // Create payment intent when card is selected
-  useEffect(() => {
-    const createPaymentIntent = async () => {
-      if (paymentMethod !== 'card' || !order || clientSecret) return;
+  // Track whether we're currently redirecting to Stripe Checkout. Disables
+  // the button and shows a spinner so the customer doesn't double-click.
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
-      try {
-        const response = await fetch(`/api/orders/${orderId}/payment`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error?.message || 'Eroare la inițializarea plății');
-        }
-
-        const data = await response.json();
-        if (data.success && data.data?.clientSecret) {
-          setClientSecret(data.data.clientSecret);
-        }
-      } catch (err) {
-        console.error('Payment intent error:', err);
-        setError(err instanceof Error ? err.message : 'Eroare la inițializarea plății');
+  // Triggered by the "Plătește cu cardul" button. Creates a hosted
+  // Checkout Session on demand and redirects to checkout.stripe.com.
+  // We deliberately DON'T auto-create on page mount any more — letting
+  // the user review the order + apply a coupon before committing.
+  const handleCardCheckout = useCallback(async () => {
+    if (!order || isRedirecting) return;
+    setIsRedirecting(true);
+    setError(null);
+    try {
+      const response = await fetch(`/api/orders/${orderId}/payment`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error?.message || 'Eroare la inițializarea plății');
       }
-    };
-
-    createPaymentIntent();
-  }, [paymentMethod, order, orderId, clientSecret]);
+      const data = await response.json();
+      if (data.success && data.data?.checkoutUrl) {
+        // Hard redirect — Stripe Checkout takes over the tab. After
+        // payment the customer is sent to successUrl which our backend
+        // configured at session creation time.
+        window.location.href = data.data.checkoutUrl;
+      } else {
+        throw new Error('Sesiunea de plată nu a putut fi creată');
+      }
+    } catch (err) {
+      console.error('Card checkout error:', err);
+      setError(err instanceof Error ? err.message : 'Eroare la inițializarea plății');
+      setIsRedirecting(false);
+    }
+  }, [order, orderId, isRedirecting]);
 
   // Handle bank transfer submission
   const handleBankTransferSubmit = async () => {
@@ -324,21 +333,68 @@ export default function CheckoutPage() {
               </CardHeader>
               <CardContent>
                 {paymentMethod === 'card' ? (
-                  // Stripe Embedded Checkout — replaces the old PaymentIntent
-                  // + Elements form. Line items render in the Stripe Dashboard
-                  // checkout summary (one row per addon + delivery + coupon),
-                  // matching cazierjudiciaronline.com's UX. Stays inline via
-                  // iframe so the customer doesn't leave the page.
-                  clientSecret ? (
-                    <EmbeddedCheckoutBlock clientSecret={clientSecret} />
-                  ) : (
-                    <div className="flex items-center justify-center py-8">
-                      <Loader2 className="h-6 w-6 animate-spin text-primary-500" />
-                      <span className="ml-3 text-neutral-600">
-                        Se inițializează plata...
-                      </span>
+                  // Hosted Stripe Checkout — on click, we create a session
+                  // server-side and redirect the customer to
+                  // checkout.stripe.com. Cleaner UX than the embedded
+                  // iframe which felt cramped. Customer returns via
+                  // successUrl after paying.
+                  <div className="space-y-4">
+                    <div className="rounded-lg border border-blue-200 bg-blue-50/50 p-4">
+                      <div className="flex gap-3">
+                        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-100 flex-shrink-0">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            className="h-4 w-4 text-blue-700"
+                          >
+                            <rect x="3" y="6" width="18" height="13" rx="2" />
+                            <path d="M3 10h18" />
+                            <path d="M7 15h2" />
+                          </svg>
+                        </div>
+                        <div className="text-sm text-blue-900">
+                          <p className="font-medium leading-tight">
+                            Plată securizată prin Stripe
+                          </p>
+                          <p className="text-xs text-blue-800 mt-1 leading-snug">
+                            Vei fi redirecționat către pagina de plată Stripe.
+                            Acceptăm Visa, Mastercard, Apple Pay, Google Pay
+                            și Link. Datele cardului nu sunt salvate de noi.
+                          </p>
+                        </div>
+                      </div>
                     </div>
-                  )
+
+                    <Button
+                      onClick={handleCardCheckout}
+                      disabled={isRedirecting}
+                      className="w-full h-12 bg-primary-500 hover:bg-primary-600 text-secondary-900 text-base font-semibold"
+                    >
+                      {isRedirecting ? (
+                        <>
+                          <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                          Se redirecționează către Stripe...
+                        </>
+                      ) : (
+                        <>
+                          Plătește cu cardul · RON {Number(order.total_price).toFixed(2)}
+                        </>
+                      )}
+                    </Button>
+
+                    <p className="text-xs text-neutral-500 text-center leading-snug">
+                      Apăsând „Plătește" accepți{' '}
+                      <a href="/termeni" className="underline hover:text-neutral-700">
+                        termenii și condițiile
+                      </a>
+                      . Plata se procesează prin Stripe (SSL 256-bit).
+                    </p>
+                  </div>
                 ) : (
                   // Bank Transfer Form
                   <div className="space-y-6">

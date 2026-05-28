@@ -138,7 +138,7 @@ export async function retrievePaymentIntent(paymentIntentId: string) {
 // delivery + coupon discount) instead of one lump-sum charge. UX stays
 // inline via @stripe/react-stripe-js's `EmbeddedCheckout`.
 
-export interface EmbeddedCheckoutOptions {
+export interface HostedCheckoutOptions {
   customer?: CustomerData;
   receiptEmail?: string;
   description?: string;
@@ -159,8 +159,11 @@ export interface EmbeddedCheckoutOptions {
   sessionMetadata: Record<string, string>;
   /** Metadata mirrored onto the PaymentIntent created by the Session. */
   paymentIntentMetadata: Record<string, string>;
-  /** URL Stripe redirects to after the embedded flow completes. */
-  returnUrl: string;
+  /** URL Stripe redirects to on successful payment.
+   *  Use `{CHECKOUT_SESSION_ID}` placeholder to receive the session id. */
+  successUrl: string;
+  /** URL Stripe redirects to if the customer aborts checkout. */
+  cancelUrl: string;
   /** Optional coupon — created on Stripe side as a one-off amount_off. */
   couponDiscount?: {
     code: string;
@@ -169,12 +172,18 @@ export interface EmbeddedCheckoutOptions {
 }
 
 /**
- * Creates a Stripe Checkout Session in embedded ui_mode. The returned
- * `client_secret` is what `<EmbeddedCheckoutProvider>` expects on the
- * client side.
+ * Creates a Stripe Checkout Session in **hosted** ui_mode (default Stripe
+ * Checkout — customer is redirected to checkout.stripe.com to pay and is
+ * returned to `successUrl` afterwards).
+ *
+ * Switched from embedded → hosted on 2026-05-28 because the embedded
+ * variant (iframe inline on /comanda/checkout) showed up cramped with
+ * Link/email/cardholder fields all visible at once. Hosted Checkout is
+ * the canonical Stripe UX, fully responsive, and matches what most
+ * customers expect when paying online.
  */
-export async function createEmbeddedCheckoutSession(
-  opts: EmbeddedCheckoutOptions
+export async function createHostedCheckoutSession(
+  opts: HostedCheckoutOptions
 ): Promise<Stripe.Checkout.Session> {
   let customerId: string | undefined;
   if (opts.customer) {
@@ -198,14 +207,15 @@ export async function createEmbeddedCheckoutSession(
   }
 
   return stripe.checkout.sessions.create({
-    ui_mode: 'embedded',
     mode: 'payment',
     line_items: opts.lineItems,
     customer: customerId,
-    return_url: opts.returnUrl,
+    success_url: opts.successUrl,
+    cancel_url: opts.cancelUrl,
     automatic_tax: { enabled: false },
     payment_method_types: ['card'],
     billing_address_collection: 'auto',
+    locale: 'ro',
     metadata: opts.sessionMetadata,
     payment_intent_data: {
       description: opts.description,

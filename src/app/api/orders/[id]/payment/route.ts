@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createClient as createServiceClient } from '@supabase/supabase-js'
-import { createEmbeddedCheckoutSession } from '@/lib/stripe'
+import { createHostedCheckoutSession } from '@/lib/stripe'
 import { buildStripeLineItems, buildPaymentIntentDescription } from '@/lib/stripe-line-items'
 import { normalizeOrderOptions } from '@/lib/orders/normalize'
 
@@ -357,7 +357,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     // for dev when NEXT_PUBLIC_APP_URL isn't set.
     const origin = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
 
-    const session = await createEmbeddedCheckoutSession({
+    const session = await createHostedCheckoutSession({
       customer: stripeCustomer,
       receiptEmail: contact?.email,
       description,
@@ -368,7 +368,14 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         userId: user?.id || 'guest',
       },
       paymentIntentMetadata: lineMetadata,
-      returnUrl: `${origin}/comanda/success/${order.id}?session_id={CHECKOUT_SESSION_ID}`,
+      // After payment, Stripe redirects to /comanda/success/[id] with the
+      // session id; the success page calls /api/orders/status to confirm
+      // the order has flipped to 'paid' (webhook usually arrives first).
+      successUrl: `${origin}/comanda/success/${order.id}?session_id={CHECKOUT_SESSION_ID}`,
+      // If the customer clicks "back" on Stripe Checkout, send them back to
+      // the order checkout page so they can pick a different method or try
+      // again with the card.
+      cancelUrl: `${origin}/comanda/checkout/${order.id}?cancelled=1`,
       ...(order.coupon_code && order.discount_amount && Number(order.discount_amount) > 0
         ? {
             couponDiscount: {
@@ -406,11 +413,12 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     return NextResponse.json({
       success: true,
       data: {
-        // Embedded Checkout uses the session's client_secret, not the
-        // PaymentIntent's. The frontend swaps from <Elements> to
-        // <EmbeddedCheckoutProvider> on the back of this.
+        // Hosted Checkout returns a redirect URL; the frontend calls
+        // `window.location.href = checkoutUrl` to send the customer to
+        // checkout.stripe.com. After payment, Stripe redirects back to
+        // successUrl with `?session_id={CHECKOUT_SESSION_ID}`.
         sessionId: session.id,
-        clientSecret: session.client_secret,
+        checkoutUrl: session.url,
         amount: Math.round(finalTotalPrice * 100),
         currency: 'ron',
       },
