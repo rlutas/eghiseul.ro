@@ -274,6 +274,69 @@ npm run build         → ✓ Compiled successfully in 3.2s, 83 pagini SSG
 
 ### Step 7 — Commit + push
 
-(Continuă imediat după...)
+Commit `4f44635` pe `main` (PR 2 frontend wizard).
+
+### Step 8 — Bug fixes post-smoke-test
+
+| Bug | Fix | Commit |
+|-----|-----|--------|
+| Scan-urile noi (ci_nou_back, passport_opened, ro_cei_reader_pdf) nu persistă la Step 3 → 2 | Indexare uploadedDocuments + ocrResults pe request type explicit, nu pe ocr.documentType (care vine 'ci_back'/'passport' din parser pentru backwards-compat) | `b2259ab` |
+| Vizual: dovada domiciliu cu scan card îngropat în info-box | Info banner separat (stil match cu "Completare automată rapidă"); scan card folosește renderScanCard standard | `b2259ab` |
+| PDF: nu se putea șterge după upload — X în header era prea mic | Butoane mari „Înlocuiește" + „Șterge" direct pe placeholder-ul PDF | `34ff02b` |
+| ci_nou_back se afișa și în slot-ul ro_cei_reader_pdf (cross-match) | Restricționat back-compat aliasing doar la perechile reale (ci_back ↔ ci_nou_back, ci_front ↔ ci_nou_front) | `117f3cf` |
+
+### Step 9 — Refactor checkout: Embedded → Hosted Stripe
+
+User feedback: embedded checkout iframe arată cramped (Link/email/etc.
+toate la un loc). Refactor la hosted Stripe Checkout (redirect):
+
+- `src/lib/stripe.ts`: `createEmbeddedCheckoutSession` → `createHostedCheckoutSession`. Înlocuit `returnUrl` cu `successUrl` + `cancelUrl`. Eliminat `ui_mode: 'embedded'`. Adăugat `locale: 'ro'`.
+- `/api/orders/[id]/payment`: returnează `checkoutUrl` (în loc de `clientSecret`).
+- Checkout page: scos `EmbeddedCheckoutBlock`, scos auto-create pe useEffect. Buton mare „Plătește cu cardul · RON X" → click → fetch session → redirect.
+- Coupon-uri merg fără re-create de session (sesiunea se creează doar la click).
+
+Commit `26cda83`.
+
+---
+
+## PR 3 — Admin display
+
+### Step 1 — DOC_LABELS extins
+Adăugat etichete pentru: `ci_vechi`, `ci_nou_front`, `ci_nou_back`, `passport_opened`, `ro_cei_reader_pdf`, plus legacy missing ones (certificat_domiciliu, residence_permit, registration_cert).
+
+### Step 2 — Cross-validation surface
+Funcție nouă `computeOcrCrossValidationWarnings(customer_data)` care wrap-uiește `crossValidateExtractedData` din lib. Apelată în render-ul admin order detail.
+
+### Step 3 — UI changes în „Documente încărcate de client"
+- **Chip „Tip act"** lângă titlul cardului (cu pictogramă CreditCard): „CI vechi (fără cip)" / „CI nou electronic (cu cip)" / „Pașaport". Vizibil instant de la titlu.
+- **Chip „N avertismente"** cu pictogramă AlertTriangle când există cross-val warnings, color amber.
+- **Alert block** detaliat care listează fiecare warning + sfat „Verifică manual documentele înainte de procesare. Mismatches pot însemna OCR slab, document greșit urcat, sau identitate diferită."
+- Border + background al cardului devin amber când există warnings (atrage atenția).
+
+### Step 4 — Verificare
+- `tsc --noEmit` curat
+- 955 teste passing
+- Build OK în 2.7s
+
+### Skipped pentru follow-up PR
+
+- „Re-rulează OCR" button — necesită API endpoint care reîncarcă din S3 și re-trimite la Gemini
+- „Marchează verificat" button — necesită coloană DB `personalKyc.adminVerifiedAt` + `adminVerifiedBy` + timeline event
+- Coloană 📎 în `/admin/orders` cu badge `N/M` (cât din documente urcate)
+
+Acestea sunt nice-to-haves; warnings surface e piesa critică — fără el admin-ul ar trece silent peste discrepanțe.
+
+Commit `63cc8fe`.
+
+---
+
+## Rezultat final
+
+**Backend (PR 1):** 4 funcții OCR noi, cross-validation, anti-forgery PDF, 23 teste.
+**Frontend wizard (PR 2):** DocumentTypePicker + conditional scan zones + persist fix + UX polish.
+**Refactor checkout:** Embedded → Hosted (redirect).
+**Admin display (PR 3):** chip tip act + cross-validation warnings.
+
+**Total:** 955 teste, type-check curat, build verde, deployment-ready.
 
 
