@@ -8,6 +8,14 @@
 
 **Security 2026-05-28:** AWS IAM key rotated + Quarantine policy detached + `.claude/settings.local.json` în `.gitignore`. Detalii complete: [`security/INCIDENT-2026-05-28-aws-key-leak.md`](security/INCIDENT-2026-05-28-aws-key-leak.md). **TODO follow-up:** actualizare env vars pe Vercel + redeploy (prod încă pe cheia ștearsă), rotare Supabase service_role JWT și GitHub PAT (au fost expuse în același fișier).
 
+**Feature 2026-05-28:** Step 2 document type picker (3-way scan flow) — CI vechi / CI nou electronic / Pașaport. Backend OCR pipeline cu 4 extractoare noi (incluiv `extractFromROCEIReaderPDF` care extrage adresa din PDF-ul oficial MAI), cross-validation între scanări, anti-forgery basic pentru PDF, admin display cu chip tip act + warnings. Detalii complete: [`plans/2026-05-28-id-document-picker-design.md`](plans/2026-05-28-id-document-picker-design.md) + [`session-logs/2026-05-28-id-document-picker-implementation.md`](session-logs/2026-05-28-id-document-picker-implementation.md). 23 noi unit tests, total 955.
+
+**Refactor 2026-05-28:** Stripe Checkout Embedded → Hosted (redirect). Customer apasă „Plătește cu cardul" → redirect la checkout.stripe.com → revine la `/comanda/success/[id]`. Cleaner UX decât iframe-ul embedded, line items + cupon păstrate identic în Dashboard.
+
+**Admin polish 2026-05-28:** „Re-OCR" button per document — admin poate re-trigger Gemini fără să forțeze clientul să re-uploadeze (util după îmbunătățiri de prompt). Endpoint `/api/admin/orders/[id]/rerun-ocr` + audit `event_type='ocr_rerun'`.
+
+**CI 2026-05-28:** Reparat după ~5 luni de eșecuri silente — 12 erori lint pre-existente (`react/no-unescaped-entities` pe ghilimele românești, `@typescript-eslint/no-explicit-any` pe modify route, `set-state-in-effect` pe header) rezolvate. CI green din nou.
+
 **Sesiune anterioară:** 2026-05-20 (SEO + rebuild Page #1)
 **Sprint-uri completate:** Sprint 0-6 ✅
 **SEO master plan + rebuild queue:** ✅ (`docs/seo/SEO-MASTER-PLAN-2026-05-20.md` + `docs/seo/REBUILD-QUEUE.md`)
