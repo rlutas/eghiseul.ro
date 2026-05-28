@@ -50,8 +50,39 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       });
     }
 
-    // Check with Stripe if payment intent exists
-    const paymentIntentId = order.stripe_payment_intent_id;
+    // Two paths to verify payment with Stripe, depending on flow:
+    //  1) Order has `stripe_payment_intent_id` (legacy PaymentIntent flow OR
+    //     webhook already arrived and stashed it) → retrieve PI directly.
+    //  2) Order has only `stripe_checkout_session_id` (post-2026-05-28
+    //     Hosted Checkout flow + webhook didn't land — common on localhost
+    //     dev without `stripe listen`) → retrieve the Session, pull the PI
+    //     id from session.payment_intent, then proceed as path 1.
+    let paymentIntentId: string | null = order.stripe_payment_intent_id || null;
+    const checkoutSessionId = order.stripe_checkout_session_id || null;
+
+    if (!paymentIntentId && checkoutSessionId) {
+      try {
+        const session = await stripe.checkout.sessions.retrieve(checkoutSessionId);
+        if (session.payment_status === 'paid') {
+          paymentIntentId =
+            typeof session.payment_intent === 'string'
+              ? session.payment_intent
+              : session.payment_intent?.id ?? null;
+        } else {
+          return NextResponse.json({
+            success: false,
+            error: `Checkout session not paid yet. Stripe status: ${session.payment_status}`,
+            data: { stripeSessionStatus: session.payment_status, orderId },
+          }, { status: 400 });
+        }
+      } catch (sessionErr) {
+        console.error('[confirm-payment] Session retrieve failed:', sessionErr);
+        return NextResponse.json({
+          success: false,
+          error: 'Failed to retrieve Stripe Checkout Session',
+        }, { status: 500 });
+      }
+    }
 
     if (!paymentIntentId) {
       return NextResponse.json(
@@ -96,13 +127,17 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
           deliveryMethod: order.delivery_method ?? null,
         });
 
-    // Payment succeeded - update order
+    // Payment succeeded - update order. Also stash paid_at + the PI id
+    // if it wasn't there before (Hosted Checkout webhook-miss path).
+    const now = new Date().toISOString();
     const { error: updateError } = await supabaseAdmin
       .from('orders')
       .update({
         payment_status: 'paid',
         status: order.status === 'pending' || order.status === 'draft' ? 'processing' : order.status,
-        updated_at: new Date().toISOString(),
+        updated_at: now,
+        ...(order.paid_at ? {} : { paid_at: now }),
+        ...(order.stripe_payment_intent_id ? {} : { stripe_payment_intent_id: paymentIntentId }),
         ...(estimatedCompletionISO ? { estimated_completion_date: estimatedCompletionISO } : {}),
       })
       .eq('id', orderId);

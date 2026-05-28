@@ -110,6 +110,10 @@ export default function SuccessPage() {
   const paymentIntent = searchParams.get('payment_intent');
   const redirectStatus = searchParams.get('redirect_status');
   const paymentMethodFromUrl = searchParams.get('method');
+  // Hosted Checkout (post-2026-05-28) appends ?session_id=cs_...
+  // When this is present and the order is still unpaid, the webhook
+  // hasn't landed yet — kick off a synchronous Stripe verification.
+  const sessionIdFromUrl = searchParams.get('session_id');
 
   const [order, setOrder] = useState<OrderData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -125,8 +129,11 @@ export default function SuccessPage() {
   useEffect(() => {
     const fetchOrder = async () => {
       try {
-        // Small delay to allow webhook to process
-        if (paymentIntent) {
+        // Small delay to allow webhook to process. We wait if EITHER signal
+        // says Stripe just completed payment:
+        //   - paymentIntent param (legacy Embedded/PI flow)
+        //   - session_id param (post-2026-05-28 Hosted Checkout flow)
+        if (paymentIntent || sessionIdFromUrl) {
           await new Promise(resolve => setTimeout(resolve, 1500));
         }
 
@@ -142,23 +149,40 @@ export default function SuccessPage() {
 
         const apiOrder = data.data.order;
 
-        // If Stripe says succeeded but order not marked as paid, confirm manually
-        if (redirectStatus === 'succeeded' && apiOrder.paymentStatus !== 'paid') {
-          console.log('Stripe payment succeeded but order not paid, confirming...');
-          try {
-            const confirmResponse = await fetch(`/api/orders/${orderId}/confirm-payment`, {
-              method: 'POST',
-            });
-            if (confirmResponse.ok) {
-              const confirmData = await confirmResponse.json();
-              if (confirmData.success) {
-                apiOrder.paymentStatus = 'paid';
-                apiOrder.status = 'processing';
-                console.log('Payment confirmed via fallback');
+        // Two signals that Stripe completed payment but our DB hasn't
+        // caught up (webhook didn't land — common on localhost dev
+        // without `stripe listen --forward-to ...`):
+        //   - redirect_status=succeeded (legacy PaymentIntent flow)
+        //   - session_id=cs_... (Hosted Checkout — added 2026-05-28)
+        // In either case, call /confirm-payment which now retrieves
+        // the session from Stripe and flips status if Stripe says paid.
+        const stripeSignalsPaid = redirectStatus === 'succeeded' || !!sessionIdFromUrl;
+        if (stripeSignalsPaid && apiOrder.paymentStatus !== 'paid') {
+          console.log('Stripe signals paid but order not marked, confirming...');
+          // Up to 2 attempts so a slow Stripe API call doesn't leave the
+          // customer staring at an "unpaid" screen after they paid.
+          for (let attempt = 0; attempt < 2; attempt++) {
+            try {
+              const confirmResponse = await fetch(`/api/orders/${orderId}/confirm-payment`, {
+                method: 'POST',
+              });
+              if (confirmResponse.ok) {
+                const confirmData = await confirmResponse.json();
+                if (confirmData.success) {
+                  apiOrder.paymentStatus = 'paid';
+                  apiOrder.status = 'processing';
+                  console.log('Payment confirmed via fallback (attempt', attempt + 1, ')');
+                  break;
+                }
               }
+            } catch (confirmError) {
+              console.error('Failed to confirm payment (attempt', attempt + 1, '):', confirmError);
             }
-          } catch (confirmError) {
-            console.error('Failed to confirm payment:', confirmError);
+            if (attempt === 0) {
+              // Brief retry — Stripe sometimes takes a moment for
+              // checkout.sessions.retrieve to reflect the latest state.
+              await new Promise(resolve => setTimeout(resolve, 1500));
+            }
           }
         }
 
@@ -217,7 +241,7 @@ export default function SuccessPage() {
       fetchOrder();
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [orderId, paymentIntent]);
+  }, [orderId, paymentIntent, sessionIdFromUrl, redirectStatus]);
 
   // GA4 Purchase Tracking
   useEffect(() => {
