@@ -409,18 +409,26 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
       if (ocr?.success && ocr.confidence >= 50) {
         const extracted = ocr.extractedData;
 
-        // OCR sometimes can't read the birth date on the CI (glare, low res).
-        // The CNP already encodes it, so derive when OCR returned null.
-        // Without this fallback isFormValid() blocks "Continuă" because
-        // birthDate is required.
-        let birthDateValue = convertDateFormat(extracted.birthDate) || personalKyc?.birthDate || '';
-        if (!birthDateValue) {
-          const cnpForDerive = extracted.cnp || personalKyc?.cnp || '';
-          const cnpRes = validateCNP(cnpForDerive);
-          if (cnpRes.valid && cnpRes.data) {
-            const d = cnpRes.data.birthDate;
-            birthDateValue = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-          }
+        // Birth date — prefer CNP-derived over OCR. CNP is mathematically
+        // authoritative for Romanian citizens; Gemini sometimes mis-reads
+        // dates (e.g., observed `07.07.1770` instead of `09.07.1977` —
+        // day/year swap on order E-260528-YV2N9). Using CNP catches both
+        // the legacy "OCR returned null" case AND the harder "OCR returned
+        // a wrong value" case.
+        const cnpForDerive = extracted.cnp || personalKyc?.cnp || '';
+        const cnpRes = validateCNP(cnpForDerive);
+        let birthDateValue = '';
+        if (cnpRes.valid && cnpRes.data) {
+          const d = cnpRes.data.birthDate;
+          birthDateValue = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        } else {
+          // CNP invalid or absent (foreign citizen, mis-OCR'd CNP) → fall
+          // back to whatever the OCR extracted, sanity-checking the year
+          // is plausible (1900..currentYear). Otherwise leave existing.
+          const ocrParsed = convertDateFormat(extracted.birthDate);
+          const ocrYear = ocrParsed ? Number(ocrParsed.slice(0, 4)) : 0;
+          const isYearPlausible = ocrYear >= 1900 && ocrYear <= new Date().getFullYear();
+          birthDateValue = isYearPlausible ? ocrParsed! : (personalKyc?.birthDate || '');
         }
 
         // Update state with extracted data
