@@ -1303,7 +1303,13 @@ export default function AdminOrderDetailPage() {
 
             <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
               {allClientDocs.map((doc, i) => (
-                <ClientDocumentCard key={`${doc.type}-${i}`} doc={doc} kyc={kycByType[doc.type]} />
+                <ClientDocumentCard
+                  key={`${doc.type}-${i}`}
+                  doc={doc}
+                  kyc={kycByType[doc.type]}
+                  orderId={order.id}
+                  onRerun={fetchOrder}
+                />
               ))}
             </div>
             {allClientDocs.length === 0 && (
@@ -1897,14 +1903,54 @@ function needsKycReview(byType: Record<string, KycPerDoc>): boolean {
   return false;
 }
 
+// Which doc types can be re-run through OCR. Excludes selfie + company
+// docs because we don't have OCR pipelines for those (selfie has a
+// separate KYC face-match flow).
+const RERUNNABLE_OCR_TYPES = new Set([
+  'ci_front', 'ci_back', 'ci_nou_front', 'ci_nou_back', 'ci_vechi',
+  'passport', 'passport_opened', 'ro_cei_reader_pdf',
+]);
+
 function ClientDocumentCard({
   doc,
   kyc,
+  orderId,
+  onRerun,
 }: {
   doc: { type: string; label: string; s3Key?: string; base64?: string; fileName?: string };
   kyc?: KycPerDoc;
+  orderId: string;
+  onRerun?: () => void;
 }) {
   const [downloading, setDownloading] = useState(false);
+  const [rerunning, setRerunning] = useState(false);
+
+  const canRerunOcr = RERUNNABLE_OCR_TYPES.has(doc.type) && (!!doc.s3Key || !!doc.base64);
+
+  const handleRerunOcr = async () => {
+    if (rerunning) return;
+    setRerunning(true);
+    try {
+      const res = await fetch(`/api/admin/orders/${orderId}/rerun-ocr`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ docType: doc.type }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        toast.error(data.error || 'Re-rulare OCR eșuată');
+        return;
+      }
+      const conf = data.data?.ocr?.confidence ?? 0;
+      const success = data.data?.ocr?.success ?? false;
+      toast.success(`OCR re-rulat (${conf}% încredere, ${success ? 'succes' : 'parțial'})`);
+      onRerun?.();
+    } catch {
+      toast.error('Eroare la re-rulare OCR');
+    } finally {
+      setRerunning(false);
+    }
+  };
 
   const handlePreview = async () => {
     if (doc.base64) {
@@ -1982,12 +2028,27 @@ function ClientDocumentCard({
           </div>
         )}
       </div>
-      {(doc.s3Key || doc.base64) && (
-        <Button size="sm" variant="ghost" className="h-7 text-xs shrink-0" onClick={handlePreview} disabled={downloading}>
-          {downloading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Eye className="h-3 w-3" />}
-          <span className="ml-1">Vezi</span>
-        </Button>
-      )}
+      <div className="flex flex-col gap-1 shrink-0">
+        {(doc.s3Key || doc.base64) && (
+          <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={handlePreview} disabled={downloading}>
+            {downloading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Eye className="h-3 w-3" />}
+            <span className="ml-1">Vezi</span>
+          </Button>
+        )}
+        {canRerunOcr && (
+          <Button
+            size="sm"
+            variant="ghost"
+            className="h-7 text-xs text-purple-700 hover:text-purple-800 hover:bg-purple-50"
+            onClick={handleRerunOcr}
+            disabled={rerunning}
+            title="Re-rulează Gemini OCR pe document (după ce prompt-ul s-a îmbunătățit sau dacă confidence inițial e mic)"
+          >
+            {rerunning ? <Loader2 className="h-3 w-3 animate-spin" /> : <RefreshCw className="h-3 w-3" />}
+            <span className="ml-1">Re-OCR</span>
+          </Button>
+        )}
+      </div>
     </div>
   );
 }
