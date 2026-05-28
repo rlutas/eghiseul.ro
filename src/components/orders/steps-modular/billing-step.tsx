@@ -586,35 +586,12 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
             />
           </div>
 
-          {/* Optional bank details */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t">
-            <div className="space-y-2">
-              <Label htmlFor="bankName" className="text-secondary-900 font-medium">
-                Bancă <span className="text-neutral-400 text-xs">(opțional)</span>
-              </Label>
-              <Input
-                id="bankName"
-                type="text"
-                value={billing?.bankName || ''}
-                onChange={(e) => updateField('bankName', e.target.value)}
-                placeholder="ex: BCR"
-                className="bg-white"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="bankIban" className="text-secondary-900 font-medium">
-                IBAN <span className="text-neutral-400 text-xs">(opțional)</span>
-              </Label>
-              <Input
-                id="bankIban"
-                type="text"
-                value={billing?.bankIban || ''}
-                onChange={(e) => updateField('bankIban', e.target.value.toUpperCase())}
-                placeholder="RO49AAAA1B31007593840000"
-                className="bg-white font-mono text-sm"
-              />
-            </div>
-          </div>
+          {/* Bancă + IBAN câmpuri eliminate 2026-05-28 — nu sunt necesare
+              pentru factura PJ. Oblio nu cere date bancare ale clientului
+              pe e-factura (acolo apar conturile NOASTRE, nu ale clientului).
+              Backward compat: dacă admin/client setează `bankName`/`bankIban`
+              prin profile (BillingProfileForm), state-ul rămâne — doar
+              wizard-ul nu le mai cere. */}
         </div>
       )}
     </div>

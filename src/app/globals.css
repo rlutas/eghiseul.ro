@@ -462,21 +462,50 @@
     border-radius: 4px;
   }
 
-  /* Skip-to-content link (hidden until keyboard-focused) */
+  /* Skip-to-content link — bulletproof sr-only pattern.
+   *
+   * Old impl used `left: -9999px` + `:focus-visible { left: 0 }`. That
+   * occasionally rendered the link visible after page reload / browser
+   * navigation because Safari (and sometimes Chrome) restores the
+   * previously-focused element on history nav, and the focused-state
+   * CSS kicked in.
+   *
+   * The clip+width:1px pattern is what WCAG-friendly libraries use:
+   * the element is technically present in the layout (so screen
+   * readers can find it) but invisible to mouse users until a real
+   * keyboard Tab focuses it. Adding `clip-path` covers modern browsers
+   * that ignore the legacy `clip` property.
+   */
   .skip-to-content {
     position: absolute;
-    left: -9999px;
-    top: 0;
-    z-index: 9999;
-    padding: 0.75rem 1.25rem;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
     background: var(--primary-500);
     color: var(--secondary-900);
     font-weight: 600;
     text-decoration: none;
-    border-radius: 0 0 8px 0;
   }
   .skip-to-content:focus-visible {
+    position: absolute;
+    width: auto;
+    height: auto;
+    padding: 0.75rem 1.25rem;
+    margin: 0;
+    overflow: visible;
+    clip: auto;
+    clip-path: none;
+    white-space: normal;
     left: 0;
+    top: 0;
+    z-index: 9999;
+    border-radius: 0 0 8px 0;
     outline-offset: -2px;
   }
 
