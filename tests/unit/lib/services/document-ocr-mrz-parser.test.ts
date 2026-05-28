@@ -145,6 +145,43 @@ describe('crossValidateExtractedData — uses parsed MRZ (no false positives)', 
     expect(docWarning.message).toContain('MB1139128');
   });
 
+  it('regression: hyphenated given name with spacing variants — same person, no warning', () => {
+    // Real data from order E-260528-DZ8MS:
+    //   CI front OCR extracted "GHEORGHE - CONSTANTIN" (spaces around hyphen)
+    //   PDF extracted "GHEORGHE-CONSTANTIN" (no spaces)
+    // Same person — should NOT flag a name mismatch.
+    const result = crossValidateExtractedData({
+      ci_front: {
+        documentType: 'ci_front',
+        lastName: 'SABO',
+        firstName: 'GHEORGHE - CONSTANTIN',
+      },
+      ro_cei_reader_pdf: {
+        documentType: 'passport',
+        lastName: 'SABO',
+        firstName: 'GHEORGHE-CONSTANTIN',
+      },
+    });
+    expect(result.filter((w) => w.field === 'name')).toEqual([]);
+  });
+
+  it('regression: name with multiple separator variants normalizes equally', () => {
+    // Edge cases: em-dash, en-dash, underscore, dot
+    const variants = [
+      { ci: 'MARIA-IOANA', pdf: 'MARIA IOANA' },          // hyphen vs space
+      { ci: 'MARIA – IOANA', pdf: 'MARIA-IOANA' },        // en-dash vs hyphen
+      { ci: 'MARIA — IOANA', pdf: 'MARIA IOANA' },        // em-dash vs space
+      { ci: 'MARIA.IOANA', pdf: 'MARIA IOANA' },          // dot vs space
+    ];
+    for (const { ci, pdf } of variants) {
+      const result = crossValidateExtractedData({
+        ci_front: { documentType: 'ci_front', lastName: 'POPESCU', firstName: ci },
+        ro_cei_reader_pdf: { documentType: 'passport', lastName: 'POPESCU', firstName: pdf },
+      });
+      expect(result.filter((w) => w.field === 'name'), `failed for ${ci} vs ${pdf}`).toEqual([]);
+    }
+  });
+
   it('falls back to Gemini-extracted mrzDocumentNumber if mrzRaw absent', () => {
     // Legacy orders pre-parser don't have mrzRaw. Use Gemini's value as-is.
     const result = crossValidateExtractedData({

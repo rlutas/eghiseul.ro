@@ -725,13 +725,26 @@ export function crossValidateExtractedData(scans: {
   const normalize = (s: string | undefined): string =>
     (s ?? '').trim().toLowerCase();
 
+  // Romanian compound given names appear inconsistently across scans:
+  //   CI front OCR → "GHEORGHE - CONSTANTIN" (spaces around hyphen)
+  //   RO CEI Reader PDF → "GHEORGHE-CONSTANTIN" (no spaces)
+  //   MRZ → "GHEORGHE<CONSTANTIN" (parsed to "GHEORGHE CONSTANTIN")
+  // All three are the SAME person. Strict whitespace-collapse only wasn't
+  // enough — we need to normalize the separator entirely. Approach:
+  // 1. strip diacritics + force lowercase (handled by `normalize`)
+  // 2. normalize ș/ț that escaped the combining-mark strip
+  // 3. replace any run of hyphens/dashes/spaces/punct with a single space
+  // 4. collapse remaining whitespace
+  // After this, all three variants above flatten to "gheorghe constantin".
   const normalizeName = (s: string | undefined): string =>
     normalize(s)
       .normalize('NFD')
       .replace(/[̀-ͯ]/g, '') // strip combining marks
       .replace(/ș/g, 's')
       .replace(/ț/g, 't')
-      .replace(/\s+/g, ' ');
+      .replace(/[-–—_.,]+/g, ' ') // separators → space (handles all dash variants)
+      .replace(/\s+/g, ' ')
+      .trim();
 
   // Prefer values parsed FROM the raw MRZ over Gemini's attempted
   // structured extraction. mrzDocumentNumber / mrzCnp from Gemini have
