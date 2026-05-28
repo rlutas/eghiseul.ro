@@ -1071,7 +1071,7 @@ export function DeliveryStepModular({ onValidChange }: DeliveryStepProps) {
             <Mail className="w-4 h-4 text-green-700 flex-shrink-0 mt-0.5" />
             <p className="text-sm text-green-800">
               PDF-urile vor fi trimise pe <strong>{state.contact.email}</strong>.
-              {' '}Poți schimba metoda apăsând pe „Livrare Fizică" mai sus.
+              {' '}Poți schimba metoda apăsând pe „Livrare Fizică” mai sus.
             </p>
           </div>
         )}
@@ -1138,14 +1138,34 @@ export function DeliveryStepModular({ onValidChange }: DeliveryStepProps) {
               </div>
             </div>
 
-            {/* International Option */}
+            {/* International Option — same dual-logo layout as Romania
+                option (left column with DHL + Poșta logos stacked) for
+                visual consistency. */}
             <div
               onClick={() => handleRegionSelect('international')}
               className="relative p-6 rounded-xl border-2 border-neutral-200 hover:border-primary-300 cursor-pointer transition-all hover:shadow-md group"
             >
               <div className="flex items-center gap-4">
-                <div className="w-16 h-16 rounded-lg bg-white border border-neutral-200 flex items-center justify-center">
-                  <Globe className="w-8 h-8 text-primary-500" />
+                <div className="flex flex-col gap-2">
+                  <div className="w-14 h-10 rounded-lg bg-white border border-yellow-200 flex items-center justify-center p-1.5">
+                    <Image
+                      src="/images/couriers/960px-DHL_Logo.svg.png"
+                      alt="DHL"
+                      width={40}
+                      height={28}
+                      className="object-contain"
+                      unoptimized
+                    />
+                  </div>
+                  <div className="w-14 h-10 rounded-lg bg-white border border-blue-200 flex items-center justify-center p-1.5">
+                    <Image
+                      src="/images/couriers/posta-romana.svg"
+                      alt="Poșta Română"
+                      width={40}
+                      height={28}
+                      className="object-contain"
+                    />
+                  </div>
                 </div>
                 <div className="flex-1">
                   <h4 className="font-semibold text-secondary-900 text-lg">Internațional</h4>
