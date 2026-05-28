@@ -834,14 +834,63 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
                 docMime === 'application/pdf' ||
                 (scanState.preview === '' && !existingDoc); // PDF newly uploaded → empty preview
               if (isPdfUpload) {
+                // Hidden input + clickable area pentru re-upload.
+                // De ce: pe PDF NU avem `<img>` interactiv ca pe imagini, deci
+                // userul nu are unde să apese pentru a înlocui. X-ul din header
+                // există, dar e mic — adăugăm aici 2 butoane mari și clare:
+                // „Înlocuiește" (click → file picker) și „Șterge" (click → resetScan).
+                const ref =
+                  type === 'ci_front' ? ciFrontInputRef :
+                  type === 'ci_back' ? ciBackInputRef :
+                  type === 'ci_nou_back' ? ciNouBackInputRef :
+                  type === 'passport_opened' ? passportOpenedInputRef :
+                  roCeiPdfInputRef;
                 return (
-                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-neutral-50 text-neutral-700">
-                    <FileCheck className="h-10 w-10 text-primary-500 mb-2" />
-                    <p className="text-sm font-medium">Document PDF încărcat</p>
-                    <p className="text-xs text-neutral-500 mt-0.5">
-                      Datele se extrag în câteva secunde
-                    </p>
-                  </div>
+                  <>
+                    <input
+                      ref={ref}
+                      type="file"
+                      accept={type === 'ro_cei_reader_pdf' ? 'application/pdf' : 'image/jpeg,image/jpg,image/png,application/pdf'}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) handleFileSelect(type, file);
+                        e.target.value = '';
+                      }}
+                      className="hidden"
+                      disabled={scanState.scanning}
+                    />
+                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-neutral-50 text-neutral-700 p-3">
+                      <FileCheck className="h-10 w-10 text-primary-500 mb-2" />
+                      <p className="text-sm font-medium">Document PDF încărcat</p>
+                      <p className="text-xs text-neutral-500 mt-0.5 mb-3">
+                        Datele se extrag în câteva secunde
+                      </p>
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            ref.current?.click();
+                          }}
+                          disabled={scanState.scanning}
+                          className="text-xs px-3 py-1.5 bg-white border border-neutral-300 rounded-md text-neutral-700 hover:bg-neutral-100 hover:border-neutral-400 transition-colors disabled:opacity-50"
+                        >
+                          Înlocuiește
+                        </button>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            resetScan(type);
+                          }}
+                          disabled={scanState.scanning}
+                          className="text-xs px-3 py-1.5 bg-white border border-red-300 rounded-md text-red-600 hover:bg-red-50 hover:border-red-400 transition-colors disabled:opacity-50"
+                        >
+                          Șterge
+                        </button>
+                      </div>
+                    </div>
+                  </>
                 );
               }
               return (
