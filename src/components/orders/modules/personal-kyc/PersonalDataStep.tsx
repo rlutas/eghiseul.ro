@@ -435,19 +435,26 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
           documentExpiry: convertDateFormat(extracted.expiryDate) || personalKyc?.documentExpiry || '',
           documentIssueDate: convertDateFormat(extracted.issueDate) || personalKyc?.documentIssueDate || '',
           documentIssuedBy: extracted.issuedBy || personalKyc?.documentIssuedBy || '',
-          documentType: ocr.documentType || type,
+          // Persistăm tipul cerut explicit (request type), NU `ocr.documentType`.
+          // De ce: extractFromCINouBack folosește `parseGeminiOCRResponse(text, 'ci_back')`
+          // pentru backward compat → `ocr.documentType` ar fi 'ci_back', dar tipul real
+          // de scan e 'ci_nou_back'. Idem pentru passport_opened și ro_cei_reader_pdf
+          // (parserul le marchează 'passport'). Dacă păstram `ocr.documentType` ca cheie,
+          // la revenire din Step 3 → 2, renderScanCard cu type='ci_nou_back' nu găsea
+          // niciun upload (filter `d.type !== 'ci_nou_back'` cădea în branch-ul gol).
+          documentType: type,
           isExpired: ocr.isExpired || false,
           requiresAddressCertificate: ocr.requiresAddressCertificate || false,
           // Note: Address will be filled separately using fillAddressFields
           fatherName: extracted.fatherName || personalKyc?.fatherName,
           motherName: extracted.motherName || personalKyc?.motherName,
-          // Add to uploaded documents
+          // Add to uploaded documents — indexat pe `type` request, vezi nota de mai sus.
           uploadedDocuments: [
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             ...(personalKyc?.uploadedDocuments || []).filter((d: any) => d.type !== type),
             {
               id: randomId(),
-              type: ocr.documentType || type,
+              type,
               fileName: file.name,
               fileSize: compressed.sizeAfter,
               mimeType: compressed.mimeType,
@@ -459,7 +466,7 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             ...(personalKyc?.ocrResults || []).filter((r: any) => r.documentType !== type),
             {
-              documentType: ocr.documentType || type,
+              documentType: type,
               success: true,
               confidence: ocr.confidence || 0.9,
               extractedData: extracted,
@@ -1125,7 +1132,7 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
                 </div>
               )}
 
-              {/* CI nou — 3 zones: front, back, RO CEI Reader PDF */}
+              {/* CI nou — 3 zones: front, back, RO CEI Reader PDF (dovadă domiciliu) */}
               {personalKyc.idDocumentType === 'ci_nou' && (
                 <>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -1141,47 +1148,53 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
                     )}
                   </div>
 
-                  <div className="rounded-xl border border-blue-200 bg-blue-50/50 p-4 mt-3">
-                    <div className="flex gap-3 mb-3">
+                  {/* Info banner — slim, deasupra cardului de upload PDF, ca să nu
+                      încărcăm vizual cardul. Match design cu banner-ul „Completare
+                      automată rapidă" de mai sus. */}
+                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-3">
+                    <div className="flex gap-3">
                       <Info className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
-                      <div className="text-sm text-blue-800">
+                      <div className="text-sm text-blue-800 flex-1">
                         <p className="font-medium mb-1">
-                          Dovadă domiciliu — PDF RO CEI Reader
+                          Pas final — dovadă de domiciliu
                         </p>
                         <p className="text-blue-700 text-xs leading-snug">
                           Adresa nu e printată pe spate la CI nou — e doar în
-                          cip. Folosește aplicația oficială MAI pentru a
-                          extrage adresa de pe cip:
+                          cip. Generează PDF-ul cu aplicația oficială MAI:
                         </p>
                         <ol className="text-blue-700 text-xs leading-snug mt-2 list-decimal list-inside space-y-0.5">
-                          <li>Instalează &quot;RO CEI Reader&quot; (gratis, de la MAI)</li>
+                          <li>Instalează <strong>RO CEI Reader</strong> (gratis, de la MAI)</li>
                           <li>Apropie telefonul de cip-ul de pe spatele CI</li>
                           <li>Aplicația generează PDF-ul → îl urci aici</li>
                         </ol>
-                        <div className="flex gap-2 mt-3">
+                        <div className="flex flex-wrap gap-2 mt-3">
                           <a
                             href="https://play.google.com/store/search?q=RO+CEI+Reader+MAI"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-[11px] px-2 py-1 bg-white border border-blue-300 rounded text-blue-700 hover:bg-blue-100"
+                            className="text-[11px] px-2.5 py-1 bg-white border border-blue-300 rounded-md text-blue-700 hover:bg-blue-100 hover:border-blue-400 transition-colors"
                           >
-                            📲 Android
+                            📲 Descarcă pentru Android
                           </a>
                           <a
                             href="https://apps.apple.com/search?term=RO%20CEI%20Reader"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-[11px] px-2 py-1 bg-white border border-blue-300 rounded text-blue-700 hover:bg-blue-100"
+                            className="text-[11px] px-2.5 py-1 bg-white border border-blue-300 rounded-md text-blue-700 hover:bg-blue-100 hover:border-blue-400 transition-colors"
                           >
-                            📲 iOS
+                            📲 Descarcă pentru iOS
                           </a>
                         </div>
                       </div>
                     </div>
+                  </div>
+
+                  {/* Card upload PDF — același stil ca scan cards de mai sus */}
+                  <div className="grid grid-cols-1 gap-4">
                     {renderScanCard(
                       'ro_cei_reader_pdf',
                       'PDF RO CEI Reader',
-                      'Acceptăm doar PDF generat de aplicația oficială MAI'
+                      'Doar PDF generat de aplicația oficială MAI'
                     )}
                   </div>
                 </>

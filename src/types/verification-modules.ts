@@ -15,7 +15,9 @@ export type DocumentType =
   | 'ci_vechi'             // Old Romanian ID (has address on front)
   | 'ci_nou_front'         // New Romanian ID front
   | 'ci_nou_back'          // New Romanian ID back
-  | 'passport'             // Passport
+  | 'passport'             // Passport (legacy — photo page only)
+  | 'passport_opened'      // Passport opened spread (post-2026-05-28 flow)
+  | 'ro_cei_reader_pdf'    // PDF from official MAI RO CEI Reader app (eCI address proof)
   | 'certificat_domiciliu' // Certificate of domicile (for address)
   | 'residence_permit'     // Permis de rezidență
   | 'registration_cert'    // Certificat de înregistrare
