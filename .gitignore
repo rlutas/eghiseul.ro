@@ -61,3 +61,6 @@ logs
 .DS_Store
 Thumbs.db
 docs/legacy/
+
+# Local Claude Code settings (may contain secrets in Bash permission rules)
+.claude/settings.local.json

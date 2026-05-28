@@ -16,6 +16,7 @@
 **Handbook Auto-Finalize cron (curier):** [`admin/auto-finalize-cron.md`](admin/auto-finalize-cron.md)
 **Gap docs secundare (Cazier+Integritate):** [`admin/secondary-service-documents.md`](admin/secondary-service-documents.md)
 **🚀 DEPLOY CHECKLIST:** [`deployment/DEPLOY-CHECKLIST.md`](deployment/DEPLOY-CHECKLIST.md) — **citește înainte de cutover**
+**🔐 Security incident 2026-05-28:** [`security/INCIDENT-2026-05-28-aws-key-leak.md`](security/INCIDENT-2026-05-28-aws-key-leak.md) — AWS key rotation + Quarantine policy detach
 **Sesiune anterioară (2026-05-20):** [`session-logs/2026-05-20-seo-cazier-judiciar-rebuild.md`](session-logs/2026-05-20-seo-cazier-judiciar-rebuild.md)
 **Sesiune anterioară (2026-04-29):** [`session-logs/2026-04-29-wizard-redesign.md`](session-logs/2026-04-29-wizard-redesign.md)
 **Testing guide:** [`testing/COMPREHENSIVE_GUIDE.md`](testing/COMPREHENSIVE_GUIDE.md)

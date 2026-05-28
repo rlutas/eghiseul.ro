@@ -1,9 +1,12 @@
 # eGhiseul.ro - Status Curent
 
-**Data:** 2026-05-27 (sesiune admin parity overhaul + coșuri abandonate)
-**Detalii:**
+**Data:** 2026-05-28 (security incident AWS key — rezolvat în <1h)
+**Detalii sesiune precedentă (2026-05-27):**
 - Dimineață: Step 2 simplification → `docs/session-logs/2026-05-27-step2-simplification.md`
 - După-amiază: admin parity + abandoned carts → `docs/session-logs/2026-05-27-admin-parity-overhaul.md`
+- Seara: Embedded Checkout + cron auto-finalize + push pe `main`
+
+**Security 2026-05-28:** AWS IAM key rotated + Quarantine policy detached + `.claude/settings.local.json` în `.gitignore`. Detalii complete: [`security/INCIDENT-2026-05-28-aws-key-leak.md`](security/INCIDENT-2026-05-28-aws-key-leak.md). **TODO follow-up:** actualizare env vars pe Vercel + redeploy (prod încă pe cheia ștearsă), rotare Supabase service_role JWT și GitHub PAT (au fost expuse în același fișier).
 
 **Sesiune anterioară:** 2026-05-20 (SEO + rebuild Page #1)
 **Sprint-uri completate:** Sprint 0-6 ✅
