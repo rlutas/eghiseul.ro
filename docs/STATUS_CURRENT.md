@@ -16,6 +16,13 @@
 
 **CI 2026-05-28:** Reparat după ~5 luni de eșecuri silente — 12 erori lint pre-existente (`react/no-unescaped-entities` pe ghilimele românești, `@typescript-eslint/no-explicit-any` pe modify route, `set-state-in-effect` pe header) rezolvate. CI green din nou.
 
+**Admin polish 2026-05-28 (P1 completat):**
+- **„Re-OCR" button per document** — admin poate re-trigger Gemini fără re-upload (commit `83586b3`)
+- **„Marchează verificat" button** + audit `documents_verified` (commit `90b7136`)
+- **Migration 046** — picker Step 2 aplicat la `cazier-fiscal` și `cazier-judiciar-persoana-fizica` (commit `90b7136`)
+- **Coloana 📎 în lista de comenzi** — N/M docs urcate + verde dacă verified, amber dacă parțial (commit `a664ab9`)
+- **TSV Export comenzi** — buton pe /admin/orders, descarcă filtrul curent cu 18 coloane pentru Sheets (commit `bf9163b`)
+
 **Sesiune anterioară:** 2026-05-20 (SEO + rebuild Page #1)
 **Sprint-uri completate:** Sprint 0-6 ✅
 **SEO master plan + rebuild queue:** ✅ (`docs/seo/SEO-MASTER-PLAN-2026-05-20.md` + `docs/seo/REBUILD-QUEUE.md`)
