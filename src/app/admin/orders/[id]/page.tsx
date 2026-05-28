@@ -668,6 +668,41 @@ export default function AdminOrderDetailPage() {
           </div>
         </div>
         <div className="flex items-center gap-2">
+          {/* Sync Stripe — visible only for orders that have a checkout
+              session but aren't marked paid. Catches "webhook didn't
+              arrive" scenarios (localhost dev, prod outage, sig mismatch).
+              Calls the Stripe API directly and flips payment_status if
+              Stripe confirms the session is paid. */}
+          {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+          {order.payment_status !== 'paid' && (order as any).stripe_checkout_session_id && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={async () => {
+                if (!confirm('Sincronizezi cu Stripe? Acest buton verifică dacă plata a fost confirmată pe Stripe și actualizează comanda corespunzător.')) return;
+                try {
+                  const res = await fetch(`/api/admin/orders/${order.id}/sync-stripe`, { method: 'POST' });
+                  const json = await res.json();
+                  if (!res.ok || !json.success) {
+                    toast.error(json.error || 'Sync eșuat');
+                    return;
+                  }
+                  if (json.data.alreadyPaid) {
+                    toast.info('Comanda era deja marcată plătită — nimic de făcut.');
+                  } else {
+                    toast.success('Plată sincronizată. Verifică Stripe Dashboard → Webhooks dacă se repetă.');
+                  }
+                  await fetchOrder();
+                } catch {
+                  toast.error('Eroare la sincronizare');
+                }
+              }}
+              title="Verifică starea plății direct pe Stripe și actualizează comanda — util când webhook-ul nu a ajuns"
+            >
+              <RefreshCw className="h-4 w-4" />
+              Sync Stripe
+            </Button>
+          )}
           {/* Modify button — only available on paid orders. Hidden on
               draft/pending/abandoned where the customer can still finish
               checkout or hasn't paid yet. Mirrors sister UX. */}
