@@ -23,6 +23,19 @@
 - **Coloana 📎 în lista de comenzi** — N/M docs urcate + verde dacă verified, amber dacă parțial (commit `a664ab9`)
 - **TSV Export comenzi** — buton pe /admin/orders, descarcă filtrul curent cu 18 coloane pentru Sheets (commit `bf9163b`)
 
+**Polish PM 2026-05-28 (live smoke-test fix-uri):** [`session-logs/2026-05-28-pm-polish-and-fixes.md`](session-logs/2026-05-28-pm-polish-and-fixes.md)
+- **birthDate fix** — CNP-derive prioritar față de OCR (Gemini swap-uia day/year pe unele CI vechi). Commit `20d08ec`.
+- **Sync Stripe button** + endpoint `/api/admin/orders/[id]/sync-stripe` — recuperare manuală când webhook-ul nu ajunge la noi. Commit `c433455`.
+- **ANAF v8 → v9** — endpoint vechi era mort (HTTP 000 timeout), v9 sincron răspunde în ~150ms. Commit `2cf1845`.
+- **Price rounding** — `priceBreakdown.totalPrice` rotunjit la 2 zecimale, gata cu „Plătește 1514.2099999999998 RON". Commit `2cf1845`.
+- **„Sari la conținut"** sr-only pattern canonical — nu mai apare random la navigare history. Commit `b14a5ac`.
+- **Bancă/IBAN scos din PJ billing** — Oblio nu pune datele bancare ale clientului pe e-factură. Commit `b14a5ac`.
+- **Step 6 Livrare polish** — picker email/physical rămâne mereu vizibil, fără confirmation screen intermediar. Commits `8d33af5` + `42b10e0` + `a0bed29`.
+- **DHL + Poșta logos** copiate din sister project + carduri internationale aliniate vizual cu cele Romania.
+- **PDF preview reparat** — thumbnail cu icon roșu + iframe preview pentru PDF-uri în KYC docs.
+
+**Tests:** 966 unit (era 955 dimineața) — +11 noi pentru price-rounding (defensiv vs floating-point drift) + ANAF v9 parsing (mock fetch + verifies endpoint URL).
+
 **Sesiune anterioară:** 2026-05-20 (SEO + rebuild Page #1)
 **Sprint-uri completate:** Sprint 0-6 ✅
 **SEO master plan + rebuild queue:** ✅ (`docs/seo/SEO-MASTER-PLAN-2026-05-20.md` + `docs/seo/REBUILD-QUEUE.md`)
