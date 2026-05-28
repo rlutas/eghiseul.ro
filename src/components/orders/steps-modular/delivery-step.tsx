@@ -75,7 +75,7 @@ const INTERNATIONAL_COURIERS = [
     name: 'DHL Express International',
     price: 250,
     estimatedDays: '1-3 zile lucrătoare',
-    logo: '/images/couriers/dhl.svg',
+    logo: '/images/couriers/960px-DHL_Logo.svg.png',
     description: 'Livrare rapidă oriunde în lume',
     badge: 'Rapid',
     color: 'yellow',
@@ -1794,60 +1794,102 @@ export function DeliveryStepModular({ onValidChange }: DeliveryStepProps) {
             Înapoi
           </Button>
 
-          <div>
-            <h3 className="font-semibold text-secondary-900 flex items-center gap-2 mb-1">
-              <Globe className="h-5 w-5 text-primary-500" />
-              Livrare Internațională
-            </h3>
-            <p className="text-sm text-neutral-500">
-              Alege transportatorul și completează adresa destinatarului.
-            </p>
+          {/* Courier Header — matches the Livrare în România banner style:
+              white logo squares + gradient background + label. Keeps the
+              wizard visually consistent across delivery sub-flows. */}
+          <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-yellow-50 to-blue-50 rounded-xl border border-neutral-200">
+            <div className="flex items-center gap-2">
+              <div className="w-10 h-10 rounded-lg bg-white flex items-center justify-center p-1.5 shadow-sm border border-yellow-200">
+                <Image
+                  src="/images/couriers/960px-DHL_Logo.svg.png"
+                  alt="DHL"
+                  width={32}
+                  height={32}
+                  className="object-contain"
+                  unoptimized
+                />
+              </div>
+              <div className="w-10 h-10 rounded-lg bg-white flex items-center justify-center p-1.5 shadow-sm border border-blue-200">
+                <Image
+                  src="/images/couriers/posta-romana.svg"
+                  alt="Poșta Română"
+                  width={32}
+                  height={32}
+                  className="object-contain"
+                />
+              </div>
+            </div>
+            <div>
+              <h3 className="font-semibold text-secondary-900">Livrare Internațională</h3>
+              <p className="text-sm text-neutral-500">DHL Express & Poșta Română International</p>
+            </div>
           </div>
 
-          {/* Courier selection */}
+          {/* Courier selection — same card pattern as Romania quotes:
+              logo on the left, name + description in the middle, badge +
+              price on the right. Selected gets a coloured border + tint. */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {INTERNATIONAL_COURIERS.map((c) => {
               const isSelected = intlProvider === c.provider;
-              const borderClass = isSelected
-                ? c.color === 'yellow'
-                  ? 'border-yellow-500 bg-yellow-50'
-                  : 'border-blue-500 bg-blue-50'
-                : 'border-neutral-200 hover:border-primary-300';
+              const isYellow = c.color === 'yellow';
               return (
-                <div
+                <button
                   key={c.provider}
+                  type="button"
                   onClick={() => setIntlProvider(c.provider)}
                   className={cn(
-                    'p-4 rounded-xl border-2 cursor-pointer transition-all hover:shadow-md',
-                    borderClass,
+                    'relative p-4 rounded-xl border-2 cursor-pointer transition-all text-left hover:shadow-md',
+                    isSelected
+                      ? (isYellow
+                          ? 'border-yellow-500 bg-yellow-50 ring-2 ring-yellow-200/60 shadow-sm'
+                          : 'border-blue-500 bg-blue-50 ring-2 ring-blue-200/60 shadow-sm')
+                      : 'border-neutral-200 bg-white hover:border-primary-300',
                   )}
                 >
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2">
-                      <Globe className={cn(
-                        'w-5 h-5',
-                        c.color === 'yellow' ? 'text-yellow-600' : 'text-blue-600',
-                      )} />
-                      <span className="font-semibold text-secondary-900 text-sm">{c.name}</span>
-                    </div>
+                  {isSelected && (
                     <span className={cn(
-                      'text-xs px-2 py-0.5 rounded',
-                      c.color === 'yellow'
-                        ? 'bg-yellow-100 text-yellow-700'
-                        : 'bg-blue-100 text-blue-700',
+                      'absolute top-2 right-2 inline-flex items-center gap-1 rounded-full text-white text-[10px] font-bold px-2 py-0.5 uppercase tracking-wide',
+                      isYellow ? 'bg-yellow-600' : 'bg-blue-600',
                     )}>
-                      {c.badge}
+                      <CheckCircle className="w-3 h-3" />
+                      Selectat
                     </span>
+                  )}
+                  <div className="flex items-start gap-3">
+                    <div className={cn(
+                      'w-12 h-12 rounded-lg bg-white flex items-center justify-center p-1.5 shadow-sm flex-shrink-0',
+                      isYellow ? 'border border-yellow-200' : 'border border-blue-200',
+                    )}>
+                      <Image
+                        src={c.logo}
+                        alt={c.name}
+                        width={36}
+                        height={36}
+                        className="object-contain"
+                        unoptimized={isYellow}
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-semibold text-secondary-900 text-sm">{c.name}</span>
+                        <span className={cn(
+                          'text-[10px] px-1.5 py-0.5 rounded font-medium',
+                          isYellow ? 'bg-yellow-100 text-yellow-800' : 'bg-blue-100 text-blue-800',
+                        )}>
+                          {c.badge}
+                        </span>
+                      </div>
+                      <p className="text-xs text-neutral-600 mt-1 leading-snug">{c.description}</p>
+                      <div className="flex items-center justify-between mt-2">
+                        <span className="text-xs text-neutral-500 inline-flex items-center gap-1">
+                          <Clock className="w-3 h-3" />
+                          {c.estimatedDays}
+                        </span>
+                        <span className="font-bold text-secondary-900 text-sm">{c.price} RON</span>
+                      </div>
+                    </div>
                   </div>
-                  <p className="text-xs text-neutral-600 mb-2">{c.description}</p>
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-neutral-500 inline-flex items-center gap-1">
-                      <Clock className="w-3 h-3" />
-                      {c.estimatedDays}
-                    </span>
-                    <span className="font-bold text-secondary-900">{c.price} RON</span>
-                  </div>
-                </div>
+                </button>
               );
             })}
           </div>
