@@ -616,6 +616,105 @@ Răspunde în acest format JSON:
  * diacritics are normalized (ș → s, ț → t) for name comparison only
  * because Gemini OCR might inconsistently transcribe them.
  */
+/**
+ * Parse Romanian eCI MRZ lines into structured fields.
+ *
+ * Why this exists: Gemini OCR's extraction of `mrzDocumentNumber` and
+ * `mrzCnp` was unreliable — observed on order E-260528-DZ8MS it concatenated
+ * `MB1139128` + check digit + CNP into a single string `MB113912841710211434518`,
+ * then picked the wrong substring for CNP (3602151 — slice of expiry date).
+ * Gemini is good at OCR (reading raw text), bad at strict position-based
+ * parsing of fixed-format strings.
+ *
+ * Solution: extract `mrzRaw[]` (the 3 lines as Gemini reads them, which is
+ * accurate) and run a deterministic TS parser to pull document number + CNP.
+ *
+ * Romanian eCI MRZ format (TD1-like, 3 lines × 30 chars):
+ *   Line 1: I + D + ROU + DOC_NUMBER_9 + CHECK_1 + PERSONAL_NUMBER_13 + <pad>
+ *           "IDROUMB1139128<4<1710211434518<<<" or "IDROUMB113912841710211434518<<<<"
+ *   Line 2: BIRTH_DATE_6 + CHECK_1 + SEX + EXP_DATE_6 + CHECK_1 + NATIONALITY_3 + <pad>
+ *   Line 3: SURNAME<<GIVEN_NAMES + <pad>
+ *
+ * Returns parsed values normalized (no padding `<`, uppercase). If a line
+ * is missing or doesn't match the expected format, the corresponding field
+ * is undefined and cross-validation skips it.
+ */
+export function parseRomanianEciMrz(mrzRaw: string[] | undefined): {
+  documentNumber?: string;
+  cnp?: string;
+  birthDate?: string;       // YYMMDD as on MRZ
+  sex?: 'M' | 'F';
+  expiryDate?: string;      // YYMMDD as on MRZ
+  nationality?: string;
+  surname?: string;
+  givenNames?: string;
+} {
+  if (!mrzRaw || mrzRaw.length === 0) return {};
+
+  // Strip stray whitespace + padding from each line for easier parsing.
+  // We DON'T pad lines to 30 chars because Gemini sometimes truncates the
+  // trailing `<<<` — fields we care about are always near the start.
+  const lines = mrzRaw.map((l) => (l || '').toUpperCase().trim());
+
+  const out: ReturnType<typeof parseRomanianEciMrz> = {};
+
+  // Line 1: ICAO TD1-style with Romanian eCI layout.
+  // Format: "ID" + "ROU" + DOC_NUMBER (9 chars, < pads, alpha-num) +
+  //         CHECK_DIGIT (1) + PERSONAL_NUMBER (13 digits) + < pads.
+  //
+  // Examples observed in the wild:
+  //   "IDROUMB113912841710211434518<<<<" — 5 + 9 + 1 + 13 = 28 + pad
+  //   "IDROUMB1139128<4<1710211434518<<" — sometimes ANAF adds < between
+  //     the segments, sometimes runs them together.
+  if (lines[0]) {
+    const l1 = lines[0].replace(/\s/g, '');
+    if (l1.startsWith('IDROU')) {
+      const body = l1.slice(5); // strip "IDROU"
+      // Try strict TD1: 9-char doc, 1-char check, 13-digit personal.
+      // Allow `<` padding INSIDE the 9-char doc field.
+      let m = body.match(/^([A-Z0-9<]{9})(\d)(\d{13})/);
+      if (!m) {
+        // Some MRZs add explicit `<` separators between the segments.
+        // Try: 9-char doc + `<` + 1-digit check + `<` + 13-digit personal.
+        m = body.match(/^([A-Z0-9<]{1,9})<+(\d)<+(\d{13})/);
+      }
+      if (m) {
+        out.documentNumber = m[1].replace(/</g, ''); // strip pad
+        out.cnp = m[3];
+      } else {
+        // Last-resort fallback: pull doc as first [A-Z]{2}[0-9]+ token
+        // and CNP as the first 13-digit run.
+        const docFallback = body.match(/^([A-Z]{1,2}\d{6,8})/);
+        if (docFallback) out.documentNumber = docFallback[1];
+        const cnpFallback = body.match(/\d{13}/);
+        if (cnpFallback) out.cnp = cnpFallback[0];
+      }
+    }
+  }
+
+  // Line 2: birth (6) + check (1) + sex (1) + expiry (6) + check (1) + country (3)
+  if (lines[1]) {
+    const l2 = lines[1].replace(/\s/g, '');
+    const m = l2.match(/^(\d{6})(\d)([MF])(\d{6})(\d)([A-Z]{3})/);
+    if (m) {
+      out.birthDate = m[1];
+      out.sex = m[3] as 'M' | 'F';
+      out.expiryDate = m[4];
+      out.nationality = m[6];
+    }
+  }
+
+  // Line 3: surname<<given_names
+  if (lines[2]) {
+    const l3 = lines[2].replace(/\s/g, '').replace(/<+$/, '');
+    const parts = l3.split('<<');
+    if (parts[0]) out.surname = parts[0].replace(/</g, ' ').trim();
+    if (parts[1]) out.givenNames = parts[1].replace(/</g, ' ').trim();
+  }
+
+  return out;
+}
+
 export function crossValidateExtractedData(scans: {
   ci_front?: ExtractedPersonalData;
   ci_nou_back?: ExtractedCINouBack;
@@ -634,29 +733,43 @@ export function crossValidateExtractedData(scans: {
       .replace(/ț/g, 't')
       .replace(/\s+/g, ' ');
 
-  // CI front document number vs MRZ on eCI back
-  if (scans.ci_front?.number && scans.ci_nou_back?.mrzDocumentNumber) {
-    const front = normalize(scans.ci_front.number);
-    const back = normalize(scans.ci_nou_back.mrzDocumentNumber);
+  // Prefer values parsed FROM the raw MRZ over Gemini's attempted
+  // structured extraction. mrzDocumentNumber / mrzCnp from Gemini have
+  // been observed concatenated or off-by-segment; the deterministic TS
+  // parser on mrzRaw is the source of truth when MRZ lines exist.
+  const mrzParsed = parseRomanianEciMrz(scans.ci_nou_back?.mrzRaw);
+  const backDocNumber = mrzParsed.documentNumber ?? scans.ci_nou_back?.mrzDocumentNumber;
+  const backCnp = mrzParsed.cnp ?? scans.ci_nou_back?.mrzCnp;
+
+  // CI front document number vs MRZ on eCI back. Compare the FULL document
+  // identifier (series + number, e.g. "MB1139128"), not just the digits.
+  // Front returns `series: 'MB'` and `number: '1139128'` separately; MRZ
+  // has them concatenated. Equalize before comparing.
+  const frontFullDocNumber = scans.ci_front?.series && scans.ci_front?.number
+    ? `${scans.ci_front.series}${scans.ci_front.number}`
+    : scans.ci_front?.number;
+  if (frontFullDocNumber && backDocNumber) {
+    const front = normalize(frontFullDocNumber);
+    const back = normalize(backDocNumber);
     if (front !== back) {
       warnings.push({
         field: 'documentNumber',
-        values: { ci_front: scans.ci_front.number, ci_nou_back: scans.ci_nou_back.mrzDocumentNumber },
-        message: `Numărul documentului de pe față (${scans.ci_front.number}) diferă de cel din MRZ-ul de pe spate (${scans.ci_nou_back.mrzDocumentNumber}).`,
+        values: { ci_front: frontFullDocNumber, ci_nou_back: backDocNumber },
+        message: `Numărul documentului de pe față (${frontFullDocNumber}) diferă de cel din MRZ-ul de pe spate (${backDocNumber}).`,
         severity: 'warning',
       });
     }
   }
 
   // CI front CNP vs MRZ CNP on eCI back
-  if (scans.ci_front?.cnp && scans.ci_nou_back?.mrzCnp) {
+  if (scans.ci_front?.cnp && backCnp) {
     const front = normalize(scans.ci_front.cnp);
-    const back = normalize(scans.ci_nou_back.mrzCnp);
+    const back = normalize(backCnp);
     if (front !== back) {
       warnings.push({
         field: 'cnp',
-        values: { ci_front: scans.ci_front.cnp, ci_nou_back: scans.ci_nou_back.mrzCnp },
-        message: `CNP-ul de pe față (${scans.ci_front.cnp}) diferă de CNP-ul din MRZ-ul de pe spate (${scans.ci_nou_back.mrzCnp}).`,
+        values: { ci_front: scans.ci_front.cnp, ci_nou_back: backCnp },
+        message: `CNP-ul de pe față (${scans.ci_front.cnp}) diferă de CNP-ul din MRZ-ul de pe spate (${backCnp}).`,
         severity: 'warning',
       });
     }
@@ -676,15 +789,16 @@ export function crossValidateExtractedData(scans: {
     }
   }
 
-  // CI front document number vs PDF number
-  if (scans.ci_front?.number && scans.ro_cei_reader_pdf?.number) {
-    const front = normalize(scans.ci_front.number);
+  // CI front document number vs PDF number. Use full doc number
+  // (series + number) since PDF reports it as one string like "MB1139128".
+  if (frontFullDocNumber && scans.ro_cei_reader_pdf?.number) {
+    const front = normalize(frontFullDocNumber);
     const pdf = normalize(scans.ro_cei_reader_pdf.number);
     if (front !== pdf) {
       warnings.push({
         field: 'documentNumber',
-        values: { ci_front: scans.ci_front.number, ro_cei_reader_pdf: scans.ro_cei_reader_pdf.number },
-        message: `Numărul documentului de pe față (${scans.ci_front.number}) diferă de cel din PDF-ul RO CEI Reader (${scans.ro_cei_reader_pdf.number}).`,
+        values: { ci_front: frontFullDocNumber, ro_cei_reader_pdf: scans.ro_cei_reader_pdf.number },
+        message: `Numărul documentului de pe față (${frontFullDocNumber}) diferă de cel din PDF-ul RO CEI Reader (${scans.ro_cei_reader_pdf.number}).`,
         severity: 'warning',
       });
     }

@@ -193,16 +193,31 @@ const STATUS_CONFIG: Record<string, { label: string; variant: 'default' | 'secon
 // ---------- Helpers ----------
 
 function extractCustomerData(cd: AnyObj | null) {
-  if (!cd) return { contact: null, personal: null, company: null, billing: null, clientType: 'pf' as string };
+  if (!cd) return { contact: null, personal: null, company: null, billing: null, clientType: 'pf' as string, billsToCompany: false };
   const contact = cd.contact || null;
   const personal = cd.personalData || cd.personal || null;
   const company = cd.companyData || cd.company || null;
   const billing = cd.billing || null;
-  let clientType = cd.clientType || 'pf';
-  if (clientType === 'pf' && (billing?.type === 'persoana_juridica' || company?.companyName)) {
-    clientType = 'pj';
-  }
-  return { contact, personal, company, billing, clientType };
+
+  // clientType = WHO the service is for (PF / PJ). NOT inferred from billing —
+  // a Cazier PF customer can ask the invoice to go to their employer (PJ
+  // billing). Earlier logic upgraded PF→PJ based on billing.type which
+  // wrongly mis-labeled PF orders as PJ across the admin UI.
+  //
+  // Only auto-promote to PJ when the customer_data has companyKyc (the
+  // service literally requires PJ data — e.g., Certificat constatator PJ),
+  // OR clientType is explicitly 'pj' in customer_data.
+  const explicitPJ = cd.clientType === 'pj';
+  const hasCompanyKyc = !!cd.companyData?.uploadedDocuments?.length || !!cd.companyKyc;
+  const clientType: string = explicitPJ || hasCompanyKyc ? 'pj' : 'pf';
+
+  // Separate flag for the "PF customer wants invoice issued to a company"
+  // case — surfaced as a small chip on the admin header without flipping
+  // the whole UI to PJ mode.
+  const billsToCompany = clientType === 'pf'
+    && (billing?.type === 'persoana_juridica' || !!billing?.companyName || !!billing?.cui);
+
+  return { contact, personal, company, billing, clientType, billsToCompany };
 }
 
 function getCustomerDisplayName(contact: AnyObj | null, personal: AnyObj | null, company: AnyObj | null, billing: AnyObj | null, isPJ: boolean): string {
@@ -601,7 +616,7 @@ export default function AdminOrderDetailPage() {
   // ---------- Derived Data ----------
 
   const displayOrderNumber = order.friendly_order_id || order.order_number;
-  const { contact, personal, company, billing, clientType } = extractCustomerData(order.customer_data);
+  const { contact, personal, company, billing, clientType, billsToCompany } = extractCustomerData(order.customer_data);
   const isPJ = clientType === 'pj';
   const status = order.status || 'draft';
   const statusConfig = STATUS_CONFIG[status] || { label: status, variant: 'outline' as const };
@@ -658,6 +673,15 @@ export default function AdminOrderDetailPage() {
                 <Badge variant="outline" className="text-sm px-3 py-1">
                   <User className="h-3.5 w-3.5 mr-1" />
                   Persoana Fizica
+                </Badge>
+              )}
+              {/* PF client → invoice billed to a company. Separate chip so the
+                  admin sees BOTH facts without us flipping the entire UI to PJ
+                  mode (which used to happen and caused mis-classified cards). */}
+              {billsToCompany && (
+                <Badge variant="outline" className="text-sm px-3 py-1 border-amber-300 bg-amber-50 text-amber-900">
+                  <Building2 className="h-3.5 w-3.5 mr-1" />
+                  Factură → {billing?.companyName || 'PJ'}
                 </Badge>
               )}
             </div>
