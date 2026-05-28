@@ -124,14 +124,16 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
   }
 
   // ── Diff math ─────────────────────────────────────────────────────────────
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // Cast once via `unknown` — Supabase's generated types don't carry the
+  // refunded_amount / additional_paid_amount columns added by migration 042.
+  const orderRow = order as unknown as Record<string, unknown>;
   const orderForDiff: OrderForDiff = {
-    total_price: Number((order as any).total_price ?? 0),
-    base_price: Number((order as any).base_price ?? 0),
-    delivery_price: Number((order as any).delivery_price ?? 0),
-    refunded_amount: Number((order as any).refunded_amount ?? 0),
-    additional_paid_amount: Number((order as any).additional_paid_amount ?? 0),
-    selected_options: (order as any).selected_options ?? [],
+    total_price: Number(orderRow.total_price ?? 0),
+    base_price: Number(orderRow.base_price ?? 0),
+    delivery_price: Number(orderRow.delivery_price ?? 0),
+    refunded_amount: Number(orderRow.refunded_amount ?? 0),
+    additional_paid_amount: Number(orderRow.additional_paid_amount ?? 0),
+    selected_options: (orderRow.selected_options as OrderForDiff['selected_options']) ?? [],
   };
   const diff = computeModifyDiff(orderForDiff, {
     selectedOptions: body.selectedOptions,

@@ -744,10 +744,10 @@ export default function AdminOrderDetailPage() {
         <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
           <div className="flex items-center gap-2 font-semibold">
             <RefreshCw className="h-4 w-4" />
-            SLA pauzat — comanda este în „standby"
+            SLA pauzat — comanda este în „standby”
           </div>
           <p className="mt-1 text-xs">
-            Termenul de livrare nu avansează. Folosește butonul „Forțează status" pentru a relua
+            Termenul de livrare nu avansează. Folosește butonul „Forțează status” pentru a relua
             comanda când blocajul cu clientul este rezolvat.
           </p>
         </div>

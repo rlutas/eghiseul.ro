@@ -49,7 +49,13 @@ export function Header() {
   // skeleton below renders identical markup on the server so the layout
   // doesn't shift; only the real Radix root mounts client-side.
   const [hydrated, setHydrated] = useState(false);
-  useEffect(() => setHydrated(true), []);
+  // This is the canonical hydration-flip pattern — we deliberately want
+  // a setState immediately after mount to swap from the SSR skeleton to
+  // the real Radix-portal-mounting tree. React Compiler's
+  // `set-state-in-effect` rule flags this because cascading renders can
+  // hurt perf, but here a single set on mount is correct and unavoidable.
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => { setHydrated(true); }, []);
   const pathname = usePathname();
   const router = useRouter();
 

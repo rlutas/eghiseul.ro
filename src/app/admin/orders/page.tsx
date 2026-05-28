@@ -216,7 +216,7 @@ export default function AdminOrdersPage() {
           <h1 className="text-2xl font-bold text-slate-900">Comenzi</h1>
           <p className="mt-0.5 text-sm text-slate-500">
             {totalCount === 0 ? 'Niciun rezultat' : `${totalCount} ${totalCount === 1 ? 'rezultat' : 'rezultate'}`}
-            {hasActiveFilters && <span className="ml-1">pentru „{activeTabLabel}"{urlSearch ? ` · „${urlSearch}"` : ''}</span>}
+            {hasActiveFilters && <span className="ml-1">pentru „{activeTabLabel}”{urlSearch ? ` · „${urlSearch}”` : ''}</span>}
           </p>
         </div>
         <Button variant="outline" size="sm" onClick={fetchOrders} disabled={loading}>

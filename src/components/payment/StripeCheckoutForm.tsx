@@ -119,7 +119,7 @@ export function StripeCheckoutForm({
           signature_metadata.consent. This notice ensures the customer sees
           the legal terms again before paying. */}
       <p className="text-[11px] leading-relaxed text-center text-neutral-500">
-        Prin click pe „Plătește" confirmi că ai citit{' '}
+        Prin click pe „Plătește” confirmi că ai citit{' '}
         <a href="/termeni" target="_blank" rel="noopener" className="underline hover:text-primary-600">
           Termenii și Condițiile
         </a>

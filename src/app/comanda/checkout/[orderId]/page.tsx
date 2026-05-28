@@ -388,7 +388,7 @@ export default function CheckoutPage() {
                     </Button>
 
                     <p className="text-xs text-neutral-500 text-center leading-snug">
-                      Apăsând „Plătește" accepți{' '}
+                      Apăsând „Plătește” accepți{' '}
                       <a href="/termeni" className="underline hover:text-neutral-700">
                         termenii și condițiile
                       </a>
