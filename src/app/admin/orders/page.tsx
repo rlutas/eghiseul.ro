@@ -67,8 +67,21 @@ interface OrderRow {
       lastName?: string;
       name?: string;
     };
-    personalData?: { firstName?: string; lastName?: string };
-    personal?: { firstName?: string; lastName?: string };
+    personalData?: {
+      firstName?: string;
+      lastName?: string;
+      // KYC-related fields used for the 📎 column
+      idDocumentType?: 'ci_vechi' | 'ci_nou' | 'passport' | null;
+      uploadedDocuments?: Array<{ type?: string }>;
+      adminVerifiedAt?: string;
+    };
+    personal?: {
+      firstName?: string;
+      lastName?: string;
+      idDocumentType?: 'ci_vechi' | 'ci_nou' | 'passport' | null;
+      uploadedDocuments?: Array<{ type?: string }>;
+      adminVerifiedAt?: string;
+    };
     companyData?: { companyName?: string };
     company?: { companyName?: string };
     billing?: { type?: string; companyName?: string };
@@ -321,6 +334,7 @@ export default function AdminOrdersPage() {
               <TableHead>Serviciu</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Plată</TableHead>
+              <TableHead className="text-center" title="Documente KYC încărcate / așteptate">📎</TableHead>
               <TableHead>Curier</TableHead>
               <TableHead>AWB</TableHead>
               <TableHead className="text-right">Total</TableHead>
@@ -331,7 +345,7 @@ export default function AdminOrdersPage() {
             {loading ? (
               Array.from({ length: 8 }).map((_, i) => (
                 <TableRow key={i}>
-                  {Array.from({ length: 9 }).map((_, j) => (
+                  {Array.from({ length: 10 }).map((_, j) => (
                     <TableCell key={j}>
                       <Skeleton className="h-5 w-full" />
                     </TableCell>
@@ -340,7 +354,7 @@ export default function AdminOrdersPage() {
               ))
             ) : orders.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={9} className="py-8 text-center text-muted-foreground">
+                <TableCell colSpan={10} className="py-8 text-center text-muted-foreground">
                   {hasActiveFilters ? 'Niciun rezultat pentru filtrele active.' : 'Nicio comandă în această categorie.'}
                 </TableCell>
               </TableRow>
@@ -377,6 +391,9 @@ export default function AdminOrdersPage() {
                   </TableCell>
                   <TableCell>
                     <PaymentBadge status={order.payment_status} method={order.payment_method} />
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <DocsBadge customerData={order.customer_data} />
                   </TableCell>
                   <TableCell>
                     <CourierBadge provider={order.courier_provider} />
@@ -535,4 +552,86 @@ function CourierBadge({ provider }: { provider: string | null }) {
     );
   }
   return <span className="text-xs">{provider}</span>;
+}
+
+/**
+ * DocsBadge — KYC document completion indicator for the orders list.
+ *
+ * Shows N/M (uploaded / expected) based on idDocumentType:
+ *   - ci_vechi  → 1 expected (front)
+ *   - ci_nou    → 3 expected (front + back + RO CEI Reader PDF)
+ *   - passport  → 1 expected (opened spread)
+ *   - null/etc. → expected = uploaded count, no fraction shown
+ *
+ * Plus visual state:
+ *   - Green check if adminVerifiedAt set
+ *   - Green text if N=M and not verified yet
+ *   - Amber if 0<N<M (partial)
+ *   - Muted dash if no docs and no idDocumentType (e.g., draft/PJ orders)
+ */
+function DocsBadge({
+  customerData,
+}: {
+  customerData: OrderRow['customer_data'];
+}) {
+  const personal = customerData?.personalData || customerData?.personal;
+  const idDocumentType = personal?.idDocumentType;
+  const uploadedDocs = personal?.uploadedDocuments || [];
+  const verified = !!personal?.adminVerifiedAt;
+
+  // Count only ID-document scan types (not selfie or company docs)
+  const ID_DOC_TYPES = new Set([
+    'ci_front', 'ci_back', 'ci_vechi', 'ci_nou_front', 'ci_nou_back',
+    'passport', 'passport_opened', 'ro_cei_reader_pdf',
+  ]);
+  const uploaded = uploadedDocs.filter((d) => d.type && ID_DOC_TYPES.has(d.type)).length;
+
+  const expected =
+    idDocumentType === 'ci_vechi' ? 1 :
+    idDocumentType === 'ci_nou' ? 3 :
+    idDocumentType === 'passport' ? 1 :
+    null;
+
+  if (uploaded === 0 && expected === null) {
+    return <span className="text-xs text-muted-foreground">-</span>;
+  }
+
+  // Verified state — green checkmark wins regardless of count
+  if (verified) {
+    return (
+      <span
+        className="inline-flex items-center gap-1 rounded bg-green-50 px-1.5 py-0.5 text-xs font-medium text-green-700"
+        title="Documente marcate verificate manual de admin"
+      >
+        ✓ {expected ? `${uploaded}/${expected}` : uploaded}
+      </span>
+    );
+  }
+
+  const label = expected ? `${uploaded}/${expected}` : `${uploaded}`;
+  if (expected !== null && uploaded === expected) {
+    return (
+      <span
+        className="inline-flex items-center rounded bg-emerald-50 px-1.5 py-0.5 text-xs font-medium text-emerald-700"
+        title="Documente complete, neverificate manual încă"
+      >
+        {label}
+      </span>
+    );
+  }
+  if (expected !== null && uploaded > 0 && uploaded < expected) {
+    return (
+      <span
+        className="inline-flex items-center rounded bg-amber-50 px-1.5 py-0.5 text-xs font-medium text-amber-700"
+        title="Documente parțiale — așteptăm completare"
+      >
+        {label}
+      </span>
+    );
+  }
+  return (
+    <span className="inline-flex items-center rounded bg-slate-100 px-1.5 py-0.5 text-xs font-medium text-slate-600">
+      {label}
+    </span>
+  );
 }
