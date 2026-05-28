@@ -479,7 +479,7 @@ export function ModularOrderWizard({ initialService, initialOptions }: ModularOr
                     )}
                     {isLastStep ? (
                       <>
-                        {isSubmitting ? 'Se procesează...' : `Plătește ${priceBreakdown.totalPrice} RON`}
+                        {isSubmitting ? 'Se procesează...' : `Plătește ${Number(priceBreakdown.totalPrice).toFixed(2)} RON`}
                         {!isSubmitting && <ArrowRight className="h-4 w-4" />}
                       </>
                     ) : (

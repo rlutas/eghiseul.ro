@@ -210,7 +210,7 @@ export function OrderWizard({ initialService, initialOptions }: OrderWizardProps
                       )}
                       {isLastStep ? (
                         <>
-                          Plătește {priceBreakdown.totalPrice} RON
+                          Plătește {Number(priceBreakdown.totalPrice).toFixed(2)} RON
                           <ArrowRight className="h-4 w-4" />
                         </>
                       ) : (

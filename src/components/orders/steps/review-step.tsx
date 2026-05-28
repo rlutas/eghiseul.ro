@@ -306,7 +306,7 @@ export function ReviewStep({ onValidChange }: ReviewStepProps) {
           <div className="pt-2 mt-2 border-t border-neutral-700 flex justify-between items-center">
             <span className="font-semibold">Total de plată</span>
             <span className="text-2xl font-bold text-primary-400">
-              {priceBreakdown.totalPrice} RON
+              {Number(priceBreakdown.totalPrice).toFixed(2)} RON
             </span>
           </div>
         </div>

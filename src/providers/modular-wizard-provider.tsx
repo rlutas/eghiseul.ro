@@ -1132,14 +1132,19 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
       discountAmount = Math.min(discountAmount, subtotal);
       discountAmount = Math.round(discountAmount * 100) / 100;
     }
-    const totalPrice = Math.max(0, subtotal - discountAmount);
+    // Round every monetary field to 2 decimals so floating-point drift
+    // (e.g., 18.61 delivery + 1495.5 services = 1514.21000000…0008) never
+    // shows up in UI labels, Stripe line items, or DB rows. The button at
+    // Step 7 previously rendered "Plătește 1514.2099999999998 RON".
+    const round2 = (n: number): number => Math.round(n * 100) / 100;
+    const totalPriceRaw = Math.max(0, subtotal - discountAmount);
 
     return {
-      basePrice,
-      optionsPrice,
-      deliveryPrice,
-      discountAmount,
-      totalPrice,
+      basePrice: round2(basePrice),
+      optionsPrice: round2(optionsPrice),
+      deliveryPrice: round2(deliveryPrice),
+      discountAmount: round2(discountAmount),
+      totalPrice: round2(totalPriceRaw),
       currency: service?.currency ?? 'RON',
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps

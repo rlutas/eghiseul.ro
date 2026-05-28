@@ -32,8 +32,13 @@ interface CompanyLookupResponse {
   error?: string;
 }
 
-const ANAF_POST_URL = 'https://webservicesp.anaf.ro/AsynchWebService/api/v8/ws/tva';
-const ANAF_GET_URL = 'https://webservicesp.anaf.ro/AsynchWebService/api/v8/ws/tva';
+// ANAF "Platitor TVA" v9 synchronous endpoint.
+// Switched from the async v8 (AsynchWebService) flow 2026-05-28 — the v8
+// host was returning HTTP 000 (connection timeout) consistently, breaking
+// PJ checkout. v9 is synchronous (single POST, response in ~150ms) and
+// returns richer data including parsed county/city/street fields.
+// Rate limit: 1 req/sec, max 100 CUIs per request (we send 1 each time).
+const ANAF_URL = 'https://webservicesp.anaf.ro/api/PlatitorTvaRest/v9/tva';
 
 /**
  * Validate CUI format
@@ -118,88 +123,55 @@ export async function fetchCompanyData(cui: string): Promise<CompanyLookupRespon
 }
 
 /**
- * GET request using Node.js https module (ANAF resets keep-alive connections from fetch())
- */
-function anafGet(url: string): Promise<{ status: number; body: string }> {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const https = require('https');
-  return new Promise((resolve, reject) => {
-    const parsed = new URL(url);
-    const req = https.get(
-      {
-        hostname: parsed.hostname,
-        path: parsed.pathname + parsed.search,
-        headers: { 'Accept': 'application/json', 'Connection': 'close' },
-        agent: false,
-      },
-      (res: import('http').IncomingMessage) => {
-        let body = '';
-        res.on('data', (d: Buffer) => (body += d));
-        res.on('end', () => resolve({ status: res.statusCode || 0, body }));
-      }
-    );
-    req.on('error', reject);
-    req.setTimeout(10000, () => { req.destroy(); reject(new Error('ANAF GET timeout')); });
-  });
-}
-
-/**
- * Fetch company data from ANAF public API (free, no API key required)
- * Uses async two-step flow: POST to submit → wait → GET to retrieve results
+ * Fetch company data from ANAF v9 synchronous endpoint.
+ *
+ * Single POST → response in ~150ms. Returns full company record including
+ * date_generale (name, registration number, status, address one-liner) +
+ * adresa_sediu_social + adresa_domiciliu_fiscal (parsed into separate
+ * county/city/street/number fields with `s`/`d` prefixed keys).
+ *
+ * 5s timeout via AbortController — well above the ~200ms typical response
+ * but tight enough that a regional outage doesn't hang the wizard.
  */
 async function fetchFromANAF(cui: string): Promise<CompanyLookupResponse> {
   const today = new Date().toISOString().split('T')[0];
 
-  // Step 1: Submit query (fetch works fine for POST)
-  const postResponse = await fetch(ANAF_POST_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify([{ cui: parseInt(cui, 10), data: today }]),
-  });
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 5000);
 
-  if (!postResponse.ok) {
-    throw new Error(`ANAF POST returned ${postResponse.status}`);
-  }
+  let raw: {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    found?: Array<any>;
+    notFound?: number[];
+  };
+  try {
+    const response = await fetch(ANAF_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify([{ cui: parseInt(cui, 10), data: today }]),
+      signal: controller.signal,
+    });
 
-  const postResult = await postResponse.json();
-  if (!postResult.correlationId) {
-    throw new Error('ANAF API did not return correlationId');
-  }
-
-  // Step 2: Wait then retrieve results (ANAF requires minimum 2s wait)
-  // Uses https module because ANAF resets keep-alive connections from fetch()
-  let result;
-  for (let attempt = 0; attempt < 3; attempt++) {
-    await new Promise((resolve) => setTimeout(resolve, attempt === 0 ? 2500 : 1500));
-
-    try {
-      const getUrl = `${ANAF_GET_URL}?id=${postResult.correlationId}`;
-      const getResponse = await anafGet(getUrl);
-
-      if (getResponse.status !== 200) {
-        throw new Error(`ANAF GET returned ${getResponse.status}`);
-      }
-
-      result = JSON.parse(getResponse.body);
-      break;
-    } catch (err) {
-      if (attempt === 2) throw err;
-      console.warn(`[ANAF] GET attempt ${attempt + 1} failed, retrying...`);
+    // ANAF returns 404 for unknown CUIs — surface as "not found" rather
+    // than re-throwing a network error, so the UI shows a clean message.
+    if (response.status === 404) {
+      return { found: false, error: 'CUI inexistent în baza de date ANAF' };
     }
+    if (!response.ok) {
+      throw new Error(`ANAF returned ${response.status}`);
+    }
+    raw = await response.json();
+  } finally {
+    clearTimeout(timeout);
   }
 
-  if (!result) {
-    throw new Error('ANAF API: failed to retrieve results after retries');
-  }
-
-  // ANAF returns found items in "found" array and missing in "notfound"
-  if (!result.found || result.found.length === 0) {
+  if (!raw.found || raw.found.length === 0) {
     return { found: false, error: 'CUI inexistent în baza de date ANAF' };
   }
 
-  const company = result.found[0];
+  const company = raw.found[0];
   const general = company.date_generale || {};
-  const name = general.denumire || '';
+  const name = (general.denumire || '').trim();
   const stare = general.stare_inregistrare || '';
   const isActive = stare.toUpperCase().includes('INREGISTRAT') &&
     !stare.toUpperCase().includes('RADIAT') &&
