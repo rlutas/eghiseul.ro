@@ -3,7 +3,10 @@ import {
   extractFromDocument,
   extractFromCIFront,
   extractFromCIBack,
+  extractFromCINouBack,
   extractFromPassport,
+  extractFromPassportOpened,
+  extractFromROCEIReaderPDF,
   extractFromCIBothSides,
   DocumentType,
 } from '@/lib/services/document-ocr';
@@ -208,26 +211,43 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      if (!['ci_front', 'ci_back', 'passport'].includes(documentType)) {
+      // ScanType (post-2026-05-28) extends the original DocumentType set.
+      // We keep legacy types working for in-flight drafts.
+      const validTypes = [
+        'ci_front', 'ci_back', 'passport',           // legacy
+        'ci_nou_back', 'passport_opened', 'ro_cei_reader_pdf',  // new
+      ];
+      if (!validTypes.includes(documentType)) {
         return NextResponse.json(
           {
             error: 'Invalid document type',
-            message: 'documentType must be ci_front, ci_back, or passport',
+            message: `documentType must be one of: ${validTypes.join(', ')}`,
           },
           { status: 400 }
         );
       }
 
       let result;
-      switch (documentType as DocumentType) {
+      switch (documentType) {
         case 'ci_front':
           result = await extractFromCIFront(imageBase64, mimeType);
           break;
         case 'ci_back':
           result = await extractFromCIBack(imageBase64, mimeType);
           break;
+        case 'ci_nou_back':
+          result = await extractFromCINouBack(imageBase64, mimeType);
+          break;
         case 'passport':
           result = await extractFromPassport(imageBase64, mimeType);
+          break;
+        case 'passport_opened':
+          result = await extractFromPassportOpened(imageBase64, mimeType);
+          break;
+        case 'ro_cei_reader_pdf':
+          // PDF path — imageBase64 carries the PDF content. mimeType ignored;
+          // Gemini handles application/pdf natively inside the extractor.
+          result = await extractFromROCEIReaderPDF(imageBase64);
           break;
         default:
           return NextResponse.json(

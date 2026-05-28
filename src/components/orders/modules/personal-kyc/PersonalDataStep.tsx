@@ -41,6 +41,7 @@ import {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { PersonalKYCConfig, DocumentType, KYCValidationResults } from '@/types/verification-modules';
 import { getCountriesForForeignType } from '@/config/countries';
+import { DocumentTypePicker } from './DocumentTypePicker';
 import { validateCNP, summarizeCNP } from '@/lib/validations/cnp';
 import { cn } from '@/lib/utils';
 import { COUNTY_NAMES, getLocalitiesForCounty, getCountyName, findCounty } from '@/lib/data/romania-counties';
@@ -154,10 +155,22 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
 
   const ciFrontInputRef = useRef<HTMLInputElement>(null);
   const ciBackInputRef = useRef<HTMLInputElement>(null);
+  // Refs for new (post-2026-05-28) scan zones — only rendered conditionally
+  // based on idDocumentType. Re-uses the same `ScanState` shape so existing
+  // progress/error UI works for all of them.
+  const ciNouBackInputRef = useRef<HTMLInputElement>(null);
+  const passportOpenedInputRef = useRef<HTMLInputElement>(null);
+  const roCeiPdfInputRef = useRef<HTMLInputElement>(null);
 
   const [ciFrontScan, setCiFrontScan] = useState<ScanState>(initialScanState);
   const [ciBackScan, setCiBackScan] = useState<ScanState>(initialScanState);
+  const [ciNouBackScan, setCiNouBackScan] = useState<ScanState>(initialScanState);
+  const [passportOpenedScan, setPassportOpenedScan] = useState<ScanState>(initialScanState);
+  const [roCeiPdfScan, setRoCeiPdfScan] = useState<ScanState>(initialScanState);
   const [showScanSection, setShowScanSection] = useState(true);
+  // Counter for OCR failures — after 2 consecutive fails we surface a
+  // "completez manual" fallback link more prominently.
+  const [scanFailureCount, setScanFailureCount] = useState(0);
   const [localities, setLocalities] = useState<string[]>([]);
   const [cnpInfo, setCnpInfo] = useState<string | null>(null);
 
@@ -288,12 +301,23 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
     updatePersonalKyc({ address: addressUpdates });
   }, [personalKyc?.address, updatePersonalKyc, cleanLocalityName]);
 
-  // Handle file select and OCR
+  // Handle file select and OCR. Accepts all 5 ScanType variants — both legacy
+  // (`ci_front`, `ci_back`) and post-2026-05-28 picker-driven types
+  // (`ci_nou_back`, `passport_opened`, `ro_cei_reader_pdf`). The setter is
+  // resolved by switch — `setState` is the React state setter for the
+  // appropriate scan-state slot.
   const handleFileSelect = useCallback(async (
-    type: 'ci_front' | 'ci_back',
+    type: 'ci_front' | 'ci_back' | 'ci_nou_back' | 'passport_opened' | 'ro_cei_reader_pdf',
     file: File
   ) => {
-    const setState = type === 'ci_front' ? setCiFrontScan : setCiBackScan;
+    const setStateMap = {
+      ci_front: setCiFrontScan,
+      ci_back: setCiBackScan,
+      ci_nou_back: setCiNouBackScan,
+      passport_opened: setPassportOpenedScan,
+      ro_cei_reader_pdf: setRoCeiPdfScan,
+    } as const;
+    const setState = setStateMap[type];
     setState(prev => ({ ...prev, scanning: true, progress: 0, error: null }));
 
     try {
@@ -339,7 +363,9 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
       // Gemini extraction takes ~2-10s. Without fake-progress the bar would
       // freeze at 40% the entire time and feel broken — so we creep it
       // forward asymptotically toward 68% while the request is in flight.
-      const docType = type === 'ci_front' ? 'ci_front' : 'ci_back';
+      // `type` is passed through directly — the API knows all 5 ScanType
+      // variants and routes to the right extractor.
+      const docType = type;
 
       const fakeProgressInterval = setInterval(() => {
         setState(prev => {
@@ -466,6 +492,8 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
         }
 
         setState(prev => ({ ...prev, scanning: false, progress: 100, success: true }));
+        // Reset failure counter on success
+        setScanFailureCount(0);
       } else {
         console.warn('OCR extraction failed or low confidence:', {
           success: ocr?.success,
@@ -484,13 +512,21 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
         scanning: false,
         error: error instanceof Error ? error.message : 'Eroare la procesare document',
       }));
+      // Bump failure counter — after 2 fails the UI surfaces a manual fallback
+      setScanFailureCount(prev => prev + 1);
     }
   }, [personalKyc, updatePersonalKyc, fillAddressFields]);
 
-  // Reset scan
-  const resetScan = useCallback((type: 'ci_front' | 'ci_back') => {
-    const setState = type === 'ci_front' ? setCiFrontScan : setCiBackScan;
-    setState(initialScanState);
+  // Reset scan — clears state slot + removes the uploaded doc/OCR result.
+  const resetScan = useCallback((type: 'ci_front' | 'ci_back' | 'ci_nou_back' | 'passport_opened' | 'ro_cei_reader_pdf') => {
+    const setStateMap = {
+      ci_front: setCiFrontScan,
+      ci_back: setCiBackScan,
+      ci_nou_back: setCiNouBackScan,
+      passport_opened: setPassportOpenedScan,
+      ro_cei_reader_pdf: setRoCeiPdfScan,
+    } as const;
+    setStateMap[type](initialScanState);
 
     // Remove from uploaded documents
     if (personalKyc?.uploadedDocuments) {
@@ -713,13 +749,23 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
 
   const cnpValidation = validateCNP(personalKyc.cnp);
 
-  // Render scan card (matches old wizard design)
+  // Render scan card — accepts any of the 5 ScanType variants. The card
+  // chrome (border colors, success state, error overlay) is the same
+  // regardless of which document is being scanned; only the icon, title,
+  // and description differ.
   const renderScanCard = (
-    type: 'ci_front' | 'ci_back',
+    type: 'ci_front' | 'ci_back' | 'ci_nou_back' | 'passport_opened' | 'ro_cei_reader_pdf',
     title: string,
     description: string
   ) => {
-    const scanState = type === 'ci_front' ? ciFrontScan : ciBackScan;
+    const scanStateMap = {
+      ci_front: ciFrontScan,
+      ci_back: ciBackScan,
+      ci_nou_back: ciNouBackScan,
+      passport_opened: passportOpenedScan,
+      ro_cei_reader_pdf: roCeiPdfScan,
+    } as const;
+    const scanState = scanStateMap[type];
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const existingDoc = personalKyc?.uploadedDocuments?.find((d: any) =>
       d.type === type || d.type === (type === 'ci_front' ? 'ci_nou_front' : 'ci_nou_back')
@@ -816,9 +862,15 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
         ) : (
           <div>
             <input
-              ref={type === 'ci_front' ? ciFrontInputRef : ciBackInputRef}
+              ref={
+                type === 'ci_front' ? ciFrontInputRef :
+                type === 'ci_back' ? ciBackInputRef :
+                type === 'ci_nou_back' ? ciNouBackInputRef :
+                type === 'passport_opened' ? passportOpenedInputRef :
+                roCeiPdfInputRef
+              }
               type="file"
-              accept="image/jpeg,image/jpg,image/png,application/pdf"
+              accept={type === 'ro_cei_reader_pdf' ? 'application/pdf' : 'image/jpeg,image/jpg,image/png,application/pdf'}
               onChange={(e) => {
                 const file = e.target.files?.[0];
                 if (file) handleFileSelect(type, file);
@@ -828,15 +880,33 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
               disabled={scanState.scanning}
             />
             <div
-              onClick={() => !scanState.scanning && (type === 'ci_front' ? ciFrontInputRef : ciBackInputRef).current?.click()}
+              onClick={() => {
+                if (scanState.scanning) return;
+                const ref =
+                  type === 'ci_front' ? ciFrontInputRef :
+                  type === 'ci_back' ? ciBackInputRef :
+                  type === 'ci_nou_back' ? ciNouBackInputRef :
+                  type === 'passport_opened' ? passportOpenedInputRef :
+                  roCeiPdfInputRef;
+                ref.current?.click();
+              }}
               className="border-2 border-dashed border-primary-300 rounded-lg p-3 text-center hover:border-primary-500 hover:bg-primary-50/50 transition-all cursor-pointer group"
             >
               {/* Show illustration */}
               <div className="mb-3 opacity-80 group-hover:opacity-100 transition-opacity">
                 {type === 'ci_front' ? (
                   <IdCardFrontIllustration className="w-full h-auto max-h-24" />
-                ) : (
+                ) : type === 'ci_back' || type === 'ci_nou_back' ? (
                   <IdCardBackIllustration className="w-full h-auto max-h-24" />
+                ) : (
+                  // Passport opened + RO CEI Reader PDF: use a simple icon placeholder
+                  <div className="flex items-center justify-center h-24 text-neutral-400">
+                    {type === 'ro_cei_reader_pdf' ? (
+                      <FileCheck className="w-10 h-10" />
+                    ) : (
+                      <Scan className="w-10 h-10" />
+                    )}
+                  </div>
                 )}
               </div>
               {/* Upload button area */}
@@ -1003,55 +1073,166 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
         </div>
       )}
 
-      {/* ID Scan Section */}
-      {mode === 'scan' && showScanSection && (
+      {/* ID Scan Section — picker + conditional scan zones per document type */}
+      {mode === 'scan' && showScanSection && !isForeignCitizen && (
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-secondary-900">
-              <Scan className="h-5 w-5 text-primary-500" />
-              <h3 className="font-semibold">Scanează Actul de Identitate</h3>
-            </div>
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={() => {
-                setShowScanSection(false);
-                setMode('manual');
-              }}
-              className="text-neutral-500 text-xs"
-            >
-              Completez manual
-            </Button>
-          </div>
+          {/* Step 1: pick document type (if not picked yet) */}
+          {!personalKyc.idDocumentType && (
+            <DocumentTypePicker
+              onPick={(type) => updatePersonalKyc({ idDocumentType: type })}
+            />
+          )}
 
-          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-3 mb-4">
-            <div className="flex gap-3">
-              <Info className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
-              <div className="text-sm text-blue-800">
-                <p className="font-medium mb-1">Completare automată rapidă</p>
-                <p className="text-blue-700 text-xs">
-                  Fotografiază cartea de identitate și datele se vor completa automat.
-                  Acceptăm CI românești sau pașapoarte.
-                </p>
+          {/* Step 2: scan zones per picked type */}
+          {personalKyc.idDocumentType && (
+            <>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-secondary-900">
+                  <Scan className="h-5 w-5 text-primary-500" />
+                  <h3 className="font-semibold">
+                    {personalKyc.idDocumentType === 'ci_vechi' && 'Scanează CI (vechi)'}
+                    {personalKyc.idDocumentType === 'ci_nou' && 'Scanează CI nou + dovadă domiciliu'}
+                    {personalKyc.idDocumentType === 'passport' && 'Scanează pașaportul'}
+                  </h3>
+                </div>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    // Allow re-picking the document type. Wipe scans so the
+                    // user doesn't accidentally submit mixed-type uploads.
+                    updatePersonalKyc({ idDocumentType: null });
+                    setCiFrontScan(initialScanState);
+                    setCiNouBackScan(initialScanState);
+                    setPassportOpenedScan(initialScanState);
+                    setRoCeiPdfScan(initialScanState);
+                  }}
+                  className="text-neutral-500 text-xs"
+                >
+                  Schimbă tipul actului
+                </Button>
               </div>
-            </div>
-          </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {renderScanCard(
-              'ci_front',
-              'Carte Identitate - Față',
-              'CNP, nume, adresă (CI vechi)'
-            )}
-            {renderScanCard(
-              'ci_back',
-              'Verso (opțional)',
-              'Doar pentru CI-uri noi cu adresa pe spate'
-            )}
-          </div>
+              {/* CI vechi — single zone (front only; back is blank/uninformative) */}
+              {personalKyc.idDocumentType === 'ci_vechi' && (
+                <div className="grid grid-cols-1 gap-4">
+                  {renderScanCard(
+                    'ci_front',
+                    'CI vechi — față',
+                    'Toate datele se citesc de pe față'
+                  )}
+                </div>
+              )}
 
-          {(ciFrontScan.success || ciBackScan.success || personalKyc.uploadedDocuments.length > 0) && (
+              {/* CI nou — 3 zones: front, back, RO CEI Reader PDF */}
+              {personalKyc.idDocumentType === 'ci_nou' && (
+                <>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {renderScanCard(
+                      'ci_front',
+                      'CI nou — față',
+                      'Foto, nume, CNP, valabilitate'
+                    )}
+                    {renderScanCard(
+                      'ci_nou_back',
+                      'CI nou — spate',
+                      'Data emiterii + autoritatea emitentă'
+                    )}
+                  </div>
+
+                  <div className="rounded-xl border border-blue-200 bg-blue-50/50 p-4 mt-3">
+                    <div className="flex gap-3 mb-3">
+                      <Info className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                      <div className="text-sm text-blue-800">
+                        <p className="font-medium mb-1">
+                          Dovadă domiciliu — PDF RO CEI Reader
+                        </p>
+                        <p className="text-blue-700 text-xs leading-snug">
+                          Adresa nu e printată pe spate la CI nou — e doar în
+                          cip. Folosește aplicația oficială MAI pentru a
+                          extrage adresa de pe cip:
+                        </p>
+                        <ol className="text-blue-700 text-xs leading-snug mt-2 list-decimal list-inside space-y-0.5">
+                          <li>Instalează &quot;RO CEI Reader&quot; (gratis, de la MAI)</li>
+                          <li>Apropie telefonul de cip-ul de pe spatele CI</li>
+                          <li>Aplicația generează PDF-ul → îl urci aici</li>
+                        </ol>
+                        <div className="flex gap-2 mt-3">
+                          <a
+                            href="https://play.google.com/store/search?q=RO+CEI+Reader+MAI"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[11px] px-2 py-1 bg-white border border-blue-300 rounded text-blue-700 hover:bg-blue-100"
+                          >
+                            📲 Android
+                          </a>
+                          <a
+                            href="https://apps.apple.com/search?term=RO%20CEI%20Reader"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[11px] px-2 py-1 bg-white border border-blue-300 rounded text-blue-700 hover:bg-blue-100"
+                          >
+                            📲 iOS
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                    {renderScanCard(
+                      'ro_cei_reader_pdf',
+                      'PDF RO CEI Reader',
+                      'Acceptăm doar PDF generat de aplicația oficială MAI'
+                    )}
+                  </div>
+                </>
+              )}
+
+              {/* Passport — opened spread */}
+              {personalKyc.idDocumentType === 'passport' && (
+                <div className="grid grid-cols-1 gap-4">
+                  {renderScanCard(
+                    'passport_opened',
+                    'Pașaport deschis',
+                    'Ambele pagini vizibile (foto + opusă), MRZ vizibil jos'
+                  )}
+                </div>
+              )}
+
+              {/* Fallback to manual — more prominent after 2 failures */}
+              {scanFailureCount >= 2 && (
+                <div className="rounded-lg border border-amber-200 bg-amber-50 p-3">
+                  <p className="text-xs text-amber-800 leading-snug">
+                    OCR-ul nu reușește. Vrei să completezi datele manual?{' '}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowScanSection(false);
+                        setMode('manual');
+                      }}
+                      className="underline font-medium hover:text-amber-900"
+                    >
+                      Da, completez manual
+                    </button>
+                  </p>
+                </div>
+              )}
+
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setShowScanSection(false);
+                  setMode('manual');
+                }}
+                className="text-neutral-500 text-xs"
+              >
+                Completez manual
+              </Button>
+            </>
+          )}
+
+          {(ciFrontScan.success || ciBackScan.success || ciNouBackScan.success || passportOpenedScan.success || roCeiPdfScan.success || personalKyc.uploadedDocuments.length > 0) && (
             <div className="text-center text-xs text-neutral-500 pt-2">
               <CheckCircle className="w-4 h-4 inline mr-1" />
               Documentele scanate vor fi folosite și la pasul de verificare KYC

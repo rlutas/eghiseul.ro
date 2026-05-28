@@ -66,6 +66,7 @@ function createInitialPersonalKYCState(): PersonalKYCState {
     birthDate: '',
     birthPlace: '',
     citizenship: 'romanian',
+    idDocumentType: null,
     documentType: null,
     documentSeries: '',
     documentNumber: '',

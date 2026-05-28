@@ -246,7 +246,18 @@ export interface PersonalKYCState {
   birthPlace: string;
   citizenship: CitizenshipType;
 
-  // Document info
+  // User's explicit choice of ID document type (post-2026-05-28 picker).
+  // Distinct from `documentType` below, which is OCR-detected. This drives
+  // which scan zones render and which OCR extractors are called.
+  //
+  // - 'ci_vechi':  carton/plastic 2009-2024, fără cip → scan: ci_front only
+  // - 'ci_nou':    eCI/CEI cu cip 2021+ → scan: ci_front + ci_nou_back + ro_cei_reader_pdf
+  // - 'passport':  pașaport simplu/electronic → scan: passport_opened
+  //
+  // null = user hasn't picked yet (show DocumentTypePicker)
+  idDocumentType: 'ci_vechi' | 'ci_nou' | 'passport' | null;
+
+  // Document info (OCR-detected, populated after scan)
   documentType: DocumentType | null;
   documentSeries: string;
   documentNumber: string;

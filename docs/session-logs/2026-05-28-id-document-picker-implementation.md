@@ -164,5 +164,116 @@ npx eslint <files>
 
 ### Step 6 — Commit + push
 
-(Continuă în Step 6 după commit...)
+Commit `90155cd` pe `main` cu mesaj cuprinzător. Suite teste: 951 passing.
+
+---
+
+## PR 2 — Frontend wizard
+
+### Step 1 — Extindere API OCR pentru noile tipuri
+
+**Fișier:** `src/app/api/ocr/extract/route.ts`
+
+Adăugat în lista de tipuri acceptate (mode='specific'):
+- `ci_nou_back` → `extractFromCINouBack`
+- `passport_opened` → `extractFromPassportOpened`
+- `ro_cei_reader_pdf` → `extractFromROCEIReaderPDF` (PDF nativ)
+
+Tipurile legacy `ci_front`, `ci_back`, `passport` rămân operaționale pentru
+drafts vechi (zero migration).
+
+### Step 2 — State shape extension
+
+**Fișier:** `src/types/verification-modules.ts`
+
+Adăugat în `PersonalKYCState`:
+```ts
+idDocumentType: 'ci_vechi' | 'ci_nou' | 'passport' | null;
+```
+
+Distinct de `documentType` (OCR-detected). Acesta e alegerea explicită a
+utilizatorului din picker — driver pentru ce scan zones se afișează.
+
+**Fișier:** `src/providers/modular-wizard-provider.tsx`
+
+`createInitialPersonalKYCState` setează `idDocumentType: null` (default
+= picker se afișează).
+
+### Step 3 — `<DocumentTypePicker>` component
+
+**Fișier nou:** `src/components/orders/modules/personal-kyc/DocumentTypePicker.tsx`
+
+3 carduri cu Lucide icons (IdCard, CreditCard, BookOpen), accesibile prin
+keyboard (toate sunt `<button type="button">`). Cardul CI nou are badge
+"Recent" pentru a ghida userii spre flow-ul cel mai probabil corect.
+
+### Step 4 — Refactor `PersonalDataStep.tsx`
+
+**Modificări structurale:**
+
+1. **Refs noi** pentru cele 3 noi zone de upload:
+   - `ciNouBackInputRef`, `passportOpenedInputRef`, `roCeiPdfInputRef`
+
+2. **State slots noi:**
+   - `ciNouBackScan`, `passportOpenedScan`, `roCeiPdfScan` (toate folosind
+     `ScanState` existent)
+   - `scanFailureCount` — pentru fallback la manual după 2 eșecuri
+
+3. **`handleFileSelect` extins** să accepte toate 5 ScanType variants.
+   Dispatch prin `setStateMap` lookup în loc de ternary cascade.
+
+4. **`resetScan` extins** la fel.
+
+5. **`renderScanCard` generalizat** să accepte oricare tip; ref-ul corect
+   prin lookup. Pentru `ro_cei_reader_pdf` schimbă `accept` pe input la
+   doar `application/pdf`. Pentru passport_opened + PDF folosește
+   icoane generice (nu illustration card).
+
+6. **Scan section refactor major** — înlocuită complet:
+   - Picker se afișează dacă `mode==='scan' && !idDocumentType && !isForeignCitizen`
+   - După pick, scan zones diferite per tip:
+     - `ci_vechi`: doar `ci_front`
+     - `ci_nou`: `ci_front` + `ci_nou_back` + info card cu instrucțiuni RO CEI Reader + `ro_cei_reader_pdf`
+     - `passport`: doar `passport_opened`
+   - Buton "Schimbă tipul actului" șterge scanările și revine la picker
+   - Buton "Completez manual" rămâne ca fallback
+   - După 2 eșecuri OCR, banner amber prominent "Vrei să completezi manual?"
+
+### Step 5 — Tests
+
+**Fișier nou:** `tests/unit/components/document-type-picker-types.test.ts` (4 tests):
+- IdDocumentType union exactă (`'ci_vechi' | 'ci_nou' | 'passport'`)
+- Acceptare valori valide
+- Export function valid
+- Component signature accept props
+
+**De ce NU full render tests:** proiectul nu are `@testing-library/react`
+instalat și Vitest e configurat pe `environment: node`, nu jsdom. Render
+tests ar fi necesitat setup separat. Pentru PR-ul ăsta, type-check +
+build + smoke test manual sunt suficiente pentru validare.
+
+### Step 6 — Verificare
+
+```
+npx tsc --noEmit      → curat
+npx vitest run        → 955 tests passing (+4 noi)
+npm run build         → ✓ Compiled successfully in 3.2s, 83 pagini SSG
+```
+
+### Modificate pe disc
+
+| Fișier | Schimbare |
+|--------|-----------|
+| `src/app/api/ocr/extract/route.ts` | +6 case-uri pentru ScanType noi |
+| `src/types/verification-modules.ts` | + câmp `idDocumentType` |
+| `src/providers/modular-wizard-provider.tsx` | init `idDocumentType: null` |
+| `src/components/orders/modules/personal-kyc/DocumentTypePicker.tsx` | NOU — 3-card picker |
+| `src/components/orders/modules/personal-kyc/PersonalDataStep.tsx` | +3 refs, +3 state slots, extins handler+resetScan+renderScanCard, scan section refactor major |
+| `tests/unit/components/document-type-picker-types.test.ts` | NOU — 4 type-contract tests |
+| `docs/session-logs/2026-05-28-id-document-picker-implementation.md` | append PR 2 |
+
+### Step 7 — Commit + push
+
+(Continuă imediat după...)
+
 
