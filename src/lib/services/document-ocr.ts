@@ -23,6 +23,56 @@ const GEMINI_MODEL = 'gemini-2.5-flash-lite';
 
 export type DocumentType = 'ci_front' | 'ci_back' | 'passport' | 'unknown';
 
+/**
+ * ScanType — what the user actually uploads in the new (post-2026-05-28)
+ * Step 2 flow. Differs from DocumentType because we split passport into
+ * `passport_opened` (full spread scan) and the new eCI back into
+ * `ci_nou_back` (no address expected).
+ *
+ * Legacy `ci_back` rămâne disponibil pentru drafts vechi; flow-ul nou
+ * nu îl mai folosește (CI vechi e doar față).
+ */
+export type ScanType =
+  | 'ci_front'
+  | 'ci_nou_back'
+  | 'passport_opened'
+  | 'ro_cei_reader_pdf';
+
+/**
+ * Data extras de pe spatele eCI (CEI cu cip). NU conține adresă pentru
+ * că eCI back nu are adresa printată — e doar în cip. OCR-ul returnează
+ * `success: true` chiar dacă adresa lipsește (spre deosebire de
+ * extractFromCIBack legacy care marca fail).
+ */
+export interface ExtractedCINouBack {
+  issueDate?: string;          // DD.MM.YYYY
+  issuedBy?: string;           // ex. "SPCEP S5 biroul nr.1"
+  mrzRaw?: string[];           // 3 linii MRZ (sau 2)
+  mrzDocumentNumber?: string;  // extras din MRZ linia 1
+  mrzCnp?: string;             // extras din MRZ linia 2
+}
+
+/**
+ * Data extrasă din PDF-ul RO CEI Reader (aplicația oficială MAI).
+ * Conține TOATE datele din CI plus adresa de domiciliu — pentru că PDF-ul
+ * citește direct din cip-ul electronic.
+ */
+export interface ExtractedROCEIReader extends ExtractedPersonalData {
+  /** Dacă PDF-ul conține footer-ul "RO CEI Reader a MAI" (anti-forgery basic). */
+  isAuthenticated?: boolean;
+}
+
+/**
+ * Cross-validation warning between scans (front vs back vs PDF).
+ * Always severity='warning' — admin decides if it's blocking.
+ */
+export interface CrossValidationWarning {
+  field: 'documentNumber' | 'cnp' | 'name' | 'birthDate';
+  values: Record<string, string | undefined>;
+  message: string;
+  severity: 'warning';
+}
+
 export interface ExtractedPersonalData {
   // Personal info
   cnp?: string;
@@ -273,6 +323,403 @@ Răspunde în acest format JSON:
     console.error('CI Back OCR error:', error);
     return createErrorResult('ci_back', 'Eroare la procesarea documentului');
   }
+}
+
+/**
+ * Extract data from the BACK of a new electronic CI (eCI / CEI with chip).
+ *
+ * Key difference from `extractFromCIBack`: eCI back does NOT have the
+ * address printed (address is only in the chip — retrieved via RO CEI
+ * Reader PDF). Prompt explicitly tells Gemini not to look for an address
+ * and not to mark fail if it's absent.
+ *
+ * What we DO extract from eCI back:
+ * - Data emiterii (issueDate)
+ * - Autoritatea emitentă (issuedBy, ex. "SPCEP S5 biroul nr.1")
+ * - MRZ (3 rânduri ICAO 9303-3)
+ * - Document number from MRZ (cross-check with front)
+ * - CNP from MRZ (cross-check with front)
+ */
+export async function extractFromCINouBack(
+  imageBase64: string,
+  mimeType: string
+): Promise<OCRResult> {
+  const model = genAI.getGenerativeModel({ model: GEMINI_MODEL });
+
+  const prompt = `Analizează această imagine a SPATELUI unei cărți electronice de identitate românești (CEI/eCI, cu cip).
+
+IMPORTANT: Răspunde DOAR în format JSON valid, fără markdown, fără explicații.
+
+ATENȚIE CRITICĂ: Pe spatele cărții electronice de identitate NU EXISTĂ adresa de domiciliu printată — adresa este stocată DOAR în cip. NU căuta adresa, NU raporta ca eroare lipsa adresei. Spatele eCI conține:
+  • Cip-ul electronic (pătrat auriu)
+  • Data emiterii ("Data emiterii / Date of issue")
+  • Autoritatea emitentă ("Autoritatea emitentă / Issuing authority", ex. "SPCEP S5 biroul nr.1")
+  • Foto micșorat + indicativul "ROU"
+  • Zona MRZ (Machine Readable Zone) — 3 rânduri de text ASCII
+
+MRZ-ul are formatul ICAO 9303-3 pentru CI:
+  Linia 1: IDROU<seria><număr_document>...
+  Linia 2: <data_naștere><sex><data_expirare>ROU<cnp_sau_personal_number>...
+  Linia 3: <NUME><<<PRENUME><<...
+
+Extrage MRZ-ul EXACT cum apare (caracterele "<" sunt padding ICAO standard).
+
+ORIENTARE: Dacă poza e făcută portrait dar cardul e landscape, analizează ca și cum ar fi rotit corect. Ignoră reflexii, degete, fundal.
+
+Răspunde în acest format JSON:
+{
+  "success": true,
+  "documentType": "ci_nou_back",
+  "confidence": 0-100,
+  "extractedData": {
+    "issueDate": "DD.MM.YYYY sau null",
+    "issuedBy": "string sau null (ex. 'SPCEP S5 biroul nr.1')",
+    "mrzRaw": ["linia 1", "linia 2", "linia 3"],
+    "mrzDocumentNumber": "numărul documentului extras din MRZ (ex. MB1139128) sau null",
+    "mrzCnp": "CNP-ul extras din MRZ (13 cifre) sau null"
+  },
+  "issues": ["doar probleme REALE de lizibilitate, NU lipsa adresei"],
+  "suggestions": ["sugestii pentru îmbunătățire poza, dacă e cazul"]
+}
+
+IMPORTANT FINAL: NU SCRIE ÎN "issues" "Address information not visible" sau echivalent. Spatele eCI nu trebuie să aibă adresă. Setează "success": true dacă ai extras măcar data emiterii SAU MRZ-ul.`;
+
+  try {
+    const result = await model.generateContent([
+      prompt,
+      {
+        inlineData: {
+          mimeType,
+          data: imageBase64.replace(/^data:image\/\w+;base64,/, ''),
+        },
+      },
+    ]);
+
+    const response = await result.response;
+    const text = response.text();
+    return parseGeminiOCRResponse(text, 'ci_back');  // reuse parser, document type stays ci_back for backward compat in OCRResult
+  } catch (error) {
+    console.error('CI Nou Back OCR error:', error);
+    return createErrorResult('ci_back', 'Eroare la procesarea documentului');
+  }
+}
+
+/**
+ * Extract data from a passport (opened spread — both photo page + opposite page visible).
+ *
+ * Replaces `extractFromPassport` for the new flow. Same data extracted,
+ * but prompt expects an opened spread image (landscape) instead of just
+ * the photo page. MRZ verification stricter.
+ *
+ * Address is NOT extracted (passports don't have addresses). Address for
+ * cazier judiciar passport users comes from Step 4 (delivery).
+ */
+export async function extractFromPassportOpened(
+  imageBase64: string,
+  mimeType: string
+): Promise<OCRResult> {
+  const model = genAI.getGenerativeModel({ model: GEMINI_MODEL });
+
+  const prompt = `Analizează această imagine a unui pașaport DESCHIS (ambele pagini vizibile: pagina cu foto + pagina opusă).
+
+IMPORTANT: Răspunde DOAR în format JSON valid, fără markdown, fără explicații.
+
+PAȘAPORTUL ROMÂN are pe pagina cu foto:
+  • Nume (Surname)
+  • Prenume (Given names)
+  • Cetățenia (Nationality) — "ROU" pentru pașaport românesc
+  • Sex (Sex) — M/F
+  • Data nașterii (Date of birth)
+  • Locul nașterii (Place of birth)
+  • Numărul pașaportului (Passport No.) — în colțul dreapta-sus
+  • Data emiterii (Date of issue)
+  • Data expirării (Date of expiry)
+  • Autoritatea emitentă (Authority)
+  • CNP (Personal Code) — uneori vizibil
+  • Foto color
+  • MRZ — 2 rânduri în partea de jos cu "P<ROU..."
+
+Pașapoarte STRĂINE au fields similare (Surname/Nom, Given names/Prénoms) în engleză + franceză + limba locală.
+
+IMPORTANT: NU căuta adresa de domiciliu. Pașapoartele NU au adresă printată niciodată.
+
+MRZ-ul (Machine Readable Zone) ICAO 9303-1:
+  Linia 1: P<<COD_TARA><NUME><<PRENUME><<<...
+  Linia 2: <NR_PAȘAPORT><CHECKSUM><COD_TARA><DATA_NAȘTERE><SEX><DATA_EXPIRARE><...
+
+Extrage MRZ-ul EXACT cum apare. Caracterele "<" sunt padding standard.
+
+Răspunde în acest format JSON:
+{
+  "success": true/false,
+  "documentType": "passport",
+  "confidence": 0-100,
+  "extractedData": {
+    "cnp": "string sau null (doar pentru pașaport românesc)",
+    "lastName": "string sau null",
+    "firstName": "string sau null",
+    "birthDate": "DD.MM.YYYY sau null",
+    "birthPlace": "string sau null",
+    "gender": "male" sau "female" sau null,
+    "nationality": "ROU sau cod ISO 3 litere",
+    "number": "numărul pașaportului sau null",
+    "issueDate": "DD.MM.YYYY sau null",
+    "expiryDate": "DD.MM.YYYY sau null",
+    "issuedBy": "string sau null",
+    "mrz": {
+      "line1": "primul rând MRZ sau null",
+      "line2": "al doilea rând MRZ sau null"
+    }
+  },
+  "issues": ["lista problemelor REALE — fără 'no address' care nu se aplică"],
+  "suggestions": ["sugestii pentru îmbunătățire poza"]
+}`;
+
+  try {
+    const result = await model.generateContent([
+      prompt,
+      {
+        inlineData: {
+          mimeType,
+          data: imageBase64.replace(/^data:image\/\w+;base64,/, ''),
+        },
+      },
+    ]);
+
+    const response = await result.response;
+    const text = response.text();
+    return parseGeminiOCRResponse(text, 'passport');
+  } catch (error) {
+    console.error('Passport Opened OCR error:', error);
+    return createErrorResult('passport', 'Eroare la procesarea documentului');
+  }
+}
+
+/**
+ * Extract data from RO CEI Reader PDF (official MAI app output).
+ *
+ * The RO CEI Reader PDF is generated by the official "RO CEI Reader" mobile
+ * app from MAI (Ministerul Afacerilor Interne). The user scans the chip of
+ * their new electronic CI via NFC and the app exports a PDF containing all
+ * the data stored on the chip, INCLUDING the address.
+ *
+ * Format is predictable (key: value lines), making this OCR very reliable.
+ * Gemini handles PDF input natively (no pdf-parse needed).
+ *
+ * Anti-forgery: we check for the footer string "RO CEI Reader a MAI" in
+ * the PDF content. Not a strong defense but catches casual forgeries.
+ *
+ * Returns address parsed into components (county, city, sector, street,
+ * number, building, staircase, floor, apartment).
+ */
+export async function extractFromROCEIReaderPDF(
+  pdfBase64: string
+): Promise<OCRResult> {
+  const model = genAI.getGenerativeModel({ model: GEMINI_MODEL });
+
+  const prompt = `Analizează acest PDF generat de aplicația oficială "RO CEI Reader" a MAI (Ministerul Afacerilor Interne din România).
+
+IMPORTANT: Răspunde DOAR în format JSON valid, fără markdown.
+
+PDF-ul are formatul standard:
+  Nume de familie: <SURNAME>
+  Prenume: <GIVEN NAMES>
+  Cetățenie: ROU
+  Sex: M sau F
+  CNP: <13 cifre>
+  Data nașterii: DD.MM.YYYY
+  Locul nașterii: <oraș>
+  Număr document: <ex. MB1139128>
+  Data emiterii: DD.MM.YYYY
+  Data expirării: DD.MM.YYYY
+  Autoritatea emitentă: <ex. SPCEP S5 biroul nr.1>
+  Domiciliu: <adresa completă>
+  Document foto: <foto persoană>
+
+ADRESA DE DOMICILIU se găsește pe rândul "Domiciliu:" și are formate posibile:
+  • București: "Mun.Bucureşti Sec.<N> Bd./Str./Ale.<nume> nr.<N> sc.<X> et.<N> ap.<N>"
+  • Urban: "Mun.<oraș> Str.<nume> nr.<N> bl.<X> sc.<X> et.<N> ap.<N>"
+  • Rural: "Com.<comună> Sat <sat> nr.<N>"
+
+ANTI-FORGERY: Verifică în textul PDF-ului dacă există string-ul exact "RO CEI Reader a MAI"
+(în footer-ul "Acest document este generat cu acordul utilizatorului prin intermediul aplicației RO CEI Reader a MAI"). Returnează "isAuthenticated": true/false pe baza acestei verificări.
+
+DIACRITICE: Folosește DOAR ă, â, î, ș, ț. NICIODATĂ š, č, ţ-cu-cedillă-veche.
+
+Răspunde în acest format JSON:
+{
+  "success": true/false,
+  "documentType": "ro_cei_reader_pdf",
+  "confidence": 0-100,
+  "isAuthenticated": true sau false,
+  "extractedData": {
+    "cnp": "string",
+    "lastName": "string",
+    "firstName": "string",
+    "birthDate": "DD.MM.YYYY",
+    "birthPlace": "string",
+    "gender": "male" sau "female",
+    "nationality": "ROU",
+    "number": "string (ex. MB1139128)",
+    "issueDate": "DD.MM.YYYY",
+    "expiryDate": "DD.MM.YYYY",
+    "issuedBy": "string (ex. 'SPCEP S5 biroul nr.1')",
+    "address": {
+      "fullAddress": "exact cum apare după 'Domiciliu:'",
+      "county": "județul (ex. 'București', 'Cluj') — pentru București NU 'Bucureşti'",
+      "city": "localitatea (ex. 'București', 'Cluj-Napoca')",
+      "sector": "1-6 doar pentru București, altfel null",
+      "streetType": "Strada/Bulevardul/Aleea/Calea (fără punct sau abrevire)",
+      "street": "numele străzii (ex. 'Schitu Măgureanu')",
+      "number": "numărul stradal",
+      "building": "blocul sau null",
+      "staircase": "scara sau null",
+      "floor": "etajul sau null",
+      "apartment": "apartamentul sau null",
+      "postalCode": null
+    }
+  },
+  "issues": [],
+  "suggestions": []
+}`;
+
+  try {
+    const result = await model.generateContent([
+      prompt,
+      {
+        inlineData: {
+          mimeType: 'application/pdf',
+          data: pdfBase64.replace(/^data:application\/pdf;base64,/, ''),
+        },
+      },
+    ]);
+
+    const response = await result.response;
+    const text = response.text();
+    return parseGeminiOCRResponse(text, 'passport'); // fallback DocumentType — we'll set isAuthenticated via extraData
+  } catch (error) {
+    console.error('RO CEI Reader PDF OCR error:', error);
+    return createErrorResult('passport', 'Eroare la procesarea PDF-ului RO CEI Reader');
+  }
+}
+
+/**
+ * Cross-validate extracted data between front, back, and PDF scans.
+ *
+ * Returns warnings (never errors — admin decides if blocking) when the
+ * same field has different values across scans. This catches:
+ * - Wrong PDF uploaded (CNP doesn't match CI)
+ * - OCR errors (typo in document number on one side)
+ * - Photoshopped documents (numbers don't add up)
+ *
+ * Comparisons are case-insensitive and ignore whitespace. Romanian
+ * diacritics are normalized (ș → s, ț → t) for name comparison only
+ * because Gemini OCR might inconsistently transcribe them.
+ */
+export function crossValidateExtractedData(scans: {
+  ci_front?: ExtractedPersonalData;
+  ci_nou_back?: ExtractedCINouBack;
+  ro_cei_reader_pdf?: ExtractedROCEIReader;
+}): CrossValidationWarning[] {
+  const warnings: CrossValidationWarning[] = [];
+
+  const normalize = (s: string | undefined): string =>
+    (s ?? '').trim().toLowerCase();
+
+  const normalizeName = (s: string | undefined): string =>
+    normalize(s)
+      .normalize('NFD')
+      .replace(/[̀-ͯ]/g, '') // strip combining marks
+      .replace(/ș/g, 's')
+      .replace(/ț/g, 't')
+      .replace(/\s+/g, ' ');
+
+  // CI front document number vs MRZ on eCI back
+  if (scans.ci_front?.number && scans.ci_nou_back?.mrzDocumentNumber) {
+    const front = normalize(scans.ci_front.number);
+    const back = normalize(scans.ci_nou_back.mrzDocumentNumber);
+    if (front !== back) {
+      warnings.push({
+        field: 'documentNumber',
+        values: { ci_front: scans.ci_front.number, ci_nou_back: scans.ci_nou_back.mrzDocumentNumber },
+        message: `Numărul documentului de pe față (${scans.ci_front.number}) diferă de cel din MRZ-ul de pe spate (${scans.ci_nou_back.mrzDocumentNumber}).`,
+        severity: 'warning',
+      });
+    }
+  }
+
+  // CI front CNP vs MRZ CNP on eCI back
+  if (scans.ci_front?.cnp && scans.ci_nou_back?.mrzCnp) {
+    const front = normalize(scans.ci_front.cnp);
+    const back = normalize(scans.ci_nou_back.mrzCnp);
+    if (front !== back) {
+      warnings.push({
+        field: 'cnp',
+        values: { ci_front: scans.ci_front.cnp, ci_nou_back: scans.ci_nou_back.mrzCnp },
+        message: `CNP-ul de pe față (${scans.ci_front.cnp}) diferă de CNP-ul din MRZ-ul de pe spate (${scans.ci_nou_back.mrzCnp}).`,
+        severity: 'warning',
+      });
+    }
+  }
+
+  // CI front CNP vs PDF CNP
+  if (scans.ci_front?.cnp && scans.ro_cei_reader_pdf?.cnp) {
+    const front = normalize(scans.ci_front.cnp);
+    const pdf = normalize(scans.ro_cei_reader_pdf.cnp);
+    if (front !== pdf) {
+      warnings.push({
+        field: 'cnp',
+        values: { ci_front: scans.ci_front.cnp, ro_cei_reader_pdf: scans.ro_cei_reader_pdf.cnp },
+        message: `CNP-ul de pe față (${scans.ci_front.cnp}) diferă de CNP-ul din PDF-ul RO CEI Reader (${scans.ro_cei_reader_pdf.cnp}).`,
+        severity: 'warning',
+      });
+    }
+  }
+
+  // CI front document number vs PDF number
+  if (scans.ci_front?.number && scans.ro_cei_reader_pdf?.number) {
+    const front = normalize(scans.ci_front.number);
+    const pdf = normalize(scans.ro_cei_reader_pdf.number);
+    if (front !== pdf) {
+      warnings.push({
+        field: 'documentNumber',
+        values: { ci_front: scans.ci_front.number, ro_cei_reader_pdf: scans.ro_cei_reader_pdf.number },
+        message: `Numărul documentului de pe față (${scans.ci_front.number}) diferă de cel din PDF-ul RO CEI Reader (${scans.ro_cei_reader_pdf.number}).`,
+        severity: 'warning',
+      });
+    }
+  }
+
+  // Name comparison (front vs PDF) — both should match
+  if (scans.ci_front?.lastName && scans.ro_cei_reader_pdf?.lastName) {
+    const front = normalizeName(scans.ci_front.lastName) + '|' + normalizeName(scans.ci_front.firstName);
+    const pdf = normalizeName(scans.ro_cei_reader_pdf.lastName) + '|' + normalizeName(scans.ro_cei_reader_pdf.firstName);
+    if (front !== pdf) {
+      warnings.push({
+        field: 'name',
+        values: {
+          ci_front: `${scans.ci_front.lastName} ${scans.ci_front.firstName}`,
+          ro_cei_reader_pdf: `${scans.ro_cei_reader_pdf.lastName} ${scans.ro_cei_reader_pdf.firstName}`,
+        },
+        message: `Numele de pe față nu se potrivește cu cel din PDF-ul RO CEI Reader.`,
+        severity: 'warning',
+      });
+    }
+  }
+
+  // Birth date comparison
+  if (scans.ci_front?.birthDate && scans.ro_cei_reader_pdf?.birthDate) {
+    if (scans.ci_front.birthDate !== scans.ro_cei_reader_pdf.birthDate) {
+      warnings.push({
+        field: 'birthDate',
+        values: { ci_front: scans.ci_front.birthDate, ro_cei_reader_pdf: scans.ro_cei_reader_pdf.birthDate },
+        message: `Data nașterii de pe față (${scans.ci_front.birthDate}) diferă de cea din PDF (${scans.ro_cei_reader_pdf.birthDate}).`,
+        severity: 'warning',
+      });
+    }
+  }
+
+  return warnings;
 }
 
 /**
