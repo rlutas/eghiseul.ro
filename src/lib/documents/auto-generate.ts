@@ -95,7 +95,28 @@ export async function autoGenerateOrderDocuments(
   const company = cd.companyData || cd.company || {};
   const billing = cd.billing || {};
 
-  const isPJ = billing?.type === 'persoana_juridica' || !!company?.companyName;
+  // `isPJ` here means "the SERVICE is for a legal entity" — drives contract
+  // template choice (contract-prestari PF vs PJ), cerere eliberare PF/PJ,
+  // împuternicire format, etc. Must NOT be inferred from billing.type
+  // alone: a PF customer (cazier pe persoană fizică) can ask the invoice
+  // be issued to their employer (billing.type='persoana_juridica') and
+  // they're still a PF for service purposes.
+  //
+  // Bug observed on order E-260528-DZ8MS: contract + cerere eliberare
+  // generated with EDIGITALIZARE S.R.L. as the contracting party because
+  // billing was PJ → contracts were legally wrong (cerere belonged to
+  // SABO Gheorghe-Constantin, the PF customer).
+  //
+  // Only treat as PJ when:
+  //   - clientType is explicitly 'pj' on customer_data (the wizard's PJ
+  //     entry point sets this), OR
+  //   - companyKyc documents have been uploaded (= the service required
+  //     PJ docs, e.g. Certificat constatator PJ).
+  const explicitPJ = cd.clientType === 'pj';
+  const hasCompanyKyc =
+    !!(cd.companyData?.uploadedDocuments && cd.companyData.uploadedDocuments.length) ||
+    !!(cd.companyKyc);
+  const isPJ = explicitPJ || hasCompanyKyc;
 
   const personalAddress = typeof personal.address === 'object' ? personal.address : undefined;
   const companyAddress = typeof company.address === 'object' ? company.address : undefined;
@@ -381,16 +402,93 @@ export async function autoGenerateOrderDocuments(
     }
   }
 
-  // Auto-allocate delegation number for the order (even though imputernicire is generated later by admin)
-  // This ensures the delegation number appears in the registry journal immediately
-  try {
-    // Check if a delegation number already exists for this order
-    const { data: existingDelegation } = await adminClient.rpc('find_existing_number', {
-      p_order_id: orderId,
-      p_type: 'delegation',
-    });
+  // Auto-allocate ALL needed delegation numbers for the order.
+  //
+  // Per lawyer reg-bar policy, every official document we obtain on behalf
+  // of the client requires its own împuternicire avocațială (= its own
+  // delegation number). For multi-service orders this means N delegations:
+  //
+  //   Example: Cazier Judiciar + Apostila Haga + Certificat Integritate
+  //            + Apostila Haga (pe integritate)
+  //          → 4 delegations (one per row above)
+  //
+  // The main service ALWAYS gets a delegation. Options that produce a
+  // separate official document also get one. Translation, legalization,
+  // urgent processing do NOT (they're modifiers on existing docs, not
+  // separate documents we represent the client to obtain).
+  //
+  // Each delegation is keyed by `service_type` in number_registry, so
+  // find_existing_number(orderId, 'delegation', service_type) dedupes
+  // per-service on regeneration — without re-using numbers across
+  // services within the same order.
+  //
+  /** Option codes that map to a separate official document → delegation needed. */
+  const DELEGATION_REQUIRING_OPTION_CODES = new Set([
+    'apostila_haga',
+    'addon_certificat_integritate',
+    'addon_certificat_nastere',
+    'addon_certificat_casatorie',
+    'addon_certificat_celibat',
+    'addon_cazier_fiscal',
+    'cazier_secundar',
+  ]);
 
-    if (!existingDelegation || existingDelegation.length === 0) {
+  /**
+   * Build list of (service_type_label, friendly_name) tuples for which we
+   * need a delegation. Main service is always #1.
+   *
+   * For bundled options (e.g., apostila_haga as bundled add-on for
+   * certificat-integritate), we use the parent option_id in the label so
+   * "Apostila Haga pe Cazier" and "Apostila Haga pe Certificat
+   * Integritate" don't collide.
+   */
+  const delegationItems: Array<{ serviceType: string; label: string }> = [];
+
+  // Main service — always.
+  delegationItems.push({
+    serviceType: order.services?.slug || order.services?.name || 'main',
+    label: order.services?.name || 'Serviciu principal',
+  });
+
+  for (const opt of selectedOptions) {
+    const directCode = (opt.code || '') as string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const bundledMeta = opt.bundled_for as any;
+    const bundledCode = bundledMeta?.bundled_option_code as string | undefined;
+    const bundledParentId = bundledMeta?.parent_option_id as string | undefined;
+    const bundledServiceSlug = bundledMeta?.bundled_service_slug as string | undefined;
+
+    const optionCode = directCode || bundledCode || '';
+    if (!DELEGATION_REQUIRING_OPTION_CODES.has(optionCode)) continue;
+
+    // service_type must be UNIQUE per delegation in this order. For
+    // non-bundled options use "<code>". For bundled, include the parent
+    // option id + bundled service slug so two apostila_haga (one per
+    // service) don't dedupe into one.
+    const serviceType = bundledCode
+      ? `bundled:${bundledParentId || 'unknown'}:${bundledServiceSlug || 'unknown'}:${bundledCode}`
+      : optionCode;
+
+    delegationItems.push({
+      serviceType,
+      label: opt.option_name || optionCode,
+    });
+  }
+
+  // Allocate (or reuse) one delegation per item.
+  for (const item of delegationItems) {
+    try {
+      const { data: existing } = await adminClient.rpc('find_existing_number', {
+        p_order_id: orderId,
+        p_type: 'delegation',
+        p_service_type: item.serviceType,
+      });
+
+      if (existing && existing.length > 0) {
+        console.log(`Delegation already allocated for ${item.serviceType}: skipping`);
+        continue;
+      }
+
       const { data: delegationResult, error: delegationError } = await adminClient.rpc('allocate_number', {
         p_type: 'delegation',
         p_order_id: orderId,
@@ -398,22 +496,28 @@ export async function autoGenerateOrderDocuments(
         p_client_email: clientData.email || null,
         p_client_cnp: clientData.cnp || null,
         p_client_cui: clientData.cui || null,
-        p_service_type: order.services?.name || '',
+        p_service_type: item.serviceType,
         p_amount: lawyerData.fee || null,
         p_source: 'platform',
         p_created_by: generatedBy,
       });
 
       if (delegationError) {
-        console.error('Failed to auto-allocate delegation number:', delegationError);
-        // Don't fail the whole submission - delegation can be allocated later
-      } else {
-        console.log(`Auto-allocated delegation number: ${delegationResult[0]?.allocated_series || 'SM'}${String(delegationResult[0]?.allocated_number).padStart(6, '0')} for order ${orderId}`);
+        console.error(`Failed to allocate delegation for ${item.serviceType}:`, delegationError);
+        // Don't fail the whole submission — admin can allocate manually later.
+        continue;
       }
+      const allocated = delegationResult?.[0];
+      if (allocated) {
+        console.log(
+          `Allocated delegation ${allocated.allocated_series || 'SM'}${String(allocated.allocated_number).padStart(6, '0')} ` +
+          `for [${item.label}] on order ${orderId}`
+        );
+      }
+    } catch (err) {
+      console.error(`Error allocating delegation for ${item.serviceType}:`, err);
+      // Non-fatal — try the next one.
     }
-  } catch (err) {
-    console.error('Error auto-allocating delegation number:', err);
-    // Non-fatal - delegation can be allocated manually later
   }
 
   // Log to order_history
