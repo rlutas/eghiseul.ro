@@ -773,10 +773,24 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
       ro_cei_reader_pdf: roCeiPdfScan,
     } as const;
     const scanState = scanStateMap[type];
+    // Direct match by type ONLY. Legacy back-compat alias (ci_back ↔ ci_nou_back)
+    // is handled below in a constrained way — applies ONLY to those two types.
+    //
+    // Bug fixed 2026-05-28: the old fallback `type === 'ci_front' ? 'ci_nou_front'
+    // : 'ci_nou_back'` triggered a `d.type === 'ci_nou_back'` cross-match for ALL
+    // non-ci_front slots — meaning `ro_cei_reader_pdf` and `passport_opened`
+    // accidentally rendered the uploaded ci_nou_back image as their own content.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const existingDoc = personalKyc?.uploadedDocuments?.find((d: any) =>
-      d.type === type || d.type === (type === 'ci_front' ? 'ci_nou_front' : 'ci_nou_back')
-    );
+    const existingDoc = personalKyc?.uploadedDocuments?.find((d: any) => {
+      if (d.type === type) return true;
+      // Strict back-compat: only between ci_back and ci_nou_back (same physical
+      // document, two naming conventions across versions of the wizard).
+      if (type === 'ci_back' && d.type === 'ci_nou_back') return true;
+      if (type === 'ci_nou_back' && d.type === 'ci_back') return true;
+      // And the original ci_front ↔ ci_nou_front legacy alias.
+      if (type === 'ci_front' && d.type === 'ci_nou_front') return true;
+      return false;
+    });
 
     const hasUpload = scanState.preview || existingDoc;
     const isSuccess = scanState.success || !!existingDoc;
