@@ -970,73 +970,112 @@ export function DeliveryStepModular({ onValidChange }: DeliveryStepProps) {
 
   return (
     <div className="space-y-6">
-      {/* Step 1: Delivery Type Selection */}
-      {!deliveryType && (
-        <div className="space-y-4">
-          <h3 className="font-semibold text-secondary-900 flex items-center gap-2">
-            <Truck className="h-5 w-5 text-primary-500" />
-            Cum doriți să primiți documentele?
-          </h3>
+      {/* Delivery Type Picker — VISIBLE ALWAYS (no longer hidden after pick).
+          Selected card shows green border + checkmark badge; user can swap
+          methods by clicking the other card. Removes the previous
+          "Email Selected" intermediate confirmation block entirely:
+          for Email the parent step's Continuă button enables immediately
+          via onValidChange(true). For Physical the sub-flow renders below. */}
+      <div className="space-y-4">
+        <h3 className="font-semibold text-secondary-900 flex items-center gap-2">
+          <Truck className="h-5 w-5 text-primary-500" />
+          Cum doriți să primiți documentele?
+        </h3>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {/* Email Option */}
-            <div
-              onClick={handleEmailSelect}
-              className="relative p-6 rounded-xl border-2 border-neutral-200 hover:border-primary-300 cursor-pointer transition-all hover:shadow-md group"
-            >
-              <div className="flex items-start gap-4">
-                <div className="w-14 h-14 rounded-full bg-green-100 flex items-center justify-center group-hover:bg-green-200 transition-colors">
-                  <Mail className="w-7 h-7 text-green-600" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {/* Email Option */}
+          <button
+            type="button"
+            onClick={handleEmailSelect}
+            className={`relative p-5 sm:p-6 rounded-xl border-2 cursor-pointer transition-all text-left ${
+              deliveryType === 'email'
+                ? 'border-green-500 bg-green-50 shadow-sm ring-2 ring-green-200/60'
+                : 'border-neutral-200 bg-white hover:border-primary-300 hover:shadow-md'
+            }`}
+          >
+            {deliveryType === 'email' && (
+              <span className="absolute top-3 right-3 inline-flex items-center gap-1 rounded-full bg-green-600 text-white text-[10px] font-bold px-2 py-0.5 uppercase tracking-wide">
+                <CheckCircle className="w-3 h-3" />
+                Selectat
+              </span>
+            )}
+            <div className="flex items-start gap-4">
+              <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center transition-colors ${
+                deliveryType === 'email' ? 'bg-green-200' : 'bg-green-100'
+              }`}>
+                <Mail className="w-6 h-6 sm:w-7 sm:h-7 text-green-700" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h4 className="font-semibold text-secondary-900 text-base sm:text-lg">Email (PDF)</h4>
+                <p className="text-xs sm:text-sm text-neutral-500 mt-1 leading-snug">
+                  Primiți documentele în format PDF direct pe email
+                </p>
+                <div className="flex items-center gap-2 sm:gap-3 mt-3 flex-wrap">
+                  <span className="inline-flex items-center gap-1 text-xs sm:text-sm text-green-700 font-medium">
+                    <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                    Instant
+                  </span>
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-green-100 text-green-800 text-[11px] sm:text-xs font-bold">
+                    GRATUIT
+                  </span>
                 </div>
-                <div className="flex-1">
-                  <h4 className="font-semibold text-secondary-900 text-lg">Email (PDF)</h4>
-                  <p className="text-sm text-neutral-500 mt-1">
-                    Primiți documentele în format PDF direct pe email
-                  </p>
-                  <div className="flex items-center gap-4 mt-3">
-                    <span className="inline-flex items-center gap-1 text-sm text-green-600 font-medium">
-                      <Clock className="w-4 h-4" />
-                      Instant
-                    </span>
-                    <span className="inline-flex items-center px-3 py-1 rounded-full bg-green-100 text-green-700 text-sm font-bold">
-                      GRATUIT
-                    </span>
-                  </div>
-                </div>
-                <ChevronRight className="w-5 h-5 text-neutral-400 group-hover:text-primary-500 transition-colors" />
               </div>
             </div>
+          </button>
 
-            {/* Physical Delivery Option */}
-            <div
-              onClick={handlePhysicalSelect}
-              className="relative p-6 rounded-xl border-2 border-neutral-200 hover:border-primary-300 cursor-pointer transition-all hover:shadow-md group"
-            >
-              <div className="flex items-start gap-4">
-                <div className="w-14 h-14 rounded-full bg-primary-100 flex items-center justify-center group-hover:bg-primary-200 transition-colors">
-                  <Package className="w-7 h-7 text-primary-600" />
+          {/* Physical Delivery Option */}
+          <button
+            type="button"
+            onClick={handlePhysicalSelect}
+            className={`relative p-5 sm:p-6 rounded-xl border-2 cursor-pointer transition-all text-left ${
+              deliveryType === 'physical'
+                ? 'border-primary-500 bg-primary-50 shadow-sm ring-2 ring-primary-200/60'
+                : 'border-neutral-200 bg-white hover:border-primary-300 hover:shadow-md'
+            }`}
+          >
+            {deliveryType === 'physical' && (
+              <span className="absolute top-3 right-3 inline-flex items-center gap-1 rounded-full bg-primary-600 text-white text-[10px] font-bold px-2 py-0.5 uppercase tracking-wide">
+                <CheckCircle className="w-3 h-3" />
+                Selectat
+              </span>
+            )}
+            <div className="flex items-start gap-4">
+              <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center transition-colors ${
+                deliveryType === 'physical' ? 'bg-primary-200' : 'bg-primary-100'
+              }`}>
+                <Package className="w-6 h-6 sm:w-7 sm:h-7 text-primary-700" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h4 className="font-semibold text-secondary-900 text-base sm:text-lg">Livrare Fizică</h4>
+                <p className="text-xs sm:text-sm text-neutral-500 mt-1 leading-snug">
+                  Primiți documentele în original, prin curier
+                </p>
+                <div className="flex items-center gap-2 sm:gap-3 mt-3 flex-wrap">
+                  <span className="inline-flex items-center gap-1 text-xs sm:text-sm text-primary-700 font-medium">
+                    <Truck className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                    1-3 zile lucrătoare
+                  </span>
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-primary-100 text-primary-800 text-[11px] sm:text-xs font-bold">
+                    de la 18 RON
+                  </span>
                 </div>
-                <div className="flex-1">
-                  <h4 className="font-semibold text-secondary-900 text-lg">Livrare Fizică</h4>
-                  <p className="text-sm text-neutral-500 mt-1">
-                    Primiți documentele în original, prin curier
-                  </p>
-                  <div className="flex items-center gap-4 mt-3">
-                    <span className="inline-flex items-center gap-1 text-sm text-primary-600 font-medium">
-                      <Truck className="w-4 h-4" />
-                      1-3 zile lucrătoare
-                    </span>
-                    <span className="inline-flex items-center px-3 py-1 rounded-full bg-primary-100 text-primary-700 text-sm font-medium">
-                      de la 18 RON
-                    </span>
-                  </div>
-                </div>
-                <ChevronRight className="w-5 h-5 text-neutral-400 group-hover:text-primary-500 transition-colors" />
               </div>
             </div>
-          </div>
+          </button>
         </div>
-      )}
+
+        {/* Inline confirmation note for Email — slim, just to reassure
+            the customer their email address is the one we have. */}
+        {deliveryType === 'email' && state.contact.email && (
+          <div className="rounded-lg border border-green-200 bg-green-50/50 p-3 flex items-start gap-3">
+            <Mail className="w-4 h-4 text-green-700 flex-shrink-0 mt-0.5" />
+            <p className="text-sm text-green-800">
+              PDF-urile vor fi trimise pe <strong>{state.contact.email}</strong>.
+              {' '}Poți schimba metoda apăsând pe „Livrare Fizică" mai sus.
+            </p>
+          </div>
+        )}
+      </div>
 
       {/* Step 2: Physical Delivery - Region Selection */}
       {deliveryType === 'physical' && !physicalRegion && (
@@ -1917,43 +1956,10 @@ export function DeliveryStepModular({ onValidChange }: DeliveryStepProps) {
         </div>
       )}
 
-      {/* Email Selected - Confirmation */}
-      {deliveryType === 'email' && (
-        <div className="space-y-4">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleBackToTypes}
-            className="text-neutral-500 hover:text-neutral-700 -ml-2"
-          >
-            <ArrowLeft className="w-4 h-4 mr-1" />
-            Schimbă metoda
-          </Button>
-
-          <div className="p-6 rounded-xl border-2 border-green-200 bg-green-50">
-            <div className="flex items-center gap-4">
-              <div className="w-14 h-14 rounded-full bg-green-100 flex items-center justify-center">
-                <CheckCircle className="w-8 h-8 text-green-600" />
-              </div>
-              <div>
-                <h4 className="font-semibold text-green-800 text-lg">Livrare prin Email</h4>
-                <p className="text-sm text-green-700 mt-1">
-                  Veți primi documentele în format PDF pe adresa: <strong>{state.contact.email}</strong>
-                </p>
-                <div className="flex items-center gap-4 mt-2">
-                  <span className="inline-flex items-center gap-1 text-sm text-green-600 font-medium">
-                    <Clock className="w-4 h-4" />
-                    Instant
-                  </span>
-                  <span className="inline-flex items-center px-3 py-1 rounded-full bg-green-200 text-green-800 text-sm font-bold">
-                    GRATUIT
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Email confirmation now inline above (next to the picker) — no
+          separate full-width block. The slim banner there is enough; the
+          parent step's "Continuă" button is already enabled via
+          onValidChange(true). */}
     </div>
   );
 }

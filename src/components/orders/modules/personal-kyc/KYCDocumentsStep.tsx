@@ -726,22 +726,39 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
                   >
                     <div className="flex items-center gap-3">
                       {doc.base64 ? (
-                        <div
-                          className="w-[80px] h-[56px] rounded border border-green-200 overflow-hidden cursor-pointer flex-shrink-0 hover:ring-2 hover:ring-primary-300 transition-all"
-                          onClick={() =>
-                            setPreviewModal({
-                              open: true,
-                              type: null,
-                              url: `data:${doc.mimeType};base64,${doc.base64}`,
-                            })
-                          }
-                        >
-                          <img
-                            src={`data:${doc.mimeType};base64,${doc.base64}`}
-                            alt={getDocumentLabel(doc.type)}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
+                        (() => {
+                          // PDFs can't render inside <img>. Show a clear PDF
+                          // icon thumbnail instead of the broken image
+                          // placeholder. Click opens the preview modal which
+                          // already handles PDFs separately.
+                          const isPdf = doc.mimeType === 'application/pdf'
+                            || doc.fileName?.toLowerCase().endsWith('.pdf');
+                          return (
+                            <div
+                              className="w-[80px] h-[56px] rounded border border-green-200 overflow-hidden cursor-pointer flex-shrink-0 hover:ring-2 hover:ring-primary-300 transition-all flex items-center justify-center bg-red-50"
+                              onClick={() =>
+                                setPreviewModal({
+                                  open: true,
+                                  type: null,
+                                  url: `data:${doc.mimeType};base64,${doc.base64}`,
+                                })
+                              }
+                            >
+                              {isPdf ? (
+                                <div className="flex flex-col items-center justify-center text-red-600">
+                                  <FileText className="h-6 w-6" />
+                                  <span className="text-[8px] font-bold tracking-wide mt-0.5">PDF</span>
+                                </div>
+                              ) : (
+                                <img
+                                  src={`data:${doc.mimeType};base64,${doc.base64}`}
+                                  alt={getDocumentLabel(doc.type)}
+                                  className="w-full h-full object-cover"
+                                />
+                              )}
+                            </div>
+                          );
+                        })()
                       ) : (
                         <CheckCircle className="h-4 w-4 text-green-600 flex-shrink-0" />
                       )}
@@ -871,11 +888,22 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
               </Button>
             </div>
             <div className="p-4">
-              <img
-                src={previewModal.url}
-                alt="Preview"
-                className="max-h-[60vh] w-full object-contain rounded-lg"
-              />
+              {/* PDF preview uses <iframe> — browsers render PDFs inline via
+                  the browser's built-in viewer. For non-PDFs we keep the
+                  original <img> render path. */}
+              {previewModal.url?.startsWith('data:application/pdf') ? (
+                <iframe
+                  src={previewModal.url}
+                  title="Preview PDF"
+                  className="w-full h-[70vh] rounded-lg border"
+                />
+              ) : (
+                <img
+                  src={previewModal.url}
+                  alt="Preview"
+                  className="max-h-[60vh] w-full object-contain rounded-lg"
+                />
+              )}
             </div>
           </div>
         </div>
@@ -893,6 +921,8 @@ function getDocumentLabel(type: DocumentType): string {
     ci_nou_front: 'CI Nou (față)',
     ci_nou_back: 'CI Nou (verso)',
     passport: 'Pașaport',
+    passport_opened: 'Pașaport (deschis)',
+    ro_cei_reader_pdf: 'PDF RO CEI Reader (dovadă domiciliu)',
     certificat_domiciliu: 'Certificat Domiciliu',
     residence_permit: 'Permis de Ședere',
     registration_cert: 'Certificat Înregistrare',
