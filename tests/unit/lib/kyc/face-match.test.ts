@@ -1,5 +1,11 @@
 import { describe, expect, it, beforeEach, vi, afterEach } from 'vitest';
-import { runFaceMatch, fetchImageAsBase64 } from '@/lib/kyc/face-match';
+import {
+  runFaceMatch,
+  fetchImageAsBase64,
+  isFaceReferenceDoc,
+  decideSelfieValidation,
+  type FaceMatchResult,
+} from '@/lib/kyc/face-match';
 
 describe('runFaceMatch', () => {
   beforeEach(() => {
@@ -151,6 +157,109 @@ describe('runFaceMatch', () => {
     expect(result.faceMatchConfidence).toBe(70);
     expect(result.validationConfidence).toBe(85);
     expect(result.valid).toBe(true);
+  });
+});
+
+describe('isFaceReferenceDoc', () => {
+  // Regression: a passport picked in Step 2 is stored as `passport_opened`
+  // (PersonalDataStep:1278), NOT `passport`. The old getIDDocument lookup
+  // searched only for `passport`, so face matching silently never ran for
+  // passport holders. These types all carry the holder's face photo.
+  it.each([
+    'ci_front',
+    'ci_vechi',
+    'ci_nou_front',
+    'passport',
+    'passport_opened',
+  ])('treats %s as a usable face reference', (type) => {
+    expect(isFaceReferenceDoc(type)).toBe(true);
+  });
+
+  it.each([
+    'selfie',
+    'certificat_domiciliu',
+    'residence_permit',
+    'ci_back',
+    'ci_nou_back',
+    'ro_cei_reader_pdf', // chip key:value PDF — no reliable face photo
+    '',
+    'unknown',
+  ])('rejects %s as a face reference', (type) => {
+    expect(isFaceReferenceDoc(type)).toBe(false);
+  });
+});
+
+describe('decideSelfieValidation', () => {
+  const okResult: FaceMatchResult = {
+    ok: true,
+    matched: true,
+    faceMatchConfidence: 92,
+    validationConfidence: 95,
+    valid: true,
+    issues: [],
+  };
+
+  it('passes clean image match without manual review', () => {
+    const d = decideSelfieValidation(okResult, { referenceMimeType: 'image/jpeg' });
+    expect(d.valid).toBe(true);
+    expect(d.faceMatch).toBe(true);
+    expect(d.faceMatchConfidence).toBe(92);
+    expect(d.confidence).toBe(95);
+    expect(d.needsManualReview).toBe(false);
+    expect(d.reviewReason).toBeUndefined();
+  });
+
+  it('flags manual review when the reference document is a PDF (even on a clean match)', () => {
+    const d = decideSelfieValidation(okResult, { referenceMimeType: 'application/pdf' });
+    expect(d.valid).toBe(true);
+    expect(d.needsManualReview).toBe(true);
+    expect(d.reviewReason).toBe('reference_pdf');
+  });
+
+  it('flags manual review on borderline confidence (<70)', () => {
+    const d = decideSelfieValidation(
+      { ...okResult, faceMatchConfidence: 62, validationConfidence: 80 },
+      { referenceMimeType: 'image/jpeg' },
+    );
+    expect(d.needsManualReview).toBe(true);
+    expect(d.reviewReason).toBe('borderline_confidence');
+  });
+
+  it('flags manual review and marks invalid when faces do not match', () => {
+    const d = decideSelfieValidation(
+      { ...okResult, matched: false, valid: false, faceMatchConfidence: 8 },
+      { referenceMimeType: 'image/jpeg' },
+    );
+    expect(d.valid).toBe(false);
+    expect(d.faceMatch).toBe(false);
+    expect(d.needsManualReview).toBe(true);
+    expect(d.reviewReason).toBe('no_match');
+  });
+
+  it('flags manual review on low quality (matched but valid=false)', () => {
+    const d = decideSelfieValidation(
+      { ...okResult, matched: true, valid: false, validationConfidence: 30 },
+      { referenceMimeType: 'image/jpeg' },
+    );
+    expect(d.valid).toBe(false);
+    expect(d.needsManualReview).toBe(true);
+    expect(d.reviewReason).toBe('low_quality');
+  });
+
+  it('never drops silently: an unavailable face match is recorded for manual review', () => {
+    const failed: FaceMatchResult = {
+      ok: false,
+      matched: false,
+      faceMatchConfidence: 0,
+      validationConfidence: 0,
+      valid: false,
+      issues: [],
+      error: 'http_429',
+    };
+    const d = decideSelfieValidation(failed, { referenceMimeType: 'image/jpeg' });
+    expect(d.valid).toBe(false);
+    expect(d.needsManualReview).toBe(true);
+    expect(d.reviewReason).toBe('face_match_unavailable:http_429');
   });
 });
 

@@ -15,6 +15,12 @@ import { Label } from '@/components/ui/label';
 import { getCountyFromCNP } from '@/lib/validations/cnp';
 import { estimateFromSelectedOptions } from '@/lib/delivery-calculator';
 import {
+  type KycPerDoc,
+  extractKycByDocType,
+  kycConfidenceClass,
+  needsKycReview,
+} from '@/lib/kyc/review';
+import {
   crossValidateExtractedData,
   type CrossValidationWarning,
   type ExtractedPersonalData,
@@ -1904,87 +1910,8 @@ function CancellationRequestedBanner({
 // ---------- Client Document Card ----------
 
 // ---------- KYC helpers (merged into the Documents card) ----------
-
-// Maps every KYC document type to its validation info from customer_data.
-// Returns `{ confidence, valid, faceMatch?, faceMatchConfidence? }` if any
-// AI verification ran on it; null otherwise.
-export interface KycPerDoc {
-  confidence: number;
-  valid: boolean;
-  faceMatch?: boolean;
-  faceMatchConfidence?: number;
-}
-
-function extractKycByDocType(customerData: AnyObj | null): Record<string, KycPerDoc> {
-  if (!customerData) return {};
-  const personal = customerData.personalData || customerData.personal;
-  if (!personal) return {};
-  const kyc = personal.kycValidation as {
-    ciFront?: { valid: boolean; confidence: number };
-    ciBack?: { valid: boolean; confidence: number };
-    selfie?: { valid: boolean; confidence: number; faceMatch: boolean; faceMatchConfidence: number };
-  } | undefined;
-  const ocrResults = personal.ocrResults as Array<{
-    documentType: string;
-    success: boolean;
-    confidence: number;
-  }> | undefined;
-
-  const ciFront =
-    kyc?.ciFront ??
-    (() => {
-      const o = ocrResults?.find(
-        (r) =>
-          r.documentType === 'ci_front' || r.documentType === 'ci_vechi' || r.documentType === 'ci_nou_front'
-      );
-      return o ? { valid: o.success, confidence: o.confidence } : undefined;
-    })();
-  const ciBack =
-    kyc?.ciBack ??
-    (() => {
-      const o = ocrResults?.find(
-        (r) => r.documentType === 'ci_back' || r.documentType === 'ci_nou_back'
-      );
-      return o ? { valid: o.success, confidence: o.confidence } : undefined;
-    })();
-  const selfie = kyc?.selfie;
-
-  const out: Record<string, KycPerDoc> = {};
-  if (ciFront) {
-    out['ci_front'] = { confidence: ciFront.confidence, valid: ciFront.valid };
-    out['ci_vechi'] = out['ci_front'];
-    out['ci_nou_front'] = out['ci_front'];
-  }
-  if (ciBack) {
-    out['ci_back'] = { confidence: ciBack.confidence, valid: ciBack.valid };
-    out['ci_nou_back'] = out['ci_back'];
-  }
-  if (selfie) {
-    out['selfie'] = {
-      confidence: selfie.confidence,
-      valid: selfie.valid,
-      faceMatch: selfie.faceMatch,
-      faceMatchConfidence: selfie.faceMatchConfidence,
-    };
-  }
-  return out;
-}
-
-const KYC_LOW_CONFIDENCE = 70;
-
-function kycConfidenceClass(c: number): string {
-  if (c >= 80) return 'bg-green-100 text-green-700';
-  if (c >= 60) return 'bg-yellow-100 text-yellow-700';
-  return 'bg-red-100 text-red-700';
-}
-
-function needsKycReview(byType: Record<string, KycPerDoc>): boolean {
-  for (const k of Object.values(byType)) {
-    if (k.confidence < KYC_LOW_CONFIDENCE) return true;
-    if (k.faceMatchConfidence !== undefined && k.faceMatchConfidence < KYC_LOW_CONFIDENCE) return true;
-  }
-  return false;
-}
+// Pure logic lives in `src/lib/kyc/review.ts` so it stays unit-testable and
+// shared. See `extractKycByDocType` / `needsKycReview` there.
 
 // Which doc types can be re-run through OCR. Excludes selfie + company
 // docs because we don't have OCR pipelines for those (selfie has a

@@ -315,6 +315,10 @@ export interface KYCValidationResults {
   selfie?: KYCDocumentValidation & {
     faceMatch: boolean;
     faceMatchConfidence: number; // 0-100
+    /** Operator should manually confirm identity (PDF ref, low/borderline confidence, or face-match unavailable). */
+    needsManualReview?: boolean;
+    /** Short machine-readable reason for the manual review flag. */
+    reviewReason?: string;
   };
 }
 

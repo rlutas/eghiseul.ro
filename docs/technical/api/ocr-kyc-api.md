@@ -34,7 +34,7 @@ Both APIs use Google Gemini AI models for vision-based analysis and are designed
        │  │ - Address parsing                    │   │
        │  └──────────────────────────────────────┘   │
        │  ┌──────────────────────────────────────┐   │
-       │  │ Gemini 1.5 Flash (KYC Validation)    │   │
+       │  │ Gemini 2.5 Flash (KYC Validation)    │   │
        │  │ - Document quality assessment        │   │
        │  │ - Face matching                      │   │
        │  │ - Tampering detection                │   │
@@ -379,7 +379,14 @@ GET /api/ocr/extract
 
 ## Endpoint: POST /api/kyc/validate
 
-Validates identity documents and performs Know Your Customer checks including face matching and tampering detection using Google Gemini 1.5 Flash.
+Validates identity documents and performs Know Your Customer checks including face matching and tampering detection using Google Gemini 2.5 Flash.
+
+> This endpoint returns the **raw** Gemini verdict (`faceMatch`,
+> `faceMatchConfidence`, `confidence`). The client wraps it via
+> `src/lib/kyc/face-match.ts` (`runFaceMatch` → `decideSelfieValidation`), which
+> applies the pass/manual-review policy (PDF reference, borderline confidence,
+> etc.) and persists `needsManualReview` / `reviewReason`. For the full feature
+> flow see [`../specs/kyc-identity-verification.md`](../specs/kyc-identity-verification.md).
 
 ### HTTP Details
 
@@ -742,7 +749,7 @@ GET /api/kyc/validate
 
 **Cost**: Lower cost per token due to Flash model
 
-## Gemini 1.5 Flash (KYC Validation)
+## Gemini 2.5 Flash (KYC Validation)
 
 **Model ID**: `gemini-1.5-flash`
 

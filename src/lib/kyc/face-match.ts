@@ -50,6 +50,104 @@ const FAILED: Omit<FaceMatchResult, 'error'> & { error: string } = {
   error: 'face_match_unavailable',
 };
 
+/**
+ * Document types whose stored image contains the holder's face photo and can
+ * therefore serve as the reference for selfie face-matching.
+ *
+ * IMPORTANT: these are the `uploadedDocuments[].type` values actually produced
+ * by the Step 2 picker (PersonalDataStep), not the picker labels. A passport is
+ * stored as `passport_opened` (see PersonalDataStep:1278) — the historical bug
+ * was that the wizard looked for `passport`, never found the reference, and so
+ * skipped face matching entirely for passport holders.
+ *
+ * `ro_cei_reader_pdf` is deliberately excluded: it is chip key:value data with
+ * no reliable face photo; for the new CI the front photo is stored as
+ * `ci_front`, which already covers that flow.
+ */
+export const FACE_REFERENCE_DOC_TYPES = [
+  'ci_front',
+  'ci_vechi',
+  'ci_nou_front',
+  'passport',
+  'passport_opened',
+] as const;
+
+/** True when a document type can be used as the face-match reference. */
+export function isFaceReferenceDoc(type: string | undefined | null): boolean {
+  return (
+    !!type && (FACE_REFERENCE_DOC_TYPES as readonly string[]).includes(type)
+  );
+}
+
+/** Confidence below this (face match OR overall) gets a human second look. */
+const MANUAL_REVIEW_CONFIDENCE_FLOOR = 70;
+
+export interface SelfieValidationDecision {
+  /** Strong enough to consider KYC auto-passed. */
+  valid: boolean;
+  /** Overall validation confidence, 0–100. */
+  confidence: number;
+  /** Whether Gemini judged the faces to match. */
+  faceMatch: boolean;
+  /** Gemini's confidence in the face match, 0–100. */
+  faceMatchConfidence: number;
+  /** True when an operator should manually confirm identity. */
+  needsManualReview: boolean;
+  /** Short machine-readable reason, present only when review is needed. */
+  reviewReason?: string;
+}
+
+/**
+ * Decide the selfie KYC validation to persist from a face-match attempt.
+ *
+ * Centralizes the "flag for manual review" policy so the wizard never silently
+ * drops a failed or uncertain identity check. A result is flagged for manual
+ * review when ANY of the following holds:
+ *   - the face match was unavailable (network/server error) — recorded, not dropped
+ *   - the faces did not match, or matched but quality was too low (`valid=false`)
+ *   - confidence is borderline (< 70 on either axis)
+ *   - the reference document is a PDF (passport/CEI scans render less reliably
+ *     for facial comparison than a plain photo)
+ */
+export function decideSelfieValidation(
+  result: FaceMatchResult,
+  opts: { referenceMimeType: string },
+): SelfieValidationDecision {
+  const referenceIsPdf = /pdf/i.test(opts.referenceMimeType || '');
+
+  if (!result.ok) {
+    return {
+      valid: false,
+      confidence: 0,
+      faceMatch: false,
+      faceMatchConfidence: 0,
+      needsManualReview: true,
+      reviewReason: `face_match_unavailable:${result.error ?? 'unknown'}`,
+    };
+  }
+
+  const borderline =
+    result.faceMatchConfidence < MANUAL_REVIEW_CONFIDENCE_FLOOR ||
+    result.validationConfidence < MANUAL_REVIEW_CONFIDENCE_FLOOR;
+  const needsManualReview = !result.valid || referenceIsPdf || borderline;
+
+  let reviewReason: string | undefined;
+  if (needsManualReview) {
+    if (!result.valid) reviewReason = result.matched ? 'low_quality' : 'no_match';
+    else if (referenceIsPdf) reviewReason = 'reference_pdf';
+    else reviewReason = 'borderline_confidence';
+  }
+
+  return {
+    valid: result.valid,
+    confidence: result.validationConfidence,
+    faceMatch: result.matched,
+    faceMatchConfidence: result.faceMatchConfidence,
+    needsManualReview,
+    reviewReason,
+  };
+}
+
 export async function runFaceMatch(input: FaceMatchInput): Promise<FaceMatchResult> {
   try {
     const response = await fetch('/api/kyc/validate', {

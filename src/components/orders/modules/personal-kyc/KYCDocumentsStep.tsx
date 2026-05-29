@@ -38,7 +38,7 @@ import {
 import { cn } from '@/lib/utils';
 import type { PersonalKYCConfig, DocumentType, UploadedDocumentState, KYCValidationResults } from '@/types/verification-modules';
 import { compressImage } from '@/lib/images/compress';
-import { runFaceMatch } from '@/lib/kyc/face-match';
+import { runFaceMatch, isFaceReferenceDoc, decideSelfieValidation } from '@/lib/kyc/face-match';
 import { randomId } from '@/lib/random-id';
 
 interface KYCDocumentsStepProps {
@@ -161,14 +161,12 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
     return personalKyc?.uploadedDocuments.find(doc => doc.type === type);
   }, [personalKyc?.uploadedDocuments]);
 
-  // Check if we have ID document (for face matching reference)
+  // Find the ID document that carries the holder's face, used as the reference
+  // for selfie face matching. Centralized in `isFaceReferenceDoc` so the type
+  // list (including `passport_opened`, the value the Step 2 picker actually
+  // stores) stays correct and tested.
   const getIDDocument = useCallback(() => {
-    return personalKyc?.uploadedDocuments.find(doc =>
-      doc.type === 'ci_front' ||
-      doc.type === 'ci_vechi' ||
-      doc.type === 'ci_nou_front' ||
-      doc.type === 'passport'
-    );
+    return personalKyc?.uploadedDocuments.find(doc => isFaceReferenceDoc(doc.type));
   }, [personalKyc?.uploadedDocuments]);
 
   // Validate step
@@ -290,37 +288,68 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
           [type]: { ...prev[type], progress: 50 },
         }));
 
-        // For selfie, perform face matching with ID document via shared util
-        if (type === 'selfie' && config.selfieRequired) {
+        // For selfie, perform face matching against the ID document. Always
+        // attempt it when a selfie is uploaded (the selfie card only renders
+        // when required — for Romanians via config, for foreigners via the
+        // passport flow — so its presence is the right trigger, not the
+        // `config.selfieRequired` flag alone, which missed foreign citizens).
+        if (type === 'selfie') {
           const idDoc = getIDDocument();
           if (idDoc?.base64) {
+            const referenceMimeType = idDoc.mimeType || 'image/jpeg';
             const result = await runFaceMatch({
               selfieBase64: base64,
               selfieMimeType: compressed.mimeType,
               referenceBase64: idDoc.base64,
-              referenceMimeType: idDoc.mimeType || 'image/jpeg',
+              referenceMimeType,
             });
+
+            // Never drop the outcome silently: decideSelfieValidation records
+            // a result for EVERY case (match, mismatch, low quality, PDF
+            // reference, or unavailable service) and flags manual review when
+            // identity could not be auto-confirmed.
+            const decision = decideSelfieValidation(result, { referenceMimeType });
 
             if (result.ok) {
               setFaceMatchResult({
-                matched: result.matched,
-                confidence: result.faceMatchConfidence / 100,
+                matched: decision.faceMatch,
+                confidence: decision.faceMatchConfidence / 100,
               });
+            } else {
+              console.warn('Face matching unavailable, flagged for manual review:', result.error);
+            }
 
-              const existingValidation = personalKyc?.kycValidation || {};
-              const updatedValidation: KYCValidationResults = {
+            const existingValidation = personalKyc?.kycValidation || {};
+            const updatedValidation: KYCValidationResults = {
+              ...existingValidation,
+              selfie: {
+                valid: decision.valid,
+                confidence: decision.confidence,
+                faceMatch: decision.faceMatch,
+                faceMatchConfidence: decision.faceMatchConfidence,
+                needsManualReview: decision.needsManualReview,
+                reviewReason: decision.reviewReason,
+              },
+            };
+            updatePersonalKyc({ kycValidation: updatedValidation });
+          } else {
+            // No face-bearing reference document was found at all → flag, so an
+            // operator confirms identity rather than the check being skipped.
+            const existingValidation = personalKyc?.kycValidation || {};
+            updatePersonalKyc({
+              kycValidation: {
                 ...existingValidation,
                 selfie: {
-                  valid: result.valid,
-                  confidence: result.validationConfidence,
-                  faceMatch: result.matched,
-                  faceMatchConfidence: result.faceMatchConfidence,
+                  valid: false,
+                  confidence: 0,
+                  faceMatch: false,
+                  faceMatchConfidence: 0,
+                  needsManualReview: true,
+                  reviewReason: 'no_reference_document',
                 },
-              };
-              updatePersonalKyc({ kycValidation: updatedValidation });
-            } else {
-              console.warn('Face matching skipped:', result.error);
-            }
+              },
+            });
+            console.warn('Face matching skipped: no face-bearing reference document found');
           }
         }
 
