@@ -16,6 +16,10 @@ import {
   type LawyerData,
 } from '@/lib/documents/generator';
 import { uploadFile, generateDocumentKey, downloadFile, deleteFile, getClientSignatureBase64 } from '@/lib/aws/s3';
+import {
+  computeDelegationItems,
+  isPJForDocumentGeneration,
+} from '@/lib/documents/delegation-items';
 
 /**
  * Format an AddressState object (or string) into a human-readable Romanian address.
@@ -95,28 +99,13 @@ export async function autoGenerateOrderDocuments(
   const company = cd.companyData || cd.company || {};
   const billing = cd.billing || {};
 
-  // `isPJ` here means "the SERVICE is for a legal entity" — drives contract
-  // template choice (contract-prestari PF vs PJ), cerere eliberare PF/PJ,
-  // împuternicire format, etc. Must NOT be inferred from billing.type
-  // alone: a PF customer (cazier pe persoană fizică) can ask the invoice
-  // be issued to their employer (billing.type='persoana_juridica') and
-  // they're still a PF for service purposes.
-  //
-  // Bug observed on order E-260528-DZ8MS: contract + cerere eliberare
-  // generated with EDIGITALIZARE S.R.L. as the contracting party because
-  // billing was PJ → contracts were legally wrong (cerere belonged to
-  // SABO Gheorghe-Constantin, the PF customer).
-  //
-  // Only treat as PJ when:
-  //   - clientType is explicitly 'pj' on customer_data (the wizard's PJ
-  //     entry point sets this), OR
-  //   - companyKyc documents have been uploaded (= the service required
-  //     PJ docs, e.g. Certificat constatator PJ).
-  const explicitPJ = cd.clientType === 'pj';
-  const hasCompanyKyc =
-    !!(cd.companyData?.uploadedDocuments && cd.companyData.uploadedDocuments.length) ||
-    !!(cd.companyKyc);
-  const isPJ = explicitPJ || hasCompanyKyc;
+  // `isPJ` here means "the SERVICE is for a legal entity" — drives
+  // contract template choice (contract-prestari PF vs PJ), cerere
+  // eliberare PF/PJ, împuternicire format, etc. Logic extracted to
+  // `delegation-items.isPJForDocumentGeneration` so it can be unit-tested
+  // — see that file for the full rationale + the E-260528-DZ8MS regression
+  // it prevents.
+  const isPJ = isPJForDocumentGeneration(cd);
 
   const personalAddress = typeof personal.address === 'object' ? personal.address : undefined;
   const companyAddress = typeof company.address === 'object' ? company.address : undefined;
@@ -422,58 +411,13 @@ export async function autoGenerateOrderDocuments(
   // per-service on regeneration — without re-using numbers across
   // services within the same order.
   //
-  /** Option codes that map to a separate official document → delegation needed. */
-  const DELEGATION_REQUIRING_OPTION_CODES = new Set([
-    'apostila_haga',
-    'addon_certificat_integritate',
-    'addon_certificat_nastere',
-    'addon_certificat_casatorie',
-    'addon_certificat_celibat',
-    'addon_cazier_fiscal',
-    'cazier_secundar',
-  ]);
-
-  /**
-   * Build list of (service_type_label, friendly_name) tuples for which we
-   * need a delegation. Main service is always #1.
-   *
-   * For bundled options (e.g., apostila_haga as bundled add-on for
-   * certificat-integritate), we use the parent option_id in the label so
-   * "Apostila Haga pe Cazier" and "Apostila Haga pe Certificat
-   * Integritate" don't collide.
-   */
-  const delegationItems: Array<{ serviceType: string; label: string }> = [];
-
-  // Main service — always.
-  delegationItems.push({
-    serviceType: order.services?.slug || order.services?.name || 'main',
-    label: order.services?.name || 'Serviciu principal',
+  // Compute the list via the pure helper. See delegation-items.ts for the
+  // policy + decision logic and tests/unit/lib/documents/delegation-items.test.ts
+  // for coverage of the dedup/bundled cases.
+  const delegationItems = computeDelegationItems({
+    services: order.services,
+    selected_options: selectedOptions,
   });
-
-  for (const opt of selectedOptions) {
-    const directCode = (opt.code || '') as string;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const bundledMeta = opt.bundled_for as any;
-    const bundledCode = bundledMeta?.bundled_option_code as string | undefined;
-    const bundledParentId = bundledMeta?.parent_option_id as string | undefined;
-    const bundledServiceSlug = bundledMeta?.bundled_service_slug as string | undefined;
-
-    const optionCode = directCode || bundledCode || '';
-    if (!DELEGATION_REQUIRING_OPTION_CODES.has(optionCode)) continue;
-
-    // service_type must be UNIQUE per delegation in this order. For
-    // non-bundled options use "<code>". For bundled, include the parent
-    // option id + bundled service slug so two apostila_haga (one per
-    // service) don't dedupe into one.
-    const serviceType = bundledCode
-      ? `bundled:${bundledParentId || 'unknown'}:${bundledServiceSlug || 'unknown'}:${bundledCode}`
-      : optionCode;
-
-    delegationItems.push({
-      serviceType,
-      label: opt.option_name || optionCode,
-    });
-  }
 
   // Allocate (or reuse) one delegation per item.
   for (const item of delegationItems) {
