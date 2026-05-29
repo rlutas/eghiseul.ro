@@ -16,6 +16,7 @@
 **Handbook Auto-Finalize cron (curier):** [`admin/auto-finalize-cron.md`](admin/auto-finalize-cron.md)
 **Gap docs secundare (Cazier+Integritate):** [`admin/secondary-service-documents.md`](admin/secondary-service-documents.md)
 **🚀 DEPLOY CHECKLIST:** [`deployment/DEPLOY-CHECKLIST.md`](deployment/DEPLOY-CHECKLIST.md) — **citește înainte de cutover**
+**▲ VERCEL DEPLOY + STRIPE WEBHOOK:** [`deployment/VERCEL_DEPLOYMENT.md`](deployment/VERCEL_DEPLOYMENT.md) — env vars, webhook, cum testezi plata
 **🔐 Security incident 2026-05-28:** [`security/INCIDENT-2026-05-28-aws-key-leak.md`](security/INCIDENT-2026-05-28-aws-key-leak.md) — AWS key rotation + Quarantine policy detach
 **🛠️ Polish PM 2026-05-28:** [`session-logs/2026-05-28-pm-polish-and-fixes.md`](session-logs/2026-05-28-pm-polish-and-fixes.md) — Smoke-test fix-uri (CUI v9, birthDate, Sync Stripe, skip-link, rounding)
 **Sesiune anterioară (2026-05-20):** [`session-logs/2026-05-20-seo-cazier-judiciar-rebuild.md`](session-logs/2026-05-20-seo-cazier-judiciar-rebuild.md)
@@ -136,6 +137,7 @@
 | **Ce am de făcut** | [`../DEVELOPMENT_MASTER_PLAN.md`](../DEVELOPMENT_MASTER_PLAN.md) |
 | **Cum funcționează API-ul** | [`technical/api/`](technical/api/) |
 | **Cum adaug un serviciu nou** | [`technical/specs/modular-wizard-guide.md`](technical/specs/modular-wizard-guide.md) |
+| **KYC: Verificare Identitate & Face Match** | [`technical/specs/kyc-identity-verification.md`](technical/specs/kyc-identity-verification.md) |
 | **Plăți & Facturare (Stripe + Oblio)** | [`technical/specs/stripe-oblio-payment-invoicing.md`](technical/specs/stripe-oblio-payment-invoicing.md) |
 | **Livrări & Curierat (Overview)** | [`technical/specs/delivery-system-architecture.md`](technical/specs/delivery-system-architecture.md) |
 | **Sameday API (EasyBox, AWB)** | [`technical/specs/sameday-api-integration.md`](technical/specs/sameday-api-integration.md) |

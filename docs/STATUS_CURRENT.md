@@ -1,6 +1,24 @@
 # eGhiseul.ro - Status Curent
 
-**Data:** 2026-05-28 (security incident AWS key — rezolvat în <1h)
+**Data:** 2026-05-29 (KYC face-match fix + LIVE pe Vercel pentru testare internă)
+
+---
+
+## ✅ SESIUNE 2026-05-29 — KYC face-match fix + deploy Vercel (testare internă)
+
+**🟢 LIVE pentru testare:** https://eghiseul-ro.vercel.app (Stripe **TEST mode**). Colegii pot testa comenzi cap-coadă. Runbook complet: [`deployment/VERCEL_DEPLOYMENT.md`](deployment/VERCEL_DEPLOYMENT.md).
+
+**Fix KYC identitate (pașaport):** Face-matchingul selfie↔act nu rula deloc pentru pașapoarte. Cauză: actul se salvează ca `passport_opened`, dar lookup-ul de referință căuta `passport` → referința nu era găsită, verificarea era sărită silențios. Reparat + politică nouă de „manual review" (referință PDF / confidence la limită / match indisponibil → flag pentru operator, niciodată drop silențios). Logica admin de review extrasă în `src/lib/kyc/review.ts` (testabilă). **41 teste KYC** (era 10), total suită **1007**. Detalii: [`session-logs/2026-05-29-kyc-face-match-passport-fix.md`](session-logs/2026-05-29-kyc-face-match-passport-fix.md) + spec feature [`technical/specs/kyc-identity-verification.md`](technical/specs/kyc-identity-verification.md).
+
+**Deploy Vercel (rezolvă TODO-ul de pe 2026-05-28):** Toate cele 29 env vars setate pe Vercel (Production+Preview). Corectat: `NEXT_PUBLIC_APP_URL`/`SITE_URL` → `https://eghiseul-ro.vercel.app` (erau `eghiseul.ro`, domeniu neconectat). Generat `CRON_SECRET` + `PII_ENCRYPTION_KEY` (lipseau). Oblio sincronizat și în `.env.local`. Redeploy făcut (env se aplică doar la rebuild).
+
+**Stripe webhook (test):** Endpoint creat → `https://eghiseul-ro.vercel.app/api/webhooks/stripe/` (**slash final obligatoriu** — `trailingSlash:true`, altfel 308). Evenimente: `checkout.session.completed`, `payment_intent.succeeded`/`payment_intent.payment_failed`, `charge.refunded`. `STRIPE_WEBHOOK_SECRET` actualizat pe Vercel. Endpoint verificat (400 la POST nesemnat = viu).
+
+**⏳ Înainte de LIVE real (clienți):** domeniu custom conectat + URL-uri actualizate · chei Stripe **LIVE** + webhook live · env vars pe **Preview** (CLI-ul vechi eșuează, de setat din dashboard). Checklist în runbook.
+
+---
+
+**Data sesiune precedentă:** 2026-05-28 (security incident AWS key — rezolvat în <1h)
 **Detalii sesiune precedentă (2026-05-27):**
 - Dimineață: Step 2 simplification → `docs/session-logs/2026-05-27-step2-simplification.md`
 - După-amiază: admin parity + abandoned carts → `docs/session-logs/2026-05-27-admin-parity-overhaul.md`

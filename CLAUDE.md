@@ -26,6 +26,7 @@ Platforma digitala pentru Romania - servicii publice digitalizate (9 servicii ac
 | **Admin panel** | `docs/admin/README.md` |
 | **RBAC & permisiuni** | `docs/admin/rbac-permissions.md` |
 | **Document generation** | `docs/technical/specs/admin-document-system.md` |
+| **KYC identity & face matching** | `docs/technical/specs/kyc-identity-verification.md` |
 | **Number registry (Barou)** | `docs/technical/specs/number-registry-system.md` |
 | **AWB & tracking** | `docs/technical/specs/awb-generation-tracking.md` |
 | **Delivery system** | `docs/technical/specs/delivery-system-architecture.md` |
@@ -33,6 +34,7 @@ Platforma digitala pentru Romania - servicii publice digitalizate (9 servicii ac
 | **Fan Courier API** | `docs/technical/specs/fan-courier-integration.md` |
 | **Plati & facturare** | `docs/technical/specs/stripe-oblio-payment-invoicing.md` |
 | **Security** | `docs/security/README.md` |
+| **Vercel deploy & Stripe webhook** | `docs/deployment/VERCEL_DEPLOYMENT.md` |
 | **S3 setup** | `docs/deployment/AWS_S3_SETUP.md` |
 | **DB migrations guide** | `docs/deployment/DATABASE_MIGRATIONS.md` |
 | **PRD** | `docs/prd/eghiseul-prd.md` |
