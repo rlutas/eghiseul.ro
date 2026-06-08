@@ -878,10 +878,26 @@ export interface OblioInvoiceInput {
 
   // Payment info
   collect?: {
-    type: string;        // 'Card', 'Transfer bancar', etc.
-    documentNumber?: string;
+    type: string;            // 'Card', 'Transfer bancar', etc.
+    documentNumber: string;  // ⚠️ REQUIRED by Oblio when `collect` is present —
+                             //    omitting it → 400 "Parametrul documentNumber
+                             //    lipseste" and the whole invoice fails. We pass
+                             //    the order number as the payment reference.
+    documentDate?: string;
     value: number;
   };
+
+  // ⚠️ Onorariu Avocat (2026-06-08): services with `services.lawyer_fee_ron > 0`
+  // (cazier judiciar/fiscal, certificate naștere/căsătorie/integritate/celibat —
+  // migration 047) get a separate "Onorariu Avocat" product line carved out of
+  // the main service price (total unchanged). `computeLawyerFee()` in
+  // `src/lib/oblio/invoice.ts` does the split; all callers (webhook,
+  // verify-payment, reissue-invoice) join `services(lawyer_fee_ron)` and pass it.
+  //
+  // ⚠️ Invoice series: env `OBLIO_SERIES_NAME=EGI2024` is the SHARED LIVE series
+  // (company EDIGITALIZARE / CIF RO49278701, also used by sister projects).
+  // eghiseul should get its OWN series before issuing real customer invoices, so
+  // test/live orders don't consume real numbers in the shared series.
 
   // Optional
   mentions?: string;

@@ -54,7 +54,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     // Fetch order with service name
     const { data: order, error: orderError } = await supabase
       .from('orders')
-      .select('*, services(name)')
+      .select('*, services(name, lawyer_fee_ron)')
       .eq('id', id)
       .single();
 
@@ -142,8 +142,9 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     let invoiceError = null;
 
     try {
-      // Get service name from joined relation
-      const serviceName = (order.services as { name: string } | null)?.name || 'Serviciu eGhiseul';
+      // Get service name + lawyer fee from joined relation
+      const svcRel = order.services as { name: string; lawyer_fee_ron?: number | null } | null;
+      const serviceName = svcRel?.name || 'Serviciu eGhiseul';
 
       invoice = await createInvoiceFromOrder(
         {
@@ -151,6 +152,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
           order_number: order.order_number ?? undefined,
           friendly_order_id: order.friendly_order_id ?? undefined,
           service_name: serviceName,
+          lawyer_fee_ron: svcRel?.lawyer_fee_ron ?? undefined,
           base_price: order.base_price ?? undefined,
           total_price: order.total_price,
           selected_options: order.selected_options as Array<{ code?: string; name: string; price: number }> | undefined,

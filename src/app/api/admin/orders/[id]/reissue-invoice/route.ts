@@ -91,7 +91,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
   const admin = createAdminClient();
   const { data: order, error: fetchErr } = await admin
     .from('orders')
-    .select('*')
+    .select('*, services(name, lawyer_fee_ron)')
     .eq('id', id)
     .single();
   if (fetchErr || !order) {
@@ -198,6 +198,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         order_number: o.order_number ?? undefined,
         friendly_order_id: o.friendly_order_id ?? undefined,
         service_name: o.services?.name ?? 'Serviciu eGhiseul',
+        lawyer_fee_ron: o.services?.lawyer_fee_ron ?? undefined,
         base_price: o.base_price ?? undefined,
         total_price: o.total_price,
         selected_options: o.selected_options ?? undefined,

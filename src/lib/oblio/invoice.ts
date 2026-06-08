@@ -36,6 +36,26 @@ export async function createInvoice(
   });
 }
 
+/**
+ * Carve a fixed lawyer fee out of a service's base price for a separate
+ * "Onorariu Avocat" invoice line. Returns the reduced service price and the
+ * fee actually applied. No split when the fee is 0/missing or the base price
+ * isn't strictly larger than the fee (can't reduce the service to ≤ 0).
+ */
+export function computeLawyerFee(
+  basePrice: number,
+  lawyerFeeRon: number | null | undefined,
+): { servicePrice: number; lawyerFee: number } {
+  const fee = lawyerFeeRon && lawyerFeeRon > 0 ? lawyerFeeRon : 0;
+  if (fee <= 0 || basePrice <= fee) {
+    return { servicePrice: basePrice, lawyerFee: 0 };
+  }
+  return {
+    servicePrice: Math.round((basePrice - fee) * 100) / 100,
+    lawyerFee: fee,
+  };
+}
+
 // ============================================================================
 // Order to Invoice
 // ============================================================================
@@ -47,6 +67,10 @@ interface OrderForInvoice {
   service_name: string;
   base_price?: number;
   total_price: number;
+  /** Lawyer fee (RON) to carve out of the main service line as a separate
+   *  "Onorariu Avocat" line. Per-service config (services.lawyer_fee_ron);
+   *  0/undefined → no split. */
+  lawyer_fee_ron?: number | null;
   // Accepts any of the historical/current shapes — normalizeOrderOptions
   // handles wizard camelCase, DB snake_case, and legacy {name, price}.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -146,11 +170,19 @@ export async function createInvoiceFromOrder(
   // Build products array
   const products: OblioProduct[] = [];
 
-  // Main service
+  // Main service — for services configured with a lawyer fee, carve a fixed
+  // "Onorariu Avocat" amount out of the service price so it shows as its own
+  // line (total unchanged). VAT identical to the service line.
+  const baseServicePrice = order.base_price || order.total_price;
+  const { servicePrice, lawyerFee } = computeLawyerFee(
+    baseServicePrice,
+    order.lawyer_fee_ron,
+  );
+
   products.push({
     name: order.service_name,
     code: order.friendly_order_id || order.order_number,
-    price: order.base_price || order.total_price,
+    price: servicePrice,
     measuringUnit: 'buc',
     currency: 'RON',
     vatPercentage: RO_VAT_RATE,
@@ -158,6 +190,20 @@ export async function createInvoiceFromOrder(
     quantity: 1,
     productType: 'Serviciu',
   });
+
+  if (lawyerFee > 0) {
+    products.push({
+      name: 'Onorariu Avocat',
+      description: 'Asistență juridică și reprezentare în fața autorităților',
+      price: lawyerFee,
+      measuringUnit: 'buc',
+      currency: 'RON',
+      vatPercentage: RO_VAT_RATE,
+      vatIncluded: true,
+      quantity: 1,
+      productType: 'Serviciu',
+    });
+  }
 
   // Add options as separate line items (canonical normalization handles all shapes)
   const normalizedOptions = normalizeOrderOptions(order.selected_options);
@@ -223,9 +269,14 @@ export async function createInvoiceFromOrder(
     });
   }
 
-  // Payment collection info
+  // Payment collection info.
+  // `documentNumber` is REQUIRED by Oblio when a `collect` block is present —
+  // omitting it returns 400 "Parametrul `documentNumber` lipseste" and the
+  // whole invoice fails to issue. We use the order number as the payment
+  // reference so the receipt ties back to the order.
   const collect: OblioCollect = {
     type: paymentMethod,
+    documentNumber: order.friendly_order_id || order.order_number || order.id,
     documentDate: new Date().toISOString().split('T')[0],
     value: order.total_price,
   };

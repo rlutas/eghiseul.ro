@@ -169,7 +169,7 @@ async function handlePaymentSucceeded(paymentIntent: Stripe.PaymentIntent) {
   // 1. Fetch full order data for invoice (with service name + estimate fields)
   const { data: order, error: fetchError } = await supabaseAdmin
     .from('orders')
-    .select('*, services(name, estimated_days, urgent_days, urgent_available)')
+    .select('*, services(name, estimated_days, urgent_days, urgent_available, lawyer_fee_ron)')
     .eq('id', orderId)
     .single()
 
@@ -251,8 +251,9 @@ async function handlePaymentSucceeded(paymentIntent: Stripe.PaymentIntent) {
 
   // 3. Create Oblio invoice
   try {
-    // Get service name from joined relation
-    const serviceName = (order.services as { name: string } | null)?.name || 'Serviciu eGhiseul';
+    // Get service name + lawyer fee from joined relation
+    const svcRel = order.services as { name: string; lawyer_fee_ron?: number | null } | null;
+    const serviceName = svcRel?.name || 'Serviciu eGhiseul';
 
     const invoice = await createInvoiceFromOrder(
       {
@@ -260,6 +261,7 @@ async function handlePaymentSucceeded(paymentIntent: Stripe.PaymentIntent) {
         order_number: order.order_number ?? undefined,
         friendly_order_id: order.friendly_order_id ?? undefined,
         service_name: serviceName,
+        lawyer_fee_ron: svcRel?.lawyer_fee_ron ?? undefined,
         base_price: order.base_price ?? undefined,
         total_price: order.total_price,
         selected_options: order.selected_options as Array<{ code?: string; name: string; price: number }> | undefined,
