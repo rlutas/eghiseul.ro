@@ -59,22 +59,27 @@ export function OrderSummaryCard({
   return (
     <Card className="overflow-hidden bg-white !py-0 !gap-0">
       <CardHeader className="!px-4 !py-3.5 border-b border-neutral-100 bg-primary-50/50 [&[class*='border-b']]:!pb-3.5">
-        <div className="flex items-center justify-between gap-2">
-          <CardTitle className="text-base font-semibold flex items-center gap-2.5 text-secondary-900 min-w-0">
-            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary-500 shrink-0 ring-2 ring-white shadow-sm">
-              <Receipt className="h-4 w-4 text-white" />
+        <CardTitle className="text-base font-semibold flex items-center gap-2.5 text-secondary-900 min-w-0">
+          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary-500 shrink-0 ring-2 ring-white shadow-sm">
+            <Receipt className="h-4 w-4 text-white" />
+          </span>
+          <span className="leading-none truncate">Rezumat comandă</span>
+        </CardTitle>
+        {/* Order code — own labelled row so it's actually visible (was a tiny
+            grey badge tucked in the corner). */}
+        {orderNumber && (
+          <div className="mt-2.5 flex items-center justify-between gap-2 rounded-lg border border-primary-200 bg-white px-3 py-2">
+            <span className="text-[11px] font-semibold uppercase tracking-wide text-neutral-500">
+              Cod comandă
             </span>
-            <span className="leading-none truncate">Rezumat comandă</span>
-          </CardTitle>
-          {orderNumber && (
             <span
-              className="inline-flex items-center rounded-md border border-primary-200/70 bg-white px-2 py-1 text-[11px] font-mono text-neutral-600 shrink-0 whitespace-nowrap"
+              className="font-mono text-sm font-bold text-primary-700 whitespace-nowrap"
               title={orderNumber}
             >
               {orderNumber}
             </span>
-          )}
-        </div>
+          </div>
+        )}
       </CardHeader>
       <CardContent className="p-4 space-y-3">
         {/* Service + its options (nested) — bundled sub-services with their

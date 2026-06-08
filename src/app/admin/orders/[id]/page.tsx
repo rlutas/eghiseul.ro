@@ -656,16 +656,16 @@ export default function AdminOrderDetailPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="sm" onClick={() => router.push('/admin/orders')}>
+      {/* Header — stacks on mobile, single row on desktop */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0 space-y-2">
+          <Button variant="ghost" size="sm" className="-ml-2 w-fit" onClick={() => router.push('/admin/orders')}>
             <ArrowLeft className="h-4 w-4" />
             Inapoi
           </Button>
-          <div>
-            <div className="flex items-center gap-3 flex-wrap">
-              <h1 className="text-2xl font-bold font-mono">{displayOrderNumber}</h1>
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <h1 className="text-xl sm:text-2xl font-bold font-mono break-all">{displayOrderNumber}</h1>
               <Badge variant={statusConfig.variant} className={`text-sm px-3 py-1 ${statusConfig.className || ''}`}>
                 {statusConfig.label}
               </Badge>
@@ -691,13 +691,13 @@ export default function AdminOrderDetailPage() {
                 </Badge>
               )}
             </div>
-            <div className="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1 text-sm text-muted-foreground">
               <span>Creata: {formatDateLong(order.created_at)}</span>
               {order.submitted_at && <span>Trimisa: {formatDate(order.submitted_at)}</span>}
             </div>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2 sm:shrink-0">
           {/* Sync Stripe — visible only for orders that have a checkout
               session but aren't marked paid. Catches "webhook didn't
               arrive" scenarios (localhost dev, prod outage, sig mismatch).
