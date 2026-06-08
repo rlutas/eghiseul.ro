@@ -89,6 +89,8 @@ interface OrderData {
   orderCode: string;
   status: string;
   paymentStatus: string;
+  invoiceNumber?: string | null;
+  invoiceUrl?: string | null;
   createdAt: string;
   updatedAt: string;
   paidAt: string | null;
@@ -509,6 +511,40 @@ function OrderStatusContent() {
                   email={email}
                   autoRefresh={true}
                 />
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Invoice — visible once Oblio issued it */}
+          {orderData.invoiceUrl && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <CreditCard className="h-5 w-5" />
+                  Factură
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                  <FileText className="h-5 w-5 text-muted-foreground shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-sm">Factură fiscală</p>
+                    {orderData.invoiceNumber && (
+                      <p className="text-xs text-muted-foreground font-mono">
+                        {orderData.invoiceNumber}
+                      </p>
+                    )}
+                  </div>
+                  <a
+                    href={orderData.invoiceUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 rounded-md bg-primary-500 px-3 py-1.5 text-sm font-medium text-white hover:bg-primary-600 transition-colors shrink-0"
+                  >
+                    <FileText className="h-4 w-4" />
+                    Vezi factura
+                  </a>
+                </div>
               </CardContent>
             </Card>
           )}

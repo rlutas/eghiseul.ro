@@ -65,6 +65,8 @@ export async function GET(request: NextRequest) {
         delivery_price,
         total_price,
         payment_status,
+        invoice_number,
+        invoice_url,
         delivery_method,
         delivery_tracking_number,
         estimated_completion_date,
@@ -221,6 +223,10 @@ export async function GET(request: NextRequest) {
         orderCode: order.friendly_order_id || order.order_number,
         status: order.status,
         paymentStatus: order.payment_status,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        invoiceNumber: (order as any).invoice_number as string | null,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        invoiceUrl: (order as any).invoice_url as string | null,
         createdAt: order.created_at,
         updatedAt: order.updated_at,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
