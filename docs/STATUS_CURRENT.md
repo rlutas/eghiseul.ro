@@ -1,6 +1,42 @@
 # eGhiseul.ro - Status Curent
 
-**Data:** 2026-05-29 (KYC face-match fix + LIVE pe Vercel pentru testare internă)
+**Data:** 2026-06-08 (fix OCR pașaport — CNP nu se extrăgea + client blocat silențios)
+
+---
+
+## ✅ SESIUNE 2026-06-08 (2) — Adresă facturare PF structurată (obligatorie pt. Oblio)
+
+**Bug raportat (Step 7 facturare):** la „Facturează pe mine", adresa de facturare era un singur câmp **opțional + needitabil** (`disabled` la self). Pentru pașaport (fără adresă pe act) câmpul rămânea gol și neputând fi completat → Oblio **nu emite factura** pe persoană fizică fără adresă (stradă + localitate + județ).
+
+**Cauză de fond:** `BillingState` nici nu avea câmpurile `city`/`county`, dar `oblio/invoice.ts` le citește separat (`billing.city`, `billing.county`) → ajungeau **mereu goale** la Oblio pentru PF.
+
+**Fix (paritate cu cazierjudiciaronline.com):**
+- `BillingState` extins: `city`, `county`, `postalCode`, `country`; `address` devine doar linia de stradă.
+- **Câmpuri structurate** în billing step: Stradă/nr (text) + **Județ (dropdown)** + **Localitate (dropdown dependent de județ)** din `romania-counties.ts` + Cod poștal (opțional). Toate **editabile** (inclusiv la „self" — pașaportul n-are adresă; CI poate fi corectat), nume/CNP rămân blocate pe act.
+- **Validare obligatorie** (`src/lib/orders/billing-validation.ts` — `isPfBillingComplete`): PF (self + altă persoană) cere nume + CNP + stradă + localitate + județ. Butonul „Plătește" e blocat fără ele. **6 teste noi.**
+- Prefill din act structurat (stradă/localitate/județ separat), județ normalizat la nume canonic via `findCounty`.
+- Admin order detail: secțiunea Facturare citește acum adresa din `billing.*` (sursa pt. Oblio) cu fallback la domiciliul scanat — vizibilă și pt. pașaport / „altă persoană".
+
+**Tests:** **1021** unit passing (+6). Lint + typecheck clean.
+
+---
+
+## ✅ SESIUNE 2026-06-08 — Fix OCR pașaport: CNP românesc + client deblocat
+
+**Bug raportat la testare (pașaport românesc scanat invers):** OCR-ul extrăgea numele/data nașterii dar **NU și CNP-ul**, deși pașaportul românesc are CNP (câmpul „5. Cod Numeric Personal" + în MRZ). Cetățeanul român era apoi **blocat silențios** la Step 2 — câmpul CNP e ascuns în scan mode iar „Continuă" rămânea dezactivat fără niciun mesaj.
+
+**Root cause (2 straturi):**
+1. **OCR** (`src/lib/services/document-ocr.ts`) — prompt-ul pașaport spunea doar „CNP uneori vizibil", fără să indice unde (câmpul 5 / MRZ personal number) și fără toleranță la poze răsturnate.
+2. **UI** (`PersonalDataStep.tsx:203,1387`) — `hideExtractedFields = mode==='scan'` ascunde câmpul CNP; sumarul apare doar dacă CNP e valid. CNP gol + cetățean român → `isFormValid()` false, fără mesaj.
+
+**Fix (generalizat la TOATE actele de identitate):**
+- **Prompturi îmbunătățite**: pașaport (`extractFromPassportOpened` + `extractFromPassport`) — locație CNP explicită (câmp 5 + MRZ personal number), orientare răsturnată, MRZ complet în JSON. CI față are deja orientare + diacritice.
+- **Fallback determinist MRZ → CNP, pe poziții** (`applyMrzCnpFallback`): aplicat la `ci_front` (CI vechi, MRZ TD1 pe față), `ci_nou_back` (eCI, MRZ TD1 pe spate) și ambii extractori de pașaport (MRZ TD3). Folosește parserele **poziționale** existente (`parseRomanianEciMrz` TD1 + `parsePassportMrz` TD3 nou), NU scanare oarbă.
+- **⚠️ Garda anti-false-positive**: o scanare naivă „orice 13 cifre care trec validateCNP" returna pe MRZ-ul TD1 al CI nou un CNP **fantomă** (`4171021143451` = născut 1817, checksum corect din întâmplare) înaintea celui real. De-aia extracția e strict pe poziții, cu test de regresie dedicat.
+- **UI nu mai blochează silențios** (general, toate tipurile de scan): după un scan unde CNP-ul lipsește (cetățean român), câmpul CNP se deblochează + banner amber clar. Clientul nu mai rămâne niciodată blocat fără feedback.
+- **Logică păstrată corect**: cerința CNP rămâne dictată de cetățenia din Step 1 (român = obligatoriu, străin = opțional).
+
+**Tests:** **1015** unit passing (era 1007; +8 `document-ocr-passport-mrz.test.ts`, inclusiv garda anti-false-positive). Lint + typecheck clean.
 
 ---
 
