@@ -4,6 +4,20 @@
 
 ---
 
+## ✅ SESIUNE 2026-06-08 (3) — Oblio: fix emitere factură + Onorariu Avocat + admin mobil
+
+**🐛 Bug critic Oblio reparat (de ce nu se emiteau facturile):** `collect` din `invoice.ts` nu trimitea `documentNumber` → Oblio respingea cu „Parametrul documentNumber lipsește" → toate facturile eșuau („Crearea facturii a eșuat" pe comenzi). Confirmat live: emis test reușit pe RAPIDCERT/CID (factura `CID-0002`, 278 RON) după ce am adăugat `documentNumber` (= numărul comenzii). Fix în `invoice.ts`.
+
+**🟣 Onorariu Avocat (linie separată pe factură):** servicii cu `services.lawyer_fee_ron > 0` (migration 047: cazier judiciar PF/PJ, cazier fiscal, certificat naștere/căsătorie/integritate/celibat = 15 RON) primesc o linie „Onorariu Avocat" scoasă din prețul serviciului principal (total neschimbat), VAT identic. `computeLawyerFee()` testabil (`invoice.ts`), toți callerii (webhook, verify-payment, reissue-invoice) fac join `services(lawyer_fee_ron)`. Paritate cu cazierjudiciaronline.com. **5 teste noi.**
+
+**📱 Admin order detail — mobile friendly:** header-ul (`/admin/orders/[id]`) se înghesuia pe mobil (titlu + badge-uri + butoane pe un rând). Acum: stack pe mobil / rând pe desktop, butoane cu `flex-wrap`, order number `break-all` + `text-xl sm:text-2xl`, date cu wrap.
+
+**⚠️ DE REZOLVAT înainte de deploy invoice:** (1) eghiseul scrie în seria LIVE partajată `EGI2024` — trebuie serie proprie; (2) storno factura test `CID-0002` de pe RAPIDCERT.
+
+**Tests:** **1026** unit passing. Lint + typecheck clean. Migration 047 aplicată.
+
+---
+
 ## ✅ SESIUNE 2026-06-08 (2) — Adresă facturare PF structurată (obligatorie pt. Oblio)
 
 **Bug raportat (Step 7 facturare):** la „Facturează pe mine", adresa de facturare era un singur câmp **opțional + needitabil** (`disabled` la self). Pentru pașaport (fără adresă pe act) câmpul rămânea gol și neputând fi completat → Oblio **nu emite factura** pe persoană fizică fără adresă (stradă + localitate + județ).
