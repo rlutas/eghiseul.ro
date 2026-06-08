@@ -16,6 +16,7 @@
  */
 
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { validateCNP } from '@/lib/validations/cnp';
 
 // Initialize Gemini AI with the 2.5 Flash Lite model for OCR
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY || '');
@@ -232,7 +233,9 @@ Răspunde în acest format JSON:
 
     const response = await result.response;
     const text = response.text();
-    return parseGeminiOCRResponse(text, 'ci_front');
+    // Old CIs carry a TD1 MRZ on the front whose personal-number field holds
+    // the CNP — recover it deterministically if Gemini missed the printed one.
+    return applyMrzCnpFallback(parseGeminiOCRResponse(text, 'ci_front'));
   } catch (error) {
     console.error('CI Front OCR error:', error);
     return createErrorResult('ci_front', 'Eroare la procesarea documentului');
@@ -397,7 +400,10 @@ IMPORTANT FINAL: NU SCRIE ÎN "issues" "Address information not visible" sau ech
 
     const response = await result.response;
     const text = response.text();
-    return parseGeminiOCRResponse(text, 'ci_back');  // reuse parser, document type stays ci_back for backward compat in OCRResult
+    // eCI back MRZ (TD1, 3 lines) carries the CNP in its personal-number
+    // field — recover it so the CNP can backfill even if the front scan missed
+    // it. Reliable: scans for the unique validateCNP-passing 13-digit run.
+    return applyMrzCnpFallback(parseGeminiOCRResponse(text, 'ci_back')); // reuse parser, document type stays ci_back for backward compat in OCRResult
   } catch (error) {
     console.error('CI Nou Back OCR error:', error);
     return createErrorResult('ci_back', 'Eroare la procesarea documentului');
@@ -424,6 +430,8 @@ export async function extractFromPassportOpened(
 
 IMPORTANT: Răspunde DOAR în format JSON valid, fără markdown, fără explicații.
 
+ORIENTAREA IMAGINII: Poza poate fi rotită sau RĂSTURNATĂ (cu susul în jos) — clienții fotografiază des greșit. Analizează conținutul ca și cum ar fi orientat corect, indiferent de cum apare. NU refuza și NU rata câmpuri din cauza orientării. Ignoră degete, masă, fundal.
+
 PAȘAPORTUL ROMÂN are pe pagina cu foto:
   • Nume (Surname)
   • Prenume (Given names)
@@ -435,19 +443,25 @@ PAȘAPORTUL ROMÂN are pe pagina cu foto:
   • Data emiterii (Date of issue)
   • Data expirării (Date of expiry)
   • Autoritatea emitentă (Authority)
-  • CNP (Personal Code) — uneori vizibil
+  • CNP — câmpul numerotat "5. Cod Numeric Personal / Personal No. / Nr. personal"
   • Foto color
   • MRZ — 2 rânduri în partea de jos cu "P<ROU..."
 
-Pașapoarte STRĂINE au fields similare (Surname/Nom, Given names/Prénoms) în engleză + franceză + limba locală.
+⚠️ CNP (CRITIC pentru pașaport ROMÂNESC): pașapoartele românești AU ÎNTOTDEAUNA CNP-ul, 13 cifre. Se găsește în DOUĂ locuri — caută-l în AMBELE și verifică să fie identice:
+  1. Câmpul numerotat "5. Cod Numeric Personal/Personal No./Nr. personal" de pe pagina cu foto.
+  2. MRZ rândul 2 — ULTIMUL grup lung de cifre (câmpul "personal number"), înainte de cifrele de control finale.
+Dacă pașaportul are cetățenia "ROU", CNP-ul NU poate fi null — extrage-l. Pentru pașapoarte STRĂINE (non-ROU) NU există CNP → pune null.
+
+Pașapoarte STRĂINE au fields similare (Surname/Nom, Given names/Prénoms) în engleză + franceză + limba locală și NU au CNP.
 
 IMPORTANT: NU căuta adresa de domiciliu. Pașapoartele NU au adresă printată niciodată.
 
-MRZ-ul (Machine Readable Zone) ICAO 9303-1:
+MRZ-ul (Machine Readable Zone) ICAO 9303-1 (TD3, 2 rânduri × 44 caractere):
   Linia 1: P<<COD_TARA><NUME><<PRENUME><<<...
-  Linia 2: <NR_PAȘAPORT><CHECKSUM><COD_TARA><DATA_NAȘTERE><SEX><DATA_EXPIRARE><...
+  Linia 2: <NR_PAȘAPORT(9)><check><COD_TARA(3)><DATA_NAȘTERE(6)><check><SEX><DATA_EXPIRARE(6)><check><PERSONAL_NUMBER(14)><check><check>
+  La pașaportul ROMÂNESC câmpul PERSONAL_NUMBER conține CNP-ul (13 cifre).
 
-Extrage MRZ-ul EXACT cum apare. Caracterele "<" sunt padding standard.
+Extrage MRZ-ul EXACT cum apare, fiecare rând complet, inclusiv toate cifrele. Caracterele "<" sunt padding standard.
 
 Răspunde în acest format JSON:
 {
@@ -488,7 +502,7 @@ Răspunde în acest format JSON:
 
     const response = await result.response;
     const text = response.text();
-    return parseGeminiOCRResponse(text, 'passport');
+    return applyMrzCnpFallback(parseGeminiOCRResponse(text, 'passport'));
   } catch (error) {
     console.error('Passport Opened OCR error:', error);
     return createErrorResult('passport', 'Eroare la procesarea documentului');
@@ -715,6 +729,111 @@ export function parseRomanianEciMrz(mrzRaw: string[] | undefined): {
   return out;
 }
 
+/**
+ * Parse a passport's TD3 (2-line) MRZ into structured fields + the CNP.
+ *
+ * The CNP is read by POSITION, not by scanning for any 13-digit run. A blind
+ * scan is unsafe: a long concatenated digit run can contain a spurious 13-digit
+ * window that happens to pass `validateCNP` (e.g. a nonsense "born 1817" code
+ * with a coincidentally-correct checksum) before the real one. The fixed-width
+ * TD3 layout lets us target the personal-number field exactly.
+ *
+ * TD3 line 2 layout (44 chars):
+ *   passportNo(9) check(1) nationality(3) birth(6) check(1) sex(1)
+ *   expiry(6) check(1) personalNumber(14) check(1) overallCheck(1)
+ * Romania puts the CNP (13 digits) at the start of the personal-number field.
+ */
+export function parsePassportMrz(
+  mrz: { line1?: string | null; line2?: string | null } | string[] | undefined,
+): {
+  passportNumber?: string;
+  nationality?: string;
+  birthDate?: string; // YYMMDD as on MRZ
+  sex?: 'M' | 'F';
+  expiryDate?: string; // YYMMDD as on MRZ
+  cnp?: string;
+} {
+  if (!mrz) return {};
+
+  const lines: string[] = Array.isArray(mrz)
+    ? mrz
+    : [mrz.line1 ?? '', mrz.line2 ?? ''];
+
+  const clean = lines.map((l) => (l || '').toUpperCase().replace(/\s/g, ''));
+  if (clean.every((l) => l.length === 0)) return {};
+
+  const out: ReturnType<typeof parsePassportMrz> = {};
+
+  // Find the line that matches the TD3 second-line layout and pull every field
+  // by position. Group 9 is the 14-char personal-number field (CNP + padding).
+  for (const l of clean) {
+    const m = l.match(
+      /([A-Z0-9<]{9})(\d)([A-Z<]{1,3})(\d{6})(\d)([MFX<])(\d{6})(\d)([A-Z0-9<]{0,14})/,
+    );
+    if (m) {
+      out.passportNumber = m[1].replace(/</g, '');
+      out.nationality = m[3].replace(/</g, '') || undefined;
+      out.birthDate = m[4];
+      if (m[6] === 'M' || m[6] === 'F') out.sex = m[6];
+      out.expiryDate = m[7];
+      const personal = (m[9] || '').replace(/</g, '');
+      const candidate = personal.slice(0, 13);
+      if (candidate.length === 13 && validateCNP(candidate).valid) {
+        out.cnp = candidate;
+      }
+      break;
+    }
+  }
+
+  return out;
+}
+
+/**
+ * If Gemini missed (or mis-read) the CNP on a Romanian ID, recover it
+ * deterministically from the MRZ. Delegates to the POSITION-BASED parsers
+ * (never a blind digit scan): `parseRomanianEciMrz` for the electronic CI back
+ * (TD1, 3 lines, `mrzRaw[]`) and `parsePassportMrz` for passports (TD3, 2
+ * lines, `mrz.{line1,line2}`). Mutates and returns the same OCRResult. No-op
+ * when the CNP is already valid or the MRZ holds no valid CNP (foreign doc).
+ */
+function applyMrzCnpFallback(result: OCRResult): OCRResult {
+  const data = result.extractedData as ExtractedPersonalData & {
+    mrz?: { line1?: string | null; line2?: string | null; line3?: string | null };
+    mrzRaw?: string[];
+  };
+
+  if (data.cnp && validateCNP(data.cnp).valid) return result;
+
+  // Gather MRZ lines from whichever shape the extractor used: `mrzRaw[]` (eCI
+  // back) or the `mrz` object (passport / old CI front).
+  const lines: string[] = (
+    data.mrzRaw?.length
+      ? data.mrzRaw
+      : [data.mrz?.line1, data.mrz?.line2, data.mrz?.line3]
+  ).filter((l): l is string => !!l && l.trim().length > 0);
+
+  if (lines.length === 0) return result;
+
+  // Try both POSITION-BASED parsers — each only matches its own MRZ format
+  // (TD1 eCI/old-CI vs TD3 passport), so passing the same lines to both is safe.
+  let cnp: string | undefined;
+  const eci = parseRomanianEciMrz(lines);
+  if (eci.cnp && validateCNP(eci.cnp).valid) cnp = eci.cnp;
+  if (!cnp) {
+    const pp = parsePassportMrz(lines);
+    if (pp.cnp) cnp = pp.cnp; // already validated inside parsePassportMrz
+  }
+
+  if (cnp) {
+    data.cnp = cnp;
+    // Drop any "CNP not found" style noise now that we recovered it.
+    result.issues = (result.issues ?? []).filter(
+      (i) => !/cnp|cod numeric/i.test(i),
+    );
+  }
+  return result;
+}
+
 export function crossValidateExtractedData(scans: {
   ci_front?: ExtractedPersonalData;
   ci_nou_back?: ExtractedCINouBack;
@@ -862,6 +981,8 @@ export async function extractFromPassport(
 
 IMPORTANT: Răspunde DOAR în format JSON valid, fără markdown, fără explicații.
 
+ORIENTAREA IMAGINII: Poza poate fi rotită sau RĂSTURNATĂ (cu susul în jos). Analizează conținutul ca și cum ar fi orientat corect, indiferent de cum apare. NU rata câmpuri din cauza orientării.
+
 Extrage următoarele date:
 - Nume complet (Surname / Nom)
 - Prenume (Given Names / Prénoms)
@@ -872,9 +993,14 @@ Extrage următoarele date:
 - Numărul pașaportului
 - Data emiterii (Date of Issue)
 - Data expirării (Date of Expiry)
-- CNP (dacă este pașaport românesc - se găsește în zona MRZ sau separat)
+- CNP — 13 cifre, OBLIGATORIU pentru pașaport ROMÂNESC (cetățenie "ROU")
 
-Verifică și zona MRZ (Machine Readable Zone) de la baza paginii dacă este vizibilă.
+⚠️ CNP (pașaport ROMÂNESC): caută-l în AMBELE locuri:
+  1. Câmpul "5. Cod Numeric Personal / Personal No. / Nr. personal".
+  2. MRZ rândul 2 — ultimul grup lung de cifre (câmpul "personal number").
+Cetățenie "ROU" → CNP-ul NU poate fi null. Pașaport STRĂIN (non-ROU) → CNP null.
+
+Extrage MRZ-ul (Machine Readable Zone, 2 rânduri de la baza paginii cu foto) EXACT cum apare, complet.
 
 Răspunde în acest format JSON:
 {
@@ -892,7 +1018,11 @@ Răspunde în acest format JSON:
     "number": "numărul pașaportului sau null",
     "issueDate": "DD.MM.YYYY sau null",
     "expiryDate": "DD.MM.YYYY sau null",
-    "issuedBy": "string sau null"
+    "issuedBy": "string sau null",
+    "mrz": {
+      "line1": "primul rând MRZ sau null",
+      "line2": "al doilea rând MRZ sau null"
+    }
   },
   "issues": ["lista problemelor detectate"],
   "suggestions": ["sugestii pentru îmbunătățire"]
@@ -911,7 +1041,7 @@ Răspunde în acest format JSON:
 
     const response = await result.response;
     const text = response.text();
-    return parseGeminiOCRResponse(text, 'passport');
+    return applyMrzCnpFallback(parseGeminiOCRResponse(text, 'passport'));
   } catch (error) {
     console.error('Passport OCR error:', error);
     return createErrorResult('passport', 'Eroare la procesarea documentului');

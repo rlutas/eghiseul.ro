@@ -150,6 +150,13 @@ Extracts data from a specific document type for optimized results.
 - `ci_back` - Romanian ID card - back side (address side)
 - `passport` - Any EU passport (Romanian or other nationalities)
 
+> **Passport CNP recovery (2026-06-08):** Romanian passports carry the CNP both
+> in field "5. Cod Numeric Personal" and in the MRZ personal-number field. When
+> Gemini misses it (rotated/upside-down photos), `parsePassportMrz()` recovers
+> it deterministically from the MRZ — it returns the unique 13-digit run that
+> passes full `validateCNP` (checksum + date + county). Foreign (non-ROU)
+> passports have no CNP, so the field stays `null` and is not required.
+
 **Example Request**:
 
 ```bash

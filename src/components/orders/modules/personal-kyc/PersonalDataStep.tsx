@@ -764,6 +764,25 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
 
   const cnpValidation = validateCNP(personalKyc.cnp);
 
+  // After a scan, if the CNP couldn't be read — e.g. an upside-down passport
+  // where both Gemini OCR and the MRZ fallback missed it — a Romanian citizen
+  // would otherwise be silently stuck: the CNP field is hidden in scan mode but
+  // CNP is required to advance. Detect that case and surface the CNP input +
+  // an explicit message so the customer can finish manually. Foreign citizens
+  // don't have a CNP, so this never applies to them.
+  const anyScanCompleted =
+    ciFrontScan.success ||
+    ciBackScan.success ||
+    ciNouBackScan.success ||
+    passportOpenedScan.success ||
+    roCeiPdfScan.success ||
+    (personalKyc.uploadedDocuments?.length ?? 0) > 0;
+  const cnpMissingAfterScan =
+    mode === 'scan' &&
+    anyScanCompleted &&
+    personalKyc.citizenship === 'romanian' &&
+    !cnpValidation.valid;
+
   // Render scan card — accepts any of the 5 ScanType variants. The card
   // chrome (border colors, success state, error overlay) is the same
   // regardless of which document is being scanned; only the icon, title,
@@ -1377,14 +1396,27 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
         {/* "Identificare" header + CNP input — hidden in scan mode.
             OCR fills CNP into state silently; the read-only summary card below
             surfaces the result. Manual mode keeps the full input visible. */}
-        {!hideExtractedFields && (
+        {(!hideExtractedFields || cnpMissingAfterScan) && (
         <div className="flex items-center gap-2 text-secondary-900">
           <CreditCard className="h-5 w-5 text-primary-500" />
           <h3 className="font-semibold">Identificare</h3>
         </div>
         )}
 
-        {!hideExtractedFields && (
+        {/* Scan succeeded but CNP couldn't be read — tell the customer plainly
+            instead of leaving the "Continuă" button silently disabled. */}
+        {cnpMissingAfterScan && (
+          <Alert className="border-amber-300 bg-amber-50 text-amber-800">
+            <AlertCircle className="h-4 w-4 text-amber-600" />
+            <AlertDescription>
+              Nu am putut citi CNP-ul de pe documentul scanat. Completează-l manual
+              mai jos ca să poți continua (îl găsești pe pașaport la „5. Cod Numeric
+              Personal” sau pe CI).
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {(!hideExtractedFields || cnpMissingAfterScan) && (
         <div className="space-y-2">
           <Label htmlFor="cnp" className="text-secondary-900 font-medium">
             CNP (Cod Numeric Personal){' '}
