@@ -389,7 +389,10 @@ export async function POST(
           }
           return null;
         })(),
-        visible_to_client: ['contract_complet', 'contract_prestari', 'contract_asistenta', 'imputernicire', 'cerere_eliberare_pf', 'cerere_eliberare_pj'].includes(docType),
+        // Only the service contract is client-visible. Contract de asistență,
+        // împuternicirea și cererile de eliberare sunt acte interne / cu date
+        // personale și NU se publică pe pagina de status a clientului.
+        visible_to_client: docType === 'contract_prestari',
         generated_by: user.id,
         metadata: {
           template,

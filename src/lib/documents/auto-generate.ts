@@ -329,7 +329,10 @@ export async function autoGenerateOrderDocuments(
         file_size: buffer.length,
         mime_type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
         document_number: docNumber,
-        visible_to_client: ['contract_prestari', 'contract_asistenta'].includes(docType),
+        // Only the service contract is exposed to the customer on the status
+        // page. Contract de asistență juridică, împuternicirea și cererile
+        // conțin date cu caracter personal / acte interne — NU se publică.
+        visible_to_client: docType === 'contract_prestari',
         generated_by: generatedBy,
         metadata: {
           template,
