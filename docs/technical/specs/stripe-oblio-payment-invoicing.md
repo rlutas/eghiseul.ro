@@ -848,13 +848,22 @@ export interface OblioInvoiceInput {
     name: string;
     cif?: string;        // For PJ
     vatPayer?: boolean;
-    address?: string;
-    city?: string;
-    county?: string;
+    address?: string;    // street line — REQUIRED (Oblio rejects empty)
+    city?: string;       // localitate — REQUIRED
+    county?: string;     // județ — REQUIRED
     country?: string;
     email?: string;
     phone?: string;
   };
+
+  // ⚠️ PF invoice address (2026-06-08): for persoană fizică the client
+  // address comes from the wizard billing step (`customer_data.billing.address`
+  // = street, `.city` = localitate, `.county` = județ), collected as structured
+  // required fields (județ + localitate dropdowns). Passports carry no address,
+  // so the customer fills it in. `createInvoiceFromOrder` in
+  // `src/lib/oblio/invoice.ts` reads these; `isPfBillingComplete`
+  // (`src/lib/orders/billing-validation.ts`) gates the wizard so an empty
+  // address can't reach Oblio.
 
   // Products/Services
   products: Array<{

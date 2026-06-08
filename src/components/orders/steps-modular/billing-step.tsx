@@ -24,8 +24,17 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { useModularWizard } from '@/providers/modular-wizard-provider';
 import { cn } from '@/lib/utils';
+import { COUNTIES, getLocalitiesForCounty, findCounty } from '@/lib/data/romania-counties';
+import { isPfBillingComplete } from '@/lib/orders/billing-validation';
 import type { BillingSource, BillingState } from '@/types/verification-modules';
 
 interface BillingStepProps {
@@ -92,7 +101,10 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
     (bp: { type: string; billing_data?: Record<string, unknown> }) => bp.type === 'persoana_juridica'
   );
 
-  // Get prefill data from personal KYC (memoized to avoid new object refs each render)
+  // Get prefill data from personal KYC (memoized to avoid new object refs each render).
+  // Address is kept STRUCTURED — Oblio needs street/locality/county separately.
+  // Passport holders have no address on the document, so these come back empty
+  // and the customer fills them in (the fields are editable, see below).
   const prefillFromId = useMemo(() => personalKyc ? {
     firstName: personalKyc.firstName,
     lastName: personalKyc.lastName,
@@ -102,15 +114,19 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
       personalKyc.address?.number ? `Nr. ${personalKyc.address.number}` : null,
       personalKyc.address?.building ? `Bl. ${personalKyc.address.building}` : null,
       personalKyc.address?.apartment ? `Ap. ${personalKyc.address.apartment}` : null,
-      personalKyc.address?.city,
-      personalKyc.address?.county,
     ].filter(Boolean).join(', '),
+    city: personalKyc.address?.city || '',
+    // Normalize the scanned county to the canonical name so it matches a
+    // dropdown option (OCR may return a code "SM" or a "Jud. ..." prefix).
+    county: findCounty(personalKyc.address?.county)?.name || '',
+    postalCode: personalKyc.address?.postalCode || '',
   // eslint-disable-next-line react-hooks/exhaustive-deps
   } : undefined, [
     personalKyc?.firstName, personalKyc?.lastName, personalKyc?.cnp,
     personalKyc?.address?.street, personalKyc?.address?.number,
     personalKyc?.address?.building, personalKyc?.address?.apartment,
     personalKyc?.address?.city, personalKyc?.address?.county,
+    personalKyc?.address?.postalCode,
   ]);
 
   // For PJ orders: auto-default to 'company' billing and prefill from companyKyc
@@ -154,8 +170,19 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
         lastName: prefillFromId.lastName,
         cnp: prefillFromId.cnp,
         address: prefillFromId.address,
+        city: prefillFromId.city,
+        county: prefillFromId.county,
+        postalCode: prefillFromId.postalCode,
+        country: 'Romania',
         type: 'persoana_fizica',
-        isValid: Boolean(prefillFromId.firstName && prefillFromId.lastName && prefillFromId.cnp),
+        isValid: isPfBillingComplete({
+          firstName: prefillFromId.firstName,
+          lastName: prefillFromId.lastName,
+          cnp: prefillFromId.cnp,
+          address: prefillFromId.address,
+          city: prefillFromId.city,
+          county: prefillFromId.county,
+        }),
       });
     }
   }, [isPJOrder, billing?.source, billing?.firstName, prefillFromId, updateBilling]);
@@ -165,6 +192,9 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
   const billingFirstName = billing?.firstName;
   const billingLastName = billing?.lastName;
   const billingCnp = billing?.cnp;
+  const billingAddress = billing?.address;
+  const billingCity = billing?.city;
+  const billingCounty = billing?.county;
   const billingCuiVerified = billing?.cuiVerified;
   const billingCompanyName = billing?.companyName;
   const billingCui = billing?.cui;
@@ -179,12 +209,17 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
 
     let isValid = false;
 
-    if (billingSource === 'self') {
-      // Self: must have name and CNP (pre-filled from ID)
-      isValid = Boolean(billingFirstName && billingLastName && billingCnp);
-    } else if (billingSource === 'other_pf') {
-      // Other PF: must have name and CNP
-      isValid = Boolean(billingFirstName && billingLastName && billingCnp);
+    if (billingSource === 'self' || billingSource === 'other_pf') {
+      // PF: name + CNP + full address (street + locality + county) — Oblio
+      // refuses the invoice without a complete address.
+      isValid = isPfBillingComplete({
+        firstName: billingFirstName,
+        lastName: billingLastName,
+        cnp: billingCnp,
+        address: billingAddress,
+        city: billingCity,
+        county: billingCounty,
+      });
     } else if (billingSource === 'company') {
       // Company: must have verified CUI and company name
       isValid = Boolean(billingCuiVerified && billingCompanyName && billingCui);
@@ -196,12 +231,13 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
     }
 
     onValidChange(isValid);
-  }, [billingSource, billingFirstName, billingLastName, billingCnp, billingCuiVerified, billingCompanyName, billingCui, billingIsValid, onValidChange, updateBilling]);
+  }, [billingSource, billingFirstName, billingLastName, billingCnp, billingAddress, billingCity, billingCounty, billingCuiVerified, billingCompanyName, billingCui, billingIsValid, onValidChange, updateBilling]);
 
   // Handle source selection
   const handleSourceSelect = useCallback((source: BillingSource) => {
     if (source === 'self') {
-      // Use data from ID scan
+      // Use data from ID scan (name/CNP authoritative; address prefilled when
+      // the document carries one, otherwise left blank for the customer).
       updateBilling({
         source,
         type: 'persoana_fizica',
@@ -209,13 +245,24 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
         lastName: prefillFromId?.lastName || '',
         cnp: prefillFromId?.cnp || '',
         address: prefillFromId?.address || '',
+        city: prefillFromId?.city || '',
+        county: prefillFromId?.county || '',
+        postalCode: prefillFromId?.postalCode || '',
+        country: 'Romania',
         // Clear company fields
         companyName: undefined,
         cui: undefined,
         regCom: undefined,
         companyAddress: undefined,
         cuiVerified: undefined,
-        isValid: Boolean(prefillFromId?.firstName && prefillFromId?.lastName && prefillFromId?.cnp),
+        isValid: isPfBillingComplete({
+          firstName: prefillFromId?.firstName,
+          lastName: prefillFromId?.lastName,
+          cnp: prefillFromId?.cnp,
+          address: prefillFromId?.address,
+          city: prefillFromId?.city,
+          county: prefillFromId?.county,
+        }),
       });
       setCuiSuccess(false);
       setCuiError(null);
@@ -228,6 +275,10 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
         lastName: '',
         cnp: '',
         address: '',
+        city: '',
+        county: '',
+        postalCode: '',
+        country: 'Romania',
         // Clear company fields
         companyName: undefined,
         cui: undefined,
@@ -261,6 +312,9 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
         lastName: undefined,
         cnp: undefined,
         address: undefined,
+        city: undefined,
+        county: undefined,
+        postalCode: undefined,
         // Prefill: companyKyc > saved profile > empty
         companyName: companyKyc?.companyName || pjData?.companyName || billing?.companyName || '',
         cui: companyKyc?.cui || pjData?.cui || billing?.cui || '',
@@ -288,6 +342,18 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
       updateBilling({ cuiVerified: false });
     }
   }, [updateBilling]);
+
+  // County → reset locality when it no longer belongs to the new county.
+  const handleCountyChange = useCallback((countyName: string) => {
+    const stillValid = getLocalitiesForCounty(countyName).includes(billing?.city || '');
+    updateBilling({ county: countyName, city: stillValid ? billing?.city : '' });
+  }, [billing?.city, updateBilling]);
+
+  // Localities for the currently selected billing county (dependent dropdown).
+  const billingLocalities = useMemo(
+    () => getLocalitiesForCounty(billing?.county),
+    [billing?.county],
+  );
 
   // Validate CUI and fetch company data
   const validateCUI = useCallback(async () => {
@@ -461,18 +527,84 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
             />
           </div>
 
+          {/* Structured billing address — required for Oblio (street + locality
+              + county sent separately). Always editable, even for "self": a
+              passport carries no address, and a scanned CI address may need a
+              correction. Name/CNP stay locked to the scanned document. */}
           <div className="space-y-2">
             <Label htmlFor="address" className="text-secondary-900 font-medium">
-              Adresă facturare
+              Stradă, număr, bloc, ap. <span className="text-red-500">*</span>
             </Label>
             <Input
               id="address"
               type="text"
               value={billing?.address || ''}
               onChange={(e) => updateField('address', e.target.value)}
-              placeholder="Strada, număr, localitate, județ"
+              placeholder="ex: Str. Mihai Viteazu nr. 10, bl. A2, ap. 5"
               className="bg-white"
-              disabled={selectedSource === 'self'}
+            />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="county" className="text-secondary-900 font-medium">
+                Județ <span className="text-red-500">*</span>
+              </Label>
+              <Select
+                value={billing?.county || ''}
+                onValueChange={handleCountyChange}
+              >
+                <SelectTrigger id="county" className="bg-white">
+                  <SelectValue placeholder="Alege județul" />
+                </SelectTrigger>
+                <SelectContent>
+                  {COUNTIES.map((c) => (
+                    <SelectItem key={c.code} value={c.name}>
+                      {c.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="city" className="text-secondary-900 font-medium">
+                Localitate <span className="text-red-500">*</span>
+              </Label>
+              <Select
+                value={billing?.city || ''}
+                onValueChange={(v) => updateField('city', v)}
+                disabled={!billing?.county}
+              >
+                <SelectTrigger id="city" className="bg-white">
+                  <SelectValue
+                    placeholder={billing?.county ? 'Alege localitatea' : 'Alege întâi județul'}
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  {billingLocalities.map((loc) => (
+                    <SelectItem key={loc} value={loc}>
+                      {loc}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="postalCode" className="text-secondary-900 font-medium">
+              Cod poștal <span className="text-xs font-normal text-neutral-500">(opțional)</span>
+            </Label>
+            <Input
+              id="postalCode"
+              type="text"
+              inputMode="numeric"
+              maxLength={6}
+              value={billing?.postalCode || ''}
+              onChange={(e) => updateField('postalCode', e.target.value.replace(/\D/g, ''))}
+              placeholder="ex: 900001"
+              className="bg-white"
             />
           </div>
         </div>

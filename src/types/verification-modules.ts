@@ -432,7 +432,11 @@ export interface BillingState {
   firstName?: string;
   lastName?: string;
   cnp?: string;
-  address?: string;
+  address?: string;     // street line: stradă, nr, bloc, scară, ap
+  city?: string;        // localitate — required for Oblio
+  county?: string;      // județ (name, e.g. "Constanța") — required for Oblio
+  postalCode?: string;  // cod poștal — optional
+  country?: string;     // default "Romania"
 
   // Persoană Juridică fields
   companyName?: string;
