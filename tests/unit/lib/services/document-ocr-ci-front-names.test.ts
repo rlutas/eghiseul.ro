@@ -16,7 +16,17 @@ import { describe, it, expect } from 'vitest';
 import {
   recoverNamesFromMrz,
   correctCiFrontNames,
+  type OCRResult,
 } from '@/lib/services/document-ocr';
+
+// CI-front extraction carries an `mrz` object on extractedData that the public
+// ExtractedPersonalData type doesn't declare (the prompt schema produces it;
+// production casts at the use site). Mirror that shape for the test fixtures.
+type CiFrontResult = OCRResult & {
+  extractedData: OCRResult['extractedData'] & {
+    mrz?: { line1?: string | null; line2?: string | null; line3?: string | null };
+  };
+};
 
 describe('recoverNamesFromMrz', () => {
   it('parses the old TD2 name on line 1 after the IDROU prefix (the real bug)', () => {
@@ -69,11 +79,14 @@ describe('recoverNamesFromMrz', () => {
 });
 
 describe('correctCiFrontNames', () => {
-  const baseResult = (overrides: Record<string, unknown>) => ({
+  const baseResult = (
+    overrides: Partial<CiFrontResult['extractedData']>,
+  ): CiFrontResult => ({
     success: true,
-    documentType: 'ci_front' as const,
+    documentType: 'ci_front',
     confidence: 98,
     extractedData: {
+      documentType: 'ci_front',
       cnp: '1720601274785',
       lastName: 'IDROU',
       firstName: 'ANDREI EUGEN',
@@ -111,6 +124,7 @@ describe('correctCiFrontNames', () => {
       documentType: 'ci_front',
       confidence: 95,
       extractedData: {
+        documentType: 'ci_front',
         lastName: 'IDROU',
         firstName: 'ȘTEFĂNESCU MARIA',
         mrz: {
@@ -121,7 +135,7 @@ describe('correctCiFrontNames', () => {
       },
       issues: [],
       suggestions: [],
-    });
+    } as CiFrontResult);
     expect(fixed.extractedData.lastName).toBe('ȘTEFĂNESCU');
     expect(fixed.extractedData.firstName).toBe('MARIA');
   });
@@ -132,13 +146,14 @@ describe('correctCiFrontNames', () => {
       documentType: 'ci_front',
       confidence: 90,
       extractedData: {
+        documentType: 'ci_front',
         lastName: 'POPA',
         firstName: 'ION',
         mrz: { line1: null, line2: null, line3: null },
       },
       issues: [],
       suggestions: [],
-    });
+    } as CiFrontResult);
     expect(fixed.extractedData.lastName).toBe('POPA');
     expect(fixed.extractedData.firstName).toBe('ION');
   });
