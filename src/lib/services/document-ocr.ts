@@ -177,6 +177,12 @@ Pentru ADRESĂ (dacă există pe față), parsează în componente:
 
 Pentru MRZ, extrage textul complet din fiecare linie. MRZ-ul nu conține diacritice (e ASCII) — îl extragi exact așa cum apare.
 
+⚠️ NUME vs PRENUME (CRITIC):
+- "Nume" (Last Name) și "Prenume" (First Name) sunt câmpurile ETICHETATE de pe fața cardului — acelea sunt sursa de adevăr.
+- NU pune NICIODATĂ în lastName prefixul din MRZ: "ID" = tipul actului, "ROU" = codul țării. Secvența "IDROU" de la începutul MRZ NU face parte din nume.
+- În MRZ numele are formatul SURNAME<<GIVEN_NAMES ("<<" separă numele de prenume, "<" simplu = spațiu).
+- Exemplu: pentru MRZ "IDROUANDREI<<EUGEN" → lastName="ANDREI", firstName="EUGEN" (GREȘIT: lastName="IDROU").
+
 Analizează calitatea imaginii și identifică tipul de CI (vechi sau nou).
 
 Răspunde în acest format JSON:
@@ -235,7 +241,11 @@ Răspunde în acest format JSON:
     const text = response.text();
     // Old CIs carry a TD1 MRZ on the front whose personal-number field holds
     // the CNP — recover it deterministically if Gemini missed the printed one.
-    return applyMrzCnpFallback(parseGeminiOCRResponse(text, 'ci_front'));
+    // Then correct the name: Gemini often leaks the "IDROU" (doc-type+country)
+    // MRZ prefix into the surname on old TD2 cards — fix it from the MRZ.
+    return correctCiFrontNames(
+      applyMrzCnpFallback(parseGeminiOCRResponse(text, 'ci_front')),
+    );
   } catch (error) {
     console.error('CI Front OCR error:', error);
     return createErrorResult('ci_front', 'Eroare la procesarea documentului');
@@ -727,6 +737,110 @@ export function parseRomanianEciMrz(mrzRaw: string[] | undefined): {
   }
 
   return out;
+}
+
+/**
+ * Recover the holder's surname + given names from a Romanian ID MRZ.
+ *
+ * Handles BOTH layouts we see in the wild:
+ *  - TD2 (old CI, 2-line MRZ): the name sits on LINE 1, right after the
+ *    "ID" (document type) + "ROU" (country) prefix, e.g.
+ *    "IDROUANDREI<<EUGEN<<<<" → surname=ANDREI, given=EUGEN. The "IDROU" is
+ *    NOT the surname — Gemini frequently leaks it into `lastName`.
+ *  - TD1 (new eCI, 3-line MRZ): the name sits on LINE 3 as
+ *    "SURNAME<<GIVEN_NAMES".
+ *
+ * The "<<" separator (surname<<given) is the reliable anchor. We scan for the
+ * first line that has it, strip a leading IDROU/IROU/I<ROU prefix (but never a
+ * bare "I"/"ID" — that would corrupt real surnames like IONESCU), reject any
+ * candidate that contains digits (that's the doc-number/CNP line), then split.
+ */
+export function recoverNamesFromMrz(
+  mrz:
+    | { line1?: string | null; line2?: string | null; line3?: string | null }
+    | string[]
+    | undefined,
+): { surname?: string; givenNames?: string } {
+  if (!mrz) return {};
+
+  const lines: string[] = Array.isArray(mrz)
+    ? mrz
+    : [mrz.line1 ?? '', mrz.line2 ?? '', mrz.line3 ?? ''];
+
+  for (const raw of lines) {
+    let l = (raw || '').toUpperCase().replace(/\s/g, '');
+    if (!l.includes('<<')) continue; // a name field always has surname<<given
+    // Strip the document-type + issuing-country prefix of a TD2 line-1 name
+    // field. Only the specific "IDROU"/"IROU"/"I<ROU" forms — NOT a bare "I".
+    l = l.replace(/^I[D<]?ROU/, '');
+    const trimmed = l.replace(/<+$/, '');
+    if (/\d/.test(trimmed)) continue; // names never contain digits → skip MRZ data lines
+    const parts = trimmed.split(/<{2,}/).filter(Boolean);
+    const surname = parts[0]?.replace(/</g, ' ').replace(/\s+/g, ' ').trim();
+    const given = parts[1]?.replace(/</g, ' ').replace(/\s+/g, ' ').trim();
+    if (surname && /[A-Z]/.test(surname)) {
+      return { surname, givenNames: given || undefined };
+    }
+  }
+  return {};
+}
+
+/** Strip Romanian diacritics + non-letters for case/accent-insensitive compare. */
+function deburrName(s: string): string {
+  return (s || '')
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '') // combining marks (ă, â, î, ș, ț, ş, ţ)
+    .toUpperCase()
+    .replace(/[^A-Z ]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+/**
+ * Correct the CI-front `lastName`/`firstName` using the MRZ when Gemini's
+ * visual extraction is contaminated — most commonly the "IDROU" document-type
+ * + country prefix leaking into the surname on old TD2 cards.
+ *
+ * Strategy: the MRZ is the source of truth for the surname↔given SPLIT, but the
+ * MRZ is ASCII (no diacritics). So we rebuild the split from MRZ and, for each
+ * token, recover the diacritic spelling from whatever the visual fields held
+ * (matched de-diacritic). We only act when the MRZ yields BOTH a surname and a
+ * given name AND the visual split disagrees with it — otherwise it's a no-op.
+ */
+export function correctCiFrontNames(result: OCRResult): OCRResult {
+  const data = result.extractedData as ExtractedPersonalData & {
+    mrz?: { line1?: string | null; line2?: string | null; line3?: string | null };
+  };
+
+  const mrzNames = recoverNamesFromMrz(data.mrz);
+  if (!mrzNames.surname || !mrzNames.givenNames) return result;
+
+  const mrzSur = deburrName(mrzNames.surname);
+  const mrzGiv = deburrName(mrzNames.givenNames);
+
+  const visLast = (data.lastName || '').trim();
+  const visFirst = (data.firstName || '').trim();
+
+  // Visual split already agrees with the MRZ → keep visual (has diacritics).
+  if (deburrName(visLast) === mrzSur && deburrName(visFirst) === mrzGiv) {
+    return result;
+  }
+
+  // Disagreement → rebuild from MRZ, recovering diacritics from the visual text.
+  const visualTokens = `${visLast} ${visFirst}`.trim().split(/\s+/).filter(Boolean);
+  const pickSpelling = (mrzToken: string): string => {
+    const hit = visualTokens.find((t) => deburrName(t) === mrzToken);
+    return hit || mrzToken; // CI names are printed upper-case → MRZ form is fine
+  };
+
+  data.lastName = mrzSur.split(' ').map(pickSpelling).join(' ');
+  data.firstName = mrzGiv.split(' ').map(pickSpelling).join(' ');
+
+  result.issues = [
+    ...(result.issues ?? []).filter((i) => !/nume corectat din mrz/i.test(i)),
+    'Nume corectat din MRZ (prefix tip-act/țară eliminat)',
+  ];
+  return result;
 }
 
 /**
