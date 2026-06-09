@@ -454,7 +454,7 @@ export function ModularOrderWizard({ initialService, initialOptions }: ModularOr
                 <Button
                   variant="outline"
                   onClick={prevStep}
-                  disabled={isFirstStep || state.isSaving}
+                  disabled={isFirstStep}
                   className="gap-2"
                 >
                   <ArrowLeft className="h-4 w-4" />
@@ -471,10 +471,18 @@ export function ModularOrderWizard({ initialService, initialOptions }: ModularOr
 
                   <Button
                     onClick={handleNext}
-                    disabled={!stepValid || state.isSaving || isSubmitting}
+                    // Intermediate steps advance optimistically — the draft
+                    // auto-save runs in the background (shown by <SaveStatus>),
+                    // so `state.isSaving` must NOT block "Continuă". Only the
+                    // final "Plătește" step waits for the save/submit to finish.
+                    disabled={
+                      !stepValid ||
+                      isSubmitting ||
+                      (isLastStep && state.isSaving)
+                    }
                     className="gap-2 bg-primary-500 hover:bg-primary-600 text-secondary-900 font-semibold"
                   >
-                    {(state.isSaving || isSubmitting) && (
+                    {((isLastStep && state.isSaving) || isSubmitting) && (
                       <Loader2 className="h-4 w-4 animate-spin" />
                     )}
                     {isLastStep ? (
