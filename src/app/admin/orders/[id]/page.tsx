@@ -64,6 +64,8 @@ import {
   Download,
   Pencil,
   RotateCcw,
+  Camera,
+  MessageCircle,
 } from 'lucide-react';
 
 // ---------- Types ----------
@@ -1349,13 +1351,19 @@ export default function AdminOrderDetailPage() {
                 )}
               </CardTitle>
 
-              {/* Verify / Unverify button */}
-              <VerifyDocumentsButton
-                orderId={order.id}
-                verifiedAt={adminVerifiedAt}
-                verifiedBy={adminVerifiedBy}
-                onChange={fetchOrder}
-              />
+              {/* Verify / Unverify + request-reupload actions */}
+              <div className="flex flex-col items-end gap-2">
+                <VerifyDocumentsButton
+                  orderId={order.id}
+                  verifiedAt={adminVerifiedAt}
+                  verifiedBy={adminVerifiedBy}
+                  onChange={fetchOrder}
+                />
+                <RequestSelfieReuploadButton
+                  orderId={order.id}
+                  customerPhone={contact?.phone}
+                />
+              </div>
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -2045,6 +2053,139 @@ function VerifyDocumentsButton({
       {submitting ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : <CheckCircle2 className="h-3 w-3 mr-1" />}
       Marchează verificat
     </Button>
+  );
+}
+
+/**
+ * Admin action: generate a single-use link for the customer to re-upload their
+ * selfie, email it to them, and surface Copy / WhatsApp-share controls so the
+ * operator can also send it manually (no WhatsApp API integration).
+ */
+function RequestSelfieReuploadButton({
+  orderId,
+  customerPhone,
+}: {
+  orderId: string;
+  customerPhone?: string | null;
+}) {
+  const [open, setOpen] = useState(false);
+  const [reason, setReason] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [result, setResult] = useState<{ url: string; emailSent: boolean; expiresAt: string } | null>(null);
+
+  const handleSend = async () => {
+    setSubmitting(true);
+    try {
+      const res = await fetch(`/api/admin/orders/${orderId}/request-reupload`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ documentType: 'selfie', reason: reason.trim() || undefined }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        toast.error(data.error || 'Cererea a eșuat');
+        return;
+      }
+      setResult({ url: data.data.reuploadUrl, emailSent: data.data.emailSent, expiresAt: data.data.expiresAt });
+      toast.success(data.data.emailSent ? 'Link generat și trimis pe email' : 'Link generat (email indisponibil)');
+    } catch {
+      toast.error('Eroare la generarea linkului');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const waHref = result
+    ? `https://wa.me/${(customerPhone || '').replace(/[\s+()-]/g, '')}?text=${encodeURIComponent(
+        `Bună! Pentru a continua comanda, te rugăm reîncarcă selfie-ul aici: ${result.url}`
+      )}`
+    : '';
+
+  if (!open) {
+    return (
+      <Button
+        size="sm"
+        variant="outline"
+        className="h-8 text-xs border-amber-300 text-amber-700 hover:bg-amber-50 hover:border-amber-400 hover:text-amber-800 shrink-0"
+        onClick={() => setOpen(true)}
+      >
+        <Camera className="h-3 w-3 mr-1" />
+        Cere poză nouă (selfie)
+      </Button>
+    );
+  }
+
+  return (
+    <div className="w-72 rounded-lg border border-amber-200 bg-amber-50/60 p-3 space-y-2 text-left">
+      {!result ? (
+        <>
+          <p className="text-xs font-medium text-amber-900">Cere clientului un selfie nou</p>
+          <Textarea
+            value={reason}
+            onChange={(e) => setReason(e.target.value)}
+            placeholder="Motiv (opțional) — ex. poza era neclară"
+            className="text-xs min-h-[56px] bg-white"
+          />
+          <div className="flex items-center gap-2">
+            <Button size="sm" className="h-7 text-xs" onClick={handleSend} disabled={submitting}>
+              {submitting ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : <Mail className="h-3 w-3 mr-1" />}
+              Trimite cererea
+            </Button>
+            <button
+              type="button"
+              className="text-xs text-neutral-500 hover:text-neutral-700"
+              onClick={() => setOpen(false)}
+              disabled={submitting}
+            >
+              Anulează
+            </button>
+          </div>
+        </>
+      ) : (
+        <>
+          <p className="text-xs font-medium text-green-800 flex items-center gap-1">
+            <CheckCircle2 className="h-3.5 w-3.5" />
+            {result.emailSent ? 'Link trimis pe email' : 'Link generat'}
+          </p>
+          <p className="text-[11px] text-neutral-600 break-all bg-white rounded px-2 py-1 border border-neutral-200">
+            {result.url}
+          </p>
+          <div className="flex flex-wrap items-center gap-2">
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-7 text-xs"
+              onClick={() => {
+                navigator.clipboard?.writeText(result.url);
+                toast.success('Link copiat');
+              }}
+            >
+              <Copy className="h-3 w-3 mr-1" />
+              Copiază
+            </Button>
+            {customerPhone && (
+              <a href={waHref} target="_blank" rel="noopener noreferrer">
+                <Button size="sm" variant="outline" className="h-7 text-xs border-green-300 text-green-700 hover:bg-green-50">
+                  <MessageCircle className="h-3 w-3 mr-1" />
+                  WhatsApp
+                </Button>
+              </a>
+            )}
+            <button
+              type="button"
+              className="text-xs text-neutral-500 hover:text-neutral-700"
+              onClick={() => {
+                setOpen(false);
+                setResult(null);
+                setReason('');
+              }}
+            >
+              Închide
+            </button>
+          </div>
+        </>
+      )}
+    </div>
   );
 }
 
