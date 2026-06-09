@@ -27,6 +27,10 @@ import {
   fetchBundledOptions,
   BUNDLED_OPTION_CODES,
 } from '@/lib/services/bundled-options';
+import {
+  isOptionDepBlocked,
+  cascadeDropCodes,
+} from '@/lib/services/option-dependencies';
 import { APOSTILA_COUNTRIES } from '@/config/apostila-countries';
 import { TRANSLATION_LANGUAGES } from '@/config/translation-languages';
 
@@ -892,14 +896,45 @@ function CrossServiceAddonCard({
     [selectedOptions, option.id]
   );
 
+  // Which bundled codes are currently selected WITHIN this parent's group.
+  // The apostilă/traducere/legalizare dependency chain is scoped per parent —
+  // selecting "legalizare" under Certificat Integritate must look only at the
+  // traducere chosen under that same secondary service, not the primary one.
+  const selectedBundledCodes = useMemo(() => {
+    const codes = new Set<string>();
+    for (const o of selectedOptions) {
+      if (
+        o.bundledFor?.parentOptionId === option.id &&
+        o.bundledFor?.bundledOptionCode
+      ) {
+        codes.add(o.bundledFor.bundledOptionCode);
+      }
+    }
+    return codes;
+  }, [selectedOptions, option.id]);
+
   const toggleBundled = (bundled: ServiceOption) => {
     const syntheticId = `bundled:${option.id}:${bundled.id}`;
     const already = selectedOptions.find((o) => o.optionId === syntheticId);
 
     if (already) {
-      onUpdateOptions(selectedOptions.filter((o) => o.optionId !== syntheticId));
+      // Deselecting a prerequisite cascades: drop its dependents in this group
+      // (traducere → legalizare → apostila_notari).
+      const dropCodes = cascadeDropCodes(bundled.code);
+      onUpdateOptions(
+        selectedOptions.filter(
+          (o) =>
+            !(
+              o.bundledFor?.parentOptionId === option.id &&
+              o.bundledFor?.bundledOptionCode &&
+              dropCodes.has(o.bundledFor.bundledOptionCode)
+            )
+        )
+      );
     } else {
       if (!bundledSlug) return;
+      // Block selecting a dependent option before its prerequisite.
+      if (isOptionDepBlocked(bundled.code, selectedBundledCodes)) return;
       const newOption: SelectedOptionState = {
         optionId: syntheticId,
         optionName: `${bundled.name} (${option.name})`,
@@ -1009,28 +1044,42 @@ function CrossServiceAddonCard({
               {sortedBundled.map((bundled) => {
                 const BIcon = CODE_ICONS[bundled.code] ?? Package;
                 const selected = isBundledSelected(bundled.id);
+                // Block dependents until their prerequisite is selected —
+                // exactly like the primary "Opțiuni suplimentare" section.
+                const depBlocked =
+                  !selected && isOptionDepBlocked(bundled.code, selectedBundledCodes);
+                const depHint = !depBlocked
+                  ? bundled.description
+                  : bundled.code === 'apostila_notari'
+                  ? 'Necesită Legalizare'
+                  : 'Necesită Traducere Autorizată';
                 return (
                   <button
                     key={bundled.id}
                     type="button"
                     onClick={() => toggleBundled(bundled)}
+                    disabled={depBlocked}
                     aria-pressed={selected}
                     className={cn(
-                      'group/inner flex w-full cursor-pointer items-center gap-3 rounded-lg border-2 p-3 text-left transition-all duration-200',
-                      selected
+                      'group/inner flex w-full items-center gap-3 rounded-lg border-2 p-3 text-left transition-all duration-200',
+                      depBlocked
+                        ? 'opacity-50 cursor-not-allowed border-neutral-200 bg-neutral-50/40'
+                        : selected
                         // Same visual contract as the top-level OptionCard:
                         // 2px primary border + full primary-50 fill +
                         // shadow lift. Anything lighter (1px border, /30
                         // tint, no shadow) reads identically to the hover
                         // state and users can't tell selection persisted.
-                        ? 'border-primary-500 bg-primary-50 shadow-sm'
-                        : 'border-neutral-200 bg-white hover:border-primary-300 hover:bg-primary-50/30'
+                        ? 'cursor-pointer border-primary-500 bg-primary-50 shadow-sm'
+                        : 'cursor-pointer border-neutral-200 bg-white hover:border-primary-300 hover:bg-primary-50/30'
                     )}
                   >
                     <div
                       className={cn(
                         'flex h-9 w-9 items-center justify-center rounded-lg shrink-0 transition-colors',
-                        selected
+                        depBlocked
+                          ? 'bg-neutral-100'
+                          : selected
                           ? 'bg-primary-100'
                           : 'bg-neutral-100 group-hover/inner:bg-primary-100/60'
                       )}
@@ -1038,7 +1087,9 @@ function CrossServiceAddonCard({
                       <BIcon
                         className={cn(
                           'h-4 w-4 transition-colors',
-                          selected
+                          depBlocked
+                            ? 'text-neutral-400'
+                            : selected
                             ? 'text-primary-600'
                             : 'text-neutral-500 group-hover/inner:text-primary-600'
                         )}
@@ -1048,13 +1099,18 @@ function CrossServiceAddonCard({
                       <p className="text-sm font-medium text-secondary-900 leading-tight">
                         {bundled.name}
                       </p>
-                      {bundled.description && (
+                      {depHint && (
                         <p className="text-xs text-neutral-500 mt-0.5 leading-snug">
-                          {bundled.description}
+                          {depHint}
                         </p>
                       )}
                     </div>
-                    <PriceChip price={bundled.price} selected={selected} size="sm" />
+                    <PriceChip
+                      price={bundled.price}
+                      selected={selected}
+                      disabled={depBlocked}
+                      size="sm"
+                    />
                     {/* No separate checkbox/radio indicator on the right —
                         the row itself becomes yellow (border + bg) when
                         selected, matching the top-level OptionCard style.
