@@ -12,7 +12,7 @@ import {
   User,
   Building2,
   Globe,
-  Flag,
+  Check,
 } from 'lucide-react';
 import {
   Form,
@@ -276,13 +276,12 @@ export function ContactStepModular({ onValidChange }: ContactStepProps) {
         {/* Citizenship + Purpose also required when contact is prefilled */}
         {showsCitizenship && (
           <>
-            <CitizenshipToggle
-              citizenship={citizenship}
-              foreignType={state.contact.foreignType ?? 'eu'}
-              onChange={(c, ft) =>
+            <ForeignCitizenCheckbox
+              isForeign={isForeign}
+              onChange={(foreign) =>
                 updateContact({
-                  citizenship: c,
-                  foreignType: c === 'foreign' ? ft : undefined,
+                  citizenship: foreign ? 'foreign' : 'romanian',
+                  foreignType: undefined,
                 })
               }
             />
@@ -290,7 +289,6 @@ export function ContactStepModular({ onValidChange }: ContactStepProps) {
               <ForeignBirthFields
                 birthCity={state.personalKyc?.foreignData?.birthCity ?? ''}
                 birthCountry={state.personalKyc?.foreignData?.birthCountry ?? ''}
-                foreignType={state.contact.foreignType}
                 onChange={(birthCity, birthCountry) => {
                   updatePersonalKyc({
                     foreignData: {
@@ -389,13 +387,12 @@ export function ContactStepModular({ onValidChange }: ContactStepProps) {
         {/* Citizenship — only for PF clients */}
         {showsCitizenship && (
           <>
-            <CitizenshipToggle
-              citizenship={citizenship}
-              foreignType={state.contact.foreignType ?? 'eu'}
-              onChange={(c, ft) =>
+            <ForeignCitizenCheckbox
+              isForeign={isForeign}
+              onChange={(foreign) =>
                 updateContact({
-                  citizenship: c,
-                  foreignType: c === 'foreign' ? ft : undefined,
+                  citizenship: foreign ? 'foreign' : 'romanian',
+                  foreignType: undefined,
                 })
               }
             />
@@ -403,7 +400,6 @@ export function ContactStepModular({ onValidChange }: ContactStepProps) {
               <ForeignBirthFields
                 birthCity={state.personalKyc?.foreignData?.birthCity ?? ''}
                 birthCountry={state.personalKyc?.foreignData?.birthCountry ?? ''}
-                foreignType={state.contact.foreignType}
                 onChange={(birthCity, birthCountry) => {
                   updatePersonalKyc({
                     foreignData: {
@@ -436,164 +432,84 @@ export function ContactStepModular({ onValidChange }: ContactStepProps) {
 }
 
 // ──────────────────────────────────────────────────────────────────────────
-// Citizenship toggle (Romanian / Foreign with EU vs non-EU sub-pick)
+// Foreign-citizen checkbox. Single opt-in: unchecked = Romanian (default),
+// checked = foreign. No EU/non-EU sub-pick — the form is intentionally simple.
 // ──────────────────────────────────────────────────────────────────────────
 
-interface CitizenshipToggleProps {
-  citizenship: 'romanian' | 'foreign';
-  foreignType: 'eu' | 'non-eu';
-  onChange: (citizenship: 'romanian' | 'foreign', foreignType: 'eu' | 'non-eu') => void;
+interface ForeignCitizenCheckboxProps {
+  isForeign: boolean;
+  onChange: (isForeign: boolean) => void;
 }
 
-function CitizenshipToggle({
-  citizenship,
-  foreignType,
-  onChange,
-}: CitizenshipToggleProps) {
+function ForeignCitizenCheckbox({ isForeign, onChange }: ForeignCitizenCheckboxProps) {
   return (
-    <div className="space-y-3">
-      <div>
-        <p className="text-secondary-900 font-medium text-sm">
-          Cetățenia ta <span className="text-red-500">*</span>
-        </p>
-        <p className="text-xs text-neutral-500 mt-0.5 leading-snug">
-          Selectează dacă ești cetățean român sau străin — fluxul de procesare diferă (cetățenii străini necesită verificări suplimentare).
-        </p>
-      </div>
-
-      <div className="grid grid-cols-2 gap-2.5 sm:gap-3">
-        {/* Romanian */}
-        <button
-          type="button"
-          onClick={() => onChange('romanian', foreignType)}
-          aria-pressed={citizenship === 'romanian'}
+    <div className="space-y-2">
+      <button
+        type="button"
+        role="checkbox"
+        aria-checked={isForeign}
+        onClick={() => onChange(!isForeign)}
+        className={cn(
+          'flex w-full items-center gap-3 rounded-xl border-2 p-3 sm:p-4 text-left transition-all duration-200',
+          isForeign
+            ? 'border-primary-500 bg-primary-50 shadow-sm'
+            : 'border-neutral-200 bg-white hover:border-primary-300 hover:bg-primary-50/30'
+        )}
+      >
+        {/* Checkbox box */}
+        <span
           className={cn(
-            'group relative flex items-center gap-2.5 rounded-xl border-2 p-3 sm:p-4 text-left transition-all duration-200',
-            citizenship === 'romanian'
-              ? 'border-primary-500 bg-primary-50 shadow-sm'
-              : 'border-neutral-200 bg-white hover:border-primary-300 hover:bg-primary-50/30'
+            'flex h-5 w-5 items-center justify-center rounded-md border-2 shrink-0 transition-colors',
+            isForeign
+              ? 'border-primary-500 bg-primary-500 text-white'
+              : 'border-neutral-300 bg-white'
           )}
         >
-          <span
-            className={cn(
-              'flex h-9 w-9 items-center justify-center rounded-xl shrink-0 transition-colors',
-              citizenship === 'romanian' ? 'bg-primary-100' : 'bg-neutral-100'
-            )}
-          >
-            <Flag
-              className={cn(
-                'h-4 w-4',
-                citizenship === 'romanian' ? 'text-primary-600' : 'text-neutral-500'
-              )}
-            />
-          </span>
-          <span className="text-sm font-semibold text-secondary-900 leading-tight">
-            Cetățean român
-          </span>
-          {citizenship === 'romanian' && (
-            <span className="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500 text-white shadow-sm">
-              <CheckCircle className="h-3 w-3" />
-            </span>
-          )}
-        </button>
-
-        {/* Foreign */}
-        <button
-          type="button"
-          onClick={() => onChange('foreign', foreignType)}
-          aria-pressed={citizenship === 'foreign'}
+          {isForeign && <Check className="h-3.5 w-3.5" strokeWidth={3} />}
+        </span>
+        {/* Globe icon */}
+        <span
           className={cn(
-            'group relative flex items-center gap-2.5 rounded-xl border-2 p-3 sm:p-4 text-left transition-all duration-200',
-            citizenship === 'foreign'
-              ? 'border-primary-500 bg-primary-50 shadow-sm'
-              : 'border-neutral-200 bg-white hover:border-primary-300 hover:bg-primary-50/30'
+            'flex h-9 w-9 items-center justify-center rounded-xl shrink-0 transition-colors',
+            isForeign ? 'bg-primary-100' : 'bg-neutral-100'
           )}
         >
-          <span
-            className={cn(
-              'flex h-9 w-9 items-center justify-center rounded-xl shrink-0 transition-colors',
-              citizenship === 'foreign' ? 'bg-primary-100' : 'bg-neutral-100'
-            )}
-          >
-            <Globe
-              className={cn(
-                'h-4 w-4',
-                citizenship === 'foreign' ? 'text-primary-600' : 'text-neutral-500'
-              )}
-            />
+          <Globe
+            className={cn('h-4 w-4', isForeign ? 'text-primary-600' : 'text-neutral-500')}
+          />
+        </span>
+        <span className="min-w-0">
+          <span className="block text-sm font-semibold text-secondary-900 leading-tight">
+            Sunt cetățean străin
           </span>
-          <span className="text-sm font-semibold text-secondary-900 leading-tight">
-            Cetățean străin
+          <span className="block text-xs text-neutral-500 mt-0.5 leading-snug">
+            Bifează doar dacă nu ești cetățean român. Cetățenii străini necesită
+            verificări suplimentare (procesare 7-15 zile lucrătoare).
           </span>
-          {citizenship === 'foreign' && (
-            <span className="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500 text-white shadow-sm">
-              <CheckCircle className="h-3 w-3" />
-            </span>
-          )}
-        </button>
-      </div>
-
-      {/* Helper hint shown only when "Cetățean străin" is picked */}
-      {citizenship === 'foreign' && (
-        <p className="text-xs text-neutral-600 leading-snug -mt-1">
-          Marchează această opțiune dacă nu ești născut în România dar ai
-          permis de rezidență sau de ședere.
-        </p>
-      )}
-
-      {/* Sub-pick: EU vs non-EU when foreign */}
-      {citizenship === 'foreign' && (
-        <div className="rounded-xl border border-amber-200 bg-amber-50/60 p-3 space-y-2">
-          <p className="text-xs text-amber-800 font-medium">
-            Tipul cetățeniei străine:
-          </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            {(['eu', 'non-eu'] as const).map((ft) => (
-              <button
-                key={ft}
-                type="button"
-                onClick={() => onChange('foreign', ft)}
-                aria-pressed={foreignType === ft}
-                className={cn(
-                  'rounded-lg border-2 px-3 py-2.5 text-sm font-medium transition-colors text-center',
-                  foreignType === ft
-                    ? 'border-amber-400 bg-white text-amber-900'
-                    : 'border-amber-200 bg-white/60 text-amber-700 hover:border-amber-300'
-                )}
-              >
-                {ft === 'eu' ? 'Născut în Uniunea Europeană' : 'Născut în afara UE'}
-              </button>
-            ))}
-          </div>
-          <p className="text-[11px] text-amber-700 mt-1 leading-snug">
-            Procesarea durează 7-15 zile lucrătoare pentru cetățenii străini.
-          </p>
-        </div>
-      )}
+        </span>
+      </button>
     </div>
   );
 }
 
 // ──────────────────────────────────────────────────────────────────────────
 // Foreign birth fields (Localitatea + Țara Nașterii) — step 1 inline block.
-// Renders inside the citizenship section when user picks "Cetățean străin".
-// Country dropdown is filtered by EU/non-EU selection.
+// Renders inside the citizenship section when "Sunt cetățean străin" is checked.
+// Country dropdown shows the full world list (no EU/non-EU split).
 // ──────────────────────────────────────────────────────────────────────────
 
 interface ForeignBirthFieldsProps {
   birthCity: string;
   birthCountry: string;
-  foreignType: 'eu' | 'non-eu' | undefined;
   onChange: (birthCity: string, birthCountry: string) => void;
 }
 
 function ForeignBirthFields({
   birthCity,
   birthCountry,
-  foreignType,
   onChange,
 }: ForeignBirthFieldsProps) {
-  const countries = getCountriesForForeignType(foreignType);
+  const countries = getCountriesForForeignType(undefined);
   return (
     <div className="rounded-xl border border-amber-200 bg-amber-50/30 p-3 sm:p-4 space-y-3">
       <p className="text-sm font-medium text-amber-900">
