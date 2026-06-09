@@ -37,6 +37,7 @@ import {
   User,
   MapPin,
   Calendar,
+  RefreshCw,
 } from 'lucide-react';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { PersonalKYCConfig, DocumentType, KYCValidationResults } from '@/types/verification-modules';
@@ -1029,9 +1030,33 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
         )}
 
         {isSuccess && (
-          <div className="flex items-center gap-2 mt-2 text-green-600">
-            <CheckCircle className="w-4 h-4 flex-shrink-0" />
-            <span className="text-xs">Date extrase cu succes!</span>
+          <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
+            <div className="flex items-center gap-2 text-green-600">
+              <CheckCircle className="w-4 h-4 flex-shrink-0" />
+              <span className="text-xs">Date extrase cu succes!</span>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                const ref =
+                  type === 'ci_front' ? ciFrontInputRef :
+                  type === 'ci_back' ? ciBackInputRef :
+                  type === 'ci_nou_back' ? ciNouBackInputRef :
+                  type === 'passport_opened' ? passportOpenedInputRef :
+                  roCeiPdfInputRef;
+                // Clear the wrong upload + its extracted data, then immediately
+                // re-open the file picker so the customer can pick the correct
+                // photo in one tap. The picker exists in the empty-upload branch,
+                // which renders after reset → wait a tick for the re-render.
+                resetScan(type);
+                setTimeout(() => ref.current?.click(), 50);
+              }}
+              disabled={scanState.scanning}
+              className="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-md border border-neutral-300 bg-white text-neutral-700 hover:bg-neutral-100 hover:border-neutral-400 transition-colors disabled:opacity-50"
+            >
+              <RefreshCw className="w-3.5 h-3.5" />
+              Poză greșită? Reîncarcă alta
+            </button>
           </div>
         )}
       </div>
