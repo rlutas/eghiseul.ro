@@ -62,6 +62,12 @@ psql "postgresql://postgres:YOUR_PASSWORD@db.llbwmitdrppomeptqlue.supabase.co:54
 | 013_fix_delivery_method_type.sql | Delivery fix | Applied |
 | 014_cazier_judiciar_options.sql | Service options | Applied |
 | 015_user_data_persistence.sql | User data persistence | Applied |
+| … | (016–046 — see `supabase/migrations/`) | Applied |
+| 047_add_lawyer_fee.sql | `services.lawyer_fee_ron` (15 RON split) | Applied |
+| 048_reupload_requests.sql | Post-order selfie re-upload links (RLS on) — see [`technical/specs/post-order-photo-reupload.md`](../technical/specs/post-order-photo-reupload.md) | Applied |
+
+> The table above is not exhaustive for 016–046; the source of truth is the
+> `supabase/migrations/` directory.
 
 ---
 

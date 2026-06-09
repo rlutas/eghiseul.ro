@@ -7,7 +7,16 @@
 **Plan SEO master:** [`seo/SEO-MASTER-PLAN-2026-05-20.md`](seo/SEO-MASTER-PLAN-2026-05-20.md)
 **Rebuild queue (47 pagini):** [`seo/REBUILD-QUEUE.md`](seo/REBUILD-QUEUE.md)
 **City pages plan:** [`seo/CITY-PAGES-PLAN.md`](seo/CITY-PAGES-PLAN.md)
-**Sesiune curentă (2026-05-27 PM):** [`session-logs/2026-05-27-admin-parity-overhaul.md`](session-logs/2026-05-27-admin-parity-overhaul.md) — **citește aici unde am rămas** (admin shell port, coșuri abandonate, dashboard extins)
+**Sesiune curentă (2026-06-09):** wizard + KYC polish — **citește aici unde am rămas**:
+- [`session-logs/2026-06-09-post-order-selfie-reupload.md`](session-logs/2026-06-09-post-order-selfie-reupload.md) — **NOU**: re-upload selfie după comandă prin link securizat (admin) → vezi [`technical/specs/post-order-photo-reupload.md`](technical/specs/post-order-photo-reupload.md)
+- [`session-logs/2026-06-09-remove-ai-selfie-face-match.md`](session-logs/2026-06-09-remove-ai-selfie-face-match.md) — eliminat face-match AI la selfie (verificare manuală)
+- [`session-logs/2026-06-09-bundled-options-dependency-chain.md`](session-logs/2026-06-09-bundled-options-dependency-chain.md) — dependențe apostilă/traducere/legalizare la serviciile secundare
+- [`session-logs/2026-06-09-step1-citizenship-single-checkbox.md`](session-logs/2026-06-09-step1-citizenship-single-checkbox.md) — o singură bifă „cetățean străin" la pasul 1
+- [`session-logs/2026-06-09-wizard-optimistic-navigation.md`](session-logs/2026-06-09-wizard-optimistic-navigation.md) — navigare optimistă (butonul „Continuă" nu mai așteaptă salvarea)
+- [`session-logs/2026-06-09-ci-front-idrou-name-fix.md`](session-logs/2026-06-09-ci-front-idrou-name-fix.md) — fix nume „IDROU" din MRZ la CI față
+- [`session-logs/2026-06-09-kyc-step2-reupload-button.md`](session-logs/2026-06-09-kyc-step2-reupload-button.md) — buton „Poză greșită? Reîncarcă" la scanare CI
+
+**Sesiune (2026-05-27 PM):** [`session-logs/2026-05-27-admin-parity-overhaul.md`](session-logs/2026-05-27-admin-parity-overhaul.md) — admin shell port, coșuri abandonate, dashboard extins
 **Sesiune (2026-05-27 AM):** [`session-logs/2026-05-27-step2-simplification.md`](session-logs/2026-05-27-step2-simplification.md) — Step 2 redesign, contract DOCX, delivery calculator
 **Parity matrix sister project:** [`admin/PARITY-MATRIX.md`](admin/PARITY-MATRIX.md) — feature-by-feature vs cazierjudiciaronline.com
 **Handbook coșuri abandonate:** [`admin/abandoned-carts.md`](admin/abandoned-carts.md)
@@ -138,6 +147,7 @@
 | **Cum funcționează API-ul** | [`technical/api/`](technical/api/) |
 | **Cum adaug un serviciu nou** | [`technical/specs/modular-wizard-guide.md`](technical/specs/modular-wizard-guide.md) |
 | **KYC: Verificare Identitate & Face Match** | [`technical/specs/kyc-identity-verification.md`](technical/specs/kyc-identity-verification.md) |
+| **Re-upload poză după comandă (selfie)** | [`technical/specs/post-order-photo-reupload.md`](technical/specs/post-order-photo-reupload.md) |
 | **Plăți & Facturare (Stripe + Oblio)** | [`technical/specs/stripe-oblio-payment-invoicing.md`](technical/specs/stripe-oblio-payment-invoicing.md) |
 | **Livrări & Curierat (Overview)** | [`technical/specs/delivery-system-architecture.md`](technical/specs/delivery-system-architecture.md) |
 | **Sameday API (EasyBox, AWB)** | [`technical/specs/sameday-api-integration.md`](technical/specs/sameday-api-integration.md) |
@@ -451,7 +461,12 @@ docs/
 - `POST /api/admin/orders/[id]/cancel-awb` - Cancel AWB
 - `GET/PATCH /api/admin/settings` - Admin settings (company_data, lawyer_data, document_counters)
 - `GET/POST /api/admin/cleanup` - GDPR cleanup
+- `POST /api/admin/orders/[id]/request-reupload` - Generate + email a secure link for the customer to re-upload their selfie ([spec](technical/specs/post-order-photo-reupload.md))
 - `POST /api/auth/register-from-order` - Convert guest to user
+
+### Public (No Auth) — Re-upload
+- `GET /api/reupload/[token]` - Re-upload link info (doc type, status)
+- `POST /api/reupload/[token]` - Customer submits the new photo (token-gated, single-use)
 
 ### Tracking
 - `GET /api/orders/[id]/tracking` - Get order tracking timeline

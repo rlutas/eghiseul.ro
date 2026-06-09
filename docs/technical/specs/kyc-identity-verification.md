@@ -1,8 +1,17 @@
 # KYC Identity Verification & Face Matching
 
-**Last Updated:** 2026-05-29
-**Version:** 1.0
+**Last Updated:** 2026-06-09
+**Version:** 1.1
 **Status:** Active
+
+> ⚠️ **2026-06-09 — Automatic AI selfie↔ID face-match REMOVED.** It was slow and
+> unreliable, so the selfie upload no longer makes a Gemini call. Every selfie is
+> now flagged `needsManualReview: true` (reason `manual_review_only`) and the
+> team confirms identity in admin. The face-match code (`lib/kyc/face-match.ts`,
+> `lib/services/kyc-validation.ts:validateSelfie`, `/api/kyc/validate`) is left in
+> the repo but is **no longer called by the wizard**. Sections below describing
+> the automatic match are historical. When a photo is wrong, the team requests a
+> new one via [`post-order-photo-reupload.md`](./post-order-photo-reupload.md).
 
 How eghiseul.ro confirms that the person submitting an order is the same person
 shown on the uploaded ID document (selfie ↔ document face matching), and how

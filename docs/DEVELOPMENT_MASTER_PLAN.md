@@ -1,7 +1,7 @@
 # eGhiseul.ro - Development Master Plan
 
-**Version:** 4.6
-**Last Updated:** 2026-02-19
+**Version:** 4.7
+**Last Updated:** 2026-06-09
 **Status:** Sprint 4 In Progress (98%) | Sprint 5 In Progress (98%) | Admin Workflow ✅ | Document Generation ✅ | Multi-Signature ✅ | Contract Preview ✅ | Contract Legal Validity ✅ | Client Downloads ✅ | Extended RBAC ✅ | Number Registry ✅ | Gemini 2.5 Flash ✅ | KYC S3 Upload ✅ | Admin UI Polish ✅ | Review Step Pricing ✅ | Registry Own Page ✅ | User Invite ✅ | Template Placeholders ✅ | CLIENT_DETAILS_BLOCK Legal Format ✅ | KYC Confidence Tracking ✅
 
 ---
@@ -532,6 +532,15 @@
 - Continue incomplete orders on behalf of customers
 - Audit logging for admin actions
 - Auto-generate contracts (contract-prestari, contract-asistenta) at payment confirmation (webhook trigger)
+
+**Recently Completed (2026-06-09 — wizard + KYC session):**
+- ✅ **Post-order selfie re-upload** — admin-generated secure single-use link (table `reupload_requests`, migration 048), public `/reincarca-poza/[token]` page, `/api/reupload/[token]` + `/api/admin/orders/[id]/request-reupload`, email (Resend) + WhatsApp share. Spec: `technical/specs/post-order-photo-reupload.md`
+- ✅ **AI selfie face-match removed** — selfie upload no longer calls Gemini; flagged `needsManualReview` for the team (manual verification)
+- ✅ **Bundled-options dependency chain** — apostilă/traducere/legalizare deps now enforced on secondary-service options too (`lib/services/option-dependencies.ts` + tests)
+- ✅ **Step 1 citizenship simplified** — single "Sunt cetățean străin" checkbox (dropped Romanian/foreign 2-button + EU/non-EU sub-picker)
+- ✅ **Optimistic wizard navigation** — "Continuă" no longer blocks on the background draft auto-save
+- ✅ **CI-front MRZ name fix** — strips the "IDROU" (doc-type+country) prefix that leaked into the surname (`recoverNamesFromMrz` + tests)
+- ✅ **KYC step "Poză greșită? Reîncarcă" button** — prominent re-scan action at step 2
 
 **Recently Completed (Sprint 4/5):**
 - ✅ Number Registry System (Barou) -- `number_ranges` + `number_registry` tables, `allocate_number()` RPC with reuse logic, admin "Registru Numere" tab (ranges management, journal, manual entry, void, CSV export), backfilled historical entries
