@@ -20,6 +20,7 @@
 - [`session-logs/2026-06-10-mobile-wizard-polish.md`](session-logs/2026-06-10-mobile-wizard-polish.md) — termeni sub semnătură, contract compact, iconițe curier
 - [`session-logs/2026-06-10-ios-input-zoom-fix.md`](session-logs/2026-06-10-ios-input-zoom-fix.md) — fix zoom iOS la dropdown-uri (font 16px pe mobil)
 - [`session-logs/2026-06-10-e2e-playwright-verification.md`](session-logs/2026-06-10-e2e-playwright-verification.md) — refresh suită E2E Playwright
+- 🔴 [`session-logs/2026-06-10-invoice-missing-postgrest-cache.md`](session-logs/2026-06-10-invoice-missing-postgrest-cache.md) — **incident**: comenzi plătite fără factură (cache PostgREST stale după migr. 049 + găuri confirm-payment & client PF) → chokepoint `ensure-invoice`, degradare grațioasă, cron auto-heal, migrare 052
 
 **Sesiune (2026-06-09):** wizard + KYC polish:
 - [`session-logs/2026-06-09-post-order-selfie-reupload.md`](session-logs/2026-06-09-post-order-selfie-reupload.md) — **NOU**: re-upload selfie după comandă prin link securizat (admin) → vezi [`technical/specs/post-order-photo-reupload.md`](technical/specs/post-order-photo-reupload.md)

@@ -73,9 +73,36 @@ export async function ensureInvoiceForPaidOrder(
     .select('id'));
 
   if (claimError) {
-    return { status: 'failed', error: claimError.message };
-  }
-  if (!claimRows || claimRows.length === 0) {
+    // GRACEFUL DEGRADATION: if PostgREST can't see the lock column (its schema
+    // cache went stale after the migration that added invoice_generating_at —
+    // observed flapping across the replica fleet), DON'T skip the invoice.
+    // Re-check invoice_number to avoid an obvious duplicate, then proceed
+    // WITHOUT the lock. A rare duplicate (recoverable via storno) is far better
+    // than a paid order silently left without an invoice.
+    const msg = claimError.message || '';
+    const lockColumnMissing =
+      claimError.code === 'PGRST204' || // column not found in schema cache
+      claimError.code === '42703' || // undefined_column
+      /invoice_generating_at/.test(msg) ||
+      /schema cache/i.test(msg);
+    if (!lockColumnMissing) {
+      return { status: 'failed', error: msg };
+    }
+    console.warn(
+      `[ensure-invoice] lock column unavailable (${msg}) — creating invoice WITHOUT lock for ${orderId}`
+    );
+    const { data: recheck } = await admin
+      .from('orders')
+      .select('invoice_number')
+      .eq('id', orderId)
+      .single();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if ((recheck as any)?.invoice_number) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return { status: 'already_exists', invoiceNumber: (recheck as any).invoice_number };
+    }
+    // fall through to the create block (degraded, no lock held)
+  } else if (!claimRows || claimRows.length === 0) {
     return { status: 'locked' };
   }
 
@@ -128,12 +155,18 @@ export async function ensureInvoiceForPaidOrder(
     const msg = err instanceof Error ? err.message : 'Unknown error';
     console.error(`[ensure-invoice] Oblio invoice creation failed for ${orderId}:`, msg);
 
-    // Self-heal: release the lock so a later retry can re-claim.
-    await admin
-      .from('orders')
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .update({ invoice_generating_at: null } as any)
-      .eq('id', orderId);
+    // Self-heal: release the lock so a later retry can re-claim. Best-effort —
+    // in degraded mode the lock column may be invisible to PostgREST, so ignore
+    // any error here (we never held a real lock in that case anyway).
+    try {
+      await admin
+        .from('orders')
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .update({ invoice_generating_at: null } as any)
+        .eq('id', orderId);
+    } catch {
+      /* lock column not visible — nothing to release */
+    }
 
     await admin.from('order_history').insert({
       order_id: orderId,

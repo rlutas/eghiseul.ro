@@ -66,6 +66,9 @@ psql "postgresql://postgres:YOUR_PASSWORD@db.llbwmitdrppomeptqlue.supabase.co:54
 | 047_add_lawyer_fee.sql | `services.lawyer_fee_ron` (15 RON split) | Applied |
 | 048_reupload_requests.sql | Post-order selfie re-upload links (RLS on) — see [`technical/specs/post-order-photo-reupload.md`](../technical/specs/post-order-photo-reupload.md) | Applied |
 | 049_invoice_generating_lock.sql | `orders.invoice_generating_at` — atomic lock vs duplicate Oblio invoices from concurrent Stripe webhooks | Applied |
+| 050_rename_certificat_integritate_slug.sql | rename `certificat-integritate-comportamentala` → `certificat-integritate` | Applied |
+| 051_cazier_fiscal_pf_name.sql | label `cazier-fiscal` → "Cazier Fiscal Persoană Fizică" | Applied |
+| 052_reload_invoice_lock_schema_cache.sql | **reload PostgREST schema cache** for 049's column (the `ADD COLUMN IF NOT EXISTS` no-op never fired `pgrst_ddl_watch` → paid orders without invoice). COMMENT DDL + `NOTIFY pgrst`. See [`.claude/rules/database.md`](../../.claude/rules/database.md) PostgREST cache section | Applied |
 
 > The table above is not exhaustive for 016–046; the source of truth is the
 > `supabase/migrations/` directory.

@@ -22,6 +22,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { ensureInvoiceForPaidOrder } from '@/lib/oblio';
 
 const MIN_AGE_MS = 30 * 60 * 1000;
 const MAX_LOOKBACK_MS = 7 * 24 * 60 * 60 * 1000; // don't keep alerting on ancient orders
@@ -111,30 +112,55 @@ export async function POST(request: NextRequest) {
   if (affected.length === 0) {
     return NextResponse.json({
       success: true,
-      data: { affectedCount: 0, processedAt: new Date().toISOString() },
+      data: { affectedCount: 0, healedCount: 0, processedAt: new Date().toISOString() },
     });
+  }
+
+  // AUTO-HEAL: try to actually create the missing invoice for each affected
+  // order (single chokepoint with atomic lock + graceful degradation). This is
+  // the final safety net: even if the webhook AND confirm-payment both missed
+  // (e.g. a transient PostgREST schema-cache flap), the hourly cron recovers it.
+  const healed: string[] = [];
+  const stillMissing: AffectedOrder[] = [];
+  for (const o of affected.slice(0, 50)) {
+    try {
+      const res = await ensureInvoiceForPaidOrder(o.id, 'Card');
+      if (res.status === 'created' || res.status === 'already_exists') {
+        healed.push(o.friendlyOrderId ?? o.orderNumber ?? o.id);
+      } else {
+        stillMissing.push(o);
+      }
+    } catch (err) {
+      console.error('[invoice-health-check] heal threw for', o.id, err);
+      stillMissing.push(o);
+    }
   }
 
   // Structured warning — searchable in Vercel logs even without Slack.
   console.warn('[invoice-health-check] paid orders without invoice (>30 min):', {
     count: affected.length,
+    healed: healed.length,
+    stillMissing: stillMissing.length,
     sample: affected.slice(0, 5).map((o) => o.friendlyOrderId ?? o.orderNumber ?? o.id),
   });
 
-  await postSlackAlert(affected);
+  // Only alert a human about the ones we couldn't auto-heal.
+  if (stillMissing.length > 0) await postSlackAlert(stillMissing);
 
   return NextResponse.json({
     success: true,
     data: {
       affectedCount: affected.length,
-      affected: affected.map((o) => ({
+      healedCount: healed.length,
+      healed,
+      stillMissing: stillMissing.map((o) => ({
         id: o.id,
         ref: o.friendlyOrderId ?? o.orderNumber,
         totalPrice: o.totalPrice,
         paidAt: o.paidAt,
         email: o.email,
       })),
-      slackPosted: !!process.env.SLACK_WEBHOOK_URL,
+      slackPosted: !!process.env.SLACK_WEBHOOK_URL && stillMissing.length > 0,
       processedAt: new Date().toISOString(),
     },
   });
