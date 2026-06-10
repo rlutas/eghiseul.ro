@@ -159,7 +159,7 @@ export default function ContractPreview() {
             <>
               <style>{contractPreviewStyles}</style>
               <div
-                className="contract-preview max-h-[500px] overflow-y-auto border rounded-lg p-6 bg-white"
+                className="contract-preview max-h-[300px] sm:max-h-[500px] overflow-y-auto border rounded-lg p-3 sm:p-6 bg-white"
                 dangerouslySetInnerHTML={{ __html: displayHtml }}
               />
             </>

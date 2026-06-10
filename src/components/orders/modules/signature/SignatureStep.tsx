@@ -18,6 +18,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { PenLine, AlertCircle, Trash2, Download } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
 import type { SignatureConfig } from '@/types/verification-modules';
 import ContractPreview from './ContractPreview';
 
@@ -29,6 +30,7 @@ interface SignatureStepProps {
 export default function SignatureStep({ config, onValidChange }: SignatureStepProps) {
   const { state, updateSignature, updateConsent } = useModularWizard();
   const signature = state.signature;
+  const termsAccepted = !!state.consent?.termsAccepted;
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
@@ -179,12 +181,24 @@ export default function SignatureStep({ config, onValidChange }: SignatureStepPr
     link.click();
   }, []);
 
-  // Validate form - only check signature (terms handled in review step)
+  // Toggle the T&C acceptance shown under the signature. One box covers all
+  // three consent flags (terms + privacy + 14-day withdrawal waiver) — the
+  // same grouped consent the backend audit trail records.
+  const handleToggleTerms = useCallback((checked: boolean) => {
+    updateConsent?.({
+      termsAccepted: checked,
+      privacyAccepted: checked,
+      withdrawalWaiver: checked,
+    });
+  }, [updateConsent]);
+
+  // Validate form — signature AND the terms checkbox must be accepted.
   const isFormValid = useCallback(() => {
     if (!signature) return false;
     if (config.required && !hasSignature) return false;
+    if (config.required && !termsAccepted) return false;
     return true;
-  }, [signature, config, hasSignature]);
+  }, [signature, config, hasSignature, termsAccepted]);
 
   // Notify parent of validation changes
   useEffect(() => {
@@ -265,12 +279,60 @@ export default function SignatureStep({ config, onValidChange }: SignatureStepPr
         </CardContent>
       </Card>
 
+      {/* Terms & Conditions — shown right under the signature, auto-ticked when
+          the user signs (signing = consent) but can be toggled independently. */}
+      <div className="rounded-lg border bg-muted/20 p-4">
+        <label className="flex items-start gap-3 cursor-pointer group">
+          <Checkbox
+            checked={termsAccepted}
+            onCheckedChange={(checked) => handleToggleTerms(checked === true)}
+            className="mt-0.5 shrink-0"
+          />
+          <span className="text-sm leading-relaxed text-neutral-700 group-hover:text-neutral-900">
+            <span className="text-red-500">*</span> Am citit și sunt de acord cu{' '}
+            <a
+              href="/termeni"
+              target="_blank"
+              rel="noopener"
+              className="text-primary-600 hover:underline font-medium"
+              onClick={(e) => e.stopPropagation()}
+            >
+              Termenii și Condițiile
+            </a>
+            {' '}și{' '}
+            <a
+              href="/confidentialitate"
+              target="_blank"
+              rel="noopener"
+              className="text-primary-600 hover:underline font-medium"
+              onClick={(e) => e.stopPropagation()}
+            >
+              Politica de Confidențialitate
+            </a>
+            . Solicit executarea imediată a serviciului și renunț la dreptul de retragere de 14 zile (OUG 34/2014, art. 16 lit. a). Accept că semnătura electronică simplă aplicată prin platformă are valoare juridică conform Legii nr. 214/2024 și Regulamentului UE 910/2014 (eIDAS).
+            {hasSignature && termsAccepted && (
+              <span className="block mt-1.5 text-xs text-green-700">
+                ✓ Bifat automat la semnare — poți debifa dacă vrei să retragi consimțământul.
+              </span>
+            )}
+          </span>
+        </label>
+      </div>
+
       {/* Validation Message */}
       {!hasSignature && config.required && (
         <Alert>
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
             Semnătura ta este obligatorie pentru a continua.
+          </AlertDescription>
+        </Alert>
+      )}
+      {hasSignature && !termsAccepted && config.required && (
+        <Alert>
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            Bifează acceptarea termenilor și condițiilor pentru a continua.
           </AlertDescription>
         </Alert>
       )}

@@ -1197,28 +1197,25 @@ export function DeliveryStepModular({ onValidChange }: DeliveryStepProps) {
             Înapoi
           </Button>
 
-          {/* Courier Header */}
+          {/* Courier Header — logos are decorative only (pointer-events-none +
+              aria-hidden) so customers don't mistake them for tappable buttons. */}
           <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-blue-50 to-red-50 rounded-xl border border-neutral-200">
-            <div className="flex items-center gap-2">
-              <div className="w-10 h-10 rounded-lg bg-white flex items-center justify-center p-1.5 shadow-sm border border-blue-100">
-                <Image
-                  src="/images/couriers/fancourier.svg"
-                  alt="Fan Courier"
-                  width={32}
-                  height={32}
-                  className="object-contain"
-                />
-              </div>
-              <div className="w-10 h-10 rounded-lg bg-white flex items-center justify-center p-1.5 shadow-sm border border-red-100">
-                <Image
-                  src="/images/couriers/sameday.webp"
-                  alt="Sameday"
-                  width={32}
-                  height={32}
-                  className="object-contain"
-                  unoptimized
-                />
-              </div>
+            <div className="flex items-center gap-2 pointer-events-none select-none shrink-0" aria-hidden="true">
+              <Image
+                src="/images/couriers/fancourier.svg"
+                alt=""
+                width={28}
+                height={28}
+                className="object-contain opacity-90"
+              />
+              <Image
+                src="/images/couriers/sameday.webp"
+                alt=""
+                width={28}
+                height={28}
+                className="object-contain opacity-90"
+                unoptimized
+              />
             </div>
             <div>
               <h3 className="font-semibold text-secondary-900">Livrare în România</h3>
@@ -1235,12 +1232,13 @@ export function DeliveryStepModular({ onValidChange }: DeliveryStepProps) {
 
             <Form {...form}>
               <form className="grid grid-cols-2 gap-3 sm:gap-4">
-                {/* County */}
+                {/* County — full width on mobile so the long placeholder isn't
+                    clipped; side-by-side with Localitate from sm up. */}
                 <FormField
                   control={form.control}
                   name="county"
                   render={({ field }) => (
-                    <FormItem>
+                    <FormItem className="col-span-2 sm:col-span-1">
                       <FormLabel>Județ <span className="text-red-500">*</span></FormLabel>
                       <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
@@ -1266,7 +1264,7 @@ export function DeliveryStepModular({ onValidChange }: DeliveryStepProps) {
                   control={form.control}
                   name="city"
                   render={({ field }) => (
-                    <FormItem>
+                    <FormItem className="col-span-2 sm:col-span-1">
                       <FormLabel>Localitate <span className="text-red-500">*</span></FormLabel>
                       <Select
                         onValueChange={field.onChange}
