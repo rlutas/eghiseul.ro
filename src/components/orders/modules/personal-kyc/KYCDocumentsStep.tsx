@@ -26,7 +26,6 @@ import {
   AlertCircle,
   Camera,
   Upload,
-  User,
   FileText,
   Trash2,
   Eye,
@@ -34,6 +33,7 @@ import {
   CreditCard,
   Info,
   FileCheck,
+  ShieldCheck,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { PersonalKYCConfig, DocumentType, UploadedDocumentState } from '@/types/verification-modules';
@@ -76,7 +76,7 @@ const DOCUMENT_CONFIG: Record<
   selfie: {
     title: 'Selfie cu Document',
     description: 'Selfie ținând documentul de identitate lângă față',
-    icon: User,
+    icon: Camera,
     tips: [
       'Ține documentul (CI sau pașaport) lângă față',
       'Asigură-te că fața ta este vizibilă clar',
@@ -804,12 +804,13 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
         </div>
       )}
 
-      {/* Security Note */}
-      <div className="text-center text-xs text-neutral-500">
-        <span className="inline-flex items-center gap-1">
-          <CheckCircle className="w-3 h-3" />
-          Documentele sunt criptate și stocate securizat pentru verificarea identității
-        </span>
+      {/* Security reassurance — calm, trustworthy, not an alert. */}
+      <div className="flex items-start gap-2.5 rounded-xl border border-green-100 bg-green-50/60 px-3.5 py-3">
+        <ShieldCheck className="w-4 h-4 text-green-600 shrink-0 mt-0.5" />
+        <p className="text-xs leading-relaxed text-neutral-600">
+          <span className="font-medium text-secondary-900">Datele tale sunt în siguranță.</span>{' '}
+          Documentele sunt criptate și stocate securizat, folosite exclusiv pentru verificarea identității.
+        </p>
       </div>
 
       {/* Preview Modal */}
