@@ -145,6 +145,24 @@ test.describe('Public API — /api/courier/localities', () => {
   });
 });
 
+test.describe('Public API — /api/courier/pickup-points (lockere)', () => {
+  test('răspunde fără 500 și setează Cache-Control la edge (CDN-cache)', async ({
+    request,
+  }) => {
+    const response = await request.get(
+      '/api/courier/pickup-points?county=' + encodeURIComponent('București'),
+    );
+    // Provider creds may be absent in CI → the route still returns 200 with an
+    // empty list (it catches provider errors). Never a 500.
+    expect(response.status(), 'pickup-points must not 500').toBeLessThan(500);
+
+    // The locker response is CDN-cacheable so repeat loads are instant.
+    const cacheControl = response.headers()['cache-control'] || '';
+    expect(cacheControl).toContain('s-maxage');
+    expect(cacheControl).toContain('stale-while-revalidate');
+  });
+});
+
 test.describe('Public API — /api/admin/* blochează accesul anonim', () => {
   const PROTECTED_ENDPOINTS = [
     '/api/admin/dashboard/stats',
