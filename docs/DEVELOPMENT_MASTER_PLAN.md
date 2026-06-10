@@ -1,7 +1,7 @@
 # eGhiseul.ro - Development Master Plan
 
-**Version:** 4.7
-**Last Updated:** 2026-06-09
+**Version:** 4.8
+**Last Updated:** 2026-06-10
 **Status:** Sprint 4 In Progress (98%) | Sprint 5 In Progress (98%) | Admin Workflow ✅ | Document Generation ✅ | Multi-Signature ✅ | Contract Preview ✅ | Contract Legal Validity ✅ | Client Downloads ✅ | Extended RBAC ✅ | Number Registry ✅ | Gemini 2.5 Flash ✅ | KYC S3 Upload ✅ | Admin UI Polish ✅ | Review Step Pricing ✅ | Registry Own Page ✅ | User Invite ✅ | Template Placeholders ✅ | CLIENT_DETAILS_BLOCK Legal Format ✅ | KYC Confidence Tracking ✅
 
 ---
@@ -532,6 +532,16 @@
 - Continue incomplete orders on behalf of customers
 - Audit logging for admin actions
 - Auto-generate contracts (contract-prestari, contract-asistenta) at payment confirmation (webhook trigger)
+
+**Recently Completed (2026-06-10 — mobile + payments + draft-resume session):**
+- 🔴 **Duplicate Oblio invoice fixed** — concurrent Stripe webhooks (checkout.session.completed + payment_intent.succeeded) created 2 invoices (E-260610-ZHGXB). Deleted both in Oblio + added an atomic DB lock (migration 049 `invoice_generating_at`) so only one webhook creates the invoice.
+- **Draft resume from server** — wizard reads `?order=&email=` and restores the saved draft cross-device (was localStorage-only); contact form syncs restored values. New E2E `draft-resume.spec`.
+- **Courier VAT aligned to 21%** (Sameday + Fan Courier fallbacks + utils) and support phone hardcoded to +40 757 708 181 (no Vercel env).
+- **Bundled-option country/language dropdowns** — apostila/translation on the secondary service (Certificat Integritate) now ask for destination country / language.
+- **KYC step polish** — selfie card uses Camera icon; encrypted-docs note redesigned (ShieldCheck card).
+- **Mobile UX batch** — Localitate type-to-search; no preselected delivery; delivery cards + locker selector layout; checkout pays directly on mobile; success page drops duplicate order code; iOS input-zoom fix (16px); contract compact + terms checkbox under signature.
+- **Lockers CDN-cached** (`/api/courier/pickup-points` Cache-Control) — repeat loads instant.
+- **E2E suite refreshed** — modernized for the new wizard (single citizenship checkbox, phone a11y label, real flow); removed a stale duplicate spec. 75 stable specs green + 1042 unit tests.
 
 **Recently Completed (2026-06-09 — wizard + KYC session):**
 - ✅ **Post-order selfie re-upload** — admin-generated secure single-use link (table `reupload_requests`, migration 048), public `/reincarca-poza/[token]` page, `/api/reupload/[token]` + `/api/admin/orders/[id]/request-reupload`, email (Resend) + WhatsApp share. Spec: `technical/specs/post-order-photo-reupload.md`

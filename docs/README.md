@@ -7,7 +7,17 @@
 **Plan SEO master:** [`seo/SEO-MASTER-PLAN-2026-05-20.md`](seo/SEO-MASTER-PLAN-2026-05-20.md)
 **Rebuild queue (47 pagini):** [`seo/REBUILD-QUEUE.md`](seo/REBUILD-QUEUE.md)
 **City pages plan:** [`seo/CITY-PAGES-PLAN.md`](seo/CITY-PAGES-PLAN.md)
-**Sesiune curentă (2026-06-09):** wizard + KYC polish — **citește aici unde am rămas**:
+**Sesiune curentă (2026-06-10):** mobil + plăți + reluare draft — **citește aici unde am rămas**:
+- 🔴 [`session-logs/2026-06-10-duplicate-oblio-invoice-fix.md`](session-logs/2026-06-10-duplicate-oblio-invoice-fix.md) — **incident**: factură Oblio dublată din webhook concurent → șters + lock atomic (migrare 049)
+- [`session-logs/2026-06-10-draft-resume-from-server.md`](session-logs/2026-06-10-draft-resume-from-server.md) — reluare comandă din server via `?order=&email=` (cross-device) + sync formular contact
+- [`session-logs/2026-06-10-sameday-vat-21-and-phone.md`](session-logs/2026-06-10-sameday-vat-21-and-phone.md) — TVA curieri aliniat la 21% + nr. suport hardcodat (+40 757 708 181)
+- [`session-logs/2026-06-10-ui-batch-bundled-kyc-lockers.md`](session-logs/2026-06-10-ui-batch-bundled-kyc-lockers.md) — dropdown țară/limbă la opțiuni bundled, card KYC, lockere CDN-cache
+- [`session-logs/2026-06-10-mobile-delivery-checkout-status-polish.md`](session-logs/2026-06-10-mobile-delivery-checkout-status-polish.md) — localitate searchable, checkout buton dublu, success cod dublu, WhatsApp prefill
+- [`session-logs/2026-06-10-mobile-wizard-polish.md`](session-logs/2026-06-10-mobile-wizard-polish.md) — termeni sub semnătură, contract compact, iconițe curier
+- [`session-logs/2026-06-10-ios-input-zoom-fix.md`](session-logs/2026-06-10-ios-input-zoom-fix.md) — fix zoom iOS la dropdown-uri (font 16px pe mobil)
+- [`session-logs/2026-06-10-e2e-playwright-verification.md`](session-logs/2026-06-10-e2e-playwright-verification.md) — refresh suită E2E Playwright
+
+**Sesiune (2026-06-09):** wizard + KYC polish:
 - [`session-logs/2026-06-09-post-order-selfie-reupload.md`](session-logs/2026-06-09-post-order-selfie-reupload.md) — **NOU**: re-upload selfie după comandă prin link securizat (admin) → vezi [`technical/specs/post-order-photo-reupload.md`](technical/specs/post-order-photo-reupload.md)
 - [`session-logs/2026-06-09-remove-ai-selfie-face-match.md`](session-logs/2026-06-09-remove-ai-selfie-face-match.md) — eliminat face-match AI la selfie (verificare manuală)
 - [`session-logs/2026-06-09-bundled-options-dependency-chain.md`](session-logs/2026-06-09-bundled-options-dependency-chain.md) — dependențe apostilă/traducere/legalizare la serviciile secundare
