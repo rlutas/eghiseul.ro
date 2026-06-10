@@ -299,8 +299,10 @@ export default function CheckoutPage() {
           </h1>
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
-          {/* Payment Section */}
-          <div className="lg:col-span-2 space-y-6">
+          {/* Payment Section — on mobile it comes AFTER the summary + coupon
+              (order-2) so the customer sees what they pay + can apply a coupon
+              before choosing how to pay. Desktop keeps it in the left columns. */}
+          <div className="lg:col-span-2 space-y-6 order-2 lg:order-1">
             {/* Error Alert */}
             {error && (
               <Alert variant="destructive">
@@ -317,6 +319,13 @@ export default function CheckoutPage() {
                   onChange={(method) => {
                     setPaymentMethod(method);
                     setError(null);
+                    // Guide the customer to the matching details section after
+                    // they pick a method (smooth scroll once it re-renders).
+                    setTimeout(() => {
+                      document
+                        .querySelector<HTMLElement>('#payment-form-anchor')
+                        ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }, 80);
                   }}
                 />
               </CardContent>
@@ -432,9 +441,9 @@ export default function CheckoutPage() {
           </div>
 
           {/* Order Summary Sidebar — uses the same <OrderSidebar> as the
-              wizard so /comanda and /comanda/checkout look identical:
-              same nested layout, same delivery estimate, same badges. */}
-          <div className="space-y-4 lg:sticky lg:top-4 lg:self-start">
+              wizard. On mobile it's FIRST (order-1) with the coupon, so the
+              customer reviews + discounts before paying. Desktop = sticky right. */}
+          <div className="space-y-4 order-1 lg:order-2 lg:sticky lg:top-4 lg:self-start">
             {(() => {
               // Compute delivery estimate from raw options (need `code` +
               // `bundledFor` which the UI-shaped list doesn't carry).

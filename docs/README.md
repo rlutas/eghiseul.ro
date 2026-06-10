@@ -8,6 +8,7 @@
 **Rebuild queue (47 pagini):** [`seo/REBUILD-QUEUE.md`](seo/REBUILD-QUEUE.md)
 **City pages plan:** [`seo/CITY-PAGES-PLAN.md`](seo/CITY-PAGES-PLAN.md)
 **Sesiune curentă (2026-06-10):** mobil + plăți + reluare draft — **citește aici unde am rămas**:
+- [`session-logs/2026-06-10-checkout-reorder-coupon.md`](session-logs/2026-06-10-checkout-reorder-coupon.md) — checkout: cupon mai sus, reordonare mobil (sumar+cupon → plată), scroll la metodă
 - [`session-logs/2026-06-10-summary-dropdown-and-console-fix.md`](session-logs/2026-06-10-summary-dropdown-and-console-fix.md) — dropdown rezumat curat (preț), spacing header, fix erori consolă (semnătură)
 - [`session-logs/2026-06-10-wizard-mobile-sticky-summary.md`](session-logs/2026-06-10-wizard-mobile-sticky-summary.md) — bară sticky cu total/preț pe toți pașii wizard (mobil)
 - [`session-logs/2026-06-10-mobile-polish-round2.md`](session-logs/2026-06-10-mobile-polish-round2.md) — titlu secundar full, ascuns stepper KYC single-doc, bară sticky checkout cu sumar
