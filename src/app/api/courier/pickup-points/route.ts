@@ -58,18 +58,29 @@ export async function GET(request: NextRequest) {
     // Sort by city name
     filteredPoints.sort((a, b) => (a.city || '').localeCompare(b.city || ''));
 
-    return NextResponse.json({
-      success: true,
-      data: filteredPoints,
-      meta: {
-        total: filteredPoints.length,
-        filters: {
-          provider: providerCode || 'all',
-          county: county || null,
-          city: city || null,
+    return NextResponse.json(
+      {
+        success: true,
+        data: filteredPoints,
+        meta: {
+          total: filteredPoints.length,
+          filters: {
+            provider: providerCode || 'all',
+            county: county || null,
+            city: city || null,
+          },
         },
       },
-    });
+      {
+        // Locker locations barely change. Cache the response at the CDN/edge
+        // (per full URL → per county/provider) so only the FIRST request per
+        // county hits the slow courier API; everyone after gets it instantly.
+        // stale-while-revalidate keeps it snappy while refreshing in the bg.
+        headers: {
+          'Cache-Control': 'public, s-maxage=86400, stale-while-revalidate=604800',
+        },
+      }
+    );
   } catch (error) {
     console.error('[Courier Pickup Points API] Error:', error);
     return NextResponse.json(
