@@ -250,6 +250,31 @@ async function handlePaymentSucceeded(paymentIntent: Stripe.PaymentIntent) {
   }
 
   // 3. Create Oblio invoice
+  //
+  // ATOMIC CLAIM against duplicate invoices: Stripe fires both
+  // checkout.session.completed and payment_intent.succeeded for the same
+  // payment ~1-2s apart, and both reach here before either writes
+  // invoice_number (the Oblio call takes ~1.5s). The read-check on line ~182
+  // is therefore racy. Claim the row with a conditional UPDATE and only the
+  // winner creates the invoice. The lock self-expires after 2 min so a genuine
+  // retry can re-claim if invoice creation failed. (Fixes E-260610-ZHGXB.)
+  const lockStaleBefore = new Date(Date.now() - 2 * 60 * 1000).toISOString()
+  const { data: claimRows, error: claimError } = await supabaseAdmin
+    .from('orders')
+    .update({ invoice_generating_at: new Date().toISOString() })
+    .eq('id', orderId)
+    .is('invoice_number', null)
+    .or(`invoice_generating_at.is.null,invoice_generating_at.lt.${lockStaleBefore}`)
+    .select('id')
+
+  if (claimError) {
+    console.error('Invoice lock claim failed:', claimError)
+  }
+  if (!claimRows || claimRows.length === 0) {
+    console.log(`Order ${orderId}: invoice already created or being created by another webhook — skipping`)
+    return
+  }
+
   try {
     // Get service name + lawyer fee from joined relation
     const svcRel = order.services as { name: string; lawyer_fee_ron?: number | null } | null;
