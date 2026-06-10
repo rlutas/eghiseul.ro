@@ -2,12 +2,16 @@
 
 import { MessageCircle, Phone } from 'lucide-react';
 
-const SUPPORT_PHONE = process.env.NEXT_PUBLIC_SUPPORT_PHONE || '+40 745 850 700';
-const SUPPORT_WHATSAPP =
-  process.env.NEXT_PUBLIC_SUPPORT_WHATSAPP_URL ||
-  // Sister-style wa.me link with prefilled greeting. Strip non-digits from
-  // the phone number for the URL but keep the formatted version for display.
-  `https://wa.me/${SUPPORT_PHONE.replace(/[^0-9]/g, '')}?text=${encodeURIComponent('Bună, am o întrebare despre comanda mea ')}`;
+const SUPPORT_PHONE = process.env.NEXT_PUBLIC_SUPPORT_PHONE || '+40 757 708 181';
+
+/** wa.me link with a prefilled message that includes the order code + site so
+ *  support instantly knows which order (and that it came from eghiseul.ro). */
+function buildWhatsappUrl(orderCode?: string): string {
+  const msg = orderCode
+    ? `Bună! Am o întrebare despre comanda ${orderCode} (eghiseul.ro).`
+    : 'Bună! Am o întrebare despre o comandă de pe eghiseul.ro.';
+  return `https://wa.me/${SUPPORT_PHONE.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(msg)}`;
+}
 
 /**
  * Fixed help card on the customer-facing /comanda/status page. Primary
@@ -18,7 +22,8 @@ const SUPPORT_WHATSAPP =
  * Matches sister project (cazierjudiciaronline.com) UX where the same green
  * card sits right under the status header.
  */
-export function HelpContactCard() {
+export function HelpContactCard({ orderCode }: { orderCode?: string }) {
+  const whatsappUrl = buildWhatsappUrl(orderCode);
   return (
     <div className="rounded-lg border border-green-200 bg-green-50 p-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -30,7 +35,7 @@ export function HelpContactCard() {
         </div>
         <div className="flex flex-wrap gap-2">
           <a
-            href={SUPPORT_WHATSAPP}
+            href={whatsappUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-1.5 rounded-md bg-green-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-green-700"

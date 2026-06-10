@@ -182,6 +182,23 @@ const contractPreviewStyles = `
     margin: 6px 0;
   }
 
+  /* Word/mammoth often emits big left indents (margin-left / text-indent /
+     nested-list padding) that push the text far right and clip it on mobile.
+     Flatten them so the contract reads edge-to-edge. Tables keep their own
+     layout below. */
+  .contract-preview p,
+  .contract-preview div:not(.sig-image):not(.sig-placeholder):not(.sig-other) {
+    margin-left: 0 !important;
+    padding-left: 0 !important;
+    text-indent: 0 !important;
+  }
+
+  .contract-preview ul,
+  .contract-preview ol {
+    margin: 6px 0;
+    padding-left: 18px;
+  }
+
   .contract-preview strong {
     font-weight: 700;
   }

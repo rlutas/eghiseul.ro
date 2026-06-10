@@ -36,6 +36,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
+import { SearchableSelect } from '@/components/shared/SearchableSelect';
 import { useModularWizard } from '@/providers/modular-wizard-provider';
 import { cn } from '@/lib/utils';
 
@@ -400,7 +401,9 @@ export function DeliveryStepModular({ onValidChange }: DeliveryStepProps) {
         );
         setQuotes(sortedQuotes);
 
-        // Re-select previously chosen service on remount, or auto-select cheapest
+        // Re-select ONLY a previously chosen service on remount. We no longer
+        // auto-select the cheapest — the customer must actively pick a delivery
+        // option (no option is preselected by default).
         const preferred = preferredService
           ? sortedQuotes.find((q: CourierQuote) => q.service === preferredService && q.provider === delivery.courierProvider)
           : null;
@@ -416,8 +419,6 @@ export function DeliveryStepModular({ onValidChange }: DeliveryStepProps) {
               });
             }
           }
-        } else if (sortedQuotes.length > 0) {
-          setSelectedQuote(sortedQuotes[0]);
         }
       } else {
         setQuoteError(data.error?.message || 'Nu am putut obține prețurile');
@@ -1266,32 +1267,26 @@ export function DeliveryStepModular({ onValidChange }: DeliveryStepProps) {
                   render={({ field }) => (
                     <FormItem className="col-span-2 sm:col-span-1">
                       <FormLabel>Localitate <span className="text-red-500">*</span></FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        value={field.value}
-                        disabled={!watchedCounty || loadingLocalities}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue
-                              placeholder={
-                                loadingLocalities
-                                  ? 'Se încarcă...'
-                                  : !watchedCounty
-                                  ? 'Selectează județul mai întâi'
-                                  : 'Selectează localitatea'
-                              }
-                            />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent className="max-h-[300px]">
-                          {localities.map((locality) => (
-                            <SelectItem key={locality.id || locality.name} value={locality.name}>
-                              {locality.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      {/* Type-to-search instead of a long native dropdown — the
+                          county can have hundreds of localities and the plain
+                          <Select> felt slow to scroll on mobile. */}
+                      {!watchedCounty ? (
+                        <div className="flex items-center h-10 px-3 py-2 border rounded-md bg-neutral-50 text-sm text-neutral-400">
+                          Selectează județul mai întâi
+                        </div>
+                      ) : loadingLocalities ? (
+                        <div className="flex items-center gap-2 h-10 px-3 py-2 border rounded-md bg-neutral-50">
+                          <Loader2 className="w-4 h-4 animate-spin text-neutral-400" />
+                          <span className="text-sm text-neutral-500">Se încarcă localitățile...</span>
+                        </div>
+                      ) : (
+                        <SearchableSelect
+                          options={localities.map((l) => l.name)}
+                          value={field.value}
+                          onChange={field.onChange}
+                          placeholder="Scrie sau alege localitatea..."
+                        />
+                      )}
                       <FormMessage />
                     </FormItem>
                   )}
@@ -1544,31 +1539,20 @@ export function DeliveryStepModular({ onValidChange }: DeliveryStepProps) {
                           isSelected && 'shadow-md'
                         )}
                       >
-                        <div className="flex items-center gap-4">
-                          {/* Radio indicator */}
+                        <div className="flex items-center gap-3">
+                          {/* Courier logo (selection is shown by the card's
+                              highlighted border/shadow — no radio needed). */}
                           <div
                             className={cn(
-                              'w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-colors',
-                              colors.radio
-                            )}
-                          >
-                            {isSelected && (
-                              <CheckCircle className="w-5 h-5 text-white" />
-                            )}
-                          </div>
-
-                          {/* Courier logo */}
-                          <div
-                            className={cn(
-                              'w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 p-1.5 border',
+                              'w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 p-1.5 border',
                               isSelected ? 'bg-white border-neutral-200 shadow-sm' : 'bg-white border-neutral-100'
                             )}
                           >
                             <Image
                               src={colors.logo}
                               alt={colors.logoAlt}
-                              width={36}
-                              height={36}
+                              width={34}
+                              height={34}
                               className="object-contain"
                               unoptimized={colors.logo.endsWith('.webp')}
                             />
@@ -1576,19 +1560,19 @@ export function DeliveryStepModular({ onValidChange }: DeliveryStepProps) {
 
                           {/* Service info */}
                           <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 flex-wrap">
-                              <h5 className="font-semibold text-secondary-900">
+                            <div className="flex items-center gap-2">
+                              <h5 className="font-semibold text-secondary-900 truncate">
                                 {quote.serviceName}
                               </h5>
                               {isLocker && (
-                                <span className={cn('text-xs px-2 py-0.5 rounded font-medium', colors.badge)}>
+                                <span className={cn('text-xs px-2 py-0.5 rounded font-medium shrink-0', colors.badge)}>
                                   Locker
                                 </span>
                               )}
                             </div>
-                            <div className="flex items-center gap-3 mt-1 text-sm text-neutral-500">
-                              <span className="flex items-center gap-1">
-                                <Clock className="w-3.5 h-3.5" />
+                            <div className="mt-1 text-sm text-neutral-500">
+                              <span className="inline-flex items-center gap-1 whitespace-nowrap">
+                                <Clock className="w-3.5 h-3.5 shrink-0" />
                                 {quote.estimatedDays === 0
                                   ? 'Azi'
                                   : quote.estimatedDays === 1
@@ -1602,7 +1586,7 @@ export function DeliveryStepModular({ onValidChange }: DeliveryStepProps) {
                           <div className="text-right flex-shrink-0">
                             <div
                               className={cn(
-                                'text-lg font-bold',
+                                'text-lg font-bold whitespace-nowrap',
                                 colors.price
                               )}
                             >
@@ -1625,21 +1609,23 @@ export function DeliveryStepModular({ onValidChange }: DeliveryStepProps) {
                         ? 'border-red-200 bg-red-50'
                         : 'border-blue-200 bg-blue-50'
                     )}>
-                      <h5 className={cn(
-                        'font-medium flex items-center gap-2 mb-3',
-                        selectedQuote.provider === 'sameday' ? 'text-red-900' : 'text-blue-900'
-                      )}>
-                        <Box className="w-4 h-4" />
-                        Selectați {getLockerBrandName(selectedQuote)}-ul
+                      <div className="mb-3">
+                        <h5 className={cn(
+                          'font-medium flex items-center gap-2',
+                          selectedQuote.provider === 'sameday' ? 'text-red-900' : 'text-blue-900'
+                        )}>
+                          <Box className="w-4 h-4 shrink-0" />
+                          <span className="truncate">Selectați {getLockerBrandName(selectedQuote)}-ul</span>
+                        </h5>
                         {lockers.length > 0 && lockers[0].distance !== undefined && (
-                          <span className={cn(
-                            'text-xs font-normal ml-auto',
+                          <p className={cn(
+                            'text-xs font-normal mt-0.5 ml-6',
                             selectedQuote.provider === 'sameday' ? 'text-red-600' : 'text-blue-600'
                           )}>
-                            (sortate după distanță)
-                          </span>
+                            sortate după distanță
+                          </p>
                         )}
-                      </h5>
+                      </div>
 
                       {(loadingLockers || gettingLocation) && (
                         <div className={cn(
@@ -1676,30 +1662,17 @@ export function DeliveryStepModular({ onValidChange }: DeliveryStepProps) {
                                     : 'hover:bg-neutral-50'
                                 )}
                               >
-                                {/* Radio */}
-                                <div className={cn(
-                                  'w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0',
-                                  isLockerSelected
-                                    ? isSameday ? 'border-red-500 bg-red-500' : 'border-blue-500 bg-blue-500'
-                                    : 'border-neutral-300 bg-white'
-                                )}>
-                                  {isLockerSelected && (
-                                    <CheckCircle className="w-4 h-4 text-white" />
-                                  )}
-                                </div>
-
-                                {/* Locker icon */}
+                                {/* Locker icon (selection shown by row background
+                                    + the colored icon — no separate radio). */}
                                 <div className={cn(
                                   'w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0',
                                   isLockerSelected
-                                    ? isSameday ? 'bg-red-100' : 'bg-blue-100'
+                                    ? isSameday ? 'bg-red-500' : 'bg-blue-500'
                                     : 'bg-neutral-100'
                                 )}>
                                   <Box className={cn(
                                     'w-4 h-4',
-                                    isLockerSelected
-                                      ? isSameday ? 'text-red-600' : 'text-blue-600'
-                                      : 'text-neutral-500'
+                                    isLockerSelected ? 'text-white' : 'text-neutral-500'
                                   )} />
                                 </div>
 

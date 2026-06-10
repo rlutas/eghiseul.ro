@@ -297,7 +297,7 @@ function OrderStatusContent() {
           {/* Help contact card — WhatsApp + phone, first touchpoint when the
               customer is confused. Always rendered above the status details
               to match sister project UX. */}
-          <HelpContactCard />
+          <HelpContactCard orderCode={orderData.orderCode} />
 
           {/* Status Card */}
           <Card>

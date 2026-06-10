@@ -513,14 +513,32 @@ export default function CheckoutPage() {
           </div>
           <Button
             type="button"
+            disabled={paymentMethod === 'card' && isRedirecting}
             onClick={() => {
-              const form =
-                document.querySelector<HTMLElement>('#payment-form-anchor');
-              form?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              // Card: pay directly (don't make the user hunt for a second
+              // button). Bank transfer: scroll to the details/instructions.
+              if (paymentMethod === 'card') {
+                handleCardCheckout();
+              } else {
+                document
+                  .querySelector<HTMLElement>('#payment-form-anchor')
+                  ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }
             }}
             className="h-11 px-5 bg-primary-500 hover:bg-primary-600 text-secondary-900 font-semibold"
           >
-            {paymentMethod === 'card' ? 'Completează plata' : 'Vezi detalii'}
+            {paymentMethod === 'card' ? (
+              isRedirecting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Se procesează...
+                </>
+              ) : (
+                'Plătește cu cardul'
+              )
+            ) : (
+              'Vezi detalii'
+            )}
           </Button>
         </div>
       </div>
