@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Service Detail Page', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/services/cazier-judiciar');
+    await page.goto('/servicii/cazier-judiciar');
   });
 
   test('should display service page with all sections', async ({ page }) => {
@@ -83,6 +83,6 @@ test.describe('Service Listing', () => {
     await serviceCard.click();
 
     // Should be on service detail page
-    await expect(page).toHaveURL(/\/services\//);
+    await expect(page).toHaveURL(/\/servicii\//);
   });
 });

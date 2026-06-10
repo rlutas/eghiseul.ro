@@ -110,8 +110,8 @@ test.describe('Homepage Navigation', () => {
     const serviceLink = page.getByRole('link', { name: /cazier|certificat|extras/i }).first();
     await serviceLink.click();
 
-    // Should be on a service page
-    await expect(page).toHaveURL(/\/services\//);
+    // Should land on a service detail or order page (RO routes).
+    await expect(page).toHaveURL(/\/(servicii|comanda)\//);
   });
 
   test('should navigate to login page', async ({ page }) => {

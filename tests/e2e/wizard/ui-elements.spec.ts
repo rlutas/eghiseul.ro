@@ -59,20 +59,18 @@ test.describe('UI Elements — shadcn rendering', () => {
     await expect(submit).toBeVisible();
   });
 
-  test('wizard: input-uri, radio group și butoane vizibile pe pasul 1', async ({
+  test('wizard: input-uri și butoane vizibile pe pasul 1', async ({
     page,
   }) => {
     await openWizard(page);
 
-    // Email + Phone textboxes
+    // Email + Phone textboxes (phone exposes aria-label="Telefon")
     await expect(page.getByRole('textbox', { name: /email/i })).toBeVisible();
     await expect(page.getByRole('textbox', { name: /telefon/i })).toBeVisible();
 
-    // Contact method radios (email / telefon / whatsapp)
-    const radios = page.getByRole('radio');
-    expect(await radios.count()).toBeGreaterThan(0);
-
-    // Continuă button present (may be disabled initially)
+    // Continuă button present (may be disabled initially). The old
+    // preferred-contact radio group was removed from step 1, so we no longer
+    // assert radios here.
     const continueBtn = page.getByRole('button', { name: /continuă/i });
     await expect(continueBtn).toBeVisible();
   });

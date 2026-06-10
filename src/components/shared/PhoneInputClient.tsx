@@ -37,6 +37,9 @@ export function PhoneInputClient({ value, onChange }: Props) {
       inputProps={{
         inputMode: 'tel',
         autoComplete: 'tel',
+        // Accessible name so screen readers announce the field and tests can
+        // target it (react-international-phone renders a bare <input> otherwise).
+        'aria-label': 'Telefon',
       }}
     />
   );

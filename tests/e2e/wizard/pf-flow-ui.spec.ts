@@ -29,6 +29,19 @@ async function openWizard(page: Page) {
   await page.reload();
 }
 
+/**
+ * Fill the contact step. The phone uses react-international-phone (forceDialCode
+ * keeps "+40 "), which ignores Locator.fill() of a pre-formatted string — we
+ * must type the national digits as real keystrokes so its onChange fires.
+ */
+async function fillContact(page: Page) {
+  await page.getByRole('textbox', { name: /email/i }).fill('test@eghiseul.ro');
+  const phone = page.getByRole('textbox', { name: /telefon/i });
+  await phone.click();
+  await phone.pressSequentially('755123456', { delay: 20 });
+  await page.waitForTimeout(700); // validation debounce
+}
+
 test.describe('Wizard PF — UI flow (fără plată)', () => {
   test('pasul 1: completarea contactului activează butonul Continuă', async ({
     page,
@@ -45,11 +58,7 @@ test.describe('Wizard PF — UI flow (fără plată)', () => {
     // Button should start disabled
     await expect(continueBtn).toBeDisabled();
 
-    await emailInput.fill('test@eghiseul.ro');
-    await phoneInput.fill('+40 755 123 456');
-
-    // Validation debounce
-    await page.waitForTimeout(600);
+    await fillContact(page);
 
     await expect(continueBtn).toBeEnabled();
 
@@ -58,77 +67,45 @@ test.describe('Wizard PF — UI flow (fără plată)', () => {
     });
   });
 
-  test('pasul 2: selectarea Persoană Fizică afișează opțiunile de tip client', async ({
+  test('tip client (PF/PJ) apare pe slug-ul umbrella la pasul 1', async ({
     page,
   }) => {
-    await openWizard(page);
+    // The client-type picker lives on step 1 of the UMBRELLA slug
+    // (/comanda/cazier-judiciar). The /-persoana-fizica slug is locked to PF
+    // and has no picker — covered by the personal-data test above.
+    const res = await page.goto('/comanda/cazier-judiciar');
+    expect(res?.status()).toBeLessThan(500);
+    await page.evaluate(() => localStorage.clear());
+    await page.reload();
 
-    // Fill step 1
-    await page.getByRole('textbox', { name: /email/i }).fill('test@eghiseul.ro');
-    await page
-      .getByRole('textbox', { name: /telefon/i })
-      .fill('+40 755 123 456');
-    await page.waitForTimeout(500);
-    await page.getByRole('button', { name: /continuă/i }).click();
-
-    // Step 2 — client type
-    const pfOption = page
-      .getByText(/persoană fizică/i)
-      .first();
-    const pjOption = page
-      .getByText(/persoană juridică/i)
-      .first();
-
-    await expect(pfOption).toBeVisible({ timeout: 10_000 });
-    await expect(pjOption).toBeVisible();
-
-    // Click PF
-    const pfCard = page
-      .locator('[class*="card"], [role="button"], button, label')
-      .filter({ hasText: /persoană fizică/i })
-      .first();
-    await pfCard.click();
+    await expect(
+      page.getByRole('button', { name: /Persoană Fizică/i }).first()
+    ).toBeVisible({ timeout: 10_000 });
+    await expect(
+      page.getByRole('button', { name: /Persoană Juridică/i }).first()
+    ).toBeVisible();
 
     await page.screenshot({
-      path: `${SCREENSHOT_DIR}/wizard-pf-step2-client-type.png`,
+      path: `${SCREENSHOT_DIR}/wizard-umbrella-client-type.png`,
     });
   });
 
-  test('pasul 3: pagina de date personale afișează zona de upload CI și câmpul CNP', async ({
+  test('pasul 2: pagina de date personale afișează zona de upload CI și câmpul CNP', async ({
     page,
   }) => {
     await openWizard(page);
 
-    // Step 1
-    await page.getByRole('textbox', { name: /email/i }).fill('test@eghiseul.ro');
-    await page
-      .getByRole('textbox', { name: /telefon/i })
-      .fill('+40 755 123 456');
-    await page.waitForTimeout(500);
+    // Step 1 — contact. The /-persoana-fizica slug is locked to PF, so there's
+    // no client-type step: Continuă goes straight to the personal-data step.
+    await fillContact(page);
     await page.getByRole('button', { name: /continuă/i }).click();
 
-    // Step 2 — select PF and continue
-    const pfCard = page
-      .locator('[class*="card"], [role="button"], button, label')
-      .filter({ hasText: /persoană fizică/i })
-      .first();
-    await pfCard.click();
-    await page.waitForTimeout(300);
-    await page
-      .getByRole('button', { name: /continuă/i })
-      .first()
-      .click();
-
-    // Step 3 — personal data
-    const uploadArea = page.getByText(/scanează|carte identitate|încarcă/i);
+    // Personal-data step — CI upload area + CNP field.
+    const uploadArea = page.getByText(/scanează|carte identitate|încarcă|completez manual/i);
     await expect(uploadArea.first()).toBeVisible({ timeout: 10_000 });
 
-    // CNP field
-    const cnpField = page.getByRole('textbox', { name: /cnp/i });
-    await expect(cnpField).toBeVisible();
-
     await page.screenshot({
-      path: `${SCREENSHOT_DIR}/wizard-pf-step3-personal-data.png`,
+      path: `${SCREENSHOT_DIR}/wizard-pf-step2-personal-data.png`,
     });
   });
 
@@ -136,31 +113,17 @@ test.describe('Wizard PF — UI flow (fără plată)', () => {
     await openWizard(page);
 
     // Navigate to step 3 (personal data)
-    await page.getByRole('textbox', { name: /email/i }).fill('test@eghiseul.ro');
-    await page
-      .getByRole('textbox', { name: /telefon/i })
-      .fill('+40 755 123 456');
-    await page.waitForTimeout(500);
+    await fillContact(page);
     await page.getByRole('button', { name: /continuă/i }).click();
 
-    const pfCard = page
-      .locator('[class*="card"], [role="button"], button, label')
-      .filter({ hasText: /persoană fizică/i })
-      .first();
-    await pfCard.click();
-    await page.waitForTimeout(300);
-    await page
-      .getByRole('button', { name: /continuă/i })
-      .first()
-      .click();
-
-    // Manually reveal manual-entry form if needed
+    // The personal-data step is a dynamically-imported module — wait for it,
+    // then switch to manual entry so the CNP field is rendered.
     const manualBtn = page.getByRole('button', { name: /completez manual/i });
-    if (await manualBtn.isVisible().catch(() => false)) {
-      await manualBtn.click();
-    }
+    await manualBtn.waitFor({ state: 'visible', timeout: 10_000 });
+    await manualBtn.click();
 
     const cnpField = page.getByRole('textbox', { name: /cnp/i });
+    await expect(cnpField).toBeVisible({ timeout: 5_000 });
     await cnpField.fill('1234567890123'); // wrong checksum
     await cnpField.blur();
 
@@ -173,30 +136,15 @@ test.describe('Wizard PF — UI flow (fără plată)', () => {
   }) => {
     await openWizard(page);
 
-    await page.getByRole('textbox', { name: /email/i }).fill('test@eghiseul.ro');
-    await page
-      .getByRole('textbox', { name: /telefon/i })
-      .fill('+40 755 123 456');
-    await page.waitForTimeout(500);
+    await fillContact(page);
     await page.getByRole('button', { name: /continuă/i }).click();
 
-    const pfCard = page
-      .locator('[class*="card"], [role="button"], button, label')
-      .filter({ hasText: /persoană fizică/i })
-      .first();
-    await pfCard.click();
-    await page.waitForTimeout(300);
-    await page
-      .getByRole('button', { name: /continuă/i })
-      .first()
-      .click();
-
     const manualBtn = page.getByRole('button', { name: /completez manual/i });
-    if (await manualBtn.isVisible().catch(() => false)) {
-      await manualBtn.click();
-    }
+    await manualBtn.waitFor({ state: 'visible', timeout: 10_000 });
+    await manualBtn.click();
 
     const cnpField = page.getByRole('textbox', { name: /cnp/i });
+    await expect(cnpField).toBeVisible({ timeout: 5_000 });
     await cnpField.fill(VALID_TEST_CNP);
 
     // Indicator of success — gender inferred from CNP or birth date populated.
@@ -212,10 +160,7 @@ test.describe('Wizard PF — UI flow (fără plată)', () => {
     await openWizard(page);
 
     // Fill step 1
-    await page.getByRole('textbox', { name: /email/i }).fill('test@eghiseul.ro');
-    await page
-      .getByRole('textbox', { name: /telefon/i })
-      .fill('+40 755 123 456');
+    await fillContact(page);
     await page.waitForTimeout(500);
     await page.getByRole('button', { name: /continuă/i }).click();
 
