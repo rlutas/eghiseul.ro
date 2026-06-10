@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -146,6 +146,21 @@ export function ContactStepModular({ onValidChange }: ContactStepProps) {
   });
 
   const { isValid: formIsValid } = form.formState;
+
+  // Draft resume: react-hook-form only applies defaultValues at mount, so when
+  // a saved draft is restored asynchronously AFTER this form mounted (server
+  // resume or localStorage), the restored email/phone wouldn't show. Sync them
+  // into the form ONCE when they first appear.
+  const contactSyncedRef = useRef(false);
+  useEffect(() => {
+    if (contactSyncedRef.current) return;
+    const email = state.contact.email;
+    const phone = state.contact.phone;
+    if (email || (phone && phone !== '+40')) {
+      contactSyncedRef.current = true;
+      form.reset({ email: email || '', phone: phone || '+40' });
+    }
+  }, [state.contact.email, state.contact.phone, form]);
 
   // Step validity:
   //   contact valid + (if required) client type + (if shown) purpose chosen

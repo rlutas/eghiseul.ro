@@ -878,15 +878,21 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
       params.set('step', stepNumber.toString());
 
       // Include order ID in URL for conversion tracking (from step 2 onwards)
-      if (orderId) {
-        params.set('order', orderId);
-      } else if (state.friendlyOrderId && stepNumber > 1) {
-        params.set('order', state.friendlyOrderId);
+      const effectiveOrderId =
+        orderId || (state.friendlyOrderId && stepNumber > 1 ? state.friendlyOrderId : null);
+      if (effectiveOrderId) {
+        params.set('order', effectiveOrderId);
+        // Carry the email too so the link can resume a GUEST draft from the
+        // server on another device (the draft GET requires a matching email
+        // for guest orders — anti-IDOR). It's the customer's own email in
+        // their own resume link.
+        const email = state.contact.email;
+        if (email) params.set('email', email);
       }
 
       router.replace(`${pathname}?${params.toString()}`, { scroll: false });
     },
-    [pathname, router, state.friendlyOrderId]
+    [pathname, router, state.friendlyOrderId, state.contact.email]
   );
 
   // Restore from localStorage on mount
@@ -898,6 +904,83 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
 
     // Try to find existing draft in localStorage
     const restoreDraft = async () => {
+      // ── Server resume via ?order= (works cross-device, unlike localStorage) ──
+      // When the URL carries an order code we fetch that draft from the server
+      // and hydrate from it. Guest drafts require the matching ?email= (anti-
+      // IDOR); authenticated owners don't. If this succeeds we're done.
+      try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const orderParam = urlParams.get('order');
+        const emailParam = urlParams.get('email');
+        if (orderParam && validateOrderId(orderParam)) {
+          const qs = new URLSearchParams({ id: orderParam });
+          if (emailParam) qs.set('email', emailParam);
+          const res = await fetch(`/api/orders/draft?${qs.toString()}`);
+          if (res.ok) {
+            const json = await res.json();
+            const order = json?.data?.order;
+            if (order && order.status === 'draft') {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              const cd = (order.customer_data as any) || {};
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              const selectedOptions = ((order.selected_options as any[]) || []).map((o) => ({
+                optionId: o.option_id,
+                optionName: o.option_name,
+                optionDescription: o.option_description || '',
+                quantity: o.quantity || 1,
+                priceModifier: o.price_modifier ?? 0,
+                code: o.code,
+                isAutoApplied: o.is_auto_applied ?? undefined,
+                bundledFor: o.bundled_for
+                  ? {
+                      parentOptionId: o.bundled_for.parent_option_id,
+                      bundledServiceSlug: o.bundled_for.bundled_service_slug,
+                      bundledOptionCode: o.bundled_for.bundled_option_code,
+                    }
+                  : undefined,
+                metadata: o.metadata,
+              }));
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              const dm = order.delivery_method as any;
+              const delivery = dm
+                ? {
+                    ...createInitialDeliveryState(),
+                    method: dm.type,
+                    methodName: dm.name,
+                    price: dm.price,
+                    estimatedDays: dm.estimated_days,
+                    address: order.delivery_address || undefined,
+                  }
+                : createInitialDeliveryState();
+              const cache: ModularDraftCache = {
+                orderId: order.id,
+                friendlyOrderId: order.friendly_order_id,
+                serviceSlug: state.serviceSlug!,
+                currentStepId: 'contact',
+                currentStepNumber: 1,
+                clientType: cd.company ? 'PJ' : cd.contact || cd.personal ? 'PF' : null,
+                data: {
+                  contact: cd.contact,
+                  personalKyc: cd.personal ?? null,
+                  companyKyc: cd.company ?? null,
+                  billing: cd.billing ?? null,
+                  selectedOptions,
+                  delivery,
+                },
+                lastSavedAt: order.last_saved_at || new Date(0).toISOString(),
+                version: CACHE_VERSION,
+              };
+              console.log('Restoring draft from server:', order.friendly_order_id);
+              dispatch({ type: 'RESTORE_FROM_CACHE', payload: cache });
+              return;
+            }
+          }
+          // 403/404 or non-draft → fall through to localStorage / blank.
+        }
+      } catch (serverErr) {
+        console.warn('Server draft resume failed, falling back to localStorage:', serverErr);
+      }
+
       try {
         // Look for any draft for this service
         const keys = Object.keys(localStorage).filter(k => k.startsWith('order_draft_'));
