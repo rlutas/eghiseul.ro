@@ -345,7 +345,7 @@ export function ModularOrderWizard({ initialService, initialOptions }: ModularOr
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-[1200px]">
+    <div className="container mx-auto px-4 py-8 pb-28 lg:pb-8 max-w-[1200px]">
       {/* Header with Order ID */}
       <div className="mb-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
@@ -448,8 +448,9 @@ export function ModularOrderWizard({ initialService, initialOptions }: ModularOr
               </Suspense>
             </CardContent>
 
-            {/* Navigation */}
-            <div className="border-t border-neutral-100 px-6 py-4 bg-neutral-50/50">
+            {/* Navigation — desktop only. On mobile the sticky bottom bar
+                (below) carries the total + Back/Continue. */}
+            <div className="hidden lg:block border-t border-neutral-100 px-6 py-4 bg-neutral-50/50">
               <div className="flex items-center justify-between">
                 <Button
                   variant="outline"
@@ -525,6 +526,57 @@ export function ModularOrderWizard({ initialService, initialOptions }: ModularOr
                 cleaner mobile layout. */}
           </div>
         </div>
+      </div>
+
+      {/* Mobile sticky summary + navigation — the running total stays visible
+          across every wizard step (like the checkout page), with Back/Continue
+          on the right. Replaces the inline footer on mobile. */}
+      <div className="lg:hidden fixed bottom-0 inset-x-0 z-40 border-t border-neutral-200 bg-white/95 backdrop-blur shadow-[0_-4px_20px_-8px_rgba(0,0,0,0.08)]">
+        <div className="px-4 py-2.5 flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-[11px] uppercase tracking-wide text-neutral-500 leading-tight">
+              Total{priceBreakdown.discountAmount > 0 ? ' (cu reducere)' : ''}
+            </p>
+            <p className="text-lg font-bold text-primary-600 tabular-nums leading-tight">
+              {Number(priceBreakdown.totalPrice).toFixed(2)} RON
+            </p>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            {!isFirstStep && (
+              <Button
+                variant="outline"
+                onClick={prevStep}
+                className="h-11 px-3"
+                aria-label="Înapoi"
+              >
+                <ArrowLeft className="h-4 w-4" />
+              </Button>
+            )}
+            <Button
+              onClick={handleNext}
+              disabled={!stepValid || isSubmitting || (isLastStep && state.isSaving)}
+              className="h-11 gap-1.5 bg-primary-500 hover:bg-primary-600 text-secondary-900 font-semibold"
+            >
+              {((isLastStep && state.isSaving) || isSubmitting) && (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              )}
+              {isLastStep ? (
+                isSubmitting ? 'Se procesează...' : 'Plătește'
+              ) : (
+                <>
+                  Continuă
+                  <ArrowRight className="h-4 w-4" />
+                </>
+              )}
+            </Button>
+          </div>
+        </div>
+        {state.error && (
+          <p className="px-4 pb-2 -mt-1 text-xs text-red-600 flex items-center gap-1">
+            <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
+            {state.error}
+          </p>
+        )}
       </div>
     </div>
   );

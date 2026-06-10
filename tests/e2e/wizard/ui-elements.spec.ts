@@ -170,4 +170,19 @@ test.describe('UI Elements — mobile viewport (iPhone 12)', () => {
       fullPage: true,
     });
   });
+
+  test('wizard arată o bară sticky jos cu totalul (RON) pe mobil', async ({
+    page,
+  }) => {
+    await openWizard(page);
+
+    // The mobile sticky summary bar shows "Total" + the running price and the
+    // Continuă button. It's fixed at the bottom of the viewport.
+    const totalLabel = page.getByText(/^Total/i).last();
+    await expect(totalLabel).toBeVisible();
+    await expect(page.getByText(/\d+[.,]\d{2}\s*RON/i).last()).toBeVisible();
+    await expect(
+      page.getByRole('button', { name: /continuă/i }).last()
+    ).toBeVisible();
+  });
 });
