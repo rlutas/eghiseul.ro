@@ -92,7 +92,11 @@ export default function SignatureStep({ config, onValidChange }: SignatureStepPr
 
   // Start drawing
   const handleStart = useCallback((e: React.MouseEvent | React.TouchEvent) => {
-    e.preventDefault();
+    // Only call preventDefault for MOUSE. React's touch listeners are passive,
+    // so preventDefault there spams "Unable to preventDefault inside passive
+    // event listener". Touch scrolling is already blocked by `touch-none` on
+    // the canvas, so we don't need it for touch.
+    if (!('touches' in e)) e.preventDefault();
     setIsDrawing(true);
     setHasSignature(true);
 
@@ -108,7 +112,7 @@ export default function SignatureStep({ config, onValidChange }: SignatureStepPr
   // Draw
   const handleMove = useCallback((e: React.MouseEvent | React.TouchEvent) => {
     if (!isDrawing) return;
-    e.preventDefault();
+    if (!('touches' in e)) e.preventDefault(); // mouse only (see handleStart)
 
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext('2d');
