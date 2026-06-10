@@ -48,6 +48,9 @@ export interface OrderSidebarProps {
    *  - 'extras'  — only estimated time + trust badges (shown in the mobile form)
    */
   variant?: 'full' | 'summary' | 'extras';
+  /** When true, the estimated time is shown INSIDE the summary card (under the
+   *  base service) instead of as a separate card. Used on checkout. */
+  timeInSummary?: boolean;
 }
 
 export function OrderSidebar({
@@ -65,6 +68,7 @@ export function OrderSidebar({
   deliveryTimeText,
   urgencyActive = false,
   variant = 'full',
+  timeInSummary = false,
 }: OrderSidebarProps) {
   const showSummary = variant === 'full' || variant === 'summary';
   const showExtras = variant === 'full' || variant === 'extras';
@@ -83,6 +87,7 @@ export function OrderSidebar({
           vatAmount={vatAmount}
           couponCode={couponCode}
           discountAmount={discountAmount}
+          deliveryTimeText={timeInSummary ? deliveryTimeText : undefined}
         />
       )}
 

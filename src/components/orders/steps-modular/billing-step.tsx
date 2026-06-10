@@ -541,7 +541,7 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
               value={billing?.address || ''}
               onChange={(e) => updateField('address', e.target.value)}
               placeholder="ex: Str. Mihai Viteazu nr. 10, bl. A2, ap. 5"
-              className="bg-white"
+              className="bg-white placeholder:text-neutral-400 placeholder:italic"
             />
           </div>
 

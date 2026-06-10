@@ -1,6 +1,6 @@
 'use client';
 
-import { Truck, Receipt, TicketPercent } from 'lucide-react';
+import { Truck, Receipt, TicketPercent, Clock } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface OrderOption {
@@ -30,6 +30,9 @@ interface OrderSummaryCardProps {
   couponCode?: string | null;
   /** Optional discount amount in RON (positive number). */
   discountAmount?: number;
+  /** Optional estimated delivery time (e.g. "3 zile lucrătoare"). When passed,
+   *  it's shown inline under the base service instead of as a separate card. */
+  deliveryTimeText?: string;
 }
 
 function fmt(value: number): string {
@@ -48,6 +51,7 @@ export function OrderSummaryCard({
   vatAmount,
   couponCode,
   discountAmount = 0,
+  deliveryTimeText,
 }: OrderSummaryCardProps) {
   const VAT_RATE = 0.21;
   const computedSubtotal =
@@ -131,6 +135,12 @@ export function OrderSummaryCard({
                       {serviceName}
                     </p>
                     <p className="text-xs text-neutral-500">Serviciu de bază</p>
+                    {deliveryTimeText && (
+                      <p className="mt-0.5 inline-flex items-center gap-1 text-xs text-neutral-500">
+                        <Clock className="h-3 w-3 text-primary-500 shrink-0" />
+                        Timp estimat: <span className="font-medium text-secondary-900">{deliveryTimeText}</span>
+                      </p>
+                    )}
                   </div>
                   <p className="text-sm font-semibold text-secondary-900 shrink-0 tabular-nums">
                     {fmt(basePrice)} RON

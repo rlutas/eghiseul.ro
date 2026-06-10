@@ -489,6 +489,8 @@ export default function CheckoutPage() {
                   discountAmount={order.discount_amount}
                   deliveryTimeText={deliveryTimeText}
                   urgencyActive={hasUrgent}
+                  variant="summary"
+                  timeInSummary
                 />
               );
             })()}
