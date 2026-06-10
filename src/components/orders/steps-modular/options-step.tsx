@@ -753,20 +753,22 @@ interface LanguageDropdownProps {
   value: string;
   onChange: (value: string) => void;
   error?: string;
+  id?: string;
 }
 
-function LanguageDropdown({ value, onChange, error }: LanguageDropdownProps) {
+function LanguageDropdown({ value, onChange, error, id = 'opt-language' }: LanguageDropdownProps) {
   return (
     <div className="border-l-2 border-primary-200 pl-4">
-      <label htmlFor="opt-language" className="text-sm font-medium text-secondary-900">
+      <label htmlFor={id} className="text-sm font-medium text-secondary-900">
         Limba Traducere <span className="text-red-500">*</span>
       </label>
       <select
-        id="opt-language"
+        id={id}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         className={cn(
-          'mt-1.5 h-11 w-full rounded-lg border bg-white px-3 text-sm transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20',
+          // text-base on mobile prevents iOS Safari auto-zoom on focus.
+          'mt-1.5 h-11 w-full rounded-lg border bg-white px-3 text-base sm:text-sm transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20',
           error ? 'border-red-500' : 'border-neutral-300'
         )}
       >
@@ -805,7 +807,8 @@ function CountryDropdown({ id, label, value, onChange, error }: CountryDropdownP
         value={value}
         onChange={(e) => onChange(e.target.value)}
         className={cn(
-          'mt-1.5 h-11 w-full rounded-lg border bg-white px-3 text-sm transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20',
+          // text-base on mobile prevents iOS Safari auto-zoom on focus.
+          'mt-1.5 h-11 w-full rounded-lg border bg-white px-3 text-base sm:text-sm transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20',
           error ? 'border-red-500' : 'border-neutral-300'
         )}
       >
@@ -946,9 +949,27 @@ function CrossServiceAddonCard({
           bundledServiceSlug: bundledSlug,
           bundledOptionCode: bundled.code,
         },
+        // Holds the apostila destination country / translation language for
+        // bundled options (same as primary options carry on their metadata).
+        metadata: {},
       };
       onUpdateOptions([...selectedOptions, newOption]);
     }
+  };
+
+  // Patch the country/language metadata on a specific bundled option (by its
+  // synthetic id). Mirrors the primary patchMetadata but scoped to this card.
+  const patchBundledMetadata = (
+    syntheticId: string,
+    patch: { country?: string; language?: string }
+  ) => {
+    onUpdateOptions(
+      selectedOptions.map((o) =>
+        o.optionId === syntheticId
+          ? { ...o, metadata: { ...(o.metadata ?? {}), ...patch } }
+          : o
+      )
+    );
   };
 
   const sortedBundled = useMemo(() => {
@@ -990,34 +1011,36 @@ function CrossServiceAddonCard({
           </div>
           <div className="flex-1 min-w-0">
             {/* Strip the "(adaugă în aceeași comandă)" disclaimer from the
-                option name — it's marketing copy stuck on the DB row and
-                makes the title noisy in the wizard + the order summary. The
-                short "Serviciu secundar" badge below already conveys the
-                same meaning, less awkwardly. */}
-            <p className="text-sm font-semibold text-secondary-900 leading-tight">
-              {option.name.replace(/\s*\(adaugă în aceeași comandă\)\s*$/i, '').trim()}
-            </p>
+                option name — marketing copy on the DB row that makes the
+                title noisy. The "Serviciu secundar" badge conveys it. */}
+            <div className="flex items-center gap-2">
+              <p className="text-sm font-semibold text-secondary-900 leading-tight truncate">
+                {option.name.replace(/\s*\(adaugă în aceeași comandă\)\s*$/i, '').trim()}
+              </p>
+              <Badge className="bg-primary-500 text-white hover:bg-primary-500 shrink-0">
+                Secundar
+              </Badge>
+            </div>
             <p className="text-xs text-neutral-500 mt-0.5 leading-snug">
               {option.description || 'Serviciu suplimentar bundluit în aceeași comandă'}
             </p>
-            <div className="mt-2 flex items-center gap-2">
-              <Badge className="bg-primary-500 text-white hover:bg-primary-500">
-                Serviciu secundar
-              </Badge>
-              <span className="text-xs text-neutral-500">
-                {isSelected ? (
-                  <span className="inline-flex items-center gap-1">
-                    <ChevronUp className="w-3 h-3" /> Ascunde opțiuni
-                  </span>
-                ) : (
-                  <span className="inline-flex items-center gap-1">
-                    <ChevronDown className="w-3 h-3" /> Vezi opțiuni pachet
-                  </span>
-                )}
-              </span>
-            </div>
           </div>
           <PriceChip price={option.price} selected={isSelected} />
+        </div>
+
+        {/* Expand/collapse toggle on its OWN line below, separated — so on
+            mobile it reads clearly as the "see options" control, not crammed
+            next to the badge + price. */}
+        <div className="mt-3 pt-2.5 border-t border-neutral-100 flex items-center justify-center gap-1 text-xs font-medium text-primary-600">
+          {isSelected ? (
+            <>
+              <ChevronUp className="w-3.5 h-3.5" /> Ascunde opțiuni
+            </>
+          ) : (
+            <>
+              <ChevronDown className="w-3.5 h-3.5" /> Vezi opțiuni pachet
+            </>
+          )}
         </div>
       </button>
 
@@ -1053,9 +1076,12 @@ function CrossServiceAddonCard({
                   : bundled.code === 'apostila_notari'
                   ? 'Necesită Legalizare'
                   : 'Necesită Traducere Autorizată';
+                const syntheticId = `bundled:${option.id}:${bundled.id}`;
+                const bundledMeta =
+                  selectedOptions.find((o) => o.optionId === syntheticId)?.metadata ?? {};
                 return (
+                  <div key={bundled.id} className="space-y-2">
                   <button
-                    key={bundled.id}
                     type="button"
                     onClick={() => toggleBundled(bundled)}
                     disabled={depBlocked}
@@ -1118,6 +1144,27 @@ function CrossServiceAddonCard({
                         into thinking the option wasn't selected even when
                         the row was clearly highlighted. */}
                   </button>
+
+                  {/* When a bundled apostila/traducere is selected, ask for the
+                      destination country / translation language right here — so
+                      a customer who wants these ONLY on the secondary service
+                      (not on the main one) can still specify them. */}
+                  {selected && bundled.code === 'apostila_haga' && (
+                    <CountryDropdown
+                      id={`bundled-country-${bundled.id}`}
+                      label="Țara pentru care se solicită Apostila"
+                      value={(bundledMeta.country as string) ?? ''}
+                      onChange={(country) => patchBundledMetadata(syntheticId, { country })}
+                    />
+                  )}
+                  {selected && bundled.code === 'traducere' && (
+                    <LanguageDropdown
+                      id={`bundled-language-${bundled.id}`}
+                      value={(bundledMeta.language as string) ?? ''}
+                      onChange={(language) => patchBundledMetadata(syntheticId, { language })}
+                    />
+                  )}
+                  </div>
                 );
               })}
             </div>

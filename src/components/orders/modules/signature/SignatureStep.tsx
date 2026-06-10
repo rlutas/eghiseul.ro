@@ -310,11 +310,6 @@ export default function SignatureStep({ config, onValidChange }: SignatureStepPr
               Politica de Confidențialitate
             </a>
             . Solicit executarea imediată a serviciului și renunț la dreptul de retragere de 14 zile (OUG 34/2014, art. 16 lit. a). Accept că semnătura electronică simplă aplicată prin platformă are valoare juridică conform Legii nr. 214/2024 și Regulamentului UE 910/2014 (eIDAS).
-            {hasSignature && termsAccepted && (
-              <span className="block mt-1.5 text-xs text-green-700">
-                ✓ Bifat automat la semnare — poți debifa dacă vrei să retragi consimțământul.
-              </span>
-            )}
           </span>
         </label>
       </div>
