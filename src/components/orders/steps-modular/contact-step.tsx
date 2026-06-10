@@ -544,7 +544,7 @@ function ForeignBirthFields({
             value={birthCity}
             onChange={(e) => onChange(e.target.value, birthCountry)}
             placeholder="Orașul sau comuna de naștere"
-            className="h-11 w-full rounded-lg border border-neutral-300 bg-white px-3 text-sm placeholder:text-neutral-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
+            className="h-11 w-full rounded-lg border border-neutral-300 bg-white px-3 text-base sm:text-sm placeholder:text-neutral-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
           />
         </div>
         <div className="space-y-1.5">
@@ -558,7 +558,7 @@ function ForeignBirthFields({
             id="contact-birth-country"
             value={birthCountry}
             onChange={(e) => onChange(birthCity, e.target.value)}
-            className="h-11 w-full rounded-lg border border-neutral-300 bg-white px-3 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
+            className="h-11 w-full rounded-lg border border-neutral-300 bg-white px-3 text-base sm:text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
           >
             <option value="">Selectați țara</option>
             {countries.map((c) => (

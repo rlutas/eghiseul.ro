@@ -53,7 +53,9 @@ export function SearchableSelect({
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
 
-  const baseClassName = `h-11 w-full rounded-lg border bg-white pl-3 pr-8 text-sm transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 ${
+  // text-base (16px) on mobile prevents iOS Safari's auto-zoom on focus
+  // (it zooms any input < 16px); text-sm (14px) from sm up keeps it compact.
+  const baseClassName = `h-11 w-full rounded-lg border bg-white pl-3 pr-8 text-base sm:text-sm transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 ${
     error ? 'border-red-500' : 'border-neutral-300'
   } ${className || ''}`;
 
