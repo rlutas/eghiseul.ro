@@ -1012,16 +1012,16 @@ function CrossServiceAddonCard({
           <div className="flex-1 min-w-0">
             {/* Strip the "(adaugă în aceeași comandă)" disclaimer from the
                 option name — marketing copy on the DB row that makes the
-                title noisy. The "Serviciu secundar" badge conveys it. */}
-            <div className="flex items-center gap-2">
-              <p className="text-sm font-semibold text-secondary-900 leading-tight truncate">
-                {option.name.replace(/\s*\(adaugă în aceeași comandă\)\s*$/i, '').trim()}
-              </p>
-              <Badge className="bg-primary-500 text-white hover:bg-primary-500 shrink-0">
-                Secundar
-              </Badge>
-            </div>
-            <p className="text-xs text-neutral-500 mt-0.5 leading-snug">
+                title noisy. Full title on its own line (no truncation), then
+                the badge BELOW it so the name is always fully readable on
+                mobile. */}
+            <p className="text-sm font-semibold text-secondary-900 leading-tight">
+              {option.name.replace(/\s*\(adaugă în aceeași comandă\)\s*$/i, '').trim()}
+            </p>
+            <Badge className="mt-1 bg-primary-500 text-white hover:bg-primary-500">
+              Serviciu secundar
+            </Badge>
+            <p className="text-xs text-neutral-500 mt-1 leading-snug">
               {option.description || 'Serviciu suplimentar bundluit în aceeași comandă'}
             </p>
           </div>

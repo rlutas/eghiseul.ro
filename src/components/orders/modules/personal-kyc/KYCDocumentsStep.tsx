@@ -760,17 +760,18 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
         </div>
       </div>
 
-      {/* Progress Summary */}
-      {(showPassport || showSelfie || showCertificate || showResidencePermit) && (
+      {/* Progress Summary — only when there are 2+ documents. A stepper for a
+          single doc (e.g. just the selfie) is meaningless, so we hide it. */}
+      {(() => {
+        const items: { type: DocumentType; label: string }[] = [];
+        if (showPassport) items.push({ type: 'passport', label: 'Pașaport' });
+        if (showSelfie) items.push({ type: 'selfie', label: 'Selfie' });
+        if (showCertificate) items.push({ type: 'certificat_domiciliu', label: 'Certificat' });
+        if (showResidencePermit) items.push({ type: 'residence_permit', label: 'Permis Ședere' });
+        if (items.length < 2) return null;
+        return (
         <div className="flex items-center justify-center gap-4 py-4">
           {(() => {
-            // Build ordered list of progress items
-            const items: { type: DocumentType; label: string }[] = [];
-            if (showPassport) items.push({ type: 'passport', label: 'Pașaport' });
-            if (showSelfie) items.push({ type: 'selfie', label: 'Selfie' });
-            if (showCertificate) items.push({ type: 'certificat_domiciliu', label: 'Certificat' });
-            if (showResidencePermit) items.push({ type: 'residence_permit', label: 'Permis Ședere' });
-
             return items.map((item, idx) => {
               const uploaded = !!getDocumentByType(item.type);
               const prevUploaded = idx > 0 ? !!getDocumentByType(items[idx - 1].type) : false;
@@ -802,7 +803,8 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
             });
           })()}
         </div>
-      )}
+        );
+      })()}
 
       {/* Security reassurance — calm, trustworthy, not an alert. */}
       <div className="flex items-start gap-2.5 rounded-xl border border-green-100 bg-green-50/60 px-3.5 py-3">
