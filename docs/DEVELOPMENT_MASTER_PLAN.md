@@ -534,6 +534,7 @@
 - Auto-generate contracts (contract-prestari, contract-asistenta) at payment confirmation (webhook trigger)
 
 **Recently Completed (2026-06-10 — mobile + payments + draft-resume session):**
+- **Wizard mobile sticky summary bar** — running total (RON) stays pinned at the bottom across every wizard step (1-6) with Back/Continuă (Plătește on the last step), mirroring the checkout bar; inline nav footer is now desktop-only.
 - **Mobile polish round 2** — secondary-service title shown in full (was truncated to "Certifi…"); KYC progress stepper hidden for single-doc (no lone "✓ Selfie"); mobile checkout sticky bar now shows a mini order summary (service + options + total). Billing source cards kept stacked on mobile.
 - 🔴 **Duplicate Oblio invoice fixed** — concurrent Stripe webhooks (checkout.session.completed + payment_intent.succeeded) created 2 invoices (E-260610-ZHGXB). Deleted both in Oblio + added an atomic DB lock (migration 049 `invoice_generating_at`) so only one webhook creates the invoice.
 - **Draft resume from server** — wizard reads `?order=&email=` and restores the saved draft cross-device (was localStorage-only); contact form syncs restored values. New E2E `draft-resume.spec`.
