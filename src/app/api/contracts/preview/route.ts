@@ -4,6 +4,26 @@ import { generateDocument, type DocumentContext, type ClientData, type CompanyDa
 import { downloadFile } from '@/lib/aws/s3';
 import mammoth from 'mammoth';
 
+// Cache the company/lawyer signature PNGs (base64) — they almost never change,
+// so re-downloading them from S3 on every contract preview is wasteful and a
+// big chunk of the preview latency. 1h TTL, keyed by S3 key.
+const signatureCache = new Map<string, { b64: string; at: number }>();
+const SIGNATURE_TTL = 60 * 60 * 1000;
+
+async function loadSignatureBase64(key?: string): Promise<string | undefined> {
+  if (!key) return undefined;
+  const cached = signatureCache.get(key);
+  if (cached && Date.now() - cached.at < SIGNATURE_TTL) return cached.b64;
+  try {
+    const buf = await downloadFile(key);
+    const b64 = buf.toString('base64');
+    signatureCache.set(key, { b64, at: Date.now() });
+    return b64;
+  } catch {
+    return undefined;
+  }
+}
+
 /**
  * Format an AddressState object (or string) into a human-readable Romanian address.
  */
@@ -163,37 +183,26 @@ export async function POST(request: NextRequest) {
       client_ip: clientIp,
     };
 
-    // Download company/lawyer signatures from S3 for preview
-    let companySignatureBase64: string | undefined;
-    let lawyerSignatureBase64: string | undefined;
+    // Download company/lawyer signatures from S3 in PARALLEL (cached) — these
+    // two sequential downloads were a large part of the preview latency.
+    const [companySignatureBase64, lawyerSignatureBase64] = await Promise.all([
+      loadSignatureBase64(companyData.signature_s3_key),
+      loadSignatureBase64(lawyerData.signature_s3_key),
+    ]);
 
-    if (companyData.signature_s3_key) {
-      try {
-        const buf = await downloadFile(companyData.signature_s3_key);
-        companySignatureBase64 = buf.toString('base64');
-      } catch { /* signature not available */ }
-    }
-    if (lawyerData.signature_s3_key) {
-      try {
-        const buf = await downloadFile(lawyerData.signature_s3_key);
-        lawyerSignatureBase64 = buf.toString('base64');
-      } catch { /* signature not available */ }
-    }
-
-    // Generate both contract-prestari and contract-asistenta separately
-    // (same templates as auto-generate.ts, which use CLIENT_DETAILS_BLOCK)
+    // Generate both contract-prestari and contract-asistenta in PARALLEL
+    // (same templates as auto-generate.ts, which use CLIENT_DETAILS_BLOCK).
     const templates = ['contract-prestari', 'contract-asistenta'];
-    const htmlParts: string[] = [];
-
-    for (const template of templates) {
-      const buffer = generateDocument(body.serviceSlug, template, context, {
-        companySignatureBase64,
-        lawyerSignatureBase64,
-      });
-
-      const result = await mammoth.convertToHtml({ buffer });
-      htmlParts.push(result.value);
-    }
+    const htmlParts = await Promise.all(
+      templates.map(async (template) => {
+        const buffer = generateDocument(body.serviceSlug, template, context, {
+          companySignatureBase64,
+          lawyerSignatureBase64,
+        });
+        const result = await mammoth.convertToHtml({ buffer });
+        return result.value;
+      })
+    );
 
     // Combine both contracts with a visual separator
     let html = htmlParts.join(

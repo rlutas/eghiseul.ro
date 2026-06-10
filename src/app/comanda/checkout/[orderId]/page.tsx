@@ -331,6 +331,15 @@ export default function CheckoutPage() {
               </CardContent>
             </Card>
 
+            {/* Coupon — right under the payment method so the customer applies
+                any discount before paying. */}
+            <CouponInput
+              orderId={order.id}
+              appliedCode={order.coupon_code}
+              appliedDiscount={order.discount_amount}
+              onChange={handleCouponChange}
+            />
+
             {/* Payment Form based on selected method */}
             <Card id="payment-form-anchor" className="scroll-mt-4">
               <CardHeader>
@@ -494,14 +503,6 @@ export default function CheckoutPage() {
                 />
               );
             })()}
-
-            {/* Coupon input — apply/remove discount before payment */}
-            <CouponInput
-              orderId={order.id}
-              appliedCode={order.coupon_code}
-              appliedDiscount={order.discount_amount}
-              onChange={handleCouponChange}
-            />
           </div>
         </div>
       </div>
