@@ -1360,12 +1360,6 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
             </>
           )}
 
-          {(ciFrontScan.success || ciBackScan.success || ciNouBackScan.success || passportOpenedScan.success || roCeiPdfScan.success || personalKyc.uploadedDocuments.length > 0) && (
-            <div className="text-center text-xs text-neutral-500 pt-2">
-              <CheckCircle className="w-4 h-4 inline mr-1" />
-              Documentele scanate vor fi folosite și la pasul de verificare KYC
-            </div>
-          )}
         </div>
       )}
 
