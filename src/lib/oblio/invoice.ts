@@ -114,6 +114,21 @@ interface OrderForInvoice {
       county?: string;
       country?: string;
     };
+    // KYC / "self" billing source — for PF orders where the customer did NOT
+    // fill a separate billing form (billing.source === 'self'), the real
+    // name/CNP/address live here (extracted from the ID document). The PF
+    // client falls back to these so the invoice isn't issued to "N/A".
+    personal?: {
+      firstName?: string;
+      lastName?: string;
+      cnp?: string;
+      address?: {
+        street?: string;
+        city?: string;
+        county?: string;
+        country?: string;
+      };
+    };
   };
 }
 
@@ -133,7 +148,11 @@ export async function createInvoiceFromOrder(
   const config = getOblioConfig();
   const billing = order.customer_data?.billing;
   const contact = order.customer_data?.contact;
-  const address = order.customer_data?.address;
+  const personal = order.customer_data?.personal;
+  // For PF "self" billing the customer never fills a billing form, so the
+  // name/CNP/address come from the KYC-extracted `personal` block. Address
+  // can live either at customer_data.address (legacy) or personal.address.
+  const address = order.customer_data?.address ?? personal?.address;
 
   const isPJ = billing?.type === 'company';
 
@@ -154,9 +173,10 @@ export async function createInvoiceFromOrder(
         save: true,
       }
     : {
-        // Individual client (PF)
-        name: `${billing?.firstName || contact?.firstName || ''} ${billing?.lastName || contact?.lastName || ''}`.trim() || 'N/A',
-        cif: billing?.cnp || '', // CNP for individuals
+        // Individual client (PF) — fall back to KYC `personal` data when the
+        // customer used "self" billing (no separate billing form filled).
+        name: `${billing?.firstName || contact?.firstName || personal?.firstName || ''} ${billing?.lastName || contact?.lastName || personal?.lastName || ''}`.trim() || 'N/A',
+        cif: billing?.cnp || personal?.cnp || '', // CNP for individuals
         address: billing?.address || address?.street || '',
         city: billing?.city || address?.city || '',
         state: billing?.county || address?.county || '',

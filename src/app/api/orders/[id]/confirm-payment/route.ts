@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { stripe } from '@/lib/stripe';
 import { computeEstimatedCompletionISO } from '@/lib/delivery-estimate-helper';
+import { ensureInvoiceForPaidOrder } from '@/lib/oblio';
 
 // Service role client for bypassing RLS
 const supabaseAdmin = createClient(
@@ -41,12 +42,22 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    // Check if already paid
+    // Check if already paid. Even so, the invoice may be missing (e.g. the
+    // order was confirmed before this endpoint emitted invoices) — backfill it.
     if (order.payment_status === 'paid') {
+      let invoiceBackfilled = false;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      if (!(order as any).invoice_number) {
+        const res = await ensureInvoiceForPaidOrder(orderId, 'Card');
+        invoiceBackfilled = res.status === 'created';
+        if (res.status === 'failed') {
+          console.error(`[confirm-payment] Invoice backfill failed for ${orderId}: ${res.error}`);
+        }
+      }
       return NextResponse.json({
         success: true,
         message: 'Order already marked as paid',
-        data: { paymentStatus: order.payment_status }
+        data: { paymentStatus: order.payment_status, invoiceBackfilled }
       });
     }
 
@@ -164,6 +175,23 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
     console.log(`[confirm-payment] Order ${orderId} marked as paid`);
 
+    // Emit the Oblio invoice. This path is the Hosted-Checkout fallback used
+    // when the Stripe webhook is slow/misses, so without this the order would
+    // stay paid with no invoice (the E-260610-NMU25 symptom). The shared
+    // helper's atomic lock makes this safe even if the webhook also fires.
+    let invoiceNumber: string | null = null;
+    try {
+      const res = await ensureInvoiceForPaidOrder(orderId, 'Card');
+      if (res.status === 'created') invoiceNumber = res.invoiceNumber;
+      else if (res.status === 'already_exists') invoiceNumber = res.invoiceNumber;
+      else if (res.status === 'failed') {
+        console.error(`[confirm-payment] Invoice creation failed for ${orderId}: ${res.error}`);
+      }
+    } catch (invErr) {
+      // Never fail the payment confirmation because of invoicing.
+      console.error('[confirm-payment] Invoice emission threw:', invErr);
+    }
+
     return NextResponse.json({
       success: true,
       message: 'Payment confirmed successfully',
@@ -171,6 +199,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         orderId,
         paymentStatus: 'paid',
         stripeStatus: paymentIntent.status,
+        invoiceNumber,
       }
     });
 

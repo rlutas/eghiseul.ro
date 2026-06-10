@@ -23,6 +23,10 @@ export {
   formatInvoiceNumber,
 } from './invoice';
 
+// Ensure-invoice (single chokepoint for first-time invoice emission)
+export { ensureInvoiceForPaidOrder } from './ensure-invoice';
+export type { EnsureInvoiceResult } from './ensure-invoice';
+
 // Types
 export type {
   OblioCompany,

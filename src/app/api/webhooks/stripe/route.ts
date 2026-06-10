@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { stripe } from '@/lib/stripe'
 import { createClient } from '@supabase/supabase-js'
 import Stripe from 'stripe'
-import { createInvoiceFromOrder } from '@/lib/oblio'
+import { ensureInvoiceForPaidOrder } from '@/lib/oblio'
 import { computeEstimatedCompletionISO } from '@/lib/delivery-estimate-helper'
 
 // Use service role for webhook handler (bypasses RLS)
@@ -249,99 +249,23 @@ async function handlePaymentSucceeded(paymentIntent: Stripe.PaymentIntent) {
     }
   }
 
-  // 3. Create Oblio invoice
+  // 3. Create Oblio invoice via the shared chokepoint.
   //
-  // ATOMIC CLAIM against duplicate invoices: Stripe fires both
-  // checkout.session.completed and payment_intent.succeeded for the same
+  // The helper holds an atomic claim against duplicate invoices: Stripe fires
+  // both checkout.session.completed and payment_intent.succeeded for the same
   // payment ~1-2s apart, and both reach here before either writes
-  // invoice_number (the Oblio call takes ~1.5s). The read-check on line ~182
-  // is therefore racy. Claim the row with a conditional UPDATE and only the
-  // winner creates the invoice. The lock self-expires after 2 min so a genuine
-  // retry can re-claim if invoice creation failed. (Fixes E-260610-ZHGXB.)
-  const lockStaleBefore = new Date(Date.now() - 2 * 60 * 1000).toISOString()
-  const { data: claimRows, error: claimError } = await supabaseAdmin
-    .from('orders')
-    .update({ invoice_generating_at: new Date().toISOString() })
-    .eq('id', orderId)
-    .is('invoice_number', null)
-    .or(`invoice_generating_at.is.null,invoice_generating_at.lt.${lockStaleBefore}`)
-    .select('id')
-
-  if (claimError) {
-    console.error('Invoice lock claim failed:', claimError)
-  }
-  if (!claimRows || claimRows.length === 0) {
+  // invoice_number (the Oblio call takes ~1.5s). Only the lock winner creates
+  // the invoice; on failure the lock self-heals so confirm-payment / the cron
+  // backfill can retry. The SAME helper is used by confirm-payment so an order
+  // confirmed via the Hosted-Checkout fallback also gets an invoice.
+  // (Fixes E-260610-ZHGXB duplicate + E-260610-NMU25 missing invoice.)
+  const result = await ensureInvoiceForPaidOrder(orderId, 'Card', {
+    historyNote: undefined, // helper writes its own "Factură emisă automat: …"
+  })
+  if (result.status === 'failed') {
+    console.error(`Order ${orderId}: invoice creation failed:`, result.error)
+  } else if (result.status === 'locked') {
     console.log(`Order ${orderId}: invoice already created or being created by another webhook — skipping`)
-    return
-  }
-
-  try {
-    // Get service name + lawyer fee from joined relation
-    const svcRel = order.services as { name: string; lawyer_fee_ron?: number | null } | null;
-    const serviceName = svcRel?.name || 'Serviciu eGhiseul';
-
-    const invoice = await createInvoiceFromOrder(
-      {
-        id: order.id,
-        order_number: order.order_number ?? undefined,
-        friendly_order_id: order.friendly_order_id ?? undefined,
-        service_name: serviceName,
-        lawyer_fee_ron: svcRel?.lawyer_fee_ron ?? undefined,
-        base_price: order.base_price ?? undefined,
-        total_price: order.total_price,
-        selected_options: order.selected_options as Array<{ code?: string; name: string; price: number }> | undefined,
-        delivery_method: order.delivery_method ?? undefined,
-        delivery_price: order.delivery_price ?? undefined,
-        coupon_code: order.coupon_code ?? null,
-        discount_amount: order.discount_amount ?? null,
-        customer_data: order.customer_data as Record<string, unknown> | undefined,
-      },
-      'Card'
-    )
-
-    // 4. Update order with invoice info
-    const { error: invoiceUpdateError } = await supabaseAdmin
-      .from('orders')
-      .update({
-        invoice_number: invoice.invoiceNumber,
-        invoice_url: invoice.pdfUrl,
-        invoice_issued_at: invoice.createdAt,
-      })
-      .eq('id', orderId)
-
-    if (invoiceUpdateError) {
-      console.error('Failed to store invoice info:', invoiceUpdateError)
-      // Don't throw - order is paid, invoice can be created manually
-    } else {
-      console.log(`Invoice ${invoice.invoiceNumber} created for order ${orderId}`)
-    }
-
-    // 5. Add to order history
-    await supabaseAdmin.from('order_history').insert({
-      order_id: orderId,
-      event_type: 'payment_confirmed',
-      notes: `Plata cu cardul confirmata. Factura: ${invoice.invoiceNumber}`,
-      new_value: JSON.stringify({
-        payment_status: 'paid',
-        invoice_number: invoice.invoiceNumber,
-        stripe_payment_intent: paymentIntent.id,
-      }),
-    })
-  } catch (invoiceError) {
-    // Log error but don't fail - payment is confirmed
-    console.error('Failed to create Oblio invoice:', invoiceError)
-
-    // Still add to order history
-    await supabaseAdmin.from('order_history').insert({
-      order_id: orderId,
-      event_type: 'payment_confirmed',
-      notes: 'Plata cu cardul confirmata. Crearea facturii a esuat - actiune manuala necesara.',
-      new_value: JSON.stringify({
-        payment_status: 'paid',
-        stripe_payment_intent: paymentIntent.id,
-        invoice_error: invoiceError instanceof Error ? invoiceError.message : 'Unknown error',
-      }),
-    })
   }
 }
 
