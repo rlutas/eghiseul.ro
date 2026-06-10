@@ -542,10 +542,10 @@ export class SamedayProvider implements CourierProvider {
     const codFee = request.cod ? 4 : 0;
 
     const standardPrice = basePrice + codFee;
-    const standardVat = standardPrice * 0.19;
+    const standardVat = standardPrice * 0.21; // RO VAT 21% (aligned with system)
 
     const lockerPriceTotal = lockerPrice + codFee;
-    const lockerVat = lockerPriceTotal * 0.19;
+    const lockerVat = lockerPriceTotal * 0.21; // RO VAT 21%
 
     const quotes: ShippingQuote[] = [
       {
@@ -724,7 +724,7 @@ export class SamedayProvider implements CourierProvider {
         awb: data.awbNumber,
         awbPdf: data.pdfLink,
         price: data.awbCost,
-        priceWithVAT: data.awbCost * 1.19,
+        priceWithVAT: data.awbCost * 1.21, // RO VAT 21%
         currency: 'RON',
         estimatedDays: 1,
         rawResponse: JSON.stringify(data),

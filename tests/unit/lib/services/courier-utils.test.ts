@@ -211,18 +211,18 @@ describe('Date helpers', () => {
 });
 
 describe('VAT + price helpers', () => {
-  it('addVAT adds 19% by default, rounds to 2 decimals', () => {
-    expect(addVAT(100)).toBe(119);
-    expect(addVAT(50.45)).toBe(60.04);
+  it('addVAT adds 21% by default (RO VAT), rounds to 2 decimals', () => {
+    expect(addVAT(100)).toBe(121);
+    expect(addVAT(50.45)).toBe(61.04);
   });
 
-  it('addVAT supports custom rate (21% for current Romania)', () => {
-    expect(addVAT(100, 0.21)).toBe(121);
+  it('addVAT supports a custom rate', () => {
+    expect(addVAT(100, 0.19)).toBe(119);
     expect(addVAT(304.64, 0.21)).toBe(368.61);
   });
 
-  it('extractVAT returns the VAT portion of a gross price', () => {
-    expect(extractVAT(119)).toBeCloseTo(19, 2);
+  it('extractVAT returns the VAT portion of a gross price (21% default)', () => {
+    expect(extractVAT(121)).toBeCloseTo(21, 2);
     expect(extractVAT(368.61, 0.21)).toBeCloseTo(63.97, 1);
   });
 

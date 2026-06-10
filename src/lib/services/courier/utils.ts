@@ -381,16 +381,16 @@ export function isBusinessDay(date: Date): boolean {
 // ============================================================================
 
 /**
- * Add VAT to price (19% for Romania)
+ * Add VAT to price (21% for Romania)
  */
-export function addVAT(price: number, vatRate: number = 0.19): number {
+export function addVAT(price: number, vatRate: number = 0.21): number {
   return Math.round((price * (1 + vatRate)) * 100) / 100;
 }
 
 /**
  * Extract VAT from gross price
  */
-export function extractVAT(grossPrice: number, vatRate: number = 0.19): number {
+export function extractVAT(grossPrice: number, vatRate: number = 0.21): number {
   const netPrice = grossPrice / (1 + vatRate);
   return Math.round((grossPrice - netPrice) * 100) / 100;
 }

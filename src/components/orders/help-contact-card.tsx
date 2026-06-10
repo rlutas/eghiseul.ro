@@ -2,7 +2,9 @@
 
 import { MessageCircle, Phone } from 'lucide-react';
 
-const SUPPORT_PHONE = process.env.NEXT_PUBLIC_SUPPORT_PHONE || '+40 757 708 181';
+// Hardcoded on purpose — the support number lives in the code, not in a Vercel
+// env var, so it's always correct on the site without extra configuration.
+const SUPPORT_PHONE = '+40 757 708 181';
 
 /** wa.me link with a prefilled message that includes the order code + site so
  *  support instantly knows which order (and that it came from eghiseul.ro). */

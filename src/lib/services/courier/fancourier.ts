@@ -1140,7 +1140,7 @@ export class FanCourierProvider implements CourierProvider {
     const basePrice = 15 + totalWeight * 5; // 15 RON base + 5 RON per kg
     const codFee = request.cod ? 5 : 0;
     const price = basePrice + codFee;
-    const vat = price * 0.19;
+    const vat = price * 0.21; // RO VAT 21% (aligned with system)
 
     const quotes: ShippingQuote[] = [
       {
@@ -1169,8 +1169,8 @@ export class FanCourierProvider implements CourierProvider {
         service: 'EXPRESS_LOCO_1H',
         serviceName: 'Express Loco (1h)',
         price: price * 2.5,
-        priceWithVAT: price * 2.5 * 1.19,
-        vat: price * 2.5 * 0.19,
+        priceWithVAT: price * 2.5 * 1.21,
+        vat: price * 2.5 * 0.21,
         currency: 'RON',
         estimatedDays: 0,
         pickupAvailable: true,
@@ -1184,8 +1184,8 @@ export class FanCourierProvider implements CourierProvider {
       service: 'FANBOX',
       serviceName: 'FANbox (Locker)',
       price: price * 0.8, // 20% cheaper
-      priceWithVAT: price * 0.8 * 1.19,
-      vat: price * 0.8 * 0.19,
+      priceWithVAT: price * 0.8 * 1.21,
+      vat: price * 0.8 * 0.21,
       currency: 'RON',
       estimatedDays: 2,
       pickupAvailable: false,
