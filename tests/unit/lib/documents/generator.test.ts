@@ -232,7 +232,7 @@ describe('buildInstitutie', () => {
     ['certificat-nastere', 'OFICIUL DE STARE CIVILĂ'],
     ['certificat-casatorie', 'OFICIUL DE STARE CIVILĂ'],
     ['certificat-celibat', 'OFICIUL DE STARE CIVILĂ'],
-    ['certificat-integritate-comportamentala', 'IPJ SATU MARE - CAZIER JUDICIAR'],
+    ['certificat-integritate', 'IPJ SATU MARE - CAZIER JUDICIAR'],
     ['extras-carte-funciara', 'OCPI SATU MARE'],
     ['certificat-constatator', 'ONRC SATU MARE'],
   ])('maps service slug "%s" → "%s"', (slug, expected) => {
