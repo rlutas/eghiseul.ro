@@ -9,7 +9,8 @@
  */
 
 import { useEffect, useState, Suspense, useCallback, useRef } from 'react';
-import { ArrowLeft, ArrowRight, Loader2, AlertTriangle, CheckCircle } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Loader2, AlertTriangle, CheckCircle, ChevronUp } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useModularWizard } from '@/providers/modular-wizard-provider';
@@ -71,6 +72,7 @@ export function ModularOrderWizard({ initialService, initialOptions }: ModularOr
   const [orderComplete, setOrderComplete] = useState(false);
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null); // null = loading
+  const [summaryOpen, setSummaryOpen] = useState(false); // mobile sticky summary dropdown
 
   // Initialize service data
   useEffect(() => {
@@ -448,9 +450,8 @@ export function ModularOrderWizard({ initialService, initialOptions }: ModularOr
               </Suspense>
             </CardContent>
 
-            {/* Navigation — desktop only. On mobile the sticky bottom bar
-                (below) carries the total + Back/Continue. */}
-            <div className="hidden lg:block border-t border-neutral-100 px-6 py-4 bg-neutral-50/50">
+            {/* Navigation — stays in the form on all sizes (Back/Continue). */}
+            <div className="border-t border-neutral-100 px-6 py-4 bg-neutral-50/50">
               <div className="flex items-center justify-between">
                 <Button
                   variant="outline"
@@ -517,8 +518,9 @@ export function ModularOrderWizard({ initialService, initialOptions }: ModularOr
           )}
         </div>
 
-        {/* Price Sidebar */}
-        <div className="lg:col-span-1">
+        {/* Price Sidebar — desktop only. On mobile the same summary is opened
+            as a dropdown from the sticky bottom bar. */}
+        <div className="hidden lg:block lg:col-span-1">
           <div className="lg:sticky lg:top-28">
             <PriceSidebarModular service={initialService} />
             {/* Order code is shown twice already (top-right header + Rezumat
@@ -528,55 +530,53 @@ export function ModularOrderWizard({ initialService, initialOptions }: ModularOr
         </div>
       </div>
 
-      {/* Mobile sticky summary + navigation — the running total stays visible
-          across every wizard step (like the checkout page), with Back/Continue
-          on the right. Replaces the inline footer on mobile. */}
-      <div className="lg:hidden fixed bottom-0 inset-x-0 z-40 border-t border-neutral-200 bg-white/95 backdrop-blur shadow-[0_-4px_20px_-8px_rgba(0,0,0,0.08)]">
-        <div className="px-4 py-2.5 flex items-center justify-between gap-3">
-          <div className="min-w-0">
-            <p className="text-[11px] uppercase tracking-wide text-neutral-500 leading-tight">
-              Total{priceBreakdown.discountAmount > 0 ? ' (cu reducere)' : ''}
-            </p>
-            <p className="text-lg font-bold text-primary-600 tabular-nums leading-tight">
-              {Number(priceBreakdown.totalPrice).toFixed(2)} RON
-            </p>
-          </div>
-          <div className="flex items-center gap-2 shrink-0">
-            {!isFirstStep && (
-              <Button
-                variant="outline"
-                onClick={prevStep}
-                className="h-11 px-3"
-                aria-label="Înapoi"
-              >
-                <ArrowLeft className="h-4 w-4" />
-              </Button>
-            )}
-            <Button
-              onClick={handleNext}
-              disabled={!stepValid || isSubmitting || (isLastStep && state.isSaving)}
-              className="h-11 gap-1.5 bg-primary-500 hover:bg-primary-600 text-secondary-900 font-semibold"
-            >
-              {((isLastStep && state.isSaving) || isSubmitting) && (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              )}
-              {isLastStep ? (
-                isSubmitting ? 'Se procesează...' : 'Plătește'
-              ) : (
-                <>
-                  Continuă
-                  <ArrowRight className="h-4 w-4" />
-                </>
-              )}
-            </Button>
-          </div>
-        </div>
-        {state.error && (
-          <p className="px-4 pb-2 -mt-1 text-xs text-red-600 flex items-center gap-1">
-            <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
-            {state.error}
-          </p>
+      {/* Mobile sticky SUMMARY bar — the running total stays visible across
+          every wizard step; tapping it opens the full "Rezumat comandă" as a
+          dropdown. Navigation (Back/Continuă) stays in the form footer. */}
+      <div className="lg:hidden fixed bottom-0 inset-x-0 z-40">
+        {/* Backdrop closes the dropdown */}
+        {summaryOpen && (
+          <button
+            type="button"
+            aria-label="Închide rezumatul"
+            onClick={() => setSummaryOpen(false)}
+            className="fixed inset-0 bg-black/30 z-0"
+          />
         )}
+        <div className="relative z-10 border-t border-neutral-200 bg-white/95 backdrop-blur shadow-[0_-4px_20px_-8px_rgba(0,0,0,0.08)]">
+          {/* Expanded summary panel */}
+          {summaryOpen && (
+            <div className="max-h-[60vh] overflow-y-auto border-b border-neutral-100 p-4">
+              <PriceSidebarModular service={initialService} />
+            </div>
+          )}
+          <button
+            type="button"
+            onClick={() => setSummaryOpen((v) => !v)}
+            aria-expanded={summaryOpen}
+            className="w-full px-4 py-2.5 flex items-center justify-between gap-3 text-left"
+          >
+            <span className="flex items-center gap-2 min-w-0">
+              <ChevronUp
+                className={cn(
+                  'h-4 w-4 text-neutral-500 transition-transform shrink-0',
+                  summaryOpen && 'rotate-180'
+                )}
+              />
+              <span className="min-w-0">
+                <span className="block text-[11px] uppercase tracking-wide text-neutral-500 leading-tight">
+                  Rezumat comandă{priceBreakdown.discountAmount > 0 ? ' · reducere aplicată' : ''}
+                </span>
+                <span className="block text-[11px] text-neutral-400 leading-tight">
+                  {summaryOpen ? 'Apasă pentru a ascunde' : 'Apasă pentru detalii'}
+                </span>
+              </span>
+            </span>
+            <span className="text-lg font-bold text-primary-600 tabular-nums shrink-0">
+              {Number(priceBreakdown.totalPrice).toFixed(2)} RON
+            </span>
+          </button>
+        </div>
       </div>
     </div>
   );

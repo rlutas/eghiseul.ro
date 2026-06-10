@@ -171,18 +171,19 @@ test.describe('UI Elements — mobile viewport (iPhone 12)', () => {
     });
   });
 
-  test('wizard arată o bară sticky jos cu totalul (RON) pe mobil', async ({
+  test('wizard arată o bară sticky-sumar jos cu totalul (RON) pe mobil', async ({
     page,
   }) => {
     await openWizard(page);
 
-    // The mobile sticky summary bar shows "Total" + the running price and the
-    // Continuă button. It's fixed at the bottom of the viewport.
-    const totalLabel = page.getByText(/^Total/i).last();
-    await expect(totalLabel).toBeVisible();
+    // The mobile sticky bar is summary-only: "Rezumat comandă" label + the
+    // running total. Navigation (Continuă) stays in the form footer, not here.
+    await expect(page.getByText(/Rezumat comandă/i).last()).toBeVisible();
     await expect(page.getByText(/\d+[.,]\d{2}\s*RON/i).last()).toBeVisible();
-    await expect(
-      page.getByRole('button', { name: /continuă/i }).last()
-    ).toBeVisible();
+
+    // Tapping the bar expands the full breakdown (shows the VAT line). Use
+    // .last() — the desktop sidebar (hidden on mobile) also contains "TVA".
+    await page.getByRole('button', { name: /Rezumat comandă/i }).last().click();
+    await expect(page.getByText(/TVA/i).last()).toBeVisible();
   });
 });
