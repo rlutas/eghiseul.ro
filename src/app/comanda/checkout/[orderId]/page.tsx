@@ -502,13 +502,22 @@ export default function CheckoutPage() {
           'shadow-[0_-4px_20px_-8px_rgba(0,0,0,0.08)]'
         )}
       >
-        <div className="container mx-auto max-w-5xl px-4 py-3 flex items-center justify-between gap-3">
+        <div className="container mx-auto max-w-5xl px-4 py-2.5 flex items-center justify-between gap-3">
           <div className="min-w-0">
-            <p className="text-[11px] uppercase tracking-wide text-neutral-500">
-              Total de plată
+            {/* Mini order summary so the bar shows WHAT is being paid, not just
+                the amount. Full itemized breakdown is in the card above. */}
+            <p className="text-xs font-semibold text-secondary-900 truncate leading-tight">
+              {order.service_name}
+              {order.client_type ? ` ${order.client_type}` : ''}
             </p>
-            <p className="text-lg font-bold text-primary-600 tabular-nums leading-tight">
-              {order.total_price.toFixed(2)} RON
+            <p className="text-[11px] text-neutral-500 leading-tight">
+              {(order.selected_options?.length ?? 0) > 0
+                ? `${order.selected_options!.length} ${order.selected_options!.length === 1 ? 'opțiune' : 'opțiuni'} · `
+                : ''}
+              Total:{' '}
+              <span className="font-bold text-primary-600 tabular-nums">
+                {order.total_price.toFixed(2)} RON
+              </span>
             </p>
           </div>
           <Button
