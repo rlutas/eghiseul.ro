@@ -102,6 +102,31 @@ describe('createInvoiceFromOrder — PF (individual)', () => {
 
     expect(oblioRequest.mock.calls[0][0].body.client.name).toBe('N/A');
   });
+
+  it('falls back to KYC `personal` data for "self" billing (no billing/contact name)', async () => {
+    // Mirrors order E-260610-NMU25: PF "self" billing where the customer never
+    // filled a billing form — name/CNP/address live in customer_data.personal.
+    const order = {
+      ...baseOrder,
+      customer_data: {
+        contact: { email: 'serviciiseonethut@gmail.com', phone: '+40745850700' },
+        billing: { type: 'individual' as const, source: 'self', isValid: false },
+        personal: {
+          firstName: 'ALBERTO-GEORGE',
+          lastName: 'GORBA',
+          cnp: '1960313303467',
+          address: { street: 'Sat.Trip', city: 'Negresti-Oas', county: 'Satu Mare' },
+        },
+      },
+    };
+    await createInvoiceFromOrder(order, 'Card');
+
+    const client = oblioRequest.mock.calls[0][0].body.client;
+    expect(client.name).toBe('ALBERTO-GEORGE GORBA');
+    expect(client.cif).toBe('1960313303467');
+    expect(client.city).toBe('Negresti-Oas');
+    expect(client.state).toBe('Satu Mare');
+  });
 });
 
 describe('createInvoiceFromOrder — PJ (company)', () => {

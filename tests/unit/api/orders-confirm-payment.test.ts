@@ -25,6 +25,14 @@ vi.mock('@/lib/delivery-estimate-helper', () => ({
   computeEstimatedCompletionISO: vi.fn(() => '2026-05-15T12:00:00.000Z'),
 }));
 
+// The route emits/backfills the Oblio invoice via this shared helper. Invoice
+// emission is covered by its own tests; here we isolate routing behaviour.
+vi.mock('@/lib/oblio', () => ({
+  ensureInvoiceForPaidOrder: vi
+    .fn()
+    .mockResolvedValue({ status: 'already_exists', invoiceNumber: 'EGI2024-0001' }),
+}));
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const stripeMocks = (await import('@/lib/stripe') as any).__mocks;
 
