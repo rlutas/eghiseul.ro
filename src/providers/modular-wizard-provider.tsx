@@ -320,7 +320,21 @@ function modularWizardReducer(
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { service, options } = action.payload;
       const verificationConfig = service.verification_config ?? DEFAULT_DISABLED_CONFIG;
-      const steps = buildWizardSteps(verificationConfig);
+
+      // PF-locked services (personal KYC, no client-type picker, no company
+      // KYC — e.g. cazier-fiscal, cazier-judiciar-persoana-fizica,
+      // certificat-integritate) have no PF/PJ selector, so clientType stayed
+      // null — which hid the "Motivul solicitării" dropdown (it requires
+      // clientType === 'PF') and the PF labeling. Default it to 'PF' here.
+      const ctEnabled = !!verificationConfig.clientTypeSelection?.enabled;
+      const isPfLocked =
+        !ctEnabled &&
+        !!verificationConfig.personalKyc?.enabled &&
+        !verificationConfig.companyKyc?.enabled;
+      const initClientType: ClientType | null = isPfLocked
+        ? 'PF'
+        : state.clientType ?? null;
+      const steps = buildWizardSteps(verificationConfig, initClientType);
 
       // Initialize module states based on config
       const personalKyc = verificationConfig.personalKyc.enabled
@@ -345,6 +359,7 @@ function modularWizardReducer(
         serviceId: service.id,
         verificationConfig,
         steps,
+        clientType: initClientType,
         personalKyc,
         companyKyc,
         property,

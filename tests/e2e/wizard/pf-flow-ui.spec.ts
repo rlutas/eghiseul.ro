@@ -39,6 +39,17 @@ async function fillContact(page: Page) {
   const phone = page.getByRole('textbox', { name: /telefon/i });
   await phone.click();
   await phone.pressSequentially('755123456', { delay: 20 });
+
+  // PF-locked cazier services now show a required "Motivul solicitării"
+  // (purpose) dropdown at step 1 — pick one so the step is valid.
+  const purpose = page.getByPlaceholder(/Selecteaz[ăa] motivul/i);
+  if (await purpose.isVisible().catch(() => false)) {
+    await purpose.click();
+    await purpose.fill('ANGAJARE');
+    await page.waitForTimeout(200);
+    await purpose.press('ArrowDown');
+    await purpose.press('Enter');
+  }
   await page.waitForTimeout(700); // validation debounce
 }
 
