@@ -349,8 +349,8 @@ export function ModularOrderWizard({ initialService, initialOptions }: ModularOr
   return (
     <div className="container mx-auto px-4 py-8 pb-28 lg:pb-8 max-w-[1200px]">
       {/* Header with Order ID */}
-      <div className="mb-8">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+      <div className="mb-4 sm:mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-3 sm:mb-4">
           <div>
             <h1 className="text-2xl font-bold text-secondary-900 mb-1">
               Comandă {initialService.name}
@@ -516,6 +516,14 @@ export function ModularOrderWizard({ initialService, initialOptions }: ModularOr
               </p>
             </div>
           )}
+
+          {/* Mobile only: estimated time + trust badges. The price summary
+              itself lives in the sticky-bar dropdown; these "extras" stay here
+              in the form so the dropdown stays clean. Desktop has them in the
+              sidebar. */}
+          <div className="lg:hidden mt-4">
+            <PriceSidebarModular service={initialService} variant="extras" />
+          </div>
         </div>
 
         {/* Price Sidebar — desktop only. On mobile the same summary is opened
@@ -544,10 +552,11 @@ export function ModularOrderWizard({ initialService, initialOptions }: ModularOr
           />
         )}
         <div className="relative z-10 border-t border-neutral-200 bg-white/95 backdrop-blur shadow-[0_-4px_20px_-8px_rgba(0,0,0,0.08)]">
-          {/* Expanded summary panel */}
+          {/* Expanded summary panel — price breakdown only (clean). The
+              estimated time + trust badges live in the form below. */}
           {summaryOpen && (
             <div className="max-h-[60vh] overflow-y-auto border-b border-neutral-100 p-4">
-              <PriceSidebarModular service={initialService} />
+              <PriceSidebarModular service={initialService} variant="summary" />
             </div>
           )}
           <button

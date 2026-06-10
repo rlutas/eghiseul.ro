@@ -41,6 +41,13 @@ export interface OrderSidebarProps {
   deliveryTimeText: string;
   /** Show the orange "⚡ Procesare urgentă activată" hint under the time. */
   urgencyActive?: boolean;
+  /**
+   * Which parts to render:
+   *  - 'full'    (default) — price summary + estimated time + trust badges
+   *  - 'summary' — only the price breakdown card (used in the mobile dropdown)
+   *  - 'extras'  — only estimated time + trust badges (shown in the mobile form)
+   */
+  variant?: 'full' | 'summary' | 'extras';
 }
 
 export function OrderSidebar({
@@ -57,24 +64,30 @@ export function OrderSidebar({
   discountAmount = 0,
   deliveryTimeText,
   urgencyActive = false,
+  variant = 'full',
 }: OrderSidebarProps) {
+  const showSummary = variant === 'full' || variant === 'summary';
+  const showExtras = variant === 'full' || variant === 'extras';
   return (
     <div className="space-y-3">
-      <OrderSummaryCard
-        orderNumber={orderNumber}
-        serviceName={serviceName}
-        basePrice={basePrice}
-        options={options}
-        deliveryMethod={deliveryMethod}
-        deliveryPrice={deliveryPrice}
-        totalPrice={totalPrice}
-        subtotalWithoutVat={subtotalWithoutVat}
-        vatAmount={vatAmount}
-        couponCode={couponCode}
-        discountAmount={discountAmount}
-      />
+      {showSummary && (
+        <OrderSummaryCard
+          orderNumber={orderNumber}
+          serviceName={serviceName}
+          basePrice={basePrice}
+          options={options}
+          deliveryMethod={deliveryMethod}
+          deliveryPrice={deliveryPrice}
+          totalPrice={totalPrice}
+          subtotalWithoutVat={subtotalWithoutVat}
+          vatAmount={vatAmount}
+          couponCode={couponCode}
+          discountAmount={discountAmount}
+        />
+      )}
 
       {/* Estimated delivery */}
+      {showExtras && (
       <Card className="bg-white border-neutral-200">
         <CardContent className="p-3.5 flex items-start gap-3">
           <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary-50 shrink-0">
@@ -93,8 +106,10 @@ export function OrderSidebar({
           </div>
         </CardContent>
       </Card>
+      )}
 
       {/* Trust badges */}
+      {showExtras && (
       <div className="space-y-2 px-1">
         <div className="flex items-center gap-2 text-xs text-neutral-600">
           <Shield className="h-3.5 w-3.5 text-emerald-500" />
@@ -105,6 +120,7 @@ export function OrderSidebar({
           <span>Garanție rambursare</span>
         </div>
       </div>
+      )}
     </div>
   );
 }

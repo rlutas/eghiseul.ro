@@ -15,9 +15,12 @@ import { OrderSidebar } from './order-sidebar';
 
 interface PriceSidebarModularProps {
   service: Service;
+  /** 'summary' = price only (mobile dropdown); 'extras' = time + badges
+   *  (mobile form); 'full' (default) = everything (desktop sidebar). */
+  variant?: 'full' | 'summary' | 'extras';
 }
 
-export function PriceSidebarModular({ service }: PriceSidebarModularProps) {
+export function PriceSidebarModular({ service, variant = 'full' }: PriceSidebarModularProps) {
   const { state, priceBreakdown } = useModularWizard();
 
   // Append client type suffix to service name when applicable (e.g.
@@ -96,6 +99,7 @@ export function PriceSidebarModular({ service }: PriceSidebarModularProps) {
       discountAmount={priceBreakdown.discountAmount}
       deliveryTimeText={deliveryTimeText}
       urgencyActive={hasUrgentaMain}
+      variant={variant}
     />
   );
 }
