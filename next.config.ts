@@ -27,6 +27,17 @@ const nextConfig: NextConfig = {
         destination: '/servicii/verificare-rovinieta-online/',
         permanent: true,
       },
+      // Certificat de Integritate slug shortened (was -comportamentala).
+      {
+        source: '/servicii/certificat-integritate-comportamentala',
+        destination: '/servicii/certificat-integritate/',
+        permanent: true,
+      },
+      {
+        source: '/comanda/certificat-integritate-comportamentala',
+        destination: '/comanda/certificat-integritate/',
+        permanent: true,
+      },
     ];
   },
 };
