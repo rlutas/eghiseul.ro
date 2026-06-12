@@ -1,8 +1,15 @@
 /**
  * GET /api/admin/orders/[id]/preview-document?key=S3_KEY
  *
- * Fetches a DOCX from S3 and converts it to HTML for in-browser preview.
- * Returns a full HTML page that can be opened in a new tab.
+ * Faithful preview: converts the DOCX to PDF (CloudConvert in prod, local
+ * LibreOffice in dev — see lib/documents/docx-to-pdf.ts), caches the PDF in
+ * S3 next to the DOCX (`<key>.preview.pdf`) and serves it inline, so the
+ * browser's native PDF viewer shows/prints the document 1:1.
+ *
+ * Fallback (no converter configured / conversion failed / ?format=html):
+ * the legacy mammoth DOCX→HTML preview. Note: HTML preview flattens
+ * positioned text boxes, so official forms (ANAF cerere) look broken there —
+ * that is a mammoth limitation, the DOCX itself is fine.
  *
  * Requires admin authentication.
  */
@@ -11,7 +18,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { requirePermission } from '@/lib/admin/permissions';
-import { getDownloadUrl } from '@/lib/aws/s3';
+import { getDownloadUrl, downloadFile, uploadFile, fileExists } from '@/lib/aws/s3';
+import { convertDocxToPdf, isPdfConversionAvailable } from '@/lib/documents/docx-to-pdf';
 import mammoth from 'mammoth';
 
 export async function GET(
@@ -53,6 +61,48 @@ export async function GET(
       return new NextResponse('Order not found', { status: 404 });
     }
 
+    // Extract filename early (used by both PDF and HTML paths)
+    const fileNameForPdf = (s3Key.split('/').pop() || 'document.docx').replace(/\.docx$/i, '.pdf');
+
+    // ── PDF-first preview ────────────────────────────────────────────────
+    // Serve a cached PDF render when available; otherwise convert once and
+    // cache it next to the DOCX. `?format=html` forces the legacy preview.
+    const wantHtml = request.nextUrl.searchParams.get('format') === 'html';
+    const pdfCacheKey = `${s3Key}.preview.pdf`;
+
+    if (!wantHtml) {
+      try {
+        let pdf: Buffer | null = null;
+        if (await fileExists(pdfCacheKey)) {
+          pdf = await downloadFile(pdfCacheKey);
+        } else if (isPdfConversionAvailable()) {
+          const docx = await downloadFile(s3Key);
+          pdf = await convertDocxToPdf(docx);
+          if (pdf) {
+            // Cache best-effort — serving the PDF matters more than caching.
+            await uploadFile(pdfCacheKey, pdf, 'application/pdf', {
+              'source-key': s3Key,
+            }).catch((e) => console.error('PDF cache upload failed:', e));
+          }
+        }
+        if (pdf) {
+          return new NextResponse(new Uint8Array(pdf), {
+            status: 200,
+            headers: {
+              'Content-Type': 'application/pdf',
+              'Content-Disposition': `inline; filename="${fileNameForPdf}"`,
+              'Content-Length': String(pdf.length),
+              'Cache-Control': 'private, max-age=300',
+            },
+          });
+        }
+      } catch (e) {
+        console.error('PDF preview failed, falling back to HTML:', e);
+      }
+      // fall through to HTML preview
+    }
+
+    // ── Legacy HTML preview (fallback) ───────────────────────────────────
     // Get presigned URL and fetch the DOCX
     const url = await getDownloadUrl(s3Key, 300);
     const response = await fetch(url);

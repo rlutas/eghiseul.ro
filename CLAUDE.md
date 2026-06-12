@@ -196,6 +196,7 @@ OBLIO_SERIES_NAME=EGH
 CRON_SECRET=
 RESEND_API_KEY=
 SMSLINK_API_KEY=
+CLOUDCONVERT_API_KEY=        # DOCX→PDF preview in admin (optional; dev uses local LibreOffice)
 ```
 
 ---

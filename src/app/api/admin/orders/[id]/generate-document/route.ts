@@ -366,6 +366,10 @@ export async function POST(
       return NextResponse.json({ success: false, error: 'Nu s-a putut încărca documentul în storage' }, { status: 500 });
     }
 
+    // The document key is deterministic, so regeneration overwrites the same
+    // DOCX — invalidate the cached PDF render (preview route recreates it).
+    await deleteFile(`${s3Key}.preview.pdf`).catch(() => {});
+
     // Insert new DB row FIRST (before deleting old ones, to prevent data loss on failure)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: insertedDoc, error: insertError } = await (adminClient as any)
@@ -448,13 +452,14 @@ export async function POST(
       .neq('s3_key', s3Key);
 
     if (existingDocs && existingDocs.length > 0) {
-      // Delete old S3 objects
+      // Delete old S3 objects (+ their cached PDF renders)
       await Promise.all(
-        existingDocs.map((doc: { id: string; s3_key: string }) =>
+        existingDocs.flatMap((doc: { id: string; s3_key: string }) => [
           deleteFile(doc.s3_key).catch((e: unknown) =>
             console.error(`Failed to delete old S3 object ${doc.s3_key}:`, e)
-          )
-        )
+          ),
+          deleteFile(`${doc.s3_key}.preview.pdf`).catch(() => {}),
+        ])
       );
       // Delete old DB rows
       const oldIds = existingDocs.map((doc: { id: string }) => doc.id);
