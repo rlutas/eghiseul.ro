@@ -848,7 +848,11 @@ Client documents stored in S3 are previewed the same way as generated documents 
 | `src/lib/documents/auto-generate.ts` | Auto-generates contracts at order submission time, logs failures to order_history |
 | `src/lib/documents/signature-inserter.ts` | Post-processing: replace marker text with DrawingML inline images in DOCX ZIP |
 | `src/app/api/admin/orders/[id]/generate-document/route.ts` | API endpoint for document generation (cleans up old versions, fetches signatures, passes to generator) |
-| `src/app/api/admin/orders/[id]/preview-document/route.ts` | Server-side DOCX-to-HTML preview endpoint (mammoth) |
+| `src/app/api/admin/orders/[id]/preview-document/route.ts` | PDF-first preview (2026-06-12): serves/creates a cached PDF render (`<key>.preview.pdf` in S3, invalidated on regeneration); falls back to mammoth DOCX-to-HTML (`?format=html`), with a red warning banner for text-box form documents that HTML cannot render faithfully |
+| `src/lib/documents/docx-to-pdf.ts` | DOCX→PDF conversion: CloudConvert sync API (`CLOUDCONVERT_API_KEY`, optional) or local LibreOffice (dev); returns null when unavailable so callers fall back to HTML preview |
+| `src/lib/documents/cazier-fiscal-cerere-pdf.ts` | Native pdf-lib fill for the ANAF cazier fiscal cerere — no converter needed in production. Frozen base PDF + per-line segment map; lines redrawn with natural flow (labels regular, values bold, embedded Liberation Sans for Ș/Ț). Uploaded as the preview PDF at generation time |
+| `scripts/build-fiscal-cerere-pdf-template.ts` | One-time builder: regenerates the ANAF base PDF + line map after the DOCX template changes (needs local LibreOffice + `npm i --no-save pdfjs-dist`) |
+| `src/templates/cazier-fiscal/cerere-cazier-fiscal-base.pdf` + `-fields.json` + `LiberationSans-*.ttf` | Frozen assets for the native ANAF PDF fill |
 | `src/app/api/contracts/preview/route.ts` | Customer-facing contract preview (wizard signature step, no auth, uses contract-complet template) |
 | `src/components/orders/modules/signature/ContractPreview.tsx` | Client-side contract preview with live signature replacement |
 | `src/components/orders/modules/signature/SignatureStep.tsx` | Signature canvas + terms acceptance |

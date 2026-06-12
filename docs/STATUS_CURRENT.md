@@ -14,7 +14,12 @@
 
 **🟣 Admin order detail:** sub fiecare opțiune apare acum **Țara** (apostilă) / **Limba** (traducere) din `selected_options[].metadata` — critic operațional (apostila se eliberează PENTRU țara aia). Numele serviciului fără sufixul redundant „Persoană Fizică/Juridică" (badge-ul din header îl arată deja).
 
-**Tests:** **1051** unit passing (8 noi ensure-invoice). Lint + typecheck clean. CI verde pe toate cele 6 commit-uri (`eced80a`…`3b89e62`), deploy automat Vercel.
+**🟣 Preview PDF documente în admin (fără servicii externe pt. ANAF):** preview-ul mammoth (DOCX→HTML) strica vizual formularele cu casete de text (ANAF), deși DOCX-ul era corect. Acum:
+- **Preview PDF-first cu cache S3** (`<key>.preview.pdf`, servit inline, print 1:1 din browser; invalidat la regenerare). Motor: LibreOffice local (dev) / CloudConvert opțional (`CLOUDCONVERT_API_KEY` — userul NU vrea cont, rămâne neconfigurat); fallback HTML cu banner de avertizare la formularele cu casete de text.
+- **Cererea ANAF cazier fiscal = PDF nativ cu pdf-lib** (`cazier-fiscal-cerere-pdf.ts`): PDF de bază înghețat + hartă de linii (build script `scripts/build-fiscal-cerere-pdf-template.ts`), liniile redesenate cu curgere naturală (etichete regular, valori bold, Liberation Sans pt. diacritice). Generat la generarea documentului, urcat ca preview render — **perfect în producție fără niciun converter/cont**.
+- **În producție:** ANAF = PDF perfect; contractele + cererile cazier judiciar = text curgător, HTML preview OK; **împuternicirea** (4 casete text) = singura cu preview HTML parțial stricat — de tratat ca ANAF dacă e nevoie (are semnătură-imagine + numere registru).
+
+**Tests:** **1051** unit passing (8 noi ensure-invoice). Lint + typecheck clean. CI verde pe toate cele 9 commit-uri (`eced80a`…`c229b71`), deploy automat Vercel.
 
 ---
 
