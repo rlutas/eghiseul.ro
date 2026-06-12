@@ -370,6 +370,37 @@ export async function POST(
     // DOCX — invalidate the cached PDF render (preview route recreates it).
     await deleteFile(`${s3Key}.preview.pdf`).catch(() => {});
 
+    // ANAF cazier fiscal cerere: fill the native PDF form (pdf-lib, no
+    // external converter needed) and upload it as the preview render so the
+    // admin preview/print is pixel-faithful immediately.
+    if (serviceSlug === 'cazier-fiscal' && template === 'cerere-eliberare-pf') {
+      try {
+        const { generateFiscalCererePdf } = await import('@/lib/documents/cazier-fiscal-cerere-pdf');
+        const addr = clientData.address_parts;
+        const pdfBuf = await generateFiscalCererePdf({
+          cnp: clientData.cnp || '',
+          lastName: clientData.lastName || '',
+          firstName: clientData.firstName || '',
+          county: addr?.county || '',
+          city: addr?.city || '',
+          street: addr?.street || '',
+          number: addr?.number || '',
+          building: addr?.building || '',
+          staircase: addr?.staircase || '',
+          apartment: addr?.apartment || '',
+          motiv: context.motiv_solicitare || 'Informare',
+          date: new Date().toLocaleDateString('ro-RO', { day: '2-digit', month: '2-digit', year: 'numeric' }),
+        });
+        await uploadFile(`${s3Key}.preview.pdf`, pdfBuf, 'application/pdf', {
+          'source-key': s3Key,
+          'renderer': 'pdf-lib-native',
+        });
+      } catch (e) {
+        // Preview render is best-effort — the DOCX is the document of record.
+        console.error('Native fiscal cerere PDF render failed:', e);
+      }
+    }
+
     // Insert new DB row FIRST (before deleting old ones, to prevent data loss on failure)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: insertedDoc, error: insertError } = await (adminClient as any)

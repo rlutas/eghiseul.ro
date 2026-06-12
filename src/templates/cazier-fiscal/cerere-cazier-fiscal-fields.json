@@ -1,0 +1,185 @@
+{
+  "lines": [
+    {
+      "y": 529,
+      "size": 12,
+      "startX": 35.18,
+      "segments": [
+        {
+          "literal": "Subsemnatul/ subscrisa având:",
+          "gapAfter": 36.04999999999998
+        },
+        {
+          "literal": "Cod de identificare fiscală:",
+          "gapAfter": 3.0499999999999545
+        },
+        {
+          "field": "CNP",
+          "gapAfter": 0
+        }
+      ]
+    },
+    {
+      "y": 503,
+      "size": 12,
+      "startX": 160.38,
+      "segments": [
+        {
+          "literal": "Nume şi prenume/denumire:",
+          "gapAfter": 2.8899999999999864
+        },
+        {
+          "field": "NUME",
+          "gapAfter": 0
+        },
+        {
+          "literal": " ",
+          "gapAfter": 0
+        },
+        {
+          "field": "PRENUME",
+          "gapAfter": 0
+        }
+      ]
+    },
+    {
+      "y": 472,
+      "size": 12,
+      "startX": 36.2,
+      "segments": [
+        {
+          "literal": "Judeţ/Țară:",
+          "gapAfter": 2.809999999999988
+        },
+        {
+          "field": "JUDETUL",
+          "gapAfter": 3.379999999999967
+        },
+        {
+          "literal": "Localitate:",
+          "gapAfter": 2.8099999999999454
+        },
+        {
+          "field": "LOCALITATEA",
+          "gapAfter": 2.802000000000021
+        },
+        {
+          "literal": "Sector:",
+          "gapAfter": 0
+        }
+      ]
+    },
+    {
+      "y": 452,
+      "size": 11,
+      "startX": 36.2,
+      "segments": [
+        {
+          "literal": "Strada:",
+          "gapAfter": 2.799999999999997
+        },
+        {
+          "field": "STR",
+          "gapAfter": 5.590000000000018
+        },
+        {
+          "literal": "Număr:",
+          "gapAfter": 2.8100000000000023
+        },
+        {
+          "field": "NR",
+          "gapAfter": 5.594999999999999
+        },
+        {
+          "literal": "Bloc:",
+          "gapAfter": 2.799999999999983
+        },
+        {
+          "field": "BL",
+          "gapAfter": 6.653999999999996
+        },
+        {
+          "literal": "Scara:",
+          "gapAfter": 2.7899999999999636
+        },
+        {
+          "field": "SC",
+          "gapAfter": 8.338999999999942
+        },
+        {
+          "literal": "Ap.",
+          "gapAfter": 2.8000000000000114
+        },
+        {
+          "field": "AP",
+          "gapAfter": 2.7989999999999213
+        },
+        {
+          "literal": "Telefon: ......................................",
+          "gapAfter": 0
+        }
+      ]
+    },
+    {
+      "y": 252,
+      "size": 12,
+      "startX": 41.95,
+      "segments": [
+        {
+          "literal": "Împuternicire/Mandat nr.",
+          "gapAfter": 77.57000000000005
+        },
+        {
+          "literal": "din data",
+          "gapAfter": 2.8099999999999454
+        },
+        {
+          "field": "DATA",
+          "gapAfter": 0
+        }
+      ]
+    },
+    {
+      "y": 223,
+      "size": 12,
+      "startX": 41.95,
+      "segments": [
+        {
+          "literal": "Solicit eliberarea unui certificat de cazier fiscal pentru a-mi servi la",
+          "gapAfter": 2.989999999999725
+        },
+        {
+          "field": "MOTIV",
+          "gapAfter": 0
+        }
+      ]
+    },
+    {
+      "y": 197,
+      "size": 12,
+      "startX": 42.53,
+      "segments": [
+        {
+          "literal": "Nume, prenume",
+          "gapAfter": 5.560000000000002
+        },
+        {
+          "field": "NUME",
+          "gapAfter": 0
+        },
+        {
+          "literal": " ",
+          "gapAfter": 0
+        },
+        {
+          "field": "PRENUME",
+          "gapAfter": 125.08799999999997
+        },
+        {
+          "literal": "Funcţia",
+          "gapAfter": 0
+        }
+      ]
+    }
+  ]
+}
