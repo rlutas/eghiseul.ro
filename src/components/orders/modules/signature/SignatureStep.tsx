@@ -125,6 +125,10 @@ export default function SignatureStep({ config, onValidChange }: SignatureStepPr
 
   // Stop drawing
   const handleEnd = useCallback(() => {
+    // Fires on mouseLeave/touchEnd too — without this guard, just hovering
+    // over the canvas would save a blank "signature" and auto-tick the T&C
+    // consent below. Consent must only ever follow an actual signature.
+    if (!isDrawing) return;
     setIsDrawing(false);
 
     const canvas = canvasRef.current;
@@ -148,7 +152,7 @@ export default function SignatureStep({ config, onValidChange }: SignatureStepPr
       privacyAccepted: true,
       withdrawalWaiver: true,
     });
-  }, [updateSignature, updateConsent]);
+  }, [isDrawing, updateSignature, updateConsent]);
 
   // Clear signature
   const handleClear = useCallback(() => {
@@ -187,14 +191,17 @@ export default function SignatureStep({ config, onValidChange }: SignatureStepPr
 
   // Toggle the T&C acceptance shown under the signature. One box covers all
   // three consent flags (terms + privacy + 14-day withdrawal waiver) — the
-  // same grouped consent the backend audit trail records.
+  // same grouped consent the backend audit trail records. Consent can never
+  // be given BEFORE signing (the checkbox is disabled until a signature
+  // exists), only withdrawn/re-given after.
   const handleToggleTerms = useCallback((checked: boolean) => {
+    if (checked && !hasSignature) return;
     updateConsent?.({
       termsAccepted: checked,
       privacyAccepted: checked,
       withdrawalWaiver: checked,
     });
-  }, [updateConsent]);
+  }, [updateConsent, hasSignature]);
 
   // Validate form — signature AND the terms checkbox must be accepted.
   const isFormValid = useCallback(() => {
@@ -284,11 +291,13 @@ export default function SignatureStep({ config, onValidChange }: SignatureStepPr
       </Card>
 
       {/* Terms & Conditions — shown right under the signature, auto-ticked when
-          the user signs (signing = consent) but can be toggled independently. */}
+          the user signs (signing = consent). Disabled until a signature exists:
+          consent must never be checkable before the client actually signs. */}
       <div className="rounded-lg border bg-muted/20 p-4">
-        <label className="flex items-start gap-3 cursor-pointer group">
+        <label className={`flex items-start gap-3 group ${hasSignature ? 'cursor-pointer' : 'cursor-not-allowed opacity-60'}`}>
           <Checkbox
             checked={termsAccepted}
+            disabled={!hasSignature}
             onCheckedChange={(checked) => handleToggleTerms(checked === true)}
             className="mt-0.5 shrink-0"
           />
