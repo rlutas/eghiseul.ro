@@ -11,6 +11,23 @@
 - Pooler host: `aws-1-eu-west-2.pooler.supabase.com:6543` with SSL `{ rejectUnauthorized: false }`
 - psql is NOT installed - use Node.js pg module instead
 
+## NEVER use `.or()` filters on UPDATE/DELETE (supabase-js mutations)
+- Our PostgREST instance rejects `or=` filters on ANY mutation with
+  `42703: column <table>.<col> does not exist` — **the column exists; the
+  message is misleading.** The same `or=` filter on a SELECT works fine.
+- This broke the invoice atomic lock (ensure-invoice.ts) on EVERY call: the
+  42703 matched the schema-cache degradation regex, every caller skipped the
+  lock, and the webhook/confirm-payment race double-issued invoices
+  (EGI2024-24097 + 24098 for E-260612-QT376, 2026-06-12).
+- Instead: run sequential conditional UPDATEs, each using only `.eq/.is/.lt/...`
+  filters (each UPDATE is atomic on its own — Postgres re-evaluates the WHERE
+  under row locks). See the claim in `lib/oblio/ensure-invoice.ts`.
+- `.or()` on SELECT queries remains fine (used across admin list/count routes).
+- When adding a lock/claim query, ALWAYS verify the exact query shape against
+  production PostgREST with an impossible UUID (errors surface even when 0
+  rows match) — a plain `update().eq()` passing does NOT prove the real claim
+  works.
+
 ## PostgREST schema cache (CRITICAL after schema changes)
 - After ANY migration that ADDs/RENAMEs/DROPs a column or table, PostgREST's
   schema cache must reload or supabase-js writes fail with

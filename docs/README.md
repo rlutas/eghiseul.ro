@@ -1,13 +1,16 @@
 # Documentație eGhiseul.ro
 
-**Ultima actualizare:** 2026-05-27 (admin parity overhaul + abandoned cart system)
+**Ultima actualizare:** 2026-06-12 (fix lock atomic facturi — `.or()` pe UPDATE interzis)
 **Status proiect:** Sprint 6 + SEO Pre-Launch Phase. **47 pagini de rebuilt pentru migrare WP→Next.js** (vezi `seo/REBUILD-QUEUE.md`). Page #1 (cazier-judiciar-online) tehnic complete dar **user feedback negativ pe vizual** — necesită revizitare.
 **Fișier principal:** [`DEVELOPMENT_MASTER_PLAN.md`](DEVELOPMENT_MASTER_PLAN.md)
 **Status curent:** [`STATUS_CURRENT.md`](STATUS_CURRENT.md) — **citeste primul daca revii dupa pauza**
 **Plan SEO master:** [`seo/SEO-MASTER-PLAN-2026-05-20.md`](seo/SEO-MASTER-PLAN-2026-05-20.md)
 **Rebuild queue (47 pagini):** [`seo/REBUILD-QUEUE.md`](seo/REBUILD-QUEUE.md)
 **City pages plan:** [`seo/CITY-PAGES-PLAN.md`](seo/CITY-PAGES-PLAN.md)
-**Sesiune curentă (2026-06-10):** mobil + plăți + reluare draft — **citește aici unde am rămas**:
+**Sesiune curentă (2026-06-12):**
+- 🔴 [`session-logs/2026-06-12-invoice-lock-or-filter-broken.md`](session-logs/2026-06-12-invoice-lock-or-filter-broken.md) — **incident**: factură dublată DIN NOU (E-260612-QT376) — lock-ul atomic nu funcționa deloc (`.or()` pe UPDATE respins de PostgREST cu 42703 înșelător, mascat de calea de degradare) → claim rescris cu UPDATE-uri condiționale secvențiale + test regresie; **storno EGI2024-24097 manual în Oblio**
+
+**Sesiune anterioară (2026-06-10):** mobil + plăți + reluare draft:
 - [`session-logs/2026-06-10-checkout-reorder-coupon.md`](session-logs/2026-06-10-checkout-reorder-coupon.md) — checkout: cupon mai sus, reordonare mobil (sumar+cupon → plată), scroll la metodă
 - [`session-logs/2026-06-10-summary-dropdown-and-console-fix.md`](session-logs/2026-06-10-summary-dropdown-and-console-fix.md) — dropdown rezumat curat (preț), spacing header, fix erori consolă (semnătură)
 - [`session-logs/2026-06-10-wizard-mobile-sticky-summary.md`](session-logs/2026-06-10-wizard-mobile-sticky-summary.md) — bară sticky cu total/preț pe toți pașii wizard (mobil)

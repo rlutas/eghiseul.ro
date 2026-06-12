@@ -60,17 +60,40 @@ export async function ensureInvoiceForPaidOrder(
 
   // 2. Atomic claim — only the winner creates the invoice. Self-expires after
   //    2 min so a genuine retry can re-claim if creation failed.
-  const lockStaleBefore = new Date(Date.now() - LOCK_STALE_MS).toISOString();
+  //
+  // IMPORTANT: no `.or()` here. The production PostgREST instance rejects
+  // `or=` filters on ANY mutation with 42703 "column ... does not exist"
+  // (the column exists — the message is misleading). The original `.or()`
+  // claim therefore errored on EVERY call, fell into the degradation path
+  // below, and the webhook/confirm-payment race double-issued invoices
+  // (EGI2024-24097 + 24098 on E-260612-QT376, 2026-06-12). Instead we run
+  // two sequential conditional UPDATEs — each one atomic on its own.
+  //
   // `invoice_generating_at` was added by migration 049 but the generated
   // Database types aren't regenerated yet — cast to bypass the stale type.
-  const { data: claimRows, error: claimError } = await (admin
+  const nowIso = new Date().toISOString();
+  // 2a. Normal case: nobody holds the lock.
+  let { data: claimRows, error: claimError } = await (admin
     .from('orders')
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    .update({ invoice_generating_at: new Date().toISOString() } as any)
+    .update({ invoice_generating_at: nowIso } as any)
     .eq('id', orderId)
     .is('invoice_number', null)
-    .or(`invoice_generating_at.is.null,invoice_generating_at.lt.${lockStaleBefore}`)
+    .is('invoice_generating_at', null)
     .select('id'));
+
+  // 2b. Takeover: a previous claimant died mid-creation (>2 min ago).
+  if (!claimError && (!claimRows || claimRows.length === 0)) {
+    const lockStaleBefore = new Date(Date.now() - LOCK_STALE_MS).toISOString();
+    ({ data: claimRows, error: claimError } = await (admin
+      .from('orders')
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .update({ invoice_generating_at: nowIso } as any)
+      .eq('id', orderId)
+      .is('invoice_number', null)
+      .lt('invoice_generating_at', lockStaleBefore)
+      .select('id')));
+  }
 
   if (claimError) {
     // GRACEFUL DEGRADATION: if PostgREST can't see the lock column (its schema
@@ -136,6 +159,19 @@ export async function ensureInvoiceForPaidOrder(
         invoice_issued_at: invoice.createdAt,
       })
       .eq('id', orderId);
+
+    // Release the lock in a SEPARATE update: if the lock column is invisible
+    // to a stale PostgREST schema cache, bundling it above would fail the
+    // critical invoice_number write too. Best-effort — ignore errors.
+    try {
+      await admin
+        .from('orders')
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .update({ invoice_generating_at: null } as any)
+        .eq('id', orderId);
+    } catch {
+      /* lock column not visible — nothing to release */
+    }
 
     await admin.from('order_history').insert({
       order_id: orderId,
