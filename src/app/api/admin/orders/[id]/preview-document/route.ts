@@ -67,6 +67,21 @@ export async function GET(
     const result = await mammoth.convertToHtml({ buffer });
     const docHtml = result.value;
 
+    // Official forms (e.g. the ANAF cerere cazier fiscal) are built from
+    // absolutely-positioned text boxes. Mammoth drops all positioning, so the
+    // HTML preview collapses into flat text and looks broken even though the
+    // DOCX itself is perfectly fine. Detect text boxes and warn loudly.
+    const hasTextBoxLayout = (() => {
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const PizZip = require('pizzip') as typeof import('pizzip');
+        const xml = new PizZip(buffer).file('word/document.xml')?.asText() ?? '';
+        return xml.includes('<wps:txbx>') || xml.includes('<v:textbox');
+      } catch {
+        return false;
+      }
+    })();
+
     // Extract filename from S3 key
     const fileName = s3Key.split('/').pop() || 'document.docx';
 
@@ -200,6 +215,7 @@ export async function GET(
       <button onclick="window.close()">Inchide</button>
     </div>
   </div>
+  ${hasTextBoxLayout ? `<div class="warnings" style="display:block; background:#f8d7da; border-color:#dc3545; color:#721c24; font-size:13px; font-weight:500;">⚠️ Acest document este un formular oficial cu casete de text poziționate (ex. cerere ANAF). Previzualizarea HTML NU reflectă aspectul real — documentul DOCX este corect. Folosiți "Descarca DOCX" pentru forma reală.</div>` : ''}
   <div class="note">Aceasta este o previzualizare HTML. Pentru documentul original cu formatare completa, folositi butonul "Descarca DOCX".</div>
   ${result.messages.length > 0 ? `<div class="warnings">Avertismente conversie: ${result.messages.map(m => m.message).join('; ')}</div>` : ''}
   <div class="page">
