@@ -277,6 +277,14 @@ function formatDate(d: string | null) {
   });
 }
 
+/** Strip the trailing "Persoană Fizică"/"Persoană Juridică" from a service
+ *  name — the entity-type badge in the page header already shows it, so
+ *  repeating it in the service card is redundant (e.g. "Cazier Fiscal
+ *  Persoană Fizică" → "Cazier Fiscal"). */
+function stripEntitySuffix(name: string): string {
+  return name.replace(/\s+Persoan[ăa]\s+(Fizic[ăa]|Juridic[ăa])\s*$/i, '');
+}
+
 /** Format a date string as DD.MM.YYYY only (no time component).
  *  Handles ISO strings ("1992-07-02T00:00:00.000Z"), plain dates ("1992-07-02"),
  *  and already-formatted Romanian dates ("02.07.1992"). */
@@ -1080,7 +1088,7 @@ export default function AdminOrderDetailPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            <InfoRow label="Serviciu" value={order.services?.name || 'N/A'} />
+            <InfoRow label="Serviciu" value={order.services?.name ? stripEntitySuffix(order.services.name) : 'N/A'} />
             {/* Real per-step delivery estimate (sums urgenta + traducere +
                 legalizare + apostila*) so admin sees the same window the
                 customer was promised. Falls back to `service.estimated_days`
