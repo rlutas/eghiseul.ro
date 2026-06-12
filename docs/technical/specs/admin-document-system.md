@@ -212,6 +212,16 @@ src/templates/
 │   ├── imputernicire.docx
 │   ├── cerere-eliberare-pf.docx
 │   └── cerere-eliberare-pj.docx
+├── cazier-fiscal/                # ANAF-specific templates (2026-06-12)
+│   └── cerere-eliberare-pf.docx  # Official ANAF "Cerere de eliberare a
+│                                 # certificatului de cazier fiscal" — ported
+│                                 # from cazierjudiciaronline.com
+│                                 # (cerere-fiscal-template.docx). Placeholders:
+│                                 # CNP, NUME, PRENUME, JUDETUL, LOCALITATEA,
+│                                 # STR, NR, BL, SC, AP, MOTIV, DATA (uppercase
+│                                 # aliases added in generator.ts). NOTE: the
+│                                 # împuternicit block (name/CNP/CI) is
+│                                 # hardcoded in the docx, not templated.
 └── shared/                       # Fallback templates (shared across services)
     ├── contract-complet.docx
     ├── contract-prestari.docx

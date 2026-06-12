@@ -303,7 +303,9 @@ export async function POST(
           }
         : null,
       document_numbers: documentNumbers,
-      motiv_solicitare: body.motiv_solicitare || 'Interes personal',
+      // Fall back to the purpose the customer picked in the wizard (e.g.
+      // cazier-fiscal "Informare") before the generic default.
+      motiv_solicitare: body.motiv_solicitare || contact.purpose || 'Interes personal',
       client_ip: cd.signature_metadata?.ip_address || 'N/A',
     };
 

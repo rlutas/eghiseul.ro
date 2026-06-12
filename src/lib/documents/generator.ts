@@ -551,6 +551,16 @@ function buildPlaceholderData(ctx: DocumentContext) {
     LOCALITATE: ap?.city || '',
     SECTOR: ap?.sector || '',
     STRADA: ap?.street || '',
+
+    // ANAF cerere cazier fiscal aliases (cazier-fiscal/cerere-eliberare-pf.docx,
+    // ported from cazierjudiciaronline.com cerere-fiscal-template.docx).
+    // The official ANAF form is filled in uppercase.
+    NUME: (ctx.client.lastName || '').toUpperCase(),
+    PRENUME: (ctx.client.firstName || '').toUpperCase(),
+    CNP: ctx.client.cnp || '',
+    JUDETUL: (ap?.county || '').toUpperCase(),
+    LOCALITATEA: (ap?.city || '').toUpperCase(),
+    STR: (ap?.street || '').toUpperCase(),
     NR: ap?.number || '',
     BL: ap?.building || '',
     SC: ap?.staircase || '',
