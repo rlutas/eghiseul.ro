@@ -109,6 +109,8 @@ interface OrderDetail {
     /** Stable code (e.g. 'urgenta', 'apostila_haga') — feeds the delivery
      *  calculator and lets the bundled-children join up to a parent. */
     code?: string;
+    /** Per-option wizard input (apostila → country, traducere → language). */
+    metadata?: { country?: string; language?: string } | null;
     /** Cross-service bundling marker — when set, this row belongs under the
      *  referenced parent option in the grouped admin view. */
     bundled_for?: {
@@ -1160,6 +1162,19 @@ export default function AdminOrderDetailPage() {
                     <span className={indented ? '' : 'font-medium'}>{stripSuffix(opt.option_name)}</span>
                     {(opt.quantity || 1) > 1 && (
                       <span className="text-muted-foreground"> x{opt.quantity}</span>
+                    )}
+                    {/* Wizard per-option input: apostille destination country /
+                        translation language — operationally critical (the
+                        apostille is issued FOR that country). */}
+                    {opt.metadata?.country && (
+                      <p className="text-xs text-muted-foreground">
+                        Țara: <span className="font-medium text-foreground">{opt.metadata.country}</span>
+                      </p>
+                    )}
+                    {opt.metadata?.language && (
+                      <p className="text-xs text-muted-foreground">
+                        Limba: <span className="font-medium text-foreground">{opt.metadata.language}</span>
+                      </p>
                     )}
                   </div>
                   {opt.price_modifier ? (
