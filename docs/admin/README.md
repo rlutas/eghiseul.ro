@@ -70,6 +70,8 @@ The Admin Panel (`/admin`) is the management interface for eGhiseul.ro, providin
 | Document generation (DOCX: contracts, imputernicire, cerere) | `src/lib/documents/generator.ts` | docxtemplater + pizzip, mammoth preview, robust error handling (S3/DB failures) |
 | Document download in admin | `src/app/admin/orders/[id]/page.tsx` | "Descarca" button on every document row, presigned S3 URL |
 | Template separation (individual DOCX templates) | `src/templates/cazier-judiciar/` | 5 templates: contract-prestari, contract-asistenta, imputernicire, cerere-pf, cerere-pj |
+| ANAF cerere for cazier-fiscal (2026-06-12) | `src/templates/cazier-fiscal/cerere-eliberare-pf.docx` | Official ANAF request form (ported from cazierjudiciaronline.com); picked up automatically by per-service template resolution. Motiv falls back to wizard purpose (`contact.purpose`). Împuternicit block hardcoded in docx |
+| Apostille country / translation language in order detail (2026-06-12) | `src/app/admin/orders/[id]/page.tsx` | "Țara: X" / "Limba: Y" under each selected option (from `selected_options[].metadata`); service name shown without redundant "Persoană Fizică/Juridică" suffix |
 | Expanded RBAC roles (5 roles) | `src/lib/admin/permissions.ts` | super_admin, manager, operator, contabil, avocat |
 | Company & lawyer data settings tab | Settings > Date firma & Avocat | Company data, lawyer data, document counters |
 | Signature management (company, lawyer, stamp) | Settings > Date firma & Avocat | PNG upload via S3 presigned URLs, used in document generation |

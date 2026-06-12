@@ -1,6 +1,20 @@
 # eGhiseul.ro - Status Curent
 
-**Data:** 2026-06-08 (fix OCR pașaport — CNP nu se extrăgea + client blocat silențios)
+**Data:** 2026-06-12 (fix lock facturi `.or()` + cerere ANAF cazier fiscal + T&C semnătură + admin polish)
+
+---
+
+## ✅ SESIUNE 2026-06-12 — Factură dublată DIN NOU (lock-ul nu funcționa) + cerere ANAF + fix-uri admin/wizard
+
+**🔴 Incident factură dublată (E-260612-QT376, EGI2024-24097+24098):** lock-ul atomic din 10 iunie **nu a funcționat niciodată** — PostgREST-ul Supabase respinge filtrele `.or()` pe ORICE UPDATE cu `42703 "column does not exist"` (înșelător — coloana există; același filtru pe SELECT merge). Eroarea se potrivea cu regexul căii de degradare (scrisă pt. cache stale) → fiecare apelant sărea lock-ul → webhook + confirm-payment au emis în paralel. **Fix:** claim rescris ca două UPDATE-uri condiționale secvențiale (`.is()`/`.lt()`, fiecare atomic), eliberare lock la succes în update separat, ambele forme verificate contra producției. **Test regresie nou** (8 teste, fake supabase cu semantica reală PostgREST + simularea cursei). Regulă nouă în `.claude/rules/database.md`: NICIODATĂ `.or()` pe mutații. Detalii: `docs/session-logs/2026-06-12-invoice-lock-or-filter-broken.md`. **⚠️ DE FĂCUT: storno `EGI2024-24097` în Oblio** (ambele încasate; comanda pointează corect la 24098).
+
+**🟣 Cerere ANAF dedicată pt. cazier-fiscal:** admin genera greșit formularul MAI (cazier judiciar) din `shared/`. Acum `src/templates/cazier-fiscal/cerere-eliberare-pf.docx` = formularul oficial ANAF (portat din cazierjudiciaronline.com), ales automat de rezoluția per-serviciu. Aliasuri noi în generator (`NUME, PRENUME, CNP, JUDETUL, LOCALITATEA, STR` — uppercase). `motiv_solicitare` cade acum pe scopul din wizard (`contact.purpose`, ex. „Informare") înainte de „Interes personal". Verificat end-to-end cu date reale — zero placeholder-e rămase. **Împuternicitul e hardcodat în docx** (avocatul de pe cazierjudiciaronline) — OK deocamdată, de parametrizat dacă depune altcineva.
+
+**🔴 T&C la pasul de semnătură:** `handleEnd` se declanșa pe `mouseLeave`/`touchEnd` fără să verifice `isDrawing` → simpla trecere peste canvas salva semnătură goală + bifa consimțământul. Fix: guard pe `isDrawing` + checkbox-ul T&C **dezactivat până există semnătură** (se bifează automat la semnare, se debifează la ștergere).
+
+**🟣 Admin order detail:** sub fiecare opțiune apare acum **Țara** (apostilă) / **Limba** (traducere) din `selected_options[].metadata` — critic operațional (apostila se eliberează PENTRU țara aia). Numele serviciului fără sufixul redundant „Persoană Fizică/Juridică" (badge-ul din header îl arată deja).
+
+**Tests:** **1051** unit passing (8 noi ensure-invoice). Lint + typecheck clean. CI verde pe toate cele 6 commit-uri (`eced80a`…`3b89e62`), deploy automat Vercel.
 
 ---
 
