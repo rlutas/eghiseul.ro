@@ -146,9 +146,15 @@ Conținutul **nu** e problema (4.500 cuvinte, FAQ cu 11 Q, prețuri, use-cases).
 - Secțiune de **proză indexabilă** pe fiecare (înainte erau card-heavy, ~0 proză): PF țintește `cazier judiciar persoană fizică` + bloc onest „gratuit la ghișeu vs. online"; PJ țintește `cazier judiciar firmă / persoană juridică / licitații SEAP` + clarificare PFA/II/ÎF.
 - Typecheck curat (`tsc --noEmit` → 0 erori).
 
+**✅ Corectură (verificat pe Vercel 2026-06-13):** hub-ul Next.js `/servicii/cazier-judiciar-online/` ARE DEJA secțiunile pe care le credeam lipsă (analiza inițială s-a uitat din greșeală la WP-ul vechi, nu la noul hub):
+- „Alege Tipul de Cazier Judiciar" → linkuri către PF + PJ ✅
+- „Online prin eGhișeul.ro vs Ghișeul Tradițional" = **blocul gratuit-vs-plătit (M2 DONE)** ✅
+- „Pentru Diaspora & Străinătate" FAQ (M3 parțial DONE) ✅
+- 30+ use-cases, prețuri, 12+ FAQ, referințe legale, schema @graph completă.
+- Deci M2/M3 sunt în mare acoperite pe hub. Rămâne doar polish-ul vizual (feedback 20 mai).
+
 **⏳ Rămâne de făcut (cazier judiciar):**
-- **HUB — secțiune „gratuit vs. noi"** (M2): hub-ul are diaspora + use-cases, dar NU are încă blocul comparativ „gratuit" care captează ~75k impresii. ⚠️ Hub-ul a fost respins vizual la 20 mai — de adăugat cu grijă / după feedback specific.
-- **Sub-pagină diaspora** (M3): `din-strainatate` — neconstruită.
+- Eventual sub-pagină dedicată `din-strainatate` (diaspora are doar FAQ pe hub acum).
 - **Migrare blog preț** (M1): `/taxa-cazier-judiciar/` (poz 6.18, 5.188 clicks) e încă pe WP — de migrat ca MDX, re-țintit pe preț, link UP la serviciu.
 - ✅ **Duplicat ruta dinamică — REZOLVAT:** `generateStaticParams` din `/servicii/[slug]` întorcea TOATE slug-urile DB → genera `/servicii/cazier-judiciar`, `/servicii/cazier-judiciar-persoana-fizica`, `...-juridica` ca duplicate ale paginilor hardcodate. Fix:
   - 3 redirect-uri 308 în `next.config.ts` (`/servicii/cazier-judiciar*` → URL canonic `/cazier-judiciar-online/*`); `/comanda/*` rămâne pe slug DB (checkout).
