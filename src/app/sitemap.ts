@@ -17,6 +17,8 @@ import { createPublicClient } from '@/lib/supabase/public';
 import {
   BASE_URL,
   HARDCODED_SERVICE_SLUGS,
+  HARDCODED_SERVICE_SUBROUTE_PATHS,
+  DB_SLUGS_WITH_HARDCODED_PAGE,
   HARDCODED_CALCULATOR_SLUGS,
   HARDCODED_TOOL_SLUGS,
   HARDCODED_ARTICLE_SLUGS,
@@ -39,6 +41,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       url: `${BASE_URL}/servicii/${slug}/`,
       changeFrequency: 'weekly',
       priority: 0.9,
+    });
+  }
+
+  // 1b. Hardcoded sub-route pages (PF / PJ under cazier-judiciar-online)
+  for (const path of HARDCODED_SERVICE_SUBROUTE_PATHS) {
+    entries.push({
+      url: `${BASE_URL}/${path}/`,
+      changeFrequency: 'weekly',
+      priority: 0.8,
     });
   }
 
@@ -81,8 +92,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     if (dbServices) {
       const hardcodedSet = new Set<string>(HARDCODED_SERVICE_SLUGS);
+      const redirectedSet = new Set<string>(DB_SLUGS_WITH_HARDCODED_PAGE);
       for (const svc of dbServices) {
         if (hardcodedSet.has(svc.slug)) continue;
+        // DB slugs that 301 → hardcoded SEO URLs must not appear in sitemap.
+        if (redirectedSet.has(svc.slug)) continue;
         entries.push({
           url: `${BASE_URL}/servicii/${svc.slug}/`,
           lastModified: svc.updated_at ? new Date(svc.updated_at) : undefined,

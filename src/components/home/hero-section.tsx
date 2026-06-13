@@ -81,7 +81,7 @@ export function HeroSection() {
                   ))}
                 </div>
                 <span className="text-xs sm:text-sm font-bold text-secondary-900">4.9</span>
-                <span className="text-[10px] sm:text-xs text-neutral-500">• 391 recenzii</span>
+                <span className="text-[10px] sm:text-xs text-neutral-500">• 450+ recenzii</span>
               </div>
             </div>
           </div>

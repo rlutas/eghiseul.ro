@@ -1,7 +1,7 @@
-import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { createPublicClient } from '@/lib/supabase/public';
+import { buildPageMetadata, buildServicePageGraph, BASE_URL } from '@/lib/seo';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
@@ -27,8 +27,18 @@ import { Service, ServiceOption, formatEstimatedDays } from '@/types/services';
 import { Footer } from '@/components/home/footer';
 import { ServiceFAQ } from '@/components/services/service-faq';
 
-// Database slug for this service
+// Database slug for this service (order pipeline identifier)
 const SERVICE_SLUG = 'cazier-judiciar-persoana-juridica';
+
+// SEO routing constants — URL path is nested under the hub, NOT the DB slug
+const PAGE_PATH = '/servicii/cazier-judiciar-online/persoana-juridica/';
+const SCHEMA_SLUG = 'cazier-judiciar-online/persoana-juridica';
+const TITLE = 'Cazier Judiciar Firmă (Persoană Juridică) Online — 198 RON | eGhișeul';
+const DESCRIPTION =
+  'Cazier judiciar pentru firmă (persoană juridică) 100% online — necesar la licitații publice ' +
+  'SEAP, contracte cu statul și fonduri europene. 198 RON, livrare în 2-4 zile. Auto-completare CUI de la ONRC.';
+const DATE_PUBLISHED = '2026-04-16';
+const DATE_MODIFIED = '2026-06-13';
 
 // Enable ISR with 1-hour revalidation
 export const revalidate = 3600;
@@ -63,42 +73,43 @@ async function getService(): Promise<{ service: Service; options: ServiceOption[
   };
 }
 
-// Generate metadata for SEO
-export async function generateMetadata(): Promise<Metadata> {
-  const data = await getService();
+// Hand-tuned SEO metadata (hub pattern) — differentiated from hub + PF to avoid
+// internal cannibalization. PJ owns "cazier judiciar firmă / persoană juridică" long-tail.
+export const metadata = buildPageMetadata({
+  title: TITLE,
+  description: DESCRIPTION,
+  path: PAGE_PATH,
+  ogImage: '/og/cazier-judiciar.png',
+});
 
-  if (!data) {
-    return {
-      title: 'Cazier Judiciar Persoană Juridică | Firme | eGhișeul',
-      description: 'Obține cazierul judiciar pentru firma ta online.',
-    };
-  }
-
-  const { service } = data;
-  const title = service.meta_title || 'Cazier Judiciar Persoană Juridică Online | Firme | eGhișeul';
-  const description = service.meta_description || service.description || '';
-
-  return {
-    title,
-    description,
-    openGraph: {
-      title,
-      description,
-      type: 'website',
-      url: 'https://eghiseul.ro/servicii/cazier-judiciar-online/persoana-juridica',
-      siteName: 'eGhiseul.ro',
-      locale: 'ro_RO',
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title,
-      description,
-    },
-    alternates: {
-      canonical: 'https://eghiseul.ro/servicii/cazier-judiciar-online/persoana-juridica',
-    },
-  };
-}
+// Full Schema.org @graph — same depth as the hub page.
+const jsonLdGraph = buildServicePageGraph({
+  slug: SCHEMA_SLUG,
+  name: 'Cazier Judiciar Persoană Juridică',
+  description:
+    'Serviciu de obținere a cazierului judiciar pentru persoane juridice (firme), eliberat de ' +
+    'Inspectoratul General al Poliției Române conform Legii 290/2004. Necesar la licitații publice SEAP, ' +
+    'contracte cu statul și fonduri europene. Auto-completare date firmă de la ONRC, livrare email.',
+  serviceType: 'Document Processing — Legal',
+  datePublished: DATE_PUBLISHED,
+  dateModified: DATE_MODIFIED,
+  reviewedBy: {
+    name: 'Departamentul Juridic eGhișeul.ro',
+    jobTitle: 'Echipă de specialiști drept administrativ',
+    organizationName: 'RapidCert SRL',
+  },
+  breadcrumb: [
+    { name: 'Acasă', url: `${BASE_URL}/` },
+    { name: 'Servicii', url: `${BASE_URL}/servicii/` },
+    { name: 'Cazier Judiciar Online', url: `${BASE_URL}/servicii/cazier-judiciar-online/` },
+    { name: 'Persoană Juridică', url: `${BASE_URL}${PAGE_PATH}` },
+  ],
+  offers: [
+    { name: 'Cazier Judiciar Persoană Juridică (Standard 2-4 zile)', price: 198, url: `${BASE_URL}${PAGE_PATH}` },
+    { name: 'Cazier Judiciar Persoană Juridică (Urgent 1-2 zile)', price: 278, url: `${BASE_URL}${PAGE_PATH}` },
+  ],
+  aggregateRating: { ratingValue: 4.9, reviewCount: 450 },
+});
 
 export default async function CazierJudiciarPJPage() {
   const data = await getService();
@@ -145,32 +156,10 @@ export default async function CazierJudiciarPJPage() {
 
   return (
     <>
-      {/* JSON-LD Structured Data */}
+      {/* JSON-LD Structured Data — full @graph */}
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            '@context': 'https://schema.org',
-            '@type': 'Service',
-            name: 'Cazier Judiciar Persoană Juridică',
-            description: service.description,
-            provider: {
-              '@type': 'Organization',
-              name: 'eGhiseul.ro',
-              url: 'https://eghiseul.ro',
-            },
-            offers: {
-              '@type': 'Offer',
-              price: service.base_price,
-              priceCurrency: 'RON',
-              availability: 'https://schema.org/InStock',
-            },
-            areaServed: {
-              '@type': 'Country',
-              name: 'Romania',
-            },
-          }),
-        }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdGraph) }}
       />
 
       <main className="min-h-screen bg-neutral-50 -mt-16 lg:-mt-[112px]">
@@ -300,7 +289,7 @@ export default async function CazierJudiciarPJPage() {
                     ))}
                   </div>
                   <span className="text-xs sm:text-sm font-bold text-secondary-900">4.9</span>
-                  <span className="text-[10px] sm:text-xs text-neutral-500">• 391 recenzii</span>
+                  <span className="text-[10px] sm:text-xs text-neutral-500">• 450+ recenzii</span>
                 </div>
               </div>
 
@@ -401,6 +390,43 @@ export default async function CazierJudiciarPJPage() {
                     </div>
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* SEO Intro Content — targets "cazier judiciar firmă / persoană juridică" + SEAP */}
+        <section className="py-12 lg:py-16 bg-neutral-50">
+          <div className="container mx-auto px-4 max-w-[820px]">
+            <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-5">
+              Cazier Judiciar pentru Firmă (Persoană Juridică) — Online
+            </h2>
+            <div className="space-y-4 text-neutral-700 leading-relaxed">
+              <p>
+                <strong>Cazierul judiciar pentru persoană juridică</strong> este documentul oficial emis de
+                Inspectoratul General al Poliției Române care atestă că o firmă nu are antecedente penale. Este
+                solicitat cel mai des la <strong>licitații publice în SEAP</strong>, la încheierea de contracte cu
+                instituții ale statului, în procese de due diligence, fuziuni și achiziții, precum și la accesarea
+                de fonduri europene (PNRR, fonduri structurale).
+              </p>
+              <p>
+                Prin eGhișeul obții <strong>cazierul judiciar pentru firmă online</strong> în 2-4 zile lucrătoare.
+                Introduci CUI-ul societății, iar datele firmei se completează automat de la ONRC. Completezi apoi
+                datele reprezentantului legal, plătești securizat și primești documentul pe email. Serviciul este
+                disponibil pentru SRL, SA, SCS, SNC și alte forme juridice.
+              </p>
+              <div className="rounded-2xl border border-neutral-200 bg-white p-5">
+                <h3 className="font-bold text-secondary-900 mb-2">
+                  Atenție: PFA, II și ÎF nu sunt persoane juridice
+                </h3>
+                <p className="text-sm text-neutral-700">
+                  Pentru Persoană Fizică Autorizată (PFA), Întreprindere Individuală (II) și Întreprindere Familială
+                  (ÎF), cazierul judiciar se eliberează pe numele <strong>persoanei fizice titulare</strong>, nu pe
+                  entitate. În acest caz folosește serviciul de{' '}
+                  <Link href="/servicii/cazier-judiciar-online/persoana-fizica" className="text-blue-600 underline font-semibold">
+                    cazier judiciar persoană fizică
+                  </Link>.
+                </p>
               </div>
             </div>
           </div>

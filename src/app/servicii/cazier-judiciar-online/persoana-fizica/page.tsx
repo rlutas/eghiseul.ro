@@ -1,7 +1,7 @@
-import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { createPublicClient } from '@/lib/supabase/public';
+import { buildPageMetadata, buildServicePageGraph, BASE_URL } from '@/lib/seo';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
@@ -26,8 +26,19 @@ import { Service, ServiceOption, formatEstimatedDays } from '@/types/services';
 import { Footer } from '@/components/home/footer';
 import { ServiceFAQ } from '@/components/services/service-faq';
 
-// Database slug for this service
+// Database slug for this service (order pipeline identifier)
 const SERVICE_SLUG = 'cazier-judiciar-persoana-fizica';
+
+// SEO routing constants — URL path is nested under the hub, NOT the DB slug
+const PAGE_PATH = '/servicii/cazier-judiciar-online/persoana-fizica/';
+const SCHEMA_SLUG = 'cazier-judiciar-online/persoana-fizica';
+const TITLE = 'Cazier Judiciar Persoană Fizică Online — 198 RON | eGhișeul';
+const DESCRIPTION =
+  'Obține cazierul judiciar pentru persoană fizică 100% online, fără drum la ghișeu. ' +
+  '198 RON, livrare în 2-4 zile pe email. Document oficial de la Poliția Română, ' +
+  'valabil pentru angajare, emigrare, adopție și proceduri legale.';
+const DATE_PUBLISHED = '2026-04-16';
+const DATE_MODIFIED = '2026-06-13';
 
 // Enable ISR with 1-hour revalidation
 export const revalidate = 3600;
@@ -62,42 +73,44 @@ async function getService(): Promise<{ service: Service; options: ServiceOption[
   };
 }
 
-// Generate metadata for SEO
-export async function generateMetadata(): Promise<Metadata> {
-  const data = await getService();
+// Hand-tuned SEO metadata (hub pattern) — differentiated from hub + PJ to avoid
+// internal cannibalization. PF owns "cazier judiciar persoană fizică" long-tail.
+export const metadata = buildPageMetadata({
+  title: TITLE,
+  description: DESCRIPTION,
+  path: PAGE_PATH,
+  ogImage: '/og/cazier-judiciar.png',
+});
 
-  if (!data) {
-    return {
-      title: 'Cazier Judiciar Persoană Fizică | eGhișeul',
-      description: 'Obține cazierul judiciar pentru persoană fizică online.',
-    };
-  }
-
-  const { service } = data;
-  const title = service.meta_title || 'Cazier Judiciar Persoană Fizică Online | eGhișeul';
-  const description = service.meta_description || service.description || '';
-
-  return {
-    title,
-    description,
-    openGraph: {
-      title,
-      description,
-      type: 'website',
-      url: 'https://eghiseul.ro/servicii/cazier-judiciar-online/persoana-fizica',
-      siteName: 'eGhiseul.ro',
-      locale: 'ro_RO',
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title,
-      description,
-    },
-    alternates: {
-      canonical: 'https://eghiseul.ro/servicii/cazier-judiciar-online/persoana-fizica',
-    },
-  };
-}
+// Full Schema.org @graph (Org + WebSite + BreadcrumbList + Service + Offers +
+// AggregateRating + WebPage + reviewedBy) — same depth as the hub page.
+const jsonLdGraph = buildServicePageGraph({
+  slug: SCHEMA_SLUG,
+  name: 'Cazier Judiciar Persoană Fizică',
+  description:
+    'Serviciu de obținere a cazierului judiciar pentru persoane fizice, eliberat de ' +
+    'Inspectoratul General al Poliției Române conform Legii 290/2004. Procesare 100% online, ' +
+    'verificare identitate KYC, livrare email + curier opțional.',
+  serviceType: 'Document Processing — Legal',
+  datePublished: DATE_PUBLISHED,
+  dateModified: DATE_MODIFIED,
+  reviewedBy: {
+    name: 'Departamentul Juridic eGhișeul.ro',
+    jobTitle: 'Echipă de specialiști drept administrativ',
+    organizationName: 'RapidCert SRL',
+  },
+  breadcrumb: [
+    { name: 'Acasă', url: `${BASE_URL}/` },
+    { name: 'Servicii', url: `${BASE_URL}/servicii/` },
+    { name: 'Cazier Judiciar Online', url: `${BASE_URL}/servicii/cazier-judiciar-online/` },
+    { name: 'Persoană Fizică', url: `${BASE_URL}${PAGE_PATH}` },
+  ],
+  offers: [
+    { name: 'Cazier Judiciar Persoană Fizică (Standard 2-4 zile)', price: 198, url: `${BASE_URL}${PAGE_PATH}` },
+    { name: 'Cazier Judiciar Persoană Fizică (Urgent 1-2 zile)', price: 278, url: `${BASE_URL}${PAGE_PATH}` },
+  ],
+  aggregateRating: { ratingValue: 4.9, reviewCount: 450 },
+});
 
 export default async function CazierJudiciarPFPage() {
   const data = await getService();
@@ -134,32 +147,10 @@ export default async function CazierJudiciarPFPage() {
 
   return (
     <>
-      {/* JSON-LD Structured Data */}
+      {/* JSON-LD Structured Data — full @graph */}
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            '@context': 'https://schema.org',
-            '@type': 'Service',
-            name: 'Cazier Judiciar Persoană Fizică',
-            description: service.description,
-            provider: {
-              '@type': 'Organization',
-              name: 'eGhiseul.ro',
-              url: 'https://eghiseul.ro',
-            },
-            offers: {
-              '@type': 'Offer',
-              price: service.base_price,
-              priceCurrency: 'RON',
-              availability: 'https://schema.org/InStock',
-            },
-            areaServed: {
-              '@type': 'Country',
-              name: 'Romania',
-            },
-          }),
-        }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdGraph) }}
       />
 
       <main className="min-h-screen bg-neutral-50 -mt-16 lg:-mt-[112px]">
@@ -289,7 +280,7 @@ export default async function CazierJudiciarPFPage() {
                     ))}
                   </div>
                   <span className="text-xs sm:text-sm font-bold text-secondary-900">4.9</span>
-                  <span className="text-[10px] sm:text-xs text-neutral-500">• 391 recenzii</span>
+                  <span className="text-[10px] sm:text-xs text-neutral-500">• 450+ recenzii</span>
                 </div>
               </div>
 
@@ -379,6 +370,43 @@ export default async function CazierJudiciarPFPage() {
                     </div>
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* SEO Intro Content — targets "cazier judiciar persoană fizică" + "gratuit" intent */}
+        <section className="py-12 lg:py-16 bg-neutral-50">
+          <div className="container mx-auto px-4 max-w-[820px]">
+            <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-5">
+              Cazier Judiciar pentru Persoană Fizică — Online, Fără Drum la Ghișeu
+            </h2>
+            <div className="space-y-4 text-neutral-700 leading-relaxed">
+              <p>
+                <strong>Cazierul judiciar pentru persoană fizică</strong> este documentul oficial emis de
+                Inspectoratul General al Poliției Române (conform Legii 290/2004) care atestă dacă o persoană
+                are sau nu antecedente penale. Este cerut frecvent la angajare în România și în străinătate,
+                pentru obținerea unei vize de muncă, pentru adopție, tutelă, permis de port-armă sau alte
+                proceduri legale.
+              </p>
+              <p>
+                Prin eGhișeul obții <strong>cazierul judiciar online pentru persoane fizice</strong> în 2-4 zile
+                lucrătoare, fără să te deplasezi la ghișeu și fără cont SPV. Completezi formularul în câteva minute,
+                îți încarci actul de identitate și un selfie pentru verificarea identității, plătești securizat, iar
+                noi depunem cererea în numele tău pe baza unei împuterniciri. Primești documentul pe email (PDF) și,
+                opțional, prin curier.
+              </p>
+              <div className="rounded-2xl border border-neutral-200 bg-neutral-50 p-5">
+                <h3 className="font-bold text-secondary-900 mb-2">
+                  Cazier judiciar gratuit la ghișeu vs. online prin eGhișeul
+                </h3>
+                <p className="text-sm text-neutral-700">
+                  Cazierul judiciar se poate obține <strong>gratuit</strong> personal, la orice secție de poliție,
+                  sau cu semnătură electronică prin portalul oficial <em>ghiseul.ro</em>/hub.mai.gov.ro. Dezavantajul:
+                  programare, deplasare, cozi și — pentru cei din diaspora — aproape imposibil fără a fi în țară.
+                  Serviciul nostru e plătit (198 RON), dar e <strong>100% online, fără deplasare, din orice oraș sau
+                  din străinătate</strong>, cu asistență dedicată. Alegi comoditatea contra cost.
+                </p>
               </div>
             </div>
           </div>

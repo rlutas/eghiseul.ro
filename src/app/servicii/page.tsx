@@ -19,6 +19,13 @@ import {
   Shield,
 } from 'lucide-react';
 import type { Service, ServiceCategory } from '@/types/services';
+import { serviceUrl } from '@/lib/seo/constants';
+
+// Cazier Judiciar PF/PJ are surfaced via the hub page, not as separate cards.
+const HIDDEN_FROM_INDEX = new Set([
+  'cazier-judiciar-persoana-fizica',
+  'cazier-judiciar-persoana-juridica',
+]);
 
 export const metadata: Metadata = {
   title: 'Servicii | Documente oficiale online pentru România | eGhișeul',
@@ -85,7 +92,9 @@ async function getActiveServices(): Promise<Service[]> {
 }
 
 export default async function ServiciiPage() {
-  const services = await getActiveServices();
+  const services = (await getActiveServices()).filter(
+    (s) => !HIDDEN_FROM_INDEX.has(s.slug)
+  );
 
   return (
     <>
@@ -105,7 +114,7 @@ export default async function ServiciiPage() {
                 '@type': 'Service',
                 name: service.name,
                 description: service.short_description || service.description || undefined,
-                url: `https://eghiseul.ro/comanda/${service.slug}`,
+                url: `https://eghiseul.ro${serviceUrl(service.slug)}`,
                 offers: {
                   '@type': 'Offer',
                   price: service.base_price,
@@ -178,8 +187,13 @@ export default async function ServiciiPage() {
                 {services.map((service) => {
                   const icon =
                     categoryIcons[service.category] ?? <FileText className="h-6 w-6" />;
-                  const detailHref = `/servicii/${service.slug}`;
-                  const orderHref = `/comanda/${service.slug}`;
+                  const detailHref = serviceUrl(service.slug);
+                  // Cazier Judiciar parent: send "order" to the hub so the user
+                  // picks PF vs PJ there (the parent slug has no direct flow).
+                  const orderHref =
+                    service.slug === 'cazier-judiciar'
+                      ? serviceUrl(service.slug)
+                      : `/comanda/${service.slug}`;
 
                   return (
                     <Card

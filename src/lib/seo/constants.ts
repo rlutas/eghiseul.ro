@@ -31,6 +31,48 @@ export const HARDCODED_SERVICE_SLUGS = [
 
 export type HardcodedServiceSlug = (typeof HARDCODED_SERVICE_SLUGS)[number];
 
+/**
+ * Hand-tuned sub-route pages that live UNDER a hardcoded service folder
+ * (not their own top-level WP slug). Paths are relative to BASE_URL, no
+ * leading/trailing slash. These must be listed in the sitemap explicitly
+ * because they are not covered by HARDCODED_SERVICE_SLUGS.
+ */
+export const HARDCODED_SERVICE_SUBROUTE_PATHS = [
+  'servicii/cazier-judiciar-online/persoana-fizica',
+  'servicii/cazier-judiciar-online/persoana-juridica',
+] as const;
+
+/**
+ * DB slugs that are 301-redirected to a hardcoded SEO URL (see next.config.ts).
+ * Exclude these from the dynamic /servicii/[slug] sitemap fallback so we never
+ * emit a redirecting URL into the sitemap.
+ */
+export const DB_SLUGS_WITH_HARDCODED_PAGE = [
+  'cazier-judiciar',
+  'cazier-judiciar-persoana-fizica',
+  'cazier-judiciar-persoana-juridica',
+  'extras-carte-funciara',
+] as const;
+
+/**
+ * DB service slug -> canonical on-site URL. Services with a hand-tuned hardcoded
+ * page resolve to that page; everything else resolves to the dynamic
+ * /servicii/[slug]/ route. ALWAYS use `serviceUrl()` for internal links so we
+ * never point at a slug that 301-redirects (which would dilute link equity).
+ */
+const SERVICE_URL_OVERRIDES: Record<string, string> = {
+  'cazier-judiciar': '/servicii/cazier-judiciar-online/',
+  'cazier-judiciar-persoana-fizica': '/servicii/cazier-judiciar-online/persoana-fizica/',
+  'cazier-judiciar-persoana-juridica': '/servicii/cazier-judiciar-online/persoana-juridica/',
+  // WP slug parity: indexed URL is extras-DE-carte-funciara (929k impressions)
+  'extras-carte-funciara': '/servicii/extras-de-carte-funciara/',
+};
+
+/** Canonical on-site URL for a service, given its DB slug. */
+export function serviceUrl(slug: string): string {
+  return SERVICE_URL_OVERRIDES[slug] ?? `/servicii/${slug}/`;
+}
+
 /** Calculator pages (ported from WP /calculator/*). */
 export const HARDCODED_CALCULATOR_SLUGS = [
   'calculator-impozit-auto',

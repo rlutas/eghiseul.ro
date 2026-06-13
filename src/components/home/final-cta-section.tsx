@@ -109,7 +109,7 @@ export function FinalCTASection() {
               ))}
             </div>
             <p className="text-white font-bold">
-              4.9/5 din 391 recenzii pe Google
+              4.9/5 din 450+ recenzii pe Google
             </p>
             <p className="text-white/50 text-sm mt-1">
               „Cel mai rapid mod de a obține documente oficiale!&rdquo; — Client verificat

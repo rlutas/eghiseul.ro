@@ -92,7 +92,7 @@ export function TestimonialsSection() {
               />
             ))}
             <span className="text-lg font-bold text-secondary-900 ml-2">4.9/5</span>
-            <span className="text-neutral-500">• 391 recenzii pe Google</span>
+            <span className="text-neutral-500">• 450+ recenzii pe Google</span>
           </div>
         </div>
 
