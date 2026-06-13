@@ -175,4 +175,46 @@ Conținutul **nu** e problema (4.500 cuvinte, FAQ cu 11 Q, prețuri, use-cases).
 
 ---
 
-*Următor: #2 Extras Carte Funciară (929k impresii, cluster cadastru).*
+## 3. SERVICIU #2 — Extras Carte Funciară
+
+**Status Next.js:** până acum exista DOAR pagina dinamică `/servicii/extras-carte-funciara/` (slug DB). Am construit pagină hardcodată hand-tuned la **slug-ul WP** `/servicii/extras-de-carte-funciara/` (acolo e tot traficul).
+
+### 3.1 Snapshot GSC
+- `/servicii/extras-de-carte-funciara/` — **7.630 clicks / 929.169 impresii / poz 8.15 / CTR 0.82%** (cea mai mare cerere latentă din site, capturare catastrofală).
+- Blog conex puternic: `/cum-aflam-numarul-carte-functionara-si-nr-cadastral/` — 33.450 clicks (cluster cadastru, intent informațional → funnel).
+
+### 3.2 Harta interogărilor
+
+**A. Comercial CF (money):**
+| Query | Impresii | Poz |
+|---|--:|--:|
+| extras carte funciara | 98.965 | 6.53 |
+| extras de carte funciara | 98.612 | 6.42 |
+| extras cf online | 81.396 | 7.82 |
+| extras carte funciara online | 46.328 | 7.17 |
+| cf online | 34.266 | 8.69 |
+| extras de carte funciara online | 24.277 | 6.98 |
+| extras cf | 20.085 | 8.09 |
+
+**B. „Carte funciară" generic (108k+ impr):** `cartea funciara` 108.792 / 4.62 · `carte funciara online` 42.125 / 6.56 · `carte funciara` 22.861 / 7.01.
+
+**C. Cluster cadastru / număr cadastral (intent „găsește imobilul" → funnel):** `localizare teren dupa numar cadastral` 49.159 · `harta cadastru` 23.353 · `cadastru online` 17.865 · `numar cadastral` 10.034 / 2.68 · `aflare numar cadastral dupa adresa` 8.777 · `numar topografic` 1.540 · `identificator imobil` 843.
+
+**D. Intent „gratuit":** `extras cf online gratuit` 10.587 / 7.56. **E. Valabilitate:** `valabilitate extras de carte funciara` 3.854 / 2.23.
+
+### 3.3 Diagnostic
+929k impresii la poz 8.15, CTR 0.82% = cerere uriașă, capturare aproape zero. Cauze: competiție (ANCPI oficial + portaluri), pagina WP grea/Elementor, și intent cadastru necaptat (mers la blog). Slug mismatch DB (`extras-carte-funciara`) vs WP (`extras-de-carte-funciara`) — risc de duplicat la migrare.
+
+### 3.4 Ce am construit (2026-06-13)
+- **Pagină hardcodată** `/servicii/extras-de-carte-funciara/page.tsx` (slug-parity WP), modelată pe structura PF acceptată: hero + price card (79.99, taxe OCPI incluse) + schema `@graph` completă (Breadcrumb + Service + Offer + AggregateRating 4.9/450 + WebPage + reviewedBy).
+- **Conținut țintit pe clustere:** intro „ce este / de unde se obține" (OCPI/ANCPI) + bloc onest „gratuit/oficial vs. noi"; secțiune **„Cum identifici imobilul"** (număr cadastral / nr CF / nr topografic / identificator electronic / după adresă / după proprietar) ce atacă clusterul cadastru; use-cases (tranzacții, credit ipotecar, succesiune, verificare); „ce conține extrasul" (părțile I-III, sarcini/ipoteci) + **„cât este valabil"** (țintă `valabilitate extras de carte funciara`); 8 FAQ.
+- **Anti-canibalizare:** `serviceUrl('extras-carte-funciara')` → `/servicii/extras-de-carte-funciara/`; redirect 308 DB-slug → WP-slug în `next.config.ts`; `extras-carte-funciara` adăugat în `DB_SLUGS_WITH_HARDCODED_PAGE` (exclus din sitemap dinamic; URL-ul WP era deja în `HARDCODED_SERVICE_SLUGS`).
+- Iconițe lucide (Home, KeyRound, MapPin, Search, ScrollText, Landmark, Banknote). `tsc` + `eslint` 0 erori.
+
+### 3.5 Rămas
+- **Cluster cadastru ca articol dedicat:** migrarea `/cum-aflam-numarul-carte-functionara-si-nr-cadastral/` (33k clicks) ca MDX, cu link UP către serviciul CF — captează intentul informațional uriaș.
+- Variante: `extras-multilingv`, carte funciară colectivă (pagini separate WP cu trafic mic).
+
+---
+
+*Următor: #3 Cazier Fiscal (506k impresii) sau #5 Certificat Naștere (943k impr, deja poz 6.33).*

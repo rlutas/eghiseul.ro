@@ -57,6 +57,13 @@ const nextConfig: NextConfig = {
         destination: '/servicii/cazier-judiciar-online/persoana-juridica/',
         permanent: true,
       },
+      // Extras Carte Funciară — DB slug (no "de") -> WP-parity SEO URL that
+      // holds the indexed traffic/backlinks (extras-DE-carte-funciara).
+      {
+        source: '/servicii/extras-carte-funciara',
+        destination: '/servicii/extras-de-carte-funciara/',
+        permanent: true,
+      },
     ];
   },
 };

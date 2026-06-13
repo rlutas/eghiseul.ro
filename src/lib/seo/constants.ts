@@ -51,6 +51,7 @@ export const DB_SLUGS_WITH_HARDCODED_PAGE = [
   'cazier-judiciar',
   'cazier-judiciar-persoana-fizica',
   'cazier-judiciar-persoana-juridica',
+  'extras-carte-funciara',
 ] as const;
 
 /**
@@ -63,6 +64,8 @@ const SERVICE_URL_OVERRIDES: Record<string, string> = {
   'cazier-judiciar': '/servicii/cazier-judiciar-online/',
   'cazier-judiciar-persoana-fizica': '/servicii/cazier-judiciar-online/persoana-fizica/',
   'cazier-judiciar-persoana-juridica': '/servicii/cazier-judiciar-online/persoana-juridica/',
+  // WP slug parity: indexed URL is extras-DE-carte-funciara (929k impressions)
+  'extras-carte-funciara': '/servicii/extras-de-carte-funciara/',
 };
 
 /** Canonical on-site URL for a service, given its DB slug. */
