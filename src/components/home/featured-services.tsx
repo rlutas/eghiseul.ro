@@ -66,7 +66,7 @@ export async function FeaturedServices() {
             asChild
             className="bg-secondary-900 hover:bg-secondary-800 text-white font-bold px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg rounded-xl transition-all duration-200 hover:shadow-lg"
           >
-            <Link href="/services">
+            <Link href="/servicii/">
               Vezi Toate Serviciile (12)
               <ArrowRight className="ml-2 w-4 h-4 sm:w-5 sm:h-5" />
             </Link>

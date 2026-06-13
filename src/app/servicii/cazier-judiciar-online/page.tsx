@@ -99,8 +99,8 @@ const jsonLdGraph = buildServicePageGraph({
       url: `${BASE_URL}/servicii/cazier-judiciar-online/persoana-juridica/`,
     },
   ],
-  // 430+ recenzii pozitive 4.9★ — agregate din Google Business Profile + Trustpilot
-  aggregateRating: { ratingValue: 4.9, reviewCount: 432 },
+  // 450+ recenzii pozitive 4.9★ — agregate din Google Business Profile + Trustpilot
+  aggregateRating: { ratingValue: 4.9, reviewCount: 450 },
 });
 
 // =============================================================================
@@ -899,7 +899,7 @@ export default function CazierJudiciarHubPage() {
                 ))}
               </div>
               <h2 className="text-2xl sm:text-3xl font-bold mb-3">
-                Peste 430 de Recenzii Pozitive — 4.9 ★ din 5
+                Peste 450 de Recenzii Pozitive — 4.9 ★ din 5
               </h2>
               <p className="text-white/70 max-w-2xl mx-auto">
                 Mii de clienți au obținut deja cazierul judiciar prin platforma noastră.
@@ -1018,7 +1018,7 @@ export default function CazierJudiciarHubPage() {
 
             <div className="mt-10 text-center">
               <p className="text-white/60 text-sm">
-                <strong className="text-white">432 recenzii verificate</strong> &middot; Nota medie{' '}
+                <strong className="text-white">450+ recenzii verificate</strong> &middot; Nota medie{' '}
                 <strong className="text-primary-500">4.9/5</strong> &middot; Procesăm cereri din 2024
               </p>
             </div>

@@ -109,7 +109,7 @@ const jsonLdGraph = buildServicePageGraph({
     { name: 'Cazier Judiciar Persoană Fizică (Standard 2-4 zile)', price: 198, url: `${BASE_URL}${PAGE_PATH}` },
     { name: 'Cazier Judiciar Persoană Fizică (Urgent 1-2 zile)', price: 278, url: `${BASE_URL}${PAGE_PATH}` },
   ],
-  aggregateRating: { ratingValue: 4.9, reviewCount: 432 },
+  aggregateRating: { ratingValue: 4.9, reviewCount: 450 },
 });
 
 export default async function CazierJudiciarPFPage() {
@@ -280,7 +280,7 @@ export default async function CazierJudiciarPFPage() {
                     ))}
                   </div>
                   <span className="text-xs sm:text-sm font-bold text-secondary-900">4.9</span>
-                  <span className="text-[10px] sm:text-xs text-neutral-500">• 391 recenzii</span>
+                  <span className="text-[10px] sm:text-xs text-neutral-500">• 450+ recenzii</span>
                 </div>
               </div>
 

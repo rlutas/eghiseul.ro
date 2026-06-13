@@ -17,7 +17,7 @@ const stats = [
     icon: Star,
     value: '4.9/5',
     label: 'Rating Google',
-    description: 'Peste 391 recenzii',
+    description: 'Peste 450 recenzii',
   },
   {
     icon: Clock,

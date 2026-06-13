@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Clock, ArrowRight, Zap, FileText, Building2, Car, User, Scale, Home } from 'lucide-react';
 import { Service } from '@/types/services';
+import { serviceUrl } from '@/lib/seo/constants';
 
 interface ServiceCardProps {
   service: Service;
@@ -77,8 +78,8 @@ export function ServiceCard({ service }: ServiceCardProps) {
           asChild
           className="w-full bg-primary-500 hover:bg-primary-600 text-secondary-900 font-bold rounded-xl h-12 shadow-[0_4px_12px_rgba(236,185,95,0.25)] hover:shadow-[0_6px_16px_rgba(236,185,95,0.35)] hover:-translate-y-0.5 transition-all duration-200"
         >
-          <Link href={`/services/${service.slug}`}>
-            Comandă Acum
+          <Link href={serviceUrl(service.slug)}>
+            Vezi detalii
             <ArrowRight className="ml-2 h-4 w-4" />
           </Link>
         </Button>

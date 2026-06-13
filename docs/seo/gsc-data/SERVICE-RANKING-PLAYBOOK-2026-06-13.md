@@ -153,8 +153,20 @@ Conținutul **nu** e problema (4.500 cuvinte, FAQ cu 11 Q, prețuri, use-cases).
 - 30+ use-cases, prețuri, 12+ FAQ, referințe legale, schema @graph completă.
 - Deci M2/M3 sunt în mare acoperite pe hub. Rămâne doar polish-ul vizual (feedback 20 mai).
 
+**✅ Navigare + infrastructură URL canonic (2026-06-13):**
+- Helper `serviceUrl(slug)` în `lib/seo/constants.ts` — slug DB → URL canonic (hub pentru cazier, `/servicii/{slug}/` în rest). Toate link-urile interne îl folosesc acum (nimic prin redirect).
+- **Mega-menu „Servicii"** în header (desktop hover + focus-within, mobil accordion) — `components/shared/services-mega-menu.tsx` + `config/services-nav.ts`. Iconițe **lucide** (Scale, ShieldCheck, Car, Ticket, Baby, Heart, UserRound, Home, Building2, Receipt) — fără emoji. Grupat pe categorii: Juridice / Auto / Personale / Imobiliare / Comerciale / Fiscale.
+- Index `/servicii`: dedup cazier judiciar (un singur card → hub, nu 3) + URL-uri canonice în carduri și în schema ItemList.
+- `ServiceCard` (homepage) + butonul „Vezi toate serviciile": acum canonice (nu mai trec prin ruta engleză orfană `/services`).
+
+**✅ Pas UI/UX (skill `ui-ux-pro-max`, stil „Accessible & Ethical" pentru gov):**
+- Mega-menu + meniu mobil: `focus-visible` rings, `motion-reduce:transition-none`, touch targets `min-h-11` (44px), `cursor-pointer`. Build lint 0 erori, `tsc` 0 erori.
+
+**✅ Recenzii actualizate la 450+** (cerere user): schema `aggregateRating.reviewCount` 432→450 pe hub/PF/PJ; badge-uri „391/430 recenzii" → „450+" pe hub, PF, PJ și pe homepage (hero, social-proof, testimonials, final-cta).
+
 **⏳ Rămâne de făcut (cazier judiciar):**
 - Eventual sub-pagină dedicată `din-strainatate` (diaspora are doar FAQ pe hub acum).
+- Migrarea blogului `/taxa-cazier-judiciar/` ca MDX re-țintit pe preț.
 - **Migrare blog preț** (M1): `/taxa-cazier-judiciar/` (poz 6.18, 5.188 clicks) e încă pe WP — de migrat ca MDX, re-țintit pe preț, link UP la serviciu.
 - ✅ **Duplicat ruta dinamică — REZOLVAT:** `generateStaticParams` din `/servicii/[slug]` întorcea TOATE slug-urile DB → genera `/servicii/cazier-judiciar`, `/servicii/cazier-judiciar-persoana-fizica`, `...-juridica` ca duplicate ale paginilor hardcodate. Fix:
   - 3 redirect-uri 308 în `next.config.ts` (`/servicii/cazier-judiciar*` → URL canonic `/cazier-judiciar-online/*`); `/comanda/*` rămâne pe slug DB (checkout).

@@ -53,6 +53,23 @@ export const DB_SLUGS_WITH_HARDCODED_PAGE = [
   'cazier-judiciar-persoana-juridica',
 ] as const;
 
+/**
+ * DB service slug -> canonical on-site URL. Services with a hand-tuned hardcoded
+ * page resolve to that page; everything else resolves to the dynamic
+ * /servicii/[slug]/ route. ALWAYS use `serviceUrl()` for internal links so we
+ * never point at a slug that 301-redirects (which would dilute link equity).
+ */
+const SERVICE_URL_OVERRIDES: Record<string, string> = {
+  'cazier-judiciar': '/servicii/cazier-judiciar-online/',
+  'cazier-judiciar-persoana-fizica': '/servicii/cazier-judiciar-online/persoana-fizica/',
+  'cazier-judiciar-persoana-juridica': '/servicii/cazier-judiciar-online/persoana-juridica/',
+};
+
+/** Canonical on-site URL for a service, given its DB slug. */
+export function serviceUrl(slug: string): string {
+  return SERVICE_URL_OVERRIDES[slug] ?? `/servicii/${slug}/`;
+}
+
 /** Calculator pages (ported from WP /calculator/*). */
 export const HARDCODED_CALCULATOR_SLUGS = [
   'calculator-impozit-auto',

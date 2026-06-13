@@ -1,4 +1,13 @@
 # SEO Documentation Index
+
+## 🟢 ACTIV — Service Ranking Playbook (GSC 2026-06-13)
+**Fișier:** [`gsc-data/SERVICE-RANKING-PLAYBOOK-2026-06-13.md`](gsc-data/SERVICE-RANKING-PLAYBOOK-2026-06-13.md)
+Playbook per-serviciu la nivel de **interogare**, derivat din exportul Google Search Console (`gsc-data/.../2026-06-13/` — Pagini.csv + Interogări.csv, ultimele 16 luni). Pentru fiecare serviciu: clustere de interogări țintă, oportunități striking-distance, diagnostic poziție/CTR și mișcări concrete de ranking pentru migrarea WP → Next.js. Alimentează `REBUILD-QUEUE.md`. **#1 Cazier Judiciar complet** (PF/PJ optimizate, canibalizare rezolvată, mega-menu navigare).
+
+Se citește împreună cu `SEO-MASTER-PLAN-2026-05-20.md` (blueprint tehnic per-pagină) și `REBUILD-QUEUE.md` (status build).
+
+---
+
 ## Cazier Fiscal Online Service Page Analysis
 
 **Analysis Date**: 2025-12-17  
