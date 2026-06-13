@@ -38,6 +38,25 @@ const nextConfig: NextConfig = {
         destination: '/comanda/certificat-integritate/',
         permanent: true,
       },
+      // Cazier Judiciar — DB slugs are served by the dynamic /servicii/[slug]
+      // route and would duplicate the hand-tuned hardcoded pages under
+      // /servicii/cazier-judiciar-online/*. Canonicalize to the SEO URLs.
+      // (Only /servicii/* — /comanda/* keeps DB slugs for the order pipeline.)
+      {
+        source: '/servicii/cazier-judiciar',
+        destination: '/servicii/cazier-judiciar-online/',
+        permanent: true,
+      },
+      {
+        source: '/servicii/cazier-judiciar-persoana-fizica',
+        destination: '/servicii/cazier-judiciar-online/persoana-fizica/',
+        permanent: true,
+      },
+      {
+        source: '/servicii/cazier-judiciar-persoana-juridica',
+        destination: '/servicii/cazier-judiciar-online/persoana-juridica/',
+        permanent: true,
+      },
     ];
   },
 };

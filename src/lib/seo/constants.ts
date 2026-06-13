@@ -31,6 +31,28 @@ export const HARDCODED_SERVICE_SLUGS = [
 
 export type HardcodedServiceSlug = (typeof HARDCODED_SERVICE_SLUGS)[number];
 
+/**
+ * Hand-tuned sub-route pages that live UNDER a hardcoded service folder
+ * (not their own top-level WP slug). Paths are relative to BASE_URL, no
+ * leading/trailing slash. These must be listed in the sitemap explicitly
+ * because they are not covered by HARDCODED_SERVICE_SLUGS.
+ */
+export const HARDCODED_SERVICE_SUBROUTE_PATHS = [
+  'servicii/cazier-judiciar-online/persoana-fizica',
+  'servicii/cazier-judiciar-online/persoana-juridica',
+] as const;
+
+/**
+ * DB slugs that are 301-redirected to a hardcoded SEO URL (see next.config.ts).
+ * Exclude these from the dynamic /servicii/[slug] sitemap fallback so we never
+ * emit a redirecting URL into the sitemap.
+ */
+export const DB_SLUGS_WITH_HARDCODED_PAGE = [
+  'cazier-judiciar',
+  'cazier-judiciar-persoana-fizica',
+  'cazier-judiciar-persoana-juridica',
+] as const;
+
 /** Calculator pages (ported from WP /calculator/*). */
 export const HARDCODED_CALCULATOR_SLUGS = [
   'calculator-impozit-auto',
