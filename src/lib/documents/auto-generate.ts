@@ -205,12 +205,13 @@ export async function autoGenerateOrderDocuments(
     } catch { /* signature not available */ }
   }
 
-  // Determine which templates to auto-generate at submission time
-  // Only contracts are auto-generated; imputernicire and cerere use custom templates uploaded by admin
-  const templates = [
-    'contract-prestari',
-    'contract-asistenta',
-  ];
+  // Determine which templates to auto-generate at submission time.
+  // Fully-automated services with no lawyer involvement (ONRC constatator,
+  // carte funciară) must NOT get a legal-assistance contract or a Barou number.
+  const NO_LAWYER_SERVICES = ['certificat-constatator', 'extras-de-carte-funciara'];
+  const templates = NO_LAWYER_SERVICES.includes(serviceSlug)
+    ? ['contract-prestari']
+    : ['contract-prestari', 'contract-asistenta'];
 
   for (const template of templates) {
     try {

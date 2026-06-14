@@ -1115,9 +1115,13 @@ export default function AdminOrderDetailPage() {
                 courier,
                 includeCourierLeg: !!courier,
               });
-              const label = est.minDays === est.maxDays
-                ? `${est.minDays} zile lucratoare`
-                : `${est.minDays}-${est.maxDays} zile lucratoare`;
+              // Digital, auto-issued services (ONRC constatator) — minutes, not days.
+              const digitalInstant = order.services?.slug === 'certificat-constatator';
+              const label = digitalInstant
+                ? 'de obicei câteva minute (automat, 24/7)'
+                : est.minDays === est.maxDays
+                  ? `${est.minDays} zile lucratoare`
+                  : `${est.minDays}-${est.maxDays} zile lucratoare`;
               return <InfoRow label="Termen estimat" value={label} />;
             })()}
             {order.selected_options && order.selected_options.length > 0 && (() => {
@@ -2528,14 +2532,15 @@ function ProcessingSection({
     return null;
   }
 
-  // Determine which document types to show
-  // Contracts are auto-generated; imputernicire + cerere are on-demand
-  const generableDocTypes = [
-    'contract_prestari',
-    'contract_asistenta',
-    'imputernicire',
-    isPJ ? 'cerere_eliberare_pj' : 'cerere_eliberare_pf',
-  ];
+  // Determine which document types to show. Fully-automated services with no
+  // lawyer involvement (ONRC constatator, carte funciară) get NO legal-assistance
+  // contract / împuternicire / cerere and NO Barou number.
+  const noLawyerService = ['certificat-constatator', 'extras-de-carte-funciara'].includes(
+    order.services?.slug ?? ''
+  );
+  const generableDocTypes = noLawyerService
+    ? ['contract_prestari']
+    : ['contract_prestari', 'contract_asistenta', 'imputernicire', isPJ ? 'cerere_eliberare_pj' : 'cerere_eliberare_pf'];
 
   return (
     <Card className="border-blue-200 bg-blue-50/30">
