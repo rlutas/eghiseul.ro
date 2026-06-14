@@ -681,6 +681,17 @@ export default function AdminOrderDetailPage() {
               <Badge variant={statusConfig.variant} className={`text-sm px-3 py-1 ${statusConfig.className || ''}`}>
                 {statusConfig.label}
               </Badge>
+              {order.friendly_order_id && (
+                <a
+                  href={`/comanda/status?order=${encodeURIComponent(order.friendly_order_id)}&email=${encodeURIComponent(order.customer_data?.contact?.email ?? '')}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-xs font-medium text-blue-600 underline whitespace-nowrap"
+                  title="Deschide pagina de status așa cum o vede clientul"
+                >
+                  Vezi ca clientul ↗
+                </a>
+              )}
               {isPJ && (
                 <Badge variant="secondary" className="text-sm px-3 py-1">
                   <Building2 className="h-3.5 w-3.5 mr-1" />
