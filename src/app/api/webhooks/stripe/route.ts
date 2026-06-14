@@ -3,6 +3,7 @@ import { stripe } from '@/lib/stripe'
 import { createClient } from '@supabase/supabase-js'
 import Stripe from 'stripe'
 import { ensureInvoiceForPaidOrder } from '@/lib/oblio'
+import { ensureOnrcJobForPaidOrder } from '@/lib/onrc/ensure-onrc-job'
 import { computeEstimatedCompletionISO } from '@/lib/delivery-estimate-helper'
 
 // Use service role for webhook handler (bypasses RLS)
@@ -267,6 +268,9 @@ async function handlePaymentSucceeded(paymentIntent: Stripe.PaymentIntent) {
   } else if (result.status === 'locked') {
     console.log(`Order ${orderId}: invoice already created or being created by another webhook — skipping`)
   }
+
+  // 4. Queue ONRC automation job (idempotent; no-op for non-ONRC services).
+  await ensureOnrcJobForPaidOrder(orderId)
 }
 
 async function handlePaymentFailed(paymentIntent: Stripe.PaymentIntent) {

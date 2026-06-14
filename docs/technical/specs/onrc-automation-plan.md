@@ -76,9 +76,9 @@ Reguli ferme:
 
 ## Ordinea de execuție recomandată
 
-1. **Faza 1** (tabelă `onrc_jobs` + creare job la plată) — în eghiseul.ro. ~0.5 zi.
-2. **Faza 2** (cele 2 endpoint-uri + secret) — în eghiseul.ro. ~0.5 zi.
-3. Admin: o mică listă în `/admin` cu job-urile ONRC (status, retry, NEEDS_OPERATOR) pentru vizibilitate. ~0.5 zi.
-4. **Faza 3** (worker Playwright) — proiect nou pe Railway. ~2-3 zile (mapare selectori LIVE pe contul ONRC logat).
+1. ✅ **Faza 1 — DONE (2026-06-14):** tabelă `onrc_jobs` (migrarea 055) + creare job idempotentă la plata confirmată (`lib/onrc/ensure-onrc-job.ts`, apelată din webhook-ul Stripe + `confirm-payment`, lângă crearea facturii). Unique index pe `order_id` = un job/comandă.
+2. ✅ **Faza 2 — DONE (2026-06-14):** `GET /api/onrc/pending` (claim atomic PENDING→PROCESSING, doar filtre `.eq` — verificat contra producției) + `POST /api/onrc/result` (DONE/FAILED/NEEDS_OPERATOR + retry_count). Auth: `Authorization: Bearer ${ONRC_WORKER_SECRET}`. **⚠️ De setat `ONRC_WORKER_SECRET` în Vercel** înainte ca worker-ul să le folosească.
+3. ⏳ Admin: o mică listă în `/admin` cu job-urile ONRC (status, retry, NEEDS_OPERATOR) pentru vizibilitate. ~0.5 zi.
+4. ⏳ **Faza 3** (worker Playwright) — proiect nou pe Railway. ~2-3 zile (mapare selectori LIVE pe contul ONRC logat). Contractul API e gata; mai rămâne pasul de **livrare** din `/api/onrc/result` (atașare PDF la comandă + email client — marcat `TODO` în endpoint, de cablat cu worker-ul când se poate testa PDF-ul real).
 
-**Următorul pas concret:** Faza 1 + 2 (coada + API) în acest repo, ca botul să aibă de unde citi.
+**Următorul pas concret:** Faza 3 (worker) + pasul de livrare în `/result` + lista admin.
