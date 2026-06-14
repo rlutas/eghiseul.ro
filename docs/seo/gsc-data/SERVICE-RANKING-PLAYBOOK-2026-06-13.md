@@ -217,4 +217,26 @@ Conținutul **nu** e problema (4.500 cuvinte, FAQ cu 11 Q, prețuri, use-cases).
 
 ---
 
-*Următor: #3 Cazier Fiscal (506k impresii) sau #5 Certificat Naștere (943k impr, deja poz 6.33).*
+## 4. BATCH 2 — Restul serviciilor (2026-06-14)
+
+Construite 7 pagini hardcodate la **slug-parity WP** (același pattern ca CF: schema `@graph` completă, `buildPageMetadata`, proză indexabilă pe clusterele GSC, bloc onest „gratuit/oficial vs noi", use-cases, FAQ 8×, `id="main-content"`, iconițe lucide `aria-hidden`, recenzii 450). Build de producție verde (toate prerenderate static).
+
+| Serviciu | URL canonic (WP slug) | Slug DB | Preț | Impresii GSC | Clustere țintă |
+|---|---|---|--:|--:|---|
+| Certificat Naștere | `/servicii/eliberare-certificat-de-nastere/` | certificat-nastere | 179 | 943k | duplicat / pierdut / romanesc / diaspora |
+| Cazier Fiscal | `/servicii/cazier-fiscal-online/` | cazier-fiscal | 198 | 506k | anaf / persoana fizica / valabilitate 30 zile |
+| Certificat Constatator | `/servicii/certificat-constatator-online/` | certificat-constatator | 119.99 | 331k | onrc / registrul comertului / extins |
+| Certificat Integritate | `/servicii/certificat-de-integritate-comportamentala/` | certificat-integritate | 250 | 148k | igpr / lucru cu minori / gratuit |
+| Certificat Căsătorie | `/servicii/eliberare-certificat-de-casatorie/` | certificat-casatorie | 179 | 168k | duplicat / cetățenie (deja poz 1.8) |
+| Certificat Celibat | `/servicii/eliberare-certificat-de-celibat/` | certificat-celibat | 179 | 108k | căsătorie în străinătate / adeverință |
+| Cazier Auto | `/servicii/cazier-auto-online/` | cazier-auto | 198 | 54k | istoric vehicul + clarificare cazier rutier/permis |
+
+**Wiring partajat (anti-canibalizare):** `serviceUrl()` override pentru toate 7 (slug DB → URL canonic); redirect 308 `/servicii/<slug-DB>` → URL WP în `next.config.ts`; toate 7 slug-uri DB adăugate în `DB_SLUGS_WITH_HARDCODED_PAGE` (excluse din sitemap-ul dinamic; URL-urile WP erau deja în `HARDCODED_SERVICE_SLUGS`). Pentru integritate, redirect-ul existent a fost reorientat la noul URL canonic (fără lanț). `/comanda/*` păstrează slug-urile DB.
+
+**De rafinat ulterior (minor):** câteva meta-descrieri depășesc 160 caractere (celibat, cazier-fiscal, cazier-auto) — doar truncare în SERP, nu blocant; imagini OG `/og/*.png` per serviciu de generat; migrare articole-cluster (cadastru, ghid integritate, taxa cazier) ca MDX cu link UP.
+
+**Rămâne:** Rovinietă (`rovinieta`, preț 0 = redirect CNAIR — tool, nu pagină clasică de comandă) + tool-ul `/tools/verificare-rovinieta-online/` (294k clicks) — de tratat separat. Plus calculatoarele (80% din trafic — sprint dedicat).
+
+---
+
+*Toate cele 9 servicii active au acum pagini SEO hardcodate (cu excepția rovinietei-tool).*
