@@ -42,6 +42,12 @@ const ALL_STEPS: Record<ModularStepId, Omit<ModularStep, 'number' | 'condition'>
     labelRo: 'Date Stare Civilă',
     moduleType: 'civilStatus',
   },
+  'constatator': {
+    id: 'constatator',
+    label: 'Constatator Details',
+    labelRo: 'Detalii Certificat',
+    moduleType: 'constatator',
+  },
   'company-data': {
     id: 'company-data',
     label: 'Company Data',
@@ -165,6 +171,14 @@ export function buildWizardSteps(
 
       steps.push(companyDocsStep);
     }
+  }
+
+  // Certificat Constatator details (after company data so the CUI is known).
+  if (verificationConfig.constatator?.enabled) {
+    steps.push({
+      ...ALL_STEPS['constatator'],
+      number: stepNumber++,
+    });
   }
 
   // Step 3: Personal Data (if personal KYC enabled)

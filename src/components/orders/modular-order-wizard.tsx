@@ -132,6 +132,8 @@ export function ModularOrderWizard({ initialService, initialOptions }: ModularOr
         return state.verificationConfig.personalKyc;
       case 'civil-status':
         return state.verificationConfig.civilStatus;
+      case 'constatator':
+        return state.verificationConfig.constatator;
       case 'company-data':
       case 'company-documents':
         return state.verificationConfig.companyKyc;

@@ -1,0 +1,203 @@
+'use client';
+
+import { useEffect, useMemo } from 'react';
+import { Check } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { useModularWizard } from '@/providers/modular-wizard-provider';
+import type { ConstatatorConfig, ConstatatorState } from '@/types/verification-modules';
+import { cn } from '@/lib/utils';
+
+interface ConstatatorStepProps {
+  config: ConstatatorConfig | null | undefined;
+  onValidChange: (valid: boolean) => void;
+}
+
+function Field({ label, required, children }: { label: string; required?: boolean; children: React.ReactNode }) {
+  return (
+    <div className="space-y-2">
+      <Label className="text-sm font-semibold text-secondary-900">
+        {label} {required && <span className="text-red-500">*</span>}
+      </Label>
+      {children}
+    </div>
+  );
+}
+
+export default function ConstatatorStep({ config, onValidChange }: ConstatatorStepProps) {
+  const { state, updateConstatator } = useModularWizard();
+  const cs: ConstatatorState = useMemo(() => state.constatator ?? {}, [state.constatator]);
+  const docTypes = useMemo(() => config?.documentTypes ?? [], [config]);
+  const purposes = useMemo(() => config?.purposes ?? [], [config]);
+
+  const selectedType = docTypes.find((t) => t.value === cs.documentType);
+  const reportTypes = selectedType?.reportTypes ?? [];
+  const isOtherPurpose = (cs.purpose ?? '').toLowerCase() === 'altele';
+
+  useEffect(() => {
+    const checks: boolean[] = [];
+    checks.push(!!cs.documentType);
+    if (reportTypes.length > 0) checks.push(!!cs.reportType);
+    checks.push(!!cs.purpose);
+    if (isOtherPurpose) checks.push(!!cs.otherPurpose?.trim());
+    checks.push(!!cs.period);
+    if (cs.period === 'custom') {
+      checks.push(!!cs.periodFrom);
+      checks.push(!!cs.periodTo);
+    }
+    checks.push(!!cs.requesterName?.trim());
+    checks.push(!!cs.requesterCnp?.trim() && cs.requesterCnp.trim().length === 13);
+    onValidChange(checks.every(Boolean));
+  }, [cs, reportTypes.length, isOtherPurpose, onValidChange]);
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-xl font-bold text-secondary-900 mb-1">Detalii certificat constatator</h2>
+        <p className="text-sm text-neutral-600">
+          Alege tipul de document și scopul. Prețul se actualizează în funcție de tipul ales.
+        </p>
+      </div>
+
+      {/* Document type — price-bearing */}
+      <Field label="Tipul documentului" required>
+        <div className="grid gap-3">
+          {docTypes.map((t) => {
+            const active = cs.documentType === t.value;
+            return (
+              <button
+                key={t.value}
+                type="button"
+                onClick={() => updateConstatator({ documentType: t.value, reportType: undefined })}
+                aria-pressed={active}
+                className={cn(
+                  'flex items-center justify-between gap-3 rounded-2xl border-2 p-4 text-left transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500',
+                  active ? 'border-primary-500 bg-primary-50' : 'border-neutral-200 bg-white hover:border-primary-300'
+                )}
+              >
+                <span className="flex items-center gap-3">
+                  <span
+                    className={cn(
+                      'flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full border-2',
+                      active ? 'border-primary-500 bg-primary-500 text-white' : 'border-neutral-300'
+                    )}
+                  >
+                    {active && <Check className="h-4 w-4" aria-hidden="true" />}
+                  </span>
+                  <span className="font-semibold text-secondary-900">{t.label}</span>
+                </span>
+                <span className="font-bold text-primary-700 whitespace-nowrap">{t.price} RON</span>
+              </button>
+            );
+          })}
+        </div>
+      </Field>
+
+      {/* Report type (conditional) */}
+      {reportTypes.length > 0 && (
+        <Field label="Specificați tipul de raport" required>
+          <Select value={cs.reportType ?? ''} onValueChange={(v) => updateConstatator({ reportType: v })}>
+            <SelectTrigger>
+              <SelectValue placeholder="Alege tipul de raport" />
+            </SelectTrigger>
+            <SelectContent>
+              {reportTypes.map((r) => (
+                <SelectItem key={r} value={r}>
+                  {r}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </Field>
+      )}
+
+      {/* Purpose / destination */}
+      <Field label="Document solicitat spre a servi la" required>
+        <Select value={cs.purpose ?? ''} onValueChange={(v) => updateConstatator({ purpose: v })}>
+          <SelectTrigger>
+            <SelectValue placeholder="Alege destinația" />
+          </SelectTrigger>
+          <SelectContent>
+            {purposes.map((p) => (
+              <SelectItem key={p} value={p}>
+                {p}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        {isOtherPurpose && (
+          <Input
+            className="mt-2"
+            value={cs.otherPurpose ?? ''}
+            onChange={(e) => updateConstatator({ otherPurpose: e.target.value })}
+            placeholder="Precizați alt scop"
+          />
+        )}
+      </Field>
+
+      {/* Period */}
+      <Field label="Perioada certificatului" required>
+        <div className="flex flex-wrap gap-2">
+          {[
+            { value: 'founding', label: 'De la înființare până în prezent' },
+            { value: 'custom', label: 'Selectare perioadă' },
+          ].map((opt) => {
+            const active = cs.period === opt.value;
+            return (
+              <button
+                key={opt.value}
+                type="button"
+                role="radio"
+                aria-checked={active}
+                onClick={() => updateConstatator({ period: opt.value as ConstatatorState['period'] })}
+                className={cn(
+                  'px-4 py-2.5 rounded-xl border-2 text-sm font-medium transition-all min-h-11 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500',
+                  active ? 'border-primary-500 bg-primary-50 text-secondary-900' : 'border-neutral-200 bg-white text-neutral-700 hover:border-primary-300'
+                )}
+              >
+                {opt.label}
+              </button>
+            );
+          })}
+        </div>
+        {cs.period === 'custom' && (
+          <div className="mt-3 grid sm:grid-cols-2 gap-4">
+            <Field label="De la" required>
+              <Input type="date" value={cs.periodFrom ?? ''} onChange={(e) => updateConstatator({ periodFrom: e.target.value })} />
+            </Field>
+            <Field label="Până la" required>
+              <Input type="date" value={cs.periodTo ?? ''} onChange={(e) => updateConstatator({ periodTo: e.target.value })} />
+            </Field>
+          </div>
+        )}
+      </Field>
+
+      {/* Requester person */}
+      <div className="grid sm:grid-cols-2 gap-4">
+        <Field label="Nume complet (persoana solicitantă)" required>
+          <Input
+            value={cs.requesterName ?? ''}
+            onChange={(e) => updateConstatator({ requesterName: e.target.value })}
+            placeholder="Nume și prenume"
+          />
+        </Field>
+        <Field label="CNP persoană solicitantă" required>
+          <Input
+            inputMode="numeric"
+            maxLength={13}
+            value={cs.requesterCnp ?? ''}
+            onChange={(e) => updateConstatator({ requesterCnp: e.target.value.replace(/\D/g, '').slice(0, 13) })}
+            placeholder="13 cifre"
+          />
+        </Field>
+      </div>
+    </div>
+  );
+}

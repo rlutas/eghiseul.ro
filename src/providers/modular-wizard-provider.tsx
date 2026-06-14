@@ -26,6 +26,7 @@ import type {
   ModularStepId,
   PersonalKYCState,
   CivilStatusState,
+  ConstatatorState,
   CompanyKYCState,
   PropertyState,
   VehicleState,
@@ -168,6 +169,7 @@ const initialState: ModularWizardState = {
 
   personalKyc: null,
   civilStatus: null,
+  constatator: null,
   companyKyc: null,
   property: null,
   vehicle: null,
@@ -206,6 +208,7 @@ type ModularWizardAction =
   | { type: 'UPDATE_CONTACT'; payload: Partial<ModularWizardState['contact']> }
   | { type: 'UPDATE_PERSONAL_KYC'; payload: Partial<PersonalKYCState> }
   | { type: 'UPDATE_CIVIL_STATUS'; payload: Partial<CivilStatusState> }
+  | { type: 'UPDATE_CONSTATATOR'; payload: Partial<ConstatatorState> }
   | { type: 'UPDATE_COMPANY_KYC'; payload: Partial<CompanyKYCState> }
   | { type: 'UPDATE_COMPANY_KYC_DOCS'; payload: UploadedDocumentState[] }
   | { type: 'UPDATE_PROPERTY'; payload: Partial<PropertyState> }
@@ -299,6 +302,7 @@ interface ModularDraftCache {
     contact?: ModularWizardState['contact'];
     personalKyc?: PersonalKYCState | null;
     civilStatus?: CivilStatusState | null;
+    constatator?: ConstatatorState | null;
     companyKyc?: CompanyKYCState | null;
     property?: PropertyState | null;
     vehicle?: VehicleState | null;
@@ -359,6 +363,9 @@ function modularWizardReducer(
       const civilStatus = verificationConfig.civilStatus?.enabled
         ? (state.civilStatus ?? {})
         : null;
+      const constatator = verificationConfig.constatator?.enabled
+        ? (state.constatator ?? {})
+        : null;
 
       return {
         ...state,
@@ -369,6 +376,7 @@ function modularWizardReducer(
         clientType: initClientType,
         personalKyc,
         civilStatus,
+        constatator,
         companyKyc,
         property,
         vehicle,
@@ -477,6 +485,13 @@ function modularWizardReducer(
       return {
         ...state,
         civilStatus: { ...(state.civilStatus ?? {}), ...action.payload },
+        isDirty: true,
+      };
+
+    case 'UPDATE_CONSTATATOR':
+      return {
+        ...state,
+        constatator: { ...(state.constatator ?? {}), ...action.payload },
         isDirty: true,
       };
 
@@ -659,6 +674,7 @@ function modularWizardReducer(
         contact: cache.data.contact || state.contact,
         personalKyc: cache.data.personalKyc ?? state.personalKyc,
         civilStatus: cache.data.civilStatus ?? state.civilStatus,
+        constatator: cache.data.constatator ?? state.constatator,
         companyKyc: cache.data.companyKyc ?? state.companyKyc,
         property: cache.data.property ?? state.property,
         vehicle: cache.data.vehicle ?? state.vehicle,
@@ -746,6 +762,7 @@ function modularWizardReducer(
         // Initialize modules based on config
         personalKyc: config?.personalKyc.enabled ? createInitialPersonalKYCState() : null,
         civilStatus: config?.civilStatus?.enabled ? {} : null,
+        constatator: config?.constatator?.enabled ? {} : null,
         companyKyc: config?.companyKyc.enabled ? createInitialCompanyKYCState() : null,
         property: config?.propertyVerification.enabled ? createInitialPropertyState() : null,
         vehicle: config?.vehicleVerification.enabled ? createInitialVehicleState() : null,
@@ -790,6 +807,7 @@ interface ModularWizardContextType {
   updateContact: (data: Partial<ModularWizardState['contact']>) => void;
   updatePersonalKyc: (data: Partial<PersonalKYCState>) => void;
   updateCivilStatus: (data: Partial<CivilStatusState>) => void;
+  updateConstatator: (data: Partial<ConstatatorState>) => void;
   updateCompanyKyc: (data: Partial<CompanyKYCState>) => void;
   updateCompanyKycDocuments: (docs: UploadedDocumentState[]) => void;
   updateProperty: (data: Partial<PropertyState>) => void;
@@ -996,6 +1014,7 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
                   contact: cd.contact,
                   personalKyc: cd.personal ?? null,
                   civilStatus: cd.civil_status ?? null,
+                  constatator: cd.constatator ?? null,
                   companyKyc: cd.company ?? null,
                   billing: cd.billing ?? null,
                   selectedOptions,
@@ -1177,6 +1196,10 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
     dispatch({ type: 'UPDATE_CIVIL_STATUS', payload: data });
   }, []);
 
+  const updateConstatator = useCallback((data: Partial<ConstatatorState>) => {
+    dispatch({ type: 'UPDATE_CONSTATATOR', payload: data });
+  }, []);
+
   const updateCompanyKyc = useCallback((data: Partial<CompanyKYCState>) => {
     dispatch({ type: 'UPDATE_COMPANY_KYC', payload: data });
   }, []);
@@ -1227,7 +1250,14 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
   // Price calculation
   const priceBreakdown = useMemo((): PriceBreakdown => {
     const service = serviceRef.current;
-    const basePrice = service?.base_price ?? 0;
+    // Certificat Constatator: the chosen document type overrides the base price
+    // (e.g. "cu Istoric" 499.99 vs "pe Firmă"/"PF" 119.99). Falls back to the
+    // service base price for every other service.
+    const constatatorTypes = state.verificationConfig?.constatator?.documentTypes;
+    const docTypePrice = constatatorTypes?.find(
+      (t) => t.value === state.constatator?.documentType
+    )?.price;
+    const basePrice = docTypePrice ?? service?.base_price ?? 0;
     const optionsPrice = state.selectedOptions.reduce(
       (sum, opt) => {
         // Defensive: handle undefined/NaN priceModifier from old cached data
@@ -1269,7 +1299,7 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
       currency: service?.currency ?? 'RON',
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state.serviceId, state.selectedOptions, state.delivery, state.coupon]);
+  }, [state.serviceId, state.selectedOptions, state.delivery, state.coupon, state.constatator?.documentType, state.verificationConfig]);
 
   // Save to localStorage
   const saveToLocalStorage = useCallback(() => {
@@ -1286,6 +1316,7 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
         contact: state.contact,
         personalKyc: state.personalKyc,
         civilStatus: state.civilStatus,
+        constatator: state.constatator,
         companyKyc: state.companyKyc,
         property: state.property,
         vehicle: state.vehicle,
@@ -1330,6 +1361,7 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
       };
       if (state.personalKyc) customerData.personal = state.personalKyc;
       if (state.civilStatus) customerData.civil_status = state.civilStatus;
+      if (state.constatator) customerData.constatator = state.constatator;
       if (state.companyKyc) customerData.company = state.companyKyc;
       if (state.property) customerData.property = state.property;
       if (state.vehicle) customerData.vehicle = state.vehicle;
@@ -1738,6 +1770,7 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
     updateContact,
     updatePersonalKyc,
     updateCivilStatus,
+    updateConstatator,
     updateCompanyKyc,
     updateCompanyKycDocuments,
     updateProperty,

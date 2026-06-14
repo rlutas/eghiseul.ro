@@ -162,6 +162,22 @@ export interface SignatureConfig {
 }
 
 /**
+ * Certificat Constatator (ONRC) details module. The document type is
+ * price-bearing — selecting it overrides the order base price (option A).
+ */
+export interface ConstatatorDocType {
+  value: string;       // e.g. 'firma' | 'pf' | 'istoric'
+  label: string;
+  price: number;       // effective base price for this document type (RON)
+  reportTypes?: string[]; // optional report sub-types for this document type
+}
+export interface ConstatatorConfig {
+  enabled: boolean;
+  documentTypes: ConstatatorDocType[];
+  purposes: string[];  // "Document solicitat spre a servi la" destinations
+}
+
+/**
  * Civil-status questionnaire module (certificat naștere / căsătorie / celibat).
  * `documentType` drives labels + which fields make sense; `fields` toggles each
  * question per service. Mirrors the data the Starea Civilă application needs.
@@ -221,6 +237,7 @@ export interface ServiceVerificationConfig {
   // Verification modules
   personalKyc: PersonalKYCConfig;
   civilStatus?: CivilStatusConfig;
+  constatator?: ConstatatorConfig;
   companyKyc: CompanyKYCConfig;
   propertyVerification: PropertyVerificationConfig;
   vehicleVerification: VehicleVerificationConfig;
@@ -243,6 +260,7 @@ export type ModularStepId =
   | 'client-type'       // Client type selection (PF/PJ)
   | 'personal-data'     // Personal KYC data entry
   | 'civil-status'      // Civil-status questionnaire (birth/marriage/celibacy certs)
+  | 'constatator'       // Certificat constatator (ONRC) details
   | 'company-data'      // Company KYC data entry
   | 'property-data'     // Property data entry
   | 'vehicle-data'      // Vehicle data entry
@@ -262,7 +280,7 @@ export interface ModularStep {
   labelRo: string;  // Romanian label
   number: number;
   condition?: (state: ModularWizardState) => boolean;
-  moduleType: 'core' | 'personalKyc' | 'civilStatus' | 'companyKyc' | 'companyDocuments' | 'property' | 'vehicle' | 'signature' | 'billing';
+  moduleType: 'core' | 'personalKyc' | 'civilStatus' | 'constatator' | 'companyKyc' | 'companyDocuments' | 'property' | 'vehicle' | 'signature' | 'billing';
 }
 
 // ============================================================================
@@ -525,6 +543,21 @@ export interface CivilStatusState {
   countryOfUse?: string;
 }
 
+/**
+ * Certificat Constatator (ONRC) details state.
+ */
+export interface ConstatatorState {
+  documentType?: string;     // matches a ConstatatorDocType.value — drives base price
+  reportType?: string;       // conditional report sub-type
+  purpose?: string;          // "servi la" destination
+  otherPurpose?: string;     // free-text when purpose is "Altele"
+  period?: 'founding' | 'custom';
+  periodFrom?: string;
+  periodTo?: string;
+  requesterName?: string;    // Nume complet persoană solicitantă
+  requesterCnp?: string;     // CNP persoană solicitantă
+}
+
 // ============================================================================
 // MODULAR WIZARD STATE
 // ============================================================================
@@ -563,6 +596,7 @@ export interface ModularWizardState {
   // Module states (nullable based on what's enabled)
   personalKyc: PersonalKYCState | null;
   civilStatus: CivilStatusState | null;
+  constatator: ConstatatorState | null;
   companyKyc: CompanyKYCState | null;
   property: PropertyState | null;
   vehicle: VehicleState | null;

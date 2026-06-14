@@ -46,6 +46,12 @@ export const MODULE_REGISTRY: Record<ModularStepId, ModuleRegistryEntry> = {
     labelRo: 'Date Stare Civilă',
     componentPath: '@/components/orders/modules/civil-status/CivilStatusStep',
   },
+  'constatator': {
+    stepId: 'constatator',
+    label: 'Constatator Details',
+    labelRo: 'Detalii Certificat',
+    componentPath: '@/components/orders/modules/constatator/ConstatatorStep',
+  },
   'company-data': {
     stepId: 'company-data',
     label: 'Company Data',
@@ -147,6 +153,7 @@ export const MODULE_LOADERS: Partial<Record<ModularStepId, ModuleComponentLoader
   'client-type': () => import('@/components/orders/modules/client-type/ClientTypeStep'),
   'personal-data': () => import('@/components/orders/modules/personal-kyc/PersonalDataStep'),
   'civil-status': () => import('@/components/orders/modules/civil-status/CivilStatusStep'),
+  'constatator': () => import('@/components/orders/modules/constatator/ConstatatorStep'),
   'company-data': () => import('@/components/orders/modules/company-kyc/CompanyDataStep'),
   'property-data': () => import('@/components/orders/modules/property/PropertyDataStep'),
   'vehicle-data': () => import('@/components/orders/modules/vehicle/VehicleDataStep'),
