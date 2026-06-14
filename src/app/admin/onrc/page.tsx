@@ -23,6 +23,7 @@ interface OnrcJob {
   company_name: string | null;
   registration_number: string | null;
   onrc_request_id: string | null;
+  onrc_draft_id: string | null;
   document_url: string | null;
   error_message: string | null;
   retry_count: number;
@@ -65,7 +66,7 @@ export default async function AdminOnrcPage() {
   const admin = createAdminClient() as any;
   const { data } = await admin
     .from('onrc_jobs')
-    .select('id, order_id, status, document_type, cui, company_name, registration_number, onrc_request_id, document_url, error_message, retry_count, created_at, orders(friendly_order_id)')
+    .select('id, order_id, status, document_type, cui, company_name, registration_number, onrc_request_id, onrc_draft_id, document_url, error_message, retry_count, created_at, orders(friendly_order_id)')
     .order('created_at', { ascending: false })
     .limit(200);
   const jobs: OnrcJob[] = data ?? [];
@@ -136,7 +137,19 @@ export default async function AdminOnrcPage() {
                   </TableCell>
                   <TableCell className="text-xs">
                     <div>{job.registration_number ?? '—'}</div>
-                    <div className="text-neutral-500">{job.onrc_request_id ?? ''}</div>
+                    {job.onrc_draft_id ? (
+                      <a
+                        href={`https://myportal.onrc.ro/request?id=${job.onrc_draft_id}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-primary-600 underline"
+                        title="Deschide cererea pe portalul ONRC"
+                      >
+                        {job.onrc_request_id ?? 'cerere ONRC'} ↗
+                      </a>
+                    ) : (
+                      <div className="text-neutral-500">{job.onrc_request_id ?? ''}</div>
+                    )}
                   </TableCell>
                   <TableCell className="text-center">{job.retry_count}</TableCell>
                   <TableCell className="text-xs text-red-600 max-w-[240px] truncate" title={job.error_message ?? ''}>
