@@ -23,7 +23,7 @@ import {
   Briefcase,
   MapPin,
 } from 'lucide-react';
-import { Service, ServiceOption, formatEstimatedDays } from '@/types/services';
+import { Service, ServiceOption } from '@/types/services';
 import { Footer } from '@/components/home/footer';
 import { ServiceFAQ } from '@/components/services/service-faq';
 import { SystemStatus } from '@/components/services/system-status';
@@ -237,21 +237,10 @@ export default async function CertificatConstatatorPage() {
                         <Clock className="h-5 w-5 text-green-600" aria-hidden="true" />
                       </div>
                       <div>
-                        <p className="font-semibold text-secondary-900 text-sm">Livrare în {formatEstimatedDays(service)}</p>
-                        <p className="text-xs text-neutral-500">Zile lucrătoare</p>
+                        <p className="font-semibold text-secondary-900 text-sm">Eliberare în câteva minute</p>
+                        <p className="text-xs text-neutral-500">Automat, 24/7</p>
                       </div>
                     </div>
-
-                    {service.urgent_days && (
-                      <div className="flex items-center gap-3 p-3 bg-gradient-to-r from-primary-50 to-primary-100/50 rounded-xl border border-primary-200">
-                        <div className="w-10 h-10 bg-primary-500 rounded-xl flex items-center justify-center flex-shrink-0">
-                          <Zap className="h-5 w-5 text-secondary-900" aria-hidden="true" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="font-bold text-secondary-900 text-sm">Urgent: {service.urgent_days} zile lucrătoare</p>
-                        </div>
-                      </div>
-                    )}
 
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
@@ -445,7 +434,7 @@ export default async function CertificatConstatatorPage() {
                 { step: 1, title: 'Introduci CUI-ul', desc: 'Completezi codul unic de înregistrare al firmei. Preluăm automat datele din ONRC.', icon: Building2 },
                 { step: 2, title: 'Confirmi Tipul', desc: 'Alegi tipul certificatului: simplu, extins sau cu istoric, în funcție de nevoie.', icon: FileText },
                 { step: 3, title: 'Plătești Securizat', desc: 'Card, Apple Pay, Google Pay — taxele ONRC sunt incluse în preț.', icon: Shield },
-                { step: 4, title: 'Primești Documentul', desc: `În ${formatEstimatedDays(service)} primești certificatul constatator pe email.`, icon: CheckCircle },
+                { step: 4, title: 'Primești Documentul', desc: 'În câteva minute primești certificatul constatator pe email (automat, 24/7).', icon: CheckCircle },
               ].map((item, index) => (
                 <div key={item.step} className="relative">
                   <div className="bg-white rounded-2xl p-6 h-full border border-neutral-200 hover:border-primary-300 hover:shadow-lg transition-all group">
@@ -509,7 +498,7 @@ export default async function CertificatConstatatorPage() {
             { q: 'Ce este certificatul constatator?', a: 'Este documentul oficial ONRC care atestă datele actuale ale unei firme: denumire, sediu, CUI, asociați, administratori, capital social și obiect de activitate. Este „cartea de identitate” a firmei la Registrul Comerțului.' },
             { q: 'Care e diferența dintre certificat simplu, extins și cu istoric?', a: 'Cel simplu conține datele de bază la zi (denumire, sediu, administratori). Cel extins include date complete: capital, obiect de activitate, mențiuni și puncte de lucru. Cel cu istoric arată evoluția datelor firmei de la înființare până în prezent.' },
             { q: 'Certificatul constatator este la zi?', a: 'Da. Certificatul reflectă situația firmei din ziua eliberării, cu toate mențiunile actualizate înscrise la ONRC până la acel moment.' },
-            { q: 'Cât durează eliberarea?', a: `${formatEstimatedDays(service)} în mod standard. Există și opțiunea Urgent pentru livrare mai rapidă.` },
+            { q: 'Cât durează eliberarea?', a: 'De obicei câteva minute — sistemul emite automat, 24/7. În cazuri rare (procesare ONRC mai lentă) poate dura mai mult.' },
             { q: 'Pot obține certificat pentru orice firmă?', a: 'Da, pentru orice persoană juridică sau entitate înregistrată la Registrul Comerțului: SRL, SA, PFA, II sau IF. Ai nevoie doar de CUI-ul firmei.' },
             { q: 'Este valabil pentru licitații publice?', a: 'Da. Certificatul constatator este unul dintre documentele acceptate la licitațiile publice din SEAP/SICAP pentru a dovedi eligibilitatea și datele de identificare ale ofertantului.' },
             { q: 'Cât este valabil certificatul constatator?', a: 'Reflectă situația din ziua eliberării. În practică, autoritățile și partenerii cer un certificat emis în ultimele 30 de zile; la licitații se acceptă de regulă unul nu mai vechi de 30 de zile.' },
@@ -534,7 +523,7 @@ export default async function CertificatConstatatorPage() {
                 Gata să obții Certificatul Constatator?
               </h2>
               <p className="text-lg text-white/80 mb-8 max-w-xl mx-auto">
-                Ai nevoie doar de CUI-ul firmei. Primești documentul în {formatEstimatedDays(service)}.
+                Ai nevoie doar de CUI-ul firmei. Primești documentul în câteva minute (automat, 24/7).
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
                 <Button
