@@ -41,6 +41,19 @@ const STATUS_STYLE: Record<OnrcJob['status'], string> = {
   FAILED: 'bg-red-100 text-red-700',
 };
 
+const EVENT_LABEL: Record<string, string> = {
+  claimed_submit: 'Preluat (depunere)',
+  claimed_retrieve: 'Verificare document',
+  submitted: 'Depus + plătit',
+  awaiting: 'Așteaptă document',
+  done: 'Eliberat',
+  failed: 'Eșuat',
+  needs_operator: 'Necesită operator',
+  retry: 'Reîncercare',
+  reaper: 'Recuperat (crash)',
+  stuck: 'Blocat',
+};
+
 const STATUS_LABEL: Record<OnrcJob['status'], string> = {
   PENDING: 'În așteptare',
   PROCESSING: 'Se procesează',
@@ -71,6 +84,23 @@ export default async function AdminOnrcPage() {
     .order('created_at', { ascending: false })
     .limit(200);
   const jobs: OnrcJob[] = data ?? [];
+
+  // Chronological activity log per job (newest first) — "ce a făcut botul".
+  const jobIds = jobs.map((j) => j.id);
+   
+  const eventsByJob: Record<string, { type: string; message: string | null; created_at: string }[]> = {};
+  if (jobIds.length > 0) {
+    const { data: events } = await admin
+      .from('onrc_job_events')
+      .select('job_id, type, message, created_at')
+      .in('job_id', jobIds)
+      .order('created_at', { ascending: false })
+      .limit(800);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    for (const e of (events ?? []) as any[]) {
+      (eventsByJob[e.job_id] ??= []).push({ type: e.type, message: e.message, created_at: e.created_at });
+    }
+  }
 
   const counts = jobs.reduce<Record<string, number>>((acc, j) => {
     acc[j.status] = (acc[j.status] ?? 0) + 1;
@@ -111,6 +141,7 @@ export default async function AdminOnrcPage() {
               <TableHead>Status</TableHead>
               <TableHead>Eliberat</TableHead>
               <TableHead>Nr. înreg. / Id cerere</TableHead>
+              <TableHead>Jurnal (ce a făcut botul)</TableHead>
               <TableHead>Încercări</TableHead>
               <TableHead>Eroare</TableHead>
               <TableHead>Creat</TableHead>
@@ -119,7 +150,7 @@ export default async function AdminOnrcPage() {
           <TableBody>
             {jobs.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={9} className="text-center text-neutral-500 py-8">
+                <TableCell colSpan={10} className="text-center text-neutral-500 py-8">
                   Niciun job ONRC încă. Se creează automat la plata comenzilor de constatator.
                 </TableCell>
               </TableRow>
@@ -161,6 +192,25 @@ export default async function AdminOnrcPage() {
                       </a>
                     ) : (
                       <div className="text-neutral-500">{job.onrc_request_id ?? ''}</div>
+                    )}
+                  </TableCell>
+                  <TableCell className="text-xs max-w-[280px]">
+                    {(eventsByJob[job.id] ?? []).length === 0 ? (
+                      <span className="text-neutral-400">—</span>
+                    ) : (
+                      <ul className="space-y-0.5">
+                        {(eventsByJob[job.id] ?? []).slice(0, 5).map((e, i) => (
+                          <li key={i} className="flex gap-1.5">
+                            <span className="text-neutral-400 whitespace-nowrap">
+                              {new Date(e.created_at).toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' })}
+                            </span>
+                            <span className="text-neutral-700">
+                              <span className="font-medium">{EVENT_LABEL[e.type] ?? e.type}</span>
+                              {e.message ? ` — ${e.message}` : ''}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
                     )}
                   </TableCell>
                   <TableCell className="text-center">{job.retry_count}</TableCell>

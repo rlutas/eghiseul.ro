@@ -9,6 +9,7 @@
  */
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { logOnrcEvent } from '@/lib/onrc/log-event';
 
 export const dynamic = 'force-dynamic';
 
@@ -131,6 +132,14 @@ export async function GET(req: NextRequest) {
     // Nothing to do (or lost a race) — tell the worker to try again.
     return NextResponse.json({ success: true, data: null });
   }
+
+  await logOnrcEvent(
+    supabase,
+    claimed.id,
+    claimed.onrc_draft_id ? 'claimed_retrieve' : 'claimed_submit',
+    claimed.onrc_draft_id ? 'Verificare document la ONRC.' : 'Preluat de worker pentru depunere la ONRC.',
+    claimed.order_id
+  );
 
   // Client contact for delivery (lives in customer_data.contact).
   const { data: order } = await supabase

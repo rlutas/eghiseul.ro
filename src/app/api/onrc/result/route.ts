@@ -11,6 +11,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { deliverOnrcResult } from '@/lib/onrc/deliver';
 import { sendEmail } from '@/lib/email/resend';
+import { logOnrcEvent } from '@/lib/onrc/log-event';
 
 export const dynamic = 'force-dynamic';
 
@@ -76,23 +77,34 @@ export async function POST(req: NextRequest) {
           updated_at: now,
         })
         .eq('id', jobId);
+      await logOnrcEvent(supabase, jobId, 'stuck', `Documentul nu a fost emis de ONRC în 2h — necesită operator.`, job?.order_id);
       if (job?.order_id) await notifyClientDelay(supabase, job.order_id).catch(() => {});
       return NextResponse.json({ success: true });
     }
 
+    const firstTime = !job?.awaiting_since;
     const patch: Record<string, unknown> = {
       status: 'AWAITING_DOCUMENT',
       last_attempt_at: now,
       locked_at: null,
       updated_at: now,
     };
-    if (!job?.awaiting_since) patch.awaiting_since = now; // mark first time it parks
+    if (firstTime) patch.awaiting_since = now; // mark first time it parks
     if (body.requestId) patch.onrc_request_id = body.requestId;
     if (body.draftId) patch.onrc_draft_id = body.draftId;
     if (body.registrationNumber) patch.registration_number = body.registrationNumber;
     const { error } = await supabase.from('onrc_jobs').update(patch).eq('id', jobId);
     if (error) {
       return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    }
+    if (firstTime) {
+      await logOnrcEvent(
+        supabase,
+        jobId,
+        'submitted',
+        `Cerere depusă + plătită la ONRC${body.requestId ? ` (Id cerere ${body.requestId})` : ''}. Se așteaptă documentul.`,
+        job?.order_id
+      );
     }
     return NextResponse.json({ success: true });
   }
@@ -118,6 +130,13 @@ export async function POST(req: NextRequest) {
     if (updated?.order_id) {
       await deliverOnrcResult(updated.order_id, body.documentUrl, body.registrationNumber);
     }
+    await logOnrcEvent(
+      supabase,
+      jobId,
+      'done',
+      `Document descărcat din ONRC, atașat comenzii + email trimis${body.registrationNumber ? ` (${body.registrationNumber})` : ''}.`,
+      updated?.order_id
+    );
     return NextResponse.json({ success: true });
   }
 
@@ -141,6 +160,13 @@ export async function POST(req: NextRequest) {
   if (error) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
+  await logOnrcEvent(
+    supabase,
+    jobId,
+    status === 'NEEDS_OPERATOR' ? 'needs_operator' : 'failed',
+    body.errorMessage ?? undefined,
+    job?.order_id
+  );
   // NEEDS_OPERATOR = a human will finish it manually → reassure the client so
   // they're not left in the dark (paid but not yet delivered).
   if (status === 'NEEDS_OPERATOR' && job?.order_id) {
