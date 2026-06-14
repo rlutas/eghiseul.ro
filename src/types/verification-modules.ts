@@ -165,11 +165,17 @@ export interface SignatureConfig {
  * Certificat Constatator (ONRC) details module. The document type is
  * price-bearing — selecting it overrides the order base price (option A).
  */
+/** A report sub-type with its OWN purpose list (matches ONRC step 4). */
+export interface ConstatatorReportType {
+  name: string;
+  purposes?: string[];
+}
 export interface ConstatatorDocType {
   value: string;       // e.g. 'firma' | 'pf' | 'istoric'
   label: string;
   price: number;       // effective base price for this document type (RON)
-  reportTypes?: string[]; // optional report sub-types for this document type
+  // Report sub-types. New shape carries per-type purposes; legacy is string[].
+  reportTypes?: Array<string | ConstatatorReportType>;
 }
 export interface ConstatatorConfig {
   enabled: boolean;

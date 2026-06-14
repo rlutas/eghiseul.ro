@@ -1,0 +1,13 @@
+-- 062_constatator_reporttype_purposes.sql
+-- Per-report-type purpose lists for constatator (matches ONRC step 4 exactly):
+-- each report type carries its OWN "Document solicitat spre a servi la" list, so
+-- the form only offers valid purposes and the worker never hits NEEDS_OPERATOR
+-- from a mismatched purpose.
+--   verification_config.constatator.documentTypes[firma].reportTypes is now
+--   [{ name, purposes:[...] }, ...] instead of [name, ...].
+-- Lists are sourced from ONRC nomenclature cc-reasons/cc-reasons-subtype-association:
+--   070 = de bază (41), 072 = fonduri IMM (10), 071 = insolvență (4).
+-- Applied via REST (the lists are long + sourced live); see also worker-onrc
+-- buildStep4Doc which resolves the purpose against the chosen report type's list.
+-- No schema change.
+NOTIFY pgrst, 'reload schema';

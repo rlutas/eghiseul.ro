@@ -38,7 +38,21 @@ export default function ConstatatorStep({ config, onValidChange }: ConstatatorSt
   const purposes = useMemo(() => config?.purposes ?? [], [config]);
 
   const selectedType = docTypes.find((t) => t.value === cs.documentType);
-  const reportTypes = selectedType?.reportTypes ?? [];
+  // Report types may be plain strings (legacy) or { name, purposes } objects.
+  const reportTypeOpts = useMemo(
+    () =>
+      (selectedType?.reportTypes ?? []).map((r) =>
+        typeof r === 'string' ? { name: r, purposes: undefined as string[] | undefined } : r
+      ),
+    [selectedType]
+  );
+  const reportTypes = reportTypeOpts.map((r) => r.name);
+  // Purposes shown are SPECIFIC to the selected report type (ONRC step 4); fall
+  // back to the global list when a report type has none / none is chosen.
+  const activePurposes = useMemo(() => {
+    const rt = reportTypeOpts.find((r) => r.name === cs.reportType);
+    return rt?.purposes && rt.purposes.length > 0 ? rt.purposes : purposes;
+  }, [reportTypeOpts, cs.reportType, purposes]);
   const isOtherPurpose = (cs.purpose ?? '').toLowerCase() === 'altele';
   // 'istoric' → needs the certificate period; 'pf' → needs the person (CNP).
   // 'firma'/'istoric' (CUI types) capture the CUI in the next step (company-data).
@@ -125,7 +139,10 @@ export default function ConstatatorStep({ config, onValidChange }: ConstatatorSt
       {/* Report type (conditional) */}
       {reportTypes.length > 0 && (
         <Field label="Specificați tipul de raport" required>
-          <Select value={cs.reportType ?? ''} onValueChange={(v) => updateConstatator({ reportType: v })}>
+          <Select
+            value={cs.reportType ?? ''}
+            onValueChange={(v) => updateConstatator({ reportType: v, purpose: undefined, otherPurpose: undefined })}
+          >
             <SelectTrigger>
               <SelectValue placeholder="Alege tipul de raport" />
             </SelectTrigger>
@@ -147,7 +164,7 @@ export default function ConstatatorStep({ config, onValidChange }: ConstatatorSt
             <SelectValue placeholder="Alege destinația" />
           </SelectTrigger>
           <SelectContent>
-            {purposes.map((p) => (
+            {activePurposes.map((p) => (
               <SelectItem key={p} value={p}>
                 {p}
               </SelectItem>
