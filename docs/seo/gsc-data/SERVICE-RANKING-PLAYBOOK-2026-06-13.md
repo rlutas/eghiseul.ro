@@ -235,8 +235,10 @@ Construite 7 pagini hardcodate la **slug-parity WP** (același pattern ca CF: sc
 
 **De rafinat ulterior (minor):** câteva meta-descrieri depășesc 160 caractere (celibat, cazier-fiscal, cazier-auto) — doar truncare în SERP, nu blocant; imagini OG `/og/*.png` per serviciu de generat; migrare articole-cluster (cadastru, ghid integritate, taxa cazier) ca MDX cu link UP.
 
-**Rămâne:** Rovinietă (`rovinieta`, preț 0 = redirect CNAIR — tool, nu pagină clasică de comandă) + tool-ul `/tools/verificare-rovinieta-online/` (294k clicks) — de tratat separat. Plus calculatoarele (80% din trafic — sprint dedicat).
+**✅ Rovinietă — tool implementat (2026-06-14):** pagină `/tools/verificare-rovinieta-online/` (294k clicks) cu widget-ul live **erovinieta.net** embed-uit (`components/tools/erovinieta-embed.tsx`, redimensionare via postMessage, ca pe WP) + conținut SEO pe clusterul „verificare rovinieta" + schema `WebApplication`. Mega-menu „Verificare Rovinietă" → tool. Rămâne: calculatoarele (80% din trafic — sprint dedicat).
+
+**📋 Gap formulare comandă (Playwright, 2026-06-14):** vezi `docs/technical/specs/wp-form-gap-analysis-2026-06-14.md` — paginile SEO sunt gata, dar **wizard-ul de comandă pentru certificatele de stare civilă (naștere/căsătorie/celibat) e minimal** față de WP (lipsesc: istoric marital, nume soț/de naștere, scop, țară folosire act, picker traducere/apostilă, livrare internațională). P0 înainte de cutover.
 
 ---
 
-*Toate cele 9 servicii active au acum pagini SEO hardcodate (cu excepția rovinietei-tool).*
+*Toate cele 9 servicii active au acum pagini SEO hardcodate; rovinietă-tool implementat cu widget. Următor: paritate formular comandă (P0) + calculatoare.*
