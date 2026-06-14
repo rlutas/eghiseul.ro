@@ -40,6 +40,14 @@ Un operator uman ia acum manual datele dintr-o comandă de **certificat constata
 ### Cunoscut / făcut
 - ~~Preview PDF în admin~~ ✅ **reparat** (PDF-urile se servesc inline, fără conversie DOCX).
 
+### Realizat — batch UX + robustețe (2026-06-14)
+- **Submit autonom validat real** prin `submitViaApi` (modulul, cap-coadă, plată din wallet) — „cumpăr → se emite singur" confirmat în producție (worker Railway → DONE).
+- **Tip raport (3) + „Altele" custom:** firma → de bază (auto) / fonduri IMM / insolvență; „Altele" trimite textul clientului ca `documentTypeOtherReason`. IMM/insolvență cu motiv nemapat → `NEEDS_OPERATOR`.
+- **Safeguards:** auto-retry FAILED neplătit (max 4, backoff, anti-dublă-plată via `onrc_draft_id IS NULL`); reaper PROCESSING blocat >10 min; AWAITING >2h → `NEEDS_OPERATOR` (`awaiting_since`, migrarea 059); email „în procesare" la client; alerte Slack din worker.
+- **Jurnal cronologic în admin** (`onrc_job_events`, migrarea 061) — coloana „Ce a făcut botul" în `/admin/onrc`.
+- **Fără documente avocațiale** la constatator + carte funciară (contract-asistenta/împuternicire/cerere + nr. Barou scoase); **termen „câteva minute"** în admin + pe pagină (card preț + copy).
+- **Link „Vezi ca clientul"** în admin (pagina de status a clientului).
+
 ---
 
 ## ✅ Realizat — flux mapat & testat live A→Z + design ASINCRON (2026-06-14)
