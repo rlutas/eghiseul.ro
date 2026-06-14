@@ -147,3 +147,31 @@ Reguli ferme:
 5. ⏳ **Faza 3 — worker Playwright** (proiect nou `worker-onrc/` pe Railway). Schelet complet + typecheck curat; **rămâne maparea selectorilor LIVE** pe contul ONRC logat (`src/onrc/selectors.ts`) + deploy.
 
 **Următorul pas concret:** mapare selectori ONRC (cu cont + `HEADLESS=false`) + deploy worker pe Railway.
+
+---
+
+## Postmortem & hardening (2026-06-14, seara)
+
+Worker-ul a trecut de la Playwright la **submit 100% prin REST API** (`worker-onrc/src/onrc/api-submit.ts`) — fără browser. Comenzi reale plătite live (RC 2381836, 2381989, 2382077). În testarea comenzii `E-260614-D5TBA` au apărut 3 probleme; toate rezolvate:
+
+### 1. Railway rula cod vechi (browser) → `page.waitForSelector: Timeout`
+- **Cauză:** „Redeploy" în Railway re-rulează build-ul vechi, nu ultimul commit. Instanța veche (browser) și cea nouă (API) au coexistat în tranziție.
+- **Fix:** deploy-ul corect se face prin **push pe `github.com/rlutas/worker-onrc`** (auto-deploy din ultimul commit). NU folosi „Redeploy" pe un deployment vechi.
+
+### 2. `account-profile.json` lipsea pe Railway → `NEEDS_OPERATOR`
+- **Cauză:** fișierul e gitignored (date cont) → nu ajunge în imaginea Railway.
+- **Fix:** fallback pe **`ONRC_ACCOUNT_PROFILE`** (JSON-ul în base64) ca env var pe Railway. Vezi `profile()` în `api-submit.ts`.
+
+### 3. ⚠️ Dublă plată (incident) — reset al unui job deja plătit
+- **Cauză:** un job depus+plătit a fost resetat manual cu `onrc_draft_id = null` → worker-ul l-a considerat nedepus și a **re-depus + re-plătit** (cereri 20262192998 + 20262193010 pe aceeași firmă). Pierdere ~30 LEI.
+- **Fix permanent (anti-dublă-plată):**
+  - Worker-ul salvează **`draftId`-ul în coadă IMEDIAT după createDraft, ÎNAINTE de plată** — status nou `CHECKPOINT` în `POST /api/onrc/result`. Orice eșec ulterior (crash, eroare după plată, reset) lasă jobul cu un `draftId` → merge pe ramura **retrieve**, niciodată re-submit. Vezi `submitViaApi(job, onDraftCreated)` + `processJob`.
+  - `GET /api/onrc/pending` claim-ul de SUBMIT cere acum **`onrc_draft_id IS NULL`** — un job cu draft nu mai poate fi re-depus.
+  - Reaper-ul existent: `PROCESSING` blocat **cu** draft → retrieve; **fără** draft → `NEEDS_OPERATOR` (nu re-depune). Auto-retry FAILED doar dacă `onrc_draft_id IS NULL`.
+  - **Regulă operare:** NU reseta niciodată un job care a fost plătit (verifică pe portalul ONRC întâi). Pentru re-livrare folosește status `AWAITING_DOCUMENT` cu draft-ul existent (retrieve-only).
+
+### 4. Notă de calcul (NC) pentru contabilitate
+- Worker-ul capturează **NC-ul** la `finalize()` și îl raportează (`calculationNote`) → coloană nouă `onrc_jobs.onrc_calc_note` (migrarea **063**). Afișat în `/admin/onrc` (coloana „Notă calcul") ca echipa de contabilitate să le poată lista per comandă.
+
+### 5. Ora afișată greșit (timezone)
+- Paginile randate server-side afișau orele în UTC. Fixat cu `timeZone: 'Europe/Bucharest'` în formatările de dată din `/admin/onrc`, `/admin/orders`, detaliul comenzii și `/comanda/status`.

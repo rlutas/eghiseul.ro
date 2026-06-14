@@ -24,6 +24,7 @@ interface OnrcJob {
   registration_number: string | null;
   onrc_request_id: string | null;
   onrc_draft_id: string | null;
+  onrc_calc_note: string | null;
   document_url: string | null;
   error_message: string | null;
   retry_count: number;
@@ -80,7 +81,7 @@ export default async function AdminOnrcPage() {
   const admin = createAdminClient() as any;
   const { data } = await admin
     .from('onrc_jobs')
-    .select('id, order_id, status, document_type, cui, company_name, registration_number, onrc_request_id, onrc_draft_id, document_url, error_message, retry_count, awaiting_since, created_at, orders(friendly_order_id)')
+    .select('id, order_id, status, document_type, cui, company_name, registration_number, onrc_request_id, onrc_draft_id, onrc_calc_note, document_url, error_message, retry_count, awaiting_since, created_at, orders(friendly_order_id)')
     .order('created_at', { ascending: false })
     .limit(200);
   const jobs: OnrcJob[] = data ?? [];
@@ -141,6 +142,7 @@ export default async function AdminOnrcPage() {
               <TableHead>Status</TableHead>
               <TableHead>Eliberat</TableHead>
               <TableHead>Nr. înreg. / Id cerere</TableHead>
+              <TableHead>Notă calcul (contabilitate)</TableHead>
               <TableHead>Jurnal (ce a făcut botul)</TableHead>
               <TableHead>Încercări</TableHead>
               <TableHead>Eroare</TableHead>
@@ -150,7 +152,7 @@ export default async function AdminOnrcPage() {
           <TableBody>
             {jobs.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={10} className="text-center text-neutral-500 py-8">
+                <TableCell colSpan={11} className="text-center text-neutral-500 py-8">
                   Niciun job ONRC încă. Se creează automat la plata comenzilor de constatator.
                 </TableCell>
               </TableRow>
@@ -167,7 +169,7 @@ export default async function AdminOnrcPage() {
                     <Badge className={`${STATUS_STYLE[job.status]} border-0`}>{STATUS_LABEL[job.status]}</Badge>
                     {job.status === 'AWAITING_DOCUMENT' && job.awaiting_since && (
                       <div className="mt-0.5 text-[10px] text-neutral-500">
-                        din {new Date(job.awaiting_since).toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' })}
+                        din {new Date(job.awaiting_since).toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Bucharest' })}
                       </div>
                     )}
                   </TableCell>
@@ -194,6 +196,13 @@ export default async function AdminOnrcPage() {
                       <div className="text-neutral-500">{job.onrc_request_id ?? ''}</div>
                     )}
                   </TableCell>
+                  <TableCell className="text-xs">
+                    {job.onrc_calc_note ? (
+                      <span className="font-mono font-semibold text-neutral-800">{job.onrc_calc_note}</span>
+                    ) : (
+                      <span className="text-neutral-400">—</span>
+                    )}
+                  </TableCell>
                   <TableCell className="text-xs max-w-[280px]">
                     {(eventsByJob[job.id] ?? []).length === 0 ? (
                       <span className="text-neutral-400">—</span>
@@ -202,7 +211,7 @@ export default async function AdminOnrcPage() {
                         {(eventsByJob[job.id] ?? []).slice(0, 5).map((e, i) => (
                           <li key={i} className="flex gap-1.5">
                             <span className="text-neutral-400 whitespace-nowrap">
-                              {new Date(e.created_at).toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' })}
+                              {new Date(e.created_at).toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Bucharest' })}
                             </span>
                             <span className="text-neutral-700">
                               <span className="font-medium">{EVENT_LABEL[e.type] ?? e.type}</span>
@@ -218,7 +227,7 @@ export default async function AdminOnrcPage() {
                     {job.error_message ?? '—'}
                   </TableCell>
                   <TableCell className="text-xs text-neutral-500 whitespace-nowrap">
-                    {new Date(job.created_at).toLocaleString('ro-RO', { dateStyle: 'short', timeStyle: 'short' })}
+                    {new Date(job.created_at).toLocaleString('ro-RO', { dateStyle: 'short', timeStyle: 'short', timeZone: 'Europe/Bucharest' })}
                   </TableCell>
                 </TableRow>
               ))

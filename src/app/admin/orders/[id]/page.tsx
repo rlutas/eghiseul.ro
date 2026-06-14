@@ -276,6 +276,7 @@ function formatDate(d: string | null) {
   if (!d) return '-';
   return new Date(d).toLocaleDateString('ro-RO', {
     day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit',
+    timeZone: 'Europe/Bucharest',
   });
 }
 
@@ -305,6 +306,7 @@ function formatDateLong(d: string | null) {
   if (!d) return 'N/A';
   return new Date(d).toLocaleDateString('ro-RO', {
     day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit',
+    timeZone: 'Europe/Bucharest',
   });
 }
 

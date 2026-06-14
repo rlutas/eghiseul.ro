@@ -16,7 +16,7 @@ import { logOnrcEvent } from '@/lib/onrc/log-event';
 export const dynamic = 'force-dynamic';
 
 const TERMINAL = ['DONE', 'FAILED', 'NEEDS_OPERATOR'] as const;
-const ALL_STATUSES = [...TERMINAL, 'AWAITING_DOCUMENT'] as const;
+const ALL_STATUSES = [...TERMINAL, 'AWAITING_DOCUMENT', 'CHECKPOINT'] as const;
 type ResultStatus = (typeof ALL_STATUSES)[number];
 
 function authorized(req: NextRequest): boolean {
@@ -38,6 +38,7 @@ export async function POST(req: NextRequest) {
     errorMessage?: string;
     requestId?: string;
     draftId?: string;
+    calculationNote?: string;
   };
   try {
     body = await req.json();
@@ -53,6 +54,22 @@ export async function POST(req: NextRequest) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const supabase = createAdminClient() as any;
   const now = new Date().toISOString();
+
+  // CHECKPOINT — the worker created the ONRC draft but has NOT paid yet. Persist
+  // the draftId immediately so any later failure (crash, post-payment error,
+  // manual reset) leaves the job carrying a draftId → it takes the retrieve path
+  // and is never re-submitted/re-paid (anti-double-pay guard). Keep status
+  // PROCESSING; the reaper reclaims it as retrieve if the worker dies here.
+  if (status === 'CHECKPOINT') {
+    const patch: Record<string, unknown> = { updated_at: now };
+    if (body.draftId) patch.onrc_draft_id = body.draftId;
+    if (body.calculationNote) patch.onrc_calc_note = body.calculationNote;
+    const { error } = await supabase.from('onrc_jobs').update(patch).eq('id', jobId);
+    if (error) {
+      return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    }
+    return NextResponse.json({ success: true });
+  }
 
   // AWAITING_DOCUMENT — submit+pay done, PDF not generated yet. Persist the ONRC
   // ids and park the job so the retrieve phase can poll it later (throttled by
@@ -93,6 +110,7 @@ export async function POST(req: NextRequest) {
     if (body.requestId) patch.onrc_request_id = body.requestId;
     if (body.draftId) patch.onrc_draft_id = body.draftId;
     if (body.registrationNumber) patch.registration_number = body.registrationNumber;
+    if (body.calculationNote) patch.onrc_calc_note = body.calculationNote;
     const { error } = await supabase.from('onrc_jobs').update(patch).eq('id', jobId);
     if (error) {
       return NextResponse.json({ success: false, error: error.message }, { status: 500 });
@@ -116,6 +134,7 @@ export async function POST(req: NextRequest) {
         status: 'DONE',
         document_url: body.documentUrl ?? null,
         registration_number: body.registrationNumber ?? null,
+        ...(body.calculationNote ? { onrc_calc_note: body.calculationNote } : {}),
         downloaded_at: now,
         error_message: null,
         updated_at: now,

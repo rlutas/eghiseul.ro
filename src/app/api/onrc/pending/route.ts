@@ -54,11 +54,15 @@ export async function GET(req: NextRequest) {
     return data;
   }
 
-  // 1) Prefer the oldest PENDING job (submit phase — new orders).
+  // 1) Prefer the oldest PENDING job (submit phase — new orders). Guard: only a
+  //    job with NO draft yet may be submitted. A PENDING job that already has a
+  //    draftId was already submitted+paid (e.g. reset by an operator) — never
+  //    re-submit it (that double-pays); it's handled by the retrieve/reaper path.
   const { data: pendingCand } = await supabase
     .from('onrc_jobs')
     .select('id')
     .eq('status', 'PENDING')
+    .is('onrc_draft_id', null)
     .order('created_at', { ascending: true })
     .limit(1)
     .maybeSingle();
