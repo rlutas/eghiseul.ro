@@ -20,8 +20,25 @@ Un operator uman ia acum manual datele dintr-o comandă de **certificat constata
 - **cu Istoric** → **manual deocamdată** (mai scump; implementăm mai târziu) → worker-ul îl trece `NEEDS_OPERATOR`.
 - **Persoană Fizică** → **flux diferit** (solicitantul trebuie să fi fost administrator) → `NEEDS_OPERATOR` deocamdată.
 
-### Cunoscut / de reparat
-- **Preview PDF în admin**: documentul constatator se descarcă dar **preview-ul nu merge** (de investigat ruta de preview/presign pentru `order_documents` tip `constatator`, cheie S3 `onrc/<jobId>.pdf`).
+### Token & headless (rezolvat 2026-06-14)
+- **Password grant Keycloak MERGE** → token direct (`frontoffice-app`, grant `password`), TTL 2h.
+  **Submit + retrieve rulează 100% headless, FĂRĂ browser.** (Fallback pe sesiune rămâne, dar nu mai e necesar.)
+- ⚠️ **Parola conține `#`** → în `.env` trebuie **între ghilimele** (`ONRC_PASSWORD='...'`), altfel dotenv o taie la `#`.
+  În **Railway** se pune **fără ghilimele** (injectează valoarea brută).
+
+### Deploy & operare
+- Worker pe GitHub: **`github.com/rlutas/worker-onrc`** (privat). Deploy pe **Railway** (Dockerfile + railway.json).
+- Env Railway: `SOURCE_API_URL=https://eghiseul-ro.vercel.app`, `ONRC_WORKER_SECRET` (= cel din Vercel),
+  `ONRC_USERNAME`, `ONRC_PASSWORD` (fără ghilimele), `AWS_*`, `HEADLESS=true`, `POLL_INTERVAL_MS=30000`.
+  ⚠️ Parola ONRC NU se pune în Vercel — doar în worker (Railway).
+- **Pagină „Stare sistem"**: `/api/status` (ONRC reachable + worker heartbeat <2 min) + componenta pe pagina
+  constatator. Workerul scrie heartbeat la fiecare poll în `/api/onrc/pending` (migrarea 058 `system_heartbeats`).
+
+### Prețuri (2026-06-14)
+- de bază (firma) + PF: **79 RON** (de la 119,99) · cu istoric: **487 RON** (de la 499,99). Aliniat la competitor.
+
+### Cunoscut / făcut
+- ~~Preview PDF în admin~~ ✅ **reparat** (PDF-urile se servesc inline, fără conversie DOCX).
 
 ---
 
