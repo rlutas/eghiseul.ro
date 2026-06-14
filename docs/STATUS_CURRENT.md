@@ -18,7 +18,13 @@
 
 **🚗 Tool rovinietă:** `/tools/verificare-rovinieta-online/` (294k clicks) cu widget-ul live **erovinieta.net** embed-uit (iframe + postMessage auto-resize) + conținut SEO + schema WebApplication.
 
+**🤖 Automatizare ONRC — A→Z FUNCȚIONAL prin API:** comanda test **E-260614-UKM7K** livrată complet fără browser — submit+plată ONRC prin REST API (cerere 20262192474, RC 2381989, 30 LEI), ONRC a emis documentul, workerul l-a atașat comenzii (vizibil client) + email + `document_ready`. Worker: `submitViaApi()` (firma/de bază automat; **istoric+PF → manual deocamdată**) + retrieve prin API. Vezi `worker-onrc/ONRC-API-SUBMIT.md`. Admin: link la cererea ONRC. **De reparat: preview PDF în admin** (download merge, preview nu).
+
+<details><summary>Istoric mapare (vechi)</summary>
+
 **🤖 Automatizare ONRC — flux mapat & testat LIVE A→Z:** `docs/technical/specs/onrc-automation-plan.md` + `worker-onrc/ONRC-FLOW.md`. Fluxul „Certificat constatator" a fost parcurs și **plătit real** pe `myportal.onrc.ro` (CUI 49278701, 30 LEI din credit, Id cerere 20262192280, RC 2381836, **PDF descărcat**). Fluxul e **ASINCRON** → backbone în 2 faze: coada `onrc_jobs` (status nou `AWAITING_DOCUMENT` + `onrc_request_id`/`onrc_draft_id`, migrarea 056), `/api/onrc/pending` servește submit+retrieve (throttle 3 min), `/api/onrc/result` acceptă `AWAITING_DOCUMENT`; worker `submitAndPay()`+`retrieveDocument()` cu selectori confirmați. **Următor: seed `storageState.json`, profil Solicitant/Facturare în contul ONRC, deploy Railway, reaper `PROCESSING`.**
+
+</details>
 
 **Verificat:** build de producție verde, `tsc` + `eslint` 0 erori. Merged direct în `main` (PR #1-#3 + commit-uri directe).
 

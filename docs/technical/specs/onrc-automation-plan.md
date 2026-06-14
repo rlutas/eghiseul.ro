@@ -1,9 +1,27 @@
 # Plan: Automatizare ONRC (coadă de stări + bot)
 
-**Status:** backbone implementat; flux ONRC **mapat & testat live A→Z**. **Ultima actualizare:** 2026-06-14.
+**Status:** ✅ **A→Z FUNCȚIONAL prin API** (submit + plată + retrieve + livrare). **Ultima actualizare:** 2026-06-14.
 **Context:** vezi și `/Users/raul/.claude/plans/este-posibil-sa-construiesc-tidy-stallman.md` (handoff-ul original al botului). Flux DOM live: `worker-onrc/ONRC-FLOW.md`.
 
 Un operator uman ia acum manual datele dintr-o comandă de **certificat constatator** / **furnizare informații**, aplică pe portalul **ONRC RECOM** (https://myportal.onrc.ro), plătește din creditul preîncărcat, descarcă PDF-ul și îl livrează clientului. Înlocuim operatorul cu un **bot de browser automation**, în 3 faze.
+
+---
+
+## ✅✅ A→Z FUNCȚIONAL prin API — submit autonom + livrare (2026-06-14)
+
+**Comanda de test E-260614-UKM7K livrată complet, fără browser:** submit + plată ONRC prin **REST API** (Id cerere 20262192474, RC 2381989, 30 LEI din credit), ONRC a emis documentul (+ email de la ONRC), workerul l-a luat prin API, l-a urcat în S3 și l-a **atașat comenzii** (vizibil clientului), comanda pe `document_ready`, email trimis clientului.
+
+- **Submit prin API** (fără browser): `worker-onrc/src/onrc/api-submit.ts` — `submitViaApi(job)`: creare draft (=GDPR), pașii 2-5, căutare firmă RECOM + validare nume, reportType+purpose din nomenclatoare, finalizare + plată wallet. Blueprint complet: `worker-onrc/ONRC-API-SUBMIT.md`. Validat dry-run (create+pași) + executat real (finalize+pay).
+- **Retrieve prin API**: `worker-onrc/src/onrc/api.ts` (token Keycloak/sesiune, summary + opis + download).
+- **Token**: password grant (dacă parola e corectă) sau fallback pe sesiunea de browser (`storageState.json`).
+
+### Scope (decizie produs)
+- **Certificat Constatator pe Firmă (de bază)** → **automat prin API** ✅
+- **cu Istoric** → **manual deocamdată** (mai scump; implementăm mai târziu) → worker-ul îl trece `NEEDS_OPERATOR`.
+- **Persoană Fizică** → **flux diferit** (solicitantul trebuie să fi fost administrator) → `NEEDS_OPERATOR` deocamdată.
+
+### Cunoscut / de reparat
+- **Preview PDF în admin**: documentul constatator se descarcă dar **preview-ul nu merge** (de investigat ruta de preview/presign pentru `order_documents` tip `constatator`, cheie S3 `onrc/<jobId>.pdf`).
 
 ---
 
