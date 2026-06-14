@@ -52,6 +52,13 @@ export const DB_SLUGS_WITH_HARDCODED_PAGE = [
   'cazier-judiciar-persoana-fizica',
   'cazier-judiciar-persoana-juridica',
   'extras-carte-funciara',
+  'cazier-fiscal',
+  'cazier-auto',
+  'certificat-nastere',
+  'certificat-casatorie',
+  'certificat-celibat',
+  'certificat-constatator',
+  'certificat-integritate',
 ] as const;
 
 /**
@@ -64,8 +71,15 @@ const SERVICE_URL_OVERRIDES: Record<string, string> = {
   'cazier-judiciar': '/servicii/cazier-judiciar-online/',
   'cazier-judiciar-persoana-fizica': '/servicii/cazier-judiciar-online/persoana-fizica/',
   'cazier-judiciar-persoana-juridica': '/servicii/cazier-judiciar-online/persoana-juridica/',
-  // WP slug parity: indexed URL is extras-DE-carte-funciara (929k impressions)
+  // WP slug parity: hardcoded SEO pages live at the indexed WP URLs (traffic + backlinks)
   'extras-carte-funciara': '/servicii/extras-de-carte-funciara/',
+  'cazier-fiscal': '/servicii/cazier-fiscal-online/',
+  'cazier-auto': '/servicii/cazier-auto-online/',
+  'certificat-nastere': '/servicii/eliberare-certificat-de-nastere/',
+  'certificat-casatorie': '/servicii/eliberare-certificat-de-casatorie/',
+  'certificat-celibat': '/servicii/eliberare-certificat-de-celibat/',
+  'certificat-constatator': '/servicii/certificat-constatator-online/',
+  'certificat-integritate': '/servicii/certificat-de-integritate-comportamentala/',
 };
 
 /** Canonical on-site URL for a service, given its DB slug. */

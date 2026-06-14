@@ -27,10 +27,17 @@ const nextConfig: NextConfig = {
         destination: '/servicii/verificare-rovinieta-online/',
         permanent: true,
       },
-      // Certificat de Integritate slug shortened (was -comportamentala).
+      // Certificat de Integritate — canonical SEO page is at the WP-parity URL
+      // /servicii/certificat-de-integritate-comportamentala/. Both the DB slug
+      // and the no-"de" variant collapse there (single hop, no redirect chain).
+      {
+        source: '/servicii/certificat-integritate',
+        destination: '/servicii/certificat-de-integritate-comportamentala/',
+        permanent: true,
+      },
       {
         source: '/servicii/certificat-integritate-comportamentala',
-        destination: '/servicii/certificat-integritate/',
+        destination: '/servicii/certificat-de-integritate-comportamentala/',
         permanent: true,
       },
       {
@@ -62,6 +69,38 @@ const nextConfig: NextConfig = {
       {
         source: '/servicii/extras-carte-funciara',
         destination: '/servicii/extras-de-carte-funciara/',
+        permanent: true,
+      },
+      // Batch 2 services — DB slug -> hardcoded WP-parity SEO URL.
+      // (/comanda/* keeps the DB slug for the order pipeline.)
+      {
+        source: '/servicii/cazier-fiscal',
+        destination: '/servicii/cazier-fiscal-online/',
+        permanent: true,
+      },
+      {
+        source: '/servicii/cazier-auto',
+        destination: '/servicii/cazier-auto-online/',
+        permanent: true,
+      },
+      {
+        source: '/servicii/certificat-nastere',
+        destination: '/servicii/eliberare-certificat-de-nastere/',
+        permanent: true,
+      },
+      {
+        source: '/servicii/certificat-casatorie',
+        destination: '/servicii/eliberare-certificat-de-casatorie/',
+        permanent: true,
+      },
+      {
+        source: '/servicii/certificat-celibat',
+        destination: '/servicii/eliberare-certificat-de-celibat/',
+        permanent: true,
+      },
+      {
+        source: '/servicii/certificat-constatator',
+        destination: '/servicii/certificat-constatator-online/',
         permanent: true,
       },
     ];

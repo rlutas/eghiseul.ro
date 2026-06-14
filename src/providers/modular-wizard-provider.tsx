@@ -25,6 +25,7 @@ import type {
   ModularStep,
   ModularStepId,
   PersonalKYCState,
+  CivilStatusState,
   CompanyKYCState,
   PropertyState,
   VehicleState,
@@ -166,6 +167,7 @@ const initialState: ModularWizardState = {
   clientType: null,
 
   personalKyc: null,
+  civilStatus: null,
   companyKyc: null,
   property: null,
   vehicle: null,
@@ -203,6 +205,7 @@ type ModularWizardAction =
   | { type: 'SET_CLIENT_TYPE'; payload: ClientType }
   | { type: 'UPDATE_CONTACT'; payload: Partial<ModularWizardState['contact']> }
   | { type: 'UPDATE_PERSONAL_KYC'; payload: Partial<PersonalKYCState> }
+  | { type: 'UPDATE_CIVIL_STATUS'; payload: Partial<CivilStatusState> }
   | { type: 'UPDATE_COMPANY_KYC'; payload: Partial<CompanyKYCState> }
   | { type: 'UPDATE_COMPANY_KYC_DOCS'; payload: UploadedDocumentState[] }
   | { type: 'UPDATE_PROPERTY'; payload: Partial<PropertyState> }
@@ -295,6 +298,7 @@ interface ModularDraftCache {
   data: {
     contact?: ModularWizardState['contact'];
     personalKyc?: PersonalKYCState | null;
+    civilStatus?: CivilStatusState | null;
     companyKyc?: CompanyKYCState | null;
     property?: PropertyState | null;
     vehicle?: VehicleState | null;
@@ -352,6 +356,9 @@ function modularWizardReducer(
       const signature = verificationConfig.signature.enabled
         ? createInitialSignatureState()
         : null;
+      const civilStatus = verificationConfig.civilStatus?.enabled
+        ? (state.civilStatus ?? {})
+        : null;
 
       return {
         ...state,
@@ -361,6 +368,7 @@ function modularWizardReducer(
         steps,
         clientType: initClientType,
         personalKyc,
+        civilStatus,
         companyKyc,
         property,
         vehicle,
@@ -462,6 +470,13 @@ function modularWizardReducer(
         personalKyc: state.personalKyc
           ? { ...state.personalKyc, ...action.payload }
           : null,
+        isDirty: true,
+      };
+
+    case 'UPDATE_CIVIL_STATUS':
+      return {
+        ...state,
+        civilStatus: { ...(state.civilStatus ?? {}), ...action.payload },
         isDirty: true,
       };
 
@@ -643,6 +658,7 @@ function modularWizardReducer(
         steps,
         contact: cache.data.contact || state.contact,
         personalKyc: cache.data.personalKyc ?? state.personalKyc,
+        civilStatus: cache.data.civilStatus ?? state.civilStatus,
         companyKyc: cache.data.companyKyc ?? state.companyKyc,
         property: cache.data.property ?? state.property,
         vehicle: cache.data.vehicle ?? state.vehicle,
@@ -729,6 +745,7 @@ function modularWizardReducer(
         steps,
         // Initialize modules based on config
         personalKyc: config?.personalKyc.enabled ? createInitialPersonalKYCState() : null,
+        civilStatus: config?.civilStatus?.enabled ? {} : null,
         companyKyc: config?.companyKyc.enabled ? createInitialCompanyKYCState() : null,
         property: config?.propertyVerification.enabled ? createInitialPropertyState() : null,
         vehicle: config?.vehicleVerification.enabled ? createInitialVehicleState() : null,
@@ -772,6 +789,7 @@ interface ModularWizardContextType {
   setClientType: (type: ClientType) => void;
   updateContact: (data: Partial<ModularWizardState['contact']>) => void;
   updatePersonalKyc: (data: Partial<PersonalKYCState>) => void;
+  updateCivilStatus: (data: Partial<CivilStatusState>) => void;
   updateCompanyKyc: (data: Partial<CompanyKYCState>) => void;
   updateCompanyKycDocuments: (docs: UploadedDocumentState[]) => void;
   updateProperty: (data: Partial<PropertyState>) => void;
@@ -977,6 +995,7 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
                 data: {
                   contact: cd.contact,
                   personalKyc: cd.personal ?? null,
+                  civilStatus: cd.civil_status ?? null,
                   companyKyc: cd.company ?? null,
                   billing: cd.billing ?? null,
                   selectedOptions,
@@ -1154,6 +1173,10 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
     dispatch({ type: 'UPDATE_PERSONAL_KYC', payload: data });
   }, []);
 
+  const updateCivilStatus = useCallback((data: Partial<CivilStatusState>) => {
+    dispatch({ type: 'UPDATE_CIVIL_STATUS', payload: data });
+  }, []);
+
   const updateCompanyKyc = useCallback((data: Partial<CompanyKYCState>) => {
     dispatch({ type: 'UPDATE_COMPANY_KYC', payload: data });
   }, []);
@@ -1262,6 +1285,7 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
       data: {
         contact: state.contact,
         personalKyc: state.personalKyc,
+        civilStatus: state.civilStatus,
         companyKyc: state.companyKyc,
         property: state.property,
         vehicle: state.vehicle,
@@ -1305,6 +1329,7 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
         contact: state.contact,
       };
       if (state.personalKyc) customerData.personal = state.personalKyc;
+      if (state.civilStatus) customerData.civil_status = state.civilStatus;
       if (state.companyKyc) customerData.company = state.companyKyc;
       if (state.property) customerData.property = state.property;
       if (state.vehicle) customerData.vehicle = state.vehicle;
@@ -1712,6 +1737,7 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
     setClientType,
     updateContact,
     updatePersonalKyc,
+    updateCivilStatus,
     updateCompanyKyc,
     updateCompanyKycDocuments,
     updateProperty,

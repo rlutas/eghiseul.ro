@@ -42,7 +42,9 @@ export const SERVICES_NAV: ServiceNavGroup[] = [
     category: 'Auto',
     items: [
       { name: 'Cazier Auto', href: serviceUrl('cazier-auto'), icon: Car },
-      { name: 'Verificare Rovinietă', href: serviceUrl('rovinieta'), icon: Ticket },
+      // Points to the verification tool (widget + the high-traffic /tools URL),
+      // not the order page — that's what users searching "verificare rovinietă" want.
+      { name: 'Verificare Rovinietă', href: '/tools/verificare-rovinieta-online/', icon: Ticket },
     ],
   },
   {

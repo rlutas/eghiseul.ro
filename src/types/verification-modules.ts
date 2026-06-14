@@ -161,6 +161,28 @@ export interface SignatureConfig {
   termsAcceptanceRequired: boolean;
 }
 
+/**
+ * Civil-status questionnaire module (certificat naștere / căsătorie / celibat).
+ * `documentType` drives labels + which fields make sense; `fields` toggles each
+ * question per service. Mirrors the data the Starea Civilă application needs.
+ */
+export interface CivilStatusConfig {
+  enabled: boolean;
+  documentType: 'nastere' | 'casatorie' | 'celibat';
+  fields: {
+    applicantType?: boolean;      // Minor / Adult (naștere)
+    maritalStatus?: boolean;      // Current marital status (celibat)
+    maritalHistory?: boolean;     // Prior marriages: yes/no → count + ended-by
+    spouseName?: boolean;         // Spouse name before marriage (căsătorie)
+    marriageDate?: boolean;       // Marriage date (căsătorie)
+    registrationPlace?: boolean;  // Office/locality that registered the act
+    birthName?: boolean;          // Name at birth (maiden / pre-marriage)
+    parentNames?: boolean;        // Father + mother full names
+    purpose?: boolean;            // Purpose of obtaining the certificate
+    countryOfUse?: boolean;       // Country where the document will be used
+  };
+}
+
 // ============================================================================
 // SERVICE VERIFICATION CONFIG
 // ============================================================================
@@ -189,6 +211,7 @@ export interface ServiceVerificationConfig {
 
   // Verification modules
   personalKyc: PersonalKYCConfig;
+  civilStatus?: CivilStatusConfig;
   companyKyc: CompanyKYCConfig;
   propertyVerification: PropertyVerificationConfig;
   vehicleVerification: VehicleVerificationConfig;
@@ -210,6 +233,7 @@ export type ModularStepId =
   | 'contact'           // Always present
   | 'client-type'       // Client type selection (PF/PJ)
   | 'personal-data'     // Personal KYC data entry
+  | 'civil-status'      // Civil-status questionnaire (birth/marriage/celibacy certs)
   | 'company-data'      // Company KYC data entry
   | 'property-data'     // Property data entry
   | 'vehicle-data'      // Vehicle data entry
@@ -229,7 +253,7 @@ export interface ModularStep {
   labelRo: string;  // Romanian label
   number: number;
   condition?: (state: ModularWizardState) => boolean;
-  moduleType: 'core' | 'personalKyc' | 'companyKyc' | 'companyDocuments' | 'property' | 'vehicle' | 'signature' | 'billing';
+  moduleType: 'core' | 'personalKyc' | 'civilStatus' | 'companyKyc' | 'companyDocuments' | 'property' | 'vehicle' | 'signature' | 'billing';
 }
 
 // ============================================================================
@@ -463,6 +487,25 @@ export interface SignatureState {
   signedAt: string;
 }
 
+/**
+ * Civil-status questionnaire state (certificat naștere / căsătorie / celibat).
+ */
+export interface CivilStatusState {
+  applicantType?: 'minor' | 'adult';
+  maritalStatus?: 'necasatorit' | 'casatorit' | 'divortat' | 'vaduv';
+  wasMarriedBefore?: boolean;
+  priorMarriagesCount?: string;
+  lastMarriageEndedBy?: 'divort' | 'deces';
+  spouseNameBeforeMarriage?: string;
+  marriageDate?: string;
+  registrationPlace?: string;
+  birthName?: string;
+  fatherName?: string;
+  motherName?: string;
+  purpose?: string;
+  countryOfUse?: string;
+}
+
 // ============================================================================
 // MODULAR WIZARD STATE
 // ============================================================================
@@ -500,6 +543,7 @@ export interface ModularWizardState {
 
   // Module states (nullable based on what's enabled)
   personalKyc: PersonalKYCState | null;
+  civilStatus: CivilStatusState | null;
   companyKyc: CompanyKYCState | null;
   property: PropertyState | null;
   vehicle: VehicleState | null;

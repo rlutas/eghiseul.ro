@@ -36,6 +36,12 @@ const ALL_STEPS: Record<ModularStepId, Omit<ModularStep, 'number' | 'condition'>
     labelRo: 'Date Personale',
     moduleType: 'personalKyc',
   },
+  'civil-status': {
+    id: 'civil-status',
+    label: 'Civil Status',
+    labelRo: 'Date Stare Civilă',
+    moduleType: 'civilStatus',
+  },
   'company-data': {
     id: 'company-data',
     label: 'Company Data',
@@ -178,6 +184,15 @@ export function buildWizardSteps(
     }
 
     steps.push(personalStep);
+  }
+
+  // Civil-status questionnaire (certificat naștere / căsătorie / celibat).
+  // Comes right after personal data so identity is captured first.
+  if (verificationConfig.civilStatus?.enabled) {
+    steps.push({
+      ...ALL_STEPS['civil-status'],
+      number: stepNumber++,
+    });
   }
 
   // Step 2c: Property Data (if property verification enabled)
