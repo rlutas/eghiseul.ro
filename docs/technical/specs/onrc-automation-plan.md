@@ -175,3 +175,41 @@ Worker-ul a trecut de la Playwright la **submit 100% prin REST API** (`worker-on
 
 ### 5. Ora afișată greșit (timezone)
 - Paginile randate server-side afișau orele în UTC. Fixat cu `timeZone: 'Europe/Bucharest'` în formatările de dată din `/admin/onrc`, `/admin/orders`, detaliul comenzii și `/comanda/status`.
+
+---
+
+## „De ce nu se eliberează IMM" — investigație completă (2026-06-14, noapte)
+
+Comanda de test `E-260614-D5TBA` (fonduri IMM) nu se elibera, deși „de bază" iese instant. Investigat A→Z, inclusiv un **test manual pe portalul oficial ONRC observat pas-cu-pas prin Playwright** (capturat fiecare apel API) + teste dry-run. Concluzii:
+
+### Două viteze la ONRC (nu e bug la noi)
+- **„De bază" (subtip 070)** → eliberare **automată, instant, 24/7** (status DONE / cod 13).
+- **„Fonduri IMM" (072)** și **„insolvență" (071)** → trec prin **backoffice-ul ONRC** (operator, în program), pot dura până la ~24h lucrătoare (status WORKING / cod 04). Concurentul „instant" are aceeași realitate — clauză explicită „livrare în max. 24h lucrătoare sau banii înapoi".
+
+### Cauza reală a blocării: MOTIV INACTIV
+- Diff complet (submisie bot vs submisie manuală care a ieșit) → **singura diferență la pasul 4**: botul trimitea motivul **„Accesare Fonduri"**, omul a ales **„Fonduri IMM"**.
+- „Accesare Fonduri" (namespace `f20a7ad7-…`) este un motiv **INACTIV** — endpoint-ul `cc-reasons-subtype-association/072` îl întoarce, dar UI-ul oficial **îl ascunde**. **Trimiterea unui motiv inactiv → ONRC rutează cererea în backoffice** (și o ține).
+- Taxa e identică pentru toate (`7515`, 30 LEI — confirmat capturând UI-ul oficial); plata (`platitor`+`complete` WALLET), pașii și structura sunt identice. Deci NU taxa, NU viteza, NU „pare bot".
+
+### Filtrul corect (sursa de adevăr a motivelor)
+UI-ul ONRC populează dropdown-ul „Document solicitat spre a servi la" din **INTERSECȚIA**:
+```
+GET /common-nomen/cc-reasons/active                          (motive ACTIVE)
+GET /common-nomen/cc-reasons/cc-reasons-subtype-association/{cod}
+```
+Asocierea singură întoarce și motive inactive/legacy. ⚠️ Namespace-ul `f20a7ad7` **NU** e un indicator de „inactiv" (ex: insolvență „Tribunal" `f20a7ad7-d1f1` e ACTIV/valid). Numere valide: **de bază 37, fonduri IMM 7, insolvență 3** (Licitație, Birou notar public, Tribunal).
+
+### Ce am reparat
+1. **Formular (DB `services.verification_config`)** — motivele per tip de raport sincronizate EXACT cu setul valid ONRC (script `scripts/sync-constatator-purposes.mjs`). Clientul nu mai poate selecta un motiv inactiv. „Altele" + text liber există DOAR la „de bază" (ca în UI).
+2. **Worker** (`worker-onrc/src/onrc/api-submit.ts`):
+   - `documentTypeOtherReason="Informare"` pentru motive normale (UI-ul nu duplică motivul acolo; doar „Altele" duce text liber).
+   - Pașii în ordinea UI **2→3→4→5** (Facturare ULTIMA, nu 2→5→3→4).
+   - **Delay uman ~0.8–1.7s** între pași (nu burst sub-secundă).
+   - `buildStep4Doc` exportat pentru teste; **filtrul `f20a7ad7` greșit a fost revertat** (excludea motive valide de insolvență).
+3. Validare: 9/9 `buildStep4Doc` + 4/4 dry-run complete (IMM/insolvență/de bază) trec.
+
+### Reguli de operare
+- Formularul = sursa de adevăr a motivelor; botul trimite ce a ales clientul (acum doar motive active).
+- Re-rulează `scripts/sync-constatator-purposes.mjs` dacă ONRC modifică lista de motive active.
+- IMM/insolvență NU se promit „instant" fără caveat — folosim „de obicei câteva minute, max 24h lucrătoare".
+- `E-260614-D5TBA` = comandă de test cu motiv inactiv → nelivrată, oprită din polling (`NEEDS_OPERATOR`), rezolvare manuală (refund/re-emitere).
