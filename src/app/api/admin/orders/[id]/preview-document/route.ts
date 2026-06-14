@@ -61,6 +61,21 @@ export async function GET(
       return new NextResponse('Order not found', { status: 404 });
     }
 
+    // ── Already a PDF (e.g. the ONRC constatator certificate, onrc/<id>.pdf) ──
+    // Serve it inline directly — no DOCX→PDF conversion, no mammoth.
+    if (/\.pdf$/i.test(s3Key)) {
+      const pdf = await downloadFile(s3Key);
+      return new NextResponse(new Uint8Array(pdf), {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/pdf',
+          'Content-Disposition': `inline; filename="${s3Key.split('/').pop() || 'document.pdf'}"`,
+          'Content-Length': String(pdf.length),
+          'Cache-Control': 'private, max-age=300',
+        },
+      });
+    }
+
     // Extract filename early (used by both PDF and HTML paths)
     const fileNameForPdf = (s3Key.split('/').pop() || 'document.docx').replace(/\.docx$/i, '.pdf');
 
