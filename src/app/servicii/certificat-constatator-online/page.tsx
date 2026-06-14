@@ -26,6 +26,7 @@ import {
 import { Service, ServiceOption, formatEstimatedDays } from '@/types/services';
 import { Footer } from '@/components/home/footer';
 import { ServiceFAQ } from '@/components/services/service-faq';
+import { SystemStatus } from '@/components/services/system-status';
 import { buildPageMetadata, buildServicePageGraph, BASE_URL } from '@/lib/seo';
 
 // Database slug (order pipeline identifier). URL path uses the WP slug
@@ -209,6 +210,9 @@ export default async function CertificatConstatatorPage() {
                   <span className="text-xs sm:text-sm font-bold text-secondary-900">4.9</span>
                   <span className="text-[10px] sm:text-xs text-neutral-500">• 450+ recenzii</span>
                 </div>
+
+                {/* Stare sistem — eliberare automată 24/7 */}
+                <SystemStatus className="mt-5 max-w-[440px]" />
               </div>
 
               {/* Price card */}

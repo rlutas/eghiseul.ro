@@ -26,6 +26,12 @@ export async function GET(req: NextRequest) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const supabase = createAdminClient() as any;
   const now = new Date().toISOString();
+
+  // Worker liveness heartbeat (best-effort) — powers the "Stare sistem" page.
+  supabase
+    .from('system_heartbeats')
+    .upsert({ name: 'onrc_worker', last_seen: now }, { onConflict: 'name' })
+    .then(() => {}, () => {});
   // Don't re-poll a request that's still generating more often than this.
   const RETRIEVE_THROTTLE_MIN = 3;
   const throttleBefore = new Date(Date.now() - RETRIEVE_THROTTLE_MIN * 60_000).toISOString();
