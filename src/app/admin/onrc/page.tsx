@@ -17,11 +17,12 @@ export const dynamic = 'force-dynamic';
 interface OnrcJob {
   id: string;
   order_id: string;
-  status: 'PENDING' | 'PROCESSING' | 'NEEDS_OPERATOR' | 'DONE' | 'FAILED';
+  status: 'PENDING' | 'PROCESSING' | 'AWAITING_DOCUMENT' | 'NEEDS_OPERATOR' | 'DONE' | 'FAILED';
   document_type: string;
   cui: string;
   company_name: string | null;
   registration_number: string | null;
+  onrc_request_id: string | null;
   document_url: string | null;
   error_message: string | null;
   retry_count: number;
@@ -32,9 +33,19 @@ interface OnrcJob {
 const STATUS_STYLE: Record<OnrcJob['status'], string> = {
   PENDING: 'bg-neutral-100 text-neutral-700',
   PROCESSING: 'bg-blue-100 text-blue-700',
+  AWAITING_DOCUMENT: 'bg-indigo-100 text-indigo-700',
   NEEDS_OPERATOR: 'bg-amber-100 text-amber-800',
   DONE: 'bg-green-100 text-green-700',
   FAILED: 'bg-red-100 text-red-700',
+};
+
+const STATUS_LABEL: Record<OnrcJob['status'], string> = {
+  PENDING: 'În așteptare',
+  PROCESSING: 'Se procesează',
+  AWAITING_DOCUMENT: 'Așteaptă documentul',
+  NEEDS_OPERATOR: 'Necesită operator',
+  DONE: 'Eliberat',
+  FAILED: 'Eșuat',
 };
 
 function friendly(orders: OnrcJob['orders']): string {
@@ -54,7 +65,7 @@ export default async function AdminOnrcPage() {
   const admin = createAdminClient() as any;
   const { data } = await admin
     .from('onrc_jobs')
-    .select('id, order_id, status, document_type, cui, company_name, registration_number, document_url, error_message, retry_count, created_at, orders(friendly_order_id)')
+    .select('id, order_id, status, document_type, cui, company_name, registration_number, onrc_request_id, document_url, error_message, retry_count, created_at, orders(friendly_order_id)')
     .order('created_at', { ascending: false })
     .limit(200);
   const jobs: OnrcJob[] = data ?? [];
@@ -75,9 +86,9 @@ export default async function AdminOnrcPage() {
       </div>
 
       <div className="flex flex-wrap gap-2">
-        {(['PENDING', 'PROCESSING', 'NEEDS_OPERATOR', 'DONE', 'FAILED'] as const).map((s) => (
+        {(['PENDING', 'PROCESSING', 'AWAITING_DOCUMENT', 'NEEDS_OPERATOR', 'DONE', 'FAILED'] as const).map((s) => (
           <span key={s} className={`rounded-full px-3 py-1 text-xs font-semibold ${STATUS_STYLE[s]}`}>
-            {s}: {counts[s] ?? 0}
+            {STATUS_LABEL[s]}: {counts[s] ?? 0}
           </span>
         ))}
       </div>
@@ -90,8 +101,9 @@ export default async function AdminOnrcPage() {
               <TableHead>Firmă (CUI)</TableHead>
               <TableHead>Tip</TableHead>
               <TableHead>Status</TableHead>
+              <TableHead>Eliberat</TableHead>
+              <TableHead>Nr. înreg. / Id cerere</TableHead>
               <TableHead>Încercări</TableHead>
-              <TableHead>Nr. înreg.</TableHead>
               <TableHead>Eroare</TableHead>
               <TableHead>Creat</TableHead>
             </TableRow>
@@ -99,7 +111,7 @@ export default async function AdminOnrcPage() {
           <TableBody>
             {jobs.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={8} className="text-center text-neutral-500 py-8">
+                <TableCell colSpan={9} className="text-center text-neutral-500 py-8">
                   Niciun job ONRC încă. Se creează automat la plata comenzilor de constatator.
                 </TableCell>
               </TableRow>
@@ -113,18 +125,20 @@ export default async function AdminOnrcPage() {
                   </TableCell>
                   <TableCell className="text-xs">{job.document_type}</TableCell>
                   <TableCell>
-                    <Badge className={`${STATUS_STYLE[job.status]} border-0`}>{job.status}</Badge>
+                    <Badge className={`${STATUS_STYLE[job.status]} border-0`}>{STATUS_LABEL[job.status]}</Badge>
                   </TableCell>
-                  <TableCell className="text-center">{job.retry_count}</TableCell>
                   <TableCell className="text-xs">
                     {job.document_url ? (
-                      <a href={job.document_url} target="_blank" rel="noreferrer" className="text-primary-600 underline">
-                        {job.registration_number ?? 'PDF'}
-                      </a>
+                      <span className="font-semibold text-green-700">✓ Da</span>
                     ) : (
-                      job.registration_number ?? '—'
+                      <span className="text-neutral-400">—</span>
                     )}
                   </TableCell>
+                  <TableCell className="text-xs">
+                    <div>{job.registration_number ?? '—'}</div>
+                    <div className="text-neutral-500">{job.onrc_request_id ?? ''}</div>
+                  </TableCell>
+                  <TableCell className="text-center">{job.retry_count}</TableCell>
                   <TableCell className="text-xs text-red-600 max-w-[240px] truncate" title={job.error_message ?? ''}>
                     {job.error_message ?? '—'}
                   </TableCell>
