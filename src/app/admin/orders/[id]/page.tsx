@@ -2427,6 +2427,7 @@ const DOC_TYPE_LABELS: Record<string, string> = {
   'cerere_eliberare': 'Cerere eliberare',
   'document_received': 'Document primit de la institutie',
   'document_final': 'Document final',
+  'constatator': 'Certificat Constatator (ONRC)',
   'invoice': 'Factura',
 };
 

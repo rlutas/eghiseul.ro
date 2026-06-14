@@ -86,10 +86,34 @@ const PJ_BILLING_OPTIONS: BillingOption[] = [
   },
 ];
 
+// Billing options for "certificat constatator pe firmă" — the certificate is for
+// a company, so default to billing that firm (PJ first), then a person. The
+// "Persoană juridică" card is prefilled with the firm from the request but the
+// CUI is editable, so billing a DIFFERENT company is just changing the CUI.
+const CONSTATATOR_BILLING_OPTIONS: BillingOption[] = [
+  {
+    source: 'company',
+    label: 'Persoană juridică',
+    description: 'Facturează pe firmă (CUI) — implicit firma din cerere, sau altă firmă',
+    icon: Building2,
+  },
+  {
+    source: 'other_pf',
+    label: 'Persoană fizică',
+    description: 'Facturează pe o persoană (CNP)',
+    icon: User,
+  },
+];
+
 export default function BillingStepModular({ onValidChange }: BillingStepProps) {
   const { state, updateBilling, prefillData } = useModularWizard();
-  const { billing, personalKyc, companyKyc, clientType } = state;
+  const { billing, personalKyc, companyKyc, clientType, constatator, serviceSlug } = state;
   const isPJOrder = clientType === 'PJ';
+  // Certificat constatator pe firmă: bill the firm by default (PJ-first), like a
+  // PJ order, even though the client type isn't "PJ".
+  const isConstatatorFirm =
+    serviceSlug === 'certificat-constatator' && constatator?.documentType !== 'pf';
+  const companyFirst = isPJOrder || isConstatatorFirm;
 
   // CUI validation state
   const [cuiLoading, setCuiLoading] = useState(false);
@@ -133,7 +157,7 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
   const companyKycCui = companyKyc?.cui;
   const companyKycName = companyKyc?.companyName;
   useEffect(() => {
-    if (isPJOrder && companyKycName && billing?.source === 'self' && !billing?.companyName) {
+    if (companyFirst && companyKycName && (billing?.source === 'self' || !billing?.source) && !billing?.companyName) {
       // Build address string from companyKyc address object
       const addr = companyKyc?.address;
       const companyAddr = addr
@@ -160,7 +184,7 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
         setCuiSuccess(true);
       }
     }
-  }, [isPJOrder, companyKycCui, companyKycName, billing?.source, billing?.companyName, companyKyc, updateBilling]);
+  }, [companyFirst, companyKycCui, companyKycName, billing?.source, billing?.companyName, companyKyc, updateBilling]);
 
   // Initialize billing with self data if available and source is 'self' (PF orders)
   useEffect(() => {
@@ -404,8 +428,12 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
     }
   }, [billing, updateBilling]);
 
-  const selectedSource = billing?.source || (isPJOrder ? 'company' : 'self');
-  const billingOptions = isPJOrder ? PJ_BILLING_OPTIONS : PF_BILLING_OPTIONS;
+  const selectedSource = billing?.source || (companyFirst ? 'company' : 'self');
+  const billingOptions = isConstatatorFirm
+    ? CONSTATATOR_BILLING_OPTIONS
+    : isPJOrder
+      ? PJ_BILLING_OPTIONS
+      : PF_BILLING_OPTIONS;
 
   return (
     <div className="space-y-8">
