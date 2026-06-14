@@ -6,6 +6,24 @@
 
 ---
 
+## ✅ IMPLEMENTAT (2026-06-14) — modul „Date Stare Civilă" + preț
+
+- **Preț:** naștere + căsătorie → **998 RON** (placeholder-ul 179 era greșit; real ~1190). Migrare `053_civil_status_module.sql`.
+- **Modul nou de wizard `civil-status`** (step „Date Stare Civilă", după Date Personale), config-driven per serviciu via `verification_config.civilStatus`:
+  - Tipuri: `src/types/verification-modules.ts` (`CivilStatusConfig`, `CivilStatusState`).
+  - Step builder + registry + loader dinamic + getModuleConfig în wizard.
+  - State în provider (`UPDATE_CIVIL_STATUS`, init, persistență în cache + `customer_data.civil_status` + restore).
+  - Componentă `src/components/orders/modules/civil-status/CivilStatusStep.tsx` (câmpuri condiționale, branching istoric marital, accesibil).
+- **Câmpuri activate per serviciu (P0 acoperit):**
+  - **Naștere:** Minor/Adult, nume tată+mamă, nume de naștere, localitate înregistrare, scop, țară folosire.
+  - **Căsătorie:** istoric marital (+count +divorț/deces), nume soț înainte de căsătorie, data căsătoriei, localitate, nume de naștere, părinți, scop, țară.
+  - **Celibat:** stare civilă actuală, istoric marital, localitate, scop, țară.
+- Verificat: build de producție verde, `tsc` 0 erori, `eslint` 0 erori.
+
+**Rămas (P1/P2):** picker limbă traducere + țară apostilă (UI peste logica existentă), livrare internațională (Poșta/DHL + țară), upload „vechiul certificat" / acte părinți, upsell celibat→naștere, a 3-a declarație. Vezi tabelul de mai jos pentru detalii.
+
+---
+
 ## 1. Structura formularelor WP (live)
 
 Toate trei sunt **WPForms cu 7 pași**, cu logică condițională de stare civilă.

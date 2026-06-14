@@ -32,10 +32,10 @@ import { buildPageMetadata, buildServicePageGraph, BASE_URL } from '@/lib/seo';
 const SERVICE_SLUG = 'certificat-nastere';
 const PAGE_PATH = '/servicii/eliberare-certificat-de-nastere/';
 const SCHEMA_SLUG = 'eliberare-certificat-de-nastere';
-const TITLE = 'Certificat de Naștere Online — Duplicat 179 RON | eGhișeul';
+const TITLE = 'Certificat de Naștere Online — Duplicat 998 RON | eGhișeul';
 const DESCRIPTION =
   'Obține online duplicatul sau copia certificatului de naștere de la Starea Civilă, ' +
-  '179 RON, fără deplasare. Util pentru certificat pierdut, din diaspora sau pentru ' +
+  '998 RON, fără deplasare. Util pentru certificat pierdut, din diaspora sau pentru ' +
   'dosar de cetățenie — îl primești pe email și prin curier.';
 const DATE_PUBLISHED = '2026-06-14';
 const DATE_MODIFIED = '2026-06-14';
@@ -92,7 +92,7 @@ const jsonLdGraph = buildServicePageGraph({
     { name: 'Certificat de Naștere', url: `${BASE_URL}${PAGE_PATH}` },
   ],
   offers: [
-    { name: 'Certificat de Naștere (Duplicat)', price: 179, url: `${BASE_URL}${PAGE_PATH}` },
+    { name: 'Certificat de Naștere (Duplicat)', price: 998, url: `${BASE_URL}${PAGE_PATH}` },
   ],
   aggregateRating: { ratingValue: 4.9, reviewCount: 450 },
 });

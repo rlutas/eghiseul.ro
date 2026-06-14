@@ -40,6 +40,12 @@ export const MODULE_REGISTRY: Record<ModularStepId, ModuleRegistryEntry> = {
     labelRo: 'Date Personale',
     componentPath: '@/components/orders/modules/personal-kyc/PersonalDataStep',
   },
+  'civil-status': {
+    stepId: 'civil-status',
+    label: 'Civil Status',
+    labelRo: 'Date Stare Civilă',
+    componentPath: '@/components/orders/modules/civil-status/CivilStatusStep',
+  },
   'company-data': {
     stepId: 'company-data',
     label: 'Company Data',
@@ -140,6 +146,7 @@ export type ModuleComponentLoader = () => Promise<{
 export const MODULE_LOADERS: Partial<Record<ModularStepId, ModuleComponentLoader>> = {
   'client-type': () => import('@/components/orders/modules/client-type/ClientTypeStep'),
   'personal-data': () => import('@/components/orders/modules/personal-kyc/PersonalDataStep'),
+  'civil-status': () => import('@/components/orders/modules/civil-status/CivilStatusStep'),
   'company-data': () => import('@/components/orders/modules/company-kyc/CompanyDataStep'),
   'property-data': () => import('@/components/orders/modules/property/PropertyDataStep'),
   'vehicle-data': () => import('@/components/orders/modules/vehicle/VehicleDataStep'),
