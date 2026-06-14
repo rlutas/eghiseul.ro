@@ -225,7 +225,7 @@ async function notifyClientDelay(supabase: any, orderId: string, backoffice = fa
   if (!email) return;
   const oid = order.friendly_order_id ?? '';
   const html = backoffice
-    ? `<p>Bună ziua,</p><p>Am depus cererea ta de certificat constatator (<strong>${oid}</strong>) la Registrul Comerțului. Acest tip de certificat (fonduri IMM / insolvență) este verificat de un operator ONRC și se eliberează de obicei <strong>în aceeași zi sau în următoarea zi lucrătoare</strong>. Îți trimitem documentul pe email imediat ce e gata.</p><p>Mulțumim,<br/>Echipa eghiseul.ro</p>`
+    ? `<p>Bună ziua,</p><p>Am depus cererea ta de certificat constatator (<strong>${oid}</strong>) la Registrul Comerțului. Se eliberează în câteva minute dacă sistemul ONRC este operațional; dacă sistemul ONRC are mentenanță sau întârzieri, în <strong>maximum 24 de ore lucrătoare</strong> (de obicei în aceeași zi). Îți trimitem documentul pe email imediat ce e gata.</p><p>Mulțumim,<br/>Echipa eghiseul.ro</p>`
     : `<p>Bună ziua,</p><p>Cererea ta de certificat constatator (<strong>${oid}</strong>) este în curs de procesare la Registrul Comerțului. Revenim cu documentul în cel mai scurt timp.</p><p>Mulțumim,<br/>Echipa eghiseul.ro</p>`;
   await sendEmail({
     to: email,
