@@ -20,6 +20,12 @@ Implementat: migrarea `056_onrc_jobs_async.sql` (coloane `onrc_request_id`/`onrc
 
 **Rămas:** seed `storageState.json` (login manual o dată) + profil Solicitant/Facturare salvat în contul ONRC + deploy worker pe Railway + reaper pentru job-uri blocate în `PROCESSING`.
 
+### 🔌 Descoperire: portalul are REST API + Keycloak → retrieve fără browser
+
+Sub SPA-ul Angular e un REST API curat (`https://myportal.onrc.ro/api/v1`) cu **Bearer JWT de la Keycloak**. Clientul `frontoffice-app` are **Direct Access Grants** activ → token-ul se ia direct cu user+parolă (`POST sso.onrc.ro/realms/onrc/.../token`, `grant_type=password`), TTL 2h. Verificat live A→Z (summary + opis + download PDF binary). Vezi `worker-onrc/ONRC-FLOW.md` + `worker-onrc/src/onrc/api.ts`.
+
+**Consecință:** **faza de retrieve (status + detalii + descărcare document) e pur HTTP, fără Playwright.** Implementată deja în worker (`api.ts`). Opțional, poate fi mutată într-un **Vercel cron** în eghiseul.ro (fără worker pentru retrieve) — necesită stocarea credențialelor ONRC în Vercel env. **Submit-ul rămâne pe browser** (formular multi-pas + plată). Decizie deschisă: retrieve în worker (acum) vs. Vercel cron.
+
 > Decizie cheie de arhitectură: botul Playwright **NU poate rula pe serverless** (Vercel functions mor în ~10–30s; fluxul ONRC durează 1–2 min cu sesiune logată). Botul e un **worker persistent separat** (proiect nou, ex. Railway) care interoghează eghiseul.ro printr-un API securizat. eghiseul.ro **NU rulează botul** — doar expune coada și primește rezultatul.
 
 ---
