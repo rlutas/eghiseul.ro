@@ -236,11 +236,14 @@ export function buildWizardSteps(
     });
   }
 
-  // Step 3: Options (always present)
-  steps.push({
-    ...ALL_STEPS['options'],
-    number: stepNumber++,
-  });
+  // Step 3: Options — skipped for constatator (no add-on options; the step would
+  // just say "Nu sunt opțiuni suplimentare"). Present for every other service.
+  if (!isConstatator) {
+    steps.push({
+      ...ALL_STEPS['options'],
+      number: stepNumber++,
+    });
+  }
 
   // Step 4: KYC Documents (if personal KYC with documents)
   // Must share the same condition as personal-data step since KYC docs verify personal identity

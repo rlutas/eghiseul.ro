@@ -12,6 +12,7 @@ import { Service } from '@/types/services';
 import { normalizeOrderOptions } from '@/lib/orders/normalize';
 import { estimateFromSelectedOptions } from '@/lib/delivery-calculator';
 import { OrderSidebar } from './order-sidebar';
+import { SystemStatus } from '@/components/services/system-status';
 
 interface PriceSidebarModularProps {
   service: Service;
@@ -75,31 +76,38 @@ export function PriceSidebarModular({ service, variant = 'full' }: PriceSidebarM
     courier: courierCode,
     includeCourierLeg: !!courierCode,
   });
-  const deliveryTimeText: string =
-    estimate.minDays === estimate.maxDays
+  // Constatator is digital + auto-issued — minutes, not business days.
+  const isConstatator = service.slug === 'certificat-constatator';
+  const deliveryTimeText: string = isConstatator
+    ? 'câteva minute (24/7)'
+    : estimate.minDays === estimate.maxDays
       ? `${estimate.minDays} zile lucrătoare`
       : `${estimate.minDays}-${estimate.maxDays} zile lucrătoare`;
 
   return (
-    <OrderSidebar
-      orderNumber={state.friendlyOrderId || ''}
-      serviceName={serviceName}
-      basePrice={priceBreakdown.basePrice}
-      options={options}
-      deliveryMethod={
-        state.delivery.method && state.delivery.price >= 0
-          ? state.delivery.methodName || state.delivery.method
-          : undefined
-      }
-      deliveryPrice={state.delivery.price}
-      totalPrice={priceBreakdown.totalPrice}
-      subtotalWithoutVat={subtotalWithoutVat}
-      vatAmount={vatAmount}
-      couponCode={state.coupon?.code ?? null}
-      discountAmount={priceBreakdown.discountAmount}
-      deliveryTimeText={deliveryTimeText}
-      urgencyActive={hasUrgentaMain}
-      variant={variant}
-    />
+    <div className="space-y-3">
+      <OrderSidebar
+        orderNumber={state.friendlyOrderId || ''}
+        serviceName={serviceName}
+        basePrice={priceBreakdown.basePrice}
+        options={options}
+        deliveryMethod={
+          state.delivery.method && state.delivery.price >= 0
+            ? state.delivery.methodName || state.delivery.method
+            : undefined
+        }
+        deliveryPrice={state.delivery.price}
+        totalPrice={priceBreakdown.totalPrice}
+        subtotalWithoutVat={subtotalWithoutVat}
+        vatAmount={vatAmount}
+        couponCode={state.coupon?.code ?? null}
+        discountAmount={priceBreakdown.discountAmount}
+        deliveryTimeText={deliveryTimeText}
+        urgencyActive={hasUrgentaMain}
+        variant={variant}
+      />
+      {/* Live ONRC system status — auto-issuance, like the competitor. */}
+      {isConstatator && variant === 'full' && <SystemStatus />}
+    </div>
   );
 }
