@@ -26,9 +26,27 @@ export async function GET(req: NextRequest) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const supabase = createAdminClient() as any;
   const now = new Date().toISOString();
+  // Don't re-poll a request that's still generating more often than this.
+  const RETRIEVE_THROTTLE_MIN = 3;
+  const throttleBefore = new Date(Date.now() - RETRIEVE_THROTTLE_MIN * 60_000).toISOString();
+  const SELECT_COLS = 'id, order_id, document_type, cui, company_name, detail, status, onrc_draft_id, onrc_request_id';
 
-  // Oldest PENDING job.
-  const { data: candidate } = await supabase
+  // Atomic claim helper — flips a specific row from `fromStatus` -> PROCESSING.
+  // Only the request that wins the conditional UPDATE gets the row (no `.or()`
+  // on mutations — see .claude/rules/database.md).
+  async function claim(id: string, fromStatus: string) {
+    const { data } = await supabase
+      .from('onrc_jobs')
+      .update({ status: 'PROCESSING', locked_at: now, last_attempt_at: now, updated_at: now })
+      .eq('id', id)
+      .eq('status', fromStatus)
+      .select(SELECT_COLS)
+      .maybeSingle();
+    return data;
+  }
+
+  // 1) Prefer the oldest PENDING job (submit phase — new orders).
+  const { data: pendingCand } = await supabase
     .from('onrc_jobs')
     .select('id')
     .eq('status', 'PENDING')
@@ -36,21 +54,24 @@ export async function GET(req: NextRequest) {
     .limit(1)
     .maybeSingle();
 
-  if (!candidate) {
-    return NextResponse.json({ success: true, data: null });
+  let claimed = pendingCand ? await claim(pendingCand.id, 'PENDING') : null;
+
+  // 2) Otherwise pick up an AWAITING_DOCUMENT job whose last poll was long
+  //    enough ago (retrieve phase — already paid, waiting on the PDF).
+  if (!claimed) {
+    const { data: awaitingCand } = await supabase
+      .from('onrc_jobs')
+      .select('id')
+      .eq('status', 'AWAITING_DOCUMENT')
+      .lt('last_attempt_at', throttleBefore)
+      .order('last_attempt_at', { ascending: true })
+      .limit(1)
+      .maybeSingle();
+    if (awaitingCand) claimed = await claim(awaitingCand.id, 'AWAITING_DOCUMENT');
   }
 
-  // Atomic claim — only the winner of PENDING -> PROCESSING gets the row back.
-  const { data: claimed } = await supabase
-    .from('onrc_jobs')
-    .update({ status: 'PROCESSING', locked_at: now, last_attempt_at: now, updated_at: now })
-    .eq('id', candidate.id)
-    .eq('status', 'PENDING')
-    .select('id, order_id, document_type, cui, company_name, detail')
-    .maybeSingle();
-
   if (!claimed) {
-    // Lost the race to another poll — tell the worker to try again.
+    // Nothing to do (or lost a race) — tell the worker to try again.
     return NextResponse.json({ success: true, data: null });
   }
 
@@ -76,6 +97,10 @@ export async function GET(req: NextRequest) {
       detail: claimed.detail,
       clientEmail,
       clientPhone,
+      // Phase discriminator: a draftId means the request was already submitted
+      // + paid → the worker runs the retrieve phase instead of submitting again.
+      status: claimed.status,
+      draftId: claimed.onrc_draft_id ?? null,
     },
   });
 }

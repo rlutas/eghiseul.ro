@@ -14,7 +14,8 @@ import { deliverOnrcResult } from '@/lib/onrc/deliver';
 export const dynamic = 'force-dynamic';
 
 const TERMINAL = ['DONE', 'FAILED', 'NEEDS_OPERATOR'] as const;
-type ResultStatus = (typeof TERMINAL)[number];
+const ALL_STATUSES = [...TERMINAL, 'AWAITING_DOCUMENT'] as const;
+type ResultStatus = (typeof ALL_STATUSES)[number];
 
 function authorized(req: NextRequest): boolean {
   const secret = process.env.ONRC_WORKER_SECRET;
@@ -33,6 +34,8 @@ export async function POST(req: NextRequest) {
     documentUrl?: string;
     registrationNumber?: string;
     errorMessage?: string;
+    requestId?: string;
+    draftId?: string;
   };
   try {
     body = await req.json();
@@ -41,13 +44,33 @@ export async function POST(req: NextRequest) {
   }
 
   const { jobId, status } = body;
-  if (!jobId || !status || !TERMINAL.includes(status)) {
+  if (!jobId || !status || !ALL_STATUSES.includes(status)) {
     return NextResponse.json({ success: false, error: 'jobId and a valid status are required' }, { status: 400 });
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const supabase = createAdminClient() as any;
   const now = new Date().toISOString();
+
+  // AWAITING_DOCUMENT — submit+pay done, PDF not generated yet. Persist the ONRC
+  // ids and park the job so the retrieve phase can poll it later (throttled by
+  // last_attempt_at — see /api/onrc/pending).
+  if (status === 'AWAITING_DOCUMENT') {
+    const patch: Record<string, unknown> = {
+      status: 'AWAITING_DOCUMENT',
+      last_attempt_at: now,
+      locked_at: null,
+      updated_at: now,
+    };
+    if (body.requestId) patch.onrc_request_id = body.requestId;
+    if (body.draftId) patch.onrc_draft_id = body.draftId;
+    if (body.registrationNumber) patch.registration_number = body.registrationNumber;
+    const { error } = await supabase.from('onrc_jobs').update(patch).eq('id', jobId);
+    if (error) {
+      return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    }
+    return NextResponse.json({ success: true });
+  }
 
   if (status === 'DONE') {
     const { data: updated, error } = await supabase

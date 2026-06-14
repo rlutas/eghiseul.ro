@@ -1,9 +1,24 @@
 # Plan: Automatizare ONRC (coadă de stări + bot)
 
-**Status:** planificat. **Ultima actualizare:** 2026-06-14.
-**Context:** vezi și `/Users/raul/.claude/plans/este-posibil-sa-construiesc-tidy-stallman.md` (handoff-ul original al botului).
+**Status:** backbone implementat; flux ONRC **mapat & testat live A→Z**. **Ultima actualizare:** 2026-06-14.
+**Context:** vezi și `/Users/raul/.claude/plans/este-posibil-sa-construiesc-tidy-stallman.md` (handoff-ul original al botului). Flux DOM live: `worker-onrc/ONRC-FLOW.md`.
 
-Un operator uman ia acum manual datele dintr-o comandă de **certificat constatator** / **furnizare informații**, aplică pe portalul **ONRC RECOM** (https://portal.onrc.ro), plătește din creditul preîncărcat, descarcă PDF-ul și îl livrează clientului. Înlocuim operatorul cu un **bot de browser automation**, în 3 faze.
+Un operator uman ia acum manual datele dintr-o comandă de **certificat constatator** / **furnizare informații**, aplică pe portalul **ONRC RECOM** (https://myportal.onrc.ro), plătește din creditul preîncărcat, descarcă PDF-ul și îl livrează clientului. Înlocuim operatorul cu un **bot de browser automation**, în 3 faze.
+
+---
+
+## ✅ Realizat — flux mapat & testat live A→Z + design ASINCRON (2026-06-14)
+
+Întreg fluxul „Certificat constatator" a fost **parcurs și executat real** pe `myportal.onrc.ro`, cu **comandă plătită din credit**: CUI 49278701 EDIGITALIZARE S.R.L., raport „de bază" / scop ANAF, **30 LEI din portofelul electronic** (WALLET), Id cerere **20262192280**, Nr. înregistrare **RC 2381836**, **PDF descărcat cu succes** (`edigitalizare_srl_j2023001097301.pdf`).
+
+**Descoperire cheie — fluxul e ASINCRON:** după plată, cererea intră „În procesare în backoffice" și documentul apare **mai târziu** (minute) în tabelul „Opis - Documente atasate cererii" de pe `/request?id=<draftId>`. Botul rulează deci în **2 faze**:
+
+1. **submit + plată** → salvează `onrc_request_id` (Id cerere) + `onrc_draft_id` → job `AWAITING_DOCUMENT`.
+2. **retrieve (poll throttled)** → reîncarcă pagina cererii până apare PDF-ul → download → `DONE` → livrare client.
+
+Implementat: migrarea `056_onrc_jobs_async.sql` (coloane `onrc_request_id`/`onrc_draft_id` + status `AWAITING_DOCUMENT`), `/api/onrc/pending` servește ambele faze (PENDING + AWAITING_DOCUMENT throttled la 3 min), `/api/onrc/result` acceptă `AWAITING_DOCUMENT`. Worker: `submitAndPay()` + `retrieveDocument()` + selectori confirmați (`worker-onrc/src/onrc/{selectors,apply}.ts`).
+
+**Rămas:** seed `storageState.json` (login manual o dată) + profil Solicitant/Facturare salvat în contul ONRC + deploy worker pe Railway + reaper pentru job-uri blocate în `PROCESSING`.
 
 > Decizie cheie de arhitectură: botul Playwright **NU poate rula pe serverless** (Vercel functions mor în ~10–30s; fluxul ONRC durează 1–2 min cu sesiune logată). Botul e un **worker persistent separat** (proiect nou, ex. Railway) care interoghează eghiseul.ro printr-un API securizat. eghiseul.ro **NU rulează botul** — doar expune coada și primește rezultatul.
 
