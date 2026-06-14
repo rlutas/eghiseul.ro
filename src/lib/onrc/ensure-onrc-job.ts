@@ -61,7 +61,9 @@ export async function ensureOnrcJobForPaidOrder(orderId: string): Promise<void> 
     const detail = {
       documentType: c.documentType ?? null,
       reportType: c.reportType ?? null,
-      purpose: c.purpose === 'Altele' ? (c.otherPurpose ?? 'Altele') : (c.purpose ?? null),
+      // Keep both so the worker can send the ONRC "Altele" option + the free text.
+      purpose: c.purpose ?? null,
+      otherPurpose: c.otherPurpose ?? null,
       period: c.period ?? null,
       periodFrom: c.periodFrom ?? null,
       periodTo: c.periodTo ?? null,
