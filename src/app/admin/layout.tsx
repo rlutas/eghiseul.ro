@@ -8,6 +8,7 @@ import { Toaster } from '@/components/ui/sonner';
 import {
   LayoutDashboard,
   ClipboardList,
+  Landmark,
   Users,
   Settings,
   LogOut,
@@ -42,6 +43,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: '/admin/orders', label: 'Comenzi', icon: ClipboardList, permission: 'orders.view' },
   { href: '/admin/orders?status=abandoned', label: 'Abandonuri', icon: UserX, permission: 'orders.view' },
   { href: '/admin/registru', label: 'Registru', icon: BookOpen, permission: 'settings.manage' },
+  { href: '/admin/onrc', label: 'ONRC', icon: Landmark, permission: 'orders.view' },
   { href: '/admin/coupons', label: 'Cupoane', icon: Ticket, permission: 'settings.manage' },
   { href: '/admin/users', label: 'Utilizatori', icon: Users, permission: 'users.manage' },
   { href: '/admin/settings', label: 'Setari', icon: Settings, permission: 'settings.manage' },
