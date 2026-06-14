@@ -273,11 +273,15 @@ export function buildWizardSteps(
     });
   }
 
-  // Step 6: Delivery (always present)
-  steps.push({
-    ...ALL_STEPS['delivery'],
-    number: stepNumber++,
-  });
+  // Step 6: Delivery — skipped for digital-only services (Certificat Constatator
+  // is delivered by email + in the client's account, no courier). For everything
+  // else it's always present.
+  if (!isConstatator) {
+    steps.push({
+      ...ALL_STEPS['delivery'],
+      number: stepNumber++,
+    });
+  }
 
   // Step 7: Billing (always present - invoice selection)
   // Last step in the wizard — submitting transitions the user to the
