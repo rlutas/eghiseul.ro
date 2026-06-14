@@ -203,11 +203,12 @@ const STATUS_CONFIG: Record<string, { label: string; variant: 'default' | 'secon
 // ---------- Helpers ----------
 
 function extractCustomerData(cd: AnyObj | null) {
-  if (!cd) return { contact: null, personal: null, company: null, billing: null, clientType: 'pf' as string, billsToCompany: false };
+  if (!cd) return { contact: null, personal: null, company: null, billing: null, constatator: null, clientType: 'pf' as string, billsToCompany: false };
   const contact = cd.contact || null;
   const personal = cd.personalData || cd.personal || null;
   const company = cd.companyData || cd.company || null;
   const billing = cd.billing || null;
+  const constatator = cd.constatator || null; // ONRC certificat constatator: documentType/reportType/purpose/…
 
   // clientType = WHO the service is for (PF / PJ). NOT inferred from billing —
   // a Cazier PF customer can ask the invoice to go to their employer (PJ
@@ -227,7 +228,7 @@ function extractCustomerData(cd: AnyObj | null) {
   const billsToCompany = clientType === 'pf'
     && (billing?.type === 'persoana_juridica' || !!billing?.companyName || !!billing?.cui);
 
-  return { contact, personal, company, billing, clientType, billsToCompany };
+  return { contact, personal, company, billing, constatator, clientType, billsToCompany };
 }
 
 function getCustomerDisplayName(contact: AnyObj | null, personal: AnyObj | null, company: AnyObj | null, billing: AnyObj | null, isPJ: boolean): string {
@@ -636,7 +637,7 @@ export default function AdminOrderDetailPage() {
   // ---------- Derived Data ----------
 
   const displayOrderNumber = order.friendly_order_id || order.order_number;
-  const { contact, personal, company, billing, clientType, billsToCompany } = extractCustomerData(order.customer_data);
+  const { contact, personal, company, billing, constatator, clientType, billsToCompany } = extractCustomerData(order.customer_data);
   const isPJ = clientType === 'pj';
   const status = order.status || 'draft';
   const statusConfig = STATUS_CONFIG[status] || { label: status, variant: 'outline' as const };
@@ -1104,6 +1105,37 @@ export default function AdminOrderDetailPage() {
           </CardHeader>
           <CardContent className="space-y-3">
             <InfoRow label="Serviciu" value={order.services?.name ? stripEntitySuffix(order.services.name) : 'N/A'} />
+            {/* Certificat constatator (ONRC): what the bot actually requested —
+                firm + CUI, document type, report type, purpose, period/person.
+                Sourced from customer_data.constatator + billing/company. */}
+            {constatator && (() => {
+              const c = constatator as AnyObj;
+              const firmName = company?.companyName || billing?.companyName || null;
+              const firmCui = company?.cui || billing?.cui || null;
+              const docTypeLabel =
+                c.documentType === 'istoric' ? 'Pe firmă (CUI) — cu istoric'
+                : c.documentType === 'pf' ? 'Persoană fizică (CNP)'
+                : 'Pe firmă (CUI) — de bază';
+              const purposeText = /^altele$/i.test(String(c.purpose ?? ''))
+                ? `Altele${c.otherPurpose ? ` — ${c.otherPurpose}` : ''}`
+                : (c.purpose || '—');
+              const periodText =
+                c.period === 'founding' ? 'De la înființare până în prezent'
+                : c.period === 'custom' ? `${c.periodFrom ?? '?'} → ${c.periodTo ?? '?'}`
+                : null;
+              return (
+                <>
+                  {firmName && <InfoRow label="Firmă" value={firmName} />}
+                  {firmCui && <InfoRow label="CUI" value={String(firmCui)} mono />}
+                  <InfoRow label="Tip document" value={docTypeLabel} />
+                  {c.reportType && <InfoRow label="Tip raport" value={String(c.reportType)} />}
+                  <InfoRow label="Scop / motiv (de ce a aplicat)" value={String(purposeText)} />
+                  {periodText && <InfoRow label="Perioadă" value={periodText} />}
+                  {c.requesterName && <InfoRow label="Solicitant (PF)" value={String(c.requesterName)} />}
+                  {c.requesterCnp && <InfoRow label="CNP solicitant" value={String(c.requesterCnp)} mono />}
+                </>
+              );
+            })()}
             {/* Real per-step delivery estimate (sums urgenta + traducere +
                 legalizare + apostila*) so admin sees the same window the
                 customer was promised. Falls back to `service.estimated_days`
