@@ -9,6 +9,7 @@
  */
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { deliverOnrcResult } from '@/lib/onrc/deliver';
 
 export const dynamic = 'force-dynamic';
 
@@ -49,7 +50,7 @@ export async function POST(req: NextRequest) {
   const now = new Date().toISOString();
 
   if (status === 'DONE') {
-    const { error } = await supabase
+    const { data: updated, error } = await supabase
       .from('onrc_jobs')
       .update({
         status: 'DONE',
@@ -59,13 +60,16 @@ export async function POST(req: NextRequest) {
         error_message: null,
         updated_at: now,
       })
-      .eq('id', jobId);
+      .eq('id', jobId)
+      .select('order_id')
+      .maybeSingle();
     if (error) {
       return NextResponse.json({ success: false, error: error.message }, { status: 500 });
     }
-    // TODO (worker delivery step): attach the PDF to the order's documents and
-    // email the client. Wired together with the worker once the real ONRC PDF
-    // flow can be tested end-to-end.
+    // Deliver to the customer: attach the PDF to the order + email them.
+    if (updated?.order_id) {
+      await deliverOnrcResult(updated.order_id, body.documentUrl, body.registrationNumber);
+    }
     return NextResponse.json({ success: true });
   }
 

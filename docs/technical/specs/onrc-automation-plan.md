@@ -78,7 +78,8 @@ Reguli ferme:
 
 1. ✅ **Faza 1 — DONE (2026-06-14):** tabelă `onrc_jobs` (migrarea 055) + creare job idempotentă la plata confirmată (`lib/onrc/ensure-onrc-job.ts`, apelată din webhook-ul Stripe + `confirm-payment`, lângă crearea facturii). Unique index pe `order_id` = un job/comandă.
 2. ✅ **Faza 2 — DONE (2026-06-14):** `GET /api/onrc/pending` (claim atomic PENDING→PROCESSING, doar filtre `.eq` — verificat contra producției) + `POST /api/onrc/result` (DONE/FAILED/NEEDS_OPERATOR + retry_count). Auth: `Authorization: Bearer ${ONRC_WORKER_SECRET}`. **⚠️ De setat `ONRC_WORKER_SECRET` în Vercel** înainte ca worker-ul să le folosească.
-3. ⏳ Admin: o mică listă în `/admin` cu job-urile ONRC (status, retry, NEEDS_OPERATOR) pentru vizibilitate. ~0.5 zi.
-4. ⏳ **Faza 3** (worker Playwright) — proiect nou pe Railway. ~2-3 zile (mapare selectori LIVE pe contul ONRC logat). Contractul API e gata; mai rămâne pasul de **livrare** din `/api/onrc/result` (atașare PDF la comandă + email client — marcat `TODO` în endpoint, de cablat cu worker-ul când se poate testa PDF-ul real).
+3. ✅ **Admin — DONE:** listă read-only `/admin/onrc` (contoare pe status, firmă/CUI, tip, retry, nr. înregistrare/PDF, eroare) pentru vizibilitate operator.
+4. ✅ **Livrare — DONE:** `POST /api/onrc/result` pe `DONE` → `lib/onrc/deliver.ts`: atașează PDF-ul la comandă (`order_documents`, `visible_to_client`), marchează `document_ready` și trimite email clientului (idempotent).
+5. ⏳ **Faza 3 — worker Playwright** (proiect nou `worker-onrc/` pe Railway). Schelet complet + typecheck curat; **rămâne maparea selectorilor LIVE** pe contul ONRC logat (`src/onrc/selectors.ts`) + deploy.
 
-**Următorul pas concret:** Faza 3 (worker) + pasul de livrare în `/result` + lista admin.
+**Următorul pas concret:** mapare selectori ONRC (cu cont + `HEADLESS=false`) + deploy worker pe Railway.
