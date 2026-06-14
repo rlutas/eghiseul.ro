@@ -1,6 +1,26 @@
 # eGhiseul.ro - Status Curent
 
-**Data:** 2026-06-12 (fix lock facturi `.or()` + cerere ANAF cazier fiscal + T&C semnătură + admin polish)
+**Data:** 2026-06-14 (SEO migration toate serviciile + module wizard stare-civilă & constatator + tool rovinietă + plan ONRC)
+
+---
+
+## ✅ SESIUNE 2026-06-13/14 — SEO migration completă + formulare de comandă fidele WP + plan automatizare ONRC
+
+**🟣 Pagini SEO hardcodate pentru TOATE serviciile (slug parity WP).** Pe baza analizei GSC 2026-06-13 (`docs/seo/gsc-data/SERVICE-RANKING-PLAYBOOK-2026-06-13.md`), construite/optimizate paginile pentru cazier judiciar (hub+PF+PJ), extras carte funciară, cazier fiscal, certificat naștere/căsătorie/celibat, certificat constatator, certificat integritate, cazier auto. Fiecare: `@graph` complet (Org+WebSite+Breadcrumb+Service+Offer+AggregateRating 4.9/450+WebPage+reviewedBy), meta diferențiată anti-canibalizare, proză indexabilă pe clusterele GSC, bloc onest „gratuit vs noi". Documentate per serviciu în `docs/services/<slug>/`.
+
+**🔄 Anti-canibalizare + navigare.** `serviceUrl()` (slug DB → URL canonic); 308-redirect DB-slug→WP-slug în `next.config.ts`; slug-uri DB excluse din sitemap-ul dinamic (`DB_SLUGS_WITH_HARDCODED_PAGE`); dedup index `/servicii`. **Mega-menu „Servicii"** în header (desktop disclosure accesibil + mobil accordion, iconițe lucide), `config/services-nav.ts`. Recenzii actualizate la **450+** peste tot.
+
+**🟣 Formulare de comandă fidele WP (Playwright + WPForms exports).** Analizate formularele live (`docs/technical/specs/wp-form-gap-analysis-2026-06-14.md`). Două module noi de wizard:
+- **`civil-status`** (migrarea 053) — pas „Date Stare Civilă" pentru naștere/căsătorie/celibat, config-driven per serviciu. Reproduce fidel logica WP: născut/căsătorit în RO vs străinătate + ⚠️ avertismente transcriere, divorț recunoscut, renunțare cetățenie → notă CNP, istoric marital, nume de naștere/părinți, „vechiul certificat" (pierdut/deteriorat/...), + specifice celibat (localitate naștere, naționalitate, „în vederea căsătoriei în străinătate").
+- **`constatator`** (migrarea 054) — pas „Detalii Certificat" pentru certificat constatator. **Tip document price-bearing** (suprascrie base price): pe Firmă/PF 119.99 vs cu Istoric 499.99. Plus tip raport, scop „servi la", perioadă, solicitant nume+CNP.
+
+**💰 Preț:** naștere + căsătorie → **998 RON** (179 era placeholder; real ~1190).
+
+**🚗 Tool rovinietă:** `/tools/verificare-rovinieta-online/` (294k clicks) cu widget-ul live **erovinieta.net** embed-uit (iframe + postMessage auto-resize) + conținut SEO + schema WebApplication.
+
+**📋 Plan automatizare ONRC:** `docs/technical/specs/onrc-automation-plan.md` — coadă de stări `onrc_jobs` + API `/api/onrc/{pending,result}` + worker Playwright separat (Railway). Formularul constatator captează deja datele pentru bot. **Următor: Faza 1+2 (coada + API).**
+
+**Verificat:** build de producție verde, `tsc` + `eslint` 0 erori. Merged direct în `main` (PR #1-#3 + commit-uri directe).
 
 ---
 

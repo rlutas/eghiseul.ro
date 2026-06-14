@@ -164,6 +164,10 @@
 | **Ce am de făcut** | [`../DEVELOPMENT_MASTER_PLAN.md`](../DEVELOPMENT_MASTER_PLAN.md) |
 | **Cum funcționează API-ul** | [`technical/api/`](technical/api/) |
 | **Cum adaug un serviciu nou** | [`technical/specs/modular-wizard-guide.md`](technical/specs/modular-wizard-guide.md) |
+| **📁 Documentație per serviciu (folder fiecare)** | [`services/`](services/) |
+| **SEO migration — playbook GSC per serviciu** | [`seo/gsc-data/SERVICE-RANKING-PLAYBOOK-2026-06-13.md`](seo/gsc-data/SERVICE-RANKING-PLAYBOOK-2026-06-13.md) |
+| **Formulare comandă vs WP (Playwright) + module stare-civilă/constatator** | [`technical/specs/wp-form-gap-analysis-2026-06-14.md`](technical/specs/wp-form-gap-analysis-2026-06-14.md) |
+| **🤖 Plan automatizare ONRC (coadă stări + bot)** | [`technical/specs/onrc-automation-plan.md`](technical/specs/onrc-automation-plan.md) |
 | **KYC: Verificare Identitate & Face Match** | [`technical/specs/kyc-identity-verification.md`](technical/specs/kyc-identity-verification.md) |
 | **Re-upload poză după comandă (selfie)** | [`technical/specs/post-order-photo-reupload.md`](technical/specs/post-order-photo-reupload.md) |
 | **Plăți & Facturare (Stripe + Oblio)** | [`technical/specs/stripe-oblio-payment-invoicing.md`](technical/specs/stripe-oblio-payment-invoicing.md) |
