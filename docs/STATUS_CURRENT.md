@@ -1,6 +1,20 @@
 # eGhiseul.ro - Status Curent
 
-**Data:** 2026-06-14 (SEO migration toate serviciile + module wizard stare-civilă & constatator + tool rovinietă + plan ONRC)
+**Data:** 2026-06-15 (ONRC constatator IMM/insolvență FUNCȚIONAL în producție)
+
+---
+
+## ✅ 2026-06-15 — ONRC constatator funcțional A→Z pentru TOATE tipurile
+
+**Comanda live `E-260615-GL74D`** (fonduri IMM, motiv „Primãrie"): depusă 21:13 → emisă + livrată automat 21:16 = **~3 minute**. Job `DONE`, PDF atașat (`order_documents` tip `constatator`), email client, `document_ready`.
+
+**Problema rezolvată:** botul/formularul trimiteau un motiv **INACTIV** („Accesare Fonduri") pe care portalul ONRC îl ascunde pentru IMM → ONRC ruta cererea în backoffice și o bloca. Filtrul corect = `cc-reasons/active` ∩ asociere pe subtip. Detalii complete: `docs/technical/specs/onrc-automation-plan.md` (secțiunea „De ce nu se eliberează IMM").
+
+**Ce s-a reparat:**
+- Formular sincronizat cu motivele valide ONRC (de bază 37, IMM 7, insolvență 3) — `scripts/sync-constatator-purposes.mjs`.
+- Worker: `documentTypeOtherReason="Informare"`, ordinea pașilor 2→3→4→5, delay uman între pași, anti-dublă-plată (checkpoint draft), NC pentru contabilitate.
+- Două viteze ONRC: „de bază" instant; IMM/insolvență prin backoffice (de obicei minute, max 24h lucrătoare).
+- Facturare constatator pe firmă: implicit Persoană juridică (firma). Admin: doc ONRC etichetat „Certificat Constatator (ONRC)". Timezone Europe/Bucharest peste tot.
 
 ---
 

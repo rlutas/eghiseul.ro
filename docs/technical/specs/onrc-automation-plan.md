@@ -1,6 +1,6 @@
 # Plan: Automatizare ONRC (coadă de stări + bot)
 
-**Status:** ✅ **A→Z FUNCȚIONAL prin API** (submit + plată + retrieve + livrare). **Ultima actualizare:** 2026-06-14.
+**Status:** ✅ **A→Z FUNCȚIONAL prin API — confirmat în producție** pentru toate tipurile (de bază / fonduri IMM / insolvență). Comanda live `E-260615-GL74D` (IMM, motiv „Primãrie") a fost depusă + plătită + emisă + livrată automat în **~3 minute** (21:13 → 21:16). **Ultima actualizare:** 2026-06-15.
 **Context:** vezi și `/Users/raul/.claude/plans/este-posibil-sa-construiesc-tidy-stallman.md` (handoff-ul original al botului). Flux DOM live: `worker-onrc/ONRC-FLOW.md`.
 
 Un operator uman ia acum manual datele dintr-o comandă de **certificat constatator** / **furnizare informații**, aplică pe portalul **ONRC RECOM** (https://myportal.onrc.ro), plătește din creditul preîncărcat, descarcă PDF-ul și îl livrează clientului. Înlocuim operatorul cu un **bot de browser automation**, în 3 faze.
@@ -213,3 +213,10 @@ Asocierea singură întoarce și motive inactive/legacy. ⚠️ Namespace-ul `f2
 - Re-rulează `scripts/sync-constatator-purposes.mjs` dacă ONRC modifică lista de motive active.
 - IMM/insolvență NU se promit „instant" fără caveat — folosim „de obicei câteva minute, max 24h lucrătoare".
 - `E-260614-D5TBA` = comandă de test cu motiv inactiv → nelivrată, oprită din polling (`NEEDS_OPERATOR`), rezolvare manuală (refund/re-emitere).
+
+### ✅ Confirmare finală (2026-06-15) — funcțional în producție
+- **`E-260615-GL74D`** (fonduri IMM, motiv valid „Primãrie"): depusă 21:13 → document gata 21:16 = **~3 minute**, livrat automat (PDF atașat la comandă `order_documents` tip `constatator`, `document_ready`, email client). Confirmă că fix-ul de motive a rezolvat blocajul.
+- Validări: dry-run 4/4 (IMM/insolvență/de bază) + `buildStep4Doc` 9/9 motive valide, CI verde, 1064 teste.
+- Admin: documentul ONRC apare la „Procesare comandă" cu eticheta **„Certificat Constatator (ONRC)"** (Previzualizare + Descarcă). Pagina încarcă documentele la deschidere → refresh dacă era deschisă înainte de livrare.
+- Facturare constatator pe firmă: implicit **Persoană juridică** (firma din cerere, CUI editabil) → apoi Persoană fizică.
+- Mesaj livrare (formular + email): „câteva minute dacă sistemul ONRC e operațional; altfel max 24h lucrătoare (de obicei aceeași zi)".
