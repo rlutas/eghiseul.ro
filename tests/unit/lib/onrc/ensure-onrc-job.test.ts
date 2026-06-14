@@ -87,7 +87,9 @@ describe('ensureOnrcJobForPaidOrder', () => {
     expect((job.detail as Record<string, unknown>).requesterCnp).toBe('1900101080010');
   });
 
-  it('resolves "Altele" purpose to the free-text value', async () => {
+  it('keeps "Altele" purpose AND the free-text reason as separate fields', async () => {
+    // The worker needs both: `purpose` = 'Altele' to select the ONRC "Altele"
+    // option, and `otherPurpose` for the documentTypeOtherReason free text.
     orderRow = order({
       customer_data: {
         company: { cui: 'RO9', companyName: 'X' },
@@ -96,7 +98,9 @@ describe('ensureOnrcJobForPaidOrder', () => {
       },
     });
     await ensureOnrcJobForPaidOrder('order-1');
-    expect((insertedJobs[0].detail as Record<string, unknown>).purpose).toBe('dosar special');
+    const detail = insertedJobs[0].detail as Record<string, unknown>;
+    expect(detail.purpose).toBe('Altele');
+    expect(detail.otherPurpose).toBe('dosar special');
   });
 
   it('does NOT queue a non-ONRC service', async () => {

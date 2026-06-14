@@ -639,6 +639,14 @@ export default function AdminOrderDetailPage() {
   const displayOrderNumber = order.friendly_order_id || order.order_number;
   const { contact, personal, company, billing, constatator, clientType, billsToCompany } = extractCustomerData(order.customer_data);
   const isPJ = clientType === 'pj';
+  // Certificat constatator on a firm (documentType firma/istoric) is a company
+  // document even though no PF/PJ "clientType" is collected — show a firm badge
+  // instead of the misleading "Persoana Fizica".
+  const constatatorFirm =
+    order.services?.slug === 'certificat-constatator' &&
+    (constatator as AnyObj | null)?.documentType !== 'pf';
+  const constatatorFirmName =
+    company?.companyName || billing?.companyName || (constatator as AnyObj | null)?.companyName || null;
   const status = order.status || 'draft';
   const statusConfig = STATUS_CONFIG[status] || { label: status, variant: 'outline' as const };
   const customerName = getCustomerDisplayName(contact, personal, company, billing, isPJ);
@@ -695,13 +703,17 @@ export default function AdminOrderDetailPage() {
                   Vezi ca clientul ↗
                 </a>
               )}
-              {isPJ && (
+              {constatatorFirm ? (
+                <Badge variant="secondary" className="text-sm px-3 py-1">
+                  <Building2 className="h-3.5 w-3.5 mr-1" />
+                  Firmă{constatatorFirmName ? ` · ${constatatorFirmName}` : ' / PJ'}
+                </Badge>
+              ) : isPJ ? (
                 <Badge variant="secondary" className="text-sm px-3 py-1">
                   <Building2 className="h-3.5 w-3.5 mr-1" />
                   Persoana Juridica
                 </Badge>
-              )}
-              {!isPJ && (
+              ) : (
                 <Badge variant="outline" className="text-sm px-3 py-1">
                   <User className="h-3.5 w-3.5 mr-1" />
                   Persoana Fizica
