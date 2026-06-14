@@ -172,9 +172,13 @@ export interface CivilStatusConfig {
   fields: {
     applicantType?: boolean;      // Minor / Adult (naștere)
     birthPlace?: boolean;         // Born in RO / abroad — warns about transcription
+    birthLocality?: boolean;      // Birth locality + county/sector (celibat)
+    nationality?: boolean;        // Nationality (celibat)
     currentlyMarried?: boolean;   // "Sunteți căsătorit?" (naștere, adults)
     maritalStatus?: boolean;      // Current marital status (celibat)
     maritalHistory?: boolean;     // Prior marriages: yes/no → count + ended-by
+    stillHaveOldMarriageCert?: boolean; // "Mai dețineți vechiul certificat de căsătorie?"
+    marriageAbroadIntent?: boolean; // "Solicitați în vederea căsătoriei în străinătate?" (celibat)
     marriagePlace?: boolean;      // Marriage in RO / abroad — warns about transcription
     spouseName?: boolean;         // Spouse name before marriage (căsătorie)
     marriageDate?: boolean;       // Marriage date (căsătorie)
@@ -498,11 +502,16 @@ export interface SignatureState {
 export interface CivilStatusState {
   applicantType?: 'minor' | 'adult';
   bornAbroad?: boolean;             // Nașterea a avut loc în străinătate
+  birthLocality?: string;           // Localitatea în care v-ați născut (celibat)
+  birthCounty?: string;             // Județul / Sectorul în care v-ați născut (celibat)
+  nationality?: string;             // Naționalitatea (celibat)
   currentlyMarried?: boolean;       // Sunteți căsătorit(ă)?
   maritalStatus?: 'necasatorit' | 'casatorit' | 'divortat' | 'vaduv';
   wasMarriedBefore?: boolean;
   priorMarriagesCount?: string;
   lastMarriageEndedBy?: 'divort' | 'deces';
+  stillHaveOldMarriageCert?: boolean; // Mai dețineți vechiul certificat de căsătorie?
+  marriageAbroadIntent?: boolean;   // Solicitați în vederea căsătoriei în străinătate?
   marriageAbroad?: boolean;         // Căsătoria a avut loc în străinătate
   spouseNameBeforeMarriage?: string;
   marriageDate?: string;

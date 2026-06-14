@@ -21,7 +21,10 @@
 - **Logică „străinătate" fidelă WPForms** (din `wpforms-form-export-06-14-2026.json`): „Nașterea/Căsătoria a avut loc în România/Străinătate" + ⚠️ avertismente de **transcriere** (dacă actul din străinătate nu e transcris în RO, nu se poate elibera); divorț în străinătate → trebuie recunoscut în RO; „Ați renunțat la cetățenia română?" → ℹ️ certificatul nu va mai avea CNP. NB: WP nu folosește un toggle generic „cetățean străin" la aceste servicii — folosește locul evenimentului + transcrierea.
 - Verificat: build de producție verde, `tsc` 0 erori, `eslint` 0 erori.
 
-**Rămas (P1/P2):** picker limbă traducere + țară apostilă (UI peste logica existentă), livrare internațională (Poșta/DHL + țară), upload „vechiul certificat" / acte părinți, upsell celibat→naștere, a 3-a declarație. Vezi tabelul de mai jos pentru detalii.
+- **Celibat — câmpuri specifice adăugate** (verificat pe export-ul WPForms): localitate+județ naștere, naționalitate, „Mai dețineți vechiul certificat de căsătorie?", „Solicitați în vederea căsătoriei în străinătate?". Scos `renouncedCitizenship` (nu apare la celibat).
+- **Naștere + căsătorie:** câmp „Vechiul certificat mi-a fost: Pierdut/Deteriorat/Furat/Altul".
+
+**Rămas (P1/P2):** picker limbă traducere + țară apostilă (UI peste logica existentă), livrare internațională (Poșta/DHL + țară), upload „vechiul certificat" / acte părinți, **upsell celibat→naștere** (cross-sell cu bundling — feature separat: câmpurile „Dețineți certificatul de naștere nou (albastru)?" + „Doriți să vă ajutăm cu obținerea certificatului de naștere?" [WP 96/97] declanșează un sub-flux de comandă certificat naștere), a 3-a declarație. Vezi tabelul de mai jos pentru detalii.
 
 ---
 

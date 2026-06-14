@@ -112,6 +112,11 @@ export default function CivilStatusStep({ config, onValidChange }: CivilStatusSt
     const checks: boolean[] = [];
     if (fields.applicantType) checks.push(!!cs.applicantType);
     if (fields.birthPlace) checks.push(cs.bornAbroad !== undefined);
+    if (fields.birthLocality) {
+      checks.push(!!cs.birthLocality?.trim());
+      checks.push(!!cs.birthCounty?.trim());
+    }
+    if (fields.nationality) checks.push(!!cs.nationality?.trim());
     if (showCurrentlyMarried) checks.push(cs.currentlyMarried !== undefined);
     if (fields.maritalStatus) checks.push(!!cs.maritalStatus);
     if (showMaritalHistory) {
@@ -119,8 +124,10 @@ export default function CivilStatusStep({ config, onValidChange }: CivilStatusSt
       if (cs.wasMarriedBefore) {
         checks.push(!!cs.priorMarriagesCount?.trim());
         checks.push(!!cs.lastMarriageEndedBy);
+        if (fields.stillHaveOldMarriageCert) checks.push(cs.stillHaveOldMarriageCert !== undefined);
       }
     }
+    if (fields.marriageAbroadIntent) checks.push(cs.marriageAbroadIntent !== undefined);
     if (showMarriagePlace) checks.push(cs.marriageAbroad !== undefined);
     if (fields.spouseName) checks.push(!!cs.spouseNameBeforeMarriage?.trim());
     if (fields.marriageDate) checks.push(!!cs.marriageDate?.trim());
@@ -174,6 +181,35 @@ export default function CivilStatusStep({ config, onValidChange }: CivilStatusSt
                 nu putem elibera documentul solicitat.
               </Notice>
             )}
+          </Field>
+        )}
+
+        {fields.birthLocality && (
+          <div className="grid sm:grid-cols-2 gap-4">
+            <Field label="Localitatea în care v-ați născut" required>
+              <Input
+                value={cs.birthLocality ?? ''}
+                onChange={(e) => updateCivilStatus({ birthLocality: e.target.value })}
+                placeholder="Oraș / comună"
+              />
+            </Field>
+            <Field label="Județul / Sectorul în care v-ați născut" required>
+              <Input
+                value={cs.birthCounty ?? ''}
+                onChange={(e) => updateCivilStatus({ birthCounty: e.target.value })}
+                placeholder="Județ / sector"
+              />
+            </Field>
+          </div>
+        )}
+
+        {fields.nationality && (
+          <Field label="Naționalitatea" required>
+            <Input
+              value={cs.nationality ?? ''}
+              onChange={(e) => updateCivilStatus({ nationality: e.target.value })}
+              placeholder="ex: română"
+            />
           </Field>
         )}
 
@@ -235,6 +271,17 @@ export default function CivilStatusStep({ config, onValidChange }: CivilStatusSt
                       Dacă divorțul a fost pronunțat în străinătate, el trebuie recunoscut/transcris în România
                       pentru a putea elibera documentul. Altfel, căsătoria anterioară figurează ca fiind în vigoare.
                     </Notice>
+                  </div>
+                )}
+                {fields.stillHaveOldMarriageCert && (
+                  <div className="sm:col-span-2">
+                    <Field label="Mai dețineți vechiul certificat de căsătorie?" required>
+                      <ChoiceRow
+                        current={cs.stillHaveOldMarriageCert === undefined ? undefined : cs.stillHaveOldMarriageCert ? 'da' : 'nu'}
+                        onChange={(v) => updateCivilStatus({ stillHaveOldMarriageCert: v === 'da' })}
+                        options={YES_NO}
+                      />
+                    </Field>
                   </div>
                 )}
               </div>
@@ -345,6 +392,16 @@ export default function CivilStatusStep({ config, onValidChange }: CivilStatusSt
                 acesta se anulează odată cu renunțarea la cetățenia română.
               </Notice>
             )}
+          </Field>
+        )}
+
+        {fields.marriageAbroadIntent && (
+          <Field label="Solicitați certificatul în vederea încheierii căsătoriei în străinătate?" required>
+            <ChoiceRow
+              current={cs.marriageAbroadIntent === undefined ? undefined : cs.marriageAbroadIntent ? 'da' : 'nu'}
+              onChange={(v) => updateCivilStatus({ marriageAbroadIntent: v === 'da' })}
+              options={YES_NO}
+            />
           </Field>
         )}
 

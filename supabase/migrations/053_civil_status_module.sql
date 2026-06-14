@@ -51,8 +51,9 @@ SET verification_config = verification_config || jsonb_build_object(
     'enabled', true,
     'documentType', 'celibat',
     'fields', jsonb_build_object(
-      'maritalStatus', true, 'maritalHistory', true, 'marriagePlace', true,
-      'registrationPlace', true, 'renouncedCitizenship', true, 'purpose', true,
+      'birthLocality', true, 'nationality', true, 'maritalStatus', true,
+      'maritalHistory', true, 'stillHaveOldMarriageCert', true, 'marriagePlace', true,
+      'marriageAbroadIntent', true, 'registrationPlace', true, 'purpose', true,
       'countryOfUse', true
     )
   )
