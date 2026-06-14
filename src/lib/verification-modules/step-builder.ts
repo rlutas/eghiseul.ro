@@ -138,16 +138,31 @@ export function buildWizardSteps(
   const showPersonalData = verificationConfig.personalKyc.enabled;
   const showCompanyData = verificationConfig.companyKyc.enabled &&
     (!hasClientTypeSelection || clientType === 'PJ');
+  const isConstatator = !!verificationConfig.constatator?.enabled;
 
-  // Step 2: Company Data (for PJ - comes before personal data)
+  // Certificat Constatator: the document type is chosen FIRST, because it drives
+  // whether we capture a CUI (firmă / istoric) or a CNP (persoană fizică).
+  if (isConstatator) {
+    steps.push({
+      ...ALL_STEPS['constatator'],
+      number: stepNumber++,
+    });
+  }
+
+  // Company Data (CUI). For constatator it only applies to CUI document types
+  // (firmă / istoric) — persoană fizică captures the CNP in the constatator step.
   if (showCompanyData) {
     const companyStep: ModularStep = {
       ...ALL_STEPS['company-data'],
       number: stepNumber++,
     };
 
-    // Add condition based on clientType if selection is enabled
-    if (hasClientTypeSelection) {
+    if (isConstatator) {
+      companyStep.condition = (state: ModularWizardState) => {
+        const dt = state.constatator?.documentType;
+        return dt === 'firma' || dt === 'istoric';
+      };
+    } else if (hasClientTypeSelection) {
       companyStep.condition = (state: ModularWizardState) => state.clientType === 'PJ';
     } else if (verificationConfig.companyKyc.condition) {
       companyStep.condition = createConditionFunction(verificationConfig.companyKyc.condition);
@@ -162,8 +177,12 @@ export function buildWizardSteps(
         number: stepNumber++,
       };
 
-      // Same condition pattern as company-data step
-      if (hasClientTypeSelection) {
+      if (isConstatator) {
+        companyDocsStep.condition = (state: ModularWizardState) => {
+          const dt = state.constatator?.documentType;
+          return dt === 'firma' || dt === 'istoric';
+        };
+      } else if (hasClientTypeSelection) {
         companyDocsStep.condition = (state: ModularWizardState) => state.clientType === 'PJ';
       } else if (verificationConfig.companyKyc.condition) {
         companyDocsStep.condition = createConditionFunction(verificationConfig.companyKyc.condition);
@@ -171,14 +190,6 @@ export function buildWizardSteps(
 
       steps.push(companyDocsStep);
     }
-  }
-
-  // Certificat Constatator details (after company data so the CUI is known).
-  if (verificationConfig.constatator?.enabled) {
-    steps.push({
-      ...ALL_STEPS['constatator'],
-      number: stepNumber++,
-    });
   }
 
   // Step 3: Personal Data (if personal KYC enabled)

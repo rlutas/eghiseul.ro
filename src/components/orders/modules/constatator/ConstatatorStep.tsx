@@ -40,6 +40,10 @@ export default function ConstatatorStep({ config, onValidChange }: ConstatatorSt
   const selectedType = docTypes.find((t) => t.value === cs.documentType);
   const reportTypes = selectedType?.reportTypes ?? [];
   const isOtherPurpose = (cs.purpose ?? '').toLowerCase() === 'altele';
+  // 'istoric' → needs the certificate period; 'pf' → needs the person (CNP).
+  // 'firma'/'istoric' (CUI types) capture the CUI in the next step (company-data).
+  const isIstoric = cs.documentType === 'istoric';
+  const isPf = cs.documentType === 'pf';
 
   useEffect(() => {
     const checks: boolean[] = [];
@@ -47,15 +51,19 @@ export default function ConstatatorStep({ config, onValidChange }: ConstatatorSt
     if (reportTypes.length > 0) checks.push(!!cs.reportType);
     checks.push(!!cs.purpose);
     if (isOtherPurpose) checks.push(!!cs.otherPurpose?.trim());
-    checks.push(!!cs.period);
-    if (cs.period === 'custom') {
-      checks.push(!!cs.periodFrom);
-      checks.push(!!cs.periodTo);
+    if (isIstoric) {
+      checks.push(!!cs.period);
+      if (cs.period === 'custom') {
+        checks.push(!!cs.periodFrom);
+        checks.push(!!cs.periodTo);
+      }
     }
-    checks.push(!!cs.requesterName?.trim());
-    checks.push(!!cs.requesterCnp?.trim() && cs.requesterCnp.trim().length === 13);
+    if (isPf) {
+      checks.push(!!cs.requesterName?.trim());
+      checks.push(!!cs.requesterCnp?.trim() && cs.requesterCnp!.trim().length === 13);
+    }
     onValidChange(checks.every(Boolean));
-  }, [cs, reportTypes.length, isOtherPurpose, onValidChange]);
+  }, [cs, reportTypes.length, isOtherPurpose, isIstoric, isPf, onValidChange]);
 
   return (
     <div className="space-y-6">
@@ -75,7 +83,15 @@ export default function ConstatatorStep({ config, onValidChange }: ConstatatorSt
               <button
                 key={t.value}
                 type="button"
-                onClick={() => updateConstatator({ documentType: t.value, reportType: undefined })}
+                onClick={() =>
+                  updateConstatator({
+                    documentType: t.value,
+                    reportType: undefined,
+                    // Clear fields that don't apply to the newly chosen type.
+                    ...(t.value !== 'istoric' ? { period: undefined, periodFrom: undefined, periodTo: undefined } : {}),
+                    ...(t.value !== 'pf' ? { requesterName: undefined, requesterCnp: undefined } : {}),
+                  })
+                }
                 aria-pressed={active}
                 className={cn(
                   'flex items-center justify-between gap-3 rounded-2xl border-2 p-4 text-left transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500',
@@ -91,7 +107,13 @@ export default function ConstatatorStep({ config, onValidChange }: ConstatatorSt
                   >
                     {active && <Check className="h-4 w-4" aria-hidden="true" />}
                   </span>
-                  <span className="font-semibold text-secondary-900">{t.label}</span>
+                  <span className="flex flex-col">
+                    <span className="font-semibold text-secondary-900">{t.label}</span>
+                    <span className="text-xs text-neutral-500">
+                      {t.value === 'pf' ? 'Pe baza CNP (persoană fizică)' : 'Pe baza CUI (firmă)'}
+                      {t.value === 'istoric' ? ' · include perioada' : ''}
+                    </span>
+                  </span>
                 </span>
                 <span className="font-bold text-primary-700 whitespace-nowrap">{t.price} RON</span>
               </button>
@@ -142,7 +164,8 @@ export default function ConstatatorStep({ config, onValidChange }: ConstatatorSt
         )}
       </Field>
 
-      {/* Period */}
+      {/* Period — only for "cu istoric" */}
+      {isIstoric && (
       <Field label="Perioada certificatului" required>
         <div className="flex flex-wrap gap-2">
           {[
@@ -178,26 +201,29 @@ export default function ConstatatorStep({ config, onValidChange }: ConstatatorSt
           </div>
         )}
       </Field>
+      )}
 
-      {/* Requester person */}
-      <div className="grid sm:grid-cols-2 gap-4">
-        <Field label="Nume complet (persoana solicitantă)" required>
-          <Input
-            value={cs.requesterName ?? ''}
-            onChange={(e) => updateConstatator({ requesterName: e.target.value })}
-            placeholder="Nume și prenume"
-          />
-        </Field>
-        <Field label="CNP persoană solicitantă" required>
-          <Input
-            inputMode="numeric"
-            maxLength={13}
-            value={cs.requesterCnp ?? ''}
-            onChange={(e) => updateConstatator({ requesterCnp: e.target.value.replace(/\D/g, '').slice(0, 13) })}
-            placeholder="13 cifre"
-          />
-        </Field>
-      </div>
+      {/* Requester person — only for "persoană fizică" (CNP) */}
+      {isPf && (
+        <div className="grid sm:grid-cols-2 gap-4">
+          <Field label="Nume complet (persoana solicitantă)" required>
+            <Input
+              value={cs.requesterName ?? ''}
+              onChange={(e) => updateConstatator({ requesterName: e.target.value })}
+              placeholder="Nume și prenume"
+            />
+          </Field>
+          <Field label="CNP persoană solicitantă" required>
+            <Input
+              inputMode="numeric"
+              maxLength={13}
+              value={cs.requesterCnp ?? ''}
+              onChange={(e) => updateConstatator({ requesterCnp: e.target.value.replace(/\D/g, '').slice(0, 13) })}
+              placeholder="13 cifre"
+            />
+          </Field>
+        </div>
+      )}
     </div>
   );
 }
