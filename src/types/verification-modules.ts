@@ -171,13 +171,17 @@ export interface CivilStatusConfig {
   documentType: 'nastere' | 'casatorie' | 'celibat';
   fields: {
     applicantType?: boolean;      // Minor / Adult (naștere)
+    birthPlace?: boolean;         // Born in RO / abroad — warns about transcription
+    currentlyMarried?: boolean;   // "Sunteți căsătorit?" (naștere, adults)
     maritalStatus?: boolean;      // Current marital status (celibat)
     maritalHistory?: boolean;     // Prior marriages: yes/no → count + ended-by
+    marriagePlace?: boolean;      // Marriage in RO / abroad — warns about transcription
     spouseName?: boolean;         // Spouse name before marriage (căsătorie)
     marriageDate?: boolean;       // Marriage date (căsătorie)
     registrationPlace?: boolean;  // Office/locality that registered the act
     birthName?: boolean;          // Name at birth (maiden / pre-marriage)
     parentNames?: boolean;        // Father + mother full names
+    renouncedCitizenship?: boolean; // Renounced RO citizenship → note: cert has no CNP
     purpose?: boolean;            // Purpose of obtaining the certificate
     countryOfUse?: boolean;       // Country where the document will be used
   };
@@ -492,16 +496,20 @@ export interface SignatureState {
  */
 export interface CivilStatusState {
   applicantType?: 'minor' | 'adult';
+  bornAbroad?: boolean;             // Nașterea a avut loc în străinătate
+  currentlyMarried?: boolean;       // Sunteți căsătorit(ă)?
   maritalStatus?: 'necasatorit' | 'casatorit' | 'divortat' | 'vaduv';
   wasMarriedBefore?: boolean;
   priorMarriagesCount?: string;
   lastMarriageEndedBy?: 'divort' | 'deces';
+  marriageAbroad?: boolean;         // Căsătoria a avut loc în străinătate
   spouseNameBeforeMarriage?: string;
   marriageDate?: string;
   registrationPlace?: string;
   birthName?: string;
   fatherName?: string;
   motherName?: string;
+  renouncedRomanianCitizenship?: boolean; // Ați renunțat la cetățenia română?
   purpose?: string;
   countryOfUse?: string;
 }

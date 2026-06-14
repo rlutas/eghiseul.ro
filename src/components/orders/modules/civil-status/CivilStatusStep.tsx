@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo } from 'react';
+import { AlertTriangle, Info } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useModularWizard } from '@/providers/modular-wizard-provider';
@@ -18,21 +19,16 @@ const DOC_LABEL: Record<NonNullable<CivilStatusConfig>['documentType'], string> 
   celibat: 'certificatul de celibat',
 };
 
-/** Small pill-style radio used throughout the wizard. */
+/** Pill-style yes/no/choice control (mobile-friendly, accessible). */
 function ChoiceRow({
-  name,
-  value,
   current,
   onChange,
   options,
 }: {
-  name: string;
-  value: string | undefined;
   current: string | undefined;
   onChange: (v: string) => void;
   options: { value: string; label: string }[];
 }) {
-  void value;
   return (
     <div className="flex flex-wrap gap-2" role="radiogroup">
       {options.map((opt) => {
@@ -55,7 +51,6 @@ function ChoiceRow({
           </button>
         );
       })}
-      <input type="hidden" name={name} value={current ?? ''} readOnly />
     </div>
   );
 }
@@ -71,24 +66,62 @@ function Field({ label, required, children }: { label: string; required?: boolea
   );
 }
 
+function Notice({ tone, children }: { tone: 'warn' | 'info'; children: React.ReactNode }) {
+  const warn = tone === 'warn';
+  return (
+    <div
+      className={cn(
+        'mt-3 flex items-start gap-2 rounded-xl border p-3 text-sm',
+        warn ? 'border-amber-200 bg-amber-50 text-amber-800' : 'border-blue-200 bg-blue-50 text-blue-800'
+      )}
+    >
+      {warn ? (
+        <AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5" aria-hidden="true" />
+      ) : (
+        <Info className="w-4 h-4 flex-shrink-0 mt-0.5" aria-hidden="true" />
+      )}
+      <span>{children}</span>
+    </div>
+  );
+}
+
+const YES_NO = [
+  { value: 'da', label: 'Da' },
+  { value: 'nu', label: 'Nu' },
+];
+const PLACE = [
+  { value: 'ro', label: 'România' },
+  { value: 'strainatate', label: 'Străinătate' },
+];
+
 export default function CivilStatusStep({ config, onValidChange }: CivilStatusStepProps) {
   const { state, updateCivilStatus } = useModularWizard();
   const cs: CivilStatusState = useMemo(() => state.civilStatus ?? {}, [state.civilStatus]);
   const fields = useMemo(() => config?.fields ?? {}, [config]);
   const docLabel = config ? DOC_LABEL[config.documentType] : 'documentul';
 
-  // Compute validity: every enabled field that is required must be filled.
+  const isAdult = !fields.applicantType || cs.applicantType === 'adult';
+  const showCurrentlyMarried = !!fields.currentlyMarried && isAdult;
+  const showMaritalHistory = !!fields.maritalHistory && isAdult;
+  const showMarriagePlace =
+    !!fields.marriagePlace &&
+    (config?.documentType === 'casatorie' || !!cs.currentlyMarried || !!cs.wasMarriedBefore);
+
+  // Validity: every visible required control must be answered.
   useEffect(() => {
     const checks: boolean[] = [];
     if (fields.applicantType) checks.push(!!cs.applicantType);
+    if (fields.birthPlace) checks.push(cs.bornAbroad !== undefined);
+    if (showCurrentlyMarried) checks.push(cs.currentlyMarried !== undefined);
     if (fields.maritalStatus) checks.push(!!cs.maritalStatus);
-    if (fields.maritalHistory) {
+    if (showMaritalHistory) {
       checks.push(cs.wasMarriedBefore !== undefined);
       if (cs.wasMarriedBefore) {
         checks.push(!!cs.priorMarriagesCount?.trim());
         checks.push(!!cs.lastMarriageEndedBy);
       }
     }
+    if (showMarriagePlace) checks.push(cs.marriageAbroad !== undefined);
     if (fields.spouseName) checks.push(!!cs.spouseNameBeforeMarriage?.trim());
     if (fields.marriageDate) checks.push(!!cs.marriageDate?.trim());
     if (fields.registrationPlace) checks.push(!!cs.registrationPlace?.trim());
@@ -97,10 +130,11 @@ export default function CivilStatusStep({ config, onValidChange }: CivilStatusSt
       checks.push(!!cs.fatherName?.trim());
       checks.push(!!cs.motherName?.trim());
     }
+    if (fields.renouncedCitizenship) checks.push(cs.renouncedRomanianCitizenship !== undefined);
     if (fields.purpose) checks.push(!!cs.purpose?.trim());
     if (fields.countryOfUse) checks.push(!!cs.countryOfUse?.trim());
     onValidChange(checks.every(Boolean));
-  }, [cs, fields, onValidChange]);
+  }, [cs, fields, showCurrentlyMarried, showMaritalHistory, showMarriagePlace, onValidChange]);
 
   return (
     <div className="space-y-6">
@@ -115,8 +149,6 @@ export default function CivilStatusStep({ config, onValidChange }: CivilStatusSt
         {fields.applicantType && (
           <Field label="Pentru cine se solicită certificatul?" required>
             <ChoiceRow
-              name="applicantType"
-              value={cs.applicantType}
               current={cs.applicantType}
               onChange={(v) => updateCivilStatus({ applicantType: v as CivilStatusState['applicantType'] })}
               options={[
@@ -127,11 +159,26 @@ export default function CivilStatusStep({ config, onValidChange }: CivilStatusSt
           </Field>
         )}
 
+        {fields.birthPlace && (
+          <Field label="Nașterea a avut loc în:" required>
+            <ChoiceRow
+              current={cs.bornAbroad === undefined ? undefined : cs.bornAbroad ? 'strainatate' : 'ro'}
+              onChange={(v) => updateCivilStatus({ bornAbroad: v === 'strainatate' })}
+              options={PLACE}
+            />
+            {cs.bornAbroad && (
+              <Notice tone="warn">
+                Dacă nașterea a avut loc în străinătate și <strong>nu a fost transcrisă</strong> în România
+                (prin Ambasadă/Consulat, Oficiul de Stare Civilă sau Direcția de Evidență a Persoanelor),
+                nu putem elibera documentul solicitat.
+              </Notice>
+            )}
+          </Field>
+        )}
+
         {fields.maritalStatus && (
           <Field label="Care este starea civilă actuală?" required>
             <ChoiceRow
-              name="maritalStatus"
-              value={cs.maritalStatus}
               current={cs.maritalStatus}
               onChange={(v) => updateCivilStatus({ maritalStatus: v as CivilStatusState['maritalStatus'] })}
               options={[
@@ -144,17 +191,22 @@ export default function CivilStatusStep({ config, onValidChange }: CivilStatusSt
           </Field>
         )}
 
-        {fields.maritalHistory && (
+        {showCurrentlyMarried && (
+          <Field label="Sunteți căsătorit(ă)?" required>
+            <ChoiceRow
+              current={cs.currentlyMarried === undefined ? undefined : cs.currentlyMarried ? 'da' : 'nu'}
+              onChange={(v) => updateCivilStatus({ currentlyMarried: v === 'da' })}
+              options={YES_NO}
+            />
+          </Field>
+        )}
+
+        {showMaritalHistory && (
           <Field label="Ați mai fost căsătorit(ă) anterior?" required>
             <ChoiceRow
-              name="wasMarriedBefore"
-              value={cs.wasMarriedBefore === undefined ? undefined : cs.wasMarriedBefore ? 'da' : 'nu'}
               current={cs.wasMarriedBefore === undefined ? undefined : cs.wasMarriedBefore ? 'da' : 'nu'}
               onChange={(v) => updateCivilStatus({ wasMarriedBefore: v === 'da' })}
-              options={[
-                { value: 'da', label: 'Da' },
-                { value: 'nu', label: 'Nu' },
-              ]}
+              options={YES_NO}
             />
             {cs.wasMarriedBefore && (
               <div className="mt-4 grid sm:grid-cols-2 gap-4 rounded-xl border border-neutral-200 bg-neutral-50 p-4">
@@ -168,8 +220,6 @@ export default function CivilStatusStep({ config, onValidChange }: CivilStatusSt
                 </Field>
                 <Field label="Ultima căsătorie s-a încheiat prin" required>
                   <ChoiceRow
-                    name="lastMarriageEndedBy"
-                    value={cs.lastMarriageEndedBy}
                     current={cs.lastMarriageEndedBy}
                     onChange={(v) => updateCivilStatus({ lastMarriageEndedBy: v as CivilStatusState['lastMarriageEndedBy'] })}
                     options={[
@@ -178,7 +228,31 @@ export default function CivilStatusStep({ config, onValidChange }: CivilStatusSt
                     ]}
                   />
                 </Field>
+                {cs.lastMarriageEndedBy === 'divort' && (
+                  <div className="sm:col-span-2">
+                    <Notice tone="warn">
+                      Dacă divorțul a fost pronunțat în străinătate, el trebuie recunoscut/transcris în România
+                      pentru a putea elibera documentul. Altfel, căsătoria anterioară figurează ca fiind în vigoare.
+                    </Notice>
+                  </div>
+                )}
               </div>
+            )}
+          </Field>
+        )}
+
+        {showMarriagePlace && (
+          <Field label="Căsătoria a avut loc în:" required>
+            <ChoiceRow
+              current={cs.marriageAbroad === undefined ? undefined : cs.marriageAbroad ? 'strainatate' : 'ro'}
+              onChange={(v) => updateCivilStatus({ marriageAbroad: v === 'strainatate' })}
+              options={PLACE}
+            />
+            {cs.marriageAbroad && (
+              <Notice tone="warn">
+                Dacă căsătoria a avut loc în străinătate și <strong>nu a fost transcrisă</strong> în România,
+                nu putem elibera documentul solicitat.
+              </Notice>
             )}
           </Field>
         )}
@@ -239,6 +313,22 @@ export default function CivilStatusStep({ config, onValidChange }: CivilStatusSt
               onChange={(e) => updateCivilStatus({ registrationPlace: e.target.value })}
               placeholder="Oraș / comună / sector"
             />
+          </Field>
+        )}
+
+        {fields.renouncedCitizenship && (
+          <Field label="Ați renunțat vreodată la cetățenia română?" required>
+            <ChoiceRow
+              current={cs.renouncedRomanianCitizenship === undefined ? undefined : cs.renouncedRomanianCitizenship ? 'da' : 'nu'}
+              onChange={(v) => updateCivilStatus({ renouncedRomanianCitizenship: v === 'da' })}
+              options={YES_NO}
+            />
+            {cs.renouncedRomanianCitizenship && (
+              <Notice tone="info">
+                Certificatul poate fi eliberat, însă pe el <strong>nu va mai figura CNP-ul</strong>, deoarece
+                acesta se anulează odată cu renunțarea la cetățenia română.
+              </Notice>
+            )}
           </Field>
         )}
 

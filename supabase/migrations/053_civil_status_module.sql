@@ -13,14 +13,18 @@
 UPDATE services SET base_price = 998 WHERE slug IN ('certificat-nastere', 'certificat-casatorie');
 
 -- 2) Civil-status config (JSONB merge into existing verification_config) ------
+-- Field set mirrors the live WPForms conditional logic (born/married abroad
+-- transcription warnings, renounced-citizenship CNP note, marital history).
 UPDATE services
 SET verification_config = verification_config || jsonb_build_object(
   'civilStatus', jsonb_build_object(
     'enabled', true,
     'documentType', 'nastere',
     'fields', jsonb_build_object(
-      'applicantType', true, 'parentNames', true, 'birthName', true,
-      'registrationPlace', true, 'purpose', true, 'countryOfUse', true
+      'applicantType', true, 'birthPlace', true, 'currentlyMarried', true,
+      'maritalHistory', true, 'marriagePlace', true, 'renouncedCitizenship', true,
+      'birthName', true, 'parentNames', true, 'registrationPlace', true,
+      'purpose', true, 'countryOfUse', true
     )
   )
 )
@@ -32,9 +36,10 @@ SET verification_config = verification_config || jsonb_build_object(
     'enabled', true,
     'documentType', 'casatorie',
     'fields', jsonb_build_object(
-      'maritalHistory', true, 'spouseName', true, 'marriageDate', true,
-      'registrationPlace', true, 'birthName', true, 'parentNames', true,
-      'purpose', true, 'countryOfUse', true
+      'maritalHistory', true, 'marriagePlace', true, 'spouseName', true,
+      'marriageDate', true, 'registrationPlace', true, 'birthName', true,
+      'parentNames', true, 'renouncedCitizenship', true, 'purpose', true,
+      'countryOfUse', true
     )
   )
 )
@@ -46,8 +51,9 @@ SET verification_config = verification_config || jsonb_build_object(
     'enabled', true,
     'documentType', 'celibat',
     'fields', jsonb_build_object(
-      'maritalStatus', true, 'maritalHistory', true,
-      'registrationPlace', true, 'purpose', true, 'countryOfUse', true
+      'maritalStatus', true, 'maritalHistory', true, 'marriagePlace', true,
+      'registrationPlace', true, 'renouncedCitizenship', true, 'purpose', true,
+      'countryOfUse', true
     )
   )
 )
