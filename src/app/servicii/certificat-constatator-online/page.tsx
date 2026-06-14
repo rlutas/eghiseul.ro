@@ -187,7 +187,7 @@ export default async function CertificatConstatatorPage() {
                       'Introduci CUI-ul firmei (preluăm automat datele ONRC)',
                       'Confirmi tipul certificatului (simplu, extins sau istoric)',
                       'Plătești securizat (taxe ONRC incluse)',
-                      `Primești certificatul pe email în ${formatEstimatedDays(service)}`,
+                      'Primești certificatul pe email, de obicei în câteva minute (24/7)',
                     ].map((step) => (
                       <li key={step} className="flex items-center gap-2">
                         <CheckCircle className="w-4 h-4 text-primary-500 flex-shrink-0" aria-hidden="true" />

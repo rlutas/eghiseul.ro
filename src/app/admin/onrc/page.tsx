@@ -27,6 +27,7 @@ interface OnrcJob {
   document_url: string | null;
   error_message: string | null;
   retry_count: number;
+  awaiting_since: string | null;
   created_at: string;
   orders: { friendly_order_id: string | null } | { friendly_order_id: string | null }[] | null;
 }
@@ -66,7 +67,7 @@ export default async function AdminOnrcPage() {
   const admin = createAdminClient() as any;
   const { data } = await admin
     .from('onrc_jobs')
-    .select('id, order_id, status, document_type, cui, company_name, registration_number, onrc_request_id, onrc_draft_id, document_url, error_message, retry_count, created_at, orders(friendly_order_id)')
+    .select('id, order_id, status, document_type, cui, company_name, registration_number, onrc_request_id, onrc_draft_id, document_url, error_message, retry_count, awaiting_since, created_at, orders(friendly_order_id)')
     .order('created_at', { ascending: false })
     .limit(200);
   const jobs: OnrcJob[] = data ?? [];
@@ -83,6 +84,12 @@ export default async function AdminOnrcPage() {
         <p className="text-sm text-neutral-600">
           Job-uri de automatizare ONRC (certificat constatator). Worker-ul extern le procesează automat.
           Vezi <code className="text-xs">docs/technical/specs/onrc-automation-plan.md</code>.
+        </p>
+        <p className="mt-1 text-xs text-neutral-500">
+          Safeguards automate: <strong>FAILED</strong> (neplătit) se reîncearcă automat (max 4, backoff);
+          job blocat în <strong>Se procesează</strong> &gt;10 min se recuperează; <strong>Așteaptă documentul</strong>
+          &gt;2h → <strong>Necesită operator</strong> + email de înștiințare la client. Cele
+          <strong> Necesită operator</strong> / <strong>Eșuat</strong> de mai jos cer intervenție manuală.
         </p>
       </div>
 
@@ -127,6 +134,11 @@ export default async function AdminOnrcPage() {
                   <TableCell className="text-xs">{job.document_type}</TableCell>
                   <TableCell>
                     <Badge className={`${STATUS_STYLE[job.status]} border-0`}>{STATUS_LABEL[job.status]}</Badge>
+                    {job.status === 'AWAITING_DOCUMENT' && job.awaiting_since && (
+                      <div className="mt-0.5 text-[10px] text-neutral-500">
+                        din {new Date(job.awaiting_since).toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' })}
+                      </div>
+                    )}
                   </TableCell>
                   <TableCell className="text-xs">
                     {job.document_url ? (

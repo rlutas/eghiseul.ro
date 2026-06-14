@@ -34,6 +34,8 @@ export async function GET(req: NextRequest) {
     .then(() => {}, () => {});
   // Don't re-poll a request that's still generating more often than this.
   const RETRIEVE_THROTTLE_MIN = 3;
+  const STALE_PROCESSING_MIN = 10; // a PROCESSING job locked longer than this = crashed worker
+  const MAX_RETRIES = 4; // auto-retry a FAILED (unpaid) submit up to this many times
   const throttleBefore = new Date(Date.now() - RETRIEVE_THROTTLE_MIN * 60_000).toISOString();
   const SELECT_COLS = 'id, order_id, document_type, cui, company_name, detail, status, onrc_draft_id, onrc_request_id';
 
@@ -74,6 +76,55 @@ export async function GET(req: NextRequest) {
       .limit(1)
       .maybeSingle();
     if (awaitingCand) claimed = await claim(awaitingCand.id, 'AWAITING_DOCUMENT');
+  }
+
+  // 3) Reaper — a job stuck in PROCESSING (worker crashed). With a draft it was
+  //    already paid (retrieve phase) → safe to reclaim. Without a draft it
+  //    crashed mid-submit → escalate to operator (avoid a double payment).
+  if (!claimed) {
+    const staleBefore = new Date(Date.now() - STALE_PROCESSING_MIN * 60_000).toISOString();
+    const { data: staleCand } = await supabase
+      .from('onrc_jobs')
+      .select('id, onrc_draft_id')
+      .eq('status', 'PROCESSING')
+      .lt('locked_at', staleBefore)
+      .order('locked_at', { ascending: true })
+      .limit(1)
+      .maybeSingle();
+    if (staleCand?.onrc_draft_id) {
+      claimed = await claim(staleCand.id, 'PROCESSING');
+    } else if (staleCand) {
+      await supabase
+        .from('onrc_jobs')
+        .update({
+          status: 'NEEDS_OPERATOR',
+          error_message: 'Blocat în PROCESSING (worker crash la submit) — verifică pe ONRC dacă s-a plătit înainte de a relua.',
+          updated_at: now,
+        })
+        .eq('id', staleCand.id)
+        .eq('status', 'PROCESSING');
+    }
+  }
+
+  // 4) Auto-retry a FAILED submit that NEVER paid (onrc_draft_id IS NULL → no
+  //    double-payment risk), with exponential backoff, up to MAX_RETRIES.
+  if (!claimed) {
+    const { data: failedCand } = await supabase
+      .from('onrc_jobs')
+      .select('id, retry_count, last_attempt_at')
+      .eq('status', 'FAILED')
+      .is('onrc_draft_id', null)
+      .lt('retry_count', MAX_RETRIES)
+      .order('last_attempt_at', { ascending: true })
+      .limit(1)
+      .maybeSingle();
+    if (failedCand) {
+      const backoffMin = Math.pow(2, failedCand.retry_count ?? 0); // 1, 2, 4, 8 min
+      const backoffBefore = new Date(Date.now() - backoffMin * 60_000).toISOString();
+      if (!failedCand.last_attempt_at || failedCand.last_attempt_at < backoffBefore) {
+        claimed = await claim(failedCand.id, 'FAILED');
+      }
+    }
   }
 
   if (!claimed) {
