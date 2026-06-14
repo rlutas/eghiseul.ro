@@ -41,10 +41,15 @@ export function SystemStatus({ className = '' }: { className?: string }) {
   const dot = (up: boolean) => (up ? 'bg-green-500' : 'bg-red-500');
 
   return (
-    <div className={`rounded-2xl border border-neutral-200 bg-white p-4 sm:p-5 ${className}`}>
-      <div className="flex items-center justify-between gap-3">
+    <div
+      role="status"
+      aria-live="polite"
+      aria-label={loading ? 'Verificăm starea sistemului' : operational ? 'Sistem operațional, eliberare automată 24/7' : 'Sistemul funcționează cu întârzieri'}
+      className={`rounded-2xl border border-neutral-200 bg-white p-4 sm:p-5 ${className}`}
+    >
+      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5">
         <div className="flex items-center gap-2.5">
-          <span className="relative flex h-2.5 w-2.5">
+          <span className="relative flex h-2.5 w-2.5" aria-hidden="true">
             {operational && (
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75 motion-reduce:hidden" />
             )}
@@ -54,15 +59,19 @@ export function SystemStatus({ className = '' }: { className?: string }) {
             {loading ? 'Verificăm starea sistemului…' : operational ? 'Sistem operațional' : 'Funcționare cu întârzieri'}
           </span>
         </div>
-        <span className="text-xs font-medium text-green-700">Eliberare automată · 24/7</span>
+        <span className={`text-xs font-medium ${operational ? 'text-green-700' : 'text-neutral-500'}`}>
+          Eliberare automată · 24/7
+        </span>
       </div>
 
       {status && (
         <div className="mt-3 grid grid-cols-1 gap-1.5 sm:grid-cols-2">
           {Object.entries(status.services).map(([key, s]) => (
-            <div key={key} className="flex items-center gap-2 text-xs text-neutral-600">
-              <span className={`inline-block h-2 w-2 rounded-full ${dot(s.up)}`} />
-              {s.label}: <span className="font-medium text-secondary-900">{s.up ? 'operațional' : 'indisponibil'}</span>
+            <div key={key} className="flex items-center gap-2 text-xs text-neutral-700">
+              <span className={`inline-block h-2 w-2 flex-shrink-0 rounded-full ${dot(s.up)}`} aria-hidden="true" />
+              <span>
+                {s.label}: <span className="font-semibold text-secondary-900">{s.up ? 'operațional' : 'indisponibil'}</span>
+              </span>
             </div>
           ))}
         </div>
