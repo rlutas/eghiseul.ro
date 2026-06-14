@@ -154,16 +154,6 @@ export default function ConstatatorStep({ config, onValidChange }: ConstatatorSt
               ))}
             </SelectContent>
           </Select>
-          {/* "De bază" is issued instantly (auto, 24/7). "Fonduri IMM" /
-              "insolvență" go through the ONRC backoffice (a human, working
-              hours) → typically same or next business day. Set expectations. */}
-          {cs.reportType && /imm|fond|insolven/i.test(cs.reportType) && (
-            <p className="mt-2 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
-              ℹ️ Se eliberează în <strong>câteva minute dacă sistemul ONRC este operațional</strong>.{' '}
-              Dacă sistemul ONRC are mentenanță sau întârzieri, în <strong>maximum 24 de ore lucrătoare</strong>
-              {' — de obicei în aceeași zi. Îți trimitem documentul pe email imediat ce e gata.'}
-            </p>
-          )}
         </Field>
       )}
 
