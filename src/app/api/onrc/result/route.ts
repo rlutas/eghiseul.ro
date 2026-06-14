@@ -78,10 +78,19 @@ export async function POST(req: NextRequest) {
     // How long has this request been waiting for ONRC to issue the document?
     const { data: job } = await supabase
       .from('onrc_jobs')
-      .select('awaiting_since, order_id')
+      .select('awaiting_since, order_id, detail')
       .eq('id', jobId)
       .maybeSingle();
-    const MAX_AWAIT_MS = 2 * 60 * 60 * 1000; // 2h — ONRC should issue well before this
+
+    // Report type drives the expected wait. "De bază" (070) is issued INSTANTLY
+    // (auto, 24/7) — if it's not out in 2h something is wrong → operator. But
+    // "fonduri IMM" (072) and "insolvență" (071) go through the ONRC BACKOFFICE
+    // (a human, in working hours) and routinely take until the next business
+    // day — so we keep polling far longer before escalating, or we'd strand a
+    // perfectly valid paid request overnight.
+    const reportType = String((job?.detail as Record<string, unknown> | null)?.reportType ?? '');
+    const isBackoffice = /imm|fond|insolven/i.test(reportType);
+    const MAX_AWAIT_MS = (isBackoffice ? 48 : 2) * 60 * 60 * 1000;
     const awaitingSince = job?.awaiting_since ? new Date(job.awaiting_since).getTime() : Date.now();
 
     // Stuck too long → escalate to a human + tell the client we're on it.
@@ -94,12 +103,17 @@ export async function POST(req: NextRequest) {
           updated_at: now,
         })
         .eq('id', jobId);
-      await logOnrcEvent(supabase, jobId, 'stuck', `Documentul nu a fost emis de ONRC în 2h — necesită operator.`, job?.order_id);
+      await logOnrcEvent(supabase, jobId, 'stuck', `Documentul nu a fost emis de ONRC în ${Math.round(MAX_AWAIT_MS / 3600000)}h — necesită operator.`, job?.order_id);
       if (job?.order_id) await notifyClientDelay(supabase, job.order_id).catch(() => {});
       return NextResponse.json({ success: true });
     }
 
     const firstTime = !job?.awaiting_since;
+    // Backoffice report types aren't instant — proactively tell the client at
+    // submission that it'll be ready within ~1 business day (set expectations).
+    if (firstTime && isBackoffice && job?.order_id) {
+      await notifyClientDelay(supabase, job.order_id, true).catch(() => {});
+    }
     const patch: Record<string, unknown> = {
       status: 'AWAITING_DOCUMENT',
       last_attempt_at: now,
@@ -194,9 +208,14 @@ export async function POST(req: NextRequest) {
   return NextResponse.json({ success: true });
 }
 
-/** Best-effort "we're processing your request" email when a job needs a human. */
+/**
+ * Best-effort "we're processing your request" email. `backoffice=true` is the
+ * normal-path heads-up for IMM/insolvență certificates (which ONRC issues via
+ * its backoffice, ~1 business day) so the client isn't surprised it's not
+ * instant; otherwise it's the "taking longer than expected" reassurance.
+ */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function notifyClientDelay(supabase: any, orderId: string): Promise<void> {
+async function notifyClientDelay(supabase: any, orderId: string, backoffice = false): Promise<void> {
   const { data: order } = await supabase
     .from('orders')
     .select('friendly_order_id, customer_data')
@@ -204,9 +223,13 @@ async function notifyClientDelay(supabase: any, orderId: string): Promise<void> 
     .maybeSingle();
   const email = order?.customer_data?.contact?.email;
   if (!email) return;
+  const oid = order.friendly_order_id ?? '';
+  const html = backoffice
+    ? `<p>Bună ziua,</p><p>Am depus cererea ta de certificat constatator (<strong>${oid}</strong>) la Registrul Comerțului. Acest tip de certificat (fonduri IMM / insolvență) este verificat de un operator ONRC și se eliberează de obicei <strong>în aceeași zi sau în următoarea zi lucrătoare</strong>. Îți trimitem documentul pe email imediat ce e gata.</p><p>Mulțumim,<br/>Echipa eghiseul.ro</p>`
+    : `<p>Bună ziua,</p><p>Cererea ta de certificat constatator (<strong>${oid}</strong>) este în curs de procesare la Registrul Comerțului. Revenim cu documentul în cel mai scurt timp.</p><p>Mulțumim,<br/>Echipa eghiseul.ro</p>`;
   await sendEmail({
     to: email,
-    subject: `Comanda ${order.friendly_order_id ?? ''} — în procesare`,
-    html: `<p>Bună ziua,</p><p>Cererea ta de certificat constatator (<strong>${order.friendly_order_id ?? ''}</strong>) este în curs de procesare la Registrul Comerțului. Revenim cu documentul în cel mai scurt timp.</p><p>Mulțumim,<br/>Echipa eghiseul.ro</p>`,
+    subject: `Comanda ${oid} — în procesare`,
+    html,
   });
 }
