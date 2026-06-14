@@ -18,7 +18,7 @@
 
 **🚗 Tool rovinietă:** `/tools/verificare-rovinieta-online/` (294k clicks) cu widget-ul live **erovinieta.net** embed-uit (iframe + postMessage auto-resize) + conținut SEO + schema WebApplication.
 
-**📋 Plan automatizare ONRC:** `docs/technical/specs/onrc-automation-plan.md` — coadă de stări `onrc_jobs` + API `/api/onrc/{pending,result}` + worker Playwright separat (Railway). Formularul constatator captează deja datele pentru bot. **Următor: Faza 1+2 (coada + API).**
+**🤖 Automatizare ONRC — flux mapat & testat LIVE A→Z:** `docs/technical/specs/onrc-automation-plan.md` + `worker-onrc/ONRC-FLOW.md`. Fluxul „Certificat constatator" a fost parcurs și **plătit real** pe `myportal.onrc.ro` (CUI 49278701, 30 LEI din credit, Id cerere 20262192280, RC 2381836, **PDF descărcat**). Fluxul e **ASINCRON** → backbone în 2 faze: coada `onrc_jobs` (status nou `AWAITING_DOCUMENT` + `onrc_request_id`/`onrc_draft_id`, migrarea 056), `/api/onrc/pending` servește submit+retrieve (throttle 3 min), `/api/onrc/result` acceptă `AWAITING_DOCUMENT`; worker `submitAndPay()`+`retrieveDocument()` cu selectori confirmați. **Următor: seed `storageState.json`, profil Solicitant/Facturare în contul ONRC, deploy Railway, reaper `PROCESSING`.**
 
 **Verificat:** build de producție verde, `tsc` + `eslint` 0 erori. Merged direct în `main` (PR #1-#3 + commit-uri directe).
 
