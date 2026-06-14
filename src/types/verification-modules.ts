@@ -181,6 +181,7 @@ export interface CivilStatusConfig {
     registrationPlace?: boolean;  // Office/locality that registered the act
     birthName?: boolean;          // Name at birth (maiden / pre-marriage)
     parentNames?: boolean;        // Father + mother full names
+    oldCertificateReason?: boolean; // "Vechiul certificat mi-a fost:" pierdut/deteriorat/...
     renouncedCitizenship?: boolean; // Renounced RO citizenship → note: cert has no CNP
     purpose?: boolean;            // Purpose of obtaining the certificate
     countryOfUse?: boolean;       // Country where the document will be used
@@ -509,6 +510,7 @@ export interface CivilStatusState {
   birthName?: string;
   fatherName?: string;
   motherName?: string;
+  oldCertificateReason?: 'pierdut' | 'deteriorat' | 'furat' | 'altul'; // Vechiul certificat mi-a fost:
   renouncedRomanianCitizenship?: boolean; // Ați renunțat la cetățenia română?
   purpose?: string;
   countryOfUse?: string;

@@ -130,6 +130,7 @@ export default function CivilStatusStep({ config, onValidChange }: CivilStatusSt
       checks.push(!!cs.fatherName?.trim());
       checks.push(!!cs.motherName?.trim());
     }
+    if (fields.oldCertificateReason) checks.push(!!cs.oldCertificateReason);
     if (fields.renouncedCitizenship) checks.push(cs.renouncedRomanianCitizenship !== undefined);
     if (fields.purpose) checks.push(!!cs.purpose?.trim());
     if (fields.countryOfUse) checks.push(!!cs.countryOfUse?.trim());
@@ -304,6 +305,21 @@ export default function CivilStatusStep({ config, onValidChange }: CivilStatusSt
               />
             </Field>
           </div>
+        )}
+
+        {fields.oldCertificateReason && (
+          <Field label="Vechiul certificat mi-a fost:" required>
+            <ChoiceRow
+              current={cs.oldCertificateReason}
+              onChange={(v) => updateCivilStatus({ oldCertificateReason: v as CivilStatusState['oldCertificateReason'] })}
+              options={[
+                { value: 'pierdut', label: 'Pierdut' },
+                { value: 'deteriorat', label: 'Deteriorat' },
+                { value: 'furat', label: 'Furat' },
+                { value: 'altul', label: 'Altul' },
+              ]}
+            />
+          </Field>
         )}
 
         {fields.registrationPlace && (

@@ -23,8 +23,8 @@ SET verification_config = verification_config || jsonb_build_object(
     'fields', jsonb_build_object(
       'applicantType', true, 'birthPlace', true, 'currentlyMarried', true,
       'maritalHistory', true, 'marriagePlace', true, 'renouncedCitizenship', true,
-      'birthName', true, 'parentNames', true, 'registrationPlace', true,
-      'purpose', true, 'countryOfUse', true
+      'birthName', true, 'parentNames', true, 'oldCertificateReason', true,
+      'registrationPlace', true, 'purpose', true, 'countryOfUse', true
     )
   )
 )
@@ -38,8 +38,8 @@ SET verification_config = verification_config || jsonb_build_object(
     'fields', jsonb_build_object(
       'maritalHistory', true, 'marriagePlace', true, 'spouseName', true,
       'marriageDate', true, 'registrationPlace', true, 'birthName', true,
-      'parentNames', true, 'renouncedCitizenship', true, 'purpose', true,
-      'countryOfUse', true
+      'parentNames', true, 'oldCertificateReason', true, 'renouncedCitizenship', true,
+      'purpose', true, 'countryOfUse', true
     )
   )
 )
