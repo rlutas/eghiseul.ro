@@ -93,7 +93,8 @@ interface OrderForInvoice {
       phone?: string;
     };
     billing?: {
-      type: 'individual' | 'company';
+      // Wizard stores 'persoana_juridica'/'persoana_fizica'; legacy: 'individual'/'company'.
+      type?: 'individual' | 'company' | 'persoana_juridica' | 'persoana_fizica' | string;
       // Individual fields
       firstName?: string;
       lastName?: string;
@@ -104,9 +105,19 @@ interface OrderForInvoice {
       regCom?: string;
       // Address
       address?: string;
+      companyAddress?: string; // wizard company-KYC fills this (infocui lookup)
       county?: string;
       city?: string;
       country?: string;
+      // The wizard sets type 'persoana_juridica'/'persoana_fizica' (not 'company').
+      source?: string;
+    };
+    /** Company-KYC block (infocui lookup) — authoritative VAT-payer flag. */
+    company?: {
+      cui?: string;
+      companyName?: string;
+      vatPayer?: boolean;
+      autoCompleteData?: { vatPayer?: boolean };
     };
     address?: {
       street?: string;
@@ -134,6 +145,68 @@ interface OrderForInvoice {
 
 type PaymentMethodType = 'Card' | 'Transfer bancar' | 'Cash';
 
+type CustomerData = NonNullable<OrderForInvoice['customer_data']>;
+
+/**
+ * Build the Oblio invoice client (PF or PJ) from an order's customer_data.
+ * Pure + unit-tested (tests/unit/lib/oblio/build-client.test.ts).
+ *
+ * A billing block carrying a CUI = company (PJ): issue the invoice to the firm.
+ * The wizard stores `type: 'persoana_juridica'` (NOT the legacy 'company'), so
+ * detection must accept both — otherwise PJ invoices fall through to PF and the
+ * client renders as "N/A". For PJ we send the CUI (RO-prefixed when a VAT payer)
+ * so Oblio validates + completes the company against ANAF.
+ */
+export function buildOblioClient(customerData: CustomerData): OblioClient {
+  const billing = customerData.billing;
+  const contact = customerData.contact;
+  const personal = customerData.personal;
+  const company = customerData.company;
+  const address = customerData.address ?? personal?.address;
+
+  const billingCui = (billing?.cui || company?.cui || '').trim();
+  const isPJ =
+    billing?.type === 'company' ||
+    billing?.type === 'persoana_juridica' ||
+    billing?.source === 'company' ||
+    (!!billingCui && billing?.type !== 'individual' && billing?.type !== 'persoana_fizica');
+
+  if (isPJ) {
+    const isVatPayer =
+      company?.vatPayer ?? company?.autoCompleteData?.vatPayer ?? billingCui.toUpperCase().startsWith('RO');
+    const cif = isVatPayer && /^\d/.test(billingCui) ? `RO${billingCui}` : billingCui;
+    return {
+      name: billing?.companyName || company?.companyName || 'N/A',
+      cif,
+      rc: billing?.regCom,
+      address: billing?.address || billing?.companyAddress || address?.street || '',
+      city: billing?.city || address?.city || '',
+      state: billing?.county || address?.county || '',
+      country: billing?.country || address?.country || 'Romania',
+      email: contact?.email,
+      phone: contact?.phone,
+      vatPayer: isVatPayer,
+      save: true,
+    };
+  }
+
+  // Individual (PF) — fall back to KYC `personal` data for "self" billing.
+  return {
+    name:
+      `${billing?.firstName || contact?.firstName || personal?.firstName || ''} ${billing?.lastName || contact?.lastName || personal?.lastName || ''}`.trim() ||
+      'N/A',
+    cif: billing?.cnp || personal?.cnp || '',
+    address: billing?.address || address?.street || '',
+    city: billing?.city || address?.city || '',
+    state: billing?.county || address?.county || '',
+    country: billing?.country || address?.country || 'Romania',
+    email: contact?.email,
+    phone: contact?.phone,
+    vatPayer: false,
+    save: false,
+  };
+}
+
 /**
  * Create invoice from order data
  *
@@ -146,46 +219,8 @@ export async function createInvoiceFromOrder(
   paymentMethod: PaymentMethodType = 'Card'
 ): Promise<StoredInvoice> {
   const config = getOblioConfig();
-  const billing = order.customer_data?.billing;
-  const contact = order.customer_data?.contact;
-  const personal = order.customer_data?.personal;
-  // For PF "self" billing the customer never fills a billing form, so the
-  // name/CNP/address come from the KYC-extracted `personal` block. Address
-  // can live either at customer_data.address (legacy) or personal.address.
-  const address = order.customer_data?.address ?? personal?.address;
-
-  const isPJ = billing?.type === 'company';
-
-  // Build client object
-  const client: OblioClient = isPJ
-    ? {
-        // Company client
-        name: billing?.companyName || 'N/A',
-        cif: billing?.cui || '',
-        rc: billing?.regCom,
-        address: billing?.address || address?.street || '',
-        city: billing?.city || address?.city || '',
-        state: billing?.county || address?.county || '',
-        country: billing?.country || address?.country || 'Romania',
-        email: contact?.email,
-        phone: contact?.phone,
-        vatPayer: billing?.cui?.startsWith('RO') || false,
-        save: true,
-      }
-    : {
-        // Individual client (PF) — fall back to KYC `personal` data when the
-        // customer used "self" billing (no separate billing form filled).
-        name: `${billing?.firstName || contact?.firstName || personal?.firstName || ''} ${billing?.lastName || contact?.lastName || personal?.lastName || ''}`.trim() || 'N/A',
-        cif: billing?.cnp || personal?.cnp || '', // CNP for individuals
-        address: billing?.address || address?.street || '',
-        city: billing?.city || address?.city || '',
-        state: billing?.county || address?.county || '',
-        country: billing?.country || address?.country || 'Romania',
-        email: contact?.email,
-        phone: contact?.phone,
-        vatPayer: false,
-        save: false, // Don't save individual clients
-      };
+  // The invoice client (PF or PJ) — pure, unit-tested in tests/.
+  const client = buildOblioClient(order.customer_data ?? {});
 
   // Build products array
   const products: OblioProduct[] = [];
