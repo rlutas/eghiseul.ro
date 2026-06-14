@@ -160,8 +160,8 @@ export default function ConstatatorStep({ config, onValidChange }: ConstatatorSt
           {cs.reportType && /imm|fond|insolven/i.test(cs.reportType) && (
             <p className="mt-2 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
               ℹ️ Acest tip de certificat este verificat de un operator ONRC și se eliberează de obicei{' '}
-              <strong>în aceeași zi sau în următoarea zi lucrătoare</strong> (nu instant ca cel „de bază").
-              Îți trimitem documentul pe email imediat ce e gata.
+              <strong>în aceeași zi sau în următoarea zi lucrătoare</strong>
+              {' (nu instant ca cel „de bază"). Îți trimitem documentul pe email imediat ce e gata.'}
             </p>
           )}
         </Field>
