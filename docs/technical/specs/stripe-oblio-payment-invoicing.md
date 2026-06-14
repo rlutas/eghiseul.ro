@@ -740,6 +740,22 @@ if (order.payment_method === 'bank_transfer' && order.payment_status === 'awaiti
 
 ## Partea 2: Oblio Integration
 
+### 2.0 ⚠️ Client facturat (PF vs PJ) — regulă critică
+
+Clientul facturii se construiește în **`buildOblioClient(customer_data)`** (pură,
+testată în `tests/unit/lib/oblio/build-client.test.ts`). Reguli:
+
+- **Detecția PJ** acceptă **`type === 'persoana_juridica'`** (ce salvează wizard-ul),
+  `'company'` (legacy), `source === 'company'`, SAU orice **CUI prezent** în
+  `billing.cui` / `company.cui`. ⚠️ NU verifica doar `type === 'company'` — wizard-ul
+  nu pune niciodată „company", deci comenzile pe firmă cădeau pe ramura PF → factură
+  cu **Client „N/A", CIF „-"** (bug real: EGI2024-24109, NETHUT DIGITAL, CUI 47872731).
+- **Oblio completează firma din CUI**: trimitem `cif` (CUI) + `name`; pentru plătitor
+  TVA prefixăm `RO` (flag `vatPayer` din company-KYC infocui). Oblio validează/completează
+  restul din ANAF. CNP-ul (PF) merge tot în câmpul `cif`.
+- **Toate serviciile** folosesc aceeași funcție → fix-ul acoperă cazier PJ, constatator etc.
+- Facturile deja emise greșit (N/A) se **stornează + re-emit manual** în Oblio.
+
 ### 2.1 Oblio API Overview
 
 | Aspect | Details |
