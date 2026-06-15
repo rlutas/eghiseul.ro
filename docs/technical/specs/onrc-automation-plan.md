@@ -220,3 +220,39 @@ Asocierea singură întoarce și motive inactive/legacy. ⚠️ Namespace-ul `f2
 - Admin: documentul ONRC apare la „Procesare comandă" cu eticheta **„Certificat Constatator (ONRC)"** (Previzualizare + Descarcă). Pagina încarcă documentele la deschidere → refresh dacă era deschisă înainte de livrare.
 - Facturare constatator pe firmă: implicit **Persoană juridică** (firma din cerere, CUI editabil) → apoi Persoană fizică.
 - Mesaj livrare (formular + email): „câteva minute dacă sistemul ONRC e operațional; altfel max 24h lucrătoare (de obicei aceeași zi)".
+
+---
+
+## 🚧 ROADMAP — automatizare „persoană fizică" + „cu istoric" (DE FĂCUT)
+
+> Handoff pentru o sesiune nouă (după `/clear`). Acum **automate**: constatator pe firmă „de bază / fonduri IMM / insolvență". **MANUALE** (rutate la `NeedsOperator`): „cu istoric" și „persoană fizică".
+
+### Unde sunt rutate la manual ACUM
+`worker-onrc/src/onrc/api-submit.ts` → `submitViaApi()`, la început:
+```ts
+if (docType === 'istoric') throw new NeedsOperatorError('… handled manually (more expensive) — operator.');
+if (docType === 'pf')      throw new NeedsOperatorError('… requester must have been an administrator — operator.');
+```
+`docType` vine din `job.detail.documentType` (formular: `firma` | `istoric` | `pf`).
+
+### Ce știm deja (din nomenclatorul ONRC)
+Subtipuri CCFIL (`GET /common-nomen/application-form-subtypes/application-type/{CCFIL}`):
+- `070` de bază, `071` insolvență, `072` fonduri IMM — **automate**.
+- **`148` „Raport Istoric"** — probabil subtipul pt. „cu istoric".
+- **`160` „Certificat constatator pe persoana"** — probabil subtipul pt. „persoană fizică".
+- (`068` CAS, `084` Furnizări info CRITERII, `149` IGI viză — necunoscute/neoferite.)
+
+### Cum se automatizează (aceeași metodă ca la IMM — dovedită)
+1. **Capturează fluxul UI real** cu Playwright (cont logat pe `myportal.onrc.ro`, wizard `/ascertaining-certificates/wizard`): alege tipul „cu istoric" / „pe persoană", parcurge pașii, **capturează fiecare `POST /complex-requests/step`** (request-body) + apelul de motive + `generate-calculate-voucher` (taxa). Vezi cum am făcut la IMM (secțiunile de mai sus).
+2. **„Cu istoric" (CUI):** la fel ca „de bază/firmă" DAR step 3 are `historicalReportPeriod` populat (`fromBegginingToPresent:true` SAU `fromDate`/`toDate`). De verificat: ce subtip/reportType folosește (070 cu perioadă vs 148), ce **cod de taxă** (≠ 7515, e mai scump — preț site 499.99), ce motive valide (`cc-reasons/active` ∩ asociere pe codul lui).
+3. **„Persoană fizică" (CNP):** subtip `160`, flux DIFERIT — solicitantul trebuie să fi fost administrator al firmei; folosește **CNP** (nu CUI). De capturat: step 2/3 (cum se identifică persoana), motivele valide, taxa. Formularul are deja `requesterName` + `requesterCnp` în `state.constatator`.
+4. **Implementare worker:** scoate `NeedsOperatorError` pt. tipul respectiv; adaugă în `buildStep3Doc`/`buildStep4Doc` (sau pași noi) logica capturată; taxa corectă în `finalize()` (acum hardcodat `7515` „de bază"). Adaugă teste dry-run (ca cele 4/4) înainte de plată reală.
+5. **Formular (DB):** sincronizează motivele valide pt. noile tipuri (extinde `scripts/sync-constatator-purposes.mjs` cu codurile 148/160).
+6. **Validare:** dry-run (fără plată) → 1 comandă reală de test → confirmă eliberarea.
+
+### Fișiere cheie
+- Worker submit: `worker-onrc/src/onrc/api-submit.ts` (`submitViaApi`, `buildStep3Doc`, `buildStep4Doc`, `finalize`, `pay`).
+- Worker API client: `worker-onrc/src/onrc/api.ts` (token, summary, opis, download).
+- Coadă/livrare: `src/app/api/onrc/{pending,result}/route.ts`, `src/lib/onrc/{ensure-onrc-job,deliver,log-event}.ts`.
+- Formular: `src/components/orders/modules/constatator/ConstatatorStep.tsx`, config motive în DB `services.verification_config` (`scripts/sync-constatator-purposes.mjs`).
+- Reguli operare (memorie): NU reseta joburi plătite; deploy worker prin `git push` (NU „Redeploy" Railway).
