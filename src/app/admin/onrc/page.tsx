@@ -11,6 +11,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
+import { OnrcManualUpload } from './OnrcManualUpload';
 
 export const dynamic = 'force-dynamic';
 
@@ -19,8 +20,9 @@ interface OnrcJob {
   order_id: string;
   status: 'PENDING' | 'PROCESSING' | 'AWAITING_DOCUMENT' | 'NEEDS_OPERATOR' | 'DONE' | 'FAILED';
   document_type: string;
-  cui: string;
+  cui: string | null;
   company_name: string | null;
+  detail: Record<string, unknown> | null;
   registration_number: string | null;
   onrc_request_id: string | null;
   onrc_draft_id: string | null;
@@ -69,6 +71,17 @@ function friendly(orders: OnrcJob['orders']): string {
   return o?.friendly_order_id ?? '—';
 }
 
+// constatator subtype label (detail.documentType: firma | istoric | pf).
+const SUBTYPE_LABEL: Record<string, string> = {
+  firma: 'Pe firmă',
+  istoric: 'Cu istoric',
+  pf: 'Persoană fizică',
+};
+function subtypeOf(detail: OnrcJob['detail']): string {
+  const d = String(detail?.documentType ?? '');
+  return SUBTYPE_LABEL[d] ?? (d || '—');
+}
+
 export default async function AdminOnrcPage() {
   const supabase = await createClient();
   const {
@@ -81,7 +94,7 @@ export default async function AdminOnrcPage() {
   const admin = createAdminClient() as any;
   const { data } = await admin
     .from('onrc_jobs')
-    .select('id, order_id, status, document_type, cui, company_name, registration_number, onrc_request_id, onrc_draft_id, onrc_calc_note, document_url, error_message, retry_count, awaiting_since, created_at, orders(friendly_order_id)')
+    .select('id, order_id, status, document_type, cui, company_name, detail, registration_number, onrc_request_id, onrc_draft_id, onrc_calc_note, document_url, error_message, retry_count, awaiting_since, created_at, orders(friendly_order_id)')
     .order('created_at', { ascending: false })
     .limit(200);
   const jobs: OnrcJob[] = data ?? [];
@@ -137,9 +150,10 @@ export default async function AdminOnrcPage() {
           <TableHeader>
             <TableRow>
               <TableHead>Comandă</TableHead>
-              <TableHead>Firmă (CUI)</TableHead>
+              <TableHead>Subiect (firmă / persoană)</TableHead>
               <TableHead>Tip</TableHead>
               <TableHead>Status</TableHead>
+              <TableHead>Acțiune manuală</TableHead>
               <TableHead>Eliberat</TableHead>
               <TableHead>Nr. înreg. / Id cerere</TableHead>
               <TableHead>Notă calcul (contabilitate)</TableHead>
@@ -152,7 +166,7 @@ export default async function AdminOnrcPage() {
           <TableBody>
             {jobs.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={11} className="text-center text-neutral-500 py-8">
+                <TableCell colSpan={12} className="text-center text-neutral-500 py-8">
                   Niciun job ONRC încă. Se creează automat la plata comenzilor de constatator.
                 </TableCell>
               </TableRow>
@@ -161,16 +175,32 @@ export default async function AdminOnrcPage() {
                 <TableRow key={job.id}>
                   <TableCell className="font-medium">{friendly(job.orders)}</TableCell>
                   <TableCell>
-                    <div className="text-sm">{job.company_name ?? '—'}</div>
-                    <div className="text-xs text-neutral-500">{job.cui}</div>
+                    {String(job.detail?.documentType ?? '') === 'pf' ? (
+                      <>
+                        <div className="text-sm">{String(job.detail?.requesterName ?? '—')}</div>
+                        <div className="text-xs text-neutral-500">CNP {String(job.detail?.requesterCnp ?? '—')}</div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="text-sm">{job.company_name ?? '—'}</div>
+                        <div className="text-xs text-neutral-500">{job.cui ?? '—'}</div>
+                      </>
+                    )}
                   </TableCell>
-                  <TableCell className="text-xs">{job.document_type}</TableCell>
+                  <TableCell className="text-xs">{subtypeOf(job.detail)}</TableCell>
                   <TableCell>
                     <Badge className={`${STATUS_STYLE[job.status]} border-0`}>{STATUS_LABEL[job.status]}</Badge>
                     {job.status === 'AWAITING_DOCUMENT' && job.awaiting_since && (
                       <div className="mt-0.5 text-[10px] text-neutral-500">
                         din {new Date(job.awaiting_since).toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Bucharest' })}
                       </div>
+                    )}
+                  </TableCell>
+                  <TableCell className="min-w-[150px]">
+                    {(job.status === 'NEEDS_OPERATOR' || job.status === 'FAILED') ? (
+                      <OnrcManualUpload orderId={job.order_id} />
+                    ) : (
+                      <span className="text-xs text-neutral-400">—</span>
                     )}
                   </TableCell>
                   <TableCell className="text-xs">

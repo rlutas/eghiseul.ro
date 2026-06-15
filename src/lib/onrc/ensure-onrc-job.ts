@@ -52,8 +52,15 @@ export async function ensureOnrcJobForPaidOrder(orderId: string): Promise<void> 
     const cd = (order.customer_data as CustomerData) ?? {};
     const company = cd.company ?? {};
     const c = cd.constatator ?? {};
-    const cui = company.cui;
-    if (!cui) {
+    const cui = company.cui ?? null;
+    const isPf = c.documentType === 'pf';
+    // PF is identified by CNP (no CUI); firmă/istoric require a CUI.
+    if (isPf) {
+      if (!c.requesterCnp) {
+        console.error(`[onrc] PF order ${orderId} has no requesterCnp — not queued`);
+        return;
+      }
+    } else if (!cui) {
       console.error(`[onrc] order ${orderId} is an ONRC service but has no CUI — not queued`);
       return;
     }

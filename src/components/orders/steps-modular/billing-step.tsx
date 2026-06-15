@@ -105,6 +105,30 @@ const CONSTATATOR_BILLING_OPTIONS: BillingOption[] = [
   },
 ];
 
+// Billing options for "certificat constatator pe persoană" — the certificate is
+// for a person, so default to billing that person (PF first), prefilled with the
+// requester name + CNP from the request, then another person or a company.
+const CONSTATATOR_PF_BILLING_OPTIONS: BillingOption[] = [
+  {
+    source: 'self',
+    label: 'Persoană fizică (solicitantul)',
+    description: 'Facturează pe persoana din cerere (nume + CNP) — completează adresa',
+    icon: User,
+  },
+  {
+    source: 'other_pf',
+    label: 'Altă persoană fizică',
+    description: 'Facturează pe numele altei persoane',
+    icon: Users,
+  },
+  {
+    source: 'company',
+    label: 'Persoană juridică',
+    description: 'Facturează pe o firmă (introdu CUI)',
+    icon: Building2,
+  },
+];
+
 export default function BillingStepModular({ onValidChange }: BillingStepProps) {
   const { state, updateBilling, prefillData } = useModularWizard();
   const { billing, personalKyc, companyKyc, clientType, constatator, serviceSlug } = state;
@@ -113,6 +137,9 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
   // PJ order, even though the client type isn't "PJ".
   const isConstatatorFirm =
     serviceSlug === 'certificat-constatator' && constatator?.documentType !== 'pf';
+  // Certificat constatator pe persoană: bill the requester person by default.
+  const isConstatatorPf =
+    serviceSlug === 'certificat-constatator' && constatator?.documentType === 'pf';
   const companyFirst = isPJOrder || isConstatatorFirm;
 
   // CUI validation state
@@ -210,6 +237,28 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
       });
     }
   }, [isPJOrder, billing?.source, billing?.firstName, prefillFromId, updateBilling]);
+
+  // Certificat constatator pe persoană: default-bill the requester person,
+  // prefilling name + CNP from the request. The full "Nume complet" is split on
+  // whitespace (firstName+lastName concatenate back to the same name on the
+  // invoice). Address stays empty → the customer completes it (Oblio needs it).
+  const requesterName = constatator?.requesterName;
+  const requesterCnp = constatator?.requesterCnp;
+  useEffect(() => {
+    if (!isConstatatorPf) return;
+    if ((billing?.source === 'self' || !billing?.source) && !billing?.firstName) {
+      const parts = (requesterName ?? '').trim().split(/\s+/).filter(Boolean);
+      updateBilling({
+        source: 'self',
+        type: 'persoana_fizica',
+        firstName: parts[0] ?? '',
+        lastName: parts.slice(1).join(' '),
+        cnp: requesterCnp ?? '',
+        country: 'Romania',
+        isValid: false, // address still required for the invoice → customer completes it
+      });
+    }
+  }, [isConstatatorPf, billing?.source, billing?.firstName, requesterName, requesterCnp, updateBilling]);
 
   // Extract primitive billing values to avoid effect re-triggers from object reference changes
   const billingSource = billing?.source;
@@ -431,9 +480,11 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
   const selectedSource = billing?.source || (companyFirst ? 'company' : 'self');
   const billingOptions = isConstatatorFirm
     ? CONSTATATOR_BILLING_OPTIONS
-    : isPJOrder
-      ? PJ_BILLING_OPTIONS
-      : PF_BILLING_OPTIONS;
+    : isConstatatorPf
+      ? CONSTATATOR_PF_BILLING_OPTIONS
+      : isPJOrder
+        ? PJ_BILLING_OPTIONS
+        : PF_BILLING_OPTIONS;
 
   return (
     <div className="space-y-8">

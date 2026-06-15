@@ -176,6 +176,9 @@ export interface ConstatatorDocType {
   price: number;       // effective base price for this document type (RON)
   // Report sub-types. New shape carries per-type purposes; legacy is string[].
   reportTypes?: Array<string | ConstatatorReportType>;
+  // Purpose list when the type has NO report sub-types (e.g. 'pf' → ONRC subtype
+  // 160's 10 reasons). 'istoric' has none (ONRC has no Tip Document step there).
+  purposes?: string[];
 }
 export interface ConstatatorConfig {
   enabled: boolean;

@@ -51,8 +51,11 @@ export default function ConstatatorStep({ config, onValidChange }: ConstatatorSt
   // back to the global list when a report type has none / none is chosen.
   const activePurposes = useMemo(() => {
     const rt = reportTypeOpts.find((r) => r.name === cs.reportType);
-    return rt?.purposes && rt.purposes.length > 0 ? rt.purposes : purposes;
-  }, [reportTypeOpts, cs.reportType, purposes]);
+    if (rt?.purposes && rt.purposes.length > 0) return rt.purposes;
+    // Type-level purposes (e.g. 'pf' → the 10 ONRC reasons for subtype 160).
+    if (selectedType?.purposes && selectedType.purposes.length > 0) return selectedType.purposes;
+    return purposes;
+  }, [reportTypeOpts, cs.reportType, purposes, selectedType]);
   const isOtherPurpose = (cs.purpose ?? '').toLowerCase() === 'altele';
   // 'istoric' → needs the certificate period; 'pf' → needs the person (CNP).
   // 'firma'/'istoric' (CUI types) capture the CUI in the next step (company-data).
@@ -63,8 +66,9 @@ export default function ConstatatorStep({ config, onValidChange }: ConstatatorSt
     const checks: boolean[] = [];
     checks.push(!!cs.documentType);
     if (reportTypes.length > 0) checks.push(!!cs.reportType);
-    checks.push(!!cs.purpose);
-    if (isOtherPurpose) checks.push(!!cs.otherPurpose?.trim());
+    // "cu istoric" has NO purpose at ONRC (no Tip Document step) — don't require it.
+    if (!isIstoric) checks.push(!!cs.purpose);
+    if (!isIstoric && isOtherPurpose) checks.push(!!cs.otherPurpose?.trim());
     if (isIstoric) {
       checks.push(!!cs.period);
       if (cs.period === 'custom') {
@@ -157,7 +161,8 @@ export default function ConstatatorStep({ config, onValidChange }: ConstatatorSt
         </Field>
       )}
 
-      {/* Purpose / destination */}
+      {/* Purpose / destination — not for "cu istoric" (ONRC has no motiv there) */}
+      {!isIstoric && (
       <Field label="Document solicitat spre a servi la" required>
         <Select value={cs.purpose ?? ''} onValueChange={(v) => updateConstatator({ purpose: v })}>
           <SelectTrigger>
@@ -180,6 +185,7 @@ export default function ConstatatorStep({ config, onValidChange }: ConstatatorSt
           />
         )}
       </Field>
+      )}
 
       {/* Period — only for "cu istoric" */}
       {isIstoric && (
