@@ -16,8 +16,8 @@ Un operator uman ia acum manual datele dintr-o comandă de **certificat constata
 - **Token**: password grant (dacă parola e corectă) sau fallback pe sesiunea de browser (`storageState.json`).
 
 ### Scope (decizie produs)
-- **Certificat Constatator pe Firmă (de bază)** → **automat prin API** ✅
-- **cu Istoric** → **manual deocamdată** (mai scump; implementăm mai târziu) → worker-ul îl trece `NEEDS_OPERATOR`.
+- **Certificat Constatator pe Firmă (de bază / IMM / insolvență)** → **automat prin API** ✅
+- **cu Istoric (Raport Istoric)** → **automat prin API** ✅ (2026-06-15, taxă 7715 = 250 LEI; validat dry-run; vezi secțiunea dedicată mai jos).
 - **Persoană Fizică** → **flux diferit** (solicitantul trebuie să fi fost administrator) → `NEEDS_OPERATOR` deocamdată.
 
 ### Token & headless (rezolvat 2026-06-14)
@@ -223,9 +223,30 @@ Asocierea singură întoarce și motive inactive/legacy. ⚠️ Namespace-ul `f2
 
 ---
 
-## 🚧 ROADMAP — automatizare „persoană fizică" + „cu istoric" (DE FĂCUT)
+## ✅ „cu istoric" (Raport Istoric) — AUTOMATIZAT prin API (2026-06-15)
 
-> Handoff pentru o sesiune nouă (după `/clear`). Acum **automate**: constatator pe firmă „de bază / fonduri IMM / insolvență". **MANUALE** (rutate la `NeedsOperator`): „cu istoric" și „persoană fizică".
+Flux ONRC capturat live (driving UI + interceptor XHR/fetch) și implementat în
+`worker-onrc/src/onrc/api-submit.ts`. **Validat prin dry-run** (creează draft +
+toți pașii, FĂRĂ plată): istoric „de la înființare", istoric interval custom, și
+de bază (fără regresie). Note complete: `worker-onrc/ONRC-CAPTURE-ISTORIC-PF.md`.
+
+- **Intrare:** home → „Furnizare Informații RC - InfoCert-Recom" (`/providing-information`) → „Eliberare Raport Istoric" (`/historical-report/wizard`).
+- **Flux:** `FI_RAPORT_ISTORIC` (NU `ELIBERARE_INFORMATII`). 5 pași: GDPR→Solicitant→Solicitare(cu perioadă)→**Facturare(step „4")**→Finalizare.
+- **createDraft** = identic cu de bază, DOAR subtipul: **RI cod 147 `17879a1e-6bc3-c7f7-e063-2a0b290a371a`**.
+- **NU are pas „Tip Document"/motiv** (asocierea de motive e goală; wizardul sare peste). Nu trimite `documentTypeReason`.
+- **Step 3** = identic cu de bază (`certificateType:JURIDIC`, `selectedList:[hit RECOM]`) + `historicalReportPeriod`:
+  - founding („De la înființare până în prezent"): `{fromBegginingToPresent:true, toDate:<now>}`
+  - custom („Selectare Perioada"): `{fromBegginingToPresent:false, fromDate, toDate}` (form trimite `period:'founding'|'custom'` + `periodFrom`/`periodTo` `YYYY-MM-DD`; min 01.01.1998).
+- **Facturare** = identic cu de bază (WALLET + profil EDIGITALIZARE), dar `stepRequestId:"4"`.
+- **Taxă:** cod **`7715`** „Eliberare raport istoric despre o firma" = **250 LEI** (de bază: 7515 = 30 LEI). Confirmat pe nota de calcul NC202601923844.
+- ⚠️ **Portofelul ONRC trebuie să aibă ≥ 250 LEI** înainte de prima comandă istoric reală (la captură soldul era 40 LEI). Worker-ul plătește `paidValue=250`.
+- **De făcut înainte de „trust complet":** alimentează walletul + **1 comandă reală de test istoric** → confirmă eliberarea A→Z. Apoi `git push` worker (NU „Redeploy" Railway).
+
+---
+
+## 🚧 ROADMAP — automatizare „persoană fizică" (DE FĂCUT)
+
+> Handoff pentru o sesiune nouă (după `/clear`). Acum **automate**: constatator pe firmă „de bază / fonduri IMM / insolvență" **+ „cu istoric"**. **MANUAL** (rutat la `NeedsOperator`): doar „persoană fizică".
 
 ### Unde sunt rutate la manual ACUM
 `worker-onrc/src/onrc/api-submit.ts` → `submitViaApi()`, la început:
