@@ -694,7 +694,7 @@ export default async function ExtrasCarteFunciaraPage() {
 
             {/* What it contains + validity — part of the specimen block */}
             <div className="mt-10 lg:mt-14 grid md:grid-cols-2 gap-6 max-w-[920px] mx-auto">
-              <div className="rounded-2xl border border-neutral-200 p-6">
+              <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
                 <h3 className="text-xl font-bold text-secondary-900 mb-4">Ce conține extrasul CF</h3>
                 <ul className="space-y-2.5 text-sm text-neutral-700">
                   {[
@@ -709,7 +709,7 @@ export default async function ExtrasCarteFunciaraPage() {
                   ))}
                 </ul>
               </div>
-              <div className="rounded-2xl border border-neutral-200 p-6 bg-primary-50/40">
+              <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
                 <h3 className="text-xl font-bold text-secondary-900 mb-4">Cât este valabil</h3>
                 <p className="text-sm text-neutral-700 leading-relaxed">
                   <strong>Extrasul de carte funciară pentru informare</strong> nu are un termen legal de expirare, dar
