@@ -915,7 +915,9 @@ export default function AdminOrderDetailPage() {
             )}
           </CardContent>
         </Card>
-        {/* Client Details (PF or PJ) */}
+        {/* Client Details (PF or PJ) — hidden for services with no ID/company
+            data (extras CF, constatator); the billing party is shown elsewhere. */}
+        {(personal || company) && (
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-base flex items-center gap-2">
@@ -1099,6 +1101,7 @@ export default function AdminOrderDetailPage() {
             )}
           </CardContent>
         </Card>
+        )}
         </div>
         {/* RIGHT column — service+options on top, delivery info below */}
         <div className="space-y-4">

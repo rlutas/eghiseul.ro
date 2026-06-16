@@ -105,22 +105,31 @@ export async function autoGenerateOrderDocuments(
   // `delegation-items.isPJForDocumentGeneration` so it can be unit-tested
   // — see that file for the full rationale + the E-260528-DZ8MS regression
   // it prevents.
-  const isPJ = isPJForDocumentGeneration(cd);
+  // Services with no ID scan / no company KYC (extras CF, constatator) have no
+  // `personal`/`company` data — the contracting party is the BILLING party the
+  // client filled in (persoană fizică sau juridică). Fall back to billing then.
+  const usesBillingAsParty = !personal.firstName && !personal.lastName && !company.companyName;
+  const billingIsPJ = billing.type === 'persoana_juridica' || billing.source === 'company';
+  const isPJ = usesBillingAsParty ? billingIsPJ : isPJForDocumentGeneration(cd);
 
   const personalAddress = typeof personal.address === 'object' ? personal.address : undefined;
   const companyAddress = typeof company.address === 'object' ? company.address : undefined;
+  // Flat billing address (street line + city + county + postal) → one string.
+  const billingAddressStr = [billing.address, billing.city, billing.county, billing.postalCode]
+    .filter(Boolean)
+    .join(', ');
 
   const clientData: ClientData = {
     name: isPJ
       ? (company.companyName || billing.companyName || 'N/A')
-      : (`${personal.firstName || ''} ${personal.lastName || ''}`.trim() || 'N/A'),
-    firstName: personal.firstName || '',
-    lastName: personal.lastName || '',
-    cnp: personal.cnp || '',
+      : (`${personal.firstName || billing.firstName || ''} ${personal.lastName || billing.lastName || ''}`.trim() || 'N/A'),
+    firstName: personal.firstName || billing.firstName || '',
+    lastName: personal.lastName || billing.lastName || '',
+    cnp: personal.cnp || billing.cnp || '',
     cui: company.cui || billing.cui || '',
     email: contact.email || '',
     phone: contact.phone || '',
-    address: formatAddress(personal.address),
+    address: formatAddress(personal.address) || billingAddressStr,
     ci_series: personal.documentSeries || personal.ci_series || '',
     ci_number: personal.documentNumber || personal.ci_number || '',
     document_issued_by: personal.documentIssuedBy || personal.issuedBy || '',
@@ -145,7 +154,10 @@ export async function autoGenerateOrderDocuments(
       building: personalAddress.building, staircase: personalAddress.staircase,
       floor: personalAddress.floor, apartment: personalAddress.apartment,
       postalCode: personalAddress.postalCode,
-    } : undefined,
+    } : (usesBillingAsParty && billing.address ? {
+      county: billing.county, city: billing.city,
+      street: billing.address, postalCode: billing.postalCode,
+    } : undefined),
     company_address_parts: companyAddress ? {
       county: companyAddress.county, city: companyAddress.city,
       street: companyAddress.street, number: companyAddress.number,
