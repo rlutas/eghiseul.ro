@@ -356,6 +356,25 @@ Testat pe 19.528 CF reale: 89% valid, 4% format vechi, 7% suspect. **Decizie: nu
 
 Extras carte funciară e serviciu **fără implicare avocațială** → la submit NU se generează **contract de asistență juridică**, **împuternicire avocațială**, **cerere** și NU se alocă **număr de Barou** (delegație). `lib/documents/auto-generate.ts`: slug-ul e în `NO_LAWYER_SERVICES` (`certificat-constatator`, `extras-carte-funciara` — atenție: slug DB e fără „de") → se generează doar `contract-prestari`; `delegationItems = []` pentru aceste servicii. (Bug reparat 2026-06-16: lista folosea greșit `extras-de-carte-funciara`, deci CF primea contract de asistență.)
 
+## 11d. Identificare imobil după adresă (serviciu nou, 198 RON)
+
+Serviciu pentru clienții care **nu știu numărul CF** — îl aflăm din adresă (+ nume proprietar). Model **operator + asistent geoportal**.
+
+**Cum funcționează (validat live):**
+- `GET /api/ancpi/lookup?address=&judet=&localitate=` → **geocode** (Esri World, Stereo70) → **query spațial** pe geoportalul ANCPI (`MapServer/1/query`, intersects, buffer 25m, 8 retry) → `NATIONAL_CADASTRAL_REFERENCE` = **numărul de carte funciară** + `IMMOVABLE_ID`.
+- ⚠️ `NATIONAL_CADASTRAL_REFERENCE` = **nr. CF** (confirmat vs extras real: 106395 = „Carte Funciară Nr. 106395"), NU nr. cadastral (ăla e 4265).
+- ⚠️ **Geoportalul ANCPI e foarte flaky** (valuri de 502) → endpoint-ul are AbortController 4s/încercare + 6-8 retry + `maxDuration=30`. Când e sus, găsește; în valuri proaste, „ancpi_unavailable" → reîncercare.
+- ⚠️ La **apartamente**, punctul găsește **parcela/blocul** (CF-ul terenului/construcției), nu unitatea → punct de plecare pentru investigare manuală.
+- ⚠️ Imobil **neînscris în CF** → nu se identifică; căutăm date utile prin alte surse.
+
+**Admin:** `/admin/identifica-imobil` — operatorul introduce județ/localitate/adresă → rulează lookup-ul cu retry → afișează CF/parcela + adresa geocodată. Pe comanda de identificare, operatorul confirmă/cercetează și livrează (+ extras CF după identificare).
+
+**Validat pe cazuri reale:** Odoreu/Salcâmilor 2 → CF 106395 ✓; Paul Greceanu 13 București (apt) → parcela CF 231817 ✓ (când ANCPI e sus). Apartamente/rural → uneori doar parcela sau ANCPI indisponibil → operator.
+
+**Avenue viitoare — căutare după PROPRIETAR:** `rp.ancpi.ro/owner-registry` (Registrul Proprietarilor, **doar prin avocat**) permite căutarea după nume proprietar — exact ce lipsește geoportalului. De explorat cu cont de avocat (recon ca la ePay) pentru cazurile unde adresa nu prinde (formularul captează deja numele proprietarului).
+
+**Fișiere:** `src/app/api/ancpi/lookup/route.ts`, `src/app/admin/identifica-imobil/{page,IdentificaImobilTool}.tsx`. Serviciu DB `identificare-imobil` (198 RON, `is_active=false` până la wizard-ul customer — validarea address-only în `PropertyDataStep` rămâne de făcut).
+
 ## 12. Dovezi recon (2026-06-15)
 
 - Cont: EDIGITALIZARE SRL, 51→50 puncte după test.
