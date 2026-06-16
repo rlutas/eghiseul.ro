@@ -241,4 +241,24 @@ Construite 7 pagini hardcodate la **slug-parity WP** (același pattern ca CF: sc
 
 ---
 
-*Toate cele 9 servicii active au acum pagini SEO hardcodate; rovinietă-tool implementat cu widget. Următor: paritate formular comandă (P0) + calculatoare.*
+## 5. BATCH 3 — Cluster cadastru: identificare imobil + plan cadastral (2026-06-16)
+
+Două servicii ANCPI noi (introduse în sesiunea 2026-06-16) primesc **pagini hardcodate dedicate**, scoase de pe ruta generică `[slug]`. Atacă explicit **clusterul cadastru** identificat în §3.2-C (929k impresii CF, intent cadastru necaptat): `localizare teren dupa numar cadastral` 49.159 · `harta cadastru` 23.353 · `cadastru online` 17.865 · `aflare numar cadastral dupa adresa` 8.777 · `identificator imobil` 843.
+
+| Serviciu | URL canonic = slug DB | Preț (cu TVA) | Fulfillment | Clustere țintă |
+|---|---|--:|---|---|
+| Identificare Imobil după Adresă | `/servicii/identificare-imobil/` | 198 | operator, no-KYC, 3 zile | `aflare numar cadastral dupa adresa`, `identificator imobil`, „nu știu numărul cadastral" |
+| Extras de Plan Cadastral | `/servicii/extras-plan-cadastral/` | 79,99 | operator, 24h | `localizare teren dupa numar cadastral`, `harta cadastru`, `plan cadastral`, ortofotoplan |
+
+**Ce am construit:**
+- **Pagini** `src/app/servicii/identificare-imobil/page.tsx` + `src/app/servicii/extras-plan-cadastral/page.tsx`, modelate pe pagina CF acceptată: hero + price card cu split TVA (ex-VAT headline + total cu TVA 21%), schema `@graph` completă (Breadcrumb + Service + Offer + AggregateRating 4.9/450 + WebPage + reviewedBy), `id="main-content"`, iconițe lucide.
+- **Identificare:** H2 „Cum afli numărul cadastral după adresă", bloc onest „când identificarea poate să nu reușească" (neintabulat / apartamente), proces 4 pași (adresă → căutare ANCPI → nr cadastral/CF → extras CF), 8 FAQ.
+- **Plan cadastral:** H2 „ce este / la ce folosește" (ortofotoplan), bloc comparativ **plan cadastral vs. extras CF**, use-cases (limite teren, construcții/urbanism, localizare, tranzacții), 7 FAQ.
+- **Internal linking în cluster:** ambele pagini + CF se inter-leagă (Identificare ⇄ Plan cadastral ⇄ CF) prin `serviceUrl()`; plan cadastral are CTA inline către Identificare pentru cazul „nu știu numărul".
+- **Wiring (fără canibalizare):** servicii noi, **fără slug WP legacy** → folder name = slug DB, deci `serviceUrl()` rezolvă direct la `/servicii/<slug>/` **fără override și fără redirect**. Adăugate doar în `HARDCODED_SERVICE_SLUGS` (intră în sitemap o singură dată; ruta dinamică le sare prin `hardcodedSet`). `tsc` + `eslint` 0 erori; `focus-visible` ring pe cardurile de cross-link (stil gov accessible).
+
+**Rămas (cluster cadastru):** OG images `/og/identificare-imobil.png` + `/og/extras-plan-cadastral.png`; SEO mai adânc pe CF (bloc „cum afli nr. cadastral după adresă" + link către Identificare); migrare articol `/cum-aflam-numarul-carte-functionara-si-nr-cadastral/` (33k clicks) ca MDX cu link UP către cele 3 servicii.
+
+---
+
+*Toate cele 11 servicii active au acum pagini SEO hardcodate (9 din batch-urile 1-2 + identificare-imobil + plan-cadastral); rovinietă-tool implementat cu widget. Următor: paritate formular comandă (P0) + calculatoare + OG images cluster cadastru.*

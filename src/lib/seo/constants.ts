@@ -23,6 +23,8 @@ export const HARDCODED_SERVICE_SLUGS = [
   'eliberare-certificat-de-casatorie',
   'eliberare-certificat-de-celibat',
   'extras-de-carte-funciara',
+  'identificare-imobil',
+  'extras-plan-cadastral',
   'certificat-constatator-online',
   'certificat-de-integritate-comportamentala',
   'extras-multilingv-certificat-nastere',
