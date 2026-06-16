@@ -17,6 +17,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
+export const maxDuration = 30; // ANCPI is flaky → allow time for retries
 
 const UA =
   'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36';
@@ -24,16 +25,20 @@ const UA =
 async function fetchJson(url: string, tries = 1): Promise<unknown | null> {
   for (let i = 0; i < tries; i++) {
     try {
+      const ctrl = new AbortController();
+      const t = setTimeout(() => ctrl.abort(), 4000); // bound each attempt
       const r = await fetch(url, {
         headers: { 'User-Agent': UA, Referer: 'https://geoportal.ancpi.ro/imobile_lookup.html', Accept: 'application/json' },
         cache: 'no-store',
+        signal: ctrl.signal,
       });
-      const t = await r.text();
-      if (r.ok && t.trim().startsWith('{')) return JSON.parse(t);
+      clearTimeout(t);
+      const body = await r.text();
+      if (r.ok && body.trim().startsWith('{')) return JSON.parse(body);
     } catch {
       /* retry */
     }
-    if (i < tries - 1) await new Promise((s) => setTimeout(s, 1200));
+    if (i < tries - 1) await new Promise((s) => setTimeout(s, 700));
   }
   return null;
 }
@@ -64,11 +69,14 @@ export async function GET(req: NextRequest) {
   //    we retry generously.
   const { x, y } = c.location;
   const geom = encodeURIComponent(JSON.stringify({ x, y, spatialReference: { wkid: 3844 } }));
+  // `distance` buffers the point ~25m so a slightly-off geocode (common for
+  // apartments/blocks) still catches the parcel.
   const qUrl =
     'https://geoportal.ancpi.ro/maps/rest/services/imobile/Imobile/MapServer/1/query' +
     `?geometry=${geom}&geometryType=esriGeometryPoint&inSR=3844&spatialRel=esriSpatialRelIntersects` +
+    '&distance=25&units=esriSRUnit_Meter' +
     '&outFields=NATIONAL_CADASTRAL_REFERENCE,IMMOVABLE_ID,INSPIRE_ID&returnGeometry=false&f=json';
-  const q = (await fetchJson(qUrl, 8)) as { features?: Array<{ attributes: Record<string, string | number> }> } | null;
+  const q = (await fetchJson(qUrl, 6)) as { features?: Array<{ attributes: Record<string, string | number> }> } | null;
   if (q === null) {
     return NextResponse.json({ success: true, data: { found: false, reason: 'ancpi_unavailable', geocoded: { address: c.address, score: c.score } } });
   }
