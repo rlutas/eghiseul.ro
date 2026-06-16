@@ -66,6 +66,16 @@ export function IdentificaImobilTool() {
 
       {err && <div className="rounded bg-red-50 border border-red-200 p-3 text-sm text-red-700">{err}</div>}
 
+      {/* Manual lawyer portal — operator searches by owner if geoportal isn't enough.
+          rp.ancpi.ro is lawyer-only + ToS forbids automation, so it's a manual link. */}
+      <div className="rounded bg-neutral-50 border border-neutral-200 p-3 text-xs text-neutral-600">
+        Dacă geoportalul nu e suficient (apartament / neînscris), caută <strong>manual după proprietar</strong> pe{' '}
+        <a className="text-primary-600 underline" target="_blank" rel="noreferrer" href="https://rp.ancpi.ro/owner-registry">
+          rp.ancpi.ro (Registrul Proprietarilor)
+        </a>{' '}
+        — acces avocat, prin interfață (NU automatizat).
+      </div>
+
       {res && (
         <div className="rounded-lg border border-neutral-200 bg-white p-4 text-sm space-y-2">
           {res.geocoded && (
