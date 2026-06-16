@@ -1,6 +1,8 @@
 # Plan: Automatizare ANCPI — Extras de Carte Funciară (coadă de stări + worker)
 
-**Status:** 🟢 **Faza 1 + Faza 2 implementate (2026-06-15)** — coadă `ancpi_jobs` + creare job idempotentă la plată + API `/api/ancpi/{pending,result}` + livrare PDF (atașare la comandă + email). API ePay ANCPI **mapat A→Z prin recon live** (comandă reală de test emisă + descărcată). Rămâne **worker-ul `worker-ancpi/`** (Railway) + modulul de wizard. Comandă reală de test plasată + emisă + descărcată automat prin portalul ePay ANCPI: `Extras de carte funciară pentru informare online (preplătit)`, imobil Botoșani CF `50528-C1-U4`, **comanda ePay `10054451`, nr. înregistrare `69000`, status `Soluționată - ADMIS`, PDF `Extras_Informare_69000.pdf` (2 pagini) descărcat — totul în ~1 minut**. Worker-ul **NU e încă construit** — acest document e blueprint-ul complet de implementare. **Ultima actualizare:** 2026-06-15.
+**Status:** ✅ **LIVE & FUNCȚIONAL A→Z (2026-06-16)** — comanda reală `E-260616-KAFEG` emisă 100% automat de worker-ul Railway: login OpenAM → validare imobil (CF 100015) → coș → checkout → comandă ePay `10057701` → `Finalizata/ADMIS` → descărcat `Extras_Informare_72368.pdf` + chitanță → atașat la comandă (`document_ready`) + email client. Fix-uri cheie: Dockerfile pin `playwright@1.48.0`; document id parsat din JSON HTML-encodat (`solutii[].idDocument`); stări soluție ADMIS/RESPINS; admin cu Reîncearcă/Copiază log/link ePay.
+
+**Status (istoric):** 🟢 **Faza 1 + Faza 2 implementate (2026-06-15)** — coadă `ancpi_jobs` + creare job idempotentă la plată + API `/api/ancpi/{pending,result}` + livrare PDF (atașare la comandă + email). API ePay ANCPI **mapat A→Z prin recon live** (comandă reală de test emisă + descărcată). Rămâne **worker-ul `worker-ancpi/`** (Railway) + modulul de wizard. Comandă reală de test plasată + emisă + descărcată automat prin portalul ePay ANCPI: `Extras de carte funciară pentru informare online (preplătit)`, imobil Botoșani CF `50528-C1-U4`, **comanda ePay `10054451`, nr. înregistrare `69000`, status `Soluționată - ADMIS`, PDF `Extras_Informare_69000.pdf` (2 pagini) descărcat — totul în ~1 minut**. Worker-ul **NU e încă construit** — acest document e blueprint-ul complet de implementare. **Ultima actualizare:** 2026-06-15.
 
 > **Model de referință:** worker-ul ONRC (`docs/technical/specs/onrc-automation-plan.md` + repo `worker-onrc/`). Replicăm exact tiparul (coadă de stări în eghiseul.ro + worker persistent pe Railway + livrare PDF la comandă), cu diferențele de portal documentate mai jos.
 
@@ -349,6 +351,10 @@ Testat pe 19.528 CF reale: 89% valid, 4% format vechi, 7% suspect. **Decizie: nu
 **Status sistem service-aware:** `/api/status?service=ancpi|onrc` → portal corect (`Portal ANCPI` vs `Portal ONRC`) + heartbeat worker. `SystemStatus` are prop `service`. Cardul „Timp estimat livrare" e ascuns la serviciile instant-digitale (constatator + CF) — rămâne doar caseta de status.
 
 **Date de test reale:** Botoșani / Botoșani / CF `50528-C1-U4` (immovableId 10691503).
+
+## 11c. Fără documente avocațiale (ca la constatator)
+
+Extras carte funciară e serviciu **fără implicare avocațială** → la submit NU se generează **contract de asistență juridică**, **împuternicire avocațială**, **cerere** și NU se alocă **număr de Barou** (delegație). `lib/documents/auto-generate.ts`: slug-ul e în `NO_LAWYER_SERVICES` (`certificat-constatator`, `extras-carte-funciara` — atenție: slug DB e fără „de") → se generează doar `contract-prestari`; `delegationItems = []` pentru aceste servicii. (Bug reparat 2026-06-16: lista folosea greșit `extras-de-carte-funciara`, deci CF primea contract de asistență.)
 
 ## 12. Dovezi recon (2026-06-15)
 

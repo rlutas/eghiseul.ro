@@ -208,7 +208,9 @@ export async function autoGenerateOrderDocuments(
   // Determine which templates to auto-generate at submission time.
   // Fully-automated services with no lawyer involvement (ONRC constatator,
   // carte funciară) must NOT get a legal-assistance contract or a Barou number.
-  const NO_LAWYER_SERVICES = ['certificat-constatator', 'extras-de-carte-funciara'];
+  // NB: the DB service slug is 'extras-carte-funciara' (no "de"); keep the "de"
+  // variant too for safety against any caller using the route slug.
+  const NO_LAWYER_SERVICES = ['certificat-constatator', 'extras-carte-funciara', 'extras-de-carte-funciara'];
   const templates = NO_LAWYER_SERVICES.includes(serviceSlug)
     ? ['contract-prestari']
     : ['contract-prestari', 'contract-asistenta'];
@@ -418,10 +420,14 @@ export async function autoGenerateOrderDocuments(
   // Compute the list via the pure helper. See delegation-items.ts for the
   // policy + decision logic and tests/unit/lib/documents/delegation-items.test.ts
   // for coverage of the dedup/bundled cases.
-  const delegationItems = computeDelegationItems({
-    services: order.services,
-    selected_options: selectedOptions,
-  });
+  // No-lawyer services (constatator, carte funciară) need NO împuternicire
+  // avocațială → no Barou delegation numbers at all.
+  const delegationItems = NO_LAWYER_SERVICES.includes(serviceSlug)
+    ? []
+    : computeDelegationItems({
+        services: order.services,
+        selected_options: selectedOptions,
+      });
 
   // Allocate (or reuse) one delegation per item.
   for (const item of delegationItems) {
