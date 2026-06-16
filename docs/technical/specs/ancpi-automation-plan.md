@@ -330,6 +330,26 @@ PDF-ul `Extras_Informare_<nr>.pdf` se atașează la comandă în `order_document
 
 ---
 
+## 11b. Live deploy + teste reale (2026-06-16)
+
+**Deploy:** platforma Next.js rulează pe **`eghiseul-ro.vercel.app`** (NU `eghiseul.ro`, care e încă WordPress-ul vechi). Worker `worker-ancpi` deployat pe **Railway** (proiect `worker-ancpi`), repo `github.com/rlutas/worker-ancpi`, polling `eghiseul-ro.vercel.app` la 60s. `ANCPI_WORKER_SECRET` în Vercel + Railway.
+
+**Dry-run live confirmat:** login OpenAM **headless** merge; nomenclatoare OK; `searchEstate(50528-C1-U4) → immovableId 10691503, Activă`. Cele mai riscante părți (auth + e-Terra) funcționează. Rămân de confirmat la prima comandă reală: `EditCartSubmit`/`CheckoutConfirmationSubmit` + parsarea `ShowOrderDetails` (protejate de `placeOrder` care cere un ID de comandă NOU — altfel aruncă, fără livrare greșită).
+
+**Bug reparat — sesiunea ePay expiră (~30 min):** `ensureLoggedIn()` (probe + re-login per job) + `searchEstate` distinge pagina de login (`SESSION_EXPIRED`) de „not found" + `processJob` reîncearcă o dată după refresh. Esențial pentru worker long-running.
+
+**Test validare (variant C) pe comenzi reale (ePay SearchEstate):** 29/38 (76%) găsite+active în ~1,9s avg (p95 ~4s); restul typo-uri client / inactive. Maparea județ→UAT 100%.
+
+**Reguli de input CF (non-blocant) — `src/lib/ancpi/cf-format.ts`:** validează identificatorul electronic (`12783` teren / `123456-C1-U2` apartament); avertizează la:
+- **colectivă** `123456-C1` (construcția întreagă) → **emitem pe teren `123456`** + warning (decizie produs; `effectiveIdentifier` aplicat în `ensure-ancpi-job`);
+- **format vechi** (`/`, titlu, top) → „CF nedigitalizat, nu se eliberează instant";
+- **suspect** → „verifică numărul".
+Testat pe 19.528 CF reale: 89% valid, 4% format vechi, 7% suspect. **Decizie: nu blocăm niciodată comanda — doar avertizăm.** Hint inline (verde/ambră) sub câmpuri în `PropertyDataStep`.
+
+**Status sistem service-aware:** `/api/status?service=ancpi|onrc` → portal corect (`Portal ANCPI` vs `Portal ONRC`) + heartbeat worker. `SystemStatus` are prop `service`. Cardul „Timp estimat livrare" e ascuns la serviciile instant-digitale (constatator + CF) — rămâne doar caseta de status.
+
+**Date de test reale:** Botoșani / Botoșani / CF `50528-C1-U4` (immovableId 10691503).
+
 ## 12. Dovezi recon (2026-06-15)
 
 - Cont: EDIGITALIZARE SRL, 51→50 puncte după test.
