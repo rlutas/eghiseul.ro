@@ -72,7 +72,10 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
   const { state, updateProperty, serviceOptions, updateOptions } = useModularWizard();
   const property = state.property;
 
-  const [searchMethod, setSearchMethod] = useState<'cadastral' | 'carteFunciara' | 'address'>('carteFunciara');
+  // Identificare service → default to the address tab (client doesn't know the number).
+  const [searchMethod, setSearchMethod] = useState<'cadastral' | 'carteFunciara' | 'address'>(
+    config.identificationService.enabled ? 'address' : 'carteFunciara'
+  );
 
   // UAT (localitate) options for the selected county, from the ANCPI nomenclator.
   const localities: string[] =
@@ -127,9 +130,17 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
     if (config.fields.cadastral.required && !property.cadastral) return false;
     if (config.fields.carteFunciara.required && !property.carteFunciara) return false;
 
-    // At least one identifier should be provided
-    const hasIdentifier = property.cadastral || property.carteFunciara;
-    if (!hasIdentifier) return false;
+    const hasIdentifier = !!(property.cadastral || property.carteFunciara);
+    const hasAddress = !!property.propertyAddress?.trim();
+
+    // "Identificare imobil după adresă": the client doesn't know the number, so an
+    // ADDRESS is enough (an identifier is also accepted). Otherwise (extras CF /
+    // plan cadastral) at least one identifier (CF / cadastral) is required.
+    if (config.identificationService.enabled) {
+      if (!hasIdentifier && !hasAddress) return false;
+    } else if (!hasIdentifier) {
+      return false;
+    }
 
     return true;
   }, [property, config]);
@@ -494,7 +505,9 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
         <Alert>
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
-            Completează cel puțin județul, localitatea și unul din: număr cadastral sau număr CF.
+            {config.identificationService.enabled
+              ? 'Completează județul, localitatea și adresa imobilului (sau numărul cadastral / CF, dacă îl știi).'
+              : 'Completează cel puțin județul, localitatea și unul din: număr cadastral sau număr CF.'}
           </AlertDescription>
         </Alert>
       )}

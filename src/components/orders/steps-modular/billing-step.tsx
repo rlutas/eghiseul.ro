@@ -157,8 +157,9 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
   // Certificat constatator pe persoană: bill the requester person by default.
   const isConstatatorPf =
     serviceSlug === 'certificat-constatator' && constatator?.documentType === 'pf';
-  // Extras Carte Funciară: no ID scan → PF (manual) or PJ; CNP optional.
-  const isCarteFunciara = serviceSlug === 'extras-carte-funciara';
+  // No-KYC property services (Extras CF, Identificare imobil): no ID scan → PF
+  // (manual) or PJ; CNP optional.
+  const isCarteFunciara = serviceSlug === 'extras-carte-funciara' || serviceSlug === 'identificare-imobil';
   const companyFirst = isPJOrder || isConstatatorFirm;
 
   // CUI validation state
