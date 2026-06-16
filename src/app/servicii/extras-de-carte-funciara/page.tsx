@@ -865,8 +865,9 @@ export default async function ExtrasCarteFunciaraPage() {
           ]}
         />
 
-        {/* CTA — premium closing panel */}
+        {/* CTA */}
         <section className="relative py-16 lg:py-24 bg-gradient-to-b from-secondary-900 to-[#0C1A2F] overflow-hidden">
+          {/* subtle dot texture */}
           <div className="absolute inset-0 opacity-5">
             <div
               className="absolute inset-0"
@@ -876,6 +877,13 @@ export default async function ExtrasCarteFunciaraPage() {
               }}
             />
           </div>
+          {/* subtle warm glow */}
+          <div
+            className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-[360px] w-[760px] max-w-[90%] rounded-full bg-primary-500/10 blur-[120px]"
+            aria-hidden="true"
+          />
+          {/* hairline accent at the top edge */}
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary-500/40 to-transparent" aria-hidden="true" />
           <div className="relative container mx-auto px-4 max-w-[760px] text-center">
             <h2 className="text-2xl lg:text-4xl font-extrabold text-white mb-4">
               Gata să obții Extrasul de Carte Funciară?
