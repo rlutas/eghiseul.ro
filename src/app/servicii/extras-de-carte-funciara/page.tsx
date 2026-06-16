@@ -28,6 +28,7 @@ import { OrderButton } from '@/components/services/order-button';
 import { WhatsAppButton } from '@/components/services/whatsapp-button';
 import { GoogleReviewsBadge } from '@/components/services/google-reviews-badge';
 import { ReviewsSection } from '@/components/services/reviews-section';
+import { GOOGLE_RATING, GOOGLE_REVIEW_COUNT_LABEL } from '@/config/contact';
 import { buildPageMetadata, buildServicePageGraph, BASE_URL, serviceUrl } from '@/lib/seo';
 
 // Database slug (order pipeline identifier). URL path uses the WP slug
@@ -864,7 +865,7 @@ export default async function ExtrasCarteFunciaraPage() {
           ]}
         />
 
-        {/* CTA */}
+        {/* CTA — premium closing panel */}
         <section className="relative py-16 lg:py-24 bg-gradient-to-b from-secondary-900 to-[#0C1A2F] overflow-hidden">
           <div className="absolute inset-0 opacity-5">
             <div
@@ -875,17 +876,40 @@ export default async function ExtrasCarteFunciaraPage() {
               }}
             />
           </div>
-          <div className="relative container mx-auto px-4 max-w-[900px]">
-            <div className="text-center">
-              <h2 className="text-2xl lg:text-4xl font-extrabold text-white mb-4">
-                Gata să obții Extrasul de Carte Funciară?
-              </h2>
-              <p className="text-lg text-white/80 mb-8 max-w-xl mx-auto">
-                Ai nevoie doar de numărul cadastral sau adresa imobilului. Primești documentul în {formatEstimatedDays(service)}.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-                <OrderButton href={`/comanda/${SERVICE_SLUG}`}>Comandă Acum</OrderButton>
-                <WhatsAppButton message="Bună ziua! Am o întrebare despre Extrasul de Carte Funciară." />
+          <div className="relative container mx-auto px-4 max-w-[920px]">
+            <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/[0.04] backdrop-blur-sm px-6 py-10 lg:px-12 lg:py-14 text-center">
+              {/* glow */}
+              <div className="pointer-events-none absolute -top-28 left-1/2 -translate-x-1/2 h-64 w-64 rounded-full bg-primary-500/20 blur-3xl" aria-hidden="true" />
+
+              <div className="relative">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-primary-500/15 border border-primary-500/30 px-3 py-1 text-xs font-bold text-primary-400 mb-5">
+                  <Zap className="h-3.5 w-3.5" aria-hidden="true" />
+                  Începe în 2 minute
+                </span>
+
+                <h2 className="text-2xl lg:text-4xl font-extrabold text-white mb-4">
+                  Gata să obții Extrasul de Carte Funciară?
+                </h2>
+                <p className="text-lg text-white/75 mb-8 max-w-xl mx-auto">
+                  Ai nevoie doar de numărul cadastral sau adresa imobilului. Primești documentul în {formatEstimatedDays(service)} —
+                  de la <span className="font-bold text-white">{fmt(priceExVat)} RON</span> + TVA, taxe ANCPI incluse.
+                </p>
+
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  <OrderButton href={`/comanda/${SERVICE_SLUG}`}>Comandă Acum</OrderButton>
+                  <WhatsAppButton message="Bună ziua! Am o întrebare despre Extrasul de Carte Funciară." />
+                </div>
+
+                {/* trust row */}
+                <div className="mt-9 pt-6 border-t border-white/10 flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-sm text-white/70">
+                  <span className="inline-flex items-center gap-1.5">
+                    <svg className="w-4 h-4 text-[#FBBC04] fill-[#FBBC04]" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" /></svg>
+                    <strong className="text-white">{GOOGLE_RATING.toString().replace('.', ',')}</strong> Google · {GOOGLE_REVIEW_COUNT_LABEL} recenzii
+                  </span>
+                  <span className="inline-flex items-center gap-1.5"><CheckCircle className="h-4 w-4 text-green-400" aria-hidden="true" /> Taxe ANCPI incluse</span>
+                  <span className="inline-flex items-center gap-1.5"><Zap className="h-4 w-4 text-primary-400" aria-hidden="true" /> Livrare în câteva minute</span>
+                  <span className="inline-flex items-center gap-1.5"><Shield className="h-4 w-4 text-white/80" aria-hidden="true" /> Plată securizată</span>
+                </div>
               </div>
             </div>
           </div>
