@@ -154,15 +154,13 @@ export default async function ExtrasCarteFunciaraPage() {
                     <Home className="h-3.5 w-3.5 mr-1" />
                     Imobiliare
                   </Badge>
-                  {service.urgent_available && (
-                    <Badge className="bg-orange-500 text-white font-bold px-3 py-1">
-                      <Zap className="h-3.5 w-3.5 mr-1" />
-                      Urgent Disponibil
-                    </Badge>
-                  )}
+                  <Badge className="bg-green-600 text-white font-bold px-3 py-1">
+                    <Zap className="h-3.5 w-3.5 mr-1" />
+                    Eliberare în câteva minute
+                  </Badge>
                   <Badge variant="outline" className="text-white/80 border-white/30 px-3 py-1">
                     <Landmark className="h-3.5 w-3.5 mr-1" />
-                    OCPI / ANCPI
+                    ANCPI
                   </Badge>
                 </div>
 
@@ -182,10 +180,10 @@ export default async function ExtrasCarteFunciaraPage() {
                   </p>
                   <ul className="mt-3 space-y-1.5 text-white/85 text-sm">
                     {[
-                      'Completezi numărul cadastral sau adresa imobilului',
-                      'Verificăm și depunem cererea la OCPI',
-                      'Plătești securizat (taxe OCPI incluse)',
-                      `Primești extrasul CF pe email în ${formatEstimatedDays(service)}`,
+                      'Completezi numărul de carte funciară sau cadastral',
+                      'Verificăm și depunem cererea automat la ANCPI',
+                      'Plătești securizat (taxe ANCPI incluse)',
+                      'Primești extrasul CF pe email în câteva minute',
                     ].map((step) => (
                       <li key={step} className="flex items-center gap-2">
                         <CheckCircle className="w-4 h-4 text-primary-500 flex-shrink-0" />
@@ -216,7 +214,7 @@ export default async function ExtrasCarteFunciaraPage() {
                   <div className="relative bg-gradient-to-br from-secondary-900 via-secondary-800 to-[#0C1A2F] p-6 text-center">
                     <div className="relative">
                       <span className="inline-block px-3 py-1 bg-primary-500 text-secondary-900 text-xs font-bold rounded-full mb-3">
-                        TAXE OCPI INCLUSE
+                        TAXE ANCPI INCLUSE
                       </span>
                       <div className="flex items-baseline justify-center gap-1">
                         <span className="text-5xl lg:text-6xl font-black text-white">{service.base_price}</span>
@@ -232,21 +230,10 @@ export default async function ExtrasCarteFunciaraPage() {
                         <Clock className="h-5 w-5 text-green-600" />
                       </div>
                       <div>
-                        <p className="font-semibold text-secondary-900 text-sm">Livrare în {formatEstimatedDays(service)}</p>
-                        <p className="text-xs text-neutral-500">Zile lucrătoare</p>
+                        <p className="font-semibold text-secondary-900 text-sm">Livrare în câteva minute</p>
+                        <p className="text-xs text-neutral-500">24/7, dacă sistemul ANCPI e operațional</p>
                       </div>
                     </div>
-
-                    {service.urgent_days && (
-                      <div className="flex items-center gap-3 p-3 bg-gradient-to-r from-primary-50 to-primary-100/50 rounded-xl border border-primary-200">
-                        <div className="w-10 h-10 bg-primary-500 rounded-xl flex items-center justify-center flex-shrink-0">
-                          <Zap className="h-5 w-5 text-secondary-900" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="font-bold text-secondary-900 text-sm">Urgent: {service.urgent_days} zile lucrătoare</p>
-                        </div>
-                      </div>
-                    )}
 
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
@@ -254,7 +241,7 @@ export default async function ExtrasCarteFunciaraPage() {
                       </div>
                       <div>
                         <p className="font-semibold text-secondary-900 text-sm">Livrare pe Email</p>
-                        <p className="text-xs text-neutral-500">PDF semnat electronic OCPI</p>
+                        <p className="text-xs text-neutral-500">PDF semnat electronic ANCPI</p>
                       </div>
                     </div>
 

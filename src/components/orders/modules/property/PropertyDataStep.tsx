@@ -72,7 +72,7 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
   const { state, updateProperty, serviceOptions, updateOptions } = useModularWizard();
   const property = state.property;
 
-  const [searchMethod, setSearchMethod] = useState<'cadastral' | 'carteFunciara' | 'address'>('cadastral');
+  const [searchMethod, setSearchMethod] = useState<'cadastral' | 'carteFunciara' | 'address'>('carteFunciara');
 
   // UAT (localitate) options for the selected county, from the ANCPI nomenclator.
   const localities: string[] =
@@ -226,21 +226,21 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
           <div className="flex gap-2 p-1 bg-muted rounded-lg">
             <Button
               type="button"
+              variant={searchMethod === 'carteFunciara' ? 'default' : 'ghost'}
+              size="sm"
+              className="flex-1"
+              onClick={() => setSearchMethod('carteFunciara')}
+            >
+              Nr. Carte Funciară
+            </Button>
+            <Button
+              type="button"
               variant={searchMethod === 'cadastral' ? 'default' : 'ghost'}
               size="sm"
               className="flex-1"
               onClick={() => setSearchMethod('cadastral')}
             >
               Nr. Cadastral
-            </Button>
-            <Button
-              type="button"
-              variant={searchMethod === 'carteFunciara' ? 'default' : 'ghost'}
-              size="sm"
-              className="flex-1"
-              onClick={() => setSearchMethod('carteFunciara')}
-            >
-              Nr. CF
             </Button>
             <Button
               type="button"

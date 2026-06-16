@@ -54,6 +54,8 @@ export interface OrderSidebarProps {
   /** When true, hide the "Timp estimat livrare" card entirely (instant-digital
    *  services rely on the live SystemStatus badge instead). */
   hideDeliveryTimeCard?: boolean;
+  /** When true, hide the "Plată securizată / Garanție rambursare" trust badges. */
+  hideTrustBadges?: boolean;
 }
 
 export function OrderSidebar({
@@ -73,6 +75,7 @@ export function OrderSidebar({
   variant = 'full',
   timeInSummary = false,
   hideDeliveryTimeCard = false,
+  hideTrustBadges = false,
 }: OrderSidebarProps) {
   const showSummary = variant === 'full' || variant === 'summary';
   const showExtras = variant === 'full' || variant === 'extras';
@@ -118,7 +121,7 @@ export function OrderSidebar({
       )}
 
       {/* Trust badges */}
-      {showExtras && (
+      {showExtras && !hideTrustBadges && (
       <div className="space-y-2 px-1">
         <div className="flex items-center gap-2 text-xs text-neutral-600">
           <Shield className="h-3.5 w-3.5 text-emerald-500" />

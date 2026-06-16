@@ -108,6 +108,7 @@ export function PriceSidebarModular({ service, variant = 'full' }: PriceSidebarM
         urgencyActive={hasUrgentaMain}
         variant={variant}
         hideDeliveryTimeCard={isInstantDigital}
+        hideTrustBadges={isInstantDigital}
       />
       {/* Live system status — replaces the delivery-time card for instant-digital
           services. ANCPI for carte funciară, ONRC for constatator. */}
