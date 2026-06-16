@@ -95,6 +95,18 @@ function friendly(orders: AncpiJob['orders']): string {
   return o?.friendly_order_id ?? '—';
 }
 
+/** First meaningful line of a message, stripped of box-drawing noise + capped —
+ *  keeps the admin table readable. Full text is available via "Copiază log". */
+function cleanMsg(msg: string | null | undefined, cap = 160): string {
+  if (!msg) return '';
+  const line = msg
+    .split('\n')
+    .map((l) => l.trim())
+    .find((l) => l && !/^[╔╚║╗╝═<3\s]*$/.test(l) && !/Playwright|docker image|current:|required:/i.test(l));
+  const out = (line ?? msg.split('\n')[0] ?? '').replace(/[╔╚║╗╝═]/g, '').trim();
+  return out.length > cap ? out.slice(0, cap) + '…' : out;
+}
+
 export default async function AdminAncpiPage() {
   const supabase = await createClient();
   const {
@@ -250,7 +262,7 @@ export default async function AdminAncpiPage() {
                               </span>
                               <span className="text-neutral-700">
                                 <span className="font-medium">{EVENT_LABEL[e.type] ?? e.type}</span>
-                                {e.message ? ` — ${e.message}` : ''}
+                                {e.message ? ` — ${cleanMsg(e.message, 90)}` : ''}
                               </span>
                             </li>
                           ))}
@@ -258,9 +270,9 @@ export default async function AdminAncpiPage() {
                       )}
                     </TableCell>
                     <TableCell className="text-center">{job.retry_count}</TableCell>
-                    <TableCell className="text-xs text-red-600 max-w-[320px] align-top">
+                    <TableCell className="text-xs text-red-600 max-w-[260px] align-top">
                       {job.error_message ? (
-                        <div className="whitespace-pre-wrap break-words">{job.error_message}</div>
+                        <div className="break-words" title={job.error_message}>{cleanMsg(job.error_message)}</div>
                       ) : (
                         '—'
                       )}
