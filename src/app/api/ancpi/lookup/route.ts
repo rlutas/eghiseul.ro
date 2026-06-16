@@ -58,23 +58,26 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ success: true, data: { found: false, reason: 'geocode_failed' } });
   }
 
-  // 2) Identify the parcel at the geocoded point (ANCPI geoportal, retried).
+  // 2) Find the cadastral parcel at the geocoded point. We use the layer-1
+  //    SPATIAL QUERY (intersects) rather than `identify` — same data, but a more
+  //    reliable first-hit code path. The ANCPI MapServer 502s intermittently, so
+  //    we retry generously.
   const { x, y } = c.location;
-  const d = 40;
-  const idUrl =
-    'https://geoportal.ancpi.ro/maps/rest/services/imobile/Imobile/MapServer/identify' +
-    `?geometry=${x},${y}&geometryType=esriGeometryPoint&sr=3844&layers=all&tolerance=6` +
-    `&mapExtent=${x - d},${y - d},${x + d},${y + d}&imageDisplay=400,400,96&returnGeometry=false&f=json`;
-  const id = (await fetchJson(idUrl, 4)) as { results?: Array<{ attributes: Record<string, string> }> } | null;
-  if (id === null) {
+  const geom = encodeURIComponent(JSON.stringify({ x, y, spatialReference: { wkid: 3844 } }));
+  const qUrl =
+    'https://geoportal.ancpi.ro/maps/rest/services/imobile/Imobile/MapServer/1/query' +
+    `?geometry=${geom}&geometryType=esriGeometryPoint&inSR=3844&spatialRel=esriSpatialRelIntersects` +
+    '&outFields=NATIONAL_CADASTRAL_REFERENCE,IMMOVABLE_ID,INSPIRE_ID&returnGeometry=false&f=json';
+  const q = (await fetchJson(qUrl, 8)) as { features?: Array<{ attributes: Record<string, string | number> }> } | null;
+  if (q === null) {
     return NextResponse.json({ success: true, data: { found: false, reason: 'ancpi_unavailable', geocoded: { address: c.address, score: c.score } } });
   }
-  const parcels = (id.results || [])
-    .filter((r) => r.attributes?.NATIONAL_CADASTRAL_REFERENCE || r.attributes?.IMMOVABLE_ID)
-    .map((r) => ({
-      cadastral: r.attributes.NATIONAL_CADASTRAL_REFERENCE || null,
-      immovableId: r.attributes.IMMOVABLE_ID || null,
-      inspireId: r.attributes.INSPIRE_ID || null,
+  const parcels = (q.features || [])
+    .filter((f) => f.attributes?.NATIONAL_CADASTRAL_REFERENCE || f.attributes?.IMMOVABLE_ID)
+    .map((f) => ({
+      cadastral: f.attributes.NATIONAL_CADASTRAL_REFERENCE != null ? String(f.attributes.NATIONAL_CADASTRAL_REFERENCE) : null,
+      immovableId: f.attributes.IMMOVABLE_ID != null ? String(f.attributes.IMMOVABLE_ID) : null,
+      inspireId: f.attributes.INSPIRE_ID != null ? String(f.attributes.INSPIRE_ID) : null,
     }));
 
   return NextResponse.json({
