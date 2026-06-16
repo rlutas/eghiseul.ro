@@ -1,4 +1,4 @@
-import { GOOGLE_REVIEWS_URL, GOOGLE_RATING, GOOGLE_REVIEW_COUNT } from '@/config/contact';
+import { GOOGLE_REVIEWS_URL, GOOGLE_RATING, GOOGLE_REVIEW_COUNT_LABEL } from '@/config/contact';
 import { cn } from '@/lib/utils';
 
 function GoogleG({ className }: { className?: string }) {
@@ -30,7 +30,7 @@ export function GoogleReviewsBadge({
       href={GOOGLE_REVIEWS_URL}
       target="_blank"
       rel="noopener noreferrer"
-      aria-label={`Recenzii Google — ${fmtRating} din 5 din ${GOOGLE_REVIEW_COUNT}+ recenzii`}
+      aria-label={`Recenzii Google — ${fmtRating} din 5 din ${GOOGLE_REVIEW_COUNT_LABEL} de recenzii`}
       className={cn(
         'inline-flex items-center gap-2.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2',
         variant === 'pill'
@@ -49,7 +49,7 @@ export function GoogleReviewsBadge({
         ))}
       </span>
       <span className="text-xs sm:text-sm font-bold text-secondary-900">{fmtRating}</span>
-      <span className="text-[10px] sm:text-xs text-neutral-500">• {GOOGLE_REVIEW_COUNT}+ recenzii</span>
+      <span className="text-[10px] sm:text-xs text-neutral-500">• {GOOGLE_REVIEW_COUNT_LABEL} recenzii</span>
     </a>
   );
 }

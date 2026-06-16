@@ -19,4 +19,5 @@ export function whatsappUrl(message: string = WHATSAPP_DEFAULT_MSG): string {
 export const GOOGLE_REVIEWS_URL = 'https://share.google/stngA2rQbVPY2l57p';
 
 export const GOOGLE_RATING = 4.9;
-export const GOOGLE_REVIEW_COUNT = 451;
+/** Display label — kept as "peste 450" so we never have to update an exact count. */
+export const GOOGLE_REVIEW_COUNT_LABEL = 'peste 450';

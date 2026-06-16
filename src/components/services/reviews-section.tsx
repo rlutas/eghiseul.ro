@@ -1,5 +1,5 @@
 import { REVIEWS, type Review } from '@/config/reviews';
-import { GOOGLE_REVIEWS_URL, GOOGLE_RATING, GOOGLE_REVIEW_COUNT } from '@/config/contact';
+import { GOOGLE_REVIEWS_URL, GOOGLE_RATING, GOOGLE_REVIEW_COUNT_LABEL } from '@/config/contact';
 import { ExternalLink } from 'lucide-react';
 
 function GoogleG({ className }: { className?: string }) {
@@ -66,7 +66,7 @@ export function ReviewsSection() {
           <div className="inline-flex items-center gap-2 text-secondary-700">
             <span className="text-2xl font-black text-secondary-900">{fmtRating}</span>
             <Stars className="w-5 h-5" />
-            <span className="text-sm text-neutral-500">· {GOOGLE_REVIEW_COUNT} de recenzii</span>
+            <span className="text-sm text-neutral-500">· {GOOGLE_REVIEW_COUNT_LABEL} de recenzii</span>
           </div>
         </div>
       </div>
@@ -93,7 +93,7 @@ export function ReviewsSection() {
             className="inline-flex items-center gap-2 rounded-xl border border-neutral-300 bg-white px-5 py-3 text-sm font-semibold text-secondary-800 hover:border-primary-400 hover:text-primary-700 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
           >
             <GoogleG className="h-4 w-4" />
-            Vezi toate cele {GOOGLE_REVIEW_COUNT} de recenzii pe Google
+            Vezi toate recenziile pe Google
             <ExternalLink className="h-4 w-4" aria-hidden="true" />
           </a>
         </div>
