@@ -51,6 +51,9 @@ export interface OrderSidebarProps {
   /** When true, the estimated time is shown INSIDE the summary card (under the
    *  base service) instead of as a separate card. Used on checkout. */
   timeInSummary?: boolean;
+  /** When true, hide the "Timp estimat livrare" card entirely (instant-digital
+   *  services rely on the live SystemStatus badge instead). */
+  hideDeliveryTimeCard?: boolean;
 }
 
 export function OrderSidebar({
@@ -69,6 +72,7 @@ export function OrderSidebar({
   urgencyActive = false,
   variant = 'full',
   timeInSummary = false,
+  hideDeliveryTimeCard = false,
 }: OrderSidebarProps) {
   const showSummary = variant === 'full' || variant === 'summary';
   const showExtras = variant === 'full' || variant === 'extras';
@@ -87,12 +91,12 @@ export function OrderSidebar({
           vatAmount={vatAmount}
           couponCode={couponCode}
           discountAmount={discountAmount}
-          deliveryTimeText={timeInSummary ? deliveryTimeText : undefined}
+          deliveryTimeText={timeInSummary && !hideDeliveryTimeCard ? deliveryTimeText : undefined}
         />
       )}
 
       {/* Estimated delivery */}
-      {showExtras && (
+      {showExtras && !hideDeliveryTimeCard && (
       <Card className="bg-white border-neutral-200">
         <CardContent className="p-3.5 flex items-start gap-3">
           <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary-50 shrink-0">

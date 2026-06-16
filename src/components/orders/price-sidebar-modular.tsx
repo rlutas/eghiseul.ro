@@ -107,9 +107,13 @@ export function PriceSidebarModular({ service, variant = 'full' }: PriceSidebarM
         deliveryTimeText={deliveryTimeText}
         urgencyActive={hasUrgentaMain}
         variant={variant}
+        hideDeliveryTimeCard={isInstantDigital}
       />
-      {/* Live system status (ONRC/ANCPI) — auto-issuance, like the competitor. */}
-      {isInstantDigital && variant === 'full' && <SystemStatus />}
+      {/* Live system status — replaces the delivery-time card for instant-digital
+          services. ANCPI for carte funciară, ONRC for constatator. */}
+      {isInstantDigital && variant === 'full' && (
+        <SystemStatus service={service.slug === 'extras-carte-funciara' ? 'ancpi' : 'onrc'} />
+      )}
     </div>
   );
 }

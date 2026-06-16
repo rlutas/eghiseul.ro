@@ -16,6 +16,7 @@
  */
 import { createAdminClient } from '@/lib/supabase/admin';
 import { resolveJudetId } from '@/lib/ancpi/judete';
+import { effectiveIdentifier } from '@/lib/ancpi/cf-format';
 
 // Only this service slug is an ANCPI service.
 const ANCPI_SLUG = 'extras-carte-funciara';
@@ -45,11 +46,15 @@ interface PropertyState {
   propertyAddress?: string;
 }
 
-/** Pick the best identifier + its type from a set of CF/cadastral/topo values. */
+/**
+ * Pick the best identifier + its type from a set of CF/cadastral/topo values.
+ * Applies effectiveIdentifier so a collective building number ("123456-C1") is
+ * issued on the land ("123456").
+ */
 function pickIdentifier(cf?: string, cad?: string, topo?: string): { identificator: string; identificatorType: 'CF' | 'CAD' | 'TOPO' } {
-  if (cf) return { identificator: cf, identificatorType: 'CF' };
-  if (cad) return { identificator: cad, identificatorType: 'CAD' };
-  return { identificator: topo ?? '', identificatorType: 'TOPO' };
+  if (cf) return { identificator: effectiveIdentifier(cf), identificatorType: 'CF' };
+  if (cad) return { identificator: effectiveIdentifier(cad), identificatorType: 'CAD' };
+  return { identificator: (topo ?? '').trim(), identificatorType: 'TOPO' };
 }
 
 interface CustomerData {

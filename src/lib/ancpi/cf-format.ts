@@ -42,6 +42,17 @@ export function normalizeCf(raw: string): string {
   return v;
 }
 
+/**
+ * The identifier we should actually order with. For a collective building number
+ * ("123456-C1") we fall back to the land number ("123456"); everything else is
+ * used as normalized. (Product decision: no collective service → issue the land.)
+ */
+export function effectiveIdentifier(raw: string): string {
+  const n = normalizeCf(raw);
+  if (COLLECTIVE.test(n)) return n.replace(/-C\d+$/, '');
+  return n;
+}
+
 export function checkCf(raw: string): CfCheck {
   const normalized = normalizeCf(raw);
   if (!normalized) return { normalized, status: 'empty' };
@@ -50,16 +61,18 @@ export function checkCf(raw: string): CfCheck {
     return { normalized, status: 'valid' };
   }
 
-  // "123456-C1" = the whole building (CF colectivă) — not issued online; for an
-  // apartment the unit number (-U..) is required.
-  if (COLLECTIVE.test(normalized)) {
+  // "123456-C1" = the whole building (CF colectivă) — not issued online. We don't
+  // offer a collective service, so we fall back to the TEREN extract (123456) and
+  // warn. For a specific apartment the unit number (-U..) is required.
+  const col = COLLECTIVE.exec(normalized);
+  if (col) {
+    const land = normalized.replace(/-C\d+$/, '');
     return {
       normalized,
       status: 'collective',
       message:
-        'Acesta e numărul construcției întregi (CF colectivă) — nu se eliberează online. ' +
-        'Pentru un apartament adaugă unitatea (ex. ' + normalized + '-U20). ' +
-        'Pentru teren folosește numărul fără „-C..". Poți continua, dar comanda va fi procesată manual.',
+        `Ai introdus construcția întreagă (CF colectivă). Vom emite extrasul pe TEREN (${land}). ` +
+        `Pentru un apartament anume, adaugă unitatea (ex. ${normalized}-U20).`,
     };
   }
 

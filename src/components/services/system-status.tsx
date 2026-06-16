@@ -12,7 +12,14 @@ interface StatusResponse {
  * "Stare sistem" badge for digital, auto-issued services (Certificat Constatator).
  * Shows whether the ONRC portal + automated issuance are operational. Polls /api/status.
  */
-export function SystemStatus({ className = '' }: { className?: string }) {
+export function SystemStatus({
+  className = '',
+  service = 'onrc',
+}: {
+  className?: string;
+  /** Which provider's status to show: 'onrc' (constatator) or 'ancpi' (carte funciară). */
+  service?: 'onrc' | 'ancpi';
+}) {
   const [status, setStatus] = useState<StatusResponse | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -20,7 +27,7 @@ export function SystemStatus({ className = '' }: { className?: string }) {
     let alive = true;
     const load = async () => {
       try {
-        const r = await fetch('/api/status', { cache: 'no-store' });
+        const r = await fetch(`/api/status?service=${service}`, { cache: 'no-store' });
         const j = (await r.json()) as StatusResponse;
         if (alive) setStatus(j);
       } catch {
@@ -35,7 +42,7 @@ export function SystemStatus({ className = '' }: { className?: string }) {
       alive = false;
       clearInterval(id);
     };
-  }, []);
+  }, [service]);
 
   const operational = status?.operational ?? true; // optimistic before first load
   const dot = (up: boolean) => (up ? 'bg-green-500' : 'bg-red-500');
