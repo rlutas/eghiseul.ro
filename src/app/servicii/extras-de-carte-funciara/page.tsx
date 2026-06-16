@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { createPublicClient } from '@/lib/supabase/public';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -472,6 +473,57 @@ export default async function ExtrasCarteFunciaraPage() {
                   )}
                 </div>
               ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Specimen — what the extract looks like */}
+        <section className="py-12 lg:py-20 bg-white">
+          <div className="container mx-auto px-4 max-w-[1200px]">
+            <div className="text-center mb-12">
+              <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-3">
+                Cum Arată Extrasul de Carte Funciară — Specimen
+              </h2>
+              <p className="text-neutral-600 max-w-2xl mx-auto">
+                Documentul pe care îl primești are antetul ANCPI și este semnat electronic de OCPI —
+                cu autenticitate verificabilă pe portalul ANCPI.
+              </p>
+            </div>
+
+            <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+              {/* Specimen image */}
+              <div className="relative bg-neutral-50 rounded-2xl p-4 border border-neutral-200 shadow-sm">
+                <Image
+                  src="/images/extras-cf-specimen.webp"
+                  alt="Specimen Extras de Carte Funciară emis de ANCPI / OCPI — exemplu document oficial cu proprietar, suprafață și sarcini"
+                  width={1414}
+                  height={2000}
+                  className="w-full h-auto rounded-lg"
+                  loading="lazy"
+                  sizes="(max-width: 1024px) 100vw, 600px"
+                />
+                <p className="text-xs text-neutral-500 mt-3 text-center italic">
+                  Exemplu document — date anonimizate. Specimen marcat conform GDPR.
+                </p>
+              </div>
+
+              {/* What it contains */}
+              <div>
+                <h3 className="text-xl font-bold text-secondary-900 mb-4">Ce vezi în extrasul CF</h3>
+                <ul className="space-y-3 text-sm text-neutral-700">
+                  {[
+                    ['Partea I — Imobilul', 'Suprafața, categoria de folosință, vecinătățile și numărul cadastral.'],
+                    ['Partea a II-a — Proprietarul', 'Proprietarul actual și modul de dobândire a dreptului de proprietate.'],
+                    ['Partea a III-a — Sarcini', 'Ipoteci, interdicții, litigii sau alte sarcini înscrise asupra imobilului.'],
+                    ['Antet și semnătură ANCPI', 'Document semnat electronic de OCPI, verificabil online pe portalul ANCPI.'],
+                  ].map(([title, desc]) => (
+                    <li key={title} className="flex items-start gap-2">
+                      <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                      <span><strong>{title}.</strong> {desc}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
           </div>
         </section>
