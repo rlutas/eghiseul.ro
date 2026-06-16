@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { ChevronRight, CalendarDays, RefreshCw, ArrowRight, Phone } from 'lucide-react';
 import { Footer } from '@/components/home/footer';
 import { Button } from '@/components/ui/button';
@@ -44,13 +45,16 @@ export function ArticleLayout({
   faqs,
   children,
 }: ArticleLayoutProps) {
+  // Featured image: derive from slug by convention unless explicitly passed.
+  const featuredImage = image ?? `/images/articole/${slug}.webp`;
+
   const jsonLdGraph = buildArticlePageGraph({
     slug,
     headline: title,
     description,
     datePublished,
     dateModified,
-    image,
+    image: featuredImage.startsWith('http') ? featuredImage : `${BASE_URL}${featuredImage}`,
     breadcrumb: [
       { name: 'Acasă', url: `${BASE_URL}/` },
       { name: 'Informații utile', url: `${BASE_URL}/blog/` },
@@ -67,7 +71,7 @@ export function ArticleLayout({
 
       <main id="main-content" className="min-h-screen bg-neutral-50 -mt-16 lg:-mt-[112px]">
         {/* Hero */}
-        <header className="relative overflow-hidden bg-gradient-to-b from-secondary-900 to-[#0C1A2F] pt-24 lg:pt-36 pb-12 lg:pb-16">
+        <header className="relative overflow-hidden bg-gradient-to-b from-secondary-900 to-[#0C1A2F] pt-24 lg:pt-36 pb-24 lg:pb-32">
           <div className="absolute inset-0 opacity-5">
             <div
               className="absolute inset-0"
@@ -115,6 +119,17 @@ export function ArticleLayout({
         {/* Body */}
         <article className="py-10 lg:py-14 bg-white">
           <div className="container mx-auto px-4 max-w-[760px]">
+            {/* Featured image — overlaps the dark hero for a polished header */}
+            <div className="relative -mt-16 lg:-mt-24 mb-8 overflow-hidden rounded-2xl border border-neutral-200 shadow-lg aspect-[16/9] bg-neutral-100">
+              <Image
+                src={featuredImage}
+                alt={title}
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, 760px"
+                priority
+              />
+            </div>
             <div
               className="prose prose-neutral max-w-none
                 prose-headings:font-bold prose-headings:text-secondary-900 prose-headings:scroll-mt-24

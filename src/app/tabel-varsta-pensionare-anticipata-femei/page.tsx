@@ -16,6 +16,7 @@ export const metadata = buildPageMetadata({
   title: `${TITLE} | eGhișeul`,
   description: DESCRIPTION,
   path: `/${SLUG}/`,
+  ogImage: `/images/articole/${SLUG}.webp`,
 });
 
 // Anexa 5, Legea 360/2023 — pensionare anticipată femei.

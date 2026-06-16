@@ -127,6 +127,7 @@ export const HARDCODED_ARTICLE_SLUGS = [
   'cazier-judiciar-vs-certificat-integritate-comportamentala',
   'importanta-extras-de-carte-funciara-colectiva',
   'extras-de-carte-funciara-pentru-casa-verde',
+  'rolul-si-atributiile-onrc-romania',
 ] as const;
 
 /** Organization-wide metadata for Schema.org Organization node. */

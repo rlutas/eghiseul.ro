@@ -17,6 +17,7 @@ export const metadata = buildPageMetadata({
   title: `${TITLE} | eGhișeul`,
   description: DESCRIPTION,
   path: `/${SLUG}/`,
+  ogImage: `/images/articole/${SLUG}.webp`,
 });
 
 export default function Page() {
