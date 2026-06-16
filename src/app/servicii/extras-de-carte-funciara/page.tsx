@@ -32,13 +32,13 @@ import { buildPageMetadata, buildServicePageGraph, BASE_URL } from '@/lib/seo';
 const SERVICE_SLUG = 'extras-carte-funciara';
 const PAGE_PATH = '/servicii/extras-de-carte-funciara/';
 const SCHEMA_SLUG = 'extras-de-carte-funciara';
-const TITLE = 'Extras de Carte Funciară Online — 79.99 RON, OCPI | eGhișeul';
+const TITLE = 'Extras de Carte Funciară Online în Câteva Minute — 89 RON | eGhișeul';
 const DESCRIPTION =
-  'Obține Extras de Carte Funciară online de la OCPI/ANCPI, fără drum la ghișeu. ' +
-  '79.99 RON, livrare pe email. Document complet cu proprietar, suprafață, sarcini și ipoteci — ' +
-  'necesar la tranzacții imobiliare, credite ipotecare și succesiuni.';
+  'Extras de Carte Funciară online de la ANCPI, livrat pe email în câteva minute — ' +
+  'singurii din România cu eliberare automată 24/7, fără taxă de urgență și fără cont ANCPI. ' +
+  '89 RON, taxe incluse. Document oficial cu proprietar, suprafață, sarcini și ipoteci.';
 const DATE_PUBLISHED = '2026-06-13';
-const DATE_MODIFIED = '2026-06-13';
+const DATE_MODIFIED = '2026-06-16';
 
 export const revalidate = 3600;
 
@@ -75,9 +75,9 @@ const jsonLdGraph = buildServicePageGraph({
   slug: SCHEMA_SLUG,
   name: 'Extras de Carte Funciară Online',
   description:
-    'Serviciu de obținere a Extrasului de Carte Funciară (CF) de la Oficiul de Cadastru și ' +
-    'Publicitate Imobiliară (OCPI/ANCPI). Document cu situația juridică a imobilului: proprietar, ' +
-    'suprafață, sarcini și ipoteci. Procesare 100% online, livrare email.',
+    'Serviciu de obținere a Extrasului de Carte Funciară (CF) de la ANCPI, eliberat automat în ' +
+    'câteva minute, 24/7. Document cu situația juridică a imobilului: proprietar, suprafață, ' +
+    'sarcini și ipoteci. 100% online, fără cont ANCPI, fără taxă de urgență, livrare pe email.',
   serviceType: 'Document Processing — Real Estate',
   datePublished: DATE_PUBLISHED,
   dateModified: DATE_MODIFIED,
@@ -92,7 +92,7 @@ const jsonLdGraph = buildServicePageGraph({
     { name: 'Extras de Carte Funciară', url: `${BASE_URL}${PAGE_PATH}` },
   ],
   offers: [
-    { name: 'Extras de Carte Funciară (Standard)', price: 79.99, url: `${BASE_URL}${PAGE_PATH}` },
+    { name: 'Extras de Carte Funciară (Standard)', price: 89, url: `${BASE_URL}${PAGE_PATH}` },
   ],
   aggregateRating: { ratingValue: 4.9, reviewCount: 450 },
 });
@@ -172,6 +172,16 @@ export default async function ExtrasCarteFunciaraPage() {
                 <p className="text-lg sm:text-xl text-white/85 leading-relaxed mb-6">
                   {service.description}
                 </p>
+
+                {/* USP — the unique selling point vs every competitor */}
+                <div className="flex items-start gap-3 rounded-xl bg-primary-500/15 border border-primary-500/40 p-4 mb-6">
+                  <Zap className="h-5 w-5 text-primary-500 flex-shrink-0 mt-0.5" />
+                  <p className="text-white/95 text-sm sm:text-base leading-relaxed">
+                    <strong className="text-primary-500">Singurii din România</strong> care îți eliberează extrasul de
+                    carte funciară <strong>în câteva minute, automat, 24/7</strong> — fără taxă de urgență, fără cont
+                    ANCPI și fără drum la ghișeu.
+                  </p>
+                </div>
 
                 <div className="bg-white/10 backdrop-blur-sm rounded-xl p-5 border border-white/20 mb-6">
                   <p className="text-white/90 leading-relaxed text-sm sm:text-base">
@@ -299,7 +309,7 @@ export default async function ExtrasCarteFunciaraPage() {
                 <p className="text-sm text-neutral-700">
                   Extrasul CF <strong>nu este gratuit</strong> — OCPI percepe o taxă oficială pentru fiecare extras,
                   indiferent de unde îl ceri. Îl poți obține personal la ghișeul OCPI sau prin portalul ANCPI (dacă ai
-                  cont și semnătură). Prin noi plătești <strong>{service.base_price} RON cu taxele OCPI incluse</strong>,
+                  cont și semnătură). Prin noi plătești <strong>{service.base_price} RON cu taxele ANCPI incluse</strong>,
                   100% online, fără cont ANCPI și fără deplasare — primești documentul pe email.
                 </p>
               </div>
@@ -488,7 +498,7 @@ export default async function ExtrasCarteFunciaraPage() {
           faqs={[
             { q: 'Ce este Extrasul de Carte Funciară?', a: 'Este documentul oficial OCPI care arată situația juridică a unui imobil: proprietarul actual, suprafața, sarcinile și ipotecile. Cartea funciară este registrul public al proprietăților.' },
             { q: 'De unde se obține extrasul de carte funciară?', a: 'De la Oficiul de Cadastru și Publicitate Imobiliară (OCPI), parte din ANCPI. Prin eGhișeul îl obții online, fără să mergi la ghișeu și fără cont ANCPI.' },
-            { q: 'Cât costă un extras de carte funciară?', a: `La noi ${service.base_price} RON, cu taxele OCPI incluse. Nu există extras CF gratuit — OCPI percepe o taxă oficială pentru fiecare extras.` },
+            { q: 'Cât costă un extras de carte funciară?', a: `La noi ${service.base_price} RON, cu taxele ANCPI incluse. Nu există extras CF gratuit — OCPI percepe o taxă oficială pentru fiecare extras.` },
             { q: 'Am nevoie de numărul cadastral?', a: 'Ai nevoie de un identificator al imobilului: număr cadastral, număr de carte funciară, număr topografic sau identificator electronic ANCPI. Dacă nu îl știi, îl putem căuta după adresă sau proprietar.' },
             { q: 'Cât este valabil extrasul de carte funciară?', a: 'Extrasul de informare reflectă situația din ziua eliberării; notarii și băncile cer de obicei unul din ultimele 30 de zile. Extrasul de autentificare (pentru vânzare) e valabil ~10 zile lucrătoare.' },
             { q: 'Cât durează eliberarea?', a: `${formatEstimatedDays(service)} în mod standard. Pentru imobile nedigitalizate poate dura puțin mai mult. Există și opțiunea Urgent.` },
