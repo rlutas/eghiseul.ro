@@ -371,7 +371,7 @@ Serviciu pentru clienții care **nu știu numărul CF** — îl aflăm din adres
 
 **Validat pe cazuri reale:** Odoreu/Salcâmilor 2 → CF 106395 ✓; Paul Greceanu 13 București (apt) → parcela CF 231817 ✓ (când ANCPI e sus). Apartamente/rural → uneori doar parcela sau ANCPI indisponibil → operator.
 
-**Avenue viitoare — căutare după PROPRIETAR:** `rp.ancpi.ro/owner-registry` (Registrul Proprietarilor, **doar prin avocat**) permite căutarea după nume proprietar — exact ce lipsește geoportalului. De explorat cu cont de avocat (recon ca la ePay) pentru cazurile unde adresa nu prinde (formularul captează deja numele proprietarului).
+**Căutare după PROPRIETAR — DOAR MANUAL (NU automatizat):** `rp.ancpi.ro/owner-registry` (Registrul Proprietarilor, prin avocat) permite căutarea după nume proprietar. ⚠️ **Termenii rp.ancpi.ro interzic explicit** uzul comercial, extragerea automată și accesul în afara interfeței (§4-5), cu monitorizare + revocare + sancțiune (§6-7). **NU automatizăm rp.ancpi.ro.** Operatorul/avocatul îl folosește **manual prin interfață** dacă geoportalul nu e suficient — în admin există doar un LINK către rp.ancpi.ro (nu extragere). Canalul comercial automat legitim rămâne **ePay** (plătit, oficial).
 
 **Fișiere:** `src/app/api/ancpi/lookup/route.ts`, `src/app/admin/identifica-imobil/{page,IdentificaImobilTool}.tsx`. Serviciu DB `identificare-imobil` (198 RON, `is_active=false` până la wizard-ul customer — validarea address-only în `PropertyDataStep` rămâne de făcut).
 
