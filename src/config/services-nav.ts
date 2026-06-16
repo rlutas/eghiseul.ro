@@ -15,7 +15,6 @@ import {
   UserRound,
   Building2,
   Receipt,
-  MapPin,
   Map as MapIcon,
   type LucideIcon,
 } from 'lucide-react';
@@ -60,8 +59,9 @@ export const SERVICES_NAV: ServiceNavGroup[] = [
   {
     category: 'Imobiliare',
     items: [
+      // Identificare Imobil is intentionally NOT a top-level menu item — it's
+      // surfaced inside the CF / Cadastral pages + order form as a fallback.
       { name: 'Extras Carte Funciară', href: serviceUrl('extras-carte-funciara'), icon: Home },
-      { name: 'Identificare Imobil', href: serviceUrl('identificare-imobil'), icon: MapPin },
       { name: 'Extras Plan Cadastral', href: serviceUrl('extras-plan-cadastral'), icon: MapIcon },
     ],
   },
