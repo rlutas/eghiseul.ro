@@ -25,7 +25,7 @@ import {
 import { Service, ServiceOption, formatEstimatedDays } from '@/types/services';
 import { Footer } from '@/components/home/footer';
 import { ServiceFAQ } from '@/components/services/service-faq';
-import { buildPageMetadata, buildServicePageGraph, BASE_URL } from '@/lib/seo';
+import { buildPageMetadata, buildServicePageGraph, BASE_URL, serviceUrl } from '@/lib/seo';
 
 // Database slug (order pipeline identifier). URL path uses the WP slug
 // (extras-DE-carte-funciara) to preserve the indexed URL + backlinks.
@@ -356,8 +356,15 @@ export default async function ExtrasCarteFunciaraPage() {
             <div className="mt-6 p-5 bg-primary-50 rounded-2xl border border-primary-200 max-w-3xl mx-auto flex items-start gap-3">
               <Search className="w-5 h-5 text-primary-600 flex-shrink-0 mt-0.5" />
               <p className="text-sm text-secondary-700">
-                <strong>Nu știi numărul cadastral?</strong> Îl poți afla din actul de proprietate, din extrasul vechi
-                sau căutând <strong>după adresă</strong> ori <strong>după proprietar</strong>. Te ajutăm noi la depunere.
+                <strong>Nu știi numărul cadastral?</strong> Îl poți afla din actul de proprietate sau din extrasul
+                vechi. Dacă nu îl găsești, îl <strong>aflăm noi după adresă</strong> prin serviciul de{' '}
+                <Link
+                  href={serviceUrl('identificare-imobil')}
+                  className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
+                >
+                  Identificare Imobil
+                </Link>
+                , apoi îți eliberăm extrasul.
               </p>
             </div>
           </div>
@@ -501,6 +508,51 @@ export default async function ExtrasCarteFunciaraPage() {
           </div>
         </section>
 
+        {/* Cum afli nr cadastral după adresă — targets the cadastre cluster on the high-traffic CF page */}
+        <section className="py-12 lg:py-20 bg-neutral-50">
+          <div className="container mx-auto px-4 max-w-[820px]">
+            <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-5">
+              Cum afli numărul cadastral după adresă
+            </h2>
+            <div className="space-y-4 text-neutral-700 leading-relaxed">
+              <p>
+                Cel mai des, numărul cadastral apare în <strong>actul de proprietate</strong> (contract de
+                vânzare-cumpărare, certificat de moștenitor), într-un <strong>extras de carte funciară mai vechi</strong>{' '}
+                sau în <strong>documentația cadastrală</strong> întocmită la intabulare. Dacă ai aceste acte, vei
+                găsi acolo numărul cadastral și numărul de carte funciară de care ai nevoie pentru extras.
+              </p>
+              <p>
+                Dacă <strong>nu ai numărul cadastral</strong> și cunoști doar adresa, îl poți obține în câteva moduri:
+              </p>
+              <ul className="space-y-2.5">
+                {[
+                  ['După adresă, prin noi', 'Identificăm imobilul (parcela/construcția și nr. CF) după adresă și îți eliberăm direct extrasul de carte funciară.'],
+                  ['Din actul de proprietate', 'Verifică contractul, certificatul de moștenitor sau documentația de intabulare.'],
+                  ['Dintr-un extras mai vechi', 'Orice extras CF anterior conține numărul cadastral al imobilului.'],
+                ].map(([title, desc]) => (
+                  <li key={title} className="flex items-start gap-2">
+                    <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-1" />
+                    <span><strong>{title}.</strong> {desc}</span>
+                  </li>
+                ))}
+              </ul>
+              <div className="rounded-2xl border border-primary-200 bg-primary-50 p-5 flex items-start gap-3">
+                <MapPin className="w-5 h-5 text-primary-600 flex-shrink-0 mt-0.5" />
+                <p className="text-sm text-secondary-700">
+                  <strong>Ai doar adresa?</strong> Cu serviciul de{' '}
+                  <Link
+                    href={serviceUrl('identificare-imobil')}
+                    className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
+                  >
+                    Identificare Imobil după Adresă
+                  </Link>{' '}
+                  aflăm noi numărul cadastral și de carte funciară, iar tu primești și extrasul CF — fără să cauți prin acte.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* FAQ */}
         <ServiceFAQ
           title="Întrebări Frecvente — Extras de Carte Funciară"
@@ -509,6 +561,7 @@ export default async function ExtrasCarteFunciaraPage() {
             { q: 'De unde se obține extrasul de carte funciară?', a: 'De la Oficiul de Cadastru și Publicitate Imobiliară (OCPI), parte din ANCPI. Prin eGhișeul îl obții online, fără să mergi la ghișeu și fără cont ANCPI.' },
             { q: 'Cât costă un extras de carte funciară?', a: `La noi ${service.base_price} RON, cu taxele ANCPI incluse. Nu există extras CF gratuit — OCPI percepe o taxă oficială pentru fiecare extras.` },
             { q: 'Am nevoie de numărul cadastral?', a: 'Ai nevoie de un identificator al imobilului: număr cadastral, număr de carte funciară, număr topografic sau identificator electronic ANCPI. Dacă nu îl știi, îl putem căuta după adresă sau proprietar.' },
+            { q: 'Cum aflu numărul cadastral după adresă?', a: 'Numărul cadastral apare în actul de proprietate sau într-un extras CF mai vechi. Dacă ai doar adresa, prin serviciul nostru de Identificare Imobil aflăm noi numărul cadastral și de carte funciară și îți eliberăm extrasul.' },
             { q: 'Cât este valabil extrasul de carte funciară?', a: 'Extrasul de informare reflectă situația din ziua eliberării; notarii și băncile cer de obicei unul din ultimele 30 de zile. Extrasul de autentificare (pentru vânzare) e valabil ~10 zile lucrătoare.' },
             { q: 'Cât durează eliberarea?', a: `${formatEstimatedDays(service)} în mod standard. Pentru imobile nedigitalizate poate dura puțin mai mult. Există și opțiunea Urgent.` },
             { q: 'Este necesar pentru vânzarea unui imobil?', a: 'Da. Notarul are nevoie de un extras de carte funciară pentru autentificare, ca să verifice proprietarul și eventualele sarcini sau ipoteci.' },

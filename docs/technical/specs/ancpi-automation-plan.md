@@ -382,3 +382,46 @@ Serviciu pentru clienții care **nu știu numărul CF** — îl aflăm din adres
 - PDF: `Extras_Informare_69000.pdf` (91 KB, 2 pagini) descărcat via `DownloadFile.action?typeD=4&id=48325457`.
 - Chitanță: `Chitanta ANCPI_11330011.pdf`.
 - Toate endpoint-urile din §5 capturate prin trafic live (Playwright network capture).
+
+## 13. Recon MANUAL rp.ancpi.ro (Registrul Proprietarilor) — DOAR documentare câmpuri
+
+> ⚠️ **NU automatizăm rp.ancpi.ro** (ToS §4-7 interzic uz comercial / extragere automată / acces în afara interfeței — vezi §11). Acest recon este **strict manual**, făcut de operator/avocat **logat în interfață**, doar ca să documentăm ce câmpuri de căutare și ce date returnează — pentru a ști când serviciul `identificare-imobil` poate fi rezolvat prin Registrul Proprietarilor (căutare după PROPRIETAR), nu prin geoportal (căutare după adresă/parcelă).
+>
+> **De ce manual:** căutarea după nume proprietar NU e expusă de geoportal (care merge după geometrie/adresă). rp.ancpi.ro o oferă, dar numai prin login avocat și numai manual. Operatorul deschide linkul din `/admin/identifica-imobil`, caută manual, copiază rezultatul în comandă.
+
+### Checklist de completat (când ești logat în rp.ancpi.ro)
+
+Completează tabelele de mai jos pe baza interfeței reale (nu prin captură de trafic — doar observare vizuală a formularului):
+
+**A. Formular de căutare — ce câmpuri de input are:**
+
+| Câmp | Tip (text / select / etc.) | Obligatoriu? | Observații (validări, format) |
+|---|---|---|---|
+| Nume proprietar | | | |
+| Prenume proprietar | | | |
+| CNP / CUI | | | |
+| Județ | | | |
+| Localitate / UAT | | | |
+| Tip persoană (PF/PJ) | | | |
+| _(alte câmpuri văzute)_ | | | |
+
+**B. Rezultate căutare — ce coloane/date afișează lista:**
+
+| Coloană rezultat | Conținut (ex.) | Util pentru identificare imobil? |
+|---|---|---|
+| Nr. carte funciară | | |
+| Nr. cadastral | | |
+| Județ / localitate | | |
+| Adresă imobil | | |
+| Cotă / tip drept | | |
+| _(alte coloane)_ | | |
+
+**C. Limitări observate:**
+- Câte rezultate maxim returnează o căutare? ____
+- Caută pe toată țara sau doar pe județul selectat? ____
+- Necesită cotă/puncte sau plată per căutare? ____
+- Mesaje de eroare / restricții văzute: ____
+
+**D. Workflow operator (de confirmat):** comandă `identificare-imobil` cu doar adresă → operator încearcă întâi geoportal (`/admin/identifica-imobil`); dacă nu e suficient și are nume proprietar → caută MANUAL în rp.ancpi.ro → copiază nr. CF/cadastral în comandă → eliberează extrasul prin ePay (canalul automat legitim).
+
+> **Status:** șablon de recon — de completat de Raul când e logat. Nu există automatizare planificată pentru rp.ancpi.ro.
