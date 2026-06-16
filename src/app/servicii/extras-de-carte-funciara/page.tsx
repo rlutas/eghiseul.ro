@@ -27,6 +27,7 @@ import { MobileStickyCTA } from '@/components/services/mobile-sticky-cta';
 import { OrderButton } from '@/components/services/order-button';
 import { WhatsAppButton } from '@/components/services/whatsapp-button';
 import { GoogleReviewsBadge } from '@/components/services/google-reviews-badge';
+import { ReviewsSection } from '@/components/services/reviews-section';
 import { buildPageMetadata, buildServicePageGraph, BASE_URL, serviceUrl } from '@/lib/seo';
 
 // Database slug (order pipeline identifier). URL path uses the WP slug
@@ -304,6 +305,9 @@ export default async function ExtrasCarteFunciaraPage() {
         {/* SEO Intro */}
         <section className="py-12 lg:py-16 bg-neutral-50">
           <div className="container mx-auto px-4 max-w-[820px]">
+            <span className="inline-block px-4 py-1.5 bg-primary-100 text-primary-700 text-sm font-semibold rounded-full mb-4">
+              Despre serviciu
+            </span>
             <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-5">
               Ce este Extrasul de Carte Funciară și de unde se obține
             </h2>
@@ -569,7 +573,7 @@ export default async function ExtrasCarteFunciaraPage() {
           <div className="container mx-auto px-4 max-w-[1000px]">
             <div className="text-center mb-8">
               <span className="inline-block px-4 py-1.5 bg-primary-100 text-primary-700 text-sm font-semibold rounded-full mb-4">
-                Bun de știut
+                Bine de știut
               </span>
               <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900">Transparent, fără surprize</h2>
             </div>
@@ -608,6 +612,9 @@ export default async function ExtrasCarteFunciaraPage() {
         <section className="py-12 lg:py-20 bg-white">
           <div className="container mx-auto px-4 max-w-[1200px]">
             <div className="text-center mb-12">
+              <span className="inline-block px-4 py-1.5 bg-primary-100 text-primary-700 text-sm font-semibold rounded-full mb-4">
+                Specimen
+              </span>
               <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-3">
                 Cum Arată Extrasul de Carte Funciară — Specimen
               </h2>
@@ -786,6 +793,9 @@ export default async function ExtrasCarteFunciaraPage() {
         {/* Cum afli nr cadastral după adresă — targets the cadastre cluster on the high-traffic CF page */}
         <section className="py-12 lg:py-20 bg-white">
           <div className="container mx-auto px-4 max-w-[820px]">
+            <span className="inline-block px-4 py-1.5 bg-primary-100 text-primary-700 text-sm font-semibold rounded-full mb-4">
+              Cadastru
+            </span>
             <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-5">
               Cum afli numărul cadastral după adresă
             </h2>
@@ -851,6 +861,8 @@ export default async function ExtrasCarteFunciaraPage() {
             { q: 'Cum primesc documentul?', a: 'Pe email, ca PDF semnat electronic de OCPI, cu autenticitate verificabilă pe portalul ANCPI.' },
           ]}
         />
+
+        <ReviewsSection />
 
         {/* CTA */}
         <section className="relative py-16 lg:py-24 bg-gradient-to-b from-secondary-900 to-[#0C1A2F] overflow-hidden">

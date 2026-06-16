@@ -15,13 +15,8 @@ export function whatsappUrl(message: string = WHATSAPP_DEFAULT_MSG): string {
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
 }
 
-/**
- * Public Google reviews URL.
- * TODO: replace with the real Google Business Profile review link when available
- * (e.g. https://g.page/r/<id>/review). The search fallback always resolves.
- */
-export const GOOGLE_REVIEWS_URL =
-  'https://www.google.com/search?q=eghiseul.ro+recenzii';
+/** Public Google Business Profile (reviews) share link. */
+export const GOOGLE_REVIEWS_URL = 'https://share.google/stngA2rQbVPY2l57p';
 
 export const GOOGLE_RATING = 4.9;
-export const GOOGLE_REVIEW_COUNT = 450;
+export const GOOGLE_REVIEW_COUNT = 451;
