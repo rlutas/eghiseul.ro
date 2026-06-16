@@ -252,7 +252,17 @@ export default async function AdminAncpiPage() {
                     </TableCell>
                     <TableCell className="text-xs">
                       <div>{job.registration_number ?? '—'}</div>
-                      <div className="text-neutral-500">{job.ancpi_order_id ?? ''}</div>
+                      {job.ancpi_order_id ? (
+                        <a
+                          href={`https://epay.ancpi.ro/epay/ShowOrderDetails.action?orderId=${job.ancpi_order_id}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-primary-600 underline"
+                          title="Deschide comanda pe ePay ANCPI"
+                        >
+                          {job.ancpi_order_id} ↗
+                        </a>
+                      ) : null}
                     </TableCell>
                     <TableCell className="text-xs max-w-[280px] align-top">
                       <div className="mb-1"><AncpiCopyLog text={logText} /></div>
