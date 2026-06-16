@@ -15,6 +15,8 @@ import {
   UserRound,
   Building2,
   Receipt,
+  MapPin,
+  Map as MapIcon,
   type LucideIcon,
 } from 'lucide-react';
 import { serviceUrl } from '@/lib/seo/constants';
@@ -59,6 +61,8 @@ export const SERVICES_NAV: ServiceNavGroup[] = [
     category: 'Imobiliare',
     items: [
       { name: 'Extras Carte Funciară', href: serviceUrl('extras-carte-funciara'), icon: Home },
+      { name: 'Identificare Imobil', href: serviceUrl('identificare-imobil'), icon: MapPin },
+      { name: 'Extras Plan Cadastral', href: serviceUrl('extras-plan-cadastral'), icon: MapIcon },
     ],
   },
   {

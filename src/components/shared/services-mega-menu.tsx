@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, PackageSearch, Newspaper } from 'lucide-react';
 import { SERVICES_NAV } from '@/config/services-nav';
 import { cn } from '@/lib/utils';
 
@@ -99,7 +99,7 @@ export function ServicesMegaMenu() {
             ))}
           </div>
 
-          <div className="mt-5 pt-4 border-t border-neutral-100">
+          <div className="mt-5 pt-4 border-t border-neutral-100 flex items-center justify-between gap-4 flex-wrap">
             <Link
               href="/servicii/"
               onClick={() => setOpen(false)}
@@ -108,6 +108,24 @@ export function ServicesMegaMenu() {
               Vezi toate serviciile
               <ChevronDown className="h-4 w-4 -rotate-90" aria-hidden="true" />
             </Link>
+            <div className="flex items-center gap-2">
+              <Link
+                href="/comanda/status/"
+                onClick={() => setOpen(false)}
+                className="inline-flex items-center gap-1.5 rounded-lg bg-neutral-100 px-3 py-1.5 text-sm font-semibold text-secondary-700 hover:bg-neutral-200 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
+              >
+                <PackageSearch className="h-4 w-4" aria-hidden="true" />
+                Status comandă
+              </Link>
+              <Link
+                href="/blog/"
+                onClick={() => setOpen(false)}
+                className="inline-flex items-center gap-1.5 rounded-lg bg-neutral-100 px-3 py-1.5 text-sm font-semibold text-secondary-700 hover:bg-neutral-200 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
+              >
+                <Newspaper className="h-4 w-4" aria-hidden="true" />
+                Blog
+              </Link>
+            </div>
           </div>
         </nav>
       </div>

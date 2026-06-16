@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Menu, X, Phone, User, Settings, FileText, LogOut, ChevronDown } from 'lucide-react';
+import { Menu, X, Phone, User, Settings, FileText, LogOut, ChevronDown, PackageSearch } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ServicesMegaMenu } from '@/components/shared/services-mega-menu';
 import { SERVICES_NAV } from '@/config/services-nav';
@@ -22,8 +22,8 @@ import type { User as SupabaseUser } from '@supabase/supabase-js';
 const navLinks = [
   { href: '/', label: 'Acasă', type: 'route' as const },
   { href: '/servicii/', label: 'Servicii', type: 'route' as const },
-  { href: '/#cum-functioneaza', label: 'Cum Funcționează', type: 'hash' as const },
-  { href: '/#intrebari', label: 'Întrebări Frecvente', type: 'hash' as const },
+  { href: '/blog/', label: 'Blog', type: 'route' as const },
+  { href: '/comanda/status/', label: 'Status comandă', type: 'route' as const },
   { href: '/#contact', label: 'Contact', type: 'hash' as const },
 ];
 
@@ -390,8 +390,21 @@ export function Header() {
                     )}
                   </nav>
 
-                  {/* Mobile Contact Info */}
-                  <div className="px-4 py-4 border-t border-neutral-100 bg-neutral-50">
+                  {/* Mobile Contact + order status */}
+                  <div className="px-4 py-4 border-t border-neutral-100 bg-neutral-50 space-y-3">
+                    <Link
+                      href="/comanda/status/"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="flex items-center gap-3 p-3 bg-white rounded-xl border border-neutral-200 hover:border-primary-300 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
+                    >
+                      <div className="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center">
+                        <PackageSearch className="w-5 h-5 text-primary-600" />
+                      </div>
+                      <div>
+                        <p className="text-xs text-neutral-500">Ai deja o comandă?</p>
+                        <p className="text-sm font-bold text-secondary-900">Verifică statusul comenzii</p>
+                      </div>
+                    </Link>
                     <a
                       href="tel:+40312299399"
                       className="flex items-center gap-3 p-3 bg-white rounded-xl border border-neutral-200 hover:border-primary-300 transition-colors"
