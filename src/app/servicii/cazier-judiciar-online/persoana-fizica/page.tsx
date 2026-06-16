@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import { Service, ServiceOption, formatEstimatedDays } from '@/types/services';
 import { Footer } from '@/components/home/footer';
+import { MobileStickyCTA } from '@/components/services/mobile-sticky-cta';
 import { ServiceFAQ } from '@/components/services/service-faq';
 
 // Database slug for this service (order pipeline identifier)
@@ -716,6 +717,8 @@ export default async function CazierJudiciarPFPage() {
           </div>
         </section>
       </main>
+
+      <MobileStickyCTA href={`/comanda/${SERVICE_SLUG}`} basePrice={service.base_price} />
 
       <Footer />
     </>

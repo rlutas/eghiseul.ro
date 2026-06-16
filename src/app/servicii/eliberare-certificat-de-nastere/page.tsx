@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import { Service, ServiceOption, formatEstimatedDays } from '@/types/services';
 import { Footer } from '@/components/home/footer';
+import { MobileStickyCTA } from '@/components/services/mobile-sticky-cta';
 import { ServiceFAQ } from '@/components/services/service-faq';
 import { buildPageMetadata, buildServicePageGraph, BASE_URL } from '@/lib/seo';
 import { ServicePrice } from '@/components/services/service-price';
@@ -519,6 +520,8 @@ export default async function CertificatNasterePage() {
           </div>
         </section>
       </main>
+
+      <MobileStickyCTA href={`/comanda/${SERVICE_SLUG}`} basePrice={service.base_price} />
 
       <Footer />
     </>

@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import { Service, ServiceOption } from '@/types/services';
 import { Footer } from '@/components/home/footer';
+import { MobileStickyCTA } from '@/components/services/mobile-sticky-cta';
 import { ServiceFAQ } from '@/components/services/service-faq';
 import { SystemStatus } from '@/components/services/system-status';
 import { buildPageMetadata, buildServicePageGraph, BASE_URL } from '@/lib/seo';
@@ -548,6 +549,8 @@ export default async function CertificatConstatatorPage() {
           </div>
         </section>
       </main>
+
+      <MobileStickyCTA href={`/comanda/${SERVICE_SLUG}`} basePrice={service.base_price} />
 
       <Footer />
     </>

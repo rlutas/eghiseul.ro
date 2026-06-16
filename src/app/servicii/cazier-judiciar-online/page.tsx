@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Footer } from '@/components/home/footer';
+import { MobileStickyCTA } from '@/components/services/mobile-sticky-cta';
 import { ServiceFAQ, type FAQ, type FAQCategory } from '@/components/services/service-faq';
 import { buildPageMetadata, buildServicePageGraph, BASE_URL } from '@/lib/seo';
 import { cn } from '@/lib/utils';
@@ -388,7 +389,7 @@ export default function CazierJudiciarHubPage() {
         </section>
 
         {/* ──────────────── ALEGE TIPUL DE CAZIER ──────────────── */}
-        <section className="py-12 lg:py-20 bg-white -mt-8">
+        <section id="alege-tip" className="py-12 lg:py-20 bg-white -mt-8 scroll-mt-24">
           <div className="container mx-auto px-4 max-w-[1000px]">
             <div className="text-center mb-10">
               <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-3">
@@ -1299,6 +1300,8 @@ export default function CazierJudiciarHubPage() {
           </Link>
         </div>
       </div>
+
+      <MobileStickyCTA href="#alege-tip" basePrice={198} ctaLabel="Alege tipul" />
 
       <Footer />
     </>

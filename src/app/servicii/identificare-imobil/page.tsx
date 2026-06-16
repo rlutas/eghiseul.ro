@@ -510,11 +510,7 @@ export default async function IdentificareImobilPage() {
         </section>
       </main>
 
-      <MobileStickyCTA
-        href={`/comanda/${SERVICE_SLUG}`}
-        priceLabel={fmt(priceExVat)}
-        totalLabel={fmt(priceWithVat)}
-      />
+      <MobileStickyCTA href={`/comanda/${SERVICE_SLUG}`} basePrice={service.base_price} />
 
       <Footer />
     </>

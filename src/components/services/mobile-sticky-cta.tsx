@@ -7,20 +7,21 @@ import { ArrowRight } from 'lucide-react';
 interface MobileStickyCTAProps {
   /** Order wizard target, e.g. `/comanda/extras-carte-funciara`. */
   href: string;
-  /** Ex-VAT price already formatted (e.g. "73,55"). */
-  priceLabel: string;
-  /** Total-with-VAT price already formatted (e.g. "89"). */
-  totalLabel: string;
+  /** VAT-inclusive total as stored in services.base_price. */
+  basePrice: number | string;
   ctaLabel?: string;
 }
+
+const fmt = (v: number) => (Number.isInteger(v) ? String(v) : v.toFixed(2).replace('.', ','));
 
 /**
  * Mobile-only sticky bottom CTA bar — the single biggest conversion lever on
  * phones (most of our traffic). Slides up after the user scrolls past the hero
  * so it never competes with the hero CTA. Respects the iOS home-indicator safe
- * area. Hidden on lg+ (desktop keeps the in-page price card).
+ * area. Hidden on lg+ (desktop keeps the in-page price card). Price math matches
+ * the ServicePrice hero block (ex-VAT headline + total cu TVA).
  */
-export function MobileStickyCTA({ href, priceLabel, totalLabel, ctaLabel = 'Comandă acum' }: MobileStickyCTAProps) {
+export function MobileStickyCTA({ href, basePrice, ctaLabel = 'Comandă acum' }: MobileStickyCTAProps) {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -29,6 +30,9 @@ export function MobileStickyCTA({ href, priceLabel, totalLabel, ctaLabel = 'Coma
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
+
+  const withVat = Number(basePrice) || 0;
+  const exVat = Math.round((withVat / 1.21) * 100) / 100;
 
   return (
     <div
@@ -41,9 +45,9 @@ export function MobileStickyCTA({ href, priceLabel, totalLabel, ctaLabel = 'Coma
         <div className="flex flex-col leading-tight">
           <span className="text-[11px] text-neutral-500">de la</span>
           <span className="text-lg font-black text-secondary-900">
-            {priceLabel} <span className="text-xs font-semibold text-neutral-400">+TVA</span>
+            {fmt(exVat)} <span className="text-xs font-semibold text-neutral-400">+TVA</span>
           </span>
-          <span className="text-[11px] text-neutral-500">{totalLabel} RON cu TVA</span>
+          <span className="text-[11px] text-neutral-500">{fmt(withVat)} RON cu TVA</span>
         </div>
         <Link
           href={href}
