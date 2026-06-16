@@ -77,8 +77,10 @@ export function PriceSidebarModular({ service, variant = 'full' }: PriceSidebarM
     includeCourierLeg: !!courierCode,
   });
   // Constatator is digital + auto-issued — minutes, not business days.
-  const isConstatator = service.slug === 'certificat-constatator';
-  const deliveryTimeText: string = isConstatator
+  // Constatator + extras carte funciară are digital + auto-issued — minutes, not days.
+  const isInstantDigital =
+    service.slug === 'certificat-constatator' || service.slug === 'extras-carte-funciara';
+  const deliveryTimeText: string = isInstantDigital
     ? 'câteva minute (24/7)'
     : estimate.minDays === estimate.maxDays
       ? `${estimate.minDays} zile lucrătoare`
@@ -106,8 +108,8 @@ export function PriceSidebarModular({ service, variant = 'full' }: PriceSidebarM
         urgencyActive={hasUrgentaMain}
         variant={variant}
       />
-      {/* Live ONRC system status — auto-issuance, like the competitor. */}
-      {isConstatator && variant === 'full' && <SystemStatus />}
+      {/* Live system status (ONRC/ANCPI) — auto-issuance, like the competitor. */}
+      {isInstantDigital && variant === 'full' && <SystemStatus />}
     </div>
   );
 }

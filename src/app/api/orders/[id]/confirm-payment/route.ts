@@ -4,6 +4,7 @@ import { stripe } from '@/lib/stripe';
 import { computeEstimatedCompletionISO } from '@/lib/delivery-estimate-helper';
 import { ensureInvoiceForPaidOrder } from '@/lib/oblio';
 import { ensureOnrcJobForPaidOrder } from '@/lib/onrc/ensure-onrc-job';
+import { ensureAncpiJobForPaidOrder } from '@/lib/ancpi/ensure-ancpi-job';
 
 // Service role client for bypassing RLS
 const supabaseAdmin = createClient(
@@ -55,6 +56,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
           console.error(`[confirm-payment] Invoice backfill failed for ${orderId}: ${res.error}`);
         }
         await ensureOnrcJobForPaidOrder(orderId);
+        await ensureAncpiJobForPaidOrder(orderId);
       }
       return NextResponse.json({
         success: true,
@@ -190,6 +192,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         console.error(`[confirm-payment] Invoice creation failed for ${orderId}: ${res.error}`);
       }
       await ensureOnrcJobForPaidOrder(orderId);
+      await ensureAncpiJobForPaidOrder(orderId);
     } catch (invErr) {
       // Never fail the payment confirmation because of invoicing.
       console.error('[confirm-payment] Invoice emission threw:', invErr);

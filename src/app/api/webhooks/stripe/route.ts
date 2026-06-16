@@ -4,6 +4,7 @@ import { createClient } from '@supabase/supabase-js'
 import Stripe from 'stripe'
 import { ensureInvoiceForPaidOrder } from '@/lib/oblio'
 import { ensureOnrcJobForPaidOrder } from '@/lib/onrc/ensure-onrc-job'
+import { ensureAncpiJobForPaidOrder } from '@/lib/ancpi/ensure-ancpi-job'
 import { computeEstimatedCompletionISO } from '@/lib/delivery-estimate-helper'
 
 // Use service role for webhook handler (bypasses RLS)
@@ -271,6 +272,9 @@ async function handlePaymentSucceeded(paymentIntent: Stripe.PaymentIntent) {
 
   // 4. Queue ONRC automation job (idempotent; no-op for non-ONRC services).
   await ensureOnrcJobForPaidOrder(orderId)
+
+  // 5. Queue ANCPI automation job (idempotent; no-op for non-ANCPI services).
+  await ensureAncpiJobForPaidOrder(orderId)
 }
 
 async function handlePaymentFailed(paymentIntent: Stripe.PaymentIntent) {

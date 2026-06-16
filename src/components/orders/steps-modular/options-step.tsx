@@ -66,8 +66,9 @@ const EXTRAS_CODES = ['apostila_haga', 'traducere', 'legalizare', 'apostila_nota
 // Auto-applied system flags — rendered as read-only info cards, not toggles.
 const AUTO_APPLIED_CODES = new Set(['cetatean_strain']);
 
-// Codes hidden from UI (deprecated — kept in DB for historical orders).
-const HIDDEN_CODES = new Set(['verificare_expert', 'copii_suplimentare']);
+// Codes hidden from UI (deprecated, or driven by another module).
+// 'extras_suplimentar' is set by the Property module (multi-imobil), not a toggle.
+const HIDDEN_CODES = new Set(['verificare_expert', 'copii_suplimentare', 'extras_suplimentar']);
 
 // ────────────────────────────────────────────────────────────────────────────
 // Helpers

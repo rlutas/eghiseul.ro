@@ -27,8 +27,10 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Home, AlertCircle, HelpCircle } from 'lucide-react';
-import type { PropertyVerificationConfig } from '@/types/verification-modules';
+import { Home, AlertCircle, HelpCircle, Plus, Trash2 } from 'lucide-react';
+import type { PropertyVerificationConfig, AdditionalImobil } from '@/types/verification-modules';
+import { normalizeJudet } from '@/lib/ancpi/judete';
+import uatNomenclator from '@/lib/ancpi/uat-nomenclator.json';
 import {
   Tooltip,
   TooltipContent,
@@ -52,10 +54,49 @@ const COUNTIES = [
 ];
 
 export default function PropertyDataStep({ config, onValidChange }: PropertyDataStepProps) {
-  const { state, updateProperty } = useModularWizard();
+  const { state, updateProperty, serviceOptions, updateOptions } = useModularWizard();
   const property = state.property;
 
   const [searchMethod, setSearchMethod] = useState<'cadastral' | 'carteFunciara' | 'address'>('cadastral');
+
+  // UAT (localitate) options for the selected county, from the ANCPI nomenclator.
+  const localities: string[] =
+    (uatNomenclator as Record<string, string[]>)[normalizeJudet(property?.county ?? '')] ?? [];
+
+  // ── Multi-imobil ("Adaugă un extras") — all in the SAME county (ANCPI rule) ──
+  const additional = property?.additionalImobile ?? [];
+  const setAdditional = useCallback(
+    (next: AdditionalImobil[]) => updateProperty?.({ additionalImobile: next }),
+    [updateProperty]
+  );
+  const addImobil = () =>
+    setAdditional([...additional, { locality: '', carteFunciara: '', cadastral: '', topografic: '' }]);
+  const removeImobil = (i: number) => setAdditional(additional.filter((_, idx) => idx !== i));
+  const updateImobil = (i: number, patch: Partial<AdditionalImobil>) =>
+    setAdditional(additional.map((im, idx) => (idx === i ? { ...im, ...patch } : im)));
+
+  // Keep the priced `extras_suplimentar` option in sync with the extra count.
+  const extraCount = additional.length;
+  useEffect(() => {
+    const opt = serviceOptions.find((o) => o.code === 'extras_suplimentar');
+    if (!opt) return;
+    const current = state.selectedOptions;
+    const existing = current.find((o) => o.code === 'extras_suplimentar');
+    if (extraCount > 0) {
+      if (existing && existing.quantity === extraCount) return; // no change → avoid loop
+      const next = current.filter((o) => o.code !== 'extras_suplimentar');
+      next.push({
+        optionId: opt.id,
+        optionName: opt.name,
+        quantity: extraCount,
+        priceModifier: Number(opt.price),
+        code: 'extras_suplimentar',
+      });
+      updateOptions(next);
+    } else if (existing) {
+      updateOptions(current.filter((o) => o.code !== 'extras_suplimentar'));
+    }
+  }, [extraCount, serviceOptions, state.selectedOptions, updateOptions]);
 
   // Validate form
   const isFormValid = useCallback(() => {
@@ -112,7 +153,7 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
               </Label>
               <Select
                 value={property.county}
-                onValueChange={(value) => updateProperty?.({ county: value })}
+                onValueChange={(value) => updateProperty?.({ county: value, locality: '' })}
               >
                 <SelectTrigger id="county">
                   <SelectValue placeholder="Selectează județul" />
@@ -127,18 +168,27 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
               </Select>
             </div>
 
-            {/* Locality */}
+            {/* Locality / UAT — dependent on the selected county (ANCPI nomenclator) */}
             <div className="space-y-2">
               <Label htmlFor="locality">
-                Localitate {config.fields.locality.required && <span className="text-red-500">*</span>}
+                Localitate / UAT {config.fields.locality.required && <span className="text-red-500">*</span>}
               </Label>
-              <Input
-                id="locality"
-                type="text"
+              <Select
                 value={property.locality}
-                onChange={(e) => updateProperty?.({ locality: e.target.value })}
-                placeholder="București, Sector 1"
-              />
+                onValueChange={(value) => updateProperty?.({ locality: value })}
+                disabled={!property.county}
+              >
+                <SelectTrigger id="locality">
+                  <SelectValue placeholder={property.county ? 'Selectează localitatea' : 'Alege întâi județul'} />
+                </SelectTrigger>
+                <SelectContent className="max-h-72">
+                  {localities.map((loc) => (
+                    <SelectItem key={loc} value={loc}>
+                      {loc}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </CardContent>
@@ -318,6 +368,84 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
                 placeholder="1234/1/2"
               />
             </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Additional imobile — "Adaugă un extras" (same county, ANCPI rule) */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Plus className="h-5 w-5" />
+            Extrase suplimentare
+          </CardTitle>
+          <CardDescription>
+            Adaugă mai multe imobile în aceeași comandă (din <strong>același județ</strong>
+            {property?.county ? ` — ${property.county}` : ''}). Fiecare extras suplimentar: 49,99 RON.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {additional.map((im, i) => (
+            <div key={i} className="rounded-lg border border-neutral-200 p-3 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium">Imobil suplimentar #{i + 2}</span>
+                <Button type="button" variant="ghost" size="sm" onClick={() => removeImobil(i)}>
+                  <Trash2 className="h-4 w-4 text-red-500" />
+                </Button>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <Label>Localitate / UAT</Label>
+                  <Select
+                    value={im.locality}
+                    onValueChange={(value) => updateImobil(i, { locality: value })}
+                    disabled={!property?.county}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder={property?.county ? 'Selectează localitatea' : 'Alege întâi județul'} />
+                    </SelectTrigger>
+                    <SelectContent className="max-h-72">
+                      {localities.map((loc) => (
+                        <SelectItem key={loc} value={loc}>
+                          {loc}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-1">
+                  <Label>Număr Carte Funciară</Label>
+                  <Input
+                    type="text"
+                    value={im.carteFunciara}
+                    onChange={(e) => updateImobil(i, { carteFunciara: e.target.value })}
+                    placeholder="123456"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label>Număr Cadastral</Label>
+                  <Input
+                    type="text"
+                    value={im.cadastral}
+                    onChange={(e) => updateImobil(i, { cadastral: e.target.value })}
+                    placeholder="123456"
+                  />
+                </div>
+              </div>
+            </div>
+          ))}
+          <Button
+            type="button"
+            variant="outline"
+            onClick={addImobil}
+            disabled={!property?.county || additional.length >= 24}
+            className="w-full"
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            Adaugă un extras (+49,99 RON)
+          </Button>
+          {!property?.county && (
+            <p className="text-xs text-muted-foreground">Selectează întâi județul imobilului principal.</p>
           )}
         </CardContent>
       </Card>

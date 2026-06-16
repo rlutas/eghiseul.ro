@@ -448,6 +448,14 @@ export interface CompanyAutoCompleteData {
 /**
  * Property Module State
  */
+/** One additional imobil in a multi-extract order (same county as the primary). */
+export interface AdditionalImobil {
+  locality: string;
+  carteFunciara: string;
+  cadastral: string;
+  topografic?: string;
+}
+
 export interface PropertyState {
   county: string;
   locality: string;
@@ -455,6 +463,9 @@ export interface PropertyState {
   cadastral: string;
   topografic?: string;
   motiv?: string;
+
+  // Multi-extract: extra imobile in the same county ("Adaugă un extras").
+  additionalImobile?: AdditionalImobil[];
 
   // For identification services
   ownerName?: string;

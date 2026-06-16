@@ -168,6 +168,7 @@
 | **SEO migration — playbook GSC per serviciu** | [`seo/gsc-data/SERVICE-RANKING-PLAYBOOK-2026-06-13.md`](seo/gsc-data/SERVICE-RANKING-PLAYBOOK-2026-06-13.md) |
 | **Formulare comandă vs WP (Playwright) + module stare-civilă/constatator** | [`technical/specs/wp-form-gap-analysis-2026-06-14.md`](technical/specs/wp-form-gap-analysis-2026-06-14.md) |
 | **🤖 Plan automatizare ONRC (coadă stări + bot)** | [`technical/specs/onrc-automation-plan.md`](technical/specs/onrc-automation-plan.md) |
+| **🤖 Plan automatizare ANCPI — Extras Carte Funciară (worker)** | [`technical/specs/ancpi-automation-plan.md`](technical/specs/ancpi-automation-plan.md) |
 | [Constatator API platform & roadmap](technical/specs/constatator-api-platform-roadmap.md) | API-as-a-service, a 2-a platformă, competitor, prețuri |
 | **KYC: Verificare Identitate & Face Match** | [`technical/specs/kyc-identity-verification.md`](technical/specs/kyc-identity-verification.md) |
 | **Re-upload poză după comandă (selfie)** | [`technical/specs/post-order-photo-reupload.md`](technical/specs/post-order-photo-reupload.md) |
