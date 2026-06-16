@@ -35,7 +35,7 @@ import { ServicePrice } from '@/components/services/service-price';
 const SERVICE_SLUG = 'certificat-casatorie';
 const PAGE_PATH = '/servicii/eliberare-certificat-de-casatorie/';
 const SCHEMA_SLUG = 'eliberare-certificat-de-casatorie';
-const TITLE = 'Certificat de Căsătorie Online — Duplicat 998 RON | eGhișeul';
+const TITLE = 'Certificat de Căsătorie Online — Duplicat 998 RON';
 const DESCRIPTION =
   'Obține duplicat sau copie legalizată după certificatul de căsătorie online, de la Starea Civilă. ' +
   '998 RON, livrare pe email — necesar pentru cetățenie, proceduri juridice și administrative, ' +
@@ -71,7 +71,7 @@ export const metadata = buildPageMetadata({
   title: TITLE,
   description: DESCRIPTION,
   path: PAGE_PATH,
-  ogImage: '/og/certificat-casatorie.png',
+  ogImage: '/og/default.png',
 });
 
 const jsonLdGraph = buildServicePageGraph({

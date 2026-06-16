@@ -35,7 +35,7 @@ import { ServicePrice } from '@/components/services/service-price';
 const SERVICE_SLUG = 'certificat-celibat';
 const PAGE_PATH = '/servicii/eliberare-certificat-de-celibat/';
 const SCHEMA_SLUG = 'eliberare-certificat-de-celibat';
-const TITLE = 'Certificat de Celibat Online — 179 RON | eGhișeul';
+const TITLE = 'Certificat de Celibat Online — 179 RON';
 const DESCRIPTION =
   'Certificat de Celibat (dovada că nu ești căsătorit) online, necesar pentru căsătoria în ' +
   'străinătate sau obținerea cetățeniei. 179 RON, 100% online, fără drum la ghișeu. ' +
@@ -71,7 +71,7 @@ export const metadata = buildPageMetadata({
   title: TITLE,
   description: DESCRIPTION,
   path: PAGE_PATH,
-  ogImage: '/og/certificat-celibat.png',
+  ogImage: '/og/default.png',
 });
 
 const jsonLdGraph = buildServicePageGraph({

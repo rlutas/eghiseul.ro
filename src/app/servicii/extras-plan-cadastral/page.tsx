@@ -33,7 +33,7 @@ import { buildPageMetadata, buildServicePageGraph, BASE_URL, serviceUrl } from '
 const SERVICE_SLUG = 'extras-plan-cadastral';
 const PAGE_PATH = '/servicii/extras-plan-cadastral/';
 const SCHEMA_SLUG = 'extras-plan-cadastral';
-const TITLE = 'Extras de Plan Cadastral pe Ortofotoplan — 79,99 RON | eGhișeul';
+const TITLE = 'Extras de Plan Cadastral pe Ortofotoplan — 79,99 RON';
 const DESCRIPTION =
   'Extras de plan cadastral pe ortofotoplan de la ANCPI — localizezi terenul pe hartă după ' +
   'numărul cadastral sau de carte funciară. 79,99 RON, taxe incluse. 100% online, ' +
@@ -62,7 +62,7 @@ export const metadata = buildPageMetadata({
   title: TITLE,
   description: DESCRIPTION,
   path: PAGE_PATH,
-  ogImage: '/og/extras-plan-cadastral.png',
+  ogImage: '/og/default.png',
 });
 
 const jsonLdGraph = buildServicePageGraph({

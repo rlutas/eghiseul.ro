@@ -55,7 +55,7 @@ export const metadata: Metadata = buildPageMetadata({
   title: TITLE,
   description: DESCRIPTION,
   path: PAGE_PATH,
-  ogImage: '/og/cazier-judiciar.png',
+  ogImage: '/og/default.png',
 });
 
 const jsonLdGraph = buildServicePageGraph({

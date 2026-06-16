@@ -36,7 +36,7 @@ import { ServicePrice } from '@/components/services/service-price';
 const SERVICE_SLUG = 'certificat-integritate';
 const PAGE_PATH = '/servicii/certificat-de-integritate-comportamentala/';
 const SCHEMA_SLUG = 'certificat-de-integritate-comportamentala';
-const TITLE = 'Certificat de Integritate Comportamentală Online | eGhișeul';
+const TITLE = 'Certificat de Integritate Comportamentală Online';
 const DESCRIPTION =
   'Certificat de Integritate Comportamentală online de la IGPR (Poliție), necesar la ' +
   'angajarea cu minori sau medii sensibile. 250 RON, 100% online, livrat pe email.';
@@ -71,7 +71,7 @@ export const metadata = buildPageMetadata({
   title: TITLE,
   description: DESCRIPTION,
   path: PAGE_PATH,
-  ogImage: '/og/certificat-integritate.png',
+  ogImage: '/og/default.png',
 });
 
 const jsonLdGraph = buildServicePageGraph({

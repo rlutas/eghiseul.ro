@@ -37,7 +37,7 @@ import { ServicePrice } from '@/components/services/service-price';
 const SERVICE_SLUG = 'cazier-fiscal';
 const PAGE_PATH = '/servicii/cazier-fiscal-online/';
 const SCHEMA_SLUG = 'cazier-fiscal-online';
-const TITLE = 'Cazier Fiscal Online — ANAF, 198 RON | eGhișeul';
+const TITLE = 'Cazier Fiscal Online — ANAF, 198 RON';
 const DESCRIPTION =
   'Obține Cazier Fiscal online de la ANAF, fără drum la ghișeu. Atestă lipsa datoriilor ' +
   'fiscale, valabil 30 de zile, 198 RON pentru persoană fizică. Procesare 100% online, ' +
@@ -73,7 +73,7 @@ export const metadata = buildPageMetadata({
   title: TITLE,
   description: DESCRIPTION,
   path: PAGE_PATH,
-  ogImage: '/og/cazier-fiscal.png',
+  ogImage: '/og/default.png',
 });
 
 const jsonLdGraph = buildServicePageGraph({

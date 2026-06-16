@@ -32,7 +32,7 @@ import { buildPageMetadata, buildServicePageGraph, BASE_URL, serviceUrl } from '
 const SERVICE_SLUG = 'identificare-imobil';
 const PAGE_PATH = '/servicii/identificare-imobil/';
 const SCHEMA_SLUG = 'identificare-imobil';
-const TITLE = 'Identificare Imobil după Adresă — Află Numărul Cadastral | eGhișeul';
+const TITLE = 'Identificare Imobil după Adresă — Află Numărul Cadastral';
 const DESCRIPTION =
   'Nu știi numărul cadastral sau de carte funciară? Îți identificăm imobilul după adresă ' +
   '(parcelă/construcție + nr. CF) direct de la ANCPI și primești și extrasul de carte funciară. ' +
@@ -61,7 +61,7 @@ export const metadata = buildPageMetadata({
   title: TITLE,
   description: DESCRIPTION,
   path: PAGE_PATH,
-  ogImage: '/og/identificare-imobil.png',
+  ogImage: '/og/default.png',
 });
 
 const jsonLdGraph = buildServicePageGraph({

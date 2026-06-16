@@ -104,14 +104,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   if (!service) {
     return {
-      title: 'Serviciu indisponibil | eGhișeul',
+      title: 'Serviciu indisponibil',
       description: 'Serviciul solicitat nu este disponibil.',
     };
   }
 
   const title =
     service.meta_title ||
-    `${service.name} Online | Livrare rapidă | eGhișeul.ro`;
+    `${service.name} Online — Livrare rapidă`;
   const description =
     service.meta_description ||
     service.short_description ||

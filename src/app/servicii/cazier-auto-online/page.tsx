@@ -36,7 +36,7 @@ import { ServicePrice } from '@/components/services/service-price';
 const SERVICE_SLUG = 'cazier-auto';
 const PAGE_PATH = '/servicii/cazier-auto-online/';
 const SCHEMA_SLUG = 'cazier-auto-online';
-const TITLE = 'Cazier Auto Online — Istoric Vehicul, 198 RON | eGhișeul';
+const TITLE = 'Cazier Auto Online — Istoric Vehicul, 198 RON';
 const DESCRIPTION =
   'Cazier Auto online — istoricul complet al vehiculului: accidente, daune, ' +
   'kilometraj real și proprietari anteriori. 198 RON, rapid, livrat pe email. ' +
@@ -72,7 +72,7 @@ export const metadata = buildPageMetadata({
   title: TITLE,
   description: DESCRIPTION,
   path: PAGE_PATH,
-  ogImage: '/og/cazier-auto.png',
+  ogImage: '/og/default.png',
 });
 
 const jsonLdGraph = buildServicePageGraph({

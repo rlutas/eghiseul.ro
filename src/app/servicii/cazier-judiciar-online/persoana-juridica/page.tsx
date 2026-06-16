@@ -34,7 +34,7 @@ const SERVICE_SLUG = 'cazier-judiciar-persoana-juridica';
 // SEO routing constants — URL path is nested under the hub, NOT the DB slug
 const PAGE_PATH = '/servicii/cazier-judiciar-online/persoana-juridica/';
 const SCHEMA_SLUG = 'cazier-judiciar-online/persoana-juridica';
-const TITLE = 'Cazier Judiciar Firmă (Persoană Juridică) Online — 198 RON | eGhișeul';
+const TITLE = 'Cazier Judiciar Firmă (Persoană Juridică) Online — 198 RON';
 const DESCRIPTION =
   'Cazier judiciar pentru firmă (persoană juridică) 100% online — necesar la licitații publice ' +
   'SEAP, contracte cu statul și fonduri europene. 198 RON, livrare în 2-4 zile. Auto-completare CUI de la ONRC.';
@@ -80,7 +80,7 @@ export const metadata = buildPageMetadata({
   title: TITLE,
   description: DESCRIPTION,
   path: PAGE_PATH,
-  ogImage: '/og/cazier-judiciar.png',
+  ogImage: '/og/default.png',
 });
 
 // Full Schema.org @graph — same depth as the hub page.

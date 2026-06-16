@@ -34,7 +34,7 @@ import { buildPageMetadata, buildServicePageGraph, BASE_URL, serviceUrl } from '
 const SERVICE_SLUG = 'extras-carte-funciara';
 const PAGE_PATH = '/servicii/extras-de-carte-funciara/';
 const SCHEMA_SLUG = 'extras-de-carte-funciara';
-const TITLE = 'Extras de Carte Funciară Online în Câteva Minute — 89 RON | eGhișeul';
+const TITLE = 'Extras de Carte Funciară Online în Câteva Minute — 89 RON';
 const DESCRIPTION =
   'Extras de Carte Funciară online de la ANCPI, livrat pe email în câteva minute — ' +
   'singurii din România cu eliberare automată 24/7, fără taxă de urgență și fără cont ANCPI. ' +
@@ -70,7 +70,7 @@ export const metadata = buildPageMetadata({
   title: TITLE,
   description: DESCRIPTION,
   path: PAGE_PATH,
-  ogImage: '/og/extras-carte-funciara.png',
+  ogImage: '/og/default.png',
 });
 
 const jsonLdGraph = buildServicePageGraph({

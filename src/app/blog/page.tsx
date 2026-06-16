@@ -13,7 +13,7 @@ const DESCRIPTION =
 export const revalidate = 86400;
 
 export const metadata = buildPageMetadata({
-  title: `${TITLE} | eGhișeul`,
+  title: `${TITLE}`,
   description: DESCRIPTION,
   path: '/blog/',
 });

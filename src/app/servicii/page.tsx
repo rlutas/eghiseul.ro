@@ -28,7 +28,7 @@ const HIDDEN_FROM_INDEX = new Set([
 ]);
 
 export const metadata: Metadata = {
-  title: 'Servicii | Documente oficiale online pentru România | eGhișeul',
+  title: 'Servicii | Documente oficiale online pentru România',
   description:
     'Catalogul complet al serviciilor eGhișeul.ro: cazier judiciar, cazier fiscal, certificat constatator, extras carte funciară, rovinietă și altele. 12 servicii digitale, 100% online.',
   keywords: [
@@ -42,7 +42,7 @@ export const metadata: Metadata = {
     'eghiseul',
   ],
   openGraph: {
-    title: 'Servicii | Documente oficiale online | eGhișeul',
+    title: 'Servicii | Documente oficiale online',
     description:
       '12 servicii digitale pentru documente oficiale din România. Comandă online, livrare rapidă.',
     type: 'website',

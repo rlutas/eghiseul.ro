@@ -14,7 +14,7 @@ import { buildPageMetadata, BASE_URL } from '@/lib/seo';
 import { organizationNode, websiteNode, breadcrumbNode } from '@/lib/seo/schema';
 
 const PAGE_PATH = '/tools/verificare-rovinieta-online/';
-const TITLE = 'Verificare Rovinietă Online — Gratuit, După Număr | eGhișeul';
+const TITLE = 'Verificare Rovinietă Online — Gratuit, După Număr';
 const DESCRIPTION =
   'Verifică gratuit valabilitatea rovinietei online, după numărul de înmatriculare, ' +
   'fără serie de șasiu. Aflăm instant dacă mașina are rovinietă validă și până când expiră.';

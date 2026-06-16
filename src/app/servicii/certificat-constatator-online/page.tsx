@@ -37,7 +37,7 @@ import { ServicePrice } from '@/components/services/service-price';
 const SERVICE_SLUG = 'certificat-constatator';
 const PAGE_PATH = '/servicii/certificat-constatator-online/';
 const SCHEMA_SLUG = 'certificat-constatator-online';
-const TITLE = 'Certificat Constatator ONRC Online — 119.99 RON | eGhișeul';
+const TITLE = 'Certificat Constatator ONRC Online — 119.99 RON';
 const DESCRIPTION =
   'Obține Certificat Constatator online de la ONRC, cu datele actuale ale firmei: ' +
   'sediu, asociați, administratori, capital social și obiect de activitate. ' +
@@ -73,7 +73,7 @@ export const metadata = buildPageMetadata({
   title: TITLE,
   description: DESCRIPTION,
   path: PAGE_PATH,
-  ogImage: '/og/certificat-constatator.png',
+  ogImage: '/og/default.png',
 });
 
 const jsonLdGraph = buildServicePageGraph({

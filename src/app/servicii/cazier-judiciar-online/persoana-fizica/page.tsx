@@ -34,7 +34,7 @@ const SERVICE_SLUG = 'cazier-judiciar-persoana-fizica';
 // SEO routing constants — URL path is nested under the hub, NOT the DB slug
 const PAGE_PATH = '/servicii/cazier-judiciar-online/persoana-fizica/';
 const SCHEMA_SLUG = 'cazier-judiciar-online/persoana-fizica';
-const TITLE = 'Cazier Judiciar Persoană Fizică Online — 198 RON | eGhișeul';
+const TITLE = 'Cazier Judiciar Persoană Fizică Online — 198 RON';
 const DESCRIPTION =
   'Obține cazierul judiciar pentru persoană fizică 100% online, fără drum la ghișeu. ' +
   '198 RON, livrare în 2-4 zile pe email. Document oficial de la Poliția Română, ' +
@@ -81,7 +81,7 @@ export const metadata = buildPageMetadata({
   title: TITLE,
   description: DESCRIPTION,
   path: PAGE_PATH,
-  ogImage: '/og/cazier-judiciar.png',
+  ogImage: '/og/default.png',
 });
 
 // Full Schema.org @graph (Org + WebSite + BreadcrumbList + Service + Offers +
