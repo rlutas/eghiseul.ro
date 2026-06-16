@@ -29,10 +29,15 @@ type Provider = keyof typeof PROVIDERS;
 async function reachable(url: string): Promise<boolean> {
   try {
     const ctrl = new AbortController();
-    const t = setTimeout(() => ctrl.abort(), 5000);
-    const r = await fetch(url, { signal: ctrl.signal, cache: 'no-store' });
+    const t = setTimeout(() => ctrl.abort(), 6000);
+    // `redirect: 'manual'` so a normal login redirect (302) is NOT followed and
+    // is still counted as reachable. Any HTTP response (2xx/3xx/4xx) means the
+    // portal answered — only 5xx or a network/timeout error counts as down.
+    // (Previously we used `r.ok`, which false-flagged the 302 login page as
+    // "indisponibil".)
+    const r = await fetch(url, { signal: ctrl.signal, cache: 'no-store', redirect: 'manual' });
     clearTimeout(t);
-    return r.ok;
+    return r.status > 0 && r.status < 500;
   } catch {
     return false;
   }
@@ -53,13 +58,17 @@ export async function GET(req: NextRequest) {
 
   const lastSeen = hb?.data?.last_seen ? new Date(hb.data.last_seen).getTime() : 0;
   const workerUp = lastSeen > 0 && Date.now() - lastSeen < WORKER_STALE_MS;
-  const operational = portalUp && workerUp;
+  // If the worker is issuing, it is logging into the portal — so the portal is
+  // reachable by definition. Avoids the contradictory "portal indisponibil +
+  // eliberare operațională" state.
+  const portalReachable = portalUp || workerUp;
+  const operational = portalReachable && workerUp;
 
   return NextResponse.json(
     {
       operational,
       services: {
-        portal: { up: portalUp, label: cfg.label },
+        portal: { up: portalReachable, label: cfg.label },
         issuance: { up: workerUp, label: 'Eliberare automată' },
       },
       lastWorkerSeen: lastSeen ? new Date(lastSeen).toISOString() : null,
