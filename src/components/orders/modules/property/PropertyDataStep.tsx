@@ -31,6 +31,7 @@ import { Home, AlertCircle, HelpCircle, Plus, Trash2 } from 'lucide-react';
 import type { PropertyVerificationConfig, AdditionalImobil } from '@/types/verification-modules';
 import { normalizeJudet } from '@/lib/ancpi/judete';
 import uatNomenclator from '@/lib/ancpi/uat-nomenclator.json';
+import { checkCf } from '@/lib/ancpi/cf-format';
 import {
   Tooltip,
   TooltipContent,
@@ -53,6 +54,20 @@ const COUNTIES = [
   'Vrancea',
 ];
 
+/** Inline, non-blocking hint under a CF/cadastral input. */
+function CfHint({ check }: { check: ReturnType<typeof checkCf> }) {
+  if (check.status === 'empty') return null;
+  if (check.status === 'valid') {
+    return <p className="text-xs text-green-600 flex items-center gap-1">✓ Format corect</p>;
+  }
+  return (
+    <Alert className="border-amber-300 bg-amber-50 py-2">
+      <AlertCircle className="h-4 w-4 text-amber-600" />
+      <AlertDescription className="text-amber-800 text-xs">{check.message}</AlertDescription>
+    </Alert>
+  );
+}
+
 export default function PropertyDataStep({ config, onValidChange }: PropertyDataStepProps) {
   const { state, updateProperty, serviceOptions, updateOptions } = useModularWizard();
   const property = state.property;
@@ -62,6 +77,10 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
   // UAT (localitate) options for the selected county, from the ANCPI nomenclator.
   const localities: string[] =
     (uatNomenclator as Record<string, string[]>)[normalizeJudet(property?.county ?? '')] ?? [];
+
+  // Non-blocking input rules for the electronic identifier (warn, don't block).
+  const cfCheck = checkCf(property?.carteFunciara ?? '');
+  const cadCheck = checkCf(property?.cadastral ?? '');
 
   // ── Multi-imobil ("Adaugă un extras") — all in the SAME county (ANCPI rule) ──
   const additional = property?.additionalImobile ?? [];
@@ -258,8 +277,9 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
                 type="text"
                 value={property.cadastral}
                 onChange={(e) => updateProperty?.({ cadastral: e.target.value })}
-                placeholder="123456"
+                placeholder="123456 sau 123456-C1-U2"
               />
+              <CfHint check={cadCheck} />
             </div>
           )}
 
@@ -287,8 +307,9 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
                 type="text"
                 value={property.carteFunciara}
                 onChange={(e) => updateProperty?.({ carteFunciara: e.target.value })}
-                placeholder="123456"
+                placeholder="123456 sau 123456-C1-U2"
               />
+              <CfHint check={cfCheck} />
             </div>
           )}
 
