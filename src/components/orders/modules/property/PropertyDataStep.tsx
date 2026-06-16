@@ -377,13 +377,17 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
             </div>
           )}
 
-          {/* Address search not available */}
+          {/* Address tab on a non-identification service → cross-sell the
+              "Identificare imobil după adresă" service (cfunciara-style). */}
           {searchMethod === 'address' && !config.identificationService.enabled && (
-            <Alert>
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>
-                Căutarea după adresă nu este disponibilă pentru acest serviciu.
-                Te rugăm să folosești numărul cadastral sau CF.
+            <Alert className="border-primary-200 bg-primary-50">
+              <AlertCircle className="h-4 w-4 text-primary-600" />
+              <AlertDescription className="text-secondary-900">
+                Nu știi numărul de carte funciară sau cadastral? Folosește serviciul{' '}
+                <a href="/comanda/identificare-imobil" className="font-semibold text-primary-600 underline">
+                  Identificare imobil după adresă
+                </a>{' '}
+                — îl aflăm noi din adresă (sau nume proprietar) și primești și extrasul de carte funciară.
               </AlertDescription>
             </Alert>
           )}

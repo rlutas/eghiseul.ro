@@ -373,7 +373,7 @@ Serviciu pentru clienții care **nu știu numărul CF** — îl aflăm din adres
 
 **Căutare după PROPRIETAR — DOAR MANUAL (NU automatizat):** `rp.ancpi.ro/owner-registry` (Registrul Proprietarilor, prin avocat) permite căutarea după nume proprietar. ⚠️ **Termenii rp.ancpi.ro interzic explicit** uzul comercial, extragerea automată și accesul în afara interfeței (§4-5), cu monitorizare + revocare + sancțiune (§6-7). **NU automatizăm rp.ancpi.ro.** Operatorul/avocatul îl folosește **manual prin interfață** dacă geoportalul nu e suficient — în admin există doar un LINK către rp.ancpi.ro (nu extragere). Canalul comercial automat legitim rămâne **ePay** (plătit, oficial).
 
-**Fișiere:** `src/app/api/ancpi/lookup/route.ts`, `src/app/admin/identifica-imobil/{page,IdentificaImobilTool}.tsx`. Serviciu DB `identificare-imobil` (198 RON, `is_active=false` până la wizard-ul customer — validarea address-only în `PropertyDataStep` rămâne de făcut).
+**Fișiere:** `src/app/api/ancpi/lookup/route.ts`, `src/app/admin/identifica-imobil/{page,IdentificaImobilTool}.tsx`. Serviciu DB `identificare-imobil` (198 RON) — **ACTIV**. Wizard customer: `PropertyDataStep` validează **address-only** când `identificationService.enabled` (tab Adresă default; CF/cadastral opționale); facturare PF/PJ fără KYC (CNP opțional, ca CF); pasul Livrare sărit (digital/email); fără ancpi_job (operator-fulfilled, NU prin worker). Operatorul folosește unealta `/admin/identifica-imobil` + livrează manual (admin upload).
 
 ## 12. Dovezi recon (2026-06-15)
 
