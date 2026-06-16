@@ -1,20 +1,21 @@
 import Link from 'next/link';
 import { Mail, Phone, Shield, Clock, FileText } from 'lucide-react';
+import { serviceUrl } from '@/lib/seo/constants';
 
 const services = [
-  { name: 'Cazier Judiciar', href: '/services/cazier-judiciar' },
-  { name: 'Cazier Fiscal', href: '/services/cazier-fiscal' },
-  { name: 'Certificat Naștere', href: '/services/certificat-nastere' },
-  { name: 'Extras Carte Funciară', href: '/services/extras-carte-funciara' },
-  { name: 'Certificat Celibat', href: '/services/certificat-celibat' },
-  { name: 'Vezi toate serviciile', href: '/services' },
+  { name: 'Cazier Judiciar', href: serviceUrl('cazier-judiciar') },
+  { name: 'Cazier Fiscal', href: serviceUrl('cazier-fiscal') },
+  { name: 'Certificat Naștere', href: serviceUrl('certificat-nastere') },
+  { name: 'Extras Carte Funciară', href: serviceUrl('extras-carte-funciara') },
+  { name: 'Certificat Celibat', href: serviceUrl('certificat-celibat') },
+  { name: 'Vezi toate serviciile', href: '/servicii/' },
 ];
 
 const legalLinks = [
-  { name: 'Termeni și Condiții', href: '/terms' },
-  { name: 'Politica de Confidențialitate', href: '/privacy' },
-  { name: 'GDPR', href: '/gdpr' },
-  { name: 'Politica Cookies', href: '/cookies' },
+  { name: 'Termeni și Condiții', href: '/termeni-si-conditii/' },
+  { name: 'Politica de Confidențialitate', href: '/politica-de-confidentialitate/' },
+  { name: 'GDPR', href: '/gdpr/' },
+  { name: 'Politica Cookies', href: '/politica-cookies/' },
 ];
 
 export function Footer() {

@@ -31,6 +31,10 @@ const STATIC_PAGES: SitemapEntry[] = [
   { url: `${BASE_URL}/servicii/`, changeFrequency: 'weekly', priority: 0.9 },
   { url: `${BASE_URL}/blog/`, changeFrequency: 'weekly', priority: 0.7 },
   { url: `${BASE_URL}/contact/`, changeFrequency: 'monthly', priority: 0.6 },
+  { url: `${BASE_URL}/termeni-si-conditii/`, changeFrequency: 'yearly', priority: 0.3 },
+  { url: `${BASE_URL}/politica-de-confidentialitate/`, changeFrequency: 'yearly', priority: 0.3 },
+  { url: `${BASE_URL}/gdpr/`, changeFrequency: 'yearly', priority: 0.3 },
+  { url: `${BASE_URL}/politica-cookies/`, changeFrequency: 'yearly', priority: 0.3 },
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
