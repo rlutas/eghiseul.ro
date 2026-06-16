@@ -261,4 +261,40 @@ Două servicii ANCPI noi (introduse în sesiunea 2026-06-16) primesc **pagini ha
 
 ---
 
-*Toate cele 11 servicii active au acum pagini SEO hardcodate (9 din batch-urile 1-2 + identificare-imobil + plan-cadastral); rovinietă-tool implementat cu widget. Următor: paritate formular comandă (P0) + calculatoare + OG images cluster cadastru.*
+## 6. BATCH 4 — Migrare articole WP → Next.js (2026-06-16)
+
+Toate articolele cu trafic din exportul GSC (Pagini.csv, 2026-06-13) au fost migrate ca pagini Next.js hand-tuned, la **paritate de URL cu WP** (root path, fără prefix `/articole/`). Acoperă integral lista `HARDCODED_ARTICLE_SLUGS` (15 articole — erau deja în sitemap, acum au pagini reale).
+
+**Infrastructură nouă:**
+- `src/components/articole/article-layout.tsx` — `ArticleLayout` partajat: hero (breadcrumb + badge categorie + H1 + dată publicare/actualizare) + corp `prose` (`@tailwindcss/typography`, adăugat ca `@plugin` în `globals.css`) + grilă „servicii legate" (CTA via `serviceUrl()` sau `href` explicit pentru tools/articole) + FAQ (`ServiceFAQ`) + CTA + Footer.
+- Schema: `buildArticlePageGraph` (Organization + WebSite + BreadcrumbList + Article) — exista deja în `lib/seo/schema.ts`.
+- Fiecare articol = folder root `src/app/<slug>/page.tsx`, static prerender, `revalidate=86400` (1 zi). `trailingSlash:true` deja activ.
+
+| Articol | Clicks GSC | Note |
+|---|--:|---|
+| tabel-varsta-pensionare-anticipata-femei | 80.233 | tabel Anexa 5 (Legea 360/2023) reprodus integral — ⚠️ verificare umană recomandată pe valorile tabelului |
+| cum-aflam-numarul-carte-functionara-si-nr-cadastral | 33.450 | flagship cluster cadastru; link UP la identificare-imobil + plan-cadastral |
+| anii-lucrati-in-strainatate-se-pun-la-pensie-in-romania | 21.342 | pensii |
+| ghid-complet-certificat-de-integritate-comportamentala | 15.617 | → certificat-integritate |
+| informatii-cazier-auto-online | 12.000 | → cazier-auto |
+| amenda-rovinieta-2025-tarife-plata-online-ghid-complet | 11.382 | tabele tarife/amenzi; → tool rovinietă |
+| cum-vor-arata-documentele-de-stare-civila-2025 | 6.892 | → certificate naștere/căsătorie |
+| taxa-cazier-judiciar | 5.188 | → cazier-judiciar |
+| eliberare-certificat-constatator-onrc-ghid | 4.556 | → certificat-constatator |
+| valabilitate-extras-de-carte-funciara | 2.704 | → extras CF + identificare |
+| cele-4-tipuri-de-certificat-constatator-online | 1.833 | ⚠️ conținut parafrazat (WebFetch a rezumat) — de cross-check manual cu WP |
+| totul-despre-cartea-funciara-colectiva | 1.339 | CF colectivă |
+| cazier-judiciar-vs-certificat-integritate-comportamentala | 418 | tabel comparativ |
+| importanta-extras-de-carte-funciara-colectiva | 357 | CF colectivă |
+| extras-de-carte-funciara-pentru-casa-verde | 161 | Casa Verde |
+
+**Internal linking:** fiecare articol trimite către serviciile/clusterul relevant prin `serviceUrl()`; articolele-pereche (CF colectivă, certificat constatator, pensii) se inter-leagă. Pagina CF a primit specimen `extras-cf-specimen.webp` + bloc „cum afli nr cadastral după adresă".
+
+**De rafinat (minor):**
+- ⚠️ **Verificare umană** pe articolul pensii 80k (290 rânduri tabel; un rând corupt de la WebFetch a fost corectat logic) și pe `cele-4-tipuri` (parafrazat) — cross-check cu sursa WP.
+- OG images per articol (none generate încă; gap general la nivel de site).
+- `rolul-si-atributiile-onrc-romania` (96 clicks) — NU e în `HARDCODED_ARTICLE_SLUGS`; de adăugat dacă vrei coverage complet.
+
+---
+
+*Toate cele 11 servicii active au pagini SEO hardcodate + cele 15 articole cu trafic migrate (root-path parity). Rovinietă-tool cu widget. Următor: paritate formular comandă (P0) + calculatoare + OG images.*
