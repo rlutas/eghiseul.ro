@@ -1,7 +1,6 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { createPublicClient } from '@/lib/supabase/public';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import {
@@ -14,7 +13,6 @@ import {
   Car,
   Search,
   Mail,
-  Phone,
   Gauge,
   Users,
   AlertTriangle,
@@ -26,6 +24,8 @@ import {
 import { Service, ServiceOption, formatEstimatedDays } from '@/types/services';
 import { Footer } from '@/components/home/footer';
 import { MobileStickyCTA } from '@/components/services/mobile-sticky-cta';
+import { WhatsAppButton } from '@/components/services/whatsapp-button';
+import { GoogleReviewsBadge } from '@/components/services/google-reviews-badge';
 import { OrderButton } from '@/components/services/order-button';
 import { ServiceFAQ } from '@/components/services/service-faq';
 import { buildPageMetadata, buildServicePageGraph, BASE_URL } from '@/lib/seo';
@@ -271,6 +271,8 @@ export default async function CazierAutoOnlinePage() {
                         <span className="text-xs">Raport detaliat</span>
                       </div>
                     </div>
+
+                    <GoogleReviewsBadge variant="bar" className="mt-3" />
                   </div>
                 </div>
               </div>
@@ -529,16 +531,7 @@ export default async function CazierAutoOnlinePage() {
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
                 <OrderButton href={`/comanda/${SERVICE_SLUG}`}>Comandă Acum</OrderButton>
-                <Button
-                  asChild
-                  variant="outline"
-                  className="border-2 border-primary-500 text-primary-500 hover:bg-primary-500 hover:text-secondary-900 font-bold px-8 py-6 text-lg rounded-xl transition-all duration-200"
-                >
-                  <a href="tel:+40312299399">
-                    <Phone className="mr-2 w-5 h-5" aria-hidden="true" />
-                    Sună-ne
-                  </a>
-                </Button>
+                <WhatsAppButton />
               </div>
             </div>
           </div>

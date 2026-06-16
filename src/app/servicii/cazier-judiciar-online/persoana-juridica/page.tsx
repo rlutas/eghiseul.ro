@@ -26,6 +26,8 @@ import {
 import { Service, ServiceOption, formatEstimatedDays } from '@/types/services';
 import { Footer } from '@/components/home/footer';
 import { MobileStickyCTA } from '@/components/services/mobile-sticky-cta';
+import { WhatsAppButton } from '@/components/services/whatsapp-button';
+import { GoogleReviewsBadge } from '@/components/services/google-reviews-badge';
 import { ServiceFAQ } from '@/components/services/service-faq';
 
 // Database slug for this service (order pipeline identifier)
@@ -390,6 +392,8 @@ export default async function CazierJudiciarPJPage() {
                         <span className="text-xs">Garanție</span>
                       </div>
                     </div>
+
+                    <GoogleReviewsBadge variant="bar" className="mt-3" />
                   </div>
                 </div>
               </div>
@@ -727,16 +731,7 @@ export default async function CazierJudiciarPJPage() {
                     <ArrowRight className="w-5 h-5 max-w-0 -translate-x-1 opacity-0 transition-all duration-200 motion-reduce:transition-none group-hover:ml-2 group-hover:max-w-[1.5rem] group-hover:translate-x-0 group-hover:opacity-100" />
                   </Link>
                 </Button>
-                <Button
-                  asChild
-                  variant="outline"
-                  className="border-2 border-blue-400 text-blue-400 hover:bg-blue-500 hover:text-white font-bold px-8 py-6 text-lg rounded-xl transition-all duration-200"
-                >
-                  <a href="tel:+40312299399">
-                    <Phone className="mr-2 w-5 h-5" />
-                    Sună-ne
-                  </a>
-                </Button>
+                <WhatsAppButton />
               </div>
 
               {/* Contact Info */}
