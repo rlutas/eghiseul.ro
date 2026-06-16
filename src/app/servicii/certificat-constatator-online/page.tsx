@@ -2,7 +2,6 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { createPublicClient } from '@/lib/supabase/public';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent } from '@/components/ui/card';
 import {
   ArrowRight,
   Clock,
@@ -29,19 +28,21 @@ import { GoogleReviewsBadge } from '@/components/services/google-reviews-badge';
 import { OrderButton } from '@/components/services/order-button';
 import { ServiceFAQ } from '@/components/services/service-faq';
 import { SystemStatus } from '@/components/services/system-status';
+import { ReviewsSection } from '@/components/services/reviews-section';
 import { buildPageMetadata, buildServicePageGraph, BASE_URL } from '@/lib/seo';
 import { ServicePrice } from '@/components/services/service-price';
+import { GOOGLE_RATING, GOOGLE_REVIEW_COUNT_LABEL } from '@/config/contact';
 
 // Database slug (order pipeline identifier). URL path uses the WP slug
 // (certificat-constatator-ONLINE) to preserve the indexed URL + backlinks.
 const SERVICE_SLUG = 'certificat-constatator';
 const PAGE_PATH = '/servicii/certificat-constatator-online/';
 const SCHEMA_SLUG = 'certificat-constatator-online';
-const TITLE = 'Certificat Constatator ONRC Online — 119.99 RON';
+const TITLE = 'Certificat Constatator ONRC Online — de la 79 RON';
 const DESCRIPTION =
   'Obține Certificat Constatator online de la ONRC, cu datele actuale ale firmei: ' +
   'sediu, asociați, administratori, capital social și obiect de activitate. ' +
-  '119.99 RON, necesar la licitații și due diligence, 100% online, livrare pe email.';
+  'De la 79 RON, pe firmă, persoană fizică sau cu istoric. 100% online, livrare pe email.';
 const DATE_PUBLISHED = '2026-06-14';
 const DATE_MODIFIED = '2026-06-14';
 
@@ -97,7 +98,9 @@ const jsonLdGraph = buildServicePageGraph({
     { name: 'Certificat Constatator', url: `${BASE_URL}${PAGE_PATH}` },
   ],
   offers: [
-    { name: 'Certificat Constatator (Standard)', price: 119.99, url: `${BASE_URL}${PAGE_PATH}` },
+    { name: 'Certificat Constatator pe Firmă', price: 79, url: `${BASE_URL}${PAGE_PATH}` },
+    { name: 'Certificat Constatator Persoană Fizică', price: 79, url: `${BASE_URL}${PAGE_PATH}` },
+    { name: 'Certificat Constatator cu Istoric', price: 487, url: `${BASE_URL}${PAGE_PATH}` },
   ],
   aggregateRating: { ratingValue: 4.9, reviewCount: 450 },
 });
@@ -106,7 +109,35 @@ export default async function CertificatConstatatorPage() {
   const data = await getService();
   if (!data) notFound();
 
-  const { service, options } = data;
+  const { service } = data;
+
+  const fmt = (v: number) => (Number.isInteger(v) ? String(v) : v.toFixed(2).replace('.', ','));
+  const exVat = (v: number) => Math.round((v / 1.21) * 100) / 100;
+
+  // The 3 real document types issued via ONRC (prices = VAT-inclusive total).
+  const docTypes = [
+    {
+      icon: Building2,
+      title: 'Certificat Constatator pe Firmă',
+      desc: 'Situația la zi a unei societăți: date de identificare, sediu social, coduri CAEN, administratori și asociați. Cel mai cerut (bănci, ANAF, licitații).',
+      price: 79,
+      featured: true,
+    },
+    {
+      icon: Users,
+      title: 'Certificat Constatator Persoană Fizică',
+      desc: 'Verifică dacă o persoană fizică deține calitatea de asociat sau administrator în firme înregistrate la Registrul Comerțului.',
+      price: 79,
+      featured: false,
+    },
+    {
+      icon: Clock,
+      title: 'Certificat Constatator cu Istoric',
+      desc: 'Evoluția completă a firmei — toate modificările de la înființare până în prezent. Util în litigii, due diligence și verificări amănunțite.',
+      price: 487,
+      featured: false,
+    },
+  ];
 
   // What the certificate contains — targets "ce contine certificatul constatator"
   const contents = [
@@ -188,7 +219,7 @@ export default async function CertificatConstatatorPage() {
                   <ul className="mt-3 space-y-1.5 text-white/85 text-sm">
                     {[
                       'Introduci CUI-ul firmei (preluăm automat datele ONRC)',
-                      'Confirmi tipul certificatului (simplu, extins sau istoric)',
+                      'Alegi tipul: pe firmă, persoană fizică sau cu istoric',
                       'Plătești securizat (taxe ONRC incluse)',
                       'Primești certificatul pe email, de obicei în câteva minute (24/7)',
                     ].map((step) => (
@@ -276,18 +307,18 @@ export default async function CertificatConstatatorPage() {
               <p>
                 Prin eGhișeul obții <strong>certificatul constatator online</strong>, fără drum la ghișeul ONRC.
                 Ai nevoie doar de CUI-ul firmei. Noi depunem cererea, plătim taxele ONRC și îți trimitem
-                <strong> certificatul constatator</strong> pe email, semnat electronic și verificabil la ONRC. Poți
-                solicita varianta simplă, <strong>certificat constatator extins</strong> sau cu istoric.
+                <strong> certificatul constatator</strong> pe email, semnat electronic și verificabil la ONRC. Îl poți
+                solicita <strong>pe firmă</strong>, <strong>pe persoană fizică</strong> sau <strong>cu istoric</strong>.
               </p>
               <div className="rounded-2xl border border-neutral-200 bg-white p-5">
                 <h3 className="font-bold text-secondary-900 mb-2">
-                  Certificat constatator de pe portalul ONRC vs. online prin eGhișeul
+                  Cât costă și de unde obții certificatul constatator
                 </h3>
                 <p className="text-sm text-neutral-700">
-                  Certificatul constatator <strong>nu este gratuit</strong> — ONRC percepe o taxă oficială pentru
-                  fiecare document. Îl poți obține personal la ghișeul ONRC sau prin portalul RECOM online (dacă ai
-                  cont și semnătură electronică). Prin noi plătești <strong>{service.base_price} RON cu taxele ONRC
-                  incluse</strong>, 100% online, fără cont RECOM și fără deplasare — primești documentul pe email.
+                  Pentru fiecare certificat constatator, ONRC percepe o <strong>taxă oficială</strong>. Îl poți obține
+                  personal la ghișeul ONRC sau prin portalul RECOM online (dacă ai cont și semnătură electronică). Prin
+                  eGhișeul plătești <strong>de la {service.base_price} RON cu taxele ONRC incluse</strong>, 100% online,
+                  fără cont RECOM și fără deplasare — primești documentul pe email.
                 </p>
               </div>
             </div>
@@ -331,40 +362,51 @@ export default async function CertificatConstatatorPage() {
           </div>
         </section>
 
-        {/* Service options (dynamic) */}
-        {options.length > 0 && (
-          <section className="py-12 lg:py-20 bg-neutral-50">
-            <div className="container mx-auto px-4 max-w-[1400px]">
-              <div className="text-center mb-10">
-                <span className="inline-block px-4 py-1.5 bg-primary-100 text-primary-700 text-sm font-semibold rounded-full mb-4">
-                  Personalizare
-                </span>
-                <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-3">Opțiuni Disponibile</h2>
-                <p className="text-neutral-600 max-w-xl mx-auto">Adaugă servicii extra pentru comanda ta</p>
-              </div>
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 max-w-3xl mx-auto">
-                {options.map((option) => (
-                  <Card key={option.id} className="border-2 border-neutral-200 hover:border-primary-400 transition-all hover:shadow-md">
-                    <CardContent className="p-4 lg:p-5">
-                      <div className="flex flex-col h-full">
-                        <div className="flex items-start justify-between gap-2 mb-2">
-                          <h3 className="font-semibold text-secondary-900 text-sm lg:text-base">{option.name}</h3>
-                          {option.is_required && (
-                            <Badge className="bg-secondary-900 text-white text-[10px] flex-shrink-0">Obligatoriu</Badge>
-                          )}
-                        </div>
-                        {option.description && (
-                          <p className="text-xs lg:text-sm text-neutral-600 mb-3 flex-1">{option.description}</p>
-                        )}
-                        <span className="font-bold text-primary-600 text-base lg:text-lg mt-auto">+{option.price} RON</span>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
+        {/* The 3 document types — highlighted */}
+        <section className="py-12 lg:py-20 bg-neutral-50">
+          <div className="container mx-auto px-4 max-w-[1100px]">
+            <div className="text-center mb-10">
+              <span className="inline-block px-4 py-1.5 bg-primary-100 text-primary-700 text-sm font-semibold rounded-full mb-4">
+                Tipuri disponibile
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-3">3 tipuri de certificat constatator</h2>
+              <p className="text-neutral-600 max-w-xl mx-auto">Alegi tipul de care ai nevoie direct în formularul de comandă.</p>
             </div>
-          </section>
-        )}
+
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6">
+              {docTypes.map((t) => (
+                <div
+                  key={t.title}
+                  className={`relative rounded-3xl border-2 bg-white p-6 lg:p-7 flex flex-col ${t.featured ? 'border-primary-500 shadow-[0_8px_28px_rgba(236,185,95,0.18)]' : 'border-neutral-200'}`}
+                >
+                  {t.featured && (
+                    <span className="absolute -top-3 left-6 inline-block rounded-full bg-primary-500 px-3 py-1 text-xs font-bold text-secondary-900">
+                      Cel mai cerut
+                    </span>
+                  )}
+                  <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-100 to-primary-200">
+                    <t.icon className="h-6 w-6 text-primary-700" aria-hidden="true" />
+                  </div>
+                  <h3 className="text-lg font-bold text-secondary-900 mb-1.5">{t.title}</h3>
+                  <p className="text-sm text-neutral-600 leading-relaxed mb-5 flex-1">{t.desc}</p>
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-3xl font-black text-secondary-900">{fmt(exVat(t.price))}</span>
+                    <span className="text-sm font-bold text-neutral-400">RON</span>
+                  </div>
+                  <p className="text-xs text-neutral-500">+ TVA 21% · {fmt(t.price)} RON cu TVA · taxe ONRC incluse</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-8 max-w-3xl mx-auto rounded-2xl border border-neutral-200 bg-white p-5 text-center">
+              <p className="text-sm text-neutral-700">
+                <strong>Cât este valabil:</strong> certificatul reflectă situația din ziua eliberării. În practică,
+                autoritățile și partenerii cer un certificat emis în <strong>ultimele 30 de zile</strong>; la licitațiile
+                publice (SEAP/SICAP) se acceptă de regulă unul nu mai vechi de 30 de zile.
+              </p>
+            </div>
+          </div>
+        </section>
 
         {/* Use cases */}
         <section className="py-12 lg:py-20 bg-white">
@@ -411,7 +453,7 @@ export default async function CertificatConstatatorPage() {
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
               {[
                 { step: 1, title: 'Introduci CUI-ul', desc: 'Completezi codul unic de înregistrare al firmei. Preluăm automat datele din ONRC.', icon: Building2 },
-                { step: 2, title: 'Confirmi Tipul', desc: 'Alegi tipul certificatului: simplu, extins sau cu istoric, în funcție de nevoie.', icon: FileText },
+                { step: 2, title: 'Alegi Tipul', desc: 'Pe firmă, pe persoană fizică sau cu istoric, în funcție de nevoie.', icon: FileText },
                 { step: 3, title: 'Plătești Securizat', desc: 'Card, Apple Pay, Google Pay — taxele ONRC sunt incluse în preț.', icon: Shield },
                 { step: 4, title: 'Primești Documentul', desc: 'În câteva minute primești certificatul constatator pe email (automat, 24/7).', icon: CheckCircle },
               ].map((item, index) => (
@@ -437,45 +479,14 @@ export default async function CertificatConstatatorPage() {
           </div>
         </section>
 
-        {/* Types + validity — targets "certificat constatator extins / la zi / valabilitate" */}
-        <section className="py-12 lg:py-20 bg-white">
-          <div className="container mx-auto px-4 max-w-[900px]">
-            <div className="grid md:grid-cols-2 gap-6">
-              <div className="rounded-2xl border border-neutral-200 p-6">
-                <h2 className="text-xl font-bold text-secondary-900 mb-4">Tipuri de certificat constatator</h2>
-                <ul className="space-y-2.5 text-sm text-neutral-700">
-                  {[
-                    'Simplu — datele actuale ale firmei la zi (denumire, sediu, administratori)',
-                    'Extins — date complete: capital, obiect de activitate, mențiuni, puncte de lucru',
-                    'Cu istoric — evoluția datelor firmei de la înființare până în prezent',
-                  ].map((row) => (
-                    <li key={row} className="flex items-start gap-2">
-                      <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" aria-hidden="true" />
-                      {row}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div className="rounded-2xl border border-neutral-200 p-6 bg-primary-50/40">
-                <h2 className="text-xl font-bold text-secondary-900 mb-4">Cât este valabil</h2>
-                <p className="text-sm text-neutral-700 leading-relaxed">
-                  <strong>Certificatul constatator</strong> reflectă situația firmei din ziua eliberării și este
-                  considerat „la zi”. În practică, autoritățile și partenerii cer un certificat emis în
-                  <strong> ultimele 30 de zile</strong>. Pentru <strong>licitații publice</strong> (SEAP/SICAP) se
-                  acceptă de regulă un certificat <strong>nu mai vechi de 30 de zile</strong> la data deschiderii
-                  ofertelor.
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
+        <ReviewsSection />
 
         {/* FAQ */}
         <ServiceFAQ
           title="Întrebări Frecvente — Certificat Constatator ONRC"
           faqs={[
             { q: 'Ce este certificatul constatator?', a: 'Este documentul oficial ONRC care atestă datele actuale ale unei firme: denumire, sediu, CUI, asociați, administratori, capital social și obiect de activitate. Este „cartea de identitate” a firmei la Registrul Comerțului.' },
-            { q: 'Care e diferența dintre certificat simplu, extins și cu istoric?', a: 'Cel simplu conține datele de bază la zi (denumire, sediu, administratori). Cel extins include date complete: capital, obiect de activitate, mențiuni și puncte de lucru. Cel cu istoric arată evoluția datelor firmei de la înființare până în prezent.' },
+            { q: 'Ce tipuri de certificat constatator pot comanda?', a: 'Trei: pe firmă (situația la zi a societății), pe persoană fizică (dacă o persoană deține calitatea de asociat/administrator în firme) și cu istoric (toate modificările firmei de la înființare până în prezent).' },
             { q: 'Certificatul constatator este la zi?', a: 'Da. Certificatul reflectă situația firmei din ziua eliberării, cu toate mențiunile actualizate înscrise la ONRC până la acel moment.' },
             { q: 'Cât durează eliberarea?', a: 'De obicei câteva minute — sistemul emite automat, 24/7. În cazuri rare (procesare ONRC mai lentă) poate dura mai mult.' },
             { q: 'Pot obține certificat pentru orice firmă?', a: 'Da, pentru orice persoană juridică sau entitate înregistrată la Registrul Comerțului: SRL, SA, PFA, II sau IF. Ai nevoie doar de CUI-ul firmei.' },
@@ -496,19 +507,23 @@ export default async function CertificatConstatatorPage() {
               }}
             />
           </div>
-          <div className="relative container mx-auto px-4 max-w-[900px]">
-            <div className="text-center">
-              <h2 className="text-2xl lg:text-4xl font-extrabold text-white mb-4">
-                Gata să obții Certificatul Constatator?
-              </h2>
-              <p className="text-lg text-white/80 mb-8 max-w-xl mx-auto">
-                Ai nevoie doar de CUI-ul firmei. Primești documentul în câteva minute (automat, 24/7).
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-                <OrderButton href={`/comanda/${SERVICE_SLUG}`}>Comandă Acum</OrderButton>
-                <WhatsAppButton />
-              </div>
+          <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-[360px] w-[760px] max-w-[90%] rounded-full bg-primary-500/10 blur-[120px]" aria-hidden="true" />
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary-500/40 to-transparent" aria-hidden="true" />
+          <div className="relative container mx-auto px-4 max-w-[760px] text-center">
+            <h2 className="text-2xl lg:text-4xl font-extrabold text-white mb-4">
+              Gata să obții Certificatul Constatator?
+            </h2>
+            <p className="text-lg text-white/75 mb-8 max-w-xl mx-auto">
+              Ai nevoie doar de CUI-ul firmei. Primești documentul în câteva minute (automat, 24/7).
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <OrderButton href={`/comanda/${SERVICE_SLUG}`}>Comandă Acum</OrderButton>
+              <WhatsAppButton message="Bună ziua! Am o întrebare despre Certificatul Constatator." />
             </div>
+            <p className="mt-6 inline-flex items-center gap-1.5 text-sm text-white/60">
+              <svg className="w-4 h-4 text-[#FBBC04] fill-[#FBBC04]" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" /></svg>
+              <strong className="text-white/90">{GOOGLE_RATING.toString().replace('.', ',')}</strong> din {GOOGLE_REVIEW_COUNT_LABEL} de recenzii Google
+            </p>
           </div>
         </section>
       </main>
