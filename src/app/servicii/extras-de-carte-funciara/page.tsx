@@ -22,6 +22,7 @@ import {
   Banknote,
   ScrollText,
   KeyRound,
+  X,
 } from 'lucide-react';
 import { Service, ServiceOption, formatEstimatedDays } from '@/types/services';
 import { Footer } from '@/components/home/footer';
@@ -337,13 +338,13 @@ export default async function ExtrasCarteFunciaraPage() {
               </p>
               <div className="rounded-2xl border border-neutral-200 bg-white p-5">
                 <h3 className="font-bold text-secondary-900 mb-2">
-                  Extras CF gratuit / oficial vs. online prin eGhișeul
+                  Cât costă și de unde obții extrasul de carte funciară
                 </h3>
                 <p className="text-sm text-neutral-700">
-                  Extrasul CF <strong>nu este gratuit</strong> — OCPI percepe o taxă oficială pentru fiecare extras,
-                  indiferent de unde îl ceri. Îl poți obține personal la ghișeul OCPI sau prin portalul ANCPI (dacă ai
-                  cont și semnătură). Prin noi plătești <strong>{service.base_price} RON cu taxele ANCPI incluse</strong>,
-                  100% online, fără cont ANCPI și fără deplasare — primești documentul pe email.
+                  Pentru fiecare extras de carte funciară, OCPI percepe o <strong>taxă oficială</strong>, indiferent
+                  de unde îl ceri. Îl poți obține personal la ghișeul OCPI sau prin portalul ANCPI (dacă ai cont și
+                  semnătură electronică). Prin eGhișeul plătești <strong>{service.base_price} RON cu taxele ANCPI
+                  incluse</strong>, 100% online, fără cont ANCPI și fără deplasare — primești documentul pe email.
                 </p>
               </div>
             </div>
@@ -367,8 +368,8 @@ export default async function ExtrasCarteFunciaraPage() {
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
               {identifiers.map((it) => (
-                <div key={it.title} className="bg-neutral-50 rounded-2xl p-5 border border-neutral-200">
-                  <div className="w-12 h-12 bg-primary-100 rounded-xl flex items-center justify-center mb-4">
+                <div key={it.title} className="bg-white rounded-2xl p-5 border border-neutral-200 hover:border-primary-300 hover:shadow-lg hover:-translate-y-1 transition-all duration-200">
+                  <div className="w-12 h-12 bg-gradient-to-br from-primary-100 to-primary-200 rounded-xl flex items-center justify-center mb-4">
                     <it.icon className="w-6 h-6 text-primary-600" />
                   </div>
                   <h3 className="text-base font-bold text-secondary-900 mb-2">{it.title}</h3>
@@ -442,8 +443,8 @@ export default async function ExtrasCarteFunciaraPage() {
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
               {useCases.map((uc) => (
-                <div key={uc.title} className="bg-neutral-50 rounded-2xl p-5 border border-neutral-200 hover:border-primary-300 hover:shadow-md transition-all">
-                  <div className="w-12 h-12 bg-primary-100 rounded-xl flex items-center justify-center mb-4">
+                <div key={uc.title} className="bg-neutral-50 rounded-2xl p-5 border border-neutral-200 hover:border-primary-300 hover:shadow-lg hover:-translate-y-1 transition-all duration-200">
+                  <div className="w-12 h-12 bg-gradient-to-br from-primary-100 to-primary-200 rounded-xl flex items-center justify-center mb-4">
                     <uc.icon className="w-6 h-6 text-primary-600" />
                   </div>
                   <h3 className="text-lg font-bold text-secondary-900 mb-3">{uc.title}</h3>
@@ -461,41 +462,85 @@ export default async function ExtrasCarteFunciaraPage() {
           </div>
         </section>
 
-        {/* How it works */}
-        <section className="py-12 lg:py-20 bg-neutral-50">
-          <div className="container mx-auto px-4 max-w-[1400px]">
-            <div className="text-center mb-12">
-              <span className="inline-block px-4 py-1.5 bg-primary-100 text-primary-700 text-sm font-semibold rounded-full mb-4">
+        {/* How it works — dark connected timeline */}
+        <section className="relative overflow-hidden bg-gradient-to-b from-secondary-900 to-[#0C1A2F] py-14 lg:py-24">
+          <div className="absolute inset-0 opacity-5">
+            <div
+              className="absolute inset-0"
+              style={{
+                backgroundImage: 'radial-gradient(circle at 1px 1px, #ECB95F 1px, transparent 0)',
+                backgroundSize: '40px 40px',
+              }}
+            />
+          </div>
+          <div className="relative container mx-auto px-4 max-w-[1100px]">
+            <div className="text-center mb-14">
+              <span className="inline-block px-4 py-1.5 bg-primary-500/15 text-primary-400 text-sm font-semibold rounded-full mb-4 border border-primary-500/30">
                 Proces simplu
               </span>
-              <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-3">Cum Funcționează?</h2>
-              <p className="text-neutral-600 max-w-2xl mx-auto">Obții extrasul de carte funciară în 4 pași, 100% online</p>
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white mb-3">Cum Funcționează?</h2>
+              <p className="text-white/70 max-w-2xl mx-auto">Obții extrasul de carte funciară în 4 pași, 100% online — fără drum la ghișeu.</p>
             </div>
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
+            <div className="relative grid sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-6">
+              {/* connecting line (desktop) */}
+              <div className="hidden lg:block absolute top-8 left-[12.5%] right-[12.5%] h-0.5 bg-gradient-to-r from-primary-500/0 via-primary-500/50 to-primary-500/0" aria-hidden="true" />
               {[
                 { step: 1, title: 'Identifici Imobilul', desc: 'Introduci numărul cadastral, numărul CF sau adresa imobilului.', icon: KeyRound },
                 { step: 2, title: 'Completezi Cererea', desc: 'Confirmi județul și localitatea. Verificăm datele înainte de depunere.', icon: FileText },
                 { step: 3, title: 'Plătești Securizat', desc: 'Card, Apple Pay, Google Pay — taxele OCPI sunt incluse în preț.', icon: Shield },
                 { step: 4, title: 'Primești Extrasul', desc: `În ${formatEstimatedDays(service)} primești extrasul CF pe email.`, icon: CheckCircle },
-              ].map((item, index) => (
-                <div key={item.step} className="relative">
-                  <div className="bg-white rounded-2xl p-6 h-full border border-neutral-200 hover:border-primary-300 hover:shadow-lg transition-all group">
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="w-12 h-12 bg-primary-500 rounded-xl flex items-center justify-center text-secondary-900 font-bold text-lg group-hover:scale-110 transition-transform">
-                        {item.step}
-                      </div>
-                      <item.icon className="w-5 h-5 text-primary-600" />
-                    </div>
-                    <h3 className="text-lg font-bold text-secondary-900 mb-2">{item.title}</h3>
-                    <p className="text-sm text-neutral-600 leading-relaxed">{item.desc}</p>
+              ].map((item) => (
+                <div key={item.step} className="relative text-center">
+                  <div className="relative z-10 mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-400 to-primary-600 text-secondary-900 shadow-[0_8px_24px_rgba(236,185,95,0.35)]">
+                    <item.icon className="h-7 w-7" aria-hidden="true" />
+                    <span className="absolute -top-2 -right-2 flex h-7 w-7 items-center justify-center rounded-full bg-white text-sm font-extrabold text-secondary-900 shadow-md">
+                      {item.step}
+                    </span>
                   </div>
-                  {index < 3 && (
-                    <div className="hidden lg:block absolute top-1/2 -right-4 transform -translate-y-1/2 z-10">
-                      <ArrowRight className="h-5 w-5 text-primary-400" />
-                    </div>
-                  )}
+                  <h3 className="text-lg font-bold text-white mb-2">{item.title}</h3>
+                  <p className="text-sm text-white/65 leading-relaxed max-w-[240px] mx-auto">{item.desc}</p>
                 </div>
               ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Good to know — no urgency fee + verification edge case */}
+        <section className="py-12 lg:py-16 bg-neutral-50">
+          <div className="container mx-auto px-4 max-w-[1000px]">
+            <div className="text-center mb-8">
+              <span className="inline-block px-4 py-1.5 bg-primary-100 text-primary-700 text-sm font-semibold rounded-full mb-4">
+                Bun de știut
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900">Transparent, fără surprize</h2>
+            </div>
+            <div className="grid md:grid-cols-2 gap-5">
+              <div className="rounded-2xl border border-green-200 bg-green-50/60 p-6 flex items-start gap-4">
+                <div className="w-12 h-12 flex-shrink-0 bg-green-100 rounded-xl flex items-center justify-center">
+                  <Zap className="w-6 h-6 text-green-600" aria-hidden="true" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-secondary-900 mb-1.5">Fără taxă de urgență</h3>
+                  <p className="text-sm text-neutral-700 leading-relaxed">
+                    Am <strong>eliminat taxa de urgență</strong> — nu o mai percepem. Sistemul nostru depune și
+                    emite cererile <strong>automat, 24/7</strong>, deci primești extrasul cât mai repede posibil,
+                    fără costuri suplimentare.
+                  </p>
+                </div>
+              </div>
+              <div className="rounded-2xl border border-amber-200 bg-amber-50/60 p-6 flex items-start gap-4">
+                <div className="w-12 h-12 flex-shrink-0 bg-amber-100 rounded-xl flex items-center justify-center">
+                  <Clock className="w-6 h-6 text-amber-600" aria-hidden="true" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-secondary-900 mb-1.5">Dacă numărul nu poate fi procesat automat</h3>
+                  <p className="text-sm text-neutral-700 leading-relaxed">
+                    Dacă numărul de carte funciară introdus este <strong>greșit</strong> sau imobilul
+                    <strong> nu este digitalizat</strong>, extrasul se eliberează în <strong>timpul programului de
+                    lucru</strong> și e posibil să te contactăm pentru verificare, ca să primești documentul corect.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </section>
@@ -547,6 +592,82 @@ export default async function ExtrasCarteFunciaraPage() {
                   ))}
                 </ul>
               </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Comparison — eGhișeul vs ghișeu vs portal */}
+        <section className="py-12 lg:py-20 bg-neutral-50">
+          <div className="container mx-auto px-4 max-w-[1000px]">
+            <div className="text-center mb-10">
+              <span className="inline-block px-4 py-1.5 bg-primary-100 text-primary-700 text-sm font-semibold rounded-full mb-4">
+                De ce eGhișeul
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-3">
+                eGhișeul vs ghișeul OCPI vs portalul ANCPI
+              </h2>
+              <p className="text-neutral-600 max-w-2xl mx-auto">
+                Aceeași carte funciară oficială — diferă doar timpul, efortul și comoditatea.
+              </p>
+            </div>
+
+            <div className="overflow-hidden rounded-3xl border border-neutral-200 bg-white shadow-sm">
+              <div className="grid grid-cols-[1.3fr_1fr_1fr_1fr] min-w-[640px] sm:min-w-0 text-sm">
+                {/* Header row */}
+                <div className="bg-neutral-50 p-4 font-semibold text-secondary-900" />
+                <div className="bg-primary-500 p-4 text-center font-extrabold text-secondary-900">
+                  eGhișeul
+                </div>
+                <div className="bg-neutral-50 p-4 text-center font-semibold text-neutral-600">Ghișeu OCPI</div>
+                <div className="bg-neutral-50 p-4 text-center font-semibold text-neutral-600">Portal ANCPI</div>
+
+                {[
+                  ['Timp de obținere', 'Câteva minute', 'Drum + așteptare', 'Cont + semnătură'],
+                  ['Cont ANCPI necesar', false, '—', true],
+                  ['Deplasare la ghișeu', false, true, false],
+                  ['Taxe ANCPI incluse', true, 'Separat', 'Separat'],
+                  ['Disponibil 24/7', true, false, true],
+                  ['Livrare pe email', 'Automat', 'Ridici fizic', 'Manual'],
+                ].map((row, i) => (
+                  <div key={row[0] as string} className="contents">
+                    <div className={`p-4 font-medium text-secondary-800 border-t border-neutral-100 ${i % 2 ? 'bg-neutral-50/50' : ''}`}>
+                      {row[0]}
+                    </div>
+                    {[1, 2, 3].map((col) => {
+                      const v = row[col];
+                      const highlight = col === 1;
+                      return (
+                        <div
+                          key={col}
+                          className={`flex items-center justify-center p-4 border-t border-neutral-100 text-center ${
+                            highlight ? 'bg-primary-50' : i % 2 ? 'bg-neutral-50/50' : ''
+                          }`}
+                        >
+                          {v === true ? (
+                            <CheckCircle className={`h-5 w-5 ${highlight ? 'text-green-600' : 'text-green-500'}`} aria-label="Da" />
+                          ) : v === false ? (
+                            <X className="h-5 w-5 text-neutral-300" aria-label="Nu" />
+                          ) : (
+                            <span className={`text-xs sm:text-sm ${highlight ? 'font-bold text-secondary-900' : 'text-neutral-600'}`}>{v}</span>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="mt-8 text-center">
+              <Button
+                asChild
+                className="bg-primary-500 hover:bg-primary-600 text-secondary-900 font-bold px-8 py-6 text-lg rounded-xl shadow-[0_6px_14px_rgba(236,185,95,0.35)] hover:shadow-[0_10px_20px_rgba(236,185,95,0.45)] hover:-translate-y-0.5 transition-all duration-200"
+              >
+                <Link href={`/comanda/${SERVICE_SLUG}`}>
+                  Comandă extrasul acum
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Link>
+              </Button>
             </div>
           </div>
         </section>
@@ -634,7 +755,7 @@ export default async function ExtrasCarteFunciaraPage() {
           faqs={[
             { q: 'Ce este Extrasul de Carte Funciară?', a: 'Este documentul oficial OCPI care arată situația juridică a unui imobil: proprietarul actual, suprafața, sarcinile și ipotecile. Cartea funciară este registrul public al proprietăților.' },
             { q: 'De unde se obține extrasul de carte funciară?', a: 'De la Oficiul de Cadastru și Publicitate Imobiliară (OCPI), parte din ANCPI. Prin eGhișeul îl obții online, fără să mergi la ghișeu și fără cont ANCPI.' },
-            { q: 'Cât costă un extras de carte funciară?', a: `La noi ${service.base_price} RON, cu taxele ANCPI incluse. Nu există extras CF gratuit — OCPI percepe o taxă oficială pentru fiecare extras.` },
+            { q: 'Cât costă un extras de carte funciară?', a: `La noi ${service.base_price} RON, cu taxele ANCPI incluse. OCPI percepe o taxă oficială pentru fiecare extras de carte funciară, indiferent de unde îl soliciți.` },
             { q: 'Am nevoie de numărul cadastral?', a: 'Ai nevoie de un identificator al imobilului: număr cadastral, număr de carte funciară, număr topografic sau identificator electronic ANCPI. Dacă nu îl știi, îl putem căuta după adresă sau proprietar.' },
             { q: 'Cum aflu numărul cadastral după adresă?', a: 'Numărul cadastral apare în actul de proprietate sau într-un extras CF mai vechi. Dacă ai doar adresa, prin serviciul nostru de Identificare Imobil aflăm noi numărul cadastral și de carte funciară și îți eliberăm extrasul.' },
             { q: 'Cât este valabil extrasul de carte funciară?', a: 'Extrasul de informare reflectă situația din ziua eliberării; notarii și băncile cer de obicei unul din ultimele 30 de zile. Extrasul de autentificare (pentru vânzare) e valabil ~10 zile lucrătoare.' },
