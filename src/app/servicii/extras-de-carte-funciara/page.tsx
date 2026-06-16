@@ -676,10 +676,49 @@ export default async function ExtrasCarteFunciaraPage() {
                     </li>
                   ))}
                 </ul>
-                <div className="mt-6 inline-flex items-center gap-2 rounded-xl bg-green-50 border border-green-200 px-4 py-2.5 text-sm font-semibold text-green-800">
-                  <CheckCircle className="h-4 w-4 text-green-600" aria-hidden="true" />
-                  Acceptat de notari, bănci și instituții
+                <div className="mt-6 flex flex-wrap items-center gap-3">
+                  <span className="inline-flex items-center gap-2 rounded-xl bg-green-50 border border-green-200 px-4 py-2.5 text-sm font-semibold text-green-800">
+                    <CheckCircle className="h-4 w-4 text-green-600" aria-hidden="true" />
+                    Acceptat de notari, bănci și instituții
+                  </span>
+                  <a
+                    href="https://www.ancpi.ro/verificare/dc_index.php"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 rounded-xl border border-neutral-300 px-4 py-2.5 text-sm font-semibold text-secondary-800 hover:border-primary-400 hover:text-primary-700 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
+                  >
+                    <Search className="h-4 w-4" aria-hidden="true" />
+                    Verifică autenticitatea pe ANCPI
+                  </a>
                 </div>
+              </div>
+            </div>
+
+            {/* What it contains + validity — part of the specimen block */}
+            <div className="mt-10 lg:mt-14 grid md:grid-cols-2 gap-6 max-w-[920px] mx-auto">
+              <div className="rounded-2xl border border-neutral-200 p-6">
+                <h3 className="text-xl font-bold text-secondary-900 mb-4">Ce conține extrasul CF</h3>
+                <ul className="space-y-2.5 text-sm text-neutral-700">
+                  {[
+                    'Partea I — descrierea imobilului (suprafață, categorie, vecinătăți)',
+                    'Partea a II-a — proprietarul actual și modul de dobândire',
+                    'Partea a III-a — sarcini: ipoteci, interdicții, litigii',
+                  ].map((row) => (
+                    <li key={row} className="flex items-start gap-2">
+                      <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                      {row}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="rounded-2xl border border-neutral-200 p-6 bg-primary-50/40">
+                <h3 className="text-xl font-bold text-secondary-900 mb-4">Cât este valabil</h3>
+                <p className="text-sm text-neutral-700 leading-relaxed">
+                  <strong>Extrasul de carte funciară pentru informare</strong> nu are un termen legal de expirare, dar
+                  reflectă situația din ziua eliberării. În practică, notarii și băncile cer un extras emis în
+                  <strong> ultimele 30 de zile</strong>. Pentru autentificarea unei vânzări, notarul solicită un
+                  <strong> extras de autentificare</strong>, valabil de regulă 10 zile lucrătoare.
+                </p>
               </div>
             </div>
           </div>
@@ -756,40 +795,8 @@ export default async function ExtrasCarteFunciaraPage() {
           </div>
         </section>
 
-        {/* Content + validity — targets "ce contine" + "valabilitate extras de carte funciara" */}
-        <section className="py-12 lg:py-20 bg-white">
-          <div className="container mx-auto px-4 max-w-[900px]">
-            <div className="grid md:grid-cols-2 gap-6">
-              <div className="rounded-2xl border border-neutral-200 p-6">
-                <h2 className="text-xl font-bold text-secondary-900 mb-4">Ce conține extrasul CF</h2>
-                <ul className="space-y-2.5 text-sm text-neutral-700">
-                  {[
-                    'Partea I — descrierea imobilului (suprafață, categorie, vecinătăți)',
-                    'Partea a II-a — proprietarul actual și modul de dobândire',
-                    'Partea a III-a — sarcini: ipoteci, interdicții, litigii',
-                  ].map((row) => (
-                    <li key={row} className="flex items-start gap-2">
-                      <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
-                      {row}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div className="rounded-2xl border border-neutral-200 p-6 bg-primary-50/40">
-                <h2 className="text-xl font-bold text-secondary-900 mb-4">Cât este valabil</h2>
-                <p className="text-sm text-neutral-700 leading-relaxed">
-                  <strong>Extrasul de carte funciară pentru informare</strong> nu are un termen legal de expirare, dar
-                  reflectă situația din ziua eliberării. În practică, notarii și băncile cer un extras emis în
-                  <strong> ultimele 30 de zile</strong>. Pentru autentificarea unei vânzări, notarul solicită un
-                  <strong> extras de autentificare</strong>, valabil de regulă 10 zile lucrătoare.
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
-
         {/* Cum afli nr cadastral după adresă — targets the cadastre cluster on the high-traffic CF page */}
-        <section className="py-12 lg:py-20 bg-neutral-50">
+        <section className="py-12 lg:py-20 bg-white">
           <div className="container mx-auto px-4 max-w-[820px]">
             <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-5">
               Cum afli numărul cadastral după adresă
