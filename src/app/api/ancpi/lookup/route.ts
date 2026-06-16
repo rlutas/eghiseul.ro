@@ -72,10 +72,13 @@ export async function GET(req: NextRequest) {
   if (q === null) {
     return NextResponse.json({ success: true, data: { found: false, reason: 'ancpi_unavailable', geocoded: { address: c.address, score: c.score } } });
   }
+  // NB: the geoportal's NATIONAL_CADASTRAL_REFERENCE is the CARTE FUNCIARĂ number
+  // (confirmed against a real extract: ref 106395 = "Carte Funciară Nr. 106395"),
+  // NOT the parcel's cadastral number. So we expose it as `cf`.
   const parcels = (q.features || [])
     .filter((f) => f.attributes?.NATIONAL_CADASTRAL_REFERENCE || f.attributes?.IMMOVABLE_ID)
     .map((f) => ({
-      cadastral: f.attributes.NATIONAL_CADASTRAL_REFERENCE != null ? String(f.attributes.NATIONAL_CADASTRAL_REFERENCE) : null,
+      cf: f.attributes.NATIONAL_CADASTRAL_REFERENCE != null ? String(f.attributes.NATIONAL_CADASTRAL_REFERENCE) : null,
       immovableId: f.attributes.IMMOVABLE_ID != null ? String(f.attributes.IMMOVABLE_ID) : null,
       inspireId: f.attributes.INSPIRE_ID != null ? String(f.attributes.INSPIRE_ID) : null,
     }));
