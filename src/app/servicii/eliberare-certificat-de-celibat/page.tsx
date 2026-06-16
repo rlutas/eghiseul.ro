@@ -26,6 +26,7 @@ import { Service, ServiceOption, formatEstimatedDays } from '@/types/services';
 import { Footer } from '@/components/home/footer';
 import { ServiceFAQ } from '@/components/services/service-faq';
 import { buildPageMetadata, buildServicePageGraph, BASE_URL } from '@/lib/seo';
+import { ServicePrice } from '@/components/services/service-price';
 
 // Database slug (order pipeline identifier). URL path uses the SEO-friendly
 // slug (eliberare-certificat-DE-celibat) to capture the search-intent phrasing.
@@ -215,10 +216,7 @@ export default async function CertificatCelibatPage() {
                       <span className="inline-block px-3 py-1 bg-primary-500 text-secondary-900 text-xs font-bold rounded-full mb-3">
                         TAXE INCLUSE
                       </span>
-                      <div className="flex items-baseline justify-center gap-1">
-                        <span className="text-5xl lg:text-6xl font-black text-white">{service.base_price}</span>
-                        <span className="text-xl font-bold text-white/70">RON</span>
-                      </div>
+                      <ServicePrice basePrice={service.base_price} />
                       <p className="text-white/60 text-sm mt-2">Fără taxe ascunse</p>
                     </div>
                   </div>
