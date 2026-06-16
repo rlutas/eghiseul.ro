@@ -20,7 +20,7 @@ export default async function AdminIdentificaImobilPage() {
         <p className="text-sm text-neutral-600">
           Unealtă operator pentru comenzile de <strong>Identificare imobil după adresă</strong>. Introdu adresa din
           comandă → caută parcela în geoportalul ANCPI (geocode + identify, cu retry). Pentru apartamente întoarce
-          CF-ul parcelei/blocului (punct de plecare). Geoportalul ANCPI e flaky — dacă dă „indisponibil", reîncearcă.
+          CF-ul parcelei/blocului (punct de plecare). Geoportalul ANCPI e flaky — dacă dă „indisponibil”, reîncearcă.
         </p>
         <p className="mt-1 text-xs text-neutral-500">
           Dacă imobilul nu e înscris în CF sau e apartament, continuă investigarea manual (geoportal + viitor

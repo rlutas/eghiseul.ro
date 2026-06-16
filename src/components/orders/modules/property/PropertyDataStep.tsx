@@ -7,6 +7,7 @@
  */
 
 import { useCallback, useState, useEffect } from 'react';
+import Link from 'next/link';
 import { useModularWizard } from '@/providers/modular-wizard-provider';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -384,9 +385,9 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
               <AlertCircle className="h-4 w-4 text-primary-600" />
               <AlertDescription className="text-secondary-900">
                 Nu știi numărul de carte funciară sau cadastral? Folosește serviciul{' '}
-                <a href="/comanda/identificare-imobil" className="font-semibold text-primary-600 underline">
+                <Link href="/comanda/identificare-imobil" className="font-semibold text-primary-600 underline">
                   Identificare imobil după adresă
-                </a>{' '}
+                </Link>{' '}
                 — îl aflăm noi din adresă (sau nume proprietar) și primești și extrasul de carte funciară.
               </AlertDescription>
             </Alert>
