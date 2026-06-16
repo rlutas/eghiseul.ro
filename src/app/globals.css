@@ -2,6 +2,13 @@
 @import "tw-animate-css";
 @plugin "@tailwindcss/typography";
 
+/* Seamless horizontal marquee for the reviews carousel. The track holds the
+   list twice; translating by -50% loops with no visible seam. */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {

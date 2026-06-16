@@ -1,4 +1,4 @@
-import { REVIEWS } from '@/config/reviews';
+import { REVIEWS, type Review } from '@/config/reviews';
 import { GOOGLE_REVIEWS_URL, GOOGLE_RATING, GOOGLE_REVIEW_COUNT } from '@/config/contact';
 import { ExternalLink } from 'lucide-react';
 
@@ -13,11 +13,11 @@ function GoogleG({ className }: { className?: string }) {
   );
 }
 
-function Stars() {
+function Stars({ className = 'w-4 h-4' }: { className?: string }) {
   return (
     <span className="flex items-center gap-0.5" aria-hidden="true">
       {[...Array(5)].map((_, i) => (
-        <svg key={i} className="w-4 h-4 text-[#FBBC04] fill-[#FBBC04]" viewBox="0 0 24 24">
+        <svg key={i} className={`${className} text-[#FBBC04] fill-[#FBBC04]`} viewBox="0 0 24 24">
           <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
         </svg>
       ))}
@@ -25,14 +25,39 @@ function Stars() {
   );
 }
 
-const AVATAR_COLORS = ['bg-blue-500', 'bg-green-600', 'bg-rose-500', 'bg-amber-500', 'bg-purple-500', 'bg-teal-600'];
+const AVATAR_COLORS = ['bg-blue-500', 'bg-green-600', 'bg-rose-500', 'bg-amber-500', 'bg-purple-500', 'bg-teal-600', 'bg-indigo-500'];
 
-/** Real Google reviews — social proof. Placed before the final CTA. */
+function ReviewCard({ r, i }: { r: Review; i: number }) {
+  return (
+    <figure className="flex w-[300px] sm:w-[340px] flex-shrink-0 flex-col rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
+      <div className="flex items-center justify-between mb-3">
+        <Stars />
+        <GoogleG className="h-5 w-5" />
+      </div>
+      <blockquote className="text-sm text-neutral-700 leading-relaxed flex-1 line-clamp-6">“{r.text}”</blockquote>
+      <figcaption className="mt-4 flex items-center gap-3 pt-4 border-t border-neutral-100">
+        <span className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full text-sm font-bold text-white ${AVATAR_COLORS[i % AVATAR_COLORS.length]}`}>
+          {r.name.charAt(0)}
+        </span>
+        <span className="min-w-0">
+          <span className="block text-sm font-semibold text-secondary-900 truncate">{r.name}</span>
+          <span className="block text-xs text-neutral-500">{r.when}</span>
+        </span>
+      </figcaption>
+    </figure>
+  );
+}
+
+/**
+ * Real Google reviews — auto-scrolling marquee (pauses on hover, manual scroll on
+ * reduced-motion). The track duplicates the list for a seamless loop.
+ */
 export function ReviewsSection() {
   const fmtRating = GOOGLE_RATING.toString().replace('.', ',');
+  const track = [...REVIEWS, ...REVIEWS];
   return (
-    <section className="py-12 lg:py-20 bg-white">
-      <div className="container mx-auto px-4 max-w-[1100px]">
+    <section className="py-12 lg:py-20 bg-neutral-50 overflow-hidden">
+      <div className="container mx-auto px-4 max-w-[1200px]">
         <div className="text-center mb-10">
           <span className="inline-flex items-center gap-2 px-4 py-1.5 bg-primary-100 text-primary-700 text-sm font-semibold rounded-full mb-4">
             <GoogleG className="h-4 w-4" /> Recenzii Google
@@ -40,39 +65,34 @@ export function ReviewsSection() {
           <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-3">Ce spun clienții despre eGhișeul</h2>
           <div className="inline-flex items-center gap-2 text-secondary-700">
             <span className="text-2xl font-black text-secondary-900">{fmtRating}</span>
-            <Stars />
+            <Stars className="w-5 h-5" />
             <span className="text-sm text-neutral-500">· {GOOGLE_REVIEW_COUNT} de recenzii</span>
           </div>
         </div>
+      </div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {REVIEWS.map((r, i) => (
-            <figure key={r.name} className="flex flex-col rounded-2xl border border-neutral-200 bg-neutral-50/60 p-5 hover:shadow-md transition-shadow">
-              <div className="flex items-center justify-between mb-3">
-                <Stars />
-                <GoogleG className="h-5 w-5" />
-              </div>
-              <blockquote className="text-sm text-neutral-700 leading-relaxed flex-1">“{r.text}”</blockquote>
-              <figcaption className="mt-4 flex items-center gap-3 pt-4 border-t border-neutral-200">
-                <span className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full text-sm font-bold text-white ${AVATAR_COLORS[i % AVATAR_COLORS.length]}`}>
-                  {r.name.charAt(0)}
-                </span>
-                <span className="min-w-0">
-                  <span className="block text-sm font-semibold text-secondary-900 truncate">{r.name}</span>
-                  <span className="block text-xs text-neutral-500">{r.when}</span>
-                </span>
-              </figcaption>
-            </figure>
-          ))}
+      {/* Marquee — full-bleed, fades on the edges */}
+      <div className="relative">
+        <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-12 sm:w-24 bg-gradient-to-r from-neutral-50 to-transparent" />
+        <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-12 sm:w-24 bg-gradient-to-l from-neutral-50 to-transparent" />
+        <div className="group flex overflow-x-auto motion-reduce:overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+          <div className="flex gap-5 w-max animate-[marquee_70s_linear_infinite] hover:[animation-play-state:paused] motion-reduce:animate-none px-4">
+            {track.map((r, i) => (
+              <ReviewCard key={i} r={r} i={i} />
+            ))}
+          </div>
         </div>
+      </div>
 
-        <div className="mt-8 text-center">
+      <div className="container mx-auto px-4 max-w-[1200px]">
+        <div className="mt-10 text-center">
           <a
             href={GOOGLE_REVIEWS_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 text-sm font-semibold text-primary-700 hover:text-primary-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 rounded"
+            className="inline-flex items-center gap-2 rounded-xl border border-neutral-300 bg-white px-5 py-3 text-sm font-semibold text-secondary-800 hover:border-primary-400 hover:text-primary-700 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
           >
+            <GoogleG className="h-4 w-4" />
             Vezi toate cele {GOOGLE_REVIEW_COUNT} de recenzii pe Google
             <ExternalLink className="h-4 w-4" aria-hidden="true" />
           </a>

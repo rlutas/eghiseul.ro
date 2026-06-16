@@ -525,6 +525,8 @@ export default async function ExtrasCarteFunciaraPage() {
           </div>
         </section>
 
+        <ReviewsSection />
+
         {/* How it works — dark connected timeline */}
         <section className="relative overflow-hidden bg-gradient-to-b from-secondary-900 to-[#0C1A2F] py-14 lg:py-24">
           <div className="absolute inset-0 opacity-5">
@@ -861,8 +863,6 @@ export default async function ExtrasCarteFunciaraPage() {
             { q: 'Cum primesc documentul?', a: 'Pe email, ca PDF semnat electronic de OCPI, cu autenticitate verificabilă pe portalul ANCPI.' },
           ]}
         />
-
-        <ReviewsSection />
 
         {/* CTA */}
         <section className="relative py-16 lg:py-24 bg-gradient-to-b from-secondary-900 to-[#0C1A2F] overflow-hidden">
