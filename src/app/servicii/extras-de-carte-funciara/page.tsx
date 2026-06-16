@@ -26,6 +26,7 @@ import {
 import { Service, ServiceOption, formatEstimatedDays } from '@/types/services';
 import { Footer } from '@/components/home/footer';
 import { ServiceFAQ } from '@/components/services/service-faq';
+import { MobileStickyCTA } from '@/components/services/mobile-sticky-cta';
 import { buildPageMetadata, buildServicePageGraph, BASE_URL, serviceUrl } from '@/lib/seo';
 
 // Database slug (order pipeline identifier). URL path uses the WP slug
@@ -289,6 +290,28 @@ export default async function ExtrasCarteFunciaraPage() {
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Trust strip */}
+        <section className="bg-white border-b border-neutral-200">
+          <div className="container mx-auto px-4 max-w-[1100px] py-6 lg:py-8">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+              {[
+                { icon: Zap, value: 'Câteva minute', label: 'Eliberare automată 24/7' },
+                { icon: Landmark, value: 'ANCPI', label: 'Document oficial OCPI' },
+                { icon: Shield, value: 'Taxe incluse', label: 'Fără cont, fără cozi' },
+                { icon: CheckCircle, value: '4.9/5', label: 'Peste 450 recenzii' },
+              ].map((t) => (
+                <div key={t.label} className="flex flex-col items-center gap-1.5">
+                  <div className="w-11 h-11 bg-primary-50 rounded-xl flex items-center justify-center">
+                    <t.icon className="h-5 w-5 text-primary-600" aria-hidden="true" />
+                  </div>
+                  <p className="text-base lg:text-lg font-extrabold text-secondary-900 leading-tight">{t.value}</p>
+                  <p className="text-xs text-neutral-500 leading-tight">{t.label}</p>
+                </div>
+              ))}
             </div>
           </div>
         </section>
@@ -665,6 +688,12 @@ export default async function ExtrasCarteFunciaraPage() {
           </div>
         </section>
       </main>
+
+      <MobileStickyCTA
+        href={`/comanda/${SERVICE_SLUG}`}
+        priceLabel={fmt(priceExVat)}
+        totalLabel={fmt(priceWithVat)}
+      />
 
       <Footer />
     </>

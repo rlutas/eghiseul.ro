@@ -23,6 +23,7 @@ import {
 import { Service, formatEstimatedDays } from '@/types/services';
 import { Footer } from '@/components/home/footer';
 import { ServiceFAQ } from '@/components/services/service-faq';
+import { MobileStickyCTA } from '@/components/services/mobile-sticky-cta';
 import { buildPageMetadata, buildServicePageGraph, BASE_URL, serviceUrl } from '@/lib/seo';
 
 // New service — no WP legacy URL, so the folder name matches the DB slug and
@@ -508,6 +509,12 @@ export default async function IdentificareImobilPage() {
           </div>
         </section>
       </main>
+
+      <MobileStickyCTA
+        href={`/comanda/${SERVICE_SLUG}`}
+        priceLabel={fmt(priceExVat)}
+        totalLabel={fmt(priceWithVat)}
+      />
 
       <Footer />
     </>
