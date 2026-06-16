@@ -277,9 +277,10 @@ export function buildWizardSteps(
   }
 
   // Step 6: Delivery — skipped for digital-only services (Certificat Constatator
-  // is delivered by email + in the client's account, no courier). For everything
-  // else it's always present.
-  if (!isConstatator) {
+  // and Extras Carte Funciară are delivered by email/PDF only, no courier).
+  // For everything else it's always present.
+  const isDigitalOnly = isConstatator || verificationConfig.propertyVerification.enabled;
+  if (!isDigitalOnly) {
     steps.push({
       ...ALL_STEPS['delivery'],
       number: stepNumber++,

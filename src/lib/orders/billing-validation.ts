@@ -15,12 +15,13 @@ import type { BillingState } from '@/types/verification-modules';
  */
 export function isPfBillingComplete(
   billing: Partial<BillingState> | null | undefined,
+  opts?: { cnpOptional?: boolean },
 ): boolean {
   if (!billing) return false;
   return Boolean(
     billing.firstName?.trim() &&
       billing.lastName?.trim() &&
-      billing.cnp?.trim() &&
+      (opts?.cnpOptional || billing.cnp?.trim()) &&
       billing.address?.trim() && // street line (stradă, nr, bloc, ap)
       billing.city?.trim() && // localitate
       billing.county?.trim(), // județ

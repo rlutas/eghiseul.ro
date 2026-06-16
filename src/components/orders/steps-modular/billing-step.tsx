@@ -129,6 +129,23 @@ const CONSTATATOR_PF_BILLING_OPTIONS: BillingOption[] = [
   },
 ];
 
+// Billing options for Extras Carte Funciară — no ID scan, so no "pe mine".
+// Client simply picks Persoană fizică OR Persoană juridică and fills the fields.
+const CF_BILLING_OPTIONS: BillingOption[] = [
+  {
+    source: 'other_pf',
+    label: 'Persoană fizică',
+    description: 'Factură pe numele tău (persoană fizică)',
+    icon: User,
+  },
+  {
+    source: 'company',
+    label: 'Persoană juridică',
+    description: 'Factură pe o firmă (introdu CUI)',
+    icon: Building2,
+  },
+];
+
 export default function BillingStepModular({ onValidChange }: BillingStepProps) {
   const { state, updateBilling, prefillData } = useModularWizard();
   const { billing, personalKyc, companyKyc, clientType, constatator, serviceSlug } = state;
@@ -140,6 +157,8 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
   // Certificat constatator pe persoană: bill the requester person by default.
   const isConstatatorPf =
     serviceSlug === 'certificat-constatator' && constatator?.documentType === 'pf';
+  // Extras Carte Funciară: no ID scan → PF (manual) or PJ; CNP optional.
+  const isCarteFunciara = serviceSlug === 'extras-carte-funciara';
   const companyFirst = isPJOrder || isConstatatorFirm;
 
   // CUI validation state
@@ -260,6 +279,15 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
     }
   }, [isConstatatorPf, billing?.source, billing?.firstName, requesterName, requesterCnp, updateBilling]);
 
+  // Extras Carte Funciară: no ID scan → default to manual persoană fizică so the
+  // fields are exposed for the client to fill (they can switch to PJ).
+  useEffect(() => {
+    if (!isCarteFunciara) return;
+    if (!billing?.source) {
+      updateBilling({ source: 'other_pf', type: 'persoana_fizica', country: 'Romania', isValid: false });
+    }
+  }, [isCarteFunciara, billing?.source, updateBilling]);
+
   // Extract primitive billing values to avoid effect re-triggers from object reference changes
   const billingSource = billing?.source;
   const billingFirstName = billing?.firstName;
@@ -292,7 +320,7 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
         address: billingAddress,
         city: billingCity,
         county: billingCounty,
-      });
+      }, { cnpOptional: isCarteFunciara });
     } else if (billingSource === 'company') {
       // Company: must have verified CUI and company name
       isValid = Boolean(billingCuiVerified && billingCompanyName && billingCui);
@@ -304,7 +332,7 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
     }
 
     onValidChange(isValid);
-  }, [billingSource, billingFirstName, billingLastName, billingCnp, billingAddress, billingCity, billingCounty, billingCuiVerified, billingCompanyName, billingCui, billingIsValid, onValidChange, updateBilling]);
+  }, [billingSource, billingFirstName, billingLastName, billingCnp, billingAddress, billingCity, billingCounty, billingCuiVerified, billingCompanyName, billingCui, billingIsValid, isCarteFunciara, onValidChange, updateBilling]);
 
   // Handle source selection
   const handleSourceSelect = useCallback((source: BillingSource) => {
@@ -477,14 +505,17 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
     }
   }, [billing, updateBilling]);
 
-  const selectedSource = billing?.source || (companyFirst ? 'company' : 'self');
-  const billingOptions = isConstatatorFirm
-    ? CONSTATATOR_BILLING_OPTIONS
-    : isConstatatorPf
-      ? CONSTATATOR_PF_BILLING_OPTIONS
-      : isPJOrder
-        ? PJ_BILLING_OPTIONS
-        : PF_BILLING_OPTIONS;
+  const selectedSource =
+    billing?.source || (isCarteFunciara ? 'other_pf' : companyFirst ? 'company' : 'self');
+  const billingOptions = isCarteFunciara
+    ? CF_BILLING_OPTIONS
+    : isConstatatorFirm
+      ? CONSTATATOR_BILLING_OPTIONS
+      : isConstatatorPf
+        ? CONSTATATOR_PF_BILLING_OPTIONS
+        : isPJOrder
+          ? PJ_BILLING_OPTIONS
+          : PF_BILLING_OPTIONS;
 
   return (
     <div className="space-y-8">
@@ -592,7 +623,7 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
 
           <div className="space-y-2">
             <Label htmlFor="cnp" className="text-secondary-900 font-medium">
-              CNP <span className="text-red-500">*</span>
+              CNP {isCarteFunciara ? <span className="text-neutral-400 text-xs">(opțional)</span> : <span className="text-red-500">*</span>}
             </Label>
             <Input
               id="cnp"

@@ -367,9 +367,11 @@ function modularWizardReducer(
         ? (state.constatator ?? {})
         : null;
 
-      // Constatator is digital (email + account) — the delivery step is skipped,
-      // so default delivery to email/free here for pricing + submission.
-      const delivery = verificationConfig.constatator?.enabled
+      // Digital-only services (Constatator, Extras Carte Funciară) skip the
+      // delivery step — default delivery to email/free for pricing + submission.
+      const isDigitalDelivery =
+        verificationConfig.constatator?.enabled || verificationConfig.propertyVerification.enabled;
+      const delivery = isDigitalDelivery
         ? { method: 'email' as const, methodName: 'Email (document digital)', price: 0, estimatedDays: 0 }
         : state.delivery;
 
