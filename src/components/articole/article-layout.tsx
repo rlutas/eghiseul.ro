@@ -6,7 +6,10 @@ import { ServiceFAQ } from '@/components/services/service-faq';
 import { buildArticlePageGraph, serviceUrl, BASE_URL } from '@/lib/seo';
 
 export interface RelatedService {
-  slug: string; // DB slug — resolved through serviceUrl()
+  /** DB service slug — resolved through serviceUrl(). Ignored if `href` is set. */
+  slug?: string;
+  /** Explicit href for non-service targets (calculators, tools, other articles). */
+  href?: string;
   label: string;
   desc: string;
 }
@@ -139,8 +142,8 @@ export function ArticleLayout({
               <div className="grid sm:grid-cols-2 gap-4">
                 {relatedServices.map((s) => (
                   <Link
-                    key={s.slug}
-                    href={serviceUrl(s.slug)}
+                    key={s.href ?? s.slug}
+                    href={s.href ?? serviceUrl(s.slug as string)}
                     className="group flex items-start gap-3 rounded-2xl border border-neutral-200 bg-white p-5 hover:border-primary-300 hover:shadow-md transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
                   >
                     <div>
