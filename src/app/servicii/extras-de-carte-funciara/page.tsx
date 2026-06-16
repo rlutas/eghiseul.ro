@@ -104,7 +104,11 @@ export default async function ExtrasCarteFunciaraPage() {
   const data = await getService();
   if (!data) notFound();
 
-  const { service, options } = data;
+  const { service } = data;
+  // Defensive: hide add-ons we don't actually offer for CF (e.g. legalized
+  // copies), independent of the DB/ISR cache state.
+  const HIDDEN_OPTION_CODES = new Set(['copii_suplimentare']);
+  const options = data.options.filter((o) => !HIDDEN_OPTION_CODES.has(o.code));
 
   // Price display: base_price is VAT-inclusive (total). Show the ex-VAT number as
   // the headline (looks smaller / more attractive) + VAT + total cu TVA.
@@ -558,39 +562,57 @@ export default async function ExtrasCarteFunciaraPage() {
               </p>
             </div>
 
-            <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-              {/* Specimen image */}
-              <div className="relative bg-neutral-50 rounded-2xl p-4 border border-neutral-200 shadow-sm">
-                <Image
-                  src="/images/extras-cf-specimen.webp"
-                  alt="Specimen Extras de Carte Funciară emis de ANCPI / OCPI — exemplu document oficial cu proprietar, suprafață și sarcini"
-                  width={1414}
-                  height={2000}
-                  className="w-full h-auto rounded-lg"
-                  loading="lazy"
-                  sizes="(max-width: 1024px) 100vw, 600px"
-                />
-                <p className="text-xs text-neutral-500 mt-3 text-center italic">
-                  Exemplu document — date anonimizate. Specimen marcat conform GDPR.
-                </p>
+            <div className="grid lg:grid-cols-[5fr_6fr] gap-8 lg:gap-14 items-center">
+              {/* Specimen image — framed */}
+              <div className="relative">
+                <div className="absolute -inset-3 bg-gradient-to-br from-primary-500/10 to-secondary-900/5 rounded-[2rem] blur-xl" aria-hidden="true" />
+                <div className="relative bg-white rounded-2xl p-3 ring-1 ring-neutral-200 shadow-[0_20px_50px_rgba(6,16,31,0.16)]">
+                  <Image
+                    src="/images/extras-cf-specimen.webp"
+                    alt="Specimen Extras de Carte Funciară emis de ANCPI / OCPI — exemplu document oficial cu proprietar, suprafață și sarcini"
+                    width={1414}
+                    height={2000}
+                    className="w-full h-auto rounded-lg"
+                    loading="lazy"
+                    sizes="(max-width: 1024px) 100vw, 500px"
+                  />
+                  <p className="text-xs text-neutral-400 mt-2 text-center italic">
+                    Exemplu — date anonimizate, marcat conform GDPR.
+                  </p>
+                </div>
               </div>
 
-              {/* What it contains */}
+              {/* Why it's legally valid (distinct from the "ce conține" section below) */}
               <div>
-                <h3 className="text-xl font-bold text-secondary-900 mb-4">Ce vezi în extrasul CF</h3>
-                <ul className="space-y-3 text-sm text-neutral-700">
+                <h3 className="text-xl lg:text-2xl font-bold text-secondary-900 mb-3">
+                  Un document oficial, valabil legal
+                </h3>
+                <p className="text-neutral-600 leading-relaxed mb-6">
+                  Extrasul pe care îl primești este <strong>identic cu cel eliberat la ghișeul OCPI</strong> — doar
+                  că îl primești pe email, fără drum și fără cont ANCPI.
+                </p>
+                <ul className="space-y-4">
                   {[
-                    ['Partea I — Imobilul', 'Suprafața, categoria de folosință, vecinătățile și numărul cadastral.'],
-                    ['Partea a II-a — Proprietarul', 'Proprietarul actual și modul de dobândire a dreptului de proprietate.'],
-                    ['Partea a III-a — Sarcini', 'Ipoteci, interdicții, litigii sau alte sarcini înscrise asupra imobilului.'],
-                    ['Antet și semnătură ANCPI', 'Document semnat electronic de OCPI, verificabil online pe portalul ANCPI.'],
-                  ].map(([title, desc]) => (
-                    <li key={title} className="flex items-start gap-2">
-                      <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
-                      <span><strong>{title}.</strong> {desc}</span>
+                    { icon: Landmark, title: 'Antet oficial ANCPI / OCPI', desc: 'Emis de Oficiul de Cadastru și Publicitate Imobiliară, cu seria și codul de înregistrare.' },
+                    { icon: Shield, title: 'Semnătură electronică eIDAS', desc: 'Are aceeași valoare legală ca varianta cu ștampilă — îl folosești la notar, bancă sau în instanță.' },
+                    { icon: Search, title: 'Cod de verificare unic', desc: 'Oricine îi poate verifica autenticitatea pe portalul ANCPI (epay.ancpi.ro).' },
+                    { icon: Mail, title: 'Livrat pe email, în PDF', desc: 'Gata de printat sau trimis mai departe, în câteva minute de la plată.' },
+                  ].map((f) => (
+                    <li key={f.title} className="flex items-start gap-3.5">
+                      <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary-100 to-primary-200">
+                        <f.icon className="h-5 w-5 text-primary-700" aria-hidden="true" />
+                      </span>
+                      <div>
+                        <p className="font-bold text-secondary-900 text-[15px]">{f.title}</p>
+                        <p className="text-sm text-neutral-600 leading-relaxed">{f.desc}</p>
+                      </div>
                     </li>
                   ))}
                 </ul>
+                <div className="mt-6 inline-flex items-center gap-2 rounded-xl bg-green-50 border border-green-200 px-4 py-2.5 text-sm font-semibold text-green-800">
+                  <CheckCircle className="h-4 w-4 text-green-600" aria-hidden="true" />
+                  Acceptat de notari, bănci și instituții
+                </div>
               </div>
             </div>
           </div>
