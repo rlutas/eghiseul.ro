@@ -297,4 +297,15 @@ Toate articolele cu trafic din exportul GSC (Pagini.csv, 2026-06-13) au fost mig
 
 ---
 
-*Toate cele 11 servicii active au pagini SEO hardcodate + cele 15 articole cu trafic migrate (root-path parity). Rovinietă-tool cu widget. Următor: paritate formular comandă (P0) + calculatoare + OG images.*
+## 7. BATCH 5 — UX conversie + blog + imagini articole (2026-06-16)
+
+- **CF page (conversie + mobil):** `MobileStickyCTA` reutilizabil (bară jos preț+Comandă, slide-up după hero, safe-area, `lg:hidden`) pe CF + identificare + plan-cadastral; trust strip sub hero; specimen `extras-cf-specimen.webp`.
+- **Header + mega menu:** `SERVICES_NAV` include acum cele 3 imobiliare (CF + Identificare + Plan cadastral); nav adăugat **Blog** + **Status comandă** (rute reale `/comanda/status/`); quick-links în mega-menu; buton proeminent „Verifică statusul comenzii" pe mobil.
+- **Imagini articole (OG/featured):** extrase din WP (og:image) → `public/images/articole/<slug>.webp` (16). `ArticleLayout` afișează imaginea (overlap hero) + o folosește în schema Article; `ogImage` în metadata fiecărui articol.
+- **/blog:** pagină arhivă (`src/app/blog/page.tsx`) + manifest `src/config/articles.ts` (16 articole, ordonate după trafic); în sitemap + nav.
+- **cele-4-tipuri:** re-importat **VERBATIM** din WP (rankează) + secțiune „Actualizare 2026" (mapare 4 scopuri ONRC → cele 3 tipuri din app: firmă 79 / PF 79 / istoric 487 RON).
+- **rolul-si-atributiile-onrc-romania:** migrat verbatim (96 clicks) + adăugat în `HARDCODED_ARTICLE_SLUGS`.
+
+---
+
+*Toate cele 11 servicii active au pagini SEO hardcodate + 16 articole cu trafic migrate (root-path parity) + arhivă /blog. Bară sticky mobil pe paginile imobiliare. Rovinietă-tool cu widget. Următor: extindere sticky CTA pe restul serviciilor + verificare umană tabel pensii 80k + paritate formular comandă (P0).*
