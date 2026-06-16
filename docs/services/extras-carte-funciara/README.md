@@ -6,10 +6,11 @@ Serviciu imobiliar pentru obținerea Extrasului de Carte Funciară (CF) de la OC
 |---|---|
 | Slug DB | `extras-carte-funciara` |
 | URL SEO (canonic) | `/servicii/extras-de-carte-funciara/` |
-| Preț | 79.99 RON (taxe OCPI incluse) · Urgent +99 RON |
-| Termen | 5 zile lucrătoare standard · 2 zile urgent |
+| Preț | 79.99 RON (taxe ANCPI incluse) · Extras suplimentar +49.99 RON/imobil |
+| Termen | **Câteva minute (24/7)** — automatizat prin worker; max 24h dacă sistemul ANCPI e în mentenanță |
 | Categorie | Imobiliare |
 | Comandă | `/comanda/extras-carte-funciara` |
+| Automatizare | ✅ **LIVE** (worker `worker-ancpi`) — vezi `docs/technical/specs/ancpi-automation-plan.md` |
 
 ---
 
@@ -54,8 +55,32 @@ prin `verification_config` / property module), NU KYC de companie. Câmpuri chei
 - **Județ + localitate** — pentru localizarea cărții funciare.
 - Contact + livrare email (PDF semnat electronic OCPI, verificabil pe portalul ANCPI).
 
-Procesare: completare identificator → confirmare județ/localitate → plată securizată (taxe OCPI incluse) →
-livrare extras pe email în 5 zile lucrătoare (2 zile urgent).
+Procesare: completare identificator → confirmare județ/localitate → plată securizată (taxe ANCPI incluse) →
+**emitere automată în câteva minute** (worker) → extras PDF + chitanță pe email.
+
+**Tabs identificare (ordine):** Nr. Carte Funciară (default) → Nr. Cadastral → Adresă. CF/cadastral sunt
+identificatori alternativi (oricare e suficient — `cadastral` NU e obligatoriu).
+
+**Reguli input CF (non-blocant, `lib/ancpi/cf-format.ts`):** validează identificatorul electronic
+(`12783` teren / `123456-C1-U2` apartament); avertizează la colectivă `123456-C1` (emitem pe teren `123456`),
+format vechi cu `/` („CF nedigitalizat — nu se eliberează instant"), suspect. **Nu blocăm — doar avertizăm.**
+
+**Fără KYC, fără livrare fizică, fără documente avocațiale.** Document digital → doar email PDF (pasul Livrare
+e sărit). Niciun buletin scanat → partea contractantă din contractul de prestări = **datele de facturare**
+(PF: nume+CNP+adresă / PJ: firmă+CUI). Fără contract de asistență juridică, fără împuternicire, fără nr. Barou.
+
+---
+
+## Automatizare ANCPI (worker)
+
+✅ **LIVE & funcțional A→Z** — confirmat pe comandă reală (`E-260616-KAFEG`, imobil 100015 Odoreu/Satu Mare).
+Worker-ul `worker-ancpi` (Railway, repo `github.com/rlutas/worker-ancpi`) face singur: login OpenAM → validare
+imobil în e-Terra (`SearchEstate`) → coș → checkout → comandă reală ePay → poll status → descărcare PDF
+(`Extras_Informare_*.pdf`) + chitanță → atașare la comandă + email. Coadă `ancpi_jobs`, API `/api/ancpi/{pending,result}`,
+livrare `lib/ancpi/deliver.ts`. Admin `/admin/ancpi` (status, jurnal, Copiază log, Reîncearcă, upload manual, link ePay).
+**Plan complet:** `docs/technical/specs/ancpi-automation-plan.md`.
+
+Cazuri → operator (NEEDS_OPERATOR): imobil negăsit / CF colectivă / status≠Activă / plan cadastral / identificare.
 
 ---
 

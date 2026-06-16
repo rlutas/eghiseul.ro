@@ -28,12 +28,17 @@ Document oficial ONRC care atestă datele actuale ale unei firme: denumire, form
 Comandă company-KYC pe slug DB (`/comanda/certificat-constatator`):
 
 1. **Contact** — date de contact solicitant.
-2. **Date firmă** — CUI + autocomplete (preluare automată date ONRC).
-3. **Documente firmă** — upload documente companie (modul company-kyc).
-4. **Detalii Certificat** (modul `constatator`, după datele firmei) — vezi mai jos.
-5. **Opțiuni** — servicii extra.
-6. **Livrare** — PDF pe email; opțional curier.
-7. **Facturare** — date de facturare.
+2. **Detalii Certificat** (modul `constatator`) — tipul documentului (firmă/PF/istoric) e ales primul (drive CUI vs CNP).
+3. **Date firmă** — CUI + autocomplete (doar pentru firmă/istoric).
+4. **Documente firmă** — upload documente companie (modul company-kyc, condiționat).
+5. **Facturare** — date de facturare.
+
+> **Serviciu digital — pașii Opțiuni și Livrare sunt SĂRITE** (constatatorul e auto-emis, doar email PDF, fără
+> curier). Vezi `step-builder.ts` (`isConstatator`). La fel ca extras carte funciară.
+
+**Fără documente avocațiale** (în `NO_LAWYER_SERVICES`): se generează doar `contract-prestari`, fără contract de
+asistență juridică / împuternicire / cerere / nr. Barou. **Partea contractantă din contract = datele de facturare**
+(PF: nume+CNP / PJ: firmă+CUI) — nu există buletin scanat. Admin: cardul „Date personale" e ascuns când e gol.
 
 ### Pasul „Detalii Certificat" (modul `constatator`)
 
@@ -54,7 +59,7 @@ Datele se salvează în `customer_data.constatator` (+ `customer_data.company` d
 
 - ✅ **Modul `constatator` + prețul pe tip (option A)** — live; config aplicat via REST în migration `054_constatator_module.sql` (2026-06-14). Oglindește formularul WPForms live.
 - ⚠️ **Maparea tip-raport (`reportTypes`) este o presupunere ajustabilă** — valorile per tip de document (ex. `pf`: „de bază / fonduri IMM / insolvență"; `istoric`: „CAS / pe persoană / IGI viză") sunt preluate din formularul WP și se pot ajusta ulterior fără schemă (update value-only pe `verification_config`).
-- 🔗 **Legătură cu botul ONRC** — pasul `constatator` captează deja exact datele de care are nevoie viitorul bot de browser automation pe portalul RECOM ONRC (vezi `docs/technical/specs/onrc-automation-plan.md`): `documentType`, `reportType`, `purpose`, `period{,From,To}`, `requesterName`, `requesterCnp` + `customer_data.company`. Job-ul botului se va crea automat la plata confirmată pentru serviciile ONRC.
+- ✅ **Automatizare ONRC LIVE** — botul/worker-ul ONRC emite automat (firmă de bază/IMM/insolvență + PF + istoric); job creat la plata confirmată, document atașat + email. Vezi `docs/technical/specs/onrc-automation-plan.md`. Pasul `constatator` captează `documentType`, `reportType`, `purpose`, `period{,From,To}`, `requesterName`, `requesterCnp` + `customer_data.company`.
 - Rămas: imagine OG `/og/certificat-constatator.png` de generat; CTR de optimizat (cel mai slab din portofoliu).
 
 ## Fișiere cheie
