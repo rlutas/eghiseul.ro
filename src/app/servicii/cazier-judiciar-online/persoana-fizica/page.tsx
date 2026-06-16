@@ -25,6 +25,7 @@ import {
 import { Service, ServiceOption, formatEstimatedDays } from '@/types/services';
 import { Footer } from '@/components/home/footer';
 import { MobileStickyCTA } from '@/components/services/mobile-sticky-cta';
+import { OrderButton } from '@/components/services/order-button';
 import { ServiceFAQ } from '@/components/services/service-faq';
 
 // Database slug for this service (order pipeline identifier)
@@ -187,7 +188,7 @@ export default async function CazierJudiciarPFPage() {
               <span className="text-white font-medium">Persoană Fizică</span>
             </nav>
 
-            <div className="flex flex-col-reverse lg:flex-row gap-8 lg:gap-12">
+            <div className="flex flex-col-reverse lg:flex-row lg:justify-between gap-8 lg:gap-12">
               {/* Left Content */}
               <div className="flex-1 max-w-[700px]">
                 {/* Badges */}
@@ -348,16 +349,7 @@ export default async function CazierJudiciarPFPage() {
                     </div>
 
                     {/* CTA Button */}
-                    <Button
-                      asChild
-                      className="w-full h-14 bg-primary-500 hover:bg-primary-600 text-secondary-900 font-bold text-lg rounded-xl shadow-[0_4px_14px_rgba(236,185,95,0.4)] hover:shadow-[0_6px_20px_rgba(236,185,95,0.5)] hover:-translate-y-0.5 transition-all mt-4"
-                      size="lg"
-                    >
-                      <Link href={`/comanda/${SERVICE_SLUG}`}>
-                        Comandă Acum
-                        <ArrowRight className="ml-2 h-5 w-5" />
-                      </Link>
-                    </Button>
+                    <OrderButton href={`/comanda/${SERVICE_SLUG}`} className="w-full mt-4">Comandă Acum</OrderButton>
 
                     {/* Trust badges */}
                     <div className="flex items-center justify-center gap-4 pt-3 border-t border-neutral-100">
@@ -665,15 +657,7 @@ export default async function CazierJudiciarPFPage() {
 
               {/* CTA Buttons */}
               <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-                <Button
-                  asChild
-                  className="bg-primary-500 hover:bg-primary-600 text-secondary-900 font-bold px-8 py-6 text-lg rounded-xl shadow-[0_6px_14px_rgba(236,185,95,0.35)] hover:shadow-[0_10px_20px_rgba(236,185,95,0.45)] hover:-translate-y-0.5 transition-all duration-200"
-                >
-                  <Link href={`/comanda/${SERVICE_SLUG}`}>
-                    Comandă Acum
-                    <ArrowRight className="ml-2 w-5 h-5" />
-                  </Link>
-                </Button>
+                <OrderButton href={`/comanda/${SERVICE_SLUG}`}>Comandă Acum</OrderButton>
                 <Button
                   asChild
                   variant="outline"

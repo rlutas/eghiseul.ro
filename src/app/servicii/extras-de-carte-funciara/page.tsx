@@ -454,10 +454,10 @@ export default async function ExtrasCarteFunciaraPage() {
                   Documentul oficial ANCPI cu proprietar, suprafață, sarcini și ipoteci. Livrat pe email.
                 </p>
                 <div className="flex items-baseline gap-1 mb-1">
-                  <span className="text-3xl font-black text-secondary-900">{service.base_price}</span>
+                  <span className="text-3xl font-black text-secondary-900">{fmt(priceExVat)}</span>
                   <span className="text-sm font-bold text-neutral-400">RON</span>
                 </div>
-                <p className="text-xs text-neutral-500">Taxe ANCPI incluse · fără taxe ascunse</p>
+                <p className="text-xs text-neutral-500">+ TVA 21% · {fmt(priceWithVat)} RON cu TVA · taxe ANCPI incluse</p>
               </div>
 
               {/* Urgency — free */}
@@ -491,10 +491,10 @@ export default async function ExtrasCarteFunciaraPage() {
                     <p className="text-sm text-neutral-600 leading-relaxed mb-5 flex-1">{option.description}</p>
                   )}
                   <div className="flex items-baseline gap-1">
-                    <span className="text-3xl font-black text-primary-600">+{option.price}</span>
+                    <span className="text-3xl font-black text-primary-600">+{fmt(Math.round((Number(option.price) / 1.21) * 100) / 100)}</span>
                     <span className="text-sm font-bold text-neutral-400">RON</span>
                   </div>
-                  <p className="text-xs text-neutral-500">Opțional, per imobil suplimentar</p>
+                  <p className="text-xs text-neutral-500">+ TVA 21% · +{option.price} RON cu TVA · opțional</p>
                 </div>
               ))}
             </div>
