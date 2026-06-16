@@ -13,6 +13,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { AncpiManualUpload } from './AncpiManualUpload';
 import { AncpiCopyLog } from './AncpiCopyLog';
+import { AncpiRetry } from './AncpiRetry';
 
 export const dynamic = 'force-dynamic';
 
@@ -233,7 +234,11 @@ export default async function AdminAncpiPage() {
                     </TableCell>
                     <TableCell className="min-w-[150px]">
                       {(job.status === 'NEEDS_OPERATOR' || job.status === 'FAILED') ? (
-                        <AncpiManualUpload orderId={job.order_id} />
+                        <div className="space-y-1.5">
+                          {/* Auto-retry only when no ePay order was placed (anti-double-pay). */}
+                          {!job.ancpi_order_id && <AncpiRetry orderId={job.order_id} />}
+                          <AncpiManualUpload orderId={job.order_id} />
+                        </div>
                       ) : (
                         <span className="text-xs text-neutral-400">—</span>
                       )}
