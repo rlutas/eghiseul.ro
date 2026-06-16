@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { AncpiManualUpload } from './AncpiManualUpload';
+import { AncpiCopyLog } from './AncpiCopyLog';
 
 export const dynamic = 'force-dynamic';
 
@@ -185,6 +186,21 @@ export default async function AdminAncpiPage() {
             ) : (
               jobs.map((job) => {
                 const im = job.detail?.imobile?.[0];
+                const logText = [
+                  `Comandă: ${friendly(job.orders)}`,
+                  `Job: ${job.id}`,
+                  `Status: ${job.status}`,
+                  `Serviciu: ${job.service_type}`,
+                  `Imobil: ${[im?.judet, im?.uat].filter(Boolean).join(' / ')} — ${im?.identificatorType ?? 'CF'} ${im?.identificator ?? ''}`,
+                  job.ancpi_order_id ? `Comandă ePay: ${job.ancpi_order_id}` : null,
+                  job.registration_number ? `Nr. înreg.: ${job.registration_number}` : null,
+                  `Încercări: ${job.retry_count}`,
+                  job.error_message ? `EROARE: ${job.error_message}` : null,
+                  '--- Jurnal ---',
+                  ...(eventsByJob[job.id] ?? []).map(
+                    (e) => `${new Date(e.created_at).toLocaleString('ro-RO', { timeZone: 'Europe/Bucharest' })}  ${EVENT_LABEL[e.type] ?? e.type}${e.message ? ` — ${e.message}` : ''}`
+                  ),
+                ].filter(Boolean).join('\n');
                 return (
                   <TableRow key={job.id}>
                     <TableCell className="font-medium">{friendly(job.orders)}</TableCell>
@@ -221,7 +237,8 @@ export default async function AdminAncpiPage() {
                       <div>{job.registration_number ?? '—'}</div>
                       <div className="text-neutral-500">{job.ancpi_order_id ?? ''}</div>
                     </TableCell>
-                    <TableCell className="text-xs max-w-[280px]">
+                    <TableCell className="text-xs max-w-[280px] align-top">
+                      <div className="mb-1"><AncpiCopyLog text={logText} /></div>
                       {(eventsByJob[job.id] ?? []).length === 0 ? (
                         <span className="text-neutral-400">—</span>
                       ) : (
@@ -241,8 +258,12 @@ export default async function AdminAncpiPage() {
                       )}
                     </TableCell>
                     <TableCell className="text-center">{job.retry_count}</TableCell>
-                    <TableCell className="text-xs text-red-600 max-w-[240px] truncate" title={job.error_message ?? ''}>
-                      {job.error_message ?? '—'}
+                    <TableCell className="text-xs text-red-600 max-w-[320px] align-top">
+                      {job.error_message ? (
+                        <div className="whitespace-pre-wrap break-words">{job.error_message}</div>
+                      ) : (
+                        '—'
+                      )}
                     </TableCell>
                     <TableCell className="text-xs text-neutral-500 whitespace-nowrap">
                       {new Date(job.created_at).toLocaleString('ro-RO', { dateStyle: 'short', timeStyle: 'short', timeZone: 'Europe/Bucharest' })}
