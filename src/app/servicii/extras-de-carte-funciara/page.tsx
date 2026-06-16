@@ -103,6 +103,12 @@ export default async function ExtrasCarteFunciaraPage() {
 
   const { service, options } = data;
 
+  // Price display: base_price is VAT-inclusive (total). Show the ex-VAT number as
+  // the headline (looks smaller / more attractive) + VAT + total cu TVA.
+  const priceWithVat = Number(service.base_price);
+  const priceExVat = Math.round((priceWithVat / 1.21) * 100) / 100;
+  const fmt = (v: number) => (Number.isInteger(v) ? String(v) : v.toFixed(2).replace('.', ','));
+
   // Ways to identify the property — targets the "număr cadastral" cluster
   const identifiers = [
     { icon: KeyRound, title: 'Număr cadastral', desc: 'Identificatorul unic al imobilului (ex: 12783).' },
@@ -227,10 +233,13 @@ export default async function ExtrasCarteFunciaraPage() {
                         TAXE ANCPI INCLUSE
                       </span>
                       <div className="flex items-baseline justify-center gap-1">
-                        <span className="text-5xl lg:text-6xl font-black text-white">{service.base_price}</span>
+                        <span className="text-5xl lg:text-6xl font-black text-white">{fmt(priceExVat)}</span>
                         <span className="text-xl font-bold text-white/70">RON</span>
                       </div>
-                      <p className="text-white/60 text-sm mt-2">Fără taxe ascunse</p>
+                      <p className="text-white/70 text-sm mt-2">
+                        + TVA 21% · <span className="font-semibold text-white">{fmt(priceWithVat)} RON</span> cu TVA
+                      </p>
+                      <p className="text-white/50 text-xs mt-1">Fără taxe ascunse</p>
                     </div>
                   </div>
 
