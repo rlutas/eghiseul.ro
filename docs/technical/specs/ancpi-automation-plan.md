@@ -16,7 +16,7 @@ Un operator uman ia acum manual datele dintr-o comandă de **extras de carte fun
 
 **Scope (faza 1):**
 - **Extras de carte funciară pentru informare** (prodId `14200` preplătit / `1420` la 20 lei) → **automatizabil** ✅
-- **Extras din planul cadastral, pe ortofotoplan** (prodId `419`) → același flux, automatizabil (de validat) 🟡
+- **Extras din planul cadastral, pe ortofotoplan** (prodId `419`) → serviciu DB `extras-plan-cadastral` (79.99 RON) **operator-fulfilled** deocamdată (decizie produs); automatizabil ulterior prin același flux ePay 🟡
 - **Identificare imobil după proprietar / adresă** → flux diferit (până la 5 zile, prin OCPI) → `NEEDS_OPERATOR` deocamdată ⏳
 - **Extras CF colectivă** → ANCPI **NU eliberează online** extrase pentru CF colective (`NNNNN-Cx`) → `NEEDS_OPERATOR` ⏳
 
