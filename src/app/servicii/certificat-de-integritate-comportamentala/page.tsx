@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { createPublicClient } from '@/lib/supabase/public';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
@@ -463,11 +464,86 @@ export default async function CertificatIntegritatePage() {
           </div>
         </section>
 
-        {/* Difference vs cazier judiciar + validity */}
+        {/* Specimen — what the certificate looks like */}
         <section className="py-12 lg:py-20 bg-white">
+          <div className="container mx-auto px-4 max-w-[1200px]">
+            <div className="text-center mb-12">
+              <span className="inline-block px-4 py-1.5 bg-primary-100 text-primary-700 text-sm font-semibold rounded-full mb-4">
+                Specimen
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-3">
+                Cum Arată Certificatul de Integritate Comportamentală — Specimen
+              </h2>
+              <p className="text-neutral-600 max-w-2xl mx-auto">
+                Documentul pe care îl primești este emis de IGPR (Poliția Română) conform Legii 118/2019,
+                semnat electronic și livrat pe email.
+              </p>
+            </div>
+
+            <div className="grid lg:grid-cols-[5fr_6fr] gap-8 lg:gap-14 items-center">
+              {/* Specimen image — framed */}
+              <div className="relative">
+                <div className="absolute -inset-3 bg-gradient-to-br from-primary-500/10 to-secondary-900/5 rounded-[2rem] blur-xl" aria-hidden="true" />
+                <div className="relative bg-white rounded-2xl p-3 ring-1 ring-neutral-200 shadow-[0_20px_50px_rgba(6,16,31,0.16)]">
+                  <Image
+                    src="/images/specimens/certificat-integritate.png"
+                    alt="Specimen certificat de integritate comportamentală emis de IGPR — exemplu cu date anonimizate"
+                    width={1000}
+                    height={1414}
+                    className="w-full h-auto rounded-lg"
+                    loading="lazy"
+                    sizes="(max-width: 1024px) 100vw, 500px"
+                  />
+                  <p className="text-xs text-neutral-400 mt-2 text-center italic">
+                    Exemplu — date anonimizate.
+                  </p>
+                </div>
+              </div>
+
+              {/* Why it's official + legally valid */}
+              <div>
+                <h3 className="text-xl lg:text-2xl font-bold text-secondary-900 mb-3">
+                  Un document oficial, valabil legal
+                </h3>
+                <p className="text-neutral-600 leading-relaxed mb-6">
+                  Certificatul pe care îl primești este <strong>identic cu cel eliberat la ghișeul IGPR</strong> —
+                  doar că îl primești pe email, fără drum și fără cont pe platforma oficială.
+                </p>
+                <ul className="space-y-4">
+                  {[
+                    { icon: Landmark, title: 'Emis de IGPR (Poliția Română)', desc: 'Eliberat de Inspectoratul General al Poliției Române, conform Legii 118/2019.' },
+                    { icon: Shield, title: 'Semnătură electronică', desc: 'Are aceeași valoare legală ca varianta cu ștampilă — îl folosești la angajator sau în dosar.' },
+                    { icon: Scale, title: 'Atestă integritatea comportamentală', desc: 'Confirmă lipsa sancțiunilor pentru infracțiuni asupra minorilor și a persoanelor vulnerabile.' },
+                    { icon: Mail, title: 'Livrat pe email, în PDF', desc: 'Gata de printat sau trimis mai departe, în zile lucrătoare de la plată.' },
+                  ].map((f) => (
+                    <li key={f.title} className="flex items-start gap-3.5">
+                      <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary-100 to-primary-200">
+                        <f.icon className="h-5 w-5 text-primary-700" aria-hidden="true" />
+                      </span>
+                      <div>
+                        <p className="font-bold text-secondary-900 text-[15px]">{f.title}</p>
+                        <p className="text-sm text-neutral-600 leading-relaxed">{f.desc}</p>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+                <div className="mt-6">
+                  <span className="inline-flex items-center gap-2 rounded-xl bg-green-50 border border-green-200 px-4 py-2.5 text-sm font-semibold text-green-800">
+                    <CheckCircle className="h-4 w-4 text-green-600" aria-hidden="true" />
+                    Acceptat de angajatori și instituții
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Difference vs cazier judiciar + validity — neutral-50 so the white
+            Specimen section above alternates cleanly; inner cards → bg-white. */}
+        <section className="py-12 lg:py-20 bg-neutral-50">
           <div className="container mx-auto px-4 max-w-[900px]">
             <div className="grid md:grid-cols-2 gap-6">
-              <div className="rounded-2xl border border-neutral-200 bg-neutral-50 p-6">
+              <div className="rounded-2xl border border-neutral-200 bg-white p-6">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-10 h-10 bg-primary-100 rounded-xl flex items-center justify-center flex-shrink-0">
                     <Scale className="w-5 h-5 text-primary-600" aria-hidden="true" />
@@ -495,7 +571,7 @@ export default async function CertificatIntegritatePage() {
                   .
                 </p>
               </div>
-              <div className="rounded-2xl border border-neutral-200 p-6 bg-primary-50/40">
+              <div className="rounded-2xl border border-neutral-200 p-6 bg-white">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-10 h-10 bg-primary-100 rounded-xl flex items-center justify-center flex-shrink-0">
                     <Clock className="w-5 h-5 text-primary-600" aria-hidden="true" />
@@ -510,8 +586,13 @@ export default async function CertificatIntegritatePage() {
                 </p>
               </div>
             </div>
+          </div>
+        </section>
 
-            <div className="mt-8 rounded-2xl border border-neutral-200 bg-neutral-50 p-6">
+        {/* Online indiferent de oraș — white, keeps the pre-FAQ section bg-white */}
+        <section className="py-12 lg:py-20 bg-white">
+          <div className="container mx-auto px-4 max-w-[900px]">
+            <div className="rounded-2xl border border-neutral-200 bg-neutral-50 p-6 lg:p-8">
               <h2 className="text-xl font-bold text-secondary-900 mb-4">
                 Obții certificatul online, indiferent de oraș
               </h2>

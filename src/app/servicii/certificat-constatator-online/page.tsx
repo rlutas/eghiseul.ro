@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { createPublicClient } from '@/lib/supabase/public';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -507,6 +508,80 @@ export default async function CertificatConstatatorPage() {
                   <p className="text-sm text-white/65 leading-relaxed max-w-[240px] mx-auto">{item.desc}</p>
                 </div>
               ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Specimen — what the certificate looks like */}
+        <section className="py-12 lg:py-20 bg-neutral-50">
+          <div className="container mx-auto px-4 max-w-[1200px]">
+            <div className="text-center mb-12">
+              <span className="inline-block px-4 py-1.5 bg-primary-100 text-primary-700 text-sm font-semibold rounded-full mb-4">
+                Specimen
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-3">
+                Cum Arată Certificatul Constatator — Specimen
+              </h2>
+              <p className="text-neutral-600 max-w-2xl mx-auto">
+                Documentul pe care îl primești are antetul Registrului Comerțului și cuprinde datele
+                actuale ale firmei, înscrise oficial la ONRC.
+              </p>
+            </div>
+
+            <div className="grid lg:grid-cols-[5fr_6fr] gap-8 lg:gap-14 items-center">
+              {/* Specimen image — framed */}
+              <div className="relative">
+                <div className="absolute -inset-3 bg-gradient-to-br from-primary-500/10 to-secondary-900/5 rounded-[2rem] blur-xl" aria-hidden="true" />
+                <div className="relative bg-white rounded-2xl p-3 ring-1 ring-neutral-200 shadow-[0_20px_50px_rgba(6,16,31,0.16)]">
+                  <Image
+                    src="/images/specimens/certificat-constatator.png"
+                    alt="Specimen certificat constatator emis de ONRC — exemplu cu date anonimizate"
+                    width={1000}
+                    height={1414}
+                    className="w-full h-auto rounded-lg"
+                    loading="lazy"
+                    sizes="(max-width: 1024px) 100vw, 500px"
+                  />
+                  <p className="text-xs text-neutral-400 mt-2 text-center italic">
+                    Exemplu — date anonimizate.
+                  </p>
+                </div>
+              </div>
+
+              {/* What the certificate shows */}
+              <div>
+                <h3 className="text-xl lg:text-2xl font-bold text-secondary-900 mb-3">
+                  Datele firmei, înscrise oficial la ONRC
+                </h3>
+                <p className="text-neutral-600 leading-relaxed mb-6">
+                  Certificatul cuprinde situația la zi a firmei din Registrul Comerțului — exact ce verifică
+                  băncile, notarii și partenerii comerciali.
+                </p>
+                <ul className="space-y-4">
+                  {[
+                    { icon: Landmark, title: 'Antet Registrul Comerțului', desc: 'Emis de Oficiul Național al Registrului Comerțului, cu numărul de înregistrare.' },
+                    { icon: Building2, title: 'Date de identificare', desc: 'Denumire, formă juridică, sediu social și cod unic de înregistrare (CUI).' },
+                    { icon: Users, title: 'Asociați & administratori', desc: 'Structura acționariatului și persoanele cu drept de reprezentare.' },
+                    { icon: Banknote, title: 'Capital & obiect de activitate', desc: 'Capitalul social, obiectul principal de activitate și codurile CAEN.' },
+                  ].map((f) => (
+                    <li key={f.title} className="flex items-start gap-3.5">
+                      <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary-100 to-primary-200">
+                        <f.icon className="h-5 w-5 text-primary-700" aria-hidden="true" />
+                      </span>
+                      <div>
+                        <p className="font-bold text-secondary-900 text-[15px]">{f.title}</p>
+                        <p className="text-sm text-neutral-600 leading-relaxed">{f.desc}</p>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+                <div className="mt-6 flex flex-wrap items-center gap-3">
+                  <span className="inline-flex items-center gap-2 rounded-xl bg-green-50 border border-green-200 px-4 py-2.5 text-sm font-semibold text-green-800">
+                    <CheckCircle className="h-4 w-4 text-green-600" aria-hidden="true" />
+                    Acceptat de bănci, notari și instituții
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
         </section>
