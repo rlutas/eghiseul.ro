@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { createPublicClient } from '@/lib/supabase/public';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
@@ -18,6 +19,7 @@ import {
   ScrollText,
   Stamp,
   IdCard,
+  Truck,
 } from 'lucide-react';
 import { Service, ServiceOption, formatEstimatedDays } from '@/types/services';
 import { Footer } from '@/components/home/footer';
@@ -70,7 +72,7 @@ export const metadata = buildPageMetadata({
   title: TITLE,
   description: DESCRIPTION,
   path: PAGE_PATH,
-  ogImage: '/og/default.png',
+  ogImage: '/og/services/certificat-celibat.png',
 });
 
 const jsonLdGraph = buildServicePageGraph({
@@ -418,6 +420,80 @@ export default async function CertificatCelibatPage() {
                   <p className="text-sm text-white/65 leading-relaxed max-w-[240px] mx-auto">{item.desc}</p>
                 </div>
               ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Specimen — what the certificat de celibat looks like */}
+        <section className="py-12 lg:py-20 bg-neutral-50">
+          <div className="container mx-auto px-4 max-w-[1200px]">
+            <div className="text-center mb-12">
+              <span className="inline-block px-4 py-1.5 bg-primary-100 text-primary-700 text-sm font-semibold rounded-full mb-4">
+                Specimen
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-3">
+                Cum Arată Certificatul de Celibat — Specimen
+              </h2>
+              <p className="text-neutral-600 max-w-2xl mx-auto">
+                Adeverința pe care o primești are antetul oficial al Serviciului de Stare Civilă și atestă
+                statutul de necăsătorit(ă) — un document oficial emis de primărie, nu o copie generată online.
+              </p>
+            </div>
+
+            <div className="grid lg:grid-cols-[5fr_6fr] gap-8 lg:gap-14 items-center">
+              {/* Specimen image — framed */}
+              <div className="relative">
+                <div className="absolute -inset-3 bg-gradient-to-br from-primary-500/10 to-secondary-900/5 rounded-[2rem] blur-xl" aria-hidden="true" />
+                <div className="relative bg-white rounded-2xl p-3 ring-1 ring-neutral-200 shadow-[0_20px_50px_rgba(6,16,31,0.16)]">
+                  <Image
+                    src="/images/specimens/certificat-celibat.png"
+                    alt="Specimen certificat de celibat (adeverință de stare civilă) emis de Starea Civilă — exemplu cu date anonimizate"
+                    width={707}
+                    height={1000}
+                    className="w-full h-auto rounded-lg"
+                    loading="lazy"
+                    sizes="(max-width: 1024px) 100vw, 500px"
+                  />
+                  <p className="text-xs text-neutral-400 mt-2 text-center italic">
+                    Exemplu — date anonimizate.
+                  </p>
+                </div>
+              </div>
+
+              {/* Why it's a real, legally valid document */}
+              <div>
+                <h3 className="text-xl lg:text-2xl font-bold text-secondary-900 mb-3">
+                  Un document oficial, valabil legal
+                </h3>
+                <p className="text-neutral-600 leading-relaxed mb-6">
+                  Certificatul de celibat este <strong>eliberat de Serviciul de Stare Civilă</strong> și atestă
+                  că nu ești căsătorit(ă) — îl depunem în numele tău și ți-l trimitem fără drum la ghișeu.
+                </p>
+                <ul className="space-y-4">
+                  {[
+                    { icon: Landmark, title: 'Antet oficial Stare Civilă', desc: 'Emis de Serviciul de Stare Civilă din cadrul primăriei localității tale de domiciliu.' },
+                    { icon: Heart, title: 'Atestă statutul de necăsătorit', desc: 'Confirmă oficial că nu ești căsătorit(ă) la data eliberării, pe baza registrelor de stare civilă.' },
+                    { icon: Shield, title: 'Valabil legal', desc: 'Îl folosești intern și pentru căsătoria în străinătate (cu apostilă) sau pentru dosare de cetățenie.' },
+                    { icon: Truck, title: 'Livrat prin curier', desc: 'Documentul fizic ajunge la tine prin curier, în zile lucrătoare — nu este generat instant.' },
+                  ].map((f) => (
+                    <li key={f.title} className="flex items-start gap-3.5">
+                      <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary-100 to-primary-200">
+                        <f.icon className="h-5 w-5 text-primary-700" aria-hidden="true" />
+                      </span>
+                      <div>
+                        <p className="font-bold text-secondary-900 text-[15px]">{f.title}</p>
+                        <p className="text-sm text-neutral-600 leading-relaxed">{f.desc}</p>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+                <div className="mt-6 flex flex-wrap items-center gap-3">
+                  <span className="inline-flex items-center gap-2 rounded-xl bg-green-50 border border-green-200 px-4 py-2.5 text-sm font-semibold text-green-800">
+                    <CheckCircle className="h-4 w-4 text-green-600" aria-hidden="true" />
+                    Acceptat de notari, primării și autorități
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
         </section>
