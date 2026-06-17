@@ -13,36 +13,43 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://eghiseul.ro"),
   title: {
-    default: "eGhiseul.ro - Documente Oficiale Online",
+    default: "Cazier Judiciar, Cazier Fiscal & Documente Oficiale Online — eGhiseul.ro",
     template: "%s | eGhiseul.ro",
   },
   description:
-    "Obtine cazier fiscal, extras carte funciara, certificat constatator si alte documente oficiale online, rapid si legal. Livrare in 24-48 ore.",
+    "Obține cazier judiciar, cazier fiscal, certificat constatator, extras de carte funciară și alte documente oficiale online — rapid, legal, fără cozi. Livrare pe email sau curier în 24-48 ore.",
   keywords: [
+    "cazier judiciar online",
     "cazier fiscal",
-    "extras carte funciara",
     "certificat constatator",
-    "documente oficiale",
-    "acte online",
-    "Romania",
+    "extras carte funciară",
+    "certificat de integritate comportamentală",
+    "documente oficiale online",
+    "acte online România",
   ],
   authors: [{ name: "eGhiseul.ro" }],
   creator: "eGhiseul.ro",
+  alternates: { canonical: "https://eghiseul.ro/" },
   openGraph: {
     type: "website",
     locale: "ro_RO",
-    url: "https://eghiseul.ro",
+    url: "https://eghiseul.ro/",
     siteName: "eGhiseul.ro",
-    title: "eGhiseul.ro - Documente Oficiale Online",
+    title: "Cazier Judiciar, Cazier Fiscal & Documente Oficiale Online — eGhiseul.ro",
     description:
-      "Obtine cazier fiscal, extras carte funciara, certificat constatator si alte documente oficiale online, rapid si legal.",
+      "Obține documente oficiale online — cazier judiciar, cazier fiscal, certificat constatator, extras de carte funciară — rapid, legal, fără cozi. Livrare 24-48 ore.",
+    images: [
+      { url: "/og/default.png", width: 1200, height: 630, alt: "eGhiseul.ro — documente oficiale online" },
+    ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "eGhiseul.ro - Documente Oficiale Online",
+    title: "Cazier Judiciar, Cazier Fiscal & Documente Oficiale Online — eGhiseul.ro",
     description:
-      "Obtine documente oficiale online, rapid si legal. Livrare in 24-48 ore.",
+      "Documente oficiale online, rapid și legal. Livrare pe email sau curier în 24-48 ore.",
+    images: ["/og/default.png"],
   },
   robots: {
     index: true,
