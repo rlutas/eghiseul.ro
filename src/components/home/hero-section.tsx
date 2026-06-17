@@ -45,6 +45,12 @@ export function HeroSection() {
               </p>
             </div>
 
+            {/* Legal disclaimer — private platform, not a state institution (parity cu site-ul WP) */}
+            <p className="mt-4 text-[11px] sm:text-xs text-white/50 leading-relaxed">
+              Serviciu privat. Nu suntem o instituție de stat și nu suntem afiliați cu vreun organ
+              guvernamental — documentele sunt emise exclusiv de autoritățile competente din România.
+            </p>
+
             {/* Primary CTA — visible above the fold (esp. mobile, where the
                 services card stacks below). Scrolls to the services list. */}
             <div className="mt-6 flex justify-center lg:justify-start">
