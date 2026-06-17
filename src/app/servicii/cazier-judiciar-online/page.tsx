@@ -1244,33 +1244,6 @@ export default function CazierJudiciarHubPage() {
         </section>
       </main>
 
-      {/* ──────────────── STICKY MOBILE CTA BAR ──────────────── */}
-      {/* Long page (4,000+ words) — mobile users need always-visible CTA. Desktop shows the inline CTAs. */}
-      <div
-        className="fixed bottom-0 left-0 right-0 z-40 lg:hidden bg-white border-t border-neutral-200 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] safe-area-bottom"
-        role="region"
-        aria-label="Acțiuni rapide cazier judiciar"
-      >
-        <div className="grid grid-cols-2 gap-2 p-3">
-          <Link
-            href="/servicii/cazier-judiciar-online/persoana-fizica/"
-            className="flex items-center justify-center gap-2 px-3 py-3 bg-primary-500 hover:bg-primary-600 text-secondary-900 font-bold rounded-lg text-sm transition-colors min-h-[48px]"
-            aria-label="Comandă cazier judiciar pentru persoană fizică, 198 RON"
-          >
-            <User className="w-4 h-4" aria-hidden="true" />
-            <span>PF — 198 RON</span>
-          </Link>
-          <Link
-            href="/servicii/cazier-judiciar-online/persoana-juridica/"
-            className="flex items-center justify-center gap-2 px-3 py-3 bg-secondary-900 hover:bg-secondary-800 text-white font-bold rounded-lg text-sm transition-colors min-h-[48px]"
-            aria-label="Comandă cazier judiciar pentru firmă (persoană juridică), 198 RON"
-          >
-            <Building2 className="w-4 h-4" aria-hidden="true" />
-            <span>PJ — 198 RON</span>
-          </Link>
-        </div>
-      </div>
-
       <MobileStickyCTA href="#alege-tip" basePrice={198} ctaLabel="Alege tipul" />
 
       <Footer />
