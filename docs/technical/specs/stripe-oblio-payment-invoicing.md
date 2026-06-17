@@ -1071,6 +1071,25 @@ OBLIO_COMPANY_CIF=RO12345678          # Company CIF for invoices
 OBLIO_SERIES_NAME=EGH                 # Invoice series name
 ```
 
+### 2.7 Comutator facturare automată (admin kill-switch)
+
+Admin → **Setări → Plăți → card Oblio** → switch **„Facturare automată"**. Permite
+oprirea emiterii automate a facturilor Oblio fără modificări de cod/env — util în
+**test/staging**, ca să nu se creeze facturi care apoi trebuie șterse.
+
+- **Stocare:** `admin_settings`, cheia `invoicing` = `{ oblio_enabled: boolean }`.
+  Cheia e în `ALLOWED_KEYS` la `PATCH /api/admin/settings`.
+- **Gate:** `ensureInvoiceForPaidOrder` (single chokepoint — webhook, confirm-payment,
+  verify-payment, cron) verifică `isInvoicingEnabled()` înainte de claim-ul atomic și
+  returnează statusul nou `disabled` când e oprită. Callerii tratează `disabled` ca
+  no-op (nu eroare).
+- **Default ON / fail-safe:** `isInvoicingEnabled()` (`src/lib/oblio/invoicing-enabled.ts`)
+  întoarce `true` dacă setarea lipsește sau citirea eșuează — nu oprește niciodată
+  facturarea în producție din greșeală. Doar `oblio_enabled: false` explicit o dezactivează.
+- **Nu blochează fulfillment:** comanda rămâne `paid`, iar job-urile ONRC/ANCPI și restul
+  procesării continuă — doar factura Oblio e sărită. La repornire, comenzile noi primesc factură.
+- **Efect imediat:** setarea se citește live din DB la fiecare comandă (fără redeploy).
+
 ---
 
 ## Partea 3: Integration Flow

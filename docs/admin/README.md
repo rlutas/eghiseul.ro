@@ -50,6 +50,7 @@ The Admin Panel (`/admin`) is the management interface for eGhiseul.ro, providin
 | AWB label download (PDF) | `/api/admin/orders/[id]/awb-label` | Print-ready labels |
 | AWB cancellation | `/api/admin/orders/[id]/cancel-awb` | Cancel AWB and revert status |
 | Payment verification (bank transfer) | `/api/admin/orders/[id]/verify-payment` | Approve/reject with reason |
+| Oblio invoicing toggle (Setări → Plăți) | `src/app/admin/settings/page.tsx` (PaymentsTab) | Switch „Facturare automată"; pauses auto Oblio invoices in test. Gate in `ensureInvoiceForPaidOrder` via `isInvoicingEnabled()`; setting `invoicing.oblio_enabled` in `admin_settings`. Default ON. See spec §2.7. |
 | GDPR cleanup | `/api/admin/cleanup` | Manual + automatic draft cleanup |
 | Order lookup by ID | `/api/admin/orders/lookup` | Quick search |
 | Users management page | `src/app/admin/users/page.tsx` | 3 tabs: Employees, Customers, Invitations |
