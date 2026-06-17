@@ -73,10 +73,20 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
   const { state, updateProperty, serviceOptions, updateOptions } = useModularWizard();
   const property = state.property;
 
-  // Identificare service → default to the address tab (client doesn't know the number).
-  const [searchMethod, setSearchMethod] = useState<'cadastral' | 'carteFunciara' | 'address'>(
-    config.identificationService.enabled ? 'address' : 'carteFunciara'
+  // Method selector. Identification service uses two methods (address / name);
+  // the other CF services use the cadastral/carteFunciara/address tabs.
+  const isIdentification = config.identificationService.enabled;
+  const [searchMethod, setSearchMethod] = useState<'cadastral' | 'carteFunciara' | 'address' | 'name'>(
+    isIdentification ? (property?.searchMethod ?? 'address') : 'carteFunciara'
   );
+
+  // Persist the chosen method on the identification service so the admin order
+  // page knows whether to run the automated lookup or process it manually.
+  useEffect(() => {
+    if (!isIdentification) return;
+    const m = searchMethod === 'name' ? 'name' : 'address';
+    if (property?.searchMethod !== m) updateProperty?.({ searchMethod: m });
+  }, [isIdentification, searchMethod, property?.searchMethod, updateProperty]);
 
   // UAT (localitate) options for the selected county, from the ANCPI nomenclator.
   const localities: string[] =
@@ -133,18 +143,24 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
 
     const hasIdentifier = !!(property.cadastral || property.carteFunciara);
     const hasAddress = !!property.propertyAddress?.trim();
+    const hasOwnerName = !!property.ownerName?.trim();
 
-    // "Identificare imobil după adresă": the client doesn't know the number, so an
-    // ADDRESS is enough (an identifier is also accepted). Otherwise (extras CF /
-    // plan cadastral) at least one identifier (CF / cadastral) is required.
+    // "Identificare imobil": client picks a method.
+    //  • "după nume"   → owner name required (manual research).
+    //  • "după adresă" → address required (admin runs the automated lookup).
+    // Other CF services (extras / plan cadastral) require an identifier (CF/cadastral).
     if (config.identificationService.enabled) {
-      if (!hasIdentifier && !hasAddress) return false;
+      if (searchMethod === 'name') {
+        if (!hasOwnerName) return false;
+      } else if (!hasAddress) {
+        return false;
+      }
     } else if (!hasIdentifier) {
       return false;
     }
 
     return true;
-  }, [property, config]);
+  }, [property, config, searchMethod]);
 
   // Notify parent of validation changes
   useEffect(() => {
@@ -234,36 +250,99 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {/* Search Method Selection */}
-          <div className="flex gap-2 p-1 bg-muted rounded-lg">
-            <Button
-              type="button"
-              variant={searchMethod === 'carteFunciara' ? 'default' : 'ghost'}
-              size="sm"
-              className="flex-1"
-              onClick={() => setSearchMethod('carteFunciara')}
-            >
-              Nr. Carte Funciară
-            </Button>
-            <Button
-              type="button"
-              variant={searchMethod === 'cadastral' ? 'default' : 'ghost'}
-              size="sm"
-              className="flex-1"
-              onClick={() => setSearchMethod('cadastral')}
-            >
-              Nr. Cadastral
-            </Button>
-            <Button
-              type="button"
-              variant={searchMethod === 'address' ? 'default' : 'ghost'}
-              size="sm"
-              className="flex-1"
-              onClick={() => setSearchMethod('address')}
-            >
-              Adresă
-            </Button>
-          </div>
+          {/* Search Method Selection — identification service has two methods
+              (address / name); other CF services keep the cadastral/CF/address tabs. */}
+          {isIdentification ? (
+            <div className="flex gap-2 p-1 bg-muted rounded-lg">
+              <Button
+                type="button"
+                variant={searchMethod === 'address' ? 'default' : 'ghost'}
+                size="sm"
+                className="flex-1"
+                onClick={() => setSearchMethod('address')}
+              >
+                📍 După adresă
+              </Button>
+              <Button
+                type="button"
+                variant={searchMethod === 'name' ? 'default' : 'ghost'}
+                size="sm"
+                className="flex-1"
+                onClick={() => setSearchMethod('name')}
+              >
+                👤 După nume
+              </Button>
+            </div>
+          ) : (
+            <div className="flex gap-2 p-1 bg-muted rounded-lg">
+              <Button
+                type="button"
+                variant={searchMethod === 'carteFunciara' ? 'default' : 'ghost'}
+                size="sm"
+                className="flex-1"
+                onClick={() => setSearchMethod('carteFunciara')}
+              >
+                Nr. Carte Funciară
+              </Button>
+              <Button
+                type="button"
+                variant={searchMethod === 'cadastral' ? 'default' : 'ghost'}
+                size="sm"
+                className="flex-1"
+                onClick={() => setSearchMethod('cadastral')}
+              >
+                Nr. Cadastral
+              </Button>
+              <Button
+                type="button"
+                variant={searchMethod === 'address' ? 'default' : 'ghost'}
+                size="sm"
+                className="flex-1"
+                onClick={() => setSearchMethod('address')}
+              >
+                Adresă
+              </Button>
+            </div>
+          )}
+
+          {/* Name Search (identification service) — manual research by owner. */}
+          {searchMethod === 'name' && isIdentification && (
+            <div className="space-y-4">
+              <Alert className="border-blue-200 bg-blue-50">
+                <AlertCircle className="h-4 w-4 text-blue-600" />
+                <AlertDescription className="text-blue-800">
+                  Căutarea după numele proprietarului se face <strong>manual</strong> de către un
+                  operator, în Registrul Proprietarilor ANCPI. Te anunțăm de îndată ce găsim imobilul.
+                </AlertDescription>
+              </Alert>
+
+              <div className="space-y-2">
+                <Label htmlFor="ownerNameSearch">Nume proprietar <span className="text-red-500">*</span></Label>
+                <Input
+                  id="ownerNameSearch"
+                  type="text"
+                  value={property.ownerName || ''}
+                  onChange={(e) => updateProperty?.({ ownerName: e.target.value })}
+                  placeholder="Popescu Ion"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Numele complet al proprietarului, exact ca în actul de proprietate.
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="ownerCnpSearch">CNP / CUI proprietar (opțional)</Label>
+                <Input
+                  id="ownerCnpSearch"
+                  type="text"
+                  value={property.ownerCnpCui || ''}
+                  onChange={(e) => updateProperty?.({ ownerCnpCui: e.target.value })}
+                  placeholder="1234567890123"
+                />
+                <p className="text-xs text-muted-foreground">Ajută la identificarea exactă a proprietarului.</p>
+              </div>
+            </div>
+          )}
 
           {/* Cadastral Number */}
           {searchMethod === 'cadastral' && (
@@ -511,7 +590,9 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
             {config.identificationService.enabled
-              ? 'Completează județul, localitatea și adresa imobilului (sau numărul cadastral / CF, dacă îl știi).'
+              ? searchMethod === 'name'
+                ? 'Completează județul, localitatea și numele proprietarului.'
+                : 'Completează județul, localitatea și adresa imobilului.'
               : 'Completează cel puțin județul, localitatea și unul din: număr cadastral sau număr CF.'}
           </AlertDescription>
         </Alert>
