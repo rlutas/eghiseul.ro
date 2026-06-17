@@ -38,9 +38,8 @@ const PAGE_PATH = '/servicii/eliberare-certificat-de-nastere/';
 const SCHEMA_SLUG = 'eliberare-certificat-de-nastere';
 const TITLE = 'Certificat de Naștere Online — Duplicat 998 RON';
 const DESCRIPTION =
-  'Obține online duplicatul sau copia certificatului de naștere de la Starea Civilă, ' +
-  '998 RON, fără deplasare. Util pentru certificat pierdut, din diaspora sau pentru ' +
-  'dosar de cetățenie — îl primești pe email și prin curier.';
+  'Duplicat certificat de naștere online de la Starea Civilă, 998 RON, fără deplasare. ' +
+  'Pentru act pierdut, din altă localitate sau diaspora. Email + curier.';
 const DATE_PUBLISHED = '2026-06-14';
 const DATE_MODIFIED = '2026-06-14';
 
@@ -301,6 +300,13 @@ export default async function CertificatNasterePage() {
                 un <strong>certificat de naștere pierdut</strong>, deteriorat sau furat, noi depunem cererea în
                 numele tău, plătim taxele și îți trimitem documentul pe email și prin curier, fără să te deplasezi.
               </p>
+              <p>
+                Cel mai mare avantaj este că obții duplicatul fără să mergi în localitatea de naștere și fără
+                programare la ghișeu. Fie că ai nevoie de eliberarea certificatului de naștere din altă localitate
+                — de exemplu te-ai născut în Galați sau Timișoara, dar locuiești în altă parte — fie că ești plecat
+                din țară, depunem cererea prin împuternicire la primăria competentă și îți trimitem documentul acasă.
+                Nu trebuie să te deplasezi și nu aștepți la coadă.
+              </p>
               <div className="rounded-2xl border border-neutral-200 bg-white p-5">
                 <h3 className="font-bold text-secondary-900 mb-2">
                   Important: poți cere certificatul și personal la Starea Civilă
@@ -344,6 +350,66 @@ export default async function CertificatNasterePage() {
                   </div>
                 </div>
               ))}
+            </div>
+
+            {/* Situații frecvente — duplicat certificat de naștere */}
+            <div className="mt-16 lg:mt-20 max-w-[1100px] mx-auto">
+              <div className="text-center mb-10">
+                <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-3">
+                  Situații frecvente — duplicat certificat de naștere
+                </h2>
+                <p className="text-neutral-600 max-w-2xl mx-auto">
+                  Indiferent de motiv, procedura este aceeași: completezi datele, noi depunem cererea la Starea
+                  Civilă și primești documentul acasă.
+                </p>
+              </div>
+              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
+                {[
+                  {
+                    icon: FileText,
+                    title: 'Certificat de naștere pierdut sau deteriorat',
+                    desc: 'Dacă ai pierdut certificatul, ți-a fost furat sau s-a deteriorat, soliciți un duplicat — un certificat nou, original, emis de Serviciul de Stare Civilă. Depunem direct cererea de duplicat în numele tău.',
+                  },
+                  {
+                    icon: Landmark,
+                    title: 'Din altă localitate, fără deplasare',
+                    desc: 'Certificatul se eliberează de primăria din localitatea unde a fost înregistrată nașterea, dar nu trebuie să mergi acolo. Depunem cererea prin împuternicire la primăria competentă și îți trimitem certificatul prin curier — fără programare.',
+                  },
+                  {
+                    icon: User,
+                    title: 'Prin împuternicire (pentru altcineva)',
+                    desc: 'Poți obține certificatul și pentru un membru al familiei, pe baza unei împuterniciri. Ai nevoie de datele complete ale titularului (nume, CNP, data și localitatea nașterii, numele părinților) și de acordul persoanei.',
+                  },
+                  {
+                    icon: Heart,
+                    title: 'Pentru copil',
+                    desc: 'Pentru un copil minor, duplicatul se solicită de către părinte sau reprezentantul legal, cu datele de naștere ale copilului și ale părinților. Util pentru dosarul de grădiniță, școală, pașaport sau alocație.',
+                  },
+                ].map((c) => (
+                  <div
+                    key={c.title}
+                    className="bg-neutral-50 rounded-2xl p-5 border border-neutral-200 hover:border-primary-300 hover:shadow-lg hover:-translate-y-1 transition-all duration-200"
+                  >
+                    <div className="w-12 h-12 bg-gradient-to-br from-primary-100 to-primary-200 rounded-xl flex items-center justify-center mb-4">
+                      <c.icon className="w-6 h-6 text-primary-600" />
+                    </div>
+                    <h3 className="text-base font-bold text-secondary-900 mb-2 leading-snug">{c.title}</h3>
+                    <p className="text-sm text-neutral-700 leading-relaxed">{c.desc}</p>
+                  </div>
+                ))}
+              </div>
+              <p className="text-sm text-neutral-600 text-center mt-6 max-w-2xl mx-auto">
+                Duplicatul este un document oficial emis de Starea Civilă și se livrează prin curier în zile
+                lucrătoare — nu este un document generat instant. Ai nevoie și de un{' '}
+                <Link href="/servicii/eliberare-certificat-de-casatorie/" className="text-primary-600 font-medium hover:underline">
+                  certificat de căsătorie
+                </Link>{' '}
+                sau de un{' '}
+                <Link href="/servicii/eliberare-certificat-de-celibat/" className="text-primary-600 font-medium hover:underline">
+                  certificat de celibat
+                </Link>
+                ? Le poți comanda la fel de simplu.
+              </p>
             </div>
           </div>
         </section>
@@ -431,7 +497,7 @@ export default async function CertificatNasterePage() {
               <div className="rounded-2xl border border-neutral-200 bg-neutral-50 p-6">
                 <div className="flex items-center gap-2 mb-4">
                   <IdCard className="w-5 h-5 text-primary-600" />
-                  <h2 className="text-xl font-bold text-secondary-900">Acte necesare</h2>
+                  <h2 className="text-xl font-bold text-secondary-900">Acte necesare pentru duplicat certificat de naștere</h2>
                 </div>
                 <ul className="space-y-2.5 text-sm text-neutral-700">
                   {[
@@ -478,6 +544,10 @@ export default async function CertificatNasterePage() {
             { q: 'Cât timp este valabil certificatul de naștere?', a: 'Certificatul de naștere nu expiră — este valabil pe toată durata vieții. Unele instituții pot cere însă o copie legalizată recentă, emisă în ultimele luni, pentru anumite dosare.' },
             { q: 'Cum primesc documentul?', a: 'Documentul original îl primești prin curier la adresa indicată, iar confirmarea și datele de tracking pe email. Te ținem la curent pe tot parcursul procesării.' },
             { q: 'Pot cere certificatul pentru altcineva?', a: 'Da, pe baza unei împuterniciri. Poți solicita certificatul de naștere pentru un membru al familiei sau o altă persoană, atâta timp cât ai acordul și împuternicirea necesară pentru depunerea cererii.' },
+            { q: 'Pot obține certificatul de naștere dintr-o altă localitate, fără să mă deplasez?', a: 'Da. Certificatul se eliberează de primăria din localitatea unde a fost înregistrată nașterea — de exemplu Galați, Timișoara sau orice alt oraș — dar nu trebuie să mergi acolo. Depunem cererea prin împuternicire la primăria competentă și îți trimitem documentul prin curier, oriunde te-ai afla.' },
+            { q: 'Trebuie să fac programare pentru eliberarea duplicatului?', a: 'Nu. Prin eGhișeul nu ai nevoie de programare la ghișeul Stării Civile și nu stai la coadă. Completezi cererea online, iar noi depunem documentația la primărie în numele tău.' },
+            { q: 'Ce acte îmi trebuie pentru un duplicat de certificat de naștere?', a: 'Ai nevoie de un act de identitate valabil și de datele de naștere ale titularului: nume complet, CNP, data și localitatea nașterii și numele părinților așa cum apar în actul de naștere. Pentru cereri în numele altei persoane sau din diaspora se adaugă o împuternicire.' },
+            { q: 'Sunt cetățean român plecat din țară — pot cere certificatul din diaspora?', a: 'Da. Românii din diaspora pot obține duplicatul fără să revină în țară. Depunem cererea prin împuternicire la primăria de naștere și îți trimitem documentul prin curier, util pentru dosare de cetățenie, pașaport sau acte la autoritățile străine.' },
           ]}
         />
 

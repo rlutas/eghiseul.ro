@@ -37,11 +37,10 @@ import { GOOGLE_RATING, GOOGLE_REVIEW_COUNT_LABEL } from '@/config/contact';
 const SERVICE_SLUG = 'certificat-constatator';
 const PAGE_PATH = '/servicii/certificat-constatator-online/';
 const SCHEMA_SLUG = 'certificat-constatator-online';
-const TITLE = 'Certificat Constatator ONRC Online — de la 89 RON';
+const TITLE = 'Certificat Constatator Online ONRC — în câteva minute';
 const DESCRIPTION =
-  'Obține Certificat Constatator online de la ONRC, cu datele actuale ale firmei: ' +
-  'sediu, asociați, administratori, capital social și obiect de activitate. ' +
-  'De la 89 RON, pe firmă, persoană fizică sau cu istoric. 100% online, livrare pe email.';
+  'Certificat constatator online ONRC, doar cu CUI-ul firmei — pe firmă, persoană fizică ' +
+  'sau cu istoric. Pe email în câteva minute. De la 89 RON, taxe ONRC incluse.';
 const DATE_PUBLISHED = '2026-06-14';
 const DATE_MODIFIED = '2026-06-14';
 
@@ -337,7 +336,14 @@ export default async function CertificatConstatatorPage() {
                   Pentru fiecare certificat constatator, ONRC percepe o <strong>taxă oficială</strong>. Îl poți obține
                   personal la ghișeul ONRC sau prin portalul RECOM online (dacă ai cont și semnătură electronică). Prin
                   eGhișeul plătești <strong>de la {service.base_price} RON cu taxele ONRC incluse</strong>, 100% online,
-                  fără cont RECOM și fără deplasare — primești documentul pe email.
+                  fără cont RECOM și fără deplasare — primești documentul pe email. Vezi pas cu pas{' '}
+                  <Link href="/eliberare-certificat-constatator-onrc-ghid/" className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
+                    cum se eliberează certificatul constatator de la ONRC
+                  </Link>{' '}
+                  sau află ce este și{' '}
+                  <Link href="/rolul-si-atributiile-onrc-romania/" className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
+                    ce atribuții are ONRC
+                  </Link>.
                 </p>
               </div>
             </div>
@@ -417,11 +423,14 @@ export default async function CertificatConstatatorPage() {
               ))}
             </div>
 
-            <div className="mt-8 max-w-3xl mx-auto rounded-2xl border border-neutral-200 bg-white p-5 text-center">
-              <p className="text-sm text-neutral-700">
-                <strong>Cât este valabil:</strong> certificatul reflectă situația din ziua eliberării. În practică,
-                autoritățile și partenerii cer un certificat emis în <strong>ultimele 30 de zile</strong>; la licitațiile
-                publice (SEAP/SICAP) se acceptă de regulă unul nu mai vechi de 30 de zile.
+            <div className="mt-8 max-w-3xl mx-auto rounded-2xl border border-neutral-200 bg-white p-6">
+              <h3 className="font-bold text-secondary-900 mb-2">Certificat constatator „de bază” sau „extins”?</h3>
+              <p className="text-sm text-neutral-700 leading-relaxed">
+                La ONRC nu există un produs separat numit „extins” — este denumirea uzuală pentru certificatul
+                <strong> pe firmă</strong>, care include deja toate datele actuale și mențiunile complete ale societății
+                (sediu, asociați, administratori, capital, obiect de activitate). Nu plătești în plus pentru „extins”:
+                îl comanzi ca certificat constatator pe firmă, <strong>89 RON cu TVA</strong>. Pentru evoluția completă
+                a firmei, de la înființare până azi, alege varianta <strong>cu istoric</strong>.
               </p>
               <p className="mt-3 text-sm text-neutral-600">
                 Nu ești sigur ce tip îți trebuie?{' '}
@@ -498,6 +507,42 @@ export default async function CertificatConstatatorPage() {
                   <p className="text-sm text-white/65 leading-relaxed max-w-[240px] mx-auto">{item.desc}</p>
                 </div>
               ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Valabilitate — targets "valabilitate certificat constatator" */}
+        <section className="py-12 lg:py-16 bg-white">
+          <div className="container mx-auto px-4 max-w-[820px]">
+            <span className="inline-block px-4 py-1.5 bg-primary-100 text-primary-700 text-sm font-semibold rounded-full mb-4">
+              Valabilitate
+            </span>
+            <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-5">
+              Cât este valabil certificatul constatator
+            </h2>
+            <div className="space-y-4 text-neutral-700 leading-relaxed">
+              <p>
+                Certificatul constatator <strong>nu are un termen legal fix de valabilitate</strong> — reflectă
+                situația firmei din <strong>ziua eliberării</strong>. Cu cât este mai recent, cu atât are mai multă
+                greutate, pentru că între timp firma poate înregistra mențiuni noi la Registrul Comerțului (schimbare
+                de sediu, administrator sau asociați).
+              </p>
+              <ul className="space-y-2.5">
+                {[
+                  ['Bănci, notari și parteneri comerciali', 'cer de regulă un certificat emis în ultimele 30 de zile.'],
+                  ['Licitații publice (SEAP/SICAP)', 'se acceptă de obicei un certificat nu mai vechi de 30 de zile.'],
+                  ['Verificări proprii (due diligence)', 'folosește mereu varianta cea mai recentă — un certificat vechi nu mai garantează datele actuale.'],
+                ].map(([t, d]) => (
+                  <li key={t} className="flex items-start gap-2">
+                    <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-1" aria-hidden="true" />
+                    <span><strong>{t}:</strong> {d}</span>
+                  </li>
+                ))}
+              </ul>
+              <p>
+                Pentru că emitem certificatul pe firmă în câteva minute, <strong>îl ai mereu actualizat la zi</strong>
+                {' '}exact când ai nevoie de el — fără să riști să prezinți un document expirat.
+              </p>
             </div>
           </div>
         </section>
@@ -605,6 +650,7 @@ export default async function CertificatConstatatorPage() {
             { q: 'Ce este certificatul constatator?', a: 'Este documentul oficial ONRC care atestă datele actuale ale unei firme: denumire, sediu, CUI, asociați, administratori, capital social și obiect de activitate. Este „cartea de identitate” a firmei la Registrul Comerțului.' },
             { q: 'Ce tipuri de certificat constatator pot comanda?', a: 'Trei: pe firmă (situația la zi a societății), pe persoană fizică (dacă o persoană deține calitatea de asociat/administrator în firme) și cu istoric (toate modificările firmei de la înființare până în prezent).' },
             { q: 'Certificatul constatator este la zi?', a: 'Da. Certificatul reflectă situația firmei din ziua eliberării, cu toate mențiunile actualizate înscrise la ONRC până la acel moment.' },
+            { q: 'Cum verific dacă o persoană este asociat sau administrator într-o firmă?', a: 'Comanzi un certificat constatator pe persoană fizică. Pe baza datelor persoanei, ONRC indică firmele în care aceasta deține calitatea de asociat sau administrator. Costă 89 RON cu TVA, taxe ONRC incluse.' },
             { q: 'Cât durează eliberarea?', a: 'De obicei câteva minute — sistemul emite automat, 24/7. În cazuri rare (procesare ONRC mai lentă) poate dura mai mult.' },
             { q: 'Cât costă un certificat constatator?', a: `De la ${service.base_price} RON cu taxele ONRC incluse (pe firmă sau pe persoană fizică); varianta cu istoric este 487 RON cu TVA. Fără costuri ascunse.` },
             { q: 'De unde obțin certificatul constatator?', a: 'De la Oficiul Național al Registrului Comerțului (ONRC). Prin eGhișeul îl obții 100% online, fără cont RECOM și fără drum la ghișeu — îl primești pe email.' },

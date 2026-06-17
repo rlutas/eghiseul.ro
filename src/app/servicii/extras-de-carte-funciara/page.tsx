@@ -36,11 +36,10 @@ import { buildPageMetadata, buildServicePageGraph, BASE_URL, serviceUrl } from '
 const SERVICE_SLUG = 'extras-carte-funciara';
 const PAGE_PATH = '/servicii/extras-de-carte-funciara/';
 const SCHEMA_SLUG = 'extras-de-carte-funciara';
-const TITLE = 'Extras de Carte Funciară Online în Câteva Minute — 89 RON';
+const TITLE = 'Extras Carte Funciară Online — în Câteva Minute, 89 RON';
 const DESCRIPTION =
-  'Extras de Carte Funciară online de la ANCPI, livrat pe email în câteva minute — ' +
-  'singurii din România cu eliberare automată 24/7, fără taxă de urgență și fără cont ANCPI. ' +
-  '89 RON, taxe incluse. Document oficial cu proprietar, suprafață, sarcini și ipoteci.';
+  'Extras de carte funciară online de la ANCPI, livrat pe email în câteva minute. ' +
+  '89 RON, taxe incluse — fără cont ANCPI și fără taxă de urgență.';
 const DATE_PUBLISHED = '2026-06-13';
 const DATE_MODIFIED = '2026-06-16';
 
@@ -604,6 +603,28 @@ export default async function ExtrasCarteFunciaraPage() {
                 </div>
               </div>
             </div>
+
+            {/* Gratuit / gratis angle — targets „extras cf online gratuit" */}
+            <div className="mt-6 max-w-[820px] mx-auto rounded-2xl border border-neutral-200 bg-white p-6 lg:p-8 shadow-sm">
+              <h3 className="text-xl font-bold text-secondary-900 mb-4">
+                Se poate obține gratuit extrasul de carte funciară?
+              </h3>
+              <div className="space-y-4 text-sm sm:text-base text-neutral-700 leading-relaxed">
+                <p>
+                  Mulți caută „extras de carte funciară gratuit” sau „extras CF online gratis”. ANCPI oferă,
+                  într-adevăr, o variantă fără cost prin platforma <strong>MyeTerra</strong> (myeterra.ancpi.ro) —
+                  însă nu este chiar „instant”: ai nevoie de un cont <strong>ROeID</strong>, de{' '}
+                  <strong>semnătură electronică calificată</strong> sau de o verificare la birou care poate dura{' '}
+                  <strong>până la 72 de ore</strong>.
+                </p>
+                <p>
+                  Pe scurt: extrasul „gratuit” cere cont, semnătură și răbdare. Prin eGhișeul plătești{' '}
+                  <strong>{service.base_price} RON cu taxele ANCPI incluse</strong> și primești același document
+                  oficial <strong>pe email, în câteva minute, fără cont și fără semnătură electronică</strong>.
+                  Documentul este identic — plătești pentru timp și pentru lipsa pașilor tehnici.
+                </p>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -711,7 +732,14 @@ export default async function ExtrasCarteFunciaraPage() {
                   <strong>Extrasul de carte funciară pentru informare</strong> nu are un termen legal de expirare, dar
                   reflectă situația din ziua eliberării. În practică, notarii și băncile cer un extras emis în
                   <strong> ultimele 30 de zile</strong>. Pentru autentificarea unei vânzări, notarul solicită un
-                  <strong> extras de autentificare</strong>, valabil de regulă 10 zile lucrătoare.
+                  <strong> extras de autentificare</strong>, valabil de regulă 10 zile lucrătoare. Vezi în detaliu{' '}
+                  <Link
+                    href="/valabilitate-extras-de-carte-funciara/"
+                    className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
+                  >
+                    cât este valabil un extras de carte funciară
+                  </Link>
+                  .
                 </p>
               </div>
             </div>
@@ -803,7 +831,14 @@ export default async function ExtrasCarteFunciaraPage() {
                 Cel mai des, numărul cadastral apare în <strong>actul de proprietate</strong> (contract de
                 vânzare-cumpărare, certificat de moștenitor), într-un <strong>extras de carte funciară mai vechi</strong>{' '}
                 sau în <strong>documentația cadastrală</strong> întocmită la intabulare. Dacă ai aceste acte, vei
-                găsi acolo numărul cadastral și numărul de carte funciară de care ai nevoie pentru extras.
+                găsi acolo{' '}
+                <Link
+                  href="/cum-aflam-numarul-carte-functionara-si-nr-cadastral/"
+                  className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
+                >
+                  cum aflu numărul cadastral și numărul de carte funciară
+                </Link>{' '}
+                de care ai nevoie pentru extras.
               </p>
               <p>
                 Dacă <strong>nu ai numărul cadastral</strong> și cunoști doar adresa, îl poți obține în câteva moduri:
@@ -834,6 +869,28 @@ export default async function ExtrasCarteFunciaraPage() {
                 </p>
               </div>
             </div>
+
+            {/* Intabulare — targets „verificare intabulare" */}
+            <div className="mt-12 pt-10 border-t border-neutral-200">
+              <h3 className="text-2xl font-bold text-secondary-900 mb-5">
+                Cum verifici dacă un imobil este intabulat
+              </h3>
+              <div className="space-y-4 text-neutral-700 leading-relaxed">
+                <p>
+                  A <strong>verifica intabularea</strong> unui imobil înseamnă a confirma că dreptul de proprietate
+                  este înscris în cartea funciară la OCPI. Cel mai sigur mod este chiar{' '}
+                  <strong>extrasul de carte funciară</strong>: dacă imobilul este intabulat, în <strong>Partea I</strong>{' '}
+                  apare descrierea cadastrală (număr cadastral, suprafață), iar în <strong>Partea a II-a</strong>{' '}
+                  figurează proprietarul și actul de dobândire.
+                </p>
+                <p>
+                  Dacă imobilul <strong>nu apare în cartea funciară</strong> sau ai doar un număr topografic vechi,
+                  proprietatea nu este (încă) intabulată cadastral, iar pentru tranzacții va fi nevoie de o
+                  documentație cadastrală întocmită de un expert autorizat. Comandând un extras CF afli imediat dacă
+                  imobilul este intabulat și situația lui juridică la zi.
+                </p>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -858,6 +915,10 @@ export default async function ExtrasCarteFunciaraPage() {
             { q: 'Ce este programul Casa Verde și ce extras îmi trebuie?', a: 'Casa Verde (Rabla pentru sisteme fotovoltaice) cere, în dosar, un extras de carte funciară recent al imobilului. Detalii în ghidul nostru dedicat: extras de carte funciară pentru Casa Verde.' },
             { q: 'Extrasul de carte funciară se actualizează automat?', a: 'Nu. Extrasul reflectă situația din ziua eliberării și nu se actualizează singur. Pentru o situație la zi, soliciți un extras nou; pentru modificări/rectificări, proprietarul se adresează biroului teritorial OCPI.' },
             { q: 'Cum primesc documentul?', a: 'Pe email, ca PDF semnat electronic de OCPI, cu autenticitate verificabilă pe portalul ANCPI.' },
+            { q: 'Pot verifica intabularea unui imobil online?', a: 'Da. Cel mai simplu mod de a verifica dacă un imobil este intabulat este să soliciți un extras de carte funciară: dacă imobilul are număr cadastral și proprietar înscris, este intabulat. Prin eGhișeul primești extrasul online, în câteva minute, fără cont ANCPI.' },
+            { q: 'Care e diferența dintre extrasul gratuit de la ANCPI și cel de la eGhișeul?', a: 'Documentul este identic — același extras oficial OCPI. Diferă modul de obținere: varianta gratuită prin MyeTerra cere cont ROeID și semnătură electronică calificată (sau verificare la birou, până la 72 de ore), iar prin eGhișeul îl primești pe email în câteva minute, fără cont și fără semnătură.' },
+            { q: 'Pot obține extrasul pentru un imobil din alt județ?', a: 'Da. Eliberăm extrase de carte funciară pentru imobile din orice județ — ai nevoie doar de numărul cadastral sau de carte funciară și de localitate. Totul se face online.' },
+            { q: 'Extrasul de carte funciară este același lucru cu cadastrul?', a: 'Nu. Cadastrul descrie tehnic imobilul (poziție, suprafață, limite), iar cartea funciară înscrie drepturile asupra lui (proprietar, sarcini, ipoteci). Extrasul CF reflectă partea juridică; ambele numere identifică același imobil.' },
           ]}
         />
 

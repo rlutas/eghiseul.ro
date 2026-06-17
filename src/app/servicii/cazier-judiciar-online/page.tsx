@@ -42,11 +42,10 @@ import {
 // =============================================================================
 
 const PAGE_PATH = '/servicii/cazier-judiciar-online/';
-const TITLE = 'Cazier Judiciar Online 2026 — Obține Rapid Fără Drumuri (198 RON)';
+const TITLE = 'Cazier Judiciar Online — Fără Drumuri, în 2-4 Zile';
 const DESCRIPTION =
-  'Obține cazierul judiciar online în 2-4 zile lucrătoare, fără deplasări. ' +
-  'Persoane fizice și juridice. 198 RON cu TVA inclus. Plată securizată Stripe. ' +
-  'Document oficial de la Poliția Română (Lege 290/2004).';
+  'Obține cazierul judiciar online de la Poliția Română, fără cozi. ' +
+  'Persoane fizice și firme, livrare în 2-4 zile pe email sau curier. Comandă în 5 minute.';
 
 const DATE_PUBLISHED = '2026-04-16';
 const DATE_MODIFIED = '2026-05-20';
@@ -294,6 +293,21 @@ const FAQ_ITEMS: FAQ[] = [
     q: 'Am pierdut sau am uitat să descarc documentul. Pot să-l descarc din nou?',
     a: 'Da. După plată, primești email cu link permanent către documentul tău. Dacă ai cont creat la noi (recomandat), poți accesa istoricul comenzilor și redescărca oricând documentele primite. Dacă ai folosit checkout fără cont și ai pierdut email-ul, contactează-ne pe contact@eghiseul.ro cu datele de identificare și îți retrimitem documentul (verificăm identitatea înainte de retransmitere, pentru securitate).',
   },
+  {
+    category: 'pret',
+    q: 'Pot obține cazierul judiciar gratuit?',
+    a: 'Documentul în sine este gratuit — din 2024 statul nu mai percepe timbru fiscal. Îl poți obține fără cost dacă te deplasezi personal la sediul IPJ, cu programare, în timpul programului. Ceea ce plătești la eGhișeul (198 RON) este serviciul de a-l obține în locul tău, 100% online: completarea cererii, verificarea identității, semnătura electronică, comunicarea cu IGPR și livrarea pe email sau curier. Documentul rămâne identic și oficial.',
+  },
+  {
+    category: 'procesare',
+    q: 'Cum se face eliberarea cazierului judiciar online?',
+    a: 'Completezi formularul cu datele tale, îți verificăm identitatea, plătești securizat, iar noi depunem cererea la IGPR. Documentul oficial îți este eliberat de IGPR și ți-l transmitem pe email semnat electronic, în 2-4 zile lucrătoare (1-2 zile urgent). Nu te deplasezi la nicio instituție.',
+  },
+  {
+    category: 'pret',
+    q: 'Cât costă cazierul judiciar și unde se plătește taxa?',
+    a: 'Taxa oficială de timbru a fost eliminată în 2024, deci documentul nu mai are taxă de stat. Prin eGhișeul serviciul online costă 198 RON cu TVA (278 RON urgent). Detalii despre costuri: vezi ghidul <a href="/taxa-cazier-judiciar/">taxa cazier judiciar</a>.',
+  },
 ];
 
 // =============================================================================
@@ -529,6 +543,8 @@ export default function CazierJudiciarHubPage() {
                 clasificate sau în domenii sensibile — educație, medicină, securitate), de{' '}
                 <strong>colegiile profesionale</strong> (medicilor, avocaților, notarilor) și de{' '}
                 <strong>autoritățile străine</strong> pentru proceduri de viză, rezidență sau adopție.
+                Eliberarea cazierului judiciar se face integral online &mdash; depui cererea, noi o
+                procesăm la IGPR și primești documentul fără să te deplasezi.
               </p>
 
               <div className="bg-primary-50/50 border-l-4 border-primary-500 p-4 rounded-r-lg mt-6">
@@ -772,7 +788,11 @@ export default function CazierJudiciarHubPage() {
                 Prețuri Transparente — Cazier Judiciar 2026
               </h2>
               <p className="text-neutral-600">
-                Toate prețurile includ TVA-ul de 21%. Fără costuri ascunse.
+                Toate prețurile includ TVA-ul de 21%. Fără costuri ascunse. Vezi în detaliu{' '}
+                <Link href="/taxa-cazier-judiciar/" className="text-primary-600 font-semibold underline underline-offset-2 hover:text-primary-700">
+                  cât costă cazierul judiciar
+                </Link>{' '}
+                și ce taxe se aplică.
               </p>
             </div>
 
@@ -888,6 +908,49 @@ export default function CazierJudiciarHubPage() {
             </div>
               );
             })()}
+          </div>
+        </section>
+
+        {/* ──────────────── CAZIER GRATUIT? ──────────────── */}
+        <section className="py-12 lg:py-20 bg-neutral-50">
+          <div className="container mx-auto px-4 max-w-[820px]">
+            <div className="text-center mb-8">
+              <Badge className="bg-primary-100 text-primary-700 font-semibold px-3 py-1 mb-4">
+                Gratuit sau cu plată
+              </Badge>
+              <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900">
+                Cazierul Judiciar Online Este Gratuit?
+              </h2>
+            </div>
+
+            <div className="space-y-4 text-neutral-700 leading-relaxed">
+              <p>
+                Mulți caută &bdquo;cazier judiciar gratuit&rdquo; și este o întrebare legitimă. Iată situația
+                reală: <strong className="text-secondary-900">taxa oficială a fost eliminată</strong> &mdash;
+                din 2024 statul nu mai percepe timbru fiscal pentru cazierul judiciar. Dacă te deplasezi
+                personal la sediul IPJ din județul tău, cu programare și în timpul programului de lucru,
+                documentul în sine este gratuit.
+              </p>
+              <p>
+                <strong className="text-secondary-900">Serviciul online are un cost.</strong> eGhișeul.ro
+                nu îți vinde documentul (acela rămâne gratuit și oficial) &mdash; îți oferă serviciul de
+                a-l obține în locul tău: completarea cererii, verificarea identității, semnătura
+                electronică eIDAS, comunicarea cu IGPR și livrarea pe email sau curier, fără deplasare și
+                fără cozi. Tariful de <strong className="text-secondary-900">198 RON</strong> acoperă acest
+                serviciu complet, cu factură inclusă.
+              </p>
+              <p>
+                <strong className="text-secondary-900">Pe scurt:</strong> dacă ai timp să te deplasezi la
+                ghișeu și să aștepți la coadă, poți obține cazierul gratuit. Dacă vrei să rezolvi totul în
+                câteva minute, de oriunde &mdash; inclusiv din diaspora &mdash; în 2-4 zile lucrătoare,
+                serviciul nostru costă 198 RON. Nu există nicio diferență de valabilitate sau de conținut:
+                ambele documente sunt emise de Poliția Română. Detalii despre{' '}
+                <Link href="/taxa-cazier-judiciar/" className="text-primary-600 font-semibold underline underline-offset-2 hover:text-primary-700">
+                  taxa cazier judiciar
+                </Link>{' '}
+                găsești în ghidul dedicat.
+              </p>
+            </div>
           </div>
         </section>
 

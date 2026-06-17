@@ -37,10 +37,10 @@ import { ServicePrice } from '@/components/services/service-price';
 const SERVICE_SLUG = 'certificat-integritate';
 const PAGE_PATH = '/servicii/certificat-de-integritate-comportamentala/';
 const SCHEMA_SLUG = 'certificat-de-integritate-comportamentala';
-const TITLE = 'Certificat de Integritate Comportamentală Online';
+const TITLE = 'Certificat Integritate Comportamentală Online IGPR';
 const DESCRIPTION =
-  'Certificat de Integritate Comportamentală online de la IGPR (Poliție), necesar la ' +
-  'angajarea cu minori sau medii sensibile. 250 RON, 100% online, livrat pe email.';
+  'Obții certificatul de integritate comportamentală online, fără drum la Poliție. ' +
+  'Taxe IGPR incluse, livrare pe email în zile lucrătoare. Comandă acum.';
 const DATE_PUBLISHED = '2026-06-14';
 const DATE_MODIFIED = '2026-06-14';
 
@@ -334,6 +334,28 @@ export default async function CertificatIntegritatePage() {
                   Poliție și fără deplasare — primești documentul pe email.
                 </p>
               </div>
+              <div className="rounded-2xl border border-neutral-200 bg-white p-6">
+                <h3 className="font-bold text-secondary-900 mb-2">
+                  Cât costă certificatul de integritate comportamentală? Este gratuit?
+                </h3>
+                <p className="text-sm text-neutral-700 leading-relaxed">
+                  Mulți caută „certificat de integritate comportamentala online gratuit”. În realitate, eliberarea{' '}
+                  <strong>nu este gratuită</strong>: IGPR percepe o <strong>taxă oficială</strong> pentru fiecare
+                  certificat. Diferența este cum o plătești. La ghișeul Poliției achiți taxa și te deplasezi personal;
+                  prin eGhișeul plătești <strong>{service.base_price} RON cu taxa IGPR inclusă</strong>, completezi
+                  totul online și primești documentul pe email — fără cont pe platforma oficială și fără drum la sediu.
+                  Nu există costuri ascunse.
+                </p>
+                <p className="text-sm text-neutral-700 leading-relaxed mt-3">
+                  <Link
+                    href="/ghid-complet-certificat-de-integritate-comportamentala/"
+                    className="text-primary-600 font-semibold hover:text-primary-700"
+                  >
+                    Vezi ghidul complet despre certificatul de integritate comportamentală
+                  </Link>
+                  .
+                </p>
+              </div>
             </div>
           </div>
         </section>
@@ -463,6 +485,13 @@ export default async function CertificatIntegritatePage() {
                   acest certificat are un <strong>scop mult mai restrâns</strong>: atestă strict că persoana nu a
                   fost sancționată pentru infracțiuni împotriva minorilor sau a altor categorii vulnerabile.
                 </p>
+                <p className="text-sm text-neutral-700 leading-relaxed mb-3">
+                  Vrei comparația detaliată?{' '}
+                  <Link href="/cazier-judiciar-vs-certificat-integritate-comportamentala/" className="text-primary-600 font-semibold hover:text-primary-700">
+                    cazier judiciar vs. certificat de integritate comportamentală
+                  </Link>
+                  .
+                </p>
                 <p className="text-sm text-neutral-700 leading-relaxed">
                   Ai nevoie și de cazierul judiciar?{' '}
                   <Link href="/servicii/cazier-judiciar-online/" className="text-primary-600 font-semibold hover:text-primary-700">
@@ -486,6 +515,24 @@ export default async function CertificatIntegritatePage() {
                 </p>
               </div>
             </div>
+
+            <div className="mt-8 rounded-2xl border border-neutral-200 bg-neutral-50 p-6">
+              <h2 className="text-xl font-bold text-secondary-900 mb-4">
+                Obții certificatul online, indiferent de oraș
+              </h2>
+              <p className="text-sm text-neutral-700 leading-relaxed mb-3">
+                Serviciul este <strong>100% online</strong>, așa că nu contează în ce localitate te afli: poți obține
+                certificatul de integritate comportamentală din <strong>București, Cluj, Iași, Timișoara, Constanța
+                sau orice alt județ</strong>, fără să te prezinți la un ghișeu IGPR local. Cererea se depune electronic
+                la Inspectoratul General al Poliției Române, iar documentul îți este livrat pe email.
+              </p>
+              <p className="text-sm text-neutral-700 leading-relaxed">
+                Unele instituții sau angajatori folosesc denumirea de{' '}
+                <strong>„adeverință de integritate comportamentală”</strong> — este vorba despre <strong>același
+                document oficial</strong> emis de IGPR conform Legii 118/2019. Indiferent de denumirea cerută în
+                dosar, certificatul obținut prin eGhișeul este documentul valabil legal.
+              </p>
+            </div>
           </div>
         </section>
 
@@ -499,7 +546,10 @@ export default async function CertificatIntegritatePage() {
             { q: 'Cât durează eliberarea?', a: `${formatEstimatedDays(service)} în mod standard. Există și opțiunea Urgent, în ${service.urgent_days} zile lucrătoare.` },
             { q: 'Cât este valabil certificatul?', a: 'De regulă aproximativ 6 luni de la eliberare, însă valabilitatea efectivă depinde de cerințele instituției sau angajatorului care îl solicită. Verifică termenul cerut înainte de depunere.' },
             { q: 'De ce aveți nevoie de datele mele personale?', a: 'Datele personale și actul de identitate sunt necesare pentru a depune cererea la IGPR în numele tău și pentru verificarea de identitate (KYC), cerută de procedura oficială. Datele sunt prelucrate securizat.' },
-            { q: 'Este gratuit?', a: `Nu. IGPR percepe o taxă oficială pentru eliberarea certificatului. La noi plătești ${service.base_price} RON cu taxele oficiale incluse, 100% online și fără deplasare.` },
+            { q: 'Pot obține certificatul de integritate comportamentală online, fără să merg la Poliție?', a: 'Da. Întregul proces este online: completezi formularul, faci verificarea de identitate și plătești, iar noi depunem cererea la IGPR. Primești certificatul pe email, fără deplasare și fără cont pe platforma oficială.' },
+            { q: 'Certificatul de integritate comportamentală este gratuit?', a: 'Nu. IGPR percepe o taxă oficială pentru eliberare. Prin eGhișeul plătești prețul afișat, cu taxa oficială inclusă, fără costuri suplimentare.' },
+            { q: 'Pot obține certificatul în Cluj, București sau alt oraș?', a: 'Da. Pentru că serviciul este 100% online, îl poți obține din orice județ — București, Cluj, Iași, Timișoara, Constanța sau oriunde te afli — fără să te deplasezi la un sediu IGPR local.' },
+            { q: '„Adeverința de integritate comportamentală” este același lucru cu certificatul?', a: 'Da. Unele instituții folosesc denumirea de adeverință, dar se referă la același document oficial emis de IGPR conform Legii 118/2019.' },
             { q: 'Cum primesc documentul?', a: 'Pe email, ca PDF semnat electronic de IGPR. La cerere, certificatul poate fi livrat și prin curier.' },
           ]}
         />
