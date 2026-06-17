@@ -226,6 +226,10 @@ export default async function CertificatConstatatorPage() {
                       </li>
                     ))}
                   </ul>
+                  <p className="mt-3 text-white/75 text-xs sm:text-sm leading-relaxed">
+                    Cererea este depusă la <strong className="text-white/90">ONRC</strong> de avocatul nostru
+                    colaborator, înscris în Barou, care coordonează procedura în numele tău.
+                  </p>
                 </div>
               </div>
 

@@ -194,6 +194,10 @@ export default async function CertificatCelibatPage() {
                       </li>
                     ))}
                   </ul>
+                  <p className="mt-3 text-white/75 text-xs sm:text-sm leading-relaxed">
+                    Avocatul nostru colaborator, înscris în Barou, depune cererea prin împuternicire la
+                    <strong className="text-white/90"> Starea Civilă</strong> și coordonează procedura în numele tău.
+                  </p>
                 </div>
               </div>
 

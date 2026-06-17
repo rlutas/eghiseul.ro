@@ -228,7 +228,8 @@ export default async function CazierJudiciarPFPage() {
                 <div className="bg-white/10 backdrop-blur-sm rounded-xl p-5 border border-white/20 mb-6">
                   <p className="text-white/90 leading-relaxed text-sm sm:text-base">
                     <strong className="text-primary-500">Cazierul Judiciar</strong> este documentul oficial
-                    care atestă că nu ai antecedente penale. Îl obții rapid de la noi:
+                    care atestă că nu ai antecedente penale. Avocatul nostru colaborator, înscris în Barou,
+                    depune cererea la IGPR și coordonează procedura legală în numele tău:
                   </p>
                   <ul className="mt-3 space-y-1.5 text-white/85 text-sm">
                     <li className="flex items-center gap-2">
@@ -372,8 +373,8 @@ export default async function CazierJudiciarPFPage() {
                 Prin eGhișeul obții <strong>cazierul judiciar online pentru persoane fizice</strong> în 2-4 zile
                 lucrătoare, fără să te deplasezi la ghișeu și fără cont SPV. Completezi formularul în câteva minute,
                 îți încarci actul de identitate și un selfie pentru verificarea identității, plătești securizat, iar
-                noi depunem cererea în numele tău pe baza unei împuterniciri. Primești documentul pe email (PDF) și,
-                opțional, prin curier.
+                avocatul colaborator înscris în Barou depune cererea la IGPR în numele tău, pe baza unei împuterniciri.
+                Primești documentul pe email (PDF) și, opțional, prin curier.
               </p>
               <div className="rounded-2xl border border-neutral-200 bg-neutral-50 p-5">
                 <h3 className="font-bold text-secondary-900 mb-2">

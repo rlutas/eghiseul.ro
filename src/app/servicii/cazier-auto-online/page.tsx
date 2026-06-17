@@ -182,7 +182,8 @@ export default async function CazierAutoOnlinePage() {
                 <div className="bg-white/10 backdrop-blur-sm rounded-xl p-5 border border-white/20 mb-6">
                   <p className="text-white/90 leading-relaxed text-sm sm:text-base">
                     <strong className="text-primary-500">Cazierul auto</strong> îți arată istoricul real al unei
-                    mașini înainte să o cumperi. Îl obții rapid de la noi:
+                    mașini înainte să o cumperi. Îl obții rapid de la noi, cu un avocat colaborator înscris în
+                    Barou care coordonează procedura legală în numele tău:
                   </p>
                   <ul className="mt-3 space-y-1.5 text-white/85 text-sm">
                     {[

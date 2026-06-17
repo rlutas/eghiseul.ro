@@ -179,7 +179,7 @@ export default async function CertificatNasterePage() {
                   <ul className="mt-3 space-y-1.5 text-white/85 text-sm">
                     {[
                       'Completezi datele (nume, CNP, data și localitatea nașterii)',
-                      'Verificăm și depunem cererea la Starea Civilă',
+                      'Avocatul colaborator depune cererea prin împuternicire la Starea Civilă',
                       'Plătești securizat (taxe incluse)',
                       `Primești certificatul în ${formatEstimatedDays(service)}`,
                     ].map((step) => (
@@ -189,6 +189,10 @@ export default async function CertificatNasterePage() {
                       </li>
                     ))}
                   </ul>
+                  <p className="mt-3 text-white/75 text-xs sm:text-sm leading-relaxed">
+                    Avocatul nostru colaborator, înscris în Barou, depune cererea prin împuternicire la
+                    <strong className="text-white/90"> Starea Civilă</strong> și coordonează procedura în numele tău.
+                  </p>
                 </div>
               </div>
 

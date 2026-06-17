@@ -377,7 +377,9 @@ export default function CazierJudiciarHubPage() {
 
                 <div className="bg-white/10 backdrop-blur-sm rounded-xl p-5 border border-white/20 mb-6">
                   <p className="text-white/90 leading-relaxed text-sm sm:text-base">
-                    <strong className="text-primary-500">Cazierul judiciar</strong> se obține simplu, în 4 pași:
+                    <strong className="text-primary-500">Cazierul judiciar</strong> se obține simplu, în 4 pași.
+                    Avocatul nostru colaborator, înscris în Barou, depune cererea la IGPR și coordonează
+                    procedura legală în numele tău:
                   </p>
                   <ul className="mt-3 space-y-1.5 text-white/85 text-sm">
                     {[

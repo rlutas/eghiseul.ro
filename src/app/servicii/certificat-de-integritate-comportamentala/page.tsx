@@ -196,7 +196,8 @@ export default async function CertificatIntegritatePage() {
                 <div className="bg-white/10 backdrop-blur-sm rounded-xl p-5 border border-white/20 mb-6">
                   <p className="text-white/90 leading-relaxed text-sm sm:text-base">
                     <strong className="text-primary-500">Certificatul de Integritate Comportamentală</strong> se
-                    obține de la IGPR. Îl primești rapid prin noi, fără deplasare:
+                    obține de la IGPR. Îl primești rapid prin noi, fără deplasare. Avocatul nostru colaborator,
+                    înscris în Barou, se ocupă de procedura legală la IGPR în numele tău:
                   </p>
                   <ul className="mt-3 space-y-1.5 text-white/85 text-sm">
                     {[
@@ -446,7 +447,7 @@ export default async function CertificatIntegritatePage() {
             <div className="relative grid sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-6">
               <div className="hidden lg:block absolute top-8 left-[12.5%] right-[12.5%] h-0.5 bg-gradient-to-r from-primary-500/0 via-primary-500/50 to-primary-500/0" aria-hidden="true" />
               {[
-                { step: 1, title: 'Completezi Formularul', desc: 'Introduci datele personale necesare pentru cererea la IGPR.', icon: FileText },
+                { step: 1, title: 'Completezi Formularul', desc: 'Introduci datele personale, iar avocatul colaborator depune cererea la IGPR în numele tău.', icon: FileText },
                 { step: 2, title: 'Verificare Identitate', desc: 'Încarci actul de identitate și faci un selfie pentru verificarea KYC.', icon: ScanFace },
                 { step: 3, title: 'Plătești Securizat', desc: 'Card, Apple Pay, Google Pay — taxele oficiale sunt incluse în preț.', icon: CreditCard },
                 { step: 4, title: 'Primești Certificatul', desc: `În ${formatEstimatedDays(service)} primești documentul pe email sau prin curier.`, icon: CheckCircle },
