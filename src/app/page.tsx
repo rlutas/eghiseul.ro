@@ -8,6 +8,7 @@ import { HowItWorksSection } from '@/components/home/how-it-works-section';
 import { PricingSection } from '@/components/home/pricing-section';
 import { TestimonialsSection } from '@/components/home/testimonials-section';
 import { FAQSection } from '@/components/home/faq-section';
+import { ArticlesSection } from '@/components/home/articles-section';
 import { FinalCTASection } from '@/components/home/final-cta-section';
 import { Footer } from '@/components/home/footer';
 
@@ -45,7 +46,10 @@ export default function HomePage() {
       {/* 9. FAQ */}
       <FAQSection />
 
-      {/* 10. Final CTA */}
+      {/* 10. Ghiduri & articole recente (parity cu site-ul WP + internal linking) */}
+      <ArticlesSection />
+
+      {/* 11. Final CTA */}
       <FinalCTASection />
 
       {/* Footer */}
