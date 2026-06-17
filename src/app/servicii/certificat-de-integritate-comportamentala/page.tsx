@@ -21,7 +21,7 @@ import {
   CreditCard,
   ScanFace,
 } from 'lucide-react';
-import { Service, ServiceOption, formatEstimatedDays } from '@/types/services';
+import { Service, ServiceOption, formatEstimatedDays, formatUrgentDays } from '@/types/services';
 import { Footer } from '@/components/home/footer';
 import { MobileStickyCTA } from '@/components/services/mobile-sticky-cta';
 import { WhatsAppButton } from '@/components/services/whatsapp-button';
@@ -244,7 +244,7 @@ export default async function CertificatIntegritatePage() {
                           <Zap className="h-5 w-5 text-secondary-900" aria-hidden="true" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="font-bold text-secondary-900 text-sm">Urgent: {service.urgent_days} zile lucrătoare</p>
+                          <p className="font-bold text-secondary-900 text-sm">Urgent: {formatUrgentDays(service)}</p>
                         </div>
                       </div>
                     )}
@@ -543,7 +543,7 @@ export default async function CertificatIntegritatePage() {
             { q: 'Ce este certificatul de integritate comportamentală?', a: 'Este documentul oficial eliberat de IGPR (Poliția Română) care atestă că persoana nu a fost sancționată pentru infracțiuni împotriva unor categorii vulnerabile, în special minori. A fost introdus prin Legea 118/2019.' },
             { q: 'Care este diferența față de cazierul judiciar?', a: 'Nu sunt același document. Cazierul judiciar arată toate condamnările penale, pe când certificatul de integritate comportamentală are un scop mult mai restrâns — atestă strict lipsa sancțiunilor pentru infracțiuni asupra minorilor și a persoanelor vulnerabile.' },
             { q: 'Când este obligatoriu?', a: 'Conform Legii 118/2019, este cerut la angajarea în roluri care presupun contact direct cu minori sau cu persoane vulnerabile: școli, creșe, after-school, cluburi sportive de copii, voluntariat și medii sensibile precum cel medical sau social.' },
-            { q: 'Cât durează eliberarea?', a: `${formatEstimatedDays(service)} în mod standard. Există și opțiunea Urgent, în ${service.urgent_days} zile lucrătoare.` },
+            { q: 'Cât durează eliberarea?', a: `${formatEstimatedDays(service)} în mod standard. Există și opțiunea Urgent, în ${formatUrgentDays(service)}.` },
             { q: 'Cât este valabil certificatul?', a: 'De regulă aproximativ 6 luni de la eliberare, însă valabilitatea efectivă depinde de cerințele instituției sau angajatorului care îl solicită. Verifică termenul cerut înainte de depunere.' },
             { q: 'De ce aveți nevoie de datele mele personale?', a: 'Datele personale și actul de identitate sunt necesare pentru a depune cererea la IGPR în numele tău și pentru verificarea de identitate (KYC), cerută de procedura oficială. Datele sunt prelucrate securizat.' },
             { q: 'Pot obține certificatul de integritate comportamentală online, fără să merg la Poliție?', a: 'Da. Întregul proces este online: completezi formularul, faci verificarea de identitate și plătești, iar noi depunem cererea la IGPR. Primești certificatul pe email, fără deplasare și fără cont pe platforma oficială.' },

@@ -36,6 +36,7 @@ export interface Service {
    */
   processing_config?: {
     estimated_days_display?: string;
+    urgent_days_display?: string;
     [key: string]: unknown;
   } | null;
   meta_title: string | null;
@@ -54,6 +55,16 @@ export interface Service {
 export function formatEstimatedDays(service: Pick<Service, 'estimated_days' | 'processing_config'>): string {
   return service.processing_config?.estimated_days_display
     ?? `${service.estimated_days} zile lucrătoare`;
+}
+
+/**
+ * Format the urgent delivery time for display. Prefers the custom
+ * `urgent_days_display` range (e.g., "1-2 zile lucrătoare") when set,
+ * otherwise falls back to the single `urgent_days` number.
+ */
+export function formatUrgentDays(service: Pick<Service, 'urgent_days' | 'processing_config'>): string | null {
+  if (service.processing_config?.urgent_days_display) return service.processing_config.urgent_days_display;
+  return service.urgent_days != null ? `${service.urgent_days} zile lucrătoare` : null;
 }
 
 // Service Option Entity
