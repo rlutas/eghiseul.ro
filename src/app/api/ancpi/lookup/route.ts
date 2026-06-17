@@ -22,6 +22,30 @@ export const maxDuration = 30; // ANCPI is flaky → allow time for retries
 const UA =
   'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36';
 
+// Lowercase + strip Romanian diacritics so "Agăș" matches "Agas" etc.
+function norm(s: string): string {
+  return (s || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '') // strip combining marks (ă â î ș ț → a a i s t)
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
+}
+
+// Administrative noise words + pure numbers are dropped so we compare on the
+// DISTINCTIVE part of a locality name. This keeps Bucharest sectors working
+// ("Bucuresti Sectorul 6" -> just "bucuresti", which Esri returns) while still
+// rejecting a same-street match in another town ("Agas" -> "agas").
+const LOC_STOPWORDS = new Set([
+  'sectorul', 'sector', 'municipiul', 'municipiu', 'orasul', 'oras',
+  'comuna', 'com', 'satul', 'sat', 'judetul', 'judet', 'nr',
+]);
+function localityTokens(loc: string): string[] {
+  return norm(loc)
+    .split(' ')
+    .filter((t) => t && !LOC_STOPWORDS.has(t) && !/^\d+$/.test(t));
+}
+
 async function fetchJson(url: string, tries = 1): Promise<unknown | null> {
   for (let i = 0; i < tries; i++) {
     try {
@@ -52,16 +76,52 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ success: false, error: 'Adresă sau localitate necesară.' }, { status: 400 });
   }
 
-  // 1) Geocode (Esri World) → Stereo70 (EPSG:3844).
+  // 1) Geocode (Esri World) → Stereo70 (EPSG:3844). Ask for several candidates +
+  //    locality fields so we can REJECT a same-street-name match in the wrong town
+  //    (e.g. "Strada Pârâului 100, Agăș" wrongly geocodes to Târgu Ocna). Without
+  //    this guard ANCPI happily returns a real-but-wrong parcel → false positive.
   const singleLine = [address, localitate, judet, 'Romania'].filter(Boolean).join(', ');
   const geoUrl =
     'https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/findAddressCandidates' +
-    `?f=json&maxLocations=1&outFields=Match_addr,Addr_type&outSR=%7B%22wkid%22%3A3844%7D&SingleLine=${encodeURIComponent(singleLine)}`;
-  const geo = (await fetchJson(geoUrl, 2)) as { candidates?: Array<{ location: { x: number; y: number }; score: number; address: string; attributes?: { Addr_type?: string } }> } | null;
-  const c = geo?.candidates?.[0];
-  if (!c) {
+    `?f=json&maxLocations=5&outFields=Match_addr,Addr_type,City,Subregion,Region&outSR=%7B%22wkid%22%3A3844%7D&SingleLine=${encodeURIComponent(singleLine)}`;
+  type Candidate = {
+    location: { x: number; y: number };
+    score: number;
+    address: string;
+    attributes?: { Addr_type?: string; City?: string; Subregion?: string; Region?: string };
+  };
+  const geo = (await fetchJson(geoUrl, 2)) as { candidates?: Candidate[] } | null;
+  const candidates = geo?.candidates ?? [];
+  if (!candidates.length) {
     return NextResponse.json({ success: true, data: { found: false, reason: 'geocode_failed' } });
   }
+
+  // Pick the best candidate whose locality matches the requested one. When a
+  // `localitate` was given, a mismatch is a HARD reject — we'd rather return
+  // nothing than a confident parcel in the wrong town.
+  const wantToks = localityTokens(localitate);
+  const inLocality = (cand: Candidate): boolean => {
+    if (!wantToks.length) return true; // nothing distinctive to check → accept best match
+    const hay = norm([cand.address, cand.attributes?.City, cand.attributes?.Subregion, cand.attributes?.Region].filter(Boolean).join(' '));
+    return wantToks.every((t) => hay.includes(t));
+  };
+  const c = candidates.find(inLocality);
+  if (!c) {
+    // Esri found something, but not in the requested locality → wrong-town match.
+    return NextResponse.json({
+      success: true,
+      data: {
+        found: false,
+        reason: 'locality_mismatch',
+        requestedLocality: localitate || null,
+        geocodedElsewhere: candidates.slice(0, 3).map((x) => ({ address: x.address, score: x.score })),
+      },
+    });
+  }
+  // Approximate matches (street-level, not an exact building point) are riskier —
+  // flag so the operator double-checks before issuing the extras.
+  const addrType = c.attributes?.Addr_type ?? null;
+  const approximate = addrType != null && !['PointAddress', 'StreetAddress'].includes(addrType);
 
   // 2) Find the cadastral parcel at the geocoded point. We use the layer-1
   //    SPATIAL QUERY (intersects) rather than `identify` — same data, but a more
@@ -76,7 +136,7 @@ export async function GET(req: NextRequest) {
     `?geometry=${geom}&geometryType=esriGeometryPoint&inSR=3844&spatialRel=esriSpatialRelIntersects` +
     '&distance=25&units=esriSRUnit_Meter' +
     '&outFields=NATIONAL_CADASTRAL_REFERENCE,IMMOVABLE_ID,INSPIRE_ID&returnGeometry=false&f=json';
-  const q = (await fetchJson(qUrl, 6)) as { features?: Array<{ attributes: Record<string, string | number> }> } | null;
+  const q = (await fetchJson(qUrl, 10)) as { features?: Array<{ attributes: Record<string, string | number> }> } | null;
   if (q === null) {
     return NextResponse.json({ success: true, data: { found: false, reason: 'ancpi_unavailable', geocoded: { address: c.address, score: c.score } } });
   }
@@ -95,7 +155,7 @@ export async function GET(req: NextRequest) {
     success: true,
     data: {
       found: parcels.length > 0,
-      geocoded: { address: c.address, score: c.score, type: c.attributes?.Addr_type ?? null, x, y },
+      geocoded: { address: c.address, score: c.score, type: addrType, approximate, x, y },
       parcels,
     },
   });

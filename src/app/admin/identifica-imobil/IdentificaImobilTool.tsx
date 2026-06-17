@@ -6,7 +6,9 @@ interface Parcel { cf: string | null; immovableId: string | null; inspireId: str
 interface LookupData {
   found: boolean;
   reason?: string;
-  geocoded?: { address: string; score: number; type?: string | null; x?: number; y?: number };
+  requestedLocality?: string | null;
+  geocodedElsewhere?: Array<{ address: string; score: number }>;
+  geocoded?: { address: string; score: number; type?: string | null; approximate?: boolean; x?: number; y?: number };
   parcels?: Parcel[];
 }
 
@@ -87,6 +89,11 @@ export function IdentificaImobilTool() {
               )}
             </p>
           )}
+          {res.geocoded?.approximate && (
+            <p className="rounded bg-amber-50 border border-amber-200 px-3 py-2 text-xs text-amber-800">
+              ⚠️ Potrivire <strong>aproximativă</strong> (la nivel de stradă, nu adresă exactă) — verifică manual pe geoportal înainte de a emite extrasul.
+            </p>
+          )}
           {res.found && res.parcels?.length ? (
             <div className="space-y-1">
               <p className="font-semibold text-green-700">✓ Parcelă identificată:</p>
@@ -98,6 +105,23 @@ export function IdentificaImobilTool() {
               <p className="text-xs text-neutral-500">
                 Pentru apartamente, acesta e CF-ul parcelei/blocului — folosește-l ca punct de plecare pentru a găsi unitatea.
               </p>
+            </div>
+          ) : res.reason === 'locality_mismatch' ? (
+            <div className="space-y-1 text-amber-700">
+              <p>
+                ⚠️ Adresa a fost găsită, dar <strong>NU în localitatea „{res.requestedLocality}”</strong> — probabil aceeași denumire de stradă în altă localitate. Nu emit un rezultat ca să evităm imobilul greșit.
+              </p>
+              {res.geocodedElsewhere?.length ? (
+                <div className="text-xs text-neutral-500">
+                  Esri a potrivit în schimb:
+                  <ul className="list-disc pl-5">
+                    {res.geocodedElsewhere.map((g, i) => (
+                      <li key={i}>{g.address} (scor {g.score})</li>
+                    ))}
+                  </ul>
+                  Caută manual după proprietar pe rp.ancpi.ro.
+                </div>
+              ) : null}
             </div>
           ) : (
             <p className="text-amber-700">
