@@ -83,7 +83,7 @@ export const metadata = buildPageMetadata({
   title: TITLE,
   description: DESCRIPTION,
   path: PAGE_PATH,
-  ogImage: '/og/default.png',
+  ogImage: '/og/services/cazier-judiciar.png',
 });
 
 // Full Schema.org @graph — same depth as the hub page.

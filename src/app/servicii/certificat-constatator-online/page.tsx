@@ -72,7 +72,7 @@ export const metadata = buildPageMetadata({
   title: TITLE,
   description: DESCRIPTION,
   path: PAGE_PATH,
-  ogImage: '/og/default.png',
+  ogImage: '/og/services/certificat-constatator.png',
 });
 
 const jsonLdGraph = buildServicePageGraph({
