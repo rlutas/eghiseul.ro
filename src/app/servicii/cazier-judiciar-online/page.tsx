@@ -5,7 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Footer } from '@/components/home/footer';
 import { MobileStickyCTA } from '@/components/services/mobile-sticky-cta';
-import { ServiceFAQ, type FAQ, type FAQCategory } from '@/components/services/service-faq';
+import { ServiceFAQ, type FAQ } from '@/components/services/service-faq';
 import { ReviewsSection } from '@/components/services/reviews-section';
 import { GoogleReviewsBadge } from '@/components/services/google-reviews-badge';
 import { buildPageMetadata, buildServicePageGraph, BASE_URL } from '@/lib/seo';
@@ -35,7 +35,6 @@ import {
   Plane,
   Gavel,
   MapPin,
-  Star,
 } from 'lucide-react';
 
 // =============================================================================
@@ -198,15 +197,6 @@ const USE_CASE_CATEGORIES = [
 // =============================================================================
 // FAQ (15+ items — răspunsuri 50-150 cuvinte, grupate pe categorii)
 // =============================================================================
-
-const FAQ_CATEGORIES: FAQCategory[] = [
-  { key: 'procesare', label: 'Procesare & Termene', icon: 'Timer', color: 'gold' },
-  { key: 'pret', label: 'Prețuri & Plată', icon: 'CircleDollarSign', color: 'green' },
-  { key: 'documente', label: 'Documente & Date', icon: 'FileSignature', color: 'blue' },
-  { key: 'utilizare', label: 'Utilizare & Valabilitate', icon: 'Shield', color: 'purple' },
-  { key: 'strainatate', label: 'Pentru Diaspora & Străinătate', icon: 'Plane', color: 'teal' },
-  { key: 'altele', label: 'Alte Întrebări', icon: 'HelpCircle', color: 'rose' },
-];
 
 const FAQ_ITEMS: FAQ[] = [
   {
@@ -791,53 +781,38 @@ export default function CazierJudiciarHubPage() {
         </section>
 
         {/* ──────────────── CUM FUNCȚIONEAZĂ ──────────────── */}
-        <section className="py-12 lg:py-20 bg-neutral-50">
-          <div className="container mx-auto px-4 max-w-[1000px]">
-            <div className="text-center mb-12">
-              <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-3">
-                Cum Funcționează — 4 Pași Simpli
-              </h2>
-              <p className="text-neutral-600">
-                Procesul complet durează 2-4 zile lucrătoare. Tu petreci 5 minute, restul facem noi.
+        {/* How it works — dark connected timeline (CF parity) */}
+        <section className="relative overflow-hidden bg-gradient-to-b from-secondary-900 to-[#0C1A2F] py-14 lg:py-24">
+          <div className="absolute inset-0 opacity-5">
+            <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, #ECB95F 1px, transparent 0)', backgroundSize: '40px 40px' }} />
+          </div>
+          <div className="relative container mx-auto px-4 max-w-[1100px]">
+            <div className="text-center mb-14">
+              <span className="inline-block px-4 py-1.5 bg-primary-500/15 text-primary-400 text-sm font-semibold rounded-full mb-4 border border-primary-500/30">
+                Proces simplu
+              </span>
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white mb-3">Cum Funcționează?</h2>
+              <p className="text-white/70 max-w-2xl mx-auto">
+                Procesul complet durează 2-4 zile lucrătoare (1-2 urgent). Tu petreci 5 minute, restul facem noi.
               </p>
             </div>
-
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="relative grid sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-6">
+              <div className="hidden lg:block absolute top-8 left-[12.5%] right-[12.5%] h-0.5 bg-gradient-to-r from-primary-500/0 via-primary-500/50 to-primary-500/0" aria-hidden="true" />
               {[
-                {
-                  step: 1,
-                  icon: FileText,
-                  title: 'Completezi Formularul',
-                  desc: 'Datele tale personale (sau ale firmei), motivul solicitării, opțiunile dorite.',
-                },
-                {
-                  step: 2,
-                  icon: Lock,
-                  title: 'Verificare Identitate',
-                  desc: 'Încarci poza CI/pașaport + selfie. Validare automată cu inteligență artificială.',
-                },
-                {
-                  step: 3,
-                  icon: CreditCard,
-                  title: 'Plată Securizată',
-                  desc: 'Stripe: card, Apple Pay, Google Pay. Primești factură pe email imediat.',
-                },
-                {
-                  step: 4,
-                  icon: Mail,
-                  title: 'Primești Cazierul',
-                  desc: 'PDF semnat electronic pe email + opțional original prin curier.',
-                },
+                { step: 1, icon: FileText, title: 'Completezi Formularul', desc: 'Datele tale (sau ale firmei), motivul solicitării și opțiunile dorite.' },
+                { step: 2, icon: Lock, title: 'Verificare Identitate', desc: 'Încarci CI/pașaport + selfie. Validare automată cu inteligență artificială.' },
+                { step: 3, icon: CreditCard, title: 'Plată Securizată', desc: 'Stripe: card, Apple Pay, Google Pay. Primești factura pe email imediat.' },
+                { step: 4, icon: Mail, title: 'Primești Cazierul', desc: 'PDF semnat electronic pe email + opțional originalul prin curier.' },
               ].map((item) => {
                 const Icon = item.icon;
                 return (
-                  <div key={item.step} className="relative bg-white rounded-xl p-6 border border-neutral-200">
-                    <div className="absolute -top-3 -left-3 w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center text-secondary-900 font-bold text-sm">
-                      {item.step}
+                  <div key={item.step} className="relative text-center">
+                    <div className="relative z-10 mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-400 to-primary-600 text-secondary-900 shadow-[0_8px_24px_rgba(236,185,95,0.35)]">
+                      <Icon className="h-7 w-7" aria-hidden="true" />
+                      <span className="absolute -top-2 -right-2 flex h-7 w-7 items-center justify-center rounded-full bg-white text-sm font-extrabold text-secondary-900 shadow-md">{item.step}</span>
                     </div>
-                    <Icon className="w-8 h-8 text-primary-600 mb-3" />
-                    <h3 className="font-bold text-secondary-900 mb-2">{item.title}</h3>
-                    <p className="text-sm text-neutral-600 leading-relaxed">{item.desc}</p>
+                    <h3 className="text-lg font-bold text-white mb-2">{item.title}</h3>
+                    <p className="text-sm text-white/65 leading-relaxed max-w-[240px] mx-auto">{item.desc}</p>
                   </div>
                 );
               })}
@@ -1019,145 +994,6 @@ export default function CazierJudiciarHubPage() {
           </div>
         </section>
 
-        {/* ──────────────── REVIEWS / SOCIAL PROOF ──────────────── */}
-        <section className="py-12 lg:py-20 bg-gradient-to-b from-secondary-900 to-[#0C1A2F] text-white">
-          <div className="container mx-auto px-4 max-w-[1100px]">
-            <div className="text-center mb-10">
-              <div className="inline-flex items-center gap-1 mb-4">
-                {[1, 2, 3, 4, 5].map((s) => (
-                  <Star
-                    key={s}
-                    className="w-7 h-7 fill-primary-500 text-primary-500"
-                  />
-                ))}
-              </div>
-              <h2 className="text-2xl sm:text-3xl font-bold mb-3">
-                Peste 450 de Recenzii Pozitive — 4.9 ★ din 5
-              </h2>
-              <p className="text-white/70 max-w-2xl mx-auto">
-                Mii de clienți au obținut deja cazierul judiciar prin platforma noastră.
-                Recenzii agregate din Google Business Profile și Trustpilot.
-              </p>
-            </div>
-
-            {(() => {
-              const REVIEWS = [
-                {
-                  quote: 'Am avut nevoie urgent de cazier judiciar pentru un job în Germania. L-am primit pe email în 2 zile, fără să mă deplasez deloc. Recomand!',
-                  author: 'Maria P.',
-                  initials: 'MP',
-                  city: 'Cluj-Napoca',
-                  scenario: 'Job străinătate',
-                  avatarBg: 'bg-gradient-to-br from-rose-400 to-rose-600',
-                },
-                {
-                  quote: 'Proces simplu și rapid. Pentru firmă am avut nevoie de cazier pentru licitație și am primit totul în 3 zile. Documentul oficial cu ștampila Poliției.',
-                  author: 'Andrei M.',
-                  initials: 'AM',
-                  city: 'București',
-                  scenario: 'Licitație publică',
-                  avatarBg: 'bg-gradient-to-br from-blue-400 to-blue-600',
-                },
-                {
-                  quote: 'Trăiesc în Italia de 5 ani și am avut nevoie de cazier pentru rezidență. Am completat formularul, am plătit și am primit documentul în 4 zile prin DHL.',
-                  author: 'Cristina R.',
-                  initials: 'CR',
-                  city: 'Torino, Italia',
-                  scenario: 'Rezidență UE',
-                  avatarBg: 'bg-gradient-to-br from-emerald-400 to-emerald-600',
-                  featured: true,
-                },
-                {
-                  quote: 'Suportul este foarte rapid — am avut o întrebare despre traducere și mi-au răspuns în 20 de minute. Au făcut și apostila pentru SUA, totul perfect.',
-                  author: 'Vlad S.',
-                  initials: 'VS',
-                  city: 'Iași',
-                  scenario: 'Viză SUA',
-                  avatarBg: 'bg-gradient-to-br from-purple-400 to-purple-600',
-                },
-                {
-                  quote: 'Am ales opțiunea urgentă pentru că aveam un termen strict pentru un dosar. Am primit cazierul a doua zi. Foarte profesionist.',
-                  author: 'Ioana D.',
-                  initials: 'ID',
-                  city: 'Timișoara',
-                  scenario: 'Procesare urgentă',
-                  avatarBg: 'bg-gradient-to-br from-amber-400 to-amber-600',
-                },
-                {
-                  quote: 'Cea mai bună soluție pentru cei care nu au timp să stea la cozi. Am terminat tot în 5 minute, apoi am uitat de el — a venit pe email la timp.',
-                  author: 'Dan T.',
-                  initials: 'DT',
-                  city: 'Brașov',
-                  scenario: 'Angajare',
-                  avatarBg: 'bg-gradient-to-br from-teal-400 to-teal-600',
-                },
-              ];
-              return (
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-              {REVIEWS.map((review, i) => (
-                <div
-                  key={i}
-                  className={cn(
-                    'relative bg-white/[0.06] hover:bg-white/[0.09] border rounded-2xl p-5 backdrop-blur transition-colors',
-                    review.featured
-                      ? 'border-primary-500/40 sm:col-span-2 lg:col-span-1 lg:row-span-2 ring-2 ring-primary-500/10'
-                      : 'border-white/10 hover:border-white/20',
-                  )}
-                >
-                  {review.featured && (
-                    <span className="absolute -top-2.5 right-4 inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide px-2 py-1 rounded-full bg-primary-500 text-secondary-900">
-                      <Star className="w-3 h-3 fill-current" aria-hidden="true" />
-                      Recenzie verificată
-                    </span>
-                  )}
-
-                  <div className="flex items-center gap-0.5 mb-3">
-                    {[1, 2, 3, 4, 5].map((s) => (
-                      <Star
-                        key={s}
-                        className="w-4 h-4 fill-primary-500 text-primary-500"
-                        aria-hidden="true"
-                      />
-                    ))}
-                  </div>
-
-                  <p className={cn(
-                    'text-white/90 leading-relaxed mb-5',
-                    review.featured ? 'text-base' : 'text-sm',
-                  )}>
-                    &ldquo;{review.quote}&rdquo;
-                  </p>
-
-                  <div className="flex items-center gap-3 pt-3 border-t border-white/10">
-                    <div className={cn(
-                      'flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-md',
-                      review.avatarBg,
-                    )} aria-hidden="true">
-                      {review.initials}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-white text-sm truncate">{review.author}</p>
-                      <p className="text-xs text-white/50 truncate">{review.city}</p>
-                    </div>
-                    <span className="hidden sm:inline-block text-[10px] px-2 py-1 rounded-full bg-primary-500/20 text-primary-500 whitespace-nowrap">
-                      {review.scenario}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-              );
-            })()}
-
-            <div className="mt-10 text-center">
-              <p className="text-white/60 text-sm">
-                <strong className="text-white">450+ recenzii verificate</strong> &middot; Nota medie{' '}
-                <strong className="text-primary-500">4.9/5</strong> &middot; Procesăm cereri din 2024
-              </p>
-            </div>
-          </div>
-        </section>
-
         {/* ──────────────── DE CE EGHISEUL ──────────────── */}
         <section className="py-12 lg:py-20 bg-white">
           <div className="container mx-auto px-4 max-w-[1100px]">
@@ -1330,7 +1166,6 @@ export default function CazierJudiciarHubPage() {
         {/* ──────────────── FAQ (15+ items) ──────────────── */}
         <ServiceFAQ
           faqs={FAQ_ITEMS}
-          categories={FAQ_CATEGORIES}
           title="Întrebări Frecvente despre Cazierul Judiciar"
         />
 
