@@ -400,14 +400,17 @@ export default function CazierJudiciarHubPage() {
                 <div className="bg-white rounded-3xl shadow-2xl overflow-hidden border border-neutral-100">
                   <div className="relative bg-gradient-to-br from-secondary-900 via-secondary-800 to-[#0C1A2F] p-6 text-center">
                     <span className="inline-block px-3 py-1 bg-primary-500 text-secondary-900 text-xs font-bold rounded-full mb-3">
-                      TVA INCLUS
+                      TAXE INCLUSE
                     </span>
                     <div className="flex items-baseline justify-center gap-1">
-                      <span className="text-5xl lg:text-6xl font-black text-white">198</span>
+                      {/* 198 RON cu TVA ÷ 1,21 = 163,64 RON fără TVA */}
+                      <span className="text-5xl lg:text-6xl font-black text-white">163,64</span>
                       <span className="text-xl font-bold text-white/70">RON</span>
                     </div>
-                    <p className="text-white/70 text-sm mt-2">Persoană fizică sau firmă — ambele variante</p>
-                    <p className="text-white/50 text-xs mt-1">Fără taxe ascunse</p>
+                    <p className="text-white/70 text-sm mt-2">
+                      + TVA 21% · <span className="font-semibold text-white">198 RON</span> cu TVA
+                    </p>
+                    <p className="text-white/50 text-xs mt-1">Persoană fizică sau firmă — fără taxe ascunse</p>
                   </div>
 
                   <div className="p-5 space-y-3">
