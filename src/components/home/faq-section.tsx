@@ -3,49 +3,7 @@
 import { useState } from 'react';
 import { ChevronDown, MessageCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
-
-const faqs = [
-  {
-    question: 'Cât durează să primesc documentul?',
-    answer:
-      'În funcție de tipul documentului și urgența selectată, livrarea durează între 24 și 72 de ore lucrătoare. Opțiunea Express poate livra în aceeași zi pentru anumite documente.',
-  },
-  {
-    question: 'Ce documente sunt necesare pentru a comanda?',
-    answer:
-      'De obicei, aveți nevoie doar de actul de identitate (CI/pașaport). Pentru anumite servicii, pot fi necesare documente adiționale precum certificat de naștere sau căsătorie. Toate cerințele sunt afișate clar la fiecare serviciu.',
-  },
-  {
-    question: 'Documentele sunt oficiale și recunoscute de autorități?',
-    answer:
-      'Da, toate documentele pe care le oferim sunt documente oficiale emise de instituțiile statului român (MAI, ANAF, ANCPI, etc.). Sunt valabile legal și acceptate de toate instituțiile.',
-  },
-  {
-    question: 'Cum se face plata?',
-    answer:
-      'Acceptăm plata cu cardul (Visa, Mastercard), transfer bancar sau numerar la curier. Emitem factură fiscală pentru toate plățile. Datele cardului sunt procesate securizat prin Stripe.',
-  },
-  {
-    question: 'Ce se întâmplă dacă documentul conține erori?',
-    answer:
-      'Verificăm fiecare document înainte de livrare. Dacă identificăm o eroare din vina noastră sau a instituției emitente, corectăm documentul gratuit și refacem livrarea fără costuri suplimentare.',
-  },
-  {
-    question: 'Pot comanda pentru altă persoană?',
-    answer:
-      'Da, puteți comanda documente pentru membrii familiei sau alte persoane, cu condiția să aveți acordul acestora și să furnizați o împuternicire notarială pentru anumite tipuri de documente.',
-  },
-  {
-    question: 'Livrați și în străinătate?',
-    answer:
-      'Da, livrăm în toată Uniunea Europeană și internațional. Pentru livrarea în străinătate, costurile și timpul de livrare variază în funcție de țara de destinație.',
-  },
-  {
-    question: 'Ce se întâmplă dacă nu pot obține documentul solicitat?',
-    answer:
-      'În cazul rar în care nu putem obține documentul (de ex. persoana are cazier pozitiv sau documentul nu există), returnăm integral suma plătită în termen de 48 de ore.',
-  },
-];
+import { HOMEPAGE_FAQS } from './faq-data';
 
 export function FAQSection() {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
@@ -68,7 +26,7 @@ export function FAQSection() {
 
         {/* FAQ List */}
         <div className="space-y-3">
-          {faqs.map((faq, index) => (
+          {HOMEPAGE_FAQS.map((faq, index) => (
             <div
               key={index}
               className={cn(

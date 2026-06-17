@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { serviceUrl } from '@/lib/seo';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Clock, Monitor, Users } from 'lucide-react';
 
@@ -97,7 +98,7 @@ export function HeroSection() {
               {services.map((service) => (
                 <Link
                   key={service.slug}
-                  href={`/services/${service.slug}`}
+                  href={service.href ?? serviceUrl(service.slug)}
                   className="group relative flex flex-col p-3 sm:p-3.5 bg-neutral-50 rounded-xl border border-transparent hover:border-primary-500 hover:bg-white hover:shadow-md transition-all min-h-[72px] sm:min-h-[80px]"
                 >
                   {/* Top row: Icon + Badge */}
@@ -176,13 +177,15 @@ interface ServiceItem {
   slug: string;
   icon: LucideIcon;
   badge?: 'Popular' | 'NOU';
+  /** Optional explicit URL (for non-service pages like the rovinietă tool). */
+  href?: string;
 }
 
 const services: ServiceItem[] = [
   { name: 'Cazier Judiciar', slug: 'cazier-judiciar', icon: FileText, badge: 'Popular' },
   { name: 'Certificat Integritate', slug: 'certificat-integritate', icon: Shield },
   { name: 'Cazier Fiscal', slug: 'cazier-fiscal', icon: Receipt },
-  { name: 'Rovinieta Online', slug: 'rovinieta', icon: Car, badge: 'NOU' },
+  { name: 'Rovinieta Online', slug: 'rovinieta', icon: Car, badge: 'NOU', href: '/tools/verificare-rovinieta-online/' },
   { name: 'Cazier Auto', slug: 'cazier-auto', icon: Car },
   { name: 'Certificat Naștere', slug: 'certificat-nastere', icon: User, badge: 'Popular' },
   { name: 'Certificat Căsătorie', slug: 'certificat-casatorie', icon: Heart },

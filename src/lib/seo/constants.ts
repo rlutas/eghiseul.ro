@@ -135,9 +135,12 @@ export const ORGANIZATION = {
   name: 'eGhișeul.ro',
   legalName: 'RapidCert SRL',
   url: BASE_URL,
-  logo: `${BASE_URL}/logo.png`,
+  // No standalone square logo asset yet — use the branded OG image (valid 200)
+  // instead of /logo.png which 404s and invalidates the Organization node.
+  logo: `${BASE_URL}/og/default.png`,
   contactPoint: {
-    telephone: '+40-770-194-101',
+    telephone: '+40-757-708-181',
+    email: 'contact@eghiseul.ro',
     contactType: 'customer service',
     areaServed: 'RO',
     availableLanguage: ['Romanian', 'English'],

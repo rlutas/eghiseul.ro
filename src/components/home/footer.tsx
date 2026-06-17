@@ -131,7 +131,7 @@ export function Footer() {
         <div className="container mx-auto px-4 py-5 sm:py-6 max-w-[1100px]">
           <div className="flex flex-col md:flex-row justify-between items-center gap-3 sm:gap-4 text-sm">
             <p className="text-white/50 text-center md:text-left text-xs sm:text-sm">
-              © 2025 eGhișeul.ro. Toate drepturile rezervate.
+              © {new Date().getFullYear()} eGhișeul.ro. Toate drepturile rezervate.
             </p>
             <div className="flex items-center gap-1.5 sm:gap-2">
               {[...Array(5)].map((_, i) => (
