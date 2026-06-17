@@ -3,7 +3,6 @@ import Link from 'next/link';
 import { createPublicClient } from '@/lib/supabase/public';
 import { Badge } from '@/components/ui/badge';
 import {
-  ArrowRight,
   Clock,
   Shield,
   Zap,
@@ -19,6 +18,7 @@ import {
   Gavel,
   Briefcase,
   MapPin,
+  X,
 } from 'lucide-react';
 import { Service, ServiceOption } from '@/types/services';
 import { Footer } from '@/components/home/footer';
@@ -290,9 +290,34 @@ export default async function CertificatConstatatorPage() {
           </div>
         </section>
 
+        {/* Trust strip */}
+        <section className="bg-white border-b border-neutral-200">
+          <div className="container mx-auto px-4 max-w-[1100px] py-6 lg:py-8">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+              {[
+                { icon: Zap, value: 'Câteva minute', label: 'Eliberare automată 24/7' },
+                { icon: Landmark, value: 'ONRC', label: 'Document oficial semnat' },
+                { icon: Building2, value: 'Doar CUI-ul', label: 'Fără cont RECOM' },
+                { icon: CheckCircle, value: '4.9/5', label: 'Peste 450 recenzii' },
+              ].map((t) => (
+                <div key={t.label} className="flex flex-col items-center gap-1.5">
+                  <div className="w-11 h-11 bg-primary-50 rounded-xl flex items-center justify-center">
+                    <t.icon className="h-5 w-5 text-primary-600" aria-hidden="true" />
+                  </div>
+                  <p className="text-base lg:text-lg font-extrabold text-secondary-900 leading-tight">{t.value}</p>
+                  <p className="text-xs text-neutral-500 leading-tight">{t.label}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
         {/* SEO Intro */}
         <section className="py-12 lg:py-16 bg-neutral-50">
           <div className="container mx-auto px-4 max-w-[820px]">
+            <span className="inline-block px-4 py-1.5 bg-primary-100 text-primary-700 text-sm font-semibold rounded-full mb-4">
+              Despre serviciu
+            </span>
             <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-5">
               Ce este Certificatul Constatator ONRC și de unde se obține
             </h2>
@@ -404,6 +429,13 @@ export default async function CertificatConstatatorPage() {
                 autoritățile și partenerii cer un certificat emis în <strong>ultimele 30 de zile</strong>; la licitațiile
                 publice (SEAP/SICAP) se acceptă de regulă unul nu mai vechi de 30 de zile.
               </p>
+              <p className="mt-3 text-sm text-neutral-600">
+                Nu ești sigur ce tip îți trebuie?{' '}
+                <Link href="/cele-4-tipuri-de-certificat-constatator-online/" className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
+                  Vezi ghidul cu toate tipurile de certificat constatator
+                </Link>
+                .
+              </p>
             </div>
           </div>
         </section>
@@ -440,41 +472,132 @@ export default async function CertificatConstatatorPage() {
           </div>
         </section>
 
-        {/* How it works */}
-        <section className="py-12 lg:py-20 bg-neutral-50">
-          <div className="container mx-auto px-4 max-w-[1400px]">
-            <div className="text-center mb-12">
-              <span className="inline-block px-4 py-1.5 bg-primary-100 text-primary-700 text-sm font-semibold rounded-full mb-4">
+        {/* How it works — dark connected timeline (CF parity) */}
+        <section className="relative overflow-hidden bg-gradient-to-b from-secondary-900 to-[#0C1A2F] py-14 lg:py-24">
+          <div className="absolute inset-0 opacity-5">
+            <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, #ECB95F 1px, transparent 0)', backgroundSize: '40px 40px' }} />
+          </div>
+          <div className="relative container mx-auto px-4 max-w-[1100px]">
+            <div className="text-center mb-14">
+              <span className="inline-block px-4 py-1.5 bg-primary-500/15 text-primary-400 text-sm font-semibold rounded-full mb-4 border border-primary-500/30">
                 Proces simplu
               </span>
-              <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-3">Cum Funcționează?</h2>
-              <p className="text-neutral-600 max-w-2xl mx-auto">Obții certificatul constatator în 4 pași, 100% online</p>
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white mb-3">Cum Funcționează?</h2>
+              <p className="text-white/70 max-w-2xl mx-auto">Obții certificatul constatator în 4 pași, 100% online — fără drum la ghișeu.</p>
             </div>
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
+            <div className="relative grid sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-6">
+              <div className="hidden lg:block absolute top-8 left-[12.5%] right-[12.5%] h-0.5 bg-gradient-to-r from-primary-500/0 via-primary-500/50 to-primary-500/0" aria-hidden="true" />
               {[
-                { step: 1, title: 'Introduci CUI-ul', desc: 'Completezi codul unic de înregistrare al firmei. Preluăm automat datele din ONRC.', icon: Building2 },
+                { step: 1, title: 'Introduci CUI-ul', desc: 'Completezi codul unic de înregistrare. Preluăm automat datele din ONRC.', icon: Building2 },
                 { step: 2, title: 'Alegi Tipul', desc: 'Pe firmă, pe persoană fizică sau cu istoric, în funcție de nevoie.', icon: FileText },
                 { step: 3, title: 'Plătești Securizat', desc: 'Card, Apple Pay, Google Pay — taxele ONRC sunt incluse în preț.', icon: Shield },
-                { step: 4, title: 'Primești Documentul', desc: 'În câteva minute primești certificatul constatator pe email (automat, 24/7).', icon: CheckCircle },
-              ].map((item, index) => (
-                <div key={item.step} className="relative">
-                  <div className="bg-white rounded-2xl p-6 h-full border border-neutral-200 hover:border-primary-300 hover:shadow-lg transition-all group">
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="w-12 h-12 bg-primary-500 rounded-xl flex items-center justify-center text-secondary-900 font-bold text-lg group-hover:scale-110 transition-transform">
-                        {item.step}
-                      </div>
-                      <item.icon className="w-5 h-5 text-primary-600" aria-hidden="true" />
-                    </div>
-                    <h3 className="text-lg font-bold text-secondary-900 mb-2">{item.title}</h3>
-                    <p className="text-sm text-neutral-600 leading-relaxed">{item.desc}</p>
+                { step: 4, title: 'Primești Documentul', desc: 'În câteva minute primești certificatul pe email (automat, 24/7).', icon: CheckCircle },
+              ].map((item) => (
+                <div key={item.step} className="relative text-center">
+                  <div className="relative z-10 mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-400 to-primary-600 text-secondary-900 shadow-[0_8px_24px_rgba(236,185,95,0.35)]">
+                    <item.icon className="h-7 w-7" aria-hidden="true" />
+                    <span className="absolute -top-2 -right-2 flex h-7 w-7 items-center justify-center rounded-full bg-white text-sm font-extrabold text-secondary-900 shadow-md">{item.step}</span>
                   </div>
-                  {index < 3 && (
-                    <div className="hidden lg:block absolute top-1/2 -right-4 transform -translate-y-1/2 z-10">
-                      <ArrowRight className="h-5 w-5 text-primary-400" aria-hidden="true" />
-                    </div>
-                  )}
+                  <h3 className="text-lg font-bold text-white mb-2">{item.title}</h3>
+                  <p className="text-sm text-white/65 leading-relaxed max-w-[240px] mx-auto">{item.desc}</p>
                 </div>
               ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Bine de știut — fără taxă de urgență + edge case */}
+        <section className="py-12 lg:py-16 bg-neutral-50">
+          <div className="container mx-auto px-4 max-w-[1000px]">
+            <div className="text-center mb-8">
+              <span className="inline-block px-4 py-1.5 bg-primary-100 text-primary-700 text-sm font-semibold rounded-full mb-4">
+                Bine de știut
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900">Transparent, fără surprize</h2>
+            </div>
+            <div className="grid md:grid-cols-2 gap-5">
+              <div className="rounded-2xl border border-green-200 bg-green-50/60 p-6 flex items-start gap-4">
+                <div className="w-12 h-12 flex-shrink-0 bg-green-100 rounded-xl flex items-center justify-center">
+                  <Zap className="w-6 h-6 text-green-600" aria-hidden="true" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-secondary-900 mb-1.5">Fără taxă de urgență</h3>
+                  <p className="text-sm text-neutral-700 leading-relaxed">
+                    Sistemul nostru depune și emite cererile <strong>automat, 24/7</strong> — primești certificatul în
+                    câteva minute, <strong>fără taxă de urgență</strong>. La alți operatori, urgența costă în plus.
+                  </p>
+                </div>
+              </div>
+              <div className="rounded-2xl border border-amber-200 bg-amber-50/60 p-6 flex items-start gap-4">
+                <div className="w-12 h-12 flex-shrink-0 bg-amber-100 rounded-xl flex items-center justify-center">
+                  <Clock className="w-6 h-6 text-amber-600" aria-hidden="true" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-secondary-900 mb-1.5">Dacă apare o întârziere</h3>
+                  <p className="text-sm text-neutral-700 leading-relaxed">
+                    Dacă <strong>CUI-ul introdus este greșit</strong> sau sistemul ONRC este în mentenanță, certificatul
+                    se eliberează în <strong>timpul programului de lucru</strong> și e posibil să te contactăm pentru
+                    verificare.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Comparison — eGhișeul vs alți operatori vs ghișeu vs portal (CF parity) */}
+        <section className="py-12 lg:py-20 bg-white">
+          <div className="container mx-auto px-4 max-w-[1000px]">
+            <div className="text-center mb-10">
+              <span className="inline-block px-4 py-1.5 bg-primary-100 text-primary-700 text-sm font-semibold rounded-full mb-4">
+                De ce eGhișeul
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-3">
+                eGhișeul vs alți operatori, ghișeul ONRC și portalul RECOM
+              </h2>
+              <p className="text-neutral-600 max-w-2xl mx-auto">
+                Același certificat oficial ONRC — diferă timpul, taxele și comoditatea.
+              </p>
+            </div>
+            <div className="overflow-x-auto rounded-3xl border border-neutral-200 bg-white shadow-sm">
+              <div className="grid grid-cols-[1.4fr_1fr_1fr_1fr_1fr] min-w-[800px] text-sm">
+                <div className="bg-neutral-50 p-4 font-semibold text-secondary-900" />
+                <div className="bg-primary-500 p-4 text-center font-extrabold text-secondary-900">eGhișeul</div>
+                <div className="bg-neutral-50 p-4 text-center font-semibold text-neutral-600">Alți operatori</div>
+                <div className="bg-neutral-50 p-4 text-center font-semibold text-neutral-600">Ghișeu ONRC</div>
+                <div className="bg-neutral-50 p-4 text-center font-semibold text-neutral-600">Portal RECOM</div>
+                {[
+                  ['Timp de obținere', 'Câteva minute', 'În program de lucru', 'Drum + așteptare', 'Cont + semnătură'],
+                  ['Taxă de urgență', '0 RON', '~19 lei', '—', '—'],
+                  ['Disponibil 24/7', true, false, false, true],
+                  ['Cont/semnătură necesare', false, false, '—', true],
+                  ['Deplasare la ghișeu', false, false, true, false],
+                  ['Taxe ONRC incluse', true, 'Variabil', 'Separat', 'Separat'],
+                  ['Livrare pe email', 'Automat', true, 'Ridici fizic', 'Manual'],
+                ].map((row, i) => (
+                  <div key={row[0] as string} className="contents">
+                    <div className={`p-4 font-medium text-secondary-800 border-t border-neutral-100 ${i % 2 ? 'bg-neutral-50/50' : ''}`}>{row[0]}</div>
+                    {[1, 2, 3, 4].map((col) => {
+                      const v = row[col];
+                      const highlight = col === 1;
+                      return (
+                        <div key={col} className={`flex items-center justify-center p-4 border-t border-neutral-100 text-center ${highlight ? 'bg-primary-50' : i % 2 ? 'bg-neutral-50/50' : ''}`}>
+                          {v === true ? (
+                            <CheckCircle className={`h-5 w-5 ${highlight ? 'text-green-600' : 'text-green-500'}`} aria-label="Da" />
+                          ) : v === false ? (
+                            <X className="h-5 w-5 text-neutral-300" aria-label="Nu" />
+                          ) : (
+                            <span className={`text-xs sm:text-sm ${highlight ? 'font-bold text-secondary-900' : 'text-neutral-600'}`}>{v}</span>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="mt-8 text-center">
+              <OrderButton href={`/comanda/${SERVICE_SLUG}`}>Comandă certificatul acum</OrderButton>
             </div>
           </div>
         </section>
@@ -489,6 +612,10 @@ export default async function CertificatConstatatorPage() {
             { q: 'Ce tipuri de certificat constatator pot comanda?', a: 'Trei: pe firmă (situația la zi a societății), pe persoană fizică (dacă o persoană deține calitatea de asociat/administrator în firme) și cu istoric (toate modificările firmei de la înființare până în prezent).' },
             { q: 'Certificatul constatator este la zi?', a: 'Da. Certificatul reflectă situația firmei din ziua eliberării, cu toate mențiunile actualizate înscrise la ONRC până la acel moment.' },
             { q: 'Cât durează eliberarea?', a: 'De obicei câteva minute — sistemul emite automat, 24/7. În cazuri rare (procesare ONRC mai lentă) poate dura mai mult.' },
+            { q: 'Cât costă un certificat constatator?', a: `De la ${service.base_price} RON cu taxele ONRC incluse (pe firmă sau pe persoană fizică); varianta cu istoric este 487 RON cu TVA. Fără costuri ascunse.` },
+            { q: 'De unde obțin certificatul constatator?', a: 'De la Oficiul Național al Registrului Comerțului (ONRC). Prin eGhișeul îl obții 100% online, fără cont RECOM și fără drum la ghișeu — îl primești pe email.' },
+            { q: 'Care e diferența dintre certificatul de bază și cel extins?', a: 'Sunt denumiri folosite uzual pentru certificatul pe firmă: „de bază" = situația la zi a societății, iar „extins" = aceleași date plus mențiuni și detalii suplimentare. La noi îl comanzi ca certificat constatator pe firmă, care include datele complete.' },
+            { q: 'Se poate obține gratuit certificatul constatator?', a: 'Anumite informații sunt disponibile gratuit prin portalul RECOM al ONRC, dar certificatul constatator oficial (semnat electronic) presupune o taxă ONRC și, de regulă, cont și semnătură electronică. Prin eGhișeul îl primești fără cont și fără deplasare.' },
             { q: 'Pot obține certificat pentru orice firmă?', a: 'Da, pentru orice persoană juridică sau entitate înregistrată la Registrul Comerțului: SRL, SA, PFA, II sau IF. Ai nevoie doar de CUI-ul firmei.' },
             { q: 'Este valabil pentru licitații publice?', a: 'Da. Certificatul constatator este unul dintre documentele acceptate la licitațiile publice din SEAP/SICAP pentru a dovedi eligibilitatea și datele de identificare ale ofertantului.' },
             { q: 'Cât este valabil certificatul constatator?', a: 'Reflectă situația din ziua eliberării. În practică, autoritățile și partenerii cer un certificat emis în ultimele 30 de zile; la licitații se acceptă de regulă unul nu mai vechi de 30 de zile.' },
