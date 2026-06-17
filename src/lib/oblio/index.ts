@@ -27,6 +27,9 @@ export {
 export { ensureInvoiceForPaidOrder } from './ensure-invoice';
 export type { EnsureInvoiceResult } from './ensure-invoice';
 
+// Admin toggle — pause automatic invoicing (e.g. in test) without code changes
+export { isInvoicingEnabled } from './invoicing-enabled';
+
 // Types
 export type {
   OblioCompany,

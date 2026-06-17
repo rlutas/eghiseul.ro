@@ -113,6 +113,7 @@ export async function PATCH(request: NextRequest) {
       'lawyer_data',
       'document_counters',
       'document_templates',
+      'invoicing',
     ];
 
     if (!ALLOWED_KEYS.includes(key)) {

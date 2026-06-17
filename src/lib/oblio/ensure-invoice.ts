@@ -19,6 +19,7 @@
 
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createInvoiceFromOrder } from './invoice';
+import { isInvoicingEnabled } from './invoicing-enabled';
 
 type PaymentMethodType = 'Card' | 'Transfer bancar' | 'Cash';
 
@@ -26,6 +27,7 @@ export type EnsureInvoiceResult =
   | { status: 'created'; invoiceNumber: string; invoiceUrl: string | null }
   | { status: 'already_exists'; invoiceNumber: string }
   | { status: 'locked' }
+  | { status: 'disabled' }
   | { status: 'failed'; error: string };
 
 const LOCK_STALE_MS = 2 * 60 * 1000;
@@ -56,6 +58,14 @@ export async function ensureInvoiceForPaidOrder(
   }
   if (o.payment_status !== 'paid') {
     return { status: 'failed', error: 'Order is not paid' };
+  }
+
+  // 1b. Admin kill-switch: automatic Oblio invoicing can be paused from
+  //     Settings → Plăți (e.g. in test, so we don't create invoices that then
+  //     have to be deleted). Defaults to ON; only an explicit toggle disables it.
+  if (!(await isInvoicingEnabled())) {
+    console.log(`[ensure-invoice] invoicing disabled in settings — skipping order ${orderId}`);
+    return { status: 'disabled' };
   }
 
   // 2. Atomic claim — only the winner creates the invoice. Self-expires after

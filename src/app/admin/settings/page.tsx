@@ -956,6 +956,10 @@ function PaymentsTab() {
     bank_name: '',
     account_holder: '',
   });
+  // Automatic Oblio invoicing toggle (default ON). Pause in test to avoid
+  // creating invoices that then have to be deleted.
+  const [invoicingEnabled, setInvoicingEnabled] = useState(true);
+  const [savingInvoicing, setSavingInvoicing] = useState(false);
 
   const fetchSettings = useCallback(async () => {
     setLoading(true);
@@ -966,6 +970,8 @@ function PaymentsTab() {
         if (json.data?.bank_details) {
           setBankDetails({ ...bankDetailsDefaults(), ...json.data.bank_details });
         }
+        // Missing setting → enabled (default). Only an explicit false disables.
+        setInvoicingEnabled(json.data?.invoicing?.oblio_enabled !== false);
       }
     } catch {
       toast.error('Eroare la incarcarea setarilor');
@@ -973,6 +979,30 @@ function PaymentsTab() {
       setLoading(false);
     }
   }, []);
+
+  const toggleInvoicing = async (next: boolean) => {
+    setSavingInvoicing(true);
+    setInvoicingEnabled(next); // optimistic
+    try {
+      const res = await fetch('/api/admin/settings', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key: 'invoicing', value: { oblio_enabled: next } }),
+      });
+      const json = await res.json();
+      if (json.success) {
+        toast.success(next ? 'Facturarea automată este PORNITĂ' : 'Facturarea automată este OPRITĂ');
+      } else {
+        setInvoicingEnabled(!next); // revert
+        toast.error(json.error || 'Eroare la salvare');
+      }
+    } catch {
+      setInvoicingEnabled(!next); // revert
+      toast.error('Eroare de retea');
+    } finally {
+      setSavingInvoicing(false);
+    }
+  };
 
   useEffect(() => {
     fetchSettings();
@@ -1135,7 +1165,7 @@ function PaymentsTab() {
             </div>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
           <div className="flex items-center gap-2">
             {oblioConfigured ? (
               <>
@@ -1151,6 +1181,30 @@ function PaymentsTab() {
             <span className="text-xs text-muted-foreground ml-2">
               (din configurare server)
             </span>
+          </div>
+
+          {/* Automatic invoicing kill-switch */}
+          <div className="flex items-start justify-between gap-4 rounded-lg border p-4">
+            <div className="space-y-0.5">
+              <Label htmlFor="invoicing-toggle" className="cursor-pointer text-sm font-medium">
+                Facturare automată
+              </Label>
+              <p className="text-xs text-muted-foreground">
+                Când e PORNITĂ, fiecare comandă plătită primește automat factură Oblio.
+                Oprește-o în test ca să nu se creeze facturi pe care trebuie să le ștergi.
+              </p>
+              {!invoicingEnabled && (
+                <p className="text-xs font-medium text-amber-700 mt-1">
+                  ⚠ OPRITĂ — comenzile plătite NU vor primi factură până repornești.
+                </p>
+              )}
+            </div>
+            <Switch
+              id="invoicing-toggle"
+              checked={invoicingEnabled}
+              onCheckedChange={toggleInvoicing}
+              disabled={savingInvoicing}
+            />
           </div>
         </CardContent>
       </Card>
