@@ -39,9 +39,8 @@ const PAGE_PATH = '/servicii/eliberare-certificat-de-casatorie/';
 const SCHEMA_SLUG = 'eliberare-certificat-de-casatorie';
 const TITLE = 'Certificat de Căsătorie Online — Duplicat 998 RON';
 const DESCRIPTION =
-  'Obține duplicat sau copie legalizată după certificatul de căsătorie online, de la Starea Civilă. ' +
-  '998 RON, livrare pe email — necesar pentru cetățenie, proceduri juridice și administrative, ' +
-  'fără drum la primărie. Util și din diaspora prin împuternicire.';
+  'Duplicat certificat de căsătorie online de la Starea Civilă, 998 RON, fără deplasare. ' +
+  'Pentru act pierdut, din altă localitate sau diaspora. Email + curier.';
 const DATE_PUBLISHED = '2026-06-14';
 const DATE_MODIFIED = '2026-06-14';
 
@@ -349,6 +348,70 @@ export default async function CertificatCasatoriePage() {
                 </div>
               ))}
             </div>
+
+            {/* Situații frecvente — duplicat certificat de căsătorie */}
+            <div className="mt-16 lg:mt-20 max-w-[1100px] mx-auto">
+              <div className="text-center mb-10">
+                <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-3">
+                  Situații frecvente — duplicat certificat de căsătorie
+                </h2>
+                <p className="text-neutral-600 max-w-2xl mx-auto">
+                  Indiferent de motiv, procedura este aceeași: completezi datele soților, noi depunem cererea la
+                  Starea Civilă și primești documentul acasă, prin curier.
+                </p>
+              </div>
+              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
+                {[
+                  {
+                    icon: FileWarning,
+                    title: 'Certificat de căsătorie pierdut sau deteriorat',
+                    desc: 'Dacă ai pierdut certificatul de căsătorie, ți-a fost furat sau s-a deteriorat, soliciți un duplicat — un certificat nou, oficial, emis de Serviciul de Stare Civilă. Depunem cererea de duplicat în numele tău, fără să stai la coadă.',
+                  },
+                  {
+                    icon: Landmark,
+                    title: 'Din altă localitate, fără deplasare',
+                    desc: 'Duplicatul se eliberează de primăria din localitatea unde a fost înregistrată căsătoria, dar nu trebuie să mergi acolo. Depunem cererea prin împuternicire la primăria competentă și îți trimitem certificatul prin curier — fără programare.',
+                  },
+                  {
+                    icon: Users,
+                    title: 'Prin împuternicire',
+                    desc: 'Cererea o poate depune oricare dintre soți sau o persoană împuternicită. Ai nevoie de datele complete ale soților (nume, prenume, CNP), data și localitatea căsătoriei — împuternicirea o pregătim noi.',
+                  },
+                  {
+                    icon: Globe,
+                    title: 'Din diaspora',
+                    desc: 'Românii plecați din țară pot obține duplicatul fără să revină acasă. Depunem cererea prin împuternicire la primăria de înregistrare și îți trimitem documentul prin curier — util pentru dosare de cetățenie sau acte la autoritățile străine.',
+                  },
+                ].map((c) => (
+                  <div
+                    key={c.title}
+                    className="bg-neutral-50 rounded-2xl p-5 border border-neutral-200 hover:border-primary-300 hover:shadow-lg hover:-translate-y-1 transition-all duration-200"
+                  >
+                    <div className="w-12 h-12 bg-gradient-to-br from-primary-100 to-primary-200 rounded-xl flex items-center justify-center mb-4">
+                      <c.icon className="w-6 h-6 text-primary-600" aria-hidden="true" />
+                    </div>
+                    <h3 className="text-base font-bold text-secondary-900 mb-2 leading-snug">{c.title}</h3>
+                    <p className="text-sm text-neutral-700 leading-relaxed">{c.desc}</p>
+                  </div>
+                ))}
+              </div>
+              <p className="text-sm text-neutral-600 text-center mt-6 max-w-2xl mx-auto">
+                Duplicatul este un document oficial emis de Starea Civilă și se livrează prin curier în zile
+                lucrătoare — nu este un document generat instant. Ai nevoie și de un{' '}
+                <Link href="/servicii/eliberare-certificat-de-nastere/" className="text-primary-600 font-medium hover:underline">
+                  certificat de naștere
+                </Link>{' '}
+                sau de un{' '}
+                <Link href="/servicii/eliberare-certificat-de-celibat/" className="text-primary-600 font-medium hover:underline">
+                  certificat de celibat
+                </Link>
+                ? Le poți comanda la fel de simplu. Vezi și{' '}
+                <Link href="/cum-vor-arata-documentele-de-stare-civila-2025/" className="text-primary-600 font-medium hover:underline">
+                  cum vor arăta documentele de stare civilă în 2025
+                </Link>
+                .
+              </p>
+            </div>
           </div>
         </section>
 
@@ -472,7 +535,10 @@ export default async function CertificatCasatoriePage() {
             { q: 'Cât durează eliberarea?', a: `${formatEstimatedDays(service)} în mod standard, în funcție de Starea Civilă a localității. Pentru căsătorii mai vechi sau din altă localitate poate dura puțin mai mult. Există și opțiunea Urgent.` },
             { q: 'Cât este valabil certificatul de căsătorie?', a: 'Certificatul de căsătorie nu expiră — atestă un eveniment de stare civilă. Totuși, unele instituții (în special pentru proceduri de cetățenie) pot cere un duplicat recent, emis în ultimele luni.' },
             { q: 'Cine poate cere un duplicat?', a: 'Oricare dintre soți, sau o persoană împuternicită. În anumite cazuri (succesiune, deces), îl pot solicita și descendenții sau persoanele cu interes legitim, cu documente justificative.' },
-            { q: 'Cum primesc documentul?', a: 'Duplicatul certificatului de căsătorie este un document fizic oficial. Îți trimitem confirmarea și o copie pe email, iar originalul / copia legalizată ajunge la tine prin curier.' },
+            { q: 'Cum primesc documentul?', a: 'Duplicatul certificatului de căsătorie este un document fizic oficial. Îți trimitem confirmarea și o copie pe email, iar originalul / copia legalizată ajunge la tine prin curier în zile lucrătoare.' },
+            { q: 'Ce este certificatul de căsătorie digital sau în format 2025?', a: 'Din 2025 actele de stare civilă se emit și în format digitalizat, cu noul model securizat. Indiferent de model, duplicatul rămâne un document oficial emis de Starea Civilă și se livrează fizic prin curier — nu este generat instant online.' },
+            { q: 'Trebuie să fac programare pentru eliberarea duplicatului?', a: 'Nu. Prin eGhișeul nu ai nevoie de programare la ghișeul Stării Civile și nu stai la coadă. Completezi cererea online, iar noi depunem documentația la primărie în numele tău, pe bază de împuternicire.' },
+            { q: 'Ce acte îmi trebuie pentru un duplicat de certificat de căsătorie?', a: 'Ai nevoie de un act de identitate valabil al solicitantului și de datele căsătoriei: numele și prenumele soților, CNP-urile, data și localitatea unde a fost înregistrată căsătoria. Pentru depunerea cererii se adaugă o împuternicire, pe care o pregătim noi.' },
           ]}
         />
 

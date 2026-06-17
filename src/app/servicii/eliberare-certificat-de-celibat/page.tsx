@@ -36,11 +36,10 @@ import { ServicePrice } from '@/components/services/service-price';
 const SERVICE_SLUG = 'certificat-celibat';
 const PAGE_PATH = '/servicii/eliberare-certificat-de-celibat/';
 const SCHEMA_SLUG = 'eliberare-certificat-de-celibat';
-const TITLE = 'Certificat de Celibat Online — 179 RON';
+const TITLE = 'Certificat de Celibat Online România — 179 RON';
 const DESCRIPTION =
-  'Certificat de Celibat (dovada că nu ești căsătorit) online, necesar pentru căsătoria în ' +
-  'străinătate sau obținerea cetățeniei. 179 RON, 100% online, fără drum la ghișeu. ' +
-  'Îl primești rapid pe email și prin curier, fără deplasare.';
+  'Certificat de celibat online de la Starea Civilă, 179 RON, fără drum la ghișeu. ' +
+  'Pentru căsătorie în străinătate, cetățenie sau din altă localitate. Email + curier.';
 const DATE_PUBLISHED = '2026-06-14';
 const DATE_MODIFIED = '2026-06-14';
 
@@ -470,6 +469,42 @@ export default async function CertificatCelibatPage() {
                 </p>
               </div>
             </div>
+
+            <div className="mt-6 rounded-2xl border border-neutral-200 bg-neutral-50 p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 bg-gradient-to-br from-primary-100 to-primary-200 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <Globe className="w-5 h-5 text-primary-600" aria-hidden="true" />
+                </div>
+                <h2 className="text-xl font-bold text-secondary-900">
+                  Certificat de celibat din altă localitate sau din diaspora
+                </h2>
+              </div>
+              <div className="space-y-3 text-sm text-neutral-700 leading-relaxed">
+                <p>
+                  Certificatul de celibat se eliberează la Serviciul de Stare Civilă din{' '}
+                  <strong>localitatea de domiciliu</strong>, indiferent unde te afli acum. Dacă ești plecat în alt
+                  oraș sau în <strong>diaspora</strong>, nu trebuie să te întorci în România: completezi datele
+                  online, noi depunem cererea în localitatea ta de domiciliu, iar documentul îl primești pe email
+                  și prin curier la adresa indicată.
+                </p>
+                <p>
+                  Astfel obții <strong>certificat de celibat în România</strong> chiar dacă locuiești în
+                  străinătate — exact varianta de care ai nevoie când pregătești dosarul de{' '}
+                  <strong>căsătorie în străinătate</strong> și nu te poți deplasa la ghișeu.
+                </p>
+                <p className="text-neutral-600">
+                  Ai nevoie și de alte documente de stare civilă? Vezi și{' '}
+                  <Link href="/servicii/eliberare-certificat-de-nastere/" className="text-primary-600 font-semibold hover:underline">
+                    certificatul de naștere
+                  </Link>{' '}
+                  sau{' '}
+                  <Link href="/servicii/eliberare-certificat-de-casatorie/" className="text-primary-600 font-semibold hover:underline">
+                    certificatul de căsătorie
+                  </Link>
+                  , pe care le poți obține tot online.
+                </p>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -484,6 +519,8 @@ export default async function CertificatCelibatPage() {
             { q: 'Cât durează eliberarea certificatului de celibat?', a: `${formatEstimatedDays(service)} în mod standard. Dacă ai nevoie mai repede, există și opțiunea Urgent. Apostila și traducerea pot adăuga câteva zile.` },
             { q: 'Cât este valabil certificatul de celibat?', a: 'Reflectă situația din ziua eliberării. În practică, autoritățile (mai ales cele străine) cer un certificat emis recent — de obicei în ultimele 3-6 luni. Verifică termenul cerut de instituția unde îl depui.' },
             { q: 'Cine poate cere certificatul de celibat?', a: 'Persoana în cauză, pe baza datelor proprii de stare civilă. Prin eGhișeul completezi datele tale și noi depunem cererea în localitatea ta de domiciliu, fără să te deplasezi.' },
+            { q: 'Pot obține certificatul de celibat din altă localitate sau din diaspora?', a: 'Da. Certificatul se eliberează la Starea Civilă din localitatea ta de domiciliu, dar nu trebuie să te deplasezi acolo. Completezi datele online, noi depunem cererea, iar documentul ajunge la tine pe email și prin curier, oriunde te-ai afla în țară sau în străinătate.' },
+            { q: 'Cât costă certificatul de celibat în România?', a: 'Prin eGhișeul costă 179 RON, cu taxele incluse, fără cont și fără drum la ghișeu. Apostila de la Haga și traducerea legalizată, dacă îl folosești în străinătate, se pot adăuga separat la comandă.' },
             { q: 'Cum primesc documentul?', a: 'Îl primești pe email și, în plus, originalul prin curier la adresa indicată. Astfel ai și varianta digitală rapidă, și documentul fizic oficial pentru dosar.' },
           ]}
         />

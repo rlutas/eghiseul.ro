@@ -33,11 +33,10 @@ import { buildPageMetadata, buildServicePageGraph, BASE_URL, serviceUrl } from '
 const SERVICE_SLUG = 'identificare-imobil';
 const PAGE_PATH = '/servicii/identificare-imobil/';
 const SCHEMA_SLUG = 'identificare-imobil';
-const TITLE = 'Identificare Imobil după Adresă — Află Numărul Cadastral';
+const TITLE = 'Număr Cadastral după Adresă — Îl Aflăm Noi | Extras CF';
 const DESCRIPTION =
-  'Nu știi numărul cadastral sau de carte funciară? Îți identificăm imobilul după adresă ' +
-  '(parcelă/construcție + nr. CF) direct de la ANCPI și primești și extrasul de carte funciară. ' +
-  '198 RON, taxe incluse. 100% online, fără cont ANCPI.';
+  'Ne dai adresa, îți aflăm numărul cadastral și de carte funciară din ANCPI ' +
+  'și primești extrasul CF pe email. 198 RON, taxe incluse, fără cont ANCPI.';
 const DATE_PUBLISHED = '2026-06-16';
 const DATE_MODIFIED = '2026-06-16';
 
@@ -316,6 +315,47 @@ export default async function IdentificareImobilPage() {
                   </p>
                 </div>
               </div>
+
+              <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
+                <h3 className="text-lg font-bold text-secondary-900 mb-3">
+                  Localizare teren după număr cadastral și verificare cadastru online
+                </h3>
+                <p className="text-sm sm:text-base text-neutral-700 leading-relaxed mb-3">
+                  Identificarea funcționează în ambele sensuri. Dacă ai doar adresa, îți aflăm numărul
+                  cadastral și de carte funciară. Dacă ai deja un <strong>număr cadastral</strong> și vrei să
+                  <strong> localizezi terenul</strong> sau să faci o <strong>verificare cadastru online</strong>,
+                  confirmăm parcela în sistemul ANCPI și îți spunem cui aparține și ce situație juridică are.
+                </p>
+                <p className="text-sm sm:text-base text-neutral-700 leading-relaxed">
+                  Rezultatul nu este o simplă căutare pe hartă: îți eliberăm și <strong>extrasul oficial de
+                  carte funciară</strong>, documentul care confirmă proprietarul, suprafața și eventualele
+                  sarcini (ipoteci, interdicții, litigii) — exact ce ai nevoie înainte de o tranzacție.
+                </p>
+              </div>
+
+              <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
+                <h3 className="text-lg font-bold text-secondary-900 mb-3">
+                  Vrei să afli singur numărul cadastral?
+                </h3>
+                <p className="text-sm sm:text-base text-neutral-700 leading-relaxed">
+                  Dacă preferi să încerci pe cont propriu, am scris un ghid pas cu pas despre{' '}
+                  <Link
+                    href="/cum-aflam-numarul-carte-functionara-si-nr-cadastral/"
+                    className="font-semibold text-primary-700 underline underline-offset-2 hover:text-primary-800"
+                  >
+                    cum afli numărul de carte funciară și numărul cadastral
+                  </Link>
+                  . Dacă ai deja numărul și vrei doar documentul, mergi direct la{' '}
+                  <Link
+                    href={serviceUrl('extras-carte-funciara')}
+                    className="font-semibold text-primary-700 underline underline-offset-2 hover:text-primary-800"
+                  >
+                    extrasul de carte funciară
+                  </Link>
+                  . Serviciul de față e pentru situația în care <strong>nu cunoști numărul</strong> și vrei
+                  să îl aflăm noi după adresă, împreună cu extrasul CF.
+                </p>
+              </div>
             </div>
           </div>
         </section>
@@ -460,6 +500,9 @@ export default async function IdentificareImobilPage() {
           title="Întrebări Frecvente — Identificare Imobil după Adresă"
           faqs={[
             { q: 'Cum aflu numărul cadastral după adresă?', a: 'Ne dai adresa completă a imobilului, iar noi localizăm parcela/construcția în sistemul ANCPI și identificăm numărul cadastral și de carte funciară. Primești rezultatul pe email, împreună cu extrasul CF.' },
+            { q: 'Cum aflu numărul de carte funciară după adresă?', a: 'La fel ca pentru numărul cadastral: pornind de la adresă, identificăm imobilul în sistemul ANCPI și îți comunicăm numărul de carte funciară. Primești și extrasul CF aferent, pe email.' },
+            { q: 'Pot localiza un teren după numărul cadastral?', a: 'Da. Dacă ai deja numărul cadastral, confirmăm parcela în sistemul ANCPI, îți spunem proprietarul și situația juridică și îți eliberăm extrasul de carte funciară. Funcționează și invers, după adresă.' },
+            { q: 'Cum fac o verificare de cadastru online?', a: 'Ne trimiți adresa sau numărul cadastral, iar noi facem verificarea în sistemul oficial ANCPI și îți returnăm extrasul de carte funciară — proprietar, suprafață și eventuale sarcini. Totul 100% online, fără cont ANCPI.' },
             { q: 'Ce primesc concret?', a: 'Numărul cadastral și/sau de carte funciară al imobilului identificat și extrasul de carte funciară aferent, livrate pe email.' },
             { q: 'Cât costă identificarea imobilului?', a: `${service.base_price} RON, cu taxele ANCPI și extrasul CF incluse. Fără costuri ascunse.` },
             { q: 'Cât durează?', a: `${formatEstimatedDays(service)}. Verificarea este făcută de un operator, pentru că presupune căutarea imobilului după adresă.` },

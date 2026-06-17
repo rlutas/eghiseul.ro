@@ -39,9 +39,8 @@ const PAGE_PATH = '/servicii/cazier-auto-online/';
 const SCHEMA_SLUG = 'cazier-auto-online';
 const TITLE = 'Cazier Auto Online — Istoric Vehicul, 198 RON';
 const DESCRIPTION =
-  'Cazier Auto online — istoricul complet al vehiculului: accidente, daune, ' +
-  'kilometraj real și proprietari anteriori. 198 RON, rapid, livrat pe email. ' +
-  'Verifică orice mașină second-hand înainte să o cumperi.';
+  'Verifică istoricul oricărei mașini după numărul de înmatriculare sau VIN: ' +
+  'accidente, daune, kilometraj real și proprietari. 198 RON, raport pe email.';
 const DATE_PUBLISHED = '2026-06-14';
 const DATE_MODIFIED = '2026-06-14';
 
@@ -503,6 +502,59 @@ export default async function CazierAutoOnlinePage() {
                 </p>
               </div>
             </div>
+
+            {/* Cost / taxă — targets "taxa cazier auto", "cazier auto online gratuit" */}
+            <div className="mt-8 max-w-[820px] mx-auto">
+              <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-4">
+                Cât costă cazierul auto și există varianta gratuită?
+              </h2>
+              <div className="space-y-4 text-neutral-700 leading-relaxed">
+                <p>
+                  Cazierul auto costă <strong>198 RON</strong>, o singură taxă, fără costuri ascunse și fără abonament.
+                  Prețul acoperă interogarea bazelor de date relevante și consolidarea <strong>raportului complet</strong>
+                  pe care îl primești pe email. Plătești securizat cu cardul, Apple Pay sau Google Pay, iar raportul
+                  ajunge la tine în {formatEstimatedDays(service)}.
+                </p>
+                <p>
+                  Mulți caută un <strong>cazier auto online gratuit</strong>, însă un raport care chiar verifică
+                  accidentele, kilometrajul real și proprietarii anteriori presupune accesul la baze de date care nu sunt
+                  publice și gratuite. O simplă căutare după numărul de înmatriculare nu îți arată istoricul real al
+                  mașinii. Pentru o decizie corectă înainte de o achiziție second-hand, raportul plătit îți oferă date
+                  pe care nu le poți obține gratuit. Dacă vrei doar să verifici <strong>rovinieta</strong> unei mașini,
+                  poți folosi gratuit{' '}
+                  <Link href="/tools/verificare-rovinieta-online/" className="text-primary-600 font-semibold hover:underline">
+                    instrumentul nostru de verificare rovinietă
+                  </Link>
+                  .
+                </p>
+              </div>
+            </div>
+
+            {/* Eliberare — targets "eliberare cazier auto online", "drpciv cazier auto" */}
+            <div className="mt-8 max-w-[820px] mx-auto">
+              <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-4">
+                Cum se face eliberarea cazierului auto online
+              </h2>
+              <div className="space-y-4 text-neutral-700 leading-relaxed">
+                <p>
+                  <strong>Eliberarea cazierului auto</strong> se face 100% online, fără să te deplasezi la vreun ghișeu și
+                  fără cont. Completezi <strong>numărul de înmatriculare</strong> sau <strong>seria de șasiu (VIN)</strong>,
+                  plătești securizat, iar noi consolidăm și îți trimitem raportul pe email în {formatEstimatedDays(service)}.
+                  Tot procesul este gândit ca să afli rapid istoricul real al mașinii, exact înainte de momentul în care
+                  trebuie să iei o decizie.
+                </p>
+                <p>
+                  Reține că <strong>DRPCIV</strong> și Poliția Rutieră gestionează datele de pe <strong>permisul de
+                  conducere</strong> (puncte de penalizare, sancțiuni) — adică situația <em>șoferului</em>, nu istoricul
+                  unei mașini. Serviciul de aici acoperă <strong>istoricul vehiculului</strong>. Pentru detalii despre ce
+                  conține raportul și cum îl interpretezi, vezi ghidul nostru{' '}
+                  <Link href="/informatii-cazier-auto-online/" className="text-primary-600 font-semibold hover:underline">
+                    informații despre cazierul auto online
+                  </Link>
+                  .
+                </p>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -518,6 +570,11 @@ export default async function CazierAutoOnlinePage() {
             { q: 'Este valabil pentru orice mașină?', a: 'Funcționează pentru majoritatea autovehiculelor înmatriculate. Cantitatea de informații disponibile poate varia în funcție de istoricul și sursele de date asociate vehiculului respectiv.' },
             { q: 'Cum primesc cazierul auto?', a: 'Îl primești pe email, ca raport PDF complet. Nu trebuie să te deplasezi și nu ai nevoie de niciun cont.' },
             { q: 'Este legal să verific istoricul unei mașini?', a: 'Da. Verificarea istoricului unui vehicul pe baza numărului de înmatriculare sau a VIN-ului este o practică uzuală și legală înainte de o tranzacție auto.' },
+            { q: 'Cât costă cazierul auto?', a: 'Cazierul auto costă 198 RON, o singură taxă, fără costuri ascunse și fără abonament. Prețul acoperă verificarea bazelor de date și raportul complet livrat pe email.' },
+            { q: 'Există cazier auto online gratuit?', a: 'Un raport care verifică real accidentele, kilometrajul și proprietarii presupune acces la baze de date care nu sunt gratuite. O simplă căutare după numărul de înmatriculare nu îți arată istoricul real al mașinii, de aceea raportul complet este un serviciu plătit.' },
+            { q: 'Cum se face eliberarea cazierului auto online?', a: 'Eliberarea se face 100% online: completezi numărul de înmatriculare sau seria de șasiu (VIN), plătești securizat și primești raportul pe email. Nu trebuie să te deplasezi la niciun ghișeu și nu ai nevoie de cont.' },
+            { q: 'Cazierul auto se obține de la DRPCIV?', a: 'Nu. DRPCIV și Poliția Rutieră gestionează datele de pe permisul de conducere (puncte de penalizare, sancțiuni) — adică situația șoferului. Cazierul auto de aici se referă la istoricul mașinii (accidente, kilometraj, proprietari), un document diferit.' },
+            { q: 'Ce valabilitate are cazierul auto?', a: 'Raportul reflectă istoricul vehiculului la momentul emiterii. Recomandăm să obții un raport actualizat chiar înainte de tranzacție, ca datele despre kilometraj, daune sau status juridic să fie cât mai recente.' },
           ]}
         />
 
