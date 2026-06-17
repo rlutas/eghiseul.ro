@@ -126,11 +126,11 @@ export function Header() {
         <div className="container mx-auto px-4 max-w-[1100px]">
           <div className="flex items-center justify-between text-sm">
             <div className="flex items-center gap-6">
-              <span className="text-white/70">Luni - Vineri: 09:00 - 18:00</span>
+              <span className="text-white/70">Luni - Vineri: 08:00 - 16:00</span>
               <span className="text-white/30">|</span>
-              <a href="tel:+40312299399" className="flex items-center gap-2 text-primary-500 hover:text-primary-400 transition-colors">
+              <a href="tel:+40757708181" className="flex items-center gap-2 text-primary-500 hover:text-primary-400 transition-colors">
                 <Phone className="w-4 h-4" />
-                +40 312 299 399
+                +40 757 708 181
               </a>
             </div>
             <div className="flex items-center gap-4">
@@ -406,7 +406,7 @@ export function Header() {
                       </div>
                     </Link>
                     <a
-                      href="tel:+40312299399"
+                      href="tel:+40757708181"
                       className="flex items-center gap-3 p-3 bg-white rounded-xl border border-neutral-200 hover:border-primary-300 transition-colors"
                     >
                       <div className="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center">
@@ -414,7 +414,7 @@ export function Header() {
                       </div>
                       <div>
                         <p className="text-xs text-neutral-500">Sună-ne acum</p>
-                        <p className="text-sm font-bold text-secondary-900">+40 312 299 399</p>
+                        <p className="text-sm font-bold text-secondary-900">+40 757 708 181</p>
                       </div>
                     </a>
                   </div>

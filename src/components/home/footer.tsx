@@ -96,8 +96,8 @@ export function Footer() {
                 </div>
                 <div>
                   <p className="text-xs text-white/50">Telefon</p>
-                  <a href="tel:+40312299399" className="text-white hover:text-primary-500 transition-colors font-medium">
-                    +40 312 299 399
+                  <a href="tel:+40757708181" className="text-white hover:text-primary-500 transition-colors font-medium">
+                    +40 757 708 181
                   </a>
                 </div>
               </li>
@@ -118,7 +118,7 @@ export function Footer() {
                 </div>
                 <div>
                   <p className="text-xs text-white/50">Program</p>
-                  <span className="text-white font-medium">Luni - Vineri: 09:00 - 18:00</span>
+                  <span className="text-white font-medium">Luni - Vineri: 08:00 - 16:00</span>
                 </div>
               </li>
             </ul>

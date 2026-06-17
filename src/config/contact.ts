@@ -7,6 +7,17 @@
 export const WHATSAPP_NUMBER = '40757708181';
 export const WHATSAPP_DISPLAY = '+40 757 708 181';
 
+/**
+ * Phone support — same number as WhatsApp. WhatsApp is the preferred channel;
+ * phone is for customers who need to call. Use PHONE_TEL for `href`, PHONE_DISPLAY for text.
+ */
+export const PHONE_TEL = '+40757708181';
+export const PHONE_DISPLAY = '+40 757 708 181';
+
+/** Support / working hours (Romanian), Mon–Fri 08:00–16:00. */
+export const SUPPORT_HOURS = 'Luni – Vineri: 08:00 – 16:00';
+export const SUPPORT_HOURS_SHORT = 'L–V 08:00–16:00';
+
 /** Default prefilled WhatsApp message. */
 export const WHATSAPP_DEFAULT_MSG = 'Bună ziua! Am o întrebare despre serviciile eGhișeul.';
 

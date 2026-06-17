@@ -57,7 +57,7 @@ export default function Page() {
       <h2>6. Contact</h2>
       <p>
         RapidCert SRL · email: <a href="mailto:contact@eghiseul.ro">contact@eghiseul.ro</a> · telefon:
-        <a href="tel:+40312299399"> +40 312 299 399</a> · WhatsApp: +40 757 708 181.
+        <a href="tel:+40757708181"> +40 757 708 181</a> · WhatsApp: +40 757 708 181.
       </p>
     </LegalLayout>
   );

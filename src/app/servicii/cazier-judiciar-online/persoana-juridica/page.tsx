@@ -699,7 +699,7 @@ export default async function CazierJudiciarPJPage() {
               {/* Contact Info */}
               <div className="grid sm:grid-cols-2 gap-4 max-w-lg mx-auto">
                 <a
-                  href="tel:+40312299399"
+                  href="tel:+40757708181"
                   className="flex items-center gap-3 px-5 py-4 bg-white/5 rounded-xl border border-white/10 hover:border-blue-500/50 transition-colors"
                 >
                   <div className="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center">
@@ -707,7 +707,7 @@ export default async function CazierJudiciarPJPage() {
                   </div>
                   <div className="text-left">
                     <p className="text-xs text-white/50">Telefon suport</p>
-                    <p className="text-white font-semibold">+40 312 299 399</p>
+                    <p className="text-white font-semibold">+40 757 708 181</p>
                   </div>
                 </a>
                 <a

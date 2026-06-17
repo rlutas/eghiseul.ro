@@ -44,7 +44,7 @@ export function FinalCTASection() {
               variant="outline"
               className="border-2 border-primary-500 text-primary-500 hover:bg-primary-500 hover:text-secondary-900 font-bold px-8 py-6 text-lg rounded-xl transition-all duration-200"
             >
-              <a href="tel:+40312299399">
+              <a href="tel:+40757708181">
                 <Phone className="mr-2 w-5 h-5" />
                 Sună-ne
               </a>
@@ -70,7 +70,7 @@ export function FinalCTASection() {
           {/* Contact Info */}
           <div className="grid sm:grid-cols-2 gap-4 max-w-lg mx-auto">
             <a
-              href="tel:+40312299399"
+              href="tel:+40757708181"
               className="flex items-center gap-3 px-5 py-4 bg-white/5 rounded-xl border border-white/10 hover:border-primary-500/50 transition-colors"
             >
               <div className="w-10 h-10 bg-primary-500/20 rounded-lg flex items-center justify-center">
@@ -78,7 +78,7 @@ export function FinalCTASection() {
               </div>
               <div className="text-left">
                 <p className="text-xs text-white/50">Telefon suport</p>
-                <p className="text-white font-semibold">+40 312 299 399</p>
+                <p className="text-white font-semibold">+40 757 708 181</p>
               </div>
             </a>
             <a

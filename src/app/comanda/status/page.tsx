@@ -605,7 +605,7 @@ function OrderStatusContent() {
                   suport@eghiseul.ro
                 </a>{' '}
                 sau la telefon{' '}
-                <a href="tel:+40311234567" className="underline hover:no-underline">
+                <a href="tel:+40757708181" className="underline hover:no-underline">
                   031 123 4567
                 </a>{' '}
                 menționând codul comenzii tale.

@@ -211,7 +211,7 @@ export function ArticleLayout({
                 variant="outline"
                 className="border-2 border-primary-500 text-primary-500 hover:bg-primary-500 hover:text-secondary-900 font-bold px-8 py-6 text-lg rounded-xl transition-all duration-200"
               >
-                <a href="tel:+40312299399">
+                <a href="tel:+40757708181">
                   <Phone className="mr-2 w-5 h-5" aria-hidden="true" />
                   Sună-ne
                 </a>

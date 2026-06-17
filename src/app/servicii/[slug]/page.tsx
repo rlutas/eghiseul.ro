@@ -192,7 +192,7 @@ function buildFaqs(service: Service): { q: string; a: string }[] {
     },
     {
       q: 'Pot anula sau modifica comanda după plată?',
-      a: 'Poți contacta echipa noastră la contact@eghiseul.ro sau +40 312 299 399 pentru modificări. Conform OUG 34/2014 art. 16 lit. m), dreptul de retragere nu se aplică după începerea procesării efective a documentului oficial, dar vom face tot posibilul să te ajutăm în orice situație.',
+      a: 'Poți contacta echipa noastră la contact@eghiseul.ro sau +40 757 708 181 pentru modificări. Conform OUG 34/2014 art. 16 lit. m), dreptul de retragere nu se aplică după începerea procesării efective a documentului oficial, dar vom face tot posibilul să te ajutăm în orice situație.',
     },
   ];
 }

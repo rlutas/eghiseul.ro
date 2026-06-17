@@ -52,7 +52,7 @@ export default function Page() {
 
       <h2>6. Contact</h2>
       <p>
-        RapidCert SRL · <a href="mailto:contact@eghiseul.ro">contact@eghiseul.ro</a> · +40 312 299 399.
+        RapidCert SRL · <a href="mailto:contact@eghiseul.ro">contact@eghiseul.ro</a> · +40 757 708 181.
       </p>
     </LegalLayout>
   );
