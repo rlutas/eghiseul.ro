@@ -4,7 +4,6 @@ import { createPublicClient } from '@/lib/supabase/public';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import {
-  ArrowRight,
   Clock,
   Shield,
   Zap,
@@ -430,39 +429,34 @@ export default async function CazierAutoOnlinePage() {
           </div>
         </section>
 
-        {/* How it works */}
-        <section className="py-12 lg:py-20 bg-white">
-          <div className="container mx-auto px-4 max-w-[1400px]">
-            <div className="text-center mb-12">
-              <span className="inline-block px-4 py-1.5 bg-primary-100 text-primary-700 text-sm font-semibold rounded-full mb-4">
+        {/* How it works — dark connected timeline (CF parity) */}
+        <section className="relative overflow-hidden bg-gradient-to-b from-secondary-900 to-[#0C1A2F] py-14 lg:py-24">
+          <div className="absolute inset-0 opacity-5">
+            <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, #ECB95F 1px, transparent 0)', backgroundSize: '40px 40px' }} />
+          </div>
+          <div className="relative container mx-auto px-4 max-w-[1100px]">
+            <div className="text-center mb-14">
+              <span className="inline-block px-4 py-1.5 bg-primary-500/15 text-primary-400 text-sm font-semibold rounded-full mb-4 border border-primary-500/30">
                 Proces simplu
               </span>
-              <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-3">Cum Funcționează?</h2>
-              <p className="text-neutral-600 max-w-2xl mx-auto">Obții cazierul auto în 4 pași, 100% online</p>
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white mb-3">Cum Funcționează?</h2>
+              <p className="text-white/70 max-w-2xl mx-auto">Obții cazierul auto în 4 pași, 100% online</p>
             </div>
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
+            <div className="relative grid sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-6">
+              <div className="hidden lg:block absolute top-8 left-[12.5%] right-[12.5%] h-0.5 bg-gradient-to-r from-primary-500/0 via-primary-500/50 to-primary-500/0" aria-hidden="true" />
               {[
                 { step: 1, title: 'Introduci Datele Mașinii', desc: 'Completezi numărul de înmatriculare sau seria de șasiu (VIN).', icon: Car },
                 { step: 2, title: 'Verificăm Bazele de Date', desc: 'Interogăm sursele cu istoricul vehiculului și consolidăm raportul.', icon: Search },
                 { step: 3, title: 'Plătești Securizat', desc: 'Card, Apple Pay sau Google Pay — fără taxe ascunse.', icon: Shield },
                 { step: 4, title: 'Primești Raportul', desc: `În ${formatEstimatedDays(service)} primești raportul complet pe email.`, icon: CheckCircle },
-              ].map((item, index) => (
-                <div key={item.step} className="relative">
-                  <div className="bg-neutral-50 rounded-2xl p-6 h-full border border-neutral-200 hover:border-primary-300 hover:shadow-lg transition-all group">
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="w-12 h-12 bg-primary-500 rounded-xl flex items-center justify-center text-secondary-900 font-bold text-lg group-hover:scale-110 transition-transform">
-                        {item.step}
-                      </div>
-                      <item.icon className="w-5 h-5 text-primary-600" aria-hidden="true" />
-                    </div>
-                    <h3 className="text-lg font-bold text-secondary-900 mb-2">{item.title}</h3>
-                    <p className="text-sm text-neutral-600 leading-relaxed">{item.desc}</p>
+              ].map((item) => (
+                <div key={item.step} className="relative text-center">
+                  <div className="relative z-10 mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-400 to-primary-600 text-secondary-900 shadow-[0_8px_24px_rgba(236,185,95,0.35)]">
+                    <item.icon className="h-7 w-7" aria-hidden="true" />
+                    <span className="absolute -top-2 -right-2 flex h-7 w-7 items-center justify-center rounded-full bg-white text-sm font-extrabold text-secondary-900 shadow-md">{item.step}</span>
                   </div>
-                  {index < 3 && (
-                    <div className="hidden lg:block absolute top-1/2 -right-4 transform -translate-y-1/2 z-10">
-                      <ArrowRight className="h-5 w-5 text-primary-400" aria-hidden="true" />
-                    </div>
-                  )}
+                  <h3 className="text-lg font-bold text-white mb-2">{item.title}</h3>
+                  <p className="text-sm text-white/65 leading-relaxed max-w-[240px] mx-auto">{item.desc}</p>
                 </div>
               ))}
             </div>
