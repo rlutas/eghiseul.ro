@@ -130,9 +130,14 @@ export function Footer() {
       <div className="border-t border-white/10">
         <div className="container mx-auto px-4 py-5 sm:py-6 max-w-[1100px]">
           <div className="flex flex-col md:flex-row justify-between items-center gap-3 sm:gap-4 text-sm">
-            <p className="text-white/50 text-center md:text-left text-xs sm:text-sm">
-              © {new Date().getFullYear()} eGhișeul.ro. Toate drepturile rezervate.
-            </p>
+            <div className="text-center md:text-left">
+              <p className="text-white/50 text-xs sm:text-sm">
+                © {new Date().getFullYear()} eGhișeul.ro. Toate drepturile rezervate.
+              </p>
+              <p className="text-white/40 text-[11px] sm:text-xs mt-1">
+                eDigitalizare SRL · CUI RO49278701 · Reg. Com. J2023001097301 · Jud. Satu Mare, Com. Odoreu, Str. Salcâmilor nr. 2
+              </p>
+            </div>
             <div className="flex items-center gap-1.5 sm:gap-2">
               {[...Array(5)].map((_, i) => (
                 <svg

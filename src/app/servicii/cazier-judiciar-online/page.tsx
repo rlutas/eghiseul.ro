@@ -71,7 +71,7 @@ const jsonLdGraph = buildServicePageGraph({
   reviewedBy: {
     name: 'Departamentul Juridic eGhișeul.ro',
     jobTitle: 'Echipă de specialiști drept administrativ',
-    organizationName: 'RapidCert SRL',
+    organizationName: 'eDigitalizare SRL',
   },
   breadcrumb: [
     { name: 'Acasă', url: `${BASE_URL}/` },
@@ -608,7 +608,7 @@ export default function CazierJudiciarHubPage() {
               <div className="bg-primary-50/50 border-l-4 border-primary-500 p-4 rounded-r-lg mt-6">
                 <p className="text-sm">
                   <strong className="text-secondary-900">Baza legală:</strong> Eliberarea cazierului
-                  online se face prin contract de prestări servicii cu eGhișeul.ro (RapidCert SRL),
+                  online se face prin contract de prestări servicii cu eGhișeul.ro (eDigitalizare SRL),
                   conform <strong>Legii 214/2024</strong> privind semnătura electronică și{' '}
                   <strong>Regulamentului UE 910/2014 (eIDAS)</strong>. Documentul rămâne emis de IGPR,
                   identic cu varianta clasică obținută la ghișeu.
@@ -1154,7 +1154,7 @@ export default function CazierJudiciarHubPage() {
                   <span className="font-semibold text-secondary-900">
                     Conținut revizuit de Departamentul Juridic eGhișeul.ro
                   </span>{' '}
-                  &mdash; specialiști drept administrativ, RapidCert SRL.
+                  &mdash; specialiști drept administrativ, eDigitalizare SRL.
                 </p>
                 <p className="text-xs mt-1 text-neutral-500">
                   Ultima actualizare:{' '}

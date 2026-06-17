@@ -89,7 +89,7 @@ const jsonLdGraph = buildServicePageGraph({
   reviewedBy: {
     name: 'Departamentul Juridic eGhișeul.ro',
     jobTitle: 'Echipă de specialiști drept administrativ',
-    organizationName: 'RapidCert SRL',
+    organizationName: 'eDigitalizare SRL',
   },
   breadcrumb: [
     { name: 'Acasă', url: `${BASE_URL}/` },

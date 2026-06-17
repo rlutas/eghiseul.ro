@@ -1,5 +1,5 @@
 /**
- * Real Google reviews for eGhișeul.ro (RapidCert SRL), pulled verbatim from the
+ * Real Google reviews for eGhișeul.ro (eDigitalizare SRL), pulled verbatim from the
  * public Google Business Profile via the Maps reviews feed, sorted "Cele mai
  * recente" (4,9 ★ / 451 recenzii, 2026-06-16). Curated to recent positive 5★,
  * diverse across services. Light diacritic/typo cleanup only. Refresh by

@@ -3,57 +3,23 @@
 import { useState } from 'react';
 import { ChevronLeft, ChevronRight, Quote, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { REVIEWS } from '@/config/reviews';
+import { GOOGLE_REVIEWS_URL } from '@/config/contact';
 
-const testimonials = [
-  {
-    name: 'Maria Ionescu',
-    role: 'Manager HR',
-    company: 'TechStart SRL',
-    content: 'Am comandat caziere judiciare pentru 15 angajați noi. Totul a fost livrat în 24 de ore. Impresionant!',
-    rating: 5,
-    avatar: 'MI',
-  },
-  {
-    name: 'Alexandru Popa',
-    role: 'Antreprenor',
-    company: 'Freelancer',
-    content: 'Aveam nevoie urgentă de extras CF pentru vânzarea apartamentului. L-am primit în aceeași zi. Super recomand!',
-    rating: 5,
-    avatar: 'AP',
-  },
-  {
-    name: 'Elena Dumitrescu',
-    role: 'Student',
-    company: 'Universitatea București',
-    content: 'Am avut nevoie de certificat de naștere apostilat pentru facultate în Germania. Procesul a fost simplu și rapid.',
-    rating: 5,
-    avatar: 'ED',
-  },
-  {
-    name: 'George Marinescu',
-    role: 'Director',
-    company: 'Construct Pro',
-    content: 'Folosim eGhișeul pentru toate certificatele constatatoare. Ne economisește zile întregi de muncă.',
-    rating: 5,
-    avatar: 'GM',
-  },
-  {
-    name: 'Ana Radu',
-    role: 'Consultant',
-    company: 'RO Consulting',
-    content: 'Am încercat să obțin cazierul fiscal singură și am pierdut 2 zile. Cu eGhișeul, l-am primit în 4 ore.',
-    rating: 5,
-    avatar: 'AR',
-  },
-  {
-    name: 'Cristian Neagu',
-    role: 'Șofer profesionist',
-    company: 'Transport Express',
-    content: 'Cazier auto în mai puțin de o zi. Exact ce aveam nevoie pentru noul angajator. Mulțumesc!',
-    rating: 5,
-    avatar: 'CN',
-  },
-];
+// Real Google reviews (config/reviews.ts) — name + relative time, verbatim text.
+const testimonials = REVIEWS.map((r) => ({
+  name: r.name,
+  when: r.when,
+  content: r.text,
+  rating: r.rating,
+  avatar: r.name
+    .split(' ')
+    .map((w) => w[0])
+    .filter(Boolean)
+    .slice(0, 2)
+    .join('')
+    .toUpperCase(),
+}));
 
 export function TestimonialsSection() {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -92,7 +58,14 @@ export function TestimonialsSection() {
               />
             ))}
             <span className="text-lg font-bold text-secondary-900 ml-2">4.9/5</span>
-            <span className="text-neutral-500">• 450+ recenzii pe Google</span>
+            <a
+              href={GOOGLE_REVIEWS_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-neutral-500 hover:text-primary-700 underline-offset-2 hover:underline transition-colors"
+            >
+              • 450+ recenzii pe Google
+            </a>
           </div>
         </div>
 
@@ -135,7 +108,7 @@ export function TestimonialsSection() {
                     {testimonial.name}
                   </p>
                   <p className="text-sm text-neutral-500">
-                    {testimonial.role} • {testimonial.company}
+                    Recenzie Google • {testimonial.when}
                   </p>
                 </div>
               </div>

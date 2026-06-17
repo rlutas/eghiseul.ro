@@ -130,14 +130,23 @@ export const HARDCODED_ARTICLE_SLUGS = [
   'rolul-si-atributiile-onrc-romania',
 ] as const;
 
-/** Organization-wide metadata for Schema.org Organization node. */
+/** Organization-wide metadata for Schema.org Organization node.
+ *  Legal data per ANAF (CUI 49278701). */
 export const ORGANIZATION = {
   name: 'eGhișeul.ro',
-  legalName: 'RapidCert SRL',
+  legalName: 'eDigitalizare SRL',
+  cui: 'RO49278701',
+  regCom: 'J2023001097301',
   url: BASE_URL,
   // No standalone square logo asset yet — use the branded OG image (valid 200)
   // instead of /logo.png which 404s and invalidates the Organization node.
   logo: `${BASE_URL}/og/default.png`,
+  address: {
+    street: 'Str. Salcâmilor nr. 2',
+    locality: 'Com. Odoreu',
+    region: 'Jud. Satu Mare',
+    country: 'RO',
+  },
   contactPoint: {
     telephone: '+40-757-708-181',
     email: 'contact@eghiseul.ro',
@@ -146,6 +155,6 @@ export const ORGANIZATION = {
     availableLanguage: ['Romanian', 'English'],
   },
   sameAs: [
-    // populate when available
+    'https://share.google/stngA2rQbVPY2l57p', // Google Business Profile (recenzii)
   ],
 } as const;

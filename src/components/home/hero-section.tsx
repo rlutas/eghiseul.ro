@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { serviceUrl } from '@/lib/seo';
+import { GOOGLE_REVIEWS_URL } from '@/config/contact';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Clock, Monitor, Users } from 'lucide-react';
 
@@ -59,9 +60,15 @@ export function HeroSection() {
               </Button>
             </div>
 
-            {/* Google Reviews Badge */}
+            {/* Google Reviews Badge — links to the real Google Business Profile */}
             <div className="mt-6 sm:mt-8 flex justify-center lg:justify-start">
-              <div className="inline-flex items-center gap-2 sm:gap-3 bg-white rounded-full px-4 sm:px-6 py-2.5 sm:py-3 shadow-lg">
+              <a
+                href={GOOGLE_REVIEWS_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Vezi recenziile pe Google (4,9 din peste 450)"
+                className="inline-flex items-center gap-2 sm:gap-3 bg-white rounded-full px-4 sm:px-6 py-2.5 sm:py-3 shadow-lg hover:shadow-xl transition-shadow"
+              >
                 <div className="flex items-center gap-1.5 sm:gap-2">
                   {/* Google Logo */}
                   <svg className="w-4 h-4 sm:w-5 sm:h-5" viewBox="0 0 24 24">
@@ -98,7 +105,7 @@ export function HeroSection() {
                 </div>
                 <span className="text-xs sm:text-sm font-bold text-secondary-900">4.9</span>
                 <span className="text-[10px] sm:text-xs text-neutral-500">• 450+ recenzii</span>
-              </div>
+              </a>
             </div>
           </div>
 

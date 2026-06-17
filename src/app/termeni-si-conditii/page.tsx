@@ -3,7 +3,7 @@ import { LegalLayout } from '@/components/legal/legal-layout';
 
 export const metadata = buildPageMetadata({
   title: 'Termeni și Condiții',
-  description: 'Termenii și condițiile de utilizare a platformei eGhișeul.ro (RapidCert SRL).',
+  description: 'Termenii și condițiile de utilizare a platformei eGhișeul.ro (eDigitalizare SRL).',
   path: '/termeni-si-conditii/',
 });
 
@@ -14,7 +14,7 @@ export default function Page() {
     <LegalLayout title="Termeni și Condiții" updated="16 iunie 2026">
       <p>
         Acești termeni și condiții reglementează utilizarea platformei <strong>eGhișeul.ro</strong>, operată de
-        <strong> RapidCert SRL</strong> („eGhișeul”, „noi”). Prin plasarea unei comenzi, accepți integral acești termeni.
+        <strong> eDigitalizare SRL</strong> („eGhișeul”, „noi”). Prin plasarea unei comenzi, accepți integral acești termeni.
       </p>
 
       <h2>1. Serviciile noastre</h2>
@@ -56,7 +56,7 @@ export default function Page() {
 
       <h2>6. Contact</h2>
       <p>
-        RapidCert SRL · email: <a href="mailto:contact@eghiseul.ro">contact@eghiseul.ro</a> · telefon:
+        eDigitalizare SRL · email: <a href="mailto:contact@eghiseul.ro">contact@eghiseul.ro</a> · telefon:
         <a href="tel:+40757708181"> +40 757 708 181</a> · WhatsApp: +40 757 708 181.
       </p>
     </LegalLayout>

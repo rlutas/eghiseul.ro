@@ -13,7 +13,7 @@ export default function Page() {
   return (
     <LegalLayout title="Politica de Cookies" updated="16 iunie 2026">
       <p>
-        Platforma <strong>eGhișeul.ro</strong> (RapidCert SRL) folosește cookie-uri pentru a funcționa corect și pentru a
+        Platforma <strong>eGhișeul.ro</strong> (eDigitalizare SRL) folosește cookie-uri pentru a funcționa corect și pentru a
         îmbunătăți experiența ta. Această politică explică ce sunt cookie-urile și cum le poți controla.
       </p>
 

@@ -3,7 +3,7 @@ import { LegalLayout } from '@/components/legal/legal-layout';
 
 export const metadata = buildPageMetadata({
   title: 'Politica de Confidențialitate',
-  description: 'Cum colectează, folosește și protejează eGhișeul.ro (RapidCert SRL) datele tale personale.',
+  description: 'Cum colectează, folosește și protejează eGhișeul.ro (eDigitalizare SRL) datele tale personale.',
   path: '/politica-de-confidentialitate/',
 });
 
@@ -13,7 +13,7 @@ export default function Page() {
   return (
     <LegalLayout title="Politica de Confidențialitate" updated="16 iunie 2026">
       <p>
-        <strong>RapidCert SRL</strong>, operatorul platformei <strong>eGhișeul.ro</strong>, prelucrează datele tale cu
+        <strong>eDigitalizare SRL</strong>, operatorul platformei <strong>eGhișeul.ro</strong>, prelucrează datele tale cu
         caracter personal în conformitate cu Regulamentul (UE) 2016/679 (GDPR). Această politică explică ce date colectăm,
         de ce și cum le protejăm.
       </p>
@@ -52,7 +52,7 @@ export default function Page() {
 
       <h2>6. Contact</h2>
       <p>
-        RapidCert SRL · <a href="mailto:contact@eghiseul.ro">contact@eghiseul.ro</a> · +40 757 708 181.
+        eDigitalizare SRL · <a href="mailto:contact@eghiseul.ro">contact@eghiseul.ro</a> · +40 757 708 181.
       </p>
     </LegalLayout>
   );

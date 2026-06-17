@@ -3,7 +3,7 @@ import { LegalLayout } from '@/components/legal/legal-layout';
 
 export const metadata = buildPageMetadata({
   title: 'GDPR — Protecția Datelor',
-  description: 'Drepturile tale GDPR și modul în care eGhișeul.ro (RapidCert SRL) protejează datele personale.',
+  description: 'Drepturile tale GDPR și modul în care eGhișeul.ro (eDigitalizare SRL) protejează datele personale.',
   path: '/gdpr/',
 });
 
@@ -13,7 +13,7 @@ export default function Page() {
   return (
     <LegalLayout title="GDPR — Protecția Datelor" updated="16 iunie 2026">
       <p>
-        <strong>RapidCert SRL</strong> (eGhișeul.ro) respectă Regulamentul General privind Protecția Datelor (UE)
+        <strong>eDigitalizare SRL</strong> (eGhișeul.ro) respectă Regulamentul General privind Protecția Datelor (UE)
         2016/679. Această pagină rezumă angajamentele noastre și drepturile tale.
       </p>
 

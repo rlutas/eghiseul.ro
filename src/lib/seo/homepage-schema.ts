@@ -37,6 +37,17 @@ export function buildHomepageGraph(faqs: HomepageFaq[]) {
         description:
           'Platformă online pentru obținerea de documente oficiale în România: cazier judiciar, ' +
           'cazier fiscal, certificat constatator, extras de carte funciară și altele. Rapid, legal, fără cozi.',
+        vatID: ORGANIZATION.cui,
+        taxID: ORGANIZATION.cui,
+        identifier: ORGANIZATION.regCom,
+        address: {
+          '@type': 'PostalAddress',
+          streetAddress: ORGANIZATION.address.street,
+          addressLocality: ORGANIZATION.address.locality,
+          addressRegion: ORGANIZATION.address.region,
+          addressCountry: ORGANIZATION.address.country,
+        },
+        sameAs: ORGANIZATION.sameAs,
         areaServed: { '@type': 'Country', name: 'Romania' },
         contactPoint: {
           '@type': 'ContactPoint',
