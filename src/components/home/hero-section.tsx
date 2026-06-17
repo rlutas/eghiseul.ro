@@ -44,6 +44,21 @@ export function HeroSection() {
               </p>
             </div>
 
+            {/* Primary CTA — visible above the fold (esp. mobile, where the
+                services card stacks below). Scrolls to the services list. */}
+            <div className="mt-6 flex justify-center lg:justify-start">
+              <Button
+                asChild
+                size="lg"
+                className="bg-primary-500 hover:bg-primary-600 text-secondary-900 font-bold px-7 py-6 text-base rounded-xl shadow-[0_6px_14px_rgba(236,185,95,0.35)] hover:-translate-y-0.5 transition-all duration-200"
+              >
+                <Link href="#servicii">
+                  Vezi serviciile și comandă
+                  <ArrowRight className="ml-1.5 h-5 w-5" aria-hidden="true" />
+                </Link>
+              </Button>
+            </div>
+
             {/* Google Reviews Badge */}
             <div className="mt-6 sm:mt-8 flex justify-center lg:justify-start">
               <div className="inline-flex items-center gap-2 sm:gap-3 bg-white rounded-full px-4 sm:px-6 py-2.5 sm:py-3 shadow-lg">

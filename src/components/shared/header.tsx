@@ -167,7 +167,7 @@ export function Header() {
                 <span className="text-xl font-extrabold text-secondary-900 leading-tight">
                   eGhișeul<span className="text-primary-500">.ro</span>
                 </span>
-                <span className="text-[10px] text-neutral-500 font-medium tracking-wide hidden md:block">
+                <span className="text-[11px] text-neutral-500 font-medium tracking-wide hidden md:block">
                   Documente oficiale online
                 </span>
               </div>
@@ -276,7 +276,7 @@ export function Header() {
                 variant="ghost"
                 size="icon"
                 aria-label="Deschide meniul"
-                className="lg:hidden hover:bg-primary-50"
+                className="lg:hidden hover:bg-primary-50 min-h-[44px] min-w-[44px]"
               >
                 <Menu className="h-6 w-6 text-secondary-900" />
               </Button>
@@ -288,7 +288,7 @@ export function Header() {
                   variant="ghost"
                   size="icon"
                   aria-label="Deschide meniul"
-                  className="hover:bg-primary-50"
+                  className="hover:bg-primary-50 min-h-[44px] min-w-[44px]"
                 >
                   <Menu className="h-6 w-6 text-secondary-900" />
                 </Button>
@@ -340,7 +340,7 @@ export function Header() {
                             <div className="pl-3 pb-2">
                               {SERVICES_NAV.map((group) => (
                                 <div key={group.category} className="mt-2">
-                                  <p className="px-3 text-[11px] font-bold uppercase tracking-wider text-primary-700">
+                                  <p className="px-3 text-xs font-bold uppercase tracking-wider text-primary-700">
                                     {group.category}
                                   </p>
                                   {group.items.map((item) => (
