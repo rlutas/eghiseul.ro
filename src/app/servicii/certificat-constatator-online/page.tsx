@@ -361,8 +361,8 @@ export default async function CertificatConstatatorPage() {
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
               {contents.map((it) => (
-                <div key={it.title} className="bg-neutral-50 rounded-2xl p-5 border border-neutral-200">
-                  <div className="w-12 h-12 bg-primary-100 rounded-xl flex items-center justify-center mb-4">
+                <div key={it.title} className="bg-white rounded-2xl p-5 border border-neutral-200 hover:border-primary-300 hover:shadow-lg hover:-translate-y-1 transition-all duration-200">
+                  <div className="w-12 h-12 bg-gradient-to-br from-primary-100 to-primary-200 rounded-xl flex items-center justify-center mb-4">
                     <it.icon className="w-6 h-6 text-primary-600" aria-hidden="true" />
                   </div>
                   <h3 className="text-base font-bold text-secondary-900 mb-2">{it.title}</h3>
@@ -447,8 +447,8 @@ export default async function CertificatConstatatorPage() {
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
               {useCases.map((uc) => (
-                <div key={uc.title} className="bg-neutral-50 rounded-2xl p-5 border border-neutral-200 hover:border-primary-300 hover:shadow-md transition-all">
-                  <div className="w-12 h-12 bg-primary-100 rounded-xl flex items-center justify-center mb-4">
+                <div key={uc.title} className="bg-neutral-50 rounded-2xl p-5 border border-neutral-200 hover:border-primary-300 hover:shadow-lg hover:-translate-y-1 transition-all duration-200">
+                  <div className="w-12 h-12 bg-gradient-to-br from-primary-100 to-primary-200 rounded-xl flex items-center justify-center mb-4">
                     <uc.icon className="w-6 h-6 text-primary-600" aria-hidden="true" />
                   </div>
                   <h3 className="text-lg font-bold text-secondary-900 mb-3">{uc.title}</h3>
@@ -465,6 +465,8 @@ export default async function CertificatConstatatorPage() {
             </div>
           </div>
         </section>
+
+        <ReviewsSection />
 
         {/* How it works — dark connected timeline (CF parity) */}
         <section className="relative overflow-hidden bg-gradient-to-b from-secondary-900 to-[#0C1A2F] py-14 lg:py-24">
@@ -595,8 +597,6 @@ export default async function CertificatConstatatorPage() {
             </div>
           </div>
         </section>
-
-        <ReviewsSection />
 
         {/* FAQ */}
         <ServiceFAQ

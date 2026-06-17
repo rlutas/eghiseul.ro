@@ -1,5 +1,10 @@
 # Services Page Design System
 
+> ⚠️ **Document istoric.** Referința aprobată este acum **`SERVICE-PAGE-DESIGN-GUIDE.md`**
+> (template = `/servicii/extras-de-carte-funciara/`, Extras de Carte Funciară), NU Cazier Fiscal.
+> Pentru ordinea canonică a secțiunilor + fundaluri, vezi acel ghid. Fișierul de față rămâne doar
+> pentru detalii de componente/culori.
+
 ## Overview
 
 Documentație pentru designul paginilor de servicii pe eGhiseul.ro. Folosim Cazier Fiscal ca template principal.

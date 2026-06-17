@@ -15,23 +15,37 @@
 
 ## 2. Ordinea secțiunilor (canonică)
 
-1. **Hero** (dark) — breadcrumb + badge-uri + H1 (`Nume\nspan Online` auriu) + descriere + USP box + listă pași; în dreapta **price card** (`lg:justify-between`).
-2. **Trust strip** (alb) — 4 micro-statistici cu iconițe.
-3. **Despre serviciu** (`neutral-50`) — badge „Despre serviciu" + H2 + proză + 1 card info onest.
-4. **Cine poate cere + ce acte/date** (alb) — 2 carduri.
-5. **Identificare / Ce îți trebuie** (alb) — grid carduri (gradient tile + hover-lift) + notă cross-sell.
-6. **Preț & opțiuni** (`neutral-50`) — 3 carduri mari: serviciul de bază (featured), urgență 0 RON, extras opțional. Prețuri **fără TVA** + „+ TVA 21% · {total} RON cu TVA".
-7. **Recenzii** (`neutral-50`) — `<ReviewsSection />` (marquee animat, recenzii reale).
-8. **Cum funcționează** (dark) — timeline conectat, 4 pași, cercuri gradient numerotate.
-9. **Bine de știut** (`neutral-50`) — 2 carduri (verde + amber) pentru USP-uri/edge cases.
-10. **Specimen** (alb) — badge „Specimen" + imagine înrămată (glow+ring) + coloană dreapta cu validitate legală + link **verificare ANCPI**; sub el 2 carduri albe „Ce conține" / „Cât este valabil".
-11. **Comparativ** (`neutral-50`) — tabel eGhișeul vs alți operatori vs ghișeu vs portal (bifă/X, coloana eGhișeul evidențiată) + CTA.
-12. **Conținut SEO suplimentar** (alb) — proză țintită pe cluster (badge + H2).
-13. **FAQ** (`<ServiceFAQ />`, `neutral-50`) — emite automat schema `FAQPage`.
-14. **CTA final** (dark) — titlu + subtext + `OrderButton` + `WhatsAppButton` + o linie discretă „4,9 din peste 450 de recenzii Google". Fundal: glow radial subtil + hairline auriu sus. **Nu** aglomera (fără panel/badge/trust-row).
-15. **`<MobileStickyCTA />`** (în afara `<main>`) + `<Footer />`.
+> **Sursă de adevăr:** `src/app/servicii/extras-de-carte-funciara/page.tsx` (CF). Lista de mai jos
+> reflectă EXACT pagina CF live — fiecare secțiune cu fundalul ei. Regula de aur: **alternanță
+> strictă** (niciodată două secțiuni cu același fundal una după alta). `<ReviewsSection />` și
+> `<ServiceFAQ />` au fundal **`neutral-50`** intern — contează la alternanță.
 
-> Nu orice serviciu are toate secțiunile — păstrează ordinea și fundalurile pentru cele incluse.
+| # | Secțiune | Fundal | Conținut |
+|---|----------|--------|----------|
+| 1 | **Hero** | **dark** `from-secondary-900 to-[#0C1A2F]` + dot-texture `opacity-5` | breadcrumb + 3 badge-uri (categorie aurie / „Eliberare în câteva minute" verde / instituție outline) + H1 (`Nume\nspan auriu`) + descriere + **USP box** auriu (`bg-primary-500/15`) + **info box** `bg-white/10 backdrop-blur` cu listă 4 pași; dreapta **price card** alb (`lg:justify-between`, `lg:self-center`). |
+| 2 | **Trust strip** | **alb** `bg-white border-b` | 4 micro-statistici (tile `bg-primary-50`, valoare + label). |
+| 3 | **Despre serviciu (SEO Intro)** | **`neutral-50`** | badge „Despre serviciu" + H2 „Ce este… și de unde se obține" + 2 paragrafe + 1 card alb „Cât costă și de unde" + dedesubt **2 carduri albe** „Cine poate cere" / „Ce acte și date" (în aceeași secțiune). |
+| 4 | **Identificare / Ce îți trebuie** | **alb** | grid 4 carduri (**gradient tile** `from-primary-100 to-primary-200` + **hover-lift** `hover:-translate-y-1 hover:shadow-lg`) + notă cross-sell `bg-primary-50`. |
+| 5 | **Preț & opțiuni** | **`neutral-50`** | 3 carduri mari: bază **featured** (`border-2 border-primary-500`), urgență **0 RON** (verde), add-on opțional. Prețuri **ex-TVA** headline + „+ TVA 21% · {total} RON cu TVA". |
+| 6 | **Use cases — „Când ai nevoie"** | **alb** | grid 4 carduri (gradient tile + hover-lift) cu liste de scenarii bifate. |
+| 7 | **`<ReviewsSection />`** | **`neutral-50`** (intern) | marquee animat cu recenzii reale Google. |
+| 8 | **Cum funcționează** | **dark** + dot-texture | timeline conectat, 4 pași, cercuri gradient numerotate (`from-primary-400 to-primary-600`), badge „Proces simplu". |
+| 9 | **Bine de știut** | **`neutral-50`** | 2 carduri (verde „fără taxă de urgență" + amber „edge case"). |
+| 10 | **Specimen** | **alb** | badge „Specimen" + imagine înrămată (glow+ring) + coloană dreapta cu validitate legală + link **verificare ANCPI**; dedesubt 2 carduri albe „Ce conține" / „Cât valabil". |
+| 11 | **Comparativ** | **`neutral-50`** | tabel eGhișeul vs alți operatori vs ghișeu vs portal (bifă/X, coloana eGhișeul `bg-primary-500`/`bg-primary-50`) + CTA. |
+| 12 | **Conținut SEO suplimentar** | **alb** | proză țintită pe cluster (badge + H2 + listă + notă cross-sell). |
+| 13 | **`<ServiceFAQ />`** | **`neutral-50`** (intern) | accordion + schema `FAQPage` automată. |
+| 14 | **CTA final** | **dark** + dot-texture + glow radial + hairline auriu sus | titlu + subtext + `OrderButton` + `WhatsAppButton` + o linie „4,9 din peste 450 de recenzii Google". **Nu** aglomera (fără panel/badge/trust-row). |
+| — | **`<MobileStickyCTA />`** (în afara `<main>`) + **`<Footer />`** | — | bară sticky mobil + footer. |
+
+**Secvența de fundaluri (memoreaz-o):**
+`dark → alb → neutral-50 → alb → neutral-50 → alb → neutral-50 → dark → neutral-50 → alb → neutral-50 → alb → neutral-50 → dark`
+
+> Nu orice serviciu are toate secțiunile (ex: fără Specimen dacă nu există imagine; fără secțiunea
+> 4/12 dacă nu e relevant SEO). Când **omiți** o secțiune, **verifică alternanța** — dacă scoaterea
+> lasă două fundaluri identice lipite, mută `<ReviewsSection />` ca să rupi seria (în CF stă pe
+> poziția 7, între Use cases `alb` și Cum funcționează `dark`). **Niciodată** Reviews `neutral-50`
+> lipit direct de FAQ `neutral-50`.
 
 ## 3. Componente partajate (refolosește, nu reinventa)
 

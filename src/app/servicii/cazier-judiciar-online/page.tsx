@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Footer } from '@/components/home/footer';
 import { MobileStickyCTA } from '@/components/services/mobile-sticky-cta';
 import { ServiceFAQ, type FAQ, type FAQCategory } from '@/components/services/service-faq';
+import { ReviewsSection } from '@/components/services/reviews-section';
 import { buildPageMetadata, buildServicePageGraph, BASE_URL } from '@/lib/seo';
 import { cn } from '@/lib/utils';
 import {
@@ -112,7 +113,7 @@ const USE_CASE_CATEGORIES = [
   {
     icon: Briefcase,
     title: 'Pentru Angajare',
-    iconBg: 'bg-primary-100',
+    iconBg: 'bg-gradient-to-br from-primary-100 to-primary-200',
     iconColor: 'text-primary-600',
     borderHover: 'hover:border-primary-300',
     cases: [
@@ -662,6 +663,9 @@ export default function CazierJudiciarHubPage() {
           </div>
         </section>
 
+        {/* ──────────────── REVIEWS (component, neutral-50) ──────────────── */}
+        <ReviewsSection />
+
         {/* ──────────────── USE CASES (20+) ──────────────── */}
         <section className="py-12 lg:py-20 bg-white">
           <div className="container mx-auto px-4 max-w-[1200px]">
@@ -1027,7 +1031,7 @@ export default function CazierJudiciarHubPage() {
         </section>
 
         {/* ──────────────── DE CE EGHISEUL ──────────────── */}
-        <section className="py-12 lg:py-20 bg-neutral-50">
+        <section className="py-12 lg:py-20 bg-white">
           <div className="container mx-auto px-4 max-w-[1100px]">
             <div className="text-center mb-12">
               <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-3">
@@ -1044,7 +1048,7 @@ export default function CazierJudiciarHubPage() {
                   icon: Award,
                   title: 'Document Oficial',
                   desc: 'Cazier emis de Inspectoratul General al Poliției Române (IGPR), identic cu cel obținut la ghișeu — aceeași valabilitate, aceeași ștampilă.',
-                  iconBg: 'bg-primary-100',
+                  iconBg: 'bg-gradient-to-br from-primary-100 to-primary-200',
                   iconColor: 'text-primary-600',
                   hoverBorder: 'hover:border-primary-300',
                   accent: 'before:bg-primary-500',
@@ -1100,7 +1104,7 @@ export default function CazierJudiciarHubPage() {
                   <div
                     key={i}
                     className={cn(
-                      'relative bg-white rounded-2xl p-6 border-2 border-neutral-200 transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5',
+                      'relative bg-neutral-50 rounded-2xl p-6 border-2 border-neutral-200 transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5',
                       'before:absolute before:left-0 before:top-6 before:bottom-6 before:w-1 before:rounded-r-full',
                       item.hoverBorder,
                       item.accent,
@@ -1119,7 +1123,7 @@ export default function CazierJudiciarHubPage() {
         </section>
 
         {/* ──────────────── SERVICII CONEXE — INTERNAL LINKS ──────────────── */}
-        <section className="py-12 lg:py-20 bg-white">
+        <section className="py-12 lg:py-20 bg-neutral-50">
           <div className="container mx-auto px-4 max-w-[1100px]">
             <div className="text-center mb-12">
               <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-3">
@@ -1174,9 +1178,9 @@ export default function CazierJudiciarHubPage() {
         </section>
 
         {/* ──────────────── EDITORIAL NOTE — E-E-A-T ──────────────── */}
-        <section className="py-8 bg-neutral-50 border-t border-neutral-200">
+        <section className="py-8 bg-white border-t border-neutral-200">
           <div className="container mx-auto px-4 max-w-[900px]">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 text-sm text-neutral-600 bg-white rounded-xl p-4 border border-neutral-200">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 text-sm text-neutral-600 bg-neutral-50 rounded-xl p-4 border border-neutral-200">
               <Award className="w-5 h-5 text-primary-600 flex-shrink-0" />
               <div>
                 <p>

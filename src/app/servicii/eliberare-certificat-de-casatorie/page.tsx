@@ -19,6 +19,7 @@ import {
   HeartHandshake,
   FileWarning,
   Users,
+  Truck,
 } from 'lucide-react';
 import { Service, ServiceOption, formatEstimatedDays } from '@/types/services';
 import { Footer } from '@/components/home/footer';
@@ -27,6 +28,7 @@ import { WhatsAppButton } from '@/components/services/whatsapp-button';
 import { GoogleReviewsBadge } from '@/components/services/google-reviews-badge';
 import { OrderButton } from '@/components/services/order-button';
 import { ServiceFAQ } from '@/components/services/service-faq';
+import { ReviewsSection } from '@/components/services/reviews-section';
 import { buildPageMetadata, buildServicePageGraph, BASE_URL } from '@/lib/seo';
 import { ServicePrice } from '@/components/services/service-price';
 
@@ -261,6 +263,28 @@ export default async function CertificatCasatoriePage() {
           </div>
         </section>
 
+        {/* Trust strip */}
+        <section className="bg-white border-b border-neutral-200">
+          <div className="container mx-auto px-4 max-w-[1100px] py-6 lg:py-8">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+              {[
+                { icon: Clock, value: formatEstimatedDays(service), label: 'Livrare estimată' },
+                { icon: Landmark, value: 'Stare Civilă', label: 'Document oficial' },
+                { icon: Truck, value: 'Curier inclus', label: 'Original / copie legalizată' },
+                { icon: CheckCircle, value: '4.9/5', label: 'Peste 450 recenzii' },
+              ].map((t) => (
+                <div key={t.label} className="flex flex-col items-center gap-1.5">
+                  <div className="w-11 h-11 bg-primary-50 rounded-xl flex items-center justify-center">
+                    <t.icon className="h-5 w-5 text-primary-600" aria-hidden="true" />
+                  </div>
+                  <p className="text-base lg:text-lg font-extrabold text-secondary-900 leading-tight">{t.value}</p>
+                  <p className="text-xs text-neutral-500 leading-tight">{t.label}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
         {/* SEO Intro */}
         <section className="py-12 lg:py-16 bg-neutral-50">
           <div className="container mx-auto px-4 max-w-[820px]">
@@ -309,8 +333,8 @@ export default async function CertificatCasatoriePage() {
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
               {useCases.map((uc) => (
-                <div key={uc.title} className="bg-neutral-50 rounded-2xl p-5 border border-neutral-200 hover:border-primary-300 hover:shadow-md transition-all">
-                  <div className="w-12 h-12 bg-primary-100 rounded-xl flex items-center justify-center mb-4">
+                <div key={uc.title} className="bg-neutral-50 rounded-2xl p-5 border border-neutral-200 hover:border-primary-300 hover:shadow-lg hover:-translate-y-1 transition-all duration-200">
+                  <div className="w-12 h-12 bg-gradient-to-br from-primary-100 to-primary-200 rounded-xl flex items-center justify-center mb-4">
                     <uc.icon className="w-6 h-6 text-primary-600" aria-hidden="true" />
                   </div>
                   <h3 className="text-lg font-bold text-secondary-900 mb-3">{uc.title}</h3>
@@ -381,7 +405,7 @@ export default async function CertificatCasatoriePage() {
                 { step: 4, title: 'Primești Documentul', desc: `În ${formatEstimatedDays(service)} primești certificatul pe email și, opțional, prin curier.`, icon: CheckCircle },
               ].map((item, index) => (
                 <div key={item.step} className="relative">
-                  <div className="bg-neutral-50 rounded-2xl p-6 h-full border border-neutral-200 hover:border-primary-300 hover:shadow-lg transition-all group">
+                  <div className="bg-neutral-50 rounded-2xl p-6 h-full border border-neutral-200 hover:border-primary-300 hover:shadow-lg hover:-translate-y-1 transition-all duration-200 group">
                     <div className="flex items-center gap-3 mb-4">
                       <div className="w-12 h-12 bg-primary-500 rounded-xl flex items-center justify-center text-secondary-900 font-bold text-lg group-hover:scale-110 transition-transform">
                         {item.step}
@@ -402,11 +426,13 @@ export default async function CertificatCasatoriePage() {
           </div>
         </section>
 
+        <ReviewsSection />
+
         {/* Documents needed + duration — targets "acte necesare" + "cat dureaza" */}
-        <section className="py-12 lg:py-20 bg-neutral-50">
+        <section className="py-12 lg:py-20 bg-white">
           <div className="container mx-auto px-4 max-w-[900px]">
             <div className="grid md:grid-cols-2 gap-6">
-              <div className="rounded-2xl border border-neutral-200 bg-white p-6">
+              <div className="rounded-2xl border border-neutral-200 bg-neutral-50 p-6">
                 <h2 className="text-xl font-bold text-secondary-900 mb-4">Acte necesare</h2>
                 <ul className="space-y-2.5 text-sm text-neutral-700">
                   {[

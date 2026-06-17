@@ -27,6 +27,7 @@ import { WhatsAppButton } from '@/components/services/whatsapp-button';
 import { GoogleReviewsBadge } from '@/components/services/google-reviews-badge';
 import { OrderButton } from '@/components/services/order-button';
 import { ServiceFAQ } from '@/components/services/service-faq';
+import { ReviewsSection } from '@/components/services/reviews-section';
 import { buildPageMetadata, buildServicePageGraph, BASE_URL } from '@/lib/seo';
 import { ServicePrice } from '@/components/services/service-price';
 
@@ -262,6 +263,28 @@ export default async function CertificatCelibatPage() {
           </div>
         </section>
 
+        {/* Trust strip */}
+        <section className="bg-white border-b border-neutral-200">
+          <div className="container mx-auto px-4 max-w-[1100px] py-6 lg:py-8">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+              {[
+                { icon: Clock, value: formatEstimatedDays(service), label: 'Livrare estimată' },
+                { icon: Mail, value: 'Email + curier', label: 'Original livrat acasă' },
+                { icon: Shield, value: 'Taxe incluse', label: 'Fără cont, fără cozi' },
+                { icon: CheckCircle, value: '4.9/5', label: 'Peste 450 recenzii' },
+              ].map((t) => (
+                <div key={t.label} className="flex flex-col items-center gap-1.5">
+                  <div className="w-11 h-11 bg-primary-50 rounded-xl flex items-center justify-center">
+                    <t.icon className="h-5 w-5 text-primary-600" aria-hidden="true" />
+                  </div>
+                  <p className="text-base lg:text-lg font-extrabold text-secondary-900 leading-tight">{t.value}</p>
+                  <p className="text-xs text-neutral-500 leading-tight">{t.label}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
         {/* SEO Intro */}
         <section className="py-12 lg:py-16 bg-neutral-50">
           <div className="container mx-auto px-4 max-w-[820px]">
@@ -311,8 +334,8 @@ export default async function CertificatCelibatPage() {
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
               {useCases.map((uc) => (
-                <div key={uc.title} className="bg-neutral-50 rounded-2xl p-5 border border-neutral-200 hover:border-primary-300 hover:shadow-md transition-all">
-                  <div className="w-12 h-12 bg-primary-100 rounded-xl flex items-center justify-center mb-4">
+                <div key={uc.title} className="bg-neutral-50 rounded-2xl p-5 border border-neutral-200 hover:border-primary-300 hover:shadow-lg hover:-translate-y-1 transition-all duration-200">
+                  <div className="w-12 h-12 bg-gradient-to-br from-primary-100 to-primary-200 rounded-xl flex items-center justify-center mb-4">
                     <uc.icon className="w-6 h-6 text-primary-600" aria-hidden="true" />
                   </div>
                   <h3 className="text-lg font-bold text-secondary-900 mb-3">{uc.title}</h3>
@@ -330,9 +353,11 @@ export default async function CertificatCelibatPage() {
           </div>
         </section>
 
+        <ReviewsSection />
+
         {/* Service options (dynamic) */}
         {options.length > 0 && (
-          <section className="py-12 lg:py-20 bg-neutral-50">
+          <section className="py-12 lg:py-20 bg-white">
             <div className="container mx-auto px-4 max-w-[1400px]">
               <div className="text-center mb-10">
                 <span className="inline-block px-4 py-1.5 bg-primary-100 text-primary-700 text-sm font-semibold rounded-full mb-4">
@@ -343,7 +368,7 @@ export default async function CertificatCelibatPage() {
               </div>
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 max-w-3xl mx-auto">
                 {options.map((option) => (
-                  <Card key={option.id} className="border-2 border-neutral-200 hover:border-primary-400 transition-all hover:shadow-md">
+                  <Card key={option.id} className="bg-neutral-50 border-2 border-neutral-200 hover:border-primary-300 hover:shadow-lg hover:-translate-y-1 transition-all duration-200">
                     <CardContent className="p-4 lg:p-5">
                       <div className="flex flex-col h-full">
                         <div className="flex items-start justify-between gap-2 mb-2">
@@ -366,7 +391,7 @@ export default async function CertificatCelibatPage() {
         )}
 
         {/* How it works */}
-        <section className="py-12 lg:py-20 bg-white">
+        <section className="py-12 lg:py-20 bg-neutral-50">
           <div className="container mx-auto px-4 max-w-[1400px]">
             <div className="text-center mb-12">
               <span className="inline-block px-4 py-1.5 bg-primary-100 text-primary-700 text-sm font-semibold rounded-full mb-4">
@@ -383,7 +408,7 @@ export default async function CertificatCelibatPage() {
                 { step: 4, title: 'Primești Documentul', desc: `În ${formatEstimatedDays(service)} primești certificatul pe email și prin curier.`, icon: CheckCircle },
               ].map((item, index) => (
                 <div key={item.step} className="relative">
-                  <div className="bg-neutral-50 rounded-2xl p-6 h-full border border-neutral-200 hover:border-primary-300 hover:shadow-lg transition-all group">
+                  <div className="bg-white rounded-2xl p-6 h-full border border-neutral-200 hover:border-primary-300 hover:shadow-lg hover:-translate-y-1 transition-all duration-200 group">
                     <div className="flex items-center gap-3 mb-4">
                       <div className="w-12 h-12 bg-primary-500 rounded-xl flex items-center justify-center text-secondary-900 font-bold text-lg group-hover:scale-110 transition-transform">
                         {item.step}
@@ -405,12 +430,12 @@ export default async function CertificatCelibatPage() {
         </section>
 
         {/* Acte necesare + Apostilă & traducere */}
-        <section className="py-12 lg:py-20 bg-neutral-50">
+        <section className="py-12 lg:py-20 bg-white">
           <div className="container mx-auto px-4 max-w-[900px]">
             <div className="grid md:grid-cols-2 gap-6">
-              <div className="rounded-2xl border border-neutral-200 bg-white p-6">
+              <div className="rounded-2xl border border-neutral-200 bg-neutral-50 p-6">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 bg-primary-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <div className="w-10 h-10 bg-gradient-to-br from-primary-100 to-primary-200 rounded-xl flex items-center justify-center flex-shrink-0">
                     <ScrollText className="w-5 h-5 text-primary-600" aria-hidden="true" />
                   </div>
                   <h2 className="text-xl font-bold text-secondary-900">Acte necesare</h2>
@@ -431,7 +456,7 @@ export default async function CertificatCelibatPage() {
               </div>
               <div className="rounded-2xl border border-neutral-200 p-6 bg-primary-50/40">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 bg-primary-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <div className="w-10 h-10 bg-gradient-to-br from-primary-100 to-primary-200 rounded-xl flex items-center justify-center flex-shrink-0">
                     <Stamp className="w-5 h-5 text-primary-600" aria-hidden="true" />
                   </div>
                   <h2 className="text-xl font-bold text-secondary-900">Apostilă & traducere</h2>
