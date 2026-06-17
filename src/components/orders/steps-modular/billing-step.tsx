@@ -15,6 +15,7 @@ import {
   User,
   Users,
   Building2,
+  Briefcase,
   CheckCircle,
   Loader2,
   AlertCircle,
@@ -43,6 +44,8 @@ interface BillingStepProps {
 
 interface BillingOption {
   source: BillingSource;
+  /** Distinct id when two options share a source (e.g. two `company` variants). */
+  id?: string;
   label: string;
   description: string;
   icon: React.ComponentType<{ className?: string }>;
@@ -93,14 +96,22 @@ const PJ_BILLING_OPTIONS: BillingOption[] = [
 const CONSTATATOR_BILLING_OPTIONS: BillingOption[] = [
   {
     source: 'company',
-    label: 'Persoană juridică',
-    description: 'Facturează pe firmă (CUI) — implicit firma din cerere, sau altă firmă',
+    id: 'request_firm',
+    label: 'Firma din certificat',
+    description: 'Eliberează factura pe aceeași societate ca certificatul',
     icon: Building2,
+  },
+  {
+    source: 'company',
+    id: 'other_company',
+    label: 'Persoană juridică',
+    description: 'Facturează pe o altă societate (alt CUI)',
+    icon: Briefcase,
   },
   {
     source: 'other_pf',
     label: 'Persoană fizică',
-    description: 'Facturează pe o persoană (CNP)',
+    description: 'Eliberează factura pe o persoană fizică',
     icon: User,
   },
 ];
@@ -166,6 +177,11 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
   const [cuiLoading, setCuiLoading] = useState(false);
   const [cuiError, setCuiError] = useState<string | null>(null);
   const [cuiSuccess, setCuiSuccess] = useState(billing?.cuiVerified ?? false);
+
+  // Constatator firm: distinguishes the two `company` billing cards — bill the
+  // firm FROM the certificate (prefilled) vs ANOTHER company (cleared CUI).
+  // UI-only; both still submit as source === 'company'.
+  const [companyMode, setCompanyMode] = useState<'request' | 'other'>('request');
 
   // Check for saved PJ billing profile to auto-fill
   const savedPjProfile = prefillData?.billing_profiles?.find(
@@ -434,6 +450,28 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [billing, prefillFromId, companyKyc, updateBilling]);
 
+  // Constatator: maps the 3 billing cards (firma din certificat / altă firmă /
+  // persoană fizică) onto the underlying sources. Both firm cards use source
+  // 'company'; they differ only in whether the CUI is prefilled or cleared.
+  const handleOptionClick = useCallback((option: BillingOption) => {
+    if (option.id === 'other_company') {
+      setCompanyMode('other');
+      updateBilling({
+        source: 'company',
+        type: 'persoana_juridica',
+        firstName: undefined, lastName: undefined, cnp: undefined,
+        address: undefined, city: undefined, county: undefined, postalCode: undefined,
+        companyName: '', cui: '', regCom: '', companyAddress: '',
+        cuiVerified: false, isValid: false,
+      });
+      setCuiSuccess(false);
+      setCuiError(null);
+      return;
+    }
+    setCompanyMode('request');
+    handleSourceSelect(option.source);
+  }, [handleSourceSelect, updateBilling]);
+
   // Update field
   const updateField = useCallback((field: keyof BillingState, value: string) => {
     updateBilling({ [field]: value });
@@ -533,12 +571,14 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
         )}>
           {billingOptions.map((option) => {
             const Icon = option.icon;
-            const isSelected = selectedSource === option.source;
+            const isSelected = option.id
+              ? selectedSource === 'company' && companyMode === (option.id === 'request_firm' ? 'request' : 'other')
+              : selectedSource === option.source;
 
             return (
               <div
-                key={option.source}
-                onClick={() => handleSourceSelect(option.source)}
+                key={option.id ?? option.source}
+                onClick={() => handleOptionClick(option)}
                 className={cn(
                   'relative p-4 rounded-xl border-2 cursor-pointer transition-all',
                   isSelected

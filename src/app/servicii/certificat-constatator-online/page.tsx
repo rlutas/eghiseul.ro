@@ -27,7 +27,6 @@ import { WhatsAppButton } from '@/components/services/whatsapp-button';
 import { GoogleReviewsBadge } from '@/components/services/google-reviews-badge';
 import { OrderButton } from '@/components/services/order-button';
 import { ServiceFAQ } from '@/components/services/service-faq';
-import { SystemStatus } from '@/components/services/system-status';
 import { ReviewsSection } from '@/components/services/reviews-section';
 import { buildPageMetadata, buildServicePageGraph, BASE_URL } from '@/lib/seo';
 import { ServicePrice } from '@/components/services/service-price';
@@ -190,12 +189,10 @@ export default async function CertificatConstatatorPage() {
                     <Building2 className="h-3.5 w-3.5 mr-1" aria-hidden="true" />
                     Comerciale
                   </Badge>
-                  {service.urgent_available && (
-                    <Badge className="bg-orange-500 text-white font-bold px-3 py-1">
-                      <Zap className="h-3.5 w-3.5 mr-1" aria-hidden="true" />
-                      Urgent Disponibil
-                    </Badge>
-                  )}
+                  <Badge className="bg-green-600 text-white font-bold px-3 py-1">
+                    <Zap className="h-3.5 w-3.5 mr-1" aria-hidden="true" />
+                    Eliberare în câteva minute
+                  </Badge>
                   <Badge variant="outline" className="text-white/80 border-white/30 px-3 py-1">
                     <Landmark className="h-3.5 w-3.5 mr-1" aria-hidden="true" />
                     ONRC
@@ -230,9 +227,6 @@ export default async function CertificatConstatatorPage() {
                     ))}
                   </ul>
                 </div>
-
-                {/* Stare sistem — eliberare automată 24/7 */}
-                <SystemStatus className="mt-5 max-w-[440px]" />
               </div>
 
               {/* Price card */}

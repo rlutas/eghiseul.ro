@@ -337,15 +337,11 @@ export default async function ExtrasCarteFunciaraPage() {
                 </p>
               </div>
             </div>
-          </div>
-        </section>
 
-        {/* Who can request + what you need — targets "cine poate scoate" + "ce acte trebuie" */}
-        <section className="py-12 lg:py-16 bg-white">
-          <div className="container mx-auto px-4 max-w-[900px]">
-            <div className="grid md:grid-cols-2 gap-6">
-              <div className="rounded-2xl border border-neutral-200 p-6">
-                <h2 className="text-xl font-bold text-secondary-900 mb-3">Cine poate cere extrasul de carte funciară</h2>
+            {/* Cine poate cere + ce acte — part of the "ce este" section */}
+            <div className="grid md:grid-cols-2 gap-6 mt-8">
+              <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
+                <h3 className="text-lg font-bold text-secondary-900 mb-3">Cine poate cere extrasul de carte funciară</h3>
                 <p className="text-sm text-neutral-700 leading-relaxed mb-3">
                   Extrasul de carte funciară <strong>pentru informare</strong> este public — îl poate cere
                   <strong> oricine</strong>, nu doar proprietarul, fără acordul acestuia. Cel mai des îl solicită:
@@ -359,8 +355,8 @@ export default async function ExtrasCarteFunciaraPage() {
                   ))}
                 </ul>
               </div>
-              <div className="rounded-2xl border border-neutral-200 p-6 bg-primary-50/40">
-                <h2 className="text-xl font-bold text-secondary-900 mb-3">Ce acte și date îți trebuie</h2>
+              <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
+                <h3 className="text-lg font-bold text-secondary-900 mb-3">Ce acte și date îți trebuie</h3>
                 <p className="text-sm text-neutral-700 leading-relaxed mb-3">
                   Pentru extrasul de informare <strong>nu ai nevoie de acte de identitate</strong> și nici de acordul
                   proprietarului. Îți trebuie doar:
