@@ -37,11 +37,11 @@ import { GOOGLE_RATING, GOOGLE_REVIEW_COUNT_LABEL } from '@/config/contact';
 const SERVICE_SLUG = 'certificat-constatator';
 const PAGE_PATH = '/servicii/certificat-constatator-online/';
 const SCHEMA_SLUG = 'certificat-constatator-online';
-const TITLE = 'Certificat Constatator ONRC Online — de la 79 RON';
+const TITLE = 'Certificat Constatator ONRC Online — de la 89 RON';
 const DESCRIPTION =
   'Obține Certificat Constatator online de la ONRC, cu datele actuale ale firmei: ' +
   'sediu, asociați, administratori, capital social și obiect de activitate. ' +
-  'De la 79 RON, pe firmă, persoană fizică sau cu istoric. 100% online, livrare pe email.';
+  'De la 89 RON, pe firmă, persoană fizică sau cu istoric. 100% online, livrare pe email.';
 const DATE_PUBLISHED = '2026-06-14';
 const DATE_MODIFIED = '2026-06-14';
 
@@ -97,8 +97,8 @@ const jsonLdGraph = buildServicePageGraph({
     { name: 'Certificat Constatator', url: `${BASE_URL}${PAGE_PATH}` },
   ],
   offers: [
-    { name: 'Certificat Constatator pe Firmă', price: 79, url: `${BASE_URL}${PAGE_PATH}` },
-    { name: 'Certificat Constatator Persoană Fizică', price: 79, url: `${BASE_URL}${PAGE_PATH}` },
+    { name: 'Certificat Constatator pe Firmă', price: 89, url: `${BASE_URL}${PAGE_PATH}` },
+    { name: 'Certificat Constatator Persoană Fizică', price: 89, url: `${BASE_URL}${PAGE_PATH}` },
     { name: 'Certificat Constatator cu Istoric', price: 487, url: `${BASE_URL}${PAGE_PATH}` },
   ],
   aggregateRating: { ratingValue: 4.9, reviewCount: 450 },
@@ -119,14 +119,14 @@ export default async function CertificatConstatatorPage() {
       icon: Building2,
       title: 'Certificat Constatator pe Firmă',
       desc: 'Situația la zi a unei societăți: date de identificare, sediu social, coduri CAEN, administratori și asociați. Cel mai cerut (bănci, ANAF, licitații).',
-      price: 79,
+      price: 89,
       featured: true,
     },
     {
       icon: Users,
       title: 'Certificat Constatator Persoană Fizică',
       desc: 'Verifică dacă o persoană fizică deține calitatea de asociat sau administrator în firme înregistrate la Registrul Comerțului.',
-      price: 79,
+      price: 89,
       featured: false,
     },
     {
