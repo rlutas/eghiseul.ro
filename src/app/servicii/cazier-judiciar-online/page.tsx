@@ -7,6 +7,7 @@ import { Footer } from '@/components/home/footer';
 import { MobileStickyCTA } from '@/components/services/mobile-sticky-cta';
 import { ServiceFAQ, type FAQ, type FAQCategory } from '@/components/services/service-faq';
 import { ReviewsSection } from '@/components/services/reviews-section';
+import { GoogleReviewsBadge } from '@/components/services/google-reviews-badge';
 import { buildPageMetadata, buildServicePageGraph, BASE_URL } from '@/lib/seo';
 import { cn } from '@/lib/utils';
 import {
@@ -346,58 +347,122 @@ export default function CazierJudiciarHubPage() {
               <span className="text-white font-medium">Cazier Judiciar Online</span>
             </nav>
 
-            <div className="text-center max-w-3xl mx-auto">
-              <Badge className="bg-primary-500 text-secondary-900 font-bold px-4 py-1.5 mb-6">
-                <Scale className="h-4 w-4 mr-2" />
-                Serviciu Juridic Oficial
-              </Badge>
-
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-tight mb-5">
-                Cazier Judiciar Online — Obține Rapid Fără Drumuri la Poliție
-              </h1>
-
-              <p className="text-lg sm:text-xl text-white/85 leading-relaxed mb-8">
-                Document oficial emis de <strong className="text-primary-500">Poliția Română</strong> conform
-                Legii 290/2004. Procesare 100% online pentru{' '}
-                <strong className="text-primary-500">persoane fizice și juridice</strong> —{' '}
-                <strong className="text-primary-500">198 RON</strong> cu TVA inclus, livrat în 2-4 zile lucrătoare.
-              </p>
-
-              <div className="flex flex-wrap justify-center gap-3 mb-8">
-                <div className="flex items-center gap-2 text-white/80 bg-white/5 px-4 py-2 rounded-full">
-                  <Clock className="w-4 h-4 text-primary-500" />
-                  <span className="text-sm font-medium">2-4 zile standard / 1-2 zile urgent</span>
+            <div className="flex flex-col-reverse lg:flex-row lg:justify-between gap-8 lg:gap-12">
+              {/* Left: content */}
+              <div className="flex-1 max-w-[700px]">
+                <div className="flex flex-wrap gap-2 mb-4">
+                  <Badge className="bg-primary-500 text-secondary-900 font-bold px-3 py-1">
+                    <Scale className="h-3.5 w-3.5 mr-1" />
+                    Serviciu Juridic Oficial
+                  </Badge>
+                  <Badge className="bg-green-600 text-white font-bold px-3 py-1">
+                    <Clock className="h-3.5 w-3.5 mr-1" />
+                    2-4 zile (1-2 urgent)
+                  </Badge>
+                  <Badge variant="outline" className="text-white/80 border-white/30 px-3 py-1">
+                    <Award className="h-3.5 w-3.5 mr-1" />
+                    IGPR
+                  </Badge>
                 </div>
-                <div className="flex items-center gap-2 text-white/80 bg-white/5 px-4 py-2 rounded-full">
-                  <Shield className="w-4 h-4 text-primary-500" />
-                  <span className="text-sm font-medium">Plată securizată Stripe</span>
+
+                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-tight mb-5">
+                  Cazier Judiciar
+                  <span className="block text-primary-500">Online</span>
+                </h1>
+
+                <p className="text-lg sm:text-xl text-white/85 leading-relaxed mb-6">
+                  Document oficial emis de <strong className="text-primary-500">Poliția Română</strong> conform
+                  Legii 290/2004, pentru <strong>persoane fizice și firme</strong>. Îl obții 100% online,
+                  fără drum la ghișeu.
+                </p>
+
+                {/* USP — diaspora */}
+                <div className="flex items-start gap-3 rounded-xl bg-primary-500/15 border border-primary-500/40 p-4 mb-6">
+                  <Globe className="h-5 w-5 text-primary-500 flex-shrink-0 mt-0.5" />
+                  <p className="text-white/95 text-sm sm:text-base leading-relaxed">
+                    Disponibil și pentru <strong className="text-primary-500">românii din diaspora</strong> — fără
+                    să te întorci în țară, cu livrare pe email sau prin curier internațional.
+                  </p>
                 </div>
-                <div className="flex items-center gap-2 text-white/80 bg-white/5 px-4 py-2 rounded-full">
-                  <Award className="w-4 h-4 text-primary-500" />
-                  <span className="text-sm font-medium">Document oficial IGPR</span>
-                </div>
-                <div className="flex items-center gap-2 text-white/80 bg-white/5 px-4 py-2 rounded-full">
-                  <Globe className="w-4 h-4 text-primary-500" />
-                  <span className="text-sm font-medium">Disponibil în diaspora</span>
+
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-5 border border-white/20 mb-6">
+                  <p className="text-white/90 leading-relaxed text-sm sm:text-base">
+                    <strong className="text-primary-500">Cazierul judiciar</strong> se obține simplu, în 4 pași:
+                  </p>
+                  <ul className="mt-3 space-y-1.5 text-white/85 text-sm">
+                    {[
+                      'Alegi tipul: persoană fizică sau firmă (PJ)',
+                      'Completezi formularul și verifici identitatea',
+                      'Plătești securizat (Stripe) — 198 RON, TVA inclus',
+                      'Primești documentul oficial IGPR în 2-4 zile (1-2 urgent)',
+                    ].map((step) => (
+                      <li key={step} className="flex items-center gap-2">
+                        <CheckCircle className="w-4 h-4 text-primary-500 flex-shrink-0" />
+                        {step}
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                <Link
-                  href="/servicii/cazier-judiciar-online/persoana-fizica/"
-                  className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-primary-500 hover:bg-primary-600 text-secondary-900 font-bold rounded-lg transition-colors"
-                >
-                  <User className="w-5 h-5" />
-                  Comandă pentru Persoană Fizică
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-                <Link
-                  href="/servicii/cazier-judiciar-online/persoana-juridica/"
-                  className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-white/10 hover:bg-white/20 text-white font-bold rounded-lg border border-white/20 transition-colors"
-                >
-                  <Building2 className="w-5 h-5" />
-                  Comandă pentru Firmă (PJ)
-                </Link>
+              {/* Right: price card */}
+              <div className="lg:w-[360px] flex-shrink-0 lg:self-center">
+                <div className="bg-white rounded-3xl shadow-2xl overflow-hidden border border-neutral-100">
+                  <div className="relative bg-gradient-to-br from-secondary-900 via-secondary-800 to-[#0C1A2F] p-6 text-center">
+                    <span className="inline-block px-3 py-1 bg-primary-500 text-secondary-900 text-xs font-bold rounded-full mb-3">
+                      TVA INCLUS
+                    </span>
+                    <div className="flex items-baseline justify-center gap-1">
+                      <span className="text-5xl lg:text-6xl font-black text-white">198</span>
+                      <span className="text-xl font-bold text-white/70">RON</span>
+                    </div>
+                    <p className="text-white/70 text-sm mt-2">Persoană fizică sau firmă — ambele variante</p>
+                    <p className="text-white/50 text-xs mt-1">Fără taxe ascunse</p>
+                  </div>
+
+                  <div className="p-5 space-y-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                        <Clock className="h-5 w-5 text-green-600" />
+                      </div>
+                      <div>
+                        <p className="font-semibold text-secondary-900 text-sm">Livrare în 2-4 zile</p>
+                        <p className="text-xs text-neutral-500">1-2 zile la varianta urgentă</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                        <Mail className="h-5 w-5 text-blue-600" />
+                      </div>
+                      <div>
+                        <p className="font-semibold text-secondary-900 text-sm">Email sau curier</p>
+                        <p className="text-xs text-neutral-500">PDF oficial IGPR, semnat electronic</p>
+                      </div>
+                    </div>
+
+                    <a
+                      href="#alege-tip"
+                      className="flex items-center justify-center gap-2 w-full mt-4 px-6 py-3.5 bg-primary-500 hover:bg-primary-600 text-secondary-900 font-bold rounded-xl transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
+                    >
+                      Alege tipul și comandă
+                      <ArrowRight className="w-4 h-4" />
+                    </a>
+
+                    <div className="flex items-center justify-center gap-4 pt-3 border-t border-neutral-100">
+                      <div className="flex items-center gap-1 text-neutral-500">
+                        <Shield className="h-4 w-4" />
+                        <span className="text-xs">Securizat</span>
+                      </div>
+                      <div className="flex items-center gap-1 text-neutral-500">
+                        <CheckCircle className="h-4 w-4" />
+                        <span className="text-xs">Document oficial</span>
+                      </div>
+                    </div>
+
+                    <GoogleReviewsBadge variant="bar" className="mt-3" />
+                  </div>
+                </div>
               </div>
             </div>
           </div>
