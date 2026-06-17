@@ -26,7 +26,11 @@ const categoryIcons: Record<string, React.ReactNode> = {
  *  specimen (rovinietă, plan cadastral, identificare, multilingv) cad pe iconiță. */
 const SPECIMEN_BY_SLUG: Record<string, string> = {
   'cazier-judiciar': '/images/specimens/cazier-judiciar.png',
+  'cazier-judiciar-persoana-fizica': '/images/specimens/cazier-judiciar.png',
+  'cazier-judiciar-persoana-juridica': '/images/specimens/cazier-judiciar.png',
   'cazier-fiscal': '/images/specimens/cazier-fiscal.png',
+  'cazier-fiscal-persoana-fizica': '/images/specimens/cazier-fiscal.png',
+  'cazier-fiscal-persoana-juridica': '/images/specimens/cazier-fiscal.png',
   'cazier-auto': '/images/specimens/cazier-auto.png',
   'certificat-integritate': '/images/specimens/certificat-integritate.png',
   'extras-carte-funciara': '/images/specimens/extras-cf.png',
@@ -57,6 +61,10 @@ export function ServiceCard({ service }: ServiceCardProps) {
           <div className="w-full h-full bg-gradient-to-br from-primary-50 to-primary-100 flex items-center justify-center text-primary-500">
             {icon}
           </div>
+        )}
+        {/* Soft fade into the card body (only over a real document) */}
+        {specimen && (
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-white to-transparent" aria-hidden="true" />
         )}
         {/* Urgency Badge */}
         {service.urgent_available && (
