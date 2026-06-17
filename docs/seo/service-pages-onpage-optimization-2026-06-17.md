@@ -23,12 +23,17 @@ alternanța fundalurilor (vezi `docs/design/SERVICE-PAGE-DESIGN-GUIDE.md`).
   informaționale care rankuiesc deja pe head terms — nu duplică conținutul lor.
 - **Acuratețe:** fără „instant" pe documente livrate în zile; „gratuit" explicat onest.
 
-## Rămase (wave 2 — impresii/poziții mai mici, de făcut pe rand)
-- cazier-auto-online (4.6k clicks, CTR 8.48%, poz 5.0 — deja bun)
-- eliberare-certificat-de-casatorie (poz 5.9)
-- eliberare-certificat-de-celibat (poz 6.6)
-- extras-plan-cadastral
-- identificare-imobil
+## Pagini optimizate (wave 2 — restul, commit 4e87813)
+
+| Pagină | Schimbări cheie |
+|---|---|
+| cazier-auto-online | meta 225→149c; blocuri „cost/gratuit" + „eliberare/DRPCIV"; 5 FAQ; link tool rovinietă + articol cazier auto. Titlu păstrat (CTR 8.48%). |
+| eliberare-certificat-de-casatorie | meta 248→138c; „Situații frecvente" 4 carduri; 4 FAQ (digital/2025, programare, acte); link siblings + articol stare civilă. |
+| eliberare-certificat-de-celibat | titlu prinde „România"; meta ~150c; bloc diaspora/altă localitate; 2 FAQ; link siblings. |
+| extras-plan-cadastral | prinde clusterul orfan „harta cadastru / cadastru online" (~68k impr, fără owner) onest (geoportal vs document); 3 FAQ. |
+| identificare-imobil | titlu tranzacțional „număr cadastral după adresă"; prinde „localizare teren după număr cadastral" (49k impr, poz 5); 2 blocuri; 3 FAQ; link anti-canibalizare la articol nr-cadastral + extras CF. |
+
+**Toate cele 11 pagini-serviciu sunt acum optimizate on-page.**
 
 ## De urmărit / follow-up tehnic
 - `/servicii/extras-multilingv-certificat-nastere/` → **404** (URL în GSC cu trafic istoric) — candidat redirect.
