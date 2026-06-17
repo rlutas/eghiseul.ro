@@ -5,7 +5,6 @@ import { buildPageMetadata, buildServicePageGraph, BASE_URL } from '@/lib/seo';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import {
-  ArrowRight,
   Clock,
   Shield,
   Zap,
@@ -20,6 +19,8 @@ import {
   Plane,
   Baby,
   Gavel,
+  Landmark,
+  Star,
 } from 'lucide-react';
 import { Service, ServiceOption, formatEstimatedDays } from '@/types/services';
 import { Footer } from '@/components/home/footer';
@@ -28,6 +29,8 @@ import { WhatsAppButton } from '@/components/services/whatsapp-button';
 import { GoogleReviewsBadge } from '@/components/services/google-reviews-badge';
 import { OrderButton } from '@/components/services/order-button';
 import { ServiceFAQ } from '@/components/services/service-faq';
+import { ServicePrice } from '@/components/services/service-price';
+import { ReviewsSection } from '@/components/services/reviews-section';
 
 // Database slug for this service (order pipeline identifier)
 const SERVICE_SLUG = 'cazier-judiciar-persoana-fizica';
@@ -262,13 +265,8 @@ export default async function CazierJudiciarPFPage() {
                       <span className="inline-block px-3 py-1 bg-primary-500 text-secondary-900 text-xs font-bold rounded-full mb-3">
                         PREȚ COMPLET
                       </span>
-                      <div className="flex items-baseline justify-center gap-1">
-                        <span className="text-5xl lg:text-6xl font-black text-white">
-                          {service.base_price}
-                        </span>
-                        <span className="text-xl font-bold text-white/70">RON</span>
-                      </div>
-                      <p className="text-white/60 text-sm mt-2">Fără taxe ascunse</p>
+                      <ServicePrice basePrice={service.base_price} />
+                      <p className="text-white/50 text-xs mt-1">Fără taxe ascunse</p>
                     </div>
                   </div>
 
@@ -334,6 +332,28 @@ export default async function CazierJudiciarPFPage() {
           </div>
         </section>
 
+        {/* Trust strip */}
+        <section className="bg-white border-b border-neutral-200">
+          <div className="container mx-auto px-4 max-w-[1100px] py-6 lg:py-8">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+              {[
+                { icon: Clock, value: '2-4 zile lucrătoare', label: 'Urgent în 1-2 zile' },
+                { icon: Landmark, value: 'IGPR', label: 'Poliția Română oficial' },
+                { icon: Mail, value: 'Email + curier', label: 'PDF + livrare opțională' },
+                { icon: Star, value: '4.9/5', label: 'Peste 450 recenzii' },
+              ].map((t) => (
+                <div key={t.label} className="flex flex-col items-center gap-1.5">
+                  <div className="w-11 h-11 bg-primary-50 rounded-xl flex items-center justify-center">
+                    <t.icon className="h-5 w-5 text-primary-600" aria-hidden="true" />
+                  </div>
+                  <p className="text-base lg:text-lg font-extrabold text-secondary-900 leading-tight">{t.value}</p>
+                  <p className="text-xs text-neutral-500 leading-tight">{t.label}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
         {/* SEO Intro Content — targets "cazier judiciar persoană fizică" + "gratuit" intent */}
         <section className="py-12 lg:py-16 bg-neutral-50">
           <div className="container mx-auto px-4 max-w-[820px]">
@@ -389,7 +409,7 @@ export default async function CazierJudiciarPFPage() {
 
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 {options.map((option) => (
-                  <Card key={option.id} className="border-2 border-neutral-200 hover:border-primary-400 transition-all hover:shadow-md">
+                  <Card key={option.id} className="bg-neutral-50 border-2 border-neutral-200 hover:border-primary-400 transition-all hover:shadow-md">
                     <CardContent className="p-4 lg:p-5">
                       <div className="flex flex-col h-full">
                         <div className="flex items-start justify-between gap-2 mb-2">
@@ -432,8 +452,8 @@ export default async function CazierJudiciarPFPage() {
 
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
               {useCases.map((useCase, index) => (
-                <div key={index} className="bg-white rounded-2xl p-5 border border-neutral-200 hover:border-primary-300 hover:shadow-md transition-all">
-                  <div className="w-12 h-12 bg-primary-100 rounded-xl flex items-center justify-center mb-4">
+                <div key={index} className="bg-white rounded-2xl p-5 border border-neutral-200 hover:border-primary-300 hover:shadow-lg hover:-translate-y-1 transition-all duration-200">
+                  <div className="w-12 h-12 bg-gradient-to-br from-primary-100 to-primary-200 rounded-xl flex items-center justify-center mb-4">
                     <useCase.icon className="w-6 h-6 text-primary-600" />
                   </div>
                   <h3 className="text-lg font-bold text-secondary-900 mb-3">{useCase.title}</h3>
@@ -451,72 +471,54 @@ export default async function CazierJudiciarPFPage() {
           </div>
         </section>
 
-        {/* How It Works */}
-        <section className="py-12 lg:py-20 bg-white">
-          <div className="container mx-auto px-4 max-w-[1400px]">
-            <div className="text-center mb-12">
-              <span className="inline-block px-4 py-1.5 bg-primary-100 text-primary-700 text-sm font-semibold rounded-full mb-4">
+        {/* How it works — dark connected timeline */}
+        <section className="relative overflow-hidden bg-gradient-to-b from-secondary-900 to-[#0C1A2F] py-14 lg:py-24">
+          <div className="absolute inset-0 opacity-5">
+            <div
+              className="absolute inset-0"
+              style={{
+                backgroundImage: 'radial-gradient(circle at 1px 1px, #ECB95F 1px, transparent 0)',
+                backgroundSize: '40px 40px',
+              }}
+            />
+          </div>
+          <div className="relative container mx-auto px-4 max-w-[1100px]">
+            <div className="text-center mb-14">
+              <span className="inline-block px-4 py-1.5 bg-primary-500/15 text-primary-400 text-sm font-semibold rounded-full mb-4 border border-primary-500/30">
                 Proces simplu
               </span>
-              <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-3">
-                Cum Funcționează?
-              </h2>
-              <p className="text-neutral-600 max-w-2xl mx-auto">
-                Obții cazierul judiciar în 4 pași simpli, 100% online
-              </p>
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white mb-3">Cum Funcționează?</h2>
+              <p className="text-white/70 max-w-2xl mx-auto">Obții cazierul judiciar în 4 pași simpli, 100% online — fără drum la ghișeu.</p>
             </div>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
+            <div className="relative grid sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-6">
+              {/* connecting line (desktop) */}
+              <div className="hidden lg:block absolute top-8 left-[12.5%] right-[12.5%] h-0.5 bg-gradient-to-r from-primary-500/0 via-primary-500/50 to-primary-500/0" aria-hidden="true" />
               {[
-                {
-                  step: 1,
-                  title: 'Completează Formularul',
-                  desc: 'Introdu datele personale inclusiv CNP, adresă și date părinți.',
-                  icon: FileText,
-                },
-                {
-                  step: 2,
-                  title: 'Încarcă Documentele',
-                  desc: 'Fotografiază CI (față + verso) și fă un selfie pentru verificare.',
-                  icon: User,
-                },
-                {
-                  step: 3,
-                  title: 'Plătește Securizat',
-                  desc: 'Card, Apple Pay, Google Pay - toate prin Stripe.',
-                  icon: Shield,
-                },
-                {
-                  step: 4,
-                  title: 'Primești Documentul',
-                  desc: `În ${formatEstimatedDays(service)} primești cazierul pe email + curier.`,
-                  icon: CheckCircle,
-                },
-              ].map((item, index) => (
-                <div key={index} className="relative">
-                  <div className="bg-neutral-50 rounded-2xl p-6 h-full border border-neutral-200 hover:border-primary-300 hover:shadow-lg transition-all group">
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="w-12 h-12 bg-primary-500 rounded-xl flex items-center justify-center text-secondary-900 font-bold text-lg group-hover:scale-110 transition-transform">
-                        {item.step}
-                      </div>
-                      <item.icon className="w-5 h-5 text-primary-600" />
-                    </div>
-                    <h3 className="text-lg font-bold text-secondary-900 mb-2">{item.title}</h3>
-                    <p className="text-sm text-neutral-600 leading-relaxed">{item.desc}</p>
+                { step: 1, title: 'Completează Formularul', desc: 'Introdu datele personale inclusiv CNP, adresă și date părinți.', icon: FileText },
+                { step: 2, title: 'Încarcă Documentele', desc: 'Fotografiază CI (față + verso) și fă un selfie pentru verificare.', icon: User },
+                { step: 3, title: 'Plătește Securizat', desc: 'Card, Apple Pay, Google Pay — toate prin Stripe.', icon: Shield },
+                { step: 4, title: 'Primești Documentul', desc: `În ${formatEstimatedDays(service)} primești cazierul pe email + curier.`, icon: CheckCircle },
+              ].map((item) => (
+                <div key={item.step} className="relative text-center">
+                  <div className="relative z-10 mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-400 to-primary-600 text-secondary-900 shadow-[0_8px_24px_rgba(236,185,95,0.35)]">
+                    <item.icon className="h-7 w-7" aria-hidden="true" />
+                    <span className="absolute -top-2 -right-2 flex h-7 w-7 items-center justify-center rounded-full bg-white text-sm font-extrabold text-secondary-900 shadow-md">
+                      {item.step}
+                    </span>
                   </div>
-                  {index < 3 && (
-                    <div className="hidden lg:block absolute top-1/2 -right-4 transform -translate-y-1/2 z-10">
-                      <ArrowRight className="h-5 w-5 text-primary-400" />
-                    </div>
-                  )}
+                  <h3 className="text-lg font-bold text-white mb-2">{item.title}</h3>
+                  <p className="text-sm text-white/65 leading-relaxed max-w-[240px] mx-auto">{item.desc}</p>
                 </div>
               ))}
             </div>
           </div>
         </section>
 
+        {/* Reviews */}
+        <ReviewsSection />
+
         {/* Required Documents */}
-        <section className="py-12 lg:py-20 bg-neutral-50">
+        <section className="py-12 lg:py-20 bg-white">
           <div className="container mx-auto px-4 max-w-[1280px]">
             <div className="text-center mb-10">
               <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-3">
@@ -536,7 +538,7 @@ export default async function CazierJudiciarPFPage() {
               ].map((doc, index) => (
                 <div
                   key={index}
-                  className="flex items-center gap-4 p-5 bg-white rounded-xl border border-neutral-200 hover:border-green-200 hover:bg-green-50/50 transition-all"
+                  className="flex items-center gap-4 p-5 bg-neutral-50 rounded-xl border border-neutral-200 hover:border-green-200 hover:bg-green-50/50 transition-all"
                 >
                   <div className="w-11 h-11 bg-green-100 rounded-xl flex items-center justify-center flex-shrink-0">
                     <CheckCircle className="h-5 w-5 text-green-600" />

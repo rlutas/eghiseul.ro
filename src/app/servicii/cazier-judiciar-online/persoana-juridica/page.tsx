@@ -28,6 +28,7 @@ import { Footer } from '@/components/home/footer';
 import { MobileStickyCTA } from '@/components/services/mobile-sticky-cta';
 import { WhatsAppButton } from '@/components/services/whatsapp-button';
 import { GoogleReviewsBadge } from '@/components/services/google-reviews-badge';
+import { ReviewsSection } from '@/components/services/reviews-section';
 import { ServiceFAQ } from '@/components/services/service-faq';
 
 // Database slug for this service (order pipeline identifier)
@@ -122,6 +123,12 @@ export default async function CazierJudiciarPJPage() {
   }
 
   const { service, options } = data;
+
+  // Price display: base_price is VAT-inclusive (total). Show the ex-VAT number as
+  // the headline (looks smaller / more attractive) + VAT + total cu TVA — same as CF.
+  const priceWithVat = Number(service.base_price);
+  const priceExVat = Math.round((priceWithVat / 1.21) * 100) / 100;
+  const fmt = (v: number) => (Number.isInteger(v) ? String(v) : v.toFixed(2).replace('.', ','));
 
   // Use cases for Cazier Judiciar PJ
   const useCases = [
@@ -272,12 +279,13 @@ export default async function CazierJudiciarPJPage() {
                         PREȚ FIRMĂ
                       </span>
                       <div className="flex items-baseline justify-center gap-1">
-                        <span className="text-5xl lg:text-6xl font-black text-white">
-                          {service.base_price}
-                        </span>
+                        <span className="text-5xl lg:text-6xl font-black text-white">{fmt(priceExVat)}</span>
                         <span className="text-xl font-bold text-white/70">RON</span>
                       </div>
-                      <p className="text-white/60 text-sm mt-2">Fără taxe ascunse</p>
+                      <p className="text-white/70 text-sm mt-2">
+                        + TVA 21% · <span className="font-semibold text-white">{fmt(priceWithVat)} RON</span> cu TVA
+                      </p>
+                      <p className="text-white/50 text-xs mt-1">Fără taxe ascunse</p>
                     </div>
                   </div>
 
@@ -359,6 +367,28 @@ export default async function CazierJudiciarPJPage() {
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Trust strip */}
+        <section className="bg-white border-b border-neutral-200">
+          <div className="container mx-auto px-4 max-w-[1100px] py-6 lg:py-8">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+              {[
+                { icon: Clock, value: '2-4 zile lucrătoare', label: '1-2 zile cu urgență' },
+                { icon: Shield, value: 'IGPR', label: 'Eliberat de Poliția Română' },
+                { icon: Building2, value: 'Auto-completare CUI', label: 'Date firmă de la ONRC' },
+                { icon: CheckCircle, value: '4.9/5', label: 'Peste 450 recenzii' },
+              ].map((t) => (
+                <div key={t.label} className="flex flex-col items-center gap-1.5">
+                  <div className="w-11 h-11 bg-blue-50 rounded-xl flex items-center justify-center">
+                    <t.icon className="h-5 w-5 text-blue-600" aria-hidden="true" />
+                  </div>
+                  <p className="text-base lg:text-lg font-extrabold text-secondary-900 leading-tight">{t.value}</p>
+                  <p className="text-xs text-neutral-500 leading-tight">{t.label}</p>
+                </div>
+              ))}
             </div>
           </div>
         </section>
@@ -505,8 +535,8 @@ export default async function CazierJudiciarPJPage() {
 
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
               {useCases.map((useCase, index) => (
-                <div key={index} className="bg-neutral-50 rounded-2xl p-5 border border-neutral-200 hover:border-blue-300 hover:shadow-md transition-all">
-                  <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-4">
+                <div key={index} className="bg-neutral-50 rounded-2xl p-5 border border-neutral-200 hover:border-blue-300 hover:shadow-lg hover:-translate-y-1 transition-all duration-200">
+                  <div className="w-12 h-12 bg-gradient-to-br from-blue-100 to-blue-200 rounded-xl flex items-center justify-center mb-4">
                     <useCase.icon className="w-6 h-6 text-blue-600" />
                   </div>
                   <h3 className="text-lg font-bold text-secondary-900 mb-3">{useCase.title}</h3>
@@ -524,64 +554,45 @@ export default async function CazierJudiciarPJPage() {
           </div>
         </section>
 
-        {/* How It Works */}
-        <section className="py-12 lg:py-20 bg-neutral-50">
-          <div className="container mx-auto px-4 max-w-[1400px]">
-            <div className="text-center mb-12">
-              <span className="inline-block px-4 py-1.5 bg-blue-100 text-blue-700 text-sm font-semibold rounded-full mb-4">
+        <ReviewsSection />
+
+        {/* How it works — dark connected timeline */}
+        <section className="relative overflow-hidden bg-gradient-to-b from-secondary-900 to-[#0C1A2F] py-14 lg:py-24">
+          <div className="absolute inset-0 opacity-5">
+            <div
+              className="absolute inset-0"
+              style={{
+                backgroundImage: 'radial-gradient(circle at 1px 1px, #3B82F6 1px, transparent 0)',
+                backgroundSize: '40px 40px',
+              }}
+            />
+          </div>
+          <div className="relative container mx-auto px-4 max-w-[1100px]">
+            <div className="text-center mb-14">
+              <span className="inline-block px-4 py-1.5 bg-blue-500/15 text-blue-400 text-sm font-semibold rounded-full mb-4 border border-blue-500/30">
                 Proces simplu
               </span>
-              <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-3">
-                Cum Funcționează?
-              </h2>
-              <p className="text-neutral-600 max-w-2xl mx-auto">
-                Obții cazierul judiciar pentru firmă în 4 pași simpli
-              </p>
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white mb-3">Cum Funcționează?</h2>
+              <p className="text-white/70 max-w-2xl mx-auto">Obții cazierul judiciar pentru firmă în 4 pași, 100% online.</p>
             </div>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
+            <div className="relative grid sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-6">
+              {/* connecting line (desktop) */}
+              <div className="hidden lg:block absolute top-8 left-[12.5%] right-[12.5%] h-0.5 bg-gradient-to-r from-blue-500/0 via-blue-500/50 to-blue-500/0" aria-hidden="true" />
               {[
-                {
-                  step: 1,
-                  title: 'Introdu CUI-ul',
-                  desc: 'Sistemul preia automat datele firmei de la ONRC.',
-                  icon: Building2,
-                },
-                {
-                  step: 2,
-                  title: 'Date Reprezentant',
-                  desc: 'Completează datele reprezentantului legal care semnează.',
-                  icon: FileText,
-                },
-                {
-                  step: 3,
-                  title: 'Plătește Securizat',
-                  desc: 'Card, Apple Pay, Google Pay - toate prin Stripe.',
-                  icon: Shield,
-                },
-                {
-                  step: 4,
-                  title: 'Primești Documentul',
-                  desc: `În ${formatEstimatedDays(service)} primești cazierul pe email.`,
-                  icon: CheckCircle,
-                },
-              ].map((item, index) => (
-                <div key={index} className="relative">
-                  <div className="bg-white rounded-2xl p-6 h-full border border-neutral-200 hover:border-blue-300 hover:shadow-lg transition-all group">
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center text-white font-bold text-lg group-hover:scale-110 transition-transform">
-                        {item.step}
-                      </div>
-                      <item.icon className="w-5 h-5 text-blue-600" />
-                    </div>
-                    <h3 className="text-lg font-bold text-secondary-900 mb-2">{item.title}</h3>
-                    <p className="text-sm text-neutral-600 leading-relaxed">{item.desc}</p>
+                { step: 1, title: 'Introdu CUI-ul', desc: 'Sistemul preia automat datele firmei de la ONRC.', icon: Building2 },
+                { step: 2, title: 'Date Reprezentant', desc: 'Completează datele reprezentantului legal care semnează.', icon: FileText },
+                { step: 3, title: 'Plătește Securizat', desc: 'Card, Apple Pay, Google Pay — toate prin Stripe.', icon: Shield },
+                { step: 4, title: 'Primești Documentul', desc: `În ${formatEstimatedDays(service)} primești cazierul pe email.`, icon: CheckCircle },
+              ].map((item) => (
+                <div key={item.step} className="relative text-center">
+                  <div className="relative z-10 mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-400 to-blue-600 text-white shadow-[0_8px_24px_rgba(59,130,246,0.35)]">
+                    <item.icon className="h-7 w-7" aria-hidden="true" />
+                    <span className="absolute -top-2 -right-2 flex h-7 w-7 items-center justify-center rounded-full bg-white text-sm font-extrabold text-secondary-900 shadow-md">
+                      {item.step}
+                    </span>
                   </div>
-                  {index < 3 && (
-                    <div className="hidden lg:block absolute top-1/2 -right-4 transform -translate-y-1/2 z-10">
-                      <ArrowRight className="h-5 w-5 text-blue-400" />
-                    </div>
-                  )}
+                  <h3 className="text-lg font-bold text-white mb-2">{item.title}</h3>
+                  <p className="text-sm text-white/65 leading-relaxed max-w-[240px] mx-auto">{item.desc}</p>
                 </div>
               ))}
             </div>
