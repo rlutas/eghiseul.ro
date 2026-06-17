@@ -129,6 +129,13 @@ export function Footer() {
       {/* Bottom Bar */}
       <div className="border-t border-white/10">
         <div className="container mx-auto px-4 py-5 sm:py-6 max-w-[1100px]">
+          {/* Legal disclaimer — private platform, not a state institution */}
+          <p className="text-white/40 text-[11px] sm:text-xs leading-relaxed text-center md:text-left mb-4 pb-4 border-b border-white/10">
+            eGhișeul.ro este un serviciu privat de asistență la obținerea de documente oficiale.
+            Nu suntem o instituție de stat și nu suntem afiliați cu vreun organ guvernamental.
+            Documentele sunt emise exclusiv de autoritățile competente din România, iar procedurile
+            sunt gestionate de un avocat colaborator înscris în Barou.
+          </p>
           <div className="flex flex-col md:flex-row justify-between items-center gap-3 sm:gap-4 text-sm">
             <div className="text-center md:text-left">
               <p className="text-white/50 text-xs sm:text-sm">

@@ -25,31 +25,26 @@ export function HeroSection() {
           <div className="flex-1 min-w-[280px] max-w-[680px] text-center lg:text-left px-1 sm:px-0">
             <h1 className="text-2xl font-extrabold tracking-tight text-white sm:text-3xl lg:text-5xl leading-[1.2]">
               Cazier Judiciar și Documente Oficiale Online –{' '}
-              <span className="text-primary-500">Fără Cozi, Livrare 24-48h</span>
+              <span className="text-primary-500">Prin Avocat, Fără Cozi, Livrare 24-48h</span>
             </h1>
 
             <p className="mt-4 sm:mt-6 text-base sm:text-lg text-white/85 leading-relaxed">
               Obțineți cazier judiciar, certificat de integritate, cazier fiscal, extras
               carte funciară și toate certificatele de stare civilă{' '}
               <strong className="text-white">fără cozi, fără deplasări</strong>.
-              eGhișeul.ro gestionează tot procesul – livrare rapidă în România și
-              internațional.
+              Avocatul nostru colaborator, înscris în Barou, se ocupă de întreaga procedură
+              legală în numele dumneavoastră.
             </p>
 
             {/* USP Highlight Box */}
             <div className="mt-5 sm:mt-6 bg-primary-500/10 border-l-[3px] border-primary-500 rounded-r-xl px-4 py-3 sm:px-5 sm:py-4">
               <p className="text-white/95 text-xs sm:text-sm leading-relaxed">
-                <strong className="text-primary-500">Peste 200.000 de documente</strong>{' '}
-                procesate din 2023. Tu completezi formularul online, noi ne ocupăm de
-                restul – certificare, apostilare și livrare la ușa ta.
+                <strong className="text-primary-500">Peste 200.000 de proceduri</strong>{' '}
+                gestionate cu succes. Tu completezi formularul online, avocatul colaborator
+                depune cererea la autorități, iar documentul oficial ajunge la tine –
+                prin curier sau pe email.
               </p>
             </div>
-
-            {/* Legal disclaimer — private platform, not a state institution (parity cu site-ul WP) */}
-            <p className="mt-4 text-[11px] sm:text-xs text-white/50 leading-relaxed">
-              Serviciu privat. Nu suntem o instituție de stat și nu suntem afiliați cu vreun organ
-              guvernamental — documentele sunt emise exclusiv de autoritățile competente din România.
-            </p>
 
             {/* Primary CTA — visible above the fold (esp. mobile, where the
                 services card stacks below). Scrolls to the services list. */}
