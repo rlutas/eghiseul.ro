@@ -50,7 +50,9 @@ export default function CompanyDataStep({ config, onValidChange }: CompanyDataSt
 
   // Auto-validate CUI when it changes (debounced)
   useEffect(() => {
-    if (!companyKyc?.cui || companyKyc.cui.length < 6) {
+    // Romanian CUIs are 2-10 digits (matches backend validateCUIFormat).
+    // Short, valid CUIs exist (e.g. 795 = CASSTIL SA), so do NOT gate on 6.
+    if (!companyKyc?.cui || companyKyc.cui.length < 2) {
       updateCompanyKyc?.({ validationStatus: 'pending' });
       return;
     }
@@ -65,7 +67,7 @@ export default function CompanyDataStep({ config, onValidChange }: CompanyDataSt
 
   // Validate CUI and fetch company data
   const validateCUI = useCallback(async (cui: string) => {
-    if (!cui || cui.length < 6) return;
+    if (!cui || cui.length < 2) return;
 
     setIsValidating(true);
     setError(null);
@@ -206,7 +208,7 @@ export default function CompanyDataStep({ config, onValidChange }: CompanyDataSt
   // Validate form
   const isFormValid = useCallback(() => {
     if (!companyKyc) return false;
-    if (!companyKyc.cui || companyKyc.cui.length < 6) return false;
+    if (!companyKyc.cui || companyKyc.cui.length < 2) return false;
     if (companyKyc.validationStatus === 'blocked') return false;
     if (companyKyc.validationStatus === 'invalid') return false;
     if (!companyKyc.companyName.trim()) return false;
@@ -284,7 +286,7 @@ export default function CompanyDataStep({ config, onValidChange }: CompanyDataSt
                 type="button"
                 variant="secondary"
                 onClick={handleSearch}
-                disabled={isValidating || !companyKyc.cui || companyKyc.cui.length < 6}
+                disabled={isValidating || !companyKyc.cui || companyKyc.cui.length < 2}
               >
                 {isValidating ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
