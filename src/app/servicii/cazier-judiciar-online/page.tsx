@@ -476,7 +476,7 @@ export default function CazierJudiciarHubPage() {
             </div>
 
             <div className="grid md:grid-cols-2 gap-6 lg:gap-8">
-              <Link href="/servicii/cazier-judiciar-online/persoana-fizica/" className="group">
+              <Link href="/comanda/cazier-judiciar-persoana-fizica/" className="group">
                 <Card className="h-full border-2 border-neutral-200 hover:border-primary-500 transition-all hover:shadow-xl cursor-pointer">
                   <CardContent className="p-6 lg:p-8">
                     <div className="flex flex-col h-full">
@@ -519,7 +519,7 @@ export default function CazierJudiciarHubPage() {
                 </Card>
               </Link>
 
-              <Link href="/servicii/cazier-judiciar-online/persoana-juridica/" className="group">
+              <Link href="/comanda/cazier-judiciar-persoana-juridica/" className="group">
                 <Card className="h-full border-2 border-neutral-200 hover:border-primary-500 transition-all hover:shadow-xl cursor-pointer">
                   <CardContent className="p-6 lg:p-8">
                     <div className="flex flex-col h-full">
@@ -1199,7 +1199,7 @@ export default function CazierJudiciarHubPage() {
 
               <div className="flex flex-col sm:flex-row gap-3 justify-center mb-10">
                 <Link
-                  href="/servicii/cazier-judiciar-online/persoana-fizica/"
+                  href="/comanda/cazier-judiciar-persoana-fizica/"
                   className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-primary-500 hover:bg-primary-600 text-secondary-900 font-bold rounded-lg transition-colors"
                 >
                   <User className="w-5 h-5" />
@@ -1207,7 +1207,7 @@ export default function CazierJudiciarHubPage() {
                   <ArrowRight className="w-4 h-4" />
                 </Link>
                 <Link
-                  href="/servicii/cazier-judiciar-online/persoana-juridica/"
+                  href="/comanda/cazier-judiciar-persoana-juridica/"
                   className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white/10 hover:bg-white/20 text-white font-bold rounded-lg border border-white/20 transition-colors"
                 >
                   <Building2 className="w-5 h-5" />

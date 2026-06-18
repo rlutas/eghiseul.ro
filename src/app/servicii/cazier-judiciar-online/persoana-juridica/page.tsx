@@ -311,7 +311,7 @@ export default async function CazierJudiciarPJPage() {
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between gap-2">
-                            <p className="font-bold text-secondary-900 text-sm">Urgent: {service.urgent_days} zile</p>
+                            <p className="font-bold text-secondary-900 text-sm">Urgent: 1-2 zile</p>
                             <span className="text-xs font-bold text-white bg-blue-600 px-2 py-1 rounded-lg">+80 RON</span>
                           </div>
                         </div>
@@ -655,7 +655,7 @@ export default async function CazierJudiciarPJPage() {
             },
             {
               q: 'Câte zile durează procesarea?',
-              a: `${formatEstimatedDays(service)} în mod standard. ${service.urgent_days} zile cu opțiunea Urgență (+80 RON).`,
+              a: `${formatEstimatedDays(service)} în mod standard. 1-2 zile lucrătoare cu opțiunea Urgență (+80 RON).`,
             },
             {
               q: 'Ce se întâmplă dacă firma are antecedente?',
