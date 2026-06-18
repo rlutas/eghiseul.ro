@@ -104,6 +104,14 @@ export function IdentificaImobilTool() {
                   {p.contains
                     ? <span className="ml-2 text-xs text-green-700">✓ punctul e în această parcelă</span>
                     : <span className="ml-2 text-xs text-amber-700">⚠️ doar în apropiere (posibil vecinul)</span>}
+                  {p.immovableId && (
+                    <div className="mt-1">
+                      <a className="text-primary-600 underline text-xs" target="_blank" rel="noreferrer"
+                        href={`https://geoportal.ancpi.ro/imobile_lookup.html?immovableid=${p.immovableId}`}>
+                        🗺️ vezi parcela în geoportal ANCPI
+                      </a>
+                    </div>
+                  )}
                 </div>
               ))}
               <p className="rounded bg-amber-50 border border-amber-200 px-3 py-2 text-xs text-amber-800">
