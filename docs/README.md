@@ -5,6 +5,7 @@
 **Fișier principal:** [`DEVELOPMENT_MASTER_PLAN.md`](DEVELOPMENT_MASTER_PLAN.md)
 **Status curent:** [`STATUS_CURRENT.md`](STATUS_CURRENT.md) — **citeste primul daca revii dupa pauza**
 **Plan SEO master:** [`seo/SEO-MASTER-PLAN-2026-05-20.md`](seo/SEO-MASTER-PLAN-2026-05-20.md)
+**⭐ Ghid AI Search / GEO (citește înainte de a scrie content):** [`seo/ai-content-optimization-guide.md`](seo/ai-content-optimization-guide.md)
 **Rebuild queue (47 pagini):** [`seo/REBUILD-QUEUE.md`](seo/REBUILD-QUEUE.md)
 **City pages plan:** [`seo/CITY-PAGES-PLAN.md`](seo/CITY-PAGES-PLAN.md)
 **Sesiune curentă (2026-06-12):**
