@@ -4,7 +4,6 @@ import { createPublicClient } from '@/lib/supabase/public';
 import { buildPageMetadata, buildServicePageGraph, BASE_URL } from '@/lib/seo';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent } from '@/components/ui/card';
 import {
   ArrowRight,
   Clock,
@@ -22,6 +21,7 @@ import {
   Handshake,
   Euro,
   AlertTriangle,
+  X,
 } from 'lucide-react';
 import { Service, ServiceOption, formatEstimatedDays } from '@/types/services';
 import { Footer } from '@/components/home/footer';
@@ -475,49 +475,78 @@ export default async function CazierJudiciarPJPage() {
           </div>
         </section>
 
-        {/* Service Options */}
-        {options.length > 0 && (
-          <section className="py-12 lg:py-20 bg-neutral-50">
-            <div className="container mx-auto px-4 max-w-[1400px]">
-              <div className="text-center mb-10">
-                <span className="inline-block px-4 py-1.5 bg-blue-100 text-blue-700 text-sm font-semibold rounded-full mb-4">
-                  Personalizare
+        {/* Preț & opțiuni — bază featured + urgență + add-on-uri (template CF, temă albastră PJ) */}
+        <section className="py-12 lg:py-20 bg-neutral-50">
+          <div className="container mx-auto px-4 max-w-[1100px]">
+            <div className="text-center mb-10">
+              <span className="inline-block px-4 py-1.5 bg-blue-100 text-blue-700 text-sm font-semibold rounded-full mb-4">
+                Preț & opțiuni
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-3">Prețuri transparente, fără surprize</h2>
+              <p className="text-neutral-600 max-w-xl mx-auto">Prețul de bază include taxele oficiale IGPR. Opțiunile sunt complet la alegerea ta.</p>
+            </div>
+
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6">
+              {/* Base service — featured */}
+              <div className="relative rounded-3xl border-2 border-blue-500 bg-white p-6 lg:p-7 shadow-[0_8px_28px_rgba(59,130,246,0.18)] flex flex-col">
+                <span className="absolute -top-3 left-6 inline-block rounded-full bg-blue-500 px-3 py-1 text-xs font-bold text-white">
+                  Serviciul de bază
                 </span>
-                <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-3">
-                  Opțiuni Disponibile
-                </h2>
-                <p className="text-neutral-600 max-w-xl mx-auto">
-                  Adaugă servicii extra pentru comanda ta
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-100 to-blue-200">
+                  <FileText className="h-6 w-6 text-blue-700" aria-hidden="true" />
+                </div>
+                <h3 className="text-lg font-bold text-secondary-900 mb-1.5">Cazier Judiciar — Persoană Juridică</h3>
+                <p className="text-sm text-neutral-600 leading-relaxed mb-5 flex-1">
+                  Documentul oficial emis de IGPR (Poliția Română) pentru firmă, semnat electronic eIDAS. Livrat pe email.
                 </p>
+                <div className="flex items-baseline gap-1 mb-1">
+                  <span className="text-3xl font-black text-secondary-900">{(service.base_price / 1.21).toFixed(2)}</span>
+                  <span className="text-sm font-bold text-neutral-400">RON</span>
+                </div>
+                <p className="text-xs text-neutral-500">+ TVA 21% · {service.base_price} RON cu TVA · taxe IGPR incluse</p>
               </div>
 
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                {options.map((option) => (
-                  <Card key={option.id} className="border-2 border-neutral-200 hover:border-blue-400 transition-all hover:shadow-md">
-                    <CardContent className="p-4 lg:p-5">
-                      <div className="flex flex-col h-full">
-                        <div className="flex items-start justify-between gap-2 mb-2">
-                          <h3 className="font-semibold text-secondary-900 text-sm lg:text-base">{option.name}</h3>
-                          {option.is_required && (
-                            <Badge className="bg-secondary-900 text-white text-[10px] flex-shrink-0">
-                              Obligatoriu
-                            </Badge>
-                          )}
-                        </div>
-                        {option.description && (
-                          <p className="text-xs lg:text-sm text-neutral-600 mb-3 flex-1">{option.description}</p>
-                        )}
-                        <span className="font-bold text-blue-600 text-base lg:text-lg mt-auto">
-                          +{option.price} RON
-                        </span>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
+              {/* Urgent processing (+80 RON — la cazier NU e gratis) */}
+              {options.filter((o) => o.code === 'urgenta').map((o) => (
+                <div key={o.id} className="relative rounded-3xl border-2 border-blue-300 bg-blue-50/50 p-6 lg:p-7 flex flex-col">
+                  <span className="absolute -top-3 left-6 inline-block rounded-full bg-blue-600 px-3 py-1 text-xs font-bold text-white">
+                    Recomandat
+                  </span>
+                  <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-100">
+                    <Zap className="h-6 w-6 text-blue-600" aria-hidden="true" />
+                  </div>
+                  <h3 className="text-lg font-bold text-secondary-900 mb-1.5">Procesare urgentă</h3>
+                  <p className="text-sm text-neutral-600 leading-relaxed mb-5 flex-1">
+                    Primești cazierul firmei în <strong>1-2 zile lucrătoare</strong> în loc de 2-4. Procesare prioritară.
+                  </p>
+                  <div className="flex items-baseline gap-1 mb-1">
+                    <span className="text-3xl font-black text-blue-600">+{(Number(o.price) / 1.21).toFixed(2)}</span>
+                    <span className="text-sm font-bold text-neutral-400">RON</span>
+                  </div>
+                  <p className="text-xs text-neutral-500">+ TVA 21% · +{o.price} RON cu TVA · opțional</p>
+                </div>
+              ))}
+
+              {/* Add-on-uri (dinamic, fără urgență) */}
+              {options.filter((o) => o.code !== 'urgenta').map((option) => (
+                <div key={option.id} className="rounded-3xl border border-neutral-200 bg-white p-6 lg:p-7 hover:border-blue-300 hover:shadow-md transition-all flex flex-col">
+                  <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-100 to-blue-200">
+                    <FileText className="h-6 w-6 text-blue-700" aria-hidden="true" />
+                  </div>
+                  <h3 className="text-lg font-bold text-secondary-900 mb-1.5">{option.name}</h3>
+                  {option.description && (
+                    <p className="text-sm text-neutral-600 leading-relaxed mb-5 flex-1">{option.description}</p>
+                  )}
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-3xl font-black text-blue-600">+{(Number(option.price) / 1.21).toFixed(2)}</span>
+                    <span className="text-sm font-bold text-neutral-400">RON</span>
+                  </div>
+                  <p className="text-xs text-neutral-500">+ TVA 21% · +{option.price} RON cu TVA · opțional</p>
+                </div>
+              ))}
             </div>
-          </section>
-        )}
+          </div>
+        </section>
 
         {/* Use Cases */}
         <section className="py-12 lg:py-20 bg-white">
@@ -556,6 +585,79 @@ export default async function CazierJudiciarPJPage() {
         </section>
 
         <ReviewsSection />
+
+        {/* Comparativ — eGhișeul vs alți operatori vs ghișeu Poliție (template CF, temă albastră PJ) */}
+        <section className="py-12 lg:py-20 bg-white">
+          <div className="container mx-auto px-4 max-w-[1000px]">
+            <div className="text-center mb-10">
+              <span className="inline-block px-4 py-1.5 bg-blue-100 text-blue-700 text-sm font-semibold rounded-full mb-4">
+                De ce eGhișeul
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-3">
+                eGhișeul vs alți operatori și ghișeul Poliției
+              </h2>
+              <p className="text-neutral-600 max-w-2xl mx-auto">
+                Același cazier judiciar oficial emis de IGPR pentru firmă — diferă timpul, comoditatea și asistența juridică.
+              </p>
+            </div>
+
+            <div className="overflow-x-auto rounded-3xl border border-neutral-200 bg-white shadow-sm">
+              <div className="grid grid-cols-[1.4fr_1fr_1fr_1fr] min-w-[640px] text-sm">
+                {/* Header row */}
+                <div className="bg-neutral-50 p-4 font-semibold text-secondary-900" />
+                <div className="bg-blue-500 p-4 text-center font-extrabold text-white">eGhișeul</div>
+                <div className="bg-neutral-50 p-4 text-center font-semibold text-neutral-600">Alți operatori online</div>
+                <div className="bg-neutral-50 p-4 text-center font-semibold text-neutral-600">Ghișeu Poliție</div>
+
+                {[
+                  ['Timp de obținere', '2-4 zile (1-2 urgent)', '5-10 zile', 'Drum + cozi'],
+                  ['Procesare 100% online', true, true, false],
+                  ['Deplasare la ghișeu', false, false, true],
+                  ['Auto-completare date firmă (CUI)', true, 'Variabil', false],
+                  ['Asistență avocat inclus', true, false, false],
+                  ['Semnătură electronică eIDAS', true, 'Variabil', false],
+                  ['Livrare pe email', 'Automat', true, 'Ridici fizic'],
+                ].map((row, i) => (
+                  <div key={row[0] as string} className="contents">
+                    <div className={`p-4 font-medium text-secondary-800 border-t border-neutral-100 ${i % 2 ? 'bg-neutral-50/50' : ''}`}>
+                      {row[0]}
+                    </div>
+                    {[1, 2, 3].map((col) => {
+                      const v = row[col];
+                      const highlight = col === 1;
+                      return (
+                        <div
+                          key={col}
+                          className={`flex items-center justify-center p-4 border-t border-neutral-100 text-center ${
+                            highlight ? 'bg-blue-50' : i % 2 ? 'bg-neutral-50/50' : ''
+                          }`}
+                        >
+                          {v === true ? (
+                            <CheckCircle className="h-5 w-5 text-green-600" aria-label="Da" />
+                          ) : v === false ? (
+                            <X className="h-5 w-5 text-neutral-300" aria-label="Nu" />
+                          ) : (
+                            <span className={`text-xs sm:text-sm ${highlight ? 'font-bold text-secondary-900' : 'text-neutral-600'}`}>{v}</span>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="mt-8 text-center">
+              <Button
+                asChild
+                className="group h-14 px-8 bg-blue-500 hover:bg-blue-600 text-white font-bold text-lg rounded-xl shadow-[0_4px_14px_rgba(59,130,246,0.4)] hover:-translate-y-0.5 transition-all"
+                size="lg"
+              >
+                <Link href={`/comanda/${SERVICE_SLUG}`}>Comandă cazierul firmei acum</Link>
+              </Button>
+            </div>
+          </div>
+        </section>
 
         {/* How it works — dark connected timeline */}
         <section className="relative overflow-hidden bg-gradient-to-b from-secondary-900 to-[#0C1A2F] py-14 lg:py-24">
