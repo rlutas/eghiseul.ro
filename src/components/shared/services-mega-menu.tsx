@@ -92,6 +92,21 @@ export function ServicesMegaMenu() {
                         </span>
                         {item.name}
                       </Link>
+                      {item.children && (
+                        <ul className="ml-10 mt-0.5 space-y-0.5 border-l border-neutral-200 pl-3">
+                          {item.children.map((child) => (
+                            <li key={child.href}>
+                              <Link
+                                href={child.href}
+                                onClick={() => setOpen(false)}
+                                className="flex min-h-9 items-center rounded-lg px-2 py-1.5 text-[13px] font-medium text-secondary-600 hover:text-secondary-900 hover:bg-neutral-50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
+                              >
+                                {child.name}
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
                     </li>
                   ))}
                 </ul>

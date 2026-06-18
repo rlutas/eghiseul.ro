@@ -24,6 +24,8 @@ export interface ServiceNavItem {
   name: string;
   href: string;
   icon: LucideIcon;
+  /** Optional sub-items (e.g. Cazier Judiciar → Persoană Fizică / Juridică). */
+  children?: ServiceNavItem[];
 }
 
 export interface ServiceNavGroup {
@@ -35,7 +37,15 @@ export const SERVICES_NAV: ServiceNavGroup[] = [
   {
     category: 'Juridice',
     items: [
-      { name: 'Cazier Judiciar', href: serviceUrl('cazier-judiciar'), icon: Scale },
+      {
+        name: 'Cazier Judiciar',
+        href: serviceUrl('cazier-judiciar'),
+        icon: Scale,
+        children: [
+          { name: 'Persoană Fizică', href: serviceUrl('cazier-judiciar-persoana-fizica'), icon: UserRound },
+          { name: 'Persoană Juridică', href: serviceUrl('cazier-judiciar-persoana-juridica'), icon: Building2 },
+        ],
+      },
       { name: 'Certificat Integritate', href: serviceUrl('certificat-integritate'), icon: ShieldCheck },
     ],
   },

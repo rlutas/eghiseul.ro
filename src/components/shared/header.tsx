@@ -344,17 +344,32 @@ export function Header() {
                                     {group.category}
                                   </p>
                                   {group.items.map((item) => (
-                                    <Link
-                                      key={item.href}
-                                      href={item.href}
-                                      onClick={() => setIsMobileMenuOpen(false)}
-                                      className="flex min-h-11 items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-secondary-700 hover:bg-neutral-50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
-                                    >
-                                      <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-primary-50 text-primary-600">
-                                        <item.icon className="h-4 w-4" />
-                                      </span>
-                                      {item.name}
-                                    </Link>
+                                    <div key={item.href}>
+                                      <Link
+                                        href={item.href}
+                                        onClick={() => setIsMobileMenuOpen(false)}
+                                        className="flex min-h-11 items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-secondary-700 hover:bg-neutral-50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
+                                      >
+                                        <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-primary-50 text-primary-600">
+                                          <item.icon className="h-4 w-4" />
+                                        </span>
+                                        {item.name}
+                                      </Link>
+                                      {item.children && (
+                                        <div className="ml-11 border-l border-neutral-200 pl-3">
+                                          {item.children.map((child) => (
+                                            <Link
+                                              key={child.href}
+                                              href={child.href}
+                                              onClick={() => setIsMobileMenuOpen(false)}
+                                              className="flex min-h-10 items-center px-3 py-2 rounded-lg text-[13px] font-medium text-secondary-600 hover:bg-neutral-50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
+                                            >
+                                              {child.name}
+                                            </Link>
+                                          ))}
+                                        </div>
+                                      )}
+                                    </div>
                                   ))}
                                 </div>
                               ))}
