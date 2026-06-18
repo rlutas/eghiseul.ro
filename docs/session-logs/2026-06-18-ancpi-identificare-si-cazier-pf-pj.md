@@ -31,6 +31,15 @@ Endpoint: `src/app/api/ancpi/lookup/route.ts` (geocode Esri → query spațial p
 2. **Termen urgent consistent:** afișa `service.urgent_days` brut (PF „2 zile", PJ „3 zile" greșit) → hardcodat „1-2 zile" ca pe pagina principală (standardul „2-4 zile" era deja OK via `processing_config.estimated_days_display`).
 3. **Aliniere design la template CF** (`extras-de-carte-funciara`, vezi `docs/design/SERVICE-PAGE-DESIGN-GUIDE.md`): secțiunea „Opțiuni" (grid plat) → „Preț & opțiuni" cu **3 carduri** (bază *featured* + urgență *Recomandat* +80 RON — NU gratis ca la CF — + add-on-uri dinamice); adăugat **tabel comparativ** „eGhișeul vs alți operatori vs ghișeu Poliție". PF în temă aurie, **PJ în temă albastră** (excepția istorică din ghid). Verificat vizual (Playwright).
 
+## 2b. Navigare — Cazier Judiciar cu sub-itemi PF/PJ (ramura `main`, deploy prod)
+
+`src/config/services-nav.ts` + `src/components/shared/{services-mega-menu,header}.tsx`:
+- Adăugat `children?: ServiceNavItem[]` la `ServiceNavItem`.
+- „Cazier Judiciar" (categoria Juridice) devine **părinte** cu sub-itemi indentați
+  **„Persoană Fizică"** și **„Persoană Juridică"** (link-uri canonice via `serviceUrl`).
+- Randat în **mega-meniul desktop** (sub-listă cu bară verticală) ȘI în **meniul mobil**.
+- Verificat vizual (Playwright) + build OK.
+
 ## 3. Ghid SEO AI Search / GEO (ramura `docs/ai-seo-content-guide`)
 
 `docs/seo/ai-content-optimization-guide.md` — sinteză din ghidul oficial Google („AI search = SEO"), research cross-platform (Search Engine Land/Journal, Ahrefs/Semrush/BrightEdge, lucrarea Princeton GEO) + audit pe conținutul nostru. Concluzii: contează conținutul unic first-hand + citate/statistici/surse (singura tactică dovedită cauzal); `llms.txt`/markup AI/chunking/keyword-stuffing sunt inutile/dăunătoare. Audit: paginile de servicii sunt puternice; blogul e veriga slabă (thin, fără autor). Indexat în `docs/README.md`.
