@@ -11,10 +11,11 @@ import { useState } from 'react';
  * lookup isn't enough) the operator researches manually on rp.ancpi.ro.
  */
 
-interface Parcel { cf: string | null; immovableId: string | null; inspireId: string | null }
+interface Parcel { cf: string | null; immovableId: string | null; inspireId: string | null; contains?: boolean }
 interface LookupData {
   found: boolean;
   reason?: string;
+  viaBufferOnly?: boolean;
   requestedLocality?: string | null;
   geocodedElsewhere?: Array<{ address: string; score: number }>;
   geocoded?: { address: string; score: number; type?: string | null; approximate?: boolean; lat?: number; lon?: number };
@@ -140,14 +141,23 @@ export function IdentificareImobilPanel({ property }: { property: PropertyData |
           )}
           {res.found && res.parcels?.length ? (
             <div className="space-y-1">
-              <p className="font-semibold text-green-700">✓ Parcelă identificată:</p>
+              <p className="font-semibold text-green-700">Parcelă găsită la acest punct:</p>
               {res.parcels.map((p, i) => (
-                <div key={i} className="rounded bg-green-50 border border-green-200 px-3 py-2">
-                  Nr. Carte Funciară: <strong>{p.cf ?? '—'}</strong> · immovableId: {p.immovableId ?? '—'}
+                <div key={i} className={`rounded border px-3 py-2 ${p.contains ? 'bg-green-50 border-green-200' : 'bg-amber-50 border-amber-200'}`}>
+                  Nr. CF / referință geoportal: <strong>{p.cf ?? '—'}</strong> · immovableId: <strong>{p.immovableId ?? '—'}</strong>
+                  {p.contains
+                    ? <span className="ml-2 text-xs text-green-700">✓ punctul e în această parcelă</span>
+                    : <span className="ml-2 text-xs text-amber-700">⚠️ doar în apropiere (posibil vecinul)</span>}
                 </div>
               ))}
+              <p className="rounded bg-amber-50 border border-amber-200 px-3 py-2 text-xs text-amber-800">
+                ⚠️ Indiciu din geoportal — poate fi nr. cadastral sau al vecinului. <strong>CF-ul oficial se confirmă pe extras și poate diferi.</strong> Verifică pe Google Maps (satelit).
+              </p>
+              {res.viaBufferOnly && (
+                <p className="text-xs text-amber-700">Niciuna nu conține exact punctul — încredere redusă, verifică manual.</p>
+              )}
               <p className="text-xs text-neutral-500">
-                Pentru apartamente, acesta e CF-ul parcelei/blocului — punct de plecare pentru a găsi unitatea.
+                Pentru apartamente, e parcela/blocul — punct de plecare pentru unitate.
               </p>
             </div>
           ) : res.reason === 'locality_mismatch' ? (

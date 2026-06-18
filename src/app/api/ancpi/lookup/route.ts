@@ -143,32 +143,64 @@ export async function GET(req: NextRequest) {
   const geom = encodeURIComponent(JSON.stringify({ x, y, spatialReference: { wkid: 3844 } }));
   // `distance` buffers the point ~25m so a slightly-off geocode (common for
   // apartments/blocks) still catches the parcel.
+  // We fetch GEOMETRY too and compute point-in-polygon ourselves. Why: a geocoded
+  // point often lands just OUTSIDE the real parcel (on the road/yard), so the 25m
+  // buffer can snap to the NEIGHBOUR. A parcel whose polygon actually CONTAINS the
+  // point is high-confidence; a buffer-only hit may be the wrong building. Real
+  // case: Salcâmilor 21 Odoreu — point outside any parcel, buffer returned 108663,
+  // but the official extract was CF 100015 (a different/neighbouring immovable).
   const qUrl =
     'https://geoportal.ancpi.ro/maps/rest/services/imobile/Imobile/MapServer/1/query' +
     `?geometry=${geom}&geometryType=esriGeometryPoint&inSR=3844&spatialRel=esriSpatialRelIntersects` +
     '&distance=25&units=esriSRUnit_Meter' +
-    '&outFields=NATIONAL_CADASTRAL_REFERENCE,IMMOVABLE_ID,INSPIRE_ID&returnGeometry=false&f=json';
-  const q = (await fetchJson(qUrl, 10)) as { features?: Array<{ attributes: Record<string, string | number> }> } | null;
+    '&outFields=NATIONAL_CADASTRAL_REFERENCE,IMMOVABLE_ID,INSPIRE_ID&returnGeometry=true&f=json';
+  const q = (await fetchJson(qUrl, 10)) as {
+    features?: Array<{ attributes: Record<string, string | number>; geometry?: { rings?: number[][][] } }>;
+  } | null;
   if (q === null) {
     return NextResponse.json({ success: true, data: { found: false, reason: 'ancpi_unavailable', geocoded: { address: c.address, score: c.score, lat, lon } } });
   }
-  // NB: the geoportal's NATIONAL_CADASTRAL_REFERENCE is the CARTE FUNCIARĂ number
-  // (confirmed against a real extract: ref 106395 = "Carte Funciară Nr. 106395"),
-  // NOT the parcel's cadastral number. So we expose it as `cf`.
+
+  // NB: the geoportal's NATIONAL_CADASTRAL_REFERENCE is NOT guaranteed to be the
+  // official "Număr Carte Funciară" — it can be the cadastral/immovable reference
+  // and the CF on the official extract may differ. So we expose it as `ref` (a
+  // hint to confirm), and surface IMMOVABLE_ID as the stable e-Terra key.
   const parcels = (q.features || [])
     .filter((f) => f.attributes?.NATIONAL_CADASTRAL_REFERENCE || f.attributes?.IMMOVABLE_ID)
     .map((f) => ({
       cf: f.attributes.NATIONAL_CADASTRAL_REFERENCE != null ? String(f.attributes.NATIONAL_CADASTRAL_REFERENCE) : null,
       immovableId: f.attributes.IMMOVABLE_ID != null ? String(f.attributes.IMMOVABLE_ID) : null,
       inspireId: f.attributes.INSPIRE_ID != null ? String(f.attributes.INSPIRE_ID) : null,
+      // true → the geocoded point is INSIDE this parcel (high confidence).
+      contains: pointInRings(x, y, f.geometry?.rings),
     }));
+
+  // Prefer the parcel that actually contains the point; otherwise keep buffer hits.
+  parcels.sort((a, b) => Number(b.contains) - Number(a.contains));
+  const containsAny = parcels.some((p) => p.contains);
 
   return NextResponse.json({
     success: true,
     data: {
       found: parcels.length > 0,
+      // viaBufferOnly → no parcel contains the point; the result may be a neighbour.
+      viaBufferOnly: parcels.length > 0 && !containsAny,
       geocoded: { address: c.address, score: c.score, type: addrType, approximate, x, y, lat, lon },
       parcels,
     },
   });
+}
+
+/** Even-odd point-in-polygon over Esri rings (outer + holes). */
+function pointInRings(x: number, y: number, rings?: number[][][]): boolean {
+  if (!rings?.length) return false;
+  let inside = false;
+  for (const ring of rings) {
+    for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+      const xi = ring[i][0], yi = ring[i][1];
+      const xj = ring[j][0], yj = ring[j][1];
+      if (yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) inside = !inside;
+    }
+  }
+  return inside;
 }
