@@ -7,7 +7,9 @@
 **Plan SEO master:** [`seo/SEO-MASTER-PLAN-2026-05-20.md`](seo/SEO-MASTER-PLAN-2026-05-20.md)
 **Rebuild queue (47 pagini):** [`seo/REBUILD-QUEUE.md`](seo/REBUILD-QUEUE.md)
 **City pages plan:** [`seo/CITY-PAGES-PLAN.md`](seo/CITY-PAGES-PLAN.md)
-**Sesiune curentă (2026-06-12):**
+**Sesiune curentă (2026-06-18):** [`session-logs/2026-06-18-ancpi-identificare-si-cazier-pf-pj.md`](session-logs/2026-06-18-ancpi-identificare-si-cazier-pf-pj.md) — identificare imobil ANCPI (validare localitate, 2 metode, Maps satelit + deep-link geoportal, point-in-polygon; descoperire vecin nr.17 vs CF oficial) + cazier PF/PJ (CTA direct, termen urgent, aliniere design CF) + ghid SEO AI Search
+
+**Sesiune (2026-06-12):**
 - 🔴 [`session-logs/2026-06-12-invoice-lock-or-filter-broken.md`](session-logs/2026-06-12-invoice-lock-or-filter-broken.md) — **incident**: factură dublată DIN NOU (E-260612-QT376) — lock-ul atomic nu funcționa deloc (`.or()` pe UPDATE respins de PostgREST cu 42703 înșelător, mascat de calea de degradare) → claim rescris cu UPDATE-uri condiționale secvențiale + test regresie; **storno EGI2024-24097 manual în Oblio**
 
 **Sesiune anterioară (2026-06-10):** mobil + plăți + reluare draft:
