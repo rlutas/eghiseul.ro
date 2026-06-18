@@ -40,6 +40,13 @@ export interface PersonalKYCConfig {
   enabled: boolean;
   condition?: string;  // e.g., "client_type == 'PF'" to only show for PF
 
+  // Whether the "Sunt cetățean străin" toggle is offered for this service.
+  // undefined/true → shown for PF (default; e.g. cazier judiciar, where
+  // foreign residents legitimately apply). false → hidden (civil-status
+  // documents like naștere/căsătorie/celibat are issued only for persons
+  // registered in the Romanian civil registry, so there is no foreign path).
+  allowForeignCitizen?: boolean;
+
   // Document requirements
   acceptedDocuments: DocumentType[];
   requireAddressCertificate: 'always' | 'ci_nou_passport' | 'never';

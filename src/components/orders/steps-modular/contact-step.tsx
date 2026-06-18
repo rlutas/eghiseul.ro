@@ -111,8 +111,13 @@ export function ContactStepModular({ onValidChange }: ContactStepProps) {
     !!state.verificationConfig?.clientTypeSelection?.enabled;
 
   // Whether to show citizenship toggle. Only relevant for PF (companies are
-  // by definition Romanian legal entities here).
-  const showsCitizenship = state.clientType === 'PF';
+  // by definition Romanian legal entities here). Also gated per-service:
+  // civil-status documents (naștere/căsătorie/celibat) set
+  // personalKyc.allowForeignCitizen = false, since they are issued only for
+  // persons registered in the Romanian civil registry (no foreign path).
+  const allowForeignCitizen =
+    state.verificationConfig?.personalKyc?.allowForeignCitizen !== false;
+  const showsCitizenship = state.clientType === 'PF' && allowForeignCitizen;
   const citizenship = state.contact.citizenship ?? 'romanian';
   const isForeign = citizenship === 'foreign';
 
