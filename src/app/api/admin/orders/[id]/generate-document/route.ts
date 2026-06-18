@@ -95,6 +95,9 @@ export async function POST(
     const personal = cd.personalData || cd.personal || {};
     const company = cd.companyData || cd.company || {};
     const billing = cd.billing || {};
+    // Civil-status step (naștere/căsătorie/celibat) collects parent full names
+    // and birth name; personalKyc no longer duplicates them for these services.
+    const civil = cd.civil_status || {};
 
     const isPJ = billing?.type === 'persoana_juridica' || !!company?.companyName;
 
@@ -124,9 +127,9 @@ export async function POST(
       // 2026-05-27 — the official cerere template still has those fields
       // though. Fill with "-" so the printed form shows a clean dash instead
       // of an empty line that an inspector might mistake for missing data.
-      father_name: personal.fatherName || '-',
-      mother_name: personal.motherName || '-',
-      previous_name: personal.previousName || '',
+      father_name: personal.fatherName || civil.fatherName || '-',
+      mother_name: personal.motherName || civil.motherName || '-',
+      previous_name: personal.previousName || civil.birthName || '',
       birth_date: personal.birthDate || '',
       birth_county: personal.birthPlace || personal.birthCounty || '',
       birth_country: personal.birthCountry || 'ROMANIA',

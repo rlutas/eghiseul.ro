@@ -20,6 +20,7 @@ import {
   computeDelegationItems,
   isPJForDocumentGeneration,
 } from '@/lib/documents/delegation-items';
+import { isNoLawyerService } from '@/lib/documents/no-lawyer-services';
 
 /**
  * Format an AddressState object (or string) into a human-readable Romanian address.
@@ -98,6 +99,9 @@ export async function autoGenerateOrderDocuments(
   const personal = cd.personalData || cd.personal || {};
   const company = cd.companyData || cd.company || {};
   const billing = cd.billing || {};
+  // Civil-status step (naștere/căsătorie/celibat) collects parent full names
+  // and birth name; personalKyc no longer duplicates them for these services.
+  const civil = cd.civil_status || {};
 
   // `isPJ` here means "the SERVICE is for a legal entity" — drives
   // contract template choice (contract-prestari PF vs PJ), cerere
@@ -141,9 +145,9 @@ export async function autoGenerateOrderDocuments(
     // Step 2 (cazier judiciar PF) no longer collects parent names since
     // 2026-05-27. The DOCX template still references them, so fall back to
     // "-" to print a clean dash on the cerere instead of an empty line.
-    father_name: personal.fatherName || '-',
-    mother_name: personal.motherName || '-',
-    previous_name: personal.previousName || '',
+    father_name: personal.fatherName || civil.fatherName || '-',
+    mother_name: personal.motherName || civil.motherName || '-',
+    previous_name: personal.previousName || civil.birthName || '',
     birth_date: personal.birthDate || '',
     birth_county: personal.birthPlace || personal.birthCounty || '',
     birth_country: personal.birthCountry || 'ROMANIA',
@@ -219,11 +223,9 @@ export async function autoGenerateOrderDocuments(
 
   // Determine which templates to auto-generate at submission time.
   // Fully-automated services with no lawyer involvement (ONRC constatator,
-  // carte funciară) must NOT get a legal-assistance contract or a Barou number.
-  // NB: the DB service slug is 'extras-carte-funciara' (no "de"); keep the "de"
-  // variant too for safety against any caller using the route slug.
-  const NO_LAWYER_SERVICES = ['certificat-constatator', 'extras-carte-funciara', 'extras-de-carte-funciara'];
-  const templates = NO_LAWYER_SERVICES.includes(serviceSlug)
+  // ANCPI carte funciară / plan cadastral / identificare imobil) must NOT get a
+  // legal-assistance contract or a Barou number — see NO_LAWYER_SERVICE_SLUGS.
+  const templates = isNoLawyerService(serviceSlug)
     ? ['contract-prestari']
     : ['contract-prestari', 'contract-asistenta'];
 
@@ -432,9 +434,9 @@ export async function autoGenerateOrderDocuments(
   // Compute the list via the pure helper. See delegation-items.ts for the
   // policy + decision logic and tests/unit/lib/documents/delegation-items.test.ts
   // for coverage of the dedup/bundled cases.
-  // No-lawyer services (constatator, carte funciară) need NO împuternicire
-  // avocațială → no Barou delegation numbers at all.
-  const delegationItems = NO_LAWYER_SERVICES.includes(serviceSlug)
+  // No-lawyer services (constatator, carte funciară / cadastral / identificare)
+  // need NO împuternicire avocațială → no Barou delegation numbers at all.
+  const delegationItems = isNoLawyerService(serviceSlug)
     ? []
     : computeDelegationItems({
         services: order.services,
