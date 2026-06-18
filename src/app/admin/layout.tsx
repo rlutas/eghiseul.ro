@@ -37,6 +37,8 @@ interface NavItem {
   icon: typeof LayoutDashboard;
   /** Permission required to see this item. undefined = always visible. */
   permission?: Permission;
+  /** Render indented as a sub-item of the entry above it. */
+  child?: boolean;
 }
 
 const NAV_ITEMS: NavItem[] = [
@@ -46,7 +48,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: '/admin/registru', label: 'Registru', icon: BookOpen, permission: 'settings.manage' },
   { href: '/admin/onrc', label: 'ONRC', icon: Landmark, permission: 'orders.view' },
   { href: '/admin/ancpi', label: 'ANCPI', icon: Landmark, permission: 'orders.view' },
-  { href: '/admin/identifica-imobil', label: 'Identifică imobil', icon: MapPin, permission: 'orders.view' },
+  { href: '/admin/identifica-imobil', label: 'Identifică imobil', icon: MapPin, permission: 'orders.view', child: true },
   { href: '/admin/coupons', label: 'Cupoane', icon: Ticket, permission: 'settings.manage' },
   { href: '/admin/users', label: 'Utilizatori', icon: Users, permission: 'users.manage' },
   { href: '/admin/settings', label: 'Setari', icon: Settings, permission: 'settings.manage' },
@@ -241,6 +243,7 @@ export default function AdminLayout({
                   onClick={() => setSidebarOpen(false)}
                   className={cn(
                     'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+                    item.child && 'ml-4 border-l border-slate-700 pl-4 text-[13px]',
                     isActive
                       ? 'bg-slate-800 text-white'
                       : 'text-slate-400 hover:bg-slate-800/50 hover:text-white'

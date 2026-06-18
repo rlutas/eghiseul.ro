@@ -8,7 +8,7 @@ interface LookupData {
   reason?: string;
   requestedLocality?: string | null;
   geocodedElsewhere?: Array<{ address: string; score: number }>;
-  geocoded?: { address: string; score: number; type?: string | null; approximate?: boolean; x?: number; y?: number };
+  geocoded?: { address: string; score: number; type?: string | null; approximate?: boolean; x?: number; y?: number; lat?: number; lon?: number };
   parcels?: Parcel[];
 }
 
@@ -83,9 +83,9 @@ export function IdentificaImobilTool() {
           {res.geocoded && (
             <p className="text-neutral-700">
               📍 Adresă geocodată: <strong>{res.geocoded.address}</strong> (scor {res.geocoded.score})
-              {res.geocoded.x != null && (
-                <> · <a className="text-primary-600 underline" target="_blank" rel="noreferrer"
-                  href={`https://geoportal.ancpi.ro/imobile_lookup.html`}>vezi pe geoportal</a></>
+              {res.geocoded.lat != null && res.geocoded.lon != null && (
+                <> · <a className="text-primary-600 underline font-medium" target="_blank" rel="noreferrer"
+                  href={`https://www.google.com/maps?q=${res.geocoded.lat},${res.geocoded.lon}&t=k&z=19`}>🛰️ vezi pe Google Maps (satelit)</a></>
               )}
             </p>
           )}

@@ -15,9 +15,20 @@
  * blocks this finds the building; the unit still needs the CF/cadastral number.
  */
 import { NextRequest, NextResponse } from 'next/server';
+import proj4 from 'proj4';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 30; // ANCPI is flaky → allow time for retries
+
+// Romanian national projection (EPSG:3844, Stereo70) → WGS84, so we can hand the
+// operator a Google Maps link to eyeball the exact building. Verified <1m vs Esri.
+const STEREO70 =
+  '+proj=sterea +lat_0=46 +lon_0=25 +k=0.99975 +x_0=500000 +y_0=500000 +ellps=krass ' +
+  '+towgs84=2.329,-147.042,-92.08,-0.309,0.325,0.497,5.69 +units=m +no_defs';
+function toLatLon(x: number, y: number): { lat: number; lon: number } {
+  const [lon, lat] = proj4(STEREO70, 'WGS84', [x, y]);
+  return { lat, lon };
+}
 
 const UA =
   'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36';
@@ -128,6 +139,7 @@ export async function GET(req: NextRequest) {
   //    reliable first-hit code path. The ANCPI MapServer 502s intermittently, so
   //    we retry generously.
   const { x, y } = c.location;
+  const { lat, lon } = toLatLon(x, y); // WGS84 for the Google Maps verification link
   const geom = encodeURIComponent(JSON.stringify({ x, y, spatialReference: { wkid: 3844 } }));
   // `distance` buffers the point ~25m so a slightly-off geocode (common for
   // apartments/blocks) still catches the parcel.
@@ -138,7 +150,7 @@ export async function GET(req: NextRequest) {
     '&outFields=NATIONAL_CADASTRAL_REFERENCE,IMMOVABLE_ID,INSPIRE_ID&returnGeometry=false&f=json';
   const q = (await fetchJson(qUrl, 10)) as { features?: Array<{ attributes: Record<string, string | number> }> } | null;
   if (q === null) {
-    return NextResponse.json({ success: true, data: { found: false, reason: 'ancpi_unavailable', geocoded: { address: c.address, score: c.score } } });
+    return NextResponse.json({ success: true, data: { found: false, reason: 'ancpi_unavailable', geocoded: { address: c.address, score: c.score, lat, lon } } });
   }
   // NB: the geoportal's NATIONAL_CADASTRAL_REFERENCE is the CARTE FUNCIARĂ number
   // (confirmed against a real extract: ref 106395 = "Carte Funciară Nr. 106395"),
@@ -155,7 +167,7 @@ export async function GET(req: NextRequest) {
     success: true,
     data: {
       found: parcels.length > 0,
-      geocoded: { address: c.address, score: c.score, type: addrType, approximate, x, y },
+      geocoded: { address: c.address, score: c.score, type: addrType, approximate, x, y, lat, lon },
       parcels,
     },
   });

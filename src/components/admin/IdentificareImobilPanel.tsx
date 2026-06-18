@@ -17,7 +17,7 @@ interface LookupData {
   reason?: string;
   requestedLocality?: string | null;
   geocodedElsewhere?: Array<{ address: string; score: number }>;
-  geocoded?: { address: string; score: number; type?: string | null; approximate?: boolean };
+  geocoded?: { address: string; score: number; type?: string | null; approximate?: boolean; lat?: number; lon?: number };
   parcels?: Parcel[];
 }
 
@@ -127,6 +127,10 @@ export function IdentificareImobilPanel({ property }: { property: PropertyData |
           {res.geocoded && (
             <p className="text-neutral-700">
               📍 Adresă geocodată: <strong>{res.geocoded.address}</strong> (scor {res.geocoded.score})
+              {res.geocoded.lat != null && res.geocoded.lon != null && (
+                <> · <a className="text-primary-600 underline font-medium" target="_blank" rel="noreferrer"
+                  href={`https://www.google.com/maps?q=${res.geocoded.lat},${res.geocoded.lon}&t=k&z=19`}>🛰️ vezi pe Google Maps (satelit)</a></>
+              )}
             </p>
           )}
           {res.geocoded?.approximate && (
