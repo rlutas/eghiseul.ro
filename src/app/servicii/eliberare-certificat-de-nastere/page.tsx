@@ -624,6 +624,40 @@ export default async function CertificatNasterePage() {
           </div>
         </section>
 
+        {/* Sectoare București + localități */}
+        <section className="py-12 bg-neutral-50">
+          <div className="max-w-4xl mx-auto px-4">
+            <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-4">
+              Certificat de naștere în București (toate sectoarele) și în orice localitate
+            </h2>
+            <p className="text-neutral-700 leading-relaxed mb-4">
+              Certificatul de naștere se eliberează de Serviciul de Stare Civilă din localitatea unde
+              a fost înregistrată nașterea — în București, de Direcția de Stare Civilă a sectorului
+              respectiv. Prin eGhișeul.ro <strong>nu trebuie să mergi la ghișeu și nu faci
+              programare</strong>: depunem cererea prin împuternicire la primăria competentă, indiferent
+              de sector sau oraș, iar tu primești duplicatul prin curier.
+            </p>
+            <p className="text-neutral-700 leading-relaxed mb-4">
+              Acoperim toate sectoarele Bucureștiului — <strong>Sectorul 1, 2, 3, 4, 5 și 6</strong> —
+              și orice localitate din țară, inclusiv orașe precum <strong>Iași, Galați, Constanța,
+              Cluj-Napoca, Timișoara sau Brașov</strong>. Util mai ales dacă te-ai mutat ori ești
+              plecat din localitatea de naștere: nu mai pierzi o zi cu drumul și coada la Starea
+              Civilă.
+            </p>
+            <p className="text-sm text-neutral-600">
+              Indiferent de sectorul sau localitatea de naștere, pașii sunt aceiași — vezi{' '}
+              <Link href="/acte-necesare-certificat-de-nastere/" className="text-primary-600 font-medium hover:underline">
+                actele necesare
+              </Link>{' '}
+              sau cum procedezi dacă ai{' '}
+              <Link href="/certificat-de-nastere-pierdut/" className="text-primary-600 font-medium hover:underline">
+                pierdut certificatul
+              </Link>
+              .
+            </p>
+          </div>
+        </section>
+
         {/* FAQ */}
         <ServiceFAQ
           title="Întrebări Frecvente — Certificat de Naștere"

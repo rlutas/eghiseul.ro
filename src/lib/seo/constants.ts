@@ -122,6 +122,7 @@ export const HARDCODED_ARTICLE_SLUGS = [
   'certificat-de-nastere-pierdut',
   'schimbare-certificat-de-nastere-vechi',
   'acte-necesare-certificat-de-nastere',
+  'transcriere-certificat-de-casatorie',
   'taxa-cazier-judiciar',
   'eliberare-certificat-constatator-onrc-ghid',
   'valabilitate-extras-de-carte-funciara',

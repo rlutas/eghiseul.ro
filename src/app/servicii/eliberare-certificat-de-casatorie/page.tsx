@@ -409,7 +409,11 @@ export default async function CertificatCasatoriePage() {
                 <Link href="/servicii/eliberare-certificat-de-celibat/" className="text-primary-600 font-medium hover:underline">
                   certificat de celibat
                 </Link>
-                ? Le poți comanda la fel de simplu. Vezi și{' '}
+                ? Le poți comanda la fel de simplu. Te-ai căsătorit în străinătate? Vezi ghidul de{' '}
+                <Link href="/transcriere-certificat-de-casatorie/" className="text-primary-600 font-medium hover:underline">
+                  transcriere a certificatului de căsătorie
+                </Link>
+                . Vezi și{' '}
                 <Link href="/cum-vor-arata-documentele-de-stare-civila-2025/" className="text-primary-600 font-medium hover:underline">
                   cum vor arăta documentele de stare civilă în 2025
                 </Link>

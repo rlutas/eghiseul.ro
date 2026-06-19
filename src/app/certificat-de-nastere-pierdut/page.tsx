@@ -17,7 +17,8 @@ export const metadata = buildPageMetadata({
   title: TITLE,
   description: DESCRIPTION,
   path: `/${SLUG}/`,
-  ogImage: `/images/articole/${SLUG}.webp`,
+  // TODO: înlocuiește cu imagine dedicată /images/articole/${SLUG}.webp când e gata
+  ogImage: '/images/articole/cum-vor-arata-documentele-de-stare-civila-2025.webp',
 });
 
 export default function Page() {

@@ -54,6 +54,13 @@
 
 ---
 
+## Pagini construite (status build)
+| Pagină (URL) | Cluster țintă | Vol | Status |
+|---|---|---|---|
+| [/servicii/eliberare-certificat-de-casatorie/](https://eghiseul.ro/servicii/eliberare-certificat-de-casatorie/) | hub + duplicat/pierdut | head | ✅ existent (link → transcriere adăugat) |
+| [/transcriere-certificat-de-casatorie/](https://eghiseul.ro/transcriere-certificat-de-casatorie/) | transcriere (diaspora) | 110 | ✅ live |
+| Model / PDF | șablon | ~390 | ⏳ de făcut |
+
 ## Maparea la pagini (recomandare)
 1. **Hub** `/servicii/eliberare-certificat-de-casatorie/` — head + eliberare/duplicat (deja serviciul principal).
 2. **Transcriere certificat de căsătorie** (110, KD 8, diaspora) — candidat de pagină/ghid.

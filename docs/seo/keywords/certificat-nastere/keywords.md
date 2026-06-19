@@ -74,7 +74,7 @@
 | [/certificat-de-nastere-pierdut/](https://eghiseul.ro/certificat-de-nastere-pierdut/) | pierdut | 2.130 | ✅ live |
 | [/schimbare-certificat-de-nastere-vechi/](https://eghiseul.ro/schimbare-certificat-de-nastere-vechi/) | schimbare model vechi | 480 | ✅ live |
 | [/acte-necesare-certificat-de-nastere/](https://eghiseul.ro/acte-necesare-certificat-de-nastere/) | acte + nou-născut | 710+ | ✅ live |
-| Secțiune sectoare/orașe (în hub) | sector/local | 2.350 | ⏳ de făcut |
+| Secțiune sectoare/orașe (în hub) | sector/local | 2.350 | ✅ live (secțiune în hub, fără adrese fabricate) |
 
 **Follow-up asset:** imagini OG `/images/articole/{slug}.webp` lipsesc pentru cele 3 ghiduri noi (nu strică build-ul; de generat pentru share social).
 
