@@ -23,7 +23,7 @@ Fiecare `keywords.md`: tabel grupat pe **cluster de sub-intenție**, cu coloane 
 | Serviciu | Keywords salvate | Sursă | Notă |
 |---|---|---|---|
 | certificat-nastere | ✅ (4 clustere, ~27.670 vol) | Semrush 2026-06-19 | KD mic (11%) — winnable; cluster topical, NU matrice orașe |
-| certificat-casatorie | ⏳ pending | — | de adăugat export |
+| certificat-casatorie | ✅ (5 clustere, ~5.850 vol) | Semrush 2026-06-19 | KD 11%; cluster topical. ⚠️ „certificat medical căsătorie" = alt document |
 | certificat-celibat | ⏳ pending | — | de adăugat export |
 | cazier-judiciar | ⏳ pending | GSC | date în `docs/seo/gsc-data/` |
 | cazier-auto | ⏳ pending | GSC | — |

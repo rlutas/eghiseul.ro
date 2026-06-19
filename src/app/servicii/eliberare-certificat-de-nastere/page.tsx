@@ -420,7 +420,11 @@ export default async function CertificatNasterePage() {
                 <Link href="/certificat-de-nastere-pierdut/" className="text-primary-600 font-medium hover:underline">
                   ai pierdut certificatul de naștere
                 </Link>
-                , vezi pașii și actele necesare pentru eliberarea duplicatului.
+                , vezi pașii și actele necesare pentru eliberarea duplicatului. Iar dacă ai un{' '}
+                <Link href="/schimbare-certificat-de-nastere-vechi/" className="text-primary-600 font-medium hover:underline">
+                  certificat de naștere vechi sau deteriorat
+                </Link>
+                , poți cere un duplicat pe modelul actual.
               </p>
             </div>
           </div>
