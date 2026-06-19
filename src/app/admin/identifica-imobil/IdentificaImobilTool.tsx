@@ -2,11 +2,14 @@
 
 import { useState } from 'react';
 
-interface Parcel { cf: string | null; immovableId: string | null; inspireId: string | null }
+interface Parcel { cf: string | null; immovableId: string | null; inspireId: string | null; contains?: boolean }
 interface LookupData {
   found: boolean;
   reason?: string;
-  geocoded?: { address: string; score: number; type?: string | null; x?: number; y?: number };
+  viaBufferOnly?: boolean;
+  requestedLocality?: string | null;
+  geocodedElsewhere?: Array<{ address: string; score: number }>;
+  geocoded?: { address: string; score: number; type?: string | null; approximate?: boolean; x?: number; y?: number; lat?: number; lon?: number };
   parcels?: Parcel[];
 }
 
@@ -81,23 +84,65 @@ export function IdentificaImobilTool() {
           {res.geocoded && (
             <p className="text-neutral-700">
               📍 Adresă geocodată: <strong>{res.geocoded.address}</strong> (scor {res.geocoded.score})
-              {res.geocoded.x != null && (
-                <> · <a className="text-primary-600 underline" target="_blank" rel="noreferrer"
-                  href={`https://geoportal.ancpi.ro/imobile_lookup.html`}>vezi pe geoportal</a></>
+              {res.geocoded.lat != null && res.geocoded.lon != null && (
+                <> · <a className="text-primary-600 underline font-medium" target="_blank" rel="noreferrer"
+                  href={`https://www.google.com/maps?q=${res.geocoded.lat},${res.geocoded.lon}&t=k&z=19`}>🛰️ vezi pe Google Maps (satelit)</a></>
               )}
+            </p>
+          )}
+          {res.geocoded?.approximate && (
+            <p className="rounded bg-amber-50 border border-amber-200 px-3 py-2 text-xs text-amber-800">
+              ⚠️ Potrivire <strong>aproximativă</strong> (la nivel de stradă, nu adresă exactă) — verifică manual pe geoportal înainte de a emite extrasul.
             </p>
           )}
           {res.found && res.parcels?.length ? (
             <div className="space-y-1">
-              <p className="font-semibold text-green-700">✓ Parcelă identificată:</p>
+              <p className="font-semibold text-green-700">Parcelă găsită la acest punct:</p>
               {res.parcels.map((p, i) => (
-                <div key={i} className="rounded bg-green-50 border border-green-200 px-3 py-2">
-                  Nr. Carte Funciară: <strong>{p.cf ?? '—'}</strong> · immovableId: {p.immovableId ?? '—'}
+                <div key={i} className={`rounded border px-3 py-2 ${p.contains ? 'bg-green-50 border-green-200' : 'bg-amber-50 border-amber-200'}`}>
+                  Nr. CF / referință geoportal: <strong>{p.cf ?? '—'}</strong> · immovableId: <strong>{p.immovableId ?? '—'}</strong>
+                  {p.contains
+                    ? <span className="ml-2 text-xs text-green-700">✓ punctul e în această parcelă</span>
+                    : <span className="ml-2 text-xs text-amber-700">⚠️ doar în apropiere (posibil vecinul)</span>}
+                  {p.immovableId && (
+                    <div className="mt-1">
+                      <a className="text-primary-600 underline text-xs" target="_blank" rel="noreferrer"
+                        href={`https://geoportal.ancpi.ro/imobile_lookup.html?immovableid=${p.immovableId}`}>
+                        🗺️ vezi parcela în geoportal ANCPI
+                      </a>
+                    </div>
+                  )}
                 </div>
               ))}
-              <p className="text-xs text-neutral-500">
-                Pentru apartamente, acesta e CF-ul parcelei/blocului — folosește-l ca punct de plecare pentru a găsi unitatea.
+              <p className="rounded bg-amber-50 border border-amber-200 px-3 py-2 text-xs text-amber-800">
+                ⚠️ Acest număr e un <strong>indiciu</strong> din geoportal — poate fi nr. cadastral sau al vecinului.
+                <strong> Numărul de Carte Funciară oficial se confirmă pe extras și poate diferi.</strong> Verifică imobilul pe Google Maps (satelit) înainte de a emite.
               </p>
+              {res.viaBufferOnly && (
+                <p className="text-xs text-amber-700">
+                  Niciuna dintre parcele nu conține exact punctul (geocodare imprecisă) — încredere redusă, verifică manual.
+                </p>
+              )}
+              <p className="text-xs text-neutral-500">
+                Pentru apartamente, e parcela/blocul — punct de plecare pentru a găsi unitatea.
+              </p>
+            </div>
+          ) : res.reason === 'locality_mismatch' ? (
+            <div className="space-y-1 text-amber-700">
+              <p>
+                ⚠️ Adresa a fost găsită, dar <strong>NU în localitatea „{res.requestedLocality}”</strong> — probabil aceeași denumire de stradă în altă localitate. Nu emit un rezultat ca să evităm imobilul greșit.
+              </p>
+              {res.geocodedElsewhere?.length ? (
+                <div className="text-xs text-neutral-500">
+                  Esri a potrivit în schimb:
+                  <ul className="list-disc pl-5">
+                    {res.geocodedElsewhere.map((g, i) => (
+                      <li key={i}>{g.address} (scor {g.score})</li>
+                    ))}
+                  </ul>
+                  Caută manual după proprietar pe rp.ancpi.ro.
+                </div>
+              ) : null}
             </div>
           ) : (
             <p className="text-amber-700">

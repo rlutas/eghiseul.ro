@@ -478,6 +478,11 @@ export interface PropertyState {
   ownerName?: string;
   ownerCnpCui?: string;
   propertyAddress?: string;
+
+  // Identification service only: how the client wants the imobil found.
+  // 'address' → admin runs the automated ANCPI lookup on-demand.
+  // 'name'    → manual research by owner (operator searches rp.ancpi.ro).
+  searchMethod?: 'address' | 'name';
 }
 
 /**

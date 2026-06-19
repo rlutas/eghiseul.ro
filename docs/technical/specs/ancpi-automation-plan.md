@@ -363,17 +363,25 @@ Serviciu pentru clienții care **nu știu numărul CF** — îl aflăm din adres
 **Cum funcționează (validat live):**
 - `GET /api/ancpi/lookup?address=&judet=&localitate=` → **geocode** (Esri World, Stereo70) → **query spațial** pe geoportalul ANCPI (`MapServer/1/query`, intersects, buffer 25m, 8 retry) → `NATIONAL_CADASTRAL_REFERENCE` = **numărul de carte funciară** + `IMMOVABLE_ID`.
 - ⚠️ `NATIONAL_CADASTRAL_REFERENCE` = **nr. CF** (confirmat vs extras real: 106395 = „Carte Funciară Nr. 106395"), NU nr. cadastral (ăla e 4265).
-- ⚠️ **Geoportalul ANCPI e foarte flaky** (valuri de 502) → endpoint-ul are AbortController 4s/încercare + 6-8 retry + `maxDuration=30`. Când e sus, găsește; în valuri proaste, „ancpi_unavailable" → reîncercare.
+- ⚠️ **Geoportalul ANCPI e foarte flaky** (valuri de 502) → endpoint-ul are AbortController 4s/încercare + **10 retry** + `maxDuration=30`. Când e sus, găsește; în valuri proaste, „ancpi_unavailable" → reîncercare.
 - ⚠️ La **apartamente**, punctul găsește **parcela/blocul** (CF-ul terenului/construcției), nu unitatea → punct de plecare pentru investigare manuală.
 - ⚠️ Imobil **neînscris în CF** → nu se identifică; căutăm date utile prin alte surse.
+- ⚠️ **Validare localitate (anti-fals-pozitiv, 2026-06-17):** Esri potrivește aceeași denumire de stradă în **altă localitate** (ex. „Strada Pârâului 100, Agăș" → Târgu Ocna), iar ANCPI întoarce o parcelă reală dar **greșită**. Endpoint-ul cere `maxLocations=5` + câmpuri `City/Subregion/Region` și acceptă doar candidatul a cărui localitate se potrivește pe **tokeni distinctivi** (diacritice normalizate; se ignoră „sectorul/comuna/nr" + numere, deci „București Sectorul 6" rămâne valid). La nepotrivire → `reason='locality_mismatch'` + adresele găsite aiurea, în loc de CF fals. Flag `approximate` pentru potriviri la nivel de stradă (nu `PointAddress`).
 
-**Admin:** `/admin/identifica-imobil` — operatorul introduce județ/localitate/adresă → rulează lookup-ul cu retry → afișează CF/parcela + adresa geocodată. Pe comanda de identificare, operatorul confirmă/cercetează și livrează (+ extras CF după identificare).
+**Customer wizard — 2 metode (2026-06-17):** serviciul `identificare-imobil` în `PropertyDataStep` arată 2 butoane în loc de taburile CF/cadastral/adresă:
+- **📍 După adresă** → adresă obligatorie + nume proprietar opțional; adminul rulează lookup-ul automat on-demand.
+- **👤 După nume** → nume proprietar obligatoriu + CNP/CUI opțional; **procesare manuală** (operatorul caută în rp.ancpi.ro).
+- Metoda aleasă: `customer_data.property.searchMethod` (`'address'|'name'`, JSONB — fără migrare DB).
 
-**Validat pe cazuri reale:** Odoreu/Salcâmilor 2 → CF 106395 ✓; Paul Greceanu 13 București (apt) → parcela CF 231817 ✓ (când ANCPI e sus). Apartamente/rural → uneori doar parcela sau ANCPI indisponibil → operator.
+**Admin:**
+- `/admin/identifica-imobil` — unealtă standalone: operatorul introduce județ/localitate/adresă → rulează lookup-ul cu retry → afișează CF/parcela + adresa geocodată.
+- **Panou în pagina comenzii** (`IdentificareImobilPanel`, doar slug `identificare-imobil`): afișează metoda aleasă + datele; la „după adresă" un buton „Identifică automat (ANCPI)" rulează lookup-ul on-demand (cu toate avertismentele: locality_mismatch / aproximativ / 502); la „după nume" afișează indicația de căutare manuală pe rp.ancpi.ro. Operatorul confirmă/cercetează și livrează (+ extras CF după identificare).
+
+**Validat pe cazuri reale (2026-06-17):** Odoreu/Salcâmilor 2 → CF 106395 ✓, Salcâmilor 21 → CF 108663 ✓; Cluj-Napoca/Constantin Noica 12 (apt) → parcela CF 319357 ✓; București S6/Aleea Parva 9 (apt) → parcela CF 238027 ✓; **Agăș/Pârâului 100 → respins corect (locality_mismatch)** în loc de CF fals din Târgu Ocna. Apartamente → doar parcela blocului (unitatea = manual).
 
 **Căutare după PROPRIETAR — DOAR MANUAL (NU automatizat):** `rp.ancpi.ro/owner-registry` (Registrul Proprietarilor, prin avocat) permite căutarea după nume proprietar. ⚠️ **Termenii rp.ancpi.ro interzic explicit** uzul comercial, extragerea automată și accesul în afara interfeței (§4-5), cu monitorizare + revocare + sancțiune (§6-7). **NU automatizăm rp.ancpi.ro.** Operatorul/avocatul îl folosește **manual prin interfață** dacă geoportalul nu e suficient — în admin există doar un LINK către rp.ancpi.ro (nu extragere). Canalul comercial automat legitim rămâne **ePay** (plătit, oficial).
 
-**Fișiere:** `src/app/api/ancpi/lookup/route.ts`, `src/app/admin/identifica-imobil/{page,IdentificaImobilTool}.tsx`. Serviciu DB `identificare-imobil` (198 RON) — **ACTIV**. Wizard customer: `PropertyDataStep` validează **address-only** când `identificationService.enabled` (tab Adresă default; CF/cadastral opționale); facturare PF/PJ fără KYC (CNP opțional, ca CF); pasul Livrare sărit (digital/email); fără ancpi_job (operator-fulfilled, NU prin worker). Operatorul folosește unealta `/admin/identifica-imobil` + livrează manual (admin upload).
+**Fișiere:** `src/app/api/ancpi/lookup/route.ts`, `src/app/admin/identifica-imobil/{page,IdentificaImobilTool}.tsx`, `src/components/admin/IdentificareImobilPanel.tsx`, `src/components/orders/modules/property/PropertyDataStep.tsx`. Serviciu DB `identificare-imobil` (198 RON) — **ACTIV**. Wizard customer: `PropertyDataStep` cu 2 metode (după adresă / după nume) când `identificationService.enabled`; facturare PF/PJ fără KYC (CNP opțional, ca CF); pasul Livrare sărit (digital/email); fără ancpi_job (operator-fulfilled, NU prin worker). Operatorul folosește panoul din comandă (lookup on-demand „după adresă") sau unealta `/admin/identifica-imobil`, + livrează manual (admin upload).
 
 ## 12. Dovezi recon (2026-06-15)
 

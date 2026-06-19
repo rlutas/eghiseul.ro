@@ -13,6 +13,7 @@ import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { getCountyFromCNP } from '@/lib/validations/cnp';
+import { IdentificareImobilPanel } from '@/components/admin/IdentificareImobilPanel';
 import { estimateFromSelectedOptions } from '@/lib/delivery-calculator';
 import {
   type KycPerDoc,
@@ -1151,6 +1152,11 @@ export default function AdminOrderDetailPage() {
                 </>
               );
             })()}
+            {/* Identificare imobil: show the chosen method + data, and let the
+                operator run the automated ANCPI lookup on-demand (address method). */}
+            {order.services?.slug === 'identificare-imobil' && (
+              <IdentificareImobilPanel property={(order.customer_data?.property as AnyObj) ?? null} />
+            )}
             {/* Real per-step delivery estimate (sums urgenta + traducere +
                 legalizare + apostila*) so admin sees the same window the
                 customer was promised. Falls back to `service.estimated_days`
