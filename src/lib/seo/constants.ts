@@ -119,6 +119,7 @@ export const HARDCODED_ARTICLE_SLUGS = [
   'informatii-cazier-auto-online',
   'amenda-rovinieta-2025-tarife-plata-online-ghid-complet',
   'cum-vor-arata-documentele-de-stare-civila-2025',
+  'certificat-de-nastere-pierdut',
   'taxa-cazier-judiciar',
   'eliberare-certificat-constatator-onrc-ghid',
   'valabilitate-extras-de-carte-funciara',

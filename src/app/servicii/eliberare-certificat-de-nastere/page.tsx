@@ -416,7 +416,11 @@ export default async function CertificatNasterePage() {
                 <Link href="/servicii/eliberare-certificat-de-celibat/" className="text-primary-600 font-medium hover:underline">
                   certificat de celibat
                 </Link>
-                ? Le poți comanda la fel de simplu.
+                ? Le poți comanda la fel de simplu. Dacă{' '}
+                <Link href="/certificat-de-nastere-pierdut/" className="text-primary-600 font-medium hover:underline">
+                  ai pierdut certificatul de naștere
+                </Link>
+                , vezi pașii și actele necesare pentru eliberarea duplicatului.
               </p>
             </div>
           </div>
