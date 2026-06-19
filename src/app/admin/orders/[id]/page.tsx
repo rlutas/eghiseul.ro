@@ -14,6 +14,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { getCountyFromCNP } from '@/lib/validations/cnp';
 import { estimateFromSelectedOptions } from '@/lib/delivery-calculator';
+import { isNoLawyerService } from '@/lib/documents/no-lawyer-services';
 import {
   type KycPerDoc,
   extractKycByDocType,
@@ -2594,11 +2595,10 @@ function ProcessingSection({
   }
 
   // Determine which document types to show. Fully-automated services with no
-  // lawyer involvement (ONRC constatator, carte funciară) get NO legal-assistance
-  // contract / împuternicire / cerere and NO Barou number.
-  const noLawyerService = ['certificat-constatator', 'extras-de-carte-funciara'].includes(
-    order.services?.slug ?? ''
-  );
+  // lawyer involvement (ONRC constatator, ANCPI carte funciară / plan cadastral /
+  // identificare imobil) get NO legal-assistance contract / împuternicire /
+  // cerere and NO Barou number — see NO_LAWYER_SERVICE_SLUGS.
+  const noLawyerService = isNoLawyerService(order.services?.slug);
   const generableDocTypes = noLawyerService
     ? ['contract_prestari']
     : ['contract_prestari', 'contract_asistenta', 'imputernicire', isPJ ? 'cerere_eliberare_pj' : 'cerere_eliberare_pf'];

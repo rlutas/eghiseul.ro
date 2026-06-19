@@ -10,6 +10,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { logOnrcEvent } from '@/lib/onrc/log-event';
+import { recordPortalStatus, parsePortalStatus } from '@/lib/status/record-outage';
 
 export const dynamic = 'force-dynamic';
 
@@ -33,6 +34,12 @@ export async function GET(req: NextRequest) {
     .from('system_heartbeats')
     .upsert({ name: 'onrc_worker', last_seen: now }, { onConflict: 'name' })
     .then(() => {}, () => {});
+
+  // Portal status reported by the worker probe (?portal=up|down|maintenance) —
+  // logs ONRC downtime windows into platform_outages on each transition.
+  const portalStatus = parsePortalStatus(req.nextUrl.searchParams.get('portal'));
+  if (portalStatus) void recordPortalStatus(supabase, 'onrc', portalStatus);
+
   // Don't re-poll a request that's still generating more often than this.
   const RETRIEVE_THROTTLE_MIN = 3;
   const STALE_PROCESSING_MIN = 10; // a PROCESSING job locked longer than this = crashed worker

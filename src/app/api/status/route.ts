@@ -31,13 +31,35 @@ async function reachable(url: string): Promise<boolean> {
     const ctrl = new AbortController();
     const t = setTimeout(() => ctrl.abort(), 6000);
     // `redirect: 'manual'` so a normal login redirect (302) is NOT followed and
-    // is still counted as reachable. Any HTTP response (2xx/3xx/4xx) means the
-    // portal answered — only 5xx or a network/timeout error counts as down.
-    // (Previously we used `r.ok`, which false-flagged the 302 login page as
-    // "indisponibil".)
+    // is still counted as reachable. A real app response is 2xx (login page) or
+    // 3xx (redirect to the SSO login). A 4xx means the app context is GONE — e.g.
+    // ANCPI returns 404 on every /epay/* path during a maintenance window — so it
+    // must count as DOWN. (We still must accept 3xx: using `r.ok` previously
+    // false-flagged the 302 login page as "indisponibil".)
     const r = await fetch(url, { signal: ctrl.signal, cache: 'no-store', redirect: 'manual' });
     clearTimeout(t);
-    return r.status > 0 && r.status < 500;
+    return r.status >= 200 && r.status < 400;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * ANCPI serves a "serviciu indisponibil / activități de mentenanță" page at the
+ * portal root during planned maintenance while every /epay/* path 404s. Confirm
+ * it so the badge can HARD-flag the portal as down even when the worker process
+ * heartbeat is still fresh (the worker stays alive on Railway but every login
+ * fails). Only probed when the main ping already failed, to avoid the extra
+ * round-trip on the happy path.
+ */
+async function ancpiInMaintenance(): Promise<boolean> {
+  try {
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 6000);
+    const r = await fetch('https://epay.ancpi.ro/', { signal: ctrl.signal, cache: 'no-store' });
+    clearTimeout(t);
+    const body = await r.text();
+    return /mentenan[țt]|serviciu indisponibil/i.test(body);
   } catch {
     return false;
   }
@@ -56,20 +78,28 @@ export async function GET(req: NextRequest) {
     supabase.from('system_heartbeats').select('last_seen').eq('name', cfg.workerName).maybeSingle(),
   ]);
 
+  // A confirmed maintenance window is a HARD "down" — it overrides the worker
+  // heartbeat. (For a transient ping blip, the fresh heartbeat still vouches for
+  // the portal, since the worker can only beat if it logged in.)
+  const maintenance = provider === 'ancpi' && !portalUp ? await ancpiInMaintenance() : false;
+
   const lastSeen = hb?.data?.last_seen ? new Date(hb.data.last_seen).getTime() : 0;
   const workerUp = lastSeen > 0 && Date.now() - lastSeen < WORKER_STALE_MS;
   // If the worker is issuing, it is logging into the portal — so the portal is
   // reachable by definition. Avoids the contradictory "portal indisponibil +
-  // eliberare operațională" state.
-  const portalReachable = portalUp || workerUp;
-  const operational = portalReachable && workerUp;
+  // eliberare operațională" state — UNLESS we confirmed a maintenance window.
+  const portalReachable = !maintenance && (portalUp || workerUp);
+  // Issuance can only really work when the portal is reachable, even if the
+  // worker process is alive — so reflect maintenance in the issuance badge too.
+  const issuanceUp = workerUp && portalReachable;
+  const operational = portalReachable && issuanceUp;
 
   return NextResponse.json(
     {
       operational,
       services: {
         portal: { up: portalReachable, label: cfg.label },
-        issuance: { up: workerUp, label: 'Eliberare automată' },
+        issuance: { up: issuanceUp, label: 'Eliberare automată' },
       },
       lastWorkerSeen: lastSeen ? new Date(lastSeen).toISOString() : null,
       updatedAt: new Date().toISOString(),

@@ -13,6 +13,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { logAncpiEvent } from '@/lib/ancpi/log-event';
+import { recordPortalStatus, parsePortalStatus } from '@/lib/status/record-outage';
 
 export const dynamic = 'force-dynamic';
 
@@ -36,6 +37,11 @@ export async function GET(req: NextRequest) {
     .from('system_heartbeats')
     .upsert({ name: 'ancpi_worker', last_seen: now }, { onConflict: 'name' })
     .then(() => {}, () => {});
+
+  // Portal status reported by the worker probe (?portal=up|down|maintenance) —
+  // logs ANCPI downtime windows into platform_outages on each transition.
+  const portalStatus = parsePortalStatus(req.nextUrl.searchParams.get('portal'));
+  if (portalStatus) void recordPortalStatus(supabase, 'ancpi', portalStatus);
 
   const RETRIEVE_THROTTLE_MIN = 2; // ANCPI is fast (~1 min); poll a bit more eagerly than ONRC
   const STALE_PROCESSING_MIN = 10; // a PROCESSING job locked longer than this = crashed worker

@@ -425,3 +425,17 @@ Completează tabelele de mai jos pe baza interfeței reale (nu prin captură de 
 **D. Workflow operator (de confirmat):** comandă `identificare-imobil` cu doar adresă → operator încearcă întâi geoportal (`/admin/identifica-imobil`); dacă nu e suficient și are nume proprietar → caută MANUAL în rp.ancpi.ro → copiază nr. CF/cadastral în comandă → eliberează extrasul prin ePay (canalul automat legitim).
 
 > **Status:** șablon de recon — de completat de Raul când e logat. Nu există automatizare planificată pentru rp.ancpi.ro.
+
+---
+
+## Logare downtime portaluri (platform_outages) — 2026-06-18
+
+Workerii (ANCPI + ONRC) probează portalul la **fiecare tick de poll (~60s)**, independent de existența job-urilor, și raportează starea la `/api/{ancpi,onrc}/pending?portal=up|down|maintenance`. Endpoint-ul (care scrie deja heartbeat-ul) deschide/închide o fereastră în tabela `platform_outages` doar la **tranziție** de stare (`src/lib/status/record-outage.ts`).
+
+- **Probe worker:** `worker-*/src/probe-portal.ts`. ANCPI: GET `epay.ancpi.ro/epay/LogIn.action` (`redirect: manual`) → 2xx/3xx = `up`; altfel verifică pagina de mentenanță la root (`/mentenan[țt]|serviciu indisponibil/i`) → `maintenance`, altfel `down`. ONRC: GET SSO `.well-known/openid-configuration` → `up`/`down` (fără concept de mentenanță).
+- **Tabel `platform_outages`** (migrare `070`): `provider`, `cause` (`maintenance`|`unreachable`), `started_at`, `ended_at` (NULL = în curs), `last_checked_at`, `detail`. Index unic parțial `(provider) WHERE ended_at IS NULL` → o singură fereastră deschisă per provider (invariant la nivel de DB).
+- **Logica de tranziție:** `up` cu fereastră deschisă → o închide (`ended_at`); `down`/`maintenance` fără fereastră → inserează; `down` cu fereastră → bump `last_checked_at` (+ upgrade `cause` dacă s-a schimbat). Doar filtre `.eq/.is` pe mutații (vezi `.claude/rules/database.md`).
+- **Admin:** pagină `/admin/status-portaluri` (nav „Stare portaluri") — listă ferestre recente + durată, banner pentru cele în curs.
+- **Fix conex `/api/status`:** `reachable()` numără acum doar 2xx/3xx ca „up" (un 404 pe `/epay/*` în mentenanță = down), plus detecție explicită a paginii de mentenanță care suprascrie heartbeat-ul workerului (altfel badge-ul arăta „operațional" în timpul mentenanței — workerul e viu pe Railway dar login-ul eșuează). Cauza confirmată a comenzii eșuate `E-260618-UEPNG`: ePay în mentenanță (404 pe tot `/epay/*`).
+
+**Deploy necesar:** push în `worker-ancpi` și `worker-onrc` (Railway, prin git push — NU Redeploy) + deploy eghiseul.ro (Vercel) pentru migrarea/endpoint-urile noi.

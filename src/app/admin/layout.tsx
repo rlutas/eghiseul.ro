@@ -18,6 +18,7 @@ import {
   Ticket,
   UserX,
   MapPin,
+  Activity,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -47,6 +48,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: '/admin/onrc', label: 'ONRC', icon: Landmark, permission: 'orders.view' },
   { href: '/admin/ancpi', label: 'ANCPI', icon: Landmark, permission: 'orders.view' },
   { href: '/admin/identifica-imobil', label: 'Identifică imobil', icon: MapPin, permission: 'orders.view' },
+  { href: '/admin/status-portaluri', label: 'Stare portaluri', icon: Activity, permission: 'orders.view' },
   { href: '/admin/coupons', label: 'Cupoane', icon: Ticket, permission: 'settings.manage' },
   { href: '/admin/users', label: 'Utilizatori', icon: Users, permission: 'users.manage' },
   { href: '/admin/settings', label: 'Setari', icon: Settings, permission: 'settings.manage' },
