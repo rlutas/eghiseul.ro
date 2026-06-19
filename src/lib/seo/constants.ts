@@ -121,6 +121,7 @@ export const HARDCODED_ARTICLE_SLUGS = [
   'cum-vor-arata-documentele-de-stare-civila-2025',
   'certificat-de-nastere-pierdut',
   'schimbare-certificat-de-nastere-vechi',
+  'acte-necesare-certificat-de-nastere',
   'taxa-cazier-judiciar',
   'eliberare-certificat-constatator-onrc-ghid',
   'valabilitate-extras-de-carte-funciara',

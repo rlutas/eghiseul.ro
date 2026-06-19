@@ -67,6 +67,17 @@
 
 ---
 
+## Pagini construite (status build)
+| Pagină (URL) | Cluster țintă | Vol | Status |
+|---|---|---|---|
+| [/servicii/eliberare-certificat-de-nastere/](https://eghiseul.ro/servicii/eliberare-certificat-de-nastere/) | hub + duplicat | head | ✅ existent (întărit cu internal links) |
+| [/certificat-de-nastere-pierdut/](https://eghiseul.ro/certificat-de-nastere-pierdut/) | pierdut | 2.130 | ✅ live |
+| [/schimbare-certificat-de-nastere-vechi/](https://eghiseul.ro/schimbare-certificat-de-nastere-vechi/) | schimbare model vechi | 480 | ✅ live |
+| [/acte-necesare-certificat-de-nastere/](https://eghiseul.ro/acte-necesare-certificat-de-nastere/) | acte + nou-născut | 710+ | ✅ live |
+| Secțiune sectoare/orașe (în hub) | sector/local | 2.350 | ⏳ de făcut |
+
+**Follow-up asset:** imagini OG `/images/articole/{slug}.webp` lipsesc pentru cele 3 ghiduri noi (nu strică build-ul; de generat pentru share social).
+
 ## Maparea la pagini (recomandare)
 1. **Hub** `/servicii/eliberare-certificat-de-nastere/` — head terms + linkuri către sub-pagini.
 2. **Duplicat online** — cel mai mare sub-cluster (4.080), KD 10. Pagină dedicată + model cerere.

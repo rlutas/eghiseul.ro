@@ -597,6 +597,13 @@ export default async function CertificatNasterePage() {
                     </li>
                   ))}
                 </ul>
+                <p className="text-sm text-neutral-600 mt-4">
+                  Vezi lista completă pe situații (duplicat, nou-născut, diaspora) în ghidul{' '}
+                  <Link href="/acte-necesare-certificat-de-nastere/" className="text-primary-600 font-medium hover:underline">
+                    acte necesare certificat de naștere
+                  </Link>
+                  .
+                </p>
               </div>
               <div className="rounded-2xl border border-neutral-200 p-6 bg-primary-50/40">
                 <div className="flex items-center gap-2 mb-4">
