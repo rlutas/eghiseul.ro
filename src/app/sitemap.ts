@@ -23,6 +23,7 @@ import {
   HARDCODED_TOOL_SLUGS,
   HARDCODED_ARTICLE_SLUGS,
 } from '@/lib/seo/constants';
+import { allCitySlugs } from '@/lib/seo/locations';
 
 type SitemapEntry = MetadataRoute.Sitemap[number];
 
@@ -80,6 +81,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   for (const slug of HARDCODED_ARTICLE_SLUGS) {
     entries.push({
       url: `${BASE_URL}/${slug}/`,
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    });
+  }
+
+  // 4b. Location pages (cazier judiciar pe oraș) — segmentate ca să poți
+  // diagnostica indexarea per-tip în GSC. Vezi src/lib/seo/locations.
+  for (const oras of allCitySlugs()) {
+    entries.push({
+      url: `${BASE_URL}/servicii/cazier-judiciar-online/${oras}/`,
       changeFrequency: 'monthly',
       priority: 0.7,
     });

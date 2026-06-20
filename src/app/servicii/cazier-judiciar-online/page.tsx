@@ -9,6 +9,7 @@ import { ServiceFAQ, type FAQ } from '@/components/services/service-faq';
 import { ReviewsSection } from '@/components/services/reviews-section';
 import { GoogleReviewsBadge } from '@/components/services/google-reviews-badge';
 import { buildPageMetadata, buildServicePageGraph, BASE_URL } from '@/lib/seo';
+import { CITIES as CAZIER_CITIES } from '@/lib/seo/locations';
 import { cn } from '@/lib/utils';
 import {
   ArrowRight,
@@ -1173,6 +1174,30 @@ export default function CazierJudiciarHubPage() {
           faqs={FAQ_ITEMS}
           title="Întrebări Frecvente despre Cazierul Judiciar"
         />
+
+        {/* ──────────────── Orașe deservite ──────────────── */}
+        <section className="py-12 lg:py-20 bg-white border-t border-neutral-200">
+          <div className="container mx-auto px-4 max-w-[900px]">
+            <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-3">
+              Cazier judiciar pe orașe
+            </h2>
+            <p className="text-neutral-600 mb-6">
+              Vezi cum obții cazierul judiciar în orașul tău — cu datele biroului IPJ local și pașii
+              pentru comanda online, fără drum la ghișeu.
+            </p>
+            <div className="flex flex-wrap gap-3">
+              {CAZIER_CITIES.map((c) => (
+                <Link
+                  key={c.slug}
+                  href={`/servicii/cazier-judiciar-online/${c.slug}/`}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-neutral-200 px-4 py-2 text-sm text-neutral-700 hover:border-primary-300 hover:text-primary-600 transition-colors"
+                >
+                  <MapPin className="w-3.5 h-3.5" /> Cazier judiciar {c.name}
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
 
         {/* ──────────────── FINAL CTA ──────────────── */}
         <section className="relative py-16 lg:py-24 bg-gradient-to-b from-secondary-900 to-[#0C1A2F] overflow-hidden">
