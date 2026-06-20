@@ -413,7 +413,11 @@ export default async function CertificatCasatoriePage() {
                 <Link href="/transcriere-certificat-de-casatorie/" className="text-primary-600 font-medium hover:underline">
                   transcriere a certificatului de căsătorie
                 </Link>
-                . Vezi și{' '}
+                , iar dacă vrei să vezi{' '}
+                <Link href="/model-certificat-de-casatorie/" className="text-primary-600 font-medium hover:underline">
+                  cum arată modelul certificatului
+                </Link>
+                , avem un ghid dedicat. Vezi și{' '}
                 <Link href="/cum-vor-arata-documentele-de-stare-civila-2025/" className="text-primary-600 font-medium hover:underline">
                   cum vor arăta documentele de stare civilă în 2025
                 </Link>

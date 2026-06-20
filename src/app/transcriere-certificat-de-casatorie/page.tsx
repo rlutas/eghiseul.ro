@@ -16,7 +16,7 @@ export const metadata = buildPageMetadata({
   title: TITLE,
   description: DESCRIPTION,
   path: `/${SLUG}/`,
-  ogImage: '/images/articole/cum-vor-arata-documentele-de-stare-civila-2025.webp',
+  ogImage: '/og/services/certificat-casatorie.png',
 });
 
 export default function Page() {

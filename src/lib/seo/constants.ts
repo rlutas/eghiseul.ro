@@ -123,6 +123,7 @@ export const HARDCODED_ARTICLE_SLUGS = [
   'schimbare-certificat-de-nastere-vechi',
   'acte-necesare-certificat-de-nastere',
   'transcriere-certificat-de-casatorie',
+  'model-certificat-de-casatorie',
   'taxa-cazier-judiciar',
   'eliberare-certificat-constatator-onrc-ghid',
   'valabilitate-extras-de-carte-funciara',
