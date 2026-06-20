@@ -106,7 +106,7 @@ Mecanic: o funcție `assertLocationPageQuality(data)` rulată în test care eșu
 
 ## 4. Rollout pe faze (cu porți de validare)
 
-- **Faza 0 — Engine + cazier judiciar pilot (10 orașe).** București (+ 6 sectoare), Cluj-Napoca, Timișoara, Iași, Constanța, Brașov, Craiova, Sibiu, Oradea, Galați. Conținut puternic, date IPJ reale.
+- **Faza 0 — Engine + cazier judiciar pilot.** ✅ LIVE (2026-06-20): engine (`src/lib/seo/locations/`) + 5 orașe cu date IPJ verificate — Cluj-Napoca, Timișoara, Iași, Constanța, Brașov. București exclus (n-are ghișeu unic → model dedicat ulterior). Build verificat, quality gate trece. URL: `/servicii/cazier-judiciar-online/{oras}`.
 - **Poartă 1:** după 3–4 săptămâni în GSC — indexare >60%, impresii reale, „Crawled - not indexed" mic. Dacă pică → template prea subțire, repară înainte de scalare.
 - **Faza 1 — scalare cazier judiciar** în clustere regionale (~10–15/săpt) până la ~40 orașe.
 - **Faza 2 — cazier auto** (reutilizează engine, date SPCRPCIV), pilot 10 → scalare.
