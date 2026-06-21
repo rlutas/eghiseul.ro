@@ -103,6 +103,8 @@ export const HARDCODED_CALCULATOR_SLUGS: readonly string[] = [
   'concediu-medical',
   'contributii-pfa',
   'calculator-indemnizatie-crestere-copil',
+  'vechime-in-munca',
+  'zile-concediu-odihna',
   'tva',
   'taxa-judiciara-de-timbru',
   'reabilitare',

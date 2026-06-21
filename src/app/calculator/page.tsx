@@ -39,6 +39,14 @@ const CATALOG: Record<string, { title: string; desc: string }> = {
     title: 'Calculator Contribuții PFA',
     desc: 'CAS, CASS și impozit pentru Declarația Unică, cu plafoanele 2026.',
   },
+  'vechime-in-munca': {
+    title: 'Calculator Vechime în Muncă',
+    desc: 'Adună perioadele de angajare → vechime totală în ani, luni, zile.',
+  },
+  'zile-concediu-odihna': {
+    title: 'Calculator Zile Concediu de Odihnă',
+    desc: 'Zile de concediu cuvenite proporțional cu lunile lucrate.',
+  },
   'calculator-indemnizatie-crestere-copil': {
     title: 'Calculator Indemnizație Creștere Copil',
     desc: 'ICC 2026: 85% din venitul net, între 1.650 și 8.500 lei brut.',
