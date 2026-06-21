@@ -366,3 +366,5 @@ A: `README.md` - "Expected Results" section or EXECUTIVE-SUMMARY.txt
 **Estimated ROI**: +300-400% organic traffic increase (6 months)
 
 For detailed information, start with any document above based on your needs.
+
+- [SEO-STATUS-2026-06-21.md](SEO-STATUS-2026-06-21.md) — status consolidat SEO + roadmap spre lansare (orașe, calculatoare, ghiduri)

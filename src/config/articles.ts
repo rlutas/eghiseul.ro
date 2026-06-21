@@ -13,6 +13,8 @@ export interface ArticleMeta {
   title: string;
   excerpt: string;
   category: string;
+  /** Override imaginea featured; fallback la /images/articole/<slug>.webp. */
+  image?: string;
 }
 
 export const ARTICLES: ArticleMeta[] = [
@@ -111,5 +113,40 @@ export const ARTICLES: ArticleMeta[] = [
     title: 'Rolul și Atribuțiile ONRC în România',
     excerpt: 'Ce este Registrul Comerțului, ce atribuții are și ce documente eliberează.',
     category: 'Comercial / ONRC',
+  },
+  {
+    slug: 'certificat-de-nastere-pierdut',
+    title: 'Certificat de Naștere Pierdut: Ce Faci și Cum Obții Duplicatul',
+    excerpt: 'Acte necesare, în cât timp se eliberează duplicatul, cât costă și ce faci dacă ai pierdut și buletinul.',
+    category: 'Stare civilă',
+    image: '/og/services/certificat-nastere.png',
+  },
+  {
+    slug: 'schimbare-certificat-de-nastere-vechi',
+    title: 'Schimbare Certificat de Naștere Vechi cu Unul Nou',
+    excerpt: 'Când trebuie schimbat cu modelul actual, ce acte îți trebuie și cum obții duplicatul online.',
+    category: 'Stare civilă',
+    image: '/og/services/certificat-nastere.png',
+  },
+  {
+    slug: 'acte-necesare-certificat-de-nastere',
+    title: 'Acte Necesare Certificat de Naștere: Listă pe Situații',
+    excerpt: 'Ce acte îți trebuie pentru duplicat, pentru un nou-născut și pentru eliberarea prin împuternicire.',
+    category: 'Stare civilă',
+    image: '/og/services/certificat-nastere.png',
+  },
+  {
+    slug: 'transcriere-certificat-de-casatorie',
+    title: 'Transcriere Certificat de Căsătorie din Străinătate',
+    excerpt: 'Ce este transcrierea, ce acte îți trebuie (apostilă, traducere) și unde se depune cererea.',
+    category: 'Stare civilă',
+    image: '/og/services/certificat-casatorie.png',
+  },
+  {
+    slug: 'model-certificat-de-casatorie',
+    title: 'Model Certificat de Căsătorie: Cum Arată și Ce Conține',
+    excerpt: 'Cum arată modelul actual, ce date conține și cum obții un exemplar oficial (duplicat).',
+    category: 'Stare civilă',
+    image: '/og/services/certificat-casatorie.png',
   },
 ];

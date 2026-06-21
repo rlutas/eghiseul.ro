@@ -89,19 +89,14 @@ export function serviceUrl(slug: string): string {
   return SERVICE_URL_OVERRIDES[slug] ?? `/servicii/${slug}/`;
 }
 
-/** Calculator pages (ported from WP /calculator/*). */
-export const HARDCODED_CALCULATOR_SLUGS = [
-  'calculator-impozit-auto',
-  'varsta-pensionare',
-  'salariu',
-  'pensie-invaliditate',
-  'calculator-indemnizatie-crestere-copil',
-  'tva',
-  'termene-judiciare',
-  'calculator-procente',
-  'reabilitare',
-  'taxa-judiciara-de-timbru',
-] as const;
+/**
+ * Calculator pages (ported from WP /calculator/*).
+ * GOL intenționat: paginile NU sunt încă construite — listarea lor în sitemap
+ * trimitea 404-uri la Google. Adaugă slug-ul AICI doar când pagina
+ * `/calculator/<slug>/` chiar există. Roadmap-ul complet (11 calculatoare cu
+ * volume + estimări) e în docs/seo/REBUILD-QUEUE.md (BATCH 3).
+ */
+export const HARDCODED_CALCULATOR_SLUGS: readonly string[] = [];
 
 /** Tools pages (ported from WP /tools/*). */
 export const HARDCODED_TOOL_SLUGS = [
