@@ -194,6 +194,148 @@ const RAW_CITIES: CityData[] = [
     ],
     nearbyCitySlugs: ['cluj-napoca'],
   },
+  {
+    slug: 'craiova',
+    name: 'Craiova',
+    judet: 'Dolj',
+    judetAbbr: 'dj',
+    population: '234.000 locuitori',
+    localAnchors: ['uzina Ford', 'Universitatea din Craiova', 'Spitalul Județean de Urgență'],
+    ipj: {
+      name: 'Serviciul Cazier Judiciar, Statistică și Evidențe Operative — IPJ Dolj',
+      address: 'Str. Vulturi nr. 19, Craiova, jud. Dolj',
+      website: 'https://dj.politiaromana.ro/ro/utile/cazier-judiciar',
+      schedule: {
+        Luni: '08:30-10:30 / 13:00-16:00',
+        Marți: '08:30-10:30 / 13:00-16:00',
+        Miercuri: '13:00-18:00',
+        Joi: '08:30-10:30 / 13:00-16:00',
+        Vineri: '08:30-13:00',
+      },
+    },
+    localContext:
+      'Craiova este reședința județului Dolj și centrul economic al Olteniei, cu uzina auto Ford și ' +
+      'Universitatea din Craiova. Cazierul judiciar este cerut frecvent aici pentru angajări la ' +
+      'platforma auto și la furnizorii ei, pentru personal medical și didactic și pentru dosare de studii.',
+    localFaq: [
+      {
+        q: 'Unde se eliberează cazierul judiciar în Craiova?',
+        a: 'La Serviciul Cazier Judiciar din cadrul IPJ Dolj, pe Str. Vulturi nr. 19. Alternativ, prin eGhișeul.ro depui cererea online și primești documentul prin curier, fără deplasare.',
+      },
+      {
+        q: 'Cât durează cazierul judiciar obținut online din Craiova?',
+        a: 'Prin eGhișeul.ro, în mod standard 2-4 zile lucrătoare. Depunem cererea la IPJ Dolj pe bază de împuternicire și îți trimitem documentul prin curier sau pe email.',
+      },
+    ],
+    nearbyCitySlugs: ['sibiu', 'timisoara'],
+  },
+  {
+    slug: 'sibiu',
+    name: 'Sibiu',
+    judet: 'Sibiu',
+    judetAbbr: 'sb',
+    population: '147.000 locuitori',
+    localAnchors: ['Continental Automotive', 'Universitatea „Lucian Blaga"', 'Marquardt'],
+    ipj: {
+      name: 'Serviciul Cazier Judiciar, Statistică și Evidențe Operative — IPJ Sibiu',
+      address: 'Str. Revoluției nr. 4-6, Sibiu, jud. Sibiu',
+      website: 'https://sb.politiaromana.ro/ro/utile/documente-eliberari-acte/cazier-judiciar',
+      schedule: {
+        Luni: '08:30-13:30',
+        Marți: '08:30-13:30',
+        Miercuri: '13:00-18:00',
+        Joi: '08:30-13:30',
+        Vineri: '08:30-13:30',
+      },
+    },
+    localContext:
+      'Sibiu este un important centru industrial și turistic din Transilvania, cu un cluster auto ' +
+      'puternic și Universitatea „Lucian Blaga". Economia de producție și sectorul turistic fac ca ' +
+      'angajatorii din Sibiu să ceară frecvent cazierul judiciar la angajare.',
+    localFaq: [
+      {
+        q: 'Unde se obține cazierul judiciar în Sibiu?',
+        a: 'La Serviciul Cazier Judiciar din IPJ Sibiu, pe Str. Revoluției nr. 4-6. Alternativ, comanzi online prin eGhișeul.ro și primești documentul prin curier.',
+      },
+      {
+        q: 'Pot obține cazierul din Sibiu dacă sunt plecat în străinătate?',
+        a: 'Da. Depunem cererea prin împuternicire la IPJ Sibiu în numele tău și îți trimitem certificatul oriunde te afli — util pentru sibienii din diaspora.',
+      },
+    ],
+    nearbyCitySlugs: ['brasov', 'cluj-napoca'],
+  },
+  {
+    slug: 'oradea',
+    name: 'Oradea',
+    judet: 'Bihor',
+    judetAbbr: 'bh',
+    population: '183.000 locuitori',
+    localAnchors: ['Universitatea din Oradea', 'parcurile industriale (Eurobusiness)', 'Spitalul Județean Oradea'],
+    ipj: {
+      name: 'Serviciul Cazier Judiciar, Statistică și Evidențe Operative — IPJ Bihor',
+      address: 'Str. Parcul Traian nr. 18, Oradea, jud. Bihor (sediu temporar — ghișeul e în renovare; verifică înainte de deplasare)',
+      phone: '0259 403 035',
+      website: 'https://bh.politiaromana.ro/ro/utile/program-cu-publicul-acte-necesare/serviciul-cazier-judiciar',
+      schedule: {
+        Luni: '08:30-15:30',
+        Marți: '08:30-15:30',
+        Miercuri: '08:30-15:30',
+        Joi: '08:30-17:00',
+        Vineri: '08:30-13:30',
+      },
+    },
+    localContext:
+      'Oradea, reședința județului Bihor la granița cu Ungaria, este unul dintre cele mai dinamice ' +
+      'orașe, cu sectoare IT/BPO și industriale. Universitatea din Oradea și parcurile industriale, ' +
+      'plus piața de muncă transfrontalieră, mențin o cerere constantă de cazier judiciar.',
+    localFaq: [
+      {
+        q: 'Unde se eliberează cazierul judiciar în Oradea?',
+        a: 'Ghișeul funcționează temporar la sediul IPJ Bihor, Str. Parcul Traian nr. 18 (clădirea e în renovare) — verifică înainte de deplasare. Prin eGhișeul.ro eviți complet drumul: comanzi online.',
+      },
+      {
+        q: 'Pot obține cazierul din Oradea pentru a lucra în Ungaria sau UE?',
+        a: 'Da. Depunem cererea la IPJ Bihor în numele tău și, la nevoie, ne ocupăm de apostilă și traducere — util pentru orădenii care lucrează peste graniță.',
+      },
+    ],
+    nearbyCitySlugs: ['arad', 'cluj-napoca'],
+  },
+  {
+    slug: 'arad',
+    name: 'Arad',
+    judet: 'Arad',
+    judetAbbr: 'ar',
+    population: '145.000 locuitori',
+    localAnchors: ['Universitatea „Aurel Vlaicu"', 'Leoni Wiring Systems', 'parcurile industriale Arad'],
+    ipj: {
+      name: 'Serviciul Cazier Judiciar, Statistică și Evidențe Operative — IPJ Arad',
+      address: 'Str. Vârful cu Dor nr. 17-21, Arad, jud. Arad',
+      phone: '0257 207 118',
+      website: 'https://ar.politiaromana.ro/ro/utile/documente-eliberari-acte/cazier-judiciar',
+      schedule: {
+        Luni: '08:30-12:00 / 13:30-15:45',
+        Marți: '08:30-12:00 / 13:30-15:45',
+        Miercuri: '08:30-12:00 / 13:30-18:00',
+        Joi: '08:30-12:00 / 13:30-15:45',
+        Vineri: '08:30-12:00 / 13:00-14:00',
+      },
+    },
+    localContext:
+      'Arad este un oraș de graniță din vestul țării, cu o bază industrială orientată pe export ' +
+      '(auto, componente electrice, alimentar) și legături strânse cu Timișoara și Ungaria. ' +
+      'Angajatorii din parcurile industriale și Universitatea „Aurel Vlaicu" cer frecvent cazierul judiciar.',
+    localFaq: [
+      {
+        q: 'Unde și când se eliberează cazierul judiciar în Arad?',
+        a: 'La Serviciul Cazier Judiciar din IPJ Arad, pe Str. Vârful cu Dor nr. 17-21, cu program luni-vineri. Prin eGhișeul.ro comanzi online, fără coadă.',
+      },
+      {
+        q: 'Pot cere cazierul în Arad fără să mă deplasez?',
+        a: 'Da. Completezi cererea online, noi o depunem la IPJ Arad pe bază de împuternicire, iar tu primești documentul prin curier în 2-4 zile lucrătoare.',
+      },
+    ],
+    nearbyCitySlugs: ['oradea', 'timisoara'],
+  },
 ];
 
 /** Orașele validate anti-thin. Importă DOAR de aici (sau prin `index.ts`). */

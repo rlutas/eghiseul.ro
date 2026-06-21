@@ -96,7 +96,9 @@ export function serviceUrl(slug: string): string {
  * `/calculator/<slug>/` chiar există. Roadmap-ul complet (11 calculatoare cu
  * volume + estimări) e în docs/seo/REBUILD-QUEUE.md (BATCH 3).
  */
-export const HARDCODED_CALCULATOR_SLUGS: readonly string[] = [];
+export const HARDCODED_CALCULATOR_SLUGS: readonly string[] = [
+  'calculator-procente',
+];
 
 /** Tools pages (ported from WP /tools/*). */
 export const HARDCODED_TOOL_SLUGS = [
