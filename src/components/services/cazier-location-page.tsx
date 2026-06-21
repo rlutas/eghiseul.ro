@@ -8,6 +8,15 @@ import {
   Building2,
   ExternalLink,
   ChevronRight,
+  Briefcase,
+  Plane,
+  GraduationCap,
+  Gavel,
+  Heart,
+  Landmark,
+  Globe,
+  FileText,
+  Users,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ServiceFAQ } from '@/components/services/service-faq';
@@ -32,10 +41,49 @@ const STEPS = [
 
 const BENEFITS = ['Fără drum la IPJ', 'Fără cozi sau programare', 'Livrare 2-4 zile', 'Plată securizată cu cardul'];
 
+const USE_CASES = [
+  { icon: Briefcase, title: 'Angajare', desc: 'Tot mai mulți angajatori cer cazierul la angajare, mai ales în pază, transport, educație, sănătate sau în sistemul financiar-bancar.' },
+  { icon: Plane, title: 'Emigrare și viză', desc: 'Necesar pentru viză, permis de ședere sau dosar de muncă în străinătate — de regulă cu apostilă de la Haga și traducere autorizată.' },
+  { icon: GraduationCap, title: 'Studii și Erasmus', desc: 'Universitățile și programele de mobilitate îl pot cere la înscriere sau pentru stagii și voluntariat.' },
+  { icon: Gavel, title: 'Licitații publice', desc: 'Administratorii de firme îl prezintă în dosarele de participare la licitații publice.' },
+  { icon: Heart, title: 'Adopție și tutelă', desc: 'Obligatoriu în dosarele de adopție, plasament familial sau tutelă.' },
+  { icon: Landmark, title: 'Funcție publică', desc: 'Cerut la concursurile pentru posturi în administrația publică și instituțiile statului.' },
+];
+
+const ACTE_PF = [
+  'Act de identitate valabil (CI sau pașaport)',
+  'O fotografie/scan pentru verificarea identității',
+  'Semnarea împuternicirii online (o generăm noi)',
+];
+const ACTE_PJ = [
+  'Datele firmei (denumire, CUI, reprezentant legal)',
+  'Actul de identitate al reprezentantului',
+  'Împuternicire / mandat pentru depunerea cererii',
+];
+
+const COMPARISON: { label: string; online: string; ghiseu: string }[] = [
+  { label: 'Deplasare la sediu', online: 'Nu', ghiseu: 'Da, la IPJ' },
+  { label: 'Disponibilitate', online: '24/7, online', ghiseu: 'Doar în program' },
+  { label: 'Cozi / așteptare', online: 'Nu', ghiseu: 'Frecvent' },
+  { label: 'Livrare', online: 'Email + curier', ghiseu: 'Pe loc, dar te deplasezi' },
+  { label: 'Traducere & apostilă', online: 'Opțional, le gestionăm noi', ghiseu: 'Le obții separat' },
+  { label: 'Plată', online: 'Card, online', ghiseu: 'La ghișeu' },
+];
+
+function genericFaq(cityName: string) {
+  return [
+    { q: 'Cât durează eliberarea cazierului judiciar?', a: 'Prin eGhișeul.ro, în mod standard 2-4 zile lucrătoare; există și opțiunea Urgent. La ghișeu se eliberează de regulă pe loc, în limita programului.' },
+    { q: 'Cât este valabil cazierul judiciar?', a: 'De regulă 6 luni de la data emiterii, însă unele instituții pot cere un document mai recent (uneori emis în ultimele 30 de zile). Verifică cerința instituției la care îl depui.' },
+    { q: 'Documentul este oficial și acceptat?', a: `Da. Primești cazierul judiciar oficial emis de Poliția Română (IPJ), valabil pentru orice instituție din țară sau, cu apostilă și traducere, din străinătate. Este același document ca cel obținut la ghișeu în ${cityName}.` },
+    { q: 'Plata și datele mele sunt în siguranță?', a: 'Da. Plata se face securizat cu cardul, iar datele sunt protejate conform GDPR. Folosim împuternicirea semnată online pentru a depune cererea în numele tău.' },
+  ];
+}
+
 export function CazierLocationPage({ city, otherCities }: { city: CityData; otherCities: OtherCity[] }) {
   const path = `${HUB_PATH}${city.slug}/`;
   const title = `Cazier Judiciar Online ${city.name}`;
   const description = `Obține cazierul judiciar în ${city.name} fără drum la IPJ ${city.judet}. Comandă online, livrare în 2-4 zile pe email sau curier.`;
+  const anchors = city.localAnchors?.length ? city.localAnchors.join(', ') : null;
 
   const jsonLd = buildLocationPageGraph({
     serviceName: `${title} — eGhișeul.ro`,
@@ -113,12 +161,12 @@ export function CazierLocationPage({ city, otherCities }: { city: CityData; othe
           </div>
         </header>
 
-        {/* Local IPJ office — anti-thin anchor, overlaps the hero like the hubs */}
+        {/* Local IPJ office — anti-thin anchor, overlaps the hero */}
         <section className="bg-white">
           <div className="container mx-auto px-4 max-w-[820px]">
             <div className="relative -mt-16 lg:-mt-20 rounded-2xl border border-neutral-200 bg-white p-6 lg:p-8 shadow-lg">
               <h2 className="text-xl sm:text-2xl font-bold text-secondary-900 mb-1">
-                Unde se eliberează cazierul judiciar în {city.name}
+                Cazier judiciar {city.name} la ghișeu — sediul IPJ {city.judet}
               </h2>
               <p className="text-sm text-neutral-600 mb-6">
                 La ghișeu, cazierul se obține de la biroul de specialitate din cadrul IPJ {city.judet}.
@@ -186,8 +234,152 @@ export function CazierLocationPage({ city, otherCities }: { city: CityData; othe
           </div>
         </section>
 
-        {/* How it works */}
+        {/* Ce este + valabilitate */}
         <section className="py-12 lg:py-16 bg-white">
+          <div className="container mx-auto px-4 max-w-[820px]">
+            <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-4">
+              Ce este cazierul judiciar și de ce ai nevoie de el în {city.name}
+            </h2>
+            <div className="space-y-4 text-neutral-700 leading-relaxed">
+              <p>
+                Cazierul judiciar este documentul oficial care atestă dacă o persoană are sau nu
+                antecedente penale. Este eliberat de <strong>Poliția Română</strong> (Inspectoratul de
+                Poliție Județean — IPJ {city.judet}, parte din IGPR) și are aceeași valoare legală
+                indiferent dacă îl obții la ghișeu sau online prin împuternicire.
+              </p>
+              <p>
+                <strong>Valabilitate:</strong> de regulă <strong>6 luni</strong> de la data emiterii.
+                Unele instituții pot cere însă un certificat mai recent (uneori emis în ultimele 30 de
+                zile), așa că merită să verifici cerința exactă a celui care ți-l solicită.
+              </p>
+              <p>
+                Cazierul judiciar nu trebuie confundat cu <strong>certificatul de integritate
+                comportamentală</strong> (necesar pentru lucrul cu minorii) — sunt documente diferite,
+                cu scopuri diferite.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Situații în care ai nevoie */}
+        <section className="py-12 lg:py-16 bg-neutral-50">
+          <div className="container mx-auto px-4 max-w-[820px]">
+            <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-3">
+              Când ai nevoie de cazier judiciar în {city.name}
+            </h2>
+            {anchors && (
+              <p className="text-neutral-700 leading-relaxed mb-6">
+                În {city.name}, cazierul judiciar este cerut frecvent pentru angajare la{' '}
+                {anchors} și pentru dosarele descrise mai jos.
+              </p>
+            )}
+            <div className="grid sm:grid-cols-2 gap-4">
+              {USE_CASES.map((u) => (
+                <div key={u.title} className="rounded-2xl border border-neutral-200 bg-white p-5">
+                  <div className="flex items-center gap-2 mb-2">
+                    <u.icon className="w-5 h-5 text-primary-600" />
+                    <h3 className="font-bold text-secondary-900">{u.title}</h3>
+                  </div>
+                  <p className="text-sm text-neutral-700 leading-relaxed">{u.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Acte necesare */}
+        <section className="py-12 lg:py-16 bg-white">
+          <div className="container mx-auto px-4 max-w-[820px]">
+            <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-6">
+              Acte necesare pentru cazier judiciar online în {city.name}
+            </h2>
+            <div className="grid sm:grid-cols-2 gap-4">
+              <div className="rounded-2xl border border-neutral-200 bg-white p-6">
+                <div className="flex items-center gap-2 mb-3">
+                  <Users className="w-5 h-5 text-primary-600" />
+                  <h3 className="font-bold text-secondary-900">Persoane fizice</h3>
+                </div>
+                <ul className="space-y-2 text-sm text-neutral-700">
+                  {ACTE_PF.map((a) => (
+                    <li key={a} className="flex items-start gap-2">
+                      <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" /> {a}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="rounded-2xl border border-neutral-200 bg-white p-6">
+                <div className="flex items-center gap-2 mb-3">
+                  <FileText className="w-5 h-5 text-primary-600" />
+                  <h3 className="font-bold text-secondary-900">Persoane juridice</h3>
+                </div>
+                <ul className="space-y-2 text-sm text-neutral-700">
+                  {ACTE_PJ.map((a) => (
+                    <li key={a} className="flex items-start gap-2">
+                      <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" /> {a}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Preț și livrare */}
+        <section className="py-12 lg:py-16 bg-neutral-50">
+          <div className="container mx-auto px-4 max-w-[820px]">
+            <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-3">
+              Preț și timp de livrare în {city.name}
+            </h2>
+            <p className="text-neutral-700 leading-relaxed mb-6">
+              Cazierul judiciar pentru persoane fizice pornește de la <strong>{PRICE} RON</strong>, cu
+              livrare standard în <strong>2-4 zile lucrătoare</strong>. Pentru situații urgente există
+              opțiunea de procesare prioritară. Costul acoperă întocmirea și depunerea cererii prin
+              împuternicire, taxele și livrarea documentului.
+            </p>
+            <div className="rounded-2xl border border-neutral-200 bg-white p-6">
+              <h3 className="font-bold text-secondary-900 mb-2">Servicii suplimentare disponibile</h3>
+              <ul className="grid sm:grid-cols-2 gap-2 text-sm text-neutral-700">
+                {['Certificat de integritate comportamentală', 'Traducere autorizată', 'Apostilă de la Haga', 'Livrare prin curier rapid'].map((s) => (
+                  <li key={s} className="flex items-start gap-2">
+                    <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" /> {s}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        {/* Online vs ghișeu */}
+        <section className="py-12 lg:py-16 bg-white">
+          <div className="container mx-auto px-4 max-w-[820px]">
+            <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-6">
+              Online vs. ghișeu — cum e mai simplu în {city.name}
+            </h2>
+            <div className="overflow-hidden rounded-2xl border border-neutral-200">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-neutral-100 text-secondary-900">
+                    <th className="text-left font-bold p-3"></th>
+                    <th className="text-left font-bold p-3">Online (eGhișeul.ro)</th>
+                    <th className="text-left font-bold p-3">La ghișeu (IPJ)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {COMPARISON.map((row) => (
+                    <tr key={row.label} className="border-t border-neutral-200">
+                      <td className="p-3 font-medium text-secondary-900">{row.label}</td>
+                      <td className="p-3 text-neutral-700">{row.online}</td>
+                      <td className="p-3 text-neutral-600">{row.ghiseu}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        {/* Cum obții — pași */}
+        <section className="py-12 lg:py-16 bg-neutral-50">
           <div className="container mx-auto px-4 max-w-[820px]">
             <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-6">
               Cum obții cazierul online în {city.name}
@@ -215,8 +407,64 @@ export function CazierLocationPage({ city, otherCities }: { city: CityData; othe
           </div>
         </section>
 
-        {/* Local FAQ */}
-        <ServiceFAQ title={`Întrebări frecvente — cazier judiciar ${city.name}`} faqs={city.localFaq} />
+        {/* Reabilitare / ștergere cazier */}
+        <section className="py-12 lg:py-16 bg-white">
+          <div className="container mx-auto px-4 max-w-[820px]">
+            <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-4">
+              Reabilitare și ștergere cazier judiciar
+            </h2>
+            <div className="space-y-4 text-neutral-700 leading-relaxed">
+              <p>
+                Dacă figurezi cu o mențiune în cazier, aceasta poate fi ștearsă prin{' '}
+                <strong>reabilitare</strong>. Există două forme: <strong>reabilitarea de drept</strong>,
+                care operează automat după trecerea unui anumit termen de la executarea pedepsei, și{' '}
+                <strong>reabilitarea judecătorească</strong>, obținută printr-o cerere la instanță.
+              </p>
+              <p>
+                După reabilitare, mențiunile nu mai apar în cazierul judiciar obișnuit (cel cerut de
+                angajatori). Termenele și condițiile diferă în funcție de tipul și durata pedepsei,
+                așa că, dacă nu ești sigur de situația ta, primul pas este să obții cazierul și să
+                verifici ce mențiuni există.
+              </p>
+              <p>
+                Te putem ajuta să obții cazierul judiciar din {city.name} pentru a verifica situația
+                ta actuală, rapid și fără drum la ghișeu.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Diaspora */}
+        <section className="py-12 lg:py-16 bg-neutral-50">
+          <div className="container mx-auto px-4 max-w-[820px]">
+            <div className="flex items-center gap-2 mb-4">
+              <Globe className="w-6 h-6 text-primary-600" />
+              <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900">
+                Cazier judiciar pentru românii din diaspora
+              </h2>
+            </div>
+            <div className="space-y-4 text-neutral-700 leading-relaxed">
+              <p>
+                Dacă ești plecat din {city.name} la muncă sau la studii în străinătate, nu trebuie să
+                te întorci în țară pentru un cazier judiciar. Depunem cererea la IPJ {city.judet} în
+                numele tău, pe bază de împuternicire semnată online, și îți trimitem documentul oriunde
+                te afli — prin curier internațional sau în format electronic.
+              </p>
+              <p>
+                Pentru folosirea cazierului în fața autorităților străine, ai de obicei nevoie de{' '}
+                <strong>apostilă de la Haga</strong> și de o <strong>traducere autorizată</strong> — pe
+                amândouă le putem gestiona pentru tine, ca să primești un dosar complet, acceptat la
+                ambasade, angajatori și instituții din străinătate.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* FAQ — generic + local */}
+        <ServiceFAQ
+          title={`Întrebări frecvente — cazier judiciar ${city.name}`}
+          faqs={[...genericFaq(city.name), ...city.localFaq]}
+        />
 
         {/* Other cities */}
         {otherCities.length > 0 && (
@@ -246,6 +494,24 @@ export function CazierLocationPage({ city, otherCities }: { city: CityData; othe
             </div>
           </section>
         )}
+
+        {/* Surse oficiale */}
+        <section className="py-8 bg-white border-t border-neutral-200">
+          <div className="container mx-auto px-4 max-w-[820px]">
+            <p className="text-xs text-neutral-500">
+              Surse oficiale:{' '}
+              <a href="https://www.politiaromana.ro/" target="_blank" rel="noopener noreferrer" className="text-primary-700 hover:underline">Poliția Română</a>
+              {city.ipj.website && (
+                <>
+                  {' · '}
+                  <a href={city.ipj.website} target="_blank" rel="noopener noreferrer" className="text-primary-700 hover:underline">IPJ {city.judet} — cazier judiciar</a>
+                </>
+              )}
+              . Informațiile despre ghișeu sunt date publice și se pot modifica; verifică pe site-ul
+              instituției înainte de deplasare.
+            </p>
+          </div>
+        </section>
 
         {/* Final CTA */}
         <section className="relative py-14 lg:py-20 bg-gradient-to-b from-secondary-900 to-[#0C1A2F] overflow-hidden">

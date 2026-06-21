@@ -26,6 +26,7 @@ const RAW_CITIES: CityData[] = [
     judet: 'Cluj',
     judetAbbr: 'cj',
     population: '286.000 locuitori',
+    localAnchors: ['Universitatea Babeș-Bolyai', 'companiile IT (Bosch, Endava, NTT Data)', 'Banca Transilvania'],
     ipj: {
       name: 'Serviciul Cazier Judiciar, Statistică și Evidențe Operative — IPJ Cluj',
       address: 'Str. Decebal nr. 26, Cluj-Napoca, jud. Cluj',
@@ -56,6 +57,7 @@ const RAW_CITIES: CityData[] = [
     judet: 'Timiș',
     judetAbbr: 'tm',
     population: '250.000 locuitori',
+    localAnchors: ['Continental', 'Universitatea de Vest', 'Universitatea Politehnica Timișoara'],
     ipj: {
       name: 'Serviciul Cazier Judiciar și Evidențe Operative — IPJ Timiș',
       address: 'Bulevardul Take Ionescu nr. 44-46, Timișoara, jud. Timiș (parter, sediul IPJ Timiș)',
@@ -90,6 +92,7 @@ const RAW_CITIES: CityData[] = [
     judet: 'Iași',
     judetAbbr: 'is',
     population: '270.000 locuitori',
+    localAnchors: ['Universitatea „Alexandru Ioan Cuza"', 'UMF „Grigore T. Popa"', 'companiile de IT și BPO'],
     ipj: {
       name: 'Serviciul Cazier Judiciar, Statistică și Evidențe Operative — IPJ Iași',
       address: 'Str. Prof. Mihai Costăchescu nr. 2, Iași, jud. Iași',
@@ -125,6 +128,7 @@ const RAW_CITIES: CityData[] = [
     judet: 'Constanța',
     judetAbbr: 'ct',
     population: '264.000 locuitori',
+    localAnchors: ['Portul Constanța', 'companiile maritime și de shipping', 'sectorul turistic de pe litoral'],
     ipj: {
       name: 'Serviciul Cazier Judiciar și Evidențe Operative — IPJ Constanța',
       address: 'Str. Renașterii nr. 15, Municipiul Constanța, jud. Constanța',
@@ -160,6 +164,7 @@ const RAW_CITIES: CityData[] = [
     judet: 'Brașov',
     judetAbbr: 'bv',
     population: '237.000 locuitori',
+    localAnchors: ['fabricile auto și industriale', 'Universitatea Transilvania', 'stațiunile turistice din zonă'],
     ipj: {
       name: 'Serviciul Cazier Judiciar — IPJ Brașov',
       address: 'Str. Nicolae Titulescu nr. 28, Brașov, jud. Brașov (sediul IPJ Brașov)',

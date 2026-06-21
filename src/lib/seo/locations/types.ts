@@ -49,6 +49,11 @@ export interface CityData {
   localContext: string;
   /** Minimum 2 întrebări specifice orașului. */
   localFaq: CityFAQ[];
+  /**
+   * Ancore locale reale (angajatori/universități/instituții) care cer frecvent
+   * cazier — adaugă specificitate la secțiunea „Situații" (anti-thin).
+   */
+  localAnchors?: string[];
   /** Slug-uri orașe apropiate, pentru internal linking spoke↔spoke. */
   nearbyCitySlugs: string[];
 }
