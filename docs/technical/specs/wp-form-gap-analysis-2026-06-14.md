@@ -6,6 +6,31 @@
 
 ---
 
+## ✅ VERIFICARE 2026-06-21 — gap-ul P0/P1 e ÎNCHIS în cod
+
+Re-verificat direct în sursă (`src/components/orders/`). Față de tabelul de gap de mai jos
+(scris pe 14 iun), codul a avansat — **P0 și P1 sunt acum implementate**:
+- **Modul `civil-status`** (`modules/civil-status/CivilStatusStep.tsx`) — P0 complet: istoric marital,
+  stare civilă actuală (celibat), nume soț înainte de căsătorie, data căsătoriei, localitate
+  înregistrare, nume de naștere, nume părinți, Minor/Adult, scop, țară folosire, „vechiul certificat
+  mi-a fost: pierdut/deteriorat/furat".
+- **Picker limbă traducere** — randat în `options-step.tsx` (`<select>` din `TRANSLATION_LANGUAGES`,
+  validare „Selectați limba de traducere").
+- **Picker țară apostilă** — `sharedCountry` + `setCountry` + validare în `options-step.tsx`.
+- **Livrare internațională** — `delivery-step.tsx`: regiune `romania | international`, curieri
+  `INTERNATIONAL_COURIERS` (DHL, Poșta Română) randați + selecție.
+- **Declarații** — model semnătură-ca-consimțământ (Legea 214/2024 / eIDAS Art. 25), deliberat — nu
+  3 checkbox-uri separate.
+
+**Rămas (doar P2-minor, NU blochează lansarea):**
+- Upload opțional „vechiul certificat" + acte de identitate părinți (naștere) — acum se colectează doar
+  motivul, nu fișierul.
+- Upsell celibat → naștere (cross-sell, decizie de produs).
+
+Concluzie: paritatea funcțională de comandă pentru stare civilă e atinsă; cele 2 rămase sunt nice-to-have.
+
+---
+
 ## ✅ IMPLEMENTAT (2026-06-14) — modul „Date Stare Civilă" + preț
 
 - **Preț:** naștere + căsătorie → **998 RON** (placeholder-ul 179 era greșit; real ~1190). Migrare `053_civil_status_module.sql`.
