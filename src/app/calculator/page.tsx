@@ -27,6 +27,18 @@ const CATALOG: Record<string, { title: string; desc: string }> = {
     title: 'Calculator Salariu Net/Brut',
     desc: 'Conversie brut↔net cu rate 2026 (CAS, CASS, impozit, deducere personală).',
   },
+  'amenda-circulatie': {
+    title: 'Calculator Amendă Circulație',
+    desc: 'Amenda pe clase + puncte de penalizare + plata redusă în 15 zile (2026).',
+  },
+  'concediu-medical': {
+    title: 'Calculator Concediu Medical',
+    desc: 'Indemnizația de concediu medical 2026 (procent progresiv, prima zi neplătită).',
+  },
+  'contributii-pfa': {
+    title: 'Calculator Contribuții PFA',
+    desc: 'CAS, CASS și impozit pentru Declarația Unică, cu plafoanele 2026.',
+  },
   'calculator-indemnizatie-crestere-copil': {
     title: 'Calculator Indemnizație Creștere Copil',
     desc: 'ICC 2026: 85% din venitul net, între 1.650 și 8.500 lei brut.',

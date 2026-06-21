@@ -99,6 +99,9 @@ export function serviceUrl(slug: string): string {
 export const HARDCODED_CALCULATOR_SLUGS: readonly string[] = [
   'calculator-impozit-auto',
   'salariu',
+  'amenda-circulatie',
+  'concediu-medical',
+  'contributii-pfa',
   'calculator-indemnizatie-crestere-copil',
   'tva',
   'taxa-judiciara-de-timbru',
