@@ -557,6 +557,455 @@ const RAW_CITIES: CityData[] = [
     ],
     nearbyCitySlugs: ['ploiesti', 'galati'],
   },
+  {
+    slug: 'resita',
+    name: 'Reșița',
+    judet: 'Caraș-Severin',
+    judetAbbr: 'cs',
+    population: '73.000 locuitori',
+    localAnchors: ['UCM Reșița (TMK)', 'Centrul Universitar Reșița (UBB)', 'Spitalul Județean Reșița'],
+    ipj: {
+      name: 'Serviciul Cazier Judiciar, Statistică și Evidențe Operative — IPJ Caraș-Severin',
+      address: 'B-dul A.I. Cuza nr. 40, Reșița, jud. Caraș-Severin (cod 320088)',
+      phone: '0255 211 943',
+      website: 'https://cs.politiaromana.ro/ro/ipj-caras-severin/servicii-judetene/serviciul-cazier-judiciar-si-evidente-operative1456222897',
+      schedule: { Luni: '09:00-13:00', Marți: '10:00-12:00 / 16:00-18:00', Miercuri: '09:00-13:00', Joi: '09:00-13:00', Vineri: '09:00-12:00' },
+    },
+    localContext:
+      'Reșița este capitala județului Caraș-Severin și unul dintre cele mai vechi centre siderurgice ' +
+      'și de construcții de mașini din România. Reșițenii și locuitorii din zonă (Caransebeș, Bocșa) ' +
+      'solicită cazier judiciar pentru angajare, licitații sau dosare administrative.',
+    localFaq: [
+      { q: 'Unde se eliberează cazierul judiciar în Reșița?', a: 'La Serviciul Cazier Judiciar din IPJ Caraș-Severin, pe B-dul A.I. Cuza nr. 40. Sau online, prin eGhișeul.ro.' },
+      { q: 'Pot obține cazierul din Reșița fără deplasare?', a: 'Da. Depunem cererea la IPJ Caraș-Severin pe bază de împuternicire și primești documentul prin curier.' },
+    ],
+    nearbyCitySlugs: ['timisoara', 'arad'],
+  },
+  {
+    slug: 'drobeta-turnu-severin',
+    name: 'Drobeta-Turnu Severin',
+    judet: 'Mehedinți',
+    judetAbbr: 'mh',
+    population: '92.000 locuitori',
+    localAnchors: ['Hidroelectrica – Porțile de Fier', 'Spitalul Județean Drobeta-Turnu Severin', 'Centrul Universitar Drobeta (Univ. Craiova)'],
+    ipj: {
+      name: 'Serviciul Cazier Judiciar, Statistică și Evidențe Operative — IPJ Mehedinți',
+      address: 'Str. Carol I nr. 75, Drobeta-Turnu Severin, jud. Mehedinți (clădire în renovare — verifică telefonic înainte de deplasare)',
+      phone: '0252 305 250',
+      website: 'https://mh.politiaromana.ro/ro/utile/documente-eliberari-acte/cazier-judiciar',
+      schedule: { Luni: '08:30-12:00 / 14:00-16:00', Marți: '10:00-14:00 / 16:00-18:00', Miercuri: '08:30-12:00 / 14:00-16:00', Joi: '08:30-12:00 / 14:00-16:00', Vineri: '08:30-12:00' },
+    },
+    localContext:
+      'Drobeta-Turnu Severin este municipiu-port la Dunăre, important nod fluvial și feroviar al ' +
+      'sud-vestului, marcat de hidroenergie (Porțile de Fier I) și de tradiția de transport fluvial. ' +
+      'Severinenii solicită cazier judiciar pentru angajare în energie, transporturi și administrație.',
+    localFaq: [
+      { q: 'Unde se eliberează cazierul judiciar în Drobeta-Turnu Severin?', a: 'La Serviciul Cazier Judiciar din IPJ Mehedinți, pe Str. Carol I nr. 75. Clădirea e în renovare — verifică telefonic. Alternativ, comanzi online prin eGhișeul.ro.' },
+      { q: 'Pot obține cazierul fără să merg la ghișeu?', a: 'Da. Prin eGhișeul.ro depunem cererea la IPJ Mehedinți în numele tău și primești documentul prin curier.' },
+    ],
+    nearbyCitySlugs: ['craiova', 'timisoara'],
+  },
+  {
+    slug: 'zalau',
+    name: 'Zalău',
+    judet: 'Sălaj',
+    judetAbbr: 'sj',
+    population: '56.000 locuitori',
+    localAnchors: ['Michelin Zalău', 'TenarisSilcotub Zalău', 'Tribunalul / IPJ Sălaj'],
+    ipj: {
+      name: 'Serviciul Cazier Judiciar, Statistică și Evidențe Operative — IPJ Sălaj',
+      address: 'Str. Tudor Vladimirescu nr. 16/A, Zalău, jud. Sălaj',
+      phone: '0260 661 285',
+      website: 'https://sj.politiaromana.ro/ro/utile/acte-necesare-pentru/eliberarea-certificatului-de-cazier-judiciar',
+      schedule: { Luni: '08:30-12:00 / 14:00-15:30', Marți: '08:30-12:00 / 14:00-15:30', Miercuri: '08:30-12:00 / 14:00-15:30', Joi: '08:30-12:00 / 14:00-15:30', Vineri: '08:30-12:00' },
+    },
+    localContext:
+      'Zalău este reședința județului Sălaj, un puternic centru industrial al Transilvaniei de ' +
+      'nord-vest, cu mii de angajați la Michelin și TenarisSilcotub. Pentru aceste locuri de muncă, ' +
+      'cazierul judiciar este frecvent cerut la angajare.',
+    localFaq: [
+      { q: 'Unde se eliberează cazierul judiciar în Zalău?', a: 'La Serviciul Cazier Judiciar (ghișeul unic) din IPJ Sălaj, pe Str. Tudor Vladimirescu nr. 16/A. Sau online, prin eGhișeul.ro.' },
+      { q: 'Pot cere cazierul în Zalău pentru angajare la Michelin?', a: 'Da. Prin eGhișeul.ro depunem cererea la IPJ Sălaj și primești documentul prin curier, fără să stai la coadă.' },
+    ],
+    nearbyCitySlugs: ['cluj-napoca', 'baia-mare'],
+  },
+  {
+    slug: 'slobozia',
+    name: 'Slobozia',
+    judet: 'Ialomița',
+    judetAbbr: 'il',
+    population: '45.000 locuitori',
+    localAnchors: ['Consiliul Județean Ialomița', 'Spitalul Județean Slobozia', 'industria agro-alimentară a Bărăganului'],
+    ipj: {
+      name: 'Serviciul Cazier Judiciar, Statistică și Evidențe Operative — IPJ Ialomița',
+      address: 'Str. Odobescu nr. 7-9, parter, Slobozia, jud. Ialomița',
+      website: 'https://il.politiaromana.ro/ro/utile/documente-eliberari-acte/obtinerea-certificatului-de-cazier-judiciar-de-integritate-comportamentala',
+    },
+    localContext:
+      'Slobozia este reședința județului Ialomița, în plină Câmpie a Bărăganului, una dintre cele mai ' +
+      'importante zone agricole ale României. Economia locală e dominată de agricultura cerealieră și ' +
+      'de industria alimentară, iar cazierul e cerut la angajare și pentru dosare administrative.',
+    localFaq: [
+      { q: 'Unde se eliberează cazierul judiciar în Slobozia?', a: 'La Serviciul Cazier Judiciar din IPJ Ialomița, pe Str. Odobescu nr. 7-9 (verifică programul telefonic pe site-ul oficial). Alternativ, comanzi online prin eGhișeul.ro.' },
+      { q: 'Pot obține cazierul din Slobozia fără deplasare?', a: 'Da. Completezi cererea online, noi o depunem la IPJ Ialomița și primești documentul prin curier.' },
+    ],
+    nearbyCitySlugs: ['bucuresti', 'calarasi'],
+  },
+  {
+    slug: 'calarasi',
+    name: 'Călărași',
+    judet: 'Călărași',
+    judetAbbr: 'cl',
+    population: '65.000 locuitori',
+    localAnchors: ['Donalam Călărași (Beltrame)', 'Saint-Gobain Glass Călărași', 'Spitalul Județean Călărași'],
+    ipj: {
+      name: 'Serviciul Cazier Judiciar, Statistică și Evidențe Operative — IPJ Călărași',
+      address: 'Str. București nr. 110, Municipiul Călărași, jud. Călărași',
+      phone: '0242 306 246',
+      website: 'https://cl.politiaromana.ro/ro/utile/eliberari-documente',
+      schedule: { Luni: '08:30-11:30 / 13:00-14:30', Marți: '08:30-11:30 / 13:00-14:30', Miercuri: '11:00-14:00 / 16:00-18:30', Joi: '08:30-11:30 / 13:00-14:30', Vineri: '08:30-11:30 / 13:00-14:00' },
+    },
+    localContext:
+      'Călărași este reședința județului, oraș-port la Dunăre, cu o economie marcată de siderurgie ' +
+      '(Donalam) și de agricultura Bărăganului. Locuitorii din municipiu și din Oltenița, Lehliu-Gară ' +
+      'sau Budești solicită frecvent cazier judiciar la angajare.',
+    localFaq: [
+      { q: 'Unde se eliberează cazierul judiciar în Călărași?', a: 'La Serviciul Cazier Judiciar din IPJ Călărași, pe Str. București nr. 110. Sau online, prin eGhișeul.ro.' },
+      { q: 'Pot obține cazierul din Călărași fără să stau la coadă?', a: 'Da. Prin eGhișeul.ro depunem cererea la IPJ Călărași și primești documentul prin curier în 2-4 zile.' },
+    ],
+    nearbyCitySlugs: ['bucuresti', 'slobozia'],
+  },
+  {
+    slug: 'giurgiu',
+    name: 'Giurgiu',
+    judet: 'Giurgiu',
+    judetAbbr: 'gr',
+    population: '54.000 locuitori',
+    localAnchors: ['Portul Giurgiu', 'PTF Giurgiu–Ruse (Podul Prieteniei)', 'Primăria Municipiului Giurgiu'],
+    ipj: {
+      name: 'Serviciul Cazier Judiciar, Statistică și Evidențe Operative — IPJ Giurgiu',
+      address: 'Bulevardul C.F.R. nr. 9, Municipiul Giurgiu, jud. Giurgiu',
+      phone: '0246 207 016',
+      website: 'https://gr.politiaromana.ro/ro/utile/documente-eliberari-acte/informatii-utile-cazier-judiciar-certificate-integritate-comportamentala',
+    },
+    localContext:
+      'Giurgiu este principalul oraș-port la Dunăre din sudul României, conectat de Ruse (Bulgaria) ' +
+      'prin Podul Prieteniei — unul dintre cele mai importante puncte de trecere a frontierei. ' +
+      'Cazierul e frecvent cerut șoferilor profesioniști și lucrătorilor din logistică.',
+    localFaq: [
+      { q: 'Unde se eliberează cazierul judiciar în Giurgiu?', a: 'La Serviciul Cazier Judiciar din IPJ Giurgiu, pe Bulevardul C.F.R. nr. 9 (verifică programul ghișeului pe site-ul oficial). Sau online, prin eGhișeul.ro.' },
+      { q: 'Sunt șofer profesionist — pot obține cazierul din Giurgiu online?', a: 'Da. Prin eGhișeul.ro depunem cererea la IPJ Giurgiu în numele tău și primești documentul prin curier — practic dacă ești mereu pe drum.' },
+    ],
+    nearbyCitySlugs: ['bucuresti', 'calarasi'],
+  },
+  {
+    slug: 'alexandria',
+    name: 'Alexandria',
+    judet: 'Teleorman',
+    judetAbbr: 'tr',
+    population: '45.000 locuitori',
+    localAnchors: ['Koyo Romania (JTEKT) – rulmenți', 'Consiliul Județean Teleorman', 'sectorul agricol-cerealier'],
+    ipj: {
+      name: 'Serviciul Cazier Judiciar, Statistică și Evidențe Operative — IPJ Teleorman',
+      address: 'Str. Ion Creangă nr. 71-73, Alexandria, jud. Teleorman',
+      website: 'https://tr.politiaromana.ro/ro/utile/cerere-certificat-cazier-judiciar/obtinerea-certificatului-de-cazier-judiciar-persoane-fizice',
+      schedule: { Luni: '08:30-12:30 / 14:00-16:00', Marți: '08:30-12:30 / 14:00-16:00', Miercuri: '08:30-12:30 / 14:00-16:00', Joi: '08:30-12:30 / 14:00-16:00', Vineri: '08:30-14:00' },
+    },
+    localContext:
+      'Alexandria este reședința județului Teleorman, în câmpia agricolă cerealieră a sudului. Mulți ' +
+      'solicitanți lucrează în industria locală, inclusiv la fabrica de rulmenți Koyo (JTEKT), precum ' +
+      'și în agricultură și industria alimentară.',
+    localFaq: [
+      { q: 'Unde se eliberează cazierul judiciar în Alexandria?', a: 'La Serviciul Cazier Judiciar din IPJ Teleorman, pe Str. Ion Creangă nr. 71-73. Sau online, prin eGhișeul.ro.' },
+      { q: 'Pot obține cazierul din Alexandria fără deplasare?', a: 'Da. Depunem cererea la IPJ Teleorman pe bază de împuternicire și primești documentul prin curier.' },
+    ],
+    nearbyCitySlugs: ['bucuresti', 'pitesti'],
+  },
+  {
+    slug: 'sfantu-gheorghe',
+    name: 'Sfântu Gheorghe',
+    judet: 'Covasna',
+    judetAbbr: 'cv',
+    population: '52.000 locuitori',
+    localAnchors: ['Consiliul Județean Covasna', 'Spitalul Județean „Dr. Fogolyán Kristóf"', 'IPJ Covasna'],
+    ipj: {
+      name: 'Serviciul Cazier Judiciar, Statistică și Evidențe Operative — IPJ Covasna',
+      address: 'Str. Gen. Gr. Bălan nr. 67, Sfântu Gheorghe, jud. Covasna',
+      phone: '0267 307 400',
+      website: 'https://cv.politiaromana.ro/ro/utile/cazier-judiciar',
+      schedule: { Luni: '08:30-12:00 / 14:00-16:00', Marți: '08:30-12:00 / 14:00-16:00', Miercuri: '08:30-12:00', Joi: '08:30-12:00', Vineri: '08:30-12:00' },
+    },
+    localContext:
+      'Sfântu Gheorghe este reședința județului Covasna, oraș din regiunea secuiască situat pe valea ' +
+      'Oltului. Economia locală e orientată spre industria textilă și de prelucrare a lemnului, ' +
+      'industria alimentară și turismul balnear, iar cazierul e cerut la angajare.',
+    localFaq: [
+      { q: 'Unde se eliberează cazierul judiciar în Sfântu Gheorghe?', a: 'La Serviciul Cazier Judiciar din IPJ Covasna, pe Str. Gen. Gr. Bălan nr. 67. Sau online, prin eGhișeul.ro.' },
+      { q: 'Pot obține cazierul din Sfântu Gheorghe fără să mă deplasez?', a: 'Da. Completezi cererea online, noi o depunem la IPJ Covasna și primești documentul prin curier.' },
+    ],
+    nearbyCitySlugs: ['brasov', 'miercurea-ciuc'],
+  },
+  {
+    slug: 'miercurea-ciuc',
+    name: 'Miercurea Ciuc',
+    judet: 'Harghita',
+    judetAbbr: 'hr',
+    population: '37.000 locuitori',
+    localAnchors: ['Fabrica de bere Ciuc (Heineken)', 'Universitatea Sapientia', 'Spitalul Județean Miercurea-Ciuc'],
+    ipj: {
+      name: 'Serviciul Cazier Judiciar, Statistică și Evidențe Operative — IPJ Harghita',
+      address: 'Str. Tudor Vladimirescu nr. 34-36, Miercurea-Ciuc, jud. Harghita',
+      phone: '0266 205 250',
+      website: 'https://hr.politiaromana.ro/ro/utile/documente-eliberari-acte/obtinerea-certificatului-de-cazier-judiciar-de-integritate-comportamentala',
+      schedule: { Luni: '08:30-12:00 / 15:00-16:00', Marți: '08:30-12:00 / 15:00-16:00', Miercuri: '08:30-12:00', Joi: '08:30-12:00', Vineri: '08:30-12:00' },
+    },
+    localContext:
+      'Miercurea Ciuc este reședința județului Harghita, în inima regiunii secuiești, cunoscut pentru ' +
+      'industria berii (Fabrica de bere Ciuc) și pentru apele minerale. Locuitorii solicită cazier ' +
+      'judiciar pentru angajare în industria locală, comerț și servicii.',
+    localFaq: [
+      { q: 'Unde se eliberează cazierul judiciar în Miercurea Ciuc?', a: 'La Serviciul Cazier Judiciar din IPJ Harghita, pe Str. Tudor Vladimirescu nr. 34-36. Sau online, prin eGhișeul.ro.' },
+      { q: 'Pot obține cazierul din Miercurea Ciuc fără deplasare?', a: 'Da. Prin eGhișeul.ro depunem cererea la IPJ Harghita și primești documentul prin curier în 2-4 zile.' },
+    ],
+    nearbyCitySlugs: ['brasov', 'sfantu-gheorghe'],
+  },
+  {
+    slug: 'braila',
+    name: 'Brăila',
+    judet: 'Brăila',
+    judetAbbr: 'br',
+    population: '154.000 locuitori',
+    localAnchors: ['Portul Brăila', 'Universitatea „Dunărea de Jos" (Centrul Brăila)', 'industria navală și logistică'],
+    ipj: {
+      name: 'Serviciul Cazier Judiciar, Statistică și Evidențe Operative — IPJ Brăila',
+      address: 'Str. Ana Aslan nr. 39, Brăila (ghișeul cu publicul, la Poliția Municipiului Brăila)',
+      phone: '0239 606 100',
+      website: 'https://br.politiaromana.ro/ro/utile/documente-eliberari-acte/obtinerea-certificatului-de-cazier-judiciar-integritate-comportamentala',
+      schedule: { Luni: '09:00-13:00', Marți: '09:00-13:00', Miercuri: '14:00-18:00', Joi: '09:00-13:00', Vineri: '09:00-13:00' },
+    },
+    localContext:
+      'Brăila este unul dintre cele mai importante orașe-port la Dunăre, cu o economie legată de ' +
+      'activitatea portuară, comerțul cu cereale și industria navală. Brăilenii au nevoie frecvent de ' +
+      'cazier pentru locuri de muncă în logistică, transport naval și învățământ.',
+    localFaq: [
+      { q: 'Unde se eliberează cazierul judiciar în Brăila?', a: 'Ghișeul cu publicul funcționează la Poliția Municipiului Brăila, pe Str. Ana Aslan nr. 39. Alternativ, comanzi online prin eGhișeul.ro.' },
+      { q: 'Pot obține cazierul din Brăila fără deplasare?', a: 'Da. Depunem cererea la IPJ Brăila pe bază de împuternicire și primești documentul prin curier.' },
+    ],
+    nearbyCitySlugs: ['galati', 'buzau'],
+  },
+  {
+    slug: 'botosani',
+    name: 'Botoșani',
+    judet: 'Botoșani',
+    judetAbbr: 'bt',
+    population: '106.000 locuitori',
+    localAnchors: ['Spitalul Județean „Mavromati"', 'industria textilă/confecții', 'Consiliul Județean Botoșani'],
+    ipj: {
+      name: 'Serviciul Cazier Judiciar, Statistică și Evidențe Operative — IPJ Botoșani',
+      address: 'B-dul Mihai Eminescu nr. 57, Botoșani, jud. Botoșani (sediul IPJ)',
+      website: 'https://bt.politiaromana.ro/ro/informatii-utile/documente-eliberare-acte/eliberare-cazier-judiciar',
+      schedule: { Luni: '08:30-13:00 / 14:00-15:00', Marți: '08:30-13:00 / 14:00-15:00', Miercuri: '08:30-13:00 / 14:00-15:00', Joi: '08:30-13:00 / 14:00-15:00', Vineri: '08:30-14:00' },
+    },
+    localContext:
+      'Botoșani este reședința județului, în nordul Moldovei, oraș cu o puternică tradiție culturală ' +
+      '(locul de naștere al lui Mihai Eminescu). Economia locală este marcată de industria textilă și ' +
+      'de procesarea agroalimentară, iar cazierul e cerut frecvent la angajare.',
+    localFaq: [
+      { q: 'Unde se eliberează cazierul judiciar în Botoșani?', a: 'La Serviciul Cazier Judiciar din IPJ Botoșani, pe B-dul Mihai Eminescu nr. 57. Sau online, prin eGhișeul.ro.' },
+      { q: 'Pot obține cazierul din Botoșani fără să stau la coadă?', a: 'Da. Prin eGhișeul.ro depunem cererea la IPJ Botoșani și primești documentul prin curier în 2-4 zile.' },
+    ],
+    nearbyCitySlugs: ['suceava', 'iasi'],
+  },
+  {
+    slug: 'vaslui',
+    name: 'Vaslui',
+    judet: 'Vaslui',
+    judetAbbr: 'vs',
+    population: '55.000 locuitori',
+    localAnchors: ['Spitalul Județean Vaslui', 'Vascar S.A. (industrie alimentară)', 'Consiliul Județean Vaslui'],
+    ipj: {
+      name: 'Serviciul Cazier Judiciar, Statistică și Evidențe Operative — IPJ Vaslui',
+      address: 'Str. Hagi Chiriac nr. 1, Vaslui, jud. Vaslui (cod 730120)',
+      phone: '0235 303 228',
+      website: 'https://vs.politiaromana.ro/ro/utile/documente-eliberari-acte/obtinerea-certificatului-de-cazier-judiciar-si-a-certificatului-pentru-integritate-comportamentala/obtinerea-certificatului-de-cazier-judiciar-persoane-fizice-si-a-extrasului-de-pe-cazierul-judiciar',
+      schedule: { Luni: '08:30-12:00 / 14:00-16:00', Marți: '08:30-12:00 / 14:00-16:00', Miercuri: '10:00-14:00 / 16:00-18:00', Joi: '08:30-12:00 / 14:00-16:00', Vineri: '09:00-13:00' },
+    },
+    localContext:
+      'Vaslui este reședința județului Vaslui, în inima Moldovei, zonă legată istoric de bătălia de la ' +
+      'Podu Înalt (1475). Economia locală se bazează pe agricultură, industrie ușoară și prelucrare, ' +
+      'iar cazierul este solicitat frecvent pentru angajare.',
+    localFaq: [
+      { q: 'Unde se eliberează cazierul judiciar în Vaslui?', a: 'La Serviciul Cazier Judiciar din IPJ Vaslui, pe Str. Hagi Chiriac nr. 1. Sau online, prin eGhișeul.ro.' },
+      { q: 'Pot obține cazierul din Vaslui fără deplasare?', a: 'Da. Depunem cererea la IPJ Vaslui pe bază de împuternicire și primești documentul prin curier.' },
+    ],
+    nearbyCitySlugs: ['iasi', 'bacau'],
+  },
+  {
+    slug: 'ramnicu-valcea',
+    name: 'Râmnicu Vâlcea',
+    judet: 'Vâlcea',
+    judetAbbr: 'vl',
+    population: '92.000 locuitori',
+    localAnchors: ['Hidroelectrica – Râmnicu Vâlcea', 'platforma chimică Oltchim-Govora (Chimcomplex)', 'Consiliul Județean Vâlcea'],
+    ipj: {
+      name: 'Serviciul Cazier Judiciar, Statistică și Evidențe Operative — IPJ Vâlcea',
+      address: 'Calea lui Traian nr. 95, Râmnicu Vâlcea, jud. Vâlcea (sediul IPJ)',
+      website: 'https://vl.politiaromana.ro/ro/utile/cazier-juridiar',
+      schedule: { Luni: '08:00-14:00', Marți: '08:00-14:00', Miercuri: '08:00-14:00 / 16:00-18:00', Joi: '08:00-14:00', Vineri: '08:00-12:00' },
+    },
+    localContext:
+      'Râmnicu Vâlcea este reședința județului Vâlcea, un puternic centru al industriei chimice ' +
+      '(platforma Govora) și energetice (Hidroelectrica administrează hidrocentralele de pe Olt). ' +
+      'Orașul e și poarta spre turismul din Oltenia de sub Munte (Cozia, Călimănești).',
+    localFaq: [
+      { q: 'Unde se eliberează cazierul judiciar în Râmnicu Vâlcea?', a: 'La Serviciul Cazier Judiciar din IPJ Vâlcea, pe Calea lui Traian nr. 95. Sau online, prin eGhișeul.ro.' },
+      { q: 'Pot obține cazierul din Râmnicu Vâlcea fără să mă deplasez?', a: 'Da. Prin eGhișeul.ro depunem cererea la IPJ Vâlcea și primești documentul prin curier.' },
+    ],
+    nearbyCitySlugs: ['pitesti', 'craiova'],
+  },
+  {
+    slug: 'deva',
+    name: 'Deva',
+    judet: 'Hunedoara',
+    judetAbbr: 'hd',
+    population: '54.000 locuitori',
+    localAnchors: ['industria siderurgică Hunedoara', 'mineritul din Valea Jiului', 'Universitatea din Petroșani'],
+    ipj: {
+      name: 'Serviciul Cazier Judiciar, Statistică și Evidențe Operative — IPJ Hunedoara',
+      address: 'Str. Mihai Eminescu nr. 130, Deva, jud. Hunedoara',
+      phone: '0254 206 722',
+      website: 'https://hd.politiaromana.ro/ro/utile/documente-eliberari-acte/serviciul-cazier-judiciar-statistica-si-evidente-operative',
+      schedule: { Luni: '08:30-12:30 / 13:30-15:30', Marți: '08:30-12:30 / 13:30-15:30', Miercuri: '08:30-12:30 / 13:30-15:30', Joi: '10:00-14:00 / 16:00-18:00', Vineri: '09:00-13:00' },
+    },
+    localContext:
+      'Deva este reședința județului Hunedoara, marcată de tradiția siderurgică de la Hunedoara și de ' +
+      'mineritul din Valea Jiului. Orașul atrage turiști datorită Cetății Devei, iar prezența ' +
+      'universitară din județ susține un flux constant de angajați și studenți care au nevoie de cazier.',
+    localFaq: [
+      { q: 'Unde se eliberează cazierul judiciar în Deva?', a: 'La Serviciul Cazier Judiciar din IPJ Hunedoara, pe Str. Mihai Eminescu nr. 130. Sau online, prin eGhișeul.ro.' },
+      { q: 'Pot obține cazierul din Deva fără deplasare?', a: 'Da. Depunem cererea la IPJ Hunedoara pe bază de împuternicire și primești documentul prin curier.' },
+    ],
+    nearbyCitySlugs: ['alba-iulia', 'timisoara'],
+  },
+  {
+    slug: 'alba-iulia',
+    name: 'Alba Iulia',
+    judet: 'Alba',
+    judetAbbr: 'ab',
+    population: '64.000 locuitori',
+    localAnchors: ['Universitatea „1 Decembrie 1918"', 'Star Transmission/Assembly Cugir', 'Consiliul Județean Alba'],
+    ipj: {
+      name: 'Serviciul Cazier Judiciar, Statistică și Evidență Operativă — IPJ Alba',
+      address: 'Str. Alexandru Ioan Cuza nr. 2, Alba Iulia, jud. Alba (ghișeul cu publicul, în incinta Carolina Mall)',
+      phone: '0258 806 161',
+      website: 'https://ab.politiaromana.ro/ro/i-p-j-alba/servicii-judetene/serviciul-cazier-judiciar-statistica-si-evidenta-operativa',
+      schedule: { Luni: '08:30-12:30 / 13:30-15:30', Marți: '10:00-13:00 / 14:00-18:00', Miercuri: '08:30-12:30 / 13:30-15:30', Joi: '08:30-12:30 / 13:30-15:30', Vineri: '08:30-13:00' },
+    },
+    localContext:
+      'Alba Iulia este orașul care găzduiește Cetatea Alba Carolina și capitala simbolică a Marii ' +
+      'Uniri de la 1918. Locuitorii, mulți activi în turism, administrație și viticultură, se ' +
+      'adresează ghișeului de cazier situat în incinta Carolina Mall; studenții Universității „1 Decembrie 1918" îl solicită frecvent.',
+    localFaq: [
+      { q: 'Unde se eliberează cazierul judiciar în Alba Iulia?', a: 'Ghișeul IPJ Alba funcționează în incinta Carolina Mall, pe Str. Alexandru Ioan Cuza nr. 2. Alternativ, comanzi online prin eGhișeul.ro.' },
+      { q: 'Pot obține cazierul din Alba Iulia fără să stau la coadă?', a: 'Da. Prin eGhișeul.ro depunem cererea la IPJ Alba și primești documentul prin curier.' },
+    ],
+    nearbyCitySlugs: ['deva', 'cluj-napoca'],
+  },
+  {
+    slug: 'bistrita',
+    name: 'Bistrița',
+    judet: 'Bistrița-Năsăud',
+    judetAbbr: 'bn',
+    population: '75.000 locuitori',
+    localAnchors: ['Teraplast S.A.', 'Spitalul Județean Bistrița', 'extensia Bistrița a UBB'],
+    ipj: {
+      name: 'Serviciul Cazier Judiciar, Statistică și Evidență Operativă — IPJ Bistrița-Năsăud',
+      address: 'Str. Nicolae Bălcescu nr. 1-3, Bistrița, jud. Bistrița-Năsăud (sediul IPJ)',
+      phone: '0263 203 250',
+      website: 'https://bn.politiaromana.ro/ro/informatii-utile/documente-eliberari-acte/obtinerea-certificatului-de-cazier-judiciar/obtinerea-certificatului-de-cazier-judiciar-persoane-fizice',
+      schedule: { Luni: '08:30-14:00', Marți: '08:30-14:00', Miercuri: '08:30-14:00 / 16:00-18:00', Joi: '08:30-14:00', Vineri: '08:30-14:00' },
+    },
+    localContext:
+      'Bistrița este reședința județului Bistrița-Năsăud, oraș medieval săsesc din nordul Transilvaniei, ' +
+      'aproape de Pasul Bârgău. Economia locală îmbină industria (prelucrarea lemnului, materiale de ' +
+      'construcții, componente auto) cu turismul montan, iar cazierul e cerut la angajare.',
+    localFaq: [
+      { q: 'Unde se eliberează cazierul judiciar în Bistrița?', a: 'La Serviciul Cazier Judiciar din IPJ Bistrița-Năsăud, pe Str. Nicolae Bălcescu nr. 1-3. Sau online, prin eGhișeul.ro.' },
+      { q: 'Pot obține cazierul din Bistrița fără deplasare?', a: 'Da. Depunem cererea la IPJ Bistrița-Năsăud pe bază de împuternicire și primești documentul prin curier.' },
+    ],
+    nearbyCitySlugs: ['cluj-napoca', 'targu-mures'],
+  },
+  {
+    slug: 'focsani',
+    name: 'Focșani',
+    judet: 'Vrancea',
+    judetAbbr: 'vn',
+    population: '79.000 locuitori',
+    localAnchors: ['Vincon Vrancea (vinuri)', 'Spitalul Județean „Sf. Pantelimon"', 'sectorul viticol (Odobești, Panciu)'],
+    ipj: {
+      name: 'Serviciul Cazier Judiciar, Statistică și Evidențe Operative — IPJ Vrancea',
+      address: 'Str. Cezar Bolliac nr. 12, Focșani, jud. Vrancea',
+      website: 'https://vn.politiaromana.ro/ro/utile/documente-eliberari-acte/cazier-judiciar',
+      schedule: { Luni: '08:30-12:00', Marți: '08:30-12:00', Miercuri: '14:00-18:00', Joi: '08:30-12:00', Vineri: '08:30-11:00' },
+    },
+    localContext:
+      'Focșani este reședința județului Vrancea, inima uneia dintre cele mai renumite regiuni viticole ' +
+      'din România (Odobești, Panciu, Cotești). Economia zonei rămâne ancorată în agricultură și ' +
+      'viticultură, iar cazierul e cerut la angajare și pentru dosare administrative.',
+    localFaq: [
+      { q: 'Unde se eliberează cazierul judiciar în Focșani?', a: 'La Serviciul Cazier Judiciar din IPJ Vrancea, pe Str. Cezar Bolliac nr. 12. Sau online, prin eGhișeul.ro.' },
+      { q: 'Pot obține cazierul din Focșani fără să mă deplasez?', a: 'Da. Prin eGhișeul.ro depunem cererea la IPJ Vrancea și primești documentul prin curier.' },
+    ],
+    nearbyCitySlugs: ['galati', 'buzau'],
+  },
+  {
+    slug: 'tulcea',
+    name: 'Tulcea',
+    judet: 'Tulcea',
+    judetAbbr: 'tl',
+    population: '73.000 locuitori',
+    localAnchors: ['Administrația Rezervației Delta Dunării (ARBDD)', 'Vard Tulcea (șantier naval)', 'turismul și pescuitul din Deltă'],
+    ipj: {
+      name: 'Serviciul Cazier Judiciar, Statistică și Evidență Operativă — IPJ Tulcea',
+      address: 'Str. Spitalului nr. 2, Tulcea, jud. Tulcea',
+      phone: '0240 506 700',
+      website: 'https://tl.politiaromana.ro/ro/utile/cazier-judiciar',
+      schedule: { Luni: '08:30-11:30 / 14:00-15:00', Marți: '08:30-11:30 / 14:00-15:00', Miercuri: '08:30-11:30 / 14:00-15:00', Joi: '09:00-12:00 / 15:00-17:00', Vineri: '08:30-11:30' },
+    },
+    localContext:
+      'Tulcea este principalul oraș-poartă către Delta Dunării, cea mai mare zonă umedă a Europei. ' +
+      'Economia locală se bazează pe turism, pescuit și navigație; orașul atrage sezonier mulți ' +
+      'lucrători în HoReCa și transport naval, pentru care cazierul este frecvent solicitat.',
+    localFaq: [
+      { q: 'Unde se eliberează cazierul judiciar în Tulcea?', a: 'La Serviciul Cazier Judiciar din IPJ Tulcea, pe Str. Spitalului nr. 2. Sau online, prin eGhișeul.ro.' },
+      { q: 'Pot obține cazierul din Tulcea fără deplasare?', a: 'Da. Depunem cererea la IPJ Tulcea pe bază de împuternicire și primești documentul prin curier — practic și pentru locuitorii din Deltă.' },
+    ],
+    nearbyCitySlugs: ['constanta', 'galati'],
+  },
+  {
+    slug: 'targoviste',
+    name: 'Târgoviște',
+    judet: 'Dâmbovița',
+    judetAbbr: 'db',
+    population: '73.000 locuitori',
+    localAnchors: ['Universitatea Valahia', 'combinatul siderurgic (fostă Mechel)', 'Curtea Domnească / Turnul Chindiei'],
+    ipj: {
+      name: 'Serviciul Cazier Judiciar, Statistică și Evidențe Operative — IPJ Dâmbovița',
+      address: 'B-dul Regele Carol I nr. 64, Târgoviște, jud. Dâmbovița',
+      phone: '0245 207 261',
+      website: 'https://db.politiaromana.ro/ro/utile/program-de-lucru-ghisee/eliberare-cazier-judiciar',
+      schedule: { Luni: '08:30-12:00 / 13:00-16:00', Marți: '08:30-12:00 / 14:00-17:00', Miercuri: '08:30-12:00 / 13:00-16:00', Joi: '08:30-12:00 / 13:00-16:00', Vineri: '08:30-11:00 / 12:00-14:00' },
+    },
+    localContext:
+      'Târgoviște, fostă capitală a Țării Românești (Curtea Domnească, Turnul Chindiei), este reședința ' +
+      'județului Dâmbovița. Orașul găzduiește Universitatea Valahia și are o tradiție industrială în ' +
+      'domeniul oțelului, iar cazierul e cerut frecvent la angajare.',
+    localFaq: [
+      { q: 'Unde se eliberează cazierul judiciar în Târgoviște?', a: 'La Serviciul Cazier Judiciar din IPJ Dâmbovița, pe B-dul Regele Carol I nr. 64. Sau online, prin eGhișeul.ro.' },
+      { q: 'Pot obține cazierul din Târgoviște fără să stau la coadă?', a: 'Da. Prin eGhișeul.ro depunem cererea la IPJ Dâmbovița și primești documentul prin curier în 2-4 zile.' },
+    ],
+    nearbyCitySlugs: ['bucuresti', 'ploiesti'],
+  },
 ];
 
 /** Orașele validate anti-thin. Importă DOAR de aici (sau prin `index.ts`). */
