@@ -47,6 +47,18 @@ const CATALOG: Record<string, { title: string; desc: string }> = {
     title: 'Calculator Zile Concediu de Odihnă',
     desc: 'Zile de concediu cuvenite proporțional cu lunile lucrate.',
   },
+  'indemnizatie-somaj': {
+    title: 'Calculator Indemnizație de Șomaj',
+    desc: 'Indemnizația de șomaj 2026: bază + supliment pe stagiu, durată, CASS.',
+  },
+  'impozit-chirie': {
+    title: 'Calculator Impozit pe Chirie',
+    desc: 'Impozit 10% pe venit net (deducere 20%) + CASS pe plafoane.',
+  },
+  'penalitati-anaf': {
+    title: 'Calculator Penalități ANAF',
+    desc: 'Dobânzi și penalități de întârziere/nedeclarare pentru taxe neplătite.',
+  },
   'calculator-indemnizatie-crestere-copil': {
     title: 'Calculator Indemnizație Creștere Copil',
     desc: 'ICC 2026: 85% din venitul net, între 1.650 și 8.500 lei brut.',
