@@ -3,7 +3,6 @@ import {
   MapPin,
   Phone,
   Clock,
-  ArrowRight,
   CheckCircle,
   Building2,
   ExternalLink,
@@ -24,7 +23,15 @@ import { Footer } from '@/components/home/footer';
 import { buildLocationPageGraph, type CityData } from '@/lib/seo/locations';
 
 const HUB_PATH = '/servicii/cazier-judiciar-online/';
-const ORDER_PATH = '/comanda/cazier-judiciar-persoana-fizica/';
+const ORDER_PF = '/comanda/cazier-judiciar-persoana-fizica/';
+const ORDER_PJ = '/comanda/cazier-judiciar-persoana-juridica/';
+const PF_PAGE = '/servicii/cazier-judiciar-online/persoana-fizica/';
+const PJ_PAGE = '/servicii/cazier-judiciar-online/persoana-juridica/';
+const RELATED_SERVICES = [
+  { href: '/servicii/cazier-auto-online/', label: 'Cazier auto online' },
+  { href: '/servicii/cazier-fiscal-online/', label: 'Cazier fiscal online' },
+  { href: '/servicii/certificat-de-integritate-comportamentala/', label: 'Certificat de integritate' },
+];
 const PRICE = 198;
 
 interface OtherCity {
@@ -140,24 +147,30 @@ export function CazierLocationPage({ city, otherCities }: { city: CityData; othe
               curier sau pe email.
             </p>
 
+            <p className="text-sm font-medium text-white/70 mb-3">Comandă direct cazierul tău — de la {PRICE} RON:</p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Button
                 asChild
-                className="bg-primary-500 hover:bg-primary-600 text-secondary-900 font-bold px-8 py-6 text-lg rounded-xl shadow-[0_6px_14px_rgba(236,185,95,0.35)] hover:shadow-[0_10px_20px_rgba(236,185,95,0.45)] hover:-translate-y-0.5 transition-all duration-200"
+                className="flex-1 bg-primary-500 hover:bg-primary-600 text-secondary-900 font-bold px-8 py-6 text-lg rounded-xl shadow-[0_6px_14px_rgba(236,185,95,0.35)] hover:shadow-[0_10px_20px_rgba(236,185,95,0.45)] hover:-translate-y-0.5 transition-all duration-200"
               >
-                <Link href={ORDER_PATH}>
-                  Comandă cazierul — de la {PRICE} RON
-                  <ArrowRight className="ml-2 w-5 h-5" aria-hidden="true" />
+                <Link href={ORDER_PF}>
+                  <Users className="mr-2 w-5 h-5" aria-hidden="true" />
+                  Persoană fizică
                 </Link>
               </Button>
               <Button
                 asChild
-                variant="outline"
-                className="border-2 border-primary-500 text-primary-500 hover:bg-primary-500 hover:text-secondary-900 font-bold px-8 py-6 text-lg rounded-xl transition-all duration-200"
+                className="flex-1 bg-primary-500 hover:bg-primary-600 text-secondary-900 font-bold px-8 py-6 text-lg rounded-xl shadow-[0_6px_14px_rgba(236,185,95,0.35)] hover:shadow-[0_10px_20px_rgba(236,185,95,0.45)] hover:-translate-y-0.5 transition-all duration-200"
               >
-                <Link href={HUB_PATH}>Vezi detaliile serviciului</Link>
+                <Link href={ORDER_PJ}>
+                  <Building2 className="mr-2 w-5 h-5" aria-hidden="true" />
+                  Persoană juridică (firmă)
+                </Link>
               </Button>
             </div>
+            <Link href={HUB_PATH} className="inline-block mt-4 text-sm text-white/70 hover:text-primary-500 transition-colors">
+              Vezi toate detaliile serviciului →
+            </Link>
           </div>
         </header>
 
@@ -235,7 +248,7 @@ export function CazierLocationPage({ city, otherCities }: { city: CityData; othe
         </section>
 
         {/* Ce este + valabilitate */}
-        <section className="py-12 lg:py-16 bg-white">
+        <section className="py-12 lg:py-16 bg-neutral-50">
           <div className="container mx-auto px-4 max-w-[820px]">
             <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-4">
               Ce este cazierul judiciar și de ce ai nevoie de el în {city.name}
@@ -262,7 +275,7 @@ export function CazierLocationPage({ city, otherCities }: { city: CityData; othe
         </section>
 
         {/* Situații în care ai nevoie */}
-        <section className="py-12 lg:py-16 bg-neutral-50">
+        <section className="py-12 lg:py-16 bg-white">
           <div className="container mx-auto px-4 max-w-[820px]">
             <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-3">
               Când ai nevoie de cazier judiciar în {city.name}
@@ -288,7 +301,7 @@ export function CazierLocationPage({ city, otherCities }: { city: CityData; othe
         </section>
 
         {/* Acte necesare */}
-        <section className="py-12 lg:py-16 bg-white">
+        <section className="py-12 lg:py-16 bg-neutral-50">
           <div className="container mx-auto px-4 max-w-[820px]">
             <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-6">
               Acte necesare pentru cazier judiciar online în {city.name}
@@ -306,6 +319,10 @@ export function CazierLocationPage({ city, otherCities }: { city: CityData; othe
                     </li>
                   ))}
                 </ul>
+                <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
+                  <Link href={ORDER_PF} className="text-primary-700 font-semibold hover:underline">Comandă pentru persoană fizică →</Link>
+                  <Link href={PF_PAGE} className="text-neutral-500 hover:text-primary-700">detalii PF</Link>
+                </div>
               </div>
               <div className="rounded-2xl border border-neutral-200 bg-white p-6">
                 <div className="flex items-center gap-2 mb-3">
@@ -319,13 +336,17 @@ export function CazierLocationPage({ city, otherCities }: { city: CityData; othe
                     </li>
                   ))}
                 </ul>
+                <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
+                  <Link href={ORDER_PJ} className="text-primary-700 font-semibold hover:underline">Comandă pentru firmă →</Link>
+                  <Link href={PJ_PAGE} className="text-neutral-500 hover:text-primary-700">detalii PJ</Link>
+                </div>
               </div>
             </div>
           </div>
         </section>
 
         {/* Preț și livrare */}
-        <section className="py-12 lg:py-16 bg-neutral-50">
+        <section className="py-12 lg:py-16 bg-white">
           <div className="container mx-auto px-4 max-w-[820px]">
             <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-3">
               Preț și timp de livrare în {city.name}
@@ -350,7 +371,7 @@ export function CazierLocationPage({ city, otherCities }: { city: CityData; othe
         </section>
 
         {/* Online vs ghișeu */}
-        <section className="py-12 lg:py-16 bg-white">
+        <section className="py-12 lg:py-16 bg-neutral-50">
           <div className="container mx-auto px-4 max-w-[820px]">
             <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-6">
               Online vs. ghișeu — cum e mai simplu în {city.name}
@@ -379,7 +400,7 @@ export function CazierLocationPage({ city, otherCities }: { city: CityData; othe
         </section>
 
         {/* Cum obții — pași */}
-        <section className="py-12 lg:py-16 bg-neutral-50">
+        <section className="py-12 lg:py-16 bg-white">
           <div className="container mx-auto px-4 max-w-[820px]">
             <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-6">
               Cum obții cazierul online în {city.name}
@@ -408,7 +429,7 @@ export function CazierLocationPage({ city, otherCities }: { city: CityData; othe
         </section>
 
         {/* Reabilitare / ștergere cazier */}
-        <section className="py-12 lg:py-16 bg-white">
+        <section className="py-12 lg:py-16 bg-neutral-50">
           <div className="container mx-auto px-4 max-w-[820px]">
             <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-4">
               Reabilitare și ștergere cazier judiciar
@@ -435,7 +456,7 @@ export function CazierLocationPage({ city, otherCities }: { city: CityData; othe
         </section>
 
         {/* Diaspora */}
-        <section className="py-12 lg:py-16 bg-neutral-50">
+        <section className="py-12 lg:py-16 bg-white">
           <div className="container mx-auto px-4 max-w-[820px]">
             <div className="flex items-center gap-2 mb-4">
               <Globe className="w-6 h-6 text-primary-600" />
@@ -468,7 +489,7 @@ export function CazierLocationPage({ city, otherCities }: { city: CityData; othe
 
         {/* Other cities */}
         {otherCities.length > 0 && (
-          <section className="py-12 lg:py-16 bg-neutral-50">
+          <section className="py-12 lg:py-16 bg-white">
             <div className="container mx-auto px-4 max-w-[820px]">
               <h2 className="text-xl sm:text-2xl font-bold text-secondary-900 mb-4">
                 Cazier judiciar și în alte orașe
@@ -491,12 +512,25 @@ export function CazierLocationPage({ city, otherCities }: { city: CityData; othe
                 </Link>{' '}
                 — depunem cererea la IPJ-ul competent în numele tău.
               </p>
+
+              <h3 className="text-base font-bold text-secondary-900 mt-8 mb-3">Alte documente utile</h3>
+              <div className="flex flex-wrap gap-3">
+                {RELATED_SERVICES.map((s) => (
+                  <Link
+                    key={s.href}
+                    href={s.href}
+                    className="inline-flex items-center gap-1.5 rounded-full border border-neutral-200 bg-white px-4 py-2 text-sm text-neutral-700 hover:border-primary-300 hover:text-primary-700 hover:shadow-sm transition-all"
+                  >
+                    <FileText className="w-3.5 h-3.5 text-primary-600" /> {s.label}
+                  </Link>
+                ))}
+              </div>
             </div>
           </section>
         )}
 
         {/* Surse oficiale */}
-        <section className="py-8 bg-white border-t border-neutral-200">
+        <section className="py-8 bg-neutral-50 border-t border-neutral-200">
           <div className="container mx-auto px-4 max-w-[820px]">
             <p className="text-xs text-neutral-500">
               Surse oficiale:{' '}
@@ -532,15 +566,26 @@ export function CazierLocationPage({ city, otherCities }: { city: CityData; othe
               Fără drum la IPJ {city.judet}, fără cozi. Completezi în câteva minute și primești
               documentul prin curier sau pe email.
             </p>
-            <Button
-              asChild
-              className="bg-primary-500 hover:bg-primary-600 text-secondary-900 font-bold px-8 py-6 text-lg rounded-xl shadow-[0_6px_14px_rgba(236,185,95,0.35)] hover:shadow-[0_10px_20px_rgba(236,185,95,0.45)] hover:-translate-y-0.5 transition-all duration-200"
-            >
-              <Link href={ORDER_PATH}>
-                Comandă acum — de la {PRICE} RON
-                <ArrowRight className="ml-2 w-5 h-5" aria-hidden="true" />
-              </Link>
-            </Button>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-xl mx-auto">
+              <Button
+                asChild
+                className="flex-1 bg-primary-500 hover:bg-primary-600 text-secondary-900 font-bold px-8 py-6 text-lg rounded-xl shadow-[0_6px_14px_rgba(236,185,95,0.35)] hover:shadow-[0_10px_20px_rgba(236,185,95,0.45)] hover:-translate-y-0.5 transition-all duration-200"
+              >
+                <Link href={ORDER_PF}>
+                  <Users className="mr-2 w-5 h-5" aria-hidden="true" />
+                  Persoană fizică
+                </Link>
+              </Button>
+              <Button
+                asChild
+                className="flex-1 bg-primary-500 hover:bg-primary-600 text-secondary-900 font-bold px-8 py-6 text-lg rounded-xl shadow-[0_6px_14px_rgba(236,185,95,0.35)] hover:shadow-[0_10px_20px_rgba(236,185,95,0.45)] hover:-translate-y-0.5 transition-all duration-200"
+              >
+                <Link href={ORDER_PJ}>
+                  <Building2 className="mr-2 w-5 h-5" aria-hidden="true" />
+                  Persoană juridică (firmă)
+                </Link>
+              </Button>
+            </div>
           </div>
         </section>
       </main>
