@@ -22,6 +22,7 @@ import type { User as SupabaseUser } from '@supabase/supabase-js';
 const navLinks = [
   { href: '/', label: 'Acasă', type: 'route' as const },
   { href: '/servicii/', label: 'Servicii', type: 'route' as const },
+  { href: '/calculator/', label: 'Calculatoare', type: 'route' as const },
   { href: '/blog/', label: 'Blog', type: 'route' as const },
   { href: '/comanda/status/', label: 'Status comandă', type: 'route' as const },
   { href: '/#contact', label: 'Contact', type: 'hash' as const },
