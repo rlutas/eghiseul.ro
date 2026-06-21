@@ -30,11 +30,13 @@ Status consolidat al lucrului SEO (stare civilă + location engine) și ce mai e
 ## 📊 Acoperire orașe (cazier judiciar)
 | Sursă | Orașe |
 |---|---|
-| **Noi** | 5 (Cluj, Timișoara, Iași, Constanța, Brașov) |
-| caziere.ro | 10 (+ București, Craiova, Sibiu, Oradea, Arad) |
-| cazierjudiciaronline.com | 39 (toate capitalele de județ) |
+| **Noi** | **37** (toate capitalele de județ + sectoare în hub) |
+| caziere.ro | 10 |
+| cazierjudiciaronline.com | 39 |
 
-**Gap imediat vs caziere.ro:** București, Craiova, Sibiu, Oradea, Arad.
+**Acoperire completă** — depășim caziere.ro și egalăm practic cazierjudiciaronline.com. Toate orașele cu date IPJ reale verificate + conținut ~2.500 cuvinte. (Update 2026-06-21.)
+
+**Calculatoare:** 12 live (vezi `calculator-formulas-2026.md`).
 
 ---
 
