@@ -97,9 +97,11 @@ export function serviceUrl(slug: string): string {
  * volume + estimări) e în docs/seo/REBUILD-QUEUE.md (BATCH 3).
  */
 export const HARDCODED_CALCULATOR_SLUGS: readonly string[] = [
-  'calculator-procente',
-  'tva',
+  'calculator-impozit-auto',
   'salariu',
+  'calculator-indemnizatie-crestere-copil',
+  'tva',
+  'calculator-procente',
 ];
 
 /** Tools pages (ported from WP /tools/*). */

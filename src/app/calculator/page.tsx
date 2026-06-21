@@ -19,9 +19,17 @@ export const metadata = buildPageMetadata({
 
 // Catalog afișat — extinde pe măsură ce se construiesc calculatoarele (vezi REBUILD-QUEUE).
 const CATALOG: Record<string, { title: string; desc: string }> = {
+  'calculator-impozit-auto': {
+    title: 'Calculator Impozit Auto',
+    desc: 'Taxa auto anuală 2026 după capacitate cilindrică și normă de poluare.',
+  },
   salariu: {
     title: 'Calculator Salariu Net/Brut',
     desc: 'Conversie brut↔net cu rate 2026 (CAS, CASS, impozit, deducere personală).',
+  },
+  'calculator-indemnizatie-crestere-copil': {
+    title: 'Calculator Indemnizație Creștere Copil',
+    desc: 'ICC 2026: 85% din venitul net, între 1.650 și 8.500 lei brut.',
   },
   tva: {
     title: 'Calculator TVA',
