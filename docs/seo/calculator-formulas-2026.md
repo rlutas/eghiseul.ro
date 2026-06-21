@@ -45,7 +45,17 @@ Sursă: research 2026-06-21 (ANAF, CNPP, legislatie.just.ro, Cod Fiscal). Folosi
 | calculator-procente | ✅ live |
 | tva | ✅ live |
 | salariu | ✅ live |
-| calculator-impozit-auto | ⬜ (verifică tabel) |
-| varsta-pensionare | ⬜ |
-| calculator-indemnizatie-crestere-copil | ⬜ |
-| pensie-invaliditate, termene-judiciare, reabilitare, taxa-judiciara-de-timbru | ⬜ |
+| calculator-impozit-auto | ✅ live (tabel 2026, orientativ) |
+| calculator-indemnizatie-crestere-copil | ✅ live |
+| taxa-judiciara-de-timbru | ✅ live (Art. 3 OUG 80/2013) |
+| reabilitare | ✅ live (termene fixe Cod Penal) |
+| varsta-pensionare | ⬜ (necesită tabel Anexa 5 lunar complet) |
+| pensie-invaliditate | ⬜ (cere punctaj contributivitate — greu consumer) |
+| termene-judiciare | ⬜ (off-by-one pe zile libere — de validat pe caz real) |
+
+## Verificare legală (research 2026-06-21)
+- **Pensionare:** contradicția = 2 legi diferite. Vechi (263/2010) = +4l/an → 65 în 2035. NOU (360/2023 Anexa 5) = incremente neuniforme per rând, implementat ca LOOKUP lunar. Bărbați 65 fix; femei primul 65 = naștere ian 1970. Reducere mame: 1c=6l...7+c=3a6l (cap 11 ani, floor 52). Stagiu minim 15, complet 35.
+- **Invaliditate:** NTP × VPR(81 lei 2026); stagiu potențial × 0.25/0.20/0.10 (gr. I/II/III); floor 1.281; însoțitor gr.I = 50% salariu minim.
+- **Termene (CPC 181-184):** pe zile libere (ambele capete excluse); zi nelucrătoare → prima zi lucrătoare; săpt/luni/ani = ziua corespunzătoare.
+- **Reabilitare (CP 165-167):** termene FIXE 3/4/5/7 ani (NU formula veche cu fracție).
+- **Taxă timbru (OUG 80/2013 Art.3):** tranșe; divorț 200/50; nominal, neindexat.

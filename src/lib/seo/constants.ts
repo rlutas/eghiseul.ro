@@ -101,6 +101,8 @@ export const HARDCODED_CALCULATOR_SLUGS: readonly string[] = [
   'salariu',
   'calculator-indemnizatie-crestere-copil',
   'tva',
+  'taxa-judiciara-de-timbru',
+  'reabilitare',
   'calculator-procente',
 ];
 

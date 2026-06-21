@@ -31,6 +31,14 @@ const CATALOG: Record<string, { title: string; desc: string }> = {
     title: 'Calculator Indemnizație Creștere Copil',
     desc: 'ICC 2026: 85% din venitul net, între 1.650 și 8.500 lei brut.',
   },
+  'taxa-judiciara-de-timbru': {
+    title: 'Calculator Taxă Judiciară de Timbru',
+    desc: 'Taxa de timbru pe tranșe (OUG 80/2013) + taxe fixe frecvente.',
+  },
+  reabilitare: {
+    title: 'Calculator Reabilitare Cazier',
+    desc: 'Când se șterge condamnarea din cazier — termenele din Codul Penal.',
+  },
   tva: {
     title: 'Calculator TVA',
     desc: 'Adaugă sau extrage TVA cu cotele 2026 (21% standard, 11% redus).',
