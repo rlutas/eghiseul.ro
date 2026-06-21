@@ -49,9 +49,16 @@ Sursă: research 2026-06-21 (ANAF, CNPP, legislatie.just.ro, Cod Fiscal). Folosi
 | calculator-indemnizatie-crestere-copil | ✅ live |
 | taxa-judiciara-de-timbru | ✅ live (Art. 3 OUG 80/2013) |
 | reabilitare | ✅ live (termene fixe Cod Penal) |
+| contributii-pfa | ✅ live (verificat: 300k→78.114) |
+| concediu-medical | ✅ live (% progresiv 2026, orientativ) |
+| amenda-circulatie | ✅ live (punct 405→432,50) |
+| vechime-in-munca | ✅ live (date math) |
+| zile-concediu-odihna | ✅ live (proporțional) |
 | varsta-pensionare | ⬜ (necesită tabel Anexa 5 lunar complet) |
 | pensie-invaliditate | ⬜ (cere punctaj contributivitate — greu consumer) |
 | termene-judiciare | ⬜ (off-by-one pe zile libere — de validat pe caz real) |
+
+**Total: 12 calculatoare live.** Rămase 3 (cu caveat de verificare). Gap secundar neacoperit: șomaj, penalități ANAF, impozit chirie.
 
 ## Verificare legală (research 2026-06-21)
 - **Pensionare:** contradicția = 2 legi diferite. Vechi (263/2010) = +4l/an → 65 în 2035. NOU (360/2023 Anexa 5) = incremente neuniforme per rând, implementat ca LOOKUP lunar. Bărbați 65 fix; femei primul 65 = naștere ian 1970. Reducere mame: 1c=6l...7+c=3a6l (cap 11 ani, floor 52). Stagiu minim 15, complet 35.
