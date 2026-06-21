@@ -5,8 +5,7 @@ import { ImpozitAutoCalculator } from '@/components/calculators/impozit-auto-cal
 const SLUG = 'calculator-impozit-auto';
 const TITLE = 'Calculator Impozit Auto 2026 — Taxa pe Mașină';
 const DESCRIPTION =
-  'Calculează impozitul auto în 2026 în funcție de capacitatea cilindrică și norma de poluare ' +
-  '(noul criteriu Euro). Estimare rapidă a taxei anuale pe mijloacele de transport.';
+  "Calculează impozitul auto 2026 după capacitatea cilindrică și norma de poluare Euro. Estimare rapidă a taxei anuale pe mașină.";
 
 export const revalidate = 86400;
 

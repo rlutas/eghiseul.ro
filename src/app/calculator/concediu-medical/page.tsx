@@ -5,8 +5,7 @@ import { ConcediuMedicalCalculator } from '@/components/calculators/concediu-med
 const SLUG = 'concediu-medical';
 const TITLE = 'Calculator Concediu Medical 2026 — Indemnizație';
 const DESCRIPTION =
-  'Calculează indemnizația de concediu medical în 2026: procentul pe tip de concediu (inclusiv ' +
-  'noul procent progresiv pentru boala obișnuită), baza de calcul și prima zi neplătită.';
+  "Calculează indemnizația de concediu medical 2026: procentul pe tip de concediu, baza de calcul și prima zi neplătită.";
 
 export const revalidate = 86400;
 

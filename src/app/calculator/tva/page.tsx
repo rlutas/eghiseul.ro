@@ -5,8 +5,7 @@ import { TvaCalculator } from '@/components/calculators/tva-calculator';
 const SLUG = 'tva';
 const TITLE = 'Calculator TVA 2026 — Adaugă sau Extrage TVA (21%)';
 const DESCRIPTION =
-  'Calculator TVA online 2026: adaugă TVA la un preț fără TVA sau extrage TVA dintr-un preț cu TVA. ' +
-  'Cota standard 21% și cota redusă 11% (plus 9% pentru locuințe până în iulie 2026).';
+  "Calculator TVA 2026: adaugă sau extrage TVA cu cota standard 21% și cota redusă 11%. Rapid, online, fără instalare.";
 
 export const revalidate = 86400;
 

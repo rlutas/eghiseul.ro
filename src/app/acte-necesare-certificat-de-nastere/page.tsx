@@ -5,9 +5,7 @@ import { ArticleLayout } from '@/components/articole/article-layout';
 const SLUG = 'acte-necesare-certificat-de-nastere';
 const TITLE = 'Acte Necesare Certificat de Naștere: Listă Completă pe Situații';
 const DESCRIPTION =
-  'Ce acte îți trebuie pentru certificatul de naștere: duplicat (pierdut sau deteriorat), ' +
-  'înregistrarea unui nou-născut și eliberarea prin împuternicire sau din diaspora. ' +
-  'Listă completă + cum obții duplicatul online prin eGhișeul.ro.';
+  "Ce acte îți trebuie pentru certificatul de naștere: duplicat, nou-născut sau prin împuternicire. Listă completă + cum îl obții online.";
 const DATE_PUBLISHED = '2026-06-19';
 const DATE_MODIFIED = '2026-06-19';
 

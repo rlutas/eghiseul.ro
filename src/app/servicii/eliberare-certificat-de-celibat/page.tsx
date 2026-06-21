@@ -39,8 +39,7 @@ const PAGE_PATH = '/servicii/eliberare-certificat-de-celibat/';
 const SCHEMA_SLUG = 'eliberare-certificat-de-celibat';
 const TITLE = 'Certificat de Celibat Online România — 179 RON';
 const DESCRIPTION =
-  'Certificat de celibat online de la Starea Civilă, 179 RON, fără drum la ghișeu. ' +
-  'Pentru căsătorie în străinătate, cetățenie sau din altă localitate. Email + curier.';
+  "Certificat de celibat online de la Starea Civilă, 179 RON, fără drum la ghișeu. Pentru căsătorie în străinătate, cetățenie sau altă localitate. Email + curier.";
 const DATE_PUBLISHED = '2026-06-14';
 const DATE_MODIFIED = '2026-06-14';
 

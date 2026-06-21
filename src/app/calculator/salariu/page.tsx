@@ -5,8 +5,7 @@ import { SalariuCalculator } from '@/components/calculators/salariu-calculator';
 const SLUG = 'salariu';
 const TITLE = 'Calculator Salariu Net/Brut 2026 — Din Brut în Net';
 const DESCRIPTION =
-  'Calculator salariu 2026: convertești brut în net și invers, cu CAS 25%, CASS 10%, impozit 10% ' +
-  'și deducerea personală. Include actualizarea salariului minim de la 1 iulie 2026.';
+  "Calculator salariu 2026: convertești brut în net și invers (CAS, CASS, impozit, deducere personală) plus costul angajatorului.";
 
 export const revalidate = 86400;
 

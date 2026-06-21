@@ -5,8 +5,7 @@ import { ArticleLayout } from '@/components/articole/article-layout';
 const SLUG = 'transcriere-certificat-de-casatorie';
 const TITLE = 'Transcriere Certificat de Căsătorie din Străinătate: Ghid Complet';
 const DESCRIPTION =
-  'Te-ai căsătorit în străinătate? Afli ce este transcrierea certificatului de căsătorie în ' +
-  'România, ce acte îți trebuie (apostilă, traducere legalizată), unde se depune și cât durează.';
+  "Te-ai căsătorit în străinătate? Vezi ce este transcrierea certificatului de căsătorie, actele necesare (apostilă, traducere) și unde se depune.";
 const DATE_PUBLISHED = '2026-06-19';
 const DATE_MODIFIED = '2026-06-19';
 

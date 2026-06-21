@@ -5,8 +5,7 @@ import { VechimeCalculator } from '@/components/calculators/vechime-calculator';
 const SLUG = 'vechime-in-munca';
 const TITLE = 'Calculator Vechime în Muncă — Ani, Luni, Zile';
 const DESCRIPTION =
-  'Calculează vechimea totală în muncă adunând mai multe perioade de angajare. Rezultat în ani, ' +
-  'luni și zile — util pentru pensie, sporuri sau dosare administrative.';
+  "Calculează vechimea totală în muncă adunând mai multe perioade de angajare. Rezultat în ani, luni și zile.";
 
 export const revalidate = 86400;
 

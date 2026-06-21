@@ -5,9 +5,7 @@ import { ArticleLayout } from '@/components/articole/article-layout';
 const SLUG = 'schimbare-certificat-de-nastere-vechi';
 const TITLE = 'Schimbare Certificat de Naștere Vechi cu Unul Nou: Ghid Complet';
 const DESCRIPTION =
-  'Ai un certificat de naștere vechi, deteriorat sau scris de mână? Afli când trebuie schimbat ' +
-  'cu modelul nou, ce acte îți trebuie, cât durează și cum obții duplicatul online prin ' +
-  'eGhișeul.ro, fără drum la Starea Civilă.';
+  "Schimbă certificatul de naștere vechi sau deteriorat cu modelul actual: ce acte îți trebuie, cât durează și cum obții duplicatul online.";
 const DATE_PUBLISHED = '2026-06-19';
 const DATE_MODIFIED = '2026-06-19';
 

@@ -5,8 +5,7 @@ import { ProcenteCalculator } from '@/components/calculators/procente-calculator
 const SLUG = 'calculator-procente';
 const TITLE = 'Calculator Procente Online — Cât e X% din Y';
 const DESCRIPTION =
-  'Calculator de procente gratuit: cât este X% dintr-o valoare, cât la sută reprezintă un număr ' +
-  'din altul și creșterea/scăderea procentuală. Rapid, online, fără instalare.';
+  "Calculator de procente online: cât e X% din Y, cât la sută reprezintă un număr din altul și variația procentuală. Gratuit.";
 
 export const revalidate = 86400;
 

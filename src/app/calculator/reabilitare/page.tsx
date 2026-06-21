@@ -6,8 +6,7 @@ import { ReabilitareCalculator } from '@/components/calculators/reabilitare-calc
 const SLUG = 'reabilitare';
 const TITLE = 'Calculator Reabilitare Cazier — Când se Șterge Condamnarea';
 const DESCRIPTION =
-  'Află când intervine reabilitarea și se șterge mențiunea din cazierul judiciar: termenele fixe ' +
-  'din Codul Penal (3, 4, 5 sau 7 ani) în funcție de pedeapsă, calculate din data executării.';
+  "Află când se șterge condamnarea din cazier: termenele de reabilitare din Codul Penal (3, 4, 5 sau 7 ani), calculate din data executării.";
 
 export const revalidate = 86400;
 

@@ -5,8 +5,7 @@ import { SomajCalculator } from '@/components/calculators/somaj-calculator';
 const SLUG = 'indemnizatie-somaj';
 const TITLE = 'Calculator Indemnizație de Șomaj 2026';
 const DESCRIPTION =
-  'Calculează indemnizația de șomaj în 2026: baza de 75% din ISR plus un supliment în funcție de ' +
-  'stagiul de cotizare, cu reținerea CASS de 10% și durata de acordare.';
+  "Calculează indemnizația de șomaj 2026: baza de 75% din ISR plus suplimentul pe stagiu, durata și reținerea CASS.";
 
 export const revalidate = 86400;
 

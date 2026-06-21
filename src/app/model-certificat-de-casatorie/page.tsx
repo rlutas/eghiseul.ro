@@ -5,8 +5,7 @@ import { ArticleLayout } from '@/components/articole/article-layout';
 const SLUG = 'model-certificat-de-casatorie';
 const TITLE = 'Model Certificat de Căsătorie: Cum Arată și Ce Conține';
 const DESCRIPTION =
-  'Cum arată modelul actual al certificatului de căsătorie, ce date conține și de ce nu există ' +
-  'un „model PDF" oficial de descărcat. Plus cum obții un exemplar real (duplicat) prin eGhișeul.ro.';
+  "Cum arată modelul certificatului de căsătorie, ce date conține și de ce nu există un PDF de descărcat. Plus cum obții un exemplar oficial.";
 const DATE_PUBLISHED = '2026-06-20';
 const DATE_MODIFIED = '2026-06-20';
 

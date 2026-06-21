@@ -5,8 +5,7 @@ import { ImpozitChirieCalculator } from '@/components/calculators/impozit-chirie
 const SLUG = 'impozit-chirie';
 const TITLE = 'Calculator Impozit pe Chirie 2026 — Venituri din Închiriere';
 const DESCRIPTION =
-  'Calculează impozitul pe venitul din chirii în 2026: 10% pe venitul net (cu deducere forfetară ' +
-  'de 20%), plus CASS pe plafoane, cu declarare prin Declarația Unică.';
+  "Calculează impozitul pe chirie 2026: 10% pe venitul net (deducere 20%) plus CASS pe plafoane. Declarare prin Declarația Unică.";
 
 export const revalidate = 86400;
 

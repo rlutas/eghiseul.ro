@@ -5,8 +5,7 @@ import { AmendaCalculator } from '@/components/calculators/amenda-calculator';
 const SLUG = 'amenda-circulatie';
 const TITLE = 'Calculator Amendă Circulație 2026 + Puncte de Penalizare';
 const DESCRIPTION =
-  'Calculează amenda de circulație pe clase, plata redusă în 15 zile și punctele de penalizare ' +
-  'pentru depășirea de viteză, cu valoarea punct-amendă 2026 (405 → 432,50 lei).';
+  "Calculează amenda de circulație pe clase, plata redusă în 15 zile și punctele de penalizare pentru viteză (valori 2026).";
 
 export const revalidate = 86400;
 

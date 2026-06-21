@@ -5,8 +5,7 @@ import { TaxaTimbruCalculator } from '@/components/calculators/taxa-timbru-calcu
 const SLUG = 'taxa-judiciara-de-timbru';
 const TITLE = 'Calculator Taxă Judiciară de Timbru 2026 (OUG 80/2013)';
 const DESCRIPTION =
-  'Calculează taxa judiciară de timbru pentru cereri evaluabile în bani, pe tranșe conform ' +
-  'OUG 80/2013, plus taxele fixe frecvente (divorț, apel, ordonanță președințială).';
+  "Calculează taxa judiciară de timbru pe tranșe (OUG 80/2013) plus taxele fixe frecvente: divorț, apel, ordonanță președințială.";
 
 export const revalidate = 86400;
 

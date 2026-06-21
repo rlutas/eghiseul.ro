@@ -5,8 +5,7 @@ import { PenalitatiAnafCalculator } from '@/components/calculators/penalitati-an
 const SLUG = 'penalitati-anaf';
 const TITLE = 'Calculator Penalități și Dobânzi ANAF — Întârziere la Plată';
 const DESCRIPTION =
-  'Calculează dobânda (0,02%/zi) și penalitățile de întârziere (0,01%/zi) sau de nedeclarare ' +
-  '(0,08%/zi) pentru obligațiile fiscale plătite cu întârziere, conform Codului de procedură fiscală.';
+  "Calculează dobânzile (0,02%/zi) și penalitățile ANAF pentru taxe plătite cu întârziere, conform Codului de procedură fiscală.";
 
 export const revalidate = 86400;
 

@@ -5,9 +5,7 @@ import { ArticleLayout } from '@/components/articole/article-layout';
 const SLUG = 'certificat-de-nastere-pierdut';
 const TITLE = 'Certificat de Naștere Pierdut: Ce Faci și Cum Obții Duplicatul';
 const DESCRIPTION =
-  'Ai pierdut certificatul de naștere? Afli ce acte îți trebuie, în cât timp se eliberează ' +
-  'duplicatul, cât costă și ce faci dacă ai pierdut și buletinul. Plus cum obții duplicatul ' +
-  'online prin eGhișeul.ro, fără drum la Starea Civilă.';
+  "Ai pierdut certificatul de naștere? Vezi actele necesare, cât durează duplicatul și cum îl obții online prin eGhișeul.ro, fără drum la Starea Civilă.";
 const DATE_PUBLISHED = '2026-06-19';
 const DATE_MODIFIED = '2026-06-19';
 

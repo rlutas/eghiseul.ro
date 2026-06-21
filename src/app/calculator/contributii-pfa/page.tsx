@@ -5,8 +5,7 @@ import { PfaCalculator } from '@/components/calculators/pfa-calculator';
 const SLUG = 'contributii-pfa';
 const TITLE = 'Calculator Contribuții PFA 2026 (CAS, CASS, Impozit)';
 const DESCRIPTION =
-  'Calculează contribuțiile PFA pentru Declarația Unică: CASS 10%, CAS 25% și impozit 10%, cu ' +
-  'plafoanele 2026 raportate la salariul minim. Estimare rapidă a totalului de plată.';
+  "Calculează contribuțiile PFA pentru Declarația Unică 2026: CASS 10%, CAS 25% și impozit 10%, cu plafoanele pe salariul minim.";
 
 export const revalidate = 86400;
 

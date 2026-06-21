@@ -5,8 +5,7 @@ import { ConcediuOdihnaCalculator } from '@/components/calculators/concediu-odih
 const SLUG = 'zile-concediu-odihna';
 const TITLE = 'Calculator Zile Concediu de Odihnă — Proporțional';
 const DESCRIPTION =
-  'Calculează câte zile de concediu de odihnă ți se cuvin proporțional cu lunile lucrate, ' +
-  'pornind de la numărul de zile pe an din contract (minim legal 20 zile lucrătoare).';
+  "Calculează zilele de concediu de odihnă cuvenite proporțional cu lunile lucrate (minim legal 20 de zile lucrătoare).";
 
 export const revalidate = 86400;
 
