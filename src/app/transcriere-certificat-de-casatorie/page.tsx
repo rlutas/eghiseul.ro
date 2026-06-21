@@ -25,6 +25,7 @@ export default function Page() {
     <ArticleLayout
       slug={SLUG}
       category="Stare civilă"
+      image="/og/services/certificat-casatorie.png"
       title={TITLE}
       description={DESCRIPTION}
       datePublished={DATE_PUBLISHED}
