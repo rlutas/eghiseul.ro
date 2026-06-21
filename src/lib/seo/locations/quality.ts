@@ -13,9 +13,13 @@ import type { CityData } from './types';
 export function assertLocationPageQuality(data: CityData): void {
   const problems: string[] = [];
 
-  // Adresa instituției = ancora principală anti-thin.
-  if (!data.ipj?.address || data.ipj.address.trim().length < 10) {
-    problems.push('lipsește adresa reală a biroului IPJ');
+  // Ancora anti-thin: adresa reală a biroului SAU o notă specifică (officeNote)
+  // pentru orașele fără ghișeu unic (ex. București).
+  const hasOffice =
+    (data.ipj?.address && data.ipj.address.trim().length >= 10) ||
+    (data.officeNote && data.officeNote.trim().length >= 30);
+  if (!hasOffice) {
+    problems.push('lipsește adresa reală a biroului IPJ sau officeNote');
   }
   // Context local care DEPINDE de oraș (testul anti-swap).
   if (!data.localContext || !data.localContext.includes(data.name)) {

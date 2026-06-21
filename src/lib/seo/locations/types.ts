@@ -40,8 +40,17 @@ export interface CityData {
   /** Abrevierea subdomeniului poliției, ex. "cj" (cj.politiaromana.ro). */
   judetAbbr: string;
   population?: string;
-  /** Biroul IPJ/DGPMB care eliberează cazierul judiciar. */
-  ipj: InstitutionOffice;
+  /**
+   * Biroul IPJ care eliberează cazierul judiciar. Opțional: orașele fără un
+   * ghișeu unic (ex. București — eliberare prin secțiile de poliție) folosesc
+   * `officeNote` în loc de un birou unic.
+   */
+  ipj?: InstitutionOffice;
+  /**
+   * Notă pentru orașele fără ghișeu unic (model „oricare secție"). Folosit în
+   * locul cardului de birou. Trebuie să fie real și specific orașului.
+   */
+  officeNote?: string;
   /**
    * 2-3 fraze de context local. OBLIGATORIU să conțină `name` — testul
    * anti-swap: dacă schimbi orașul, pagina nu mai e validă.

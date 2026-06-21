@@ -336,6 +336,35 @@ const RAW_CITIES: CityData[] = [
     ],
     nearbyCitySlugs: ['oradea', 'timisoara'],
   },
+  {
+    slug: 'bucuresti',
+    name: 'București',
+    judet: 'București',
+    judetAbbr: 'b',
+    population: '1,7 milioane locuitori',
+    localAnchors: ['multinaționalele și sectorul corporate', 'firmele de pază și transport', 'spitalele și instituțiile publice'],
+    officeNote:
+      'În București, cazierul judiciar nu se eliberează la un singur ghișeu, ci la oricare dintre ' +
+      'secțiile de poliție ale Capitalei (Secțiile 1–26) sau electronic. Serviciul de specialitate ' +
+      'este coordonat de Direcția Generală de Poliție a Municipiului București (DGPMB). De aceea, cel ' +
+      'mai simplu este să comanzi online: depunem cererea în numele tău, fără să fie nevoie să alegi ' +
+      'secția sau să te deplasezi.',
+    localContext:
+      'București este capitala și cel mai mare oraș al României, cu cea mai mare concentrare de ' +
+      'angajatori, instituții publice și multinaționale. Cazierul judiciar este cel mai cerut document ' +
+      'aici — pentru angajări (corporate, pază, transport, sistem bancar), concursuri, vize și dosare administrative.',
+    localFaq: [
+      {
+        q: 'Unde se eliberează cazierul judiciar în București?',
+        a: 'Nu există un ghișeu unic — cererea se poate depune la oricare dintre secțiile de poliție din București (1–26) sau electronic. Prin eGhișeul.ro nu mai alegi secția: depunem cererea în numele tău și primești documentul prin curier.',
+      },
+      {
+        q: 'Pot obține cazierul în București fără să merg la secția de poliție?',
+        a: 'Da. Completezi datele online, semnezi împuternicirea în aplicație, iar noi depunem cererea la autoritatea competentă din București. Primești cazierul prin curier sau pe email, în 2-4 zile lucrătoare.',
+      },
+    ],
+    nearbyCitySlugs: ['constanta', 'brasov'],
+  },
 ];
 
 /** Orașele validate anti-thin. Importă DOAR de aici (sau prin `index.ts`). */

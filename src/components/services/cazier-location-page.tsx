@@ -105,7 +105,7 @@ export function CazierLocationPage({ city, otherCities }: { city: CityData; othe
     ],
   });
 
-  const scheduleRows = city.ipj.schedule ? Object.entries(city.ipj.schedule) : [];
+  const scheduleRows = city.ipj?.schedule ? Object.entries(city.ipj.schedule) : [];
 
   return (
     <>
@@ -179,8 +179,10 @@ export function CazierLocationPage({ city, otherCities }: { city: CityData; othe
           <div className="container mx-auto px-4 max-w-[820px]">
             <div className="relative -mt-16 lg:-mt-20 rounded-2xl border border-neutral-200 bg-white p-6 lg:p-8 shadow-lg">
               <h2 className="text-xl sm:text-2xl font-bold text-secondary-900 mb-1">
-                Cazier judiciar {city.name} la ghișeu — sediul IPJ {city.judet}
+                Cazier judiciar {city.name} la ghișeu{city.ipj ? ` — sediul IPJ ${city.judet}` : ''}
               </h2>
+              {city.ipj ? (
+              <>
               <p className="text-sm text-neutral-600 mb-6">
                 La ghișeu, cazierul se obține de la biroul de specialitate din cadrul IPJ {city.judet}.
                 Mai jos găsești datele oficiale — sau eviți complet drumul comandând online.
@@ -243,6 +245,10 @@ export function CazierLocationPage({ city, otherCities }: { city: CityData; othe
                 modifica — verifică pe site-ul instituției înainte de deplasare. Cu eGhișeul.ro nu mai
                 depinzi de program.
               </p>
+              </>
+              ) : (
+                <p className="text-neutral-700 leading-relaxed">{city.officeNote}</p>
+              )}
             </div>
           </div>
         </section>
@@ -535,7 +541,7 @@ export function CazierLocationPage({ city, otherCities }: { city: CityData; othe
             <p className="text-xs text-neutral-500">
               Surse oficiale:{' '}
               <a href="https://www.politiaromana.ro/" target="_blank" rel="noopener noreferrer" className="text-primary-700 hover:underline">Poliția Română</a>
-              {city.ipj.website && (
+              {city.ipj?.website && (
                 <>
                   {' · '}
                   <a href={city.ipj.website} target="_blank" rel="noopener noreferrer" className="text-primary-700 hover:underline">IPJ {city.judet} — cazier judiciar</a>
