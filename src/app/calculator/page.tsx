@@ -19,6 +19,14 @@ export const metadata = buildPageMetadata({
 
 // Catalog afișat — extinde pe măsură ce se construiesc calculatoarele (vezi REBUILD-QUEUE).
 const CATALOG: Record<string, { title: string; desc: string }> = {
+  salariu: {
+    title: 'Calculator Salariu Net/Brut',
+    desc: 'Conversie brut↔net cu rate 2026 (CAS, CASS, impozit, deducere personală).',
+  },
+  tva: {
+    title: 'Calculator TVA',
+    desc: 'Adaugă sau extrage TVA cu cotele 2026 (21% standard, 11% redus).',
+  },
   'calculator-procente': {
     title: 'Calculator Procente',
     desc: 'X% dintr-o valoare, cât la sută reprezintă un număr din altul, variație procentuală.',

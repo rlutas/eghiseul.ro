@@ -98,6 +98,8 @@ export function serviceUrl(slug: string): string {
  */
 export const HARDCODED_CALCULATOR_SLUGS: readonly string[] = [
   'calculator-procente',
+  'tva',
+  'salariu',
 ];
 
 /** Tools pages (ported from WP /tools/*). */
