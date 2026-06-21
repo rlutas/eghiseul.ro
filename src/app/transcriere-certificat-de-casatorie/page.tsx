@@ -109,6 +109,17 @@ export default function Page() {
         ce documente sunt acceptate în cazul tău.
       </p>
 
+      <h2>Țări frecvente și apostila</h2>
+      <p>
+        Cele mai multe cereri de transcriere vin de la românii căsătoriți în{' '}
+        <strong>Italia, Spania, Germania, Marea Britanie</strong> sau alte state din UE. Pentru aceste
+        țări, certificatul de căsătorie trebuie de regulă <strong>apostilat</strong> (Convenția de la
+        Haga) în statul emitent și apoi <strong>tradus legalizat</strong> în limba română. Documentele
+        din state care nu sunt parte la Convenția de la Haga necesită <strong>supralegalizare</strong>,
+        un proces mai lung. Verifică din timp cerințele, pentru că apostila se obține în țara unde s-a
+        încheiat căsătoria.
+      </p>
+
       <h2>Documente conexe</h2>
       <p>
         Dacă te-ai căsătorit în străinătate, e posibil să ai nevoie și de transcrierea altor acte sau

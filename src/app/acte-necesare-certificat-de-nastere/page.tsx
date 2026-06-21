@@ -117,6 +117,16 @@ export default function Page() {
         la primăria competentă și îți trimitem certificatul prin curier oriunde te afli.
       </p>
 
+      <h2>Cât durează și cât costă eliberarea</h2>
+      <p>
+        La ghișeu, un <strong>duplicat</strong> se eliberează de regulă în aceeași zi sau în câteva
+        zile lucrătoare, în funcție de primărie. <strong>Taxa de stare civilă</strong> este mică sau
+        inexistentă în multe localități. Prin eGhișeul.ro, termenul standard este de{' '}
+        <strong>2–4 zile lucrătoare</strong>, iar costul afișat acoperă întocmirea și depunerea cererii
+        prin împuternicire, taxele și livrarea prin curier. Pentru prima înregistrare a unui nou-născut,
+        primul certificat este <strong>gratuit</strong>.
+      </p>
+
       <h2>Cum simplifici totul prin eGhișeul.ro</h2>
       <p>
         În loc să afli lista exactă a fiecărui ghișeu și să te deplasezi, completezi datele online,

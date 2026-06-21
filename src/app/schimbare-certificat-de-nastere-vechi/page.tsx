@@ -123,6 +123,17 @@ export default function Page() {
         <Link href={nastereUrl}>eliberare certificat de naștere online</Link>.
       </p>
 
+      <h2>Certificatele de naștere vechi, completate de mână</h2>
+      <p>
+        Certificatele emise în urmă cu zeci de ani erau adesea <strong>completate de mână</strong>, pe
+        un formular mai vechi, iar cu timpul cerneala se decolorează sau hârtia se deteriorează. Aceste
+        documente rămân valabile, însă pot fi greu de citit sau de acceptat la dosare oficiale ori în
+        străinătate. Soluția este aceeași: soliciți un <strong>duplicat tipărit pe modelul actual</strong>,
+        cu toate datele preluate din registrele Stării Civile. Dacă între timp documentul s-a și pierdut,
+        vezi pașii pentru un{' '}
+        <Link href="/certificat-de-nastere-pierdut/">certificat de naștere pierdut</Link>.
+      </p>
+
       <h2>Concluzie</h2>
       <p>
         Un certificat de naștere vechi rămâne valabil, dar îl poți înlocui oricând cu un{' '}

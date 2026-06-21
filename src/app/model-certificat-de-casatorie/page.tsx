@@ -86,6 +86,15 @@ export default function Page() {
         o simplă imagine — trebuie să soliciți un exemplar oficial.
       </p>
 
+      <h2>Certificat de căsătorie sau extras multilingv?</h2>
+      <p>
+        Dacă ai nevoie de document pentru o autoritate din străinătate, există și{' '}
+        <strong>extrasul multilingv</strong> de pe actul de căsătorie — un formular standardizat,
+        recunoscut în UE <strong>fără traducere</strong>. Pentru folosirea în România este suficient
+        certificatul de căsătorie obișnuit (sau duplicatul lui); pentru dosare în alt stat UE, extrasul
+        multilingv îți poate scuti o traducere. Alege în funcție de unde depui documentul.
+      </p>
+
       <h2>Cum obții un exemplar oficial (duplicat)</h2>
       <p>
         Dacă ai pierdut certificatul, l-ai deteriorat sau îți trebuie un exemplar suplimentar,
