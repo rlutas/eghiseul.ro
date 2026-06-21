@@ -170,6 +170,35 @@ export default function Page() {
         <Link href={nastereUrl}>eliberare certificat de naștere online</Link>.
       </p>
 
+      <h2>Duplicat sau copie legalizată — ce îți trebuie</h2>
+      <p>
+        Multă lume confundă cele două. <strong>Duplicatul</strong> este un certificat de naștere nou,
+        original, emis de Starea Civilă — el înlocuiește exemplarul pierdut și are aceeași valoare
+        juridică. <strong>Copia legalizată</strong> este o fotocopie a unui certificat existent,
+        certificată de un notar „conform cu originalul”; nu îți este de folos dacă nu mai ai deloc
+        documentul. Pe scurt: dacă ai pierdut certificatul, ai nevoie de un <strong>duplicat</strong>,
+        nu de o copie legalizată.
+      </p>
+
+      <h2>Ce conține și cât este valabil noul certificat</h2>
+      <p>
+        Duplicatul conține aceleași date ca originalul: numele titularului, data și locul nașterii,
+        numele părinților, plus seria și numărul noului exemplar. <strong>Certificatul de naștere nu
+        expiră</strong> — este valabil pe toată durata vieții. Unele instituții pot cere însă o copie
+        legalizată recentă (emisă în ultimele luni) pentru anumite dosare, dar documentul în sine
+        rămâne valabil permanent.
+      </p>
+
+      <h2>Ai pierdut certificatul de naștere fiind în străinătate</h2>
+      <p>
+        Dacă ești plecat din țară, nu trebuie să te întorci doar pentru un act. Pe baza unei{' '}
+        <strong>împuterniciri</strong> semnate online, depunem cererea la Starea Civilă din localitatea
+        de naștere și îți trimitem duplicatul oriunde te afli. Pentru folosirea documentului în fața
+        autorităților străine poți avea nevoie de <strong>apostilă</strong> și de o{' '}
+        <strong>traducere autorizată</strong> — le putem gestiona tot noi, ca să primești un dosar
+        complet, gata de depus.
+      </p>
+
       <h2>Concluzie</h2>
       <p>
         Un certificat de naștere pierdut nu este o problemă greu de rezolvat: soliciți un{' '}
