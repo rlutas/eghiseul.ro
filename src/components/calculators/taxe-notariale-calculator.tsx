@@ -146,6 +146,7 @@ export function TaxeNotarialeCalculator() {
       const onorBrut = Math.max(onorariu(value, SALE_BRACKETS), floor);
       const rows: Row[] = [
         { label: 'Onorariu partaj (cu TVA 21%)', value: onorBrut * (1 + TVA), note: `minim ${fmt(floor)} lei (${nLot} loturi)` },
+        { label: `Intabulare (${pj ? '0,5% PJ' : '0,15% PF'})`, value: intab },
         { label: 'Impozit la stat', value: 0, note: 'partajul este scutit; 1%/3% doar pe sulta peste cotă' },
         { label: 'Extras de carte funciară', value: EXTRAS_CF },
       ];
@@ -223,9 +224,9 @@ export function TaxeNotarialeCalculator() {
 
       {/* Opțiuni specifice */}
       <div className="grid sm:grid-cols-2 gap-4 mt-5">
-        {(tab === 'vanzare' || tab === 'donatie') && (
+        {(tab === 'vanzare' || tab === 'donatie' || tab === 'partaj') && (
           <div>
-            <Label className="mb-1.5 block">Cumpărător / dobânditor</Label>
+            <Label className="mb-1.5 block">{tab === 'partaj' ? 'Copărtași' : 'Cumpărător / dobânditor'}</Label>
             <div className="flex gap-2">
               {([[false, 'Persoană fizică'], [true, 'Persoană juridică']] as [boolean, string][]).map(([k, l]) => (
                 <button
