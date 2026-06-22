@@ -122,6 +122,14 @@ export const HARDCODED_CALCULATOR_SLUGS: readonly string[] = [
   'inflatie',
   'diurna',
   'impozit-casa',
+  'credit-ipotecar',
+  'zile-lucratoare',
+  'calculator-data',
+  'concediu-maternitate',
+  'dobanda-legala',
+  'grad-indatorare',
+  'concediu-paternal',
+  'spor-salarial',
 ];
 
 /** Tools pages (ported from WP /tools/*). */

@@ -29,6 +29,14 @@ import {
   TrendingUp,
   MapPin,
   House,
+  Banknote,
+  CalendarDays,
+  CalendarRange,
+  HeartPulse,
+  Scale,
+  Gauge,
+  UserRound,
+  Moon,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -56,6 +64,9 @@ export const CALCULATORS_NAV: CalculatorNavGroup[] = [
       { name: 'Zile concediu de odihnă', href: '/calculator/zile-concediu-odihna/', icon: Plane },
       { name: 'Impozit pe pensie', href: '/calculator/impozit-pensie/', icon: HandCoins },
       { name: 'Diurnă', href: '/calculator/diurna/', icon: MapPin },
+      { name: 'Concediu maternitate', href: '/calculator/concediu-maternitate/', icon: HeartPulse },
+      { name: 'Concediu paternal', href: '/calculator/concediu-paternal/', icon: UserRound },
+      { name: 'Spor noapte / ore supl.', href: '/calculator/spor-salarial/', icon: Moon },
     ],
   },
   {
@@ -70,6 +81,8 @@ export const CALCULATORS_NAV: CalculatorNavGroup[] = [
       { name: 'Rambursare anticipată', href: '/calculator/rambursare-anticipata/', icon: PiggyBank },
       { name: 'Inflație', href: '/calculator/inflatie/', icon: TrendingUp },
       { name: 'Impozit pe casă', href: '/calculator/impozit-casa/', icon: House },
+      { name: 'Credit ipotecar', href: '/calculator/credit-ipotecar/', icon: Banknote },
+      { name: 'Grad de îndatorare', href: '/calculator/grad-indatorare/', icon: Gauge },
     ],
   },
   {
@@ -81,6 +94,9 @@ export const CALCULATORS_NAV: CalculatorNavGroup[] = [
       { name: 'Taxă judiciară de timbru', href: '/calculator/taxa-judiciara-de-timbru/', icon: Stamp },
       { name: 'Reabilitare cazier', href: '/calculator/reabilitare/', icon: ShieldCheck },
       { name: 'Amendă circulație + puncte', href: '/calculator/amenda-circulatie/', icon: TrafficCone },
+      { name: 'Dobândă legală', href: '/calculator/dobanda-legala/', icon: Scale },
+      { name: 'Zile lucrătoare', href: '/calculator/zile-lucratoare/', icon: CalendarDays },
+      { name: 'Calculator dată', href: '/calculator/calculator-data/', icon: CalendarRange },
       { name: 'Calculator procente', href: '/calculator/calculator-procente/', icon: Calculator },
     ],
   },

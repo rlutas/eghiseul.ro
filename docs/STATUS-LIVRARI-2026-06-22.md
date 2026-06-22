@@ -10,6 +10,19 @@ Recapitulare practică: ce e construit, unde îl găsești și cum îl testezi. 
 > - **Imagini OG dinamice brandate** per calculator: rută edge `src/app/api/og/calculator/route.tsx` (next/og, 1200×630, font Liberation pt diacritice); toate 15 `ogImage → /api/og/calculator?title=${TITLE}`.
 > - **ANCPI worker — fix login** (repo separat `~/Projects/worker-ancpi`): vezi secțiunea 7 de mai jos.
 
+> **Update 22 iunie (seara) — extindere majoră:**
+> - **25 calculatoare** acum (de la 15). Noi: taxe notariale (4 tab-uri, credit ipotecar + Noua Casă), pensie alimentară, termene judiciare, dividende, taxe SRL, rambursare anticipată, impozit pensie, inflație, diurnă, impozit casă. **Fiecare validat** față de sursă oficială + concurență (notariate.ro / calculator-termene.ro / estimez.ro), cu research legal/fiscal 2026 dedicat.
+> - **Pagină `/curs-valutar`** — convertor valutar + variație zilnică ▲/▼ + grafice evoluție 10 zile (SVG) + tabel toate valutele, live din feed-ul oficial BNR (`lib/bnr.ts`, `/api/bnr-rate`). Reutilizabil în calculatoarele cu €.
+> - **Header responsive** — comutare desktop/mobil mutată la `xl` (1280) ca să nu mai dea overflow pe tabletă/laptop mic.
+> - **Conținut îmbogățit** și pe cele 10 calculatoare noi (workflow 10 agenți): exemple numerice, tabele, greșeli frecvente, FAQ.
+> - **Toate 25 în mega-meniu** (desktop + mobil, 3 categorii) + sitemap + index + OG dinamic. Verificat vizual.
+> - **Research-ul a prevenit erori reale:** impozit dividende 16% (nu 10%), CASS nou pe pensii 2026, grila notarială nouă OMJ 177/C/2024 (nu vechea 46/2011).
+>
+> **Roadmap calculatoare (din gap analysis vs estimez.ro/eghiseul.ro):**
+> - 🟢 În lucru: credit ipotecar, zile lucrătoare, calculator dată (matematică pură)
+> - 🟡 După research: concediu maternitate, dobândă legală, grad îndatorare (DTI), concediu paternal, spor noapte/weekend
+> - 🔴 Blocat pe date: estimare pensie + migrare vârstă-pensionare/invaliditate (din WP vechi) — necesită Anexa 5 Legea 360/2023
+
 ---
 
 ## 1. Calculatoare (15 — toate verificate legal)
