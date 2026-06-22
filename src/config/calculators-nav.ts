@@ -21,6 +21,7 @@ import {
   Calculator,
   Landmark,
   HeartHandshake,
+  Gavel,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -62,6 +63,7 @@ export const CALCULATORS_NAV: CalculatorNavGroup[] = [
     items: [
       { name: 'Taxe notariale', href: '/calculator/taxe-notariale/', icon: Landmark },
       { name: 'Pensie alimentară', href: '/calculator/pensie-alimentara/', icon: HeartHandshake },
+      { name: 'Termene judiciare', href: '/calculator/termene-judiciare/', icon: Gavel },
       { name: 'Taxă judiciară de timbru', href: '/calculator/taxa-judiciara-de-timbru/', icon: Stamp },
       { name: 'Reabilitare cazier', href: '/calculator/reabilitare/', icon: ShieldCheck },
       { name: 'Amendă circulație + puncte', href: '/calculator/amenda-circulatie/', icon: TrafficCone },

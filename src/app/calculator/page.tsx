@@ -87,6 +87,10 @@ const CATALOG: Record<string, { title: string; desc: string }> = {
     title: 'Calculator Pensie Alimentară',
     desc: 'Pensia de întreținere pentru copii: 1/4, 1/3 sau 1/2 din venitul net (Cod Civil art. 529).',
   },
+  'termene-judiciare': {
+    title: 'Calculator Termene Judiciare',
+    desc: 'Termene procedurale pe zile, săptămâni, luni sau ani (Cod Proc. Civilă/Penală), cu sărbători legale.',
+  },
 };
 
 export default function Page() {
