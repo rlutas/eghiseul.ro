@@ -129,20 +129,22 @@ export default function RovinietaOnlinePage() {
           </div>
         </section>
 
-        {/* Cum cumperi */}
+        {/* De ce de aici */}
         <section className="py-12 lg:py-16 bg-white">
           <div className="container mx-auto px-4 max-w-[1100px]">
-            <div className="grid sm:grid-cols-3 gap-5">
+            <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 text-center mb-8">De ce să cumperi rovinieta online de aici?</h2>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
               {[
-                { icon: CheckCircle, title: 'Alege categoria și perioada', desc: 'Selectezi categoria vehiculului (A pentru autoturisme) și cât timp vrei rovinieta — de la o zi la 12 luni.' },
-                { icon: Zap, title: 'Plătești și se activează instant', desc: 'Introduci numărul de înmatriculare, plătești securizat cu cardul, iar rovinieta se activează imediat.' },
-                { icon: Mail, title: 'Primești confirmarea pe email', desc: 'Rovinieta este înregistrată oficial în sistemul CNAIR și primești dovada pe email.' },
+                { icon: Zap, title: 'Valabilă Instant', desc: 'Rovinieta devine activă imediat după finalizarea plății. Fără timp de așteptare.' },
+                { icon: ShieldCheck, title: 'Plată 100% Securizată', desc: 'Plata prin sisteme bancare certificate, cu autentificare 3D Secure.' },
+                { icon: CheckCircle, title: 'De pe Orice Dispozitiv', desc: 'Cumperi rovinieta online de pe telefon, tabletă sau PC. Funcționează oriunde.' },
+                { icon: Mail, title: 'Confirmare pe Email', desc: 'Primești dovada plății pe email — document oficial pentru verificarea rovinietei.' },
               ].map((c) => (
                 <div key={c.title} className="rounded-2xl border border-neutral-200 bg-neutral-50 p-5">
                   <div className="w-12 h-12 bg-primary-100 rounded-xl flex items-center justify-center mb-4">
                     <c.icon className="w-6 h-6 text-primary-600" aria-hidden="true" />
                   </div>
-                  <h2 className="text-base font-bold text-secondary-900 mb-2">{c.title}</h2>
+                  <h3 className="text-base font-bold text-secondary-900 mb-2">{c.title}</h3>
                   <p className="text-sm text-neutral-600 leading-relaxed">{c.desc}</p>
                 </div>
               ))}
@@ -153,19 +155,26 @@ export default function RovinietaOnlinePage() {
         {/* SEO content + categorii */}
         <section className="py-12 lg:py-16 bg-neutral-50">
           <div className="container mx-auto px-4 max-w-[820px]">
-            <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-5">Ce este rovinieta și cum o cumperi online</h2>
+            <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-5">Ce este rovinieta și de ce ai nevoie de ea?</h2>
             <div className="space-y-4 text-neutral-700 leading-relaxed">
               <p>
-                <strong>Rovinieta</strong> (vinieta de drum) este taxa obligatorie de utilizare a rețelei de
-                drumuri naționale din România, administrată de <strong>CNAIR</strong>. Orice vehicul care circulă
-                pe drumurile naționale și autostrăzi trebuie să aibă rovinietă validă, altfel riști o amendă.
+                <strong>Rovinieta</strong> (taxa de drum) este obligatorie pentru toate vehiculele care circulă pe
+                drumurile naționale și autostrăzile din România, administrată de <strong>CNAIR</strong>. Este un
+                document electronic care atestă plata tarifului de utilizare a drumurilor.
               </p>
-              <p>
-                Cea mai simplă metodă este să <strong>cumperi rovinieta online</strong>: alegi categoria și
-                perioada, introduci numărul de înmatriculare și plătești cu cardul. Rovinieta se activează imediat,
-                fără să mai mergi la o benzinărie sau la ghișeu. <strong>Plata rovinietei online</strong> este
-                securizată, iar confirmarea ajunge pe email.
-              </p>
+              <ul className="space-y-2 list-none pl-0">
+                {[
+                  'Document electronic din 2010 — nu mai există autocolant pe parbriz.',
+                  'Verificarea se face automat, prin camerele CNAIR de pe drumuri.',
+                  'Fără rovinietă validă, amenda este între 250 și 1.500 lei (în funcție de categorie).',
+                  'O cumperi online în 2 minute, cu activare imediată.',
+                ].map((item) => (
+                  <li key={item} className="flex items-start gap-2">
+                    <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" aria-hidden="true" />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
 
             <h2 className="text-2xl font-bold text-secondary-900 mt-10 mb-5">Categorii de rovinietă</h2>

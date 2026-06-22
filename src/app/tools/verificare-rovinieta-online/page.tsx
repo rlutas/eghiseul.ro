@@ -79,13 +79,22 @@ const INFO_CARDS = [
   { icon: ShieldCheck, title: 'Date oficiale CNAIR', desc: 'Rezultatul se bazează pe evidența oficială a rovinietelor din România.' },
 ];
 
+const TARIFE_AB = [
+  { p: '1 zi', a: '3,5 € (≈18 lei)', b: '8,6 € (≈44 lei)' },
+  { p: '10 zile', a: '6 € (≈31 lei)', b: '11,5 € (≈58 lei)' },
+  { p: '30 zile', a: '9,5 € (≈48 lei)', b: '18,2 € (≈92 lei)' },
+  { p: '60 zile', a: '15 € (≈76 lei)', b: '28,8 € (≈146 lei)' },
+  { p: '12 luni', a: '50 € (≈255 lei)', b: '96 € (≈486 lei)' },
+];
+
 const FAQS = [
-  { q: 'Cum verific rovinieta online?', a: 'Introdu numărul de înmatriculare al vehiculului în câmpul din instrument și apasă verifică. Rezultatul îți arată dacă rovinieta este validă și până când expiră.' },
+  { q: 'Cum verific rovinieta online?', a: 'Introdu numărul de înmatriculare al vehiculului în câmpul din instrument și apasă verifică. Rezultatul îți arată instant dacă rovinieta este validă și până când expiră.' },
   { q: 'Pot verifica rovinieta fără seria de șasiu?', a: 'Da. Verificarea se face doar după numărul de înmatriculare — nu ai nevoie de seria de șasiu.' },
+  { q: 'Am fost prins fără rovinietă în România, ce fac?', a: 'Dacă ai fost prins fără rovinietă, trebuie să plătești amenda contravențională și să achiziționezi urgent o rovinietă pentru a evita alte sancțiuni. Persoanele fizice achită amenda la bugetul local, iar persoanele juridice la bugetul de stat.' },
+  { q: 'Am nevoie de rovinietă pentru remorcă?', a: 'Nu. Rovinieta nu este necesară pentru remorcă. Aceasta se emite doar pentru numărul de înmatriculare al capului tractor.' },
+  { q: 'În ce monedă se plătește rovinieta în România?', a: 'Suma afișată pentru rovinietă este în euro, dar plata se face în lei, la cursul Băncii Naționale a României (BNR). Străinii pot plăti în valute liber convertibile, la echivalentul în euro.' },
+  { q: 'De unde pot cumpăra fizic rovinieta în România?', a: 'Deși rovinieta electronică a înlocuit autocolantul de pe parbriz, ea poate fi achiziționată și din locații fizice: CNAIR, Poșta Română, Banca Transilvania și benzinării (MOL, Lukoil, OMV, Rompetrol). Cel mai simplu rămâne însă online.' },
   { q: 'Verificarea rovinietei este gratuită?', a: 'Da, verificarea valabilității rovinietei este gratuită și nelimitată.' },
-  { q: 'De unde vin datele?', a: 'Rezultatul se bazează pe evidența oficială a rovinietelor administrată de CNAIR.' },
-  { q: 'Cât este valabilă rovinieta?', a: 'Rovinieta se poate cumpăra pe diferite perioade (de la o zi până la 12 luni). Verificarea îți arată data exactă de expirare pentru vehiculul căutat.' },
-  { q: 'Ce risc dacă circul fără rovinietă?', a: 'Circulația pe drumurile naționale fără rovinietă validă se sancționează cu amendă. Verifică din timp și cumpără rovinieta înainte să expire.' },
 ];
 
 export default function VerificareRovinietaPage() {
@@ -114,18 +123,17 @@ export default function VerificareRovinietaPage() {
               Verificare Rovinietă Online
             </h1>
             <p className="text-lg text-white/85 leading-relaxed">
-              Verifică <strong className="text-primary-500">gratuit</strong> dacă o mașină are rovinietă validă
-              și până când expiră — după numărul de înmatriculare, fără serie de șasiu.
+              Verifică <strong className="text-primary-500">gratuit</strong> și rapid valabilitatea rovinietei tale.
+              Indiferent dacă ești persoană fizică sau juridică, afli instant dacă rovinieta este validă folosind
+              doar numărul de înmatriculare.
             </p>
-            <p className="mt-3 text-sm text-white/55">Date oficiale CNAIR · serviciu informativ gratuit · actualizat {ACTUALIZAT}</p>
+            <p className="mt-3 text-sm text-white/55">Date oficiale CNAIR · serviciu informativ gratuit · disponibil 24/7 · actualizat {ACTUALIZAT}</p>
           </div>
         </header>
 
-        {/* Widget — overlaps hero (ca la calculatoare) */}
+        {/* Widget — overlaps hero (embed-ul e deja card alb; doar overlap, fără wrapper) */}
         <section className="bg-white">
           <div className="container mx-auto px-4 max-w-[820px]">
-            {/* Embed-ul erovinieta vine deja ca un card alb — NU îl mai învelim într-un
-                al doilea card; păstrăm doar overlap-ul peste hero (ca la calculatoare). */}
             <div className="relative -mt-16 lg:-mt-20">
               <ErovinietaEmbed />
             </div>
@@ -133,13 +141,14 @@ export default function VerificareRovinietaPage() {
               <p className="text-xs font-bold uppercase tracking-wider text-primary-700 mb-1">Pe scurt</p>
               <p className="text-[15px] leading-relaxed text-secondary-800">
                 Introdu numărul de înmatriculare (fără serie de șasiu) și afli instant, gratuit, dacă vehiculul are
-                rovinietă validă și data exactă de expirare. Datele provin din evidența oficială CNAIR.
+                rovinietă validă și data exactă de expirare. Datele provin din evidența oficială CNAIR, iar serviciul
+                e disponibil 24/7.
               </p>
             </div>
           </div>
         </section>
 
-        {/* Info cards */}
+        {/* Pași */}
         <section className="py-12 lg:py-16 bg-white">
           <div className="container mx-auto px-4 max-w-[1100px]">
             <div className="grid sm:grid-cols-3 gap-5">
@@ -156,21 +165,27 @@ export default function VerificareRovinietaPage() {
           </div>
         </section>
 
-        {/* SEO content — prose, ca la calculatoare */}
+        {/* SEO content — conținutul real de pe eghiseul.ro */}
         <article className="py-12 lg:py-16 bg-neutral-50">
           <div className="container mx-auto px-4 max-w-[760px]">
-            <div className="prose prose-neutral max-w-none prose-headings:font-bold prose-headings:text-secondary-900 prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-4 prose-p:text-neutral-700 prose-p:leading-relaxed prose-li:text-neutral-700 prose-li:marker:text-primary-500 prose-a:text-primary-700 prose-a:font-medium prose-strong:text-secondary-900">
-              <h2>Ce este rovinieta și de ce o verifici</h2>
+            <div className="prose prose-neutral max-w-none prose-headings:font-bold prose-headings:text-secondary-900 prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-4 prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-3 prose-p:text-neutral-700 prose-p:leading-relaxed prose-li:text-neutral-700 prose-li:marker:text-primary-500 prose-a:text-primary-700 prose-a:font-medium prose-strong:text-secondary-900 prose-table:text-sm prose-th:bg-neutral-100 prose-th:text-secondary-900 prose-td:align-top">
+              <h2>Ce este rovinieta și cum verifici valabilitatea</h2>
+              <h3>Definiția și importanța rovinietei</h3>
               <p>
-                <strong>Rovinieta</strong> (vinieta de drum) este taxa obligatorie de utilizare a rețelei de
-                drumuri naționale din România, administrată de CNAIR. Verificarea rovinietei îți arată dacă un
-                vehicul are taxa de drum plătită și valabilă — util înainte de a cumpăra o mașină second-hand,
-                înainte de un drum lung sau pur și simplu ca să eviți o <strong>amendă pentru lipsa rovinietei</strong>.
+                Rovinieta este un document electronic care atestă plata tarifului de utilizare a rețelei de drumuri
+                naționale din România. Este obligatorie pentru toate vehiculele care circulă pe drumurile naționale
+                și are rolul de a contribui la întreținerea și modernizarea infrastructurii rutiere. Neplata
+                rovinietei poate atrage amenzi substanțiale și restricții de circulație.
+              </p>
+              <h3>Procesul de verificare a valabilității rovinietei online</h3>
+              <p>
+                Verificarea valabilității rovinietei online este un proces simplu și rapid. Poți verifica instant dacă
+                rovinieta ta este validă, folosind doar numărul de înmatriculare. Serviciul este disponibil 24/7 și te
+                ajută să eviți amenzile cauzate de expirarea rovinietei.
               </p>
               <p>
-                Poți face <strong>verificarea rovinietei după numărul de înmatriculare</strong>, fără să ai nevoie
-                de seria de șasiu. Sistemul compară numărul introdus cu evidența oficială CNAIR și îți spune dacă
-                rovinieta este validă și până când.
+                Pașii sunt simpli: introduci numărul de înmatriculare, primești rezultatul verificării instant pe
+                ecran și poți repeta procesul pentru a verifica o altă mașină.
               </p>
 
               <div className="not-prose rounded-2xl border border-amber-200 bg-amber-50 p-5 flex items-start gap-3 my-6">
@@ -182,20 +197,63 @@ export default function VerificareRovinietaPage() {
                 </p>
               </div>
 
-              <h2>Ce afli din verificare</h2>
+              <h2>Cum verific dacă am nevoie de rovinietă în România?</h2>
+              <h3>Drumuri unde este necesară rovinieta</h3>
+              <p>Ai nevoie de rovinietă atunci când părăsești orașul. Mai exact, rovinieta este necesară pe:</p>
               <ul>
-                <li>Dacă vehiculul are <strong>rovinietă validă</strong> în acest moment.</li>
-                <li><strong>Data exactă de expirare</strong> a rovinietei.</li>
-                <li>Verificarea se face doar după <strong>numărul de înmatriculare</strong>, fără serie de șasiu.</li>
-                <li>Este <strong>gratuită, instant și nelimitată</strong>.</li>
+                <li>Drumuri expres</li>
+                <li>Drumuri naționale europene (E)</li>
+                <li>Autostrăzi</li>
+                <li>Drumuri naționale principale</li>
+                <li>Drumuri naționale secundare</li>
+              </ul>
+              <p>Practic, rovinieta este echivalentul taxei de autostradă în România.</p>
+
+              <h3>Drumuri unde NU este necesară rovinieta</h3>
+              <p>Nu ai nevoie de rovinietă dacă circuli pe:</p>
+              <ul>
+                <li>Drumuri județene</li>
+                <li>Drumuri comunale</li>
+                <li>Drumuri naționale la trecerea prin municipii</li>
               </ul>
 
-              <h2>Când merită să verifici rovinieta</h2>
+              <h3>Excepții de la plata rovinietei</h3>
+              <p>Sunt scutite de plata rovinietei:</p>
+              <ul>
+                <li>Vehiculele cu numere provizorii</li>
+                <li>Mașinile aflate în serviciile statului sau din ministere</li>
+                <li>Vehiculele adaptate pentru persoanele cu handicap și îngrijitorii acestora (rovinietă gratuită)</li>
+                <li><strong>Motocicletele</strong> — sunt scutite și nu necesită rovinietă</li>
+              </ul>
+
+              <h2>Cât costă rovinieta în 2026 (autoturisme și marfă ușoară)</h2>
               <p>
-                Verifică rovinieta <strong>înainte de a cumpăra o mașină second-hand</strong> (ca să știi dacă mai
-                are taxa de drum plătită), <strong>înainte de un drum lung pe autostradă sau drum național</strong>,
-                sau pur și simplu dacă <strong>nu mai știi când îți expiră</strong> rovinieta. Dacă a expirat sau e
-                pe cale să expire, o poți cumpăra online în câteva minute.
+                Rovinieta se plătește în funcție de categoria vehiculului (A-H). Tarifele sunt stabilite în euro prin
+                lege și se achită în lei, la cursul de referință (ianuarie 2026: 1 EUR ≈ 5,10 lei). Cele mai folosite
+                sunt categoriile A (autoturisme) și B (marfă ≤ 3,5 t):
+              </p>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Perioadă</th>
+                    <th>Categoria A (autoturism)</th>
+                    <th>Categoria B (marfă ≤ 3,5 t)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {TARIFE_AB.map((t) => (
+                    <tr key={t.p}>
+                      <td>{t.p}</td>
+                      <td>{t.a}</td>
+                      <td>{t.b}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <p className="text-sm text-neutral-500">
+                Pentru categoriile de marfă și transport persoane peste 3,5 t (C-H), tariful crește în funcție de masă
+                și numărul de axe. <strong>Atenție:</strong> de la 1 iulie 2026 tarifele se schimbă, diferențiate pe
+                norma de poluare (Euro). Vezi prețul exact la finalizarea comenzii.
               </p>
             </div>
           </div>
