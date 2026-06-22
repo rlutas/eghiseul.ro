@@ -1,0 +1,14 @@
+{
+  "//": "Template MCP la nivel de proiect (reproductibil pt echipă). Copiază în .mcp.json și completează. NU comite secrete — folosește ${ENV_VAR}. Vezi docs/claude-code-setup.md.",
+  "//note": "Momentan MCP-urile vin din pluginuri globale (supabase/stripe/vercel/github/playwright/context7). Acest fișier e pt reproductibilitate dacă vrei config în repo. Pornit doar dacă îl redenumești în .mcp.json.",
+  "mcpServers": {
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp@latest"]
+    },
+    "playwright": {
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp@latest"]
+    }
+  }
+}
