@@ -1,139 +1,103 @@
-'use client';
-
-import { useState } from 'react';
-import { ChevronLeft, ChevronRight, Quote, Star } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Star, MessageSquare, Users, PenLine, ArrowUpRight } from 'lucide-react';
 import { REVIEWS } from '@/config/reviews';
-import { GOOGLE_REVIEWS_URL } from '@/config/contact';
+import { GOOGLE_REVIEWS_URL, GOOGLE_REVIEW_WRITE_URL, GOOGLE_RATING } from '@/config/contact';
 
-// Real Google reviews (config/reviews.ts) — name + relative time, verbatim text.
-const testimonials = REVIEWS.map((r) => ({
-  name: r.name,
-  when: r.when,
-  content: r.text,
-  rating: r.rating,
-  avatar: r.name
-    .split(' ')
-    .map((w) => w[0])
-    .filter(Boolean)
-    .slice(0, 2)
-    .join('')
-    .toUpperCase(),
-}));
+const STATS = [
+  { icon: Star, value: `${GOOGLE_RATING}/5`, label: 'Rating mediu' },
+  { icon: MessageSquare, value: '400+', label: 'Recenzii Google' },
+  { icon: Users, value: '150k+', label: 'Clienți mulțumiți' },
+];
+
+const FEATURED = REVIEWS.slice(0, 6);
+
+function initials(name: string) {
+  return name.split(' ').filter(Boolean).slice(0, 2).map((w) => w[0]).join('').toUpperCase();
+}
 
 export function TestimonialsSection() {
-  const [currentIndex, setCurrentIndex] = useState(0);
-
-  const nextSlide = () => {
-    setCurrentIndex((prev) => (prev + 1) % Math.ceil(testimonials.length / 3));
-  };
-
-  const prevSlide = () => {
-    setCurrentIndex((prev) =>
-      prev === 0 ? Math.ceil(testimonials.length / 3) - 1 : prev - 1
-    );
-  };
-
-  const visibleTestimonials = testimonials.slice(
-    currentIndex * 3,
-    currentIndex * 3 + 3
-  );
-
   return (
-    <section className="py-16 lg:py-24 bg-white">
-      <div className="container mx-auto px-4 max-w-[1100px]">
+    <section className="relative overflow-hidden bg-gradient-to-b from-secondary-900 to-[#0a1628] py-16 lg:py-20">
+      {/* dot pattern */}
+      <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
+        <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(rgba(236,185,95,0.04) 1px, transparent 1px)', backgroundSize: '30px 30px' }} />
+      </div>
+
+      <div className="relative container mx-auto px-4 max-w-[1200px]">
         {/* Header */}
-        <div className="text-center mb-12 lg:mb-16">
-          <span className="inline-block px-4 py-1.5 bg-primary-100 text-primary-700 text-sm font-semibold rounded-full mb-4">
-            Recenzii verificate
-          </span>
-          <h2 className="text-2xl lg:text-4xl font-extrabold text-secondary-900 mb-4">
-            Ce spun clienții noștri
-          </h2>
-          <div className="flex items-center justify-center gap-2">
-            {[...Array(5)].map((_, i) => (
-              <Star
-                key={i}
-                className="w-6 h-6 text-[#FBBC04] fill-[#FBBC04]"
-              />
+        <div className="text-center mb-12">
+          <p className="text-sm font-bold uppercase tracking-wider text-primary-500 mb-3">Recenzii clienți</p>
+          <h2 className="text-3xl lg:text-[2.25rem] font-extrabold text-white leading-tight mb-4">Ce spun clienții noștri</h2>
+          <p className="text-lg text-white/70 leading-relaxed max-w-[600px] mx-auto">
+            Peste 150.000 de români ne-au acordat încrederea pentru obținerea documentelor oficiale. Iată ce spun
+            despre experiența lor.
+          </p>
+
+          {/* Stats */}
+          <div className="flex items-center justify-center gap-4 sm:gap-10 mt-8">
+            {STATS.map((s, i) => (
+              <div key={s.label} className="flex items-center gap-4 sm:gap-10">
+                <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3 text-center sm:text-left">
+                  <span className="flex h-9 w-9 sm:h-12 sm:w-12 items-center justify-center rounded-xl bg-primary-500/10">
+                    <s.icon className="h-4 w-4 sm:h-6 sm:w-6 text-primary-500" aria-hidden="true" />
+                  </span>
+                  <span>
+                    <strong className="block text-base sm:text-[22px] font-extrabold text-white leading-none">{s.value}</strong>
+                    <span className="text-[10px] sm:text-[13px] text-white/60">{s.label}</span>
+                  </span>
+                </div>
+                {i < STATS.length - 1 && <span className="h-9 sm:h-10 w-px bg-white/15" aria-hidden="true" />}
+              </div>
             ))}
-            <span className="text-lg font-bold text-secondary-900 ml-2">4.9/5</span>
-            <a
-              href={GOOGLE_REVIEWS_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-neutral-500 hover:text-primary-700 underline-offset-2 hover:underline transition-colors"
-            >
-              • 450+ recenzii pe Google
-            </a>
           </div>
         </div>
 
-        {/* Testimonials Grid */}
-        <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
-          {visibleTestimonials.map((testimonial, index) => (
+        {/* Reviews grid */}
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {FEATURED.map((r) => (
             <div
-              key={index}
-              className="bg-neutral-50 rounded-2xl p-6 border border-neutral-100 hover:border-primary-200 hover:shadow-lg transition-all duration-300"
+              key={r.name + r.when}
+              className="flex flex-col rounded-2xl border border-white/10 bg-white/[0.05] p-6 hover:border-primary-500/30 hover:bg-white/[0.08] transition-all duration-300"
             >
-              {/* Quote Icon */}
-              <div className="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center mb-4">
-                <Quote className="w-5 h-5 text-primary-600" />
-              </div>
-
-              {/* Content */}
-              <p className="text-secondary-700 leading-relaxed mb-6">
-                &ldquo;{testimonial.content}&rdquo;
-              </p>
-
-              {/* Rating */}
-              <div className="flex gap-1 mb-4">
-                {[...Array(testimonial.rating)].map((_, i) => (
-                  <Star
-                    key={i}
-                    className="w-4 h-4 text-[#FBBC04] fill-[#FBBC04]"
-                  />
+              <div className="flex gap-0.5 mb-3">
+                {Array.from({ length: r.rating }).map((_, i) => (
+                  <Star key={i} className="h-4 w-4 fill-primary-500 text-primary-500" aria-hidden="true" />
                 ))}
               </div>
-
-              {/* Author */}
+              <p className="flex-1 text-[15px] leading-relaxed text-white/85 mb-5">„{r.text}”</p>
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-primary-500 rounded-full flex items-center justify-center">
-                  <span className="text-secondary-900 font-bold text-sm">
-                    {testimonial.avatar}
-                  </span>
-                </div>
-                <div>
-                  <p className="font-semibold text-secondary-900">
-                    {testimonial.name}
-                  </p>
-                  <p className="text-sm text-neutral-500">
-                    Recenzie Google • {testimonial.when}
-                  </p>
-                </div>
+                <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-primary-500/20 text-sm font-bold text-primary-400">
+                  {initials(r.name)}
+                </span>
+                <span className="min-w-0">
+                  <strong className="block truncate text-sm font-semibold text-white">{r.name}</strong>
+                  <span className="text-xs text-white/50">{r.when} · Google</span>
+                </span>
               </div>
             </div>
           ))}
         </div>
 
-        {/* Navigation */}
-        <div className="flex justify-center gap-3 mt-8">
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={prevSlide}
-            className="rounded-full border-neutral-200 hover:border-primary-300 hover:bg-primary-50"
-          >
-            <ChevronLeft className="w-5 h-5" />
-          </Button>
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={nextSlide}
-            className="rounded-full border-neutral-200 hover:border-primary-300 hover:bg-primary-50"
-          >
-            <ChevronRight className="w-5 h-5" />
-          </Button>
+        {/* CTA */}
+        <div className="mt-12 border-t border-white/10 pt-10 text-center">
+          <p className="text-white/70 mb-6">Vrei să vezi toate recenziile sau să lași propria părere?</p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <a
+              href={GOOGLE_REVIEW_WRITE_URL}
+              target="_blank"
+              rel="noopener"
+              className="inline-flex w-full sm:w-auto items-center justify-center gap-2.5 rounded-xl bg-primary-500 px-8 py-4 font-bold text-secondary-900 hover:bg-primary-600 hover:-translate-y-0.5 hover:shadow-[0_6px_20px_rgba(236,185,95,0.3)] transition-all"
+            >
+              <PenLine className="h-[18px] w-[18px]" aria-hidden="true" /> Lasă o recenzie pe Google
+            </a>
+            <a
+              href={GOOGLE_REVIEWS_URL}
+              target="_blank"
+              rel="noopener"
+              className="inline-flex w-full sm:w-auto items-center justify-center gap-2.5 rounded-xl border-2 border-white/30 px-8 py-4 font-bold text-white hover:bg-white/10 hover:border-white/50 transition-all"
+            >
+              Vezi toate recenziile <ArrowUpRight className="h-[18px] w-[18px]" aria-hidden="true" />
+            </a>
+          </div>
         </div>
       </div>
     </section>

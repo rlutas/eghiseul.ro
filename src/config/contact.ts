@@ -28,6 +28,8 @@ export function whatsappUrl(message: string = WHATSAPP_DEFAULT_MSG): string {
 
 /** Public Google Business Profile (reviews) share link. */
 export const GOOGLE_REVIEWS_URL = 'https://share.google/stngA2rQbVPY2l57p';
+/** Direct "write a review" link (Google g.page). */
+export const GOOGLE_REVIEW_WRITE_URL = 'https://g.page/r/CSfYKsVLbx7PEBM/review';
 
 export const GOOGLE_RATING = 4.9;
 /** Display label — kept as "peste 450" so we never have to update an exact count. */
