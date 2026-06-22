@@ -219,4 +219,18 @@ export const ARTICLES: ArticleMeta[] = [
     category: 'Stare civilă',
     image: '/og/services/certificat-casatorie.png',
   },
+  {
+    slug: 'acte-necesare-casatorie',
+    title: 'Acte Necesare Căsătorie: Dosarul Complet la Starea Civilă',
+    excerpt: 'Declarația cu 10 zile înainte, certificatele medicale (valabile 14 zile) și restul actelor. Vezi lista completă.',
+    category: 'Stare civilă',
+    image: '/og/services/certificat-casatorie.png',
+  },
+  {
+    slug: 'inregistrare-nastere-copil-nou-nascut',
+    title: 'Înregistrarea Nașterii Copilului: Termen, Acte și Primul Certificat',
+    excerpt: 'Termen legal de 30 de zile, actele necesare și cum obții primul certificat de naștere (gratuit) + CNP-ul.',
+    category: 'Stare civilă',
+    image: '/og/services/certificat-nastere.png',
+  },
 ];

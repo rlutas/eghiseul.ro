@@ -1006,6 +1006,247 @@ const RAW_CITIES: CityData[] = [
     ],
     nearbyCitySlugs: ['bucuresti', 'ploiesti'],
   },
+  {
+    slug: 'targu-jiu',
+    name: 'Târgu Jiu',
+    judet: 'Gorj',
+    judetAbbr: 'gj',
+    population: '78.000 locuitori',
+    localAnchors: ['Ansamblul monumental Brâncuși', 'Complexul Energetic Oltenia (CEO)', 'spitalele și unitățile de învățământ din Târgu Jiu'],
+    ipj: {
+      name: 'Serviciul Cazier Judiciar, Statistică și Evidențe Operative — IPJ Gorj',
+      address: 'Str. Traian nr. 2, Târgu Jiu, jud. Gorj',
+      phone: '0253 221 581',
+      website: 'https://gj.politiaromana.ro/ro/utile/documente-eliberari-acte/cazier-judiciar',
+      schedule: { 'Luni': '08:30-12:30, 13:30-16:00', 'Marți': '08:30-12:30, 13:30-16:00', 'Miercuri': '08:30-12:30, 13:30-18:00', 'Joi': '08:30-12:30, 13:30-16:00', 'Vineri': '08:30-12:30' },
+    },
+    localContext:
+      'Târgu Jiu, reședința județului Gorj și orașul lui Brâncuși, este un important centru al ' +
+      'industriei energetice din Oltenia. Cazierul judiciar este cerut frecvent în Târgu Jiu pentru ' +
+      'angajări la Complexul Energetic Oltenia, în mediul bugetar și pentru dosare de licitație.',
+    localFaq: [
+      { q: 'Unde se eliberează cazierul judiciar în Târgu Jiu?', a: 'La Serviciul Cazier Judiciar din IPJ Gorj, pe Str. Traian nr. 2. Sau online prin eGhișeul.ro, cu livrare prin curier.' },
+      { q: 'Care e programul cu publicul pentru cazier la IPJ Gorj?', a: 'De regulă luni-joi 08:30-12:30 și 13:30-16:00 (miercuri până la 18:00), vineri 08:30-12:30. Prin eGhișeul.ro eviți programul ghișeului.' },
+    ],
+    nearbyCitySlugs: ['ramnicu-valcea', 'drobeta-turnu-severin'],
+  },
+  {
+    slug: 'piatra-neamt',
+    name: 'Piatra Neamț',
+    judet: 'Neamț',
+    judetAbbr: 'nt',
+    population: '85.000 locuitori',
+    localAnchors: ['platforma industrială și firmele din zona Piatra Neamț', 'spitalul județean', 'unitățile de turism din Cheile Bicazului'],
+    ipj: {
+      name: 'Serviciul Cazier Judiciar, Statistică și Evidențe Operative — IPJ Neamț',
+      address: 'Str. Alexandru cel Bun nr. 12, Piatra Neamț, jud. Neamț',
+      phone: '0233 207 000',
+      website: 'https://nt.politiaromana.ro/ro/utile/documente-eliberari-acte',
+      schedule: { 'Luni': '08:30-12:00, 14:00-16:00', 'Marți': '08:30-12:00, 14:00-16:00', 'Miercuri': '08:30-12:00, 14:00-16:00', 'Joi': '08:30-12:00, 14:00-17:00', 'Vineri': '08:30-12:00' },
+    },
+    localContext:
+      'Piatra Neamț, reședința județului Neamț, este o poartă turistică spre Cheile Bicazului și un ' +
+      'centru economic al Moldovei. Locuitorii din Piatra Neamț au nevoie de cazier judiciar pentru ' +
+      'angajări, pentru activități de turism și pentru dosare în mediul bugetar.',
+    localFaq: [
+      { q: 'Unde obțin cazierul judiciar în Piatra Neamț?', a: 'La ghișeul de cazier al IPJ Neamț, pe Str. Alexandru cel Bun nr. 12 (sediul cu publicul). Sau online prin eGhișeul.ro.' },
+      { q: 'Pot obține cazierul din Piatra Neamț dacă sunt plecat din oraș?', a: 'Da. Depunem cererea prin împuternicire la IPJ Neamț și îți trimitem cazierul prin curier oriunde te afli.' },
+    ],
+    nearbyCitySlugs: ['bacau', 'suceava'],
+  },
+  {
+    slug: 'slatina',
+    name: 'Slatina',
+    judet: 'Olt',
+    judetAbbr: 'ot',
+    population: '70.000 locuitori',
+    localAnchors: ['combinatul de aluminiu Alro', 'platforma industrială Slatina', 'spitalul județean Olt'],
+    ipj: {
+      name: 'Serviciul Cazier Judiciar, Statistică și Evidențe Operative — IPJ Olt',
+      address: 'Str. Mihai Eminescu nr. 19, Slatina, jud. Olt',
+      postalCode: '230116',
+      phone: '0249 406 500',
+      website: 'https://ot.politiaromana.ro/ro/utile/cazier-judiciar',
+      schedule: { 'Luni': '08:30-12:00, 13:30-15:00', 'Marți': '08:30-12:00, 13:30-15:00', 'Miercuri': '08:30-12:00, 13:30-15:00', 'Joi': '08:30-12:00, 13:30-15:00', 'Vineri': '08:30-12:00, 13:00-14:00' },
+    },
+    localContext:
+      'Slatina, reședința județului Olt, este un puternic centru al industriei aluminiului (Alro) ' +
+      'din sudul țării. Cazierul judiciar este cerut în Slatina pentru angajări pe platforma ' +
+      'industrială, în sistemul bugetar și pentru dosare de licitație publică.',
+    localFaq: [
+      { q: 'Unde se eliberează cazierul judiciar în Slatina?', a: 'La Serviciul Cazier Judiciar din IPJ Olt, pe Str. Mihai Eminescu nr. 19. Sau online prin eGhișeul.ro, cu livrare prin curier.' },
+      { q: 'Cât durează să obțin cazierul în Slatina prin eGhișeul.ro?', a: 'În mod standard 2-4 zile lucrătoare: depunem cererea la IPJ Olt în numele tău și primești documentul prin curier.' },
+    ],
+    nearbyCitySlugs: ['craiova', 'pitesti'],
+  },
+  {
+    slug: 'satu-mare',
+    name: 'Satu Mare',
+    judet: 'Satu Mare',
+    judetAbbr: 'sm',
+    population: '102.000 locuitori',
+    localAnchors: ['firmele din parcurile industriale Satu Mare', 'spitalul județean', 'instituțiile transfrontaliere (granița cu Ungaria)'],
+    ipj: {
+      name: 'Serviciul Cazier Judiciar, Statistică și Evidențe Operative — IPJ Satu Mare',
+      address: 'Str. Mircea cel Bătrân nr. 3, Satu Mare, jud. Satu Mare',
+      phone: '0261 807 777',
+      website: 'https://sm.politiaromana.ro/ro/utile/program-ghiseu-cazier',
+      schedule: { 'Luni': '09:00-13:00', 'Marți': '09:00-13:00', 'Miercuri': '09:00-13:00', 'Joi': '09:00-12:00, 14:30-15:30', 'Vineri': '09:00-13:00' },
+    },
+    localContext:
+      'Satu Mare, reședința județului cu același nume, este un important oraș transfrontalier la ' +
+      'granița cu Ungaria, cu parcuri industriale active. Cazierul judiciar este cerut în Satu Mare ' +
+      'pentru angajări, pentru lucrul în străinătate și pentru dosare în mediul bugetar.',
+    localFaq: [
+      { q: 'Unde obțin cazierul judiciar în Satu Mare?', a: 'La ghișeul de cazier al IPJ Satu Mare, pe Str. Mircea cel Bătrân nr. 3. Sau online prin eGhișeul.ro.' },
+      { q: 'Pot obține cazierul din Satu Mare pentru un loc de muncă în străinătate?', a: 'Da. Îl obținem la IPJ Satu Mare și, la cerere, gestionăm apostila și traducerea autorizată necesare în străinătate.' },
+    ],
+    nearbyCitySlugs: ['oradea', 'baia-mare'],
+  },
+  {
+    slug: 'ilfov',
+    name: 'Ilfov',
+    judet: 'Ilfov',
+    judetAbbr: 'if',
+    population: '540.000 locuitori (județ)',
+    localAnchors: ['platformele logistice și depozitele din jurul Bucureștiului', 'orașele Voluntari, Buftea, Otopeni, Pantelimon'],
+    ipj: {
+      name: 'Serviciul Cazier Judiciar, Statistică și Evidențe Operative — IPJ Ilfov',
+      address: 'Șos. Fabrica de Glucoză nr. 7, sector 2, București',
+      phone: '021 232 98 35',
+      website: 'https://if.politiaromana.ro/ro/utile/program-si-documente-eliberari-acte',
+      schedule: { 'Luni': '08:30-12:00', 'Marți': '08:30-12:00, 14:00-16:00', 'Miercuri': '08:30-12:00', 'Joi': '08:30-12:00, 14:00-16:00', 'Vineri': '08:30-12:00' },
+    },
+    localContext:
+      'Județul Ilfov înconjoară Bucureștiul și concentrează cele mai mari platforme logistice și ' +
+      'rezidențiale din jurul Capitalei. Pentru locuitorii din Ilfov (Voluntari, Buftea, Otopeni, ' +
+      'Pantelimon), ghișeul de cazier al IPJ Ilfov este în București, sector 2, pe Șos. Fabrica de Glucoză.',
+    localFaq: [
+      { q: 'Unde se eliberează cazierul judiciar pentru locuitorii din Ilfov?', a: 'La Serviciul Cazier Judiciar al IPJ Ilfov, situat în București, sector 2, pe Șos. Fabrica de Glucoză nr. 7. Sau online prin eGhișeul.ro.' },
+      { q: 'Locuiesc în Ilfov — pot obține cazierul fără să merg până la ghișeu?', a: 'Da. Prin eGhișeul.ro depunem cererea la IPJ Ilfov în numele tău și primești documentul prin curier în Voluntari, Buftea, Otopeni sau oriunde în județ.' },
+    ],
+    nearbyCitySlugs: ['bucuresti', 'giurgiu'],
+  },
+  {
+    slug: 'turda',
+    name: 'Turda',
+    judet: 'Cluj',
+    judetAbbr: 'cj',
+    population: '47.000 locuitori',
+    localAnchors: ['Salina Turda', 'fabricile și firmele din zona Turda-Câmpia Turzii'],
+    officeNote:
+      'Turda nu are un ghișeu de cazier propriu: locuitorii se adresează Serviciului Cazier Judiciar ' +
+      'din cadrul IPJ Cluj, în Cluj-Napoca, pe Str. Decebal nr. 26. Prin eGhișeul.ro eviți deplasarea.',
+    localContext:
+      'Turda este al doilea oraș al județului Cluj, cunoscut pentru Salina Turda și pentru zona ' +
+      'industrială Turda-Câmpia Turzii. Locuitorii din Turda au nevoie de cazier judiciar pentru ' +
+      'angajări, pentru activități turistice și pentru dosare în mediul bugetar.',
+    localFaq: [
+      { q: 'Unde obțin cazierul judiciar dacă locuiesc în Turda?', a: 'Cazierul se eliberează la IPJ Cluj, în Cluj-Napoca — Turda nu are ghișeu propriu. Alternativ, prin eGhișeul.ro depui cererea online, cu livrare prin curier la Turda.' },
+      { q: 'Pot evita drumul până la Cluj-Napoca pentru cazier?', a: 'Da. Depunem cererea prin împuternicire la IPJ Cluj și îți trimitem cazierul prin curier la Turda, fără să te deplasezi.' },
+    ],
+    nearbyCitySlugs: ['cluj-napoca', 'targu-mures'],
+  },
+  {
+    slug: 'medias',
+    name: 'Mediaș',
+    judet: 'Sibiu',
+    judetAbbr: 'sb',
+    population: '47.000 locuitori',
+    localAnchors: ['fostele platforme Romgaz și industria locală', 'centrul istoric medieval Mediaș'],
+    officeNote:
+      'Mediaș nu are un ghișeu de cazier propriu: locuitorii se adresează Serviciului Cazier Judiciar ' +
+      'din cadrul IPJ Sibiu, în municipiul Sibiu. Prin eGhișeul.ro depui cererea online, fără deplasare.',
+    localContext:
+      'Mediaș este al doilea oraș al județului Sibiu, un centru istoric și industrial legat de ' +
+      'sectorul gazelor naturale. Locuitorii din Mediaș au nevoie de cazier judiciar pentru angajări ' +
+      'în industrie, în mediul bugetar și pentru dosare de licitație.',
+    localFaq: [
+      { q: 'Unde obțin cazierul judiciar dacă locuiesc în Mediaș?', a: 'La IPJ Sibiu, în municipiul Sibiu — Mediaș nu are ghișeu propriu. Alternativ, prin eGhișeul.ro depui cererea online și primești documentul prin curier la Mediaș.' },
+      { q: 'Pot obține cazierul din Mediaș fără drum la Sibiu?', a: 'Da. Depunem cererea prin împuternicire la IPJ Sibiu și îți trimitem cazierul prin curier la Mediaș.' },
+    ],
+    nearbyCitySlugs: ['sibiu', 'brasov'],
+  },
+  {
+    slug: 'lugoj',
+    name: 'Lugoj',
+    judet: 'Timiș',
+    judetAbbr: 'tm',
+    population: '40.000 locuitori',
+    localAnchors: ['firmele din zona industrială Lugoj', 'instituțiile de pe valea Timișului'],
+    officeNote:
+      'Lugoj nu are un ghișeu de cazier propriu: locuitorii se adresează Serviciului Cazier Judiciar ' +
+      'din cadrul IPJ Timiș, în Timișoara. Prin eGhișeul.ro eviți deplasarea între orașe.',
+    localContext:
+      'Lugoj este un important oraș secundar al județului Timiș, pe valea Timișului, cu o zonă ' +
+      'industrială activă. Locuitorii din Lugoj au nevoie de cazier judiciar pentru angajări, pentru ' +
+      'lucrul în străinătate și pentru dosare în mediul bugetar.',
+    localFaq: [
+      { q: 'Unde obțin cazierul judiciar dacă locuiesc în Lugoj?', a: 'La IPJ Timiș, în Timișoara — Lugoj nu are ghișeu propriu. Alternativ, prin eGhișeul.ro depui cererea online, cu livrare prin curier la Lugoj.' },
+      { q: 'Pot obține cazierul din Lugoj fără drum la Timișoara?', a: 'Da. Depunem cererea prin împuternicire la IPJ Timiș și îți trimitem cazierul prin curier la Lugoj.' },
+    ],
+    nearbyCitySlugs: ['timisoara', 'resita'],
+  },
+  {
+    slug: 'barlad',
+    name: 'Bârlad',
+    judet: 'Vaslui',
+    judetAbbr: 'vs',
+    population: '54.000 locuitori',
+    localAnchors: ['platforma industrială Bârlad (rulmenți, componente auto)', 'liceele și spitalul municipal'],
+    officeNote:
+      'Bârlad nu are un ghișeu de cazier propriu: locuitorii se adresează Serviciului Cazier Judiciar ' +
+      'din cadrul IPJ Vaslui, în municipiul Vaslui. Prin eGhișeul.ro depui cererea online, fără deplasare.',
+    localContext:
+      'Bârlad este cel mai mare municipiu al județului Vaslui, cu o tradiție industrială în ' +
+      'producția de rulmenți și componente auto. Locuitorii din Bârlad au nevoie de cazier judiciar ' +
+      'pentru angajări pe platforma industrială și pentru dosare în mediul bugetar.',
+    localFaq: [
+      { q: 'Unde obțin cazierul judiciar dacă locuiesc în Bârlad?', a: 'La IPJ Vaslui, în municipiul Vaslui — Bârlad nu are ghișeu propriu. Alternativ, prin eGhișeul.ro depui cererea online, cu livrare prin curier la Bârlad.' },
+      { q: 'Pot obține cazierul din Bârlad fără drum la Vaslui?', a: 'Da. Depunem cererea prin împuternicire la IPJ Vaslui și îți trimitem cazierul prin curier la Bârlad.' },
+    ],
+    nearbyCitySlugs: ['vaslui', 'galati'],
+  },
+  {
+    slug: 'sebes',
+    name: 'Sebeș',
+    judet: 'Alba',
+    judetAbbr: 'ab',
+    population: '27.000 locuitori',
+    localAnchors: ['fabricile auto și de procesare a lemnului (Kronospan, Cupru)', 'centrul istoric Sebeș'],
+    officeNote:
+      'Sebeș nu are un ghișeu de cazier propriu: locuitorii se adresează Serviciului Cazier Judiciar ' +
+      'din cadrul IPJ Alba, în Alba Iulia. Prin eGhișeul.ro depui cererea online, fără deplasare.',
+    localContext:
+      'Sebeș este unul dintre cele mai dinamice orașe industriale ale județului Alba, cu fabrici ' +
+      'auto și de procesare a lemnului. Locuitorii din Sebeș au nevoie de cazier judiciar mai ales ' +
+      'pentru angajări în fabricile din zonă și pentru dosare în mediul bugetar.',
+    localFaq: [
+      { q: 'Unde obțin cazierul judiciar dacă locuiesc în Sebeș?', a: 'La IPJ Alba, în Alba Iulia — Sebeș nu are ghișeu propriu. Alternativ, prin eGhișeul.ro depui cererea online, cu livrare prin curier la Sebeș.' },
+      { q: 'Pot obține cazierul din Sebeș fără drum la Alba Iulia?', a: 'Da. Depunem cererea prin împuternicire la IPJ Alba și îți trimitem cazierul prin curier la Sebeș.' },
+    ],
+    nearbyCitySlugs: ['alba-iulia', 'sibiu'],
+  },
+  {
+    slug: 'onesti',
+    name: 'Onești',
+    judet: 'Bacău',
+    judetAbbr: 'bc',
+    population: '39.000 locuitori',
+    localAnchors: ['platforma chimică și industrială Onești', 'baza sportivă (gimnastică) și liceele'],
+    officeNote:
+      'Onești nu are un ghișeu de cazier propriu: locuitorii se adresează Serviciului Cazier Judiciar ' +
+      'din cadrul IPJ Bacău, în municipiul Bacău. Prin eGhișeul.ro eviți deplasarea între orașe.',
+    localContext:
+      'Onești este unul dintre cele mai mari orașe ale județului Bacău, cu o tradiție industrială și ' +
+      'sportivă recunoscută. Locuitorii din Onești au nevoie de cazier judiciar pentru angajări pe ' +
+      'platforma industrială, în sistemul bugetar și pentru dosare sportive.',
+    localFaq: [
+      { q: 'Unde obțin cazierul judiciar dacă locuiesc în Onești?', a: 'La IPJ Bacău, în municipiul Bacău — Onești nu are ghișeu propriu. Alternativ, prin eGhișeul.ro depui cererea online, cu livrare prin curier la Onești.' },
+      { q: 'Pot obține cazierul din Onești fără drum la Bacău?', a: 'Da. Depunem cererea prin împuternicire la IPJ Bacău și îți trimitem cazierul prin curier la Onești.' },
+    ],
+    nearbyCitySlugs: ['bacau', 'piatra-neamt'],
+  },
 ];
 
 /** Orașele validate anti-thin. Importă DOAR de aici (sau prin `index.ts`). */

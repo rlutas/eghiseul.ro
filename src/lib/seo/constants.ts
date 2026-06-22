@@ -175,6 +175,8 @@ export const HARDCODED_ARTICLE_SLUGS = [
   'duplicat-certificat-de-nastere',
   'transcriere-certificat-de-nastere',
   'duplicat-certificat-de-casatorie',
+  'acte-necesare-casatorie',
+  'inregistrare-nastere-copil-nou-nascut',
 ] as const;
 
 /** Organization-wide metadata for Schema.org Organization node.
