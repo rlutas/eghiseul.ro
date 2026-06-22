@@ -107,25 +107,25 @@ const TOOLS: McpTool[] = [
 
 export function WebMcpTools() {
   useEffect(() => {
+    // Namespace neașezat încă: exemplele canonice folosesc document.modelContext,
+    // WebIDL folosește navigator.modelContext — detectăm ambele.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const mc = (navigator as any)?.modelContext;
+    const mc = (document as any)?.modelContext || (navigator as any)?.modelContext;
     if (!mc || typeof mc.registerTool !== 'function') return;
-    const handles: unknown[] = [];
+    // Dezînregistrare prin AbortSignal (forma corectă din spec), nu handle.unregister.
+    const controller = new AbortController();
     for (const tool of TOOLS) {
       try {
-        handles.push(mc.registerTool(tool));
+        mc.registerTool({ ...tool, annotations: { readOnlyHint: true } }, { signal: controller.signal });
       } catch {
-        /* API experimentală — ignoră dacă forma diferă */
+        /* API experimentală (origin trial) — ignoră dacă forma diferă */
       }
     }
     return () => {
-      for (const h of handles) {
-        try {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          (h as any)?.unregister?.();
-        } catch {
-          /* ignore */
-        }
+      try {
+        controller.abort();
+      } catch {
+        /* ignore */
       }
     };
   }, []);
