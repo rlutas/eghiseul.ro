@@ -115,6 +115,8 @@ export const HARDCODED_CALCULATOR_SLUGS: readonly string[] = [
   'taxe-notariale',
   'pensie-alimentara',
   'termene-judiciare',
+  'dividende',
+  'taxe-srl',
 ];
 
 /** Tools pages (ported from WP /tools/*). */

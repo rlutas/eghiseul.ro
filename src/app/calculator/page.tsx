@@ -91,6 +91,14 @@ const CATALOG: Record<string, { title: string; desc: string }> = {
     title: 'Calculator Termene Judiciare',
     desc: 'Termene procedurale pe zile, săptămâni, luni sau ani (Cod Proc. Civilă/Penală), cu sărbători legale.',
   },
+  dividende: {
+    title: 'Calculator Dividende',
+    desc: 'Impozit pe dividende 16% (2026) + CASS pe plafoane; suma netă încasată.',
+  },
+  'taxe-srl': {
+    title: 'Calculator Taxe SRL',
+    desc: 'Micro 1% sau profit 16% + impozit dividende și CASS; câți bani rămân în mână.',
+  },
 };
 
 export default function Page() {

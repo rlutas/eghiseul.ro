@@ -22,6 +22,8 @@ import {
   Landmark,
   HeartHandshake,
   Gavel,
+  Coins,
+  Building2,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -53,6 +55,8 @@ export const CALCULATORS_NAV: CalculatorNavGroup[] = [
     category: 'Fiscal',
     items: [
       { name: 'TVA', href: '/calculator/tva/', icon: Percent },
+      { name: 'Dividende', href: '/calculator/dividende/', icon: Coins },
+      { name: 'Taxe SRL', href: '/calculator/taxe-srl/', icon: Building2 },
       { name: 'Impozit auto', href: '/calculator/calculator-impozit-auto/', icon: Car },
       { name: 'Impozit pe chirie', href: '/calculator/impozit-chirie/', icon: Home },
       { name: 'Penalități ANAF', href: '/calculator/penalitati-anaf/', icon: FileWarning },
