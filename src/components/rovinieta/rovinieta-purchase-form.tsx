@@ -120,9 +120,9 @@ export function RovinietaPurchaseForm() {
       </form>
 
       <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 mt-6 pt-5 border-t border-neutral-100">
-        <span className="flex items-center gap-1.5 text-xs font-medium text-neutral-600"><Lock className="h-4 w-4 text-primary-600" /> Securizat</span>
-        <span className="flex items-center gap-1.5 text-xs font-medium text-neutral-600"><BadgeCheck className="h-4 w-4 text-primary-600" /> Oficial CNAIR</span>
-        <span className="flex items-center gap-1.5 text-xs font-medium text-neutral-600"><Zap className="h-4 w-4 text-primary-600" /> Activare instant</span>
+        <span className="flex items-center gap-1.5 text-xs font-medium text-neutral-600"><Lock className="h-4 w-4 text-primary-600" aria-hidden="true" /> Securizat</span>
+        <span className="flex items-center gap-1.5 text-xs font-medium text-neutral-600"><BadgeCheck className="h-4 w-4 text-primary-600" aria-hidden="true" /> Oficial CNAIR</span>
+        <span className="flex items-center gap-1.5 text-xs font-medium text-neutral-600"><Zap className="h-4 w-4 text-primary-600" aria-hidden="true" /> Activare instant</span>
       </div>
     </div>
   );

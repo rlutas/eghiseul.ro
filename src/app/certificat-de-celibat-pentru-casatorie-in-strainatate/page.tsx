@@ -8,7 +8,7 @@ const DESCRIPTION =
   'Te căsătorești în străinătate? Vezi cum obții certificatul de celibat (Anexa 9), apostila de la Prefectură și traducerea legalizată — pas cu pas, fără drum în țară.';
 const DATE_PUBLISHED = '2026-06-22';
 const DATE_MODIFIED = '2026-06-22';
-const OGIMAGE = '/og/services/certificat-nastere.png';
+const OGIMAGE = '/og/services/certificat-celibat.png';
 const CATEGORY = 'Stare civilă';
 
 export const revalidate = 86400;

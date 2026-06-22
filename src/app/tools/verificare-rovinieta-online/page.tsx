@@ -26,7 +26,7 @@ export const metadata = buildPageMetadata({
   title: TITLE,
   description: DESCRIPTION,
   path: PAGE_PATH,
-  ogImage: '/og/verificare-rovinieta.png',
+  ogImage: '/og/default.png',
 });
 
 const PAGE_URL = `${BASE_URL}${PAGE_PATH}`;

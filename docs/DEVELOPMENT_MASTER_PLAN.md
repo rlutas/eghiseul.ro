@@ -1,5 +1,7 @@
 # eGhiseul.ro - Development Master Plan
 
+> **⚡ Header stale (2026-06-10).** Pentru starea reală vezi [`STATUS_CURRENT.md`](STATUS_CURRENT.md) + [`changelog/`](changelog/). De atunci: ONRC + ANCPI live, 36 calculatoare, expansiune SEO (CF/cazier/ONRC/stare civilă), rovinietă, /tools/.
+
 **Version:** 4.8
 **Last Updated:** 2026-06-10
 **Status:** Sprint 4 In Progress (98%) | Sprint 5 In Progress (98%) | Admin Workflow ✅ | Document Generation ✅ | Multi-Signature ✅ | Contract Preview ✅ | Contract Legal Validity ✅ | Client Downloads ✅ | Extended RBAC ✅ | Number Registry ✅ | Gemini 2.5 Flash ✅ | KYC S3 Upload ✅ | Admin UI Polish ✅ | Review Step Pricing ✅ | Registry Own Page ✅ | User Invite ✅ | Template Placeholders ✅ | CLIENT_DETAILS_BLOCK Legal Format ✅ | KYC Confidence Tracking ✅
@@ -115,7 +117,7 @@
 ### Technical Specifications
 | Document | Locație | Status |
 |----------|---------|--------|
-| **Database Schema** | `docs/technical/database/services-schema.md` | ✅ Complete |
+| **Database Schema** | `docs/technical/database/schema-sprint2.md` | ✅ Complete |
 | **OCR Research** | `docs/technical/ocr-services-privacy-research.md` | ✅ Complete |
 | **Backend Comparison** | `docs/technical/supabase-vs-nestjs-comparison.md` | ✅ Complete |
 | **User Data Persistence** | `docs/technical/specs/user-data-persistence.md` | ✅ Complete |

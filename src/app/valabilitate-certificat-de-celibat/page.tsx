@@ -8,7 +8,7 @@ const DESCRIPTION =
   'Cât e valabil certificatul de celibat (Anexa 9): 6 luni în România și 90 de zile (3 luni) când îl prezinți în străinătate pentru căsătorie. Vezi de ce diferă și ce verifici.';
 const DATE_PUBLISHED = '2026-06-22';
 const DATE_MODIFIED = '2026-06-22';
-const OGIMAGE = '/og/services/certificat-nastere.png';
+const OGIMAGE = '/og/services/certificat-celibat.png';
 
 export const revalidate = 86400;
 

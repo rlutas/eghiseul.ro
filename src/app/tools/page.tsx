@@ -78,7 +78,7 @@ export default function ToolsPage() {
               <span className="text-white/80">Instrumente</span>
             </nav>
             <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-primary-500 text-secondary-900 text-xs font-bold rounded-full mb-4">
-              <Ticket className="w-3.5 h-3.5" /> Gratuite
+              <Ticket className="w-3.5 h-3.5" aria-hidden="true" /> Gratuite
             </span>
             <h1 className="text-3xl sm:text-4xl lg:text-[2.75rem] font-extrabold text-white leading-tight mb-5">
               Instrumente online gratuite
@@ -105,7 +105,7 @@ export default function ToolsPage() {
                   <h2 className="text-lg font-bold text-secondary-900 mb-2">{t.title}</h2>
                   <p className="text-sm text-neutral-600 leading-relaxed mb-4">{t.desc}</p>
                   <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary-700 group-hover:gap-2.5 transition-all">
-                    {t.cta} <ArrowRight className="h-4 w-4" />
+                    {t.cta} <ArrowRight className="h-4 w-4" aria-hidden="true" />
                   </span>
                 </Link>
               ))}
