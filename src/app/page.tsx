@@ -39,17 +39,17 @@ export default function HomePage() {
       {/* 4. De ce eGhișeul — trust & diferențiere */}
       <WhyUsSection />
 
-      {/* 5. Use Cases - When you need us */}
+      {/* 5. Recenzii Google — social proof */}
+      <TestimonialsSection />
+
+      {/* 6. Use Cases - When you need us */}
       <UseCasesSection />
 
-      {/* 5. Pain Points - Problems we solve */}
+      {/* 7. Pain Points - Problems we solve */}
       <PainPointsSection />
 
-      {/* 6. Pricing */}
+      {/* 8. Pricing */}
       <PricingSection />
-
-      {/* 8. Testimonials */}
-      <TestimonialsSection />
 
       {/* 9. FAQ */}
       <FAQSection />
