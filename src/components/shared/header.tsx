@@ -6,7 +6,9 @@ import { usePathname, useRouter } from 'next/navigation';
 import { Menu, X, Phone, User, Settings, FileText, LogOut, ChevronDown, PackageSearch } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ServicesMegaMenu } from '@/components/shared/services-mega-menu';
+import { CalculatorsMegaMenu } from '@/components/shared/calculators-mega-menu';
 import { SERVICES_NAV } from '@/config/services-nav';
+import { CALCULATORS_NAV } from '@/config/calculators-nav';
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet';
 import {
   DropdownMenu,
@@ -42,6 +44,7 @@ export function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [mobileServicesOpen, setMobileServicesOpen] = useState(false);
+  const [mobileCalculatorsOpen, setMobileCalculatorsOpen] = useState(false);
   const [user, setUser] = useState<SupabaseUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   // Defer mounting Radix portals/triggers to after hydration. Radix
@@ -179,6 +182,8 @@ export function Header() {
               {navLinks.map((link) =>
                 link.label === 'Servicii' ? (
                   <ServicesMegaMenu key={link.href} />
+                ) : link.label === 'Calculatoare' ? (
+                  <CalculatorsMegaMenu key={link.href} />
                 ) : (
                   <Link
                     key={link.href}
@@ -380,6 +385,55 @@ export function Header() {
                                 className="mt-3 ml-3 inline-flex items-center gap-1.5 text-sm font-semibold text-primary-700"
                               >
                                 Vezi toate serviciile
+                                <ChevronDown className="h-4 w-4 -rotate-90" />
+                              </Link>
+                            </div>
+                          )}
+                        </div>
+                      ) : link.label === 'Calculatoare' ? (
+                        <div key={link.href} className="flex flex-col">
+                          <button
+                            type="button"
+                            onClick={() => setMobileCalculatorsOpen((v) => !v)}
+                            aria-expanded={mobileCalculatorsOpen}
+                            className="flex items-center justify-between text-base font-semibold px-4 py-4 rounded-xl text-secondary-700 hover:bg-neutral-50 border-l-4 border-l-transparent transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
+                          >
+                            Calculatoare
+                            <ChevronDown
+                              className={cn(
+                                'h-5 w-5 transition-transform duration-200 motion-reduce:transition-none',
+                                mobileCalculatorsOpen && 'rotate-180'
+                              )}
+                            />
+                          </button>
+                          {mobileCalculatorsOpen && (
+                            <div className="pl-3 pb-2">
+                              {CALCULATORS_NAV.map((group) => (
+                                <div key={group.category} className="mt-2">
+                                  <p className="px-3 text-xs font-bold uppercase tracking-wider text-primary-700">
+                                    {group.category}
+                                  </p>
+                                  {group.items.map((item) => (
+                                    <Link
+                                      key={item.href}
+                                      href={item.href}
+                                      onClick={() => setIsMobileMenuOpen(false)}
+                                      className="flex min-h-11 items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-secondary-700 hover:bg-neutral-50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
+                                    >
+                                      <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-primary-50 text-primary-600">
+                                        <item.icon className="h-4 w-4" />
+                                      </span>
+                                      {item.name}
+                                    </Link>
+                                  ))}
+                                </div>
+                              ))}
+                              <Link
+                                href="/calculator/"
+                                onClick={() => setIsMobileMenuOpen(false)}
+                                className="mt-3 ml-3 inline-flex items-center gap-1.5 text-sm font-semibold text-primary-700"
+                              >
+                                Vezi toate calculatoarele
                                 <ChevronDown className="h-4 w-4 -rotate-90" />
                               </Link>
                             </div>
