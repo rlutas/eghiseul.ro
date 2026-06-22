@@ -38,6 +38,8 @@ import {
   UserRound,
   Moon,
   Hourglass,
+  CircleDollarSign,
+  Accessibility,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -69,6 +71,8 @@ export const CALCULATORS_NAV: CalculatorNavGroup[] = [
       { name: 'Concediu paternal', href: '/calculator/concediu-paternal/', icon: UserRound },
       { name: 'Spor noapte / ore supl.', href: '/calculator/spor-salarial/', icon: Moon },
       { name: 'Vârstă de pensionare', href: '/calculator/varsta-pensionare/', icon: Hourglass },
+      { name: 'Estimare pensie', href: '/calculator/estimare-pensie/', icon: CircleDollarSign },
+      { name: 'Pensie de invaliditate', href: '/calculator/pensie-invaliditate/', icon: Accessibility },
     ],
   },
   {

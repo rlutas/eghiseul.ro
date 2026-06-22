@@ -32,6 +32,8 @@ const DESC: Record<string, string> = {
   'concediu-paternal': 'Zilele de concediu paternal (10 + 5 cu curs) și indemnizația.',
   'spor-salarial': 'Spor de noapte, ore suplimentare și muncă în sărbători legale.',
   'varsta-pensionare': 'Vârsta standard de pensionare și data ieșirii (Anexa 5, Legea 360/2023).',
+  'estimare-pensie': 'Cuantumul pensiei: puncte de contributivitate + stabilitate × VPR (81 lei).',
+  'pensie-invaliditate': 'Pensia de invaliditate pe grade (I/II/III) + indemnizația de însoțitor.',
   tva: 'Adaugă sau extrage TVA cu cotele 2026 (21% standard, 11% redus).',
   dividende: 'Impozit pe dividende 16% (2026) + CASS; suma netă încasată.',
   'taxe-srl': 'Micro 1% sau profit 16% + dividende și CASS; câți bani rămân.',

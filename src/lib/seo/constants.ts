@@ -131,6 +131,8 @@ export const HARDCODED_CALCULATOR_SLUGS: readonly string[] = [
   'concediu-paternal',
   'spor-salarial',
   'varsta-pensionare',
+  'estimare-pensie',
+  'pensie-invaliditate',
 ];
 
 /** Tools pages (ported from WP /tools/*). */
