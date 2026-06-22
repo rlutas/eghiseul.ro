@@ -99,6 +99,10 @@ const CATALOG: Record<string, { title: string; desc: string }> = {
     title: 'Calculator Taxe SRL',
     desc: 'Micro 1% sau profit 16% + impozit dividende și CASS; câți bani rămân în mână.',
   },
+  'rambursare-anticipata': {
+    title: 'Calculator Rambursare Anticipată',
+    desc: 'Cât economisești dacă plătești anticipat creditul: reduci durata sau rata.',
+  },
 };
 
 export default function Page() {

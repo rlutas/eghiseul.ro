@@ -24,6 +24,7 @@ import {
   Gavel,
   Coins,
   Building2,
+  PiggyBank,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -60,6 +61,7 @@ export const CALCULATORS_NAV: CalculatorNavGroup[] = [
       { name: 'Impozit auto', href: '/calculator/calculator-impozit-auto/', icon: Car },
       { name: 'Impozit pe chirie', href: '/calculator/impozit-chirie/', icon: Home },
       { name: 'Penalități ANAF', href: '/calculator/penalitati-anaf/', icon: FileWarning },
+      { name: 'Rambursare anticipată', href: '/calculator/rambursare-anticipata/', icon: PiggyBank },
     ],
   },
   {

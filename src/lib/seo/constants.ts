@@ -117,6 +117,7 @@ export const HARDCODED_CALCULATOR_SLUGS: readonly string[] = [
   'termene-judiciare',
   'dividende',
   'taxe-srl',
+  'rambursare-anticipata',
 ];
 
 /** Tools pages (ported from WP /tools/*). */
