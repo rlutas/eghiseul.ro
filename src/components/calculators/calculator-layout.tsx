@@ -21,6 +21,10 @@ export interface CalculatorLayoutProps {
   faqs?: { q: string; a: string }[];
 }
 
+// Toate calculatoarele au fost verificate/actualizate în iunie 2026 (rate 2026).
+const DATE_MODIFIED = '2026-06-22';
+const ACTUALIZAT = 'iunie 2026';
+
 export function CalculatorLayout({
   slug,
   title,
@@ -51,8 +55,22 @@ export function CalculatorLayout({
         url,
         applicationCategory: 'FinanceApplication',
         operatingSystem: 'Web',
+        inLanguage: 'ro-RO',
+        isAccessibleForFree: true,
+        description,
+        dateModified: DATE_MODIFIED,
         offers: { '@type': 'Offer', price: '0', priceCurrency: 'RON' },
         provider: { '@id': `${BASE_URL}/#organization` },
+      },
+      {
+        '@type': 'WebPage',
+        '@id': `${url}#webpage`,
+        url,
+        name: title,
+        inLanguage: 'ro-RO',
+        dateModified: DATE_MODIFIED,
+        breadcrumb: { '@id': `${url}#breadcrumb` },
+        publisher: { '@id': `${BASE_URL}/#organization` },
       },
     ],
   };
@@ -77,7 +95,9 @@ export function CalculatorLayout({
             <nav className="flex items-center gap-2 text-sm text-white/60 mb-6 flex-wrap" aria-label="Breadcrumb">
               <Link href="/" className="hover:text-primary-500 transition-colors">Acasă</Link>
               <ChevronRight className="h-4 w-4" />
-              <span className="text-white/80">Calculatoare</span>
+              <Link href="/calculator/" className="hover:text-primary-500 transition-colors">Calculatoare</Link>
+              <ChevronRight className="h-4 w-4" />
+              <span className="text-white/80">{heading}</span>
             </nav>
             <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-primary-500 text-secondary-900 text-xs font-bold rounded-full mb-4">
               <Calculator className="w-3.5 h-3.5" /> Calculator gratuit
@@ -86,6 +106,7 @@ export function CalculatorLayout({
               {heading}
             </h1>
             <p className="text-lg text-white/85 leading-relaxed">{description}</p>
+            <p className="mt-3 text-sm text-white/55">Actualizat: {ACTUALIZAT} · rate și praguri 2026</p>
           </div>
         </header>
 
