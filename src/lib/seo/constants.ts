@@ -112,6 +112,7 @@ export const HARDCODED_CALCULATOR_SLUGS: readonly string[] = [
   'taxa-judiciara-de-timbru',
   'reabilitare',
   'calculator-procente',
+  'taxe-notariale',
 ];
 
 /** Tools pages (ported from WP /tools/*). */

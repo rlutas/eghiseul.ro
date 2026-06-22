@@ -79,6 +79,10 @@ const CATALOG: Record<string, { title: string; desc: string }> = {
     title: 'Calculator Procente',
     desc: 'X% dintr-o valoare, cât la sută reprezintă un număr din altul, variație procentuală.',
   },
+  'taxe-notariale': {
+    title: 'Calculator Taxe Notariale',
+    desc: 'Onorariu notarial, intabulare, impozit și extras CF pentru vânzare, donație, succesiune, partaj.',
+  },
 };
 
 export default function Page() {

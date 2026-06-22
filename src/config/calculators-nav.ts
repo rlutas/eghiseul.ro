@@ -19,6 +19,7 @@ import {
   ShieldCheck,
   TrafficCone,
   Calculator,
+  Landmark,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -58,6 +59,7 @@ export const CALCULATORS_NAV: CalculatorNavGroup[] = [
   {
     category: 'Juridic & altele',
     items: [
+      { name: 'Taxe notariale', href: '/calculator/taxe-notariale/', icon: Landmark },
       { name: 'Taxă judiciară de timbru', href: '/calculator/taxa-judiciara-de-timbru/', icon: Stamp },
       { name: 'Reabilitare cazier', href: '/calculator/reabilitare/', icon: ShieldCheck },
       { name: 'Amendă circulație + puncte', href: '/calculator/amenda-circulatie/', icon: TrafficCone },
