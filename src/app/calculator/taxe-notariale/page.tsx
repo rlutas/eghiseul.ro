@@ -69,6 +69,56 @@ export default function Page() {
         depășite.
       </p>
 
+      <h2>Grila de onorarii notariale 2026 (vânzare și donație)</h2>
+      <p>
+        Onorariul minim se calculează progresiv pe tranșe de valoare. Sumele de mai jos sunt{' '}
+        <strong>fără TVA</strong> — la total se adaugă TVA 21%.
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>Valoarea tranzacției</th>
+            <th>Onorariu minim (fără TVA)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>până la 20.000 lei</td>
+            <td>2,2% (minim 230 lei)</td>
+          </tr>
+          <tr>
+            <td>20.001 – 35.000 lei</td>
+            <td>440 lei + 1,9% pentru ce depășește 20.000</td>
+          </tr>
+          <tr>
+            <td>35.001 – 65.000 lei</td>
+            <td>725 lei + 1,6% pentru ce depășește 35.000</td>
+          </tr>
+          <tr>
+            <td>65.001 – 100.000 lei</td>
+            <td>1.205 lei + 1,5% pentru ce depășește 65.000</td>
+          </tr>
+          <tr>
+            <td>100.001 – 200.000 lei</td>
+            <td>1.705 lei + 1,1% pentru ce depășește 100.000</td>
+          </tr>
+          <tr>
+            <td>200.001 – 600.000 lei</td>
+            <td>2.805 lei + 0,9% pentru ce depășește 200.000</td>
+          </tr>
+          <tr>
+            <td>peste 600.000 lei</td>
+            <td>6.405 lei + 0,6% pentru ce depășește 600.000</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        Succesiunea are o grilă separată (mai mică): 2,7% până la 20.000 lei (minim 240 lei/dosar), apoi 540 lei + 1,9%,
+        725 lei + 1,6% și, peste 65.000 lei, 1.205 lei + 0,85%. Partajul are un onorariu minim de 450 lei plus 115 lei
+        pentru fiecare lot format.
+
+      </p>
+
       <h2>Exemplu: vânzare apartament de 350.000 lei</h2>
       <ul>
         <li>
