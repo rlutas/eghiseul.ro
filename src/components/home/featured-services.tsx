@@ -92,7 +92,7 @@ export function FeaturedServices() {
     <section className="bg-white py-16 lg:py-20">
       <div className="container mx-auto px-4 max-w-[1200px]">
         {/* Header */}
-        <div className="flex flex-col lg:flex-row items-start gap-8 lg:gap-10 mb-12">
+        <div className="flex flex-col lg:flex-row lg:items-center gap-8 lg:gap-10 mb-12">
           <div className="flex-1">
             <p className="text-sm font-bold uppercase tracking-wider text-primary-500 mb-3">Servicii disponibile</p>
             <h2 className="text-3xl lg:text-[2.25rem] font-extrabold text-secondary-900 leading-tight mb-4">
