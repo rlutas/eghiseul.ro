@@ -105,7 +105,7 @@ export default function Page() {
       </p>
 
       <p>
-        Vezi și <Link href="/calculator/impozit-auto/">calculatorul de impozit auto</Link>,{' '}
+        Vezi și <Link href="/calculator/calculator-impozit-auto/">calculatorul de impozit auto</Link>,{' '}
         <Link href="/calculator/taxe-notariale/">calculatorul de taxe notariale</Link> sau, dacă vrei să verifici situația
         juridică a imobilului, serviciul de <Link href="/servicii/extras-de-carte-funciara/">extras de carte funciară</Link>.
       </p>

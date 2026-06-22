@@ -54,6 +54,18 @@ export default function Page() {
           q: 'Cine reține impozitul și CASS din pensie?',
           a: 'Reținerea se face automat la sursă de către Casa Națională de Pensii Publice, înainte de plata pensiei. Pensionarul primește direct suma netă, fără să depună vreo declarație, iar pe talon apar separat impozitul și CASS reținute.',
         },
+        {
+          q: 'O pensie de exact 3.001 lei cât plătește?',
+          a: 'Doar 1 leu depășește pragul de 3.000 lei, deci se aplică 10% CASS pe acel leu (0,1 lei) și 10% impozit pe restul (sub 0,1 lei). În practică, pensiile aflate imediat peste prag sunt impozitate cu sume neglijabile, pentru că ambele cote se aplică exclusiv pe diferența peste 3.000 lei, nu pe toată pensia.',
+        },
+        {
+          q: 'Pensiile private de la Pilonul II și III intră în acest calcul?',
+          a: 'Acest calculator estimează impozitul și CASS pe pensia publică plătită de Casa Națională de Pensii Publice. Sumele încasate din pensiile private (Pilon II și III) au reguli proprii de impozitare la momentul plății și nu se cumulează automat cu pensia publică în formula de aici. Verifică talonul și documentele administratorului fondului pentru regimul exact.',
+        },
+        {
+          q: 'Se modifică pragul de 3.000 lei în fiecare an?',
+          a: 'Pragul scutit de 3.000 lei și cotele de 10% impozit și 10% CASS sunt valorile în vigoare pentru 2026, conform legislației aplicabile pensiilor. Orice modificare a pragului sau a cotelor printr-o lege ulterioară ar schimba rezultatul, motiv pentru care calculatorul este orientativ și recomandăm verificarea pe talonul oficial.',
+        },
       ]}
     >
       <h2>Cum se impozitează pensia în 2026</h2>
@@ -156,6 +168,86 @@ export default function Page() {
         este în vigoare, însă a fost contestată la Curtea Constituțională (CCR). Până la o eventuală decizie de
         neconstituționalitate, reținerile se fac conform legii în vigoare, motiv pentru care rezultatul acestui
         calculator rămâne orientativ.
+      </p>
+
+      <h2>Cum funcționează pragul de 3.000 lei</h2>
+      <p>
+        Pragul de <strong>3.000 lei</strong> nu este o sumă de la care se schimbă cota, ci o{' '}
+        <strong>parte scutită</strong> care se scade întotdeauna înainte de aplicarea celor două cote de 10%. Indiferent
+        cât de mare este pensia, primii 3.000 lei rămân neimpozitați, iar impozitul și CASS se aplică exclusiv pe
+        diferența de deasupra pragului. De aceea o pensie aflată chiar peste prag plătește sume foarte mici, în timp ce
+        sarcina fiscală crește treptat pe măsură ce pensia se îndepărtează de cei 3.000 lei.
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>Pensie brută</th>
+            <th>Parte peste prag</th>
+            <th>Total reținut (CASS + impozit)</th>
+            <th>Procent din pensie</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>3.000 lei</td>
+            <td>0 lei</td>
+            <td>0 lei</td>
+            <td>0%</td>
+          </tr>
+          <tr>
+            <td>4.000 lei</td>
+            <td>1.000 lei</td>
+            <td>190 lei</td>
+            <td>4,75%</td>
+          </tr>
+          <tr>
+            <td>5.000 lei</td>
+            <td>2.000 lei</td>
+            <td>380 lei</td>
+            <td>7,60%</td>
+          </tr>
+          <tr>
+            <td>6.300 lei</td>
+            <td>3.300 lei</td>
+            <td>627 lei</td>
+            <td>9,95%</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        Pe măsură ce partea peste prag se apropie de valoarea totală a pensiei, procentul efectiv reținut se apropie de
+        cumulul celor două cote, dar nu îl atinge niciodată, fiindcă cei 3.000 lei scutiți rămân mereu în afara bazei de
+        calcul.
+      </p>
+
+      <h2>Cazuri speciale</h2>
+      <ul>
+        <li>
+          <strong>Mai multe pensii încasate simultan.</strong> Dacă o persoană primește mai multe pensii, modul în care
+          se cumulează sumele pentru aplicarea pragului de 3.000 lei și a cotelor de 10% poate diferi. Pe talonul emis de
+          Casa de Pensii apar reținerile efective, așa că acolo se vede situația exactă.
+        </li>
+        <li>
+          <strong>Pensia de invaliditate și de urmaș.</strong> Aceleași reguli — pragul scutit de 3.000 lei și cele două
+          cote de 10% — se aplică pe suma încasată lunar, indiferent de tipul pensiei publice.
+        </li>
+        <li>
+          <strong>Pensie cumulată cu salariu.</strong> Dacă pensionarul are și venituri din muncă, salariul se
+          impozitează separat, după regulile lui, iar pensia rămâne supusă pragului de 3.000 lei și cotelor de aici.
+        </li>
+        <li>
+          <strong>Pensii imediat peste prag.</strong> O pensie aflată cu puțin peste 3.000 lei plătește sume neglijabile,
+          pentru că ambele cote se aplică doar pe diferența mică ce depășește pragul.
+        </li>
+      </ul>
+
+      <h2>De ce rezultatul este orientativ</h2>
+      <p>
+        Reținerile se fac automat la sursă de Casa Națională de Pensii Publice, iar pe talon impozitul și CASS apar
+        separat. Acest calculator reproduce ordinea oficială — CASS prima, scăzută din baza impozitului — și folosește
+        pragul de 3.000 lei și cotele de 10% în vigoare pentru 2026. Totuși, situațiile cu pensii cumulate, eventuale
+        modificări legislative ulterioare sau o decizie a Curții Constituționale pot schimba sumele finale. Pentru
+        cifrele exacte încasate, sursa de referință rămâne talonul de pensie.
       </p>
 
       <p>

@@ -31,6 +31,9 @@ export default function Page() {
         { q: 'Indemnizația de maternitate se impozitează?', a: 'Nu. Indemnizația de maternitate este neimpozabilă: nu se rețin impozit pe venit, CAS sau CASS din ea, conform art. 62 din Codul Fiscal. Suma netă încasată este egală cu suma brută calculată.' },
         { q: 'Care este diferența dintre concediul de maternitate și cel de creștere a copilului?', a: 'Concediul de maternitate (sarcină și lăuzie) acoperă 126 de zile în jurul nașterii și se plătește prin sistemul de asigurări sociale de sănătate (OUG 158/2005). Concediul pentru creșterea copilului începe după el și se acordă până la 2 ani, fiind reglementat separat și cu altă bază de calcul.' },
         { q: 'Cine plătește indemnizația de maternitate?', a: 'Indemnizația se suportă integral din bugetul Fondului Național Unic de Asigurări Sociale de Sănătate (FNUASS). Angajatorul o calculează și o avansează, apoi recuperează sumele de la Casa de Asigurări de Sănătate.' },
+        { q: 'Ce se întâmplă dacă venitul meu brut depășește plafonul?', a: 'Baza de calcul a indemnizației este plafonată la 12 salarii minime brute pe țară. Dacă media venitului brut din ultimele 6 luni depășește acest plafon, indemnizația se calculează aplicând 85% asupra plafonului, nu asupra venitului real. Astfel, indemnizația nu mai crește peste valoarea maximă corespunzătoare plafonului.' },
+        { q: 'Cum se calculează indemnizația dacă am avut luni cu venit incomplet?', a: 'Media se raportează la venitul efectiv asigurat din cele 6 luni de referință. Dacă în această perioadă ai avut luni cu zile fără contribuție (de exemplu un alt concediu medical), baza de calcul poate fi mai mică, ceea ce reduce indemnizația de 85%. Pentru situații exacte consultă Casa de Asigurări de Sănătate sau un contabil.' },
+        { q: 'Pot beneficia de indemnizație fără stagiu de asigurare?', a: 'Nu. Pentru deschiderea dreptului la indemnizația de maternitate trebuie îndeplinit stagiul minim de asigurare prevăzut de OUG 158/2005. Fără acest stagiu, dreptul la indemnizație nu se deschide, chiar dacă concediul de maternitate de 126 de zile rămâne posibil.' },
       ]}
     >
       <h2>Cum se calculează indemnizația de maternitate în 2026</h2>
@@ -77,6 +80,96 @@ export default function Page() {
         adică aproximativ 4 luni. Pentru venituri variabile sau pentru a vedea efectul plafonului de
         12 salarii minime, folosește calculatorul de mai sus.
       </p>
+
+      <h2>Tabel orientativ: indemnizația în funcție de venitul brut</h2>
+      <p>
+        Tabelul de mai jos arată cum se transformă media venitului brut lunar din ultimele 6 luni în
+        indemnizație de maternitate, aplicând cota de <strong>85%</strong>. Pentru că indemnizația este
+        neimpozabilă, suma din coloana indemnizației este și suma netă încasată lunar.
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>Media venitului brut lunar</th>
+            <th>Indemnizație lunară (85%)</th>
+            <th>Net încasat (neimpozabil)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>3.000 lei</td>
+            <td>2.550 lei</td>
+            <td>2.550 lei</td>
+          </tr>
+          <tr>
+            <td>4.000 lei</td>
+            <td>3.400 lei</td>
+            <td>3.400 lei</td>
+          </tr>
+          <tr>
+            <td>5.000 lei</td>
+            <td>4.250 lei</td>
+            <td>4.250 lei</td>
+          </tr>
+          <tr>
+            <td>8.000 lei</td>
+            <td>6.800 lei</td>
+            <td>6.800 lei</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        Valorile sunt orientative și presupun un venit brut constant pe toată perioada de referință.
+        Atenție: dacă media venitului brut depășește <strong>12 salarii minime brute pe țară</strong>,
+        baza de calcul se oprește la acest plafon, iar indemnizația nu mai crește peste valoarea
+        corespunzătoare plafonului — vezi exemplul de mai jos.
+      </p>
+
+      <h2>Exemplu cu plafonul de 12 salarii minime</h2>
+      <p>
+        Plafonul protejează bugetul de asigurări, dar înseamnă că veniturile foarte mari nu se reflectă
+        integral în indemnizație. Pașii sunt aceiași, doar că baza de calcul se „taie” la plafon:
+      </p>
+      <ul>
+        <li>
+          se stabilește <strong>plafonul</strong> ca 12 × salariul minim brut pe țară aplicabil;
+        </li>
+        <li>
+          dacă media venitului brut din cele 6 luni este peste plafon, se folosește{' '}
+          <strong>plafonul</strong> drept bază de calcul, nu media reală;
+        </li>
+        <li>
+          se aplică <strong>85%</strong> asupra plafonului, obținând indemnizația lunară maximă.
+        </li>
+      </ul>
+      <p>
+        Astfel, două persoane cu venituri brute diferite, dar ambele peste plafon, vor primi aceeași
+        indemnizație de maternitate. Calculatorul de mai sus aplică automat acest plafon, deci nu este
+        nevoie să-l calculezi manual.
+      </p>
+
+      <h2>Cazuri speciale</h2>
+      <ul>
+        <li>
+          <strong>Luni cu venit incomplet în perioada de referință.</strong> Dacă în cele 6 luni există
+          luni cu zile fără contribuție (de exemplu alt concediu medical), media se calculează raportat
+          la venitul efectiv asigurat, ceea ce poate reduce baza de calcul.
+        </li>
+        <li>
+          <strong>Stagiu de asigurare insuficient.</strong> Pentru a beneficia de indemnizație trebuie
+          îndeplinit stagiul minim de asigurare prevăzut de OUG 158/2005; fără acesta, dreptul nu se
+          deschide.
+        </li>
+        <li>
+          <strong>Compensarea celor 63 + 63 de zile.</strong> Cele două perioade (prenatal și postnatal)
+          se pot compensa între ele în limita celor 126 de zile, însă concediul de lăuzie de minimum 42
+          de zile după naștere rămâne obligatoriu și nu poate fi redus.
+        </li>
+        <li>
+          <strong>Naștere prematură sau întârziată.</strong> Repartizarea zilelor se ajustează în
+          funcție de momentul real al nașterii, dar durata totală rămâne de 126 de zile.
+        </li>
+      </ul>
 
       <h2>Situații și greșeli frecvente</h2>
       <ul>

@@ -32,6 +32,9 @@ export default function Page() {
         { q: 'Câți ani de vechime îmi trebuie pentru pensie?', a: 'Stagiul minim de cotizare este de 15 ani (atât pentru bărbați, cât și pentru femei). Stagiul complet de cotizare este de 35 de ani la bărbați; la femei crește treptat spre 35 de ani până în ianuarie 2030. Vechimea în muncă nu coincide întotdeauna cu stagiul de cotizare: contează perioadele pentru care s-au plătit contribuții.' },
         { q: 'Vechimea în muncă este același lucru cu stagiul de cotizare?', a: 'Nu întotdeauna. Vechimea în muncă reflectă timpul lucrat pe baza contractelor, iar stagiul de cotizare reflectă perioadele pentru care s-au plătit efectiv contribuțiile la pensie. Pentru pensie contează stagiul de cotizare din evidențele casei de pensii, nu doar vechimea din carnetul de muncă.' },
         { q: 'Concediile (medical, creștere copil, fără plată) intră în vechime?', a: 'Concediul medical și concediul de creștere a copilului sunt, în general, perioade asimilate și se iau în calcul. Concediul fără plată, de regulă, NU adaugă vechime. Reguli exacte se aplică pe caz; rezultatul calculatorului rămâne orientativ.' },
+        { q: 'Dacă am avut două contracte de muncă în același timp, vechimea se dublează?', a: 'Nu. Pentru vechime, perioada suprapusă se numără o singură dată: într-un an calendaristic nu poți acumula mai mult de 12 luni de vechime, oricâte contracte simultane ai avea. La stagiul de cotizare contează contribuțiile efectiv plătite, nu numărul de contracte.' },
+        { q: 'Perioada de studii sau de șomaj contează la vechime?', a: 'Pentru vechimea din carnetul de muncă, de regulă nu. Pentru stagiul de cotizare însă, anumite perioade (studii, șomaj indemnizat, creștere copil) pot fi asimilate în condițiile legii. Casa de pensii stabilește exact ce perioade se iau în calcul pe baza dosarului tău.' },
+        { q: 'De unde verific oficial vechimea și stagiul meu de cotizare?', a: 'Vechimea rezultă din carnetul de muncă și din REVISAL, iar stagiul de cotizare exact se verifică în evidențele casei de pensii (CNPP). Calculatorul de aici îți oferă o estimare orientativă pe baza perioadelor pe care le introduci.' },
       ]}
     >
       <h2>Cum aduni vechimea din mai multe locuri de muncă</h2>
@@ -76,6 +79,69 @@ export default function Page() {
         Valorile privind pensionarea sunt orientative și depind de Legea 360/2023 (Anexa 5), de stagiul
         de cotizare efectiv și de eventualele reduceri (de exemplu, pentru mame). Verifică situația ta
         exactă cu calculatorul oficial CNPP și cu casa de pensii.
+      </p>
+
+      <h2>Vechime în muncă vs. stagiu de cotizare: diferența care contează</h2>
+      <p>
+        Cele două noțiuni se confundă des, dar nu sunt identice. <strong>Vechimea în muncă</strong>{' '}
+        este timpul total în care ai avut un contract de muncă, indiferent dacă pentru acel timp s-au
+        plătit sau nu contribuții. <strong>Stagiul de cotizare</strong> este perioada pentru care s-au
+        achitat efectiv contribuțiile de asigurări sociale (CAS) și este singurul care contează la
+        stabilirea pensiei. În practică, ele coincid de cele mai multe ori, dar pot diferi: de exemplu,
+        dacă un angajator a reținut, dar nu a virat contribuțiile, vechimea există în contract, însă
+        stagiul de cotizare poate fi incomplet în evidențele casei de pensii.
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>Criteriu</th>
+            <th>Vechime în muncă</th>
+            <th>Stagiu de cotizare</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Ce măsoară</td>
+            <td>Timpul cu contract de muncă</td>
+            <td>Perioadele cu contribuții plătite</td>
+          </tr>
+          <tr>
+            <td>Sursa oficială</td>
+            <td>Carnet de muncă / REVISAL</td>
+            <td>Evidențele casei de pensii (CNPP)</td>
+          </tr>
+          <tr>
+            <td>Relevanță principală</td>
+            <td>Spor de vechime, concediu, dosare administrative</td>
+            <td>Dreptul și cuantumul pensiei</td>
+          </tr>
+          <tr>
+            <td>Perioade asimilate</td>
+            <td>De regulă nu se adaugă</td>
+            <td>Studii, șomaj, creștere copil (în condițiile legii)</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        De aceea, pentru cele <strong>15 ani</strong> stagiu minim sau cele <strong>35 de ani</strong>{' '}
+        stagiu complet, suma din carnetul de muncă este doar un punct de plecare: cifra finală vine din
+        evidențele CNPP.
+      </p>
+
+      <h2>Cazuri speciale: perioade asimilate și suprapuneri</h2>
+      <p>
+        Câteva situații care nu se rezolvă cu o simplă adunare a perioadelor:
+      </p>
+      <ul>
+        <li><strong>Concediu de creștere a copilului:</strong> este, în general, perioadă asimilată și se ia în calcul la stagiul de cotizare.</li>
+        <li><strong>Concediu medical:</strong> perioadele de incapacitate temporară de muncă se asimilează, de regulă, stagiului de cotizare.</li>
+        <li><strong>Concediu fără plată:</strong> de regulă NU adaugă vechime și nici stagiu de cotizare, fiindcă nu se plătesc contribuții.</li>
+        <li><strong>Două contracte simultan:</strong> pentru vechime, timpul suprapus se numără o singură dată — nu poți avea mai mult de 12 luni de vechime într-un an calendaristic.</li>
+        <li><strong>Perioadele de studii sau de șomaj indemnizat:</strong> pot conta la stagiul de cotizare, în condițiile legii, chiar dacă nu apar ca vechime în carnetul de muncă.</li>
+      </ul>
+      <p>
+        Pentru aceste cazuri, calculatorul de mai sus îți dă suma brută a perioadelor de angajare; ajustările
+        privind perioadele asimilate le face casa de pensii pe baza dosarului tău.
       </p>
 
       <h2>Greșeli frecvente la calculul vechimii</h2>

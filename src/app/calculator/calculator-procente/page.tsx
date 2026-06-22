@@ -32,6 +32,9 @@ export default function Page() {
         { q: 'Cum aplic o reducere de X% la un preț?', a: 'Înmulțești prețul cu (100 − procentul reducerii) împărțit la 100. De exemplu, un preț de 250 lei cu reducere de 20% devine 250 × 80 / 100 = 200 lei. Diferența de 50 lei este valoarea reducerii.' },
         { q: 'Cum aflu prețul inițial dinainte de o majorare?', a: 'Împarți prețul actual la (100 + procentul majorării) și înmulțești cu 100. De exemplu, dacă un produs costă acum 121 lei după o majorare de 21%, prețul inițial era 121 / 121 × 100 = 100 lei. Atenție: nu scazi pur și simplu 21% din prețul final, fiindcă procentul s-a aplicat valorii vechi, nu celei noi.' },
         { q: 'De ce o creștere de 50% urmată de o scădere de 50% nu mă aduce la valoarea inițială?', a: 'Pentru că fiecare procent se aplică unei baze diferite. 100 + 50% = 150, apoi 150 − 50% = 75, nu 100. Variațiile procentuale succesive nu se adună și nu se anulează direct, ci se înmulțesc.' },
+        { q: 'Cum calculez procentul dintr-un total când am mai multe valori?', a: 'Aduni toate valorile pentru a obține totalul, apoi împarți fiecare valoare la total și înmulțești cu 100. De exemplu, dacă trei sume sunt 50, 30 și 20, totalul este 100, iar ponderile sunt 50%, 30% și 20%. Suma tuturor procentelor unui întreg trebuie să dea 100%.' },
+        { q: 'Care e diferența dintre puncte procentuale și procent?', a: 'Punctele procentuale măsoară diferența absolută dintre două procente, iar procentul măsoară variația relativă. O creștere de la 20% la 25% înseamnă +5 puncte procentuale, dar o creștere relativă de 25% (calculată ca 5 / 20 × 100). Confuzia dintre cele două este una dintre cele mai frecvente greșeli.' },
+        { q: 'Pot calcula mai multe reduceri aplicate una după alta?', a: 'Da, dar reducerile succesive nu se adună. O reducere de 20% urmată de încă 10% nu înseamnă 30%. Înmulțești factorii: 250 × 0,8 × 0,9 = 180 lei, ceea ce echivalează cu o reducere totală de 28%, nu 30%. Folosește tabelul cu factori de înmulțire pentru a evita erorile.' },
       ]}
     >
       <h2>Cum funcționează calculatorul de procente</h2>
@@ -129,6 +132,76 @@ export default function Page() {
         <Link href="/calculator/tva/">calculatorul de TVA</Link>.
       </p>
 
+      <h2>Exemplu numeric pas cu pas: creșterea procentuală</h2>
+      <p>
+        Variația procentuală este cea mai utilă când compari două valori — de pildă un preț, o
+        cifră de afaceri sau un buget — între două momente. Să presupunem că o valoare a crescut de
+        la <strong>200 lei</strong> la <strong>250 lei</strong>. Iată cum afli cu cât la sută a
+        crescut.
+      </p>
+      <ul>
+        <li>
+          <strong>Pasul 1 — diferența absolută:</strong> 250 − 200 = <strong>50 lei</strong>. Aceasta
+          este creșterea în valoare, nu în procente.
+        </li>
+        <li>
+          <strong>Pasul 2 — raportarea la valoarea inițială:</strong> 50 / 200 = 0,25. Întotdeauna
+          împarți la valoarea <em>de la care</em> pleci, nu la cea finală.
+        </li>
+        <li>
+          <strong>Pasul 3 — transformarea în procent:</strong> 0,25 × 100 ={' '}
+          <strong>+25%</strong>. Valoarea a crescut cu 25%.
+        </li>
+      </ul>
+      <p>
+        Verificarea inversă confirmă rezultatul: 200 × 1,25 = 250 lei. Dacă ai fi raportat greșit
+        diferența la valoarea finală (50 / 250 = 20%), ai fi obținut un rezultat eronat — de aceea
+        numitorul corect este mereu valoarea inițială.
+      </p>
+
+      <h2>Tabel: aceeași diferență, două procente diferite</h2>
+      <p>
+        Una dintre capcanele procentelor este că aceeași diferență absolută înseamnă procente
+        diferite, în funcție de sensul comparației. Tabelul arată de ce o creștere și o scădere
+        între aceleași două valori nu au același procent.
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>Comparație</th>
+            <th>Calcul</th>
+            <th>Variație</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>De la 200 la 250</td>
+            <td>50 / 200 × 100</td>
+            <td>+25%</td>
+          </tr>
+          <tr>
+            <td>De la 250 la 200</td>
+            <td>−50 / 250 × 100</td>
+            <td>−20%</td>
+          </tr>
+          <tr>
+            <td>De la 100 la 150</td>
+            <td>50 / 100 × 100</td>
+            <td>+50%</td>
+          </tr>
+          <tr>
+            <td>De la 150 înapoi la 100</td>
+            <td>−50 / 150 × 100</td>
+            <td>≈ −33,33%</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        Observă ultimele două rânduri: ca să revii de la 150 la 100 ai nevoie de o scădere de
+        aproximativ 33,33%, nu de 50%. Acesta este motivul matematic pentru care{' '}
+        <strong>+50% urmat de −50% nu te readuce la valoarea inițială</strong> (100 → 150 → 75).
+      </p>
+
       <h2>Greșeli frecvente la procente</h2>
       <ul>
         <li>
@@ -149,12 +222,41 @@ export default function Page() {
           400% mai mult decât 50 — întreabă-te mereu care este valoarea de referință (Y).
         </li>
       </ul>
+      <h2>Unde apar procentele în practică</h2>
+      <p>
+        Procentele nu sunt doar un exercițiu de matematică — le întâlnești zilnic în cumpărături,
+        salarii, dobânzi și taxe oficiale. Câteva situații tipice în care un calcul corect te
+        ajută să iei o decizie:
+      </p>
+      <ul>
+        <li>
+          <strong>Reduceri și promoții:</strong> verifici dacă o reducere de 25% chiar înseamnă
+          economia anunțată și compari oferte exprimate diferit (preț redus vs. procent reducere).
+        </li>
+        <li>
+          <strong>TVA și prețuri:</strong> adaugi sau extragi cota de TVA dintr-un preț, folosind
+          factorii din tabelul de mai sus. Pentru calcule complete folosește{' '}
+          <Link href="/calculator/tva/">calculatorul de TVA</Link>.
+        </li>
+        <li>
+          <strong>Salariu și rețineri:</strong> contribuțiile sociale și impozitul pe venit se
+          aplică procentual din salariul brut, iar diferența dintre brut și net se exprimă tot în
+          procente.
+        </li>
+        <li>
+          <strong>Taxe oficiale pe tranșe:</strong> unele taxe se calculează ca procent dintr-o
+          valoare, uneori pe praguri succesive.
+        </li>
+      </ul>
       <p>
         Procentele apar des și în taxele oficiale: de exemplu, <strong>taxa judiciară de timbru</strong>{' '}
         se calculează pe tranșe procentuale din valoarea cererii — vezi{' '}
         <Link href="/calculator/taxa-judiciara-de-timbru/">calculatorul de taxă judiciară de timbru</Link>.
-        Dacă ai nevoie de un document oficial precum cazierul judiciar, îl poți obține online prin{' '}
-        <Link href="/servicii/cazier-judiciar-online/">serviciul de cazier judiciar</Link>.
+        Dacă vrei să compari rapid două sume sau să afli ponderea unei valori dintr-un total, poți
+        reveni oricând la{' '}
+        <Link href="/calculator/calculator-procente/">calculatorul de procente</Link> de mai sus.
+        Iar dacă ai nevoie de un document oficial precum cazierul judiciar, îl poți obține online
+        prin <Link href="/servicii/cazier-judiciar-online/">serviciul de cazier judiciar</Link>.
       </p>
     </CalculatorLayout>
   );

@@ -164,7 +164,7 @@ export default function Page() {
       <p>
         Vezi și <Link href="/calculator/taxe-notariale/">calculatorul de taxe notariale</Link> (util la creditul
         ipotecar), <Link href="/calculator/salariu/">calculatorul de salariu</Link> (pentru a verifica gradul de
-        îndatorare) sau, dacă vrei să vinzi o proprietate cu credit, <Link href="/servicii/extras-carte-funciara/">extrasul
+        îndatorare) sau, dacă vrei să vinzi o proprietate cu credit, <Link href="/servicii/extras-de-carte-funciara/">extrasul
         de carte funciară</Link>.
       </p>
 

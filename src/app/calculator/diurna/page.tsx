@@ -50,6 +50,18 @@ export default function Page() {
           q: 'Se cumulează diurna în țară cu cea din străinătate în aceeași lună?',
           a: 'Da, dar fiecare se raportează la propriul plafon: 57,5 lei/zi pentru deplasările interne și 2,5 × valoarea categoriei I pe țară pentru cele externe. Excedentul peste fiecare plafon se impozitează ca venit salarial (impozit 10%, CAS 25%, CASS 10%).',
         },
+        {
+          q: 'Diurna neimpozabilă este venit net pentru angajat?',
+          a: 'Da. Partea de diurnă care se încadrează în plafonul neimpozabil (57,5 lei/zi în țară sau 2,5 × categoria I pe țară în străinătate) se acordă fără impozit și fără contribuții, deci ajunge integral, netă, la angajat. Doar partea care depășește plafonul intră în baza salarială impozabilă.',
+        },
+        {
+          q: 'De unde vine valoarea de 23 lei folosită la calculul intern?',
+          a: 'Cei 23 lei reprezintă diurna de referință din sectorul public pentru deplasări interne. Pentru sectorul privat, plafonul neimpozabil este 2,5 × această valoare, adică 57,5 lei/zi. Confuzia dintre cele două repere (23 lei vs. 57,5 lei) este o greșeală frecventă.',
+        },
+        {
+          q: 'Ce se întâmplă dacă firma nu acordă deloc diurnă?',
+          a: 'Diurna nu este obligatorie prin lege pentru sectorul privat decât în limitele stabilite prin contractul individual sau colectiv de muncă ori prin regulamentul intern. Dacă firma acordă o sumă, partea sub plafon (57,5 lei/zi în țară) este neimpozabilă, iar ce depășește se impozitează ca salariu (impozit 10%, CAS 25%, CASS 10%).',
+        },
       ]}
     >
       <h2>Ce este diurna și când e neimpozabilă</h2>
@@ -106,6 +118,77 @@ export default function Page() {
           </tr>
         </tbody>
       </table>
+
+      <h2>Exemplu detaliat pentru delegație în țară</h2>
+      <p>
+        Să luăm un caz concret: un angajat din sectorul privat pleacă în delegație internă timp de 8 zile, iar
+        firma îi acordă o diurnă de 80 lei/zi. Plafonul neimpozabil intern este <strong>57,5 lei/zi</strong>
+        {' '}(2,5 × 23 lei). Defalcarea pe zi și pe total arată astfel:
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>Element</th>
+            <th>Pe zi</th>
+            <th>Total (8 zile)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Diurnă acordată</td>
+            <td>80 lei</td>
+            <td>640 lei</td>
+          </tr>
+          <tr>
+            <td>Parte neimpozabilă</td>
+            <td>57,5 lei</td>
+            <td>460 lei</td>
+          </tr>
+          <tr>
+            <td>Parte impozabilă</td>
+            <td>22,5 lei</td>
+            <td>180 lei</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        Cei <strong>180 lei</strong> care depășesc plafonul se adaugă la baza salarială și se impozitează ca venit
+        din salarii: impozit 10%, CAS 25% și CASS 10% (plus CAM 2,25% datorat de angajator). Cei 460 lei sub plafon
+        rămân netezi pentru angajat. Important: chiar și după ce treci de 57,5 lei/zi, trebuie verificat separat și
+        plafonul lunar de <strong>3 salarii de bază</strong> — dacă suma neimpozabilă lunară l-ar depăși, partea care
+        excede acest plafon devine la rândul ei impozabilă.
+      </p>
+
+      <h2>Cazuri speciale și context legal</h2>
+      <p>
+        Regulile de diurnă au câteva situații care se interpretează greșit frecvent. Iată cele mai importante:
+      </p>
+      <ul>
+        <li>
+          <strong>Deplasări sub 12 ore:</strong> se acordă, de regulă, doar 50% din diurnă. Plafonul neimpozabil se
+          aplică proporțional cu suma efectiv acordată, nu la valoarea integrală;
+        </li>
+        <li>
+          <strong>Plafonul lunar de 3 salarii de bază:</strong> indiferent de numărul de zile, suma neimpozabilă pe
+          lună nu poate depăși echivalentul a 3 salarii de bază aferente locului de muncă. Se aplică plafonul mai mic
+          dintre limita zilnică (57,5 lei × zile) și cea lunară (3 salarii);
+        </li>
+        <li>
+          <strong>Categoria I pe țară:</strong> pentru deplasările externe, baza neimpozabilă pleacă de la valoarea
+          categoriei I stabilită prin <strong>HG 518/1995</strong> pentru fiecare stat, înmulțită cu 2,5 pentru
+          sectorul privat;
+        </li>
+        <li>
+          <strong>Cumul intern + extern:</strong> dacă în aceeași lună ai și delegații interne, și externe, fiecare
+          se raportează la propriul plafon (57,5 lei/zi în țară, respectiv 2,5 × categoria I pe țară), nu la un plafon
+          unic comun.
+        </li>
+      </ul>
+      <p>
+        Pentru diurna acordată în valută, conversia în lei la stabilirea părții impozabile se face la cursul de schimb
+        relevant pentru ziua respectivă — de aceea este util să verifici{' '}
+        <Link href="/curs-valutar/">cursul valutar BNR</Link> înainte de a calcula excedentul impozabil.
+      </p>
 
       <h2>Greșeli frecvente</h2>
       <ul>

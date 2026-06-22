@@ -32,6 +32,9 @@ export default function Page() {
         { q: 'Pot reporta zilele de concediu în anul următor?', a: 'Da. Dacă din motive justificate nu ai efectuat concediul în anul de referință, angajatorul are obligația de a-l acorda într-o perioadă de 18 luni începând cu anul următor (Codul Muncii, art. 146 alin. 4). Înlocuirea concediului cu bani în timpul derulării contractului este interzisă, cu excepția compensării la încetare.' },
         { q: 'Sărbătorile legale și weekendul se scad din zilele de concediu?', a: 'Nu. Concediul de odihnă se exprimă în zile lucrătoare, deci zilele de repaus săptămânal (de regulă sâmbătă și duminică) și sărbătorile legale nu se includ în cele 20 de zile și nu se consumă din ele.' },
         { q: 'Câte zile de concediu am dacă m-am angajat la jumătatea anului?', a: 'Pentru anul angajării concediul se acordă proporțional cu perioada lucrată. La 20 de zile pe an și 6 luni lucrate rezultă 20 × 6 / 12 = 10 zile lucrătoare.' },
+        { q: 'Cum se calculează indemnizația de concediu pe care o primesc?', a: 'Indemnizația de concediu nu poate fi mai mică decât salariul de bază, sporurile permanente și indemnizațiile cuvenite pentru perioada respectivă. Se determină pe baza mediei zilnice a veniturilor din ultimele 3 luni anterioare lunii în care este efectuat concediul, înmulțită cu numărul de zile lucrătoare de concediu (Codul Muncii, art. 150).' },
+        { q: 'Ce se întâmplă cu concediul dacă lucrez cu fracțiune de normă (part-time)?', a: 'Salariatul cu contract pe fracțiune de normă beneficiază de aceleași drepturi ca salariatul cu normă întreagă, deci de cel puțin 20 de zile lucrătoare de concediu pe an, proporțional cu timpul efectiv lucrat. Durata în zile lucrătoare nu se reduce, ci doar indemnizația, raportată la salariul aferent fracțiunii de normă.' },
+        { q: 'Concediul fără plată reduce zilele de concediu de odihnă?', a: 'Da. Perioadele de concediu fără plată nu se iau în calcul la stabilirea dreptului la concediu de odihnă, spre deosebire de concediul medical sau cel de maternitate, care sunt asimilate perioadelor de activitate.' },
       ]}
     >
       <h2>Cum se calculează zilele de concediu de odihnă</h2>
@@ -105,11 +108,61 @@ export default function Page() {
           încetarea raportului de muncă.
         </li>
       </ul>
+      <h2>Cadrul legal: ce spune Codul Muncii</h2>
+      <p>
+        Dreptul la concediu de odihnă este garantat tuturor salariaților și este reglementat de
+        <strong> Codul Muncii (Legea 53/2003)</strong>, în special prin articolele 144-153. Câteva
+        repere esențiale pe care orice angajat ar trebui să le cunoască:
+      </p>
+      <ul>
+        <li>
+          <strong>Durata minimă (art. 145):</strong> dreptul la concediu de odihnă anual plătit este de
+          minim <strong>20 de zile lucrătoare</strong>. Acest minim nu poate fi diminuat prin contract,
+          dar poate fi majorat.
+        </li>
+        <li>
+          <strong>Caracterul obligatoriu (art. 144):</strong> dreptul la concediu de odihnă nu poate
+          forma obiectul vreunei cesiuni, renunțări sau limitări. Salariatul nu poate renunța la el.
+        </li>
+        <li>
+          <strong>Reportarea (art. 146-148):</strong> efectuarea concediului se realizează în baza unei
+          programări, iar dacă din motive justificate nu a fost efectuat, angajatorul este obligat să îl
+          acorde într-o perioadă de <strong>18 luni</strong> începând cu anul următor.
+        </li>
+        <li>
+          <strong>Compensarea (art. 146 alin. 3):</strong> compensarea în bani a concediului neefectuat
+          este permisă numai în cazul <strong>încetării contractului individual de muncă</strong>.
+        </li>
+      </ul>
+
+      <h2>Exemplu numeric: indemnizația la încetarea contractului</h2>
+      <p>
+        Reluăm exemplul angajatului cu <strong>21 de zile</strong> pe an care a lucrat <strong>6 luni</strong>
+        {' '}și are dreptul la <strong>11 zile lucrătoare</strong> de concediu neefectuat. Să presupunem că
+        salariul de bază a fost de <strong>4.620 lei</strong> brut pe lună, fără sporuri permanente, iar luna
+        de referință are 21 de zile lucrătoare.
+      </p>
+      <ul>
+        <li><strong>Pasul 1 — media zilnică:</strong> 4.620 lei / 21 zile lucrătoare = <strong>220 lei/zi</strong>.</li>
+        <li><strong>Pasul 2 — zile compensate:</strong> 11 zile lucrătoare neefectuate.</li>
+        <li><strong>Pasul 3 — indemnizația brută:</strong> 220 lei × 11 zile = <strong>2.420 lei</strong> brut.</li>
+        <li>
+          <strong>Pasul 4 — rețineri:</strong> din suma brută se rețin contribuțiile și impozitul, exact ca
+          la salariu, rezultând valoarea netă efectiv încasată.
+        </li>
+      </ul>
+      <p className="text-sm text-neutral-500">
+        Estimare orientativă. Dacă există sporuri permanente sau o lună de referință cu alt număr de zile
+        lucrătoare, media zilnică se modifică. Reținerile depind de cotele fiscale în vigoare.
+      </p>
+
       <p>
         Dacă pregătești un dosar pentru un nou loc de muncă, ai putea avea nevoie și de un{' '}
         <Link href="/servicii/cazier-judiciar-online/">cazier judiciar online</Link>, iar pentru a-ți
         verifica anii de activitate poți folosi{' '}
-        <Link href="/calculator/vechime-in-munca/">calculatorul de vechime în muncă</Link>.
+        <Link href="/calculator/vechime-in-munca/">calculatorul de vechime în muncă</Link>. Pentru a estima
+        venitul net din care se calculează indemnizația de concediu, poți consulta și{' '}
+        <Link href="/calculator/salariu/">calculatorul de salariu brut în net</Link>.
       </p>
     </CalculatorLayout>
   );

@@ -32,6 +32,9 @@ export default function Page() {
         { q: 'Procentul de 55/65/75% se aplică pe toate zilele sau progresiv?', a: 'Progresiv, în cadrul aceluiași episod de boală: primele 7 zile la 55%, zilele 8-14 la 65%, iar de la a 15-a zi 75%. Nu se aplică retroactiv procentul cel mai mare pe toate zilele.' },
         { q: 'Există un plafon al indemnizației de concediu medical?', a: 'Da. Baza de calcul este limitată la media a 12 salarii minime brute pe țară pe lună. În 2026 salariul minim este 4.050 lei (ianuarie-iunie) și 4.325 lei (iulie-decembrie), deci plafonul se modifică la mijlocul anului.' },
         { q: 'Accidentele de muncă au aceleași reguli ca boala obișnuită?', a: 'Nu. Accidentul de muncă și boala profesională se plătesc cu 80% și au regim separat (Legea 346/2002), iar prima zi neplătită nu li se aplică.' },
+        { q: 'Din indemnizația de concediu medical se rețin impozit și contribuții?', a: 'Da. Indemnizația brută se impozitează cu 10% impozit pe venit și cu 10% CASS (contribuția de asigurări sociale de sănătate). Nu se reține CAS (pensie) pe indemnizația de boală. Suma încasată în mână este, așadar, mai mică decât indemnizația brută calculată.' },
+        { q: 'Cine plătește indemnizația — angajatorul sau CNAS?', a: 'Primele zile sunt suportate din fondul de salarii al angajatorului, iar restul din bugetul Fondului național unic de asigurări sociale de sănătate (FNUASS), prin CNAS. Pentru salariat plata vine integral prin angajator, care apoi recuperează partea suportată de FNUASS.' },
+        { q: 'De câte luni de stagiu am nevoie ca să primesc indemnizația?', a: 'Regula generală cere un stagiu de asigurare de minimum 6 luni realizate în ultimele 12 luni anterioare lunii certificatului. Pentru urgențe medico-chirurgicale și bolile din grupa A indemnizația se acordă fără condiție de stagiu.' },
       ]}
     >
       <h2>Cum se calculează indemnizația de concediu medical</h2>
@@ -141,6 +144,91 @@ export default function Page() {
         brut din ultimele luni, ori{' '}
         <Link href="/calculator/contributii-pfa/">calculatorul de contribuții PFA</Link> dacă ești
         liber profesionist asigurat în sistemul de sănătate.
+      </p>
+
+      <h2>Cât rămâne în mână: impozitul și contribuțiile</h2>
+      <p>
+        Indemnizația calculată de calculator este una <strong>brută</strong>. Înainte să ajungă la
+        salariat, din ea se rețin <strong>impozitul pe venit de 10%</strong> și{' '}
+        <strong>CASS de 10%</strong> (contribuția de asigurări sociale de sănătate). Spre deosebire de
+        salariul obișnuit, pe indemnizația de boală <strong>nu se reține CAS</strong> (contribuția la
+        pensie), pentru că perioada de incapacitate temporară de muncă constituie oricum stagiu de
+        cotizare asimilat.
+      </p>
+      <p>
+        Reluând exemplul de mai sus, dacă indemnizația brută este de ≈ 1.500 lei, reținerile
+        aproximative sunt 10% CASS și 10% impozit aplicat după CASS, iar suma încasată în mână scade
+        corespunzător. Procentul exact depinde de ordinea reținerilor și de eventualele deduceri, însă
+        ca regulă practică din indemnizația brută se duc aproximativ două cote de 10%.
+      </p>
+
+      <h2>Cine plătește și de unde vin banii</h2>
+      <p>
+        Plata indemnizației se face <strong>prin angajator</strong>, însă sursa banilor este împărțită.
+        Primele zile ale concediului medical sunt suportate din <strong>fondul de salarii al
+        angajatorului</strong>, iar partea care depășește această perioadă este suportată din{' '}
+        <strong>Fondul național unic de asigurări sociale de sănătate (FNUASS)</strong>, gestionat de
+        CNAS. Angajatorul avansează suma către salariat și ulterior recuperează de la FNUASS partea ce
+        revine bugetului. Pentru salariat, fluxul este transparent: banii apar pe statul de plată
+        împreună cu (sau în locul) salariului, după aceleași termene.
+      </p>
+
+      <h2>Condiția de stagiu și excepțiile</h2>
+      <p>
+        Ca să ai dreptul la indemnizație, ai nevoie de regulă de un <strong>stagiu de asigurare de
+        minimum 6 luni</strong> realizate în ultimele 12 luni anterioare lunii în care a fost emis
+        certificatul medical. Această condiție protejează fondul de asigurări împotriva folosirii
+        abuzive imediat după angajare.
+      </p>
+      <ul>
+        <li><strong>Fără condiție de stagiu:</strong> urgențele medico-chirurgicale și bolile din grupa A (TBC, cancer, SIDA, boli infecto-contagioase) — plătite cu 100% indiferent de vechime;</li>
+        <li><strong>Stagiu insuficient:</strong> dacă nu acoperi cele 6 luni, dreptul la indemnizație poate fi limitat sau refuzat, chiar dacă certificatul este valabil medical;</li>
+        <li><strong>Cumul de surse:</strong> stagiul se poate constitui din mai multe locuri de muncă sau perioade asimilate (inclusiv concedii medicale anterioare).</li>
+      </ul>
+
+      <h2>Tabel: ce intră și ce nu intră în calcul</h2>
+      <p>
+        Nu orice sumă încasată în ultimele 6 luni intră în baza de calcul, iar din rezultatul brut nu
+        se rețin toate contribuțiile pe care le-ai vedea la un salariu normal. Tabelul de mai jos
+        rezumă regulile.
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>Element</th>
+            <th>Intră în calcul / se reține?</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Venitul brut lunar (ultimele 6 luni)</td>
+            <td>Da — formează media bazei de calcul</td>
+          </tr>
+          <tr>
+            <td>Plafonul de 12 salarii minime/lună</td>
+            <td>Da — limitează baza, oricât de mare e venitul</td>
+          </tr>
+          <tr>
+            <td>Prima zi a episodului de boală</td>
+            <td>Nu se plătește (OUG 91/2025), excepție accident de muncă</td>
+          </tr>
+          <tr>
+            <td>Impozit pe venit 10%</td>
+            <td>Da — se reține din indemnizația brută</td>
+          </tr>
+          <tr>
+            <td>CASS 10%</td>
+            <td>Da — se reține din indemnizația brută</td>
+          </tr>
+          <tr>
+            <td>CAS (pensie)</td>
+            <td>Nu — nu se reține pe indemnizația de boală</td>
+          </tr>
+        </tbody>
+      </table>
+      <p className="text-sm text-neutral-500">
+        Valori orientative. Ordinea exactă a reținerilor și tratamentul deducerilor se aplică potrivit
+        normelor în vigoare; verifică cu angajatorul.
       </p>
 
       <p className="text-sm text-neutral-500">

@@ -32,6 +32,9 @@ export default function Page() {
         { q: 'Care este indemnizația minimă de șomaj?', a: 'Cuantumul minim este baza de 75% din ISR, adică 495 lei brut (circa 446 lei net după CASS 10%). Persoanele cu stagiu de cotizare scurt (sub 3 ani) primesc doar această bază, fără supliment pe vechime.' },
         { q: 'Absolvenții primesc indemnizație de șomaj?', a: 'Da, dar într-un regim separat: absolvenții fără loc de muncă primesc 50% din ISR (330 lei brut) pe o perioadă de 6 luni, dacă se înregistrează la ANOFM în termen de 60 de zile de la absolvire. Acest calculator estimează indemnizația pentru persoanele cu stagiu de cotizare.' },
         { q: 'Cum se calculează stagiul de cotizare pentru șomaj?', a: 'Conta perioada în care ai fost asigurat în sistemul asigurărilor pentru șomaj. Pentru a primi indemnizație ai nevoie de minimum 12 luni de cotizare în ultimele 24 de luni dinaintea înregistrării la ANOFM.' },
+        { q: 'Cum influențează salariul mediu brut cuantumul indemnizației?', a: 'Doar partea suplimentară (3%, 5%, 7% sau 10%) se aplică la salariul mediu brut din ultimele 12 luni; baza de 495 lei (75% din ISR) rămâne fixă indiferent de salariu. Astfel, la un stagiu de 5-10 ani (+5%), un salariu brut de 4.000 lei aduce un supliment de 200 lei, iar unul de 8.000 lei aduce 400 lei.' },
+        { q: 'Pot lucra în timp ce primesc indemnizație de șomaj?', a: 'Dacă te angajezi, dreptul la indemnizație încetează de la data începerii activității. Totuși, dacă te angajezi înainte de expirarea perioadei și ai fost beneficiar cel puțin o lună, poți primi o sumă reprezentând o parte din indemnizația rămasă, ca stimulent de revenire pe piața muncii.' },
+        { q: 'Ce obligații am cât timp primesc șomaj?', a: 'Trebuie să te prezinți lunar la ANOFM pentru viza carnetului, să participi la programele de ocupare oferite și să accepți un loc de muncă corespunzător pregătirii. Refuzul nejustificat al unui loc de muncă sau al unui curs de formare poate duce la încetarea indemnizației.' },
       ]}
     >
       <h2>Cum se calculează indemnizația de șomaj</h2>
@@ -139,6 +142,83 @@ export default function Page() {
         </li>
       </ul>
 
+      <h2>Cât primești în funcție de salariu și stagiu</h2>
+      <p>
+        Pentru că baza de <strong>495 lei</strong> este fixă, diferențele de cuantum apar din
+        suplimentul aplicat la salariul mediu brut al ultimelor 12 luni. Tabelul de mai jos arată
+        câteva combinații uzuale de stagiu și salariu, cu indemnizația brută rezultată (înainte de
+        reținerea CASS 10%):
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>Stagiu</th>
+            <th>Supliment</th>
+            <th>Salariu mediu brut</th>
+            <th>Supliment în lei</th>
+            <th>Indemnizație brută</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>2 ani</td>
+            <td>0%</td>
+            <td>3.500 lei</td>
+            <td>0 lei</td>
+            <td>495 lei</td>
+          </tr>
+          <tr>
+            <td>4 ani</td>
+            <td>+3%</td>
+            <td>4.000 lei</td>
+            <td>120 lei</td>
+            <td>615 lei</td>
+          </tr>
+          <tr>
+            <td>8 ani</td>
+            <td>+5%</td>
+            <td>5.000 lei</td>
+            <td>250 lei</td>
+            <td>745 lei</td>
+          </tr>
+          <tr>
+            <td>15 ani</td>
+            <td>+7%</td>
+            <td>6.000 lei</td>
+            <td>420 lei</td>
+            <td>915 lei</td>
+          </tr>
+          <tr>
+            <td>25 ani</td>
+            <td>+10%</td>
+            <td>8.000 lei</td>
+            <td>800 lei</td>
+            <td>1.295 lei</td>
+          </tr>
+        </tbody>
+      </table>
+      <p className="text-sm text-neutral-500">
+        Din fiecare valoare brută se reține apoi CASS 10%. De exemplu, dintr-o indemnizație brută de
+        745 lei rămân aproximativ 671 lei net.
+      </p>
+
+      <h2>Cadrul legal și ce contează la dosar</h2>
+      <p>
+        Indemnizația de șomaj este reglementată de <strong>Legea 76/2002</strong> privind sistemul
+        asigurărilor pentru șomaj și stimularea ocupării forței de muncă. Pentru a beneficia de
+        indemnizație ai nevoie de un stagiu de cotizare de minimum <strong>12 luni</strong> în
+        ultimele 24 de luni dinaintea înregistrării la ANOFM, iar încetarea raportului de muncă nu
+        trebuie să-ți fie imputabilă (de exemplu, demisia fără motiv întemeiat nu dă, de regulă,
+        dreptul la indemnizație).
+      </p>
+      <p>
+        La dosar contează în primul rând adeverințele care atestă perioadele asigurate și salariile
+        din ultimele 12 luni: pe baza lor ANOFM stabilește atât <strong>suplimentul</strong> (3%, 5%,
+        7% sau 10% din salariul mediu brut), cât și <strong>durata</strong> (6, 9 sau 12 luni). Baza
+        de <strong>495 lei</strong> (75% din ISR) se aplică în mod identic tuturor beneficiarilor, iar
+        din suma brută se reține <strong>CASS 10%</strong> începând cu august 2025.
+      </p>
+
       <h2>Documente utile când rămâi fără loc de muncă</h2>
       <p>
         Pentru angajarea la un nou loc de muncă, multe firme cer un{' '}
@@ -146,7 +226,10 @@ export default function Page() {
         obține 100% online, fără drum la ghișeu. Dacă vrei să estimezi și salariul de la viitorul job,
         folosește <Link href="/calculator/salariu/">calculatorul de salariu net</Link>, iar pentru
         vechimea acumulată poți verifica{' '}
-        <Link href="/calculator/vechime-in-munca/">calculatorul de vechime în muncă</Link>.
+        <Link href="/calculator/vechime-in-munca/">calculatorul de vechime în muncă</Link>. Dacă
+        plănuiești o activitate independentă după perioada de șomaj, vezi și{' '}
+        <Link href="/calculator/contributii-pfa/">calculatorul de contribuții PFA</Link> pentru a
+        estima contribuțiile datorate.
       </p>
 
       <p className="text-sm text-neutral-500">

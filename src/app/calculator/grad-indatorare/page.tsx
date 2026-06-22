@@ -46,6 +46,18 @@ export default function Page() {
           q: 'Intră toate creditele în calculul gradului de îndatorare?',
           a: 'Da. Banca însumează ratele tuturor creditelor active (ipotecar, nevoi personale, auto, leasing) și limitele cardurilor de credit și ale descoperitului de cont, raportate la venitul net. Acesta este motivul pentru care un card neutilizat îți poate reduce capacitatea de creditare.',
         },
+        {
+          q: 'Ce este testul de stres aplicat de bancă?',
+          a: 'Testul de stres este o simulare prin care banca verifică dacă ai rămâne sub plafonul de 40% (45% prima locuință în lei) chiar dacă dobânda crește sau cursul valutar se modifică. Banca recalculează rata cu o dobândă majorată și cu o depreciere ipotetică a leului, iar gradul de îndatorare trebuie să se mențină în limită și în acest scenariu nefavorabil.',
+        },
+        {
+          q: 'Pot avea două plafoane diferite în același timp?',
+          a: 'Da. Dacă ai un credit ipotecar în lei pentru prima locuință (45%) și vrei în plus un credit de nevoi personale, suma ratelor tuturor creditelor trebuie să respecte plafonul. În practică banca aplică limita cea mai relevantă pe totalul ratelor raportat la venitul net, fără a depăși 40% în lei pentru creditele care nu sunt prima locuință.',
+        },
+        {
+          q: 'Cum îmi pot reduce gradul de îndatorare înainte de a cere creditul?',
+          a: 'Poți reduce gradul de îndatorare prin: creșterea avansului (rată mai mică), prelungirea perioadei de rambursare, închiderea creditelor mici și a cardurilor de credit nefolosite, sau adăugarea unui co-debitor cu venit. Fiecare dintre aceste măsuri scade raportul dintre total rate și venitul net.',
+        },
       ]}
     >
       <h2>Cum se calculează gradul de îndatorare</h2>
@@ -105,6 +117,81 @@ export default function Page() {
         <strong>40%</strong> și cererea ar fi respinsă: ar trebui fie să reduci rata (avans mai mare
         sau perioadă mai lungă), fie să închizi creditul de nevoi personale.
       </p>
+
+      <h2>Tabel cu plafoanele BNR pe tip de credit</h2>
+      <p>
+        Pentru o privire de ansamblu rapidă, iată cum se aplică limitele din Regulamentul BNR nr.
+        17/2012 (modificat prin Regulamentul nr. 6/2018) în funcție de monedă și de scopul creditului:
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>Tip credit</th>
+            <th>Plafon standard</th>
+            <th>Plafon prima locuință</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Credit în lei (RON)</td>
+            <td>40%</td>
+            <td>45%</td>
+          </tr>
+          <tr>
+            <td>Credit în valută (EUR, alte monede)</td>
+            <td>20%</td>
+            <td>25%</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        Diferența mare dintre lei și valută nu este întâmplătoare: la creditele în valută, jumătate din
+        plafonul în lei este „rezervat” pentru a acoperi riscul ca rata să crească dacă leul se
+        depreciază față de moneda creditului. Cu cât moneda este mai instabilă pentru veniturile tale
+        în lei, cu atât marja de siguranță cerută de BNR este mai mare.
+      </p>
+
+      <h2>Testul de stres al băncii</h2>
+      <p>
+        Pe lângă calculul simplu al gradului de îndatorare, banca aplică un <strong>test de stres</strong>:
+        recalculează rata presupunând o creștere a dobânzii și, la creditele în valută, o depreciere a
+        leului. Practic, banca verifică dacă ai rămâne sub plafonul de <strong>40%</strong> în lei
+        (respectiv <strong>45%</strong> pentru prima locuință) și într-un scenariu economic nefavorabil,
+        nu doar la dobânda din momentul semnării.
+      </p>
+      <p>
+        De aceea se poate întâmpla ca un calcul „pe hârtie” să arate un grad de îndatorare de, să zicem,
+        38%, dar banca să respingă cererea pentru că, după aplicarea testului de stres, rata simulată
+        împinge gradul peste 40%. Un avans mai mare sau o perioadă de rambursare mai lungă te ajută să
+        păstrezi o marjă de siguranță față de această recalculare. Înainte de a estima rata, asigură-te
+        că pornești de la venitul net corect folosind{' '}
+        <Link href="/calculator/salariu/">calculatorul de salariu net/brut</Link>.
+      </p>
+
+      <h2>Cazuri speciale și venituri eligibile</h2>
+      <ul>
+        <li>
+          <strong>Co-debitor și venituri cumulate.</strong> Dacă aplici împreună cu soțul/soția sau cu
+          un co-debitor, băncile însumează veniturile nete, ceea ce poate scădea gradul de îndatorare
+          comun sub plafonul de 40% (45% prima locuință în lei).
+        </li>
+        <li>
+          <strong>Venituri din chirii sau activități independente.</strong> Acestea pot fi luate în
+          calcul de unele bănci, dar de regulă cu un coeficient de prudență (nu se contează 100%),
+          tocmai pentru că sunt mai puțin stabile decât salariul.
+        </li>
+        <li>
+          <strong>Refinanțare.</strong> Dacă refinanțezi un credit existent pentru a obține o rată mai
+          mică, gradul de îndatorare scade, ceea ce îți poate crește capacitatea de a accesa un credit
+          nou ulterior.
+        </li>
+        <li>
+          <strong>Prima locuință vs. a doua.</strong> Plafonul majorat de <strong>45%</strong> în lei
+          (respectiv <strong>25%</strong> în valută) se aplică o singură dată, pentru prima locuință
+          achiziționată. Pentru orice achiziție ulterioară se revine la <strong>40%</strong> în lei și{' '}
+          <strong>20%</strong> în valută.
+        </li>
+      </ul>
 
       <h2>Greșeli frecvente și context legal</h2>
       <ul>

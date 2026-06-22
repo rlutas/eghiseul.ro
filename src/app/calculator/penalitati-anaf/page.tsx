@@ -32,6 +32,9 @@ export default function Page() {
         { q: 'Din ce zi încep să curgă accesoriile?', a: 'Accesoriile (dobânda și penalitatea) curg începând cu ziua imediat următoare scadenței și până la data stingerii sumei datorate inclusiv, conform art. 174 din Codul de procedură fiscală. Pentru fiecare zi de întârziere se aplică cota zilnică pe debitul rămas.' },
         { q: 'Se calculează accesorii și pentru sume sub 100 de lei?', a: 'Nu. Pentru obligațiile fiscale principale mai mici de un anumit prag (de regulă sub plafonul stabilit prin Codul de procedură fiscală), organul fiscal nu calculează și nu comunică accesorii. Verifică decizia de impunere sau certificatul de atestare fiscală pentru cuantumul exact.' },
         { q: 'Cum aflu suma exactă de plată a penalităților?', a: 'Suma exactă rezultă din decizia referitoare la obligațiile de plată accesorii emisă de ANAF, vizibilă și în Spațiul Privat Virtual (SPV). Calculatorul oferă o estimare orientativă; pentru reconcilierea finală folosește certificatul de atestare fiscală sau consultă un contabil.' },
+        { q: 'Se calculează accesorii și pe perioada eșalonării la plată?', a: 'Pe durata unei eșalonări la plată aprobate, în locul dobânzii de 0,02%/zi se aplică o dobândă de eșalonare, iar penalitatea de întârziere de 0,01%/zi nu se mai datorează pentru ratele plătite la termenele din graficul de eșalonare. Dacă pierzi eșalonarea, accesoriile se recalculează după regimul general. Cifrele standard din calculator (0,02% și 0,01% pe zi) se aplică în afara unei eșalonări active.' },
+        { q: 'Plata parțială reduce accesoriile pentru zilele următoare?', a: 'Da. Accesoriile se calculează pe debitul rămas neachitat, zi de zi. Dacă plătești o parte din obligație, dobânda de 0,02%/zi și penalitatea de întârziere de 0,01%/zi se aplică de la acea dată doar pe soldul rămas, nu pe suma inițială. De aceea o plată parțială cât mai devreme reduce totalul accesoriilor.' },
+        { q: 'Cine datorează penalitatea de nedeclarare de 0,08%/zi?', a: 'Penalitatea de nedeclarare de 0,08%/zi se aplică obligațiilor fiscale principale stabilite suplimentar de ANAF prin decizie de impunere, ca urmare a unei inspecții fiscale, pentru sume care nu fuseseră declarate. Nu se aplică sumelor pe care contribuabilul le-a declarat corect dar nu le-a plătit la timp — acolo se aplică penalitatea de întârziere de 0,01%/zi. Penalitatea de nedeclarare nu poate depăși debitul și se reduce cu 75% la conformare.' },
       ]}
     >
       <h2>Cum se calculează penalitățile ANAF</h2>
@@ -134,11 +137,120 @@ export default function Page() {
         </li>
       </ul>
 
+      <h2>Al doilea exemplu: TVA întârziat 90 de zile</h2>
+      <p>
+        Să luăm o obligație de <strong>TVA declarată dar neplătită</strong> de 25.000 lei, achitată
+        cu <strong>90 de zile</strong> întârziere. Calculăm fiecare accesoriu pe debitul rămas, pas
+        cu pas:
+      </p>
+      <ul>
+        <li>
+          <strong>Pasul 1 — dobânda de întârziere:</strong> 25.000 × 0,02% × 90 zile ={' '}
+          <strong>450 lei</strong> (0,02%/zi se aplică întotdeauna);
+        </li>
+        <li>
+          <strong>Pasul 2 — penalitatea de întârziere:</strong> 25.000 × 0,01% × 90 zile ={' '}
+          <strong>225 lei</strong> (sumă declarată, deci 0,01%/zi);
+        </li>
+        <li>
+          <strong>Pasul 3 — total accesorii:</strong> 450 + 225 = <strong>675 lei</strong>, pe
+          lângă debitul de 25.000 lei, deci <strong>25.675 lei</strong> de plată în total.
+        </li>
+      </ul>
+      <p>
+        Dacă aceeași sumă ar fi fost <strong>nedeclarată</strong> și stabilită la inspecție,
+        penalitatea de nedeclarare ar fi 25.000 × 0,08% × 90 zile = <strong>1.800 lei</strong>. La
+        conformare (plata sau eșalonarea în termen), reducerea de 75% o aduce la{' '}
+        <strong>450 lei</strong>, plus dobânda de 450 lei — sensibil mai mult decât regimul de sumă
+        declarată corect. Observă cum penalitatea de nedeclarare de 0,08%/zi este de opt ori mai
+        mare decât cea de întârziere de 0,01%/zi.
+      </p>
+      <p className="text-sm text-neutral-500">
+        Valori orientative. Plata parțială mai devreme reduce debitul pe care se aplică accesoriile
+        pentru zilele rămase.
+      </p>
+
+      <h2>Declarat vs. nedeclarat: ce regim ți se aplică</h2>
+      <p>
+        Cel mai important factor pentru cuantumul accesoriilor este <strong>cum a fost stabilit
+        debitul</strong>. Tabelul de mai jos compară cele două situații pentru aceeași sumă și
+        aceeași întârziere:
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>Situație</th>
+            <th>Dobândă</th>
+            <th>Penalitate aplicabilă</th>
+            <th>Reducere posibilă</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Sumă declarată, plătită cu întârziere</td>
+            <td>0,02%/zi</td>
+            <td>Penalitate de întârziere 0,01%/zi</td>
+            <td>—</td>
+          </tr>
+          <tr>
+            <td>Sumă nedeclarată, descoperită la control</td>
+            <td>0,02%/zi</td>
+            <td>Penalitate de nedeclarare 0,08%/zi (plafonată la debit)</td>
+            <td>75% la conformare</td>
+          </tr>
+        </tbody>
+      </table>
+      <p className="text-sm text-neutral-500">
+        Dobânda de 0,02%/zi este comună ambelor situații. Diferă doar penalitatea: 0,01%/zi pentru
+        sumele declarate, 0,08%/zi pentru cele nedeclarate. Reducerea de 75% privește exclusiv
+        penalitatea de nedeclarare.
+      </p>
+
+      <h2>Context legal: temeiul accesoriilor</h2>
+      <p>
+        Accesoriile fiscale sunt reglementate de <strong>Legea 207/2015</strong> privind Codul de
+        procedură fiscală. <strong>Dobânda de întârziere</strong> de 0,02%/zi (art. 174) reprezintă
+        echivalentul prejudiciului adus bugetului prin neîncasarea la termen a sumei și se
+        datorează în toate cazurile de plată cu întârziere. <strong>Penalitatea de întârziere</strong>{' '}
+        de 0,01%/zi (art. 176) are caracter sancționatoriu și se aplică obligațiilor declarate dar
+        neachitate. <strong>Penalitatea de nedeclarare</strong> de 0,08%/zi (art. 181) sancționează
+        nedeclararea sumelor descoperite ulterior la control, nu se cumulează cu penalitatea de
+        întârziere pe aceeași sumă, nu poate depăși valoarea debitului principal și se reduce cu
+        75% atunci când contribuabilul se conformează (achită sau eșalonează debitul în termen).
+      </p>
+      <p>
+        Toate cotele se aplică <strong>pe zi de întârziere</strong>, calculate de la ziua imediat
+        următoare scadenței până la data stingerii obligației inclusiv. Sumele rezultate sunt
+        comunicate prin decizia referitoare la obligațiile de plată accesorii, vizibilă în Spațiul
+        Privat Virtual (SPV).
+      </p>
+
+      <h2>Cum eviți și cum reduci accesoriile</h2>
+      <ul>
+        <li>
+          <strong>Plătește chiar și parțial:</strong> orice plată reduce debitul pe care se
+          calculează dobânda de 0,02%/zi și penalitatea de 0,01%/zi pentru zilele următoare.
+        </li>
+        <li>
+          <strong>Declară corect și la timp:</strong> o sumă declarată atrage doar penalitatea de
+          întârziere de 0,01%/zi, nu cea de nedeclarare de 0,08%/zi — de opt ori mai mică.
+        </li>
+        <li>
+          <strong>Conformează-te rapid după control:</strong> achitarea sau eșalonarea în termenul
+          comunicat de ANAF declanșează reducerea de 75% a penalității de nedeclarare.
+        </li>
+        <li>
+          <strong>Monitorizează SPV:</strong> verifică periodic obligațiile și deciziile de
+          accesorii pentru a opri creșterea zilnică a sumelor.
+        </li>
+      </ul>
+
       <p>
         Pentru obligații curente, verifică-ți situația fiscală în Spațiul Privat Virtual (SPV)
         înainte de scadență. Dacă ai nevoie de alte estimări online, încearcă și{' '}
-        <Link href="/calculator/contributii-pfa/">calculatorul de contribuții PFA</Link> sau{' '}
-        <Link href="/calculator/tva/">calculatorul de TVA</Link>.
+        <Link href="/calculator/contributii-pfa/">calculatorul de contribuții PFA</Link>,{' '}
+        <Link href="/calculator/tva/">calculatorul de TVA</Link> sau{' '}
+        <Link href="/calculator/dobanda-legala/">calculatorul de dobândă legală</Link>.
       </p>
     </CalculatorLayout>
   );
