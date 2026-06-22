@@ -2,6 +2,14 @@
 
 Recapitulare practică: ce e construit, unde îl găsești și cum îl testezi. Tot e **live pe eghiseul.ro**, pe GitHub (branch `main`), CI verde.
 
+> **Update 22 iunie (după-amiază) — adăugat la calculatoare:**
+> - **Mega-meniu „Calculatoare"** (desktop + mobil, ca la Servicii) — `src/config/calculators-nav.ts` + `src/components/shared/calculators-mega-menu.tsx`, 15 grupate în 3 categorii.
+> - **QA corectitudine:** toate 15 testate cu valori reale în browser, fiecare verificat contra formulei → corecte.
+> - **Conținut îmbogățit** pe toate 15 (workflow 15 agenți): +3-4 secțiuni (exemplu numeric, tabele, greșeli frecvente) + 3-4 FAQ + linkuri interne fiecare.
+> - **Pop-up captare email** (lead-gen, GDPR) pe paginile de calculator → tabel `newsletter_subscribers` (migrare 074) + `/api/newsletter` + `src/components/calculators/newsletter-popup.tsx`. Incentive: „alerte fiscale + ghiduri"; trigger scroll 50%.
+> - **Imagini OG dinamice brandate** per calculator: rută edge `src/app/api/og/calculator/route.tsx` (next/og, 1200×630, font Liberation pt diacritice); toate 15 `ogImage → /api/og/calculator?title=${TITLE}`.
+> - **ANCPI worker — fix login** (repo separat `~/Projects/worker-ancpi`): vezi secțiunea 7 de mai jos.
+
 ---
 
 ## 1. Calculatoare (15 — toate verificate legal)
@@ -86,6 +94,20 @@ Wizard-ul de comandă pentru **naștere / căsătorie / celibat** e complet faț
 ## 6. Cum verifici că totul e indexabil
 - **Sitemap:** `/sitemap.xml` — include toate calculatoarele, orașele, ghidurile, serviciile (fără 404-uri; calculatoarele neconstruite au fost scoase).
 - **CI:** verde pe `main` (lint + tsc).
+
+---
+
+## 7. ANCPI worker — fix login (22 iunie)
+
+Repo separat: `~/Projects/worker-ancpi` (NU în acest repo). Detalii complete în memorie `ancpi-worker-status` + `docs/technical/specs/ancpi-automation-plan.md`.
+
+**Problema:** comenzi EXTRAS_CF eșuau repetat cu „Login did not reach the authenticated account page." (ex. E-260622-RPGN8, CF 151420-C1-U33 Satu Mare).
+
+**Cauza:** după login OpenAM, workerul făcea un `goto epay LogIn.action` suplimentar; un GET la `LogIn.action` fără sesiune validă întoarce o pagină „40x - client error" → verificarea „Contul meu" pica. Pagina de login + credențialele erau OK.
+
+**Fix** (`src/ancpi/session.ts`): verifică întâi pagina pe care a aterizat după login (evită goto-ul 40x-prone), cu goto doar ca fallback + eroare diagnostic (mentenanță / rămas-pe-login / 40x / neașteptat + URL). Commit `a14973f`.
+
+**⚠️ Deploy:** worker-ul se deployează cu **`railway up` din `~/Projects/worker-ancpi`** (Railway CLI) — **git push NU deployează** (repo neconectat la auto-deploy). După deploy, comanda E-260622-RPGN8 s-a plasat + plătit automat (ePay 10077906, status PROCESSING).
 
 ---
 
