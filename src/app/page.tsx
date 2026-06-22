@@ -1,6 +1,5 @@
 import { Suspense } from 'react';
 import { HeroSection } from '@/components/home/hero-section';
-import { SocialProofSection } from '@/components/home/social-proof-section';
 import { FeaturedServices, FeaturedServicesSkeleton } from '@/components/home/featured-services';
 import { UseCasesSection } from '@/components/home/use-cases-section';
 import { PainPointsSection } from '@/components/home/pain-points-section';
@@ -26,8 +25,8 @@ export default function HomePage() {
       {/* 1. Hero Section */}
       <HeroSection />
 
-      {/* 2. Social Proof - Stats & Trust */}
-      <SocialProofSection />
+      {/* 2. Cum funcționează în 3 pași (sub hero) — include bara de trust */}
+      <HowItWorksSection />
 
       {/* 3. Featured Services */}
       <section id="servicii">
@@ -42,10 +41,7 @@ export default function HomePage() {
       {/* 5. Pain Points - Problems we solve */}
       <PainPointsSection />
 
-      {/* 6. How It Works - Process */}
-      <HowItWorksSection />
-
-      {/* 7. Pricing */}
+      {/* 6. Pricing */}
       <PricingSection />
 
       {/* 8. Testimonials */}
