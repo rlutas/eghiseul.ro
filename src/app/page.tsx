@@ -5,7 +5,6 @@ import { WhyUsSection } from '@/components/home/why-us-section';
 import { UseCasesSection } from '@/components/home/use-cases-section';
 import { PainPointsSection } from '@/components/home/pain-points-section';
 import { HowItWorksSection } from '@/components/home/how-it-works-section';
-import { PricingSection } from '@/components/home/pricing-section';
 import { TestimonialsSection } from '@/components/home/testimonials-section';
 import { FAQSection } from '@/components/home/faq-section';
 import { HOMEPAGE_FAQS } from '@/components/home/faq-data';
@@ -48,10 +47,7 @@ export default function HomePage() {
       {/* 7. Pain Points - Problems we solve */}
       <PainPointsSection />
 
-      {/* 8. Pricing */}
-      <PricingSection />
-
-      {/* 9. FAQ */}
+      {/* 8. FAQ */}
       <FAQSection />
 
       {/* 10. Ghiduri & articole recente (parity cu site-ul WP + internal linking) */}
