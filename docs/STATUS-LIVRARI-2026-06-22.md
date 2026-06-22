@@ -2,6 +2,31 @@
 
 Recapitulare practică: ce e construit, unde îl găsești și cum îl testezi. Tot e **live pe eghiseul.ro**, pe GitHub (branch `main`), CI verde.
 
+---
+
+## 🟢 STARE FINALĂ (22 iunie 2026, seara) — citește ăsta primul
+
+**36 de calculatoare** live, fiecare validat față de sursă oficială + concurență, cu research legal/fiscal 2026 dedicat. Toate în **mega-meniu** (desktop + mobil, 3 categorii) + **index categorizat** cu iconițe (`/calculator/`) + sitemap + OG dinamic.
+
+**Lista completă (36) pe categorii:**
+- **Salariu & muncă (15):** salariu net/brut, contribuții PFA, concediu medical, indemnizație șomaj, indemnizație creștere copil, vechime în muncă, zile concediu de odihnă, impozit pe pensie, diurnă, concediu maternitate, concediu paternal, spor noapte/ore supl., vârstă de pensionare, estimare pensie, pensie de invaliditate.
+- **Fiscal (11):** TVA, dividende, taxe SRL, impozit auto, impozit chirie, penalități ANAF, rambursare anticipată, inflație, impozit pe casă, credit ipotecar, grad de îndatorare.
+- **Juridic & altele (10):** taxe notariale, pensie alimentară, termene judiciare, taxă judiciară de timbru, reabilitare cazier, amendă circulație, dobândă legală, zile lucrătoare, calculator dată, procente.
+
+**Plus:** pagină `/curs-valutar` (convertor + variație ▲/▼ + grafice 10 zile, live BNR).
+
+**Validări cheie (vs surse oficiale/concurență):** taxe notariale = notariate.ro la leu; termene = calculator-termene.ro; estimare pensie 35 ani → 3.341 lei; vârstă pensionare = Anexa 5 (din PDF, parsat automat); dividende 16% (nu 10%); credit ipotecar 1.933 lei; dobândă legală BNR 6,5%.
+
+**Conținut SEO:** toate paginile au content bogat (600–850+ cuvinte) — exemple numerice pas cu pas, tabele, greșeli frecvente, context legal, FAQ. Cele subțiri (3 pensii + 8 noi + originale) îmbogățite prin workflow (19 agenți).
+
+**GEO / AI Overviews (audit `/seo`):** content best-in-class (figuri datate, surse legale citate). Adăugat la nivel de template (toate 36): `dateModified` în schema, linie „Actualizat: iunie 2026", breadcrumb complet, WebApplication îmbogățit.
+
+**Research-ul a prevenit erori reale:** dividend 16% (nu 10%), CASS nou pe pensii, dobândă BNR 6,5%, VPR 81 înghețat, grila notarială nouă OMJ 177/C/2024, mitul civil/penal la termene.
+
+**Rămas (opțional, GEO):** bloc TL;DR per pagină (necesită workflow), atribuire autor/reviewer E-E-A-T (necesită decizie: cine e reviewer-ul editorial).
+
+---
+
 > **Update 22 iunie (după-amiază) — adăugat la calculatoare:**
 > - **Mega-meniu „Calculatoare"** (desktop + mobil, ca la Servicii) — `src/config/calculators-nav.ts` + `src/components/shared/calculators-mega-menu.tsx`, 15 grupate în 3 categorii.
 > - **QA corectitudine:** toate 15 testate cu valori reale în browser, fiecare verificat contra formulei → corecte.
