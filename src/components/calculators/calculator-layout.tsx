@@ -3,6 +3,7 @@ import { ChevronRight, Calculator, ArrowRight, Phone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ServiceFAQ } from '@/components/services/service-faq';
 import { Footer } from '@/components/home/footer';
+import { NewsletterPopup } from '@/components/calculators/newsletter-popup';
 import { BASE_URL } from '@/lib/seo';
 import { organizationNode, websiteNode, breadcrumbNode } from '@/lib/seo/schema';
 
@@ -163,6 +164,7 @@ export function CalculatorLayout({
       </main>
 
       <Footer />
+      <NewsletterPopup />
     </>
   );
 }
