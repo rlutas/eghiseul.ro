@@ -15,6 +15,7 @@ import {
   UserRound,
   Building2,
   Receipt,
+  Globe,
   Map as MapIcon,
   type LucideIcon,
 } from 'lucide-react';
@@ -65,6 +66,9 @@ export const SERVICES_NAV: ServiceNavGroup[] = [
       { name: 'Certificat Naștere', href: serviceUrl('certificat-nastere'), icon: Baby },
       { name: 'Certificat Căsătorie', href: serviceUrl('certificat-casatorie'), icon: Heart },
       { name: 'Certificat Celibat', href: serviceUrl('certificat-celibat'), icon: UserRound },
+      // Extrase multilingve (formular standard UE) — pagini statice, href direct (nu serviceUrl).
+      { name: 'Extras Multilingv Naștere', href: '/servicii/extras-multilingv-certificat-nastere/', icon: Globe },
+      { name: 'Extras Multilingv Căsătorie', href: '/servicii/extras-multilingv-certificat-casatorie/', icon: Globe },
     ],
   },
   {

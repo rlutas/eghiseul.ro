@@ -32,3 +32,8 @@ Pe `valabilitate-certificat-de-celibat`: framing **dual 6 luni / 90 zile** — n
 
 ## Vezi și
 `../SEO-STATUS-2026-06-22.md` — overview.
+
+## Extrase multilingve (uz în UE) — 2026-06-22
+Pagini noi la `/servicii/extras-multilingv-certificat-{nastere,casatorie}/` (formular standard UE, Reg. 2016/1191 — recunoscut în UE fără traducere/apostilă). Rankau pe WP; reconstruite la același URL + 301 vechi scoase. **În mega-meniul Servicii** (categoria Personale) + sitemap (`HARDCODED_SERVICE_SLUGS`).
+
+> Notă meniu: Cazier Auto (categoria Auto) + Cazier Fiscal (categoria Fiscale) erau deja în `src/config/services-nav.ts` — confirmate în DOM.
