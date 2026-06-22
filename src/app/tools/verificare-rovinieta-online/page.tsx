@@ -124,7 +124,9 @@ export default function VerificareRovinietaPage() {
         {/* Widget — overlaps hero (ca la calculatoare) */}
         <section className="bg-white">
           <div className="container mx-auto px-4 max-w-[820px]">
-            <div className="relative -mt-16 lg:-mt-20 rounded-2xl border border-neutral-200 bg-white p-4 sm:p-6 shadow-lg">
+            {/* Embed-ul erovinieta vine deja ca un card alb — NU îl mai învelim într-un
+                al doilea card; păstrăm doar overlap-ul peste hero (ca la calculatoare). */}
+            <div className="relative -mt-16 lg:-mt-20">
               <ErovinietaEmbed />
             </div>
             <div className="mt-5 rounded-2xl border-l-4 border-primary-500 bg-primary-50/60 px-5 py-4">
