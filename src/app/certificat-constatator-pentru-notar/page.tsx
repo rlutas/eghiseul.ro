@@ -241,6 +241,13 @@ export default function Page() {
         <Link href="/calculator/taxe-notariale/">calculatorul de taxe notariale</Link>, ca să știi din
         timp la ce onorariu să te aștepți.
       </p>
+      <p>
+        Vezi toate detaliile despre tipuri, preț și termene pe{' '}
+        <Link href="/servicii/certificat-constatator-online/">
+          pagina principală certificat constatator online
+        </Link>
+        .
+      </p>
 
       <h2>Concluzie</h2>
       <p>

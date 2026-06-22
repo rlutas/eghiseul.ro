@@ -121,7 +121,9 @@ export default function Page() {
         și legalității oricărei tranzacții imobiliare. Prin utilizarea resurselor disponibile și, dacă este necesar,
         apelând la serviciul de <Link href={serviceUrl('identificare-imobil')}>identificare a imobilului după
         adresă</Link>, proprietarii pot naviga cu succes prin complexitatea sistemului de cadastru și înregistrare a
-        proprietăților.
+        proprietăților. Odată ce ai numărul cadastral sau de carte funciară, poți obține rapid un{' '}
+        <Link href="/servicii/extras-de-carte-funciara/">extras de carte funciară online</Link>, cu situația juridică
+        la zi a imobilului.
       </p>
     </ArticleLayout>
   );

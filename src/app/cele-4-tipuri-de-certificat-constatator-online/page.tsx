@@ -188,7 +188,8 @@ export default function Page() {
       <p>
         Indiferent de tipul de care ai nevoie, îl poți obține 100% online prin serviciul nostru de{' '}
         <Link href={serviceUrl('certificat-constatator')}>certificat constatator</Link> — completezi datele, plătești
-        securizat și primești documentul pe email.
+        securizat și primești documentul pe email. Vezi pagina serviciului și{' '}
+        <Link href="/servicii/certificat-constatator-online/">comanzi certificatul constatator online</Link> în câțiva pași.
       </p>
     </ArticleLayout>
   );

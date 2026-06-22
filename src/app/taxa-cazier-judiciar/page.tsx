@@ -66,6 +66,10 @@ export default function Page() {
         obținerea unor avize sau dosare administrative. Una dintre primele întrebări pe care oamenii
         le au este: <strong>cât costă taxa pentru cazier judiciar și unde se plătește?</strong>
       </p>
+      <p>
+        Vezi serviciul:{' '}
+        <Link href="/servicii/cazier-judiciar-online/">cazierul judiciar online</Link>.
+      </p>
       <p>În acest articol vom detalia:</p>
       <ul>
         <li>care este <strong>costul taxei pentru cazier judiciar</strong>;</li>

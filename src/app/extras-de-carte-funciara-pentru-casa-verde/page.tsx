@@ -180,7 +180,8 @@ export default function Page() {
         participarea la Programul Casa Verde, oferind suport în completarea documentelor și interpretarea
         legislației aplicabile, totul din confortul propriei case. Dacă nu știi numărul cadastral al imobilului,
         poți folosi serviciul de{' '}
-        <Link href={serviceUrl('identificare-imobil')}>identificare imobil după adresă</Link>.
+        <Link href={serviceUrl('identificare-imobil')}>identificare imobil după adresă</Link>. Vezi serviciul:{' '}
+        <Link href="/servicii/extras-de-carte-funciara/">obții extrasul de carte funciară online</Link>.
       </p>
 
       <h2>Concluzie</h2>

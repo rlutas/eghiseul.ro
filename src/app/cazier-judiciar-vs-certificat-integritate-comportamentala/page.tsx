@@ -199,6 +199,11 @@ export default function Page() {
         Platforma poate fi accesată de către cetățeni români, persoane juridice și cetățeni străini, fiecare având
         condiții specifice de aplicare.
       </p>
+      <p>
+        Vezi serviciul:{' '}
+        <Link href="/servicii/cazier-judiciar-online/">comanzi cazierul judiciar online</Link>, fără deplasare la
+        ghișeu, cu livrare rapidă în format electronic sau la domiciliu.
+      </p>
 
       <h3>Documente necesare pentru obținerea certificatelor</h3>
       <p>

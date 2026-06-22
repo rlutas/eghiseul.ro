@@ -163,7 +163,9 @@ export default function Page() {
       <p>
         <Link href={serviceUrl('extras-carte-funciara')}>Extrasul de carte funciară</Link> colectivă oferă informații
         detaliate despre <strong>imobil</strong>, <strong>proprietari</strong> și situația juridică, fiind
-        indispensabil pentru <strong>tranzacțiile imobiliare</strong>.
+        indispensabil pentru <strong>tranzacțiile imobiliare</strong>. Poți solicita un{' '}
+        <Link href="/servicii/extras-de-carte-funciara/">extras de carte funciară online</Link>, livrat oficial de
+        ANCPI direct pe email, fără deplasare la ghișeu.
       </p>
 
       <h2>Intabularea și actualizarea informațiilor</h2>

@@ -140,7 +140,9 @@ export default function Page() {
       <p>
         Este recomandat să obțineți un certificat constatator atunci când începeți o colaborare cu o altă persoană
         sau companie, când doriți să faceți dovada existenței unei firme sau când solicitați servicii sau credite de
-        la instituții financiare.
+        la instituții financiare. Pentru a economisi timp, poți solicita un{' '}
+        <Link href="/servicii/certificat-constatator-online/">certificat constatator online</Link> direct de pe
+        platforma noastră.
       </p>
 
       <h2>Concluzie</h2>

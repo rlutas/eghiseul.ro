@@ -96,7 +96,9 @@ export default function Page() {
       <h2>Beneficiile obținerii extrasului</h2>
       <p>
         Obținerea acestui document aduce securitate juridică incomparabilă și transparență în tranzacțiile imobiliare,
-        reducând semnificativ riscurile de fraudă și litigii.
+        reducând semnificativ riscurile de fraudă și litigii. Cel mai simplu,{' '}
+        <Link href="/servicii/extras-de-carte-funciara/">comanzi extrasul de carte funciară online</Link>, direct
+        din sursa oficială ANCPI, fără să te deplasezi la OCPI.
       </p>
       <p>
         Poți solicita un{' '}

@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { buildPageMetadata } from '@/lib/seo';
 import { ArticleLayout } from '@/components/articole/article-layout';
 
@@ -83,7 +84,9 @@ export default function Page() {
       <h3>4. Emiterea de certificate constatatoare</h3>
       <p>
         Instituția emite certificate constatatoare privind situația juridică a societăților comerciale, documente
-        extrem de importante pentru diverse tranzacții comerciale sau solicitări de finanțare.
+        extrem de importante pentru diverse tranzacții comerciale sau solicitări de finanțare. Poți obține un{' '}
+        <Link href="/servicii/certificat-constatator-online/">certificat constatator de la ONRC</Link> direct online,
+        fără deplasare la ghișeu.
       </p>
 
       <h2>Concluzie</h2>

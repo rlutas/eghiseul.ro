@@ -220,6 +220,13 @@ export default function Page() {
         <Link href={constatatorUrl}>eGhișeul.ro</Link> te ajută să-l ai exact la timp, fără riscul de
         a rata termenul.
       </p>
+      <p>
+        Vezi serviciul:{' '}
+        <Link href="/servicii/certificat-constatator-online/">
+          pagina principală certificat constatator online
+        </Link>
+        .
+      </p>
     </ArticleLayout>
   );
 }

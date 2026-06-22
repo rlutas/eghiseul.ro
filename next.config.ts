@@ -29,18 +29,6 @@ const nextConfig: NextConfig = {
         destination: '/tools/verificare-rovinieta-online/',
         permanent: true,
       },
-      // Extras multilingv (naștere/căsătorie) — rankau pe WP dar nu au pagină în Next.
-      // 301 către pagina de eliberare relevantă (evită 404; recuperează link equity).
-      {
-        source: '/servicii/extras-multilingv-certificat-nastere',
-        destination: '/servicii/eliberare-certificat-de-nastere/',
-        permanent: true,
-      },
-      {
-        source: '/servicii/extras-multilingv-certificat-casatorie',
-        destination: '/servicii/eliberare-certificat-de-casatorie/',
-        permanent: true,
-      },
       // Certificat de Integritate — canonical SEO page is at the WP-parity URL
       // /servicii/certificat-de-integritate-comportamentala/. Both the DB slug
       // and the no-"de" variant collapse there (single hop, no redirect chain).
