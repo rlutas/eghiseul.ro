@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import { OCPI_COUNTIES } from '@/lib/seo/locations/ocpi';
 import Image from 'next/image';
 import { createPublicClient } from '@/lib/supabase/public';
 import { Badge } from '@/components/ui/badge';
@@ -956,6 +957,27 @@ export default async function ExtrasCarteFunciaraPage() {
               <svg className="w-4 h-4 text-[#FBBC04] fill-[#FBBC04]" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" /></svg>
               <strong className="text-white/90">{GOOGLE_RATING.toString().replace('.', ',')}</strong> din {GOOGLE_REVIEW_COUNT_LABEL} de recenzii Google
             </p>
+          </div>
+        </section>
+
+        {/* Extras carte funciară pe județe */}
+        <section className="py-12 bg-neutral-50 border-t border-neutral-100">
+          <div className="container mx-auto px-4 max-w-[820px]">
+            <h2 className="text-xl font-bold text-secondary-900 mb-2">Extras carte funciară pe județe</h2>
+            <p className="text-neutral-600 mb-5 text-sm">
+              Vezi cum obții extrasul de carte funciară în județul tău, cu datele biroului OCPI local și pașii pentru comanda online.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {OCPI_COUNTIES.map((c) => (
+                <Link
+                  key={c.slug}
+                  href={`/servicii/extras-de-carte-funciara/${c.slug}/`}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-neutral-200 bg-white px-4 py-2 text-sm text-neutral-700 hover:border-primary-300 hover:text-primary-600 transition-colors"
+                >
+                  {c.judet}
+                </Link>
+              ))}
+            </div>
           </div>
         </section>
       </main>

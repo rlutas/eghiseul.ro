@@ -24,6 +24,7 @@ import {
   HARDCODED_ARTICLE_SLUGS,
 } from '@/lib/seo/constants';
 import { allCitySlugs } from '@/lib/seo/locations';
+import { allOcpiSlugs } from '@/lib/seo/locations/ocpi';
 
 type SitemapEntry = MetadataRoute.Sitemap[number];
 
@@ -92,6 +93,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   for (const oras of allCitySlugs()) {
     entries.push({
       url: `${BASE_URL}/servicii/cazier-judiciar-online/${oras}/`,
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    });
+  }
+
+  // 4c. Location pages (extras carte funciară pe județ) — date OCPI reale.
+  for (const judet of allOcpiSlugs()) {
+    entries.push({
+      url: `${BASE_URL}/servicii/extras-de-carte-funciara/${judet}/`,
       changeFrequency: 'monthly',
       priority: 0.7,
     });
