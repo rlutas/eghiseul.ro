@@ -2,6 +2,13 @@
 
 Rezumat al expansiunii location-SEO + clustere construite pe 22 iunie 2026. Tot e **live pe main**, CI verde, în sitemap (186 URL-uri total). Strategia de scope: vezi memoria `location-seo-scope` + `docs/plans/2026-06-19-location-seo-engine.md`.
 
+## 📁 Foldere dedicate (per treabă)
+- [`carte-funciara/`](carte-funciara/README.md) — 42 pagini CF pe județe (date OCPI) + analiză competiție.
+- [`cazier-judiciar/`](cazier-judiciar/README.md) — 48 orașe cazier (date IPJ).
+- [`onrc-certificat-constatator/`](onrc-certificat-constatator/README.md) — 4 pagini use-case.
+- [`stare-civila/`](stare-civila/README.md) — 8 ghiduri (celibat/naștere/căsătorie).
+- [`keywords/`](keywords/) — keyword research per serviciu.
+
 ## Ce s-a construit
 
 ### 1. Extras Carte Funciară pe județe — 42 pagini (P1) ✅

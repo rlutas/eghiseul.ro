@@ -27,7 +27,7 @@ Fiecare `keywords.md`: tabel grupat pe **cluster de sub-intenție**, cu coloane 
 | certificat-celibat | ⏳ pending | — | de adăugat export |
 | cazier-judiciar | ⏳ pending | GSC | date în `docs/seo/gsc-data/` |
 | cazier-auto | ⏳ pending | GSC | — |
-| extras-carte-funciara | ⏳ pending | — | vezi `competitor-analysis-extras-carte-funciara.md` |
+| extras-carte-funciara | ⏳ pending | — | vezi `../carte-funciara/competitor-analysis.md` |
 | certificat-constatator | ⏳ pending | — | segmentare pe caz, nu orașe |
 
 ## Legătură cu planul

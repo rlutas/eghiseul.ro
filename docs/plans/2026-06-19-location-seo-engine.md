@@ -168,5 +168,5 @@ Mecanic: o funcție `assertLocationPageQuality(data)` rulată în test care eșu
 
 ## 7. Relația cu docs existente
 - Înlocuiește/ridică `docs/seo/CITY-PAGES-PLAN.md` (cazier-only, 2026-05-20) la engine multi-serviciu. Conținutul per-city de acolo (tabelul de elemente diferențiate) rămâne sursa pentru body-ul cazier.
-- `docs/seo/competitor-analysis-extras-carte-funciara.md` = input pentru Faza 3.
+- `docs/seo/carte-funciara/competitor-analysis.md` = input pentru Faza 3.
 - La final de fiecare fază: update `docs/DEVELOPMENT_MASTER_PLAN.md` + `docs/seo/INDEX.md`.

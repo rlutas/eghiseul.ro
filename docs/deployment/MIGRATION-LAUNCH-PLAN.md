@@ -106,4 +106,4 @@ Fiecare pagină de serviciu are: hero + price card (split TVA) + sticky CTA mobi
 
 ---
 
-*Vezi și `docs/seo/seo-audit-and-ranking-plan.md` (audit tehnic + plan ranking/backlinks) și `docs/seo/competitor-analysis-extras-carte-funciara.md`.*
+*Vezi și `docs/seo/seo-audit-and-ranking-plan.md` (audit tehnic + plan ranking/backlinks) și `docs/seo/carte-funciara/competitor-analysis.md`.*
