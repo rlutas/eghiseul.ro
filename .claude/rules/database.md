@@ -1,4 +1,14 @@
+---
+paths:
+  - "supabase/**"
+  - "**/*.sql"
+  - "src/lib/supabase/**"
+  - "src/lib/oblio/**"
+---
+
 # Database Rules
+
+> Regulă path-scoped: se încarcă DOAR când atingi fișiere SQL / Supabase / migrări (economie context în sesiunile fără DB). Conține lecții din incidente reale (lock facturi, `.or()` pe mutații, cache PostgREST).
 
 - NEVER ask user to run SQL/migrations manually - execute via Supabase REST API yourself
 - Read service role key from `.env.local` -> `SUPABASE_SERVICE_ROLE_KEY`
