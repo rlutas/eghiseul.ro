@@ -18,6 +18,7 @@ export const HARDCODED_SERVICE_SLUGS = [
   'cazier-judiciar-online',
   'cazier-fiscal-online',
   'cazier-auto-online',
+  'rovinieta-online',
   'verificare-rovinieta-online',
   'eliberare-certificat-de-nastere',
   'eliberare-certificat-de-casatorie',

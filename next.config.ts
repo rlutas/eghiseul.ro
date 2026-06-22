@@ -20,11 +20,13 @@ const nextConfig: NextConfig = {
         destination: '/comanda/:slug/',
         permanent: true,
       },
-      // Rovinieta WP variant — both URLs exist in GSC; we canonicalize to
-      // the verificare-rovinieta-online one (16K clicks vs 133 clicks).
+      // /servicii/rovinieta-online/ este acum o pagină reală (cumpărare rovinietă,
+      // intenție „rovinieta online" ~134K impresii) — NU se mai redirectează.
+      // Vechiul /servicii/verificare-rovinieta-online/ (16K clickuri GSC) nu are
+      // pagină → îl trimitem la tool-ul real de verificare din /tools/.
       {
-        source: '/servicii/rovinieta-online',
-        destination: '/servicii/verificare-rovinieta-online/',
+        source: '/servicii/verificare-rovinieta-online',
+        destination: '/tools/verificare-rovinieta-online/',
         permanent: true,
       },
       // Certificat de Integritate — canonical SEO page is at the WP-parity URL

@@ -56,6 +56,7 @@ export const SERVICES_NAV: ServiceNavGroup[] = [
       // Points to the verification tool (widget + the high-traffic /tools URL),
       // not the order page — that's what users searching "verificare rovinietă" want.
       { name: 'Verificare Rovinietă', href: '/tools/verificare-rovinieta-online/', icon: Ticket },
+      { name: 'Rovinietă Online', href: '/servicii/rovinieta-online/', icon: Ticket },
     ],
   },
   {
