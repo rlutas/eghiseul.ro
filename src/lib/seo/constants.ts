@@ -130,6 +130,7 @@ export const HARDCODED_CALCULATOR_SLUGS: readonly string[] = [
   'grad-indatorare',
   'concediu-paternal',
   'spor-salarial',
+  'varsta-pensionare',
 ];
 
 /** Tools pages (ported from WP /tools/*). */

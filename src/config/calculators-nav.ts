@@ -37,6 +37,7 @@ import {
   Gauge,
   UserRound,
   Moon,
+  Hourglass,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -67,6 +68,7 @@ export const CALCULATORS_NAV: CalculatorNavGroup[] = [
       { name: 'Concediu maternitate', href: '/calculator/concediu-maternitate/', icon: HeartPulse },
       { name: 'Concediu paternal', href: '/calculator/concediu-paternal/', icon: UserRound },
       { name: 'Spor noapte / ore supl.', href: '/calculator/spor-salarial/', icon: Moon },
+      { name: 'Vârstă de pensionare', href: '/calculator/varsta-pensionare/', icon: Hourglass },
     ],
   },
   {
