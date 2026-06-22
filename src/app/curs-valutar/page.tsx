@@ -1,13 +1,15 @@
 import Link from 'next/link';
-import { ChevronRight, TrendingUp } from 'lucide-react';
+import { ChevronRight, TrendingUp, ArrowUpRight, ArrowDownRight, Minus } from 'lucide-react';
 import { buildPageMetadata } from '@/lib/seo';
-import { getBnrRates, CURRENCY_NAMES, type BnrRate } from '@/lib/bnr';
+import { getBnrRates, getBnrHistory, CURRENCY_NAMES, type BnrRate } from '@/lib/bnr';
 import { ServiceFAQ } from '@/components/services/service-faq';
 import { Footer } from '@/components/home/footer';
+import { CursConverter } from '@/components/curs-valutar/curs-converter';
+import { CursChart } from '@/components/curs-valutar/curs-chart';
 
-const TITLE = 'Curs Valutar BNR Azi — Euro, Dolar și Toate Valutele';
+const TITLE = 'Curs Valutar BNR Azi — Euro, Dolar, Liră (Convertor + Grafice)';
 const DESCRIPTION =
-  'Cursul valutar oficial BNR de azi: euro, dolar, liră, franc elvețian și toate valutele, actualizat zilnic din sursa oficială a Băncii Naționale a României.';
+  'Curs valutar BNR oficial azi: euro, dolar, liră și toate valutele, cu variație zilnică, convertor valutar și grafice de evoluție. Actualizat din sursa oficială BNR.';
 
 export const revalidate = 3600;
 
@@ -19,25 +21,59 @@ export const metadata = buildPageMetadata({
 });
 
 const PRIORITY = ['EUR', 'USD', 'GBP', 'CHF'];
+const CHART_CODES = ['EUR', 'USD', 'GBP'];
 const nf = new Intl.NumberFormat('ro-RO', { minimumFractionDigits: 4, maximumFractionDigits: 4 });
 
 function sortRates(rates: BnrRate[]): BnrRate[] {
   return [...rates].sort((a, b) => {
     const ia = PRIORITY.indexOf(a.currency);
     const ib = PRIORITY.indexOf(b.currency);
-    if (ia !== -1 || ib !== -1) {
-      return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib);
-    }
+    if (ia !== -1 || ib !== -1) return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib);
     return a.currency.localeCompare(b.currency);
   });
 }
 
+function Variatie({ delta }: { delta: number | null }) {
+  if (delta === null) return <span className="text-neutral-300">—</span>;
+  if (Math.abs(delta) < 0.00005)
+    return (
+      <span className="inline-flex items-center gap-0.5 text-neutral-400">
+        <Minus className="w-3.5 h-3.5" />0
+      </span>
+    );
+  const up = delta > 0;
+  return (
+    <span className={`inline-flex items-center gap-0.5 font-semibold ${up ? 'text-green-600' : 'text-red-600'}`}>
+      {up ? <ArrowUpRight className="w-3.5 h-3.5" /> : <ArrowDownRight className="w-3.5 h-3.5" />}
+      {up ? '+' : '−'}
+      {nf.format(Math.abs(delta))}
+    </span>
+  );
+}
+
 export default async function Page() {
-  const { date, rates } = await getBnrRates();
+  const [{ date, rates }, history] = await Promise.all([getBnrRates(), getBnrHistory()]);
   const sorted = sortRates(rates);
+
+  const prevMap: Record<string, number> = {};
+  for (const [code, vals] of Object.entries(history.series)) {
+    if (vals.length >= 2) prevMap[code] = vals[vals.length - 2];
+  }
+  const per1 = (r: BnrRate) => r.value / r.multiplier;
+  const deltaOf = (r: BnrRate): number | null => (prevMap[r.currency] != null ? per1(r) - prevMap[r.currency] : null);
+
+  const converterCurrencies = [
+    { code: 'RON', name: 'Leu românesc', perUnit: 1 },
+    ...sorted.map((r) => ({ code: r.currency, name: CURRENCY_NAMES[r.currency] ?? r.currency, perUnit: per1(r) })),
+  ];
+
   const dateLabel = date
     ? new Date(date).toLocaleDateString('ro-RO', { day: 'numeric', month: 'long', year: 'numeric' })
     : null;
+
+  const highlights = PRIORITY.slice(0, 3)
+    .map((code) => sorted.find((r) => r.currency === code))
+    .filter((r): r is BnrRate => Boolean(r));
 
   return (
     <>
@@ -64,44 +100,78 @@ export default async function Page() {
             <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-primary-500 text-secondary-900 text-xs font-bold rounded-full mb-4">
               <TrendingUp className="w-3.5 h-3.5" /> Curs oficial BNR
             </span>
-            <h1 className="text-3xl sm:text-4xl lg:text-[2.75rem] font-extrabold text-white leading-tight mb-5">
-              Curs valutar BNR {dateLabel ? `— ${dateLabel}` : 'azi'}
+            <h1 className="text-3xl sm:text-4xl lg:text-[2.75rem] font-extrabold text-white leading-tight mb-4">
+              Curs valutar BNR azi
             </h1>
             <p className="text-lg text-white/85 leading-relaxed">
-              Cursurile de referință ale Băncii Naționale a României, actualizate zilnic din sursa oficială. 1 unitate de
-              valută exprimată în lei (RON).
+              Convertor valutar, curs oficial pentru toate valutele și grafice de evoluție.
+              {dateLabel && (
+                <>
+                  {' '}
+                  Curs de referință din <strong className="text-white">{dateLabel}</strong>, valabil până la următoarea
+                  publicare BNR.
+                </>
+              )}
             </p>
           </div>
         </header>
 
-        {/* Tabel — overlaps hero */}
+        {/* Convertor — overlaps hero */}
         <section className="bg-white">
           <div className="container mx-auto px-4 max-w-[820px]">
-            <div className="relative -mt-16 lg:-mt-20 rounded-2xl border border-neutral-200 bg-white p-4 sm:p-6 shadow-lg">
+            <div className="relative -mt-16 lg:-mt-20">
+              <CursConverter currencies={converterCurrencies} />
+            </div>
+
+            {/* Variație rapidă EUR/USD/GBP */}
+            {highlights.length > 0 && (
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-4">
+                {highlights.map((r) => (
+                  <div key={r.currency} className="rounded-xl border border-neutral-200 bg-white p-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-semibold text-neutral-600">
+                        {CURRENCY_NAMES[r.currency] ?? r.currency}
+                      </span>
+                      <span className="text-xs font-mono text-neutral-400">{r.currency}</span>
+                    </div>
+                    <div className="mt-1 flex items-baseline justify-between gap-2">
+                      <span className="text-2xl font-extrabold text-secondary-900 tabular-nums">{nf.format(per1(r))}</span>
+                      <Variatie delta={deltaOf(r)} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </section>
+
+        {/* Tabel complet */}
+        <section className="bg-white pt-8">
+          <div className="container mx-auto px-4 max-w-[820px]">
+            <h2 className="text-xl font-bold text-secondary-900 mb-3">Toate cursurile BNR</h2>
+            <div className="rounded-2xl border border-neutral-200 bg-white p-4 sm:p-6 shadow-sm">
               {sorted.length > 0 ? (
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-neutral-200 text-left text-neutral-500">
                       <th className="py-2.5 pr-3 font-semibold">Valută</th>
                       <th className="py-2.5 px-3 font-semibold">Cod</th>
-                      <th className="py-2.5 pl-3 font-semibold text-right">Curs (lei)</th>
+                      <th className="py-2.5 px-3 font-semibold text-right">Curs (lei)</th>
+                      <th className="py-2.5 pl-3 font-semibold text-right">Variație</th>
                     </tr>
                   </thead>
                   <tbody>
                     {sorted.map((r) => {
-                      const per1 = r.value / r.multiplier;
                       const major = PRIORITY.includes(r.currency);
                       return (
-                        <tr
-                          key={r.currency}
-                          className={major ? 'border-b border-neutral-100 bg-primary-50/40' : 'border-b border-neutral-100'}
-                        >
-                          <td className="py-2.5 pr-3 text-secondary-900">
-                            {CURRENCY_NAMES[r.currency] ?? r.currency}
-                          </td>
+                        <tr key={r.currency} className={`border-b border-neutral-100 ${major ? 'bg-primary-50/40' : ''}`}>
+                          <td className="py-2.5 pr-3 text-secondary-900">{CURRENCY_NAMES[r.currency] ?? r.currency}</td>
                           <td className="py-2.5 px-3 text-neutral-500 font-mono">{r.currency}</td>
-                          <td className="py-2.5 pl-3 text-right font-bold text-secondary-900 tabular-nums">
-                            {nf.format(per1)}
+                          <td className="py-2.5 px-3 text-right font-bold text-secondary-900 tabular-nums">
+                            {nf.format(per1(r))}
+                          </td>
+                          <td className="py-2.5 pl-3 text-right tabular-nums">
+                            <Variatie delta={deltaOf(r)} />
                           </td>
                         </tr>
                       );
@@ -114,12 +184,27 @@ export default async function Page() {
                 </p>
               )}
               <p className="text-xs text-neutral-400 mt-4">
-                Sursă: Banca Națională a României (cursuri de referință). Cursurile comerciale ale băncilor și caselor de
-                schimb diferă de cursul BNR.
+                Variația este față de ziua de curs anterioară. Sursă: Banca Națională a României (cursuri de referință).
               </p>
             </div>
           </div>
         </section>
+
+        {/* Grafice de evoluție */}
+        {history.dates.length >= 2 && (
+          <section className="bg-white pt-10">
+            <div className="container mx-auto px-4 max-w-[820px]">
+              <h2 className="text-xl font-bold text-secondary-900 mb-3">Evoluția cursului (ultimele zile)</h2>
+              <div className="space-y-4">
+                {CHART_CODES.map((code) =>
+                  history.series[code] && history.series[code].length >= 2 ? (
+                    <CursChart key={code} code={code} dates={history.dates} values={history.series[code]} />
+                  ) : null
+                )}
+              </div>
+            </div>
+          </section>
+        )}
 
         {/* SEO content */}
         <article className="py-12 lg:py-16 bg-white">
@@ -137,20 +222,28 @@ export default async function Page() {
               <p>
                 Banca Națională a României publică zilnic, în fiecare zi lucrătoare (în jurul orei 13:00), cursurile de
                 referință pentru leu față de principalele valute. Acestea sunt cursuri <strong>oficiale</strong>,
-                folosite pentru contabilitate, declarații fiscale, contracte și calcule notariale — nu sunt cursuri la
-                care poți schimba efectiv bani (băncile și casele de schimb aplică propriile cursuri, ușor diferite).
+                folosite pentru contabilitate, declarații fiscale, contracte și calcule notariale. Nu sunt cursurile la
+                care schimbi efectiv bani — băncile și casele de schimb aplică propriile cursuri de vânzare și cumpărare,
+                cu un comision inclus.
+              </p>
+              <h2>Convertor valutar BNR</h2>
+              <p>
+                Convertorul de mai sus folosește cursurile oficiale BNR pentru a transforma orice sumă dintr-o valută în
+                alta (sau în lei). Toate conversiile se fac prin leu (RON), moneda de referință a cursului BNR. Pentru
+                conversii rapide euro–leu sau dolar–leu, alege valutele și introdu suma.
               </p>
               <h2>Când se actualizează cursul</h2>
               <p>
-                Cursul BNR se stabilește o singură dată pe zi și rămâne valabil până la următoarea zi lucrătoare. În
-                weekend și de sărbătorile legale se folosește ultimul curs publicat. Tabelul de mai sus se actualizează
-                automat din sursa oficială BNR.
+                Cursul BNR se stabilește o singură dată pe zi și rămâne valabil până în următoarea zi lucrătoare. În
+                weekend și de sărbătorile legale se folosește ultimul curs publicat — de aceea, lunea dimineața, cursul
+                afișat poate fi cel de vineri, până la publicarea noului curs. Variația din tabel arată cum s-a modificat
+                fiecare valută față de ziua de curs anterioară.
               </p>
               <h2>Cum se citește cursul</h2>
               <p>
-                Valoarea afișată reprezintă câți lei costă o unitate din valuta respectivă. De exemplu, un curs euro de
-                5,2391 înseamnă că 1 EUR = 5,2391 lei. Pentru valutele cu valoare mică pe unitate (yen, forint), BNR
-                publică oficial cursul la 100 de unități; în tabel afișăm valoarea raportată la o singură unitate.
+                Valoarea afișată reprezintă câți lei costă o unitate din valuta respectivă. Un curs euro de 5,2391
+                înseamnă că 1 EUR = 5,2391 lei. Pentru valutele cu valoare mică pe unitate (yen, forint), BNR publică
+                oficial cursul la 100 de unități; în tabel afișăm valoarea raportată la o singură unitate.
               </p>
               <p>
                 Cursul BNR este folosit și în <Link href="/calculator/taxe-notariale/">calculatorul de taxe notariale</Link>{' '}
@@ -177,8 +270,8 @@ export default async function Page() {
               a: 'În weekend și de sărbătorile legale BNR nu publică un curs nou, așa că se folosește ultimul curs publicat în ziua lucrătoare anterioară.',
             },
             {
-              q: 'Cursul de pe această pagină este oficial?',
-              a: 'Da, cursurile sunt preluate automat din sursa oficială a Băncii Naționale a României (feed-ul de cursuri de referință) și se actualizează zilnic.',
+              q: 'Cursul de pe această pagină este oficial și actualizat?',
+              a: 'Da, cursurile sunt preluate automat din sursa oficială a Băncii Naționale a României (feed-ul de cursuri de referință) și se actualizează în fiecare zi lucrătoare, după publicarea BNR.',
             },
           ]}
         />

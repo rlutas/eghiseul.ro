@@ -41,6 +41,40 @@ export async function getBnrRates(): Promise<BnrData> {
   }
 }
 
+export interface BnrHistory {
+  dates: string[]; // crescător (cel mai vechi → cel mai nou)
+  series: Record<string, number[]>; // valoare per 1 unitate, aliniată cu `dates`
+}
+
+/** Istoricul pe 10 zile (bnr.ro/nbrfxrates10days.xml) pentru variație + grafice. */
+export async function getBnrHistory(): Promise<BnrHistory> {
+  try {
+    const res = await fetch('https://www.bnr.ro/nbrfxrates10days.xml', { next: { revalidate: 3600 } });
+    if (!res.ok) throw new Error(`bnr ${res.status}`);
+    const xml = await res.text();
+    const cubeRe = /<Cube date="([\d-]+)">([\s\S]*?)<\/Cube>/g;
+    const cubes: { date: string; body: string }[] = [];
+    let cm: RegExpExecArray | null;
+    while ((cm = cubeRe.exec(xml)) !== null) cubes.push({ date: cm[1], body: cm[2] });
+    cubes.sort((a, b) => a.date.localeCompare(b.date));
+
+    const dates: string[] = [];
+    const series: Record<string, number[]> = {};
+    for (const cube of cubes) {
+      dates.push(cube.date);
+      const rateRe = /<Rate currency="([A-Z]+)"(?: multiplier="(\d+)")?>([\d.]+)<\/Rate>/g;
+      let rm: RegExpExecArray | null;
+      while ((rm = rateRe.exec(cube.body)) !== null) {
+        const mult = rm[2] ? parseInt(rm[2], 10) : 1;
+        (series[rm[1]] ??= []).push(parseFloat(rm[3]) / mult);
+      }
+    }
+    return { dates, series };
+  } catch {
+    return { dates: [], series: {} };
+  }
+}
+
 /** Denumiri RO pentru valutele publicate de BNR (fallback = codul). */
 export const CURRENCY_NAMES: Record<string, string> = {
   AED: 'Dirham UAE',
