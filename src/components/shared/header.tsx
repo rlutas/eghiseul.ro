@@ -413,7 +413,7 @@ export function Header() {
                                   <p className="px-3 text-xs font-bold uppercase tracking-wider text-primary-700">
                                     {group.category}
                                   </p>
-                                  {group.items.map((item) => (
+                                  {group.items.filter((item) => item.popular).map((item) => (
                                     <Link
                                       key={item.href}
                                       href={item.href}

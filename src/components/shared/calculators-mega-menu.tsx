@@ -77,7 +77,7 @@ export function CalculatorsMegaMenu() {
                   {group.category}
                 </p>
                 <ul className="space-y-1">
-                  {group.items.map((item) => (
+                  {group.items.filter((item) => item.popular).map((item) => (
                     <li key={item.href}>
                       <Link
                         href={item.href}
