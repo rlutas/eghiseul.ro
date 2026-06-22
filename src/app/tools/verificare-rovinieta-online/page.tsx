@@ -96,10 +96,9 @@ export default function VerificareRovinietaPage() {
               </p>
             </div>
 
-            {/* The widget */}
-            <div className="bg-white rounded-3xl shadow-2xl p-3 sm:p-4 border border-neutral-100">
-              <ErovinietaEmbed />
-            </div>
+            {/* The widget — erovinieta.net embed comes self-styled as a white card,
+                so we render it directly (no extra white wrapper → avoids double-card). */}
+            <ErovinietaEmbed />
 
             <p className="text-center text-white/50 text-xs mt-4">
               Verificarea folosește datele oficiale CNAIR. Serviciu informativ gratuit.

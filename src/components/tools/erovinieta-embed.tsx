@@ -32,9 +32,10 @@ export function ErovinietaEmbed() {
       src={EMBED_SRC}
       title="Verificare rovinietă online"
       loading="lazy"
+      scrolling="no"
       referrerPolicy="no-referrer-when-downgrade"
-      className="block w-full rounded-2xl border border-neutral-200 bg-white shadow-sm"
-      style={{ height: 420, border: 0 }}
+      className="block w-full"
+      style={{ height: 420, border: 0, background: 'transparent' }}
     />
   );
 }
