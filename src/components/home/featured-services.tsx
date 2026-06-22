@@ -22,6 +22,7 @@ const PF_SERVICES: ServiceItem[] = [
   { name: 'Extras Multilingv Certificat Căsătorie', href: '/servicii/extras-multilingv-certificat-casatorie/', img: '/images/specimens/extras-multilingv-casatorie.webp', badge: null, desc: 'Extras multilingv căsătorie recunoscut în UE. Fără traducere legalizată sau apostilă Haga.' },
   { name: 'Certificat de Celibat', href: '/servicii/eliberare-certificat-de-celibat/', img: '/images/specimens/certificat-celibat.png', badge: 'popular', desc: 'Certificat de celibat online pentru căsătorie în străinătate. Eliberare rapidă, livrare internațională.' },
   { name: 'Extras Carte Funciară', href: '/servicii/extras-de-carte-funciara/', img: '/images/specimens/extras-cf.png', badge: null, desc: 'Extras de carte funciară online de la ANCPI. Verifici proprietatea instant, livrare pe email în câteva minute.' },
+  { name: 'Certificat Constatator Persoană Fizică', href: '/servicii/certificat-constatator-online/', img: '/images/specimens/certificat-constatator.png', badge: null, desc: 'Verifică, după CNP, dacă o persoană este asociat sau administrator în firme înregistrate la Registrul Comerțului.' },
   { name: 'Rovinieta Online', href: '/servicii/rovinieta-online/', img: '/images/specimens/rovinieta.webp', badge: 'nou', desc: 'Cumpără rovinieta online rapid și simplu. Valabilă imediat după plată, fără așteptare.' },
 ];
 
