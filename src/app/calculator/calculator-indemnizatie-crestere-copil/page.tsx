@@ -15,7 +15,7 @@ export const metadata = buildPageMetadata({
   title: TITLE,
   description: DESCRIPTION,
   path: `/calculator/${SLUG}/`,
-  ogImage: '/og/default.png',
+  ogImage: `/api/og/calculator?title=${encodeURIComponent(TITLE)}`,
 });
 
 export default function Page() {
