@@ -165,6 +165,16 @@ export const HARDCODED_ARTICLE_SLUGS = [
   'importanta-extras-de-carte-funciara-colectiva',
   'extras-de-carte-funciara-pentru-casa-verde',
   'rolul-si-atributiile-onrc-romania',
+  'certificat-constatator-pentru-banca',
+  'certificat-constatator-pentru-licitatie',
+  'certificat-constatator-pentru-notar',
+  'certificat-constatator-pentru-fonduri-europene',
+  'certificat-de-celibat',
+  'valabilitate-certificat-de-celibat',
+  'certificat-de-celibat-pentru-casatorie-in-strainatate',
+  'duplicat-certificat-de-nastere',
+  'transcriere-certificat-de-nastere',
+  'duplicat-certificat-de-casatorie',
 ] as const;
 
 /** Organization-wide metadata for Schema.org Organization node.

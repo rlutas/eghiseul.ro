@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: { params: Promise<{ judet: st
     title: `Extras Carte Funciară Online ${c.judet} — 89 RON, Fără Drum la OCPI`,
     description: `Obține extrasul de carte funciară pentru un imobil din județul ${c.judet} online, fără drum la ${c.office}. 89 RON, taxe incluse, livrare pe email în câteva minute.`,
     path: `/servicii/extras-de-carte-funciara/${c.slug}/`,
-    ogImage: '/og/default.png',
+    ogImage: '/og/services/extras-cf.png',
   });
 }
 
