@@ -7,6 +7,7 @@ Rezumat al expansiunii location-SEO + clustere construite pe 22 iunie 2026. Tot 
 - [`cazier-judiciar/`](cazier-judiciar/README.md) — 48 orașe cazier (date IPJ).
 - [`onrc-certificat-constatator/`](onrc-certificat-constatator/README.md) — 4 pagini use-case.
 - [`stare-civila/`](stare-civila/README.md) — 8 ghiduri (celibat/naștere/căsătorie).
+- [`rovinieta/`](rovinieta/README.md) — tool verificare + pagină cumpărare (afiliere).
 - [`keywords/`](keywords/) — keyword research per serviciu.
 
 ## Ce s-a construit
@@ -38,6 +39,25 @@ Rezumat al expansiunii location-SEO + clustere construite pe 22 iunie 2026. Tot 
 
 ## Sitemap — verificat 2026-06-22
 - Total: **186 URL-uri**. 42 CF județe ✓, 48 cazier orașe (+2 sub-rute PF/PJ) ✓, 12 ghiduri noi ✓.
+
+## Validare GSC (keyword cross-check, date mai-iunie 2026)
+Paginile construite țintesc cerere REALĂ confirmată în GSC (sursă: `gsc-data/.../Interogări.csv`):
+
+| Cluster | Query reprezentativ | Clickuri | Impresii | Poziție | Pagina |
+|---|---|---|---|---|---|
+| Carte funciară | „extras carte funciara" | 993 | 98.965 | 6.5 | hub + 42 județe (long-tail local) |
+| ONRC | „certificat constatator online" | 781 | 103.550 | 7.7 | hub + 4 use-case |
+| Stare civilă | „duplicat certificat de nastere online" | 4.390 | 17.220 | 2.6 (CTR 25%) | `duplicat-certificat-de-nastere` ✅ |
+| Stare civilă | „certificat de celibat" | 365 | 5.231 | 5.8 | `certificat-de-celibat` (pilon) ✅ |
+| Rovinietă | „rovinieta online" | 778 | 134.402 | **10.3** | `/servicii/rovinieta-online/` (nou) |
+| Calculatoare | „calculator salariu net" | 19.588 | 1.157.494 | 4.2 | `/calculator/salariu/` |
+| Calculatoare | „calculator impozit auto 2026" | 72.471 | 136.774 | **1.6 (CTR 53%)** | `/calculator/calculator-impozit-auto/` — domină |
+| Calculatoare | „calcul varsta pensionare legea noua" | 21.369 | 133.936 | 2.4 | `/calculator/varsta-pensionare/` |
+
+**Concluzii:**
+- Toate clusterele construite au cerere reală mare; paginile noi sunt aliniate la query-uri existente.
+- **Oportunități striking-distance** (poz 6-10, impresii mari) de urmărit după indexare: CF „extras carte funciara" (poz 6.5, 99K), ONRC „certificat constatator online" (poz 7.7, 103K), Rovinietă „rovinieta online" (poz 10.3, 134K → noua pagină de cumpărare).
+- Calculatoarele = motorul de trafic (salariu 1.1M impresii, impozit auto domină la poz 1.6/CTR 53%, pensie 130K+).
 
 ## De ce NU s-au făcut anumite pagini (decizii anti-doorway)
 - **Cazier auto** pe orașe — emis de Poliția Rutieră, fără dataset per-oraș → doorway trap.
