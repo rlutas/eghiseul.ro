@@ -1,6 +1,7 @@
 import { Suspense } from 'react';
 import { HeroSection } from '@/components/home/hero-section';
 import { FeaturedServices, FeaturedServicesSkeleton } from '@/components/home/featured-services';
+import { WhyUsSection } from '@/components/home/why-us-section';
 import { UseCasesSection } from '@/components/home/use-cases-section';
 import { PainPointsSection } from '@/components/home/pain-points-section';
 import { HowItWorksSection } from '@/components/home/how-it-works-section';
@@ -35,7 +36,10 @@ export default function HomePage() {
         </Suspense>
       </section>
 
-      {/* 4. Use Cases - When you need us */}
+      {/* 4. De ce eGhișeul — trust & diferențiere */}
+      <WhyUsSection />
+
+      {/* 5. Use Cases - When you need us */}
       <UseCasesSection />
 
       {/* 5. Pain Points - Problems we solve */}
