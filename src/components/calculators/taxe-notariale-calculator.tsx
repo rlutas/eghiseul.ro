@@ -49,6 +49,22 @@ function onorariu(value: number, brackets: Bracket[]): number {
   return 0;
 }
 
+// Onorariu contract de ipotecă — OMJ 177/C/2024 Anexa 2 Pct. V, pe suma creditului, +TVA 21%.
+function onorariuIpoteca(loan: number): number {
+  if (loan <= 0) return 0;
+  let pre: number;
+  if (loan <= 50000) pre = Math.max(loan * 0.0085, 150);
+  else if (loan <= 100000) pre = (loan - 50000) * 0.005 + 425;
+  else if (loan <= 200000) pre = (loan - 100000) * 0.0046 + 750;
+  else if (loan <= 500000) pre = (loan - 200000) * 0.0019 + 1209;
+  else pre = (loan - 500000) * 0.001 + 1778;
+  return Math.round(pre * (1 + TVA));
+}
+// Intabulare ipotecă (ANCPI) — 0,1% din credit + 100 lei, fără TVA.
+function intabulareIpoteca(loan: number): number {
+  return loan > 0 ? Math.round(loan * 0.001 + 100) : 0;
+}
+
 const fmt = (n: number) =>
   new Intl.NumberFormat('ro-RO', { maximumFractionDigits: 0 }).format(Math.round(n));
 const parse = (s: string) => parseFloat(s.replace(/[.\s]/g, '').replace(',', '.'));
@@ -77,6 +93,8 @@ export function TaxeNotarialeCalculator() {
   const [ruda, setRuda] = useState(true);
   const [peste2, setPeste2] = useState(false);
   const [loturiStr, setLoturi] = useState('2');
+  const [modPlata, setModPlata] = useState<'fara' | 'ipotecar' | 'noua'>('fara');
+  const [creditStr, setCredit] = useState('');
 
   useEffect(() => {
     fetch('/api/bnr-rate')
@@ -89,6 +107,8 @@ export function TaxeNotarialeCalculator() {
   const raw = parse(valStr);
   const value = !isNaN(raw) && raw > 0 ? (cur === 'eur' ? raw * eur : raw) : 0;
   const valid = value > 0;
+  const creditRaw = parse(creditStr);
+  const loanValue = !isNaN(creditRaw) && creditRaw > 0 ? (cur === 'eur' ? creditRaw * eur : creditRaw) : 0;
 
   // Build result groups per tab.
   const groups: { title: string; subtitle?: string; rows: Row[] }[] = [];
@@ -100,10 +120,19 @@ export function TaxeNotarialeCalculator() {
     const impozit = value * (sub3 ? 0.03 : 0.01);
 
     if (tab === 'vanzare') {
+      // Noua Casă: onorariul de vânzare are reducere 30% și nu se adaugă liniile de ipotecă.
+      const saleOnor = onorariu(value, SALE_BRACKETS) * (modPlata === 'noua' ? 0.7 : 1) * (1 + TVA);
       const buyer: Row[] = [
-        { label: 'Onorariu notarial (cu TVA 21%)', value: onorTva },
+        {
+          label: modPlata === 'noua' ? 'Onorariu notarial (Noua Casă, cu TVA 21%)' : 'Onorariu notarial (cu TVA 21%)',
+          value: saleOnor,
+        },
         { label: `Intabulare (${pj ? '0,5% PJ' : '0,15% PF'})`, value: intab },
       ];
+      if (modPlata === 'ipotecar' && loanValue > 0) {
+        buyer.push({ label: 'Onorariu ipotecă (cu TVA 21%)', value: onorariuIpoteca(loanValue) });
+        buyer.push({ label: 'Intabulare ipotecă', value: intabulareIpoteca(loanValue) });
+      }
       const seller: Row[] = [
         { label: `Impozit la stat (${sub3 ? '3% sub 3 ani' : '1% peste 3 ani'})`, value: impozit },
         { label: 'Extras de carte funciară', value: EXTRAS_CF },
@@ -221,6 +250,50 @@ export function TaxeNotarialeCalculator() {
           : 'Se încarcă cursul BNR…'}
         {cur === 'eur' && valid && ` · echivalent ${fmt(value)} lei`}
       </p>
+
+      {/* Mod plată (doar vânzare) */}
+      {tab === 'vanzare' && (
+        <div className="mt-5">
+          <Label className="mb-1.5 block">Mod plată</Label>
+          <div className="flex flex-wrap gap-2">
+            {(
+              [
+                ['fara', 'Fără credit'],
+                ['ipotecar', 'Credit ipotecar'],
+                ['noua', 'Credit Noua Casă'],
+              ] as ['fara' | 'ipotecar' | 'noua', string][]
+            ).map(([k, l]) => (
+              <button
+                key={k}
+                type="button"
+                onClick={() => setModPlata(k)}
+                className={cn(
+                  'flex-1 min-w-[120px] px-3 py-2 rounded-lg text-sm font-semibold border transition-all',
+                  modPlata === k
+                    ? 'bg-primary-500 border-primary-500 text-secondary-900'
+                    : 'bg-white border-neutral-200 text-neutral-700 hover:border-primary-300'
+                )}
+              >
+                {l}
+              </button>
+            ))}
+          </div>
+          {modPlata === 'ipotecar' && (
+            <div className="mt-3">
+              <Label htmlFor="notar-credit" className="mb-1.5 block">
+                Suma creditului ({cur === 'eur' ? '€' : 'lei'})
+              </Label>
+              <Input
+                id="notar-credit"
+                inputMode="numeric"
+                value={creditStr}
+                onChange={(e) => setCredit(e.target.value)}
+                placeholder={cur === 'eur' ? 'ex. 80000' : 'ex. 300000'}
+              />
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Opțiuni specifice */}
       <div className="grid sm:grid-cols-2 gap-4 mt-5">
