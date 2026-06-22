@@ -46,6 +46,18 @@ export default function Page() {
           q: 'Actul trimis prin poștă sau e-mail în ultima zi este în termen?',
           a: 'Da. Actul depus la oficiul poștal prin scrisoare recomandată sau la un serviciu de curierat înăuntrul termenului este considerat făcut în termen (art. 183 CPC), chiar dacă ajunge la instanță mai târziu. Înalta Curte a extins regula și la fax și e-mail.',
         },
+        {
+          q: 'De când începe să curgă termenul pentru apel?',
+          a: 'Ca regulă, termenul pentru exercitarea unei căi de atac curge de la comunicarea hotărârii, nu de la pronunțare. Ziua comunicării (dies a quo) nu se socotește în sistemul „zile libere" (art. 181 alin. 1 pct. 2 CPC), iar termenul se calculează începând cu ziua imediat următoare comunicării.',
+        },
+        {
+          q: 'Cum dovedesc că am depus actul în termen prin poștă?',
+          a: 'Dovada o face data poștei: ștampila oficiului poștal de pe plicul scrisorii recomandate sau recipisa de la serviciul de curierat. Conform art. 183 CPC, contează data predării către poștă, nu data la care actul ajunge efectiv la instanță, așa că păstrează recipisa cu data vizibilă.',
+        },
+        {
+          q: 'Termenul de un an care începe pe 29 februarie când se împlinește?',
+          a: 'Termenele pe ani se împlinesc în ziua corespunzătoare din ultimul an (art. 181 alin. 1 pct. 3). Când anul final nu are zi corespunzătoare — de exemplu 29 februarie într-un an nebisect — termenul se împlinește în ultima zi a acelei luni, adică 28 februarie. Aceeași regulă se aplică termenelor pe luni care încep pe data de 31.',
+        },
       ]}
     >
       <h2>Ce sunt termenele procedurale</h2>
@@ -78,9 +90,101 @@ export default function Page() {
         Paște, Rusalii).
       </p>
 
+      <h2>Exemplu numeric pas cu pas</h2>
       <p>
-        Vezi și <Link href="/calculator/taxa-judiciara-de-timbru/">calculatorul de taxă judiciară de timbru</Link> sau{' '}
-        <Link href="/calculator/reabilitare/">calculatorul de reabilitare</Link>.
+        Să presupunem un termen de apel de <strong>30 de zile</strong> care curge de la comunicarea hotărârii, iar
+        comunicarea s-a făcut <strong>vineri, 15 mai</strong>. În sistemul „zile libere”:
+      </p>
+      <ul>
+        <li>
+          <strong>Ziua de început</strong> (15 mai, ziua comunicării) <strong>nu se socotește</strong> — termenul începe
+          să curgă de a doua zi.
+        </li>
+        <li>
+          Numărăm 30 de zile calendaristice, începând cu 16 mai. A 30-a zi cade pe <strong>14 iunie</strong>.
+        </li>
+        <li>
+          <strong>Ziua de împlinire</strong> nu se socotește nici ea, deci termenul se împlinește efectiv pe{' '}
+          <strong>15 iunie</strong>.
+        </li>
+        <li>
+          Dacă 15 iunie ar fi o zi nelucrătoare (weekend sau sărbătoare legală), termenul se prelungește în prima zi
+          lucrătoare următoare, iar actul depus la poștă în acea zi este în termen (art. 183).
+        </li>
+      </ul>
+      <p>
+        Pentru orice termen critic, introdu data exactă în calculatorul de mai sus: el aplică automat excluderea ambelor
+        capete și prelungirea în zi lucrătoare.
+      </p>
+
+      <h2>Tipuri uzuale de termene procedurale</h2>
+      <p>
+        Tabelul de mai jos rezumă câteva termene întâlnite frecvent. Toate se calculează cu același sistem de{' '}
+        <strong>zile libere</strong> (ambele capete excluse) și se prelungesc în prima zi lucrătoare dacă ultima zi este
+        nelucrătoare:
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>Act de procedură</th>
+            <th>Termen orientativ</th>
+            <th>De când curge (regulă)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Apel (drept comun)</td>
+            <td>30 de zile</td>
+            <td>De la comunicarea hotărârii</td>
+          </tr>
+          <tr>
+            <td>Recurs (drept comun)</td>
+            <td>30 de zile</td>
+            <td>De la comunicarea hotărârii</td>
+          </tr>
+          <tr>
+            <td>Întâmpinare</td>
+            <td>25 de zile</td>
+            <td>De la comunicarea cererii de chemare în judecată</td>
+          </tr>
+          <tr>
+            <td>Contestație în anulare</td>
+            <td>15 zile</td>
+            <td>De la comunicarea hotărârii</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        Termenele de mai sus sunt cele de drept comun; legi speciale pot prevedea termene diferite, mai scurte sau mai
+        lungi. Verifică întotdeauna textul aplicabil cauzei tale.
+      </p>
+
+      <h2>Greșeli frecvente la calculul termenelor</h2>
+      <ul>
+        <li>
+          <strong>Socotirea ambelor capete.</strong> Cea mai comună eroare este numărarea zilei de început și/sau a celei
+          de împlinire. La termenele procedurale pe zile, ambele se exclud — atât în civil, cât și în penal.
+        </li>
+        <li>
+          <strong>Confuzia civil / penal.</strong> Mulți cred că penalul folosește „zile pline”. Pentru termenele
+          procedurale nu există această diferență; sistemul „zile pline” privește doar măsurile preventive (art. 271
+          CPP).
+        </li>
+        <li>
+          <strong>Ignorarea sărbătorilor mobile.</strong> Paștele și Rusaliile cad în date diferite în fiecare an;
+          omiterea lor poate scurta artificial termenul cu una sau două zile.
+        </li>
+        <li>
+          <strong>Calculul de la pronunțare, nu de la comunicare.</strong> Pentru căile de atac, termenul curge, ca
+          regulă, de la comunicarea hotărârii, nu din ziua pronunțării.
+        </li>
+      </ul>
+
+      <p>
+        Vezi și <Link href="/calculator/taxa-judiciara-de-timbru/">calculatorul de taxă judiciară de timbru</Link>,{' '}
+        <Link href="/calculator/reabilitare/">calculatorul de reabilitare</Link> sau, dacă ai nevoie de o decizie
+        judecătorească definitivă, serviciul de{' '}
+        <Link href="/servicii/cazier-judiciar-online/">cazier judiciar online</Link>.
       </p>
 
       <p className="text-sm text-neutral-500">

@@ -42,6 +42,18 @@ export default function Page() {
           q: 'Cât este cota de impozitare?',
           a: 'Pentru clădirile rezidențiale ale persoanelor fizice cota este între 0,08% și 0,2%, stabilită de fiecare consiliu local (frecvent 0,1%). Pentru clădirile nerezidențiale cota este 0,2–1,3%.',
         },
+        {
+          q: 'Cum aflu coeficientul de corecție al casei mele?',
+          a: 'Coeficientul de corecție (între 0,90 și 2,60) depinde de zona din localitate (A, B, C, D) și de rangul localității (0, I, II, III, IV, V), stabilite prin hotărâre a consiliului local. Îl găsești în hotărârea anuală de taxe și impozite a primăriei sau direct la Direcția de Taxe (DITL), care îți poate confirma zona în care se află imobilul.',
+        },
+        {
+          q: 'Se cumulează reducerea pentru vechime cu indexarea din 2026?',
+          a: 'Da. Valoarea pe m² indexată (+79,6%) se folosește la calculul valorii impozabile, iar reducerea pentru vechime (15% la 50–100 de ani, 25% peste 100 de ani) se aplică după aceea, asupra valorii deja calculate. Cele două se combină, deci o casă veche tot are de plătit mai mult în 2026 decât în 2025, dar mai puțin decât o casă nouă identică.',
+        },
+        {
+          q: 'Plătesc impozit dacă am mai multe locuințe?',
+          a: 'Da, fiecare clădire se impozitează separat, după aceeași formulă (suprafață × valoare/m² × coeficient de corecție × ajustare vechime, înmulțit cu cota locală de 0,08–0,2%). Unele primării aplică majorări pentru deținătorii de mai multe imobile; verifică hotărârea consiliului local și situația ta la Direcția de Taxe.',
+        },
       ]}
     >
       <h2>Cum se calculează impozitul pe clădiri</h2>
@@ -59,9 +71,43 @@ export default function Page() {
         <li><strong>Cota locală</strong> (0,08–0,2% pentru locuințe).</li>
       </ul>
 
+      <h2>Exemplu numeric pas cu pas</h2>
       <p>
-        Vezi și <Link href="/calculator/impozit-auto/">calculatorul de impozit auto</Link> sau{' '}
-        <Link href="/calculator/taxe-notariale/">calculatorul de taxe notariale</Link>.
+        Să presupunem un apartament cu instalații complete, suprafață construită de <strong>80 m²</strong>, situat în
+        zona B a unei localități de rang I, într-o clădire cu vechime de 60 de ani. Calculul se face astfel:
+      </p>
+      <ul>
+        <li><strong>Pasul 1 – valoarea de bază:</strong> 80 m² × valoarea/m² indexată (Cod Fiscal art. 457, +79,6% în 2026);</li>
+        <li><strong>Pasul 2 – corecția de zonă/rang:</strong> rezultatul se înmulțește cu coeficientul de corecție (între 0,90 și 2,60, după zonă și rangul localității);</li>
+        <li><strong>Pasul 3 – ajustarea pentru vechime:</strong> pentru 60 de ani (intervalul 50–100 de ani) se aplică o reducere de 15% a valorii impozabile;</li>
+        <li><strong>Pasul 4 – impozitul anual:</strong> valoarea impozabilă obținută se înmulțește cu cota locală (0,08–0,2%, frecvent 0,1%).</li>
+      </ul>
+      <p>
+        Schimbând doar zona sau rangul (coeficient de la 0,90 până la 2,60) impozitul variază de aproape trei ori pentru
+        aceeași casă, motiv pentru care zona contează adesea mai mult decât suprafața.
+      </p>
+
+      <h2>Greșeli frecvente la calculul impozitului</h2>
+      <ul>
+        <li><strong>Folosirea suprafeței utile în loc de cea construită</strong> – impozitul se raportează la suprafața construită desfășurată, nu la cea din actul de proprietate sau cea utilă;</li>
+        <li><strong>Ignorarea instalațiilor</strong> – lipsa apei, canalizării, electricității sau încălzirii schimbă valoarea/m² folosită;</li>
+        <li><strong>Aplicarea greșită a reducerii de vechime</strong> – reducerea de 15% este doar pentru 50–100 de ani, iar cea de 25% doar pentru clădiri de peste 100 de ani; sub 50 de ani nu există reducere;</li>
+        <li><strong>Presupunerea unei cote fixe</strong> – cota rezidențială (0,08–0,2%) și coeficientul de corecție (0,90–2,60) diferă de la o primărie la alta.</li>
+      </ul>
+
+      <h2>Cazuri speciale</h2>
+      <p>
+        Pentru clădirile <strong>nerezidențiale</strong> (spații comerciale, birouri) cota este de 0,2–1,3%, mult peste
+        cea rezidențială, iar valoarea impozabilă se determină de regulă pe baza unui raport de evaluare. La clădirile cu
+        <strong> destinație mixtă</strong> (locuință plus spațiu folosit pentru activitate economică) impozitul se împarte
+        proporțional pe cele două destinații. Reducerile pentru vechime (15% la 50–100 de ani, 25% peste 100 de ani) și
+        indexarea valorilor/m² (+79,6%) rămân aplicabile părții rezidențiale, după aceeași logică ca la o locuință obișnuită.
+      </p>
+
+      <p>
+        Vezi și <Link href="/calculator/impozit-auto/">calculatorul de impozit auto</Link>,{' '}
+        <Link href="/calculator/taxe-notariale/">calculatorul de taxe notariale</Link> sau, dacă vrei să verifici situația
+        juridică a imobilului, serviciul de <Link href="/servicii/extras-de-carte-funciara/">extras de carte funciară</Link>.
       </p>
 
       <p className="text-sm text-neutral-500">

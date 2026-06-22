@@ -42,6 +42,18 @@ export default function Page() {
           q: 'Pensiile mici sunt impozitate?',
           a: 'Nu. Pensiile până în 3.000 lei pe lună sunt scutite integral atât de impozit, cât și de CASS.',
         },
+        {
+          q: 'De ce CASS se calculează înaintea impozitului?',
+          a: 'Pentru că CASS este o contribuție deductibilă: se reține prima, din partea care depășește 3.000 lei, iar impozitul de 10% se aplică abia după ce CASS a fost scăzut din bază. Astfel impozitul nu se calculează pe o sumă din care s-a reținut deja CASS, evitând dubla impozitare a aceleiași contribuții.',
+        },
+        {
+          q: 'Pensia de invaliditate sau de urmaș se impozitează la fel?',
+          a: 'Regula pragului de 3.000 lei și cotele de 10% impozit și 10% CASS se aplică pe suma încasată lunar, indiferent de tipul pensiei. Dacă o persoană încasează mai multe pensii, modul de cumulare poate diferi, de aceea recomandăm verificarea pe talonul de pensie emis de Casa de Pensii.',
+        },
+        {
+          q: 'Cine reține impozitul și CASS din pensie?',
+          a: 'Reținerea se face automat la sursă de către Casa Națională de Pensii Publice, înainte de plata pensiei. Pensionarul primește direct suma netă, fără să depună vreo declarație, iar pe talon apar separat impozitul și CASS reținute.',
+        },
       ]}
     >
       <h2>Cum se impozitează pensia în 2026</h2>
@@ -58,9 +70,99 @@ export default function Page() {
         <li>Pensie 3.000 lei sau mai mică → <strong>scutită integral</strong>.</li>
       </ul>
 
+      <h2>Calcul pas cu pas pentru o pensie de 5.000 lei</h2>
       <p>
-        Vezi și <Link href="/calculator/salariu/">calculatorul de salariu net</Link> sau{' '}
-        <Link href="/calculator/indemnizatie-somaj/">calculatorul de indemnizație de șomaj</Link>.
+        Pentru a vedea exact cum se aplică regulile, urmărește un exemplu detaliat la o pensie brută de{' '}
+        <strong>5.000 lei</strong> pe lună:
+      </p>
+      <ul>
+        <li>
+          <strong>Pasul 1 — partea impozabilă:</strong> din 5.000 lei se scade pragul scutit de 3.000 lei, rămân{' '}
+          <strong>2.000 lei</strong> peste prag.
+        </li>
+        <li>
+          <strong>Pasul 2 — CASS:</strong> 10% din 2.000 lei = <strong>200 lei</strong>. CASS se reține prima.
+        </li>
+        <li>
+          <strong>Pasul 3 — baza impozitului:</strong> din partea peste prag se scade CASS: 2.000 − 200 ={' '}
+          <strong>1.800 lei</strong>.
+        </li>
+        <li>
+          <strong>Pasul 4 — impozit:</strong> 10% din 1.800 lei = <strong>180 lei</strong>.
+        </li>
+        <li>
+          <strong>Pasul 5 — pensie netă:</strong> 5.000 − 200 (CASS) − 180 (impozit) = <strong>4.620 lei</strong> încasați.
+        </li>
+      </ul>
+
+      <h2>Tabel comparativ pensie brută vs. netă</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Pensie brută</th>
+            <th>CASS (10%)</th>
+            <th>Impozit (10%)</th>
+            <th>Pensie netă</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>3.000 lei</td>
+            <td>0 lei</td>
+            <td>0 lei</td>
+            <td>3.000 lei</td>
+          </tr>
+          <tr>
+            <td>4.000 lei</td>
+            <td>100 lei</td>
+            <td>90 lei</td>
+            <td>3.810 lei</td>
+          </tr>
+          <tr>
+            <td>5.000 lei</td>
+            <td>200 lei</td>
+            <td>180 lei</td>
+            <td>4.620 lei</td>
+          </tr>
+          <tr>
+            <td>6.300 lei</td>
+            <td>330 lei</td>
+            <td>297 lei</td>
+            <td>5.673 lei</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>Greșeli frecvente la calculul impozitului pe pensie</h2>
+      <ul>
+        <li>
+          <strong>Aplicarea cotei pe toată pensia.</strong> Cele două cote de 10% nu se aplică pe întreaga pensie, ci
+          doar pe partea care depășește pragul de 3.000 lei. O pensie de 3.000 lei rămâne scutită integral.
+        </li>
+        <li>
+          <strong>Inversarea ordinii.</strong> Dacă impozitul se calculează înaintea CASS, rezultă o sumă greșită. CASS
+          se reține prima și reduce baza pe care se aplică impozitul de 10%.
+        </li>
+        <li>
+          <strong>Confuzia între brut și net.</strong> Suma de pe talon poate fi deja netă; pentru a estima câștigul net
+          pornește mereu de la pensia brută lunară.
+        </li>
+      </ul>
+
+      <h2>Context legal</h2>
+      <p>
+        Extinderea CASS la pensii pentru perioada <strong>2026-2027</strong> a fost introdusă prin{' '}
+        <strong>Legea 141/2025</strong>. Măsura se aplică doar pensiilor a căror parte depășește pragul de 3.000 lei și
+        este în vigoare, însă a fost contestată la Curtea Constituțională (CCR). Până la o eventuală decizie de
+        neconstituționalitate, reținerile se fac conform legii în vigoare, motiv pentru care rezultatul acestui
+        calculator rămâne orientativ.
+      </p>
+
+      <p>
+        Vezi și <Link href="/calculator/salariu/">calculatorul de salariu net</Link>,{' '}
+        <Link href="/calculator/indemnizatie-somaj/">calculatorul de indemnizație de șomaj</Link> sau{' '}
+        <Link href="/calculator/impozit-chirie/">calculatorul de impozit pe chirie</Link>. Dacă ai nevoie de documente
+        oficiale, vezi <Link href="/servicii/">serviciile eGhișeul.ro</Link>.
       </p>
 
       <p className="text-sm text-neutral-500">

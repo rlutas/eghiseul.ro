@@ -47,6 +47,18 @@ export default function Page() {
           a: 'Donația este scutită de impozit între rude și afini până la gradul III inclusiv și între soți; în rest se aplică 1% sau 3% (după vechime). Moștenirea este scutită dacă succesiunea este dezbătută în 2 ani de la deces; dacă se depășesc 2 ani, se plătește 1% din valoarea masei succesorale.',
         },
         {
+          q: 'Cât costă în plus actul dacă cumpăr cu credit ipotecar?',
+          a: 'Pe lângă contractul de vânzare-cumpărare apare un contract de ipotecă autentificat și înscrierea ipotecii în cartea funciară. Onorariul pentru ipotecă se calculează pe aceeași grilă progresivă OMJ 177/C/2024, raportat la valoarea creditului, la care se adaugă TVA 21%. Pentru creditele din programul Noua Casă, onorariile notariale beneficiază de o reducere de 30% față de grila standard.',
+        },
+        {
+          q: 'Ce este extrasul de carte funciară și cât costă?',
+          a: 'Extrasul de carte funciară de autentificare este documentul prin care notarul verifică situația juridică a imobilului (proprietar, sarcini, ipoteci) chiar înainte de semnarea actului. Tariful este de aproximativ 40 lei și de regulă este plătit de vânzător. Fără el, notarul nu poate autentifica transferul.',
+        },
+        {
+          q: 'Cine plătește intabularea la persoane juridice?',
+          a: 'Tariful de intabulare (înscriere în cartea funciară) este 0,15% din valoare pentru persoane fizice și 0,5% pentru persoane juridice. De regulă îl suportă dobânditorul (cumpărătorul). Diferența de cotă înseamnă că, la aceeași valoare, o firmă plătește o intabulare de peste trei ori mai mare decât o persoană fizică.',
+        },
+        {
           q: 'Sunt aceste sume exacte?',
           a: 'Sunt estimări orientative bazate pe grilele oficiale 2026 (OMJ 177/C/2024, Cod Fiscal art. 111, tarife ANCPI). Onorariile sunt minime și pot varia de la un notar la altul, iar valoarea de impozitare nu poate fi sub valoarea de grilă a Camerei Notarilor. Pentru o cifră exactă, cere o ofertă la biroul notarial.',
         },
@@ -157,10 +169,82 @@ export default function Page() {
         </li>
       </ul>
 
+      <h2>Exemplu: donație apartament de 200.000 lei către un copil</h2>
+      <p>
+        La o donație între rude apropiate, costul principal rămâne onorariul notarial plus intabularea — impozitul către
+        stat lipsește, fiindcă donația este scutită între rude și afini până la gradul III inclusiv și între soți.
+      </p>
+      <ul>
+        <li>
+          <strong>Onorariu notarial:</strong> 1.705 + 1,1% × (200.000 − 100.000) = 2.805 lei, plus TVA 21% ≈{' '}
+          <strong>3.394 lei</strong>.
+        </li>
+        <li>
+          <strong>Intabulare (0,15% PF):</strong> 300 lei.
+        </li>
+        <li>
+          <strong>Impozit la stat:</strong> 0 lei (donație scutită între rude până la gradul III).
+        </li>
+        <li>
+          <strong>Extras de carte funciară (autentificare):</strong> ~40 lei.
+        </li>
+      </ul>
+      <p>
+        Dacă donatarul nu se încadrează în gradul de rudenie scutit, se aplică impozitul pe transfer de{' '}
+        <strong>1% (peste 3 ani)</strong> sau <strong>3% (sub 3 ani)</strong>, exact ca la vânzare.
+      </p>
+
+      <h2>Cazuri speciale: credit ipotecar și Noua Casă</h2>
+      <p>
+        Când cumpărarea se face cu credit ipotecar, la actul de vânzare se adaugă un{' '}
+        <strong>contract de ipotecă</strong> autentificat și înscrierea ipotecii în cartea funciară. Onorariul pentru
+        ipotecă se calculează pe aceeași grilă progresivă OMJ 177/C/2024, raportat la valoarea creditului, plus TVA 21%.
+        Pentru creditele garantate prin programul guvernamental{' '}
+        <strong>Noua Casă</strong>, onorariile notariale beneficiază de o reducere de{' '}
+        <strong>30%</strong> față de grila standard, ceea ce reduce sensibil costul total al perfectării actului.
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>Tipul actului</th>
+            <th>Impozit la stat</th>
+            <th>Intabulare</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Vânzare-cumpărare (PF)</td>
+            <td>1% (peste 3 ani) / 3% (sub 3 ani)</td>
+            <td>0,15%</td>
+          </tr>
+          <tr>
+            <td>Vânzare-cumpărare (PJ)</td>
+            <td>1% / 3%</td>
+            <td>0,5%</td>
+          </tr>
+          <tr>
+            <td>Donație (rude până la gradul III)</td>
+            <td>0 lei (scutit)</td>
+            <td>0,15%</td>
+          </tr>
+          <tr>
+            <td>Succesiune (dezbătută în 2 ani)</td>
+            <td>0 lei (scutit)</td>
+            <td>0,15%</td>
+          </tr>
+          <tr>
+            <td>Credit Noua Casă</td>
+            <td>—</td>
+            <td>0,15% (onorariu notarial −30%)</td>
+          </tr>
+        </tbody>
+      </table>
+
       <p>
         Pentru actul de vânzare ai nevoie și de un{' '}
         <Link href="/servicii/extras-de-carte-funciara/">extras de carte funciară</Link> actualizat. Vezi și{' '}
-        <Link href="/calculator/taxa-judiciara-de-timbru/">calculatorul de taxă judiciară de timbru</Link> sau{' '}
+        <Link href="/calculator/taxa-judiciara-de-timbru/">calculatorul de taxă judiciară de timbru</Link>,{' '}
+        <Link href="/calculator/impozit-chirie/">calculatorul de impozit pe chirie</Link> sau{' '}
         <Link href="/calculator/tva/">calculatorul de TVA</Link>.
       </p>
 
