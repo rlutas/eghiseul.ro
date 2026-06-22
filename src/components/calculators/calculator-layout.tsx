@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { ServiceFAQ } from '@/components/services/service-faq';
 import { Footer } from '@/components/home/footer';
 import { NewsletterPopup } from '@/components/calculators/newsletter-popup';
+import { WebMcpTools } from '@/components/calculators/webmcp-tools';
 import { BASE_URL } from '@/lib/seo';
 import { organizationNode, websiteNode, breadcrumbNode } from '@/lib/seo/schema';
 
@@ -19,6 +20,8 @@ export interface CalculatorLayoutProps {
   /** Conținut SEO sub calculator (prose). */
   children: React.ReactNode;
   faqs?: { q: string; a: string }[];
+  /** Răspuns direct, 1-2 propoziții (TL;DR) — afișat sub widget, pentru AI Overviews. */
+  tldr?: string;
 }
 
 // Toate calculatoarele au fost verificate/actualizate în iunie 2026 (rate 2026).
@@ -33,6 +36,7 @@ export function CalculatorLayout({
   widget,
   children,
   faqs,
+  tldr,
 }: CalculatorLayoutProps) {
   const url = `${BASE_URL}/calculator/${slug}/`;
   const jsonLd = {
@@ -69,6 +73,8 @@ export function CalculatorLayout({
         name: title,
         inLanguage: 'ro-RO',
         dateModified: DATE_MODIFIED,
+        lastReviewed: DATE_MODIFIED,
+        reviewedBy: { '@id': `${BASE_URL}/#organization` },
         breadcrumb: { '@id': `${url}#breadcrumb` },
         publisher: { '@id': `${BASE_URL}/#organization` },
       },
@@ -106,7 +112,7 @@ export function CalculatorLayout({
               {heading}
             </h1>
             <p className="text-lg text-white/85 leading-relaxed">{description}</p>
-            <p className="mt-3 text-sm text-white/55">Actualizat: {ACTUALIZAT} · rate și praguri 2026</p>
+            <p className="mt-3 text-sm text-white/55">Verificat de Echipa eGhișeul.ro · actualizat {ACTUALIZAT} · rate și praguri 2026</p>
           </div>
         </header>
 
@@ -116,6 +122,12 @@ export function CalculatorLayout({
             <div className="relative -mt-16 lg:-mt-20 rounded-2xl border border-neutral-200 bg-white p-6 lg:p-8 shadow-lg">
               {widget}
             </div>
+            {tldr && (
+              <div className="mt-5 rounded-2xl border-l-4 border-primary-500 bg-primary-50/60 px-5 py-4">
+                <p className="text-xs font-bold uppercase tracking-wider text-primary-700 mb-1">Pe scurt</p>
+                <p className="text-[15px] leading-relaxed text-secondary-800">{tldr}</p>
+              </div>
+            )}
           </div>
         </section>
 
@@ -186,6 +198,7 @@ export function CalculatorLayout({
 
       <Footer />
       <NewsletterPopup />
+      <WebMcpTools />
     </>
   );
 }

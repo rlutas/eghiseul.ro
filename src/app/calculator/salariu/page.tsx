@@ -24,6 +24,7 @@ export default function Page() {
       title={TITLE}
       heading="Calculator Salariu Net/Brut 2026"
       description="Calculează salariul net din brut (sau invers) cu ratele valabile în 2026 — CAS, CASS, impozit și deducerea personală — plus costul total pentru angajator."
+      tldr="În 2026 din salariul brut se rețin CAS 25%, CASS 10% și impozit 10% (pe baza brut − CAS − CASS − deducere). De exemplu, 5.000 lei brut înseamnă 2.925 lei net, iar angajatorul mai plătește CAM 2,25% peste brut."
       widget={<SalariuCalculator />}
       faqs={[
         { q: 'Ce rețineri se aplică la salariu în 2026?', a: 'Din salariul brut se rețin: CAS (pensie) 25%, CASS (sănătate) 10% și impozit pe venit 10% (după scăderea contribuțiilor și a deducerii personale). Angajatorul plătește în plus CAM 2,25%.' },

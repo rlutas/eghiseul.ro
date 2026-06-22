@@ -24,6 +24,7 @@ export default function Page() {
       title={TITLE}
       heading="Calculator Spor Noapte și Ore Suplimentare 2026"
       description="Calculează sporurile cuvenite conform Codului Muncii — spor de noapte (minim 25%), ore suplimentare (minim 75%) și muncă în sărbători legale (minim 100%). Acestea sunt minime legale; contractul colectiv de muncă poate prevedea procente mai mari."
+      tldr="Conform Codului Muncii (Legea 53/2003), sporul de noapte este de minim 25% (art. 126), orele suplimentare se plătesc cu minim 75% (art. 123), iar munca în sărbători legale cu minim 100% — plată dublă (art. 142). Sunt minime legale; CCM-ul poate prevedea procente mai mari."
       widget={<SporSalarialCalculator />}
       faqs={[
         {

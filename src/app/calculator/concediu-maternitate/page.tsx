@@ -24,6 +24,7 @@ export default function Page() {
       title={TITLE}
       heading="Calculator Concediu Maternitate 2026"
       description="Estimează indemnizația de maternitate (concediul de sarcină și lăuzie) pe baza venitului brut din ultimele 6 luni — 85% din media lunară, pe o durată de 126 de zile, neimpozabilă."
+      tldr="Indemnizația de maternitate este de 85% din media venitului brut din ultimele 6 luni, plafonată la 12 salarii minime brute, pe o durată de 126 de zile (63 prenatal + 63 postnatal), conform OUG 158/2005. Este neimpozabilă, deci netul încasat este egal cu suma brută."
       widget={<ConcediuMaternitateCalculator />}
       faqs={[
         { q: 'Cât durează concediul de maternitate în 2026?', a: 'Concediul de maternitate durează 126 de zile calendaristice, conform OUG 158/2005: 63 de zile prenatal (înainte de naștere) și 63 de zile postnatal (după naștere). Cele două perioade se pot compensa între ele, dar concediul de lăuzie obligatoriu, de minimum 42 de zile după naștere, trebuie efectuat integral.' },

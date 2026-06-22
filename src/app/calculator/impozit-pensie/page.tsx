@@ -24,6 +24,7 @@ export default function Page() {
       title={TITLE}
       heading="Calculator Impozit pe Pensie 2026"
       description="Estimează impozitul, CASS și pensia netă pe baza pensiei brute lunare, conform regulilor în vigoare în 2026."
+      tldr="În 2026, pensia se impozitează cu 10% și se reține CASS 10%, dar doar pe partea care depășește 3.000 lei pe lună (Legea 141/2025); pensiile până în 3.000 lei sunt scutite integral. CASS se reține prima și se scade din baza impozitului."
       widget={<ImpozitPensieCalculator />}
       faqs={[
         {

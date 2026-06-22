@@ -24,6 +24,7 @@ export default function Page() {
       title={TITLE}
       heading="Calculator Pensie de Invaliditate"
       description="Estimează cuantumul pensiei de invaliditate pe grade (I, II, III), pe baza stagiului realizat și a salariului, conform Legii 360/2023."
+      tldr="În 2026, pensia de invaliditate = (puncte realizate + puncte din stagiul potențial) × 81 lei (VPR). Stagiul potențial, până la 35 de ani, se creditează cu 0,25 puncte/lună la gradul I, 0,20 la II și 0,10 la III; doar gradul I primește în plus indemnizația de însoțitor de 2.163 lei."
       widget={<PensieInvaliditateCalculator />}
       faqs={[
         {

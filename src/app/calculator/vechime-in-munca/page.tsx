@@ -24,6 +24,7 @@ export default function Page() {
       title={TITLE}
       heading="Calculator Vechime în Muncă"
       description="Adună mai multe perioade de angajare și află vechimea totală în muncă, exprimată în ani, luni și zile."
+      tldr="Vechimea totală în muncă este suma perioadelor lucrate (data angajării până la încetare, inclusiv), exprimată în ani, luni și zile; pauzele dintre contracte nu se adună. Pentru pensie contează stagiul de cotizare din evidențele CNPP: minimum 15 ani, complet 35 de ani."
       widget={<VechimeCalculator />}
       faqs={[
         { q: 'Cum se calculează vechimea în muncă?', a: 'Se adună toate perioadele lucrate (de la data angajării până la data încetării, inclusiv) și se exprimă în ani, luni și zile. Calculatorul însumează automat mai multe perioade.' },

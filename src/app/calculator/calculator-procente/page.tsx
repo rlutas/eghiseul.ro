@@ -24,6 +24,7 @@ export default function Page() {
       title={TITLE}
       heading="Calculator Procente"
       description="Calculează rapid procente: X% dintr-o valoare, cât la sută reprezintă un număr din altul sau variația procentuală dintre două valori."
+      tldr="X% dintr-o valoare = valoare × procent / 100 (ex. 20% din 250 = 50). Cât la sută e X din Y = X / Y × 100. Variația procentuală = (final − inițial) / inițial × 100, pozitivă la creștere, negativă la scădere."
       widget={<ProcenteCalculator />}
       faqs={[
         { q: 'Cum calculez X% dintr-o valoare?', a: 'Înmulțești valoarea cu procentul împărțit la 100. De exemplu, 20% din 250 = 250 × 20 / 100 = 50. În calculatorul de mai sus alege modul „X% din Y".' },

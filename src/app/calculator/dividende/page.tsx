@@ -24,6 +24,7 @@ export default function Page() {
       title={TITLE}
       heading="Calculator Dividende 2026"
       description="Estimează impozitul pe dividende și suma netă încasată, conform regulilor în vigoare în 2026 (impozit 16% + CASS pe plafoane)."
+      tldr="În 2026, dividendele se impozitează cu 16% (Legea 141/2025). În plus, datorezi CASS în sumă fixă pe plafon (2.430, 4.860 sau 9.720 lei) dacă veniturile extra-salariale depășesc 24.300 lei/an."
       widget={<DividendeCalculator />}
       faqs={[
         {

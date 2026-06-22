@@ -24,6 +24,7 @@ export default function Page() {
       title={TITLE}
       heading="Calculator Termene Judiciare 2026"
       description="Calculează data împlinirii unui termen procedural pe zile, săptămâni, luni sau ani, conform Codului de Procedură Civilă (art. 181) și Penală (art. 269), cu sărbătorile legale luate în calcul."
+      tldr="Termenele procedurale pe zile se calculează în sistemul zilelor libere (art. 181 CPC, identic în penal art. 269): nici ziua de început, nici cea de împlinire nu se socotesc, deci un termen de 5 zile acoperă 7 zile calendaristice, iar dacă ultima zi e în weekend sau sărbătoare se prelungește în prima zi lucrătoare."
       widget={<TermeneCalculator />}
       faqs={[
         {

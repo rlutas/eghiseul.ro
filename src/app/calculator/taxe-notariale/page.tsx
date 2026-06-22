@@ -24,6 +24,7 @@ export default function Page() {
       title={TITLE}
       heading="Calculator Taxe Notariale 2026"
       description="Estimează onorariul notarial, intabularea, impozitul la stat și extrasul de carte funciară pentru vânzare, donație, succesiune sau partaj, conform grilelor în vigoare în 2026."
+      tldr="La vânzare în 2026 plătești: onorariu notarial progresiv (OMJ 177/C/2024, de la 2,2%) plus TVA 21%, intabulare 0,15% (PF) și impozit la stat 1% (peste 3 ani) sau 3% (sub 3 ani) din valoarea contractului."
       widget={<TaxeNotarialeCalculator />}
       faqs={[
         {

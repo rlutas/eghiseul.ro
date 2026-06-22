@@ -24,6 +24,7 @@ export default function Page() {
       title={TITLE}
       heading="Calculator TVA 2026"
       description="Adaugă sau extrage TVA rapid, cu cotele valabile în 2026: 21% standard, 11% redus și 9% tranzitoriu pentru locuințe."
+      tldr="În 2026 cota standard de TVA este 21% (Legea 141/2025, de la 1 august 2025), cota redusă 11%, plus 9% tranzitoriu pentru locuințe eligibile până la 31 iulie 2026. Adăugare: ×1,21; extragere dintr-un preț cu TVA: × 21/121."
       widget={<TvaCalculator />}
       faqs={[
         { q: 'Cât este TVA standard în România în 2026?', a: 'Cota standard de TVA este 21% (majorată de la 19% începând cu 1 august 2025). Cota redusă este 11% (a înlocuit fostele cote de 5% și 9%).' },

@@ -24,6 +24,7 @@ export default function Page() {
       title={TITLE}
       heading="Calculator Inflație"
       description="Află cât valorează azi o sumă de bani din trecut și cât a fost inflația cumulată între doi ani, pe baza datelor INS."
+      tldr="Inflația se compune: factorul cumulat este produsul ratelor anuale (1 + rata/100), nu suma lor. Calculatorul folosește rata medie anuală IPC publicată de INS pentru anii 2000–2025 și arată câți lei îți trebuie azi pentru puterea de cumpărare a unei sume din trecut."
       widget={<InflatieCalculator />}
       faqs={[
         {

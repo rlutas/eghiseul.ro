@@ -24,6 +24,7 @@ export default function Page() {
       title={TITLE}
       heading="Calculator Penalități și Dobânzi ANAF"
       description="Estimează accesoriile (dobândă + penalități) pentru o obligație fiscală plătită cu întârziere, conform Codului de procedură fiscală."
+      tldr="Pentru o taxă ANAF plătită cu întârziere se datorează dobândă de 0,02%/zi (mereu) plus penalitate de întârziere de 0,01%/zi pentru sume declarate, sau penalitate de nedeclarare de 0,08%/zi pentru sume descoperite la control (Legea 207/2015)."
       widget={<PenalitatiAnafCalculator />}
       faqs={[
         { q: 'Cât este dobânda de întârziere la ANAF?', a: 'Dobânda de întârziere este 0,02% pe zi (aproximativ 7,3% pe an), conform art. 174 din Codul de procedură fiscală. Se aplică în toate cazurile de plată cu întârziere.' },

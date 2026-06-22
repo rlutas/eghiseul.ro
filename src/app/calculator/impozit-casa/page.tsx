@@ -24,6 +24,7 @@ export default function Page() {
       title={TITLE}
       heading="Calculator Impozit pe Casă 2026"
       description="Estimează impozitul anual pe clădirea rezidențială pe baza suprafeței, tipului de construcție, zonei și vechimii, conform valorilor 2026."
+      tldr="În 2026 impozitul pe casă = suprafață × valoare/m² (indexată +79,6%) × coeficient de corecție (0,90–2,60) × ajustare vechime, înmulțit cu cota locală rezidențială de 0,08–0,2% (frecvent 0,1%)."
       widget={<ImpozitCladiriCalculator />}
       faqs={[
         {

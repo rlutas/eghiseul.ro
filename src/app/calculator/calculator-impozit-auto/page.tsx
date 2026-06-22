@@ -24,6 +24,7 @@ export default function Page() {
       title={TITLE}
       heading="Calculator Impozit Auto 2026"
       description="Estimează impozitul anual pe mașină conform noilor reguli din 2026, care țin cont atât de capacitatea cilindrică, cât și de norma de poluare Euro."
+      tldr="Din 2026 (Legea 239/2025), impozitul auto = numărul de grupe de 200 cmc (rotunjit în sus) × tariful pe grupă al normei Euro, plus cota adițională a primăriei (0-50%). Mașinile electrice plătesc 40 lei/an, iar hibridele ≤50g CO₂ pot avea reducere de până la 30%."
       widget={<ImpozitAutoCalculator />}
       faqs={[
         { q: 'Cum se calculează impozitul auto în 2026?', a: 'Din 2026, impozitul depinde de capacitatea cilindrică ȘI de norma de poluare (Euro). Se ia numărul de grupe de 200 cmc (rotunjit în sus) înmulțit cu tariful pe grupă corespunzător normei Euro, apoi se aplică eventuala cotă adițională a primăriei (0-50%).' },

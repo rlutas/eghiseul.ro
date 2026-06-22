@@ -24,6 +24,7 @@ export default function Page() {
       title={TITLE}
       heading="Calculator Indemnizație de Șomaj 2026"
       description="Estimează indemnizația de șomaj lunară și durata de acordare, în funcție de stagiul de cotizare și de salariul mediu."
+      tldr="În 2026, indemnizația de șomaj = 495 lei (75% din ISR) plus un procent din salariul mediu brut al ultimelor 12 luni (+3% la 3-5 ani, +5% la 5-10, +7% la 10-20, +10% peste 20 ani), pe 6-12 luni. Din suma brută se reține CASS 10%."
       widget={<SomajCalculator />}
       faqs={[
         { q: 'Cât este indemnizația de șomaj în 2026?', a: 'Baza este 75% din ISR (660 lei) = 495 lei, la care se adaugă un procent din salariul mediu brut din ultimele 12 luni, în funcție de vechime: +3% (peste 3 ani), +5% (peste 5), +7% (peste 10), +10% (peste 20). Din indemnizație se reține CASS 10%.' },

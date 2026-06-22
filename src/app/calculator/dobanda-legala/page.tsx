@@ -24,6 +24,7 @@ export default function Page() {
       title={TITLE}
       heading="Calculator Dobândă Legală 2026"
       description="Calculează dobânda legală penalizatoare sau remuneratorie pe baza ratei de referință BNR (6,50% în februarie 2026), conform OG 13/2011 și Legii 72/2013, pentru o sumă și o perioadă de întârziere."
+      tldr="La rata BNR de 6,50% (februarie 2026), dobânda legală penalizatoare civilă este 10,50% pe an (BNR+4pp), iar între profesioniști 14,50% pe an (BNR+8pp, Legea 72/2013). Suma se calculează: sumă × rata × zile / 365."
       widget={<DobandaLegalaCalculator />}
       faqs={[
         {

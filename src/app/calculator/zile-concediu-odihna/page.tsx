@@ -24,6 +24,7 @@ export default function Page() {
       title={TITLE}
       heading="Calculator Zile Concediu de Odihnă"
       description="Află câte zile de concediu de odihnă ți se cuvin proporțional cu perioada lucrată în anul curent."
+      tldr="Concediul de odihnă pornește de la minimul legal de 20 de zile lucrătoare pe an (Codul Muncii, art. 145) și se acordă proporțional cu lunile lucrate: zile pe an × luni lucrate / 12."
       widget={<ConcediuOdihnaCalculator />}
       faqs={[
         { q: 'Câte zile de concediu de odihnă am pe an?', a: 'Minimul legal este de 20 de zile lucrătoare pe an (Codul Muncii, art. 145). Prin contract sau contract colectiv pot fi acordate mai multe (frecvent 21-25).' },

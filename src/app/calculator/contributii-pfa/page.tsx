@@ -24,6 +24,7 @@ export default function Page() {
       title={TITLE}
       heading="Calculator Contribuții PFA 2026"
       description="Estimează contribuțiile și impozitul de plată pentru o PFA (Declarația Unică): CASS, CAS și impozit pe venit, cu plafoanele în vigoare."
+      tldr="În 2026, o PFA în sistem real plătește CASS 10% (peste 6 salarii minime = 24.300 lei), CAS 25% doar dacă venitul net depășește 12 salarii minime (48.600 lei) și impozit pe venit 10% aplicat după scăderea CAS și CASS."
       widget={<PfaCalculator />}
       faqs={[
         { q: 'Ce contribuții plătește o PFA în 2026?', a: 'CASS 10% (sănătate), CAS 25% (pensie, doar peste 12 salarii minime) și impozit pe venit 10%. CASS și CAS se scad din baza impozitului.' },

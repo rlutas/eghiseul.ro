@@ -24,6 +24,7 @@ export default function Page() {
       title={TITLE}
       heading="Calculator Reabilitare Cazier Judiciar"
       description="Calculează data la care intervine reabilitarea și se șterge mențiunea din cazierul judiciar, pe baza termenelor fixe din Codul Penal."
+      tldr="Condamnarea se șterge din cazier după termene fixe din Codul Penal (art. 165-167), calculate de la executarea pedepsei: 3 ani (amendă, închisoare ≤ 2 ani sau suspendare), 4 ani (2-5 ani), 5 ani (5-10 ani) și 7 ani (peste 10 ani)."
       widget={<ReabilitareCalculator />}
       faqs={[
         { q: 'După cât timp se șterge cazierul judiciar?', a: 'Depinde de pedeapsă: reabilitarea de drept intervine după 3 ani (amendă, închisoare ≤ 2 ani, suspendare). Reabilitarea judecătorească: 4 ani (2-5 ani închisoare), 5 ani (5-10 ani) sau 7 ani (peste 10 ani), calculate de la executarea pedepsei.' },

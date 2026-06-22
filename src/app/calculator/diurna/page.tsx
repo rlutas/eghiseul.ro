@@ -24,6 +24,7 @@ export default function Page() {
       title={TITLE}
       heading="Calculator Diurnă 2026"
       description="Estimează partea neimpozabilă și partea impozabilă a diurnei pentru delegație sau detașare, în țară sau în străinătate."
+      tldr="În 2026, diurna pentru delegații interne este neimpozabilă până la 57,5 lei/zi (2,5 × 23 lei), dar și în limita a 3 salarii de bază pe lună. Ce depășește plafonul se impozitează ca salariu (impozit 10%, CAS 25%, CASS 10%)."
       widget={<DiurnaCalculator />}
       faqs={[
         {

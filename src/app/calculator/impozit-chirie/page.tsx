@@ -24,6 +24,7 @@ export default function Page() {
       title={TITLE}
       heading="Calculator Impozit pe Chirie 2026"
       description="Estimează impozitul și CASS pe veniturile din închiriere, conform regulilor fiscale în vigoare în 2026."
+      tldr="În 2026, chiria pe termen lung se impozitează cu 10% pe venitul net (după deducerea forfetară de 20%), adică circa 8% din chiria brută. CASS se plătește pe plafon (6, 12 sau 24 salarii minime) doar dacă venitul net pasiv depășește 6 salarii minime pe an."
       widget={<ImpozitChirieCalculator />}
       faqs={[
         { q: 'Cât este impozitul pe chirie în 2026?', a: 'Impozitul este 10% aplicat pe venitul net. Venitul net = venit brut − 20% deducere forfetară (termen lung), deci impozitul efectiv este circa 8% din chiria încasată. Pentru închirierea turistică (scurtă durată) deducerea este 30%.' },

@@ -24,6 +24,7 @@ export default function Page() {
       title={TITLE}
       heading="Calculator Grad de Îndatorare 2026"
       description="Calculează gradul de îndatorare (DTI) — ce procent din venitul net lunar pleacă pe rate — și verifică dacă te încadrezi în plafoanele impuse de BNR pentru a obține un credit."
+      tldr="În 2026, gradul maxim de îndatorare admis de BNR (Regulamentul nr. 17/2012, modificat prin nr. 6/2018) este 40% din venitul net pentru creditele în lei (45% la prima locuință) și 20% în valută (25% la prima locuință)."
       widget={<GradIndatorareCalculator />}
       faqs={[
         {

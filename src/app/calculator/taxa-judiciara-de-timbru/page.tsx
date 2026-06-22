@@ -24,6 +24,7 @@ export default function Page() {
       title={TITLE}
       heading="Calculator Taxă Judiciară de Timbru"
       description="Estimează taxa judiciară de timbru pentru o cerere evaluabilă în bani, conform tranșelor din OUG 80/2013, plus taxele fixe cele mai întâlnite."
+      tldr="Taxa judiciară de timbru se calculează pe tranșe progresive (OUG 80/2013): de exemplu, pentru o cerere de 100.000 lei plătești 2.105 lei + 2% din ce depășește 50.000 lei = 3.105 lei. Divorțul are taxă fixă de 200 lei, iar apelul costă 50% din taxa de fond."
       widget={<TaxaTimbruCalculator />}
       faqs={[
         { q: 'Cum se calculează taxa de timbru pentru o cerere evaluabilă în bani?', a: 'Se aplică tranșe progresive (Art. 3 OUG 80/2013): de exemplu, pentru 100.000 lei taxa este 2.105 lei + 2% din suma ce depășește 50.000 lei = 3.105 lei.' },

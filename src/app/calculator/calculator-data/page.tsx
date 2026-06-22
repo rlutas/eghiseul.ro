@@ -24,6 +24,7 @@ export default function Page() {
       title={TITLE}
       heading="Calculator Dată 2026"
       description="Adună sau scade zile, luni ori ani la o dată (sau doar zile lucrătoare) și calculează diferența în zile între două date — util pentru termene, scadențe și vârste."
+      tldr="Calculatorul are două moduri: aduni sau scazi zile, luni ori ani la o dată de pornire și afli data rezultată, sau introduci două date și obții diferența în zile. Opțional poți număra doar zile lucrătoare, ignorând weekendurile. Rezultatul este orientativ, nu oficial."
       widget={<DataCalculator />}
       faqs={[
         { q: 'Ce face acest calculator de dată?', a: 'Adună sau scade un număr de zile, luni sau ani la o dată de pornire și îți arată data rezultată. Alternativ, calculează câte zile sunt între două date. Poți alege să numeri toate zilele sau doar zilele lucrătoare.' },

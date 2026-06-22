@@ -24,6 +24,7 @@ export default function Page() {
       title={TITLE}
       heading="Calculator Estimare Pensie"
       description="Estimează cuantumul pensiei pentru limită de vârstă pe baza stagiului de cotizare și a salariului, conform sistemului de puncte din Legea 360/2023."
+      tldr="În 2026, pensia = total puncte × 81 lei (valoarea punctului de referință, înghețată prin Legea 141/2025). Punctele se compun din contributivitate (salariul tău ÷ media de ~9.192 lei/an) plus stabilitate peste 25 de ani de stagiu. Exemplu: 35 de ani la media pe economie = 41,25 puncte ≈ 3.341 lei/lună."
       widget={<EstimarePensieCalculator />}
       faqs={[
         {

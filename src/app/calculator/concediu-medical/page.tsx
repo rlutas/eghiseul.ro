@@ -24,6 +24,7 @@ export default function Page() {
       title={TITLE}
       heading="Calculator Concediu Medical 2026"
       description="Estimează indemnizația de concediu medical pe baza venitului mediu, a tipului de concediu și a regulilor în vigoare în 2026."
+      tldr="În 2026, boala obișnuită se plătește progresiv: 55% (zilele 1-7), 65% (8-14), 75% (15+). Baza e media venitului brut din ultimele 6 luni, plafonată la 12 salarii minime/lună, iar prima zi a episodului nu se plătește (OUG 91/2025)."
       widget={<ConcediuMedicalCalculator />}
       faqs={[
         { q: 'Cât la sută din salariu primesc pe concediu medical în 2026?', a: 'Depinde de tip: boala obișnuită are procent progresiv — 55% (până la 7 zile), 65% (8-14 zile), 75% (15+ zile). Urgențele și bolile din grupa A sunt 100%, maternitatea și îngrijirea copilului 85%, riscul maternal 75%, accidentul de muncă 80%.' },

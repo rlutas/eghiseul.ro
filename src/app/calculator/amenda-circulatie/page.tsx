@@ -24,6 +24,7 @@ export default function Page() {
       title={TITLE}
       heading="Calculator Amendă Circulație 2026"
       description="Estimează amenda rutieră pe clase și punctele de penalizare pentru depășirea de viteză, cu valoarea punctului-amendă valabilă în 2026."
+      tldr="În 2026, amenda rutieră = puncte-amendă × valoarea punctului (405 lei până la 30 iunie, 432,50 lei de la 1 iulie). Achiți jumătate din minimul clasei dacă plătești în 15 zile; permisul se suspendă la 15 puncte de penalizare."
       widget={<AmendaCalculator />}
       faqs={[
         { q: 'Cât este un punct-amendă în 2026?', a: 'Un punct-amendă valorează 10% din salariul minim brut: 405 lei până la 30 iunie 2026 și 432,50 lei de la 1 iulie 2026 (după majorarea salariului minim). Valoarea aplicată depinde de data contravenției.' },

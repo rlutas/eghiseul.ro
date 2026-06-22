@@ -24,6 +24,7 @@ export default function Page() {
       title={TITLE}
       heading="Calculator Credit Ipotecar 2026"
       description="Estimează rata lunară a unui credit ipotecar cu rate egale (anuitate), totalul de plată și dobânda totală. Calculul este orientativ, fără comisioane și fără DAE."
+      tldr="Rata lunară la un credit cu rate egale se calculează cu R = P·i/(1−(1+i)^−n); de exemplu 300.000 lei la 6% pe 25 de ani înseamnă circa 1.933 lei pe lună. Rata, cu celelalte credite, nu trebuie să depășească 40% din venitul net."
       widget={<CreditIpotecarCalculator />}
       faqs={[
         { q: 'Cum se calculează rata lunară la un credit ipotecar?', a: 'La un credit cu rate egale (anuitate) rata lunară se calculează cu formula R = P·i/(1−(1+i)^−n), unde P este suma împrumutată, i este dobânda lunară (dobânda anuală împărțită la 12) și n este numărul total de luni. Rata rămâne constantă pe toată perioada dacă dobânda nu se modifică.' },

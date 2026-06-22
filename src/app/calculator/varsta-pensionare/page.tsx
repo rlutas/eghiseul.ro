@@ -24,6 +24,7 @@ export default function Page() {
       title={TITLE}
       heading="Calculator Vârstă de Pensionare"
       description="Calculează vârsta standard de pensionare, data ieșirii la pensie și stagiile de cotizare, pe baza datei nașterii și a sexului (Anexa 5, Legea 360/2023)."
+      tldr="Vârsta standard de pensionare se egalizează la 65 de ani pentru femei și bărbați (Anexa 5, Legea 360/2023). Bărbații născuți după 1950 și femeile născute din ianuarie 1970 ies la 65 de ani, cu stagiu complet de 35 de ani și minim 15 ani de cotizare."
       widget={<VarstaPensionareCalculator />}
       faqs={[
         {

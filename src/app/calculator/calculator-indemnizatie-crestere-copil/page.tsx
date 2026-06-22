@@ -25,6 +25,7 @@ export default function Page() {
       title={TITLE}
       heading="Calculator Indemnizație Creștere Copil 2026"
       description="Estimează indemnizația lunară de creștere a copilului (ICC) pe baza venitului net mediu, conform regulilor în vigoare în 2026."
+      tldr="În 2026, indemnizația de creștere a copilului este 85% din venitul net mediu lunar, între minimul de 1.650 lei și maximul de 8.500 lei brut. Din suma brută se reține CASS 10%, deci maximul net încasat este 7.650 lei pe lună."
       widget={<IccCalculator />}
       faqs={[
         { q: 'Cât este indemnizația de creștere a copilului în 2026?', a: 'ICC este 85% din venitul net mediu lunar din ultimele 12 luni (din cele 24 dinaintea nașterii), între un minim de 1.650 lei și un maxim de 8.500 lei brut. Din suma brută se reține CASS 10%.' },

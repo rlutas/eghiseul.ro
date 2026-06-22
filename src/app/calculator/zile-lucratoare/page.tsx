@@ -24,6 +24,7 @@ export default function Page() {
       title={TITLE}
       heading="Calculator Zile Lucrătoare 2026"
       description="Calculează câte zile lucrătoare sunt între două date, excluzând automat weekendurile și sărbătorile legale din Codul Muncii. În 2026 sunt aproximativ 250 de zile lucrătoare."
+      tldr="Anul 2026 are aproximativ 250 de zile lucrătoare: din zilele de luni până vineri se scad weekendurile și sărbătorile legale prevăzute de art. 139 din Codul Muncii (fixe și mobile, precum Paștele și Rusaliile)."
       widget={<ZileLucratoareCalculator />}
       faqs={[
         { q: 'Câte zile lucrătoare are anul 2026?', a: 'Anul 2026 are aproximativ 250 de zile lucrătoare, după excluderea weekendurilor (sâmbătă și duminică) și a sărbătorilor legale prevăzute de Codul Muncii.' },

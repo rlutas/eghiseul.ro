@@ -24,6 +24,7 @@ export default function Page() {
       title={TITLE}
       heading="Calculator Concediu Paternal 2026"
       description="Află câte zile de concediu paternal ți se cuvin în 2026 conform Legii 210/1999: 10 zile lucrătoare de bază, plus 5 zile dacă ai absolvit un curs de puericultură, plătite 100% de angajator."
+      tldr="În 2026, concediul paternal este de 10 zile lucrătoare (Legea 210/1999), plus 5 zile dacă ai absolvit un curs de puericultură (total 15 zile), plătite 100% de angajator și luate în primele 8 săptămâni de la naștere."
       widget={<ConcediuPaternalCalculator />}
       faqs={[
         {

@@ -24,6 +24,7 @@ export default function Page() {
       title={TITLE}
       heading="Calculator Rambursare Anticipată Credit"
       description="Află cât economisești dacă plătești anticipat o sumă din credit — comparând cele două opțiuni: reduci perioada sau reduci rata lunară."
+      tldr="Suma plătită anticipat se duce integral în principal, iar reducerea perioadei economisește de regulă mai multă dobândă decât reducerea ratei. La dobândă variabilă comisionul de rambursare anticipată este zero (OUG 50/2010); la dobândă fixă, maximum 1%."
       widget={<RambursareAnticipataCalculator />}
       faqs={[
         {

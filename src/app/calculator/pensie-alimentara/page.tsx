@@ -24,6 +24,7 @@ export default function Page() {
       title={TITLE}
       heading="Calculator Pensie Alimentară 2026"
       description="Estimează pensia de întreținere datorată copiilor pe baza venitului net al părintelui obligat, conform cotelor din Codul Civil (art. 529)."
+      tldr="Pensia alimentară se calculează ca o cotă din venitul net lunar al părintelui obligat (art. 529 Cod Civil): până la 1/4 (25%) pentru un copil, 1/3 pentru doi și 1/2 pentru trei sau mai mulți, fără ca totalul întreținerii să depășească 50% din venitul net."
       widget={<PensieAlimentaraCalculator />}
       faqs={[
         {

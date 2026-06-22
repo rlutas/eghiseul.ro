@@ -24,6 +24,7 @@ export default function Page() {
       title={TITLE}
       heading="Calculator Taxe SRL 2026"
       description="Estimează taxarea totală a unui SRL în 2026 — impozit micro 1% sau pe profit 16%, plus impozit pe dividende și CASS — și câți bani rămân efectiv în mână."
+      tldr="În 2026 un SRL plătește impozit micro 1% pe venituri (sub 100.000 EUR, cu cel puțin un salariat) sau 16% pe profit, iar dividendele distribuite se impozitează cu 16% plus CASS pe plafoane. Exemplu: la 300.000 lei venituri și 100.000 lei cheltuieli rămân ~155.760 lei în mână."
       widget={<TaxeSrlCalculator />}
       faqs={[
         {
