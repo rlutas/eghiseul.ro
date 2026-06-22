@@ -30,5 +30,11 @@
 - Vechiul redirect `/servicii/rovinieta-online` → `/servicii/verificare-rovinieta-online/` ducea într-un **404** → eliminat (acum pagină reală).
 - `/servicii/verificare-rovinieta-online` (16K clickuri GSC, era 404) → redirecționat la `/tools/verificare-rovinieta-online/` (tool-ul real). Recuperare trafic.
 
+## Update final (2026-06-22)
+- **Conținut importat de pe paginile live eghiseul.ro** (care rankează), nu scris de la zero: verificare (ce e rovinieta, drumuri unde e necesară/NU, excepții, tarife A+B, FAQ real) + cumpărare (4 beneficii, amenzi 250-1.500 lei, electronică din 2010, camere CNAIR).
+- **Funnel bidirecțional:** verificare → „cumpără rovinieta online" și invers.
+- **Layout consistent cu calculatoarele** (hero cu badge, widget overlapping un singur card, „Pe scurt", FAQ, CTA). Fix: embed-ul erovinieta e deja card alb → fără wrapper alb dublu.
+- **Pagină nouă `/tools/`** (Instrumente): listează verificare rovinietă + calculatoare. Schema CollectionPage, în sitemap.
+
 ## Surse
 CNAIR „Contravaloare Rovinietă Ianuarie 2026" (PDF oficial), cnadnr.ro, erovinieta.net/categorii-rovinieta.

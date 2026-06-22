@@ -2,6 +2,8 @@
 
 **Data:** 2026-06-15 (ONRC constatator IMM/insolvență FUNCȚIONAL în producție)
 
+> **⚡ Update 2026-06-22:** de atunci s-au livrat: 36 calculatoare (îmbogățite + GEO), expansiune location-SEO (42 CF pe județe, 48 orașe cazier, clustere ONRC + stare civilă = 66 pagini noi), rovinietă (verificare consistent + pagină cumpărare), pagină `/tools/`, meniu calculatoare limitat la populare, reorganizare docs. Detalii: [`changelog/2026-06-22-seo-expansion-rovinieta-tools.md`](changelog/2026-06-22-seo-expansion-rovinieta-tools.md). Restul fișierului de mai jos reflectă starea de la 2026-06-15.
+
 ---
 
 ## ✅ 2026-06-15 — ONRC constatator funcțional A→Z pentru TOATE tipurile

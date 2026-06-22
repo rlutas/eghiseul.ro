@@ -21,6 +21,9 @@ Platforma digitala pentru Romania - servicii publice digitalizate (9 servicii ac
 | **Status proiect & sprint** | `docs/DEVELOPMENT_MASTER_PLAN.md` |
 | **Status curent (ce merge, probleme, testare)** | `docs/STATUS_CURRENT.md` |
 | **Index complet docs** | `docs/README.md` |
+| **Changelog (ce s-a livrat, pe sesiuni)** | `docs/changelog/` |
+| **SEO (location pages, clustere, keywords, GSC)** | `docs/seo/README.md` |
+| **WebMCP (tools pentru agenți AI)** | `docs/technical/webmcp.md` |
 | **Cum adaug serviciu nou** | `docs/technical/specs/modular-wizard-guide.md` |
 | **API endpoints** | `docs/technical/api/` + `docs/README.md` (summary) |
 | **Admin panel** | `docs/admin/README.md` |
@@ -201,5 +204,5 @@ CLOUDCONVERT_API_KEY=        # DOCX→PDF preview in admin (optional; dev uses l
 
 ---
 
-**Last Updated:** 2026-02-17
-**Version:** 5.0 (lean - rules in .claude/rules/, details in docs/)
+**Last Updated:** 2026-06-22
+**Version:** 5.1 (docs reorganizate: root cu 3 docuri vii, `changelog/` nou, foldere index per zonă, istoric în `archive/`)

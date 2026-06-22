@@ -85,7 +85,7 @@
 | **PRD** | `docs/prd/eghiseul-prd.md` | ✅ Complete |
 | **Security Architecture** | `docs/security-architecture.md` | ✅ Complete |
 | **Legal** | `docs/legal/compliance-research.md` | ✅ Complete |
-| **Tech Stack** | `docs/TECHNOLOGY_RECOMMENDATIONS.md` | ✅ Complete |
+| **Tech Stack** | `docs/archive/TECHNOLOGY_RECOMMENDATIONS.md` | ✅ Complete |
 
 ### Security Documentation (NEW - Sprint 3)
 | Document | Locație | Status |
@@ -2652,7 +2652,7 @@ Customer views tracking timeline:
 - Sprint 5: 98% complete (unchanged - remaining: charts, audit logging)
 - CLIENT_DETAILS_BLOCK Legal Format: Complete (PF + PJ)
 - KYC Confidence Tracking: Complete (types, wizard state, admin display)
-- Session recap document created: `docs/SESSION_RECAP.md`
+- Session recap document created: `docs/session-logs/2026-02-19-session-recap.md`
 
 ---
 
