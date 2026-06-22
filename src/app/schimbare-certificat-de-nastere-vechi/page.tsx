@@ -71,7 +71,7 @@ export default function Page() {
       <ul>
         <li>certificatul este <strong>deteriorat, rupt, pătat sau ilizibil</strong>;</li>
         <li>este un <strong>model vechi, completat de mână</strong>, greu de acceptat de unele instituții;</li>
-        <li>o autoritate din <strong>străinătate</strong> îți cere un exemplar recent, tipărit (eventual împreună cu <Link href="/servicii/extras-multilingv-certificat-nastere/">extrasul multilingv</Link>);</li>
+        <li>o autoritate din <strong>străinătate</strong> îți cere un exemplar recent, tipărit (eventual împreună cu <strong>extrasul multilingv</strong>);</li>
         <li>ai nevoie de un exemplar curat pentru un <strong>dosar oficial</strong> (notariat, bancă, pensii, succesiune).</li>
       </ul>
 

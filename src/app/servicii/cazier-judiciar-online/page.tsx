@@ -43,7 +43,7 @@ import {
 // =============================================================================
 
 const PAGE_PATH = '/servicii/cazier-judiciar-online/';
-const TITLE = 'Cazier Judiciar Online — Fără Drumuri, în 2-4 Zile';
+const TITLE = 'Cazier Judiciar Online 2026 — Fără Drumuri, în 2-4 Zile';
 const DESCRIPTION =
   'Obține cazierul judiciar online de la Poliția Română, fără cozi. ' +
   'Persoane fizice și firme, livrare în 2-4 zile pe email sau curier. Comandă în 5 minute.';

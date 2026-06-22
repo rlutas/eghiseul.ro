@@ -19,7 +19,6 @@ export const HARDCODED_SERVICE_SLUGS = [
   'cazier-fiscal-online',
   'cazier-auto-online',
   'rovinieta-online',
-  'verificare-rovinieta-online',
   'eliberare-certificat-de-nastere',
   'eliberare-certificat-de-casatorie',
   'eliberare-certificat-de-celibat',
@@ -28,8 +27,9 @@ export const HARDCODED_SERVICE_SLUGS = [
   'extras-plan-cadastral',
   'certificat-constatator-online',
   'certificat-de-integritate-comportamentala',
-  'extras-multilingv-certificat-nastere',
-  'extras-multilingv-certificat-casatorie',
+  // NOTE: 'verificare-rovinieta-online' scos — redirect 301 → /tools/ (next.config). Tool-ul real e în HARDCODED_TOOL_SLUGS.
+  // NOTE: 'extras-multilingv-certificat-{nastere,casatorie}' scoase — nu au pagină în Next (ar da 404 în sitemap);
+  //       redirect 301 → eliberare-certificat-de-{nastere,casatorie} în next.config. De construit pagini dedicate ulterior.
 ] as const;
 
 export type HardcodedServiceSlug = (typeof HARDCODED_SERVICE_SLUGS)[number];

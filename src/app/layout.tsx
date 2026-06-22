@@ -15,7 +15,7 @@ const inter = Inter({
 export const metadata: Metadata = {
   metadataBase: new URL("https://eghiseul.ro"),
   title: {
-    default: "Cazier Judiciar, Cazier Fiscal & Documente Oficiale Online — eGhiseul.ro",
+    default: "eGhișeul.ro — Documente Oficiale Online: Cazier, Carte Funciară",
     template: "%s | eGhiseul.ro",
   },
   description:
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
     locale: "ro_RO",
     url: "https://eghiseul.ro/",
     siteName: "eGhiseul.ro",
-    title: "Cazier Judiciar, Cazier Fiscal & Documente Oficiale Online — eGhiseul.ro",
+    title: "eGhișeul.ro — Documente Oficiale Online: Cazier, Carte Funciară",
     description:
       "Obține documente oficiale online — cazier judiciar, cazier fiscal, certificat constatator, extras de carte funciară — rapid, legal, fără cozi. Livrare 24-48 ore.",
     images: [
@@ -46,7 +46,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Cazier Judiciar, Cazier Fiscal & Documente Oficiale Online — eGhiseul.ro",
+    title: "eGhișeul.ro — Documente Oficiale Online: Cazier, Carte Funciară",
     description:
       "Documente oficiale online, rapid și legal. Livrare pe email sau curier în 24-48 ore.",
     images: ["/og/default.png"],

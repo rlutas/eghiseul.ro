@@ -4,7 +4,7 @@ import { CalculatorLayout } from '@/components/calculators/calculator-layout';
 import { PensieInvaliditateCalculator } from '@/components/calculators/pensie-invaliditate-calculator';
 
 const SLUG = 'pensie-invaliditate';
-const TITLE = 'Calculator Pensie de Invaliditate 2026';
+const TITLE = 'Calculator Pensie Invaliditate 2026 — Gradele I, II, III';
 const DESCRIPTION =
   'Estimează pensia de invaliditate în 2026 pe grade (I, II, III): puncte realizate + stagiu potențial × VPR 81 lei, plus indemnizația de însoțitor pentru gradul I.';
 

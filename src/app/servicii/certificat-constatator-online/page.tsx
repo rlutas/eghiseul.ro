@@ -38,7 +38,7 @@ import { GOOGLE_RATING, GOOGLE_REVIEW_COUNT_LABEL } from '@/config/contact';
 const SERVICE_SLUG = 'certificat-constatator';
 const PAGE_PATH = '/servicii/certificat-constatator-online/';
 const SCHEMA_SLUG = 'certificat-constatator-online';
-const TITLE = 'Certificat Constatator Online ONRC — în câteva minute';
+const TITLE = 'Certificat Constatator ONRC Online 2026 — de la 89 RON';
 const DESCRIPTION =
   'Certificat constatator online ONRC, doar cu CUI-ul firmei — pe firmă, persoană fizică ' +
   'sau cu istoric. Pe email în câteva minute. De la 89 RON, taxe ONRC incluse.';

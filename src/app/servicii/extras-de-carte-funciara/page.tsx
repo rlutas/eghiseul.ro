@@ -37,7 +37,7 @@ import { buildPageMetadata, buildServicePageGraph, BASE_URL, serviceUrl } from '
 const SERVICE_SLUG = 'extras-carte-funciara';
 const PAGE_PATH = '/servicii/extras-de-carte-funciara/';
 const SCHEMA_SLUG = 'extras-de-carte-funciara';
-const TITLE = 'Extras Carte Funciară Online — în Câteva Minute, 89 RON';
+const TITLE = 'Extras Carte Funciară Online 2026 — în 5 Minute, 89 RON';
 const DESCRIPTION =
   'Extras de carte funciară online de la ANCPI, livrat pe email în câteva minute. ' +
   '89 RON, taxe incluse — fără cont ANCPI și fără taxă de urgență.';
