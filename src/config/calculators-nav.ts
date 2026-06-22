@@ -25,6 +25,8 @@ import {
   Coins,
   Building2,
   PiggyBank,
+  HandCoins,
+  TrendingUp,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -50,6 +52,7 @@ export const CALCULATORS_NAV: CalculatorNavGroup[] = [
       { name: 'Indemnizație creștere copil', href: '/calculator/calculator-indemnizatie-crestere-copil/', icon: Baby },
       { name: 'Vechime în muncă', href: '/calculator/vechime-in-munca/', icon: CalendarClock },
       { name: 'Zile concediu de odihnă', href: '/calculator/zile-concediu-odihna/', icon: Plane },
+      { name: 'Impozit pe pensie', href: '/calculator/impozit-pensie/', icon: HandCoins },
     ],
   },
   {
@@ -62,6 +65,7 @@ export const CALCULATORS_NAV: CalculatorNavGroup[] = [
       { name: 'Impozit pe chirie', href: '/calculator/impozit-chirie/', icon: Home },
       { name: 'Penalități ANAF', href: '/calculator/penalitati-anaf/', icon: FileWarning },
       { name: 'Rambursare anticipată', href: '/calculator/rambursare-anticipata/', icon: PiggyBank },
+      { name: 'Inflație', href: '/calculator/inflatie/', icon: TrendingUp },
     ],
   },
   {

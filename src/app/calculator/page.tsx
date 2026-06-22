@@ -103,6 +103,14 @@ const CATALOG: Record<string, { title: string; desc: string }> = {
     title: 'Calculator Rambursare Anticipată',
     desc: 'Cât economisești dacă plătești anticipat creditul: reduci durata sau rata.',
   },
+  'impozit-pensie': {
+    title: 'Calculator Impozit pe Pensie',
+    desc: 'Impozit 10% + CASS 10% pe partea peste 3.000 lei; pensia netă încasată (2026).',
+  },
+  inflatie: {
+    title: 'Calculator Inflație',
+    desc: 'Puterea de cumpărare a banilor între doi ani, pe baza ratelor INS.',
+  },
 };
 
 export default function Page() {

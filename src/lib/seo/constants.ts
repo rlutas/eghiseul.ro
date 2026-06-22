@@ -118,6 +118,8 @@ export const HARDCODED_CALCULATOR_SLUGS: readonly string[] = [
   'dividende',
   'taxe-srl',
   'rambursare-anticipata',
+  'impozit-pensie',
+  'inflatie',
 ];
 
 /** Tools pages (ported from WP /tools/*). */
