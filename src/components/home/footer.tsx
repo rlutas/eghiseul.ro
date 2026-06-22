@@ -9,6 +9,7 @@ const services = [
   { name: 'Extras Carte Funciară', href: serviceUrl('extras-carte-funciara') },
   { name: 'Certificat Celibat', href: serviceUrl('certificat-celibat') },
   { name: 'Calculatoare', href: '/calculator/' },
+  { name: 'Curs valutar BNR', href: '/curs-valutar/' },
   { name: 'Vezi toate serviciile', href: '/servicii/' },
 ];
 
