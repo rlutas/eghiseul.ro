@@ -113,6 +113,7 @@ export const HARDCODED_CALCULATOR_SLUGS: readonly string[] = [
   'reabilitare',
   'calculator-procente',
   'taxe-notariale',
+  'pensie-alimentara',
 ];
 
 /** Tools pages (ported from WP /tools/*). */

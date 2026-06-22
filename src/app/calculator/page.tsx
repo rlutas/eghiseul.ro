@@ -83,6 +83,10 @@ const CATALOG: Record<string, { title: string; desc: string }> = {
     title: 'Calculator Taxe Notariale',
     desc: 'Onorariu notarial, intabulare, impozit și extras CF pentru vânzare, donație, succesiune, partaj.',
   },
+  'pensie-alimentara': {
+    title: 'Calculator Pensie Alimentară',
+    desc: 'Pensia de întreținere pentru copii: 1/4, 1/3 sau 1/2 din venitul net (Cod Civil art. 529).',
+  },
 };
 
 export default function Page() {
