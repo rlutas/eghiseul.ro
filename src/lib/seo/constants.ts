@@ -120,6 +120,8 @@ export const HARDCODED_CALCULATOR_SLUGS: readonly string[] = [
   'rambursare-anticipata',
   'impozit-pensie',
   'inflatie',
+  'diurna',
+  'impozit-casa',
 ];
 
 /** Tools pages (ported from WP /tools/*). */

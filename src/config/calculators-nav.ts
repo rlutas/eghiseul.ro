@@ -27,6 +27,8 @@ import {
   PiggyBank,
   HandCoins,
   TrendingUp,
+  MapPin,
+  House,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -53,6 +55,7 @@ export const CALCULATORS_NAV: CalculatorNavGroup[] = [
       { name: 'Vechime în muncă', href: '/calculator/vechime-in-munca/', icon: CalendarClock },
       { name: 'Zile concediu de odihnă', href: '/calculator/zile-concediu-odihna/', icon: Plane },
       { name: 'Impozit pe pensie', href: '/calculator/impozit-pensie/', icon: HandCoins },
+      { name: 'Diurnă', href: '/calculator/diurna/', icon: MapPin },
     ],
   },
   {
@@ -66,6 +69,7 @@ export const CALCULATORS_NAV: CalculatorNavGroup[] = [
       { name: 'Penalități ANAF', href: '/calculator/penalitati-anaf/', icon: FileWarning },
       { name: 'Rambursare anticipată', href: '/calculator/rambursare-anticipata/', icon: PiggyBank },
       { name: 'Inflație', href: '/calculator/inflatie/', icon: TrendingUp },
+      { name: 'Impozit pe casă', href: '/calculator/impozit-casa/', icon: House },
     ],
   },
   {

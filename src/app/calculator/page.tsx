@@ -111,6 +111,14 @@ const CATALOG: Record<string, { title: string; desc: string }> = {
     title: 'Calculator Inflație',
     desc: 'Puterea de cumpărare a banilor între doi ani, pe baza ratelor INS.',
   },
+  diurna: {
+    title: 'Calculator Diurnă',
+    desc: 'Diurna neimpozabilă (57,5 lei/zi în țară, per țară în străinătate) și partea impozabilă.',
+  },
+  'impozit-casa': {
+    title: 'Calculator Impozit pe Casă',
+    desc: 'Impozit pe clădiri 2026 după suprafață, tip, zonă și vechime (orientativ).',
+  },
 };
 
 export default function Page() {
