@@ -3,7 +3,6 @@ import { HeroSection } from '@/components/home/hero-section';
 import { FeaturedServices, FeaturedServicesSkeleton } from '@/components/home/featured-services';
 import { WhyUsSection } from '@/components/home/why-us-section';
 import { UseCasesSection } from '@/components/home/use-cases-section';
-import { PainPointsSection } from '@/components/home/pain-points-section';
 import { HowItWorksSection } from '@/components/home/how-it-works-section';
 import { TestimonialsSection } from '@/components/home/testimonials-section';
 import { FAQSection } from '@/components/home/faq-section';
@@ -44,10 +43,7 @@ export default function HomePage() {
       {/* 6. Use Cases - When you need us */}
       <UseCasesSection />
 
-      {/* 7. Pain Points - Problems we solve */}
-      <PainPointsSection />
-
-      {/* 8. FAQ */}
+      {/* 7. FAQ */}
       <FAQSection />
 
       {/* 10. Ghiduri & articole recente (parity cu site-ul WP + internal linking) */}
