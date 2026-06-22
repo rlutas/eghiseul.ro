@@ -1,5 +1,7 @@
 # Location SEO Engine — Implementation Plan (multi-serviciu)
 
+> **⚠️ STARE 2026-06-22:** parțial IMPLEMENTAT. Vezi `docs/seo/SEO-STATUS-2026-06-22.md` pentru ce e live (42 CF pe județe, 48 orașe cazier, clustere ONRC + stare civilă). Planul rămâne ca referință de strategie; scope-ul rafinat e în memoria `location-seo-scope`.
+
 > **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
 
 **Goal:** Construiește un singur engine reutilizabil de pagini pe locație (`/servicii/{serviciu}/{locatie}`) care captează long-tail-ul local organic pe serviciile unde există intenție locală REALĂ + o instituție locală reală — fără a cădea în „doorway / thin content".
