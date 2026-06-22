@@ -55,6 +55,18 @@ Alte striking-distance (poz 4-12, impresii mari, CTR slab):
 5. 📱 **Mobile + CWV** — 83% mobil; performanța paginilor grele de calculator pe mobil = direct ranking + CTR.
 6. 🌍 **Diaspora** — clusterele „din străinătate" (apostilă, transcriere, cazier emigrare, celibat) deja construite parțial → de extins.
 
-> Plan de acțiune go-live detaliat (paritate URL, titluri CTR, checklist tehnic): se completează din auditul de go-live.
+## 6. Plan de acțiune go-live (din audit — paritate 38/40 top earners OK)
+
+### ✅ REZOLVAT (2026-06-22)
+- 🔴 **3 ship-blockers sitemap:** scos `verificare-rovinieta-online` (redirecta) + `extras-multilingv-{nastere,casatorie}` (404) din `HARDCODED_SERVICE_SLUGS` → 301 redirects în next.config + linkuri interne moarte scoase.
+- 🔴 **Pagina `/contact/`** construită (era în sitemap dar 404; WP `/contact` ranka 2.374 cl) — schema ContactPage + disclaimer brand.
+- 🎯 **Titluri CTR** rescrise pe underperformeri: salariu, tva, pensie-invaliditate, carte-funciară, cazier-judiciar, certificat-constatator + homepage (brand „eGhișeul.ro" în față pt intenția „ghiseul"). Toate ≤62 char, cu an + gratuit/preț.
+
+### ⏳ RĂMAS (înainte/la cutover)
+1. **CWV/Lighthouse** pe `/calculator/salariu/` + `/calculator/calculator-impozit-auto/` (≈750k cl combinate) pe preview Vercel — target INP <200ms. Cel mai mare risc de regres.
+2. **Internal linking** către paginile de serviciu de la poz 8-10 (extras-carte-funciară, certificat-constatator, cazier-judiciar) din articolele cu trafic + homepage → urcă poziția (au deja schema + content; lipsește autoritate/linking).
+3. **Ziua cutover:** păstrează același domeniu (trailing-slash identic), submit `sitemap.xml` în GSC, request indexing pe cele 7 pagini cu titlu schimbat, monitorizează Coverage „404" + pozițiile top-10 timp de 2 săpt.
+4. **Conținut (opțional):** construiește pagini dedicate `extras-multilingv-{nastere,casatorie}` (rankau pe WP, acum redirect) ca să recuperezi cele ~1.700 clickuri.
+5. **Brand „ghiseul":** secțiune de dezambiguizare pe homepage („cauți să plătești impozite? acela e portalul oficial; noi îți obținem documentele") — captează intenția onest, NU impersona.
 
 **Ultima actualizare:** 2026-06-22 · sursă GSC: export 2026-06-13.

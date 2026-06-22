@@ -16,6 +16,7 @@ Index al documentației SEO. Status curent al expansiunii: [`SEO-STATUS-2026-06-
 ## Planuri & referințe (vii)
 | Fișier | Rol |
 |---|---|
+| [`SEO-ANALYSIS-2026-06-22.md`](SEO-ANALYSIS-2026-06-22.md) | Analiză GSC: ce rankează, ce merge, oportunități + plan go-live |
 | [`SEO-STATUS-2026-06-22.md`](SEO-STATUS-2026-06-22.md) | Status curent expansiune location-SEO + clustere |
 | [`SEO-MASTER-PLAN-2026-05-20.md`](SEO-MASTER-PLAN-2026-05-20.md) | Plan SEO master (migrare WP→Next) |
 | [`REBUILD-QUEUE.md`](REBUILD-QUEUE.md) | Coada de pagini de rebuilt |
