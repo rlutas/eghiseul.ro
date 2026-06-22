@@ -126,7 +126,7 @@ export function Header() {
   return (
     <>
       {/* Top Bar - Desktop only */}
-      <div className="hidden lg:block bg-secondary-900 text-white py-2">
+      <div className="hidden xl:block bg-secondary-900 text-white py-2">
         <div className="container mx-auto px-4 max-w-[1100px]">
           <div className="flex items-center justify-between text-sm">
             <div className="flex items-center gap-6">
@@ -154,14 +154,14 @@ export function Header() {
       {/* Main Header */}
       <header
         className={cn(
-          'fixed top-0 lg:top-[40px] left-0 right-0 z-50 transition-all duration-300',
+          'fixed top-0 xl:top-[40px] left-0 right-0 z-50 transition-all duration-300',
           isScrolled
-            ? 'lg:top-0 bg-white shadow-[0_4px_20px_rgba(6,16,31,0.08)]'
+            ? 'xl:top-0 bg-white shadow-[0_4px_20px_rgba(6,16,31,0.08)]'
             : 'bg-white'
         )}
       >
         <div className="container mx-auto px-4 lg:px-6 max-w-[1100px]">
-          <div className="flex items-center justify-between h-16 lg:h-[72px]">
+          <div className="flex items-center justify-between h-16 xl:h-[72px]">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2.5 group" aria-label="eGhișeul.ro - Acasă">
               <div className="w-10 h-10 bg-primary-500 rounded-xl flex items-center justify-center shadow-[0_4px_12px_rgba(236,185,95,0.3)] group-hover:shadow-[0_6px_16px_rgba(236,185,95,0.4)] transition-shadow">
@@ -178,7 +178,7 @@ export function Header() {
             </Link>
 
             {/* Desktop Navigation */}
-            <nav className="hidden lg:flex items-center gap-1" aria-label="Navigare principală">
+            <nav className="hidden xl:flex items-center gap-1" aria-label="Navigare principală">
               {navLinks.map((link) =>
                 link.label === 'Servicii' ? (
                   <ServicesMegaMenu key={link.href} />
@@ -190,7 +190,7 @@ export function Header() {
                     href={link.href}
                     onClick={(e) => handleNavClick(e, link)}
                     className={cn(
-                      'px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-200',
+                      'px-3 py-2 text-sm font-semibold rounded-lg transition-all duration-200 whitespace-nowrap',
                       isActiveLink(link)
                         ? 'text-primary-700 bg-primary-50'
                         : 'text-secondary-700 hover:text-secondary-900 hover:bg-neutral-50'
@@ -203,7 +203,7 @@ export function Header() {
             </nav>
 
             {/* Desktop Auth Buttons / User Menu */}
-            <div className="hidden lg:flex items-center gap-3">
+            <div className="hidden xl:flex items-center gap-3">
               {isLoading ? (
                 <div className="w-9 h-9 rounded-full bg-neutral-100 animate-pulse" />
               ) : user ? (
@@ -282,14 +282,14 @@ export function Header() {
                 variant="ghost"
                 size="icon"
                 aria-label="Deschide meniul"
-                className="lg:hidden hover:bg-primary-50 min-h-[44px] min-w-[44px]"
+                className="xl:hidden hover:bg-primary-50 min-h-[44px] min-w-[44px]"
               >
                 <Menu className="h-6 w-6 text-secondary-900" />
               </Button>
             )}
             {hydrated && (
             <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
-              <SheetTrigger asChild className="lg:hidden">
+              <SheetTrigger asChild className="xl:hidden">
                 <Button
                   variant="ghost"
                   size="icon"
@@ -562,7 +562,7 @@ export function Header() {
       </header>
 
       {/* Spacer for fixed header */}
-      <div className="h-16 lg:h-[112px]" />
+      <div className="h-16 xl:h-[112px]" />
     </>
   );
 }
