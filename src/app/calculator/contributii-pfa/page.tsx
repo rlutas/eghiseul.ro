@@ -34,6 +34,8 @@ export default function Page() {
         { q: 'Ce înseamnă plafonul de 6, 12, 24, 60 sau 72 de salarii minime?', a: 'Sunt praguri de venit net raportate la salariul minim de la 1 ianuarie (4.050 lei). 6 SM = pragul minim de la care datorezi CASS; 12 SM = pragul de la care apare CAS; 24 SM = baza maximă pentru CAS; 60 SM (venit 2025) sau 72 SM (venit 2026) = plafonul maxim pentru CASS. Peste plafon, baza rămâne la nivelul plafonului.' },
         { q: 'Cum se calculează impozitul de 10% la PFA?', a: 'Impozitul de 10% se aplică pe venitul net din care s-au scăzut CAS și CASS efectiv datorate. Adică: impozit = 10% × (venit net − CAS datorat − CASS datorat). Contribuțiile reduc deci baza impozabilă.' },
         { q: 'Plătesc CAS dacă am venituri mici la PFA?', a: 'Nu. CAS (pensia, 25%) se datorează doar dacă venitul net depășește 12 salarii minime (48.600 lei în 2026). Sub acest prag CAS este zero, dar poți opta voluntar pentru a-ți construi stagiu de cotizare la pensie.' },
+        { q: 'Care e diferența între sistem real și normă de venit?', a: 'În sistem real, baza de calcul este venitul net efectiv (încasări minus cheltuieli deductibile), pe care se aplică impozitul de 10% și contribuțiile. La normă de venit, baza impozabilă este o sumă fixă stabilită anual de ANAF pentru codul CAEN și județul tău, indiferent de încasările reale — cheltuielile nu se mai deduc. Norma de venit nu mai este disponibilă dacă depășești plafonul de venit prevăzut de lege.' },
+        { q: 'Pe ce bază se calculează CAS dacă venitul e între 12 și 24 de salarii minime?', a: 'Dacă venitul net este între 12 salarii minime (48.600 lei) și 24 salarii minime (97.200 lei), baza CAS este 12 salarii minime, deci CAS = 25% × 48.600 = 12.150 lei. Abia când venitul net depășește 24 salarii minime, baza CAS urcă la 24 SM, adică 24.300 lei.' },
       ]}
     >
       <h2>Cum se calculează contribuțiile PFA în 2026</h2>
@@ -86,6 +88,97 @@ export default function Page() {
         legislative aflate în clarificare la momentul depunerii.
       </p>
 
+      <h2>Exemplu pentru un venit mic: 30.000 lei net (2026)</h2>
+      <p>
+        Acum o PFA care abia pornește, cu un venit net de doar 30.000 lei în 2026, fără alt venit din salariu sau pensie:
+      </p>
+      <ul>
+        <li>
+          <strong>CASS 10%:</strong> venitul (30.000 lei) este peste pragul de 6 SM (24.300 lei), deci baza este
+          venitul realizat. CASS = 10% × 30.000 = <strong>3.000 lei</strong>.
+        </li>
+        <li>
+          <strong>CAS 25%:</strong> venitul este sub 12 SM (48.600 lei), deci CAS nu se datorează:{' '}
+          <strong>0 lei</strong> (rămâne opțional, pentru stagiu de pensie).
+        </li>
+        <li>
+          <strong>Impozit 10%:</strong> = 10% × (30.000 − 3.000 − 0) = 10% × 27.000 = <strong>2.700 lei</strong>.
+        </li>
+      </ul>
+      <p>
+        Total de plată: 3.000 + 0 + 2.700 = <strong>5.700 lei</strong>, rămânând un venit net după contribuții
+        de <strong>24.300 lei</strong>. Observă cum, la venituri mici, CASS minim cântărește mult mai mult
+        proporțional decât la veniturile mari, unde plafoanele limitează contribuțiile.
+      </p>
+
+      <h2>Sistem real vs normă de venit</h2>
+      <p>
+        O PFA poate fi impozitată în <strong>sistem real</strong> (pe venitul net efectiv) sau pe{' '}
+        <strong>normă de venit</strong> (o sumă fixă stabilită de ANAF pentru codul CAEN și județ). Alegerea
+        schimbă atât baza impozitului, cât și pe cea a contribuțiilor:
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>Criteriu</th>
+            <th>Sistem real</th>
+            <th>Normă de venit</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Baza de calcul</td>
+            <td>Venit net (încasări − cheltuieli deductibile)</td>
+            <td>Normă fixă pe CAEN/județ</td>
+          </tr>
+          <tr>
+            <td>Cheltuieli deductibile</td>
+            <td>Da, se scad efectiv</td>
+            <td>Nu se mai deduc</td>
+          </tr>
+          <tr>
+            <td>Impozit pe venit</td>
+            <td>10% pe venitul net</td>
+            <td>10% pe normă</td>
+          </tr>
+          <tr>
+            <td>CAS și CASS</td>
+            <td>Pe plafoane (6/12/24 SM)</td>
+            <td>Pe plafoane (6/12/24 SM)</td>
+          </tr>
+          <tr>
+            <td>Potrivit pentru</td>
+            <td>Cheltuieli mari sau venit variabil</td>
+            <td>Cheltuieli mici și venit predictibil</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        Norma de venit nu mai este disponibilă dacă depășești plafonul de venit prevăzut de lege; în acel caz
+        treci obligatoriu la sistem real. Pentru contribuții (CAS, CASS), plafoanele de 6, 12 și 24 salarii minime
+        se aplică la fel în ambele sisteme.
+      </p>
+
+      <h2>Cazuri speciale</h2>
+      <ul>
+        <li>
+          <strong>Salariat și PFA în paralel.</strong> Dacă ești deja asigurat ca salariat, nu mai datorezi CASS
+          minim când venitul din PFA e sub 6 SM; peste prag însă CASS de 10% se aplică pe venitul realizat.
+        </li>
+        <li>
+          <strong>Pensionar cu PFA.</strong> Ești deja asigurat în sistemul de sănătate, deci CASS minim nu se
+          impune sub prag; CAS rămâne opțional, fiindcă ai deja calitatea de pensionar.
+        </li>
+        <li>
+          <strong>An incomplet de activitate.</strong> Dacă PFA a fost activă doar câteva luni, plafoanele rămân
+          raportate la salariul minim anual — nu se reduc proporțional cu lunile lucrate.
+        </li>
+        <li>
+          <strong>Venituri din mai multe surse.</strong> Veniturile din PFA, drepturi de autor sau chirii se
+          cumulează pentru verificarea plafoanelor CASS, dar fiecare categorie are reguli proprii de impozitare.
+        </li>
+      </ul>
+
       <h2>Greșeli frecvente la calculul contribuțiilor PFA</h2>
       <ul>
         <li><strong>Confuzia între venitul brut și venitul net.</strong> Contribuțiile se calculează pe venitul net (încasări minus cheltuieli deductibile), nu pe încasări.</li>
@@ -99,7 +192,10 @@ export default function Page() {
       <p>
         Dacă ești salariat și PFA în paralel, verifică și{' '}
         <Link href="/calculator/salariu/">calculatorul de salariu net</Link> pentru a vedea contribuțiile reținute
-        deja de angajator. Pentru deschiderea sau modificarea unei PFA la Registrul Comerțului, vezi{' '}
+        deja de angajator. Dacă te întrebi dacă PFA mai e
+        avantajoasă față de o firmă, compară sarcina fiscală cu{' '}
+        <Link href="/calculator/taxe-srl/">calculatorul de taxe SRL</Link>. Pentru deschiderea sau modificarea
+        unei PFA la Registrul Comerțului, vezi{' '}
         <Link href="/servicii/cazier-judiciar-online/">cazierul judiciar online</Link>, document adesea cerut în
         relația cu instituțiile.
       </p>

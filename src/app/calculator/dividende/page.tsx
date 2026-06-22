@@ -55,6 +55,14 @@ export default function Page() {
           q: 'Plătesc CASS dacă scot dividende dintr-un singur SRL, dar am și chirii?',
           a: 'Da. Plafonul CASS se aplică la totalul veniturilor extra-salariale dintr-un an: dividende + chirii + dobânzi + alte venituri. Dacă suma cumulată depășește 24.300 lei (6 salarii minime în 2026), datorezi CASS pe plafonul corespunzător, indiferent din câte surse provin veniturile.',
         },
+        {
+          q: 'Când se declară și se plătește CASS-ul pe dividende?',
+          a: 'CASS pe dividende se declară prin Declarația Unică (formularul 212), depusă până la 25 mai a anului următor celui în care s-au realizat veniturile. Plata se face în baza aceleiași declarații. Impozitul de 16% se reține însă de firmă la sursă, în momentul plății dividendelor, și se virează la stat separat de CASS.',
+        },
+        {
+          q: 'Se plătește impozit pe dividende dacă firma nu distribuie profitul?',
+          a: 'Nu. Impozitul de 16% și CASS apar doar la distribuirea efectivă a profitului către asociați, aprobată prin hotărâre AGA. Dacă profitul rămâne în firmă (reportat sau capitalizat), nu se datorează impozit pe dividende — el devine exigibil abia în anul în care AGA decide repartizarea.',
+        },
       ]}
     >
       <h2>Cum se calculează impozitul pe dividende</h2>
@@ -174,6 +182,49 @@ export default function Page() {
         <Link href="/calculator/salariu/">calculatorul de salariu brut-net</Link> pentru a compara cum te
         avantajează salariul față de dividende, sau obține rapid un{' '}
         <Link href="/servicii/certificat-constatator-online/">certificat constatator</Link> cu situația firmei.
+      </p>
+
+      <h2>Cazuri speciale: mai multe surse de venit</h2>
+      <p>
+        Plafonul CASS este unic pe persoană, nu pe firmă sau pe tip de venit. Asta înseamnă că dividendele se adună cu
+        chiriile, dobânzile, câștigurile din investiții și alte venituri extra-salariale pentru a stabili plafonul
+        aplicabil. Câteva situații frecvente:
+      </p>
+      <ul>
+        <li>
+          <strong>Două SRL-uri:</strong> dacă scoți 20.000 lei dintr-o firmă și 20.000 lei din alta, totalul de 40.000
+          lei depășește pragul de 24.300 lei și datorezi CASS de 2.430 lei o singură dată, pe persoană — nu de două ori.
+        </li>
+        <li>
+          <strong>Dividende plus chirii:</strong> 30.000 lei dividende și 25.000 lei chirii înseamnă un venit cumulat de
+          55.000 lei, care depășește pragul de 48.600 lei, deci CASS-ul urcă la <strong>4.860 lei</strong>.
+        </li>
+        <li>
+          <strong>An fără venituri:</strong> dacă într-un an nu distribui dividende și nu ai alte venituri
+          extra-salariale peste prag, nu datorezi CASS pentru acel an.
+        </li>
+      </ul>
+      <p>
+        Dacă o parte din venituri provin din chirii, vezi și{' '}
+        <Link href="/calculator/impozit-chirie/">calculatorul de impozit pe chirie</Link>, iar pentru comparația cu
+        statutul de PFA poți folosi{' '}
+        <Link href="/calculator/contributii-pfa/">calculatorul de contribuții PFA</Link>.
+      </p>
+
+      <h2>Context legal: ce s-a schimbat din 2026</h2>
+      <p>
+        Modificarea cotei de impozit pe dividende de la 10% la <strong>16%</strong> a fost introdusă prin{' '}
+        <strong>Legea 141/2025</strong> și se aplică dividendelor distribuite începând cu 1 ianuarie 2026. Reține
+        distincția esențială: contează <strong>data distribuirii</strong> (hotărârea AGA), nu data la care banii ajung
+        efectiv în cont. Dividendele aprobate prin AGA până la 31 decembrie 2025 rămân impozitate cu 10%, chiar dacă
+        plata se face în 2026.
+      </p>
+      <p>
+        CASS pe veniturile extra-salariale funcționează tot pe sistemul de plafoane raportate la salariul minim brut pe
+        țară (4.050 lei în 2026): 6 salarii (24.300 lei), 12 salarii (48.600 lei) și 24 de salarii (97.200 lei).
+        Important: CASS pe dividende este o sumă fixă pe plafon, nu un procent regularizabil, și nu se restituie chiar
+        dacă veniturile reale au fost mai mici decât plafonul atins. Toate aceste obligații se declară prin Declarația
+        Unică.
       </p>
 
       <p className="text-sm text-neutral-500">

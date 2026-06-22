@@ -55,6 +55,14 @@ export default function Page() {
           q: 'Plătesc impozit dacă am mai multe locuințe?',
           a: 'Da, fiecare clădire se impozitează separat, după aceeași formulă (suprafață × valoare/m² × coeficient de corecție × ajustare vechime, înmulțit cu cota locală de 0,08–0,2%). Unele primării aplică majorări pentru deținătorii de mai multe imobile; verifică hotărârea consiliului local și situația ta la Direcția de Taxe.',
         },
+        {
+          q: 'Până când și cum se plătește impozitul pe casă?',
+          a: 'Impozitul pe clădiri este anual și se poate achita în două rate egale, cu termene la 31 martie și 30 septembrie. Dacă plătești integral toată suma datorată pentru anul în curs până la 31 martie, multe primării acordă o bonificație (de regulă până la 10%, stabilită prin hotărâre a consiliului local). Plata se face la Direcția de Taxe (DITL), prin Ghișeul.ro sau în contul primăriei.',
+        },
+        {
+          q: 'Cum se schimbă impozitul după ce extind sau modific casa?',
+          a: 'Orice modificare a suprafeței construite (mansardare, extindere, recepție a unei construcții noi) sau a destinației clădirii trebuie declarată la Direcția de Taxe în termen de 30 de zile, iar impozitul se recalculează după aceeași formulă cu noua suprafață. O suprafață mai mare crește valoarea impozabilă proporțional, înainte de aplicarea coeficientului de corecție (0,90–2,60) și a ajustării pentru vechime.',
+        },
       ]}
     >
       <h2>Cum se calculează impozitul pe clădiri</h2>
@@ -105,8 +113,77 @@ export default function Page() {
         indexarea valorilor/m² (+79,6%) rămân aplicabile părții rezidențiale, după aceeași logică ca la o locuință obișnuită.
       </p>
 
+      <h2>Tabel orientativ al cotelor și ajustărilor</h2>
+      <p>
+        Tabelul de mai jos rezumă elementele care intră în formula impozitului pe clădiri pentru 2026. Valorile exacte
+        ale cotei locale și ale coeficientului de corecție se citesc din hotărârea consiliului local al primăriei tale.
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>Element</th>
+            <th>Valoare 2026</th>
+            <th>Se aplică pentru</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Indexare valoare/m² (art. 457)</td>
+            <td>+79,6%</td>
+            <td>Toate clădirile</td>
+          </tr>
+          <tr>
+            <td>Coeficient de corecție</td>
+            <td>0,90–2,60</td>
+            <td>După zonă (A–D) și rang (0–V)</td>
+          </tr>
+          <tr>
+            <td>Reducere vechime 50–100 ani</td>
+            <td>−15%</td>
+            <td>Valoarea impozabilă</td>
+          </tr>
+          <tr>
+            <td>Reducere vechime peste 100 ani</td>
+            <td>−25%</td>
+            <td>Valoarea impozabilă</td>
+          </tr>
+          <tr>
+            <td>Cotă rezidențial</td>
+            <td>0,08–0,2%</td>
+            <td>Locuințe (persoane fizice)</td>
+          </tr>
+          <tr>
+            <td>Cotă nerezidențial</td>
+            <td>0,2–1,3%</td>
+            <td>Spații comerciale, birouri</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>Termene de plată și bonificații</h2>
+      <p>
+        Impozitul pe clădiri se datorează pentru întregul an și se poate achita în <strong>două rate egale</strong>, cu
+        termene la <strong>31 martie</strong> și <strong>30 septembrie</strong>. Dacă achiți integral suma datorată
+        până la 31 martie, multe primării acordă o <strong>bonificație</strong> (de regulă până la 10%, stabilită prin
+        hotărâre a consiliului local). Plata se face la Direcția de Taxe și Impozite Locale (DITL), online prin
+        Ghișeul.ro sau prin transfer în contul primăriei. Neplata la termen atrage majorări de întârziere, calculate
+        zilnic, astfel încât e util să verifici din timp valoarea exactă în evidențele fiscale.
+      </p>
+
+      <h2>Context legal și sursa cifrelor</h2>
+      <p>
+        Modul de calcul al impozitului pe clădiri este reglementat de <strong>Codul Fiscal (art. 457)</strong>, care
+        stabilește metoda valorii impozabile pe metru pătrat și grila de valori. Pentru 2026, aceste valori au fost
+        <strong> indexate cu aproximativ 79,6%</strong>, iar reducerile pentru vechime (15% la 50–100 de ani, 25% peste
+        100 de ani) au fost confirmate prin <strong>OUG 9/2026</strong>. Cota efectivă (0,08–0,2% rezidențial, 0,2–1,3%
+        nerezidențial) și coeficientul de corecție (0,90–2,60) sunt lăsate de lege la latitudinea fiecărui consiliu
+        local, în limitele de mai sus. De aceea două case identice din localități diferite pot avea impozite sensibil
+        diferite: cifrele din formulă sunt naționale, dar deciziile finale sunt locale.
+      </p>
+
       <p>
         Vezi și <Link href="/calculator/calculator-impozit-auto/">calculatorul de impozit auto</Link>,{' '}
+        <Link href="/calculator/impozit-chirie/">calculatorul de impozit pe chirie</Link>,{' '}
         <Link href="/calculator/taxe-notariale/">calculatorul de taxe notariale</Link> sau, dacă vrei să verifici situația
         juridică a imobilului, serviciul de <Link href="/servicii/extras-de-carte-funciara/">extras de carte funciară</Link>.
       </p>

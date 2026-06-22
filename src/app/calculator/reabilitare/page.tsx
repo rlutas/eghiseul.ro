@@ -33,6 +33,8 @@ export default function Page() {
         { q: 'De când începe să curgă termenul de reabilitare?', a: 'Termenul curge de la data executării pedepsei principale: data eliberării din închisoare, data achitării integrale a amenzii sau data împlinirii termenului de supraveghere la suspendare. Dacă pedeapsa a fost grațiată, termenul curge de la data grațierii. Nu se calculează de la data condamnării.' },
         { q: 'O nouă infracțiune oprește termenul de reabilitare?', a: 'Da. Pentru reabilitarea judecătorească, condamnatul nu trebuie să fi săvârșit o nouă infracțiune în interiorul termenului. O nouă condamnare întrerupe termenul, care reîncepe de la executarea celei de-a doua pedepse. Reabilitarea de drept nu mai intervine automat dacă apare o nouă condamnare în interval.' },
         { q: 'Reabilitarea șterge condamnarea din cazierul cerut de instituții?', a: 'Reabilitarea elimină mențiunea din cazierul judiciar obișnuit (cel cerut de angajatori sau pentru acte uzuale). Totuși, condamnarea rămâne în evidențele interne ale poliției și apare în cazierul extins solicitat de organele judiciare. Pentru documentul standard, după reabilitare cazierul apare curat.' },
+        { q: 'Trebuie să plătesc o taxă pentru cererea de reabilitare judecătorească?', a: 'Da. Cererea de reabilitare judecătorească se depune la instanță și presupune o taxă judiciară de timbru, plus eventuale cheltuieli pentru obținerea actelor doveditoare (cazier, dovada achitării despăgubirilor). Reabilitarea de drept, fiind automată, nu necesită cerere și nici taxă.' },
+        { q: 'Reabilitarea de drept și cea judecătorească au aceeași dată de start a termenului?', a: 'Da, ambele se calculează de la executarea pedepsei principale (eliberarea din închisoare, achitarea amenzii sau împlinirea termenului de supraveghere). Diferă doar durata termenului și modul de operare: de drept intervine automat, judecătorească necesită cerere și hotărâre.' },
       ]}
     >
       <h2>Când se șterge cazierul judiciar prin reabilitare</h2>
@@ -122,6 +124,55 @@ export default function Page() {
         fost o amendă, poți estima și{' '}
         <Link href="/calculator/amenda-circulatie/">valoarea unei amenzi</Link> cu un calculator
         dedicat.
+      </p>
+
+      <h2>Cazuri speciale: condamnări succesive, grațiere și amânare</h2>
+      <p>
+        Regula termenelor fixe se aplică direct la o singură condamnare, dar realitatea aduce des
+        situații mai complicate, în care data reabilitării se mută:
+      </p>
+      <ul>
+        <li>
+          <strong>Condamnări succesive:</strong> dacă persoana are mai multe condamnări, termenul
+          de reabilitare se calculează după <strong>ultima pedeapsă executată</strong>, raportat la
+          cea mai grea dintre ele. O nouă infracțiune în interval întrerupe termenul, care reîncepe
+          de la zero după executarea celei de-a doua pedepse;
+        </li>
+        <li>
+          <strong>Grațiere:</strong> când pedeapsa a fost grațiată total, termenul de reabilitare
+          curge de la <strong>data grațierii</strong>, nu de la o eliberare care nu a mai avut loc.
+          Durata termenului rămâne cea corespunzătoare pedepsei aplicate inițial (3, 4, 5 sau 7 ani);
+        </li>
+        <li>
+          <strong>Amânarea aplicării pedepsei:</strong> dacă instanța a amânat aplicarea pedepsei și
+          termenul de supraveghere s-a împlinit fără incident, persoana nu este considerată
+          condamnată — deci nu mai vorbim despre reabilitare, ci despre o situație în care mențiunea
+          nu produce efecte în cazierul uzual.
+        </li>
+      </ul>
+      <p>
+        În toate aceste situații, termenele rămân cele fixe din Codul Penal — se schimbă doar data de
+        la care încep să curgă. Tot ce ține de procedura în instanță (cerere, dovezi, taxe) ține de
+        reabilitarea judecătorească; reabilitarea de drept rămâne automată atât timp cât nu apare o
+        nouă infracțiune în interval.
+      </p>
+
+      <h2>Ce documente îți trebuie și ce verifici după reabilitare</h2>
+      <p>
+        Pentru o cerere de reabilitare judecătorească, instanța verifică în principal trei condiții:
+        împlinirea termenului, lipsa unei noi infracțiuni și achitarea integrală a cheltuielilor de
+        judecată și a despăgubirilor civile. În acest scop sunt utile cazierul judiciar actualizat,
+        dovada plăților efectuate și, dacă e cazul, hotărârile de condamnare. Pentru reabilitarea de
+        drept nu se depune nimic — ea operează automat, iar mențiunea dispare singură din cazierul
+        uzual la împlinirea celor 3 ani.
+      </p>
+      <p>
+        După ce termenul s-a împlinit, pasul practic este să verifici efectiv documentul: comandă{' '}
+        <Link href={serviceUrl('cazier-judiciar')}>cazierul judiciar online</Link> și confirmă că
+        mențiunea nu mai apare. Dacă pregătești o cerere în instanță, poți estima costul cu{' '}
+        <Link href="/calculator/taxa-judiciara-de-timbru/">calculatorul taxei judiciare de timbru</Link>{' '}
+        și poți urmări încadrarea în{' '}
+        <Link href="/calculator/termene-judiciare/">termenele procedurale</Link>.
       </p>
 
       <p className="text-sm text-neutral-500">

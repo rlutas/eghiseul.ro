@@ -35,6 +35,8 @@ export default function Page() {
         { q: 'Câte luni de venituri se iau în calcul?', a: 'Se folosesc 12 luni de venituri din cele 24 de luni dinaintea nașterii. Pentru aceste 12 luni se calculează venitul net mediu lunar, iar indemnizația este 85% din această medie.' },
         { q: 'Cât primește efectiv o persoană cu venitul net mediu de 4.000 lei?', a: 'Indemnizația brută este 85% × 4.000 = 3.400 lei. Suma se află între minim (1.650 lei) și maxim (8.500 lei), deci rămâne 3.400 lei brut. După reținerea CASS de 10% (340 lei), încasezi aproximativ 3.060 lei net pe lună.' },
         { q: 'Indemnizația de creștere a copilului se cumulează cu alocația de stat?', a: 'Da. Alocația de stat pentru copii este un drept separat și se acordă în plus față de indemnizația de creștere a copilului sau față de stimulentul de inserție.' },
+        { q: 'Până la ce vârstă a copilului se acordă indemnizația?', a: 'Indemnizația se acordă până când copilul împlinește 2 ani. În cazul copilului cu handicap, perioada se extinde până la 3 ani. Dacă te întorci la muncă mai devreme, poți opta pentru stimulentul de inserție.' },
+        { q: 'Cât este stimulentul de inserție dacă mă întorc la muncă?', a: 'Stimulentul de inserție este 1.500 lei pe lună dacă obții venituri înainte ca bebelușul să împlinească 6 luni și 650 lei pe lună dacă te întorci mai târziu. Spre deosebire de ICC, stimulentul nu depinde de venitul tău anterior și se acordă în sumă fixă.' },
       ]}
     >
       <h2>Cum se calculează indemnizația de creștere a copilului</h2>
@@ -140,6 +142,70 @@ export default function Page() {
           de luni dinaintea nașterii, nu neapărat ultimele 12 luni consecutive.
         </li>
       </ul>
+
+      <h2>Stimulent de inserție sau indemnizație: ce alegi?</h2>
+      <p>
+        Mulți părinți ezită între a rămâne pe indemnizație și a reveni la muncă pentru stimulentul de
+        inserție. Diferența practică este simplă: <strong>ICC</strong> îți acoperă 85% din venitul net
+        mediu (între 1.650 și 8.500 lei brut), în timp ce <strong>stimulentul de inserție</strong> este o
+        sumă fixă de 1.500 lei sau 650 lei pe lună, indiferent cât ai câștigat înainte.
+      </p>
+      <ul>
+        <li>
+          <strong>Dacă aveai un venit mic</strong> (de exemplu net mediu sub circa 1.765 lei), stimulentul
+          de 1.500 lei poate fi mai avantajos decât indemnizația plafonată la minim.
+        </li>
+        <li>
+          <strong>Dacă aveai un venit mare,</strong> indemnizația de creștere a copilului depășește net
+          stimulentul, așa că ai de câștigat rămânând acasă cât timp ești îndreptățit.
+        </li>
+        <li>
+          <strong>Stimulentul se cumulează cu salariul:</strong> revii la muncă, încasezi salariul integral
+          și primești în plus suma fixă, plus alocația de stat a copilului.
+        </li>
+      </ul>
+
+      <h2>Cazuri speciale și situații care influențează cuantumul</h2>
+      <p>
+        Calculul standard de 85% din venitul net mediu are câteva nuanțe importante de care depinde suma
+        finală:
+      </p>
+      <ul>
+        <li>
+          <strong>Sarcini suprapuse.</strong> Dacă rămâi însărcinată din nou în timpul indemnizației, ai
+          dreptul la un cuantum suplimentar pentru perioada de suprapunere, conform regulilor în vigoare.
+        </li>
+        <li>
+          <strong>Copil cu handicap.</strong> Indemnizația se acordă până la 3 ani, nu doar 2 ani, iar
+          părintele beneficiază de drepturi suplimentare prevăzute de lege.
+        </li>
+        <li>
+          <strong>Venituri din mai multe surse.</strong> La media netă se iau în calcul nu doar salariile,
+          ci și veniturile din activități independente, drepturi de autor sau alte surse impozabile
+          realizate în cele 12 luni relevante.
+        </li>
+        <li>
+          <strong>Plafonarea la maxim.</strong> Indiferent de numărul surselor de venit, indemnizația brută
+          nu poate depăși 8.500 lei, deci net încasezi cel mult 7.650 lei pe lună.
+        </li>
+      </ul>
+
+      <h2>Context legal și actualizări</h2>
+      <p>
+        Indemnizația de creștere a copilului este reglementată prin OUG 111/2010 și normele sale de
+        aplicare. Pragul minim se calculează ca 2,5 × ISR (indicatorul social de referință), iar pragul
+        maxim este stabilit la 8.500 lei brut. Reținerea <strong>CASS 10%</strong> a fost introdusă din 1
+        august 2025, motiv pentru care suma efectiv încasată este mai mică decât cuantumul brut comunicat
+        de autorități. Cererea pentru indemnizație se depune la agenția județeană pentru plăți și
+        inspecție socială (AJPIS), de regulă în termen de 60 de zile de la încheierea concediului de
+        maternitate, împreună cu documentele care atestă veniturile din cele 12 luni luate în calcul.
+      </p>
+
+      <p>
+        Pentru perioada dinainte de naștere, vezi și calculatorul de{' '}
+        <Link href="/calculator/concediu-maternitate/">concediu de maternitate</Link>, util pentru a estima
+        indemnizația aferentă celor 126 de zile de concediu prenatal și postnatal.
+      </p>
 
       <p>
         Dacă pregătești dosarul pentru indemnizație sau pentru reluarea activității, ai putea avea nevoie

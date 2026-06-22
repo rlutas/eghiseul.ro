@@ -51,6 +51,14 @@ export default function Page() {
           q: 'Pot folosi acest calculator pentru a actualiza o sumă dintr-un contract sau o pensie?',
           a: 'Calculatorul oferă o estimare orientativă a puterii de cumpărare pe baza IPC INS și poate fi util pentru a înțelege evoluția unei sume în timp. Pentru indexări oficiale (pensii, chirii, despăgubiri) se folosesc indici și formule stabilite prin lege sau contract, care pot diferi de media folosită aici.',
         },
+        {
+          q: 'De ce contează atât de mult anii 2022 și 2023 în rezultat?',
+          a: 'Pentru că inflația se compune, anii cu rate mari domină factorul cumulat. În 2022 rata medie anuală a fost 13,8%, iar în 2023 a fost 10,4%; înmulțiți între ei (1,138 × 1,104), cei doi ani adaugă singuri peste un sfert la factorul cumulat, deci un interval care îi include arată o pierdere de putere de cumpărare mult mai mare.',
+        },
+        {
+          q: 'Ce se întâmplă dacă intervalul include ani de deflație?',
+          a: 'Anii de deflație au rată negativă, deci înmulțesc factorul cumulat cu un număr sub 1 și îl reduc ușor. În 2015 rata a fost −0,6% (factor 0,994), iar în 2016 a fost −1,5% (factor 0,985). Efectul lor este mult mai mic decât al anilor de vârf, dar calculatorul îl ia corect în considerare.',
+        },
       ]}
     >
       <h2>Ce arată calculatorul de inflație</h2>
@@ -112,10 +120,76 @@ export default function Page() {
         cifră concretă, ușor de comparat între doi ani.
       </p>
 
+      <h2>Anii care contează cel mai mult în interval</h2>
+      <p>
+        Pentru că factorul cumulat este produsul ratelor anuale, câțiva ani „grei” pot domina rezultatul. Tabelul de mai
+        jos rezumă punctele care influențează cel mai mult un calcul pe intervalul 2000–2025:
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>Perioadă</th>
+            <th>Ce s-a întâmplat</th>
+            <th>Efect asupra factorului cumulat</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>2015</td>
+            <td>Deflație, rată medie anuală −0,6%</td>
+            <td>Reduce ușor factorul (înmulțire cu 0,994)</td>
+          </tr>
+          <tr>
+            <td>2016</td>
+            <td>Deflație, rată medie anuală −1,5%</td>
+            <td>Reduce ușor factorul (înmulțire cu 0,985)</td>
+          </tr>
+          <tr>
+            <td>2022</td>
+            <td>Vârf de inflație, rată medie anuală 13,8%</td>
+            <td>Crește puternic factorul (înmulțire cu 1,138)</td>
+          </tr>
+          <tr>
+            <td>2023</td>
+            <td>Inflație ridicată, rată medie anuală 10,4%</td>
+            <td>Crește puternic factorul (înmulțire cu 1,104)</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        Se vede de ce un interval care include 2022 și 2023 produce o pierdere de putere de cumpărare mult mai mare decât
+        unul care se oprește înainte: cei doi ani de vârf, înmulțiți între ei, adaugă singuri peste un sfert la factorul
+        cumulat. În schimb, anii de deflație din 2015 și 2016 trag rezultatul în jos, dar cu mult mai puțin decât urcă
+        anii de vârf.
+      </p>
+
+      <h2>Cazuri speciale și limite</h2>
+      <ul>
+        <li>
+          <strong>Interval care începe și se termină în același an.</strong> Dacă alegi același an de start și de final,
+          factorul cumulat este 1, iar puterea de cumpărare rămâne neschimbată — nu se aplică nicio rată.
+        </li>
+        <li>
+          <strong>Intervale care conțin doar ani de deflație.</strong> Un interval limitat la 2015–2016 produce un
+          factor cumulat sub 1, adică suma ar cumpăra puțin mai mult la final decât la început, un caz rar în datele INS.
+        </li>
+        <li>
+          <strong>Sume foarte mari sau foarte vechi.</strong> Cu cât intervalul e mai lung și include mai mulți ani de
+          inflație ridicată, cu atât factorul cumulat crește, iar diferența în lei devine impresionantă — un efect
+          normal al compunerii, nu o eroare de calcul.
+        </li>
+        <li>
+          <strong>Comparație cu dobânda unui depozit.</strong> Dacă banii ar fi fost ținuți într-un depozit cu dobândă,
+          puterea de cumpărare reală depinde de diferența dintre dobândă și inflație; calculatorul arată doar erodarea
+          dată de inflație, nu și eventualul randament.
+        </li>
+      </ul>
+
       <p>
         Vezi și <Link href="/curs-valutar/">cursul valutar BNR</Link>,{' '}
         <Link href="/calculator/salariu/">calculatorul de salariu</Link> sau{' '}
-        <Link href="/calculator/rambursare-anticipata/">calculatorul de rambursare anticipată</Link>.
+        <Link href="/calculator/rambursare-anticipata/">calculatorul de rambursare anticipată</Link> sau{' '}
+        <Link href="/calculator/dobanda-legala/">calculatorul de dobândă legală</Link>.
       </p>
 
       <p className="text-sm text-neutral-500">

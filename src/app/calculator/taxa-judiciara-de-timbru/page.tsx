@@ -33,6 +33,8 @@ export default function Page() {
         { q: 'Cât plătesc dacă fac apel?', a: 'La apel se datorează 50% din taxa achitată la judecata în fond a cererii (Art. 23 OUG 80/2013). Dacă în fond ai plătit, de exemplu, 3.105 lei pentru o cerere de 100.000 lei, taxa de apel este 1.552,5 lei. Recursul se timbrează la 100 lei pentru motive de nelegalitate sau tot 50% din taxa de fond, în funcție de tipul cauzei.' },
         { q: 'Cum se calculează taxa pentru partaj (ieșire din indiviziune)?', a: 'Taxa depinde de ce solicită cererea: doar partajul bunurilor — 3% din valoarea masei partajabile; stabilirea bunurilor supuse împărțelii — 5%; și stabilirea calității de coproprietar și a cotei — 5%. Dacă se cer mai multe dintre acestea, procentele se cumulează.' },
         { q: 'Ce se întâmplă dacă greșesc suma taxei de timbru?', a: 'Dacă ai plătit mai puțin, instanța îți pune în vedere să completezi diferența până la primul termen; cererea netimbrată corect se anulează. Dacă ai plătit mai mult, poți cere restituirea sumei achitate în plus în termen de un an de la data plății. Pentru încadrarea corectă a cererii, este recomandat un avocat.' },
+        { q: 'Există cereri scutite de taxa judiciară de timbru?', a: 'Da. Sunt scutite integral, de exemplu, cererile privind drepturile de muncă ale salariaților, pensiile de întreținere, ocrotirea minorilor și protecția consumatorilor. În plus, persoanele cu venituri reduse pot obține scutirea, reducerea sau eșalonarea taxei prin ajutorul public judiciar, dovedind situația materială.' },
+        { q: 'Unde se plătește taxa judiciară de timbru?', a: 'Taxa se achită anticipat, în contul bugetului local al unității administrativ-teritoriale de domiciliu al reclamantului, iar dovada plății se atașează la dosar. Trebuie achitată înainte de înregistrarea cererii sau cel târziu până la primul termen stabilit de instanță.' },
       ]}
     >
       <h2>Cum se calculează taxa judiciară de timbru</h2>
@@ -121,6 +123,58 @@ export default function Page() {
           este achitată până la termenul stabilit de instanță.
         </li>
       </ul>
+      <h2>Exemplu de calcul pentru partaj</h2>
+      <p>
+        Cererile de <strong>ieșire din indiviziune</strong> (partaj) se timbrează în cote procentuale aplicate
+        la valoarea masei partajabile, iar procentele se cumulează în funcție de capetele de cerere solicitate.
+        Să presupunem o masă partajabilă de <strong>200.000 lei</strong>, în care reclamantul cere atât
+        stabilirea bunurilor supuse împărțelii, cât și partajul propriu-zis:
+      </p>
+      <ul>
+        <li>stabilirea bunurilor supuse împărțelii: 5% × 200.000 = <strong>10.000 lei</strong>;</li>
+        <li>partajul efectiv al bunurilor: 3% × 200.000 = <strong>6.000 lei</strong>;</li>
+        <li>taxă cumulată: 10.000 + 6.000 = <strong>16.000 lei</strong>.</li>
+      </ul>
+      <p>
+        Dacă se cere și <strong>stabilirea calității de coproprietar și a cotei</strong>, se adaugă încă 5%,
+        adică 10.000 lei. Spre deosebire de cererile pe tranșe, la partaj procentul se aplică la întreaga valoare
+        a masei, nu doar la partea care depășește un prag — de aceea taxa poate fi semnificativ mai mare.
+      </p>
+
+      <h2>Cazuri speciale și scutiri</h2>
+      <p>
+        Legea prevede o serie de <strong>scutiri de la plata taxei</strong> sau situații în care timbrarea
+        urmează reguli speciale:
+      </p>
+      <ul>
+        <li>
+          <strong>cereri scutite integral:</strong> cele privind protecția consumatorilor, drepturile de muncă
+          ale salariaților, pensiile de întreținere sau ocrotirea minorilor sunt scutite de taxă judiciară de timbru;
+        </li>
+        <li>
+          <strong>ajutorul public judiciar:</strong> persoanele cu venituri reduse pot solicita scutirea, reducerea
+          sau eșalonarea taxei, dovedind situația materială;
+        </li>
+        <li>
+          <strong>cereri neevaluabile în bani:</strong> când valoarea nu poate fi stabilită, multe cereri se
+          timbrează cu o taxă fixă de 20 lei;
+        </li>
+        <li>
+          <strong>contestația la executare:</strong> se timbrează raportat la valoarea bunurilor urmărite sau a
+          debitului, fără a depăși un plafon stabilit de lege.
+        </li>
+      </ul>
+
+      <h2>Când și cum se plătește taxa</h2>
+      <p>
+        Taxa judiciară de timbru se achită <strong>anticipat</strong>, înainte de înregistrarea cererii sau cel
+        târziu până la primul termen stabilit de instanță. Plata se face în contul bugetului local al unității
+        administrativ-teritoriale unde domiciliază reclamantul, iar dovada se atașează la dosar. Dacă instanța
+        constată că suma este insuficientă, îți pune în vedere să completezi diferența; în lipsa achitării,
+        cererea se anulează ca netimbrată. Pentru actele care necesită autentificare notarială înainte de proces
+        (de exemplu un act de partaj voluntar), poți estima costurile cu{' '}
+        <Link href="/calculator/taxe-notariale/">calculatorul de taxe notariale</Link>.
+      </p>
       <p>
         Dacă ai nevoie să verifici antecedentele penale înainte de o reabilitare judecătorească sau pentru
         un dosar, poți comanda online un{' '}

@@ -33,6 +33,8 @@ export default function Page() {
         { q: 'Până când depun Declarația Unică pentru chirie?', a: 'Termenul standard este 25 mai al anului următor celui în care ai obținut venitul. În aceeași declarație estimezi și venitul anului curent și plătești impozitul aferent. Verifică termenul exact pe anaf.ro, deoarece poate fi prelungit prin ordin ANAF.' },
         { q: 'Cum se calculează CASS dacă am chirie și alte venituri pasive?', a: 'CASS pe venituri pasive (chirii, dividende, dobânzi, investiții) se cumulează. Plafonul se stabilește pe total: 6, 12 sau 24 de salarii minime brute. CASS este 10% din plafonul atins, nu din venitul real. Estimare orientativă, deoarece salariul minim crește la mijlocul anului 2026.' },
         { q: 'Pot deduce cheltuieli reale în loc de cota forfetară?', a: 'Pentru chiria în sistem real (mai mult de 5 contracte sau opțiune expresă) poți deduce cheltuieli reale documentate în locul cotei forfetare de 20%. Pentru majoritatea proprietarilor cu unul-două contracte, sistemul cu deducere forfetară de 20% este mai simplu și avantajos.' },
+        { q: 'Trebuie să înregistrez contractul de închiriere la ANAF?', a: 'Înregistrarea contractului la ANAF nu mai este obligatorie pentru stabilirea impozitului, dar un contract înregistrat îți dă titlu executoriu și ușurează evacuarea în caz de neplată. Indiferent de înregistrare, ai obligația să declari venitul prin Declarația Unică și să plătești impozitul de 10% pe venitul net.' },
+        { q: 'Cum împart impozitul dacă apartamentul are doi proprietari?', a: 'Dacă imobilul este deținut în coproprietate, fiecare proprietar declară și impozitează doar cota-parte de venit care îi revine, conform procentului de deținere. Deducerea forfetară de 20% și plafoanele CASS se aplică separat, pe venitul fiecăruia, ceea ce poate reduce contribuția totală față de un singur titular.' },
       ]}
     >
       <h2>Cum se calculează impozitul pe chirie în 2026</h2>
@@ -84,6 +86,71 @@ export default function Page() {
         orientative — confirmă pragul aplicabil cu un contabil sau pe anaf.ro.
       </p>
 
+      <h2>Termen lung vs. regim turistic: ce impozit plătești</h2>
+      <p>
+        Tipul de închiriere schimbă doar deducerea forfetară (20% sau 30%), nu și cota de impozit,
+        care rămâne 10% pe venitul net. Tabelul de mai jos compară cele două regimuri pentru câteva
+        niveluri uzuale de chirie, ca să vezi rapid impozitul anual estimat:
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>Chirie brută anuală</th>
+            <th>Impozit termen lung (deducere 20%)</th>
+            <th>Impozit regim turistic (deducere 30%)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>18.000 lei (1.500 lei/lună)</td>
+            <td>1.440 lei/an</td>
+            <td>1.260 lei/an</td>
+          </tr>
+          <tr>
+            <td>30.000 lei (2.500 lei/lună)</td>
+            <td>2.400 lei/an</td>
+            <td>2.100 lei/an</td>
+          </tr>
+          <tr>
+            <td>48.000 lei (4.000 lei/lună)</td>
+            <td>3.840 lei/an</td>
+            <td>3.360 lei/an</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        Valorile reprezintă <strong>doar impozitul de 10%</strong> pe venitul net și nu includ CASS,
+        care se adaugă separat dacă venitul net pasiv depășește 6 salarii minime pe an. Folosește
+        calculatorul de mai sus pentru cifra exactă în funcție de chiria și de situația ta.
+      </p>
+
+      <h2>Context legal și obligații de declarare</h2>
+      <p>
+        Veniturile din cedarea folosinței bunurilor (chirii) sunt reglementate de Codul Fiscal și se
+        declară prin <strong>Declarația Unică</strong>, depusă online prin Spațiul Privat Virtual
+        (SPV) de pe anaf.ro. În aceeași declarație estimezi venitul anului curent, plătești impozitul
+        aferent și regularizezi venitul realizat în anul precedent.
+      </p>
+      <p>
+        Reține câteva repere practice care influențează suma datorată:
+      </p>
+      <ul>
+        <li>
+          <strong>Reținere la sursă pentru chiriași persoane juridice.</strong> Când chiriașul este o
+          firmă, aceasta calculează, reține și virează impozitul de 10% la fiecare plată; tu nu îl mai
+          declari ca impozit, dar rămâi responsabil de CASS prin Declarația Unică.
+        </li>
+        <li>
+          <strong>Cumulul surselor pasive pentru CASS.</strong> Chiriile se adună cu dividendele,
+          dobânzile și câștigurile din investiții pentru stabilirea plafonului CASS, astfel încât
+          contribuția poate apărea chiar dacă o singură sursă pare mică.
+        </li>
+        <li>
+          <strong>Plata în avans și regularizarea.</strong> Impozitul estimat se poate achita pe
+          parcursul anului, iar diferențele se sting la regularizare, după depunerea declarației.
+        </li>
+      </ul>
+
       <h2>Greșeli frecvente și situații speciale</h2>
       <ul>
         <li>
@@ -107,7 +174,9 @@ export default function Page() {
       </ul>
       <p>
         Dacă vrei să verifici alte obligații fiscale, vezi și{' '}
-        <Link href="/calculator/contributii-pfa/">calculatorul de contribuții PFA</Link> sau{' '}
+        <Link href="/calculator/contributii-pfa/">calculatorul de contribuții PFA</Link>,{' '}
+        <Link href="/calculator/dividende/">calculatorul de impozit pe dividende</Link> (care intră
+        în același plafon CASS) sau{' '}
         <Link href="/calculator/salariu/">calculatorul de salariu net/brut</Link>. Pentru
         formalități precum dovada de bună reputație la administrarea unor proprietăți, poți obține
         rapid{' '}

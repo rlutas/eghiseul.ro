@@ -34,6 +34,8 @@ export default function Page() {
         { q: 'Cum sunt împărțite amenzile pe clase?', a: 'Pentru persoane fizice, OUG 195/2002 prevede 4 clase de sancțiuni exprimate în puncte-amendă: clasa I (2-3 puncte), clasa a II-a (4-5 puncte), clasa a III-a (6-8 puncte) și clasa a IV-a (9-20 puncte). Agentul constatator alege valoarea din interval, iar suma în lei rezultă înmulțind punctele cu valoarea punctului-amendă din ziua contravenției.' },
         { q: 'De la ce dată se aplică valoarea de 432,50 lei pe punct?', a: 'Valoarea punctului-amendă este 10% din salariul minim brut, deci urmărește majorarea acestuia. Pentru contravenții constatate până la 30 iunie 2026 se aplică 405 lei/punct, iar pentru cele de la 1 iulie 2026 se aplică 432,50 lei/punct. Contează data procesului-verbal, nu data plății.' },
         { q: 'Punctele de penalizare afectează cazierul auto sau cel judiciar?', a: 'Punctele de penalizare se înregistrează în evidența rutieră a poliției, nu în cazierul judiciar. O amendă de circulație este o contravenție, nu o infracțiune, deci nu apare în cazierul judiciar. Anumite fapte grave (de exemplu conducerea sub influența alcoolului peste limita legală) sunt însă infracțiuni și pot genera o mențiune care necesită ulterior reabilitare.' },
+        { q: 'Ce se întâmplă dacă nu plătesc amenda în termen?', a: 'Dacă nu plătești în 15 zile pierzi reducerea la jumătate și datorezi suma integrală stabilită în procesul-verbal. Dacă nu o achiți nici după rămânerea definitivă, creanța se transmite la executare (Fisc sau primărie) și se transformă într-o obligație bugetară pe care o poți regla doar prin plata integrală; pentru contravenții, amenda nu se prescrie la fel ca alte debite și poate fi executată silit.' },
+        { q: 'Pot contesta procesul-verbal de amendă?', a: 'Da. Plângerea contravențională se depune la judecătoria în a cărei rază a fost constatată fapta, în termen de 15 zile de la comunicarea procesului-verbal. Depunerea plângerii suspendă executarea amenzii până la soluționare. Atenție: termenul de contestare și cel de plată redusă curg în paralel, deci dacă pierzi în instanță datorezi suma integrală.' },
       ]}
     >
       <h2>Cum se calculează amenda de circulație în 2026</h2>
@@ -134,6 +136,57 @@ export default function Page() {
       <p className="text-sm text-neutral-500">
         Estimare orientativă conform OUG 195/2002. Suma exactă în limita clasei și încadrarea o
         stabilește agentul constatator.
+      </p>
+      <h2>Termenele de plată și de contestare</h2>
+      <p>
+        După primirea procesului-verbal ai două termene paralele, fiecare de{' '}
+        <strong>15 zile calendaristice</strong>, dar cu efecte diferite. Tabelul de mai jos rezumă
+        ce poți face și ce sumă datorezi în fiecare interval:
+      </p>
+      <ul>
+        <li>
+          <strong>În primele 15 zile (plată redusă):</strong> achiți jumătate din minimul clasei și
+          stingi definitiv obligația. Pentru exemplul de mai sus (clasa a III-a, 6 puncte minim),
+          plata redusă este <strong>3 puncte × 432,50 = 1.297,50 lei</strong>.
+        </li>
+        <li>
+          <strong>În primele 15 zile (plângere contravențională):</strong> poți contesta
+          procesul-verbal la judecătorie; depunerea suspendă executarea până la soluționare.
+        </li>
+        <li>
+          <strong>După 15 zile, fără plată și fără contestație:</strong> pierzi reducerea și
+          datorezi suma integrală din proces-verbal (în exemplu, <strong>2.595 lei</strong>).
+        </li>
+        <li>
+          <strong>După rămânerea definitivă, fără plată:</strong> creanța trece la executare silită
+          prin Fisc sau primărie, ca debit bugetar.
+        </li>
+      </ul>
+      <p>
+        Întârzierea la plata altor obligații bugetare generează majorări; pentru a estima cât costă
+        o restanță către stat poți folosi{' '}
+        <Link href="/calculator/penalitati-anaf/">calculatorul de penalități ANAF</Link>.
+      </p>
+      <h2>Contextul legal: OUG 195/2002 și salariul minim</h2>
+      <p>
+        Cadrul amenzilor rutiere este <strong>OUG 195/2002</strong> privind circulația pe drumurile
+        publice, completată de regulamentul de aplicare. Particularitatea sistemului românesc este
+        că amenda nu este o sumă fixă în lei, ci un număr de <strong>puncte-amendă</strong> ancorat
+        la salariul minim brut pe economie. Un punct valorează 10% din salariul minim, motiv pentru
+        care cuantumul în lei se modifică automat ori de câte ori crește salariul minim — de aici
+        cele două valori din 2026: <strong>405 lei</strong> până la 30 iunie și{' '}
+        <strong>432,50 lei</strong> de la 1 iulie.
+      </p>
+      <p>
+        Acest mecanism are două consecințe practice. În primul rând, ceea ce contează pentru
+        cuantum este <strong>data contravenției</strong> (data procesului-verbal), nu data plății:
+        o faptă din iunie rămâne calculată la 405 lei/punct chiar dacă o achiți în iulie. În al
+        doilea rând, clasele I-IV definesc doar intervalul de puncte, iar agentul constatator alege
+        valoarea concretă din interval în funcție de gravitatea faptei și de circumstanțe.
+      </p>
+      <p className="text-sm text-neutral-500">
+        Informații cu caracter general conform OUG 195/2002; pentru situații concrete consultă
+        procesul-verbal și, dacă este cazul, un avocat.
       </p>
     </CalculatorLayout>
   );
