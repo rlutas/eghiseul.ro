@@ -161,8 +161,11 @@ export default function VerificareRovinietaPage() {
               <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 flex items-start gap-3">
                 <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" aria-hidden="true" />
                 <p className="text-sm text-amber-800">
-                  <strong>Rovinieta a expirat?</strong> Circulația fără rovinietă validă se sancționează cu amendă.
-                  Cumpără rovinieta la timp de pe platforma oficială CNAIR pentru a evita amenzile.
+                  <strong>Rovinieta a expirat?</strong> Circulația fără rovinietă validă se sancționează cu amendă.{' '}
+                  <Link href="/servicii/rovinieta-online/" className="font-semibold text-amber-900 underline">
+                    Cumpără rovinieta online
+                  </Link>{' '}
+                  la timp, în câteva minute, ca să eviți amenzile.
                 </p>
               </div>
               <ul className="space-y-2">
