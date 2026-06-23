@@ -49,6 +49,7 @@ const CODE_ICONS: Record<string, React.ComponentType<{ className?: string }>> = 
   legalizare: Scale,
   apostila_notari: BookOpen,
   urgenta: Clock,
+  extras_multilingv: Globe,
 };
 
 // Hint text displayed under the option name (kept short — ~1 line).
@@ -135,6 +136,26 @@ export function OptionsStepModular({ onValidChange }: OptionsStepProps) {
     () => serviceOptions.filter(isCrossServiceOption),
     [serviceOptions]
   );
+
+  // Generic "other options" bucket — any active option NOT already rendered by a
+  // dedicated section above (urgența, lanțul apostilă/traducere, cross-service,
+  // auto-aplicate, sau ascunse). Ex: extras multilingv pe naștere/căsătorie.
+  // Previne pasul gol și randează automat opțiuni viitoare fără cod nou.
+  const otherOptions = useMemo(() => {
+    const handled = new Set<string>([
+      ...EXTRAS_CODES,
+      'urgenta',
+      ...AUTO_APPLIED_CODES,
+      ...HIDDEN_CODES,
+    ]);
+    return serviceOptions.filter(
+      (o) =>
+        !!o.code &&
+        o.is_active !== false &&
+        !handled.has(o.code) &&
+        !isCrossServiceOption(o)
+    );
+  }, [serviceOptions]);
 
   // ──────────────────────────────────────────────────────────────────────────
   // Selection helpers
@@ -616,6 +637,32 @@ export function OptionsStepModular({ onValidChange }: OptionsStepProps) {
                 selectedOptions={selectedOptions}
                 onToggleParent={() => toggleCrossServiceOption(option)}
                 onUpdateOptions={commit}
+              />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* ────────────────────────────────────────────────────────────── */}
+      {/* Alte opțiuni — bucket generic (ex: extras multilingv UE)        */}
+      {/* ────────────────────────────────────────────────────────────── */}
+      {otherOptions.length > 0 && (
+        <section className="space-y-3">
+          <SectionHeader
+            icon={Globe}
+            title="Documente suplimentare"
+            subtitle="Forme suplimentare ale documentului, în aceeași comandă"
+          />
+          <div className="space-y-3">
+            {otherOptions.map((option) => (
+              <OptionCard
+                key={option.id}
+                icon={CODE_ICONS[option.code] ?? Globe}
+                name={option.name}
+                hint={option.description || ''}
+                price={option.price}
+                selected={isCodeSelected(option.code)}
+                onClick={() => toggleByCode(option)}
               />
             ))}
           </div>
