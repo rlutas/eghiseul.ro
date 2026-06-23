@@ -1,164 +1,186 @@
 import Link from 'next/link';
-import { Mail, Phone, Shield, Clock, FileText } from 'lucide-react';
+import { Mail, Phone, Clock, Shield, FileText, MessageCircle } from 'lucide-react';
 import { serviceUrl } from '@/lib/seo/constants';
 
-const services = [
+const WHATSAPP =
+  'https://wa.me/40757708181?text=' +
+  encodeURIComponent('Bună ziua! Aș dori informații despre serviciile eGhișeul.ro.');
+
+const servicesA = [
   { name: 'Cazier Judiciar', href: serviceUrl('cazier-judiciar') },
   { name: 'Cazier Fiscal', href: serviceUrl('cazier-fiscal') },
+  { name: 'Cazier Auto', href: serviceUrl('cazier-auto') },
   { name: 'Certificat Naștere', href: serviceUrl('certificat-nastere') },
-  { name: 'Extras Carte Funciară', href: serviceUrl('extras-carte-funciara') },
+  { name: 'Certificat Căsătorie', href: serviceUrl('certificat-casatorie') },
   { name: 'Certificat Celibat', href: serviceUrl('certificat-celibat') },
+];
+
+const servicesB = [
+  { name: 'Extras Carte Funciară', href: serviceUrl('extras-carte-funciara') },
+  { name: 'Certificat Constatator', href: serviceUrl('certificat-constatator') },
+  { name: 'Extras Multilingv', href: '/servicii/extras-multilingv-certificat-nastere/' },
+  { name: 'Rovinietă Online', href: '/servicii/rovinieta-online/' },
   { name: 'Calculatoare', href: '/calculator/' },
-  { name: 'Curs valutar BNR', href: '/curs-valutar/' },
-  { name: 'Vezi toate serviciile', href: '/servicii/' },
+  { name: 'Toate serviciile', href: '/servicii/' },
 ];
 
 const legalLinks = [
   { name: 'Termeni și Condiții', href: '/termeni-si-conditii/' },
-  { name: 'Politica de Confidențialitate', href: '/politica-de-confidentialitate/' },
+  { name: 'Confidențialitate', href: '/politica-de-confidentialitate/' },
   { name: 'GDPR', href: '/gdpr/' },
-  { name: 'Politica Cookies', href: '/politica-cookies/' },
+  { name: 'Cookies', href: '/politica-cookies/' },
 ];
+
+function ServiceLink({ name, href }: { name: string; href: string }) {
+  return (
+    <li>
+      <Link href={href} className="text-white/70 hover:text-primary-500 transition-colors inline-block py-0.5">
+        {name}
+      </Link>
+    </li>
+  );
+}
 
 export function Footer() {
   return (
     <footer className="bg-secondary-900 text-white">
-      {/* Main Footer */}
-      <div className="container mx-auto px-4 py-10 sm:py-12 lg:py-16 max-w-[1100px]">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 lg:gap-12">
-          {/* Column 1: About & Logo */}
-          <div className="lg:col-span-1 space-y-4">
+      {/* Mega top */}
+      <div className="container mx-auto px-4 py-12 lg:py-16 max-w-[1200px]">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12">
+          {/* Despre */}
+          <div className="lg:col-span-4 space-y-5">
             <Link href="/" className="flex items-center gap-2.5">
               <div className="w-10 h-10 bg-primary-500 rounded-xl flex items-center justify-center shadow-[0_4px_12px_rgba(236,185,95,0.3)]">
                 <span className="text-secondary-900 font-extrabold text-base">eG</span>
               </div>
-              <div className="flex flex-col">
-                <span className="text-xl font-extrabold text-white leading-tight">
-                  eGhișeul<span className="text-primary-500">.ro</span>
-                </span>
-              </div>
+              <span className="text-xl font-extrabold text-white leading-tight">
+                eGhișeul<span className="text-primary-500">.ro</span>
+              </span>
             </Link>
-            <p className="text-sm sm:text-base text-white/70 leading-relaxed">
-              Platforma digitală pentru obținerea documentelor românești, rapid și legal.
-              Procesăm peste 200.000 de documente anual.
+            <p className="text-sm text-white/70 leading-relaxed">
+              Ne dedicăm simplificării și eficientizării proceselor birocratice pentru românii de pretutindeni.
+              Misiunea noastră este să oferim acces rapid și sigur la serviciile de obținere a documentelor
+              esențiale: certificate de naștere, căsătorie și celibat, cazier judiciar și auto, traduceri
+              legalizate, apostile și supralegalizări.
             </p>
-            <div className="flex flex-wrap gap-2 sm:gap-3 pt-2">
-              <div className="flex items-center gap-1.5 px-3 py-2 bg-white/5 rounded-lg">
-                <Shield className="w-4 h-4 text-primary-500" />
-                <span className="text-xs sm:text-sm text-white/70">SSL</span>
-              </div>
-              <div className="flex items-center gap-1.5 px-3 py-2 bg-white/5 rounded-lg">
-                <FileText className="w-4 h-4 text-primary-500" />
-                <span className="text-xs sm:text-sm text-white/70">GDPR</span>
-              </div>
+            <div className="flex flex-wrap gap-2.5 pt-1">
+              <span className="flex items-center gap-1.5 px-3 py-2 bg-white/5 rounded-lg">
+                <Shield className="w-4 h-4 text-primary-500" aria-hidden="true" />
+                <span className="text-xs text-white/70">SSL securizat</span>
+              </span>
+              <span className="flex items-center gap-1.5 px-3 py-2 bg-white/5 rounded-lg">
+                <FileText className="w-4 h-4 text-primary-500" aria-hidden="true" />
+                <span className="text-xs text-white/70">GDPR</span>
+              </span>
             </div>
           </div>
 
-          {/* Column 2: Services */}
-          <div className="space-y-3 sm:space-y-4">
-            <h3 className="text-white font-bold text-base sm:text-lg">Servicii</h3>
-            <ul className="space-y-2.5 sm:space-y-3 text-sm sm:text-base">
-              {services.map((service, i) => (
-                <li key={i}>
-                  <Link
-                    href={service.href}
-                    className="text-white/70 hover:text-primary-500 transition-colors inline-block py-0.5"
-                  >
-                    {service.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+          {/* Servicii — 2 coloane */}
+          <div className="lg:col-span-5">
+            <h3 className="text-white font-bold text-lg mb-4">Servicii</h3>
+            <div className="grid grid-cols-2 gap-x-6">
+              <ul className="space-y-2.5 text-sm">
+                {servicesA.map((s) => <ServiceLink key={s.name} {...s} />)}
+              </ul>
+              <ul className="space-y-2.5 text-sm">
+                {servicesB.map((s) => <ServiceLink key={s.name} {...s} />)}
+              </ul>
+            </div>
           </div>
 
-          {/* Column 3: Legal */}
-          <div className="space-y-3 sm:space-y-4">
-            <h3 className="text-white font-bold text-base sm:text-lg">Legal</h3>
-            <ul className="space-y-2.5 sm:space-y-3 text-sm sm:text-base">
-              {legalLinks.map((link, i) => (
-                <li key={i}>
-                  <Link
-                    href={link.href}
-                    className="text-white/70 hover:text-primary-500 transition-colors inline-block py-0.5"
-                  >
-                    {link.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Column 4: Contact */}
-          <div className="space-y-3 sm:space-y-4">
-            <h3 className="text-white font-bold text-base sm:text-lg">Contact</h3>
-            <ul className="space-y-3 sm:space-y-4 text-sm sm:text-base">
-              <li className="flex items-start gap-3">
-                <div className="w-9 h-9 sm:w-10 sm:h-10 bg-primary-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <Phone className="h-4 w-4 sm:h-5 sm:w-5 text-primary-500" />
-                </div>
-                <div>
-                  <p className="text-xs text-white/50">Telefon</p>
-                  <a href="tel:+40757708181" className="text-white hover:text-primary-500 transition-colors font-medium">
-                    +40 757 708 181
-                  </a>
-                </div>
+          {/* Contact — WhatsApp prioritar */}
+          <div className="lg:col-span-3">
+            <h3 className="text-white font-bold text-lg mb-4">Contact</h3>
+            <a
+              href={WHATSAPP}
+              target="_blank"
+              rel="nofollow noopener"
+              className="flex items-center gap-3 rounded-xl bg-[#25D366] px-4 py-3 mb-4 font-bold text-white hover:bg-[#20bd5a] hover:-translate-y-0.5 hover:shadow-[0_6px_20px_rgba(37,211,102,0.3)] transition-all"
+            >
+              <MessageCircle className="h-6 w-6 flex-shrink-0" aria-hidden="true" />
+              <span className="leading-tight">
+                Scrie-ne pe WhatsApp
+                <span className="block text-[11px] font-medium text-white/80">Metoda preferată · răspuns rapid</span>
+              </span>
+            </a>
+            <ul className="space-y-3 text-sm">
+              <li className="flex items-center gap-3">
+                <Phone className="h-4 w-4 text-primary-500 flex-shrink-0" aria-hidden="true" />
+                <a href="tel:+40757708181" className="text-white/80 hover:text-primary-500 transition-colors">+40 757 708 181</a>
               </li>
-              <li className="flex items-start gap-3">
-                <div className="w-9 h-9 sm:w-10 sm:h-10 bg-primary-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <Mail className="h-4 w-4 sm:h-5 sm:w-5 text-primary-500" />
-                </div>
-                <div>
-                  <p className="text-xs text-white/50">Email</p>
-                  <a href="mailto:contact@eghiseul.ro" className="text-white hover:text-primary-500 transition-colors font-medium">
-                    contact@eghiseul.ro
-                  </a>
-                </div>
+              <li className="flex items-center gap-3">
+                <Mail className="h-4 w-4 text-primary-500 flex-shrink-0" aria-hidden="true" />
+                <a href="mailto:contact@eghiseul.ro" className="text-white/80 hover:text-primary-500 transition-colors">contact@eghiseul.ro</a>
               </li>
-              <li className="flex items-start gap-3">
-                <div className="w-9 h-9 sm:w-10 sm:h-10 bg-primary-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <Clock className="h-4 w-4 sm:h-5 sm:w-5 text-primary-500" />
-                </div>
-                <div>
-                  <p className="text-xs text-white/50">Program</p>
-                  <span className="text-white font-medium">Luni - Vineri: 08:00 - 16:00</span>
-                </div>
+              <li className="flex items-center gap-3">
+                <Clock className="h-4 w-4 text-primary-500 flex-shrink-0" aria-hidden="true" />
+                <span className="text-white/80">Luni - Vineri: 08:00 - 16:00</span>
               </li>
             </ul>
           </div>
         </div>
+
+        {/* Banner metode de plată */}
+        <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 rounded-2xl bg-white px-6 py-5">
+          <span className="text-sm font-semibold text-secondary-900">Plăți 100% securizate cu</span>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/images/footer/payment-methods.webp"
+            alt="Metode de plată acceptate: Visa, Mastercard, Apple Pay, Google Pay"
+            width={900}
+            height={172}
+            className="h-7 sm:h-9 w-auto"
+            loading="lazy"
+          />
+        </div>
       </div>
 
-      {/* Bottom Bar */}
+      {/* Bottom bar */}
       <div className="border-t border-white/10">
-        <div className="container mx-auto px-4 py-5 sm:py-6 max-w-[1100px]">
-          {/* Legal disclaimer — private platform, not a state institution */}
-          <p className="text-white/40 text-[11px] sm:text-xs leading-relaxed text-center md:text-left mb-4 pb-4 border-b border-white/10">
-            eGhișeul.ro este un serviciu privat de asistență la obținerea de documente.
-            Nu suntem o instituție de stat și nu suntem afiliați cu vreun organ guvernamental.
-            Documentele sunt emise exclusiv de autoritățile competente din România, iar procedurile
-            sunt gestionate de un avocat colaborator înscris în Barou.
-          </p>
-          <div className="flex flex-col md:flex-row justify-between items-center gap-3 sm:gap-4 text-sm">
-            <div className="text-center md:text-left">
-              <p className="text-white/50 text-xs sm:text-sm">
-                © {new Date().getFullYear()} eGhișeul.ro. Toate drepturile rezervate.
-              </p>
-              <p className="text-white/40 text-[11px] sm:text-xs mt-1">
-                eDigitalizare SRL · CUI RO49278701 · Reg. Com. J2023001097301 · Jud. Satu Mare, Com. Odoreu, Str. Salcâmilor nr. 2
-              </p>
-            </div>
-            <div className="flex items-center gap-1.5 sm:gap-2">
+        <div className="container mx-auto px-4 py-6 max-w-[1200px]">
+          {/* Linkuri legale + rating */}
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-5">
+            <nav className="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-white/60">
+              {legalLinks.map((l) => (
+                <Link key={l.name} href={l.href} className="hover:text-primary-500 transition-colors">{l.name}</Link>
+              ))}
+            </nav>
+            <div className="flex items-center gap-1.5">
               {[...Array(5)].map((_, i) => (
-                <svg
-                  key={i}
-                  className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#FBBC04] fill-[#FBBC04]"
-                  viewBox="0 0 24 24"
-                >
+                <svg key={i} className="w-4 h-4 text-[#FBBC04] fill-[#FBBC04]" viewBox="0 0 24 24">
                   <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
                 </svg>
               ))}
-              <span className="text-white font-medium ml-1 text-xs sm:text-sm">4.9/5</span>
-              <span className="text-white/50 text-xs sm:text-sm">pe Google</span>
+              <span className="text-white font-medium ml-1 text-sm">4.9/5</span>
+              <span className="text-white/50 text-sm">pe Google</span>
+            </div>
+          </div>
+
+          {/* Copyright + firmă */}
+          <div className="border-t border-white/10 pt-5">
+            <p className="text-white/60 text-sm">© {new Date().getFullYear()} eGhișeul.ro. Toate drepturile rezervate.</p>
+            <p className="text-white/40 text-[11px] mt-1">
+              eDigitalizare SRL · CUI RO49278701 · Reg. Com. J2023001097301 · Jud. Satu Mare, Com. Odoreu, Str. Salcâmilor nr. 2
+            </p>
+
+            {/* Disclaimer — sub copyright */}
+            <p className="text-white/40 text-[11px] leading-relaxed mt-4">
+              eGhișeul.ro este un serviciu privat de asistență la obținerea de documente. Nu suntem o instituție de
+              stat și nu suntem afiliați cu vreun organ guvernamental. Documentele sunt emise exclusiv de
+              autoritățile competente din România, iar procedurile sunt gestionate de un avocat colaborator înscris
+              în Barou.
+            </p>
+
+            {/* Badge-uri ANPC (SAL + SOL) — obligatorii legal */}
+            <div className="flex flex-wrap items-center gap-3 mt-5">
+              <a href="https://anpc.ro/ce-este-sal/" target="_blank" rel="nofollow noopener" aria-label="ANPC — Soluționarea Alternativă a Litigiilor">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/images/footer/anpc-sal.svg" alt="ANPC SAL" width={250} height={50} className="h-11 w-auto rounded" loading="lazy" />
+              </a>
+              <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="nofollow noopener" aria-label="ANPC — Soluționarea Online a Litigiilor (UE)">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/images/footer/anpc-sol.svg" alt="ANPC SOL" width={250} height={50} className="h-11 w-auto rounded" loading="lazy" />
+              </a>
             </div>
           </div>
         </div>
