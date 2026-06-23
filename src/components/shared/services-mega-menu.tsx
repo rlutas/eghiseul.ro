@@ -95,7 +95,7 @@ export function ServicesMegaMenu() {
                       {item.children && (
                         <ul className="ml-10 mt-0.5 space-y-0.5 border-l border-neutral-200 pl-3">
                           {item.children.map((child) => (
-                            <li key={child.href}>
+                            <li key={child.name}>
                               <Link
                                 href={child.href}
                                 onClick={() => setOpen(false)}

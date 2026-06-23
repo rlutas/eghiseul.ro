@@ -365,7 +365,7 @@ export function Header() {
                                         <div className="ml-11 border-l border-neutral-200 pl-3">
                                           {item.children.map((child) => (
                                             <Link
-                                              key={child.href}
+                                              key={child.name}
                                               href={child.href}
                                               onClick={() => setIsMobileMenuOpen(false)}
                                               className="flex min-h-10 items-center px-3 py-2 rounded-lg text-[13px] font-medium text-secondary-600 hover:bg-neutral-50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"

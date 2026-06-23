@@ -16,6 +16,7 @@ import {
   Building2,
   Receipt,
   Globe,
+  FileText,
   Map as MapIcon,
   type LucideIcon,
 } from 'lucide-react';
@@ -63,12 +64,23 @@ export const SERVICES_NAV: ServiceNavGroup[] = [
   {
     category: 'Personale',
     items: [
-      { name: 'Certificat Naștere', href: serviceUrl('certificat-nastere'), icon: Baby },
-      { name: 'Certificat Căsătorie', href: serviceUrl('certificat-casatorie'), icon: Heart },
+      {
+        name: 'Certificat Naștere',
+        href: serviceUrl('certificat-nastere'),
+        icon: Baby,
+        children: [
+          { name: 'Extras Multilingv', href: '/servicii/extras-multilingv-certificat-nastere/', icon: Globe },
+        ],
+      },
+      {
+        name: 'Certificat Căsătorie',
+        href: serviceUrl('certificat-casatorie'),
+        icon: Heart,
+        children: [
+          { name: 'Extras Multilingv', href: '/servicii/extras-multilingv-certificat-casatorie/', icon: Globe },
+        ],
+      },
       { name: 'Certificat Celibat', href: serviceUrl('certificat-celibat'), icon: UserRound },
-      // Extrase multilingve (formular standard UE) — pagini statice, href direct (nu serviceUrl).
-      { name: 'Extras Multilingv Naștere', href: '/servicii/extras-multilingv-certificat-nastere/', icon: Globe },
-      { name: 'Extras Multilingv Căsătorie', href: '/servicii/extras-multilingv-certificat-casatorie/', icon: Globe },
     ],
   },
   {
@@ -83,7 +95,16 @@ export const SERVICES_NAV: ServiceNavGroup[] = [
   {
     category: 'Comerciale',
     items: [
-      { name: 'Certificat Constatator', href: serviceUrl('certificat-constatator'), icon: Building2 },
+      {
+        name: 'Certificat Constatator',
+        href: serviceUrl('certificat-constatator'),
+        icon: Building2,
+        children: [
+          { name: 'Firmă', href: serviceUrl('certificat-constatator'), icon: Building2 },
+          { name: 'Persoană Fizică', href: serviceUrl('certificat-constatator'), icon: UserRound },
+          { name: 'Cu Istoric', href: serviceUrl('certificat-constatator'), icon: FileText },
+        ],
+      },
     ],
   },
   {

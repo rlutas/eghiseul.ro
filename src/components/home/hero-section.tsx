@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { serviceUrl } from '@/lib/seo';
 import { GOOGLE_REVIEWS_URL } from '@/config/contact';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Clock, Monitor, Users } from 'lucide-react';
+import { ArrowRight, Clock, Monitor, Users, Zap } from 'lucide-react';
 
 export function HeroSection() {
   return (
@@ -61,8 +61,19 @@ export function HeroSection() {
               </Button>
             </div>
 
+            {/* Servicii instant — eliberare automată 24/7 */}
+            <div className="mt-5 flex justify-center lg:justify-start">
+              <span className="inline-flex items-center gap-2 rounded-full bg-primary-500/10 ring-1 ring-primary-500/30 px-4 py-2 text-xs sm:text-sm text-white/90">
+                <Zap className="h-4 w-4 text-primary-500 flex-shrink-0" aria-hidden="true" />
+                <span>
+                  <strong className="text-primary-500">Extras carte funciară</strong> și{' '}
+                  <strong className="text-primary-500">certificat constatator</strong> — eliberare automată, 24/7
+                </span>
+              </span>
+            </div>
+
             {/* Google Reviews Badge — links to the real Google Business Profile */}
-            <div className="mt-6 sm:mt-8 flex justify-center lg:justify-start">
+            <div className="mt-5 sm:mt-6 flex justify-center lg:justify-start">
               <a
                 href={GOOGLE_REVIEWS_URL}
                 target="_blank"
@@ -149,19 +160,8 @@ export function HeroSection() {
               ))}
             </div>
 
-            {/* CTA Button */}
-            <Button
-              asChild
-              className="w-full bg-primary-500 hover:bg-primary-600 text-secondary-900 font-bold h-11 sm:h-12 rounded-xl shadow-md hover:shadow-lg transition-all mb-3 sm:mb-4"
-            >
-              <Link href="/#servicii">
-                Toate Serviciile
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
-
             {/* Trust Badges */}
-            <div className="flex flex-wrap justify-center gap-3 sm:gap-6 pt-3 sm:pt-4 border-t border-neutral-200">
+            <div className="flex flex-wrap justify-center gap-3 sm:gap-6 pt-4 sm:pt-5 mt-1 border-t border-neutral-200">
               <div className="flex items-center gap-1.5">
                 <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary-500" />
                 <span className="text-[10px] sm:text-xs text-neutral-600 font-medium">Livrare 24-48h</span>
