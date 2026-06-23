@@ -6,11 +6,26 @@ const WHATSAPP =
   'https://wa.me/40757708181?text=' +
   encodeURIComponent('Bună ziua! Aș dori informații despre serviciile eGhișeul.ro.');
 
-const serviceGroups = [
+interface FooterService {
+  name: string;
+  href: string;
+  children?: { name: string; href: string }[];
+}
+
+const CONSTATATOR = serviceUrl('certificat-constatator');
+
+const serviceGroups: { title: string; items: FooterService[] }[] = [
   {
     title: 'Caziere',
     items: [
-      { name: 'Cazier Judiciar', href: serviceUrl('cazier-judiciar') },
+      {
+        name: 'Cazier Judiciar',
+        href: serviceUrl('cazier-judiciar'),
+        children: [
+          { name: 'Persoană Fizică', href: serviceUrl('cazier-judiciar-persoana-fizica') },
+          { name: 'Persoană Juridică', href: serviceUrl('cazier-judiciar-persoana-juridica') },
+        ],
+      },
       { name: 'Cazier Fiscal', href: serviceUrl('cazier-fiscal') },
       { name: 'Cazier Auto', href: serviceUrl('cazier-auto') },
       { name: 'Certificat Integritate', href: serviceUrl('certificat-integritate') },
@@ -22,16 +37,25 @@ const serviceGroups = [
       { name: 'Certificat Naștere', href: serviceUrl('certificat-nastere') },
       { name: 'Certificat Căsătorie', href: serviceUrl('certificat-casatorie') },
       { name: 'Certificat Celibat', href: serviceUrl('certificat-celibat') },
-      { name: 'Extras Multilingv', href: '/servicii/extras-multilingv-certificat-nastere/' },
+      { name: 'Extras Multilingv Naștere', href: '/servicii/extras-multilingv-certificat-nastere/' },
+      { name: 'Extras Multilingv Căsătorie', href: '/servicii/extras-multilingv-certificat-casatorie/' },
     ],
   },
   {
     title: 'Imobiliare & firme',
     items: [
+      {
+        name: 'Certificat Constatator',
+        href: CONSTATATOR,
+        children: [
+          { name: 'Firmă', href: CONSTATATOR },
+          { name: 'Persoană Fizică', href: CONSTATATOR },
+          { name: 'Cu Istoric', href: CONSTATATOR },
+        ],
+      },
       { name: 'Extras Carte Funciară', href: serviceUrl('extras-carte-funciara') },
-      { name: 'Certificat Constatator', href: serviceUrl('certificat-constatator') },
+      { name: 'Extras Plan Cadastral', href: serviceUrl('extras-plan-cadastral') },
       { name: 'Rovinietă Online', href: '/servicii/rovinieta-online/' },
-      { name: 'Toate serviciile', href: '/servicii/' },
     ],
   },
 ];
@@ -90,6 +114,17 @@ export function Footer() {
                     <Link href={s.href} className="text-white/70 hover:text-primary-500 transition-colors inline-block py-0.5">
                       {s.name}
                     </Link>
+                    {s.children && (
+                      <ul className="mt-1.5 ml-1.5 space-y-1.5 border-l border-white/10 pl-3">
+                        {s.children.map((c) => (
+                          <li key={c.name}>
+                            <Link href={c.href} className="text-white/55 hover:text-primary-500 transition-colors text-[13px]">
+                              {c.name}
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
                   </li>
                 ))}
               </ul>
