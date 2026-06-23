@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
-import { Menu, X, Phone, User, Settings, FileText, LogOut, ChevronDown, PackageSearch } from 'lucide-react';
+import { Menu, X, Phone, User, Settings, FileText, LogOut, ChevronDown, PackageSearch, LogIn, UserPlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ServicesMegaMenu } from '@/components/shared/services-mega-menu';
 import { CalculatorsMegaMenu } from '@/components/shared/calculators-mega-menu';
@@ -249,21 +249,34 @@ export function Header() {
                   </DropdownMenuContent>
                 </DropdownMenu>
               ) : (
-                <>
-                  <Button
-                    variant="ghost"
-                    asChild
-                    className="text-secondary-700 hover:text-secondary-900 hover:bg-neutral-100 font-semibold"
-                  >
-                    <Link href="/auth/login">Autentificare</Link>
-                  </Button>
-                  <Button
-                    asChild
-                    className="bg-primary-500 hover:bg-primary-600 text-secondary-900 font-bold px-6 rounded-xl shadow-[0_6px_14px_rgba(236,185,95,0.35)] hover:shadow-[0_10px_20px_rgba(236,185,95,0.45)] hover:-translate-y-0.5 transition-all duration-200"
-                  >
-                    <Link href="/auth/register">Începe Acum</Link>
-                  </Button>
-                </>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button
+                      aria-label="Cont — autentificare sau înregistrare"
+                      className="flex items-center justify-center w-10 h-10 rounded-full border border-neutral-200 text-secondary-700 hover:bg-neutral-100 hover:border-primary-300 hover:text-secondary-900 transition-colors"
+                    >
+                      <User className="w-5 h-5" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56">
+                    <div className="px-3 py-2 border-b border-neutral-100">
+                      <p className="text-sm font-semibold text-secondary-900">Contul tău</p>
+                      <p className="text-xs text-neutral-500">Autentifică-te sau creează cont</p>
+                    </div>
+                    <DropdownMenuItem asChild className="cursor-pointer">
+                      <Link href="/auth/login" className="flex items-center gap-2">
+                        <LogIn className="w-4 h-4" />
+                        Autentificare
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild className="cursor-pointer">
+                      <Link href="/auth/register" className="flex items-center gap-2 font-semibold text-primary-700 focus:text-primary-700">
+                        <UserPlus className="w-4 h-4" />
+                        Creează cont
+                      </Link>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               )}
             </div>
 
