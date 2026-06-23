@@ -65,22 +65,7 @@ export function Footer() {
               și supralegalizări.
             </p>
 
-            {/* Plăți */}
-            <div>
-              <span className="inline-flex rounded-md bg-white px-2.5 py-1.5">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src="/images/footer/payment-methods.webp"
-                  alt="Visa, Mastercard, Apple Pay, Google Pay"
-                  width={900}
-                  height={172}
-                  className="h-5 w-auto"
-                  loading="lazy"
-                />
-              </span>
-            </div>
-
-            {/* SSL / GDPR — sub plăți */}
+            {/* SSL / GDPR */}
             <div className="flex flex-wrap gap-2.5">
               <span className="flex items-center gap-1.5 px-3 py-2 bg-white/5 rounded-lg">
                 <Shield className="w-4 h-4 text-primary-500" aria-hidden="true" />
@@ -130,16 +115,40 @@ export function Footer() {
                 <span className="text-white/80">Luni - Vineri: 08:00 - 16:00</span>
               </li>
             </ul>
+          </div>
+        </div>
 
-            {/* Badge-uri ANPC — sub contact */}
-            <div className="flex flex-wrap items-center gap-2 mt-5">
+        {/* Metode de plată + ANPC — 2 coloane cu titluri */}
+        <div className="mt-12 grid sm:grid-cols-2 gap-8 lg:gap-12 border-t border-white/10 pt-10">
+          {/* Plăți */}
+          <div className="text-center sm:pr-8 lg:pr-12 sm:border-r sm:border-white/10">
+            <h3 className="text-white font-bold text-lg mb-3">Metode de Plată Acceptate</h3>
+            <span className="block h-0.5 w-full max-w-md mx-auto bg-primary-500/70 mb-6" aria-hidden="true" />
+            <span className="inline-flex rounded-xl bg-white px-5 py-3">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/images/footer/payment-methods.webp"
+                alt="Metode de plată acceptate: Visa, Mastercard, Apple Pay, Google Pay"
+                width={900}
+                height={172}
+                className="h-9 sm:h-10 w-auto"
+                loading="lazy"
+              />
+            </span>
+          </div>
+
+          {/* ANPC */}
+          <div className="text-center">
+            <h3 className="text-white font-bold text-lg mb-3">ANPC</h3>
+            <span className="block h-0.5 w-full max-w-md mx-auto bg-primary-500/70 mb-6" aria-hidden="true" />
+            <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
               <a href="https://anpc.ro/ce-este-sal/" target="_blank" rel="nofollow noopener" aria-label="ANPC — Soluționarea Alternativă a Litigiilor">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/images/footer/anpc-sal.svg" alt="ANPC SAL" width={250} height={50} className="h-9 w-auto rounded" loading="lazy" />
+                <img src="/images/footer/anpc-sal.svg" alt="ANPC SAL — Soluționarea Alternativă a Litigiilor" width={250} height={50} className="h-12 w-auto rounded" loading="lazy" />
               </a>
               <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="nofollow noopener" aria-label="ANPC — Soluționarea Online a Litigiilor (UE)">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/images/footer/anpc-sol.svg" alt="ANPC SOL" width={250} height={50} className="h-9 w-auto rounded" loading="lazy" />
+                <img src="/images/footer/anpc-sol.svg" alt="ANPC SOL — Soluționarea Online a Litigiilor" width={250} height={50} className="h-12 w-auto rounded" loading="lazy" />
               </a>
             </div>
           </div>
