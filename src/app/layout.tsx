@@ -4,6 +4,7 @@ import Script from "next/script";
 import "./globals.css";
 import { QueryProvider } from "@/providers/query-provider";
 import { Header } from "@/components/shared/header";
+import { WhatsAppFloat } from "@/components/shared/whatsapp-float";
 
 const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
 
@@ -91,6 +92,7 @@ export default function RootLayout({
         <QueryProvider>
           <Header />
           {children}
+          <WhatsAppFloat />
         </QueryProvider>
       </body>
     </html>
