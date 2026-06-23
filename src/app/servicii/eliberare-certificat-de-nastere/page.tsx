@@ -519,7 +519,7 @@ export default async function CertificatNasterePage() {
                 <div className="absolute -inset-3 bg-gradient-to-br from-primary-500/10 to-secondary-900/5 rounded-[2rem] blur-xl" aria-hidden="true" />
                 <div className="relative bg-white rounded-2xl p-3 ring-1 ring-neutral-200 shadow-[0_20px_50px_rgba(6,16,31,0.16)]">
                   <Image
-                    src="/images/specimens/certificat-nastere.png"
+                    src="/images/specimens/certificat-nastere.webp"
                     alt="Specimen certificat de naștere emis de Starea Civilă — exemplu cu date anonimizate"
                     width={1000}
                     height={1414}

@@ -35,8 +35,8 @@ const SPECIMEN_BY_SLUG: Record<string, string> = {
   'certificat-integritate': '/images/specimens/certificat-integritate.png',
   'extras-carte-funciara': '/images/specimens/extras-cf.png',
   'certificat-constatator': '/images/specimens/certificat-constatator.png',
-  'certificat-nastere': '/images/specimens/certificat-nastere.png',
-  'certificat-casatorie': '/images/specimens/certificat-casatorie.png',
+  'certificat-nastere': '/images/specimens/certificat-nastere.webp',
+  'certificat-casatorie': '/images/specimens/certificat-casatorie.webp',
   'certificat-celibat': '/images/specimens/certificat-celibat.png',
 };
 
