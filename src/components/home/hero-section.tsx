@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { serviceUrl } from '@/lib/seo';
 import { GOOGLE_REVIEWS_URL } from '@/config/contact';
-import { Clock, Monitor, Users } from 'lucide-react';
+import { Clock, Monitor, Users, ArrowRight } from 'lucide-react';
 
 export function HeroSection() {
   return (
@@ -95,7 +95,7 @@ export function HeroSection() {
           </div>
 
           {/* Right Column - Services Box */}
-          <div className="bg-white rounded-2xl p-5 sm:p-7 w-full max-w-[560px] shadow-2xl">
+          <div className="bg-white rounded-2xl p-5 sm:p-7 w-full max-w-[600px] shadow-2xl">
             <h2 className="text-base sm:text-lg font-bold text-secondary-900 text-center mb-4 sm:mb-5">
               Servicii Disponibile
             </h2>
@@ -111,7 +111,7 @@ export function HeroSection() {
                   <div className="w-8 h-8 sm:w-9 sm:h-9 bg-primary-100 rounded-lg flex items-center justify-center flex-shrink-0">
                     <service.icon className="w-4 h-4 sm:w-[18px] sm:h-[18px] text-primary-600" />
                   </div>
-                  <span className="flex-1 min-w-0 text-xs sm:text-[13px] font-semibold text-secondary-900 leading-tight">
+                  <span className="flex-1 min-w-0 truncate text-xs sm:text-[13px] font-semibold text-secondary-900">
                     {service.name}
                   </span>
                   {service.badge && (
@@ -131,8 +131,17 @@ export function HeroSection() {
               ))}
             </div>
 
+            {/* CTA — Toate serviciile */}
+            <Link
+              href="/#servicii"
+              className="flex items-center justify-center gap-2 w-full bg-primary-500 hover:bg-primary-600 text-secondary-900 font-bold h-11 sm:h-12 rounded-xl shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all mb-4 sm:mb-5"
+            >
+              Toate Serviciile
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            </Link>
+
             {/* Trust Badges */}
-            <div className="flex flex-wrap justify-center gap-3 sm:gap-6 pt-4 sm:pt-5 mt-1 border-t border-neutral-200">
+            <div className="flex flex-wrap justify-center gap-3 sm:gap-6 pt-4 sm:pt-5 border-t border-neutral-200">
               <div className="flex items-center gap-1.5">
                 <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary-500" />
                 <span className="text-[10px] sm:text-xs text-neutral-600 font-medium">Livrare 24-48h</span>
