@@ -99,6 +99,8 @@ interface Service {
     numbering?: { contract?: boolean; imputernicire?: boolean };
     institution?: string;
     default_motiv?: string;
+    estimated_days_display?: string;
+    urgent_days_display?: string;
   } | null;
   created_at: string | null;
   updated_at: string | null;
@@ -533,6 +535,15 @@ function EditServiceDialog({
   const [estimatedDays, setEstimatedDays] = useState(
     String(service.estimated_days ?? '')
   );
+  // Customer-facing delivery-term strings (processing_config). Editable here so
+  // we don't have to touch code each time terms change — formatEstimatedDays /
+  // formatUrgentDays read these and propagate on every /servicii page + wizard.
+  const [estimatedDaysDisplay, setEstimatedDaysDisplay] = useState(
+    service.processing_config?.estimated_days_display || ''
+  );
+  const [urgentDaysDisplay, setUrgentDaysDisplay] = useState(
+    service.processing_config?.urgent_days_display || ''
+  );
   const [isFeatured, setIsFeatured] = useState(!!service.is_featured);
   const [saving, setSaving] = useState(false);
 
@@ -558,6 +569,21 @@ function EditServiceDialog({
           updates.estimated_days = days;
         }
       }
+
+      // Merge delivery-term display strings into processing_config (preserve all
+      // other keys: numbering, institution, document_templates, etc).
+      const nextConfig: Record<string, unknown> = { ...(service.processing_config || {}) };
+      if (estimatedDaysDisplay.trim()) {
+        nextConfig.estimated_days_display = estimatedDaysDisplay.trim();
+      } else {
+        delete nextConfig.estimated_days_display;
+      }
+      if (urgentDaysDisplay.trim()) {
+        nextConfig.urgent_days_display = urgentDaysDisplay.trim();
+      } else {
+        delete nextConfig.urgent_days_display;
+      }
+      updates.processing_config = nextConfig;
 
       const res = await fetch('/api/admin/settings/services', {
         method: 'PATCH',
@@ -600,7 +626,7 @@ function EditServiceDialog({
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="edit-days">Zile estimare</Label>
+              <Label htmlFor="edit-days">Zile estimare (numeric)</Label>
               <Input
                 id="edit-days"
                 type="number"
@@ -608,6 +634,32 @@ function EditServiceDialog({
                 value={estimatedDays}
                 onChange={(e) => setEstimatedDays(e.target.value)}
                 placeholder="ex: 5"
+              />
+            </div>
+          </div>
+
+          {/* Termeni de livrare afisati pe site — text liber, se propaga peste
+              tot (pagini servicii + wizard) prin formatEstimatedDays/formatUrgentDays. */}
+          <div className="rounded-lg border border-neutral-200 bg-neutral-50 p-3 space-y-3">
+            <p className="text-xs font-medium text-neutral-600">
+              Termen livrare afisat pe site (lasa gol = foloseste „{estimatedDays || '–'} zile lucratoare”)
+            </p>
+            <div className="space-y-2">
+              <Label htmlFor="edit-days-display">Termen standard</Label>
+              <Input
+                id="edit-days-display"
+                value={estimatedDaysDisplay}
+                onChange={(e) => setEstimatedDaysDisplay(e.target.value)}
+                placeholder="ex: 2-4 zile lucratoare / cateva minute (24/7)"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-urgent-display">Termen urgent (optional)</Label>
+              <Input
+                id="edit-urgent-display"
+                value={urgentDaysDisplay}
+                onChange={(e) => setUrgentDaysDisplay(e.target.value)}
+                placeholder="ex: 1-2 zile lucratoare"
               />
             </div>
           </div>

@@ -666,7 +666,19 @@ Features planned but not yet scheduled for a specific sprint.
 
 **Problem:** WPForms avea formulare separate "Extras Multilingv Certificat Naștere/Căsătorie" (10176/10274). În wizardul nostru lipsește opțiunea add-on de extras multilingv pentru naștere/căsătorie. Deferred de la auditul civil-status (2026-06-18) și confirmat la auditul complet (2026-06-23).
 
-**Scope:** Adăugare `service_option` (extras multilingv) pe certificat-nastere + certificat-casatorie cu preț + procesare.
+**Scope:** Adăugare `service_option` (extras multilingv) pe certificat-nastere + certificat-casatorie cu preț + procesare. **Prețuri din WPForms vechi (verificat 2026-06-23):** standalone **799 lei**, ca add-on în formularul de naștere/căsătorie **399 lei**; termen 7-15 zile (la fel ca certificatul de bază). Specimene WebP 2025 deja existente: `extras-multilingv-nastere.webp`, `extras-multilingv-casatorie.webp`.
+
+#### Termen dinamic stare civilă pe oficiul selectat
+
+**Problem:** Termenul de eliberare la naștere/căsătorie/celibat variază mult după oficiul de stare civilă: București + toate sectoarele = lent (~15-30 zile), oficii rapide (ex. Satu Mare) = ~5-7 zile, restul ~7-15 zile. Acum afișăm un baseline static „7-15 zile lucrătoare" (migrația 077). Câmpul de localitate din modulul civil-status (`CivilStatusStep.tsx`, „Județul / Sectorul") e **text liber** → nu putem detecta fiabil oficiul.
+
+**Scope:** Conversie câmp localitate la selecție structurată (județ/sector dropdown) + mapare oficiu→tier termen + afișare dinamică a termenului în wizard (și notă pe pagina serviciului că București durează mai mult). Acoperă și extras multilingv naștere/căsătorie.
+
+#### Specimene PNG vechi pe 4 pagini servicii
+
+**Problem:** Paginile integritate / cazier-auto / cazier-fiscal / constatator folosesc specimene PNG vechi (17.06), fără versiuni WebP 2025 în `public/images/specimens/`. Restul certificatelor au WebP 2025.
+
+**Scope:** Refacere documente specimen + conversie WebP pentru cele 4.
 
 ---
 

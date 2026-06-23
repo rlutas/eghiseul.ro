@@ -236,9 +236,15 @@ export function buildWizardSteps(
     });
   }
 
-  // Step 3: Options — skipped for constatator (no add-on options; the step would
-  // just say "Nu sunt opțiuni suplimentare"). Present for every other service.
-  if (!isConstatator) {
+  // Step 3: Options — skipped when the service has no add-on options to toggle:
+  //   • Certificat Constatator — no options at all.
+  //   • Property-verification services (Extras Carte Funciară / plan cadastral /
+  //     identificare imobil) — their only option ("extras suplimentar") is driven
+  //     by the Property module's multi-imobil control (HIDDEN_CODES in
+  //     options-step.tsx), not an options toggle, so the step would render blank.
+  // Present for every other service.
+  const hasOptionsStep = !isConstatator && !verificationConfig.propertyVerification.enabled;
+  if (hasOptionsStep) {
     steps.push({
       ...ALL_STEPS['options'],
       number: stepNumber++,

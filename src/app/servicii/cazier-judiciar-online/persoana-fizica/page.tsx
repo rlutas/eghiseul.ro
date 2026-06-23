@@ -22,7 +22,7 @@ import {
   Star,
   X,
 } from 'lucide-react';
-import { Service, ServiceOption, formatEstimatedDays } from '@/types/services';
+import { Service, ServiceOption, formatEstimatedDays, formatUrgentDays } from '@/types/services';
 import { Footer } from '@/components/home/footer';
 import { MobileStickyCTA } from '@/components/services/mobile-sticky-cta';
 import { WhatsAppButton } from '@/components/services/whatsapp-button';
@@ -292,7 +292,7 @@ export default async function CazierJudiciarPFPage() {
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between gap-2">
-                            <p className="font-bold text-secondary-900 text-sm">Urgent: 1-2 zile</p>
+                            <p className="font-bold text-secondary-900 text-sm">Urgent: {formatUrgentDays(service)}</p>
                             <span className="text-xs font-bold text-white bg-primary-600 px-2 py-1 rounded-lg">+80 RON</span>
                           </div>
                         </div>
