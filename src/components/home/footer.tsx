@@ -65,6 +65,19 @@ export function Footer() {
               și supralegalizări.
             </p>
 
+            {/* Metode de plată — sub text */}
+            <div>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/images/footer/payment-methods.webp"
+                alt="Metode de plată acceptate: Visa, Mastercard, Apple Pay, Google Pay"
+                width={900}
+                height={172}
+                className="h-8 w-auto"
+                loading="lazy"
+              />
+            </div>
+
             {/* SSL / GDPR */}
             <div className="flex flex-wrap gap-2.5">
               <span className="flex items-center gap-1.5 px-3 py-2 bg-white/5 rounded-lg">
@@ -118,36 +131,16 @@ export function Footer() {
           </div>
         </div>
 
-        {/* Metode de plată + ANPC — 2 coloane */}
-        <div className="mt-10 grid sm:grid-cols-2 gap-6">
-          {/* Plăți */}
-          <div className="text-center">
-            <h3 className="text-white/80 font-semibold text-sm mb-3">Metode de plată acceptate</h3>
+        {/* ANPC — linie nouă după Contact */}
+        <div className="mt-8 flex flex-wrap items-center gap-3 md:justify-end">
+          <a href="https://anpc.ro/ce-este-sal/" target="_blank" rel="nofollow noopener" aria-label="ANPC — Soluționarea Alternativă a Litigiilor">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/images/footer/payment-methods.webp"
-              alt="Metode de plată acceptate: Visa, Mastercard, Apple Pay, Google Pay"
-              width={900}
-              height={172}
-              className="h-10 w-auto mx-auto"
-              loading="lazy"
-            />
-          </div>
-
-          {/* ANPC */}
-          <div className="text-center">
-            <h3 className="text-white/80 font-semibold text-sm mb-3">ANPC</h3>
-            <div className="flex flex-wrap items-center justify-center gap-3">
-              <a href="https://anpc.ro/ce-este-sal/" target="_blank" rel="nofollow noopener" aria-label="ANPC — Soluționarea Alternativă a Litigiilor">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/images/footer/anpc-sal.svg" alt="ANPC SAL — Soluționarea Alternativă a Litigiilor" width={250} height={50} className="h-9 w-auto rounded" loading="lazy" />
-              </a>
-              <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="nofollow noopener" aria-label="ANPC — Soluționarea Online a Litigiilor (UE)">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/images/footer/anpc-sol.svg" alt="ANPC SOL — Soluționarea Online a Litigiilor" width={250} height={50} className="h-9 w-auto rounded" loading="lazy" />
-              </a>
-            </div>
-          </div>
+            <img src="/images/footer/anpc-sal.svg" alt="ANPC SAL — Soluționarea Alternativă a Litigiilor" width={250} height={50} className="h-9 w-auto rounded" loading="lazy" />
+          </a>
+          <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="nofollow noopener" aria-label="ANPC — Soluționarea Online a Litigiilor (UE)">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/images/footer/anpc-sol.svg" alt="ANPC SOL — Soluționarea Online a Litigiilor" width={250} height={50} className="h-9 w-auto rounded" loading="lazy" />
+          </a>
         </div>
       </div>
 
