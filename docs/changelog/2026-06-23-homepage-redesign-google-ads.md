@@ -51,3 +51,34 @@ checker. Memoria proiectului: [[google-ads-documente-oficiale]].
 ## 3. Meniu
 Adăugate `extras-multilingv-{nastere,casatorie}` în mega-meniul Servicii (categoria Personale).
 Card „Certificat Constatator Persoană Fizică" (după CNP) la PF.
+
+## 4. Footer — mega footer (design WP)
+Rescris complet (`src/components/home/footer.tsx`):
+- **Despre** (logo + descriere misiune + metode de plată sub text) / **Servicii categorizate**
+  (CAZIERE → Cazier Judiciar [PF/PJ] · STARE CIVILĂ → Naștere/Căsătorie [Extras Multilingv] ·
+  IMOBILIARE & FIRME → Certificat Constatator [Firmă/PF/Istoric] + CF + Plan Cadastral + Rovinietă) /
+  **Contact**.
+- Secțiune dedicată jos **„Metode de plată"** (Visa/Mastercard/Apple Pay/Google Pay, fără bg alb) +
+  **ANPC** (SAL+SOL) jos-dreapta lângă copyright. Disclaimer sub copyright.
+- Imagini: `public/images/footer/{payment-methods.webp, anpc-sal.svg, anpc-sol.svg}` (de pe WP).
+
+## 5. Buton WhatsApp flotant
+`src/components/shared/whatsapp-float.tsx` — buton verde fix jos-dreapta, site-wide (în `layout.tsx`),
+cu puls. Metoda de contact preferată.
+
+## 6. Brand — logo real + favicon + specimene noi
+- **Logo** real orizontal în header (`public/images/brand/logo-wide.webp`), desktop + mobil. Assets:
+  `brand/{logo,icon,logo-wide}.webp`. **Favicon**: `src/app/icon.png` (512) + `apple-icon.png` (180)
+  din icon-ul scut; scos `favicon.ico` vechi.
+- **Specimene noi** (de pe WP, webp, branded eGHISEUL): certificat naștere, căsătorie, celibat,
+  extras multilingv naștere. Salvate și deces/divorț/apostila-haga pentru pagini viitoare.
+
+## 7. Header — iconiță user
+Butoanele „Autentificare" + „Începe Acum" → o **iconiță user** cu dropdown (Autentificare / Creează
+cont). Economisește spațiu în header.
+
+## 8. Hero — card servicii + badge 24/7
+- Card „Servicii Disponibile" cu itemi **orizontali** (icon + nume pe o linie + badge dreapta), mai
+  lat (600px), buton „Toate Serviciile" + trust badges. Stil ca pe eghiseul.ro.
+- Badge **24/7** pe Extras CF + Certificat Constatator (servicii cu worker, eliberare automată).
+- Mega-meniu nested (Naștere/Căsătorie → Extras Multilingv, Constatator → Firmă/PF/Istoric).
