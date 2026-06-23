@@ -34,11 +34,17 @@ const serviceGroups: { title: string; items: FooterService[] }[] = [
   {
     title: 'Stare civilă',
     items: [
-      { name: 'Certificat Naștere', href: serviceUrl('certificat-nastere') },
-      { name: 'Certificat Căsătorie', href: serviceUrl('certificat-casatorie') },
+      {
+        name: 'Certificat Naștere',
+        href: serviceUrl('certificat-nastere'),
+        children: [{ name: 'Extras Multilingv', href: '/servicii/extras-multilingv-certificat-nastere/' }],
+      },
+      {
+        name: 'Certificat Căsătorie',
+        href: serviceUrl('certificat-casatorie'),
+        children: [{ name: 'Extras Multilingv', href: '/servicii/extras-multilingv-certificat-casatorie/' }],
+      },
       { name: 'Certificat Celibat', href: serviceUrl('certificat-celibat') },
-      { name: 'Extras Multilingv Naștere', href: '/servicii/extras-multilingv-certificat-nastere/' },
-      { name: 'Extras Multilingv Căsătorie', href: '/servicii/extras-multilingv-certificat-casatorie/' },
     ],
   },
   {
