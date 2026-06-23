@@ -119,7 +119,7 @@ export function Footer() {
         </div>
 
         {/* Metode de plată + ANPC — 2 coloane */}
-        <div className="mt-8 grid sm:grid-cols-2 gap-6 border-t border-white/10 pt-8">
+        <div className="mt-10 grid sm:grid-cols-2 gap-6">
           {/* Plăți */}
           <div className="text-center">
             <h3 className="text-white/80 font-semibold text-sm mb-3">Metode de plată acceptate</h3>
@@ -129,7 +129,7 @@ export function Footer() {
               alt="Metode de plată acceptate: Visa, Mastercard, Apple Pay, Google Pay"
               width={900}
               height={172}
-              className="h-7 w-auto mx-auto"
+              className="h-10 w-auto mx-auto"
               loading="lazy"
             />
           </div>
