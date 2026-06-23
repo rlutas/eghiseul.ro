@@ -37,7 +37,7 @@ const SPECIMEN_BY_SLUG: Record<string, string> = {
   'certificat-constatator': '/images/specimens/certificat-constatator.png',
   'certificat-nastere': '/images/specimens/certificat-nastere.webp',
   'certificat-casatorie': '/images/specimens/certificat-casatorie.webp',
-  'certificat-celibat': '/images/specimens/certificat-celibat.png',
+  'certificat-celibat': '/images/specimens/certificat-celibat.webp',
 };
 
 export function ServiceCard({ service }: ServiceCardProps) {
