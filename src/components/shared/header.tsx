@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { Menu, X, Phone, User, Settings, FileText, LogOut, ChevronDown, PackageSearch } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -163,18 +164,15 @@ export function Header() {
         <div className="container mx-auto px-4 lg:px-6 max-w-[1100px]">
           <div className="flex items-center justify-between h-16 xl:h-[72px]">
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-2.5 group" aria-label="eGhișeul.ro - Acasă">
-              <div className="w-10 h-10 bg-primary-500 rounded-xl flex items-center justify-center shadow-[0_4px_12px_rgba(236,185,95,0.3)] group-hover:shadow-[0_6px_16px_rgba(236,185,95,0.4)] transition-shadow">
-                <span className="text-secondary-900 font-extrabold text-base">eG</span>
-              </div>
-              <div className="flex flex-col">
-                <span className="text-xl font-extrabold text-secondary-900 leading-tight">
-                  eGhișeul<span className="text-primary-500">.ro</span>
-                </span>
-                <span className="text-[11px] text-neutral-500 font-medium tracking-wide hidden md:block">
-                  Documente online
-                </span>
-              </div>
+            <Link href="/" className="flex items-center" aria-label="eGhișeul.ro - Acasă">
+              <Image
+                src="/images/brand/logo-wide.webp"
+                alt="eGhișeul.ro"
+                width={330}
+                height={80}
+                priority
+                className="h-9 xl:h-10 w-auto"
+              />
             </Link>
 
             {/* Desktop Navigation */}
@@ -303,13 +301,8 @@ export function Header() {
                 <div className="flex flex-col h-full">
                   {/* Mobile Header */}
                   <div className="flex items-center justify-between p-5 border-b border-neutral-100 bg-neutral-50">
-                    <Link href="/" className="flex items-center gap-2" onClick={() => setIsMobileMenuOpen(false)}>
-                      <div className="w-9 h-9 bg-primary-500 rounded-xl flex items-center justify-center">
-                        <span className="text-secondary-900 font-bold text-sm">eG</span>
-                      </div>
-                      <span className="text-lg font-bold text-secondary-900">
-                        eGhișeul<span className="text-primary-500">.ro</span>
-                      </span>
+                    <Link href="/" className="flex items-center" onClick={() => setIsMobileMenuOpen(false)}>
+                      <Image src="/images/brand/logo-wide.webp" alt="eGhișeul.ro" width={330} height={80} className="h-8 w-auto" />
                     </Link>
                     <SheetClose asChild>
                       <Button
