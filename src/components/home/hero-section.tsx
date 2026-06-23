@@ -1,8 +1,7 @@
 import Link from 'next/link';
 import { serviceUrl } from '@/lib/seo';
 import { GOOGLE_REVIEWS_URL } from '@/config/contact';
-import { Button } from '@/components/ui/button';
-import { ArrowRight, Clock, Monitor, Users, Zap } from 'lucide-react';
+import { Clock, Monitor, Users } from 'lucide-react';
 
 export function HeroSection() {
   return (
@@ -46,34 +45,8 @@ export function HeroSection() {
               </p>
             </div>
 
-            {/* Primary CTA — visible above the fold (esp. mobile, where the
-                services card stacks below). Scrolls to the services list. */}
-            <div className="mt-6 flex justify-center lg:justify-start">
-              <Button
-                asChild
-                size="lg"
-                className="bg-primary-500 hover:bg-primary-600 text-secondary-900 font-bold px-7 py-6 text-base rounded-xl shadow-[0_6px_14px_rgba(236,185,95,0.35)] hover:-translate-y-0.5 transition-all duration-200"
-              >
-                <Link href="#servicii">
-                  Vezi serviciile și comandă
-                  <ArrowRight className="ml-1.5 h-5 w-5" aria-hidden="true" />
-                </Link>
-              </Button>
-            </div>
-
-            {/* Servicii instant — eliberare automată 24/7 */}
-            <div className="mt-5 flex justify-center lg:justify-start">
-              <span className="inline-flex items-center gap-2 rounded-full bg-primary-500/10 ring-1 ring-primary-500/30 px-4 py-2 text-xs sm:text-sm text-white/90">
-                <Zap className="h-4 w-4 text-primary-500 flex-shrink-0" aria-hidden="true" />
-                <span>
-                  <strong className="text-primary-500">Extras carte funciară</strong> și{' '}
-                  <strong className="text-primary-500">certificat constatator</strong> — eliberare automată, 24/7
-                </span>
-              </span>
-            </div>
-
             {/* Google Reviews Badge — links to the real Google Business Profile */}
-            <div className="mt-5 sm:mt-6 flex justify-center lg:justify-start">
+            <div className="mt-6 sm:mt-8 flex justify-center lg:justify-start">
               <a
                 href={GOOGLE_REVIEWS_URL}
                 target="_blank"
@@ -145,7 +118,9 @@ export function HeroSection() {
                         className={`text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wide ${
                           service.badge === 'Popular'
                             ? 'bg-primary-500 text-secondary-900'
-                            : 'bg-success-500 text-white'
+                            : service.badge === 'NOU'
+                              ? 'bg-success-500 text-white'
+                              : 'bg-secondary-900 text-white'
                         }`}
                       >
                         {service.badge}
@@ -199,7 +174,7 @@ interface ServiceItem {
   name: string;
   slug: string;
   icon: LucideIcon;
-  badge?: 'Popular' | 'NOU';
+  badge?: 'Popular' | 'NOU' | '24/7';
   /** Optional explicit URL (for non-service pages like the rovinietă tool). */
   href?: string;
 }
@@ -213,6 +188,6 @@ const services: ServiceItem[] = [
   { name: 'Certificat Naștere', slug: 'certificat-nastere', icon: User, badge: 'Popular' },
   { name: 'Certificat Căsătorie', slug: 'certificat-casatorie', icon: Heart },
   { name: 'Certificat Celibat', slug: 'certificat-celibat', icon: CheckCircle, badge: 'Popular' },
-  { name: 'Extras Carte Funciară', slug: 'extras-carte-funciara', icon: Building },
-  { name: 'Certificat Constatator', slug: 'certificat-constatator', icon: Building },
+  { name: 'Extras Carte Funciară', slug: 'extras-carte-funciara', icon: Building, badge: '24/7' },
+  { name: 'Certificat Constatator', slug: 'certificat-constatator', icon: Building, badge: '24/7' },
 ];
