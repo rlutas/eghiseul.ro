@@ -43,14 +43,14 @@ export default function HomePage() {
       {/* 6. Use Cases - When you need us */}
       <UseCasesSection />
 
-      {/* 7. FAQ */}
+      {/* 7. Final CTA — deasupra FAQ */}
+      <FinalCTASection />
+
+      {/* 8. FAQ */}
       <FAQSection />
 
-      {/* 10. Ghiduri & articole recente (parity cu site-ul WP + internal linking) */}
+      {/* 9. Ghiduri & articole recente (parity cu site-ul WP + internal linking) */}
       <ArticlesSection />
-
-      {/* 11. Final CTA */}
-      <FinalCTASection />
 
       {/* Footer */}
       <Footer />
