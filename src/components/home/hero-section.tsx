@@ -95,7 +95,7 @@ export function HeroSection() {
           </div>
 
           {/* Right Column - Services Box */}
-          <div className="bg-white rounded-2xl p-5 sm:p-7 w-full max-w-[480px] shadow-2xl">
+          <div className="bg-white rounded-2xl p-5 sm:p-7 w-full max-w-[560px] shadow-2xl">
             <h2 className="text-base sm:text-lg font-bold text-secondary-900 text-center mb-4 sm:mb-5">
               Servicii Disponibile
             </h2>
@@ -106,31 +106,27 @@ export function HeroSection() {
                 <Link
                   key={service.slug}
                   href={service.href ?? serviceUrl(service.slug)}
-                  className="group relative flex flex-col p-3 sm:p-3.5 bg-neutral-50 rounded-xl border border-transparent hover:border-primary-500 hover:bg-white hover:shadow-md transition-all min-h-[72px] sm:min-h-[80px]"
+                  className="group flex items-center gap-2.5 p-2.5 sm:p-3 bg-neutral-50 rounded-xl border border-transparent hover:border-primary-500 hover:bg-white hover:shadow-md transition-all"
                 >
-                  {/* Top row: Icon + Badge */}
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="w-8 h-8 sm:w-9 sm:h-9 bg-primary-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <service.icon className="w-4 h-4 sm:w-[18px] sm:h-[18px] text-primary-600" />
-                    </div>
-                    {service.badge && (
-                      <span
-                        className={`text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wide ${
-                          service.badge === 'Popular'
-                            ? 'bg-primary-500 text-secondary-900'
-                            : service.badge === 'NOU'
-                              ? 'bg-success-500 text-white'
-                              : 'bg-secondary-900 text-white'
-                        }`}
-                      >
-                        {service.badge}
-                      </span>
-                    )}
+                  <div className="w-8 h-8 sm:w-9 sm:h-9 bg-primary-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <service.icon className="w-4 h-4 sm:w-[18px] sm:h-[18px] text-primary-600" />
                   </div>
-                  {/* Service name */}
-                  <span className="text-xs sm:text-[13px] font-semibold text-secondary-900 leading-tight group-hover:text-secondary-900">
+                  <span className="flex-1 min-w-0 text-xs sm:text-[13px] font-semibold text-secondary-900 leading-tight">
                     {service.name}
                   </span>
+                  {service.badge && (
+                    <span
+                      className={`flex-shrink-0 text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wide ${
+                        service.badge === 'Popular'
+                          ? 'bg-primary-500 text-secondary-900'
+                          : service.badge === 'NOU'
+                            ? 'bg-success-500 text-white'
+                            : 'bg-secondary-900 text-white'
+                      }`}
+                    >
+                      {service.badge}
+                    </span>
+                  )}
                 </Link>
               ))}
             </div>
