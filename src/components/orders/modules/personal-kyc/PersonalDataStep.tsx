@@ -1720,6 +1720,28 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
             </div>
           </div>
         )}
+
+        {/* Nume Anterior — optional, only if service collects it */}
+        {config?.collectBirthName && (
+          <div className="pt-4 border-t">
+            <div className="space-y-2">
+              <Label htmlFor="birthName" className="text-secondary-900 font-medium">
+                Nume Anterior <span className="text-neutral-400 font-normal">(opțional)</span>
+              </Label>
+              <Input
+                id="birthName"
+                type="text"
+                value={personalKyc.birthName || ''}
+                onChange={(e) => updatePersonalKyc({ birthName: e.target.value })}
+                placeholder="Numele de naștere / dinaintea căsătoriei (dacă diferă)"
+                className="bg-white placeholder:text-neutral-400"
+              />
+              <p className="text-xs text-neutral-500">
+                Completează doar dacă ți-ai schimbat numele (ex. după căsătorie).
+              </p>
+            </div>
+          </div>
+        )}
       </div>
       )}
       {/* /Personal Info Section */}

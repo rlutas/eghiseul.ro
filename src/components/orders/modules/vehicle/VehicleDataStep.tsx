@@ -120,6 +120,7 @@ export default function VehicleDataStep({ config, onValidChange }: VehicleDataSt
 
     // Check required fields based on config
     if (config.fields.plateNumber.required && !vehicle.plateNumber) return false;
+    if (config.fields.drivingLicense?.required && !vehicle.drivingLicense) return false;
     if (config.fields.vin.required && !vehicle.vin) return false;
     if (config.fields.category.required && !vehicle.category) return false;
     if (config.fields.period.required && !vehicle.period) return false;
@@ -181,28 +182,49 @@ export default function VehicleDataStep({ config, onValidChange }: VehicleDataSt
         </CardHeader>
         <CardContent className="space-y-4">
           {/* Plate Number */}
-          <div className="space-y-2">
-            <Label htmlFor="plateNumber">
-              Număr de Înmatriculare {config.fields.plateNumber.required && <span className="text-red-500">*</span>}
-            </Label>
-            <Input
-              id="plateNumber"
-              type="text"
-              value={vehicle.plateNumber}
-              onChange={(e) => handlePlateChange(e.target.value)}
-              placeholder="B 123 ABC"
-              className={plateError ? 'border-red-500' : ''}
-            />
-            {plateError && (
-              <p className="text-sm text-red-500">{plateError}</p>
-            )}
-            {vehicle.plateNumber && !plateError && validatePlate(vehicle.plateNumber) && (
-              <p className="text-sm text-green-600 flex items-center gap-1">
-                <CheckCircle className="h-3 w-3" />
-                Format valid
+          {config.fields.plateNumber.required && (
+            <div className="space-y-2">
+              <Label htmlFor="plateNumber">
+                Număr de Înmatriculare <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                id="plateNumber"
+                type="text"
+                value={vehicle.plateNumber}
+                onChange={(e) => handlePlateChange(e.target.value)}
+                placeholder="B 123 ABC"
+                className={plateError ? 'border-red-500' : ''}
+              />
+              {plateError && (
+                <p className="text-sm text-red-500">{plateError}</p>
+              )}
+              {vehicle.plateNumber && !plateError && validatePlate(vehicle.plateNumber) && (
+                <p className="text-sm text-green-600 flex items-center gap-1">
+                  <CheckCircle className="h-3 w-3" />
+                  Format valid
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* Driving Licence Number (cazier auto = driver record by permit) */}
+          {config.fields.drivingLicense?.required && (
+            <div className="space-y-2">
+              <Label htmlFor="drivingLicense">
+                Numărul Permisului de Conducere <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                id="drivingLicense"
+                type="text"
+                value={vehicle.drivingLicense || ''}
+                onChange={(e) => updateVehicle?.({ drivingLicense: e.target.value.toUpperCase() })}
+                placeholder="ex. 123456789"
+              />
+              <p className="text-xs text-muted-foreground">
+                Îl găsești pe permisul de conducere (rubrica 5).
               </p>
-            )}
-          </div>
+            </div>
+          )}
 
           {/* VIN */}
           {(config.fields.vin.required || config.vinValidation) && (

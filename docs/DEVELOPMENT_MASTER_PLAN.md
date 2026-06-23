@@ -651,6 +651,23 @@ Features planned but not yet scheduled for a specific sprint.
 
 **Scope:** Store `stripe_payment_intent_id` on orders (already partially done via webhook), expose in admin UI, optional reconciliation page in `/admin/accounting` or `/admin/settings`, CSV export.
 
+#### Certificat Constatator — filtrare "scop" pe tip raport
+
+**Problem:** Lista "Document solicitat spre a servi la" (purposes) din wizardul constatatorului e GLOBALĂ — toate scopurile sunt oferite indiferent de `documentType` (firma / pf / istoric) + report type. Utilizatorul poate alege combinații invalide (ex. firma/de bază + "Birou Notar"), care ajung la worker și escaladează la `NEEDS_OPERATOR` în loc de auto-routing. Descoperit la auditul WPForms (2026-06-23).
+
+**Requirements:**
+- Purpose-urile filtrate per `documentType` + `reportType` (structura `ConstatatorReportType.purposes` există deja în tip, dar DB nu e populat complet)
+- Migrația 062 a intenționat asta dar e incompletă — de finalizat
+- ⚠️ Atinge logica worker-ului ONRC (`buildStep4Doc`) — de validat cu dry-run, NU schimba botul orb (vezi [[onrc-constatator-status]])
+
+**Scope:** Completare DB `verification_config.constatator.documentTypes[].reportTypes[].purposes`, filtrare în wizard step, validare worker.
+
+#### Extras Multilingv (add-on naștere/căsătorie)
+
+**Problem:** WPForms avea formulare separate "Extras Multilingv Certificat Naștere/Căsătorie" (10176/10274). În wizardul nostru lipsește opțiunea add-on de extras multilingv pentru naștere/căsătorie. Deferred de la auditul civil-status (2026-06-18) și confirmat la auditul complet (2026-06-23).
+
+**Scope:** Adăugare `service_option` (extras multilingv) pe certificat-nastere + certificat-casatorie cu preț + procesare.
+
 ---
 
 ## STRUCTURĂ PROIECT ACTUALĂ

@@ -72,6 +72,11 @@ export interface PersonalKYCConfig {
     enabled: boolean;
     condition?: string;  // e.g., "applicant_type == 'minor'"
   };
+
+  // Optional "Nume Anterior" (name at birth / before marriage). When true, an
+  // optional text field is shown in the personal-data step. Used by cazier
+  // judiciar for applicants who changed their name. undefined/false → hidden.
+  collectBirthName?: boolean;
 }
 
 export interface CitizenshipFlowConfig {
@@ -152,6 +157,10 @@ export interface VehicleVerificationConfig {
     year: { required: boolean };
     category: { required: boolean };  // For rovinieta
     period: { required: boolean };    // For rovinieta
+    // Driving-licence number. Cazier auto = the driver's record (sanctions /
+    // points), keyed by permit number, not the vehicle plate. Optional key so
+    // services that don't collect it (rovinieta, etc.) need not declare it.
+    drivingLicense?: { required: boolean };
   };
 
   // Validation
@@ -349,6 +358,10 @@ export interface PersonalKYCState {
   fatherName?: string;
   motherName?: string;
 
+  // Nume anterior (la naștere / dinaintea căsătoriei) — optional, gated by
+  // PersonalKYCConfig.collectBirthName.
+  birthName?: string;
+
   // Uploaded documents
   uploadedDocuments: UploadedDocumentState[];
 
@@ -485,6 +498,7 @@ export interface PropertyState {
  */
 export interface VehicleState {
   plateNumber: string;
+  drivingLicense?: string;  // Numărul permisului de conducere (cazier auto)
   vin?: string;
   brand?: string;
   model?: string;
