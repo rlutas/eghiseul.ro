@@ -73,7 +73,7 @@ export function Footer() {
                 alt="Metode de plată acceptate: Visa, Mastercard, Apple Pay, Google Pay"
                 width={900}
                 height={172}
-                className="h-8 w-auto"
+                className="h-11 w-auto"
                 loading="lazy"
               />
             </div>
@@ -119,18 +119,6 @@ export function Footer() {
             </ul>
           </div>
         </div>
-
-        {/* ANPC — linie nouă după Contact */}
-        <div className="mt-8 flex flex-wrap items-center gap-3 md:justify-end">
-          <a href="https://anpc.ro/ce-este-sal/" target="_blank" rel="nofollow noopener" aria-label="ANPC — Soluționarea Alternativă a Litigiilor">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/images/footer/anpc-sal.svg" alt="ANPC SAL — Soluționarea Alternativă a Litigiilor" width={250} height={50} className="h-9 w-auto rounded" loading="lazy" />
-          </a>
-          <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="nofollow noopener" aria-label="ANPC — Soluționarea Online a Litigiilor (UE)">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/images/footer/anpc-sol.svg" alt="ANPC SOL — Soluționarea Online a Litigiilor" width={250} height={50} className="h-9 w-auto rounded" loading="lazy" />
-          </a>
-        </div>
       </div>
 
       {/* Bottom bar */}
@@ -154,12 +142,27 @@ export function Footer() {
             </div>
           </div>
 
-          {/* Copyright + firmă + disclaimer */}
+          {/* Copyright + firmă (stânga) + ANPC (dreapta) */}
           <div className="border-t border-white/10 pt-5">
-            <p className="text-white/60 text-sm">© {new Date().getFullYear()} eGhișeul.ro. Toate drepturile rezervate.</p>
-            <p className="text-white/40 text-[11px] mt-1">
-              eDigitalizare SRL · CUI RO49278701 · Reg. Com. J2023001097301 · Jud. Satu Mare, Com. Odoreu, Str. Salcâmilor nr. 2
-            </p>
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div>
+                <p className="text-white/60 text-sm">© {new Date().getFullYear()} eGhișeul.ro. Toate drepturile rezervate.</p>
+                <p className="text-white/40 text-[11px] mt-1">
+                  eDigitalizare SRL · CUI RO49278701 · Reg. Com. J2023001097301 · Jud. Satu Mare, Com. Odoreu, Str. Salcâmilor nr. 2
+                </p>
+              </div>
+              {/* Badge-uri ANPC — dreapta, sub recenzii */}
+              <div className="flex items-center gap-3 flex-shrink-0">
+                <a href="https://anpc.ro/ce-este-sal/" target="_blank" rel="nofollow noopener" aria-label="ANPC — Soluționarea Alternativă a Litigiilor">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src="/images/footer/anpc-sal.svg" alt="ANPC SAL — Soluționarea Alternativă a Litigiilor" width={250} height={50} className="h-9 w-auto rounded" loading="lazy" />
+                </a>
+                <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="nofollow noopener" aria-label="ANPC — Soluționarea Online a Litigiilor (UE)">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src="/images/footer/anpc-sol.svg" alt="ANPC SOL — Soluționarea Online a Litigiilor" width={250} height={50} className="h-9 w-auto rounded" loading="lazy" />
+                </a>
+              </div>
+            </div>
             <p className="text-white/40 text-[11px] leading-relaxed mt-4">
               eGhișeul.ro este un serviciu privat de asistență la obținerea de documente. Nu suntem o instituție de
               stat și nu suntem afiliați cu vreun organ guvernamental. Documentele sunt emise exclusiv de
