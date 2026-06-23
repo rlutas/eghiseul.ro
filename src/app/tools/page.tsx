@@ -125,7 +125,7 @@ export default function ToolsPage() {
             </p>
             <p className="text-neutral-700 leading-relaxed">
               Toate instrumentele sunt gratuite, nu necesită cont și folosesc date oficiale și formule la zi. Dacă ai
-              nevoie să obții un <Link href="/servicii/" className="text-primary-700 font-medium underline">document oficial</Link>,
+              nevoie să obții un <Link href="/servicii/" className="text-primary-700 font-medium underline">document</Link>,
               îți gestionăm întreaga procedură 100% online.
             </p>
           </div>

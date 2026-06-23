@@ -81,7 +81,7 @@ export default function Page() {
       <p>
         Un act notarial care implică o firmă trebuie semnat de <strong>persoana îndreptățită</strong>{' '}
         — administratorul sau asociatul cu putere de reprezentare. Notarul nu poate presupune cine
-        deține aceste calități; el le verifică pe baza unui document oficial emis de{' '}
+        deține aceste calități; el le verifică pe baza unui document emis de{' '}
         <strong>Oficiul Național al Registrului Comerțului (ONRC)</strong>. Certificatul constatator
         este exact acel document: confirmă, la zi, cine sunt asociații, cine este administrator și
         cine are dreptul să semneze obligații în numele societății.

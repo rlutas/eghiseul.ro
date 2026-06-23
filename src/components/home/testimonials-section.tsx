@@ -28,7 +28,7 @@ export function TestimonialsSection() {
           <p className="text-sm font-bold uppercase tracking-wider text-primary-500 mb-3">Recenzii clienți</p>
           <h2 className="text-3xl lg:text-[2.25rem] font-extrabold text-white leading-tight mb-4">Ce spun clienții noștri</h2>
           <p className="text-lg text-white/70 leading-relaxed max-w-[600px] mx-auto">
-            Peste 150.000 de români ne-au acordat încrederea pentru obținerea documentelor oficiale. Iată ce spun
+            Peste 150.000 de români ne-au acordat încrederea pentru obținerea documentelor. Iată ce spun
             despre experiența lor.
           </p>
 

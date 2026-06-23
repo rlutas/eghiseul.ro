@@ -39,7 +39,7 @@ export default function Page() {
         {
           slug: 'cazier-judiciar',
           label: 'Cazier Judiciar Online',
-          desc: 'Document oficial IGPR, livrat rapid.',
+          desc: 'Document IGPR, livrat rapid.',
         },
       ]}
       faqs={[

@@ -96,7 +96,7 @@ export function ServiceCard({ service }: ServiceCardProps) {
 
         {/* Description */}
         <p className="text-neutral-600 text-sm leading-relaxed line-clamp-3">
-          {service.short_description || service.description || 'Document oficial disponibil pentru comandă online.'}
+          {service.short_description || service.description || 'Document disponibil pentru comandă online.'}
         </p>
 
         {/* Metadata Grid */}

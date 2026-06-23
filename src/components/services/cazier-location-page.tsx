@@ -261,7 +261,7 @@ export function CazierLocationPage({ city, otherCities }: { city: CityData; othe
             </h2>
             <div className="space-y-4 text-neutral-700 leading-relaxed">
               <p>
-                Cazierul judiciar este documentul oficial care atestă dacă o persoană are sau nu
+                Cazierul judiciar este documentul care atestă dacă o persoană are sau nu
                 antecedente penale. Este eliberat de <strong>Poliția Română</strong> (Inspectoratul de
                 Poliție Județean — IPJ {city.judet}, parte din IGPR) și are aceeași valoare legală
                 indiferent dacă îl obții la ghișeu sau online prin împuternicire.

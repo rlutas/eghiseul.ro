@@ -24,7 +24,7 @@ export function HeroSection() {
           {/* Left Column - Text */}
           <div className="flex-1 min-w-[280px] max-w-[680px] text-center lg:text-left px-1 sm:px-0">
             <h1 className="text-2xl font-extrabold tracking-tight text-white sm:text-3xl lg:text-5xl leading-[1.2]">
-              Cazier Judiciar și Documente Oficiale Online –{' '}
+              Cazier Judiciar și Documente Online –{' '}
               <span className="text-primary-500">Prin Avocat, Fără Cozi, Livrare 24-48h</span>
             </h1>
 
@@ -41,7 +41,7 @@ export function HeroSection() {
               <p className="text-white/95 text-xs sm:text-sm leading-relaxed">
                 <strong className="text-primary-500">Peste 200.000 de proceduri</strong>{' '}
                 gestionate cu succes. Tu completezi formularul online, avocatul colaborator
-                depune cererea la autorități, iar documentul oficial ajunge la tine –
+                depune cererea la autorități, iar documentul ajunge la tine –
                 prin curier sau pe email.
               </p>
             </div>

@@ -39,7 +39,7 @@ export function Footer() {
               </div>
             </Link>
             <p className="text-sm sm:text-base text-white/70 leading-relaxed">
-              Platforma digitală pentru obținerea documentelor oficiale românești, rapid și legal.
+              Platforma digitală pentru obținerea documentelor românești, rapid și legal.
               Procesăm peste 200.000 de documente anual.
             </p>
             <div className="flex flex-wrap gap-2 sm:gap-3 pt-2">
@@ -133,7 +133,7 @@ export function Footer() {
         <div className="container mx-auto px-4 py-5 sm:py-6 max-w-[1100px]">
           {/* Legal disclaimer — private platform, not a state institution */}
           <p className="text-white/40 text-[11px] sm:text-xs leading-relaxed text-center md:text-left mb-4 pb-4 border-b border-white/10">
-            eGhișeul.ro este un serviciu privat de asistență la obținerea de documente oficiale.
+            eGhișeul.ro este un serviciu privat de asistență la obținerea de documente.
             Nu suntem o instituție de stat și nu suntem afiliați cu vreun organ guvernamental.
             Documentele sunt emise exclusiv de autoritățile competente din România, iar procedurile
             sunt gestionate de un avocat colaborator înscris în Barou.

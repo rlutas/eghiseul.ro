@@ -269,7 +269,7 @@ export default async function CertificatIntegritatePage() {
                       </div>
                       <div className="flex items-center gap-1 text-neutral-500">
                         <CheckCircle className="h-4 w-4" aria-hidden="true" />
-                        <span className="text-xs">Document oficial</span>
+                        <span className="text-xs">Document</span>
                       </div>
                     </div>
 
@@ -286,7 +286,7 @@ export default async function CertificatIntegritatePage() {
           <div className="container mx-auto px-4 max-w-[1100px] py-6 lg:py-8">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
               {[
-                { icon: Landmark, value: 'IGPR', label: 'Document oficial al Poliției' },
+                { icon: Landmark, value: 'IGPR', label: 'Document al Poliției' },
                 { icon: Clock, value: formatEstimatedDays(service), label: 'Livrare estimată' },
                 { icon: Mail, value: 'Pe email', label: 'PDF semnat electronic' },
                 { icon: CheckCircle, value: '4.9/5', label: 'Peste 450 recenzii' },
@@ -311,7 +311,7 @@ export default async function CertificatIntegritatePage() {
             </h2>
             <div className="space-y-4 text-neutral-700 leading-relaxed">
               <p>
-                <strong>Certificatul de integritate comportamentala</strong> este documentul oficial eliberat de
+                <strong>Certificatul de integritate comportamentala</strong> este documentul eliberat de
                 Inspectoratul General al Poliției Române (<strong>IGPR</strong>), introdus prin
                 <strong> Legea 118/2019</strong>. El atestă faptul că persoana <strong>nu a fost condamnată sau
                 sancționată</strong> pentru infracțiuni săvârșite asupra unor categorii de persoane vulnerabile,
@@ -504,7 +504,7 @@ export default async function CertificatIntegritatePage() {
               {/* Why it's official + legally valid */}
               <div>
                 <h3 className="text-xl lg:text-2xl font-bold text-secondary-900 mb-3">
-                  Un document oficial, valabil legal
+                  Un document, valabil legal
                 </h3>
                 <p className="text-neutral-600 leading-relaxed mb-6">
                   Certificatul pe care îl primești este <strong>identic cu cel eliberat la ghișeul IGPR</strong> —
@@ -606,7 +606,7 @@ export default async function CertificatIntegritatePage() {
               <p className="text-sm text-neutral-700 leading-relaxed">
                 Unele instituții sau angajatori folosesc denumirea de{' '}
                 <strong>„adeverință de integritate comportamentală”</strong> — este vorba despre <strong>același
-                document oficial</strong> emis de IGPR conform Legii 118/2019. Indiferent de denumirea cerută în
+                document</strong> emis de IGPR conform Legii 118/2019. Indiferent de denumirea cerută în
                 dosar, certificatul obținut prin eGhișeul este documentul valabil legal.
               </p>
             </div>
@@ -617,7 +617,7 @@ export default async function CertificatIntegritatePage() {
         <ServiceFAQ
           title="Întrebări Frecvente — Certificat de Integritate Comportamentală"
           faqs={[
-            { q: 'Ce este certificatul de integritate comportamentală?', a: 'Este documentul oficial eliberat de IGPR (Poliția Română) care atestă că persoana nu a fost sancționată pentru infracțiuni împotriva unor categorii vulnerabile, în special minori. A fost introdus prin Legea 118/2019.' },
+            { q: 'Ce este certificatul de integritate comportamentală?', a: 'Este documentul eliberat de IGPR (Poliția Română) care atestă că persoana nu a fost sancționată pentru infracțiuni împotriva unor categorii vulnerabile, în special minori. A fost introdus prin Legea 118/2019.' },
             { q: 'Care este diferența față de cazierul judiciar?', a: 'Nu sunt același document. Cazierul judiciar arată toate condamnările penale, pe când certificatul de integritate comportamentală are un scop mult mai restrâns — atestă strict lipsa sancțiunilor pentru infracțiuni asupra minorilor și a persoanelor vulnerabile.' },
             { q: 'Când este obligatoriu?', a: 'Conform Legii 118/2019, este cerut la angajarea în roluri care presupun contact direct cu minori sau cu persoane vulnerabile: școli, creșe, after-school, cluburi sportive de copii, voluntariat și medii sensibile precum cel medical sau social.' },
             { q: 'Cât durează eliberarea?', a: `${formatEstimatedDays(service)} în mod standard. Există și opțiunea Urgent, în ${formatUrgentDays(service)}.` },
@@ -626,7 +626,7 @@ export default async function CertificatIntegritatePage() {
             { q: 'Pot obține certificatul de integritate comportamentală online, fără să merg la Poliție?', a: 'Da. Întregul proces este online: completezi formularul, faci verificarea de identitate și plătești, iar noi depunem cererea la IGPR. Primești certificatul pe email, fără deplasare și fără cont pe platforma oficială.' },
             { q: 'Certificatul de integritate comportamentală este gratuit?', a: 'Nu. IGPR percepe o taxă oficială pentru eliberare. Prin eGhișeul plătești prețul afișat, cu taxa oficială inclusă, fără costuri suplimentare.' },
             { q: 'Pot obține certificatul în Cluj, București sau alt oraș?', a: 'Da. Pentru că serviciul este 100% online, îl poți obține din orice județ — București, Cluj, Iași, Timișoara, Constanța sau oriunde te afli — fără să te deplasezi la un sediu IGPR local.' },
-            { q: '„Adeverința de integritate comportamentală” este același lucru cu certificatul?', a: 'Da. Unele instituții folosesc denumirea de adeverință, dar se referă la același document oficial emis de IGPR conform Legii 118/2019.' },
+            { q: '„Adeverința de integritate comportamentală” este același lucru cu certificatul?', a: 'Da. Unele instituții folosesc denumirea de adeverință, dar se referă la același document emis de IGPR conform Legii 118/2019.' },
             { q: 'Cum primesc documentul?', a: 'Pe email, ca PDF semnat electronic de IGPR. La cerere, certificatul poate fi livrat și prin curier.' },
           ]}
         />

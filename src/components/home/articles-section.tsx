@@ -12,7 +12,7 @@ export function ArticlesSection() {
   const articles = ARTICLES.slice(0, 3);
 
   return (
-    <section className="py-16 lg:py-24 bg-white">
+    <section className="py-16 lg:py-24 bg-neutral-50">
       <div className="container mx-auto px-4 max-w-[1100px]">
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-10">
           <div>
@@ -23,7 +23,7 @@ export function ArticlesSection() {
               Ghiduri și articole recente
             </h2>
             <p className="text-neutral-600 mt-2 max-w-xl">
-              Răspunsuri clare la întrebările frecvente despre documentele oficiale și procedurile administrative.
+              Răspunsuri clare la întrebările frecvente despre documentele și procedurile administrative.
             </p>
           </div>
           <Link

@@ -222,7 +222,7 @@ export default function Page() {
         Regulamentul nr. 6/2018), aplicabil tuturor instituțiilor de credit din România. Înainte de a
         depune dosarul, verifică-ți și salariul net cu{' '}
         <Link href="/calculator/salariu/">calculatorul de salariu net/brut</Link>, iar dacă ai nevoie
-        de documente oficiale pentru bancă, vezi{' '}
+        de documente pentru bancă, vezi{' '}
         <Link href="/servicii/">serviciile eGhișeul</Link>.
       </p>
 

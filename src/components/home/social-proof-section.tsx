@@ -30,7 +30,7 @@ const stats = [
 const trustBadges = [
   { icon: Shield, label: 'SSL Securizat' },
   { icon: Award, label: 'GDPR Compliant' },
-  { icon: FileText, label: 'Documente Oficiale' },
+  { icon: FileText, label: 'Documente' },
 ];
 
 export function SocialProofSection() {

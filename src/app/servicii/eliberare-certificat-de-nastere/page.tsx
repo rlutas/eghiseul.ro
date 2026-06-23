@@ -250,7 +250,7 @@ export default async function CertificatNasterePage() {
                       </div>
                       <div className="flex items-center gap-1 text-neutral-500">
                         <CheckCircle className="h-4 w-4" />
-                        <span className="text-xs">Document oficial</span>
+                        <span className="text-xs">Document</span>
                       </div>
                     </div>
 
@@ -292,7 +292,7 @@ export default async function CertificatNasterePage() {
             </h2>
             <div className="space-y-4 text-neutral-700 leading-relaxed">
               <p>
-                <strong>Certificatul de naștere</strong> este actul oficial care atestă identitatea, data și locul
+                <strong>Certificatul de naștere</strong> este actul care atestă identitatea, data și locul
                 nașterii unei persoane. Dacă ai pierdut documentul original, ai nevoie de un <strong>duplicat
                 certificat de naștere</strong> sau de o copie legalizată pentru un dosar, le poți obține rapid
                 prin eGhișeul. Solicitarea de <strong>certificat de naștere online</strong> înseamnă că nu mai
@@ -403,7 +403,7 @@ export default async function CertificatNasterePage() {
                 ))}
               </div>
               <p className="text-sm text-neutral-600 text-center mt-6 max-w-2xl mx-auto">
-                Duplicatul este un document oficial emis de Starea Civilă și se livrează prin curier în zile
+                Duplicatul este un document emis de Starea Civilă și se livrează prin curier în zile
                 lucrătoare — nu este un document generat instant. Pentru autoritățile din străinătate există și{' '}
                 <strong>extrasul multilingv de pe certificatul de naștere</strong>, recunoscut în UE fără traducere.
                 Ai nevoie și de un{' '}
@@ -536,7 +536,7 @@ export default async function CertificatNasterePage() {
               {/* Why it's an official, legally valid document */}
               <div>
                 <h3 className="text-xl lg:text-2xl font-bold text-secondary-900 mb-3">
-                  Un document oficial, valabil legal
+                  Un document, valabil legal
                 </h3>
                 <p className="text-neutral-600 leading-relaxed mb-6">
                   Duplicatul certificatului de naștere este <strong>identic cu cel eliberat la ghișeul Stării
@@ -660,7 +660,7 @@ export default async function CertificatNasterePage() {
         <ServiceFAQ
           title="Întrebări Frecvente — Certificat de Naștere"
           faqs={[
-            { q: 'Ce este certificatul de naștere?', a: 'Este actul oficial de stare civilă care atestă identitatea, data și locul nașterii unei persoane, precum și numele părinților. Se eliberează de Serviciul de Stare Civilă din localitatea unde a fost înregistrată nașterea.' },
+            { q: 'Ce este certificatul de naștere?', a: 'Este actul de stare civilă care atestă identitatea, data și locul nașterii unei persoane, precum și numele părinților. Se eliberează de Serviciul de Stare Civilă din localitatea unde a fost înregistrată nașterea.' },
             { q: 'Care e diferența dintre duplicat și copie legalizată?', a: 'Duplicatul este un certificat de naștere nou, original, emis de Starea Civilă atunci când ai pierdut sau ai deteriorat documentul. Copia legalizată este o fotocopie certificată conform cu originalul de un notar. Pentru cele mai multe dosare se cere duplicatul (originalul).' },
             { q: 'Cum obțin un certificat de naștere pierdut?', a: 'Soliciți un duplicat de la Starea Civilă din localitatea de naștere. Prin eGhișeul completezi datele online, noi depunem cererea și plătim taxele, iar tu primești noul certificat fără să te deplasezi.' },
             { q: 'Pot obține certificatul din altă localitate sau din străinătate?', a: 'Da. Certificatul se eliberează de primăria din localitatea de naștere, dar nu trebuie să mergi acolo. Depunem cererea prin împuternicire în numele tău, util mai ales pentru românii din diaspora.' },

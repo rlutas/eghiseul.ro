@@ -77,7 +77,7 @@ export function WhyUsSection() {
               <p className="text-sm font-bold uppercase tracking-wider text-primary-500">De ce să ne alegi</p>
             </div>
             <h2 className="text-3xl lg:text-[2.4rem] font-extrabold text-secondary-900 leading-[1.15] mb-5">
-              Expertiză și încredere în obținerea documentelor oficiale
+              Expertiză și încredere în obținerea documentelor
             </h2>
             <p className="text-base lg:text-[17px] leading-relaxed text-neutral-600 mb-8">
               Din 2023, oferim asistență profesională românilor din țară și din diaspora. Avocatul nostru colaborator,

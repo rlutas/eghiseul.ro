@@ -256,7 +256,7 @@ export default function Page() {
         Dacă vrei să compari rapid două sume sau să afli ponderea unei valori dintr-un total, poți
         reveni oricând la{' '}
         <Link href="/calculator/calculator-procente/">calculatorul de procente</Link> de mai sus.
-        Iar dacă ai nevoie de un document oficial precum cazierul judiciar, îl poți obține online
+        Iar dacă ai nevoie de un document precum cazierul judiciar, îl poți obține online
         prin <Link href="/servicii/cazier-judiciar-online/">serviciul de cazier judiciar</Link>.
       </p>
     </CalculatorLayout>

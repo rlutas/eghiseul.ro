@@ -41,7 +41,7 @@ const SCHEMA_SLUG = 'cazier-judiciar-online/persoana-fizica';
 const TITLE = 'Cazier Judiciar Persoană Fizică Online — 198 RON';
 const DESCRIPTION =
   'Obține cazierul judiciar pentru persoană fizică 100% online, fără drum la ghișeu. ' +
-  '198 RON, livrare în 2-4 zile pe email. Document oficial de la Poliția Română, ' +
+  '198 RON, livrare în 2-4 zile pe email. Document de la Poliția Română, ' +
   'valabil pentru angajare, emigrare, adopție și proceduri legale.';
 const DATE_PUBLISHED = '2026-04-16';
 const DATE_MODIFIED = '2026-06-13';
@@ -227,7 +227,7 @@ export default async function CazierJudiciarPFPage() {
                 {/* SEO Content Box */}
                 <div className="bg-white/10 backdrop-blur-sm rounded-xl p-5 border border-white/20 mb-6">
                   <p className="text-white/90 leading-relaxed text-sm sm:text-base">
-                    <strong className="text-primary-500">Cazierul Judiciar</strong> este documentul oficial
+                    <strong className="text-primary-500">Cazierul Judiciar</strong> este documentul
                     care atestă că nu ai antecedente penale. Avocatul nostru colaborator, înscris în Barou,
                     depune cererea la IGPR și coordonează procedura legală în numele tău:
                   </p>
@@ -363,7 +363,7 @@ export default async function CazierJudiciarPFPage() {
             </h2>
             <div className="space-y-4 text-neutral-700 leading-relaxed">
               <p>
-                <strong>Cazierul judiciar pentru persoană fizică</strong> este documentul oficial emis de
+                <strong>Cazierul judiciar pentru persoană fizică</strong> este documentul emis de
                 Inspectoratul General al Poliției Române (conform Legii 290/2004) care atestă dacă o persoană
                 are sau nu antecedente penale. Este cerut frecvent la angajare în România și în străinătate,
                 pentru obținerea unei vize de muncă, pentru adopție, tutelă, permis de port-armă sau alte
@@ -414,7 +414,7 @@ export default async function CazierJudiciarPFPage() {
                 </div>
                 <h3 className="text-lg font-bold text-secondary-900 mb-1.5">Cazier Judiciar — Persoană Fizică</h3>
                 <p className="text-sm text-neutral-600 leading-relaxed mb-5 flex-1">
-                  Documentul oficial emis de IGPR (Poliția Română), semnat electronic eIDAS. Livrat pe email.
+                  Documentul emis de IGPR (Poliția Română), semnat electronic eIDAS. Livrat pe email.
                 </p>
                 <div className="flex items-baseline gap-1 mb-1">
                   <span className="text-3xl font-black text-secondary-900">{(service.base_price / 1.21).toFixed(2)}</span>
@@ -664,7 +664,7 @@ export default async function CazierJudiciarPFPage() {
           faqs={[
             {
               q: 'Ce este Cazierul Judiciar?',
-              a: 'Cazierul Judiciar este un document oficial emis de Poliția Română care atestă dacă o persoană are sau nu antecedente penale. Arată condamnările definitive.',
+              a: 'Cazierul Judiciar este un document emis de Poliția Română care atestă dacă o persoană are sau nu antecedente penale. Arată condamnările definitive.',
             },
             {
               q: 'Care e diferența dintre Cazier Judiciar și Cazier Fiscal?',

@@ -9,7 +9,7 @@ import { Loader2 } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Comandă Nouă - eGhișeul.ro',
-  description: 'Plasează o comandă pentru documente oficiale românești',
+  description: 'Plasează o comandă pentru documente românești',
 };
 
 // Fetch service by slug

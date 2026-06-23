@@ -250,7 +250,7 @@ export default async function IdentificareImobilPage() {
                       </div>
                       <div className="flex items-center gap-1 text-neutral-500">
                         <CheckCircle className="h-4 w-4" />
-                        <span className="text-xs">Document oficial</span>
+                        <span className="text-xs">Document</span>
                       </div>
                     </div>
 

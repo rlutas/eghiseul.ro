@@ -263,7 +263,7 @@ export default function Page() {
       <h2>Comparativ: eGhișeul.ro vs. alte platforme de cazier judiciar online</h2>
       <p>
         Mulți utilizatori aleg doar pe baza prețului atunci când vine vorba de servicii online, însă
-        atunci când vorbim de documente oficiale, siguranța și legalitatea trebuie să primeze.
+        atunci când vorbim de documente, siguranța și legalitatea trebuie să primeze.
       </p>
       <p>
         Iată o comparație între <strong>eGhișeul.ro</strong> și alte platforme „low-cost”:
@@ -321,7 +321,7 @@ export default function Page() {
 
       <h2>Situații în care ai nevoie de cazier judiciar</h2>
       <p>
-        Cazierul judiciar este un document oficial solicitat într-o varietate de contexte, atât
+        Cazierul judiciar este un document solicitat într-o varietate de contexte, atât
         pentru <strong>persoane fizice</strong>, cât și pentru <strong>persoane juridice</strong>. În
         funcție de scop, <strong>certificatul de cazier judiciar</strong> poate fi necesar pentru:
       </p>

@@ -32,7 +32,7 @@ export default function Page() {
       publishedLabel="ianuarie 2024"
       updatedLabel="16 iunie 2026"
       relatedServices={[
-        { slug: 'extras-carte-funciara', label: 'Extras de Carte Funciară', desc: 'Document oficial ANCPI, livrat pe email.' },
+        { slug: 'extras-carte-funciara', label: 'Extras de Carte Funciară', desc: 'Document ANCPI, livrat pe email.' },
         { href: '/totul-despre-cartea-funciara-colectiva/', label: 'Totul despre cartea funciară colectivă', desc: 'Ghid complet despre CF colectivă.' },
       ]}
       faqs={[
@@ -102,7 +102,7 @@ export default function Page() {
       </p>
       <p>
         Poți solicita un{' '}
-        <Link href={serviceUrl('extras-carte-funciara')}>extras de carte funciară online</Link>, document oficial
+        <Link href={serviceUrl('extras-carte-funciara')}>extras de carte funciară online</Link>, document
         ANCPI livrat pe email, fără deplasări la sediul OCPI. Pentru detalii despre acest tip de document, vezi și
         ghidul nostru <Link href="/totul-despre-cartea-funciara-colectiva/">Totul despre cartea funciară colectivă</Link>.
       </p>

@@ -35,7 +35,7 @@ export function buildHomepageGraph(faqs: HomepageFaq[]) {
         logo: { '@type': 'ImageObject', url: ORGANIZATION.logo },
         image: `${BASE_URL}/og/default.png`,
         description:
-          'Platformă online pentru obținerea de documente oficiale în România: cazier judiciar, ' +
+          'Platformă online pentru obținerea de documente în România: cazier judiciar, ' +
           'cazier fiscal, certificat constatator, extras de carte funciară și altele. Rapid, legal, fără cozi.',
         vatID: ORGANIZATION.cui,
         taxID: ORGANIZATION.cui,
@@ -77,7 +77,7 @@ export function buildHomepageGraph(faqs: HomepageFaq[]) {
         '@type': 'WebPage',
         '@id': `${BASE_URL}/#webpage`,
         url: `${BASE_URL}/`,
-        name: 'Cazier Judiciar, Cazier Fiscal & Documente Oficiale Online — eGhiseul.ro',
+        name: 'Cazier Judiciar, Cazier Fiscal & Documente Online — eGhiseul.ro',
         inLanguage: 'ro-RO',
         isPartOf: { '@id': `${BASE_URL}/#website` },
         about: { '@id': `${BASE_URL}/#organization` },

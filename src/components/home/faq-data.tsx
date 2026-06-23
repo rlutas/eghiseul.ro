@@ -32,7 +32,7 @@ export const HOMEPAGE_FAQ_ITEMS: HomepageFaqItem[] = [
     plain: 'Cazierul judiciar online se obține în 24-48 de ore de la validarea cererii. Completezi formularul online, efectuezi plata securizată și primești documentul prin curier la adresa dorită. Livrăm în România și internațional.',
   },
   {
-    question: 'Pot obține documente oficiale dacă sunt în străinătate?',
+    question: 'Pot obține documente dacă sunt în străinătate?',
     answer: (
       <>
         <p><strong>Da, absolut!</strong> Serviciile noastre sunt create special pentru românii din diaspora. Poți obține:</p>
@@ -66,9 +66,9 @@ export const HOMEPAGE_FAQ_ITEMS: HomepageFaqItem[] = [
   {
     question: 'Cine procesează cererile și ce înseamnă „avocat colaborator"?',
     answer: (
-      <p>Toate cererile depuse prin eGhișeul.ro sunt gestionate de un <strong>avocat colaborator</strong>, membru al Baroului din România, cu drept de exercitare a profesiei. Când soliciți un document, se încheie un <strong>contract de mandat</strong> (împuternicire avocațială) prin care avocatul te reprezintă în fața autorităților competente. Acesta depune cererea în numele tău, iar documentul oficial este emis de autoritatea statului român (Poliția Română, ANAF, Primării, ANCPI sau ONRC). Secretul profesional avocațial protejează datele tale personale, iar procedura este 100% conformă cu legislația română.</p>
+      <p>Toate cererile depuse prin eGhișeul.ro sunt gestionate de un <strong>avocat colaborator</strong>, membru al Baroului din România, cu drept de exercitare a profesiei. Când soliciți un document, se încheie un <strong>contract de mandat</strong> (împuternicire avocațială) prin care avocatul te reprezintă în fața autorităților competente. Acesta depune cererea în numele tău, iar documentul este emis de autoritatea statului român (Poliția Română, ANAF, Primării, ANCPI sau ONRC). Secretul profesional avocațial protejează datele tale personale, iar procedura este 100% conformă cu legislația română.</p>
     ),
-    plain: 'Toate cererile sunt gestionate de un avocat colaborator, membru al Baroului din România. Se încheie un contract de mandat (împuternicire avocațială) prin care avocatul te reprezintă în fața autorităților și depune cererea în numele tău. Documentul oficial este emis de autoritatea statului (Poliția Română, ANAF, Primării, ANCPI sau ONRC). Secretul profesional avocațial protejează datele personale.',
+    plain: 'Toate cererile sunt gestionate de un avocat colaborator, membru al Baroului din România. Se încheie un contract de mandat (împuternicire avocațială) prin care avocatul te reprezintă în fața autorităților și depune cererea în numele tău. Documentul este emis de autoritatea statului (Poliția Română, ANAF, Primării, ANCPI sau ONRC). Secretul profesional avocațial protejează datele personale.',
   },
   {
     question: 'Ce metode de plată acceptați?',
@@ -160,7 +160,7 @@ export const HOMEPAGE_FAQ_ITEMS: HomepageFaqItem[] = [
     question: 'Ce este extrasul de carte funciară și când am nevoie de el?',
     answer: (
       <>
-        <p><strong><Link href="/servicii/extras-de-carte-funciara/" className={A}>Extrasul de carte funciară</Link></strong> este documentul oficial de la ANCPI care arată situația juridică a unui imobil. Ai nevoie de el pentru:</p>
+        <p><strong><Link href="/servicii/extras-de-carte-funciara/" className={A}>Extrasul de carte funciară</Link></strong> este documentul de la ANCPI care arată situația juridică a unui imobil. Ai nevoie de el pentru:</p>
         <ul>
           <li>Vânzare sau cumpărare proprietate</li>
           <li>Obținere credit ipotecar</li>
@@ -171,7 +171,7 @@ export const HOMEPAGE_FAQ_ITEMS: HomepageFaqItem[] = [
         <p>Îl primești în format digital pe email în maxim 24 de ore.</p>
       </>
     ),
-    plain: 'Extrasul de carte funciară este documentul oficial de la ANCPI care arată situația juridică a unui imobil. Este necesar pentru vânzare sau cumpărare proprietate, credit ipotecar, verificare sarcini și ipoteci, moșteniri sau autorizații de construire.',
+    plain: 'Extrasul de carte funciară este documentul de la ANCPI care arată situația juridică a unui imobil. Este necesar pentru vânzare sau cumpărare proprietate, credit ipotecar, verificare sarcini și ipoteci, moșteniri sau autorizații de construire.',
   },
   {
     question: 'Ce este cazierul fiscal și cine are nevoie de el?',

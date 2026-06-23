@@ -97,12 +97,11 @@ export function FeaturedServices() {
           <div className="flex-1">
             <p className="text-sm font-bold uppercase tracking-wider text-primary-500 mb-3">Servicii disponibile</p>
             <h2 className="text-3xl lg:text-[2.25rem] font-extrabold text-secondary-900 leading-tight mb-4">
-              Documente oficiale online pentru cetățenii români de pretutindeni
+              Documente online pentru cetățenii români de pretutindeni
             </h2>
             <p className="text-base leading-relaxed text-neutral-600 mb-3 max-w-[650px]">
               Obține rapid <strong>cazier judiciar online</strong>, <strong>certificate de stare civilă</strong>,{' '}
-              <strong>extras carte funciară</strong>, <strong>certificat constatator</strong> și alte documente
-              oficiale — indiferent dacă ești în România sau în străinătate.
+              <strong>extras carte funciară</strong>, <strong>certificat constatator</strong> și alte documente — indiferent dacă ești în România sau în străinătate.
             </p>
             <p className="text-base leading-relaxed text-neutral-600 max-w-[650px]">
               Serviciile noastre sunt 100% online și elimină deplasările la ghișee. Documentele fizice ajung prin
@@ -113,7 +112,7 @@ export function FeaturedServices() {
           <div className="w-full max-w-[280px] mx-auto lg:mx-0 flex-shrink-0">
             <Image
               src="/images/servicii-header.webp"
-              alt="Documente oficiale online eGhișeul.ro"
+              alt="Documente online eGhișeul.ro"
               width={280}
               height={373}
               className="w-full h-auto rounded-2xl shadow-[0_10px_40px_rgba(6,16,31,0.12)]"

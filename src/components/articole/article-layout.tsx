@@ -191,10 +191,10 @@ export function ArticleLayout({
           </div>
           <div className="relative container mx-auto px-4 max-w-[820px] text-center">
             <h2 className="text-2xl lg:text-3xl font-extrabold text-white mb-4">
-              Ai nevoie de un document oficial?
+              Ai nevoie de un document?
             </h2>
             <p className="text-lg text-white/80 mb-8 max-w-xl mx-auto">
-              eGhișeul îți obține documentele oficiale 100% online, fără drumuri la ghișeu.
+              eGhișeul îți obține documentele 100% online, fără drumuri la ghișeu.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button

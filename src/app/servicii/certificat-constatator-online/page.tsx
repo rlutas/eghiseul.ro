@@ -276,7 +276,7 @@ export default async function CertificatConstatatorPage() {
                       </div>
                       <div className="flex items-center gap-1 text-neutral-500">
                         <CheckCircle className="h-4 w-4" aria-hidden="true" />
-                        <span className="text-xs">Document oficial</span>
+                        <span className="text-xs">Document</span>
                       </div>
                     </div>
 
@@ -294,7 +294,7 @@ export default async function CertificatConstatatorPage() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
               {[
                 { icon: Zap, value: 'Câteva minute', label: 'Eliberare automată 24/7' },
-                { icon: Landmark, value: 'ONRC', label: 'Document oficial semnat' },
+                { icon: Landmark, value: 'ONRC', label: 'Document semnat' },
                 { icon: Building2, value: 'Doar CUI-ul', label: 'Fără cont RECOM' },
                 { icon: CheckCircle, value: '4.9/5', label: 'Peste 450 recenzii' },
               ].map((t) => (
@@ -321,7 +321,7 @@ export default async function CertificatConstatatorPage() {
             </h2>
             <div className="space-y-4 text-neutral-700 leading-relaxed">
               <p>
-                <strong>Certificatul constatator</strong> este documentul oficial eliberat de Oficiul Național al
+                <strong>Certificatul constatator</strong> este documentul eliberat de Oficiul Național al
                 Registrului Comerțului (<strong>ONRC</strong>) care atestă datele actuale ale unei firme: denumirea,
                 forma juridică, sediul social, codul unic de înregistrare (CUI), asociații, administratorii, capitalul
                 social și obiectul de activitate. Este, practic, „cartea de identitate” a firmei la
@@ -726,7 +726,7 @@ export default async function CertificatConstatatorPage() {
         <ServiceFAQ
           title="Întrebări Frecvente — Certificat Constatator ONRC"
           faqs={[
-            { q: 'Ce este certificatul constatator?', a: 'Este documentul oficial ONRC care atestă datele actuale ale unei firme: denumire, sediu, CUI, asociați, administratori, capital social și obiect de activitate. Este „cartea de identitate” a firmei la Registrul Comerțului.' },
+            { q: 'Ce este certificatul constatator?', a: 'Este documentul ONRC care atestă datele actuale ale unei firme: denumire, sediu, CUI, asociați, administratori, capital social și obiect de activitate. Este „cartea de identitate” a firmei la Registrul Comerțului.' },
             { q: 'Ce tipuri de certificat constatator pot comanda?', a: 'Trei: pe firmă (situația la zi a societății), pe persoană fizică (dacă o persoană deține calitatea de asociat/administrator în firme) și cu istoric (toate modificările firmei de la înființare până în prezent).' },
             { q: 'Certificatul constatator este la zi?', a: 'Da. Certificatul reflectă situația firmei din ziua eliberării, cu toate mențiunile actualizate înscrise la ONRC până la acel moment.' },
             { q: 'Cum verific dacă o persoană este asociat sau administrator într-o firmă?', a: 'Comanzi un certificat constatator pe persoană fizică. Pe baza datelor persoanei, ONRC indică firmele în care aceasta deține calitatea de asociat sau administrator. Costă 89 RON cu TVA, taxe ONRC incluse.' },

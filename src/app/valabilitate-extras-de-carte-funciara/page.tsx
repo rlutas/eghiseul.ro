@@ -31,7 +31,7 @@ export default function Page() {
       publishedLabel="ianuarie 2024"
       updatedLabel="16 iunie 2026"
       relatedServices={[
-        { slug: 'extras-carte-funciara', label: 'Extras de Carte Funciară', desc: 'Document oficial ANCPI, livrat pe email în câteva minute.' },
+        { slug: 'extras-carte-funciara', label: 'Extras de Carte Funciară', desc: 'Document ANCPI, livrat pe email în câteva minute.' },
         { slug: 'identificare-imobil', label: 'Identificare Imobil după Adresă', desc: 'Nu știi numărul cadastral? Îl aflăm noi după adresă.' },
       ]}
       faqs={[
@@ -80,7 +80,7 @@ export default function Page() {
       <p>
         Valabilitatea unui extras de carte funciară nu se poate prelungi, dar se poate obține un nou extras pe
         platforma <Link href={serviceUrl('extras-carte-funciara')}>eGhișeul.ro</Link>. Procesul este 100% online, iar
-        documentul oficial îți este livrat pe email în câteva minute.
+        documentul îți este livrat pe email în câteva minute.
       </p>
 
       <h3>Există situații în care valabilitatea unui extras de carte funciară poate fi redusă?</h3>

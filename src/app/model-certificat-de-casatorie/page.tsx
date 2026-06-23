@@ -41,7 +41,7 @@ export default function Page() {
       faqs={[
         {
           q: 'Există un model PDF de certificat de căsătorie de descărcat?',
-          a: 'Nu. Certificatul de căsătorie este un document oficial, securizat, tipărit pe formular tipizat de Starea Civilă — nu poate fi descărcat ca PDF sau completat singur. Online găsești doar imagini ale modelului, cu rol informativ. Un exemplar valabil se obține doar de la Starea Civilă.',
+          a: 'Nu. Certificatul de căsătorie este un document, securizat, tipărit pe formular tipizat de Starea Civilă — nu poate fi descărcat ca PDF sau completat singur. Online găsești doar imagini ale modelului, cu rol informativ. Un exemplar valabil se obține doar de la Starea Civilă.',
         },
         {
           q: 'Ce date conține certificatul de căsătorie?',
@@ -64,7 +64,7 @@ export default function Page() {
       <p>
         Certificatul de căsătorie este tipărit pe un <strong>formular tipizat, securizat</strong>,
         emis de Serviciul de Stare Civilă. Modelul actual conține elemente de siguranță (stemă,
-        serie, semnături și ștampilă), tocmai pentru că este un act oficial cu valoare juridică.
+        serie, semnături și ștampilă), tocmai pentru că este un act cu valoare juridică.
         Imaginile de tip „model” pe care le găsești online au doar rol <strong>informativ</strong> —
         nu pot fi folosite ca document.
       </p>

@@ -140,7 +140,7 @@ export function CarteFunciaraLocationPage({ county, others }: { county: OcpiCoun
           <div className="container mx-auto px-4 max-w-[760px] prose prose-neutral max-w-none prose-headings:font-bold prose-headings:text-secondary-900 prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-4 prose-p:text-neutral-700 prose-li:text-neutral-700 prose-li:marker:text-primary-500 prose-a:text-primary-700 prose-a:font-medium prose-strong:text-secondary-900">
             <h2>Ce este extrasul de carte funciară</h2>
             <p>
-              Extrasul de carte funciară este documentul oficial emis de ANCPI (Agenția Națională de Cadastru și
+              Extrasul de carte funciară este documentul emis de ANCPI (Agenția Națională de Cadastru și
               Publicitate Imobiliară) care arată <strong>situația juridică a unui imobil</strong>: cine este proprietarul,
               suprafața și datele cadastrale, precum și sarcinile înscrise — ipoteci, sechestre, servituți sau interdicții.
               Pentru imobilele din județul {county.judet}, evidența este ținută de {county.office}.

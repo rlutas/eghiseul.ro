@@ -81,7 +81,7 @@ const jsonLdGraph = buildServicePageGraph({
   name: 'Cazier Fiscal Online',
   description:
     'Serviciu de obținere a Cazierului Fiscal (certificat de cazier fiscal) de la ANAF pentru ' +
-    'persoană fizică. Documentul oficial care atestă lipsa datoriilor fiscale la bugetul de stat. ' +
+    'persoană fizică. Documentul care atestă lipsa datoriilor fiscale la bugetul de stat. ' +
     'Procesare 100% online, fără cont SPV, livrare email.',
   serviceType: 'Document Processing — Fiscal',
   datePublished: DATE_PUBLISHED,
@@ -249,7 +249,7 @@ export default async function CazierFiscalOnlinePage() {
                       </div>
                       <div className="flex items-center gap-1 text-neutral-500">
                         <CheckCircle className="h-4 w-4" aria-hidden="true" />
-                        <span className="text-xs">Document oficial</span>
+                        <span className="text-xs">Document</span>
                       </div>
                     </div>
 
@@ -266,7 +266,7 @@ export default async function CazierFiscalOnlinePage() {
           <div className="container mx-auto px-4 max-w-[1100px] py-6 lg:py-8">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
               {[
-                { icon: Landmark, value: 'ANAF', label: 'Document oficial semnat' },
+                { icon: Landmark, value: 'ANAF', label: 'Document semnat' },
                 { icon: Clock, value: formatEstimatedDays(service), label: 'Livrare estimată' },
                 { icon: Mail, value: 'Pe email', label: 'Fără cont SPV' },
                 { icon: CheckCircle, value: '4.9/5', label: 'Peste 450 recenzii' },
@@ -291,7 +291,7 @@ export default async function CazierFiscalOnlinePage() {
             </h2>
             <div className="space-y-4 text-neutral-700 leading-relaxed">
               <p>
-                <strong>Cazierul fiscal</strong> (sau „certificat de cazier fiscal”) este documentul oficial
+                <strong>Cazierul fiscal</strong> (sau „certificat de cazier fiscal”) este documentul
                 eliberat de <strong>ANAF</strong> care atestă <strong>lipsa datoriilor fiscale</strong> ale unei
                 persoane la bugetul general consolidat al statului. Practic, certificatul confirmă că persoana
                 fizică nu figurează cu obligații fiscale restante, fapte sancționate de legile fiscale, contravenții
@@ -478,7 +478,7 @@ export default async function CazierFiscalOnlinePage() {
                 <div className="relative bg-white rounded-2xl p-3 ring-1 ring-neutral-200 shadow-[0_20px_50px_rgba(6,16,31,0.16)]">
                   <Image
                     src="/images/specimens/cazier-fiscal.png"
-                    alt="Specimen cazier fiscal emis de ANAF — exemplu document oficial cu date anonimizate"
+                    alt="Specimen cazier fiscal emis de ANAF — exemplu document cu date anonimizate"
                     width={1000}
                     height={1414}
                     className="w-full h-auto rounded-lg"
@@ -494,7 +494,7 @@ export default async function CazierFiscalOnlinePage() {
               {/* Why it's legally valid */}
               <div>
                 <h3 className="text-xl lg:text-2xl font-bold text-secondary-900 mb-3">
-                  Un document oficial, valabil legal
+                  Un document, valabil legal
                 </h3>
                 <p className="text-neutral-600 leading-relaxed mb-6">
                   Cazierul fiscal pe care îl primești este <strong>identic cu cel eliberat la ghișeul ANAF</strong> —
@@ -573,7 +573,7 @@ export default async function CazierFiscalOnlinePage() {
         <ServiceFAQ
           title="Întrebări Frecvente — Cazier Fiscal Online"
           faqs={[
-            { q: 'Ce este cazierul fiscal?', a: 'Este documentul oficial eliberat de ANAF care atestă că o persoană nu are datorii fiscale la bugetul de stat și nu a săvârșit fapte sancționate de legile fiscale, contabile sau de evaziune fiscală.' },
+            { q: 'Ce este cazierul fiscal?', a: 'Este documentul eliberat de ANAF care atestă că o persoană nu are datorii fiscale la bugetul de stat și nu a săvârșit fapte sancționate de legile fiscale, contabile sau de evaziune fiscală.' },
             { q: 'Care este diferența dintre cazier fiscal și cazier judiciar?', a: 'Cazierul fiscal este emis de ANAF și se referă strict la situația fiscală (datorii, fapte economice). Cazierul judiciar este emis de Poliție/IGPR și conține eventualele condamnări penale. Sunt două documente diferite, cu instituții și scopuri diferite.' },
             { q: 'Cât este valabil cazierul fiscal?', a: 'Cazierul fiscal este valabil 30 de zile de la data emiterii. După expirare trebuie solicitat unul nou, deoarece situația fiscală a persoanei se poate modifica.' },
             { q: 'Cât durează eliberarea?', a: `${formatEstimatedDays(service)} în mod standard. Există și opțiunea Urgent pentru livrare mai rapidă.` },

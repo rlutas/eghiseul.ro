@@ -269,7 +269,7 @@ export default async function ExtrasCarteFunciaraPage() {
                       </div>
                       <div className="flex items-center gap-1 text-neutral-500">
                         <CheckCircle className="h-4 w-4" />
-                        <span className="text-xs">Document oficial</span>
+                        <span className="text-xs">Document</span>
                       </div>
                     </div>
 
@@ -287,7 +287,7 @@ export default async function ExtrasCarteFunciaraPage() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
               {[
                 { icon: Zap, value: 'Câteva minute', label: 'Eliberare automată 24/7' },
-                { icon: Landmark, value: 'ANCPI', label: 'Document oficial OCPI' },
+                { icon: Landmark, value: 'ANCPI', label: 'Document OCPI' },
                 { icon: Shield, value: 'Taxe incluse', label: 'Fără cont, fără cozi' },
                 { icon: CheckCircle, value: '4.9/5', label: 'Peste 450 recenzii' },
               ].map((t) => (
@@ -314,7 +314,7 @@ export default async function ExtrasCarteFunciaraPage() {
             </h2>
             <div className="space-y-4 text-neutral-700 leading-relaxed">
               <p>
-                <strong>Extrasul de Carte Funciară</strong> (sau „extras CF”) este documentul oficial eliberat de
+                <strong>Extrasul de Carte Funciară</strong> (sau „extras CF”) este documentul eliberat de
                 Oficiul de Cadastru și Publicitate Imobiliară (<strong>OCPI</strong>), parte din ANCPI, care atestă
                 situația juridică a unui imobil: cine este proprietarul actual, suprafața, vecinătățile și eventualele
                 <strong> sarcini, ipoteci sau interdicții</strong>. Cartea funciară este registrul public în care se
@@ -440,7 +440,7 @@ export default async function ExtrasCarteFunciaraPage() {
                 </div>
                 <h3 className="text-lg font-bold text-secondary-900 mb-1.5">Extras de Carte Funciară</h3>
                 <p className="text-sm text-neutral-600 leading-relaxed mb-5 flex-1">
-                  Documentul oficial ANCPI cu proprietar, suprafață, sarcini și ipoteci. Livrat pe email.
+                  Documentul ANCPI cu proprietar, suprafață, sarcini și ipoteci. Livrat pe email.
                 </p>
                 <div className="flex items-baseline gap-1 mb-1">
                   <span className="text-3xl font-black text-secondary-900">{fmt(priceExVat)}</span>
@@ -620,8 +620,7 @@ export default async function ExtrasCarteFunciaraPage() {
                 </p>
                 <p>
                   Pe scurt: extrasul „gratuit” cere cont, semnătură și răbdare. Prin eGhișeul plătești{' '}
-                  <strong>{service.base_price} RON cu taxele ANCPI incluse</strong> și primești același document
-                  oficial <strong>pe email, în câteva minute, fără cont și fără semnătură electronică</strong>.
+                  <strong>{service.base_price} RON cu taxele ANCPI incluse</strong> și primești același document <strong>pe email, în câteva minute, fără cont și fără semnătură electronică</strong>.
                   Documentul este identic — plătești pentru timp și pentru lipsa pașilor tehnici.
                 </p>
               </div>
@@ -652,7 +651,7 @@ export default async function ExtrasCarteFunciaraPage() {
                 <div className="relative bg-white rounded-2xl p-3 ring-1 ring-neutral-200 shadow-[0_20px_50px_rgba(6,16,31,0.16)]">
                   <Image
                     src="/images/extras-cf-specimen.webp"
-                    alt="Specimen Extras de Carte Funciară emis de ANCPI / OCPI — exemplu document oficial cu proprietar, suprafață și sarcini"
+                    alt="Specimen Extras de Carte Funciară emis de ANCPI / OCPI — exemplu document cu proprietar, suprafață și sarcini"
                     width={1414}
                     height={2000}
                     className="w-full h-auto rounded-lg"
@@ -668,7 +667,7 @@ export default async function ExtrasCarteFunciaraPage() {
               {/* Why it's legally valid (distinct from the "ce conține" section below) */}
               <div>
                 <h3 className="text-xl lg:text-2xl font-bold text-secondary-900 mb-3">
-                  Un document oficial, valabil legal
+                  Un document, valabil legal
                 </h3>
                 <p className="text-neutral-600 leading-relaxed mb-6">
                   Extrasul pe care îl primești este <strong>identic cu cel eliberat la ghișeul OCPI</strong> — doar
@@ -899,8 +898,8 @@ export default async function ExtrasCarteFunciaraPage() {
         <ServiceFAQ
           title="Întrebări Frecvente — Extras de Carte Funciară"
           faqs={[
-            { q: 'Ce este Extrasul de Carte Funciară?', a: 'Este documentul oficial OCPI care arată situația juridică a unui imobil: proprietarul actual, suprafața, sarcinile și ipotecile. Cartea funciară este registrul public al proprietăților.' },
-            { q: 'Ce înseamnă extras de carte funciară?', a: 'Extras de carte funciară înseamnă documentul oficial care atestă situația juridică actuală a unui imobil — proprietar, suprafață, vecinătăți, sarcini și ipoteci — extras din cartea funciară ținută de OCPI/ANCPI.' },
+            { q: 'Ce este Extrasul de Carte Funciară?', a: 'Este documentul OCPI care arată situația juridică a unui imobil: proprietarul actual, suprafața, sarcinile și ipotecile. Cartea funciară este registrul public al proprietăților.' },
+            { q: 'Ce înseamnă extras de carte funciară?', a: 'Extras de carte funciară înseamnă documentul care atestă situația juridică actuală a unui imobil — proprietar, suprafață, vecinătăți, sarcini și ipoteci — extras din cartea funciară ținută de OCPI/ANCPI.' },
             { q: 'De unde se scoate extrasul de carte funciară?', a: 'De la Oficiul de Cadastru și Publicitate Imobiliară (OCPI), parte din ANCPI. Prin eGhișeul îl scoți online, fără să mergi la ghișeu și fără cont ANCPI.' },
             { q: 'Cine poate scoate un extras de carte funciară?', a: 'Extrasul de informare este public — îl poate scoate oricine (cumpărător, notar, avocat, bancă, moștenitor), nu doar proprietarul și fără acordul acestuia.' },
             { q: 'Ce acte trebuie pentru extras de carte funciară?', a: 'Pentru extrasul de informare nu ai nevoie de acte de identitate sau de acordul proprietarului. Îți trebuie doar un identificator al imobilului (număr cadastral sau de carte funciară) ori adresa, plus județul și localitatea.' },

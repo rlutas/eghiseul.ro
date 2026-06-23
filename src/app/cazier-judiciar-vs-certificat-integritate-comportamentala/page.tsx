@@ -31,7 +31,7 @@ export default function Page() {
       publishedLabel="ianuarie 2024"
       updatedLabel="16 iunie 2026"
       relatedServices={[
-        { slug: 'cazier-judiciar', label: 'Cazier Judiciar Online', desc: 'Document oficial IGPR, livrat rapid.' },
+        { slug: 'cazier-judiciar', label: 'Cazier Judiciar Online', desc: 'Document IGPR, livrat rapid.' },
         { slug: 'certificat-integritate', label: 'Certificat de Integritate Comportamentală', desc: 'Necesar pentru lucrul cu minori.' },
       ]}
       faqs={[
@@ -58,7 +58,7 @@ export default function Page() {
       ]}
     >
       <p>
-        Cazierul judiciar și certificatul de integritate comportamentală sunt două documente oficiale ușor de
+        Cazierul judiciar și certificatul de integritate comportamentală sunt două documente ușor de
         confundat, dar care vizează aspecte juridice diferite. Acest ghid explică ce conține fiecare, cadrul legal
         care le reglementează, când sunt necesare și de ce, în multe situații, sunt complementare — nu
         interschimbabile.
@@ -68,7 +68,7 @@ export default function Page() {
 
       <h3>Definiție conform Legii nr. 290/2004</h3>
       <p>
-        Cazierul judiciar este un document oficial emis de Poliția Română care reflectă istoricul penal al unei
+        Cazierul judiciar este un document emis de Poliția Română care reflectă istoricul penal al unei
         persoane fizice sau juridice. Acesta conține informații despre condamnările definitive, măsurile educative
         sau de siguranță, amenzile penale, dar și deciziile judiciare recunoscute din alte state membre ale Uniunii
         Europene. Documentul este reglementat de Legea nr. 290/2004 privind cazierul judiciar.

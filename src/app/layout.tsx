@@ -15,18 +15,18 @@ const inter = Inter({
 export const metadata: Metadata = {
   metadataBase: new URL("https://eghiseul.ro"),
   title: {
-    default: "eGhișeul.ro — Documente Oficiale Online: Cazier, Carte Funciară",
+    default: "eGhișeul.ro — Documente Online: Cazier, Carte Funciară",
     template: "%s | eGhiseul.ro",
   },
   description:
-    "Obține cazier judiciar, cazier fiscal, certificat constatator, extras de carte funciară și alte documente oficiale online — rapid, legal, fără cozi. Livrare pe email sau curier în 24-48 ore.",
+    "Obține cazier judiciar, cazier fiscal, certificat constatator, extras de carte funciară și alte documente online — rapid, legal, fără cozi. Livrare pe email sau curier în 24-48 ore.",
   keywords: [
     "cazier judiciar online",
     "cazier fiscal",
     "certificat constatator",
     "extras carte funciară",
     "certificat de integritate comportamentală",
-    "documente oficiale online",
+    "documente online",
     "acte online România",
   ],
   authors: [{ name: "eGhiseul.ro" }],
@@ -37,18 +37,18 @@ export const metadata: Metadata = {
     locale: "ro_RO",
     url: "https://eghiseul.ro/",
     siteName: "eGhiseul.ro",
-    title: "eGhișeul.ro — Documente Oficiale Online: Cazier, Carte Funciară",
+    title: "eGhișeul.ro — Documente Online: Cazier, Carte Funciară",
     description:
-      "Obține documente oficiale online — cazier judiciar, cazier fiscal, certificat constatator, extras de carte funciară — rapid, legal, fără cozi. Livrare 24-48 ore.",
+      "Obține documente online — cazier judiciar, cazier fiscal, certificat constatator, extras de carte funciară — rapid, legal, fără cozi. Livrare 24-48 ore.",
     images: [
-      { url: "/og/default.png", width: 1200, height: 630, alt: "eGhiseul.ro — documente oficiale online" },
+      { url: "/og/default.png", width: 1200, height: 630, alt: "eGhiseul.ro — documente online" },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "eGhișeul.ro — Documente Oficiale Online: Cazier, Carte Funciară",
+    title: "eGhișeul.ro — Documente Online: Cazier, Carte Funciară",
     description:
-      "Documente oficiale online, rapid și legal. Livrare pe email sau curier în 24-48 ore.",
+      "Documente online, rapid și legal. Livrare pe email sau curier în 24-48 ore.",
     images: ["/og/default.png"],
   },
   robots: {

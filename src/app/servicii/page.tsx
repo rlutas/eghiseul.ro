@@ -28,12 +28,12 @@ const HIDDEN_FROM_INDEX = new Set([
 ]);
 
 export const metadata: Metadata = {
-  title: 'Servicii | Documente oficiale online pentru România',
+  title: 'Servicii | Documente online pentru România',
   description:
     'Catalogul complet al serviciilor eGhișeul.ro: cazier judiciar, cazier fiscal, certificat constatator, extras carte funciară, rovinietă și altele. 12 servicii digitale, 100% online.',
   keywords: [
     'servicii online',
-    'documente oficiale',
+    'documente',
     'cazier judiciar',
     'cazier fiscal',
     'certificat constatator',
@@ -42,9 +42,9 @@ export const metadata: Metadata = {
     'eghiseul',
   ],
   openGraph: {
-    title: 'Servicii | Documente oficiale online',
+    title: 'Servicii | Documente online',
     description:
-      '12 servicii digitale pentru documente oficiale din România. Comandă online, livrare rapidă.',
+      '12 servicii digitale pentru documente din România. Comandă online, livrare rapidă.',
     type: 'website',
     url: 'https://eghiseul.ro/servicii',
     siteName: 'eGhiseul.ro',
@@ -106,7 +106,7 @@ export default async function ServiciiPage() {
             '@context': 'https://schema.org',
             '@type': 'ItemList',
             name: 'Servicii eGhișeul.ro',
-            description: 'Catalogul serviciilor digitale pentru documente oficiale din România.',
+            description: 'Catalogul serviciilor digitale pentru documente din România.',
             itemListElement: services.map((service, index) => ({
               '@type': 'ListItem',
               position: index + 1,
@@ -152,7 +152,7 @@ export default async function ServiciiPage() {
               </h1>
 
               <p className="text-lg sm:text-xl text-white/85 leading-relaxed mb-8">
-                12 servicii digitale pentru documente oficiale din România. Comandă online, semnezi electronic, primești documentul acasă.
+                12 servicii digitale pentru documente din România. Comandă online, semnezi electronic, primești documentul acasă.
               </p>
 
               <div className="flex flex-wrap justify-center gap-4">
@@ -162,7 +162,7 @@ export default async function ServiciiPage() {
                 </div>
                 <div className="flex items-center gap-2 text-white/70 bg-white/5 px-4 py-2 rounded-full">
                   <Shield className="w-4 h-4 text-primary-500" />
-                  <span className="text-sm">Documente oficiale</span>
+                  <span className="text-sm">Documente</span>
                 </div>
                 <div className="flex items-center gap-2 text-white/70 bg-white/5 px-4 py-2 rounded-full">
                   <CheckCircle className="w-4 h-4 text-primary-500" />
@@ -226,7 +226,7 @@ export default async function ServiciiPage() {
                         <p className="text-neutral-600 text-sm leading-relaxed line-clamp-3">
                           {service.short_description ||
                             service.description ||
-                            'Document oficial disponibil pentru comandă online.'}
+                            'Document disponibil pentru comandă online.'}
                         </p>
 
                         <div className="grid grid-cols-2 gap-4 pt-4 border-t border-neutral-100">

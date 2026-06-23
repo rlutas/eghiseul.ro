@@ -73,7 +73,7 @@ export default function Page() {
 
       <h2>Ce este certificatul constatator și de ce îl cere autoritatea contractantă</h2>
       <p>
-        Certificatul constatator este documentul oficial emis de Oficiul Național al Registrului
+        Certificatul constatator este documentul emis de Oficiul Național al Registrului
         Comerțului (ONRC) care atestă <strong>situația „la zi” a unei firme</strong>: că există
         legal, că este activă și ce <strong>coduri CAEN</strong> are autorizate. Într-o licitație,
         autoritatea contractantă îl folosește pentru a verifica două lucruri esențiale:

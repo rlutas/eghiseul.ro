@@ -32,7 +32,7 @@ export default function Page() {
       updatedLabel="16 iunie 2026"
       relatedServices={[
         { slug: 'identificare-imobil', label: 'Identificare Imobil după Adresă', desc: 'Nu știi numărul cadastral? Îl aflăm noi după adresă.' },
-        { slug: 'extras-carte-funciara', label: 'Extras de Carte Funciară', desc: 'Document oficial ANCPI, livrat pe email în câteva minute.' },
+        { slug: 'extras-carte-funciara', label: 'Extras de Carte Funciară', desc: 'Document ANCPI, livrat pe email în câteva minute.' },
         { slug: 'extras-plan-cadastral', label: 'Extras de Plan Cadastral', desc: 'Localizezi terenul pe ortofotoplan după nr. cadastral.' },
       ]}
       faqs={[
@@ -104,8 +104,7 @@ export default function Page() {
           complica procesul.
         </li>
         <li>
-          <strong>Folosește surse oficiale.</strong> Pentru a obține numerele necesare, bazează-te pe documente
-          oficiale sau pe extrasul de carte funciară existent. Evită sursele neoficiale, care pot conține informații
+          <strong>Folosește surse oficiale.</strong> Pentru a obține numerele necesare, bazează-te pe documente sau pe extrasul de carte funciară existent. Evită sursele neoficiale, care pot conține informații
           inexacte.
         </li>
         <li>

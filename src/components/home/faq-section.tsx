@@ -27,7 +27,7 @@ export function FAQSection() {
             Ai întrebări? Avem răspunsuri
           </h2>
           <p className="text-lg text-neutral-600 max-w-[600px] mx-auto">
-            Află tot ce trebuie să știi despre obținerea documentelor oficiale online prin eGhișeul.
+            Află tot ce trebuie să știi despre obținerea documentelor online prin eGhișeul.
           </p>
         </div>
 

@@ -254,7 +254,7 @@ export default async function CertificatCelibatPage() {
                       </div>
                       <div className="flex items-center gap-1 text-neutral-500">
                         <CheckCircle className="h-4 w-4" aria-hidden="true" />
-                        <span className="text-xs">Document oficial</span>
+                        <span className="text-xs">Document</span>
                       </div>
                     </div>
 
@@ -297,7 +297,7 @@ export default async function CertificatCelibatPage() {
             <div className="space-y-4 text-neutral-700 leading-relaxed">
               <p>
                 <strong>Certificatul de celibat</strong> (numit și <strong>certificat de stare civilă</strong> sau
-                <strong> adeverință de celibat</strong>) este documentul oficial de Stare Civilă care atestă că o
+                <strong> adeverință de celibat</strong>) este documentul de Stare Civilă care atestă că o
                 persoană <strong>nu este căsătorită</strong>. Practic, este dovada legală a faptului că ești
                 necăsătorit(ă) la data eliberării, eliberată pe baza datelor din registrele de stare civilă.
               </p>
@@ -439,7 +439,7 @@ export default async function CertificatCelibatPage() {
               </h2>
               <p className="text-neutral-600 max-w-2xl mx-auto">
                 Adeverința pe care o primești are antetul oficial al Serviciului de Stare Civilă și atestă
-                statutul de necăsătorit(ă) — un document oficial emis de primărie, nu o copie generată online.
+                statutul de necăsătorit(ă) — un document emis de primărie, nu o copie generată online.
               </p>
             </div>
 
@@ -466,7 +466,7 @@ export default async function CertificatCelibatPage() {
               {/* Why it's a real, legally valid document */}
               <div>
                 <h3 className="text-xl lg:text-2xl font-bold text-secondary-900 mb-3">
-                  Un document oficial, valabil legal
+                  Un document, valabil legal
                 </h3>
                 <p className="text-neutral-600 leading-relaxed mb-6">
                   Certificatul de celibat este <strong>eliberat de Serviciul de Stare Civilă</strong> și atestă
@@ -585,7 +585,7 @@ export default async function CertificatCelibatPage() {
         <ServiceFAQ
           title="Întrebări Frecvente — Certificat de Celibat"
           faqs={[
-            { q: 'Ce este certificatul de celibat?', a: 'Este documentul oficial de stare civilă care atestă că o persoană nu este căsătorită la data eliberării. Se eliberează pe baza datelor din registrele de stare civilă din localitatea de domiciliu.' },
+            { q: 'Ce este certificatul de celibat?', a: 'Este documentul de stare civilă care atestă că o persoană nu este căsătorită la data eliberării. Se eliberează pe baza datelor din registrele de stare civilă din localitatea de domiciliu.' },
             { q: 'Certificatul de celibat este același cu adeverința de celibat?', a: 'Da. Certificatul de celibat, adeverința de celibat și certificatul de stare civilă se referă la același document — dovada că nu ești căsătorit(ă). Diferă doar denumirea folosită de diverse instituții.' },
             { q: 'Pot folosi certificatul de celibat pentru căsătoria în străinătate?', a: 'Da, acesta este cel mai frecvent motiv. Multe primării din străinătate cer dovada că ești necăsătorit(ă) pentru a întocmi dosarul de căsătorie. De obicei mai e nevoie de apostilă și traducere legalizată.' },
             { q: 'Am nevoie de apostilă pe certificatul de celibat?', a: 'Dacă îl folosești în străinătate, de regulă da — apostila de la Haga (sau supralegalizarea) confirmă autenticitatea documentului pentru autoritățile străine. Putem adăuga apostila și traducerea legalizată la comandă.' },

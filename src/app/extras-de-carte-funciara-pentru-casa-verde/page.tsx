@@ -35,7 +35,7 @@ export default function Page() {
         {
           slug: 'extras-carte-funciara',
           label: 'Extras de Carte Funciară',
-          desc: 'Document oficial ANCPI, livrat pe email în câteva minute.',
+          desc: 'Document ANCPI, livrat pe email în câteva minute.',
         },
         {
           slug: 'identificare-imobil',
@@ -50,7 +50,7 @@ export default function Page() {
         },
         {
           q: 'Ce înseamnă un Extras de Carte Funciară?',
-          a: 'Extrasul de carte funciară este un document oficial care furnizează informații despre statutul juridic al unei proprietăți, inclusiv dreptul de proprietate, existența sarcinilor sau litigiilor.',
+          a: 'Extrasul de carte funciară este un document care furnizează informații despre statutul juridic al unei proprietăți, inclusiv dreptul de proprietate, existența sarcinilor sau litigiilor.',
         },
         {
           q: 'Cine poate să aplice pentru Casa Verde?',

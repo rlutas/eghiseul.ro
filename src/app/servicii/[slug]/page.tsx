@@ -126,7 +126,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     keywords: [
       service.name.toLowerCase(),
       `${service.name.toLowerCase()} online`,
-      'documente oficiale',
+      'documente',
       'eghiseul',
       categoryLabels[service.category]?.toLowerCase() ?? 'servicii',
     ],
@@ -166,7 +166,7 @@ function buildFaqs(service: Service): { q: string; a: string }[] {
   return [
     {
       q: `Ce este ${name} și la ce îmi folosește?`,
-      a: `${name} este un document oficial eliberat de autoritățile competente din România. ${
+      a: `${name} este un document eliberat de autoritățile competente din România. ${
         service.short_description || service.description || ''
       } Îl poți solicita pentru proceduri administrative, angajare, licitații publice, parteneriate comerciale sau pentru a atesta o situație legală.`,
     },
@@ -180,7 +180,7 @@ function buildFaqs(service: Service): { q: string; a: string }[] {
     },
     {
       q: 'Cum primesc documentul final?',
-      a: 'Documentul este livrat în format digital (PDF) pe email sau prin curier (Fan Courier / Sameday) la adresa specificată. Poți alege metoda preferată în timpul comenzii. Pentru documente oficiale cu ștampilă, livrarea fizică prin curier este recomandată.',
+      a: 'Documentul este livrat în format digital (PDF) pe email sau prin curier (Fan Courier / Sameday) la adresa specificată. Poți alege metoda preferată în timpul comenzii. Pentru documente cu ștampilă, livrarea fizică prin curier este recomandată.',
     },
     {
       q: 'Ce documente trebuie să încarc pentru a comanda?',
@@ -192,7 +192,7 @@ function buildFaqs(service: Service): { q: string; a: string }[] {
     },
     {
       q: 'Pot anula sau modifica comanda după plată?',
-      a: 'Poți contacta echipa noastră la contact@eghiseul.ro sau +40 757 708 181 pentru modificări. Conform OUG 34/2014 art. 16 lit. m), dreptul de retragere nu se aplică după începerea procesării efective a documentului oficial, dar vom face tot posibilul să te ajutăm în orice situație.',
+      a: 'Poți contacta echipa noastră la contact@eghiseul.ro sau +40 757 708 181 pentru modificări. Conform OUG 34/2014 art. 16 lit. m), dreptul de retragere nu se aplică după începerea procesării efective a documentului, dar vom face tot posibilul să te ajutăm în orice situație.',
     },
   ];
 }
@@ -328,7 +328,7 @@ export default async function ServiceDetailPage({ params }: PageProps) {
                 </div>
                 <div className="flex items-center gap-2 text-white/70 bg-white/5 px-4 py-2 rounded-full">
                   <Shield className="w-4 h-4 text-primary-500" />
-                  <span className="text-sm">Document oficial</span>
+                  <span className="text-sm">Document</span>
                 </div>
                 <div className="flex items-center gap-2 text-white/70 bg-white/5 px-4 py-2 rounded-full">
                   <CheckCircle className="w-4 h-4 text-primary-500" />
@@ -411,7 +411,7 @@ export default async function ServiceDetailPage({ params }: PageProps) {
                 </p>
               ) : (
                 <p className="text-neutral-700 leading-relaxed">
-                  {service.name} este un document oficial necesar în multe proceduri
+                  {service.name} este un document necesar în multe proceduri
                   administrative și legale. Îl obții integral online, fără deplasări la
                   ghișee, cu plată securizată și livrare pe email sau prin curier.
                 </p>
@@ -427,7 +427,7 @@ export default async function ServiceDetailPage({ params }: PageProps) {
                 <div className="flex items-start gap-3 p-4 bg-neutral-50 rounded-xl">
                   <CheckCircle className="w-5 h-5 text-green-500 shrink-0 mt-0.5" />
                   <span className="text-sm text-neutral-700">
-                    Document oficial cu valoare legală
+                    Document cu valoare legală
                   </span>
                 </div>
                 <div className="flex items-start gap-3 p-4 bg-neutral-50 rounded-xl">
@@ -528,7 +528,7 @@ export default async function ServiceDetailPage({ params }: PageProps) {
                   <ul className="space-y-2 flex-1 mb-6">
                     <li className="flex items-start gap-2 text-sm text-neutral-700">
                       <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
-                      Document oficial complet
+                      Document complet
                     </li>
                     <li className="flex items-start gap-2 text-sm text-neutral-700">
                       <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
@@ -722,7 +722,7 @@ export default async function ServiceDetailPage({ params }: PageProps) {
               Comandă {service.name} acum
             </h2>
             <p className="text-lg text-white/80 mb-8 max-w-xl mx-auto">
-              Primești documentul oficial rapid, fără drumuri la ghișee. Plată
+              Primești documentul rapid, fără drumuri la ghișee. Plată
               securizată, asistență dedicată.
             </p>
 

@@ -203,7 +203,7 @@ const FAQ_ITEMS: FAQ[] = [
   {
     category: 'procesare',
     q: 'Cât durează obținerea cazierului judiciar online?',
-    a: 'Procesarea standard durează între 2 și 4 zile lucrătoare de la momentul plății, conform Legii 290/2004 privind cazierul judiciar. Termenul include trei etape: (1) preluarea cererii de către Inspectoratul General al Poliției Române — IGPR, în maxim 24 de ore; (2) eliberarea documentului oficial de către Direcția Cazier Judiciar, Statistică și Evidențe Operative, care durează 1-3 zile lucrătoare; (3) transmiterea către tine pe email a documentului semnat electronic, automat după emitere. Dacă alegi opțiunea urgentă (+80 RON), termenul total scade la 1-2 zile lucrătoare. Documentele cu cerere depusă vineri după ora 14:00 sau în weekend intră în prelucrare luni dimineața, conform programului oficial al ghișeelor de cazier judiciar. Nu există nicio diferență de calitate sau valabilitate între documentul obținut prin platforma noastră și cel obținut direct la sediul Poliției — ambele sunt eliberate de IGPR și au aceeași ștampilă oficială.',
+    a: 'Procesarea standard durează între 2 și 4 zile lucrătoare de la momentul plății, conform Legii 290/2004 privind cazierul judiciar. Termenul include trei etape: (1) preluarea cererii de către Inspectoratul General al Poliției Române — IGPR, în maxim 24 de ore; (2) eliberarea documentului de către Direcția Cazier Judiciar, Statistică și Evidențe Operative, care durează 1-3 zile lucrătoare; (3) transmiterea către tine pe email a documentului semnat electronic, automat după emitere. Dacă alegi opțiunea urgentă (+80 RON), termenul total scade la 1-2 zile lucrătoare. Documentele cu cerere depusă vineri după ora 14:00 sau în weekend intră în prelucrare luni dimineața, conform programului oficial al ghișeelor de cazier judiciar. Nu există nicio diferență de calitate sau valabilitate între documentul obținut prin platforma noastră și cel obținut direct la sediul Poliției — ambele sunt eliberate de IGPR și au aceeași ștampilă oficială.',
   },
   {
     category: 'pret',
@@ -233,7 +233,7 @@ const FAQ_ITEMS: FAQ[] = [
   {
     category: 'utilizare',
     q: 'Cazierul judiciar online este același document ca cel obținut la ghișeu?',
-    a: 'Da, este exact același document oficial emis de Poliția Română conform Legii 290/2004 privind cazierul judiciar. Conține aceleași informații, aceeași semnătură și ștampilă oficială, și are aceeași valabilitate legală — atât în România cât și în străinătate. Singura diferență este că noi îți primim cererea online, o procesăm și îți trimitem documentul fără să fie nevoie să mergi personal.',
+    a: 'Da, este exact același document emis de Poliția Română conform Legii 290/2004 privind cazierul judiciar. Conține aceleași informații, aceeași semnătură și ștampilă oficială, și are aceeași valabilitate legală — atât în România cât și în străinătate. Singura diferență este că noi îți primim cererea online, o procesăm și îți trimitem documentul fără să fie nevoie să mergi personal.',
   },
   {
     category: 'utilizare',
@@ -293,7 +293,7 @@ const FAQ_ITEMS: FAQ[] = [
   {
     category: 'procesare',
     q: 'Cum se face eliberarea cazierului judiciar online?',
-    a: 'Completezi formularul cu datele tale, îți verificăm identitatea, plătești securizat, iar noi depunem cererea la IGPR. Documentul oficial îți este eliberat de IGPR și ți-l transmitem pe email semnat electronic, în 2-4 zile lucrătoare (1-2 zile urgent). Nu te deplasezi la nicio instituție.',
+    a: 'Completezi formularul cu datele tale, îți verificăm identitatea, plătești securizat, iar noi depunem cererea la IGPR. Documentul îți este eliberat de IGPR și ți-l transmitem pe email semnat electronic, în 2-4 zile lucrătoare (1-2 zile urgent). Nu te deplasezi la nicio instituție.',
   },
   {
     category: 'pret',
@@ -362,7 +362,7 @@ export default function CazierJudiciarHubPage() {
                 </h1>
 
                 <p className="text-lg sm:text-xl text-white/85 leading-relaxed mb-6">
-                  Document oficial emis de <strong className="text-primary-500">Poliția Română</strong> conform
+                  Document emis de <strong className="text-primary-500">Poliția Română</strong> conform
                   Legii 290/2004, pentru <strong>persoane fizice și firme</strong>. Îl obții 100% online,
                   fără drum la ghișeu.
                 </p>
@@ -387,7 +387,7 @@ export default function CazierJudiciarHubPage() {
                       'Alegi tipul: persoană fizică sau firmă (PJ)',
                       'Completezi formularul și verifici identitatea',
                       'Plătești securizat (Stripe) — 198 RON, TVA inclus',
-                      'Primești documentul oficial IGPR în 2-4 zile (1-2 urgent)',
+                      'Primești documentul IGPR în 2-4 zile (1-2 urgent)',
                     ].map((step) => (
                       <li key={step} className="flex items-center gap-2">
                         <CheckCircle className="w-4 h-4 text-primary-500 flex-shrink-0" />
@@ -452,7 +452,7 @@ export default function CazierJudiciarHubPage() {
                       </div>
                       <div className="flex items-center gap-1 text-neutral-500">
                         <CheckCircle className="h-4 w-4" />
-                        <span className="text-xs">Document oficial</span>
+                        <span className="text-xs">Document</span>
                       </div>
                     </div>
 
@@ -583,7 +583,7 @@ export default function CazierJudiciarHubPage() {
 
             <div className="bg-white rounded-2xl p-6 lg:p-8 border border-neutral-200 space-y-4 text-neutral-700 leading-relaxed">
               <p>
-                <strong className="text-secondary-900">Cazierul Judiciar</strong> este un document oficial
+                <strong className="text-secondary-900">Cazierul Judiciar</strong> este un document
                 emis de <strong>Inspectoratul General al Poliției Române (IGPR)</strong> prin
                 Direcția Cazier Judiciar, Statistică și Evidențe Operative, conform{' '}
                 <strong>Legii nr. 290/2004</strong> privind cazierul judiciar, modificată prin
@@ -639,7 +639,7 @@ export default function CazierJudiciarHubPage() {
               <div className="relative bg-neutral-50 rounded-2xl p-4 border border-neutral-200 shadow-sm">
                 <Image
                   src="/images/cazier-judiciar-specimen.webp"
-                  alt="Specimen Cazier Judiciar emis de Inspectoratul General al Poliției Române — exemplu document oficial"
+                  alt="Specimen Cazier Judiciar emis de Inspectoratul General al Poliției Române — exemplu document"
                   width={1414}
                   height={2000}
                   className="w-full h-auto rounded-lg"
@@ -1016,7 +1016,7 @@ export default function CazierJudiciarHubPage() {
               {[
                 {
                   icon: Award,
-                  title: 'Document Oficial',
+                  title: 'Document',
                   desc: 'Cazier emis de Inspectoratul General al Poliției Române (IGPR), identic cu cel obținut la ghișeu — aceeași valabilitate, aceeași ștampilă.',
                   iconBg: 'bg-gradient-to-br from-primary-100 to-primary-200',
                   iconColor: 'text-primary-600',
@@ -1100,7 +1100,7 @@ export default function CazierJudiciarHubPage() {
                 Servicii Conexe
               </h2>
               <p className="text-neutral-600 max-w-2xl mx-auto">
-                Alte documente oficiale care pot fi solicitate împreună cu cazierul judiciar.
+                Alte documente care pot fi solicitate împreună cu cazierul judiciar.
               </p>
             </div>
 
@@ -1219,7 +1219,7 @@ export default function CazierJudiciarHubPage() {
               </h2>
               <p className="text-lg text-white/80 mb-8 max-w-2xl mx-auto">
                 5 minute să completezi formularul. Restul facem noi.
-                Document oficial emis de Poliția Română pentru 198 RON.
+                Document emis de Poliția Română pentru 198 RON.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-3 justify-center mb-10">

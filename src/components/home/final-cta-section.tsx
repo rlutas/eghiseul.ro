@@ -38,7 +38,7 @@ export function FinalCTASection() {
         </div>
 
         <h2 className="text-3xl sm:text-4xl lg:text-[42px] font-extrabold text-white leading-tight mb-5">
-          Obține documentele oficiale <span className="text-primary-500">rapid și simplu</span>
+          Obține documentele <span className="text-primary-500">rapid și simplu</span>
         </h2>
         <p className="mx-auto mb-10 max-w-[600px] text-lg leading-relaxed text-white/80">
           Nu mai pierde timp la cozi! Completează cererea online în 2 minute și primești documentele acasă sau pe

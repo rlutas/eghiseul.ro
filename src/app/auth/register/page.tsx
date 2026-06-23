@@ -100,14 +100,14 @@ export default function RegisterPage() {
             Creează-ți contul gratuit
           </h1>
           <p className="text-lg text-white/80 mb-10">
-            Alătură-te celor peste 200.000 de clienți care au ales eGhișeul.ro pentru documentele lor oficiale.
+            Alătură-te celor peste 200.000 de clienți care au ales eGhișeul.ro pentru documentele lor.
           </p>
 
           <div className="space-y-6">
             {[
               { icon: FileText, title: 'Toate documentele într-un loc', desc: 'Cazier, certificate, extras CF și multe altele' },
               { icon: Clock, title: 'Livrare rapidă', desc: 'Documente în 24-48h, fără cozi' },
-              { icon: Shield, title: '100% Legal și sigur', desc: 'Documente oficiale, recunoscute de stat' },
+              { icon: Shield, title: '100% Legal și sigur', desc: 'Documente, recunoscute de stat' },
               { icon: CheckCircle, title: 'Fără deplasări', desc: 'Tot procesul se face online' },
             ].map((item, i) => (
               <div key={i} className="flex items-start gap-4">

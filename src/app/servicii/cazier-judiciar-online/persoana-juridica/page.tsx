@@ -402,7 +402,7 @@ export default async function CazierJudiciarPJPage() {
             </h2>
             <div className="space-y-4 text-neutral-700 leading-relaxed">
               <p>
-                <strong>Cazierul judiciar pentru persoană juridică</strong> este documentul oficial emis de
+                <strong>Cazierul judiciar pentru persoană juridică</strong> este documentul emis de
                 Inspectoratul General al Poliției Române care atestă că o firmă nu are antecedente penale. Este
                 solicitat cel mai des la <strong>licitații publice în SEAP</strong>, la încheierea de contracte cu
                 instituții ale statului, în procese de due diligence, fuziuni și achiziții, precum și la accesarea
@@ -497,7 +497,7 @@ export default async function CazierJudiciarPJPage() {
                 </div>
                 <h3 className="text-lg font-bold text-secondary-900 mb-1.5">Cazier Judiciar — Persoană Juridică</h3>
                 <p className="text-sm text-neutral-600 leading-relaxed mb-5 flex-1">
-                  Documentul oficial emis de IGPR (Poliția Română) pentru firmă, semnat electronic eIDAS. Livrat pe email.
+                  Documentul emis de IGPR (Poliția Română) pentru firmă, semnat electronic eIDAS. Livrat pe email.
                 </p>
                 <div className="flex items-baseline gap-1 mb-1">
                   <span className="text-3xl font-black text-secondary-900">{(service.base_price / 1.21).toFixed(2)}</span>
@@ -741,7 +741,7 @@ export default async function CazierJudiciarPJPage() {
           faqs={[
             {
               q: 'Ce este Cazierul Judiciar pentru Persoană Juridică?',
-              a: 'Este un document oficial care atestă că firma (persoana juridică) nu are antecedente penale. Se emite de Poliția Română.',
+              a: 'Este un document care atestă că firma (persoana juridică) nu are antecedente penale. Se emite de Poliția Română.',
             },
             {
               q: 'Ce firmă poate solicita cazier judiciar?',

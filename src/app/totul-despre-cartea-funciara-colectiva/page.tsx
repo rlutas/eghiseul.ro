@@ -31,13 +31,13 @@ export default function Page() {
       publishedLabel="ianuarie 2024"
       updatedLabel="16 iunie 2026"
       relatedServices={[
-        { slug: 'extras-carte-funciara', label: 'Extras de Carte Funciară', desc: 'Document oficial ANCPI, livrat pe email.' },
+        { slug: 'extras-carte-funciara', label: 'Extras de Carte Funciară', desc: 'Document ANCPI, livrat pe email.' },
         { href: '/importanta-extras-de-carte-funciara-colectiva/', label: 'Importanța extrasului de carte funciară colectivă', desc: 'De ce contează CF colectivă pentru apartamente.' },
       ]}
       faqs={[
         {
           q: 'Ce este cartea funciară colectivă?',
-          a: 'Cartea funciară colectivă este un document oficial înființat odată cu înregistrarea primei cărți funciare individuale la oficiul de cadastru și publicitate imobiliară, care include informații despre terenul pe care se află condominiul, cotele indivize și drepturile de proprietate ale fiecărui proprietar.',
+          a: 'Cartea funciară colectivă este un document înființat odată cu înregistrarea primei cărți funciare individuale la oficiul de cadastru și publicitate imobiliară, care include informații despre terenul pe care se află condominiul, cotele indivize și drepturile de proprietate ale fiecărui proprietar.',
         },
         {
           q: 'Care este diferența dintre un extras de carte funciară și un extras de carte funciară colectivă?',
@@ -77,7 +77,7 @@ export default function Page() {
       </ul>
       <p>
         <strong>Cartea funciară</strong> oferă garanția că drepturile de proprietate și alte aspecte juridice sunt
-        înregistrate oficial, fiind un <strong>document oficial</strong> indispensabil pentru realizarea{' '}
+        înregistrate oficial, fiind un <strong>document</strong> indispensabil pentru realizarea{' '}
         <strong>tranzacțiilor imobiliare</strong>, obținerea de credite bancare sau rezolvarea litigiilor legate de
         proprietăți.
       </p>
@@ -109,7 +109,7 @@ export default function Page() {
       <h2>Ce conține extrasul de carte funciară colectivă?</h2>
       <p>
         <strong>Extrasul de carte funciară colectivă</strong> este o versiune restrânsă a{' '}
-        <strong>cărții funciare colective</strong> și reprezintă un <strong>document oficial</strong> necesar pentru
+        <strong>cărții funciare colective</strong> și reprezintă un <strong>document</strong> necesar pentru
         diverse <strong>tranzacții imobiliare</strong>. Structura sa este următoarea:
       </p>
       <ul>

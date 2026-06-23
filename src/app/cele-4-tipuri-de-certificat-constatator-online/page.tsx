@@ -36,7 +36,7 @@ export default function Page() {
       ]}
       faqs={[
         { q: 'Câte tipuri de certificat constatator există?', a: 'La ONRC există patru variante principale: furnizare informații, certificatul de bază, cel pentru fonduri IMM și cel pentru insolvență. Prin eGhișeul îl poți comanda în trei forme: pe firmă, pe persoană fizică și cu istoric.' },
-        { q: 'Ce este certificatul constatator?', a: 'Este un document oficial emis de ONRC care servește drept dovadă legală a diferitelor aspecte ale unei companii: date de identificare, coduri CAEN, administratori, asociați și statutul firmei.' },
+        { q: 'Ce este certificatul constatator?', a: 'Este un document emis de ONRC care servește drept dovadă legală a diferitelor aspecte ale unei companii: date de identificare, coduri CAEN, administratori, asociați și statutul firmei.' },
         { q: 'Ce tip de certificat constatator îmi trebuie?', a: 'Depinde de scop: pentru bănci/ANAF/licitații — cel de bază; pentru fonduri europene — cel pentru IMM; pentru insolvență — cel cu situații financiare. La eGhișeul alegi între pe firmă, pe persoană fizică sau cu istoric.' },
         { q: 'Cum obțin certificatul constatator online?', a: 'Accesezi pagina serviciului, completezi datele firmei (denumire, nr. ONRC, CUI), alegi tipul de certificat, plătești online și primești documentul pe email.' },
       ]}
@@ -50,7 +50,7 @@ export default function Page() {
 
       <h2>Ce este un Certificat Constatator?</h2>
       <p>
-        Certificatul constatator este un document oficial emis de Oficiul Național al Registrului Comerțului (ONRC)
+        Certificatul constatator este un document emis de Oficiul Național al Registrului Comerțului (ONRC)
         în România, care servește ca o dovadă legală a diferitelor aspecte ale unei companii. Acesta este o
         necesitate pentru afaceri, indiferent de dimensiunea sau domeniul de activitate al acestora. Certificatul
         constatator oferă o imagine de ansamblu și actualizată asupra informațiilor esențiale legate de o firmă,

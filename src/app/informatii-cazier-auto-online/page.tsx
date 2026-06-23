@@ -57,7 +57,7 @@ export default function Page() {
       ]}
     >
       <p>
-        <strong>Cazierul auto</strong> este un document oficial care reflectă istoricul sancțiunilor rutiere ale unui
+        <strong>Cazierul auto</strong> este un document care reflectă istoricul sancțiunilor rutiere ale unui
         conducător auto. Este emis de autoritățile competente, în principal de <strong>Poliția Rutieră</strong>, și
         consemnează abaterile de circulație ale șoferului pe drumurile publice din România.
       </p>

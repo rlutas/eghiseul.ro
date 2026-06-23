@@ -20,7 +20,7 @@ const STEPS = [
       <>
         Plătești online cu cardul în siguranță (criptare SSL). Avocatul nostru colaborator, înscris în Barou, depune
         cererea în numele tău la instituțiile competente pentru <strong>certificate de naștere</strong>,{' '}
-        <strong>căsătorie</strong>, <strong>celibat</strong> sau alte <strong>acte oficiale</strong>.
+        <strong>căsătorie</strong>, <strong>celibat</strong> sau alte <strong>acte</strong>.
       </>
     ),
     benefits: ['Protecție date GDPR', 'Verificare automată a erorilor'],
@@ -52,10 +52,10 @@ export function HowItWorksSection() {
         {/* Header */}
         <div className="text-center mb-12 lg:mb-14">
           <h2 className="text-3xl lg:text-[2.25rem] font-extrabold text-secondary-900 leading-tight mb-4">
-            Cum obții <span className="text-primary-500">documente oficiale online</span> în 3 pași
+            Cum obții <span className="text-primary-500">documente online</span> în 3 pași
           </h2>
           <p className="text-lg text-neutral-600 leading-relaxed max-w-[650px] mx-auto">
-            Cazier judiciar, certificate de stare civilă, extras carte funciară și alte acte oficiale — direct la
+            Cazier judiciar, certificate de stare civilă, extras carte funciară și alte acte — direct la
             tine acasă, fără cozi la ghișee.
           </p>
         </div>

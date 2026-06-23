@@ -74,7 +74,7 @@ export default function Page() {
 
       <h2>Ce este certificatul constatator</h2>
       <p>
-        Certificatul constatator este documentul oficial emis de{' '}
+        Certificatul constatator este documentul emis de{' '}
         <strong>Oficiul Național al Registrului Comerțului (ONRC)</strong> care descrie situația la zi
         a unei firme sau a unui PFA. El confirmă datele de identificare ale societății și starea ei
         juridică. Pentru bancă, acest document este „buletinul” firmei: arată dacă entitatea este
@@ -133,7 +133,7 @@ export default function Page() {
         </li>
       </ul>
       <p>
-        Pe scurt: banca nu se bazează pe declarațiile tale, ci pe documentul oficial de la ONRC. Fără
+        Pe scurt: banca nu se bazează pe declarațiile tale, ci pe documentul de la ONRC. Fără
         el, dosarul de deschidere de cont sau de credit nu poate fi procesat.
       </p>
 

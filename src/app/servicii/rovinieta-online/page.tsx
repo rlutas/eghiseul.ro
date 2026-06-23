@@ -138,7 +138,7 @@ export default function RovinietaOnlinePage() {
                 { icon: Zap, title: 'Valabilă Instant', desc: 'Rovinieta devine activă imediat după finalizarea plății. Fără timp de așteptare.' },
                 { icon: ShieldCheck, title: 'Plată 100% Securizată', desc: 'Plata prin sisteme bancare certificate, cu autentificare 3D Secure.' },
                 { icon: CheckCircle, title: 'De pe Orice Dispozitiv', desc: 'Cumperi rovinieta online de pe telefon, tabletă sau PC. Funcționează oriunde.' },
-                { icon: Mail, title: 'Confirmare pe Email', desc: 'Primești dovada plății pe email — document oficial pentru verificarea rovinietei.' },
+                { icon: Mail, title: 'Confirmare pe Email', desc: 'Primești dovada plății pe email — document pentru verificarea rovinietei.' },
               ].map((c) => (
                 <div key={c.title} className="rounded-2xl border border-neutral-200 bg-neutral-50 p-5">
                   <div className="w-12 h-12 bg-primary-100 rounded-xl flex items-center justify-center mb-4">

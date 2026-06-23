@@ -242,7 +242,7 @@ function InviteAcceptContent() {
 
       {/* Footer */}
       <p className="mt-8 text-xs text-gray-400">
-        Platformă de documente oficiale online
+        Platformă de documente online
       </p>
 
       <Toaster position="top-center" richColors />

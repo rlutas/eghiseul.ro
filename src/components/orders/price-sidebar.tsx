@@ -148,7 +148,7 @@ export function PriceSidebar() {
             <div>
               <p className="font-medium text-secondary-900">100% Legal</p>
               <p className="text-neutral-500 text-xs">
-                Document oficial cu valabilitate juridică
+                Document cu valabilitate juridică
               </p>
             </div>
           </div>

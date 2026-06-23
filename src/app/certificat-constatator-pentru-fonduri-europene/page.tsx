@@ -42,7 +42,7 @@ export default function Page() {
       faqs={[
         {
           q: 'De ce îmi cere finanțatorul un certificat constatator?',
-          a: 'Pentru că este documentul oficial prin care ONRC atestă că firma există, este activă și are obiectul de activitate (codul CAEN) potrivit activității pe care vrei să o finanțezi. Finanțatorul (Agenția pentru IMM, AFIR, APIA) îl folosește pentru a verifica eligibilitatea solicitantului înainte de a aproba grantul.',
+          a: 'Pentru că este documentul prin care ONRC atestă că firma există, este activă și are obiectul de activitate (codul CAEN) potrivit activității pe care vrei să o finanțezi. Finanțatorul (Agenția pentru IMM, AFIR, APIA) îl folosește pentru a verifica eligibilitatea solicitantului înainte de a aproba grantul.',
         },
         {
           q: 'Ce tip de certificat constatator îmi trebuie pentru fonduri europene?',

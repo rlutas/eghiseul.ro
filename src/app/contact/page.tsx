@@ -9,7 +9,7 @@ const PAGE_PATH = '/contact/';
 const TITLE = 'Contact — eGhișeul.ro';
 const DESCRIPTION =
   'Contactează eGhișeul.ro: telefon +40 757 708 181, email contact@eghiseul.ro. ' +
-  'Asistență pentru cazier, carte funciară, certificat constatator și alte documente oficiale online.';
+  'Asistență pentru cazier, carte funciară, certificat constatator și alte documente online.';
 
 export const metadata = buildPageMetadata({ title: TITLE, description: DESCRIPTION, path: PAGE_PATH });
 
@@ -68,7 +68,7 @@ export default function ContactPage() {
             <h1 className="text-3xl sm:text-4xl lg:text-[2.75rem] font-extrabold text-white leading-tight mb-5">Contact</h1>
             <p className="text-lg text-white/85 leading-relaxed">
               Ai o întrebare despre o comandă sau despre un serviciu? Suntem aici să te ajutăm cu obținerea
-              documentelor oficiale online.
+              documentelor online.
             </p>
           </div>
         </header>
@@ -115,7 +115,7 @@ export default function ContactPage() {
 
             <div className="mt-8 rounded-2xl border border-amber-200 bg-amber-50 p-5">
               <p className="text-sm text-amber-800">
-                <strong>eGhișeul.ro este un serviciu privat</strong> de asistență pentru obținerea documentelor oficiale —
+                <strong>eGhișeul.ro este un serviciu privat</strong> de asistență pentru obținerea documentelor —
                 nu suntem o instituție de stat și nu suntem afiliați cu portalul guvernamental ghiseul.ro. Documentele
                 sunt emise de instituțiile abilitate; noi depunem cererile în numele tău și ți le livrăm.
               </p>

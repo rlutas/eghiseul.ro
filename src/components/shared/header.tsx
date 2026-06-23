@@ -172,7 +172,7 @@ export function Header() {
                   eGhișeul<span className="text-primary-500">.ro</span>
                 </span>
                 <span className="text-[11px] text-neutral-500 font-medium tracking-wide hidden md:block">
-                  Documente oficiale online
+                  Documente online
                 </span>
               </div>
             </Link>

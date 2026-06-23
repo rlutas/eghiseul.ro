@@ -19,7 +19,7 @@ export default function Page() {
 
       <h2>1. Serviciile noastre</h2>
       <p>
-        eGhișeul este o platformă privată de intermediere care te ajută să obții documente oficiale (cazier judiciar,
+        eGhișeul este o platformă privată de intermediere care te ajută să obții documente (cazier judiciar,
         certificate de stare civilă, extras de carte funciară, certificat constatator etc.) de la instituțiile emitente.
         Nu suntem o instituție publică; acționăm în numele tău, pe bază de împuternicire/contract de prestări servicii,
         pentru depunerea cererilor și obținerea documentelor.

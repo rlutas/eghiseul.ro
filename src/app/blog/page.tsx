@@ -5,9 +5,9 @@ import { Footer } from '@/components/home/footer';
 import { ARTICLES } from '@/config/articles';
 import { buildPageMetadata } from '@/lib/seo';
 
-const TITLE = 'Blog — Informații utile despre documente oficiale';
+const TITLE = 'Blog — Informații utile despre documente';
 const DESCRIPTION =
-  'Ghiduri și articole despre acte oficiale din România: carte funciară, cadastru, cazier judiciar, ' +
+  'Ghiduri și articole despre acte din România: carte funciară, cadastru, cazier judiciar, ' +
   'certificate de stare civilă, ONRC, pensii și rovinietă. Explicații clare, pas cu pas.';
 
 export const revalidate = 86400;
