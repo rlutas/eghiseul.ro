@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Mail, Phone, Clock, Shield, FileText, MessageCircle } from 'lucide-react';
+import { Mail, Phone, Clock, MessageCircle } from 'lucide-react';
 import { serviceUrl } from '@/lib/seo/constants';
 
 const WHATSAPP =
@@ -78,17 +78,6 @@ export function Footer() {
               />
             </div>
 
-            {/* SSL / GDPR */}
-            <div className="flex flex-wrap gap-2.5">
-              <span className="flex items-center gap-1.5 px-3 py-2 bg-white/5 rounded-lg">
-                <Shield className="w-4 h-4 text-primary-500" aria-hidden="true" />
-                <span className="text-xs text-white/70">SSL securizat</span>
-              </span>
-              <span className="flex items-center gap-1.5 px-3 py-2 bg-white/5 rounded-lg">
-                <FileText className="w-4 h-4 text-primary-500" aria-hidden="true" />
-                <span className="text-xs text-white/70">GDPR</span>
-              </span>
-            </div>
           </div>
 
           {/* Servicii — categorizate */}
