@@ -13,6 +13,8 @@ import { normalizeOrderOptions } from '@/lib/orders/normalize';
 import { estimateFromSelectedOptions } from '@/lib/delivery-calculator';
 import { OrderSidebar } from './order-sidebar';
 import { SystemStatus } from '@/components/services/system-status';
+import { useCivilStatusTerms } from '@/hooks/use-civil-status-terms';
+import { resolveCivilTermTier } from '@/lib/civil-status/delivery-terms';
 
 interface PriceSidebarModularProps {
   service: Service;
@@ -23,6 +25,7 @@ interface PriceSidebarModularProps {
 
 export function PriceSidebarModular({ service, variant = 'full' }: PriceSidebarModularProps) {
   const { state, priceBreakdown } = useModularWizard();
+  const civilTiers = useCivilStatusTerms();
 
   // Append client type suffix to service name when applicable (e.g.
   // "Cazier Judiciar" → "Cazier Judiciar PF" / "PJ"). Driven by service config
@@ -80,11 +83,23 @@ export function PriceSidebarModular({ service, variant = 'full' }: PriceSidebarM
   // Constatator + extras carte funciară are digital + auto-issued — minutes, not days.
   const isInstantDigital =
     service.slug === 'certificat-constatator' || service.slug === 'extras-carte-funciara';
+
+  // Civil-status (naștere/căsătorie/celibat): termenul de procesare depinde de
+  // oficiul de înregistrare (registrationPlace). Suprascrie calculul numeric.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const isCivilStatus = !!(state.verificationConfig as any)?.civilStatus;
+  const civilTerm =
+    isCivilStatus && state.civilStatus?.registrationPlace
+      ? resolveCivilTermTier(state.civilStatus.registrationPlace, civilTiers)
+      : null;
+
   const deliveryTimeText: string = isInstantDigital
     ? 'câteva minute (24/7)'
-    : estimate.minDays === estimate.maxDays
-      ? `${estimate.minDays} zile lucrătoare`
-      : `${estimate.minDays}-${estimate.maxDays} zile lucrătoare`;
+    : civilTerm
+      ? civilTerm.display
+      : estimate.minDays === estimate.maxDays
+        ? `${estimate.minDays} zile lucrătoare`
+        : `${estimate.minDays}-${estimate.maxDays} zile lucrătoare`;
 
   return (
     <div className="space-y-3">

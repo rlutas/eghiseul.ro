@@ -33,6 +33,7 @@ import {
   Truck,
   CreditCard,
   Settings,
+  Clock,
   RefreshCw,
   Save,
   Edit,
@@ -194,6 +195,10 @@ export default function AdminSettingsPage() {
             <Building2 className="h-4 w-4 mr-1.5" />
             Date firma
           </TabsTrigger>
+          <TabsTrigger value="civil-terms">
+            <Clock className="h-4 w-4 mr-1.5" />
+            Termene stare civilă
+          </TabsTrigger>
           <TabsTrigger value="system">
             <Settings className="h-4 w-4 mr-1.5" />
             Sistem
@@ -211,6 +216,9 @@ export default function AdminSettingsPage() {
         </TabsContent>
         <TabsContent value="company">
           <CompanyTab />
+        </TabsContent>
+        <TabsContent value="civil-terms">
+          <CivilTermsTab />
         </TabsContent>
         <TabsContent value="system">
           <SystemTab />
@@ -717,6 +725,168 @@ function EditServiceDialog({
         </DialogFooter>
       </DialogContent>
     </Dialog>
+  );
+}
+
+// ══════════════════════════════════════════════════════════════
+// CIVIL-STATUS DELIVERY TERMS TAB
+// ══════════════════════════════════════════════════════════════
+
+interface CivilTier {
+  display: string;
+  minDays?: number;
+  maxDays?: number;
+  counties?: string[];
+}
+interface CivilTiers {
+  slow: CivilTier;
+  fast: CivilTier;
+  default: CivilTier;
+}
+
+const CIVIL_TIERS_DEFAULT: CivilTiers = {
+  slow: { display: '15-30 zile lucrătoare', minDays: 15, maxDays: 30 },
+  fast: { display: '5-7 zile lucrătoare', minDays: 5, maxDays: 7, counties: ['Satu Mare'] },
+  default: { display: '7-15 zile lucrătoare', minDays: 7, maxDays: 15 },
+};
+
+function CivilTermsTab() {
+  const [tiers, setTiers] = useState<CivilTiers>(CIVIL_TIERS_DEFAULT);
+  const [fastCountiesText, setFastCountiesText] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      setLoading(true);
+      try {
+        const res = await fetch('/api/admin/settings');
+        const json = await res.json();
+        const v = (json?.data?.civil_status_term_tiers as CivilTiers) || CIVIL_TIERS_DEFAULT;
+        setTiers(v);
+        setFastCountiesText((v.fast?.counties || []).join(', '));
+      } catch {
+        toast.error('Eroare la incarcarea termenelor');
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
+
+  const save = async () => {
+    setSaving(true);
+    try {
+      const counties = fastCountiesText
+        .split(/[,\n]/)
+        .map((s) => s.trim())
+        .filter(Boolean);
+      const value: CivilTiers = {
+        slow: { ...tiers.slow },
+        fast: { ...tiers.fast, counties },
+        default: { ...tiers.default },
+      };
+      const res = await fetch('/api/admin/settings', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key: 'civil_status_term_tiers', value }),
+      });
+      const json = await res.json();
+      if (json.success) {
+        toast.success('Termenele au fost salvate');
+      } else {
+        toast.error(json.error || 'Eroare la salvare');
+      }
+    } catch {
+      toast.error('Eroare de retea');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) {
+    return <Skeleton className="h-64 w-full rounded-lg mt-4" />;
+  }
+
+  return (
+    <div className="space-y-6 mt-4">
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <Clock className="h-5 w-5 text-primary-600" />
+            <div>
+              <CardTitle>Termen eliberare stare civilă (pe oficiu)</CardTitle>
+              <CardDescription>
+                Naștere / căsătorie / celibat — termenul afișat în wizard + pe site
+                în funcție de oficiul de înregistrare ales de client.
+              </CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-5">
+          <div className="space-y-2">
+            <Label htmlFor="civil-slow">București + sectoare (lent)</Label>
+            <Input
+              id="civil-slow"
+              value={tiers.slow.display}
+              onChange={(e) =>
+                setTiers((t) => ({ ...t, slow: { ...t.slow, display: e.target.value } }))
+              }
+              placeholder="ex: 15-30 zile lucrătoare"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="civil-default">Restul județelor (standard)</Label>
+            <Input
+              id="civil-default"
+              value={tiers.default.display}
+              onChange={(e) =>
+                setTiers((t) => ({ ...t, default: { ...t.default, display: e.target.value } }))
+              }
+              placeholder="ex: 7-15 zile lucrătoare"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="civil-fast">Oficii rapide (rapid)</Label>
+            <Input
+              id="civil-fast"
+              value={tiers.fast.display}
+              onChange={(e) =>
+                setTiers((t) => ({ ...t, fast: { ...t.fast, display: e.target.value } }))
+              }
+              placeholder="ex: 5-7 zile lucrătoare"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="civil-fast-counties">
+              Județe rapide (separate prin virgulă)
+            </Label>
+            <Textarea
+              id="civil-fast-counties"
+              value={fastCountiesText}
+              onChange={(e) => setFastCountiesText(e.target.value)}
+              rows={2}
+              placeholder="ex: Satu Mare, Bihor"
+            />
+            <p className="text-xs text-neutral-500">
+              Numele exact al județului. București + sectoarele sunt mereu „lent”.
+            </p>
+          </div>
+          <div className="flex justify-end">
+            <Button onClick={save} disabled={saving}>
+              {saving ? (
+                <>
+                  <RefreshCw className="h-4 w-4 animate-spin" /> Se salveaza...
+                </>
+              ) : (
+                <>
+                  <Save className="h-4 w-4" /> Salveaza
+                </>
+              )}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 }
 

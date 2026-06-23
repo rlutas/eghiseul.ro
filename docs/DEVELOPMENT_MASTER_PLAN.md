@@ -662,17 +662,13 @@ Features planned but not yet scheduled for a specific sprint.
 
 **Scope:** Completare DB `verification_config.constatator.documentTypes[].reportTypes[].purposes`, filtrare în wizard step, validare worker.
 
-#### Extras Multilingv (add-on naștere/căsătorie)
+#### ✅ Extras Multilingv (add-on naștere/căsătorie) — LIVRAT 2026-06-23
 
-**Problem:** WPForms avea formulare separate "Extras Multilingv Certificat Naștere/Căsătorie" (10176/10274). În wizardul nostru lipsește opțiunea add-on de extras multilingv pentru naștere/căsătorie. Deferred de la auditul civil-status (2026-06-18) și confirmat la auditul complet (2026-06-23).
+Add-on `extras_multilingv` (399 lei) pe certificat-nastere + certificat-casatorie (migrația 078), randat în secțiunea generică „Documente suplimentare" din options-step. Vezi `changelog/2026-06-23-multilingv-civil-dynamic-terms.md`. (Standalone 799 lei rămâne posibil viitor — paginile SEO există deja.)
 
-**Scope:** Adăugare `service_option` (extras multilingv) pe certificat-nastere + certificat-casatorie cu preț + procesare. **Prețuri din WPForms vechi (verificat 2026-06-23):** standalone **799 lei**, ca add-on în formularul de naștere/căsătorie **399 lei**; termen 7-15 zile (la fel ca certificatul de bază). Specimene WebP 2025 deja existente: `extras-multilingv-nastere.webp`, `extras-multilingv-casatorie.webp`.
+#### ✅ Termen dinamic stare civilă pe oficiul selectat — LIVRAT 2026-06-23
 
-#### Termen dinamic stare civilă pe oficiul selectat
-
-**Problem:** Termenul de eliberare la naștere/căsătorie/celibat variază mult după oficiul de stare civilă: București + toate sectoarele = lent (~15-30 zile), oficii rapide (ex. Satu Mare) = ~5-7 zile, restul ~7-15 zile. Acum afișăm un baseline static „7-15 zile lucrătoare" (migrația 077). Câmpul de localitate din modulul civil-status (`CivilStatusStep.tsx`, „Județul / Sectorul") e **text liber** → nu putem detecta fiabil oficiul.
-
-**Scope:** Conversie câmp localitate la selecție structurată (județ/sector dropdown) + mapare oficiu→tier termen + afișare dinamică a termenului în wizard (și notă pe pagina serviciului că București durează mai mult). Acoperă și extras multilingv naștere/căsătorie.
+3 tiers (București/sectoare 15-30, oficii rapide 5-7, rest 7-15), lista de oficii rapide editabilă din `/admin/settings` → „Termene stare civilă". `registrationPlace` convertit la dropdown structurat. Migrația 079 + `src/lib/civil-status/delivery-terms.ts`. Vezi changelog + `docs/plans/2026-06-23-civil-status-dynamic-terms-design.md`.
 
 #### Specimene PNG vechi pe 4 pagini servicii
 

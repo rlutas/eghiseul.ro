@@ -7,6 +7,11 @@ import { Label } from '@/components/ui/label';
 import { useModularWizard } from '@/providers/modular-wizard-provider';
 import type { CivilStatusConfig, CivilStatusState } from '@/types/verification-modules';
 import { cn } from '@/lib/utils';
+import { useCivilStatusTerms } from '@/hooks/use-civil-status-terms';
+import {
+  CIVIL_REGISTRATION_OPTIONS,
+  resolveCivilTermTier,
+} from '@/lib/civil-status/delivery-terms';
 
 interface CivilStatusStepProps {
   config: CivilStatusConfig | null | undefined;
@@ -99,6 +104,13 @@ export default function CivilStatusStep({ config, onValidChange }: CivilStatusSt
   const cs: CivilStatusState = useMemo(() => state.civilStatus ?? {}, [state.civilStatus]);
   const fields = useMemo(() => config?.fields ?? {}, [config]);
   const docLabel = config ? DOC_LABEL[config.documentType] : 'documentul';
+
+  // Termen de eliberare estimat în funcție de oficiul (registrationPlace) ales.
+  const termTiers = useCivilStatusTerms();
+  const resolvedTerm = useMemo(
+    () => resolveCivilTermTier(cs.registrationPlace, termTiers),
+    [cs.registrationPlace, termTiers]
+  );
 
   const isAdult = !fields.applicantType || cs.applicantType === 'adult';
   const showCurrentlyMarried = !!fields.currentlyMarried && isAdult;
@@ -370,12 +382,26 @@ export default function CivilStatusStep({ config, onValidChange }: CivilStatusSt
         )}
 
         {fields.registrationPlace && (
-          <Field label="Localitatea care a înregistrat actul" required>
-            <Input
+          <Field label="Județul / sectorul care a înregistrat actul" required>
+            <select
               value={cs.registrationPlace ?? ''}
               onChange={(e) => updateCivilStatus({ registrationPlace: e.target.value })}
-              placeholder="Oraș / comună / sector"
-            />
+              className="h-11 w-full rounded-lg border border-neutral-300 bg-white px-3 text-base sm:text-sm transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
+            >
+              <option value="">Selectați județul / sectorul</option>
+              {CIVIL_REGISTRATION_OPTIONS.map((opt) => (
+                <option key={opt} value={opt}>
+                  {opt}
+                </option>
+              ))}
+            </select>
+            {cs.registrationPlace?.trim() && (
+              <Notice tone="info">
+                Termen estimat de eliberare:{' '}
+                <strong>{resolvedTerm.display}</strong>. Termenul efectiv depinde
+                de oficiul de stare civilă și poate varia.
+              </Notice>
+            )}
           </Field>
         )}
 
