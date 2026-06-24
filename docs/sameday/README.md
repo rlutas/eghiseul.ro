@@ -63,6 +63,9 @@ Payload (același ca la AWB, recipient minim):
 ## Test live (script ad-hoc)
 Auth → geolocation/county → city → pickup-points → estimate-cost. Confirmat 200 + `amount`. (Script temporar, nu commit-uit; reface oricând cu env-ul.)
 
+## Monitoring (implementat)
+- La creare AWB (`api/courier/ship`): compară `result.priceWithVAT` (cost real curier) cu `orders.delivery_price` (încasat). Dacă real − încasat > 1 RON → `console.warn [Courier cost mismatch]` (audit „nu pierdem bani").
+
 ## Backlog
-- Preț real locker: estimează cu un locker reprezentativ din oraș, sau la momentul selectării lockerului.
+- Preț real locker: estimate-cost cu service=15 + `oohLastMile` întoarce încă 400 (validare strictă Sameday, fără eroare pe câmp). Acum fallback `standard*0.85`. De reluat cu payload-ul exact din AWB locker reușit (după prima livrare locker reală).
 - Monitoring quote vs `awbCost` real la creare AWB.

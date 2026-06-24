@@ -118,6 +118,30 @@ export async function POST(request: NextRequest) {
     // Create the shipment
     const result = await courierProvider.createShipment(shipmentRequest);
 
+    // Monitoring „nu pierdem bani": compară costul REAL al curierului (din AWB)
+    // cu prețul de livrare încasat de la client. Dacă real > încasat cu >1 RON,
+    // pierdem pe livrare → warn pentru audit (ex. estimarea a fost sub real).
+    if (body.orderId && result.success && typeof result.priceWithVAT === 'number') {
+      try {
+        const { data: ord } = await supabase
+          .from('orders')
+          .select('delivery_price')
+          .eq('id', body.orderId)
+          .single();
+        const charged = Number(ord?.delivery_price ?? 0);
+        const realCost = result.priceWithVAT;
+        if (charged > 0 && realCost - charged > 1) {
+          console.warn(
+            `[Courier cost mismatch] order=${body.orderId} provider=${body.provider} ` +
+            `încasat=${charged} RON, cost real=${realCost.toFixed(2)} RON, ` +
+            `pierdere=${(realCost - charged).toFixed(2)} RON`
+          );
+        }
+      } catch {
+        /* monitoring best-effort — nu blochează crearea AWB */
+      }
+    }
+
     // If orderId provided, update the order with AWB info
     if (body.orderId && result.success) {
       // Use existing columns for tracking
