@@ -578,7 +578,7 @@ export interface CivilStatusState {
   birthName?: string;
   fatherName?: string;
   motherName?: string;
-  oldCertificateReason?: 'pierdut' | 'deteriorat' | 'furat' | 'altul'; // Vechiul certificat mi-a fost:
+  oldCertificateReason?: 'pierdut' | 'distrus' | 'furat'; // Vechiul certificat mi-a fost:
   renouncedRomanianCitizenship?: boolean; // Ați renunțat la cetățenia română?
   purpose?: string;
   countryOfUse?: string;

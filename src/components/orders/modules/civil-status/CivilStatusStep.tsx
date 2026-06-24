@@ -9,9 +9,12 @@ import type { CivilStatusConfig, CivilStatusState } from '@/types/verification-m
 import { cn } from '@/lib/utils';
 import { useCivilStatusTerms } from '@/hooks/use-civil-status-terms';
 import {
-  CIVIL_REGISTRATION_OPTIONS,
+  CIVIL_COUNTY_OPTIONS,
+  BUCHAREST_SECTORS,
   resolveCivilTermTier,
 } from '@/lib/civil-status/delivery-terms';
+import { SearchableSelect } from '@/components/shared/SearchableSelect';
+import { COUNTRIES } from '@/config/countries';
 
 interface CivilStatusStepProps {
   config: CivilStatusConfig | null | undefined;
@@ -111,6 +114,13 @@ export default function CivilStatusStep({ config, onValidChange }: CivilStatusSt
     () => resolveCivilTermTier(cs.registrationPlace, termTiers),
     [cs.registrationPlace, termTiers]
   );
+  // Cascadă județ → sector pentru registrationPlace. Pt București stocăm
+  // „București (Sectorul N)"; pt rest = numele județului.
+  const rp = cs.registrationPlace ?? '';
+  const rpIsBuc = /^bucure[sș]ti/i.test(rp);
+  const rpCounty = rpIsBuc ? 'București' : rp;
+  const rpSector = rpIsBuc ? (rp.match(/Sectorul \d/)?.[0] ?? '') : '';
+  const rpComplete = !!rp.trim() && (!rpIsBuc || !!rpSector);
 
   const isAdult = !fields.applicantType || cs.applicantType === 'adult';
   const showCurrentlyMarried = !!fields.currentlyMarried && isAdult;
@@ -143,7 +153,7 @@ export default function CivilStatusStep({ config, onValidChange }: CivilStatusSt
     if (showMarriagePlace) checks.push(cs.marriageAbroad !== undefined);
     if (fields.spouseName) checks.push(!!cs.spouseNameBeforeMarriage?.trim());
     if (fields.marriageDate) checks.push(!!cs.marriageDate?.trim());
-    if (fields.registrationPlace) checks.push(!!cs.registrationPlace?.trim());
+    if (fields.registrationPlace) checks.push(rpComplete);
     if (fields.birthName) checks.push(!!cs.birthName?.trim());
     if (fields.parentNames) {
       checks.push(!!cs.fatherName?.trim());
@@ -373,29 +383,42 @@ export default function CivilStatusStep({ config, onValidChange }: CivilStatusSt
               onChange={(v) => updateCivilStatus({ oldCertificateReason: v as CivilStatusState['oldCertificateReason'] })}
               options={[
                 { value: 'pierdut', label: 'Pierdut' },
-                { value: 'deteriorat', label: 'Deteriorat' },
+                { value: 'distrus', label: 'Distrus' },
                 { value: 'furat', label: 'Furat' },
-                { value: 'altul', label: 'Altul' },
               ]}
             />
           </Field>
         )}
 
         {fields.registrationPlace && (
-          <Field label="Județul / sectorul care a înregistrat actul" required>
-            <select
-              value={cs.registrationPlace ?? ''}
-              onChange={(e) => updateCivilStatus({ registrationPlace: e.target.value })}
-              className="h-11 w-full rounded-lg border border-neutral-300 bg-white px-3 text-base sm:text-sm transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
-            >
-              <option value="">Selectați județul / sectorul</option>
-              {CIVIL_REGISTRATION_OPTIONS.map((opt) => (
-                <option key={opt} value={opt}>
-                  {opt}
-                </option>
-              ))}
-            </select>
-            {cs.registrationPlace?.trim() && (
+          <Field label="Județul care a înregistrat actul" required>
+            <SearchableSelect
+              options={CIVIL_COUNTY_OPTIONS}
+              priorityOptions={['București', 'Cluj', 'Timiș', 'Iași', 'Constanța', 'Brașov']}
+              value={rpCounty}
+              placeholder="Caută județul..."
+              onChange={(county) =>
+                updateCivilStatus({
+                  registrationPlace: county === 'București' ? 'București' : county,
+                })
+              }
+            />
+            {rpIsBuc && (
+              <div className="mt-3">
+                <p className="text-sm font-medium text-secondary-900 mb-1.5">
+                  Sectorul <span className="text-red-500">*</span>
+                </p>
+                <SearchableSelect
+                  options={BUCHAREST_SECTORS}
+                  value={rpSector}
+                  placeholder="Alege sectorul..."
+                  onChange={(sector) =>
+                    updateCivilStatus({ registrationPlace: `București (${sector})` })
+                  }
+                />
+              </div>
+            )}
+            {rpComplete && (
               <Notice tone="info">
                 Termen estimat de eliberare:{' '}
                 <strong>{resolvedTerm.display}</strong>. Termenul efectiv depinde
@@ -443,10 +466,12 @@ export default function CivilStatusStep({ config, onValidChange }: CivilStatusSt
 
         {fields.countryOfUse && (
           <Field label="Țara în care urmează să fie folosit actul" required>
-            <Input
+            <SearchableSelect
+              options={COUNTRIES}
+              priorityOptions={['România', 'Italia', 'Spania', 'Germania', 'Marea Britanie', 'Franța']}
               value={cs.countryOfUse ?? ''}
-              onChange={(e) => updateCivilStatus({ countryOfUse: e.target.value })}
-              placeholder="ex: România, Italia, Germania"
+              placeholder="Caută țara..."
+              onChange={(country) => updateCivilStatus({ countryOfUse: country })}
             />
           </Field>
         )}

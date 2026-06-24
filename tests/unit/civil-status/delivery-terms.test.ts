@@ -2,6 +2,8 @@ import { describe, it, expect } from 'vitest';
 import {
   resolveCivilTermTier,
   CIVIL_REGISTRATION_OPTIONS,
+  CIVIL_COUNTY_OPTIONS,
+  BUCHAREST_SECTORS,
   DEFAULT_CIVIL_TERM_TIERS,
   type CivilTermTiers,
 } from '@/lib/civil-status/delivery-terms';
@@ -85,6 +87,25 @@ describe('CIVIL_REGISTRATION_OPTIONS', () => {
       const tier = resolveCivilTermTier(opt).tier;
       expect(['slow', 'fast', 'default']).toContain(tier);
     }
+  });
+});
+
+describe('CIVIL_COUNTY_OPTIONS + BUCHAREST_SECTORS (cascade UI)', () => {
+  it('county list includes București once and ordinary counties', () => {
+    expect(CIVIL_COUNTY_OPTIONS.filter((c) => c === 'București')).toHaveLength(1);
+    expect(CIVIL_COUNTY_OPTIONS).toContain('Satu Mare');
+    expect(CIVIL_COUNTY_OPTIONS).toContain('Cluj');
+  });
+
+  it('has exactly 6 București sectors', () => {
+    expect(BUCHAREST_SECTORS).toEqual([
+      'Sectorul 1', 'Sectorul 2', 'Sectorul 3',
+      'Sectorul 4', 'Sectorul 5', 'Sectorul 6',
+    ]);
+  });
+
+  it('a "București (Sectorul N)" value (built in the step) resolves to SLOW', () => {
+    expect(resolveCivilTermTier('București (Sectorul 4)').tier).toBe('slow');
   });
 });
 

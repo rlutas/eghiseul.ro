@@ -32,12 +32,24 @@ export const DEFAULT_CIVIL_TERM_TIERS: CivilTermTiers = {
 };
 
 /**
- * Opțiunile pentru câmpul „unde a fost înregistrat actul" — toate județele,
- * cu București expandat pe sectoare (orice „București…" = tier slow).
+ * Județele pentru câmpul „unde a fost înregistrat actul" — toate, București
+ * inclus o singură dată (sectorul se alege separat, cascadă).
+ */
+export const CIVIL_COUNTY_OPTIONS: string[] = COUNTIES.map((c) => c.name);
+
+/** Sectoarele Bucureștiului (cascadă când județul = București). */
+export const BUCHAREST_SECTORS: string[] = Array.from(
+  { length: 6 },
+  (_, i) => `Sectorul ${i + 1}`
+);
+
+/**
+ * Toate valorile valide pentru registrationPlace — județe, cu București
+ * expandat pe sectoare (orice „București…" = tier slow). Folosit la validare/test.
  */
 export const CIVIL_REGISTRATION_OPTIONS: string[] = COUNTIES.flatMap((c) =>
   c.name === 'București'
-    ? Array.from({ length: 6 }, (_, i) => `București (Sectorul ${i + 1})`)
+    ? BUCHAREST_SECTORS.map((s) => `București (${s})`)
     : [c.name]
 );
 
