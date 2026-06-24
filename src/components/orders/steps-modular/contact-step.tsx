@@ -48,32 +48,6 @@ function getPurposeOptionsForService(slug: string | null): readonly string[] | n
   return null;
 }
 
-/** Most-frequently picked motives, surfaced at the top of the dropdown. */
-function getPurposePriorityForService(slug: string | null): readonly string[] {
-  if (!slug) return [];
-  if (slug.includes('cazier-judiciar')) {
-    return [
-      'ANGAJARE',
-      'ADOPȚIE',
-      'VIZĂ',
-      'EMIGRARE',
-      'CĂSĂTORIE',
-      'CONCURS/EXAMEN',
-      'ALTE MOTIVE',
-    ];
-  }
-  if (slug.includes('cazier-fiscal')) {
-    return ['Angajare', 'Dosar', 'Licitație', 'Bancă', 'Alte motive'];
-  }
-  if (slug.includes('cazier-auto')) {
-    return ['LOCUL DE MUNCĂ', 'INTERES PERSONAL', 'ALTE MOTIVE'];
-  }
-  if (slug.includes('integritate')) {
-    return ['ANGAJARE', 'ADOPȚIE', 'CONCURS', 'VOLUNTARIAT'];
-  }
-  return [];
-}
-
 // Phone validation: international E.164-ish format. We accept any number that
 // starts with + followed by 8-15 digits/spaces — react-international-phone
 // gives us back values like "+40712345678".
@@ -123,7 +97,6 @@ export function ContactStepModular({ onValidChange }: ContactStepProps) {
 
   // Service-specific purpose / motivul solicitării. Drop-down only.
   const purposeOptions = getPurposeOptionsForService(state.serviceSlug);
-  const purposePriority = getPurposePriorityForService(state.serviceSlug);
   const showsPurpose =
     !!purposeOptions && state.clientType === 'PF';
   const purpose = state.contact.purpose ?? '';
@@ -328,7 +301,6 @@ export function ContactStepModular({ onValidChange }: ContactStepProps) {
         {showsPurpose && purposeOptions && (
           <PurposeSelect
             options={purposeOptions}
-            priorityOptions={purposePriority}
             value={purpose}
             onChange={(v) => updateContact({ purpose: v })}
           />
@@ -441,7 +413,6 @@ export function ContactStepModular({ onValidChange }: ContactStepProps) {
         {showsPurpose && purposeOptions && (
           <PurposeSelect
             options={purposeOptions}
-            priorityOptions={purposePriority}
             value={purpose}
             onChange={(v) => updateContact({ purpose: v })}
           />
@@ -584,14 +555,12 @@ function ForeignBirthFields({
 
 interface PurposeSelectProps {
   options: readonly string[];
-  priorityOptions?: readonly string[];
   value: string;
   onChange: (value: string) => void;
 }
 
 function PurposeSelect({
   options,
-  priorityOptions,
   value,
   onChange,
 }: PurposeSelectProps) {
@@ -602,12 +571,11 @@ function PurposeSelect({
           Motivul solicitării <span className="text-red-500">*</span>
         </p>
         <p className="text-xs text-neutral-500 mt-0.5 leading-snug">
-          Acest motiv apare scris pe documentul eliberat. Cele mai frecvente sunt afișate primele — sau caută în listă.
+          Acest motiv apare scris pe documentul eliberat. Caută sau alege din listă.
         </p>
       </div>
       <SearchableSelect
         options={options}
-        priorityOptions={priorityOptions}
         value={value}
         onChange={onChange}
         placeholder="Selectează motivul (ex: Angajare, Adopție, Vize)"

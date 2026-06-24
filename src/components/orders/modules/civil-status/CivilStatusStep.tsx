@@ -394,7 +394,6 @@ export default function CivilStatusStep({ config, onValidChange }: CivilStatusSt
           <Field label="Județul care a înregistrat actul" required>
             <SearchableSelect
               options={CIVIL_COUNTY_OPTIONS}
-              priorityOptions={['București', 'Cluj', 'Timiș', 'Iași', 'Constanța', 'Brașov']}
               value={rpCounty}
               placeholder="Caută județul..."
               onChange={(county) =>
@@ -468,7 +467,6 @@ export default function CivilStatusStep({ config, onValidChange }: CivilStatusSt
           <Field label="Țara în care urmează să fie folosit actul" required>
             <SearchableSelect
               options={COUNTRIES}
-              priorityOptions={['România', 'Italia', 'Spania', 'Germania', 'Marea Britanie', 'Franța']}
               value={cs.countryOfUse ?? ''}
               placeholder="Caută țara..."
               onChange={(country) => updateCivilStatus({ countryOfUse: country })}

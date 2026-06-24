@@ -19,10 +19,6 @@ function stripDiacritics(str: string): string {
 
 interface SearchableSelectProps {
   options: readonly string[];
-  /** Optional ordered list of items to surface at the very top of the
-   *  unfiltered list (most-likely picks). Already-included options are
-   *  not duplicated in the main list. */
-  priorityOptions?: readonly string[];
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
@@ -32,7 +28,6 @@ interface SearchableSelectProps {
 
 export function SearchableSelect({
   options,
-  priorityOptions = [],
   value,
   onChange,
   placeholder = 'Cauta...',
@@ -71,15 +66,10 @@ export function SearchableSelect({
   // then the rest with priority items dedup'd out.
   const normalizedSearch = stripDiacritics(search);
   const isSearching = search.length > 0;
-  const fullList = isSearching
+  // Arată TOATE opțiunile (în ordinea dată — alfabetică), scrollabil. Scrii ca să filtrezi.
+  const visible = isSearching
     ? options.filter((o) => stripDiacritics(o).includes(normalizedSearch))
-    : (() => {
-        const prioritySet = new Set(priorityOptions);
-        const rest = options.filter((o) => !prioritySet.has(o));
-        return [...priorityOptions.filter((p) => options.includes(p)), ...rest];
-      })();
-  const visible = fullList.slice(0, 8);
-  const hasMore = fullList.length > 8;
+    : options;
 
   // Compute dropdown position relative to viewport so it can escape any
   // ancestor with overflow:hidden (the wizard step Card uses it).
@@ -258,47 +248,27 @@ export function SearchableSelect({
                 style={dropdownStyle}
                 className="max-h-64 overflow-auto rounded-lg border border-neutral-200 bg-white shadow-xl"
               >
-                {visible.map((item, i) => {
-                  const isPriority =
-                    !isSearching && priorityOptions.includes(item);
-                  return (
-                    <li
-                      key={item}
-                      role="option"
-                      aria-selected={i === highlightIndex}
-                      className={`cursor-pointer px-3 py-2 text-sm transition-colors ${
-                        i === highlightIndex
-                          ? 'bg-primary-50 text-primary-700 font-medium'
-                          : item === value
-                          ? 'bg-primary-50/50 font-medium text-primary-700'
-                          : 'hover:bg-neutral-50'
-                      } ${
-                        isPriority && i === priorityOptions.length - 1
-                          ? 'border-b border-neutral-100'
-                          : ''
-                      }`}
-                      onMouseDown={(e) => {
-                        e.preventDefault();
-                        handleSelect(item);
-                      }}
-                      onMouseEnter={() => setHighlightIndex(i)}
-                    >
-                      <div className="flex items-center justify-between gap-2">
-                        <span className="truncate">{item}</span>
-                        {isPriority && (
-                          <span className="text-[10px] uppercase tracking-wide text-primary-500 shrink-0">
-                            Frecvent
-                          </span>
-                        )}
-                      </div>
-                    </li>
-                  );
-                })}
-                {hasMore && (
-                  <li className="px-3 py-2 text-[11px] text-neutral-500 text-center border-t border-neutral-100 bg-neutral-50/40">
-                    +{fullList.length - 8} rezultate — continuă să scrii
+                {visible.map((item, i) => (
+                  <li
+                    key={item}
+                    role="option"
+                    aria-selected={i === highlightIndex}
+                    className={`cursor-pointer px-3 py-2 text-sm transition-colors ${
+                      i === highlightIndex
+                        ? 'bg-primary-50 text-primary-700 font-medium'
+                        : item === value
+                        ? 'bg-primary-50/50 font-medium text-primary-700'
+                        : 'hover:bg-neutral-50'
+                    }`}
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      handleSelect(item);
+                    }}
+                    onMouseEnter={() => setHighlightIndex(i)}
+                  >
+                    <span className="truncate">{item}</span>
                   </li>
-                )}
+                ))}
               </ul>
             )}
             {visible.length === 0 && search.length > 0 && (

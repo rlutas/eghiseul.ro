@@ -276,7 +276,7 @@ export function DeliveryStepModular({ onValidChange }: DeliveryStepProps) {
     isCivilStatus ? 'physical' : delivery.method === 'email' ? 'email' : delivery.method ? 'physical' : null
   );
   const [physicalRegion, setPhysicalRegion] = useState<PhysicalRegion | null>(
-    isCivilStatus ? 'romania' : delivery.method && delivery.method !== 'email' ? 'romania' : null
+    delivery.method && delivery.method !== 'email' ? 'romania' : null
   );
 
   // Courier quotes
@@ -385,15 +385,18 @@ export function DeliveryStepModular({ onValidChange }: DeliveryStepProps) {
       const data = await response.json();
 
       if (data.success && data.data?.quotes) {
-        // Apply markup to prices and sort by final price (cheapest first)
+        // Apply markup + minim de livrare (niciodată sub 20 RON cu TVA —
+        // acoperim procesare, plic, manoperă). Sortează cheapest-first.
+        const MIN_PRICE_WITH_VAT = 20;
+        const MIN_PRICE = Math.round((MIN_PRICE_WITH_VAT / 1.21) * 100) / 100;
         const quotesWithMarkup = data.data.quotes.map((quote: CourierQuote) => ({
           ...quote,
           // Store original prices for reference
           originalPrice: quote.price,
           originalPriceWithVAT: quote.priceWithVAT,
-          // Apply markup to the displayed prices
-          price: applyMarkup(quote.price),
-          priceWithVAT: applyMarkup(quote.priceWithVAT),
+          // Apply markup + floor to the displayed prices
+          price: Math.max(applyMarkup(quote.price), MIN_PRICE),
+          priceWithVAT: Math.max(applyMarkup(quote.priceWithVAT), MIN_PRICE_WITH_VAT),
         }));
 
         // Filter out disabled locker services, then sort by price
