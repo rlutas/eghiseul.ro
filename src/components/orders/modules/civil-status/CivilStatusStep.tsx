@@ -122,6 +122,13 @@ export default function CivilStatusStep({ config, onValidChange }: CivilStatusSt
   const rpSector = rpIsBuc ? (rp.match(/Sectorul \d/)?.[0] ?? '') : '';
   const rpComplete = !!rp.trim() && (!rpIsBuc || !!rpSector);
 
+  // Aceeași cascadă județ→sector pentru județul/sectorul nașterii (celibat).
+  const bc = cs.birthCounty ?? '';
+  const bcIsBuc = /^bucure[sș]ti/i.test(bc);
+  const bcCounty = bcIsBuc ? 'București' : bc;
+  const bcSector = bcIsBuc ? (bc.match(/Sectorul \d/)?.[0] ?? '') : '';
+  const bcComplete = !!bc.trim() && (!bcIsBuc || !!bcSector);
+
   const isAdult = !fields.applicantType || cs.applicantType === 'adult';
   const showCurrentlyMarried = !!fields.currentlyMarried && isAdult;
   const showMaritalHistory = !!fields.maritalHistory && isAdult;
@@ -136,7 +143,7 @@ export default function CivilStatusStep({ config, onValidChange }: CivilStatusSt
     if (fields.birthPlace) checks.push(cs.bornAbroad !== undefined);
     if (fields.birthLocality) {
       checks.push(!!cs.birthLocality?.trim());
-      checks.push(!!cs.birthCounty?.trim());
+      checks.push(bcComplete);
     }
     if (fields.nationality) checks.push(!!cs.nationality?.trim());
     if (showCurrentlyMarried) checks.push(cs.currentlyMarried !== undefined);
@@ -215,12 +222,32 @@ export default function CivilStatusStep({ config, onValidChange }: CivilStatusSt
                 placeholder="Oraș / comună"
               />
             </Field>
-            <Field label="Județul / Sectorul în care v-ați născut" required>
-              <Input
-                value={cs.birthCounty ?? ''}
-                onChange={(e) => updateCivilStatus({ birthCounty: e.target.value })}
-                placeholder="Județ / sector"
+            <Field label="Județul în care v-ați născut" required>
+              <SearchableSelect
+                options={CIVIL_COUNTY_OPTIONS}
+                value={bcCounty}
+                placeholder="Caută județul..."
+                onChange={(county) =>
+                  updateCivilStatus({
+                    birthCounty: county === 'București' ? 'București' : county,
+                  })
+                }
               />
+              {bcIsBuc && (
+                <div className="mt-3">
+                  <p className="text-sm font-medium text-secondary-900 mb-1.5">
+                    Sectorul <span className="text-red-500">*</span>
+                  </p>
+                  <SearchableSelect
+                    options={BUCHAREST_SECTORS}
+                    value={bcSector}
+                    placeholder="Alege sectorul..."
+                    onChange={(sector) =>
+                      updateCivilStatus({ birthCounty: `București (${sector})` })
+                    }
+                  />
+                </div>
+              )}
             </Field>
           </div>
         )}
