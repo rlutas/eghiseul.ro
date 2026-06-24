@@ -573,6 +573,7 @@ export interface CivilStatusState {
   marriageAbroadIntent?: boolean;   // Solicitați în vederea căsătoriei în străinătate?
   marriageAbroad?: boolean;         // Căsătoria a avut loc în străinătate
   spouseNameBeforeMarriage?: string;
+  futureSpouseName?: string;        // celibat: numele viitorului soț/soție (căsătorie în străinătate)
   marriageDate?: string;
   registrationPlace?: string;
   birthName?: string;

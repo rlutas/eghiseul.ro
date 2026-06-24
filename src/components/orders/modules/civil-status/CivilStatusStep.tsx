@@ -145,7 +145,10 @@ export default function CivilStatusStep({ config, onValidChange }: CivilStatusSt
       checks.push(!!cs.birthLocality?.trim());
       checks.push(bcComplete);
     }
-    if (fields.nationality) checks.push(!!cs.nationality?.trim());
+    if (fields.marriageAbroadIntent && cs.marriageAbroadIntent === true) {
+      checks.push(!!cs.futureSpouseName?.trim());
+      if (fields.nationality) checks.push(!!cs.nationality?.trim());
+    }
     if (showCurrentlyMarried) checks.push(cs.currentlyMarried !== undefined);
     if (fields.maritalStatus) checks.push(!!cs.maritalStatus);
     if (showMaritalHistory) {
@@ -168,7 +171,8 @@ export default function CivilStatusStep({ config, onValidChange }: CivilStatusSt
     }
     if (fields.oldCertificateReason) checks.push(!!cs.oldCertificateReason);
     if (fields.renouncedCitizenship) checks.push(cs.renouncedRomanianCitizenship !== undefined);
-    if (fields.purpose) checks.push(!!cs.purpose?.trim());
+    if (fields.purpose && !(fields.marriageAbroadIntent && cs.marriageAbroadIntent === true))
+      checks.push(!!cs.purpose?.trim());
     if (fields.countryOfUse) checks.push(!!cs.countryOfUse?.trim());
     onValidChange(checks.every(Boolean));
   }, [cs, fields, showCurrentlyMarried, showMaritalHistory, showMarriagePlace, onValidChange]);
@@ -252,15 +256,6 @@ export default function CivilStatusStep({ config, onValidChange }: CivilStatusSt
           </div>
         )}
 
-        {fields.nationality && (
-          <Field label="Naționalitatea" required>
-            <Input
-              value={cs.nationality ?? ''}
-              onChange={(e) => updateCivilStatus({ nationality: e.target.value })}
-              placeholder="ex: română"
-            />
-          </Field>
-        )}
 
         {fields.maritalStatus && (
           <Field label="Care este starea civilă actuală?" required>
@@ -480,12 +475,33 @@ export default function CivilStatusStep({ config, onValidChange }: CivilStatusSt
           </Field>
         )}
 
-        {fields.purpose && (
+        {/* Căsătorie în străinătate = Da → date despre viitorul soț/soție. */}
+        {fields.marriageAbroadIntent && cs.marriageAbroadIntent === true && (
+          <div className="grid sm:grid-cols-2 gap-4">
+            <Field label="Numele complet al viitorului soț/soție" required>
+              <Input
+                value={cs.futureSpouseName ?? ''}
+                onChange={(e) => updateCivilStatus({ futureSpouseName: e.target.value })}
+                placeholder="Nume și prenume"
+              />
+            </Field>
+            <Field label="Naționalitatea viitorului soț/soție" required>
+              <Input
+                value={cs.nationality ?? ''}
+                onChange={(e) => updateCivilStatus({ nationality: e.target.value })}
+                placeholder="ex: italiană, germană"
+              />
+            </Field>
+          </div>
+        )}
+
+        {/* Scopul — apare DOAR dacă NU e pentru căsătorie în străinătate. */}
+        {fields.purpose && !(fields.marriageAbroadIntent && cs.marriageAbroadIntent === true) && (
           <Field label="Scopul obținerii certificatului" required>
             <Input
               value={cs.purpose ?? ''}
               onChange={(e) => updateCivilStatus({ purpose: e.target.value })}
-              placeholder="ex: dosar de cetățenie, căsătorie în străinătate, instanță"
+              placeholder="ex: dosar de cetățenie, instanță, bancă"
             />
           </Field>
         )}
