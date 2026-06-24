@@ -229,6 +229,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       deliveryTrackingNumber: order.delivery_tracking_number || null,
       contractUrl: order.contract_url,
       finalDocumentUrl: order.final_document_url,
+      invoiceUrl: order.invoice_url,
+      invoiceNumber: order.invoice_number,
       createdAt: order.created_at,
       updatedAt: order.updated_at,
       estimatedCompletion: persistedEstimate ?? estimatedCompletion.toISOString(),

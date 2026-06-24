@@ -142,6 +142,8 @@ interface OrderData {
   deliveryTrackingNumber: string | null;
   contractUrl: string | null;
   finalDocumentUrl: string | null;
+  invoiceUrl: string | null;
+  invoiceNumber: string | null;
   createdAt: string;
   updatedAt: string;
   estimatedCompletion: string;
@@ -898,6 +900,34 @@ export default function OrderDetailPage() {
                     )}
                   </button>
                 ))}
+              </div>
+            </div>
+          )}
+
+          {/* Factura (Oblio) */}
+          {order.invoiceUrl && (
+            <div className="bg-white rounded-2xl border border-neutral-200 overflow-hidden">
+              <div className="p-4 border-b border-neutral-100 bg-neutral-50">
+                <h4 className="font-semibold text-secondary-900">Factură</h4>
+              </div>
+              <div className="p-4">
+                <a
+                  href={order.invoiceUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 p-3 rounded-xl hover:bg-neutral-50 transition-colors group"
+                >
+                  <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
+                    <Receipt className="w-5 h-5 text-green-600" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-secondary-900">Factură fiscală</p>
+                    <p className="text-xs text-neutral-500">
+                      {order.invoiceNumber ? `Nr. ${order.invoiceNumber} · ` : ''}Click pentru descărcare
+                    </p>
+                  </div>
+                  <Download className="w-5 h-5 text-neutral-400" />
+                </a>
               </div>
             </div>
           )}
