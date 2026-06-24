@@ -447,8 +447,8 @@ export default function SuccessPage() {
   });
   const processingTimeText =
     deliveryEstimate.minDays === deliveryEstimate.maxDays
-      ? `Procesăm documentul în ${deliveryEstimate.minDays} zile lucrătoare`
-      : `Procesăm documentul în ${deliveryEstimate.minDays}-${deliveryEstimate.maxDays} zile lucrătoare`;
+      ? `Primești documentul în ${deliveryEstimate.minDays} zile lucrătoare`
+      : `Primești documentul în ${deliveryEstimate.minDays}-${deliveryEstimate.maxDays} zile lucrătoare`;
 
   // Normalized options for the shared OrderSummaryCard — names already
   // stripped of the "(adaugă în aceeași comandă)" marketing suffix, and

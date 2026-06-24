@@ -1,6 +1,6 @@
 'use client';
 
-import { MessageCircle, Phone } from 'lucide-react';
+import { MessageCircle } from 'lucide-react';
 
 // Hardcoded on purpose — the support number lives in the code, not in a Vercel
 // env var, so it's always correct on the site without extra configuration.
@@ -40,17 +40,10 @@ export function HelpContactCard({ orderCode }: { orderCode?: string }) {
             href={whatsappUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 rounded-md bg-green-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-green-700"
+            className="inline-flex items-center gap-1.5 rounded-md bg-green-600 px-4 py-2 text-sm font-semibold text-white hover:bg-green-700"
           >
-            <MessageCircle className="h-3.5 w-3.5" />
-            WhatsApp
-          </a>
-          <a
-            href={`tel:${SUPPORT_PHONE.replace(/\s/g, '')}`}
-            className="inline-flex items-center gap-1.5 rounded-md border border-green-300 bg-white px-3 py-1.5 text-xs font-semibold text-green-800 hover:bg-green-100"
-          >
-            <Phone className="h-3.5 w-3.5" />
-            {SUPPORT_PHONE}
+            <MessageCircle className="h-4 w-4" />
+            Scrie-ne pe WhatsApp
           </a>
         </div>
       </div>
