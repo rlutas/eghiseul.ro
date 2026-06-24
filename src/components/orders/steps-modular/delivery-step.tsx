@@ -835,8 +835,8 @@ export function DeliveryStepModular({ onValidChange }: DeliveryStepProps) {
       updateDelivery({
         method: 'courier',
         methodName: isLocker && selectedLocker
-          ? `${selectedQuote.providerName} - ${lockerBrand} (${selectedLocker.name})`
-          : `${selectedQuote.providerName} - ${selectedQuote.serviceName}`,
+          ? `Livrare România · ${selectedQuote.providerName} - ${lockerBrand} (${selectedLocker.name})`
+          : `Livrare România · ${selectedQuote.providerName} - ${selectedQuote.serviceName}`,
         price: selectedQuote.priceWithVAT,
         estimatedDays: selectedQuote.estimatedDays,
         courierProvider: selectedQuote.provider,
@@ -885,7 +885,7 @@ export function DeliveryStepModular({ onValidChange }: DeliveryStepProps) {
     const subscription = intlForm.watch((value) => {
       updateDelivery({
         method: 'courier',
-        methodName: courier.name,
+        methodName: `Livrare internațională · ${courier.name}`,
         price: courier.price,
         estimatedDays: 0, // free-text range stored in methodName; numeric used for SLA only
         courierProvider: courier.provider,
