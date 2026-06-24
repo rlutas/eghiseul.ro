@@ -15,6 +15,8 @@ import { OrderSidebar } from './order-sidebar';
 import { SystemStatus } from '@/components/services/system-status';
 import { useCivilStatusTerms } from '@/hooks/use-civil-status-terms';
 import { resolveCivilTermTier } from '@/lib/civil-status/delivery-terms';
+import { getServiceSpecimen } from '@/config/service-specimens';
+import Image from 'next/image';
 
 interface PriceSidebarModularProps {
   service: Service;
@@ -101,6 +103,8 @@ export function PriceSidebarModular({ service, variant = 'full' }: PriceSidebarM
         ? `${estimate.minDays} zile lucrătoare`
         : `${estimate.minDays}-${estimate.maxDays} zile lucrătoare`;
 
+  const specimen = getServiceSpecimen(service.slug);
+
   return (
     <div className="space-y-3">
       <OrderSidebar
@@ -129,6 +133,25 @@ export function PriceSidebarModular({ service, variant = 'full' }: PriceSidebarM
           services. ANCPI for carte funciară, ONRC for constatator. */}
       {isInstantDigital && variant === 'full' && (
         <SystemStatus service={service.slug === 'extras-carte-funciara' ? 'ancpi' : 'onrc'} />
+      )}
+
+      {/* Specimen document — așa arată ce primește clientul (doar sidebar desktop). */}
+      {variant === 'full' && specimen && (
+        <div className="rounded-xl border border-neutral-200 bg-white p-3">
+          <p className="text-xs font-medium text-neutral-500 mb-2">
+            Așa arată documentul pe care îl primești
+          </p>
+          <Image
+            src={specimen.src}
+            alt={specimen.alt}
+            width={400}
+            height={560}
+            className="w-full h-auto rounded-lg border border-neutral-100"
+          />
+          <p className="text-[10px] text-neutral-400 mt-1.5 text-center">
+            Model orientativ
+          </p>
+        </div>
       )}
     </div>
   );
