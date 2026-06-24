@@ -44,7 +44,7 @@ Payload (același ca la AWB, recipient minim):
   "pickupPoint":"<id>"
 }
 ```
-**Răspuns:** `{ "amount": 28.6, "currency": "Ron", "time": 24 }` — `amount` = tarif net RON (tratat ca fără TVA), `time` = ore.
+**Răspuns:** `{ "amount": 28.6, "currency": "Ron", "time": 24 }` — `amount` = tarif **net RON (fără TVA)**, `time` = ore. (Confirmat owner: +21% TVA la final.)
 
 - **Standard (service 7)**: merge cu county+city → preț real. Ex. 0.5kg Cluj→Cluj = **28.6 RON**.
 - **Locker (service 15)**: întoarce **400** fără un locker specific (`oohLastMile`). La quote-time nu avem locker ales → în cod facem **fallback la `standard*0.85`**.
@@ -53,7 +53,7 @@ Payload (același ca la AWB, recipient minim):
 1. `sameday.getQuotes` → încearcă `getEstimatedQuotes` (estimate-cost real); fallback la `getBasePriceQuotes` (`14+4/kg`) dacă eșuează.
 2. UI (`delivery-step.tsx`): `applyMarkup` **+15%** + **floor minim 20 RON cu TVA**.
 3. TVA 21% adăugat (price → priceWithVAT).
-> ⚠️ De confirmat dacă `amount` e net sau cu TVA. Tratat ca NET (adăugăm 21%) → direcție sigură (nu pierdem; eventual TVA dublu = client plătește puțin în plus). De clarificat din factura Sameday.
+> ✅ Confirmat (owner, 2026-06-24): pe factura Sameday `amount` apare **fără TVA**; cei 21% se adaugă la factura finală. Tratamentul din cod (amount = net + 21%) e corect.
 
 ## Important
 - **Greutate default 0.5 kg** (plic documente) — `DEFAULT_DOCUMENT_PACKAGE` în `courier/utils.ts`. Dacă se trimit cutii mai grele → preț mai mare.
@@ -64,6 +64,5 @@ Payload (același ca la AWB, recipient minim):
 Auth → geolocation/county → city → pickup-points → estimate-cost. Confirmat 200 + `amount`. (Script temporar, nu commit-uit; reface oricând cu env-ul.)
 
 ## Backlog
-- Confirmă net vs gross pe `amount` (factură Sameday).
 - Preț real locker: estimează cu un locker reprezentativ din oraș, sau la momentul selectării lockerului.
 - Monitoring quote vs `awbCost` real la creare AWB.
