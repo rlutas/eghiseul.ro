@@ -33,6 +33,7 @@ import {
 } from '@/lib/services/option-dependencies';
 import { APOSTILA_COUNTRIES } from '@/config/apostila-countries';
 import { TRANSLATION_LANGUAGES } from '@/config/translation-languages';
+import { SpecimenInfoButton } from '@/components/orders/specimen-info-button';
 
 interface OptionsStepProps {
   onValidChange: (valid: boolean) => void;
@@ -156,6 +157,21 @@ export function OptionsStepModular({ onValidChange }: OptionsStepProps) {
         !isCrossServiceOption(o)
     );
   }, [serviceOptions]);
+
+  // Specimen (mostră) pentru o opțiune, dacă există — afișat ca „Vezi specimen".
+  const optionSpecimen = useCallback(
+    (code: string | undefined): { src: string; alt: string } | null => {
+      if (code === 'apostila_haga')
+        return { src: '/images/specimens/apostila-haga.webp', alt: 'Apostila de la Haga (specimen)' };
+      if (code === 'extras_multilingv') {
+        return state.serviceSlug === 'certificat-casatorie'
+          ? { src: '/images/specimens/extras-multilingv-casatorie.webp', alt: 'Extras multilingv căsătorie (specimen)' }
+          : { src: '/images/specimens/extras-multilingv-nastere.webp', alt: 'Extras multilingv naștere (specimen)' };
+      }
+      return null;
+    },
+    [state.serviceSlug]
+  );
 
   // ──────────────────────────────────────────────────────────────────────────
   // Selection helpers
@@ -536,6 +552,12 @@ export function OptionsStepModular({ onValidChange }: OptionsStepProps) {
                   selected={hagaSelected}
                   onClick={() => toggleByCode(apostilaHaga)}
                 />
+                <div className="pl-1">
+                  <SpecimenInfoButton
+                    src="/images/specimens/apostila-haga.webp"
+                    alt="Apostila de la Haga (specimen)"
+                  />
+                </div>
                 {hagaSelected && (
                   <CountryDropdown
                     id="opt-country-haga"
@@ -654,17 +676,26 @@ export function OptionsStepModular({ onValidChange }: OptionsStepProps) {
             subtitle="Forme suplimentare ale documentului, în aceeași comandă"
           />
           <div className="space-y-3">
-            {otherOptions.map((option) => (
-              <OptionCard
-                key={option.id}
-                icon={CODE_ICONS[option.code] ?? Globe}
-                name={option.name}
-                hint={option.description || ''}
-                price={option.price}
-                selected={isCodeSelected(option.code)}
-                onClick={() => toggleByCode(option)}
-              />
-            ))}
+            {otherOptions.map((option) => {
+              const spec = optionSpecimen(option.code);
+              return (
+                <div key={option.id}>
+                  <OptionCard
+                    icon={CODE_ICONS[option.code] ?? Globe}
+                    name={option.name}
+                    hint={option.description || ''}
+                    price={option.price}
+                    selected={isCodeSelected(option.code)}
+                    onClick={() => toggleByCode(option)}
+                  />
+                  {spec && (
+                    <div className="mt-1.5 pl-1">
+                      <SpecimenInfoButton src={spec.src} alt={spec.alt} />
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
           {/* Disclaimer extras multilingv — nu se poate traduce/apostila. */}
           {otherOptions.some((o) => o.code === 'extras_multilingv') &&
