@@ -261,6 +261,10 @@ interface DeliveryStepProps {
 export function DeliveryStepModular({ onValidChange }: DeliveryStepProps) {
   const { state, updateDelivery } = useModularWizard();
   const { delivery } = state;
+  // Stare civilă: livrare obligatoriu fizică + electronică împreună (o singură
+  // opțiune „Electronic & Livrare la adresă"), fără alegere email-only.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const isCivilStatus = !!(state.verificationConfig as any)?.civilStatus;
 
   // Track initial mount to avoid resetting restored form values
   const isInitialMount = useRef(true);
@@ -269,10 +273,10 @@ export function DeliveryStepModular({ onValidChange }: DeliveryStepProps) {
 
   // Step states
   const [deliveryType, setDeliveryType] = useState<DeliveryType | null>(
-    delivery.method === 'email' ? 'email' : delivery.method ? 'physical' : null
+    isCivilStatus ? 'physical' : delivery.method === 'email' ? 'email' : delivery.method ? 'physical' : null
   );
   const [physicalRegion, setPhysicalRegion] = useState<PhysicalRegion | null>(
-    delivery.method && delivery.method !== 'email' ? 'romania' : null
+    isCivilStatus ? 'romania' : delivery.method && delivery.method !== 'email' ? 'romania' : null
   );
 
   // Courier quotes
@@ -937,6 +941,7 @@ export function DeliveryStepModular({ onValidChange }: DeliveryStepProps) {
 
   // Go back to delivery type selection
   const handleBackToTypes = () => {
+    if (isCivilStatus) return; // civil: o singură metodă, fără back la picker
     setDeliveryType(null);
     setPhysicalRegion(null);
     setSelectedQuote(null);
@@ -977,6 +982,26 @@ export function DeliveryStepModular({ onValidChange }: DeliveryStepProps) {
           "Email Selected" intermediate confirmation block entirely:
           for Email the parent step's Continuă button enables immediately
           via onValidChange(true). For Physical the sub-flow renders below. */}
+      {isCivilStatus && (
+        <div className="rounded-xl border-2 border-primary-500 bg-primary-50 p-5">
+          <div className="flex items-start gap-4">
+            <div className="w-12 h-12 rounded-full bg-primary-200 flex items-center justify-center shrink-0">
+              <Package className="w-6 h-6 text-primary-700" />
+            </div>
+            <div>
+              <h4 className="font-semibold text-secondary-900 text-base sm:text-lg">
+                Electronic &amp; Livrare la adresă
+              </h4>
+              <p className="text-xs sm:text-sm text-neutral-600 mt-1 leading-snug">
+                Documentele de stare civilă se trimit obligatoriu și fizic: primești
+                originalul prin curier la adresă, plus PDF-ul pe email.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {!isCivilStatus && (
       <div className="space-y-4">
         <h3 className="font-semibold text-secondary-900 flex items-center gap-2">
           <Truck className="h-5 w-5 text-primary-500" />
@@ -1077,6 +1102,7 @@ export function DeliveryStepModular({ onValidChange }: DeliveryStepProps) {
           </div>
         )}
       </div>
+      )}
 
       {/* Step 2: Physical Delivery - Region Selection */}
       {deliveryType === 'physical' && !physicalRegion && (
