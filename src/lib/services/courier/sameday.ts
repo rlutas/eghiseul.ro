@@ -518,13 +518,120 @@ export class SamedayProvider implements CourierProvider {
 
   /**
    * Get shipping quotes for Sameday services.
-   * Note: Sameday API has no public estimate/tariff endpoint.
-   * Prices shown are base estimates; actual cost is determined at AWB creation.
+   * Prefers REAL prices via `POST /api/awb/estimate-cost` (Sameday eAWB cost
+   * estimation, no AWB created). Falls back to base estimates if the endpoint
+   * fails or credentials are missing — so quotes never break.
    */
   async getQuotes(request: QuoteRequest): Promise<ShippingQuote[]> {
-    // Note: Sameday API has no public estimate/tariff endpoint.
-    // Prices shown are base estimates; actual cost is determined at AWB creation.
+    if (this.hasCredentials()) {
+      try {
+        const real = await this.getEstimatedQuotes(request);
+        if (real.length > 0) return real;
+      } catch (err) {
+        console.warn(
+          '[Sameday] estimate-cost failed, falling back to base prices:',
+          err instanceof Error ? err.message : err
+        );
+      }
+    }
     return this.getBasePriceQuotes(request);
+  }
+
+  /**
+   * Real Sameday prices via `POST /api/awb/estimate-cost`. Returns the net cost
+   * per service (we add 21% VAT downstream like elsewhere). Throws on any failure
+   * so the caller falls back to base estimates.
+   */
+  private async getEstimatedQuotes(request: QuoteRequest): Promise<ShippingQuote[]> {
+    const countyId = await this.resolveCountyId(request.recipient.county);
+    const cityId = countyId
+      ? await this.resolveCityId(request.recipient.city, countyId)
+      : null;
+    if (!countyId || !cityId) {
+      throw new Error(`Could not resolve ${request.recipient.city}, ${request.recipient.county}`);
+    }
+
+    // Default pickup point (optional — Sameday uses account default otherwise).
+    let pickupPointId: string | undefined;
+    try {
+      const pickupData = await this.apiRequest<{
+        data: Array<{ id: number; defaultPickupPoint: boolean }>;
+      }>('/api/client/pickup-points?countPerPage=100');
+      const def = pickupData.data.find((p) => p.defaultPickupPoint) || pickupData.data[0];
+      if (def) pickupPointId = String(def.id);
+    } catch {
+      /* use API default */
+    }
+
+    const totalWeight = request.packages.reduce((s, p) => s + p.weight * p.quantity, 0);
+    const totalParcels = request.packages.reduce((s, p) => s + p.quantity, 0);
+    const round2 = (n: number) => Math.round(n * 100) / 100;
+
+    const estimate = async (serviceId: number, isLocker: boolean): Promise<number> => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const body: Record<string, any> = {
+        packageType: totalWeight <= 1 ? '1' : '0',
+        packageNumber: String(totalParcels),
+        packageWeight: String(totalWeight),
+        service: String(serviceId),
+        awbPayment: '1',
+        cashOnDelivery: request.cod ? String(request.cod) : '0',
+        insuredValue: '0',
+        thirdPartyPickup: '0',
+        awbRecipient: {
+          name: 'Estimare',
+          phoneNumber: '0700000000',
+          personType: '0',
+          ...(isLocker
+            ? { email: '' }
+            : {
+                county: String(countyId),
+                city: String(cityId),
+                address: 'Estimare',
+                postalCode: request.recipient.postalCode || '',
+              }),
+        },
+        parcels: request.packages.map((p) => ({
+          weight: String(p.weight),
+          width: String(p.width || 22),
+          length: String(p.length || 30),
+          height: String(p.height || 1),
+        })),
+      };
+      if (pickupPointId) body.pickupPoint = pickupPointId;
+      const data = await this.apiRequest<{ cost: number }>('/api/awb/estimate-cost', {
+        method: 'POST',
+        body: JSON.stringify(body),
+      });
+      if (typeof data?.cost !== 'number') throw new Error('estimate-cost: cost missing');
+      return data.cost;
+    };
+
+    const quotes: ShippingQuote[] = [];
+
+    // Standard home delivery (we have county/city → reliable).
+    const stdCost = await estimate(SAMEDAY_SERVICES.STANDARD_24H, false);
+    quotes.push({
+      provider: 'sameday', providerName: 'Sameday', service: 'STANDARD_24H',
+      serviceName: 'Standard 24H', price: round2(stdCost), priceWithVAT: round2(stdCost * 1.21),
+      vat: round2(stdCost * 0.21), currency: 'RON', estimatedDays: 1, pickupAvailable: true,
+    });
+
+    // EasyBox locker — estimate; if it fails, derive from standard (~15% less).
+    let lockerCost: number;
+    try {
+      lockerCost = await estimate(SAMEDAY_SERVICES.LOCKER_NEXTDAY, true);
+    } catch {
+      lockerCost = round2(stdCost * 0.85);
+    }
+    quotes.push({
+      provider: 'sameday', providerName: 'Sameday', service: 'LOCKER_NEXTDAY',
+      serviceName: 'EasyBox (Locker)', price: round2(lockerCost), priceWithVAT: round2(lockerCost * 1.21),
+      vat: round2(lockerCost * 0.21), currency: 'RON', estimatedDays: 1,
+      pickupAvailable: false, lockerAvailable: true,
+    });
+
+    return quotes;
   }
 
   /**
