@@ -599,12 +599,14 @@ export class SamedayProvider implements CourierProvider {
         })),
       };
       if (pickupPointId) body.pickupPoint = pickupPointId;
-      const data = await this.apiRequest<{ cost: number }>('/api/awb/estimate-cost', {
-        method: 'POST',
-        body: JSON.stringify(body),
-      });
-      if (typeof data?.cost !== 'number') throw new Error('estimate-cost: cost missing');
-      return data.cost;
+      // Sameday estimate-cost returns { amount, currency, time } — `amount` is
+      // the net tariff in RON (verified live 2026-06-24).
+      const data = await this.apiRequest<{ amount: number; currency?: string; time?: number }>(
+        '/api/awb/estimate-cost',
+        { method: 'POST', body: JSON.stringify(body) }
+      );
+      if (typeof data?.amount !== 'number') throw new Error('estimate-cost: amount missing');
+      return data.amount;
     };
 
     const quotes: ShippingQuote[] = [];
