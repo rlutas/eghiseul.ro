@@ -518,6 +518,7 @@ export default function AdminOrderDetailPage() {
     id: string; email: string | null; firstName: string | null;
     lastName: string | null; phone: string | null; kycVerified: boolean;
   } | null>(null);
+  const [kycSaving, setKycSaving] = useState(false);
   const [timeline, setTimeline] = useState<TimelineEvent[]>([]);
   const [orderDocuments, setOrderDocuments] = useState<OrderDocument[]>([]);
   const [optionStatuses, setOptionStatuses] = useState<OrderOptionStatus[]>([]);
@@ -569,6 +570,29 @@ export default function AdminOrderDetailPage() {
   }, [orderId, fetchOrder]);
 
   // ---------- AWB Handlers ----------
+
+  const handleToggleAccountKyc = async () => {
+    if (!account) return;
+    setKycSaving(true);
+    try {
+      const res = await fetch(`/api/admin/users/customers/${account.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ kyc_verified: !account.kycVerified }),
+      });
+      const json = await res.json();
+      if (json.success) {
+        toast.success(json.message || 'KYC actualizat');
+        setAccount((a) => (a ? { ...a, kycVerified: !a.kycVerified } : a));
+      } else {
+        toast.error(json.error || 'Eroare la actualizare KYC');
+      }
+    } catch {
+      toast.error('Eroare de rețea');
+    } finally {
+      setKycSaving(false);
+    }
+  };
 
   const handleGenerateAwb = async () => {
     if (!order) return;
@@ -1004,9 +1028,27 @@ export default function AdminOrderDetailPage() {
                       </span>
                     )}
                   </div>
-                  <a href="/admin/users" className="inline-block text-xs text-primary-600 hover:underline">
-                    Vezi clientul în conturi →
-                  </a>
+                  <div className="flex items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={handleToggleAccountKyc}
+                      disabled={kycSaving}
+                      className={`inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-semibold disabled:opacity-50 ${
+                        account.kycVerified
+                          ? 'border border-neutral-300 bg-white text-neutral-700 hover:bg-neutral-50'
+                          : 'bg-green-600 text-white hover:bg-green-700'
+                      }`}
+                    >
+                      {kycSaving
+                        ? 'Se salvează...'
+                        : account.kycVerified
+                          ? 'Anulează verificarea KYC'
+                          : 'Marchează KYC verificat'}
+                    </button>
+                    <a href="/admin/users" className="text-xs text-primary-600 hover:underline">
+                      Vezi clientul →
+                    </a>
+                  </div>
                 </>
               )}
             </div>

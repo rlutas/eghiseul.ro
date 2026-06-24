@@ -167,11 +167,11 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     }
 
     const body = await request.json();
-    const { blocked } = body;
+    const { blocked, kyc_verified } = body;
 
-    if (typeof blocked !== 'boolean') {
+    if (typeof blocked !== 'boolean' && typeof kyc_verified !== 'boolean') {
       return NextResponse.json(
-        { success: false, error: 'blocked must be a boolean' },
+        { success: false, error: 'blocked or kyc_verified must be a boolean' },
         { status: 400 }
       );
     }
@@ -194,16 +194,20 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
     if (profile.role !== 'customer') {
       return NextResponse.json(
-        { success: false, error: 'Can only block/unblock customers' },
+        { success: false, error: 'Can only update customers' },
         { status: 400 }
       );
     }
 
-    // Update blocked_at timestamp
     const updateData: Record<string, unknown> = {
-      blocked_at: blocked ? new Date().toISOString() : null,
       updated_at: new Date().toISOString(),
     };
+    if (typeof blocked === 'boolean') {
+      updateData.blocked_at = blocked ? new Date().toISOString() : null;
+    }
+    if (typeof kyc_verified === 'boolean') {
+      updateData.kyc_verified = kyc_verified;
+    }
 
     const { error: updateError } = await adminClient
       .from('profiles')
@@ -232,8 +236,11 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
     return NextResponse.json({
       success: true,
-      message: blocked ? 'Customer blocked successfully' : 'Customer unblocked successfully',
-      data: { blocked, blocked_at: blocked ? updateData.blocked_at : null },
+      message:
+        typeof kyc_verified === 'boolean'
+          ? (kyc_verified ? 'KYC marcat ca verificat' : 'Verificare KYC anulată')
+          : (blocked ? 'Customer blocked successfully' : 'Customer unblocked successfully'),
+      data: { blocked, kyc_verified, blocked_at: updateData.blocked_at ?? null },
     });
   } catch (error) {
     console.error('Update customer error:', error);
