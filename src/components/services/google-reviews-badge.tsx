@@ -32,24 +32,37 @@ export function GoogleReviewsBadge({
       rel="noopener noreferrer"
       aria-label={`Recenzii Google — ${fmtRating} din 5 din ${GOOGLE_REVIEW_COUNT_LABEL} de recenzii`}
       className={cn(
-        'inline-flex items-center gap-2.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2',
+        'transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2',
         variant === 'pill'
-          ? 'rounded-full bg-white px-4 py-2.5 shadow-lg hover:shadow-xl'
-          : 'w-full justify-center rounded-xl border border-neutral-200 bg-white px-3 py-2.5 hover:border-neutral-300',
+          ? 'inline-flex items-center gap-2.5 rounded-full bg-white px-4 py-2.5 shadow-lg hover:shadow-xl'
+          : 'flex w-full flex-col items-center gap-0.5 rounded-xl border border-neutral-200 bg-white px-3 py-2.5 hover:border-neutral-300',
         className,
       )}
     >
-      <GoogleG className="h-4 w-4 flex-shrink-0" />
-      <span className="text-xs sm:text-sm font-semibold text-secondary-900">Google</span>
-      <span className="flex items-center gap-0.5" aria-hidden="true">
-        {[...Array(5)].map((_, i) => (
-          <svg key={i} className="w-3.5 h-3.5 text-[#FBBC04] fill-[#FBBC04]" viewBox="0 0 24 24">
-            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-          </svg>
-        ))}
+      {/* Rating row: Google logo + stars + score */}
+      <span className="inline-flex items-center gap-2">
+        <GoogleG className="h-4 w-4 flex-shrink-0" />
+        <span className="text-xs sm:text-sm font-semibold text-secondary-900">Google</span>
+        <span className="flex items-center gap-0.5" aria-hidden="true">
+          {[...Array(5)].map((_, i) => (
+            <svg key={i} className="w-3.5 h-3.5 text-[#FBBC04] fill-[#FBBC04]" viewBox="0 0 24 24">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+            </svg>
+          ))}
+        </span>
+        <span className="text-xs sm:text-sm font-bold text-secondary-900">{fmtRating}</span>
+        {/* Pill (hero) keeps the count inline; bar (price card) drops it to its own line below */}
+        {variant === 'pill' && (
+          <span className="text-[10px] sm:text-xs text-neutral-500 whitespace-nowrap">
+            • {GOOGLE_REVIEW_COUNT_LABEL} recenzii
+          </span>
+        )}
       </span>
-      <span className="text-xs sm:text-sm font-bold text-secondary-900">{fmtRating}</span>
-      <span className="text-[10px] sm:text-xs text-neutral-500">• {GOOGLE_REVIEW_COUNT_LABEL} recenzii</span>
+      {variant === 'bar' && (
+        <span className="text-[11px] sm:text-xs text-neutral-500 whitespace-nowrap">
+          {GOOGLE_REVIEW_COUNT_LABEL} recenzii
+        </span>
+      )}
     </a>
   );
 }
