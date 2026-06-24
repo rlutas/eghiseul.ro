@@ -27,6 +27,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useModularWizard } from '@/providers/modular-wizard-provider';
 import { PhoneInput } from '@/components/shared/PhoneInput';
+import { isValidPhoneNumber } from 'libphonenumber-js';
 import { SearchableSelect } from '@/components/shared/SearchableSelect';
 import { cn } from '@/lib/utils';
 import type { ClientType } from '@/types/verification-modules';
@@ -48,18 +49,16 @@ function getPurposeOptionsForService(slug: string | null): readonly string[] | n
   return null;
 }
 
-// Phone validation: international E.164-ish format. We accept any number that
-// starts with + followed by 8-15 digits/spaces — react-international-phone
-// gives us back values like "+40712345678".
-const PHONE_REGEX = /^\+[1-9]\d{6,14}$/;
-
+// Phone validation: per-country length + pattern via libphonenumber-js.
+// react-international-phone gives E.164 (`+40712345678`); isValidPhoneNumber
+// respinge un număr cu o cifră în plus/minus pentru țara aleasă (RO sau alta).
 const contactSchema = z.object({
   email: z.string().email('Introdu o adresă de email validă'),
   phone: z
     .string()
     .min(1, 'Introdu numărul de telefon')
-    .refine((v) => PHONE_REGEX.test(v.replace(/\s+/g, '')), {
-      message: 'Număr de telefon invalid',
+    .refine((v) => isValidPhoneNumber(v.replace(/\s+/g, '')), {
+      message: 'Număr de telefon invalid (verifică numărul de cifre pentru țara aleasă)',
     }),
 });
 
