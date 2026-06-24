@@ -4,6 +4,21 @@
 
 > **⚡ Update 2026-06-22:** de atunci s-au livrat: 36 calculatoare (îmbogățite + GEO), expansiune location-SEO (42 CF pe județe, 48 orașe cazier, clustere ONRC + stare civilă = 66 pagini noi), rovinietă (verificare consistent + pagină cumpărare), pagină `/tools/`, meniu calculatoare limitat la populare, reorganizare docs. Detalii: [`changelog/2026-06-22-seo-expansion-rovinieta-tools.md`](changelog/2026-06-22-seo-expansion-rovinieta-tools.md). Restul fișierului de mai jos reflectă starea de la 2026-06-15.
 
+> **⚡ Update 2026-06-23/24 — LIVRAT (migrații 075-080):**
+> - **Prețuri + termene** pe 14 servicii + **editor admin** termene (/admin/settings). Integritate 198, celibat 698. Urgent scos de la naștere/căsătorie/celibat/fiscal/CF.
+> - **Stare civilă:** termen dinamic pe oficiu (București 15-30 / rapid 5-7 / rest 7-15, editabil admin); formular — dropdown-uri searchable (arată TOT, alfabetic) + cascadă București→sector; „vechiul certificat" Pierdut/Distrus/Furat; țara = toate țările; **2 declarații la semnătură**; **livrare combinată** Electronic+adresă; **extras multilingv** add-on 399 + disclaimer + „Vezi specimen".
+> - **Cont client:** footer adăugat, spațiu alb sub header reparat, **facturi vizibile** în detaliul comenzii, timp livrare în rezumat, trust badges scoase, specimen pe mobil.
+> - **Admin:** comparație **OCR buletin vs date completate**, legătură **comandă↔cont** + verificare **KYC pe cont**.
+> - **Curier/Sameday:** **prețuri REALE** via `estimate-cost` (testat live, `amount` fără TVA +21%; vezi `sameday/README.md`); lockere paginare paralelă; **minim 20 RON** + etichetă cu regiune (România/internațional); **monitoring** cost-real-vs-încasat la AWB.
+> - **Status comandă:** doar WhatsApp. **Success:** „Primești documentul în X zile" (nu „procesăm").
+> - Detalii: `changelog/2026-06-23-*` + `changelog/2026-06-24-*`. Build + 1078 teste verzi.
+>
+> **🔜 DE RELUAT (features mari, neîncepute — roadmap `plans/2026-06-24-account-features-roadmap.md`):**
+> 1. **Prefill wizard** (auto-completare date/KYC/adresă pt user logat; API `/api/user/prefill-data` există, de integrat) — ~25h, recomandat primul.
+> 2. **Mașini salvate** + reminder ITP/asigurare/rovinietă (tabel+UI+wizard) — ~45h.
+> 3. **Imobile salvate** (refolosire CF în wizard) — ~15-40h.
+> 4. Preț real **locker Sameday** (estimate-cost cu oohLastMile dă 400 — de reluat după prima livrare locker reală).
+
 ---
 
 ## ✅ 2026-06-15 — ONRC constatator funcțional A→Z pentru TOATE tipurile
