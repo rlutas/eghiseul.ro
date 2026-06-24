@@ -14,8 +14,6 @@
  * both surfaces.
  */
 
-import { Card, CardContent } from '@/components/ui/card';
-import { Shield, CheckCircle, Clock } from 'lucide-react';
 import { OrderSummaryCard } from '@/components/payment';
 
 interface OrderSidebarOption {
@@ -71,14 +69,10 @@ export function OrderSidebar({
   couponCode,
   discountAmount = 0,
   deliveryTimeText,
-  urgencyActive = false,
   variant = 'full',
-  timeInSummary = false,
   hideDeliveryTimeCard = false,
-  hideTrustBadges = false,
 }: OrderSidebarProps) {
   const showSummary = variant === 'full' || variant === 'summary';
-  const showExtras = variant === 'full' || variant === 'extras';
   return (
     <div className="space-y-3">
       {showSummary && (
@@ -94,44 +88,8 @@ export function OrderSidebar({
           vatAmount={vatAmount}
           couponCode={couponCode}
           discountAmount={discountAmount}
-          deliveryTimeText={timeInSummary && !hideDeliveryTimeCard ? deliveryTimeText : undefined}
+          deliveryTimeText={!hideDeliveryTimeCard ? deliveryTimeText : undefined}
         />
-      )}
-
-      {/* Estimated delivery */}
-      {showExtras && !hideDeliveryTimeCard && (
-      <Card className="bg-white border-neutral-200">
-        <CardContent className="p-3.5 flex items-start gap-3">
-          <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary-50 shrink-0">
-            <Clock className="h-3.5 w-3.5 text-primary-600" />
-          </span>
-          <div className="min-w-0">
-            <p className="text-xs text-neutral-500">Timp estimat livrare</p>
-            <p className="text-sm font-semibold text-secondary-900 leading-tight">
-              {deliveryTimeText}
-            </p>
-            {urgencyActive && (
-              <p className="text-[10px] text-primary-600 font-medium mt-0.5">
-                ⚡ Procesare urgentă activată
-              </p>
-            )}
-          </div>
-        </CardContent>
-      </Card>
-      )}
-
-      {/* Trust badges */}
-      {showExtras && !hideTrustBadges && (
-      <div className="space-y-2 px-1">
-        <div className="flex items-center gap-2 text-xs text-neutral-600">
-          <Shield className="h-3.5 w-3.5 text-emerald-500" />
-          <span>Plată securizată 100%</span>
-        </div>
-        <div className="flex items-center gap-2 text-xs text-neutral-600">
-          <CheckCircle className="h-3.5 w-3.5 text-emerald-500" />
-          <span>Garanție rambursare</span>
-        </div>
-      </div>
       )}
     </div>
   );

@@ -135,8 +135,9 @@ export function PriceSidebarModular({ service, variant = 'full' }: PriceSidebarM
         <SystemStatus service={service.slug === 'extras-carte-funciara' ? 'ancpi' : 'onrc'} />
       )}
 
-      {/* Specimen document — așa arată ce primește clientul (doar sidebar desktop). */}
-      {variant === 'full' && specimen && (
+      {/* Specimen document — așa arată ce primește clientul (sidebar desktop +
+          inline pe mobil). */}
+      {(variant === 'full' || variant === 'extras') && specimen && (
         <div className="rounded-xl border border-neutral-200 bg-white p-3">
           <p className="text-xs font-medium text-neutral-500 mb-2">
             Așa arată documentul pe care îl primești
