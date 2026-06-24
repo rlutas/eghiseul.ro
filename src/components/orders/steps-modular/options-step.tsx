@@ -666,6 +666,18 @@ export function OptionsStepModular({ onValidChange }: OptionsStepProps) {
               />
             ))}
           </div>
+          {/* Disclaimer extras multilingv — nu se poate traduce/apostila. */}
+          {otherOptions.some((o) => o.code === 'extras_multilingv') &&
+            isCodeSelected('extras_multilingv') && (
+              <div className="flex gap-2.5 rounded-xl border border-amber-200 bg-amber-50 p-3">
+                <Info className="h-4 w-4 shrink-0 text-amber-600 mt-0.5" />
+                <p className="text-xs text-amber-800 leading-snug">
+                  Extrasul multilingv <strong>nu se poate traduce și nici apostila</strong>.
+                  Dacă alegi și traducere/apostilă, acestea se aplică pe duplicatul
+                  certificatului simplu, nu pe extrasul multilingv.
+                </p>
+              </div>
+            )}
         </section>
       )}
 
