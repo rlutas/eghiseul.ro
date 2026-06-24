@@ -12,6 +12,7 @@
 > - **Curier/Sameday:** **prețuri REALE** via `estimate-cost` (testat live, `amount` fără TVA +21%; vezi `sameday/README.md`); lockere paginare paralelă; **minim 20 RON** + etichetă cu regiune (România/internațional); **monitoring** cost-real-vs-încasat la AWB.
 > - **Status comandă:** doar WhatsApp. **Success:** „Primești documentul în X zile" (nu „procesăm").
 > - **Celibat:** județul nașterii = dropdown searchable + cascadă București; „Scopul" apare doar dacă NU e căsătorie în străinătate; dacă Da → date viitor soț/soție (nume + naționalitate). Paritate WPForms.
+> - **Validare telefon:** per-țară cu `libphonenumber-js` (`isValidPhoneNumber` pe E.164) — respinge numărul cu o cifră în plus/minus (RO sau altă țară). Test: `tests/unit/lib/phone-validation.test.ts`.
 > - **Analiză concurent ANCPI (cfunciara.ro):** avem 3 servicii, ei 24 — gap de 21 (PAD, copii arhivă OCPI, certificate urbanism, pachete). Pentru colaborare cu topograf (Mircea). Doc: `services/ancpi-servicii.md` + tabel cost/profit `services/ancpi-servicii-costuri.csv` (Google Sheets).
 > - Detalii: `changelog/2026-06-23-*` + `changelog/2026-06-24-*`. Build + 1078 teste verzi.
 >
