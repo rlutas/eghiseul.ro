@@ -59,9 +59,10 @@ export default async function AccountPage() {
   const initials = `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase() || 'U'
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-neutral-50 to-white">
-      {/* Hero Header */}
-      <div className="bg-gradient-to-r from-secondary-900 via-secondary-800 to-secondary-900 text-white">
+    <div className="min-h-screen bg-gradient-to-b from-neutral-50 to-white -mt-16 xl:-mt-[112px]">
+      {/* Hero Header — bleed up under the fixed global header (elimină banda
+          albă a spacer-ului dintre header și „Salut, nume"). */}
+      <div className="bg-gradient-to-r from-secondary-900 via-secondary-800 to-secondary-900 text-white pt-16 xl:pt-[112px]">
         <div className="container mx-auto px-4 py-8 max-w-6xl">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
             {/* User Info */}

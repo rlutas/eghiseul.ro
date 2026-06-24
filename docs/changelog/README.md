@@ -4,6 +4,7 @@ Jurnal de livrări pe sesiuni/zile (ordine cronologică inversă). Fiecare entry
 
 | Data | Ce s-a livrat | Detalii |
 |---|---|---|
+| 2026-06-24 | Stare civilă: urgent scos, formular (dropdown-uri searchable + cascadă București), semnătură (2 declarații), livrare combinată, specimen wizard, fix-uri cont, admin OCR-vs-formular | [2026-06-24-civil-status-ux-admin-ocr.md](2026-06-24-civil-status-ux-admin-ocr.md) |
 | 2026-06-23 | Extras multilingv add-on (399) + termen dinamic stare civilă pe oficiu (editabil admin) | [2026-06-23-multilingv-civil-dynamic-terms.md](2026-06-23-multilingv-civil-dynamic-terms.md) |
 | 2026-06-23 | Prețuri (integritate 198, celibat 698) + termeni livrare pe 14 servicii + editor admin termeni + skip pas opțiuni la property | [2026-06-23-pricing-delivery-terms.md](2026-06-23-pricing-delivery-terms.md) |
 | 2026-06-23 | Audit wizard (paritate WPForms): nume părinți + nume anterior judiciar, număr permis auto, termen/KYC auto | [2026-06-23-wizard-audit-fixes.md](2026-06-23-wizard-audit-fixes.md) |

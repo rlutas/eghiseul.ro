@@ -326,9 +326,9 @@ export default function OrderDetailPage() {
   const isCompany = !!order.customerData?.company?.cui || order.customerData?.billing?.type === 'company';
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-neutral-50 to-white">
-      {/* Hero Header */}
-      <div className="bg-gradient-to-r from-secondary-900 via-secondary-800 to-secondary-900 text-white">
+    <div className="min-h-screen bg-gradient-to-b from-neutral-50 to-white -mt-16 xl:-mt-[112px]">
+      {/* Hero Header — bleed up under the fixed global header. */}
+      <div className="bg-gradient-to-r from-secondary-900 via-secondary-800 to-secondary-900 text-white pt-16 xl:pt-[112px]">
         <div className="container mx-auto px-4 py-6 max-w-6xl">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex items-center gap-4">
