@@ -939,63 +939,56 @@ export class SamedayProvider implements CourierProvider {
       }
 
       // Fetch all locker locations (oohType=0 for EasyBox only)
-      const allLockers: ServicePoint[] = [];
-      let page = 1;
-      let totalPages = 1;
+      // Raw locker shape from Sameday `ooh-locations`.
+      interface RawLocker {
+        oohId: number; name: string; address: string; city: string;
+        cityId: number; county: string; countyId: number; country: string;
+        postalCode: string; lat: number; lng: number; oohType: number;
+        schedule: Array<{ day: number; openingHour: string; closingHour: string }>;
+      }
+      type OohResponse = { total: number; pages: number; data: RawLocker[] };
 
-      do {
+      const fetchPage = (p: number) => {
         const params = new URLSearchParams({
           countPerPage: '500',
-          page: String(page),
+          page: String(p),
           listingType: '0', // 0=lockers only, 1=lockers+PUDOs
           countryCode: 'RO',
         });
+        return this.apiRequest<OohResponse>(`/api/client/ooh-locations?${params}`);
+      };
 
-        const data = await this.apiRequest<{
-          total: number;
-          pages: number;
-          data: Array<{
-            oohId: number;
-            name: string;
-            address: string;
-            city: string;
-            cityId: number;
-            county: string;
-            countyId: number;
-            country: string;
-            postalCode: string;
-            lat: number;
-            lng: number;
-            oohType: number;
-            schedule: Array<{ day: number; openingHour: string; closingHour: string }>;
-          }>;
-        }>(`/api/client/ooh-locations?${params}`);
+      const mapLocker = (locker: RawLocker): ServicePoint => ({
+        id: String(locker.oohId),
+        type: 'locker',
+        name: locker.name,
+        address: locker.address,
+        city: locker.city,
+        county: locker.county,
+        country: 'RO',
+        postalCode: locker.postalCode,
+        coordinates:
+          locker.lat && locker.lng ? { lat: locker.lat, lng: locker.lng } : undefined,
+        openingHours: locker.schedule?.[0]
+          ? `${locker.schedule[0].openingHour} - ${locker.schedule[0].closingHour}`
+          : '00:00 - 23:59',
+        provider: 'sameday',
+      });
 
-        totalPages = data.pages;
+      // Page 1 to learn totalPages, then fetch the rest IN PARALLEL (was a
+      // sequential do/while → slow first load fetching all RO lockers).
+      const first = await fetchPage(1);
+      const totalPages = first.pages || 1;
+      const allLockers: ServicePoint[] = first.data.map(mapLocker);
 
-        for (const locker of data.data) {
-          allLockers.push({
-            id: String(locker.oohId),
-            type: 'locker',
-            name: locker.name,
-            address: locker.address,
-            city: locker.city,
-            county: locker.county,
-            country: 'RO',
-            postalCode: locker.postalCode,
-            coordinates:
-              locker.lat && locker.lng
-                ? { lat: locker.lat, lng: locker.lng }
-                : undefined,
-            openingHours: locker.schedule?.[0]
-              ? `${locker.schedule[0].openingHour} - ${locker.schedule[0].closingHour}`
-              : '00:00 - 23:59',
-            provider: 'sameday',
-          });
+      if (totalPages > 1) {
+        const restPages = await Promise.all(
+          Array.from({ length: totalPages - 1 }, (_, i) => fetchPage(i + 2))
+        );
+        for (const pageData of restPages) {
+          for (const locker of pageData.data) allLockers.push(mapLocker(locker));
         }
-
-        page++;
-      } while (page <= totalPages);
+      }
 
       // Store in cache (all lockers, unfiltered)
       lockerCache = allLockers;
