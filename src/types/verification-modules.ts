@@ -681,6 +681,10 @@ export interface ConsentState {
   termsAccepted: boolean;
   privacyAccepted: boolean;
   withdrawalWaiver: boolean;
+  /** Civil-status only: vechiul certificat devine nul la emiterea unuia nou. */
+  oldCertVoidAccepted?: boolean;
+  /** Civil-status only: declarație pe propria răspundere privind corectitudinea datelor. */
+  dataAccuracyAccepted?: boolean;
 }
 
 export interface SelectedOptionState {

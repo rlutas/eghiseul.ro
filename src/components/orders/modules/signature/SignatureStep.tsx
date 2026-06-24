@@ -32,6 +32,13 @@ export default function SignatureStep({ config, onValidChange }: SignatureStepPr
   const signature = state.signature;
   const termsAccepted = !!state.consent?.termsAccepted;
 
+  // Civil-status (naștere/căsătorie/celibat) cere două declarații suplimentare
+  // la semnătură: vechiul certificat devine nul + corectitudinea datelor.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const isCivilStatus = !!(state.verificationConfig as any)?.civilStatus;
+  const oldCertVoidAccepted = !!state.consent?.oldCertVoidAccepted;
+  const dataAccuracyAccepted = !!state.consent?.dataAccuracyAccepted;
+
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [hasSignature, setHasSignature] = useState(false);
@@ -175,6 +182,8 @@ export default function SignatureStep({ config, onValidChange }: SignatureStepPr
       termsAccepted: false,
       privacyAccepted: false,
       withdrawalWaiver: false,
+      oldCertVoidAccepted: false,
+      dataAccuracyAccepted: false,
     });
   }, [updateSignature, updateConsent]);
 
@@ -204,12 +213,15 @@ export default function SignatureStep({ config, onValidChange }: SignatureStepPr
   }, [updateConsent, hasSignature]);
 
   // Validate form — signature AND the terms checkbox must be accepted.
+  // Civil-status also requires the two extra declarations.
   const isFormValid = useCallback(() => {
     if (!signature) return false;
     if (config.required && !hasSignature) return false;
     if (config.required && !termsAccepted) return false;
+    if (config.required && isCivilStatus && (!oldCertVoidAccepted || !dataAccuracyAccepted))
+      return false;
     return true;
-  }, [signature, config, hasSignature, termsAccepted]);
+  }, [signature, config, hasSignature, termsAccepted, isCivilStatus, oldCertVoidAccepted, dataAccuracyAccepted]);
 
   // Notify parent of validation changes
   useEffect(() => {
@@ -327,6 +339,43 @@ export default function SignatureStep({ config, onValidChange }: SignatureStepPr
         </label>
       </div>
 
+      {/* Declarații suplimentare — doar stare civilă (naștere/căsătorie/celibat) */}
+      {isCivilStatus && (
+        <>
+          <div className="rounded-lg border bg-muted/20 p-4">
+            <label className={`flex items-start gap-3 group ${hasSignature ? 'cursor-pointer' : 'cursor-not-allowed opacity-60'}`}>
+              <Checkbox
+                checked={oldCertVoidAccepted}
+                disabled={!hasSignature}
+                onCheckedChange={(checked) =>
+                  hasSignature && updateConsent?.({ oldCertVoidAccepted: checked === true })
+                }
+                className="mt-0.5 shrink-0"
+              />
+              <span className="text-sm leading-relaxed text-neutral-700 group-hover:text-neutral-900">
+                <span className="text-red-500">*</span> Înțeleg și sunt de acord că, odată cu înregistrarea comenzii pentru emiterea unui nou certificat, documentul anterior își pierde valabilitatea (devine nul), chiar dacă este identificat ulterior, și trebuie distrus.
+              </span>
+            </label>
+          </div>
+
+          <div className="rounded-lg border bg-muted/20 p-4">
+            <label className={`flex items-start gap-3 group ${hasSignature ? 'cursor-pointer' : 'cursor-not-allowed opacity-60'}`}>
+              <Checkbox
+                checked={dataAccuracyAccepted}
+                disabled={!hasSignature}
+                onCheckedChange={(checked) =>
+                  hasSignature && updateConsent?.({ dataAccuracyAccepted: checked === true })
+                }
+                className="mt-0.5 shrink-0"
+              />
+              <span className="text-sm leading-relaxed text-neutral-700 group-hover:text-neutral-900">
+                <span className="text-red-500">*</span> <strong>Declarație privind corectitudinea datelor.</strong> Declar pe propria răspundere că toate informațiile furnizate sunt reale, corecte și complete. Înțeleg că eGhișeul.ro acționează în baza datelor comunicate de mine și nu răspunde pentru eventualele erori sau omisiuni din informațiile pe care le-am furnizat. În cazul în care informațiile declarate sunt false, incomplete sau eronate, documentul solicitat nu poate fi eliberat, iar contravaloarea serviciului prestat nu se restituie. De asemenea, înțeleg că furnizarea de informații false poate atrage răspunderea mea conform legislației în vigoare.
+              </span>
+            </label>
+          </div>
+        </>
+      )}
+
       {/* Validation Message */}
       {!hasSignature && config.required && (
         <Alert>
@@ -341,6 +390,15 @@ export default function SignatureStep({ config, onValidChange }: SignatureStepPr
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
             Bifează acceptarea termenilor și condițiilor pentru a continua.
+          </AlertDescription>
+        </Alert>
+      )}
+      {hasSignature && termsAccepted && isCivilStatus &&
+        (!oldCertVoidAccepted || !dataAccuracyAccepted) && config.required && (
+        <Alert>
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            Bifează ambele declarații suplimentare pentru a continua.
           </AlertDescription>
         </Alert>
       )}
