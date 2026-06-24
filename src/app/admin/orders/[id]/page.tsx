@@ -514,6 +514,10 @@ export default function AdminOrderDetailPage() {
   const orderId = params.id as string;
 
   const [order, setOrder] = useState<OrderDetail | null>(null);
+  const [account, setAccount] = useState<{
+    id: string; email: string | null; firstName: string | null;
+    lastName: string | null; phone: string | null; kycVerified: boolean;
+  } | null>(null);
   const [timeline, setTimeline] = useState<TimelineEvent[]>([]);
   const [orderDocuments, setOrderDocuments] = useState<OrderDocument[]>([]);
   const [optionStatuses, setOptionStatuses] = useState<OrderOptionStatus[]>([]);
@@ -548,6 +552,7 @@ export default function AdminOrderDetailPage() {
       } as unknown as OrderDetail;
 
       setOrder(normalizedOrder);
+      setAccount(json.data.account || null);
       setTimeline((json.data.timeline || []) as TimelineEvent[]);
       setOrderDocuments((json.data.documents || []) as OrderDocument[]);
       setOptionStatuses((json.data.option_statuses || []) as OrderOptionStatus[]);
@@ -966,6 +971,45 @@ export default function AdminOrderDetailPage() {
             {!contact?.email && !contact?.phone && (
               <p className="text-sm text-muted-foreground">Nicio informatie de contact.</p>
             )}
+
+            {/* Account linkage — client cu cont eGhișeul + status KYC pe cont */}
+            <div className="pt-3 border-t border-neutral-100 space-y-2">
+              <div className="flex items-center justify-between gap-2 text-sm">
+                <span className="text-muted-foreground flex items-center gap-1.5">
+                  <User className="h-3.5 w-3.5" /> Cont eGhișeul
+                </span>
+                {account ? (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800 border border-blue-200">
+                    <CheckCircle2 className="h-3 w-3" /> Client înregistrat
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-neutral-100 px-2 py-0.5 text-xs font-medium text-neutral-600">
+                    Comandă ca invitat
+                  </span>
+                )}
+              </div>
+              {account && (
+                <>
+                  <div className="flex items-center justify-between gap-2 text-sm">
+                    <span className="text-muted-foreground flex items-center gap-1.5">
+                      <Shield className="h-3.5 w-3.5" /> KYC cont
+                    </span>
+                    {account.kycVerified ? (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800 border border-green-300">
+                        <CheckCircle2 className="h-3 w-3" /> Verificat
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-900 border border-amber-300">
+                        <AlertTriangle className="h-3 w-3" /> Neverificat — necesită check
+                      </span>
+                    )}
+                  </div>
+                  <a href="/admin/users" className="inline-block text-xs text-primary-600 hover:underline">
+                    Vezi clientul în conturi →
+                  </a>
+                </>
+              )}
+            </div>
             {/* Citizenship + foreign type (PF only). Surfaced for admin
                 triage — foreign citizens have a different processing SLA. */}
             {contact?.citizenship && (

@@ -56,6 +56,31 @@ export async function GET(
       );
     }
 
+    // Fetch the customer's ACCOUNT profile (registered user vs guest).
+    // null user_id = guest checkout; set = has an eGhișeul account.
+    let account: {
+      id: string; email: string | null; firstName: string | null;
+      lastName: string | null; phone: string | null; kycVerified: boolean;
+    } | null = null;
+    if (order.user_id) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: profile } = await (adminClient as any)
+        .from('profiles')
+        .select('id, email, first_name, last_name, phone, kyc_verified')
+        .eq('id', order.user_id)
+        .maybeSingle();
+      if (profile) {
+        account = {
+          id: profile.id,
+          email: profile.email,
+          firstName: profile.first_name,
+          lastName: profile.last_name,
+          phone: profile.phone,
+          kycVerified: !!profile.kyc_verified,
+        };
+      }
+    }
+
     // Fetch order history / timeline
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: history } = await (adminClient as any)
@@ -96,6 +121,7 @@ export async function GET(
       success: true,
       data: {
         order,
+        account,
         timeline: history || [],
         documents: documents || [],
         option_statuses: optionStatuses || [],
