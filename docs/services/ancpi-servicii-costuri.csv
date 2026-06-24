@@ -1,0 +1,25 @@
+Categorie,#,Serviciu,Pret cfunciara (baza lei + TVA),Termen lor,Cost eliberare (NOI),Pret vanzare (NOI),Profit (vanzare - cost),Rentabil? (Da/Nu),Necesita (T=topograf / O=OCPI / A=primarie),Status (Avem/Lipsa)
+Extrase,1,Extras de Carte Funciara,68+TVA,1 zi (15 min prioritate),,89,,,—,Avem (worker ANCPI)
+Extrase,2,Extras CF dupa adresa,250+TVA,max 6h,,,,,O,Lipsa
+Extrase,3,Extras Plan Cadastral pe Ortofotoplan,68+TVA,1 zi (15 min prioritate),,79.99,,,—,Avem (worker ANCPI)
+Extrase,4,Extras CF Colectiva,139+TVA,4 zile,,,,,—,Lipsa
+Identificari,5,Identificare imobil dupa adresa,250+TVA,10 zile,,198,,,—,Avem
+Identificari,6,Identificare imobile dupa proprietar,250+TVA,5 zile,,,,,O,Lipsa
+Planuri,7,Plan de amplasament si delimitare (PAD),179+TVA,4 zile,,,,,T+O,Lipsa
+Planuri,8,Copie Plan Incadrare,179+TVA,4 zile,,,,,O,Lipsa
+Copii certificate,9,Copie Carte Funciara (in extenso),139+TVA,4 zile,,,,,O,Lipsa
+Copii certificate,10,Copie Plan Cadastral,179+TVA,4 zile,,,,,O,Lipsa
+Copii certificate,11,Copie inventar coordonate Stereo 70,179+TVA,4 zile,,,,,T+O,Lipsa
+Copii certificate,12,Copie Intabulare,179+TVA,4 zile,,,,,O,Lipsa
+Copii certificate,13,Copie dupa Releveu,179+TVA,4 zile,,,,,T+O,Lipsa
+Copii certificate,14,Copie certificata din arhiva OCPI,179+TVA,4 zile,,,,,O,Lipsa
+Copii certificate,15,Copie Contract Vanzare-Cumparare,179+TVA,4 zile,,,,,O,Lipsa
+Copii certificate,16,Certificat de sarcini,250+TVA,max 4 zile,,,,,O,Lipsa
+Operatiuni CF,17,Actualizare adresa in Cartea Funciara,250+TVA,15 zile,,,,,O,Lipsa
+Pachete documente,18,Documente cadastrale pt Certificat de urbanism,490+TVA,max 4 zile,,,,,T+O,Lipsa
+Pachete documente,19,Documente cadastrale pt vanzare-cumparare credit ipotecar,290+TVA,max 4 zile,,,,,O,Lipsa
+Pachete documente,20,Documente cadastrale pt Casa Verde,179+TVA,4 zile,,,,,O,Lipsa
+Pachete documente,21,Documente cadastrale pt Casa Verde Duplex/Bloc,290+TVA,4 zile,,,,,O,Lipsa
+Certificate,22,Certificat detinere/nedetinere imobile (ANCPI),250+TVA,5 zile,,,,,O,Lipsa
+Certificate,23,Certificat de Urbanism pentru Informare,780+TVA,pana la 30 zile,,,,,A,Lipsa
+Certificate,24,Certificat de Urbanism pentru Construire,980+TVA,pana la 30 zile,,,,,A,Lipsa

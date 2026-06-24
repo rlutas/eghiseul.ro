@@ -87,6 +87,12 @@ Marcaj: **[T]** topograf autorizat ANCPI · **[O]** depunere/cerere la ghișeul 
 - Plată card/transfer prin Netopia. Termene calculate L-V 08-18.
 - Pricing: bază „X+TVA" + supliment „Prioritate" per serviciu + „Validare specialist" +9 la extras CF.
 
+## 📊 Tabel pentru calcul cost/profit (Google Sheets)
+
+`docs/services/ancpi-servicii-costuri.csv` — deschide în **Google Sheets** (Fișier → Import → Încarcă) sau Excel. Are coloane goale de completat: **Cost eliberare (NOI)**, **Preț vânzare (NOI)**, **Profit**, **Rentabil?**. Pentru cele 3 servicii pe care le avem, prețul nostru e deja pus.
+
+**Profit:** după ce completezi costul + prețul de vânzare, adaugă formula `=PrețVânzare − Cost` pe coloana Profit (ex. în Sheets: `=G2-F2`). Așa vezi pe fiecare serviciu marja + dacă e rentabil. Discută cu Mircea costul lui de eliberare per categorie (mai ales [T] topograf + [O] OCPI).
+
 ## Următor (decizie business)
 - Quick win fără topograf: adaugă #2 + #4 (worker ANCPI existent).
 - Cu Mircea: PAD + inventar Stereo 70 + releveu (topograf) + blocul de copii din arhivă OCPI.
