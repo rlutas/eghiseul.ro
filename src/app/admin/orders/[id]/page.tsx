@@ -339,6 +339,77 @@ function computeOcrCrossValidationWarnings(cd: AnyObj | null): CrossValidationWa
   });
 }
 
+// ── OCR vs date completate de client ────────────────────────────────────────
+// Compară ce a EXTRAS OCR-ul de pe buletin (personal.ocrResults[].extractedData)
+// cu ce a COMPLETAT/editat clientul în formular (personal.firstName/cnp/etc).
+// Diferențele = client a corectat OCR-ul SAU a introdus date greșite → operatorul
+// verifică manual. Datele OCR sunt prefill, dar editabile de client.
+interface OcrFormRow {
+  field: string;
+  label: string;
+  ocr: string;
+  form: string;
+  match: boolean;
+}
+
+function normCmp(v: unknown): string {
+  return String(v ?? '')
+    .trim()
+    .toUpperCase()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .replace(/[^A-Z0-9]/g, '');
+}
+
+// Egalitate de dată indiferentă la format (DD.MM.YYYY vs YYYY-MM-DD etc).
+function datesEqual(a: unknown, b: unknown): boolean {
+  const parts = (s: unknown) =>
+    String(s ?? '')
+      .split(/\D+/)
+      .filter(Boolean)
+      .map(Number)
+      .sort((x, y) => x - y);
+  const pa = parts(a);
+  const pb = parts(b);
+  if (pa.length !== 3 || pb.length !== 3) return normCmp(a) === normCmp(b);
+  return pa.every((v, i) => v === pb[i]);
+}
+
+function computeOcrVsFormRows(cd: AnyObj | null): OcrFormRow[] {
+  if (!cd) return [];
+  const personal = cd.personalData || cd.personal;
+  const ocrResults: Array<{ extractedData?: AnyObj }> | undefined = personal?.ocrResults;
+  if (!personal || !ocrResults || ocrResults.length === 0) return [];
+
+  // Merge OCR fields across all scans (first non-empty wins).
+  const ocr: AnyObj = {};
+  for (const r of ocrResults) {
+    const d = r.extractedData || {};
+    for (const k of ['firstName', 'lastName', 'cnp', 'birthDate', 'series', 'number', 'expiryDate']) {
+      if (ocr[k] == null && d[k]) ocr[k] = d[k];
+    }
+  }
+  if (Object.keys(ocr).length === 0) return [];
+
+  const pairs: Array<[string, string, unknown, unknown, boolean]> = [
+    ['lastName', 'Nume', ocr.lastName, personal.lastName, false],
+    ['firstName', 'Prenume', ocr.firstName, personal.firstName, false],
+    ['cnp', 'CNP', ocr.cnp, personal.cnp, false],
+    ['birthDate', 'Data nașterii', ocr.birthDate, personal.birthDate, true],
+    ['series', 'Serie', ocr.series, personal.documentSeries, false],
+    ['number', 'Număr', ocr.number, personal.documentNumber, false],
+    ['expiryDate', 'Expirare', ocr.expiryDate, personal.documentExpiry, true],
+  ];
+
+  const rows: OcrFormRow[] = [];
+  for (const [field, label, o, f, isDate] of pairs) {
+    if (!o && !f) continue;
+    const match = !!o && !!f && (isDate ? datesEqual(o, f) : normCmp(o) === normCmp(f));
+    rows.push({ field, label, ocr: o ? String(o) : '—', form: f ? String(f) : '—', match });
+  }
+  return rows;
+}
+
 /** Extract all client-uploaded documents from customer_data */
 function extractClientDocuments(cd: AnyObj | null): Array<{ type: string; label: string; s3Key?: string; base64?: string; fileName?: string }> {
   if (!cd) return [];
@@ -1391,6 +1462,8 @@ export default function AdminOrderDetailPage() {
           const kycByType = extractKycByDocType(order.customer_data);
           const reviewNeeded = needsKycReview(kycByType);
           const crossValWarnings = computeOcrCrossValidationWarnings(order.customer_data);
+          const ocrFormRows = computeOcrVsFormRows(order.customer_data);
+          const ocrFormMismatches = ocrFormRows.filter((r) => !r.match && r.ocr !== '—' && r.form !== '—').length;
           const personalData = order.customer_data?.personalData || order.customer_data?.personal;
           const idDocumentType = personalData?.idDocumentType as 'ci_vechi' | 'ci_nou' | 'passport' | null | undefined;
           const idTypeLabel =
@@ -1481,6 +1554,60 @@ export default function AdminOrderDetailPage() {
                   document sau face-match.
                 </AlertDescription>
               </Alert>
+            )}
+
+            {/* OCR (de pe buletin) vs date completate de client în formular */}
+            {ocrFormRows.length > 0 && (
+              <div className={`rounded-lg border ${ocrFormMismatches > 0 ? 'border-amber-300 bg-amber-50/40' : 'border-neutral-200 bg-neutral-50/40'}`}>
+                <div className="flex items-center gap-2 px-3 py-2 border-b border-neutral-100">
+                  {ocrFormMismatches > 0 ? (
+                    <AlertTriangle className="h-4 w-4 text-amber-600" />
+                  ) : (
+                    <CheckCircle2 className="h-4 w-4 text-green-600" />
+                  )}
+                  <span className="text-sm font-semibold text-secondary-900">
+                    OCR buletin vs. date completate
+                  </span>
+                  {ocrFormMismatches > 0 && (
+                    <span className="ml-auto inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-900 border border-amber-300">
+                      {ocrFormMismatches} {ocrFormMismatches === 1 ? 'diferență' : 'diferențe'}
+                    </span>
+                  )}
+                </div>
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="text-[11px] uppercase tracking-wide text-neutral-400">
+                      <th className="text-left font-medium px-3 py-1.5">Câmp</th>
+                      <th className="text-left font-medium px-3 py-1.5">OCR (buletin)</th>
+                      <th className="text-left font-medium px-3 py-1.5">Formular (client)</th>
+                      <th className="px-3 py-1.5"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {ocrFormRows.map((r) => (
+                      <tr key={r.field} className={`border-t border-neutral-100 ${!r.match && r.ocr !== '—' && r.form !== '—' ? 'bg-amber-50' : ''}`}>
+                        <td className="px-3 py-1.5 text-neutral-500">{r.label}</td>
+                        <td className="px-3 py-1.5 font-medium text-secondary-900 tabular-nums">{r.ocr}</td>
+                        <td className="px-3 py-1.5 font-medium text-secondary-900 tabular-nums">{r.form}</td>
+                        <td className="px-3 py-1.5 text-right">
+                          {r.ocr === '—' || r.form === '—' ? (
+                            <span className="text-neutral-300">–</span>
+                          ) : r.match ? (
+                            <CheckCircle2 className="h-4 w-4 text-green-600 inline" />
+                          ) : (
+                            <AlertTriangle className="h-4 w-4 text-amber-600 inline" />
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                {ocrFormMismatches > 0 && (
+                  <p className="px-3 py-2 text-xs text-amber-700 italic border-t border-amber-100">
+                    Clientul a modificat datele față de buletinul scanat. Verifică înainte de procesare.
+                  </p>
+                )}
+              </div>
             )}
 
 
