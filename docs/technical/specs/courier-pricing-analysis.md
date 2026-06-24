@@ -12,7 +12,7 @@
 | Fan Courier | FANbox | **API REAL** | internal-tariff + service=FANbox | `fancourier.ts:506` |
 | Fan Courier | fallback mock | ESTIMAT | `15 + greutate*5` | `fancourier.ts:1140` |
 
-**Sameday NU are API public de quote** → prețul afișat e estimare; costul real se află la crearea AWB. Risc: real AWB poate diferi de estimare.
+**Update 2026-06-24:** Sameday ARE `POST /api/awb/estimate-cost` (eAWB) — implementat în `sameday.getEstimatedQuotes` (preț real per serviciu Standard + EasyBox), cu fallback la `14+4/kg` dacă endpoint-ul eșuează. ⚠️ De verificat cu credențiale Sameday reale (shape răspuns `{cost}` + payload). Fallback-ul protejează quote-urile.
 
 ## Parametri curenți (verificat)
 - Greutate default: **0.5 kg** (plic A4 documente) — `utils.ts:17` / `delivery-step.tsx:381`. Corect pentru plic; dacă se trimit cutii mai grele → preț real mai mare.
