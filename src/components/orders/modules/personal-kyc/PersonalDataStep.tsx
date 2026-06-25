@@ -2041,7 +2041,7 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
                 <div className="text-sm">
                   <p className="font-medium text-secondary-900">Adresă de domiciliu preluată automat</p>
                   <p className="text-neutral-700 mt-0.5">{autoAddressText}</p>
-                  <p className="text-xs text-neutral-500 mt-1">Verifică adresa. Dacă e greșită sau incompletă, apasă „Editează".</p>
+                  <p className="text-xs text-neutral-500 mt-1">Verifică adresa. Dacă e greșită sau incompletă, apasă „Editează”.</p>
                 </div>
               </div>
               <Button type="button" variant="outline" size="sm" onClick={() => setEditAddress(true)} className="flex-shrink-0">
