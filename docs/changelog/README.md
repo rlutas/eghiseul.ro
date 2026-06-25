@@ -4,6 +4,7 @@
  
  | Data | Ce s-a livrat | Detalii |
  |---|---|---|
+ | 2026-06-25 | Fix ANAF: firmă cu sediu transferat („TRANSFER(SOSIRE)") marcată greșit inactivă → constatator blocat | [anaf-firma-activa-transfer](2026-06-25-anaf-firma-activa-transfer.md) |
  | 2026-06-25 | Wizard: feedback „de ce nu pot continua" (listă + scroll) · mașini salvate · OCR din PDF + clarificare RO CEI | [wizard-validation-feedback](../features/wizard-validation-feedback/README.md) · [saved-vehicles](../features/saved-vehicles/README.md) · [ocr-pdf-rocei](2026-06-25-ocr-pdf-rocei-clarity.md) |
  | 2026-06-25 | 🔒 Fix KYC: act de identitate obligatoriu (ruta „completez manual" lăsa să comanzi fără act) — toate 8 servicii KYC | [2026-06-25-kyc-act-identitate-fix.md](2026-06-25-kyc-act-identitate-fix.md) |
  | 2026-06-24 | Dropdown-uri (tot+alfabetic), livrare (RO/intl, min 20 RON, etichetă cu regiune), specimen opțiuni, lockere paralel, admin KYC cont, WhatsApp status | [2026-06-24-courier-options-pricing-kyc.md](2026-06-24-courier-options-pricing-kyc.md) |
