@@ -66,7 +66,7 @@ export interface UserPermissions {
  * These are merged with any explicit JSONB permissions for the role.
  */
 const ROLE_DEFAULTS: Record<string, Permission[]> = {
-  'manager': ['orders.view', 'orders.manage', 'payments.verify', 'users.manage', 'settings.manage', 'documents.generate', 'documents.view'],
+  'manager': ['orders.view', 'orders.manage', 'orders.pdf_upload', 'payments.verify', 'users.manage', 'settings.manage', 'documents.generate', 'documents.view'],
   'operator': ['orders.view', 'orders.manage', 'documents.generate', 'documents.view'],
   'contabil': ['orders.view', 'payments.verify', 'documents.view'],
   'avocat': ['orders.view', 'documents.view'],
