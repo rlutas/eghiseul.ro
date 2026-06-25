@@ -98,6 +98,11 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
   const updateImobil = (i: number, patch: Partial<AdditionalImobil>) =>
     setAdditional(additional.map((im, idx) => (idx === i ? { ...im, ...patch } : im)));
 
+  // Multi-imobil ("Adaugă un extras") is only offered for services that actually
+  // have the priced extras_suplimentar option (Extras CF). Copii/certificate and
+  // the other cadastral services are single-property — no extra here.
+  const allowMultiImobil = serviceOptions.some((o) => o.code === 'extras_suplimentar');
+
   // Keep the priced `extras_suplimentar` option in sync with the extra count.
   const extraCount = additional.length;
   useEffect(() => {
@@ -409,7 +414,9 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
         </CardContent>
       </Card>
 
-      {/* Additional imobile — "Adaugă un extras" (same county, ANCPI rule) */}
+      {/* Additional imobile — "Adaugă un extras" (same county, ANCPI rule).
+          Only for services with the priced extras_suplimentar option (Extras CF). */}
+      {allowMultiImobil && (
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -486,6 +493,7 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
           )}
         </CardContent>
       </Card>
+      )}
 
       {/* Purpose/Reason (optional) */}
       <Card>
