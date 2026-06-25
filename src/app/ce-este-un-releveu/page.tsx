@@ -54,7 +54,7 @@ export default function Page() {
       <p>
         Releveul este <strong>planul la scară al unei unități individuale</strong> — un apartament, o casă sau un
         spațiu — care arată compartimentarea interioară: camerele, suprafețele utile și dimensiunile. Practic,
-        este reprezentarea „pe hârtie" a interiorului imobilului, așa cum a fost măsurat la cadastru.
+        este reprezentarea „pe hârtie” a interiorului imobilului, așa cum a fost măsurat la cadastru.
       </p>
 
       <h2>Ce conține releveul unui apartament</h2>

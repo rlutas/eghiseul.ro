@@ -45,7 +45,7 @@ export default function Page() {
       ]}
     >
       <p>
-        „Am nevoie de planul cadastral" — auzi des asta la notar, la bancă sau când depui o documentație. Dar ce
+        „Am nevoie de planul cadastral” — auzi des asta la notar, la bancă sau când depui o documentație. Dar ce
         este, mai exact, <strong>planul cadastral</strong>, și cu ce diferă de releveu sau de extrasul de carte
         funciară? Le punem cap la cap, ca să știi exact ce să ceri.
       </p>
@@ -53,7 +53,7 @@ export default function Page() {
       <h2>Ce este planul cadastral</h2>
       <p>
         Planul cadastral este <strong>reprezentarea grafică a imobilului</strong> așa cum este înscris la cadastru:
-        conturul parcelei, poziția, suprafața și vecinătățile. Pe scurt, arată „unde se află" și „cum este delimitat"
+        conturul parcelei, poziția, suprafața și vecinătățile. Pe scurt, arată „unde se află” și „cum este delimitat”
         terenul sau construcția, spre deosebire de extrasul de carte funciară, care arată situația juridică.
       </p>
 
@@ -70,8 +70,8 @@ export default function Page() {
       <p>
         Diferența pe care o caută mulți: planul cadastral arată <strong>parcela pe hartă</strong> (contur, poziție,
         vecinătăți), iar <Link href={serviceUrl('copie-releveu')}>releveul</Link> arată{' '}
-        <strong>interiorul imobilului</strong> (camerele și suprafețele utile). Unul e „de afară", celălalt „de
-        dinăuntru". Pentru o tranzacție completă ai nevoie de ambele.
+        <strong>interiorul imobilului</strong> (camerele și suprafețele utile). Unul e „de afară”, celălalt „de
+        dinăuntru”. Pentru o tranzacție completă ai nevoie de ambele.
       </p>
 
       <h2>Plan cadastral vs. extras de carte funciară</h2>
