@@ -29,7 +29,7 @@ export function DocumentTypePicker({ onPick }: DocumentTypePickerProps) {
     <div className="space-y-3">
       <div className="text-center">
         <h3 className="text-sm sm:text-base font-semibold text-secondary-900">
-          Ce tip de act ai?
+          Ce tip de act dețineți?
         </h3>
         <p className="text-xs text-neutral-500 mt-1">
           Apasă pe varianta care arată ca actul tău.
