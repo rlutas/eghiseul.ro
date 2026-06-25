@@ -407,7 +407,42 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
 
       setState(prev => ({ ...prev, progress: 90 }));
 
-      if (ocr?.success && ocr.confidence >= 50) {
+      if (type === 'ro_cei_reader_pdf') {
+        // RO CEI = dovadă de domiciliu. NU suprascrie identitatea (nume/CNP/dată
+        // vin din actul de identitate, care e autoritar). Doar:
+        //  1) cross-check CNP cu actul → dacă DIFERĂ, e alt om → respinge cu mesaj
+        //     clar (înainte suprascria datele de pe buletin cu cele din PDF!);
+        //  2) dacă se potrivește (sau OCR n-a citit CNP-ul), stochează PDF-ul +
+        //     pre-completează DOAR adresa.
+        const ex = ocr?.extractedData;
+        const ciCnp = (personalKyc?.cnp || '').replace(/\D/g, '');
+        const pdfCnp = (ex?.cnp || '').replace(/\D/g, '');
+        if (ciCnp && pdfCnp && ciCnp !== pdfCnp) {
+          throw new Error('Documentul (RO CEI) nu corespunde cu actul de identitate — CNP diferit. Încarcă dovada de domiciliu a aceleiași persoane.');
+        }
+        updatePersonalKyc({
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          uploadedDocuments: [
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            ...(personalKyc?.uploadedDocuments || []).filter((d: any) => d.type !== type),
+            {
+              id: randomId(), type, fileName: file.name, fileSize: compressed.sizeAfter,
+              mimeType: compressed.mimeType, uploadedAt: new Date().toISOString(), base64,
+            },
+          ],
+          ocrResults: [
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            ...(personalKyc?.ocrResults || []).filter((r: any) => r.documentType !== type),
+            {
+              documentType: type, success: !!ocr?.success, confidence: ocr?.confidence || 0,
+              extractedData: ex || {}, issues: ocr?.issues || [], processedAt: new Date().toISOString(),
+            },
+          ],
+        });
+        if (ex?.address) fillAddressFields(ex.address);
+        setState(prev => ({ ...prev, scanning: false, progress: 100, success: true }));
+        setScanFailureCount(0);
+      } else if (ocr?.success && ocr.confidence >= 50) {
         const extracted = ocr.extractedData;
 
         // Birth date — prefer CNP-derived over OCR. CNP is mathematically
@@ -509,45 +544,6 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
 
         setState(prev => ({ ...prev, scanning: false, progress: 100, success: true }));
         // Reset failure counter on success
-        setScanFailureCount(0);
-      } else if (type === 'ro_cei_reader_pdf') {
-        // RO CEI PDF = document JUSTIFICATIV pentru adresă. OCR-ul (auto-completare
-        // adresă) e best-effort — dacă Gemini nu reușește, NU blocăm clientul:
-        // stocăm PDF-ul + mergem mai departe (operatorul verifică adresa manual).
-        // Altfel un PDF valid pe care AI-ul nu-l citește perfect bloca complet
-        // comanda (ro_cei e obligatoriu la CI nou).
-        const extracted = ocr?.extractedData;
-        updatePersonalKyc({
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          uploadedDocuments: [
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            ...(personalKyc?.uploadedDocuments || []).filter((d: any) => d.type !== type),
-            {
-              id: randomId(),
-              type,
-              fileName: file.name,
-              fileSize: compressed.sizeAfter,
-              mimeType: compressed.mimeType,
-              uploadedAt: new Date().toISOString(),
-              base64,
-            },
-          ],
-          ocrResults: [
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            ...(personalKyc?.ocrResults || []).filter((r: any) => r.documentType !== type),
-            {
-              documentType: type,
-              success: !!ocr?.success,
-              confidence: ocr?.confidence || 0,
-              extractedData: extracted || {},
-              issues: ocr?.issues || [],
-              processedAt: new Date().toISOString(),
-            },
-          ],
-        });
-        // Dacă totuși a extras adresa, o pre-completăm (bonus).
-        if (extracted?.address) fillAddressFields(extracted.address);
-        setState(prev => ({ ...prev, scanning: false, progress: 100, success: true }));
         setScanFailureCount(0);
       } else {
         console.warn('OCR extraction failed or low confidence:', {

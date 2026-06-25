@@ -16,3 +16,8 @@ Build OK, **1089 teste verzi**.
 
 ## Update — RO CEI nu mai blochează la OCR eșuat
 PDF-ul RO CEI e document JUSTIFICATIV pentru adresă; OCR-ul (auto-completare adresă) e best-effort. Înainte, dacă Gemini întorcea <50% încredere, componenta arunca eroare („Nu am putut extrage datele... încredere 0%") și NU stoca documentul → client blocat (ro_cei e obligatoriu la CI nou). Acum: pentru `ro_cei_reader_pdf`, dacă OCR eșuează, **stocăm totuși PDF-ul + mergem mai departe** (operatorul verifică adresa manual); dacă OCR reușește, pre-completăm adresa ca bonus. Doar tipul ro_cei e soft-accept; CI față/spate rămân pe OCR (au fallback manual).
+
+## Update 2 — RO CEI nu mai suprascrie identitatea + cross-check CNP
+Bug: dacă OCR-ul RO CEI reușea (≥50%), intra în branch-ul principal care suprascria nume/CNP/dată cu datele din PDF. Dacă PDF-ul era al ALTEI persoane (alt buletin), datele de pe actul de identitate erau înlocuite tăcut cu cele din PDF.
+
+Fix: `ro_cei_reader_pdf` are acum branch dedicat (primul): NU atinge identitatea (nume/CNP/dată vin din actul de identitate, autoritar); face **cross-check CNP** — dacă CNP-ul din PDF diferă de cel din act → eroare „Documentul (RO CEI) nu corespunde cu actul de identitate — CNP diferit"; dacă se potrivește (sau OCR n-a citit CNP) → stochează PDF-ul + pre-completează DOAR adresa.
