@@ -71,6 +71,11 @@ Sursă: `docs/services/ancpi-servicii-costuri.csv`. `base_price` e cu TVA → `c
 pentru servicii `imobiliare`; `page` (→ `serviceUrl(slug)`) pe toate cele 17 pagini `/servicii`
 imobiliare. Permite comutarea rapidă între documentele cadastrale fără pierderea contextului.
 
+## Admin: secțiune Colaboratori + onorariu topograf (migrare 087)
+- `services.lawyer_fee_ron = 15` pe cele 14 servicii imobiliare (același mecanism ca onorariul avocatului). Linia de factură Oblio se numește **„Onorariu Topograf"** pentru serviciile `imobiliare` (vs „Onorariu Avocat") — `lib/oblio/invoice.ts` (`fee_label`/`fee_description`) + `ensure-invoice.ts` (după `category`).
+- `/admin/colaboratori` (permisiune `orders.view`): selectezi colaboratorul + luna → sumar (nr comenzi, încasări, onorarii) + tabel comenzi + **export CSV/TSV**. API: `/api/admin/collaborators` + `/api/admin/collaborators/orders` (cu `format=tsv`).
+- Separat de secțiunea ANCPI (aceea rămâne pentru workerul automat). Onorariile avocat rămân pe serviciile lor; topograf pe cele imobiliare.
+
 ## Rămas (backlog)
 - UI admin de invitare/management colaboratori (acum: creare directă în DB).
 - Pass SEO fin (GSC keywords, location pages unde aplică) + listare în indexul `/servicii`.

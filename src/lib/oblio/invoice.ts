@@ -67,10 +67,13 @@ interface OrderForInvoice {
   service_name: string;
   base_price?: number;
   total_price: number;
-  /** Lawyer fee (RON) to carve out of the main service line as a separate
-   *  "Onorariu Avocat" line. Per-service config (services.lawyer_fee_ron);
-   *  0/undefined → no split. */
+  /** Professional fee (RON) to carve out of the main service line as a separate
+   *  line. Per-service config (services.lawyer_fee_ron); 0/undefined → no split. */
   lawyer_fee_ron?: number | null;
+  /** Label/description for the carved fee line. Defaults to the lawyer wording;
+   *  cadastral (imobiliare) services pass "Onorariu Topograf". */
+  fee_label?: string | null;
+  fee_description?: string | null;
   // Accepts any of the historical/current shapes — normalizeOrderOptions
   // handles wizard camelCase, DB snake_case, and legacy {name, price}.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -248,8 +251,8 @@ export async function createInvoiceFromOrder(
 
   if (lawyerFee > 0) {
     products.push({
-      name: 'Onorariu Avocat',
-      description: 'Asistență juridică și reprezentare în fața autorităților',
+      name: order.fee_label || 'Onorariu Avocat',
+      description: order.fee_description || 'Asistență juridică și reprezentare în fața autorităților',
       price: lawyerFee,
       measuringUnit: 'buc',
       currency: 'RON',

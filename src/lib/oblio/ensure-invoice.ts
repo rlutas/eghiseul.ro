@@ -42,7 +42,7 @@ export async function ensureInvoiceForPaidOrder(
   // 1. Fetch order + service fields needed for the invoice.
   const { data: order, error: fetchError } = await admin
     .from('orders')
-    .select('*, services(name, lawyer_fee_ron)')
+    .select('*, services(name, lawyer_fee_ron, category)')
     .eq('id', orderId)
     .single();
 
@@ -141,7 +141,10 @@ export async function ensureInvoiceForPaidOrder(
 
   // 3. Create the invoice (only the lock winner reaches here).
   try {
-    const svcRel = o.services as { name: string; lawyer_fee_ron?: number | null } | null;
+    const svcRel = o.services as { name: string; lawyer_fee_ron?: number | null; category?: string | null } | null;
+    // Cadastral (imobiliare) services are handled by the topograph collaborator,
+    // so their carved fee line reads "Onorariu Topograf" instead of "Avocat".
+    const isImobiliare = svcRel?.category === 'imobiliare';
     const invoice = await createInvoiceFromOrder(
       {
         id: o.id,
@@ -149,6 +152,10 @@ export async function ensureInvoiceForPaidOrder(
         friendly_order_id: o.friendly_order_id ?? undefined,
         service_name: svcRel?.name || 'Serviciu eGhiseul',
         lawyer_fee_ron: svcRel?.lawyer_fee_ron ?? undefined,
+        fee_label: isImobiliare ? 'Onorariu Topograf' : undefined,
+        fee_description: isImobiliare
+          ? 'Servicii de cadastru și asistență la obținerea documentului de la OCPI/ANCPI'
+          : undefined,
         base_price: o.base_price ?? undefined,
         total_price: o.total_price,
         selected_options: o.selected_options ?? undefined,
