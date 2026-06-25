@@ -25,3 +25,7 @@ Fix: `ro_cei_reader_pdf` are acum branch dedicat (primul): NU atinge identitatea
 ## Update 3 — Confirmare compactă adresă + admin
 - Adresa de domiciliu, când e auto-completată (din RO CEI sau scan CI), se arată ca **rezumat compact read-only** (card verde + textul adresei) cu buton „Editează", nu ca formular gol. Dacă OCR-ul ratează adresa → câmpuri editabile direct (clientul o scrie manual). Răspunde la „are rost s-o arătăm?": da — verificare + fallback OCR.
 - **Admin:** ro_cei era deja stocat în `uploadedDocuments` + arătat ca „PDF RO CEI Reader (dovada domiciliu)" + descărcabil (`extractClientDocuments`). Confirmat — echipa îl vede.
+
+## Update 4 — confidence Gemini nesigur + banner prematur
+- **OCR confidence:0 deși citește corect:** `gemini-2.5-flash-lite` întoarce des `confidence:0` chiar când extrage perfect (verificat pe buletin real: CNP + nume citite, confidence 0). Gate-ul `confidence>=50` respingea buletine valide cu „încredere 0%". Fix: acceptăm dacă datele sunt UTILIZABILE — CNP valid (checksum) sau nume+prenume complete — indiferent de cifra confidence.
+- **Banner validare prematur:** `validationAttempt` e counter global; un click „Continuă" invalid pe un pas făcea ca pasul următor să afișeze erorile la intrare. Fix: fiecare pas reține un baseline (valoarea la montare) și reacționează doar la incrementări de pe ACEL pas.
