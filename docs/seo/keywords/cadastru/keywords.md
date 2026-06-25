@@ -69,12 +69,15 @@ copie + releveu.
 
 ---
 
-## Rezumat decizii (ce facem)
-| Topic | Pagină de îmbunătățit | Articol nou? |
+## Rezumat decizii (ce facem) — STATUS
+| Topic | Pagină | Articol |
 |---|---|---|
-| Releveu | copie-releveu (releveu apartament/casă, preț, FAQ) | DA — „Ce este un releveu" (head 1.9K) |
-| Plan de încadrare | copie-plan-incadrare (în zonă, online, FAQ) | NU (volum întrebări ≈ 0) |
-| Plan cadastral | extras-plan-cadastral (extras, online, ortofotoplan) | DA — „Ce este planul cadastral / vs releveu" |
+| Releveu | ✅ copie-releveu (deja conține „releveu apartament/casă", preț, FAQ — rescris) | ✅ `/ce-este-un-releveu` (head 1.9K) |
+| Plan de încadrare | ✅ copie-plan-incadrare (deja conține „în zonă"/„online") | NU (volum întrebări ≈ 0) |
+| Plan cadastral | ✅ extras-plan-cadastral (deja conține „online"/„ortofotoplan") | ✅ `/ce-este-planul-cadastral` (head 720) |
+
+Articolele linkează către paginile de serviciu (intern linking). Rămas opțional: link invers
+pagină → articol (din secțiunile de content/FAQ) pentru a întări articolele.
 
 Prioritate după ușurință+volum: plan de încadrare (KD 2–8, doar pagină) → releveu (5.4K) → plan cadastral.
 Constrângere copy: fără „oficial"+„documente/acte" (politica Google Ads).

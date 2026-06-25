@@ -178,6 +178,8 @@ export const HARDCODED_ARTICLE_SLUGS = [
   'duplicat-certificat-de-casatorie',
   'acte-necesare-casatorie',
   'inregistrare-nastere-copil-nou-nascut',
+  'ce-este-un-releveu',
+  'ce-este-planul-cadastral',
 ] as const;
 
 /** Organization-wide metadata for Schema.org Organization node.
