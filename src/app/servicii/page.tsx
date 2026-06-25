@@ -91,14 +91,82 @@ const categoryIcons: Record<ServiceCategory, React.ReactNode> = {
   personale: <User className="h-6 w-6" />,
 };
 
-const categoryLabels: Record<ServiceCategory, string> = {
-  fiscale: 'Fiscale',
-  juridice: 'Juridice',
-  imobiliare: 'Imobiliare',
-  comerciale: 'Comerciale',
-  auto: 'Auto',
-  personale: 'Personale',
-};
+// Services grouped by the issuing state institution (display order top→bottom).
+const INSTITUTION_GROUPS: { key: ServiceCategory; title: string; authority: string }[] = [
+  { key: 'imobiliare', title: 'Carte Funciară & Cadastru', authority: 'ANCPI / OCPI' },
+  { key: 'juridice', title: 'Caziere & Integritate', authority: 'IGPR / Ministerul Justiției' },
+  { key: 'comerciale', title: 'Firme', authority: 'ONRC' },
+  { key: 'fiscale', title: 'Fiscal', authority: 'ANAF' },
+  { key: 'personale', title: 'Stare Civilă', authority: 'Primării / D.E.P.A.B.D.' },
+  { key: 'auto', title: 'Auto', authority: 'Poliția Rutieră / CNAIR' },
+];
+
+function ServiceCardItem({ service }: { service: Service }) {
+  const icon = categoryIcons[service.category] ?? <FileText className="h-6 w-6" />;
+  const detailHref = serviceUrl(service.slug);
+  // Cazier Judiciar parent: order goes to the hub so the user picks PF vs PJ.
+  const orderHref = service.slug === 'cazier-judiciar' ? serviceUrl(service.slug) : `/comanda/${service.slug}`;
+  const specimen = serviceSpecimen(service);
+
+  return (
+    <Card className="group relative overflow-hidden bg-white p-0 hover:shadow-[0_12px_30px_rgba(6,16,31,0.12)] transition-all duration-300 border border-neutral-200 hover:border-primary-400 hover:-translate-y-1.5 flex flex-col h-full rounded-2xl">
+      {/* Specimen image header — larger than the homepage cards */}
+      <div className="relative w-full bg-gradient-to-b from-neutral-50 to-white border-b border-neutral-100" style={{ paddingTop: '92%' }}>
+        {service.urgent_available && (
+          <span className="absolute top-3 right-3 z-10 inline-flex items-center rounded-md bg-primary-500 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-secondary-900 shadow-sm">
+            <Zap className="h-3 w-3 mr-1" />
+            Urgent
+          </span>
+        )}
+        {specimen ? (
+          <Image
+            src={specimen}
+            alt={`Specimen ${service.name}`}
+            fill
+            sizes="(max-width:640px) 100vw, (max-width:1024px) 50vw, 300px"
+            className="object-contain p-4 transition-transform duration-300 group-hover:scale-[1.03]"
+          />
+        ) : (
+          <span className="absolute inset-0 flex items-center justify-center">
+            <span className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary-100 text-primary-600">{icon}</span>
+          </span>
+        )}
+      </div>
+
+      <CardContent className="flex flex-1 flex-col p-4">
+        <CardTitle className="text-[15px] font-bold text-secondary-900 leading-snug mb-1.5">{service.name}</CardTitle>
+        <p className="text-neutral-500 text-xs leading-relaxed line-clamp-2 mb-3">
+          {service.short_description || service.description || 'Document disponibil pentru comandă online.'}
+        </p>
+        <div className="mt-auto flex items-end justify-between gap-2 pt-3 border-t border-neutral-100">
+          <div>
+            <p className="text-[10px] text-neutral-400 uppercase tracking-wide font-medium">Preț</p>
+            <p className="text-base font-extrabold text-secondary-900">
+              <span className="text-primary-600">{service.base_price}</span>{' '}
+              <span className="text-xs font-bold text-neutral-500">{service.currency || 'RON'}</span>
+            </p>
+          </div>
+          <div className="text-right">
+            <p className="text-[10px] text-neutral-400 uppercase tracking-wide font-medium">Termen</p>
+            <p className="text-xs font-semibold text-secondary-900 flex items-center justify-end gap-1">
+              <Clock className="h-3.5 w-3.5 text-primary-500" />
+              {service.estimated_days === 1 ? '24 ore' : `${service.estimated_days} zile`}
+            </p>
+          </div>
+        </div>
+      </CardContent>
+
+      <CardFooter className="p-4 pt-0 flex flex-col gap-1.5">
+        <Button asChild className="w-full bg-primary-500 hover:bg-primary-600 text-secondary-900 font-bold rounded-xl h-10 shadow-[0_4px_12px_rgba(236,185,95,0.25)] hover:shadow-[0_6px_16px_rgba(236,185,95,0.35)] hover:-translate-y-0.5 transition-all duration-200">
+          <Link href={orderHref}>Comandă acum<ArrowRight className="ml-2 h-4 w-4" /></Link>
+        </Button>
+        <Button asChild variant="ghost" className="w-full text-secondary-900 hover:text-primary-700 font-semibold h-8 text-sm">
+          <Link href={detailHref}>Vezi detalii</Link>
+        </Button>
+      </CardFooter>
+    </Card>
+  );
+}
 
 async function getActiveServices(): Promise<Service[]> {
   const supabase = createPublicClient();
@@ -200,9 +268,9 @@ export default async function ServiciiPage() {
           </div>
         </section>
 
-        {/* Services Grid */}
-        <section className="py-12 lg:py-20 bg-neutral-50 -mt-8">
-          <div className="container mx-auto px-4 max-w-[1100px]">
+        {/* Services grouped by issuing institution — 4 per row */}
+        <section className="py-12 lg:py-16 bg-neutral-50 -mt-8">
+          <div className="container mx-auto px-4 max-w-[1280px]">
             {services.length === 0 ? (
               <div className="text-center py-16">
                 <p className="text-neutral-600 text-lg">
@@ -210,103 +278,23 @@ export default async function ServiciiPage() {
                 </p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-                {services.map((service) => {
-                  const icon =
-                    categoryIcons[service.category] ?? <FileText className="h-6 w-6" />;
-                  const detailHref = serviceUrl(service.slug);
-                  // Cazier Judiciar parent: send "order" to the hub so the user
-                  // picks PF vs PJ there (the parent slug has no direct flow).
-                  const orderHref =
-                    service.slug === 'cazier-judiciar'
-                      ? serviceUrl(service.slug)
-                      : `/comanda/${service.slug}`;
-
-                  const specimen = serviceSpecimen(service);
-
-                  return (
-                    <Card
-                      key={service.id}
-                      className="group relative overflow-hidden bg-white p-0 hover:shadow-[0_12px_30px_rgba(6,16,31,0.12)] transition-all duration-300 border border-neutral-200 hover:border-primary-400 hover:-translate-y-1.5 flex flex-col h-full rounded-2xl"
-                    >
-                      {/* Specimen image header */}
-                      <div className="relative w-full bg-gradient-to-b from-neutral-50 to-white border-b border-neutral-100" style={{ paddingTop: '58%' }}>
-                        <span className="absolute top-3 left-3 z-10 rounded-md bg-white/90 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-primary-700 shadow-sm">
-                          {categoryLabels[service.category] ?? 'Serviciu'}
-                        </span>
-                        {service.urgent_available && (
-                          <span className="absolute top-3 right-3 z-10 inline-flex items-center rounded-md bg-primary-500 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-secondary-900 shadow-sm">
-                            <Zap className="h-3 w-3 mr-1" />
-                            Urgent
-                          </span>
-                        )}
-                        {specimen ? (
-                          <Image
-                            src={specimen}
-                            alt={`Specimen ${service.name}`}
-                            fill
-                            sizes="(max-width:768px) 100vw, 360px"
-                            className="object-contain p-4 transition-transform duration-300 group-hover:scale-[1.03]"
-                          />
-                        ) : (
-                          <span className="absolute inset-0 flex items-center justify-center">
-                            <span className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary-100 text-primary-600">
-                              {icon}
-                            </span>
-                          </span>
-                        )}
-                      </div>
-
-                      <CardContent className="flex flex-1 flex-col p-5">
-                        <CardTitle className="text-base font-bold text-secondary-900 leading-snug mb-2">
-                          {service.name}
-                        </CardTitle>
-                        <p className="text-neutral-500 text-sm leading-relaxed line-clamp-2 mb-4">
-                          {service.short_description ||
-                            service.description ||
-                            'Document disponibil pentru comandă online.'}
-                        </p>
-
-                        <div className="mt-auto flex items-end justify-between gap-3 pt-4 border-t border-neutral-100">
-                          <div>
-                            <p className="text-[11px] text-neutral-400 uppercase tracking-wide font-medium">Preț</p>
-                            <p className="text-lg font-extrabold text-secondary-900">
-                              <span className="text-primary-600">{service.base_price}</span>{' '}
-                              <span className="text-sm font-bold text-neutral-500">{service.currency || 'RON'}</span>
-                            </p>
-                          </div>
-                          <div className="text-right">
-                            <p className="text-[11px] text-neutral-400 uppercase tracking-wide font-medium">Termen</p>
-                            <p className="text-sm font-semibold text-secondary-900 flex items-center justify-end gap-1">
-                              <Clock className="h-4 w-4 text-primary-500" />
-                              {service.estimated_days === 1 ? '24 ore' : `${service.estimated_days} zile`}
-                            </p>
-                          </div>
-                        </div>
-                      </CardContent>
-
-                      <CardFooter className="p-5 pt-0 flex flex-col gap-2">
-                        <Button
-                          asChild
-                          className="w-full bg-primary-500 hover:bg-primary-600 text-secondary-900 font-bold rounded-xl h-11 shadow-[0_4px_12px_rgba(236,185,95,0.25)] hover:shadow-[0_6px_16px_rgba(236,185,95,0.35)] hover:-translate-y-0.5 transition-all duration-200"
-                        >
-                          <Link href={orderHref}>
-                            Comandă acum
-                            <ArrowRight className="ml-2 h-4 w-4" />
-                          </Link>
-                        </Button>
-                        <Button
-                          asChild
-                          variant="ghost"
-                          className="w-full text-secondary-900 hover:text-primary-700 font-semibold h-9"
-                        >
-                          <Link href={detailHref}>Vezi detalii</Link>
-                        </Button>
-                      </CardFooter>
-                    </Card>
-                  );
-                })}
-              </div>
+              INSTITUTION_GROUPS.map((group) => {
+                const items = services.filter((s) => s.category === group.key);
+                if (items.length === 0) return null;
+                return (
+                  <div key={group.key} className="mb-12 last:mb-0 scroll-mt-24" id={group.key}>
+                    <div className="mb-6 flex items-baseline gap-3 border-b border-neutral-200 pb-3">
+                      <h2 className="text-xl sm:text-2xl font-bold text-secondary-900">{group.title}</h2>
+                      <span className="text-sm font-semibold text-primary-600">{group.authority}</span>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+                      {items.map((service) => (
+                        <ServiceCardItem key={service.id} service={service} />
+                      ))}
+                    </div>
+                  </div>
+                );
+              })
             )}
           </div>
         </section>
