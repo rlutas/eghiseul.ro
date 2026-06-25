@@ -1352,11 +1352,13 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
                       <Info className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
                       <div className="text-sm text-blue-800 flex-1">
                         <p className="font-medium mb-1">
-                          Pas final — dovadă de domiciliu
+                          Pas final — documentul care îți confirmă adresa
                         </p>
                         <p className="text-blue-700 text-xs leading-snug">
-                          Adresa nu e printată pe spate la CI nou — e doar în
-                          cip. Generează PDF-ul cu aplicația oficială MAI:
+                          Pe cărțile de identitate noi adresa <strong>nu mai apare
+                          tipărită</strong> — e doar în cip. Acest PDF (generat de
+                          aplicația oficială MAI) e documentul care îți
+                          <strong> confirmă adresa de domiciliu</strong>. Cum îl obții:
                         </p>
                         <ol className="text-blue-700 text-xs leading-snug mt-2 list-decimal list-inside space-y-0.5">
                           <li>Instalează <strong>RO CEI Reader</strong> (gratis, de la MAI)</li>
@@ -1389,8 +1391,8 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
                   <div className="grid grid-cols-1 gap-4">
                     {renderScanCard(
                       'ro_cei_reader_pdf',
-                      'PDF RO CEI Reader',
-                      'Doar PDF generat de aplicația oficială MAI'
+                      'PDF care confirmă adresa (RO CEI Reader)',
+                      'Documentul care atestă adresa — doar PDF din aplicația oficială MAI'
                     )}
                   </div>
                 </>

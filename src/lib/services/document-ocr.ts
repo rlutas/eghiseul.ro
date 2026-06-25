@@ -232,7 +232,7 @@ Răspunde în acest format JSON:
       {
         inlineData: {
           mimeType,
-          data: imageBase64.replace(/^data:image\/\w+;base64,/, ''),
+          data: imageBase64.replace(/^data:[^;]+;base64,/, ''),
         },
       },
     ]);
@@ -324,7 +324,7 @@ Răspunde în acest format JSON:
       {
         inlineData: {
           mimeType,
-          data: imageBase64.replace(/^data:image\/\w+;base64,/, ''),
+          data: imageBase64.replace(/^data:[^;]+;base64,/, ''),
         },
       },
     ]);
@@ -403,7 +403,7 @@ IMPORTANT FINAL: NU SCRIE ÎN "issues" "Address information not visible" sau ech
       {
         inlineData: {
           mimeType,
-          data: imageBase64.replace(/^data:image\/\w+;base64,/, ''),
+          data: imageBase64.replace(/^data:[^;]+;base64,/, ''),
         },
       },
     ]);
@@ -505,7 +505,7 @@ Răspunde în acest format JSON:
       {
         inlineData: {
           mimeType,
-          data: imageBase64.replace(/^data:image\/\w+;base64,/, ''),
+          data: imageBase64.replace(/^data:[^;]+;base64,/, ''),
         },
       },
     ]);
@@ -1148,7 +1148,7 @@ Răspunde în acest format JSON:
       {
         inlineData: {
           mimeType,
-          data: imageBase64.replace(/^data:image\/\w+;base64,/, ''),
+          data: imageBase64.replace(/^data:[^;]+;base64,/, ''),
         },
       },
     ]);
@@ -1188,7 +1188,7 @@ Răspunde cu UN SINGUR CUVÂNT.`;
       {
         inlineData: {
           mimeType,
-          data: imageBase64.replace(/^data:image\/\w+;base64,/, ''),
+          data: imageBase64.replace(/^data:[^;]+;base64,/, ''),
         },
       },
     ]);
