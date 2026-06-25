@@ -13,6 +13,7 @@
 > - **Status comandă:** doar WhatsApp. **Success:** „Primești documentul în X zile" (nu „procesăm").
 > - **Celibat:** județul nașterii = dropdown searchable + cascadă București; „Scopul" apare doar dacă NU e căsătorie în străinătate; dacă Da → date viitor soț/soție (nume + naționalitate). Paritate WPForms.
 > - **Validare telefon:** per-țară cu `libphonenumber-js` (`isValidPhoneNumber` pe E.164) — respinge numărul cu o cifră în plus/minus (RO sau altă țară). Test: `tests/unit/lib/phone-validation.test.ts`.
+> - **🔒 FIX KYC — act de identitate obligatoriu:** ruta „Completez manual" de la pasul 2 amâna actul „la pasul 4" dar pasul KYC nu-l cerea (doar selfie) → se putea comanda FĂRĂ act. Reparat (`KYCDocumentsStep`): cetățenii români trebuie să aibă un act (scanat la pas 2 SAU încărcat la pasul KYC via card nou „Act de Identitate (obligatoriu)"); cont cu KYC verificat = refolosit. Se aplică la TOATE cele 8 servicii cu KYC personal (caziere x4, integritate, naștere/căsătorie/celibat). Tip nou `DocumentType.act_identitate`.
 > - **Analiză concurent ANCPI (cfunciara.ro):** avem 3 servicii, ei 24 — gap de 21 (PAD, copii arhivă OCPI, certificate urbanism, pachete). Pentru colaborare cu topograf (Mircea). Doc: `services/ancpi-servicii.md` + tabel cost/profit `services/ancpi-servicii-costuri.csv` (Google Sheets).
 > - Detalii: `changelog/2026-06-23-*` + `changelog/2026-06-24-*`. Build + 1078 teste verzi.
 >

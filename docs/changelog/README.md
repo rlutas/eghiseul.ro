@@ -4,6 +4,7 @@ Jurnal de livrări pe sesiuni/zile (ordine cronologică inversă). Fiecare entry
 
 | Data | Ce s-a livrat | Detalii |
 |---|---|---|
+| 2026-06-25 | 🔒 Fix KYC: act de identitate obligatoriu (ruta „completez manual" lăsa să comanzi fără act) — toate 8 servicii KYC | [2026-06-25-kyc-act-identitate-fix.md](2026-06-25-kyc-act-identitate-fix.md) |
 | 2026-06-24 | Dropdown-uri (tot+alfabetic), livrare (RO/intl, min 20 RON, etichetă cu regiune), specimen opțiuni, lockere paralel, admin KYC cont, WhatsApp status | [2026-06-24-courier-options-pricing-kyc.md](2026-06-24-courier-options-pricing-kyc.md) |
 | 2026-06-24 | Stare civilă: urgent scos, formular (dropdown-uri searchable + cascadă București), semnătură (2 declarații), livrare combinată, specimen wizard, fix-uri cont, admin OCR-vs-formular | [2026-06-24-civil-status-ux-admin-ocr.md](2026-06-24-civil-status-ux-admin-ocr.md) |
 | 2026-06-23 | Extras multilingv add-on (399) + termen dinamic stare civilă pe oficiu (editabil admin) | [2026-06-23-multilingv-civil-dynamic-terms.md](2026-06-23-multilingv-civil-dynamic-terms.md) |
