@@ -45,7 +45,7 @@ interface KYCDocumentsStepProps {
   onValidChange: (valid: boolean) => void;
 }
 
-type KYCDocType = 'selfie' | 'certificat_domiciliu' | 'residence_permit' | 'passport' | 'act_identitate';
+type KYCDocType = 'selfie' | 'certificat_domiciliu' | 'residence_permit' | 'passport' | 'act_identitate' | 'act_identitate_back';
 
 interface UploadState {
   file: File | null;
@@ -114,21 +114,29 @@ const DOCUMENT_CONFIG: Record<
     ],
   },
   act_identitate: {
-    title: 'Act de Identitate (obligatoriu)',
-    description: 'Poză cu cartea de identitate (CI). Necesar pentru verificare — ai ales completarea manuală a datelor.',
+    title: 'Act de Identitate — față (obligatoriu)',
+    description: 'Poză cu fața cărții de identitate (CI). Necesar pentru verificare — ai ales completarea manuală a datelor.',
     icon: CreditCard,
     tips: [
-      'Fotografiază CI-ul complet, toate colțurile vizibile',
+      'Fotografiază fața CI-ului, toate colțurile vizibile',
       'Datele clare, fără reflexii sau umbre',
-      'Pentru CI nou (cu cip) încarcă și fața, și versoul',
+    ],
+  },
+  act_identitate_back: {
+    title: 'Act de Identitate — spate (obligatoriu)',
+    description: 'Poză cu spatele cărții de identitate (CI).',
+    icon: CreditCard,
+    tips: [
+      'Fotografiază versoul CI-ului complet',
+      'Datele clare, fără reflexii sau umbre',
     ],
   },
 };
 
-// Tipuri de document care contează ca „act de identitate" (scan la pasul 2 SAU
-// upload manual la pasul KYC). Folosit ca să nu se poată comanda fără act.
-const ID_DOC_TYPES = [
-  'ci_front', 'ci_nou_front', 'ci_nou_back', 'ci_vechi', 'passport_opened', 'act_identitate',
+// Tipuri de scan de act de la pasul 2 (ruta „scanează"). Dacă există vreunul,
+// actul a fost deja colectat la pasul 2. Altfel = ruta manuală → cerem actul aici.
+const SCAN_ID_TYPES = [
+  'ci_front', 'ci_nou_front', 'ci_nou_back', 'ci_vechi', 'passport_opened',
 ];
 
 // Max file size: 10MB
@@ -150,6 +158,7 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
     residence_permit: { ...initialUploadState },
     passport: { ...initialUploadState },
     act_identitate: { ...initialUploadState },
+    act_identitate_back: { ...initialUploadState },
   });
 
   const [previewModal, setPreviewModal] = useState<{
@@ -167,6 +176,7 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
   const permitInputRef = useRef<HTMLInputElement>(null);
   const passportInputRef = useRef<HTMLInputElement>(null);
   const actInputRef = useRef<HTMLInputElement>(null);
+  const actBackInputRef = useRef<HTMLInputElement>(null);
 
   // Get uploaded documents
   const getDocumentByType = useCallback((type: DocumentType): UploadedDocumentState | undefined => {
@@ -205,8 +215,13 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
     // încărcat aici dacă a ales completarea manuală). Închide gaura: ruta manuală
     // amâna actul la pasul KYC, dar nu-l cerea niciodată → se comanda fără act.
     if (!isForeign) {
-      const hasId = personalKyc.uploadedDocuments.some((d) => ID_DOC_TYPES.includes(d.type));
-      if (!hasId) return false;
+      const hasScanId = personalKyc.uploadedDocuments.some((d) => SCAN_ID_TYPES.includes(d.type));
+      if (!hasScanId) {
+        // Ruta manuală (n-a scanat la pasul 2): cere față + spate ale actului aici.
+        const hasFront = personalKyc.uploadedDocuments.some((d) => d.type === 'act_identitate');
+        const hasBack = personalKyc.uploadedDocuments.some((d) => d.type === 'act_identitate_back');
+        if (!hasFront || !hasBack) return false;
+      }
     }
 
     // Check for address certificate if required (Romanian-citizen path only).
@@ -531,6 +546,8 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
                   ? passportInputRef
                   : type === 'act_identitate'
                   ? actInputRef
+                  : type === 'act_identitate_back'
+                  ? actBackInputRef
                   : certInputRef
               }
               type="file"
@@ -619,8 +636,8 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
   const showResidencePermit = isForeignCitizen;
   // Act de identitate — pentru români care au ales completarea manuală la pasul 2
   // (nu au scanat actul). Dacă actul e deja scanat la pasul 2, nu mai apare aici.
-  const hasIdDoc = personalKyc.uploadedDocuments.some((d) => ID_DOC_TYPES.includes(d.type));
-  const showActIdentitate = !isForeignCitizen && !hasIdDoc;
+  const hasScanIdDoc = personalKyc.uploadedDocuments.some((d) => SCAN_ID_TYPES.includes(d.type));
+  const showActIdentitate = !isForeignCitizen && !hasScanIdDoc;
 
   // Count uploaded documents (from Step 3)
   const idDocsCount = personalKyc.uploadedDocuments.filter(d =>
@@ -766,8 +783,9 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
         </Card>
       )}
 
-      {/* Act de identitate — români care au completat manual la pasul 2 (obligatoriu) */}
+      {/* Act de identitate (față + spate) — români care au completat manual la pasul 2 */}
       {showActIdentitate && (!hasValidAccountKyc || showReuploadOption) && renderUploadCard('act_identitate')}
+      {showActIdentitate && (!hasValidAccountKyc || showReuploadOption) && renderUploadCard('act_identitate_back')}
 
       {/* Passport Section — foreign citizens (replaces CI scan from step 2) */}
       {showPassport && (!hasValidAccountKyc || showReuploadOption) && renderUploadCard('passport')}

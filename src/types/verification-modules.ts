@@ -22,7 +22,8 @@ export type DocumentType =
   | 'residence_permit'     // Permis de rezidență
   | 'registration_cert'    // Certificat de înregistrare
   | 'selfie'               // Selfie for face matching
-  | 'act_identitate'       // Act de identitate încărcat manual la pasul KYC (ruta „completez manual")
+  | 'act_identitate'       // Act de identitate (față) încărcat manual la pasul KYC (ruta „completez manual")
+  | 'act_identitate_back'  // Act de identitate (spate) — ruta manuală
   | 'company_registration_cert'  // PJ: Certificat de Înregistrare (CUI)
   | 'company_statement_cert'     // PJ: Certificat Constatator (ONRC)
   | 'unknown';
