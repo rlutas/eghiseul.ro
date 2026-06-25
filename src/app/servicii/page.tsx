@@ -1,7 +1,8 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
+import Image from 'next/image';
 import { createPublicClient } from '@/lib/supabase/public';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardFooter, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Footer } from '@/components/home/footer';
@@ -27,10 +28,36 @@ const HIDDEN_FROM_INDEX = new Set([
   'cazier-judiciar-persoana-juridica',
 ]);
 
+// Specimen document images per service (same assets as the homepage cards).
+const SERVICE_SPECIMENS: Record<string, string> = {
+  'cazier-judiciar': '/images/specimens/cazier-judiciar.png',
+  'cazier-fiscal': '/images/specimens/cazier-fiscal.png',
+  'cazier-auto': '/images/specimens/cazier-auto.png',
+  'certificat-integritate': '/images/specimens/certificat-integritate.png',
+  'certificat-nastere': '/images/specimens/certificat-nastere.webp',
+  'certificat-casatorie': '/images/specimens/certificat-casatorie.webp',
+  'certificat-celibat': '/images/specimens/certificat-celibat.webp',
+  'certificat-constatator': '/images/specimens/certificat-constatator.png',
+  'rovinieta': '/images/specimens/rovinieta.webp',
+  'extras-carte-funciara': '/images/specimens/extras-cf.png',
+};
+
+/**
+ * Specimen image for a service card. Cadastral (imobiliare) services without a
+ * dedicated specimen reuse the Extras CF sample — they are all OCPI/CF documents
+ * that look alike, so it reads as a representative cadastral document.
+ */
+function serviceSpecimen(service: Service): string | null {
+  return (
+    SERVICE_SPECIMENS[service.slug] ||
+    (service.category === 'imobiliare' ? '/images/specimens/extras-cf.png' : null)
+  );
+}
+
 export const metadata: Metadata = {
   title: 'Servicii | Documente online pentru România',
   description:
-    'Catalogul complet al serviciilor eGhișeul.ro: cazier judiciar, cazier fiscal, certificat constatator, extras carte funciară, rovinietă și altele. 12 servicii digitale, 100% online.',
+    'Catalogul complet al serviciilor eGhișeul.ro: cazier judiciar, cazier fiscal, certificat constatator, extras carte funciară, acte cadastrale, rovinietă și altele. 100% online.',
   keywords: [
     'servicii online',
     'documente',
@@ -44,7 +71,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Servicii | Documente online',
     description:
-      '12 servicii digitale pentru documente din România. Comandă online, livrare rapidă.',
+      'Servicii digitale pentru documente din România: caziere, stare civilă, acte cadastrale, firme. Comandă online, livrare rapidă.',
     type: 'website',
     url: 'https://eghiseul.ro/servicii',
     siteName: 'eGhiseul.ro',
@@ -152,7 +179,7 @@ export default async function ServiciiPage() {
               </h1>
 
               <p className="text-lg sm:text-xl text-white/85 leading-relaxed mb-8">
-                12 servicii digitale pentru documente din România. Comandă online, semnezi electronic, primești documentul acasă.
+                {services.length} de servicii digitale pentru documente din România — caziere, stare civilă, acte cadastrale și firme. Comandă online, semnezi electronic, primești documentul acasă.
               </p>
 
               <div className="flex flex-wrap justify-center gap-4">
@@ -195,69 +222,73 @@ export default async function ServiciiPage() {
                       ? serviceUrl(service.slug)
                       : `/comanda/${service.slug}`;
 
+                  const specimen = serviceSpecimen(service);
+
                   return (
                     <Card
                       key={service.id}
-                      className="relative overflow-hidden bg-white hover:shadow-lg transition-all duration-300 border-l-4 border-l-primary-500 border-t border-r border-b border-neutral-200 hover:border-primary-300 hover:-translate-y-1 flex flex-col h-full rounded-2xl"
+                      className="group relative overflow-hidden bg-white p-0 hover:shadow-[0_12px_30px_rgba(6,16,31,0.12)] transition-all duration-300 border border-neutral-200 hover:border-primary-400 hover:-translate-y-1.5 flex flex-col h-full rounded-2xl"
                     >
-                      {service.urgent_available && (
-                        <Badge className="absolute top-4 right-4 bg-primary-500 text-secondary-900 font-bold px-3 py-1 rounded-full">
-                          <Zap className="h-3 w-3 mr-1 inline" />
-                          Urgent
-                        </Badge>
-                      )}
-
-                      <CardHeader className="space-y-4 p-6">
-                        <div className="w-14 h-14 bg-primary-100 rounded-xl flex items-center justify-center text-primary-600">
-                          {icon}
-                        </div>
-
-                        <div className="space-y-2">
-                          <span className="text-xs font-semibold text-primary-700 uppercase tracking-wide">
-                            {categoryLabels[service.category] ?? 'Serviciu'}
+                      {/* Specimen image header */}
+                      <div className="relative w-full bg-gradient-to-b from-neutral-50 to-white border-b border-neutral-100" style={{ paddingTop: '58%' }}>
+                        <span className="absolute top-3 left-3 z-10 rounded-md bg-white/90 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-primary-700 shadow-sm">
+                          {categoryLabels[service.category] ?? 'Serviciu'}
+                        </span>
+                        {service.urgent_available && (
+                          <span className="absolute top-3 right-3 z-10 inline-flex items-center rounded-md bg-primary-500 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-secondary-900 shadow-sm">
+                            <Zap className="h-3 w-3 mr-1" />
+                            Urgent
                           </span>
-                          <CardTitle className="text-xl font-bold text-secondary-900">
-                            {service.name}
-                          </CardTitle>
-                        </div>
-                      </CardHeader>
+                        )}
+                        {specimen ? (
+                          <Image
+                            src={specimen}
+                            alt={`Specimen ${service.name}`}
+                            fill
+                            sizes="(max-width:768px) 100vw, 360px"
+                            className="object-contain p-4 transition-transform duration-300 group-hover:scale-[1.03]"
+                          />
+                        ) : (
+                          <span className="absolute inset-0 flex items-center justify-center">
+                            <span className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary-100 text-primary-600">
+                              {icon}
+                            </span>
+                          </span>
+                        )}
+                      </div>
 
-                      <CardContent className="space-y-4 flex-1 px-6 pb-0">
-                        <p className="text-neutral-600 text-sm leading-relaxed line-clamp-3">
+                      <CardContent className="flex flex-1 flex-col p-5">
+                        <CardTitle className="text-base font-bold text-secondary-900 leading-snug mb-2">
+                          {service.name}
+                        </CardTitle>
+                        <p className="text-neutral-500 text-sm leading-relaxed line-clamp-2 mb-4">
                           {service.short_description ||
                             service.description ||
                             'Document disponibil pentru comandă online.'}
                         </p>
 
-                        <div className="grid grid-cols-2 gap-4 pt-4 border-t border-neutral-100">
-                          <div className="space-y-1">
-                            <p className="text-xs text-neutral-500 uppercase tracking-wide font-medium">
-                              Preț
-                            </p>
-                            <p className="text-lg font-bold text-secondary-900">
+                        <div className="mt-auto flex items-end justify-between gap-3 pt-4 border-t border-neutral-100">
+                          <div>
+                            <p className="text-[11px] text-neutral-400 uppercase tracking-wide font-medium">Preț</p>
+                            <p className="text-lg font-extrabold text-secondary-900">
                               <span className="text-primary-600">{service.base_price}</span>{' '}
-                              {service.currency || 'RON'}
+                              <span className="text-sm font-bold text-neutral-500">{service.currency || 'RON'}</span>
                             </p>
                           </div>
-
-                          <div className="space-y-1">
-                            <p className="text-xs text-neutral-500 uppercase tracking-wide font-medium">
-                              Termen
-                            </p>
-                            <p className="text-sm font-semibold text-secondary-900 flex items-center gap-1">
+                          <div className="text-right">
+                            <p className="text-[11px] text-neutral-400 uppercase tracking-wide font-medium">Termen</p>
+                            <p className="text-sm font-semibold text-secondary-900 flex items-center justify-end gap-1">
                               <Clock className="h-4 w-4 text-primary-500" />
-                              {service.estimated_days === 1
-                                ? '24 ore'
-                                : `${service.estimated_days} zile`}
+                              {service.estimated_days === 1 ? '24 ore' : `${service.estimated_days} zile`}
                             </p>
                           </div>
                         </div>
                       </CardContent>
 
-                      <CardFooter className="p-6 pt-4 flex flex-col gap-2">
+                      <CardFooter className="p-5 pt-0 flex flex-col gap-2">
                         <Button
                           asChild
-                          className="w-full bg-primary-500 hover:bg-primary-600 text-secondary-900 font-bold rounded-xl h-12 shadow-[0_4px_12px_rgba(236,185,95,0.25)] hover:shadow-[0_6px_16px_rgba(236,185,95,0.35)] hover:-translate-y-0.5 transition-all duration-200"
+                          className="w-full bg-primary-500 hover:bg-primary-600 text-secondary-900 font-bold rounded-xl h-11 shadow-[0_4px_12px_rgba(236,185,95,0.25)] hover:shadow-[0_6px_16px_rgba(236,185,95,0.35)] hover:-translate-y-0.5 transition-all duration-200"
                         >
                           <Link href={orderHref}>
                             Comandă acum
@@ -267,7 +298,7 @@ export default async function ServiciiPage() {
                         <Button
                           asChild
                           variant="ghost"
-                          className="w-full text-secondary-900 hover:text-primary-700 font-semibold"
+                          className="w-full text-secondary-900 hover:text-primary-700 font-semibold h-9"
                         >
                           <Link href={detailHref}>Vezi detalii</Link>
                         </Button>
