@@ -709,6 +709,21 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
       return false;
     }
 
+    // Scan mode: cere SETUL COMPLET de scanări pentru tipul de act ales — nu doar
+    // „≥1 poză". Previne: a ales CI nou dar a urcat doar fața (sau aceeași poză de
+    // 2 ori) → ne lipsesc date. CI nou cere și dovada de domiciliu (RO CEI PDF).
+    if (!hasValidKycFromAccount && personalKyc.idDocumentType && !isForeignCitizen) {
+      const has = (t: string) => uploadedDocs.some((d) => d.type === t);
+      if (personalKyc.idDocumentType === 'ci_vechi') {
+        if (!has('ci_front')) return false;
+      } else if (personalKyc.idDocumentType === 'ci_nou') {
+        if (!has('ci_front') || !has('ci_nou_back')) return false;
+        if (config?.requireAddressCertificate !== 'never' && !has('ro_cei_reader_pdf')) return false;
+      } else if (personalKyc.idDocumentType === 'passport') {
+        if (!has('passport_opened')) return false;
+      }
+    }
+
     // Check if expired document is allowed
     if (personalKyc?.isExpired && !config?.expiredDocumentAllowed) {
       return false;
