@@ -1,6 +1,13 @@
 /**
  * Company & Address Validation Service
  *
+ * ⚠️ NUME ISTORIC: fișierul se cheamă „infocui" din motive moștenite, dar NU mai
+ * folosește infocui.ro. Validarea firmei se face prin API-ul oficial GRATUIT
+ * ANAF (webservicesp.anaf.ro). Nu redenumi în `anaf.ts` — fișierul conține și
+ * funcții de adrese/localități (județe, localități) folosite de curieri, care
+ * n-au legătură cu ANAF. Dacă vrei curățenie, split în `company-anaf.ts` +
+ * `localities.ts` (atinge importurile din api/company/validate + courier/*).
+ *
  * Company validation uses the free official ANAF API (webservicesp.anaf.ro):
  * - Validates CUI checksum using Romanian algorithm
  * - Fetches company data (name, address, reg. number, VAT status)
