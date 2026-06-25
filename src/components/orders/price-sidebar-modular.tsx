@@ -124,6 +124,7 @@ export function PriceSidebarModular({ service, variant = 'full' }: PriceSidebarM
         couponCode={state.coupon?.code ?? null}
         discountAmount={priceBreakdown.discountAmount}
         deliveryTimeText={deliveryTimeText}
+        deliverableText={(service.processing_config as { deliverable?: string } | null)?.deliverable || undefined}
         urgencyActive={hasUrgentaMain}
         variant={variant}
         hideDeliveryTimeCard={isInstantDigital}

@@ -37,6 +37,8 @@ export interface OrderSidebarProps {
   discountAmount?: number;
   /** Pre-computed text like "5-7 zile lucrătoare" or "2-4 zile lucrătoare". */
   deliveryTimeText: string;
+  /** "Ce primești" — delivered document, shown under the base service. */
+  deliverableText?: string;
   /** Show the orange "⚡ Procesare urgentă activată" hint under the time. */
   urgencyActive?: boolean;
   /**
@@ -69,6 +71,7 @@ export function OrderSidebar({
   couponCode,
   discountAmount = 0,
   deliveryTimeText,
+  deliverableText,
   variant = 'full',
   hideDeliveryTimeCard = false,
 }: OrderSidebarProps) {
@@ -89,6 +92,7 @@ export function OrderSidebar({
           couponCode={couponCode}
           discountAmount={discountAmount}
           deliveryTimeText={!hideDeliveryTimeCard ? deliveryTimeText : undefined}
+          deliverableText={deliverableText}
         />
       )}
     </div>

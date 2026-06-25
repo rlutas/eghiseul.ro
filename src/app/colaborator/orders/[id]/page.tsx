@@ -25,6 +25,7 @@ interface OrderDetail {
   created_at: string;
   customer_data: Record<string, any> | null; // eslint-disable-line @typescript-eslint/no-explicit-any
   services: { name: string; slug: string } | null;
+  deliverable: string | null;
   documents: OrderDoc[];
 }
 
@@ -138,6 +139,15 @@ export default function CollaboratorOrderDetail() {
           <Field label="Proprietar" value={property.ownerName} />
         </dl>
       </div>
+
+      {/* Deliverable — what Mircea must obtain + upload for this order */}
+      {order.deliverable && (
+        <div className="mb-6 rounded-lg border border-primary-200 bg-primary-50 p-4">
+          <p className="text-xs font-semibold uppercase tracking-wide text-primary-700">De livrat către client</p>
+          <p className="mt-1 text-base font-bold text-secondary-900">{order.deliverable}</p>
+          <p className="mt-1 text-xs text-slate-500">Obține documentul de la OCPI/ANCPI, scanează-l și încarcă-l mai jos, apoi marchează comanda gata.</p>
+        </div>
+      )}
 
       {/* Documents */}
       <div className="mb-6 rounded-lg border border-slate-200 bg-white p-5">

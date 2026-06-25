@@ -33,6 +33,8 @@ interface OrderSummaryCardProps {
   /** Optional estimated delivery time (e.g. "3 zile lucrătoare"). When passed,
    *  it's shown inline under the base service instead of as a separate card. */
   deliveryTimeText?: string;
+  /** "Ce primești" — the delivered document for this service. */
+  deliverableText?: string;
 }
 
 function fmt(value: number): string {
@@ -52,6 +54,7 @@ export function OrderSummaryCard({
   couponCode,
   discountAmount = 0,
   deliveryTimeText,
+  deliverableText,
 }: OrderSummaryCardProps) {
   const VAT_RATE = 0.21;
   const computedSubtotal =
@@ -135,6 +138,11 @@ export function OrderSummaryCard({
                       {serviceName}
                     </p>
                     <p className="text-xs text-neutral-500">Serviciu de bază</p>
+                    {deliverableText && (
+                      <p className="mt-0.5 text-xs text-neutral-600">
+                        Primești: <span className="font-medium text-secondary-900">{deliverableText}</span>
+                      </p>
+                    )}
                     {deliveryTimeText && (
                       <p className="mt-0.5 inline-flex items-center gap-1 text-xs text-neutral-500">
                         <Clock className="h-3 w-3 text-primary-500 shrink-0" />

@@ -32,13 +32,15 @@ export async function GET(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: order, error } = await (admin as any)
       .from('orders')
-      .select('id, friendly_order_id, status, created_at, service_id, customer_data, selected_options, services:service_id(name, slug)')
+      .select('id, friendly_order_id, status, created_at, service_id, customer_data, selected_options, services:service_id(name, slug, processing_config)')
       .eq('id', orderId)
       .single();
 
     if (error || !order) {
       return NextResponse.json({ success: false, error: 'Comanda nu a fost găsită' }, { status: 404 });
     }
+
+    const deliverable = order.services?.processing_config?.deliverable || null;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: documents } = await (admin as any)
@@ -47,7 +49,7 @@ export async function GET(
       .eq('order_id', orderId)
       .order('created_at', { ascending: false });
 
-    return NextResponse.json({ success: true, data: { ...order, documents: documents ?? [] } });
+    return NextResponse.json({ success: true, data: { ...order, deliverable, documents: documents ?? [] } });
   } catch (error) {
     console.error('[collaborator] order detail error:', error);
     return NextResponse.json({ success: false, error: 'Eroare internă' }, { status: 500 });
