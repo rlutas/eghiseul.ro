@@ -29,6 +29,7 @@ Fiecare `keywords.md`: tabel grupat pe **cluster de sub-intenție**, cu coloane 
 | cazier-auto | ⏳ pending | GSC | — |
 | extras-carte-funciara | ⏳ pending | — | vezi `../carte-funciara/competitor-analysis.md` |
 | certificat-constatator | ⏳ pending | — | segmentare pe caz, nu orașe |
+| cadastru (releveu/plan încadrare/plan cadastral) | ✅ (3 clustere, ~9.200 vol) | Semrush 2026-06-25 | KD 2–19, winnable. Pagini: copie-releveu / copie-plan-incadrare / extras-plan-cadastral. 2 articole propuse. Vezi `cadastru/keywords.md` |
 
 ## Legătură cu planul
 Maparea keyword → pagini e operaționalizată în `docs/plans/2026-06-19-location-seo-engine.md`.
