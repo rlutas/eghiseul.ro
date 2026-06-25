@@ -510,6 +510,45 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
         setState(prev => ({ ...prev, scanning: false, progress: 100, success: true }));
         // Reset failure counter on success
         setScanFailureCount(0);
+      } else if (type === 'ro_cei_reader_pdf') {
+        // RO CEI PDF = document JUSTIFICATIV pentru adresă. OCR-ul (auto-completare
+        // adresă) e best-effort — dacă Gemini nu reușește, NU blocăm clientul:
+        // stocăm PDF-ul + mergem mai departe (operatorul verifică adresa manual).
+        // Altfel un PDF valid pe care AI-ul nu-l citește perfect bloca complet
+        // comanda (ro_cei e obligatoriu la CI nou).
+        const extracted = ocr?.extractedData;
+        updatePersonalKyc({
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          uploadedDocuments: [
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            ...(personalKyc?.uploadedDocuments || []).filter((d: any) => d.type !== type),
+            {
+              id: randomId(),
+              type,
+              fileName: file.name,
+              fileSize: compressed.sizeAfter,
+              mimeType: compressed.mimeType,
+              uploadedAt: new Date().toISOString(),
+              base64,
+            },
+          ],
+          ocrResults: [
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            ...(personalKyc?.ocrResults || []).filter((r: any) => r.documentType !== type),
+            {
+              documentType: type,
+              success: !!ocr?.success,
+              confidence: ocr?.confidence || 0,
+              extractedData: extracted || {},
+              issues: ocr?.issues || [],
+              processedAt: new Date().toISOString(),
+            },
+          ],
+        });
+        // Dacă totuși a extras adresa, o pre-completăm (bonus).
+        if (extracted?.address) fillAddressFields(extracted.address);
+        setState(prev => ({ ...prev, scanning: false, progress: 100, success: true }));
+        setScanFailureCount(0);
       } else {
         console.warn('OCR extraction failed or low confidence:', {
           success: ocr?.success,

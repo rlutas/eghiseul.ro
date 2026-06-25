@@ -13,3 +13,6 @@ Clienții nu înțelegeau ce e PDF-ul RO CEI. Text actualizat în wizard (pasul 
 
 ## Verificat
 Build OK, **1089 teste verzi**.
+
+## Update — RO CEI nu mai blochează la OCR eșuat
+PDF-ul RO CEI e document JUSTIFICATIV pentru adresă; OCR-ul (auto-completare adresă) e best-effort. Înainte, dacă Gemini întorcea <50% încredere, componenta arunca eroare („Nu am putut extrage datele... încredere 0%") și NU stoca documentul → client blocat (ro_cei e obligatoriu la CI nou). Acum: pentru `ro_cei_reader_pdf`, dacă OCR eșuează, **stocăm totuși PDF-ul + mergem mai departe** (operatorul verifică adresa manual); dacă OCR reușește, pre-completăm adresa ca bonus. Doar tipul ro_cei e soft-accept; CI față/spate rămân pe OCR (au fallback manual).
