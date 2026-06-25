@@ -403,11 +403,16 @@ export default function CivilStatusStep({ config, onValidChange }: CivilStatusSt
             <ChoiceRow
               current={cs.oldCertificateReason}
               onChange={(v) => updateCivilStatus({ oldCertificateReason: v as CivilStatusState['oldCertificateReason'] })}
-              options={[
-                { value: 'pierdut', label: 'Pierdut' },
-                { value: 'distrus', label: 'Distrus' },
-                { value: 'furat', label: 'Furat' },
-              ]}
+              // Naștere + căsătorie: doar „Pierdut". Celibat: pierdut/distrus/furat.
+              options={
+                config?.documentType === 'celibat'
+                  ? [
+                      { value: 'pierdut', label: 'Pierdut' },
+                      { value: 'distrus', label: 'Distrus' },
+                      { value: 'furat', label: 'Furat' },
+                    ]
+                  : [{ value: 'pierdut', label: 'Pierdut' }]
+              }
             />
           </Field>
         )}
