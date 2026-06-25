@@ -9,6 +9,7 @@
  */
 
 import { useEffect, useState, Suspense, useCallback, useRef } from 'react';
+import { toast } from 'sonner';
 import { ArrowLeft, ArrowRight, Loader2, AlertTriangle, CheckCircle, ChevronUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -62,6 +63,7 @@ export function ModularOrderWizard({ initialService, initialOptions }: ModularOr
     visibleSteps,
     isFirstStep,
     isLastStep,
+    requestValidation,
   } = useModularWizard();
 
   const [stepValid, setStepValid] = useState(false);
@@ -225,6 +227,14 @@ export function ModularOrderWizard({ initialService, initialOptions }: ModularOr
 
   // Handle next
   const handleNext = () => {
+    // Pas invalid → nu avansăm; semnalăm pasului să afișeze ce lipsește + scroll
+    // la prima problemă (în loc să lăsăm butonul „mort" fără explicație). Toast =
+    // plasă de siguranță pentru pașii care nu au listă proprie de erori.
+    if (!stepValid) {
+      requestValidation();
+      toast.error('Mai sunt câmpuri obligatorii necompletate pe acest pas.');
+      return;
+    }
     if (isLastStep) {
       handleSubmitOrder();
     } else {
@@ -481,8 +491,10 @@ export function ModularOrderWizard({ initialService, initialOptions }: ModularOr
                     // auto-save runs in the background (shown by <SaveStatus>),
                     // so `state.isSaving` must NOT block "Continuă". Only the
                     // final "Plătește" step waits for the save/submit to finish.
+                    // Butonul NU se mai dezactivează pe pas invalid — la click pe
+                    // pas invalid afișăm ce lipsește + scroll la problemă
+                    // (handleNext → requestValidation). Doar submit-ul așteaptă.
                     disabled={
-                      !stepValid ||
                       isSubmitting ||
                       (isLastStep && state.isSaving)
                     }

@@ -148,7 +148,7 @@ const initialScanState: ScanState = {
 // state.contact.foreignType using getCountriesForForeignType().
 
 export default function PersonalDataStep({ config, onValidChange }: PersonalDataStepProps) {
-  const { state, updatePersonalKyc, isPrefilled, prefillData } = useModularWizard();
+  const { state, updatePersonalKyc, isPrefilled, prefillData, validationAttempt } = useModularWizard();
   const personalKyc = state.personalKyc;
 
   // Check if we have valid KYC from user's account
@@ -765,6 +765,54 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
     onValidChange(isFormValid());
   }, [isFormValid, onValidChange]);
 
+  // Lista a ce lipsește — pentru afișare + scroll când userul apasă „Continuă"
+  // pe un pas invalid (ca să vadă imediat ce nu a completat).
+  const getMissingItems = useCallback((): string[] => {
+    if (!personalKyc) return [];
+    const m: string[] = [];
+    const isForeign = personalKyc.citizenship !== 'romanian';
+    if (!isForeign && !validateCNP(personalKyc.cnp).valid) m.push('CNP valid (13 cifre)');
+    else if (isForeign && personalKyc.cnp && !validateCNP(personalKyc.cnp).valid) m.push('CNP valid (sau lasă-l gol)');
+    if (!personalKyc.firstName.trim()) m.push('Numele');
+    if (!personalKyc.lastName.trim()) m.push('Prenumele');
+    if (!personalKyc.birthDate) m.push('Data nașterii');
+    const acceptedDocs = config?.acceptedDocuments ?? [];
+    const docs = personalKyc.uploadedDocuments ?? [];
+    if (acceptedDocs.length > 0 && !hasValidKycFromAccount) {
+      const has = (t: string) => docs.some((d) => d.type === t);
+      if (personalKyc.idDocumentType && !isForeign) {
+        if (personalKyc.idDocumentType === 'ci_vechi' && !has('ci_front')) m.push('Scanarea CI (față)');
+        if (personalKyc.idDocumentType === 'ci_nou') {
+          if (!has('ci_front')) m.push('CI nou — față');
+          if (!has('ci_nou_back')) m.push('CI nou — spate');
+          if (config?.requireAddressCertificate !== 'never' && !has('ro_cei_reader_pdf')) m.push('PDF RO CEI Reader (dovadă domiciliu)');
+        }
+        if (personalKyc.idDocumentType === 'passport' && !has('passport_opened')) m.push('Scanarea pașaportului');
+      } else if (docs.length === 0) {
+        m.push('Actul de identitate (alege tipul + scanează, sau completează manual)');
+      }
+    }
+    if (isForeign) {
+      if (!personalKyc.foreignData?.birthCity?.trim()) m.push('Localitatea nașterii');
+      if (!personalKyc.foreignData?.birthCountry) m.push('Țara nașterii');
+      const hasRoAddr = personalKyc.foreignData?.hasRomanianAddress ?? true;
+      if (hasRoAddr) {
+        if (!personalKyc.address?.street?.trim() || !personalKyc.address?.city?.trim() || !personalKyc.address?.county?.trim()) m.push('Adresa de domiciliu');
+      } else if (!personalKyc.foreignData?.foreignAddress?.trim()) m.push('Adresa din străinătate');
+    }
+    return m;
+  }, [personalKyc, config, hasValidKycFromAccount]);
+
+  const [showErrors, setShowErrors] = useState(false);
+  const errorRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (validationAttempt > 0 && !isFormValid()) {
+      setShowErrors(true);
+      setTimeout(() => errorRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 60);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [validationAttempt]);
+
   if (!personalKyc) {
     return (
       <div className="flex items-center justify-center p-8">
@@ -1078,8 +1126,26 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
     );
   };
 
+  const missingItems = showErrors ? getMissingItems() : [];
+
   return (
     <div className="space-y-8">
+      {/* Ce lipsește pentru a continua — apare după ce userul apasă „Continuă"
+          pe un pas invalid; face scroll aici (mai ales pe mobil). */}
+      {missingItems.length > 0 && (
+        <div ref={errorRef}>
+          <Alert variant="destructive" className="bg-red-50 border-red-300">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription className="text-red-800">
+              <p className="font-semibold mb-1">Nu poți continua — completează:</p>
+              <ul className="list-disc list-inside space-y-0.5 text-sm">
+                {missingItems.map((it, i) => <li key={i}>{it}</li>)}
+              </ul>
+            </AlertDescription>
+          </Alert>
+        </div>
+      )}
+
       {/* Prefilled Data Banner */}
       {isPrefilled && (personalKyc?.firstName || personalKyc?.cnp) && (
         <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-4">

@@ -145,7 +145,7 @@ const MAX_FILE_SIZE = 10 * 1024 * 1024;
 const ACCEPTED_TYPES = ['image/jpeg', 'image/jpg', 'image/png'];
 
 export default function KYCDocumentsStep({ config, onValidChange }: KYCDocumentsStepProps) {
-  const { state, updatePersonalKyc, isPrefilled, prefillData } = useModularWizard();
+  const { state, updatePersonalKyc, isPrefilled, prefillData, validationAttempt } = useModularWizard();
   const personalKyc = state.personalKyc;
 
   // Check if user has valid KYC from their account
@@ -247,6 +247,39 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
   useEffect(() => {
     onValidChange(isValid());
   }, [isValid, onValidChange]);
+
+  // Ce documente lipsesc — pentru afișare + scroll când userul apasă „Continuă".
+  const getMissingItems = useCallback((): string[] => {
+    if (!personalKyc) return [];
+    if (hasValidAccountKyc && !showReuploadOption) return [];
+    const m: string[] = [];
+    const isForeign = !!personalKyc.citizenship && personalKyc.citizenship !== 'romanian';
+    const has = (t: string) => personalKyc.uploadedDocuments.some((d) => d.type === t);
+    if (isForeign && !has('passport')) m.push('Pașaportul');
+    if ((config.selfieRequired || isForeign) && !has('selfie')) m.push('Selfie cu actul de identitate');
+    if (!isForeign) {
+      const hasScanId = personalKyc.uploadedDocuments.some((d) => SCAN_ID_TYPES.includes(d.type));
+      if (!hasScanId) {
+        if (!has('act_identitate')) m.push('Act de identitate — față');
+        if (!has('act_identitate_back')) m.push('Act de identitate — spate');
+      }
+    }
+    if (!isForeign && personalKyc.requiresAddressCertificate && config.requireAddressCertificate !== 'never' && !has('certificat_domiciliu')) {
+      m.push('Certificat de domiciliu');
+    }
+    if (isForeign && !has('residence_permit')) m.push('Permis de rezidență / certificat fiscal');
+    return m;
+  }, [personalKyc, config, hasValidAccountKyc, showReuploadOption]);
+
+  const [showErrors, setShowErrors] = useState(false);
+  const errorRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (validationAttempt > 0 && !isValid()) {
+      setShowErrors(true);
+      setTimeout(() => errorRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 60);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [validationAttempt]);
 
   // Handle file selection
   const handleFileSelect = useCallback(
@@ -644,8 +677,25 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
     d.type !== 'selfie' && d.type !== 'certificat_domiciliu' && d.type !== 'residence_permit'
   ).length;
 
+  const missingItems = showErrors ? getMissingItems() : [];
+
   return (
     <div className="space-y-6">
+      {/* Ce lipsește pentru a continua — apare la „Continuă" pe pas invalid + scroll. */}
+      {missingItems.length > 0 && (
+        <div ref={errorRef}>
+          <Alert variant="destructive" className="bg-red-50 border-red-300">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription className="text-red-800">
+              <p className="font-semibold mb-1">Nu poți continua — încarcă:</p>
+              <ul className="list-disc list-inside space-y-0.5 text-sm">
+                {missingItems.map((it, i) => <li key={i}>{it}</li>)}
+              </ul>
+            </AlertDescription>
+          </Alert>
+        </div>
+      )}
+
       {/* KYC Already Verified Banner */}
       {hasValidAccountKyc && !showReuploadOption && (
         <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-6">

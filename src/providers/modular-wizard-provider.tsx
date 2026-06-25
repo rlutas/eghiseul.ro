@@ -810,6 +810,11 @@ interface ModularWizardContextType {
   visibleSteps: ModularStep[];
   currentStep: ModularStep | null;
 
+  // Validation feedback: incrementat când userul apasă „Continuă" pe un pas
+  // invalid → pașii afișează ce lipsește + fac scroll la prima problemă.
+  validationAttempt: number;
+  requestValidation: () => void;
+
   // Data Updates
   initService: (service: Service, options: ServiceOption[]) => void;
   setClientType: (type: ClientType) => void;
@@ -906,6 +911,10 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
   const [prefillData, setPrefillData] = useState<UserPrefillData | null>(null);
   const [isPrefilled, setIsPrefilled] = useState(false);
   const prefillLoadedRef = useRef(false);
+
+  // Validation feedback counter (vezi context type).
+  const [validationAttempt, setValidationAttempt] = useState(0);
+  const requestValidation = useCallback(() => setValidationAttempt((n) => n + 1), []);
 
   // Check if we can save to server
   const canSaveToServer = useMemo(() => {
@@ -1774,6 +1783,8 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
     isLastStep,
     visibleSteps,
     currentStep,
+    validationAttempt,
+    requestValidation,
     initService,
     setClientType,
     updateContact,
