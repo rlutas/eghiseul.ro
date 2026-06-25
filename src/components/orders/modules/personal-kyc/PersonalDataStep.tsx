@@ -848,6 +848,10 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [validationAttempt]);
 
+  // Confirmare compactă a adresei: când e deja completată (auto din RO CEI sau
+  // din scan CI), o arătăm ca rezumat read-only + „Editează", nu ca formular gol.
+  const [editAddress, setEditAddress] = useState(false);
+
   if (!personalKyc) {
     return (
       <div className="flex items-center justify-center p-8">
@@ -1162,6 +1166,22 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
   };
 
   const missingItems = showErrors ? getMissingItems() : [];
+
+  // Adresa e completată (auto din RO CEI / scan CI) → o arătăm ca rezumat.
+  const _addr = personalKyc.address;
+  const addressAutoFilled = !!(_addr?.county && _addr?.city && _addr?.street);
+  const autoAddressText = addressAutoFilled
+    ? [
+        _addr.street,
+        _addr.number && `nr. ${_addr.number}`,
+        _addr.building && `bl. ${_addr.building}`,
+        _addr.staircase && `sc. ${_addr.staircase}`,
+        _addr.floor && `et. ${_addr.floor}`,
+        _addr.apartment && `ap. ${_addr.apartment}`,
+        _addr.city,
+        _addr.county,
+      ].filter(Boolean).join(', ')
+    : '';
 
   return (
     <div className="space-y-8">
@@ -2012,6 +2032,26 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
           personalKyc.foreignData?.hasRomanianAddress === false
         ) && (
         <>
+        {/* Confirmare compactă — adresa deja completată (auto din RO CEI / scan CI) */}
+        {addressAutoFilled && !editAddress && (
+          <div className="rounded-xl border border-green-200 bg-green-50/50 p-3 sm:p-4">
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex gap-2.5">
+                <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
+                <div className="text-sm">
+                  <p className="font-medium text-secondary-900">Adresă de domiciliu preluată automat</p>
+                  <p className="text-neutral-700 mt-0.5">{autoAddressText}</p>
+                  <p className="text-xs text-neutral-500 mt-1">Verifică adresa. Dacă e greșită sau incompletă, apasă „Editează".</p>
+                </div>
+              </div>
+              <Button type="button" variant="outline" size="sm" onClick={() => setEditAddress(true)} className="flex-shrink-0">
+                Editează
+              </Button>
+            </div>
+          </div>
+        )}
+        {(!addressAutoFilled || editAddress) && (
+        <>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="county" className="text-secondary-900 font-medium">
@@ -2182,6 +2222,8 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
             className="bg-white placeholder:text-neutral-400"
           />
         </div>
+        </>
+        )}
         </>
         )}
       </div>
