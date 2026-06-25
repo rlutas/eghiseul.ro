@@ -173,9 +173,9 @@ async function fetchFromANAF(cui: string): Promise<CompanyLookupResponse> {
   const general = company.date_generale || {};
   const name = (general.denumire || '').trim();
   const stare = general.stare_inregistrare || '';
-  const isActive = stare.toUpperCase().includes('INREGISTRAT') &&
-    !stare.toUpperCase().includes('RADIAT') &&
-    !stare.toUpperCase().includes('DIZOLVAT');
+  const inInactiveRegister =
+    (company as { stare_inactiv?: { statusInactivi?: boolean } }).stare_inactiv?.statusInactivi === true;
+  const isActive = isCompanyActive(stare, inInactiveRegister);
 
   return {
     found: true,
@@ -193,6 +193,27 @@ async function fetchFromANAF(cui: string): Promise<CompanyLookupResponse> {
   };
 }
 
+
+/**
+ * O firmă e ACTIVĂ dacă NU e în registrul ANAF de inactivi (statusInactivi) și
+ * starea de înregistrare NU indică radiere/dizolvare/lichidare/inactivare.
+ *
+ * NU verificăm prezența cuvântului „INREGISTRAT" în string — ANAF întoarce și
+ * alte stări active normale care NU-l conțin, ex.:
+ *   - „TRANSFER(SOSIRE) din data ..." (firma și-a mutat sediul în alt județ)
+ *   - „TRANSFER(PLECARE) din data ..."
+ * Acestea erau marcate greșit ca inactive, deși la ONRC firma e în funcțiune.
+ */
+export function isCompanyActive(stare: string, inInactiveRegister: boolean): boolean {
+  const u = (stare || '').toUpperCase();
+  return (
+    !inInactiveRegister &&
+    !u.includes('RADIAT') &&
+    !u.includes('DIZOLVAT') &&
+    !u.includes('LICHIDARE') &&
+    !u.includes('INACTIV')
+  );
+}
 
 /**
  * Extract company type from company name
