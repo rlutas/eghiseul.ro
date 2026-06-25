@@ -309,7 +309,11 @@ export default async function CopiePlanCadastralPage() {
                 <strong>arhiva Oficiului de Cadastru și Publicitate Imobiliară (OCPI / ANCPI)</strong>. Pe scurt, este
                 copia documentului care a stat la baza înscrierii imobilului în sistemul de cadastru: conturul, limitele
                 și datele tehnice <strong>așa cum au fost recepționate și arhivate</strong> de OCPI. Planul este
-                întocmit la scară (de regulă 1:500 sau 1:1000 în intravilan și 1:2000 sau 1:5000 în extravilan).
+                întocmit la scară (de regulă 1:500 sau 1:1000 în intravilan și 1:2000 sau 1:5000 în extravilan). Vezi pe larg{' '}
+                <Link href="/ce-este-planul-cadastral/" className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
+                  ce este planul cadastral
+                </Link>
+                .
               </p>
               <p>
                 O ceri pentru <strong>documentații tehnice</strong>, dosare notariale, certificate de urbanism,
@@ -509,6 +513,17 @@ export default async function CopiePlanCadastralPage() {
                 <div>
                   <p className="font-bold text-secondary-900 group-hover:text-primary-700">Identificare Imobil după Adresă</p>
                   <p className="text-sm text-neutral-600">Nu știi numărul cadastral? Îl aflăm după adresă.</p>
+                </div>
+                <ArrowRight className="w-4 h-4 text-neutral-400 ml-auto flex-shrink-0 mt-1 group-hover:text-primary-600" />
+              </Link>
+              <Link
+                href={serviceUrl('copie-plan-incadrare')}
+                className="group flex items-start gap-3 rounded-2xl border border-neutral-200 bg-neutral-50 p-5 hover:border-primary-300 hover:shadow-md transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
+              >
+                <Ruler className="w-6 h-6 text-primary-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-bold text-secondary-900 group-hover:text-primary-700">Copie după Planul de Încadrare</p>
+                  <p className="text-sm text-neutral-600">Poziția imobilului în zonă, din dosarul cadastral.</p>
                 </div>
                 <ArrowRight className="w-4 h-4 text-neutral-400 ml-auto flex-shrink-0 mt-1 group-hover:text-primary-600" />
               </Link>

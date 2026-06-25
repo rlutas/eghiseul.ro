@@ -29,6 +29,22 @@ export const HARDCODED_SERVICE_SLUGS = [
   'certificat-de-integritate-comportamentala',
   'extras-multilingv-certificat-nastere',
   'extras-multilingv-certificat-casatorie',
+  // Servicii cadastrale topograf (folder == slug DB, fără redirect) — pagini
+  // hand-tuned 1000+ cuvinte, merită prioritate 0.9 în sitemap.
+  'certificat-sarcini',
+  'copie-carte-funciara',
+  'copie-plan-cadastral',
+  'copie-inventar-coordonate',
+  'copie-intabulare',
+  'copie-releveu',
+  'copie-arhiva-ocpi',
+  'copie-contract-vanzare',
+  'plan-amplasament-delimitare',
+  'copie-plan-incadrare',
+  'extras-cf-colectiv',
+  'actualizare-adresa-cf',
+  'identificare-imobile-proprietar',
+  'certificat-detineri-imobile',
   // NOTE: 'verificare-rovinieta-online' scos — redirect 301 → /tools/ (next.config). Tool-ul real e în HARDCODED_TOOL_SLUGS.
 ] as const;
 

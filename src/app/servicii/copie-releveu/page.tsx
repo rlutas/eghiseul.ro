@@ -308,7 +308,11 @@ export default async function CopieReleveuPage() {
                 <strong> suprafață utilă</strong> are fiecare: camera de zi, dormitoarele, bucătăria, baia, holul,
                 balconul, plus dimensiunile interioare. Mulți proprietari îi spun pe scurt schița apartamentului. Planșa
                 a fost măsurată și depusă la Oficiul de Cadastru și Publicitate Imobiliară (<strong>OCPI / ANCPI</strong>)
-                la avizarea documentației cadastrale.
+                la avizarea documentației cadastrale. Vezi pe larg{' '}
+                <Link href="/ce-este-un-releveu/" className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
+                  ce este un releveu
+                </Link>
+                .
               </p>
               <p>
                 O <strong>copie după releveu</strong> este copia certificată a acestei planșe, scoasă din arhiva OCPI a

@@ -521,6 +521,28 @@ export default async function CopieCarteFunciaraPage() {
                 </div>
                 <ArrowRight className="w-4 h-4 text-neutral-400 ml-auto flex-shrink-0 mt-1 group-hover:text-primary-600" />
               </Link>
+              <Link
+                href={serviceUrl('extras-cf-colectiv')}
+                className="group flex items-start gap-3 rounded-2xl border border-neutral-200 bg-neutral-50 p-5 hover:border-primary-300 hover:shadow-md transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
+              >
+                <Landmark className="w-6 h-6 text-primary-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-bold text-secondary-900 group-hover:text-primary-700">Extras CF Colectiv</p>
+                  <p className="text-sm text-neutral-600">Cartea funciară colectivă a întregului imobil bloc.</p>
+                </div>
+                <ArrowRight className="w-4 h-4 text-neutral-400 ml-auto flex-shrink-0 mt-1 group-hover:text-primary-600" />
+              </Link>
+              <Link
+                href={serviceUrl('actualizare-adresa-cf')}
+                className="group flex items-start gap-3 rounded-2xl border border-neutral-200 bg-neutral-50 p-5 hover:border-primary-300 hover:shadow-md transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
+              >
+                <MapPin className="w-6 h-6 text-primary-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-bold text-secondary-900 group-hover:text-primary-700">Actualizare Adresă în CF</p>
+                  <p className="text-sm text-neutral-600">Corectezi sau actualizezi adresa imobilului în cartea funciară.</p>
+                </div>
+                <ArrowRight className="w-4 h-4 text-neutral-400 ml-auto flex-shrink-0 mt-1 group-hover:text-primary-600" />
+              </Link>
             </div>
           </div>
         </section>

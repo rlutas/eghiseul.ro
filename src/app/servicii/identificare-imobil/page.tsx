@@ -498,6 +498,39 @@ export default async function IdentificareImobilPage() {
                 </div>
                 <ArrowRight className="w-4 h-4 text-neutral-400 ml-auto flex-shrink-0 mt-1 group-hover:text-primary-600" />
               </Link>
+              <Link
+                href={serviceUrl('identificare-imobile-proprietar')}
+                className="group flex items-start gap-3 rounded-2xl border border-neutral-200 bg-neutral-50 p-5 hover:border-primary-300 hover:shadow-md transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
+              >
+                <UserSearch className="w-6 h-6 text-primary-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-bold text-secondary-900 group-hover:text-primary-700">Identificare Imobile după Proprietar</p>
+                  <p className="text-sm text-neutral-600">Afli imobilele deținute de o persoană.</p>
+                </div>
+                <ArrowRight className="w-4 h-4 text-neutral-400 ml-auto flex-shrink-0 mt-1 group-hover:text-primary-600" />
+              </Link>
+              <Link
+                href={serviceUrl('certificat-detineri-imobile')}
+                className="group flex items-start gap-3 rounded-2xl border border-neutral-200 bg-neutral-50 p-5 hover:border-primary-300 hover:shadow-md transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
+              >
+                <Building2 className="w-6 h-6 text-primary-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-bold text-secondary-900 group-hover:text-primary-700">Certificat de Dețineri Imobile</p>
+                  <p className="text-sm text-neutral-600">Atestă imobilele înscrise pe numele unei persoane.</p>
+                </div>
+                <ArrowRight className="w-4 h-4 text-neutral-400 ml-auto flex-shrink-0 mt-1 group-hover:text-primary-600" />
+              </Link>
+              <Link
+                href={serviceUrl('copie-carte-funciara')}
+                className="group flex items-start gap-3 rounded-2xl border border-neutral-200 bg-neutral-50 p-5 hover:border-primary-300 hover:shadow-md transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
+              >
+                <ScrollText className="w-6 h-6 text-primary-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-bold text-secondary-900 group-hover:text-primary-700">Copie Carte Funciară</p>
+                  <p className="text-sm text-neutral-600">Copie conformă a cărții funciare a imobilului.</p>
+                </div>
+                <ArrowRight className="w-4 h-4 text-neutral-400 ml-auto flex-shrink-0 mt-1 group-hover:text-primary-600" />
+              </Link>
             </div>
           </div>
         </section>

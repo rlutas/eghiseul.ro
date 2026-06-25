@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { createPublicClient } from '@/lib/supabase/public';
 import { Badge } from '@/components/ui/badge';
 import {
+  ArrowRight,
   Clock,
   Shield,
   Zap,
@@ -898,7 +899,14 @@ export default async function ExtrasCarteFunciaraPage() {
                 <p>
                   Dacă imobilul <strong>nu apare în cartea funciară</strong> sau ai doar un număr topografic vechi,
                   proprietatea nu este (încă) intabulată cadastral, iar pentru tranzacții va fi nevoie de o
-                  documentație cadastrală întocmită de un expert autorizat. Comandând un extras CF afli imediat dacă
+                  documentație cadastrală întocmită de un expert autorizat — vezi{' '}
+                  <Link
+                    href="/ce-este-planul-cadastral/"
+                    className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
+                  >
+                    ce este planul cadastral
+                  </Link>
+                  . Comandând un extras CF afli imediat dacă
                   imobilul este intabulat și situația lui juridică la zi.
                 </p>
               </div>
@@ -968,6 +976,61 @@ export default async function ExtrasCarteFunciaraPage() {
               <svg className="w-4 h-4 text-[#FBBC04] fill-[#FBBC04]" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" /></svg>
               <strong className="text-white/90">{GOOGLE_RATING.toString().replace('.', ',')}</strong> din {GOOGLE_REVIEW_COUNT_LABEL} de recenzii Google
             </p>
+          </div>
+        </section>
+
+        {/* Related — alte documente pentru imobile */}
+        <section className="py-12 lg:py-16 bg-white">
+          <div className="container mx-auto px-4 max-w-[900px]">
+            <h2 className="text-xl sm:text-2xl font-bold text-secondary-900 mb-6 text-center">
+              Servicii pentru imobile
+            </h2>
+            <div className="grid sm:grid-cols-2 gap-4">
+              <Link
+                href={serviceUrl('copie-carte-funciara')}
+                className="group flex items-start gap-3 rounded-2xl border border-neutral-200 bg-neutral-50 p-5 hover:border-primary-300 hover:shadow-md transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
+              >
+                <FileText className="w-6 h-6 text-primary-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-bold text-secondary-900 group-hover:text-primary-700">Copie Carte Funciară</p>
+                  <p className="text-sm text-neutral-600">Copie conformă a cărții funciare a imobilului.</p>
+                </div>
+                <ArrowRight className="w-4 h-4 text-neutral-400 ml-auto flex-shrink-0 mt-1 group-hover:text-primary-600" />
+              </Link>
+              <Link
+                href={serviceUrl('certificat-sarcini')}
+                className="group flex items-start gap-3 rounded-2xl border border-neutral-200 bg-neutral-50 p-5 hover:border-primary-300 hover:shadow-md transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
+              >
+                <Shield className="w-6 h-6 text-primary-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-bold text-secondary-900 group-hover:text-primary-700">Certificat de Sarcini</p>
+                  <p className="text-sm text-neutral-600">Verifici ipoteci, interdicții și litigii.</p>
+                </div>
+                <ArrowRight className="w-4 h-4 text-neutral-400 ml-auto flex-shrink-0 mt-1 group-hover:text-primary-600" />
+              </Link>
+              <Link
+                href={serviceUrl('extras-cf-colectiv')}
+                className="group flex items-start gap-3 rounded-2xl border border-neutral-200 bg-neutral-50 p-5 hover:border-primary-300 hover:shadow-md transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
+              >
+                <Landmark className="w-6 h-6 text-primary-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-bold text-secondary-900 group-hover:text-primary-700">Extras CF Colectiv</p>
+                  <p className="text-sm text-neutral-600">Pentru imobile cu mai multe unități (bloc).</p>
+                </div>
+                <ArrowRight className="w-4 h-4 text-neutral-400 ml-auto flex-shrink-0 mt-1 group-hover:text-primary-600" />
+              </Link>
+              <Link
+                href={serviceUrl('actualizare-adresa-cf')}
+                className="group flex items-start gap-3 rounded-2xl border border-neutral-200 bg-neutral-50 p-5 hover:border-primary-300 hover:shadow-md transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
+              >
+                <MapPin className="w-6 h-6 text-primary-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-bold text-secondary-900 group-hover:text-primary-700">Actualizare Adresă în CF</p>
+                  <p className="text-sm text-neutral-600">Corectezi sau actualizezi adresa imobilului în CF.</p>
+                </div>
+                <ArrowRight className="w-4 h-4 text-neutral-400 ml-auto flex-shrink-0 mt-1 group-hover:text-primary-600" />
+              </Link>
+            </div>
           </div>
         </section>
 

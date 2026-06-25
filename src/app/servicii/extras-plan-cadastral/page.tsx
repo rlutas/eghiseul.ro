@@ -307,7 +307,11 @@ export default async function ExtrasPlanCadastralPage() {
                 <strong> ortofotoplan</strong> (imagine aeriană georeferențiată), eliberată de Oficiul de Cadastru
                 și Publicitate Imobiliară (<strong>OCPI / ANCPI</strong>). Spre deosebire de extrasul de carte
                 funciară — care arată situația juridică — planul cadastral arată <strong>poziția, conturul și
-                vecinătățile</strong> imobilului pe hartă.
+                vecinătățile</strong> imobilului pe hartă. Vezi pe larg{' '}
+                <Link href="/ce-este-planul-cadastral/" className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
+                  ce este planul cadastral
+                </Link>
+                .
               </p>
               <p>
                 Este folosit pentru a <strong>localiza terenul după numărul cadastral</strong>, pentru verificarea
@@ -492,6 +496,50 @@ export default async function ExtrasPlanCadastralPage() {
                 <div>
                   <p className="font-bold text-secondary-900 group-hover:text-primary-700">Identificare Imobil după Adresă</p>
                   <p className="text-sm text-neutral-600">Nu știi numărul cadastral? Îl aflăm după adresă.</p>
+                </div>
+                <ArrowRight className="w-4 h-4 text-neutral-400 ml-auto flex-shrink-0 mt-1 group-hover:text-primary-600" />
+              </Link>
+              <Link
+                href={serviceUrl('copie-plan-cadastral')}
+                className="group flex items-start gap-3 rounded-2xl border border-neutral-200 bg-neutral-50 p-5 hover:border-primary-300 hover:shadow-md transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
+              >
+                <MapIcon className="w-6 h-6 text-primary-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-bold text-secondary-900 group-hover:text-primary-700">Copie Plan Cadastral</p>
+                  <p className="text-sm text-neutral-600">Copie a planului cadastral al imobilului.</p>
+                </div>
+                <ArrowRight className="w-4 h-4 text-neutral-400 ml-auto flex-shrink-0 mt-1 group-hover:text-primary-600" />
+              </Link>
+              <Link
+                href={serviceUrl('plan-amplasament-delimitare')}
+                className="group flex items-start gap-3 rounded-2xl border border-neutral-200 bg-neutral-50 p-5 hover:border-primary-300 hover:shadow-md transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
+              >
+                <Ruler className="w-6 h-6 text-primary-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-bold text-secondary-900 group-hover:text-primary-700">Plan de Amplasament și Delimitare</p>
+                  <p className="text-sm text-neutral-600">Reprezentarea cu limitele și dimensiunile parcelei.</p>
+                </div>
+                <ArrowRight className="w-4 h-4 text-neutral-400 ml-auto flex-shrink-0 mt-1 group-hover:text-primary-600" />
+              </Link>
+              <Link
+                href={serviceUrl('copie-plan-incadrare')}
+                className="group flex items-start gap-3 rounded-2xl border border-neutral-200 bg-neutral-50 p-5 hover:border-primary-300 hover:shadow-md transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
+              >
+                <Layers className="w-6 h-6 text-primary-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-bold text-secondary-900 group-hover:text-primary-700">Copie Plan de Încadrare</p>
+                  <p className="text-sm text-neutral-600">Încadrarea imobilului în zonă, pe hartă.</p>
+                </div>
+                <ArrowRight className="w-4 h-4 text-neutral-400 ml-auto flex-shrink-0 mt-1 group-hover:text-primary-600" />
+              </Link>
+              <Link
+                href={serviceUrl('copie-inventar-coordonate')}
+                className="group flex items-start gap-3 rounded-2xl border border-neutral-200 bg-neutral-50 p-5 hover:border-primary-300 hover:shadow-md transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
+              >
+                <MapPin className="w-6 h-6 text-primary-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-bold text-secondary-900 group-hover:text-primary-700">Copie Inventar de Coordonate</p>
+                  <p className="text-sm text-neutral-600">Coordonatele punctelor de contur ale parcelei.</p>
                 </div>
                 <ArrowRight className="w-4 h-4 text-neutral-400 ml-auto flex-shrink-0 mt-1 group-hover:text-primary-600" />
               </Link>

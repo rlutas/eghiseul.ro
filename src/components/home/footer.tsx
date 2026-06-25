@@ -61,6 +61,8 @@ const serviceGroups: { title: string; items: FooterService[] }[] = [
       },
       { name: 'Extras Carte Funciară', href: serviceUrl('extras-carte-funciara') },
       { name: 'Extras Plan Cadastral', href: serviceUrl('extras-plan-cadastral') },
+      { name: 'Copie Carte Funciară', href: serviceUrl('copie-carte-funciara') },
+      { name: 'Certificat de Sarcini', href: serviceUrl('certificat-sarcini') },
       { name: 'Rovinietă Online', href: '/servicii/rovinieta-online/' },
     ],
   },
