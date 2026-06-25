@@ -38,8 +38,8 @@ const PAGE_PATH = '/servicii/copie-releveu/';
 const SCHEMA_SLUG = 'copie-releveu';
 const TITLE = 'Copie după Releveu Apartament — Plan de Nivel OCPI';
 const DESCRIPTION =
-  'Copie după releveul imobilului — planul de nivel al apartamentului cu camerele, suprafețele utile ' +
-  'și dimensiunile interioare, din dosarul cadastral OCPI. Taxe incluse, 100% online, livrare pe email, fără cont ANCPI.';
+  'Copie certificată după releveul apartamentului din arhiva OCPI: planul cu dispunerea camerelor, ' +
+  'suprafețele utile per încăpere și dimensiunile interioare. Taxe incluse, 100% online, livrare pe email, fără cont ANCPI.';
 const DATE_PUBLISHED = '2026-06-25';
 const DATE_MODIFIED = '2026-06-25';
 
@@ -71,8 +71,8 @@ const jsonLdGraph = buildServicePageGraph({
   slug: SCHEMA_SLUG,
   name: 'Copie după Releveu',
   description:
-    'Serviciu de obținere a copiei după releveul imobilului din dosarul cadastral OCPI — planul de nivel al ' +
-    'apartamentului sau spațiului, cu compartimentarea interioară, camerele, suprafețele utile și dimensiunile. ' +
+    'Serviciu de obținere a copiei certificate după releveul imobilului din arhiva OCPI: planul cu dispunerea ' +
+    'camerelor unui apartament sau spațiu, suprafețele utile per încăpere și dimensiunile interioare. ' +
     '100% online, fără cont ANCPI, livrare pe email.',
   serviceType: 'Document Processing — Real Estate',
   datePublished: DATE_PUBLISHED,
@@ -111,10 +111,10 @@ export default async function CopieReleveuPage() {
   ];
 
   const useCases = [
-    { icon: Home, title: 'Vânzare apartament', items: ['Dosar notarial', 'Verificare compartimentare', 'Anexă la antecontract'] },
+    { icon: Home, title: 'Vânzare apartament', items: ['Dosar notarial', 'Anexă la antecontract', 'Structura reală a imobilului'] },
     { icon: Landmark, title: 'Credit ipotecar', items: ['Dosar pentru bancă', 'Evaluare imobil', 'Garanție ipotecară'] },
-    { icon: Ruler, title: 'Verificare suprafață utilă', items: ['Suprafețe pe camere', 'Dimensiuni interioare', 'Total suprafață utilă'] },
-    { icon: Layers, title: 'Amenajări & dosare', items: ['Proiect de amenajare', 'Comparare cu situația reală', 'Documentații tehnice'] },
+    { icon: Ruler, title: 'Verificare suprafață utilă', items: ['Suprafețe per cameră', 'Dimensiuni interioare', 'Recapitulația suprafețelor'] },
+    { icon: Layers, title: 'Autorizații și succesiune', items: ['Autorizație de construire sau demolare', 'Certificat de urbanism', 'Dosar de succesiune'] },
   ];
 
   return (
@@ -169,17 +169,17 @@ export default async function CopieReleveuPage() {
                 </h1>
 
                 <p className="text-lg sm:text-xl text-white/85 leading-relaxed mb-6">
-                  Releveul este planul de nivel al apartamentului — compartimentarea interioară, camerele,
-                  suprafețele utile și dimensiunile. Îl obții din dosarul cadastral OCPI, 100% online.
+                  Releveul este planul apartamentului: dispunerea camerelor, suprafețele utile per încăpere
+                  și dimensiunile interioare. Îți eliberăm copia certificată din arhiva OCPI, 100% online.
                 </p>
 
                 {/* USP */}
                 <div className="flex items-start gap-3 rounded-xl bg-primary-500/15 border border-primary-500/40 p-4 mb-6">
                   <Ruler className="h-5 w-5 text-primary-500 flex-shrink-0 mt-0.5" />
                   <p className="text-white/95 text-sm sm:text-base leading-relaxed">
-                    Vezi exact <strong className="text-primary-500">compartimentarea și suprafețele utile</strong> ale
-                    apartamentului — util pentru <strong>vânzare, credit ipotecar</strong>, verificarea suprafeței
-                    și planuri de amenajare.
+                    Vezi exact <strong className="text-primary-500">cum sunt dispuse camerele și ce suprafață</strong> are
+                    fiecare. Releveul îți folosește la <strong>vânzare, credit ipotecar</strong>, autorizații de
+                    construire și dosare de succesiune.
                   </p>
                 </div>
 
@@ -303,29 +303,29 @@ export default async function CopieReleveuPage() {
             </h2>
             <div className="space-y-4 text-neutral-700 leading-relaxed">
               <p>
-                <strong>Releveul</strong> este <strong>planul de nivel</strong> al unei unități individuale —
-                de regulă un apartament sau un spațiu — desenul care arată <strong>compartimentarea interioară</strong>:
-                camerele, holurile, băile, balcoanele, dimensiunile pereților și <strong>suprafețele utile</strong> ale
-                fiecărei încăperi. Pe scurt, este harta interiorului așa cum a fost măsurat și depus la Oficiul de
-                Cadastru și Publicitate Imobiliară (<strong>OCPI / ANCPI</strong>) la momentul intabulării.
+                <strong>Releveul</strong> este reprezentarea grafică a unei unități individuale, de regulă un apartament,
+                un spațiu comercial sau o construcție. Arată <strong>cum sunt dispuse camerele</strong> și ce
+                <strong> suprafață utilă</strong> are fiecare: camera de zi, dormitoarele, bucătăria, baia, holul,
+                balconul, plus dimensiunile interioare. Mulți proprietari îi spun pe scurt schița apartamentului. Planșa
+                a fost măsurată și depusă la Oficiul de Cadastru și Publicitate Imobiliară (<strong>OCPI / ANCPI</strong>)
+                la avizarea documentației cadastrale.
               </p>
               <p>
-                O <strong>copie după releveu</strong> înseamnă extragerea acestei planșe din dosarul cadastral al
-                apartamentului. Spre deosebire de planul cadastral — care arată poziția imobilului pe ortofotoplan, la
-                nivel de teren — releveul coboară în interior și îți arată exact <strong>cum este împărțit spațiul</strong>
-                {' '}și ce suprafață are fiecare cameră. Prin eGhișeul îl obții online, fără cont ANCPI și fără deplasare
-                la ghișeul OCPI.
+                O <strong>copie după releveu</strong> este copia certificată a acestei planșe, scoasă din arhiva OCPI a
+                imobilului. Spre deosebire de planul cadastral, care arată poziția imobilului pe ortofotoplan, releveul
+                te duce în interior și îți arată împărțirea spațiului cu suprafața fiecărei încăperi. Prin eGhișeul o
+                primești online, fără cont ANCPI și fără drum la ghișeul OCPI.
               </p>
               <div className="rounded-2xl border border-neutral-200 bg-white p-5">
                 <h3 className="font-bold text-secondary-900 mb-2">
-                  Ce conține planul de nivel
+                  Ce conține releveul
                 </h3>
                 <p className="text-sm text-neutral-700">
-                  Releveul include <strong>conturul fiecărei încăperi</strong>, denumirea camerelor (cameră de zi,
-                  dormitor, bucătărie, baie, hol, balcon), <strong>suprafețele utile</strong> exprimate în metri pătrați,
-                  dimensiunile interioare și, de obicei, un <strong>tabel cu totalul suprafeței utile</strong>. Este
-                  planșa la care se raportează notarul, banca sau evaluatorul atunci când au nevoie de structura reală a
-                  apartamentului.
+                  Releveul include <strong>conturul fiecărei încăperi</strong> și denumirea camerelor,
+                  <strong> suprafețele utile</strong> exprimate în metri pătrați, dimensiunile interioare și
+                  <strong> recapitulația suprafețelor per cameră</strong>. Pe planșă apar și adresa completă a imobilului,
+                  numărul de carte funciară și numărul cadastral. Este desenul la care se raportează notarul, banca sau
+                  evaluatorul când au nevoie de structura reală a apartamentului.
                 </p>
               </div>
 
@@ -333,23 +333,21 @@ export default async function CopieReleveuPage() {
                 Când ai nevoie de copie după releveu
               </h3>
               <p>
-                Releveul este cerut frecvent la <strong>vânzarea unui apartament</strong>, ca anexă în dosarul notarial,
-                și la <strong>obținerea unui credit ipotecar</strong>, pentru că banca și evaluatorul verifică structura
-                și suprafața utilă a imobilului adus în garanție. Tot el îți folosește când vrei să{' '}
-                <strong>verifici suprafața utilă reală</strong>, să compari planul depus la OCPI cu situația din teren
-                sau să pregătești un <strong>proiect de amenajare</strong> ori de recompartimentare.
+                Releveul se cere des la <strong>vânzarea unui apartament</strong>, ca anexă în dosarul notarial, și la
+                <strong> creditul ipotecar</strong>, pentru că banca și evaluatorul verifică structura și suprafața utilă
+                a imobilului adus în garanție. Tot el intră în dosarele de <strong>autorizație de construire sau
+                demolare</strong>, în certificatul de urbanism și în <strong>procedurile de succesiune</strong>. Îți este
+                util și când vrei doar să recuperezi planșa pierdută sau să verifici suprafața utilă reală a locuinței.
               </p>
               <p>
-                În practică, mulți proprietari descoperă diferențe între ce scrie în actele de proprietate și ce arată
-                releveul — de aceea compararea cu <strong>situația reală</strong> a apartamentului este un pas util
-                înainte de o tranzacție sau de lucrări. Dacă ai modificat compartimentarea fără actualizare cadastrală,
-                releveul curent îți arată exact ce este înregistrat la OCPI în acest moment.
+                Există și situații în care arhiva nu are un releveu avizat. La imobilele înscrise în cărți funciare mai
+                vechi, deschise încă din perioada Imperiului Austro-Ungar, planșa poate lipsi. În astfel de cazuri îți
+                spunem ce date găsim în dosarul cadastral înainte să continui comanda.
               </p>
               <p>
                 Releveul completează celelalte planșe cadastrale ale imobilului: <strong>planul cadastral</strong> pe
-                ortofotoplan (poziția pe hartă) și <strong>extrasul de carte funciară</strong> (situația juridică —
-                proprietar, suprafață, sarcini). Pentru multe proceduri — în special vânzare și credit — sunt necesare
-                împreună.{' '}
+                ortofotoplan, cu poziția pe hartă, și <strong>extrasul de carte funciară</strong>, cu situația juridică
+                (proprietar, suprafață, sarcini). Pentru vânzare și pentru credit sunt cerute de obicei împreună.{' '}
                 <Link href={serviceUrl('extras-carte-funciara')} className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
                   Vezi extrasul de carte funciară
                 </Link>

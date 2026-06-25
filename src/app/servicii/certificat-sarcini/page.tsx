@@ -309,23 +309,25 @@ export default async function CertificatSarciniPage() {
               </p>
               <p>
                 În practică, certificatul îți spune dacă terenul sau apartamentul are{' '}
-                <strong>ipoteci</strong> (de regulă în favoarea unei bănci), <strong>privilegii</strong>,{' '}
-                <strong>servituți</strong> (de exemplu drept de trecere), <strong>interdicții</strong> de
-                înstrăinare sau de grevare, ori <strong>litigii și procese notate</strong> în cartea funciară.
-                Dacă imobilul este „liber de sarcini”, certificatul confirmă tocmai acest lucru — un argument
-                solid la negociere și la notar.
+                <strong>ipoteci</strong> (de regulă în favoarea unei bănci), <strong>privilegii imobiliare</strong>,{' '}
+                <strong>sechestre sau popriri</strong>, <strong>servituți</strong> (de exemplu drept de trecere),{' '}
+                <strong>drept de uzufruct</strong>, <strong>interdicții</strong> de înstrăinare sau de grevare, ori{' '}
+                <strong>litigii și procese notate</strong> în cartea funciară. Dacă imobilul este „liber de sarcini”,
+                certificatul confirmă tocmai acest lucru, un argument solid la negociere și la notar.
               </p>
 
               <h3 className="text-xl font-bold text-secondary-900 pt-2">
                 Când ai nevoie de un certificat de sarcini
               </h3>
               <p>
-                Certificatul de sarcini este cerut sau recomandat în cele mai importante momente legate de un
-                imobil: <strong>înainte de o vânzare-cumpărare</strong>, ca să știi exact ce cumperi; la{' '}
-                <strong>contractarea unui credit ipotecar</strong>, când banca verifică garanția; la o
-                <strong> verificare a imobilului înainte de tranzacție</strong> (due diligence); sau pentru{' '}
-                <strong>dosarul notarial</strong> la autentificarea unui act. Pentru investitori și agenții
-                imobiliare, este pasul de bază al oricărui audit de proprietate.
+                Certificatul de sarcini este cerut sau recomandat în momentele importante legate de un imobil:{' '}
+                <strong>înainte de o vânzare-cumpărare</strong>, ca să știi exact ce cumperi; la{' '}
+                <strong>contractarea unui credit ipotecar</strong>, când banca verifică garanția; la o{' '}
+                <strong>verificare a imobilului înainte de tranzacție</strong> (due diligence); sau pentru{' '}
+                <strong>dosarul notarial</strong>, la autentificarea unui act ori într-o succesiune. Mai poate fi
+                folosit ca document justificativ în instanță sau pur și simplu pentru informare, când vrei să afli ce
+                sarcini are un imobil. Poate fi cerut de orice persoană fizică sau juridică interesată de situația
+                proprietății.
               </p>
 
               <div className="rounded-2xl border border-neutral-200 bg-white p-5">
@@ -523,15 +525,15 @@ export default async function CertificatSarciniPage() {
         <ServiceFAQ
           title="Întrebări Frecvente — Certificat de Sarcini"
           faqs={[
-            { q: 'Ce sunt sarcinile unui imobil?', a: 'Sarcinile sunt drepturile sau restricțiile unor terți înscrise asupra imobilului în cartea funciară: ipoteci, privilegii, servituți (ex: drept de trecere), interdicții de înstrăinare ori de grevare și litigii sau procese notate. Ele „grevează” proprietatea și pot limita ce poate face proprietarul cu ea.' },
-            { q: 'Ce conține certificatul de sarcini?', a: 'Conține situația grevărilor înscrise asupra imobilului din cartea funciară — ipotecile, privilegiile, servituțile, interdicțiile și litigiile notate. Dacă imobilul nu are sarcini, certificatul confirmă că este liber de sarcini.' },
+            { q: 'Ce sunt sarcinile unui imobil?', a: 'Sarcinile sunt drepturile sau restricțiile unor terți înscrise asupra imobilului în cartea funciară: ipoteci, privilegii imobiliare, sechestre, popriri, servituți (ex: drept de trecere), drept de uzufruct, interdicții de înstrăinare ori de grevare și litigii sau procese notate. Ele „grevează” proprietatea și pot limita ce poate face proprietarul cu ea.' },
+            { q: 'Ce conține certificatul de sarcini?', a: 'Conține situația grevărilor înscrise asupra imobilului din cartea funciară: ipotecile, privilegiile, sechestrele, popririle, servituțile, dreptul de uzufruct, interdicțiile și litigiile notate. Dacă imobilul nu are sarcini, certificatul confirmă că este liber de sarcini.' },
             { q: 'Cu ce diferă de extrasul de carte funciară?', a: 'Extrasul de carte funciară complet conține întreaga situație a imobilului, inclusiv proprietarii, suprafața și sarcinile. Certificatul de sarcini este focusat strict pe partea de grevări (ipoteci, interdicții, litigii). Dacă vrei imaginea juridică completă, alegi extrasul; dacă te interesează doar sarcinile, certificatul este mai direct.' },
             { q: 'Cât durează eliberarea certificatului de sarcini?', a: `${formatEstimatedDays(service)}. Documentul este procesat de un operator și livrat pe email.` },
             { q: 'Cât costă certificatul de sarcini?', a: `${service.base_price} RON, cu taxele OCPI incluse. Fără costuri ascunse.` },
             { q: 'Nu știu numărul cadastral. Ce fac?', a: 'Îl putem afla după adresă prin serviciul de Identificare Imobil, apoi îți eliberăm certificatul de sarcini pentru proprietatea găsită.' },
             { q: 'Am nevoie de cont ANCPI?', a: 'Nu. Ne ocupăm noi de tot procesul; tu ai nevoie doar de numărul cadastral sau de carte funciară și de localitate.' },
             { q: 'Certificatul de sarcini este valabil la notar și la bancă?', a: 'Da. Certificatul de sarcini este documentul OCPI/ANCPI emis din cartea funciară și este folosit în mod curent în dosarele notariale și de credit ipotecar pentru a dovedi situația grevărilor imobilului.' },
-            { q: 'Pot verifica un imobil înainte să îl cumpăr?', a: 'Da. Certificatul de sarcini este exact instrumentul de verificare înainte de tranzacție: vezi dacă imobilul are ipoteci, interdicții sau litigii înainte să semnezi.' },
+            { q: 'Cine poate cere un certificat de sarcini?', a: 'Îl poate cere orice persoană fizică sau juridică interesată de situația imobilului, nu doar proprietarul. Ai nevoie de numărul cadastral sau de carte funciară și de localitate, iar un operator se ocupă de cererea către OCPI.' },
           ]}
         />
 

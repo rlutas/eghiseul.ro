@@ -37,8 +37,8 @@ const PAGE_PATH = '/servicii/copie-inventar-coordonate/';
 const SCHEMA_SLUG = 'copie-inventar-coordonate';
 const TITLE = 'Copie Inventar de Coordonate Stereo 70';
 const DESCRIPTION =
-  'Copie inventar de coordonate în sistem Stereo 70 — lista punctelor de hotar ale imobilului cu ' +
-  'coordonate X/Y, după numărul cadastral sau de carte funciară. Taxe OCPI incluse, 100% online, livrare pe email.';
+  'Copie inventar de coordonate în sistem Stereo 70: lista punctelor de hotar ale imobilului, cu ' +
+  'coordonate X/Y, după numărul cadastral sau de carte funciară. Taxe OCPI incluse, totul online, livrare pe email.';
 const DATE_PUBLISHED = '2026-06-25';
 const DATE_MODIFIED = '2026-06-25';
 
@@ -70,9 +70,9 @@ const jsonLdGraph = buildServicePageGraph({
   slug: SCHEMA_SLUG,
   name: 'Copie Inventar de Coordonate Stereo 70',
   description:
-    'Serviciu de obținere a copiei inventarului de coordonate în sistemul de proiecție Stereo 70 — ' +
-    'lista punctelor de contur ale imobilului cu coordonate X/Y (puncte de hotar), utilă pentru ' +
-    'trasare în teren, proiectare și verificarea limitelor. 100% online, livrare pe email, taxe OCPI incluse.',
+    'Serviciu de obținere a copiei inventarului de coordonate în sistemul de proiecție Stereo 70. ' +
+    'Cuprinde lista punctelor de contur ale imobilului cu coordonate X/Y (puncte de hotar), folosită pentru ' +
+    'trasare în teren, proiectare și verificarea limitelor. Online, cu livrare pe email și taxe OCPI incluse.',
   serviceType: 'Document Processing — Real Estate',
   datePublished: DATE_PUBLISHED,
   dateModified: DATE_MODIFIED,
@@ -169,7 +169,8 @@ export default async function CopieInventarCoordonatePage() {
 
                 <p className="text-lg sm:text-xl text-white/85 leading-relaxed mb-6">
                   Lista punctelor de contur ale imobilului, cu coordonate X/Y în sistemul de proiecție
-                  Stereo 70 — exact ce folosesc topografii și proiectanții pentru trasare și verificare în teren.
+                  Stereo 70. Sunt valorile pe care le folosesc topografii și proiectanții ca să traseze
+                  și să verifice limitele în teren.
                 </p>
 
                 {/* USP */}
@@ -177,8 +178,8 @@ export default async function CopieInventarCoordonatePage() {
                   <Ruler className="h-5 w-5 text-primary-500 flex-shrink-0 mt-0.5" />
                   <p className="text-white/95 text-sm sm:text-base leading-relaxed">
                     Primești <strong className="text-primary-500">coordonatele tuturor punctelor de hotar</strong> ale
-                    parcelei în Stereo 70 — utile pentru <strong>trasarea limitelor în teren</strong>, proiectare,
-                    dezmembrare/alipire și verificarea suprapunerilor cu vecinii.
+                    parcelei în Stereo 70. Le folosești la <strong>trasarea limitelor în teren</strong>, la proiectare,
+                    la dezmembrare sau alipire și ca să verifici suprapunerile cu vecinii.
                   </p>
                 </div>
 
@@ -303,27 +304,27 @@ export default async function CopieInventarCoordonatePage() {
             <div className="space-y-4 text-neutral-700 leading-relaxed">
               <p>
                 <strong>Copia inventarului de coordonate</strong> în sistemul de proiecție{' '}
-                <strong>Stereo 70</strong> este lista punctelor de contur ale imobilului — adică{' '}
-                <strong>punctele de hotar</strong> care delimitează parcela — exprimate prin coordonate{' '}
+                <strong>Stereo 70</strong> este lista punctelor de contur ale imobilului, adică{' '}
+                <strong>punctele de hotar</strong> care delimitează parcela, exprimate prin coordonate{' '}
                 <strong>X și Y</strong>. Fiecare colț al terenului are o pereche de coordonate raportată la
-                sistemul național de referință, astfel încât poziția exactă a imobilului poate fi reconstituită
-                matematic, indiferent de cine face măsurătoarea.
+                sistemul național de referință, așa că poziția exactă a imobilului poate fi reconstituită
+                matematic, oricine ar face măsurătoarea.
               </p>
               <p>
                 Pe scurt, inventarul de coordonate este „scheletul numeric” al limitei tale de proprietate.
-                În timp ce planul de amplasament arată grafic forma parcelei, inventarul de coordonate
-                conține valorile precise pe care un topograf le încarcă direct în stația totală sau în
-                receptorul GPS pentru a regăsi sau materializa hotarele pe teren.
+                Planul de amplasament arată grafic forma parcelei, în timp ce inventarul de coordonate
+                conține valorile precise pe care un topograf le încarcă în stația totală sau în
+                receptorul GPS ca să regăsească sau să materializeze hotarele pe teren.
               </p>
 
               <h3 className="text-xl font-bold text-secondary-900 pt-2">
                 Ce conține inventarul de coordonate
               </h3>
               <p>
-                Documentul cuprinde un tabel cu toate punctele de contur ale imobilului (numerotate, de regulă,
-                1, 2, 3 …), iar pentru fiecare punct sunt trecute coordonatele <strong>X (nord)</strong> și{' '}
-                <strong>Y (est)</strong> în sistemul Stereo 70. De multe ori sunt incluse și distanțele dintre
-                puncte și suprafața rezultată din calcul, astfel încât conturul să poată fi verificat și închis
+                Documentul cuprinde un tabel cu toate punctele de contur ale imobilului, numerotate de regulă
+                1, 2, 3 și așa mai departe. Pentru fiecare punct sunt trecute coordonatele <strong>X (nord)</strong> și{' '}
+                <strong>Y (est)</strong> în sistemul Stereo 70. De multe ori apar și distanțele dintre
+                puncte, plus suprafața rezultată din calcul, ca să poți verifica și închide conturul
                 geometric. Aceste valori sunt cele înregistrate în baza de date OCPI/ANCPI pentru imobilul tău.
               </p>
 
@@ -332,10 +333,10 @@ export default async function CopieInventarCoordonatePage() {
                   Inventar de coordonate vs. plan de amplasament
                 </h3>
                 <p className="text-sm text-neutral-700">
-                  <strong>Inventarul de coordonate</strong> = valorile numerice X/Y ale punctelor de hotar (pentru
-                  trasare și calcul). <strong>Planul de amplasament și delimitare</strong> = reprezentarea grafică
-                  a aceleiași parcele, la scară, cu vecinătăți. Sunt complementare — multe documentații cadastrale
-                  le folosesc împreună.{' '}
+                  <strong>Inventarul de coordonate</strong> înseamnă valorile numerice X/Y ale punctelor de hotar,
+                  pentru trasare și calcul. <strong>Planul de amplasament și delimitare</strong> este reprezentarea
+                  grafică a aceleiași parcele, la scară, cu vecinătăți. Se completează reciproc, iar multe documentații
+                  cadastrale le folosesc împreună.{' '}
                   <Link href={serviceUrl('plan-amplasament-delimitare')} className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
                     Vezi planul de amplasament și delimitare
                   </Link>
@@ -347,17 +348,17 @@ export default async function CopieInventarCoordonatePage() {
                 Cui îi folosește și când
               </h3>
               <p>
-                Inventarul de coordonate este folosit în special de <strong>topografi, ingineri geodezi și
-                proiectanți</strong>, dar îți este util și ție ca proprietar atunci când ai o lucrare în teren.
-                Îl ceri pentru <strong>trasarea limitelor în teren</strong> (când vrei să marchezi exact unde
-                trece hotarul), pentru <strong>proiectarea</strong> unei construcții, pentru operațiuni de{' '}
-                <strong>dezmembrare sau alipire</strong> (când se recalculează loturi și suprafețe), pentru{' '}
-                <strong>verificarea suprapunerilor</strong> cu parcelele vecine și, în general, pentru orice
-                documentație de cadastru și topografie care are nevoie de poziția numerică a punctelor de hotar.
+                Inventarul de coordonate este folosit mai ales de <strong>topografi, ingineri geodezi și
+                proiectanți</strong>, însă îți este util și ție, ca proprietar, când ai o lucrare în teren.
+                Îl ceri pentru <strong>trasarea limitelor</strong>, când vrei să marchezi exact pe unde
+                trece hotarul, pentru <strong>proiectarea</strong> unei construcții sau pentru operațiuni de{' '}
+                <strong>dezmembrare ori alipire</strong>, unde se recalculează loturi și suprafețe. La fel,
+                ajută la <strong>verificarea suprapunerilor</strong> cu parcelele vecine și la orice
+                documentație de cadastru sau topografie care are nevoie de poziția numerică a punctelor de hotar.
               </p>
               <p>
-                Prin eGhișeul îl obții <strong>100% online</strong>, fără cont la ANCPI și fără deplasare la
-                ghișeul OCPI: ne ocupăm noi de tot, tu ai nevoie doar de numărul cadastral sau de numărul de
+                Prin eGhișeul îl obții <strong>100% online</strong>, fără cont la ANCPI și fără drum la
+                ghișeul OCPI. Ne ocupăm noi de proces, tu ai nevoie doar de numărul cadastral sau de numărul de
                 carte funciară al imobilului.
               </p>
               <p>

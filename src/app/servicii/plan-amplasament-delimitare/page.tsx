@@ -38,9 +38,9 @@ const PAGE_PATH = '/servicii/plan-amplasament-delimitare/';
 const SCHEMA_SLUG = 'plan-amplasament-delimitare';
 const TITLE = 'Plan de Amplasament și Delimitare (PAD) din Arhiva OCPI';
 const DESCRIPTION =
-  'Plan de amplasament și delimitare (PAD) din arhiva OCPI — conturul parcelei, dimensiunile laturilor, ' +
-  'suprafața măsurată și vecinătățile, după numărul cadastral sau de carte funciară. Taxe OCPI incluse, ' +
-  '100% online, livrare pe email, fără cont ANCPI.';
+  'Obții planul de amplasament și delimitare (PAD) din arhiva OCPI după numărul cadastral sau de carte funciară: ' +
+  'conturul parcelei, lungimile laturilor, suprafața măsurată și vecinătățile. Taxe OCPI incluse, ' +
+  'totul online, livrare pe email, fără cont ANCPI.';
 const DATE_PUBLISHED = '2026-06-25';
 const DATE_MODIFIED = '2026-06-25';
 
@@ -72,9 +72,9 @@ const jsonLdGraph = buildServicePageGraph({
   slug: SCHEMA_SLUG,
   name: 'Plan de Amplasament și Delimitare',
   description:
-    'Serviciu de obținere a planului de amplasament și delimitare (PAD) din arhiva OCPI — planul întocmit ' +
-    'la recepția cadastrală, cu conturul parcelei, dimensiunile laturilor, suprafața măsurată și vecinătățile. ' +
-    '100% online, fără cont ANCPI, livrare pe email.',
+    'Serviciu prin care primești planul de amplasament și delimitare (PAD) din arhiva OCPI — planul întocmit ' +
+    'la recepția cadastrală, cu conturul parcelei, lungimile laturilor, suprafața măsurată și vecinătățile. ' +
+    'Totul online, fără cont ANCPI, livrare pe email.',
   serviceType: 'Document Processing — Real Estate',
   datePublished: DATE_PUBLISHED,
   dateModified: DATE_MODIFIED,
@@ -112,10 +112,10 @@ export default async function PlanAmplasamentDelimitarePage() {
   ];
 
   const useCases = [
-    { icon: ScrollText, title: 'Vânzare teren', items: ['Dosar notarial', 'Verificare suprafață', 'Anexă la contract'] },
-    { icon: Layers, title: 'Dezmembrare & alipire', items: ['Documentație cadastrală', 'Operațiuni de carte funciară', 'Repoziționare limite'] },
-    { icon: Home, title: 'Construcții & autorizații', items: ['Autorizație de construire', 'Certificat de urbanism', 'Proiectare'] },
-    { icon: Ruler, title: 'Verifici limitele', items: ['Dimensiunile laturilor', 'Suprafața măsurată', 'Vecinătăți'] },
+    { icon: ScrollText, title: 'Vânzare teren', items: ['Dosar notarial', 'Verificarea suprafeței', 'Anexă la contract'] },
+    { icon: Layers, title: 'Dezmembrare și alipire', items: ['Documentație cadastrală', 'Operațiuni de carte funciară', 'Repoziționarea limitelor'] },
+    { icon: Home, title: 'Construcții și avize', items: ['Autorizație de construire', 'Certificat de urbanism', 'Racorduri la utilități'] },
+    { icon: Ruler, title: 'Verifici limitele', items: ['Lungimile laturilor', 'Suprafața măsurată', 'Vecinătățile parcelei'] },
   ];
 
   return (
@@ -170,17 +170,17 @@ export default async function PlanAmplasamentDelimitarePage() {
                 </h1>
 
                 <p className="text-lg sm:text-xl text-white/85 leading-relaxed mb-6">
-                  Planul care delimitează imobilul, întocmit la recepția cadastrală: conturul parcelei,
-                  dimensiunile laturilor, suprafața măsurată și vecinătățile. Copie din arhiva OCPI.
+                  Planul tehnic care arată cum a fost măsurat și delimitat imobilul la recepția cadastrală:
+                  conturul parcelei, lungimile laturilor, suprafața măsurată și vecinătățile. Copie din arhiva OCPI.
                 </p>
 
                 {/* USP */}
                 <div className="flex items-start gap-3 rounded-xl bg-primary-500/15 border border-primary-500/40 p-4 mb-6">
                   <Ruler className="h-5 w-5 text-primary-500 flex-shrink-0 mt-0.5" />
                   <p className="text-white/95 text-sm sm:text-base leading-relaxed">
-                    Vezi exact <strong className="text-primary-500">conturul, laturile și suprafața</strong> imobilului
-                    — planul de care ai nevoie pentru <strong>vânzare, dezmembrare/alipire</strong> sau pentru o
-                    autorizație de construire.
+                    Ai într-un singur plan <strong className="text-primary-500">conturul, laturile și suprafața</strong> imobilului,
+                    așa cum sunt necesare la <strong>vânzare, dezmembrare sau alipire</strong> și la dosarul pentru
+                    autorizația de construire.
                   </p>
                 </div>
 

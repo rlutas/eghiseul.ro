@@ -168,18 +168,18 @@ export default async function CopieCarteFunciaraPage() {
                 </h1>
 
                 <p className="text-lg sm:text-xl text-white/85 leading-relaxed mb-6">
-                  Reproducerea completă a cărții funciare — toate cele trei părți (A, B și C) și istoricul
-                  înscrierilor, copie certificată din arhiva OCPI. Util pentru litigii, succesiuni și verificarea
-                  istoricului proprietății.
+                  Reproducerea completă a cărții funciare: toate cele trei părți (A, B și C), plus istoricul
+                  înscrierilor, copie certificată din arhiva OCPI. O folosești în litigii, la succesiuni și când vrei
+                  să vezi tot istoricul unei proprietăți.
                 </p>
 
                 {/* USP */}
                 <div className="flex items-start gap-3 rounded-xl bg-primary-500/15 border border-primary-500/40 p-4 mb-6">
                   <ScrollText className="h-5 w-5 text-primary-500 flex-shrink-0 mt-0.5" />
                   <p className="text-white/95 text-sm sm:text-base leading-relaxed">
-                    Spre deosebire de extrasul de informare (un sumar la zi), copia{' '}
+                    Extrasul de informare arată doar situația la zi. Copia{' '}
                     <strong className="text-primary-500">in extenso reproduce conținutul complet</strong> al cărții
-                    funciare, inclusiv <strong>istoricul tuturor înscrierilor</strong> — esențial în instanță și la notar.
+                    funciare, cu <strong>istoricul tuturor înscrierilor</strong>, copie pe care instanțele și notarii o cer adesea.
                   </p>
                 </div>
 
@@ -305,28 +305,28 @@ export default async function CopieCarteFunciaraPage() {
               <p>
                 <strong>Copia cărții funciare in extenso</strong> este reproducerea <strong>integrală</strong> a
                 cărții funciare a unui imobil, o copie certificată eliberată din arhiva Oficiului de Cadastru și
-                Publicitate Imobiliară (<strong>OCPI / ANCPI</strong>). Spre deosebire de un sumar, aceasta redă
-                conținutul complet al CF — toate cele trei părți și istoricul înscrierilor — exact așa cum figurează
-                în registrul de carte funciară.
+                Publicitate Imobiliară (<strong>OCPI / ANCPI</strong>). Redă conținutul complet al CF, cu toate cele
+                trei părți și cu istoricul înscrierilor, exact așa cum figurează în registrul de carte funciară.
               </p>
               <p>
-                Cartea funciară este structurată în trei părți, iar copia in extenso le reproduce pe toate:{' '}
-                <strong>Partea A</strong> (descrierea imobilului: număr cadastral, suprafață, categorie de
-                folosință, vecinătăți), <strong>Partea B</strong> (proprietarii și actele în baza cărora s-a
-                dobândit dreptul de proprietate) și <strong>Partea C</strong> (sarcinile: ipoteci, servituți,
-                interdicții, notări, sechestre). Pe lângă situația la zi, copia integrală arată și{' '}
-                <strong>înscrierile vechi, radiate sau modificate</strong>, oferind istoricul complet al imobilului.
+                Cartea funciară are trei părți, iar copia in extenso le reproduce pe toate:{' '}
+                <strong>Partea A</strong> descrie imobilul (număr cadastral, suprafață, categorie de folosință,
+                vecinătăți). <strong>Partea B</strong> arată proprietarii și actele prin care s-a dobândit dreptul de
+                proprietate. <strong>Partea C</strong> cuprinde sarcinile: ipoteci, servituți, interdicții, notări,
+                sechestre. Spre deosebire de extras, copia integrală include și{' '}
+                <strong>înscrierile vechi, radiate sau modificate</strong>, cu documentele care stau la baza fiecărei
+                înscrieri, astfel încât ai istoricul complet al imobilului.
               </p>
               <div className="rounded-2xl border border-neutral-200 bg-white p-5">
                 <h3 className="font-bold text-secondary-900 mb-2">
                   Copie in extenso vs. extras de carte funciară de informare
                 </h3>
                 <p className="text-sm text-neutral-700">
-                  <strong>Extrasul de informare</strong> este un sumar la zi al situației juridice — proprietarul
-                  actual, suprafața și sarcinile în vigoare la momentul eliberării. <strong>Copia in extenso</strong>{' '}
-                  reproduce conținutul complet al cărții funciare, inclusiv istoricul tuturor înscrierilor (chiar și
-                  cele radiate). Pentru o simplă verificare a situației curente e suficient extrasul; pentru litigii,
-                  succesiuni sau verificarea istoricului ai nevoie de copia integrală.{' '}
+                  <strong>Extrasul de informare</strong> arată situația juridică la zi: proprietarul actual,
+                  suprafața și sarcinile în vigoare la momentul eliberării. <strong>Copia in extenso</strong>{' '}
+                  reproduce conținutul complet al cărții funciare, cu istoricul tuturor înscrierilor, inclusiv cele
+                  radiate. Pentru o verificare rapidă a situației curente este suficient extrasul. Când ai nevoie de
+                  istoric, în litigii sau la succesiuni, ceri copia integrală.{' '}
                   <Link href={serviceUrl('extras-carte-funciara')} className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
                     Vezi extrasul de carte funciară
                   </Link>
@@ -338,18 +338,18 @@ export default async function CopieCarteFunciaraPage() {
                 Când ai nevoie de copia integrală a cărții funciare
               </h3>
               <p>
-                Copia in extenso este cerută atunci când nu îți este suficient să știi situația de astăzi, ci ai
-                nevoie de <strong>tot istoricul</strong> imobilului: în <strong>litigii</strong> și dosare juridice
-                (ca probă a lanțului de proprietate), în <strong>succesiuni</strong> și dezbateri succesorale, la{' '}
-                <strong>reconstituirea</strong> unor drepturi, pentru verificarea aprofundată a istoricului unei
-                proprietăți înainte de o tranzacție importantă (<strong>due diligence</strong>) sau atunci când o
-                instanță ori un notar solicită expres copia integrală a CF.
+                Ceri copia in extenso când nu îți ajunge situația de astăzi și vrei{' '}
+                <strong>tot istoricul</strong> imobilului. Apare cel mai des în <strong>litigii</strong> și dosare
+                juridice, ca probă a lanțului de proprietate, la <strong>succesiuni</strong> și partaje, la{' '}
+                <strong>reconstituirea</strong> unor drepturi sau în verificarea aprofundată dinaintea unei tranzacții
+                importante (<strong>due diligence</strong>). O instanță ori un notar o poate solicita și ca atare,
+                expres, în locul extrasului.
               </p>
               <p>
-                Prin eGhișeul comanzi copia cărții funciare in extenso 100% online, fără cont ANCPI și fără deplasare
-                la ghișeul OCPI. Un operator preia cererea, achită taxele OCPI (incluse în preț) și îți trimite copia
+                Prin eGhișeul comanzi copia cărții funciare in extenso 100% online, fără cont ANCPI și fără drum la
+                ghișeul OCPI. Un operator preia cererea, achită taxele OCPI (incluse în preț) și îți trimite copia
                 certificată pe email. Ai nevoie doar de <strong>numărul de carte funciară</strong> sau de{' '}
-                <strong>numărul cadastral</strong>, împreună cu județul și localitatea.
+                <strong>numărul cadastral</strong>, plus județul și localitatea.
               </p>
               <p>
                 Dacă nu cunoști aceste numere, le putem afla mai întâi după adresă prin serviciul de{' '}
@@ -529,15 +529,15 @@ export default async function CopieCarteFunciaraPage() {
         <ServiceFAQ
           title="Întrebări Frecvente — Copie Carte Funciară in extenso"
           faqs={[
-            { q: 'Ce este copia cărții funciare in extenso?', a: 'Este reproducerea integrală a cărții funciare a unui imobil — o copie certificată din arhiva OCPI/ANCPI care redă conținutul complet al CF, inclusiv istoricul tuturor înscrierilor, nu doar situația la zi.' },
-            { q: 'Cu ce diferă de extrasul de carte funciară de informare?', a: 'Extrasul de informare este un sumar la zi (proprietar actual, suprafață, sarcini în vigoare). Copia in extenso reproduce integral cartea funciară, inclusiv înscrierile vechi sau radiate și întregul istoric. Pentru litigii, succesiuni și verificarea istoricului ai nevoie de copia integrală.' },
+            { q: 'Ce este copia cărții funciare in extenso?', a: 'Este reproducerea integrală a cărții funciare a unui imobil, o copie certificată din arhiva OCPI/ANCPI. Redă conținutul complet al CF, cu istoricul tuturor înscrierilor și documentele care stau la baza lor, nu numai situația la zi.' },
+            { q: 'Cu ce diferă de extrasul de carte funciară de informare?', a: 'Extrasul de informare arată situația la zi: proprietar actual, suprafață, sarcini în vigoare. Copia in extenso reproduce integral cartea funciară, cu înscrierile vechi sau radiate și cu tot istoricul. Pentru litigii, succesiuni și verificarea istoricului ceri copia integrală.' },
             { q: 'Ce conțin părțile A, B și C ale cărții funciare?', a: 'Partea A descrie imobilul (număr cadastral, suprafață, categorie de folosință, vecinătăți). Partea B cuprinde proprietarii și actele de dobândire a dreptului de proprietate. Partea C conține sarcinile: ipoteci, servituți, interdicții, notări și sechestre. Copia in extenso le reproduce pe toate trei.' },
             { q: 'Când am nevoie de copia in extenso?', a: 'În litigii și dosare juridice, la succesiuni și partaje, pentru reconstituirea unor drepturi, la verificarea aprofundată a istoricului proprietății (due diligence) sau când o instanță ori un notar solicită expres copia integrală a CF.' },
+            { q: 'Cine poate cere copia in extenso?', a: 'Oricine poate comanda copia in extenso a unei cărți funciare, nu doar proprietarul. Persoanele juridice trec CUI-ul firmei pentru factură. Nu îți trebuie cont ANCPI; ne ocupăm noi de cerere.' },
             { q: 'Cât durează eliberarea?', a: `${formatEstimatedDays(service)}. Cererea este procesată de un operator, care achită taxele OCPI și îți livrează copia certificată pe email.` },
             { q: 'Cât costă copia cărții funciare in extenso?', a: `${service.base_price} RON, cu taxele OCPI incluse. Fără costuri ascunse.` },
-            { q: 'Nu știu numărul cadastral sau de carte funciară. Ce fac?', a: 'Le putem afla după adresă prin serviciul de Identificare Imobil, apoi îți eliberăm copia integrală a cărții funciare.' },
-            { q: 'Am nevoie de cont ANCPI?', a: 'Nu. Ne ocupăm noi de tot procesul; tu ai nevoie doar de numărul de carte funciară sau cadastral, plus județul și localitatea.' },
-            { q: 'Ce valabilitate are copia in extenso?', a: 'Copia reflectă conținutul cărții funciare la data eliberării. Pentru proceduri în care se cere o copie recentă (instanță, notar), recomandăm să o obții cu puțin timp înainte de depunere, astfel încât să cuprindă cele mai recente înscrieri.' },
+            { q: 'Nu știu numărul cadastral sau de carte funciară. Ce fac?', a: 'Le aflăm după adresă prin serviciul de Identificare Imobil, apoi îți eliberăm copia integrală a cărții funciare.' },
+            { q: 'Ce valabilitate are copia in extenso?', a: 'Copia reflectă conținutul cărții funciare la data eliberării. Dacă o procedură cere o copie recentă (instanță, notar), obține-o cu puțin timp înainte de depunere, ca să cuprindă cele mai noi înscrieri.' },
           ]}
         />
 

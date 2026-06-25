@@ -36,9 +36,9 @@ const PAGE_PATH = '/servicii/copie-contract-vanzare/';
 const SCHEMA_SLUG = 'copie-contract-vanzare';
 const TITLE = 'Copie Contract Vânzare-Cumpărare din Arhiva OCPI';
 const DESCRIPTION =
-  'Obține o copie a contractului de vânzare-cumpărare al imobilului din arhiva OCPI/ANCPI — actul ' +
-  'în baza căruia s-a intabulat dreptul de proprietate. Util când nu mai ai exemplarul propriu. ' +
-  'Taxe OCPI incluse, 100% online, livrare pe email.';
+  'Obține copia certificată a contractului de vânzare-cumpărare al imobilului din arhiva OCPI/ANCPI — ' +
+  'actul notarial în baza căruia s-a intabulat dreptul de proprietate. Util când nu mai ai exemplarul ' +
+  'propriu. Taxe OCPI incluse, online, livrare pe email.';
 const DATE_PUBLISHED = '2026-06-25';
 const DATE_MODIFIED = '2026-06-25';
 
@@ -70,9 +70,9 @@ const jsonLdGraph = buildServicePageGraph({
   slug: SCHEMA_SLUG,
   name: 'Copie Contract Vânzare-Cumpărare',
   description:
-    'Serviciu de obținere a unei copii a contractului de vânzare-cumpărare al imobilului din arhiva ' +
-    'OCPI/ANCPI — actul în baza căruia s-a făcut intabularea dreptului de proprietate. Util când ' +
-    'proprietarul nu mai are exemplarul propriu. 100% online, taxe OCPI incluse, livrare pe email.',
+    'Serviciu de obținere a copiei certificate a contractului de vânzare-cumpărare al imobilului din ' +
+    'arhiva OCPI/ANCPI — actul notarial în baza căruia s-a făcut intabularea dreptului de proprietate. ' +
+    'Util când proprietarul nu mai are exemplarul propriu. Online, taxe OCPI incluse, livrare pe email.',
   serviceType: 'Document Processing — Real Estate',
   datePublished: DATE_PUBLISHED,
   dateModified: DATE_MODIFIED,
@@ -168,9 +168,9 @@ export default async function CopieContractVanzarePage() {
                 </h1>
 
                 <p className="text-lg sm:text-xl text-white/85 leading-relaxed mb-6">
-                  Obținem o copie a contractului de vânzare-cumpărare al imobilului din arhiva OCPI — actul
-                  în baza căruia s-a intabulat dreptul de proprietate. Ai nevoie doar de numărul de carte
-                  funciară sau cadastral.
+                  Obținem copia certificată a contractului de vânzare-cumpărare al imobilului din arhiva OCPI,
+                  actul notarial în baza căruia s-a intabulat dreptul de proprietate. Ai nevoie doar de numărul
+                  de carte funciară sau cadastral.
                 </p>
 
                 {/* USP */}
@@ -178,7 +178,7 @@ export default async function CopieContractVanzarePage() {
                   <ScrollText className="h-5 w-5 text-primary-500 flex-shrink-0 mt-0.5" />
                   <p className="text-white/95 text-sm sm:text-base leading-relaxed">
                     Recuperezi <strong className="text-primary-500">actul de proprietate din arhivă</strong> când
-                    nu mai ai exemplarul propriu — util pentru <strong>succesiuni, dosare la bancă sau notar</strong>
+                    nu mai ai exemplarul propriu. Este util pentru <strong>succesiuni, dosare la bancă sau notar</strong>
                     {' '}și pentru verificarea condițiilor tranzacției anterioare.
                   </p>
                 </div>

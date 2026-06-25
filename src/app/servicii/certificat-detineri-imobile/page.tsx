@@ -38,8 +38,9 @@ const PAGE_PATH = '/servicii/certificat-detineri-imobile/';
 const SCHEMA_SLUG = 'certificat-detineri-imobile';
 const TITLE = 'Certificat privind Deținerea de Imobile — Adeverință OCPI';
 const DESCRIPTION =
-  'Certificat privind deținerea sau nedeținerea de imobile, eliberat de OCPI/ANCPI după persoană ' +
-  '(nume + CNP/CUI + județ). Util pentru dosare de locuință, ajutoare și succesiuni. 198 RON, taxe incluse, pe email.';
+  'Certificat care atestă dacă o persoană deține sau nu deține imobile în evidențele OCPI/ANCPI. ' +
+  'Verificare după persoană (nume + CNP/CUI), pe localitate sau județ. Cerut la dosare de locuință, ' +
+  'ajutoare, succesiuni și dosare bancare. 198 RON, taxe incluse, pe email.';
 const DATE_PUBLISHED = '2026-06-25';
 const DATE_MODIFIED = '2026-06-25';
 
@@ -71,9 +72,10 @@ const jsonLdGraph = buildServicePageGraph({
   slug: SCHEMA_SLUG,
   name: 'Certificat privind Deținerea de Imobile',
   description:
-    'Serviciu de obținere a certificatului privind deținerea sau nedeținerea de imobile, eliberat de ' +
-    'OCPI/ANCPI. Atestă dacă o persoană deține sau nu proprietăți imobiliare înscrise în evidențe, la ' +
-    'nivel de localitate sau județ. Căutare după persoană (nume + CNP/CUI). 100% online, fără cont ANCPI, livrare pe email.',
+    'Serviciu de obținere a certificatului privind deținerea sau nedeținerea de imobile, eliberat și ' +
+    'semnat electronic de OCPI/ANCPI. Arată dacă o persoană figurează ca proprietar de imobile în ' +
+    'evidențele de cadastru și carte funciară, la nivel de localitate, sector sau județ. Căutare după ' +
+    'persoană (nume + CNP/CUI). 100% online, fără cont ANCPI, livrare pe email.',
   serviceType: 'Document Processing — Real Estate',
   datePublished: DATE_PUBLISHED,
   dateModified: DATE_MODIFIED,
@@ -113,8 +115,8 @@ export default async function CertificatDetineriImobilePage() {
 
   const useCases = [
     { icon: Home, title: 'Dosare de locuință', items: ['Locuință ANL', 'Locuință socială', 'Dovada că nu deții o altă locuință'] },
-    { icon: ScrollText, title: 'Ajutoare & subvenții', items: ['Dosare de ajutor social', 'Burse pentru elevi/studenți', 'Sprijin financiar'] },
-    { icon: Building2, title: 'Succesiuni & notariat', items: ['Dosar de succesiune', 'Masă succesorală', 'Acte la notar'] },
+    { icon: ScrollText, title: 'Ajutoare & subvenții', items: ['Dosare de ajutor social', 'Burse pentru elevi sau studenți', 'Dosare bancare'] },
+    { icon: Building2, title: 'Succesiuni & notariat', items: ['Succesiuni și partaj', 'Masă succesorală', 'Litigii cu imobile'] },
     { icon: Shield, title: 'Dovada (ne)deținerii', items: ['Confirmi că deții imobile', 'Sau că nu deții niciunul', 'Acceptat la instituții'] },
   ];
 
@@ -170,8 +172,8 @@ export default async function CertificatDetineriImobilePage() {
                 </h1>
 
                 <p className="text-lg sm:text-xl text-white/85 leading-relaxed mb-6">
-                  Documentul OCPI/ANCPI care atestă dacă o persoană <strong>deține sau nu deține</strong> proprietăți
-                  imobiliare înscrise în evidențe, la nivel de localitate sau județ.
+                  Documentul OCPI/ANCPI care arată dacă o persoană <strong>figurează sau nu</strong> cu proprietăți
+                  imobiliare în evidențele de cadastru și carte funciară, pe o localitate sau pe un județ întreg.
                 </p>
 
                 {/* USP */}
@@ -304,18 +306,19 @@ export default async function CertificatDetineriImobilePage() {
             </h2>
             <div className="space-y-4 text-neutral-700 leading-relaxed">
               <p>
-                <strong>Certificatul privind deținerea (sau nedeținerea) de imobile</strong> este documentul eliberat
-                de Oficiul de Cadastru și Publicitate Imobiliară (<strong>OCPI / ANCPI</strong>) care atestă dacă o
-                anumită persoană <strong>deține sau nu deține proprietăți imobiliare</strong> înscrise în evidențele de
-                cadastru și carte funciară. Verificarea se face pe o unitate administrativ-teritorială (localitate sau
-                județ), iar rezultatul confirmă fie că persoana figurează cu imobile, fie că nu figurează cu niciunul.
+                <strong>Certificatul privind deținerea (sau nedeținerea) de imobile</strong> este eliberat și semnat
+                electronic de Oficiul de Cadastru și Publicitate Imobiliară (<strong>OCPI / ANCPI</strong>). El arată
+                dacă, la data interogării, o persoană <strong>figurează sau nu ca proprietar</strong> de imobile în
+                evidențele integrate de cadastru și carte funciară. Verificarea se face pe o unitate
+                administrativ-teritorială (localitate, sector sau județ), iar rezultatul confirmă fie că persoana are
+                imobile înscrise, fie că nu are niciunul.
               </p>
               <p>
-                Spre deosebire de extrasul de carte funciară, care descrie un singur imobil identificat printr-un număr
-                cadastral, acest certificat pornește de la <strong>persoană</strong> și răspunde la o întrebare diferită:
-                „are sau nu are această persoană proprietăți pe raza UAT-ului verificat?”. De aceea este cerut frecvent
-                ca <strong>dovadă a deținerii ori a nedeținerii unei locuințe</strong>, mai ales în dosarele unde
-                eligibilitatea depinde de patrimoniul imobiliar al solicitantului.
+                Extrasul de carte funciară descrie un singur imobil, identificat printr-un număr cadastral. Acest
+                certificat pleacă de la <strong>persoană</strong> și răspunde la altă întrebare: „are această persoană
+                proprietăți pe raza UAT-ului verificat?”. Tocmai de aceea ajunge des să fie folosit ca
+                <strong> dovadă a deținerii sau a nedeținerii unei locuințe</strong>, în dosarele unde eligibilitatea
+                ține de patrimoniul imobiliar al solicitantului.
               </p>
 
               <div className="rounded-2xl border border-neutral-200 bg-white p-5">
@@ -335,28 +338,30 @@ export default async function CertificatDetineriImobilePage() {
                 Deținere vs. nedeținere: ce poate să arate certificatul
               </h3>
               <p>
-                Rezultatul poate fi de două feluri. Dacă persoana <strong>deține imobile</strong> înscrise în evidențe,
-                certificatul confirmă deținerea (în funcție de tipul documentului, poate include și o listă a imobilelor
-                pe raza UAT-ului verificat). Dacă persoana <strong>nu deține niciun imobil</strong>, certificatul atestă
-                nedeținerea — adică exact „adeverința că nu am casă/teren” cerută în multe dosare de locuință și ajutoare.
+                Rezultatul vine în două variante. Dacă persoana <strong>are imobile</strong> înscrise în evidențe,
+                certificatul confirmă deținerea și, în funcție de tipul documentului, poate include și lista imobilelor
+                de pe raza UAT-ului verificat. Dacă persoana <strong>nu are niciun imobil</strong> înscris, certificatul
+                atestă nedeținerea, adică tocmai „adeverința că nu am casă sau teren” cerută în dosarele de locuință și
+                de ajutoare.
               </p>
               <p>
-                Important de reținut: certificatul reflectă <strong>evidențele de cadastru și carte funciară</strong> la
-                nivelul UAT-ului verificat. Proprietățile neînscrise (neintabulate) sau cele aflate pe raza altor
-                localități/județe nu apar automat — de aceea îți confirmăm înainte exact ce acoperire teritorială alegi,
-                ca certificatul să corespundă cerinței din dosarul tău.
+                Un detaliu de reținut: certificatul reflectă starea înscrisă la data interogării, în
+                <strong> evidențele de cadastru și carte funciară</strong> de pe UAT-ul ales. Proprietățile
+                neintabulate, cele din cărți funciare vechi încă nedigitizate sau cele aflate pe raza altor localități
+                ori județe nu apar aici. De aceea îți confirmăm dinainte ce acoperire teritorială alegi, ca documentul
+                să corespundă cu cerința din dosarul tău.
               </p>
 
               <h3 className="text-xl font-bold text-secondary-900 pt-2">
                 La ce dosare îți este cerut
               </h3>
               <p>
-                Cel mai des, certificatul este solicitat în <strong>dosarele de locuință</strong> (locuințe ANL,
-                locuințe sociale sau de necesitate), unde trebuie să dovedești că nu deții deja o locuință în
-                proprietate. Apare și în <strong>dosarele de ajutoare și subvenții</strong>, la acordarea unor burse,
-                în <strong>dosarele notariale și de succesiune</strong>, precum și ori de câte ori o instituție îți cere
-                o dovadă privind patrimoniul imobiliar. Prin eGhișeul îl obții 100% online: tu ne dai datele persoanei,
-                noi facem verificarea la OCPI și îți trimitem certificatul pe email.
+                Cel mai des, certificatul este cerut la <strong>dosarele de locuință</strong> (locuințe ANL, locuințe
+                sociale sau de necesitate), unde trebuie să arăți că nu deții deja o locuință în proprietate. Apare apoi
+                în <strong>dosarele de ajutoare și subvenții</strong>, la acordarea unor burse, în
+                <strong> succesiuni, partaje și litigii</strong> cu imobile, în dosarele bancare, precum și ori de câte
+                ori o instituție îți cere o confirmare privind patrimoniul imobiliar. Prin eGhișeul îl obții 100%
+                online: ne dai datele persoanei, noi facem verificarea la OCPI și îți trimitem certificatul pe email.
               </p>
 
               <div className="rounded-2xl border border-neutral-200 bg-white p-5">
@@ -532,15 +537,15 @@ export default async function CertificatDetineriImobilePage() {
         <ServiceFAQ
           title="Întrebări Frecvente — Certificat privind Deținerea de Imobile"
           faqs={[
-            { q: 'Ce atestă certificatul privind deținerea de imobile?', a: 'Atestă dacă o anumită persoană deține sau nu deține proprietăți imobiliare înscrise în evidențele de cadastru și carte funciară, pe raza unității administrativ-teritoriale verificate (localitate sau județ).' },
-            { q: 'Care e diferența dintre certificatul de deținere și cel de nedeținere?', a: 'Este același tip de document; rezultatul diferă. Dacă persoana are imobile, certificatul confirmă deținerea (uneori cu lista imobilelor). Dacă nu are niciun imobil, atestă nedeținerea — adică dovada că persoana nu deține casă sau teren în zona verificată.' },
-            { q: 'Ce date îmi trebuie pentru a comanda?', a: 'Numele complet al persoanei și CNP-ul (pentru persoană fizică) sau CUI-ul (pentru persoană juridică), plus județul sau localitatea unde vrei să fie făcută verificarea. Nu ai nevoie de niciun număr cadastral.' },
-            { q: 'Pe ce zonă se face verificarea?', a: 'Verificarea se face la nivel de unitate administrativ-teritorială — o localitate sau un județ. Proprietățile de pe raza altor localități/județe nu apar automat, așa că îți confirmăm acoperirea înainte de a face verificarea.' },
-            { q: 'Apar și imobilele neintabulate?', a: 'Nu. Certificatul reflectă evidențele de cadastru și carte funciară. Proprietățile neînscrise (neintabulate) nu figurează în aceste evidențe și, prin urmare, nu pot fi confirmate prin acest document.' },
+            { q: 'Ce atestă certificatul privind deținerea de imobile?', a: 'Arată dacă, la data interogării, o persoană figurează sau nu ca proprietar de imobile în evidențele integrate de cadastru și carte funciară, pe raza unității administrativ-teritoriale verificate (localitate, sector sau județ). Este eliberat și semnat electronic de OCPI/ANCPI.' },
+            { q: 'Care e diferența dintre certificatul de deținere și cel de nedeținere?', a: 'Este același document, doar rezultatul diferă. Dacă persoana are imobile, certificatul confirmă deținerea (uneori cu lista imobilelor). Dacă nu are niciunul, atestă nedeținerea, adică dovada că persoana nu figurează cu casă sau teren în zona verificată.' },
+            { q: 'Ce date îmi trebuie pentru a comanda?', a: 'Numele complet al persoanei și CNP-ul (pentru persoană fizică) sau CUI-ul (pentru persoană juridică), plus județul, sectorul sau localitatea unde vrei să fie făcută verificarea. Nu ai nevoie de niciun număr cadastral.' },
+            { q: 'Pe ce zonă se face verificarea?', a: 'Verificarea se face la nivel de unitate administrativ-teritorială: o localitate, un sector sau un județ. Proprietățile de pe raza altor localități sau județe nu apar automat, așa că îți confirmăm acoperirea înainte de a face verificarea.' },
+            { q: 'Apar și imobilele neintabulate sau din cărți funciare vechi?', a: 'Nu întotdeauna. Certificatul reflectă starea înscrisă în evidențele de cadastru și carte funciară la data interogării. Proprietățile neintabulate sau cele din cărți funciare vechi, încă nedigitizate, pot să nu figureze în aceste evidențe.' },
             { q: 'Cât costă?', a: `${service.base_price} RON, cu taxele OCPI incluse. Fără costuri ascunse.` },
-            { q: 'Cât durează eliberarea?', a: `${formatEstimatedDays(service)}. Verificarea este făcută de un operator, deoarece presupune o căutare la OCPI după datele persoanei.` },
-            { q: 'La ce dosare este acceptat?', a: 'Este cerut frecvent la dosarele de locuință (ANL, locuință socială), la ajutoare și subvenții, la acordarea unor burse, în dosarele de succesiune și notariale, precum și ori de câte ori o instituție cere o dovadă privind patrimoniul imobiliar.' },
-            { q: 'Am nevoie de cont ANCPI?', a: 'Nu. Ne ocupăm noi de tot procesul; tu trebuie doar să ne dai datele persoanei și zona de verificat, iar certificatul îl primești pe email.' },
+            { q: 'Cât durează eliberarea?', a: `${formatEstimatedDays(service)}. Verificarea este făcută de un operator, fiindcă presupune o căutare la OCPI după datele persoanei.` },
+            { q: 'La ce dosare este cerut?', a: 'Apare des la dosarele de locuință (ANL, locuință socială), la ajutoare și subvenții, la acordarea unor burse, în succesiuni, partaje și litigii cu imobile, în dosarele bancare, precum și ori de câte ori o instituție cere o confirmare privind patrimoniul imobiliar.' },
+            { q: 'Am nevoie de cont ANCPI?', a: 'Nu. Ne ocupăm noi de tot procesul. Tu ne dai datele persoanei și zona de verificat, iar certificatul îl primești pe email.' },
           ]}
         />
 

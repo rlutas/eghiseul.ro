@@ -36,9 +36,10 @@ const PAGE_PATH = '/servicii/actualizare-adresa-cf/';
 const SCHEMA_SLUG = 'actualizare-adresa-cf';
 const TITLE = 'Actualizare Adresă în Cartea Funciară (OCPI/ANCPI)';
 const DESCRIPTION =
-  'Actualizarea adresei imobilului în cartea funciară — alinierea adresei din CF cu nomenclatorul ' +
-  'stradal actual, după renumerotări sau redenumiri de străzi. Taxe OCPI incluse, 100% online, ' +
-  'confirmare pe email, fără cont ANCPI.';
+  'Actualizăm adresa imobilului în cartea funciară prin cerere la OCPI: aliniem adresa din CF cu ' +
+  'nomenclatorul stradal actual după renumerotări, redenumiri de străzi sau atribuirea unui număr ' +
+  'poștal nou. Taxe OCPI incluse, 100% online, fără cont ANCPI. Primești extrasul de carte funciară ' +
+  'cu adresa corectată, pe email.';
 const DATE_PUBLISHED = '2026-06-25';
 const DATE_MODIFIED = '2026-06-25';
 
@@ -70,9 +71,10 @@ const jsonLdGraph = buildServicePageGraph({
   slug: SCHEMA_SLUG,
   name: 'Actualizare Adresă în Cartea Funciară',
   description:
-    'Serviciu de actualizare a adresei poștale a imobilului în cartea funciară prin cerere depusă la ' +
-    'OCPI/ANCPI — alinierea adresei din CF cu nomenclatorul stradal actual, după renumerotări sau ' +
-    'redenumiri de străzi. 100% online, taxe OCPI incluse, confirmare pe email, fără cont ANCPI.',
+    'Serviciu de actualizare a adresei poștale a imobilului în cartea funciară, prin cerere depusă la ' +
+    'OCPI/ANCPI. Aliniem adresa din CF cu nomenclatorul stradal actual după renumerotări, redenumiri de ' +
+    'străzi sau atribuirea unui număr poștal nou. 100% online, taxe OCPI incluse, confirmare pe email, ' +
+    'fără cont ANCPI.',
   serviceType: 'Document Processing — Real Estate',
   datePublished: DATE_PUBLISHED,
   dateModified: DATE_MODIFIED,
@@ -168,8 +170,8 @@ export default async function ActualizareAdresaCfPage() {
                 </h1>
 
                 <p className="text-lg sm:text-xl text-white/85 leading-relaxed mb-6">
-                  Aliniem adresa imobilului din cartea funciară cu nomenclatorul stradal actual. Depunem
-                  cererea la OCPI și ne ocupăm de tot procesul, fără deplasare la ghișeu.
+                  Aducem adresa imobilului din cartea funciară la zi cu nomenclatorul stradal. Pregătim și
+                  depunem cererea la OCPI, apoi ne ocupăm de tot procesul. Nu trebuie să mergi la ghișeu.
                 </p>
 
                 {/* USP */}
@@ -534,7 +536,7 @@ export default async function ActualizareAdresaCfPage() {
             { q: 'Cine poate cere actualizarea adresei?', a: 'Proprietarul imobilului sau o persoană împuternicită de acesta. Ne ocupăm noi de pregătirea și depunerea cererii la OCPI în numele tău.' },
             { q: 'Am nevoie de cont ANCPI?', a: 'Nu. Ne ocupăm noi de tot procesul; tu ai nevoie doar de numărul de carte funciară sau cadastral și de adresa corectă.' },
             { q: 'Nu știu numărul de carte funciară. Ce fac?', a: 'Îl putem afla după adresă prin serviciul de Identificare Imobil, apoi pregătim cererea de actualizare a adresei.' },
-            { q: 'Ce primesc la final?', a: 'Primești pe email confirmarea că adresa a fost actualizată în cartea funciară. La cerere, putem elibera și un extras de carte funciară în care apare adresa corectată.' },
+            { q: 'Ce primesc la final?', a: 'Primești pe email încheierea de carte funciară prin care OCPI confirmă modificarea, împreună cu un extras de carte funciară în care apare adresa corectată și factura. La cerere, putem trimite documentele și pe WhatsApp.' },
           ]}
         />
 

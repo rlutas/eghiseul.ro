@@ -38,8 +38,9 @@ const PAGE_PATH = '/servicii/copie-plan-cadastral/';
 const SCHEMA_SLUG = 'copie-plan-cadastral';
 const TITLE = 'Copie Plan Cadastral din Arhiva OCPI (ANCPI)';
 const DESCRIPTION =
-  'Copie certificată a planului cadastral din arhiva OCPI — planul de situație înregistrat la recepția ' +
-  'cadastrală, după numărul cadastral sau de carte funciară. Taxe OCPI incluse, 100% online, livrare pe email.';
+  'Copie certificată a planului cadastral din arhiva OCPI: planul de situație înregistrat la recepția ' +
+  'cadastrală, obținut după numărul cadastral sau de carte funciară. Taxe OCPI incluse, fără cont ANCPI, ' +
+  'livrare pe email.';
 const DATE_PUBLISHED = '2026-06-25';
 const DATE_MODIFIED = '2026-06-25';
 
@@ -71,9 +72,9 @@ const jsonLdGraph = buildServicePageGraph({
   slug: SCHEMA_SLUG,
   name: 'Copie Plan Cadastral',
   description:
-    'Serviciu de obținere a copiei certificate a planului cadastral din arhiva OCPI / ANCPI — planul de ' +
-    'situație înregistrat la recepția cadastrală a imobilului, util pentru documentații tehnice și dosare. ' +
-    '100% online, fără cont ANCPI, livrare pe email.',
+    'Serviciu de obținere a copiei certificate a planului cadastral din arhiva OCPI / ANCPI: planul de ' +
+    'situație înregistrat la recepția cadastrală a imobilului, util pentru documentații tehnice, autorizații ' +
+    'și dosare notariale. Online, fără cont ANCPI, livrare pe email.',
   serviceType: 'Document Processing — Real Estate',
   datePublished: DATE_PUBLISHED,
   dateModified: DATE_MODIFIED,
@@ -112,9 +113,9 @@ export default async function CopiePlanCadastralPage() {
 
   const useCases = [
     { icon: Ruler, title: 'Documentații tehnice', items: ['Plan de situație', 'Limitele recepționate', 'Suport pentru topograf'] },
-    { icon: Home, title: 'Dosare & avize', items: ['Dosar notarial', 'Certificat de urbanism', 'Autorizație de construire'] },
-    { icon: ScrollText, title: 'Comparare cu terenul', items: ['Situația din arhivă', 'Verificare limite', 'Litigii vecinătate'] },
-    { icon: Layers, title: 'Proiectare & arhivă', items: ['Date pentru proiectare', 'Istoricul recepției', 'Copie de referință'] },
+    { icon: Home, title: 'Dosare & avize', items: ['Dosar notarial', 'Certificat de urbanism', 'Autorizație construire/demolare'] },
+    { icon: ScrollText, title: 'Comparare cu terenul', items: ['Situația din arhivă', 'Verificare limite', 'Litigii de vecinătate'] },
+    { icon: Layers, title: 'Proiectare & utilități', items: ['Date pentru proiectare', 'Racordări la utilități', 'Istoricul recepției'] },
   ];
 
   return (
@@ -169,17 +170,17 @@ export default async function CopiePlanCadastralPage() {
                 </h1>
 
                 <p className="text-lg sm:text-xl text-white/85 leading-relaxed mb-6">
-                  Copia certificată a planului cadastral înregistrat la recepția imobilului, direct din arhiva
-                  OCPI / ANCPI. O obții după numărul cadastral sau de carte funciară.
+                  Copia certificată a planului cadastral înregistrat la recepția imobilului, scoasă din arhiva
+                  OCPI / ANCPI. O ceri după numărul cadastral sau de carte funciară, fără drum la ghișeu.
                 </p>
 
                 {/* USP */}
                 <div className="flex items-start gap-3 rounded-xl bg-primary-500/15 border border-primary-500/40 p-4 mb-6">
                   <ScrollText className="h-5 w-5 text-primary-500 flex-shrink-0 mt-0.5" />
                   <p className="text-white/95 text-sm sm:text-base leading-relaxed">
-                    Primești <strong className="text-primary-500">planul de situație din dosarul de cadastru</strong> —
-                    documentul de arhivă cu limitele și datele <strong>așa cum au fost recepționate</strong>, util
-                    pentru documentații tehnice, comparare cu terenul și dosare.
+                    Primești <strong className="text-primary-500">planul de situație din dosarul de cadastru</strong>,
+                    documentul de arhivă cu limitele și datele <strong>așa cum au fost recepționate</strong>. Îți este
+                    de folos la documentații tehnice, dosare notariale și la verificarea limitelor față de teren.
                   </p>
                 </div>
 
@@ -304,27 +305,29 @@ export default async function CopiePlanCadastralPage() {
             <div className="space-y-4 text-neutral-700 leading-relaxed">
               <p>
                 <strong>Copia planului cadastral</strong> este reproducerea certificată a{' '}
-                <strong>planului de situație</strong> înregistrat la recepția cadastrală a imobilului, eliberată din
-                <strong> arhiva Oficiului de Cadastru și Publicitate Imobiliară (OCPI / ANCPI)</strong>. Practic, este
+                <strong>planului de situație</strong> înregistrat la recepția cadastrală a imobilului, eliberată din{' '}
+                <strong>arhiva Oficiului de Cadastru și Publicitate Imobiliară (OCPI / ANCPI)</strong>. Pe scurt, este
                 copia documentului care a stat la baza înscrierii imobilului în sistemul de cadastru: conturul, limitele
-                și datele tehnice <strong>așa cum au fost recepționate și arhivate</strong> de OCPI.
+                și datele tehnice <strong>așa cum au fost recepționate și arhivate</strong> de OCPI. Planul este
+                întocmit la scară (de regulă 1:500 sau 1:1000 în intravilan și 1:2000 sau 1:5000 în extravilan).
               </p>
               <p>
-                Este folosită pentru <strong>documentații tehnice</strong>, dosare notariale, certificate de urbanism,
-                proiectare, precum și pentru <strong>compararea situației din arhivă cu situația din teren</strong>.
-                Prin eGhișeul o obții online, fără cont ANCPI și fără deplasare la ghișeul OCPI — un operator depune
-                cererea în numele tău, achită taxele OCPI și îți trimite copia pe email.
+                O ceri pentru <strong>documentații tehnice</strong>, dosare notariale, certificate de urbanism,
+                autorizații de construire sau demolare, racordări la utilități și proiectare, dar și ca să compari
+                <strong> situația din arhivă cu situația din teren</strong>. Prin eGhișeul o obții online, fără cont
+                ANCPI și fără drum la ghișeul OCPI: un operator depune cererea în numele tău, achită taxele OCPI și îți
+                trimite copia pe email.
               </p>
               <div className="rounded-2xl border border-neutral-200 bg-white p-5">
                 <h3 className="font-bold text-secondary-900 mb-2">
                   Copie plan cadastral vs. extras de plan cadastral pe ortofotoplan
                 </h3>
                 <p className="text-sm text-neutral-700">
-                  <strong>Copia planului cadastral</strong> = reproducerea documentului de arhivă (planul de situație
-                  înregistrat la recepție).{' '}
-                  <strong>Extrasul de plan cadastral</strong> = reprezentarea imobilului la zi, pe ortofotoplan
-                  (imagine aeriană georeferențiată). Primul arată ce s-a depus și recepționat, al doilea arată poziția
-                  pe harta cadastrală curentă.{' '}
+                  <strong>Copia planului cadastral</strong> reproduce documentul de arhivă, adică planul de situație
+                  înregistrat la recepție.{' '}
+                  <strong>Extrasul de plan cadastral</strong> arată imobilul la zi, pe ortofotoplan (imagine aeriană
+                  georeferențiată). Primul îți spune ce s-a depus și recepționat, al doilea îți arată poziția pe harta
+                  cadastrală curentă.{' '}
                   <Link href={serviceUrl('extras-plan-cadastral')} className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
                     Vezi extrasul de plan cadastral pe ortofotoplan
                   </Link>
@@ -338,8 +341,8 @@ export default async function CopiePlanCadastralPage() {
               <p>
                 Documentul reproduce <strong>planul de situație din dosarul de cadastru</strong>: conturul parcelei,
                 dimensiunile și limitele recepționate, numărul cadastral, suprafața și, după caz, poziția construcțiilor.
-                Spre deosebire de harta interactivă de pe geoportalul ANCPI — care are caracter informativ — copia din
-                arhivă este un <strong>document OCPI / ANCPI</strong> certificat, livrat în format electronic pe email.
+                Harta interactivă de pe geoportalul ANCPI are doar caracter informativ. Copia din arhivă este un{' '}
+                <strong>document OCPI / ANCPI</strong> certificat, livrat în format electronic pe email.
               </p>
               <p>
                 Pentru multe proceduri ai nevoie atât de planul cadastral, cât și de situația juridică a imobilului. Dacă
@@ -518,14 +521,14 @@ export default async function CopiePlanCadastralPage() {
           title="Întrebări Frecvente — Copie Plan Cadastral"
           faqs={[
             { q: 'Ce este copia planului cadastral?', a: 'Este reproducerea certificată a planului de situație înregistrat la recepția cadastrală a imobilului, eliberată din arhiva OCPI/ANCPI. Reflectă conturul, limitele și datele tehnice așa cum au fost recepționate și arhivate.' },
-            { q: 'Cu ce diferă de extrasul de plan cadastral pe ortofotoplan?', a: 'Copia planului cadastral reproduce documentul de arhivă (planul de situație depus la recepție), în timp ce extrasul de plan cadastral arată imobilul la zi, pe ortofotoplan (imagine aeriană georeferențiată). Primul arată ce s-a recepționat, al doilea arată poziția pe harta cadastrală curentă.' },
-            { q: 'Ce conține documentul?', a: 'Conturul parcelei, dimensiunile și limitele recepționate, numărul cadastral, suprafața și, după caz, poziția construcțiilor — adică planul de situație din dosarul de cadastru.' },
-            { q: 'La ce îmi folosește?', a: 'Pentru documentații tehnice, dosare notariale, certificate de urbanism, proiectare și pentru compararea situației din arhivă cu situația din teren.' },
+            { q: 'Cu ce diferă de extrasul de plan cadastral pe ortofotoplan?', a: 'Copia planului cadastral reproduce documentul de arhivă (planul de situație depus la recepție), iar extrasul de plan cadastral arată imobilul la zi, pe ortofotoplan (imagine aeriană georeferențiată). Primul îți spune ce s-a recepționat, al doilea îți arată poziția pe harta cadastrală curentă.' },
+            { q: 'Ce conține documentul?', a: 'Conturul parcelei, dimensiunile și limitele recepționate, numărul cadastral, suprafața și, după caz, poziția construcțiilor. Practic, este planul de situație din dosarul de cadastru, întocmit la scară (de regulă 1:500 sau 1:1000 în intravilan și 1:2000 sau 1:5000 în extravilan).' },
+            { q: 'La ce îmi folosește?', a: 'La documentații tehnice, dosare notariale, certificate de urbanism, autorizații de construire sau demolare, racordări la utilități și proiectare. Tot cu el compari situația din arhivă cu cea din teren.' },
             { q: 'Cât costă copia planului cadastral?', a: `${service.base_price} RON, cu taxele OCPI incluse. Fără costuri ascunse.` },
-            { q: 'Cât durează eliberarea?', a: `${formatEstimatedDays(service)}. Cererea este depusă și procesată de un operator, iar documentul este livrat pe email.` },
-            { q: 'Nu știu numărul cadastral. Ce fac?', a: 'Îl putem afla după adresă prin serviciul de Identificare Imobil, apoi îți eliberăm copia planului cadastral.' },
-            { q: 'Am nevoie de cont ANCPI?', a: 'Nu. Ne ocupăm noi de tot procesul; tu ai nevoie doar de numărul cadastral sau de carte funciară.' },
-            { q: 'Cât timp este valabilă copia?', a: 'Copia reflectă situația din arhivă la momentul eliberării. Dacă imobilul a suferit modificări (dezmembrare, alipire, actualizări), poate fi necesar un document mai recent; pentru poziția la zi îți recomandăm extrasul de plan cadastral pe ortofotoplan.' },
+            { q: 'Cât durează eliberarea?', a: `${formatEstimatedDays(service)}. Cererea este depusă și procesată de un operator, iar documentul ajunge la tine pe email.` },
+            { q: 'Nu știu numărul cadastral. Ce fac?', a: 'Îl aflăm noi după adresă, prin serviciul de Identificare Imobil, apoi îți eliberăm copia planului cadastral pentru terenul găsit.' },
+            { q: 'Am nevoie de cont ANCPI?', a: 'Nu. Ne ocupăm noi de tot procesul. Tu ne dai numărul cadastral sau de carte funciară.' },
+            { q: 'Cât timp este valabilă copia?', a: 'Copia reflectă situația din arhivă la momentul eliberării. Dacă imobilul a suferit modificări (dezmembrare, alipire sau actualizări), s-ar putea să ai nevoie de un document mai recent. Pentru poziția la zi îți recomandăm extrasul de plan cadastral pe ortofotoplan.' },
           ]}
         />
 

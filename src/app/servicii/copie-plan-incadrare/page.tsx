@@ -37,9 +37,9 @@ const PAGE_PATH = '/servicii/copie-plan-incadrare/';
 const SCHEMA_SLUG = 'copie-plan-incadrare';
 const TITLE = 'Copie Plan de Încadrare în Zonă din Arhiva OCPI';
 const DESCRIPTION =
-  'Copie a planului de încadrare în zonă din arhiva OCPI — vezi poziția imobilului în contextul ' +
-  'zonei și al cvartalului, după numărul cadastral sau de carte funciară. Taxe incluse, 100% online, ' +
-  'livrare pe email, fără cont ANCPI.';
+  'Comandă copia planului de încadrare în zonă din arhiva OCPI. Vezi unde se află imobilul în zonă ' +
+  'și în cvartal, după numărul cadastral sau de carte funciară. Taxe incluse, online, livrare pe ' +
+  'email, fără cont ANCPI.';
 const DATE_PUBLISHED = '2026-06-25';
 const DATE_MODIFIED = '2026-06-25';
 
@@ -71,9 +71,9 @@ const jsonLdGraph = buildServicePageGraph({
   slug: SCHEMA_SLUG,
   name: 'Copie Plan de Încadrare',
   description:
-    'Serviciu de obținere a copiei planului de încadrare în zonă din arhiva OCPI — planul la scară mică ' +
-    'care arată poziția imobilului în contextul zonei și al cvartalului, parte din documentația cadastrală. ' +
-    '100% online, fără cont ANCPI, livrare pe email.',
+    'Serviciu de obținere a copiei planului de încadrare în zonă din arhiva OCPI. Planul la scară mică ' +
+    'arată poziția imobilului în zonă și în cvartal și face parte din documentația cadastrală. ' +
+    'Online, fără cont ANCPI, livrare pe email.',
   serviceType: 'Document Processing — Real Estate',
   datePublished: DATE_PUBLISHED,
   dateModified: DATE_MODIFIED,
@@ -111,10 +111,10 @@ export default async function CopiePlanIncadrarePage() {
   ];
 
   const useCases = [
-    { icon: MapIcon, title: 'Localizezi imobilul în zonă', items: ['Poziția în cvartal', 'Context urban/rural', 'Repere și vecinătăți'] },
-    { icon: Home, title: 'Construcții & autorizații', items: ['Documentații tehnice', 'Autorizație de construire', 'Certificat de urbanism'] },
-    { icon: Ruler, title: 'Proiectare & cadastru', items: ['Planuri la scară mică', 'Suport pentru proiectanți', 'Documentație cadastrală'] },
-    { icon: ScrollText, title: 'Dosare & avize', items: ['Dosar la primărie', 'Avize și acorduri', 'Dosar notarial'] },
+    { icon: MapIcon, title: 'Localizezi imobilul în zonă', items: ['Poziția în cvartal', 'Context urban sau rural', 'Repere și vecinătăți'] },
+    { icon: Home, title: 'Construcție și autorizare', items: ['Certificat de urbanism', 'Autorizație de construire', 'Autorizație de demolare'] },
+    { icon: Ruler, title: 'Proiectare și cadastru', items: ['Planuri la scară mică', 'Suport pentru proiectanți', 'Documentație cadastrală'] },
+    { icon: ScrollText, title: 'Bancă și utilități', items: ['Dosar de credit bancar', 'Racordare la utilități', 'Avize și acorduri'] },
   ];
 
   return (
@@ -169,17 +169,17 @@ export default async function CopiePlanIncadrarePage() {
                 </h1>
 
                 <p className="text-lg sm:text-xl text-white/85 leading-relaxed mb-6">
-                  Planul la scară mică ce arată poziția imobilului în contextul zonei și al cvartalului,
-                  copie din arhiva OCPI. Îl găsești după numărul cadastral sau de carte funciară.
+                  Planul la scară mică arată unde se află imobilul în zonă și în cvartal, împreună cu
+                  terenurile din jur. Comanzi copia din arhiva OCPI după numărul cadastral sau de carte funciară.
                 </p>
 
                 {/* USP */}
                 <div className="flex items-start gap-3 rounded-xl bg-primary-500/15 border border-primary-500/40 p-4 mb-6">
                   <MapIcon className="h-5 w-5 text-primary-500 flex-shrink-0 mt-0.5" />
                   <p className="text-white/95 text-sm sm:text-base leading-relaxed">
-                    Vezi exact <strong className="text-primary-500">unde se încadrează imobilul în zonă</strong> —
-                    util pentru <strong>documentații tehnice, certificat de urbanism și autorizație de
-                    construire</strong>, precum și pentru proiectare.
+                    Vezi <strong className="text-primary-500">unde se încadrează imobilul în zonă</strong>.
+                    Planul este cerut la <strong>certificatul de urbanism, autorizația de construire</strong> și
+                    în proiectare.
                   </p>
                 </div>
 

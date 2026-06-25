@@ -305,17 +305,16 @@ export default async function IdentificareImobileProprietarPage() {
             <div className="space-y-4 text-neutral-700 leading-relaxed">
               <p>
                 <strong>Identificarea imobilelor după proprietar</strong> înseamnă să afli ce terenuri și
-                construcții deține o anumită persoană — fizică sau juridică — pornind de la{' '}
-                <strong>numele proprietarului</strong>, nu de la numărul cadastral sau de la adresă. Căutăm în
-                evidențele de <strong>cadastru și carte funciară</strong>, la nivel de localitate și județ, și
+                construcții deține o persoană, fizică sau juridică, pornind de la{' '}
+                <strong>numele proprietarului</strong> și nu de la numărul cadastral sau de la adresă. Căutăm în
+                evidențele de <strong>cadastru și carte funciară</strong>, la nivel de localitate și județ, apoi
                 îți întocmim lista imobilelor înscrise pe numele indicat.
               </p>
               <p>
-                Spre deosebire de un extras de carte funciară clasic — unde pornești de la un imobil cunoscut și
-                afli cine este proprietarul — aici procesul este invers: pornești de la o{' '}
-                <strong>persoană</strong> și afli ce imobile are. Este o căutare pe care o pot face proprietarii,
-                moștenitorii, creditorii, avocații sau cumpărătorii care vor să verifice patrimoniul cuiva
-                înainte de o decizie importantă.
+                La un extras de carte funciară obișnuit pornești de la un imobil cunoscut și afli cine este
+                proprietarul. Aici procesul este invers: pleci de la o <strong>persoană</strong> și afli ce
+                imobile are. Este o căutare utilă proprietarilor, moștenitorilor, creditorilor, avocaților sau
+                cumpărătorilor care vor să verifice patrimoniul cuiva înainte de o decizie importantă.
               </p>
 
               <div className="rounded-2xl border border-neutral-200 bg-white p-5">

@@ -38,8 +38,8 @@ const PAGE_PATH = '/servicii/copie-arhiva-ocpi/';
 const SCHEMA_SLUG = 'copie-arhiva-ocpi';
 const TITLE = 'Copie Certificată din Arhiva OCPI — Documentație Cadastrală';
 const DESCRIPTION =
-  'Copie certificată din arhiva teritorială OCPI/BCPI: memoriu tehnic, planuri și actele care au stat ' +
-  'la baza înscrierii imobilului. După numărul cadastral sau de carte funciară. Taxe OCPI incluse, 100% online, livrare pe email.';
+  'Obții o copie certificată din arhiva teritorială OCPI/BCPI: memoriu tehnic, planuri și înscrisurile care au stat ' +
+  'la baza intabulării imobilului. Cauți după numărul cadastral sau de carte funciară, cu taxele OCPI incluse. Totul online, livrare pe email.';
 const DATE_PUBLISHED = '2026-06-25';
 const DATE_MODIFIED = '2026-06-25';
 
@@ -71,9 +71,9 @@ const jsonLdGraph = buildServicePageGraph({
   slug: SCHEMA_SLUG,
   name: 'Copie certificată din arhiva OCPI',
   description:
-    'Serviciu de obținere a unei copii certificate din arhiva teritorială OCPI/BCPI — documentația ' +
-    'cadastrală depusă pentru un imobil (memoriu tehnic, planuri, piese scrise care au stat la baza ' +
-    'înscrierii). 100% online, fără cont ANCPI, livrare pe email.',
+    'Serviciu prin care obții o copie certificată din arhiva teritorială OCPI/BCPI, adică documentația ' +
+    'cadastrală depusă pentru un imobil: memoriu tehnic, planuri și piese scrise care au stat la baza ' +
+    'înscrierii. Online, fără cont ANCPI, livrare pe email.',
   serviceType: 'Document Processing — Real Estate',
   datePublished: DATE_PUBLISHED,
   dateModified: DATE_MODIFIED,
@@ -111,10 +111,10 @@ export default async function CopieArhivaOcpiPage() {
   ];
 
   const useCases = [
-    { icon: ScrollText, title: 'Reconstituire acte pierdute', items: ['Documentație cadastrală pierdută', 'Memoriu tehnic lipsă', 'Piese din dosarul depus'] },
-    { icon: Layers, title: 'Dosare juridice', items: ['Litigii de proprietate', 'Succesiuni & partaje', 'Probe pentru instanță'] },
-    { icon: Ruler, title: 'Completare documentații', items: ['Dezmembrare/alipire', 'Reactualizare cadastrală', 'Avize & autorizații'] },
-    { icon: Search, title: 'Verificare istoric & due diligence', items: ['Istoricul înscrierilor', 'Verificare înainte de cumpărare', 'Audit imobiliar'] },
+    { icon: ScrollText, title: 'Reconstituirea pieselor pierdute', items: ['Documentație cadastrală rătăcită', 'Memoriu tehnic lipsă', 'Piese din dosarul depus'] },
+    { icon: Layers, title: 'Dosare juridice', items: ['Litigii de proprietate', 'Succesiuni și partaje', 'Probe pentru instanță'] },
+    { icon: Ruler, title: 'Completarea documentațiilor', items: ['Dezmembrare sau alipire', 'Reactualizare cadastrală', 'Avize și autorizații'] },
+    { icon: Search, title: 'Verificare istoric și due diligence', items: ['Istoricul înscrierilor', 'Verificare înainte de cumpărare', 'Audit imobiliar'] },
   ];
 
   return (
@@ -169,8 +169,8 @@ export default async function CopieArhivaOcpiPage() {
                 </h1>
 
                 <p className="text-lg sm:text-xl text-white/85 leading-relaxed mb-6">
-                  Recuperăm pentru tine orice piesă din dosarul cadastral depus la OCPI/BCPI — memoriu tehnic,
-                  planuri și piesele scrise care au stat la baza înscrierii imobilului.
+                  Îți recuperăm orice piesă din dosarul cadastral depus la OCPI/BCPI: memoriul tehnic,
+                  planurile și înscrisurile care au stat la baza intabulării imobilului.
                 </p>
 
                 {/* USP */}
@@ -536,7 +536,7 @@ export default async function CopieArhivaOcpiPage() {
             { q: 'Nu știu numărul cadastral. Ce fac?', a: 'Îl putem afla după adresă prin serviciul de Identificare Imobil, apoi căutăm dosarul în arhiva teritorială OCPI.' },
             { q: 'Am nevoie de cont ANCPI?', a: 'Nu. Ne ocupăm noi de tot procesul: identificarea dosarului, depunerea cererii și achitarea taxelor. Tu ai nevoie doar de numărul cadastral sau de carte funciară.' },
             { q: 'Nu știu exact ce piesă îmi trebuie. Cum procedez?', a: 'Ne spui scopul (reconstituire, dosar juridic, completare documentație) și te ghidăm noi spre piesele necesare. Ne poți scrie pe WhatsApp pentru o recomandare rapidă înainte de comandă.' },
-            { q: 'Pot folosi copia într-un dosar la instanță sau la notar?', a: 'Da. Copia certificată de OCPI este des folosită ca probă în litigii de proprietate, succesiuni și partaje, precum și la notar pentru completarea dosarelor.' },
+            { q: 'Pot folosi copia într-un dosar la instanță sau la notar?', a: 'Da. Copia certificată de OCPI este folosită ca probă în litigii de proprietate, succesiuni și partaje, la notar pentru completarea dosarelor, dar și ca document justificativ pentru intabulare, autorizație de construire, certificat de urbanism sau credit bancar.' },
           ]}
         />
 

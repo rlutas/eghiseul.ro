@@ -37,8 +37,8 @@ const PAGE_PATH = '/servicii/extras-cf-colectiv/';
 const SCHEMA_SLUG = 'extras-cf-colectiv';
 const TITLE = 'Extras de Carte Funciară Colectivă (Bloc / Condominiu)';
 const DESCRIPTION =
-  'Extras de carte funciară colectivă pentru bloc sau condominiu — părțile comune și cotele indivize ale ' +
-  'construcției, distinct de CF individuală a apartamentului. Taxe OCPI incluse, 100% online, livrare pe email, fără cont ANCPI.';
+  'Cartea funciară a blocului sau condominiului: părțile comune și cotele indivize ale construcției, ' +
+  'document separat de extrasul CF al apartamentului. Taxe OCPI incluse, 100% online, livrare pe email, fără cont ANCPI.';
 const DATE_PUBLISHED = '2026-06-25';
 const DATE_MODIFIED = '2026-06-25';
 
@@ -70,7 +70,7 @@ const jsonLdGraph = buildServicePageGraph({
   slug: SCHEMA_SLUG,
   name: 'Extras de Carte Funciară Colectivă',
   description:
-    'Serviciu de obținere a extrasului de carte funciară colectivă de la OCPI/ANCPI — cartea funciară a ' +
+    'Obținerea extrasului de carte funciară colectivă de la OCPI/ANCPI, adică a cărții funciare a ' +
     'construcției-condominiu (bloc), care cuprinde părțile comune și cotele indivize aferente fiecărui apartament. ' +
     '100% online, fără cont ANCPI, livrare pe email.',
   serviceType: 'Document Processing — Real Estate',
@@ -168,8 +168,9 @@ export default async function ExtrasCfColectivPage() {
                 </h1>
 
                 <p className="text-lg sm:text-xl text-white/85 leading-relaxed mb-6">
-                  Cartea funciară a întregii construcții-condominiu (blocul), cu părțile comune și cotele
-                  indivize — distinctă de CF individuală a apartamentului. O obții 100% online, fără cont ANCPI.
+                  Cartea funciară a întregii construcții-condominiu, adică a blocului, cu părțile comune și
+                  cotele indivize. Este un document separat de cartea funciară a apartamentului tău. O obții
+                  100% online, fără cont ANCPI.
                 </p>
 
                 {/* USP */}
@@ -304,7 +305,7 @@ export default async function ExtrasCfColectivPage() {
               <p>
                 <strong>Extrasul de carte funciară colectivă</strong> este extrasul CF al imobilului-bloc, adică
                 al întregii <strong>construcții-condominiu</strong> în care se află apartamentul tău. Spre deosebire
-                de cartea funciară individuală — care descrie un singur apartament și proprietarul lui — cartea
+                de cartea funciară individuală, care descrie un singur apartament și proprietarul lui, cartea
                 funciară colectivă cuprinde <strong>părțile comune</strong> ale blocului (fundație, structură,
                 acoperiș, casa scării, lift, terenul de sub bloc) și <strong>cotele indivize</strong> care revin
                 fiecărui apartament din aceste părți comune.
@@ -332,7 +333,7 @@ export default async function ExtrasCfColectivPage() {
                   <strong>CF colectivă</strong> = cartea funciară a întregului bloc (părțile comune și cotele
                   indivize ale construcției-condominiu). <strong>CF individuală</strong> = cartea funciară a unui
                   singur apartament (proprietar, suprafață utilă, sarcini). Sunt documente complementare — pentru
-                  o tranzacție completă ai de obicei nevoie de ambele.{' '}
+                  o tranzacție completă ai de obicei nevoie de amândouă.{' '}
                   <Link href={serviceUrl('extras-carte-funciara')} className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
                     Vezi extrasul de carte funciară individuală
                   </Link>
@@ -353,7 +354,7 @@ export default async function ExtrasCfColectivPage() {
               </p>
               <p>
                 Pentru a comanda extrasul colectiv ai nevoie de <strong>numărul de carte funciară colectivă</strong> sau
-                de <strong>numărul cadastral al blocului</strong> — atenție, acestea sunt diferite de numărul CF al
+                de <strong>numărul cadastral al blocului</strong>. Atenție, acestea sunt diferite de numărul CF al
                 apartamentului. Dacă deții doar datele apartamentului, numărul CF colectivă apare de regulă chiar în
                 extrasul individual al apartamentului, la rubrica de identificare a construcției.
               </p>
@@ -379,7 +380,7 @@ export default async function ExtrasCfColectivPage() {
                 Cum identifici blocul pentru extrasul CF colectivă
               </h2>
               <p className="text-neutral-600 max-w-2xl mx-auto">
-                Ai nevoie de un singur identificator al construcției — nu cel al apartamentului tău.
+                Ai nevoie de un singur identificator al construcției, nu cel al apartamentului tău.
               </p>
             </div>
 
@@ -414,7 +415,7 @@ export default async function ExtrasCfColectivPage() {
                 Când ai nevoie
               </span>
               <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-3">
-                Când Ai Nevoie de Extras CF Colectivă?
+                Când ai nevoie de extrasul CF colectivă
               </h2>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
