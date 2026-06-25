@@ -8,6 +8,7 @@
 
 import { useCallback, useState, useEffect } from 'react';
 import { useModularWizard } from '@/providers/modular-wizard-provider';
+import { SavedVehiclePicker } from './SavedVehiclePicker';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -169,6 +170,9 @@ export default function VehicleDataStep({ config, onValidChange }: VehicleDataSt
 
   return (
     <div className="space-y-6">
+      {/* Prefill din mașinile salvate (user logat) */}
+      <SavedVehiclePicker onPick={(v) => updateVehicle?.(v)} />
+
       {/* Vehicle Identification */}
       <Card>
         <CardHeader>

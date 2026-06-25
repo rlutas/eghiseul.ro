@@ -18,14 +18,14 @@ Bazat pe analiza a 3 agenți (zona /account, documente per comandă, fezabilitat
 - ✅ (legat) Urgent scos de unde nu există (migrația 080); footer/reviews/urgent pe paginile servicii.
 - ⏳ Spațiu alb sub header în /account — cauza = banda spacer-ului global (`header.tsx:570`, h-16/h-112) deasupra hero-ului dark. Necesită confirmare vizuală (hero bleed sub header).
 
-## Faza 2 — Prefill wizard (quick win, ~25h)
+## ✅ Faza 2 — Prefill wizard — DEJA IMPLEMENTAT (loadPrefillData + PREFILL_FROM_PROFILE în provider; auto pt user logat)
 API-ul există; lipsește integrarea în provider + steps.
 - `modular-wizard-provider`: `useEffect` fetch `/api/user/prefill-data` la init (user logat) + action `PREFILL_FROM_PROFILE`.
 - PersonalKYCStep: auto-fill CNP/nume/dată/loc naștere/adresă + badge „pre-completat".
 - KYC step: „Already Verified" + warning expirare.
 - Address/Property: dropdown adrese salvate.
 
-## Faza 3 — Mașini salvate + reminder (~45h)
+## ✅ Faza 3 — Mașini salvate — LIVRAT 2026-06-25 (migrația 082 + API + tab + wizard prefill). Vezi docs/features/saved-vehicles/. Reminder email = backlog.
 NU există tabel/UI.
 - Migrație: `user_saved_vehicles` (user_id, label, data JSONB {plateNumber, vin, brand, model, year, drivingLicense}, is_default).
 - API CRUD `/api/user/vehicles` + RLS.

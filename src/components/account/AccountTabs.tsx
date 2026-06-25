@@ -15,6 +15,7 @@ import {
   MapPin,
   CreditCard,
   Package,
+  Car,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import ProfileTab from './ProfileTab';
@@ -22,8 +23,9 @@ import KYCTab from './KYCTab';
 import AddressesTab from './AddressesTab';
 import BillingTab from './BillingTab';
 import OrdersTab from './OrdersTab';
+import VehiclesTab from './VehiclesTab';
 
-type TabId = 'profile' | 'kyc' | 'addresses' | 'billing' | 'orders';
+type TabId = 'profile' | 'kyc' | 'addresses' | 'vehicles' | 'billing' | 'orders';
 
 interface Tab {
   id: TabId;
@@ -36,6 +38,7 @@ const TABS: Tab[] = [
   { id: 'profile', label: 'Profil', labelShort: 'Profil', icon: User },
   { id: 'kyc', label: 'Verificare KYC', labelShort: 'KYC', icon: Shield },
   { id: 'addresses', label: 'Adrese', labelShort: 'Adrese', icon: MapPin },
+  { id: 'vehicles', label: 'Mașinile mele', labelShort: 'Mașini', icon: Car },
   { id: 'billing', label: 'Facturare', labelShort: 'Facturare', icon: CreditCard },
   { id: 'orders', label: 'Comenzi', labelShort: 'Comenzi', icon: Package },
 ];
@@ -69,6 +72,8 @@ export default function AccountTabs({ initialTab = 'profile', className }: Accou
         return <KYCTab />;
       case 'addresses':
         return <AddressesTab />;
+      case 'vehicles':
+        return <VehiclesTab />;
       case 'billing':
         return <BillingTab />;
       case 'orders':
