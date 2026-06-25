@@ -21,3 +21,7 @@ PDF-ul RO CEI e document JUSTIFICATIV pentru adresă; OCR-ul (auto-completare ad
 Bug: dacă OCR-ul RO CEI reușea (≥50%), intra în branch-ul principal care suprascria nume/CNP/dată cu datele din PDF. Dacă PDF-ul era al ALTEI persoane (alt buletin), datele de pe actul de identitate erau înlocuite tăcut cu cele din PDF.
 
 Fix: `ro_cei_reader_pdf` are acum branch dedicat (primul): NU atinge identitatea (nume/CNP/dată vin din actul de identitate, autoritar); face **cross-check CNP** — dacă CNP-ul din PDF diferă de cel din act → eroare „Documentul (RO CEI) nu corespunde cu actul de identitate — CNP diferit"; dacă se potrivește (sau OCR n-a citit CNP) → stochează PDF-ul + pre-completează DOAR adresa.
+
+## Update 3 — Confirmare compactă adresă + admin
+- Adresa de domiciliu, când e auto-completată (din RO CEI sau scan CI), se arată ca **rezumat compact read-only** (card verde + textul adresei) cu buton „Editează", nu ca formular gol. Dacă OCR-ul ratează adresa → câmpuri editabile direct (clientul o scrie manual). Răspunde la „are rost s-o arătăm?": da — verificare + fallback OCR.
+- **Admin:** ro_cei era deja stocat în `uploadedDocuments` + arătat ca „PDF RO CEI Reader (dovada domiciliu)" + descărcabil (`extractClientDocuments`). Confirmat — echipa îl vede.
