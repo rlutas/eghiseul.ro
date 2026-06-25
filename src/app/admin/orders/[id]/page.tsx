@@ -67,6 +67,7 @@ import {
   RotateCcw,
   Camera,
   MessageCircle,
+  Handshake,
 } from 'lucide-react';
 
 // ---------- Types ----------
@@ -3007,6 +3008,25 @@ function ProcessingSection({
                 </div>
               );
             })}
+
+            {/* Documents uploaded by a collaborator (topograf) */}
+            {documents.filter(d => d.type === 'collaborator-document').map(doc => (
+              <div key={doc.id} className="flex items-center justify-between py-2 px-3 rounded-lg border border-primary-200 bg-primary-50 text-sm">
+                <div className="flex items-center gap-2 min-w-0">
+                  <Handshake className="h-4 w-4 text-primary-600 shrink-0" />
+                  <span className="font-medium truncate">Document de la colaborator</span>
+                  <span className="text-xs text-neutral-500 truncate">{doc.file_name}</span>
+                </div>
+                <div className="flex items-center gap-1 shrink-0">
+                  <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => handlePreviewDocument(doc)}>
+                    <Eye className="h-3 w-3" /><span className="ml-1">Previzualizare</span>
+                  </Button>
+                  <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => handleDownloadDocument(doc)} disabled={downloadingDoc === doc.id}>
+                    {downloadingDoc === doc.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Download className="h-3 w-3" />}<span className="ml-1">Descarca</span>
+                  </Button>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 

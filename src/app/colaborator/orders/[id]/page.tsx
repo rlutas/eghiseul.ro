@@ -46,6 +46,8 @@ export default function CollaboratorOrderDetail() {
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [releasing, setReleasing] = useState(false);
+  const [note, setNote] = useState('');
+  const [savingNote, setSavingNote] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const load = async () => {
@@ -81,6 +83,26 @@ export default function CollaboratorOrderDetail() {
     } finally {
       setUploading(false);
       if (fileRef.current) fileRef.current.value = '';
+    }
+  };
+
+  const handleAddNote = async () => {
+    if (!note.trim()) return;
+    setSavingNote(true);
+    try {
+      const res = await fetch(`/api/collaborator/orders/${orderId}/note`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ note: note.trim() }),
+      });
+      const json = await res.json();
+      if (!json.success) throw new Error(json.error || 'Eroare');
+      toast.success('Notă adăugată — vizibilă echipei în istoricul comenzii.');
+      setNote('');
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Eroare');
+    } finally {
+      setSavingNote(false);
     }
   };
 
@@ -176,6 +198,24 @@ export default function CollaboratorOrderDetail() {
             ))}
           </ul>
         )}
+      </div>
+
+      {/* Note for the team */}
+      <div className="mb-6 rounded-lg border border-slate-200 bg-white p-5">
+        <h2 className="mb-2 text-sm font-semibold text-slate-900">Notă pentru echipă</h2>
+        <p className="mb-3 text-xs text-slate-500">Ex: nr. înregistrare, observații, dacă lipsește ceva. Apare în istoricul comenzii în admin.</p>
+        <textarea
+          value={note}
+          onChange={(e) => setNote(e.target.value)}
+          rows={3}
+          placeholder="Scrie o notă pentru echipă..."
+          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/30"
+        />
+        <div className="mt-2 flex justify-end">
+          <Button onClick={handleAddNote} disabled={savingNote || !note.trim()} variant="outline" size="sm">
+            {savingNote ? 'Se salvează...' : 'Adaugă notă'}
+          </Button>
+        </div>
       </div>
 
       {/* Actions */}
