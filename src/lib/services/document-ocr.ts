@@ -1312,8 +1312,17 @@ export function parseGeminiOCRResponse(
   rawText: string,
   documentType: DocumentType,
 ): OCRResult {
-  const jsonMatch = rawText.match(/\{[\s\S]*\}/);
-  if (!jsonMatch) {
+  // Curăță fence-urile markdown (```json ... ```) pe care Gemini le adaugă des,
+  // apoi extrage primul JSON — fie OBIECT {...}, fie ARRAY [{...}] (Gemini
+  // întoarce uneori un array cu un singur element). Înainte prindeam doar `{...}`,
+  // iar pe array luam o felie greșită → JSON.parse pica → confidence 0.
+  const cleaned = rawText.replace(/```(?:json)?/gi, '').trim();
+  const objMatch = cleaned.match(/\{[\s\S]*\}/);
+  const arrMatch = cleaned.match(/\[[\s\S]*\]/);
+  // Preferă structura care începe prima în text.
+  const useArray = !!arrMatch && (!objMatch || arrMatch.index! < objMatch.index!);
+  const jsonStr = useArray ? arrMatch![0] : objMatch?.[0];
+  if (!jsonStr) {
     return createErrorResult(
       documentType,
       'Nu s-a putut procesa documentul',
@@ -1329,7 +1338,9 @@ export function parseGeminiOCRResponse(
     suggestions?: string[];
   };
   try {
-    parsed = JSON.parse(jsonMatch[0]);
+    const raw = JSON.parse(jsonStr);
+    // Dacă Gemini a întors un array, ia primul element.
+    parsed = Array.isArray(raw) ? raw[0] : raw;
   } catch {
     return createErrorResult(
       documentType,
