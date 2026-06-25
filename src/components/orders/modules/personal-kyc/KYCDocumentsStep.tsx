@@ -273,8 +273,10 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
 
   const [showErrors, setShowErrors] = useState(false);
   const errorRef = useRef<HTMLDivElement>(null);
+  // Vezi nota din PersonalDataStep: reacționăm doar la incrementări de pe ACEST pas.
+  const validationBaselineRef = useRef(validationAttempt);
   useEffect(() => {
-    if (validationAttempt > 0 && !isValid()) {
+    if (validationAttempt > validationBaselineRef.current && !isValid()) {
       setShowErrors(true);
       setTimeout(() => errorRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 60);
     }

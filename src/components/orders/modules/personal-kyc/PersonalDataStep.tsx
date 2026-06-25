@@ -840,8 +840,12 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
 
   const [showErrors, setShowErrors] = useState(false);
   const errorRef = useRef<HTMLDivElement>(null);
+  // Baseline = valoarea counter-ului GLOBAL la montarea pasului. Reacționăm DOAR
+  // la incrementări ulterioare (click „Continuă" pe ACEST pas), nu la valoarea
+  // moștenită de la un pas anterior → altfel banner-ul apărea direct la intrare.
+  const validationBaselineRef = useRef(validationAttempt);
   useEffect(() => {
-    if (validationAttempt > 0 && !isFormValid()) {
+    if (validationAttempt > validationBaselineRef.current && !isFormValid()) {
       setShowErrors(true);
       setTimeout(() => errorRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 60);
     }
