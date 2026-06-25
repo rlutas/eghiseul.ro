@@ -89,8 +89,8 @@ export function Header() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Hide header on admin routes (after all hooks)
-  if (pathname.startsWith('/admin')) {
+  // Hide header on admin + collaborator portal routes (after all hooks)
+  if (pathname.startsWith('/admin') || pathname.startsWith('/colaborator')) {
     return null;
   }
 

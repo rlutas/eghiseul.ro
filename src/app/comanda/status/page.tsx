@@ -43,6 +43,11 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; icon: typeof
 
   // Processing workflow
   processing: { label: 'În procesare', color: 'bg-blue-100 text-blue-800', icon: Package },
+  documents_generated: { label: 'Documente generate', color: 'bg-blue-100 text-blue-800', icon: FileText },
+  submitted_to_institution: { label: 'Depus la instituție', color: 'bg-indigo-100 text-indigo-800', icon: Truck },
+  document_received: { label: 'Document primit', color: 'bg-teal-100 text-teal-800', icon: CheckCircle },
+  extras_in_progress: { label: 'În lucru', color: 'bg-blue-100 text-blue-800', icon: Package },
+  document_ready: { label: 'Documentul este eliberat', color: 'bg-green-100 text-green-800', icon: CheckCircle },
   pending_documents: { label: 'Așteptăm documente', color: 'bg-orange-100 text-orange-800', icon: FileText },
   documents_prepared: { label: 'Documente pregătite', color: 'bg-indigo-100 text-indigo-800', icon: FileText },
   submitted_to_authority: { label: 'Depus la autorități', color: 'bg-indigo-100 text-indigo-800', icon: Truck },

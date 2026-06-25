@@ -14,17 +14,16 @@ import {
   Mail,
   Landmark,
   ScrollText,
-  Building2,
-  AlertTriangle,
-  UserSearch,
+  KeyRound,
+  Layers,
 } from 'lucide-react';
 import { Service, formatEstimatedDays } from '@/types/services';
 import { Footer } from '@/components/home/footer';
 import { ServiceFAQ } from '@/components/services/service-faq';
+import { ReviewsSection } from '@/components/services/reviews-section';
 import { MobileStickyCTA } from '@/components/services/mobile-sticky-cta';
 import { WhatsAppButton } from '@/components/services/whatsapp-button';
 import { GoogleReviewsBadge } from '@/components/services/google-reviews-badge';
-import { ReviewsSection } from '@/components/services/reviews-section';
 import { OrderButton } from '@/components/services/order-button';
 import { buildPageMetadata, buildServicePageGraph, BASE_URL, serviceUrl } from '@/lib/seo';
 import { getImobiliareServices } from '@/lib/services/imobiliare';
@@ -32,15 +31,15 @@ import { ServiceSwitcher } from '@/components/services/service-switcher';
 
 // New service — no WP legacy URL, so the folder name matches the DB slug and
 // serviceUrl() resolves to this page with no redirect/override needed.
-const SERVICE_SLUG = 'identificare-imobil';
-const PAGE_PATH = '/servicii/identificare-imobil/';
-const SCHEMA_SLUG = 'identificare-imobil';
-const TITLE = 'Număr Cadastral după Adresă — Îl Aflăm Noi | Extras CF';
+const SERVICE_SLUG = 'certificat-sarcini';
+const PAGE_PATH = '/servicii/certificat-sarcini/';
+const SCHEMA_SLUG = 'certificat-sarcini';
+const TITLE = 'Certificat de Sarcini — Verifică Grevările unui Imobil | OCPI';
 const DESCRIPTION =
-  'Ne dai adresa, îți aflăm numărul cadastral și de carte funciară din ANCPI ' +
-  'și primești extrasul CF pe email. 198 RON, taxe incluse, fără cont ANCPI.';
-const DATE_PUBLISHED = '2026-06-16';
-const DATE_MODIFIED = '2026-06-16';
+  'Certificat de sarcini OCPI/ANCPI — verifici ipoteci, privilegii, servituți, interdicții și litigii notate ' +
+  'asupra unui imobil, după numărul cadastral sau de carte funciară. Taxe incluse, 100% online, livrare pe email.';
+const DATE_PUBLISHED = '2026-06-25';
+const DATE_MODIFIED = '2026-06-25';
 
 export const revalidate = 3600;
 
@@ -68,11 +67,11 @@ export const metadata = buildPageMetadata({
 
 const jsonLdGraph = buildServicePageGraph({
   slug: SCHEMA_SLUG,
-  name: 'Identificare Imobil după Adresă',
+  name: 'Certificat de Sarcini',
   description:
-    'Serviciu de identificare a unui imobil (parcelă/construcție și număr de carte funciară) pornind ' +
-    'de la adresă, atunci când nu cunoști numărul cadastral. După identificare primești și extrasul de ' +
-    'carte funciară de la ANCPI. 100% online, fără cont ANCPI, livrare pe email.',
+    'Serviciu de obținere a certificatului de sarcini de la OCPI/ANCPI — situația grevărilor înscrise asupra ' +
+    'unui imobil (ipoteci, privilegii, servituți, interdicții, litigii notate), util înainte de vânzare-cumpărare ' +
+    'sau credit ipotecar. 100% online, fără cont ANCPI, livrare pe email.',
   serviceType: 'Document Processing — Real Estate',
   datePublished: DATE_PUBLISHED,
   dateModified: DATE_MODIFIED,
@@ -84,15 +83,15 @@ const jsonLdGraph = buildServicePageGraph({
   breadcrumb: [
     { name: 'Acasă', url: `${BASE_URL}/` },
     { name: 'Servicii', url: `${BASE_URL}/servicii/` },
-    { name: 'Identificare Imobil după Adresă', url: `${BASE_URL}${PAGE_PATH}` },
+    { name: 'Certificat de Sarcini', url: `${BASE_URL}${PAGE_PATH}` },
   ],
   offers: [
-    { name: 'Identificare Imobil după Adresă', price: 198, url: `${BASE_URL}${PAGE_PATH}` },
+    { name: 'Certificat de Sarcini', price: 99, url: `${BASE_URL}${PAGE_PATH}` },
   ],
   aggregateRating: { ratingValue: 4.9, reviewCount: 450 },
 });
 
-export default async function IdentificareImobilPage() {
+export default async function CertificatSarciniPage() {
   const service = await getService();
   const switcherServices = await getImobiliareServices();
   if (!service) notFound();
@@ -103,19 +102,17 @@ export default async function IdentificareImobilPage() {
   const priceExVat = Math.round((priceWithVat / 1.21) * 100) / 100;
   const fmt = (v: number) => (Number.isInteger(v) ? String(v) : v.toFixed(2).replace('.', ','));
 
-  // Why you might not know the cadastral number — targets the long-tail intent
-  const reasons = [
-    { icon: Home, title: 'Casă moștenită', desc: 'Imobil primit prin succesiune, fără actele cadastrale la îndemână.' },
-    { icon: Building2, title: 'Apartament', desc: 'Cunoști adresa, dar nu numărul cadastral sau de carte funciară.' },
-    { icon: ScrollText, title: 'Act vechi', desc: 'Proprietate cu documente vechi, fără număr cadastral atribuit clar.' },
-    { icon: MapPin, title: 'Teren', desc: 'Parcelă pe care vrei să o localizezi și să o verifici juridic.' },
+  // Ways to identify the property
+  const identifiers = [
+    { icon: KeyRound, title: 'Număr cadastral', desc: 'Identificatorul unic al imobilului (ex: 12783).' },
+    { icon: ScrollText, title: 'Număr de carte funciară', desc: 'Numărul CF asociat proprietății din localitate.' },
   ];
 
   const useCases = [
-    { icon: Search, title: 'Vrei extrasul CF', items: ['Dar nu știi nr. cadastral', 'Pornind doar de la adresă', 'Verificare proprietar'] },
-    { icon: Home, title: 'Tranzacție imobiliară', items: ['Verifici un imobil înainte de cumpărare', 'Confirmi proprietarul', 'Identifici sarcini'] },
-    { icon: ScrollText, title: 'Succesiune', items: ['Imobil moștenit', 'Acte incomplete', 'Pregătire dosar notarial'] },
-    { icon: Shield, title: 'Verificare proprietate', items: ['Localizezi parcela', 'Afli situația juridică', 'Confirmi datele'] },
+    { icon: Home, title: 'Înainte de vânzare-cumpărare', items: ['Verifici grevările', 'Eviți surprize la notar', 'Negociezi în cunoștință de cauză'] },
+    { icon: Landmark, title: 'Credit ipotecar', items: ['Cerut de bancă', 'Verificarea garanției', 'Dosar de finanțare'] },
+    { icon: Search, title: 'Due diligence imobil', items: ['Verificare înainte de tranzacție', 'Investiții imobiliare', 'Audit proprietate'] },
+    { icon: ScrollText, title: 'Dosar notarial', items: ['Autentificare contract', 'Acte de dezmembrare/alipire', 'Succesiuni'] },
   ];
 
   return (
@@ -144,7 +141,7 @@ export default async function IdentificareImobilPage() {
               <ChevronRight className="h-4 w-4" />
               <Link href="/servicii/" className="hover:text-primary-500 transition-colors">Servicii</Link>
               <ChevronRight className="h-4 w-4" />
-              <span className="text-white font-medium">Identificare Imobil după Adresă</span>
+              <span className="text-white font-medium">Certificat de Sarcini</span>
             </nav>
 
             <div className="flex flex-col-reverse lg:flex-row lg:justify-between gap-8 lg:gap-12">
@@ -155,45 +152,46 @@ export default async function IdentificareImobilPage() {
                     Imobiliare
                   </Badge>
                   <Badge className="bg-green-600 text-white font-bold px-3 py-1">
-                    <UserSearch className="h-3.5 w-3.5 mr-1" />
-                    Aflăm noi numărul cadastral
+                    <Shield className="h-3.5 w-3.5 mr-1" />
+                    Verifici grevările
                   </Badge>
                   <Badge variant="outline" className="text-white/80 border-white/30 px-3 py-1">
                     <Landmark className="h-3.5 w-3.5 mr-1" />
-                    ANCPI
+                    OCPI / ANCPI
                   </Badge>
                 </div>
 
                 <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-tight mb-5">
-                  Identificare Imobil
-                  <span className="block text-primary-500">după Adresă</span>
+                  Certificat de Sarcini
+                  <span className="block text-primary-500">pentru un imobil</span>
                 </h1>
 
                 <p className="text-lg sm:text-xl text-white/85 leading-relaxed mb-6">
-                  Nu știi numărul cadastral sau de carte funciară? Îți identificăm imobilul pornind doar
-                  de la adresă și primești și extrasul de carte funciară.
+                  Vezi exact ce sarcini sunt înscrise asupra unui imobil — ipoteci, privilegii, servituți,
+                  interdicții sau litigii notate — după numărul cadastral sau de carte funciară.
                 </p>
 
                 {/* USP */}
                 <div className="flex items-start gap-3 rounded-xl bg-primary-500/15 border border-primary-500/40 p-4 mb-6">
-                  <UserSearch className="h-5 w-5 text-primary-500 flex-shrink-0 mt-0.5" />
+                  <Shield className="h-5 w-5 text-primary-500 flex-shrink-0 mt-0.5" />
                   <p className="text-white/95 text-sm sm:text-base leading-relaxed">
-                    Dai <strong className="text-primary-500">adresa</strong>, noi căutăm parcela/construcția
-                    în sistemul ANCPI, îți <strong>aflăm numărul cadastral și de carte funciară</strong> și
-                    îți livrăm extrasul CF — fără cont ANCPI și fără drum la OCPI.
+                    Înainte să cumperi sau să garantezi un imobil, verifică dacă are{' '}
+                    <strong className="text-primary-500">ipoteci, interdicții sau litigii notate</strong> — ca să
+                    nu ai surprize la notar sau la bancă. Documentul provine direct din{' '}
+                    <strong>cartea funciară</strong>.
                   </p>
                 </div>
 
                 <div className="bg-white/10 backdrop-blur-sm rounded-xl p-5 border border-white/20 mb-6">
                   <p className="text-white/90 leading-relaxed text-sm sm:text-base">
-                    <strong className="text-primary-500">Cum decurge</strong> identificarea imobilului:
+                    <strong className="text-primary-500">Cum obții</strong> certificatul de sarcini:
                   </p>
                   <ul className="mt-3 space-y-1.5 text-white/85 text-sm">
                     {[
-                      'Ne dai adresa completă a imobilului',
-                      'Localizăm parcela/construcția în sistemul ANCPI',
-                      'Identificăm numărul cadastral și de carte funciară',
-                      'Primești extrasul CF pe email',
+                      'Introduci numărul de carte funciară sau cadastral',
+                      'Confirmi județul și localitatea',
+                      'Plătești securizat (taxe OCPI incluse)',
+                      'Primești certificatul de sarcini pe email',
                     ].map((step) => (
                       <li key={step} className="flex items-center gap-2">
                         <CheckCircle className="w-4 h-4 text-primary-500 flex-shrink-0" />
@@ -210,7 +208,7 @@ export default async function IdentificareImobilPage() {
                   <div className="relative bg-gradient-to-br from-secondary-900 via-secondary-800 to-[#0C1A2F] p-6 text-center">
                     <div className="relative">
                       <span className="inline-block px-3 py-1 bg-primary-500 text-secondary-900 text-xs font-bold rounded-full mb-3">
-                        EXTRAS CF INCLUS
+                        TAXE OCPI INCLUSE
                       </span>
                       <div className="flex items-baseline justify-center gap-1">
                         <span className="text-5xl lg:text-6xl font-black text-white">{fmt(priceExVat)}</span>
@@ -219,7 +217,7 @@ export default async function IdentificareImobilPage() {
                       <p className="text-white/70 text-sm mt-2">
                         + TVA 21% · <span className="font-semibold text-white">{fmt(priceWithVat)} RON</span> cu TVA
                       </p>
-                      <p className="text-white/50 text-xs mt-1">Identificare + extras CF, taxe incluse</p>
+                      <p className="text-white/50 text-xs mt-1">Fără taxe ascunse</p>
                     </div>
                   </div>
 
@@ -230,7 +228,7 @@ export default async function IdentificareImobilPage() {
                       </div>
                       <div>
                         <p className="font-semibold text-secondary-900 text-sm">Livrare în {formatEstimatedDays(service)}</p>
-                        <p className="text-xs text-neutral-500">Verificare făcută de un operator</p>
+                        <p className="text-xs text-neutral-500">Procesat de un operator</p>
                       </div>
                     </div>
 
@@ -240,7 +238,7 @@ export default async function IdentificareImobilPage() {
                       </div>
                       <div>
                         <p className="font-semibold text-secondary-900 text-sm">Livrare pe Email</p>
-                        <p className="text-xs text-neutral-500">Nr. cadastral/CF + extras CF</p>
+                        <p className="text-xs text-neutral-500">Certificat de sarcini OCPI</p>
                       </div>
                     </div>
 
@@ -270,9 +268,9 @@ export default async function IdentificareImobilPage() {
           <div className="container mx-auto px-4 max-w-[1100px] py-6 lg:py-8">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
               {[
-                { icon: UserSearch, value: 'După adresă', label: 'Aflăm nr. cadastral/CF' },
-                { icon: Landmark, value: 'ANCPI', label: 'Date oficiale OCPI' },
-                { icon: Shield, value: 'Extras CF inclus', label: 'Fără cont, fără drum la OCPI' },
+                { icon: Landmark, value: 'OCPI / ANCPI', label: 'Document OCPI' },
+                { icon: Clock, value: formatEstimatedDays(service), label: 'Procesat de un operator' },
+                { icon: Mail, value: 'Livrare pe email', label: 'Situația sarcinilor' },
                 { icon: CheckCircle, value: '4.9/5', label: 'Peste 450 recenzii' },
               ].map((t) => (
                 <div key={t.label} className="flex flex-col items-center gap-1.5">
@@ -300,95 +298,92 @@ export default async function IdentificareImobilPage() {
         <section className="py-12 lg:py-16 bg-neutral-50">
           <div className="container mx-auto px-4 max-w-[820px]">
             <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-5">
-              Cum afli numărul cadastral după adresă
+              Ce este certificatul de sarcini și la ce folosește
             </h2>
             <div className="space-y-4 text-neutral-700 leading-relaxed">
               <p>
-                Pentru a obține un <strong>extras de carte funciară</strong> ai nevoie de un identificator al
-                imobilului — <strong>numărul cadastral</strong> sau <strong>numărul de carte funciară</strong>.
-                Problema apare des: cunoști adresa, dar nu ai numărul cadastral la îndemână. Acolo intervenim noi:
-                <strong> identificăm imobilul după adresă</strong> și îți spunem numărul cadastral și de carte funciară.
+                <strong>Certificatul de sarcini</strong> este documentul care arată ce sarcini și grevări sunt
+                înscrise asupra unui imobil — adică ce drepturi sau restricții ale unor terți apasă asupra
+                proprietății. Este eliberat de Oficiul de Cadastru și Publicitate Imobiliară
+                (<strong>OCPI / ANCPI</strong>) pe baza datelor din <strong>cartea funciară</strong> a imobilului.
               </p>
               <p>
-                Folosim datele oficiale ale ANCPI (geoportalul și sistemul de cadastru) pentru a localiza
-                <strong> parcela sau construcția</strong> la adresa indicată. După ce identificăm imobilul, obținem
-                și <strong>extrasul de carte funciară</strong> și îți trimitem totul pe email, fără cont ANCPI și
-                fără deplasare la Oficiul de Cadastru (OCPI).
+                În practică, certificatul îți spune dacă terenul sau apartamentul are{' '}
+                <strong>ipoteci</strong> (de regulă în favoarea unei bănci), <strong>privilegii</strong>,{' '}
+                <strong>servituți</strong> (de exemplu drept de trecere), <strong>interdicții</strong> de
+                înstrăinare sau de grevare, ori <strong>litigii și procese notate</strong> în cartea funciară.
+                Dacă imobilul este „liber de sarcini”, certificatul confirmă tocmai acest lucru — un argument
+                solid la negociere și la notar.
               </p>
-              <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 flex items-start gap-3">
-                <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
-                <div>
-                  <h3 className="font-bold text-secondary-900 mb-1">Important — când identificarea poate să nu reușească</h3>
-                  <p className="text-sm text-neutral-700">
-                    Dacă imobilul <strong>nu este înscris în cartea funciară</strong> (neintabulat / fără cadastru),
-                    identificarea poate să nu reușească — în acest caz căutăm date utile prin alte surse oficiale.
-                    <strong> Apartamentele</strong> pot necesita verificări suplimentare (bloc, scară, etaj). Te ținem
-                    la curent pe tot parcursul și îți comunicăm rezultatul.
-                  </p>
-                </div>
+
+              <h3 className="text-xl font-bold text-secondary-900 pt-2">
+                Când ai nevoie de un certificat de sarcini
+              </h3>
+              <p>
+                Certificatul de sarcini este cerut sau recomandat în cele mai importante momente legate de un
+                imobil: <strong>înainte de o vânzare-cumpărare</strong>, ca să știi exact ce cumperi; la{' '}
+                <strong>contractarea unui credit ipotecar</strong>, când banca verifică garanția; la o
+                <strong> verificare a imobilului înainte de tranzacție</strong> (due diligence); sau pentru{' '}
+                <strong>dosarul notarial</strong> la autentificarea unui act. Pentru investitori și agenții
+                imobiliare, este pasul de bază al oricărui audit de proprietate.
+              </p>
+
+              <div className="rounded-2xl border border-neutral-200 bg-white p-5">
+                <h3 className="font-bold text-secondary-900 mb-2">
+                  Certificat de sarcini vs. extras de carte funciară
+                </h3>
+                <p className="text-sm text-neutral-700">
+                  <strong>Extrasul de carte funciară</strong> complet conține întreaga situație a imobilului,
+                  inclusiv proprietarii, suprafața și sarcinile. <strong>Certificatul de sarcini</strong> este
+                  focusat strict pe partea de grevări — exact secțiunea care arată ipotecile, interdicțiile și
+                  litigiile. Dacă ai nevoie de imaginea juridică completă, alegi extrasul; dacă te interesează
+                  doar dacă imobilul are sarcini, certificatul de sarcini este mai direct.{' '}
+                  <Link href={serviceUrl('extras-carte-funciara')} className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
+                    Vezi extrasul de carte funciară
+                  </Link>
+                  .
+                </p>
               </div>
 
-              <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
-                <h3 className="text-lg font-bold text-secondary-900 mb-3">
-                  Localizare teren după număr cadastral și verificare cadastru online
-                </h3>
-                <p className="text-sm sm:text-base text-neutral-700 leading-relaxed mb-3">
-                  Identificarea funcționează în ambele sensuri. Dacă ai doar adresa, îți aflăm numărul
-                  cadastral și de carte funciară. Dacă ai deja un <strong>număr cadastral</strong> și vrei să
-                  <strong> localizezi terenul</strong> sau să faci o <strong>verificare cadastru online</strong>,
-                  confirmăm parcela în sistemul ANCPI și îți spunem cui aparține și ce situație juridică are.
-                </p>
-                <p className="text-sm sm:text-base text-neutral-700 leading-relaxed">
-                  Rezultatul nu este o simplă căutare pe hartă: îți eliberăm și <strong>extrasul oficial de
-                  carte funciară</strong>, documentul care confirmă proprietarul, suprafața și eventualele
-                  sarcini (ipoteci, interdicții, litigii) — exact ce ai nevoie înainte de o tranzacție.
-                </p>
-              </div>
-
-              <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
-                <h3 className="text-lg font-bold text-secondary-900 mb-3">
-                  Vrei să afli singur numărul cadastral?
-                </h3>
-                <p className="text-sm sm:text-base text-neutral-700 leading-relaxed">
-                  Dacă preferi să încerci pe cont propriu, am scris un ghid pas cu pas despre{' '}
-                  <Link
-                    href="/cum-aflam-numarul-carte-functionara-si-nr-cadastral/"
-                    className="font-semibold text-primary-700 underline underline-offset-2 hover:text-primary-800"
-                  >
-                    cum afli numărul de carte funciară și numărul cadastral
-                  </Link>
-                  . Dacă ai deja numărul și vrei doar documentul, mergi direct la{' '}
-                  <Link
-                    href={serviceUrl('extras-carte-funciara')}
-                    className="font-semibold text-primary-700 underline underline-offset-2 hover:text-primary-800"
-                  >
-                    extrasul de carte funciară
-                  </Link>
-                  . Serviciul de față e pentru situația în care <strong>nu cunoști numărul</strong> și vrei
-                  să îl aflăm noi după adresă, împreună cu extrasul CF.
-                </p>
-              </div>
+              <h3 className="text-xl font-bold text-secondary-900 pt-2">
+                De ce să îl obții online prin eGhișeul
+              </h3>
+              <p>
+                Prin eGhișeul comanzi certificatul de sarcini 100% online, <strong>fără cont ANCPI</strong> și
+                fără deplasare la ghișeul OCPI. Tu introduci numărul cadastral sau de carte funciară și
+                localitatea, iar un <strong>operator</strong> se ocupă de cererea către OCPI și de obținerea
+                documentului. <strong>Taxele OCPI sunt incluse</strong> în preț, fără costuri ascunse, iar
+                certificatul de sarcini îți este livrat pe email în formatul eliberat de instituție.
+              </p>
+              <p>
+                Dacă nu cunoști numărul cadastral sau cel de carte funciară al imobilului, îl putem afla după
+                adresă prin serviciul de{' '}
+                <Link href={serviceUrl('identificare-imobil')} className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
+                  identificare imobil
+                </Link>
+                , iar apoi îți eliberăm certificatul de sarcini pentru proprietatea găsită.
+              </p>
             </div>
           </div>
         </section>
 
-        {/* Reasons you might not know the number */}
+        {/* Identifiers */}
         <section className="py-12 lg:py-20 bg-white">
           <div className="container mx-auto px-4 max-w-[1100px]">
             <div className="text-center mb-10">
               <span className="inline-block px-4 py-1.5 bg-primary-100 text-primary-700 text-sm font-semibold rounded-full mb-4">
-                Pentru cine
+                Ce îți trebuie
               </span>
               <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-3">
-                Când ai nevoie de identificarea imobilului
+                Cum identifici imobilul pentru certificatul de sarcini
               </h2>
               <p className="text-neutral-600 max-w-2xl mx-auto">
-                Ai doar adresa și vrei să afli numărul cadastral, numărul de carte funciară sau proprietarul.
+                Ai nevoie de un singur identificator. Dacă nu îl știi, îl putem afla după adresă.
               </p>
             </div>
 
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-              {reasons.map((it) => (
+            <div className="grid sm:grid-cols-2 gap-5 max-w-2xl mx-auto">
+              {identifiers.map((it) => (
                 <div key={it.title} className="bg-neutral-50 rounded-2xl p-5 border border-neutral-200 hover:border-primary-300 hover:shadow-lg hover:-translate-y-1 transition-all duration-200">
                   <div className="w-12 h-12 bg-gradient-to-br from-primary-100 to-primary-200 rounded-xl flex items-center justify-center mb-4">
                     <it.icon className="w-6 h-6 text-primary-600" />
@@ -398,6 +393,17 @@ export default async function IdentificareImobilPage() {
                 </div>
               ))}
             </div>
+
+            <div className="mt-6 p-5 bg-primary-50 rounded-2xl border border-primary-200 max-w-2xl mx-auto flex items-start gap-3">
+              <Search className="w-5 h-5 text-primary-600 flex-shrink-0 mt-0.5" />
+              <p className="text-sm text-secondary-700">
+                <strong>Nu știi numărul cadastral?</strong> Îl putem afla după adresă prin serviciul de{' '}
+                <Link href={serviceUrl('identificare-imobil')} className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
+                  Identificare Imobil
+                </Link>
+                , apoi îți eliberăm certificatul de sarcini.
+              </p>
+            </div>
           </div>
         </section>
 
@@ -406,10 +412,10 @@ export default async function IdentificareImobilPage() {
           <div className="container mx-auto px-4 max-w-[1400px]">
             <div className="text-center mb-10">
               <span className="inline-block px-4 py-1.5 bg-primary-100 text-primary-700 text-sm font-semibold rounded-full mb-4">
-                Situații frecvente
+                Când ai nevoie
               </span>
               <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-3">
-                În ce situații te ajută
+                Când Ai Nevoie de Certificat de Sarcini?
               </h2>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -444,15 +450,15 @@ export default async function IdentificareImobilPage() {
                 Proces simplu
               </span>
               <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white mb-3">Cum Funcționează?</h2>
-              <p className="text-white/70 max-w-2xl mx-auto">Identificăm imobilul în 4 pași, 100% online</p>
+              <p className="text-white/70 max-w-2xl mx-auto">Obții certificatul de sarcini în 4 pași, 100% online</p>
             </div>
             <div className="relative grid sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-6">
               <div className="hidden lg:block absolute top-8 left-[12.5%] right-[12.5%] h-0.5 bg-gradient-to-r from-primary-500/0 via-primary-500/50 to-primary-500/0" aria-hidden="true" />
               {[
-                { step: 1, title: 'Ne dai adresa', desc: 'Completezi adresa imobilului (județ, localitate, stradă, număr).', icon: MapPin },
-                { step: 2, title: 'Căutăm imobilul', desc: 'Localizăm parcela/construcția în sistemul ANCPI și identificăm nr. cadastral/CF.', icon: Search },
-                { step: 3, title: 'Plătești Securizat', desc: 'Card, Apple Pay, Google Pay — taxele ANCPI sunt incluse în preț.', icon: Shield },
-                { step: 4, title: 'Primești rezultatul', desc: `În ${formatEstimatedDays(service)} primești nr. cadastral/CF și extrasul CF pe email.`, icon: CheckCircle },
+                { step: 1, title: 'Identifici Imobilul', desc: 'Introduci numărul cadastral sau de carte funciară.', icon: KeyRound },
+                { step: 2, title: 'Confirmi Localitatea', desc: 'Alegi județul și localitatea. Verificăm datele înainte de depunere.', icon: MapPin },
+                { step: 3, title: 'Plătești Securizat', desc: 'Card, Apple Pay, Google Pay — taxele OCPI sunt incluse.', icon: Shield },
+                { step: 4, title: 'Primești Certificatul', desc: `În ${formatEstimatedDays(service)} primești certificatul de sarcini pe email.`, icon: CheckCircle },
               ].map((item) => (
                 <div key={item.step} className="relative text-center">
                   <div className="relative z-10 mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-400 to-primary-600 text-secondary-900 shadow-[0_8px_24px_rgba(236,185,95,0.35)]">
@@ -469,7 +475,7 @@ export default async function IdentificareImobilPage() {
 
         <ReviewsSection />
 
-        {/* Related — cross-link to CF + plan cadastral */}
+        {/* Related — cross-link to CF + copie CF + identificare */}
         <section className="py-12 lg:py-16 bg-white">
           <div className="container mx-auto px-4 max-w-[900px]">
             <h2 className="text-xl sm:text-2xl font-bold text-secondary-900 mb-6 text-center">
@@ -483,18 +489,29 @@ export default async function IdentificareImobilPage() {
                 <ScrollText className="w-6 h-6 text-primary-600 flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="font-bold text-secondary-900 group-hover:text-primary-700">Extras de Carte Funciară</p>
-                  <p className="text-sm text-neutral-600">Dacă știi deja numărul cadastral sau de CF.</p>
+                  <p className="text-sm text-neutral-600">Situația juridică completă: proprietar, suprafață, sarcini.</p>
                 </div>
                 <ArrowRight className="w-4 h-4 text-neutral-400 ml-auto flex-shrink-0 mt-1 group-hover:text-primary-600" />
               </Link>
               <Link
-                href={serviceUrl('extras-plan-cadastral')}
+                href={serviceUrl('copie-carte-funciara')}
                 className="group flex items-start gap-3 rounded-2xl border border-neutral-200 bg-neutral-50 p-5 hover:border-primary-300 hover:shadow-md transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
               >
-                <MapPin className="w-6 h-6 text-primary-600 flex-shrink-0 mt-0.5" />
+                <Mail className="w-6 h-6 text-primary-600 flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="font-bold text-secondary-900 group-hover:text-primary-700">Extras de Plan Cadastral</p>
-                  <p className="text-sm text-neutral-600">Localizezi terenul pe ortofotoplan după nr. cadastral.</p>
+                  <p className="font-bold text-secondary-900 group-hover:text-primary-700">Copie Carte Funciară</p>
+                  <p className="text-sm text-neutral-600">Copia documentelor din cartea funciară a imobilului.</p>
+                </div>
+                <ArrowRight className="w-4 h-4 text-neutral-400 ml-auto flex-shrink-0 mt-1 group-hover:text-primary-600" />
+              </Link>
+              <Link
+                href={serviceUrl('identificare-imobil')}
+                className="group flex items-start gap-3 rounded-2xl border border-neutral-200 bg-neutral-50 p-5 hover:border-primary-300 hover:shadow-md transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
+              >
+                <Layers className="w-6 h-6 text-primary-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-bold text-secondary-900 group-hover:text-primary-700">Identificare Imobil după Adresă</p>
+                  <p className="text-sm text-neutral-600">Nu știi numărul cadastral? Îl aflăm după adresă.</p>
                 </div>
                 <ArrowRight className="w-4 h-4 text-neutral-400 ml-auto flex-shrink-0 mt-1 group-hover:text-primary-600" />
               </Link>
@@ -504,19 +521,17 @@ export default async function IdentificareImobilPage() {
 
         {/* FAQ */}
         <ServiceFAQ
-          title="Întrebări Frecvente — Identificare Imobil după Adresă"
+          title="Întrebări Frecvente — Certificat de Sarcini"
           faqs={[
-            { q: 'Cum aflu numărul cadastral după adresă?', a: 'Ne dai adresa completă a imobilului, iar noi localizăm parcela/construcția în sistemul ANCPI și identificăm numărul cadastral și de carte funciară. Primești rezultatul pe email, împreună cu extrasul CF.' },
-            { q: 'Cum aflu numărul de carte funciară după adresă?', a: 'La fel ca pentru numărul cadastral: pornind de la adresă, identificăm imobilul în sistemul ANCPI și îți comunicăm numărul de carte funciară. Primești și extrasul CF aferent, pe email.' },
-            { q: 'Pot localiza un teren după numărul cadastral?', a: 'Da. Dacă ai deja numărul cadastral, confirmăm parcela în sistemul ANCPI, îți spunem proprietarul și situația juridică și îți eliberăm extrasul de carte funciară. Funcționează și invers, după adresă.' },
-            { q: 'Cum fac o verificare de cadastru online?', a: 'Ne trimiți adresa sau numărul cadastral, iar noi facem verificarea în sistemul oficial ANCPI și îți returnăm extrasul de carte funciară — proprietar, suprafață și eventuale sarcini. Totul 100% online, fără cont ANCPI.' },
-            { q: 'Ce primesc concret?', a: 'Numărul cadastral și/sau de carte funciară al imobilului identificat și extrasul de carte funciară aferent, livrate pe email.' },
-            { q: 'Cât costă identificarea imobilului?', a: `${service.base_price} RON, cu taxele ANCPI și extrasul CF incluse. Fără costuri ascunse.` },
-            { q: 'Cât durează?', a: `${formatEstimatedDays(service)}. Verificarea este făcută de un operator, pentru că presupune căutarea imobilului după adresă.` },
-            { q: 'Funcționează pentru apartamente?', a: 'Da, dar apartamentele pot necesita verificări suplimentare (bloc, scară, etaj) și uneori date din actul de proprietate. Te ținem la curent.' },
-            { q: 'Ce se întâmplă dacă imobilul nu poate fi identificat?', a: 'Dacă imobilul nu este înscris în cartea funciară (neintabulat / fără cadastru), identificarea poate să nu reușească. În acest caz căutăm date utile prin alte surse oficiale și îți comunicăm rezultatul.' },
-            { q: 'Am nevoie de cont ANCPI?', a: 'Nu. Ne ocupăm noi de tot procesul; tu trebuie doar să ne dai adresa imobilului.' },
-            { q: 'Pot identifica imobilul și după proprietar?', a: 'Căutarea standard este după adresă. Dacă ai doar numele proprietarului, contactează-ne și verificăm ce opțiuni sunt disponibile pentru cazul tău.' },
+            { q: 'Ce sunt sarcinile unui imobil?', a: 'Sarcinile sunt drepturile sau restricțiile unor terți înscrise asupra imobilului în cartea funciară: ipoteci, privilegii, servituți (ex: drept de trecere), interdicții de înstrăinare ori de grevare și litigii sau procese notate. Ele „grevează” proprietatea și pot limita ce poate face proprietarul cu ea.' },
+            { q: 'Ce conține certificatul de sarcini?', a: 'Conține situația grevărilor înscrise asupra imobilului din cartea funciară — ipotecile, privilegiile, servituțile, interdicțiile și litigiile notate. Dacă imobilul nu are sarcini, certificatul confirmă că este liber de sarcini.' },
+            { q: 'Cu ce diferă de extrasul de carte funciară?', a: 'Extrasul de carte funciară complet conține întreaga situație a imobilului, inclusiv proprietarii, suprafața și sarcinile. Certificatul de sarcini este focusat strict pe partea de grevări (ipoteci, interdicții, litigii). Dacă vrei imaginea juridică completă, alegi extrasul; dacă te interesează doar sarcinile, certificatul este mai direct.' },
+            { q: 'Cât durează eliberarea certificatului de sarcini?', a: `${formatEstimatedDays(service)}. Documentul este procesat de un operator și livrat pe email.` },
+            { q: 'Cât costă certificatul de sarcini?', a: `${service.base_price} RON, cu taxele OCPI incluse. Fără costuri ascunse.` },
+            { q: 'Nu știu numărul cadastral. Ce fac?', a: 'Îl putem afla după adresă prin serviciul de Identificare Imobil, apoi îți eliberăm certificatul de sarcini pentru proprietatea găsită.' },
+            { q: 'Am nevoie de cont ANCPI?', a: 'Nu. Ne ocupăm noi de tot procesul; tu ai nevoie doar de numărul cadastral sau de carte funciară și de localitate.' },
+            { q: 'Certificatul de sarcini este valabil la notar și la bancă?', a: 'Da. Certificatul de sarcini este documentul OCPI/ANCPI emis din cartea funciară și este folosit în mod curent în dosarele notariale și de credit ipotecar pentru a dovedi situația grevărilor imobilului.' },
+            { q: 'Pot verifica un imobil înainte să îl cumpăr?', a: 'Da. Certificatul de sarcini este exact instrumentul de verificare înainte de tranzacție: vezi dacă imobilul are ipoteci, interdicții sau litigii înainte să semnezi.' },
           ]}
         />
 
@@ -534,10 +549,10 @@ export default async function IdentificareImobilPage() {
           <div className="relative container mx-auto px-4 max-w-[900px]">
             <div className="text-center">
               <h2 className="text-2xl lg:text-4xl font-extrabold text-white mb-4">
-                Nu știi numărul cadastral? Îl aflăm noi.
+                Gata să obții Certificatul de Sarcini?
               </h2>
               <p className="text-lg text-white/80 mb-8 max-w-xl mx-auto">
-                Ai nevoie doar de adresa imobilului. Primești numărul cadastral/CF și extrasul de carte funciară în {formatEstimatedDays(service)}.
+                Ai nevoie doar de numărul cadastral sau de carte funciară. Primești documentul în {formatEstimatedDays(service)}.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
                 <OrderButton href={`/comanda/${SERVICE_SLUG}`}>Comandă Acum</OrderButton>

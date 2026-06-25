@@ -14,17 +14,18 @@ import {
   Mail,
   Landmark,
   ScrollText,
-  Building2,
-  AlertTriangle,
-  UserSearch,
+  KeyRound,
+  Map as MapIcon,
+  Layers,
+  Ruler,
 } from 'lucide-react';
 import { Service, formatEstimatedDays } from '@/types/services';
 import { Footer } from '@/components/home/footer';
 import { ServiceFAQ } from '@/components/services/service-faq';
+import { ReviewsSection } from '@/components/services/reviews-section';
 import { MobileStickyCTA } from '@/components/services/mobile-sticky-cta';
 import { WhatsAppButton } from '@/components/services/whatsapp-button';
 import { GoogleReviewsBadge } from '@/components/services/google-reviews-badge';
-import { ReviewsSection } from '@/components/services/reviews-section';
 import { OrderButton } from '@/components/services/order-button';
 import { buildPageMetadata, buildServicePageGraph, BASE_URL, serviceUrl } from '@/lib/seo';
 import { getImobiliareServices } from '@/lib/services/imobiliare';
@@ -32,15 +33,15 @@ import { ServiceSwitcher } from '@/components/services/service-switcher';
 
 // New service — no WP legacy URL, so the folder name matches the DB slug and
 // serviceUrl() resolves to this page with no redirect/override needed.
-const SERVICE_SLUG = 'identificare-imobil';
-const PAGE_PATH = '/servicii/identificare-imobil/';
-const SCHEMA_SLUG = 'identificare-imobil';
-const TITLE = 'Număr Cadastral după Adresă — Îl Aflăm Noi | Extras CF';
+const SERVICE_SLUG = 'copie-plan-cadastral';
+const PAGE_PATH = '/servicii/copie-plan-cadastral/';
+const SCHEMA_SLUG = 'copie-plan-cadastral';
+const TITLE = 'Copie Plan Cadastral din Arhiva OCPI (ANCPI)';
 const DESCRIPTION =
-  'Ne dai adresa, îți aflăm numărul cadastral și de carte funciară din ANCPI ' +
-  'și primești extrasul CF pe email. 198 RON, taxe incluse, fără cont ANCPI.';
-const DATE_PUBLISHED = '2026-06-16';
-const DATE_MODIFIED = '2026-06-16';
+  'Copie certificată a planului cadastral din arhiva OCPI — planul de situație înregistrat la recepția ' +
+  'cadastrală, după numărul cadastral sau de carte funciară. Taxe OCPI incluse, 100% online, livrare pe email.';
+const DATE_PUBLISHED = '2026-06-25';
+const DATE_MODIFIED = '2026-06-25';
 
 export const revalidate = 3600;
 
@@ -68,11 +69,11 @@ export const metadata = buildPageMetadata({
 
 const jsonLdGraph = buildServicePageGraph({
   slug: SCHEMA_SLUG,
-  name: 'Identificare Imobil după Adresă',
+  name: 'Copie Plan Cadastral',
   description:
-    'Serviciu de identificare a unui imobil (parcelă/construcție și număr de carte funciară) pornind ' +
-    'de la adresă, atunci când nu cunoști numărul cadastral. După identificare primești și extrasul de ' +
-    'carte funciară de la ANCPI. 100% online, fără cont ANCPI, livrare pe email.',
+    'Serviciu de obținere a copiei certificate a planului cadastral din arhiva OCPI / ANCPI — planul de ' +
+    'situație înregistrat la recepția cadastrală a imobilului, util pentru documentații tehnice și dosare. ' +
+    '100% online, fără cont ANCPI, livrare pe email.',
   serviceType: 'Document Processing — Real Estate',
   datePublished: DATE_PUBLISHED,
   dateModified: DATE_MODIFIED,
@@ -84,15 +85,15 @@ const jsonLdGraph = buildServicePageGraph({
   breadcrumb: [
     { name: 'Acasă', url: `${BASE_URL}/` },
     { name: 'Servicii', url: `${BASE_URL}/servicii/` },
-    { name: 'Identificare Imobil după Adresă', url: `${BASE_URL}${PAGE_PATH}` },
+    { name: 'Copie Plan Cadastral', url: `${BASE_URL}${PAGE_PATH}` },
   ],
   offers: [
-    { name: 'Identificare Imobil după Adresă', price: 198, url: `${BASE_URL}${PAGE_PATH}` },
+    { name: 'Copie Plan Cadastral', price: 99, url: `${BASE_URL}${PAGE_PATH}` },
   ],
   aggregateRating: { ratingValue: 4.9, reviewCount: 450 },
 });
 
-export default async function IdentificareImobilPage() {
+export default async function CopiePlanCadastralPage() {
   const service = await getService();
   const switcherServices = await getImobiliareServices();
   if (!service) notFound();
@@ -103,19 +104,17 @@ export default async function IdentificareImobilPage() {
   const priceExVat = Math.round((priceWithVat / 1.21) * 100) / 100;
   const fmt = (v: number) => (Number.isInteger(v) ? String(v) : v.toFixed(2).replace('.', ','));
 
-  // Why you might not know the cadastral number — targets the long-tail intent
-  const reasons = [
-    { icon: Home, title: 'Casă moștenită', desc: 'Imobil primit prin succesiune, fără actele cadastrale la îndemână.' },
-    { icon: Building2, title: 'Apartament', desc: 'Cunoști adresa, dar nu numărul cadastral sau de carte funciară.' },
-    { icon: ScrollText, title: 'Act vechi', desc: 'Proprietate cu documente vechi, fără număr cadastral atribuit clar.' },
-    { icon: MapPin, title: 'Teren', desc: 'Parcelă pe care vrei să o localizezi și să o verifici juridic.' },
+  // Ways to identify the property
+  const identifiers = [
+    { icon: KeyRound, title: 'Număr cadastral', desc: 'Identificatorul unic al imobilului (ex: 12783).' },
+    { icon: ScrollText, title: 'Număr de carte funciară', desc: 'Numărul CF asociat proprietății din localitate.' },
   ];
 
   const useCases = [
-    { icon: Search, title: 'Vrei extrasul CF', items: ['Dar nu știi nr. cadastral', 'Pornind doar de la adresă', 'Verificare proprietar'] },
-    { icon: Home, title: 'Tranzacție imobiliară', items: ['Verifici un imobil înainte de cumpărare', 'Confirmi proprietarul', 'Identifici sarcini'] },
-    { icon: ScrollText, title: 'Succesiune', items: ['Imobil moștenit', 'Acte incomplete', 'Pregătire dosar notarial'] },
-    { icon: Shield, title: 'Verificare proprietate', items: ['Localizezi parcela', 'Afli situația juridică', 'Confirmi datele'] },
+    { icon: Ruler, title: 'Documentații tehnice', items: ['Plan de situație', 'Limitele recepționate', 'Suport pentru topograf'] },
+    { icon: Home, title: 'Dosare & avize', items: ['Dosar notarial', 'Certificat de urbanism', 'Autorizație de construire'] },
+    { icon: ScrollText, title: 'Comparare cu terenul', items: ['Situația din arhivă', 'Verificare limite', 'Litigii vecinătate'] },
+    { icon: Layers, title: 'Proiectare & arhivă', items: ['Date pentru proiectare', 'Istoricul recepției', 'Copie de referință'] },
   ];
 
   return (
@@ -144,7 +143,7 @@ export default async function IdentificareImobilPage() {
               <ChevronRight className="h-4 w-4" />
               <Link href="/servicii/" className="hover:text-primary-500 transition-colors">Servicii</Link>
               <ChevronRight className="h-4 w-4" />
-              <span className="text-white font-medium">Identificare Imobil după Adresă</span>
+              <span className="text-white font-medium">Copie Plan Cadastral</span>
             </nav>
 
             <div className="flex flex-col-reverse lg:flex-row lg:justify-between gap-8 lg:gap-12">
@@ -155,8 +154,8 @@ export default async function IdentificareImobilPage() {
                     Imobiliare
                   </Badge>
                   <Badge className="bg-green-600 text-white font-bold px-3 py-1">
-                    <UserSearch className="h-3.5 w-3.5 mr-1" />
-                    Aflăm noi numărul cadastral
+                    <ScrollText className="h-3.5 w-3.5 mr-1" />
+                    Din arhiva OCPI
                   </Badge>
                   <Badge variant="outline" className="text-white/80 border-white/30 px-3 py-1">
                     <Landmark className="h-3.5 w-3.5 mr-1" />
@@ -165,35 +164,35 @@ export default async function IdentificareImobilPage() {
                 </div>
 
                 <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-tight mb-5">
-                  Identificare Imobil
-                  <span className="block text-primary-500">după Adresă</span>
+                  Copie Plan Cadastral
+                  <span className="block text-primary-500">din Arhiva OCPI</span>
                 </h1>
 
                 <p className="text-lg sm:text-xl text-white/85 leading-relaxed mb-6">
-                  Nu știi numărul cadastral sau de carte funciară? Îți identificăm imobilul pornind doar
-                  de la adresă și primești și extrasul de carte funciară.
+                  Copia certificată a planului cadastral înregistrat la recepția imobilului, direct din arhiva
+                  OCPI / ANCPI. O obții după numărul cadastral sau de carte funciară.
                 </p>
 
                 {/* USP */}
                 <div className="flex items-start gap-3 rounded-xl bg-primary-500/15 border border-primary-500/40 p-4 mb-6">
-                  <UserSearch className="h-5 w-5 text-primary-500 flex-shrink-0 mt-0.5" />
+                  <ScrollText className="h-5 w-5 text-primary-500 flex-shrink-0 mt-0.5" />
                   <p className="text-white/95 text-sm sm:text-base leading-relaxed">
-                    Dai <strong className="text-primary-500">adresa</strong>, noi căutăm parcela/construcția
-                    în sistemul ANCPI, îți <strong>aflăm numărul cadastral și de carte funciară</strong> și
-                    îți livrăm extrasul CF — fără cont ANCPI și fără drum la OCPI.
+                    Primești <strong className="text-primary-500">planul de situație din dosarul de cadastru</strong> —
+                    documentul de arhivă cu limitele și datele <strong>așa cum au fost recepționate</strong>, util
+                    pentru documentații tehnice, comparare cu terenul și dosare.
                   </p>
                 </div>
 
                 <div className="bg-white/10 backdrop-blur-sm rounded-xl p-5 border border-white/20 mb-6">
                   <p className="text-white/90 leading-relaxed text-sm sm:text-base">
-                    <strong className="text-primary-500">Cum decurge</strong> identificarea imobilului:
+                    <strong className="text-primary-500">Cum obții</strong> copia planului cadastral:
                   </p>
                   <ul className="mt-3 space-y-1.5 text-white/85 text-sm">
                     {[
-                      'Ne dai adresa completă a imobilului',
-                      'Localizăm parcela/construcția în sistemul ANCPI',
-                      'Identificăm numărul cadastral și de carte funciară',
-                      'Primești extrasul CF pe email',
+                      'Introduci numărul de carte funciară sau cadastral',
+                      'Confirmi județul și localitatea',
+                      'Plătești securizat (taxe OCPI incluse)',
+                      'Primești copia planului cadastral pe email',
                     ].map((step) => (
                       <li key={step} className="flex items-center gap-2">
                         <CheckCircle className="w-4 h-4 text-primary-500 flex-shrink-0" />
@@ -210,7 +209,7 @@ export default async function IdentificareImobilPage() {
                   <div className="relative bg-gradient-to-br from-secondary-900 via-secondary-800 to-[#0C1A2F] p-6 text-center">
                     <div className="relative">
                       <span className="inline-block px-3 py-1 bg-primary-500 text-secondary-900 text-xs font-bold rounded-full mb-3">
-                        EXTRAS CF INCLUS
+                        TAXE OCPI INCLUSE
                       </span>
                       <div className="flex items-baseline justify-center gap-1">
                         <span className="text-5xl lg:text-6xl font-black text-white">{fmt(priceExVat)}</span>
@@ -219,7 +218,7 @@ export default async function IdentificareImobilPage() {
                       <p className="text-white/70 text-sm mt-2">
                         + TVA 21% · <span className="font-semibold text-white">{fmt(priceWithVat)} RON</span> cu TVA
                       </p>
-                      <p className="text-white/50 text-xs mt-1">Identificare + extras CF, taxe incluse</p>
+                      <p className="text-white/50 text-xs mt-1">Fără taxe ascunse</p>
                     </div>
                   </div>
 
@@ -230,7 +229,7 @@ export default async function IdentificareImobilPage() {
                       </div>
                       <div>
                         <p className="font-semibold text-secondary-900 text-sm">Livrare în {formatEstimatedDays(service)}</p>
-                        <p className="text-xs text-neutral-500">Verificare făcută de un operator</p>
+                        <p className="text-xs text-neutral-500">Procesat de un operator</p>
                       </div>
                     </div>
 
@@ -240,7 +239,7 @@ export default async function IdentificareImobilPage() {
                       </div>
                       <div>
                         <p className="font-semibold text-secondary-900 text-sm">Livrare pe Email</p>
-                        <p className="text-xs text-neutral-500">Nr. cadastral/CF + extras CF</p>
+                        <p className="text-xs text-neutral-500">Copie din arhiva OCPI</p>
                       </div>
                     </div>
 
@@ -270,9 +269,9 @@ export default async function IdentificareImobilPage() {
           <div className="container mx-auto px-4 max-w-[1100px] py-6 lg:py-8">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
               {[
-                { icon: UserSearch, value: 'După adresă', label: 'Aflăm nr. cadastral/CF' },
-                { icon: Landmark, value: 'ANCPI', label: 'Date oficiale OCPI' },
-                { icon: Shield, value: 'Extras CF inclus', label: 'Fără cont, fără drum la OCPI' },
+                { icon: Landmark, value: 'ANCPI', label: 'Document OCPI' },
+                { icon: Clock, value: formatEstimatedDays(service), label: 'Procesat de un operator' },
+                { icon: Mail, value: 'Livrare pe email', label: 'Copie din arhivă' },
                 { icon: CheckCircle, value: '4.9/5', label: 'Peste 450 recenzii' },
               ].map((t) => (
                 <div key={t.label} className="flex flex-col items-center gap-1.5">
@@ -300,95 +299,85 @@ export default async function IdentificareImobilPage() {
         <section className="py-12 lg:py-16 bg-neutral-50">
           <div className="container mx-auto px-4 max-w-[820px]">
             <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-5">
-              Cum afli numărul cadastral după adresă
+              Ce este copia planului cadastral și la ce folosește
             </h2>
             <div className="space-y-4 text-neutral-700 leading-relaxed">
               <p>
-                Pentru a obține un <strong>extras de carte funciară</strong> ai nevoie de un identificator al
-                imobilului — <strong>numărul cadastral</strong> sau <strong>numărul de carte funciară</strong>.
-                Problema apare des: cunoști adresa, dar nu ai numărul cadastral la îndemână. Acolo intervenim noi:
-                <strong> identificăm imobilul după adresă</strong> și îți spunem numărul cadastral și de carte funciară.
+                <strong>Copia planului cadastral</strong> este reproducerea certificată a{' '}
+                <strong>planului de situație</strong> înregistrat la recepția cadastrală a imobilului, eliberată din
+                <strong> arhiva Oficiului de Cadastru și Publicitate Imobiliară (OCPI / ANCPI)</strong>. Practic, este
+                copia documentului care a stat la baza înscrierii imobilului în sistemul de cadastru: conturul, limitele
+                și datele tehnice <strong>așa cum au fost recepționate și arhivate</strong> de OCPI.
               </p>
               <p>
-                Folosim datele oficiale ale ANCPI (geoportalul și sistemul de cadastru) pentru a localiza
-                <strong> parcela sau construcția</strong> la adresa indicată. După ce identificăm imobilul, obținem
-                și <strong>extrasul de carte funciară</strong> și îți trimitem totul pe email, fără cont ANCPI și
-                fără deplasare la Oficiul de Cadastru (OCPI).
+                Este folosită pentru <strong>documentații tehnice</strong>, dosare notariale, certificate de urbanism,
+                proiectare, precum și pentru <strong>compararea situației din arhivă cu situația din teren</strong>.
+                Prin eGhișeul o obții online, fără cont ANCPI și fără deplasare la ghișeul OCPI — un operator depune
+                cererea în numele tău, achită taxele OCPI și îți trimite copia pe email.
               </p>
-              <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 flex items-start gap-3">
-                <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
-                <div>
-                  <h3 className="font-bold text-secondary-900 mb-1">Important — când identificarea poate să nu reușească</h3>
-                  <p className="text-sm text-neutral-700">
-                    Dacă imobilul <strong>nu este înscris în cartea funciară</strong> (neintabulat / fără cadastru),
-                    identificarea poate să nu reușească — în acest caz căutăm date utile prin alte surse oficiale.
-                    <strong> Apartamentele</strong> pot necesita verificări suplimentare (bloc, scară, etaj). Te ținem
-                    la curent pe tot parcursul și îți comunicăm rezultatul.
-                  </p>
-                </div>
-              </div>
-
-              <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
-                <h3 className="text-lg font-bold text-secondary-900 mb-3">
-                  Localizare teren după număr cadastral și verificare cadastru online
+              <div className="rounded-2xl border border-neutral-200 bg-white p-5">
+                <h3 className="font-bold text-secondary-900 mb-2">
+                  Copie plan cadastral vs. extras de plan cadastral pe ortofotoplan
                 </h3>
-                <p className="text-sm sm:text-base text-neutral-700 leading-relaxed mb-3">
-                  Identificarea funcționează în ambele sensuri. Dacă ai doar adresa, îți aflăm numărul
-                  cadastral și de carte funciară. Dacă ai deja un <strong>număr cadastral</strong> și vrei să
-                  <strong> localizezi terenul</strong> sau să faci o <strong>verificare cadastru online</strong>,
-                  confirmăm parcela în sistemul ANCPI și îți spunem cui aparține și ce situație juridică are.
-                </p>
-                <p className="text-sm sm:text-base text-neutral-700 leading-relaxed">
-                  Rezultatul nu este o simplă căutare pe hartă: îți eliberăm și <strong>extrasul oficial de
-                  carte funciară</strong>, documentul care confirmă proprietarul, suprafața și eventualele
-                  sarcini (ipoteci, interdicții, litigii) — exact ce ai nevoie înainte de o tranzacție.
+                <p className="text-sm text-neutral-700">
+                  <strong>Copia planului cadastral</strong> = reproducerea documentului de arhivă (planul de situație
+                  înregistrat la recepție).{' '}
+                  <strong>Extrasul de plan cadastral</strong> = reprezentarea imobilului la zi, pe ortofotoplan
+                  (imagine aeriană georeferențiată). Primul arată ce s-a depus și recepționat, al doilea arată poziția
+                  pe harta cadastrală curentă.{' '}
+                  <Link href={serviceUrl('extras-plan-cadastral')} className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
+                    Vezi extrasul de plan cadastral pe ortofotoplan
+                  </Link>
+                  .
                 </p>
               </div>
 
-              <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
-                <h3 className="text-lg font-bold text-secondary-900 mb-3">
-                  Vrei să afli singur numărul cadastral?
-                </h3>
-                <p className="text-sm sm:text-base text-neutral-700 leading-relaxed">
-                  Dacă preferi să încerci pe cont propriu, am scris un ghid pas cu pas despre{' '}
-                  <Link
-                    href="/cum-aflam-numarul-carte-functionara-si-nr-cadastral/"
-                    className="font-semibold text-primary-700 underline underline-offset-2 hover:text-primary-800"
-                  >
-                    cum afli numărul de carte funciară și numărul cadastral
-                  </Link>
-                  . Dacă ai deja numărul și vrei doar documentul, mergi direct la{' '}
-                  <Link
-                    href={serviceUrl('extras-carte-funciara')}
-                    className="font-semibold text-primary-700 underline underline-offset-2 hover:text-primary-800"
-                  >
-                    extrasul de carte funciară
-                  </Link>
-                  . Serviciul de față e pentru situația în care <strong>nu cunoști numărul</strong> și vrei
-                  să îl aflăm noi după adresă, împreună cu extrasul CF.
-                </p>
-              </div>
+              <h3 className="text-xl font-bold text-secondary-900 pt-2">
+                Ce conține copia planului cadastral
+              </h3>
+              <p>
+                Documentul reproduce <strong>planul de situație din dosarul de cadastru</strong>: conturul parcelei,
+                dimensiunile și limitele recepționate, numărul cadastral, suprafața și, după caz, poziția construcțiilor.
+                Spre deosebire de harta interactivă de pe geoportalul ANCPI — care are caracter informativ — copia din
+                arhivă este un <strong>document OCPI / ANCPI</strong> certificat, livrat în format electronic pe email.
+              </p>
+              <p>
+                Pentru multe proceduri ai nevoie atât de planul cadastral, cât și de situația juridică a imobilului. Dacă
+                îți trebuie proprietarul, suprafața și sarcinile, comanzi și{' '}
+                <Link href={serviceUrl('extras-carte-funciara')} className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
+                  extrasul de carte funciară
+                </Link>
+                .
+              </p>
+              <p>
+                Dacă nu cunoști numărul cadastral și vrei doar să <strong>identifici imobilul după adresă</strong>,
+                folosește serviciul de{' '}
+                <Link href={serviceUrl('identificare-imobil')} className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
+                  identificare imobil
+                </Link>
+                , apoi îți eliberăm copia planului cadastral pentru terenul găsit.
+              </p>
             </div>
           </div>
         </section>
 
-        {/* Reasons you might not know the number */}
+        {/* Identifiers */}
         <section className="py-12 lg:py-20 bg-white">
           <div className="container mx-auto px-4 max-w-[1100px]">
             <div className="text-center mb-10">
               <span className="inline-block px-4 py-1.5 bg-primary-100 text-primary-700 text-sm font-semibold rounded-full mb-4">
-                Pentru cine
+                Ce îți trebuie
               </span>
               <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-3">
-                Când ai nevoie de identificarea imobilului
+                Cum identifici imobilul pentru copia planului cadastral
               </h2>
               <p className="text-neutral-600 max-w-2xl mx-auto">
-                Ai doar adresa și vrei să afli numărul cadastral, numărul de carte funciară sau proprietarul.
+                Ai nevoie de un singur identificator. Dacă nu îl știi, îl putem afla după adresă.
               </p>
             </div>
 
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-              {reasons.map((it) => (
+            <div className="grid sm:grid-cols-2 gap-5 max-w-2xl mx-auto">
+              {identifiers.map((it) => (
                 <div key={it.title} className="bg-neutral-50 rounded-2xl p-5 border border-neutral-200 hover:border-primary-300 hover:shadow-lg hover:-translate-y-1 transition-all duration-200">
                   <div className="w-12 h-12 bg-gradient-to-br from-primary-100 to-primary-200 rounded-xl flex items-center justify-center mb-4">
                     <it.icon className="w-6 h-6 text-primary-600" />
@@ -398,6 +387,17 @@ export default async function IdentificareImobilPage() {
                 </div>
               ))}
             </div>
+
+            <div className="mt-6 p-5 bg-primary-50 rounded-2xl border border-primary-200 max-w-2xl mx-auto flex items-start gap-3">
+              <Search className="w-5 h-5 text-primary-600 flex-shrink-0 mt-0.5" />
+              <p className="text-sm text-secondary-700">
+                <strong>Nu știi numărul cadastral?</strong> Îl putem afla după adresă prin serviciul de{' '}
+                <Link href={serviceUrl('identificare-imobil')} className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
+                  Identificare Imobil
+                </Link>
+                , apoi îți eliberăm copia planului cadastral.
+              </p>
+            </div>
           </div>
         </section>
 
@@ -406,10 +406,10 @@ export default async function IdentificareImobilPage() {
           <div className="container mx-auto px-4 max-w-[1400px]">
             <div className="text-center mb-10">
               <span className="inline-block px-4 py-1.5 bg-primary-100 text-primary-700 text-sm font-semibold rounded-full mb-4">
-                Situații frecvente
+                Când ai nevoie
               </span>
               <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-3">
-                În ce situații te ajută
+                Când Ai Nevoie de Copia Planului Cadastral?
               </h2>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -444,15 +444,15 @@ export default async function IdentificareImobilPage() {
                 Proces simplu
               </span>
               <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white mb-3">Cum Funcționează?</h2>
-              <p className="text-white/70 max-w-2xl mx-auto">Identificăm imobilul în 4 pași, 100% online</p>
+              <p className="text-white/70 max-w-2xl mx-auto">Obții copia planului cadastral în 4 pași, 100% online</p>
             </div>
             <div className="relative grid sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-6">
               <div className="hidden lg:block absolute top-8 left-[12.5%] right-[12.5%] h-0.5 bg-gradient-to-r from-primary-500/0 via-primary-500/50 to-primary-500/0" aria-hidden="true" />
               {[
-                { step: 1, title: 'Ne dai adresa', desc: 'Completezi adresa imobilului (județ, localitate, stradă, număr).', icon: MapPin },
-                { step: 2, title: 'Căutăm imobilul', desc: 'Localizăm parcela/construcția în sistemul ANCPI și identificăm nr. cadastral/CF.', icon: Search },
-                { step: 3, title: 'Plătești Securizat', desc: 'Card, Apple Pay, Google Pay — taxele ANCPI sunt incluse în preț.', icon: Shield },
-                { step: 4, title: 'Primești rezultatul', desc: `În ${formatEstimatedDays(service)} primești nr. cadastral/CF și extrasul CF pe email.`, icon: CheckCircle },
+                { step: 1, title: 'Identifici Imobilul', desc: 'Introduci numărul cadastral sau de carte funciară.', icon: KeyRound },
+                { step: 2, title: 'Confirmi Localitatea', desc: 'Alegi județul și localitatea. Verificăm datele înainte de depunere.', icon: MapPin },
+                { step: 3, title: 'Plătești Securizat', desc: 'Card, Apple Pay, Google Pay — taxele OCPI sunt incluse.', icon: Shield },
+                { step: 4, title: 'Primești Copia', desc: `În ${formatEstimatedDays(service)} primești copia planului cadastral pe email.`, icon: CheckCircle },
               ].map((item) => (
                 <div key={item.step} className="relative text-center">
                   <div className="relative z-10 mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-400 to-primary-600 text-secondary-900 shadow-[0_8px_24px_rgba(236,185,95,0.35)]">
@@ -469,13 +469,24 @@ export default async function IdentificareImobilPage() {
 
         <ReviewsSection />
 
-        {/* Related — cross-link to CF + plan cadastral */}
+        {/* Related — cross-link to extras plan + CF + identificare */}
         <section className="py-12 lg:py-16 bg-white">
-          <div className="container mx-auto px-4 max-w-[900px]">
+          <div className="container mx-auto px-4 max-w-[1100px]">
             <h2 className="text-xl sm:text-2xl font-bold text-secondary-900 mb-6 text-center">
               Servicii pentru imobile
             </h2>
-            <div className="grid sm:grid-cols-2 gap-4">
+            <div className="grid sm:grid-cols-3 gap-4">
+              <Link
+                href={serviceUrl('extras-plan-cadastral')}
+                className="group flex items-start gap-3 rounded-2xl border border-neutral-200 bg-neutral-50 p-5 hover:border-primary-300 hover:shadow-md transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
+              >
+                <MapIcon className="w-6 h-6 text-primary-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-bold text-secondary-900 group-hover:text-primary-700">Extras de Plan Cadastral</p>
+                  <p className="text-sm text-neutral-600">Imobilul la zi, pe ortofotoplan (harta cadastrală).</p>
+                </div>
+                <ArrowRight className="w-4 h-4 text-neutral-400 ml-auto flex-shrink-0 mt-1 group-hover:text-primary-600" />
+              </Link>
               <Link
                 href={serviceUrl('extras-carte-funciara')}
                 className="group flex items-start gap-3 rounded-2xl border border-neutral-200 bg-neutral-50 p-5 hover:border-primary-300 hover:shadow-md transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
@@ -483,18 +494,18 @@ export default async function IdentificareImobilPage() {
                 <ScrollText className="w-6 h-6 text-primary-600 flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="font-bold text-secondary-900 group-hover:text-primary-700">Extras de Carte Funciară</p>
-                  <p className="text-sm text-neutral-600">Dacă știi deja numărul cadastral sau de CF.</p>
+                  <p className="text-sm text-neutral-600">Situația juridică: proprietar, suprafață, sarcini.</p>
                 </div>
                 <ArrowRight className="w-4 h-4 text-neutral-400 ml-auto flex-shrink-0 mt-1 group-hover:text-primary-600" />
               </Link>
               <Link
-                href={serviceUrl('extras-plan-cadastral')}
+                href={serviceUrl('identificare-imobil')}
                 className="group flex items-start gap-3 rounded-2xl border border-neutral-200 bg-neutral-50 p-5 hover:border-primary-300 hover:shadow-md transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
               >
-                <MapPin className="w-6 h-6 text-primary-600 flex-shrink-0 mt-0.5" />
+                <Layers className="w-6 h-6 text-primary-600 flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="font-bold text-secondary-900 group-hover:text-primary-700">Extras de Plan Cadastral</p>
-                  <p className="text-sm text-neutral-600">Localizezi terenul pe ortofotoplan după nr. cadastral.</p>
+                  <p className="font-bold text-secondary-900 group-hover:text-primary-700">Identificare Imobil după Adresă</p>
+                  <p className="text-sm text-neutral-600">Nu știi numărul cadastral? Îl aflăm după adresă.</p>
                 </div>
                 <ArrowRight className="w-4 h-4 text-neutral-400 ml-auto flex-shrink-0 mt-1 group-hover:text-primary-600" />
               </Link>
@@ -504,19 +515,17 @@ export default async function IdentificareImobilPage() {
 
         {/* FAQ */}
         <ServiceFAQ
-          title="Întrebări Frecvente — Identificare Imobil după Adresă"
+          title="Întrebări Frecvente — Copie Plan Cadastral"
           faqs={[
-            { q: 'Cum aflu numărul cadastral după adresă?', a: 'Ne dai adresa completă a imobilului, iar noi localizăm parcela/construcția în sistemul ANCPI și identificăm numărul cadastral și de carte funciară. Primești rezultatul pe email, împreună cu extrasul CF.' },
-            { q: 'Cum aflu numărul de carte funciară după adresă?', a: 'La fel ca pentru numărul cadastral: pornind de la adresă, identificăm imobilul în sistemul ANCPI și îți comunicăm numărul de carte funciară. Primești și extrasul CF aferent, pe email.' },
-            { q: 'Pot localiza un teren după numărul cadastral?', a: 'Da. Dacă ai deja numărul cadastral, confirmăm parcela în sistemul ANCPI, îți spunem proprietarul și situația juridică și îți eliberăm extrasul de carte funciară. Funcționează și invers, după adresă.' },
-            { q: 'Cum fac o verificare de cadastru online?', a: 'Ne trimiți adresa sau numărul cadastral, iar noi facem verificarea în sistemul oficial ANCPI și îți returnăm extrasul de carte funciară — proprietar, suprafață și eventuale sarcini. Totul 100% online, fără cont ANCPI.' },
-            { q: 'Ce primesc concret?', a: 'Numărul cadastral și/sau de carte funciară al imobilului identificat și extrasul de carte funciară aferent, livrate pe email.' },
-            { q: 'Cât costă identificarea imobilului?', a: `${service.base_price} RON, cu taxele ANCPI și extrasul CF incluse. Fără costuri ascunse.` },
-            { q: 'Cât durează?', a: `${formatEstimatedDays(service)}. Verificarea este făcută de un operator, pentru că presupune căutarea imobilului după adresă.` },
-            { q: 'Funcționează pentru apartamente?', a: 'Da, dar apartamentele pot necesita verificări suplimentare (bloc, scară, etaj) și uneori date din actul de proprietate. Te ținem la curent.' },
-            { q: 'Ce se întâmplă dacă imobilul nu poate fi identificat?', a: 'Dacă imobilul nu este înscris în cartea funciară (neintabulat / fără cadastru), identificarea poate să nu reușească. În acest caz căutăm date utile prin alte surse oficiale și îți comunicăm rezultatul.' },
-            { q: 'Am nevoie de cont ANCPI?', a: 'Nu. Ne ocupăm noi de tot procesul; tu trebuie doar să ne dai adresa imobilului.' },
-            { q: 'Pot identifica imobilul și după proprietar?', a: 'Căutarea standard este după adresă. Dacă ai doar numele proprietarului, contactează-ne și verificăm ce opțiuni sunt disponibile pentru cazul tău.' },
+            { q: 'Ce este copia planului cadastral?', a: 'Este reproducerea certificată a planului de situație înregistrat la recepția cadastrală a imobilului, eliberată din arhiva OCPI/ANCPI. Reflectă conturul, limitele și datele tehnice așa cum au fost recepționate și arhivate.' },
+            { q: 'Cu ce diferă de extrasul de plan cadastral pe ortofotoplan?', a: 'Copia planului cadastral reproduce documentul de arhivă (planul de situație depus la recepție), în timp ce extrasul de plan cadastral arată imobilul la zi, pe ortofotoplan (imagine aeriană georeferențiată). Primul arată ce s-a recepționat, al doilea arată poziția pe harta cadastrală curentă.' },
+            { q: 'Ce conține documentul?', a: 'Conturul parcelei, dimensiunile și limitele recepționate, numărul cadastral, suprafața și, după caz, poziția construcțiilor — adică planul de situație din dosarul de cadastru.' },
+            { q: 'La ce îmi folosește?', a: 'Pentru documentații tehnice, dosare notariale, certificate de urbanism, proiectare și pentru compararea situației din arhivă cu situația din teren.' },
+            { q: 'Cât costă copia planului cadastral?', a: `${service.base_price} RON, cu taxele OCPI incluse. Fără costuri ascunse.` },
+            { q: 'Cât durează eliberarea?', a: `${formatEstimatedDays(service)}. Cererea este depusă și procesată de un operator, iar documentul este livrat pe email.` },
+            { q: 'Nu știu numărul cadastral. Ce fac?', a: 'Îl putem afla după adresă prin serviciul de Identificare Imobil, apoi îți eliberăm copia planului cadastral.' },
+            { q: 'Am nevoie de cont ANCPI?', a: 'Nu. Ne ocupăm noi de tot procesul; tu ai nevoie doar de numărul cadastral sau de carte funciară.' },
+            { q: 'Cât timp este valabilă copia?', a: 'Copia reflectă situația din arhivă la momentul eliberării. Dacă imobilul a suferit modificări (dezmembrare, alipire, actualizări), poate fi necesar un document mai recent; pentru poziția la zi îți recomandăm extrasul de plan cadastral pe ortofotoplan.' },
           ]}
         />
 
@@ -534,10 +543,10 @@ export default async function IdentificareImobilPage() {
           <div className="relative container mx-auto px-4 max-w-[900px]">
             <div className="text-center">
               <h2 className="text-2xl lg:text-4xl font-extrabold text-white mb-4">
-                Nu știi numărul cadastral? Îl aflăm noi.
+                Gata să obții Copia Planului Cadastral?
               </h2>
               <p className="text-lg text-white/80 mb-8 max-w-xl mx-auto">
-                Ai nevoie doar de adresa imobilului. Primești numărul cadastral/CF și extrasul de carte funciară în {formatEstimatedDays(service)}.
+                Ai nevoie doar de numărul cadastral sau de carte funciară. Primești documentul în {formatEstimatedDays(service)}.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
                 <OrderButton href={`/comanda/${SERVICE_SLUG}`}>Comandă Acum</OrderButton>

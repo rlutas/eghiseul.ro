@@ -31,6 +31,7 @@ interface AdminContextType {
 const IMPLIED_PERMISSIONS: Record<string, string[]> = {
   'orders.view': [],
   'orders.manage': ['orders.view'],
+  'orders.pdf_upload': ['orders.view'],
   'payments.verify': ['orders.view'],
   'users.manage': [],
   'settings.manage': [],
@@ -46,6 +47,7 @@ const ROLE_DEFAULTS: Record<string, string[]> = {
   'operator': ['orders.view', 'orders.manage', 'documents.generate', 'documents.view'],
   'contabil': ['orders.view', 'payments.verify', 'documents.view'],
   'avocat': ['orders.view', 'documents.view'],
+  'collaborator': ['orders.view', 'orders.pdf_upload'],
 };
 
 // ──────────────────────────────────────────────────────────────

@@ -186,6 +186,9 @@ export async function GET(request: NextRequest) {
       imputernicire: 'Împuternicire',
       cerere_eliberare_pf: 'Cerere Eliberare PF',
       cerere_eliberare_pj: 'Cerere Eliberare PJ',
+      'collaborator-document': 'Document eliberat',
+      'extras-carte-funciara': 'Extras de Carte Funciară',
+      'ancpi-chitanta': 'Chitanță ANCPI',
     };
 
     const clientDocuments = (documents || []).map(doc => ({

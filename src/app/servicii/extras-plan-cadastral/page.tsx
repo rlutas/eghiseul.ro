@@ -28,6 +28,8 @@ import { WhatsAppButton } from '@/components/services/whatsapp-button';
 import { GoogleReviewsBadge } from '@/components/services/google-reviews-badge';
 import { OrderButton } from '@/components/services/order-button';
 import { buildPageMetadata, buildServicePageGraph, BASE_URL, serviceUrl } from '@/lib/seo';
+import { getImobiliareServices } from '@/lib/services/imobiliare';
+import { ServiceSwitcher } from '@/components/services/service-switcher';
 
 // New service — no WP legacy URL, so the folder name matches the DB slug and
 // serviceUrl() resolves to this page with no redirect/override needed.
@@ -93,6 +95,7 @@ const jsonLdGraph = buildServicePageGraph({
 
 export default async function ExtrasPlanCadastralPage() {
   const service = await getService();
+  const switcherServices = await getImobiliareServices();
   if (!service) notFound();
 
   // Price display: base_price is VAT-inclusive (total). Show the ex-VAT number as
@@ -282,6 +285,15 @@ export default async function ExtrasPlanCadastralPage() {
             </div>
           </div>
         </section>
+
+        {/* Service switcher — jump between cadastral services (cfunciara-style) */}
+        {switcherServices.length > 1 && (
+          <section className="bg-white border-b border-neutral-200">
+            <div className="container mx-auto px-4 max-w-[820px] py-6">
+              <ServiceSwitcher services={switcherServices} currentSlug={SERVICE_SLUG} mode="page" className="max-w-md" />
+            </div>
+          </section>
+        )}
 
         {/* SEO Intro */}
         <section className="py-12 lg:py-16 bg-neutral-50">

@@ -140,6 +140,17 @@ const CONSTATATOR_PF_BILLING_OPTIONS: BillingOption[] = [
   },
 ];
 
+// Property/cadastral (imobiliare) services collect no scanned ID, so billing is
+// a simple Persoană fizică / Persoană juridică choice (no "Facturează pe mine").
+const NO_ID_SCAN_PROPERTY_SLUGS = new Set<string>([
+  'extras-carte-funciara', 'identificare-imobil', 'extras-plan-cadastral',
+  'certificat-sarcini', 'copie-carte-funciara', 'copie-plan-cadastral',
+  'copie-inventar-coordonate', 'copie-intabulare', 'copie-releveu',
+  'copie-arhiva-ocpi', 'copie-contract-vanzare', 'plan-amplasament-delimitare',
+  'copie-plan-incadrare', 'extras-cf-colectiv', 'actualizare-adresa-cf',
+  'identificare-imobile-proprietar', 'certificat-detineri-imobile',
+]);
+
 // Billing options for Extras Carte Funciară — no ID scan, so no "pe mine".
 // Client simply picks Persoană fizică OR Persoană juridică and fills the fields.
 const CF_BILLING_OPTIONS: BillingOption[] = [
@@ -168,9 +179,11 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
   // Certificat constatator pe persoană: bill the requester person by default.
   const isConstatatorPf =
     serviceSlug === 'certificat-constatator' && constatator?.documentType === 'pf';
-  // No-KYC property services (Extras CF, Identificare imobil): no ID scan → PF
-  // (manual) or PJ; CNP optional.
-  const isCarteFunciara = serviceSlug === 'extras-carte-funciara' || serviceSlug === 'identificare-imobil';
+  // No-KYC property/topograph services (imobiliare): no ID scan → the client
+  // simply picks Persoană fizică OR Persoană juridică (no "Facturează pe mine");
+  // CNP optional. Covers Extras CF, Identificare imobil, Plan cadastral + the
+  // full cadastral catalog (certificat sarcini, copii, PAD, etc.).
+  const isCarteFunciara = NO_ID_SCAN_PROPERTY_SLUGS.has(serviceSlug || '');
   const companyFirst = isPJOrder || isConstatatorFirm;
 
   // CUI validation state
@@ -621,7 +634,7 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
       {(selectedSource === 'self' || selectedSource === 'other_pf') && (
         <div className="space-y-4 p-4 bg-neutral-50 rounded-xl">
           <h4 className="font-medium text-secondary-900">
-            {selectedSource === 'self' ? 'Date facturare (din act)' : 'Date facturare (persoană fizică)'}
+            {selectedSource === 'self' && !isCarteFunciara ? 'Date facturare (din act)' : 'Date facturare (persoană fizică)'}
           </h4>
 
           {selectedSource === 'self' && prefillFromId && (

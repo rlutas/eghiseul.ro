@@ -31,6 +31,8 @@ import { GoogleReviewsBadge } from '@/components/services/google-reviews-badge';
 import { ReviewsSection } from '@/components/services/reviews-section';
 import { GOOGLE_RATING, GOOGLE_REVIEW_COUNT_LABEL } from '@/config/contact';
 import { buildPageMetadata, buildServicePageGraph, BASE_URL, serviceUrl } from '@/lib/seo';
+import { getImobiliareServices } from '@/lib/services/imobiliare';
+import { ServiceSwitcher } from '@/components/services/service-switcher';
 
 // Database slug (order pipeline identifier). URL path uses the WP slug
 // (extras-DE-carte-funciara) to preserve the indexed URL + backlinks.
@@ -106,6 +108,7 @@ export default async function ExtrasCarteFunciaraPage() {
   if (!data) notFound();
 
   const { service } = data;
+  const switcherServices = await getImobiliareServices();
   // Defensive: hide add-ons we don't actually offer for CF (e.g. legalized
   // copies), independent of the DB/ISR cache state.
   const HIDDEN_OPTION_CODES = new Set(['copii_suplimentare']);
@@ -302,6 +305,15 @@ export default async function ExtrasCarteFunciaraPage() {
             </div>
           </div>
         </section>
+
+        {/* Service switcher — jump between cadastral services (cfunciara-style) */}
+        {switcherServices.length > 1 && (
+          <section className="bg-white border-b border-neutral-200">
+            <div className="container mx-auto px-4 max-w-[820px] py-6">
+              <ServiceSwitcher services={switcherServices} currentSlug={SERVICE_SLUG} mode="page" className="max-w-md" />
+            </div>
+          </section>
+        )}
 
         {/* SEO Intro */}
         <section className="py-12 lg:py-16 bg-neutral-50">

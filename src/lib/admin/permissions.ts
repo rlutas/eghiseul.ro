@@ -7,6 +7,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 export type Permission =
   | 'orders.view'
   | 'orders.manage'
+  | 'orders.pdf_upload'
   | 'payments.verify'
   | 'users.manage'
   | 'settings.manage'
@@ -23,6 +24,7 @@ export type Permission =
 const IMPLIED_PERMISSIONS: Record<Permission, Permission[]> = {
   'orders.view': [],
   'orders.manage': ['orders.view'],
+  'orders.pdf_upload': ['orders.view'],
   'payments.verify': ['orders.view'],
   'users.manage': [],
   'settings.manage': [],
@@ -37,6 +39,7 @@ const IMPLIED_PERMISSIONS: Record<Permission, Permission[]> = {
 export const ALL_PERMISSIONS: Permission[] = [
   'orders.view',
   'orders.manage',
+  'orders.pdf_upload',
   'payments.verify',
   'users.manage',
   'settings.manage',
@@ -67,6 +70,10 @@ const ROLE_DEFAULTS: Record<string, Permission[]> = {
   'operator': ['orders.view', 'orders.manage', 'documents.generate', 'documents.view'],
   'contabil': ['orders.view', 'payments.verify', 'documents.view'],
   'avocat': ['orders.view', 'documents.view'],
+  // Collaborator (e.g. authorized topograph): scoped to assigned services only.
+  // Service scoping is enforced separately via collaborator_service_assignments.
+  // NOTE: collaborator is intentionally NOT in ADMIN_ROLES — no /admin access.
+  'collaborator': ['orders.view', 'orders.pdf_upload'],
 };
 
 /**
@@ -223,4 +230,68 @@ export async function requireAdmin(userId: string): Promise<void> {
       { status: 403, headers: { 'Content-Type': 'application/json' } }
     );
   }
+}
+
+// ──────────────────────────────────────────────────────────────
+// Collaborator scoping (topograph). Collaborators see/handle only the
+// orders of the services explicitly assigned to them.
+// ──────────────────────────────────────────────────────────────
+
+/**
+ * Returns the service_id UUIDs a collaborator is assigned to handle.
+ */
+export async function getCollaboratorServices(userId: string): Promise<string[]> {
+  // collaborator_service_assignments is not in the generated types yet.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const supabase = createAdminClient() as any;
+  const { data } = await supabase
+    .from('collaborator_service_assignments')
+    .select('service_id')
+    .eq('collaborator_id', userId);
+  return ((data as { service_id: string }[] | null) || []).map((r) => r.service_id);
+}
+
+/**
+ * Require the user to be a collaborator assigned to the given order's service.
+ * Throws a 403 Response otherwise. Use at the entry of every /api/collaborator route.
+ *
+ * Returns the order's service_id on success (handy for callers).
+ */
+export async function requireCollaboratorForOrder(
+  userId: string,
+  orderId: string
+): Promise<string> {
+  const { role } = await getUserPermissions(userId);
+  if (role !== 'collaborator') {
+    throw new Response(
+      JSON.stringify({ error: 'Collaborator access required' }),
+      { status: 403, headers: { 'Content-Type': 'application/json' } }
+    );
+  }
+
+  const supabase = createAdminClient();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: order } = await (supabase as any)
+    .from('orders')
+    .select('service_id')
+    .eq('id', orderId)
+    .single();
+
+  const serviceId: string | undefined = order?.service_id;
+  if (!serviceId) {
+    throw new Response(
+      JSON.stringify({ error: 'Order not found' }),
+      { status: 404, headers: { 'Content-Type': 'application/json' } }
+    );
+  }
+
+  const assigned = await getCollaboratorServices(userId);
+  if (!assigned.includes(serviceId)) {
+    throw new Response(
+      JSON.stringify({ error: 'Order not in your assigned services' }),
+      { status: 403, headers: { 'Content-Type': 'application/json' } }
+    );
+  }
+
+  return serviceId;
 }

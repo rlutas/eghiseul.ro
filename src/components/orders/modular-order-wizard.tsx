@@ -46,9 +46,11 @@ function StepLoading() {
 interface ModularOrderWizardProps {
   initialService: Service;
   initialOptions: ServiceOption[];
+  /** Optional control rendered in the header (e.g. cadastral service switcher). */
+  headerExtra?: React.ReactNode;
 }
 
-export function ModularOrderWizard({ initialService, initialOptions }: ModularOrderWizardProps) {
+export function ModularOrderWizard({ initialService, initialOptions, headerExtra }: ModularOrderWizardProps) {
   const {
     state,
     initService,
@@ -392,6 +394,10 @@ export function ModularOrderWizard({ initialService, initialOptions }: ModularOr
             <OrderIdBadge orderId={state.friendlyOrderId} />
           </div>
         )}
+
+        {/* Optional header control (cadastral service switcher) — full width,
+            responsive: stacks under the title on mobile, sits inline on desktop. */}
+        {headerExtra && <div className="mt-3 sm:mt-4">{headerExtra}</div>}
       </div>
 
       {/* Progress Indicator */}

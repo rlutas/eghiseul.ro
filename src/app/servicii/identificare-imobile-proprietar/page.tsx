@@ -14,17 +14,17 @@ import {
   Mail,
   Landmark,
   ScrollText,
-  Building2,
   AlertTriangle,
-  UserSearch,
+  Users,
+  Layers,
 } from 'lucide-react';
 import { Service, formatEstimatedDays } from '@/types/services';
 import { Footer } from '@/components/home/footer';
 import { ServiceFAQ } from '@/components/services/service-faq';
+import { ReviewsSection } from '@/components/services/reviews-section';
 import { MobileStickyCTA } from '@/components/services/mobile-sticky-cta';
 import { WhatsAppButton } from '@/components/services/whatsapp-button';
 import { GoogleReviewsBadge } from '@/components/services/google-reviews-badge';
-import { ReviewsSection } from '@/components/services/reviews-section';
 import { OrderButton } from '@/components/services/order-button';
 import { buildPageMetadata, buildServicePageGraph, BASE_URL, serviceUrl } from '@/lib/seo';
 import { getImobiliareServices } from '@/lib/services/imobiliare';
@@ -32,15 +32,15 @@ import { ServiceSwitcher } from '@/components/services/service-switcher';
 
 // New service — no WP legacy URL, so the folder name matches the DB slug and
 // serviceUrl() resolves to this page with no redirect/override needed.
-const SERVICE_SLUG = 'identificare-imobil';
-const PAGE_PATH = '/servicii/identificare-imobil/';
-const SCHEMA_SLUG = 'identificare-imobil';
-const TITLE = 'Număr Cadastral după Adresă — Îl Aflăm Noi | Extras CF';
+const SERVICE_SLUG = 'identificare-imobile-proprietar';
+const PAGE_PATH = '/servicii/identificare-imobile-proprietar/';
+const SCHEMA_SLUG = 'identificare-imobile-proprietar';
+const TITLE = 'Identificare Imobile după Proprietar — Lista Bunurilor';
 const DESCRIPTION =
-  'Ne dai adresa, îți aflăm numărul cadastral și de carte funciară din ANCPI ' +
-  'și primești extrasul CF pe email. 198 RON, taxe incluse, fără cont ANCPI.';
-const DATE_PUBLISHED = '2026-06-16';
-const DATE_MODIFIED = '2026-06-16';
+  'Identificăm imobilele înscrise pe numele unei persoane (fizice sau juridice) în evidențele de ' +
+  'cadastru și carte funciară, după nume și localitate. 198 RON, taxe OCPI incluse, livrare pe email.';
+const DATE_PUBLISHED = '2026-06-25';
+const DATE_MODIFIED = '2026-06-25';
 
 export const revalidate = 3600;
 
@@ -68,11 +68,12 @@ export const metadata = buildPageMetadata({
 
 const jsonLdGraph = buildServicePageGraph({
   slug: SCHEMA_SLUG,
-  name: 'Identificare Imobil după Adresă',
+  name: 'Identificare Imobile după Proprietar',
   description:
-    'Serviciu de identificare a unui imobil (parcelă/construcție și număr de carte funciară) pornind ' +
-    'de la adresă, atunci când nu cunoști numărul cadastral. După identificare primești și extrasul de ' +
-    'carte funciară de la ANCPI. 100% online, fără cont ANCPI, livrare pe email.',
+    'Serviciu de identificare a imobilelor (terenuri și construcții) deținute de o persoană fizică ' +
+    'sau juridică, prin căutare în evidențele de cadastru și carte funciară după numele proprietarului ' +
+    '(și, unde e cazul, CNP/CUI), la nivel de localitate și județ. Rezultatul este lista imobilelor ' +
+    'înscrise pe acel proprietar. 100% online, fără cont ANCPI, livrare pe email.',
   serviceType: 'Document Processing — Real Estate',
   datePublished: DATE_PUBLISHED,
   dateModified: DATE_MODIFIED,
@@ -84,15 +85,15 @@ const jsonLdGraph = buildServicePageGraph({
   breadcrumb: [
     { name: 'Acasă', url: `${BASE_URL}/` },
     { name: 'Servicii', url: `${BASE_URL}/servicii/` },
-    { name: 'Identificare Imobil după Adresă', url: `${BASE_URL}${PAGE_PATH}` },
+    { name: 'Identificare Imobile după Proprietar', url: `${BASE_URL}${PAGE_PATH}` },
   ],
   offers: [
-    { name: 'Identificare Imobil după Adresă', price: 198, url: `${BASE_URL}${PAGE_PATH}` },
+    { name: 'Identificare Imobile după Proprietar', price: 198, url: `${BASE_URL}${PAGE_PATH}` },
   ],
   aggregateRating: { ratingValue: 4.9, reviewCount: 450 },
 });
 
-export default async function IdentificareImobilPage() {
+export default async function IdentificareImobileProprietarPage() {
   const service = await getService();
   const switcherServices = await getImobiliareServices();
   if (!service) notFound();
@@ -103,19 +104,18 @@ export default async function IdentificareImobilPage() {
   const priceExVat = Math.round((priceWithVat / 1.21) * 100) / 100;
   const fmt = (v: number) => (Number.isInteger(v) ? String(v) : v.toFixed(2).replace('.', ','));
 
-  // Why you might not know the cadastral number — targets the long-tail intent
-  const reasons = [
-    { icon: Home, title: 'Casă moștenită', desc: 'Imobil primit prin succesiune, fără actele cadastrale la îndemână.' },
-    { icon: Building2, title: 'Apartament', desc: 'Cunoști adresa, dar nu numărul cadastral sau de carte funciară.' },
-    { icon: ScrollText, title: 'Act vechi', desc: 'Proprietate cu documente vechi, fără număr cadastral atribuit clar.' },
-    { icon: MapPin, title: 'Teren', desc: 'Parcelă pe care vrei să o localizezi și să o verifici juridic.' },
+  // What you give us — search is by OWNER, not by cadastral number
+  const identifiers = [
+    { icon: Users, title: 'Nume / denumire proprietar', desc: 'Numele complet al persoanei fizice sau denumirea persoanei juridice (firmă).' },
+    { icon: ScrollText, title: 'CNP / CUI (opțional)', desc: 'Codul numeric personal sau codul fiscal, dacă îl ai — crește precizia căutării.' },
+    { icon: MapPin, title: 'Județ + localitate', desc: 'Zona în care căutăm imobilele înscrise pe numele proprietarului.' },
   ];
 
   const useCases = [
-    { icon: Search, title: 'Vrei extrasul CF', items: ['Dar nu știi nr. cadastral', 'Pornind doar de la adresă', 'Verificare proprietar'] },
-    { icon: Home, title: 'Tranzacție imobiliară', items: ['Verifici un imobil înainte de cumpărare', 'Confirmi proprietarul', 'Identifici sarcini'] },
-    { icon: ScrollText, title: 'Succesiune', items: ['Imobil moștenit', 'Acte incomplete', 'Pregătire dosar notarial'] },
-    { icon: Shield, title: 'Verificare proprietate', items: ['Localizezi parcela', 'Afli situația juridică', 'Confirmi datele'] },
+    { icon: ScrollText, title: 'Succesiuni', items: ['Masa succesorală', 'Imobile moștenite', 'Dosar notarial'] },
+    { icon: Search, title: 'Due diligence', items: ['Verificare patrimoniu', 'Înainte de o tranzacție', 'Confirmare proprietar'] },
+    { icon: Landmark, title: 'Executări & creanțe', items: ['Bunuri urmăribile', 'Recuperare creanțe', 'Dosar de executare'] },
+    { icon: Shield, title: 'Litigii & partaj', items: ['Proces civil', 'Partaj de bunuri', 'Verificare dețineri'] },
   ];
 
   return (
@@ -144,7 +144,7 @@ export default async function IdentificareImobilPage() {
               <ChevronRight className="h-4 w-4" />
               <Link href="/servicii/" className="hover:text-primary-500 transition-colors">Servicii</Link>
               <ChevronRight className="h-4 w-4" />
-              <span className="text-white font-medium">Identificare Imobil după Adresă</span>
+              <span className="text-white font-medium">Identificare Imobile după Proprietar</span>
             </nav>
 
             <div className="flex flex-col-reverse lg:flex-row lg:justify-between gap-8 lg:gap-12">
@@ -155,45 +155,45 @@ export default async function IdentificareImobilPage() {
                     Imobiliare
                   </Badge>
                   <Badge className="bg-green-600 text-white font-bold px-3 py-1">
-                    <UserSearch className="h-3.5 w-3.5 mr-1" />
-                    Aflăm noi numărul cadastral
+                    <Users className="h-3.5 w-3.5 mr-1" />
+                    Căutare după proprietar
                   </Badge>
                   <Badge variant="outline" className="text-white/80 border-white/30 px-3 py-1">
                     <Landmark className="h-3.5 w-3.5 mr-1" />
-                    ANCPI
+                    Cadastru & CF
                   </Badge>
                 </div>
 
                 <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-tight mb-5">
-                  Identificare Imobil
-                  <span className="block text-primary-500">după Adresă</span>
+                  Identificare Imobile
+                  <span className="block text-primary-500">după Proprietar</span>
                 </h1>
 
                 <p className="text-lg sm:text-xl text-white/85 leading-relaxed mb-6">
-                  Nu știi numărul cadastral sau de carte funciară? Îți identificăm imobilul pornind doar
-                  de la adresă și primești și extrasul de carte funciară.
+                  Afli ce imobile deține o persoană fizică sau juridică. Căutăm în evidențele de cadastru
+                  și carte funciară după numele proprietarului și îți livrăm lista imobilelor înscrise pe el.
                 </p>
 
                 {/* USP */}
                 <div className="flex items-start gap-3 rounded-xl bg-primary-500/15 border border-primary-500/40 p-4 mb-6">
-                  <UserSearch className="h-5 w-5 text-primary-500 flex-shrink-0 mt-0.5" />
+                  <Users className="h-5 w-5 text-primary-500 flex-shrink-0 mt-0.5" />
                   <p className="text-white/95 text-sm sm:text-base leading-relaxed">
-                    Dai <strong className="text-primary-500">adresa</strong>, noi căutăm parcela/construcția
-                    în sistemul ANCPI, îți <strong>aflăm numărul cadastral și de carte funciară</strong> și
-                    îți livrăm extrasul CF — fără cont ANCPI și fără drum la OCPI.
+                    Aici <strong className="text-primary-500">nu căutăm după numărul cadastral</strong>, ci
+                    după <strong>proprietar</strong>: ne dai numele (și, dacă îl ai, CNP/CUI) plus județul și
+                    localitatea, iar noi îți spunem ce imobile sunt înscrise pe numele lui.
                   </p>
                 </div>
 
                 <div className="bg-white/10 backdrop-blur-sm rounded-xl p-5 border border-white/20 mb-6">
                   <p className="text-white/90 leading-relaxed text-sm sm:text-base">
-                    <strong className="text-primary-500">Cum decurge</strong> identificarea imobilului:
+                    <strong className="text-primary-500">Cum decurge</strong> identificarea după proprietar:
                   </p>
                   <ul className="mt-3 space-y-1.5 text-white/85 text-sm">
                     {[
-                      'Ne dai adresa completă a imobilului',
-                      'Localizăm parcela/construcția în sistemul ANCPI',
-                      'Identificăm numărul cadastral și de carte funciară',
-                      'Primești extrasul CF pe email',
+                      'Ne dai numele proprietarului și județul/localitatea',
+                      'Verificăm eligibilitatea cererii și interesul legitim',
+                      'Plătești securizat (taxele OCPI sunt incluse)',
+                      'Primești lista imobilelor pe email',
                     ].map((step) => (
                       <li key={step} className="flex items-center gap-2">
                         <CheckCircle className="w-4 h-4 text-primary-500 flex-shrink-0" />
@@ -210,7 +210,7 @@ export default async function IdentificareImobilPage() {
                   <div className="relative bg-gradient-to-br from-secondary-900 via-secondary-800 to-[#0C1A2F] p-6 text-center">
                     <div className="relative">
                       <span className="inline-block px-3 py-1 bg-primary-500 text-secondary-900 text-xs font-bold rounded-full mb-3">
-                        EXTRAS CF INCLUS
+                        TAXE OCPI INCLUSE
                       </span>
                       <div className="flex items-baseline justify-center gap-1">
                         <span className="text-5xl lg:text-6xl font-black text-white">{fmt(priceExVat)}</span>
@@ -219,7 +219,7 @@ export default async function IdentificareImobilPage() {
                       <p className="text-white/70 text-sm mt-2">
                         + TVA 21% · <span className="font-semibold text-white">{fmt(priceWithVat)} RON</span> cu TVA
                       </p>
-                      <p className="text-white/50 text-xs mt-1">Identificare + extras CF, taxe incluse</p>
+                      <p className="text-white/50 text-xs mt-1">Căutare după proprietar, taxe incluse</p>
                     </div>
                   </div>
 
@@ -240,7 +240,7 @@ export default async function IdentificareImobilPage() {
                       </div>
                       <div>
                         <p className="font-semibold text-secondary-900 text-sm">Livrare pe Email</p>
-                        <p className="text-xs text-neutral-500">Nr. cadastral/CF + extras CF</p>
+                        <p className="text-xs text-neutral-500">Lista imobilelor proprietarului</p>
                       </div>
                     </div>
 
@@ -270,9 +270,9 @@ export default async function IdentificareImobilPage() {
           <div className="container mx-auto px-4 max-w-[1100px] py-6 lg:py-8">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
               {[
-                { icon: UserSearch, value: 'După adresă', label: 'Aflăm nr. cadastral/CF' },
-                { icon: Landmark, value: 'ANCPI', label: 'Date oficiale OCPI' },
-                { icon: Shield, value: 'Extras CF inclus', label: 'Fără cont, fără drum la OCPI' },
+                { icon: Users, value: 'După proprietar', label: 'Nume / denumire firmă' },
+                { icon: Landmark, value: 'Cadastru & CF', label: 'Evidențe OCPI / ANCPI' },
+                { icon: Shield, value: 'Eligibilitate', label: 'Verificăm interesul legitim' },
                 { icon: CheckCircle, value: '4.9/5', label: 'Peste 450 recenzii' },
               ].map((t) => (
                 <div key={t.label} className="flex flex-col items-center gap-1.5">
@@ -300,95 +300,101 @@ export default async function IdentificareImobilPage() {
         <section className="py-12 lg:py-16 bg-neutral-50">
           <div className="container mx-auto px-4 max-w-[820px]">
             <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-5">
-              Cum afli numărul cadastral după adresă
+              Ce înseamnă identificarea imobilelor după proprietar
             </h2>
             <div className="space-y-4 text-neutral-700 leading-relaxed">
               <p>
-                Pentru a obține un <strong>extras de carte funciară</strong> ai nevoie de un identificator al
-                imobilului — <strong>numărul cadastral</strong> sau <strong>numărul de carte funciară</strong>.
-                Problema apare des: cunoști adresa, dar nu ai numărul cadastral la îndemână. Acolo intervenim noi:
-                <strong> identificăm imobilul după adresă</strong> și îți spunem numărul cadastral și de carte funciară.
+                <strong>Identificarea imobilelor după proprietar</strong> înseamnă să afli ce terenuri și
+                construcții deține o anumită persoană — fizică sau juridică — pornind de la{' '}
+                <strong>numele proprietarului</strong>, nu de la numărul cadastral sau de la adresă. Căutăm în
+                evidențele de <strong>cadastru și carte funciară</strong>, la nivel de localitate și județ, și
+                îți întocmim lista imobilelor înscrise pe numele indicat.
               </p>
               <p>
-                Folosim datele oficiale ale ANCPI (geoportalul și sistemul de cadastru) pentru a localiza
-                <strong> parcela sau construcția</strong> la adresa indicată. După ce identificăm imobilul, obținem
-                și <strong>extrasul de carte funciară</strong> și îți trimitem totul pe email, fără cont ANCPI și
-                fără deplasare la Oficiul de Cadastru (OCPI).
+                Spre deosebire de un extras de carte funciară clasic — unde pornești de la un imobil cunoscut și
+                afli cine este proprietarul — aici procesul este invers: pornești de la o{' '}
+                <strong>persoană</strong> și afli ce imobile are. Este o căutare pe care o pot face proprietarii,
+                moștenitorii, creditorii, avocații sau cumpărătorii care vor să verifice patrimoniul cuiva
+                înainte de o decizie importantă.
               </p>
+
+              <div className="rounded-2xl border border-neutral-200 bg-white p-5">
+                <h3 className="font-bold text-secondary-900 mb-2">
+                  Căutare după proprietar, nu după număr cadastral
+                </h3>
+                <p className="text-sm text-neutral-700">
+                  Important: pentru acest serviciu <strong>nu ai nevoie de numărul cadastral</strong> sau de
+                  numărul de carte funciară. Câmpurile de care avem nevoie sunt:{' '}
+                  <strong>numele / denumirea proprietarului</strong>, opțional <strong>CNP-ul</strong> (persoană
+                  fizică) sau <strong>CUI-ul</strong> (persoană juridică), plus <strong>județul și
+                  localitatea</strong> în care vrei să căutăm. Cu cât datele sunt mai precise, cu atât lista
+                  rezultată este mai exactă.
+                </p>
+              </div>
+
+              <p>
+                După verificare, primești pe email <strong>lista imobilelor</strong> înscrise pe numele
+                proprietarului în zona indicată, cu informațiile disponibile pentru fiecare poziție (localizare,
+                tip de imobil și, unde se poate, numărul cadastral sau de carte funciară). Pe baza acestei liste
+                poți comanda apoi un{' '}
+                <Link href={serviceUrl('extras-carte-funciara')} className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
+                  extras de carte funciară
+                </Link>
+                {' '}pentru fiecare imobil care te interesează.
+              </p>
+
               <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 flex items-start gap-3">
                 <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
                 <div>
-                  <h3 className="font-bold text-secondary-900 mb-1">Important — când identificarea poate să nu reușească</h3>
+                  <h3 className="font-bold text-secondary-900 mb-1">Eligibilitate & protecția datelor (GDPR)</h3>
                   <p className="text-sm text-neutral-700">
-                    Dacă imobilul <strong>nu este înscris în cartea funciară</strong> (neintabulat / fără cadastru),
-                    identificarea poate să nu reușească — în acest caz căutăm date utile prin alte surse oficiale.
-                    <strong> Apartamentele</strong> pot necesita verificări suplimentare (bloc, scară, etaj). Te ținem
-                    la curent pe tot parcursul și îți comunicăm rezultatul.
+                    Căutarea după proprietar prelucrează date cu caracter personal și este supusă verificării
+                    <strong> interesului legitim</strong>. Înainte de procesare, echipa noastră{' '}
+                    <strong>verifică eligibilitatea cererii</strong> (de exemplu: calitatea de moștenitor,
+                    creditor, parte într-un litigiu sau alt temei legal). Dacă cererea nu îndeplinește condițiile,
+                    îți comunicăm acest lucru și nu se efectuează căutarea.
                   </p>
                 </div>
               </div>
 
-              <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
-                <h3 className="text-lg font-bold text-secondary-900 mb-3">
-                  Localizare teren după număr cadastral și verificare cadastru online
-                </h3>
-                <p className="text-sm sm:text-base text-neutral-700 leading-relaxed mb-3">
-                  Identificarea funcționează în ambele sensuri. Dacă ai doar adresa, îți aflăm numărul
-                  cadastral și de carte funciară. Dacă ai deja un <strong>număr cadastral</strong> și vrei să
-                  <strong> localizezi terenul</strong> sau să faci o <strong>verificare cadastru online</strong>,
-                  confirmăm parcela în sistemul ANCPI și îți spunem cui aparține și ce situație juridică are.
-                </p>
-                <p className="text-sm sm:text-base text-neutral-700 leading-relaxed">
-                  Rezultatul nu este o simplă căutare pe hartă: îți eliberăm și <strong>extrasul oficial de
-                  carte funciară</strong>, documentul care confirmă proprietarul, suprafața și eventualele
-                  sarcini (ipoteci, interdicții, litigii) — exact ce ai nevoie înainte de o tranzacție.
-                </p>
-              </div>
-
-              <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
-                <h3 className="text-lg font-bold text-secondary-900 mb-3">
-                  Vrei să afli singur numărul cadastral?
-                </h3>
-                <p className="text-sm sm:text-base text-neutral-700 leading-relaxed">
-                  Dacă preferi să încerci pe cont propriu, am scris un ghid pas cu pas despre{' '}
-                  <Link
-                    href="/cum-aflam-numarul-carte-functionara-si-nr-cadastral/"
-                    className="font-semibold text-primary-700 underline underline-offset-2 hover:text-primary-800"
-                  >
-                    cum afli numărul de carte funciară și numărul cadastral
-                  </Link>
-                  . Dacă ai deja numărul și vrei doar documentul, mergi direct la{' '}
-                  <Link
-                    href={serviceUrl('extras-carte-funciara')}
-                    className="font-semibold text-primary-700 underline underline-offset-2 hover:text-primary-800"
-                  >
-                    extrasul de carte funciară
-                  </Link>
-                  . Serviciul de față e pentru situația în care <strong>nu cunoști numărul</strong> și vrei
-                  să îl aflăm noi după adresă, împreună cu extrasul CF.
-                </p>
-              </div>
+              <h3 className="text-xl font-bold text-secondary-900 pt-2">
+                Acoperire la nivel de localitate și județ
+              </h3>
+              <p>
+                Evidențele de cadastru și carte funciară sunt organizate pe <strong>localități și unități
+                administrativ-teritoriale</strong>. De aceea, căutarea după proprietar se face pe zona pe care o
+                indici (o localitate sau un județ), nu automat pe toată țara. Dacă bănuiești că o persoană deține
+                imobile în mai multe județe, ne poți indica fiecare zonă și extindem căutarea corespunzător.
+              </p>
+              <p>
+                Dacă, în schimb, cunoști deja adresa unui imobil și vrei să afli numărul cadastral sau
+                proprietarul lui, folosește serviciul de{' '}
+                <Link href={serviceUrl('identificare-imobil')} className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
+                  identificare imobil după adresă
+                </Link>
+                . Serviciul de față este pentru situația inversă: pleci de la o persoană și afli imobilele ei.
+              </p>
             </div>
           </div>
         </section>
 
-        {/* Reasons you might not know the number */}
+        {/* Identifiers */}
         <section className="py-12 lg:py-20 bg-white">
           <div className="container mx-auto px-4 max-w-[1100px]">
             <div className="text-center mb-10">
               <span className="inline-block px-4 py-1.5 bg-primary-100 text-primary-700 text-sm font-semibold rounded-full mb-4">
-                Pentru cine
+                Ce îți trebuie
               </span>
               <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-3">
-                Când ai nevoie de identificarea imobilului
+                Ce date ne dai pentru căutarea după proprietar
               </h2>
               <p className="text-neutral-600 max-w-2xl mx-auto">
-                Ai doar adresa și vrei să afli numărul cadastral, numărul de carte funciară sau proprietarul.
+                Nu ai nevoie de numărul cadastral. Pornim de la datele proprietarului și de la localitate.
               </p>
             </div>
 
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-              {reasons.map((it) => (
+            <div className="grid sm:grid-cols-3 gap-5 max-w-3xl mx-auto">
+              {identifiers.map((it) => (
                 <div key={it.title} className="bg-neutral-50 rounded-2xl p-5 border border-neutral-200 hover:border-primary-300 hover:shadow-lg hover:-translate-y-1 transition-all duration-200">
                   <div className="w-12 h-12 bg-gradient-to-br from-primary-100 to-primary-200 rounded-xl flex items-center justify-center mb-4">
                     <it.icon className="w-6 h-6 text-primary-600" />
@@ -398,6 +404,15 @@ export default async function IdentificareImobilPage() {
                 </div>
               ))}
             </div>
+
+            <div className="mt-6 p-5 bg-primary-50 rounded-2xl border border-primary-200 max-w-3xl mx-auto flex items-start gap-3">
+              <Search className="w-5 h-5 text-primary-600 flex-shrink-0 mt-0.5" />
+              <p className="text-sm text-secondary-700">
+                <strong>Cauți o firmă?</strong> Pentru persoane juridice ne dai denumirea și, ideal,{' '}
+                <strong>CUI-ul</strong>. Pentru persoane fizice, numele complet și, dacă îl ai,{' '}
+                <strong>CNP-ul</strong> ajută la diferențierea persoanelor cu nume identice.
+              </p>
+            </div>
           </div>
         </section>
 
@@ -406,10 +421,10 @@ export default async function IdentificareImobilPage() {
           <div className="container mx-auto px-4 max-w-[1400px]">
             <div className="text-center mb-10">
               <span className="inline-block px-4 py-1.5 bg-primary-100 text-primary-700 text-sm font-semibold rounded-full mb-4">
-                Situații frecvente
+                Când ai nevoie
               </span>
               <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-3">
-                În ce situații te ajută
+                Când Ai Nevoie de Identificarea Imobilelor după Proprietar?
               </h2>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -444,15 +459,15 @@ export default async function IdentificareImobilPage() {
                 Proces simplu
               </span>
               <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white mb-3">Cum Funcționează?</h2>
-              <p className="text-white/70 max-w-2xl mx-auto">Identificăm imobilul în 4 pași, 100% online</p>
+              <p className="text-white/70 max-w-2xl mx-auto">Identificăm imobilele proprietarului în 4 pași, 100% online</p>
             </div>
             <div className="relative grid sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-6">
               <div className="hidden lg:block absolute top-8 left-[12.5%] right-[12.5%] h-0.5 bg-gradient-to-r from-primary-500/0 via-primary-500/50 to-primary-500/0" aria-hidden="true" />
               {[
-                { step: 1, title: 'Ne dai adresa', desc: 'Completezi adresa imobilului (județ, localitate, stradă, număr).', icon: MapPin },
-                { step: 2, title: 'Căutăm imobilul', desc: 'Localizăm parcela/construcția în sistemul ANCPI și identificăm nr. cadastral/CF.', icon: Search },
-                { step: 3, title: 'Plătești Securizat', desc: 'Card, Apple Pay, Google Pay — taxele ANCPI sunt incluse în preț.', icon: Shield },
-                { step: 4, title: 'Primești rezultatul', desc: `În ${formatEstimatedDays(service)} primești nr. cadastral/CF și extrasul CF pe email.`, icon: CheckCircle },
+                { step: 1, title: 'Ne dai datele', desc: 'Numele / denumirea proprietarului, opțional CNP/CUI, plus județul și localitatea.', icon: Users },
+                { step: 2, title: 'Verificăm eligibilitatea', desc: 'Confirmăm interesul legitim al cererii, conform regulilor de protecție a datelor.', icon: Search },
+                { step: 3, title: 'Plătești Securizat', desc: 'Card, Apple Pay, Google Pay — taxele OCPI sunt incluse în preț.', icon: Shield },
+                { step: 4, title: 'Primești lista', desc: `În ${formatEstimatedDays(service)} primești pe email lista imobilelor înscrise pe proprietar.`, icon: CheckCircle },
               ].map((item) => (
                 <div key={item.step} className="relative text-center">
                   <div className="relative z-10 mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-400 to-primary-600 text-secondary-900 shadow-[0_8px_24px_rgba(236,185,95,0.35)]">
@@ -469,13 +484,35 @@ export default async function IdentificareImobilPage() {
 
         <ReviewsSection />
 
-        {/* Related — cross-link to CF + plan cadastral */}
+        {/* Related — cross-link to imobiliare services */}
         <section className="py-12 lg:py-16 bg-white">
           <div className="container mx-auto px-4 max-w-[900px]">
             <h2 className="text-xl sm:text-2xl font-bold text-secondary-900 mb-6 text-center">
               Servicii pentru imobile
             </h2>
-            <div className="grid sm:grid-cols-2 gap-4">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <Link
+                href={serviceUrl('certificat-detineri-imobile')}
+                className="group flex items-start gap-3 rounded-2xl border border-neutral-200 bg-neutral-50 p-5 hover:border-primary-300 hover:shadow-md transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
+              >
+                <Layers className="w-6 h-6 text-primary-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-bold text-secondary-900 group-hover:text-primary-700">Certificat de Dețineri Imobile</p>
+                  <p className="text-sm text-neutral-600">Atestarea imobilelor deținute de o persoană.</p>
+                </div>
+                <ArrowRight className="w-4 h-4 text-neutral-400 ml-auto flex-shrink-0 mt-1 group-hover:text-primary-600" />
+              </Link>
+              <Link
+                href={serviceUrl('identificare-imobil')}
+                className="group flex items-start gap-3 rounded-2xl border border-neutral-200 bg-neutral-50 p-5 hover:border-primary-300 hover:shadow-md transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
+              >
+                <MapPin className="w-6 h-6 text-primary-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-bold text-secondary-900 group-hover:text-primary-700">Identificare Imobil după Adresă</p>
+                  <p className="text-sm text-neutral-600">Pornești de la adresă și afli numărul cadastral.</p>
+                </div>
+                <ArrowRight className="w-4 h-4 text-neutral-400 ml-auto flex-shrink-0 mt-1 group-hover:text-primary-600" />
+              </Link>
               <Link
                 href={serviceUrl('extras-carte-funciara')}
                 className="group flex items-start gap-3 rounded-2xl border border-neutral-200 bg-neutral-50 p-5 hover:border-primary-300 hover:shadow-md transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
@@ -483,18 +520,7 @@ export default async function IdentificareImobilPage() {
                 <ScrollText className="w-6 h-6 text-primary-600 flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="font-bold text-secondary-900 group-hover:text-primary-700">Extras de Carte Funciară</p>
-                  <p className="text-sm text-neutral-600">Dacă știi deja numărul cadastral sau de CF.</p>
-                </div>
-                <ArrowRight className="w-4 h-4 text-neutral-400 ml-auto flex-shrink-0 mt-1 group-hover:text-primary-600" />
-              </Link>
-              <Link
-                href={serviceUrl('extras-plan-cadastral')}
-                className="group flex items-start gap-3 rounded-2xl border border-neutral-200 bg-neutral-50 p-5 hover:border-primary-300 hover:shadow-md transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
-              >
-                <MapPin className="w-6 h-6 text-primary-600 flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="font-bold text-secondary-900 group-hover:text-primary-700">Extras de Plan Cadastral</p>
-                  <p className="text-sm text-neutral-600">Localizezi terenul pe ortofotoplan după nr. cadastral.</p>
+                  <p className="text-sm text-neutral-600">Situația juridică a unui imobil din listă.</p>
                 </div>
                 <ArrowRight className="w-4 h-4 text-neutral-400 ml-auto flex-shrink-0 mt-1 group-hover:text-primary-600" />
               </Link>
@@ -504,19 +530,17 @@ export default async function IdentificareImobilPage() {
 
         {/* FAQ */}
         <ServiceFAQ
-          title="Întrebări Frecvente — Identificare Imobil după Adresă"
+          title="Întrebări Frecvente — Identificare Imobile după Proprietar"
           faqs={[
-            { q: 'Cum aflu numărul cadastral după adresă?', a: 'Ne dai adresa completă a imobilului, iar noi localizăm parcela/construcția în sistemul ANCPI și identificăm numărul cadastral și de carte funciară. Primești rezultatul pe email, împreună cu extrasul CF.' },
-            { q: 'Cum aflu numărul de carte funciară după adresă?', a: 'La fel ca pentru numărul cadastral: pornind de la adresă, identificăm imobilul în sistemul ANCPI și îți comunicăm numărul de carte funciară. Primești și extrasul CF aferent, pe email.' },
-            { q: 'Pot localiza un teren după numărul cadastral?', a: 'Da. Dacă ai deja numărul cadastral, confirmăm parcela în sistemul ANCPI, îți spunem proprietarul și situația juridică și îți eliberăm extrasul de carte funciară. Funcționează și invers, după adresă.' },
-            { q: 'Cum fac o verificare de cadastru online?', a: 'Ne trimiți adresa sau numărul cadastral, iar noi facem verificarea în sistemul oficial ANCPI și îți returnăm extrasul de carte funciară — proprietar, suprafață și eventuale sarcini. Totul 100% online, fără cont ANCPI.' },
-            { q: 'Ce primesc concret?', a: 'Numărul cadastral și/sau de carte funciară al imobilului identificat și extrasul de carte funciară aferent, livrate pe email.' },
-            { q: 'Cât costă identificarea imobilului?', a: `${service.base_price} RON, cu taxele ANCPI și extrasul CF incluse. Fără costuri ascunse.` },
-            { q: 'Cât durează?', a: `${formatEstimatedDays(service)}. Verificarea este făcută de un operator, pentru că presupune căutarea imobilului după adresă.` },
-            { q: 'Funcționează pentru apartamente?', a: 'Da, dar apartamentele pot necesita verificări suplimentare (bloc, scară, etaj) și uneori date din actul de proprietate. Te ținem la curent.' },
-            { q: 'Ce se întâmplă dacă imobilul nu poate fi identificat?', a: 'Dacă imobilul nu este înscris în cartea funciară (neintabulat / fără cadastru), identificarea poate să nu reușească. În acest caz căutăm date utile prin alte surse oficiale și îți comunicăm rezultatul.' },
-            { q: 'Am nevoie de cont ANCPI?', a: 'Nu. Ne ocupăm noi de tot procesul; tu trebuie doar să ne dai adresa imobilului.' },
-            { q: 'Pot identifica imobilul și după proprietar?', a: 'Căutarea standard este după adresă. Dacă ai doar numele proprietarului, contactează-ne și verificăm ce opțiuni sunt disponibile pentru cazul tău.' },
+            { q: 'Cum căutați imobilele după numele proprietarului?', a: 'Pornim de la numele persoanei fizice sau de la denumirea firmei și căutăm în evidențele de cadastru și carte funciară, la nivel de localitate și județ. Întocmim lista imobilelor înscrise pe numele indicat și ți-o trimitem pe email.' },
+            { q: 'Ce date îmi trebuie pentru căutare?', a: 'Ai nevoie de numele / denumirea proprietarului și de zona în care căutăm (județ și localitate). Numărul cadastral nu este necesar. CNP-ul (persoană fizică) sau CUI-ul (persoană juridică) sunt opționale, dar cresc precizia rezultatului.' },
+            { q: 'Ce primesc concret?', a: 'Primești lista imobilelor înscrise pe numele proprietarului în zona indicată, cu informațiile disponibile pentru fiecare poziție (localizare, tip de imobil și, unde se poate, numărul cadastral sau de carte funciară). Apoi poți comanda separat extrasul de carte funciară pentru fiecare imobil.' },
+            { q: 'Căutarea acoperă tot județul sau toată țara?', a: 'Evidențele sunt organizate pe localități și județe, așa că facem căutarea pe zona pe care o indici. Dacă o persoană poate deține imobile în mai multe județe, ne spui fiecare zonă și extindem căutarea corespunzător.' },
+            { q: 'Pot căuta și o firmă (persoană juridică)?', a: 'Da. Pentru persoane juridice ne dai denumirea și, ideal, CUI-ul. Procedura este aceeași: identificăm imobilele înscrise pe firma respectivă în zona indicată.' },
+            { q: 'Cât durează?', a: `${formatEstimatedDays(service)}. Căutarea este făcută de un operator, pentru că presupune verificarea eligibilității și identificarea imobilelor după proprietar.` },
+            { q: 'Cât costă serviciul?', a: `${service.base_price} RON, cu taxele OCPI incluse. Fără costuri ascunse.` },
+            { q: 'Este legal? Cum respectați protecția datelor (GDPR)?', a: 'Căutarea după proprietar prelucrează date cu caracter personal și este permisă doar pe baza unui interes legitim (de exemplu calitatea de moștenitor, creditor sau parte într-un litigiu). Înainte de procesare verificăm eligibilitatea cererii; dacă nu sunt îndeplinite condițiile, nu efectuăm căutarea.' },
+            { q: 'Am nevoie de cont ANCPI?', a: 'Nu. Ne ocupăm noi de tot procesul; tu trebuie doar să ne dai numele proprietarului și zona în care să căutăm.' },
           ]}
         />
 
@@ -534,10 +558,10 @@ export default async function IdentificareImobilPage() {
           <div className="relative container mx-auto px-4 max-w-[900px]">
             <div className="text-center">
               <h2 className="text-2xl lg:text-4xl font-extrabold text-white mb-4">
-                Nu știi numărul cadastral? Îl aflăm noi.
+                Află ce imobile deține un proprietar
               </h2>
               <p className="text-lg text-white/80 mb-8 max-w-xl mx-auto">
-                Ai nevoie doar de adresa imobilului. Primești numărul cadastral/CF și extrasul de carte funciară în {formatEstimatedDays(service)}.
+                Ai nevoie doar de numele proprietarului și de localitate. Primești lista imobilelor în {formatEstimatedDays(service)}.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
                 <OrderButton href={`/comanda/${SERVICE_SLUG}`}>Comandă Acum</OrderButton>

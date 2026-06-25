@@ -18,7 +18,7 @@ export const STATUS_OPTIONS: StatusOption[] = [
   { value: 'submitted_to_institution', label: 'Trimis instituție', group: 'normal' },
   { value: 'document_received', label: 'Document primit', group: 'normal' },
   { value: 'extras_in_progress', label: 'Extras în lucru', group: 'normal' },
-  { value: 'document_ready', label: 'Document gata', group: 'normal' },
+  { value: 'document_ready', label: 'Documentul este eliberat', group: 'normal' },
   { value: 'shipped', label: 'Expediată', group: 'normal' },
   { value: 'delivered', label: 'Livrată', group: 'normal' },
   { value: 'completed', label: 'Finalizată', group: 'normal' },

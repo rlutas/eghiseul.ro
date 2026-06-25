@@ -6,6 +6,8 @@ import { ModularWizardProvider } from '@/providers/modular-wizard-provider';
 import { ModularOrderWizard } from '@/components/orders/modular-order-wizard';
 import { Service, ServiceOption } from '@/types/services';
 import { Loader2 } from 'lucide-react';
+import { getImobiliareServices } from '@/lib/services/imobiliare';
+import { ServiceSwitcher } from '@/components/services/service-switcher';
 
 // Fetch service by slug
 async function getService(slug: string): Promise<{ service: Service; options: ServiceOption[] } | null> {
@@ -86,6 +88,22 @@ export default async function OrderPage({ params }: OrderPageProps) {
     notFound();
   }
 
+  // For cadastral (imobiliare) services, offer a quick service switcher above
+  // the wizard — like cfunciara's service-type dropdown on the order form.
+  const isImobiliare = serviceData.service.category === 'imobiliare';
+  const switcherServices = isImobiliare ? await getImobiliareServices() : [];
+
+  const switcher =
+    isImobiliare && switcherServices.length > 1 ? (
+      <ServiceSwitcher
+        services={switcherServices}
+        currentSlug={serviceData.service.slug}
+        mode="order"
+        inline
+        className="rounded-xl border border-neutral-200 bg-white px-4 py-3 shadow-sm"
+      />
+    ) : undefined;
+
   return (
     <main className="min-h-screen bg-neutral-50 pt-16">
       <Suspense fallback={<WizardLoading />}>
@@ -93,6 +111,7 @@ export default async function OrderPage({ params }: OrderPageProps) {
           <ModularOrderWizard
             initialService={serviceData.service}
             initialOptions={serviceData.options}
+            headerExtra={switcher}
           />
         </ModularWizardProvider>
       </Suspense>
