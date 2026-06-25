@@ -442,7 +442,16 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
         if (ex?.address) fillAddressFields(ex.address);
         setState(prev => ({ ...prev, scanning: false, progress: 100, success: true }));
         setScanFailureCount(0);
-      } else if (ocr?.success && ocr.confidence >= 50) {
+      } else if (
+        ocr?.success &&
+        // Confidence-ul de la Gemini (flash-lite) e NESIGUR — întoarce des 0 chiar
+        // când citește perfect documentul. Nu ne bazăm doar pe el: acceptăm dacă
+        // datele extrase sunt UTILIZABILE — CNP valid (anchor matematic) sau nume
+        // complet. Altfel un buletin citit corect era respins cu „încredere 0%".
+        (ocr.confidence >= 50 ||
+          validateCNP(ocr.extractedData?.cnp || '').valid ||
+          !!(ocr.extractedData?.firstName && ocr.extractedData?.lastName))
+      ) {
         const extracted = ocr.extractedData;
 
         // Birth date — prefer CNP-derived over OCR. CNP is mathematically
