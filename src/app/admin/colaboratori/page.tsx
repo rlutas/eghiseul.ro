@@ -9,6 +9,7 @@ interface Collaborator {
   id: string;
   name: string;
   email: string;
+  feeLabel: string;
   services: { service_id: string; name: string; slug: string }[];
 }
 interface CollabOrder {
@@ -76,6 +77,7 @@ export default function CollaboratorsAdminPage() {
 
   const exportUrl = `/api/admin/collaborators/orders?collaboratorId=${selectedId}&month=${month}&format=tsv`;
   const fmt = (n: number) => n.toLocaleString('ro-RO', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const feeLabel = collaborators.find((c) => c.id === selectedId)?.feeLabel || 'Onorariu';
 
   return (
     <div className="mx-auto max-w-6xl">
@@ -130,7 +132,7 @@ export default function CollaboratorsAdminPage() {
               <p className="mt-1 text-2xl font-extrabold text-slate-900">{fmt(summary.revenue)} <span className="text-sm font-bold text-slate-400">RON</span></p>
             </div>
             <div className="rounded-xl border border-slate-200 bg-white p-5">
-              <div className="flex items-center gap-2 text-slate-500"><Receipt className="h-4 w-4" /><span className="text-xs uppercase tracking-wide">Onorariu topograf</span></div>
+              <div className="flex items-center gap-2 text-slate-500"><Receipt className="h-4 w-4" /><span className="text-xs uppercase tracking-wide">{feeLabel}</span></div>
               <p className="mt-1 text-2xl font-extrabold text-slate-900">{fmt(summary.fees)} <span className="text-sm font-bold text-slate-400">RON</span></p>
             </div>
           </div>

@@ -47,8 +47,31 @@ export async function GET() {
       id: p.id,
       name: [p.first_name, p.last_name].filter(Boolean).join(' ') || p.email || 'Colaborator',
       email: p.email || '',
+      feeLabel: 'Onorariu topograf',
       services: byCollab[p.id] || [],
     }));
+
+    // Synthetic "Avocat" entry — not a collaborator account, but the lawyer fee
+    // is configured per-service (lawyer_fee_ron) on the non-cadastral services.
+    // Surfaced here so admins see avocat onorarii alongside the topograph, in one place.
+    const { data: lawyerSvcs } = await admin
+      .from('services')
+      .select('id, name, slug')
+      .gt('lawyer_fee_ron', 0)
+      .neq('category', 'imobiliare')
+      .eq('is_active', true);
+    if (lawyerSvcs && lawyerSvcs.length > 0) {
+      const { data: lawyerSetting } = await admin
+        .from('admin_settings').select('value').eq('key', 'lawyer_data').maybeSingle();
+      const lawyerName = lawyerSetting?.value?.lawyer_name || 'Avocat';
+      collaborators.unshift({
+        id: '__avocat__',
+        name: `${lawyerName} (avocat)`,
+        email: '',
+        feeLabel: 'Onorariu avocat',
+        services: lawyerSvcs.map((s: { id: string; name: string; slug: string }) => ({ service_id: s.id, name: s.name, slug: s.slug })),
+      });
+    }
 
     return NextResponse.json({ success: true, data: collaborators });
   } catch (error) {

@@ -36,7 +36,17 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'collaboratorId lipsă' }, { status: 400 });
     }
 
-    const serviceIds = await getCollaboratorServices(collaboratorId);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const adminEarly = createAdminClient() as any;
+    let serviceIds: string[];
+    if (collaboratorId === '__avocat__') {
+      // Avocat: services with a lawyer fee, excluding cadastral (those are topograf).
+      const { data: ls } = await adminEarly
+        .from('services').select('id').gt('lawyer_fee_ron', 0).neq('category', 'imobiliare');
+      serviceIds = (ls || []).map((s: { id: string }) => s.id);
+    } else {
+      serviceIds = await getCollaboratorServices(collaboratorId);
+    }
     if (serviceIds.length === 0) {
       return NextResponse.json({ success: true, data: { orders: [], summary: { count: 0, revenue: 0, fees: 0 } } });
     }
@@ -88,7 +98,7 @@ export async function GET(request: NextRequest) {
     };
 
     if (format === 'tsv') {
-      const COLUMNS = ['Comandă', 'Serviciu', 'Client', 'Email', 'Status', 'Preț (RON)', 'Onorariu topograf (RON)', 'Test', 'Dată'];
+      const COLUMNS = ['Comandă', 'Serviciu', 'Client', 'Email', 'Status', 'Preț (RON)', 'Onorariu (RON)', 'Test', 'Dată'];
       const lines = [COLUMNS.join('\t')];
       for (const o of orders) {
         lines.push([
