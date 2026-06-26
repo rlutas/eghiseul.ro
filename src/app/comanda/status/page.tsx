@@ -99,6 +99,7 @@ interface OrderData {
   createdAt: string;
   updatedAt: string;
   paidAt: string | null;
+  selfCancelAllowed?: boolean;
   service: {
     id: string;
     name: string;
@@ -289,16 +290,19 @@ function OrderStatusContent() {
       {/* Order Details */}
       {orderData && (
         <div className="space-y-6">
-          {/* Self-cancel card — shown only when status='paid' and within
-              the 30-min window. Hidden after cancellation or window expiry. */}
-          <SelfCancelCard
-            orderCode={orderData.orderCode}
-            email={email}
-            status={orderData.status}
-            paidAt={orderData.paidAt}
-            totalRon={orderData.pricing?.totalPrice ?? 0}
-            onCancelled={() => handleSearch(orderCode, email)}
-          />
+          {/* Self-cancel card — only for services with the 30-min self-cancel
+              enabled (processing_config.allow_self_cancel), when status='paid'
+              and within the window. Hidden after cancellation or window expiry. */}
+          {orderData.selfCancelAllowed !== false && (
+            <SelfCancelCard
+              orderCode={orderData.orderCode}
+              email={email}
+              status={orderData.status}
+              paidAt={orderData.paidAt}
+              totalRon={orderData.pricing?.totalPrice ?? 0}
+              onCancelled={() => handleSearch(orderCode, email)}
+            />
+          )}
 
           {/* Help contact card — WhatsApp + phone, first touchpoint when the
               customer is confused. Always rendered above the status details

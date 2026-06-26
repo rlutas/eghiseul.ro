@@ -102,6 +102,7 @@ interface Service {
     default_motiv?: string;
     estimated_days_display?: string;
     urgent_days_display?: string;
+    allow_self_cancel?: boolean;
   } | null;
   created_at: string | null;
   updated_at: string | null;
@@ -553,6 +554,10 @@ function EditServiceDialog({
     service.processing_config?.urgent_days_display || ''
   );
   const [isFeatured, setIsFeatured] = useState(!!service.is_featured);
+  // 30-min customer self-cancel toggle (processing_config.allow_self_cancel).
+  const [allowSelfCancel, setAllowSelfCancel] = useState(
+    service.processing_config?.allow_self_cancel !== false
+  );
   const [saving, setSaving] = useState(false);
 
   const handleSave = async () => {
@@ -591,6 +596,7 @@ function EditServiceDialog({
       } else {
         delete nextConfig.urgent_days_display;
       }
+      nextConfig.allow_self_cancel = allowSelfCancel;
       updates.processing_config = nextConfig;
 
       const res = await fetch('/api/admin/settings/services', {
@@ -701,6 +707,17 @@ function EditServiceDialog({
             />
             <Label htmlFor="edit-featured" className="cursor-pointer">
               Serviciu promovat (afisat pe prima pagina)
+            </Label>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <Switch
+              id="edit-self-cancel"
+              checked={allowSelfCancel}
+              onCheckedChange={setAllowSelfCancel}
+            />
+            <Label htmlFor="edit-self-cancel" className="cursor-pointer">
+              Anulare 30 min de către client (apare în „status comandă”)
             </Label>
           </div>
         </div>

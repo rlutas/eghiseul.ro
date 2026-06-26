@@ -78,7 +78,8 @@ export async function GET(request: NextRequest) {
           slug,
           category,
           estimated_days,
-          urgent_days
+          urgent_days,
+          processing_config
         )
       `)
       .or(`friendly_order_id.eq.${orderCode},order_number.eq.${orderCode}`)
@@ -234,6 +235,10 @@ export async function GET(request: NextRequest) {
         updatedAt: order.updated_at,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         paidAt: (order as any).paid_at as string | null,
+        // Per-service 30-min self-cancel toggle (processing_config.allow_self_cancel).
+        // Default true when unset; instant-automated services set it false.
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        selfCancelAllowed: ((order as any).service?.processing_config?.allow_self_cancel) !== false,
         service: serviceData,
         selectedOptions: selectedOptions.map(opt => ({
           optionName: opt.optionName || opt.option_name || '',

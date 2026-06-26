@@ -83,7 +83,7 @@ export async function POST(req: NextRequest) {
     const { data: orders, error: fetchError } = await supabase
       .from('orders')
       .select(
-        'id, friendly_order_id, order_number, status, paid_at, total_price, customer_data, stripe_payment_intent_id'
+        'id, friendly_order_id, order_number, status, paid_at, total_price, customer_data, stripe_payment_intent_id, service:services(processing_config)'
       )
       .or(`friendly_order_id.eq.${orderNumber},order_number.eq.${orderNumber}`)
       .limit(1);
@@ -111,6 +111,16 @@ export async function POST(req: NextRequest) {
           error: 'Comanda nu a fost găsită. Verifică numărul comenzii și emailul.',
         },
         { status: 404 }
+      );
+    }
+
+    // Per-service gate: self-cancel must be enabled for this service.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const allowSelfCancel = ((order as any).service?.processing_config?.allow_self_cancel) !== false;
+    if (!allowSelfCancel) {
+      return NextResponse.json(
+        { success: false, error: 'Acest serviciu nu poate fi anulat online. Contactează-ne pe WhatsApp sau telefon.', code: 'not_allowed' },
+        { status: 400 }
       );
     }
 
