@@ -26,7 +26,7 @@ export const MODULE_REGISTRY: Record<ModularStepId, ModuleRegistryEntry> = {
     stepId: 'contact',
     label: 'Contact',
     labelRo: 'Date Contact',
-    componentPath: '@/components/orders/steps/contact-step',
+    componentPath: '@/components/orders/steps-modular/contact-step',
   },
   'client-type': {
     stepId: 'client-type',
@@ -80,7 +80,7 @@ export const MODULE_REGISTRY: Record<ModularStepId, ModuleRegistryEntry> = {
     stepId: 'options',
     label: 'Options',
     labelRo: 'Opțiuni',
-    componentPath: '@/components/orders/steps/options-step',
+    componentPath: '@/components/orders/steps-modular/options-step',
   },
   'kyc-documents': {
     stepId: 'kyc-documents',
@@ -98,7 +98,7 @@ export const MODULE_REGISTRY: Record<ModularStepId, ModuleRegistryEntry> = {
     stepId: 'delivery',
     label: 'Delivery',
     labelRo: 'Livrare',
-    componentPath: '@/components/orders/steps/delivery-step',
+    componentPath: '@/components/orders/steps-modular/delivery-step',
   },
   'billing': {
     stepId: 'billing',
@@ -110,7 +110,7 @@ export const MODULE_REGISTRY: Record<ModularStepId, ModuleRegistryEntry> = {
     stepId: 'review',
     label: 'Review',
     labelRo: 'Finalizare',
-    componentPath: '@/components/orders/steps/review-step',
+    componentPath: '@/components/orders/steps-modular/review-step',
   },
 };
 

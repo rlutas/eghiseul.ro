@@ -25,14 +25,16 @@ describe('buildPageMetadata', () => {
     expect(og.images[0].height).toBe(630);
   });
 
-  it('omits OG/Twitter images when ogImage not provided', () => {
+  it('falls back to the default OG image when ogImage not provided', () => {
     const meta = buildPageMetadata({
       title: 't',
       description: 'd',
       path: '/x/',
     });
-    const og = meta.openGraph as { images?: unknown };
-    expect(og.images).toBeUndefined();
+    const og = meta.openGraph as { images: Array<{ url: string }> };
+    expect(og.images[0].url).toBe(`${BASE_URL}/og/default.png`);
+    const tw = meta.twitter as { images: string[] };
+    expect(tw.images[0]).toBe(`${BASE_URL}/og/default.png`);
   });
 
   it('sets noindex when requested', () => {
