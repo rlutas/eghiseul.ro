@@ -43,10 +43,10 @@ import {
 // =============================================================================
 
 const PAGE_PATH = '/servicii/cazier-judiciar-online/';
-const TITLE = 'Cazier Judiciar Online 2026 — Fără Drumuri, în 2-4 Zile';
+const TITLE = 'Cazier Judiciar Online 2026 — Fără Drumuri, în 3-5 Zile';
 const DESCRIPTION =
   'Obține cazierul judiciar online de la Poliția Română, fără cozi. ' +
-  'Persoane fizice și firme, livrare în 2-4 zile pe email sau curier. Comandă în 5 minute.';
+  'Persoane fizice și firme, livrare în 3-5 zile pe email sau curier. Comandă în 5 minute.';
 
 const DATE_PUBLISHED = '2026-04-16';
 const DATE_MODIFIED = '2026-05-20';
@@ -81,7 +81,7 @@ const jsonLdGraph = buildServicePageGraph({
   ],
   offers: [
     {
-      name: 'Cazier Judiciar — Persoană Fizică (Standard 2-4 zile)',
+      name: 'Cazier Judiciar — Persoană Fizică (Standard 3-5 zile)',
       price: 198,
       url: `${BASE_URL}/servicii/cazier-judiciar-online/persoana-fizica/`,
     },
@@ -91,7 +91,7 @@ const jsonLdGraph = buildServicePageGraph({
       url: `${BASE_URL}/servicii/cazier-judiciar-online/persoana-fizica/`,
     },
     {
-      name: 'Cazier Judiciar — Persoană Juridică (Standard 2-4 zile)',
+      name: 'Cazier Judiciar — Persoană Juridică (Standard 3-5 zile)',
       price: 198,
       url: `${BASE_URL}/servicii/cazier-judiciar-online/persoana-juridica/`,
     },
@@ -293,7 +293,7 @@ const FAQ_ITEMS: FAQ[] = [
   {
     category: 'procesare',
     q: 'Cum se face eliberarea cazierului judiciar online?',
-    a: 'Completezi formularul cu datele tale, îți verificăm identitatea, plătești securizat, iar noi depunem cererea la IGPR. Documentul îți este eliberat de IGPR și ți-l transmitem pe email semnat electronic, în 2-4 zile lucrătoare (1-2 zile urgent). Nu te deplasezi la nicio instituție.',
+    a: 'Completezi formularul cu datele tale, îți verificăm identitatea, plătești securizat, iar noi depunem cererea la IGPR. Documentul îți este eliberat de IGPR și ți-l transmitem pe email semnat electronic, în 3-5 zile lucrătoare (1-2 zile urgent). Nu te deplasezi la nicio instituție.',
   },
   {
     category: 'pret',
@@ -348,7 +348,7 @@ export default function CazierJudiciarHubPage() {
                   </Badge>
                   <Badge className="bg-green-600 text-white font-bold px-3 py-1">
                     <Clock className="h-3.5 w-3.5 mr-1" />
-                    2-4 zile (1-2 urgent)
+                    3-5 zile (1-2 urgent)
                   </Badge>
                   <Badge variant="outline" className="text-white/80 border-white/30 px-3 py-1">
                     <Award className="h-3.5 w-3.5 mr-1" />
@@ -387,7 +387,7 @@ export default function CazierJudiciarHubPage() {
                       'Alegi tipul: persoană fizică sau firmă (PJ)',
                       'Completezi formularul și verifici identitatea',
                       'Plătești securizat (Stripe) — 198 RON, TVA inclus',
-                      'Primești documentul IGPR în 2-4 zile (1-2 urgent)',
+                      'Primești documentul IGPR în 3-5 zile (1-2 urgent)',
                     ].map((step) => (
                       <li key={step} className="flex items-center gap-2">
                         <CheckCircle className="w-4 h-4 text-primary-500 flex-shrink-0" />
@@ -422,7 +422,7 @@ export default function CazierJudiciarHubPage() {
                         <Clock className="h-5 w-5 text-green-600" />
                       </div>
                       <div>
-                        <p className="font-semibold text-secondary-900 text-sm">Livrare în 2-4 zile</p>
+                        <p className="font-semibold text-secondary-900 text-sm">Livrare în 3-5 zile</p>
                         <p className="text-xs text-neutral-500">1-2 zile la varianta urgentă</p>
                       </div>
                     </div>
@@ -669,7 +669,7 @@ export default function CazierJudiciarHubPage() {
                     </thead>
                     <tbody>
                       {[
-                        { label: 'Termen procesare', us: '2-4 zile', them: '3-7 zile', usWin: true },
+                        { label: 'Termen procesare', us: '3-5 zile', them: '3-7 zile', usWin: true },
                         { label: 'Deplasare necesară', us: 'Nu', them: 'Da (2 ori)', usWin: true },
                         { label: 'Cozi la ghișeu', us: 'Nu', them: '30-90 min', usWin: true },
                         { label: 'Program disponibil', us: '24/7 online', them: 'Program restrâns**', usWin: true },
@@ -702,7 +702,7 @@ export default function CazierJudiciarHubPage() {
                 {/* Mobile: stacked compact cards (no horizontal scroll) */}
                 <div className="sm:hidden space-y-2.5">
                   {[
-                    { label: 'Termen procesare', us: '2-4 zile', them: '3-7 zile' },
+                    { label: 'Termen procesare', us: '3-5 zile', them: '3-7 zile' },
                     { label: 'Deplasare', us: 'Nu — totul online', them: 'Da (2 ori la sediu)' },
                     { label: 'Cozi', us: 'Fără așteptare', them: '30-90 min' },
                     { label: 'Program', us: '24/7 online', them: 'Restrâns**' },
@@ -799,7 +799,7 @@ export default function CazierJudiciarHubPage() {
               </span>
               <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white mb-3">Cum Funcționează?</h2>
               <p className="text-white/70 max-w-2xl mx-auto">
-                Procesul complet durează 2-4 zile lucrătoare (1-2 urgent). Tu petreci 5 minute, restul facem noi.
+                Procesul complet durează 3-5 zile lucrătoare (1-2 urgent). Tu petreci 5 minute, restul facem noi.
               </p>
             </div>
             <div className="relative grid sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-6">
@@ -844,9 +844,9 @@ export default function CazierJudiciarHubPage() {
 
             {(() => {
               const PRICING_BASE = [
-                { service: 'Cazier PF — Standard', termen: '2-4 zile lucrătoare', pret: '198 RON' },
+                { service: 'Cazier PF — Standard', termen: '3-5 zile lucrătoare', pret: '198 RON' },
                 { service: 'Cazier PF — Urgent', termen: '1-2 zile lucrătoare', pret: '278 RON' },
-                { service: 'Cazier PJ — Standard', termen: '2-4 zile lucrătoare', pret: '198 RON' },
+                { service: 'Cazier PJ — Standard', termen: '3-5 zile lucrătoare', pret: '198 RON' },
                 { service: 'Cazier PJ — Urgent', termen: '1-2 zile lucrătoare', pret: '278 RON' },
                 { service: 'Cetățean Străin', termen: '7-15 zile lucrătoare', pret: '298 RON' },
               ];
@@ -988,7 +988,7 @@ export default function CazierJudiciarHubPage() {
               <p>
                 <strong className="text-secondary-900">Pe scurt:</strong> dacă ai timp să te deplasezi la
                 ghișeu și să aștepți la coadă, poți obține cazierul gratuit. Dacă vrei să rezolvi totul în
-                câteva minute, de oriunde &mdash; inclusiv din diaspora &mdash; în 2-4 zile lucrătoare,
+                câteva minute, de oriunde &mdash; inclusiv din diaspora &mdash; în 3-5 zile lucrătoare,
                 serviciul nostru costă 198 RON. Nu există nicio diferență de valabilitate sau de conținut:
                 ambele documente sunt emise de Poliția Română. Detalii despre{' '}
                 <Link href="/taxa-cazier-judiciar/" className="text-primary-600 font-semibold underline underline-offset-2 hover:text-primary-700">

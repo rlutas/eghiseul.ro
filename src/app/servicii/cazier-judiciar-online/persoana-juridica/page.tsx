@@ -40,7 +40,7 @@ const SCHEMA_SLUG = 'cazier-judiciar-online/persoana-juridica';
 const TITLE = 'Cazier Judiciar Firmă (Persoană Juridică) Online — 198 RON';
 const DESCRIPTION =
   'Cazier judiciar pentru firmă (persoană juridică) 100% online — necesar la licitații publice ' +
-  'SEAP, contracte cu statul și fonduri europene. 198 RON, livrare în 2-4 zile. Auto-completare CUI de la ONRC.';
+  'SEAP, contracte cu statul și fonduri europene. 198 RON, livrare în 3-5 zile. Auto-completare CUI de la ONRC.';
 const DATE_PUBLISHED = '2026-04-16';
 const DATE_MODIFIED = '2026-06-13';
 
@@ -109,7 +109,7 @@ const jsonLdGraph = buildServicePageGraph({
     { name: 'Persoană Juridică', url: `${BASE_URL}${PAGE_PATH}` },
   ],
   offers: [
-    { name: 'Cazier Judiciar Persoană Juridică (Standard 2-4 zile)', price: 198, url: `${BASE_URL}${PAGE_PATH}` },
+    { name: 'Cazier Judiciar Persoană Juridică (Standard 3-5 zile)', price: 198, url: `${BASE_URL}${PAGE_PATH}` },
     { name: 'Cazier Judiciar Persoană Juridică (Urgent 1-2 zile)', price: 278, url: `${BASE_URL}${PAGE_PATH}` },
   ],
   aggregateRating: { ratingValue: 4.9, reviewCount: 450 },
@@ -377,7 +377,7 @@ export default async function CazierJudiciarPJPage() {
           <div className="container mx-auto px-4 max-w-[1100px] py-6 lg:py-8">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
               {[
-                { icon: Clock, value: '2-4 zile lucrătoare', label: '1-2 zile cu urgență' },
+                { icon: Clock, value: '3-5 zile lucrătoare', label: '1-2 zile cu urgență' },
                 { icon: Shield, value: 'IGPR', label: 'Eliberat de Poliția Română' },
                 { icon: Building2, value: 'Auto-completare CUI', label: 'Date firmă de la ONRC' },
                 { icon: CheckCircle, value: '4.9/5', label: 'Peste 450 recenzii' },
@@ -409,7 +409,7 @@ export default async function CazierJudiciarPJPage() {
                 de fonduri europene (PNRR, fonduri structurale).
               </p>
               <p>
-                Prin eGhișeul obții <strong>cazierul judiciar pentru firmă online</strong> în 2-4 zile lucrătoare.
+                Prin eGhișeul obții <strong>cazierul judiciar pentru firmă online</strong> în 3-5 zile lucrătoare.
                 Introduci CUI-ul societății, iar datele firmei se completează automat de la ONRC. Completezi apoi
                 datele reprezentantului legal, plătești securizat și primești documentul pe email. Serviciul este
                 disponibil pentru SRL, SA, SCS, SNC și alte forme juridice.
@@ -517,7 +517,7 @@ export default async function CazierJudiciarPJPage() {
                   </div>
                   <h3 className="text-lg font-bold text-secondary-900 mb-1.5">Procesare urgentă</h3>
                   <p className="text-sm text-neutral-600 leading-relaxed mb-5 flex-1">
-                    Primești cazierul firmei în <strong>1-2 zile lucrătoare</strong> în loc de 2-4. Procesare prioritară.
+                    Primești cazierul firmei în <strong>1-2 zile lucrătoare</strong> în loc de 3-5. Procesare prioritară.
                   </p>
                   <div className="flex items-baseline gap-1 mb-1">
                     <span className="text-3xl font-black text-blue-600">+{(Number(o.price) / 1.21).toFixed(2)}</span>
@@ -610,7 +610,7 @@ export default async function CazierJudiciarPJPage() {
                 <div className="bg-neutral-50 p-4 text-center font-semibold text-neutral-600">Ghișeu Poliție</div>
 
                 {[
-                  ['Timp de obținere', '2-4 zile (1-2 urgent)', '5-10 zile', 'Drum + cozi'],
+                  ['Timp de obținere', '3-5 zile (1-2 urgent)', '5-10 zile', 'Drum + cozi'],
                   ['Procesare 100% online', true, true, false],
                   ['Deplasare la ghișeu', false, false, true],
                   ['Auto-completare date firmă (CUI)', true, 'Variabil', false],

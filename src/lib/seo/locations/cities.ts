@@ -81,7 +81,7 @@ const RAW_CITIES: CityData[] = [
       },
       {
         q: 'Cât durează eliberarea cazierului în Timișoara?',
-        a: 'La ghișeu se eliberează de regulă pe loc, în limita programului. Prin eGhișeul.ro depunem cererea în numele tău și primești documentul prin curier în 2-4 zile lucrătoare, fără deplasare.',
+        a: 'La ghișeu se eliberează de regulă pe loc, în limita programului. Prin eGhișeul.ro depunem cererea în numele tău și primești documentul prin curier în 3-5 zile lucrătoare, fără deplasare.',
       },
     ],
     nearbyCitySlugs: ['cluj-napoca'],
@@ -189,7 +189,7 @@ const RAW_CITIES: CityData[] = [
       },
       {
         q: 'Pot obține cazierul în Brașov fără să stau la coadă?',
-        a: 'Da. Prin eGhișeul.ro completezi cererea online în câteva minute, noi o depunem la IPJ Brașov pe bază de împuternicire, iar tu primești documentul prin curier în 2-4 zile lucrătoare.',
+        a: 'Da. Prin eGhișeul.ro completezi cererea online în câteva minute, noi o depunem la IPJ Brașov pe bază de împuternicire, iar tu primești documentul prin curier în 3-5 zile lucrătoare.',
       },
     ],
     nearbyCitySlugs: ['cluj-napoca'],
@@ -224,7 +224,7 @@ const RAW_CITIES: CityData[] = [
       },
       {
         q: 'Cât durează cazierul judiciar obținut online din Craiova?',
-        a: 'Prin eGhișeul.ro, în mod standard 2-4 zile lucrătoare. Depunem cererea la IPJ Dolj pe bază de împuternicire și îți trimitem documentul prin curier sau pe email.',
+        a: 'Prin eGhișeul.ro, în mod standard 3-5 zile lucrătoare. Depunem cererea la IPJ Dolj pe bază de împuternicire și îți trimitem documentul prin curier sau pe email.',
       },
     ],
     nearbyCitySlugs: ['sibiu', 'timisoara'],
@@ -331,7 +331,7 @@ const RAW_CITIES: CityData[] = [
       },
       {
         q: 'Pot cere cazierul în Arad fără să mă deplasez?',
-        a: 'Da. Completezi cererea online, noi o depunem la IPJ Arad pe bază de împuternicire, iar tu primești documentul prin curier în 2-4 zile lucrătoare.',
+        a: 'Da. Completezi cererea online, noi o depunem la IPJ Arad pe bază de împuternicire, iar tu primești documentul prin curier în 3-5 zile lucrătoare.',
       },
     ],
     nearbyCitySlugs: ['oradea', 'timisoara'],
@@ -360,7 +360,7 @@ const RAW_CITIES: CityData[] = [
       },
       {
         q: 'Pot obține cazierul în București fără să merg la secția de poliție?',
-        a: 'Da. Completezi datele online, semnezi împuternicirea în aplicație, iar noi depunem cererea la autoritatea competentă din București. Primești cazierul prin curier sau pe email, în 2-4 zile lucrătoare.',
+        a: 'Da. Completezi datele online, semnezi împuternicirea în aplicație, iar noi depunem cererea la autoritatea competentă din București. Primești cazierul prin curier sau pe email, în 3-5 zile lucrătoare.',
       },
     ],
     nearbyCitySlugs: ['constanta', 'brasov'],
@@ -386,7 +386,7 @@ const RAW_CITIES: CityData[] = [
       'în șantierul naval și în transporturi.',
     localFaq: [
       { q: 'Unde se eliberează cazierul judiciar în Galați?', a: 'La Serviciul Cazier Judiciar din cadrul IPJ Galați, pe Str. Brăilei nr. 200. Alternativ, prin eGhișeul.ro comanzi online și primești documentul prin curier.' },
-      { q: 'Cât durează cazierul obținut online din Galați?', a: 'Prin eGhișeul.ro, în mod standard 2-4 zile lucrătoare. Depunem cererea la IPJ Galați pe bază de împuternicire.' },
+      { q: 'Cât durează cazierul obținut online din Galați?', a: 'Prin eGhișeul.ro, în mod standard 3-5 zile lucrătoare. Depunem cererea la IPJ Galați pe bază de împuternicire.' },
     ],
     nearbyCitySlugs: ['buzau', 'constanta'],
   },
@@ -410,7 +410,7 @@ const RAW_CITIES: CityData[] = [
       'solicită cazier judiciar pentru angajări în rafinării, comerț și transporturi.',
     localFaq: [
       { q: 'Unde se eliberează cazierul judiciar în Ploiești?', a: 'La Serviciul Cazier Judiciar din IPJ Prahova, pe Str. Vasile Lupu nr. 60. Sau online, prin eGhișeul.ro, fără deplasare.' },
-      { q: 'Pot obține cazierul din Ploiești fără să stau la coadă?', a: 'Da. Completezi cererea online, noi o depunem la IPJ Prahova și primești documentul prin curier în 2-4 zile.' },
+      { q: 'Pot obține cazierul din Ploiești fără să stau la coadă?', a: 'Da. Completezi cererea online, noi o depunem la IPJ Prahova și primești documentul prin curier în 3-5 zile.' },
     ],
     nearbyCitySlugs: ['bucuresti', 'buzau'],
   },
@@ -505,7 +505,7 @@ const RAW_CITIES: CityData[] = [
       'mediu universitar activ; mulți suceveni solicită cazier judiciar pentru angajare și pentru dosare de lucru în străinătate.',
     localFaq: [
       { q: 'Unde se eliberează cazierul judiciar în Suceava?', a: 'La Serviciul Cazier Judiciar din IPJ Suceava, pe Bd. 1 Mai nr. 9. Program luni-vineri 08:30-13:00. Sau online, prin eGhișeul.ro.' },
-      { q: 'Pot obține cazierul din Suceava fără să mă deplasez?', a: 'Da. Completezi cererea online, noi o depunem la IPJ Suceava și primești documentul prin curier în 2-4 zile.' },
+      { q: 'Pot obține cazierul din Suceava fără să mă deplasez?', a: 'Da. Completezi cererea online, noi o depunem la IPJ Suceava și primești documentul prin curier în 3-5 zile.' },
     ],
     nearbyCitySlugs: ['iasi', 'bacau'],
   },
@@ -553,7 +553,7 @@ const RAW_CITIES: CityData[] = [
       'Buzoienii solicită frecvent cazier judiciar pentru angajare în fabrici, transporturi și administrație.',
     localFaq: [
       { q: 'Unde se eliberează cazierul judiciar în Buzău?', a: 'La Serviciul Cazier Judiciar din IPJ Buzău, pe Str. Chiristigii nr. 8-10. Sau online, prin eGhișeul.ro, fără coadă.' },
-      { q: 'Pot obține cazierul din Buzău fără să mă deplasez?', a: 'Da. Completezi cererea online, noi o depunem la IPJ Buzău și primești documentul prin curier în 2-4 zile.' },
+      { q: 'Pot obține cazierul din Buzău fără să mă deplasez?', a: 'Da. Completezi cererea online, noi o depunem la IPJ Buzău și primești documentul prin curier în 3-5 zile.' },
     ],
     nearbyCitySlugs: ['ploiesti', 'galati'],
   },
@@ -671,7 +671,7 @@ const RAW_CITIES: CityData[] = [
       'sau Budești solicită frecvent cazier judiciar la angajare.',
     localFaq: [
       { q: 'Unde se eliberează cazierul judiciar în Călărași?', a: 'La Serviciul Cazier Judiciar din IPJ Călărași, pe Str. București nr. 110. Sau online, prin eGhișeul.ro.' },
-      { q: 'Pot obține cazierul din Călărași fără să stau la coadă?', a: 'Da. Prin eGhișeul.ro depunem cererea la IPJ Călărași și primești documentul prin curier în 2-4 zile.' },
+      { q: 'Pot obține cazierul din Călărași fără să stau la coadă?', a: 'Da. Prin eGhișeul.ro depunem cererea la IPJ Călărași și primești documentul prin curier în 3-5 zile.' },
     ],
     nearbyCitySlugs: ['bucuresti', 'slobozia'],
   },
@@ -765,7 +765,7 @@ const RAW_CITIES: CityData[] = [
       'judiciar pentru angajare în industria locală, comerț și servicii.',
     localFaq: [
       { q: 'Unde se eliberează cazierul judiciar în Miercurea Ciuc?', a: 'La Serviciul Cazier Judiciar din IPJ Harghita, pe Str. Tudor Vladimirescu nr. 34-36. Sau online, prin eGhișeul.ro.' },
-      { q: 'Pot obține cazierul din Miercurea Ciuc fără deplasare?', a: 'Da. Prin eGhișeul.ro depunem cererea la IPJ Harghita și primești documentul prin curier în 2-4 zile.' },
+      { q: 'Pot obține cazierul din Miercurea Ciuc fără deplasare?', a: 'Da. Prin eGhișeul.ro depunem cererea la IPJ Harghita și primești documentul prin curier în 3-5 zile.' },
     ],
     nearbyCitySlugs: ['brasov', 'sfantu-gheorghe'],
   },
@@ -812,7 +812,7 @@ const RAW_CITIES: CityData[] = [
       'de procesarea agroalimentară, iar cazierul e cerut frecvent la angajare.',
     localFaq: [
       { q: 'Unde se eliberează cazierul judiciar în Botoșani?', a: 'La Serviciul Cazier Judiciar din IPJ Botoșani, pe B-dul Mihai Eminescu nr. 57. Sau online, prin eGhișeul.ro.' },
-      { q: 'Pot obține cazierul din Botoșani fără să stau la coadă?', a: 'Da. Prin eGhișeul.ro depunem cererea la IPJ Botoșani și primești documentul prin curier în 2-4 zile.' },
+      { q: 'Pot obține cazierul din Botoșani fără să stau la coadă?', a: 'Da. Prin eGhișeul.ro depunem cererea la IPJ Botoșani și primești documentul prin curier în 3-5 zile.' },
     ],
     nearbyCitySlugs: ['suceava', 'iasi'],
   },
@@ -1002,7 +1002,7 @@ const RAW_CITIES: CityData[] = [
       'domeniul oțelului, iar cazierul e cerut frecvent la angajare.',
     localFaq: [
       { q: 'Unde se eliberează cazierul judiciar în Târgoviște?', a: 'La Serviciul Cazier Judiciar din IPJ Dâmbovița, pe B-dul Regele Carol I nr. 64. Sau online, prin eGhișeul.ro.' },
-      { q: 'Pot obține cazierul din Târgoviște fără să stau la coadă?', a: 'Da. Prin eGhișeul.ro depunem cererea la IPJ Dâmbovița și primești documentul prin curier în 2-4 zile.' },
+      { q: 'Pot obține cazierul din Târgoviște fără să stau la coadă?', a: 'Da. Prin eGhișeul.ro depunem cererea la IPJ Dâmbovița și primești documentul prin curier în 3-5 zile.' },
     ],
     nearbyCitySlugs: ['bucuresti', 'ploiesti'],
   },
@@ -1075,7 +1075,7 @@ const RAW_CITIES: CityData[] = [
       'industrială, în sistemul bugetar și pentru dosare de licitație publică.',
     localFaq: [
       { q: 'Unde se eliberează cazierul judiciar în Slatina?', a: 'La Serviciul Cazier Judiciar din IPJ Olt, pe Str. Mihai Eminescu nr. 19. Sau online prin eGhișeul.ro, cu livrare prin curier.' },
-      { q: 'Cât durează să obțin cazierul în Slatina prin eGhișeul.ro?', a: 'În mod standard 2-4 zile lucrătoare: depunem cererea la IPJ Olt în numele tău și primești documentul prin curier.' },
+      { q: 'Cât durează să obțin cazierul în Slatina prin eGhișeul.ro?', a: 'În mod standard 3-5 zile lucrătoare: depunem cererea la IPJ Olt în numele tău și primești documentul prin curier.' },
     ],
     nearbyCitySlugs: ['craiova', 'pitesti'],
   },

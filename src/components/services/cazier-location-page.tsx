@@ -43,10 +43,10 @@ const STEPS = [
   'Completezi datele online, în 2-3 minute (fără cont).',
   'Semnezi împuternicirea direct în aplicație și plătești cu cardul.',
   'Depunem cererea la IPJ în numele tău, pe bază de împuternicire.',
-  'Primești cazierul prin curier sau pe email, în 2-4 zile lucrătoare.',
+  'Primești cazierul prin curier sau pe email, în 3-5 zile lucrătoare.',
 ];
 
-const BENEFITS = ['Fără drum la IPJ', 'Fără cozi sau programare', 'Livrare 2-4 zile', 'Plată securizată cu cardul'];
+const BENEFITS = ['Fără drum la IPJ', 'Fără cozi sau programare', 'Livrare 3-5 zile', 'Plată securizată cu cardul'];
 
 const USE_CASES = [
   { icon: Briefcase, title: 'Angajare', desc: 'Tot mai mulți angajatori cer cazierul la angajare, mai ales în pază, transport, educație, sănătate sau în sistemul financiar-bancar.' },
@@ -79,7 +79,7 @@ const COMPARISON: { label: string; online: string; ghiseu: string }[] = [
 
 function genericFaq(cityName: string) {
   return [
-    { q: 'Cât durează eliberarea cazierului judiciar?', a: 'Prin eGhișeul.ro, în mod standard 2-4 zile lucrătoare; există și opțiunea Urgent. La ghișeu se eliberează de regulă pe loc, în limita programului.' },
+    { q: 'Cât durează eliberarea cazierului judiciar?', a: 'Prin eGhișeul.ro, în mod standard 3-5 zile lucrătoare; există și opțiunea Urgent. La ghișeu se eliberează de regulă pe loc, în limita programului.' },
     { q: 'Cât este valabil cazierul judiciar?', a: 'De regulă 6 luni de la data emiterii, însă unele instituții pot cere un document mai recent (uneori emis în ultimele 30 de zile). Verifică cerința instituției la care îl depui.' },
     { q: 'Documentul este oficial și acceptat?', a: `Da. Primești cazierul judiciar oficial emis de Poliția Română (IPJ), valabil pentru orice instituție din țară sau, cu apostilă și traducere, din străinătate. Este același document ca cel obținut la ghișeu în ${cityName}.` },
     { q: 'Plata și datele mele sunt în siguranță?', a: 'Da. Plata se face securizat cu cardul, iar datele sunt protejate conform GDPR. Folosim împuternicirea semnată online pentru a depune cererea în numele tău.' },
@@ -89,7 +89,7 @@ function genericFaq(cityName: string) {
 export function CazierLocationPage({ city, otherCities }: { city: CityData; otherCities: OtherCity[] }) {
   const path = `${HUB_PATH}${city.slug}/`;
   const title = `Cazier Judiciar Online ${city.name}`;
-  const description = `Obține cazierul judiciar în ${city.name} fără drum la IPJ ${city.judet}. Comandă online, livrare în 2-4 zile pe email sau curier.`;
+  const description = `Obține cazierul judiciar în ${city.name} fără drum la IPJ ${city.judet}. Comandă online, livrare în 3-5 zile pe email sau curier.`;
   const anchors = city.localAnchors?.length ? city.localAnchors.join(', ') : null;
 
   const jsonLd = buildLocationPageGraph({
@@ -359,7 +359,7 @@ export function CazierLocationPage({ city, otherCities }: { city: CityData; othe
             </h2>
             <p className="text-neutral-700 leading-relaxed mb-6">
               Cazierul judiciar pentru persoane fizice pornește de la <strong>{PRICE} RON</strong>, cu
-              livrare standard în <strong>2-4 zile lucrătoare</strong>. Pentru situații urgente există
+              livrare standard în <strong>3-5 zile lucrătoare</strong>. Pentru situații urgente există
               opțiunea de procesare prioritară. Costul acoperă întocmirea și depunerea cererii prin
               împuternicire, taxele și livrarea documentului.
             </p>

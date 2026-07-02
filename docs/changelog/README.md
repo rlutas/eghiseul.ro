@@ -4,6 +4,7 @@
  
  | Data | Ce s-a livrat | Detalii |
  |---|---|---|
+ | 2026-07-02 | Termen standard cazier/integritate 2-4 → 3-5 zile (urgentul 1-2 devine atractiv) — migrație 091 + conținut SEO cluster cazier | [2026-07-02-cazier-standard-term-3-5.md](2026-07-02-cazier-standard-term-3-5.md) |
  | 2026-07-02 | Formular de contact pe `/contact` (honeypot + rate-limit → email Resend + DB `contact_messages`) + linkuri header/footer | [2026-07-02-contact-form.md](2026-07-02-contact-form.md) |
  | 2026-06-25 | Fix ANAF: firmă cu sediu transferat („TRANSFER(SOSIRE)") marcată greșit inactivă → constatator blocat | [anaf-firma-activa-transfer](2026-06-25-anaf-firma-activa-transfer.md) |
  | 2026-06-25 | Wizard: feedback „de ce nu pot continua" (listă + scroll) · mașini salvate · OCR din PDF + clarificare RO CEI | [wizard-validation-feedback](../features/wizard-validation-feedback/README.md) · [saved-vehicles](../features/saved-vehicles/README.md) · [ocr-pdf-rocei](2026-06-25-ocr-pdf-rocei-clarity.md) |

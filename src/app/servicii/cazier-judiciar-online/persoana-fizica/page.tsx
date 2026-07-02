@@ -41,7 +41,7 @@ const SCHEMA_SLUG = 'cazier-judiciar-online/persoana-fizica';
 const TITLE = 'Cazier Judiciar Persoană Fizică Online — 198 RON';
 const DESCRIPTION =
   'Obține cazierul judiciar pentru persoană fizică 100% online, fără drum la ghișeu. ' +
-  '198 RON, livrare în 2-4 zile pe email. Document de la Poliția Română, ' +
+  '198 RON, livrare în 3-5 zile pe email. Document de la Poliția Română, ' +
   'valabil pentru angajare, emigrare, adopție și proceduri legale.';
 const DATE_PUBLISHED = '2026-04-16';
 const DATE_MODIFIED = '2026-06-13';
@@ -112,7 +112,7 @@ const jsonLdGraph = buildServicePageGraph({
     { name: 'Persoană Fizică', url: `${BASE_URL}${PAGE_PATH}` },
   ],
   offers: [
-    { name: 'Cazier Judiciar Persoană Fizică (Standard 2-4 zile)', price: 198, url: `${BASE_URL}${PAGE_PATH}` },
+    { name: 'Cazier Judiciar Persoană Fizică (Standard 3-5 zile)', price: 198, url: `${BASE_URL}${PAGE_PATH}` },
     { name: 'Cazier Judiciar Persoană Fizică (Urgent 1-2 zile)', price: 278, url: `${BASE_URL}${PAGE_PATH}` },
   ],
   aggregateRating: { ratingValue: 4.9, reviewCount: 450 },
@@ -338,7 +338,7 @@ export default async function CazierJudiciarPFPage() {
           <div className="container mx-auto px-4 max-w-[1100px] py-6 lg:py-8">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
               {[
-                { icon: Clock, value: '2-4 zile lucrătoare', label: 'Urgent în 1-2 zile' },
+                { icon: Clock, value: '3-5 zile lucrătoare', label: 'Urgent în 1-2 zile' },
                 { icon: Landmark, value: 'IGPR', label: 'Poliția Română oficial' },
                 { icon: Mail, value: 'Email + curier', label: 'PDF + livrare opțională' },
                 { icon: Star, value: '4.9/5', label: 'Peste 450 recenzii' },
@@ -370,7 +370,7 @@ export default async function CazierJudiciarPFPage() {
                 proceduri legale.
               </p>
               <p>
-                Prin eGhișeul obții <strong>cazierul judiciar online pentru persoane fizice</strong> în 2-4 zile
+                Prin eGhișeul obții <strong>cazierul judiciar online pentru persoane fizice</strong> în 3-5 zile
                 lucrătoare, fără să te deplasezi la ghișeu și fără cont SPV. Completezi formularul în câteva minute,
                 îți încarci actul de identitate și un selfie pentru verificarea identității, plătești securizat, iar
                 avocatul colaborator înscris în Barou depune cererea la IGPR în numele tău, pe baza unei împuterniciri.
@@ -434,7 +434,7 @@ export default async function CazierJudiciarPFPage() {
                   </div>
                   <h3 className="text-lg font-bold text-secondary-900 mb-1.5">Procesare urgentă</h3>
                   <p className="text-sm text-neutral-600 leading-relaxed mb-5 flex-1">
-                    Primești cazierul în <strong>1-2 zile lucrătoare</strong> în loc de 2-4. Procesare prioritară.
+                    Primești cazierul în <strong>1-2 zile lucrătoare</strong> în loc de 3-5. Procesare prioritară.
                   </p>
                   <div className="flex items-baseline gap-1 mb-1">
                     <span className="text-3xl font-black text-primary-600">+{(Number(o.price) / 1.21).toFixed(2)}</span>
@@ -568,7 +568,7 @@ export default async function CazierJudiciarPFPage() {
                 <div className="bg-neutral-50 p-4 text-center font-semibold text-neutral-600">Ghișeu Poliție</div>
 
                 {[
-                  ['Timp de obținere', '2-4 zile (1-2 urgent)', '5-10 zile', 'Drum + cozi'],
+                  ['Timp de obținere', '3-5 zile (1-2 urgent)', '5-10 zile', 'Drum + cozi'],
                   ['Procesare 100% online', true, true, false],
                   ['Deplasare la ghișeu', false, false, true],
                   ['Disponibil din diaspora', true, 'Variabil', false],

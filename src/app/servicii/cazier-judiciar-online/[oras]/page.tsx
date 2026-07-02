@@ -20,7 +20,7 @@ export async function generateMetadata({
   if (!city) return {};
   return buildPageMetadata({
     title: `Cazier Judiciar Online ${city.name} — Fără Drum la IPJ ${city.judet}`,
-    description: `Obține cazierul judiciar în ${city.name} online, fără cozi la IPJ ${city.judet}. Depunem cererea în numele tău, livrare în 2-4 zile pe email sau curier. Comandă în 5 minute.`,
+    description: `Obține cazierul judiciar în ${city.name} online, fără cozi la IPJ ${city.judet}. Depunem cererea în numele tău, livrare în 3-5 zile pe email sau curier. Comandă în 5 minute.`,
     path: `/servicii/cazier-judiciar-online/${city.slug}/`,
     ogImage: '/og/services/cazier-judiciar.png',
   });
