@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Mail, Phone, Clock, MessageCircle } from 'lucide-react';
+import { Mail, Phone, Clock, MessageCircle, Send } from 'lucide-react';
 import { serviceUrl } from '@/lib/seo/constants';
 
 const WHATSAPP =
@@ -143,6 +143,10 @@ export function Footer() {
           <div className="col-span-2 md:col-span-3 lg:col-span-3">
             <h3 className="text-white font-bold text-lg mb-4">Contact</h3>
             <ul className="space-y-3 text-sm">
+              <li className="flex items-center gap-3">
+                <Send className="h-4 w-4 text-primary-500 flex-shrink-0" aria-hidden="true" />
+                <Link href="/contact/" className="text-white/80 hover:text-primary-500 transition-colors">Formular de contact</Link>
+              </li>
               <li className="flex items-center gap-3">
                 <MessageCircle className="h-4 w-4 text-[#25D366] flex-shrink-0" aria-hidden="true" />
                 <a href={WHATSAPP} target="_blank" rel="nofollow noopener" className="text-white/80 hover:text-primary-500 transition-colors">WhatsApp (răspuns rapid)</a>

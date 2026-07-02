@@ -41,6 +41,7 @@ Index al documentației. Aceasta e o **hartă**, nu un jurnal — pentru jurnalu
 - **Plăți & facturare:** [`technical/specs/stripe-oblio-payment-invoicing.md`](technical/specs/stripe-oblio-payment-invoicing.md)
 - **ANCPI automation:** [`technical/specs/ancpi-automation-plan.md`](technical/specs/ancpi-automation-plan.md)
 - **Deploy:** [`deployment/VERCEL_DEPLOYMENT.md`](deployment/VERCEL_DEPLOYMENT.md)
+- **Email (Resend + Zoho) setup:** [`deployment/EMAIL_RESEND_ZOHO_SETUP.md`](deployment/EMAIL_RESEND_ZOHO_SETUP.md)
 
 ---
 

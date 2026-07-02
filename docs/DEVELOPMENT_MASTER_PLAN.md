@@ -875,7 +875,8 @@ SMSLINK_SENDER=eGhiseul
 
 # Email (Resend) ⏳
 RESEND_API_KEY=
-EMAIL_FROM=comenzi@eghiseul.ro
+RESEND_FROM=eGhișeul.ro <contact@eghiseul.ro>
+RESEND_REPLY_TO=contact@eghiseul.ro
 ```
 
 ---

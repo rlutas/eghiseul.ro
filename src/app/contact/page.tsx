@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { ChevronRight, Phone, Mail, MapPin, Clock, MessageCircle } from 'lucide-react';
 import { Footer } from '@/components/home/footer';
+import { ContactForm } from '@/components/contact/contact-form';
 import { buildPageMetadata, BASE_URL } from '@/lib/seo';
 import { organizationNode, websiteNode, breadcrumbNode } from '@/lib/seo/schema';
 import { ORGANIZATION } from '@/lib/seo/constants';
@@ -87,6 +88,16 @@ export default function ContactPage() {
                 </a>
               ))}
             </div>
+          </div>
+        </section>
+
+        <section className="pt-14 lg:pt-20 pb-6 bg-white">
+          <div className="container mx-auto px-4 max-w-[820px]">
+            <div className="mb-8">
+              <h2 className="text-2xl lg:text-3xl font-extrabold text-secondary-900 mb-2">Scrie-ne un mesaj</h2>
+              <p className="text-neutral-600">Completează formularul și îți răspundem în cel mai scurt timp, de regulă în aceeași zi lucrătoare.</p>
+            </div>
+            <ContactForm />
           </div>
         </section>
 

@@ -22,13 +22,15 @@ import { cn } from '@/lib/utils';
 import { createClient } from '@/lib/supabase/client';
 import type { User as SupabaseUser } from '@supabase/supabase-js';
 
-const navLinks = [
-  { href: '/', label: 'Acasă', type: 'route' as const },
-  { href: '/servicii/', label: 'Servicii', type: 'route' as const },
-  { href: '/calculator/', label: 'Calculatoare', type: 'route' as const },
-  { href: '/blog/', label: 'Blog', type: 'route' as const },
-  { href: '/comanda/status/', label: 'Status comandă', type: 'route' as const },
-  { href: '/#contact', label: 'Contact', type: 'hash' as const },
+type NavLink = { href: string; label: string; type: 'route' | 'hash' };
+
+const navLinks: NavLink[] = [
+  { href: '/', label: 'Acasă', type: 'route' },
+  { href: '/servicii/', label: 'Servicii', type: 'route' },
+  { href: '/calculator/', label: 'Calculatoare', type: 'route' },
+  { href: '/blog/', label: 'Blog', type: 'route' },
+  { href: '/comanda/status/', label: 'Status comandă', type: 'route' },
+  { href: '/contact/', label: 'Contact', type: 'route' },
 ];
 
 // Smooth scroll utility
