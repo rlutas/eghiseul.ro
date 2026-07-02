@@ -2,6 +2,10 @@
 
 **Data:** 2026-06-15 (ONRC constatator IMM/insolvență FUNCȚIONAL în producție)
 
+> **⚡ Update 2026-07-02 — LIVRAT:**
+> - **Formular de contact** pe `/contact` (nu mai are doar carduri): honeypot + rate-limit 5/10min/IP → salvare `contact_messages` (migrație 090) + email Resend la contact@ (reply-to client). Linkat din header nav + footer. OPEN: fără UI admin de citit mesajele (vin pe email + DB). Detalii: [`changelog/2026-07-02-contact-form.md`](changelog/2026-07-02-contact-form.md).
+> - **Termen standard cazier/integritate 2-4 → 3-5 zile** (migrație 091): urgentul 1-2 se suprapunea cu standardul, puțini clienți alegeau urgența. Lărgit ca urgentul să se vândă. Doar 5 servicii cu urgență (cazier judiciar x3 + auto + integritate); fiscal + identificare-imobil rămân 2-4. Conținut SEO hardcodat cazier-judiciar actualizat (6 fișiere). Detalii: [`changelog/2026-07-02-cazier-standard-term-3-5.md`](changelog/2026-07-02-cazier-standard-term-3-5.md).
+
 > **⚡ Update 2026-06-22:** de atunci s-au livrat: 36 calculatoare (îmbogățite + GEO), expansiune location-SEO (42 CF pe județe, 48 orașe cazier, clustere ONRC + stare civilă = 66 pagini noi), rovinietă (verificare consistent + pagină cumpărare), pagină `/tools/`, meniu calculatoare limitat la populare, reorganizare docs. Detalii: [`changelog/2026-06-22-seo-expansion-rovinieta-tools.md`](changelog/2026-06-22-seo-expansion-rovinieta-tools.md). Restul fișierului de mai jos reflectă starea de la 2026-06-15.
 
 > **⚡ Update 2026-06-23/24 — LIVRAT (migrații 075-080):**
