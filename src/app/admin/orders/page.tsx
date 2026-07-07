@@ -24,6 +24,8 @@ import {
   Truck,
   X as XIcon,
   Receipt,
+  AlertTriangle,
+  Ticket,
 } from 'lucide-react';
 import { STATUS_TABS, type OrdersCounts } from '@/lib/admin/orders-tabs';
 
@@ -88,6 +90,11 @@ interface OrderRow {
     billing?: { type?: string; companyName?: string };
   } | null;
   created_at: string | null;
+  estimated_completion_date: string | null;
+  invoice_number: string | null;
+  invoice_url: string | null;
+  coupon_code: string | null;
+  admin_notes: string | null;
   services: { name: string; slug: string } | null;
 }
 
@@ -108,6 +115,7 @@ export default function AdminOrdersPage() {
   const urlTest = (searchParams.get('test') as 'hide' | 'only' | 'all' | null) || 'hide';
   const urlService = searchParams.get('service') || 'all';
   const urlSearch = searchParams.get('search') || '';
+  const urlQuick = searchParams.get('quick') || '';
   const urlPage = Math.max(0, parseInt(searchParams.get('page') || '0', 10));
 
   const [orders, setOrders] = useState<OrderRow[]>([]);
@@ -140,6 +148,7 @@ export default function AdminOrdersPage() {
     urlStatus !== 'all' ||
     urlService !== 'all' ||
     urlSearch !== '' ||
+    urlQuick !== '' ||
     urlTest !== 'hide';
 
   const buildQuery = useCallback(() => {
@@ -147,11 +156,12 @@ export default function AdminOrdersPage() {
     if (urlStatus !== 'all') params.set('status', urlStatus);
     if (urlService !== 'all') params.set('service', urlService);
     if (urlSearch) params.set('search', urlSearch);
+    if (urlQuick) params.set('quick', urlQuick);
     if (urlTest !== 'hide') params.set('test', urlTest);
     params.set('page', String(urlPage));
     params.set('limit', String(PAGE_SIZE));
     return params.toString();
-  }, [urlStatus, urlService, urlSearch, urlTest, urlPage]);
+  }, [urlStatus, urlService, urlSearch, urlQuick, urlTest, urlPage]);
 
   const fetchOrders = useCallback(async () => {
     setLoading(true);
@@ -319,6 +329,58 @@ export default function AdminOrdersPage() {
         </div>
       </div>
 
+      {/* Filtre rapide + Stadiu chips (parity cazierjudiciaronline.com) */}
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+        <span className="text-[11px] font-medium uppercase tracking-wide text-slate-400">Filtre rapide:</span>
+        <SandboxChip active={urlQuick === ''} label="Fără" onClick={() => updateParams({ quick: null })} />
+        <SandboxChip
+          active={urlQuick === 'overdue'}
+          label="Expirate"
+          count={counts?.overdue}
+          tone="danger"
+          onClick={() => updateParams({ quick: urlQuick === 'overdue' ? null : 'overdue' })}
+        />
+        <SandboxChip
+          active={urlQuick === 'deadline_soon'}
+          label="Deadline < 48h"
+          count={counts?.deadline_soon}
+          tone="warn"
+          onClick={() => updateParams({ quick: urlQuick === 'deadline_soon' ? null : 'deadline_soon' })}
+        />
+        <SandboxChip
+          active={urlQuick === 'with_coupon'}
+          label="Cu cupon"
+          count={counts?.with_coupon}
+          onClick={() => updateParams({ quick: urlQuick === 'with_coupon' ? null : 'with_coupon' })}
+        />
+
+        <span className="ml-1 text-[11px] font-medium uppercase tracking-wide text-slate-400">Stadiu:</span>
+        <SandboxChip
+          active={urlQuick === 'documents_generated'}
+          label="Documente generate"
+          count={counts?.stage_documents_generated}
+          onClick={() => updateParams({ quick: urlQuick === 'documents_generated' ? null : 'documents_generated' })}
+        />
+        <SandboxChip
+          active={urlQuick === 'submitted'}
+          label="Depus la instituție"
+          count={counts?.stage_submitted}
+          onClick={() => updateParams({ quick: urlQuick === 'submitted' ? null : 'submitted' })}
+        />
+        <SandboxChip
+          active={urlQuick === 'received'}
+          label="Document primit"
+          count={counts?.stage_received}
+          onClick={() => updateParams({ quick: urlQuick === 'received' ? null : 'received' })}
+        />
+        <SandboxChip
+          active={urlQuick === 'ready'}
+          label="Gata de livrare"
+          count={counts?.stage_ready}
+          onClick={() => updateParams({ quick: urlQuick === 'ready' ? null : 'ready' })}
+        />
+      </div>
+
       {/* Quick chips row: Sandbox + Reset */}
       <div className="flex flex-wrap items-center gap-2">
         <span className="text-[11px] font-medium uppercase tracking-wide text-slate-400">Test:</span>
@@ -362,6 +424,7 @@ export default function AdminOrdersPage() {
               <TableHead>Curier</TableHead>
               <TableHead>AWB</TableHead>
               <TableHead className="text-right">Total</TableHead>
+              <TableHead>Termen</TableHead>
               <TableHead>Dată</TableHead>
             </TableRow>
           </TableHeader>
@@ -369,7 +432,7 @@ export default function AdminOrdersPage() {
             {loading ? (
               Array.from({ length: 8 }).map((_, i) => (
                 <TableRow key={i}>
-                  {Array.from({ length: 10 }).map((_, j) => (
+                  {Array.from({ length: 11 }).map((_, j) => (
                     <TableCell key={j}>
                       <Skeleton className="h-5 w-full" />
                     </TableCell>
@@ -378,7 +441,7 @@ export default function AdminOrdersPage() {
               ))
             ) : orders.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={10} className="py-8 text-center text-muted-foreground">
+                <TableCell colSpan={11} className="py-8 text-center text-muted-foreground">
                   {hasActiveFilters ? 'Niciun rezultat pentru filtrele active.' : 'Nicio comandă în această categorie.'}
                 </TableCell>
               </TableRow>
@@ -395,6 +458,15 @@ export default function AdminOrdersPage() {
                       {order.is_test && (
                         <span className="inline-flex items-center rounded border border-amber-300 bg-amber-50 px-1 py-0 text-[9px] font-semibold uppercase tracking-wide text-amber-700">
                           Test
+                        </span>
+                      )}
+                      {order.payment_status === 'paid' && !order.invoice_number && (
+                        <span
+                          title="Comandă plătită fără factură emisă"
+                          className="inline-flex items-center gap-0.5 rounded border border-red-300 bg-red-50 px-1 py-0 text-[9px] font-semibold uppercase tracking-wide text-red-700"
+                        >
+                          <AlertTriangle className="h-2.5 w-2.5" />
+                          Fără factură
                         </span>
                       )}
                     </div>
@@ -432,7 +504,15 @@ export default function AdminOrdersPage() {
                     )}
                   </TableCell>
                   <TableCell className="text-right font-medium">
-                    {order.total_price.toFixed(2)} RON
+                    <div className="flex items-center justify-end gap-1">
+                      {order.coupon_code && (
+                        <Ticket className="h-3.5 w-3.5 text-emerald-600" aria-label={`Cupon ${order.coupon_code}`} />
+                      )}
+                      {order.total_price.toFixed(2)} RON
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <DeadlineCell iso={order.estimated_completion_date} status={order.status} />
                   </TableCell>
                   <TableCell className="text-sm text-muted-foreground">
                     {order.created_at
@@ -485,6 +565,37 @@ export default function AdminOrdersPage() {
 
 // Helper components
 
+function DeadlineCell({ iso, status }: { iso: string | null; status: string | null }) {
+  if (!iso) return <span className="text-xs text-muted-foreground">—</span>;
+  const d = new Date(iso);
+  const now = new Date();
+  const inactive = [
+    'completed', 'refunded', 'cancelled', 'abandoned', 'cancellation_requested', 'standby', 'draft', 'pending',
+  ].includes(status || '');
+  const ms = d.getTime() - now.getTime();
+  const days = Math.round(ms / 86_400_000);
+  const dateStr = d.toLocaleDateString('ro-RO', { day: '2-digit', month: '2-digit', timeZone: 'Europe/Bucharest' });
+  let cls = 'text-slate-600';
+  let hint = '';
+  if (!inactive) {
+    if (ms < 0) {
+      cls = 'text-red-600 font-semibold';
+      hint = `expirat de ${Math.abs(days)}z`;
+    } else if (ms < 48 * 3_600_000) {
+      cls = 'text-amber-600 font-semibold';
+      hint = days <= 0 ? 'azi' : `în ${days}z`;
+    } else {
+      hint = `în ${days}z`;
+    }
+  }
+  return (
+    <div className={`text-xs ${cls}`}>
+      {dateStr}
+      {hint && <span className="ml-1 opacity-70">· {hint}</span>}
+    </div>
+  );
+}
+
 function SandboxChip({
   active,
   label,
@@ -495,12 +606,14 @@ function SandboxChip({
   active: boolean;
   label: string;
   count?: number;
-  tone?: 'warn';
+  tone?: 'warn' | 'danger';
   onClick: () => void;
 }) {
   const base =
     'inline-flex items-center gap-1 rounded-md border px-2 py-1 text-xs font-medium transition-colors';
-  const activeCls = tone === 'warn'
+  const activeCls = tone === 'danger'
+    ? 'border-red-300 bg-red-50 text-red-900'
+    : tone === 'warn'
     ? 'border-amber-300 bg-amber-50 text-amber-900'
     : 'border-slate-400 bg-slate-100 text-slate-900';
   const idleCls = 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50';

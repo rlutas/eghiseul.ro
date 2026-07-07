@@ -51,6 +51,15 @@ export interface OrdersCounts {
   completed: number;
   abandoned: number;
   test_only: number;
+  // Quick-filter chip badges ("Filtre rapide")
+  overdue: number;
+  deadline_soon: number;
+  with_coupon: number;
+  // Workflow-stage chip badges ("Stadiu")
+  stage_documents_generated: number;
+  stage_submitted: number;
+  stage_received: number;
+  stage_ready: number;
 }
 
 export type TestFilter = 'hide' | 'only' | 'all';

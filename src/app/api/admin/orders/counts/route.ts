@@ -9,6 +9,7 @@ import {
   parseTestFilter,
   type OrdersCounts,
 } from '@/lib/admin/orders-tabs';
+import { applyQuickOrStage } from '@/lib/admin/order-quick-filters';
 
 /**
  * GET /api/admin/orders/counts
@@ -74,7 +75,11 @@ export async function GET(request: NextRequest) {
       return q;
     };
 
-    const [allRes, paidRes, processingRes, shippedRes, completedRes, abandonedRes, testOnlyRes] =
+    const [
+      allRes, paidRes, processingRes, shippedRes, completedRes, abandonedRes, testOnlyRes,
+      overdueRes, deadlineSoonRes, withCouponRes,
+      stageDocsRes, stageSubmittedRes, stageReceivedRes, stageReadyRes,
+    ] =
       await Promise.all([
         buildQuery().not('status', 'in', hiddenList),
         buildQuery().eq('status', 'paid'),
@@ -91,6 +96,15 @@ export async function GET(request: NextRequest) {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           .eq('is_test' as any, true)
           .not('status', 'in', hiddenList),
+        // Quick-filter chip counts
+        applyQuickOrStage(buildQuery(), 'overdue'),
+        applyQuickOrStage(buildQuery(), 'deadline_soon'),
+        applyQuickOrStage(buildQuery(), 'with_coupon'),
+        // Workflow-stage chip counts
+        applyQuickOrStage(buildQuery(), 'documents_generated'),
+        applyQuickOrStage(buildQuery(), 'submitted'),
+        applyQuickOrStage(buildQuery(), 'received'),
+        applyQuickOrStage(buildQuery(), 'ready'),
       ]);
 
     const counts: OrdersCounts = {
@@ -101,6 +115,13 @@ export async function GET(request: NextRequest) {
       completed: completedRes.count || 0,
       abandoned: abandonedRes.count || 0,
       test_only: testOnlyRes.count || 0,
+      overdue: overdueRes.count || 0,
+      deadline_soon: deadlineSoonRes.count || 0,
+      with_coupon: withCouponRes.count || 0,
+      stage_documents_generated: stageDocsRes.count || 0,
+      stage_submitted: stageSubmittedRes.count || 0,
+      stage_received: stageReceivedRes.count || 0,
+      stage_ready: stageReadyRes.count || 0,
     };
 
     return NextResponse.json({ success: true, data: counts });

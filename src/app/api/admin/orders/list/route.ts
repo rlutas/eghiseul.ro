@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { requirePermission } from '@/lib/admin/permissions';
 import { parseTestFilter, resolveStatusFilter } from '@/lib/admin/orders-tabs';
+import { applyQuickOrStage } from '@/lib/admin/order-quick-filters';
 
 /**
  * GET /api/admin/orders/list - List all orders (for admin)
@@ -70,6 +71,11 @@ export async function GET(request: NextRequest) {
         is_test,
         customer_data,
         created_at,
+        estimated_completion_date,
+        invoice_number,
+        invoice_url,
+        coupon_code,
+        admin_notes,
         services(name, slug)
       `,
         { count: 'estimated' }
@@ -105,12 +111,28 @@ export async function GET(request: NextRequest) {
       query = query.eq('service_id', service);
     }
 
-    // Apply search filter (server-side)
+    // Quick-filter / workflow-stage chip (overdue | deadline_soon | with_coupon
+    // | documents_generated | submitted | received | ready).
+    const quick = searchParams.get('quick') || '';
+    if (quick) {
+      query = applyQuickOrStage(query, quick);
+    }
+
+    // Apply search filter (server-side). Parity with sister: also match client
+    // name (first/last), phone and billing name — the team looks people up by name.
     if (search) {
-      // Search across multiple fields using OR
-      // Note: PostgREST uses -> for JSON traversal, ->> for text extraction
+      // PostgREST uses -> for JSON traversal, ->> for text extraction.
       query = query.or(
-        `order_number.ilike.%${search}%,friendly_order_id.ilike.%${search}%,delivery_tracking_number.ilike.%${search}%,customer_data->contact->>email.ilike.%${search}%`
+        [
+          `order_number.ilike.%${search}%`,
+          `friendly_order_id.ilike.%${search}%`,
+          `delivery_tracking_number.ilike.%${search}%`,
+          `customer_data->contact->>email.ilike.%${search}%`,
+          `customer_data->contact->>phone.ilike.%${search}%`,
+          `customer_data->personal->>firstName.ilike.%${search}%`,
+          `customer_data->personal->>lastName.ilike.%${search}%`,
+          `customer_data->billing->>name.ilike.%${search}%`,
+        ].join(',')
       );
     }
 
