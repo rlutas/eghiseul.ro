@@ -107,6 +107,33 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+
+  // Baseline security headers on every route. HSTS is already added by Vercel
+  // at the edge, so it's not repeated here. CSP is intentionally omitted for
+  // now — a strict policy needs testing against Stripe, GA, and the erovinieta
+  // iframe; add it later as report-only first. These four are non-breaking.
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          // Block MIME-type sniffing.
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          // Anti-clickjacking — nothing legitimately frames our pages (the
+          // rovinietă tool frames erovinieta.net as the parent, unaffected).
+          { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
+          // Don't leak full URLs to third parties on cross-origin navigations.
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+          // Lock down browser features. camera=(self) stays enabled for the
+          // KYC selfie capture; payment=(self) for Stripe wallet buttons.
+          {
+            key: 'Permissions-Policy',
+            value: 'camera=(self), microphone=(), geolocation=(), payment=(self), usb=()',
+          },
+        ],
+      },
+    ];
+  },
 };
 
 export default nextConfig;
