@@ -966,6 +966,11 @@ export default function AdminOrderDetailPage() {
         </div>
       )}
 
+      {/* Note Echipă — moved to the top for parity with cazierjudiciaronline.com
+          (prominent, right after the banners) so the team sees/writes notes
+          without scrolling to the bottom. */}
+      <NoteEchipaCard orderId={order.id} timeline={timeline} onAdded={fetchOrder} />
+
       {/* ROW 1: Date contact + Date personale (left) | Serviciu + Livrare (right).
                  Stacked cards within each column per user-requested layout. */}
       <div className="grid gap-4 lg:grid-cols-2">
@@ -1993,12 +1998,6 @@ export default function AdminOrderDetailPage() {
         currentStatus={order.status || 'draft'}
         onUpdated={fetchOrder}
       />
-
-      {/* Note Echipă — internal admin notes (Cmd+Enter to submit). Shows
-          only human notes (filters out system-* changed_by). Each note
-          attached to a status transition gets a small badge showing the
-          status it was attached to. */}
-      <NoteEchipaCard orderId={order.id} timeline={timeline} onAdded={fetchOrder} />
 
       {/* Order Timeline */}
       <Card>
