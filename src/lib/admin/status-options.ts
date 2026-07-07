@@ -18,6 +18,12 @@ export const STATUS_OPTIONS: StatusOption[] = [
   { value: 'submitted_to_institution', label: 'Trimis instituție', group: 'normal' },
   { value: 'document_received', label: 'Document primit', group: 'normal' },
   { value: 'extras_in_progress', label: 'Extras în lucru', group: 'normal' },
+  // Granular add-on stages (only relevant for orders with translation /
+  // legalization / apostille add-ons) — parity with cazierjudiciaronline.com.
+  { value: 'la_tradus', label: 'La traducere', group: 'normal' },
+  { value: 'la_legalizat', label: 'La legalizare', group: 'normal' },
+  { value: 'la_apostila_notari', label: 'Apostilă Notari', group: 'normal' },
+  { value: 'eliberat_apostila_haga', label: 'Apostilă Haga', group: 'normal' },
   { value: 'document_ready', label: 'Documentul este eliberat', group: 'normal' },
   { value: 'shipped', label: 'Expediată', group: 'normal' },
   { value: 'delivered', label: 'Livrată', group: 'normal' },
