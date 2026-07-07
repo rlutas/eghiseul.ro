@@ -8,6 +8,7 @@ import { Menu, X, Phone, User, Settings, FileText, LogOut, ChevronDown, PackageS
 import { Button } from '@/components/ui/button';
 import { ServicesMegaMenu } from '@/components/shared/services-mega-menu';
 import { CalculatorsMegaMenu } from '@/components/shared/calculators-mega-menu';
+import { HeaderServiceSearch } from '@/components/shared/header-service-search';
 import { SERVICES_NAV } from '@/config/services-nav';
 import { CALCULATORS_NAV } from '@/config/calculators-nav';
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet';
@@ -204,6 +205,7 @@ export function Header() {
 
             {/* Desktop Auth Buttons / User Menu */}
             <div className="hidden xl:flex items-center gap-3">
+              <HeaderServiceSearch className="h-10 w-10 border border-neutral-200 hover:border-primary-300" />
               {isLoading ? (
                 <div className="w-9 h-9 rounded-full bg-neutral-100 animate-pulse" />
               ) : user ? (
@@ -290,12 +292,14 @@ export function Header() {
                 the why. The placeholder is non-interactive (no `Sheet`
                 wrapping it) but that's fine: it's only visible for ~1
                 frame on first paint. */}
+            <div className="flex items-center gap-1 xl:hidden">
+            <HeaderServiceSearch className="min-h-[44px] min-w-[44px]" />
             {!hydrated && (
               <Button
                 variant="ghost"
                 size="icon"
                 aria-label="Deschide meniul"
-                className="xl:hidden hover:bg-primary-50 min-h-[44px] min-w-[44px]"
+                className="hover:bg-primary-50 min-h-[44px] min-w-[44px]"
               >
                 <Menu className="h-6 w-6 text-secondary-900" />
               </Button>
@@ -565,6 +569,7 @@ export function Header() {
               </SheetContent>
             </Sheet>
             )}
+            </div>
           </div>
         </div>
       </header>

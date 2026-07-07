@@ -2,6 +2,11 @@
 
 **Data:** 2026-06-15 (ONRC constatator IMM/insolvență FUNCȚIONAL în producție)
 
+> **⚡ Update 2026-07-07 — LIVRAT + GO-LIVE:**
+> - **Filtre + căutare pe `/servicii`** (client-side): search instant (nume + descriere + sinonime categorie: „firma"→Firme, „teren"→Carte Funciară) + chip-uri categorie, sticky pe mobil. Fără filtru = grupare pe instituție (SEO păstrat); cu filtru = grid plat + contor. **Palette 🔍 în header** (desktop + mobil) — command-palette peste serviciile din meniu, Enter→primul rezultat. Helper pur `service-search.ts` + 9 teste. Fără dep/migrare.
+> - **🟢 DNS CUTOVER eghiseul.ro → Vercel** (în propagare): nameservere delegate la `ns1/ns2.vercel-dns.com` (Vercel: Current NS ✔). Domeniul e asignat proiectului `eghiseul-ro`, SSL auto. Resolverele cu cache clausweb (WordPress vechi 89.44.105.35) se actualizează în ≤24-48h. robots.txt + sitemap (204 URL) verificate OK pe app.
+> - **🔴 Rămân blockere config (acțiunea ta, conturi reale):** Stripe LIVE (`sk_live`/`pk_live` + webhook live pe `/api/webhooks/stripe`), serie Oblio proprie `EGH` (acum `EGI2024` partajată) + storno facturi test, prim test plătit real ANCPI/ONRC.
+>
 > **⚡ Update 2026-07-02 — LIVRAT:**
 > - **Formular de contact** pe `/contact` (nu mai are doar carduri): honeypot + rate-limit 5/10min/IP → salvare `contact_messages` (migrație 090) + email Resend la contact@ (reply-to client). Linkat din header nav + footer. OPEN: fără UI admin de citit mesajele (vin pe email + DB). Detalii: [`changelog/2026-07-02-contact-form.md`](changelog/2026-07-02-contact-form.md).
 > - **Termen standard cazier/integritate 2-4 → 3-5 zile** (migrație 091): urgentul 1-2 se suprapunea cu standardul, puțini clienți alegeau urgența. Lărgit ca urgentul să se vândă. Doar 5 servicii cu urgență (cazier judiciar x3 + auto + integritate); fiscal + identificare-imobil rămân 2-4. Conținut SEO hardcodat cazier-judiciar actualizat (6 fișiere). Detalii: [`changelog/2026-07-02-cazier-standard-term-3-5.md`](changelog/2026-07-02-cazier-standard-term-3-5.md).
