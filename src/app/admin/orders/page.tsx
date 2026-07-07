@@ -16,6 +16,12 @@ import { Input } from '@/components/ui/input';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import {
   Search,
   RefreshCw,
   ChevronLeft,
@@ -26,6 +32,10 @@ import {
   Receipt,
   AlertTriangle,
   Ticket,
+  StickyNote,
+  Eye,
+  ExternalLink,
+  FileText,
 } from 'lucide-react';
 import { STATUS_TABS, type OrdersCounts } from '@/lib/admin/orders-tabs';
 
@@ -125,6 +135,8 @@ export default function AdminOrdersPage() {
   const [services, setServices] = useState<ServiceOption[]>([]);
   // Local-only search input — debounced into the URL on Enter or blur.
   const [searchInput, setSearchInput] = useState(urlSearch);
+  // Order previewed in the quick-view "Detalii" dialog (parity with sister).
+  const [detailOrder, setDetailOrder] = useState<OrderRow | null>(null);
 
   const updateParams = useCallback(
     (patch: Record<string, string | null>) => {
@@ -426,13 +438,14 @@ export default function AdminOrdersPage() {
               <TableHead className="text-right">Total</TableHead>
               <TableHead>Termen</TableHead>
               <TableHead>Dată</TableHead>
+              <TableHead className="text-right">Acțiuni</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {loading ? (
               Array.from({ length: 8 }).map((_, i) => (
                 <TableRow key={i}>
-                  {Array.from({ length: 11 }).map((_, j) => (
+                  {Array.from({ length: 12 }).map((_, j) => (
                     <TableCell key={j}>
                       <Skeleton className="h-5 w-full" />
                     </TableCell>
@@ -441,7 +454,7 @@ export default function AdminOrdersPage() {
               ))
             ) : orders.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={11} className="py-8 text-center text-muted-foreground">
+                <TableCell colSpan={12} className="py-8 text-center text-muted-foreground">
                   {hasActiveFilters ? 'Niciun rezultat pentru filtrele active.' : 'Nicio comandă în această categorie.'}
                 </TableCell>
               </TableRow>
@@ -468,6 +481,12 @@ export default function AdminOrdersPage() {
                           <AlertTriangle className="h-2.5 w-2.5" />
                           Fără factură
                         </span>
+                      )}
+                      {order.admin_notes && order.admin_notes.trim() && (
+                        <StickyNote
+                          className="h-3 w-3 text-amber-500"
+                          aria-label="Are note echipă"
+                        />
                       )}
                     </div>
                   </TableCell>
@@ -524,6 +543,20 @@ export default function AdminOrdersPage() {
                         })
                       : '-'}
                   </TableCell>
+                  <TableCell className="text-right">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-7 px-2 text-xs"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setDetailOrder(order);
+                      }}
+                    >
+                      <Eye className="mr-1 h-3.5 w-3.5" />
+                      Detalii
+                    </Button>
+                  </TableCell>
                 </TableRow>
               ))
             )}
@@ -559,6 +592,100 @@ export default function AdminOrdersPage() {
           </div>
         </div>
       )}
+
+      {/* Quick-view "Detalii" dialog — parity with cazierjudiciaronline.com */}
+      <Dialog open={!!detailOrder} onOpenChange={(o) => !o && setDetailOrder(null)}>
+        <DialogContent className="max-w-lg">
+          {detailOrder && (
+            <>
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2 font-mono text-base">
+                  {detailOrder.friendly_order_id || detailOrder.order_number}
+                  {detailOrder.is_test && (
+                    <span className="rounded border border-amber-300 bg-amber-50 px-1 text-[9px] font-semibold uppercase text-amber-700">
+                      Test
+                    </span>
+                  )}
+                </DialogTitle>
+              </DialogHeader>
+              <div className="space-y-1.5 text-sm">
+                <DetailRow label="Client" value={getCustomerName(detailOrder)} />
+                <DetailRow label="Email" value={detailOrder.customer_data?.contact?.email || '—'} />
+                <DetailRow label="Telefon" value={detailOrder.customer_data?.contact?.phone || '—'} />
+                <DetailRow label="Serviciu" value={detailOrder.services?.name || '—'} />
+                <DetailRow label="Status" value={<StatusBadge status={detailOrder.status || 'draft'} />} />
+                <DetailRow
+                  label="Plată"
+                  value={<PaymentBadge status={detailOrder.payment_status} method={detailOrder.payment_method} />}
+                />
+                <DetailRow label="Sumă" value={`${detailOrder.total_price.toFixed(2)} RON`} />
+                <DetailRow
+                  label="Termen"
+                  value={<DeadlineCell iso={detailOrder.estimated_completion_date} status={detailOrder.status} />}
+                />
+                <DetailRow
+                  label="Factură"
+                  value={
+                    detailOrder.invoice_number ? (
+                      detailOrder.invoice_url ? (
+                        <a
+                          href={detailOrder.invoice_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 text-blue-600 hover:underline"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <FileText className="h-3.5 w-3.5" />
+                          {detailOrder.invoice_number}
+                        </a>
+                      ) : (
+                        detailOrder.invoice_number
+                      )
+                    ) : (
+                      <span className="text-red-600">Fără factură</span>
+                    )
+                  }
+                />
+                <DetailRow label="Cupon" value={detailOrder.coupon_code || '—'} />
+                {detailOrder.admin_notes?.trim() && (
+                  <div className="mt-1 rounded-md border border-amber-200 bg-amber-50 p-2">
+                    <p className="flex items-center gap-1 text-xs font-semibold text-amber-800">
+                      <StickyNote className="h-3 w-3" />
+                      Note echipă
+                    </p>
+                    <p className="mt-1 whitespace-pre-wrap text-xs text-amber-900">{detailOrder.admin_notes}</p>
+                  </div>
+                )}
+              </div>
+              <div className="flex justify-end gap-2 pt-2">
+                <Button variant="outline" size="sm" onClick={() => setDetailOrder(null)}>
+                  Închide
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={() => {
+                    const id = detailOrder.id;
+                    setDetailOrder(null);
+                    router.push(`/admin/orders/${id}#notes-echipa`);
+                  }}
+                >
+                  Deschide comanda
+                  <ExternalLink className="ml-1 h-3.5 w-3.5" />
+                </Button>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
+
+function DetailRow({ label, value }: { label: string; value: React.ReactNode }) {
+  return (
+    <div className="flex items-start justify-between gap-3 border-b border-slate-100 py-1 last:border-0">
+      <span className="text-xs font-medium uppercase tracking-wide text-slate-400">{label}</span>
+      <span className="text-right text-sm text-slate-800">{value}</span>
     </div>
   );
 }
