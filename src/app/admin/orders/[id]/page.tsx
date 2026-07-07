@@ -1759,14 +1759,6 @@ export default function AdminOrderDetailPage() {
         })()
       )}
 
-      {/* PROCESSING SECTION - RIGHT AFTER CONTACT & SERVICE */}
-      <ProcessingSection
-        order={order}
-        documents={orderDocuments}
-        optionStatuses={optionStatuses}
-        onStatusChange={fetchOrder}
-      />
-
       {/* ROW 2: Facturare + Contract semnat */}
       <div className="grid gap-4 lg:grid-cols-2">
         {/* Facturare — clean InfoRow style matching sister project. Includes
@@ -2037,6 +2029,15 @@ export default function AdminOrderDetailPage() {
           <OrderTimeline timeline={timeline} orderCreatedAt={order.created_at} />
         </CardContent>
       </Card>
+
+      {/* PROCESSING / GENERARE DOCUMENTE — at the bottom, parity with the
+          sister's "Generare Documente Juridice" placement. */}
+      <ProcessingSection
+        order={order}
+        documents={orderDocuments}
+        optionStatuses={optionStatuses}
+        onStatusChange={fetchOrder}
+      />
 
       {/* Admin Notes */}
       {order.admin_notes && (
