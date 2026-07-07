@@ -483,10 +483,9 @@ export default function AdminOrdersPage() {
                         </span>
                       )}
                       {order.admin_notes && order.admin_notes.trim() && (
-                        <StickyNote
-                          className="h-3 w-3 text-amber-500"
-                          aria-label="Are note echipă"
-                        />
+                        <span title={order.admin_notes} className="inline-flex">
+                          <StickyNote className="h-3 w-3 text-amber-500" aria-label="Are note echipă" />
+                        </span>
                       )}
                     </div>
                   </TableCell>
@@ -496,6 +495,15 @@ export default function AdminOrdersPage() {
                       <span className="text-xs text-muted-foreground">
                         {order.customer_data?.contact?.email || '-'}
                       </span>
+                      {order.admin_notes && order.admin_notes.trim() && (
+                        <span
+                          title={order.admin_notes}
+                          className="mt-0.5 flex max-w-[220px] items-center gap-1 text-[11px] italic text-amber-600"
+                        >
+                          <StickyNote className="h-3 w-3 shrink-0" />
+                          <span className="truncate">{order.admin_notes}</span>
+                        </span>
+                      )}
                     </div>
                   </TableCell>
                   <TableCell className="max-w-[180px] truncate text-sm">
