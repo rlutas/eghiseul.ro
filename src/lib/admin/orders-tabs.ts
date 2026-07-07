@@ -59,6 +59,10 @@ export interface OrdersCounts {
   stage_documents_generated: number;
   stage_submitted: number;
   stage_received: number;
+  stage_la_tradus: number;
+  stage_la_legalizat: number;
+  stage_la_apostila_notari: number;
+  stage_apostila_haga: number;
   stage_ready: number;
 }
 

@@ -41,6 +41,10 @@ export const STAGE_FILTERS = {
   documents_generated: 'documents_generated',
   submitted: 'submitted_to_institution',
   received: 'document_received',
+  la_tradus: 'la_tradus',
+  la_legalizat: 'la_legalizat',
+  la_apostila_notari: 'la_apostila_notari',
+  apostila_haga: 'eliberat_apostila_haga',
   ready: 'document_ready',
 } as const;
 
@@ -50,6 +54,10 @@ export const STAGE_LABELS: Record<StageFilter, string> = {
   documents_generated: 'Documente generate',
   submitted: 'Depus la instituție',
   received: 'Document primit',
+  la_tradus: 'La traducere',
+  la_legalizat: 'La legalizare',
+  la_apostila_notari: 'Apostilă Notari',
+  apostila_haga: 'Apostilă Haga',
   ready: 'Gata de livrare',
 };
 

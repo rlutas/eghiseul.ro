@@ -81,13 +81,13 @@ export async function GET(
       }
     }
 
-    // Fetch order history / timeline
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // Fetch order history / timeline.
     // order_history stores status transitions in old_value/new_value jsonb
     // ({ status: '...' }). Select those (NOT the non-existent from_status/
     // to_status columns — that select silently failed and wiped the whole
     // timeline, so notes + history never rendered) and derive from_status/
     // to_status for the UI below.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: rawHistory, error: historyError } = await (adminClient as any)
       .from('order_history')
       .select('id, event_type, notes, old_value, new_value, created_at, changed_by')

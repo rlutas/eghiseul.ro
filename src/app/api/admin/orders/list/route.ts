@@ -145,9 +145,30 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // Team-note counts per order (sister parity: StickyNote icon + count in
+    // the list). Counts human-authored order_history notes (non-empty, not
+    // system-*) for just the current page of orders — one cheap query.
+    const noteCounts: Record<string, number> = {};
+    const orderRows = (orders || []) as unknown as Array<Record<string, unknown> & { id: string }>;
+    const ids = orderRows.map((o) => o.id);
+    if (ids.length > 0) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: noteRows } = await (adminClient as any)
+        .from('order_history')
+        .select('order_id, changed_by, notes')
+        .in('order_id', ids)
+        .not('notes', 'is', null);
+      for (const r of (noteRows || []) as Array<{ order_id: string; changed_by: string | null; notes: string | null }>) {
+        const by = (r.changed_by || '').toLowerCase();
+        if (by.startsWith('system')) continue;
+        if (!(r.notes || '').trim()) continue;
+        noteCounts[r.order_id] = (noteCounts[r.order_id] || 0) + 1;
+      }
+    }
+
     return NextResponse.json({
       success: true,
-      data: orders || [],
+      data: orderRows.map((o) => ({ ...o, note_count: noteCounts[o.id] || 0 })),
       total: count || 0,
     });
   } catch (error) {

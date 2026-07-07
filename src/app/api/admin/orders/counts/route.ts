@@ -78,7 +78,9 @@ export async function GET(request: NextRequest) {
     const [
       allRes, paidRes, processingRes, shippedRes, completedRes, abandonedRes, testOnlyRes,
       overdueRes, deadlineSoonRes, withCouponRes,
-      stageDocsRes, stageSubmittedRes, stageReceivedRes, stageReadyRes,
+      stageDocsRes, stageSubmittedRes, stageReceivedRes,
+      stageTradusRes, stageLegalizatRes, stageApostilaNotariRes, stageApostilaHagaRes,
+      stageReadyRes,
     ] =
       await Promise.all([
         buildQuery().not('status', 'in', hiddenList),
@@ -104,6 +106,10 @@ export async function GET(request: NextRequest) {
         applyQuickOrStage(buildQuery(), 'documents_generated'),
         applyQuickOrStage(buildQuery(), 'submitted'),
         applyQuickOrStage(buildQuery(), 'received'),
+        applyQuickOrStage(buildQuery(), 'la_tradus'),
+        applyQuickOrStage(buildQuery(), 'la_legalizat'),
+        applyQuickOrStage(buildQuery(), 'la_apostila_notari'),
+        applyQuickOrStage(buildQuery(), 'apostila_haga'),
         applyQuickOrStage(buildQuery(), 'ready'),
       ]);
 
@@ -121,6 +127,10 @@ export async function GET(request: NextRequest) {
       stage_documents_generated: stageDocsRes.count || 0,
       stage_submitted: stageSubmittedRes.count || 0,
       stage_received: stageReceivedRes.count || 0,
+      stage_la_tradus: stageTradusRes.count || 0,
+      stage_la_legalizat: stageLegalizatRes.count || 0,
+      stage_la_apostila_notari: stageApostilaNotariRes.count || 0,
+      stage_apostila_haga: stageApostilaHagaRes.count || 0,
       stage_ready: stageReadyRes.count || 0,
     };
 

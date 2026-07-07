@@ -116,6 +116,7 @@ interface OrderRow {
   invoice_url: string | null;
   coupon_code: string | null;
   admin_notes: string | null;
+  note_count?: number;
   services: { name: string; slug: string } | null;
 }
 
@@ -397,6 +398,30 @@ export default function AdminOrdersPage() {
           onClick={() => updateParams({ quick: urlQuick === 'received' ? null : 'received' })}
         />
         <SandboxChip
+          active={urlQuick === 'la_tradus'}
+          label="La traducere"
+          count={counts?.stage_la_tradus}
+          onClick={() => updateParams({ quick: urlQuick === 'la_tradus' ? null : 'la_tradus' })}
+        />
+        <SandboxChip
+          active={urlQuick === 'la_legalizat'}
+          label="La legalizare"
+          count={counts?.stage_la_legalizat}
+          onClick={() => updateParams({ quick: urlQuick === 'la_legalizat' ? null : 'la_legalizat' })}
+        />
+        <SandboxChip
+          active={urlQuick === 'la_apostila_notari'}
+          label="Apostilă Notari"
+          count={counts?.stage_la_apostila_notari}
+          onClick={() => updateParams({ quick: urlQuick === 'la_apostila_notari' ? null : 'la_apostila_notari' })}
+        />
+        <SandboxChip
+          active={urlQuick === 'apostila_haga'}
+          label="Apostilă Haga"
+          count={counts?.stage_apostila_haga}
+          onClick={() => updateParams({ quick: urlQuick === 'apostila_haga' ? null : 'apostila_haga' })}
+        />
+        <SandboxChip
           active={urlQuick === 'ready'}
           label="Gata de livrare"
           count={counts?.stage_ready}
@@ -440,6 +465,7 @@ export default function AdminOrdersPage() {
             <TableRow>
               <TableHead>Nr. Comandă</TableHead>
               <TableHead>Client</TableHead>
+              <TableHead className="w-8 px-1" title="Note echipă" />
               <TableHead>Serviciu</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Plată</TableHead>
@@ -456,7 +482,7 @@ export default function AdminOrdersPage() {
             {loading ? (
               Array.from({ length: 8 }).map((_, i) => (
                 <TableRow key={i}>
-                  {Array.from({ length: 12 }).map((_, j) => (
+                  {Array.from({ length: 13 }).map((_, j) => (
                     <TableCell key={j}>
                       <Skeleton className="h-5 w-full" />
                     </TableCell>
@@ -465,7 +491,7 @@ export default function AdminOrdersPage() {
               ))
             ) : orders.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={12} className="py-8 text-center text-muted-foreground">
+                <TableCell colSpan={13} className="py-8 text-center text-muted-foreground">
                   {hasActiveFilters ? 'Niciun rezultat pentru filtrele active.' : 'Nicio comandă în această categorie.'}
                 </TableCell>
               </TableRow>
@@ -493,11 +519,6 @@ export default function AdminOrdersPage() {
                           Fără factură
                         </span>
                       )}
-                      {order.admin_notes && order.admin_notes.trim() && (
-                        <span title={order.admin_notes} className="inline-flex">
-                          <StickyNote className="h-3 w-3 text-amber-500" aria-label="Are note echipă" />
-                        </span>
-                      )}
                     </div>
                   </TableCell>
                   <TableCell>
@@ -506,16 +527,26 @@ export default function AdminOrdersPage() {
                       <span className="text-xs text-muted-foreground">
                         {order.customer_data?.contact?.email || '-'}
                       </span>
-                      {order.admin_notes && order.admin_notes.trim() && (
-                        <span
-                          title={order.admin_notes}
-                          className="mt-0.5 flex max-w-[220px] items-center gap-1 text-[11px] italic text-amber-600"
-                        >
-                          <StickyNote className="h-3 w-3 shrink-0" />
-                          <span className="truncate">{order.admin_notes}</span>
-                        </span>
-                      )}
                     </div>
+                  </TableCell>
+                  {/* Note echipă — sister-style icon + count, jumps to the notes card */}
+                  <TableCell className="w-8 px-1">
+                    {(order.note_count ?? 0) > 0 ? (
+                      <button
+                        type="button"
+                        title={`${order.note_count} note echipă — deschide`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          router.push(`/admin/orders/${order.id}#notes-echipa`);
+                        }}
+                        className="relative inline-flex items-center justify-center rounded p-1 text-amber-500 hover:bg-amber-50"
+                      >
+                        <StickyNote className="h-4 w-4" />
+                        <span className="absolute -right-0.5 -top-0.5 flex h-3.5 min-w-3.5 items-center justify-center rounded-full bg-amber-500 px-0.5 text-[9px] font-bold text-white">
+                          {order.note_count}
+                        </span>
+                      </button>
+                    ) : null}
                   </TableCell>
                   <TableCell className="max-w-[180px] truncate text-sm">
                     {order.services?.name || '-'}
