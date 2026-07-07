@@ -105,6 +105,21 @@ const nextConfig: NextConfig = {
         destination: '/servicii/certificat-constatator-online/',
         permanent: true,
       },
+      // WordPress legacy taxonomy/category URLs that have no equivalent on the
+      // new site (404 at cutover). Map each to the closest live page to keep
+      // backlinks + indexed equity. Verified 2026-07-07 against the old WP
+      // sitemap_index.xml (Yoast) vs the new site.
+      { source: '/categorii_servicii/caziere', destination: '/servicii/cazier-judiciar-online/', permanent: true },
+      { source: '/categorii_servicii/certificate-casatorie', destination: '/servicii/eliberare-certificat-de-casatorie/', permanent: true },
+      { source: '/categorii_servicii/certificate-nastere', destination: '/servicii/eliberare-certificat-de-nastere/', permanent: true },
+      { source: '/categorii_servicii/persoane-fizice', destination: '/servicii/', permanent: true },
+      { source: '/categorii_servicii/persoane-juridice', destination: '/servicii/', permanent: true },
+      { source: '/categorii_servicii/alte-servicii', destination: '/servicii/', permanent: true },
+      { source: '/category/informatii-utile', destination: '/blog/', permanent: true },
+      { source: '/category/informatii-utile/cazier-judiciar-online', destination: '/servicii/cazier-judiciar-online/', permanent: true },
+      { source: '/category/informatii-utile/certificat-constatator', destination: '/servicii/certificat-constatator-online/', permanent: true },
+      { source: '/category/informatii-utile/extras-de-carte-funciara', destination: '/servicii/extras-de-carte-funciara/', permanent: true },
+      { source: '/cookies-policy', destination: '/politica-cookies/', permanent: true },
     ];
   },
 

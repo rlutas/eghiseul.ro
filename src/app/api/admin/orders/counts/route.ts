@@ -81,7 +81,8 @@ export async function GET(request: NextRequest) {
         buildQuery().filter('status', 'in', processingList),
         buildQuery().filter('status', 'in', shippedList),
         buildQuery().eq('status', 'completed'),
-        buildQuery().eq('status', 'abandoned'),
+        // "Neplătite" tab count = draft + pending + abandoned (matches list).
+        buildQuery().filter('status', 'in', hiddenList),
         // test_only ignores the active testFilter and just counts sandbox rows
         // so the user knows how many are out there even when on "hide".
         adminClient

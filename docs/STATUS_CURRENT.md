@@ -7,7 +7,15 @@
 > - **🟢 DNS CUTOVER eghiseul.ro → Vercel** (în propagare): nameservere delegate la `ns1/ns2.vercel-dns.com` (Vercel: Current NS ✔). Domeniul e asignat proiectului `eghiseul-ro`, SSL auto. Resolverele cu cache clausweb (WordPress vechi 89.44.105.35) se actualizează în ≤24-48h. robots.txt + sitemap (204 URL) verificate OK pe app.
 > - **✅ Stripe LIVE setat pe Vercel Production** (`sk_live` + `pk_live` + `whsec` webhook live pe `/api/webhooks/stripe`) + rebuild. Preview lăsat fără chei (rămâne test post-launch). ⚠️ `sk_live` a fost lipit în clar în chat → de rotit în Stripe + reactualizat.
 > - **✅ Serie Oblio proprie `EGH`** setată pe Vercel (era `EGI2024` partajată cu cazierjudiciar) + redeploy. TODO: storno facturi test rămase (CID-0002).
-> - **🔴 Rămâne:** propagare DNS completă (resolvere publice încă pe WordPress la ~17:30), apoi **prim test plătit real** ANCPI/ONRC + verificare webhook→factură EGH pe `eghiseul.ro`.
+> - **✅ DNS propagat** (~17:45): `eghiseul.ro` servește app-ul Next + SSL Vercel. Site LIVE. Smoke test OK. **Comenzi reale intră deja** pe app-ul nou (ex. Viorica naștere — plată eșuată la bancă, dar fluxul Stripe live merge cap-coadă).
+> - **✅ RLS fix (migrație 092):** 5 tabele worker/system (onrc/ancpi jobs+events, heartbeats) aveau RLS dezactivat (anon CRUD complet — alertă Supabase). Activat RLS; acces doar prin service_role. Verificat: anon→[], workeri neafectați.
+> - **✅ Headere securitate** (X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy) via next.config; HSTS de la Vercel. CSP amânat. vercel.app preview = SSO, neindexabil.
+> - **✅ GA4 LIVE** (`G-8LFRWD479Z` pe Vercel prod) — era oprit (lipsea `NEXT_PUBLIC_GA_MEASUREMENT_ID`). Acum tracking/conversii active.
+> - **✅ Redirect-uri WP→nou (11):** taxonomii `categorii_servicii/*` + `category/informatii-utile/*` + `cookies-policy` dădeau 404 pe site nou; mapate 301 în next.config (verificat vs sitemap Yoast vechi; 34/46 URL-uri deja OK).
+> - **✅ Tab „Neplătite" în admin** (fost „Abandonate"): acum include draft+pending+abandoned → comenzile eșuate/incomplete (ex. Viorica) sunt vizibile pt. follow-up. Erau ascunse (default „Toate" le ascunde, tab-ul vechi doar `abandoned`).
+> - **✅ Comenzi WordPress tranziție:** clienți care au plătit pe WP vechi în timpul propagării (annushka etc.) — extrase din dump-ul WP (`wp_wpforms_entries`) → CSV pt. echipă + import în DB nou (ex. `WP-260707-99959`, status processing/paid). Fișiere upload rămân pe host clausweb.
+> - **✅ Cleanup comenzi test:** 269 comenzi test/dev pre-lansare șterse (backup JSON în Downloads). Rămân doar comenzi reale de azi. 130 numere Barou păstrate.
+> - **🔴 Rămâne:** rotire `sk_live` (lipită în chat); storno facturi test Oblio; batch import restul comenzilor plătite WP; registru numere cross-platform (design); perf listă admin (trage `customer_data` întreg).
 >
 > **⚡ Update 2026-07-02 — LIVRAT:**
 > - **Formular de contact** pe `/contact` (nu mai are doar carduri): honeypot + rate-limit 5/10min/IP → salvare `contact_messages` (migrație 090) + email Resend la contact@ (reply-to client). Linkat din header nav + footer. OPEN: fără UI admin de citit mesajele (vin pe email + DB). Detalii: [`changelog/2026-07-02-contact-form.md`](changelog/2026-07-02-contact-form.md).

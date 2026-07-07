@@ -36,7 +36,11 @@ export const STATUS_TABS: StatusTab[] = [
   { value: 'processing', label: 'În procesare', countKey: 'processing' },
   { value: 'shipped', label: 'Expediate', countKey: 'shipped' },
   { value: 'completed', label: 'Finalizate', countKey: 'completed' },
-  { value: 'abandoned', label: 'Abandonate', countKey: 'abandoned' },
+  // "Neplătite" = draft + pending + abandoned: every order where the customer
+  // started but never completed payment (incl. failed-payment pending orders).
+  // These are hidden from the default "Toate" tab; this tab surfaces them so
+  // the team can follow up / recover.
+  { value: 'abandoned', label: 'Neplătite', countKey: 'abandoned' },
 ];
 
 export interface OrdersCounts {
@@ -79,7 +83,8 @@ export function resolveStatusFilter(tab: string | null | undefined): StatusFilte
     case 'completed':
       return { eq: 'completed' };
     case 'abandoned':
-      return { eq: 'abandoned' };
+      // "Neplătite" tab — draft + pending + abandoned (all incomplete/unpaid).
+      return { in: HIDDEN_FROM_DEFAULT };
     // Specific status not in the tab list — pass through verbatim. Lets the
     // debug URL `?status=draft` still work.
     case 'draft':
