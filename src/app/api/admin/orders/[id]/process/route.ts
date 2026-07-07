@@ -19,6 +19,10 @@ const VALID_TRANSITIONS: Record<string, string[]> = {
 const ACTION_STATUS_MAP: Record<string, string> = {
   'start_processing': 'processing',
   'generate_cerere': 'documents_generated',
+  // Alias: the detail-page "Marchează documente generate" button emits
+  // `mark_documents_generated`; keep the older `generate_cerere` too. Without
+  // this the button 400'd and the processing→documents_generated step was dead.
+  'mark_documents_generated': 'documents_generated',
   'mark_submitted': 'submitted_to_institution',
   'upload_received': 'document_received',
   'start_extras': 'extras_in_progress',
