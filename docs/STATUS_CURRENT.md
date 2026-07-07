@@ -5,7 +5,9 @@
 > **⚡ Update 2026-07-07 — LIVRAT + GO-LIVE:**
 > - **Filtre + căutare pe `/servicii`** (client-side): search instant (nume + descriere + sinonime categorie: „firma"→Firme, „teren"→Carte Funciară) + chip-uri categorie, sticky pe mobil. Fără filtru = grupare pe instituție (SEO păstrat); cu filtru = grid plat + contor. **Palette 🔍 în header** (desktop + mobil) — command-palette peste serviciile din meniu, Enter→primul rezultat. Helper pur `service-search.ts` + 9 teste. Fără dep/migrare.
 > - **🟢 DNS CUTOVER eghiseul.ro → Vercel** (în propagare): nameservere delegate la `ns1/ns2.vercel-dns.com` (Vercel: Current NS ✔). Domeniul e asignat proiectului `eghiseul-ro`, SSL auto. Resolverele cu cache clausweb (WordPress vechi 89.44.105.35) se actualizează în ≤24-48h. robots.txt + sitemap (204 URL) verificate OK pe app.
-> - **🔴 Rămân blockere config (acțiunea ta, conturi reale):** Stripe LIVE (`sk_live`/`pk_live` + webhook live pe `/api/webhooks/stripe`), serie Oblio proprie `EGH` (acum `EGI2024` partajată) + storno facturi test, prim test plătit real ANCPI/ONRC.
+> - **✅ Stripe LIVE setat pe Vercel Production** (`sk_live` + `pk_live` + `whsec` webhook live pe `/api/webhooks/stripe`) + rebuild. Preview lăsat fără chei (rămâne test post-launch). ⚠️ `sk_live` a fost lipit în clar în chat → de rotit în Stripe + reactualizat.
+> - **✅ Serie Oblio proprie `EGH`** setată pe Vercel (era `EGI2024` partajată cu cazierjudiciar) + redeploy. TODO: storno facturi test rămase (CID-0002).
+> - **🔴 Rămâne:** propagare DNS completă (resolvere publice încă pe WordPress la ~17:30), apoi **prim test plătit real** ANCPI/ONRC + verificare webhook→factură EGH pe `eghiseul.ro`.
 >
 > **⚡ Update 2026-07-02 — LIVRAT:**
 > - **Formular de contact** pe `/contact` (nu mai are doar carduri): honeypot + rate-limit 5/10min/IP → salvare `contact_messages` (migrație 090) + email Resend la contact@ (reply-to client). Linkat din header nav + footer. OPEN: fără UI admin de citit mesajele (vin pe email + DB). Detalii: [`changelog/2026-07-02-contact-form.md`](changelog/2026-07-02-contact-form.md).
