@@ -7,6 +7,14 @@
 
 ---
 
+## Fix log
+
+### 2026-07-07 — RLS enabled on 5 worker/system tables (Supabase linter `rls_disabled_in_public`)
+
+Supabase flagged `onrc_jobs`, `onrc_job_events`, `ancpi_jobs`, `ancpi_job_events`, `system_heartbeats` as publicly accessible (RLS disabled, anon granted full CRUD). Fixed by **migration 092** (`ENABLE ROW LEVEL SECURITY`, no policies). These tables are accessed exclusively via `service_role` (workers, admin API, `/api/status`, admin pages' data queries all use `createAdminClient()`), which bypasses RLS. Verified post-fix: anon key reads return `[]` on all 5; service_role still reads real rows; both Railway workers heartbeating normally (last_seen seconds after the change). 0 public tables remain without RLS.
+
+---
+
 ## Executive Summary
 
 The eGhiseul.ro platform processes highly sensitive personal data (Romanian CNP, government-issued ID cards, biometric images) with **CRITICAL security vulnerabilities** and **GDPR non-compliance** that expose the platform to:
