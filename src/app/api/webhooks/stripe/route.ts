@@ -146,16 +146,30 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
       .eq('id', orderId)
   }
 
-  // If the session is already in "complete" payment_status, run the full
-  // fulfilment path now (don't wait for the PI event — saves a few seconds
-  // and prevents the order sitting in `paid_pending` if PI webhook is slow).
-  if (session.payment_status === 'paid' && paymentIntentId) {
-    const stripe = (await import('stripe')).default
-    const client = new stripe(process.env.STRIPE_SECRET_KEY!)
-    const pi = await client.paymentIntents.retrieve(paymentIntentId)
-    // Carry orderId forward via metadata so handlePaymentSucceeded finds it.
-    if (!pi.metadata?.orderId) {
-      pi.metadata = { ...(pi.metadata || {}), orderId }
+  // If the session is paid, run the full fulfilment path NOW — even when the
+  // PI id is missing or a PI retrieve fails. handlePaymentSucceeded works off
+  // orderId (from metadata), so a synthetic PI is enough to drive the invoice +
+  // status flip. Previously this was gated on `&& paymentIntentId`, so a paid
+  // session that arrived without a resolvable PaymentIntent silently skipped
+  // fulfilment (no invoice, no paid_at) — the real cause of orders sitting paid
+  // without an invoice while the checkout.session.completed event kept retrying.
+  if (session.payment_status === 'paid') {
+    let pi: Stripe.PaymentIntent
+    if (paymentIntentId) {
+      try {
+        const stripe = (await import('stripe')).default
+        const client = new stripe(process.env.STRIPE_SECRET_KEY!)
+        const retrieved = await client.paymentIntents.retrieve(paymentIntentId)
+        pi = { ...retrieved, metadata: { ...(retrieved.metadata || {}), orderId } }
+      } catch (err) {
+        console.error(
+          `[stripe webhook] PI retrieve failed for ${orderId}; fulfilling with synthetic PI:`,
+          err instanceof Error ? err.message : err
+        )
+        pi = { id: paymentIntentId, metadata: { orderId } } as unknown as Stripe.PaymentIntent
+      }
+    } else {
+      pi = { metadata: { orderId } } as unknown as Stripe.PaymentIntent
     }
     await handlePaymentSucceeded(pi)
   }
@@ -213,6 +227,13 @@ async function handlePaymentSucceeded(paymentIntent: Stripe.PaymentIntent) {
       payment_status: 'paid',
       status: 'processing',
       updated_at: paidAtNow,
+      // Record payment metadata the webhook previously never set — leaving
+      // paid_at / PI null even on paid orders. Stable once set.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ...((order as any).paid_at ? {} : { paid_at: paidAtNow }),
+      ...(paymentIntent.id && !(order as { stripe_payment_intent_id?: string }).stripe_payment_intent_id
+        ? { stripe_payment_intent_id: paymentIntent.id }
+        : {}),
       ...(estimatedCompletionISO ? { estimated_completion_date: estimatedCompletionISO } : {}),
     })
     .eq('id', orderId)
@@ -270,11 +291,20 @@ async function handlePaymentSucceeded(paymentIntent: Stripe.PaymentIntent) {
     console.log(`Order ${orderId}: invoice already created or being created by another webhook — skipping`)
   }
 
-  // 4. Queue ONRC automation job (idempotent; no-op for non-ONRC services).
-  await ensureOnrcJobForPaidOrder(orderId)
-
-  // 5. Queue ANCPI automation job (idempotent; no-op for non-ANCPI services).
-  await ensureAncpiJobForPaidOrder(orderId)
+  // 4. Queue ONRC + ANCPI automation jobs (idempotent; no-op for non-matching
+  // services). Guarded so a transient job-queue failure can NOT throw the whole
+  // webhook → 500 → Stripe retry-storm. Both are also re-run by confirm-payment
+  // and the hourly cron, so a miss self-heals.
+  try {
+    await ensureOnrcJobForPaidOrder(orderId)
+  } catch (e) {
+    console.error(`Order ${orderId}: ensureOnrcJob failed (non-fatal):`, e instanceof Error ? e.message : e)
+  }
+  try {
+    await ensureAncpiJobForPaidOrder(orderId)
+  } catch (e) {
+    console.error(`Order ${orderId}: ensureAncpiJob failed (non-fatal):`, e instanceof Error ? e.message : e)
+  }
 }
 
 async function handlePaymentFailed(paymentIntent: Stripe.PaymentIntent) {
