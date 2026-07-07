@@ -56,10 +56,16 @@ describe('resolveStatusFilter', () => {
     expect(f.in).toEqual(SHIPPED_GROUP);
   });
 
-  it('paid/completed/abandoned → eq', () => {
+  it('paid/completed → eq', () => {
     expect(resolveStatusFilter('paid').eq).toBe('paid');
     expect(resolveStatusFilter('completed').eq).toBe('completed');
-    expect(resolveStatusFilter('abandoned').eq).toBe('abandoned');
+  });
+
+  it('abandoned ("Neplătite") tab → in draft+pending+abandoned', () => {
+    // The tab surfaces every incomplete/unpaid order (draft, pending, and
+    // explicit abandons) so failed-payment orders are visible for follow-up.
+    expect(resolveStatusFilter('abandoned').in).toEqual(HIDDEN_FROM_DEFAULT);
+    expect(resolveStatusFilter('abandoned').eq).toBeUndefined();
   });
 
   it('debug statuses pass through as eq', () => {
