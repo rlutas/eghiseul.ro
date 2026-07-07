@@ -83,11 +83,25 @@ export async function GET(
 
     // Fetch order history / timeline
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: history } = await (adminClient as any)
+    // order_history stores status transitions in old_value/new_value jsonb
+    // ({ status: '...' }). Select those (NOT the non-existent from_status/
+    // to_status columns — that select silently failed and wiped the whole
+    // timeline, so notes + history never rendered) and derive from_status/
+    // to_status for the UI below.
+    const { data: rawHistory, error: historyError } = await (adminClient as any)
       .from('order_history')
-      .select('id, event_type, notes, new_value, created_at, changed_by, from_status, to_status')
+      .select('id, event_type, notes, old_value, new_value, created_at, changed_by')
       .eq('order_id', orderId)
       .order('created_at', { ascending: true });
+    if (historyError) {
+      console.error('Failed to fetch order history:', historyError.message);
+    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const history = (rawHistory || []).map((h: any) => ({
+      ...h,
+      from_status: h.old_value?.status ?? null,
+      to_status: h.new_value?.status ?? null,
+    }));
 
     // Fetch order documents (contracts, cereri, documents received, etc.)
     // Order by created_at DESC so the latest version of each type comes first

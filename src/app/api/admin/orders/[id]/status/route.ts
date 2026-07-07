@@ -191,8 +191,11 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
     await adminClient.from('order_history').insert({
       order_id: orderId,
       event_type: auditEventType,
-      from_status: prevStatus,
-      to_status: newStatus,
+      // order_history has old_value/new_value jsonb (NOT from_status/to_status
+      // columns — inserting those silently failed and status changes never
+      // logged). The GET route derives from_status/to_status from these.
+      old_value: { status: prevStatus },
+      new_value: { status: newStatus },
       changed_by: profile?.email || user.id,
       notes: auditNote,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
