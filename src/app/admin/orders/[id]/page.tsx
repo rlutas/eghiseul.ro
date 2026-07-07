@@ -89,6 +89,8 @@ interface OrderDetail {
   payment_status: string | null;
   payment_method: string | null;
   stripe_payment_intent_id: string | null;
+  stripe_checkout_session_id?: string | null;
+  is_test?: boolean | null;
   paid_at: string | null;
   invoice_number: string | null;
   invoice_url: string | null;
@@ -1951,7 +1953,7 @@ export default function AdminOrderDetailPage() {
                   </>
                 ) : order.payment_method ? (
                   order.payment_method
-                ) : order.stripe_payment_intent_id ? (
+                ) : order.stripe_payment_intent_id || order.stripe_checkout_session_id ? (
                   <>
                     <CreditCard className="h-3.5 w-3.5 text-indigo-600" />
                     Stripe (card)
@@ -1967,24 +1969,48 @@ export default function AdminOrderDetailPage() {
               <span className="text-sm text-muted-foreground">Status plata</span>
               <PaymentStatusBadge status={order.payment_status} />
             </div>
-            {order.stripe_payment_intent_id && (
-              <div className="flex items-center justify-between gap-4 text-sm">
-                <span className="text-muted-foreground shrink-0">Stripe PI</span>
-                <a
-                  href={`https://dashboard.stripe.com/payments/${order.stripe_payment_intent_id}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-1 font-mono text-xs text-indigo-600 hover:text-indigo-800 hover:underline truncate max-w-[60%]"
-                  title="Deschide in Stripe Dashboard"
-                >
-                  {order.stripe_payment_intent_id}
-                  <ExternalLink className="h-3 w-3 shrink-0" />
-                </a>
-              </div>
-            )}
-            {order.paid_at && (
-              <InfoRow label="Platita la" value={formatDate(order.paid_at)} />
-            )}
+            {/* Stripe dashboard deep links — parity with sister. Live vs test
+                detected from the checkout-session prefix (cs_live_/cs_test_). */}
+            {(() => {
+              const isTest = order.stripe_checkout_session_id?.startsWith('cs_test_') || order.is_test;
+              const stripeBase = isTest ? 'https://dashboard.stripe.com/test' : 'https://dashboard.stripe.com';
+              return (
+                <>
+                  {order.stripe_checkout_session_id && (
+                    <div className="flex items-center justify-between gap-4 text-sm">
+                      <span className="text-muted-foreground shrink-0">Checkout Session</span>
+                      <a
+                        href={`${stripeBase}/checkout/sessions/${order.stripe_checkout_session_id}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1 font-mono text-xs text-indigo-600 hover:text-indigo-800 hover:underline truncate max-w-[60%]"
+                        title="Deschide sesiunea in Stripe Dashboard"
+                      >
+                        {order.stripe_checkout_session_id.substring(0, 22)}…
+                        <ExternalLink className="h-3 w-3 shrink-0" />
+                      </a>
+                    </div>
+                  )}
+                  {order.stripe_payment_intent_id && (
+                    <div className="flex items-center justify-between gap-4 text-sm">
+                      <span className="text-muted-foreground shrink-0">Stripe Payment</span>
+                      <a
+                        href={`${stripeBase}/payments/${order.stripe_payment_intent_id}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1 font-mono text-xs text-indigo-600 hover:text-indigo-800 hover:underline truncate max-w-[60%]"
+                        title="Deschide plata in Stripe Dashboard"
+                      >
+                        {order.stripe_payment_intent_id.substring(0, 22)}…
+                        <ExternalLink className="h-3 w-3 shrink-0" />
+                      </a>
+                    </div>
+                  )}
+                </>
+              );
+            })()}
+            <InfoRow label="Platita la" value={order.paid_at ? formatDate(order.paid_at) : 'Neplătit'} />
+            <InfoRow label="Data comanda" value={formatDate(order.created_at)} />
           </CardContent>
         </Card>
       </div>
