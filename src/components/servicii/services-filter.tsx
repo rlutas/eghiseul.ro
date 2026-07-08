@@ -53,6 +53,8 @@ const SERVICE_SPECIMENS: Record<string, string> = {
   'certificat-constatator': '/images/specimens/certificat-constatator.png',
   rovinieta: '/images/specimens/rovinieta.webp',
   'extras-carte-funciara': '/images/specimens/extras-cf.png',
+  'extras-multilingv-certificat-nastere': '/images/specimens/extras-multilingv-nastere.webp',
+  'extras-multilingv-certificat-casatorie': '/images/specimens/extras-multilingv-casatorie.webp',
 };
 
 function serviceSpecimen(service: Service): string | null {

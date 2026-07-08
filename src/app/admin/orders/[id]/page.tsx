@@ -2268,7 +2268,9 @@ function NoteEchipaCard({
     () =>
       timeline.filter((t: TimelineEvent) => {
         const by = (t.changed_by || '').toLowerCase();
-        if (by.startsWith('system')) return false;
+        // Only notes with a REAL human author — auto rows (contract generat
+        // automat etc.) have changed_by null and are not team notes.
+        if (!by || by.startsWith('system')) return false;
         return t.event_type === 'note_added' && !!(t.notes || '').trim();
       }),
     [timeline]

@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { createPublicClient } from '@/lib/supabase/public';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
@@ -529,6 +530,41 @@ export default async function ExtrasMultilingvNasterePage() {
                   <p className="text-sm text-white/65 leading-relaxed max-w-[240px] mx-auto">{item.desc}</p>
                 </div>
               ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Specimen — cum arată documentul */}
+        <section className="py-12 lg:py-16 bg-neutral-50">
+          <div className="container mx-auto px-4 max-w-[900px]">
+            <div className="grid lg:grid-cols-[5fr_6fr] gap-8 lg:gap-14 items-center">
+              <div className="relative">
+                <div className="absolute -inset-3 bg-gradient-to-br from-primary-500/10 to-secondary-900/5 rounded-[2rem] blur-xl" aria-hidden="true" />
+                <div className="relative bg-white rounded-2xl p-3 ring-1 ring-neutral-200 shadow-[0_20px_50px_rgba(6,16,31,0.16)]">
+                  <Image
+                    src="/images/specimens/extras-multilingv-nastere.webp"
+                    alt="Specimen extrasul multilingv de naștere — exemplu cu date anonimizate"
+                    width={1000}
+                    height={1414}
+                    className="w-full h-auto rounded-lg"
+                    loading="lazy"
+                    sizes="(max-width: 1024px) 100vw, 500px"
+                  />
+                  <p className="text-xs text-neutral-400 mt-2 text-center italic">Exemplu — date anonimizate.</p>
+                </div>
+              </div>
+              <div>
+                <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-4">Cum arată extrasul multilingv</h2>
+                <p className="text-neutral-700 leading-relaxed mb-3">
+                  Formularul standard multilingv are un format unic în toată Uniunea Europeană: rubricile sunt
+                  numerotate și traduse în limbile oficiale ale statelor membre, astfel încât autoritatea din
+                  străinătate citește documentul direct, fără traducător.
+                </p>
+                <p className="text-neutral-700 leading-relaxed">
+                  Documentul este emis de starea civilă împreună cu certificatul și are aceeași valoare
+                  juridică în orice stat UE.
+                </p>
+              </div>
             </div>
           </div>
         </section>

@@ -157,10 +157,14 @@ export async function GET(request: NextRequest) {
         .from('order_history')
         .select('order_id, changed_by, notes')
         .in('order_id', ids)
-        .not('notes', 'is', null);
+        .eq('event_type', 'note_added')
+        .not('notes', 'is', null)
+        .not('changed_by', 'is', null);
       for (const r of (noteRows || []) as Array<{ order_id: string; changed_by: string | null; notes: string | null }>) {
+        // Team-added notes only: real author (auto-generated rows have
+        // changed_by NULL) and not a system job.
         const by = (r.changed_by || '').toLowerCase();
-        if (by.startsWith('system')) continue;
+        if (!by || by.startsWith('system')) continue;
         if (!(r.notes || '').trim()) continue;
         noteCounts[r.order_id] = (noteCounts[r.order_id] || 0) + 1;
       }
