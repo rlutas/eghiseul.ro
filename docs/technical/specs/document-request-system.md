@@ -55,13 +55,25 @@ Admin (pagina comenzii)                    Client                         Sistem
 
 ## Documente disponibile (catalog)
 
-`selfie`, `ci_vechi`, `ci_nou_front`, `ci_nou_back`, `passport`,
-`certificat_domiciliu` → ajung în `customer_data.personal/personalData.uploadedDocuments`.
+`act_identitate` (generic — CI sau pașaport, clientul alege ce act are; tipul
+e recunoscut de guard-ul KYC din `/submit` ca act manual), `selfie`,
+`ci_vechi`, `ci_nou_front`, `ci_nou_back`, `passport`, `certificat_domiciliu`
+→ ajung în `customer_data.personal/personalData.uploadedDocuments`.
 `company_registration_cert`, `company_statement_cert` (acceptă PDF) → ajung în
 `customer_data.company.uploadedDocuments`.
 
 Adaugi un tip nou = o intrare în `REUPLOAD_DOC_SPECS` (zero migrare — coloana
 `document_types` e JSONB).
+
+### Sugestii per serviciu
+
+Modalul admin pre-bifează documentele cerute de serviciul comenzii, derivate
+din `verification_config` prin `suggestedDocsForService()`:
+- `personalKyc.enabled` → `act_identitate` (+ `selfie` dacă `selfieRequired`)
+- `companyKyc.documentsRequired` → `companyKyc.requiredDocuments`
+
+Acestea apar primele, cu badge „necesar la serviciu". Operatorul poate
+bifa/debifa orice tip din catalog.
 
 ## Reguli & decizii
 

@@ -9,9 +9,12 @@ din comandă, fără telefoane și fără email-uri manuale. Așa funcționează
 
 1. Deschizi comanda în admin → secțiunea de documente client.
 2. Apeși **„Solicită documente"** (unde era „Cere poză nouă (selfie)").
-3. **Bifezi ce documente vrei** — selfie, buletin (vechi / nou față+verso),
-   pașaport, certificat domiciliu, certificat înregistrare firmă, certificat
-   constatator. Poți scrie și un motiv (ex. „poza era neclară").
+3. **Bifezi ce documente vrei** — documentele necesare serviciului sunt deja
+   pre-bifate și marcate „necesar la serviciu" (ex. la cazier PJ: act de
+   identitate + selfie + certificat înregistrare). În listă mai ai: act de
+   identitate generic (clientul încarcă CI sau pașaport, ce are), CI vechi /
+   nou față+verso, pașaport, certificat domiciliu, certificat constatator.
+   Poți scrie și un motiv (ex. „poza era neclară").
 4. Apeși **Trimite cererea**. Gata.
 
 ## Ce se întâmplă automat
