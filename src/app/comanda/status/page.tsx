@@ -638,15 +638,23 @@ function OrderStatusContent() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
-                  {orderData.documents.map((doc) => (
+                  {orderData.documents.map((doc) => {
+                    // Green badge ONLY for the delivered document itself
+                    // (team feedback) — contracts/cereri stay neutral.
+                    const isDelivered = [
+                      'constatator',
+                      'extras-carte-funciara',
+                      'document_received',
+                      'document_final',
+                      'collaborator-document',
+                    ].includes(doc.type);
+                    return (
                     <div
                       key={doc.id}
                       className="flex items-center gap-3 p-3 rounded-lg bg-muted/50"
                     >
-                      {/* Green document badge — delivered files must pop
-                          (team feedback). */}
-                      <div className="h-9 w-9 rounded-lg bg-green-100 flex items-center justify-center shrink-0">
-                        <FileText className="h-5 w-5 text-green-600" />
+                      <div className={`h-9 w-9 rounded-lg flex items-center justify-center shrink-0 ${isDelivered ? 'bg-green-100' : 'bg-muted'}`}>
+                        <FileText className={`h-5 w-5 ${isDelivered ? 'text-green-600' : 'text-muted-foreground'}`} />
                       </div>
                       <div className="flex-1">
                         <p className="font-medium text-sm">{doc.label}</p>
@@ -671,7 +679,8 @@ function OrderStatusContent() {
                         Vizualizează
                       </Button>
                     </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </CardContent>
             </Card>
