@@ -132,9 +132,19 @@ export async function GET(request: NextRequest) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const deliveryMethod = order.delivery_method as any;
 
+    // Internal/team-only events must NEVER reach the public timeline — team
+    // notes (note_added) can contain operational details (e.g. corrected
+    // phone numbers), and the reupload/kyc events use team-facing wording.
+    const INTERNAL_EVENTS = new Set([
+      'note_added',
+      'admin_action',
+      'reupload_requested',
+      'kyc_photo_resubmitted',
+    ]);
+
     // Build timeline from history - extract status from new_value when available
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const timeline = (history || []).map((h: any) => {
+    const timeline = (history || []).filter((h: any) => !INTERNAL_EVENTS.has(h.event_type)).map((h: any) => {
       const newValue = h.new_value as { status?: string; payment_status?: string } | null;
 
       // Determine status to show based on event type

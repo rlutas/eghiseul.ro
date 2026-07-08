@@ -42,6 +42,7 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; icon: typeof
   // Payment statuses
   payment_confirmed: { label: 'Plată confirmată', color: 'bg-green-100 text-green-800', icon: CheckCircle },
   payment_received: { label: 'Plată primită', color: 'bg-green-100 text-green-800', icon: CheckCircle },
+  paid: { label: 'Plătită', color: 'bg-green-100 text-green-800', icon: CheckCircle },
 
   // Processing workflow
   processing: { label: 'În procesare', color: 'bg-blue-100 text-blue-800', icon: Package },
