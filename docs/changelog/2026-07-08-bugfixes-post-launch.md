@@ -279,12 +279,28 @@ Verificat live cap-coadă: email cu link corect, banner pe status client,
 pagina de upload cu 2 carduri, comanda în „Așteptare client" vizibilă în
 tab-ul În procesare, audit în istoric, revenire automată pe `paid` la final.
 
+## 20b. 📧 Design branded pe emailurile tranzacționale
+
+- Layout partajat `branded-layout.ts` — același limbaj vizual ca emailul de
+  confirmare comandă (header navy cu logo, card alb, CTA auriu, footer legal).
+- Aplicat pe: **„Documentul tău este gata"** (`document-ready.ts` — folosit de
+  toate cele 3 livrări: worker ONRC, worker ANCPI, colaborator; înainte
+  trimiteau HTML gol, fără design — raportat de user cu screenshot Resend),
+  emailul de **solicitare documente** către client și notificarea internă
+  „documente primite".
+- CTA-ul „document gata" duce acum la **pagina de status pre-completată**
+  (merge fără cont), nu la `/account`.
+
 ## 21. 💸 Build-uri Vercel limitate (cost) + recuperare documente client din WP vechi
 
 - **Cost**: Build CPU Minutes ajunsese la ~$11.76 din bugetul lunar (~$13/20
   cheltuiți la 8 iulie) — prea multe deploy-uri mărunte. Adăugat
   **`ignoreCommand`** în `vercel.json`: commit-urile care ating DOAR `docs/`,
   `*.md`, `supabase/migrations/` sau `.claude/` **nu mai declanșează build**.
+  În plus, **build-urile de preview sunt sărite complet** (doar production se
+  construiește) — setat și în dashboard (Ignored Build Step, via API) și în
+  `vercel.json` (are prioritate). Preview punctual la nevoie:
+  `vercel build && vercel deploy --prebuilt` (zero Build CPU pe platformă).
   Regulă de lucru: schimbările de cod se grupează — un push per lot, nu per
   fix mărunt.
 - **Ops**: recuperate documentele KYC ale comenzii atrittner@yahoo.com de pe

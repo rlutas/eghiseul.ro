@@ -548,7 +548,7 @@
 - **E2E suite refreshed** — modernized for the new wizard (single citizenship checkbox, phone a11y label, real flow); removed a stale duplicate spec. 75 stable specs green + 1042 unit tests.
 
 **Recently Completed (2026-06-09 — wizard + KYC session):**
-- ✅ **Post-order selfie re-upload** — admin-generated secure single-use link (table `reupload_requests`, migration 048), public `/reincarca-poza/[token]` page, `/api/reupload/[token]` + `/api/admin/orders/[id]/request-reupload`, email (Resend) + WhatsApp share. Spec: `technical/specs/post-order-photo-reupload.md`
+- ✅ **Post-order selfie re-upload** — admin-generated secure single-use link (table `reupload_requests`, migration 048), public `/reincarca-poza/[token]` page, `/api/reupload/[token]` + `/api/admin/orders/[id]/request-reupload`, email (Resend) + WhatsApp share. ⤴️ Extins 2026-07-08 la **multi-document „Solicită documente"** (migrations 101+102): checkboxes per serviciu, auto-standby cu revenire automată, banner status client, notificare echipă. Spec actual: `technical/specs/document-request-system.md` (vechiul `post-order-photo-reupload.md` = superseded)
 - ✅ **AI selfie face-match removed** — selfie upload no longer calls Gemini; flagged `needsManualReview` for the team (manual verification)
 - ✅ **Bundled-options dependency chain** — apostilă/traducere/legalizare deps now enforced on secondary-service options too (`lib/services/option-dependencies.ts` + tests)
 - ✅ **Step 1 citizenship simplified** — single "Sunt cetățean străin" checkbox (dropped Romanian/foreign 2-button + EU/non-EU sub-picker)

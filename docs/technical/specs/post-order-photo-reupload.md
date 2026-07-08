@@ -2,7 +2,10 @@
 
 **Last Updated:** 2026-06-09
 **Version:** 1.0
-**Status:** Active
+**Status:** ⛔ SUPERSEDED (2026-07-08) — fluxul a fost extins la multi-document
+(„Solicită documente"), cu auto-standby + notificare echipă. Vezi
+[`document-request-system.md`](document-request-system.md). Acest doc rămâne
+doar ca istoric al versiunii doar-selfie (migrarea 048).
 
 Lets the team request a fresh KYC photo (currently the **selfie**) from a
 customer **after** the order is placed, via a secure single-use link. Built
