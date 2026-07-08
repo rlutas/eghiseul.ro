@@ -16,6 +16,72 @@ interface UpdateStatusCardProps {
 }
 
 /**
+ * Compact status dropdown for the order-detail HEADER (in front of the
+ * Modifică / Storno / Reîncarcă buttons — team request 2026-07-08): pick a
+ * status → applied immediately, no extra click. Terminal statuses ask for a
+ * confirm() first. The full UpdateStatusCard below stays for transitions
+ * that need a note.
+ */
+export function QuickStatusSelect({
+  orderId,
+  currentStatus,
+  onUpdated,
+}: UpdateStatusCardProps) {
+  const [submitting, setSubmitting] = useState(false);
+
+  const apply = async (newStatus: string) => {
+    if (newStatus === currentStatus) return;
+    const opt = STATUS_OPTIONS.find((o) => o.value === newStatus);
+    if (
+      opt?.group === 'terminal' &&
+      !confirm(
+        `Sigur treci comanda pe „${opt.label}"? Status terminal — refund-ul Stripe / stornarea facturii NU se fac automat.`
+      )
+    ) {
+      return;
+    }
+    setSubmitting(true);
+    try {
+      const res = await fetch(`/api/admin/orders/${orderId}/status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus }),
+      });
+      const json = await res.json();
+      if (!res.ok || !json.success) {
+        toast.error(json.error || 'Eroare la actualizare');
+        return;
+      }
+      const msg = json.standby
+        ? `Status actualizat — termen mutat cu ${json.standby.pausedBusinessDays} zile lucrătoare`
+        : `Status actualizat: ${findStatusLabel(newStatus)}`;
+      toast.success(msg);
+      onUpdated();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Eroare de rețea');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <select
+      value={currentStatus}
+      disabled={submitting}
+      onChange={(e) => apply(e.target.value)}
+      title="Schimbă statusul comenzii"
+      className="h-8 rounded-md border border-input bg-transparent px-2 text-xs font-medium outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/40 disabled:opacity-50"
+    >
+      {STATUS_OPTIONS.map((opt) => (
+        <option key={opt.value} value={opt.value}>
+          {opt.label}
+        </option>
+      ))}
+    </select>
+  );
+}
+
+/**
  * Inline "Actualizează Status" card on the admin order detail page.
  *
  * Matches the sister project UX: dropdown + optional note + button in one

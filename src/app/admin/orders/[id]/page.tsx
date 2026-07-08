@@ -30,7 +30,7 @@ import {
   type ExtractedROCEIReader,
 } from '@/lib/services/document-ocr';
 import { ModifyOrderDialog } from '@/components/admin/modify-order-dialog';
-import { UpdateStatusCard } from '@/components/admin/update-status-card';
+import { UpdateStatusCard, QuickStatusSelect } from '@/components/admin/update-status-card';
 import {
   ArrowLeft,
   User,
@@ -936,6 +936,13 @@ export default function AdminOrderDetailPage() {
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-2 sm:shrink-0">
+          {/* Quick status dropdown — in front of the action buttons (team
+              request): pick a status → applied instantly, no second click. */}
+          <QuickStatusSelect
+            orderId={order.id}
+            currentStatus={order.status || 'draft'}
+            onUpdated={refreshSilent}
+          />
           {/* Sync Stripe — visible only for orders that have a checkout
               session but aren't marked paid. Catches "webhook didn't
               arrive" scenarios (localhost dev, prod outage, sig mismatch).

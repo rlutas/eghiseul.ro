@@ -331,6 +331,14 @@ tab-ul În procesare, audit în istoric, revenire automată pe `paid` la final.
   la generarea cererii"). Re-generarea contractelor NU schimbă statusul
   (e corecție, nu început de lucru). Cerință echipă.
 
+## 24. ⚡ Dropdown rapid de status în header-ul comenzii
+
+- `QuickStatusSelect` în fața butoanelor Sync Stripe / Modifică / Storno /
+  Reîncarcă: alegi statusul din dropdown → se aplică instant (fără click
+  suplimentar), cu `confirm()` la statusurile terminale. Cardul complet
+  „Actualizează Status" (cu notă + avertismente) rămâne mai jos pentru
+  tranzițiile care au nevoie de context. Cerință echipă.
+
 ## Rămase în coadă (nefăcute)
 
 - Email confirmare comandă către client (nu se trimite — port din sister).
