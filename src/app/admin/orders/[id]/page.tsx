@@ -243,9 +243,12 @@ function extractCustomerData(cd: AnyObj | null) {
 function getCustomerDisplayName(contact: AnyObj | null, personal: AnyObj | null, company: AnyObj | null, billing: AnyObj | null, isPJ: boolean): string {
   if (isPJ) return company?.companyName || billing?.companyName || 'N/A';
   if (contact?.name) return contact.name;
-  const firstName = contact?.firstName || personal?.firstName || '';
-  const lastName = contact?.lastName || personal?.lastName || '';
+  // Billing name as final fallback — services without a personal-KYC step
+  // (e.g. identificare imobil) only collect the customer's name at billing.
+  const firstName = contact?.firstName || personal?.firstName || billing?.firstName || '';
+  const lastName = contact?.lastName || personal?.lastName || billing?.lastName || '';
   if (firstName || lastName) return `${firstName} ${lastName}`.trim();
+  if (billing?.name) return String(billing.name);
   return 'N/A';
 }
 
@@ -1282,6 +1285,11 @@ export default function AdminOrderDetailPage() {
             customer_data.civil_status (marriage history, parents, birth name,
             purpose) which was previously stored but never displayed. */}
         <CivilStatusCard civilStatus={(order.customer_data as AnyObj | null)?.civil_status as AnyObj | null} />
+
+        {/* Date imobil — identificare imobil / servicii cadastrale. Renders
+            customer_data.property (county/locality/address/owner/CF), needed
+            by the team to actually run the identification. */}
+        <PropertyCard property={(order.customer_data as AnyObj | null)?.property as AnyObj | null} />
         </div>
         {/* RIGHT column — service+options on top, delivery info below */}
         <div className="space-y-4">
@@ -3307,6 +3315,48 @@ function CopyAddressButton({ label }: { label: string }) {
       {copied ? <Check className="h-3.5 w-3.5 text-green-600" /> : <Copy className="h-3.5 w-3.5" />}
       {copied ? 'Copiat!' : 'Copiază adresa'}
     </button>
+  );
+}
+
+/** Romanian labels for customer_data.property keys (identificare imobil /
+ *  servicii cadastrale), in display order. Unknown keys fall back verbatim. */
+const PROPERTY_LABELS: Array<[string, string]> = [
+  ['county', 'Județ'],
+  ['locality', 'Localitate'],
+  ['propertyAddress', 'Adresa imobilului'],
+  ['ownerName', 'Proprietar (nume complet)'],
+  ['cadastral', 'Nr. cadastral'],
+  ['carteFunciara', 'Nr. carte funciară'],
+  ['motiv', 'Motivul solicitării'],
+];
+
+function PropertyCard({ property }: { property: AnyObj | null }) {
+  if (!property || typeof property !== 'object') return null;
+  const entries = Object.entries(property).filter(([, v]) => v != null && String(v).trim() !== '');
+  if (entries.length === 0) return null;
+
+  const known = new Map(PROPERTY_LABELS);
+  const ordered: Array<[string, string]> = [
+    ...PROPERTY_LABELS.filter(([k]) => property[k] != null && String(property[k]).trim() !== '').map(
+      ([k, label]) => [label, String(property[k])] as [string, string]
+    ),
+    ...entries.filter(([k]) => !known.has(k)).map(([k, v]) => [k, String(v)] as [string, string]),
+  ];
+
+  return (
+    <Card>
+      <CardHeader className="pb-3">
+        <CardTitle className="text-base flex items-center gap-2">
+          <MapPin className="h-4 w-4" />
+          Date imobil
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-1">
+        {ordered.map(([label, value]) => (
+          <InfoRow key={label} label={label} value={value} />
+        ))}
+      </CardContent>
+    </Card>
   );
 }
 

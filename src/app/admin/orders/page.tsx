@@ -816,9 +816,13 @@ function getCustomerName(order: OrderRow): string {
 
   if (isPJ) return company?.companyName || billing?.companyName || 'N/A';
   if (contact?.name) return contact.name;
-  const firstName = contact?.firstName || personal?.firstName || '';
-  const lastName = contact?.lastName || personal?.lastName || '';
+  // Billing name as a final fallback — services without a personal-KYC step
+  // (e.g. identificare imobil) only collect the name at billing.
+  const b = billing as { firstName?: string; lastName?: string; name?: string } | undefined;
+  const firstName = contact?.firstName || personal?.firstName || b?.firstName || '';
+  const lastName = contact?.lastName || personal?.lastName || b?.lastName || '';
   if (firstName || lastName) return `${firstName} ${lastName}`.trim();
+  if (b?.name) return b.name;
   return 'N/A';
 }
 
