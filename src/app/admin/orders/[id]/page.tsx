@@ -1029,7 +1029,15 @@ export default function AdminOrderDetailPage() {
       {/* Note Echipă — moved to the top for parity with cazierjudiciaronline.com
           (prominent, right after the banners) so the team sees/writes notes
           without scrolling to the bottom. */}
-      <NoteEchipaCard orderId={order.id} timeline={timeline} onAdded={fetchOrder} />
+      {/* Note Echipă + Actualizează Status — 50/50 sus, fără scroll (cerere user). */}
+      <div className="grid gap-4 lg:grid-cols-2 items-start">
+        <NoteEchipaCard orderId={order.id} timeline={timeline} onAdded={fetchOrder} />
+        <UpdateStatusCard
+          orderId={order.id}
+          currentStatus={order.status || 'draft'}
+          onUpdated={fetchOrder}
+        />
+      </div>
 
       {/* ROW 1: Date contact + Date personale (left) | Serviciu + Livrare (right).
                  Stacked cards within each column per user-requested layout. */}
@@ -2039,18 +2047,13 @@ export default function AdminOrderDetailPage() {
         })()
       )}
 
-      {/* ROW 2: Contract semnat */}
-      <div className="grid gap-4 lg:grid-cols-2">
+      {/* ROW 2: Contract semnat + Plata — aceeași linie, 50/50 (cerere user). */}
+      <div className="grid gap-4 lg:grid-cols-2 items-start">
 
         {/* Contract semnat — legal validity audit: signature timestamp,
             signing IP, browser user agent, SHA-256 of the contract PDF.
             Hidden when the contract hasn't been signed yet. */}
         <ContractSignedCard customerData={order.customer_data} />
-      </div>
-
-      {/* ROW 3: Plata (full width — it's information-dense and reads better
-          on a single row with all line-item rows visible at once). */}
-      <div>
         {/* Payment */}
         <Card>
           <CardHeader className="pb-3">
@@ -2164,15 +2167,6 @@ export default function AdminOrderDetailPage() {
         </Card>
       </div>
 
-
-      {/* Inline Update Status card — the everyday admin tool for changing
-          an order's status. Optional note, single click apply. Matches the
-          sister project's UX (Actualizează Status card). */}
-      <UpdateStatusCard
-        orderId={order.id}
-        currentStatus={order.status || 'draft'}
-        onUpdated={fetchOrder}
-      />
 
       {/* Order Timeline */}
       <Card>
