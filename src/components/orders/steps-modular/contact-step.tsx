@@ -270,6 +270,10 @@ export function ContactStepModular({ onValidChange }: ContactStepProps) {
           <>
             <ForeignCitizenCheckbox
               isForeign={isForeign}
+              extraDays={Math.max(
+                Number(state.verificationConfig?.personalKyc?.citizenshipFlows?.foreign?.extraDays) || 0,
+                Number(state.verificationConfig?.personalKyc?.citizenshipFlows?.european?.extraDays) || 0
+              )}
               onChange={(foreign) =>
                 updateContact({
                   citizenship: foreign ? 'foreign' : 'romanian',
@@ -380,6 +384,10 @@ export function ContactStepModular({ onValidChange }: ContactStepProps) {
           <>
             <ForeignCitizenCheckbox
               isForeign={isForeign}
+              extraDays={Math.max(
+                Number(state.verificationConfig?.personalKyc?.citizenshipFlows?.foreign?.extraDays) || 0,
+                Number(state.verificationConfig?.personalKyc?.citizenshipFlows?.european?.extraDays) || 0
+              )}
               onChange={(foreign) =>
                 updateContact({
                   citizenship: foreign ? 'foreign' : 'romanian',
@@ -429,9 +437,13 @@ export function ContactStepModular({ onValidChange }: ContactStepProps) {
 interface ForeignCitizenCheckboxProps {
   isForeign: boolean;
   onChange: (isForeign: boolean) => void;
+  /** Max extra processing days for foreign citizens, from the service's
+   *  personalKyc.citizenshipFlows config. 0 = no extra time (e.g. cazier
+   *  fiscal) → the description must NOT claim longer processing. */
+  extraDays?: number;
 }
 
-function ForeignCitizenCheckbox({ isForeign, onChange }: ForeignCitizenCheckboxProps) {
+function ForeignCitizenCheckbox({ isForeign, onChange, extraDays = 0 }: ForeignCitizenCheckboxProps) {
   return (
     <div className="space-y-2">
       <button
@@ -473,8 +485,9 @@ function ForeignCitizenCheckbox({ isForeign, onChange }: ForeignCitizenCheckboxP
             Sunt cetățean străin
           </span>
           <span className="block text-xs text-neutral-500 mt-0.5 leading-snug">
-            Bifează doar dacă nu ești cetățean român. Cetățenii străini necesită
-            verificări suplimentare (procesare 7-15 zile lucrătoare).
+            Bifează doar dacă nu ești cetățean român.
+            {extraDays > 0 &&
+              ` Cetățenii străini necesită verificări suplimentare (procesare cu până la ${extraDays} zile lucrătoare în plus).`}
           </span>
         </span>
       </button>

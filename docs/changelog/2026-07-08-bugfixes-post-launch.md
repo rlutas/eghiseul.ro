@@ -116,6 +116,39 @@ Fiecare secțiune: **ce era stricat → ce s-a făcut → ce rămâne de verific
 - Coloană note (icon+contor, ca sora) + search după nume/telefon + link-uri
   Stripe în Plata + Note Echipă sus + Procesare jos (paritate layout).
 
+## 11. Cazier fiscal — termen 1-3 + fără prelungire pentru străini (migrarea 098)
+
+- **Semnalat de echipă:** pagina afișa „2-4 zile lucrătoare" (real: 1-3) și
+  wizard-ul spunea că cetățenii străini au „procesare 7-15 zile" — NEVALABIL la
+  fiscal (ANAF nu prelungește).
+- **Făcut:** migrarea 098 — `estimated_days_display` → „1-3 zile lucrătoare",
+  `extraDays` foreign/european → 0 la cazier-fiscal. Textul de la bifă
+  („Sunt cetățean străin") din wizard e acum **condiționat de config**
+  (`citizenshipFlows.*.extraDays`): dacă extraDays=0 nu mai apare nicio
+  mențiune de prelungire; dacă >0 afișează valoarea reală per serviciu
+  (nu mai e hardcodat 7-15 pt. toate). T&C §6 corectat (fiscal exceptat de
+  la prelungirea de 15 zile).
+- **De verificat:** wizard cazier fiscal cu bifa de străin (fără mențiune de
+  prelungire) + pagina serviciului afișează 1-3.
+
+## 12. Copy Sheet 1/2 + Motivul în admin (registrul manual al avocatei)
+
+- **Făcut:** butoane „Copy Sheet 1" (clienți: Nume/Email/CNP-CUI/Serviciu/
+  Link/Preț) + „Copy Sheet 2" (instituții: Nume/Email/Preț/Serviciu/-/
+  Instituție/Motiv) pe cardul Date personale din detaliul comenzii — TSV
+  gata de paste în coloana D din Google Sheets (paritate cazierjudiciaronline;
+  soluție temporară până la registrul cross-platform). Preț = bază+urgență,
+  instituția dedusă din slug (ANAF/IPJ/Stare civilă). „Motivul solicitarii"
+  afișat și în cardul Serviciu și opțiuni.
+
+## 13. Multilingv — pagini full-service + email confirmare comenzi
+
+- Pagini extras-multilingv rebuild complet ca pagini de serviciu (hero preț
+  DB 798, pachet +498, FAQ 8, JSON-LD 2 Offers) + internal linking
+  bidirecțional cu certificat naștere/căsătorie/celibat/blog.
+- Email de confirmare către client la TOATE comenzile plătite (buton
+  „Verifică statusul" pre-completat) — o dată per comandă, migrarea 097.
+
 ## Rămase în coadă (nefăcute)
 
 - Email confirmare comandă către client (nu se trimite — port din sister).
