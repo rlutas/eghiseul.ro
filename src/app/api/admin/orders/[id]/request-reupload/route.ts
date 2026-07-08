@@ -103,20 +103,29 @@ export async function POST(
       null;
 
     // One active link per order: cancel any previous still-pending request so
-    // an older emailed link can't race the new one.
+    // an older emailed link can't race the new one. Keep its return_status —
+    // if the order is ALREADY in standby (because of that previous request),
+    // the new request must remember the original pre-standby status, or the
+    // order would stay parked forever after completion.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (admin as any)
+    const { data: cancelledPrev } = await (admin as any)
       .from('reupload_requests')
       .update({ status: 'cancelled', updated_at: new Date().toISOString() })
       .eq('order_id', orderId)
-      .eq('status', 'pending');
+      .eq('status', 'pending')
+      .select('return_status');
 
     // Park the order in standby (SLA paused) while we wait on the customer.
     // Remember where it was so completion can restore it automatically.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const currentStatus = (order as any).status as string;
+    const inheritedReturnStatus: string | null =
+      currentStatus === 'standby'
+        ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          ((cancelledPrev as any[])?.find((r) => r.return_status)?.return_status ?? null)
+        : null;
     const shouldStandby = STANDBY_ELIGIBLE_STATUSES.has(currentStatus);
-    const returnStatus = shouldStandby ? currentStatus : null;
+    const returnStatus = shouldStandby ? currentStatus : inheritedReturnStatus;
 
     // Opaque, URL-safe token. 32 random bytes → ~43 base64url chars.
     const token = randomBytes(32).toString('base64url');
