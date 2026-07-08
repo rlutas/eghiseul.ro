@@ -1,172 +1,628 @@
+import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { ChevronRight, Globe, CheckCircle, FileText, Plane } from 'lucide-react';
+import { createPublicClient } from '@/lib/supabase/public';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
+import {
+  Clock,
+  Shield,
+  FileText,
+  CheckCircle,
+  ChevronRight,
+  Mail,
+  Landmark,
+  User,
+  Heart,
+  Globe,
+  IdCard,
+  CalendarDays,
+  Plane,
+  Users,
+  Package,
+} from 'lucide-react';
+import { Service, ServiceOption, formatEstimatedDays } from '@/types/services';
 import { Footer } from '@/components/home/footer';
+import { MobileStickyCTA } from '@/components/services/mobile-sticky-cta';
+import { WhatsAppButton } from '@/components/services/whatsapp-button';
+import { GoogleReviewsBadge } from '@/components/services/google-reviews-badge';
+import { OrderButton } from '@/components/services/order-button';
 import { ServiceFAQ } from '@/components/services/service-faq';
-import { buildPageMetadata, BASE_URL } from '@/lib/seo';
-import { organizationNode, websiteNode, breadcrumbNode } from '@/lib/seo/schema';
+import { ReviewsSection } from '@/components/services/reviews-section';
+import { buildPageMetadata, buildServicePageGraph, BASE_URL } from '@/lib/seo';
+import { ServicePrice } from '@/components/services/service-price';
 
+const SERVICE_SLUG = 'extras-multilingv-certificat-casatorie';
 const PAGE_PATH = '/servicii/extras-multilingv-certificat-casatorie/';
 const TITLE = 'Extras Multilingv Certificat de Căsătorie 2026 — pentru UE, Fără Traducere';
 const DESCRIPTION =
   'Extrasul multilingv de pe certificatul de căsătorie (formular standard UE) e recunoscut în ' +
-  'Uniunea Europeană fără traducere și fără apostilă. Vezi când îți trebuie și cum îl obții.';
+  'Uniunea Europeană fără traducere și fără apostilă. 798 RON totul inclus, fără deplasare.';
+const DATE_PUBLISHED = '2026-06-25';
+const DATE_MODIFIED = '2026-07-08';
 
-export const metadata = buildPageMetadata({ title: TITLE, description: DESCRIPTION, path: PAGE_PATH, ogImage: '/og/services/certificat-casatorie.png' });
+export const revalidate = 3600;
 
-const PAGE_URL = `${BASE_URL}${PAGE_PATH}`;
+async function getService(): Promise<{ service: Service; options: ServiceOption[] } | null> {
+  const supabase = createPublicClient();
 
-const jsonLdGraph = {
-  '@context': 'https://schema.org',
-  '@graph': [
-    organizationNode(),
-    websiteNode(),
+  const { data: service, error } = await supabase
+    .from('services')
+    .select('*')
+    .eq('slug', SERVICE_SLUG)
+    .eq('is_active', true)
+    .single();
+
+  if (error || !service) return null;
+
+  const { data: options } = await supabase
+    .from('service_options')
+    .select('*')
+    .eq('service_id', service.id)
+    .eq('is_active', true)
+    .order('display_order', { ascending: true });
+
+  return { service: service as Service, options: (options as ServiceOption[]) || [] };
+}
+
+export const metadata = buildPageMetadata({
+  title: TITLE,
+  description: DESCRIPTION,
+  path: PAGE_PATH,
+  ogImage: '/og/services/certificat-casatorie.png',
+});
+
+const jsonLdGraph = buildServicePageGraph({
+  slug: SERVICE_SLUG,
+  name: 'Extras Multilingv Certificat de Căsătorie',
+  description:
+    'Serviciu de obținere a extrasului multilingv de pe certificatul de căsătorie (formular standard ' +
+    'multilingv conform Regulamentului (UE) 2016/1191), recunoscut în toate statele UE fără traducere ' +
+    'autorizată și fără apostilă. Procesare 100% online, depunere prin avocat partener, livrare ' +
+    'electronică și prin curier, inclusiv internațional.',
+  serviceType: 'Document Processing — Civil Status',
+  datePublished: DATE_PUBLISHED,
+  dateModified: DATE_MODIFIED,
+  reviewedBy: {
+    name: 'Departamentul Juridic eGhișeul.ro',
+    jobTitle: 'Echipă de specialiști drept administrativ',
+    organizationName: 'eDigitalizare SRL',
+  },
+  breadcrumb: [
+    { name: 'Acasă', url: `${BASE_URL}/` },
+    { name: 'Servicii', url: `${BASE_URL}/servicii/` },
+    { name: 'Extras Multilingv Certificat de Căsătorie', url: `${BASE_URL}${PAGE_PATH}` },
+  ],
+  offers: [
+    { name: 'Extras Multilingv Certificat de Căsătorie', price: 798, url: `${BASE_URL}${PAGE_PATH}` },
     {
-      ...breadcrumbNode([
-        { name: 'Acasă', url: `${BASE_URL}/` },
-        { name: 'Servicii', url: `${BASE_URL}/servicii/` },
-        { name: 'Extras Multilingv Certificat de Căsătorie', url: PAGE_URL },
-      ]),
-      '@id': `${PAGE_URL}#breadcrumb`,
-    },
-    {
-      '@type': 'Service',
-      '@id': `${PAGE_URL}#service`,
-      name: 'Extras Multilingv Certificat de Căsătorie',
-      serviceType: 'Document de stare civilă pentru uz în străinătate',
-      url: PAGE_URL,
-      areaServed: { '@type': 'Country', name: 'România' },
-      description: DESCRIPTION,
-      provider: { '@id': `${BASE_URL}/#organization` },
+      name: 'Pachet: Extras Multilingv + Certificat de Căsătorie (duplicat)',
+      price: 1296,
+      url: `${BASE_URL}${PAGE_PATH}`,
     },
   ],
-};
+  aggregateRating: { ratingValue: 4.9, reviewCount: 450 },
+});
 
-const FAQS = [
-  { q: 'Ce este extrasul multilingv de pe certificatul de căsătorie?', a: 'Este un formular standard multilingv (introdus prin Regulamentul UE 2016/1191) care însoțește certificatul de căsătorie și redă datele în mai multe limbi oficiale ale UE, pentru a fi folosit în alt stat membru fără traducere.' },
-  { q: 'Înlocuiește traducerea și apostila?', a: 'În interiorul Uniunii Europene, formularul standard multilingv elimină nevoia de traducere și de apostilă pentru certificatul de căsătorie. Pentru țări din afara UE rămâne necesară apostila de la Haga + traducerea legalizată.' },
-  { q: 'Când am nevoie de el?', a: 'Când prezinți certificatul de căsătorie unei autorități dintr-un alt stat UE: permis de ședere, regim matrimonial, dosare administrative, recunoașterea căsătoriei în altă țară.' },
-  { q: 'De unde se obține?', a: 'De la serviciul de stare civilă al primăriei care deține actul de căsătorie, eliberat împreună cu certificatul/duplicatul. Prin eGhișeul.ro depunem cererea în numele tău și îți livrăm documentul, fără drum la ghișeu.' },
-  { q: 'Cât costă și cât durează?', a: "Serviciul complet costă 798 RON (include onorariul avocatului partener și depunerea cererii). Termenul depinde de oficiul de stare civilă care deține actul; îți comunicăm estimarea la plasarea comenzii." },
-];
+export default async function ExtrasMultilingvCasatoriePage() {
+  const data = await getService();
+  if (!data) notFound();
 
-export default function ExtrasMultilingvCasatoriePage() {
+  const { service, options } = data;
+
+  // When you need the multilingual extract — main EU use cases
+  const useCases = [
+    { icon: Heart, title: 'Recunoașterea căsătoriei', items: ['Căsătorie recunoscută în alt stat UE', 'Acte la autoritățile străine', 'Dosare de reîntregire a familiei'] },
+    { icon: Landmark, title: 'Regim matrimonial', items: ['Dovada regimului matrimonial', 'Acte notariale în UE', 'Achiziții imobiliare în străinătate'] },
+    { icon: User, title: 'Schimbarea numelui', items: ['Actualizarea numelui după căsătorie', 'Acte de identitate în alt stat UE', 'Conturi bancare și contracte'] },
+    { icon: Users, title: 'Dosare de familie', items: ['Permis de ședere pentru soț/soție', 'Alocații și asigurări sociale UE', 'Alte proceduri administrative'] },
+  ];
+
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdGraph) }} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdGraph) }}
+      />
 
       <main id="main-content" className="min-h-screen bg-neutral-50 -mt-16 lg:-mt-[112px]">
-        <header className="relative overflow-hidden bg-gradient-to-b from-secondary-900 to-[#0C1A2F] pt-24 lg:pt-36 pb-20 lg:pb-28">
+        {/* Hero */}
+        <section className="relative overflow-hidden bg-gradient-to-b from-secondary-900 to-[#0C1A2F] pt-24 lg:pt-36 pb-16 lg:pb-24">
           <div className="absolute inset-0 opacity-5">
-            <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, #ECB95F 1px, transparent 0)', backgroundSize: '40px 40px' }} />
+            <div
+              className="absolute inset-0"
+              style={{
+                backgroundImage: 'radial-gradient(circle at 1px 1px, #ECB95F 1px, transparent 0)',
+                backgroundSize: '40px 40px',
+              }}
+            />
           </div>
-          <div className="relative container mx-auto px-4 max-w-[820px]">
-            <nav className="flex items-center gap-2 text-sm text-white/60 mb-6 flex-wrap" aria-label="Breadcrumb">
+
+          <div className="relative container mx-auto px-4 max-w-[1280px]">
+            <nav className="flex items-center gap-2 text-sm text-white/60 mb-8 flex-wrap" aria-label="Breadcrumb">
               <Link href="/" className="hover:text-primary-500 transition-colors">Acasă</Link>
-              <ChevronRight className="h-4 w-4" aria-hidden="true" />
+              <ChevronRight className="h-4 w-4" />
               <Link href="/servicii/" className="hover:text-primary-500 transition-colors">Servicii</Link>
-              <ChevronRight className="h-4 w-4" aria-hidden="true" />
-              <span className="text-white/80">Extras Multilingv Certificat de Căsătorie</span>
+              <ChevronRight className="h-4 w-4" />
+              <span className="text-white font-medium">Extras Multilingv Certificat de Căsătorie</span>
             </nav>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-primary-500 text-secondary-900 text-xs font-bold rounded-full mb-4">
-              <Globe className="w-3.5 h-3.5" aria-hidden="true" /> Recunoscut în UE
-            </span>
-            <h1 className="text-3xl sm:text-4xl lg:text-[2.6rem] font-extrabold text-white leading-tight mb-5">
-              Extras Multilingv de pe Certificatul de Căsătorie
-            </h1>
-            <p className="text-lg text-white/85 leading-relaxed">
-              Formularul standard multilingv care însoțește certificatul de căsătorie și îl face valabil în Uniunea
-              Europeană <strong className="text-white">fără traducere și fără apostilă</strong>.
-            </p>
-            <div className="mt-7 flex flex-wrap gap-3">
-              <Link
-                href="/comanda/extras-multilingv-certificat-casatorie/"
-                className="inline-flex items-center gap-2 rounded-xl bg-primary-500 px-6 py-3 font-bold text-secondary-900 shadow-[0_6px_14px_rgba(236,185,95,0.35)] transition-colors hover:bg-primary-600"
-              >
-                Comandă acum
-                <ChevronRight className="h-4 w-4" aria-hidden="true" />
-              </Link>
-              <span className="inline-flex items-center rounded-xl border border-white/20 bg-white/5 px-4 py-3 text-sm text-white/80">
-                798 RON — totul inclus, depunem cererea în numele tău
-              </span>
+
+            <div className="flex flex-col-reverse lg:flex-row lg:justify-between gap-8 lg:gap-12">
+              <div className="flex-1 max-w-[700px]">
+                <div className="flex flex-wrap gap-2 mb-4">
+                  <Badge className="bg-primary-500 text-secondary-900 font-bold px-3 py-1">
+                    <Globe className="h-3.5 w-3.5 mr-1" />
+                    Recunoscut în UE
+                  </Badge>
+                  <Badge className="bg-green-600 text-white font-bold px-3 py-1">
+                    <CheckCircle className="h-3.5 w-3.5 mr-1" />
+                    Fără traducere
+                  </Badge>
+                  <Badge variant="outline" className="text-white/80 border-white/30 px-3 py-1">
+                    <Landmark className="h-3.5 w-3.5 mr-1" />
+                    Stare Civilă
+                  </Badge>
+                </div>
+
+                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-tight mb-5">
+                  Extras Multilingv
+                  <span className="block text-primary-500">Certificat de Căsătorie — pentru UE</span>
+                </h1>
+
+                <p className="text-lg sm:text-xl text-white/85 leading-relaxed mb-6">
+                  Formularul standard multilingv (Regulamentul UE 2016/1191) care însoțește certificatul
+                  de căsătorie și îl face valabil în toate statele Uniunii Europene, fără traducere
+                  autorizată și fără apostilă.
+                </p>
+
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-5 border border-white/20 mb-6">
+                  <p className="text-white/90 leading-relaxed text-sm sm:text-base">
+                    <strong className="text-primary-500">Extrasul multilingv</strong> îl obții de la noi,
+                    fără drum la Starea Civilă:
+                  </p>
+                  <ul className="mt-3 space-y-1.5 text-white/85 text-sm">
+                    {[
+                      'Completezi online datele actului de căsătorie (dată, locul înregistrării, soț/soție)',
+                      'Semnezi electronic împuternicirea, direct în formular',
+                      'Avocatul partener depune cererea la Starea Civilă care deține actul',
+                      'Primești extrasul electronic și/sau prin curier, oriunde în lume',
+                    ].map((step) => (
+                      <li key={step} className="flex items-center gap-2">
+                        <CheckCircle className="w-4 h-4 text-primary-500 flex-shrink-0" />
+                        {step}
+                      </li>
+                    ))}
+                  </ul>
+                  <p className="mt-3 text-white/75 text-xs sm:text-sm leading-relaxed">
+                    Avocatul nostru partener, înscris în Barou, depune cererea prin împuternicire la
+                    <strong className="text-white/90"> Starea Civilă</strong> și coordonează procedura în numele tău.
+                  </p>
+                </div>
+              </div>
+
+              {/* Price card */}
+              <div className="lg:w-[360px] flex-shrink-0 lg:self-center">
+                <div className="bg-white rounded-3xl shadow-2xl overflow-hidden border border-neutral-100">
+                  <div className="relative bg-gradient-to-br from-secondary-900 via-secondary-800 to-[#0C1A2F] p-6 text-center">
+                    <div className="relative">
+                      <span className="inline-block px-3 py-1 bg-primary-500 text-secondary-900 text-xs font-bold rounded-full mb-3">
+                        TOTUL INCLUS
+                      </span>
+                      <ServicePrice basePrice={service.base_price} />
+                      <p className="text-white/60 text-sm mt-2">Onorariu avocat inclus</p>
+                    </div>
+                  </div>
+
+                  <div className="p-5 space-y-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                        <Clock className="h-5 w-5 text-green-600" />
+                      </div>
+                      <div>
+                        <p className="font-semibold text-secondary-900 text-sm">Livrare în {formatEstimatedDays(service)}</p>
+                        <p className="text-xs text-neutral-500">În funcție de oficiul stării civile</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3 p-3 bg-gradient-to-r from-primary-50 to-primary-100/50 rounded-xl border border-primary-200">
+                      <div className="w-10 h-10 bg-primary-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                        <Package className="h-5 w-5 text-secondary-900" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-bold text-secondary-900 text-sm">Pachet cu certificatul: +498 RON</p>
+                        <p className="text-xs text-neutral-600">În loc de 998 RON separat</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                        <Mail className="h-5 w-5 text-blue-600" />
+                      </div>
+                      <div>
+                        <p className="font-semibold text-secondary-900 text-sm">Livrare pe Email</p>
+                        <p className="text-xs text-neutral-500">Plus original prin curier, inclusiv internațional</p>
+                      </div>
+                    </div>
+
+                    <OrderButton href={`/comanda/${SERVICE_SLUG}`} className="w-full mt-4">Comandă Acum</OrderButton>
+
+                    <div className="flex items-center justify-center gap-4 pt-3 border-t border-neutral-100">
+                      <div className="flex items-center gap-1 text-neutral-500">
+                        <Shield className="h-4 w-4" />
+                        <span className="text-xs">Securizat</span>
+                      </div>
+                      <div className="flex items-center gap-1 text-neutral-500">
+                        <CheckCircle className="h-4 w-4" />
+                        <span className="text-xs">Document</span>
+                      </div>
+                    </div>
+
+                    <GoogleReviewsBadge variant="bar" className="mt-3" />
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-        </header>
+        </section>
 
-        <article className="py-12 lg:py-16 bg-white">
-          <div className="container mx-auto px-4 max-w-[760px] prose prose-neutral max-w-none prose-headings:font-bold prose-headings:text-secondary-900 prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-4 prose-p:text-neutral-700 prose-li:text-neutral-700 prose-li:marker:text-primary-500 prose-a:text-primary-700 prose-a:font-medium prose-strong:text-secondary-900">
-            <h2>Ce este extrasul multilingv</h2>
-            <p>
-              Extrasul multilingv este un <strong>formular standard multilingv</strong> introdus prin
-              <strong> Regulamentul (UE) 2016/1191</strong>, care se atașează certificatului de căsătorie și redă
-              datele în limbile oficiale ale statelor membre, pentru a fi folosit într-un alt stat UE fără traducere.
-            </p>
-
-            <h2>Când îți trebuie</h2>
-            <ul>
-              <li>Permis de ședere sau dosar de muncă pentru familie într-o țară UE</li>
-              <li>Recunoașterea căsătoriei și regimul matrimonial în străinătate</li>
-              <li>Dosare administrative (alocații, asigurări, acte) în UE</li>
-              <li>Schimbarea numelui după căsătorie în actele dintr-un alt stat membru</li>
-            </ul>
-
-            <div className="not-prose grid sm:grid-cols-3 gap-4 my-6">
+        {/* Trust strip */}
+        <section className="bg-white border-b border-neutral-200">
+          <div className="container mx-auto px-4 max-w-[1100px] py-6 lg:py-8">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
               {[
-                { icon: Globe, t: 'Valabil în UE', d: 'Recunoscut în toate statele membre.' },
-                { icon: CheckCircle, t: 'Fără traducere', d: 'Formularul redă datele multilingv.' },
-                { icon: Plane, t: 'Fără apostilă (în UE)', d: 'Scutit de apostilă între statele UE.' },
-              ].map((c) => (
-                <div key={c.t} className="rounded-xl border border-neutral-200 p-4">
-                  <c.icon className="h-5 w-5 text-primary-600 mb-2" aria-hidden="true" />
-                  <p className="font-bold text-secondary-900 text-sm">{c.t}</p>
-                  <p className="text-sm text-neutral-600">{c.d}</p>
+                { icon: CalendarDays, value: formatEstimatedDays(service), label: 'Livrare estimată' },
+                { icon: Globe, value: 'Valabil în UE', label: 'Fără traducere, fără apostilă' },
+                { icon: Mail, value: 'Email + curier', label: 'Inclusiv internațional (DHL)' },
+                { icon: CheckCircle, value: '4.9/5', label: 'Peste 450 recenzii' },
+              ].map((t) => (
+                <div key={t.label} className="flex flex-col items-center gap-1.5">
+                  <div className="w-11 h-11 bg-primary-50 rounded-xl flex items-center justify-center">
+                    <t.icon className="h-5 w-5 text-primary-600" aria-hidden="true" />
+                  </div>
+                  <p className="text-base lg:text-lg font-extrabold text-secondary-900 leading-tight">{t.value}</p>
+                  <p className="text-xs text-neutral-500 leading-tight">{t.label}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* SEO Intro */}
+        <section className="py-12 lg:py-16 bg-neutral-50">
+          <div className="container mx-auto px-4 max-w-[820px]">
+            <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-5">
+              Extras Multilingv de pe Certificatul de Căsătorie — Online
+            </h2>
+            <div className="space-y-4 text-neutral-700 leading-relaxed">
+              <p>
+                <strong>Extrasul multilingv de pe certificatul de căsătorie</strong> este un formular standard
+                multilingv introdus prin <strong>Regulamentul (UE) 2016/1191</strong>. El însoțește
+                certificatul de căsătorie și redă datele acestuia în limbile oficiale ale statelor membre,
+                astfel încât actul tău este acceptat de autoritățile din <strong>toate statele Uniunii
+                Europene fără traducere autorizată și fără apostilă</strong>.
+              </p>
+              <p>
+                Documentul se eliberează de <strong>serviciul de stare civilă al primăriei care deține actul
+                de căsătorie</strong>. Prin eGhișeul nu trebuie să te deplasezi: completezi datele online,
+                semnezi electronic împuternicirea direct în formular, iar <strong>avocatul nostru
+                partener</strong> depune cererea la primăria competentă. Primești extrasul electronic și/sau
+                prin curier, inclusiv internațional prin DHL — util mai ales dacă locuiești deja în alt stat UE.
+              </p>
+              <p>
+                Dacă nu mai ai certificatul de căsătorie sau ai nevoie și de un exemplar nou, poți comanda în
+                aceeași cerere și{' '}
+                <Link href="/servicii/eliberare-certificat-de-casatorie/" className="text-primary-600 font-medium hover:underline">
+                  duplicatul certificatului de căsătorie
+                </Link>{' '}
+                — la pachet costă doar +498 RON, față de 998 RON comandat separat. Pentru o căsătorie
+                viitoare în străinătate îți poate trebui, în schimb,{' '}
+                <Link href="/servicii/eliberare-certificat-de-celibat/" className="text-primary-600 font-medium hover:underline">
+                  certificatul de celibat
+                </Link>
+                . Vezi și{' '}
+                <Link href="/servicii/extras-multilingv-certificat-nastere/" className="text-primary-600 font-medium hover:underline">
+                  extrasul multilingv de pe certificatul de naștere
+                </Link>{' '}
+                sau toate{' '}
+                <Link href="/servicii/" className="text-primary-600 font-medium hover:underline">
+                  serviciile eGhișeul
+                </Link>
+                .
+              </p>
+              <div className="rounded-2xl border border-neutral-200 bg-white p-5">
+                <h3 className="font-bold text-secondary-900 mb-2">
+                  Important: doar pentru statele Uniunii Europene
+                </h3>
+                <p className="text-sm text-neutral-700">
+                  Formularul standard multilingv este recunoscut <strong>numai între statele membre UE</strong>.
+                  Pentru țări din afara Uniunii Europene (Marea Britanie, SUA, Canada etc.) rămâne necesară{' '}
+                  <strong>apostila de la Haga</strong> și, de regulă, o <strong>traducere legalizată</strong> a
+                  certificatului. Dacă nu ești sigur ce îți cere autoritatea străină, scrie-ne pe WhatsApp
+                  înainte de comandă.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Use cases */}
+        <section className="py-12 lg:py-20 bg-white">
+          <div className="container mx-auto px-4 max-w-[1400px]">
+            <div className="text-center mb-10">
+              <span className="inline-block px-4 py-1.5 bg-primary-100 text-primary-700 text-sm font-semibold rounded-full mb-4">
+                Când ai nevoie
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-3">
+                Când Ai Nevoie de Extrasul Multilingv?
+              </h2>
+              <p className="text-neutral-600 max-w-2xl mx-auto">
+                Ori de câte ori prezinți certificatul de căsătorie unei autorități dintr-un alt stat membru UE.
+              </p>
+            </div>
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
+              {useCases.map((uc) => (
+                <div key={uc.title} className="bg-neutral-50 rounded-2xl p-5 border border-neutral-200 hover:border-primary-300 hover:shadow-lg hover:-translate-y-1 transition-all duration-200">
+                  <div className="w-12 h-12 bg-gradient-to-br from-primary-100 to-primary-200 rounded-xl flex items-center justify-center mb-4">
+                    <uc.icon className="w-6 h-6 text-primary-600" />
+                  </div>
+                  <h3 className="text-lg font-bold text-secondary-900 mb-3">{uc.title}</h3>
+                  <div className="space-y-2">
+                    {uc.items.map((item) => (
+                      <div key={item} className="flex items-center gap-2 text-sm text-neutral-700">
+                        <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
+                        {item}
+                      </div>
+                    ))}
+                  </div>
                 </div>
               ))}
             </div>
 
-            <div className="not-prose my-8 rounded-2xl border border-primary-200 bg-primary-50/60 p-6">
-              <p className="font-bold text-secondary-900">Cum comanzi — serviciu complet, 798 RON</p>
-              <ol className="mt-2 list-decimal space-y-1 pl-5 text-sm text-neutral-700">
-                <li>Completezi formularul online (date personale + datele actului de căsătorie).</li>
-                <li>Semnezi electronic împuternicirea — depunem noi cererea la starea civilă.</li>
-                <li>Primești extrasul multilingv electronic și/sau prin curier, oriunde în lume.</li>
-              </ol>
-              <Link
-                href="/comanda/extras-multilingv-certificat-casatorie/"
-                className="mt-4 inline-flex items-center gap-2 rounded-xl bg-primary-500 px-6 py-3 font-bold text-secondary-900 no-underline shadow-[0_6px_14px_rgba(236,185,95,0.35)] transition-colors hover:bg-primary-600"
-              >
-                Comandă extras multilingv — 798 RON
-                <ChevronRight className="h-4 w-4" aria-hidden="true" />
-              </Link>
-            </div>
-
-            <h2>Înlocuiește traducerea și apostila?</h2>
-            <p>
-              <strong>Da, în interiorul Uniunii Europene.</strong> Formularul standard multilingv elimină nevoia de
-              traducere autorizată și de apostilă pentru certificatul de căsătorie folosit în alt stat UE. Pentru
-              țările din <strong>afara UE</strong>, rămâne necesară apostila de la Haga + traducerea legalizată.
-            </p>
-
-            <h2>Cum îl obții</h2>
-            <p>
-              Extrasul multilingv se eliberează de <strong>serviciul de stare civilă al primăriei</strong> care
-              deține actul de căsătorie, împreună cu certificatul sau cu un{' '}
-              <Link href="/duplicat-certificat-de-casatorie/">duplicat de certificat de căsătorie</Link>. Prin
-              eGhișeul.ro depunem cererea în numele tău și îți livrăm documentul, fără drum la ghișeu.
-            </p>
-
-            <div className="not-prose rounded-2xl border border-primary-200 bg-primary-50/60 p-5 flex items-start gap-3 mt-6">
-              <FileText className="w-5 h-5 text-primary-600 flex-shrink-0 mt-0.5" aria-hidden="true" />
-              <p className="text-sm text-secondary-800">
-                Ai nevoie întâi de certificat? Vezi serviciul{' '}
-                <Link href="/servicii/eliberare-certificat-de-casatorie/" className="font-semibold text-primary-700 underline">eliberare certificat de căsătorie</Link>{' '}
-                — apoi solicităm și extrasul multilingv pentru uz în străinătate.
+            {/* UE vs non-UE — ce înlocuiește extrasul multilingv */}
+            <div className="mt-16 lg:mt-20 max-w-[1100px] mx-auto">
+              <div className="text-center mb-10">
+                <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-3">
+                  Înlocuiește traducerea și apostila?
+                </h2>
+                <p className="text-neutral-600 max-w-2xl mx-auto">
+                  Da — dar numai în interiorul Uniunii Europene. Iată exact ce acoperă formularul standard multilingv.
+                </p>
+              </div>
+              <div className="grid md:grid-cols-2 gap-5">
+                <div className="bg-green-50 rounded-2xl p-6 border border-green-200">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Globe className="w-6 h-6 text-green-600" />
+                    <h3 className="text-lg font-bold text-secondary-900">În statele membre UE</h3>
+                  </div>
+                  <ul className="space-y-2.5 text-sm text-neutral-700">
+                    {[
+                      'Certificatul + extrasul multilingv sunt acceptate direct',
+                      'NU ai nevoie de traducere autorizată',
+                      'NU ai nevoie de apostilă',
+                      'Formularul redă datele în limbile oficiale ale statelor membre',
+                    ].map((row) => (
+                      <li key={row} className="flex items-start gap-2">
+                        <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                        {row}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div className="bg-neutral-50 rounded-2xl p-6 border border-neutral-200">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Plane className="w-6 h-6 text-neutral-500" />
+                    <h3 className="text-lg font-bold text-secondary-900">În afara UE</h3>
+                  </div>
+                  <ul className="space-y-2.5 text-sm text-neutral-700">
+                    {[
+                      'Extrasul multilingv NU este suficient',
+                      'Rămâne necesară apostila de la Haga pe certificat',
+                      'De regulă se cere și traducere legalizată',
+                      'Verifică cerințele exacte ale autorității străine înainte de comandă',
+                    ].map((row) => (
+                      <li key={row} className="flex items-start gap-2">
+                        <ChevronRight className="w-4 h-4 text-neutral-400 flex-shrink-0 mt-0.5" />
+                        {row}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+              <p className="text-sm text-neutral-600 text-center mt-6 max-w-2xl mx-auto">
+                Extrasul multilingv nu circulă singur — el <strong>însoțește certificatul de căsătorie</strong>.
+                Dacă actul tău e pierdut sau deteriorat, vezi ghidul despre{' '}
+                <Link href="/duplicat-certificat-de-casatorie/" className="text-primary-600 font-medium hover:underline">
+                  duplicatul certificatului de căsătorie
+                </Link>
+                , iar dacă te-ai căsătorit în străinătate și actul nu e încă înregistrat în România, citește despre{' '}
+                <Link href="/transcriere-certificat-de-casatorie/" className="text-primary-600 font-medium hover:underline">
+                  transcrierea certificatului de căsătorie
+                </Link>
+                .
               </p>
             </div>
           </div>
-        </article>
+        </section>
 
-        <ServiceFAQ title="Întrebări Frecvente — Extras Multilingv" faqs={FAQS} />
+        {/* Pachet + service options (dynamic) */}
+        <section className="py-12 lg:py-20 bg-neutral-50">
+          <div className="container mx-auto px-4 max-w-[1400px]">
+            <div className="text-center mb-10">
+              <span className="inline-block px-4 py-1.5 bg-primary-100 text-primary-700 text-sm font-semibold rounded-full mb-4">
+                Personalizare
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-3">Extras Singur sau la Pachet cu Certificatul</h2>
+              <p className="text-neutral-600 max-w-xl mx-auto">
+                Dacă îți trebuie și un certificat de căsătorie nou (duplicat), pachetul e varianta mai avantajoasă.
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-5 max-w-3xl mx-auto mb-8">
+              <div className="bg-white rounded-2xl p-6 border-2 border-neutral-200">
+                <h3 className="font-bold text-secondary-900 mb-1">Extras multilingv</h3>
+                <p className="text-sm text-neutral-600 mb-3">Formularul standard UE, pentru certificatul pe care îl ai deja.</p>
+                <p className="text-3xl font-extrabold text-secondary-900">{service.base_price} <span className="text-base font-semibold text-neutral-500">RON</span></p>
+                <p className="text-xs text-neutral-500 mt-1">Totul inclus — onorariu avocat + depunere</p>
+              </div>
+              <div className="bg-white rounded-2xl p-6 border-2 border-primary-400 relative">
+                <span className="absolute -top-3 left-6 px-3 py-0.5 bg-primary-500 text-secondary-900 text-xs font-bold rounded-full">
+                  ECONOMISEȘTI 500 RON
+                </span>
+                <h3 className="font-bold text-secondary-900 mb-1">Pachet: extras + certificat (duplicat)</h3>
+                <p className="text-sm text-neutral-600 mb-3">Primești și un certificat de căsătorie nou, în aceeași cerere.</p>
+                <p className="text-3xl font-extrabold text-secondary-900">{Number(service.base_price) + 498} <span className="text-base font-semibold text-neutral-500">RON</span></p>
+                <p className="text-xs text-neutral-500 mt-1">Certificatul la pachet: +498 RON, în loc de 998 RON separat</p>
+              </div>
+            </div>
+
+            {options.length > 0 && (
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 max-w-3xl mx-auto">
+                {options.map((option) => (
+                  <Card key={option.id} className="border-2 border-neutral-200 hover:border-primary-400 transition-all hover:shadow-md">
+                    <CardContent className="p-4 lg:p-5">
+                      <div className="flex flex-col h-full">
+                        <div className="flex items-start justify-between gap-2 mb-2">
+                          <h3 className="font-semibold text-secondary-900 text-sm lg:text-base">{option.name}</h3>
+                          {option.is_required && (
+                            <Badge className="bg-secondary-900 text-white text-[10px] flex-shrink-0">Obligatoriu</Badge>
+                          )}
+                        </div>
+                        {option.description && (
+                          <p className="text-xs lg:text-sm text-neutral-600 mb-3 flex-1">{option.description}</p>
+                        )}
+                        <span className="font-bold text-primary-600 text-base lg:text-lg mt-auto">+{option.price} RON</span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </div>
+        </section>
+
+        {/* How it works — dark connected timeline */}
+        <section className="relative overflow-hidden bg-gradient-to-b from-secondary-900 to-[#0C1A2F] py-14 lg:py-24">
+          <div className="absolute inset-0 opacity-5">
+            <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, #ECB95F 1px, transparent 0)', backgroundSize: '40px 40px' }} />
+          </div>
+          <div className="relative container mx-auto px-4 max-w-[1100px]">
+            <div className="text-center mb-14">
+              <span className="inline-block px-4 py-1.5 bg-primary-500/15 text-primary-400 text-sm font-semibold rounded-full mb-4 border border-primary-500/30">
+                Proces simplu
+              </span>
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white mb-3">Cum Funcționează?</h2>
+              <p className="text-white/70 max-w-2xl mx-auto">Obții extrasul multilingv în 4 pași, 100% online</p>
+            </div>
+            <div className="relative grid sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-6">
+              <div className="hidden lg:block absolute top-8 left-[12.5%] right-[12.5%] h-0.5 bg-gradient-to-r from-primary-500/0 via-primary-500/50 to-primary-500/0" aria-hidden="true" />
+              {[
+                { step: 1, title: 'Completezi Datele', desc: 'Introduci datele actului de căsătorie: data, locul înregistrării și numele soților.', icon: User },
+                { step: 2, title: 'Semnezi Împuternicirea', desc: 'Încarci actul de identitate, faci un selfie de verificare și semnezi electronic împuternicirea.', icon: FileText },
+                { step: 3, title: 'Plătești Securizat', desc: 'Card, Apple Pay, Google Pay — onorariul avocatului partener e inclus în preț.', icon: Shield },
+                { step: 4, title: 'Primești Documentul', desc: `În ${formatEstimatedDays(service)} primești extrasul electronic și/sau prin curier.`, icon: CheckCircle },
+              ].map((item) => (
+                <div key={item.step} className="relative text-center">
+                  <div className="relative z-10 mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-400 to-primary-600 text-secondary-900 shadow-[0_8px_24px_rgba(236,185,95,0.35)]">
+                    <item.icon className="h-7 w-7" aria-hidden="true" />
+                    <span className="absolute -top-2 -right-2 flex h-7 w-7 items-center justify-center rounded-full bg-white text-sm font-extrabold text-secondary-900 shadow-md">{item.step}</span>
+                  </div>
+                  <h3 className="text-lg font-bold text-white mb-2">{item.title}</h3>
+                  <p className="text-sm text-white/65 leading-relaxed max-w-[240px] mx-auto">{item.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <ReviewsSection />
+
+        {/* Needs + timing */}
+        <section className="py-12 lg:py-20 bg-white">
+          <div className="container mx-auto px-4 max-w-[900px]">
+            <div className="grid md:grid-cols-2 gap-6">
+              <div className="rounded-2xl border border-neutral-200 bg-neutral-50 p-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <IdCard className="w-5 h-5 text-primary-600" />
+                  <h2 className="text-xl font-bold text-secondary-900">Acte necesare pentru extrasul multilingv</h2>
+                </div>
+                <ul className="space-y-2.5 text-sm text-neutral-700">
+                  {[
+                    'Act de identitate valabil (CI sau pașaport) — îl scanezi direct în formular',
+                    'Selfie cu actul de identitate, pentru verificarea identității',
+                    'Datele actului de căsătorie: data, locul înregistrării, numele soților',
+                    'Atât — împuternicirea o semnezi electronic, direct în wizard',
+                  ].map((row) => (
+                    <li key={row} className="flex items-start gap-2">
+                      <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                      {row}
+                    </li>
+                  ))}
+                </ul>
+                <p className="text-sm text-neutral-600 mt-4">
+                  Formularul online te ghidează pas cu pas — nu trebuie să pregătești nimic în avans.
+                </p>
+              </div>
+              <div className="rounded-2xl border border-neutral-200 p-6 bg-primary-50/40">
+                <div className="flex items-center gap-2 mb-4">
+                  <CalendarDays className="w-5 h-5 text-primary-600" />
+                  <h2 className="text-xl font-bold text-secondary-900">Cât durează</h2>
+                </div>
+                <p className="text-sm text-neutral-700 leading-relaxed">
+                  În mod standard, eliberarea extrasului multilingv durează
+                  <strong> {formatEstimatedDays(service)}</strong>, în funcție de oficiul stării civile
+                  care deține actul de căsătorie și de timpul de procesare al primăriei. Livrarea electronică
+                  ajunge imediat ce documentul e eliberat, iar originalul vine prin curier — inclusiv{' '}
+                  <strong>internațional, prin DHL</strong>, dacă ești în străinătate.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* FAQ */}
+        <ServiceFAQ
+          title="Întrebări Frecvente — Extras Multilingv Certificat de Căsătorie"
+          faqs={[
+            { q: 'Ce este extrasul multilingv de pe certificatul de căsătorie?', a: 'Este un formular standard multilingv, introdus prin Regulamentul (UE) 2016/1191, care însoțește certificatul de căsătorie și redă datele acestuia în limbile oficiale ale statelor membre. Rolul lui este să facă actul acceptat în alt stat UE fără traducere.' },
+            { q: 'Înlocuiește traducerea și apostila?', a: 'Da, în interiorul Uniunii Europene: formularul standard multilingv elimină nevoia de traducere autorizată și de apostilă pentru certificatul de căsătorie. Pentru țări din afara UE rămâne necesară apostila de la Haga plus traducerea legalizată.' },
+            { q: 'Cât costă extrasul multilingv?', a: 'Serviciul complet costă 798 RON — totul inclus: onorariul avocatului partener, depunerea cererii prin împuternicire și livrarea. Nu există taxe ascunse.' },
+            { q: 'Pot comanda și certificatul de căsătorie împreună cu extrasul?', a: 'Da, și e varianta cea mai avantajoasă: adaugi certificatul (duplicat) la pachet pentru doar +498 RON, față de 998 RON cât costă comandat separat — economisești 500 RON. Există și calea inversă: comanzi certificatul de căsătorie la 998 RON și adaugi extrasul multilingv ca opțiune, la +398 RON.' },
+            { q: 'Când am nevoie de extrasul multilingv?', a: 'Când prezinți certificatul de căsătorie unei autorități dintr-un alt stat UE: recunoașterea căsătoriei, dovada regimului matrimonial, schimbarea numelui după căsătorie în actele din alt stat membru, permis de ședere pentru soț/soție sau alte dosare de familie.' },
+            { q: 'De unde se eliberează și cine depune cererea?', a: 'Se eliberează de serviciul de stare civilă al primăriei care deține actul de căsătorie. Prin eGhișeul, avocatul nostru partener depune cererea prin împuternicire — pe care o semnezi electronic direct în formular — fără să te deplasezi la ghișeu.' },
+            { q: 'Cât durează și cum primesc documentul?', a: `Termenul standard este de ${formatEstimatedDays(service)}, în funcție de oficiul stării civile care deține actul. Primești extrasul electronic pe email și/sau în original prin curier, inclusiv internațional prin DHL, oriunde în lume.` },
+            { q: 'Ce acte îmi trebuie ca să comand?', a: 'Doar actul de identitate (îl scanezi în formular), un selfie cu actul pentru verificarea identității și datele actului de căsătorie: data, locul înregistrării și numele soților. Wizard-ul online te ghidează pas cu pas.' },
+          ]}
+        />
+
+        {/* CTA */}
+        <section className="relative py-16 lg:py-24 bg-gradient-to-b from-secondary-900 to-[#0C1A2F] overflow-hidden">
+          <div className="absolute inset-0 opacity-5">
+            <div
+              className="absolute inset-0"
+              style={{
+                backgroundImage: 'radial-gradient(circle at 1px 1px, #ECB95F 1px, transparent 0)',
+                backgroundSize: '40px 40px',
+              }}
+            />
+          </div>
+          <div className="relative container mx-auto px-4 max-w-[900px]">
+            <div className="text-center">
+              <h2 className="text-2xl lg:text-4xl font-extrabold text-white mb-4">
+                Gata să obții Extrasul Multilingv?
+              </h2>
+              <p className="text-lg text-white/80 mb-8 max-w-xl mx-auto">
+                Completezi datele online, fără drum la Starea Civilă. Primești documentul în {formatEstimatedDays(service)},
+                valabil în toată Uniunea Europeană.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+                <OrderButton href={`/comanda/${SERVICE_SLUG}`}>Comandă Acum</OrderButton>
+                <WhatsAppButton />
+              </div>
+            </div>
+          </div>
+        </section>
       </main>
+
+      <MobileStickyCTA href={`/comanda/${SERVICE_SLUG}`} basePrice={service.base_price} />
 
       <Footer />
     </>

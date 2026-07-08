@@ -404,8 +404,12 @@ export default async function CertificatNasterePage() {
               </div>
               <p className="text-sm text-neutral-600 text-center mt-6 max-w-2xl mx-auto">
                 Duplicatul este un document emis de Starea Civilă și se livrează prin curier în zile
-                lucrătoare — nu este un document generat instant. Pentru autoritățile din străinătate există și{' '}
-                <strong>extrasul multilingv de pe certificatul de naștere</strong>, recunoscut în UE fără traducere.
+                lucrătoare — nu este un document generat instant. Ai nevoie de certificat pentru o autoritate din UE?
+                Vezi{' '}
+                <Link href="/servicii/extras-multilingv-certificat-nastere/" className="text-primary-600 font-medium hover:underline">
+                  extrasul multilingv de pe certificatul de naștere
+                </Link>
+                , recunoscut în toate statele UE fără traducere și fără apostilă.
                 Ai nevoie și de un{' '}
                 <Link href="/servicii/eliberare-certificat-de-casatorie/" className="text-primary-600 font-medium hover:underline">
                   certificat de căsătorie

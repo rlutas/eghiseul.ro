@@ -409,7 +409,11 @@ export default async function CertificatCasatoriePage() {
                 <Link href="/servicii/eliberare-certificat-de-celibat/" className="text-primary-600 font-medium hover:underline">
                   certificat de celibat
                 </Link>
-                ? Le poți comanda la fel de simplu. Te-ai căsătorit în străinătate? Vezi ghidul de{' '}
+                ? Le poți comanda la fel de simplu. Ai nevoie de certificat pentru o autoritate din UE? Vezi{' '}
+                <Link href="/servicii/extras-multilingv-certificat-casatorie/" className="text-primary-600 font-medium hover:underline">
+                  extrasul multilingv de pe certificatul de căsătorie
+                </Link>
+                , recunoscut în toate statele UE fără traducere și fără apostilă. Te-ai căsătorit în străinătate? Vezi ghidul de{' '}
                 <Link href="/transcriere-certificat-de-casatorie/" className="text-primary-600 font-medium hover:underline">
                   transcriere a certificatului de căsătorie
                 </Link>
