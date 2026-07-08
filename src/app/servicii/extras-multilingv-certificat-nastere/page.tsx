@@ -77,6 +77,18 @@ export default function ExtrasMultilingvNasterePage() {
               Formularul standard multilingv care însoțește certificatul de naștere și îl face valabil în Uniunea
               Europeană <strong className="text-white">fără traducere și fără apostilă</strong>.
             </p>
+            <div className="mt-7 flex flex-wrap gap-3">
+              <Link
+                href="/comanda/certificat-nastere/"
+                className="inline-flex items-center gap-2 rounded-xl bg-primary-500 px-6 py-3 font-bold text-secondary-900 shadow-[0_6px_14px_rgba(236,185,95,0.35)] transition-colors hover:bg-primary-600"
+              >
+                Comandă acum
+                <ChevronRight className="h-4 w-4" aria-hidden="true" />
+              </Link>
+              <span className="inline-flex items-center rounded-xl border border-white/20 bg-white/5 px-4 py-3 text-sm text-white/80">
+                În formular, bifează opțiunea „Extras Multilingv” (+399 RON)
+              </span>
+            </div>
           </div>
         </header>
 
@@ -110,6 +122,22 @@ export default function ExtrasMultilingvNasterePage() {
                   <p className="text-sm text-neutral-600">{c.d}</p>
                 </div>
               ))}
+            </div>
+
+            <div className="not-prose my-8 rounded-2xl border border-primary-200 bg-primary-50/60 p-6">
+              <p className="font-bold text-secondary-900">Cum comanzi extrasul multilingv</p>
+              <ol className="mt-2 list-decimal space-y-1 pl-5 text-sm text-neutral-700">
+                <li>Pornește comanda pentru <strong>certificatul de naștere</strong> (butonul de mai jos).</li>
+                <li>La pasul „Opțiuni”, bifează <strong>„Extras Multilingv” (+399 RON)</strong>.</li>
+                <li>Primești certificatul împreună cu extrasul multilingv.</li>
+              </ol>
+              <Link
+                href="/comanda/certificat-nastere/"
+                className="mt-4 inline-flex items-center gap-2 rounded-xl bg-primary-500 px-6 py-3 font-bold text-secondary-900 no-underline shadow-[0_6px_14px_rgba(236,185,95,0.35)] transition-colors hover:bg-primary-600"
+              >
+                Comandă certificat + extras multilingv
+                <ChevronRight className="h-4 w-4" aria-hidden="true" />
+              </Link>
             </div>
 
             <h2>Înlocuiește traducerea și apostila?</h2>

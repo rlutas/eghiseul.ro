@@ -79,6 +79,75 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       );
     }
 
+    // ── Server-side KYC completeness guard ──────────────────────────────
+    // The wizard gates documents client-side, but direct checkout links,
+    // draft-resume flows or back-navigation can bypass the KYC step entirely
+    // (real case: E-260708-AJ5M8 reached checkout without a selfie). Enforce
+    // the same minimal requirements here so no client path can skip them.
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: svcCfg } = await (adminClient as any)
+        .from('services')
+        .select('verification_config')
+        .eq('id', order.service_id)
+        .single();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const pk = (svcCfg?.verification_config as any)?.personalKyc;
+      if (pk?.enabled) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const cd = order.customer_data as any;
+        const personal = cd?.personal || cd?.personalData || {};
+        const docs: Array<{ type?: string }> = personal.uploadedDocuments || [];
+        const has = (t: string) => docs.some((d) => d.type === t);
+        const citizenship = personal.citizenship || 'romanian';
+        const isForeign = citizenship !== 'romanian';
+
+        // Verified account-KYC is a legitimate bypass (documents live on the
+        // customer's profile, re-used across orders).
+        let accountKycOk = false;
+        if (order.user_id) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const { data: prof } = await (adminClient as any)
+            .from('profiles')
+            .select('kyc_verified')
+            .eq('id', order.user_id)
+            .single();
+          accountKycOk = !!prof?.kyc_verified;
+        }
+
+        if (!accountKycOk) {
+          const SCAN_ID_TYPES = ['ci_front', 'ci_nou_front', 'ci_nou_back', 'ci_vechi', 'passport_opened'];
+          const missing: string[] = [];
+          if (isForeign) {
+            if (!has('passport')) missing.push('pașaportul');
+            if (!has('selfie')) missing.push('selfie cu actul de identitate');
+            if (!has('residence_permit')) missing.push('permisul de rezidență / certificatul fiscal');
+          } else {
+            const hasScanId = docs.some((d) => SCAN_ID_TYPES.includes(d.type || ''));
+            const hasManualId = has('act_identitate');
+            if (!hasScanId && !hasManualId) missing.push('actul de identitate');
+            if (pk.selfieRequired && !has('selfie')) missing.push('selfie cu actul de identitate');
+          }
+          if (missing.length > 0) {
+            return NextResponse.json(
+              {
+                success: false,
+                error: {
+                  code: 'KYC_INCOMPLETE',
+                  message: `Lipsesc documente obligatorii: ${missing.join(', ')}. Te rugăm să revii la pasul de verificare a identității.`,
+                },
+              },
+              { status: 400 }
+            );
+          }
+        }
+      }
+    } catch (guardErr) {
+      // Config lookup failure must not block legitimate orders — the guard
+      // fails open on infrastructure errors, never on missing documents.
+      console.error('[submit] KYC guard config lookup failed (continuing):', guardErr instanceof Error ? guardErr.message : guardErr);
+    }
+
     // Capture audit context (IP, user agent) from request
     const auditCtx = getAuditContext(request);
     const now = new Date().toISOString();
