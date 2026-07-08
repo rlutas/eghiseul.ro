@@ -29,6 +29,7 @@ import {
   Upload,
 } from 'lucide-react';
 import TrackingTimeline from '@/components/orders/tracking-timeline';
+import { Footer } from '@/components/home/footer';
 
 // Order status mapping - complete workflow
 const STATUS_CONFIG: Record<string, { label: string; color: string; icon: typeof Clock }> = {
@@ -641,7 +642,11 @@ function OrderStatusContent() {
                       key={doc.id}
                       className="flex items-center gap-3 p-3 rounded-lg bg-muted/50"
                     >
-                      <FileText className="h-5 w-5 text-muted-foreground" />
+                      {/* Green document badge — delivered files must pop
+                          (team feedback). */}
+                      <div className="h-9 w-9 rounded-lg bg-green-100 flex items-center justify-center shrink-0">
+                        <FileText className="h-5 w-5 text-green-600" />
+                      </div>
                       <div className="flex-1">
                         <p className="font-medium text-sm">{doc.label}</p>
                         <p className="text-xs text-muted-foreground">
@@ -706,17 +711,21 @@ function OrderStatusContent() {
   );
 }
 
-// Main page component with Suspense
+// Main page component with Suspense. Footer added explicitly — the root
+// layout renders only the Header; each page brings its own Footer.
 export default function OrderStatusPage() {
   return (
-    <Suspense
-      fallback={
-        <div className="container mx-auto px-4 py-8 max-w-2xl flex items-center justify-center min-h-[400px]">
-          <Loader2 className="h-8 w-8 animate-spin text-primary-500" />
-        </div>
-      }
-    >
-      <OrderStatusContent />
-    </Suspense>
+    <>
+      <Suspense
+        fallback={
+          <div className="container mx-auto px-4 py-8 max-w-2xl flex items-center justify-center min-h-[400px]">
+            <Loader2 className="h-8 w-8 animate-spin text-primary-500" />
+          </div>
+        }
+      >
+        <OrderStatusContent />
+      </Suspense>
+      <Footer />
+    </>
   );
 }

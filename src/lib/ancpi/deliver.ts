@@ -64,7 +64,9 @@ export async function deliverAncpiResult(
       }
     }
 
-    // 1b. Attach the ANCPI receipt (chitanță) — for the client's records.
+    // 1b. Attach the ANCPI receipt (chitanță) — INTERNAL ONLY (contabilitate/
+    // audit). Team decision 2026-07-08: the customer must never see it on the
+    // status page — they get only the extras itself.
     if (chitantaUrl) {
       const { data: existingReceipt } = await supabase
         .from('order_documents')
@@ -79,7 +81,7 @@ export async function deliverAncpiResult(
           s3_key: chitantaUrl,
           file_name: `Chitanta-ANCPI-${friendly}.pdf`,
           mime_type: 'application/pdf',
-          visible_to_client: true,
+          visible_to_client: false,
           metadata: { source: 'ancpi-worker' },
         });
       }
