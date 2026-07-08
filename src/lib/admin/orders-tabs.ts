@@ -3,9 +3,12 @@
 
 // Team rule: while there is STILL WORK to do on an order, it stays in the
 // "În procesare" tab — every active workflow status between paid and shipped
-// (incl. depus la instituție + the granular add-on stages).
+// (incl. depus la instituție + the granular add-on stages). 'standby'
+// (waiting on customer documents) counts as work-in-flight too — team asked
+// (2026-07-08) that parked orders remain visible under În procesare.
 export const PROCESSING_GROUP = [
   'processing',
+  'standby',
   'documents_generated',
   'submitted_to_institution',
   'document_received',

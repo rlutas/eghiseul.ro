@@ -120,6 +120,46 @@ export async function GET(
       .eq('order_id', orderId)
       .order('created_at', { ascending: true });
 
+    // Active "Solicită documente" request — surfaced on the order page so the
+    // team always sees what was asked from the customer (and can re-share the
+    // link) even after a page refresh.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let reuploadRequest: any = null;
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: reupload } = await (adminClient as any)
+        .from('reupload_requests')
+        .select('id, token, document_type, document_types, completed_documents, status, reason, requested_at, token_expires_at')
+        .eq('order_id', orderId)
+        .in('status', ['pending', 'completed'])
+        .order('requested_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (reupload) {
+        const base = process.env.NEXT_PUBLIC_APP_URL ?? 'https://eghiseul.ro';
+        const expired =
+          reupload.status === 'pending' &&
+          new Date(reupload.token_expires_at).getTime() < Date.now();
+        reuploadRequest = {
+          id: reupload.id,
+          status: expired ? 'expired' : reupload.status,
+          documentTypes:
+            Array.isArray(reupload.document_types) && reupload.document_types.length > 0
+              ? reupload.document_types
+              : [reupload.document_type],
+          completedDocuments: Array.isArray(reupload.completed_documents)
+            ? reupload.completed_documents
+            : [],
+          reason: reupload.reason ?? null,
+          requestedAt: reupload.requested_at,
+          expiresAt: reupload.token_expires_at,
+          url: `${base}/reincarca-poza/${reupload.token}`,
+        };
+      }
+    } catch (err) {
+      console.error('[admin order] reupload lookup failed (continuing):', err);
+    }
+
     // Generate presigned URL for client signature if stored in S3
     let signatureUrl: string | undefined;
     const cd = order.customer_data as Record<string, unknown> | null;
@@ -139,6 +179,7 @@ export async function GET(
         timeline: history || [],
         documents: documents || [],
         option_statuses: optionStatuses || [],
+        reupload_request: reuploadRequest,
         ...(signatureUrl ? { signature_url: signatureUrl } : {}),
       },
     });

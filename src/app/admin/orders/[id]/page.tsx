@@ -143,6 +143,17 @@ interface OrderDetail {
   } | null;
 }
 
+interface ReuploadRequestInfo {
+  id: string;
+  status: 'pending' | 'completed' | 'expired';
+  documentTypes: string[];
+  completedDocuments: Array<{ type: string; s3Key: string; at: string }>;
+  reason: string | null;
+  requestedAt: string;
+  expiresAt: string;
+  url: string;
+}
+
 interface TimelineEvent {
   id: string;
   event_type: string;
@@ -540,6 +551,7 @@ export default function AdminOrderDetailPage() {
   const [timeline, setTimeline] = useState<TimelineEvent[]>([]);
   const [orderDocuments, setOrderDocuments] = useState<OrderDocument[]>([]);
   const [optionStatuses, setOptionStatuses] = useState<OrderOptionStatus[]>([]);
+  const [reuploadRequest, setReuploadRequest] = useState<ReuploadRequestInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -579,6 +591,7 @@ export default function AdminOrderDetailPage() {
       setTimeline((json.data.timeline || []) as TimelineEvent[]);
       setOrderDocuments((json.data.documents || []) as OrderDocument[]);
       setOptionStatuses((json.data.option_statuses || []) as OrderOptionStatus[]);
+      setReuploadRequest((json.data.reupload_request || null) as ReuploadRequestInfo | null);
     } catch (err) {
       console.error('Error fetching order:', err);
       setError('A aparut o eroare la incarcarea comenzii.');
@@ -1938,6 +1951,62 @@ export default function AdminOrderDetailPage() {
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
+            {reuploadRequest && reuploadRequest.status !== 'completed' && (
+              <Alert className={reuploadRequest.status === 'expired' ? 'bg-red-50 border-red-300' : 'bg-orange-50 border-orange-300'}>
+                <Camera className={`h-4 w-4 ${reuploadRequest.status === 'expired' ? 'text-red-700' : 'text-orange-700'}`} />
+                <AlertTitle className={`text-sm font-semibold ${reuploadRequest.status === 'expired' ? 'text-red-900' : 'text-orange-900'}`}>
+                  {reuploadRequest.status === 'expired'
+                    ? 'Cerere de documente EXPIRATĂ (clientul nu a încărcat la timp)'
+                    : 'Documente solicitate de la client — în așteptare'}
+                </AlertTitle>
+                <AlertDescription className={`text-sm ${reuploadRequest.status === 'expired' ? 'text-red-800' : 'text-orange-800'}`}>
+                  <ul className="list-disc list-inside mt-1 space-y-0.5">
+                    {reuploadRequest.documentTypes.map((t) => {
+                      const done = reuploadRequest.completedDocuments.some((d) => d.type === t);
+                      return (
+                        <li key={t}>
+                          {REUPLOAD_DOC_SPECS[t]?.label ?? t}
+                          {done && <span className="ml-1 text-green-700 font-medium">✓ încărcat</span>}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                  {reuploadRequest.reason && (
+                    <p className="text-xs mt-1.5 italic">Motiv: {reuploadRequest.reason}</p>
+                  )}
+                  <p className="text-xs mt-1.5">
+                    Solicitat {new Date(reuploadRequest.requestedAt).toLocaleString('ro-RO')} · valabil până la{' '}
+                    {new Date(reuploadRequest.expiresAt).toLocaleDateString('ro-RO')}
+                  </p>
+                  <div className="flex items-center gap-2 mt-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="h-7 text-xs"
+                      onClick={() => {
+                        navigator.clipboard?.writeText(reuploadRequest.url);
+                        toast.success('Link copiat');
+                      }}
+                    >
+                      <Copy className="h-3 w-3 mr-1" />
+                      Copiază linkul
+                    </Button>
+                    {contact?.phone && reuploadRequest.status === 'pending' && (
+                      <a
+                        href={`https://wa.me/${contact.phone.replace(/[\s+()-]/g, '')}?text=${encodeURIComponent(`Bună! Pentru a continua comanda, te rugăm încarcă documentele aici: ${reuploadRequest.url}`)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <Button size="sm" variant="outline" className="h-7 text-xs border-green-300 text-green-700 hover:bg-green-50">
+                          <MessageCircle className="h-3 w-3 mr-1" />
+                          WhatsApp
+                        </Button>
+                      </a>
+                    )}
+                  </div>
+                </AlertDescription>
+              </Alert>
+            )}
             {crossValWarnings.length > 0 && (
               <Alert className="bg-amber-50 border-amber-300">
                 <AlertTriangle className="h-4 w-4 text-amber-700" />
