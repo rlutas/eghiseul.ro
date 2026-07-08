@@ -182,6 +182,9 @@ export async function GET(request: NextRequest) {
     // Transform documents for client display
     const DOC_TYPE_LABELS: Record<string, string> = {
       contract_complet: 'Contract',
+      constatator: 'Certificat Constatator (ONRC)',
+      document_received: 'Document primit de la instituție',
+      document_final: 'Document final',
       contract_prestari: 'Contract Prestări Servicii',
       contract_asistenta: 'Contract Asistență Juridică',
       imputernicire: 'Împuternicire',
@@ -192,10 +195,21 @@ export async function GET(request: NextRequest) {
       'ancpi-chitanta': 'Chitanță ANCPI',
     };
 
+    // Company name for constatator label — the client should see WHICH firm
+    // the certificate is for (e.g. "Certificat Constatator — RNWE GROUP SRL").
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const cdAny = order.customer_data as any;
+    const firmName =
+      cdAny?.billing?.companyName || cdAny?.company?.companyName ||
+      cdAny?.companyData?.companyName || cdAny?.constatator?.companyName || null;
+
     const clientDocuments = (documents || []).map(doc => ({
       id: doc.id,
       type: doc.type,
-      label: DOC_TYPE_LABELS[doc.type] || doc.type,
+      label:
+        doc.type === 'constatator' && firmName
+          ? `Certificat Constatator — ${firmName}`
+          : DOC_TYPE_LABELS[doc.type] || doc.type,
       fileName: doc.file_name,
       fileSize: doc.file_size,
       documentNumber: doc.document_number,

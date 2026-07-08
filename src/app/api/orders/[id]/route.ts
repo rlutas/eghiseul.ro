@@ -292,6 +292,9 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     // Transform documents for client display
     const DOC_TYPE_LABELS: Record<string, string> = {
       contract_complet: 'Contract',
+      constatator: 'Certificat Constatator (ONRC)',
+      document_received: 'Document primit de la instituție',
+      document_final: 'Document final',
       contract_prestari: 'Contract Prestări Servicii',
       contract_asistenta: 'Contract Asistență Juridică',
       imputernicire: 'Împuternicire',
