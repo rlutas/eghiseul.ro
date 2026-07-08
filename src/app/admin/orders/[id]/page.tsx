@@ -931,8 +931,11 @@ export default function AdminOrderDetailPage() {
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1 text-sm text-muted-foreground">
               <span>Creata: {formatDateLong(order.created_at)}</span>
               {order.submitted_at && <span>Trimisa: {formatDate(order.submitted_at)}</span>}
-              {/* Termen estimat — up top, right under the order number (sister parity). */}
-              {order.estimated_completion_date && (
+              {/* Termen estimat — up top, right under the order number (sister
+                  parity). Hidden once the order reached a terminal state — a
+                  deadline on a finished order is just noise. */}
+              {order.estimated_completion_date &&
+                !['completed', 'delivered', 'cancelled', 'refunded'].includes(order.status || '') && (
                 <span className="font-semibold text-orange-600">
                   Termen estimat: {formatDate(order.estimated_completion_date)}
                   {order.services?.estimated_days ? ` (${order.services.estimated_days} zile lucratoare)` : ''}
@@ -1161,6 +1164,10 @@ export default function AdminOrderDetailPage() {
                 </>
               );
             })()}
+            {/* Date imobil — în același chenar cu Detalii Serviciu (cerință
+                echipă): county/locality/address/owner/CF, needed by the team
+                to actually run the identification. */}
+            <PropertySection property={(order.customer_data as AnyObj | null)?.property as AnyObj | null} />
             {/* Real per-step delivery estimate (sums urgenta + traducere +
                 legalizare + apostila*) so admin sees the same window the
                 customer was promised. Falls back to `service.estimated_days`
@@ -1659,12 +1666,6 @@ export default function AdminOrderDetailPage() {
         </div>
         {/* RIGHT column — service+options on top, delivery info below */}
         <div className="space-y-4">
-        {/* Date imobil — identificare imobil / servicii cadastrale (CF).
-            Coloana dreaptă, deasupra Facturării (layout cerut de echipă:
-            Informații Client | Date imobil, cu Facturarea sub el). Renders
-            customer_data.property (county/locality/address/owner/CF), needed
-            by the team to actually run the identification. */}
-        <PropertyCard property={(order.customer_data as AnyObj | null)?.property as AnyObj | null} />
         {/* Delivery Address — hidden entirely for email-only deliveries
             (certificat constatator, extras CF: PDF-ul e singura metodă, cardul
             ar arăta doar "Metoda: Email (PDF)" = zgomot). Reapare dacă există
@@ -3748,7 +3749,7 @@ const PROPERTY_LABELS: Array<[string, string]> = [
   ['motiv', 'Motivul solicitării'],
 ];
 
-function PropertyCard({ property }: { property: AnyObj | null }) {
+function PropertySection({ property }: { property: AnyObj | null }) {
   if (!property || typeof property !== 'object') return null;
   const entries = Object.entries(property).filter(([, v]) => v != null && String(v).trim() !== '');
   if (entries.length === 0) return null;
@@ -3762,19 +3763,15 @@ function PropertyCard({ property }: { property: AnyObj | null }) {
   ];
 
   return (
-    <Card>
-      <CardHeader className="pb-3">
-        <CardTitle className="text-base flex items-center gap-2">
-          <MapPin className="h-4 w-4" />
-          Date imobil
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-1">
-        {ordered.map(([label, value]) => (
-          <InfoRow key={label} label={label} value={value} />
-        ))}
-      </CardContent>
-    </Card>
+    <>
+      <p className="pt-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground flex items-center gap-1.5">
+        <MapPin className="h-3.5 w-3.5" />
+        Date imobil
+      </p>
+      {ordered.map(([label, value]) => (
+        <InfoRow key={label} label={label} value={value} />
+      ))}
+    </>
   );
 }
 
