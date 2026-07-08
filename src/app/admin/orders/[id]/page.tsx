@@ -51,6 +51,7 @@ import {
   RefreshCw,
   Loader2,
   Copy,
+  Check,
   FileCheck,
   Upload,
   Shield,
@@ -1526,6 +1527,37 @@ export default function AdminOrderDetailPage() {
                       order.delivery_address.postalCode || order.delivery_address.postal_code,
                     ].filter(Boolean).join(', ')}
                   </p>
+                  {order.delivery_address.country && (
+                    <p className="text-muted-foreground">{order.delivery_address.country}</p>
+                  )}
+                  {(order.delivery_address.name || order.delivery_address.phone) && (
+                    <p className="text-muted-foreground">
+                      {[order.delivery_address.name, order.delivery_address.phone].filter(Boolean).join(' · ')}
+                    </p>
+                  )}
+                  {/* Copy-paste friendly international label (name / street /
+                      postal city / country / phone) for manual shipping (DHL etc.) */}
+                  <CopyAddressButton
+                    label={[
+                      order.delivery_address.name ||
+                        (order.customer_data as AnyObj | null)?.contact?.name ||
+                        '',
+                      [
+                        order.delivery_address.street,
+                        order.delivery_address.number && `Nr. ${order.delivery_address.number}`,
+                      ].filter(Boolean).join(', '),
+                      [
+                        order.delivery_address.postalCode || order.delivery_address.postal_code,
+                        order.delivery_address.city,
+                      ].filter(Boolean).join(' '),
+                      order.delivery_address.county,
+                      order.delivery_address.country || 'România',
+                      order.delivery_address.phone ||
+                        (order.customer_data as AnyObj | null)?.contact?.phone,
+                    ]
+                      .filter(Boolean)
+                      .join('\n')}
+                  />
                 </div>
               </>
             )}
@@ -3142,6 +3174,26 @@ function AwbSection({
     return null;
   }
 
+  // Automatic AWB generation only works for Fan Courier + Sameday. DHL /
+  // Poșta / other international couriers are handled MANUALLY by the team —
+  // show a clear note instead of a button that would fail.
+  const provider = (order.courier_provider || detectedCourierProvider || '').toLowerCase();
+  const AWB_CAPABLE = ['fancourier', 'fan_courier', 'fan', 'sameday'];
+  if (!hasAwb && provider && !AWB_CAPABLE.includes(provider)) {
+    return (
+      <>
+        <Separator className="my-2" />
+        <div className="rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
+          <p className="font-semibold">AWB manual ({provider.toUpperCase()})</p>
+          <p className="mt-1 text-xs">
+            Generarea automată de AWB funcționează doar pentru Fan Courier și Sameday. Pentru acest
+            curier, expedierea se face manual — folosește adresa de livrare de mai sus (buton „Copiază adresa").
+          </p>
+        </div>
+      </>
+    );
+  }
+
   if (hasAwb) {
     const canMarkDelivered = order.status === 'shipped';
     return (
@@ -3232,6 +3284,31 @@ function AwbSection({
 }
 
 // ---------- Helper Components ----------
+
+/** One-click copy of the delivery address as an international shipping label
+ *  (name / street / postal+city / region / country / phone) — for manual
+ *  shipping with DHL & co. where the team pastes into the courier's form. */
+function CopyAddressButton({ label }: { label: string }) {
+  const [copied, setCopied] = useState(false);
+  return (
+    <button
+      type="button"
+      onClick={async () => {
+        try {
+          await navigator.clipboard.writeText(label);
+          setCopied(true);
+          setTimeout(() => setCopied(false), 2000);
+        } catch {
+          /* clipboard unavailable — ignore */
+        }
+      }}
+      className="mt-2 inline-flex items-center gap-1.5 rounded-md border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50"
+    >
+      {copied ? <Check className="h-3.5 w-3.5 text-green-600" /> : <Copy className="h-3.5 w-3.5" />}
+      {copied ? 'Copiat!' : 'Copiază adresa'}
+    </button>
+  );
+}
 
 /** Romanian labels for known civil_status keys, in display order. Unknown
  *  keys fall back to the raw key so imported/new fields are never hidden. */
