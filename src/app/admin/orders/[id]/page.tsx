@@ -795,6 +795,11 @@ export default function AdminOrderDetailPage() {
     (constatator as AnyObj | null)?.documentType !== 'pf';
   const constatatorFirmName =
     company?.companyName || billing?.companyName || (constatator as AnyObj | null)?.companyName || null;
+  // Auto-issued PDF services — no urgency, no delivery choice, minutes-term:
+  // the Urgenta / Metoda livrare / Termen rows are hidden for these.
+  const isInstantService = ['certificat-constatator', 'extras-carte-funciara', 'extras-plan-cadastral'].includes(
+    order.services?.slug || ''
+  );
   const status = order.status || 'draft';
   const statusConfig = STATUS_CONFIG[status] || { label: status, variant: 'outline' as const };
   const customerName = getCustomerDisplayName(contact, personal, company, billing, isPJ);
@@ -1085,17 +1090,21 @@ export default function AdminOrderDetailPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            {/* Urgenta + metoda livrare sus, ca pe sora */}
-            <InfoRow
-              label="Urgenta"
-              value={(() => {
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                const opts = (order.selected_options as any[] | null) || [];
-                const urgent = opts.find((o) => o?.code === 'urgenta' && !o?.bundledFor);
-                return urgent ? '⚡ Urgent' : 'Standard';
-              })()}
-            />
-            {deliveryMethodParsed?.name && (
+            {/* Urgenta + metoda livrare sus, ca pe sora. Ascunse la serviciile
+                instant (constatator / extras CF): nu au urgență, PDF-ul e
+                singura livrare și termenul nu interesează echipa. */}
+            {!isInstantService && (
+              <InfoRow
+                label="Urgenta"
+                value={(() => {
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  const opts = (order.selected_options as any[] | null) || [];
+                  const urgent = opts.find((o) => o?.code === 'urgenta' && !o?.bundledFor);
+                  return urgent ? '⚡ Urgent' : 'Standard';
+                })()}
+              />
+            )}
+            {!isInstantService && deliveryMethodParsed?.name && (
               <InfoRow label="Metoda livrare" value={String(deliveryMethodParsed.name)} />
             )}
             <p className="pt-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Servicii comandate</p>
@@ -1126,8 +1135,12 @@ export default function AdminOrderDetailPage() {
                 <>
                   {firmName && <InfoRow label="Firmă" value={firmName} />}
                   {firmCui && <InfoRow label="CUI" value={String(firmCui)} mono />}
-                  <InfoRow label="Tip document" value={docTypeLabel} />
-                  {c.reportType && <InfoRow label="Tip raport" value={String(c.reportType)} />}
+                  {/* One merged row — "Tip document" + "Tip raport" repeated
+                      the same "de bază" info twice (team feedback). */}
+                  <InfoRow
+                    label="Tip document"
+                    value={c.reportType ? `${c.reportType} — ${docTypeLabel}` : docTypeLabel}
+                  />
                   <InfoRow label="Scop / motiv (de ce a aplicat)" value={String(purposeText)} />
                   {periodText && <InfoRow label="Perioadă" value={periodText} />}
                   {c.requesterName && <InfoRow label="Solicitant (PF)" value={String(c.requesterName)} />}
@@ -1159,11 +1172,11 @@ export default function AdminOrderDetailPage() {
                 courier,
                 includeCourierLeg: !!courier,
               });
-              // Digital, auto-issued services (ONRC constatator) — minutes, not days.
-              const digitalInstant = order.services?.slug === 'certificat-constatator';
-              const label = digitalInstant
-                ? 'de obicei câteva minute (automat, 24/7)'
-                : est.minDays === est.maxDays
+              // Instant services (ONRC constatator, extras CF) — the term is
+              // minutes and irrelevant to the team; row hidden entirely.
+              if (isInstantService) return null;
+              const label =
+                est.minDays === est.maxDays
                   ? `${est.minDays} zile lucratoare`
                   : `${est.minDays}-${est.maxDays} zile lucratoare`;
               return <InfoRow label="Termen estimat" value={label} />;
@@ -1324,13 +1337,25 @@ export default function AdminOrderDetailPage() {
             </div>
           </CardHeader>
           <CardContent className="space-y-3">
-            <InfoRow label="Tip persoana" value={isPJ ? 'Persoana Juridica' : 'Persoana Fizica'} />
-            <InfoRow label="Nume" value={customerName} icon={isPJ ? <Building2 className="h-3.5 w-3.5" /> : <User className="h-3.5 w-3.5" />} />
-            {isPJ && company?.cui && <InfoRow label="CUI" value={String(company.cui)} />}
-            {isPJ && company && (company.registrationNumber || company.regCom) && (
+            {/* Constatator pe firmă: subiectul comenzii e FIRMA căutată —
+                echipa vrea detaliile ei aici (feedback E-260708-QFVFY), nu un
+                derutant "Persoana Fizica / N/A". */}
+            <InfoRow
+              label="Tip persoana"
+              value={isPJ ? 'Persoana Juridica' : constatatorFirm ? 'Firmă (constatator)' : 'Persoana Fizica'}
+            />
+            <InfoRow
+              label={constatatorFirm ? 'Firmă' : 'Nume'}
+              value={constatatorFirm ? constatatorFirmName || 'N/A' : customerName}
+              icon={isPJ || constatatorFirm ? <Building2 className="h-3.5 w-3.5" /> : <User className="h-3.5 w-3.5" />}
+            />
+            {(isPJ || constatatorFirm) && (company?.cui || billing?.cui) && (
+              <InfoRow label="CUI" value={String(company?.cui || billing?.cui)} />
+            )}
+            {(isPJ || constatatorFirm) && company && (company.registrationNumber || company.regCom) && (
               <InfoRow label="Nr. Reg. Com." value={company.registrationNumber || company.regCom} mono />
             )}
-            {isPJ && company?.validationStatus && (
+            {(isPJ || constatatorFirm) && company?.validationStatus && (
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">Validare CUI</span>
                 <Badge
@@ -1341,7 +1366,7 @@ export default function AdminOrderDetailPage() {
                 </Badge>
               </div>
             )}
-            {isPJ && company?.address && (
+            {(isPJ || constatatorFirm) && company?.address && (
               <InfoRow label="Sediu social" value={formatAddress(company.address) || 'N/A'} />
             )}
             {contact?.email && <InfoRow label="Email" value={contact.email} icon={<Mail className="h-3.5 w-3.5" />} />}
