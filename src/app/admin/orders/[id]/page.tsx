@@ -836,6 +836,31 @@ export default function AdminOrderDetailPage() {
               <Badge variant={statusConfig.variant} className={`text-sm px-3 py-1 ${statusConfig.className || ''}`}>
                 {statusConfig.label}
               </Badge>
+              {constatatorFirm ? (
+                <Badge variant="secondary" className="text-sm px-3 py-1">
+                  <Building2 className="h-3.5 w-3.5 mr-1" />
+                  Firmă{constatatorFirmName ? ` · ${constatatorFirmName}` : ' / PJ'}
+                </Badge>
+              ) : isPJ ? (
+                <Badge variant="secondary" className="text-sm px-3 py-1">
+                  <Building2 className="h-3.5 w-3.5 mr-1" />
+                  Persoana Juridica
+                </Badge>
+              ) : (
+                <Badge variant="outline" className="text-sm px-3 py-1">
+                  <User className="h-3.5 w-3.5 mr-1" />
+                  Persoana Fizica
+                </Badge>
+              )}
+              {/* PF client → invoice billed to a company. Separate chip so the
+                  admin sees BOTH facts without us flipping the entire UI to PJ
+                  mode (which used to happen and caused mis-classified cards). */}
+              {billsToCompany && (
+                <Badge variant="outline" className="text-sm px-3 py-1 border-amber-300 bg-amber-50 text-amber-900">
+                  <Building2 className="h-3.5 w-3.5 mr-1" />
+                  Factură → {billing?.companyName || 'PJ'}
+                </Badge>
+              )}
               {order.friendly_order_id && (
                 <a
                   href={`/comanda/status?order=${encodeURIComponent(order.friendly_order_id)}&email=${encodeURIComponent(order.customer_data?.contact?.email ?? '')}`}
@@ -864,31 +889,6 @@ export default function AdminOrderDetailPage() {
                 >
                   <Copy className="h-3 w-3" /> Link status
                 </button>
-              )}
-              {constatatorFirm ? (
-                <Badge variant="secondary" className="text-sm px-3 py-1">
-                  <Building2 className="h-3.5 w-3.5 mr-1" />
-                  Firmă{constatatorFirmName ? ` · ${constatatorFirmName}` : ' / PJ'}
-                </Badge>
-              ) : isPJ ? (
-                <Badge variant="secondary" className="text-sm px-3 py-1">
-                  <Building2 className="h-3.5 w-3.5 mr-1" />
-                  Persoana Juridica
-                </Badge>
-              ) : (
-                <Badge variant="outline" className="text-sm px-3 py-1">
-                  <User className="h-3.5 w-3.5 mr-1" />
-                  Persoana Fizica
-                </Badge>
-              )}
-              {/* PF client → invoice billed to a company. Separate chip so the
-                  admin sees BOTH facts without us flipping the entire UI to PJ
-                  mode (which used to happen and caused mis-classified cards). */}
-              {billsToCompany && (
-                <Badge variant="outline" className="text-sm px-3 py-1 border-amber-300 bg-amber-50 text-amber-900">
-                  <Building2 className="h-3.5 w-3.5 mr-1" />
-                  Factură → {billing?.companyName || 'PJ'}
-                </Badge>
               )}
             </div>
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1 text-sm text-muted-foreground">
