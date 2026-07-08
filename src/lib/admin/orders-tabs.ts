@@ -1,8 +1,19 @@
 // Status groupings for the admin /admin/orders tabs UI. Kept in one place so
 // the visible list, the tab badges, and the dashboard stay in sync.
 
+// Team rule: while there is STILL WORK to do on an order, it stays in the
+// "În procesare" tab — every active workflow status between paid and shipped
+// (incl. depus la instituție + the granular add-on stages).
 export const PROCESSING_GROUP = [
   'processing',
+  'documents_generated',
+  'submitted_to_institution',
+  'document_received',
+  'extras_in_progress',
+  'la_tradus',
+  'la_legalizat',
+  'la_apostila_notari',
+  'eliberat_apostila_haga',
   'kyc_pending',
   'kyc_approved',
   'document_ready',

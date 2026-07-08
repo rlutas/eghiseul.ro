@@ -548,8 +548,12 @@ export default function AdminOrderDetailPage() {
   const [cancelling, setCancelling] = useState(false);
   const [downloading, setDownloading] = useState(false);
 
-  const fetchOrder = useCallback(async () => {
-    setLoading(true);
+  const fetchOrder = useCallback(async (opts?: { silent?: boolean }) => {
+    // Silent refresh: inline actions (generate document, add note, update
+    // status…) re-fetch WITHOUT flipping the whole page into the loading
+    // spinner — that unmounted the content and threw the user back to the
+    // top of the page (team-reported bug).
+    if (!opts?.silent) setLoading(true);
     setError(null);
     try {
       const res = await fetch(`/api/admin/orders/${orderId}`);
@@ -580,6 +584,9 @@ export default function AdminOrderDetailPage() {
       setLoading(false);
     }
   }, [orderId]);
+
+  // Stable callback for inline sections — never triggers the full-page spinner.
+  const refreshSilent = useCallback(() => fetchOrder({ silent: true }), [fetchOrder]);
 
   useEffect(() => {
     if (orderId) fetchOrder();
@@ -996,7 +1003,7 @@ export default function AdminOrderDetailPage() {
               Storno + Reemite
             </Button>
           )}
-          <Button variant="outline" size="sm" onClick={fetchOrder}>
+          <Button variant="outline" size="sm" onClick={() => fetchOrder()}>
             <RefreshCw className="h-4 w-4" />
             Reincarca
           </Button>
@@ -1007,7 +1014,7 @@ export default function AdminOrderDetailPage() {
           within the 30-min window (or admin set this status manually). One
           click processes the Stripe refund (70%) and flips to 'refunded'. */}
       {order.status === 'cancellation_requested' && (
-        <CancellationRequestedBanner order={order} onProcessed={fetchOrder} />
+        <CancellationRequestedBanner order={order} onProcessed={refreshSilent} />
       )}
 
       {/* Standby banner — shown when SLA is paused. Reminds operators that
@@ -1031,11 +1038,11 @@ export default function AdminOrderDetailPage() {
           without scrolling to the bottom. */}
       {/* Note Echipă + Actualizează Status — 50/50 sus, fără scroll (cerere user). */}
       <div className="grid gap-4 lg:grid-cols-2 items-start">
-        <NoteEchipaCard orderId={order.id} timeline={timeline} onAdded={fetchOrder} />
+        <NoteEchipaCard orderId={order.id} timeline={timeline} onAdded={refreshSilent} />
         <UpdateStatusCard
           orderId={order.id}
           currentStatus={order.status || 'draft'}
-          onUpdated={fetchOrder}
+          onUpdated={refreshSilent}
         />
       </div>
 
@@ -1128,7 +1135,7 @@ export default function AdminOrderDetailPage() {
               orderId={order.id}
               email={contact?.email || ''}
               phone={contact?.phone || ''}
-              onSaved={fetchOrder}
+              onSaved={refreshSilent}
             />
 
             {/* Account linkage — client cu cont eGhișeul + status KYC pe cont */}
@@ -1917,7 +1924,7 @@ export default function AdminOrderDetailPage() {
                   orderId={order.id}
                   verifiedAt={adminVerifiedAt}
                   verifiedBy={adminVerifiedBy}
-                  onChange={fetchOrder}
+                  onChange={refreshSilent}
                 />
                 <RequestSelfieReuploadButton
                   orderId={order.id}
@@ -2019,7 +2026,7 @@ export default function AdminOrderDetailPage() {
                   doc={doc}
                   kyc={kycByType[doc.type]}
                   orderId={order.id}
-                  onRerun={fetchOrder}
+                  onRerun={refreshSilent}
                 />
               ))}
             </div>
@@ -2183,7 +2190,7 @@ export default function AdminOrderDetailPage() {
         order={order}
         documents={orderDocuments}
         optionStatuses={optionStatuses}
-        onStatusChange={fetchOrder}
+        onStatusChange={refreshSilent}
       />
 
       {/* Order Timeline — ultimul, cerere user */}
@@ -2232,7 +2239,7 @@ export default function AdminOrderDetailPage() {
         orderNumber={displayOrderNumber}
         initialOptions={(order.selected_options ?? []) as Parameters<typeof ModifyOrderDialog>[0]['initialOptions']}
         initialDeliveryPrice={Number(order.delivery_price ?? 0)}
-        onApplied={fetchOrder}
+        onApplied={refreshSilent}
       />
 
     </div>
