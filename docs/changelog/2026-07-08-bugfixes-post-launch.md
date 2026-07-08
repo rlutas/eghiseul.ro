@@ -339,6 +339,28 @@ tab-ul În procesare, audit în istoric, revenire automată pe `paid` la final.
   „Actualizează Status" (cu notă + avertismente) rămâne mai jos pentru
   tranzițiile care au nevoie de context. Cerință echipă.
 
+## 25. 🧹 Val de curățenie pe pagina de comandă din admin (feedback echipă, pe comenzi reale)
+
+Toate verificate live pe producție (E-260708-VC4GH, E-260708-QFVFY, E-260708-YQM7S):
+
+- **Layout**: cardul „Actualizează Status" eliminat (înlocuit de dropdown-ul
+  din header); „Detalii Serviciu" mutat lângă Note Echipă; la comenzile cu
+  imobil (CF/cadastru) „Date imobil" e în coloana dreaptă cu **Facturarea
+  imediat sub el**.
+- **Informații Client (PJ)**: Nr. Reg. Com. + Validare ANAF + Sediu social
+  grupate sus, sub CUI; blocul duplicat de firmă de sub „Cont eGhișeul"
+  eliminat.
+- **Constatator pe firmă**: Informații Client arată firma-țintă („Firmă
+  (constatator)" + denumire/CUI/Reg.Com./ANAF/sediu), nu „Persoana Fizica /
+  N/A"; rândul „Tip document" combinat (dispărut dublul „de bază").
+- **Servicii instant** (constatator, extras CF/plan cadastral): rândurile
+  Urgenta / Metoda livrare / Termen estimat ascunse din Detalii Serviciu;
+  cardul „Livrare" ascuns complet la livrări doar-email fără semnal fizic
+  (adresă/curier/AWB îl readuc).
+- **Fix listă comenzi**: dropdown-ul „Filtrare după serviciu" era gol —
+  `/api/services` întoarce `{ data: { services } }`, pagina citea `data`
+  direct ca array. Acum listează toate cele 30 de servicii.
+
 ## Rămase în coadă (nefăcute)
 
 - Email confirmare comandă către client (nu se trimite — port din sister).
