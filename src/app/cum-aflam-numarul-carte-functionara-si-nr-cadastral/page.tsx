@@ -8,7 +8,7 @@ const DESCRIPTION =
   'Cum afli numărul de carte funciară și numărul cadastral al unui imobil: din actul de proprietate, ' +
   'dintr-un extras CF mai vechi sau după adresă. Ghid complet + unde apar aceste numere în extras.';
 const DATE_PUBLISHED = '2023-12-01';
-const DATE_MODIFIED = '2026-06-16';
+const DATE_MODIFIED = '2026-07-08';
 
 export const revalidate = 86400;
 
@@ -29,7 +29,7 @@ export default function Page() {
       datePublished={DATE_PUBLISHED}
       dateModified={DATE_MODIFIED}
       publishedLabel="decembrie 2023"
-      updatedLabel="16 iunie 2026"
+      updatedLabel="8 iulie 2026"
       relatedServices={[
         { slug: 'identificare-imobil', label: 'Identificare Imobil după Adresă', desc: 'Nu știi numărul cadastral? Îl aflăm noi după adresă.' },
         { slug: 'extras-carte-funciara', label: 'Extras de Carte Funciară', desc: 'Document ANCPI, livrat pe email în câteva minute.' },
@@ -40,6 +40,7 @@ export default function Page() {
         { q: 'Care e diferența dintre numărul cadastral și numărul de carte funciară?', a: 'Numărul cadastral este codul unic atribuit unității de proprietate pentru identificare geografică și administrativă. Numărul de carte funciară identifică înregistrarea imobilului în registrul de publicitate imobiliară. Ambele apar în extrasul de carte funciară.' },
         { q: 'Cum aflu numărul cadastral după adresă?', a: 'Dacă ai doar adresa, prin serviciul de Identificare Imobil aflăm parcela/construcția și numărul de carte funciară, apoi îți eliberăm extrasul CF.' },
         { q: 'Unde găsesc numărul cadastral într-un extras de carte funciară?', a: 'În Partea I a extrasului (descrierea imobilului) — acolo apar numărul cadastral și suprafața. Numărul de carte funciară apare în antetul extrasului, alături de localitate.' },
+        { q: 'Cât costă identificarea imobilului dacă nu am numărul de carte funciară?', a: 'Identificarea imobilului costă 163,64 lei + TVA — același preț și după adresă, și după numele proprietarului. În ambele cazuri primești numărul de carte funciară al imobilului, apoi poți comanda extrasul CF.' },
       ]}
     >
       <p>
@@ -79,6 +80,33 @@ export default function Page() {
         apoi îți eliberăm extrasul de carte funciară. Astfel afli numărul cadastral fără să cauți prin acte vechi sau
         să te deplasezi la sediul OCPI.
       </p>
+
+      {/* CTA — direct în formularele de comandă (cerere echipă): cine nu are
+          numărul CF nu trebuie să caute mai departe prin articol. */}
+      <div className="not-prose my-8 rounded-2xl border border-primary-200 bg-primary-50/60 p-6">
+        <p className="text-lg font-bold text-secondary-900 mb-1">
+          Nu ai numărul de carte funciară sau nu-l găsești?
+        </p>
+        <p className="text-sm text-neutral-700 mb-4 leading-relaxed">
+          Îl aflăm noi pentru tine, direct de la OCPI — pornind de la <strong>adresa imobilului</strong> sau de
+          la <strong>numele proprietarului</strong>. Ambele variante costă <strong>163,64 lei + TVA</strong>.
+          Primești identificarea imobilului cu numărul de carte funciară, apoi putem elibera și extrasul CF.
+        </p>
+        <div className="flex flex-wrap gap-3">
+          <Link
+            href="/comanda/identificare-imobil/"
+            className="inline-flex items-center justify-center rounded-xl bg-primary-500 hover:bg-primary-600 px-5 py-3 text-sm font-semibold text-secondary-900 transition-colors"
+          >
+            Identificare după adresă — 163,64 lei + TVA
+          </Link>
+          <Link
+            href="/comanda/identificare-imobile-proprietar/"
+            className="inline-flex items-center justify-center rounded-xl border border-primary-400 bg-white hover:bg-primary-50 px-5 py-3 text-sm font-semibold text-secondary-900 transition-colors"
+          >
+            Identificare după proprietar — 163,64 lei + TVA
+          </Link>
+        </div>
+      </div>
 
       <h2>Cum identifici numărul în practică, dintr-un extras vechi</h2>
       <p>

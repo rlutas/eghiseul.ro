@@ -3,12 +3,12 @@ import { buildPageMetadata, serviceUrl } from '@/lib/seo';
 import { ArticleLayout } from '@/components/articole/article-layout';
 
 const SLUG = 'cele-4-tipuri-de-certificat-constatator-online';
-const TITLE = 'Cele 4 Tipuri de Certificat Constatator Online';
+const TITLE = 'Tipurile de Certificat Constatator Online — Ghid Actualizat';
 const DESCRIPTION =
-  'Cele 4 tipuri principale de certificat constatator emise de ONRC: furnizare informații, ' +
-  'de bază, pentru fonduri IMM și pentru insolvență — ce conține fiecare, când îl folosești și cum îl obții online.';
+  'Tipurile de certificat constatator pe care le poți comanda online: pe firmă (de bază, fonduri IMM, insolvență), ' +
+  'pe persoană fizică și cu istoric — ce conține fiecare, pentru ce scopuri îl folosești, cât costă și cum îl primești pe email, 24/7.';
 const DATE_PUBLISHED = '2024-01-01';
-const DATE_MODIFIED = '2026-06-16';
+const DATE_MODIFIED = '2026-07-08';
 
 export const revalidate = 86400;
 
@@ -29,16 +29,17 @@ export default function Page() {
       datePublished={DATE_PUBLISHED}
       dateModified={DATE_MODIFIED}
       publishedLabel="ianuarie 2024"
-      updatedLabel="16 iunie 2026"
+      updatedLabel="8 iulie 2026"
       relatedServices={[
         { slug: 'certificat-constatator', label: 'Certificat Constatator ONRC', desc: 'Obține certificatul constatator online, fără drum la ghișeu.' },
         { href: '/eliberare-certificat-constatator-onrc-ghid/', label: 'Ghid eliberare certificat constatator', desc: 'Pașii compleți pentru obținere de la ONRC.' },
       ]}
       faqs={[
-        { q: 'Câte tipuri de certificat constatator există?', a: 'La ONRC există patru variante principale: furnizare informații, certificatul de bază, cel pentru fonduri IMM și cel pentru insolvență. Prin eGhișeul îl poți comanda în trei forme: pe firmă, pe persoană fizică și cu istoric.' },
+        { q: 'Câte tipuri de certificat constatator există?', a: 'Pe firmă (CUI) există trei rapoarte: certificatul constatator de bază, cel pentru fonduri IMM și cel pentru insolvență. Separat, poți comanda certificat constatator pe persoană fizică (CNP) și certificat constatator cu istoric.' },
         { q: 'Ce este certificatul constatator?', a: 'Este un document emis de ONRC care servește drept dovadă legală a diferitelor aspecte ale unei companii: date de identificare, coduri CAEN, administratori, asociați și statutul firmei.' },
-        { q: 'Ce tip de certificat constatator îmi trebuie?', a: 'Depinde de scop: pentru bănci/ANAF/licitații — cel de bază; pentru fonduri europene — cel pentru IMM; pentru insolvență — cel cu situații financiare. La eGhișeul alegi între pe firmă, pe persoană fizică sau cu istoric.' },
-        { q: 'Cum obțin certificatul constatator online?', a: 'Accesezi pagina serviciului, completezi datele firmei (denumire, nr. ONRC, CUI), alegi tipul de certificat, plătești online și primești documentul pe email.' },
+        { q: 'Ce tip de certificat constatator îmi trebuie?', a: 'Pentru licitații, bănci, notar, viză, leasing, instanță sau ANAF/TVA — cel de bază. Pentru accesare de fonduri europene/IMM (AFIR, APIA, ministere, primărie) — cel pentru fonduri IMM. Pentru licitație, notar sau tribunal în context de insolvență — cel pentru insolvență. Pentru verificarea unei persoane (asociat/administrator) — cel pe persoană fizică. Pentru istoricul complet al firmei — cel cu istoric.' },
+        { q: 'Cât costă certificatul constatator online?', a: 'Certificatul constatator pe firmă (de bază, fonduri IMM sau insolvență) și cel pe persoană fizică costă 73,55 lei + TVA. Certificatul constatator cu istoric costă 402,48 lei + TVA.' },
+        { q: 'Cât durează eliberarea certificatului constatator?', a: 'Certificatul de bază, cel pe persoană fizică și cel cu istoric se emit automat, de obicei în câteva minute, 24/7 — inclusiv noaptea și în weekend. Rapoartele pentru fonduri IMM și insolvență trec prin backoffice-ul ONRC și durează de regulă până la 24 de ore lucrătoare.' },
       ]}
     >
       <p>
@@ -57,33 +58,94 @@ export default function Page() {
         fiind folosit în diverse contexte comerciale și legale.
       </p>
 
-      <h2>Tipuri de Certificat Constatator</h2>
-      <h3>1. Furnizare informații</h3>
+      <h2>Tipurile de Certificat Constatator (actualizat 2026)</h2>
       <p>
-        Certificatul constatator furnizare informații oferă o imagine detaliată asupra firmei, incluzând datele de
-        identificare precum denumirea firmei, forma juridică, numărul ONRC, CUI, adresa sediului social și statusul
-        firmei. De asemenea, acesta include informații sumarizate despre codurile CAEN și detaliile legate de
-        administratori sau asociați.
+        În formularul nostru de comandă alegi întâi <strong>subiectul</strong> certificatului — firmă (CUI),
+        persoană fizică (CNP) sau firmă cu istoric — iar pentru firmă alegi apoi <strong>tipul de raport</strong>:
+        de bază, pentru fonduri IMM sau pentru insolvență. Mai jos găsești fiecare variantă, cu scopurile exacte
+        acceptate de ONRC și prețul.
       </p>
-      <h3>2. Certificat constatator de bază</h3>
+
+      <h3>1. Certificat constatator de bază (pe firmă) — 73,55 lei + TVA</h3>
       <p>
-        Certificatul constatator de bază este necesar pentru interacțiunea cu băncile, ANAF sau CNAS și este
-        indispensabil pentru companiile care doresc să acceseze fonduri europene, să obțină autorizații diverse, să
-        participe la licitații publice sau să se înregistreze ca plătitoare de TVA. Acest tip de certificat oferă
-        informații detaliate legate de modificările înregistrate la Registrul Comerțului.
+        Cel mai cerut tip: situația la zi a societății (date de identificare, sediu, coduri CAEN,
+        administratori/asociați, statut). Scopurile acceptate includ: <strong>licitație, bancă, leasing, birou
+        notar public, obținere viză, ambasadă, instanță, parchet, poliție, eliberare cazier judiciar, ANAF /
+        Administrația Finanțelor Publice, înregistrare în scopuri de TVA, Registrul Operatorilor Intracomunitari,
+        autorizare, ARR, RAR, vamă, CNAS, Casa de Pensii, OCPI, primărie, informare</strong> și altele.
+        Se emite <strong>automat, de obicei în câteva minute, 24/7</strong> — inclusiv noaptea și în weekend.
       </p>
-      <h3>3. Certificat Constatator pentru Fonduri IMM</h3>
       <p>
-        Diferit de certificatul de bază, certificat constatator pentru fonduri IMM este destinat întreprinderilor
-        mici și mijlocii care doresc să acceseze fonduri europene sau granturi. Acesta include, pe lângă datele de
-        identificare, informații despre acționari/asociați și detalii financiare, cum ar fi mărimea capitalului
-        social și situația financiară actuală.
+          <Link
+            href="/comanda/certificat-constatator/"
+            className="not-prose inline-flex items-center justify-center rounded-xl bg-primary-500 hover:bg-primary-600 px-5 py-2.5 text-sm font-semibold text-secondary-900 transition-colors no-underline"
+          >
+            Comandă certificat de bază — 73,55 lei + TVA
+          </Link>
       </p>
-      <h3>4. Certificat Constatator pentru Insolvență</h3>
+
+      <h3>2. Certificat constatator pentru fonduri IMM (pe firmă) — 73,55 lei + TVA</h3>
       <p>
-        Certificat Constatator pentru insolvență este crucial în deschiderea procedurii de insolvență. Este
-        solicitat de instanțele judecătorești sau notarii publici și include, pe lângă informațiile de bază,
-        situațiile financiare anuale, cum ar fi cifra de afaceri, profitul și pierderile.
+        Destinat firmelor care accesează <strong>fonduri europene sau granturi</strong>. Scopuri acceptate:
+        <strong> Accesare Fonduri Europene, Fonduri IMM, APIA (Agenția de Plăți și Intervenții în Agricultură),
+        AFIR, Ministerul Muncii, Ministerul Economiei, primărie</strong>. Include, pe lângă datele de identificare,
+        informații despre acționari/asociați și capital. Trece prin backoffice-ul ONRC — îl primești de regulă în
+        <strong> maximum 24 de ore lucrătoare</strong>.
+      </p>
+      <p>
+          <Link
+            href="/comanda/certificat-constatator/"
+            className="not-prose inline-flex items-center justify-center rounded-xl bg-primary-500 hover:bg-primary-600 px-5 py-2.5 text-sm font-semibold text-secondary-900 transition-colors no-underline"
+          >
+            Comandă certificat fonduri IMM — 73,55 lei + TVA
+          </Link>
+      </p>
+
+      <h3>3. Certificat constatator pentru insolvență (pe firmă) — 73,55 lei + TVA</h3>
+      <p>
+        Necesar în procedurile de insolvență. Scopuri acceptate: <strong>licitație, birou notar public,
+        tribunal</strong>. Include, pe lângă informațiile de bază, situațiile financiare anuale (cifră de afaceri,
+        profit/pierderi). Se eliberează prin backoffice-ul ONRC, de regulă în <strong>maximum 24 de ore
+        lucrătoare</strong>.
+      </p>
+      <p>
+          <Link
+            href="/comanda/certificat-constatator/"
+            className="not-prose inline-flex items-center justify-center rounded-xl bg-primary-500 hover:bg-primary-600 px-5 py-2.5 text-sm font-semibold text-secondary-900 transition-colors no-underline"
+          >
+            Comandă certificat pentru insolvență — 73,55 lei + TVA
+          </Link>
+      </p>
+
+      <h3>4. Certificat constatator Persoană Fizică (CNP) — 73,55 lei + TVA</h3>
+      <p>
+        Verifică dacă o <strong>persoană fizică</strong> deține calitatea de asociat, acționar sau administrator în
+        firme înregistrate la Registrul Comerțului. Scopuri acceptate: <strong>informare, ANAF / Administrația
+        Finanțelor Publice, înregistrare în scopuri de TVA, eliberare cazier judiciar, poliție, autorizare, AFIR,
+        primărie</strong> și altele. Se emite <strong>automat, în câteva minute, 24/7</strong>.
+      </p>
+      <p>
+          <Link
+            href="/comanda/certificat-constatator/"
+            className="not-prose inline-flex items-center justify-center rounded-xl bg-primary-500 hover:bg-primary-600 px-5 py-2.5 text-sm font-semibold text-secondary-900 transition-colors no-underline"
+          >
+            Comandă certificat persoană fizică — 73,55 lei + TVA
+          </Link>
+      </p>
+
+      <h3>5. Certificat constatator cu istoric — 402,48 lei + TVA</h3>
+      <p>
+        Include <strong>istoricul modificărilor firmei</strong> — de la înființare până în prezent sau pe o perioadă
+        aleasă de tine. Util în litigii, due diligence, succesiuni sau verificări amănunțite ale unui partener de
+        afaceri. Se emite <strong>automat, în câteva minute, 24/7</strong>.
+      </p>
+      <p>
+          <Link
+            href="/comanda/certificat-constatator/"
+            className="not-prose inline-flex items-center justify-center rounded-xl bg-primary-500 hover:bg-primary-600 px-5 py-2.5 text-sm font-semibold text-secondary-900 transition-colors no-underline"
+          >
+            Comandă certificat cu istoric — 402,48 lei + TVA
+          </Link>
       </p>
 
       <h2>Rolul eGhișeul în Simplificarea Procurării Certificatelor</h2>
@@ -174,22 +236,10 @@ export default function Page() {
         constatator reprezintă o componentă vitală pentru succesul și integritatea oricărei afaceri.
       </p>
 
-      <h2>Actualizare 2026 — cum comanzi certificatul constatator prin eGhișeul</h2>
       <p>
-        Cele patru tipuri de mai sus descriu <strong>scopurile</strong> clasice ale certificatului constatator emis
-        de ONRC. În practică, prin eGhișeul comanzi certificatul în funcție de <strong>subiectul</strong> lui, în
-        trei forme:
-      </p>
-      <ul>
-        <li><strong>Certificat Constatator pe Firmă</strong> — situația la zi a unei societăți (date de identificare, sediu, coduri CAEN, administratori/asociați). Acoperă scopurile „furnizare informații”, „de bază” și „fonduri IMM” descrise mai sus.</li>
-        <li><strong>Certificat Constatator Persoană Fizică</strong> — verifică dacă o persoană fizică deține calitatea de asociat/administrator în firme înregistrate la Registrul Comerțului.</li>
-        <li><strong>Certificat Constatator cu Istoric</strong> — include istoricul modificărilor firmei (de la înființare sau pe o perioadă aleasă), util în litigii, due diligence sau verificări amănunțite.</li>
-      </ul>
-      <p>
-        Indiferent de tipul de care ai nevoie, îl poți obține 100% online prin serviciul nostru de{' '}
-        <Link href={serviceUrl('certificat-constatator')}>certificat constatator</Link> — completezi datele, plătești
-        securizat și primești documentul pe email. Vezi pagina serviciului și{' '}
-        <Link href="/servicii/certificat-constatator-online/">comanzi certificatul constatator online</Link> în câțiva pași.
+        Indiferent de tipul de care ai nevoie, îl obții 100% online prin serviciul nostru de{' '}
+        <Link href={serviceUrl('certificat-constatator')}>certificat constatator</Link>: completezi datele, plătești
+        securizat cu cardul și primești documentul pe email — fără drumuri la ONRC și fără program de ghișeu.
       </p>
     </ArticleLayout>
   );
