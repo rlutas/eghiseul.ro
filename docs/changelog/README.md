@@ -4,7 +4,7 @@
  
  | Data | Ce s-a livrat | Detalii |
  |---|---|---|
- | 2026-07-08 | 🔴 Bugfix-uri post-lansare (facturare kill-switch → EGH-0001, note/istoric admin, bypass selfie KYC, date imobil/stare civilă vizibile, DHL manual + copiază adresa, WhatsApp scos din admin) + 🟣 Extras Multilingv standalone 799 (migrațiile 093-096) | [2026-07-08-bugfixes-post-launch.md](2026-07-08-bugfixes-post-launch.md) |
+ | 2026-07-08 | 🔴 Bugfix-uri post-lansare, 27 secțiuni + TL;DR (facturare kill-switch → EGH-0001; incident workeri 19h; KYC cazier PJ — migrarea 100; 🟣 **„Solicită documente"** multi-doc cu auto-standby — migrațiile 101-102; env vercel.app/SSO reparat; emailuri branded; build-uri limitate; admin detail reorganizat; status client: chitanță+note interne ascunse, timeline curat RO) + 🟣 Extras Multilingv standalone 799 (migrațiile 093-096) | [2026-07-08-bugfixes-post-launch.md](2026-07-08-bugfixes-post-launch.md) |
  | 2026-07-02 | Termen standard cazier/integritate 2-4 → 3-5 zile (urgentul 1-2 devine atractiv) — migrație 091 + conținut SEO cluster cazier | [2026-07-02-cazier-standard-term-3-5.md](2026-07-02-cazier-standard-term-3-5.md) |
  | 2026-07-02 | Formular de contact pe `/contact` (honeypot + rate-limit → email Resend + DB `contact_messages`) + linkuri header/footer | [2026-07-02-contact-form.md](2026-07-02-contact-form.md) |
  | 2026-06-25 | Fix ANAF: firmă cu sediu transferat („TRANSFER(SOSIRE)") marcată greșit inactivă → constatator blocat | [anaf-firma-activa-transfer](2026-06-25-anaf-firma-activa-transfer.md) |

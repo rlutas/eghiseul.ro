@@ -3,6 +3,18 @@
 Prima zi întreagă LIVE. Bugurile au venit din utilizare reală (echipă + clienți).
 Fiecare secțiune: **ce era stricat → ce s-a făcut → ce rămâne de verificat**.
 
+## TL;DR — harta zilei (62 commit-uri)
+
+| Zonă | Secțiuni | Esența |
+|------|----------|--------|
+| **Facturare & note echipă** | §1–5 | kill-switch Oblio găsit → EGH-0001; istoric/note reparate (coloane inexistente) |
+| **Multilingv & servicii** | §6–13 | Extras Multilingv standalone (migrațiile 096-097), pricing, specimene |
+| **Admin layout & feedback** | §14–15, §22–25, §27 | pagina de comandă reorganizată pe feedback live, dropdown rapid status, Date imobil în Detalii Serviciu |
+| **Workeri ONRC/ANCPI** | §16–17 | incident 19h (SOURCE_API_URL pe vercel.app/SSO) → fix + livrare cap-coadă |
+| **KYC & Solicită documente** | §18–19, §22 | cazier PJ cere buletin+selfie (migrarea 100); sistem nou multi-document cu auto-standby (101+102), ciclu real confirmat |
+| **Infrastructură & cost** | §20–21 | env-uri vercel.app reparate; emailuri branded; build-uri limitate (ignoreCommand + fără preview) |
+| **Status client (public)** | §26 | chitanța ANCPI ascunsă, note interne filtrate, timeline dedupat RO, footer + badge verde pe documentul livrat |
+
 ---
 
 ## 1. 🔴 Facturile nu se emiteau pe comenzile plătite
@@ -360,6 +372,54 @@ Toate verificate live pe producție (E-260708-VC4GH, E-260708-QFVFY, E-260708-YQ
 - **Fix listă comenzi**: dropdown-ul „Filtrare după serviciu" era gol —
   `/api/services` întoarce `{ data: { services } }`, pagina citea `data`
   direct ca array. Acum listează toate cele 30 de servicii.
+
+## 26. 🔒✨ Pagina publică de status — confidențialitate + polish (pe E-260708-YQM7S)
+
+- **🚨 Chitanța ANCPI nu mai apare clientului** — worker-ul o atașa cu
+  `visible_to_client=true`; e document intern (contabilitate). Cod + rândul
+  existent corectate; în admin rămâne vizibilă.
+- **🚨 Notele interne filtrate din timeline** — `note_added` ajungea la client
+  (inclusiv „Contact actualizat de echipă — telefon: …"). Evenimentele interne
+  (note, admin_action, reupload_requested, kyc_photo_resubmitted) sunt excluse
+  din API-ul public.
+- **Timeline curat, fiecare etapă O dată**: Comandă plasată → În așteptarea
+  plății → Documente generate → Plată confirmată → Documentul este eliberat →
+  Finalizat. Dedup pe etapă + „paid" pliat în „Plată confirmată" — zero
+  statusuri netraduse.
+- **Footer-ul site-ului** adăugat pe pagina de status (root layout-ul aduce
+  doar header-ul).
+- **Badge verde DOAR pe documentul livrat** (extras CF, constatator, document
+  final/colaborator) — contractele/cererile au iconiță neutră.
+
+## 27. 🧹 Admin — Istoric în română + Date imobil unificat + termen ascuns la final
+
+- **Toate evenimentele din „Istoric comanda" au etichete RO** (note_added →
+  „Nota echipa", reupload_requested → „Documente solicitate clientului",
+  kyc_photo_resubmitted, payment_received, modified, shipped, delivered,
+  cancelled, refunded, extra_payment_*, kyc_verified…) + status
+  `pending_payment` la badge-uri; fallback-urile umanizate. Adminul păstrează
+  intenționat istoricul COMPLET (audit) — doar clientul vede varianta curată.
+- **„Date imobil" e sub-secțiune ÎN cardul Detalii Serviciu** (același chenar),
+  nu card separat — la CF/cadastru totul despre serviciu e într-un singur loc.
+- **„Termen estimat" din header ascuns** la statusurile terminale (Finalizată/
+  Livrată/Anulată/Rambursată) — deadline pe comandă terminată e zgomot.
+
+## Cum funcționăm de azi (procese noi, pe scurt)
+
+1. **Documente lipsă de la client** → buton „Solicită documente" pe comandă
+   (pre-bifat ce cere serviciul) → email + banner pe status cu link → comanda
+   stă în „Așteptare client" (SLA pauzat, vizibilă în În procesare) → la
+   upload complet revine SINGURĂ pe statusul anterior + email pe contact@.
+   Ghid echipă: `docs/admin/mesaj-echipa-solicita-documente.md`.
+2. **Start procesare** → „Generează" pe cerere/împuternicire mută automat
+   comanda din Plătită în În procesare (fără click separat).
+3. **Schimbare status** → dropdown-ul din header-ul comenzii (instant, cu
+   confirm pe terminale).
+4. **Deploy-uri** → cod pe LOTURI (un push per lot); docs/migrări/`.claude` nu
+   mai declanșează build; preview-urile nu se mai construiesc deloc
+   (`vercel build && vercel deploy --prebuilt` la nevoie).
+5. **Debugging „link mort în email"** → verifică ÎNTÂI host-ul: orice
+   `eghiseul-ro.vercel.app` = login wall SSO; publicul e `https://eghiseul.ro`.
 
 ## Rămase în coadă (nefăcute)
 
