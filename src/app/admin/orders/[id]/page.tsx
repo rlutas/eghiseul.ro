@@ -242,7 +242,16 @@ function extractCustomerData(cd: AnyObj | null) {
   // service literally requires PJ data — e.g., Certificat constatator PJ),
   // OR clientType is explicitly 'pj' in customer_data.
   const explicitPJ = cd.clientType === 'pj';
-  const hasCompanyKyc = !!cd.companyData?.uploadedDocuments?.length || !!cd.companyKyc;
+  // Company-KYC evidence lives under cd.company for the modular wizard (PJ
+  // cazier writes company.cui/companyName/uploadedDocuments there — checking
+  // only companyData/companyKyc mis-labeled those orders as PF). Constatator
+  // is excluded: its cd.company is the TARGET firm looked up by a (possibly
+  // PF) customer, and it gets its own firm badge downstream.
+  const hasCompanyKyc =
+    !!cd.companyData?.uploadedDocuments?.length ||
+    !!cd.companyKyc ||
+    (!cd.constatator &&
+      !!(cd.company?.cui || cd.company?.companyName || cd.company?.uploadedDocuments?.length));
   const clientType: string = explicitPJ || hasCompanyKyc ? 'pj' : 'pf';
 
   // Separate flag for the "PF customer wants invoice issued to a company"
@@ -1120,6 +1129,7 @@ export default function AdminOrderDetailPage() {
           <CardContent className="space-y-3">
             <InfoRow label="Tip persoana" value={isPJ ? 'Persoana Juridica' : 'Persoana Fizica'} />
             <InfoRow label="Nume" value={customerName} icon={isPJ ? <Building2 className="h-3.5 w-3.5" /> : <User className="h-3.5 w-3.5" />} />
+            {isPJ && company?.cui && <InfoRow label="CUI" value={String(company.cui)} />}
             {contact?.email && <InfoRow label="Email" value={contact.email} icon={<Mail className="h-3.5 w-3.5" />} />}
             {contact?.phone && (
               <div className="flex items-center justify-between gap-4 text-sm">
