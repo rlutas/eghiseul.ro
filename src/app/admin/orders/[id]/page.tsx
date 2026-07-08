@@ -3187,7 +3187,7 @@ function AwbSection({
           <p className="font-semibold">AWB manual ({provider.toUpperCase()})</p>
           <p className="mt-1 text-xs">
             Generarea automată de AWB funcționează doar pentru Fan Courier și Sameday. Pentru acest
-            curier, expedierea se face manual — folosește adresa de livrare de mai sus (buton „Copiază adresa").
+            curier, expedierea se face manual — folosește adresa de livrare de mai sus (buton „Copiază adresa”).
           </p>
         </div>
       </>
