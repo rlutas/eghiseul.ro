@@ -1,9 +1,18 @@
+'use client';
+
+import { usePathname } from 'next/navigation';
+
 const WHATSAPP =
   'https://wa.me/40757708181?text=' +
   encodeURIComponent('Bună ziua! Aș dori informații despre serviciile eGhișeul.ro.');
 
-/** Fixed WhatsApp button, bottom-right, site-wide. */
+/** Fixed WhatsApp button, bottom-right, site-wide — hidden on the admin and
+ *  collaborator portals (internal tools; it overlapped admin action buttons). */
 export function WhatsAppFloat() {
+  const pathname = usePathname();
+  if (pathname.startsWith('/admin') || pathname.startsWith('/colaborator')) {
+    return null;
+  }
   return (
     <a
       href={WHATSAPP}

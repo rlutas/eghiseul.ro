@@ -78,6 +78,11 @@ export const DB_SLUGS_WITH_HARDCODED_PAGE = [
   'certificat-celibat',
   'certificat-constatator',
   'certificat-integritate',
+  // Extras multilingv standalone (migrarea 096): slug-ul DB == folderul
+  // paginii hand-tuned, deci pagina dinamică /servicii/[slug] nu trebuie
+  // să dubleze conținutul.
+  'extras-multilingv-certificat-nastere',
+  'extras-multilingv-certificat-casatorie',
 ] as const;
 
 /**

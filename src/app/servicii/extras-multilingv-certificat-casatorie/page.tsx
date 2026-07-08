@@ -46,7 +46,7 @@ const FAQS = [
   { q: 'Înlocuiește traducerea și apostila?', a: 'În interiorul Uniunii Europene, formularul standard multilingv elimină nevoia de traducere și de apostilă pentru certificatul de căsătorie. Pentru țări din afara UE rămâne necesară apostila de la Haga + traducerea legalizată.' },
   { q: 'Când am nevoie de el?', a: 'Când prezinți certificatul de căsătorie unei autorități dintr-un alt stat UE: permis de ședere, regim matrimonial, dosare administrative, recunoașterea căsătoriei în altă țară.' },
   { q: 'De unde se obține?', a: 'De la serviciul de stare civilă al primăriei care deține actul de căsătorie, eliberat împreună cu certificatul/duplicatul. Prin eGhișeul.ro depunem cererea în numele tău și îți livrăm documentul, fără drum la ghișeu.' },
-  { q: 'Cât costă și cât durează?', a: 'Taxa de stare civilă este mică (sau gratuită la prima eliberare). Termenul depinde de primărie; îți comunicăm estimarea la plasarea comenzii.' },
+  { q: 'Cât costă și cât durează?', a: "Serviciul complet costă 799 RON (include onorariul avocatului partener și depunerea cererii). Termenul depinde de oficiul de stare civilă care deține actul; îți comunicăm estimarea la plasarea comenzii." },
 ];
 
 export default function ExtrasMultilingvCasatoriePage() {
@@ -79,14 +79,14 @@ export default function ExtrasMultilingvCasatoriePage() {
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
               <Link
-                href="/comanda/certificat-casatorie/"
+                href="/comanda/extras-multilingv-certificat-casatorie/"
                 className="inline-flex items-center gap-2 rounded-xl bg-primary-500 px-6 py-3 font-bold text-secondary-900 shadow-[0_6px_14px_rgba(236,185,95,0.35)] transition-colors hover:bg-primary-600"
               >
                 Comandă acum
                 <ChevronRight className="h-4 w-4" aria-hidden="true" />
               </Link>
               <span className="inline-flex items-center rounded-xl border border-white/20 bg-white/5 px-4 py-3 text-sm text-white/80">
-                În formular, bifează opțiunea „Extras Multilingv” (+399 RON)
+                799 RON — totul inclus, depunem cererea în numele tău
               </span>
             </div>
           </div>
@@ -124,17 +124,17 @@ export default function ExtrasMultilingvCasatoriePage() {
             </div>
 
             <div className="not-prose my-8 rounded-2xl border border-primary-200 bg-primary-50/60 p-6">
-              <p className="font-bold text-secondary-900">Cum comanzi extrasul multilingv</p>
+              <p className="font-bold text-secondary-900">Cum comanzi — serviciu complet, 799 RON</p>
               <ol className="mt-2 list-decimal space-y-1 pl-5 text-sm text-neutral-700">
-                <li>Pornește comanda pentru <strong>certificatul de căsătorie</strong> (butonul de mai jos).</li>
-                <li>La pasul „Opțiuni”, bifează <strong>„Extras Multilingv” (+399 RON)</strong>.</li>
-                <li>Primești certificatul împreună cu extrasul multilingv.</li>
+                <li>Completezi formularul online (date personale + datele actului de căsătorie).</li>
+                <li>Semnezi electronic împuternicirea — depunem noi cererea la starea civilă.</li>
+                <li>Primești extrasul multilingv electronic și/sau prin curier, oriunde în lume.</li>
               </ol>
               <Link
-                href="/comanda/certificat-casatorie/"
+                href="/comanda/extras-multilingv-certificat-casatorie/"
                 className="mt-4 inline-flex items-center gap-2 rounded-xl bg-primary-500 px-6 py-3 font-bold text-secondary-900 no-underline shadow-[0_6px_14px_rgba(236,185,95,0.35)] transition-colors hover:bg-primary-600"
               >
-                Comandă certificat + extras multilingv
+                Comandă extras multilingv — 799 RON
                 <ChevronRight className="h-4 w-4" aria-hidden="true" />
               </Link>
             </div>
