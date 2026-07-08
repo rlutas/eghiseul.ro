@@ -847,6 +847,24 @@ export default function AdminOrderDetailPage() {
                   Vezi ca clientul ↗
                 </a>
               )}
+              {order.friendly_order_id && (
+                <button
+                  type="button"
+                  title="Copiază linkul de status (pre-completat) pentru client"
+                  className="inline-flex items-center gap-1 rounded border border-neutral-200 px-1.5 py-0.5 text-xs font-medium text-slate-600 hover:bg-slate-50"
+                  onClick={async () => {
+                    const url = `${window.location.origin}/comanda/status/?order=${encodeURIComponent(order.friendly_order_id!)}&email=${encodeURIComponent((order.customer_data as AnyObj | null)?.contact?.email || '')}`;
+                    try {
+                      await navigator.clipboard.writeText(url);
+                      toast.success('Link status copiat');
+                    } catch {
+                      toast.error('Nu am putut copia');
+                    }
+                  }}
+                >
+                  <Copy className="h-3 w-3" /> Link status
+                </button>
+              )}
               {constatatorFirm ? (
                 <Badge variant="secondary" className="text-sm px-3 py-1">
                   <Building2 className="h-3.5 w-3.5 mr-1" />
@@ -1007,14 +1025,6 @@ export default function AdminOrderDetailPage() {
         </div>
       )}
 
-      {/* Link status comandă (ca și clientul) — pre-filled tracking URL the
-          team can copy/share with the customer (sister parity). */}
-      {order.friendly_order_id && (
-        <StatusLinkCard
-          friendlyOrderId={order.friendly_order_id}
-          email={(order.customer_data as AnyObj | null)?.contact?.email || ''}
-        />
-      )}
 
       {/* Note Echipă — moved to the top for parity with cazierjudiciaronline.com
           (prominent, right after the banners) so the team sees/writes notes
@@ -1026,15 +1036,59 @@ export default function AdminOrderDetailPage() {
       <div className="grid gap-4 lg:grid-cols-2">
         {/* LEFT column — contact info on top, personal/company data below */}
         <div className="space-y-4">
-        {/* Contact Info */}
+        {/* Informatii Client — contact + date personale într-un singur card
+            (paritate cazierjudiciaronline), cu Copy Sheet 1/2 sub titlu. */}
         <Card>
-          <CardHeader className="pb-3">
+          <CardHeader className="pb-3 space-y-2">
             <CardTitle className="text-base flex items-center gap-2">
-              <Mail className="h-4 w-4" />
-              Date contact
+              <User className="h-4 w-4" />
+              Informatii Client
             </CardTitle>
+            <div className="flex gap-1.5">
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-7 gap-1.5 text-xs"
+                title="Sheet 1 (clienți) — D:Nume E:Email F:CNP/CUI G:Serviciu H:Link I:Preț"
+                onClick={async () => {
+                  const idCode = isPJ
+                    ? String(company?.cui || billing?.cui || '').replace(/^RO/i, '')
+                    : String(personal?.cnp || billing?.cnp || '');
+                  const link = `${typeof window !== 'undefined' ? window.location.origin : 'https://eghiseul.ro'}/admin/orders/${order.id}`;
+                  const row = [customerName, contact?.email || '', idCode, sheetServiceLabel, link, sheetPrice].join('\t');
+                  try {
+                    await navigator.clipboard.writeText(row);
+                    toast.success('Sheet 1 copiat — paste în coloana D');
+                  } catch {
+                    toast.error('Nu am putut copia.');
+                  }
+                }}
+              >
+                <Copy className="h-3.5 w-3.5" />
+                Copy Sheet 1
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-7 gap-1.5 text-xs"
+                title="Sheet 2 (instituții) — D:Nume E:Email F:Preț G:Serviciu H:- I:Instituție J:Motiv"
+                onClick={async () => {
+                  const row = [customerName, contact?.email || '', sheetPrice, sheetServiceLabel, '-', sheetInstitution, sheetMotiv].join('\t');
+                  try {
+                    await navigator.clipboard.writeText(row);
+                    toast.success('Sheet 2 copiat — paste în coloana D');
+                  } catch {
+                    toast.error('Nu am putut copia.');
+                  }
+                }}
+              >
+                <Copy className="h-3.5 w-3.5" />
+                Copy Sheet 2
+              </Button>
+            </div>
           </CardHeader>
           <CardContent className="space-y-3">
+            <InfoRow label="Tip persoana" value={isPJ ? 'Persoana Juridica' : 'Persoana Fizica'} />
             <InfoRow label="Nume" value={customerName} icon={isPJ ? <Building2 className="h-3.5 w-3.5" /> : <User className="h-3.5 w-3.5" />} />
             {contact?.email && <InfoRow label="Email" value={contact.email} icon={<Mail className="h-3.5 w-3.5" />} />}
             {contact?.phone && (
@@ -1135,64 +1189,11 @@ export default function AdminOrderDetailPage() {
             {contact?.purpose && (
               <InfoRow label="Motivul solicitarii" value={String(contact.purpose)} />
             )}
-          </CardContent>
-        </Card>
-        {/* Client Details (PF or PJ) — hidden for services with no ID/company
-            data (extras CF, constatator); the billing party is shown elsewhere. */}
-        {(personal || company) && (
-        <Card>
-          <CardHeader className="pb-3 flex-row items-center justify-between space-y-0">
-            <CardTitle className="text-base flex items-center gap-2">
-              {isPJ ? <Building2 className="h-4 w-4" /> : <User className="h-4 w-4" />}
-              {isPJ ? 'Date firma' : 'Date personale'}
-            </CardTitle>
-            {/* Copy Sheet 1/2 — registrul manual al avocatei în Google Sheets
-                (paritate cazierjudiciaronline; temporar, până la registrul
-                cross-platform). TSV gata de paste în coloana D. */}
-            <div className="flex gap-1.5">
-              <Button
-                variant="outline"
-                size="sm"
-                className="h-7 gap-1.5 text-xs"
-                title="Sheet 1 (clienți) — D:Nume E:Email F:CNP/CUI G:Serviciu H:Link I:Preț"
-                onClick={async () => {
-                  const idCode = isPJ
-                    ? String(company?.cui || billing?.cui || '').replace(/^RO/i, '')
-                    : String(personal?.cnp || billing?.cnp || '');
-                  const link = `${typeof window !== 'undefined' ? window.location.origin : 'https://eghiseul.ro'}/admin/orders/${order.id}`;
-                  const row = [customerName, contact?.email || '', idCode, sheetServiceLabel, link, sheetPrice].join('\t');
-                  try {
-                    await navigator.clipboard.writeText(row);
-                    toast.success('Sheet 1 copiat — paste în coloana D');
-                  } catch {
-                    toast.error('Nu am putut copia.');
-                  }
-                }}
-              >
-                <Copy className="h-3.5 w-3.5" />
-                Copy Sheet 1
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                className="h-7 gap-1.5 text-xs"
-                title="Sheet 2 (instituții) — D:Nume E:Email F:Preț G:Serviciu H:- I:Instituție J:Motiv"
-                onClick={async () => {
-                  const row = [customerName, contact?.email || '', sheetPrice, sheetServiceLabel, '-', sheetInstitution, sheetMotiv].join('\t');
-                  try {
-                    await navigator.clipboard.writeText(row);
-                    toast.success('Sheet 2 copiat — paste în coloana D');
-                  } catch {
-                    toast.error('Nu am putut copia.');
-                  }
-                }}
-              >
-                <Copy className="h-3.5 w-3.5" />
-                Copy Sheet 2
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-3">
+
+            {/* Date personale / firmă — continuare în același card */}
+            {(personal || company) && (
+              <>
+                <Separator className="my-2" />
             {isPJ && company ? (
               <>
                 <InfoRow label="Denumire firma" value={company.companyName || 'N/A'} />
@@ -1366,9 +1367,10 @@ export default function AdminOrderDetailPage() {
                 {isPJ ? 'Nicio informatie despre firma.' : 'Nicio informatie personala.'}
               </p>
             )}
+              </>
+            )}
           </CardContent>
         </Card>
-        )}
 
         {/* Date stare civilă — for naștere/căsătorie/celibat orders. Renders
             customer_data.civil_status (marriage history, parents, birth name,
@@ -1392,10 +1394,24 @@ export default function AdminOrderDetailPage() {
           <CardHeader className="pb-3">
             <CardTitle className="text-base flex items-center gap-2">
               <FileText className="h-4 w-4" />
-              Serviciu si optiuni
+              Detalii Serviciu
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
+            {/* Urgenta + metoda livrare sus, ca pe sora */}
+            <InfoRow
+              label="Urgenta"
+              value={(() => {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const opts = (order.selected_options as any[] | null) || [];
+                const urgent = opts.find((o) => o?.code === 'urgenta' && !o?.bundledFor);
+                return urgent ? '⚡ Urgent' : 'Standard';
+              })()}
+            />
+            {deliveryMethodParsed?.name && (
+              <InfoRow label="Metoda livrare" value={String(deliveryMethodParsed.name)} />
+            )}
+            <p className="pt-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Servicii comandate</p>
             <InfoRow label="Serviciu" value={order.services?.name ? stripEntitySuffix(order.services.name) : 'N/A'} />
             {/* Motivul solicitării — critical operational info (goes on the
                 request to the institution). Sourced from whichever module
@@ -3382,57 +3398,6 @@ function AwbSection({
 }
 
 // ---------- Helper Components ----------
-
-/** „Link status comandă (ca și clientul)" — read-only pre-filled tracking URL
- *  with copy + open buttons. The team shares it with customers who ask for
- *  status (sister parity). */
-function StatusLinkCard({ friendlyOrderId, email }: { friendlyOrderId: string; email: string }) {
-  const [copied, setCopied] = useState(false);
-  const base = typeof window !== 'undefined' ? window.location.origin : 'https://eghiseul.ro';
-  const url = `${base}/comanda/status/?order=${encodeURIComponent(friendlyOrderId)}&email=${encodeURIComponent(email)}`;
-  return (
-    <Card>
-      <CardContent className="p-4">
-        <p className="flex items-center gap-1.5 text-sm font-semibold text-secondary-900">
-          🔗 Link status comandă (ca și clientul)
-        </p>
-        <p className="mt-0.5 text-xs text-muted-foreground">
-          Pagina de urmărire pre-completată. Dă-i share clientului dacă vrea statusul.
-        </p>
-        <div className="mt-2 flex items-center gap-2">
-          <input
-            readOnly
-            value={url}
-            onFocus={(e) => e.currentTarget.select()}
-            className="h-9 w-full rounded-md border border-neutral-200 bg-neutral-50 px-3 font-mono text-xs text-slate-700 outline-none"
-          />
-          <Button
-            variant="outline"
-            size="icon"
-            className="h-9 w-9 shrink-0"
-            title="Copiază linkul"
-            onClick={async () => {
-              try {
-                await navigator.clipboard.writeText(url);
-                setCopied(true);
-                setTimeout(() => setCopied(false), 2000);
-              } catch {
-                /* ignore */
-              }
-            }}
-          >
-            {copied ? <Check className="h-4 w-4 text-green-600" /> : <Copy className="h-4 w-4" />}
-          </Button>
-          <Button asChild variant="outline" size="icon" className="h-9 w-9 shrink-0" title="Deschide ca clientul">
-            <a href={url} target="_blank" rel="noreferrer">
-              <ExternalLink className="h-4 w-4" />
-            </a>
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
 
 /** One-click copy of the delivery address as an international shipping label
  *  (name / street / postal+city / region / country / phone) — for manual
