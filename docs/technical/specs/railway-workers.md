@@ -1,5 +1,8 @@
 # Workeri Railway — ONRC & ANCPI (overview)
 
+> ⚠️ **INCIDENT 2026-07-08:** ambii workeri au murit ~19h pentru că `SOURCE_API_URL` era setat pe `eghiseul-ro.vercel.app`, care a primit Vercel SSO la lansare. `SOURCE_API_URL` TREBUIE să fie `https://eghiseul.ro` (domeniul public). Debugging: joburi PENDING → verifică `system_heartbeats` primul.
+
+
 Avem **2 workeri persistenți pe Railway**, în **repo-uri separate** (NU în acest repo, NU pe Vercel/serverless). Fiecare automatizează un portal guvernamental: înlocuiește operatorul uman care depunea manual cererile. Comunică cu eghiseul.ro printr-un API securizat (coadă de stări + livrare PDF).
 
 > ⚠️ **Cel mai important: metoda de deploy DIFERĂ între cei doi workeri.** Vezi tabelul.

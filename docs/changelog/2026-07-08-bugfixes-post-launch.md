@@ -182,6 +182,30 @@ Layout nou, în ordinea fluxului de lucru (paritate + îmbunătățiri față de
   mod silent: acțiunile inline reîmprospătează datele fără să arunce pagina
   pe spinner (care te trimitea înapoi sus).
 
+## 16. 🚨 INCIDENT: workerii ONRC + ANCPI morți ~19h (rezolvat)
+
+- **Simptom:** constatator plătit (E-260708-QFVFY) stătea PENDING, nepreluat.
+  Heartbeat-urile ambilor workeri opriseră pe 07.07 ~17:00.
+- **Cauza:** workerii aveau în Railway `SOURCE_API_URL=https://eghiseul-ro.vercel.app`
+  (singura adresă a app-ului când au fost construiți, în iunie). La lansare,
+  vercel.app a fost pus pe **preview + SSO** (corect, anti-indexare) → SSO
+  blochează și API-ul → workerii primeau login wall în loc de joburi.
+  NU au fost de vină headerele de securitate sau RLS-ul.
+- **Fix:** `railway variables --set SOURCE_API_URL=https://eghiseul.ro` la
+  AMBII workeri (onrc + ancpi) → restart automat → jobul preluat și livrat
+  cap-coadă în ~10 min (RC 2714634, comandă completed, PDF la client).
+  ANCPI: zero joburi afectate (nu au intrat comenzi CF în fereastra moartă).
+- **Lecție (debugging viitor):** joburi ONRC/ANCPI care stau PENDING →
+  verifică ÎNTÂI `system_heartbeats`. Workerii depind de domeniul PUBLIC
+  (eghiseul.ro) — orice protecție pusă pe URL-ul din `SOURCE_API_URL` îi omoară.
+- **De făcut (propus):** alertă automată în cron-ul de health-check când un
+  heartbeat tace >10 min.
+
+## 17. UX admin: buton Reîncarcă pe Cozi ONRC/ANCPI
+
+- Soft refresh (`router.refresh()`) — reîmprospătează statusul joburilor fără
+  reload complet de pagină; echipa nu pierde poziția.
+
 ## Rămase în coadă (nefăcute)
 
 - Email confirmare comandă către client (nu se trimite — port din sister).
