@@ -1655,13 +1655,15 @@ export default function AdminOrderDetailPage() {
             purpose) which was previously stored but never displayed. */}
         <CivilStatusCard civilStatus={(order.customer_data as AnyObj | null)?.civil_status as AnyObj | null} />
 
-        {/* Date imobil — identificare imobil / servicii cadastrale. Renders
-            customer_data.property (county/locality/address/owner/CF), needed
-            by the team to actually run the identification. */}
-        <PropertyCard property={(order.customer_data as AnyObj | null)?.property as AnyObj | null} />
         </div>
         {/* RIGHT column — service+options on top, delivery info below */}
         <div className="space-y-4">
+        {/* Date imobil — identificare imobil / servicii cadastrale (CF).
+            Coloana dreaptă, deasupra Facturării (layout cerut de echipă:
+            Informații Client | Date imobil, cu Facturarea sub el). Renders
+            customer_data.property (county/locality/address/owner/CF), needed
+            by the team to actually run the identification. */}
+        <PropertyCard property={(order.customer_data as AnyObj | null)?.property as AnyObj | null} />
         {/* Delivery Address — hidden entirely for email-only deliveries
             (certificat constatator, extras CF: PDF-ul e singura metodă, cardul
             ar arăta doar "Metoda: Email (PDF)" = zgomot). Reapare dacă există
