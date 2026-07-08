@@ -11,6 +11,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
+import { RefreshButton } from '@/components/admin/refresh-button';
 import { OnrcManualUpload } from './OnrcManualUpload';
 
 export const dynamic = 'force-dynamic';
@@ -123,6 +124,7 @@ export default async function AdminOnrcPage() {
 
   return (
     <div className="space-y-6">
+      <div className="flex items-start justify-between gap-3">
       <div>
         <h1 className="text-2xl font-bold text-secondary-900">Cozi ONRC</h1>
         <p className="text-sm text-neutral-600">
@@ -135,6 +137,8 @@ export default async function AdminOnrcPage() {
           &gt;2h → <strong>Necesită operator</strong> + email de înștiințare la client. Cele
           <strong> Necesită operator</strong> / <strong>Eșuat</strong> de mai jos cer intervenție manuală.
         </p>
+      </div>
+      <RefreshButton />
       </div>
 
       <div className="flex flex-wrap gap-2">

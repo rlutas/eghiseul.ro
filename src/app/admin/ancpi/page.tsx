@@ -11,6 +11,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
+import { RefreshButton } from '@/components/admin/refresh-button';
 import { AncpiManualUpload } from './AncpiManualUpload';
 import { AncpiCopyLog } from './AncpiCopyLog';
 import { AncpiRetry } from './AncpiRetry';
@@ -149,6 +150,7 @@ export default async function AdminAncpiPage() {
 
   return (
     <div className="space-y-6">
+      <div className="flex items-start justify-between gap-3">
       <div>
         <h1 className="text-2xl font-bold text-secondary-900">Cozi ANCPI</h1>
         <p className="text-sm text-neutral-600">
@@ -162,6 +164,8 @@ export default async function AdminAncpiPage() {
           <strong> Necesită operator</strong> / <strong>Eșuat</strong> de mai jos cer intervenție manuală
           (CF colectivă, plan cadastral, identificare).
         </p>
+      </div>
+      <RefreshButton />
       </div>
 
       <div className="flex flex-wrap gap-2">
