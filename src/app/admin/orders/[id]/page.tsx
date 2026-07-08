@@ -1442,8 +1442,8 @@ export default function AdminOrderDetailPage() {
                 <Separator className="my-2" />
             {isPJ && company ? (
               <>
-                <InfoRow label="Denumire firma" value={company.companyName || 'N/A'} />
-                {company.cui && <InfoRow label="CUI" value={company.cui} mono />}
+                {/* Denumire + CUI sunt deja afișate în capul cardului (Nume /
+                    CUI) — aici rămân doar datele care NU apar mai sus. */}
                 {(company.registrationNumber || company.regCom) && (
                   <InfoRow label="Nr. Reg. Com." value={company.registrationNumber || company.regCom} mono />
                 )}
@@ -1630,7 +1630,16 @@ export default function AdminOrderDetailPage() {
         </div>
         {/* RIGHT column — service+options on top, delivery info below */}
         <div className="space-y-4">
-        {/* Delivery Address */}
+        {/* Delivery Address — hidden entirely for email-only deliveries
+            (certificat constatator, extras CF: PDF-ul e singura metodă, cardul
+            ar arăta doar "Metoda: Email (PDF)" = zgomot). Reapare dacă există
+            orice semnal fizic: adresă, curier sau AWB. */}
+        {!(
+          deliveryMethodParsed?.type === 'email' &&
+          !order.delivery_address &&
+          !detectedCourierProvider &&
+          !order.delivery_tracking_number
+        ) && (
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-base flex items-center gap-2">
@@ -1758,6 +1767,7 @@ export default function AdminOrderDetailPage() {
             />
           </CardContent>
         </Card>
+        )}
 
         {/* Facturare — mutat în coloana dreaptă sub Livrare (umple golul,
             cerere user). */}
