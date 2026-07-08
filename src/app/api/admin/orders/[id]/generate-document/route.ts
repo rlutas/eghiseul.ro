@@ -516,6 +516,30 @@ export async function POST(
         notes: `Document generat: ${fileName}`,
       });
 
+    // Generating the cerere/împuternicirea IS the start of manual processing
+    // (cazier judiciar/fiscal etc. — the automated services never pass through
+    // here), so move a still-'paid' order to 'processing' automatically
+    // instead of asking the operator for a second click. Contract re-generation
+    // is excluded — that's a correction, not a work signal.
+    const startsProcessing = template.startsWith('cerere') || template === 'imputernicire';
+    if (startsProcessing && order.status === 'paid') {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (adminClient as any)
+        .from('orders')
+        .update({ status: 'processing', updated_at: new Date().toISOString() })
+        .eq('id', orderId)
+        .eq('status', 'paid');
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (adminClient as any).from('order_history').insert({
+        order_id: orderId,
+        changed_by: user.id,
+        event_type: 'status_changed',
+        old_value: { status: 'paid' },
+        new_value: { status: 'processing' },
+        notes: 'Trecut automat în procesare la generarea cererii',
+      });
+    }
+
     // Return the DOCX file as download
     return new NextResponse(new Uint8Array(buffer), {
       status: 200,

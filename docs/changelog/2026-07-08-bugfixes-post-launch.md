@@ -322,6 +322,15 @@ tab-ul În procesare, audit în istoric, revenire automată pe `paid` la final.
   firmei + rând CUI în Informații Client), cu excepția constatatorului (acolo
   `company` e firma-țintă, nu clientul — își păstrează badge-ul propriu).
 
+## 23. ⚙️ Generarea cererii trece automat comanda „În procesare"
+
+- La serviciile manuale (cazier judiciar/fiscal etc. — NU cele automate
+  ONRC/ANCPI, care nu trec pe aici), când echipa apasă „Generează" pe
+  **cerere*/împuternicire** și comanda e încă pe `paid`, statusul trece
+  automat pe `processing` + intrare în istoric („Trecut automat în procesare
+  la generarea cererii"). Re-generarea contractelor NU schimbă statusul
+  (e corecție, nu început de lucru). Cerință echipă.
+
 ## Rămase în coadă (nefăcute)
 
 - Email confirmare comandă către client (nu se trimite — port din sister).
