@@ -172,6 +172,16 @@ Layout nou, în ordinea fluxului de lucru (paritate + îmbunătățiri față de
 - **Procesare comanda** (butoane workflow + documente generate) →
   **deasupra Istoricului**; **Istoric comandă = ultimul**.
 
+## 15. Feedback echipă (10:23-10:35) — reparat imediat
+
+- **„Depus la instituție" rămâne în tab-ul În procesare** — grupul include
+  acum TOATE statusurile active (regula: cât mai e vreo acțiune pe comandă,
+  stă în În procesare): depus, document primit, extras în lucru, la
+  traducere/legalizare/apostile, KYC, gata de expediere.
+- **Generarea împuternicirii/cererii nu mai „dă refresh"** — fetchOrder are
+  mod silent: acțiunile inline reîmprospătează datele fără să arunce pagina
+  pe spinner (care te trimitea înapoi sus).
+
 ## Rămase în coadă (nefăcute)
 
 - Email confirmare comandă către client (nu se trimite — port din sister).
