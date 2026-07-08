@@ -15,7 +15,7 @@ import { Label } from '@/components/ui/label';
 import { getCountyFromCNP } from '@/lib/validations/cnp';
 import { estimateFromSelectedOptions } from '@/lib/delivery-calculator';
 import { isNoLawyerService } from '@/lib/documents/no-lawyer-services';
-import { REUPLOAD_DOC_SPECS } from '@/lib/reupload/doc-types';
+import { REUPLOAD_DOC_SPECS, suggestedDocsForService } from '@/lib/reupload/doc-types';
 import {
   type KycPerDoc,
   extractKycByDocType,
@@ -139,6 +139,7 @@ interface OrderDetail {
     slug: string;
     base_price: number;
     estimated_days: number | null;
+    verification_config?: unknown;
   } | null;
 }
 
@@ -1930,6 +1931,7 @@ export default function AdminOrderDetailPage() {
                 <RequestDocumentsButton
                   orderId={order.id}
                   customerPhone={contact?.phone}
+                  verificationConfig={order.services?.verification_config}
                   onSent={refreshSilent}
                 />
               </div>
@@ -2570,15 +2572,25 @@ function VerifyDocumentsButton({
 function RequestDocumentsButton({
   orderId,
   customerPhone,
+  verificationConfig,
   onSent,
 }: {
   orderId: string;
   customerPhone?: string | null;
+  verificationConfig?: unknown;
   onSent?: () => void;
 }) {
   const [open, setOpen] = useState(false);
   const [reason, setReason] = useState('');
-  const [selected, setSelected] = useState<Set<string>>(new Set(['selfie']));
+  // Pre-check what the service itself requires (CI+selfie / acte firmă);
+  // the operator can adjust freely.
+  const suggested = useMemo(
+    () => new Set(suggestedDocsForService(verificationConfig)),
+    [verificationConfig]
+  );
+  const [selected, setSelected] = useState<Set<string>>(
+    () => new Set(suggested.size > 0 ? suggested : ['selfie'])
+  );
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState<{
     url: string;
@@ -2660,20 +2672,29 @@ function RequestDocumentsButton({
             Ce documente ceri de la client?
           </p>
           <div className="space-y-1 bg-white rounded-md border border-amber-100 p-2 max-h-44 overflow-y-auto">
-            {Object.entries(REUPLOAD_DOC_SPECS).map(([type, spec]) => (
-              <label
-                key={type}
-                className="flex items-start gap-2 text-xs text-neutral-800 cursor-pointer py-0.5"
-              >
-                <input
-                  type="checkbox"
-                  className="mt-0.5 accent-amber-600"
-                  checked={selected.has(type)}
-                  onChange={() => toggle(type)}
-                />
-                <span>{spec.label}</span>
-              </label>
-            ))}
+            {Object.entries(REUPLOAD_DOC_SPECS)
+              .sort(([a], [b]) => Number(suggested.has(b)) - Number(suggested.has(a)))
+              .map(([type, spec]) => (
+                <label
+                  key={type}
+                  className="flex items-start gap-2 text-xs text-neutral-800 cursor-pointer py-0.5"
+                >
+                  <input
+                    type="checkbox"
+                    className="mt-0.5 accent-amber-600"
+                    checked={selected.has(type)}
+                    onChange={() => toggle(type)}
+                  />
+                  <span>
+                    {spec.label}
+                    {suggested.has(type) && (
+                      <span className="ml-1 rounded bg-amber-100 px-1 py-px text-[10px] font-medium text-amber-800">
+                        necesar la serviciu
+                      </span>
+                    )}
+                  </span>
+                </label>
+              ))}
           </div>
           <Textarea
             value={reason}

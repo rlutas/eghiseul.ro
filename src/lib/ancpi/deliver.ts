@@ -11,6 +11,7 @@
  */
 import { createAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from '@/lib/email/resend';
+import { renderDocumentReadyEmail } from '@/lib/email/templates/document-ready';
 
 export async function deliverAncpiResult(
   orderId: string,
@@ -95,17 +96,17 @@ export async function deliverAncpiResult(
     if (email) {
       const appUrl =
         process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_SITE_URL || 'https://eghiseul.ro';
+      const mail = renderDocumentReadyEmail({
+        friendlyOrderId: friendly,
+        documentLabel: 'Extrasul de Carte Funciară',
+        registrationNumber: registrationNumber ?? null,
+        viewUrl: `${appUrl}/comanda/status/?order=${encodeURIComponent(friendly)}&email=${encodeURIComponent(email)}`,
+      });
       await sendEmail({
         to: email,
-        subject: `Extrasul de carte funciară pentru comanda ${friendly} este gata`,
-        html: `
-          <p>Bună,</p>
-          <p>Extrasul de carte funciară pentru comanda <strong>${friendly}</strong> a fost emis${
-            registrationNumber ? ` (nr. înregistrare ${registrationNumber})` : ''
-          } și este disponibil în contul tău.</p>
-          <p><a href="${appUrl}/account">Vezi comanda și descarcă documentul</a></p>
-          <p>Mulțumim,<br/>eGhișeul.ro</p>
-        `,
+        subject: mail.subject,
+        html: mail.html,
+        text: mail.text,
         idempotencyKey: `ancpi-deliver-${orderId}`,
       });
     }

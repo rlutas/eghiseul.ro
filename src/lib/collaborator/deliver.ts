@@ -10,6 +10,7 @@
  */
 import { createAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from '@/lib/email/resend';
+import { renderDocumentReadyEmail } from '@/lib/email/templates/document-ready';
 
 export interface DeliverResult {
   ok: boolean;
@@ -59,15 +60,16 @@ export async function deliverCollaboratorResult(orderId: string): Promise<Delive
     const appUrl =
       process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_SITE_URL || 'https://eghiseul.ro';
     try {
+      const mail = renderDocumentReadyEmail({
+        friendlyOrderId: friendly,
+        documentLabel: serviceName,
+        viewUrl: `${appUrl}/comanda/status/?order=${encodeURIComponent(friendly)}&email=${encodeURIComponent(email)}`,
+      });
       await sendEmail({
         to: email,
-        subject: `Documentul pentru comanda ${friendly} este gata`,
-        html: `
-          <p>Bună,</p>
-          <p>${serviceName} pentru comanda <strong>${friendly}</strong> a fost emis și este disponibil în contul tău.</p>
-          <p><a href="${appUrl}/account">Vezi comanda și descarcă documentul</a></p>
-          <p>Mulțumim,<br/>eGhișeul.ro</p>
-        `,
+        subject: mail.subject,
+        html: mail.html,
+        text: mail.text,
         idempotencyKey: `collaborator-deliver-${orderId}`,
       });
     } catch (err) {

@@ -230,6 +230,22 @@ Layout nou, în ordinea fluxului de lucru (paritate + îmbunătățiri față de
 - **Ops:** clientul E-260708-VC4GH (adrian.bucur@bluit.ro / +40747064855)
   trebuie contactat pentru buletinul administratorului + selfie.
 
+## 19. 🟣 „Solicită documente" — cerere multi-document cu standby automat
+
+- Butonul admin „Cere poză nouă (selfie)" devine **„Solicită documente"**:
+  checkboxes (selfie, CI, pașaport, certificat domiciliu, acte firmă) + motiv.
+- Un link unic (7 zile) pentru tot setul; clientul îl primește pe **email** și
+  îl vede și ca **banner portocaliu pe pagina de status** comandă.
+- Pagina `/reincarca-poza` acceptă acum mai multe documente (poze + PDF la
+  actele firmei), cu progres per document.
+- **Automat**: la trimitere comanda intră în `standby` („Așteptăm documente de
+  la tine", SLA pauzat); când clientul încarcă tot, comanda revine singură la
+  statusul anterior (termen ajustat cu zilele pauzate) și **echipa primește
+  email pe contact@** cu link spre admin. Orice upload resetează verificarea
+  KYC — comanda reapare la reverificare.
+- Spec complet: `docs/technical/specs/document-request-system.md`. Migrarea 101.
+- Primul test real: E-260708-VC4GH (buletin administrator + selfie).
+
 ## Rămase în coadă (nefăcute)
 
 - Email confirmare comandă către client (nu se trimite — port din sister).

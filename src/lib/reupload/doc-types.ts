@@ -19,6 +19,15 @@ export interface ReuploadDocSpec {
 }
 
 export const REUPLOAD_DOC_SPECS: Record<string, ReuploadDocSpec> = {
+  // Generic ID — use when you don't know which document the customer holds.
+  // Lands as type 'act_identitate', which the /submit KYC guard accepts as a
+  // manual ID (same type the wizard's manual route writes).
+  act_identitate: {
+    label: 'Act de identitate (CI sau pașaport)',
+    hint: 'Poză clară cu buletinul sau pașaportul, toate datele lizibile',
+    target: 'personal',
+    acceptsPdf: false,
+  },
   selfie: {
     label: 'Selfie cu actul de identitate',
     hint: 'Fața și actul de identitate vizibile, bine luminate',
@@ -75,6 +84,31 @@ export function isKnownReuploadDocType(type: string): boolean {
 
 export function reuploadDocLabel(type: string): string {
   return REUPLOAD_DOC_SPECS[type]?.label ?? type;
+}
+
+/**
+ * Which documents the SERVICE itself requires, derived from its
+ * verification_config — used by the admin "Solicită documente" modal to
+ * pre-check the right boxes per service (CI + selfie where personal KYC is
+ * on; certificat înregistrare/constatator where company documents are
+ * required). The operator can always add/remove anything from the catalog.
+ */
+export function suggestedDocsForService(verificationConfig: unknown): string[] {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const vc = verificationConfig as any;
+  const out: string[] = [];
+  const pk = vc?.personalKyc;
+  if (pk?.enabled) {
+    out.push('act_identitate');
+    if (pk.selfieRequired) out.push('selfie');
+  }
+  const ck = vc?.companyKyc;
+  if (ck?.enabled && ck?.documentsRequired && Array.isArray(ck.requiredDocuments)) {
+    for (const t of ck.requiredDocuments) {
+      if (typeof t === 'string' && isKnownReuploadDocType(t)) out.push(t);
+    }
+  }
+  return out;
 }
 
 /**

@@ -1,8 +1,11 @@
 /**
  * Internal notification sent to the team inbox when a customer finishes
  * uploading all documents requested via "Solicită documente". Fired from
- * POST /api/reupload/[token] on the last document.
+ * POST /api/reupload/[token] on the last document. Uses the shared branded
+ * shell for consistency.
  */
+
+import { brandedEmailHtml, bulletList, ctaButton, escHtml, infoRows } from './branded-layout';
 
 export interface ReuploadCompletedInput {
   orderNumber: string;
@@ -19,39 +22,26 @@ export function buildReuploadCompletedSubject(input: ReuploadCompletedInput): st
 }
 
 export function buildReuploadCompletedHtml(input: ReuploadCompletedInput): string {
-  const docList = input.documentLabels
-    .map((l) => `<li style="margin:0 0 4px 0;font-size:14px;line-height:1.5">${escapeHtml(l)}</li>`)
-    .join('');
-  const statusLine = input.restoredStatus
-    ? `<p style="margin:0 0 16px 0;font-size:14px;line-height:1.6;color:#374151">
-         Comanda a ieșit din așteptare și a revenit la statusul
-         <strong>${escapeHtml(input.restoredStatus)}</strong> (termenul estimat a fost ajustat automat).
-       </p>`
-    : '';
-  return `<!doctype html>
-<html lang="ro">
-  <head><meta charset="utf-8" /><title>${escapeHtml(buildReuploadCompletedSubject(input))}</title></head>
-  <body style="margin:0;padding:0;background:#f9fafb;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;color:#1f2937">
-    <div style="max-width:560px;margin:0 auto;padding:24px">
-      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:28px">
-        <h1 style="margin:0 0 12px 0;font-size:18px;color:#111827">
-          Clientul a încărcat documentele solicitate
-        </h1>
-        <p style="margin:0 0 12px 0;font-size:14px;color:#374151">
-          Comanda <strong>${escapeHtml(input.orderNumber)}</strong> — documente primite:
-        </p>
-        <ul style="margin:0 0 16px 0;padding-left:20px">${docList}</ul>
-        ${statusLine}
-        <div style="margin:20px 0 0 0">
-          <a href="${escapeAttr(input.adminOrderUrl)}"
-             style="display:inline-block;background:#ECB95F;color:#1f2937;font-weight:600;font-size:14px;text-decoration:none;padding:10px 20px;border-radius:8px">
-            Deschide comanda în admin
-          </a>
-        </div>
-      </div>
-    </div>
-  </body>
-</html>`;
+  const rows = [
+    { label: 'Comandă', value: input.orderNumber, mono: true },
+    {
+      label: 'Status',
+      value: input.restoredStatus
+        ? `Revenit din așteptare → ${input.restoredStatus}`
+        : 'Nemodificat (nu era în așteptare)',
+    },
+  ];
+  const content = `        <h1 style="margin:0 0 6px;font-size:20px;color:#0f172a;">Clientul a încărcat documentele ✅</h1>
+        <p style="margin:0 0 18px;color:#475569;font-size:14px;line-height:1.6;">Toate documentele solicitate au sosit${escHtml(input.restoredStatus ? ' — termenul estimat a fost ajustat automat cu zilele pauzate.' : '.')} Verificați-le înainte de procesare (comanda a reapărut la verificare KYC).</p>
+        ${infoRows(rows)}
+        <p style="margin:0 0 8px;color:#475569;font-size:14px;">Documente primite:</p>
+        ${bulletList(input.documentLabels)}
+        ${ctaButton('Deschide comanda în admin', input.adminOrderUrl)}`;
+
+  return brandedEmailHtml({
+    preheader: `Comanda ${input.orderNumber}: documentele solicitate au sosit.`,
+    content,
+  });
 }
 
 export function buildReuploadCompletedText(input: ReuploadCompletedInput): string {
@@ -67,17 +57,4 @@ export function buildReuploadCompletedText(input: ReuploadCompletedInput): strin
     '',
     `Admin: ${input.adminOrderUrl}`,
   ].join('\n');
-}
-
-function escapeHtml(s: string): string {
-  return s
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
-
-function escapeAttr(s: string): string {
-  return s.replace(/"/g, '&quot;');
 }

@@ -44,7 +44,7 @@ export async function GET(
       .from('orders')
       .select(`
         *,
-        services(id, name, slug, base_price, estimated_days)
+        services(id, name, slug, base_price, estimated_days, verification_config)
       `)
       .eq('id', orderId)
       .single();
