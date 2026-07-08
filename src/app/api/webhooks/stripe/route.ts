@@ -291,6 +291,15 @@ async function handlePaymentSucceeded(paymentIntent: Stripe.PaymentIntent) {
     console.log(`Order ${orderId}: invoice already created or being created by another webhook — skipping`)
   }
 
+  // 3b. Customer confirmation email — exactly once per order (atomic claim on
+  // confirmation_email_sent_at). Non-fatal: a send failure never 500s the webhook.
+  try {
+    const { sendOrderConfirmationIfNeeded } = await import('@/lib/email/order-confirmation');
+    await sendOrderConfirmationIfNeeded(supabaseAdmin, orderId);
+  } catch (e) {
+    console.error(`Order ${orderId}: confirmation email failed (non-fatal):`, e instanceof Error ? e.message : e);
+  }
+
   // 4. Queue ONRC + ANCPI automation jobs (idempotent; no-op for non-matching
   // services). Guarded so a transient job-queue failure can NOT throw the whole
   // webhook → 500 → Stripe retry-storm. Both are also re-run by confirm-payment

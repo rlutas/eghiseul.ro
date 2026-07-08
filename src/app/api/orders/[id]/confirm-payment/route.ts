@@ -58,6 +58,13 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         await ensureOnrcJobForPaidOrder(orderId);
         await ensureAncpiJobForPaidOrder(orderId);
       }
+      // Confirmation email — atomic claim, sends at most once per order.
+      try {
+        const { sendOrderConfirmationIfNeeded } = await import('@/lib/email/order-confirmation');
+        await sendOrderConfirmationIfNeeded(supabaseAdmin, orderId);
+      } catch (e) {
+        console.error(`[confirm-payment] confirmation email failed (non-fatal):`, e instanceof Error ? e.message : e);
+      }
       return NextResponse.json({
         success: true,
         message: 'Order already marked as paid',
@@ -196,6 +203,14 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     } catch (invErr) {
       // Never fail the payment confirmation because of invoicing.
       console.error('[confirm-payment] Invoice emission threw:', invErr);
+    }
+
+    // Confirmation email — atomic claim, sends at most once per order.
+    try {
+      const { sendOrderConfirmationIfNeeded } = await import('@/lib/email/order-confirmation');
+      await sendOrderConfirmationIfNeeded(supabaseAdmin, orderId);
+    } catch (e) {
+      console.error('[confirm-payment] confirmation email failed (non-fatal):', e instanceof Error ? e.message : e);
     }
 
     return NextResponse.json({
