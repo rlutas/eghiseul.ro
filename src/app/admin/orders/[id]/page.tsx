@@ -92,6 +92,7 @@ interface OrderDetail {
   stripe_payment_intent_id: string | null;
   stripe_checkout_session_id?: string | null;
   is_test?: boolean | null;
+  estimated_completion_date?: string | null;
   paid_at: string | null;
   invoice_number: string | null;
   invoice_url: string | null;
@@ -875,6 +876,13 @@ export default function AdminOrderDetailPage() {
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1 text-sm text-muted-foreground">
               <span>Creata: {formatDateLong(order.created_at)}</span>
               {order.submitted_at && <span>Trimisa: {formatDate(order.submitted_at)}</span>}
+              {/* Termen estimat — up top, right under the order number (sister parity). */}
+              {order.estimated_completion_date && (
+                <span className="font-semibold text-orange-600">
+                  Termen estimat: {formatDate(order.estimated_completion_date)}
+                  {order.services?.estimated_days ? ` (${order.services.estimated_days} zile lucratoare)` : ''}
+                </span>
+              )}
             </div>
           </div>
         </div>
@@ -997,6 +1005,15 @@ export default function AdminOrderDetailPage() {
             comanda când blocajul cu clientul este rezolvat.
           </p>
         </div>
+      )}
+
+      {/* Link status comandă (ca și clientul) — pre-filled tracking URL the
+          team can copy/share with the customer (sister parity). */}
+      {order.friendly_order_id && (
+        <StatusLinkCard
+          friendlyOrderId={order.friendly_order_id}
+          email={(order.customer_data as AnyObj | null)?.contact?.email || ''}
+        />
       )}
 
       {/* Note Echipă — moved to the top for parity with cazierjudiciaronline.com
@@ -2214,18 +2231,15 @@ function NoteEchipaCard({
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Filter rules (mirrors sister):
-  //   - keep entries authored by a real admin (not system-*)
-  //   - keep both pure notes (note_added) AND status transitions that came
-  //     with a meaningful note attached
+  // Only MANUALLY added team notes (event_type note_added, human author).
+  // Status-change notes are NOT repeated here — they already show in the
+  // Istoric timeline below (user request: no duplication).
   const visibleNotes = useMemo(
     () =>
       timeline.filter((t: TimelineEvent) => {
         const by = (t.changed_by || '').toLowerCase();
         if (by.startsWith('system')) return false;
-        if (t.event_type === 'note_added' && (t.notes || '').trim()) return true;
-        if ((t.notes || '').trim().length > 0) return true;
-        return false;
+        return t.event_type === 'note_added' && !!(t.notes || '').trim();
       }),
     [timeline]
   );
@@ -3368,6 +3382,57 @@ function AwbSection({
 }
 
 // ---------- Helper Components ----------
+
+/** „Link status comandă (ca și clientul)" — read-only pre-filled tracking URL
+ *  with copy + open buttons. The team shares it with customers who ask for
+ *  status (sister parity). */
+function StatusLinkCard({ friendlyOrderId, email }: { friendlyOrderId: string; email: string }) {
+  const [copied, setCopied] = useState(false);
+  const base = typeof window !== 'undefined' ? window.location.origin : 'https://eghiseul.ro';
+  const url = `${base}/comanda/status/?order=${encodeURIComponent(friendlyOrderId)}&email=${encodeURIComponent(email)}`;
+  return (
+    <Card>
+      <CardContent className="p-4">
+        <p className="flex items-center gap-1.5 text-sm font-semibold text-secondary-900">
+          🔗 Link status comandă (ca și clientul)
+        </p>
+        <p className="mt-0.5 text-xs text-muted-foreground">
+          Pagina de urmărire pre-completată. Dă-i share clientului dacă vrea statusul.
+        </p>
+        <div className="mt-2 flex items-center gap-2">
+          <input
+            readOnly
+            value={url}
+            onFocus={(e) => e.currentTarget.select()}
+            className="h-9 w-full rounded-md border border-neutral-200 bg-neutral-50 px-3 font-mono text-xs text-slate-700 outline-none"
+          />
+          <Button
+            variant="outline"
+            size="icon"
+            className="h-9 w-9 shrink-0"
+            title="Copiază linkul"
+            onClick={async () => {
+              try {
+                await navigator.clipboard.writeText(url);
+                setCopied(true);
+                setTimeout(() => setCopied(false), 2000);
+              } catch {
+                /* ignore */
+              }
+            }}
+          >
+            {copied ? <Check className="h-4 w-4 text-green-600" /> : <Copy className="h-4 w-4" />}
+          </Button>
+          <Button asChild variant="outline" size="icon" className="h-9 w-9 shrink-0" title="Deschide ca clientul">
+            <a href={url} target="_blank" rel="noreferrer">
+              <ExternalLink className="h-4 w-4" />
+            </a>
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
 
 /** One-click copy of the delivery address as an international shipping label
  *  (name / street / postal+city / region / country / phone) — for manual
