@@ -89,6 +89,27 @@ ORDER BY created_at DESC
 LIMIT 20;
 ```
 
+### Reupload Requests („Solicită documente")
+
+Tabela `reupload_requests` (migrări 048 + 101): linkuri single-use prin care
+clientul (re)încarcă documente după plasarea comenzii. Coloane cheie:
+`document_types` JSONB (setul cerut), `completed_documents` JSONB (progres),
+`return_status` (statusul restaurat automat la finalizare — comanda stă în
+`standby` cât așteaptă), `token_expires_at` (7 zile), `status`
+(pending/completed/cancelled/expired). RLS activ fără politici publice —
+acces doar service-role. Flux complet: `../specs/document-request-system.md`.
+
+```sql
+-- Cererea activă a unei comenzi
+SELECT document_types, completed_documents, return_status, token_expires_at
+FROM reupload_requests
+WHERE order_id = 'order-uuid' AND status = 'pending';
+```
+
+`order_history.event_type` include și `reupload_requested` +
+`kyc_photo_resubmitted` (migrarea 102 — înainte constraint-ul le respingea
+silențios).
+
 ### Statistics
 
 ```sql

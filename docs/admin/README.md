@@ -211,6 +211,8 @@ The `employee` role has been replaced by specialized roles. See [Workflow Design
 | `/api/admin/orders/[id]/generate-document` | POST | `orders.manage` | Generate DOCX document (contract, imputernicire, cerere) |
 | `/api/admin/orders/[id]/preview-document` | GET | `documents.view` | Preview DOCX as HTML via mammoth (server-side), includes "Descarca DOCX" button, `?print=1` auto-print |
 | `/api/contracts/preview` | POST | Public (no auth) | Contract preview for wizard signature step |
+| `/api/admin/orders/[id]/request-reupload` | POST | `orders.manage` | „Solicită documente" — cerere multi-document de la client, auto-standby, email cu link. Spec: `technical/specs/document-request-system.md` |
+| `/api/reupload/[token]` | GET, POST | Public (token-gated) | Upload documente de către client (link single-use, 7 zile) |
 
 ### Planned (Not Yet Built)
 
