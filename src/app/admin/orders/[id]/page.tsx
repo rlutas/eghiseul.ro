@@ -30,7 +30,7 @@ import {
   type ExtractedROCEIReader,
 } from '@/lib/services/document-ocr';
 import { ModifyOrderDialog } from '@/components/admin/modify-order-dialog';
-import { UpdateStatusCard, QuickStatusSelect } from '@/components/admin/update-status-card';
+import { QuickStatusSelect } from '@/components/admin/update-status-card';
 import {
   ArrowLeft,
   User,
@@ -1066,15 +1066,205 @@ export default function AdminOrderDetailPage() {
 
       {/* Note Echipă — moved to the top for parity with cazierjudiciaronline.com
           (prominent, right after the banners) so the team sees/writes notes
-          without scrolling to the bottom. */}
-      {/* Note Echipă + Actualizează Status — 50/50 sus, fără scroll (cerere user). */}
+          without scrolling to the bottom. The old "Actualizează Status" card
+          that sat next to it was replaced by the QuickStatusSelect dropdown
+          in the header (team request 2026-07-08). */}
       <div className="grid gap-4 lg:grid-cols-2 items-start">
         <NoteEchipaCard orderId={order.id} timeline={timeline} onAdded={refreshSilent} />
-        <UpdateStatusCard
-          orderId={order.id}
-          currentStatus={order.status || 'draft'}
-          onUpdated={refreshSilent}
-        />
+        {/* Service & Options — grouped to match what the customer saw in
+            the order summary (main service + nested add-ons + each
+            "Serviciu secundar" like Certificat Integritate with its own
+            indented add-ons). Same shape used on /comanda, /comanda/checkout
+            and the success page so admin reads the order the same way the
+            customer placed it. */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base flex items-center gap-2">
+              <FileText className="h-4 w-4" />
+              Detalii Serviciu
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {/* Urgenta + metoda livrare sus, ca pe sora */}
+            <InfoRow
+              label="Urgenta"
+              value={(() => {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const opts = (order.selected_options as any[] | null) || [];
+                const urgent = opts.find((o) => o?.code === 'urgenta' && !o?.bundledFor);
+                return urgent ? '⚡ Urgent' : 'Standard';
+              })()}
+            />
+            {deliveryMethodParsed?.name && (
+              <InfoRow label="Metoda livrare" value={String(deliveryMethodParsed.name)} />
+            )}
+            <p className="pt-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Servicii comandate</p>
+            <InfoRow label="Serviciu" value={order.services?.name ? stripEntitySuffix(order.services.name) : 'N/A'} />
+            {/* Motivul solicitării — critical operational info (goes on the
+                request to the institution). Sourced from whichever module
+                collected it (contact/cazier, stare civilă, imobil, ONRC). */}
+            {sheetMotiv && <InfoRow label="Motivul solicitarii" value={sheetMotiv} />}
+            {/* Certificat constatator (ONRC): what the bot actually requested —
+                firm + CUI, document type, report type, purpose, period/person.
+                Sourced from customer_data.constatator + billing/company. */}
+            {constatator && (() => {
+              const c = constatator as AnyObj;
+              const firmName = company?.companyName || billing?.companyName || null;
+              const firmCui = company?.cui || billing?.cui || null;
+              const docTypeLabel =
+                c.documentType === 'istoric' ? 'Pe firmă (CUI) — cu istoric'
+                : c.documentType === 'pf' ? 'Persoană fizică (CNP)'
+                : 'Pe firmă (CUI) — de bază';
+              const purposeText = /^altele$/i.test(String(c.purpose ?? ''))
+                ? `Altele${c.otherPurpose ? ` — ${c.otherPurpose}` : ''}`
+                : (c.purpose || '—');
+              const periodText =
+                c.period === 'founding' ? 'De la înființare până în prezent'
+                : c.period === 'custom' ? `${c.periodFrom ?? '?'} → ${c.periodTo ?? '?'}`
+                : null;
+              return (
+                <>
+                  {firmName && <InfoRow label="Firmă" value={firmName} />}
+                  {firmCui && <InfoRow label="CUI" value={String(firmCui)} mono />}
+                  <InfoRow label="Tip document" value={docTypeLabel} />
+                  {c.reportType && <InfoRow label="Tip raport" value={String(c.reportType)} />}
+                  <InfoRow label="Scop / motiv (de ce a aplicat)" value={String(purposeText)} />
+                  {periodText && <InfoRow label="Perioadă" value={periodText} />}
+                  {c.requesterName && <InfoRow label="Solicitant (PF)" value={String(c.requesterName)} />}
+                  {c.requesterCnp && <InfoRow label="CNP solicitant" value={String(c.requesterCnp)} mono />}
+                </>
+              );
+            })()}
+            {/* Real per-step delivery estimate (sums urgenta + traducere +
+                legalizare + apostila*) so admin sees the same window the
+                customer was promised. Falls back to `service.estimated_days`
+                if the calculator returns nothing (no recognized add-ons). */}
+            {(() => {
+              const rawOpts = (order.selected_options ?? []).map((o) => ({
+                code: o.code ?? null,
+                optionName: o.option_name,
+                bundledFor:
+                  o.bundledFor ??
+                  (o.bundled_for
+                    ? { parentOptionId: o.bundled_for.parent_option_id }
+                    : null),
+              }));
+              const courier =
+                typeof order.delivery_method === 'object'
+                  ? (order.delivery_method as { method?: string } | null)?.method ?? null
+                  : (order.delivery_method as string | null) ?? null;
+              const est = estimateFromSelectedOptions({
+                selectedOptions: rawOpts,
+                baseDays: order.services?.estimated_days ?? undefined,
+                courier,
+                includeCourierLeg: !!courier,
+              });
+              // Digital, auto-issued services (ONRC constatator) — minutes, not days.
+              const digitalInstant = order.services?.slug === 'certificat-constatator';
+              const label = digitalInstant
+                ? 'de obicei câteva minute (automat, 24/7)'
+                : est.minDays === est.maxDays
+                  ? `${est.minDays} zile lucratoare`
+                  : `${est.minDays}-${est.maxDays} zile lucratoare`;
+              return <InfoRow label="Termen estimat" value={label} />;
+            })()}
+            {order.selected_options && order.selected_options.length > 0 && (() => {
+              // Split into main-service add-ons vs secondary-service groups.
+              // A row is a "secondary service" if other rows reference it
+              // via `bundled_for.parent_option_id`. The marketing suffix
+              // "(adaugă în aceeași comandă)" is stripped from display so
+              // names stay readable (it's still in the DB row for audit).
+              const stripSuffix = (name: string | undefined) =>
+                (name ?? '')
+                  .replace(/\s*\([^()]*\(adaugă în aceeași comandă\)\)\s*$/i, '')
+                  .replace(/\s*\(adaugă în aceeași comandă\)\s*$/i, '')
+                  .trim();
+              const opts = order.selected_options;
+              const childrenByParent = new Map<string, typeof opts>();
+              for (const o of opts) {
+                const parentId =
+                  o.bundled_for?.parent_option_id ?? o.bundledFor?.parentOptionId;
+                if (parentId) {
+                  const list = childrenByParent.get(parentId) ?? [];
+                  list.push(o);
+                  childrenByParent.set(parentId, list);
+                }
+              }
+              const topLevel = opts.filter(
+                (o) => !(o.bundled_for?.parent_option_id ?? o.bundledFor?.parentOptionId)
+              );
+              const directAddons = topLevel.filter(
+                (o) => !(o.option_id && (childrenByParent.get(o.option_id)?.length ?? 0) > 0)
+              );
+              const subServices = topLevel.filter(
+                (o) => o.option_id && (childrenByParent.get(o.option_id)?.length ?? 0) > 0
+              );
+              const renderRow = (opt: (typeof opts)[number], indented = false) => (
+                <div
+                  key={opt.option_id ?? opt.option_name}
+                  className={`flex items-start justify-between gap-2 text-sm ${
+                    indented ? 'pl-3 ml-1 border-l-2 border-primary-100 text-muted-foreground' : ''
+                  }`}
+                >
+                  <div>
+                    <span className={indented ? '' : 'font-medium'}>{stripSuffix(opt.option_name)}</span>
+                    {(opt.quantity || 1) > 1 && (
+                      <span className="text-muted-foreground"> x{opt.quantity}</span>
+                    )}
+                    {/* Wizard per-option input: apostille destination country /
+                        translation language — operationally critical (the
+                        apostille is issued FOR that country). */}
+                    {opt.metadata?.country && (
+                      <p className="text-xs text-muted-foreground">
+                        Țara: <span className="font-medium text-foreground">{opt.metadata.country}</span>
+                      </p>
+                    )}
+                    {opt.metadata?.language && (
+                      <p className="text-xs text-muted-foreground">
+                        Limba: <span className="font-medium text-foreground">{opt.metadata.language}</span>
+                      </p>
+                    )}
+                  </div>
+                  {opt.price_modifier ? (
+                    <span className={indented ? 'shrink-0' : 'font-medium shrink-0'}>
+                      +{opt.price_modifier.toFixed(2)} RON
+                    </span>
+                  ) : null}
+                </div>
+              );
+              return (
+                <>
+                  <Separator className="my-2" />
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                    Optiuni selectate
+                  </p>
+                  {directAddons.map((opt) => renderRow(opt))}
+                  {subServices.map((sub) => {
+                    const kids = (sub.option_id && childrenByParent.get(sub.option_id)) || [];
+                    return (
+                      <div key={sub.option_id} className="space-y-1.5 mt-1">
+                        <div className="flex items-start justify-between gap-2 text-sm pt-1 border-t border-neutral-100">
+                          <div>
+                            <span className="font-semibold">{stripSuffix(sub.option_name)}</span>
+                            <p className="text-[11px] text-muted-foreground uppercase tracking-wide">
+                              Serviciu secundar
+                            </p>
+                          </div>
+                          {sub.price_modifier ? (
+                            <span className="font-semibold shrink-0">
+                              +{sub.price_modifier.toFixed(2)} RON
+                            </span>
+                          ) : null}
+                        </div>
+                        {kids.map((kid) => renderRow(kid, true))}
+                      </div>
+                    );
+                  })}
+                </>
+              );
+            })()}
+          </CardContent>
+        </Card>
       </div>
 
       {/* ROW 1: Date contact + Date personale (left) | Serviciu + Livrare (right).
@@ -1440,200 +1630,6 @@ export default function AdminOrderDetailPage() {
         </div>
         {/* RIGHT column — service+options on top, delivery info below */}
         <div className="space-y-4">
-        {/* Service & Options — grouped to match what the customer saw in
-            the order summary (main service + nested add-ons + each
-            "Serviciu secundar" like Certificat Integritate with its own
-            indented add-ons). Same shape used on /comanda, /comanda/checkout
-            and the success page so admin reads the order the same way the
-            customer placed it. */}
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base flex items-center gap-2">
-              <FileText className="h-4 w-4" />
-              Detalii Serviciu
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {/* Urgenta + metoda livrare sus, ca pe sora */}
-            <InfoRow
-              label="Urgenta"
-              value={(() => {
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                const opts = (order.selected_options as any[] | null) || [];
-                const urgent = opts.find((o) => o?.code === 'urgenta' && !o?.bundledFor);
-                return urgent ? '⚡ Urgent' : 'Standard';
-              })()}
-            />
-            {deliveryMethodParsed?.name && (
-              <InfoRow label="Metoda livrare" value={String(deliveryMethodParsed.name)} />
-            )}
-            <p className="pt-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Servicii comandate</p>
-            <InfoRow label="Serviciu" value={order.services?.name ? stripEntitySuffix(order.services.name) : 'N/A'} />
-            {/* Motivul solicitării — critical operational info (goes on the
-                request to the institution). Sourced from whichever module
-                collected it (contact/cazier, stare civilă, imobil, ONRC). */}
-            {sheetMotiv && <InfoRow label="Motivul solicitarii" value={sheetMotiv} />}
-            {/* Certificat constatator (ONRC): what the bot actually requested —
-                firm + CUI, document type, report type, purpose, period/person.
-                Sourced from customer_data.constatator + billing/company. */}
-            {constatator && (() => {
-              const c = constatator as AnyObj;
-              const firmName = company?.companyName || billing?.companyName || null;
-              const firmCui = company?.cui || billing?.cui || null;
-              const docTypeLabel =
-                c.documentType === 'istoric' ? 'Pe firmă (CUI) — cu istoric'
-                : c.documentType === 'pf' ? 'Persoană fizică (CNP)'
-                : 'Pe firmă (CUI) — de bază';
-              const purposeText = /^altele$/i.test(String(c.purpose ?? ''))
-                ? `Altele${c.otherPurpose ? ` — ${c.otherPurpose}` : ''}`
-                : (c.purpose || '—');
-              const periodText =
-                c.period === 'founding' ? 'De la înființare până în prezent'
-                : c.period === 'custom' ? `${c.periodFrom ?? '?'} → ${c.periodTo ?? '?'}`
-                : null;
-              return (
-                <>
-                  {firmName && <InfoRow label="Firmă" value={firmName} />}
-                  {firmCui && <InfoRow label="CUI" value={String(firmCui)} mono />}
-                  <InfoRow label="Tip document" value={docTypeLabel} />
-                  {c.reportType && <InfoRow label="Tip raport" value={String(c.reportType)} />}
-                  <InfoRow label="Scop / motiv (de ce a aplicat)" value={String(purposeText)} />
-                  {periodText && <InfoRow label="Perioadă" value={periodText} />}
-                  {c.requesterName && <InfoRow label="Solicitant (PF)" value={String(c.requesterName)} />}
-                  {c.requesterCnp && <InfoRow label="CNP solicitant" value={String(c.requesterCnp)} mono />}
-                </>
-              );
-            })()}
-            {/* Real per-step delivery estimate (sums urgenta + traducere +
-                legalizare + apostila*) so admin sees the same window the
-                customer was promised. Falls back to `service.estimated_days`
-                if the calculator returns nothing (no recognized add-ons). */}
-            {(() => {
-              const rawOpts = (order.selected_options ?? []).map((o) => ({
-                code: o.code ?? null,
-                optionName: o.option_name,
-                bundledFor:
-                  o.bundledFor ??
-                  (o.bundled_for
-                    ? { parentOptionId: o.bundled_for.parent_option_id }
-                    : null),
-              }));
-              const courier =
-                typeof order.delivery_method === 'object'
-                  ? (order.delivery_method as { method?: string } | null)?.method ?? null
-                  : (order.delivery_method as string | null) ?? null;
-              const est = estimateFromSelectedOptions({
-                selectedOptions: rawOpts,
-                baseDays: order.services?.estimated_days ?? undefined,
-                courier,
-                includeCourierLeg: !!courier,
-              });
-              // Digital, auto-issued services (ONRC constatator) — minutes, not days.
-              const digitalInstant = order.services?.slug === 'certificat-constatator';
-              const label = digitalInstant
-                ? 'de obicei câteva minute (automat, 24/7)'
-                : est.minDays === est.maxDays
-                  ? `${est.minDays} zile lucratoare`
-                  : `${est.minDays}-${est.maxDays} zile lucratoare`;
-              return <InfoRow label="Termen estimat" value={label} />;
-            })()}
-            {order.selected_options && order.selected_options.length > 0 && (() => {
-              // Split into main-service add-ons vs secondary-service groups.
-              // A row is a "secondary service" if other rows reference it
-              // via `bundled_for.parent_option_id`. The marketing suffix
-              // "(adaugă în aceeași comandă)" is stripped from display so
-              // names stay readable (it's still in the DB row for audit).
-              const stripSuffix = (name: string | undefined) =>
-                (name ?? '')
-                  .replace(/\s*\([^()]*\(adaugă în aceeași comandă\)\)\s*$/i, '')
-                  .replace(/\s*\(adaugă în aceeași comandă\)\s*$/i, '')
-                  .trim();
-              const opts = order.selected_options;
-              const childrenByParent = new Map<string, typeof opts>();
-              for (const o of opts) {
-                const parentId =
-                  o.bundled_for?.parent_option_id ?? o.bundledFor?.parentOptionId;
-                if (parentId) {
-                  const list = childrenByParent.get(parentId) ?? [];
-                  list.push(o);
-                  childrenByParent.set(parentId, list);
-                }
-              }
-              const topLevel = opts.filter(
-                (o) => !(o.bundled_for?.parent_option_id ?? o.bundledFor?.parentOptionId)
-              );
-              const directAddons = topLevel.filter(
-                (o) => !(o.option_id && (childrenByParent.get(o.option_id)?.length ?? 0) > 0)
-              );
-              const subServices = topLevel.filter(
-                (o) => o.option_id && (childrenByParent.get(o.option_id)?.length ?? 0) > 0
-              );
-              const renderRow = (opt: (typeof opts)[number], indented = false) => (
-                <div
-                  key={opt.option_id ?? opt.option_name}
-                  className={`flex items-start justify-between gap-2 text-sm ${
-                    indented ? 'pl-3 ml-1 border-l-2 border-primary-100 text-muted-foreground' : ''
-                  }`}
-                >
-                  <div>
-                    <span className={indented ? '' : 'font-medium'}>{stripSuffix(opt.option_name)}</span>
-                    {(opt.quantity || 1) > 1 && (
-                      <span className="text-muted-foreground"> x{opt.quantity}</span>
-                    )}
-                    {/* Wizard per-option input: apostille destination country /
-                        translation language — operationally critical (the
-                        apostille is issued FOR that country). */}
-                    {opt.metadata?.country && (
-                      <p className="text-xs text-muted-foreground">
-                        Țara: <span className="font-medium text-foreground">{opt.metadata.country}</span>
-                      </p>
-                    )}
-                    {opt.metadata?.language && (
-                      <p className="text-xs text-muted-foreground">
-                        Limba: <span className="font-medium text-foreground">{opt.metadata.language}</span>
-                      </p>
-                    )}
-                  </div>
-                  {opt.price_modifier ? (
-                    <span className={indented ? 'shrink-0' : 'font-medium shrink-0'}>
-                      +{opt.price_modifier.toFixed(2)} RON
-                    </span>
-                  ) : null}
-                </div>
-              );
-              return (
-                <>
-                  <Separator className="my-2" />
-                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                    Optiuni selectate
-                  </p>
-                  {directAddons.map((opt) => renderRow(opt))}
-                  {subServices.map((sub) => {
-                    const kids = (sub.option_id && childrenByParent.get(sub.option_id)) || [];
-                    return (
-                      <div key={sub.option_id} className="space-y-1.5 mt-1">
-                        <div className="flex items-start justify-between gap-2 text-sm pt-1 border-t border-neutral-100">
-                          <div>
-                            <span className="font-semibold">{stripSuffix(sub.option_name)}</span>
-                            <p className="text-[11px] text-muted-foreground uppercase tracking-wide">
-                              Serviciu secundar
-                            </p>
-                          </div>
-                          {sub.price_modifier ? (
-                            <span className="font-semibold shrink-0">
-                              +{sub.price_modifier.toFixed(2)} RON
-                            </span>
-                          ) : null}
-                        </div>
-                        {kids.map((kid) => renderRow(kid, true))}
-                      </div>
-                    );
-                  })}
-                </>
-              );
-            })()}
-          </CardContent>
-        </Card>
         {/* Delivery Address */}
         <Card>
           <CardHeader className="pb-3">
