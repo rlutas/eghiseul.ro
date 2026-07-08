@@ -310,6 +310,18 @@ tab-ul În procesare, audit în istoric, revenire automată pe `paid` la final.
   (entry-ul clientului), NU prin vecinătatea din dump — rândurile alăturate
   sunt alți clienți.
 
+## 22. ✅ Primul ciclu complet „Solicită documente" + fix badge PF/PJ
+
+- **Ciclu complet CONFIRMAT pe comandă reală** (E-260708-VC4GH): clientul a
+  încărcat act + selfie prin link → cererea `completed`, documentele în S3 +
+  `customer_data`, comanda a ieșit AUTOMAT din standby înapoi pe `paid`
+  (52 min pauzate, termen mutat 13→14.07), email trimis către echipă.
+- **Fix admin**: comenzile cazier PJ apăreau „Persoana Fizica" cu Nume N/A —
+  `extractCustomerData` căuta company-KYC doar în `companyData`/`companyKyc`,
+  dar wizardul modular scrie `company`. Acum promovează corect la PJ (numele
+  firmei + rând CUI în Informații Client), cu excepția constatatorului (acolo
+  `company` e firma-țintă, nu clientul — își păstrează badge-ul propriu).
+
 ## Rămase în coadă (nefăcute)
 
 - Email confirmare comandă către client (nu se trimite — port din sister).
