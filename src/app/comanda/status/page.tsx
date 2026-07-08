@@ -341,6 +341,20 @@ function OrderStatusContent() {
                   <div className={`px-3 py-1.5 rounded-full text-sm font-medium ${getStatusConfig(orderData.status).color}`}>
                     {getStatusConfig(orderData.status).label}
                   </div>
+                  {/* Quick jump: document(e) gata -> scroll direct la sectiunea
+                      Documente (clientul nu mai cauta pe pagina). */}
+                  {orderData.documents && orderData.documents.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        document.getElementById('documente')?.scrollIntoView({ behavior: 'smooth' })
+                      }
+                      className="inline-flex items-center gap-1.5 rounded-full bg-primary-500 px-3 py-1.5 text-sm font-bold text-secondary-900 shadow-sm transition-colors hover:bg-primary-600"
+                    >
+                      <FileText className="h-4 w-4" />
+                      Vezi documentul
+                    </button>
+                  )}
                 </div>
               </div>
             </CardHeader>
@@ -561,7 +575,7 @@ function OrderStatusContent() {
 
           {/* Documents */}
           {orderData.documents && orderData.documents.length > 0 && (
-            <Card>
+            <Card id="documente" className="scroll-mt-24">
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
                   <FileText className="h-5 w-5" />
@@ -579,7 +593,10 @@ function OrderStatusContent() {
                       <div className="flex-1">
                         <p className="font-medium text-sm">{doc.label}</p>
                         <p className="text-xs text-muted-foreground">
-                          {doc.documentNumber && `Nr. ${doc.documentNumber} · `}
+                          {/* Numărul RC (înregistrarea ONRC) e intern — clientul
+                              vede doar numele documentului. */}
+                          {doc.documentNumber && !doc.documentNumber.startsWith('RC ') &&
+                            `Nr. ${doc.documentNumber} · `}
                           {formatDate(doc.createdAt)}
                         </p>
                       </div>
@@ -615,7 +632,7 @@ function OrderStatusContent() {
                 </a>{' '}
                 sau la telefon{' '}
                 <a href="tel:+40757708181" className="underline hover:no-underline">
-                  031 123 4567
+                  +40 757 708 181
                 </a>{' '}
                 menționând codul comenzii tale.
               </p>

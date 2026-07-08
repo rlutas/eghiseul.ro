@@ -58,8 +58,17 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       return new NextResponse('Document not found', { status: 404 });
     }
 
-    // Fetch DOCX from S3
     const url = await getDownloadUrl(doc.s3_key, 300);
+
+    // PDFs (constatator ONRC, extras CF de la worker, documente scanate) se
+    // afișează nativ în browser — mammoth e DOAR pentru DOCX; rularea lui pe
+    // PDF arunca și clientul primea „Failed to preview document".
+    const lowerName = (doc.file_name || doc.s3_key || '').toLowerCase();
+    if (lowerName.endsWith('.pdf')) {
+      return NextResponse.redirect(url);
+    }
+
+    // Fetch DOCX from S3
     const response = await fetch(url);
 
     if (!response.ok) {
