@@ -1,4 +1,5 @@
 {
+  "ignoreCommand": "git diff --quiet HEAD^ HEAD -- ':!docs' ':!*.md' ':!supabase/migrations' ':!.claude'",
   "crons": [
     {
       "path": "/api/cron/update-tracking",

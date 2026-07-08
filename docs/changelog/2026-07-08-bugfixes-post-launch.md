@@ -245,6 +245,14 @@ Layout nou, în ordinea fluxului de lucru (paritate + îmbunătățiri față de
   KYC — comanda reapare la reverificare.
 - Spec complet: `docs/technical/specs/document-request-system.md`. Migrarea 101.
 - Primul test real: E-260708-VC4GH (buletin administrator + selfie).
+- **Iterația 2 (feedback la test):** pagina `/reincarca-poza` are acum footer-ul
+  site-ului (layout propriu, noindex; bara de logo duplicată scoasă — header-ul
+  vine din root layout), afișează **motivul solicitării** („Mesaj de la echipa
+  eGhișeul.ro"), codul comenzii și valabilitatea linkului. **„Act de
+  identitate" = 2 casete: față (obligatoriu) + verso (opțional**, doar pt. CI —
+  mecanism generic `companionOf` în catalog: companion-ele apar la client, nu
+  în modalul admin, nu blochează finalizarea). Linkurile active se
+  reconstruiesc din config la accesare — fără re-trimitere.
 
 ## 20. 🚨 NEXT_PUBLIC_APP_URL arăta spre vercel.app (SSO) + fixuri găsite la primul test real
 
@@ -270,6 +278,21 @@ Primul test „Solicită documente" pe E-260708-VC4GH a scos 4 probleme, toate r
 Verificat live cap-coadă: email cu link corect, banner pe status client,
 pagina de upload cu 2 carduri, comanda în „Așteptare client" vizibilă în
 tab-ul În procesare, audit în istoric, revenire automată pe `paid` la final.
+
+## 21. 💸 Build-uri Vercel limitate (cost) + recuperare documente client din WP vechi
+
+- **Cost**: Build CPU Minutes ajunsese la ~$11.76 din bugetul lunar (~$13/20
+  cheltuiți la 8 iulie) — prea multe deploy-uri mărunte. Adăugat
+  **`ignoreCommand`** în `vercel.json`: commit-urile care ating DOAR `docs/`,
+  `*.md`, `supabase/migrations/` sau `.claude/` **nu mai declanșează build**.
+  Regulă de lucru: schimbările de cod se grupează — un push per lot, nu per
+  fix mărunt.
+- **Ops**: recuperate documentele KYC ale comenzii atrittner@yahoo.com de pe
+  WP-ul vechi (dump `eghiseul_wp789.sql` + host clausweb prin IP): CI + selfie
+  + semnătură → `~/Downloads/atrittner-documente/`. Verificare obligatorie la
+  astfel de extrageri: fișierele se confirmă prin tabela `wp_wpforms_entry_fields`
+  (entry-ul clientului), NU prin vecinătatea din dump — rândurile alăturate
+  sunt alți clienți.
 
 ## Rămase în coadă (nefăcute)
 
