@@ -236,10 +236,11 @@ export default function AdminOrdersPage() {
     fetch('/api/services')
       .then((r) => r.json())
       .then((d) => {
-        if (d.success || d.data) {
-          const list = (d.data || []) as Array<{ id: string; slug: string; name: string }>;
-          setServices(list.map((s) => ({ id: s.id, slug: s.slug, name: s.name })));
-        }
+        // /api/services wraps the list: { success, data: { services: [...] } }.
+        // Reading d.data directly returned an object → .map produced an empty
+        // dropdown (team report 2026-07-08).
+        const list = (d.data?.services || []) as Array<{ id: string; slug: string; name: string }>;
+        setServices(list.map((s) => ({ id: s.id, slug: s.slug, name: s.name })));
       })
       .catch(() => {});
   }, []);
