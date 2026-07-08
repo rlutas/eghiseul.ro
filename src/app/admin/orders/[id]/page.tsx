@@ -1276,6 +1276,11 @@ export default function AdminOrderDetailPage() {
           </CardContent>
         </Card>
         )}
+
+        {/* Date stare civilă — for naștere/căsătorie/celibat orders. Renders
+            customer_data.civil_status (marriage history, parents, birth name,
+            purpose) which was previously stored but never displayed. */}
+        <CivilStatusCard civilStatus={(order.customer_data as AnyObj | null)?.civil_status as AnyObj | null} />
         </div>
         {/* RIGHT column — service+options on top, delivery info below */}
         <div className="space-y-4">
@@ -3227,6 +3232,57 @@ function AwbSection({
 }
 
 // ---------- Helper Components ----------
+
+/** Romanian labels for known civil_status keys, in display order. Unknown
+ *  keys fall back to the raw key so imported/new fields are never hidden. */
+const CIVIL_STATUS_LABELS: Array<[string, string]> = [
+  ['marriageDate', 'Data căsătoriei'],
+  ['marriagePlace', 'Căsătoria a avut loc în'],
+  ['officeLocality', 'Oficiul stării civile (localitate)'],
+  ['spouseNameBeforeMarriage', 'Numele soțului/soției înainte de căsătorie'],
+  ['previouslyMarried', 'Căsătorit(ă) anterior'],
+  ['previousMarriagesCount', 'De câte ori anterior'],
+  ['lastMarriageEndedBy', 'Ultima căsătorie încheiată prin'],
+  ['renouncedRomanianCitizenship', 'A renunțat la cetățenia română'],
+  ['birthName', 'Numele la naștere'],
+  ['fatherName', 'Numele tatălui'],
+  ['motherName', 'Numele mamei'],
+  ['purpose', 'Scopul obținerii'],
+  ['countryOfUse', 'Țara în care va fi folosit'],
+];
+
+function CivilStatusCard({ civilStatus }: { civilStatus: AnyObj | null }) {
+  if (!civilStatus || typeof civilStatus !== 'object') return null;
+  const entries = Object.entries(civilStatus).filter(
+    ([, v]) => v != null && String(v).trim() !== ''
+  );
+  if (entries.length === 0) return null;
+
+  const known = new Map(CIVIL_STATUS_LABELS);
+  // Known keys first (in label order), then any extras verbatim.
+  const ordered: Array<[string, string]> = [
+    ...CIVIL_STATUS_LABELS.filter(
+      ([k]) => civilStatus[k] != null && String(civilStatus[k]).trim() !== ''
+    ).map(([k, label]) => [label, String(civilStatus[k])] as [string, string]),
+    ...entries.filter(([k]) => !known.has(k)).map(([k, v]) => [k, String(v)] as [string, string]),
+  ];
+
+  return (
+    <Card>
+      <CardHeader className="pb-3">
+        <CardTitle className="text-base flex items-center gap-2">
+          <FileText className="h-4 w-4" />
+          Date stare civilă
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-1">
+        {ordered.map(([label, value]) => (
+          <InfoRow key={label} label={label} value={value} />
+        ))}
+      </CardContent>
+    </Card>
+  );
+}
 
 function InfoRow({ label, value, icon, mono = false }: { label: string; value: string; icon?: React.ReactNode; mono?: boolean }) {
   return (
