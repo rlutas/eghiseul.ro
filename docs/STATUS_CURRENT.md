@@ -1,5 +1,10 @@
 # eGhiseul.ro - Status Curent
 
+> **⚡ Update 2026-07-08 — LIVRAT:**
+> - **Newsletter GDPR complet** (migrația 095): opt-in explicit (popup calculatoare + checkbox contact form, nebifat default), `consent_text` + IP stocate ca dovadă, **unsubscribe 1-click** cu token (`/api/newsletter/unsubscribe/?token=`, pagină RO, rândul păstrat ca dovadă), re-consent reactivează. **Admin → Marketing** (nav nou, settings.manage): listă abonați, Activi/Dezabonați, căutare, Export CSV. Testat E2E pe live (subscribe → DB → unsubscribe → confirmare). ⚠️ API-ul cere trailing slash (`/api/newsletter/`) la apeluri directe (curl); fetch din browser urmează 308.
+> - **T&C extins la 18 secțiuni** cu conținutul operațional de pe WP-ul vechi: program de lucru + regula orei 14:00, întârzieri independente, condiții specifice pe servicii (împuternicire, anulare imposibilă la procesare automată, respingere ANCPI fără rambursare, credit ONRC), livrare, cesionare/subcontractare, corectitudinea datelor, reclamații. Termenele referă paginile serviciilor (sursă unică). Text vechi păstrat în `~/Downloads/eghiseul_wp_termeni_vechi.txt`.
+> - **Self-cancel 30 min verificat**: exista deja (card countdown pe `/comanda/status` + refund 70% admin, 23 teste). Dependența `paid_at` reparată de fix-ul webhook din 07.07.
+
 **Data:** 2026-06-15 (ONRC constatator IMM/insolvență FUNCȚIONAL în producție)
 
 > **⚡ Update 2026-07-07 — LIVRAT + GO-LIVE:**
