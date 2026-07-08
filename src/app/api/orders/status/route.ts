@@ -190,6 +190,21 @@ export async function GET(request: NextRequest) {
       }
     }
 
+    // Clean the customer-facing timeline (team feedback): each stage appears
+    // ONCE (raw history has repeats — two pending_payment rows, 'paid' +
+    // payment_confirmed, double 'completed'), and the raw 'paid' status is
+    // folded into payment_confirmed so nothing renders untranslated.
+    const seenStages = new Set<string>();
+    const cleanedTimeline = timeline.filter((t) => {
+      const stage = t.status === 'paid' ? 'payment_confirmed' : t.status;
+      t.status = stage;
+      if (seenStages.has(stage)) return false;
+      seenStages.add(stage);
+      return true;
+    });
+    timeline.length = 0;
+    timeline.push(...cleanedTimeline);
+
     // Transform documents for client display
     const DOC_TYPE_LABELS: Record<string, string> = {
       contract_complet: 'Contract',

@@ -198,6 +198,7 @@ interface OrderOptionStatus {
 const STATUS_CONFIG: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline'; className?: string }> = {
   draft: { label: 'Ciorna', variant: 'secondary' },
   pending: { label: 'In asteptare', variant: 'outline' },
+  pending_payment: { label: 'In asteptarea platii', variant: 'outline' },
   paid: { label: 'Platita', variant: 'default', className: 'bg-green-600 text-white' },
   processing: { label: 'In procesare', variant: 'default', className: 'bg-blue-600 text-white' },
   documents_generated: { label: 'Documente generate', variant: 'default', className: 'bg-blue-500 text-white' },
@@ -3883,6 +3884,21 @@ const TIMELINE_EVENT_CONFIG: Record<string, { icon: React.ElementType; color: st
   order_submitted: { icon: CheckCircle2, color: 'text-green-500', label: 'Comanda trimisa' },
   document_generation_failed: { icon: AlertTriangle, color: 'text-red-500', label: 'Eroare generare document' },
   order_cancelled: { icon: XCircle, color: 'text-red-500', label: 'Comanda anulata' },
+  payment_received: { icon: CreditCard, color: 'text-green-500', label: 'Plata primita' },
+  note_added: { icon: FileText, color: 'text-slate-400', label: 'Nota echipa' },
+  reupload_requested: { icon: Upload, color: 'text-amber-500', label: 'Documente solicitate clientului' },
+  kyc_photo_resubmitted: { icon: Upload, color: 'text-green-500', label: 'Client a incarcat documentele' },
+  modified: { icon: RefreshCw, color: 'text-amber-500', label: 'Comanda modificata' },
+  recovery_email_sent: { icon: Mail, color: 'text-blue-400', label: 'Email recuperare trimis' },
+  extra_payment_sent: { icon: CreditCard, color: 'text-yellow-500', label: 'Link plata suplimentara trimis' },
+  extra_payment_received: { icon: CreditCard, color: 'text-green-500', label: 'Plata suplimentara primita' },
+  shipped: { icon: Truck, color: 'text-purple-500', label: 'Expediata' },
+  delivered: { icon: CheckCircle2, color: 'text-emerald-600', label: 'Livrata' },
+  cancelled: { icon: XCircle, color: 'text-red-500', label: 'Anulata' },
+  cancellation_requested: { icon: AlertTriangle, color: 'text-red-500', label: 'Anulare solicitata' },
+  refunded: { icon: CreditCard, color: 'text-red-500', label: 'Rambursata' },
+  abandoned: { icon: XCircle, color: 'text-gray-400', label: 'Abandonata' },
+  kyc_verified: { icon: CheckCircle2, color: 'text-green-500', label: 'KYC verificat' },
 };
 
 function OrderTimeline({ timeline, orderCreatedAt }: { timeline: TimelineEvent[]; orderCreatedAt: string | null }) {
@@ -3895,7 +3911,7 @@ function OrderTimeline({ timeline, orderCreatedAt }: { timeline: TimelineEvent[]
   return (
     <div className="relative space-y-0">
       {events.map((event, index) => {
-        const config = TIMELINE_EVENT_CONFIG[event.event_type] || { icon: Clock, color: 'text-gray-400', label: event.event_type };
+        const config = TIMELINE_EVENT_CONFIG[event.event_type] || { icon: Clock, color: 'text-gray-400', label: (event.event_type || '').replace(/_/g, ' ') };
         const Icon = config.icon;
         const isLast = index === events.length - 1;
         return (

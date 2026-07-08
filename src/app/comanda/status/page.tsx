@@ -224,7 +224,7 @@ function OrderStatusContent() {
   };
 
   const getStatusConfig = (status: string) => {
-    return STATUS_CONFIG[status] || { label: status, color: 'bg-gray-100 text-gray-800', icon: Clock };
+    return STATUS_CONFIG[status] || { label: (status || '').replace(/_/g, ' '), color: 'bg-gray-100 text-gray-800', icon: Clock };
   };
 
   return (
