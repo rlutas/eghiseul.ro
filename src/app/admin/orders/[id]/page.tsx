@@ -1122,6 +1122,15 @@ export default function AdminOrderDetailPage() {
               <p className="text-sm text-muted-foreground">Nicio informatie de contact.</p>
             )}
 
+            {/* Corectare contact — clientul greșește frecvent telefonul și
+                devine de necontactat; echipa îl corectează aici (cu audit). */}
+            <ContactEditInline
+              orderId={order.id}
+              email={contact?.email || ''}
+              phone={contact?.phone || ''}
+              onSaved={fetchOrder}
+            />
+
             {/* Account linkage — client cu cont eGhișeul + status KYC pe cont */}
             <div className="pt-3 border-t border-neutral-100 space-y-2">
               <div className="flex items-center justify-between gap-2 text-sm">
@@ -3396,6 +3405,96 @@ function AwbSection({
 }
 
 // ---------- Helper Components ----------
+
+/** Inline admin correction of the customer's contact (phone/email) — saved
+ *  via PATCH /api/admin/orders/[id]/contact with an audit note. */
+function ContactEditInline({
+  orderId,
+  email,
+  phone,
+  onSaved,
+}: {
+  orderId: string;
+  email: string;
+  phone: string;
+  onSaved: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [newEmail, setNewEmail] = useState(email);
+  const [newPhone, setNewPhone] = useState(phone);
+  const [saving, setSaving] = useState(false);
+
+  if (!open) {
+    return (
+      <button
+        type="button"
+        onClick={() => {
+          setNewEmail(email);
+          setNewPhone(phone);
+          setOpen(true);
+        }}
+        className="inline-flex items-center gap-1.5 rounded-md border border-neutral-200 px-2 py-1 text-xs font-medium text-slate-600 hover:bg-slate-50"
+      >
+        <Pencil className="h-3 w-3" />
+        Corectează contact
+      </button>
+    );
+  }
+
+  const save = async () => {
+    setSaving(true);
+    try {
+      const res = await fetch(`/api/admin/orders/${orderId}/contact`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: newEmail.trim(), phone: newPhone.trim() }),
+      });
+      const json = await res.json();
+      if (!res.ok || !json.success) {
+        toast.error(json.error || 'Eroare la salvare');
+        return;
+      }
+      toast.success('Contact actualizat');
+      setOpen(false);
+      onSaved();
+    } catch {
+      toast.error('Eroare de rețea');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className="space-y-2 rounded-lg border border-amber-200 bg-amber-50/50 p-3">
+      <p className="text-xs font-semibold text-amber-800">Corectează datele de contact</p>
+      <div className="grid gap-2 sm:grid-cols-2">
+        <input
+          type="email"
+          value={newEmail}
+          onChange={(e) => setNewEmail(e.target.value)}
+          placeholder="Email"
+          className="h-9 rounded-md border border-neutral-200 bg-white px-3 text-sm outline-none focus:border-amber-400"
+        />
+        <input
+          type="tel"
+          value={newPhone}
+          onChange={(e) => setNewPhone(e.target.value)}
+          placeholder="Telefon (+40...)"
+          className="h-9 rounded-md border border-neutral-200 bg-white px-3 text-sm outline-none focus:border-amber-400"
+        />
+      </div>
+      <div className="flex gap-2">
+        <Button size="sm" className="h-7 text-xs" onClick={save} disabled={saving}>
+          {saving ? 'Se salvează…' : 'Salvează'}
+        </Button>
+        <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => setOpen(false)} disabled={saving}>
+          Anulează
+        </Button>
+      </div>
+      <p className="text-[11px] text-amber-700">Modificarea se notează automat în Note Echipă (vechi → nou).</p>
+    </div>
+  );
+}
 
 /** One-click copy of the delivery address as an international shipping label
  *  (name / street / postal+city / region / country / phone) — for manual
