@@ -16,6 +16,13 @@ export interface ReuploadDocSpec {
   target: 'personal' | 'company';
   /** Company paperwork usually arrives as PDF; ID photos are images only. */
   acceptsPdf: boolean;
+  /**
+   * Optional companion of another doc type: not selectable in the admin
+   * modal and not required for completion, but offered as an extra upload
+   * slot on the customer page whenever its parent type is requested
+   * (e.g. the back of a generic ID — passports have no back).
+   */
+  companionOf?: string;
 }
 
 export const REUPLOAD_DOC_SPECS: Record<string, ReuploadDocSpec> = {
@@ -23,10 +30,17 @@ export const REUPLOAD_DOC_SPECS: Record<string, ReuploadDocSpec> = {
   // Lands as type 'act_identitate', which the /submit KYC guard accepts as a
   // manual ID (same type the wizard's manual route writes).
   act_identitate: {
-    label: 'Act de identitate (CI sau pașaport)',
-    hint: 'Poză clară cu buletinul sau pașaportul, toate datele lizibile',
+    label: 'Act de identitate — față (CI sau pașaport)',
+    hint: 'Poză clară cu fața buletinului sau pagina cu poza din pașaport, toate datele lizibile',
     target: 'personal',
     acceptsPdf: false,
+  },
+  act_identitate_back: {
+    label: 'Act de identitate — verso',
+    hint: 'Doar pentru carte de identitate — versoul actului (la pașaport nu e cazul)',
+    target: 'personal',
+    acceptsPdf: false,
+    companionOf: 'act_identitate',
   },
   selfie: {
     label: 'Selfie cu actul de identitate',

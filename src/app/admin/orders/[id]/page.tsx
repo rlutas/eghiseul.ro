@@ -2742,6 +2742,7 @@ function RequestDocumentsButton({
           </p>
           <div className="space-y-1 bg-white rounded-md border border-amber-100 p-2 max-h-44 overflow-y-auto">
             {Object.entries(REUPLOAD_DOC_SPECS)
+              .filter(([, spec]) => !spec.companionOf)
               .sort(([a], [b]) => Number(suggested.has(b)) - Number(suggested.has(a)))
               .map(([type, spec]) => (
                 <label

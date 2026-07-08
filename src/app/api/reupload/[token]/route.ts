@@ -51,6 +51,7 @@ interface ReuploadRow {
   document_types: string[] | null;
   completed_documents: Array<{ type: string; s3Key: string; at: string }>;
   status: string;
+  reason: string | null;
   token_expires_at: string;
   return_status: string | null;
 }
@@ -61,6 +62,13 @@ function requestedTypes(req: ReuploadRow): string[] {
     : [req.document_type];
 }
 
+/** Optional companion types (e.g. ID back) offered alongside the requested set. */
+function companionTypes(requested: string[]): string[] {
+  return Object.entries(REUPLOAD_DOC_SPECS)
+    .filter(([, spec]) => spec.companionOf && requested.includes(spec.companionOf))
+    .map(([type]) => type);
+}
+
 async function loadRequest(token: string) {
   const admin = createAdminClient();
   // `reupload_requests` isn't in the generated Supabase types yet — cast the
@@ -68,7 +76,7 @@ async function loadRequest(token: string) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data, error } = await (admin as any)
     .from('reupload_requests')
-    .select('id, order_id, document_type, document_types, completed_documents, status, token_expires_at, return_status')
+    .select('id, order_id, document_type, document_types, completed_documents, status, reason, token_expires_at, return_status')
     .eq('token', token)
     .single();
   if (error || !data) return { admin, req: null as ReuploadRow | null };
@@ -79,7 +87,8 @@ async function loadRequest(token: string) {
 
 function docsPayload(req: ReuploadRow) {
   const done = new Set(req.completed_documents.map((d) => d.type));
-  return requestedTypes(req).map((type) => {
+  const requested = requestedTypes(req);
+  const entry = (type: string, optional: boolean) => {
     const spec = REUPLOAD_DOC_SPECS[type];
     return {
       type,
@@ -87,8 +96,19 @@ function docsPayload(req: ReuploadRow) {
       hint: spec?.hint ?? '',
       acceptsPdf: spec?.acceptsPdf ?? false,
       uploaded: done.has(type),
+      optional,
     };
-  });
+  };
+  // Interleave each companion right after its parent so the page shows
+  // "Act — față" and "Act — verso (opțional)" together.
+  const out: ReturnType<typeof entry>[] = [];
+  for (const type of requested) {
+    out.push(entry(type, false));
+    for (const companion of companionTypes([type])) {
+      out.push(entry(companion, true));
+    }
+  }
+  return out;
 }
 
 export async function GET(
@@ -96,18 +116,36 @@ export async function GET(
   { params }: { params: Promise<{ token: string }> }
 ) {
   const { token } = await params;
-  const { req } = await loadRequest(token);
+  const { admin, req } = await loadRequest(token);
   if (!req) {
     return NextResponse.json({ success: false, error: 'invalid' }, { status: 404 });
   }
   const expired = new Date(req.token_expires_at).getTime() < Date.now();
   const usable = req.status === 'pending' && !expired;
+
+  // Friendly order code for page context (not PII — the token holder got it
+  // in the request email anyway).
+  let orderCode: string | null = null;
+  try {
+    const { data: order } = await admin
+      .from('orders')
+      .select('friendly_order_id, order_number')
+      .eq('id', req.order_id)
+      .single();
+    orderCode = order?.friendly_order_id || order?.order_number || null;
+  } catch {
+    // non-blocking
+  }
+
   return NextResponse.json({
     success: true,
     data: {
       documents: docsPayload(req),
       status: expired && req.status === 'pending' ? 'expired' : req.status,
       usable,
+      reason: req.reason,
+      orderCode,
+      expiresAt: req.token_expires_at,
     },
   });
 }
@@ -135,6 +173,7 @@ export async function POST(
     const contentType: string = ((body?.contentType as string) || 'image/jpeg').toLowerCase();
 
     const types = requestedTypes(req);
+    const allowedTypes = [...types, ...companionTypes(types)];
     // Single-doc legacy links may omit documentType — default to the only doc.
     const docType: string =
       typeof body?.documentType === 'string' && body.documentType
@@ -142,7 +181,7 @@ export async function POST(
         : types.length === 1
           ? types[0]
           : '';
-    if (!types.includes(docType)) {
+    if (!allowedTypes.includes(docType)) {
       return NextResponse.json(
         { success: false, error: 'Documentul nu face parte din această cerere' },
         { status: 400 }

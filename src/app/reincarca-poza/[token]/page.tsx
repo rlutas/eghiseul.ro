@@ -7,6 +7,8 @@
  * pașaport, certificat firmă (PDF)... Opened from the link in the
  * admin-triggered email / WhatsApp message or from the order status page.
  * No login. Mobile-first — most customers open it on a phone.
+ *
+ * The header/footer chrome lives in layout.tsx.
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -18,6 +20,8 @@ import {
   Camera,
   Upload,
   FileText,
+  MessageSquareText,
+  ShieldCheck,
 } from 'lucide-react';
 import { compressImage } from '@/lib/images/compress';
 
@@ -27,12 +31,19 @@ interface RequestedDoc {
   hint: string;
   acceptsPdf: boolean;
   uploaded: boolean;
+  optional?: boolean;
 }
 
 type LoadState =
   | { kind: 'loading' }
   | { kind: 'unusable'; status: string }
-  | { kind: 'ready'; documents: RequestedDoc[] }
+  | {
+      kind: 'ready';
+      documents: RequestedDoc[];
+      reason: string | null;
+      orderCode: string | null;
+      expiresAt: string | null;
+    }
   | { kind: 'done' };
 
 const MAX_PDF_BYTES = 9 * 1024 * 1024;
@@ -57,7 +68,13 @@ export default function ReuploadPage() {
         if (!data.data.usable) {
           setState({ kind: 'unusable', status: data.data.status });
         } else {
-          setState({ kind: 'ready', documents: data.data.documents });
+          setState({
+            kind: 'ready',
+            documents: data.data.documents,
+            reason: data.data.reason ?? null,
+            orderCode: data.data.orderCode ?? null,
+            expiresAt: data.data.expiresAt ?? null,
+          });
         }
       } catch {
         if (!cancelled) setState({ kind: 'unusable', status: 'invalid' });
@@ -68,24 +85,26 @@ export default function ReuploadPage() {
     };
   }, [token]);
 
-  const handleUploaded = useCallback(
-    (documents: RequestedDoc[], allDone: boolean) => {
-      if (allDone) setState({ kind: 'done' });
-      else setState({ kind: 'ready', documents });
-    },
-    []
-  );
+  const handleUploaded = useCallback((documents: RequestedDoc[], allDone: boolean) => {
+    if (allDone) {
+      setState({ kind: 'done' });
+    } else {
+      setState((prev) =>
+        prev.kind === 'ready' ? { ...prev, documents } : prev
+      );
+    }
+  }, []);
 
   const remaining =
-    state.kind === 'ready' ? state.documents.filter((d) => !d.uploaded).length : 0;
+    state.kind === 'ready'
+      ? state.documents.filter((d) => !d.uploaded && !d.optional).length
+      : 0;
+  const requiredCount =
+    state.kind === 'ready' ? state.documents.filter((d) => !d.optional).length : 0;
 
   return (
-    <div className="min-h-screen bg-neutral-50 flex flex-col items-center px-4 py-10">
+    <div className="flex flex-col items-center px-4 py-10">
       <div className="w-full max-w-md">
-        <div className="text-center mb-6">
-          <div className="text-xl font-bold text-secondary-900">eGhișeul.ro</div>
-        </div>
-
         <div className="bg-white border border-neutral-200 rounded-2xl p-6 shadow-sm">
           {state.kind === 'loading' && (
             <div className="flex flex-col items-center gap-3 py-8 text-neutral-500">
@@ -132,17 +151,34 @@ export default function ReuploadPage() {
           {state.kind === 'ready' && (
             <div className="space-y-4">
               <div className="text-center">
+                {state.orderCode && (
+                  <p className="text-xs font-mono text-neutral-400 mb-1">
+                    Comanda {state.orderCode}
+                  </p>
+                )}
                 <h1 className="text-lg font-semibold text-secondary-900">
-                  {state.documents.length === 1
+                  {requiredCount === 1
                     ? 'Încarcă documentul solicitat'
                     : 'Încarcă documentele solicitate'}
                 </h1>
                 <p className="text-sm text-neutral-600 mt-1 leading-relaxed">
-                  {remaining === state.documents.length
-                    ? `Avem nevoie de ${state.documents.length === 1 ? 'un document' : `${state.documents.length} documente`} pentru a continua comanda.`
+                  {remaining === requiredCount
+                    ? `Avem nevoie de ${requiredCount === 1 ? 'un document' : `${requiredCount} documente`} pentru a continua comanda.`
                     : `Încă ${remaining} ${remaining === 1 ? 'document rămas' : 'documente rămase'}.`}
                 </p>
               </div>
+
+              {state.reason && (
+                <div className="flex items-start gap-2.5 rounded-xl bg-blue-50 border border-blue-100 px-3.5 py-3">
+                  <MessageSquareText className="h-4 w-4 text-blue-600 mt-0.5 shrink-0" />
+                  <div>
+                    <p className="text-xs font-semibold text-blue-900 mb-0.5">
+                      Mesaj de la echipa eGhișeul.ro
+                    </p>
+                    <p className="text-sm text-blue-900/90 leading-relaxed">{state.reason}</p>
+                  </div>
+                </div>
+              )}
 
               {state.documents.map((doc) => (
                 <DocUploadCard
@@ -152,11 +188,24 @@ export default function ReuploadPage() {
                   onUploaded={handleUploaded}
                 />
               ))}
+
+              {state.expiresAt && (
+                <p className="text-center text-xs text-neutral-400">
+                  Linkul este valabil până la{' '}
+                  {new Date(state.expiresAt).toLocaleDateString('ro-RO', {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric',
+                  })}
+                  .
+                </p>
+              )}
             </div>
           )}
         </div>
 
-        <p className="text-center text-xs text-neutral-400 mt-4">
+        <p className="flex items-center justify-center gap-1.5 text-center text-xs text-neutral-400 mt-4">
+          <ShieldCheck className="h-3.5 w-3.5" />
           Documentele sunt criptate și folosite exclusiv pentru procesarea comenzii.
         </p>
       </div>
@@ -260,7 +309,14 @@ function DocUploadCard({
   return (
     <div className="rounded-xl border border-neutral-200 p-4 space-y-3">
       <div>
-        <p className="text-sm font-semibold text-secondary-900">{doc.label}</p>
+        <p className="text-sm font-semibold text-secondary-900">
+          {doc.label}
+          {doc.optional && (
+            <span className="ml-1.5 rounded-full bg-neutral-100 px-2 py-0.5 text-[10px] font-medium text-neutral-500 align-middle">
+              opțional
+            </span>
+          )}
+        </p>
         {doc.hint && <p className="text-xs text-neutral-500 mt-0.5">{doc.hint}</p>}
       </div>
 
