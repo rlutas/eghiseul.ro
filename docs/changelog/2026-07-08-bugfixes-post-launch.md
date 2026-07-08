@@ -246,6 +246,31 @@ Layout nou, în ordinea fluxului de lucru (paritate + îmbunătățiri față de
 - Spec complet: `docs/technical/specs/document-request-system.md`. Migrarea 101.
 - Primul test real: E-260708-VC4GH (buletin administrator + selfie).
 
+## 20. 🚨 NEXT_PUBLIC_APP_URL arăta spre vercel.app (SSO) + fixuri găsite la primul test real
+
+Primul test „Solicită documente" pe E-260708-VC4GH a scos 4 probleme, toate reparate:
+
+- **`NEXT_PUBLIC_APP_URL` + `NEXT_PUBLIC_SITE_URL` = `eghiseul-ro.vercel.app`**
+  (env vechi de 40 zile, aceeași cauză ca incidentul workerilor): linkul de
+  upload din email ducea clientul la login wall Vercel. Corectate la
+  `https://eghiseul.ro` prin `vercel env` + redeploy. ⚠️ Lecție: orice link
+  generat server-side depinde de env-ul ăsta — la incidente „link mort", el e
+  primul suspect.
+- **`return_status` se pierdea la a doua cerere consecutivă** (comanda deja în
+  standby → NULL → comanda rămânea blocată în standby după upload). Cererea
+  nouă moștenește acum return_status de la cea anulată.
+- **Audit invizibil**: CHECK-ul `order_history_event_type_check` nu includea
+  `reupload_requested`/`kyc_photo_resubmitted` — inserturile eșuau silențios
+  din migrarea 048 încoace. Migrarea 102 le adaugă.
+- **Cererea dispărea din admin după refresh** — era doar state local. Acum
+  `GET /api/admin/orders/[id]` întoarce cererea activă și pagina afișează
+  banner persistent (documente cerute cu ✓ progres, motiv, valabilitate,
+  Copiază link / WhatsApp; expirate cu roșu).
+
+Verificat live cap-coadă: email cu link corect, banner pe status client,
+pagina de upload cu 2 carduri, comanda în „Așteptare client" vizibilă în
+tab-ul În procesare, audit în istoric, revenire automată pe `paid` la final.
+
 ## Rămase în coadă (nefăcute)
 
 - Email confirmare comandă către client (nu se trimite — port din sister).
