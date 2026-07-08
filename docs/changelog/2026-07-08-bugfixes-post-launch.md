@@ -101,8 +101,10 @@ Fiecare secțiune: **ce era stricat → ce s-a făcut → ce rămâne de verific
   box „Cum comanzi" (3 pași), copy actualizat la 799; slug-urile adăugate în
   `DB_SLUGS_WITH_HARDCODED_PAGE` (anti-duplicare SEO). `/comanda/…` verificat 200.
 - **De verificat:** o comandă de test cap-coadă pe noul wizard; eventual
-  specimen/imagine dedicată; add-on-ul vechi `extras_multilingv` rămâne pe
-  serviciile părinte (de decis dacă îl păstrăm — client poate lua ambele căi).
+  specimen/imagine dedicată.
+- **Decizie (user, 08.07):** add-on-ul `extras_multilingv` (+399) RĂMÂNE pe
+  certificat naștere/căsătorie — două căi valide: cumperi certificatul + extrasul
+  ca add-on (997+399) SAU doar extrasul standalone (799).
 
 ## Alte îmbunătățiri din aceeași zi
 
