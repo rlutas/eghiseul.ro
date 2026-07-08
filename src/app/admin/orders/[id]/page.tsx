@@ -1706,6 +1706,132 @@ export default function AdminOrderDetailPage() {
             />
           </CardContent>
         </Card>
+
+        {/* Facturare — mutat în coloana dreaptă sub Livrare (umple golul,
+            cerere user). */}
+        {/* Facturare — clean InfoRow style matching sister project. Includes
+            Oblio invoice number row with a link when the invoice has been
+            issued (paid orders). */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base flex items-center gap-2">
+              <Receipt className="h-4 w-4" />
+              Facturare
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-1">
+            {(() => {
+              const isPJBilling = billing?.type === 'persoana_juridica';
+              const tipFactura = isPJBilling ? 'Persoana Juridica' : 'Persoana Fizica';
+              const nume = isPJBilling
+                ? billing?.companyName || ''
+                : [billing?.lastName || personal?.lastName, billing?.firstName || personal?.firstName]
+                    .filter(Boolean)
+                    .join(' ');
+              const addrObj = isPJBilling
+                ? typeof billing?.companyAddress === 'object'
+                  ? billing.companyAddress
+                  : null
+                : typeof personal?.address === 'object'
+                  ? personal.address
+                  : null;
+              const addrStr = isPJBilling
+                ? typeof billing?.companyAddress === 'string'
+                  ? billing.companyAddress
+                  : ''
+                : typeof personal?.address === 'string'
+                  ? personal.address
+                  : '';
+
+              // For PF the invoice address comes from the billing step
+              // (billing.address/city/county) — that's what's sent to Oblio and
+              // may differ from the domicile (e.g. passport users, "another
+              // person"). Fall back to the scanned domicile address.
+              const pfStrada =
+                (!isPJBilling && billing?.address) ||
+                (addrObj
+                  ? [
+                      addrObj.street,
+                      addrObj.number && `nr. ${addrObj.number}`,
+                      addrObj.building && `bl. ${addrObj.building}`,
+                      addrObj.staircase && `sc. ${addrObj.staircase}`,
+                      addrObj.floor && `et. ${addrObj.floor}`,
+                      addrObj.apartment && `ap. ${addrObj.apartment}`,
+                    ]
+                      .filter(Boolean)
+                      .join(', ')
+                  : addrStr);
+              const strada = isPJBilling
+                ? addrObj
+                  ? [
+                      addrObj.street,
+                      addrObj.number && `nr. ${addrObj.number}`,
+                      addrObj.building && `bl. ${addrObj.building}`,
+                      addrObj.staircase && `sc. ${addrObj.staircase}`,
+                      addrObj.floor && `et. ${addrObj.floor}`,
+                      addrObj.apartment && `ap. ${addrObj.apartment}`,
+                    ]
+                      .filter(Boolean)
+                      .join(', ')
+                  : addrStr
+                : pfStrada;
+              const cityVal = isPJBilling
+                ? addrObj?.city
+                : billing?.city || addrObj?.city;
+              const countyVal = isPJBilling
+                ? addrObj?.county
+                : billing?.county || addrObj?.county;
+              const postalVal = isPJBilling
+                ? addrObj?.postalCode || addrObj?.postal_code
+                : billing?.postalCode || addrObj?.postalCode || addrObj?.postal_code;
+
+              return (
+                <>
+                  <InfoRow label="Tip factură" value={tipFactura} />
+                  {nume && <InfoRow label="Nume" value={nume} />}
+                  {isPJBilling && billing?.cui && <InfoRow label="CUI" value={billing.cui} mono />}
+                  {isPJBilling && (billing?.regCom || billing?.registrationNumber) && (
+                    <InfoRow
+                      label="Nr. Reg. Com."
+                      value={billing.regCom || billing.registrationNumber}
+                      mono
+                    />
+                  )}
+                  {strada && <InfoRow label="Strada" value={strada} />}
+                  {cityVal && <InfoRow label="Oraș" value={cityVal} />}
+                  {countyVal && <InfoRow label="Județ" value={countyVal} />}
+                  {postalVal && (
+                    <InfoRow label="Cod poștal" value={postalVal} />
+                  )}
+                  <Separator className="my-1.5" />
+                  {/* Oblio invoice slot — shows "—" until the invoice is
+                      issued, then displays the invoice number with a link
+                      to the Oblio PDF. */}
+                  {order.invoice_number && order.invoice_url ? (
+                    <div className="flex items-center justify-between gap-4 text-sm">
+                      <span className="text-muted-foreground">Nr. factură Oblio</span>
+                      <Link
+                        href={order.invoice_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="font-mono text-primary hover:underline"
+                      >
+                        {order.invoice_number} ↗
+                      </Link>
+                    </div>
+                  ) : order.invoice_number ? (
+                    <InfoRow label="Nr. factură Oblio" value={order.invoice_number} mono />
+                  ) : (
+                    <InfoRow label="Nr. factură Oblio" value="—" />
+                  )}
+                  {!billing && !personal && (
+                    <p className="text-sm text-muted-foreground">Nicio informație de facturare.</p>
+                  )}
+                </>
+              );
+            })()}
+          </CardContent>
+        </Card>
         </div>
       </div>
 
@@ -1913,131 +2039,8 @@ export default function AdminOrderDetailPage() {
         })()
       )}
 
-      {/* ROW 2: Facturare + Contract semnat */}
+      {/* ROW 2: Contract semnat */}
       <div className="grid gap-4 lg:grid-cols-2">
-        {/* Facturare — clean InfoRow style matching sister project. Includes
-            Oblio invoice number row with a link when the invoice has been
-            issued (paid orders). */}
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base flex items-center gap-2">
-              <Receipt className="h-4 w-4" />
-              Facturare
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-1">
-            {(() => {
-              const isPJBilling = billing?.type === 'persoana_juridica';
-              const tipFactura = isPJBilling ? 'Persoana Juridica' : 'Persoana Fizica';
-              const nume = isPJBilling
-                ? billing?.companyName || ''
-                : [billing?.lastName || personal?.lastName, billing?.firstName || personal?.firstName]
-                    .filter(Boolean)
-                    .join(' ');
-              const addrObj = isPJBilling
-                ? typeof billing?.companyAddress === 'object'
-                  ? billing.companyAddress
-                  : null
-                : typeof personal?.address === 'object'
-                  ? personal.address
-                  : null;
-              const addrStr = isPJBilling
-                ? typeof billing?.companyAddress === 'string'
-                  ? billing.companyAddress
-                  : ''
-                : typeof personal?.address === 'string'
-                  ? personal.address
-                  : '';
-
-              // For PF the invoice address comes from the billing step
-              // (billing.address/city/county) — that's what's sent to Oblio and
-              // may differ from the domicile (e.g. passport users, "another
-              // person"). Fall back to the scanned domicile address.
-              const pfStrada =
-                (!isPJBilling && billing?.address) ||
-                (addrObj
-                  ? [
-                      addrObj.street,
-                      addrObj.number && `nr. ${addrObj.number}`,
-                      addrObj.building && `bl. ${addrObj.building}`,
-                      addrObj.staircase && `sc. ${addrObj.staircase}`,
-                      addrObj.floor && `et. ${addrObj.floor}`,
-                      addrObj.apartment && `ap. ${addrObj.apartment}`,
-                    ]
-                      .filter(Boolean)
-                      .join(', ')
-                  : addrStr);
-              const strada = isPJBilling
-                ? addrObj
-                  ? [
-                      addrObj.street,
-                      addrObj.number && `nr. ${addrObj.number}`,
-                      addrObj.building && `bl. ${addrObj.building}`,
-                      addrObj.staircase && `sc. ${addrObj.staircase}`,
-                      addrObj.floor && `et. ${addrObj.floor}`,
-                      addrObj.apartment && `ap. ${addrObj.apartment}`,
-                    ]
-                      .filter(Boolean)
-                      .join(', ')
-                  : addrStr
-                : pfStrada;
-              const cityVal = isPJBilling
-                ? addrObj?.city
-                : billing?.city || addrObj?.city;
-              const countyVal = isPJBilling
-                ? addrObj?.county
-                : billing?.county || addrObj?.county;
-              const postalVal = isPJBilling
-                ? addrObj?.postalCode || addrObj?.postal_code
-                : billing?.postalCode || addrObj?.postalCode || addrObj?.postal_code;
-
-              return (
-                <>
-                  <InfoRow label="Tip factură" value={tipFactura} />
-                  {nume && <InfoRow label="Nume" value={nume} />}
-                  {isPJBilling && billing?.cui && <InfoRow label="CUI" value={billing.cui} mono />}
-                  {isPJBilling && (billing?.regCom || billing?.registrationNumber) && (
-                    <InfoRow
-                      label="Nr. Reg. Com."
-                      value={billing.regCom || billing.registrationNumber}
-                      mono
-                    />
-                  )}
-                  {strada && <InfoRow label="Strada" value={strada} />}
-                  {cityVal && <InfoRow label="Oraș" value={cityVal} />}
-                  {countyVal && <InfoRow label="Județ" value={countyVal} />}
-                  {postalVal && (
-                    <InfoRow label="Cod poștal" value={postalVal} />
-                  )}
-                  <Separator className="my-1.5" />
-                  {/* Oblio invoice slot — shows "—" until the invoice is
-                      issued, then displays the invoice number with a link
-                      to the Oblio PDF. */}
-                  {order.invoice_number && order.invoice_url ? (
-                    <div className="flex items-center justify-between gap-4 text-sm">
-                      <span className="text-muted-foreground">Nr. factură Oblio</span>
-                      <Link
-                        href={order.invoice_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="font-mono text-primary hover:underline"
-                      >
-                        {order.invoice_number} ↗
-                      </Link>
-                    </div>
-                  ) : order.invoice_number ? (
-                    <InfoRow label="Nr. factură Oblio" value={order.invoice_number} mono />
-                  ) : (
-                    <InfoRow label="Nr. factură Oblio" value="—" />
-                  )}
-                  {!billing && !personal && (
-                    <p className="text-sm text-muted-foreground">Nicio informație de facturare.</p>
-                  )}
-                </>
-              );
-            })()}
-          </CardContent>
-        </Card>
 
         {/* Contract semnat — legal validity audit: signature timestamp,
             signing IP, browser user agent, SHA-256 of the contract PDF.
