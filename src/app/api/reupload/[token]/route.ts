@@ -1,30 +1,45 @@
 /**
- * Public, token-gated re-upload endpoint (no login).
+ * Public, token-gated document upload endpoint (no login) for the
+ * "Solicită documente" flow.
  *
- * GET  /api/reupload/[token]  → minimal info for the page (doc type, order code,
- *                               status). Leaks no PII.
- * POST /api/reupload/[token]  → accepts a new photo (base64), uploads it to S3,
- *                               replaces the document on the order, re-flags the
- *                               order for manual review, marks the request used.
+ * GET  /api/reupload/[token]  → the list of requested documents + which are
+ *                               already uploaded (no PII).
+ * POST /api/reupload/[token]  → accepts ONE document per call (base64),
+ *                               uploads it to S3, replaces the document on the
+ *                               order and re-flags it for manual review. When
+ *                               the LAST requested document arrives the
+ *                               request flips to 'completed', the order exits
+ *                               standby (restored to its pre-request status,
+ *                               SLA shifted by the paused days) and the team
+ *                               inbox is notified.
  *
  * Security: the token is an opaque random string stored in `reupload_requests`.
  * A request is usable only while status='pending' and not past token_expires_at.
- * Single-use — completing it flips status to 'completed'. Accessed via the
- * service-role admin client (the table has RLS on, no public policies).
+ * Accessed via the service-role admin client (the table has RLS on, no public
+ * policies).
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { uploadBase64, getExtensionFromContentType } from '@/lib/aws/s3';
+import {
+  REUPLOAD_DOC_SPECS,
+  reuploadDocLabel,
+} from '@/lib/reupload/doc-types';
+import { exitStandby } from '@/lib/orders/standby';
+import { sendEmail } from '@/lib/email/resend';
+import {
+  buildReuploadCompletedSubject,
+  buildReuploadCompletedHtml,
+  buildReuploadCompletedText,
+} from '@/lib/email/templates/reupload-completed';
+import { ORGANIZATION } from '@/lib/seo/constants';
 
 export const runtime = 'nodejs';
 export const maxDuration = 30;
 
-const ALLOWED_TYPES = new Set(['image/jpeg', 'image/jpg', 'image/png', 'image/webp']);
+const IMAGE_TYPES = new Set(['image/jpeg', 'image/jpg', 'image/png', 'image/webp']);
 const MAX_BASE64_LEN = 12_000_000; // ~9 MB binary — phone photos compressed client-side are far smaller
-const DOC_LABELS: Record<string, string> = {
-  selfie: 'selfie cu actul de identitate',
-};
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyObj = Record<string, any>;
@@ -33,8 +48,17 @@ interface ReuploadRow {
   id: string;
   order_id: string;
   document_type: string;
+  document_types: string[] | null;
+  completed_documents: Array<{ type: string; s3Key: string; at: string }>;
   status: string;
   token_expires_at: string;
+  return_status: string | null;
+}
+
+function requestedTypes(req: ReuploadRow): string[] {
+  return Array.isArray(req.document_types) && req.document_types.length > 0
+    ? req.document_types
+    : [req.document_type];
 }
 
 async function loadRequest(token: string) {
@@ -44,11 +68,27 @@ async function loadRequest(token: string) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data, error } = await (admin as any)
     .from('reupload_requests')
-    .select('id, order_id, document_type, status, token_expires_at')
+    .select('id, order_id, document_type, document_types, completed_documents, status, token_expires_at, return_status')
     .eq('token', token)
     .single();
   if (error || !data) return { admin, req: null as ReuploadRow | null };
-  return { admin, req: data as ReuploadRow };
+  const row = data as ReuploadRow;
+  if (!Array.isArray(row.completed_documents)) row.completed_documents = [];
+  return { admin, req: row };
+}
+
+function docsPayload(req: ReuploadRow) {
+  const done = new Set(req.completed_documents.map((d) => d.type));
+  return requestedTypes(req).map((type) => {
+    const spec = REUPLOAD_DOC_SPECS[type];
+    return {
+      type,
+      label: reuploadDocLabel(type),
+      hint: spec?.hint ?? '',
+      acceptsPdf: spec?.acceptsPdf ?? false,
+      uploaded: done.has(type),
+    };
+  });
 }
 
 export async function GET(
@@ -65,8 +105,7 @@ export async function GET(
   return NextResponse.json({
     success: true,
     data: {
-      documentType: req.document_type,
-      documentLabel: DOC_LABELS[req.document_type] || req.document_type,
+      documents: docsPayload(req),
       status: expired && req.status === 'pending' ? 'expired' : req.status,
       usable,
     },
@@ -93,21 +132,40 @@ export async function POST(
 
     const body = await request.json().catch(() => ({}));
     const imageBase64: string | undefined = body?.imageBase64;
-    const contentType: string = (body?.contentType as string) || 'image/jpeg';
-    if (!imageBase64 || typeof imageBase64 !== 'string') {
-      return NextResponse.json({ success: false, error: 'Lipsește imaginea' }, { status: 400 });
-    }
-    if (!ALLOWED_TYPES.has(contentType.toLowerCase())) {
-      return NextResponse.json({ success: false, error: 'Format imagine neacceptat' }, { status: 400 });
-    }
-    if (imageBase64.length > MAX_BASE64_LEN) {
-      return NextResponse.json({ success: false, error: 'Imagine prea mare' }, { status: 413 });
+    const contentType: string = ((body?.contentType as string) || 'image/jpeg').toLowerCase();
+
+    const types = requestedTypes(req);
+    // Single-doc legacy links may omit documentType — default to the only doc.
+    const docType: string =
+      typeof body?.documentType === 'string' && body.documentType
+        ? body.documentType
+        : types.length === 1
+          ? types[0]
+          : '';
+    if (!types.includes(docType)) {
+      return NextResponse.json(
+        { success: false, error: 'Documentul nu face parte din această cerere' },
+        { status: 400 }
+      );
     }
 
-    const docType = req.document_type;
+    const spec = REUPLOAD_DOC_SPECS[docType];
+    const allowed = new Set(IMAGE_TYPES);
+    if (spec?.acceptsPdf) allowed.add('application/pdf');
+
+    if (!imageBase64 || typeof imageBase64 !== 'string') {
+      return NextResponse.json({ success: false, error: 'Lipsește fișierul' }, { status: 400 });
+    }
+    if (!allowed.has(contentType)) {
+      return NextResponse.json({ success: false, error: 'Format fișier neacceptat' }, { status: 400 });
+    }
+    if (imageBase64.length > MAX_BASE64_LEN) {
+      return NextResponse.json({ success: false, error: 'Fișier prea mare' }, { status: 413 });
+    }
+
     const ext = getExtensionFromContentType(contentType);
     // Distinct key per re-upload keeps prior versions; customer_data points at
-    // the latest. Timestamp-free (Date.now is fine on the server here).
+    // the latest.
     const s3Key = `kyc/${req.order_id}/${docType}_reupload_${req.id}.${ext}`;
     await uploadBase64(s3Key, imageBase64, contentType, {
       orderId: req.order_id,
@@ -116,13 +174,18 @@ export async function POST(
     });
 
     // Update the order: replace the document's s3Key + re-flag for manual review.
-    const { data: order } = await admin
+    // (`standby_*` columns aren't in the generated types yet — cast the builder.)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: order } = await (admin as any)
       .from('orders')
-      .select('id, customer_data')
+      .select('id, friendly_order_id, order_number, status, customer_data, standby_started_at, standby_total_seconds, estimated_completion_date')
       .eq('id', req.order_id)
       .single();
     const customerData: AnyObj = (order?.customer_data as AnyObj) ?? {};
-    const updatedCustomerData = applyReuploadToCustomerData(customerData, docType, s3Key, contentType);
+    const updatedCustomerData =
+      spec?.target === 'company'
+        ? applyCompanyDocToCustomerData(customerData, docType, s3Key, contentType)
+        : applyPersonalDocToCustomerData(customerData, docType, s3Key, contentType);
 
     const nowIso = new Date().toISOString();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -131,21 +194,47 @@ export async function POST(
       .update({ customer_data: updatedCustomerData, kyc_verified_at: null, updated_at: nowIso })
       .eq('id', req.order_id);
 
+    // Progress bookkeeping on the request row.
+    const completed = [
+      ...req.completed_documents.filter((d) => d.type !== docType),
+      { type: docType, s3Key, at: nowIso },
+    ];
+    const doneTypes = new Set(completed.map((d) => d.type));
+    const allDone = types.every((t) => doneTypes.has(t));
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     await (admin as any)
       .from('reupload_requests')
-      .update({ status: 'completed', completed_at: nowIso, new_s3_key: s3Key, updated_at: nowIso })
+      .update({
+        completed_documents: completed,
+        ...(allDone
+          ? { status: 'completed', completed_at: nowIso, new_s3_key: s3Key }
+          : {}),
+        updated_at: nowIso,
+      })
       .eq('id', req.id);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     await (admin as any).from('order_history').insert({
       order_id: req.order_id,
       event_type: 'kyc_photo_resubmitted',
-      new_value: { documentType: docType, s3Key, reuploadRequestId: req.id },
-      notes: `Client a reîncărcat ${DOC_LABELS[docType] || docType} — necesită reverificare`,
+      new_value: { documentType: docType, s3Key, reuploadRequestId: req.id, allDone },
+      notes: `Client a încărcat ${reuploadDocLabel(docType)} (${doneTypes.size}/${types.length}) — necesită reverificare`,
     });
 
-    return NextResponse.json({ success: true, data: { message: 'Poza a fost încărcată' } });
+    // Last document: bring the order back from standby + tell the team.
+    if (allDone) {
+      await finalizeRequest(admin, req, order as AnyObj | null, types, nowIso);
+    }
+
+    return NextResponse.json({
+      success: true,
+      data: {
+        message: 'Document încărcat',
+        documents: docsPayload({ ...req, completed_documents: completed }),
+        allDone,
+      },
+    });
   } catch (error) {
     console.error('[reupload:POST] error:', error);
     return NextResponse.json(
@@ -156,12 +245,82 @@ export async function POST(
 }
 
 /**
- * Replace the re-uploaded document's s3Key inside customer_data (handles both
- * `personal` (PF submit shape) and `personalData` (wizard shape)), clear any
- * admin verification flag so the team re-checks, and re-flag the selfie KYC
- * entry for manual review.
+ * On the last upload: restore the order from standby to its pre-request
+ * status (shifting the SLA by the paused business days) and notify the team
+ * inbox. Failures here must not fail the customer's upload — everything is
+ * best-effort with its own error logging.
  */
-function applyReuploadToCustomerData(
+async function finalizeRequest(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  admin: any,
+  req: ReuploadRow,
+  order: AnyObj | null,
+  types: string[],
+  nowIso: string
+) {
+  let restoredStatus: string | null = null;
+  try {
+    // Only touch the status if the order is still parked where we put it —
+    // an operator may have moved it manually in the meantime.
+    if (req.return_status && order?.status === 'standby' && order?.standby_started_at) {
+      const exit = exitStandby({
+        standby_started_at: order.standby_started_at,
+        standby_total_seconds: order.standby_total_seconds ?? 0,
+        estimated_completion_date: order.estimated_completion_date ?? null,
+      });
+      await admin
+        .from('orders')
+        .update({
+          status: req.return_status,
+          standby_started_at: exit.standby_started_at,
+          standby_total_seconds: exit.standby_total_seconds,
+          estimated_completion_date: exit.estimated_completion_date,
+          updated_at: nowIso,
+        })
+        .eq('id', req.order_id);
+      restoredStatus = req.return_status;
+
+      await admin.from('order_history').insert({
+        order_id: req.order_id,
+        event_type: 'status_changed',
+        old_value: { status: 'standby' },
+        new_value: { status: req.return_status, pausedBusinessDays: exit.pausedBusinessDays },
+        notes: `Documente primite de la client — comanda a revenit din așteptare (SLA +${exit.pausedBusinessDays} zile lucrătoare)`,
+      });
+    }
+  } catch (err) {
+    console.error('[reupload] standby exit failed (continuing):', err);
+  }
+
+  try {
+    const base = process.env.NEXT_PUBLIC_APP_URL ?? 'https://eghiseul.ro';
+    const orderNumber: string =
+      order?.friendly_order_id || order?.order_number || req.order_id;
+    const input = {
+      orderNumber,
+      adminOrderUrl: `${base}/admin/orders/${req.order_id}`,
+      documentLabels: types.map((t) => reuploadDocLabel(t)),
+      restoredStatus,
+    };
+    await sendEmail({
+      to: ORGANIZATION.contactPoint.email,
+      subject: buildReuploadCompletedSubject(input),
+      html: buildReuploadCompletedHtml(input),
+      text: buildReuploadCompletedText(input),
+      idempotencyKey: `reupload-completed-${req.id}`,
+    });
+  } catch (err) {
+    console.error('[reupload] team notification failed (continuing):', err);
+  }
+}
+
+/**
+ * Replace the re-uploaded PERSONAL document's s3Key inside customer_data
+ * (handles both `personal` (PF submit shape) and `personalData` (wizard
+ * shape)), clear any admin verification flag so the team re-checks, and
+ * re-flag the selfie KYC entry for manual review.
+ */
+function applyPersonalDocToCustomerData(
   customerData: AnyObj,
   docType: string,
   s3Key: string,
@@ -170,9 +329,15 @@ function applyReuploadToCustomerData(
   const out: AnyObj = { ...customerData };
   const nowIso = new Date().toISOString();
 
-  for (const shapeKey of ['personal', 'personalData'] as const) {
-    const shape = customerData[shapeKey];
-    if (!shape || typeof shape !== 'object') continue;
+  // Orders that never had a personal shape (e.g. PJ orders placed before the
+  // personal-KYC config fix) still need somewhere to put the document.
+  const shapeKeys = ['personal', 'personalData'].filter(
+    (k) => customerData[k] && typeof customerData[k] === 'object'
+  );
+  if (shapeKeys.length === 0) shapeKeys.push('personal');
+
+  for (const shapeKey of shapeKeys) {
+    const shape: AnyObj = customerData[shapeKey] ?? {};
     const next: AnyObj = { ...shape };
 
     // Replace (or add) the document entry.
@@ -215,4 +380,45 @@ function applyReuploadToCustomerData(
   }
 
   return out;
+}
+
+/**
+ * Replace (or add) a COMPANY document inside customer_data.company
+ * .uploadedDocuments — the shape the PJ wizard writes ({id, type, s3Key,
+ * fileName, fileSize, mimeType, uploadedAt}).
+ */
+function applyCompanyDocToCustomerData(
+  customerData: AnyObj,
+  docType: string,
+  s3Key: string,
+  mimeType: string
+): AnyObj {
+  const nowIso = new Date().toISOString();
+  const company: AnyObj =
+    customerData.company && typeof customerData.company === 'object'
+      ? { ...customerData.company }
+      : {};
+  const docs: AnyObj[] = Array.isArray(company.uploadedDocuments)
+    ? company.uploadedDocuments
+    : [];
+  let found = false;
+  const newDocs = docs.map((d) => {
+    if (d?.type === docType) {
+      found = true;
+      return { ...d, s3Key, mimeType, uploadedAt: nowIso };
+    }
+    return d;
+  });
+  if (!found) {
+    newDocs.push({
+      id: s3Key,
+      type: docType,
+      s3Key,
+      fileName: `${docType}_reupload`,
+      mimeType,
+      uploadedAt: nowIso,
+    });
+  }
+  company.uploadedDocuments = newDocs;
+  return { ...customerData, company };
 }

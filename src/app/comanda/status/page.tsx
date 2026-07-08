@@ -26,6 +26,7 @@ import {
   CreditCard,
   ArrowLeft,
   FileText,
+  Upload,
 } from 'lucide-react';
 import TrackingTimeline from '@/components/orders/tracking-timeline';
 
@@ -58,6 +59,9 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; icon: typeof
   ready_for_delivery: { label: 'Pregătit pentru livrare', color: 'bg-emerald-100 text-emerald-800', icon: Package },
   shipped: { label: 'Expediat', color: 'bg-blue-100 text-blue-800', icon: Truck },
   delivered: { label: 'Livrat', color: 'bg-green-100 text-green-800', icon: CheckCircle },
+
+  // Waiting on the customer (SLA paused) — set when the team requests documents
+  standby: { label: 'Așteptăm documente de la tine', color: 'bg-orange-100 text-orange-800', icon: Upload },
 
   // Final statuses
   completed: { label: 'Finalizat', color: 'bg-green-100 text-green-800', icon: CheckCircle },
@@ -111,6 +115,11 @@ interface OrderData {
   selectedOptions?: SelectedOption[];
   processingDays?: number | null;
   hasUrgent?: boolean;
+  pendingReupload?: {
+    url: string;
+    documents: string[];
+    expiresAt: string;
+  } | null;
   estimatedCompletionDate?: string | null;
   delivery: {
     method: string | null;
@@ -308,6 +317,49 @@ function OrderStatusContent() {
               customer is confused. Always rendered above the status details
               to match sister project UX. */}
           <HelpContactCard orderCode={orderData.orderCode} />
+
+          {/* Documents requested from the customer — most urgent action, shown
+              above everything else with a direct link to the upload page. */}
+          {orderData.pendingReupload && orderData.pendingReupload.documents.length > 0 && (
+            <Card className="border-orange-300 bg-orange-50/70">
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-3">
+                  <div className="h-10 w-10 rounded-full bg-orange-100 flex items-center justify-center shrink-0">
+                    <Upload className="h-5 w-5 text-orange-600" />
+                  </div>
+                  <div className="flex-1 space-y-2">
+                    <p className="font-semibold text-orange-900">
+                      Avem nevoie de documente de la tine
+                    </p>
+                    <p className="text-sm text-orange-800">
+                      Pentru a continua procesarea comenzii, te rugăm să încarci:
+                    </p>
+                    <ul className="text-sm text-orange-900 list-disc list-inside space-y-0.5">
+                      {orderData.pendingReupload.documents.map((label) => (
+                        <li key={label}>{label}</li>
+                      ))}
+                    </ul>
+                    <a
+                      href={orderData.pendingReupload.url}
+                      className="inline-flex items-center gap-2 mt-1 rounded-lg bg-orange-600 hover:bg-orange-700 text-white text-sm font-semibold px-4 py-2 transition-colors"
+                    >
+                      <Upload className="h-4 w-4" />
+                      Încarcă documentele
+                    </a>
+                    <p className="text-xs text-orange-700">
+                      Linkul este valabil până la{' '}
+                      {new Date(orderData.pendingReupload.expiresAt).toLocaleDateString('ro-RO', {
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric',
+                      })}
+                      . Comanda este în așteptare până primim documentele.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Status Card */}
           <Card>

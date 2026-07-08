@@ -1,5 +1,6 @@
 import { createClient as createServiceClient } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';
+import { reuploadDocLabel } from '@/lib/reupload/doc-types';
 
 // Service role client to bypass RLS for public order status lookup
 const getServiceClient = () => createServiceClient(
@@ -228,6 +229,48 @@ export async function GET(request: NextRequest) {
     const urgentDays = serviceData?.urgent_days || null;
     const processingDays = hasUrgent && urgentDays ? urgentDays : (estimatedDays || null);
 
+    // Active "Solicită documente" request → the status page shows an upload
+    // banner with the direct link. Safe to expose here: the caller already
+    // proved they know the order code + the order's email.
+    let pendingReupload: {
+      url: string;
+      documents: string[];
+      expiresAt: string;
+    } | null = null;
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: reupload } = await (supabase as any)
+        .from('reupload_requests')
+        .select('token, document_type, document_types, completed_documents, token_expires_at')
+        .eq('order_id', order.id)
+        .eq('status', 'pending')
+        .gt('token_expires_at', new Date().toISOString())
+        .order('requested_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (reupload) {
+        const types: string[] =
+          Array.isArray(reupload.document_types) && reupload.document_types.length > 0
+            ? reupload.document_types
+            : [reupload.document_type];
+        const done = new Set(
+          (Array.isArray(reupload.completed_documents) ? reupload.completed_documents : []).map(
+            (d: { type: string }) => d.type
+          )
+        );
+        const base = process.env.NEXT_PUBLIC_APP_URL ?? 'https://eghiseul.ro';
+        pendingReupload = {
+          url: `${base}/reincarca-poza/${reupload.token}`,
+          documents: types
+            .filter((t) => !done.has(t))
+            .map((t) => reuploadDocLabel(t)),
+          expiresAt: reupload.token_expires_at,
+        };
+      }
+    } catch (err) {
+      console.error('[order-status] reupload lookup failed (continuing):', err);
+    }
+
     // VAT calculation (21% included in price)
     const VAT_RATE = 0.21;
     const totalPrice = parseFloat(String(order.total_price || 0));
@@ -261,6 +304,7 @@ export async function GET(request: NextRequest) {
         })),
         processingDays,
         hasUrgent,
+        pendingReupload,
         estimatedCompletionDate: order.estimated_completion_date
           ? new Date(order.estimated_completion_date).toISOString()
           : null,

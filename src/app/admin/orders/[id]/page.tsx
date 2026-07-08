@@ -15,6 +15,7 @@ import { Label } from '@/components/ui/label';
 import { getCountyFromCNP } from '@/lib/validations/cnp';
 import { estimateFromSelectedOptions } from '@/lib/delivery-calculator';
 import { isNoLawyerService } from '@/lib/documents/no-lawyer-services';
+import { REUPLOAD_DOC_SPECS } from '@/lib/reupload/doc-types';
 import {
   type KycPerDoc,
   extractKycByDocType,
@@ -1926,9 +1927,10 @@ export default function AdminOrderDetailPage() {
                   verifiedBy={adminVerifiedBy}
                   onChange={refreshSilent}
                 />
-                <RequestSelfieReuploadButton
+                <RequestDocumentsButton
                   orderId={order.id}
                   customerPhone={contact?.phone}
+                  onSent={refreshSilent}
                 />
               </div>
             </div>
@@ -2560,37 +2562,69 @@ function VerifyDocumentsButton({
 }
 
 /**
- * Admin action: generate a single-use link for the customer to re-upload their
- * selfie, email it to them, and surface Copy / WhatsApp-share controls so the
- * operator can also send it manually (no WhatsApp API integration).
+ * Admin action: "Solicită documente" — pick which documents the customer must
+ * (re)upload, generate a single-use link, email it to them and park the order
+ * in standby (SLA paused). Copy / WhatsApp-share controls let the operator
+ * also send the link manually (no WhatsApp API integration).
  */
-function RequestSelfieReuploadButton({
+function RequestDocumentsButton({
   orderId,
   customerPhone,
+  onSent,
 }: {
   orderId: string;
   customerPhone?: string | null;
+  onSent?: () => void;
 }) {
   const [open, setOpen] = useState(false);
   const [reason, setReason] = useState('');
+  const [selected, setSelected] = useState<Set<string>>(new Set(['selfie']));
   const [submitting, setSubmitting] = useState(false);
-  const [result, setResult] = useState<{ url: string; emailSent: boolean; expiresAt: string } | null>(null);
+  const [result, setResult] = useState<{
+    url: string;
+    emailSent: boolean;
+    expiresAt: string;
+    standby: boolean;
+  } | null>(null);
+
+  const toggle = (type: string) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(type)) next.delete(type);
+      else next.add(type);
+      return next;
+    });
+  };
 
   const handleSend = async () => {
+    if (selected.size === 0) {
+      toast.error('Bifează cel puțin un document');
+      return;
+    }
     setSubmitting(true);
     try {
       const res = await fetch(`/api/admin/orders/${orderId}/request-reupload`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ documentType: 'selfie', reason: reason.trim() || undefined }),
+        body: JSON.stringify({ documentTypes: [...selected], reason: reason.trim() || undefined }),
       });
       const data = await res.json();
       if (!res.ok || !data.success) {
         toast.error(data.error || 'Cererea a eșuat');
         return;
       }
-      setResult({ url: data.data.reuploadUrl, emailSent: data.data.emailSent, expiresAt: data.data.expiresAt });
-      toast.success(data.data.emailSent ? 'Link generat și trimis pe email' : 'Link generat (email indisponibil)');
+      setResult({
+        url: data.data.reuploadUrl,
+        emailSent: data.data.emailSent,
+        expiresAt: data.data.expiresAt,
+        standby: !!data.data.standby,
+      });
+      toast.success(
+        data.data.emailSent
+          ? `Link trimis pe email${data.data.standby ? ' — comanda e în așteptare client' : ''}`
+          : 'Link generat (email indisponibil)'
+      );
+      onSent?.();
     } catch {
       toast.error('Eroare la generarea linkului');
     } finally {
@@ -2600,7 +2634,7 @@ function RequestSelfieReuploadButton({
 
   const waHref = result
     ? `https://wa.me/${(customerPhone || '').replace(/[\s+()-]/g, '')}?text=${encodeURIComponent(
-        `Bună! Pentru a continua comanda, te rugăm reîncarcă selfie-ul aici: ${result.url}`
+        `Bună! Pentru a continua comanda, te rugăm încarcă documentele aici: ${result.url}`
       )}`
     : '';
 
@@ -2613,26 +2647,48 @@ function RequestSelfieReuploadButton({
         onClick={() => setOpen(true)}
       >
         <Camera className="h-3 w-3 mr-1" />
-        Cere poză nouă (selfie)
+        Solicită documente
       </Button>
     );
   }
 
   return (
-    <div className="w-72 rounded-lg border border-amber-200 bg-amber-50/60 p-3 space-y-2 text-left">
+    <div className="w-80 rounded-lg border border-amber-200 bg-amber-50/60 p-3 space-y-2 text-left">
       {!result ? (
         <>
-          <p className="text-xs font-medium text-amber-900">Cere clientului un selfie nou</p>
+          <p className="text-xs font-medium text-amber-900">
+            Ce documente ceri de la client?
+          </p>
+          <div className="space-y-1 bg-white rounded-md border border-amber-100 p-2 max-h-44 overflow-y-auto">
+            {Object.entries(REUPLOAD_DOC_SPECS).map(([type, spec]) => (
+              <label
+                key={type}
+                className="flex items-start gap-2 text-xs text-neutral-800 cursor-pointer py-0.5"
+              >
+                <input
+                  type="checkbox"
+                  className="mt-0.5 accent-amber-600"
+                  checked={selected.has(type)}
+                  onChange={() => toggle(type)}
+                />
+                <span>{spec.label}</span>
+              </label>
+            ))}
+          </div>
           <Textarea
             value={reason}
             onChange={(e) => setReason(e.target.value)}
             placeholder="Motiv (opțional) — ex. poza era neclară"
             className="text-xs min-h-[56px] bg-white"
           />
+          <p className="text-[11px] text-amber-800">
+            Clientul primește email cu link de încărcare. Comanda intră automat în
+            „așteptare client&rdquo; (SLA pauzat) și revine singură când încarcă tot.
+          </p>
           <div className="flex items-center gap-2">
             <Button size="sm" className="h-7 text-xs" onClick={handleSend} disabled={submitting}>
               {submitting ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : <Mail className="h-3 w-3 mr-1" />}
-              Trimite cererea
+              Trimite cererea ({selected.size})
             </Button>
             <button
               type="button"
@@ -2649,6 +2705,7 @@ function RequestSelfieReuploadButton({
           <p className="text-xs font-medium text-green-800 flex items-center gap-1">
             <CheckCircle2 className="h-3.5 w-3.5" />
             {result.emailSent ? 'Link trimis pe email' : 'Link generat'}
+            {result.standby ? ' — comandă în așteptare client' : ''}
           </p>
           <p className="text-[11px] text-neutral-600 break-all bg-white rounded px-2 py-1 border border-neutral-200">
             {result.url}

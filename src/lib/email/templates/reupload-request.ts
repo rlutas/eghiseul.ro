@@ -1,7 +1,7 @@
 /**
- * Email sent to a customer when the team needs them to re-upload a KYC photo
- * (currently the selfie) after the order was placed. Triggered from the admin
- * order page via POST /api/admin/orders/[id]/request-reupload.
+ * Email sent to a customer when the team needs them to (re)upload one or more
+ * documents after the order was placed ("Solicită documente"). Triggered from
+ * the admin order page via POST /api/admin/orders/[id]/request-reupload.
  *
  * Contains a single-use, expiring link to /reincarca-poza/<token>. Both HTML
  * and plain-text are produced; the body is fully inline (no external assets).
@@ -11,18 +11,22 @@ export interface ReuploadEmailInput {
   customerFirstName?: string | null;
   /** Friendly order code shown for reference, e.g. "E-260609-AB12C". */
   orderNumber: string;
-  /** Human label of the document to re-upload, e.g. "selfie cu actul de identitate". */
-  documentLabel: string;
+  /** Human labels of the requested documents. */
+  documentLabels: string[];
   /** Optional operator note explaining why. */
   reason?: string | null;
-  /** Absolute link to the re-upload page. */
+  /** Absolute link to the upload page. */
   reuploadUrl: string;
   /** Human-readable expiry, e.g. "16 iunie 2026". */
   expiresLabel: string;
 }
 
 export function buildReuploadSubject(input: ReuploadEmailInput): string {
-  return `Acțiune necesară: reîncarcă ${input.documentLabel} — comanda ${input.orderNumber}`;
+  const what =
+    input.documentLabels.length === 1
+      ? input.documentLabels[0].toLowerCase()
+      : `${input.documentLabels.length} documente`;
+  return `Acțiune necesară: încarcă ${what} — comanda ${input.orderNumber}`;
 }
 
 export function buildReuploadHtml(input: ReuploadEmailInput): string {
@@ -34,6 +38,12 @@ export function buildReuploadHtml(input: ReuploadEmailInput): string {
          <strong>Motiv:</strong> ${escapeHtml(input.reason)}
        </p>`
     : '';
+  const docList = input.documentLabels
+    .map(
+      (label) =>
+        `<li style="margin:0 0 6px 0;font-size:15px;line-height:1.6">${escapeHtml(label)}</li>`
+    )
+    .join('');
   return `<!doctype html>
 <html lang="ro">
   <head>
@@ -46,15 +56,18 @@ export function buildReuploadHtml(input: ReuploadEmailInput): string {
       <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:32px 28px">
         <p style="margin:0 0 12px 0;font-size:14px;color:#6b7280">Comanda ${escapeHtml(input.orderNumber)}</p>
         <h1 style="margin:0 0 16px 0;font-size:22px;line-height:1.3;color:#111827">${greeting}</h1>
-        <p style="margin:0 0 16px 0;font-size:15px;line-height:1.6">
-          Pentru a continua procesarea comenzii tale, avem nevoie să reîncarci
-          <strong>${escapeHtml(input.documentLabel)}</strong>. Durează mai puțin de un minut.
+        <p style="margin:0 0 12px 0;font-size:15px;line-height:1.6">
+          Pentru a continua procesarea comenzii tale, avem nevoie să încarci
+          ${input.documentLabels.length === 1 ? 'următorul document' : 'următoarele documente'}:
         </p>
+        <ul style="margin:0 0 16px 0;padding-left:20px">
+          ${docList}
+        </ul>
         ${reasonBlock}
         <div style="text-align:center;margin:28px 0">
           <a href="${escapeAttr(input.reuploadUrl)}"
              style="display:inline-block;background:#ECB95F;color:#1f2937;font-weight:600;font-size:16px;text-decoration:none;padding:14px 28px;border-radius:10px">
-            Reîncarcă poza
+            ${input.documentLabels.length === 1 ? 'Încarcă documentul' : 'Încarcă documentele'}
           </a>
         </div>
         <p style="margin:0 0 8px 0;font-size:13px;line-height:1.6;color:#6b7280">
@@ -64,8 +77,9 @@ export function buildReuploadHtml(input: ReuploadEmailInput): string {
           <a href="${escapeAttr(input.reuploadUrl)}" style="color:#b8860b">${escapeHtml(input.reuploadUrl)}</a>
         </p>
         <p style="margin:0;font-size:13px;line-height:1.6;color:#6b7280">
-          Linkul este valabil până la <strong>${escapeHtml(input.expiresLabel)}</strong> și poate fi
-          folosit o singură dată. Dacă nu ai solicitat această acțiune, ignoră acest email.
+          Linkul este valabil până la <strong>${escapeHtml(input.expiresLabel)}</strong>.
+          Comanda ta este în așteptare până primim documentele. Dacă nu ai
+          solicitat această acțiune, ignoră acest email.
         </p>
       </div>
       <p style="text-align:center;margin:16px 0 0 0;font-size:12px;color:#9ca3af">
@@ -84,11 +98,15 @@ export function buildReuploadText(input: ReuploadEmailInput): string {
     '',
     greeting,
     '',
-    `Pentru a continua procesarea comenzii, te rugăm să reîncarci ${input.documentLabel}.`,
+    `Pentru a continua procesarea comenzii, te rugăm să încarci ${
+      input.documentLabels.length === 1 ? 'următorul document' : 'următoarele documente'
+    }:`,
+    ...input.documentLabels.map((l) => `  - ${l}`),
     reason,
-    `Deschide acest link (valabil până la ${input.expiresLabel}, o singură utilizare):`,
+    `Deschide acest link (valabil până la ${input.expiresLabel}):`,
     input.reuploadUrl,
     '',
+    'Comanda ta este în așteptare până primim documentele.',
     'Dacă nu ai solicitat această acțiune, ignoră acest email.',
     '',
     'eGhișeul.ro',

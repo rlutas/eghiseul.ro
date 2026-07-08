@@ -1,12 +1,22 @@
 /**
  * POST /api/admin/orders/[id]/request-reupload
  *
- * Creates a single-use, expiring link that lets the customer re-upload a KYC
- * photo (currently the selfie) after the order was placed, and emails it to
- * them. The operator triggers this from the admin order page when a photo is
- * wrong/unclear. The link points at /reincarca-poza/<token>.
+ * "Solicită documente": creates a single-use, expiring link through which the
+ * customer uploads one or more documents (selfie, CI, pașaport, certificat
+ * firmă...) after the order was placed, and emails it to them. Triggered from
+ * the admin order page. The link points at /reincarca-poza/<token>.
  *
- * Body: { documentType?: 'selfie'; reason?: string }  (documentType defaults to 'selfie')
+ * Side effects:
+ *   - any previous still-pending request for the order is cancelled (one
+ *     active link per order keeps the customer flow unambiguous);
+ *   - the order is parked in status='standby' (SLA paused via
+ *     standby_started_at) when its current status allows it; the pre-standby
+ *     status is stored on the request (`return_status`) and restored
+ *     automatically when the customer finishes uploading.
+ *
+ * Body: { documentTypes?: string[]; documentType?: string; reason?: string }
+ *       (documentTypes preferred; single documentType kept for backward compat;
+ *        defaults to ['selfie'])
  * Auth: `orders.manage` permission required.
  *
  * Returns the link + expiry so the admin UI can also copy it / share it on
@@ -24,13 +34,16 @@ import {
   buildReuploadHtml,
   buildReuploadText,
 } from '@/lib/email/templates/reupload-request';
+import {
+  isKnownReuploadDocType,
+  reuploadDocLabel,
+  STANDBY_ELIGIBLE_STATUSES,
+} from '@/lib/reupload/doc-types';
+import { enterStandby } from '@/lib/orders/standby';
 
 export const runtime = 'nodejs';
 
 const TOKEN_TTL_DAYS = 7;
-const DOC_LABELS: Record<string, string> = {
-  selfie: 'selfie cu actul de identitate',
-};
 
 export async function POST(
   request: NextRequest,
@@ -51,11 +64,21 @@ export async function POST(
     }
 
     const body = await request.json().catch(() => ({}));
-    const documentType = (body?.documentType as string) || 'selfie';
     const reason = typeof body?.reason === 'string' ? body.reason.trim() || null : null;
-    if (documentType !== 'selfie') {
+
+    let documentTypes: string[] = Array.isArray(body?.documentTypes)
+      ? body.documentTypes.filter((t: unknown): t is string => typeof t === 'string')
+      : [];
+    if (documentTypes.length === 0 && typeof body?.documentType === 'string') {
+      documentTypes = [body.documentType];
+    }
+    if (documentTypes.length === 0) documentTypes = ['selfie'];
+    documentTypes = [...new Set(documentTypes)];
+
+    const unknown = documentTypes.filter((t) => !isKnownReuploadDocType(t));
+    if (unknown.length > 0) {
       return NextResponse.json(
-        { success: false, error: 'Doar reîncărcarea selfie-ului este suportată momentan' },
+        { success: false, error: `Tip de document necunoscut: ${unknown.join(', ')}` },
         { status: 400 }
       );
     }
@@ -63,7 +86,7 @@ export async function POST(
     const admin = createAdminClient();
     const { data: order, error: fetchErr } = await admin
       .from('orders')
-      .select('id, friendly_order_id, customer_data')
+      .select('id, friendly_order_id, order_number, status, customer_data')
       .eq('id', orderId)
       .single();
     if (fetchErr || !order) {
@@ -79,6 +102,22 @@ export async function POST(
       customerData?.personalData?.first_name ??
       null;
 
+    // One active link per order: cancel any previous still-pending request so
+    // an older emailed link can't race the new one.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (admin as any)
+      .from('reupload_requests')
+      .update({ status: 'cancelled', updated_at: new Date().toISOString() })
+      .eq('order_id', orderId)
+      .eq('status', 'pending');
+
+    // Park the order in standby (SLA paused) while we wait on the customer.
+    // Remember where it was so completion can restore it automatically.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const currentStatus = (order as any).status as string;
+    const shouldStandby = STANDBY_ELIGIBLE_STATUSES.has(currentStatus);
+    const returnStatus = shouldStandby ? currentStatus : null;
+
     // Opaque, URL-safe token. 32 random bytes → ~43 base64url chars.
     const token = randomBytes(32).toString('base64url');
     const now = new Date();
@@ -89,18 +128,33 @@ export async function POST(
       .from('reupload_requests')
       .insert({
         order_id: orderId,
-        document_type: documentType,
+        document_type: documentTypes[0],
+        document_types: documentTypes,
         token,
         token_expires_at: expiresAt.toISOString(),
         status: 'pending',
         reason,
         requested_by: user.id,
+        return_status: returnStatus,
       })
       .select('id')
       .single();
     if (insertErr) {
       console.error('[request-reupload] insert failed:', insertErr);
       return NextResponse.json({ success: false, error: 'Nu am putut crea cererea' }, { status: 500 });
+    }
+
+    if (shouldStandby) {
+      const standby = enterStandby(now);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (admin as any)
+        .from('orders')
+        .update({
+          status: 'standby',
+          standby_started_at: standby.standby_started_at,
+          updated_at: now.toISOString(),
+        })
+        .eq('id', orderId);
     }
 
     const base = process.env.NEXT_PUBLIC_APP_URL ?? 'https://eghiseul.ro';
@@ -111,12 +165,14 @@ export async function POST(
       year: 'numeric',
     });
 
+    const documentLabels = documentTypes.map((t) => reuploadDocLabel(t));
+
     let emailSent = false;
     if (email) {
       const emailInput = {
         customerFirstName: firstName,
-        orderNumber: order.friendly_order_id || orderId,
-        documentLabel: DOC_LABELS[documentType] || documentType,
+        orderNumber: order.friendly_order_id || order.order_number || orderId,
+        documentLabels,
         reason,
         reuploadUrl,
         expiresLabel,
@@ -137,13 +193,28 @@ export async function POST(
       order_id: orderId,
       event_type: 'reupload_requested',
       changed_by: user.id,
-      new_value: { documentType, reuploadRequestId: inserted.id, emailSent, reason },
-      notes: `Cerere reîncărcare ${DOC_LABELS[documentType] || documentType}${emailSent ? ' (email trimis)' : ''}`,
+      new_value: {
+        documentTypes,
+        reuploadRequestId: inserted.id,
+        emailSent,
+        reason,
+        standby: shouldStandby,
+        returnStatus,
+      },
+      notes: `Solicitare documente: ${documentLabels.join(', ')}${emailSent ? ' (email trimis)' : ''}${shouldStandby ? ' — comandă în așteptare client (SLA pauzat)' : ''}`,
     });
 
     return NextResponse.json({
       success: true,
-      data: { reuploadRequestId: inserted.id, token, reuploadUrl, expiresAt: expiresAt.toISOString(), emailSent },
+      data: {
+        reuploadRequestId: inserted.id,
+        token,
+        reuploadUrl,
+        expiresAt: expiresAt.toISOString(),
+        emailSent,
+        documentTypes,
+        standby: shouldStandby,
+      },
     });
   } catch (error) {
     console.error('[request-reupload] error:', error);
