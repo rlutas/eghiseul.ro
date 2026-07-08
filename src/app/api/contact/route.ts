@@ -31,6 +31,8 @@ interface ContactBody {
   message?: string;
   // Honeypot — real users never fill this (hidden field). Bots do.
   website?: string;
+  // Optional GDPR newsletter opt-in (checkbox in the form, unchecked by default).
+  newsletter?: boolean;
 }
 
 export async function POST(req: NextRequest) {
@@ -117,6 +119,38 @@ export async function POST(req: NextRequest) {
     await sendEmail({ to: INBOX, subject: mail.subject, html: mail.html, text: mail.text, replyTo: email });
   } catch (e) {
     console.error('[contact] email notify failed:', e instanceof Error ? e.message : e);
+  }
+
+  // Optional newsletter opt-in (explicit checkbox). Best-effort: a failure
+  // here must not fail the contact message itself.
+  if (body.newsletter === true) {
+    try {
+      const { CONSENT_TEXT } = await import('@/lib/marketing/consent');
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const nl = supabase as any;
+      const { data: existing } = await nl
+        .from('newsletter_subscribers')
+        .select('id')
+        .ilike('email', email)
+        .maybeSingle();
+      if (existing) {
+        await nl
+          .from('newsletter_subscribers')
+          .update({ consent: true, consent_text: CONSENT_TEXT, unsubscribed_at: null, source: 'contact-form', name })
+          .eq('id', existing.id);
+      } else {
+        await nl.from('newsletter_subscribers').insert({
+          email,
+          name,
+          source: 'contact-form',
+          consent: true,
+          consent_text: CONSENT_TEXT,
+          ip: ip === 'unknown' ? null : ip,
+        });
+      }
+    } catch (e) {
+      console.error('[contact] newsletter opt-in failed:', e instanceof Error ? e.message : e);
+    }
   }
 
   return NextResponse.json({ success: true });

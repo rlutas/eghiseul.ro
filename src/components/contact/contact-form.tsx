@@ -42,6 +42,7 @@ export function ContactForm() {
       subject,
       message: String(data.get('message') ?? ''),
       website: String(data.get('website') ?? ''), // honeypot
+      newsletter: data.get('newsletter') === 'on',
     };
 
     try {
@@ -158,6 +159,19 @@ export function ContactForm() {
           <a href="/politica-de-confidentialitate/" className="underline hover:text-primary-700">politica de confidențialitate</a>.
         </p>
       </div>
+
+      {/* Newsletter opt-in — GDPR: unchecked by default, explicit wording */}
+      <label className="flex items-start gap-2.5 text-sm text-neutral-600 cursor-pointer">
+        <input
+          type="checkbox"
+          name="newsletter"
+          className="mt-0.5 h-4 w-4 rounded border-neutral-300 accent-primary-500"
+        />
+        <span>
+          Sunt de acord să primesc pe email noutăți, ghiduri și oferte de la eGhișeul.ro.
+          Mă pot dezabona oricând, printr-un singur click.
+        </span>
+      </label>
     </form>
   );
 }

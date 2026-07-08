@@ -20,6 +20,7 @@ import {
   MapPin,
   Activity,
   Handshake,
+  Mail,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -52,6 +53,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: '/admin/colaboratori', label: 'Colaboratori', icon: Handshake, permission: 'orders.view' },
   { href: '/admin/status-portaluri', label: 'Stare portaluri', icon: Activity, permission: 'orders.view' },
   { href: '/admin/coupons', label: 'Cupoane', icon: Ticket, permission: 'settings.manage' },
+  { href: '/admin/marketing', label: 'Marketing', icon: Mail, permission: 'settings.manage' },
   { href: '/admin/users', label: 'Utilizatori', icon: Users, permission: 'users.manage' },
   { href: '/admin/settings', label: 'Setari', icon: Settings, permission: 'settings.manage' },
 ];
