@@ -25,7 +25,7 @@ export default function Page() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }} />
-      <LegalLayout title="Termeni și Condiții" updated="26 iunie 2026">
+      <LegalLayout title="Termeni și Condiții" updated="8 iulie 2026">
         <p>
           Acești Termeni și Condiții reglementează utilizarea platformei <strong>eGhișeul.ro</strong>, operată de
           <strong> eDigitalizare SRL</strong> (CUI RO49278701, Reg. Com. J2023001097301, sediul în Jud. Satu Mare,
@@ -79,16 +79,53 @@ export default function Page() {
           <strong> Stripe</strong> (certificat PCI DSS Level 1). Nu stocăm datele cardului pe serverele noastre.
         </p>
 
-        <h2>5. Termene de livrare</h2>
+        <h2>5. Program de lucru și termene de procesare</h2>
+        <p><strong>Program de lucru:</strong></p>
+        <ul>
+          <li>Luni – Joi: 08:00 – 16:00</li>
+          <li>Vineri: 08:00 – 15:00</li>
+          <li>Sâmbătă, Duminică și sărbători legale: închis</li>
+        </ul>
         <p>
-          Termenele afișate sunt estimative și curg din momentul confirmării plății și al primirii tuturor datelor
-          necesare. Pentru documentele procesate automat (de ex. extras de carte funciară, certificat constatator),
-          livrarea poate fi în câteva minute, dacă sistemul instituției este operațional. Întârzierile cauzate de
-          autorități (IGPR, ANAF, DRPCIV, ANCPI/OCPI, ONRC), de serviciile de curierat sau de date incomplete/eronate
-          furnizate de client nu pot fi imputate Prestatorului.
+          Termenele afișate sunt estimative, se exprimă în <strong>zile lucrătoare</strong> și curg din momentul
+          confirmării plății și al primirii tuturor datelor necesare. Pentru comenzile plasate după ora 14:00 sau în
+          afara programului, termenul se calculează începând cu următoarea zi lucrătoare. Pentru documentele procesate
+          automat (de ex. extras de carte funciară, certificat constatator), livrarea poate fi în câteva minute, dacă
+          sistemul instituției este operațional.
+        </p>
+        <p>Pot apărea întârzieri din motive independente de Prestator, precum:</p>
+        <ul>
+          <li>indisponibilitatea serverelor sau platformelor instituțiilor publice (IGPR, ANAF, DRPCIV, ANCPI/OCPI, ONRC);</li>
+          <li>necesitatea furnizării unor documente sau clarificări suplimentare de către client;</li>
+          <li>furnizarea de date eronate sau incomplete;</li>
+          <li>necesitatea digitalizării unor documente (de ex. cărți funciare nedigitalizate);</li>
+          <li>sărbători legale, lipsă de personal sau alte dificultăți la instituțiile competente;</li>
+          <li>întârzieri ale serviciilor de curierat.</li>
+        </ul>
+        <p>Astfel de întârzieri nu pot fi imputate Prestatorului.</p>
+
+        <h2>6. Condiții specifice pe servicii</h2>
+        <p>
+          Termenul estimat pentru fiecare serviciu este cel afișat pe pagina serviciului la momentul plasării
+          comenzii. Suplimentar, se aplică următoarele reguli specifice:
+        </p>
+        <ul>
+          <li><strong>Cazier judiciar, cazier auto, certificat de integritate, cazier fiscal, acte de stare civilă</strong> — necesită împuternicire avocațială semnată electronic. Pentru persoanele născute în străinătate sau în cazul unor verificări suplimentare la instituții, termenul se poate prelungi (până la 15 zile lucrătoare la caziere). Anularea este posibilă doar în primele 30 de minute (rambursare 70%), conform secțiunii 8.</li>
+          <li><strong>Extras de carte funciară, extras de plan cadastral, certificat constatator</strong> — intră imediat în procesare automată; <strong>anularea nu este posibilă după plasarea comenzii</strong>. Dacă imobilul nu este digitalizat sau datele necesită verificări, termenul se poate prelungi cu până la 3 zile lucrătoare.</li>
+          <li><strong>Imobil fără geometrie / neidentificabil</strong> — dacă imobilul nu poate fi identificat sau nu are geometrie în sistemul ANCPI, instituția emite un document de respingere, care se livrează clientului; suma achitată nu se rambursează, serviciul de procesare fiind prestat.</li>
+          <li><strong>Identificare imobil</strong> (după proprietar și adresă) — termen de până la 10 zile lucrătoare; dacă imobilul nu este înscris în cartea funciară, se livrează documentul de respingere, fără rambursare. Anularea nu este posibilă după plasarea comenzii.</li>
+          <li><strong>Certificat constatator pentru entități neînregistrate la ONRC</strong> (de ex. cabinete medicale, ONG-uri) sau cu date incorecte — nu se emite document de respingere; clientul este informat și primește un <strong>credit</strong> pentru eliberarea documentului, transferabil pe alt CUI sau către un alt serviciu de preț egal.</li>
+        </ul>
+
+        <h2>7. Modalități de livrare</h2>
+        <p>
+          Documentele pot fi livrate în format digital (email și/sau cont online), fizic prin curier, sau în ambele
+          formate, conform opțiunilor afișate pe platformă la plasarea comenzii. Eventualele costuri suplimentare de
+          curierat (de ex. livrare internațională) sunt afișate înainte de plată sau comunicate prin email/WhatsApp
+          împreună cu opțiunile disponibile.
         </p>
 
-        <h2>6. Dreptul de retragere, anulare și rambursare</h2>
+        <h2>8. Dreptul de retragere, anulare și rambursare</h2>
         <p>
           Conform OUG 34/2014 art. 16 lit. m), dreptul legal de retragere nu se aplică după începerea efectivă a
           prestării serviciului (depunerea cererii la instituție), serviciul fiind personalizat. Suplimentar, pentru
@@ -101,7 +138,7 @@ export default function Page() {
         </ul>
         <p>Rambursările se procesează prin aceeași metodă de plată, în 5–10 zile lucrătoare.</p>
 
-        <h2>7. Semnătura electronică</h2>
+        <h2>9. Semnătura electronică</h2>
         <p>
           Contractul de prestări servicii și împuternicirea se semnează electronic pe platformă, conform
           <strong> Legii nr. 214/2024</strong> privind digitalizarea și <strong>Regulamentului (UE) nr. 910/2014
@@ -111,7 +148,7 @@ export default function Page() {
           SHA-256 al documentului semnat.
         </p>
 
-        <h2>8. Contractul, asistența juridică și serviciile de specialitate</h2>
+        <h2>10. Contractul, asistența juridică și serviciile de specialitate</h2>
         <p>
           La finalizarea comenzii se generează automat documentele aferente (de ex. contract de prestări servicii,
           contract de asistență, împuternicire), cu număr unic și semnătură electronică. Prin plasarea comenzii,
@@ -127,7 +164,15 @@ export default function Page() {
         </ul>
         <p>Documentele semnate sunt stocate securizat și pot fi descărcate din contul tău sau solicitate pe email.</p>
 
-        <h2>9. Obligațiile beneficiarului</h2>
+        <h2>11. Cesionarea și subcontractarea</h2>
+        <p>
+          Prestatorul poate cesiona și/sau subcontracta o terță parte (de ex. avocat partener, topograf autorizat,
+          traducător, curier) pentru serviciile aferente onorării comenzii, cu informarea prealabilă a Clientului,
+          fără a fi necesar acordul acestuia. În orice situație, Prestatorul rămâne responsabil față de Client pentru
+          îndeplinirea tuturor obligațiilor contractuale.
+        </p>
+
+        <h2>12. Obligațiile beneficiarului și corectitudinea datelor</h2>
         <ul>
           <li>Să furnizeze date corecte, complete și actuale — orice eroare poate duce la respingerea cererii.</li>
           <li>Să încarce documente lizibile și valabile, acolo unde sunt necesare.</li>
@@ -135,8 +180,15 @@ export default function Page() {
           <li>Să răspundă solicitărilor de informații suplimentare în maximum 48 de ore.</li>
           <li>Să nu utilizeze serviciile în scopuri ilegale și să nu furnizeze datele altor persoane fără acordul/împuternicirea acestora.</li>
         </ul>
+        <p>
+          Este esențial ca datele furnizate în formularul de comandă să fie corecte și complete: orice eroare poate
+          genera întârzieri, documente incorecte sau chiar imposibilitatea prestării serviciului, fără drept de
+          rambursare. Verifică atent informațiile înainte de trimitere. Dacă observi o greșeală, contactează-ne cât
+          mai repede — cel mai rapid pe{' '}
+          <a href="https://wa.me/40757708181" target="_blank" rel="noopener noreferrer">WhatsApp</a>.
+        </p>
 
-        <h2>10. Obligațiile prestatorului</h2>
+        <h2>13. Obligațiile prestatorului</h2>
         <ul>
           <li>Să proceseze cererile cu diligență profesională, în termenele estimate.</li>
           <li>Să informeze clientul despre stadiul comenzii (email și/sau telefon).</li>
@@ -145,7 +197,7 @@ export default function Page() {
           <li>Să notifice clientul în cel mai scurt timp în cazul oricărui impediment.</li>
         </ul>
 
-        <h2>11. Protecția datelor (GDPR)</h2>
+        <h2>14. Protecția datelor (GDPR)</h2>
         <p>
           eDigitalizare SRL, în calitate de operator, prelucrează datele conform Regulamentului (UE) 2016/679 (GDPR).
           Temeiul prelucrării este executarea contractului (art. 6 alin. 1 lit. b) și îndeplinirea obligațiilor legale
@@ -154,13 +206,19 @@ export default function Page() {
           Detalii în <Link href="/politica-de-confidentialitate/">Politica de Confidențialitate</Link> și pagina <Link href="/gdpr/">GDPR</Link>.
         </p>
 
-        <h2>12. Limitarea răspunderii</h2>
+        <h2>15. Limitarea răspunderii</h2>
         <p>Prestatorul nu răspunde pentru: date incorecte furnizate de beneficiar; întârzieri/ refuzuri ale autorităților sau ale curierilor; forță majoră (inclusiv indisponibilitatea sistemelor instituțiilor); utilizarea documentelor în alte scopuri; daune indirecte. Răspunderea totală a Prestatorului este limitată la valoarea serviciului achitat pentru comanda respectivă.</p>
 
-        <h2>13. Proprietate intelectuală</h2>
+        <h2>16. Proprietate intelectuală</h2>
         <p>Întregul conținut al platformei (texte, imagini, design, logo-uri, cod) este proprietatea eDigitalizare SRL și este protejat de lege. Reproducerea fără acord scris este interzisă.</p>
 
-        <h2>14. Legislație aplicabilă și soluționarea litigiilor</h2>
+        <h2>17. Reclamații, legislație aplicabilă și soluționarea litigiilor</h2>
+        <p>
+          Pentru orice nelămuriri, sugestii sau reclamații ne poți contacta pe{' '}
+          <a href="https://wa.me/40757708181" target="_blank" rel="noopener noreferrer">WhatsApp</a> sau la{' '}
+          <a href="mailto:contact@eghiseul.ro">contact@eghiseul.ro</a>. Ne angajăm să răspundem prompt și să tratăm
+          toate sesizările cu seriozitate.
+        </p>
         <p>
           Acești termeni sunt guvernați de legea română. Litigiile se soluționează amiabil; în caz contrar, de
           instanțele competente din România. Consumatorii pot apela la{' '}
@@ -168,7 +226,7 @@ export default function Page() {
           <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener noreferrer">SOL (ODR)</a>.
         </p>
 
-        <h2>15. Contact</h2>
+        <h2>18. Contact</h2>
         <p>
           eDigitalizare SRL · CUI RO49278701 · Reg. Com. J2023001097301 · email:{' '}
           <a href="mailto:contact@eghiseul.ro">contact@eghiseul.ro</a> · telefon/WhatsApp:{' '}
