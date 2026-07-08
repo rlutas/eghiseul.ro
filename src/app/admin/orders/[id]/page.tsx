@@ -1327,6 +1327,23 @@ export default function AdminOrderDetailPage() {
             <InfoRow label="Tip persoana" value={isPJ ? 'Persoana Juridica' : 'Persoana Fizica'} />
             <InfoRow label="Nume" value={customerName} icon={isPJ ? <Building2 className="h-3.5 w-3.5" /> : <User className="h-3.5 w-3.5" />} />
             {isPJ && company?.cui && <InfoRow label="CUI" value={String(company.cui)} />}
+            {isPJ && company && (company.registrationNumber || company.regCom) && (
+              <InfoRow label="Nr. Reg. Com." value={company.registrationNumber || company.regCom} mono />
+            )}
+            {isPJ && company?.validationStatus && (
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-muted-foreground">Validare CUI</span>
+                <Badge
+                  variant={company.validationStatus === 'valid' ? 'default' : 'destructive'}
+                  className={company.validationStatus === 'valid' ? 'bg-green-600' : ''}
+                >
+                  {company.validationStatus === 'valid' ? 'Validat ANAF' : company.validationStatus}
+                </Badge>
+              </div>
+            )}
+            {isPJ && company?.address && (
+              <InfoRow label="Sediu social" value={formatAddress(company.address) || 'N/A'} />
+            )}
             {contact?.email && <InfoRow label="Email" value={contact.email} icon={<Mail className="h-3.5 w-3.5" />} />}
             {contact?.phone && (
               <div className="flex items-center justify-between gap-4 text-sm">
@@ -1436,35 +1453,13 @@ export default function AdminOrderDetailPage() {
               <InfoRow label="Motivul solicitarii" value={String(contact.purpose)} />
             )}
 
-            {/* Date personale / firmă — continuare în același card */}
-            {(personal || company) && (
+            {/* Date personale — continuare în același card. Datele de firmă
+                (PJ) sunt afișate integral în capul cardului
+                (Nume/CUI/Reg.Com./ANAF/sediu). */}
+            {personal && !(isPJ && company) && (
               <>
                 <Separator className="my-2" />
-            {isPJ && company ? (
-              <>
-                {/* Denumire + CUI sunt deja afișate în capul cardului (Nume /
-                    CUI) — aici rămân doar datele care NU apar mai sus. */}
-                {(company.registrationNumber || company.regCom) && (
-                  <InfoRow label="Nr. Reg. Com." value={company.registrationNumber || company.regCom} mono />
-                )}
-                {company.validationStatus && (
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">Validare CUI</span>
-                    <Badge variant={company.validationStatus === 'valid' ? 'default' : 'destructive'}
-                           className={company.validationStatus === 'valid' ? 'bg-green-600' : ''}>
-                      {company.validationStatus === 'valid' ? 'Validat ANAF' : company.validationStatus}
-                    </Badge>
-                  </div>
-                )}
-                {company.address && (
-                  <>
-                    <Separator className="my-2" />
-                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Sediu social</p>
-                    <p className="text-sm">{formatAddress(company.address) || 'N/A'}</p>
-                  </>
-                )}
-              </>
-            ) : personal ? (
+            {personal ? (
               <>
                 {/* Compact 2-column grid for personal data */}
                 <div className="grid grid-cols-2 gap-x-6 gap-y-1.5 text-sm">
