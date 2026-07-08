@@ -206,6 +206,30 @@ Layout nou, în ordinea fluxului de lucru (paritate + îmbunătățiri față de
 - Soft refresh (`router.refresh()`) — reîmprospătează statusul joburilor fără
   reload complet de pagină; echipa nu pierde poziția.
 
+## 18. 🚨 Cazier PJ: comandă fără buletin administrator + selfie (E-260708-VC4GH)
+
+- **Simptom:** E-260708-VC4GH (BLU IT SECURITY SRL, cazier PJ, plătit urgent)
+  a finalizat wizard-ul doar cu certificat de înmatriculare + semnătură —
+  fără CI-ul administratorului și fără selfie.
+- **NU e bypass de client** (diferit de E-260708-AJ5M8 de dimineață): serviciul
+  `cazier-judiciar-persoana-juridica` avea în DB
+  `verification_config.personalKyc.enabled=false` + `acceptedDocuments=[]` →
+  wizard-ul nu construia deloc pașii Date Personale / Documente KYC, iar
+  guard-ul server-side din `/submit` (commit 7192d5e, gate pe
+  `personalKyc.enabled`) sărea complet peste comandă.
+- **Regresie de config nedocumentată:** migrarea 012 (design original) avea
+  personalKyc ACTIV pe PJ (CI + selfie reprezentant); a fost dezactivat direct
+  în DB înainte de 2026-05-28 (migrarea 046 îl nota deja ca disabled), fără
+  migrare. Legacy `config.kyc_requirements` încă cerea
+  `representative_id + selfie = true`.
+- **Fix (migrarea 100, data-only, aplicată direct — fără deploy):** re-enable
+  `personalKyc` pe PJ cu fluxul simplificat (ca la cazier-auto: selfie
+  obligatoriu, fără date părinți, fără certificat adresă). Verificat live:
+  wizard-ul PJ are acum 9 pași, cu **Date Personale (4)** și
+  **Documente KYC (6)**; guard-ul din `/submit` se aplică automat.
+- **Ops:** clientul E-260708-VC4GH (adrian.bucur@bluit.ro / +40747064855)
+  trebuie contactat pentru buletinul administratorului + selfie.
+
 ## Rămase în coadă (nefăcute)
 
 - Email confirmare comandă către client (nu se trimite — port din sister).
