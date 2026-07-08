@@ -3,6 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { createPublicClient } from '@/lib/supabase/public';
 import { Badge } from '@/components/ui/badge';
+import { ServiceOptionsSection } from '@/components/services/service-options-section';
 import { Card, CardContent } from '@/components/ui/card';
 import {
   Clock,
@@ -432,39 +433,7 @@ export default async function CertificatCasatoriePage() {
         </section>
 
         {/* Service options (dynamic) */}
-        {options.length > 0 && (
-          <section className="py-12 lg:py-20 bg-neutral-50">
-            <div className="container mx-auto px-4 max-w-[1400px]">
-              <div className="text-center mb-10">
-                <span className="inline-block px-4 py-1.5 bg-primary-100 text-primary-700 text-sm font-semibold rounded-full mb-4">
-                  Personalizare
-                </span>
-                <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-3">Opțiuni Disponibile</h2>
-                <p className="text-neutral-600 max-w-xl mx-auto">Adaugă servicii extra pentru comanda ta</p>
-              </div>
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 max-w-3xl mx-auto">
-                {options.map((option) => (
-                  <Card key={option.id} className="border-2 border-neutral-200 hover:border-primary-400 transition-all hover:shadow-md">
-                    <CardContent className="p-4 lg:p-5">
-                      <div className="flex flex-col h-full">
-                        <div className="flex items-start justify-between gap-2 mb-2">
-                          <h3 className="font-semibold text-secondary-900 text-sm lg:text-base">{option.name}</h3>
-                          {option.is_required && (
-                            <Badge className="bg-secondary-900 text-white text-[10px] flex-shrink-0">Obligatoriu</Badge>
-                          )}
-                        </div>
-                        {option.description && (
-                          <p className="text-xs lg:text-sm text-neutral-600 mb-3 flex-1">{option.description}</p>
-                        )}
-                        <span className="font-bold text-primary-600 text-base lg:text-lg mt-auto">+{option.price} RON</span>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </div>
-          </section>
-        )}
+        {options.length > 0 && <ServiceOptionsSection options={options} />}
 
         {/* How it works — dark connected timeline (CF parity) */}
         <section className="relative overflow-hidden bg-gradient-to-b from-secondary-900 to-[#0C1A2F] py-14 lg:py-24">
