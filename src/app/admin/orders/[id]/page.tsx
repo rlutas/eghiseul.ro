@@ -2168,7 +2168,16 @@ export default function AdminOrderDetailPage() {
       </div>
 
 
-      {/* Order Timeline */}
+      {/* PROCESSING / GENERARE DOCUMENTE — at the bottom, parity with the
+          sister's "Generare Documente Juridice" placement. */}
+      <ProcessingSection
+        order={order}
+        documents={orderDocuments}
+        optionStatuses={optionStatuses}
+        onStatusChange={fetchOrder}
+      />
+
+      {/* Order Timeline — ultimul, cerere user */}
       <Card>
         <CardHeader className="pb-3">
           <CardTitle className="text-base flex items-center gap-2">
@@ -2181,14 +2190,6 @@ export default function AdminOrderDetailPage() {
         </CardContent>
       </Card>
 
-      {/* PROCESSING / GENERARE DOCUMENTE — at the bottom, parity with the
-          sister's "Generare Documente Juridice" placement. */}
-      <ProcessingSection
-        order={order}
-        documents={orderDocuments}
-        optionStatuses={optionStatuses}
-        onStatusChange={fetchOrder}
-      />
 
       {/* Admin Notes */}
       {order.admin_notes && (
