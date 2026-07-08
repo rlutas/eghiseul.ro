@@ -149,6 +149,29 @@ Fiecare secțiune: **ce era stricat → ce s-a făcut → ce rămâne de verific
 - Email de confirmare către client la TOATE comenzile plătite (buton
   „Verifică statusul" pre-completat) — o dată per comandă, migrarea 097.
 
+## 14. 🎨 Reorganizare completă pagina de comandă din admin (după feedback echipă)
+
+Layout nou, în ordinea fluxului de lucru (paritate + îmbunătățiri față de sora):
+
+- **Header:** nr comandă → status → Persoana Fizică/Juridică → „Vezi ca
+  clientul ↗" → buton „📋 Link status" (copiază URL-ul de urmărire
+  pre-completat cu order+email — cardul mare de link a fost eliminat, ocupa
+  loc). **Termen estimat** afișat portocaliu sus, sub numărul comenzii.
+- **Note Echipă (50%) + Actualizează Status (50%)** — sus, pe aceeași linie,
+  fără scroll. Note Echipă arată DOAR notele adăugate manual (cele de status
+  rămân în Istoric — nu se mai dublează).
+- **Informatii Client** — un singur card (contact + date personale fuzionate):
+  Tip persoana primul rând, **Copy Sheet 1/2 sub titlu**, apoi toate datele.
+  🆕 **„Corectează contact"** — echipa poate corecta telefonul/emailul greșit
+  al clientului direct din card (formular inline; modificarea se scrie automat
+  ca notă de audit „vechi → nou").
+- **Detalii Serviciu** — Urgenta (⚡/Standard) + Metoda livrare sus, apoi
+  „SERVICII COMANDATE" cu Motivul solicitării; sub el **Livrare** apoi
+  **Facturare** (mutat din rândul de jos — umplea golul).
+- **Contract semnat (50%) + Plata (50%)** — aceeași linie.
+- **Procesare comanda** (butoane workflow + documente generate) →
+  **deasupra Istoricului**; **Istoric comandă = ultimul**.
+
 ## Rămase în coadă (nefăcute)
 
 - Email confirmare comandă către client (nu se trimite — port din sister).
