@@ -1136,10 +1136,22 @@ export default function AdminOrderDetailPage() {
                   {firmName && <InfoRow label="Firmă" value={firmName} />}
                   {firmCui && <InfoRow label="CUI" value={String(firmCui)} mono />}
                   {/* One merged row — "Tip document" + "Tip raport" repeated
-                      the same "de bază" info twice (team feedback). */}
+                      the same "de bază" info twice (team feedback). When the
+                      report name is present, only the firm/PF context is
+                      appended (the report name already says de bază/extins). */}
                   <InfoRow
                     label="Tip document"
-                    value={c.reportType ? `${c.reportType} — ${docTypeLabel}` : docTypeLabel}
+                    value={
+                      c.reportType
+                        ? `${c.reportType} — ${
+                            c.documentType === 'pf'
+                              ? 'persoană fizică (CNP)'
+                              : c.documentType === 'istoric'
+                                ? 'pe firmă (CUI), cu istoric'
+                                : 'pe firmă (CUI)'
+                          }`
+                        : docTypeLabel
+                    }
                   />
                   <InfoRow label="Scop / motiv (de ce a aplicat)" value={String(purposeText)} />
                   {periodText && <InfoRow label="Perioadă" value={periodText} />}
