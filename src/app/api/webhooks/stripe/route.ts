@@ -225,7 +225,11 @@ async function handlePaymentSucceeded(paymentIntent: Stripe.PaymentIntent) {
     .from('orders')
     .update({
       payment_status: 'paid',
-      status: 'processing',
+      // Sister-parity (team request): payment lands the order in 'paid' — it
+      // moves to 'processing' only when the team actually starts working on
+      // it (Începe procesarea / document generation), so the "Plătite" tab
+      // is the real to-do inbox.
+      status: 'paid',
       updated_at: paidAtNow,
       // Record payment metadata the webhook previously never set — leaving
       // paid_at / PI null even on paid orders. Stable once set.

@@ -156,7 +156,9 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       .from('orders')
       .update({
         payment_status: 'paid',
-        status: order.status === 'pending' || order.status === 'draft' ? 'processing' : order.status,
+        // Sister-parity (team request): after payment the order sits in
+        // 'paid' — the team moves it to 'processing' when work starts.
+        status: order.status === 'pending' || order.status === 'draft' ? 'paid' : order.status,
         updated_at: now,
         ...(order.paid_at ? {} : { paid_at: now }),
         ...(order.stripe_payment_intent_id ? {} : { stripe_payment_intent_id: paymentIntentId }),
