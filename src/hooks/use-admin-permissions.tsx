@@ -28,7 +28,7 @@ interface AdminContextType {
 // Implied permissions (mirrors server-side logic)
 // ──────────────────────────────────────────────────────────────
 
-const IMPLIED_PERMISSIONS: Record<string, string[]> = {
+export const IMPLIED_PERMISSIONS: Record<string, string[]> = {
   'orders.view': [],
   'orders.manage': ['orders.view'],
   'orders.pdf_upload': ['orders.view'],
@@ -43,7 +43,7 @@ const IMPLIED_PERMISSIONS: Record<string, string[]> = {
 /**
  * Default permissions for each admin role (mirrors server-side ROLE_DEFAULTS).
  */
-const ROLE_DEFAULTS: Record<string, string[]> = {
+export const ROLE_DEFAULTS: Record<string, string[]> = {
   'manager': ['orders.view', 'orders.manage', 'orders.pdf_upload', 'payments.verify', 'users.manage', 'settings.manage', 'documents.generate', 'documents.view'],
   'operator': ['orders.view', 'orders.manage', 'documents.generate', 'documents.view'],
   'contabil': ['orders.view', 'payments.verify', 'documents.view'],

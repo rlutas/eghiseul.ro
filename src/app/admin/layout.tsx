@@ -26,6 +26,8 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import {
   AdminPermissionProvider,
+  ROLE_DEFAULTS,
+  IMPLIED_PERMISSIONS,
   type AdminUser,
 } from '@/hooks/use-admin-permissions';
 import type { Permission } from '@/lib/admin/permissions';
@@ -40,18 +42,24 @@ interface NavItem {
   icon: typeof LayoutDashboard;
   /** Permission required to see this item. undefined = always visible. */
   permission?: Permission;
+  /** Roluri pentru care itemul se ASCUNDE chiar dacă permisiunea există
+   *  (ex. avocatul are orders.view dar nu are treabă cu ONRC/ANCPI). */
+  hideForRoles?: string[];
 }
 
+// Avocatul vede DOAR ce ține de ea: Comenzi (scopate server-side pe
+// serviciile cu avocat) + Registru. Restul (dashboard cu venituri, ONRC/ANCPI,
+// colaboratori etc.) sunt operațiunile echipei — ascunse pentru rolul ei.
 const NAV_ITEMS: NavItem[] = [
-  { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/admin', label: 'Dashboard', icon: LayoutDashboard, hideForRoles: ['avocat'] },
   { href: '/admin/orders', label: 'Comenzi', icon: ClipboardList, permission: 'orders.view' },
-  { href: '/admin/orders?status=abandoned', label: 'Abandonuri', icon: UserX, permission: 'orders.view' },
+  { href: '/admin/orders?status=abandoned', label: 'Abandonuri', icon: UserX, permission: 'orders.view', hideForRoles: ['avocat'] },
   { href: '/admin/registru', label: 'Registru', icon: BookOpen, permission: 'registry.manage' },
-  { href: '/admin/onrc', label: 'ONRC', icon: Landmark, permission: 'orders.view' },
-  { href: '/admin/ancpi', label: 'ANCPI', icon: Landmark, permission: 'orders.view' },
-  { href: '/admin/identifica-imobil', label: 'Identifică imobil', icon: MapPin, permission: 'orders.view' },
-  { href: '/admin/colaboratori', label: 'Colaboratori', icon: Handshake, permission: 'orders.view' },
-  { href: '/admin/status-portaluri', label: 'Stare portaluri', icon: Activity, permission: 'orders.view' },
+  { href: '/admin/onrc', label: 'ONRC', icon: Landmark, permission: 'orders.view', hideForRoles: ['avocat'] },
+  { href: '/admin/ancpi', label: 'ANCPI', icon: Landmark, permission: 'orders.view', hideForRoles: ['avocat'] },
+  { href: '/admin/identifica-imobil', label: 'Identifică imobil', icon: MapPin, permission: 'orders.view', hideForRoles: ['avocat'] },
+  { href: '/admin/colaboratori', label: 'Colaboratori', icon: Handshake, permission: 'orders.view', hideForRoles: ['avocat'] },
+  { href: '/admin/status-portaluri', label: 'Stare portaluri', icon: Activity, permission: 'orders.view', hideForRoles: ['avocat'] },
   { href: '/admin/coupons', label: 'Cupoane', icon: Ticket, permission: 'settings.manage' },
   { href: '/admin/marketing', label: 'Marketing', icon: Mail, permission: 'settings.manage' },
   { href: '/admin/users', label: 'Utilizatori', icon: Users, permission: 'users.manage' },
@@ -59,16 +67,12 @@ const NAV_ITEMS: NavItem[] = [
 ];
 
 // ──────────────────────────────────────────────────────────────
-// Implied permissions (client-side mirror for nav filtering)
+// Permission check (client-side mirror for nav filtering).
+// BUG istoric: varianta veche se uita DOAR la JSONB-ul explicit de permisiuni
+// și ignora ROLE_DEFAULTS — un avocat/operator/contabil cu JSONB gol nu vedea
+// NIMIC în sidebar. Acum refolosim exact logica hook-ului: defaults de rol +
+// permisiuni explicite + permisiuni implicate.
 // ──────────────────────────────────────────────────────────────
-
-const IMPLIED_PERMISSIONS: Record<string, string[]> = {
-  'orders.view': [],
-  'orders.manage': ['orders.view'],
-  'payments.verify': ['orders.view'],
-  'users.manage': [],
-  'settings.manage': [],
-};
 
 function hasPermissionClient(
   role: string,
@@ -77,18 +81,15 @@ function hasPermissionClient(
 ): boolean {
   if (role === 'super_admin') return true;
 
-  // Check direct permission
-  if (permissions[required] === true) return true;
-
-  // Check if any held permission implies the required one
+  const held = new Set<string>(ROLE_DEFAULTS[role] ?? []);
   for (const [key, value] of Object.entries(permissions)) {
-    if (value === true) {
-      const implied = IMPLIED_PERMISSIONS[key];
-      if (implied && implied.includes(required)) return true;
-    }
+    if (value === true) held.add(key);
+  }
+  for (const perm of Array.from(held)) {
+    for (const implied of IMPLIED_PERMISSIONS[perm] ?? []) held.add(implied);
   }
 
-  return false;
+  return held.has(required);
 }
 
 // ──────────────────────────────────────────────────────────────
@@ -153,14 +154,22 @@ export default function AdminLayout({
     checkAuth();
   }, [router, isPublicRoute]);
 
-  // Filter nav items based on user permissions
+  // Filter nav items based on user permissions + role scoping
   const visibleNavItems = useMemo(() => {
     if (!user) return [];
     return NAV_ITEMS.filter((item) => {
+      if (item.hideForRoles?.includes(user.role)) return false;
       if (!item.permission) return true; // Dashboard is always visible
       return hasPermissionClient(user.role, user.permissions, item.permission);
     });
   }, [user]);
+
+  // Avocatul nu are dashboard — aterizează direct pe Registru (partea ei).
+  useEffect(() => {
+    if (user?.role === 'avocat' && pathname === '/admin') {
+      router.replace('/admin/registru');
+    }
+  }, [user, pathname, router]);
 
   const handleLogout = async () => {
     const supabase = createClient();
