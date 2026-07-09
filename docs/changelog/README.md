@@ -4,6 +4,7 @@
  
  | Data | Ce s-a livrat | Detalii |
  |---|---|---|
+ | 2026-07-09 | 🟣 Întrebări divorț (RO/străinătate + înregistrat în RO) la 5 servicii stare civilă · 🔴 fix motiv lipsă la comenzi PJ cazier (E-260708-VC4GH) + semnal „necompletat" în admin · minim livrare RO 25 lei (era 20) · admin: card stare civilă 100% RO + separatoare rânduri toate cardurile + layout stare civilă lângă client | [2026-07-09-divort-strainatate-stare-civila.md](2026-07-09-divort-strainatate-stare-civila.md) |
  | 2026-07-08 | 🔴 Bugfix-uri post-lansare, 27 secțiuni + TL;DR (facturare kill-switch → EGH-0001; incident workeri 19h; KYC cazier PJ — migrarea 100; 🟣 **„Solicită documente"** multi-doc cu auto-standby — migrațiile 101-102; env vercel.app/SSO reparat; emailuri branded; build-uri limitate; admin detail reorganizat; status client: chitanță+note interne ascunse, timeline curat RO) + 🟣 Extras Multilingv standalone 799 (migrațiile 093-096) | [2026-07-08-bugfixes-post-launch.md](2026-07-08-bugfixes-post-launch.md) |
  | 2026-07-02 | Termen standard cazier/integritate 2-4 → 3-5 zile (urgentul 1-2 devine atractiv) — migrație 091 + conținut SEO cluster cazier | [2026-07-02-cazier-standard-term-3-5.md](2026-07-02-cazier-standard-term-3-5.md) |
  | 2026-07-02 | Formular de contact pe `/contact` (honeypot + rate-limit → email Resend + DB `contact_messages`) + linkuri header/footer | [2026-07-02-contact-form.md](2026-07-02-contact-form.md) |

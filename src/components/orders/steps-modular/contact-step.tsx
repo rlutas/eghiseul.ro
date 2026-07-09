@@ -95,9 +95,11 @@ export function ContactStepModular({ onValidChange }: ContactStepProps) {
   const isForeign = citizenship === 'foreign';
 
   // Service-specific purpose / motivul solicitării. Drop-down only.
+  // Shown for ALL client types — PJ orders (cazier PJ) need the motiv on the
+  // cerere too; the old `clientType === 'PF'` gate silently dropped it
+  // (regression found on E-260708-VC4GH: order landed without motiv).
   const purposeOptions = getPurposeOptionsForService(state.serviceSlug);
-  const showsPurpose =
-    !!purposeOptions && state.clientType === 'PF';
+  const showsPurpose = !!purposeOptions;
   const purpose = state.contact.purpose ?? '';
 
   const clientTypeOptions =

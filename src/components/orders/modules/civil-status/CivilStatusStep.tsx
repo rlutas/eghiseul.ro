@@ -156,6 +156,10 @@ export default function CivilStatusStep({ config, onValidChange }: CivilStatusSt
       if (cs.wasMarriedBefore) {
         checks.push(!!cs.priorMarriagesCount?.trim());
         checks.push(!!cs.lastMarriageEndedBy);
+        if (cs.lastMarriageEndedBy === 'divort') {
+          checks.push(!!cs.divorcePlace);
+          if (cs.divorcePlace === 'strainatate') checks.push(cs.divorceRegisteredInRomania !== undefined);
+        }
         if (fields.stillHaveOldMarriageCert) checks.push(cs.stillHaveOldMarriageCert !== undefined);
       }
     }
@@ -302,7 +306,15 @@ export default function CivilStatusStep({ config, onValidChange }: CivilStatusSt
                 <Field label="Ultima căsătorie s-a încheiat prin" required>
                   <ChoiceRow
                     current={cs.lastMarriageEndedBy}
-                    onChange={(v) => updateCivilStatus({ lastMarriageEndedBy: v as CivilStatusState['lastMarriageEndedBy'] })}
+                    onChange={(v) =>
+                      updateCivilStatus({
+                        lastMarriageEndedBy: v as CivilStatusState['lastMarriageEndedBy'],
+                        // Divorce sub-answers only make sense for 'divort'.
+                        ...(v !== 'divort'
+                          ? { divorcePlace: undefined, divorceRegisteredInRomania: undefined }
+                          : {}),
+                      })
+                    }
                     options={[
                       { value: 'divort', label: 'Divorț' },
                       { value: 'deces', label: 'Decesul soțului/soției' },
@@ -311,10 +323,41 @@ export default function CivilStatusStep({ config, onValidChange }: CivilStatusSt
                 </Field>
                 {cs.lastMarriageEndedBy === 'divort' && (
                   <div className="sm:col-span-2">
-                    <Notice tone="warn">
-                      Dacă divorțul a fost pronunțat în străinătate, el trebuie recunoscut/transcris în România
-                      pentru a putea elibera documentul. Altfel, căsătoria anterioară figurează ca fiind în vigoare.
-                    </Notice>
+                    <Field label="Unde s-a făcut divorțul?" required>
+                      <ChoiceRow
+                        current={cs.divorcePlace}
+                        onChange={(v) =>
+                          updateCivilStatus({
+                            divorcePlace: v as CivilStatusState['divorcePlace'],
+                            ...(v === 'ro' ? { divorceRegisteredInRomania: undefined } : {}),
+                          })
+                        }
+                        options={PLACE}
+                      />
+                    </Field>
+                    {cs.divorcePlace === 'strainatate' && (
+                      <div className="mt-4">
+                        <Field label="A fost înregistrat divorțul în România?" required>
+                          <ChoiceRow
+                            current={
+                              cs.divorceRegisteredInRomania === undefined
+                                ? undefined
+                                : cs.divorceRegisteredInRomania
+                                  ? 'da'
+                                  : 'nu'
+                            }
+                            onChange={(v) => updateCivilStatus({ divorceRegisteredInRomania: v === 'da' })}
+                            options={YES_NO}
+                          />
+                        </Field>
+                      </div>
+                    )}
+                    {cs.divorcePlace === 'strainatate' && cs.divorceRegisteredInRomania === false && (
+                      <Notice tone="warn">
+                        Divorțul pronunțat în străinătate trebuie recunoscut/transcris în România
+                        pentru a putea elibera documentul. Altfel, căsătoria anterioară figurează ca fiind în vigoare.
+                      </Notice>
+                    )}
                   </div>
                 )}
                 {fields.stillHaveOldMarriageCert && (

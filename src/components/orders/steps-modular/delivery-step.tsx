@@ -64,6 +64,12 @@ const SENDER_LOCATION = {
 // 15% = 0.15, 20% = 0.20, etc.
 const DELIVERY_MARKUP_PERCENTAGE = 0.15; // 15% markup
 
+// Preț minim livrare RO (cu TVA) — se aplică la TOATE cotele domestice (Fan
+// Courier, FANbox, Sameday, EasyBox) DUPĂ markup, ca să nu vindem livrarea
+// sub cost (procesare, plic, manoperă).
+const MIN_DELIVERY_PRICE_WITH_VAT = 25;
+const MIN_DELIVERY_PRICE = Math.round((MIN_DELIVERY_PRICE_WITH_VAT / 1.21) * 100) / 100;
+
 // =============================================================================
 // INTERNATIONAL COURIERS (fixed price, no live quote)
 // =============================================================================
@@ -385,18 +391,15 @@ export function DeliveryStepModular({ onValidChange }: DeliveryStepProps) {
       const data = await response.json();
 
       if (data.success && data.data?.quotes) {
-        // Apply markup + minim de livrare (niciodată sub 20 RON cu TVA —
-        // acoperim procesare, plic, manoperă). Sortează cheapest-first.
-        const MIN_PRICE_WITH_VAT = 20;
-        const MIN_PRICE = Math.round((MIN_PRICE_WITH_VAT / 1.21) * 100) / 100;
+        // Apply markup + minim de livrare. Sortează cheapest-first.
         const quotesWithMarkup = data.data.quotes.map((quote: CourierQuote) => ({
           ...quote,
           // Store original prices for reference
           originalPrice: quote.price,
           originalPriceWithVAT: quote.priceWithVAT,
           // Apply markup + floor to the displayed prices
-          price: Math.max(applyMarkup(quote.price), MIN_PRICE),
-          priceWithVAT: Math.max(applyMarkup(quote.priceWithVAT), MIN_PRICE_WITH_VAT),
+          price: Math.max(applyMarkup(quote.price), MIN_DELIVERY_PRICE),
+          priceWithVAT: Math.max(applyMarkup(quote.priceWithVAT), MIN_DELIVERY_PRICE_WITH_VAT),
         }));
 
         // Filter out disabled locker services, then sort by price

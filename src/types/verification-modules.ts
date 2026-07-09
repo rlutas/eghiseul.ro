@@ -571,6 +571,8 @@ export interface CivilStatusState {
   wasMarriedBefore?: boolean;
   priorMarriagesCount?: string;
   lastMarriageEndedBy?: 'divort' | 'deces';
+  divorcePlace?: 'ro' | 'strainatate';  // Unde s-a făcut divorțul
+  divorceRegisteredInRomania?: boolean; // Divorț în străinătate: a fost înregistrat în România?
   stillHaveOldMarriageCert?: boolean; // Mai dețineți vechiul certificat de căsătorie?
   marriageAbroadIntent?: boolean;   // Solicitați în vederea căsătoriei în străinătate?
   marriageAbroad?: boolean;         // Căsătoria a avut loc în străinătate

@@ -1115,8 +1115,17 @@ export default function AdminOrderDetailPage() {
             <InfoRow label="Serviciu" value={order.services?.name ? stripEntitySuffix(order.services.name) : 'N/A'} />
             {/* Motivul solicitării — critical operational info (goes on the
                 request to the institution). Sourced from whichever module
-                collected it (contact/cazier, stare civilă, imobil, ONRC). */}
-            {sheetMotiv && <InfoRow label="Motivul solicitarii" value={sheetMotiv} />}
+                collected it (contact/cazier, stare civilă, imobil, ONRC).
+                Pe serviciile care cer motiv (cazier/integritate), lipsa lui e
+                semnalată explicit — echipa trebuie să-l ceară clientului. */}
+            {sheetMotiv ? (
+              <InfoRow label="Motivul solicitarii" value={sheetMotiv} />
+            ) : /cazier|integritate/.test(order.services?.slug || '') ? (
+              <div className="flex items-center justify-between gap-4 text-sm border-b border-border/60 py-1.5 last:border-b-0">
+                <span className="text-muted-foreground">Motivul solicitarii</span>
+                <span className="font-medium text-amber-600">necompletat — cere clientului</span>
+              </div>
+            ) : null}
             {/* Certificat constatator (ONRC): what the bot actually requested —
                 firm + CUI, document type, report type, purpose, period/person.
                 Sourced from customer_data.constatator + billing/company. */}
@@ -1376,7 +1385,7 @@ export default function AdminOrderDetailPage() {
               <InfoRow label="Nr. Reg. Com." value={company.registrationNumber || company.regCom} mono />
             )}
             {(isPJ || constatatorFirm) && company?.validationStatus && (
-              <div className="flex items-center justify-between text-sm">
+              <div className="flex items-center justify-between text-sm border-b border-border/60 py-1.5 last:border-b-0">
                 <span className="text-muted-foreground">Validare CUI</span>
                 <Badge
                   variant={company.validationStatus === 'valid' ? 'default' : 'destructive'}
@@ -1391,7 +1400,7 @@ export default function AdminOrderDetailPage() {
             )}
             {contact?.email && <InfoRow label="Email" value={contact.email} icon={<Mail className="h-3.5 w-3.5" />} />}
             {contact?.phone && (
-              <div className="flex items-center justify-between gap-4 text-sm">
+              <div className="flex items-center justify-between gap-4 text-sm border-b border-border/60 py-1.5 last:border-b-0">
                 <span className="text-muted-foreground flex items-center gap-1.5 shrink-0">
                   <Phone className="h-3.5 w-3.5" />
                   Telefon
@@ -1424,7 +1433,7 @@ export default function AdminOrderDetailPage() {
 
             {/* Account linkage — client cu cont eGhișeul + status KYC pe cont */}
             <div className="pt-3 border-t border-neutral-100 space-y-2">
-              <div className="flex items-center justify-between gap-2 text-sm">
+              <div className="flex items-center justify-between gap-2 text-sm border-b border-border/60 py-1.5 last:border-b-0">
                 <span className="text-muted-foreground flex items-center gap-1.5">
                   <User className="h-3.5 w-3.5" /> Cont eGhișeul
                 </span>
@@ -1440,7 +1449,7 @@ export default function AdminOrderDetailPage() {
               </div>
               {account && (
                 <>
-                  <div className="flex items-center justify-between gap-2 text-sm">
+                  <div className="flex items-center justify-between gap-2 text-sm border-b border-border/60 py-1.5 last:border-b-0">
                     <span className="text-muted-foreground flex items-center gap-1.5">
                       <Shield className="h-3.5 w-3.5" /> KYC cont
                     </span>
@@ -1658,14 +1667,14 @@ export default function AdminOrderDetailPage() {
           </CardContent>
         </Card>
 
+        </div>
+        {/* RIGHT column — civil-status data (if any) next to client info,
+            then delivery + billing below (user-requested layout). */}
+        <div className="space-y-4">
         {/* Date stare civilă — for naștere/căsătorie/celibat orders. Renders
             customer_data.civil_status (marriage history, parents, birth name,
-            purpose) which was previously stored but never displayed. */}
+            purpose). Placed beside Informații Client. */}
         <CivilStatusCard civilStatus={(order.customer_data as AnyObj | null)?.civil_status as AnyObj | null} />
-
-        </div>
-        {/* RIGHT column — service+options on top, delivery info below */}
-        <div className="space-y-4">
         {/* Delivery Address — hidden entirely for email-only deliveries
             (certificat constatator, extras CF: PDF-ul e singura metodă, cardul
             ar arăta doar "Metoda: Email (PDF)" = zgomot). Reapare dacă există
@@ -1697,7 +1706,7 @@ export default function AdminOrderDetailPage() {
                 />
               )}
             {detectedCourierProvider && (
-              <div className="flex items-center justify-between text-sm">
+              <div className="flex items-center justify-between text-sm border-b border-border/60 py-1.5 last:border-b-0">
                 <span className="text-muted-foreground">Curier</span>
                 <span className="flex items-center gap-1.5">
                   <CourierIcon provider={detectedCourierProvider} />
@@ -1906,7 +1915,7 @@ export default function AdminOrderDetailPage() {
                       issued, then displays the invoice number with a link
                       to the Oblio PDF. */}
                   {order.invoice_number && order.invoice_url ? (
-                    <div className="flex items-center justify-between gap-4 text-sm">
+                    <div className="flex items-center justify-between gap-4 text-sm border-b border-border/60 py-1.5 last:border-b-0">
                       <span className="text-muted-foreground">Nr. factură Oblio</span>
                       <Link
                         href={order.invoice_url}
@@ -2239,7 +2248,7 @@ export default function AdminOrderDetailPage() {
               <span>{order.total_price?.toFixed(2) || '0.00'} RON</span>
             </div>
             <Separator />
-            <div className="flex items-center justify-between gap-4 text-sm">
+            <div className="flex items-center justify-between gap-4 text-sm border-b border-border/60 py-1.5 last:border-b-0">
               <span className="text-muted-foreground flex items-center gap-1.5 shrink-0">
                 Metoda plata
               </span>
@@ -2277,7 +2286,7 @@ export default function AdminOrderDetailPage() {
               return (
                 <>
                   {order.stripe_checkout_session_id && (
-                    <div className="flex items-center justify-between gap-4 text-sm">
+                    <div className="flex items-center justify-between gap-4 text-sm border-b border-border/60 py-1.5 last:border-b-0">
                       <span className="text-muted-foreground shrink-0">Checkout Session</span>
                       <a
                         href={`${stripeBase}/checkout/sessions/${order.stripe_checkout_session_id}`}
@@ -2292,7 +2301,7 @@ export default function AdminOrderDetailPage() {
                     </div>
                   )}
                   {order.stripe_payment_intent_id && (
-                    <div className="flex items-center justify-between gap-4 text-sm">
+                    <div className="flex items-center justify-between gap-4 text-sm border-b border-border/60 py-1.5 last:border-b-0">
                       <span className="text-muted-foreground shrink-0">Stripe Payment</span>
                       <a
                         href={`${stripeBase}/payments/${order.stripe_payment_intent_id}`}
@@ -3776,22 +3785,66 @@ function PropertySection({ property }: { property: AnyObj | null }) {
 }
 
 /** Romanian labels for known civil_status keys, in display order. Unknown
- *  keys fall back to the raw key so imported/new fields are never hidden. */
+ *  keys fall back to the raw key so imported/new fields are never hidden.
+ *  Boolean fields are phrased so a Da/Nu value reads naturally. */
 const CIVIL_STATUS_LABELS: Array<[string, string]> = [
+  ['applicantType', 'Certificat solicitat pentru'],
+  ['bornAbroad', 'Născut(ă) în străinătate'],
+  ['birthLocality', 'Localitatea nașterii'],
+  ['birthCounty', 'Județul nașterii'],
+  ['nationality', 'Naționalitate'],
+  ['birthName', 'Numele la naștere'],
+  ['fatherName', 'Numele tatălui'],
+  ['motherName', 'Numele mamei'],
+  ['maritalStatus', 'Stare civilă actuală'],
+  ['currentlyMarried', 'Căsătorit(ă) în prezent'],
+  ['wasMarriedBefore', 'Căsătorit(ă) anterior'],
+  ['previouslyMarried', 'Căsătorit(ă) anterior'],
+  ['priorMarriagesCount', 'Câte căsătorii anterioare'],
+  ['previousMarriagesCount', 'Câte căsătorii anterioare'],
+  ['lastMarriageEndedBy', 'Ultima căsătorie încheiată prin'],
+  ['divorcePlace', 'Divorțul a avut loc în'],
+  ['divorceRegisteredInRomania', 'Divorț înregistrat în România'],
+  ['stillHaveOldMarriageCert', 'Mai deține vechiul certificat de căsătorie'],
+  ['marriageAbroad', 'Căsătorie în străinătate'],
   ['marriageDate', 'Data căsătoriei'],
   ['marriagePlace', 'Căsătoria a avut loc în'],
   ['officeLocality', 'Oficiul stării civile (localitate)'],
   ['spouseNameBeforeMarriage', 'Numele soțului/soției înainte de căsătorie'],
-  ['previouslyMarried', 'Căsătorit(ă) anterior'],
-  ['previousMarriagesCount', 'De câte ori anterior'],
-  ['lastMarriageEndedBy', 'Ultima căsătorie încheiată prin'],
+  ['marriageAbroadIntent', 'Pentru căsătorie în străinătate'],
+  ['futureSpouseName', 'Viitorul soț/soție'],
+  ['oldCertificateReason', 'Vechiul certificat a fost'],
+  ['registrationPlace', 'Județul care a înregistrat actul'],
   ['renouncedRomanianCitizenship', 'A renunțat la cetățenia română'],
-  ['birthName', 'Numele la naștere'],
-  ['fatherName', 'Numele tatălui'],
-  ['motherName', 'Numele mamei'],
   ['purpose', 'Scopul obținerii'],
   ['countryOfUse', 'Țara în care va fi folosit'],
 ];
+
+/** Wizard stores canonical values (booleans, 'ro'/'strainatate', 'divort'); show them in Romanian. */
+const CIVIL_STATUS_VALUE_LABELS: Record<string, string> = {
+  true: 'Da',
+  false: 'Nu',
+  ro: 'România',
+  strainatate: 'Străinătate',
+  divort: 'Divorț',
+  deces: 'Decesul soțului/soției',
+  adult: 'Adult (18 ani și peste)',
+  minor: 'Minor (sub 18 ani)',
+  necasatorit: 'Necăsătorit(ă)',
+  casatorit: 'Căsătorit(ă)',
+  divortat: 'Divorțat(ă)',
+  vaduv: 'Văduv(ă)',
+  pierdut: 'Pierdut',
+  distrus: 'Distrus',
+  furat: 'Furat',
+};
+
+function formatCivilValue(v: unknown): string {
+  const s = String(v);
+  // ISO dates from the wizard's <input type="date"> → dd.mm.yyyy
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return formatDateOnly(s);
+  return CIVIL_STATUS_VALUE_LABELS[s] ?? s;
+}
 
 function CivilStatusCard({ civilStatus }: { civilStatus: AnyObj | null }) {
   if (!civilStatus || typeof civilStatus !== 'object') return null;
@@ -3805,8 +3858,8 @@ function CivilStatusCard({ civilStatus }: { civilStatus: AnyObj | null }) {
   const ordered: Array<[string, string]> = [
     ...CIVIL_STATUS_LABELS.filter(
       ([k]) => civilStatus[k] != null && String(civilStatus[k]).trim() !== ''
-    ).map(([k, label]) => [label, String(civilStatus[k])] as [string, string]),
-    ...entries.filter(([k]) => !known.has(k)).map(([k, v]) => [k, String(v)] as [string, string]),
+    ).map(([k, label]) => [label, formatCivilValue(civilStatus[k])] as [string, string]),
+    ...entries.filter(([k]) => !known.has(k)).map(([k, v]) => [k, formatCivilValue(v)] as [string, string]),
   ];
 
   return (
@@ -3828,7 +3881,7 @@ function CivilStatusCard({ civilStatus }: { civilStatus: AnyObj | null }) {
 
 function InfoRow({ label, value, icon, mono = false }: { label: string; value: string; icon?: React.ReactNode; mono?: boolean }) {
   return (
-    <div className="flex items-center justify-between gap-4 text-sm">
+    <div className="flex items-center justify-between gap-4 text-sm border-b border-border/60 py-1.5 last:border-b-0">
       <span className="text-muted-foreground flex items-center gap-1.5 shrink-0">
         {icon}
         {label}
