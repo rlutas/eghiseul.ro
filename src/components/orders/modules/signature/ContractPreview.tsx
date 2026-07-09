@@ -75,6 +75,8 @@ export default function ContractPreview() {
           servicePrice: priceBreakdown.basePrice,
           orderId: state.orderId || undefined,
           friendlyOrderId: state.friendlyOrderId || undefined,
+          // PF/PJ pe contract = tipul SERVICIULUI (nu al facturării)
+          clientType: state.clientType || undefined,
         };
 
         const response = await fetch('/api/contracts/preview', {

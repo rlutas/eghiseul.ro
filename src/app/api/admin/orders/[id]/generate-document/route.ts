@@ -5,6 +5,7 @@ import { requirePermission } from '@/lib/admin/permissions';
 import { generateDocument, type DocumentContext, type ClientData, type CompanyData, type LawyerData } from '@/lib/documents/generator';
 import { uploadFile, generateDocumentKey, downloadFile, deleteFile, getClientSignatureBase64 } from '@/lib/aws/s3';
 import { allocateNumber, findExistingNumber, getRegistryClient } from '@/lib/registry/client';
+import { isPJForDocumentGeneration } from '@/lib/documents/delegation-items';
 
 /**
  * Format an AddressState object (or string) into a human-readable Romanian address.
@@ -100,7 +101,15 @@ export async function POST(
     // and birth name; personalKyc no longer duplicates them for these services.
     const civil = cd.civil_status || {};
 
-    const isPJ = billing?.type === 'persoana_juridica' || !!company?.companyName;
+    // "PJ" = SERVICIUL e pentru o firmă (există company KYC / clientType pj),
+    // NU "factura e pe firmă". O comandă PF cu factura pe angajator rămâne PF
+    // pe documente (aceeași regulă ca auto-generate.ts / delegation-items).
+    // Excepție: servicii fără date personale/firmă (extras CF, constatator) —
+    // partea contractantă e entitatea de FACTURARE.
+    const usesBillingAsParty = !personal.firstName && !personal.lastName && !company.companyName;
+    const isPJ = usesBillingAsParty
+      ? (billing?.type === 'persoana_juridica' || billing?.source === 'company')
+      : isPJForDocumentGeneration(cd);
 
     const personalAddress = typeof personal.address === 'object' ? personal.address : undefined;
     const companyAddress = typeof company.address === 'object' ? company.address : undefined;

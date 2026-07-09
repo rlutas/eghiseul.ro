@@ -3218,7 +3218,9 @@ function ProcessingSection({
 
   const status = order.status || 'draft';
   const buttonConfig = PROCESSING_ACTION_BUTTONS[status];
-  const isPJ = order.customer_data?.billing?.type === 'persoana_juridica' || !!order.customer_data?.companyData?.companyName;
+  // Cererea PF/PJ urmează SERVICIUL (company KYC prezent = PJ), nu facturarea
+  // — comanda PF cu factura pe angajator primește cerere PF.
+  const isPJ = !!order.customer_data?.companyData?.companyName || !!order.customer_data?.company?.companyName;
 
   // Show for all processable statuses
   const processableStatuses = ['pending', 'paid', 'processing', 'documents_generated', 'submitted_to_institution', 'document_received', 'extras_in_progress', 'document_ready'];

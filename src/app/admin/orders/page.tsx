@@ -813,16 +813,21 @@ function getCustomerName(order: OrderRow): string {
   const personal = cd?.personalData || cd?.personal;
   const company = cd?.companyData || cd?.company;
   const billing = cd?.billing;
-  const isPJ = billing?.type === 'persoana_juridica' || !!company?.companyName;
 
-  if (isPJ) return company?.companyName || billing?.companyName || 'N/A';
+  // Clientul afișat = BENEFICIARUL serviciului, nu entitatea de facturare.
+  // O comandă PF (cazier pe persoană) poate avea factura pe angajator
+  // (billing PJ) — afișam greșit firma (ex. E-260709-V9G9M: comanda Biancăi,
+  // factura pe INTERTEK). Firma e clientul DOAR când serviciul e pe firmă
+  // (există company KYC).
+  if (company?.companyName) return company.companyName;
   if (contact?.name) return contact.name;
-  // Billing name as a final fallback — services without a personal-KYC step
-  // (e.g. identificare imobil) only collect the name at billing.
-  const b = billing as { firstName?: string; lastName?: string; name?: string } | undefined;
+  const b = billing as { firstName?: string; lastName?: string; name?: string; companyName?: string } | undefined;
   const firstName = contact?.firstName || personal?.firstName || b?.firstName || '';
   const lastName = contact?.lastName || personal?.lastName || b?.lastName || '';
   if (firstName || lastName) return `${firstName} ${lastName}`.trim();
+  // Fallback final — servicii fără pas personal (ex. constatator pe firmă,
+  // identificare imobil): numele există doar la facturare.
+  if (billing?.type === 'persoana_juridica' && billing?.companyName) return billing.companyName;
   if (b?.name) return b.name;
   return 'N/A';
 }

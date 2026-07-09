@@ -49,6 +49,8 @@ function formatAddress(address: unknown): string {
 interface PreviewRequestBody {
   serviceSlug: string;
   serviceName: string;
+  /** Tipul SERVICIULUI (PF/PJ) din wizard — nu al facturării. */
+  clientType?: 'PF' | 'PJ' | null;
   contact: {
     email: string;
     phone: string;
@@ -122,7 +124,9 @@ export async function POST(request: NextRequest) {
     const company = body.companyData || {};
     const billing = body.billing || {};
 
-    const isPJ = billing.type === 'persoana_juridica' || !!company.companyName;
+    // PJ doar când SERVICIUL e pe firmă (company KYC / clientType PJ) — nu
+    // când doar factura e pe firmă (comandă PF cu factura pe angajator).
+    const isPJ = !!company.companyName || body.clientType === 'PJ';
 
     const personalAddress = typeof personal.address === 'object' ? personal.address : undefined;
     const companyAddress = typeof company.address === 'object' ? company.address : undefined;
