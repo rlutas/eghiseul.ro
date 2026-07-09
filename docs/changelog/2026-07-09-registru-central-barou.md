@@ -75,3 +75,18 @@ a permisului, iar nr. permisului nici nu se afișa în admin. Fix (migrarea 105)
   E-260709-WT4KL echipa cere pozele direct din admin (link de reîncărcare).
 - Bonus fix latent: click-ul pe cardurile de upload act identitate deschidea
   input-ul greșit (cădea pe ref-ul certificatului) — mapare unificată.
+
+## Admin & documente — finisaje (după feedback echipă)
+
+- **CJO/ecazier, lista comenzi**: numerele Barou vizibile sub nr. comenzii
+  („SM 005774 · 007256", + delegația integritate la duale); iconița de livrare
+  electronică nu mai e fulger albastru (părea urgență) — plic gri; fulgerul
+  PORTOCALIU rămâne doar pe urgente.
+- **eghiseul, lista comenzi**: fulger portocaliu lângă client la comenzile cu
+  procesare urgentă (nu exista niciun marcaj).
+- **Împuternicire eghiseul** ({{INSTITUTIE}}): text complet „să se prezinte la
+  IPJ SATU MARE, în vederea ridicării Cazier Auto. Motivul solicitării: ..."
+  (motivul din wizard; înainte scria doar „IPJ SATU MARE - CAZIER AUTO" fără
+  motiv). CJO/ecazier aveau deja formatul corect în template.
+- Împuternicirile deja generate cu textul vechi: Regenereaza din admin —
+  numărul se refolosește (idempotent), doar textul se corectează.
