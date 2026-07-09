@@ -706,7 +706,6 @@ function NumberRegistryContent() {
                       <th className="py-2 px-2 font-medium">Client</th>
                       <th className="py-2 px-2 font-medium">CNP/CUI</th>
                       <th className="py-2 px-2 font-medium">Serviciu</th>
-                      <th className="py-2 px-2 font-medium">Suma</th>
                       <th className="py-2 px-2 font-medium">Sursa</th>
                       <th className="py-2 px-2 font-medium">Actiuni</th>
                     </tr>
@@ -806,7 +805,6 @@ function NumberRegistryContent() {
                           <td className="py-2 px-2">{group.clientName}</td>
                           <td className="py-2 px-2 font-mono text-xs">{group.clientCnp || group.clientCui || '-'}</td>
                           <td className="py-2 px-2">{group.serviceType || '-'}</td>
-                          <td className="py-2 px-2">{group.amount ? `${group.amount} RON` : '-'}</td>
                           <td className="py-2 px-2">
                             <Badge variant={
                               group.source === 'platform' ? 'default' :
@@ -882,7 +880,6 @@ function NumberRegistryContent() {
                         <td className="py-2 px-2">{entry.client_name}</td>
                         <td className="py-2 px-2 font-mono text-xs">{entry.client_cnp || entry.client_cui || '-'}</td>
                         <td className="py-2 px-2">{entry.service_type || '-'}</td>
-                        <td className="py-2 px-2">{entry.amount ? `${entry.amount} RON` : '-'}</td>
                         <td className="py-2 px-2">
                           <Badge variant="secondary">Manual</Badge>
                         </td>
