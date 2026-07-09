@@ -6,7 +6,19 @@
 > Numerele se alocă **DOAR după plată reușită** — niciun număr ars pe comenzi
 > neplătite.
 
-**Implementat:** 2026-07-09 | **Status:** cod gata, așteaptă cutover (vezi [Rollout](#rollout--cutover))
+**Implementat + LIVE:** 2026-07-09 (deploy ambele platforme; proiect Supabase
+`registru-barou-central` / ksqkttalapjlgugshuks, eu-west-2)
+
+**Intervale oficiale Barou 2026 (adresa oficială, seria SM):**
+| Tip | Interval | Ultimul folosit manual (Sheets) | Următorul emis de registru |
+|---|---|---|---|
+| Contracte asistență juridică | 003551 – 006550 | 005771 | **005772** |
+| Împuterniciri avocațiale | 005051 – 008050 | 007254 | **SM007255** |
+
+Intervalele legacy migrate din eghiseul (4256-5256 / 5738-7738) sunt ARHIVATE —
+erau depășite de utilizarea manuală reală. Jurnalul istoric complet din Google
+Sheets urmează să fie importat cu `--sheet=` (audit; nu blochează emiterea —
+`next_number` e deja corect).
 
 ---
 

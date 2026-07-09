@@ -62,6 +62,29 @@ export default function AdminRegistruPage() {
         </p>
       </div>
 
+      {/* Info: registru CENTRAL partajat, alocare automată post-plată */}
+      <div className="rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900 space-y-1.5">
+        <p className="font-semibold">📖 Registru CENTRAL — partajat pe 3 platforme (din 09.07.2026)</p>
+        <ul className="list-disc pl-5 space-y-1 text-blue-800">
+          <li>
+            Numerele se alocă <strong>automat, DOAR după plata reușită</strong>, pe toate platformele:
+            eghiseul.ro, cazierjudiciaronline.com și ecazier.ro (coloana „Comanda" arată platforma pentru CJO/ecazier).
+          </li>
+          <li>
+            <strong>Nu se mai ține evidența în Google Sheets</strong> — acest jurnal este registrul oficial;
+            exportul CSV de aici merge la raportarea către Barou.
+          </li>
+          <li>
+            Intervale oficiale 2026 (seria SM): contracte <strong>003551–006550</strong>, împuterniciri <strong>005051–008050</strong>.
+            La comenzile neplătite NU se emit numere; la regenerare de documente numărul se refolosește (nu se irosește).
+          </li>
+          <li>
+            Dacă o alocare eșuează (registru indisponibil), comanda se procesează normal și numărul se alocă
+            automat la următoarea rulare a cronului orar — vezi nota de pe comandă.
+          </li>
+        </ul>
+      </div>
+
       <NumberRegistryContent />
     </div>
   );
