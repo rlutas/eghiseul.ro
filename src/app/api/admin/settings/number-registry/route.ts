@@ -2,8 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { requirePermission } from '@/lib/admin/permissions';
+import { getRegistryClient } from '@/lib/registry/client';
 
-// number_registry table is not in generated Supabase types yet.
+// The registry lives in the CENTRAL Supabase project (shared by eghiseul,
+// cazierjudiciaronline, ecazier). Local adminClient is kept ONLY for
+// enriching eghiseul rows with their order_documents info.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyClient = any;
 
@@ -45,14 +48,15 @@ export async function GET(request: NextRequest) {
     const dateFrom = searchParams.get('date_from');
     const dateTo = searchParams.get('date_to');
     const search = searchParams.get('search');
-    const orderId = searchParams.get('order_id');
+    const orderRef = searchParams.get('order_ref');
     const page = Math.max(1, parseInt(searchParams.get('page') || '1', 10));
     const perPage = Math.min(200, Math.max(1, parseInt(searchParams.get('per_page') || '50', 10)));
 
+    const registryClient: AnyClient = getRegistryClient();
     const adminClient: AnyClient = createAdminClient();
 
     // Get total count with same filters
-    let countQuery = adminClient
+    let countQuery = registryClient
       .from('number_registry')
       .select('*', { count: 'exact', head: true })
       .eq('year', year);
@@ -61,7 +65,7 @@ export async function GET(request: NextRequest) {
     const from = (page - 1) * perPage;
     const to = from + perPage - 1;
 
-    let dataQuery = adminClient
+    let dataQuery = registryClient
       .from('number_registry')
       .select('*')
       .eq('year', year)
@@ -89,9 +93,9 @@ export async function GET(request: NextRequest) {
       dataQuery = dataQuery.lte('date', dateTo);
     }
 
-    if (orderId) {
-      countQuery = countQuery.eq('order_id', orderId);
-      dataQuery = dataQuery.eq('order_id', orderId);
+    if (orderRef) {
+      countQuery = countQuery.eq('order_ref', orderRef);
+      dataQuery = dataQuery.eq('order_ref', orderRef);
     }
 
     if (search) {
@@ -124,32 +128,39 @@ export async function GET(request: NextRequest) {
 
     const data = dataResult.data || [];
 
-    // Enrich entries with friendly_order_id from orders table
-    const orderIds = data
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .filter((e: any) => e.order_id)
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .map((e: any) => e.order_id);
-
-    let orderMap: Record<string, string> = {};
-    if (orderIds.length > 0) {
-      const { data: orders } = await adminClient
+    // Resolve local order UUIDs for EGHISEUL rows (order_ref = friendly_order_id)
+    // so the admin UI can keep linking to /admin/orders/<uuid>.
+    const eghiseulRefs = [
+      ...new Set(
+        data
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          .filter((e: any) => e.platform === 'eghiseul' && e.order_ref)
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          .map((e: any) => e.order_ref)
+      ),
+    ];
+    let refToUuid: Record<string, string> = {};
+    if (eghiseulRefs.length > 0) {
+      const { data: localOrders } = await adminClient
         .from('orders')
         .select('id, friendly_order_id')
-        .in('id', orderIds);
-      if (orders) {
-        orderMap = Object.fromEntries(
+        .in('friendly_order_id', eghiseulRefs);
+      if (localOrders) {
+        refToUuid = Object.fromEntries(
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          orders.map((o: any) => [o.id, o.friendly_order_id])
+          localOrders.map((o: any) => [o.friendly_order_id, o.id])
         );
       }
     }
 
-    // Enrich entries with linked document info
+    // Enrich EGHISEUL rows with local document info (order_document_ref is a
+    // local order_documents.id stored as text). Rows from other platforms
+    // (cazierjudiciaronline/ecazier) just display platform + order_ref.
     const docIds = data
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .map((e: any) => e.order_document_id)
-      .filter((id: string | null) => id !== null);
+      .filter((e: any) => e.platform === 'eghiseul' && e.order_document_ref)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .map((e: any) => e.order_document_ref);
 
     let docMap = new Map<string, { s3_key: string; file_name: string; type: string }>();
     if (docIds.length > 0) {
@@ -167,10 +178,16 @@ export async function GET(request: NextRequest) {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const enrichedData = data.map((entry: any) => {
-      const doc = entry.order_document_id ? docMap.get(entry.order_document_id) : null;
+      const doc =
+        entry.platform === 'eghiseul' && entry.order_document_ref
+          ? docMap.get(entry.order_document_ref)
+          : null;
       return {
         ...entry,
-        friendly_order_id: entry.order_id ? (orderMap[entry.order_id] || null) : null,
+        // order_ref IS the human-readable id on every platform (friendly_order_id / order_number)
+        friendly_order_id: entry.order_ref || null,
+        // Local UUID (eghiseul rows only) so the UI can link to /admin/orders/<uuid>
+        order_id: entry.platform === 'eghiseul' ? (refToUuid[entry.order_ref] ?? null) : null,
         document_s3_key: doc?.s3_key || null,
         document_file_name: doc?.file_name || null,
         document_type: doc?.type || null,
@@ -242,11 +259,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const adminClient: AnyClient = createAdminClient();
+    const registryClient: AnyClient = getRegistryClient();
 
-    // ── Allocate number via RPC ──
+    // ── Allocate number via CENTRAL RPC (manual entry: no platform/order_ref) ──
 
-    const { data, error } = await (adminClient as AnyClient).rpc('allocate_number', {
+    const { data, error } = await registryClient.rpc('allocate_number', {
       p_type: body.type,
       p_client_name: body.client_name.trim(),
       p_client_email: body.client_email || null,
@@ -257,7 +274,7 @@ export async function POST(request: NextRequest) {
       p_amount: body.amount || null,
       p_source: 'manual',
       p_date: body.date || new Date().toISOString().split('T')[0],
-      p_created_by: user.id,
+      p_created_by: user.email ?? user.id,
     });
 
     if (error) {

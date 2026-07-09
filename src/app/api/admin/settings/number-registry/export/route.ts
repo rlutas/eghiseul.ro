@@ -2,8 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { requirePermission } from '@/lib/admin/permissions';
+import { getRegistryClient } from '@/lib/registry/client';
 
-// number_registry table is not in generated Supabase types yet.
+// The registry lives in the CENTRAL Supabase project. Local adminClient is
+// kept only for enriching eghiseul rows with document file names.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyClient = any;
 
@@ -78,12 +80,13 @@ export async function GET(request: NextRequest) {
     const dateFrom = searchParams.get('date_from');
     const dateTo = searchParams.get('date_to');
     const search = searchParams.get('search');
-    const orderId = searchParams.get('order_id');
+    const orderRef = searchParams.get('order_ref');
 
+    const registryClient: AnyClient = getRegistryClient();
     const adminClient: AnyClient = createAdminClient();
 
     // Build query - fetch ALL matching entries (no pagination)
-    let query = adminClient
+    let query = registryClient
       .from('number_registry')
       .select('*')
       .eq('year', year)
@@ -105,8 +108,8 @@ export async function GET(request: NextRequest) {
       query = query.lte('date', dateTo);
     }
 
-    if (orderId) {
-      query = query.eq('order_id', orderId);
+    if (orderRef) {
+      query = query.eq('order_ref', orderRef);
     }
 
     if (search) {
@@ -124,28 +127,11 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Enrich entries with friendly_order_id from orders table
-    const orderIds = (entries || [])
-      .filter((e: AnyClient) => e.order_id)
-      .map((e: AnyClient) => e.order_id);
-
-    let orderMap: Record<string, string> = {};
-    if (orderIds.length > 0) {
-      const { data: orders } = await adminClient
-        .from('orders')
-        .select('id, friendly_order_id')
-        .in('id', orderIds);
-      if (orders) {
-        orderMap = Object.fromEntries(
-          orders.map((o: AnyClient) => [o.id, o.friendly_order_id])
-        );
-      }
-    }
-
-    // Enrich entries with linked document file names
+    // Enrich EGHISEUL rows with local document file names (order_document_ref
+    // is a local order_documents.id stored as text).
     const docIds = (entries || [])
-      .map((e: AnyClient) => e.order_document_id)
-      .filter((id: string | null) => id !== null);
+      .filter((e: AnyClient) => e.platform === 'eghiseul' && e.order_document_ref)
+      .map((e: AnyClient) => e.order_document_ref);
 
     let docMap: Record<string, string> = {};
     if (docIds.length > 0) {
@@ -175,6 +161,7 @@ export async function GET(request: NextRequest) {
       'Descriere',
       'Suma',
       'Sursa',
+      'Platforma',
       'Comanda',
       'Anulat',
       'Motiv Anulare',
@@ -194,10 +181,15 @@ export async function GET(request: NextRequest) {
       escapeCsvField(entry.description),
       escapeCsvField(entry.amount),
       escapeCsvField(SOURCE_LABELS[entry.source] || entry.source),
-      escapeCsvField(entry.order_id ? (orderMap[entry.order_id] || '') : ''),
+      escapeCsvField(entry.platform || ''),
+      escapeCsvField(entry.order_ref || ''),
       escapeCsvField(entry.voided_at ? 'Da' : ''),
       escapeCsvField(entry.void_reason),
-      escapeCsvField(entry.order_document_id ? (docMap[entry.order_document_id] || '') : ''),
+      escapeCsvField(
+        entry.platform === 'eghiseul' && entry.order_document_ref
+          ? (docMap[entry.order_document_ref] || '')
+          : ''
+      ),
     ]);
 
     // UTF-8 BOM for Excel compatibility + header + data rows

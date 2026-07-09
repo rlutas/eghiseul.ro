@@ -109,10 +109,35 @@ export async function POST(request: NextRequest) {
     })
   );
 
+  // BAROU SWEEP (runs every time, independent of the invoice check): paid
+  // orders whose Barou numbers were never allocated (e.g. the central registry
+  // was unreachable when the webhook fired). Idempotent + fail-soft; capped
+  // per run. 14-day lookback.
+  let barouHealed = 0;
+  try {
+    const { data: barouPending } = await ordersTable
+      .select('id')
+      .eq('payment_status', 'paid')
+      .is('barou_numbers_allocated_at', null)
+      .gte('updated_at', new Date(now - 14 * 24 * 60 * 60 * 1000).toISOString())
+      .limit(20);
+
+    if (barouPending?.length) {
+      const { ensureBarouDocumentsForPaidOrder } = await import('@/lib/documents/ensure-barou-documents');
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      for (const o of barouPending as any[]) {
+        const res = await ensureBarouDocumentsForPaidOrder(o.id);
+        if (res.ok && !res.skipped) barouHealed++;
+      }
+    }
+  } catch (err) {
+    console.error('[invoice-health-check] barou sweep failed:', err);
+  }
+
   if (affected.length === 0) {
     return NextResponse.json({
       success: true,
-      data: { affectedCount: 0, healedCount: 0, processedAt: new Date().toISOString() },
+      data: { affectedCount: 0, healedCount: 0, barouHealed, processedAt: new Date().toISOString() },
     });
   }
 
@@ -152,6 +177,7 @@ export async function POST(request: NextRequest) {
     data: {
       affectedCount: affected.length,
       healedCount: healed.length,
+      barouHealed,
       healed,
       stillMissing: stillMissing.map((o) => ({
         id: o.id,

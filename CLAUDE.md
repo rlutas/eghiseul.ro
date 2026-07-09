@@ -30,7 +30,8 @@ Platforma digitala pentru Romania - servicii publice digitalizate (9 servicii ac
 | **RBAC & permisiuni** | `docs/admin/rbac-permissions.md` |
 | **Document generation** | `docs/technical/specs/admin-document-system.md` |
 | **KYC identity & face matching** | `docs/technical/specs/kyc-identity-verification.md` |
-| **Number registry (Barou)** | `docs/technical/specs/number-registry-system.md` |
+| **Registru central numere Barou (3 platforme, alocare post-plată)** | `docs/registru-central/README.md` |
+| **Number registry (Barou) — spec istoric pre-central** | `docs/technical/specs/number-registry-system.md` |
 | **AWB & tracking** | `docs/technical/specs/awb-generation-tracking.md` |
 | **Delivery system** | `docs/technical/specs/delivery-system-architecture.md` |
 | **Sameday API** | `docs/technical/specs/sameday-api-integration.md` |

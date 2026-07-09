@@ -76,8 +76,9 @@ function NumberRegistryContent() {
   const [ranges, setRanges] = useState<NumberRangeWithStats[]>([]);
   const [rangesLoading, setRangesLoading] = useState(true);
 
-  // Registry journal
-  const [registryEntries, setRegistryEntries] = useState<(NumberRegistryEntry & { friendly_order_id?: string | null })[]>([]);
+  // Registry journal (central registry rows, enriched by the API with
+  // friendly_order_id + local order_id UUID for eghiseul rows)
+  const [registryEntries, setRegistryEntries] = useState<(NumberRegistryEntry & { friendly_order_id?: string | null; order_id?: string | null })[]>([]);
   const [registryLoading, setRegistryLoading] = useState(true);
   const [pagination, setPagination] = useState({ page: 1, per_page: 50, total: 0, total_pages: 0 });
 
@@ -120,7 +121,8 @@ function NumberRegistryContent() {
   // ── Group entries by order for display ─────────────────────
 
   interface GroupedOrderRow {
-    orderId: string;
+    orderId: string | null;
+    platform: string | null;
     friendlyOrderId: string;
     contractNumber: number | null;
     contractEntryId: string | null;
@@ -142,16 +144,19 @@ function NumberRegistryContent() {
     const manualEntries: (NumberRegistryEntry & { friendly_order_id?: string | null })[] = [];
 
     for (const entry of registryEntries) {
-      if (!entry.order_id) {
+      // Central registry rows are keyed by (platform, order_ref); rows with
+      // no order_ref are manual/personal entries.
+      if (!entry.order_ref) {
         manualEntries.push(entry);
         continue;
       }
 
-      const key = entry.order_id;
+      const key = `${entry.platform ?? ''}:${entry.order_ref}`;
       if (!orderGroups.has(key)) {
         orderGroups.set(key, {
-          orderId: entry.order_id,
-          friendlyOrderId: entry.friendly_order_id || '-',
+          orderId: entry.order_id ?? null,
+          platform: entry.platform ?? null,
+          friendlyOrderId: entry.friendly_order_id || entry.order_ref || '-',
           contractNumber: null,
           contractEntryId: null,
           contractDocS3Key: null,
@@ -581,13 +586,22 @@ function NumberRegistryContent() {
 
                       return (
                         <tr
-                          key={group.orderId}
+                          key={`${group.platform ?? ''}:${group.friendlyOrderId}`}
                           className={`border-b ${group.voided ? 'bg-red-50 line-through text-muted-foreground' : ''}`}
                         >
                           <td className="py-2 px-2">
-                            <a href={`/admin/orders/${group.orderId}`} className="text-blue-600 hover:underline text-xs font-mono">
-                              {group.friendlyOrderId}
-                            </a>
+                            {group.orderId ? (
+                              <a href={`/admin/orders/${group.orderId}`} className="text-blue-600 hover:underline text-xs font-mono">
+                                {group.friendlyOrderId}
+                              </a>
+                            ) : (
+                              <span className="text-xs font-mono">{group.friendlyOrderId}</span>
+                            )}
+                            {group.platform && group.platform !== 'eghiseul' && (
+                              <span className="ml-1.5 inline-flex rounded bg-neutral-100 px-1.5 py-0.5 text-[10px] font-medium text-neutral-600 align-middle">
+                                {group.platform === 'cazierjudiciaronline' ? 'CJO' : 'ecazier'}
+                              </span>
+                            )}
                           </td>
                           <td className="py-2 px-2 font-mono">
                             {group.contractNumber ?? '-'}

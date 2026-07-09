@@ -65,6 +65,13 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       } catch (e) {
         console.error(`[confirm-payment] confirmation email failed (non-fatal):`, e instanceof Error ? e.message : e);
       }
+      // Barou numbers + contract-asistenta backfill (idempotent, never throws).
+      try {
+        const { ensureBarouDocumentsForPaidOrder } = await import('@/lib/documents/ensure-barou-documents');
+        await ensureBarouDocumentsForPaidOrder(orderId);
+      } catch (e) {
+        console.error(`[confirm-payment] ensureBarouDocuments failed (non-fatal):`, e instanceof Error ? e.message : e);
+      }
       return NextResponse.json({
         success: true,
         message: 'Order already marked as paid',
@@ -213,6 +220,15 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       await sendOrderConfirmationIfNeeded(supabaseAdmin, orderId);
     } catch (e) {
       console.error('[confirm-payment] confirmation email failed (non-fatal):', e instanceof Error ? e.message : e);
+    }
+
+    // Barou numbers + contract-asistenta — allocated only after payment
+    // (idempotent, never throws; cron sweep retries misses).
+    try {
+      const { ensureBarouDocumentsForPaidOrder } = await import('@/lib/documents/ensure-barou-documents');
+      await ensureBarouDocumentsForPaidOrder(orderId);
+    } catch (e) {
+      console.error('[confirm-payment] ensureBarouDocuments failed (non-fatal):', e instanceof Error ? e.message : e);
     }
 
     return NextResponse.json({

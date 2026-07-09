@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { requirePermission } from '@/lib/admin/permissions';
+import { getRegistryClient } from '@/lib/registry/client';
 
-// number_ranges table is not in generated Supabase types yet.
+// Ranges live in the CENTRAL registry project (shared by all platforms).
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyClient = any;
 
@@ -39,7 +39,7 @@ export async function PATCH(
       throw error;
     }
 
-    const adminClient: AnyClient = createAdminClient();
+    const adminClient: AnyClient = getRegistryClient();
 
     // Fetch current range to verify it exists
     const { data: currentRange, error: fetchError } = await adminClient

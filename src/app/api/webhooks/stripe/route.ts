@@ -318,6 +318,16 @@ async function handlePaymentSucceeded(paymentIntent: Stripe.PaymentIntent) {
   } catch (e) {
     console.error(`Order ${orderId}: ensureAncpiJob failed (non-fatal):`, e instanceof Error ? e.message : e)
   }
+
+  // 5. Barou numbers + contract-asistenta — allocated ONLY after payment,
+  // from the CENTRAL registry. Fail-soft (helper never throws) + idempotent;
+  // misses self-heal via confirm-payment and the hourly cron sweep.
+  try {
+    const { ensureBarouDocumentsForPaidOrder } = await import('@/lib/documents/ensure-barou-documents')
+    await ensureBarouDocumentsForPaidOrder(orderId)
+  } catch (e) {
+    console.error(`Order ${orderId}: ensureBarouDocuments failed (non-fatal):`, e instanceof Error ? e.message : e)
+  }
 }
 
 async function handlePaymentFailed(paymentIntent: Stripe.PaymentIntent) {

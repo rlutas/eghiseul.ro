@@ -22,6 +22,9 @@ export interface NumberRangeWithStats extends NumberRange {
   usage_percent: number;
 }
 
+/** Platforms consuming the central registry. */
+export type RegistryPlatform = 'eghiseul' | 'cazierjudiciaronline' | 'ecazier';
+
 export interface NumberRegistryEntry {
   id: string;
   range_id: string | null;
@@ -29,8 +32,9 @@ export interface NumberRegistryEntry {
   type: 'contract' | 'delegation';
   series: string | null;
   year: number;
-  order_id: string | null;
-  order_document_id: string | null;
+  platform: RegistryPlatform | null;
+  order_ref: string | null;
+  order_document_ref: string | null;
   client_name: string;
   client_email: string | null;
   client_cnp: string | null;
@@ -53,6 +57,8 @@ export interface AllocateNumberResult {
   allocated_year: number;
   range_id: string;
   registry_id: string;
+  /** TRUE when an existing live allocation was returned instead of a new one. */
+  reused: boolean;
 }
 
 export interface FindExistingNumberResult {

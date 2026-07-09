@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { requirePermission } from '@/lib/admin/permissions';
+import { getRegistryClient } from '@/lib/registry/client';
 
-// number_registry table is not in generated Supabase types yet.
+// The registry lives in the CENTRAL Supabase project.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyClient = any;
 
@@ -41,13 +41,13 @@ export async function POST(
 
     const body = await request.json().catch(() => ({}));
 
-    const adminClient: AnyClient = createAdminClient();
+    const adminClient: AnyClient = getRegistryClient();
 
-    // ── Void number via RPC ──
+    // ── Void number via CENTRAL RPC ──
 
-    const { data, error } = await (adminClient as AnyClient).rpc('void_number', {
+    const { data, error } = await adminClient.rpc('void_number', {
       p_registry_id: id,
-      p_voided_by: user.id,
+      p_voided_by: user.email ?? user.id,
       p_void_reason: body.reason || null,
     });
 

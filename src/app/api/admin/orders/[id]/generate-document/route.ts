@@ -4,6 +4,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { requirePermission } from '@/lib/admin/permissions';
 import { generateDocument, type DocumentContext, type ClientData, type CompanyData, type LawyerData } from '@/lib/documents/generator';
 import { uploadFile, generateDocumentKey, downloadFile, deleteFile, getClientSignatureBase64 } from '@/lib/aws/s3';
+import { allocateNumber, findExistingNumber, getRegistryClient } from '@/lib/registry/client';
 
 /**
  * Format an AddressState object (or string) into a human-readable Romanian address.
@@ -174,9 +175,20 @@ export async function POST(
       }
     })();
 
-    // Allocate document numbers via number_registry system
+    // Allocate document numbers via the CENTRAL registry (dedicated Supabase
+    // project). Barou numbers are finite — they may be consumed ONLY by PAID
+    // orders (post-payment allocation policy, 2026-07).
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const documentNumbers: any = {};
+    const registryOrderRef: string = order.friendly_order_id || orderId;
+    const needsBarouNumber = ['contract-asistenta', 'contract-complet', 'imputernicire'].includes(template);
+
+    if (needsBarouNumber && order.payment_status !== 'paid') {
+      return NextResponse.json(
+        { success: false, error: 'Numerele Barou se alocă doar după plată. Comanda nu este plătită.' },
+        { status: 400 }
+      );
+    }
 
     if (template === 'contract-prestari') {
       // Contract prestari does NOT consume a Barou number
@@ -185,98 +197,74 @@ export async function POST(
     }
 
     if (['contract-asistenta', 'contract-complet'].includes(template)) {
-      // Check for existing number (regeneration reuse)
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data: existing } = await (adminClient as any).rpc('find_existing_number', {
-        p_order_id: orderId,
-        p_type: 'contract',
-      });
-
-      if (existing && existing.length > 0) {
-        documentNumbers.contract_number = existing[0].existing_number;
-        documentNumbers.contract_series = existing[0].existing_series;
-      } else {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { data: allocated, error: allocError } = await (adminClient as any).rpc('allocate_number', {
-          p_type: 'contract',
-          p_order_id: orderId,
-          p_client_name: clientData.name,
-          p_client_email: clientData.email || null,
-          p_client_cnp: clientData.cnp || null,
-          p_client_cui: clientData.cui || null,
-          p_service_type: order.services?.name || '',
-          p_amount: lawyerData?.fee || null,
-          p_created_by: user.id,
+      try {
+        // Idempotent: reuses the existing allocation on regeneration.
+        const allocated = await allocateNumber({
+          type: 'contract',
+          platform: 'eghiseul',
+          orderRef: registryOrderRef,
+          clientName: clientData.name,
+          clientEmail: clientData.email || undefined,
+          clientCnp: clientData.cnp || undefined,
+          clientCui: clientData.cui || undefined,
+          serviceType: order.services?.name || '',
+          amount: lawyerData?.fee || undefined,
+          createdBy: user.email ?? user.id,
         });
 
-        if (allocError) {
-          console.error('Failed to allocate contract number:', allocError);
-          return NextResponse.json(
-            { success: false, error: 'Nu s-a putut aloca numar de contract. Verificati intervalele disponibile.' },
-            { status: 400 }
-          );
-        }
-
-        documentNumbers.contract_number = allocated[0].allocated_number;
-        documentNumbers.contract_series = allocated[0].allocated_series;
+        documentNumbers.contract_number = allocated.number;
+        documentNumbers.contract_series = allocated.series;
         documentNumbers.registry_ids = {
           ...documentNumbers.registry_ids,
-          contract: allocated[0].registry_id,
+          contract: allocated.registryId,
         };
+      } catch (allocError) {
+        console.error('Failed to allocate contract number:', allocError);
+        return NextResponse.json(
+          { success: false, error: 'Nu s-a putut aloca numar de contract. Verificati intervalele disponibile in /admin/registru.' },
+          { status: 400 }
+        );
       }
     }
 
     if (template === 'imputernicire') {
-      // Check for existing delegation number (regeneration reuse)
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data: existing } = await (adminClient as any).rpc('find_existing_number', {
-        p_order_id: orderId,
-        p_type: 'delegation',
-        p_service_type: body.service_type || order.services?.name || null,
-      });
-
-      if (existing && existing.length > 0) {
-        documentNumbers.imputernicire_number = existing[0].existing_number;
-        documentNumbers.imputernicire_series = existing[0].existing_series || 'SM';
-      } else {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { data: allocated, error: allocError } = await (adminClient as any).rpc('allocate_number', {
-          p_type: 'delegation',
-          p_order_id: orderId,
-          p_client_name: clientData.name,
-          p_client_email: clientData.email || null,
-          p_client_cnp: clientData.cnp || null,
-          p_client_cui: clientData.cui || null,
-          p_service_type: body.service_type || order.services?.name || '',
-          p_amount: lawyerData?.fee || null,
-          p_created_by: user.id,
+      try {
+        // Idempotent per (order, service_type) — regeneration reuses.
+        const allocated = await allocateNumber({
+          type: 'delegation',
+          platform: 'eghiseul',
+          orderRef: registryOrderRef,
+          clientName: clientData.name,
+          clientEmail: clientData.email || undefined,
+          clientCnp: clientData.cnp || undefined,
+          clientCui: clientData.cui || undefined,
+          serviceType: body.service_type || order.services?.name || '',
+          amount: lawyerData?.fee || undefined,
+          createdBy: user.email ?? user.id,
         });
 
-        if (allocError) {
-          console.error('Failed to allocate delegation number:', allocError);
-          return NextResponse.json(
-            { success: false, error: 'Nu s-a putut aloca numar de imputernicire. Verificati intervalele disponibile.' },
-            { status: 400 }
-          );
-        }
-
-        documentNumbers.imputernicire_number = allocated[0].allocated_number;
-        documentNumbers.imputernicire_series = allocated[0].allocated_series || 'SM';
+        documentNumbers.imputernicire_number = allocated.number;
+        documentNumbers.imputernicire_series = allocated.series || 'SM';
         documentNumbers.registry_ids = {
           ...documentNumbers.registry_ids,
-          delegation: allocated[0].registry_id,
+          delegation: allocated.registryId,
         };
+      } catch (allocError) {
+        console.error('Failed to allocate delegation number:', allocError);
+        return NextResponse.json(
+          { success: false, error: 'Nu s-a putut aloca numar de imputernicire. Verificati intervalele disponibile in /admin/registru.' },
+          { status: 400 }
+        );
       }
 
-      // Also fetch the contract number from this order for cross-reference in template
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data: contractEntry } = await (adminClient as any).rpc('find_existing_number', {
-        p_order_id: orderId,
-        p_type: 'contract',
-      });
-
-      if (contractEntry && contractEntry.length > 0) {
-        documentNumbers.contract_number = contractEntry[0].existing_number;
+      // Contract number cross-reference for the împuternicire template.
+      try {
+        const contractEntry = await findExistingNumber('eghiseul', registryOrderRef, 'contract');
+        if (contractEntry) {
+          documentNumbers.contract_number = contractEntry.number;
+        }
+      } catch (crossRefErr) {
+        console.warn('Contract cross-reference lookup failed (non-fatal):', crossRefErr);
       }
     }
 
@@ -450,30 +438,31 @@ export async function POST(
       return NextResponse.json({ success: false, error: 'Nu s-a putut salva documentul' }, { status: 500 });
     }
 
-    // Link document back to registry entry
-    const registryId = documentNumbers.registry_ids?.contract || documentNumbers.registry_ids?.delegation;
-    if (registryId && insertedDoc?.id) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await (adminClient as any)
-        .from('number_registry')
-        .update({ order_document_id: insertedDoc.id })
-        .eq('id', registryId);
-    }
-
-    // Catch-all: also handle reused numbers that weren't linked via registry_ids
-    if (insertedDoc?.id) {
-      const docType2 = template === 'imputernicire' ? 'delegation' :
-                       ['contract-asistenta', 'contract-complet'].includes(template) ? 'contract' : null;
-
-      if (docType2) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        await (adminClient as any)
+    // Link document back to the CENTRAL registry entry (non-fatal).
+    try {
+      const registry = getRegistryClient();
+      const registryId = documentNumbers.registry_ids?.contract || documentNumbers.registry_ids?.delegation;
+      if (registryId && insertedDoc?.id) {
+        await registry
           .from('number_registry')
-          .update({ order_document_id: insertedDoc.id })
-          .eq('order_id', orderId)
-          .eq('type', docType2)
-          .is('order_document_id', null);
+          .update({ order_document_ref: insertedDoc.id })
+          .eq('id', registryId);
+      } else if (insertedDoc?.id) {
+        // Catch-all for reused numbers without a stored registry id.
+        const docType2 = template === 'imputernicire' ? 'delegation' :
+                         ['contract-asistenta', 'contract-complet'].includes(template) ? 'contract' : null;
+        if (docType2) {
+          await registry
+            .from('number_registry')
+            .update({ order_document_ref: insertedDoc.id })
+            .eq('platform', 'eghiseul')
+            .eq('order_ref', registryOrderRef)
+            .eq('type', docType2)
+            .is('order_document_ref', null);
+        }
       }
+    } catch (linkErr) {
+      console.warn('Registry back-link failed (non-fatal):', linkErr);
     }
 
     // Now clean up previous versions of this document type (safe — new row already exists)

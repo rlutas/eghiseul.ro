@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { requirePermission } from '@/lib/admin/permissions';
+import { getRegistryClient } from '@/lib/registry/client';
 
-// number_ranges table is not in generated Supabase types yet.
+// Ranges live in the CENTRAL registry project (shared by all platforms);
+// its tables are not in the local generated Supabase types.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyClient = any;
 
@@ -43,7 +44,7 @@ export async function GET(request: NextRequest) {
     const type = searchParams.get('type'); // 'contract' | 'delegation' | null
     const status = searchParams.get('status'); // 'active' | 'exhausted' | 'archived' | null
 
-    const adminClient: AnyClient = createAdminClient();
+    const adminClient: AnyClient = getRegistryClient();
 
     // Build query
     let query = adminClient
@@ -166,7 +167,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const adminClient: AnyClient = createAdminClient();
+    const adminClient: AnyClient = getRegistryClient();
 
     // ── Check for overlapping ranges ──
 
@@ -213,7 +214,7 @@ export async function POST(request: NextRequest) {
         series: type === 'delegation' ? (series?.trim() || null) : null,
         status: 'active',
         notes: notes?.trim() || null,
-        created_by: user.id,
+        created_by: user.email ?? user.id,
       })
       .select()
       .single();

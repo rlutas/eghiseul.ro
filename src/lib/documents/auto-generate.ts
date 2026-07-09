@@ -21,6 +21,7 @@ import {
   isPJForDocumentGeneration,
 } from '@/lib/documents/delegation-items';
 import { isNoLawyerService } from '@/lib/documents/no-lawyer-services';
+import { allocateNumber, getRegistryClient, formatRegistryNumber } from '@/lib/registry/client';
 
 /**
  * Format an AddressState object (or string) into a human-readable Romanian address.
@@ -53,14 +54,20 @@ interface GenerateResult {
 }
 
 /**
- * Auto-generate all standard documents for an order.
+ * Auto-generate the standard documents for an order.
  *
- * Generates: contract-complet, imputernicire, and cerere-eliberare-pf/pj.
- * Returns array of generated document metadata.
+ * Two-phase flow (Barou numbers are allocated ONLY after payment):
+ *  - mode 'submit' (order submission, BEFORE payment): generates ONLY
+ *    contract-prestari (client-visible, numbered by friendly_order_id — no
+ *    Barou number). No registry allocation happens here.
+ *  - mode 'post-payment' (Stripe webhook / confirm-payment / cron): allocates
+ *    the Barou contract number from the CENTRAL registry, generates
+ *    contract-asistenta, and allocates all delegation numbers.
  */
 export async function autoGenerateOrderDocuments(
   orderId: string,
   generatedBy: string | null,
+  mode: 'submit' | 'post-payment' = 'submit',
 ): Promise<GenerateResult[]> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const adminClient = createAdminClient() as any;
@@ -221,13 +228,22 @@ export async function autoGenerateOrderDocuments(
     } catch { /* signature not available */ }
   }
 
-  // Determine which templates to auto-generate at submission time.
+  // Determine which templates to generate for this phase.
   // Fully-automated services with no lawyer involvement (ONRC constatator,
   // ANCPI carte funciară / plan cadastral / identificare imobil) must NOT get a
   // legal-assistance contract or a Barou number — see NO_LAWYER_SERVICE_SLUGS.
-  const templates = isNoLawyerService(serviceSlug)
-    ? ['contract-prestari']
-    : ['contract-prestari', 'contract-asistenta'];
+  //
+  // 'submit' = pre-payment → only contract-prestari (no Barou numbers burned
+  // on orders that never pay). 'post-payment' → contract-asistenta with a
+  // real Barou number from the central registry.
+  const noLawyer = isNoLawyerService(serviceSlug);
+  const templates =
+    mode === 'submit'
+      ? ['contract-prestari']
+      : noLawyer
+        ? []
+        : ['contract-asistenta'];
+  const friendlyOrderRef: string = order.friendly_order_id || orderId;
 
   for (const template of templates) {
     try {
@@ -240,37 +256,25 @@ export async function autoGenerateOrderDocuments(
       }
 
       if (template === 'contract-asistenta') {
-        // Check if a number already exists (regeneration reuse)
-        const { data: existing } = await adminClient.rpc('find_existing_number', {
-          p_order_id: orderId,
-          p_type: 'contract',
+        // Allocate (or idempotently reuse) the Barou contract number from the
+        // CENTRAL registry. The RPC is idempotent per (platform, order_ref,
+        // type) — regeneration never wastes a number.
+        const allocated = await allocateNumber({
+          type: 'contract',
+          platform: 'eghiseul',
+          orderRef: friendlyOrderRef,
+          clientName: clientData.name,
+          clientEmail: clientData.email || undefined,
+          clientCnp: clientData.cnp || undefined,
+          clientCui: clientData.cui || undefined,
+          serviceType: order.services?.name || '',
+          amount: lawyerData.fee || undefined,
+          createdBy: generatedBy ?? 'eghiseul-post-payment',
         });
 
-        if (existing && existing.length > 0) {
-          // Reuse existing number (regeneration case)
-          documentNumbers.contract_number = existing[0].existing_number;
-          documentNumbers.contract_series = existing[0].existing_series;
-        } else {
-          // Allocate a new Barou number
-          const { data: allocated, error: allocError } = await adminClient.rpc('allocate_number', {
-            p_type: 'contract',
-            p_order_id: orderId,
-            p_client_name: clientData.name,
-            p_client_email: clientData.email || null,
-            p_client_cnp: clientData.cnp || null,
-            p_client_cui: clientData.cui || null,
-            p_service_type: order.services?.name || '',
-            p_amount: lawyerData.fee || null,
-            p_created_by: generatedBy,
-          });
-
-          if (allocError) {
-            throw new Error(`Nu s-a putut aloca numar de contract: ${allocError.message}`);
-          }
-
-          documentNumbers.contract_number = allocated[0].allocated_number;
-          documentNumbers.registry_ids = { contract: allocated[0].registry_id };
-        }
+        documentNumbers.contract_number = allocated.number;
+        documentNumbers.contract_series = allocated.series;
+        documentNumbers.registry_ids = { contract: allocated.registryId };
       }
 
       const context: DocumentContext = {
@@ -366,23 +370,29 @@ export async function autoGenerateOrderDocuments(
         throw new Error(`DB insert failed: ${insertError.message}`);
       }
 
-      // Link order_document_id back to number_registry
-      if (documentNumbers.registry_ids?.contract && insertedDoc?.id) {
-        await adminClient
-          .from('number_registry')
-          .update({ order_document_id: insertedDoc.id })
-          .eq('id', documentNumbers.registry_ids.contract);
-      }
-
-      // Catch-all: link any unlinked contract registry entry for this order
-      // This handles the reuse path where find_existing_number was used but no registry_id was stored
+      // Back-link the generated document to the CENTRAL registry entry.
       if (insertedDoc?.id && template === 'contract-asistenta') {
-        await adminClient
-          .from('number_registry')
-          .update({ order_document_id: insertedDoc.id })
-          .eq('order_id', orderId)
-          .eq('type', 'contract')
-          .is('order_document_id', null);
+        try {
+          const registry = getRegistryClient();
+          if (documentNumbers.registry_ids?.contract) {
+            await registry
+              .from('number_registry')
+              .update({ order_document_ref: insertedDoc.id })
+              .eq('id', documentNumbers.registry_ids.contract);
+          } else {
+            // Catch-all for entries allocated without a stored registry id.
+            await registry
+              .from('number_registry')
+              .update({ order_document_ref: insertedDoc.id })
+              .eq('platform', 'eghiseul')
+              .eq('order_ref', friendlyOrderRef)
+              .eq('type', 'contract')
+              .is('order_document_ref', null);
+          }
+        } catch (linkErr) {
+          // Non-fatal: the allocation row exists; only the doc pointer is missing.
+          console.warn('[auto-generate] registry back-link failed:', linkErr);
+        }
       }
 
       results.push({
@@ -436,56 +446,48 @@ export async function autoGenerateOrderDocuments(
   // for coverage of the dedup/bundled cases.
   // No-lawyer services (constatator, carte funciară / cadastral / identificare)
   // need NO împuternicire avocațială → no Barou delegation numbers at all.
-  const delegationItems = isNoLawyerService(serviceSlug)
-    ? []
-    : computeDelegationItems({
-        services: order.services,
-        selected_options: selectedOptions,
-      });
+  // Delegations are allocated ONLY post-payment (Barou numbers are finite).
+  const delegationItems =
+    mode !== 'post-payment' || noLawyer
+      ? []
+      : computeDelegationItems({
+          services: order.services,
+          selected_options: selectedOptions,
+        });
 
-  // Allocate (or reuse) one delegation per item.
+  // Allocate one delegation per item — the central RPC is idempotent per
+  // (platform, order_ref, 'delegation', service_type), so re-runs reuse.
+  let delegationFailures = 0;
   for (const item of delegationItems) {
     try {
-      const { data: existing } = await adminClient.rpc('find_existing_number', {
-        p_order_id: orderId,
-        p_type: 'delegation',
-        p_service_type: item.serviceType,
+      const allocated = await allocateNumber({
+        type: 'delegation',
+        platform: 'eghiseul',
+        orderRef: friendlyOrderRef,
+        clientName: clientData.name,
+        clientEmail: clientData.email || undefined,
+        clientCnp: clientData.cnp || undefined,
+        clientCui: clientData.cui || undefined,
+        serviceType: item.serviceType,
+        amount: lawyerData.fee || undefined,
+        createdBy: generatedBy ?? 'eghiseul-post-payment',
       });
 
-      if (existing && existing.length > 0) {
-        console.log(`Delegation already allocated for ${item.serviceType}: skipping`);
-        continue;
-      }
-
-      const { data: delegationResult, error: delegationError } = await adminClient.rpc('allocate_number', {
-        p_type: 'delegation',
-        p_order_id: orderId,
-        p_client_name: clientData.name,
-        p_client_email: clientData.email || null,
-        p_client_cnp: clientData.cnp || null,
-        p_client_cui: clientData.cui || null,
-        p_service_type: item.serviceType,
-        p_amount: lawyerData.fee || null,
-        p_source: 'platform',
-        p_created_by: generatedBy,
-      });
-
-      if (delegationError) {
-        console.error(`Failed to allocate delegation for ${item.serviceType}:`, delegationError);
-        // Don't fail the whole submission — admin can allocate manually later.
-        continue;
-      }
-      const allocated = delegationResult?.[0];
-      if (allocated) {
-        console.log(
-          `Allocated delegation ${allocated.allocated_series || 'SM'}${String(allocated.allocated_number).padStart(6, '0')} ` +
-          `for [${item.label}] on order ${orderId}`
-        );
-      }
+      console.log(
+        `${allocated.reused ? 'Reused' : 'Allocated'} delegation ` +
+        `${formatRegistryNumber('delegation', allocated.number, allocated.series)} ` +
+        `for [${item.label}] on order ${orderId}`
+      );
     } catch (err) {
+      delegationFailures++;
       console.error(`Error allocating delegation for ${item.serviceType}:`, err);
-      // Non-fatal — try the next one.
+      // Non-fatal — try the next one; the post-payment cron sweep retries.
     }
+  }
+  if (delegationFailures > 0) {
+    throw new Error(
+      `${delegationFailures}/${delegationItems.length} delegation allocations failed — will retry via cron`
+    );
   }
 
   // Log to order_history
@@ -496,9 +498,13 @@ export async function autoGenerateOrderDocuments(
       event_type: 'document_generated',
       new_value: {
         auto_generated: true,
+        mode,
         documents: results.map(r => ({ template: r.template, file_name: r.fileName })),
       },
-      notes: `Contractele au fost generate automat la plasarea comenzii`,
+      notes:
+        mode === 'post-payment'
+          ? 'Contract asistență + numere Barou alocate automat după plată'
+          : 'Contractul de prestări servicii a fost generat automat la plasarea comenzii',
     });
   }
 
