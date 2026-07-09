@@ -191,9 +191,11 @@ eghiseul, generare împuternicire cu alt service_type).
   contract/delegație când are nevoie, vede jurnalul, exportă CSV-ul pentru
   Barou), **manager** și **super_admin**; `settings.manage` o implică
   (nimeni nu a pierdut acces).
-- Contul avocatei: /admin/users → Invită utilizator → rol **avocat** (vede
-  DOAR: comenzile read-only, documentele și Registrul — fără setări, useri
-  sau plăți).
+- Contul avocatei: gabriela_tarta@yahoo.com (rol **avocat**, creat 2026-07-09).
+  Experiența ei e scopată complet: sidebar doar **Comenzi + Registru**,
+  /admin o redirecționează la Registru, iar lista de comenzi arată DOAR
+  serviciile cu avocat (fără constatator/CF/cadastru). Fără setări, useri,
+  plăți, dashboard.
 
 ## Operare (echipă + avocat)
 

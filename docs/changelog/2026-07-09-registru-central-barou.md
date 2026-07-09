@@ -121,3 +121,8 @@ e gata" adminul vede acum dacă clientul chiar l-a deschis:
   CU avocat (constatator/CF/cadastru — excluse; același principiu ca scoparea
   colaboratorului pe serviciile asignate).
 - Cont creat: gabriela_tarta@yahoo.com (rol avocat).
+- Fix sidebar admin: hasPermissionClient ignora ROLE_DEFAULTS (rol cu JSONB gol
+  nu vedea nimic în meniu — avocata vedea doar Dashboard). Layout-ul
+  refolosește acum logica hook-ului.
+- Scopare vizuală avocat: sidebar doar Comenzi + Registru (hideForRoles);
+  /admin → redirect la /admin/registru pentru rolul avocat.
