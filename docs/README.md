@@ -18,7 +18,7 @@ Index al documentației. Aceasta e o **hartă**, nu un jurnal — pentru jurnalu
 | **SEO** | [`seo/`](seo/) | location pages (CF/cazier), clustere (ONRC/stare civilă/rovinietă), keywords, GSC, planuri |
 | **Servicii** | [`services/`](services/) | catalog viu, folder-per-serviciu |
 | **Admin** | [`admin/`](admin/) | RBAC, handbook-uri operaționale (storno, modifică comandă, coșuri abandonate) |
-| **Deployment** | [`deployment/`](deployment/) | Vercel + Stripe webhook, S3, migrări DB, deploy checklist |
+| **Deployment** | [`deployment/`](deployment/) | Vercel + Stripe webhook, S3, migrări DB, email Zoho+Resend, deploy checklist |
 | **Securitate** | [`security/`](security/) | audit securitate, incidente |
 | **Design** | [`design/`](design/) | sistem de design, ghiduri vizuale |
 | **PRD / Business** | [`prd/`](prd/), [`business/`](business/), [`legal/`](legal/) | cerințe produs, business, legal |
