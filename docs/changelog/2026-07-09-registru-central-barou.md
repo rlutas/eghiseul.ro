@@ -58,3 +58,20 @@
 8. ✅ Fix eghiseul PF/PJ: lista admin + generarea documentelor urmează
    beneficiarul serviciului, nu entitatea de facturare (comandă PF cu factura
    pe angajator nu mai apare/generează ca PJ).
+
+## Cazier auto: poza permisului obligatorie (regresie E-260709-WT4KL)
+
+Comanda a intrat cu nr. permis (colectat din migrarea 075) dar FĂRĂ nicio poză
+a permisului, iar nr. permisului nici nu se afișa în admin. Fix (migrarea 105):
+
+- **Wizard**: pasul Documente KYC cere acum obligatoriu „Permis de Conducere —
+  față" + „verso" la cazier-auto (config-driven:
+  `personalKyc.extraDocuments: ['permis_fata','permis_verso']` — mecanism nou,
+  reutilizabil pentru orice serviciu care are nevoie de documente extra; se
+  cer și clienților cu KYC salvat în cont, permisul nu face parte din KYC).
+- **Admin Detalii Serviciu**: afișează acum Nr. permis / Nr. înmatriculare /
+  VIN din customer_data.vehicle (nu se afișau deloc).
+- **Solicită documente**: tipuri noi `permis_fata`/`permis_verso` — pentru
+  E-260709-WT4KL echipa cere pozele direct din admin (link de reîncărcare).
+- Bonus fix latent: click-ul pe cardurile de upload act identitate deschidea
+  input-ul greșit (cădea pe ref-ul certificatului) — mapare unificată.

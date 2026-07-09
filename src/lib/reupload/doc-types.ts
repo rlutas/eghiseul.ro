@@ -78,6 +78,19 @@ export const REUPLOAD_DOC_SPECS: Record<string, ReuploadDocSpec> = {
     target: 'personal',
     acceptsPdf: true,
   },
+  permis_fata: {
+    label: 'Permis de conducere — față',
+    hint: 'Poză clară cu fața permisului de conducere, numărul și datele lizibile',
+    target: 'personal',
+    acceptsPdf: false,
+  },
+  permis_verso: {
+    label: 'Permis de conducere — verso',
+    hint: 'Versoul permisului de conducere (categoriile vizibile)',
+    target: 'personal',
+    acceptsPdf: false,
+    companionOf: 'permis_fata',
+  },
   company_registration_cert: {
     label: 'Certificat de Înregistrare (firmă)',
     hint: 'Documentul cu CUI-ul firmei, emis de Registrul Comerțului',
@@ -115,6 +128,12 @@ export function suggestedDocsForService(verificationConfig: unknown): string[] {
   if (pk?.enabled) {
     out.push('act_identitate');
     if (pk.selfieRequired) out.push('selfie');
+    // Service-specific extra documents (e.g. cazier auto → permis fata/verso)
+    if (Array.isArray(pk.extraDocuments)) {
+      for (const t of pk.extraDocuments) {
+        if (typeof t === 'string' && isKnownReuploadDocType(t)) out.push(t);
+      }
+    }
   }
   const ck = vc?.companyKyc;
   if (ck?.enabled && ck?.documentsRequired && Array.isArray(ck.requiredDocuments)) {

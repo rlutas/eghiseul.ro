@@ -464,6 +464,8 @@ function extractClientDocuments(cd: AnyObj | null): Array<{ type: string; label:
     residence_permit: 'Permis rezidenta',
     act_identitate: 'Act de identitate — față (manual)',
     act_identitate_back: 'Act de identitate — spate (manual)',
+    permis_fata: 'Permis de conducere — fata',
+    permis_verso: 'Permis de conducere — verso',
     registration_cert: 'Certificat inregistrare',
     selfie: 'Selfie verificare',
     company_registration_cert: 'Certificat Inregistrare',
@@ -521,6 +523,8 @@ function extractKycDocKeys(kycDocs: AnyObj | null): Array<{ type: string; label:
     residence_permit: 'Permis rezidenta',
     act_identitate: 'Act de identitate — față (manual)',
     act_identitate_back: 'Act de identitate — spate (manual)',
+    permis_fata: 'Permis de conducere — fata',
+    permis_verso: 'Permis de conducere — verso',
     registration_cert: 'Certificat inregistrare',
     selfie: 'Selfie verificare',
     company_registration_cert: 'Certificat Inregistrare',
@@ -1127,6 +1131,19 @@ export default function AdminOrderDetailPage() {
                 <span className="font-medium text-amber-600">necompletat — cere clientului</span>
               </div>
             ) : null}
+            {/* Date vehicul (cazier auto) — nr. permis e informația operațională
+                critică pentru cerere; nu era afișată deloc (E-260709-WT4KL). */}
+            {(() => {
+              const v = (order.customer_data as AnyObj | null)?.vehicle as AnyObj | null;
+              if (!v) return null;
+              return (
+                <>
+                  {v.drivingLicense && <InfoRow label="Nr. permis de conducere" value={String(v.drivingLicense)} mono />}
+                  {v.plateNumber && <InfoRow label="Nr. inmatriculare" value={String(v.plateNumber)} mono />}
+                  {v.vin && <InfoRow label="Serie sasiu (VIN)" value={String(v.vin)} mono />}
+                </>
+              );
+            })()}
             {/* Certificat constatator (ONRC): what the bot actually requested —
                 firm + CUI, document type, report type, purpose, period/person.
                 Sourced from customer_data.constatator + billing/company. */}

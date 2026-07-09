@@ -45,7 +45,7 @@ interface KYCDocumentsStepProps {
   onValidChange: (valid: boolean) => void;
 }
 
-type KYCDocType = 'selfie' | 'certificat_domiciliu' | 'residence_permit' | 'passport' | 'act_identitate' | 'act_identitate_back';
+type KYCDocType = 'selfie' | 'certificat_domiciliu' | 'residence_permit' | 'passport' | 'act_identitate' | 'act_identitate_back' | 'permis_fata' | 'permis_verso';
 
 interface UploadState {
   file: File | null;
@@ -131,6 +131,24 @@ const DOCUMENT_CONFIG: Record<
       'Datele clare, fără reflexii sau umbre',
     ],
   },
+  permis_fata: {
+    title: 'Permis de Conducere — față (obligatoriu)',
+    description: 'Poză cu fața permisului de conducere. Necesar pentru cazierul auto.',
+    icon: CreditCard,
+    tips: [
+      'Numărul permisului și datele complet vizibile',
+      'Poza clară, fără reflexii sau umbre',
+    ],
+  },
+  permis_verso: {
+    title: 'Permis de Conducere — verso (obligatoriu)',
+    description: 'Poză cu versoul permisului de conducere (categoriile).',
+    icon: CreditCard,
+    tips: [
+      'Categoriile și datele complet vizibile',
+      'Poza clară, fără reflexii sau umbre',
+    ],
+  },
 };
 
 // Tipuri de scan de act de la pasul 2 (ruta „scanează"). Dacă există vreunul,
@@ -159,7 +177,13 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
     passport: { ...initialUploadState },
     act_identitate: { ...initialUploadState },
     act_identitate_back: { ...initialUploadState },
+    permis_fata: { ...initialUploadState },
+    permis_verso: { ...initialUploadState },
   });
+
+  // Documente EXTRA cerute de serviciu (ex. cazier auto → permis față+verso).
+  // Nu fac parte din KYC-ul de cont, deci se cer chiar și cu KYC salvat valid.
+  const extraDocs = (config.extraDocuments ?? []) as KYCDocType[];
 
   const [previewModal, setPreviewModal] = useState<{
     open: boolean;
@@ -177,6 +201,21 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
   const passportInputRef = useRef<HTMLInputElement>(null);
   const actInputRef = useRef<HTMLInputElement>(null);
   const actBackInputRef = useRef<HTMLInputElement>(null);
+  const permisFataInputRef = useRef<HTMLInputElement>(null);
+  const permisVersoInputRef = useRef<HTMLInputElement>(null);
+
+  // Un singur loc pentru maparea tip → input ref (folosit și de <input ref>
+  // și de click handler — înainte click-ul cădea pe certInputRef pentru
+  // tipurile noi și deschidea input-ul greșit).
+  const refForType = (type: KYCDocType) =>
+    type === 'selfie' ? selfieInputRef
+    : type === 'residence_permit' ? permitInputRef
+    : type === 'passport' ? passportInputRef
+    : type === 'act_identitate' ? actInputRef
+    : type === 'act_identitate_back' ? actBackInputRef
+    : type === 'permis_fata' ? permisFataInputRef
+    : type === 'permis_verso' ? permisVersoInputRef
+    : certInputRef;
 
   // Get uploaded documents
   const getDocumentByType = useCallback((type: DocumentType): UploadedDocumentState | undefined => {
@@ -187,10 +226,18 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
   const isValid = useCallback(() => {
     if (!personalKyc) return false;
 
+    // Documentele extra ale serviciului (permis etc.) se cer ÎNTOTDEAUNA —
+    // KYC-ul salvat în cont nu le include.
+    const hasAllExtras = extraDocs.every((t) =>
+      personalKyc.uploadedDocuments.some((d) => d.type === t)
+    );
+
     // If user has valid KYC from account and not showing reupload, automatically valid
     if (hasValidAccountKyc && !showReuploadOption) {
-      return true;
+      return hasAllExtras;
     }
+
+    if (!hasAllExtras) return false;
 
     const isForeign =
       !!personalKyc.citizenship && personalKyc.citizenship !== 'romanian';
@@ -241,7 +288,7 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
     }
 
     return true;
-  }, [personalKyc, config, hasValidAccountKyc, showReuploadOption]);
+  }, [personalKyc, config, hasValidAccountKyc, showReuploadOption, extraDocs]);
 
   // Notify parent of validation changes
   useEffect(() => {
@@ -251,10 +298,13 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
   // Ce documente lipsesc — pentru afișare + scroll când userul apasă „Continuă".
   const getMissingItems = useCallback((): string[] => {
     if (!personalKyc) return [];
-    if (hasValidAccountKyc && !showReuploadOption) return [];
-    const m: string[] = [];
-    const isForeign = !!personalKyc.citizenship && personalKyc.citizenship !== 'romanian';
     const has = (t: string) => personalKyc.uploadedDocuments.some((d) => d.type === t);
+    const extrasMissing = extraDocs
+      .filter((t) => !has(t))
+      .map((t) => DOCUMENT_CONFIG[t]?.title || t);
+    if (hasValidAccountKyc && !showReuploadOption) return extrasMissing;
+    const m: string[] = [...extrasMissing];
+    const isForeign = !!personalKyc.citizenship && personalKyc.citizenship !== 'romanian';
     if (isForeign && !has('passport')) m.push('Pașaportul');
     if ((config.selfieRequired || isForeign) && !has('selfie')) m.push('Selfie cu actul de identitate');
     if (!isForeign) {
@@ -269,7 +319,7 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
     }
     if (isForeign && !has('residence_permit')) m.push('Permis de rezidență / certificat fiscal');
     return m;
-  }, [personalKyc, config, hasValidAccountKyc, showReuploadOption]);
+  }, [personalKyc, config, hasValidAccountKyc, showReuploadOption, extraDocs]);
 
   const [showErrors, setShowErrors] = useState(false);
   const errorRef = useRef<HTMLDivElement>(null);
@@ -572,19 +622,7 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
             onDragOver={(e) => e.preventDefault()}
           >
             <input
-              ref={
-                type === 'selfie'
-                  ? selfieInputRef
-                  : type === 'residence_permit'
-                  ? permitInputRef
-                  : type === 'passport'
-                  ? passportInputRef
-                  : type === 'act_identitate'
-                  ? actInputRef
-                  : type === 'act_identitate_back'
-                  ? actBackInputRef
-                  : certInputRef
-              }
+              ref={refForType(type)}
               type="file"
               accept="image/jpeg,image/jpg,image/png,application/pdf"
               capture={type === 'selfie' ? 'user' : undefined}
@@ -596,16 +634,7 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
               className="hidden"
             />
             <div
-              onClick={() =>
-                (type === 'selfie'
-                  ? selfieInputRef
-                  : type === 'residence_permit'
-                  ? permitInputRef
-                  : type === 'passport'
-                  ? passportInputRef
-                  : certInputRef
-                ).current?.click()
-              }
+              onClick={() => refForType(type).current?.click()}
               className="border border-neutral-200 rounded-lg p-6 text-center hover:bg-neutral-50 transition-colors cursor-pointer"
             >
               <div className="flex justify-center gap-2 mb-2">
@@ -850,6 +879,11 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
 
       {/* Residence Permit Section - only show for non-romanian citizens */}
       {showResidencePermit && (!hasValidAccountKyc || showReuploadOption) && renderUploadCard('residence_permit')}
+
+      {/* Documente EXTRA cerute de serviciu (ex. cazier auto → permis de
+          conducere față+verso). Se cer ÎNTOTDEAUNA — nu fac parte din KYC-ul
+          de cont. */}
+      {extraDocs.map((t) => renderUploadCard(t))}
 
       {/* Info Banner */}
       <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">

@@ -24,6 +24,8 @@ export type DocumentType =
   | 'selfie'               // Selfie for face matching
   | 'act_identitate'       // Act de identitate (față) încărcat manual la pasul KYC (ruta „completez manual")
   | 'act_identitate_back'  // Act de identitate (spate) — ruta manuală
+  | 'permis_fata'          // Permis de conducere — față (cazier auto)
+  | 'permis_verso'         // Permis de conducere — verso (cazier auto)
   | 'company_registration_cert'  // PJ: Certificat de Înregistrare (CUI)
   | 'company_statement_cert'     // PJ: Certificat Constatator (ONRC)
   | 'unknown';
@@ -52,6 +54,10 @@ export interface PersonalKYCConfig {
   // Document requirements
   acceptedDocuments: DocumentType[];
   requireAddressCertificate: 'always' | 'ci_nou_passport' | 'never';
+  /** Service-specific REQUIRED extra uploads at the KYC step (e.g. cazier
+   *  auto → ['permis_fata','permis_verso']). Rendered as their own upload
+   *  cards; the step is invalid until all are uploaded. */
+  extraDocuments?: DocumentType[];
 
   // Verification requirements
   selfieRequired: boolean;
