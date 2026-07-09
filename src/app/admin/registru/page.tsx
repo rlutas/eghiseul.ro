@@ -68,7 +68,7 @@ export default function AdminRegistruPage() {
         <ul className="list-disc pl-5 space-y-1 text-blue-800">
           <li>
             Numerele se alocă <strong>automat, DOAR după plata reușită</strong>, pe toate platformele:
-            eghiseul.ro, cazierjudiciaronline.com și ecazier.ro (coloana „Comanda" arată platforma pentru CJO/ecazier).
+            eghiseul.ro, cazierjudiciaronline.com și ecazier.ro (coloana Comanda arată platforma pentru CJO/ecazier).
           </li>
           <li>
             <strong>Nu se mai ține evidența în Google Sheets</strong> — acest jurnal este registrul oficial;
@@ -106,6 +106,7 @@ function NumberRegistryContent() {
   const [pagination, setPagination] = useState({ page: 1, per_page: 50, total: 0, total_pages: 0 });
 
   // Filters
+  const [showArchived, setShowArchived] = useState(false);
   const [filterType, setFilterType] = useState<string>('');
   const [filterYear, setFilterYear] = useState<number>(new Date().getFullYear());
   const [filterSource, setFilterSource] = useState<string>('');
@@ -466,7 +467,18 @@ function NumberRegistryContent() {
             <p className="text-sm text-muted-foreground">Nu exista intervale configurate.</p>
           ) : (
             <div className="space-y-4">
-              {ranges.map(range => (
+              {/* Arhivatele stau ascunse implicit — apar doar la cerere. */}
+              {ranges.some(r => r.status === 'archived') && (
+                <label className="flex items-center gap-2 text-xs text-muted-foreground cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={showArchived}
+                    onChange={(e) => setShowArchived(e.target.checked)}
+                  />
+                  Arata intervalele arhivate ({ranges.filter(r => r.status === 'archived').length})
+                </label>
+              )}
+              {ranges.filter(r => showArchived || r.status !== 'archived').map(range => (
                 <div key={range.id} className="border rounded-lg p-4">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
@@ -620,9 +632,17 @@ function NumberRegistryContent() {
                             ) : (
                               <span className="text-xs font-mono">{group.friendlyOrderId}</span>
                             )}
-                            {group.platform && group.platform !== 'eghiseul' && (
-                              <span className="ml-1.5 inline-flex rounded bg-neutral-100 px-1.5 py-0.5 text-[10px] font-medium text-neutral-600 align-middle">
-                                {group.platform === 'cazierjudiciaronline' ? 'CJO' : 'ecazier'}
+                            {group.platform && (
+                              <span
+                                className={`ml-1.5 inline-flex rounded px-1.5 py-0.5 text-[10px] font-medium align-middle ${
+                                  group.platform === 'eghiseul'
+                                    ? 'bg-blue-100 text-blue-700'
+                                    : group.platform === 'ecazier'
+                                      ? 'bg-violet-100 text-violet-700'
+                                      : 'bg-amber-100 text-amber-700'
+                                }`}
+                              >
+                                {group.platform === 'eghiseul' ? 'eGhișeul' : group.platform === 'cazierjudiciaronline' ? 'CJO' : 'ecazier'}
                               </span>
                             )}
                           </td>
