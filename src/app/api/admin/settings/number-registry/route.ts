@@ -259,12 +259,21 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Optional order link — lets the team allocate an EXTRA delegation for
+    // unforeseen services on an existing order (e.g. apostilă adăugată
+    // ulterior). service_type distinguishes it from the order's other numbers.
+    const validPlatforms = ['eghiseul', 'cazierjudiciaronline', 'ecazier'];
+    const platform = body.platform && validPlatforms.includes(body.platform) ? body.platform : null;
+    const orderRef = platform && body.order_ref?.trim() ? body.order_ref.trim() : null;
+
     const registryClient: AnyClient = getRegistryClient();
 
-    // ── Allocate number via CENTRAL RPC (manual entry: no platform/order_ref) ──
+    // ── Allocate number via CENTRAL RPC ──
 
     const { data, error } = await registryClient.rpc('allocate_number', {
       p_type: body.type,
+      p_platform: platform,
+      p_order_ref: orderRef,
       p_client_name: body.client_name.trim(),
       p_client_email: body.client_email || null,
       p_client_cnp: body.client_cnp || null,

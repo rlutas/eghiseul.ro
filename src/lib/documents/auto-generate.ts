@@ -469,6 +469,7 @@ export async function autoGenerateOrderDocuments(
         clientCnp: clientData.cnp || undefined,
         clientCui: clientData.cui || undefined,
         serviceType: item.serviceType,
+        description: `Împuternicire pentru ${item.label}`,
         amount: lawyerData.fee || undefined,
         createdBy: generatedBy ?? 'eghiseul-post-payment',
       });

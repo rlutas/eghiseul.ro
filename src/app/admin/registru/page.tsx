@@ -138,6 +138,8 @@ function NumberRegistryContent() {
     description: '',
     amount: '',
     date: new Date().toISOString().split('T')[0],
+    platform: '',
+    order_ref: '',
   });
 
   const [saving, setSaving] = useState(false);
@@ -151,7 +153,7 @@ function NumberRegistryContent() {
     contractNumber: number | null;
     contractEntryId: string | null;
     contractDocS3Key: string | null;
-    delegationNumbers: { number: number; series: string | null; id: string; s3Key: string | null }[];
+    delegationNumbers: { number: number; series: string | null; id: string; s3Key: string | null; serviceType: string | null }[];
     date: string;
     clientName: string;
     clientCnp: string | null;
@@ -210,6 +212,7 @@ function NumberRegistryContent() {
           id: entry.id,
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           s3Key: (entry as any).document_s3_key || null,
+          serviceType: entry.service_type,
         });
       }
       if (entry.voided_at) {
@@ -310,7 +313,7 @@ function NumberRegistryContent() {
         const nr = json.data[0];
         toast.success(`Numar alocat: ${nr.allocated_number} (${nr.allocated_series ? nr.allocated_series : ''}${manualEntry.type === 'contract' ? 'Contract' : 'Delegatie'} ${nr.allocated_year})`);
         setAddManualOpen(false);
-        setManualEntry({ type: 'contract', client_name: '', client_email: '', client_cnp: '', client_cui: '', service_type: '', description: '', amount: '', date: new Date().toISOString().split('T')[0] });
+        setManualEntry({ type: 'contract', client_name: '', client_email: '', client_cnp: '', client_cui: '', service_type: '', description: '', amount: '', date: new Date().toISOString().split('T')[0], platform: '', order_ref: '' });
         fetchRegistry();
         fetchRanges(); // Refresh ranges too (available count changed)
       } else {
@@ -660,10 +663,18 @@ function NumberRegistryContent() {
                           </td>
                           <td className="py-2 px-2 font-mono">
                             {group.delegationNumbers.length > 0
-                              ? group.delegationNumbers.map((d, idx) => (
-                                  <span key={d.id}>
-                                    {idx > 0 && ', '}
-                                    {d.number}
+                              ? group.delegationNumbers.map((d) => (
+                                  <div key={d.id} className="whitespace-nowrap">
+                                    <span title={d.serviceType || undefined}>{d.number}</span>
+                                    {d.serviceType && (
+                                      <span className="ml-1 font-sans text-[10px] text-muted-foreground">
+                                        {d.serviceType.startsWith('apostila-haga')
+                                          ? 'Apostilă Haga'
+                                          : d.serviceType.startsWith('bundled:')
+                                            ? d.serviceType.split(':').pop()
+                                            : d.serviceType}
+                                      </span>
+                                    )}
                                     {d.s3Key && (
                                       <button
                                         onClick={() => handleDocDownload(d.s3Key!)}
@@ -673,7 +684,7 @@ function NumberRegistryContent() {
                                         <FileDown className="h-3.5 w-3.5" />
                                       </button>
                                     )}
-                                  </span>
+                                  </div>
                                 ))
                               : '-'}
                           </td>
@@ -921,7 +932,7 @@ function NumberRegistryContent() {
             </div>
             <div>
               <Label>Serviciu / Descriere</Label>
-              <Input value={manualEntry.service_type} onChange={e => setManualEntry({...manualEntry, service_type: e.target.value})} placeholder="Ex: Consultanta juridica" />
+              <Input value={manualEntry.service_type} onChange={e => setManualEntry({...manualEntry, service_type: e.target.value})} placeholder="Ex: Consultanta juridica / Apostila Haga extra" />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
@@ -931,6 +942,28 @@ function NumberRegistryContent() {
               <div>
                 <Label>Data</Label>
                 <Input type="date" value={manualEntry.date} onChange={e => setManualEntry({...manualEntry, date: e.target.value})} />
+              </div>
+            </div>
+            {/* Optional: leagă numărul de o comandă existentă — pentru servicii
+                extra neprevăzute adăugate ulterior (ex. apostilă cerută după
+                plasare). Serviciul de mai sus TREBUIE să difere de cele deja
+                alocate pe comandă (altfel primești numărul existent înapoi). */}
+            <div className="rounded-lg border border-dashed p-3 space-y-3">
+              <p className="text-xs text-muted-foreground">Opțional: leagă de o comandă existentă (serviciu extra neprevăzut)</p>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>Platformă</Label>
+                  <select className="w-full border rounded px-3 py-2 mt-1" value={manualEntry.platform} onChange={e => setManualEntry({...manualEntry, platform: e.target.value})}>
+                    <option value="">— fără comandă —</option>
+                    <option value="eghiseul">eGhișeul</option>
+                    <option value="cazierjudiciaronline">cazierjudiciaronline</option>
+                    <option value="ecazier">ecazier</option>
+                  </select>
+                </div>
+                <div>
+                  <Label>Nr. comandă</Label>
+                  <Input value={manualEntry.order_ref} onChange={e => setManualEntry({...manualEntry, order_ref: e.target.value})} placeholder="E-260709-XXXXX / CJO-..." disabled={!manualEntry.platform} />
+                </div>
               </div>
             </div>
           </div>
