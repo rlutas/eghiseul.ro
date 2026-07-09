@@ -47,4 +47,14 @@
 4. ✅ Jurnal: grupuri complete cross-pagină, numere padded (005774/SM007256),
    Sursa = site-ul, editare/anulare/restaurare/ștergere per număr, alocare
    manuală combo Contract+Delegatie.
-5. Rămas: verificare primă comandă reală pe eghiseul și ecazier (CJO ✅).
+5. ✅ TOATE 3 platformele verificate pe comenzi reale: CJO-20260709-14944
+   (005774/007256), EJC-20260709-05461 ecazier (005775/007257),
+   E-260709-V9G9M eghiseul (005778/SM007260 — pe numele persoanei, nu al
+   firmei de facturare).
+6. ✅ Fix dublu-SM pe CJO/ecazier: delegation_number stochează doar numărul
+   padded (template-ul pune „SERIA: SM"); comenzile de azi corectate în DB.
+7. ✅ Nume de familie primul pe documentele CJO/ecazier (registru,
+   împuternicire, contract).
+8. ✅ Fix eghiseul PF/PJ: lista admin + generarea documentelor urmează
+   beneficiarul serviciului, nu entitatea de facturare (comandă PF cu factura
+   pe angajator nu mai apare/generează ca PJ).

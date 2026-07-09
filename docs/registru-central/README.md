@@ -22,9 +22,15 @@ contractul ei (coloana H din sheet-ul de contracte; grupate prin
 Haga la a 2-a delegație a contractelor cu apostilă etc.). Intrările test
 migrate din registrul local eghiseul + intervalele legacy = ȘTERSE.
 
-**Prima comandă reală prin registru: CJO-20260709-14944 (2026-07-09)** —
-contract 005774 + delegație SM007256, alocate automat la plată, legate corect,
-PDF regenerat cu numărul oficial. ✅ interconectarea confirmată end-to-end.
+**✅ TOATE 3 PLATFORMELE VERIFICATE PE COMENZI REALE (2026-07-09):**
+| Platformă | Comandă | Contract | Delegație |
+|---|---|---|---|
+| cazierjudiciaronline | CJO-20260709-14944 | 005774 | 007256 |
+| ecazier | EJC-20260709-05461 | 005775 | 007257 |
+| eghiseul | E-260709-V9G9M | 005778 | 007260 |
+
+Interconectarea confirmată end-to-end: alocare automată la plată, un singur
+șir comun de numere, jurnal central corect pe toate.
 
 ---
 
@@ -141,6 +147,17 @@ plăților, indiferent de site (decizie 2026-07-09).
 | Contract Prestări Servicii (EDIGITALIZARE) — eghiseul + CJO | numărul COMENZII, NICIODATĂ numărul Barou | `E-260709-XXXXX` / `CJO-...` |
 | Contract de Asistență Juridică (avocat) — toate platformele | nr. contract Barou | `NR. SM 005774` (padded 6) |
 | Împuternicire / Delegație — toate platformele | nr. delegație Barou, UNUL PER DOCUMENT OFICIAL | `SM007256` |
+
+⚠️ **Pe CJO/ecazier, coloanele `delegation_number` stochează DOAR numărul
+padded (`007258`, FĂRĂ prefix SM)** — template-ul DOCX de împuternicire
+tipărește deja „SERIA: SM NR:"; cu prefix apărea dublu („SM NR: SM007258").
+Pe eghiseul, `order_documents.document_number` include seria (`SM007260`) —
+template-ul de acolo folosește placeholders separate SERIE + NRDELEGATIE.
+
+**Numele pe documente (CJO/ecazier): NUMELE de familie primul, apoi prenumele**
+(la registru, împuternicire, contract PDF). Regula PF/PJ (eghiseul):
+clientul/documentele urmează BENEFICIARUL serviciului — comanda PF cu factura
+pe angajator rămâne PF (fix 2026-07-09, E-260709-V9G9M afișată ca INTERTEK).
 
 ⚠️ Fix 2026-07-09 (CJO `contract-pdf.ts`): titlul Prestări purta greșit
 numărul Barou — mutat pe pagina „Contract de Asistenta". ecazier (variant
