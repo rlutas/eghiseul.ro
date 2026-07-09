@@ -421,6 +421,25 @@ Toate verificate live pe producție (E-260708-VC4GH, E-260708-QFVFY, E-260708-YQ
 5. **Debugging „link mort în email"** → verifică ÎNTÂI host-ul: orice
    `eghiseul-ro.vercel.app` = login wall SSO; publicul e `https://eghiseul.ro`.
 
+## 28. 📝 Articole actualizate cu CTA-uri spre formulare + prețuri „X lei + TVA"
+
+- **„Cum afli numărul de carte funciară"**: box CTA nou — cine nu are/nu
+  găsește numărul CF poate comanda **identificare imobil după adresă SAU după
+  numele proprietarului**, ambele **163,64 lei + TVA**, cu butoane direct în
+  formularele de comandă + FAQ de preț. **Migrarea 103** (aplicată):
+  `identificare-imobile-proprietar` aliniat la 198 RON total (era placeholder
+  302,50 din migrarea 084) — decizie user: ambele identificări același preț.
+- **„Cele 4 tipuri de certificat constatator"** → rescris la realitatea
+  formularului (titlu nou „Tipurile de Certificat Constatator — Ghid
+  Actualizat", URL/SEO păstrat): 3 rapoarte pe firmă (de bază / fonduri IMM /
+  insolvență) + persoană fizică (CNP) + cu istoric, cu scopurile EXACTE din
+  formular la fiecare, termen real (automat în minute 24/7 la de
+  bază/PF/istoric; ~24h backoffice ONRC la IMM/insolvență), **buton CTA la
+  fiecare tip** direct în formular și FAQ-uri noi (preț + durată).
+- **Convenție prețuri în articole** (decizie user): se afișează prețul de bază
+  fără TVA + „+ TVA" (73,55 / 402,48 / 163,64) — cifrele corespund 1:1 cu
+  subtotalul din checkout (89 / 487 / 198 cu TVA inclus).
+
 ## Rămase în coadă (nefăcute)
 
 - Email confirmare comandă către client (nu se trimite — port din sister).
