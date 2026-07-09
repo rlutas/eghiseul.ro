@@ -90,3 +90,18 @@ a permisului, iar nr. permisului nici nu se afișa în admin. Fix (migrarea 105)
   motiv). CJO/ecazier aveau deja formatul corect în template.
 - Împuternicirile deja generate cu textul vechi: Regenereaza din admin —
   numărul se refolosește (idempotent), doar textul se corectează.
+
+## Tracking: „clientul a vizualizat documentul" (migrarea 106)
+
+La comenzile ONRC/ANCPI (și orice document livrat), după emailul „documentul
+e gata" adminul vede acum dacă clientul chiar l-a deschis:
+
+- **order_documents**: `first/last_viewed_by_client_at` + `client_view_count`,
+  incrementate la preview-ul de pe pagina de status și la download-ul din cont
+  (`track-client-view.ts`, non-fatal).
+- **Admin, comandă**: badge pe fiecare document client-visible — verde
+  „✓ vizualizat de client · 09.07.2026 14:30 (×3)" sau gri „nevizualizat de
+  client"; + event în istoricul comenzii la prima vizualizare.
+- **Bonus fix**: CHECK-ul `order_history.event_type` respingea SILENȚIOS
+  `document_generation_failed` (vechi) și `barou_allocation_failed` (de azi) —
+  evenimentele astea nu apăreau niciodată în istoric. Constraint extins.

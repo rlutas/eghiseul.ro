@@ -60,6 +60,10 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       );
     }
 
+    // Marchează descărcarea de către client (non-fatal).
+    const { trackClientDocumentView } = await import('@/lib/documents/track-client-view');
+    await trackClientDocumentView(adminClient, doc, orderId);
+
     // Generate presigned download URL (15 minutes)
     const url = await getDownloadUrl(doc.s3_key, 900);
 

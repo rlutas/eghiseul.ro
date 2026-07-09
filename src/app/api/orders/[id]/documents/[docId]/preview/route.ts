@@ -58,6 +58,11 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       return new NextResponse('Document not found', { status: 404 });
     }
 
+    // Marchează vizualizarea de către client (first/last/count + event în
+    // istoricul comenzii la prima deschidere) — non-fatal.
+    const { trackClientDocumentView } = await import('@/lib/documents/track-client-view');
+    await trackClientDocumentView(adminClient, doc, orderId);
+
     const url = await getDownloadUrl(doc.s3_key, 300);
 
     // PDFs (constatator ONRC, extras CF de la worker, documente scanate) se

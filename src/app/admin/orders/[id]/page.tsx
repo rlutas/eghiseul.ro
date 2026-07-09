@@ -179,6 +179,38 @@ interface OrderDocument {
   generated_by: string | null;
   metadata: AnyObj | null;
   created_at: string | null;
+  first_viewed_by_client_at?: string | null;
+  last_viewed_by_client_at?: string | null;
+  client_view_count?: number | null;
+}
+
+/** „Vizualizat de client" — confirmă că clientul chiar a deschis documentul
+ *  de pe pagina de status / din cont (ex. constatatorul/extrasul livrat de
+ *  workeri, după emailul „documentul e gata"). */
+function ClientViewedBadge({ doc }: { doc: OrderDocument }) {
+  if (!doc.visible_to_client) return null;
+  if (!doc.first_viewed_by_client_at) {
+    return (
+      <span
+        className="ml-2 inline-flex items-center rounded bg-neutral-100 px-1.5 py-0.5 text-[10px] font-medium text-neutral-500 align-middle"
+        title="Clientul nu a deschis încă documentul pe pagina de status"
+      >
+        nevizualizat de client
+      </span>
+    );
+  }
+  const when = new Date(doc.first_viewed_by_client_at).toLocaleString('ro-RO', {
+    day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit',
+  });
+  const count = doc.client_view_count ?? 1;
+  return (
+    <span
+      className="ml-2 inline-flex items-center gap-1 rounded bg-green-100 px-1.5 py-0.5 text-[10px] font-medium text-green-700 align-middle"
+      title={`Prima vizualizare: ${when}${doc.last_viewed_by_client_at ? ` · Ultima: ${new Date(doc.last_viewed_by_client_at).toLocaleString('ro-RO', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}` : ''} · ${count} deschideri`}
+    >
+      ✓ vizualizat de client · {when}{count > 1 ? ` (×${count})` : ''}
+    </span>
+  );
 }
 
 interface OrderOptionStatus {
@@ -3344,6 +3376,7 @@ function ProcessingSection({
                       {doc?.created_at && (
                         <span className="text-xs text-muted-foreground ml-2">{formatDate(doc.created_at)}</span>
                       )}
+                      {doc && <ClientViewedBadge doc={doc} />}
                     </div>
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
@@ -3402,6 +3435,7 @@ function ProcessingSection({
                       {doc.created_at && (
                         <span className="text-xs text-muted-foreground ml-2">{formatDate(doc.created_at)}</span>
                       )}
+                      <ClientViewedBadge doc={doc} />
                     </div>
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
@@ -3438,6 +3472,7 @@ function ProcessingSection({
                   <div className="flex items-center gap-2">
                     <CheckCircle className="h-4 w-4 text-green-500" />
                     <span className="font-medium">{DOC_TYPE_LABELS[docType] || docType}</span>
+                    <ClientViewedBadge doc={doc} />
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
                     <Button
@@ -3471,6 +3506,7 @@ function ProcessingSection({
                   <Handshake className="h-4 w-4 text-primary-600 shrink-0" />
                   <span className="font-medium truncate">Document de la colaborator</span>
                   <span className="text-xs text-neutral-500 truncate">{doc.file_name}</span>
+                  <ClientViewedBadge doc={doc} />
                 </div>
                 <div className="flex items-center gap-1 shrink-0">
                   <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => handlePreviewDocument(doc)}>
@@ -3969,6 +4005,7 @@ const TIMELINE_EVENT_CONFIG: Record<string, { icon: React.ElementType; color: st
   document_generated: { icon: FileCheck, color: 'text-blue-500', label: 'Documente generate' },
   submitted_to_institution: { icon: Building2, color: 'text-orange-500', label: 'Depusa la institutie' },
   document_received_from_institution: { icon: FileCheck, color: 'text-teal-500', label: 'Document primit de la institutie' },
+  document_viewed_by_client: { icon: Eye, color: 'text-green-600', label: 'Clientul a vizualizat documentul' },
   option_completed: { icon: CheckCircle2, color: 'text-green-500', label: 'Optiune finalizata' },
   extras_started: { icon: Clock, color: 'text-amber-500', label: 'Extras-uri incepute' },
   notification_sent: { icon: Mail, color: 'text-blue-400', label: 'Notificare trimisa' },
