@@ -332,10 +332,18 @@ export async function POST(
       lawyerSignatureBase64,
     });
 
-    // Store document reference in order_documents
+    // Store document reference in order_documents.
+    // Împuternicirile sunt PER SERVICIU (cazier, apostilă, integritate...) —
+    // fiecare are numărul ei de delegație și fișierul ei; sufixul de serviciu
+    // în nume separă documentele și scopează cleanup-ul (fără el, generarea
+    // împuternicirii #2 o ștergea pe #1).
     const docType = template.replace(/-/g, '_');
     const friendlyId = order.friendly_order_id || orderId;
-    const fileName = `${template}-${friendlyId}.docx`;
+    const serviceSuffix =
+      template === 'imputernicire' && body.service_type
+        ? '-' + String(body.service_type).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40)
+        : '';
+    const fileName = `${template}${serviceSuffix}-${friendlyId}.docx`;
 
     // Upload generated document to S3
     const s3Key = generateDocumentKey(friendlyId, docType, fileName);
@@ -424,6 +432,7 @@ export async function POST(
         generated_by: user.id,
         metadata: {
           template,
+          service_type: template === 'imputernicire' ? (body.service_type || order.services?.name || null) : null,
           document_numbers: documentNumbers,
           registry_id: documentNumbers.registry_ids?.contract || documentNumbers.registry_ids?.delegation || null,
         },
@@ -452,26 +461,34 @@ export async function POST(
         const docType2 = template === 'imputernicire' ? 'delegation' :
                          ['contract-asistenta', 'contract-complet'].includes(template) ? 'contract' : null;
         if (docType2) {
-          await registry
+          let linkQuery = registry
             .from('number_registry')
             .update({ order_document_ref: insertedDoc.id })
             .eq('platform', 'eghiseul')
             .eq('order_ref', registryOrderRef)
             .eq('type', docType2)
             .is('order_document_ref', null);
+          // Multi-delegation orders: link ONLY the delegation of this service.
+          if (docType2 === 'delegation' && body.service_type) {
+            linkQuery = linkQuery.eq('service_type', body.service_type);
+          }
+          await linkQuery;
         }
       }
     } catch (linkErr) {
       console.warn('Registry back-link failed (non-fatal):', linkErr);
     }
 
-    // Now clean up previous versions of this document type (safe — new row already exists)
+    // Now clean up previous versions of THIS document (safe — new row already
+    // exists). Scoped pe file_name ca împuternicirile altor servicii de pe
+    // aceeași comandă (alt sufix → alt fișier) să NU fie șterse.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: existingDocs } = await (adminClient as any)
       .from('order_documents')
       .select('id, s3_key')
       .eq('order_id', orderId)
       .eq('type', docType)
+      .eq('file_name', fileName)
       .neq('s3_key', s3Key);
 
     if (existingDocs && existingDocs.length > 0) {

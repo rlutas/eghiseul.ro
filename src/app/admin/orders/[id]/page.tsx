@@ -15,6 +15,7 @@ import { Label } from '@/components/ui/label';
 import { getCountyFromCNP } from '@/lib/validations/cnp';
 import { estimateFromSelectedOptions } from '@/lib/delivery-calculator';
 import { isNoLawyerService } from '@/lib/documents/no-lawyer-services';
+import { computeDelegationItems } from '@/lib/documents/delegation-items';
 import { REUPLOAD_DOC_SPECS, suggestedDocsForService } from '@/lib/reupload/doc-types';
 import {
   type KycPerDoc,
@@ -3163,13 +3164,13 @@ function ProcessingSection({
     }
   };
 
-  const handleGenerateDocument = async (template: string) => {
-    setGeneratingDoc(template);
+  const handleGenerateDocument = async (template: string, serviceType?: string) => {
+    setGeneratingDoc(serviceType ? `${template}:${serviceType}` : template);
     try {
       const res = await fetch(`/api/admin/orders/${order.id}/generate-document`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ template }),
+        body: JSON.stringify({ template, ...(serviceType ? { service_type: serviceType } : {}) }),
       });
 
       if (!res.ok) {
@@ -3280,14 +3281,36 @@ function ProcessingSection({
             Documente generate
           </h4>
           <div className="space-y-1.5">
-            {/* Auto-generated contracts */}
-            {generableDocTypes.map(docType => {
-              const doc = documents.find(d => d.type === docType);
+            {/* Auto-generated contracts. Împuternicirile sunt PER SERVICIU —
+                fiecare document oficial (cazier, apostilă, integritate...) are
+                delegația și fișierul lui, deci un rând per serviciu. */}
+            {generableDocTypes.flatMap(docType => {
+              if (docType !== 'imputernicire') return [{ docType, serviceType: undefined as string | undefined, label: DOC_TYPE_LABELS[docType] || docType }];
+              const items = computeDelegationItems({
+                services: order.services,
+                selected_options: (order.selected_options as AnyObj[]) || [],
+              });
+              return items.map((item) => ({
+                docType,
+                serviceType: item.serviceType,
+                label: items.length > 1
+                  ? `Imputernicire — ${item.label}`
+                  : (DOC_TYPE_LABELS[docType] || docType),
+              }));
+            }).map(({ docType, serviceType, label }) => {
+              const doc = docType === 'imputernicire' && serviceType
+                ? documents.find(d =>
+                    d.type === docType &&
+                    ((d.metadata as AnyObj | null)?.service_type === serviceType ||
+                      // legacy docs generated before per-service metadata
+                      (!(d.metadata as AnyObj | null)?.service_type &&
+                        serviceType === (order.services?.slug || order.services?.name))))
+                : documents.find(d => d.type === docType);
               const template = DOC_TEMPLATE_MAP[docType];
-              const isGenerating = generatingDoc === template;
+              const isGenerating = generatingDoc === (serviceType ? `${template}:${serviceType}` : template);
 
               return (
-                <div key={docType} className="flex items-center justify-between py-2 px-3 rounded-lg border bg-white text-sm">
+                <div key={`${docType}${serviceType ? `:${serviceType}` : ''}`} className="flex items-center justify-between py-2 px-3 rounded-lg border bg-white text-sm">
                   <div className="flex items-center gap-2 min-w-0">
                     {doc ? (
                       <CheckCircle className="h-4 w-4 text-green-500 shrink-0" />
@@ -3295,7 +3318,7 @@ function ProcessingSection({
                       <Circle className="h-4 w-4 text-gray-300 shrink-0" />
                     )}
                     <div className="min-w-0">
-                      <span className={doc ? 'font-medium' : ''}>{DOC_TYPE_LABELS[docType] || docType}</span>
+                      <span className={doc ? 'font-medium' : ''}>{label}</span>
                       {doc?.document_number && (
                         <span className="text-xs text-muted-foreground ml-2 font-mono">Nr. {doc.document_number}</span>
                       )}
@@ -3333,7 +3356,7 @@ function ProcessingSection({
                         size="sm"
                         variant={doc ? 'outline' : 'default'}
                         className="h-7 text-xs"
-                        onClick={() => handleGenerateDocument(template)}
+                        onClick={() => handleGenerateDocument(template, serviceType)}
                         disabled={isGenerating}
                       >
                         {isGenerating ? <Loader2 className="h-3 w-3 animate-spin" /> : <FileText className="h-3 w-3" />}

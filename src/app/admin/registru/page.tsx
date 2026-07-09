@@ -27,6 +27,9 @@ import {
   Trash2,
   Loader2,
   FileDown,
+  Pencil,
+  RotateCcw,
+  X,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAdminPermissions } from '@/hooks/use-admin-permissions';
@@ -129,7 +132,7 @@ function NumberRegistryContent() {
     notes: '',
   });
   const [manualEntry, setManualEntry] = useState({
-    type: 'contract' as 'contract' | 'delegation',
+    type: 'contract_delegatie' as string,
     client_name: '',
     client_email: '',
     client_cnp: '',
@@ -140,9 +143,22 @@ function NumberRegistryContent() {
     date: new Date().toISOString().split('T')[0],
     platform: '',
     order_ref: '',
+    linked_contract_number: '',
   });
 
   const [saving, setSaving] = useState(false);
+
+  // Edit entry dialog
+  const [editOpen, setEditOpen] = useState(false);
+  const [editEntry, setEditEntry] = useState<{
+    id: string; type: string; number: string; series: string;
+    client_name: string; client_cnp: string; client_cui: string;
+    service_type: string; description: string; amount: string; date: string;
+  } | null>(null);
+
+  // Numerele se afișează EXACT ca pe documente: padded la 6 cifre (005771).
+  const fmtNr = (n: number | null | undefined) =>
+    n === null || n === undefined ? '-' : String(n).padStart(6, '0');
 
   // ── Group entries by order for display ─────────────────────
 
@@ -179,10 +195,13 @@ function NumberRegistryContent() {
 
       const key = `${entry.platform ?? ''}:${entry.order_ref}`;
       if (!orderGroups.has(key)) {
+        // SHEET-XXXXXX = grupare sintetică pentru importul din Google Sheets
+        // (leagă contractul de delegațiile lui) — nu e o comandă reală.
+        const isSheetImport = (entry.order_ref || '').startsWith('SHEET-');
         orderGroups.set(key, {
           orderId: entry.order_id ?? null,
           platform: entry.platform ?? null,
-          friendlyOrderId: entry.friendly_order_id || entry.order_ref || '-',
+          friendlyOrderId: isSheetImport ? '-' : (entry.friendly_order_id || entry.order_ref || '-'),
           contractNumber: null,
           contractEntryId: null,
           contractDocS3Key: null,
@@ -311,16 +330,102 @@ function NumberRegistryContent() {
       const json = await res.json();
       if (json.success) {
         const nr = json.data[0];
-        toast.success(`Numar alocat: ${nr.allocated_number} (${nr.allocated_series ? nr.allocated_series : ''}${manualEntry.type === 'contract' ? 'Contract' : 'Delegatie'} ${nr.allocated_year})`);
+        const pad = (n: number) => String(n).padStart(6, '0');
+        if (manualEntry.type === 'contract_delegatie' && json.delegation?.[0]) {
+          const d = json.delegation[0];
+          toast.success(`Alocate: Contract ${pad(nr.allocated_number)} + Delegatie ${d.allocated_series || 'SM'}${pad(d.allocated_number)}`);
+        } else {
+          toast.success(`Numar alocat: ${manualEntry.type === 'contract' ? 'Contract' : 'Delegatie'} ${nr.allocated_series || ''}${pad(nr.allocated_number)}`);
+        }
         setAddManualOpen(false);
-        setManualEntry({ type: 'contract', client_name: '', client_email: '', client_cnp: '', client_cui: '', service_type: '', description: '', amount: '', date: new Date().toISOString().split('T')[0], platform: '', order_ref: '' });
-        fetchRegistry();
+        setManualEntry({ type: 'contract_delegatie', client_name: '', client_email: '', client_cnp: '', client_cui: '', service_type: '', description: '', amount: '', date: new Date().toISOString().split('T')[0], platform: '', order_ref: '', linked_contract_number: '' });
+        // Sari la pagina 1 — numărul nou (cel mai mare) apare primul în jurnal.
+        fetchRegistry(1);
         fetchRanges(); // Refresh ranges too (available count changed)
       } else {
         toast.error(json.error || 'Eroare la alocarea numarului');
       }
     } catch { toast.error('Eroare de retea'); }
     finally { setSaving(false); }
+  };
+
+  // ── Edit / Restore / Delete entry ───────────────────────────
+  const openEditDialog = (entryId: string) => {
+    const entry = registryEntries.find(e => e.id === entryId);
+    if (!entry) return;
+    setEditEntry({
+      id: entry.id,
+      type: entry.type,
+      number: String(entry.number),
+      series: entry.series || '',
+      client_name: entry.client_name || '',
+      client_cnp: entry.client_cnp || '',
+      client_cui: entry.client_cui || '',
+      service_type: entry.service_type || '',
+      description: entry.description || '',
+      amount: entry.amount != null ? String(entry.amount) : '',
+      date: entry.date || new Date().toISOString().split('T')[0],
+    });
+    setEditOpen(true);
+  };
+
+  const handleEditSave = async () => {
+    if (!editEntry) return;
+    setSaving(true);
+    try {
+      const res = await fetch(`/api/admin/settings/number-registry/${editEntry.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          number: parseInt(editEntry.number, 10),
+          series: editEntry.series || null,
+          client_name: editEntry.client_name,
+          client_cnp: editEntry.client_cnp || null,
+          client_cui: editEntry.client_cui || null,
+          service_type: editEntry.service_type || null,
+          description: editEntry.description || null,
+          amount: editEntry.amount === '' ? null : parseFloat(editEntry.amount),
+          date: editEntry.date,
+        }),
+      });
+      const json = await res.json();
+      if (json.success) {
+        toast.success('Inregistrare actualizata');
+        setEditOpen(false);
+        setEditEntry(null);
+        fetchRegistry(pagination.page);
+      } else {
+        toast.error(json.error || 'Eroare la actualizare');
+      }
+    } catch { toast.error('Eroare de retea'); }
+    finally { setSaving(false); }
+  };
+
+  const handleRestore = async (entryId: string) => {
+    try {
+      const res = await fetch(`/api/admin/settings/number-registry/${entryId}/restore`, { method: 'POST' });
+      const json = await res.json();
+      if (json.success) {
+        toast.success('Numar restaurat — este din nou valid');
+        fetchRegistry(pagination.page);
+      } else {
+        toast.error(json.error || 'Eroare la restaurare');
+      }
+    } catch { toast.error('Eroare de retea'); }
+  };
+
+  const handleDeletePermanent = async (entryId: string, label: string) => {
+    if (!window.confirm(`Stergi DEFINITIV ${label} din registru? Pentru numere consumate real folositi Anulare (numarul nu se refoloseste). Stergerea e pentru intrari gresite/test.`)) return;
+    try {
+      const res = await fetch(`/api/admin/settings/number-registry/${entryId}`, { method: 'DELETE' });
+      const json = await res.json();
+      if (json.success) {
+        toast.success('Inregistrare stearsa definitiv');
+        fetchRegistry(pagination.page);
+      } else {
+        toast.error(json.error || 'Eroare la stergere');
+      }
+    } catch { toast.error('Eroare de retea'); }
   };
 
   const handleVoid = async () => {
@@ -486,7 +591,7 @@ function NumberRegistryContent() {
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
                       <span className="font-medium">
-                        {range.type === 'contract' ? 'Contracte Asistenta' : 'Imputerniciri'} {range.year}
+                        {range.type === 'contract' ? 'Contracte Asistenta' : 'Delegatii'} {range.year}
                         {range.series ? ` (Seria ${range.series})` : ''}
                       </span>
                       <Badge variant={range.status === 'active' ? 'default' : range.status === 'exhausted' ? 'destructive' : 'secondary'}>
@@ -594,7 +699,7 @@ function NumberRegistryContent() {
                   <thead>
                     <tr className="border-b text-left">
                       <th className="py-2 px-2 font-medium">Comanda</th>
-                      <th className="py-2 px-2 font-medium">Nr Contract</th>
+                      <th className="py-2 px-2 font-medium">Nr Contract Asistenta</th>
                       <th className="py-2 px-2 font-medium">Nr Delegatie</th>
                       <th className="py-2 px-2 font-medium">Serie</th>
                       <th className="py-2 px-2 font-medium">Data</th>
@@ -612,14 +717,20 @@ function NumberRegistryContent() {
                       const delegationSeries = group.delegationNumbers.length > 0
                         ? group.delegationNumbers[0].series
                         : null;
-                      const allEntryIds: { id: string; label: string }[] = [];
-                      if (group.contractEntryId && !group.voidedEntryIds.includes(group.contractEntryId)) {
-                        allEntryIds.push({ id: group.contractEntryId, label: `Contract ${group.contractNumber}` });
+                      const allEntries: { id: string; label: string; voided: boolean }[] = [];
+                      if (group.contractEntryId) {
+                        allEntries.push({
+                          id: group.contractEntryId,
+                          label: `Contract ${fmtNr(group.contractNumber)}`,
+                          voided: group.voidedEntryIds.includes(group.contractEntryId),
+                        });
                       }
                       for (const d of group.delegationNumbers) {
-                        if (!group.voidedEntryIds.includes(d.id)) {
-                          allEntryIds.push({ id: d.id, label: `Delegatie ${d.series || ''}${d.number}` });
-                        }
+                        allEntries.push({
+                          id: d.id,
+                          label: `Delegatie ${d.series || ''}${fmtNr(d.number)}`,
+                          voided: group.voidedEntryIds.includes(d.id),
+                        });
                       }
 
                       return (
@@ -650,7 +761,7 @@ function NumberRegistryContent() {
                             )}
                           </td>
                           <td className="py-2 px-2 font-mono">
-                            {group.contractNumber ?? '-'}
+                            {fmtNr(group.contractNumber)}
                             {group.contractDocS3Key && (
                               <button
                                 onClick={() => handleDocDownload(group.contractDocS3Key!)}
@@ -665,7 +776,7 @@ function NumberRegistryContent() {
                             {group.delegationNumbers.length > 0
                               ? group.delegationNumbers.map((d) => (
                                   <div key={d.id} className="whitespace-nowrap">
-                                    <span title={d.serviceType || undefined}>{d.number}</span>
+                                    <span title={d.serviceType || undefined}>{fmtNr(d.number)}</span>
                                     {d.serviceType && (
                                       <span className="ml-1 font-sans text-[10px] text-muted-foreground">
                                         {d.serviceType.startsWith('apostila-haga')
@@ -702,45 +813,28 @@ function NumberRegistryContent() {
                               group.source === 'manual' ? 'secondary' :
                               group.source === 'voided' ? 'destructive' : 'outline'
                             }>
-                              {group.source === 'platform' ? 'Platforma' :
-                               group.source === 'manual' ? 'Manual' :
-                               group.source === 'voided' ? 'Anulat' : 'Rezervat'}
+                              {group.source === 'platform'
+                                ? (group.platform === 'eghiseul' ? 'eGhișeul' : group.platform === 'ecazier' ? 'ecazier' : group.platform === 'cazierjudiciaronline' ? 'CJO' : 'Platforma')
+                                : group.source === 'manual' ? 'Manual'
+                                : group.source === 'voided' ? 'Anulat' : 'Rezervat'}
                             </Badge>
                           </td>
                           <td className="py-2 px-2">
-                            {allEntryIds.length === 1 ? (
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="text-red-600 hover:text-red-800"
-                                title={`Anuleaza ${allEntryIds[0].label}`}
-                                onClick={() => {
-                                  setVoidEntryId(allEntryIds[0].id);
-                                  setVoidDialogOpen(true);
-                                }}
-                              >
-                                <Trash2 className="h-3.5 w-3.5" />
-                              </Button>
-                            ) : allEntryIds.length > 1 ? (
-                              <div className="flex flex-col gap-1">
-                                {allEntryIds.map(e => (
-                                  <Button
-                                    key={e.id}
-                                    variant="ghost"
-                                    size="sm"
-                                    className="text-red-600 hover:text-red-800 h-auto py-0.5 px-1 text-xs justify-start"
-                                    title={`Anuleaza ${e.label}`}
-                                    onClick={() => {
-                                      setVoidEntryId(e.id);
-                                      setVoidDialogOpen(true);
-                                    }}
-                                  >
-                                    <Trash2 className="h-3 w-3 mr-1" />
-                                    {e.label}
-                                  </Button>
-                                ))}
-                              </div>
-                            ) : null}
+                            <div className="flex flex-col gap-0.5">
+                              {allEntries.map(e => (
+                                <EntryActions
+                                  key={e.id}
+                                  entryId={e.id}
+                                  label={e.label}
+                                  voided={e.voided}
+                                  showLabel={allEntries.length > 1}
+                                  onEdit={openEditDialog}
+                                  onVoid={(id) => { setVoidEntryId(id); setVoidDialogOpen(true); }}
+                                  onRestore={handleRestore}
+                                  onDelete={handleDeletePermanent}
+                                />
+                              ))}
+                            </div>
                           </td>
                         </tr>
                       );
@@ -754,7 +848,7 @@ function NumberRegistryContent() {
                       >
                         <td className="py-2 px-2 text-xs text-muted-foreground">-</td>
                         <td className="py-2 px-2 font-mono">
-                          {entry.type === 'contract' ? entry.number : '-'}
+                          {entry.type === 'contract' ? fmtNr(entry.number) : '-'}
                           {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                           {entry.type === 'contract' && (entry as any).document_s3_key && (
                             <button
@@ -768,7 +862,7 @@ function NumberRegistryContent() {
                           )}
                         </td>
                         <td className="py-2 px-2 font-mono">
-                          {entry.type === 'delegation' ? entry.number : '-'}
+                          {entry.type === 'delegation' ? fmtNr(entry.number) : '-'}
                           {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                           {entry.type === 'delegation' && (entry as any).document_s3_key && (
                             <button
@@ -793,19 +887,16 @@ function NumberRegistryContent() {
                           <Badge variant="secondary">Manual</Badge>
                         </td>
                         <td className="py-2 px-2">
-                          {!entry.voided_at && (
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="text-red-600 hover:text-red-800"
-                              onClick={() => {
-                                setVoidEntryId(entry.id);
-                                setVoidDialogOpen(true);
-                              }}
-                            >
-                              <Trash2 className="h-3.5 w-3.5" />
-                            </Button>
-                          )}
+                          <EntryActions
+                            entryId={entry.id}
+                            label={`${entry.type === 'contract' ? 'Contract' : 'Delegatie'} ${entry.series || ''}${fmtNr(entry.number)}`}
+                            voided={!!entry.voided_at}
+                            showLabel={false}
+                            onEdit={openEditDialog}
+                            onVoid={(id) => { setVoidEntryId(id); setVoidDialogOpen(true); }}
+                            onRestore={handleRestore}
+                            onDelete={handleDeletePermanent}
+                          />
                         </td>
                       </tr>
                     ))}
@@ -855,7 +946,7 @@ function NumberRegistryContent() {
               <Label>Tip</Label>
               <select className="w-full border rounded px-3 py-2 mt-1" value={newRange.type} onChange={e => setNewRange({...newRange, type: e.target.value as 'contract' | 'delegation'})}>
                 <option value="contract">Contract Asistenta Juridica</option>
-                <option value="delegation">Imputernicire Avocatiala</option>
+                <option value="delegation">Delegatie (Imputernicire Avocatiala)</option>
               </select>
             </div>
             <div>
@@ -907,11 +998,23 @@ function NumberRegistryContent() {
           <div className="space-y-4">
             <div>
               <Label>Tip</Label>
-              <select className="w-full border rounded px-3 py-2 mt-1" value={manualEntry.type} onChange={e => setManualEntry({...manualEntry, type: e.target.value as 'contract' | 'delegation'})}>
-                <option value="contract">Contract</option>
-                <option value="delegation">Imputernicire</option>
+              <select className="w-full border rounded px-3 py-2 mt-1" value={manualEntry.type} onChange={e => setManualEntry({...manualEntry, type: e.target.value})}>
+                <option value="contract_delegatie">Contract + Delegatie (legate)</option>
+                <option value="contract">Doar Contract</option>
+                <option value="delegation">Doar Delegatie</option>
               </select>
             </div>
+            {/* Delegatie legata de un contract deja existent */}
+            {manualEntry.type === 'delegation' && (
+              <div>
+                <Label>Nr. contract existent (opțional)</Label>
+                <Input
+                  value={manualEntry.linked_contract_number}
+                  onChange={e => setManualEntry({...manualEntry, linked_contract_number: e.target.value})}
+                  placeholder="ex: 005771 — leagă delegația de contractul clientului"
+                />
+              </div>
+            )}
             <div>
               <Label>Nume client *</Label>
               <Input value={manualEntry.client_name} onChange={e => setManualEntry({...manualEntry, client_name: e.target.value})} />
@@ -1001,6 +1104,132 @@ function NumberRegistryContent() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Edit Entry Dialog */}
+      <Dialog open={editOpen} onOpenChange={(open) => { setEditOpen(open); if (!open) setEditEntry(null); }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              Editare {editEntry?.type === 'contract' ? 'Contract' : 'Delegatie'}
+            </DialogTitle>
+          </DialogHeader>
+          {editEntry && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>Numar *</Label>
+                  <Input value={editEntry.number} onChange={e => setEditEntry({...editEntry, number: e.target.value.replace(/\D/g, '')})} />
+                  <p className="text-[11px] text-muted-foreground mt-1">Duplicatele sunt respinse automat.</p>
+                </div>
+                <div>
+                  <Label>Serie</Label>
+                  <Input value={editEntry.series} onChange={e => setEditEntry({...editEntry, series: e.target.value})} placeholder="SM" />
+                </div>
+              </div>
+              <div>
+                <Label>Nume client *</Label>
+                <Input value={editEntry.client_name} onChange={e => setEditEntry({...editEntry, client_name: e.target.value})} />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>CNP</Label>
+                  <Input value={editEntry.client_cnp} onChange={e => setEditEntry({...editEntry, client_cnp: e.target.value})} maxLength={13} />
+                </div>
+                <div>
+                  <Label>CUI</Label>
+                  <Input value={editEntry.client_cui} onChange={e => setEditEntry({...editEntry, client_cui: e.target.value})} />
+                </div>
+              </div>
+              <div>
+                <Label>Serviciu</Label>
+                <Input value={editEntry.service_type} onChange={e => setEditEntry({...editEntry, service_type: e.target.value})} />
+              </div>
+              <div>
+                <Label>Descriere</Label>
+                <Input value={editEntry.description} onChange={e => setEditEntry({...editEntry, description: e.target.value})} placeholder="ex: Pentru contract 005771 — Cazier Judiciar" />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>Suma (RON)</Label>
+                  <Input type="number" step="0.01" value={editEntry.amount} onChange={e => setEditEntry({...editEntry, amount: e.target.value})} />
+                </div>
+                <div>
+                  <Label>Data</Label>
+                  <Input type="date" value={editEntry.date} onChange={e => setEditEntry({...editEntry, date: e.target.value})} />
+                </div>
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => { setEditOpen(false); setEditEntry(null); }}>Anuleaza</Button>
+            <Button onClick={handleEditSave} disabled={saving || !editEntry?.client_name.trim() || !editEntry?.number}>
+              {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+              Salveaza
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
+
+/** Acțiuni per intrare de registru: editare, anulare (void), iar pe cele
+ *  anulate — restaurare sau ștergere definitivă. */
+function EntryActions({
+  entryId,
+  label,
+  voided,
+  showLabel,
+  onEdit,
+  onVoid,
+  onRestore,
+  onDelete,
+}: {
+  entryId: string;
+  label: string;
+  voided: boolean;
+  showLabel: boolean;
+  onEdit: (id: string) => void;
+  onVoid: (id: string) => void;
+  onRestore: (id: string) => void;
+  onDelete: (id: string, label: string) => void;
+}) {
+  return (
+    <div className="flex items-center gap-0.5 whitespace-nowrap">
+      {showLabel && <span className="text-[10px] text-muted-foreground mr-1 font-mono">{label.replace(/^(Contract|Delegatie) /, '$1 ').split(' ')[1]}</span>}
+      <button
+        onClick={() => onEdit(entryId)}
+        className="p-1 text-muted-foreground hover:text-foreground"
+        title={`Editeaza ${label}`}
+      >
+        <Pencil className="h-3.5 w-3.5" />
+      </button>
+      {!voided ? (
+        <button
+          onClick={() => onVoid(entryId)}
+          className="p-1 text-red-600 hover:text-red-800"
+          title={`Anuleaza ${label} (numarul nu se refoloseste)`}
+        >
+          <Trash2 className="h-3.5 w-3.5" />
+        </button>
+      ) : (
+        <>
+          <button
+            onClick={() => onRestore(entryId)}
+            className="p-1 text-green-600 hover:text-green-800"
+            title={`Restaureaza ${label} (redevine valid)`}
+          >
+            <RotateCcw className="h-3.5 w-3.5" />
+          </button>
+          <button
+            onClick={() => onDelete(entryId, label)}
+            className="p-1 text-red-600 hover:text-red-800"
+            title={`Sterge DEFINITIV ${label}`}
+          >
+            <X className="h-3.5 w-3.5" />
+          </button>
+        </>
+      )}
     </div>
   );
 }

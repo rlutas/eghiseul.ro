@@ -126,7 +126,36 @@ export async function GET(request: NextRequest) {
     const total = countResult.count || 0;
     const totalPages = Math.ceil(total / perPage);
 
-    const data = dataResult.data || [];
+    let data = dataResult.data || [];
+
+    // Complete the groups: paginarea sortată pe număr desparte contractul
+    // (5xxx) de delegațiile lui (7xxx) pe pagini diferite → UI-ul ar arăta
+    // grupuri incomplete („Nr Contract: -"). Aducem TOȚI frații care împart
+    // (platform/SHEET, order_ref) cu rândurile paginii curente.
+    const pageRefs = [
+      ...new Set(
+        data
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          .filter((e: any) => e.order_ref)
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          .map((e: any) => e.order_ref)
+      ),
+    ];
+    if (pageRefs.length > 0) {
+      const { data: siblings } = await registryClient
+        .from('number_registry')
+        .select('*')
+        .eq('year', year)
+        .in('order_ref', pageRefs);
+      if (siblings) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const seen = new Set(data.map((e: any) => e.id));
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        for (const s of siblings as any[]) {
+          if (!seen.has(s.id)) { data = [...data, s]; seen.add(s.id); }
+        }
+      }
+    }
 
     // Resolve local order UUIDs for EGHISEUL rows (order_ref = friendly_order_id)
     // so the admin UI can keep linking to /admin/orders/<uuid>.
@@ -244,10 +273,11 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
 
     // ── Validation ──
-
-    if (!body.type || (body.type !== 'contract' && body.type !== 'delegation')) {
+    // 'contract_delegatie' = alocare COMBO: contract + delegatie legate
+    // intr-o singura actiune (cazul uzual la alocarea manuala).
+    if (!body.type || !['contract', 'delegation', 'contract_delegatie'].includes(body.type)) {
       return NextResponse.json(
-        { success: false, error: 'Tipul trebuie sa fie "contract" sau "delegation"' },
+        { success: false, error: 'Tipul trebuie sa fie "contract", "delegation" sau "contract_delegatie"' },
         { status: 400 }
       );
     }
@@ -268,10 +298,9 @@ export async function POST(request: NextRequest) {
 
     const registryClient: AnyClient = getRegistryClient();
 
-    // ── Allocate number via CENTRAL RPC ──
-
-    const { data, error } = await registryClient.rpc('allocate_number', {
-      p_type: body.type,
+    // ── Allocate via CENTRAL RPC ──
+    const isCombo = body.type === 'contract_delegatie';
+    const baseParams = {
       p_platform: platform,
       p_order_ref: orderRef,
       p_client_name: body.client_name.trim(),
@@ -279,28 +308,66 @@ export async function POST(request: NextRequest) {
       p_client_cnp: body.client_cnp || null,
       p_client_cui: body.client_cui || null,
       p_service_type: body.service_type || null,
-      p_description: body.description || null,
       p_amount: body.amount || null,
       p_source: 'manual',
       p_date: body.date || new Date().toISOString().split('T')[0],
       p_created_by: user.email ?? user.id,
-    });
+    };
 
-    if (error) {
-      console.error('Failed to allocate number:', error);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const allocate = (type: string, description: string | null): Promise<{ data: any; error: any }> =>
+      registryClient.rpc('allocate_number', { ...baseParams, p_type: type, p_description: description });
 
-      // P0002 = no active range available
+    const errorResponse = (error: { code?: string }) => {
       if (error.code === 'P0002') {
         return NextResponse.json(
           { success: false, error: 'Nu exista un interval activ de numere pentru acest tip. Creati un interval in setarile de numere.' },
           { status: 400 }
         );
       }
-
       return NextResponse.json(
         { success: false, error: 'Eroare la alocarea numarului din registru' },
         { status: 500 }
       );
+    };
+
+    if (isCombo) {
+      // Contract + delegatie legate: alocam contractul, apoi delegatia cu
+      // trimitere la numarul contractului in descriere.
+      const contractRes = await allocate('contract', body.description || null);
+      if (contractRes.error) {
+        console.error('Combo contract allocation failed:', contractRes.error);
+        return errorResponse(contractRes.error);
+      }
+      const contractNr = String(contractRes.data[0].allocated_number).padStart(6, '0');
+      const delegRes = await allocate(
+        'delegation',
+        `Pentru contract ${contractNr}${body.service_type ? ` — ${body.service_type}` : ''}`
+      );
+      if (delegRes.error) {
+        console.error('Combo delegation allocation failed (contract already allocated):', delegRes.error);
+        return NextResponse.json(
+          { success: false, error: `Contractul ${contractNr} a fost alocat, dar delegatia a esuat. Alocati delegatia separat.` },
+          { status: 500 }
+        );
+      }
+      return NextResponse.json(
+        { success: true, data: contractRes.data, delegation: delegRes.data },
+        { status: 201 }
+      );
+    }
+
+    // Delegatie legata de un contract EXISTENT (nr. introdus manual).
+    let description: string | null = body.description || null;
+    if (body.type === 'delegation' && body.linked_contract_number) {
+      const linked = String(body.linked_contract_number).replace(/\D/g, '').padStart(6, '0');
+      description = `Pentru contract ${linked}${body.service_type ? ` — ${body.service_type}` : ''}${description ? `. ${description}` : ''}`;
+    }
+
+    const { data, error } = await allocate(body.type, description);
+    if (error) {
+      console.error('Failed to allocate number:', error);
+      return errorResponse(error);
     }
 
     return NextResponse.json({ success: true, data }, { status: 201 });
