@@ -163,6 +163,9 @@ function NumberRegistryContent() {
   // ── Group entries by order for display ─────────────────────
 
   interface GroupedOrderRow {
+    /** Cheia unică de grup (platform:order_ref) — React key; friendlyOrderId
+     *  e doar de AFIȘARE și poate fi '-' pe importurile din Sheets. */
+    groupKey: string;
     orderId: string | null;
     platform: string | null;
     friendlyOrderId: string;
@@ -199,6 +202,7 @@ function NumberRegistryContent() {
         // (leagă contractul de delegațiile lui) — nu e o comandă reală.
         const isSheetImport = (entry.order_ref || '').startsWith('SHEET-');
         orderGroups.set(key, {
+          groupKey: key,
           orderId: entry.order_id ?? null,
           platform: entry.platform ?? null,
           friendlyOrderId: isSheetImport ? '-' : (entry.friendly_order_id || entry.order_ref || '-'),
@@ -451,9 +455,12 @@ function NumberRegistryContent() {
     finally { setSaving(false); }
   };
 
-  const handleExport = async () => {
+  // Export CSV — pentru control/raportare la Barou. Contractele și
+  // delegațiile se exportă SEPARAT (două fișiere), fiecare complet pe an.
+  const handleExport = async (exportType?: 'contract' | 'delegation') => {
     const params = new URLSearchParams({ year: String(filterYear) });
-    if (filterType) params.set('type', filterType);
+    if (exportType) params.set('type', exportType);
+    else if (filterType) params.set('type', filterType);
     if (filterSource) params.set('source', filterSource);
     if (filterSearch) params.set('search', filterSearch);
     window.open(`/api/admin/settings/number-registry/export?${params}`, '_blank');
@@ -610,9 +617,9 @@ function NumberRegistryContent() {
                     )}
                   </div>
                   <div className="flex items-center gap-4 text-sm text-muted-foreground mb-2">
-                    <span>{range.range_start} - {range.range_end}</span>
+                    <span className="font-mono">{fmtNr(range.range_start)} – {fmtNr(range.range_end)}</span>
                     <span>{range.used}/{range.total} utilizate ({range.usage_percent}%)</span>
-                    {range.status === 'active' && <span>Urmatorul: {range.next_number}</span>}
+                    {range.status === 'active' && <span>Urmatorul: <span className="font-mono font-medium text-foreground">{fmtNr(range.next_number)}</span></span>}
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
                     <div
@@ -638,8 +645,13 @@ function NumberRegistryContent() {
             <CardDescription>Evidenta completa a numerelor alocate</CardDescription>
           </div>
           <div className="flex gap-2">
-            <Button size="sm" variant="outline" onClick={handleExport}>
-              Export CSV
+            <Button size="sm" variant="outline" onClick={() => handleExport('contract')} title="Toate contractele de asistență din anul selectat — pentru control/Barou">
+              <FileDown className="h-3.5 w-3.5 mr-1" />
+              Export Contracte
+            </Button>
+            <Button size="sm" variant="outline" onClick={() => handleExport('delegation')} title="Toate delegațiile din anul selectat — pentru control/Barou">
+              <FileDown className="h-3.5 w-3.5 mr-1" />
+              Export Delegatii
             </Button>
             <Button size="sm" onClick={() => setAddManualOpen(true)}>
               + Alocare manuala
@@ -734,7 +746,7 @@ function NumberRegistryContent() {
 
                       return (
                         <tr
-                          key={`${group.platform ?? ''}:${group.friendlyOrderId}`}
+                          key={group.groupKey}
                           className={`border-b ${group.voided ? 'bg-red-50 line-through text-muted-foreground' : ''}`}
                         >
                           <td className="py-2 px-2">

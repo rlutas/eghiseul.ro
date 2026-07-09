@@ -85,46 +85,43 @@ export async function GET(request: NextRequest) {
     const registryClient: AnyClient = getRegistryClient();
     const adminClient: AnyClient = createAdminClient();
 
-    // Build query - fetch ALL matching entries (no pagination)
-    let query = registryClient
-      .from('number_registry')
-      .select('*')
-      .eq('year', year)
-      .order('number', { ascending: true });
+    // Fetch ALL matching entries. Supabase taie la 1000 de rânduri per query —
+    // exportul pentru control trebuie să fie COMPLET, deci paginăm în chunks.
+    const CHUNK = 1000;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const entries: any[] = [];
+    for (let offset = 0; ; offset += CHUNK) {
+      let query = registryClient
+        .from('number_registry')
+        .select('*')
+        .eq('year', year)
+        .order('number', { ascending: true })
+        .range(offset, offset + CHUNK - 1);
 
-    if (type && (type === 'contract' || type === 'delegation')) {
-      query = query.eq('type', type);
-    }
+      if (type && (type === 'contract' || type === 'delegation')) {
+        query = query.eq('type', type);
+      }
+      if (source && ['platform', 'manual', 'reserved', 'voided'].includes(source)) {
+        query = query.eq('source', source);
+      }
+      if (dateFrom) query = query.gte('date', dateFrom);
+      if (dateTo) query = query.lte('date', dateTo);
+      if (orderRef) query = query.eq('order_ref', orderRef);
+      if (search) {
+        const searchFilter = `client_name.ilike.%${search}%,client_email.ilike.%${search}%,client_cnp.ilike.%${search}%,client_cui.ilike.%${search}%`;
+        query = query.or(searchFilter);
+      }
 
-    if (source && ['platform', 'manual', 'reserved', 'voided'].includes(source)) {
-      query = query.eq('source', source);
-    }
-
-    if (dateFrom) {
-      query = query.gte('date', dateFrom);
-    }
-
-    if (dateTo) {
-      query = query.lte('date', dateTo);
-    }
-
-    if (orderRef) {
-      query = query.eq('order_ref', orderRef);
-    }
-
-    if (search) {
-      const searchFilter = `client_name.ilike.%${search}%,client_email.ilike.%${search}%,client_cnp.ilike.%${search}%,client_cui.ilike.%${search}%`;
-      query = query.or(searchFilter);
-    }
-
-    const { data: entries, error } = await query;
-
-    if (error) {
-      console.error('Failed to fetch registry entries for export:', error);
-      return NextResponse.json(
-        { success: false, error: 'Eroare la exportul registrului de numere' },
-        { status: 500 }
-      );
+      const { data: chunk, error } = await query;
+      if (error) {
+        console.error('Failed to fetch registry entries for export:', error);
+        return NextResponse.json(
+          { success: false, error: 'Eroare la exportul registrului de numere' },
+          { status: 500 }
+        );
+      }
+      entries.push(...(chunk ?? []));
+      if (!chunk || chunk.length < CHUNK) break;
     }
 
     // Enrich EGHISEUL rows with local document file names (order_document_ref
@@ -169,7 +166,8 @@ export async function GET(request: NextRequest) {
     ];
 
     const rows = (entries || []).map((entry: AnyClient) => [
-      escapeCsvField(entry.number),
+      // Padded ca pe documente (005771) — evidența pentru control identică cu actele.
+      escapeCsvField(String(entry.number).padStart(6, '0')),
       escapeCsvField(TYPE_LABELS[entry.type] || entry.type),
       escapeCsvField(entry.series),
       escapeCsvField(formatDateRO(entry.date)),
@@ -203,7 +201,7 @@ export async function GET(request: NextRequest) {
       status: 200,
       headers: {
         'Content-Type': 'text/csv; charset=utf-8',
-        'Content-Disposition': `attachment; filename="registru-numere-${year}.csv"`,
+        'Content-Disposition': `attachment; filename="registru-${type === 'contract' ? 'contracte' : type === 'delegation' ? 'delegatii' : 'numere'}-${year}.csv"`,
       },
     });
   } catch (error) {

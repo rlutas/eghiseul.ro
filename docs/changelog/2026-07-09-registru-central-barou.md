@@ -126,3 +126,11 @@ e gata" adminul vede acum dacă clientul chiar l-a deschis:
   refolosește acum logica hook-ului.
 - Scopare vizuală avocat: sidebar doar Comenzi + Registru (hideForRoles);
   /admin → redirect la /admin/registru pentru rolul avocat.
+- Verificat vizual pe contul avocatei (login local): sidebar doar
+  Comenzi+Registru, redirect /admin→Registru (fix trailing slash), intervale
+  cu numere padded, fix chei React duplicate pe grupurile SHEET-.
+- Export CSV pentru CONTROL: butoane separate „Export Contracte" / „Export
+  Delegatii" (fișiere separate: registru-contracte-2026.csv /
+  registru-delegatii-2026.csv), numere padded, și FIX trunchierea la 1000 de
+  rânduri (limita Supabase) — exportul paginează și scoate TOT (verificat:
+  1997 contracte + 2217 delegații).

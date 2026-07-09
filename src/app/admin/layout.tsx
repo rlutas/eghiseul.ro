@@ -165,8 +165,9 @@ export default function AdminLayout({
   }, [user]);
 
   // Avocatul nu are dashboard — aterizează direct pe Registru (partea ei).
+  // Notă: site-ul are trailingSlash, deci pathname poate fi '/admin/' sau '/admin'.
   useEffect(() => {
-    if (user?.role === 'avocat' && pathname === '/admin') {
+    if (user?.role === 'avocat' && (pathname === '/admin' || pathname === '/admin/')) {
       router.replace('/admin/registru');
     }
   }, [user, pathname, router]);
