@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { requirePermission } from '@/lib/admin/permissions';
+import { requirePermission, getUserPermissions } from '@/lib/admin/permissions';
 import { parseTestFilter, resolveStatusFilter } from '@/lib/admin/orders-tabs';
+import { NO_LAWYER_SERVICE_SLUGS } from '@/lib/documents/no-lawyer-services';
 import { applyQuickOrStage } from '@/lib/admin/order-quick-filters';
 
 /**
@@ -37,6 +38,10 @@ export async function GET(request: NextRequest) {
       if (error instanceof Response) return error;
       throw error;
     }
+    // Rolul decide scoparea listei: avocatul vede DOAR comenzile serviciilor
+    // cu avocat (cele fără avocat — constatator/CF/cadastru — nu o privesc),
+    // același principiu ca scoparea colaboratorului pe serviciile asignate.
+    const { role: userRole } = await getUserPermissions(user.id);
 
     const adminClient = createAdminClient();
 
@@ -110,6 +115,18 @@ export async function GET(request: NextRequest) {
     // service id from the services dropdown.
     if (service) {
       query = query.eq('service_id', service);
+    }
+
+    // Scopare avocat: exclude serviciile FĂRĂ avocat (nu o privesc).
+    if (userRole === 'avocat') {
+      const { data: noLawyerServices } = await adminClient
+        .from('services')
+        .select('id')
+        .in('slug', [...NO_LAWYER_SERVICE_SLUGS]);
+      const excludeIds = (noLawyerServices ?? []).map((s) => s.id);
+      if (excludeIds.length > 0) {
+        query = query.not('service_id', 'in', `(${excludeIds.join(',')})`);
+      }
     }
 
     // Quick-filter / workflow-stage chip (overdue | deadline_soon | with_coupon

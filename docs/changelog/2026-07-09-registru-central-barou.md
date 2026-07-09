@@ -117,3 +117,7 @@ e gata" adminul vede acum dacă clientul chiar l-a deschis:
 - Cont: /admin/users → Invită → rol „avocat".
 - Fix teste CI: buildInstitutie testele verificau formatul VECHI al textului
   împuternicirii — actualizate la fraza completă cu motiv (11 → verzi).
+- Scopare listă comenzi pentru rolul avocat: vede DOAR comenzile serviciilor
+  CU avocat (constatator/CF/cadastru — excluse; același principiu ca scoparea
+  colaboratorului pe serviciile asignate).
+- Cont creat: gabriela_tarta@yahoo.com (rol avocat).
