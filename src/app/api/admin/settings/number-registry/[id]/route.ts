@@ -18,7 +18,7 @@ async function requireAdmin() {
     return { error: NextResponse.json({ success: false, error: 'Authentication required' }, { status: 401 }) };
   }
   try {
-    await requirePermission(user.id, 'settings.manage');
+    await requirePermission(user.id, 'registry.manage');
   } catch (error) {
     if (error instanceof Response) return { error };
     throw error;

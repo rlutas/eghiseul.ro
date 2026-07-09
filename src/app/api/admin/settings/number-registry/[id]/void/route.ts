@@ -33,7 +33,7 @@ export async function POST(
     }
 
     try {
-      await requirePermission(user.id, 'settings.manage');
+      await requirePermission(user.id, 'registry.manage');
     } catch (error) {
       if (error instanceof Response) return error;
       throw error;

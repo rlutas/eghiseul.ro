@@ -223,20 +223,37 @@ describe('buildDeliveryTerms', () => {
 });
 
 describe('buildInstitutie', () => {
+  // 2026-07-09: textul activităților de pe împuternicire e acum FRAZA
+  // completă (cerință echipă): „să se prezinte la <autoritate>, în vederea
+  // ridicării <document>. Motivul solicitării: <motiv>."
   it.each([
-    ['cazier-judiciar', 'IPJ SATU MARE - CAZIER JUDICIAR'],
-    ['cazier-judiciar-persoana-fizica', 'IPJ SATU MARE - CAZIER JUDICIAR'],
-    ['cazier-judiciar-persoana-juridica', 'IPJ SATU MARE - CAZIER JUDICIAR'],
-    ['cazier-auto', 'IPJ SATU MARE - CAZIER AUTO'],
-    ['cazier-fiscal', 'ANAF SATU MARE'],
-    ['certificat-nastere', 'OFICIUL DE STARE CIVILĂ'],
-    ['certificat-casatorie', 'OFICIUL DE STARE CIVILĂ'],
-    ['certificat-celibat', 'OFICIUL DE STARE CIVILĂ'],
-    ['certificat-integritate', 'IPJ SATU MARE - CAZIER JUDICIAR'],
-    ['extras-carte-funciara', 'OCPI SATU MARE'],
-    ['certificat-constatator', 'ONRC SATU MARE'],
-  ])('maps service slug "%s" → "%s"', (slug, expected) => {
-    expect(buildInstitutie(slug)).toBe(expected);
+    ['cazier-judiciar', 'IPJ SATU MARE', 'Cazier Judiciar'],
+    ['cazier-judiciar-persoana-fizica', 'IPJ SATU MARE', 'Cazier Judiciar'],
+    ['cazier-judiciar-persoana-juridica', 'IPJ SATU MARE', 'Cazier Judiciar'],
+    ['cazier-auto', 'IPJ SATU MARE', 'Cazier Auto'],
+    ['cazier-fiscal', 'ANAF SATU MARE', 'Cazier Fiscal'],
+    ['certificat-nastere', 'OFICIUL DE STARE CIVILĂ', 'Certificat de Naștere'],
+    ['certificat-casatorie', 'OFICIUL DE STARE CIVILĂ', 'Certificat de Căsătorie'],
+    ['certificat-celibat', 'OFICIUL DE STARE CIVILĂ', 'Certificat de Celibat'],
+    ['certificat-integritate', 'IPJ SATU MARE', 'Certificat de Integritate Comportamentală'],
+    ['extras-carte-funciara', 'OCPI SATU MARE', 'Extras de Carte Funciară'],
+    ['certificat-constatator', 'ONRC SATU MARE', 'Certificat Constatator'],
+  ])('slug "%s" → „să se prezinte la %s, în vederea ridicării %s."', (slug, authority, document) => {
+    expect(buildInstitutie(slug)).toBe(
+      `să se prezinte la ${authority}, în vederea ridicării ${document}.`
+    );
+  });
+
+  it('appends the motiv when provided', () => {
+    expect(buildInstitutie('cazier-judiciar', 'AUTORITATI')).toBe(
+      'să se prezinte la IPJ SATU MARE, în vederea ridicării Cazier Judiciar. Motivul solicitării: AUTORITATI.'
+    );
+  });
+
+  it('trims and skips empty motiv', () => {
+    expect(buildInstitutie('cazier-auto', '  ')).toBe(
+      'să se prezinte la IPJ SATU MARE, în vederea ridicării Cazier Auto.'
+    );
   });
 
   it('returns the slug as-is when no mapping exists (graceful fallback)', () => {

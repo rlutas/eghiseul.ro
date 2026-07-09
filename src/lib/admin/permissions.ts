@@ -12,7 +12,8 @@ export type Permission =
   | 'users.manage'
   | 'settings.manage'
   | 'documents.generate'
-  | 'documents.view';
+  | 'documents.view'
+  | 'registry.manage';
 
 /**
  * Implied permissions: if a user has a permission on the left,
@@ -27,9 +28,12 @@ const IMPLIED_PERMISSIONS: Record<Permission, Permission[]> = {
   'orders.pdf_upload': ['orders.view'],
   'payments.verify': ['orders.view'],
   'users.manage': [],
-  'settings.manage': [],
+  // settings.manage implică registrul — cine administra setările înainte de
+  // separarea permisiunii de registru nu pierde acces.
+  'settings.manage': ['registry.manage'],
   'documents.generate': ['documents.view', 'orders.view'],
   'documents.view': ['orders.view'],
+  'registry.manage': [],
 };
 
 // ──────────────────────────────────────────────────────────────
@@ -45,6 +49,7 @@ export const ALL_PERMISSIONS: Permission[] = [
   'settings.manage',
   'documents.generate',
   'documents.view',
+  'registry.manage',
 ];
 
 // ──────────────────────────────────────────────────────────────
@@ -69,7 +74,9 @@ const ROLE_DEFAULTS: Record<string, Permission[]> = {
   'manager': ['orders.view', 'orders.manage', 'orders.pdf_upload', 'payments.verify', 'users.manage', 'settings.manage', 'documents.generate', 'documents.view'],
   'operator': ['orders.view', 'orders.manage', 'documents.generate', 'documents.view'],
   'contabil': ['orders.view', 'payments.verify', 'documents.view'],
-  'avocat': ['orders.view', 'documents.view'],
+  // Avocatul gestionează registrul de numere Barou (contracte + delegații)
+  // — își alocă manual numere pentru cazurile personale când are nevoie.
+  'avocat': ['orders.view', 'documents.view', 'registry.manage'],
   // Collaborator (e.g. authorized topograph): scoped to assigned services only.
   // Service scoping is enforced separately via collaborator_service_assignments.
   // NOTE: collaborator is intentionally NOT in ADMIN_ROLES — no /admin access.

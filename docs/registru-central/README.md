@@ -183,6 +183,18 @@ eghiseul, generare împuternicire cu alt service_type).
   refolosește), pe anulate: ↩️ Restaurare, ❌ Ștergere definitivă (doar pentru
   intrări greșite/test).
 
+## Acces
+
+- Pagina `/admin/registru` + toate API-urile de registru cer permisiunea
+  **`registry.manage`** (2026-07-09; înainte: settings.manage).
+- O au implicit: **avocat** (rolul doamnei avocat — își alocă manual numere de
+  contract/delegație când are nevoie, vede jurnalul, exportă CSV-ul pentru
+  Barou), **manager** și **super_admin**; `settings.manage` o implică
+  (nimeni nu a pierdut acces).
+- Contul avocatei: /admin/users → Invită utilizator → rol **avocat** (vede
+  DOAR: comenzile read-only, documentele și Registrul — fără setări, useri
+  sau plăți).
+
 ## Operare (echipă + avocat)
 
 - **Vezi registrul**: eghiseul.ro → `/admin/registru` (jurnal cu toate

@@ -34,9 +34,10 @@ const IMPLIED_PERMISSIONS: Record<string, string[]> = {
   'orders.pdf_upload': ['orders.view'],
   'payments.verify': ['orders.view'],
   'users.manage': [],
-  'settings.manage': [],
+  'settings.manage': ['registry.manage'],
   'documents.generate': ['documents.view', 'orders.view'],
   'documents.view': ['orders.view'],
+  'registry.manage': [],
 };
 
 /**
@@ -46,7 +47,7 @@ const ROLE_DEFAULTS: Record<string, string[]> = {
   'manager': ['orders.view', 'orders.manage', 'orders.pdf_upload', 'payments.verify', 'users.manage', 'settings.manage', 'documents.generate', 'documents.view'],
   'operator': ['orders.view', 'orders.manage', 'documents.generate', 'documents.view'],
   'contabil': ['orders.view', 'payments.verify', 'documents.view'],
-  'avocat': ['orders.view', 'documents.view'],
+  'avocat': ['orders.view', 'documents.view', 'registry.manage'],
   'collaborator': ['orders.view', 'orders.pdf_upload'],
 };
 

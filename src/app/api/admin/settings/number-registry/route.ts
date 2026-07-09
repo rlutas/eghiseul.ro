@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
     }
 
     try {
-      await requirePermission(user.id, 'settings.manage');
+      await requirePermission(user.id, 'registry.manage');
     } catch (error) {
       if (error instanceof Response) return error;
       throw error;
@@ -264,7 +264,7 @@ export async function POST(request: NextRequest) {
     }
 
     try {
-      await requirePermission(user.id, 'settings.manage');
+      await requirePermission(user.id, 'registry.manage');
     } catch (error) {
       if (error instanceof Response) return error;
       throw error;

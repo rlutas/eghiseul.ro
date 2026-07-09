@@ -85,11 +85,22 @@ describe('getUserPermissions — role defaults', () => {
     expect(result.permissions).not.toContain('users.manage');
   });
 
-  it('avocat gets read-only on orders + documents', async () => {
+  it('avocat gets read-only on orders + documents AND registry management', async () => {
     mockProfile('avocat', null);
     const result = await getUserPermissions('user-1');
 
-    expect(result.permissions.sort()).toEqual(['orders.view', 'documents.view'].sort());
+    // registry.manage (2026-07-09): avocatul își gestionează registrul de
+    // numere Barou (alocă manual contracte/delegații pentru cazuri personale).
+    expect(result.permissions.sort()).toEqual(
+      ['orders.view', 'documents.view', 'registry.manage'].sort()
+    );
+  });
+
+  it('settings.manage implies registry.manage (nobody loses registry access)', async () => {
+    mockProfile('employee', { 'settings.manage': true });
+    const result = await getUserPermissions('user-1');
+
+    expect(result.permissions).toContain('registry.manage');
   });
 
   it('manager + extra JSONB permissions merges them', async () => {

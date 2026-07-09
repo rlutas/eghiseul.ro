@@ -105,3 +105,15 @@ e gata" adminul vede acum dacă clientul chiar l-a deschis:
 - **Bonus fix**: CHECK-ul `order_history.event_type` respingea SILENȚIOS
   `document_generation_failed` (vechi) și `barou_allocation_failed` (de azi) —
   evenimentele astea nu apăreau niciodată în istoric. Constraint extins.
+
+## Acces avocat la registru (permisiunea `registry.manage`)
+
+- Permisiune nouă `registry.manage` — separă registrul de `settings.manage`
+  (care o implică, deci nimeni nu pierde acces). Rolul **avocat** o primește
+  implicit: doamna avocat intră în /admin, vede DOAR comenzile (read-only),
+  documentele și **Registrul** (alocă manual contract+delegație pentru
+  cazurile ei, editează, anulează, exportă CSV pentru Barou) — fără setări,
+  utilizatori sau plăți.
+- Cont: /admin/users → Invită → rol „avocat".
+- Fix teste CI: buildInstitutie testele verificau formatul VECHI al textului
+  împuternicirii — actualizate la fraza completă cu motiv (11 → verzi).

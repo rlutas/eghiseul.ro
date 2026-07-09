@@ -46,7 +46,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/admin/orders', label: 'Comenzi', icon: ClipboardList, permission: 'orders.view' },
   { href: '/admin/orders?status=abandoned', label: 'Abandonuri', icon: UserX, permission: 'orders.view' },
-  { href: '/admin/registru', label: 'Registru', icon: BookOpen, permission: 'settings.manage' },
+  { href: '/admin/registru', label: 'Registru', icon: BookOpen, permission: 'registry.manage' },
   { href: '/admin/onrc', label: 'ONRC', icon: Landmark, permission: 'orders.view' },
   { href: '/admin/ancpi', label: 'ANCPI', icon: Landmark, permission: 'orders.view' },
   { href: '/admin/identifica-imobil', label: 'Identifică imobil', icon: MapPin, permission: 'orders.view' },

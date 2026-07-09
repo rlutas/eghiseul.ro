@@ -18,7 +18,7 @@
 | `manager` | Manager cu acces extins (aproape toate permisiunile) | DA |
 | `operator` | Operator comenzi si documente | DA |
 | `contabil` | Contabil (vizualizare comenzi + verificare plati) | DA |
-| `avocat` | Avocat (vizualizare comenzi + documente) | DA |
+| `avocat` | Avocat (vizualizare comenzi + documente, gestionare registru numere Barou) | DA |
 | `customer` | Client obisnuit (fara acces admin) | N/A |
 | `partner` | Partener API (existent, viitor) | N/A |
 
@@ -44,7 +44,7 @@
 | `manager` | `orders.view`, `orders.manage`, `payments.verify`, `users.manage`, `settings.manage`, `documents.generate`, `documents.view` |
 | `operator` | `orders.view`, `orders.manage`, `documents.generate`, `documents.view` |
 | `contabil` | `orders.view`, `payments.verify`, `documents.view` |
-| `avocat` | `orders.view`, `documents.view` |
+| `avocat` | `orders.view`, `documents.view`, `registry.manage` |
 
 **Reguli:**
 - `super_admin` are TOATE permisiunile implicit (nu se verifica JSONB)
