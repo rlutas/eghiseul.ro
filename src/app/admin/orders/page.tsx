@@ -83,6 +83,7 @@ interface OrderRow {
   courier_service: string | null;
   delivery_tracking_number: string | null;
   delivery_method: string | null;
+  selected_options?: Array<{ code?: string | null; option_name?: string | null }> | null;
   customer_data: {
     contact?: {
       email?: string;
@@ -524,7 +525,22 @@ export default function AdminOrdersPage() {
                   </TableCell>
                   <TableCell>
                     <div className="flex flex-col">
-                      <span className="text-sm font-medium">{getCustomerName(order)}</span>
+                      <span className="text-sm font-medium">
+                        {getCustomerName(order)}
+                        {/* Fulger PORTOCALIU doar la comenzile cu procesare urgentă
+                            (paritate cu admin-ul cazierjudiciaronline). */}
+                        {Array.isArray(order.selected_options) &&
+                          order.selected_options.some(
+                            (o) => o?.code === 'urgenta' || /urgent/i.test(String(o?.option_name || ''))
+                          ) && (
+                            <span
+                              className="ml-1 text-[11px] font-semibold text-orange-600 align-middle"
+                              title="Procesare urgentă"
+                            >
+                              ⚡
+                            </span>
+                          )}
+                      </span>
                       <span className="text-xs text-muted-foreground">
                         {order.customer_data?.contact?.email || '-'}
                       </span>

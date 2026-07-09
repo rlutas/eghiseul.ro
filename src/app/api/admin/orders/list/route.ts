@@ -70,6 +70,7 @@ export async function GET(request: NextRequest) {
         delivery_method,
         is_test,
         customer_data,
+        selected_options,
         created_at,
         estimated_completion_date,
         invoice_number,

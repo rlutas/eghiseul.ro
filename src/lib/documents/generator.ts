@@ -315,24 +315,34 @@ export function buildDeliveryTerms(order: DocumentContext['order'], selectedOpti
   return parts.join('\n');
 }
 
+/** Autoritatea + documentul de ridicat, per serviciu — pentru textul
+ *  activităților de pe împuternicire. */
+const INSTITUTIE_MAP: Record<string, { authority: string; document: string }> = {
+  'cazier-judiciar': { authority: 'IPJ SATU MARE', document: 'Cazier Judiciar' },
+  'cazier-judiciar-persoana-fizica': { authority: 'IPJ SATU MARE', document: 'Cazier Judiciar' },
+  'cazier-judiciar-persoana-juridica': { authority: 'IPJ SATU MARE', document: 'Cazier Judiciar' },
+  'cazier-auto': { authority: 'IPJ SATU MARE', document: 'Cazier Auto' },
+  'cazier-fiscal': { authority: 'ANAF SATU MARE', document: 'Cazier Fiscal' },
+  'certificat-nastere': { authority: 'OFICIUL DE STARE CIVILĂ', document: 'Certificat de Naștere' },
+  'certificat-casatorie': { authority: 'OFICIUL DE STARE CIVILĂ', document: 'Certificat de Căsătorie' },
+  'certificat-celibat': { authority: 'OFICIUL DE STARE CIVILĂ', document: 'Certificat de Celibat' },
+  'certificat-integritate': { authority: 'IPJ SATU MARE', document: 'Certificat de Integritate Comportamentală' },
+  'extras-carte-funciara': { authority: 'OCPI SATU MARE', document: 'Extras de Carte Funciară' },
+  'certificat-constatator': { authority: 'ONRC SATU MARE', document: 'Certificat Constatator' },
+};
+
 /**
- * Map service slug to institution name for imputernicire avocatiala.
+ * Textul complet al activităților de pe împuternicire — placeholder
+ * {{INSTITUTIE}}. Format (identic cu template-ul cazierjudiciaronline):
+ *   „să se prezinte la IPJ SATU MARE, în vederea ridicării Cazier Judiciar.
+ *    Motivul solicitării: AUTORITATI."
+ * Înainte scria doar „IPJ SATU MARE - CAZIER AUTO", fără motiv.
  */
-export function buildInstitutie(serviceSlug?: string): string {
-  const map: Record<string, string> = {
-    'cazier-judiciar': 'IPJ SATU MARE - CAZIER JUDICIAR',
-    'cazier-judiciar-persoana-fizica': 'IPJ SATU MARE - CAZIER JUDICIAR',
-    'cazier-judiciar-persoana-juridica': 'IPJ SATU MARE - CAZIER JUDICIAR',
-    'cazier-auto': 'IPJ SATU MARE - CAZIER AUTO',
-    'cazier-fiscal': 'ANAF SATU MARE',
-    'certificat-nastere': 'OFICIUL DE STARE CIVILĂ',
-    'certificat-casatorie': 'OFICIUL DE STARE CIVILĂ',
-    'certificat-celibat': 'OFICIUL DE STARE CIVILĂ',
-    'certificat-integritate': 'IPJ SATU MARE - CAZIER JUDICIAR',
-    'extras-carte-funciara': 'OCPI SATU MARE',
-    'certificat-constatator': 'ONRC SATU MARE',
-  };
-  return map[serviceSlug || ''] || serviceSlug || '';
+export function buildInstitutie(serviceSlug?: string, motiv?: string): string {
+  const entry = INSTITUTIE_MAP[serviceSlug || ''];
+  if (!entry) return serviceSlug || '';
+  const motivPart = motiv?.trim() ? ` Motivul solicitării: ${motiv.trim()}.` : '';
+  return `să se prezinte la ${entry.authority}, în vederea ridicării ${entry.document}.${motivPart}`;
 }
 
 /**
@@ -623,7 +633,7 @@ function buildPlaceholderData(ctx: DocumentContext) {
     CLIENT: ctx.client.name,
     MOTIV: ctx.motiv_solicitare || 'Interes personal',
     DATAGENERAT: dateFormatted,
-    INSTITUTIE: buildInstitutie(ctx.order.service_slug),
+    INSTITUTIE: buildInstitutie(ctx.order.service_slug, ctx.motiv_solicitare),
 
     // Dates
     DATA: dateFormatted,

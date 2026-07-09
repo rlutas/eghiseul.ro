@@ -303,7 +303,7 @@ export async function autoGenerateOrderDocuments(
             }
           : null,
         document_numbers: documentNumbers,
-        motiv_solicitare: 'Interes personal',
+        motiv_solicitare: contact.purpose || 'Interes personal',
         client_ip: clientIp,
       };
 
