@@ -15,10 +15,16 @@
 | Contracte asistență juridică | 003551 – 006550 | 005771 | **005772** |
 | Împuterniciri avocațiale | 005051 – 008050 | 007254 | **SM007255** |
 
-Intervalele legacy migrate din eghiseul (4256-5256 / 5738-7738) sunt ARHIVATE —
-erau depășite de utilizarea manuală reală. Jurnalul istoric complet din Google
-Sheets urmează să fie importat cu `--sheet=` (audit; nu blochează emiterea —
-`next_number` e deja corect).
+**Jurnal**: importul complet din Google Sheets e FĂCUT (1982 contracte + 2203
+delegații 2026, în intervalele oficiale) — fiecare delegație legată de
+contractul ei (coloana H din sheet-ul de contracte; grupate prin
+`order_ref = SHEET-XXXXXX`) cu serviciul pe fiecare (Cazier Fiscal, Apostilă
+Haga la a 2-a delegație a contractelor cu apostilă etc.). Intrările test
+migrate din registrul local eghiseul + intervalele legacy = ȘTERSE.
+
+**Prima comandă reală prin registru: CJO-20260709-14944 (2026-07-09)** —
+contract 005774 + delegație SM007256, alocate automat la plată, legate corect,
+PDF regenerat cu numărul oficial. ✅ interconectarea confirmată end-to-end.
 
 ---
 
@@ -127,6 +133,38 @@ plăților, indiferent de site (decizie 2026-07-09).
 5. **Google Sheets = mort** după cutover.
 
 ---
+
+## Reguli pe documente (cine ce număr poartă)
+
+| Document | Număr | Format afișat |
+|---|---|---|
+| Contract Prestări Servicii (EDIGITALIZARE) — eghiseul + CJO | numărul COMENZII, NICIODATĂ numărul Barou | `E-260709-XXXXX` / `CJO-...` |
+| Contract de Asistență Juridică (avocat) — toate platformele | nr. contract Barou | `NR. SM 005774` (padded 6) |
+| Împuternicire / Delegație — toate platformele | nr. delegație Barou, UNUL PER DOCUMENT OFICIAL | `SM007256` |
+
+⚠️ Fix 2026-07-09 (CJO `contract-pdf.ts`): titlul Prestări purta greșit
+numărul Barou — mutat pe pagina „Contract de Asistenta". ecazier (variant
+cabinet) era corect — acolo contractul ESTE al avocatului.
+
+**Delegații multiple per comandă** — fiecare document oficial = delegația lui:
+serviciu principal + certificat integritate add-on + câte una PER Apostilă
+Haga. În admin eghiseul, împuternicirile se generează per serviciu (un rând
+per delegație, fișiere separate). Serviciu extra neprevăzut după plasare →
+`/admin/registru` → Alocare Manuală cu platformă + nr. comandă (sau, pe
+eghiseul, generare împuternicire cu alt service_type).
+
+## Jurnalul din /admin/registru — funcții
+
+- Grupare pe comandă: contract + toate delegațiile lui pe UN rând (API-ul
+  aduce automat frații grupului chiar dacă paginarea i-ar despărți).
+- Numere padded ca pe documente (005774, SM007256); Sursa arată SITE-ul.
+- Alocare manuală: implicit „Contract + Delegatie (legate)"; „Doar Delegatie"
+  cu nr. contract existent opțional; opțional legată de o comandă (platformă +
+  nr. comandă). După alocare, jurnalul sare pe pagina 1 (numărul nou primul).
+- Acțiuni per număr: ✏️ Editare (număr/serie/client/serviciu/descriere/sumă/
+  dată — duplicatele respinse de UNIQUE), 🗑 Anulare (void, numărul NU se
+  refolosește), pe anulate: ↩️ Restaurare, ❌ Ștergere definitivă (doar pentru
+  intrări greșite/test).
 
 ## Operare (echipă + avocat)
 

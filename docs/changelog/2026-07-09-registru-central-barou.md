@@ -36,9 +36,15 @@
 - Env `REGISTRY_SUPABASE_URL/SERVICE_KEY` pe Vercel (prod+preview, ambele
   proiecte).
 
-## Rămas deschis
+## Follow-up (aceeași zi)
 
-1. **Import CSV Google Sheets** — jurnalul istoric manual complet, pentru
-   audit (NU blochează emiterea; next_number e deja corect).
-2. **Verificare prime comenzi reale plătite** — una per platformă: rând nou în
-   jurnalul central cu platforma corectă + numerele pe comandă/documente.
+1. ✅ Jurnalul complet 2026 importat din CSV-uri Sheets (1982 contracte + 2203
+   delegații, legate contract↔delegație prin coloana H; 007253 recuperată).
+2. ✅ Prima comandă reală verificată end-to-end: CJO-20260709-14944 → contract
+   005774 + delegație SM007256, alocate automat la plată.
+3. ✅ Fix CJO `contract-pdf.ts`: numărul Barou mutat de pe titlul Prestări pe
+   „Contract de Asistenta" (PDF-ul comenzii reale regenerat + verificat).
+4. ✅ Jurnal: grupuri complete cross-pagină, numere padded (005774/SM007256),
+   Sursa = site-ul, editare/anulare/restaurare/ștergere per număr, alocare
+   manuală combo Contract+Delegatie.
+5. Rămas: verificare primă comandă reală pe eghiseul și ecazier (CJO ✅).
