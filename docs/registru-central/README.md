@@ -199,6 +199,8 @@ eghiseul, generare împuternicire cu alt service_type).
 
 ## Operare (echipă + avocat)
 
+> Ghid prietenos pentru doamna avocat (gata de trimis): [ghid-avocat.md](ghid-avocat.md)
+
 - **Vezi registrul**: eghiseul.ro → `/admin/registru` (jurnal cu toate
   platformele, filtre, export CSV pentru raportarea la Barou).
 - **Adaugi interval nou** (numere noi de la Barou): `/admin/registru` →
