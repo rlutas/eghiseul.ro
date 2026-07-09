@@ -15,6 +15,12 @@
   E-260708-VC4GH) nu pot fi backfill-uite — echipa vede semnalul și cere
   motivul de la client.
 
+## Homepage: hero — servicii vizibile pe mobil + spațiu sub header
+
+- Grila „Servicii Disponibile": **1 coloană pe mobil** (numele + badge-urile se
+  trunchiau în 2 coloane — „Cazi… POPULAR"), 2 coloane de la `sm` în sus.
+- Mai mult spațiu între header și H1: `pt-20/24/40` → `pt-24/28/44`.
+
 ## Admin: layout comenzi stare civilă + format date
 
 - „Date stare civilă" mutat **lângă** „Informații Client" (coloana dreaptă,

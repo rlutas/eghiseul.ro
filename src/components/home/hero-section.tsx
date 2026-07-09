@@ -18,7 +18,7 @@ export function HeroSection() {
         />
       </div>
 
-      <div className="relative container mx-auto px-4 max-w-[1280px] pt-20 pb-12 sm:pt-24 sm:pb-16 lg:pt-40 lg:pb-24">
+      <div className="relative container mx-auto px-4 max-w-[1280px] pt-24 pb-12 sm:pt-28 sm:pb-16 lg:pt-44 lg:pb-24">
         <div className="flex flex-wrap items-center justify-center gap-8 sm:gap-10 lg:gap-12 xl:gap-16">
           {/* Left Column - Text */}
           <div className="flex-1 min-w-[280px] max-w-[680px] text-center lg:text-left px-1 sm:px-0">
@@ -100,8 +100,9 @@ export function HeroSection() {
               Servicii Disponibile
             </h2>
 
-            {/* Services Grid */}
-            <div className="grid grid-cols-2 gap-2.5 sm:gap-3 mb-4 sm:mb-5">
+            {/* Services Grid — 1 col on mobile so full names + badges stay
+                visible (2 cols truncated them); 2 cols from sm up. */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 mb-4 sm:mb-5">
               {services.map((service) => (
                 <Link
                   key={service.slug}
