@@ -24,7 +24,7 @@ export function WhatsAppFloat() {
       rel="nofollow noopener"
       aria-label="Scrie-ne pe WhatsApp"
       className={`group fixed right-5 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-[0_8px_24px_rgba(37,211,102,0.45)] transition-transform duration-200 hover:scale-110 hover:bg-[#20bd5a] ${
-        isOrderFlow ? 'bottom-[86px] lg:bottom-5' : 'bottom-5'
+        isOrderFlow ? 'bottom-[76px] lg:bottom-5' : 'bottom-5'
       }`}
     >
       {/* puls subtil */}

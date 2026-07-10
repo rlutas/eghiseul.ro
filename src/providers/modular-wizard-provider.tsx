@@ -969,6 +969,10 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
 
   // Restore from localStorage on mount
   const cacheRestoredRef = useRef(false);
+  // True when a cross-service contact handoff was applied this mount — the
+  // URL-step-sync effect runs in the same commit and would otherwise still see
+  // the stale (empty) contact and bounce the client back to step 1.
+  const handoffAppliedRef = useRef(false);
 
   useEffect(() => {
     if (cacheRestoredRef.current || !state.serviceSlug) return;
@@ -976,6 +980,37 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
 
     // Try to find existing draft in localStorage
     const restoreDraft = async () => {
+      // ── Cross-service contact handoff ─────────────────────────────────
+      // Set by in-wizard service jumps (e.g. extras CF „Nu știu" → identificare
+      // imobil) so the client doesn't retype email/phone. sessionStorage, not
+      // URL params — no PII in URLs. Consumed once, max 10 min old.
+      try {
+        const raw = sessionStorage.getItem('wizard_contact_handoff');
+        if (raw) {
+          sessionStorage.removeItem('wizard_contact_handoff');
+          const handoff = JSON.parse(raw) as {
+            email?: string; phone?: string; preferredContact?: string; ts?: number;
+          };
+          if (handoff.ts && Date.now() - handoff.ts < 10 * 60_000 && handoff.email) {
+            handoffAppliedRef.current = true;
+            dispatch({
+              type: 'UPDATE_CONTACT',
+              payload: {
+                email: handoff.email,
+                phone: handoff.phone || '',
+                ...(handoff.preferredContact
+                  ? { preferredContact: handoff.preferredContact as 'email' | 'phone' | 'whatsapp' }
+                  : {}),
+              },
+            });
+            dispatch({ type: 'MARK_INITIALIZED' });
+            return; // fresh order on the new service, contact carried over
+          }
+        }
+      } catch {
+        // sessionStorage unavailable (private mode edge cases) — start blank
+      }
+
       // ── Server resume via ?order= (works cross-device, unlike localStorage) ──
       // When the URL carries an order code we fetch that draft from the server
       // and hydrate from it. Guest drafts require the matching ?email= (anti-
@@ -1135,8 +1170,10 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
     if (stepParam) {
       const stepNumber = parseInt(stepParam, 10);
 
-      // If trying to go to step > 1, verify we have valid contact data
-      if (stepNumber > 1 && !hasValidContactData(state.contact)) {
+      // If trying to go to step > 1, verify we have valid contact data.
+      // An applied cross-service handoff also counts — the restore effect ran
+      // first in this same commit, so state.contact is still stale here.
+      if (stepNumber > 1 && !hasValidContactData(state.contact) && !handoffAppliedRef.current) {
         // No valid contact data - redirect to step 1
         console.log('No valid contact data, redirecting to step 1');
         updateURL(1);

@@ -7,7 +7,7 @@
  */
 
 import { useCallback, useState, useEffect } from 'react';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useModularWizard } from '@/providers/modular-wizard-provider';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -71,6 +71,22 @@ function CfHint({ check }: { check: ReturnType<typeof checkCf> }) {
 
 export default function PropertyDataStep({ config, onValidChange }: PropertyDataStepProps) {
   const { state, updateProperty, serviceOptions, updateOptions } = useModularWizard();
+  const router = useRouter();
+
+  // „Nu știu" → jump to the right identification service, carrying the contact
+  // data over (sessionStorage handoff, consumed by the wizard provider — no PII
+  // in the URL) and landing directly on its step 2 (Date Imobil).
+  const jumpToService = useCallback((slug: string) => {
+    try {
+      sessionStorage.setItem('wizard_contact_handoff', JSON.stringify({
+        email: state.contact.email,
+        phone: state.contact.phone,
+        preferredContact: state.contact.preferredContact,
+        ts: Date.now(),
+      }));
+    } catch { /* private mode — client just retypes contact */ }
+    router.push(`/comanda/${slug}?step=2`);
+  }, [router, state.contact.email, state.contact.phone, state.contact.preferredContact]);
   const property = state.property;
 
   // Identificare service → default to the address tab (client doesn't know the number).
@@ -242,12 +258,14 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
         </CardHeader>
         <CardContent className="px-4 sm:px-6 space-y-4">
           {/* Search Method Selection */}
-          <div className="flex gap-2 p-1 bg-muted rounded-lg">
+          {/* min-w-0 + text-xs on mobile: the three nowrap labels overflowed
+              390px and pushed the whole form horizontally off-screen */}
+          <div className="flex gap-1 sm:gap-2 p-1 bg-muted rounded-lg">
             <Button
               type="button"
               variant={searchMethod === 'carteFunciara' ? 'default' : 'ghost'}
               size="sm"
-              className="flex-1"
+              className="flex-1 min-w-0 px-1 sm:px-3 text-xs sm:text-sm"
               onClick={() => setSearchMethod('carteFunciara')}
             >
               Nr. Carte Funciară
@@ -256,7 +274,7 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
               type="button"
               variant={searchMethod === 'cadastral' ? 'default' : 'ghost'}
               size="sm"
-              className="flex-1"
+              className="flex-1 min-w-0 px-1 sm:px-3 text-xs sm:text-sm"
               onClick={() => setSearchMethod('cadastral')}
             >
               Nr. Cadastral
@@ -265,7 +283,7 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
               type="button"
               variant={searchMethod === 'address' ? 'default' : 'ghost'}
               size="sm"
-              className="flex-1"
+              className="flex-1 min-w-0 px-1 sm:px-3 text-xs sm:text-sm"
               onClick={() => setSearchMethod('address')}
             >
               {config.identificationService.enabled ? 'Adresă' : 'Nu știu'}
@@ -399,20 +417,22 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
                 </AlertDescription>
               </Alert>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <Link
-                  href="/comanda/identificare-imobil"
-                  className="flex flex-col items-center gap-1 rounded-xl border-2 border-neutral-200 hover:border-primary-400 p-4 text-center transition-colors"
+                <button
+                  type="button"
+                  onClick={() => jumpToService('identificare-imobil')}
+                  className="flex min-w-0 flex-col items-center gap-1 rounded-xl border-2 border-neutral-200 hover:border-primary-400 p-3 text-center transition-colors cursor-pointer"
                 >
-                  <span className="font-semibold text-secondary-900 text-sm">Știu adresa imobilului</span>
-                  <span className="text-xs text-neutral-500">Identificare imobil după adresă</span>
-                </Link>
-                <Link
-                  href="/comanda/identificare-imobile-proprietar"
-                  className="flex flex-col items-center gap-1 rounded-xl border-2 border-neutral-200 hover:border-primary-400 p-4 text-center transition-colors"
+                  <span className="font-semibold text-secondary-900 text-sm break-words">Știu adresa imobilului</span>
+                  <span className="text-xs text-neutral-500 break-words">Identificare imobil după adresă</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => jumpToService('identificare-imobile-proprietar')}
+                  className="flex min-w-0 flex-col items-center gap-1 rounded-xl border-2 border-neutral-200 hover:border-primary-400 p-3 text-center transition-colors cursor-pointer"
                 >
-                  <span className="font-semibold text-secondary-900 text-sm">Știu proprietarul</span>
-                  <span className="text-xs text-neutral-500">Identificare imobile după proprietar</span>
-                </Link>
+                  <span className="font-semibold text-secondary-900 text-sm break-words">Știu proprietarul</span>
+                  <span className="text-xs text-neutral-500 break-words">Identificare imobile după proprietar</span>
+                </button>
               </div>
             </div>
           )}
