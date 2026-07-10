@@ -259,7 +259,9 @@ export async function getCollaboratorServices(userId: string): Promise<string[]>
 }
 
 /**
- * Require the user to be a collaborator assigned to the given order's service.
+ * Require the user to be a collaborator allowed to handle the given order:
+ * either the order's SERVICE is assigned to them (083), or the ORDER itself
+ * was sent to them from admin (orders.assigned_collaborator_id, 108).
  * Throws a 403 Response otherwise. Use at the entry of every /api/collaborator route.
  *
  * Returns the order's service_id on success (handy for callers).
@@ -280,7 +282,7 @@ export async function requireCollaboratorForOrder(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data: order } = await (supabase as any)
     .from('orders')
-    .select('service_id')
+    .select('service_id, assigned_collaborator_id')
     .eq('id', orderId)
     .single();
 
@@ -290,6 +292,10 @@ export async function requireCollaboratorForOrder(
       JSON.stringify({ error: 'Order not found' }),
       { status: 404, headers: { 'Content-Type': 'application/json' } }
     );
+  }
+
+  if (order?.assigned_collaborator_id === userId) {
+    return serviceId; // sent to this collaborator explicitly from admin
   }
 
   const assigned = await getCollaboratorServices(userId);

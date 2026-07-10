@@ -40,6 +40,22 @@
   (scăpate de migrația 087 — decontul arăta 0 RON); `extras-carte-funciara` rămâne 0
   intenționat (worker ANCPI, fără topograf).
 
+## Asignare per-comandă (identificările rămân la echipa internă)
+
+- Identificare-imobil + identificare-imobile-proprietar **scoase din alocările pe serviciu**
+  ale topografului (14 servicii rămase) — echipa internă le lucrează implicit.
+- **Migrația 108**: `orders.assigned_collaborator_id` + RLS extins — colaboratorul vede o
+  comandă dacă serviciul e alocat LUI **sau** comanda i-a fost trimisă explicit.
+- **Admin**: în „Procesare comandă" (`/admin/orders/[id]`) — select „Colaborator (topograf)"
+  + Trimite/Retrage (`POST /api/admin/orders/[id]/assign-collaborator`, permisiune
+  `orders.manage`); colaboratorul primește email cu link la comandă.
+- `requireCollaboratorForOrder` + lista + decontul acceptă ambele căi de scop.
+
+## Serviciile mele
+
+- Pagină nouă `/colaborator/servicii` (+ nav): serviciu, preț client, onorariul lui
+  (15 RON — linia „Onorariu Topograf" de pe factură). API: `GET /api/collaborator/services`.
+
 ## Verificat local (mobil, cont real)
 
 Login → listă comenzi fără date client → detaliu doar cu datele de lucrare → decont

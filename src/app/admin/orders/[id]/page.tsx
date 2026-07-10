@@ -35,6 +35,7 @@ import { QuickStatusSelect } from '@/components/admin/update-status-card';
 import {
   ArrowLeft,
   User,
+  Users,
   Phone,
   Mail,
   Building2,
@@ -131,6 +132,7 @@ interface OrderDetail {
   kyc_documents: AnyObj | null;
   documents: AnyObj | null;
   admin_notes: string | null;
+  assigned_collaborator_id?: string | null;
   created_at: string | null;
   updated_at: string | null;
   submitted_at: string | null;
@@ -3176,6 +3178,86 @@ const PROCESSING_ACTION_BUTTONS: Record<string, {
   },
 };
 
+/** Trimite comanda la un colaborator (topograf) sau o retrage. */
+function CollaboratorAssign({ order, onChanged }: { order: OrderDetail; onChanged: () => void }) {
+  const [collabs, setCollabs] = useState<{ id: string; name: string; email: string }[]>([]);
+  const [selected, setSelected] = useState<string>(order.assigned_collaborator_id || '');
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch('/api/admin/collaborators');
+        const json = await res.json();
+        if (json.success) {
+          setCollabs(
+            (json.data?.collaborators || json.data || []).filter(
+              (c: { id: string }) => c.id !== '__avocat__'
+            )
+          );
+        }
+      } catch { /* listă goală → secțiunea nu se afișează */ }
+    })();
+  }, []);
+
+  if (collabs.length === 0) return null;
+
+  const save = async (collaboratorId: string | null) => {
+    setSaving(true);
+    try {
+      const res = await fetch(`/api/admin/orders/${order.id}/assign-collaborator`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ collaboratorId }),
+      });
+      const json = await res.json();
+      if (!json.success) throw new Error(json.error || 'Eroare');
+      toast.success(collaboratorId ? 'Comanda a fost trimisă colaboratorului (primește email).' : 'Comanda a fost retrasă de la colaborator.');
+      setSelected(collaboratorId || '');
+      onChanged();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Eroare');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const current = order.assigned_collaborator_id || '';
+
+  return (
+    <div className="rounded-lg border border-slate-200 bg-white px-4 py-3">
+      <h4 className="text-sm font-semibold mb-2 flex items-center gap-2">
+        <Users className="h-4 w-4" />
+        Colaborator (topograf)
+      </h4>
+      <div className="flex flex-wrap items-center gap-2">
+        <select
+          value={selected}
+          onChange={(e) => setSelected(e.target.value)}
+          className="flex-1 min-w-[180px] rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm"
+        >
+          <option value="">— nealocat (echipa internă) —</option>
+          {collabs.map((c) => (
+            <option key={c.id} value={c.id}>{c.name || c.email}</option>
+          ))}
+        </select>
+        <button
+          onClick={() => save(selected || null)}
+          disabled={saving || selected === current}
+          className="rounded-lg bg-blue-600 px-3 py-2 text-sm font-medium text-white disabled:opacity-50"
+        >
+          {saving ? 'Se salvează...' : selected ? 'Trimite' : 'Retrage'}
+        </button>
+      </div>
+      {current && (
+        <p className="mt-1.5 text-xs text-slate-500">
+          Comanda e vizibilă în portalul colaboratorului; la încărcarea PDF-ului se livrează automat clientului.
+        </p>
+      )}
+    </div>
+  );
+}
+
 function ProcessingSection({
   order,
   documents,
@@ -3324,6 +3406,11 @@ function ProcessingSection({
             </div>
           </div>
         )}
+
+        {/* Send the order to a collaborator (topograph). Used when the internal
+            team can't fulfil an identificare order — the collaborator then sees
+            it in /colaborator and delivers it there. */}
+        <CollaboratorAssign order={order} onChanged={onStatusChange} />
 
         {/* Generated Documents - with generate + preview buttons */}
         <div>

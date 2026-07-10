@@ -22,19 +22,23 @@ export async function GET(request: NextRequest) {
     }
 
     const serviceIds = await getCollaboratorServices(user.id);
-    if (serviceIds.length === 0) {
-      return NextResponse.json({ success: true, data: [] });
-    }
 
     const { searchParams } = new URL(request.url);
     const status = searchParams.get('status');
+
+    // Scope: orders of the collaborator's services OR orders sent to them
+    // explicitly from admin (assigned_collaborator_id — e.g. identificare
+    // orders the internal team couldn't solve).
+    const scopeFilter = serviceIds.length > 0
+      ? `service_id.in.(${serviceIds.join(',')}),assigned_collaborator_id.eq.${user.id}`
+      : `assigned_collaborator_id.eq.${user.id}`;
 
     const admin = createAdminClient();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let query = (admin as any)
       .from('orders')
       .select('id, friendly_order_id, status, created_at, service_id, customer_data, services:service_id(name, slug)')
-      .in('service_id', serviceIds)
+      .or(scopeFilter)
       .neq('status', 'draft')
       .order('created_at', { ascending: false })
       .limit(200);

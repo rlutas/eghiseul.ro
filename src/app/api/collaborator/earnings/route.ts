@@ -28,12 +28,6 @@ export async function GET(request: NextRequest) {
     }
 
     const serviceIds = await getCollaboratorServices(user.id);
-    if (serviceIds.length === 0) {
-      return NextResponse.json({
-        success: true,
-        data: { month: null, orders: [], summary: { count: 0, totalFees: 0 } },
-      });
-    }
 
     const { searchParams } = new URL(request.url);
     const now = new Date();
@@ -46,12 +40,17 @@ export async function GET(request: NextRequest) {
     const start = new Date(Date.UTC(y!, m! - 1, 1)).toISOString();
     const end = new Date(Date.UTC(y!, m!, 1)).toISOString();
 
+    // Same scope as the orders list: own services OR orders assigned directly.
+    const scopeFilter = serviceIds.length > 0
+      ? `service_id.in.(${serviceIds.join(',')}),assigned_collaborator_id.eq.${user.id}`
+      : `assigned_collaborator_id.eq.${user.id}`;
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const admin = createAdminClient() as any;
     const { data, error } = await admin
       .from('orders')
       .select('id, friendly_order_id, status, paid_at, is_test, customer_data, services:service_id(name, lawyer_fee_ron)')
-      .in('service_id', serviceIds)
+      .or(scopeFilter)
       .eq('payment_status', 'paid')
       .neq('status', 'cancelled')
       .is('refunded_at', null)
