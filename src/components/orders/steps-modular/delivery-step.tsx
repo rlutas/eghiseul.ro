@@ -1275,7 +1275,7 @@ export function DeliveryStepModular({ onValidChange }: DeliveryStepProps) {
                       <FormLabel>Județ <span className="text-red-500">*</span></FormLabel>
                       <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
-                          <SelectTrigger>
+                          <SelectTrigger className="w-full min-w-0">
                             <SelectValue placeholder="Selectează județul" />
                           </SelectTrigger>
                         </FormControl>

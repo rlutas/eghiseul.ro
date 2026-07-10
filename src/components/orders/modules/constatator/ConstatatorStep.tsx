@@ -147,7 +147,7 @@ export default function ConstatatorStep({ config, onValidChange }: ConstatatorSt
             value={cs.reportType ?? ''}
             onValueChange={(v) => updateConstatator({ reportType: v, purpose: undefined, otherPurpose: undefined })}
           >
-            <SelectTrigger>
+            <SelectTrigger className="w-full min-w-0">
               <SelectValue placeholder="Alege tipul de raport" />
             </SelectTrigger>
             <SelectContent>
@@ -165,7 +165,7 @@ export default function ConstatatorStep({ config, onValidChange }: ConstatatorSt
       {!isIstoric && (
       <Field label="Document solicitat spre a servi la" required>
         <Select value={cs.purpose ?? ''} onValueChange={(v) => updateConstatator({ purpose: v })}>
-          <SelectTrigger>
+          <SelectTrigger className="w-full min-w-0">
             <SelectValue placeholder="Alege destinația" />
           </SelectTrigger>
           <SelectContent>

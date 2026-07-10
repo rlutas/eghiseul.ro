@@ -2074,7 +2074,7 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
               value={personalKyc.address.county}
               onValueChange={handleCountyChange}
             >
-              <SelectTrigger id="county" className="bg-white">
+              <SelectTrigger id="county" className="w-full min-w-0 bg-white">
                 <SelectValue placeholder="— Selectează județul —" />
               </SelectTrigger>
               <SelectContent className="max-h-[300px]">
@@ -2097,7 +2097,7 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
                   address: { ...personalKyc.address, city: value }
                 })}
               >
-                <SelectTrigger id="city" className="bg-white">
+                <SelectTrigger id="city" className="w-full min-w-0 bg-white">
                   <SelectValue placeholder="— Selectează localitatea —" />
                 </SelectTrigger>
                 <SelectContent className="max-h-[300px]">

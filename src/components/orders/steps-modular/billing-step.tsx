@@ -760,7 +760,7 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
                 value={billing?.county || ''}
                 onValueChange={handleCountyChange}
               >
-                <SelectTrigger id="county" className="bg-white">
+                <SelectTrigger id="county" className="w-full min-w-0 bg-white">
                   <SelectValue placeholder="Alege județul" />
                 </SelectTrigger>
                 <SelectContent>
@@ -782,7 +782,7 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
                 onValueChange={(v) => updateField('city', v)}
                 disabled={!billing?.county}
               >
-                <SelectTrigger id="city" className="bg-white">
+                <SelectTrigger id="city" className="w-full min-w-0 bg-white">
                   <SelectValue
                     placeholder={billing?.county ? 'Alege localitatea' : 'Alege întâi județul'}
                   />

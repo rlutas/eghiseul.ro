@@ -325,7 +325,7 @@ export default function VehicleDataStep({ config, onValidChange }: VehicleDataSt
                 value={vehicle.category || ''}
                 onValueChange={(value) => updateVehicle?.({ category: value })}
               >
-                <SelectTrigger id="category">
+                <SelectTrigger id="category" className="w-full min-w-0">
                   <SelectValue placeholder="Selectează categoria" />
                 </SelectTrigger>
                 <SelectContent>
@@ -348,7 +348,7 @@ export default function VehicleDataStep({ config, onValidChange }: VehicleDataSt
                   value={vehicle.period || ''}
                   onValueChange={(value) => updateVehicle?.({ period: value })}
                 >
-                  <SelectTrigger id="period">
+                  <SelectTrigger id="period" className="w-full min-w-0">
                     <SelectValue placeholder="Selectează perioada" />
                   </SelectTrigger>
                   <SelectContent>
