@@ -47,7 +47,15 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'Eroare la încărcarea comenzilor' }, { status: 500 });
     }
 
-    return NextResponse.json({ success: true, data: data ?? [] });
+    // Privacy: the collaborator gets ONLY the work data (property). Client
+    // contact/billing/personal never leave the server on this endpoint.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const sanitized = (data ?? []).map((o: any) => ({
+      ...o,
+      customer_data: { property: o.customer_data?.property ?? null },
+    }));
+
+    return NextResponse.json({ success: true, data: sanitized });
   } catch (error) {
     console.error('[collaborator] list orders error:', error);
     return NextResponse.json({ success: false, error: 'Eroare internă' }, { status: 500 });

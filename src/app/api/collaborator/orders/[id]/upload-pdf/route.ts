@@ -4,12 +4,19 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { requireCollaboratorForOrder, checkPermission } from '@/lib/admin/permissions';
 import { uploadFile, generateFinalDocumentKey } from '@/lib/aws/s3';
 import { compressPdf } from '@/lib/documents/pdf-compress';
+import { deliverCollaboratorResult } from '@/lib/collaborator/deliver';
 
 /**
  * Collaborator (topograph) uploads the scanned result PDF for one of their
  * orders. The PDF is compressed (CloudConvert, with graceful fallback to the
- * original) before going to S3 to keep storage costs down. The document is
- * attached as NOT-yet-visible to the client; releasing happens in mark-ready.
+ * original) before going to S3 to keep storage costs down.
+ *
+ * Upload DELIVERS: after attaching, deliverCollaboratorResult runs immediately
+ * (docs → visible_to_client, order → document_ready, idempotent client email).
+ * Product decision 2026-07-10: one-step flow — the separate "Marchează gata"
+ * confirmation button was skipped by nobody but added friction. A second PDF
+ * uploaded later re-runs delivery: it becomes visible too, and the 24h email
+ * idempotency key prevents a duplicate email.
  *
  * multipart/form-data: file=<pdf>, documentNumber=<optional registration nr>.
  */
@@ -80,9 +87,21 @@ export async function POST(
       return NextResponse.json({ success: false, error: 'Eroare la salvarea documentului' }, { status: 500 });
     }
 
+    // One-step flow: uploading IS delivering. If delivery fails the document
+    // is already attached — surface the error so the collaborator retries via
+    // support instead of silently leaving the client without status.
+    const delivery = await deliverCollaboratorResult(orderId);
+    if (!delivery.ok) {
+      console.error('[collaborator] auto-deliver after upload failed:', delivery.error);
+      return NextResponse.json({
+        success: true,
+        data: { s3_key: key, originalSize, finalSize, compressed, delivered: false },
+      });
+    }
+
     return NextResponse.json({
       success: true,
-      data: { s3_key: key, originalSize, finalSize, compressed },
+      data: { s3_key: key, originalSize, finalSize, compressed, delivered: true },
     });
   } catch (error) {
     console.error('[collaborator] upload-pdf error:', error);

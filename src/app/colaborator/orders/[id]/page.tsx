@@ -45,7 +45,6 @@ export default function CollaboratorOrderDetail() {
   const [order, setOrder] = useState<OrderDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
-  const [releasing, setReleasing] = useState(false);
   const [note, setNote] = useState('');
   const [savingNote, setSavingNote] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -71,12 +70,12 @@ export default function CollaboratorOrderDetail() {
       const res = await fetch(`/api/collaborator/orders/${orderId}/upload-pdf`, { method: 'POST', body: fd });
       const json = await res.json();
       if (!json.success) throw new Error(json.error || 'Eroare la încărcare');
-      const { originalSize, finalSize, compressed } = json.data;
-      toast.success(
-        compressed
-          ? `Document încărcat (comprimat ${(originalSize / 1024 / 1024).toFixed(1)}MB → ${(finalSize / 1024 / 1024).toFixed(1)}MB)`
-          : 'Document încărcat'
-      );
+      const { delivered } = json.data;
+      if (delivered) {
+        toast.success('Document încărcat și trimis clientului — statusul comenzii s-a actualizat automat.');
+      } else {
+        toast.warning('Documentul s-a încărcat, dar trimiterea către client a eșuat. Reîncearcă sau anunță echipa.');
+      }
       await load();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : 'Eroare la încărcare');
@@ -106,25 +105,9 @@ export default function CollaboratorOrderDetail() {
     }
   };
 
-  const handleMarkReady = async () => {
-    setReleasing(true);
-    try {
-      const res = await fetch(`/api/collaborator/orders/${orderId}/mark-ready`, { method: 'POST' });
-      const json = await res.json();
-      if (!json.success) throw new Error(json.error || 'Eroare');
-      toast.success('Comanda a fost marcată gata și livrată clientului.');
-      await load();
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : 'Eroare');
-    } finally {
-      setReleasing(false);
-    }
-  };
-
   if (loading) return <p className="text-sm text-slate-500">Se încarcă...</p>;
   if (!order) return <p className="text-sm text-red-600">Comanda nu a fost găsită.</p>;
 
-  const contact = order.customer_data?.contact ?? {};
   const property = order.customer_data?.property ?? {};
   const hasDocs = order.documents.some((d) => d.metadata?.source === 'collaborator');
   const delivered = order.status === 'document_ready' || order.status === 'completed' || order.status === 'shipped' || order.status === 'delivered';
@@ -149,9 +132,6 @@ export default function CollaboratorOrderDetail() {
       <div className="mb-6 rounded-lg border border-slate-200 bg-white p-5">
         <h2 className="mb-3 text-sm font-semibold text-slate-900">Date pentru lucrare</h2>
         <dl className="grid grid-cols-2 gap-4">
-          <Field label="Client" value={[contact.firstName, contact.lastName].filter(Boolean).join(' ')} />
-          <Field label="Email" value={contact.email} />
-          <Field label="Telefon" value={contact.phone} />
           <Field label="Județ" value={property.county} />
           <Field label="Localitate" value={property.locality} />
           <Field label="Carte Funciară" value={property.carteFunciara} />
@@ -218,7 +198,7 @@ export default function CollaboratorOrderDetail() {
         </div>
       </div>
 
-      {/* Actions */}
+      {/* Actions — one step: upload = deliver (docs visible + status + email) */}
       <div className="flex flex-wrap items-center gap-3">
         <input
           ref={fileRef}
@@ -230,18 +210,19 @@ export default function CollaboratorOrderDetail() {
             if (f) handleUpload(f);
           }}
         />
-        <Button onClick={() => fileRef.current?.click()} disabled={uploading || delivered} variant="outline">
-          <Upload className="mr-2 h-4 w-4" />
-          {uploading ? 'Se încarcă...' : 'Încarcă PDF scanat'}
-        </Button>
-
-        <Button onClick={handleMarkReady} disabled={releasing || !hasDocs || delivered}>
-          <CheckCircle2 className="mr-2 h-4 w-4" />
-          {delivered ? 'Livrată' : releasing ? 'Se livrează...' : 'Marchează gata & livrează'}
+        <Button onClick={() => fileRef.current?.click()} disabled={uploading} className="h-11">
+          {delivered ? <CheckCircle2 className="mr-2 h-4 w-4" /> : <Upload className="mr-2 h-4 w-4" />}
+          {uploading
+            ? 'Se încarcă și se trimite...'
+            : delivered
+              ? 'Livrată — încarcă document suplimentar'
+              : 'Încarcă PDF și trimite clientului'}
         </Button>
       </div>
       {!hasDocs && !delivered && (
-        <p className="mt-2 text-xs text-slate-400">Încarcă documentul înainte de a marca comanda gata.</p>
+        <p className="mt-2 text-xs text-slate-400">
+          La încărcare, documentul se trimite automat clientului și statusul comenzii se actualizează.
+        </p>
       )}
     </div>
   );

@@ -42,14 +42,25 @@ export async function GET(
 
     const deliverable = order.services?.processing_config?.deliverable || null;
 
+    // Only the collaborator's own uploads — the rest of the order's documents
+    // (contract, cerere) carry client personal data and aren't his work.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: documents } = await (admin as any)
       .from('order_documents')
       .select('id, type, file_name, file_size, mime_type, visible_to_client, metadata, created_at')
       .eq('order_id', orderId)
+      .eq('metadata->>source', 'collaborator')
       .order('created_at', { ascending: false });
 
-    return NextResponse.json({ success: true, data: { ...order, deliverable, documents: documents ?? [] } });
+    // Privacy: only the work data (property) reaches the collaborator —
+    // contact/billing/personal client data stays server-side. ownerName/address
+    // inside property ARE the object of the work on identificare services.
+    const sanitizedOrder = {
+      ...order,
+      customer_data: { property: order.customer_data?.property ?? null },
+    };
+
+    return NextResponse.json({ success: true, data: { ...sanitizedOrder, deliverable, documents: documents ?? [] } });
   } catch (error) {
     console.error('[collaborator] order detail error:', error);
     return NextResponse.json({ success: false, error: 'Eroare internă' }, { status: 500 });

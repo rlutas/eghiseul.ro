@@ -51,20 +51,26 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ success: true, data: { orders: [], summary: { count: 0, revenue: 0, fees: 0 } } });
     }
 
+    // Settlement rule (agreed 2026-07-10): a fee is owed per PAID order,
+    // assigned to the month of paid_at, excluding cancelled/refunded orders.
+    // (Previously counted ALL non-draft orders by created_at, which inflated
+    // the totals with unpaid/abandoned/cancelled orders.)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const admin = createAdminClient() as any;
     let query = admin
       .from('orders')
       .select('id, friendly_order_id, status, total_price, customer_data, created_at, paid_at, is_test, services:service_id(name, slug, lawyer_fee_ron)')
       .in('service_id', serviceIds)
-      .neq('status', 'draft')
-      .order('created_at', { ascending: false });
+      .eq('payment_status', 'paid')
+      .neq('status', 'cancelled')
+      .is('refunded_at', null)
+      .order('paid_at', { ascending: false });
 
     if (/^\d{4}-\d{2}$/.test(month)) {
       const [y, m] = month.split('-').map(Number);
       const start = new Date(Date.UTC(y, m - 1, 1)).toISOString();
       const end = new Date(Date.UTC(y, m, 1)).toISOString();
-      query = query.gte('created_at', start).lt('created_at', end);
+      query = query.gte('paid_at', start).lt('paid_at', end);
     }
 
     const { data, error } = await query;
@@ -88,13 +94,16 @@ export async function GET(request: NextRequest) {
         fee,
         isTest: !!o.is_test,
         createdAt: o.created_at,
+        paidAt: o.paid_at,
       };
     });
 
+    // Test orders stay visible in the list (flagged) but owe no fee.
+    const billable = orders.filter((o: { isTest: boolean }) => !o.isTest);
     const summary = {
-      count: orders.length,
-      revenue: Math.round(orders.reduce((s: number, o: { total: number }) => s + o.total, 0) * 100) / 100,
-      fees: Math.round(orders.reduce((s: number, o: { fee: number }) => s + o.fee, 0) * 100) / 100,
+      count: billable.length,
+      revenue: Math.round(billable.reduce((s: number, o: { total: number }) => s + o.total, 0) * 100) / 100,
+      fees: Math.round(billable.reduce((s: number, o: { fee: number }) => s + o.fee, 0) * 100) / 100,
     };
 
     if (format === 'tsv') {
@@ -104,7 +113,7 @@ export async function GET(request: NextRequest) {
         lines.push([
           tsvCell(o.friendlyOrderId), tsvCell(o.service), tsvCell(o.client), tsvCell(o.email),
           tsvCell(o.status), tsvCell(o.total.toFixed(2)), tsvCell(o.fee.toFixed(2)),
-          o.isTest ? 'da' : 'nu', tsvCell(new Date(o.createdAt).toLocaleDateString('ro-RO')),
+          o.isTest ? 'da' : 'nu', tsvCell(new Date(o.paidAt || o.createdAt).toLocaleDateString('ro-RO')),
         ].join('\t'));
       }
       lines.push('');

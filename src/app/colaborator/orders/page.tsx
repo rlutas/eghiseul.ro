@@ -10,14 +10,14 @@ interface CollabOrder {
   status: string;
   created_at: string;
   service_id: string;
-  customer_data: { contact?: { firstName?: string; lastName?: string; email?: string } } | null;
+  // API-ul returnează DOAR datele de lucrare (property) — fără date de client.
+  customer_data: { property?: { county?: string; locality?: string } | null } | null;
   services: { name: string; slug: string } | null;
 }
 
-function customerName(o: CollabOrder): string {
-  const c = o.customer_data?.contact;
-  const n = [c?.firstName, c?.lastName].filter(Boolean).join(' ');
-  return n || c?.email || '—';
+function propertyLocation(o: CollabOrder): string {
+  const p = o.customer_data?.property;
+  return [p?.locality, p?.county].filter(Boolean).join(', ') || '—';
 }
 
 export default function CollaboratorOrdersPage() {
@@ -61,7 +61,7 @@ export default function CollaboratorOrdersPage() {
               <tr>
                 <th className="px-4 py-3">Comandă</th>
                 <th className="px-4 py-3">Serviciu</th>
-                <th className="px-4 py-3">Client</th>
+                <th className="px-4 py-3">Localitate</th>
                 <th className="px-4 py-3">Status</th>
                 <th className="px-4 py-3">Dată</th>
               </tr>
@@ -75,7 +75,7 @@ export default function CollaboratorOrdersPage() {
                     </Link>
                   </td>
                   <td className="px-4 py-3 text-slate-700">{o.services?.name ?? '—'}</td>
-                  <td className="px-4 py-3 text-slate-700">{customerName(o)}</td>
+                  <td className="px-4 py-3 text-slate-700">{propertyLocation(o)}</td>
                   <td className="px-4 py-3">
                     <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-700">
                       {findStatusLabel(o.status)}
