@@ -19,6 +19,7 @@
 | `operator` | Operator comenzi si documente | DA |
 | `contabil` | Contabil (vizualizare comenzi + verificare plati) | DA |
 | `avocat` | Avocat (vizualizare comenzi + documente, gestionare registru numere Barou) | DA |
+| `collaborator` | Colaborator extern (topograf Mircea) — portal SEPARAT `/colaborator`, NU are acces `/admin`. Vede doar comenzile serviciilor alocate (`collaborator_service_assignments`) SAU comenzile trimise explicit din admin (`orders.assigned_collaborator_id`, migrația 108), FĂRĂ date personale client. Upload PDF = livrare automată. Decont lunar în portal. Cont creat prin `scripts/create-topograf-account.mjs` (nu prin invite — are nevoie de alocări de servicii); apare în `/admin/users` tab Angajați pentru vizibilitate. | DA |
 | `customer` | Client obisnuit (fara acces admin) | N/A |
 | `partner` | Partener API (existent, viitor) | N/A |
 

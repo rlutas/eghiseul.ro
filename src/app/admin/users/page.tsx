@@ -126,9 +126,12 @@ const ROLE_CONFIG: Record<string, { label: string; description: string }> = {
   operator: { label: 'Operator', description: 'Gestionare comenzi și documente' },
   contabil: { label: 'Contabil', description: 'Vizualizare comenzi și verificare plăți' },
   manager: { label: 'Manager', description: 'Acces complet (fără super admin)' },
+  collaborator: { label: 'Colaborator (topograf)', description: 'Portal /colaborator — comenzi cadastrale, upload documente, decont' },
 };
 
-const INVITE_ROLES = Object.keys(ROLE_CONFIG);
+// Collaborators are created via scripts/create-topograf-account.mjs (they need
+// service assignments the invite flow doesn't create) — visible here, not invitable.
+const INVITE_ROLES = Object.keys(ROLE_CONFIG).filter((r) => r !== 'collaborator');
 
 // ──────────────────────────────────────────────────────────────
 // Types

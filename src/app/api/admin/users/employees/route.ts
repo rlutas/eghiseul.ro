@@ -36,11 +36,12 @@ export async function GET() {
 
     const adminClient = createAdminClient();
 
-    // Fetch all profiles with employee or super_admin role
+    // Fetch all internal/team profiles (collaborator = topograf, visible for
+    // oversight; created via script, not via the invite flow).
     const { data: employees, error } = await adminClient
       .from('profiles')
       .select('id, email, first_name, last_name, role, permissions, created_at, updated_at')
-      .in('role', ['employee', 'super_admin', 'manager', 'operator', 'contabil', 'avocat'])
+      .in('role', ['employee', 'super_admin', 'manager', 'operator', 'contabil', 'avocat', 'collaborator'])
       .order('created_at', { ascending: false });
 
     if (error) {

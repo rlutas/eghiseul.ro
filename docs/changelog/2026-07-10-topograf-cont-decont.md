@@ -56,6 +56,12 @@
 - Pagină nouă `/colaborator/servicii` (+ nav): serviciu, preț client, onorariul lui
   (15 RON — linia „Onorariu Topograf" de pe factură). API: `GET /api/collaborator/services`.
 
+## Vizibil în /admin/users
+
+- Rolul `collaborator` apare acum în tab-ul Angajați (`/admin/users`) — API-ul de listare
+  include rolul, badge „Colaborator (topograf)". NU e invitabil de acolo (are nevoie de
+  alocări de servicii — se creează prin script). Profil: Mircea Dumitrean (topograf).
+
 ## Verificat local (mobil, cont real)
 
 Login → listă comenzi fără date client → detaliu doar cu datele de lucrare → decont
