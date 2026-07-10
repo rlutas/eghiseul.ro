@@ -61,7 +61,7 @@ export async function generateMetadata({
 // Loading component
 function WizardLoading() {
   return (
-    <div className="min-h-screen bg-neutral-50 pt-20">
+    <div className="min-h-screen bg-neutral-50 pt-4">
       <div className="container mx-auto px-4 py-8 max-w-[1200px]">
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="text-center">
@@ -105,7 +105,9 @@ export default async function OrderPage({ params }: OrderPageProps) {
     ) : undefined;
 
   return (
-    <main className="min-h-screen bg-neutral-50 pt-16">
+    // Header renders its own fixed-header spacer — no pt needed here (a
+    // duplicate pt-16 stacked ~64px of dead space above the form).
+    <main className="min-h-screen bg-neutral-50">
       <Suspense fallback={<WizardLoading />}>
         <ModularWizardProvider>
           <ModularOrderWizard

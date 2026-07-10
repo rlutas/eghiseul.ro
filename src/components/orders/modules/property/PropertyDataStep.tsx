@@ -170,8 +170,8 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
   return (
     <div className="space-y-6">
       {/* Property Location */}
-      <Card>
-        <CardHeader>
+      <Card className="py-4 gap-4 sm:py-6 sm:gap-6">
+        <CardHeader className="px-4 sm:px-6">
           <CardTitle className="flex items-center gap-2">
             <Home className="h-5 w-5" />
             Localizare Imobil
@@ -180,7 +180,7 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
             Introdu locația imobilului pentru care dorești extrasul CF
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="px-4 sm:px-6 space-y-4">
           <div className="grid grid-cols-2 gap-3 md:gap-4">
             {/* County */}
             <div className="space-y-2">
@@ -191,8 +191,10 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
                 value={property.county}
                 onValueChange={(value) => updateProperty?.({ county: value, locality: '' })}
               >
-                <SelectTrigger id="county">
-                  <SelectValue placeholder="Selectează județul" />
+                {/* w-full: the shadcn trigger defaults to w-fit + nowrap and the
+                    two dropdowns overlapped each other in the 2-col mobile grid */}
+                <SelectTrigger id="county" className="w-full min-w-0">
+                  <SelectValue placeholder="Selectează" />
                 </SelectTrigger>
                 <SelectContent>
                   {COUNTIES.map(county => (
@@ -214,8 +216,8 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
                 onValueChange={(value) => updateProperty?.({ locality: value })}
                 disabled={!property.county}
               >
-                <SelectTrigger id="locality">
-                  <SelectValue placeholder={property.county ? 'Selectează localitatea' : 'Alege întâi județul'} />
+                <SelectTrigger id="locality" className="w-full min-w-0">
+                  <SelectValue placeholder="Selectează" />
                 </SelectTrigger>
                 <SelectContent className="max-h-72">
                   {localities.map((loc) => (
@@ -231,14 +233,14 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
       </Card>
 
       {/* Property Identification */}
-      <Card>
-        <CardHeader>
+      <Card className="py-4 gap-4 sm:py-6 sm:gap-6">
+        <CardHeader className="px-4 sm:px-6">
           <CardTitle>Identificare Imobil</CardTitle>
           <CardDescription>
             Poți identifica imobilul prin număr cadastral, număr carte funciară sau adresă
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="px-4 sm:px-6 space-y-4">
           {/* Search Method Selection */}
           <div className="flex gap-2 p-1 bg-muted rounded-lg">
             <Button
@@ -266,7 +268,7 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
               className="flex-1"
               onClick={() => setSearchMethod('address')}
             >
-              Adresă
+              {config.identificationService.enabled ? 'Adresă' : 'Nu știu'}
             </Button>
           </div>
 
@@ -383,19 +385,36 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
             </div>
           )}
 
-          {/* Address tab on a non-identification service → cross-sell the
-              "Identificare imobil după adresă" service (cfunciara-style). */}
+          {/* „Nu știu" tab on a non-identification service → route the client
+              to the right identification service (the wizard switches service
+              and keeps them in the order flow). */}
           {searchMethod === 'address' && !config.identificationService.enabled && (
-            <Alert className="border-primary-200 bg-primary-50">
-              <AlertCircle className="h-4 w-4 text-primary-600" />
-              <AlertDescription className="text-secondary-900">
-                Nu știi numărul de carte funciară sau cadastral? Folosește serviciul{' '}
-                <Link href="/comanda/identificare-imobil" className="font-semibold text-primary-600 underline">
-                  Identificare imobil după adresă
-                </Link>{' '}
-                — îl aflăm noi din adresă (sau nume proprietar) și primești și extrasul de carte funciară.
-              </AlertDescription>
-            </Alert>
+            <div className="space-y-3">
+              <Alert className="border-primary-200 bg-primary-50">
+                <AlertCircle className="h-4 w-4 text-primary-600" />
+                <AlertDescription className="text-secondary-900">
+                  Nicio problemă — îl identificăm noi. Alege de mai jos cum îl putem
+                  găsi, iar comanda continuă automat pe serviciul potrivit (primești
+                  și extrasul de carte funciară).
+                </AlertDescription>
+              </Alert>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <Link
+                  href="/comanda/identificare-imobil"
+                  className="flex flex-col items-center gap-1 rounded-xl border-2 border-neutral-200 hover:border-primary-400 p-4 text-center transition-colors"
+                >
+                  <span className="font-semibold text-secondary-900 text-sm">Știu adresa imobilului</span>
+                  <span className="text-xs text-neutral-500">Identificare imobil după adresă</span>
+                </Link>
+                <Link
+                  href="/comanda/identificare-imobile-proprietar"
+                  className="flex flex-col items-center gap-1 rounded-xl border-2 border-neutral-200 hover:border-primary-400 p-4 text-center transition-colors"
+                >
+                  <span className="font-semibold text-secondary-900 text-sm">Știu proprietarul</span>
+                  <span className="text-xs text-neutral-500">Identificare imobile după proprietar</span>
+                </Link>
+              </div>
+            </div>
           )}
 
           {/* Topografic Number (optional) */}
@@ -417,18 +436,20 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
       {/* Additional imobile — "Adaugă un extras" (same county, ANCPI rule).
           Only for services with the priced extras_suplimentar option (Extras CF). */}
       {allowMultiImobil && (
-      <Card>
-        <CardHeader>
+      <Card className="py-4 gap-4 sm:py-6 sm:gap-6 border-2 border-primary-300 bg-primary-50/40">
+        <CardHeader className="px-4 sm:px-6">
           <CardTitle className="flex items-center gap-2">
-            <Plus className="h-5 w-5" />
-            Extrase suplimentare
+            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary-500 text-white">
+              <Plus className="h-4 w-4" />
+            </span>
+            Mai ai un imobil?
           </CardTitle>
           <CardDescription>
             Adaugă mai multe imobile în aceeași comandă (din <strong>același județ</strong>
-            {property?.county ? ` — ${property.county}` : ''}). Fiecare extras suplimentar: 49,99 RON.
+            {property?.county ? ` — ${property.county}` : ''}). Fiecare extras suplimentar: doar <strong>49,99 RON</strong> în loc de 89 RON.
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="px-4 sm:px-6 space-y-4">
           {additional.map((im, i) => (
             <div key={i} className="rounded-lg border border-neutral-200 p-3 space-y-3">
               <div className="flex items-center justify-between">
@@ -445,8 +466,8 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
                     onValueChange={(value) => updateImobil(i, { locality: value })}
                     disabled={!property?.county}
                   >
-                    <SelectTrigger>
-                      <SelectValue placeholder={property?.county ? 'Selectează localitatea' : 'Alege întâi județul'} />
+                    <SelectTrigger className="w-full min-w-0 bg-white">
+                      <SelectValue placeholder="Selectează" />
                     </SelectTrigger>
                     <SelectContent className="max-h-72">
                       {localities.map((loc) => (
@@ -480,12 +501,11 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
           ))}
           <Button
             type="button"
-            variant="outline"
             onClick={addImobil}
             disabled={!property?.county || additional.length >= 24}
-            className="w-full"
+            className="w-full h-11 text-sm font-bold bg-primary-500 hover:bg-primary-600 text-secondary-900"
           >
-            <Plus className="mr-2 h-4 w-4" />
+            <Plus className="mr-2 h-5 w-5" />
             Adaugă un extras (+49,99 RON)
           </Button>
           {!property?.county && (
@@ -495,15 +515,18 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
       </Card>
       )}
 
-      {/* Purpose/Reason (optional) */}
-      <Card>
-        <CardHeader>
+      {/* Purpose/Reason (optional). Hidden on Extras CF — ANCPI never asks for
+          a motive on the automated extras flow (the worker sends only
+          CF/cadastral + județ/UAT), so the field was pure noise there. */}
+      {state.serviceSlug !== 'extras-carte-funciara' && (
+      <Card className="py-4 gap-4 sm:py-6 sm:gap-6">
+        <CardHeader className="px-4 sm:px-6">
           <CardTitle>Motiv Solicitare</CardTitle>
           <CardDescription>
-            Pentru ce aveți nevoie de acest extras CF? (opțional)
+            Pentru ce aveți nevoie de acest document? (opțional)
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-4 sm:px-6">
           <Textarea
             value={property.motiv || ''}
             onChange={(e) => updateProperty?.({ motiv: e.target.value })}
@@ -512,6 +535,7 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
           />
         </CardContent>
       </Card>
+      )}
 
       {/* Validation Summary */}
       {!isFormValid() && (
