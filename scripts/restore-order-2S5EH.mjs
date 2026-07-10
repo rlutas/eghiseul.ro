@@ -13,10 +13,12 @@
  *  4. ancpi_jobs → inserts the PENDING job exactly as ensureAncpiJobForPaidOrder
  *     would have (judetId 83 = Brașov, identifier type CF, prod 14200).
  *
- * Run: node --env-file=.env.local scripts/restore-order-2S5EH.js
+ * Run: node --env-file=.env.local scripts/restore-order-2S5EH.mjs
  */
-const { Client } = require('pg');
-const fs = require('fs');
+import pg from 'pg';
+import fs from 'fs';
+
+const { Client } = pg;
 
 const ORDER_ID = '2cad49da-ff98-4289-99a8-623ee9c01c70';
 

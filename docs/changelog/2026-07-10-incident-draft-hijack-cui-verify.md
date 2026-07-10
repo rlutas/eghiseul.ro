@@ -50,6 +50,13 @@ suprascrie contactul unui draft restaurat; self-heal la 403 (draft nou, datele c
 - Semnături Zoho per persoană în `semnatura-email/` (Raul/Carla/Angela/Maria + generică);
   logo PNG hostat la `/images/brand/logo-wide.png`
 
+## CI
+
+Primele 2 push-uri au picat la lint pe GitHub Actions: `scripts/restore-order-2S5EH.js` folosea
+`require()` (CommonJS) — regulă `@typescript-eslint/no-require-imports`. Convertit la ESM
+(`restore-order-2S5EH.mjs`, `import pg from 'pg'`), lint verde (0 erori; cele 29 warnings sunt
+pre-existente, neblocante).
+
 ## Lecție operațională
 
 **Nu deschide link-uri de resume ale clienților într-un browser cu sesiune activă** — inspecția
