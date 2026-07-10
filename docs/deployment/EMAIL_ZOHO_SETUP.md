@@ -41,9 +41,13 @@ schimbare de nameservere: re-verifică TOATE înregistrările de email.
 - Resend → contact@eghiseul.ro: **delivered** ✅ (circuit complet
   platformă → Resend DKIM → Zoho inbox)
 - comenzi@: primul test a bounce-uit (aliasul nu exista încă) → Resend a pus
-  adresa pe **suppression list**. După crearea aliasului, scoate-o din
-  Resend Dashboard → **Suppressions** (căutare comenzi@eghiseul.ro → Remove),
-  altfel Resend refuză trimiterile viitoare către ea cu status `suppressed`.
+  adresa pe **suppression list**. Stare 2026-07-10: aliasul EXISTĂ și primirea
+  externă merge (test manual OK), dar adresa e **încă suprimată în Resend** —
+  inofensiv cât timp platforma nu trimite prin Resend către ea (verificat:
+  notificările merg doar pe contact@; comenzi@ e doar text pe AWB,
+  `generate-awb/route.ts`). Dacă platforma va emaila vreodată comenzi@:
+  Resend → Emails → click pe emailul `suppressed` → **Remove from suppression
+  list** (nu există pagină/API separat de Suppressions).
 
 ## Operare Zoho (Admin Console: mailadmin.zoho.eu)
 
@@ -54,15 +58,25 @@ schimbare de nameservere: re-verifică TOATE înregistrările de email.
 - **Utilizator nou** (coleg cu adresa lui): Users → Add User (gratuit până la
   5 în total).
 
-## Acces echipă — 2 variante
+## Acces echipă (actualizat 2026-07-10)
 
-1. **Parolă comună pe contact@** (recomandat acum, echipă mică): toți intră pe
-   mail.zoho.eu cu contact@eghiseul.ro + parola. Simplu; dezavantaj — nu vezi
-   cine a răspuns.
-2. **Utilizatori separați + Grup** (când crește echipa): creezi useri
-   personali (ana@, mircea@... — gratuit ≤5), transformi comenzi@ din alias în
-   **Grup** (Admin → Groups) cu membrii echipei → fiecare primește mailurile
-   în inboxul propriu și poate răspunde ca și comenzi@. Audit per persoană.
+⚠️ **Planul Free real = 1 SINGUR user** (org creată pe zoho.eu; pricing-ul
+public zice 5, dar Add User cere plată). Decizie: fără upgrade deocamdată.
+
+- Toată echipa (Raul, Carla, Angela, Maria) intră pe **contact@** cu parolă
+  comună; display name „Echipa eGhișeul.ro". Dezavantaj: nu vezi cine a răspuns.
+- **Semnături personale**: `semnatura-email/` în repo — semnatura.html
+  (generică) + semnatura-{raul,carla,angela,maria}.html; se instalează toate în
+  contul contact@ (Settings → Signatures → Insert HTML `</>`), fiecare o alege
+  pe a lui la compunere. Logo hostat: https://eghiseul.ro/images/brand/logo-wide.png
+  (PNG, nu webp — Outlook nu afișează webp).
+- **comenzi@ rămâne alias** pe contact@ (grupurile cer useri multipli). Pentru
+  răspuns de pe comenzi@: Settings → Mail → Send mail as → comenzi@.
+- Upgrade viitor: **Mail Lite ~1€/user/lună** → useri separați + Grup comenzi@
+  cu „send as group" + IMAP/POP.
+- ⚠️ La orice login de pe device nou, Zoho trimite **OTP pe contact@** →
+  chicken-and-egg dacă nimeni nu e logat. Fix: recovery email + telefon setate
+  la accounts.zoho.eu → Security (setat 2026-07-10).
 
 ## Notă platformă
 

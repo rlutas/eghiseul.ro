@@ -23,6 +23,62 @@ interface DraftOrderData {
   discount_amount?: number;
 }
 
+/** True when a value carries no actual data (recursively): null/''/[]/{} of empties. */
+function isEmptyDeep(v: unknown): boolean {
+  if (v == null || v === '') return true;
+  if (Array.isArray(v)) return v.every(isEmptyDeep);
+  if (typeof v === 'object') return Object.values(v as Record<string, unknown>).every(isEmptyDeep);
+  return false; // numbers/booleans count as data
+}
+
+/**
+ * Merge incoming customer_data over the stored one WITHOUT letting an empty
+ * client section wipe a non-empty server section. Root cause of incident
+ * E-260710-2S5EH (2026-07-10): a resume session whose local state had an empty
+ * `property` autosaved and destroyed the property data of a draft the customer
+ * then paid for. Sections the client genuinely edited are non-empty, so they
+ * still overwrite; only "empty over non-empty" is refused.
+ */
+function mergeCustomerData(
+  existing: Record<string, unknown> | null,
+  incoming: Record<string, unknown>
+): Record<string, unknown> {
+  const base = existing ?? {};
+  const merged: Record<string, unknown> = { ...base };
+  for (const [key, val] of Object.entries(incoming)) {
+    if (isEmptyDeep(val) && !isEmptyDeep(base[key])) continue;
+    merged[key] = val;
+  }
+  return merged;
+}
+
+/**
+ * Ownership gate shared by the POST-upsert and PATCH paths.
+ * Rules (guest cross-device resume stays possible via matching email):
+ *  - session user owns the order → allowed
+ *  - unclaimed (guest) draft → allowed only when the draft has no email yet,
+ *    or the request/session email matches the stored contact email
+ *  - anything else → denied
+ */
+function canUpdateDraft(
+  user: { id: string; email?: string } | null,
+  order: { user_id: string | null; customer_data: unknown },
+  requestEmail: string | undefined
+): boolean {
+  const existingEmail = (
+    (order.customer_data as { contact?: { email?: string } } | null)?.contact?.email || ''
+  ).toLowerCase() || undefined;
+  const sessionEmail = user?.email?.toLowerCase();
+
+  if (user && order.user_id === user.id) return true;
+  if (order.user_id && order.user_id !== (user?.id ?? null)) return false;
+  if (!order.user_id) {
+    if (!existingEmail) return true; // first contact entry on a fresh draft
+    return existingEmail === requestEmail || existingEmail === sessionEmail;
+  }
+  return false;
+}
+
 // Simple validation function
 function validateDraftData(data: unknown): { valid: boolean; data?: DraftOrderData; error?: string } {
   if (!data || typeof data !== 'object') {
@@ -100,7 +156,7 @@ export async function POST(request: NextRequest) {
     if (data.friendly_order_id) {
       const { data: existingOrder } = await adminClient
         .from('orders')
-        .select('id, friendly_order_id, status')
+        .select('id, friendly_order_id, status, user_id, customer_data')
         .eq('friendly_order_id', data.friendly_order_id)
         .single();
 
@@ -120,10 +176,33 @@ export async function POST(request: NextRequest) {
           );
         }
 
+        // SECURITY: this upsert branch previously updated ANY draft known by
+        // friendly_order_id with zero ownership checks (the id sits in resume
+        // URLs) — same gate as PATCH now applies.
+        const postRequestEmail = (
+          (data.customer_data as { contact?: { email?: string } } | undefined)?.contact?.email || ''
+        ).toLowerCase() || undefined;
+        if (!canUpdateDraft(user, existingOrder, postRequestEmail)) {
+          console.warn(`Draft POST-update denied for order ${existingOrder.friendly_order_id}`);
+          return NextResponse.json(
+            {
+              success: false,
+              error: {
+                code: 'FORBIDDEN',
+                message: 'Nu ai permisiunea să modifici această comandă',
+              },
+            },
+            { status: 403 }
+          );
+        }
+
         // Order is a draft - update it instead of creating duplicate
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const updatePayload: any = {
-          customer_data: data.customer_data || {},
+          customer_data: mergeCustomerData(
+            existingOrder.customer_data as Record<string, unknown> | null,
+            (data.customer_data as Record<string, unknown>) || {}
+          ),
           selected_options: data.selected_options || [],
           kyc_documents: data.kyc_documents || {},
           delivery_method: data.delivery_method || null,
@@ -389,30 +468,12 @@ export async function PATCH(request: NextRequest) {
     const existingEmail = existingCustomerData?.contact?.email?.toLowerCase();
     const requestEmail = (body.customer_data?.contact?.email as string)?.toLowerCase();
 
-    let canUpdate = false;
-
-    if (user && existingOrder.user_id === user.id) {
-      // Authenticated user updating their own order
-      canUpdate = true;
-    } else if (user && !existingOrder.user_id) {
-      // Authenticated user claiming an unclaimed order - allow (will link on save)
-      canUpdate = true;
-    } else if (!user && !existingOrder.user_id) {
-      // Guest updating guest order - verify email matches OR this is the first email entry
-      if (!existingEmail) {
-        // No email stored yet - allow update (first time entering contact)
-        canUpdate = true;
-      } else if (requestEmail && requestEmail === existingEmail) {
-        // Email matches - allow update
-        canUpdate = true;
-      } else {
-        // Email mismatch - deny
-        console.warn(`Draft update denied: email mismatch for order ${existingOrder.friendly_order_id}`);
-        canUpdate = false;
-      }
-    } else if (user && existingOrder.user_id && existingOrder.user_id !== user.id) {
-      // Authenticated user trying to update someone else's order
-      canUpdate = false;
+    // Incident E-260710-2S5EH: a logged-in session could previously claim and
+    // overwrite ANY unclaimed guest draft. Now a claim requires the stored
+    // contact email to match the session/request email (same rule as guests).
+    const canUpdate = canUpdateDraft(user, existingOrder, requestEmail);
+    if (!canUpdate) {
+      console.warn(`Draft update denied for order ${existingOrder.friendly_order_id}`);
     }
 
     if (!canUpdate) {
@@ -448,7 +509,11 @@ export async function PATCH(request: NextRequest) {
     };
 
     if (body.customer_data !== undefined) {
-      updateData.customer_data = body.customer_data;
+      // Never let an empty client section wipe a non-empty stored one.
+      updateData.customer_data = mergeCustomerData(
+        existingOrder.customer_data as Record<string, unknown> | null,
+        body.customer_data as Record<string, unknown>
+      );
     }
     if (body.selected_options !== undefined) {
       updateData.selected_options = body.selected_options;
@@ -481,9 +546,14 @@ export async function PATCH(request: NextRequest) {
       updateData.discount_amount = body.discount_amount;
     }
 
-    // Associate with user if they're now authenticated
+    // Associate with user only when their identity matches the draft's contact
+    // email (a guest who created the draft then logged in). A foreign logged-in
+    // session must never silently claim someone else's guest order.
     if (user && !existingOrder.user_id) {
-      updateData.user_id = user.id;
+      const sessionEmail = user.email?.toLowerCase();
+      if (!existingEmail || existingEmail === sessionEmail) {
+        updateData.user_id = user.id;
+      }
     }
 
     // Update the order (use admin client to bypass RLS)
@@ -619,8 +689,10 @@ export async function GET(request: NextRequest) {
     if (user && order.user_id === user.id) {
       // Authenticated user accessing their own order
       isOwner = true;
-    } else if (orderEmail && email && email.toLowerCase() === orderEmail) {
-      // Guest accessing order with matching email
+    } else if (!order.user_id && orderEmail && email && email.toLowerCase() === orderEmail) {
+      // Guest accessing an UNCLAIMED order with matching email. Once a draft
+      // belongs to an account (user_id set), the email URL param alone must not
+      // expose it — only the owning session may read it.
       isOwner = true;
     } else if (!order.user_id && !orderEmail) {
       // Order has no owner info - this is a fresh draft

@@ -15,6 +15,21 @@
 const BASE32_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 
 /**
+ * Cryptographically random Base32 code. Math.random() was guessable enough to
+ * make order-id enumeration realistic (32^5 ≈ 33.5M/day with a known date
+ * prefix); Web Crypto works in browser, Node 20+ and edge runtimes alike.
+ */
+function randomBase32(length: number): string {
+  const bytes = new Uint8Array(length);
+  globalThis.crypto.getRandomValues(bytes);
+  let code = '';
+  for (let i = 0; i < length; i++) {
+    code += BASE32_CHARS[bytes[i]! % BASE32_CHARS.length];
+  }
+  return code;
+}
+
+/**
  * Generate a unique order ID
  * Format: E-YYMMDD-XXXXX (14 chars total)
  */
@@ -25,14 +40,7 @@ export function generateOrderId(): string {
   const dd = String(now.getDate()).padStart(2, '0');
   const date = `${yy}${mm}${dd}`; // YYMMDD
 
-  // Generate 5 random Base32 characters
-  let code = '';
-  for (let i = 0; i < 5; i++) {
-    const randomIndex = Math.floor(Math.random() * BASE32_CHARS.length);
-    code += BASE32_CHARS[randomIndex];
-  }
-
-  return `E-${date}-${code}`;
+  return `E-${date}-${randomBase32(5)}`;
 }
 
 /**
@@ -45,13 +53,7 @@ export function generatePaymentReference(): string {
     .slice(0, 10)
     .replace(/-/g, '');
 
-  let code = '';
-  for (let i = 0; i < 5; i++) {
-    const randomIndex = Math.floor(Math.random() * BASE32_CHARS.length);
-    code += BASE32_CHARS[randomIndex];
-  }
-
-  return `PAY-${date}-${code}`;
+  return `PAY-${date}-${randomBase32(5)}`;
 }
 
 /**

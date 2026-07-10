@@ -188,7 +188,11 @@ export function ModularOrderWizard({ initialService, initialOptions, headerExtra
   // Handle order submission - redirect to checkout page
   const handleSubmitOrder = useCallback(async () => {
     if (!state.orderId) {
+      // Draft not yet persisted (fresh id after a recovered save error, or the
+      // very first autosave still in flight) — tell the user instead of a dead
+      // button; the autosave loop assigns the id within seconds.
       console.error('No order ID available');
+      toast.error('Comanda se salvează încă — așteaptă o secundă și apasă din nou.');
       return;
     }
 
@@ -212,9 +216,12 @@ export function ModularOrderWizard({ initialService, initialOptions, headerExtra
       });
 
       if (!submitResponse.ok) {
-        const submitError = await submitResponse.json();
+        const submitError = await submitResponse.json().catch(() => ({}));
         console.error('Order submission failed:', submitError);
-        // Show error to user instead of silently continuing
+        toast.error(
+          submitError?.error?.message ||
+            'Nu am putut finaliza comanda. Verifică datele introduse și încearcă din nou.'
+        );
         setIsSubmitting(false);
         return;
       }
@@ -223,6 +230,7 @@ export function ModularOrderWizard({ initialService, initialOptions, headerExtra
       window.location.href = `/comanda/checkout/${state.orderId}`;
     } catch (error) {
       console.error('Order submission error:', error);
+      toast.error('Eroare de conexiune la trimiterea comenzii. Verifică internetul și încearcă din nou.');
       setIsSubmitting(false);
     }
   }, [state.orderId, priceBreakdown.totalPrice, state.signature?.signatureBase64, state.signature?.termsAccepted, state.consent]);
@@ -363,7 +371,7 @@ export function ModularOrderWizard({ initialService, initialOptions, headerExtra
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 pb-28 lg:pb-8 max-w-[1200px]">
+    <div className="container mx-auto px-4 pt-3 sm:pt-8 pb-28 lg:pb-8 max-w-[1200px]">
       {/* Header with Order ID */}
       <div className="mb-4 sm:mb-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-3 sm:mb-4">

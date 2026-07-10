@@ -26,8 +26,11 @@ export function brandedEmailHtml({ preheader, content }: BrandedEmailInput): str
   <div style="display:none;max-height:0;overflow:hidden;">${escHtml(preheader)}</div>
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:32px 16px;">
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#ffffff;border:1px solid #e2e8f0;border-radius:16px;overflow:hidden;">
-      <tr><td style="background:#0B1B33;padding:22px 28px;">
-        <span style="color:#ffffff;font-size:18px;font-weight:800;">eGhișeul<span style="color:#ECB95F;">.ro</span></span>
+      <tr><td style="background:#0B1B33;padding:18px 28px;">
+        <table role="presentation" cellpadding="0" cellspacing="0"><tr>
+          <td style="vertical-align:middle;padding-right:10px;"><img src="https://eghiseul.ro/icon.png" alt="" width="30" height="30" style="display:block;border:0;border-radius:8px;"></td>
+          <td style="vertical-align:middle;"><span style="color:#ffffff;font-size:18px;font-weight:800;">eGhiseul<span style="color:#ECB95F;">.ro</span></span></td>
+        </tr></table>
       </td></tr>
       <tr><td style="padding:28px;">
 ${content}

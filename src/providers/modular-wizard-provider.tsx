@@ -700,12 +700,15 @@ function modularWizardReducer(
     case 'PREFILL_FROM_PROFILE': {
       const prefill = action.payload;
 
-      // Build contact data from prefill
+      // Build contact data from prefill. EXISTING wizard data wins: on a
+      // restored draft the stored contact is the customer's — the logged-in
+      // profile must only fill gaps, never replace it (a foreign session's
+      // profile once replaced a guest draft's contact, incident E-260710-2S5EH).
       const newContact = {
         ...state.contact,
-        email: prefill.contact.email || state.contact.email,
-        phone: prefill.contact.phone || prefill.personal.phone || state.contact.phone,
-        preferredContact: (prefill.contact.preferredContact as 'email' | 'phone' | 'whatsapp') || state.contact.preferredContact,
+        email: state.contact.email || prefill.contact.email,
+        phone: state.contact.phone || prefill.contact.phone || prefill.personal.phone,
+        preferredContact: state.contact.preferredContact || (prefill.contact.preferredContact as 'email' | 'phone' | 'whatsapp'),
       };
 
       // Build personal KYC data if module is active
@@ -1034,6 +1037,12 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
                   civilStatus: cd.civil_status ?? null,
                   constatator: cd.constatator ?? null,
                   companyKyc: cd.company ?? null,
+                  // property/vehicle were missing here → every server resume of
+                  // a property/vehicle service restored EMPTY module state and
+                  // the next autosave wiped the server copy (incident
+                  // E-260710-2S5EH, 2026-07-10).
+                  property: cd.property ?? null,
+                  vehicle: cd.vehicle ?? null,
                   billing: cd.billing ?? null,
                   selectedOptions,
                   delivery,
@@ -1474,13 +1483,16 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
         const errorData = await response.json().catch(() => ({}));
         console.error('Save draft error:', response.status, errorData);
 
-        // Handle recoverable 400 errors by generating a fresh draft
+        // Handle recoverable errors by generating a fresh draft. 403 FORBIDDEN
+        // = this session may not touch that draft (stale localStorage cache of
+        // someone else's order, or ownership rules tightened) — keep the form
+        // data the user typed and continue on a brand-new order id.
         const errorCode = errorData.error?.code;
-        if (response.status === 400 && (
+        if (response.status === 403 || (response.status === 400 && (
           errorCode === 'INVALID_STATUS' ||
           errorCode === 'INVALID_ORDER_ID' ||
           errorCode === 'VALIDATION_ERROR'
-        )) {
+        ))) {
           console.warn('Draft save failed with', errorCode, '- generating fresh order ID');
           const newFriendlyOrderId = generateOrderId();
           dispatch({

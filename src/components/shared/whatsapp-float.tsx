@@ -7,19 +7,25 @@ const WHATSAPP =
   encodeURIComponent('Bună ziua! Aș dori informații despre serviciile eGhișeul.ro.');
 
 /** Fixed WhatsApp button, bottom-right, site-wide — hidden on the admin and
- *  collaborator portals (internal tools; it overlapped admin action buttons). */
+ *  collaborator portals (internal tools; it overlapped admin action buttons).
+ *  On the order flow (/comanda/*) mobile has fixed bottom bars (wizard order
+ *  summary, checkout „Plătește") — lift the button above them so it never
+ *  covers the pay button; those bars disappear on lg, where bottom-5 returns. */
 export function WhatsAppFloat() {
   const pathname = usePathname();
   if (pathname.startsWith('/admin') || pathname.startsWith('/colaborator')) {
     return null;
   }
+  const isOrderFlow = pathname.startsWith('/comanda');
   return (
     <a
       href={WHATSAPP}
       target="_blank"
       rel="nofollow noopener"
       aria-label="Scrie-ne pe WhatsApp"
-      className="group fixed bottom-5 right-5 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-[0_8px_24px_rgba(37,211,102,0.45)] transition-transform duration-200 hover:scale-110 hover:bg-[#20bd5a]"
+      className={`group fixed right-5 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-[0_8px_24px_rgba(37,211,102,0.45)] transition-transform duration-200 hover:scale-110 hover:bg-[#20bd5a] ${
+        isOrderFlow ? 'bottom-24 lg:bottom-5' : 'bottom-5'
+      }`}
     >
       {/* puls subtil */}
       <span className="absolute inset-0 rounded-full bg-[#25D366] opacity-60 motion-safe:animate-ping" aria-hidden="true" />

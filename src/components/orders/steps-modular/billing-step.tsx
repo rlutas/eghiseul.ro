@@ -10,7 +10,7 @@
  * 3. "Facturează pe firmă" - Company billing with CUI validation (PJ)
  */
 
-import { useEffect, useState, useCallback, useMemo } from 'react';
+import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import {
   User,
   Users,
@@ -169,7 +169,7 @@ const CF_BILLING_OPTIONS: BillingOption[] = [
 ];
 
 export default function BillingStepModular({ onValidChange }: BillingStepProps) {
-  const { state, updateBilling, prefillData } = useModularWizard();
+  const { state, updateBilling, prefillData, validationAttempt } = useModularWizard();
   const { billing, personalKyc, companyKyc, clientType, constatator, serviceSlug } = state;
   const isPJOrder = clientType === 'PJ';
   // Certificat constatator pe firmă: bill the firm by default (PJ-first), like a
@@ -309,14 +309,9 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
     }
   }, [isConstatatorPf, billing?.source, billing?.firstName, requesterName, requesterCnp, updateBilling]);
 
-  // Extras Carte Funciară: no ID scan → default to manual persoană fizică so the
-  // fields are exposed for the client to fill (they can switch to PJ).
-  useEffect(() => {
-    if (!isCarteFunciara) return;
-    if (!billing?.source) {
-      updateBilling({ source: 'other_pf', type: 'persoana_fizica', country: 'Romania', isValid: false });
-    }
-  }, [isCarteFunciara, billing?.source, updateBilling]);
+  // Extras Carte Funciară / cadastral: no implicit default — the client must
+  // explicitly pick Persoană fizică or Persoană juridică before any fields
+  // appear (a preselected PF form confused clients who wanted PJ billing).
 
   // Extract primitive billing values to avoid effect re-triggers from object reference changes
   const billingSource = billing?.source;
@@ -557,8 +552,48 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
     }
   }, [billing, updateBilling]);
 
-  const selectedSource =
-    billing?.source || (isCarteFunciara ? 'other_pf' : companyFirst ? 'company' : 'self');
+  // Auto-verify the CUI ~1s after the client stops typing — clients skip the
+  // „Verifică" button and hit Plătește with an unverified CUI (real case:
+  // E-260710-2S5EH sat unpayable with everything typed manually). Guarded by
+  // lastAutoCui so a failed lookup doesn't retry in a loop for the same value.
+  const lastAutoCui = useRef<string | null>(null);
+  useEffect(() => {
+    if (billingSource !== 'company') return;
+    const cui = (billingCui || '').replace(/\s/g, '');
+    if (billingCuiVerified || cuiLoading) return;
+    if (cui.replace(/\D/g, '').length < 6) return;
+    if (lastAutoCui.current === cui) return;
+    const t = setTimeout(() => {
+      lastAutoCui.current = cui;
+      validateCUI();
+    }, 900);
+    return () => clearTimeout(t);
+  }, [billingCui, billingCuiVerified, cuiLoading, billingSource, validateCUI]);
+
+  // „Plătește"/„Continuă" pressed on an invalid step → show what's missing and,
+  // if the blocker is an unverified CUI, verify it on the spot instead of
+  // leaving a dead button.
+  const [showStepErrors, setShowStepErrors] = useState(false);
+  useEffect(() => {
+    if (validationAttempt === 0) return;
+    setShowStepErrors(true);
+    if (
+      billingSource === 'company' &&
+      !billingCuiVerified &&
+      !cuiLoading &&
+      (billingCui || '').replace(/\D/g, '').length >= 2
+    ) {
+      validateCUI();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [validationAttempt]);
+
+  // CF/cadastral: no implicit default (chooser first). Legacy drafts saved with
+  // source 'self' (not a CF option — its fields render disabled and can never be
+  // filled) fall back to the editable manual-PF variant.
+  const selectedSource = isCarteFunciara
+    ? (billing?.source === 'self' ? 'other_pf' : billing?.source)
+    : (billing?.source || (companyFirst ? 'company' : 'self'));
   const billingOptions = isCarteFunciara
     ? CF_BILLING_OPTIONS
     : isConstatatorFirm
@@ -579,8 +614,8 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
         </h3>
 
         <div className={cn(
-          'grid grid-cols-1 gap-4',
-          billingOptions.length === 3 ? 'sm:grid-cols-3' : 'sm:grid-cols-2'
+          'grid gap-3 sm:gap-4',
+          billingOptions.length === 2 ? 'grid-cols-2' : 'grid-cols-1 sm:grid-cols-3'
         )}>
           {billingOptions.map((option) => {
             const Icon = option.icon;
@@ -593,7 +628,7 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
                 key={option.id ?? option.source}
                 onClick={() => handleOptionClick(option)}
                 className={cn(
-                  'relative p-4 rounded-xl border-2 cursor-pointer transition-all',
+                  'relative p-3 sm:p-4 rounded-xl border-2 cursor-pointer transition-all',
                   isSelected
                     ? 'border-primary-500 bg-primary-50 shadow-md'
                     : 'border-neutral-200 hover:border-primary-300'
@@ -601,7 +636,7 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
               >
                 {/* Selection Indicator */}
                 {isSelected && (
-                  <div className="absolute top-3 right-3">
+                  <div className="absolute top-2 right-2 sm:top-3 sm:right-3">
                     <CheckCircle className="w-5 h-5 text-primary-600" />
                   </div>
                 )}
@@ -609,25 +644,32 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
                 <div className="flex flex-col items-center text-center">
                   <div
                     className={cn(
-                      'w-12 h-12 rounded-full flex items-center justify-center mb-3',
+                      'w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center mb-2 sm:mb-3',
                       isSelected ? 'bg-primary-200' : 'bg-neutral-100'
                     )}
                   >
                     <Icon
                       className={cn(
-                        'w-6 h-6',
+                        'w-5 h-5 sm:w-6 sm:h-6',
                         isSelected ? 'text-primary-700' : 'text-neutral-600'
                       )}
                     />
                   </div>
 
-                  <h4 className="font-semibold text-secondary-900">{option.label}</h4>
+                  <h4 className="font-semibold text-secondary-900 text-sm sm:text-base">{option.label}</h4>
                   <p className="text-xs text-neutral-500 mt-1">{option.description}</p>
                 </div>
               </div>
             );
           })}
         </div>
+
+        {showStepErrors && !selectedSource && (
+          <p className="text-sm text-red-500 flex items-center gap-1">
+            <AlertCircle className="h-4 w-4 shrink-0" />
+            Alege pe cine emitem factura: persoană fizică sau firmă.
+          </p>
+        )}
       </div>
 
       {/* Persoană Fizică Fields (self or other_pf) */}
@@ -644,7 +686,7 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
             </div>
           )}
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-3 sm:gap-4">
             <div className="space-y-2">
               <Label htmlFor="lastName" className="text-secondary-900 font-medium">
                 Nume <span className="text-red-500">*</span>
@@ -709,7 +751,7 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
             />
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-3 sm:gap-4">
             <div className="space-y-2">
               <Label htmlFor="county" className="text-secondary-900 font-medium">
                 Județ <span className="text-red-500">*</span>
@@ -838,49 +880,73 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
                 CUI valid - date completate automat
               </p>
             )}
+            {!billing?.cuiVerified && !cuiError && !cuiLoading && (
+              <p className={cn(
+                'text-sm flex items-center gap-1',
+                showStepErrors ? 'text-red-500' : 'text-neutral-500'
+              )}>
+                <AlertCircle className="h-4 w-4 shrink-0" />
+                {showStepErrors
+                  ? 'CUI-ul trebuie verificat înainte de plată — apasă „Verifică".'
+                  : 'Introdu CUI-ul — preluăm automat datele firmei de la ANAF.'}
+              </p>
+            )}
+            {cuiLoading && (
+              <p className="text-sm text-neutral-500 flex items-center gap-1">
+                <Loader2 className="h-4 w-4 animate-spin shrink-0" />
+                Verificăm firma la ANAF...
+              </p>
+            )}
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="companyName" className="text-secondary-900 font-medium">
-              Denumire firmă <span className="text-red-500">*</span>
-            </Label>
-            <Input
-              id="companyName"
-              type="text"
-              value={billing?.companyName || ''}
-              onChange={(e) => updateField('companyName', e.target.value)}
-              placeholder="SC Firma Mea SRL"
-              className="bg-white"
-            />
-          </div>
+          {/* Company data appears only after a successful ANAF verification and
+              is read-only (official record — the invoice must match it; hand
+              edits produced unverifiable data and blocked payment). */}
+          {billing?.cuiVerified && (
+            <>
+              <div className="space-y-2">
+                <Label htmlFor="companyName" className="text-secondary-900 font-medium">
+                  Denumire firmă
+                </Label>
+                <Input
+                  id="companyName"
+                  type="text"
+                  value={billing?.companyName || ''}
+                  readOnly
+                  disabled
+                  className="bg-neutral-100"
+                />
+              </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="regCom" className="text-secondary-900 font-medium">
-              Nr. Registrul Comerțului
-            </Label>
-            <Input
-              id="regCom"
-              type="text"
-              value={billing?.regCom || ''}
-              onChange={(e) => updateField('regCom', e.target.value)}
-              placeholder="J40/1234/2020"
-              className="bg-white"
-            />
-          </div>
+              <div className="space-y-2">
+                <Label htmlFor="regCom" className="text-secondary-900 font-medium">
+                  Nr. Registrul Comerțului
+                </Label>
+                <Input
+                  id="regCom"
+                  type="text"
+                  value={billing?.regCom || ''}
+                  readOnly
+                  disabled
+                  className="bg-neutral-100"
+                />
+              </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="companyAddress" className="text-secondary-900 font-medium">
-              Sediu social <span className="text-red-500">*</span>
-            </Label>
-            <Input
-              id="companyAddress"
-              type="text"
-              value={billing?.companyAddress || ''}
-              onChange={(e) => updateField('companyAddress', e.target.value)}
-              placeholder="Strada, număr, localitate, județ"
-              className="bg-white"
-            />
-          </div>
+              <div className="space-y-2">
+                <Label htmlFor="companyAddress" className="text-secondary-900 font-medium">
+                  Sediu social
+                </Label>
+                <Input
+                  id="companyAddress"
+                  type="text"
+                  value={billing?.companyAddress || ''}
+                  readOnly
+                  disabled
+                  className="bg-neutral-100"
+                />
+              </div>
+            </>
+          )}
 
           {/* Bancă + IBAN câmpuri eliminate 2026-05-28 — nu sunt necesare
               pentru factura PJ. Oblio nu cere date bancare ale clientului
