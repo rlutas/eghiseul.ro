@@ -192,10 +192,10 @@ export async function POST(request: NextRequest) {
   });
 }
 
-// Dev-only dry-run.
+// Vercel Cron invokes cron paths with GET (same auth header) — a
+// production-blocked GET means the schedule NEVER runs (this cron 405'd on
+// every hourly tick until 2026-07-12; E-260710-EFNSH stayed paid with no
+// invoice for 2 days because of it).
 export async function GET(request: NextRequest) {
-  if (process.env.NODE_ENV === 'production') {
-    return NextResponse.json({ success: false, error: 'GET disabled in production' }, { status: 405 });
-  }
   return POST(request);
 }

@@ -248,6 +248,11 @@ export function ModularOrderWizard({ initialService, initialOptions, headerExtra
     if (isLastStep) {
       handleSubmitOrder();
     } else {
+      // Reset validity BEFORE advancing: `stepValid` still holds the finished
+      // step's `true` until the next step's effect reports in, so a fast
+      // double-tap on «Continuă» would skip the new step's validation entirely
+      // (how E-260712-VQ3WA paid with an incomplete billing block).
+      setStepValid(false);
       nextStep();
     }
   };

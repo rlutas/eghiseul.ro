@@ -159,12 +159,12 @@ export async function POST(request: NextRequest) {
   });
 }
 
+// In production, GET runs the real job: Vercel Cron invokes cron paths with
+// GET (same auth header), so a blocked GET means the schedule never fires.
+// In dev, GET stays a dry-run listing the decisions without applying them.
 export async function GET(request: NextRequest) {
   if (process.env.NODE_ENV === 'production') {
-    return NextResponse.json(
-      { success: false, error: 'GET disabled in production' },
-      { status: 405 }
-    );
+    return POST(request);
   }
   const authHeader = request.headers.get('authorization');
   if (authHeader !== `Bearer ${process.env.CRON_SECRET ?? ''}`) {

@@ -6,6 +6,7 @@ import { createHash } from 'crypto';
 import { autoGenerateOrderDocuments } from '@/lib/documents/auto-generate';
 import { uploadOrderSignature, uploadBase64 } from '@/lib/aws/s3';
 import { computeEstimatedCompletionISO } from '@/lib/delivery-estimate-helper';
+import { getMissingInvoiceClientFields } from '@/lib/oblio/invoice';
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -146,6 +147,32 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       // Config lookup failure must not block legitimate orders — the guard
       // fails open on infrastructure errors, never on missing documents.
       console.error('[submit] KYC guard config lookup failed (continuing):', guardErr instanceof Error ? guardErr.message : guardErr);
+    }
+
+    // ── Server-side billing completeness guard ──────────────────────────
+    // The wizard validates billing client-side only; fast double-taps on
+    // «Continuă» and resumed drafts can reach submit with an incomplete
+    // billing block (real case: E-260712-VQ3WA paid with just 4 chars of a
+    // surname, and invoice EGH-0028 was issued with no address). Validate the
+    // EFFECTIVE invoice client — after the same contact/KYC fallbacks the
+    // Oblio builder applies — so KYC-backed orders with a sparse billing
+    // block keep working.
+    {
+      const missingBilling = getMissingInvoiceClientFields(
+        (order.customer_data as Parameters<typeof getMissingInvoiceClientFields>[0]) ?? {}
+      );
+      if (missingBilling.length > 0) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: {
+              code: 'BILLING_INCOMPLETE',
+              message: `Datele de facturare sunt incomplete: lipsește ${missingBilling.join(', ')}. Te rugăm să revii la pasul „Facturare" și să completezi toate câmpurile.`,
+            },
+          },
+          { status: 400 }
+        );
+      }
     }
 
     // Capture audit context (IP, user agent) from request

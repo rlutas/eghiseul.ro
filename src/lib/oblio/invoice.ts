@@ -160,6 +160,17 @@ type CustomerData = NonNullable<OrderForInvoice['customer_data']>;
  * client renders as "N/A". For PJ we send the CUI (RO-prefixed when a VAT payer)
  * so Oblio validates + completes the company against ANAF.
  */
+export function isPJBillingData(customerData: CustomerData): boolean {
+  const billing = customerData.billing;
+  const billingCui = (billing?.cui || customerData.company?.cui || '').trim();
+  return (
+    billing?.type === 'company' ||
+    billing?.type === 'persoana_juridica' ||
+    billing?.source === 'company' ||
+    (!!billingCui && billing?.type !== 'individual' && billing?.type !== 'persoana_fizica')
+  );
+}
+
 export function buildOblioClient(customerData: CustomerData): OblioClient {
   const billing = customerData.billing;
   const contact = customerData.contact;
@@ -168,11 +179,7 @@ export function buildOblioClient(customerData: CustomerData): OblioClient {
   const address = customerData.address ?? personal?.address;
 
   const billingCui = (billing?.cui || company?.cui || '').trim();
-  const isPJ =
-    billing?.type === 'company' ||
-    billing?.type === 'persoana_juridica' ||
-    billing?.source === 'company' ||
-    (!!billingCui && billing?.type !== 'individual' && billing?.type !== 'persoana_fizica');
+  const isPJ = isPJBillingData(customerData);
 
   if (isPJ) {
     const isVatPayer =
@@ -208,6 +215,36 @@ export function buildOblioClient(customerData: CustomerData): OblioClient {
     vatPayer: false,
     save: false,
   };
+}
+
+/**
+ * Fields the Oblio invoice client would be missing if issued from this
+ * customer_data — AFTER all the buildOblioClient fallbacks (contact/personal
+ * KYC data). Used as a server-side submit guard: an empty list means the
+ * invoice can be issued with complete client data.
+ *
+ * PJ needs only firm name + CUI (Oblio completes address from ANAF).
+ * PF needs full name + street + locality + county (Oblio rejects an empty
+ * address on individuals). CNP is NOT required here — real paid orders exist
+ * where the CNP lives only in encrypted columns, and Oblio accepts PF clients
+ * without one.
+ */
+export function getMissingInvoiceClientFields(customerData: CustomerData): string[] {
+  const c = buildOblioClient(customerData);
+  const missing: string[] = [];
+
+  if (isPJBillingData(customerData)) {
+    if (!c.name?.trim() || c.name === 'N/A') missing.push('denumirea firmei');
+    if (!c.cif?.trim()) missing.push('CUI-ul firmei');
+    return missing;
+  }
+
+  const nameParts = (c.name || '').trim().split(/\s+/).filter(Boolean);
+  if (nameParts.length < 2) missing.push('numele complet');
+  if (!c.address?.trim()) missing.push('adresa (stradă, număr)');
+  if (!c.city?.trim()) missing.push('localitatea');
+  if (!c.state?.trim()) missing.push('județul');
+  return missing;
 }
 
 /**

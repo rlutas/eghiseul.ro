@@ -196,3 +196,10 @@ export async function POST(request: NextRequest) {
   };
   return NextResponse.json({ success: true, data: summary });
 }
+
+// Vercel Cron invokes cron paths with GET (same auth header) — without this
+// passthrough the schedule never fires (the route only exported POST, so
+// every 15-min tick got a 405 and no recovery email was ever sent by cron).
+export async function GET(request: NextRequest) {
+  return POST(request);
+}
