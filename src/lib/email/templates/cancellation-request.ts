@@ -1,7 +1,6 @@
 // Email confirmation sent when a customer self-cancels within the 30-min
-// window. Plain string templates so we don't pull a JSX renderer just for
-// transactional emails. HTML escaping is done at the boundary so the body
-// stays safe even if name/order_number contain weird characters.
+// window. Uses the shared branded shell (same look as the order emails).
+import { brandedEmailHtml, infoRows } from './branded-layout';
 
 export interface CancellationRequestEmailInput {
   clientName: string;
@@ -27,28 +26,22 @@ export function renderCancellationRequestEmail(input: CancellationRequestEmailIn
   const { clientName, orderNumber, amountTotalRon, refundAmountRon } = input;
   const subject = `Cerere anulare comandă ${orderNumber} înregistrată`;
 
-  const html = `<!DOCTYPE html>
-<html>
-  <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; color: #0f172a;">
-    <h1 style="font-size: 20px; margin-bottom: 8px;">Cerere de anulare înregistrată</h1>
-    <p>Salut ${esc(clientName)},</p>
-    <p>Am primit cererea ta de anulare pentru comanda <strong>${esc(orderNumber)}</strong>.</p>
-    <div style="background: #fff7ed; border-left: 3px solid #f59e0b; padding: 12px 16px; margin: 16px 0; border-radius: 6px;">
-      <p style="margin: 0; font-size: 14px;">
-        <strong>Rambursare 70%:</strong> ${refundAmountRon.toFixed(2)} RON din ${amountTotalRon.toFixed(2)} RON.
-      </p>
-      <p style="margin: 6px 0 0; font-size: 13px; color: #78350f;">
-        Diferența de 30% acoperă comisioanele Stripe + procesarea deja începută.
-      </p>
-    </div>
-    <p>Rambursarea va apărea în contul tău în <strong>5–10 zile lucrătoare</strong>, automat pe metoda de plată folosită.</p>
-    <p>Nu este nevoie să faci nimic — te contactăm pe email când refund-ul este procesat.</p>
-    <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 24px 0;" />
-    <p style="font-size: 12px; color: #64748b;">
-      Dacă ai întrebări, răspunde la acest email sau contactează-ne pe WhatsApp.
-    </p>
-  </body>
-</html>`;
+  const html = brandedEmailHtml({
+    preheader: `Cerere de anulare înregistrată pentru comanda ${orderNumber} — rambursare ${refundAmountRon.toFixed(2)} RON`,
+    content: `
+        <h1 style="margin:0 0 6px;color:#0B1B33;font-size:20px;">Cerere de anulare înregistrată</h1>
+        <p style="margin:0 0 18px;color:#475569;font-size:14px;line-height:1.6;">Salut ${esc(clientName)}, am primit cererea ta de anulare pentru comanda de mai jos.</p>
+        ${infoRows([
+          { label: 'Comandă', value: orderNumber, mono: true },
+          { label: 'Total achitat', value: `${amountTotalRon.toFixed(2)} RON` },
+          { label: 'Rambursare (70%)', value: `${refundAmountRon.toFixed(2)} RON` },
+        ])}
+        <div style="background:#fff7ed;border-left:3px solid #f59e0b;padding:12px 16px;margin:18px 0;border-radius:6px;">
+          <p style="margin:0;font-size:13px;color:#78350f;line-height:1.6;">Diferența de 30% acoperă comisioanele de plată + procesarea deja începută.</p>
+        </div>
+        <p style="margin:0 0 8px;color:#475569;font-size:14px;line-height:1.6;">Rambursarea apare în contul tău în <strong>5–10 zile lucrătoare</strong>, automat pe metoda de plată folosită.</p>
+        <p style="margin:0;color:#475569;font-size:14px;line-height:1.6;">Nu trebuie să faci nimic — te anunțăm pe email când refund-ul e procesat.</p>`,
+  });
 
   const text = `Cerere de anulare înregistrată
 

@@ -12,6 +12,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { deliverAncpiResult } from '@/lib/ancpi/deliver';
 import { sendEmail } from '@/lib/email/resend';
+import { brandedEmailHtml, infoRows } from '@/lib/email/templates/branded-layout';
 import { logAncpiEvent } from '@/lib/ancpi/log-event';
 
 export const dynamic = 'force-dynamic';
@@ -210,6 +211,13 @@ async function notifyClientDelay(supabase: any, orderId: string): Promise<void> 
   await sendEmail({
     to: email,
     subject: `Comanda ${oid} — în procesare`,
-    html: `<p>Bună ziua,</p><p>Cererea ta de extras de carte funciară (<strong>${oid}</strong>) este în curs de procesare la ANCPI. Revenim cu documentul în cel mai scurt timp.</p><p>Mulțumim,<br/>Echipa eghiseul.ro</p>`,
+    html: brandedEmailHtml({
+      preheader: `Comanda ${oid} este în procesare la ANCPI`,
+      content: `
+        <h1 style="margin:0 0 6px;color:#0B1B33;font-size:20px;">Comanda ta este în procesare</h1>
+        <p style="margin:0 0 18px;color:#475569;font-size:14px;line-height:1.6;">Bună ziua! Cererea ta de extras de carte funciară este în curs de procesare la ANCPI. Revenim cu documentul pe email în cel mai scurt timp.</p>
+        ${infoRows([{ label: 'Comandă', value: oid, mono: true }])}`,
+    }),
+    text: `Bună ziua! Cererea ta de extras de carte funciară (${oid}) este în curs de procesare la ANCPI. Revenim cu documentul pe email în cel mai scurt timp.`,
   });
 }

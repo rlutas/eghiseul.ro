@@ -33,3 +33,11 @@ onorariul, fără totalul încasat de la client (baza de calcul dintre părți).
 - Refăcut pe template-ul branded al comenzilor (`branded-layout.ts`): header navy + logo, rânduri
   Comandă/Serviciu, buton „Deschide comanda" către portal, footer legal, preheader; subiect cu numele serviciului
 - Testat pe adresa reală: primit OK (13.07)
+
+### Uniformizare TOATE emailurile pe template-ul branded
+Audit complet al celor 12 puncte de trimitere email. Trecute pe shell-ul branded (header navy +
+logo scut, card alb, buton auriu, footer legal, preheader):
+- **recovery abandon** (cupon 10%), **plată suplimentară** (Modifică), **cerere anulare** (refund 70%),
+  **mesaj contact** (intern), **„în procesare" ANCPI** și **„în procesare" ONRC** (erau 3 rânduri de HTML gol)
+- + logo-ul scut adăugat la **confirmarea de comandă** (avea doar text în header)
+Deja branded dinainte: document gata, reupload (×2), alocare colaborator. Verificate vizual toate (randate + screenshot).

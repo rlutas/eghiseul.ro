@@ -11,6 +11,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { deliverOnrcResult } from '@/lib/onrc/deliver';
 import { sendEmail } from '@/lib/email/resend';
+import { brandedEmailHtml, infoRows } from '@/lib/email/templates/branded-layout';
 import { logOnrcEvent } from '@/lib/onrc/log-event';
 
 export const dynamic = 'force-dynamic';
@@ -224,12 +225,19 @@ async function notifyClientDelay(supabase: any, orderId: string, backoffice = fa
   const email = order?.customer_data?.contact?.email;
   if (!email) return;
   const oid = order.friendly_order_id ?? '';
-  const html = backoffice
-    ? `<p>Bună ziua,</p><p>Am depus cererea ta de certificat constatator (<strong>${oid}</strong>) la Registrul Comerțului. Se eliberează în câteva minute dacă sistemul ONRC este operațional; dacă sistemul ONRC are mentenanță sau întârzieri, în <strong>maximum 24 de ore lucrătoare</strong> (de obicei în aceeași zi). Îți trimitem documentul pe email imediat ce e gata.</p><p>Mulțumim,<br/>Echipa eghiseul.ro</p>`
-    : `<p>Bună ziua,</p><p>Cererea ta de certificat constatator (<strong>${oid}</strong>) este în curs de procesare la Registrul Comerțului. Revenim cu documentul în cel mai scurt timp.</p><p>Mulțumim,<br/>Echipa eghiseul.ro</p>`;
+  const body = backoffice
+    ? 'Am depus cererea ta de certificat constatator la Registrul Comerțului. Se eliberează în câteva minute dacă sistemul ONRC este operațional; la mentenanță sau întârzieri, în <strong>maximum 24 de ore lucrătoare</strong> (de obicei în aceeași zi). Îți trimitem documentul pe email imediat ce e gata.'
+    : 'Cererea ta de certificat constatator este în curs de procesare la Registrul Comerțului. Revenim cu documentul pe email în cel mai scurt timp.';
   await sendEmail({
     to: email,
     subject: `Comanda ${oid} — în procesare`,
-    html,
+    html: brandedEmailHtml({
+      preheader: `Comanda ${oid} este în procesare la Registrul Comerțului`,
+      content: `
+        <h1 style="margin:0 0 6px;color:#0B1B33;font-size:20px;">Comanda ta este în procesare</h1>
+        <p style="margin:0 0 18px;color:#475569;font-size:14px;line-height:1.6;">Bună ziua! ${body}</p>
+        ${infoRows([{ label: 'Comandă', value: oid, mono: true }])}`,
+    }),
+    text: `Bună ziua! ${body.replace(/<[^>]+>/g, '')} (Comanda ${oid})`,
   });
 }

@@ -5,9 +5,10 @@
  * receives a Stripe Elements link tied to the PaymentIntent we just
  * created on their behalf.
  *
- * Both HTML and plain-text emitted; HTML is fully inline (no external
- * assets) so it renders in email clients that block images.
+ * Both HTML and plain-text emitted; wrapped in the shared branded shell
+ * so it matches every other customer email.
  */
+import { brandedEmailHtml, ctaButton } from './branded-layout';
 
 export interface ExtraPaymentEmailInput {
   customerFirstName?: string | null;
@@ -31,44 +32,21 @@ export function buildExtraPaymentHtml(input: ExtraPaymentEmailInput): string {
   const greeting = input.customerFirstName
     ? `Salut ${escapeHtml(input.customerFirstName)},`
     : 'Salut,';
-  return `<!doctype html>
-<html lang="ro">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>${escapeHtml(buildExtraPaymentSubject(input))}</title>
-  </head>
-  <body style="margin:0;padding:0;background:#f9fafb;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;color:#1f2937">
-    <div style="max-width:560px;margin:0 auto;padding:24px">
-      <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:32px 28px">
-        <p style="margin:0 0 12px 0;font-size:14px;color:#6b7280">Comanda ${escapeHtml(input.orderNumber)}</p>
-        <h1 style="margin:0 0 16px 0;font-size:22px;line-height:1.3;color:#111827">${greeting}</h1>
-        <p style="margin:0 0 16px 0;font-size:15px;line-height:1.6">
-          Am modificat comanda ta conform discuției. Pentru a finaliza, este nevoie de o plată suplimentară.
-        </p>
-        <div style="background:#fffbeb;border:2px solid #fcd34d;border-radius:10px;padding:18px;margin:0 0 20px 0">
-          <p style="margin:0 0 6px 0;font-size:12px;text-transform:uppercase;letter-spacing:1px;color:#92400e">Sumă de plată</p>
-          <p style="margin:0;font-size:32px;font-weight:bold;color:#78350f;tabular-nums">${input.amountRon.toFixed(2)} RON</p>
-          <p style="margin:8px 0 0 0;font-size:13px;color:#92400e">${escapeHtml(input.changesDescription)}</p>
+  return brandedEmailHtml({
+    preheader: `Plată suplimentară ${input.amountRon.toFixed(2)} RON pentru comanda ${input.orderNumber}`,
+    content: `
+        <p style="margin:0 0 10px;font-size:13px;color:#64748b;">Comanda <span style="font-family:monospace;font-weight:700;color:#0f172a;">${escapeHtml(input.orderNumber)}</span></p>
+        <h1 style="margin:0 0 12px;color:#0B1B33;font-size:20px;">${greeting}</h1>
+        <p style="margin:0 0 16px;color:#475569;font-size:14px;line-height:1.6;">Am modificat comanda ta conform discuției. Pentru a finaliza, este nevoie de o plată suplimentară.</p>
+        <div style="background:#fffbeb;border:2px solid #fcd34d;border-radius:10px;padding:18px;margin:0 0 20px;">
+          <p style="margin:0 0 6px;font-size:12px;text-transform:uppercase;letter-spacing:1px;color:#92400e;">Sumă de plată</p>
+          <p style="margin:0;font-size:32px;font-weight:bold;color:#78350f;">${input.amountRon.toFixed(2)} RON</p>
+          <p style="margin:8px 0 0;font-size:13px;color:#92400e;">${escapeHtml(input.changesDescription)}</p>
         </div>
-        <p style="margin:0 0 24px 0;font-size:14px;color:#6b7280;line-height:1.6">
-          Plata se face în siguranță prin Stripe. Datele tale de card sunt criptate end-to-end și nu sunt stocate de noi.
-        </p>
-        <p style="margin:0 0 8px 0;text-align:center">
-          <a href="${escapeAttr(input.paymentUrl)}" style="display:inline-block;padding:14px 32px;background:#ecb95f;color:#1f2937;font-weight:600;text-decoration:none;border-radius:10px;font-size:15px">
-            Plătește ${input.amountRon.toFixed(2)} RON →
-          </a>
-        </p>
-        <p style="margin:14px 0 0 0;text-align:center;font-size:12px;color:#9ca3af">
-          Link-ul rămâne valid 24h. Dacă apare orice problemă, răspunde la acest email.
-        </p>
-      </div>
-      <p style="margin:18px 0 0 0;text-align:center;font-size:12px;color:#9ca3af;line-height:1.5">
-        Ai primit acest email pentru că ai o comandă activă pe eGhișeul.ro. Modificarea + plata sunt înregistrate în istoricul comenzii.
-      </p>
-    </div>
-  </body>
-</html>`;
+        <p style="margin:0 0 6px;font-size:13px;color:#64748b;line-height:1.6;">Plata se face în siguranță prin Stripe. Datele cardului sunt criptate end-to-end și nu sunt stocate de noi.</p>
+        ${ctaButton(`Plătește ${input.amountRon.toFixed(2)} RON`, input.paymentUrl)}
+        <p style="margin:14px 0 0;text-align:center;font-size:12px;color:#9ca3af;">Link-ul rămâne valid 24h. Orice problemă — răspunde la acest email.</p>`,
+  });
 }
 
 export function buildExtraPaymentText(input: ExtraPaymentEmailInput): string {
@@ -103,6 +81,3 @@ function escapeHtml(s: string): string {
     .replace(/'/g, '&#39;');
 }
 
-function escapeAttr(s: string): string {
-  return s.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
-}
