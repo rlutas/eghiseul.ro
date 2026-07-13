@@ -38,12 +38,12 @@ import { ServicePrice } from '@/components/services/service-price';
 const SERVICE_SLUG = 'certificat-casatorie';
 const PAGE_PATH = '/servicii/eliberare-certificat-de-casatorie/';
 const SCHEMA_SLUG = 'eliberare-certificat-de-casatorie';
-const TITLE = 'Certificat de Căsătorie Online — Duplicat 998 RON';
+const TITLE = 'Certificat de Căsătorie Online — Duplicat de la Starea Civilă';
 const DESCRIPTION =
   'Duplicat certificat de căsătorie online de la Starea Civilă, 998 RON, fără deplasare. ' +
   'Pentru act pierdut, din altă localitate sau diaspora. Email + curier.';
 const DATE_PUBLISHED = '2026-06-14';
-const DATE_MODIFIED = '2026-06-14';
+const DATE_MODIFIED = '2026-07-13';
 
 export const revalidate = 3600;
 

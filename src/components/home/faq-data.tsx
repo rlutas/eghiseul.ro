@@ -20,7 +20,7 @@ export const HOMEPAGE_FAQ_ITEMS: HomepageFaqItem[] = [
     question: 'Cât durează obținerea unui cazier judiciar online?',
     answer: (
       <>
-        <p><strong>Cazierul judiciar online</strong> se obține în 24-48 de ore de la validarea cererii. Procesul este simplu:</p>
+        <p><Link href="/servicii/cazier-judiciar-online/" className={A}><strong>Cazierul judiciar online</strong></Link> se obține în 24-48 de ore de la validarea cererii. Procesul este simplu:</p>
         <ul>
           <li>Completezi formularul online (2 minute)</li>
           <li>Efectuezi plata securizată</li>

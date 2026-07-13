@@ -49,8 +49,8 @@ const DESCRIPTION =
   'Persoane fizice și firme, livrare în 3-5 zile pe email sau curier. Comandă în 5 minute.';
 
 const DATE_PUBLISHED = '2026-04-16';
-const DATE_MODIFIED = '2026-05-20';
-const DATE_MODIFIED_DISPLAY = '20 mai 2026';
+const DATE_MODIFIED = '2026-07-13';
+const DATE_MODIFIED_DISPLAY = '13 iulie 2026';
 
 export const metadata: Metadata = buildPageMetadata({
   title: TITLE,
@@ -362,9 +362,10 @@ export default function CazierJudiciarHubPage() {
                 </h1>
 
                 <p className="text-lg sm:text-xl text-white/85 leading-relaxed mb-6">
-                  Document emis de <strong className="text-primary-500">Poliția Română</strong> conform
-                  Legii 290/2004, pentru <strong>persoane fizice și firme</strong>. Îl obții 100% online,
-                  fără drum la ghișeu.
+                  Prin eGhișeul.ro obții cazierul judiciar <strong>100% online, în 3-5 zile lucrătoare</strong> —
+                  document emis de <strong className="text-primary-500">Poliția Română</strong> conform
+                  Legii 290/2004, pentru <strong>persoane fizice și firme</strong>, cu taxele incluse.
+                  Fără drum la ghișeu.
                 </p>
 
                 {/* USP — diaspora */}

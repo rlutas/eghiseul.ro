@@ -48,6 +48,12 @@ export default function Page() {
         firme. Acest articol își propune să exploreze și să clarifice cele patru tipuri principale de certificate
         constatatoare pe care le puteți solicita de la ONRC, fiecare cu particularitățile și importanța sa specifică.
       </p>
+      <p>
+        Pe scurt: dacă știi deja ce tip îți trebuie, poți obține un{' '}
+        <Link href="/servicii/certificat-constatator-online/">certificat constatator online</Link> prin
+        eGhișeul — doar cu CUI-ul firmei, emis de obicei în câteva minute, de la 89 RON cu taxele ONRC incluse.
+        Mai jos găsești ghidul complet al celor 4 tipuri, ca să alegi corect.
+      </p>
 
       <h2>Ce este un Certificat Constatator?</h2>
       <p>

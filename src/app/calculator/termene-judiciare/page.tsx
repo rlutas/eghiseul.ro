@@ -4,7 +4,7 @@ import { CalculatorLayout } from '@/components/calculators/calculator-layout';
 import { TermeneCalculator } from '@/components/calculators/termene-calculator';
 
 const SLUG = 'termene-judiciare';
-const TITLE = 'Calculator Termene Judiciare 2026 — Termene Procedurale';
+const TITLE = 'Calculator Termene Judiciare 2026 — Exact, Gratuit, pe Loc';
 const DESCRIPTION =
   'Calculează termenele procedurale (judiciare) conform Codului de Procedură Civilă și Penală: zile, săptămâni, luni sau ani, cu sărbătorile legale 2026 luate în calcul.';
 

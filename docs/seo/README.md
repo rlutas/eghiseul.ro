@@ -16,6 +16,7 @@ Index al documentației SEO. Status curent al expansiunii: [`SEO-STATUS-2026-06-
 ## Planuri & referințe (vii)
 | Fișier | Rol |
 |---|---|
+| [`STRATEGY-2026-07-13-post-cutover.md`](STRATEGY-2026-07-13-post-cutover.md) | **CURENT** — strategie post-cutover pe GSC live: indexare (66/204!), striking distance, GEO/AI, autoritate |
 | [`SEO-ANALYSIS-2026-06-22.md`](SEO-ANALYSIS-2026-06-22.md) | Analiză GSC: ce rankează, ce merge, oportunități + plan go-live |
 | [`SEO-STATUS-2026-06-22.md`](SEO-STATUS-2026-06-22.md) | Status curent expansiune location-SEO + clustere |
 | [`SEO-MASTER-PLAN-2026-05-20.md`](SEO-MASTER-PLAN-2026-05-20.md) | Plan SEO master (migrare WP→Next) |

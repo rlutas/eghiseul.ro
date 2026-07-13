@@ -37,12 +37,12 @@ import { ServicePrice } from '@/components/services/service-price';
 const SERVICE_SLUG = 'certificat-nastere';
 const PAGE_PATH = '/servicii/eliberare-certificat-de-nastere/';
 const SCHEMA_SLUG = 'eliberare-certificat-de-nastere';
-const TITLE = 'Certificat de Naștere Online — Duplicat 998 RON';
+const TITLE = 'Certificat de Naștere Online — Duplicat de la Starea Civilă';
 const DESCRIPTION =
   'Duplicat certificat de naștere online de la Starea Civilă, 998 RON, fără deplasare. ' +
   'Pentru act pierdut, din altă localitate sau diaspora. Email + curier.';
 const DATE_PUBLISHED = '2026-06-14';
-const DATE_MODIFIED = '2026-06-14';
+const DATE_MODIFIED = '2026-07-13';
 
 export const revalidate = 3600;
 
@@ -623,6 +623,14 @@ export default async function CertificatNasterePage() {
               sau cum procedezi dacă ai{' '}
               <Link href="/certificat-de-nastere-pierdut/" className="text-primary-600 font-medium hover:underline">
                 pierdut certificatul
+              </Link>
+              . Găsești ghiduri separate și pentru{' '}
+              <Link href="/duplicat-certificat-de-nastere/" className="text-primary-600 font-medium hover:underline">
+                obținerea unui duplicat de la orice primărie
+              </Link>{' '}
+              și pentru{' '}
+              <Link href="/transcriere-certificat-de-nastere/" className="text-primary-600 font-medium hover:underline">
+                transcrierea certificatului obținut în străinătate
               </Link>
               .
             </p>
