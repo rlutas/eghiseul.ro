@@ -44,7 +44,7 @@ export function ArticlesSection() {
             >
               <div className="relative aspect-[16/9] overflow-hidden bg-neutral-100">
                 <Image
-                  src={`/images/articole/${a.slug}.webp`}
+                  src={a.image ?? `/images/articole/${a.slug}.webp`}
                   alt={a.title}
                   fill
                   className="object-cover group-hover:scale-[1.03] transition-transform duration-300 motion-reduce:transition-none"
