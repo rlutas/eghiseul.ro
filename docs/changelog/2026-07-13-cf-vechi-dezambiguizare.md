@@ -36,6 +36,11 @@ Cauze, fapte verificate pe ePay, research ANCPI (Ordin 600/2023) și regulile fi
 - CF nou de UNITATE (`123456-C1-U2`) → câmpul cadastral/topografic se ASCUNDE + mesaj verde „identifică exact apartamentul" (nu mai cerem numere inutile)
 - `jumpToService` („Nu știu" → identificare) folosește `router.replace` — back-ul de browser nu te mai aruncă în mijlocul wizardului vechi (raportat la test: selectorul arăta serviciul vechi — era browser-back pe URL-ul vechi, nu pierdere de state; verificat: după switch, dropdown-ul e corect pe ambii pași)
 
+### Iterația 4 (reguli finale identificator + UX colectiv)
+- Sub „✓ Format corect" scrie acum CE primește: `123456` → „extrasul pentru TEREN/casă (inclusiv terenul de sub bloc)"; `123456-C1-U2` → „extrasul pentru APARTAMENT" — și la imobilele suplimentare
+- `123456-C1` (colectivă): mesaj explicit + **buton „Comandă Extras CF Colectiv cu numărul introdus"** — sare direct în wizardul colectiv cu numărul/județul/localitatea PĂSTRATE (handoff extins cu property); eliminat comportamentul vechi care tăia silențios `-C1` și emitea pe teren
+- Specimen: chenarul albastru din dreapta scos (rămân galbenul pe „Nr. CF vechi" — repoziționat exact pe text, mai gros — și albastrul pe coloana din tabel)
+
 ## Rămase (backlog)
 - Faza 2: admin — alegere unitate din candidates cu 1 click (re-enqueue job)
 - Faza 3.2: validare live SearchEstate în wizard pre-plată (confirmare vizuală adresă)

@@ -55,11 +55,23 @@ const COUNTIES = [
   'Vrancea',
 ];
 
+/** What the client will actually receive for a VALID electronic identifier. */
+function cfOutcome(normalized: string): string | null {
+  if (/^\d{1,7}-C\d+-U\d+$/.test(normalized)) return 'vei primi extrasul pentru APARTAMENT (unitatea ta individuală)';
+  if (/^\d{1,7}$/.test(normalized)) return 'vei primi extrasul pentru TEREN / casă (inclusiv terenul de sub bloc)';
+  return null;
+}
+
 /** Inline, non-blocking hint under a CF/cadastral input. */
 function CfHint({ check }: { check: ReturnType<typeof checkCf> }) {
   if (check.status === 'empty') return null;
   if (check.status === 'valid') {
-    return <p className="text-xs text-green-600 flex items-center gap-1">✓ Format corect</p>;
+    const outcome = cfOutcome(check.normalized);
+    return (
+      <p className="text-xs text-green-600 flex items-center gap-1">
+        ✓ Format corect{outcome ? <span className="text-green-700"> — {outcome}</span> : null}
+      </p>
+    );
   }
   return (
     <Alert className="border-amber-300 bg-amber-50 py-2">
@@ -109,8 +121,6 @@ function CfSpecimenExplainer() {
             <div className="absolute rounded border-2 border-green-500 bg-green-400/15" style={{ left: '37%', top: '31%', width: '27%', height: '9%' }} />
             {/* Nr. CF vechi */}
             <div className="absolute rounded border-[3px] border-amber-600 bg-amber-400/20" style={{ left: '70%', top: '60%', width: '29%', height: '5.5%' }} />
-            {/* Nr. cadastral vechi + Nr. topografic */}
-            <div className="absolute rounded border-2 border-blue-500 bg-blue-400/15" style={{ left: '70%', top: '66.5%', width: '29%', height: '9.5%' }} />
             {/* coloana Nr. cadastral / Nr. topografic din tabel */}
             <div className="absolute rounded border-2 border-blue-500 bg-blue-400/15" style={{ left: '14%', top: '77.5%', width: '14%', height: '18%' }} />
           </div>
@@ -127,7 +137,7 @@ function CfSpecimenExplainer() {
             </li>
             <li>
               <mark className="bg-blue-100 text-blue-900 font-semibold px-1 rounded">Albastru</mark> —
-              „Nr. cadastral&rdquo; / „Nr. topografic&rdquo; (în dreapta sus și în tabelul A1). Dacă ai doar
+              „Nr. cadastral&rdquo; / „Nr. topografic&rdquo; — coloana din tabelul A1. Dacă ai doar
               numărul vechi, adaugă-l și pe acesta — identifică exact apartamentul tău.
             </li>
           </ul>
@@ -144,13 +154,16 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
   // „Nu știu" → jump to the right identification service, carrying the contact
   // data over (sessionStorage handoff, consumed by the wizard provider — no PII
   // in the URL) and landing directly on its step 2 (Date Imobil).
-  const jumpToService = useCallback((slug: string) => {
+  const jumpToService = useCallback((slug: string, carryProperty?: Record<string, string | undefined>) => {
     try {
       sessionStorage.setItem('wizard_contact_handoff', JSON.stringify({
         email: state.contact.email,
         phone: state.contact.phone,
         preferredContact: state.contact.preferredContact,
         ts: Date.now(),
+        // e.g. the collective-CF button carries the number/county over to
+        // Extras CF Colectiv so the client doesn't retype anything.
+        ...(carryProperty ? { property: carryProperty } : {}),
       }));
     } catch { /* private mode — client just retypes contact */ }
     // replace, not push: browser-back should NOT land the user back inside the
@@ -390,6 +403,22 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
                   se emite exact pe el, fără risc de confuzie.
                 </p>
                 <CfHint check={cfCheck} />
+                {cfCheck.status === 'collective' && (
+                  <Button
+                    type="button"
+                    size="sm"
+                    className="w-full sm:w-auto bg-primary-500 hover:bg-primary-600 text-secondary-900 font-semibold"
+                    onClick={() =>
+                      jumpToService('extras-cf-colectiv', {
+                        county: property.county,
+                        locality: property.locality,
+                        carteFunciara: property.carteFunciara,
+                      })
+                    }
+                  >
+                    Comandă Extras CF Colectiv cu numărul introdus →
+                  </Button>
+                )}
               </div>
 
               {/* Combined cadastral/topografic — the extract has ONE merged
@@ -604,8 +633,9 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
                     type="text"
                     value={im.carteFunciara}
                     onChange={(e) => updateImobil(i, { carteFunciara: e.target.value })}
-                    placeholder="123456"
+                    placeholder="123456 sau 123456-C1-U2"
                   />
+                  <CfHint check={checkCf(im.carteFunciara ?? '')} />
                 </div>
                 <div className="space-y-1">
                   <Label>

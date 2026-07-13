@@ -990,6 +990,7 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
           sessionStorage.removeItem('wizard_contact_handoff');
           const handoff = JSON.parse(raw) as {
             email?: string; phone?: string; preferredContact?: string; ts?: number;
+            property?: { county?: string; locality?: string; carteFunciara?: string; cadastral?: string; topografic?: string };
           };
           if (handoff.ts && Date.now() - handoff.ts < 10 * 60_000 && handoff.email) {
             handoffAppliedRef.current = true;
@@ -1003,6 +1004,12 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
                   : {}),
               },
             });
+            // Cross-service jumps can also carry the property block (e.g. the
+            // collective-CF button on Extras CF → Extras CF Colectiv keeps the
+            // number/county the client already typed).
+            if (handoff.property && typeof handoff.property === 'object') {
+              dispatch({ type: 'UPDATE_PROPERTY', payload: handoff.property });
+            }
             dispatch({ type: 'MARK_INITIALIZED' });
             return; // fresh order on the new service, contact carried over
           }
