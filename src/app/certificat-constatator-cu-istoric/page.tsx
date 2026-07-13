@@ -16,7 +16,7 @@ export const metadata = buildPageMetadata({
   title: TITLE,
   description: DESCRIPTION,
   path: `/${SLUG}/`,
-  ogImage: '/images/articole/cele-4-tipuri-de-certificat-constatator-online.webp',
+  ogImage: `/images/articole/${SLUG}.webp`,
 });
 
 export default function Page() {
@@ -30,7 +30,6 @@ export default function Page() {
       dateModified={DATE_MODIFIED}
       publishedLabel="13 iulie 2026"
       updatedLabel="13 iulie 2026"
-      image="/images/articole/cele-4-tipuri-de-certificat-constatator-online.webp"
       relatedServices={[
         { slug: 'certificat-constatator', label: 'Certificat Constatator Online', desc: 'Toate tipurile, doar cu CUI-ul firmei — comandă 24/7.' },
         { href: '/cele-4-tipuri-de-certificat-constatator-online/', label: 'Cele 4 tipuri de certificat constatator', desc: 'Ghidul complet: care tip îți trebuie și de ce.' },

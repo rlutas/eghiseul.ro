@@ -29,7 +29,6 @@ export const ARTICLES: ArticleMeta[] = [
     title: 'Certificat Constatator cu Istoric — Ce Conține, Preț, Cum Îl Obții',
     excerpt: 'Toate modificările firmei de la înființare: asociați, sedii, capital. Când ai nevoie de istoric și când ajunge certificatul de bază.',
     category: 'Firme & ONRC',
-    image: '/images/articole/cele-4-tipuri-de-certificat-constatator-online.webp',
   },
   {
     slug: 'tabel-varsta-pensionare-anticipata-femei',
