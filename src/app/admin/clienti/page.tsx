@@ -123,7 +123,8 @@ export default function AdminClientiPage() {
 
       <p className="text-xs text-muted-foreground">
         GDPR: comunicări comerciale doar către <strong>clienți</strong> (soft opt-in — servicii similare,
-        cu dezabonare în fiecare email). Lead-urile (formular fără plată) nu primesc marketing.
+        cu dezabonare în fiecare email). Lead-urile (formular fără plată) nu primesc marketing.{' '}
+        <a href="/admin/marketing" className="text-primary-700 underline">Abonații cu opt-in explicit →</a>
       </p>
 
       <div className="rounded-lg border overflow-x-auto bg-white">

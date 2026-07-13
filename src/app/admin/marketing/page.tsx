@@ -80,7 +80,8 @@ export default function AdminMarketingPage() {
             Marketing — Abonați newsletter
           </h1>
           <p className="mt-0.5 text-sm text-slate-500">
-            {rows.length} {rows.length === 1 ? 'abonat' : 'abonați'} · doar persoane cu consimțământ explicit (GDPR).
+            {rows.length} {rows.length === 1 ? 'abonat' : 'abonați'} · doar persoane cu consimțământ explicit (GDPR).{' '}
+            <a href="/admin/clienti" className="text-primary-700 underline">Registrul complet de clienți & lead-uri →</a>
             Cei dezabonați rămân în listă ca dovadă, dar NU li se trimit emailuri.
           </p>
         </div>
