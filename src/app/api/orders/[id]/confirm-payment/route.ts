@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 import { stripe } from '@/lib/stripe';
 import { computeEstimatedCompletionISO } from '@/lib/delivery-estimate-helper';
 import { ensureInvoiceForPaidOrder } from '@/lib/oblio';
+import { upsertContactForPaidOrder } from '@/lib/contacts/upsert';
 import { ensureOnrcJobForPaidOrder } from '@/lib/onrc/ensure-onrc-job';
 import { ensureAncpiJobForPaidOrder } from '@/lib/ancpi/ensure-ancpi-job';
 
@@ -51,6 +52,8 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       if (!(order as any).invoice_number) {
         const res = await ensureInvoiceForPaidOrder(orderId, 'Card');
+      if (res.status === 'created') await upsertContactForPaidOrder(orderId);
+        if (res.status === 'created') await upsertContactForPaidOrder(orderId);
         invoiceBackfilled = res.status === 'created';
         if (res.status === 'failed') {
           console.error(`[confirm-payment] Invoice backfill failed for ${orderId}: ${res.error}`);

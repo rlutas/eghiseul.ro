@@ -3,6 +3,7 @@ import { stripe } from '@/lib/stripe'
 import { createClient } from '@supabase/supabase-js'
 import Stripe from 'stripe'
 import { ensureInvoiceForPaidOrder } from '@/lib/oblio'
+import { upsertContactForPaidOrder } from '@/lib/contacts/upsert'
 import { ensureOnrcJobForPaidOrder } from '@/lib/onrc/ensure-onrc-job'
 import { ensureAncpiJobForPaidOrder } from '@/lib/ancpi/ensure-ancpi-job'
 import { computeEstimatedCompletionISO } from '@/lib/delivery-estimate-helper'
@@ -289,6 +290,9 @@ async function handlePaymentSucceeded(paymentIntent: Stripe.PaymentIntent) {
   const result = await ensureInvoiceForPaidOrder(orderId, 'Card', {
     historyNote: undefined, // helper writes its own "Factură emisă automat: …"
   })
+
+  // Contact registry: exactly once per order (invoice lock winner).
+  if (result.status === 'created') await upsertContactForPaidOrder(orderId)
   if (result.status === 'failed') {
     console.error(`Order ${orderId}: invoice creation failed:`, result.error)
   } else if (result.status === 'locked') {

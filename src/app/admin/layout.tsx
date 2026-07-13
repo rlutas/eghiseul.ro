@@ -62,6 +62,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: '/admin/status-portaluri', label: 'Stare portaluri', icon: Activity, permission: 'orders.view', hideForRoles: ['avocat'] },
   { href: '/admin/coupons', label: 'Cupoane', icon: Ticket, permission: 'settings.manage' },
   { href: '/admin/marketing', label: 'Marketing', icon: Mail, permission: 'settings.manage' },
+  { href: '/admin/clienti', label: 'Clienți', icon: Users, permission: 'users.manage' },
   { href: '/admin/users', label: 'Utilizatori', icon: Users, permission: 'users.manage' },
   { href: '/admin/settings', label: 'Setari', icon: Settings, permission: 'settings.manage' },
 ];
