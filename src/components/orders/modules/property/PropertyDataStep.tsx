@@ -535,16 +535,17 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
 
               {config.identificationService.extraFields.includes('ownerName') && (
                 <div className="space-y-2">
-                  <Label htmlFor="ownerName">Nume proprietar (opțional)</Label>
+                  <Label htmlFor="ownerName">Nume complet proprietar</Label>
                   <Input
                     id="ownerName"
                     type="text"
                     value={property.ownerName || ''}
                     onChange={(e) => updateProperty?.({ ownerName: e.target.value })}
-                    placeholder="Popescu Ion"
+                    placeholder="Nume și prenume, exact ca în acte (ex: Popescu Ion-Andrei)"
                   />
                   <p className="text-xs text-muted-foreground">
-                    Ajută la identificarea mai rapidă a imobilului
+                    Numele complet (nume + prenume, ca în actul de proprietate) — doar numele de
+                    familie nu e suficient pentru identificare.
                   </p>
                 </div>
               )}
@@ -561,6 +562,20 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
                   />
                 </div>
               )}
+
+              <div className="space-y-2">
+                <Label htmlFor="additionalInfo">Alte informații utile (opțional)</Label>
+                <Textarea
+                  id="additionalInfo"
+                  value={property.additionalInfo || ''}
+                  onChange={(e) => updateProperty?.({ additionalInfo: e.target.value })}
+                  placeholder="Orice detaliu care ajută identificarea: repere, vecinătăți, nr. vechi de casă, cum apare adresa în alte acte, foste denumiri de stradă etc."
+                  rows={3}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Cu cât mai multe detalii, cu atât identificarea e mai rapidă și mai sigură.
+                </p>
+              </div>
             </div>
           )}
 

@@ -13,13 +13,14 @@ interface EarningOrder {
   status: string;
   paidAt: string | null;
   fee: number;
+  clientTotal: number;
   isTest: boolean;
 }
 
 interface EarningsData {
   month: string | null;
   orders: EarningOrder[];
-  summary: { count: number; totalFees: number };
+  summary: { count: number; totalFees: number; totalCollected: number };
 }
 
 /** Last 12 months as YYYY-MM options, newest first. */
@@ -64,7 +65,7 @@ export default function CollaboratorDecontPage() {
     })();
   }, [month]);
 
-  const summary = data?.summary ?? { count: 0, totalFees: 0 };
+  const summary = data?.summary ?? { count: 0, totalFees: 0, totalCollected: 0 };
 
   return (
     <div className="mx-auto max-w-5xl">
@@ -86,12 +87,20 @@ export default function CollaboratorDecontPage() {
         </select>
       </div>
 
-      <div className="mb-6 grid grid-cols-2 gap-3 sm:gap-4">
+      <div className="mb-6 grid grid-cols-3 gap-3 sm:gap-4">
         <div className="rounded-lg border border-slate-200 bg-white p-4 sm:p-5">
           <div className="mb-1 flex items-center gap-2 text-xs uppercase text-slate-400">
             <ClipboardList className="h-4 w-4" /> Comenzi plătite
           </div>
           <p className="text-2xl font-bold text-slate-900">{loading ? '…' : summary.count}</p>
+        </div>
+        <div className="rounded-lg border border-slate-200 bg-white p-4 sm:p-5">
+          <div className="mb-1 flex items-center gap-2 text-xs uppercase text-slate-400">
+            <Wallet className="h-4 w-4" /> Încasat servicii (TVA incl.)
+          </div>
+          <p className="text-2xl font-bold text-slate-900">
+            {loading ? '…' : `${summary.totalCollected.toFixed(2)} RON`}
+          </p>
         </div>
         <div className="rounded-lg border border-primary-200 bg-primary-50 p-4 sm:p-5">
           <div className="mb-1 flex items-center gap-2 text-xs uppercase text-primary-700">
@@ -121,6 +130,7 @@ export default function CollaboratorDecontPage() {
                 <th className="px-4 py-3">Localitate</th>
                 <th className="px-4 py-3">Status</th>
                 <th className="px-4 py-3">Plătită la</th>
+                <th className="px-4 py-3 text-right">Încasat client (TVA incl.)</th>
                 <th className="px-4 py-3 text-right">Onorariu</th>
               </tr>
             </thead>
@@ -144,6 +154,9 @@ export default function CollaboratorDecontPage() {
                   </td>
                   <td className="px-4 py-3 text-slate-500">
                     {o.paidAt ? new Date(o.paidAt).toLocaleDateString('ro-RO') : '—'}
+                  </td>
+                  <td className="px-4 py-3 text-right text-slate-600">
+                    {o.isTest ? '—' : `${o.clientTotal.toFixed(2)} RON`}
                   </td>
                   <td className="px-4 py-3 text-right font-medium text-slate-900">
                     {o.isTest ? '—' : `${o.fee.toFixed(2)} RON`}

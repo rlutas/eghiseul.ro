@@ -101,6 +101,7 @@ interface Service {
     institution?: string;
     default_motiv?: string;
     estimated_days_display?: string;
+    ancpi_cost_ron?: number;
     urgent_days_display?: string;
     allow_self_cancel?: boolean;
   } | null;
@@ -554,6 +555,10 @@ function EditServiceDialog({
     service.processing_config?.urgent_days_display || ''
   );
   const [isFeatured, setIsFeatured] = useState(!!service.is_featured);
+  // Cost ANCPI informativ (tarif oficial Ordin 16/2019) — afișat topografului.
+  const [ancpiCost, setAncpiCost] = useState(
+    service.processing_config?.ancpi_cost_ron != null ? String(service.processing_config.ancpi_cost_ron) : ''
+  );
   // 30-min customer self-cancel toggle (processing_config.allow_self_cancel).
   const [allowSelfCancel, setAllowSelfCancel] = useState(
     service.processing_config?.allow_self_cancel !== false
@@ -597,6 +602,11 @@ function EditServiceDialog({
         delete nextConfig.urgent_days_display;
       }
       nextConfig.allow_self_cancel = allowSelfCancel;
+      if (ancpiCost.trim() && !isNaN(parseFloat(ancpiCost))) {
+        nextConfig.ancpi_cost_ron = parseFloat(ancpiCost);
+      } else {
+        delete nextConfig.ancpi_cost_ron;
+      }
       updates.processing_config = nextConfig;
 
       const res = await fetch('/api/admin/settings/services', {
@@ -674,6 +684,18 @@ function EditServiceDialog({
                 value={urgentDaysDisplay}
                 onChange={(e) => setUrgentDaysDisplay(e.target.value)}
                 placeholder="ex: 1-2 zile lucratoare"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-ancpi-cost">Cost ANCPI informativ (lei)</Label>
+              <Input
+                id="edit-ancpi-cost"
+                type="number"
+                step="0.01"
+                min="0"
+                value={ancpiCost}
+                onChange={(e) => setAncpiCost(e.target.value)}
+                placeholder="tarif oficial Ordin 16/2019"
               />
             </div>
           </div>

@@ -498,6 +498,8 @@ export interface PropertyState {
   // For identification services
   ownerName?: string;
   ownerCnpCui?: string;
+  /** Free-text extra details from the client (identificare imobil). */
+  additionalInfo?: string;
   propertyAddress?: string;
 }
 

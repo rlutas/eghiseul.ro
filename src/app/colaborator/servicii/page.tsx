@@ -9,6 +9,7 @@ interface CollabService {
   slug: string;
   clientPrice: number;
   fee: number;
+  ancpiCost?: number | null;
 }
 
 export default function CollaboratorServicesPage() {
@@ -57,6 +58,7 @@ export default function CollaboratorServicesPage() {
                   <span className="inline-flex items-center gap-1"><Layers className="h-3.5 w-3.5" /> Serviciu</span>
                 </th>
                 <th className="px-4 py-3 text-right">Preț client</th>
+                <th className="px-4 py-3 text-right">Cost ANCPI (informativ)</th>
                 <th className="px-4 py-3 text-right">Onorariul tău</th>
               </tr>
             </thead>
@@ -65,6 +67,9 @@ export default function CollaboratorServicesPage() {
                 <tr key={s.id} className="hover:bg-slate-50">
                   <td className="px-4 py-3 font-medium text-slate-800">{s.name}</td>
                   <td className="px-4 py-3 text-right text-slate-600">{s.clientPrice.toFixed(2)} RON</td>
+                  <td className="px-4 py-3 text-right text-slate-500">
+                    {s.ancpiCost != null ? `${s.ancpiCost.toFixed(2)} RON` : '—'}
+                  </td>
                   <td className="px-4 py-3 text-right font-semibold text-slate-900">{s.fee.toFixed(2)} RON</td>
                 </tr>
               ))}

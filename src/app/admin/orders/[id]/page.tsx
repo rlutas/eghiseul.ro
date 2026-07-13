@@ -3922,6 +3922,7 @@ const PROPERTY_LABELS: Array<[string, string]> = [
   ['carteFunciara', 'Nr. carte funciară'],
   ['topografic', 'Nr. topografic'],
   ['motiv', 'Motivul solicitării'],
+  ['additionalInfo', 'Alte informații de la client'],
 ];
 
 function PropertySection({ property }: { property: AnyObj | null }) {

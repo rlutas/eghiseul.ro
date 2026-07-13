@@ -30,7 +30,7 @@ export async function GET() {
     const admin = createAdminClient() as any;
     const { data, error } = await admin
       .from('services')
-      .select('id, name, slug, base_price, lawyer_fee_ron')
+      .select('id, name, slug, base_price, lawyer_fee_ron, processing_config')
       .in('id', serviceIds)
       .order('name');
 
@@ -46,6 +46,7 @@ export async function GET() {
       slug: s.slug,
       clientPrice: Number(s.base_price) || 0,
       fee: Number(s.lawyer_fee_ron) || 0,
+      ancpiCost: s.processing_config?.ancpi_cost_ron != null ? Number(s.processing_config.ancpi_cost_ron) : null,
     }));
 
     return NextResponse.json({ success: true, data: services });

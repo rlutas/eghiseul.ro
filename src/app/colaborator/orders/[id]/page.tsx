@@ -139,6 +139,8 @@ export default function CollaboratorOrderDetail() {
           <Field label="Nr. topografic" value={property.topografic} />
           <Field label="Adresă imobil" value={property.propertyAddress ?? property.address} />
           <Field label="Proprietar" value={property.ownerName} />
+          <Field label="Motivul solicitării" value={property.motiv} />
+          <Field label="Alte informații de la client" value={property.additionalInfo} />
         </dl>
       </div>
 

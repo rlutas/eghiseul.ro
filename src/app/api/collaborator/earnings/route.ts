@@ -49,7 +49,7 @@ export async function GET(request: NextRequest) {
     const admin = createAdminClient() as any;
     const { data, error } = await admin
       .from('orders')
-      .select('id, friendly_order_id, status, paid_at, is_test, customer_data, services:service_id(name, lawyer_fee_ron)')
+      .select('id, friendly_order_id, status, paid_at, is_test, total_price, customer_data, services:service_id(name, lawyer_fee_ron)')
       .or(scopeFilter)
       .eq('payment_status', 'paid')
       .neq('status', 'cancelled')
@@ -74,6 +74,8 @@ export async function GET(request: NextRequest) {
         status: o.status,
         paidAt: o.paid_at,
         fee: Number(o.services?.lawyer_fee_ron) || 0,
+        // Prețul plătit de client (TVA inclus) — bază pentru decontul lunar.
+        clientTotal: Number(o.total_price) || 0,
         isTest: !!o.is_test,
       };
     });
@@ -84,6 +86,8 @@ export async function GET(request: NextRequest) {
       count: billable.length,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       totalFees: Math.round(billable.reduce((s: number, o: any) => s + o.fee, 0) * 100) / 100,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      totalCollected: Math.round(billable.reduce((s: number, o: any) => s + o.clientTotal, 0) * 100) / 100,
     };
 
     return NextResponse.json({ success: true, data: { month, orders, summary } });
