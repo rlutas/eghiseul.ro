@@ -27,3 +27,9 @@ onorariul, fără totalul încasat de la client (baza de calcul dintre părți).
   actualizare adresă 60 (2.6.3) · dețineri imobile 10 (2.7.9). PAD = fără seed (tarif variabil).
 - Afișat la colaborator în `/colaborator/servicii` (coloana „Cost ANCPI (informativ)")
 - **Editabil din admin** Settings → Servicii → Edit („Cost ANCPI informativ (lei)") — fără cod
+
+### Email de alocare comandă (către topograf)
+- Era HTML minimal pe 2 rânduri → arăta stricat și ateriza în spam la Yahoo (raportat de Mircea)
+- Refăcut pe template-ul branded al comenzilor (`branded-layout.ts`): header navy + logo, rânduri
+  Comandă/Serviciu, buton „Deschide comanda" către portal, footer legal, preheader; subiect cu numele serviciului
+- Testat pe adresa reală: primit OK (13.07)
