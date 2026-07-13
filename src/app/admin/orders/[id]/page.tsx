@@ -3926,8 +3926,15 @@ const PROPERTY_LABELS: Array<[string, string]> = [
 
 function PropertySection({ property }: { property: AnyObj | null }) {
   if (!property || typeof property !== 'object') return null;
-  const entries = Object.entries(property).filter(([, v]) => v != null && String(v).trim() !== '');
-  if (entries.length === 0) return null;
+  // additionalImobile is an array of objects — rendered as dedicated rows
+  // below, never through the generic String() pass ("[object Object]").
+  const extraImobile = Array.isArray(property.additionalImobile)
+    ? (property.additionalImobile as Array<Record<string, unknown>>)
+    : [];
+  const entries = Object.entries(property).filter(
+    ([k, v]) => k !== 'additionalImobile' && v != null && typeof v !== 'object' && String(v).trim() !== ''
+  );
+  if (entries.length === 0 && extraImobile.length === 0) return null;
 
   const known = new Map(PROPERTY_LABELS);
   const ordered: Array<[string, string]> = [
@@ -3937,6 +3944,16 @@ function PropertySection({ property }: { property: AnyObj | null }) {
     ...entries.filter(([k]) => !known.has(k)).map(([k, v]) => [k, String(v)] as [string, string]),
   ];
 
+  const imobilSummary = (im: Record<string, unknown>): string =>
+    [
+      im.locality ? `Localitate: ${im.locality}` : null,
+      im.carteFunciara ? `CF: ${im.carteFunciara}` : null,
+      im.cadastral ? `Cadastral/Topo: ${im.cadastral}` : null,
+      im.topografic ? `Topografic: ${im.topografic}` : null,
+    ]
+      .filter(Boolean)
+      .join(' · ') || '—';
+
   return (
     <>
       <p className="pt-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground flex items-center gap-1.5">
@@ -3945,6 +3962,9 @@ function PropertySection({ property }: { property: AnyObj | null }) {
       </p>
       {ordered.map(([label, value]) => (
         <InfoRow key={label} label={label} value={value} />
+      ))}
+      {extraImobile.map((im, i) => (
+        <InfoRow key={`extra-${i}`} label={`Imobil suplimentar #${i + 2}`} value={imobilSummary(im)} />
       ))}
     </>
   );
