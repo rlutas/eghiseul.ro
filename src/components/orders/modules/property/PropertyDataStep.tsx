@@ -32,7 +32,7 @@ import { Home, AlertCircle, HelpCircle, Plus, Trash2 } from 'lucide-react';
 import type { PropertyVerificationConfig, AdditionalImobil } from '@/types/verification-modules';
 import { normalizeJudet } from '@/lib/ancpi/judete';
 import uatNomenclator from '@/lib/ancpi/uat-nomenclator.json';
-import { checkCf } from '@/lib/ancpi/cf-format';
+import { checkCf, normalizeCf } from '@/lib/ancpi/cf-format';
 import {
   Tooltip,
   TooltipContent,
@@ -161,7 +161,9 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
         ts: Date.now(),
       }));
     } catch { /* private mode — client just retypes contact */ }
-    router.push(`/comanda/${slug}?step=2`);
+    // replace, not push: browser-back should NOT land the user back inside the
+    // wizard they just left (confusing — the old draft reappears mid-flow).
+    router.replace(`/comanda/${slug}?step=2`);
   }, [router, state.contact.email, state.contact.phone, state.contact.preferredContact]);
   const property = state.property;
 
@@ -176,6 +178,9 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
 
   // Non-blocking input rules for the electronic identifier (warn, don't block).
   const cfCheck = checkCf(property?.carteFunciara ?? '');
+  // Electronic UNIT identifier (123456-C1-U2) pinpoints the apartment by
+  // itself — no cadastral/topografic disambiguation needed.
+  const isElectronicUnit = /^\d{1,7}-C\d+-U\d+$/.test(normalizeCf(property?.carteFunciara ?? ''));
 
   // ── Multi-imobil ("Adaugă un extras") — all in the SAME county (ANCPI rule) ──
   const additional = property?.additionalImobile ?? [];
@@ -400,7 +405,15 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
                   number this is the only thing that pinpoints the apartment
                   (two real wrong-unit deliveries without it). Stored in
                   property.cadastral (searchable identifier when CF is empty);
-                  the worker matches it against BOTH ePay columns. */}
+                  the worker matches it against BOTH ePay columns.
+                  HIDDEN when the CF is already an electronic UNIT identifier
+                  (123456-C1-U2) — that pinpoints the apartment by itself. */}
+              {isElectronicUnit ? (
+                <p className="text-xs text-green-700 bg-green-50 border border-green-200 rounded-lg px-3 py-2">
+                  ✓ Ai introdus numărul electronic al unității — identifică exact apartamentul,
+                  nu mai e nevoie de alte numere.
+                </p>
+              ) : (
               <div className={cfCheck.status === 'old_format'
                 ? 'rounded-lg border-2 border-amber-300 bg-amber-50 p-3 space-y-2'
                 : 'space-y-2'}>
@@ -452,6 +465,7 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
                   </div>
                 )}
               </div>
+              )}
 
               <CfSpecimenExplainer />
             </div>

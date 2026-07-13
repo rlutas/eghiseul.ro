@@ -32,6 +32,10 @@ Cauze, fapte verificate pe ePay, research ANCPI (Ordin 600/2023) și regulile fi
 - Worker: `normId` curăță virgule/punctuație din paste-ul clientului (caz real: „...V,") — redeploy Railway
 - **Fix bug separat descoperit la test**: toggle-ul „Sunt cetățean străin" apărea pe 19 servicii FĂRĂ KYC (extras CF, toate imobiliarele, constatator, rovinietă) — `allowForeignCitizen: null !== false`. Acum apare doar unde există flux de identitate (caziere + integritate); stare civilă rămâne ascuns.
 
+### Iterația 3 (feedback testare user)
+- CF nou de UNITATE (`123456-C1-U2`) → câmpul cadastral/topografic se ASCUNDE + mesaj verde „identifică exact apartamentul" (nu mai cerem numere inutile)
+- `jumpToService` („Nu știu" → identificare) folosește `router.replace` — back-ul de browser nu te mai aruncă în mijlocul wizardului vechi (raportat la test: selectorul arăta serviciul vechi — era browser-back pe URL-ul vechi, nu pierdere de state; verificat: după switch, dropdown-ul e corect pe ambii pași)
+
 ## Rămase (backlog)
 - Faza 2: admin — alegere unitate din candidates cu 1 click (re-enqueue job)
 - Faza 3.2: validare live SearchEstate în wizard pre-plată (confirmare vizuală adresă)
