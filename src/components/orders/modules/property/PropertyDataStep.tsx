@@ -93,50 +93,42 @@ function CfSpecimenExplainer() {
       </button>
       {open && (
         <div className="px-3 pb-3 space-y-3">
-          {/* Mock of the extract header — mirrors the real ANCPI layout */}
-          <div className="rounded-md border border-neutral-300 bg-white p-3 text-[11px] leading-relaxed shadow-sm">
-            <p className="text-center font-bold text-neutral-800">EXTRAS DE CARTE FUNCIARĂ</p>
-            <p className="text-center text-neutral-500">PENTRU INFORMARE</p>
-            <p className="text-center mt-1">
-              Carte Funciară Nr.{' '}
-              <mark className="bg-green-100 text-green-900 font-bold px-1 rounded">170641-C1-U27</mark> Brașov
-            </p>
-            <div className="mt-2 flex justify-between items-start border-t border-neutral-200 pt-2">
-              <span className="font-semibold">A. Partea I. Descrierea imobilului</span>
-              <span>
-                Nr. CF vechi:{' '}
-                <mark className="bg-amber-100 text-amber-900 font-bold px-1 rounded">31286</mark>
-              </span>
-            </div>
-            <div className="mt-2 border border-neutral-300 rounded overflow-hidden">
-              <div className="grid grid-cols-2 bg-neutral-100 text-neutral-600 font-medium">
-                <span className="px-2 py-1 border-r border-neutral-300">Nr. cadastral / Nr. topografic</span>
-                <span className="px-2 py-1">Observații / Referințe</span>
-              </div>
-              <div className="grid grid-cols-2">
-                <span className="px-2 py-1 border-r border-neutral-300">
-                  Top:{' '}
-                  <mark className="bg-blue-100 text-blue-900 font-bold px-1 rounded">7584/2-7583/2/3/2/V</mark>
-                </span>
-                <span className="px-2 py-1 text-neutral-500">compus din 2 camere...</span>
-              </div>
-            </div>
+          {/* Real (anonymized) extract header with the identifiers ringed.
+              Overlay boxes are positioned in % of the image (858×345), so they
+              track the photo at any width. */}
+          <div className="relative rounded-md border border-neutral-300 bg-white overflow-hidden shadow-sm">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/images/specimens/specimen-cf-antet.png"
+              alt="Antetul unui extras de carte funciară cu numerele evidențiate"
+              className="w-full h-auto"
+              width={858}
+              height={345}
+            />
+            {/* Carte Funciară Nr. — numărul NOU */}
+            <div className="absolute rounded border-2 border-green-500 bg-green-400/15" style={{ left: '37%', top: '31%', width: '27%', height: '9%' }} />
+            {/* Nr. CF vechi */}
+            <div className="absolute rounded border-2 border-amber-500 bg-amber-400/15" style={{ left: '70%', top: '58%', width: '29%', height: '5.5%' }} />
+            {/* Nr. cadastral vechi + Nr. topografic */}
+            <div className="absolute rounded border-2 border-blue-500 bg-blue-400/15" style={{ left: '70%', top: '63.5%', width: '29%', height: '9%' }} />
+            {/* coloana Nr. cadastral / Nr. topografic din tabel */}
+            <div className="absolute rounded border-2 border-blue-500 bg-blue-400/15" style={{ left: '14%', top: '77.5%', width: '14%', height: '18%' }} />
           </div>
           <ul className="space-y-1.5 text-xs text-neutral-700">
             <li>
-              <mark className="bg-green-100 text-green-900 font-semibold px-1 rounded">Verde</mark> — numărul
-              NOU (electronic). Cel mai sigur: extrasul se emite exact pe el. La apartamente arată ca{' '}
-              <code className="bg-neutral-100 px-1 rounded">123456-C1-U27</code>.
+              <mark className="bg-green-100 text-green-900 font-semibold px-1 rounded">Verde</mark> —
+              „Carte Funciară Nr.&rdquo; = numărul NOU (electronic). Cel mai sigur: extrasul se emite exact
+              pe el. La apartamente arată ca <code className="bg-neutral-100 px-1 rounded">123456-C1-U27</code>.
             </li>
             <li>
-              <mark className="bg-amber-100 text-amber-900 font-semibold px-1 rounded">Galben</mark> — numărul
-              de pe cărțile VECHI (pe hârtie). Atenție: la blocuri, același număr vechi acoperea toate
-              apartamentele — introdus singur, poate indica alt apartament!
+              <mark className="bg-amber-100 text-amber-900 font-semibold px-1 rounded">Galben</mark> —
+              „Nr. CF vechi&rdquo; = numărul de pe cărțile VECHI (pe hârtie). Atenție: la blocuri, același
+              număr vechi acoperea toate apartamentele — introdus singur, poate indica alt apartament!
             </li>
             <li>
-              <mark className="bg-blue-100 text-blue-900 font-semibold px-1 rounded">Albastru</mark> — numărul
-              topografic (sau cadastral) din tabelul A1. Dacă ai doar numărul vechi, adaugă-l și pe acesta —
-              identifică exact apartamentul tău.
+              <mark className="bg-blue-100 text-blue-900 font-semibold px-1 rounded">Albastru</mark> —
+              „Nr. cadastral&rdquo; / „Nr. topografic&rdquo; (în dreapta sus și în tabelul A1). Dacă ai doar
+              numărul vechi, adaugă-l și pe acesta — identifică exact apartamentul tău.
             </li>
           </ul>
         </div>
