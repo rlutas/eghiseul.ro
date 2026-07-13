@@ -108,9 +108,9 @@ function CfSpecimenExplainer() {
             {/* Carte Funciară Nr. — numărul NOU */}
             <div className="absolute rounded border-2 border-green-500 bg-green-400/15" style={{ left: '37%', top: '31%', width: '27%', height: '9%' }} />
             {/* Nr. CF vechi */}
-            <div className="absolute rounded border-2 border-amber-500 bg-amber-400/15" style={{ left: '70%', top: '58%', width: '29%', height: '5.5%' }} />
+            <div className="absolute rounded border-[3px] border-amber-600 bg-amber-400/20" style={{ left: '70%', top: '60%', width: '29%', height: '5.5%' }} />
             {/* Nr. cadastral vechi + Nr. topografic */}
-            <div className="absolute rounded border-2 border-blue-500 bg-blue-400/15" style={{ left: '70%', top: '63.5%', width: '29%', height: '9%' }} />
+            <div className="absolute rounded border-2 border-blue-500 bg-blue-400/15" style={{ left: '70%', top: '66.5%', width: '29%', height: '9.5%' }} />
             {/* coloana Nr. cadastral / Nr. topografic din tabel */}
             <div className="absolute rounded border-2 border-blue-500 bg-blue-400/15" style={{ left: '14%', top: '77.5%', width: '14%', height: '18%' }} />
           </div>

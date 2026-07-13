@@ -48,8 +48,8 @@ interface PropertyState {
 
 /**
  * Pick the best identifier + its type from a set of CF/cadastral/topo values.
- * Applies effectiveIdentifier so a collective building number ("123456-C1") is
- * issued on the land ("123456").
+ * Applies effectiveIdentifier (normalization only — collective numbers are no
+ * longer stripped to the land; the worker's collective guard handles them).
  */
 function pickIdentifier(cf?: string, cad?: string, topo?: string): { identificator: string; identificatorType: 'CF' | 'CAD' | 'TOPO' } {
   if (cf) return { identificator: effectiveIdentifier(cf), identificatorType: 'CF' };

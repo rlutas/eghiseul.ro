@@ -43,14 +43,14 @@ export function normalizeCf(raw: string): string {
 }
 
 /**
- * The identifier we should actually order with. For a collective building number
- * ("123456-C1") we fall back to the land number ("123456"); everything else is
- * used as normalized. (Product decision: no collective service → issue the land.)
+ * The identifier we should actually order with — just the normalized value.
+ * A collective building number ("123456-C1") is NO longer silently stripped
+ * to the land: the client is signposted to the "Extras CF Colectiv" service
+ * instead (see checkCf), and if they proceed anyway the worker's collective
+ * guard routes the job to an operator rather than issuing the wrong document.
  */
 export function effectiveIdentifier(raw: string): string {
-  const n = normalizeCf(raw);
-  if (COLLECTIVE.test(n)) return n.replace(/-C\d+$/, '');
-  return n;
+  return normalizeCf(raw);
 }
 
 export function checkCf(raw: string): CfCheck {
@@ -61,9 +61,9 @@ export function checkCf(raw: string): CfCheck {
     return { normalized, status: 'valid' };
   }
 
-  // "123456-C1" = the whole building (CF colectivă) — not issued online. We don't
-  // offer a collective service, so we fall back to the TEREN extract (123456) and
-  // warn. For a specific apartment the unit number (-U..) is required.
+  // "123456-C1" = the whole building (CF colectivă). Signpost to the dedicated
+  // Extras CF Colectiv service (available in the "Alt document cadastral?"
+  // switcher above the form) instead of silently issuing on the land.
   const col = COLLECTIVE.exec(normalized);
   if (col) {
     const land = normalized.replace(/-C\d+$/, '');
@@ -71,8 +71,10 @@ export function checkCf(raw: string): CfCheck {
       normalized,
       status: 'collective',
       message:
-        `Ai introdus construcția întreagă (CF colectivă). Vom emite extrasul pe TEREN (${land}). ` +
-        `Pentru un apartament anume, adaugă unitatea (ex. ${normalized}-U20).`,
+        `Ai introdus o carte funciară COLECTIVĂ (a întregii clădiri, ${normalized}). Pentru ea alege ` +
+        `serviciul „Extras CF Colectiv" din selectorul «Alt document cadastral?» de deasupra formularului. ` +
+        `Dacă vrei apartamentul tău, adaugă unitatea (ex. ${normalized}-U20); dacă vrei terenul de sub ` +
+        `clădire, introdu doar ${land}.`,
     };
   }
 
