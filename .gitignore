@@ -64,3 +64,4 @@ docs/legacy/
 
 # Local Claude Code settings (may contain secrets in Bash permission rules)
 .claude/settings.local.json
+docs/archive/exporturi-wpforms/entries/
