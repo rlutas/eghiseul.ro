@@ -7,7 +7,7 @@
  * comunicări comerciale (soft opt-in, cu dezabonare).
  */
 
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -49,24 +49,27 @@ export default function AdminClientiPage() {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
 
-  const load = useCallback(async () => {
-    // defer the synchronous setState out of the effect's sync body (lint rule)
-    await Promise.resolve();
-    setLoading(true);
-    const params = new URLSearchParams({ page: String(page) });
-    if (q.trim()) params.set('q', q.trim());
-    if (service) params.set('service', service);
-    if (customer) params.set('customer', customer);
-    const res = await fetch(`/api/admin/contacts?${params}`);
-    const json = await res.json();
-    if (json.success) {
-      setRows(json.data.contacts);
-      setTotal(json.data.total);
-    }
-    setLoading(false);
+  // All setState here happens AFTER awaits (never synchronously inside the
+  // effect body) — loading=true is set by the change handlers themselves.
+  useEffect(() => {
+    const ctrl = new AbortController();
+    (async () => {
+      try {
+        const params = new URLSearchParams({ page: String(page) });
+        if (q.trim()) params.set('q', q.trim());
+        if (service) params.set('service', service);
+        if (customer) params.set('customer', customer);
+        const res = await fetch(`/api/admin/contacts?${params}`, { signal: ctrl.signal });
+        const json = await res.json();
+        if (json.success) {
+          setRows(json.data.contacts);
+          setTotal(json.data.total);
+        }
+      } catch { /* aborted / network — keep previous rows */ }
+      if (!ctrl.signal.aborted) setLoading(false);
+    })();
+    return () => ctrl.abort();
   }, [q, service, customer, page]);
-
-  useEffect(() => { load(); }, [load]);
 
   const exportCsv = () => {
     const params = new URLSearchParams({ format: 'csv' });
@@ -97,10 +100,10 @@ export default function AdminClientiPage() {
             className="pl-8"
             placeholder="Caută email / nume / telefon"
             value={q}
-            onChange={(e) => { setQ(e.target.value); setPage(1); }}
+            onChange={(e) => { setQ(e.target.value); setPage(1); setLoading(true); }}
           />
         </div>
-        <Select value={service || 'all'} onValueChange={(v) => { setService(v === 'all' ? '' : v); setPage(1); }}>
+        <Select value={service || 'all'} onValueChange={(v) => { setService(v === 'all' ? '' : v); setPage(1); setLoading(true); }}>
           <SelectTrigger className="w-56"><SelectValue /></SelectTrigger>
           <SelectContent>
             {SERVICE_OPTIONS.map(([v, label]) => (
@@ -108,7 +111,7 @@ export default function AdminClientiPage() {
             ))}
           </SelectContent>
         </Select>
-        <Select value={customer || 'all'} onValueChange={(v) => { setCustomer(v === 'all' ? '' : v); setPage(1); }}>
+        <Select value={customer || 'all'} onValueChange={(v) => { setCustomer(v === 'all' ? '' : v); setPage(1); setLoading(true); }}>
           <SelectTrigger className="w-48"><SelectValue /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Toți</SelectItem>
@@ -176,8 +179,8 @@ export default function AdminClientiPage() {
       <div className="flex items-center justify-between text-sm">
         <span className="text-neutral-500">Pagina {page} din {pages.toLocaleString('ro-RO')}</span>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>Înapoi</Button>
-          <Button variant="outline" size="sm" disabled={page >= pages} onClick={() => setPage((p) => p + 1)}>Înainte</Button>
+          <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => { setPage((p) => p - 1); setLoading(true); }}>Înapoi</Button>
+          <Button variant="outline" size="sm" disabled={page >= pages} onClick={() => { setPage((p) => p + 1); setLoading(true); }}>Înainte</Button>
         </div>
       </div>
     </div>

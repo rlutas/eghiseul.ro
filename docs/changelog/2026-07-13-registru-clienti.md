@@ -27,3 +27,10 @@ serviciu + client/lead, paginare, **export CSV pe filtrul curent**.
 - Sincronizare segment „clienți" în Resend Audiences + primul broadcast (cu unsubscribe Resend)
 - ⚠️ De discutat: CSV-urile WPForms cu PII sunt în repo (docs/archive/exporturi-wpforms) — acum că
   datele-s în DB, recomandat să le scoatem din git
+
+## Update (aceeași zi)
+- **CSV-urile WPForms cu PII scoase din repo** (commit 20e56ab): backup local în afara git
+  (`~/Documents/eghiseul-backups/`), `entries/` în .gitignore, README explicativ în arhivă.
+  Fișierele rămân în istoricul git (repo privat) — scrub complet de istoric = operațiune separată dacă se decide.
+- Fix CI: regula de lint `setState sincron în effect` pe pagina /admin/clienti — refăcut fetch-ul
+  cu AbortController, loading setat din handler-e.
