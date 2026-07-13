@@ -3920,6 +3920,7 @@ const PROPERTY_LABELS: Array<[string, string]> = [
   ['ownerName', 'Proprietar (nume complet)'],
   ['cadastral', 'Nr. cadastral'],
   ['carteFunciara', 'Nr. carte funciară'],
+  ['topografic', 'Nr. topografic'],
   ['motiv', 'Motivul solicitării'],
 ];
 

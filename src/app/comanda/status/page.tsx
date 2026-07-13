@@ -692,10 +692,10 @@ function OrderStatusContent() {
               <p className="text-sm text-blue-800">
                 <strong>Ai nevoie de ajutor?</strong> Contactează-ne la{' '}
                 <a
-                  href="mailto:suport@eghiseul.ro"
+                  href="mailto:contact@eghiseul.ro"
                   className="underline hover:no-underline"
                 >
-                  suport@eghiseul.ro
+                  contact@eghiseul.ro
                 </a>{' '}
                 sau la telefon{' '}
                 <a href="tel:+40757708181" className="underline hover:no-underline">

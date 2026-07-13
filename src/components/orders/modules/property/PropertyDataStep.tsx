@@ -69,6 +69,82 @@ function CfHint({ check }: { check: ReturnType<typeof checkCf> }) {
   );
 }
 
+/**
+ * "Unde găsesc numerele?" — specimen of an extras header with the three
+ * identifiers highlighted, using ANCPI's exact field labels (Ordin 600/2023)
+ * so the client recognizes them on their own document. Born out of two real
+ * wrong-apartment deliveries caused by old CF numbers (docs incident
+ * E-260710-F3AYS / worker-ancpi/docs/cf-vechi-dezambiguizare.md).
+ */
+function CfSpecimenExplainer() {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="rounded-lg border border-neutral-200 bg-neutral-50">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="w-full flex items-center justify-between px-3 py-2 text-sm font-medium text-secondary-900"
+      >
+        <span className="flex items-center gap-2">
+          <HelpCircle className="h-4 w-4 text-primary-600" />
+          Unde găsesc numărul cărții funciare?
+        </span>
+        <span className="text-neutral-400">{open ? '▴' : '▾'}</span>
+      </button>
+      {open && (
+        <div className="px-3 pb-3 space-y-3">
+          {/* Mock of the extract header — mirrors the real ANCPI layout */}
+          <div className="rounded-md border border-neutral-300 bg-white p-3 text-[11px] leading-relaxed shadow-sm">
+            <p className="text-center font-bold text-neutral-800">EXTRAS DE CARTE FUNCIARĂ</p>
+            <p className="text-center text-neutral-500">PENTRU INFORMARE</p>
+            <p className="text-center mt-1">
+              Carte Funciară Nr.{' '}
+              <mark className="bg-green-100 text-green-900 font-bold px-1 rounded">170641-C1-U27</mark> Brașov
+            </p>
+            <div className="mt-2 flex justify-between items-start border-t border-neutral-200 pt-2">
+              <span className="font-semibold">A. Partea I. Descrierea imobilului</span>
+              <span>
+                Nr. CF vechi:{' '}
+                <mark className="bg-amber-100 text-amber-900 font-bold px-1 rounded">31286</mark>
+              </span>
+            </div>
+            <div className="mt-2 border border-neutral-300 rounded overflow-hidden">
+              <div className="grid grid-cols-2 bg-neutral-100 text-neutral-600 font-medium">
+                <span className="px-2 py-1 border-r border-neutral-300">Nr. cadastral / Nr. topografic</span>
+                <span className="px-2 py-1">Observații / Referințe</span>
+              </div>
+              <div className="grid grid-cols-2">
+                <span className="px-2 py-1 border-r border-neutral-300">
+                  Top:{' '}
+                  <mark className="bg-blue-100 text-blue-900 font-bold px-1 rounded">7584/2-7583/2/3/2/V</mark>
+                </span>
+                <span className="px-2 py-1 text-neutral-500">compus din 2 camere...</span>
+              </div>
+            </div>
+          </div>
+          <ul className="space-y-1.5 text-xs text-neutral-700">
+            <li>
+              <mark className="bg-green-100 text-green-900 font-semibold px-1 rounded">Verde</mark> — numărul
+              NOU (electronic). Cel mai sigur: extrasul se emite exact pe el. La apartamente arată ca{' '}
+              <code className="bg-neutral-100 px-1 rounded">123456-C1-U27</code>.
+            </li>
+            <li>
+              <mark className="bg-amber-100 text-amber-900 font-semibold px-1 rounded">Galben</mark> — numărul
+              de pe cărțile VECHI (pe hârtie). Atenție: la blocuri, același număr vechi acoperea toate
+              apartamentele — introdus singur, poate indica alt apartament!
+            </li>
+            <li>
+              <mark className="bg-blue-100 text-blue-900 font-semibold px-1 rounded">Albastru</mark> — numărul
+              topografic (sau cadastral) din tabelul A1. Dacă ai doar numărul vechi, adaugă-l și pe acesta —
+              identifică exact apartamentul tău.
+            </li>
+          </ul>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function PropertyDataStep({ config, onValidChange }: PropertyDataStepProps) {
   const { state, updateProperty, serviceOptions, updateOptions } = useModularWizard();
   const router = useRouter();
@@ -322,31 +398,76 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
 
           {/* Carte Funciară Number */}
           {searchMethod === 'carteFunciara' && (
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <Label htmlFor="carteFunciara">
-                  Număr Carte Funciară {config.fields.carteFunciara.required && <span className="text-red-500">*</span>}
-                </Label>
-                <Tooltip>
+            <div className="space-y-3">
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="carteFunciara">
+                    Număr Carte Funciară {config.fields.carteFunciara.required && <span className="text-red-500">*</span>}
+                  </Label>
+                  <Tooltip>
+                      <TooltipTrigger type="button">
+                        <HelpCircle className="h-4 w-4 text-muted-foreground" />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p className="max-w-xs">
+                          Pe extras apare în antet ca „Carte Funciară Nr.&rdquo; (ex: 123456, iar la
+                          apartament 123456-C1-U2). Dacă ai doar acte vechi, numărul de acolo apare
+                          pe extrasele noi ca „Nr. CF vechi&rdquo; — introdu-l aici (poate avea și sufix,
+                          ex: 30155/A) și completează și numărul topografic de mai jos.
+                        </p>
+                      </TooltipContent>
+                    </Tooltip>
+                </div>
+                <Input
+                  id="carteFunciara"
+                  type="text"
+                  value={property.carteFunciara}
+                  onChange={(e) => updateProperty?.({ carteFunciara: e.target.value })}
+                  placeholder="123456 sau 123456-C1-U2"
+                />
+                <CfHint check={cfCheck} />
+              </div>
+
+              {/* Topografic — always available: with an OLD paper CF number the
+                  topo number is the only thing that pinpoints the apartment
+                  (two real wrong-unit deliveries without it). Highlighted when
+                  the CF value looks like an old format. */}
+              <div className={cfCheck.status === 'old_format'
+                ? 'rounded-lg border-2 border-amber-300 bg-amber-50 p-3 space-y-2'
+                : 'space-y-2'}>
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="topografic">
+                    Număr topografic{' '}
+                    <span className={cfCheck.status === 'old_format' ? 'text-amber-700 font-semibold' : 'text-muted-foreground font-normal'}>
+                      {cfCheck.status === 'old_format'
+                        ? '— recomandat pentru cartea ta veche'
+                        : '(opțional — necesar la carte funciară veche)'}
+                    </span>
+                  </Label>
+                  <Tooltip>
                     <TooltipTrigger type="button">
                       <HelpCircle className="h-4 w-4 text-muted-foreground" />
                     </TooltipTrigger>
                     <TooltipContent>
                       <p className="max-w-xs">
-                        Numărul CF este înscris pe extrasul de carte funciară anterior.
-                        Format: 123456 (fără prefix).
+                        Îl găsești pe actul de proprietate sau pe extras, în tabelul „Nr. cadastral /
+                        Nr. topografic&rdquo; (ex: 7584/2-7583/2/3/2/V). La cărțile funciare vechi de bloc,
+                        același număr de carte acoperea toate apartamentele — numărul topografic
+                        identifică EXACT apartamentul tău.
                       </p>
                     </TooltipContent>
                   </Tooltip>
+                </div>
+                <Input
+                  id="topografic"
+                  type="text"
+                  value={property.topografic || ''}
+                  onChange={(e) => updateProperty?.({ topografic: e.target.value })}
+                  placeholder="ex: 7584/2-7583/2/3/2/V"
+                />
               </div>
-              <Input
-                id="carteFunciara"
-                type="text"
-                value={property.carteFunciara}
-                onChange={(e) => updateProperty?.({ carteFunciara: e.target.value })}
-                placeholder="123456 sau 123456-C1-U2"
-              />
-              <CfHint check={cfCheck} />
+
+              <CfSpecimenExplainer />
             </div>
           )}
 
@@ -437,19 +558,6 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
             </div>
           )}
 
-          {/* Topografic Number (optional) */}
-          {config.fields.topografic.required && (
-            <div className="space-y-2">
-              <Label htmlFor="topografic">Număr Topografic</Label>
-              <Input
-                id="topografic"
-                type="text"
-                value={property.topografic || ''}
-                onChange={(e) => updateProperty?.({ topografic: e.target.value })}
-                placeholder="1234/1/2"
-              />
-            </div>
-          )}
         </CardContent>
       </Card>
 
@@ -514,6 +622,17 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
                     value={im.cadastral}
                     onChange={(e) => updateImobil(i, { cadastral: e.target.value })}
                     placeholder="123456"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label>
+                    Nr. topografic <span className="text-muted-foreground font-normal">(la CF veche)</span>
+                  </Label>
+                  <Input
+                    type="text"
+                    value={im.topografic || ''}
+                    onChange={(e) => updateImobil(i, { topografic: e.target.value })}
+                    placeholder="ex: 7584/2-7583/2/3/2/V"
                   />
                 </div>
               </div>

@@ -86,8 +86,9 @@ export function checkCf(raw: string): CfCheck {
       normalized,
       status: 'old_format',
       message:
-        'Numărul pare în format vechi (nedigitalizat). Identificatorul electronic arată ca 123456 sau 123456-C1-U2. ' +
-        'Poți continua comanda, dar dacă imobilul nu e digitalizat în sistemul ANCPI, extrasul NU se eliberează instant și poate dura.',
+        'Pare un număr de carte funciară VECHE (pe hârtie). La blocuri, același număr vechi acoperea toate ' +
+        'apartamentele — ca să emitem extrasul pentru apartamentul TĂU, completează și numărul topografic ' +
+        '(de pe actul de proprietate, ex: 7584/2-7583/2/3/2/V) în câmpul de mai jos.',
     };
   }
 
