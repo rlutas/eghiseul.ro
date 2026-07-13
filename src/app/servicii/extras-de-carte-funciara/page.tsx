@@ -40,12 +40,12 @@ import { ServiceSwitcher } from '@/components/services/service-switcher';
 const SERVICE_SLUG = 'extras-carte-funciara';
 const PAGE_PATH = '/servicii/extras-de-carte-funciara/';
 const SCHEMA_SLUG = 'extras-de-carte-funciara';
-const TITLE = 'Extras Carte Funciară Online 2026 — în 5 Minute, 89 RON';
+const TITLE = 'Extras Carte Funciară Online în 5 Minute — Automat, 24/7';
 const DESCRIPTION =
-  'Extras de carte funciară online de la ANCPI, livrat pe email în câteva minute. ' +
-  '89 RON, taxe incluse — fără cont ANCPI și fără taxă de urgență.';
+  'Extras de carte funciară ANCPI eliberat automat, pe email, în câteva minute — 24/7, ' +
+  'inclusiv noaptea și în weekend. Fără cont ANCPI, fără taxă de urgență. 4.9★ din 450+ recenzii.';
 const DATE_PUBLISHED = '2026-06-13';
-const DATE_MODIFIED = '2026-06-16';
+const DATE_MODIFIED = '2026-07-13';
 
 export const revalidate = 3600;
 
@@ -918,6 +918,7 @@ export default async function ExtrasCarteFunciaraPage() {
         <ServiceFAQ
           title="Întrebări Frecvente — Extras de Carte Funciară"
           faqs={[
+            { q: 'Pot obține extrasul de carte funciară noaptea sau în weekend?', a: 'Da. Sistemul eGhișeul eliberează extrasul automat, 24/7 — inclusiv noaptea, sâmbăta, duminica și de sărbători. Nu depinzi de programul de lucru al vreunui operator: comanzi oricând și primești documentul pe email în câteva minute.' },
             { q: 'Ce este Extrasul de Carte Funciară?', a: 'Este documentul OCPI care arată situația juridică a unui imobil: proprietarul actual, suprafața, sarcinile și ipotecile. Cartea funciară este registrul public al proprietăților.' },
             { q: 'Ce înseamnă extras de carte funciară?', a: 'Extras de carte funciară înseamnă documentul care atestă situația juridică actuală a unui imobil — proprietar, suprafață, vecinătăți, sarcini și ipoteci — extras din cartea funciară ținută de OCPI/ANCPI.' },
             { q: 'De unde se scoate extrasul de carte funciară?', a: 'De la Oficiul de Cadastru și Publicitate Imobiliară (OCPI), parte din ANCPI. Prin eGhișeul îl scoți online, fără să mergi la ghișeu și fără cont ANCPI.' },

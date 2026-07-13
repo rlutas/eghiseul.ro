@@ -38,12 +38,12 @@ import { GOOGLE_RATING, GOOGLE_REVIEW_COUNT_LABEL } from '@/config/contact';
 const SERVICE_SLUG = 'certificat-constatator';
 const PAGE_PATH = '/servicii/certificat-constatator-online/';
 const SCHEMA_SLUG = 'certificat-constatator-online';
-const TITLE = 'Certificat Constatator ONRC Online 2026 — de la 89 RON';
+const TITLE = 'Certificat Constatator ONRC Online 24/7 — de la 89 RON';
 const DESCRIPTION =
-  'Certificat constatator online ONRC, doar cu CUI-ul firmei — pe firmă, persoană fizică ' +
-  'sau cu istoric. Pe email în câteva minute. De la 89 RON, taxe ONRC incluse.';
+  'Certificat constatator eliberat automat în câteva minute, 24/7 — inclusiv noaptea și în weekend. ' +
+  'Doar cu CUI-ul firmei: pe firmă, PF sau cu istoric. De la 89 RON, taxe ONRC incluse. 4.9★.';
 const DATE_PUBLISHED = '2026-06-14';
-const DATE_MODIFIED = '2026-06-14';
+const DATE_MODIFIED = '2026-07-13';
 
 export const revalidate = 3600;
 
@@ -726,6 +726,7 @@ export default async function CertificatConstatatorPage() {
         <ServiceFAQ
           title="Întrebări Frecvente — Certificat Constatator ONRC"
           faqs={[
+            { q: 'Pot obține certificatul constatator noaptea sau în weekend?', a: 'Da. Certificatul de bază se eliberează automat, 24/7 — inclusiv noaptea, în weekend și de sărbători. Comanzi oricând cu CUI-ul firmei și primești documentul pe email în câteva minute, fără să depinzi de programul ONRC sau al vreunui operator.' },
             { q: 'Ce este certificatul constatator?', a: 'Este documentul ONRC care atestă datele actuale ale unei firme: denumire, sediu, CUI, asociați, administratori, capital social și obiect de activitate. Este „cartea de identitate” a firmei la Registrul Comerțului.' },
             { q: 'Ce tipuri de certificat constatator pot comanda?', a: 'Trei: pe firmă (situația la zi a societății), pe persoană fizică (dacă o persoană deține calitatea de asociat/administrator în firme) și cu istoric (toate modificările firmei de la înființare până în prezent).' },
             { q: 'Certificatul constatator este la zi?', a: 'Da. Certificatul reflectă situația firmei din ziua eliberării, cu toate mențiunile actualizate înscrise la ONRC până la acel moment.' },

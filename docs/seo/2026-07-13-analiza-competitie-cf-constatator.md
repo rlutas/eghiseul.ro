@@ -102,8 +102,15 @@ Noi avem conținut superior (3.200-4.000 cuvinte, comparații, specimene, recenz
 9. **Backlink-uri tematice**: imobiliare/juridic (storia blog, avocatnet guest, forumuri notariat) pe paginile CF; contabilitate/antreprenoriat pe constatator.
 
 ### D. De monitorizat / decizie business
-10. **Prețul CF (89 vs 49/19+TVA)**: gap real de competitivitate pe un produs comodizat de gratuitatea MyTerra. Decizie: ori tier redus, ori diferențiere clară (fără cont, identificare după adresă — pe care competiția n-o are).
+10. **Prețul CF: DECIS 2026-07-13 — rămâne 89 RON.** Poziționarea = **eliberare instant, automat 24/7** (workerii Railway) — competitorii procesează manual, în program de lucru; niciunul nu livrează efectiv non-stop. Diferențiatorul se comunică în title/meta/FAQ/comparații, nu prin preț.
 11. Poziții re-check în 2-3 săptămâni post-revalidare snippets (nu re-verifica zilnic).
+
+### Executat 2026-07-13 seara (etapa 1 — CTR & poziționare 24/7)
+- Title CF: `Extras Carte Funciară Online în 5 Minute — Automat, 24/7` (scos „89 RON" — anti-CTR lângă 19-49 lei ai competiției)
+- Title constatator: `Certificat Constatator ONRC Online 24/7 — de la 89 RON` (păstrat prețul — suntem #2 pe „pret")
+- Meta descriptions: ambele refăcute pe instant + 24/7 + noaptea/weekend + 4.9★/450 recenzii
+- FAQ nou pe ambele pagini: „Pot obține … noaptea sau în weekend?" — țintește long-tail fără competiție + citabilitate AI Overview
+- dateModified actualizat → semnal freshness
 
 ---
 
