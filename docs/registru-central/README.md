@@ -260,3 +260,5 @@ eghiseul și sheet se rezolvă cu echipa).
 | CJO hooks | `api/stripe/webhook`, `api/stripe/webhook-cabinet`, `api/cron/health-check`, `api/admin/delegation` |
 | Script migrare | `eghiseul.ro/scripts/migrate-registry-to-central.ts` |
 | Spec registru original (istoric, doar eghiseul, pre-central) | `docs/technical/specs/number-registry-system.md` |
+
+**Update 2026-07-13 (CJO):** numerele de delegație pentru Apostila Haga (alocate doar în registrul central, serviceType `apostila-haga:<target>`, fără coloană pe orders) sunt acum AFIȘATE în admin CJO pe cardul de împuternicire — endpoint nou `GET /api/admin/registry-numbers` (lookup `find_existing_number` per target). Commit CJO 349b4d82.
