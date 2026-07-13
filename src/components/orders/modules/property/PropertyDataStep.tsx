@@ -55,18 +55,25 @@ const COUNTIES = [
   'Vrancea',
 ];
 
-/** What the client will actually receive for a VALID electronic identifier. */
-function cfOutcome(normalized: string): string | null {
+/** What the client will actually receive for a VALID electronic identifier.
+ *  hasSecondary = the combined cadastral/topografic field is filled — a plain
+ *  number can be an OLD CF whose cadastral points at an apartment, so the
+ *  outcome is decided by that number, not by the land. */
+function cfOutcome(normalized: string, hasSecondary?: boolean): string | null {
   if (/^\d{1,7}-C\d+-U\d+$/.test(normalized)) return 'vei primi extrasul pentru APARTAMENT (unitatea ta individuală)';
-  if (/^\d{1,7}$/.test(normalized)) return 'vei primi extrasul pentru TEREN / casă (inclusiv terenul de sub bloc)';
+  if (/^\d{1,7}$/.test(normalized)) {
+    return hasSecondary
+      ? 'identificăm imobilul exact după nr. cadastral/topografic introdus mai jos'
+      : 'vei primi extrasul pentru TEREN / casă (inclusiv terenul de sub bloc); dacă numărul e de pe o carte VECHE de bloc, completează și nr. cadastral/topografic mai jos';
+  }
   return null;
 }
 
 /** Inline, non-blocking hint under a CF/cadastral input. */
-function CfHint({ check }: { check: ReturnType<typeof checkCf> }) {
+function CfHint({ check, hasSecondary }: { check: ReturnType<typeof checkCf>; hasSecondary?: boolean }) {
   if (check.status === 'empty') return null;
   if (check.status === 'valid') {
-    const outcome = cfOutcome(check.normalized);
+    const outcome = cfOutcome(check.normalized, hasSecondary);
     return (
       <p className="text-xs text-green-600 flex items-center gap-1">
         ✓ Format corect{outcome ? <span className="text-green-700"> — {outcome}</span> : null}
@@ -402,7 +409,7 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
                   arată ca <code className="bg-neutral-100 px-1 rounded">123456-C1-U2</code>) — extrasul
                   se emite exact pe el, fără risc de confuzie.
                 </p>
-                <CfHint check={cfCheck} />
+                <CfHint check={cfCheck} hasSecondary={!!property.cadastral?.trim()} />
                 {cfCheck.status === 'collective' && (
                   <Button
                     type="button"
@@ -635,7 +642,7 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
                     onChange={(e) => updateImobil(i, { carteFunciara: e.target.value })}
                     placeholder="123456 sau 123456-C1-U2"
                   />
-                  <CfHint check={checkCf(im.carteFunciara ?? '')} />
+                  <CfHint check={checkCf(im.carteFunciara ?? '')} hasSecondary={!!im.cadastral?.trim()} />
                 </div>
                 <div className="space-y-1">
                   <Label>
