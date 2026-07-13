@@ -84,11 +84,17 @@ export function ContactStepModular({ onValidChange }: ContactStepProps) {
     !!state.verificationConfig?.clientTypeSelection?.enabled;
 
   // Whether to show citizenship toggle. Only relevant for PF (companies are
-  // by definition Romanian legal entities here). Also gated per-service:
-  // civil-status documents (naștere/căsătorie/celibat) set
-  // personalKyc.allowForeignCitizen = false, since they are issued only for
-  // persons registered in the Romanian civil registry (no foreign path).
+  // by definition Romanian legal entities here). Gated per-service on TWO
+  // config bits:
+  //  - personalKyc.enabled — citizenship only matters where an identity flow
+  //    exists at all. Services without KYC (extras CF, constatator, rovinieta)
+  //    have enabled=false + allowForeignCitizen=null, and `null !== false`
+  //    used to leak the toggle onto their step 1 (reported on extras CF,
+  //    2026-07-13).
+  //  - personalKyc.allowForeignCitizen — civil-status documents set it to
+  //    false (issued only for persons in the Romanian civil registry).
   const allowForeignCitizen =
+    state.verificationConfig?.personalKyc?.enabled === true &&
     state.verificationConfig?.personalKyc?.allowForeignCitizen !== false;
   const showsCitizenship = state.clientType === 'PF' && allowForeignCitizen;
   const citizenship = state.contact.citizenship ?? 'romanian';

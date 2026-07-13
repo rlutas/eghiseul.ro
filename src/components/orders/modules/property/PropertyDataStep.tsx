@@ -176,7 +176,6 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
 
   // Non-blocking input rules for the electronic identifier (warn, don't block).
   const cfCheck = checkCf(property?.carteFunciara ?? '');
-  const cadCheck = checkCf(property?.cadastral ?? '');
 
   // ── Multi-imobil ("Adaugă un extras") — all in the SAME county (ANCPI rule) ──
   const additional = property?.additionalImobile ?? [];
@@ -329,13 +328,15 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
         <CardHeader className="px-4 sm:px-6">
           <CardTitle>Identificare Imobil</CardTitle>
           <CardDescription>
-            Poți identifica imobilul prin număr cadastral, număr carte funciară sau adresă
+            Identifică imobilul prin numărul cărții funciare — iar la cărțile vechi, adaugă numărul cadastral/topografic
           </CardDescription>
         </CardHeader>
         <CardContent className="px-4 sm:px-6 space-y-4">
-          {/* Search Method Selection */}
-          {/* min-w-0 + text-xs on mobile: the three nowrap labels overflowed
-              390px and pushed the whole form horizontally off-screen */}
+          {/* Search Method Selection — two tabs. The old separate "Nr.
+              Cadastral" tab was never used in production (0/7 paid orders) and
+              the extract itself has ONE merged column "Nr. cadastral / Nr.
+              topografic", so cadastral now lives as the combined secondary
+              field under the CF tab. */}
           <div className="flex gap-1 sm:gap-2 p-1 bg-muted rounded-lg">
             <Button
               type="button"
@@ -348,15 +349,6 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
             </Button>
             <Button
               type="button"
-              variant={searchMethod === 'cadastral' ? 'default' : 'ghost'}
-              size="sm"
-              className="flex-1 min-w-0 px-1 sm:px-3 text-xs sm:text-sm"
-              onClick={() => setSearchMethod('cadastral')}
-            >
-              Nr. Cadastral
-            </Button>
-            <Button
-              type="button"
               variant={searchMethod === 'address' ? 'default' : 'ghost'}
               size="sm"
               className="flex-1 min-w-0 px-1 sm:px-3 text-xs sm:text-sm"
@@ -365,36 +357,6 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
               {config.identificationService.enabled ? 'Adresă' : 'Nu știu'}
             </Button>
           </div>
-
-          {/* Cadastral Number */}
-          {searchMethod === 'cadastral' && (
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <Label htmlFor="cadastral">
-                  Număr Cadastral {config.fields.cadastral.required && <span className="text-red-500">*</span>}
-                </Label>
-                <Tooltip>
-                    <TooltipTrigger type="button">
-                      <HelpCircle className="h-4 w-4 text-muted-foreground" />
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p className="max-w-xs">
-                        Numărul cadastral este un identificator unic al imobilului.
-                        Îl găsești în actul de proprietate sau în extrasul CF anterior.
-                      </p>
-                    </TooltipContent>
-                  </Tooltip>
-              </div>
-              <Input
-                id="cadastral"
-                type="text"
-                value={property.cadastral}
-                onChange={(e) => updateProperty?.({ cadastral: e.target.value })}
-                placeholder="123456 sau 123456-C1-U2"
-              />
-              <CfHint check={cadCheck} />
-            </div>
-          )}
 
           {/* Carte Funciară Number */}
           {searchMethod === 'carteFunciara' && (
@@ -425,22 +387,29 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
                   onChange={(e) => updateProperty?.({ carteFunciara: e.target.value })}
                   placeholder="123456 sau 123456-C1-U2"
                 />
+                <p className="text-xs text-muted-foreground">
+                  Cel mai sigur e numărul <strong>NOU</strong>, de pe un extras recent (la apartamente
+                  arată ca <code className="bg-neutral-100 px-1 rounded">123456-C1-U2</code>) — extrasul
+                  se emite exact pe el, fără risc de confuzie.
+                </p>
                 <CfHint check={cfCheck} />
               </div>
 
-              {/* Topografic — always available: with an OLD paper CF number the
-                  topo number is the only thing that pinpoints the apartment
-                  (two real wrong-unit deliveries without it). Highlighted when
-                  the CF value looks like an old format. */}
+              {/* Combined cadastral/topografic — the extract has ONE merged
+                  column "Nr. cadastral / Nr. topografic". With an OLD paper CF
+                  number this is the only thing that pinpoints the apartment
+                  (two real wrong-unit deliveries without it). Stored in
+                  property.cadastral (searchable identifier when CF is empty);
+                  the worker matches it against BOTH ePay columns. */}
               <div className={cfCheck.status === 'old_format'
                 ? 'rounded-lg border-2 border-amber-300 bg-amber-50 p-3 space-y-2'
                 : 'space-y-2'}>
                 <div className="flex items-center gap-2">
-                  <Label htmlFor="topografic">
-                    Număr topografic{' '}
+                  <Label htmlFor="cadastral">
+                    Nr. cadastral sau topografic{' '}
                     <span className={cfCheck.status === 'old_format' ? 'text-amber-700 font-semibold' : 'text-muted-foreground font-normal'}>
                       {cfCheck.status === 'old_format'
-                        ? '— recomandat pentru cartea ta veche'
+                        ? '— completează-l pentru cartea ta veche'
                         : '(opțional — necesar la carte funciară veche)'}
                     </span>
                   </Label>
@@ -450,21 +419,38 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
                     </TooltipTrigger>
                     <TooltipContent>
                       <p className="max-w-xs">
-                        Îl găsești pe actul de proprietate sau pe extras, în tabelul „Nr. cadastral /
-                        Nr. topografic&rdquo; (ex: 7584/2-7583/2/3/2/V). La cărțile funciare vechi de bloc,
-                        același număr de carte acoperea toate apartamentele — numărul topografic
-                        identifică EXACT apartamentul tău.
+                        Îl găsești pe actul de proprietate sau pe extras, în coloana „Nr. cadastral /
+                        Nr. topografic&rdquo; (ex: 123456 sau 7584/2-7583/2/3/2/V). La cărțile funciare
+                        vechi de bloc, același număr de carte acoperea toate apartamentele — acest
+                        număr identifică EXACT apartamentul tău.
                       </p>
                     </TooltipContent>
                   </Tooltip>
                 </div>
                 <Input
-                  id="topografic"
+                  id="cadastral"
                   type="text"
-                  value={property.topografic || ''}
-                  onChange={(e) => updateProperty?.({ topografic: e.target.value })}
-                  placeholder="ex: 7584/2-7583/2/3/2/V"
+                  value={property.cadastral || ''}
+                  onChange={(e) => updateProperty?.({ cadastral: e.target.value })}
+                  placeholder="ex: 123456 sau 7584/2-7583/2/3/2/V"
                 />
+                {cfCheck.status === 'old_format' && (
+                  <div className="space-y-1.5 pt-1">
+                    <Label htmlFor="propertyAddressOld" className="text-amber-800">
+                      Adresa imobilului (stradă, nr., bloc, scară, apartament)
+                    </Label>
+                    <Input
+                      id="propertyAddressOld"
+                      type="text"
+                      value={property.propertyAddress || ''}
+                      onChange={(e) => updateProperty?.({ propertyAddress: e.target.value })}
+                      placeholder="ex: Str. Soarelui nr. 5, Bl. 9, Sc. B, Ap. 13"
+                    />
+                    <p className="text-xs text-amber-700">
+                      Ne ajută să confirmăm că emitem extrasul exact pentru apartamentul tău.
+                    </p>
+                  </div>
+                )}
               </div>
 
               <CfSpecimenExplainer />
@@ -616,23 +602,15 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
                   />
                 </div>
                 <div className="space-y-1">
-                  <Label>Număr Cadastral</Label>
+                  <Label>
+                    Nr. cadastral sau topografic{' '}
+                    <span className="text-muted-foreground font-normal">(la CF veche)</span>
+                  </Label>
                   <Input
                     type="text"
                     value={im.cadastral}
                     onChange={(e) => updateImobil(i, { cadastral: e.target.value })}
-                    placeholder="123456"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <Label>
-                    Nr. topografic <span className="text-muted-foreground font-normal">(la CF veche)</span>
-                  </Label>
-                  <Input
-                    type="text"
-                    value={im.topografic || ''}
-                    onChange={(e) => updateImobil(i, { topografic: e.target.value })}
-                    placeholder="ex: 7584/2-7583/2/3/2/V"
+                    placeholder="ex: 123456 sau 7584/2-.../V"
                   />
                 </div>
               </div>

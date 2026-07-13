@@ -25,6 +25,13 @@ Cauze, fapte verificate pe ePay, research ANCPI (Ordin 600/2023) și regulile fi
 - Admin: eticheta „Nr. topografic" în secțiunea Date imobil
 - Bonus: `suport@eghiseul.ro` (inexistent — a respins emailul de reclamație al clientului!) → `contact@eghiseul.ro` pe pagina de status
 
+## Iterația 2 (același ziua, după feedback)
+- **Tab-ul „Nr. Cadastral" eliminat** (0 utilizări în producție) → rămân 2 tab-uri; sub CF: câmp combinat „**Nr. cadastral sau topografic**" (oglindește coloana unică de pe extras); workerul face match pe AMBELE coloane ePay indiferent de proveniență
+- Hint permanent sub CF: „Cel mai sigur e numărul NOU (123456-C1-U2)..."
+- **Câmp „Adresa imobilului"** (stradă/bloc/scară/ap) apare automat la CF vechi → ajunge la operator lângă lista de unități (NU se folosește la emitere automată — adresele e-terra au duplicate)
+- Worker: `normId` curăță virgule/punctuație din paste-ul clientului (caz real: „...V,") — redeploy Railway
+- **Fix bug separat descoperit la test**: toggle-ul „Sunt cetățean străin" apărea pe 19 servicii FĂRĂ KYC (extras CF, toate imobiliarele, constatator, rovinietă) — `allowForeignCitizen: null !== false`. Acum apare doar unde există flux de identitate (caziere + integritate); stare civilă rămâne ascuns.
+
 ## Rămase (backlog)
 - Faza 2: admin — alegere unitate din candidates cu 1 click (re-enqueue job)
 - Faza 3.2: validare live SearchEstate în wizard pre-plată (confirmare vizuală adresă)
