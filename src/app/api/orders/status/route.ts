@@ -238,6 +238,10 @@ export async function GET(request: NextRequest) {
       cdAny?.billing?.firstName || cdAny?.personal?.firstName,
       cdAny?.billing?.lastName || cdAny?.personal?.lastName,
     ].filter(Boolean).join(' ') || null;
+    // Motivul solicitării — same lookup chain as the admin order page.
+    const purpose =
+      cdAny?.contact?.purpose || cdAny?.civil_status?.purpose ||
+      cdAny?.property?.motiv || cdAny?.constatator?.purpose || null;
 
     const clientDocuments = (documents || []).map(doc => ({
       id: doc.id,
@@ -320,6 +324,7 @@ export async function GET(request: NextRequest) {
         clientType: isPJ ? 'PJ' : 'PF',
         clientName: isPJ ? null : pfName,
         companyName: isPJ ? firmName : null,
+        purpose,
         status: order.status,
         paymentStatus: order.payment_status,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
