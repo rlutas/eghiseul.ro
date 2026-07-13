@@ -64,7 +64,7 @@ function cfOutcome(normalized: string, hasSecondary?: boolean): string | null {
   if (/^\d{1,7}$/.test(normalized)) {
     return hasSecondary
       ? 'identificăm imobilul exact după nr. cadastral/topografic introdus mai jos'
-      : 'vei primi extrasul pentru TEREN / casă (inclusiv terenul de sub bloc); dacă numărul e de pe o carte VECHE de bloc, completează și nr. cadastral/topografic mai jos';
+      : 'dacă e numărul NOU, primești extrasul pe teren/casă; dacă e de pe o carte VECHE (posibil apartament!), completează și nr. cadastral/topografic mai jos';
   }
   return null;
 }
