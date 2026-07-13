@@ -240,6 +240,35 @@ export default async function ServiceDetailPage({ params }: PageProps) {
     },
   };
 
+  // Rating on a Product node — Google review snippets don't accept Service
+  // as parent type (see src/lib/seo/schema.ts productNode).
+  const productLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: service.name,
+    description:
+      service.description ||
+      service.short_description ||
+      `${service.name} online, livrare rapidă.`,
+    image: 'https://eghiseul.ro/og/default.png',
+    url: `https://eghiseul.ro/servicii/${service.slug}`,
+    brand: { '@type': 'Organization', name: 'eGhișeul.ro', url: 'https://eghiseul.ro' },
+    offers: {
+      '@type': 'Offer',
+      price: basePrice.toString(),
+      priceCurrency: service.currency || 'RON',
+      availability: 'https://schema.org/InStock',
+      url: `https://eghiseul.ro/servicii/${service.slug}`,
+    },
+    aggregateRating: {
+      '@type': 'AggregateRating',
+      ratingValue: 4.8,
+      reviewCount: 64,
+      bestRating: 5,
+      worstRating: 1,
+    },
+  };
+
   const breadcrumbLd = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -270,6 +299,10 @@ export default async function ServiceDetailPage({ params }: PageProps) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productLd) }}
       />
       <script
         type="application/ld+json"

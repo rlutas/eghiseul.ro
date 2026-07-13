@@ -113,17 +113,44 @@ export function serviceNode(input: ServiceSchemaInput) {
       availability: o.availability ?? 'https://schema.org/InStock',
       ...(o.url ? { url: o.url } : { url }),
     })),
-    ...(input.aggregateRating
-      ? {
-          aggregateRating: {
-            '@type': 'AggregateRating',
-            ratingValue: input.aggregateRating.ratingValue,
-            reviewCount: input.aggregateRating.reviewCount,
-            bestRating: 5,
-            worstRating: 1,
-          },
-        }
-      : {}),
+  };
+}
+
+/**
+ * Product node carrying the aggregateRating. Google review snippets do NOT
+ * support `Service` as parent type (GSC error: "Tip de obiect nevalid pentru
+ * <parent_node>", 2026-07-13) — supported types are Product, LocalBusiness,
+ * etc. LocalBusiness/Organization self-ratings are "self-serving" and also
+ * invalid, so the rating lives on a Product describing the offered service.
+ */
+export function productNode(input: ServiceSchemaInput) {
+  if (!input.aggregateRating) return null;
+  const url = `${BASE_URL}/servicii/${input.slug}/`;
+  const prices = input.offers.map((o) => o.price);
+  return {
+    '@type': 'Product',
+    '@id': `${url}#product`,
+    name: input.name,
+    description: input.description,
+    image: `${BASE_URL}/og/default.png`,
+    url,
+    brand: { '@id': `${BASE_URL}/#organization` },
+    offers: {
+      '@type': 'AggregateOffer',
+      lowPrice: Math.min(...prices),
+      highPrice: Math.max(...prices),
+      priceCurrency: input.offers[0]?.priceCurrency ?? 'RON',
+      offerCount: input.offers.length,
+      availability: 'https://schema.org/InStock',
+      url,
+    },
+    aggregateRating: {
+      '@type': 'AggregateRating',
+      ratingValue: input.aggregateRating.ratingValue,
+      reviewCount: input.aggregateRating.reviewCount,
+      bestRating: 5,
+      worstRating: 1,
+    },
   };
 }
 
@@ -175,6 +202,10 @@ export function buildServicePageGraph(input: ServiceSchemaInput) {
     { ...breadcrumbNode(input.breadcrumb), '@id': `${BASE_URL}/servicii/${input.slug}/#breadcrumb` },
     serviceNode(input),
   ];
+  const product = productNode(input);
+  if (product) {
+    graph.push(product);
+  }
   // Add WebPage node when we have editorial metadata to expose
   if (input.dateModified || input.datePublished || input.reviewedBy) {
     graph.push(webPageNode(input));

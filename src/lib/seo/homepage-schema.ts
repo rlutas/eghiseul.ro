@@ -57,13 +57,10 @@ export function buildHomepageGraph(faqs: HomepageFaq[]) {
           areaServed: 'RO',
           availableLanguage: ['Romanian', 'English'],
         },
-        aggregateRating: {
-          '@type': 'AggregateRating',
-          ratingValue: 4.9,
-          reviewCount: 450,
-          bestRating: 5,
-          worstRating: 1,
-        },
+        // NO aggregateRating here — Organization self-ratings are
+        // "self-serving" per Google review-snippet policy and get the whole
+        // page flagged invalid in GSC (2026-07-13). Ratings live on the
+        // per-service Product nodes instead (see schema.ts productNode).
       },
       {
         '@type': 'WebSite',

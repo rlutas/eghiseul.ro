@@ -5,6 +5,7 @@ import {
   breadcrumbNode,
   organizationNode,
   serviceNode,
+  productNode,
   articleNode,
 } from '@/lib/seo/schema';
 import { BASE_URL } from '@/lib/seo/constants';
@@ -65,18 +66,7 @@ describe('serviceNode', () => {
     expect(node.offers[1].price).toBe(278);
   });
 
-  it('omits aggregateRating when not provided', () => {
-    const node = serviceNode({
-      slug: 'x',
-      name: 'X',
-      description: 'x',
-      breadcrumb: [],
-      offers: [{ name: 'a', price: 1 }],
-    });
-    expect((node as Record<string, unknown>).aggregateRating).toBeUndefined();
-  });
-
-  it('includes aggregateRating with bestRating/worstRating defaults', () => {
+  it('never carries aggregateRating (unsupported parent type for review snippets)', () => {
     const node = serviceNode({
       slug: 'x',
       name: 'X',
@@ -85,7 +75,46 @@ describe('serviceNode', () => {
       offers: [{ name: 'a', price: 1 }],
       aggregateRating: { ratingValue: 4.9, reviewCount: 1247 },
     });
-    expect(node.aggregateRating).toMatchObject({
+    expect((node as Record<string, unknown>).aggregateRating).toBeUndefined();
+  });
+});
+
+describe('productNode', () => {
+  it('returns null without aggregateRating', () => {
+    expect(
+      productNode({
+        slug: 'x',
+        name: 'X',
+        description: 'x',
+        breadcrumb: [],
+        offers: [{ name: 'a', price: 1 }],
+      })
+    ).toBeNull();
+  });
+
+  it('carries the rating with AggregateOffer price range', () => {
+    const node = productNode({
+      slug: 'cazier-judiciar-online',
+      name: 'Cazier Judiciar Online',
+      description: 'd',
+      breadcrumb: [],
+      offers: [
+        { name: 'Standard', price: 198 },
+        { name: 'Urgent', price: 278 },
+      ],
+      aggregateRating: { ratingValue: 4.9, reviewCount: 1247 },
+    });
+    expect(node?.['@type']).toBe('Product');
+    expect(node?.['@id']).toBe(`${BASE_URL}/servicii/cazier-judiciar-online/#product`);
+    expect(node?.brand).toEqual({ '@id': `${BASE_URL}/#organization` });
+    expect(node?.offers).toMatchObject({
+      '@type': 'AggregateOffer',
+      lowPrice: 198,
+      highPrice: 278,
+      priceCurrency: 'RON',
+      offerCount: 2,
+    });
+    expect(node?.aggregateRating).toMatchObject({
       '@type': 'AggregateRating',
       ratingValue: 4.9,
       reviewCount: 1247,

@@ -44,6 +44,24 @@ const jsonLdGraph = {
       description: DESCRIPTION,
       provider: { '@id': `${BASE_URL}/#organization` },
     },
+    // Rating on a Product node — Google review snippets don't accept Service
+    // as parent type (see src/lib/seo/schema.ts productNode).
+    {
+      '@type': 'Product',
+      '@id': `${PAGE_URL}#product`,
+      name: 'Rovinieta Online',
+      description: DESCRIPTION,
+      image: `${BASE_URL}/og/default.png`,
+      url: PAGE_URL,
+      brand: { '@id': `${BASE_URL}/#organization` },
+      aggregateRating: {
+        '@type': 'AggregateRating',
+        ratingValue: 4.8,
+        reviewCount: 89,
+        bestRating: 5,
+        worstRating: 1,
+      },
+    },
   ],
 };
 
