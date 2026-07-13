@@ -435,7 +435,10 @@ export default async function CertificatConstatatorPage() {
                 <strong> pe firmă</strong>, care include deja toate datele actuale și mențiunile complete ale societății
                 (sediu, asociați, administratori, capital, obiect de activitate). Nu plătești în plus pentru „extins”:
                 îl comanzi ca certificat constatator pe firmă, <strong>89 RON cu TVA</strong>. Pentru evoluția completă
-                a firmei, de la înființare până azi, alege varianta <strong>cu istoric</strong>.
+                a firmei, de la înființare până azi, alege varianta <strong>cu istoric</strong> —{' '}
+                <Link href="/certificat-constatator-cu-istoric/" className="font-semibold text-primary-700 underline">
+                  vezi ghidul: ce conține și când ai nevoie de istoric
+                </Link>.
               </p>
               <p className="mt-3 text-sm text-neutral-600">
                 Nu ești sigur ce tip îți trebuie?{' '}

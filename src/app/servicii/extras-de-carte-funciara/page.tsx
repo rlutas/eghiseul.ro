@@ -636,6 +636,13 @@ export default async function ExtrasCarteFunciaraPage() {
                   <strong>{service.base_price} RON cu taxele ANCPI incluse</strong> și primești același document <strong>pe email, în câteva minute, fără cont și fără semnătură electronică</strong>.
                   Documentul este identic — plătești pentru timp și pentru lipsa pașilor tehnici.
                 </p>
+                <p>
+                  Vrei totuși varianta gratuită? Am scris un{' '}
+                  <Link href="/extras-carte-funciara-gratuit/" className="font-semibold text-primary-700 underline">
+                    ghid complet: extras de carte funciară gratuit prin MyTerra
+                  </Link>{' '}
+                  — pașii, condițiile de cont și limitele, explicate onest.
+                </p>
               </div>
             </div>
           </div>

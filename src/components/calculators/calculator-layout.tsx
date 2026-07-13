@@ -28,6 +28,64 @@ export interface CalculatorLayoutProps {
 const DATE_MODIFIED = '2026-06-22';
 const ACTUALIZAT = 'iunie 2026';
 
+/**
+ * Internal linking calculatoare → pagini de servicii (money pages).
+ * Calculatoarele aduc ~80% din clicurile organice; blocul de mai jos pasează
+ * autoritate + trafic spre servicii cu ancore exact-match, contextual pe
+ * subiectul calculatorului. Mapare per slug, cu fallback pe setul default.
+ */
+interface RelatedService {
+  href: string;
+  label: string;
+  desc: string;
+}
+
+const SVC = {
+  cazier: { href: '/servicii/cazier-judiciar-online/', label: 'Cazier judiciar online', desc: 'Eliberat rapid, 100% online — pentru angajare, licitații sau străinătate.' },
+  cazierAuto: { href: '/servicii/cazier-auto-online/', label: 'Cazier auto online', desc: 'Istoricul sancțiunilor rutiere, fără drum la poliție.' },
+  cazierFiscal: { href: '/servicii/cazier-fiscal-online/', label: 'Cazier fiscal online', desc: 'De la ANAF, necesar la înființare firmă sau licitații.' },
+  extrasCF: { href: '/servicii/extras-de-carte-funciara/', label: 'Extras de carte funciară online', desc: 'Automat, în câteva minute, 24/7 — fără cont ANCPI.' },
+  constatator: { href: '/servicii/certificat-constatator-online/', label: 'Certificat constatator online', desc: 'De la ONRC, doar cu CUI-ul firmei — eliberare instant, 24/7.' },
+  nastere: { href: '/servicii/eliberare-certificat-de-nastere/', label: 'Certificat de naștere online', desc: 'Duplicat eliberat oficial, livrat oriunde.' },
+} satisfies Record<string, RelatedService>;
+
+const DEFAULT_RELATED: RelatedService[] = [SVC.cazier, SVC.extrasCF, SVC.constatator];
+
+const RELATED_BY_SLUG: Record<string, RelatedService[]> = {
+  // Imobiliare & credit → extras CF
+  'taxe-notariale': [SVC.extrasCF, SVC.cazier, SVC.constatator],
+  'credit-ipotecar': [SVC.extrasCF, SVC.cazier],
+  'impozit-casa': [SVC.extrasCF, SVC.constatator],
+  'impozit-chirie': [SVC.extrasCF, SVC.constatator],
+  'rambursare-anticipata': [SVC.extrasCF, SVC.cazier],
+  'grad-indatorare': [SVC.extrasCF, SVC.cazier],
+  // Firmă & fiscal → constatator + cazier fiscal
+  'taxe-srl': [SVC.constatator, SVC.cazierFiscal],
+  'dividende': [SVC.constatator, SVC.cazierFiscal],
+  'tva': [SVC.constatator, SVC.cazierFiscal],
+  'contributii-pfa': [SVC.constatator, SVC.cazierFiscal],
+  'penalitati-anaf': [SVC.cazierFiscal, SVC.constatator],
+  'diurna': [SVC.constatator, SVC.cazier],
+  // Juridic → cazier
+  'reabilitare': [SVC.cazier, SVC.cazierAuto],
+  'termene-judiciare': [SVC.cazier, SVC.extrasCF],
+  'taxa-judiciara-de-timbru': [SVC.cazier, SVC.extrasCF],
+  // Auto
+  'amenda-circulatie': [SVC.cazierAuto, SVC.cazier],
+  'calculator-impozit-auto': [SVC.cazierAuto, SVC.constatator],
+  // Muncă / angajare → cazier
+  'salariu': [SVC.cazier, SVC.cazierFiscal],
+  'spor-salarial': [SVC.cazier, SVC.constatator],
+  'vechime-in-munca': [SVC.cazier, SVC.extrasCF],
+  'zile-concediu-odihna': [SVC.cazier, SVC.constatator],
+  'indemnizatie-somaj': [SVC.cazier, SVC.cazierFiscal],
+  // Familie → certificat naștere
+  'concediu-maternitate': [SVC.nastere, SVC.cazier],
+  'concediu-paternal': [SVC.nastere, SVC.cazier],
+  'calculator-indemnizatie-crestere-copil': [SVC.nastere, SVC.cazier],
+  'pensie-alimentara': [SVC.nastere, SVC.cazier],
+};
+
 export function CalculatorLayout({
   slug,
   title,
@@ -152,6 +210,30 @@ export function CalculatorLayout({
 
         {/* FAQ */}
         {faqs && faqs.length > 0 && <ServiceFAQ title="Întrebări frecvente" faqs={faqs} />}
+
+        {/* Related services — internal linking calculatoare → money pages */}
+        <section className="py-12 bg-neutral-50 border-t border-neutral-200">
+          <div className="container mx-auto px-4 max-w-[820px]">
+            <h2 className="text-xl lg:text-2xl font-extrabold text-secondary-900 mb-6">
+              Documente utile, 100% online
+            </h2>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {(RELATED_BY_SLUG[slug] ?? DEFAULT_RELATED).map((s) => (
+                <Link
+                  key={s.href}
+                  href={s.href}
+                  className="group rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm hover:shadow-md hover:border-primary-300 transition-all"
+                >
+                  <p className="font-bold text-secondary-900 group-hover:text-primary-700 transition-colors mb-1.5 flex items-center gap-1.5">
+                    {s.label}
+                    <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true" />
+                  </p>
+                  <p className="text-sm text-neutral-600 leading-relaxed">{s.desc}</p>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
 
         {/* CTA */}
         <section className="relative py-14 lg:py-20 bg-gradient-to-b from-secondary-900 to-[#0C1A2F] overflow-hidden">

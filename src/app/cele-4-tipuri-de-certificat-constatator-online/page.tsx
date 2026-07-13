@@ -143,7 +143,9 @@ export default function Page() {
       <p>
         Include <strong>istoricul modificărilor firmei</strong> — de la înființare până în prezent sau pe o perioadă
         aleasă de tine. Util în litigii, due diligence, succesiuni sau verificări amănunțite ale unui partener de
-        afaceri. Se emite <strong>automat, în câteva minute, 24/7</strong>.
+        afaceri. Se emite <strong>automat, în câteva minute, 24/7</strong>. Am scris și un{' '}
+        <Link href="/certificat-constatator-cu-istoric/">ghid dedicat certificatului constatator cu istoric</Link> —
+        ce conține exact și când merită diferența de preț.
       </p>
       <p>
           <Link

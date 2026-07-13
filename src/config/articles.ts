@@ -19,6 +19,20 @@ export interface ArticleMeta {
 
 export const ARTICLES: ArticleMeta[] = [
   {
+    slug: 'extras-carte-funciara-gratuit',
+    title: 'Extras de Carte Funciară Gratuit prin MyTerra — Ghid + Limite',
+    excerpt: 'Cum obții gratuit extrasul de informare prin MyTerra (ANCPI), ce condiții sunt și când are sens varianta plătită, eliberată instant.',
+    category: 'Cadastru & imobiliare',
+    image: '/images/articole/cum-aflam-numarul-carte-functionara-si-nr-cadastral.webp',
+  },
+  {
+    slug: 'certificat-constatator-cu-istoric',
+    title: 'Certificat Constatator cu Istoric — Ce Conține, Preț, Cum Îl Obții',
+    excerpt: 'Toate modificările firmei de la înființare: asociați, sedii, capital. Când ai nevoie de istoric și când ajunge certificatul de bază.',
+    category: 'Firme & ONRC',
+    image: '/images/articole/cele-4-tipuri-de-certificat-constatator-online.webp',
+  },
+  {
     slug: 'tabel-varsta-pensionare-anticipata-femei',
     title: 'Tabel Vârstă Pensionare Anticipată Femei',
     excerpt: 'Tabelul complet cu vârsta de pensionare anticipată pentru femei, în funcție de stagiul de cotizare.',
