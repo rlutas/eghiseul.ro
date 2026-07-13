@@ -625,6 +625,18 @@
 
 Features planned but not yet scheduled for a specific sprint.
 
+#### SEO/GEO — Fronturile C+D din strategia post-cutover (2026-07-13)
+
+Fronturile A (indexare/tehnic) + B (striking distance) executate 2026-07-13 — vezi
+`changelog/2026-07-13-seo-strategy-quick-wins.md`. Rămase, per
+`docs/seo/STRATEGY-2026-07-13-post-cutover.md`:
+- **Front C (GEO retrofit):** answer-first pe restul serviciilor + top 15 articole; densitate
+  statistici/legi; FAQPage peste tot; pagină „Despre noi" E-E-A-T (firmă + avocat + sameAs);
+  freshness pipeline (dateModified real, prețuri din DB).
+- **Front D (autoritate):** articole noi prin /humanizer; Reddit/foruri RO; digital PR
+  (HotNews/Digi24/StartupCafe); Google Business Profile + directoare.
+- **Manual user:** șters sitemap vechi WP din GSC; Bing Webmaster Tools (Import from GSC).
+
 #### Post-Order Delivery Request
 
 **Problem:** Currently, if a client chooses "no delivery" (ridicare personala) at checkout, they cannot request delivery later. Clients sometimes change their mind after placing an order and want the document delivered by courier.
