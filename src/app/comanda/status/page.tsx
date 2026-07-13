@@ -98,6 +98,9 @@ interface SelectedOption {
 interface OrderData {
   id: string;
   orderCode: string;
+  clientType?: 'PF' | 'PJ';
+  clientName?: string | null;
+  companyName?: string | null;
   status: string;
   paymentStatus: string;
   invoiceNumber?: string | null;
@@ -441,6 +444,13 @@ function OrderStatusContent() {
                         );
                       })}
                     </div>
+                  )}
+                  {(orderData.companyName || orderData.clientName) && (
+                    <p className="text-sm text-muted-foreground mt-1">
+                      {orderData.clientType === 'PJ'
+                        ? <>Persoană juridică — <span className="font-medium text-foreground">{orderData.companyName}</span></>
+                        : <>Persoană fizică — <span className="font-medium text-foreground">{orderData.clientName}</span></>}
+                    </p>
                   )}
                   <p className="text-sm text-muted-foreground mt-1">
                     Comandat pe {formatDate(orderData.createdAt)}

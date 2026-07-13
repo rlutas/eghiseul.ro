@@ -229,6 +229,16 @@ export async function GET(request: NextRequest) {
       cdAny?.billing?.companyName || cdAny?.company?.companyName ||
       cdAny?.companyData?.companyName || cdAny?.constatator?.companyName || null;
 
+    // Client identity for the status card (requester already proved
+    // order_code + email ownership). PF name from billing/personal; PJ = firm.
+    const isPJ =
+      cdAny?.billing?.type === 'persoana_juridica' || cdAny?.billing?.type === 'company' ||
+      cdAny?.billing?.source === 'company' || !!firmName;
+    const pfName = [
+      cdAny?.billing?.firstName || cdAny?.personal?.firstName,
+      cdAny?.billing?.lastName || cdAny?.personal?.lastName,
+    ].filter(Boolean).join(' ') || null;
+
     const clientDocuments = (documents || []).map(doc => ({
       id: doc.id,
       type: doc.type,
@@ -307,6 +317,9 @@ export async function GET(request: NextRequest) {
       data: {
         id: order.id,
         orderCode: order.friendly_order_id || order.order_number,
+        clientType: isPJ ? 'PJ' : 'PF',
+        clientName: isPJ ? null : pfName,
+        companyName: isPJ ? firmName : null,
         status: order.status,
         paymentStatus: order.payment_status,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
