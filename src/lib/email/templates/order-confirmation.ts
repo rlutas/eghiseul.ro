@@ -55,7 +55,7 @@ export function renderOrderConfirmationEmail(input: OrderConfirmationEmailInput)
         <table role="presentation" cellpadding="0" cellspacing="0" width="100%"><tr><td align="center">
           <a href="${esc(statusUrl)}" style="display:inline-block;background:#ECB95F;color:#0B1B33;font-weight:800;font-size:15px;text-decoration:none;padding:14px 28px;border-radius:12px;">Verifică statusul comenzii</a>
         </td></tr></table>
-        <p style="margin:22px 0 0;color:#94a3b8;font-size:12px;line-height:1.6;">Te ținem la curent pe email la fiecare pas important. Întrebări? Răspundem rapid pe <a href="https://wa.me/40757708181" style="color:#0B1B33;">WhatsApp</a> sau la <a href="mailto:contact@eghiseul.ro" style="color:#0B1B33;">contact@eghiseul.ro</a>.</p>
+        <p style="margin:22px 0 0;color:#94a3b8;font-size:12px;line-height:1.6;">Te ținem la curent pe email la fiecare pas important. Întrebări? Răspundem rapid pe <a href="https://eghiseul.ro/contact" style="color:#0B1B33;">WhatsApp (pagina de contact)</a> sau la <a href="mailto:contact@eghiseul.ro" style="color:#0B1B33;">contact@eghiseul.ro</a>.</p>
       </td></tr>
       <tr><td style="background:#f8fafc;border-top:1px solid #e2e8f0;padding:16px 28px;">
         <p style="margin:0;color:#94a3b8;font-size:11px;line-height:1.6;">eDigitalizare SRL · CUI RO49278701 · eGhișeul.ro este un serviciu privat de asistență la obținerea de documente; nu suntem instituție de stat.</p>
