@@ -16,7 +16,7 @@ export const metadata = buildPageMetadata({
   title: TITLE,
   description: DESCRIPTION,
   path: `/${SLUG}/`,
-  ogImage: '/images/articole/cum-aflam-numarul-carte-functionara-si-nr-cadastral.webp',
+  ogImage: `/images/articole/${SLUG}.webp`,
 });
 
 export default function Page() {
@@ -30,7 +30,6 @@ export default function Page() {
       dateModified={DATE_MODIFIED}
       publishedLabel="13 iulie 2026"
       updatedLabel="13 iulie 2026"
-      image="/images/articole/cum-aflam-numarul-carte-functionara-si-nr-cadastral.webp"
       relatedServices={[
         { slug: 'extras-carte-funciara', label: 'Extras de Carte Funciară Online', desc: 'Fără cont ANCPI, eliberat automat în câteva minute, 24/7.' },
         { href: '/cum-aflam-numarul-carte-functionara-si-nr-cadastral/', label: 'Cum afli numărul de carte funciară', desc: 'Din acte, dintr-un extras vechi sau după adresă.' },

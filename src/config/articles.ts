@@ -23,7 +23,6 @@ export const ARTICLES: ArticleMeta[] = [
     title: 'Extras de Carte Funciară Gratuit prin MyTerra — Ghid + Limite',
     excerpt: 'Cum obții gratuit extrasul de informare prin MyTerra (ANCPI), ce condiții sunt și când are sens varianta plătită, eliberată instant.',
     category: 'Cadastru & imobiliare',
-    image: '/images/articole/cum-aflam-numarul-carte-functionara-si-nr-cadastral.webp',
   },
   {
     slug: 'certificat-constatator-cu-istoric',
