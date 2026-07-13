@@ -3115,6 +3115,9 @@ const DOC_TYPE_LABELS: Record<string, string> = {
   'document_received': 'Document primit de la institutie',
   'document_final': 'Document final',
   'constatator': 'Certificat Constatator (ONRC)',
+  'extras-carte-funciara': 'Extras Carte Funciara (ANCPI)',
+  'ancpi-chitanta': 'Chitanta ANCPI (intern)',
+  'collaborator-document': 'Document de la colaborator',
   'invoice': 'Factura',
 };
 
@@ -3550,15 +3553,23 @@ function ProcessingSection({
               ))
             }
 
-            {/* Special documents (received from institution, final) */}
-            {['document_received', 'document_final'].map(docType => {
-              const doc = documents.find(d => d.type === docType);
-              if (!doc) return null;
-              return (
-                <div key={docType} className="flex items-center justify-between py-2 px-3 rounded-lg border bg-white text-sm">
-                  <div className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    <span className="font-medium">{DOC_TYPE_LABELS[docType] || docType}</span>
+            {/* Delivered / other documents — CATCH-ALL: anything not rendered
+                above (ANCPI extras + chitanță, ONRC constatator, document_received,
+                document_final...). A fixed two-type list here hid the ANCPI/ONRC
+                deliverables entirely (raportat 2026-07-13). */}
+            {documents
+              .filter(d => !generableDocTypes.includes(d.type) && d.type !== 'collaborator-document')
+              .map(doc => (
+                <div key={doc.id} className="flex items-center justify-between py-2 px-3 rounded-lg border bg-white text-sm">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <CheckCircle className="h-4 w-4 text-green-500 shrink-0" />
+                    <span className="font-medium truncate">{DOC_TYPE_LABELS[doc.type] || doc.file_name || doc.type}</span>
+                    {doc.document_number && (
+                      <span className="text-xs text-neutral-500 font-mono shrink-0">nr. {doc.document_number}</span>
+                    )}
+                    {!doc.visible_to_client && (
+                      <span className="text-[10px] uppercase rounded bg-neutral-100 text-neutral-500 px-1.5 py-0.5 shrink-0">intern</span>
+                    )}
                     <ClientViewedBadge doc={doc} />
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
@@ -3583,8 +3594,7 @@ function ProcessingSection({
                     </Button>
                   </div>
                 </div>
-              );
-            })}
+              ))}
 
             {/* Documents uploaded by a collaborator (topograf) */}
             {documents.filter(d => d.type === 'collaborator-document').map(doc => (
