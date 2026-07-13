@@ -190,6 +190,9 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
 
   // Non-blocking input rules for the electronic identifier (warn, don't block).
   const cfCheck = checkCf(property?.carteFunciara ?? '');
+  // On the collective-extract wizard a "-C1" number IS the right format —
+  // no warning, no jump button (fulfilled by the topograf, not the worker).
+  const isColectivService = state.serviceSlug === 'extras-cf-colectiv';
   // Electronic UNIT identifier (123456-C1-U2) pinpoints the apartment by
   // itself — no cadastral/topografic disambiguation needed.
   const isElectronicUnit = /^\d{1,7}-C\d+-U\d+$/.test(normalizeCf(property?.carteFunciara ?? ''));
@@ -409,22 +412,30 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
                   arată ca <code className="bg-neutral-100 px-1 rounded">123456-C1-U2</code>) — extrasul
                   se emite exact pe el, fără risc de confuzie.
                 </p>
-                <CfHint check={cfCheck} hasSecondary={!!property.cadastral?.trim()} />
-                {cfCheck.status === 'collective' && (
-                  <Button
-                    type="button"
-                    size="sm"
-                    className="w-full sm:w-auto bg-primary-500 hover:bg-primary-600 text-secondary-900 font-semibold"
-                    onClick={() =>
-                      jumpToService('extras-cf-colectiv', {
-                        county: property.county,
-                        locality: property.locality,
-                        carteFunciara: property.carteFunciara,
-                      })
-                    }
-                  >
-                    Comandă Extras CF Colectiv cu numărul introdus →
-                  </Button>
+                {isColectivService && cfCheck.status === 'collective' ? (
+                  <p className="text-xs text-green-600">
+                    ✓ Format corect — vei primi extrasul CF colectiv pentru întreaga clădire
+                  </p>
+                ) : (
+                  <>
+                    <CfHint check={cfCheck} hasSecondary={!!property.cadastral?.trim()} />
+                    {!isColectivService && cfCheck.status === 'collective' && (
+                      <Button
+                        type="button"
+                        size="sm"
+                        className="w-full sm:w-auto bg-primary-500 hover:bg-primary-600 text-secondary-900 font-semibold"
+                        onClick={() =>
+                          jumpToService('extras-cf-colectiv', {
+                            county: property.county,
+                            locality: property.locality,
+                            carteFunciara: property.carteFunciara,
+                          })
+                        }
+                      >
+                        Comandă Extras CF Colectiv cu numărul introdus →
+                      </Button>
+                    )}
+                  </>
                 )}
               </div>
 
@@ -436,10 +447,11 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
                   the worker matches it against BOTH ePay columns.
                   HIDDEN when the CF is already an electronic UNIT identifier
                   (123456-C1-U2) — that pinpoints the apartment by itself. */}
-              {isElectronicUnit ? (
+              {isElectronicUnit || (isColectivService && cfCheck.status === 'collective') ? (
                 <p className="text-xs text-green-700 bg-green-50 border border-green-200 rounded-lg px-3 py-2">
-                  ✓ Ai introdus numărul electronic al unității — identifică exact apartamentul,
-                  nu mai e nevoie de alte numere.
+                  {isElectronicUnit
+                    ? '✓ Ai introdus numărul electronic al unității — identifică exact apartamentul, nu mai e nevoie de alte numere.'
+                    : '✓ Numărul colectiv identifică întreaga clădire — nu mai e nevoie de alte numere.'}
                 </p>
               ) : (
               <div className={cfCheck.status === 'old_format'
