@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { requirePermission } from '@/lib/admin/permissions';
 import { sendEmail } from '@/lib/email/resend';
+import { brandedEmailHtml, ctaButton, infoRows, escHtml } from '@/lib/email/templates/branded-layout';
 
 /**
  * Sends an order to a collaborator (topograph) — or takes it back.
@@ -69,11 +70,27 @@ export async function POST(
         const email = authUser?.user?.email;
         if (email) {
           const friendly = order.friendly_order_id || orderId;
+          const serviceName = order.services?.name ?? '';
+          const portalUrl = `https://eghiseul.ro/colaborator/orders/${orderId}`;
+          // Branded shell (same visual language as the order emails) — the old
+          // bare two-line HTML looked broken and landed in Yahoo spam.
+          const html = brandedEmailHtml({
+            preheader: `Comandă nouă de lucrat: ${friendly} — ${serviceName}`,
+            content: `
+        <h1 style="margin:0 0 6px;color:#0B1B33;font-size:20px;">Comandă nouă alocată</h1>
+        <p style="margin:0 0 18px;color:#475569;font-size:14px;line-height:1.6;">Salut! Ți-a fost alocată o comandă nouă în portalul de colaborator.</p>
+        ${infoRows([
+          { label: 'Comandă', value: friendly, mono: true },
+          { label: 'Serviciu', value: escHtml(serviceName) },
+        ])}
+        <p style="margin:18px 0 0;color:#475569;font-size:14px;line-height:1.6;">Toate datele pentru lucrare (imobil, adresă, proprietar) sunt în portal:</p>
+        ${ctaButton('Deschide comanda', portalUrl)}`,
+          });
           await sendEmail({
             to: email,
-            subject: `Comandă nouă alocată: ${friendly}`,
-            html: `<p>Bună,</p><p>Ți-a fost alocată comanda <strong>${friendly}</strong> (${order.services?.name ?? ''}).</p><p>O găsești în portal: <a href="https://eghiseul.ro/colaborator/orders/${orderId}">deschide comanda</a>.</p>`,
-            text: `Ți-a fost alocată comanda ${friendly} (${order.services?.name ?? ''}). O găsești la https://eghiseul.ro/colaborator/orders/${orderId}`,
+            subject: `Comandă nouă alocată: ${friendly} — ${serviceName}`,
+            html,
+            text: `Salut! Ți-a fost alocată comanda ${friendly} (${serviceName}). Toate datele pentru lucrare sunt în portal: ${portalUrl}`,
             idempotencyKey: `collab-assign-${orderId}-${collaboratorId}`,
           });
         }
