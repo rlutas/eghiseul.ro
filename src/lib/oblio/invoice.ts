@@ -304,7 +304,10 @@ export async function createInvoiceFromOrder(
   const normalizedOptions = normalizeOrderOptions(order.selected_options);
   for (const option of normalizedOptions) {
     products.push({
-      name: option.name,
+      // baseName (no country/language suffix) — a wrong metadata detail on a
+      // fiscal document is worse than none (E-260714-WXGYQ: „— Chile" pe
+      // factura unei comenzi pentru Italia).
+      name: option.baseName,
       code: option.code,
       price: option.unitPrice,
       measuringUnit: 'buc',

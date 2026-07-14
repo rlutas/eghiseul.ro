@@ -231,6 +231,34 @@ describe('createInvoiceFromOrder — products / line items', () => {
     expect(products[2]).toMatchObject({ name: 'Apostila Haga', code: 'apostila', price: 100 });
   });
 
+  it('invoice lines DROP the country/language metadata suffix', async () => {
+    // Incident E-260714-WXGYQ: „Apostilă de la Haga — Chile" pe factura unei
+    // comenzi pentru Italia. Pe documentul fiscal linia rămâne fără detaliu;
+    // detaliul (name cu sufix) trăiește doar în admin/summary.
+    const order = {
+      ...baseOrder,
+      selected_options: [
+        {
+          code: 'apostila_haga',
+          option_name: 'Apostilă de la Haga',
+          price_modifier: 198,
+          metadata: { country: 'Chile' },
+        },
+        {
+          code: 'traducere',
+          option_name: 'Traducere Autorizată',
+          price_modifier: 178.5,
+          metadata: { language: 'Engleză (UK)' },
+        },
+      ],
+    };
+    await createInvoiceFromOrder(order, 'Card');
+
+    const products = oblioRequest.mock.calls[0][0].body.products;
+    expect(products[1].name).toBe('Apostilă de la Haga');
+    expect(products[2].name).toBe('Traducere Autorizată');
+  });
+
   it('adds delivery as line item when delivery_price > 0', async () => {
     const order = {
       ...baseOrder,

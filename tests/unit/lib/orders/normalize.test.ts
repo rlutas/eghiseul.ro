@@ -64,6 +64,30 @@ describe('normalizeOrderOption', () => {
     expect(o.name).toBe('Apostilă Haga — Germania');
   });
 
+  it('exposes baseName WITHOUT the metadata suffix (for fiscal invoices)', () => {
+    // Incident E-260714-WXGYQ: „Apostilă de la Haga — Chile" pe factură,
+    // comanda era pentru Italia. Facturile folosesc baseName; metadata rămâne
+    // doar pe `name` (admin/summary).
+    const o = normalizeOrderOption({
+      optionName: 'Apostilă Haga',
+      priceModifier: 238,
+      quantity: 1,
+      metadata: { country: 'Chile' },
+    });
+    expect(o.baseName).toBe('Apostilă Haga');
+    expect(o.name).toBe('Apostilă Haga — Chile');
+  });
+
+  it('baseName still strips the marketing suffix', () => {
+    const o = normalizeOrderOption({
+      optionName: 'Certificat Integritate (adaugă în aceeași comandă)',
+      priceModifier: 100,
+      quantity: 1,
+      metadata: { country: 'Italia' },
+    });
+    expect(o.baseName).toBe('Certificat Integritate');
+  });
+
   it('joins both language and country with bullet', () => {
     const o = normalizeOrderOption({
       optionName: 'Traducere',

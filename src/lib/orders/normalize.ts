@@ -24,6 +24,11 @@ export interface OrderOptionLine {
   code?: string;
   /** Display name. Includes appended metadata (language/country) if present. */
   name: string;
+  /** Display name WITHOUT the metadata suffix — for fiscal invoices, where a
+   *  stale/wrong country-language detail is worse than no detail (incident
+   *  E-260714-WXGYQ: „Apostilă de la Haga — Chile" pe factură, comanda era
+   *  pentru Italia). Metadata stays on `name` for admin/summary surfaces. */
+  baseName: string;
   /** Optional human description. */
   description?: string;
   /** Per-unit price in RON (TVA-inclusive — same convention as the rest of the app). */
@@ -120,6 +125,7 @@ export function normalizeOrderOption(raw: RawOption): OrderOptionLine {
     optionId: raw.optionId ?? raw.option_id ?? undefined,
     code: raw.code,
     name: appendMetadataToName(baseName, raw.metadata ?? undefined),
+    baseName: stripSecondaryServiceSuffix(baseName),
     description,
     unitPrice,
     quantity,
