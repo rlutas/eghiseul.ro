@@ -276,7 +276,6 @@ export const MOTIV_CAZIER_FISCAL_OPTIONS = [
   "Înlesniri de Plată",
   "APIA",
   "Autorizare Agent Temporar",
-  "Programul RABLA",
   "Contract în Asigurări",
 ] as const;
 
