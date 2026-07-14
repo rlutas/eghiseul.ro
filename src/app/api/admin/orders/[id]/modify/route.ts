@@ -230,6 +230,12 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       const orderNum = ((order as any).friendly_order_id ?? (order as any).order_number ?? '') as string;
       const base = process.env.NEXT_PUBLIC_APP_URL ?? 'https://eghiseul.ro';
 
+      const clientName = [
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ((order as any).customer_data?.personal?.firstName as string) ?? '',
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ((order as any).customer_data?.personal?.lastName as string) ?? '',
+      ].filter(Boolean).join(' ');
       const session = await stripe.checkout.sessions.create({
         mode: 'payment',
         line_items: [
@@ -237,8 +243,10 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
             price_data: {
               currency: 'ron',
               product_data: {
-                name: `Plată suplimentară comanda ${orderNum}`,
-                description: changesSummary.slice(0, 500) || undefined,
+                // Numele liniei = CE se plătește — apare la client în Checkout
+                // și în Stripe dashboard (ușor de identificat în decontări).
+                name: `Extra ${orderNum}: ${changesSummary}`.slice(0, 250),
+                description: `Comanda ${orderNum}${clientName ? ` · ${clientName}` : ''}`.slice(0, 500),
               },
               unit_amount: Math.round(diff.diff * 100),
             },
@@ -256,7 +264,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
           adminEmail,
         },
         payment_intent_data: {
-          description: `Plată suplimentară comanda ${orderNum} — ${changesSummary}`.slice(0, 999),
+          description: `Extra ${orderNum}: ${changesSummary}${clientName ? ` · ${clientName}` : ''}`.slice(0, 999),
           metadata: {
             purpose: 'extra_charge',
             orderId: order.id,

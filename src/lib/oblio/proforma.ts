@@ -44,8 +44,10 @@ interface ExtraDocInput {
 function buildProducts(input: ExtraDocInput): OblioProduct[] {
   return [
     {
-      name: `Servicii suplimentare comanda ${input.orderNumber}`.slice(0, 200),
-      description: input.description.slice(0, 500),
+      // Linia documentului spune CE s-a cumpărat (traducere/livrare/...),
+      // nu doar "servicii suplimentare" generic.
+      name: `${input.description || 'Servicii suplimentare'} — comanda ${input.orderNumber}`.slice(0, 200),
+      description: `Plată suplimentară comanda ${input.orderNumber}`.slice(0, 500),
       price: input.amountRon,
       measuringUnit: 'buc',
       currency: 'RON',
