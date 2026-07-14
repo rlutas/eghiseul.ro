@@ -28,13 +28,13 @@
 - [ ] Cont Stripe pe firma nouă, activat pe RON
 - [ ] eghiseul env: `STRIPE_SECRET_KEY`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` + **webhook nou** în contul nou → `https://eghiseul.ro/api/webhooks/stripe` (events: checkout.session.completed, payment_intent.succeeded, payment_intent.payment_failed, charge.refunded) → `STRIPE_WEBHOOK_SECRET` nou
 - [ ] CJO env: `STRIPE_SECRET_KEY`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` + webhook nou → `https://cazierjudiciaronline.com/api/stripe/webhook` → `STRIPE_WEBHOOK_SECRET` nou
-- [ ] ⚠️ **P2 — cod CJO:** `src/lib/stripe/client.ts` → `getStripeForAccount()` dispecerizează hardcodat pe `"bmr_digital" | "cabinet_tarta"`, iar comenzile salvează `orders.stripe_account`. La firma nouă: adaugă o valoare nouă (ex. `"firma_noua"`) în dispatch + în `tenantConfig()` din `source-detect.ts`. ~30 min de lucru.
+- [ ] ~~P2~~ **REZOLVAT 14 iul** — dispatch-ul e env-driven acum: comenzile noi primesc eticheta din `STRIPE_ACCOUNT_LABEL` (default `bmr_digital`), iar `getStripeForAccount` rezolvă cheile: eticheta curentă → `STRIPE_SECRET_KEY`; etichete istorice → `STRIPE_SECRET_KEY_<ETICHETA_UPPER>` (ex. `STRIPE_SECRET_KEY_BMR_DIGITAL` = cheia veche, pt refund-uri pe comenzi vechi). **La switch: env only, zero cod** — setezi `STRIPE_ACCOUNT_LABEL=firma_noua`, `STRIPE_SECRET_KEY`=cheia nouă, `STRIPE_SECRET_KEY_BMR_DIGITAL`=cheia veche.
 - [ ] Redeploy ambele platforme (env-urile nu intră fără build)
 - [ ] Comandă test pe fiecare platformă: plată → factură pe seria nouă → apare în decontări
 
 ### 3. Bancă
 - [ ] Cont bancar nou legat la Stripe (payout destination)
-- [ ] ⚠️ **P3 — dacă banca NU e BT:** parserul din `src/lib/accounting/bank-statement.ts` (`parseBtCsv`) e specific formatului BT „Lista de tranzacții". Pentru altă bancă se scrie un adaptor nou (~1 oră) — structura internă (categorii, match payout) rămâne identică.
+- [ ] ~~P3~~ **NU SE APLICĂ** — decizie user 14 iul: contul rămâne la BT și pe firma nouă → parserul existent merge nemodificat. (Dacă vreodată se schimbă banca: adaptor nou în `bank-statement.ts`, ~1 oră.)
 - [ ] env nou (ambele proiecte relevante): `ACCOUNTING_COMPANY=FIRMA_NOUA` — tag-uiește payouts + extrasele noi pe firma nouă (istoricul vechi rămâne pe EDIGITALIZARE, separabil în rapoarte)
 
 ### 4. Contabil / fiscal
@@ -48,8 +48,6 @@
 - Registrul Barou, workerii ONRC/ANCPI, Resend/emailuri, SMSLink
 - ecazier (Cabinet Tarța) — complet independent
 
-## Singurele 2 lucruri de COD la switch
-1. CJO `getStripeForAccount` + `tenantConfig` — valoarea nouă de cont (P2)
-2. Parser bancă nouă dacă nu-i BT (P3)
-
-Restul = env + un rând în DB + webhooks în dashboard-ul Stripe nou.
+## Lucruri de COD la switch
+**NICIUNUL.** (P2 rezolvat env-driven 14 iul; P3 nu se aplică — banca rămâne BT.)
+Switch complet = env-uri + un rând în `companies` (CJO) + webhooks în dashboard-ul Stripe nou + seriile în Oblio.
