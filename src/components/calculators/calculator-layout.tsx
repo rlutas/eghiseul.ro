@@ -49,6 +49,8 @@ const SVC = {
   nastere: { href: '/servicii/eliberare-certificat-de-nastere/', label: 'Certificat de naștere online', desc: 'Duplicat eliberat oficial, livrat oriunde.' },
   identificareImobil: { href: '/servicii/identificare-imobil/', label: 'Identificare imobil', desc: 'Afli numărul de CF și cadastral când ai doar date vechi.' },
   copieCF: { href: '/servicii/copie-carte-funciara/', label: 'Copie carte funciară', desc: 'Copia CF-ului vechi, cu istoricul înscrierilor.' },
+  // External: sister platform cfunciara.ro — service not offered on eghiseul.
+  urbanism: { href: 'https://www.cfunciara.ro/servicii/certificat-de-urbanism-pentru-informare', label: 'Certificat de urbanism pentru informare', desc: 'Afli ce se poate construi pe teren ÎNAINTE să cumperi — restricții, POT/CUT, interdicții.' },
 } satisfies Record<string, RelatedService>;
 
 const DEFAULT_RELATED: RelatedService[] = [SVC.cazier, SVC.extrasCF, SVC.constatator];
@@ -56,7 +58,7 @@ const DEFAULT_RELATED: RelatedService[] = [SVC.cazier, SVC.extrasCF, SVC.constat
 const RELATED_BY_SLUG: Record<string, RelatedService[]> = {
   // Imobiliare & credit → extras CF
   'taxe-notariale': [SVC.extrasCF, SVC.cazier, SVC.constatator],
-  'credit-ipotecar': [SVC.extrasCF, SVC.cazier],
+  'credit-ipotecar': [SVC.extrasCF, SVC.urbanism, SVC.cazier],
   'impozit-casa': [SVC.extrasCF, SVC.constatator],
   'impozit-chirie': [SVC.extrasCF, SVC.constatator],
   'rambursare-anticipata': [SVC.extrasCF, SVC.cazier],
