@@ -182,7 +182,19 @@ export async function POST(request: NextRequest) {
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
               } as any);
           } catch (err) {
-            console.error(`[invoice-health-check] extra-invoice heal failed for ${orderNum}[${i}]:`, err instanceof Error ? err.message : err);
+            const msg = err instanceof Error ? err.message : String(err);
+            console.error(`[invoice-health-check] extra-invoice heal failed for ${orderNum}[${i}]:`, msg);
+            // Surface the failure in the order timeline — runtime logs aren't
+            // reachable from the CLI, and a silent hourly failure is invisible
+            // (this exact invoice failed 6+ crons before anyone saw why).
+            await (supabase.from('order_history') as ReturnType<typeof supabase.from>)
+              .insert({
+                order_id: o.id,
+                event_type: 'extra_invoice_failed',
+                notes: `Emitere factură extra eșuată (cron): ${msg.slice(0, 400)}`,
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              } as any)
+              .then(() => {}, () => {});
           }
         }
         if (changed) console.log(`[invoice-health-check] extra invoice(s) healed for ${orderNum}`);
