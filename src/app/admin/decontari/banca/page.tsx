@@ -156,7 +156,7 @@ export default function BancaPage() {
       <Card>
         <CardContent className="p-0">
           {entries.length === 0 ? (
-            <p className="p-10 text-center text-neutral-500">Niciun extras importat{month ? ' pentru luna selectată' : ''}. Exportă CSV-ul „Lista de tranzacții" din BT24 și importă-l aici.</p>
+            <p className="p-10 text-center text-neutral-500">Niciun extras importat{month ? ' pentru luna selectată' : ''}. Exportă CSV-ul „Lista de tranzacții” din BT24 și importă-l aici.</p>
           ) : (
             <table className="w-full text-sm">
               <thead>
