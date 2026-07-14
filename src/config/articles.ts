@@ -19,6 +19,12 @@ export interface ArticleMeta {
 
 export const ARTICLES: ArticleMeta[] = [
   {
+    slug: 'cat-costa-cadastrul-si-intabularea',
+    title: 'Cât Costă Cadastrul și Intabularea în 2026? Prețuri reale + acte necesare',
+    excerpt: 'Apartament 820–1.220 lei, casă cu teren 1.520–2.620 lei, intabulare după cumpărare 0,15% din preț. Taxele ANCPI exacte, actele pe scenarii + checklist descărcabil.',
+    category: 'Cadastru & imobiliare',
+  },
+  {
     slug: 'cat-poti-construi-pe-teren',
     title: 'Cât Poți Construi pe Terenul Tău? POT și CUT explicate simplu',
     excerpt: 'Formula: teren × POT / 100 = suprafața maximă la sol. De unde iei POT-ul, valorile legale pe zone, greșelile frecvente + calculator interactiv.',

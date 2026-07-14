@@ -53,6 +53,8 @@ const DESC: Record<string, string> = {
   'calculator-procente': 'X% dintr-o valoare, cât % reprezintă, variație procentuală.',
   'jugar-stanjen-in-mp': 'Jugăr, stânjen, falce, pogon → metri pătrați, ari și hectare.',
   'cat-pot-construi': 'Teren + POT din certificatul de urbanism → câți mp poate ocupa construcția.',
+  'valabilitate-documente': 'Cazier, extras CF, constatator — mai e valabil? Până când?',
+  'cost-cadastru-intabulare': 'Taxă ANCPI exactă + interval onorariu topograf → total estimat.',
 };
 
 function slugOf(href: string): string {

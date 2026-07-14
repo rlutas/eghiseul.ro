@@ -42,6 +42,8 @@ import {
   Accessibility,
   LandPlot,
   Ruler,
+  FileCheck,
+  Hammer,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -100,12 +102,14 @@ export const CALCULATORS_NAV: CalculatorNavGroup[] = [
       { name: 'Grad de îndatorare', href: '/calculator/grad-indatorare/', icon: Gauge },
       { name: 'Rambursare anticipată', href: '/calculator/rambursare-anticipata/', icon: PiggyBank },
       { name: 'Cât pot construi (POT/CUT)', href: '/calculator/cat-pot-construi/', icon: Ruler, popular: true },
+      { name: 'Cost cadastru & intabulare', href: '/calculator/cost-cadastru-intabulare/', icon: Hammer },
       { name: 'Jugăr & stânjen în mp', href: '/calculator/jugar-stanjen-in-mp/', icon: LandPlot, popular: true },
     ],
   },
   {
     category: 'Juridic & altele',
     items: [
+      { name: 'Mai e valabil documentul?', href: '/calculator/valabilitate-documente/', icon: FileCheck, popular: true },
       { name: 'Pensie alimentară', href: '/calculator/pensie-alimentara/', icon: HeartHandshake, popular: true },
       { name: 'Termene judiciare', href: '/calculator/termene-judiciare/', icon: Gavel, popular: true },
       { name: 'Taxă judiciară de timbru', href: '/calculator/taxa-judiciara-de-timbru/', icon: Stamp },
