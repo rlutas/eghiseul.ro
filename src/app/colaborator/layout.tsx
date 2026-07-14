@@ -5,7 +5,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { Toaster } from '@/components/ui/sonner';
-import { ClipboardList, Layers, LogOut, Menu, Wallet, X } from 'lucide-react';
+import { ClipboardList, Coins, Layers, LogOut, Menu, Wallet, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -140,6 +140,19 @@ export default function CollaboratorLayout({ children }: { children: React.React
           >
             <Layers className="h-5 w-5 shrink-0" />
             Serviciile mele
+          </Link>
+          <Link
+            href="/colaborator/tarife"
+            onClick={() => setSidebarOpen(false)}
+            className={cn(
+              'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+              pathname.startsWith('/colaborator/tarife')
+                ? 'bg-slate-800 text-white'
+                : 'text-slate-400 hover:bg-slate-800/50 hover:text-white'
+            )}
+          >
+            <Coins className="h-5 w-5 shrink-0" />
+            Tarife ANCPI
           </Link>
         </nav>
 

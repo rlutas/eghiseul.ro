@@ -22,6 +22,7 @@ import {
   Handshake,
   Mail,
   Banknote,
+  Coins,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -59,6 +60,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: '/admin/onrc', label: 'ONRC', icon: Landmark, permission: 'orders.view', hideForRoles: ['avocat'] },
   { href: '/admin/ancpi', label: 'ANCPI', icon: Landmark, permission: 'orders.view', hideForRoles: ['avocat'] },
   { href: '/admin/identifica-imobil', label: 'Identifică imobil', icon: MapPin, permission: 'orders.view', hideForRoles: ['avocat'] },
+  { href: '/admin/tarife-ancpi', label: 'Tarife ANCPI', icon: Coins, permission: 'orders.view', hideForRoles: ['avocat'] },
   { href: '/admin/colaboratori', label: 'Colaboratori', icon: Handshake, permission: 'orders.view', hideForRoles: ['avocat'] },
   { href: '/admin/status-portaluri', label: 'Stare portaluri', icon: Activity, permission: 'orders.view', hideForRoles: ['avocat'] },
   { href: '/admin/decontari', label: 'Decontări', icon: Banknote, permission: 'payments.verify', hideForRoles: ['avocat'] },

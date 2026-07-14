@@ -155,6 +155,7 @@ export const HARDCODED_CALCULATOR_SLUGS: readonly string[] = [
   'varsta-pensionare',
   'estimare-pensie',
   'pensie-invaliditate',
+  'jugar-stanjen-in-mp',
 ];
 
 /** Tools pages (ported from WP /tools/*). */

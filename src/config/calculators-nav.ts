@@ -40,6 +40,7 @@ import {
   Hourglass,
   CircleDollarSign,
   Accessibility,
+  LandPlot,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -91,6 +92,7 @@ export const CALCULATORS_NAV: CalculatorNavGroup[] = [
       { name: 'Impozit pe casă', href: '/calculator/impozit-casa/', icon: House },
       { name: 'Credit ipotecar', href: '/calculator/credit-ipotecar/', icon: Banknote, popular: true },
       { name: 'Grad de îndatorare', href: '/calculator/grad-indatorare/', icon: Gauge },
+      { name: 'Jugăr & stânjen în mp', href: '/calculator/jugar-stanjen-in-mp/', icon: LandPlot },
     ],
   },
   {

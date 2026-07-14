@@ -47,6 +47,8 @@ const SVC = {
   extrasCF: { href: '/servicii/extras-de-carte-funciara/', label: 'Extras de carte funciară online', desc: 'Automat, în câteva minute, 24/7 — fără cont ANCPI.' },
   constatator: { href: '/servicii/certificat-constatator-online/', label: 'Certificat constatator online', desc: 'De la ONRC, doar cu CUI-ul firmei — eliberare instant, 24/7.' },
   nastere: { href: '/servicii/eliberare-certificat-de-nastere/', label: 'Certificat de naștere online', desc: 'Duplicat eliberat oficial, livrat oriunde.' },
+  identificareImobil: { href: '/servicii/identificare-imobil/', label: 'Identificare imobil', desc: 'Afli numărul de CF și cadastral când ai doar date vechi.' },
+  copieCF: { href: '/servicii/copie-carte-funciara/', label: 'Copie carte funciară', desc: 'Copia CF-ului vechi, cu istoricul înscrierilor.' },
 } satisfies Record<string, RelatedService>;
 
 const DEFAULT_RELATED: RelatedService[] = [SVC.cazier, SVC.extrasCF, SVC.constatator];
@@ -59,6 +61,7 @@ const RELATED_BY_SLUG: Record<string, RelatedService[]> = {
   'impozit-chirie': [SVC.extrasCF, SVC.constatator],
   'rambursare-anticipata': [SVC.extrasCF, SVC.cazier],
   'grad-indatorare': [SVC.extrasCF, SVC.cazier],
+  'jugar-stanjen-in-mp': [SVC.extrasCF, SVC.identificareImobil, SVC.copieCF],
   // Firmă & fiscal → constatator + cazier fiscal
   'taxe-srl': [SVC.constatator, SVC.cazierFiscal],
   'dividende': [SVC.constatator, SVC.cazierFiscal],
