@@ -95,10 +95,10 @@ export function Footer() {
     <footer className="bg-secondary-900 text-white">
       {/* Mega top */}
       <div className="container mx-auto px-4 py-12 lg:py-16 max-w-[1200px]">
-        {/* Brand + descriere + plăți — rând de sine stătător, pe toată lățimea,
-            ca serviciile + contactul să încapă în 5 coloane egale dedesubt. */}
-        <div className="mb-10 flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
-          <div className="max-w-xl space-y-4">
+        {/* Un singur rând pe desktop: brand (mai lat) + 4 grupe servicii +
+            contact. Pe mobil/tabletă brandul ocupă rândul întreg. */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-[1.6fr_1fr_1fr_0.95fr_1.25fr_1.05fr] gap-8 lg:gap-10">
+          <div className="col-span-2 md:col-span-3 lg:col-span-1 space-y-4">
             <Link href="/" className="flex items-center gap-3">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
@@ -133,9 +133,6 @@ export function Footer() {
             </div>
 
           </div>
-        </div>
-
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 lg:gap-10">
 
           {/* Servicii — categorizate */}
           {serviceGroups.map((group) => (
