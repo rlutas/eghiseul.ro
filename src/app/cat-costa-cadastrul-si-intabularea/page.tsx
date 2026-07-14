@@ -31,7 +31,7 @@ export default function Page() {
       dateModified={DATE_MODIFIED}
       publishedLabel="14 iulie 2026"
       updatedLabel="14 iulie 2026"
-      imageAlt="Topograf autorizat cu stație totală măsurând limita unui teren cu casă, cu planul de amplasament și delimitare și extrasul de carte funciară pe capota mașinii"
+      imageAlt="Stație totală de topografie pe trepied galben în fața unei case, cu documentația cadastrală și planul de amplasament pe o masă de lemn — măsurători pentru cadastru și intabulare"
       relatedServices={[
         {
           slug: 'extras-carte-funciara',

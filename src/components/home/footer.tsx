@@ -48,7 +48,7 @@ const serviceGroups: { title: string; items: FooterService[] }[] = [
     ],
   },
   {
-    title: 'Imobiliare & firme',
+    title: 'Firme & auto',
     items: [
       {
         name: 'Certificat Constatator',
@@ -59,11 +59,26 @@ const serviceGroups: { title: string; items: FooterService[] }[] = [
           { name: 'Cu Istoric', href: CONSTATATOR },
         ],
       },
-      { name: 'Extras Carte Funciară', href: serviceUrl('extras-carte-funciara') },
-      { name: 'Extras Plan Cadastral', href: serviceUrl('extras-plan-cadastral') },
-      { name: 'Copie Carte Funciară', href: serviceUrl('copie-carte-funciara') },
-      { name: 'Certificat de Sarcini', href: serviceUrl('certificat-sarcini') },
       { name: 'Rovinietă Online', href: '/servicii/rovinieta-online/' },
+    ],
+  },
+  // Cadastru & topografie — serviciile prin topograful autorizat + cele
+  // automate ANCPI, grupate ca oamenii să le găsească din footer (căutate).
+  {
+    title: 'Carte Funciară & Cadastru',
+    items: [
+      { name: 'Extras Carte Funciară', href: serviceUrl('extras-carte-funciara') },
+      { name: 'Certificat de Urbanism', href: serviceUrl('certificat-urbanism-informare') },
+      {
+        name: 'Identificare Imobil',
+        href: serviceUrl('identificare-imobil'),
+        children: [{ name: 'După proprietar', href: serviceUrl('identificare-imobile-proprietar') }],
+      },
+      { name: 'Copie Carte Funciară', href: serviceUrl('copie-carte-funciara') },
+      { name: 'Plan Amplasament (PAD)', href: serviceUrl('plan-amplasament-delimitare') },
+      { name: 'Certificat de Sarcini', href: serviceUrl('certificat-sarcini') },
+      { name: 'Actualizare Adresă CF', href: serviceUrl('actualizare-adresa-cf') },
+      { name: 'Extras Plan Cadastral', href: serviceUrl('extras-plan-cadastral') },
     ],
   },
 ];
@@ -81,8 +96,9 @@ export function Footer() {
       {/* Mega top */}
       <div className="container mx-auto px-4 py-12 lg:py-16 max-w-[1200px]">
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-12 gap-8 lg:gap-10">
-          {/* Despre + plăți + trust */}
-          <div className="col-span-2 md:col-span-3 lg:col-span-3 space-y-5">
+          {/* Despre + plăți + contact (contactul stă sub brand ca să facă loc
+              celei de-a 4-a coloane de servicii: Carte Funciară & Cadastru) */}
+          <div className="col-span-2 md:col-span-3 lg:col-span-4 space-y-5">
             <Link href="/" className="flex items-center gap-2.5">
               <div className="w-10 h-10 bg-primary-500 rounded-xl flex items-center justify-center shadow-[0_4px_12px_rgba(236,185,95,0.3)]">
                 <span className="text-secondary-900 font-extrabold text-base">eG</span>
@@ -110,6 +126,29 @@ export function Footer() {
               />
             </div>
 
+            {/* Contact — compact, sub brand */}
+            <ul className="space-y-2.5 text-sm pt-1">
+              <li className="flex items-center gap-3">
+                <Send className="h-4 w-4 text-primary-500 flex-shrink-0" aria-hidden="true" />
+                <Link href="/contact/" className="text-white/80 hover:text-primary-500 transition-colors">Formular de contact</Link>
+              </li>
+              <li className="flex items-center gap-3">
+                <MessageCircle className="h-4 w-4 text-[#25D366] flex-shrink-0" aria-hidden="true" />
+                <a href={WHATSAPP} target="_blank" rel="nofollow noopener" className="text-white/80 hover:text-primary-500 transition-colors">WhatsApp (răspuns rapid)</a>
+              </li>
+              <li className="flex items-center gap-3">
+                <Phone className="h-4 w-4 text-primary-500 flex-shrink-0" aria-hidden="true" />
+                <a href="tel:+40757708181" className="text-white/80 hover:text-primary-500 transition-colors">+40 757 708 181</a>
+              </li>
+              <li className="flex items-center gap-3">
+                <Mail className="h-4 w-4 text-primary-500 flex-shrink-0" aria-hidden="true" />
+                <a href="mailto:contact@eghiseul.ro" className="text-white/80 hover:text-primary-500 transition-colors">contact@eghiseul.ro</a>
+              </li>
+              <li className="flex items-center gap-3">
+                <Clock className="h-4 w-4 text-primary-500 flex-shrink-0" aria-hidden="true" />
+                <span className="text-white/80">Luni - Vineri: 08:00 - 16:00</span>
+              </li>
+            </ul>
           </div>
 
           {/* Servicii — categorizate */}
@@ -139,32 +178,6 @@ export function Footer() {
             </div>
           ))}
 
-          {/* Contact + ANPC */}
-          <div className="col-span-2 md:col-span-3 lg:col-span-3">
-            <h3 className="text-white font-bold text-lg mb-4">Contact</h3>
-            <ul className="space-y-3 text-sm">
-              <li className="flex items-center gap-3">
-                <Send className="h-4 w-4 text-primary-500 flex-shrink-0" aria-hidden="true" />
-                <Link href="/contact/" className="text-white/80 hover:text-primary-500 transition-colors">Formular de contact</Link>
-              </li>
-              <li className="flex items-center gap-3">
-                <MessageCircle className="h-4 w-4 text-[#25D366] flex-shrink-0" aria-hidden="true" />
-                <a href={WHATSAPP} target="_blank" rel="nofollow noopener" className="text-white/80 hover:text-primary-500 transition-colors">WhatsApp (răspuns rapid)</a>
-              </li>
-              <li className="flex items-center gap-3">
-                <Phone className="h-4 w-4 text-primary-500 flex-shrink-0" aria-hidden="true" />
-                <a href="tel:+40757708181" className="text-white/80 hover:text-primary-500 transition-colors">+40 757 708 181</a>
-              </li>
-              <li className="flex items-center gap-3">
-                <Mail className="h-4 w-4 text-primary-500 flex-shrink-0" aria-hidden="true" />
-                <a href="mailto:contact@eghiseul.ro" className="text-white/80 hover:text-primary-500 transition-colors">contact@eghiseul.ro</a>
-              </li>
-              <li className="flex items-center gap-3">
-                <Clock className="h-4 w-4 text-primary-500 flex-shrink-0" aria-hidden="true" />
-                <span className="text-white/80">Luni - Vineri: 08:00 - 16:00</span>
-              </li>
-            </ul>
-          </div>
         </div>
       </div>
 
@@ -213,8 +226,8 @@ export function Footer() {
             <p className="text-white/40 text-[11px] leading-relaxed mt-4">
               eGhișeul.ro este un serviciu privat de asistență la obținerea de documente. Nu suntem o instituție de
               stat și nu suntem afiliați cu vreun organ guvernamental. Documentele sunt emise exclusiv de
-              autoritățile competente din România, iar procedurile sunt gestionate de un avocat colaborator înscris
-              în Barou.
+              autoritățile competente din România. Lucrăm cu avocați colaboratori înscriși în Barou și topografi
+              autorizați ANCPI/OCPI, care gestionează procedurile în numele tău.
             </p>
           </div>
         </div>

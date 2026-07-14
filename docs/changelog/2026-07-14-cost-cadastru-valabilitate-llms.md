@@ -25,6 +25,13 @@ Pachetul 2 din research-ul de idei (după POT/CUT): ideile #4, #2 și #6.
 
 Era din mai, doar despre cazier, cu operator greșit (RapidCert → **EDIGITALIZARE S.R.L.**, CIF RO49278701). Acum: tot catalogul (30 servicii active cu prețuri reale din DB), calculatoarele-cheie, fapte citabile pentru AI (formula POT, valorile jugăr/falce/pogon, regula urgenței ANCPI, valabilități documente), secțiune „Pentru AI assistants".
 
+## 5. Completări (aceeași seară)
+
+- **Imagine featured articol cadastru** pusă (stație totală + casă, webp 1600px/100KB) + alt corectat la conținutul real al pozei.
+- **Checklist PDF v2**: logo grafic (logo-wide.webp) în loc de text + tabelul de taxe ANCPI înlocuit cu **prețurile serviciilor NOASTRE** (decizie Raul: clientul oricum nu poate face ce facem noi — extras instant etc.) + link eghiseul.ro/servicii. Sursa HTML regenerabilă: `scripts/lead-magnets/checklist-cadastru.html` (PDF: `npx playwright pdf`).
+- **Footer restructurat**: coloana Contact mutată sub brand (col-span-4) → loc pentru a 4-a grupă de servicii **„Carte Funciară & Cadastru"** (extras CF, certificat urbanism, identificare imobil + după proprietar, copie CF, PAD, certificat sarcini, actualizare adresă CF, extras plan cadastral — serviciile topografului, căutate organic). Grupa veche „Imobiliare & firme" → „Firme & auto". Text legal reformulat: „Lucrăm cu avocați colaboratori înscriși în Barou și topografi autorizați ANCPI/OCPI".
+- **Plan cookie consent / GDPR**: `docs/plans/2026-07-14-cookie-consent-gdpr.md` — audit (GA4 se încarcă azi FĂRĂ consimțământ = neconform), recomandare self-built + Google Consent Mode v2, checklist implementare, 2 decizii rămase la Raul.
+
 ## Verificare
 
 tsc + eslint curat (inclusiv fix react-compiler: Date.now() scos din render în valabilitate-calculator), 1.155 teste, toate paginile 200, checklist-ul randează în articol, PDF servit 200.

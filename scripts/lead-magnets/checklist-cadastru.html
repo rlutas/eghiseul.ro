@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<title>Checklist Cadastru și Intabulare</title>
+<style>
+  @page { size: A4; margin: 14mm 16mm; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; color: #1a2332; font-size: 10.5pt; line-height: 1.45; }
+  .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #ECB95F; padding-bottom: 10px; margin-bottom: 16px; }
+  .logo { font-size: 16pt; font-weight: 800; color: #06101F; }
+  .logo span { color: #C89B3C; }
+  .tag { font-size: 8.5pt; color: #64748b; }
+  h1 { font-size: 17pt; color: #06101F; margin-bottom: 4px; }
+  .subtitle { color: #475569; font-size: 10pt; margin-bottom: 14px; }
+  h2 { font-size: 11.5pt; color: #06101F; background: #FBF3E4; padding: 5px 10px; border-radius: 6px; margin: 14px 0 8px; }
+  ul { list-style: none; margin: 0 0 6px; }
+  li { padding: 3px 0 3px 24px; position: relative; border-bottom: 1px dotted #e2e8f0; }
+  li::before { content: ""; position: absolute; left: 2px; top: 6px; width: 11px; height: 11px; border: 1.5px solid #C89B3C; border-radius: 3px; }
+  .note { font-size: 8.5pt; color: #64748b; font-style: italic; padding-left: 24px; }
+  table { width: 100%; border-collapse: collapse; font-size: 9pt; margin: 6px 0; }
+  th, td { border: 1px solid #e2e8f0; padding: 4px 8px; text-align: left; }
+  th { background: #06101F; color: #fff; font-weight: 600; }
+  .steps { counter-reset: step; }
+  .steps li { padding-left: 28px; border-bottom: none; }
+  .steps li::before { counter-increment: step; content: counter(step); border: none; background: #06101F; color: #ECB95F; font-weight: 700; font-size: 8pt; text-align: center; line-height: 15px; width: 15px; height: 15px; border-radius: 50%; top: 5px; }
+  .footer { margin-top: 16px; border-top: 2px solid #ECB95F; padding-top: 8px; font-size: 8.5pt; color: #475569; display: flex; justify-content: space-between; }
+  .footer strong { color: #06101F; }
+  .two-col { display: flex; gap: 16px; }
+  .two-col > div { flex: 1; }
+</style>
+</head>
+<body>
+  <div class="header">
+    <img src="file:///Users/raul/Projects/eghiseul.ro/public/images/brand/logo-wide.webp" alt="eGhișeul.ro" style="height:34px;width:auto;">
+    <div class="tag">Checklist practic · iulie 2026 · eghiseul.ro</div>
+  </div>
+
+  <h1>Checklist: Cadastru și Intabulare</h1>
+  <p class="subtitle">Actele necesare pe scenarii + pașii în ordinea corectă. Bifează pe măsură ce aduni dosarul.</p>
+
+  <h2>📋 Scenariul 1 — Apartament (primă înregistrare în CF)</h2>
+  <ul>
+    <li>Act de proprietate (contract vânzare-cumpărare / moștenire / donație) — copie legalizată</li>
+    <li>Certificat fiscal de la primărie (Direcția Taxe și Impozite) — valabil în luna depunerii</li>
+    <li>Actul de identitate al proprietarului / proprietarilor — copii</li>
+    <li>Releveu apartament (îl întocmește topograful autorizat)</li>
+    <li>Copia cărții funciare colective a blocului (dacă există)</li>
+    <li>Cerere tip + declarație privind limitele imobilului (le pregătește topograful)</li>
+  </ul>
+
+  <h2>🏠 Scenariul 2 — Casă cu teren</h2>
+  <ul>
+    <li>Act de proprietate teren + construcție — copie legalizată</li>
+    <li>Autorizația de construire + proces-verbal de recepție finală (pentru construcție)</li>
+    <li>Certificat fiscal de la primărie — cu valoarea de impozitare a construcției</li>
+    <li>Certificat de atestare a edificării construcției (de la primărie), dacă lipsește recepția</li>
+    <li>Actul de identitate al proprietarilor — copii</li>
+    <li>Plan de amplasament și delimitare (PAD) — îl întocmește topograful, cu măsurători la teren</li>
+  </ul>
+  <p class="note">Casă veche fără autorizație? Se poate intabula pe certificat de atestare + expertiză — întreabă topograful.</p>
+
+  <h2>🌍 Scenariul 3 — Teren (cu sau fără acte vechi)</h2>
+  <ul>
+    <li>Titlu de proprietate / act de proprietate — copie legalizată</li>
+    <li>Certificat fiscal de la primărie</li>
+    <li>Certificat de moștenitor (dacă terenul vine din succesiune)</li>
+    <li>Plan de amplasament și delimitare (PAD) + inventar de coordonate — topograful</li>
+    <li>Extras din planul parcelar avizat de primărie (la terenuri extravilane din titluri)</li>
+    <li>La acte vechi cu jugăre/stânjeni: conversia suprafeței în mp (eghiseul.ro/calculator/jugar-stanjen-in-mp)</li>
+  </ul>
+
+  <div class="two-col">
+    <div>
+      <h2>💰 Documentele — cât costă prin eGhișeul.ro</h2>
+      <table>
+        <tr><th>Document</th><th>Preț</th><th>Termen</th></tr>
+        <tr><td>Extras carte funciară</td><td>89 lei + TVA</td><td>câteva minute, 24/7</td></tr>
+        <tr><td>Extras plan cadastral</td><td>79,99 lei + TVA</td><td>câteva minute</td></tr>
+        <tr><td>Copie carte funciară (CF veche)</td><td>168,19 lei + TVA</td><td>1-3 zile</td></tr>
+        <tr><td>Identificare imobil după adresă</td><td>198 lei + TVA</td><td>1-3 zile</td></tr>
+        <tr><td>Plan amplasament (PAD)</td><td>216,59 lei + TVA</td><td>1-3 zile</td></tr>
+        <tr><td>Certificat de sarcini</td><td>302,50 lei + TVA</td><td>1-3 zile</td></tr>
+        <tr><td>Actualizare adresă în CF</td><td>302,50 lei + TVA</td><td>1-3 zile</td></tr>
+        <tr><td>Certificat de urbanism</td><td>780 lei + TVA</td><td>~30 zile</td></tr>
+      </table>
+      <p class="note" style="padding-left:0">Toate 100% online, cu taxele incluse — comandă pe <strong>eghiseul.ro/servicii</strong>. Extrasul CF și planul cadastral se eliberează automat, fără drum la OCPI.</p>
+    </div>
+    <div>
+      <h2>🧭 Pașii, în ordine</h2>
+      <ul class="steps">
+        <li>Scoate un extras CF recent — vezi situația reală</li>
+        <li>Adună actele din scenariul tău (lista de mai sus)</li>
+        <li>Alege topograful autorizat — cere 2-3 oferte</li>
+        <li>Topograful măsoară + întocmește documentația</li>
+        <li>Depunere la OCPI (o face de regulă topograful)</li>
+        <li>Primești încheierea + extrasul CF nou</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div><strong>Ai nevoie de documente?</strong> Extras CF în câteva minute, copii CF vechi, PAD, identificare imobil — <strong>eghiseul.ro/servicii</strong></div>
+    <div>Calculator costuri: <strong>eghiseul.ro/calculator/cost-cadastru-intabulare</strong></div>
+  </div>
+</body>
+</html>
