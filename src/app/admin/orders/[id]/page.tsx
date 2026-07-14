@@ -1460,6 +1460,16 @@ export default function AdminOrderDetailPage() {
                 </p>
                 <p className="text-xs mt-0.5">Sună clientul pentru adresa corectă, actualizeaz-o și retrimite documentele.</p>
               </div>
+            ) : (order as AnyObj).email_last_delivered_at || (order as AnyObj).email_last_opened_at ? (
+              <p className="text-xs text-green-700 py-1">
+                ✓ Email livrat
+                {(order as AnyObj).email_last_delivered_at
+                  ? ` (${new Date(String((order as AnyObj).email_last_delivered_at)).toLocaleString('ro-RO')})`
+                  : ''}
+                {(order as AnyObj).email_last_opened_at
+                  ? ` · deschis de client (${new Date(String((order as AnyObj).email_last_opened_at)).toLocaleString('ro-RO')})`
+                  : ''}
+              </p>
             ) : null}
             {contact?.phone && (
               <div className="flex items-center justify-between gap-4 text-sm border-b border-border/60 py-1.5 last:border-b-0">

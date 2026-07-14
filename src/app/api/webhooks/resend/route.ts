@@ -66,6 +66,7 @@ interface ResendWebhookPayload {
     to?: string[] | string;
     subject?: string;
     bounce?: { type?: string; subType?: string; message?: string };
+    failed?: { reason?: string };
   };
 }
 
@@ -88,7 +89,9 @@ export async function POST(request: NextRequest) {
   }
 
   const type = payload.type ?? '';
-  if (type !== 'email.bounced' && type !== 'email.complained') {
+  const NEGATIVE = type === 'email.bounced' || type === 'email.complained' || type === 'email.failed';
+  const POSITIVE = type === 'email.delivered' || type === 'email.opened';
+  if (!NEGATIVE && !POSITIVE) {
     // Not our concern — ack so Resend doesn't retry.
     return NextResponse.json({ received: true });
   }
@@ -97,7 +100,42 @@ export async function POST(request: NextRequest) {
   const toList = Array.isArray(data.to) ? data.to : data.to ? [data.to] : [];
   const bouncedEmail = (toList[0] ?? '').toLowerCase();
   const subject = data.subject ?? '';
-  const bounceInfo = data.bounce?.message || data.bounce?.subType || data.bounce?.type || type;
+  const bounceInfo =
+    data.bounce?.message || data.bounce?.subType || data.bounce?.type || data.failed?.reason || type;
+
+  // ── Positive signals: stamp delivered/opened on the client's recent
+  //    orders; a successful delivery also clears the bounce flag (the
+  //    corrected address demonstrably works). No admin alert needed.
+  if (POSITIVE) {
+    if (bouncedEmail) {
+      try {
+        const admin = createAdminClient();
+        const since = new Date(Date.now() - 60 * 24 * 3600 * 1000).toISOString();
+        const stamp =
+          type === 'email.delivered'
+            ? { email_last_delivered_at: new Date().toISOString(), email_bounced_at: null, email_bounce_reason: null }
+            : { email_last_opened_at: new Date().toISOString() };
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { data: orders } = await (admin as any)
+          .from('orders')
+          .select('id')
+          .eq('customer_data->contact->>email', bouncedEmail)
+          .gte('created_at', since)
+          .order('created_at', { ascending: false })
+          .limit(5);
+        if (orders?.length) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          await (admin as any)
+            .from('orders')
+            .update(stamp)
+            .in('id', orders.map((o: { id: string }) => o.id));
+        }
+      } catch (err) {
+        console.error('[webhooks/resend] positive-event update failed', err);
+      }
+    }
+    return NextResponse.json({ received: true });
+  }
 
   console.error('[webhooks/resend] bounce/complaint received', {
     type,
