@@ -99,10 +99,16 @@ export function Footer() {
             ca serviciile + contactul să încapă în 5 coloane egale dedesubt. */}
         <div className="mb-10 flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
           <div className="max-w-xl space-y-4">
-            <Link href="/" className="flex items-center gap-2.5">
-              <div className="w-10 h-10 bg-primary-500 rounded-xl flex items-center justify-center shadow-[0_4px_12px_rgba(236,185,95,0.3)]">
-                <span className="text-secondary-900 font-extrabold text-base">eG</span>
-              </div>
+            <Link href="/" className="flex items-center gap-3">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/images/brand/icon.webp"
+                alt=""
+                aria-hidden="true"
+                width={500}
+                height={500}
+                className="h-12 w-12 rounded-xl"
+              />
               <span className="text-xl font-extrabold text-white leading-tight">
                 eGhișeul<span className="text-primary-500">.ro</span>
               </span>
