@@ -36,6 +36,7 @@ Avem **2 workeri persistenți pe Railway**, în **repo-uri separate** (NU în ac
 - **Ce face:** login OpenAM → validare imobil (județ/localitate/CF) → coș → checkout → comandă ePay (plată din puncte preplătite, prodId `14200`, 1 punct/extras) → poll status soluție (ADMIS/RESPINS) → descarcă PDF + chitanță → atașează la comandă (`document_ready`) + email.
 - **Status:** ✅ **LIVE & FUNCȚIONAL A→Z** (2026-06-16) — comanda reală `E-260616-KAFEG` emisă 100% automat. Sesiunea 2026-06-22: reparat bug de login (pagina post-redirect verificată întâi) + redeploy prin `railway up`; comanda `E-260622-RPGN8` plasată + plătită automat (ePay 10077906).
 - **Fix-uri cheie:** Dockerfile pin `playwright@1.48.0`; `idDocument` parsat din JSON HTML-encodat (`solutii[].idDocument`); stări ADMIS/RESPINS.
+- **Proba de portal (2026-07-14):** rezultatul probei HTTP către ANCPI e cache-uit **15 min** (`PROBE_INTERVAL_MS`, default 900000) — poll-ul de joburi rămâne la 60s, iar statusul cached se raportează la fiecare tick (freshness în admin neafectat). Fereastra din `platform_outages` (scrisă din probă) e acum **sursa de adevăr** pentru `/api/status` (badge-ul public) — ping-ul din Vercel + heartbeat-ul nu mai pot arăta „operațional" în timpul unui outage real.
 - **Detalii:** [`ancpi-automation-plan.md`](ancpi-automation-plan.md).
 
-**Ultima actualizare:** 2026-06-22.
+**Ultima actualizare:** 2026-07-14.

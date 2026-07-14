@@ -83,6 +83,17 @@ export function SystemStatus({
           ))}
         </div>
       )}
+
+      {/* Reassurance while the provider portal is down: orders keep queuing and
+          the worker issues them automatically the moment the portal recovers —
+          the customer doesn't need to wait or come back. */}
+      {!loading && !operational && (
+        <p className="mt-3 rounded-lg bg-amber-50 px-3 py-2 text-xs leading-relaxed text-amber-900">
+          Poți plasa comanda fără grijă: se procesează <strong>automat, cu prioritate</strong>, imediat
+          ce platforma {service === 'ancpi' ? 'ANCPI' : 'ONRC'} redevine funcțională. Te anunțăm pe
+          email când documentul e eliberat.
+        </p>
+      )}
     </div>
   );
 }
