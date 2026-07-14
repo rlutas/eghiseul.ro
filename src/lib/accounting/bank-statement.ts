@@ -138,12 +138,18 @@ export function parseBtCsv(content: string): { account: string; entries: BankEnt
   if (headerIdx < 0) throw new Error('Format necunoscut — nu găsesc antetul "Data tranzactie" (e export BT?)');
 
   const entries: BankEntry[] = [];
+  // BT reuses the same Referinta for related legs occasionally — suffix
+  // repeats so the primary key stays unique per statement line.
+  const refSeen = new Map<string, number>();
   for (let i = headerIdx + 1; i < lines.length; i++) {
     if (!lines[i].trim()) continue;
     const c = parseCsvLine(lines[i]);
     const txDate = toIso(c[0] ?? '');
-    const reference = (c[2] ?? '').trim();
+    let reference = (c[2] ?? '').trim();
     if (!txDate || !reference) continue;
+    const n = (refSeen.get(reference) ?? 0) + 1;
+    refSeen.set(reference, n);
+    if (n > 1) reference = `${reference}#${n}`;
     const type = (c[3] ?? '').trim() || null;
     const desc = (c[4] ?? '').trim() || null;
     const debit = Math.round(parseFloat(c[5] || '0') * 100) || 0;
