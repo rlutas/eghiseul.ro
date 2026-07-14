@@ -226,6 +226,29 @@ export async function syncPayouts(opts: { sinceDays?: number } = {}): Promise<Pa
         startingAfter = page.data[page.data.length - 1]?.id;
       }
 
+      // Unknown charges: extra-charge Checkout Sessions carry metadata on the
+      // SESSION, not the charge — look the session up by payment intent.
+      // WP-era charges have no session and stay 'necunoscut' (expected).
+      for (const r of rows) {
+        if (r.platform !== 'necunoscut' || r.type !== 'charge' || !r.payment_intent_id) continue;
+        try {
+          const sessions = await stripe.checkout.sessions.list({ payment_intent: r.payment_intent_id, limit: 1 });
+          const sess = sessions.data[0];
+          const meta = sess?.metadata ?? {};
+          const ref = (meta.order_ref as string) || (meta.orderNumber as string) || null;
+          if (ref) {
+            r.order_number = ref.toUpperCase();
+            r.platform = platformFromOrderNumber(r.order_number);
+            if (meta.purpose === 'extra_charge' && !r.description) r.description = `Plată suplimentară comanda ${ref}`;
+          } else if ((meta.orderId as string) || (meta.order_id as string)) {
+            r._orderId = (meta.orderId as string) ?? null;
+            r.platform = meta.app_id === 'cjo' || meta.order_id ? 'cjo' : 'eghiseul';
+          }
+        } catch {
+          /* lookup is best-effort */
+        }
+      }
+
       await enrichEghiseul(rows.filter((r) => r.platform === 'eghiseul'));
       await enrichCjo(rows.filter((r) => r.platform === 'cjo'), errors);
 
