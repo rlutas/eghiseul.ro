@@ -21,6 +21,7 @@ import {
   Activity,
   Handshake,
   Mail,
+  Banknote,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -60,6 +61,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: '/admin/identifica-imobil', label: 'Identifică imobil', icon: MapPin, permission: 'orders.view', hideForRoles: ['avocat'] },
   { href: '/admin/colaboratori', label: 'Colaboratori', icon: Handshake, permission: 'orders.view', hideForRoles: ['avocat'] },
   { href: '/admin/status-portaluri', label: 'Stare portaluri', icon: Activity, permission: 'orders.view', hideForRoles: ['avocat'] },
+  { href: '/admin/decontari', label: 'Decontări', icon: Banknote, permission: 'payments.verify', hideForRoles: ['avocat'] },
   { href: '/admin/coupons', label: 'Cupoane', icon: Ticket, permission: 'settings.manage' },
   { href: '/admin/marketing', label: 'Marketing', icon: Mail, permission: 'settings.manage' },
   { href: '/admin/clienti', label: 'Clienți', icon: Users, permission: 'users.manage' },

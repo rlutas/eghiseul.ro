@@ -140,6 +140,16 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
       ? session.payment_intent
       : session.payment_intent?.id
 
+  // Extra charge (admin order modification) — separate settlement path:
+  // credit additional_paid_amount + issue the fiscal invoice referencing the
+  // proforma. Regular fulfilment must NOT run for these sessions.
+  if (session.metadata?.purpose === 'extra_charge') {
+    if (session.payment_status === 'paid') {
+      await handleExtraChargePaid(session, orderId, paymentIntentId ?? null)
+    }
+    return
+  }
+
   if (paymentIntentId) {
     await supabaseAdmin
       .from('orders')
@@ -176,7 +186,106 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
   }
 }
 
+// Extra-charge settlement (admin order modification paid by the customer):
+// credit additional_paid_amount, clear pending_extra_*, move the proforma
+// into extra_billing together with the fiscal invoice issued now
+// (referenceDocument → Oblio links proforma + invoice). Idempotent via the
+// pending_extra_payment_intent_id match — a webhook retry after the clear
+// finds no pending row and exits.
+async function handleExtraChargePaid(
+  session: Stripe.Checkout.Session,
+  orderId: string,
+  paymentIntentId: string | null
+) {
+  const { data: order } = await supabaseAdmin
+    .from('orders')
+    .select('*')
+    .eq('id', orderId)
+    .single()
+  if (!order) {
+    console.error(`[stripe webhook] extra_charge: order ${orderId} not found`)
+    return
+  }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const anyOrder = order as any
+  if (anyOrder.pending_extra_payment_intent_id !== session.id) {
+    console.log(
+      `[stripe webhook] extra_charge for ${orderId}: session ${session.id} is not the pending one (already settled?) — skipping`
+    )
+    return
+  }
+  const amountRon = (session.amount_total ?? 0) / 100
+  const orderNum = (anyOrder.friendly_order_id ?? anyOrder.order_number ?? '') as string
+  const proforma = anyOrder.pending_extra_proforma as
+    | { seriesName: string; number: string; link: string | null; amount?: number }
+    | null
+
+  // Fiscal invoice for the extra amount (best-effort: settlement must not
+  // fail on an Oblio hiccup; the invoice-health cron / admin can re-issue).
+  let invoiceRef: { seriesName: string; number: string; link: string | null } | null = null
+  try {
+    const { createInvoiceFromProforma } = await import('@/lib/oblio/proforma')
+    invoiceRef = await createInvoiceFromProforma({
+      orderNumber: orderNum,
+      amountRon,
+      description: `Servicii suplimentare comanda ${orderNum}`,
+      customerData: anyOrder.customer_data ?? {},
+      proforma: proforma ?? { seriesName: '', number: '', link: null },
+      paymentIntentId,
+    })
+  } catch (err) {
+    console.error(
+      `[stripe webhook] extra_charge invoice emission failed for ${orderNum}:`,
+      err instanceof Error ? err.message : err
+    )
+  }
+
+  const extraBilling = Array.isArray(anyOrder.extra_billing) ? anyOrder.extra_billing : []
+  extraBilling.push({
+    proforma: proforma ?? null,
+    invoice: invoiceRef,
+    amount: amountRon,
+    paidAt: new Date().toISOString(),
+    paymentIntentId,
+  })
+
+  await supabaseAdmin
+    .from('orders')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    .update({
+      additional_paid_amount: Number(anyOrder.additional_paid_amount ?? 0) + amountRon,
+      pending_extra_payment_intent_id: null,
+      pending_extra_payment_amount: null,
+      pending_extra_payment_url: null,
+      pending_extra_proforma: null,
+      extra_billing: extraBilling,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any)
+    .eq('id', orderId)
+
+  await supabaseAdmin
+    .from('order_history')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    .insert({
+      order_id: orderId,
+      event_type: 'extra_payment_received',
+      notes: `Încasare extra ${amountRon.toFixed(2)} RON (${session.id})${invoiceRef ? ` · factură ${invoiceRef.seriesName}-${invoiceRef.number}` : ' · FACTURA NEEMISĂ — verifică Oblio'}`,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any)
+
+  console.log(
+    `[stripe webhook] extra_charge settled for ${orderNum}: +${amountRon.toFixed(2)} RON, invoice ${invoiceRef ? `${invoiceRef.seriesName}-${invoiceRef.number}` : 'FAILED'}`
+  )
+}
+
 async function handlePaymentSucceeded(paymentIntent: Stripe.PaymentIntent) {
+  // Extra-charge PIs must NOT run the regular fulfilment (they'd re-invoice
+  // the whole order) — settlement happens in handleExtraChargePaid via the
+  // checkout.session.completed event.
+  if (paymentIntent.metadata?.purpose === 'extra_charge') {
+    console.log(`[stripe webhook] PI ${paymentIntent.id} is an extra_charge — handled by session path`)
+    return
+  }
   const orderId = paymentIntent.metadata?.orderId
   if (!orderId) {
     console.error('No orderId in payment intent metadata')

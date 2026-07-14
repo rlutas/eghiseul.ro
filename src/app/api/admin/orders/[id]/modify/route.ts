@@ -23,7 +23,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { requirePermission } from '@/lib/admin/permissions';
-import { createRefund, createExtraPaymentIntent } from '@/lib/stripe';
+import { createRefund, stripe } from '@/lib/stripe';
+import { createProformaForExtra } from '@/lib/oblio/proforma';
 import {
   computeModifyDiff,
   describeChanges,
@@ -209,11 +210,15 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     }
   }
 
-  // Diff > 0 → new PaymentIntent for the extra amount + email the customer
-  // a payment link. The email is best-effort — if Resend isn't configured
-  // or the send fails, the admin still gets the client_secret back in the
-  // response and can copy/forward manually.
+  // Diff > 0 → Hosted Checkout Session for the extra amount + Oblio PROFORMA
+  // + email the customer the Stripe payment link. (Session, not raw
+  // PaymentIntent — the old PI flow pointed customers at /comanda/plata-extra
+  // which never existed, so extra payments could never be completed.)
+  // The fiscal invoice is issued by the webhook AFTER payment, referencing
+  // the proforma. Email is best-effort — the admin still gets the URL back
+  // and can re-share it manually.
   let extraPaymentEmailSent = false;
+  let extraProforma: { seriesName: string; number: string; link: string | null } | null = null;
   if (diff.action === 'extra_payment') {
     try {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -221,28 +226,66 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         contact?: { email?: string; firstName?: string };
         personal?: { firstName?: string };
       };
-      const intent = await createExtraPaymentIntent({
-        amountRon: diff.diff,
-        orderId: order.id,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        orderNumber: ((order as any).friendly_order_id ?? (order as any).order_number ?? '') as string,
-        changesDescription: changesSummary,
-        receiptEmail: cd.contact?.email,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const orderNum = ((order as any).friendly_order_id ?? (order as any).order_number ?? '') as string;
+      const base = process.env.NEXT_PUBLIC_APP_URL ?? 'https://eghiseul.ro';
+
+      const session = await stripe.checkout.sessions.create({
+        mode: 'payment',
+        line_items: [
+          {
+            price_data: {
+              currency: 'ron',
+              product_data: {
+                name: `Plată suplimentară comanda ${orderNum}`,
+                description: changesSummary.slice(0, 500) || undefined,
+              },
+              unit_amount: Math.round(diff.diff * 100),
+            },
+            quantity: 1,
+          },
+        ],
+        success_url: `${base}/comanda/status?order=${encodeURIComponent(orderNum)}&email=${encodeURIComponent(cd.contact?.email ?? '')}`,
+        cancel_url: `${base}/comanda/status?order=${encodeURIComponent(orderNum)}&email=${encodeURIComponent(cd.contact?.email ?? '')}`,
+        locale: 'ro',
+        payment_method_types: ['card'],
         metadata: {
+          purpose: 'extra_charge',
+          orderId: order.id,
+          orderNumber: orderNum,
           adminEmail,
         },
+        payment_intent_data: {
+          description: `Plată suplimentară comanda ${orderNum} — ${changesSummary}`.slice(0, 999),
+          metadata: {
+            purpose: 'extra_charge',
+            orderId: order.id,
+            orderNumber: orderNum,
+          },
+          receipt_email: cd.contact?.email ?? undefined,
+        },
       });
-      pendingPaymentIntentId = intent.id;
-      pendingPaymentClientSecret = intent.client_secret;
+      pendingPaymentIntentId = session.id;
+      pendingPaymentClientSecret = session.url;
 
-      // Send the customer the payment link. We construct a tenant URL the
-      // frontend will resolve to a mini-Elements page; the URL embeds the
-      // PaymentIntent id so the route can fetch its client_secret server-
-      // side rather than leaking it in the email body.
+      // Oblio proforma for the extra amount (best-effort: a missing proforma
+      // series must not block the payment link; the webhook issues the fiscal
+      // invoice regardless, with referenceDocument only when we have one).
+      try {
+        extraProforma = await createProformaForExtra({
+          orderNumber: orderNum,
+          amountRon: diff.diff,
+          description: changesSummary,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          customerData: ((order as any).customer_data ?? {}),
+        });
+      } catch (proformaErr) {
+        console.warn('[modify] proforma emission failed (continuing):', proformaErr instanceof Error ? proformaErr.message : proformaErr);
+      }
+
       const customerEmail = cd.contact?.email?.trim();
-      if (customerEmail) {
-        const base = process.env.NEXT_PUBLIC_APP_URL ?? 'https://eghiseul.ro';
-        const paymentUrl = `${base}/comanda/plata-extra/${intent.id}`;
+      if (customerEmail && session.url) {
+        const paymentUrl = session.url;
         const firstName = cd.personal?.firstName ?? cd.contact?.firstName ?? null;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const orderNum = ((order as any).friendly_order_id ?? (order as any).order_number ?? '') as string;
@@ -270,7 +313,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
               changesDescription: changesSummary,
               paymentUrl,
             }),
-            idempotencyKey: `extra-payment-${intent.id}`,
+            idempotencyKey: `extra-payment-${session.id}`,
           });
           extraPaymentEmailSent = !result.skipped;
         } catch (emailErr) {
@@ -311,13 +354,14 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
   }
   if (diff.action === 'extra_payment') {
     // We don't credit additional_paid_amount until the customer actually pays
-    // (webhook will do that). Persist the URL so admin can re-share.
-    updatePayload.pending_extra_payment_intent_id = pendingPaymentIntentId;
+    // (webhook does that on checkout.session.completed / purpose=extra_charge).
+    updatePayload.pending_extra_payment_intent_id = pendingPaymentIntentId; // cs_... session id
     updatePayload.pending_extra_payment_amount = diff.diff;
-    // The "URL" in our PaymentIntent flow is a Stripe Elements client_secret,
-    // not a hosted checkout URL. Caller (admin UI) can either embed it in a
-    // mini-Elements payment page OR copy it for follow-up emails.
+    // Hosted Checkout URL — shareable directly with the customer.
     updatePayload.pending_extra_payment_url = pendingPaymentClientSecret;
+    if (extraProforma) {
+      updatePayload.pending_extra_proforma = { ...extraProforma, amount: diff.diff };
+    }
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
