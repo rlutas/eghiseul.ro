@@ -37,7 +37,7 @@ export default function Page() {
         },
         {
           q: 'De unde aflu POT-ul și CUT-ul terenului meu?',
-          a: 'Din certificatul de urbanism pentru informare, eliberat de primăria localității — acolo sunt scrise valorile maxime exacte pentru parcela ta. Orientativ, le poți căuta și în PUG-ul sau PUZ-ul zonei, dar certificatul e documentul care contează.',
+          a: 'Din certificatul de urbanism pentru informare, eliberat de primăria localității — acolo sunt scrise valorile maxime exacte pentru parcela ta. Orientativ, le poți căuta și în PUG sau PUZ: PUG-ul (plan urbanistic general) e făcut de primărie și acoperă toată localitatea; PUZ-ul (plan urbanistic zonal) e făcut de regulă de un investitor pentru o zonă anume — de exemplu 1-2 hectare pe care vrea să construiască case sau blocuri — și poate schimba regulile PUG-ului acolo. Certificatul rămâne documentul care contează.',
         },
         {
           q: 'Care este POT-ul maxim în zonele rezidențiale?',
@@ -145,6 +145,14 @@ export default function Page() {
         poate coborî la 20%; într-o zonă comercială poate urca peste 80%. Valoarea care contează juridic
         e cea din certificatul de urbanism.
       </p>
+      <p>
+        Ce înseamnă PUG și PUZ, ca să nu le confunzi: <strong>PUG-ul</strong> (plan urbanistic general) e
+        făcut de primărie și acoperă întreaga localitate — el dă regulile implicite pentru fiecare zonă.{' '}
+        <strong>PUZ-ul</strong> (plan urbanistic zonal) e făcut de regulă de un investitor pentru un teren
+        anume, de exemplu 1-2 hectare pe care vrea să ridice case sau blocuri, și poate modifica local
+        regulile din PUG (alt POT, alt regim de înălțime). Dacă parcela ta e într-o zonă cu PUZ aprobat,
+        valorile PUZ-ului sunt cele valabile.
+      </p>
 
       <h2>Ce intră și ce nu intră în suprafața construită</h2>
       <p>Aici se fac cele mai multe greșeli de calcul. La amprenta pentru POT:</p>
@@ -177,6 +185,11 @@ export default function Page() {
         Terenul e din acte vechi, măsurat în jugăre sau stânjeni? Folosește întâi{' '}
         <Link href="/calculator/jugar-stanjen-in-mp/">convertorul de unități vechi de teren</Link> și
         introdu aici rezultatul în metri pătrați.
+      </p>
+      <p>
+        Vrei tot contextul — exemple pe cifre, retrageri, ce faci pas cu pas înainte de proiect? L-am pus
+        în ghidul <Link href="/cat-poti-construi-pe-teren/">Cât poți construi pe terenul tău: POT și CUT
+        explicate simplu</Link>.
       </p>
     </CalculatorLayout>
   );

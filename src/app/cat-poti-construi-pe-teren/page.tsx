@@ -203,6 +203,15 @@ export default function Page() {
         </li>
       </ol>
       <p>
+        Valorile vin, la origine, din planurile urbanistice — și merită să știi diferența dintre ele.{' '}
+        <strong>PUG-ul</strong> (plan urbanistic general) e făcut de primărie și acoperă toată localitatea:
+        el stabilește regulile implicite pentru fiecare zonă. <strong>PUZ-ul</strong> (plan urbanistic
+        zonal) e făcut de regulă de un investitor, pentru un teren anume — de exemplu 1-2 hectare pe care
+        vrea să construiască un ansamblu de case sau blocuri — și poate schimba local regulile PUG-ului:
+        alt POT, alt CUT, alt regim de înălțime. Dacă terenul tău a fost prins într-un PUZ aprobat,
+        valorile din PUZ sunt cele care se aplică, iar certificatul de urbanism le va reflecta.
+      </p>
+      <p>
         Cumperi teren și vânzătorul „știe sigur” că e construibil cu POT 40%? Verifică. Certificatul de
         urbanism costă puțin față de o parcelă pe care descoperi după cumpărare că e zonă protejată cu POT
         20% sau interdicție temporară de construire. Se poate solicita de oricine, pentru orice teren — nu

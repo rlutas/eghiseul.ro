@@ -19,6 +19,12 @@ export interface ArticleMeta {
 
 export const ARTICLES: ArticleMeta[] = [
   {
+    slug: 'cat-poti-construi-pe-teren',
+    title: 'Cât Poți Construi pe Terenul Tău? POT și CUT explicate simplu',
+    excerpt: 'Formula: teren × POT / 100 = suprafața maximă la sol. De unde iei POT-ul, valorile legale pe zone, greșelile frecvente + calculator interactiv.',
+    category: 'Cadastru & imobiliare',
+  },
+  {
     slug: 'extras-carte-funciara-gratuit',
     title: 'Extras de Carte Funciară Gratuit prin MyTerra — Ghid + Limite',
     excerpt: 'Cum obții gratuit extrasul de informare prin MyTerra (ANCPI), ce condiții sunt și când are sens varianta plătită, eliberată instant.',

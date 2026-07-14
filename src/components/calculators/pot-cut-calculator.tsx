@@ -101,7 +101,7 @@ export function PotCutCalculator() {
           <Link href="/servicii/certificat-urbanism-informare/" className="font-semibold text-primary-600 hover:underline">
             certificatul de urbanism pentru informare
           </Link>{' '}
-          (sau în PUG/PUZ-ul zonei).
+          — sau în PUG-ul localității / PUZ-ul zonei.
         </p>
       </div>
 
@@ -139,7 +139,8 @@ export function PotCutCalculator() {
           )}
           <p className="pt-1 text-xs text-neutral-500">
             Calcul orientativ după formulele din Legea 350/2001 (anexa 2). Valorile POT/CUT exacte ale
-            parcelei tale sunt cele din certificatul de urbanism — regimul de înălțime real îl dă PUG/PUZ-ul.
+            parcelei tale sunt cele din certificatul de urbanism — regimul de înălțime real îl dă PUG-ul
+            localității sau PUZ-ul zonei.
           </p>
         </div>
       )}
