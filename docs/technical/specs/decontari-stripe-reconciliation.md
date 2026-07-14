@@ -79,3 +79,7 @@ User a prins o atribuire greșită (factura lui Florea Mihai pe tranzacția lui 
 Nefacturate REALE (4 tranzacții + 1 comandă): hunkjaku 182,30 (extra DHL recreat manual 13.07, fără factură) · ratskawines 307,80 (extra CJO pre-feature) · 50 + 250 RON (Link by Stripe, orderId 122M — sursă neidentificată, nu există în dump WP) · CJO-20260601-85107 305,10 (în afara ferestrei de payouts).
 
 Script de audit reutilizabil: scratchpad `audit_links.js` — de rulat după orice linkare retroactivă.
+
+### Serie unică EGH (decizie user, 14 iul)
+
+CJO emitea pe seria EGI2024 (moștenită din integrarea WP). Pentru decontări liniare, **ambele platforme emit de acum pe seria EGH**: `companies.oblio_series_name` = 'EGH' în DB-ul CJO (setat 14 iul prin REST; codul CJO citește DB-ul, nu env-ul). Istoric: EGI2024 = era WP + CJO până la 14 iul; EGH = eghiseul app + CJO app + emiteri manuale. Extra-ul RATSKA 307,80 fusese facturat MANUAL pe EGH-0016 (9 iul) — legat.
