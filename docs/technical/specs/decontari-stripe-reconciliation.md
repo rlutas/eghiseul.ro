@@ -48,3 +48,15 @@ Flux: admin creează extra charge → **proformă Oblio** (link PDF în emailul 
 - Payout-ul exemplu `po_1TsuSSHGb8JBHhclKsKnNlQB` (1.049,73 RON, 6 charges mixte) trebuie să apară cu toate cele 6 tranzacții atribuite + facturi
 - Extra charge test (test mode): modify → proformă în Oblio → plată → factură cu referință + `extra_billing` populat
 - Cron: log `[cron/payout-sync]` în Vercel după 05:30
+
+## Istoric: linkarea retroactivă (2026-07-14)
+
+Tranzacțiile din era WP (până 8 iul) n-au număr de comandă în Stripe. Legate retroactiv de facturile lor Oblio (EGI2024, emise atunci de integrarea WP) prin scripturi de match strict (scratchpad: `link_cjo_june.js`, `link_wp_era.js`):
+- comenzile CJO iunie: 76/77 linkate pe orders (email+sumă+dată ±3d, unic; perechile identice — cronologic comandă↔număr factură)
+- tranzacțiile WP: 53 linkate direct pe `stripe_payout_transactions` (email+sumă+dată; fallback sumă+dată T+3 unic bidirecțional)
+- **125 rămân „nefacturat"**: clustere ambigue (mai multe plăți identice în aceeași fereastră — nedecidabil automat) — sumele payouts oricum bat la ban; verificabile manual după sumă+dată în Oblio
+- sync-ul **prezervă** linkurile manuale (nu le suprascrie cu null) — fix `e674e14`
+- tipul Stripe `payment` (Payment Links WP) = încasare, numărat peste tot — fix `ae096e8`
+- comanda fără nicio factură emisă: CJO-20260601-85107 (305,10) — decizie user
+
+Verificare completă: toate cele 29 payouts reconciliază exact (sum(net)==payout), 0 tranzacții neexplicate. Scriptul de audit: scratchpad `verify_all_payouts.py`.
