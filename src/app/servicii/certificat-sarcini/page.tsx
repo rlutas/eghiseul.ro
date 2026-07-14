@@ -65,7 +65,7 @@ export const metadata = buildPageMetadata({
   ogImage: '/og/default.png',
 });
 
-const jsonLdGraph = buildServicePageGraph({
+const buildJsonLd = (basePrice: number) => buildServicePageGraph({
   slug: SCHEMA_SLUG,
   name: 'Certificat de Sarcini',
   description:
@@ -86,13 +86,15 @@ const jsonLdGraph = buildServicePageGraph({
     { name: 'Certificat de Sarcini', url: `${BASE_URL}${PAGE_PATH}` },
   ],
   offers: [
-    { name: 'Certificat de Sarcini', price: 99, url: `${BASE_URL}${PAGE_PATH}` },
+    { name: 'Certificat de Sarcini', price: basePrice, url: `${BASE_URL}${PAGE_PATH}` },
   ],
   aggregateRating: { ratingValue: 4.9, reviewCount: 450 },
 });
 
 export default async function CertificatSarciniPage() {
   const service = await getService();
+  // Schema price follows the DB (admin-editable) — hardcodat doar fallback-ul.
+  const jsonLdGraph = buildJsonLd(Number(service?.base_price ?? 99));
   const switcherServices = await getImobiliareServices();
   if (!service) notFound();
 

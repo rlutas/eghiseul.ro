@@ -68,7 +68,7 @@ export const metadata = buildPageMetadata({
   ogImage: '/og/default.png',
 });
 
-const jsonLdGraph = buildServicePageGraph({
+const buildJsonLd = (basePrice: number) => buildServicePageGraph({
   slug: SCHEMA_SLUG,
   name: 'Copie Plan Cadastral',
   description:
@@ -89,13 +89,15 @@ const jsonLdGraph = buildServicePageGraph({
     { name: 'Copie Plan Cadastral', url: `${BASE_URL}${PAGE_PATH}` },
   ],
   offers: [
-    { name: 'Copie Plan Cadastral', price: 99, url: `${BASE_URL}${PAGE_PATH}` },
+    { name: 'Copie Plan Cadastral', price: basePrice, url: `${BASE_URL}${PAGE_PATH}` },
   ],
   aggregateRating: { ratingValue: 4.9, reviewCount: 450 },
 });
 
 export default async function CopiePlanCadastralPage() {
   const service = await getService();
+  // Schema price follows the DB (admin-editable) — hardcodat doar fallback-ul.
+  const jsonLdGraph = buildJsonLd(Number(service?.base_price ?? 99));
   const switcherServices = await getImobiliareServices();
   if (!service) notFound();
 

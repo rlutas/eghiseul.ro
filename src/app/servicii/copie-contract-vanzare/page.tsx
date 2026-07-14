@@ -66,7 +66,7 @@ export const metadata = buildPageMetadata({
   ogImage: '/og/default.png',
 });
 
-const jsonLdGraph = buildServicePageGraph({
+const buildJsonLd = (basePrice: number) => buildServicePageGraph({
   slug: SCHEMA_SLUG,
   name: 'Copie Contract Vânzare-Cumpărare',
   description:
@@ -87,13 +87,15 @@ const jsonLdGraph = buildServicePageGraph({
     { name: 'Copie Contract Vânzare-Cumpărare', url: `${BASE_URL}${PAGE_PATH}` },
   ],
   offers: [
-    { name: 'Copie Contract Vânzare-Cumpărare', price: 149, url: `${BASE_URL}${PAGE_PATH}` },
+    { name: 'Copie Contract Vânzare-Cumpărare', price: basePrice, url: `${BASE_URL}${PAGE_PATH}` },
   ],
   aggregateRating: { ratingValue: 4.9, reviewCount: 450 },
 });
 
 export default async function CopieContractVanzarePage() {
   const service = await getService();
+  // Schema price follows the DB (admin-editable) — hardcodat doar fallback-ul.
+  const jsonLdGraph = buildJsonLd(Number(service?.base_price ?? 149));
   const switcherServices = await getImobiliareServices();
   if (!service) notFound();
 

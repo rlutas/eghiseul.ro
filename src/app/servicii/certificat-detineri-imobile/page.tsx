@@ -68,7 +68,7 @@ export const metadata = buildPageMetadata({
   ogImage: '/og/default.png',
 });
 
-const jsonLdGraph = buildServicePageGraph({
+const buildJsonLd = (basePrice: number) => buildServicePageGraph({
   slug: SCHEMA_SLUG,
   name: 'Certificat privind Deținerea de Imobile',
   description:
@@ -90,13 +90,15 @@ const jsonLdGraph = buildServicePageGraph({
     { name: 'Certificat privind Deținerea de Imobile', url: `${BASE_URL}${PAGE_PATH}` },
   ],
   offers: [
-    { name: 'Certificat privind Deținerea de Imobile', price: 198, url: `${BASE_URL}${PAGE_PATH}` },
+    { name: 'Certificat privind Deținerea de Imobile', price: basePrice, url: `${BASE_URL}${PAGE_PATH}` },
   ],
   aggregateRating: { ratingValue: 4.9, reviewCount: 450 },
 });
 
 export default async function CertificatDetineriImobilePage() {
   const service = await getService();
+  // Schema price follows the DB (admin-editable) — hardcodat doar fallback-ul.
+  const jsonLdGraph = buildJsonLd(Number(service?.base_price ?? 198));
   const switcherServices = await getImobiliareServices();
   if (!service) notFound();
 

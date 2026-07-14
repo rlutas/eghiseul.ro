@@ -67,7 +67,7 @@ export const metadata = buildPageMetadata({
   ogImage: '/og/default.png',
 });
 
-const jsonLdGraph = buildServicePageGraph({
+const buildJsonLd = (basePrice: number) => buildServicePageGraph({
   slug: SCHEMA_SLUG,
   name: 'Copie certificată din arhiva OCPI',
   description:
@@ -88,13 +88,15 @@ const jsonLdGraph = buildServicePageGraph({
     { name: 'Copie din Arhiva OCPI', url: `${BASE_URL}${PAGE_PATH}` },
   ],
   offers: [
-    { name: 'Copie certificată din arhiva OCPI', price: 119, url: `${BASE_URL}${PAGE_PATH}` },
+    { name: 'Copie certificată din arhiva OCPI', price: basePrice, url: `${BASE_URL}${PAGE_PATH}` },
   ],
   aggregateRating: { ratingValue: 4.9, reviewCount: 450 },
 });
 
 export default async function CopieArhivaOcpiPage() {
   const service = await getService();
+  // Schema price follows the DB (admin-editable) — hardcodat doar fallback-ul.
+  const jsonLdGraph = buildJsonLd(Number(service?.base_price ?? 119));
   const switcherServices = await getImobiliareServices();
   if (!service) notFound();
 

@@ -68,7 +68,7 @@ export const metadata = buildPageMetadata({
   ogImage: '/og/default.png',
 });
 
-const jsonLdGraph = buildServicePageGraph({
+const buildJsonLd = (basePrice: number) => buildServicePageGraph({
   slug: SCHEMA_SLUG,
   name: 'Plan de Amplasament și Delimitare',
   description:
@@ -89,13 +89,15 @@ const jsonLdGraph = buildServicePageGraph({
     { name: 'Plan de Amplasament și Delimitare', url: `${BASE_URL}${PAGE_PATH}` },
   ],
   offers: [
-    { name: 'Plan de Amplasament și Delimitare', price: 149, url: `${BASE_URL}${PAGE_PATH}` },
+    { name: 'Plan de Amplasament și Delimitare', price: basePrice, url: `${BASE_URL}${PAGE_PATH}` },
   ],
   aggregateRating: { ratingValue: 4.9, reviewCount: 450 },
 });
 
 export default async function PlanAmplasamentDelimitarePage() {
   const service = await getService();
+  // Schema price follows the DB (admin-editable) — hardcodat doar fallback-ul.
+  const jsonLdGraph = buildJsonLd(Number(service?.base_price ?? 149));
   const switcherServices = await getImobiliareServices();
   if (!service) notFound();
 

@@ -38,9 +38,9 @@ import { ServicePrice } from '@/components/services/service-price';
 const SERVICE_SLUG = 'certificat-celibat';
 const PAGE_PATH = '/servicii/eliberare-certificat-de-celibat/';
 const SCHEMA_SLUG = 'eliberare-certificat-de-celibat';
-const TITLE = 'Certificat de Celibat Online România — 179 RON';
+const TITLE = 'Certificat de Celibat Online România — Rapid, de la Starea Civilă';
 const DESCRIPTION =
-  "Certificat de celibat online de la Starea Civilă, 179 RON, fără drum la ghișeu. Pentru căsătorie în străinătate, cetățenie sau altă localitate. Email + curier.";
+  "Certificat de celibat online de la Starea Civilă, 698 RON cu taxele incluse, fără drum la ghișeu. Pentru căsătorie în străinătate, cetățenie sau altă localitate. Email + curier.";
 const DATE_PUBLISHED = '2026-06-14';
 const DATE_MODIFIED = '2026-06-14';
 
@@ -75,7 +75,7 @@ export const metadata = buildPageMetadata({
   ogImage: '/og/services/certificat-celibat.png',
 });
 
-const jsonLdGraph = buildServicePageGraph({
+const buildJsonLd = (basePrice: number) => buildServicePageGraph({
   slug: SCHEMA_SLUG,
   name: 'Certificat de Celibat Online',
   description:
@@ -96,7 +96,7 @@ const jsonLdGraph = buildServicePageGraph({
     { name: 'Certificat de Celibat', url: `${BASE_URL}${PAGE_PATH}` },
   ],
   offers: [
-    { name: 'Certificat de Celibat (Standard)', price: 179, url: `${BASE_URL}${PAGE_PATH}` },
+    { name: 'Certificat de Celibat (Standard)', price: basePrice, url: `${BASE_URL}${PAGE_PATH}` },
   ],
   aggregateRating: { ratingValue: 4.9, reviewCount: 450 },
 });
@@ -106,6 +106,8 @@ export default async function CertificatCelibatPage() {
   if (!data) notFound();
 
   const { service, options } = data;
+  // Schema price follows the DB (admin-editable) — hardcodat doar fallback-ul.
+  const jsonLdGraph = buildJsonLd(Number(service?.base_price ?? 698));
 
   // Situations where a certificat de celibat is required
   const useCases = [
@@ -562,7 +564,7 @@ export default async function CertificatCelibatPage() {
             { q: 'Cât este valabil certificatul de celibat?', a: 'Reflectă situația din ziua eliberării. În practică, autoritățile (mai ales cele străine) cer un certificat emis recent — de obicei în ultimele 3-6 luni. Verifică termenul cerut de instituția unde îl depui.' },
             { q: 'Cine poate cere certificatul de celibat?', a: 'Persoana în cauză, pe baza datelor proprii de stare civilă. Prin eGhișeul completezi datele tale și noi depunem cererea în localitatea ta de domiciliu, fără să te deplasezi.' },
             { q: 'Pot obține certificatul de celibat din altă localitate sau din diaspora?', a: 'Da. Certificatul se eliberează la Starea Civilă din localitatea ta de domiciliu, dar nu trebuie să te deplasezi acolo. Completezi datele online, noi depunem cererea, iar documentul ajunge la tine pe email și prin curier, oriunde te-ai afla în țară sau în străinătate.' },
-            { q: 'Cât costă certificatul de celibat în România?', a: 'Prin eGhișeul costă 179 RON, cu taxele incluse, fără cont și fără drum la ghișeu. Apostila de la Haga și traducerea legalizată, dacă îl folosești în străinătate, se pot adăuga separat la comandă.' },
+            { q: 'Cât costă certificatul de celibat în România?', a: 'Prin eGhișeul costă 698 RON, cu taxele incluse, fără cont și fără drum la ghișeu. Apostila de la Haga și traducerea legalizată, dacă îl folosești în străinătate, se pot adăuga separat la comandă.' },
             { q: 'Cum primesc documentul?', a: 'Îl primești pe email și, în plus, originalul prin curier la adresa indicată. Astfel ai și varianta digitală rapidă, și documentul fizic oficial pentru dosar.' },
           ]}
         />
