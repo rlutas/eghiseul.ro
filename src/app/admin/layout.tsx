@@ -203,7 +203,7 @@ export default function AdminLayout({
 
   return (
     <AdminPermissionProvider user={user}>
-      <div className="flex h-screen bg-gray-50">
+      <div className="flex h-screen bg-gray-50 print:h-auto print:bg-white">
         {/* Mobile sidebar overlay */}
         {sidebarOpen && (
           <div
@@ -218,7 +218,7 @@ export default function AdminLayout({
             hover lifting to white. */}
         <aside
           className={cn(
-            'fixed inset-y-0 left-0 z-50 flex w-64 flex-col bg-slate-900 text-white transition-transform duration-200 lg:static lg:translate-x-0',
+            'fixed inset-y-0 left-0 z-50 flex w-64 flex-col bg-slate-900 text-white transition-transform duration-200 lg:static lg:translate-x-0 print:hidden',
             sidebarOpen ? 'translate-x-0' : '-translate-x-full'
           )}
         >
@@ -299,7 +299,7 @@ export default function AdminLayout({
         <div className="flex flex-1 flex-col overflow-hidden">
           {/* Top bar — mobile only (sister project pattern). On desktop the
               sidebar carries the brand so we don't need a duplicate header. */}
-          <header className="flex h-16 items-center border-b bg-white px-4 lg:hidden">
+          <header className="flex h-16 items-center border-b bg-white px-4 lg:hidden print:hidden">
             <Button
               variant="ghost"
               size="icon"
@@ -311,7 +311,7 @@ export default function AdminLayout({
           </header>
 
           {/* Page content */}
-          <main className="flex-1 overflow-auto p-4 lg:p-6">
+          <main className="flex-1 overflow-auto p-4 lg:p-6 print:overflow-visible print:p-0">
             {children}
           </main>
         </div>
