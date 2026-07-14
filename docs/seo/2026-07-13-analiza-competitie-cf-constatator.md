@@ -115,3 +115,24 @@ Noi avem conținut superior (3.200-4.000 cuvinte, comparații, specimene, recenz
 ---
 
 **Fișiere relevante:** `src/app/servicii/extras-de-carte-funciara/page.tsx`, `src/app/servicii/certificat-constatator-online/page.tsx`, strategia generală în `STRATEGY-2026-07-13-post-cutover.md`.
+
+## Anexă: verificare poziții toate serviciile (14 iul 2026, incognito pws=0)
+
+| Keyword | Poziția eghiseul | Note |
+|---|---|---|
+| cazier judiciar online | **#5** (homepage) + #8 (serviciu) | + CJO al nostru #3 — 3 sloturi de-ale noastre în top 10 |
+| cazier fiscal online | **#5** | + CJO #2 |
+| cazier auto online | **#1** (articol) + #6 (serviciu) | + CJO #2 — dominăm |
+| certificat de naștere online | **#1** 🏆 | băteam centruldevize (#2 acum) |
+| certificat de căsătorie online | **#1** 🏆 | |
+| certificat de celibat | **#2** | centruldevize #1 |
+| identificare imobil după adresă | #3 (articol) + #8 (serviciu) | |
+| copie carte funciară | #5 | |
+| certificat de sarcini imobil | #4 | |
+| extras plan cadastral | #3 | |
+| extras carte funciară colectivă | **#1** + #5 | ambele articole |
+| plan de amplasament și delimitare | ABSENT (pagina indexată) | keyword de firme de cadastru locale — pagină tânără, are nevoie de conținut+linkuri |
+| copie arhivă OCPI | #18 (pagina greșită) | pagina proprie indexată dar nu rankează încă |
+| certificat dețineri imobile | NEINDEXATĂ → **request indexing cerut 14 iul** | |
+
+**Concluzie:** portofoliul rankează excelent (5 poziții #1-#2). Slabe doar 3 pagini topograf foarte tinere (sub 3 săpt): plan-amplasament, copie-arhiva-ocpi, certificat-detineri. Acțiuni: indexare cerută (dețineri), restul = timp + interlinking din articolele CF (deja făcut parțial) — re-check la 27 iul odată cu CF/constatator.
