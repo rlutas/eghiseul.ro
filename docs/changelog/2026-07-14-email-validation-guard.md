@@ -24,9 +24,9 @@
 
 | # | Task | De ce |
 |---|---|---|
-| 1 | **Webhook Resend `email.bounced`** → marchează comanda, alertă admin, SMS client cu link status | Singura plasă pentru local-part greșit pe domeniu valid (cazul MG6MF) |
+| 1 | ~~Webhook Resend `email.bounced`~~ **FĂCUT** (`/api/webhooks/resend`): verificare semnătură Svix + alertă admin pe contact@ (comenzi + telefon client) + SMS best-effort prin SMSLink. **Setup manual rămas:** Resend dashboard → Webhooks → endpoint `https://eghiseul.ro/api/webhooks/resend`, evenimente `email.bounced` + `email.complained` → secretul `whsec_...` în Vercel env ca `RESEND_WEBHOOK_SECRET` (+ redeploy). SMS-ul pornește când `SMSLINK_API_KEY` (format `connection_id;password`) e setat. | Singura plasă pentru local-part greșit pe domeniu valid (cazul MG6MF) |
 | 2 | GSC: Request indexing rămas pe 4 URL-uri (istoric, 2 pagini servicii, homepage) | fiecare cerere ~1 min (test live Google) |
 | 3 | DMARC: după 2-4 săpt de rapoarte pe contact@ → `p=quarantine` | protecție anti-spoofing reală |
-| 4 | Clientul MG6MF: sunat la +40723600877 → email corect → update comandă + resend | documentul stă gata, nelivrat |
+| 4 | ~~Clientul MG6MF~~ REZOLVAT — documentul trimis manual de Raul (14.07) | — |
 | 5 | Re-check poziții SERP CF/constatator (~27 iul) + validare review snippets în GSC | măsurare plan SEO |
 | 6 | OTS Agerpres „primul serviciu 100% automat 24/7" | decizie user (cost mic, slot SERP) |
