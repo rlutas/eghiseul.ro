@@ -30,6 +30,7 @@ import { PhoneInput } from '@/components/shared/PhoneInput';
 import { isValidPhoneNumber } from 'libphonenumber-js';
 import { SearchableSelect } from '@/components/shared/SearchableSelect';
 import { cn } from '@/lib/utils';
+import { suggestEmailCorrection } from '@/lib/email-typo';
 import type { ClientType } from '@/types/verification-modules';
 import { getCountriesForForeignType } from '@/config/countries';
 import {
@@ -347,6 +348,26 @@ export function ContactStepModular({ onValidChange }: ContactStepProps) {
               <FormDescription>
                 Vei primi confirmarea comenzii și documentele pe acest email
               </FormDescription>
+              {(() => {
+                const suggestion = field.value ? suggestEmailCorrection(field.value) : null;
+                if (!suggestion) return null;
+                return (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      form.setValue('email', suggestion, { shouldValidate: true });
+                      updateContact({ email: suggestion });
+                    }}
+                    className="mt-1.5 flex w-full items-start gap-2 rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-left text-sm text-amber-900 hover:bg-amber-100 transition-colors"
+                  >
+                    <span aria-hidden="true">⚠️</span>
+                    <span>
+                      Adresa pare greșită. Ai vrut să scrii{' '}
+                      <strong className="underline">{suggestion}</strong>? Apasă aici pentru corectare.
+                    </span>
+                  </button>
+                );
+              })()}
               <FormMessage />
             </FormItem>
           )}

@@ -7,6 +7,7 @@ import { autoGenerateOrderDocuments } from '@/lib/documents/auto-generate';
 import { uploadOrderSignature, uploadBase64 } from '@/lib/aws/s3';
 import { computeEstimatedCompletionISO } from '@/lib/delivery-estimate-helper';
 import { getMissingInvoiceClientFields } from '@/lib/oblio/invoice';
+import { emailDomainAcceptsMail } from '@/lib/email-mx';
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -172,6 +173,31 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
           },
           { status: 400 }
         );
+      }
+    }
+
+    // ── Email domain deliverability guard ───────────────────────────────
+    // Rejects domains that can't receive email at all (typo'd/made-up
+    // domains → guaranteed bounce, client never learns the document is
+    // ready). Fail-open on DNS trouble; can't catch wrong local parts on
+    // valid domains (that's the bounce webhook's job). Context: E-260713-MG6MF.
+    {
+      const contactEmail = (order.customer_data as { contact?: { email?: string } } | null)
+        ?.contact?.email;
+      if (contactEmail) {
+        const accepts = await emailDomainAcceptsMail(contactEmail);
+        if (accepts === false) {
+          return NextResponse.json(
+            {
+              success: false,
+              error: {
+                code: 'EMAIL_DOMAIN_INVALID',
+                message: `Adresa de email „${contactEmail}" pare greșită — domeniul nu poate primi emailuri. Te rugăm să revii la pasul „Contact" și să corectezi adresa, altfel nu vei primi documentele.`,
+              },
+            },
+            { status: 400 }
+          );
+        }
       }
     }
 

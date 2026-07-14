@@ -18,6 +18,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { OrderSummaryCard } from '@/components/payment';
 import { estimateFromSelectedOptions } from '@/lib/delivery-calculator';
+import { suggestEmailCorrection } from '@/lib/email-typo';
 
 interface SelectedOption {
   optionName?: string;
@@ -331,6 +332,11 @@ export default function SuccessPage() {
 
   const orderNumber = order.friendly_order_id || `ORD-${order.order_number}`;
   const email = order.customer_data?.contact?.email || '';
+  const emailTypoSuggestion = email ? suggestEmailCorrection(email) : null;
+  // Instant services (worker-automated): document lands in minutes, so the
+  // status page matters more than the email inbox.
+  const svcLower = (order.service_name || '').toLowerCase();
+  const isInstantService = svcLower.includes('constatator') || svcLower.includes('carte funciar');
 
   // Bank transfer pending state
   if (isPending) {
@@ -560,11 +566,51 @@ export default function SuccessPage() {
               </div>
             </div>
 
-            {/* Email notification */}
+            {/* Instant services: point the customer at the status page —
+                the document usually lands in ~5 minutes. */}
+            {isInstantService && (
+              <div className="text-left rounded-xl border border-green-200 bg-green-50 p-4 mb-6">
+                <p className="text-sm text-green-900 leading-relaxed">
+                  <strong>Documentul se eliberează automat — de obicei în ~5 minute.</strong>{' '}
+                  Îl primești pe email și îl poți descărca oricând de pe{' '}
+                  <button
+                    type="button"
+                    onClick={() => router.push(`/comanda/status?order=${orderNumber}&email=${encodeURIComponent(email)}`)}
+                    className="font-semibold underline"
+                  >
+                    pagina de status a comenzii
+                  </button>
+                  {' '}— dă un refresh acolo peste câteva minute dacă nu a apărut încă.
+                </p>
+              </div>
+            )}
+
+            {/* Email verification — the document goes HERE; a typo means the
+                customer never finds out the order is done (E-260713-MG6MF). */}
             {email && (
-              <div className="flex items-center gap-2 justify-center text-sm text-neutral-500 mb-6">
-                <Mail className="h-4 w-4" />
-                <span>Confirmare trimisă la: {email}</span>
+              <div className={`text-left rounded-xl border p-4 mb-6 ${emailTypoSuggestion ? 'border-red-300 bg-red-50' : 'border-neutral-200 bg-neutral-50'}`}>
+                <div className="flex items-start gap-2">
+                  <Mail className={`h-4 w-4 mt-0.5 shrink-0 ${emailTypoSuggestion ? 'text-red-600' : 'text-neutral-500'}`} />
+                  <div className="text-sm leading-relaxed">
+                    <p className="text-neutral-700">
+                      Documentele și notificările se trimit la:{' '}
+                      <strong className="text-secondary-900">{email}</strong>
+                    </p>
+                    {emailTypoSuggestion ? (
+                      <p className="mt-1 font-medium text-red-700">
+                        ⚠️ Adresa pare greșită (ai vrut {emailTypoSuggestion}?). Scrie-ne ACUM pe{' '}
+                        <a href="mailto:contact@eghiseul.ro" className="underline">contact@eghiseul.ro</a> sau la{' '}
+                        <a href="tel:+40757708181" className="underline">0757 708 181</a> ca să o corectăm.
+                      </p>
+                    ) : (
+                      <p className="mt-1 text-neutral-500">
+                        Verifică dacă adresa e scrisă corect. E greșită? Sună-ne la{' '}
+                        <a href="tel:+40757708181" className="underline">0757 708 181</a> sau scrie pe{' '}
+                        <a href="mailto:contact@eghiseul.ro" className="underline">contact@eghiseul.ro</a> și o corectăm imediat.
+                      </p>
+                    )}
+                  </div>
+                </div>
               </div>
             )}
 
