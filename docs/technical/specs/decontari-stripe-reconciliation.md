@@ -71,3 +71,11 @@ Afirmația inițială „9 încasări nefacturate" era GREȘITĂ pentru 7 din el
 3. CJO-20260601-85107, 305,10 RON, 1 iun — comandă reală CJO, integrarea WP a ratat factura
 
 Lecție: la match-ul pe dată folosește T+3 pt card (`charge`) și T+5 pt Payment Links (`payment`).
+
+### Incident + reparație finală (14 iul, a treia trecere)
+
+User a prins o atribuire greșită (factura lui Florea Mihai pe tranzacția lui Geanta Constantin). Cauza: euristica „closest-of-N" + patch-ul țintit fără set de facturi-folosite → 9 facturi duplicate pe câte 2 rânduri și 10 nepotriviri de email. **Reparație**: audit charge-cu-charge (email Stripe = autoritate, comparat cu emailul de pe factura Oblio) → 21 de rânduri re-legate strict pe emailul propriu. Audit final: **0 duplicate, 0 nepotriviri pe toate cele 175 de rânduri euristice**, sumele reconciliază pe toate 29.
+
+Nefacturate REALE (4 tranzacții + 1 comandă): hunkjaku 182,30 (extra DHL recreat manual 13.07, fără factură) · ratskawines 307,80 (extra CJO pre-feature) · 50 + 250 RON (Link by Stripe, orderId 122M — sursă neidentificată, nu există în dump WP) · CJO-20260601-85107 305,10 (în afara ferestrei de payouts).
+
+Script de audit reutilizabil: scratchpad `audit_links.js` — de rulat după orice linkare retroactivă.
