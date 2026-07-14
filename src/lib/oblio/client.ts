@@ -139,7 +139,16 @@ export async function oblioRequest<T>(
     throw new Error(`Oblio API error: ${response.status} - ${errorText}`);
   }
 
-  const data: OblioApiResponse<T> = await response.json();
+  // Oblio can answer 200 with an HTML page (WAF/maintenance/edge) — surface
+  // the actual body instead of an opaque "Unexpected token '<'" JSON error.
+  const raw = await response.text();
+  let data: OblioApiResponse<T>;
+  try {
+    data = JSON.parse(raw) as OblioApiResponse<T>;
+  } catch {
+    console.error('Oblio non-JSON response:', response.status, raw.slice(0, 300));
+    throw new Error(`Oblio non-JSON response (${response.status}): ${raw.slice(0, 200)}`);
+  }
 
   if (data.status !== 200) {
     throw new Error(`Oblio error: ${data.statusMessage}`);
