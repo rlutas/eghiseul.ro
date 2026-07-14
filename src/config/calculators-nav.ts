@@ -79,26 +79,31 @@ export const CALCULATORS_NAV: CalculatorNavGroup[] = [
     ],
   },
   {
-    category: 'Fiscal',
+    category: 'Fiscal & firmă',
     items: [
       { name: 'TVA', href: '/calculator/tva/', icon: Percent, popular: true },
       { name: 'Dividende', href: '/calculator/dividende/', icon: Coins, popular: true },
       { name: 'Taxe SRL', href: '/calculator/taxe-srl/', icon: Building2 },
       { name: 'Impozit auto', href: '/calculator/calculator-impozit-auto/', icon: Car, popular: true },
-      { name: 'Impozit pe chirie', href: '/calculator/impozit-chirie/', icon: Home, popular: true },
       { name: 'Penalități ANAF', href: '/calculator/penalitati-anaf/', icon: FileWarning },
-      { name: 'Rambursare anticipată', href: '/calculator/rambursare-anticipata/', icon: PiggyBank },
       { name: 'Inflație', href: '/calculator/inflatie/', icon: TrendingUp },
-      { name: 'Impozit pe casă', href: '/calculator/impozit-casa/', icon: House },
+    ],
+  },
+  {
+    category: 'Imobiliare & credite',
+    items: [
       { name: 'Credit ipotecar', href: '/calculator/credit-ipotecar/', icon: Banknote, popular: true },
+      { name: 'Taxe notariale', href: '/calculator/taxe-notariale/', icon: Landmark, popular: true },
+      { name: 'Impozit pe casă', href: '/calculator/impozit-casa/', icon: House, popular: true },
+      { name: 'Impozit pe chirie', href: '/calculator/impozit-chirie/', icon: Home },
       { name: 'Grad de îndatorare', href: '/calculator/grad-indatorare/', icon: Gauge },
-      { name: 'Jugăr & stânjen în mp', href: '/calculator/jugar-stanjen-in-mp/', icon: LandPlot },
+      { name: 'Rambursare anticipată', href: '/calculator/rambursare-anticipata/', icon: PiggyBank },
+      { name: 'Jugăr & stânjen în mp', href: '/calculator/jugar-stanjen-in-mp/', icon: LandPlot, popular: true },
     ],
   },
   {
     category: 'Juridic & altele',
     items: [
-      { name: 'Taxe notariale', href: '/calculator/taxe-notariale/', icon: Landmark, popular: true },
       { name: 'Pensie alimentară', href: '/calculator/pensie-alimentara/', icon: HeartHandshake, popular: true },
       { name: 'Termene judiciare', href: '/calculator/termene-judiciare/', icon: Gavel, popular: true },
       { name: 'Taxă judiciară de timbru', href: '/calculator/taxa-judiciara-de-timbru/', icon: Stamp },
