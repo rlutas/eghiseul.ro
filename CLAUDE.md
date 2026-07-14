@@ -201,7 +201,7 @@ OBLIO_SERIES_NAME=EGH
 CRON_SECRET=
 RESEND_API_KEY=
 RESEND_WEBHOOK_SECRET=       # Svix secret pt /api/webhooks/resend (bounce alerts)
-SMSLINK_API_KEY=             # format: connection_id;password
+SMSLINK_API_KEY=
 CLOUDCONVERT_API_KEY=        # DOCX→PDF preview in admin (optional; dev uses local LibreOffice)
 ```
 

@@ -1451,6 +1451,16 @@ export default function AdminOrderDetailPage() {
               <InfoRow label="Sediu social" value={formatAddress(company.address) || 'N/A'} />
             )}
             {contact?.email && <InfoRow label="Email" value={contact.email} icon={<Mail className="h-3.5 w-3.5" />} />}
+            {(order as AnyObj).email_bounced_at ? (
+              <div className="rounded-lg border border-red-300 bg-red-50 px-3 py-2 my-1.5 text-sm text-red-800">
+                <p className="font-semibold">⚠️ Emailurile către client NU se livrează (bounce)</p>
+                <p className="text-xs mt-0.5">
+                  {String((order as AnyObj).email_bounce_reason || 'adresă probabil greșită')} ·{' '}
+                  {new Date(String((order as AnyObj).email_bounced_at)).toLocaleString('ro-RO')}
+                </p>
+                <p className="text-xs mt-0.5">Sună clientul pentru adresa corectă, actualizeaz-o și retrimite documentele.</p>
+              </div>
+            ) : null}
             {contact?.phone && (
               <div className="flex items-center justify-between gap-4 text-sm border-b border-border/60 py-1.5 last:border-b-0">
                 <span className="text-muted-foreground flex items-center gap-1.5 shrink-0">

@@ -8,8 +8,9 @@
  * domain, so this webhook is the last line of defense:
  *
  *   email.bounced / email.complained →
- *     1. alert admin (email to contact@) with order + client phone
- *     2. best-effort SMS to the client with the status-page link
+ *     1. mark the client's recent orders (email_bounced_at + reason,
+ *        migration 111) — admin order page shows a red banner
+ *     2. alert admin (email to contact@) with orders + client phone
  *
  * Setup (one-time, Resend dashboard → Webhooks):
  *   - endpoint: https://eghiseul.ro/api/webhooks/resend
@@ -23,7 +24,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'node:crypto';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from '@/lib/email/resend';
-import { sendSms } from '@/lib/sms/smslink';
 
 export const runtime = 'nodejs';
 
@@ -106,7 +106,8 @@ export async function POST(request: NextRequest) {
     bounceInfo,
   });
 
-  // Find the most recent matching order (submitted in the last 60 days).
+  // Find the client's recent orders (last 60 days) and mark them bounced —
+  // the admin order page shows a red banner off email_bounced_at.
   let orderInfo = '';
   let clientPhone = '';
   let orderNumber = '';
@@ -117,11 +118,11 @@ export async function POST(request: NextRequest) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { data: orders } = await (admin as any)
         .from('orders')
-        .select('order_number, status, created_at, customer_data')
+        .select('id, order_number, status, created_at, customer_data')
         .eq('customer_data->contact->>email', bouncedEmail)
         .gte('created_at', since)
         .order('created_at', { ascending: false })
-        .limit(3);
+        .limit(5);
       if (orders?.length) {
         orderNumber = orders[0].order_number;
         clientPhone = orders[0].customer_data?.contact?.phone ?? '';
@@ -131,9 +132,17 @@ export async function POST(request: NextRequest) {
               `${o.order_number} (${o.status}, ${o.created_at?.slice(0, 10)})`
           )
           .join(', ');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await (admin as any)
+          .from('orders')
+          .update({
+            email_bounced_at: new Date().toISOString(),
+            email_bounce_reason: `${type}: ${bounceInfo}`.slice(0, 500),
+          })
+          .in('id', orders.map((o: { id: string }) => o.id));
       }
     } catch (err) {
-      console.error('[webhooks/resend] order lookup failed', err);
+      console.error('[webhooks/resend] order lookup/update failed', err);
     }
   }
 
@@ -155,14 +164,6 @@ export async function POST(request: NextRequest) {
       </div>`,
     idempotencyKey: `bounce-alert-${data.email_id ?? bouncedEmail}-${type}`,
   });
-
-  // 2. Best-effort SMS to the client (skipped until SMSLINK_API_KEY is set).
-  if (clientPhone && orderNumber && type === 'email.bounced') {
-    await sendSms(
-      clientPhone,
-      `eGhiseul.ro: Emailul dvs. (${bouncedEmail}) nu poate primi mesaje, deci nu primiti actualizarile comenzii ${orderNumber}. Verificati statusul pe eghiseul.ro/comanda/status sau sunati la 0757708181 pentru corectarea adresei.`
-    );
-  }
 
   return NextResponse.json({ received: true });
 }
