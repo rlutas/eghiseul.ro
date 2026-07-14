@@ -252,6 +252,33 @@ export async function syncPayouts(opts: { sinceDays?: number } = {}): Promise<Pa
       await enrichEghiseul(rows.filter((r) => r.platform === 'eghiseul'));
       await enrichCjo(rows.filter((r) => r.platform === 'cjo'), errors);
 
+
+      // Preserve manually-attached invoices (WP-era links added by the
+      // matching scripts): when this sync computed no invoice for a row that
+      // already has one in the DB, keep the existing values. MUST run before
+      // matched_count is computed.
+      {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { data: existing } = await (admin as any)
+          .from('stripe_payout_transactions')
+          .select('id, invoice_number, invoice_url, client_name, client_email, platform, order_number')
+          .eq('payout_id', payout.id)
+          .not('invoice_number', 'is', null);
+        const keep = new Map((existing ?? []).map((e: { id: string }) => [e.id, e]));
+        for (const r of rows) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const prev = keep.get(r.id) as any;
+          if (prev && !r.invoice_number) {
+            r.invoice_number = prev.invoice_number;
+            r.invoice_url = r.invoice_url ?? prev.invoice_url;
+            r.client_name = r.client_name ?? prev.client_name;
+            r.client_email = r.client_email ?? prev.client_email;
+            if (r.platform === 'necunoscut' && prev.platform !== 'necunoscut') r.platform = prev.platform;
+            r.order_number = r.order_number ?? prev.order_number;
+          }
+        }
+      }
+
       const CHARGE_LIKE = new Set(['charge', 'payment']); // 'payment' = Payment Links (era WP)
       const matched = rows.filter((r) => CHARGE_LIKE.has(r.type) && r.invoice_number).length;
       const chargeCount = rows.filter((r) => CHARGE_LIKE.has(r.type)).length;
