@@ -252,8 +252,9 @@ export async function syncPayouts(opts: { sinceDays?: number } = {}): Promise<Pa
       await enrichEghiseul(rows.filter((r) => r.platform === 'eghiseul'));
       await enrichCjo(rows.filter((r) => r.platform === 'cjo'), errors);
 
-      const matched = rows.filter((r) => r.type === 'charge' && r.invoice_number).length;
-      const chargeCount = rows.filter((r) => r.type === 'charge').length;
+      const CHARGE_LIKE = new Set(['charge', 'payment']); // 'payment' = Payment Links (era WP)
+      const matched = rows.filter((r) => CHARGE_LIKE.has(r.type) && r.invoice_number).length;
+      const chargeCount = rows.filter((r) => CHARGE_LIKE.has(r.type)).length;
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { error: pErr } = await (admin as any).from('stripe_payouts').upsert({

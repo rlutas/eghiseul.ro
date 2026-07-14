@@ -71,9 +71,9 @@ export default function PayoutDetailPage() {
   if (error) return <p className="p-8 text-red-600">Eroare: {error}</p>;
   if (!payout) return <p className="p-8 text-neutral-500">Se încarcă…</p>;
 
-  const charges = txs.filter((t) => t.type === 'charge');
-  const refunds = txs.filter((t) => t.type === 'refund');
-  const others = txs.filter((t) => t.type !== 'charge' && t.type !== 'refund');
+  const charges = txs.filter((t) => t.type === 'charge' || t.type === 'payment');
+  const refunds = txs.filter((t) => t.type === 'refund' || t.type === 'payment_refund');
+  const others = txs.filter((t) => !['charge', 'payment', 'refund', 'payment_refund'].includes(t.type));
   const totGross = txs.reduce((a, t) => a + t.gross_bani, 0);
   const totFee = txs.reduce((a, t) => a + t.fee_bani, 0);
   const totNet = txs.reduce((a, t) => a + t.net_bani, 0);

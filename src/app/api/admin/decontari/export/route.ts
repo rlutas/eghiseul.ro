@@ -92,7 +92,7 @@ export async function GET(request: NextRequest) {
           esc(p?.arrival_date),
           esc(r.payout_id),
           esc(p?.status),
-          esc(r.type === 'charge' ? 'Încasare' : r.type === 'refund' ? 'Rambursare' : r.type),
+          esc(['charge', 'payment'].includes(r.type as string) ? 'Încasare' : ['refund', 'payment_refund'].includes(r.type as string) ? 'Rambursare' : r.type),
           esc(r.order_number),
           esc(r.platform === 'cjo' ? 'cazierjudiciaronline.com' : r.platform === 'eghiseul' ? 'eghiseul.ro' : 'necunoscut'),
           esc(r.client_name),
