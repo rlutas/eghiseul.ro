@@ -54,6 +54,8 @@ function extractOrderNumber(source: Stripe.Charge | null, description: string | 
 }
 
 interface TxRow {
+  /** Transient: charge metadata.orderId (extra charges lack orderNumber). */
+  _orderId?: string | null;
   id: string;
   payout_id: string;
   type: string;
@@ -74,26 +76,46 @@ interface TxRow {
   raw: unknown;
 }
 
-/** Enrich eghiseul rows from our own DB (invoice + client + service). */
+/** Enrich eghiseul rows from our own DB (invoice + client + service).
+ *  Matches by order number AND by order id (extra-charge PIs carry only
+ *  metadata.orderId, no orderNumber/description → rows landed unmatched). */
 async function enrichEghiseul(rows: TxRow[]) {
   const admin = createAdminClient();
   const orderNumbers = [...new Set(rows.map((r) => r.order_number).filter(Boolean))] as string[];
-  if (!orderNumbers.length) return;
+  const orderIds = [...new Set(rows.filter((r) => !r.order_number && r._orderId).map((r) => r._orderId))] as string[];
+  if (!orderNumbers.length && !orderIds.length) return;
+  const select = 'id, friendly_order_id, order_number, invoice_number, invoice_url, customer_data, services(name)';
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: orders } = await (admin as any)
-    .from('orders')
-    .select('friendly_order_id, order_number, invoice_number, invoice_url, customer_data, services(name)')
-    .or(
-      `friendly_order_id.in.(${orderNumbers.map((o) => `"${o}"`).join(',')}),order_number.in.(${orderNumbers.map((o) => `"${o}"`).join(',')})`
-    );
+  const numberQuery = orderNumbers.length
+    ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (admin as any)
+        .from('orders')
+        .select(select)
+        .or(
+          `friendly_order_id.in.(${orderNumbers.map((o) => `"${o}"`).join(',')}),order_number.in.(${orderNumbers.map((o) => `"${o}"`).join(',')})`
+        )
+    : Promise.resolve({ data: [] });
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const idQuery = orderIds.length
+    ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (admin as any).from('orders').select(select).in('id', orderIds)
+    : Promise.resolve({ data: [] });
+  const [{ data: byNum }, { data: byIdData }] = await Promise.all([numberQuery, idQuery]);
+  const orders = [...(byNum ?? []), ...(byIdData ?? [])];
   const byNumber = new Map<string, Record<string, unknown>>();
-  for (const o of orders ?? []) {
+  const byId = new Map<string, Record<string, unknown>>();
+  for (const o of orders) {
     if (o.friendly_order_id) byNumber.set(String(o.friendly_order_id).toUpperCase(), o);
     if (o.order_number) byNumber.set(String(o.order_number).toUpperCase(), o);
+    if (o.id) byId.set(String(o.id), o);
   }
   for (const r of rows) {
-    const o = r.order_number ? byNumber.get(r.order_number.toUpperCase()) : undefined;
+    const o =
+      (r.order_number ? byNumber.get(r.order_number.toUpperCase()) : undefined) ??
+      (r._orderId ? byId.get(r._orderId) : undefined);
     if (!o) continue;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if (!r.order_number) r.order_number = ((o as any).friendly_order_id ?? (o as any).order_number) as string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const anyO = o as any;
     r.invoice_number = anyO.invoice_number ?? r.invoice_number;
@@ -176,6 +198,7 @@ export async function syncPayouts(opts: { sinceDays?: number } = {}): Promise<Pa
             isCharge?.metadata?.app_id === 'cjo' ? 'cjo' : platformFromOrderNumber(orderNumber);
           if (platform === 'necunoscut' && isCharge?.metadata?.orderId) platform = 'eghiseul';
           rows.push({
+            _orderId: (isCharge?.metadata?.orderId as string | undefined) ?? null,
             id: tx.id,
             payout_id: payout.id,
             type: tx.type,
@@ -227,8 +250,9 @@ export async function syncPayouts(opts: { sinceDays?: number } = {}): Promise<Pa
       if (pErr) throw new Error(pErr.message);
 
       if (rows.length) {
+        const persistable = rows.map(({ _orderId, ...rest }) => { void _orderId; return rest; });
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { error: tErr } = await (admin as any).from('stripe_payout_transactions').upsert(rows);
+        const { error: tErr } = await (admin as any).from('stripe_payout_transactions').upsert(persistable);
         if (tErr) throw new Error(tErr.message);
       }
       payoutsSynced++;
