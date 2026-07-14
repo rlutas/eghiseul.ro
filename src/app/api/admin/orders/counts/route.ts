@@ -76,7 +76,7 @@ export async function GET(request: NextRequest) {
     };
 
     const [
-      allRes, paidRes, processingRes, shippedRes, completedRes, abandonedRes, testOnlyRes,
+      allRes, paidRes, processingRes, shippedRes, completedRes, abandonedRes, standbyRes, testOnlyRes,
       overdueRes, deadlineSoonRes, withCouponRes,
       stageDocsRes, stageSubmittedRes, stageReceivedRes,
       stageTradusRes, stageLegalizatRes, stageApostilaNotariRes, stageApostilaHagaRes,
@@ -90,6 +90,8 @@ export async function GET(request: NextRequest) {
         buildQuery().eq('status', 'completed'),
         // "Neplătite" tab count = draft + pending + abandoned (matches list).
         buildQuery().filter('status', 'in', hiddenList),
+        // "Așteptare client" — parked orders waiting on the customer.
+        buildQuery().eq('status', 'standby'),
         // test_only ignores the active testFilter and just counts sandbox rows
         // so the user knows how many are out there even when on "hide".
         adminClient
@@ -120,6 +122,7 @@ export async function GET(request: NextRequest) {
       shipped: shippedRes.count || 0,
       completed: completedRes.count || 0,
       abandoned: abandonedRes.count || 0,
+      standby: standbyRes.count || 0,
       test_only: testOnlyRes.count || 0,
       overdue: overdueRes.count || 0,
       deadline_soon: deadlineSoonRes.count || 0,

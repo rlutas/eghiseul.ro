@@ -36,7 +36,8 @@ export type StatusTabValue =
   | 'processing'
   | 'shipped'
   | 'completed'
-  | 'abandoned';
+  | 'abandoned'
+  | 'standby';
 
 export interface StatusTab {
   value: StatusTabValue;
@@ -55,6 +56,10 @@ export const STATUS_TABS: StatusTab[] = [
   // These are hidden from the default "Toate" tab; this tab surfaces them so
   // the team can follow up / recover.
   { value: 'abandoned', label: 'Neplătite', countKey: 'abandoned' },
+  // Comenzile parcate în așteptarea clientului (acte expirate, documente
+  // cerute). Rămân ȘI în „În procesare" (PROCESSING_GROUP) — tab-ul ăsta e
+  // vederea dedicată pentru follow-up.
+  { value: 'standby', label: 'Așteptare client', countKey: 'standby' },
 ];
 
 export interface OrdersCounts {
@@ -64,6 +69,7 @@ export interface OrdersCounts {
   shipped: number;
   completed: number;
   abandoned: number;
+  standby: number;
   test_only: number;
   // Quick-filter chip badges ("Filtre rapide")
   overdue: number;
@@ -109,6 +115,8 @@ export function resolveStatusFilter(tab: string | null | undefined): StatusFilte
       return { in: SHIPPED_GROUP };
     case 'completed':
       return { eq: 'completed' };
+    case 'standby':
+      return { eq: 'standby' };
     case 'abandoned':
       // "Neplătite" tab — draft + pending + abandoned (all incomplete/unpaid).
       return { in: HIDDEN_FROM_DEFAULT };
