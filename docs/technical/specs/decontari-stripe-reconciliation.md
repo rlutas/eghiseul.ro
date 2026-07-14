@@ -60,3 +60,14 @@ Tranzacțiile din era WP (până 8 iul) n-au număr de comandă în Stripe. Lega
 - comanda fără nicio factură emisă: CJO-20260601-85107 (305,10) — decizie user
 
 Verificare completă: toate cele 29 payouts reconciliază exact (sum(net)==payout), 0 tranzacții neexplicate. Scriptul de audit: scratchpad `verify_all_payouts.py`.
+
+### Corecție 2026-07-14 (a doua trecere)
+
+Afirmația inițială „9 încasări nefacturate" era GREȘITĂ pentru 7 din ele — fereastra de dată era prea strâmtă: **Payment Links (type `payment`) se decontează la T+5**, nu T+3 ca charge-urile card. Regăsite și legate prin email exact + sumă exactă (EGI2024-24008/24153/24230/24235/24239/24242/24277).
+
+**Rămase real nefacturate: 3** (~605 RON):
+1. 50 RON, 17 iun — Link by Stripe, metadata `orderId:122280853`, sursă neidentificată (nu există în dump WP, nici în DB-urile noi)
+2. 250 RON, 22 iun — idem, `orderId:122469196`
+3. CJO-20260601-85107, 305,10 RON, 1 iun — comandă reală CJO, integrarea WP a ratat factura
+
+Lecție: la match-ul pe dată folosește T+3 pt card (`charge`) și T+5 pt Payment Links (`payment`).
