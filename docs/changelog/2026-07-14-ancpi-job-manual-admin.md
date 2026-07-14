@@ -23,7 +23,7 @@ Operatorul introduce CF-ul găsit direct pe pagina comenzii → workerul emite �
 
 `src/app/admin/ancpi/AncpiCreateJob.tsx` — buton „⚙️ Generează extras CF (worker ANCPI)" pe pagina comenzii admin, sub secțiunea „Date imobil", afișat pentru comenzile **plătite** cu slug `identificare-imobil`, `identificare-imobile-proprietar` sau `extras-carte-funciara` (fallback când auto-queue-ul de la plată n-a pornit — ex. date imobil lipsă).
 
-- Județ/localitate prefill din `customer_data.property`.
+- Județ + Localitate/UAT = **dropdown-uri din exact aceleași liste ca wizard-ul de pe site** (`COUNTY_NAMES` din `judete.ts` + `uat-nomenclator.json`, dependente: județ → UAT-urile lui) — fără text liber, fără typo-uri pe care workerul nu le poate rezolva. Server-side, localitatea e validată contra nomenclatorului (400 dacă nu există în județ). Prefill din `customer_data.property` doar dacă valorile există în liste.
 - Select tip identificator (CF / cadastral / topografic).
 - Avertizări live `checkCf` (reformulate pentru operator): CF colectivă → workerul rutează la „Necesită operator"; format vechi / suspect → atenție înainte de a consuma punctul.
 - După creare: workerul preia la următorul poll (~1 min); livrarea către client e automată (`/api/ancpi/result` → `deliver.ts`).

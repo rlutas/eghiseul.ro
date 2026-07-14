@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { requirePermission } from '@/lib/admin/permissions';
-import { resolveJudetId } from '@/lib/ancpi/judete';
+import { resolveJudetId, normalizeJudet } from '@/lib/ancpi/judete';
 import { effectiveIdentifier } from '@/lib/ancpi/cf-format';
+import uatNomenclator from '@/lib/ancpi/uat-nomenclator.json';
 
 /**
  * Operator creates an ANCPI job MANUALLY for a paid order — used when the CF
@@ -56,6 +57,15 @@ export async function POST(
     if (judetId == null) {
       return NextResponse.json(
         { success: false, error: `Județ nerecunoscut de nomenclatorul ANCPI: „${judet}”.` },
+        { status: 400 }
+      );
+    }
+    // Locality must be an exact UAT from the ANCPI nomenclator (same list the
+    // admin dropdown offers) — the worker resolves uatId from this name.
+    const uats = (uatNomenclator as Record<string, string[]>)[normalizeJudet(judet)] ?? [];
+    if (!uats.some((u) => u.toLowerCase() === localitate.toLowerCase())) {
+      return NextResponse.json(
+        { success: false, error: `Localitate „${localitate}” inexistentă în nomenclatorul UAT pentru ${judet}.` },
         { status: 400 }
       );
     }

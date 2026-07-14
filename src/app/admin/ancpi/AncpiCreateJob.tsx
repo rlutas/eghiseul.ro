@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import { checkCf } from '@/lib/ancpi/cf-format';
+import { COUNTY_NAMES, normalizeJudet } from '@/lib/ancpi/judete';
+import uatNomenclator from '@/lib/ancpi/uat-nomenclator.json';
 
 /**
  * Operator form: queue an ANCPI extras-CF job manually for THIS order — for
@@ -21,9 +23,19 @@ export function AncpiCreateJob({
   defaultLocalitate?: string;
   onCreated?: () => void;
 }) {
+  // Prefill only with values that exist in the shared lists — a free-text
+  // county/locality from older data must not preselect something the worker
+  // can't resolve.
+  const initialJudet =
+    COUNTY_NAMES.find((c) => normalizeJudet(c) === normalizeJudet(defaultJudet ?? '')) ?? '';
+  const uatsFor = (county: string): string[] =>
+    (uatNomenclator as Record<string, string[]>)[normalizeJudet(county)] ?? [];
+  const initialLocalitate =
+    uatsFor(initialJudet).find((u) => u.toLowerCase() === (defaultLocalitate ?? '').toLowerCase()) ?? '';
+
   const [open, setOpen] = useState(false);
-  const [judet, setJudet] = useState(defaultJudet ?? '');
-  const [localitate, setLocalitate] = useState(defaultLocalitate ?? '');
+  const [judet, setJudet] = useState(initialJudet);
+  const [localitate, setLocalitate] = useState(initialLocalitate);
   const [identificator, setIdentificator] = useState('');
   const [tip, setTip] = useState<'CF' | 'CAD' | 'TOPO'>('CF');
   const [busy, setBusy] = useState(false);
@@ -73,11 +85,31 @@ export function AncpiCreateJob({
         Introdu CF-ul identificat → workerul plasează comanda pe ePay, descarcă PDF-ul și îl livrează
         automat clientului. Consumă <strong>1 punct</strong> din creditul prepaid.
       </p>
+      {/* Same county list + ANCPI UAT nomenclator as the customer wizard
+          (PropertyDataStep) — dropdowns, not free text, so the worker's
+          locality→uatId resolution can't fail on a typo. */}
       <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-        <input value={judet} onChange={(e) => setJudet(e.target.value)} placeholder="Județ (ex: Cluj)"
-          className="rounded border border-neutral-300 px-2 py-1.5 text-xs" />
-        <input value={localitate} onChange={(e) => setLocalitate(e.target.value)} placeholder="Localitate / UAT (ex: Cluj-Napoca)"
-          className="rounded border border-neutral-300 px-2 py-1.5 text-xs" />
+        <select
+          value={judet}
+          onChange={(e) => { setJudet(e.target.value); setLocalitate(''); }}
+          className="rounded border border-neutral-300 bg-white px-2 py-1.5 text-xs"
+        >
+          <option value="">Județ…</option>
+          {COUNTY_NAMES.map((c) => (
+            <option key={c} value={c}>{c}</option>
+          ))}
+        </select>
+        <select
+          value={localitate}
+          onChange={(e) => setLocalitate(e.target.value)}
+          disabled={!judet}
+          className="rounded border border-neutral-300 bg-white px-2 py-1.5 text-xs disabled:opacity-50"
+        >
+          <option value="">{judet ? 'Localitate / UAT…' : 'Alege întâi județul'}</option>
+          {uatsFor(judet).map((u) => (
+            <option key={u} value={u}>{u}</option>
+          ))}
+        </select>
       </div>
       <div className="flex gap-2">
         <select value={tip} onChange={(e) => setTip(e.target.value as 'CF' | 'CAD' | 'TOPO')}

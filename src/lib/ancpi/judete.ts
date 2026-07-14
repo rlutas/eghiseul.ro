@@ -34,3 +34,16 @@ export function resolveJudetId(displayName: string | undefined | null): number |
   if (!displayName) return null;
   return JUDET_ID[normalizeJudet(displayName)] ?? null;
 }
+
+/** County display names exactly as shown in the wizard (PropertyDataStep) —
+ *  every entry resolves via resolveJudetId. Shared source for admin forms so
+ *  operators pick from the same list as customers (no free-text typos). */
+export const COUNTY_NAMES = [
+  'Alba', 'Arad', 'Argeș', 'Bacău', 'Bihor', 'Bistrița-Năsăud', 'Botoșani',
+  'Brașov', 'Brăila', 'București', 'Buzău', 'Caraș-Severin', 'Călărași',
+  'Cluj', 'Constanța', 'Covasna', 'Dâmbovița', 'Dolj', 'Galați', 'Giurgiu',
+  'Gorj', 'Harghita', 'Hunedoara', 'Ialomița', 'Iași', 'Ilfov', 'Maramureș',
+  'Mehedinți', 'Mureș', 'Neamț', 'Olt', 'Prahova', 'Satu Mare', 'Sălaj',
+  'Sibiu', 'Suceava', 'Teleorman', 'Timiș', 'Tulcea', 'Vaslui', 'Vâlcea',
+  'Vrancea',
+] as const;
