@@ -31,6 +31,7 @@ import {
   type ExtractedROCEIReader,
 } from '@/lib/services/document-ocr';
 import { ModifyOrderDialog } from '@/components/admin/modify-order-dialog';
+import { AncpiCreateJob } from '@/app/admin/ancpi/AncpiCreateJob';
 import { QuickStatusSelect } from '@/components/admin/update-status-card';
 import {
   ArrowLeft,
@@ -1229,6 +1230,24 @@ export default function AdminOrderDetailPage() {
                 echipă): county/locality/address/owner/CF, needed by the team
                 to actually run the identification. */}
             <PropertySection property={(order.customer_data as AnyObj | null)?.property as AnyObj | null} />
+            {/* Manual ANCPI job: for identificare-imobil orders the operator finds
+                the CF (geoportal tool) and queues the extras here — the worker
+                issues + delivers it automatically. Also a fallback for extras-CF
+                orders whose auto-queue at payment didn't fire. */}
+            {['identificare-imobil', 'identificare-imobile-proprietar', 'extras-carte-funciara'].includes(
+              order.services?.slug || ''
+            ) &&
+              (order.payment_status === 'paid' || order.payment_status === 'succeeded') && (() => {
+                const prop = (order.customer_data as AnyObj | null)?.property as AnyObj | null;
+                return (
+                  <AncpiCreateJob
+                    orderId={order.id}
+                    defaultJudet={prop?.county ? String(prop.county) : undefined}
+                    defaultLocalitate={prop?.locality ? String(prop.locality) : undefined}
+                    onCreated={refreshSilent}
+                  />
+                );
+              })()}
             {/* Real per-step delivery estimate (sums urgenta + traducere +
                 legalizare + apostila*) so admin sees the same window the
                 customer was promised. Falls back to `service.estimated_days`

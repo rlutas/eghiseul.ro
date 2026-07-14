@@ -83,7 +83,7 @@ describe('resolveStatusFilter', () => {
 });
 
 describe('STATUS_TABS', () => {
-  it('exposes the 6 tabs in the canonical order', () => {
+  it('exposes the 7 tabs in the canonical order', () => {
     expect(STATUS_TABS.map((t) => t.value)).toEqual([
       'all',
       'paid',
@@ -91,6 +91,7 @@ describe('STATUS_TABS', () => {
       'shipped',
       'completed',
       'abandoned',
+      'standby',
     ]);
   });
 

@@ -81,6 +81,7 @@ const EVENT_LABEL: Record<string, string> = {
   failed: 'Eșuat',
   needs_operator: 'Necesită operator',
   retry: 'Reîncercare',
+  created_manual: 'Creat manual (admin)',
   reaper: 'Recuperat (crash)',
   stuck: 'Blocat',
 };
