@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import Link from 'next/link';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
@@ -48,6 +49,12 @@ export function PotCutCalculator() {
             value={suprafata}
             onChange={(e) => setSuprafata(e.target.value)}
           />
+          <p className="text-[11px] leading-snug text-neutral-500">
+            Nu știi suprafața exactă?{' '}
+            <Link href="/servicii/extras-de-carte-funciara/" className="font-semibold text-primary-600 hover:underline">
+              Află din extrasul CF →
+            </Link>
+          </p>
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="pc-unit">Unitate</Label>
@@ -70,6 +77,12 @@ export function PotCutCalculator() {
             value={pot}
             onChange={(e) => setPot(e.target.value)}
           />
+          <p className="text-[11px] leading-snug text-neutral-500">
+            Nu știi POT-ul?{' '}
+            <Link href="/servicii/certificat-urbanism-informare/" className="font-semibold text-primary-600 hover:underline">
+              Solicită certificat de urbanism →
+            </Link>
+          </p>
         </div>
       </div>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
@@ -84,7 +97,11 @@ export function PotCutCalculator() {
           />
         </div>
         <p className="self-end pb-1 text-xs text-neutral-500 sm:col-span-2">
-          POT și CUT sunt scrise în certificatul de urbanism pentru informare (sau în PUG/PUZ-ul zonei).
+          POT-ul și CUT-ul parcelei tale sunt scrise în{' '}
+          <Link href="/servicii/certificat-urbanism-informare/" className="font-semibold text-primary-600 hover:underline">
+            certificatul de urbanism pentru informare
+          </Link>{' '}
+          (sau în PUG/PUZ-ul zonei).
         </p>
       </div>
 
