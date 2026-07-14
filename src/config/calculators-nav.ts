@@ -44,6 +44,7 @@ import {
   Ruler,
   FileCheck,
   Hammer,
+  Euro,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -90,6 +91,7 @@ export const CALCULATORS_NAV: CalculatorNavGroup[] = [
       { name: 'Impozit auto', href: '/calculator/calculator-impozit-auto/', icon: Car, popular: true },
       { name: 'Penalități ANAF', href: '/calculator/penalitati-anaf/', icon: FileWarning },
       { name: 'Inflație', href: '/calculator/inflatie/', icon: TrendingUp },
+      { name: 'Curs valutar BNR', href: '/curs-valutar/', icon: Euro, popular: true },
     ],
   },
   {

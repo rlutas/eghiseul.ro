@@ -55,10 +55,14 @@ const DESC: Record<string, string> = {
   'cat-pot-construi': 'Teren + POT din certificatul de urbanism → câți mp poate ocupa construcția.',
   'valabilitate-documente': 'Cazier, extras CF, constatator — mai e valabil? Până când?',
   'cost-cadastru-intabulare': 'Taxă ANCPI exactă + interval onorariu topograf → total estimat.',
+  'curs-valutar': 'Curs BNR oficial azi: euro, dolar, liră — convertor + grafice de evoluție.',
 };
 
 function slugOf(href: string): string {
-  return href.split('/').filter(Boolean)[1] ?? '';
+  // Last path segment — handles both /calculator/<slug>/ and root-level tools
+  // like /curs-valutar/.
+  const parts = href.split('/').filter(Boolean);
+  return parts[parts.length - 1] ?? '';
 }
 
 interface CalcItem {
