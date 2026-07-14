@@ -625,6 +625,12 @@
 
 Features planned but not yet scheduled for a specific sprint.
 
+#### ⏭️ URMĂTORUL (programat 2026-07-15): Cookie consent banner (GDPR)
+
+Plan complet gata: `docs/plans/2026-07-14-cookie-consent-gdpr.md`. GA4 se încarcă azi FĂRĂ
+consimțământ = neconform. Self-built banner + Google Consent Mode v2 (~½ zi). Decizii Raul:
+categoria Marketing (conversii Ads?) + replicare CJO/cfunciara.
+
 #### ⏭️ URMĂTORUL (programat 2026-07-15): Audit paritate servicii imobiliare vs cfunciara.ro
 
 Cerință Raul (2026-07-14): verificăm TOATE serviciile fulfillment manual (imobiliare/topograf,
