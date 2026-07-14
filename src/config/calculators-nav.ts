@@ -41,6 +41,7 @@ import {
   CircleDollarSign,
   Accessibility,
   LandPlot,
+  Ruler,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -98,6 +99,7 @@ export const CALCULATORS_NAV: CalculatorNavGroup[] = [
       { name: 'Impozit pe chirie', href: '/calculator/impozit-chirie/', icon: Home },
       { name: 'Grad de îndatorare', href: '/calculator/grad-indatorare/', icon: Gauge },
       { name: 'Rambursare anticipată', href: '/calculator/rambursare-anticipata/', icon: PiggyBank },
+      { name: 'Cât pot construi (POT/CUT)', href: '/calculator/cat-pot-construi/', icon: Ruler, popular: true },
       { name: 'Jugăr & stânjen în mp', href: '/calculator/jugar-stanjen-in-mp/', icon: LandPlot, popular: true },
     ],
   },

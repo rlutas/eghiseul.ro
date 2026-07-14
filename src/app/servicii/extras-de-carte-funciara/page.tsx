@@ -387,6 +387,30 @@ export default async function ExtrasCarteFunciaraPage() {
           </div>
         </section>
 
+        {/* Build-intent upsell: land buyers checking the CF are often about to
+            build — route them to the POT/CUT calculator + certificat urbanism. */}
+        <section className="py-10 bg-white">
+          <div className="container mx-auto px-4 max-w-[1100px]">
+            <div className="rounded-2xl border border-primary-200 bg-primary-50 p-6 sm:p-8">
+              <h2 className="text-xl sm:text-2xl font-bold text-secondary-900 mb-2">
+                Vrei să construiești pe terenul tău?
+              </h2>
+              <p className="text-secondary-700 leading-relaxed">
+                Nu știi cât teren poți ocupa cu noua construcție? Introdu suprafața din acte și procentul
+                de ocupare (POT) din certificatul de urbanism în{' '}
+                <Link href="/calculator/cat-pot-construi/" className="font-semibold text-primary-700 underline hover:text-primary-800">
+                  calculatorul nostru
+                </Link>{' '}
+                și afli pe loc câți metri pătrați poate ocupa construcția. Nu ai certificatul de urbanism?{' '}
+                <Link href="/servicii/certificat-urbanism-informare/" className="font-semibold text-primary-700 underline hover:text-primary-800">
+                  Îl obținem noi de la primărie
+                </Link>{' '}
+                — cu POT, CUT, regim de înălțime și toate restricțiile terenului.
+              </p>
+            </div>
+          </div>
+        </section>
+
         {/* Property identifiers — targets "număr cadastral" cluster */}
         <section className="py-12 lg:py-20 bg-white">
           <div className="container mx-auto px-4 max-w-[1100px]">

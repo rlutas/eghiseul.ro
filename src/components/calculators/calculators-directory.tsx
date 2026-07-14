@@ -52,6 +52,7 @@ const DESC: Record<string, string> = {
   'calculator-data': 'Adună/scade zile la o dată sau diferența între două date.',
   'calculator-procente': 'X% dintr-o valoare, cât % reprezintă, variație procentuală.',
   'jugar-stanjen-in-mp': 'Jugăr, stânjen, falce, pogon → metri pătrați, ari și hectare.',
+  'cat-pot-construi': 'Teren + POT din certificatul de urbanism → câți mp poate ocupa construcția.',
 };
 
 function slugOf(href: string): string {

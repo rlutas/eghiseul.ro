@@ -63,6 +63,7 @@ const RELATED_BY_SLUG: Record<string, RelatedService[]> = {
   'rambursare-anticipata': [SVC.extrasCF, SVC.cazier],
   'grad-indatorare': [SVC.extrasCF, SVC.cazier],
   'jugar-stanjen-in-mp': [SVC.extrasCF, SVC.identificareImobil, SVC.copieCF],
+  'cat-pot-construi': [SVC.urbanism, SVC.extrasCF, SVC.identificareImobil],
   // Firmă & fiscal → constatator + cazier fiscal
   'taxe-srl': [SVC.constatator, SVC.cazierFiscal],
   'dividende': [SVC.constatator, SVC.cazierFiscal],

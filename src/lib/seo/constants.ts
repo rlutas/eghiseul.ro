@@ -156,6 +156,7 @@ export const HARDCODED_CALCULATOR_SLUGS: readonly string[] = [
   'estimare-pensie',
   'pensie-invaliditate',
   'jugar-stanjen-in-mp',
+  'cat-pot-construi',
 ];
 
 /** Tools pages (ported from WP /tools/*). */
@@ -186,6 +187,7 @@ export const HARDCODED_ARTICLE_SLUGS = [
   'valabilitate-extras-de-carte-funciara',
   'cele-4-tipuri-de-certificat-constatator-online',
   'totul-despre-cartea-funciara-colectiva',
+  'cat-poti-construi-pe-teren',
   'cazier-judiciar-vs-certificat-integritate-comportamentala',
   'importanta-extras-de-carte-funciara-colectiva',
   'extras-de-carte-funciara-pentru-casa-verde',
