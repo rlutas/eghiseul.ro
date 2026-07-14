@@ -25,7 +25,20 @@ Diferențiator vs competiție: calculatoarele POT/CUT existente (proiect-dtac, k
 ## Distribuție & indexare
 
 - **IndexNow**: cele 7 URL-uri noi trimise (200 OK) — acoperă Bing → ChatGPT search/Copilot.
-- **GSC Request indexing: DE FĂCUT MANUAL** (extensia Chrome nu s-a conectat în sesiune) — lista: cele 7 URL-uri din tabel.
+- **GSC Request indexing: DE FĂCUT MANUAL** (extensia Chrome nu s-a mai conectat în sesiune, deși a mers dimineața) — lista completă (9):
+  1. https://eghiseul.ro/calculator/jugar-stanjen-in-mp/
+  2. https://eghiseul.ro/calculator/cat-pot-construi/
+  3. https://eghiseul.ro/cat-poti-construi-pe-teren/
+  4. https://eghiseul.ro/calculator/cost-cadastru-intabulare/
+  5. https://eghiseul.ro/cat-costa-cadastrul-si-intabularea/
+  6. https://eghiseul.ro/calculator/valabilitate-documente/
+  7. https://eghiseul.ro/servicii/certificat-urbanism-informare/
+  8. https://eghiseul.ro/curs-valutar/ (era orfană — vezi mai jos)
+  9. https://eghiseul.ro/servicii/plan-amplasament-delimitare/ (Crawled-not-indexed în GSC)
+
+## Analiza GSC Coverage „Crawled — not indexed" (export 14.07, 379 URL-uri)
+
+**Sănătos.** 329 (87%) = chunks JS/CSS `_next/static` (normal, nu se indexează); ~40 = moloz WP vechi care moare corect (feed-uri RSS, arhive pe date, wp-json, variante gclid/utm). Real cu acțiune: **/curs-valutar/ era ORFANĂ** (în sitemap dar zero linkuri din navigație) → adăugată în mega-meniul Calculatoare (Fiscal & firmă, popular) + card în /calculator + IndexNow; **/servicii/plan-amplasament-delimitare/** neindexată → acum are link sitewide din footer (coloana nouă) + IndexNow. De urmărit fără acțiune: 2 pagini de locație (cazier/iași, CF/bistrița) — riscul cunoscut de thin content.
 - Footer sitewide: coloană nouă „Carte Funciară & Cadastru" (8 servicii topograf) = internal linking din toate paginile + ancoră „Certificat de Urbanism" nouă.
 - Homepage + /blog: ambele articole noi pe primele poziții (config/articles.ts).
 
