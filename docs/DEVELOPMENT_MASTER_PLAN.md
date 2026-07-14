@@ -625,6 +625,26 @@
 
 Features planned but not yet scheduled for a specific sprint.
 
+#### ⏭️ URMĂTORUL (programat 2026-07-15): Audit paritate servicii imobiliare vs cfunciara.ro
+
+Cerință Raul (2026-07-14): verificăm TOATE serviciile fulfillment manual (imobiliare/topograf,
+18 în DB acum) să fie ca pe cfunciara.ro — informație corectă, documentate complet, prețuri reale.
+
+Per serviciu, checklist:
+1. **Preț** — aliniate la cfunciara prin migrările 085/086/103 (bază×1,21 TVA, urgențe per doc);
+   auditul = RE-verificare azi vs cfunciara.ro (posibil drift între timp) la /admin/settings →
+   Servicii. Nou: certificat-urbanism-informare pus la 780 (oglindă cfunciara) — de confirmat.
+2. **Conținut/descriere** — comparat cu pagina echivalentă de pe cfunciara.ro (ce e documentul,
+   la ce folosește, acte necesare, termen); serviciile fără pagină dedicată /servicii/ statică
+   folosesc ruta dinamică — decis care primesc pagină SEO pe template-ul CF.
+3. **Termen afișat** — processing_config.estimated_days_display real (nu genericul „1-3 zile").
+4. **Taxele oficiale ANCPI** menționate pe pagină unde e cazul (referință: /admin/tarife-ancpi,
+   `src/lib/ancpi/tarife-oficiale.ts` — Ordin 16/2019, urgență 4×).
+5. **Fulfillment** — cine procesează (echipă vs colaborator Mircea via
+   collaborator_service_assignments); urbanism momentan nealocat.
+
+Context în `changelog/2026-07-14-convertor-teren-tarife-ancpi.md` (+ secțiunea 4, urbanism).
+
 #### SEO/GEO — Fronturile C+D din strategia post-cutover (2026-07-13)
 
 Fronturile A (indexare/tehnic) + B (striking distance) executate 2026-07-13 — vezi

@@ -173,6 +173,7 @@ The `employee` role has been replaced by specialized roles. See [Workflow Design
 | Users - Invitations | `/admin/users` (tab) | `users.manage` | Implemented |
 | Settings | `/admin/settings` | `settings.manage` | Implemented |
 | Invite Accept | `/admin/invite/accept` | Public (token-based) | Implemented |
+| Tarife ANCPI (referință Ordin 16/2019, taxe + urgență) | `/admin/tarife-ancpi` | `orders.view` | Implemented (2026-07-14; aceeași listă la `/colaborator/tarife`) |
 
 ---
 
@@ -213,6 +214,7 @@ The `employee` role has been replaced by specialized roles. See [Workflow Design
 | `/api/contracts/preview` | POST | Public (no auth) | Contract preview for wizard signature step |
 | `/api/admin/orders/[id]/request-reupload` | POST | `orders.manage` | „Solicită documente" — cerere multi-document de la client, auto-standby, email cu link. Spec: `technical/specs/document-request-system.md` |
 | `/api/reupload/[token]` | GET, POST | Public (token-gated) | Upload documente de către client (link single-use, 7 zile) |
+| `/api/admin/orders/[id]/ancpi-create-job` | POST | `orders.manage` | Job ANCPI manual (operatorul pune CF-ul găsit la identificare → workerul emite extrasul). Dropdown-uri județ/UAT din nomenclator; doar comenzi plătite; 409 dacă job există. Spec: `technical/specs/ancpi-automation-plan.md` §11 |
 
 ### Planned (Not Yet Built)
 
