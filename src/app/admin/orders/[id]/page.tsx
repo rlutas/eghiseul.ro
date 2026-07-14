@@ -1097,6 +1097,10 @@ export default function AdminOrderDetailPage() {
         <CancellationRequestedBanner order={order} onProcessed={refreshSilent} />
       )}
 
+      {/* Extra-payment banners (parity with CJO admin): pending link the
+          operator can re-share + green summary once the extra was paid. */}
+      <ExtraPaymentBanners order={order} />
+
       {/* Standby banner — shown when SLA is paused. Reminds operators that
           the deadline isn't ticking down. */}
       {order.status === 'standby' && (
@@ -2022,6 +2026,42 @@ export default function AdminOrderDetailPage() {
                   ) : (
                     <InfoRow label="Nr. factură Oblio" value="—" />
                   )}
+                  {/* Extra-charge invoices (Modify flow) — listed under the main
+                      invoice so the team sees the full fiscal picture. */}
+                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                  {(((order as any).extra_billing ?? []) as ExtraBillingEntry[]).map((eb, i) => (
+                    <div key={i} className="flex items-center justify-between gap-4 text-sm border-b border-border/60 py-1.5 last:border-b-0">
+                      <span className="text-muted-foreground">
+                        Factură extra{eb.amount ? ` (${Number(eb.amount).toFixed(2)} RON)` : ''}
+                      </span>
+                      <span className="text-right">
+                        {eb.invoice?.number ? (
+                          eb.invoice.link ? (
+                            <Link href={eb.invoice.link} target="_blank" rel="noopener noreferrer" className="font-mono text-primary hover:underline">
+                              {eb.invoice.seriesName}-{eb.invoice.number} ↗
+                            </Link>
+                          ) : (
+                            <span className="font-mono">{eb.invoice.seriesName}-{eb.invoice.number}</span>
+                          )
+                        ) : (
+                          <span className="text-xs font-semibold text-amber-600" title="Webhook-ul nu a reușit emiterea; cron-ul orar o emite automat.">
+                            ⚠️ neemisă — se emite automat
+                          </span>
+                        )}
+                        {eb.proforma?.number && (
+                          <span className="ml-2 text-xs text-neutral-400">
+                            {eb.proforma.link ? (
+                              <Link href={eb.proforma.link} target="_blank" rel="noopener noreferrer" className="hover:underline">
+                                proformă {eb.proforma.seriesName}-{eb.proforma.number} ↗
+                              </Link>
+                            ) : (
+                              <>proformă {eb.proforma.seriesName}-{eb.proforma.number}</>
+                            )}
+                          </span>
+                        )}
+                      </span>
+                    </div>
+                  ))}
                   {!billing && !personal && (
                     <p className="text-sm text-muted-foreground">Nicio informație de facturare.</p>
                   )}
@@ -2607,6 +2647,78 @@ function NoteEchipaCard({
 }
 
 // ---------- Cancellation Requested Banner ----------
+
+interface ExtraBillingEntry {
+  amount?: number;
+  paidAt?: string;
+  paymentIntentId?: string | null;
+  proforma?: { seriesName?: string; number?: string; link?: string | null } | null;
+  invoice?: { seriesName?: string; number?: string; link?: string | null } | null;
+}
+
+/** Extra-payment state banners (parity with the CJO admin order page):
+ *  amber "așteptăm plata" with a re-shareable link while the customer hasn't
+ *  paid the Modify-flow extra, green summary once it settled. */
+function ExtraPaymentBanners({ order }: { order: OrderDetail }) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const o = order as any;
+  const pendingUrl: string | null = o.pending_extra_payment_url ?? null;
+  const pendingAmount: number | null = o.pending_extra_payment_amount ?? null;
+  const additionalPaid: number = Number(o.additional_paid_amount ?? 0);
+  const email = (order.customer_data as AnyObj | null)?.contact as AnyObj | null;
+
+  if (!pendingUrl && additionalPaid <= 0) return null;
+
+  return (
+    <>
+      {additionalPaid > 0 && (
+        <div className="rounded-lg border-2 border-emerald-300 bg-emerald-50 p-4">
+          <p className="text-sm font-semibold text-emerald-900">
+            Plătit suplimentar: <span className="font-mono">{additionalPaid.toFixed(2)} RON</span>
+            <span className="ml-2 font-normal text-emerald-800">
+              · Total încasat:{' '}
+              <span className="font-mono">
+                {(Number(order.total_price ?? 0) + additionalPaid).toFixed(2)} RON
+              </span>
+            </span>
+          </p>
+          <p className="mt-1 text-xs text-emerald-800">
+            Factura pentru extra apare mai jos la „Facturare”, sub factura principală.
+          </p>
+        </div>
+      )}
+      {pendingUrl && (
+        <div className="rounded-lg border-2 border-amber-400 bg-amber-50 p-4">
+          <p className="text-sm font-semibold text-amber-900">
+            ⏳ Așteptăm plată extra{pendingAmount ? <>: <span className="font-mono">{Number(pendingAmount).toFixed(2)} RON</span></> : null}
+          </p>
+          <p className="mt-1 text-xs text-amber-800">
+            Linkul a fost trimis pe emailul clientului{email?.email ? ` (${String(email.email)})` : ''}. Dacă nu l-a
+            primit, copiază-l de aici:
+          </p>
+          <div className="mt-2 flex items-center gap-2">
+            <input
+              readOnly
+              value={pendingUrl}
+              onFocus={(e) => e.currentTarget.select()}
+              className="h-8 flex-1 rounded border border-amber-300 bg-white px-2 font-mono text-xs"
+            />
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => {
+                navigator.clipboard.writeText(pendingUrl);
+                toast.success('Link de plată copiat');
+              }}
+            >
+              Copiază
+            </Button>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
 
 function CancellationRequestedBanner({
   order,

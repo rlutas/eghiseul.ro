@@ -134,10 +134,68 @@ export async function POST(request: NextRequest) {
     console.error('[invoice-health-check] barou sweep failed:', err);
   }
 
+  // EXTRA-INVOICE SWEEP: paid extra charges whose fiscal invoice failed at the
+  // webhook (extra_billing entries with invoice:null — e.g. E-260714-WXGYQ,
+  // where only the proforma existed). Issues the invoice from the proforma and
+  // writes it back. Fail-soft per entry; 14-day lookback, capped per run.
+  let extraHealed = 0;
+  try {
+    const { data: withExtra } = await ordersTable
+      .select('id, friendly_order_id, order_number, customer_data, extra_billing')
+      .not('extra_billing', 'is', null)
+      .gte('updated_at', new Date(now - 14 * 24 * 60 * 60 * 1000).toISOString())
+      .limit(100);
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const needingHeal = ((withExtra ?? []) as any[]).filter((o) =>
+      Array.isArray(o.extra_billing) && o.extra_billing.some((e: { invoice?: unknown }) => !e.invoice)
+    );
+    if (needingHeal.length) {
+      const { createInvoiceFromProforma } = await import('@/lib/oblio/proforma');
+      for (const o of needingHeal.slice(0, 10)) {
+        const orderNum = (o.friendly_order_id ?? o.order_number ?? '') as string;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const entries = o.extra_billing as any[];
+        let changed = false;
+        for (let i = 0; i < entries.length; i++) {
+          if (entries[i].invoice) continue;
+          try {
+            const inv = await createInvoiceFromProforma({
+              orderNumber: orderNum,
+              amountRon: Number(entries[i].amount ?? 0),
+              description: `Servicii suplimentare comanda ${orderNum}`,
+              customerData: o.customer_data ?? {},
+              proforma: entries[i].proforma ?? { seriesName: '', number: '', link: null },
+              paymentIntentId: entries[i].paymentIntentId ?? null,
+            });
+            entries[i] = { ...entries[i], invoice: inv };
+            changed = true;
+            extraHealed++;
+            await ordersTable
+              .update({ extra_billing: entries })
+              .eq('id', o.id);
+            await (supabase.from('order_history') as ReturnType<typeof supabase.from>)
+              .insert({
+                order_id: o.id,
+                event_type: 'extra_invoice_issued',
+                notes: `Factură extra emisă de cron (webhook eșuase): ${inv.seriesName}-${inv.number} pentru ${Number(entries[i].amount ?? 0).toFixed(2)} RON`,
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              } as any);
+          } catch (err) {
+            console.error(`[invoice-health-check] extra-invoice heal failed for ${orderNum}[${i}]:`, err instanceof Error ? err.message : err);
+          }
+        }
+        if (changed) console.log(`[invoice-health-check] extra invoice(s) healed for ${orderNum}`);
+      }
+    }
+  } catch (err) {
+    console.error('[invoice-health-check] extra-invoice sweep failed:', err);
+  }
+
   if (affected.length === 0) {
     return NextResponse.json({
       success: true,
-      data: { affectedCount: 0, healedCount: 0, barouHealed, processedAt: new Date().toISOString() },
+      data: { affectedCount: 0, healedCount: 0, barouHealed, extraHealed, processedAt: new Date().toISOString() },
     });
   }
 
@@ -178,6 +236,7 @@ export async function POST(request: NextRequest) {
       affectedCount: affected.length,
       healedCount: healed.length,
       barouHealed,
+      extraHealed,
       healed,
       stillMissing: stillMissing.map((o) => ({
         id: o.id,
