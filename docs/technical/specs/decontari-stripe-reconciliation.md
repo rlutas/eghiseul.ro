@@ -83,3 +83,16 @@ Script de audit reutilizabil: scratchpad `audit_links.js` — de rulat după ori
 ### Serie unică EGH (decizie user, 14 iul)
 
 CJO emitea pe seria EGI2024 (moștenită din integrarea WP). Pentru decontări liniare, **ambele platforme emit de acum pe seria EGH**: `companies.oblio_series_name` = 'EGH' în DB-ul CJO (setat 14 iul prin REST; codul CJO citește DB-ul, nu env-ul). Istoric: EGI2024 = era WP + CJO până la 14 iul; EGH = eghiseul app + CJO app + emiteri manuale. Extra-ul RATSKA 307,80 fusese facturat MANUAL pe EGH-0016 (9 iul) — legat.
+
+## Faza 2 — Extras de cont BT (LIVE, 14 iul)
+
+**UI:** `/admin/decontari/banca` · **Migrarea 114** (`bank_statement_entries`, aplicată) · **Lib:** `src/lib/accounting/bank-statement.ts`
+
+- **Import CSV BT** („Lista de tranzacții" din BT24): parser cu antet + dedup referințe duplicate (BT refolosește Referinta pe leguri corelate)
+- **Categorii automate** (prima regulă câștigă; ordinea contează — POS-urile externe conțin „comision tranzacție 0.00" și trebuie prinse ÎNAINTEA regulii de comisioane): decontări Stripe · traduceri (Kenna Zwenna) · taxe ONRC (POS ONRC București) · taxe ANCPI (NETOPIA) · **furnizori externi** (POS în USD/EUR — Vercel/Google/Amazon; `needs_invoice=true` → alertă roșie „facturi de descărcat/listat pentru contabil, nu apar în SPV") · curierat · salarii · ANAF/Trezorerie · leasing/asigurări auto · combustibil · telecom · comisioane bancă · aport
+- **Match payout↔bancă**: credit Stripe cu sumă exactă ±3 zile → `stripe_payouts.bank_matched_at` + link din extras spre decontare. Iunie importat: 19/29 payouts confirmate în bancă (restul = iulie, vin cu extrasul următor)
+- Reguli noi de categorisire: se adaugă în `RULES` din `bank-statement.ts`
+
+## Verificare SPV (14 iul)
+
+`invoice/list?withEinvoiceStatus=1` — câmpul `einvoice` = link XML când e trimisă. **Toate cele 398 de facturi active (1 iun–14 iul, EGH 43 + EGI2024 355) sunt trimise în SPV, 0 netrimise.** Facturile furnizorilor STRĂINI (Vercel etc.) nu apar în SPV prin natura lor — de aia există alerta roșie din pagina de bancă.
