@@ -26,6 +26,8 @@ export interface ArticleLayoutProps {
   publishedLabel?: string;
   updatedLabel?: string;
   image?: string;
+  /** Descriptive alt for the featured image; falls back to the title. */
+  imageAlt?: string;
   relatedServices?: RelatedService[];
   faqs?: { q: string; a: string }[];
   children: React.ReactNode;
@@ -41,6 +43,7 @@ export function ArticleLayout({
   publishedLabel,
   updatedLabel,
   image,
+  imageAlt,
   relatedServices = [],
   faqs,
   children,
@@ -123,7 +126,7 @@ export function ArticleLayout({
             <div className="relative -mt-16 lg:-mt-24 mb-8 overflow-hidden rounded-2xl border border-neutral-200 shadow-lg aspect-[16/9] bg-neutral-100">
               <Image
                 src={featuredImage}
-                alt={title}
+                alt={imageAlt ?? title}
                 fill
                 className="object-cover"
                 sizes="(max-width: 768px) 100vw, 760px"

@@ -30,6 +30,7 @@ export default function Page() {
       dateModified={DATE_MODIFIED}
       publishedLabel="14 iulie 2026"
       updatedLabel="14 iulie 2026"
+      imageAlt="Teren delimitat cu țăruși și sfoară pentru amprenta viitoarei case, cu plan de situație și ruletă în prim-plan — calculul POT înainte de construire"
       relatedServices={[
         {
           slug: 'certificat-urbanism-informare',
