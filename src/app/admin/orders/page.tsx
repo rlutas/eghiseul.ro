@@ -146,8 +146,19 @@ export default function AdminOrdersPage() {
   const [totalCount, setTotalCount] = useState(0);
   const [counts, setCounts] = useState<OrdersCounts | null>(null);
   const [services, setServices] = useState<ServiceOption[]>([]);
-  // Local-only search input — debounced into the URL on Enter or blur.
+  // Local-only search input — live-debounced into the URL: filtrează singur
+  // de la 3 caractere (400ms după ce te oprești din tastat), fără Enter.
+  // Enter/blur rămân pentru căutări de 1-2 caractere și golire instantă.
   const [searchInput, setSearchInput] = useState(urlSearch);
+  useEffect(() => {
+    if (searchInput === urlSearch) return;
+    // sub 3 caractere nu căutăm live (prea multe rezultate); golirea completă
+    // resetează imediat prin blur/Enter sau după debounce
+    if (searchInput.length > 0 && searchInput.length < 3) return;
+    const t = setTimeout(() => updateParams({ search: searchInput }), 400);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchInput]);
   // Order previewed in the quick-view "Detalii" dialog (parity with sister).
   const [detailOrder, setDetailOrder] = useState<OrderRow | null>(null);
 
