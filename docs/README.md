@@ -41,6 +41,7 @@ Index al documentației. Aceasta e o **hartă**, nu un jurnal — pentru jurnalu
 - **Solicită documente (cerere de la client + standby):** [`technical/specs/document-request-system.md`](technical/specs/document-request-system.md)
 - **RBAC & permisiuni:** [`admin/rbac-permissions.md`](admin/rbac-permissions.md)
 - **Plăți & facturare:** [`technical/specs/stripe-oblio-payment-invoicing.md`](technical/specs/stripe-oblio-payment-invoicing.md)
+- **Webhook Resend (bounce → banner admin + alertă):** [`technical/specs/resend-bounce-webhook.md`](technical/specs/resend-bounce-webhook.md)
 - **ANCPI automation:** [`technical/specs/ancpi-automation-plan.md`](technical/specs/ancpi-automation-plan.md)
 - **Deploy:** [`deployment/VERCEL_DEPLOYMENT.md`](deployment/VERCEL_DEPLOYMENT.md)
 - **Email (Resend + Zoho) setup:** [`deployment/EMAIL_RESEND_ZOHO_SETUP.md`](deployment/EMAIL_RESEND_ZOHO_SETUP.md)

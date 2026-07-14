@@ -25,8 +25,10 @@
 | # | Task | De ce |
 |---|---|---|
 | 1 | ~~Webhook Resend `email.bounced`~~ **FĂCUT** (`/api/webhooks/resend`): verificare semnătură Svix → marchează comenzile clientului (`email_bounced_at` + `email_bounce_reason`, migrarea 111, aplicată) → **banner roșu în admin pe comandă** (lângă email) + alertă pe contact@ cu comenzile și telefonul clientului. FĂRĂ SMS (decizie user). Extins cu semnale pozitive (migrarea 112, aplicată): `email.delivered` → „✓ Email livrat" în admin și șterge flag-ul de bounce (adresa corectată funcționează); `email.opened` → „deschis de client (data)"; `email.failed` → tratat ca bounce. **Setup manual rămas:** Resend dashboard → Webhooks → endpoint `https://eghiseul.ro/api/webhooks/resend`, evenimente `email.bounced` + `email.complained` → secretul `whsec_...` în Vercel env ca `RESEND_WEBHOOK_SECRET` + redeploy. | Singura plasă pentru local-part greșit pe domeniu valid (cazul MG6MF) |
-| 2 | GSC: Request indexing rămas pe 4 URL-uri (istoric, 2 pagini servicii, homepage) | fiecare cerere ~1 min (test live Google) |
+| 2 | ~~GSC Request indexing~~ FĂCUT 14.07 pe: articol CF gratuit, articol istoric, pagina serviciu CF, pagina serviciu constatator. Homepage = cotă zilnică atinsă → de cerut mâine (opțional, e indexată oricum) | — |
 | 3 | DMARC: după 2-4 săpt de rapoarte pe contact@ → `p=quarantine` | protecție anti-spoofing reală |
 | 4 | ~~Clientul MG6MF~~ REZOLVAT — documentul trimis manual de Raul (14.07) | — |
 | 5 | Re-check poziții SERP CF/constatator (~27 iul) + validare review snippets în GSC | măsurare plan SEO |
 | 6 | OTS Agerpres „primul serviciu 100% automat 24/7" | decizie user (cost mic, slot SERP) |
+
+**Verificare finală 2026-07-14:** webhook testat end-to-end cu payload semnat (Svix) → 200, comanda E-260713-MG6MF marcată în DB (banner admin), alerta livrată pe contact@. Spec complet: [docs/technical/specs/resend-bounce-webhook.md](../technical/specs/resend-bounce-webhook.md).
