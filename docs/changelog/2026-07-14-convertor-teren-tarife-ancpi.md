@@ -31,6 +31,13 @@ Sursa: **Ordin ANCPI 16/2019** consolidat 26.07.2024 (citit din PDF integral). D
 Noi: `src/app/calculator/jugar-stanjen-in-mp/page.tsx`, `src/components/calculators/{unitati-teren-calculator,unitati-teren-data,calculators-directory}.tsx`, `src/lib/ancpi/tarife-oficiale.ts`, `src/components/admin/tarife-ancpi-table.tsx`, `src/app/admin/tarife-ancpi/page.tsx`, `src/app/colaborator/tarife/page.tsx`.
 Modificate: `calculator/page.tsx` (refactor thin shell), `calculators-nav.ts`, `calculator-layout.tsx` (related services), `seo/constants.ts` (sitemap), `admin/layout.tsx` + `colaborator/layout.tsx` (nav).
 
+## 4. Serviciu nou: Certificat de Urbanism pentru Informare (completare aceeași zi)
+
+- **Migrarea 116** (rulată): slug `certificat-urbanism-informare`, 780 lei, imobiliare, 30 zile (termen legal primărie), fără KYC, PropertyDataStep cu `identificationService.enabled` (comandă validă doar cu adresa; CF opțional). Paritate cu cfunciara.ro.
+- Pagină prin ruta dinamică `/servicii/certificat-urbanism-informare/` + wizard `/comanda/...` — ambele verificate 200; sitemap îl preia automat din DB.
+- Link-ul „Documente utile" de la calculatorul credit ipotecar mutat de pe cfunciara.ro pe pagina noastră internă.
+- De făcut: pagină SEO dedicată (design CF template), preț de confirmat cu echipa, cine îl procesează (echipă vs colaborator).
+
 ## Next (backlog discutat)
 
 - Articol „Cartea funciară veche: jugări, stânjeni, nr. topografic — ce faci cu ea" + interlinking convertor ↔ articol ↔ servicii.
