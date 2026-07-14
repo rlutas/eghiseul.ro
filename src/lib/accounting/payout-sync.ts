@@ -13,6 +13,9 @@
  *      E-/EJC- → eghiseul · CJO-/CAO-/CFO-/CIC-/EJC → per prefix
  *   3. otherwise 'necunoscut' (still listed — signal for manual action)
  *
+ * Env prerequisites: CJO_SUPABASE_URL/KEY (CJO enrichment) — set in Vercel
+ * production 2026-07-14 alongside OBLIO_PROFORMA_SERIES.
+ *
  * Amount units: everything here is BANI (Stripe native). eghiseul orders
  * store RON numerics; CJO stores bani — conversion happens at enrichment.
  */
