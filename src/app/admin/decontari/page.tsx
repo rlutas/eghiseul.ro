@@ -97,6 +97,9 @@ export default function DecontariPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
+          <Button asChild variant="outline" size="sm">
+            <Link href="/admin/decontari/banca">Extras bancă</Link>
+          </Button>
           <input
             type="month"
             value={month}
