@@ -73,22 +73,32 @@ export async function GET(req: NextRequest) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const supabase = createAdminClient() as any;
 
-  const [portalUp, hb] = await Promise.all([
+  const [portalUp, hb, outage] = await Promise.all([
     reachable(cfg.pingUrl),
     supabase.from('system_heartbeats').select('last_seen').eq('name', cfg.workerName).maybeSingle(),
+    // Open downtime window recorded from the WORKER's portal probe — the
+    // authoritative signal: the worker exercises the real login/order flow,
+    // while our Vercel-side ping can get a healthy-looking 302 from a CDN edge
+    // even when the portal is effectively down (incident 2026-07-14: badge
+    // showed "operațional" during a 14h ANCPI outage the admin page was
+    // correctly displaying from this very table).
+    supabase.from('platform_outages').select('cause, started_at').eq('provider', provider).is('ended_at', null).maybeSingle(),
   ]);
+
+  const openOutage = (outage?.data ?? null) as { cause?: string; started_at?: string } | null;
 
   // A confirmed maintenance window is a HARD "down" — it overrides the worker
   // heartbeat. (For a transient ping blip, the fresh heartbeat still vouches for
   // the portal, since the worker can only beat if it logged in.)
-  const maintenance = provider === 'ancpi' && !portalUp ? await ancpiInMaintenance() : false;
+  const maintenance =
+    openOutage?.cause === 'maintenance' ||
+    (provider === 'ancpi' && !portalUp ? await ancpiInMaintenance() : false);
 
   const lastSeen = hb?.data?.last_seen ? new Date(hb.data.last_seen).getTime() : 0;
   const workerUp = lastSeen > 0 && Date.now() - lastSeen < WORKER_STALE_MS;
-  // If the worker is issuing, it is logging into the portal — so the portal is
-  // reachable by definition. Avoids the contradictory "portal indisponibil +
-  // eliberare operațională" state — UNLESS we confirmed a maintenance window.
-  const portalReachable = !maintenance && (portalUp || workerUp);
+  // The worker heartbeat only proves the worker reaches OUR API, not the
+  // portal — an open outage window always wins over the optimistic signals.
+  const portalReachable = !openOutage && !maintenance && (portalUp || workerUp);
   // Issuance can only really work when the portal is reachable, even if the
   // worker process is alive — so reflect maintenance in the issuance badge too.
   const issuanceUp = workerUp && portalReachable;
@@ -102,6 +112,7 @@ export async function GET(req: NextRequest) {
         issuance: { up: issuanceUp, label: 'Eliberare automată' },
       },
       lastWorkerSeen: lastSeen ? new Date(lastSeen).toISOString() : null,
+      outageSince: openOutage?.started_at ?? null,
       updatedAt: new Date().toISOString(),
     },
     { headers: { 'Cache-Control': 'no-store' } }
