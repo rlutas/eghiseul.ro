@@ -17,6 +17,10 @@
  *   - events:   email.bounced, email.complained
  *   - copy the signing secret (whsec_...) → Vercel env RESEND_WEBHOOK_SECRET
  *
+ * NOTE: configure the Resend webhook URL WITH a trailing slash
+ * (https://eghiseul.ro/api/webhooks/resend/) — Next.js trailingSlash
+ * redirects POST /api/webhooks/resend with a 308 otherwise.
+ *
  * Signature: Resend signs with Svix (svix-id / svix-timestamp /
  * svix-signature headers, HMAC-SHA256 over "id.timestamp.body").
  */
