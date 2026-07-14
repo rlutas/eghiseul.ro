@@ -168,6 +168,8 @@ export function parseBtCsv(content: string): { account: string; entries: BankEnt
     }
 
     entries.push({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ...({ company: process.env.ACCOUNTING_COMPANY ?? 'EDIGITALIZARE' } as any),
       reference,
       account,
       tx_date: txDate,

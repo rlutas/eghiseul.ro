@@ -286,6 +286,7 @@ export async function syncPayouts(opts: { sinceDays?: number } = {}): Promise<Pa
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { error: pErr } = await (admin as any).from('stripe_payouts').upsert({
         id: payout.id,
+        company: process.env.ACCOUNTING_COMPANY ?? 'EDIGITALIZARE',
         amount_bani: payout.amount,
         currency: payout.currency,
         status: payout.status,
