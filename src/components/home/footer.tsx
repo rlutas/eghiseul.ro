@@ -95,10 +95,10 @@ export function Footer() {
     <footer className="bg-secondary-900 text-white">
       {/* Mega top */}
       <div className="container mx-auto px-4 py-12 lg:py-16 max-w-[1200px]">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-12 gap-8 lg:gap-10">
-          {/* Despre + plăți + contact (contactul stă sub brand ca să facă loc
-              celei de-a 4-a coloane de servicii: Carte Funciară & Cadastru) */}
-          <div className="col-span-2 md:col-span-3 lg:col-span-4 space-y-5">
+        {/* Brand + descriere + plăți — rând de sine stătător, pe toată lățimea,
+            ca serviciile + contactul să încapă în 5 coloane egale dedesubt. */}
+        <div className="mb-10 flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+          <div className="max-w-xl space-y-4">
             <Link href="/" className="flex items-center gap-2.5">
               <div className="w-10 h-10 bg-primary-500 rounded-xl flex items-center justify-center shadow-[0_4px_12px_rgba(236,185,95,0.3)]">
                 <span className="text-secondary-900 font-extrabold text-base">eG</span>
@@ -126,34 +126,14 @@ export function Footer() {
               />
             </div>
 
-            {/* Contact — compact, sub brand */}
-            <ul className="space-y-2.5 text-sm pt-1">
-              <li className="flex items-center gap-3">
-                <Send className="h-4 w-4 text-primary-500 flex-shrink-0" aria-hidden="true" />
-                <Link href="/contact/" className="text-white/80 hover:text-primary-500 transition-colors">Formular de contact</Link>
-              </li>
-              <li className="flex items-center gap-3">
-                <MessageCircle className="h-4 w-4 text-[#25D366] flex-shrink-0" aria-hidden="true" />
-                <a href={WHATSAPP} target="_blank" rel="nofollow noopener" className="text-white/80 hover:text-primary-500 transition-colors">WhatsApp (răspuns rapid)</a>
-              </li>
-              <li className="flex items-center gap-3">
-                <Phone className="h-4 w-4 text-primary-500 flex-shrink-0" aria-hidden="true" />
-                <a href="tel:+40757708181" className="text-white/80 hover:text-primary-500 transition-colors">+40 757 708 181</a>
-              </li>
-              <li className="flex items-center gap-3">
-                <Mail className="h-4 w-4 text-primary-500 flex-shrink-0" aria-hidden="true" />
-                <a href="mailto:contact@eghiseul.ro" className="text-white/80 hover:text-primary-500 transition-colors">contact@eghiseul.ro</a>
-              </li>
-              <li className="flex items-center gap-3">
-                <Clock className="h-4 w-4 text-primary-500 flex-shrink-0" aria-hidden="true" />
-                <span className="text-white/80">Luni - Vineri: 08:00 - 16:00</span>
-              </li>
-            </ul>
           </div>
+        </div>
+
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 lg:gap-10">
 
           {/* Servicii — categorizate */}
           {serviceGroups.map((group) => (
-            <div key={group.title} className="lg:col-span-2">
+            <div key={group.title}>
               <h3 className="text-white font-bold text-sm uppercase tracking-wide mb-4">{group.title}</h3>
               <ul className="space-y-2.5 text-sm">
                 {group.items.map((s) => (
@@ -178,6 +158,32 @@ export function Footer() {
             </div>
           ))}
 
+          {/* Contact — coloana a 5-a, după servicii */}
+          <div>
+            <h3 className="text-white font-bold text-sm uppercase tracking-wide mb-4">Contact</h3>
+            <ul className="space-y-2.5 text-sm">
+              <li className="flex items-center gap-3">
+                <Send className="h-4 w-4 text-primary-500 flex-shrink-0" aria-hidden="true" />
+                <Link href="/contact/" className="text-white/70 hover:text-primary-500 transition-colors">Formular de contact</Link>
+              </li>
+              <li className="flex items-center gap-3">
+                <MessageCircle className="h-4 w-4 text-[#25D366] flex-shrink-0" aria-hidden="true" />
+                <a href={WHATSAPP} target="_blank" rel="nofollow noopener" className="text-white/70 hover:text-primary-500 transition-colors">WhatsApp</a>
+              </li>
+              <li className="flex items-center gap-3">
+                <Phone className="h-4 w-4 text-primary-500 flex-shrink-0" aria-hidden="true" />
+                <a href="tel:+40757708181" className="text-white/70 hover:text-primary-500 transition-colors">+40 757 708 181</a>
+              </li>
+              <li className="flex items-center gap-3">
+                <Mail className="h-4 w-4 text-primary-500 flex-shrink-0" aria-hidden="true" />
+                <a href="mailto:contact@eghiseul.ro" className="text-white/70 hover:text-primary-500 transition-colors">contact@eghiseul.ro</a>
+              </li>
+              <li className="flex items-center gap-3">
+                <Clock className="h-4 w-4 text-primary-500 flex-shrink-0" aria-hidden="true" />
+                <span className="text-white/70">L-V: 08:00 - 16:00</span>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
 
