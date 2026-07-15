@@ -112,6 +112,10 @@ export default async function Page() {
           ))}
         </ul>
         <p>
+          Excepția acoperă <strong>toate variantele</strong> serviciilor de mai sus — la
+          certificatul constatator: de bază, IMM, insolvență, persoană fizică și cu istoric.
+        </p>
+        <p>
           De asemenea, comanda nu mai poate fi anulată online dacă a fost deja{' '}
           <strong>expediată</strong> sau <strong>finalizată</strong>, indiferent de momentul cererii.
         </p>
