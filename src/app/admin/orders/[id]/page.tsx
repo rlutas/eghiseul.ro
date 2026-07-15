@@ -845,24 +845,6 @@ export default function AdminOrderDetailPage() {
   const statusConfig = STATUS_CONFIG[status] || { label: status, variant: 'outline' as const };
   const customerName = getCustomerDisplayName(contact, personal, company, billing, isPJ);
 
-  // ── Copy Sheet 1/2 derivations (lawyer's manual Google Sheets register) ──
-  // Price = service base + urgency tier only (NEVER the full total — the team
-  // uses this column to spot urgent orders), same rule as the sister project.
-  const sheetPrice = (() => {
-    const base = Number(order.base_price ?? order.services?.base_price ?? 0);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const opts = (order.selected_options as any[] | null) || [];
-    const urgent = opts.find((o) => o?.code === 'urgenta' && !o?.bundledFor);
-    return Math.round(base + (urgent ? Number(urgent.price) || 0 : 0));
-  })();
-  const sheetServiceLabel = order.services?.name ? stripEntitySuffix(order.services.name) : 'Serviciu';
-  const sheetInstitution = (() => {
-    const slug = order.services?.slug || '';
-    if (slug.startsWith('cazier-fiscal')) return 'ANAF SATU MARE';
-    if (slug.startsWith('cazier-') || slug.startsWith('certificat-integritate')) return 'IPJ SATU MARE';
-    if (/nastere|casatorie|celibat|multilingv/.test(slug)) return 'STARE CIVILĂ (PRIMĂRIE)';
-    return '-';
-  })();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const sheetMotiv = (() => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -1402,55 +1384,15 @@ export default function AdminOrderDetailPage() {
         {/* LEFT column — contact info on top, personal/company data below */}
         <div className="space-y-4">
         {/* Informatii Client — contact + date personale într-un singur card
-            (paritate cazierjudiciaronline), cu Copy Sheet 1/2 sub titlu. */}
+            (paritate cazierjudiciaronline). Butoanele Copy Sheet 1/2 au fost
+            scoase (15.07.2026): registrul avocatei nu se mai ține în Google
+            Sheets — registrul central din /admin/registru e evidența oficială. */}
         <Card>
           <CardHeader className="pb-3 space-y-2">
             <CardTitle className="text-base flex items-center gap-2">
               <User className="h-4 w-4" />
               Informatii Client
             </CardTitle>
-            <div className="flex gap-1.5">
-              <Button
-                variant="outline"
-                size="sm"
-                className="h-7 gap-1.5 text-xs"
-                title="Sheet 1 (clienți) — D:Nume E:Email F:CNP/CUI G:Serviciu H:Link I:Preț"
-                onClick={async () => {
-                  const idCode = isPJ
-                    ? String(company?.cui || billing?.cui || '').replace(/^RO/i, '')
-                    : String(personal?.cnp || billing?.cnp || '');
-                  const link = `${typeof window !== 'undefined' ? window.location.origin : 'https://eghiseul.ro'}/admin/orders/${order.id}`;
-                  const row = [customerName, contact?.email || '', idCode, sheetServiceLabel, link, sheetPrice].join('\t');
-                  try {
-                    await navigator.clipboard.writeText(row);
-                    toast.success('Sheet 1 copiat — paste în coloana D');
-                  } catch {
-                    toast.error('Nu am putut copia.');
-                  }
-                }}
-              >
-                <Copy className="h-3.5 w-3.5" />
-                Copy Sheet 1
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                className="h-7 gap-1.5 text-xs"
-                title="Sheet 2 (instituții) — D:Nume E:Email F:Preț G:Serviciu H:- I:Instituție J:Motiv"
-                onClick={async () => {
-                  const row = [customerName, contact?.email || '', sheetPrice, sheetServiceLabel, '-', sheetInstitution, sheetMotiv].join('\t');
-                  try {
-                    await navigator.clipboard.writeText(row);
-                    toast.success('Sheet 2 copiat — paste în coloana D');
-                  } catch {
-                    toast.error('Nu am putut copia.');
-                  }
-                }}
-              >
-                <Copy className="h-3.5 w-3.5" />
-                Copy Sheet 2
-              </Button>
-            </div>
           </CardHeader>
           <CardContent className="space-y-3">
             {/* Constatator pe firmă: subiectul comenzii e FIRMA căutată —
