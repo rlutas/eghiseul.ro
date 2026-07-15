@@ -353,6 +353,7 @@ export async function GET(request: NextRequest) {
         })),
         // Fiscal invoices for extra payments (admin Modify flow) — shown next
         // to the main invoice so the client sees the full billing picture.
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         extraInvoices: (Array.isArray((order as any).extra_billing) ? (order as any).extra_billing : [])
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           .filter((e: any) => e?.invoice?.number)
