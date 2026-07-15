@@ -191,6 +191,7 @@ export const HARDCODED_ARTICLE_SLUGS = [
   'totul-despre-cartea-funciara-colectiva',
   'cat-poti-construi-pe-teren',
   'cat-costa-cadastrul-si-intabularea',
+  'ancpi-nu-functioneaza',
   'cazier-judiciar-vs-certificat-integritate-comportamentala',
   'importanta-extras-de-carte-funciara-colectiva',
   'extras-de-carte-funciara-pentru-casa-verde',

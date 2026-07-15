@@ -19,6 +19,12 @@ export interface ArticleMeta {
 
 export const ARTICLES: ArticleMeta[] = [
   {
+    slug: 'ancpi-nu-functioneaza',
+    title: 'ANCPI Nu Funcționează: cădere națională a sistemelor (13–20 iulie 2026)',
+    excerpt: 'Sistemele ANCPI sunt picate în toată țara din 13 iulie; estimare oficială de revenire: 20 iulie. Ce înseamnă pentru extrase CF și tranzacții + ce se întâmplă cu comenzile.',
+    category: 'Cadastru & imobiliare',
+  },
+  {
     slug: 'cat-costa-cadastrul-si-intabularea',
     title: 'Cât Costă Cadastrul și Intabularea în 2026? Prețuri reale + acte necesare',
     excerpt: 'Apartament 820–1.220 lei, casă cu teren 1.520–2.620 lei, intabulare după cumpărare 0,15% din preț. Taxele ANCPI exacte, actele pe scenarii + checklist descărcabil.',
