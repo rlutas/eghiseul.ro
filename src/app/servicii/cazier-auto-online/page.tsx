@@ -4,7 +4,6 @@ import Image from 'next/image';
 import { createPublicClient } from '@/lib/supabase/public';
 import { Badge } from '@/components/ui/badge';
 import { ServiceOptionsSection } from '@/components/services/service-options-section';
-import { Card, CardContent } from '@/components/ui/card';
 import {
   Clock,
   Shield,
@@ -12,14 +11,15 @@ import {
   CheckCircle,
   ChevronRight,
   Car,
-  Search,
   Mail,
   Gauge,
-  Users,
   AlertTriangle,
-  ShoppingCart,
-  Banknote,
-  Tag,
+  Ban,
+  FileText,
+  Truck,
+  Briefcase,
+  Globe,
+  Camera,
   Info,
 } from 'lucide-react';
 import { Service, ServiceOption, formatEstimatedDays, formatUrgentDays } from '@/types/services';
@@ -38,12 +38,12 @@ import { ServicePrice } from '@/components/services/service-price';
 const SERVICE_SLUG = 'cazier-auto';
 const PAGE_PATH = '/servicii/cazier-auto-online/';
 const SCHEMA_SLUG = 'cazier-auto-online';
-const TITLE = 'Cazier Auto Online — Istoric Vehicul, 198 RON';
+const TITLE = 'Cazier Auto Online — Istoricul Sancțiunilor Rutiere, fără Drumuri';
 const DESCRIPTION =
-  'Verifică istoricul oricărei mașini după numărul de înmatriculare sau VIN: ' +
-  'accidente, daune, kilometraj real și proprietari. 198 RON, raport pe email.';
+  'Obții cazierul auto (fișa de evidență a conducătorului auto) online: sancțiuni rutiere, ' +
+  'puncte de penalizare, suspendări. Necesar pentru atestat profesional și angajare ca șofer.';
 const DATE_PUBLISHED = '2026-06-14';
-const DATE_MODIFIED = '2026-06-14';
+const DATE_MODIFIED = '2026-07-15';
 
 export const revalidate = 3600;
 
@@ -80,9 +80,9 @@ const jsonLdGraph = buildServicePageGraph({
   slug: SCHEMA_SLUG,
   name: 'Cazier Auto Online',
   description:
-    'Serviciu de obținere a istoricului complet al unui vehicul (cazier auto): accidente, daune, ' +
-    'kilometraj real, proprietari anteriori și verificări de furt, leasing sau gajuri. Procesare ' +
-    '100% online, livrare rapidă pe email.',
+    'Serviciu de obținere a cazierului auto (fișa de evidență a conducătorului auto), eliberat de ' +
+    'Poliția Rutieră: istoricul sancțiunilor rutiere, punctele de penalizare active și suspendările ' +
+    'permisului de conducere. Procesare 100% online prin avocat, livrare PDF pe email.',
   serviceType: 'Document Processing — Auto',
   datePublished: DATE_PUBLISHED,
   dateModified: DATE_MODIFIED,
@@ -97,7 +97,7 @@ const jsonLdGraph = buildServicePageGraph({
     { name: 'Cazier Auto', url: `${BASE_URL}${PAGE_PATH}` },
   ],
   offers: [
-    { name: 'Cazier Auto (Standard)', price: 198, url: `${BASE_URL}${PAGE_PATH}` },
+    { name: 'Cazier Auto — Fișa Conducătorului Auto (Standard)', price: 198, url: `${BASE_URL}${PAGE_PATH}` },
   ],
   aggregateRating: { ratingValue: 4.9, reviewCount: 450 },
 });
@@ -108,19 +108,19 @@ export default async function CazierAutoOnlinePage() {
 
   const { service, options } = data;
 
-  // What you verify with a vehicle history report
+  // What the driver record (fișa conducătorului auto) contains
   const checks = [
-    { icon: AlertTriangle, title: 'Accidente & daune', desc: 'Istoric de accidente, daune totale și reparații majore raportate.' },
-    { icon: Gauge, title: 'Kilometraj real', desc: 'Verifică kilometrajul declarat și depistează frauda de km (rulaj dat înapoi).' },
-    { icon: Users, title: 'Proprietari anteriori', desc: 'Numărul și succesiunea proprietarilor de-a lungul timpului.' },
-    { icon: Shield, title: 'Furt, leasing & gajuri', desc: 'Status de furt, contracte de leasing active sau gajuri și sarcini.' },
+    { icon: AlertTriangle, title: 'Sancțiuni rutiere', desc: 'Amenzile și contravențiile rutiere înregistrate pe numele tău la Poliția Rutieră.' },
+    { icon: Gauge, title: 'Puncte de penalizare active', desc: 'Punctele de penalizare în vigoare la data eliberării documentului.' },
+    { icon: Ban, title: 'Suspendări ale permisului', desc: 'Perioadele în care exercitarea dreptului de a conduce a fost suspendată.' },
+    { icon: FileText, title: 'Mențiuni despre abateri', desc: 'Mențiunile înregistrate în evidența conducătorilor auto despre abaterile constatate.' },
   ];
 
   const useCases = [
-    { icon: ShoppingCart, title: 'Cumperi mașină second-hand', items: ['Verificare înainte de ofertă', 'Confirmi declarațiile vânzătorului', 'Eviți capcanele'] },
-    { icon: Banknote, title: 'Verifici înainte de plată', items: ['Înainte de avans', 'Înainte de transfer', 'Negociere informată'] },
-    { icon: Shield, title: 'Evaluare asigurare', items: ['Istoric daune', 'Risc real', 'Dosar complet'] },
-    { icon: Tag, title: 'Vânzare transparentă', items: ['Dovedești istoricul curat', 'Crești încrederea', 'Vinzi mai repede'] },
+    { icon: Truck, title: 'Atestat profesional', items: ['Taxi, transport marfă sau persoane', 'Document obligatoriu la dosar', 'Cerut de ARR și angajatori'] },
+    { icon: Briefcase, title: 'Angajare ca șofer', items: ['Firme de transport', 'Platforme de ride-sharing', 'Dovedești istoricul la volan'] },
+    { icon: Gauge, title: 'Verifici punctele proprii', items: ['Afli punctele active', 'Vezi sancțiunile înregistrate', 'Fără drum la poliție'] },
+    { icon: Globe, title: 'Permis din străinătate', items: ['Atestă faptele din România', 'Pentru instituții străine', 'Termen de procesare mai lung'] },
   ];
 
   return (
@@ -166,14 +166,14 @@ export default async function CazierAutoOnlinePage() {
                     </Badge>
                   )}
                   <Badge variant="outline" className="text-white/80 border-white/30 px-3 py-1">
-                    <Search className="h-3.5 w-3.5 mr-1" aria-hidden="true" />
-                    Istoric Vehicul
+                    <FileText className="h-3.5 w-3.5 mr-1" aria-hidden="true" />
+                    Fișa Conducătorului Auto
                   </Badge>
                 </div>
 
                 <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-tight mb-5">
                   Cazier Auto Online
-                  <span className="block text-primary-500">Istoric Complet Vehicul</span>
+                  <span className="block text-primary-500">Istoricul Sancțiunilor Rutiere</span>
                 </h1>
 
                 <p className="text-lg sm:text-xl text-white/85 leading-relaxed mb-6">
@@ -182,16 +182,17 @@ export default async function CazierAutoOnlinePage() {
 
                 <div className="bg-white/10 backdrop-blur-sm rounded-xl p-5 border border-white/20 mb-6">
                   <p className="text-white/90 leading-relaxed text-sm sm:text-base">
-                    <strong className="text-primary-500">Cazierul auto</strong> îți arată istoricul real al unei
-                    mașini înainte să o cumperi. Îl obții rapid de la noi, cu un avocat colaborator înscris în
-                    Barou care coordonează procedura legală în numele tău:
+                    <strong className="text-primary-500">Cazierul auto</strong> — fișa de evidență a
+                    conducătorului auto — arată istoricul tău la volan: amenzi, puncte de penalizare,
+                    suspendări ale permisului. Îl obținem de la Poliția Rutieră prin avocatul nostru
+                    colaborator înscris în Barou, care depune cererea în numele tău:
                   </p>
                   <ul className="mt-3 space-y-1.5 text-white/85 text-sm">
                     {[
-                      'Introduci numărul de înmatriculare sau seria de șasiu (VIN)',
-                      'Verificăm bazele de date cu istoricul vehiculului',
+                      'Completezi formularul cu numărul permisului de conducere',
+                      'Încarci actul de identitate, permisul și un selfie cu actul',
                       'Plătești securizat, fără taxe ascunse',
-                      `Primești raportul pe email în ${formatEstimatedDays(service)}`,
+                      `Primești documentul PDF pe email în ${formatEstimatedDays(service)}`,
                     ].map((step) => (
                       <li key={step} className="flex items-center gap-2">
                         <CheckCircle className="w-4 h-4 text-primary-500 flex-shrink-0" aria-hidden="true" />
@@ -208,7 +209,7 @@ export default async function CazierAutoOnlinePage() {
                   <div className="relative bg-gradient-to-br from-secondary-900 via-secondary-800 to-[#0C1A2F] p-6 text-center">
                     <div className="relative">
                       <span className="inline-block px-3 py-1 bg-primary-500 text-secondary-900 text-xs font-bold rounded-full mb-3">
-                        ISTORIC COMPLET
+                        FIȘA CONDUCĂTORULUI AUTO
                       </span>
                       <ServicePrice basePrice={service.base_price} />
                       <p className="text-white/60 text-sm mt-2">Fără taxe ascunse</p>
@@ -222,7 +223,7 @@ export default async function CazierAutoOnlinePage() {
                       </div>
                       <div>
                         <p className="font-semibold text-secondary-900 text-sm">Livrare în {formatEstimatedDays(service)}</p>
-                        <p className="text-xs text-neutral-500">Rapid pe email</p>
+                        <p className="text-xs text-neutral-500">Procesare prin avocat</p>
                       </div>
                     </div>
 
@@ -243,7 +244,7 @@ export default async function CazierAutoOnlinePage() {
                       </div>
                       <div>
                         <p className="font-semibold text-secondary-900 text-sm">Livrare pe Email</p>
-                        <p className="text-xs text-neutral-500">Raport PDF complet</p>
+                        <p className="text-xs text-neutral-500">PDF + opțional curier</p>
                       </div>
                     </div>
 
@@ -256,7 +257,7 @@ export default async function CazierAutoOnlinePage() {
                       </div>
                       <div className="flex items-center gap-1 text-neutral-500">
                         <CheckCircle className="h-4 w-4" aria-hidden="true" />
-                        <span className="text-xs">Raport detaliat</span>
+                        <span className="text-xs">Eliberat de Poliția Rutieră</span>
                       </div>
                     </div>
 
@@ -273,9 +274,9 @@ export default async function CazierAutoOnlinePage() {
           <div className="container mx-auto px-4 max-w-[1100px] py-6 lg:py-8">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
               {[
-                { icon: Car, value: 'Istoric complet', label: 'Verificare vehicul' },
+                { icon: FileText, value: 'Fișa șoferului', label: 'Sancțiuni și puncte' },
                 { icon: Clock, value: formatEstimatedDays(service), label: 'Livrare estimată' },
-                { icon: Mail, value: 'Pe email', label: 'Raport PDF complet' },
+                { icon: Mail, value: 'Pe email', label: 'PDF + opțional curier' },
                 { icon: CheckCircle, value: '4.9/5', label: 'Peste 450 recenzii' },
               ].map((t) => (
                 <div key={t.label} className="flex flex-col items-center gap-1.5">
@@ -298,48 +299,54 @@ export default async function CazierAutoOnlinePage() {
             </h2>
             <div className="space-y-4 text-neutral-700 leading-relaxed">
               <p>
-                <strong>Cazierul auto</strong> (sau „istoricul auto”) este un raport care adună tot ce s-a întâmplat
-                cu un vehicul de-a lungul timpului: <strong>accidente și daune</strong>, evoluția
-                <strong> kilometrajului</strong>, numărul de <strong>proprietari anteriori</strong> și eventuale
-                probleme juridice precum furt, leasing sau gajuri. Pe scurt, îți arată adevăratul istoric al unei
-                mașini, dincolo de ce spune vânzătorul.
+                <strong>Cazierul auto</strong> este denumirea uzuală pentru <strong>fișa de evidență a
+                conducătorului auto</strong>, document eliberat de <strong>Poliția Rutieră</strong> despre
+                șofer, nu despre mașină. El adună istoricul tău rutier: <strong>amenzile</strong> și
+                contravențiile înregistrate, <strong>punctele de penalizare</strong> active și
+                eventualele <strong>suspendări ale permisului</strong> de conducere.
               </p>
               <p>
-                Prin eGhișeul obții <strong>cazierul auto online</strong>, fără drumuri și fără cont. Ai nevoie doar
-                de <strong>numărul de înmatriculare</strong> sau de <strong>seria de șasiu (VIN)</strong>. Verificăm
-                bazele de date relevante și îți trimitem raportul complet pe email, ca să poți decide în cunoștință
-                de cauză înainte de a cumpăra o mașină second-hand.
+                Prin eGhișeul obții <strong>cazierul auto online</strong>, fără drum la poliție și fără cont.
+                Ai nevoie doar de <strong>permisul de conducere</strong> (numărul permisului), actul de
+                identitate și un selfie cu actul. Avocatul nostru colaborator depune cererea la Poliția
+                Rutieră în numele tău, iar tu primești documentul PDF pe email — cu livrare opțională
+                și prin curier.
               </p>
               <div className="rounded-2xl border border-neutral-200 bg-white p-5">
                 <h3 className="font-bold text-secondary-900 mb-2 flex items-center gap-2">
                   <Info className="w-5 h-5 text-primary-600 flex-shrink-0" aria-hidden="true" />
-                  Cazier auto (vehicul) vs. cazier rutier / cazier permis auto (șofer)
+                  Cazier auto (șofer) vs. istoricul vehiculului (mașină)
                 </h3>
                 <p className="text-sm text-neutral-700">
-                  Acest serviciu este <strong>cazierul vehiculului</strong> — istoricul mașinii (accidente, km,
-                  proprietari). El este diferit de <strong>cazierul rutier</strong> (numit și „cazier permis auto”),
-                  care este <strong>cazierul șoferului</strong>: punctele de penalizare, sancțiunile și abaterile
-                  înregistrate la <strong>DRPCIV / Poliția Rutieră</strong> pe numele unei persoane. Dacă vrei
-                  istoricul unei <em>mașini</em>, ești în locul potrivit. Dacă vrei situația de pe
-                  <em> permisul tău de conducere</em>, acela este un alt document, obținut de la autoritățile rutiere.
+                  Acest serviciu este <strong>cazierul conducătorului auto</strong> — situația ta de șofer
+                  (sancțiuni, puncte de penalizare, suspendări). Unii caută sub același nume
+                  <strong> istoricul vehiculului</strong> — un raport despre o <em>mașină</em> (accidente,
+                  daune, rulaj), obținut după numărul de înmatriculare sau seria de șasiu. Acela
+                  este un alt tip de verificare, pe care <strong>nu îl oferim</strong>. Iar pentru
+                  infracțiuni există <strong>cazierul judiciar</strong>, un document separat — îl poți
+                  comanda la{' '}
+                  <Link href="/servicii/cazier-judiciar-online/" className="text-primary-600 font-semibold hover:underline">
+                    cazier judiciar online
+                  </Link>
+                  .
                 </p>
               </div>
             </div>
           </div>
         </section>
 
-        {/* What you verify — feature cards */}
+        {/* What the document contains — feature cards */}
         <section className="py-12 lg:py-20 bg-white">
           <div className="container mx-auto px-4 max-w-[1100px]">
             <div className="text-center mb-10">
               <span className="inline-block px-4 py-1.5 bg-primary-100 text-primary-700 text-sm font-semibold rounded-full mb-4">
-                Ce verifici
+                Ce conține
               </span>
               <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-3">
-                Ce verifici cu cazierul auto
+                Ce conține cazierul auto
               </h2>
               <p className="text-neutral-600 max-w-2xl mx-auto">
-                Raportul îți arată într-un singur loc datele care contează cel mai mult la o mașină second-hand.
+                Fișa de evidență arată, într-un singur document, situația ta ca șofer în evidențele Poliției Rutiere.
               </p>
             </div>
 
@@ -358,8 +365,12 @@ export default async function CazierAutoOnlinePage() {
             <div className="mt-6 p-5 bg-primary-50 rounded-2xl border border-primary-200 max-w-3xl mx-auto flex items-start gap-3">
               <Gauge className="w-5 h-5 text-primary-600 flex-shrink-0 mt-0.5" aria-hidden="true" />
               <p className="text-sm text-secondary-700">
-                <strong>Frauda de kilometraj</strong> este una dintre cele mai frecvente capcane la mașinile
-                second-hand. Cazierul auto compară kilometrajul raportat în timp și semnalează inconsistențele.
+                <strong>Punctele de penalizare</strong> se anulează la 6 luni de la data constatării, așa că
+                fișa arată doar punctele active la data eliberării. Ai primit recent o amendă? Vezi{' '}
+                <Link href="/calculator/amenda-circulatie/" className="text-primary-600 font-semibold hover:underline">
+                  calculatorul de amenzi rutiere
+                </Link>{' '}
+                ca să afli cât ai de plată și câte puncte primești.
               </p>
             </div>
           </div>
@@ -416,10 +427,10 @@ export default async function CazierAutoOnlinePage() {
             <div className="relative grid sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-6">
               <div className="hidden lg:block absolute top-8 left-[12.5%] right-[12.5%] h-0.5 bg-gradient-to-r from-primary-500/0 via-primary-500/50 to-primary-500/0" aria-hidden="true" />
               {[
-                { step: 1, title: 'Introduci Datele Mașinii', desc: 'Completezi numărul de înmatriculare sau seria de șasiu (VIN).', icon: Car },
-                { step: 2, title: 'Verificăm Bazele de Date', desc: 'Interogăm sursele cu istoricul vehiculului și consolidăm raportul.', icon: Search },
+                { step: 1, title: 'Completezi Formularul', desc: 'Introduci datele tale personale și numărul permisului de conducere.', icon: FileText },
+                { step: 2, title: 'Încarci Actele', desc: 'Actul de identitate, permisul de conducere și un selfie cu actul în mână.', icon: Camera },
                 { step: 3, title: 'Plătești Securizat', desc: 'Card, Apple Pay sau Google Pay — fără taxe ascunse.', icon: Shield },
-                { step: 4, title: 'Primești Raportul', desc: `În ${formatEstimatedDays(service)} primești raportul complet pe email.`, icon: CheckCircle },
+                { step: 4, title: 'Primești Documentul', desc: `În ${formatEstimatedDays(service)} primești cazierul auto în PDF, pe email.`, icon: CheckCircle },
               ].map((item) => (
                 <div key={item.step} className="relative text-center">
                   <div className="relative z-10 mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-400 to-primary-600 text-secondary-900 shadow-[0_8px_24px_rgba(236,185,95,0.35)]">
@@ -434,7 +445,7 @@ export default async function CazierAutoOnlinePage() {
           </div>
         </section>
 
-        {/* Specimen — what the report looks like */}
+        {/* Specimen — what the document looks like */}
         <section className="py-12 lg:py-20 bg-white">
           <div className="container mx-auto px-4 max-w-[1200px]">
             <div className="text-center mb-12">
@@ -442,11 +453,11 @@ export default async function CazierAutoOnlinePage() {
                 Specimen
               </span>
               <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-3">
-                Cum Arată Raportul de Cazier Auto — Specimen
+                Cum Arată Cazierul Auto — Specimen
               </h2>
               <p className="text-neutral-600 max-w-2xl mx-auto">
-                Raportul pe care îl primești adună într-un singur document istoricul vehiculului — accidente,
-                kilometraj, proprietari și status juridic — gata de citit înainte de o achiziție.
+                Fișa de evidență a conducătorului auto, eliberată de Poliția Rutieră: sancțiunile rutiere,
+                punctele de penalizare active și suspendările permisului, într-un singur document.
               </p>
             </div>
 
@@ -457,7 +468,7 @@ export default async function CazierAutoOnlinePage() {
                 <div className="relative bg-white rounded-2xl p-3 ring-1 ring-neutral-200 shadow-[0_20px_50px_rgba(6,16,31,0.16)]">
                   <Image
                     src="/images/specimens/cazier-auto.png"
-                    alt="Specimen cazier auto — exemplu raport oficial cu date anonimizate"
+                    alt="Specimen cazier auto — fișa de evidență a conducătorului auto, date anonimizate"
                     width={1000}
                     height={1414}
                     className="w-full h-auto rounded-lg"
@@ -470,21 +481,21 @@ export default async function CazierAutoOnlinePage() {
                 </div>
               </div>
 
-              {/* What the report gives you */}
+              {/* What the document gives you */}
               <div>
                 <h3 className="text-xl lg:text-2xl font-bold text-secondary-900 mb-3">
-                  Un raport complet, ușor de citit
+                  Documentul de la Poliția Rutieră, la tine pe email
                 </h3>
                 <p className="text-neutral-600 leading-relaxed mb-6">
-                  Primești <strong>raportul PDF complet pe email</strong>, fără drumuri și fără cont — cu istoricul
-                  vehiculului consolidat din bazele de date verificate.
+                  Primești <strong>documentul PDF pe email</strong>, fără drumuri și fără cont — obținut de la
+                  Poliția Rutieră prin avocatul nostru colaborator, pe baza permisului tău de conducere.
                 </p>
                 <ul className="space-y-4">
                   {[
-                    { icon: AlertTriangle, title: 'Istoric de accidente și daune', desc: 'Evenimentele și reparațiile majore raportate de-a lungul timpului.' },
-                    { icon: Gauge, title: 'Kilometraj raportat în timp', desc: 'Evoluția kilometrajului, cu semnalarea inconsistențelor și a fraudei de km.' },
-                    { icon: Users, title: 'Proprietari și status juridic', desc: 'Numărul de proprietari anteriori și verificări de furt, leasing sau gajuri.' },
-                    { icon: Mail, title: 'Livrat pe email, în PDF', desc: 'Gata de printat sau trimis mai departe, fără deplasare și fără cont.' },
+                    { icon: AlertTriangle, title: 'Sancțiunile rutiere înregistrate', desc: 'Amenzile și contravențiile de pe numele tău, așa cum apar în evidențe.' },
+                    { icon: Gauge, title: 'Punctele de penalizare active', desc: 'Punctele în vigoare la data eliberării — cele mai vechi de 6 luni nu mai apar.' },
+                    { icon: Ban, title: 'Suspendări și mențiuni', desc: 'Perioadele de suspendare a permisului și mențiunile despre abaterile constatate.' },
+                    { icon: Mail, title: 'Livrat pe email, în PDF', desc: 'Gata de depus la dosar sau trimis mai departe; opțional și prin curier.' },
                   ].map((f) => (
                     <li key={f.title} className="flex items-start gap-3.5">
                       <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary-100 to-primary-200">
@@ -500,7 +511,7 @@ export default async function CazierAutoOnlinePage() {
                 <div className="mt-6 flex flex-wrap items-center gap-3">
                   <span className="inline-flex items-center gap-2 rounded-xl bg-green-50 border border-green-200 px-4 py-2.5 text-sm font-semibold text-green-800">
                     <CheckCircle className="h-4 w-4 text-green-600" aria-hidden="true" />
-                    Raport detaliat, livrat pe email
+                    Eliberat de Poliția Rutieră, livrat pe email
                   </span>
                 </div>
               </div>
@@ -510,18 +521,18 @@ export default async function CazierAutoOnlinePage() {
 
         <ReviewsSection />
 
-        {/* Content + clarification — targets "ce contine" + driver-record intent */}
+        {/* Content + clarification — targets "ce contine" + vehicle-history intent */}
         <section className="py-12 lg:py-20 bg-white">
           <div className="container mx-auto px-4 max-w-[900px]">
             <div className="grid md:grid-cols-2 gap-6">
               <div className="rounded-2xl border border-neutral-200 bg-neutral-50 p-6">
-                <h2 className="text-xl font-bold text-secondary-900 mb-4">Ce conține raportul auto</h2>
+                <h2 className="text-xl font-bold text-secondary-900 mb-4">Ce conține fișa conducătorului auto</h2>
                 <ul className="space-y-2.5 text-sm text-neutral-700">
                   {[
-                    'Istoric de accidente, daune și reparații majore',
-                    'Evoluția kilometrajului și alerte de fraudă km',
-                    'Numărul și succesiunea proprietarilor anteriori',
-                    'Status furt, leasing activ, gajuri și sarcini',
+                    'Sancțiunile rutiere înregistrate (amenzi, contravenții)',
+                    'Punctele de penalizare active la data eliberării',
+                    'Perioadele de suspendare a permisului de conducere',
+                    'Mențiunile despre abateri din evidența Poliției Rutiere',
                   ].map((row) => (
                     <li key={row} className="flex items-start gap-2">
                       <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" aria-hidden="true" />
@@ -531,62 +542,62 @@ export default async function CazierAutoOnlinePage() {
                 </ul>
               </div>
               <div className="rounded-2xl border border-neutral-200 p-6 bg-primary-50/40">
-                <h2 className="text-xl font-bold text-secondary-900 mb-4">Cauți cazierul șoferului?</h2>
+                <h2 className="text-xl font-bold text-secondary-900 mb-4">Cauți istoricul mașinii?</h2>
                 <p className="text-sm text-neutral-700 leading-relaxed">
-                  Dacă te interesează <strong>cazierul rutier</strong> sau „<strong>cazierul permis auto</strong>” —
-                  adică punctele de penalizare și abaterile de pe <strong>permisul de conducere</strong> al unei
-                  persoane (date gestionate de <strong>DRPCIV / Poliția Rutieră</strong>) — acela este un document
-                  despre <strong>șofer</strong>, nu despre mașină. Serviciul de pe această pagină acoperă
-                  <strong> istoricul vehiculului</strong>, nu situația permisului.
+                  Dacă te interesează <strong>istoricul unui vehicul</strong> — accidente, daune, rulajul
+                  real sau câți proprietari a avut, verificat după numărul de înmatriculare sau seria de
+                  șasiu — acela este un alt tip de raport, despre <strong>mașină</strong>, pe care nu îl oferim.
+                  Serviciul de pe această pagină este <strong>cazierul conducătorului auto</strong>: situația
+                  ta de șofer în evidențele Poliției Rutiere, obținută pe baza permisului de conducere.
                 </p>
               </div>
             </div>
 
-            {/* Cost / taxă — targets "taxa cazier auto", "cazier auto online gratuit" */}
+            {/* Cost — targets "taxa cazier auto", "cat costa cazierul auto" */}
             <div className="mt-8 max-w-[820px] mx-auto">
               <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-4">
-                Cât costă cazierul auto și există varianta gratuită?
+                Cât costă cazierul auto și cum îl obții
               </h2>
               <div className="space-y-4 text-neutral-700 leading-relaxed">
                 <p>
-                  Cazierul auto costă <strong>198 RON</strong>, o singură taxă, fără costuri ascunse și fără abonament.
-                  Prețul acoperă interogarea bazelor de date relevante și consolidarea <strong>raportului complet</strong>
-                  pe care îl primești pe email. Plătești securizat cu cardul, Apple Pay sau Google Pay, iar raportul
-                  ajunge la tine în {formatEstimatedDays(service)}.
+                  Prin eGhișeul, cazierul auto costă <strong>198 RON cu TVA inclus</strong>, o singură taxă,
+                  fără costuri ascunse. Prețul acoperă întreaga procedură: avocatul colaborator pregătește și
+                  depune cererea la Poliția Rutieră în numele tău, iar tu primești documentul PDF pe email
+                  în {formatEstimatedDays(service)} — sau în regim urgent, dacă te grăbește un termen.
+                  Plătești securizat cu cardul, Apple Pay sau Google Pay.
                 </p>
                 <p>
-                  Mulți caută un <strong>cazier auto online gratuit</strong>, însă un raport care chiar verifică
-                  accidentele, kilometrajul real și proprietarii anteriori presupune accesul la baze de date care nu sunt
-                  publice și gratuite. O simplă căutare după numărul de înmatriculare nu îți arată istoricul real al
-                  mașinii. Pentru o decizie corectă înainte de o achiziție second-hand, raportul plătit îți oferă date
-                  pe care nu le poți obține gratuit. Dacă vrei doar să verifici <strong>rovinieta</strong> unei mașini,
-                  poți folosi gratuit{' '}
-                  <Link href="/tools/verificare-rovinieta-online/" className="text-primary-600 font-semibold hover:underline">
-                    instrumentul nostru de verificare rovinietă
+                  Alternativa clasică este drumul la <strong>serviciul rutier</strong>: cerere depusă personal,
+                  în timpul programului de lucru, cu așteptare la ghișeu. Dacă ești plecat din țară, lucrezi în
+                  alt oraș sau pur și simplu nu ai timp de drumuri, varianta online prin avocat rezolvă totul
+                  de la distanță — inclusiv pentru <strong>permise emise în străinătate</strong>, caz în care
+                  documentul atestă faptele comise pe teritoriul României.
+                </p>
+              </div>
+            </div>
+
+            {/* Validity + guide — targets "valabilitate cazier auto" */}
+            <div className="mt-8 max-w-[820px] mx-auto">
+              <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-4">
+                Cât este valabil cazierul auto
+              </h2>
+              <div className="space-y-4 text-neutral-700 leading-relaxed">
+                <p>
+                  Legea nu stabilește un termen de valabilitate, dar în practică instituțiile acceptă fișa de
+                  evidență a conducătorului auto emisă în ultimele <strong>30 de zile</strong> — documentul
+                  reflectă situația ta la data eliberării, iar punctele de penalizare se schimbă în timp.
+                  Recomandarea noastră: comandă-l cu puțin timp înainte de depunerea dosarului. Poți verifica
+                  termenele uzuale pentru mai multe acte în{' '}
+                  <Link href="/calculator/valabilitate-documente/" className="text-primary-600 font-semibold hover:underline">
+                    calculatorul de valabilitate a documentelor
                   </Link>
                   .
                 </p>
-              </div>
-            </div>
-
-            {/* Eliberare — targets "eliberare cazier auto online", "drpciv cazier auto" */}
-            <div className="mt-8 max-w-[820px] mx-auto">
-              <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-4">
-                Cum se face eliberarea cazierului auto online
-              </h2>
-              <div className="space-y-4 text-neutral-700 leading-relaxed">
                 <p>
-                  <strong>Eliberarea cazierului auto</strong> se face 100% online, fără să te deplasezi la vreun ghișeu și
-                  fără cont. Completezi <strong>numărul de înmatriculare</strong> sau <strong>seria de șasiu (VIN)</strong>,
-                  plătești securizat, iar noi consolidăm și îți trimitem raportul pe email în {formatEstimatedDays(service)}.
-                  Tot procesul este gândit ca să afli rapid istoricul real al mașinii, exact înainte de momentul în care
-                  trebuie să iei o decizie.
-                </p>
-                <p>
-                  Reține că <strong>DRPCIV</strong> și Poliția Rutieră gestionează datele de pe <strong>permisul de
-                  conducere</strong> (puncte de penalizare, sancțiuni) — adică situația <em>șoferului</em>, nu istoricul
-                  unei mașini. Serviciul de aici acoperă <strong>istoricul vehiculului</strong>. Pentru detalii despre ce
-                  conține raportul și cum îl interpretezi, vezi ghidul nostru{' '}
+                  Pentru <strong>atestatul profesional</strong> (taxi, transport marfă sau persoane), fișa
+                  conducătorului auto este piesă obligatorie la dosar, iar firmele de transport și platformele
+                  de ride-sharing o cer tot mai des la angajare. Detalii despre document, cine îl eliberează și
+                  cum îl citești găsești în ghidul nostru{' '}
                   <Link href="/informatii-cazier-auto-online/" className="text-primary-600 font-semibold hover:underline">
                     informații despre cazierul auto online
                   </Link>
@@ -601,19 +612,18 @@ export default async function CazierAutoOnlinePage() {
         <ServiceFAQ
           title="Întrebări Frecvente — Cazier Auto"
           faqs={[
-            { q: 'Ce este cazierul auto?', a: 'Este un raport cu istoricul complet al unui vehicul: accidente, daune, evoluția kilometrajului, proprietari anteriori și verificări de furt, leasing sau gajuri. Te ajută să cunoști starea reală a unei mașini înainte să o cumperi.' },
-            { q: 'Ce conține cazierul auto?', a: 'Conține istoricul de accidente și daune, kilometrajul raportat în timp (cu alerte de fraudă km), numărul de proprietari anteriori și statusul juridic al mașinii (furt, leasing activ, gajuri și sarcini).' },
-            { q: 'Care e diferența dintre cazier auto și cazier rutier / cazier permis auto?', a: 'Cazierul auto se referă la mașină (istoricul vehiculului). Cazierul rutier sau „cazierul permis auto” se referă la șofer — punctele de penalizare și abaterile de pe permisul de conducere, gestionate de DRPCIV / Poliția Rutieră. Acest serviciu acoperă istoricul vehiculului, nu situația permisului.' },
-            { q: 'Ce date îmi trebuie pentru a comanda?', a: 'Ai nevoie de numărul de înmatriculare sau de seria de șasiu (VIN) a mașinii. VIN-ul (17 caractere) oferă cea mai precisă identificare a vehiculului.' },
-            { q: 'Cât durează să primesc raportul?', a: `${formatEstimatedDays(service)} în mod standard. Există și opțiunea de procesare urgentă pentru livrare și mai rapidă.` },
-            { q: 'Este valabil pentru orice mașină?', a: 'Funcționează pentru majoritatea autovehiculelor înmatriculate. Cantitatea de informații disponibile poate varia în funcție de istoricul și sursele de date asociate vehiculului respectiv.' },
-            { q: 'Cum primesc cazierul auto?', a: 'Îl primești pe email, ca raport PDF complet. Nu trebuie să te deplasezi și nu ai nevoie de niciun cont.' },
-            { q: 'Este legal să verific istoricul unei mașini?', a: 'Da. Verificarea istoricului unui vehicul pe baza numărului de înmatriculare sau a VIN-ului este o practică uzuală și legală înainte de o tranzacție auto.' },
-            { q: 'Cât costă cazierul auto?', a: 'Cazierul auto costă 198 RON, o singură taxă, fără costuri ascunse și fără abonament. Prețul acoperă verificarea bazelor de date și raportul complet livrat pe email.' },
-            { q: 'Există cazier auto online gratuit?', a: 'Un raport care verifică real accidentele, kilometrajul și proprietarii presupune acces la baze de date care nu sunt gratuite. O simplă căutare după numărul de înmatriculare nu îți arată istoricul real al mașinii, de aceea raportul complet este un serviciu plătit.' },
-            { q: 'Cum se face eliberarea cazierului auto online?', a: 'Eliberarea se face 100% online: completezi numărul de înmatriculare sau seria de șasiu (VIN), plătești securizat și primești raportul pe email. Nu trebuie să te deplasezi la niciun ghișeu și nu ai nevoie de cont.' },
-            { q: 'Cazierul auto se obține de la DRPCIV?', a: 'Nu. DRPCIV și Poliția Rutieră gestionează datele de pe permisul de conducere (puncte de penalizare, sancțiuni) — adică situația șoferului. Cazierul auto de aici se referă la istoricul mașinii (accidente, kilometraj, proprietari), un document diferit.' },
-            { q: 'Ce valabilitate are cazierul auto?', a: 'Raportul reflectă istoricul vehiculului la momentul emiterii. Recomandăm să obții un raport actualizat chiar înainte de tranzacție, ca datele despre kilometraj, daune sau status juridic să fie cât mai recente.' },
+            { q: 'Ce este cazierul auto?', a: 'Este fișa de evidență a conducătorului auto, un document eliberat de Poliția Rutieră despre șofer: istoricul sancțiunilor rutiere (amenzi, contravenții), punctele de penalizare active și suspendările permisului de conducere. Se obține pe baza permisului, nu pe numărul mașinii.' },
+            { q: 'Ce acte îmi trebuie pentru a comanda?', a: 'Ai nevoie de actul de identitate, permisul de conducere (numărul permisului) și un selfie cu actul în mână, pentru verificarea identității. Totul se încarcă direct în formular, de pe telefon sau calculator.' },
+            { q: 'Cât durează să primesc cazierul auto?', a: `${formatEstimatedDays(service)} în mod standard. Dacă te grăbește un termen, există și procesare urgentă, cu livrare în ${formatUrgentDays(service) ?? 'regim prioritar'}.` },
+            { q: 'Am permis emis în străinătate. Pot obține cazierul auto din România?', a: 'Da. Documentul atestă faptele comise pe teritoriul României, indiferent de statul care a emis permisul. Pentru permisele emise în străinătate termenul de procesare este mai lung decât cel standard.' },
+            { q: 'Care e diferența dintre cazierul auto și cazierul judiciar?', a: 'Cazierul auto (fișa conducătorului auto) arată sancțiunile rutiere: amenzi, puncte de penalizare, suspendări ale permisului. Cazierul judiciar arată infracțiunile și condamnările penale și se eliberează de poliție pe alt circuit. Sunt documente diferite, cerute în situații diferite — pe eGhișeul le poți comanda pe amândouă.' },
+            { q: 'Care e diferența dintre cazierul auto și istoricul vehiculului?', a: 'Cazierul auto este despre șofer: sancțiunile și punctele de pe permisul tău. Istoricul vehiculului este despre o mașină (accidente, daune, rulaj), verificat după numărul de înmatriculare sau seria de șasiu — un alt tip de raport, pe care nu îl oferim.' },
+            { q: 'Cât este valabil cazierul auto?', a: 'Legea nu fixează un termen, dar în practică instituțiile cer un document emis în ultimele 30 de zile, pentru că punctele de penalizare și sancțiunile se schimbă în timp. Comandă-l cu puțin timp înainte de depunerea dosarului.' },
+            { q: 'Îmi trebuie cazier auto pentru atestatul profesional?', a: 'Da. Pentru atestatul profesional de taxi sau de transport marfă și persoane, fișa de evidență a conducătorului auto este document obligatoriu la dosar. Și angajatorii din transport sau ride-sharing o cer frecvent la angajare.' },
+            { q: 'Cât costă cazierul auto?', a: 'Prin eGhișeul, cazierul auto costă 198 RON cu TVA inclus, o singură taxă, fără costuri ascunse. Prețul acoperă întreaga procedură prin avocatul colaborator și livrarea documentului PDF pe email.' },
+            { q: 'Cum primesc cazierul auto?', a: 'Îl primești pe email, în format PDF, fără să te deplasezi la vreun ghișeu. Dacă ai nevoie și de exemplarul fizic, îl putem trimite opțional prin curier, oriunde în țară sau în străinătate.' },
+            { q: 'Trebuie să merg personal la Poliția Rutieră?', a: 'Nu. Avocatul nostru colaborator, înscris în Barou, depune cererea în numele tău pe baza împuternicirii semnate online în formular. Tu doar completezi datele, încarci actele și primești documentul pe email.' },
+            { q: 'Pot vedea punctele mele de penalizare în cazierul auto?', a: 'Da, acesta este unul dintre cele mai frecvente motive de comandă. Fișa arată punctele de penalizare active la data eliberării — punctele se anulează la 6 luni de la data constatării, deci cele expirate nu mai apar.' },
           ]}
         />
 
@@ -631,10 +641,10 @@ export default async function CazierAutoOnlinePage() {
           <div className="relative container mx-auto px-4 max-w-[900px]">
             <div className="text-center">
               <h2 className="text-2xl lg:text-4xl font-extrabold text-white mb-4">
-                Gata să afli istoricul real al mașinii?
+                Gata să obții cazierul auto fără drumuri?
               </h2>
               <p className="text-lg text-white/80 mb-8 max-w-xl mx-auto">
-                Ai nevoie doar de numărul de înmatriculare sau seria de șasiu. Primești raportul în {formatEstimatedDays(service)}.
+                Ai nevoie doar de actul de identitate, permisul de conducere și un selfie. Primești documentul în {formatEstimatedDays(service)}.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
                 <OrderButton href={`/comanda/${SERVICE_SLUG}`}>Comandă Acum</OrderButton>
