@@ -624,7 +624,9 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
             <input
               ref={refForType(type)}
               type="file"
-              accept="image/jpeg,image/jpg,image/png,application/pdf"
+              // Selfie must be a photo — a PDF in the selfie slot was one of
+              // the ways wrong files ended up there (2026-07-15 sweep).
+              accept={type === 'selfie' ? 'image/jpeg,image/jpg,image/png' : 'image/jpeg,image/jpg,image/png,application/pdf'}
               capture={type === 'selfie' ? 'user' : undefined}
               onChange={(e) => {
                 const file = e.target.files?.[0];
