@@ -54,9 +54,11 @@ interface ReuploadRow {
 }
 
 function requestedTypes(req: ReuploadRow): string[] {
-  return Array.isArray(req.document_types) && req.document_types.length > 0
-    ? req.document_types
-    : [req.document_type];
+  // document_types (array) e autoritar chiar și GOL — cererile de completare
+  // „doar semnătura" au [] intenționat, iar fallback-ul pe document_type
+  // reînvia un „selfie” fantomă care bloca finalizarea (finding code-review
+  // ea6269e). Fallback doar pe rândurile legacy unde coloana e null.
+  return Array.isArray(req.document_types) ? req.document_types : [req.document_type];
 }
 
 /** Optional companion types (e.g. ID back) offered alongside the requested set. */

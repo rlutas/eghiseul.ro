@@ -150,12 +150,13 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     });
 
     // Complet? (toate documentele + semnătura)
-    const types: string[] =
-      Array.isArray(req.document_types) && req.document_types.length > 0
-        ? req.document_types
-        : req.document_type
-          ? [req.document_type]
-          : [];
+    // Array-ul e autoritar chiar și gol ([] = doar semnătura) — vezi
+    // requestedTypes din ruta principală.
+    const types: string[] = Array.isArray(req.document_types)
+      ? req.document_types
+      : req.document_type
+        ? [req.document_type]
+        : [];
     const done = new Set(
       (Array.isArray(req.completed_documents) ? req.completed_documents : []).map(
         (d: { type: string }) => d.type

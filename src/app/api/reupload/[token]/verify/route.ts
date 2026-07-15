@@ -58,11 +58,20 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     const orderEmail = String((order?.customer_data as any)?.contact?.email || '').trim().toLowerCase();
 
     if (!order || !orderEmail || orderEmail !== email) {
+      // Increment ATOMIC sub prag (funcție SQL, migrarea 126) — read-modify-
+      // write-ul clasic pierdea incremente la cereri paralele și lock-ul de
+      // brute-force devenea ocolibil (finding code-review ea6269e).
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await (admin as any)
-        .from('reupload_requests')
-        .update({ email_confirm_attempts: (req.email_confirm_attempts || 0) + 1, updated_at: new Date().toISOString() })
-        .eq('id', req.id);
+      const { data: newCount } = await (admin as any).rpc('increment_email_confirm_attempts', {
+        p_request_id: req.id,
+        p_max: MAX_ATTEMPTS,
+      });
+      if (newCount === null || newCount === undefined) {
+        return NextResponse.json(
+          { success: false, error: 'Prea multe încercări — contactează-ne pentru un link nou.' },
+          { status: 429 }
+        );
+      }
       return NextResponse.json(
         { success: false, error: 'Emailul nu corespunde comenzii. Folosește adresa cu care s-a plasat comanda.' },
         { status: 403 }
@@ -70,12 +79,13 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     }
 
     // Success — full payload + proof.
-    const types: string[] =
-      Array.isArray(req.document_types) && req.document_types.length > 0
-        ? req.document_types
-        : req.document_type
-          ? [req.document_type]
-          : [];
+    // Array-ul e autoritar chiar și gol ([] = doar semnătura) — vezi
+    // requestedTypes din ruta principală.
+    const types: string[] = Array.isArray(req.document_types)
+      ? req.document_types
+      : req.document_type
+        ? [req.document_type]
+        : [];
     const done = new Set(
       (Array.isArray(req.completed_documents) ? req.completed_documents : []).map(
         (d: { type: string }) => d.type
