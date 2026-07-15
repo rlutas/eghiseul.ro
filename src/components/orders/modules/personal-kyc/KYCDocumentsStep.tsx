@@ -693,6 +693,11 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
                   </button>
                 </div>
                 <p className="mt-2 text-[11px] text-neutral-400">JPEG sau PNG, max 10MB</p>
+                <p className="mt-2 rounded-lg bg-amber-50 px-3 py-2 text-left text-[11px] leading-relaxed text-amber-800">
+                  <strong>Important:</strong> dacă poza încărcată nu este un selfie corect (față + act,
+                  clar vizibile), te vom contacta să o refaci, iar <strong>livrarea documentului se
+                  poate întârzia</strong> — fără selfie-ul corect nu putem procesa comanda.
+                </p>
               </div>
             ) : (
               <div
