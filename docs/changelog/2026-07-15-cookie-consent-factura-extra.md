@@ -1,4 +1,19 @@
-# 2026-07-15 — Cookie consent banner (GDPR) LIVE + factura extra rezolvată (EGH-0055)
+# 2026-07-15 — Cookie consent LIVE + factura extra rezolvată + căderea ANCPI + merchant listings
+
+## 0. 🔵🔴 Căderea națională ANCPI (13–20 iulie) — reacția noastră
+
+- **Confirmat NU e de la workerul nostru** (întrebarea lui Raul, verificat cu dovezi): pe 13.07 workerul a procesat 0 joburi, 0 evenimente în fereastra căderii (23:02); singura activitate = probă GET 1/min pe pagina de login; incidentul e pe toate sistemele ANCPI naționale (eTerra/ePay/geoportal + interne), eroarea văzută de noi = `ERR_EMPTY_RESPONSE` de la serverul lor OpenAM. Oficial: „incident tehnic în curs de investigare", estimare revenire 20.07.
+- **Articol breaking** `/ancpi-nu-functioneaza/` (news-jacking pe căutările în explozie): datele proprii de monitoring (căderea la 23:02 = fapt citabil unic), informarea oficială OCPI ca imagine cu atribuire, **widget-ul de status LIVE embedded** (SystemStatus arată acum și „Indisponibil din <data, ora>" din platform_outages — vizibil și pe paginile de comandă), 6 FAQ, CTA-uri (comanda intră în coadă → eliberare automată cu prioritate). Prima poziție blog+homepage, revalidate orar, IndexNow 200.
+- **Clienții afectați notificați pe email** (3 comenzi plătite în așteptare: E-260715-BC3RP extras CF, E-260714-99AFD extras plan, E-260713-E4MJ4 identificare) — Resend, ID-uri de livrare confirmate; mesaj: comanda în siguranță, termen 20.07, procesare automată la revenire, link articol.
+- **Rămas**: jobul FAILED al E-260715-BC3RP e la retry_count=4 (max) — echipa apasă „Reîncearcă" în /admin/ancpi (safe: fără comandă ePay plasată); clasificatorul a blocat pe bună dreptate modificarea directă din sesiune.
+
+## 0b. 🔴 Merchant listings GSC (email 15.07): 3 probleme schema Product — FIXATE
+
+GSC a semnalat pe nodurile Product (cele cu rating din fix-ul review snippets): `brand` tip nevalid, lipsă `hasMerchantReturnPolicy` și `shippingDetails` în offers. Fix în 3 locuri (`schema.ts` productNode — sursa paginilor dedicate, `[slug]/page.tsx` — paginile dinamice, rovinieta — doar brand):
+- `brand` → `{ '@type': 'Brand', name: 'eGhișeul.ro' }` (era @id spre Organization);
+- `hasMerchantReturnPolicy` → MerchantReturnNotPermitted, applicableCountry RO (documente personalizate, fără retur după procesare — conform T&C/OUG 34);
+- `shippingDetails` → OfferShippingDetails cu shippingRate 0 RON, destinație RO (livrarea digitală e inclusă; curierul e opțiune tarifată separat).
+Constante exportate (PRODUCT_BRAND, MERCHANT_RETURN_POLICY, OFFER_SHIPPING_DETAILS) ca toate nodurile să rămână sincrone. Test unit actualizat. **După deploy: Validate fix în GSC** (secțiunea Merchant listings).
 
 ## 1. 🟣 Cookie consent banner — implementat conform planului
 

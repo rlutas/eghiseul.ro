@@ -106,13 +106,20 @@ describe('productNode', () => {
     });
     expect(node?.['@type']).toBe('Product');
     expect(node?.['@id']).toBe(`${BASE_URL}/servicii/cazier-judiciar-online/#product`);
-    expect(node?.brand).toEqual({ '@id': `${BASE_URL}/#organization` });
+    // Merchant-listing requirements (GSC 2026-07-15): Brand type + return
+    // policy + shipping details on the offer.
+    expect(node?.brand).toEqual({ '@type': 'Brand', name: 'eGhișeul.ro' });
     expect(node?.offers).toMatchObject({
       '@type': 'AggregateOffer',
       lowPrice: 198,
       highPrice: 278,
       priceCurrency: 'RON',
       offerCount: 2,
+      hasMerchantReturnPolicy: {
+        '@type': 'MerchantReturnPolicy',
+        returnPolicyCategory: 'https://schema.org/MerchantReturnNotPermitted',
+      },
+      shippingDetails: { '@type': 'OfferShippingDetails' },
     });
     expect(node?.aggregateRating).toMatchObject({
       '@type': 'AggregateRating',

@@ -123,6 +123,27 @@ export function serviceNode(input: ServiceSchemaInput) {
  * etc. LocalBusiness/Organization self-ratings are "self-serving" and also
  * invalid, so the rating lives on a Product describing the offered service.
  */
+/**
+ * Merchant-listing fields Google flags as missing on Product offers (GSC email
+ * 2026-07-15: „Lipsește hasMerchantReturnPolicy/shippingDetails", „Tip de
+ * obiect nevalid pentru brand"). Documents are personalized services: no
+ * returns after processing starts (T&C / OUG 34/2014 art. 16), delivered
+ * digitally at no extra cost — the courier add-on is priced separately.
+ */
+export const PRODUCT_BRAND = { '@type': 'Brand', name: 'eGhișeul.ro' } as const;
+
+export const MERCHANT_RETURN_POLICY = {
+  '@type': 'MerchantReturnPolicy',
+  applicableCountry: 'RO',
+  returnPolicyCategory: 'https://schema.org/MerchantReturnNotPermitted',
+} as const;
+
+export const OFFER_SHIPPING_DETAILS = {
+  '@type': 'OfferShippingDetails',
+  shippingRate: { '@type': 'MonetaryAmount', value: 0, currency: 'RON' },
+  shippingDestination: { '@type': 'DefinedRegion', addressCountry: 'RO' },
+} as const;
+
 export function productNode(input: ServiceSchemaInput) {
   if (!input.aggregateRating) return null;
   const url = `${BASE_URL}/servicii/${input.slug}/`;
@@ -134,7 +155,7 @@ export function productNode(input: ServiceSchemaInput) {
     description: input.description,
     image: `${BASE_URL}/og/default.png`,
     url,
-    brand: { '@id': `${BASE_URL}/#organization` },
+    brand: PRODUCT_BRAND,
     offers: {
       '@type': 'AggregateOffer',
       lowPrice: Math.min(...prices),
@@ -143,6 +164,8 @@ export function productNode(input: ServiceSchemaInput) {
       offerCount: input.offers.length,
       availability: 'https://schema.org/InStock',
       url,
+      hasMerchantReturnPolicy: MERCHANT_RETURN_POLICY,
+      shippingDetails: OFFER_SHIPPING_DETAILS,
     },
     aggregateRating: {
       '@type': 'AggregateRating',

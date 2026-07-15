@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { createPublicClient } from '@/lib/supabase/public';
+import { PRODUCT_BRAND, MERCHANT_RETURN_POLICY, OFFER_SHIPPING_DETAILS } from '@/lib/seo/schema';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -252,13 +253,15 @@ export default async function ServiceDetailPage({ params }: PageProps) {
       `${service.name} online, livrare rapidă.`,
     image: 'https://eghiseul.ro/og/default.png',
     url: `https://eghiseul.ro/servicii/${service.slug}`,
-    brand: { '@type': 'Organization', name: 'eGhișeul.ro', url: 'https://eghiseul.ro' },
+    brand: PRODUCT_BRAND,
     offers: {
       '@type': 'Offer',
       price: basePrice.toString(),
       priceCurrency: service.currency || 'RON',
       availability: 'https://schema.org/InStock',
       url: `https://eghiseul.ro/servicii/${service.slug}`,
+      hasMerchantReturnPolicy: MERCHANT_RETURN_POLICY,
+      shippingDetails: OFFER_SHIPPING_DETAILS,
     },
     aggregateRating: {
       '@type': 'AggregateRating',

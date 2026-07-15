@@ -53,7 +53,7 @@ const jsonLdGraph = {
       description: DESCRIPTION,
       image: `${BASE_URL}/og/default.png`,
       url: PAGE_URL,
-      brand: { '@id': `${BASE_URL}/#organization` },
+      brand: { '@type': 'Brand', name: 'eGhișeul.ro' },
       aggregateRating: {
         '@type': 'AggregateRating',
         ratingValue: 4.8,
