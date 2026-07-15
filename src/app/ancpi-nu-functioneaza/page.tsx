@@ -1,6 +1,8 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { buildPageMetadata } from '@/lib/seo';
 import { ArticleLayout } from '@/components/articole/article-layout';
+import { SystemStatus } from '@/components/services/system-status';
 
 const SLUG = 'ancpi-nu-functioneaza';
 const TITLE = 'ANCPI Nu Funcționează: cădere națională a sistemelor (13–20 iulie 2026)';
@@ -92,6 +94,29 @@ export default function Page() {
         </a>
         ), dar problema e centrală — aceleași sisteme deservesc toate OCPI-urile din țară.
       </p>
+
+      <figure className="not-prose my-6">
+        <Image
+          src="/images/articole/ancpi-informare-oficiala-iulie-2026.webp"
+          alt="Informarea oficială ANCPI/OCPI: aplicațiile informatice nu vor fi funcționale până în 20.07.2026, sistem temporar nefuncțional"
+          width={1200}
+          height={800}
+          className="w-full rounded-xl border border-neutral-200"
+        />
+        <figcaption className="mt-2 text-center text-sm text-neutral-500">
+          Informarea oficială distribuită de oficiile teritoriale ANCPI (aici, OCPI Bihor): sistemele
+          nefuncționale până în 20.07.2026.
+        </figcaption>
+      </figure>
+
+      <h2>Starea sistemelor ANCPI, în timp real</h2>
+      <p>
+        Monitorizarea noastră verifică portalul ANCPI continuu — indicatorul de mai jos e live, cu
+        momentul exact de la care sistemele sunt indisponibile:
+      </p>
+      <div className="not-prose my-6">
+        <SystemStatus service="ancpi" />
+      </div>
 
       <h2>Ce nu funcționează în acest interval</h2>
       <ul>

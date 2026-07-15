@@ -5,6 +5,8 @@ import { useEffect, useState } from 'react';
 interface StatusResponse {
   operational: boolean;
   services: Record<string, { up: boolean; label: string }>;
+  /** Start of the currently-open outage window (platform_outages), if any. */
+  outageSince?: string | null;
   updatedAt: string;
 }
 
@@ -82,6 +84,24 @@ export function SystemStatus({
             </div>
           ))}
         </div>
+      )}
+
+      {/* Since-when marker for the current outage — real data from our own
+          portal monitoring (platform_outages), not a static label. */}
+      {!loading && !operational && status?.outageSince && (
+        <p className="mt-2 text-xs text-neutral-500">
+          Indisponibil din{' '}
+          <span className="font-semibold text-secondary-900">
+            {new Date(status.outageSince).toLocaleString('ro-RO', {
+              day: 'numeric',
+              month: 'long',
+              hour: '2-digit',
+              minute: '2-digit',
+              timeZone: 'Europe/Bucharest',
+            })}
+          </span>{' '}
+          — monitorizăm continuu și reluăm eliberarea automat la revenire.
+        </p>
       )}
 
       {/* Reassurance while the provider portal is down: orders keep queuing and
