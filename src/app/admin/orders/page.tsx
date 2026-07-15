@@ -534,6 +534,16 @@ export default function AdminOrdersPage() {
                         </span>
                       )}
                     </div>
+                    {/* Nr. contract asistență · delegație — sub nr. comandă, ca pe CJO */}
+                    {(order.barou?.contract || order.barou?.delegation) && (
+                      <div
+                        className="mt-0.5 font-mono text-[10px] font-normal text-muted-foreground"
+                        title="Nr. contract asistență · Nr. delegație"
+                      >
+                        {order.barou?.contract ?? '—'}
+                        {order.barou?.delegation ? ` · ${order.barou.delegation}` : ''}
+                      </div>
+                    )}
                   </TableCell>
                   <TableCell>
                     <div className="flex flex-col">
@@ -562,16 +572,6 @@ export default function AdminOrdersPage() {
                         </span>
                       )}
                     </div>
-                    {/* Nr. contract asistență · delegație — paritate cu admin-ul CJO */}
-                    {(order.barou?.contract || order.barou?.delegation) && (
-                      <div
-                        className="mt-0.5 font-mono text-[10px] font-normal text-muted-foreground"
-                        title="Nr. contract asistență · Nr. delegație"
-                      >
-                        {order.barou?.contract ?? '—'}
-                        {order.barou?.delegation ? ` · ${order.barou.delegation}` : ''}
-                      </div>
-                    )}
                   </TableCell>
                   {/* Note echipă — sister-style icon + count, jumps to the notes card */}
                   <TableCell className="w-8 px-1">
