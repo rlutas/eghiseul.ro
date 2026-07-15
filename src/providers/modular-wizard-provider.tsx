@@ -715,6 +715,10 @@ function modularWizardReducer(
     }
 
     case 'PREFILL_FROM_PROFILE': {
+      // Mod telefonic: NU precompleta din contul logat — echipa e logată cu
+      // contul EI de admin, iar comanda e a CLIENTULUI de la telefon. Fără
+      // gate, emailul/CNP-ul adminului ajungeau în comanda clientului.
+      if (isPhoneOrderMode()) return state;
       const prefill = action.payload;
 
       // Build contact data from prefill. EXISTING wizard data wins: on a
