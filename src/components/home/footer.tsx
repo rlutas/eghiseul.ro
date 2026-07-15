@@ -86,6 +86,7 @@ const serviceGroups: { title: string; items: FooterService[] }[] = [
 
 const legalLinks = [
   { name: 'Termeni și Condiții', href: '/termeni-si-conditii/' },
+  { name: 'Politica de anulare', href: '/termeni-si-conditii/#anulare' },
   { name: 'Confidențialitate', href: '/politica-de-confidentialitate/' },
   { name: 'GDPR', href: '/gdpr/' },
   { name: 'Cookies', href: '/politica-cookies/' },

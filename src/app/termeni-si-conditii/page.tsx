@@ -125,15 +125,16 @@ export default function Page() {
           împreună cu opțiunile disponibile.
         </p>
 
-        <h2>8. Dreptul de retragere, anulare și rambursare</h2>
+        <h2 id="anulare" className="scroll-mt-24">8. Dreptul de retragere, anulare și rambursare</h2>
         <p>
           Conform OUG 34/2014 art. 16 lit. m), dreptul legal de retragere nu se aplică după începerea efectivă a
           prestării serviciului (depunerea cererii la instituție), serviciul fiind personalizat. Suplimentar, pentru
           <strong> serviciile eligibile</strong> oferim o politică de anulare proprie:
         </p>
         <ul>
-          <li><strong>În primele 30 de minute</strong> de la confirmarea plății, dacă serviciul comandat este eligibil, poți solicita anularea din pagina de <Link href="/comanda/status/">verificare status comandă</Link> (opțiunea apare acolo doar pentru serviciile eligibile) și primești <strong>70%</strong> din suma plătită (30% acoperă costurile administrative și de procesare). Pentru serviciile care intră imediat în procesare automată, anularea poate să nu fie disponibilă.</li>
-          <li><strong>După depunerea cererii</strong> la autorități, anularea nu mai este posibilă, procedura fiind deja inițiată.</li>
+          <li><strong>În primele 30 de minute</strong> de la confirmarea plății poți solicita anularea din pagina de <Link href="/comanda/status/">verificare status comandă</Link> și primești <strong>70%</strong> din suma plătită (30% acoperă costurile administrative și de procesare). Dreptul de anulare în această fereastră se păstrează chiar dacă procesarea internă a comenzii a început deja.</li>
+          <li><strong>Excepție — serviciile cu eliberare automată instantanee</strong> (extras de carte funciară, certificat constatator): documentul se emite în câteva minute de la plată, deci anularea nu este posibilă după plasarea comenzii; opțiunea de anulare nu apare pentru aceste servicii.</li>
+          <li><strong>După expirarea celor 30 de minute</strong>, anularea online nu mai este posibilă — cererea este deja în curs de procesare la autorități.</li>
           <li><strong>Dacă serviciul nu poate fi prestat din culpa Prestatorului</strong>, primești rambursare integrală (100%).</li>
         </ul>
         <p>Rambursările se procesează prin aceeași metodă de plată, în 5–10 zile lucrătoare.</p>

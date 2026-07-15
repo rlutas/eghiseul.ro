@@ -17,6 +17,23 @@ export type SelfCancelDecision =
   | { canCancel: true }
   | { canCancel: false; code: 'not_paid' | 'no_paid_at' | 'window_expired' | 'already_cancelled'; reason: string };
 
+// Statuses that block self-cancel outright, regardless of the 30-min window.
+// Politica (paritate CJO, termeni secțiunea 8): în primele 30 de minute de la
+// plată clientul poate anula INDIFERENT cât a avansat comanda intern — echipa
+// poate porni procesarea în minutul 5, dar promisiunea de 30 de minute din
+// termeni rămâne valabilă. Blochează doar stadiile ireversibile
+// (expediat/finalizat) și cele deja anulate/neplătite.
+export const SELF_CANCEL_BLOCKED_STATUSES = [
+  'draft',
+  'pending',
+  'abandoned',
+  'cancellation_requested',
+  'cancelled',
+  'refunded',
+  'shipped',
+  'completed',
+] as const;
+
 // Returns whether an order can still be cancelled by the customer. Pure —
 // only inspects status, paid_at, and the current time.
 export function evaluateSelfCancel(input: SelfCancelInput): SelfCancelDecision {
@@ -31,14 +48,12 @@ export function evaluateSelfCancel(input: SelfCancelInput): SelfCancelDecision {
     };
   }
 
-  // Anything past 'paid' means we've already started processing — that's
-  // the bright line for the customer-facing window.
-  if (status !== 'paid') {
+  if ((SELF_CANCEL_BLOCKED_STATUSES as readonly string[]).includes(status ?? '')) {
     return {
       canCancel: false,
       code: 'not_paid',
       reason:
-        'Comanda nu poate fi anulată — este deja în curs de procesare. Pentru asistență contactează-ne pe WhatsApp sau telefon.',
+        'Comanda nu mai poate fi anulată online (expediată, finalizată sau fără plată confirmată). Pentru asistență contactează-ne pe WhatsApp sau telefon.',
     };
   }
 

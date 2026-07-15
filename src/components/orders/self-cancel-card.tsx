@@ -7,6 +7,7 @@ import {
   cancelWindowRemainingMs,
   computeCancelRefundAmount,
   formatCancelCountdown,
+  SELF_CANCEL_BLOCKED_STATUSES,
 } from '@/lib/orders/self-cancel';
 
 interface SelfCancelCardProps {
@@ -22,7 +23,9 @@ interface SelfCancelCardProps {
  * Customer-facing card shown on /comanda/status when the order is within the
  * 30-min cancel window. Live countdown, confirm step, calls /api/orders/cancel.
  *
- * Hidden entirely when: status !== 'paid', no paid_at, or window expired.
+ * Hidden entirely when: blocked status (shipped/completed/unpaid/cancelled),
+ * no paid_at, or window expired. Paritate CJO: în fereastra de 30 min se
+ * poate anula indiferent cât a avansat procesarea internă.
  * After cancellation_requested: shows a confirmation banner instead.
  */
 export function SelfCancelCard({
@@ -67,7 +70,7 @@ export function SelfCancelCard({
     );
   }
 
-  if (status !== 'paid' || !paidAt) return null;
+  if ((SELF_CANCEL_BLOCKED_STATUSES as readonly string[]).includes(status) || !paidAt) return null;
   const remaining = cancelWindowRemainingMs(paidAt, now);
   if (remaining <= 0) return null;
 

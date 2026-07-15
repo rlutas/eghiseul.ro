@@ -152,7 +152,7 @@ export async function POST(req: NextRequest) {
     await supabase.from('order_history').insert({
       order_id: order.id,
       event_type: 'cancellation_requested',
-      from_status: 'paid',
+      from_status: order.status,
       to_status: 'cancellation_requested',
       changed_by: 'client',
       notes: 'Anulare solicitată de client (în termen de 30 minute)',

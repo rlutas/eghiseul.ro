@@ -30,8 +30,17 @@ describe('evaluateSelfCancel', () => {
     }
   });
 
-  it('refuses when already processing (status moved past paid)', () => {
-    for (const status of ['processing', 'documents_generated', 'shipped', 'completed']) {
+  it('allows cancel within window even when processing already started (CJO parity)', () => {
+    // Politica: fereastra de 30 min e promisiunea către client — echipa
+    // pornind procesarea în minutul 5 nu i-o poate lua.
+    for (const status of ['processing', 'documents_generated', 'submitted_to_institution', 'standby']) {
+      const r = evaluateSelfCancel({ status, paid_at: tenMinAgo, now });
+      expect(r.canCancel).toBe(true);
+    }
+  });
+
+  it('refuses irreversible/unpaid statuses regardless of window', () => {
+    for (const status of ['shipped', 'completed', 'draft', 'pending', 'abandoned']) {
       const r = evaluateSelfCancel({ status, paid_at: tenMinAgo, now });
       expect(r.canCancel).toBe(false);
       if (!r.canCancel) expect(r.code).toBe('not_paid');
