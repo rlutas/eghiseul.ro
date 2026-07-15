@@ -105,6 +105,11 @@ interface Service {
     urgent_days_display?: string;
     allow_self_cancel?: boolean;
   } | null;
+  verification_config?: {
+    constatator?: {
+      documentTypes?: { label: string; price: number; value: string }[];
+    };
+  } | null;
   created_at: string | null;
   updated_at: string | null;
   service_options: ServiceOption[];
@@ -563,6 +568,12 @@ function EditServiceDialog({
   const [allowSelfCancel, setAllowSelfCancel] = useState(
     service.processing_config?.allow_self_cancel !== false
   );
+  // Variant prices (constatator: firmă/PF/istoric) — editable so the team
+  // never needs a code change for a price bump on a variant.
+  const variantTypes = service.verification_config?.constatator?.documentTypes;
+  const [variantPrices, setVariantPrices] = useState<Record<string, string>>(() =>
+    Object.fromEntries((variantTypes ?? []).map((t) => [t.value, String(t.price)]))
+  );
   const [saving, setSaving] = useState(false);
 
   const handleSave = async () => {
@@ -608,6 +619,19 @@ function EditServiceDialog({
         delete nextConfig.ancpi_cost_ron;
       }
       updates.processing_config = nextConfig;
+
+      // Variant prices — send only valid numbers; the API patches JUST the
+      // price fields inside verification_config (structure stays untouched).
+      if (variantTypes?.length) {
+        const priceMap: Record<string, number> = {};
+        for (const [value, raw] of Object.entries(variantPrices)) {
+          const p = parseFloat(raw);
+          if (!isNaN(p) && p >= 0) priceMap[value] = p;
+        }
+        if (Object.keys(priceMap).length) {
+          updates.constatator_prices = priceMap;
+        }
+      }
 
       const res = await fetch('/api/admin/settings/services', {
         method: 'PATCH',
@@ -661,6 +685,32 @@ function EditServiceDialog({
               />
             </div>
           </div>
+
+          {/* Preturi pe variante (constatator: firma / PF / cu istoric) —
+              citite live de wizard din verification_config.constatator. */}
+          {variantTypes && variantTypes.length > 0 && (
+            <div className="rounded-lg border border-neutral-200 bg-neutral-50 p-3 space-y-3">
+              <p className="text-xs font-medium text-neutral-600">
+                Preturi pe variante (tipul documentului din wizard)
+              </p>
+              {variantTypes.map((t) => (
+                <div key={t.value} className="flex items-center gap-3">
+                  <span className="flex-1 text-sm">{t.label}</span>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    className="w-28"
+                    value={variantPrices[t.value] ?? ''}
+                    onChange={(e) =>
+                      setVariantPrices((prev) => ({ ...prev, [t.value]: e.target.value }))
+                    }
+                  />
+                  <span className="text-xs text-neutral-500">lei</span>
+                </div>
+              ))}
+            </div>
+          )}
 
           {/* Termeni de livrare afisati pe site — text liber, se propaga peste
               tot (pagini servicii + wizard) prin formatEstimatedDays/formatUrgentDays. */}

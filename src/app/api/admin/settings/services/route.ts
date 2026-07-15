@@ -51,6 +51,7 @@ export async function GET() {
         requires_kyc,
         display_order,
         processing_config,
+        verification_config,
         created_at,
         updated_at,
         service_options (
@@ -151,6 +152,34 @@ export async function PATCH(request: NextRequest) {
       }
     }
 
+    const adminClient = createAdminClient();
+
+    // Variant prices for constatator (verification_config.constatator.
+    // documentTypes[].price — firmă/PF/istoric). Deliberately NOT a raw
+    // verification_config overwrite: we re-read the current config and patch
+    // ONLY the price fields, so wizard structure/flags can't be clobbered
+    // from the admin UI.
+    if (updates.constatator_prices && typeof updates.constatator_prices === 'object') {
+      const priceMap = updates.constatator_prices as Record<string, number>;
+      const { data: current } = await adminClient
+        .from('services')
+        .select('verification_config')
+        .eq('id', id)
+        .single();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const vc = ((current as any)?.verification_config ?? {}) as any;
+      const docTypes = vc?.constatator?.documentTypes;
+      if (Array.isArray(docTypes)) {
+        for (const dt of docTypes) {
+          const next = priceMap[dt.value];
+          if (typeof next === 'number' && Number.isFinite(next) && next >= 0) {
+            dt.price = next;
+          }
+        }
+        sanitized.verification_config = vc;
+      }
+    }
+
     if (Object.keys(sanitized).length === 0) {
       return NextResponse.json(
         { success: false, error: 'Niciun camp valid de actualizat' },
@@ -160,8 +189,6 @@ export async function PATCH(request: NextRequest) {
 
     // Add updated_at
     sanitized.updated_at = new Date().toISOString();
-
-    const adminClient = createAdminClient();
 
     const { data, error } = await adminClient
       .from('services')
