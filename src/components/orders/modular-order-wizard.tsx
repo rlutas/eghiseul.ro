@@ -72,6 +72,15 @@ export function ModularOrderWizard({ initialService, initialOptions, headerExtra
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [DynamicComponent, setDynamicComponent] = useState<React.ComponentType<any> | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  // Mod telefonic: citit post-mount (SSR nu vede URL-ul → hydration-safe;
+  // setTimeout 0 pt react-compiler — fără setState sincron în effect).
+  const [phoneMode, setPhoneMode] = useState(false);
+  useEffect(() => {
+    const t = setTimeout(() => {
+      if (isPhoneOrderMode()) setPhoneMode(true);
+    }, 0);
+    return () => clearTimeout(t);
+  }, []);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [orderComplete, setOrderComplete] = useState(false);
   const [showSaveModal, setShowSaveModal] = useState(false);
@@ -550,7 +559,7 @@ export function ModularOrderWizard({ initialService, initialOptions, headerExtra
                       <>
                         {isSubmitting
                           ? 'Se procesează...'
-                          : isPhoneOrderMode()
+                          : phoneMode
                             ? `Creează comanda (${Number(priceBreakdown.totalPrice).toFixed(2)} RON, fără plată)`
                             : `Plătește ${Number(priceBreakdown.totalPrice).toFixed(2)} RON`}
                         {!isSubmitting && <ArrowRight className="h-4 w-4" />}

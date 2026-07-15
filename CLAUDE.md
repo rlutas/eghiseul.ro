@@ -27,6 +27,7 @@ Platforma digitala pentru Romania - servicii publice digitalizate (9 servicii ac
 | **Cum adaug serviciu nou** | `docs/technical/specs/modular-wizard-guide.md` |
 | **API endpoints** | `docs/technical/api/` + `docs/README.md` (summary) |
 | **Admin panel** | `docs/admin/README.md` |
+| **Comenzi telefonice (admin A→Z, link plată, link completare)** | `docs/admin/comenzi-telefonice/README.md` |
 | **RBAC & permisiuni** | `docs/admin/rbac-permissions.md` |
 | **Document generation** | `docs/technical/specs/admin-document-system.md` |
 | **KYC identity & face matching** | `docs/technical/specs/kyc-identity-verification.md` |

@@ -16,6 +16,7 @@
 | [RBAC & Permissions](./rbac-permissions.md) | Role-based access control system, granular permissions, user management, settings pages | Implemented |
 | [Security Audit](./security-audit.md) | Security audit of admin Supabase client, IDOR fixes, RLS policy recommendations | 3/4 Critical Fixed |
 | [Workflow Design](./workflow-design.md) | Order processing workflow: status flow, document generation, DOCX templates, template separation, company/lawyer settings, RBAC roles, processing_config, notifications | Design Complete (v1.1) |
+| [Comenzi telefonice](./comenzi-telefonice/README.md) | Comenzi create de admin A→Z: wizard în mod telefonic, link plată / plată manuală cu referință, link personalizat de completare (acte + semnătură, gate email) | Implemented (2026-07-15) |
 
 ---
 
