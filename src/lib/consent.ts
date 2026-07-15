@@ -11,7 +11,12 @@ export interface ConsentState {
   marketing: boolean;
   /** ISO timestamp of the choice — proof of when consent was given. */
   ts: string;
+  /** Consent-receipt id — mirrored in cookie_consent_log (GDPR art. 7 proof). */
+  id: string;
 }
+
+/** Bump when the banner text/categories change — logged with each receipt. */
+export const CONSENT_BANNER_VERSION = 'v1-2026-07-15';
 
 export const CONSENT_COOKIE = 'eg_cookie_consent';
 export const CONSENT_MAX_AGE = 60 * 60 * 24 * 180; // 6 months
@@ -36,8 +41,26 @@ export function readConsent(): ConsentState | null {
 }
 
 export function writeConsent(analytics: boolean, marketing: boolean): ConsentState {
-  const state: ConsentState = { v: 1, analytics, marketing, ts: new Date().toISOString() };
+  const state: ConsentState = {
+    v: 1,
+    analytics,
+    marketing,
+    ts: new Date().toISOString(),
+    id: crypto.randomUUID(),
+  };
   document.cookie = `${CONSENT_COOKIE}=${encodeURIComponent(JSON.stringify(state))}; path=/; max-age=${CONSENT_MAX_AGE}; SameSite=Lax`;
+  // Consent receipt — fire-and-forget; the banner never blocks on it.
+  fetch('/api/consent-log', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      consentId: state.id,
+      analytics,
+      marketing,
+      bannerVersion: CONSENT_BANNER_VERSION,
+    }),
+    keepalive: true,
+  }).catch(() => {});
   window.dispatchEvent(new CustomEvent(CONSENT_CHANGED_EVENT, { detail: state }));
   return state;
 }

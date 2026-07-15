@@ -101,6 +101,12 @@ export default function Page() {
           Dacă refuzi analiza după ce o acceptaseși, cookie-urile <code>_ga*</code> sunt șterse
           automat la salvarea noii opțiuni.
         </p>
+        <p>
+          Pentru a putea dovedi consimțământul (art. 7 GDPR), fiecare alegere salvată primește un
+          identificator de confirmare (păstrat în cookie-ul <code>eg_cookie_consent</code>) și e
+          înregistrată în registrul nostru de consimțăminte, împreună cu data și versiunea
+          bannerului afișat.
+        </p>
 
         <h2>Cum îți schimbi opțiunea</h2>
         <p>
