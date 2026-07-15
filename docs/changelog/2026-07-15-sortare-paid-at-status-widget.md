@@ -28,3 +28,9 @@ Erau afișate sub client (implementarea din 15.07 dimineața); mutate în celula
 4. **Migrarea 122** (rulată în prod): `allow_self_cancel=true` explicit pe certificat-urbanism-informare (era null — endpoint-ul îl trata permisiv prin `!== false`, dar config-ul trebuie explicit).
 
 Mecanica: client cere anularea din `/comanda/status/` → status `cancellation_requested` + email → echipa face refundul de 70% din admin (review manual al cazurilor borderline).
+
+## 5. 🟣 Pagini dedicate „Politica de anulare" pe TOATE platformele (`63467ab` + CJO `dd5a6880`)
+
+- **eGhișeul**: `/politica-de-anulare/` (LegalLayout: 30 min/70%, pași, excepții instant extras CF + constatator, FAQ, temei OUG 34/2014) + link footer „Politica de anulare" + sitemap + termenii §8 linkuiesc pagina.
+- **CJO**: `/politica-de-anulare` pe template-ul legal propriu + link în footer (Legal) + sitemap.
+- **eCazier**: `/ecazier/politica-de-anulare` (branding cabinet, diacritice) + link în footer-ul propriu; rewrite-ul multi-tenant servește automat `ecazier.ro/politica-de-anulare`.
