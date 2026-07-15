@@ -152,7 +152,12 @@ export default function CollaboratorsAdminPage() {
   };
 
   useEffect(() => {
-    reloadCollaborators();
+    // Deferred a tick — react-compiler can't see the await gap inside
+    // reloadCollaborators and flags it as sync setState in an effect.
+    const t = setTimeout(() => {
+      void reloadCollaborators();
+    }, 0);
+    return () => clearTimeout(t);
   }, []);
 
   useEffect(() => {

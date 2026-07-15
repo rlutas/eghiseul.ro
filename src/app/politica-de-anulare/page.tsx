@@ -24,18 +24,35 @@ const breadcrumb = {
 // Live lists from DB (processing_config.allow_self_cancel) — the policy page
 // can never drift from what the cancel endpoint actually enforces. Revalidated
 // daily together with the page.
-async function getCancellationLists(): Promise<{ cancellable: string[]; excluded: string[] }> {
+// Detail per excluded service — spells out the variants so the client knows
+// the exception covers ALL of them (e.g. constatator cu istoric).
+const EXCLUDED_DETAILS: Record<string, string> = {
+  'certificat-constatator':
+    'toate variantele — de bază, IMM, insolvență, persoană fizică și cu istoric',
+  'extras-carte-funciara': 'inclusiv extrasul de informare eliberat automat 24/7',
+  'extras-plan-cadastral': 'intră imediat în procesare la ANCPI',
+  rovinieta: 'odată emisă, valabilitatea pornește imediat și CNAIR nu o rambursează',
+};
+
+async function getCancellationLists(): Promise<{
+  cancellable: string[];
+  excluded: { name: string; detail?: string }[];
+}> {
   const supabase = createPublicClient();
   const { data } = await supabase
     .from('services')
-    .select('name, processing_config')
+    .select('slug, name, processing_config')
     .eq('is_active', true)
     .order('name');
   const cancellable: string[] = [];
-  const excluded: string[] = [];
+  const excluded: { name: string; detail?: string }[] = [];
   for (const s of data ?? []) {
     const pc = s.processing_config as { allow_self_cancel?: boolean } | null;
-    (pc?.allow_self_cancel === false ? excluded : cancellable).push(s.name);
+    if (pc?.allow_self_cancel === false) {
+      excluded.push({ name: s.name, detail: EXCLUDED_DETAILS[s.slug] });
+    } else {
+      cancellable.push(s.name);
+    }
   }
   return { cancellable, excluded };
 }
@@ -105,15 +122,16 @@ export default async function Page() {
           posibilă după plasarea comenzii, iar opțiunea de anulare nu apare pentru ele:
         </p>
         <ul>
-          {excluded.map((name) => (
-            <li key={name}>
-              <strong>{name}</strong>
+          {excluded.map((s) => (
+            <li key={s.name}>
+              <strong>{s.name}</strong>
+              {s.detail ? <> ({s.detail})</> : null}
             </li>
           ))}
         </ul>
         <p>
-          Excepția acoperă <strong>toate variantele</strong> serviciilor de mai sus — la
-          certificatul constatator: de bază, IMM, insolvență, persoană fizică și cu istoric.
+          Excepția acoperă <strong>toate variantele</strong> serviciilor de mai sus, indiferent de
+          opțiunile alese în comandă.
         </p>
         <p>
           De asemenea, comanda nu mai poate fi anulată online dacă a fost deja{' '}
