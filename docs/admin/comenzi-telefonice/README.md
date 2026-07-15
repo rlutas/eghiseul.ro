@@ -1,6 +1,17 @@
 # Comenzi telefonice (create de admin, A→Z)
 
-**Livrat:** 2026-07-15 · **Platforme:** eGhișeul (LIVE) + CJO/eCazier (în lucru, aceeași arhitectură) · **Migrări:** 125, 126 (rulate în producție)
+> ## ⚠️ STATUS: DE REGÂNDIT (decizie Raul, 15.07.2026 seara)
+>
+> Implementarea de mai jos e funcțională tehnic (cod livrat pe ambele platforme, teste verzi), dar **Raul a respins fluxul: „nu e bine deloc, trebuie regândit tot logic"**. Se reia discuția pe 16.07. NU se folosește în producție și NU se construiește peste până la redesign.
+>
+> **De clarificat la regândire (întrebări deschise):**
+> 1. Ce anume nu e ok: faptul că adminul e dus în FORMULARUL PUBLIC (`?telefonic=1`) în loc de un formular intern de admin? Împărțirea pașilor echipă/client? Cele DOUĂ linkuri separate (plată, apoi completare) — poate trebuie UN SINGUR link unde clientul plătește ȘI completează actele+semnătura într-un singur flux?
+> 2. Ordinea dorită: plata înainte de acte (cum e acum) sau clientul primește un link unde face tot (acte+semnătură+plată) pe datele pre-completate de echipă?
+> 3. Ce părți poate alege echipa să lase clientului, per comandă (configurabil: scanare act / KYC / semnare / plată)?
+>
+> Ce e REFOLOSIBIL indiferent de redesign: link-ul tokenizat cu gate de email (securitate testată), mark-paid manual cu factură corectă, extensia reupload cu semnătură, extragerile CJO (line-items cu teste de paritate, standby, SmartBill).
+
+**Livrat (tehnic):** 2026-07-15 · **Platforme:** eGhișeul + CJO/eCazier · **Migrări:** 125, 126 rulate (eghiseul); 027 NERULATĂ (CJO, SQL Editor)
 
 Echipa preia comenzi la telefon/WhatsApp și le introduce în platformă de la A la Z. Plata se ia prin link trimis clientului SAU se marchează manual (transfer/cash). După plată, clientul primește un **link personalizat** unde încarcă actele (CI + selfie) și semnează — atât și nimic altceva.
 
