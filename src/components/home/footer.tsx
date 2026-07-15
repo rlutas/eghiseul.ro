@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Mail, Phone, Clock, MessageCircle, Send } from 'lucide-react';
 import { serviceUrl } from '@/lib/seo/constants';
+import { CookieSettingsLink } from '@/components/consent/cookie-settings-link';
 
 const WHATSAPP =
   'https://wa.me/40757708181?text=' +
@@ -199,6 +200,7 @@ export function Footer() {
               {legalLinks.map((l) => (
                 <Link key={l.name} href={l.href} className="hover:text-primary-500 transition-colors">{l.name}</Link>
               ))}
+              <CookieSettingsLink className="hover:text-primary-500 transition-colors" />
             </nav>
             <div className="flex items-center gap-1.5">
               {[...Array(5)].map((_, i) => (

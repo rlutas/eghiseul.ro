@@ -1,12 +1,10 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import Script from "next/script";
 import "./globals.css";
 import { QueryProvider } from "@/providers/query-provider";
 import { Header } from "@/components/shared/header";
 import { WhatsAppFloat } from "@/components/shared/whatsapp-float";
-
-const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
+import { CookieConsent } from "@/components/consent/cookie-consent";
 
 const inter = Inter({
   subsets: ["latin", "latin-ext"],
@@ -65,25 +63,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ro">
-      <head>
-        {/* Google Analytics */}
-        {GA_MEASUREMENT_ID && (
-          <>
-            <Script
-              src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
-              strategy="afterInteractive"
-            />
-            <Script id="google-analytics" strategy="afterInteractive">
-              {`
-                window.dataLayer = window.dataLayer || [];
-                function gtag(){dataLayer.push(arguments);}
-                gtag('js', new Date());
-                gtag('config', '${GA_MEASUREMENT_ID}');
-              `}
-            </Script>
-          </>
-        )}
-      </head>
+      {/* Google Analytics NU se mai încarcă necondiționat — gtag.js e injectat
+          de CookieConsent DOAR după opt-in analitice (Consent Mode v2, default
+          denied). Vezi docs/plans/2026-07-14-cookie-consent-gdpr.md. */}
+      <head />
       <body className={`${inter.variable} font-sans antialiased`} suppressHydrationWarning>
         {/* Skip-to-content link for keyboard / screen-reader users. Hidden until focused. */}
         <a href="#main-content" className="skip-to-content">
@@ -93,6 +76,7 @@ export default function RootLayout({
           <Header />
           {children}
           <WhatsAppFloat />
+          <CookieConsent />
         </QueryProvider>
       </body>
     </html>
