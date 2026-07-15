@@ -86,6 +86,11 @@ export async function GET(request: NextRequest) {
       `,
         { count: 'estimated' }
       )
+      // paid_at first: o comandă creată ca draft ieri și plătită azi trebuie
+      // să apară în top AZI (echipa se uită la capul listei) — sortarea pe
+      // created_at o îngropa printre comenzile de ieri (caz real E-260714-773QA).
+      // Neplătitele (paid_at null) cad pe created_at.
+      .order('paid_at', { ascending: false, nullsFirst: false })
       .order('created_at', { ascending: false })
       .range(page * limit, (page + 1) * limit - 1);
 
