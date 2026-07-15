@@ -36,6 +36,44 @@ import { useAdminPermissions } from '@/hooks/use-admin-permissions';
 import type { NumberRangeWithStats, NumberRegistryEntry } from '@/types/number-registry';
 
 // ──────────────────────────────────────────────────────────────
+// Order search (manual allocation dialog)
+// ──────────────────────────────────────────────────────────────
+
+interface OrderSearchRow {
+  orderNumber: string;
+  friendlyId: string | null;
+  clientName: string;
+  email: string;
+  cnp: string;
+  cui: string;
+  serviceName: string;
+  total: number | null;
+  paid: boolean;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function mapOrderSearchRow(o: any): OrderSearchRow {
+  const cd = o.customer_data || {};
+  const contact = cd.contact || {};
+  const personal = cd.personal || cd.personalData || {};
+  const billing = cd.billing || {};
+  const name =
+    `${contact.firstName || personal.firstName || ''} ${contact.lastName || personal.lastName || ''}`.trim() ||
+    billing.companyName || '';
+  return {
+    orderNumber: o.order_number,
+    friendlyId: o.friendly_order_id || null,
+    clientName: name,
+    email: contact.email || '',
+    cnp: String(personal.cnp || billing.cnp || ''),
+    cui: String(billing.cui || ''),
+    serviceName: o.services?.name || '',
+    total: o.total_price ?? null,
+    paid: o.payment_status === 'paid',
+  };
+}
+
+// ──────────────────────────────────────────────────────────────
 // Main Page
 // ──────────────────────────────────────────────────────────────
 
@@ -147,6 +185,53 @@ function NumberRegistryContent() {
   });
 
   const [saving, setSaving] = useState(false);
+
+  // Order search inside the manual-allocation dialog — the team types a
+  // client name / order number / email, picks the order, and every relevant
+  // field prefills from the DB (no more copy-paste from the orders list).
+  const [orderSearch, setOrderSearch] = useState('');
+  const [orderResults, setOrderResults] = useState<OrderSearchRow[]>([]);
+  const [orderSearching, setOrderSearching] = useState(false);
+  const [pickedOrder, setPickedOrder] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!addManualOpen) return;
+    const q = orderSearch.trim();
+    if (q.length < 3) {
+      setOrderResults([]);
+      return;
+    }
+    const t = setTimeout(async () => {
+      setOrderSearching(true);
+      try {
+        const res = await fetch(`/api/admin/orders/list?search=${encodeURIComponent(q)}&limit=8`);
+        const json = await res.json();
+        if (json.success) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          setOrderResults((json.data as any[]).map((o) => mapOrderSearchRow(o)));
+        }
+      } catch { /* keep last results */ }
+      finally { setOrderSearching(false); }
+    }, 350);
+    return () => clearTimeout(t);
+  }, [orderSearch, addManualOpen]);
+
+  const pickOrder = (o: OrderSearchRow) => {
+    setManualEntry((prev) => ({
+      ...prev,
+      client_name: o.clientName || prev.client_name,
+      client_email: o.email || prev.client_email,
+      client_cnp: o.cnp || '',
+      client_cui: o.cui || '',
+      service_type: o.serviceName || prev.service_type,
+      amount: o.total != null ? String(o.total) : prev.amount,
+      platform: 'eghiseul',
+      order_ref: o.orderNumber,
+    }));
+    setPickedOrder(o.friendlyId || o.orderNumber);
+    setOrderResults([]);
+    setOrderSearch('');
+  };
 
   // Edit entry dialog
   const [editOpen, setEditOpen] = useState(false);
@@ -343,6 +428,9 @@ function NumberRegistryContent() {
         }
         setAddManualOpen(false);
         setManualEntry({ type: 'contract_delegatie', client_name: '', client_email: '', client_cnp: '', client_cui: '', service_type: '', description: '', amount: '', date: new Date().toISOString().split('T')[0], platform: '', order_ref: '', linked_contract_number: '' });
+        setPickedOrder(null);
+        setOrderSearch('');
+        setOrderResults([]);
         // Sari la pagina 1 — numărul nou (cel mai mare) apare primul în jurnal.
         fetchRegistry(1);
         fetchRanges(); // Refresh ranges too (available count changed)
@@ -1024,6 +1112,44 @@ function NumberRegistryContent() {
                 />
               </div>
             )}
+            {/* Căutare comandă → precompletează tot (nume, CNP/CUI, email,
+                serviciu, sumă, platformă + nr. comandă). Clientul manual e
+                oricum clientul avocatei — alocarea merge pe datele comenzii. */}
+            <div className="rounded-lg border border-blue-200 bg-blue-50 p-3 space-y-2 relative">
+              <Label>Caută comanda (nume client / nr. comandă / email)</Label>
+              <Input
+                value={orderSearch}
+                onChange={e => setOrderSearch(e.target.value)}
+                placeholder="ex: Popescu / E-260715-XXXXX — minim 3 caractere"
+              />
+              {pickedOrder && !orderSearch && (
+                <p className="text-xs text-blue-800">
+                  ✓ Precompletat din comanda <span className="font-mono font-semibold">{pickedOrder}</span>
+                </p>
+              )}
+              {orderSearching && <p className="text-xs text-muted-foreground">Caut...</p>}
+              {orderResults.length > 0 && (
+                <div className="absolute left-3 right-3 top-full z-50 -mt-1 max-h-56 overflow-y-auto rounded-md border bg-white shadow-lg">
+                  {orderResults.map((o) => (
+                    <button
+                      key={o.orderNumber}
+                      type="button"
+                      onClick={() => pickOrder(o)}
+                      className="flex w-full items-center justify-between gap-2 border-b px-3 py-2 text-left text-sm hover:bg-blue-50 last:border-b-0"
+                    >
+                      <span>
+                        <span className="font-mono text-xs text-blue-700">{o.friendlyId || o.orderNumber}</span>
+                        <span className="ml-2 font-medium">{o.clientName || '—'}</span>
+                        <span className="ml-2 text-xs text-muted-foreground">{o.serviceName}</span>
+                      </span>
+                      <span className="whitespace-nowrap text-xs text-muted-foreground">
+                        {o.total != null ? `${o.total} lei` : ''}{!o.paid ? ' · neplătită' : ''}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
             <div>
               <Label>Nume client *</Label>
               <Input value={manualEntry.client_name} onChange={e => setManualEntry({...manualEntry, client_name: e.target.value})} />
