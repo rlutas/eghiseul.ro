@@ -40,6 +40,7 @@ const STATIC_PAGES: SitemapEntry[] = [
   { url: `${BASE_URL}/politica-de-confidentialitate/`, changeFrequency: 'yearly', priority: 0.3 },
   { url: `${BASE_URL}/gdpr/`, changeFrequency: 'yearly', priority: 0.3 },
   { url: `${BASE_URL}/politica-cookies/`, changeFrequency: 'yearly', priority: 0.3 },
+  { url: `${BASE_URL}/politica-de-anulare/`, changeFrequency: 'yearly', priority: 0.3 },
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {

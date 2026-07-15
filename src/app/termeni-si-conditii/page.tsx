@@ -137,7 +137,11 @@ export default function Page() {
           <li><strong>După expirarea celor 30 de minute</strong>, anularea online nu mai este posibilă — cererea este deja în curs de procesare la autorități.</li>
           <li><strong>Dacă serviciul nu poate fi prestat din culpa Prestatorului</strong>, primești rambursare integrală (100%).</li>
         </ul>
-        <p>Rambursările se procesează prin aceeași metodă de plată, în 5–10 zile lucrătoare.</p>
+        <p>
+          Rambursările se procesează prin aceeași metodă de plată, în 5–10 zile lucrătoare. Detalii
+          complete, pași și întrebări frecvente: <Link href="/politica-de-anulare/">Politica de anulare
+          și rambursare</Link>.
+        </p>
 
         <h2>9. Semnătura electronică</h2>
         <p>
