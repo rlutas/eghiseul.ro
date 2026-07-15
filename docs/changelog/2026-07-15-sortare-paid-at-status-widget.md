@@ -34,3 +34,10 @@ Mecanica: client cere anularea din `/comanda/status/` → status `cancellation_r
 - **eGhișeul**: `/politica-de-anulare/` (LegalLayout: 30 min/70%, pași, excepții instant extras CF + constatator, FAQ, temei OUG 34/2014) + link footer „Politica de anulare" + sitemap + termenii §8 linkuiesc pagina.
 - **CJO**: `/politica-de-anulare` pe template-ul legal propriu + link în footer (Legal) + sitemap.
 - **eCazier**: `/ecazier/politica-de-anulare` (branding cabinet, diacritice) + link în footer-ul propriu; rewrite-ul multi-tenant servește automat `ecazier.ro/politica-de-anulare`.
+
+## 6. 🔴 CI roșu din 14.07 + completări politică anulare + variante constatator în admin
+
+- **CI GitHub roșu de la `feb4859`** (14.07): react-compiler dădea ERROR pe `/admin/colaboratori` (setState sincron în effect) — fix `ca58a38` (setTimeout 0). Toate rulările verzi din nou.
+- **Rovinieta neanulabilă** (migrarea 124, rulată): odată emisă, CNAIR nu rambursează. Excepțiile pe `/politica-de-anulare/` afișează acum și detaliile variantelor (constatator: de bază/IMM/insolvență/PF/istoric; extras CF: informare 24/7; plan cadastral; rovinieta).
+- **Prețurile variantelor constatator editabile în admin** (`fa46002`): trăiau doar în `verification_config.constatator.documentTypes` (firmă 89 / PF 89 / istoric 487) — invizibile. Acum secțiune „Prețuri pe variante" în Setări → Servicii → Edit; API-ul patch-uiește DOAR price (structura config rămâne intactă).
+- **CJO + eCazier: bara „Total de Plătit" de la primul pas** (`e000f165`) — clientul vede prețul înainte să completeze orice câmp (paritate eghiseul; era din pasul 2).
