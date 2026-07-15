@@ -1,4 +1,5 @@
 import { createClient as createServiceClient } from '@supabase/supabase-js';
+import { normalizeOrderOptions } from '@/lib/orders/normalize';
 import { NextRequest, NextResponse } from 'next/server';
 import { reuploadDocLabel } from '@/lib/reupload/doc-types';
 
@@ -68,6 +69,8 @@ export async function GET(request: NextRequest) {
         payment_status,
         invoice_number,
         invoice_url,
+        extra_billing,
+        additional_paid_amount,
         delivery_method,
         delivery_tracking_number,
         estimated_completion_date,
@@ -256,11 +259,14 @@ export async function GET(request: NextRequest) {
       createdAt: doc.created_at,
     }));
 
-    // Determine if order has urgent processing option
-    const selectedOptions = (order.selected_options as Array<{ optionName?: string; option_name?: string; priceModifier?: number; quantity?: number }>) || [];
-    const hasUrgent = selectedOptions.some(
-      opt => (opt.optionName || opt.option_name || '').toLowerCase().includes('urgent')
+    // Canonical option shape (snake_case wizard rows + camelCase Modify rows) —
+    // the old manual map showed 0 lei on wizard rows (read only priceModifier)
+    // and is the single place the client sees what they paid for, including
+    // add-ons bought later via extra payment.
+    const normalizedOptions = normalizeOrderOptions(
+      order.selected_options as Parameters<typeof normalizeOrderOptions>[0]
     );
+    const hasUrgent = normalizedOptions.some((opt) => opt.name.toLowerCase().includes('urgent'));
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const serviceData = order.service as any;
@@ -340,11 +346,23 @@ export async function GET(request: NextRequest) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         selfCancelAllowed: ((order as any).service?.processing_config?.allow_self_cancel) !== false,
         service: serviceData,
-        selectedOptions: selectedOptions.map(opt => ({
-          optionName: opt.optionName || opt.option_name || '',
-          priceModifier: opt.priceModifier || 0,
-          quantity: opt.quantity || 1,
+        selectedOptions: normalizedOptions.map((opt) => ({
+          optionName: opt.name,
+          priceModifier: opt.unitPrice,
+          quantity: opt.quantity,
         })),
+        // Fiscal invoices for extra payments (admin Modify flow) — shown next
+        // to the main invoice so the client sees the full billing picture.
+        extraInvoices: (Array.isArray((order as any).extra_billing) ? (order as any).extra_billing : [])
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          .filter((e: any) => e?.invoice?.number)
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          .map((e: any) => ({
+            number: `${e.invoice.seriesName}-${e.invoice.number}`,
+            url: e.invoice.link ?? null,
+            amount: e.amount ?? null,
+            paidAt: e.paidAt ?? null,
+          })),
         processingDays,
         hasUrgent,
         pendingReupload,
@@ -365,6 +383,9 @@ export async function GET(request: NextRequest) {
           vatAmount,
           vatRate: VAT_RATE,
           totalPrice: order.total_price,
+          // Extra payments collected after the original order (Modify flow).
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          additionalPaid: Number((order as any).additional_paid_amount ?? 0) || 0,
         },
         timeline,
         documents: clientDocuments,

@@ -1296,7 +1296,19 @@ export default function AdminOrderDetailPage() {
                   .replace(/\s*\([^()]*\(adaugă în aceeași comandă\)\)\s*$/i, '')
                   .replace(/\s*\(adaugă în aceeași comandă\)\s*$/i, '')
                   .trim();
-              const opts = order.selected_options;
+              // Rows come in TWO shapes: snake_case (wizard-persisted) and
+              // camelCase (written by the admin Modify dialog). Normalize here
+              // — otherwise Modify-added options rendered with EMPTY name and
+              // no price (incident E-260714-WXGYQ: legalizare + apostilă
+              // notari plătite prin extra, invizibile în admin).
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              const opts = (order.selected_options as any[]).map((o) => ({
+                ...o,
+                option_id: o.option_id ?? o.optionId,
+                option_name: o.option_name ?? o.optionName,
+                option_description: o.option_description ?? o.optionDescription,
+                price_modifier: o.price_modifier ?? o.priceModifier,
+              })) as typeof order.selected_options;
               const childrenByParent = new Map<string, typeof opts>();
               for (const o of opts) {
                 const parentId =

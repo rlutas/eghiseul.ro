@@ -106,6 +106,8 @@ interface OrderData {
   paymentStatus: string;
   invoiceNumber?: string | null;
   invoiceUrl?: string | null;
+  /** Fiscal invoices for extra payments (admin Modify flow). */
+  extraInvoices?: { number: string; url: string | null; amount: number | null; paidAt: string | null }[];
   createdAt: string;
   updatedAt: string;
   paidAt: string | null;
@@ -141,6 +143,7 @@ interface OrderData {
     vatAmount?: number;
     vatRate?: number;
     totalPrice: number;
+    additionalPaid?: number;
   };
   timeline: Array<{
     status: string;
@@ -539,6 +542,22 @@ function OrderStatusContent() {
                   <span>Total</span>
                   <span>{Number(orderData.pricing.totalPrice).toFixed(2)} RON</span>
                 </div>
+                {/* Services added later via the extra-payment flow — the client
+                    paid them separately, so they get their own line. */}
+                {(orderData.pricing.additionalPaid ?? 0) > 0 && (
+                  <>
+                    <div className="flex justify-between text-sm mt-1">
+                      <span className="text-muted-foreground">Servicii adăugate ulterior (achitate)</span>
+                      <span>+{Number(orderData.pricing.additionalPaid).toFixed(2)} RON</span>
+                    </div>
+                    <div className="flex justify-between font-semibold text-sm mt-1">
+                      <span>Total achitat</span>
+                      <span>
+                        {(Number(orderData.pricing.totalPrice) + Number(orderData.pricing.additionalPaid)).toFixed(2)} RON
+                      </span>
+                    </div>
+                  </>
+                )}
                 {/* Show VAT included note if no breakdown */}
                 {orderData.pricing.subtotalWithoutVat == null && (
                   <p className="text-xs text-muted-foreground mt-1">(TVA 21% inclus)</p>
@@ -609,36 +628,62 @@ function OrderStatusContent() {
             </Card>
           )}
 
-          {/* Invoice — visible once Oblio issued it */}
-          {orderData.invoiceUrl && (
+          {/* Invoices — the main one + any extra-payment invoices (services
+              added later through the Modify flow). */}
+          {(orderData.invoiceUrl || (orderData.extraInvoices?.length ?? 0) > 0) && (
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
                   <CreditCard className="h-5 w-5" />
-                  Factură
+                  {(orderData.extraInvoices?.length ?? 0) > 0 ? 'Facturi' : 'Factură'}
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-                  <FileText className="h-5 w-5 text-muted-foreground shrink-0" />
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium text-sm">Factură fiscală</p>
-                    {orderData.invoiceNumber && (
-                      <p className="text-xs text-muted-foreground font-mono">
-                        {orderData.invoiceNumber}
+              <CardContent className="space-y-2">
+                {orderData.invoiceUrl && (
+                  <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                    <FileText className="h-5 w-5 text-muted-foreground shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-sm">Factură fiscală</p>
+                      {orderData.invoiceNumber && (
+                        <p className="text-xs text-muted-foreground font-mono">
+                          {orderData.invoiceNumber}
+                        </p>
+                      )}
+                    </div>
+                    <a
+                      href={orderData.invoiceUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 rounded-md bg-primary-500 px-3 py-1.5 text-sm font-medium text-white hover:bg-primary-600 transition-colors shrink-0"
+                    >
+                      <FileText className="h-4 w-4" />
+                      Vezi factura
+                    </a>
+                  </div>
+                )}
+                {(orderData.extraInvoices ?? []).map((inv) => (
+                  <div key={inv.number} className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                    <FileText className="h-5 w-5 text-muted-foreground shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-sm">
+                        Factură servicii adăugate ulterior
+                        {inv.amount ? ` · ${Number(inv.amount).toFixed(2)} RON` : ''}
                       </p>
+                      <p className="text-xs text-muted-foreground font-mono">{inv.number}</p>
+                    </div>
+                    {inv.url && (
+                      <a
+                        href={inv.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 rounded-md bg-primary-500 px-3 py-1.5 text-sm font-medium text-white hover:bg-primary-600 transition-colors shrink-0"
+                      >
+                        <FileText className="h-4 w-4" />
+                        Vezi factura
+                      </a>
                     )}
                   </div>
-                  <a
-                    href={orderData.invoiceUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 rounded-md bg-primary-500 px-3 py-1.5 text-sm font-medium text-white hover:bg-primary-600 transition-colors shrink-0"
-                  >
-                    <FileText className="h-4 w-4" />
-                    Vezi factura
-                  </a>
-                </div>
+                ))}
               </CardContent>
             </Card>
           )}
