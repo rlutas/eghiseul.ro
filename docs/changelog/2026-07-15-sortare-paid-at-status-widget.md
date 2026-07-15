@@ -17,3 +17,14 @@ Cât timp ANCPI/ONRC e jos, caseta galbenă din widget (sidebar wizard extras CF
 ## 3. ✅ Nr. contract · delegație mutate sub numărul comenzii (`1bc9d3f`)
 
 Erau afișate sub client (implementarea din 15.07 dimineața); mutate în celula numărului de comandă — paritate exactă cu admin-ul CJO.
+
+## 4. 🟣 Politica de anulare 30 min — pusă la punct (`bb3bd06`)
+
+**Audit (cerere Raul):** eghiseul AVEA deja self-cancel complet (endpoint `/api/orders/cancel` + `SelfCancelCard` pe status + countdown + email + 70% refund manual din admin), config per-serviciu corect (constatator + extras CF excluse ca instant). Găsite și reparate:
+
+1. **Gate-ul de status era mai strict decât promisiunea**: anularea mergea DOAR din status `paid` — dacă echipa pornea procesarea în minutul 5, clientul pierdea dreptul de 30 min din termeni. Acum (paritate CJO): fereastra de 30 min e garantată indiferent de progresul intern; blochează doar `shipped`/`completed`/anulate/neplătite.
+2. **Termeni secțiunea 8**: anchor `#anulare` + excepția instant numită explicit (extras CF, constatator) + garanția ferestrei chiar cu procesare începută.
+3. **Footer**: link nou „Politica de anulare" → `/termeni-si-conditii/#anulare`.
+4. **Migrarea 122** (rulată în prod): `allow_self_cancel=true` explicit pe certificat-urbanism-informare (era null — endpoint-ul îl trata permisiv prin `!== false`, dar config-ul trebuie explicit).
+
+Mecanica: client cere anularea din `/comanda/status/` → status `cancellation_requested` + email → echipa face refundul de 70% din admin (review manual al cazurilor borderline).
