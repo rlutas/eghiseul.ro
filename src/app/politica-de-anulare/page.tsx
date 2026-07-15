@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { buildPageMetadata, BASE_URL } from '@/lib/seo';
 import { LegalLayout } from '@/components/legal/legal-layout';
+import { createPublicClient } from '@/lib/supabase/public';
 
 export const metadata = buildPageMetadata({
   title: 'Politica de Anulare și Rambursare',
@@ -20,7 +21,27 @@ const breadcrumb = {
   ],
 };
 
-export default function Page() {
+// Live lists from DB (processing_config.allow_self_cancel) — the policy page
+// can never drift from what the cancel endpoint actually enforces. Revalidated
+// daily together with the page.
+async function getCancellationLists(): Promise<{ cancellable: string[]; excluded: string[] }> {
+  const supabase = createPublicClient();
+  const { data } = await supabase
+    .from('services')
+    .select('name, processing_config')
+    .eq('is_active', true)
+    .order('name');
+  const cancellable: string[] = [];
+  const excluded: string[] = [];
+  for (const s of data ?? []) {
+    const pc = s.processing_config as { allow_self_cancel?: boolean } | null;
+    (pc?.allow_self_cancel === false ? excluded : cancellable).push(s.name);
+  }
+  return { cancellable, excluded };
+}
+
+export default async function Page() {
+  const { cancellable, excluded } = await getCancellationLists();
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }} />
@@ -66,6 +87,17 @@ export default function Page() {
           </li>
         </ol>
 
+        <h2>Ce servicii pot fi anulate</h2>
+        <p>
+          Fereastra de 30 de minute se aplică pentru <strong>toate serviciile de mai jos</strong>{' '}
+          (lista se actualizează automat pe măsură ce adăugăm servicii):
+        </p>
+        <ul>
+          {cancellable.map((name) => (
+            <li key={name}>{name}</li>
+          ))}
+        </ul>
+
         <h2>Excepții — servicii care NU pot fi anulate</h2>
         <p>
           Serviciile cu <strong>eliberare automată instantanee</strong> intră în procesare în
@@ -73,14 +105,11 @@ export default function Page() {
           posibilă după plasarea comenzii, iar opțiunea de anulare nu apare pentru ele:
         </p>
         <ul>
-          <li>
-            <strong>Extras de carte funciară</strong> (inclusiv extrasul de informare eliberat
-            automat 24/7);
-          </li>
-          <li>
-            <strong>Certificat constatator</strong> (toate variantele — de bază, IMM, insolvență, PF,
-            istoric).
-          </li>
+          {excluded.map((name) => (
+            <li key={name}>
+              <strong>{name}</strong>
+            </li>
+          ))}
         </ul>
         <p>
           De asemenea, comanda nu mai poate fi anulată online dacă a fost deja{' '}
