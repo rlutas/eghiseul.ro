@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { Download, Users, ClipboardList, Wallet, Receipt } from 'lucide-react';
+import { Download, Users, ClipboardList, Wallet, Receipt, ListChecks } from 'lucide-react';
 import { useAdminPermissions } from '@/hooks/use-admin-permissions';
 import { findStatusLabel } from '@/lib/admin/status-options';
 
@@ -37,6 +37,100 @@ function monthOptions(): { value: string; label: string }[] {
   return opts;
 }
 
+
+/** Admin-manageable service assignments (decizie 2026-07-15): bife pe servicii
+ *  în loc de migrări manuale. users.manage only — schimbă ce comenzi vede
+ *  colaboratorul prin RLS. */
+function ServiceAssignments({ collaboratorId, onChanged }: { collaboratorId: string; onChanged: () => void }) {
+  const [open, setOpen] = useState(false);
+  const [rows, setRows] = useState<{ id: string; slug: string; name: string; category: string; assigned: boolean }[]>([]);
+  const [busy, setBusy] = useState<string | null>(null);
+  const [err, setErr] = useState('');
+
+  useEffect(() => {
+    if (!open || !collaboratorId) return;
+    (async () => {
+      const res = await fetch(`/api/admin/collaborators/services?collaboratorId=${collaboratorId}`);
+      const json = await res.json();
+      if (json.success) setRows(json.data);
+      else setErr(json.error || 'Eroare la încărcare');
+    })();
+  }, [open, collaboratorId]);
+
+  const toggle = async (serviceId: string, assigned: boolean) => {
+    setBusy(serviceId);
+    setErr('');
+    try {
+      const res = await fetch('/api/admin/collaborators/services', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ collaboratorId, serviceId, assigned }),
+      });
+      const json = await res.json();
+      if (!json.success) throw new Error(json.error || 'Eroare');
+      setRows((r) => r.map((x) => (x.id === serviceId ? { ...x, assigned } : x)));
+      onChanged();
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : 'Eroare');
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const byCategory = rows.reduce<Record<string, typeof rows>>((acc, r) => {
+    (acc[r.category] ??= []).push(r);
+    return acc;
+  }, {});
+
+  return (
+    <div className="mb-6 rounded-xl border border-slate-200 bg-white">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="flex w-full items-center justify-between px-5 py-3 text-left"
+      >
+        <span className="flex items-center gap-2 text-sm font-semibold text-slate-900">
+          <ListChecks className="h-4 w-4 text-primary-600" />
+          Servicii alocate ({rows.filter((r) => r.assigned).length || '…'})
+        </span>
+        <span className="text-xs text-slate-400">{open ? 'ascunde' : 'gestionează'}</span>
+      </button>
+      {open && (
+        <div className="border-t border-slate-100 px-5 py-4">
+          <p className="mb-3 text-xs text-slate-500">
+            Bifat = colaboratorul vede și lucrează comenzile serviciului (și intră în decontul lui).
+            Debifat = serviciul se lucrează intern.
+          </p>
+          {err && <p className="mb-2 text-xs font-semibold text-red-600">{err}</p>}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {Object.entries(byCategory).map(([cat, items]) => (
+              <div key={cat}>
+                <p className="mb-1.5 text-[11px] font-bold uppercase tracking-wide text-slate-400">{cat}</p>
+                <ul className="space-y-1">
+                  {items.map((svc) => (
+                    <li key={svc.id}>
+                      <label className="flex items-center gap-2 text-sm text-slate-700">
+                        <input
+                          type="checkbox"
+                          checked={svc.assigned}
+                          disabled={busy === svc.id}
+                          onChange={(e) => toggle(svc.id, e.target.checked)}
+                          className="h-4 w-4"
+                        />
+                        {svc.name}
+                      </label>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function CollaboratorsAdminPage() {
   const { hasPermission } = useAdminPermissions();
   const [collaborators, setCollaborators] = useState<Collaborator[]>([]);
@@ -47,16 +141,18 @@ export default function CollaboratorsAdminPage() {
   const [loading, setLoading] = useState(true);
   const months = useMemo(() => monthOptions(), []);
 
+  const reloadCollaborators = async (keepSelection = false) => {
+    const res = await fetch('/api/admin/collaborators');
+    const json = await res.json();
+    if (json.success) {
+      setCollaborators(json.data);
+      if (!keepSelection && json.data.length) setSelectedId(json.data[0].id);
+    }
+    setLoading(false);
+  };
+
   useEffect(() => {
-    (async () => {
-      const res = await fetch('/api/admin/collaborators');
-      const json = await res.json();
-      if (json.success) {
-        setCollaborators(json.data);
-        if (json.data.length) setSelectedId(json.data[0].id);
-      }
-      setLoading(false);
-    })();
+    reloadCollaborators();
   }, []);
 
   useEffect(() => {
@@ -120,6 +216,11 @@ export default function CollaboratorsAdminPage() {
               <Download className="h-4 w-4" /> Export CSV/TSV
             </a>
           </div>
+
+          {/* Service assignments — users.manage only */}
+          {hasPermission('users.manage') && selectedId && (
+            <ServiceAssignments collaboratorId={selectedId} onChanged={() => reloadCollaborators(true)} />
+          )}
 
           {/* Summary */}
           <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
