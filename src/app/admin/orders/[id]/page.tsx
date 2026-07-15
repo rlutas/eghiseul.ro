@@ -845,7 +845,6 @@ export default function AdminOrderDetailPage() {
   const statusConfig = STATUS_CONFIG[status] || { label: status, variant: 'outline' as const };
   const customerName = getCustomerDisplayName(contact, personal, company, billing, isPJ);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const sheetMotiv = (() => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const cd = order.customer_data as any;
