@@ -626,8 +626,10 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
               type="file"
               // Selfie must be a photo — a PDF in the selfie slot was one of
               // the ways wrong files ended up there (2026-07-15 sweep).
+              // NO static `capture`: on iOS it forces the camera and blocks
+              // the gallery, which breaks applying for someone else (spouse).
+              // The "Fă selfie acum" button sets it per-click instead.
               accept={type === 'selfie' ? 'image/jpeg,image/jpg,image/png' : 'image/jpeg,image/jpg,image/png,application/pdf'}
-              capture={type === 'selfie' ? 'user' : undefined}
               onChange={(e) => {
                 const file = e.target.files?.[0];
                 if (file) handleFileSelect(type, file);
@@ -635,21 +637,73 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
               }}
               className="hidden"
             />
-            <div
-              onClick={() => refForType(type).current?.click()}
-              className="border border-neutral-200 rounded-lg p-6 text-center hover:bg-neutral-50 transition-colors cursor-pointer"
-            >
-              <div className="flex justify-center gap-2 mb-2">
-                <Camera className="w-6 h-6 text-neutral-400" />
-                <Upload className="w-6 h-6 text-neutral-400" />
+            {type === 'selfie' ? (
+              <div className="border border-neutral-200 rounded-lg p-4 text-center">
+                {/* Exemplu vizual — cea mai eficientă instrucțiune: oamenii
+                    copiază poza, nu citesc textul. Fișierul e generat separat;
+                    dacă lipsește, blocul imaginii se ascunde singur. */}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/images/upload-guides/selfie-cu-act-exemplu.webp"
+                  alt="Exemplu de selfie corect: persoana ține actul de identitate lângă față, ambele clar vizibile"
+                  width={640}
+                  height={400}
+                  loading="lazy"
+                  className="mx-auto mb-3 max-h-44 w-auto rounded-lg"
+                  onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                />
+                <p className="text-sm font-medium text-secondary-900">
+                  Selfie cu actul de identitate în mână
+                </p>
+                <p className="mt-0.5 text-xs text-neutral-500">
+                  Fața și actul trebuie să fie clar vizibile, ca în exemplu. Aplici pentru altcineva
+                  (soț/soție, părinte)? Încarcă selfie-ul <strong>acelei persoane</strong> cu actul ei.
+                </p>
+                <div className="mt-3 flex flex-col justify-center gap-2 sm:flex-row">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const input = refForType(type).current;
+                      if (!input) return;
+                      input.setAttribute('capture', 'user');
+                      input.click();
+                    }}
+                    className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700"
+                  >
+                    <Camera className="h-4 w-4" /> Fă selfie acum
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const input = refForType(type).current;
+                      if (!input) return;
+                      input.removeAttribute('capture');
+                      input.click();
+                    }}
+                    className="inline-flex items-center justify-center gap-2 rounded-lg border border-neutral-300 px-4 py-2 text-sm font-semibold text-secondary-900 hover:bg-neutral-50"
+                  >
+                    <Upload className="h-4 w-4" /> Încarcă o poză existentă
+                  </button>
+                </div>
+                <p className="mt-2 text-[11px] text-neutral-400">JPEG sau PNG, max 10MB</p>
               </div>
-              <p className="text-sm font-medium text-secondary-900 mb-1">
-                {type === 'selfie' ? 'Click pentru selfie sau trage o imagine' : 'Trage fișierul aici sau click pentru a selecta'}
-              </p>
-              <p className="text-xs text-neutral-500">
-                JPEG sau PNG, max 10MB
-              </p>
-            </div>
+            ) : (
+              <div
+                onClick={() => refForType(type).current?.click()}
+                className="border border-neutral-200 rounded-lg p-6 text-center hover:bg-neutral-50 transition-colors cursor-pointer"
+              >
+                <div className="flex justify-center gap-2 mb-2">
+                  <Camera className="w-6 h-6 text-neutral-400" />
+                  <Upload className="w-6 h-6 text-neutral-400" />
+                </div>
+                <p className="text-sm font-medium text-secondary-900 mb-1">
+                  Trage fișierul aici sau click pentru a selecta
+                </p>
+                <p className="text-xs text-neutral-500">
+                  JPEG sau PNG, max 10MB
+                </p>
+              </div>
+            )}
           </div>
         )}
 
