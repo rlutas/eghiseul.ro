@@ -10,7 +10,7 @@
  */
 
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { useModularWizard } from '@/providers/modular-wizard-provider';
+import { useModularWizard, isPhoneOrderMode } from '@/providers/modular-wizard-provider';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
@@ -188,8 +188,11 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
     state.contact.citizenship === 'foreign' ||
     state.personalKyc?.citizenship !== undefined &&
       state.personalKyc?.citizenship !== 'romanian';
+  // Mod telefonic: echipa TASTEAZĂ datele clientului — scanarea actului e a
+  // clientului, prin link-ul de completare (după plată). Direct pe manual.
+  const phoneMode = isPhoneOrderMode();
   const [mode, setMode] = useState<'choice' | 'scan' | 'manual'>(
-    isForeignCitizen ? 'manual' : hasExistingData ? 'scan' : 'choice'
+    phoneMode ? 'manual' : isForeignCitizen ? 'manual' : hasExistingData ? 'scan' : 'choice'
   );
 
   // In scan mode we hide the WHOLE form (CNP, serie/număr, nume, prenume,
@@ -749,14 +752,16 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
     // Skip document requirement if user has valid KYC from their account
     const acceptedDocs = config?.acceptedDocuments ?? [];
     const uploadedDocs = personalKyc?.uploadedDocuments ?? [];
-    if (acceptedDocs.length > 0 && uploadedDocs.length === 0 && !hasValidKycFromAccount) {
+    // Mod telefonic: actul NU se cere aici — clientul îl încarcă prin link-ul
+    // de completare. Echipa avansează doar cu datele tastate.
+    if (!phoneMode && acceptedDocs.length > 0 && uploadedDocs.length === 0 && !hasValidKycFromAccount) {
       return false;
     }
 
     // Scan mode: cere SETUL COMPLET de scanări pentru tipul de act ales — nu doar
     // „≥1 poză". Previne: a ales CI nou dar a urcat doar fața (sau aceeași poză de
     // 2 ori) → ne lipsesc date. CI nou cere și dovada de domiciliu (RO CEI PDF).
-    if (!hasValidKycFromAccount && personalKyc.idDocumentType && !isForeignCitizen) {
+    if (!phoneMode && !hasValidKycFromAccount && personalKyc.idDocumentType && !isForeignCitizen) {
       const has = (t: string) => uploadedDocs.some((d) => d.type === t);
       if (personalKyc.idDocumentType === 'ci_vechi') {
         if (!has('ci_front')) return false;
@@ -802,7 +807,7 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
     }
 
     return true;
-  }, [personalKyc, config, hasValidKycFromAccount]);
+  }, [personalKyc, config, hasValidKycFromAccount, phoneMode]);
 
   // Notify parent when validity changes
   useEffect(() => {
@@ -822,7 +827,7 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
     if (!personalKyc.birthDate) m.push('Data nașterii');
     const acceptedDocs = config?.acceptedDocuments ?? [];
     const docs = personalKyc.uploadedDocuments ?? [];
-    if (acceptedDocs.length > 0 && !hasValidKycFromAccount) {
+    if (!phoneMode && acceptedDocs.length > 0 && !hasValidKycFromAccount) {
       const has = (t: string) => docs.some((d) => d.type === t);
       if (personalKyc.idDocumentType && !isForeign) {
         if (personalKyc.idDocumentType === 'ci_vechi' && !has('ci_front')) m.push('Scanarea CI (față)');
@@ -845,7 +850,7 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
       } else if (!personalKyc.foreignData?.foreignAddress?.trim()) m.push('Adresa din străinătate');
     }
     return m;
-  }, [personalKyc, config, hasValidKycFromAccount]);
+  }, [personalKyc, config, hasValidKycFromAccount, phoneMode]);
 
   const [showErrors, setShowErrors] = useState(false);
   const errorRef = useRef<HTMLDivElement>(null);
@@ -1318,7 +1323,12 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
                 : 'Completezi manual datele.'}
             </p>
             <p className="text-amber-800 text-xs mt-0.5 leading-snug">
-              {isForeignCitizen ? (
+              {phoneMode ? (
+                <>
+                  Comandă telefonică: tastezi doar datele clientului. <strong>Actul, selfie-ul și
+                  semnătura</strong> le face clientul prin link-ul de completare, după plată.
+                </>
+              ) : isForeignCitizen ? (
                 <>
                   La pasul 4 va trebui să încarci 3 documente: <strong>pașaportul deschis</strong>,
                   un <strong>selfie cu pașaportul</strong>, și <strong>permisul de
