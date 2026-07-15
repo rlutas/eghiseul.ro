@@ -39,6 +39,7 @@ Platforma digitala pentru Romania - servicii publice digitalizate (9 servicii ac
 | **Plati & facturare** | `docs/technical/specs/stripe-oblio-payment-invoicing.md` |
 | **Workeri Railway (ONRC/ANCPI) — deploy & status** | `docs/technical/specs/railway-workers.md` ⚠️ deploy DIFERĂ: ONRC=`git push`, ANCPI=`railway up` |
 | **Security** | `docs/security/README.md` |
+| **Cookie consent / GDPR (banner + consent receipts)** | `docs/technical/specs/cookie-consent.md` |
 | **Vercel deploy & Stripe webhook** | `docs/deployment/VERCEL_DEPLOYMENT.md` |
 | **S3 setup** | `docs/deployment/AWS_S3_SETUP.md` |
 | **DB migrations guide** | `docs/deployment/DATABASE_MIGRATIONS.md` |

@@ -45,6 +45,7 @@ Index al documentației. Aceasta e o **hartă**, nu un jurnal — pentru jurnalu
 - **Decontări Stripe (reconciliere cross-platform + proforme extra):** [`technical/specs/decontari-stripe-reconciliation.md`](technical/specs/decontari-stripe-reconciliation.md)
 - **Runbook schimbare firmă (Stripe/Oblio/bancă noi):** [`technical/specs/schimbare-firma-runbook.md`](technical/specs/schimbare-firma-runbook.md)
 - **ANCPI automation:** [`technical/specs/ancpi-automation-plan.md`](technical/specs/ancpi-automation-plan.md)
+- **Cookie consent (GDPR, banner + consent receipts):** [`technical/specs/cookie-consent.md`](technical/specs/cookie-consent.md)
 - **Deploy:** [`deployment/VERCEL_DEPLOYMENT.md`](deployment/VERCEL_DEPLOYMENT.md)
 - **Email (Resend + Zoho) setup:** [`deployment/EMAIL_RESEND_ZOHO_SETUP.md`](deployment/EMAIL_RESEND_ZOHO_SETUP.md)
 
