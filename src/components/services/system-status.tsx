@@ -109,9 +109,11 @@ export function SystemStatus({
           the customer doesn't need to wait or come back. */}
       {!loading && !operational && (
         <p className="mt-3 rounded-lg bg-amber-50 px-3 py-2 text-xs leading-relaxed text-amber-900">
-          Poți plasa comanda fără grijă: se procesează <strong>automat, cu prioritate</strong>, imediat
-          ce platforma {service === 'ancpi' ? 'ANCPI' : 'ONRC'} redevine funcțională. Te anunțăm pe
-          email când documentul e eliberat.
+          <strong>Atenție:</strong> sistemele naționale {service === 'ancpi' ? 'ANCPI' : 'ONRC'} sunt
+          temporar indisponibile, însă <strong>poți plasa comanda în continuare</strong>. Cererea ta
+          este înregistrată și va fi procesată <strong>cu prioritate, automat</strong>, imediat ce
+          sistemele redevin funcționale. Monitorizăm permanent situația și te anunțăm pe email când
+          documentul este eliberat. Mulțumim pentru înțelegere!
         </p>
       )}
     </div>
