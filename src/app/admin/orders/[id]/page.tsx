@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
@@ -1081,6 +1082,10 @@ export default function AdminOrderDetailPage() {
       {/* Extra-payment banners (parity with CJO admin): pending link the
           operator can re-share + green summary once the extra was paid. */}
       <ExtraPaymentBanners order={order} />
+
+      {/* Comenzi telefonice: card de plată (link / manual) cât timp e neplătită
+          + trimiterea link-ului de completare (acte + semnătură) după plată. */}
+      <PhoneOrderActions order={order} onChanged={refreshSilent} />
 
       {/* Standby banner — shown when SLA is paused. Reminds operators that
           the deadline isn't ticking down. */}
@@ -2612,6 +2617,193 @@ interface ExtraBillingEntry {
 /** Extra-payment state banners (parity with the CJO admin order page):
  *  amber "așteptăm plata" with a re-shareable link while the customer hasn't
  *  paid the Modify-flow extra, green summary once it settled. */
+/**
+ * Comenzi telefonice (channel='phone', sau orice comandă neplătită creată de
+ * admin): plata (link Stripe emailat / marcare manuală cu referință) și, după
+ * plată, link-ul de completare — clientul încarcă actele + semnează.
+ */
+function PhoneOrderActions({ order, onChanged }: { order: OrderDetail; onChanged: () => void }) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const o = order as any;
+  const [sendingLink, setSendingLink] = useState(false);
+  const [paymentUrl, setPaymentUrl] = useState<string | null>(null);
+  const [markOpen, setMarkOpen] = useState(false);
+  const [markMethod, setMarkMethod] = useState<'transfer' | 'cash'>('transfer');
+  const [markRef, setMarkRef] = useState('');
+  const [marking, setMarking] = useState(false);
+  const [sendingCompletion, setSendingCompletion] = useState(false);
+  const [completionUrl, setCompletionUrl] = useState<string | null>(null);
+
+  const isPhone = o.channel === 'phone';
+  const unpaid = order.payment_status !== 'paid';
+  // Semnătura lipsă = link-ul de completare încă are sens (și pe comenzile web
+  // rămase fără acte, dar butonul e gândit pentru cele telefonice).
+  const hasSignature = !!(order.customer_data as AnyObj | null)?.signature_s3_key ||
+    !!(order.customer_data as AnyObj | null)?.signature_base64;
+  if (!isPhone) return null;
+
+  const sendPaymentLink = async () => {
+    setSendingLink(true);
+    try {
+      const res = await fetch(`/api/admin/orders/${order.id}/send-payment-link`, { method: 'POST' });
+      const json = await res.json();
+      if (json.success) {
+        setPaymentUrl(json.data.paymentUrl);
+        toast.success('Link de plată trimis pe email');
+      } else {
+        toast.error(json.error || 'Eroare la trimitere');
+      }
+    } catch {
+      toast.error('Eroare de rețea');
+    } finally {
+      setSendingLink(false);
+    }
+  };
+
+  const markPaid = async () => {
+    if (!markRef.trim()) {
+      toast.error('Referința plății e obligatorie');
+      return;
+    }
+    setMarking(true);
+    try {
+      const res = await fetch(`/api/admin/orders/${order.id}/mark-paid`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ method: markMethod, reference: markRef.trim() }),
+      });
+      const json = await res.json();
+      if (json.success) {
+        toast.success('Plata înregistrată — factura și documentele se emit automat');
+        setMarkOpen(false);
+        onChanged();
+      } else {
+        toast.error(json.error || 'Eroare');
+      }
+    } catch {
+      toast.error('Eroare de rețea');
+    } finally {
+      setMarking(false);
+    }
+  };
+
+  const sendCompletion = async () => {
+    setSendingCompletion(true);
+    try {
+      const res = await fetch(`/api/admin/orders/${order.id}/request-completion`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({}),
+      });
+      const json = await res.json();
+      if (json.success) {
+        setCompletionUrl(json.data.completionUrl);
+        toast.success(`Link de completare trimis${json.data.standby ? ' — comanda e în așteptare client' : ''}`);
+        onChanged();
+      } else {
+        toast.error(json.error || 'Eroare');
+      }
+    } catch {
+      toast.error('Eroare de rețea');
+    } finally {
+      setSendingCompletion(false);
+    }
+  };
+
+  const copy = async (url: string, label: string) => {
+    try {
+      await navigator.clipboard.writeText(url);
+      toast.success(`${label} copiat`);
+    } catch {
+      toast.error('Nu am putut copia');
+    }
+  };
+
+  return (
+    <div className="rounded-lg border-2 border-blue-300 bg-blue-50 p-4 space-y-3">
+      <p className="text-sm font-semibold text-blue-900">
+        📞 Comandă telefonică {unpaid ? '— neplătită' : hasSignature ? '— completă' : '— plătită, acte/semnătură în lucru'}
+      </p>
+
+      {unpaid && (
+        <div className="flex flex-wrap items-center gap-2">
+          <Button size="sm" onClick={sendPaymentLink} disabled={sendingLink}>
+            {sendingLink ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : null}
+            Trimite link de plată
+          </Button>
+          <Button size="sm" variant="outline" onClick={() => setMarkOpen(true)}>
+            Marchează plătită manual
+          </Button>
+          {paymentUrl && (
+            <Button size="sm" variant="ghost" onClick={() => copy(paymentUrl, 'Link plată')}>
+              Copiază link-ul de plată
+            </Button>
+          )}
+        </div>
+      )}
+
+      {unpaid && markOpen && (
+        <div className="rounded-lg border border-blue-200 bg-white p-3 space-y-2">
+          <div className="flex gap-3 text-sm">
+            <label className="flex items-center gap-1.5 cursor-pointer">
+              <input type="radio" checked={markMethod === 'transfer'} onChange={() => setMarkMethod('transfer')} />
+              Transfer bancar
+            </label>
+            <label className="flex items-center gap-1.5 cursor-pointer">
+              <input type="radio" checked={markMethod === 'cash'} onChange={() => setMarkMethod('cash')} />
+              Cash
+            </label>
+          </div>
+          <Input
+            value={markRef}
+            onChange={(e) => setMarkRef(e.target.value)}
+            placeholder="Referință obligatorie: nr. tranzacție / chitanță"
+          />
+          <div className="flex gap-2">
+            <Button size="sm" onClick={markPaid} disabled={marking || !markRef.trim()}>
+              {marking ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : null}
+              Confirmă plata
+            </Button>
+            <Button size="sm" variant="outline" onClick={() => setMarkOpen(false)} disabled={marking}>
+              Renunță
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {!unpaid && !hasSignature && (
+        <div className="flex flex-wrap items-center gap-2">
+          <Button size="sm" onClick={sendCompletion} disabled={sendingCompletion}>
+            {sendingCompletion ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : null}
+            Trimite link de completare (acte + semnătură)
+          </Button>
+          {completionUrl && (
+            <>
+              <Button size="sm" variant="ghost" onClick={() => copy(completionUrl, 'Link completare')}>
+                Copiază link-ul
+              </Button>
+              <a
+                href={`https://wa.me/?text=${encodeURIComponent(completionUrl)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-blue-700 underline"
+              >
+                Trimite pe WhatsApp
+              </a>
+            </>
+          )}
+        </div>
+      )}
+
+      {o.payment_reference && (
+        <p className="text-xs text-blue-800">
+          Plată manuală · referință: <span className="font-mono font-semibold">{o.payment_reference}</span>
+        </p>
+      )}
+    </div>
+  );
+}
+
 function ExtraPaymentBanners({ order }: { order: OrderDetail }) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const o = order as any;

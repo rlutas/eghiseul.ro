@@ -308,6 +308,9 @@ export default function AdminOrdersPage() {
             <RefreshCw className={`mr-1 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
             Reîncarcă
           </Button>
+          <Button size="sm" onClick={() => router.push('/admin/orders/new')} title="Comandă telefonică — creată de echipă A→Z">
+            + Comandă nouă
+          </Button>
         </div>
       </div>
 

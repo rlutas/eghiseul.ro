@@ -26,14 +26,7 @@ import {
   REUPLOAD_DOC_SPECS,
   reuploadDocLabel,
 } from '@/lib/reupload/doc-types';
-import { exitStandby } from '@/lib/orders/standby';
-import { sendEmail } from '@/lib/email/resend';
-import {
-  buildReuploadCompletedSubject,
-  buildReuploadCompletedHtml,
-  buildReuploadCompletedText,
-} from '@/lib/email/templates/reupload-completed';
-import { ORGANIZATION } from '@/lib/seo/constants';
+import { finalizeReuploadRequest } from '@/lib/reupload/finalize';
 
 export const runtime = 'nodejs';
 export const maxDuration = 30;
@@ -54,6 +47,10 @@ interface ReuploadRow {
   reason: string | null;
   token_expires_at: string;
   return_status: string | null;
+  flow: string | null;
+  require_email_confirm: boolean | null;
+  signature_required: boolean | null;
+  signature_completed_at: string | null;
 }
 
 function requestedTypes(req: ReuploadRow): string[] {
@@ -76,7 +73,7 @@ async function loadRequest(token: string) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data, error } = await (admin as any)
     .from('reupload_requests')
-    .select('id, order_id, document_type, document_types, completed_documents, status, reason, token_expires_at, return_status')
+    .select('id, order_id, document_type, document_types, completed_documents, status, reason, token_expires_at, return_status, flow, require_email_confirm, signature_required, signature_completed_at')
     .eq('token', token)
     .single();
   if (error || !data) return { admin, req: null as ReuploadRow | null };
@@ -123,6 +120,21 @@ export async function GET(
   const expired = new Date(req.token_expires_at).getTime() < Date.now();
   const usable = req.status === 'pending' && !expired;
 
+  // Completion flow: NOTHING is revealed before the email-confirm gate — the
+  // full payload comes from POST /verify with the order email (anti-forwarding,
+  // per the draft-hijack lesson E-260710-2S5EH).
+  if (req.require_email_confirm) {
+    return NextResponse.json({
+      success: true,
+      data: {
+        usable,
+        status: expired && req.status === 'pending' ? 'expired' : req.status,
+        requiresEmailConfirm: true,
+        expiresAt: req.token_expires_at,
+      },
+    });
+  }
+
   // Friendly order code for page context (not PII — the token holder got it
   // in the request email anyway).
   let orderCode: string | null = null;
@@ -166,6 +178,24 @@ export async function POST(
         { success: false, error: expired ? 'Link expirat' : 'Link deja folosit' },
         { status: 410 }
       );
+    }
+
+    // Completion flow: uploads require the email-confirm proof from /verify.
+    if (req.require_email_confirm) {
+      const { data: orderForGate } = await admin
+        .from('orders')
+        .select('customer_data')
+        .eq('id', req.order_id)
+        .single();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const gateEmail = ((orderForGate?.customer_data as any)?.contact?.email as string) || null;
+      const { checkProofHeaders } = await import('@/lib/reupload/completion-proof');
+      if (!checkProofHeaders(request.headers, token, gateEmail)) {
+        return NextResponse.json(
+          { success: false, error: 'Confirmă mai întâi emailul comenzii.' },
+          { status: 403 }
+        );
+      }
     }
 
     const body = await request.json().catch(() => ({}));
@@ -239,7 +269,10 @@ export async function POST(
       { type: docType, s3Key, at: nowIso },
     ];
     const doneTypes = new Set(completed.map((d) => d.type));
-    const allDone = types.every((t) => doneTypes.has(t));
+    // Completion flow: the signature is part of the completion condition —
+    // the request finishes only after docs AND signature.
+    const signaturePending = !!req.signature_required && !req.signature_completed_at;
+    const allDone = types.every((t) => doneTypes.has(t)) && !signaturePending;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     await (admin as any)
@@ -261,9 +294,10 @@ export async function POST(
       notes: `Client a încărcat ${reuploadDocLabel(docType)} (${doneTypes.size}/${types.length}) — necesită reverificare`,
     });
 
-    // Last document: bring the order back from standby + tell the team.
+    // Last document (+ signature, on completion flow): bring the order back
+    // from standby, regenerate signed documents (completion), tell the team.
     if (allDone) {
-      await finalizeRequest(admin, req, order as AnyObj | null, types, nowIso);
+      await finalizeReuploadRequest(admin, req, order as AnyObj | null, types, nowIso);
     }
 
     return NextResponse.json({
@@ -280,76 +314,6 @@ export async function POST(
       { success: false, error: error instanceof Error ? error.message : 'Eroare necunoscută' },
       { status: 500 }
     );
-  }
-}
-
-/**
- * On the last upload: restore the order from standby to its pre-request
- * status (shifting the SLA by the paused business days) and notify the team
- * inbox. Failures here must not fail the customer's upload — everything is
- * best-effort with its own error logging.
- */
-async function finalizeRequest(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  admin: any,
-  req: ReuploadRow,
-  order: AnyObj | null,
-  types: string[],
-  nowIso: string
-) {
-  let restoredStatus: string | null = null;
-  try {
-    // Only touch the status if the order is still parked where we put it —
-    // an operator may have moved it manually in the meantime.
-    if (req.return_status && order?.status === 'standby' && order?.standby_started_at) {
-      const exit = exitStandby({
-        standby_started_at: order.standby_started_at,
-        standby_total_seconds: order.standby_total_seconds ?? 0,
-        estimated_completion_date: order.estimated_completion_date ?? null,
-      });
-      await admin
-        .from('orders')
-        .update({
-          status: req.return_status,
-          standby_started_at: exit.standby_started_at,
-          standby_total_seconds: exit.standby_total_seconds,
-          estimated_completion_date: exit.estimated_completion_date,
-          updated_at: nowIso,
-        })
-        .eq('id', req.order_id);
-      restoredStatus = req.return_status;
-
-      await admin.from('order_history').insert({
-        order_id: req.order_id,
-        event_type: 'status_changed',
-        old_value: { status: 'standby' },
-        new_value: { status: req.return_status, pausedBusinessDays: exit.pausedBusinessDays },
-        notes: `Documente primite de la client — comanda a revenit din așteptare (SLA +${exit.pausedBusinessDays} zile lucrătoare)`,
-      });
-    }
-  } catch (err) {
-    console.error('[reupload] standby exit failed (continuing):', err);
-  }
-
-  try {
-    const base = process.env.NEXT_PUBLIC_APP_URL ?? 'https://eghiseul.ro';
-    const orderNumber: string =
-      order?.friendly_order_id || order?.order_number || req.order_id;
-    const input = {
-      orderNumber,
-      adminOrderUrl: `${base}/admin/orders/${req.order_id}`,
-      documentLabels: types.map((t) => reuploadDocLabel(t)),
-      restoredStatus,
-    };
-    await sendEmail({
-      to: ORGANIZATION.contactPoint.email,
-      subject: buildReuploadCompletedSubject(input),
-      html: buildReuploadCompletedHtml(input),
-      text: buildReuploadCompletedText(input),
-      idempotencyKey: `reupload-completed-${req.id}`,
-    });
-  } catch (err) {
-    console.error('[reupload] team notification failed (continuing):', err);
   }
 }
 
