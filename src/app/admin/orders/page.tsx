@@ -82,6 +82,8 @@ interface OrderRow {
   courier_provider: string | null;
   courier_service: string | null;
   delivery_tracking_number: string | null;
+  /** Nr. contract asistență + delegație (din order_documents) — paritate CJO. */
+  barou?: { contract: string | null; delegation: string | null } | null;
   delivery_method: string | null;
   selected_options?: Array<{ code?: string | null; option_name?: string | null }> | null;
   customer_data: {
@@ -351,7 +353,7 @@ export default function AdminOrdersPage() {
           <div className="relative w-full max-w-xs lg:w-64">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
-              placeholder="Caută nr. comandă, email, AWB…"
+              placeholder="Caută nr. comandă, email, telefon…"
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               onKeyDown={(e) => {
@@ -484,7 +486,6 @@ export default function AdminOrdersPage() {
               <TableHead>Plată</TableHead>
               <TableHead className="text-center" title="Documente KYC încărcate / așteptate">📎</TableHead>
               <TableHead>Curier</TableHead>
-              <TableHead>AWB</TableHead>
               <TableHead className="text-right">Total</TableHead>
               <TableHead>Termen</TableHead>
               <TableHead>Dată</TableHead>
@@ -555,7 +556,22 @@ export default function AdminOrdersPage() {
                       <span className="text-xs text-muted-foreground">
                         {order.customer_data?.contact?.email || '-'}
                       </span>
+                      {order.customer_data?.contact?.phone && (
+                        <span className="text-xs text-muted-foreground">
+                          {order.customer_data.contact.phone}
+                        </span>
+                      )}
                     </div>
+                    {/* Nr. contract asistență · delegație — paritate cu admin-ul CJO */}
+                    {(order.barou?.contract || order.barou?.delegation) && (
+                      <div
+                        className="mt-0.5 font-mono text-[10px] font-normal text-muted-foreground"
+                        title="Nr. contract asistență · Nr. delegație"
+                      >
+                        {order.barou?.contract ?? '—'}
+                        {order.barou?.delegation ? ` · ${order.barou.delegation}` : ''}
+                      </div>
+                    )}
                   </TableCell>
                   {/* Note echipă — sister-style icon + count, jumps to the notes card */}
                   <TableCell className="w-8 px-1">
@@ -590,15 +606,6 @@ export default function AdminOrdersPage() {
                   </TableCell>
                   <TableCell>
                     <CourierBadge provider={order.courier_provider} />
-                  </TableCell>
-                  <TableCell>
-                    {order.delivery_tracking_number ? (
-                      <span className="rounded bg-green-50 px-1.5 py-0.5 font-mono text-xs text-green-700">
-                        {order.delivery_tracking_number}
-                      </span>
-                    ) : (
-                      <span className="text-xs text-muted-foreground">-</span>
-                    )}
                   </TableCell>
                   <TableCell className="text-right font-medium">
                     <div className="flex items-center justify-end gap-1">

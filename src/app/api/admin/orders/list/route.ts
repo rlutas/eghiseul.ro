@@ -188,9 +188,31 @@ export async function GET(request: NextRequest) {
       }
     }
 
+    // Nr. contract asistență + delegație per comandă (order_documents) —
+    // afișate sub numărul comenzii, paritate cu admin-ul CJO.
+    const barouByOrder: Record<string, { contract: string | null; delegation: string | null }> = {};
+    if (orderRows.length) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: docNumbers } = await (adminClient as any)
+        .from('order_documents')
+        .select('order_id, type, document_number')
+        .in('order_id', orderRows.map((o) => o.id))
+        .in('type', ['contract_asistenta', 'imputernicire'])
+        .not('document_number', 'is', null);
+      for (const d of (docNumbers ?? []) as { order_id: string; type: string; document_number: string }[]) {
+        const entry = (barouByOrder[d.order_id] ??= { contract: null, delegation: null });
+        if (d.type === 'contract_asistenta') entry.contract = d.document_number;
+        else entry.delegation = d.document_number;
+      }
+    }
+
     return NextResponse.json({
       success: true,
-      data: orderRows.map((o) => ({ ...o, note_count: noteCounts[o.id] || 0 })),
+      data: orderRows.map((o) => ({
+        ...o,
+        note_count: noteCounts[o.id] || 0,
+        barou: barouByOrder[o.id] ?? null,
+      })),
       total: count || 0,
     });
   } catch (error) {
