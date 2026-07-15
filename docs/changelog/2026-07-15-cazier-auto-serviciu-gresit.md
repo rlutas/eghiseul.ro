@@ -1,6 +1,6 @@
 # 2026-07-15 — Incident conținut: pagina cazier auto descria ALT serviciu
 
-**Severitate:** high (conținut înșelător pe pagină live cu trafic) · **Fix:** migrarea `120` (DB, rulată în producție) + rescriere completă pagină (`87a71a6`)
+**Severitate:** high (conținut înșelător pe pagină live cu trafic) · **Fix:** migrarea `120` (DB, rulată în producție) + rescriere completă pagină (`87a71a6`) + migrarea `121` (VIN scos din wizard, `4c43c26`)
 
 ## Ce s-a întâmplat
 
@@ -8,13 +8,12 @@ Pagina `/servicii/cazier-auto-online/` (+ descrierea serviciului din DB) prezent
 
 Descoperit de Raul comparând cu cazierjudiciaronline.com. Colision terminologic: „cazier auto" e folosit colocvial pentru ambele, dar noi vindem doar fișa conducătorului.
 
-## Ce era deja corect (important)
+## Ce era deja corect / ce NU (corectură)
 
-- **Wizard-ul colecta datele corecte**: `verification_config` are DOAR `drivingLicense.required=true`; toate câmpurile de vehicul (VIN, placă, marcă, model, an) sunt `required:false` și `VehicleDataStep` randează câmpuri NUMAI când sunt required → clientul vedea doar „Nr. permis de conducere". **Nicio comandă nu a colectat date greșite.**
+- Câmpurile `required` erau corecte: DOAR `drivingLicense.required=true`, toate câmpurile de vehicul `required:false`.
+- **DAR wizard-ul afișa totuși „Serie șasiu (VIN)"**: flag-ul separat `vehicleVerification.vinValidation=true` forțează randarea VIN chiar cu `vin.required=false` (`VehicleDataStep.tsx:234`: `vin.required || config.vinValidation`). Prima verificare (doar pe required) a ratat asta — prins de Raul pe formularul live. **Fix: migrarea 121** (`vinValidation=false`, rulată în producție; efect imediat, config-ul e citit din DB la runtime).
 - OG image folosea deja specimenul real („Istoric Sancțiuni").
 - Preț (198 RON) și termene (3-5 zile / urgent 1-2) corecte în DB.
-
-Deci incidentul a fost DOAR de prezentare (pagină + descrieri DB), nu de flux.
 
 ## Fix
 
@@ -32,3 +31,4 @@ Deci incidentul a fost DOAR de prezentare (pagină + descrieri DB), nu de flux.
 1. La migrarea de conținut dintre platforme, **verifică serviciul REAL vândut**, nu doar keyword-ul — „cazier auto" acoperă colocvial două servicii diferite.
 2. Config-ul wizard-ului (required fields) e sursa adevărului pentru ce vindem; conținutul paginii trebuie aliniat la el, nu invers.
 3. Titlurile ciudate din GA se verifică întâi pe LIVE (curl titluri) înainte de vânătoare în cod — GA păstrează titlurile istorice per vizită.
+4. **Verificarea „ce câmpuri vede clientul" NU se termină la `required`** — `verification_config` are flag-uri care forțează randarea independent de required (ex. `vinValidation`). Verifică toate condițiile de randare din componentă sau, mai sigur, formularul LIVE.
