@@ -38,3 +38,7 @@ Saga (13 cron-uri eșuate silențios) închisă azi:
 4. **EGH-0055 emisă** (182,30 lei, referință proforma PEGH-0001), scrisă în `extra_billing` + `order_history` — vizibilă în admin la Facturare sub EGH-0047.
 
 **Lecții:** (1) Oblio: referenceDocument ⇒ fără products; (2) erorile proceselor de fundal TREBUIE să fie vizibile în DB, nu doar în loguri inaccesibile; (3) CHECK constraints pe event_type = de verificat la orice tip nou de eveniment.
+
+### Follow-up: serviciile plătite prin extra erau INVIZIBILE (fix ba6941a)
+
+Opțiunile scrise de dialogul Modifică sunt camelCase; admin-ul randa doar snake_case → legalizarea + apostila notari plătite apăreau cu nume gol/fără preț, iar pe statusul clientului opțiunile ORIGINALE apăreau cu 0 lei (API-ul citea doar priceModifier). Fixat: normalizare în admin, `normalizeOrderOptions` în /api/orders/status, card „Facturi" pe status client cu AMBELE facturi (EGH-0047 + EGH-0055 cu link PDF) + „Servicii adăugate ulterior (achitate)" și „Total achitat" în sumarul de preț. Verificat end-to-end pe comanda reală.
