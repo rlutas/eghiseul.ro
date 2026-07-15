@@ -14,7 +14,7 @@ import { ArrowLeft, ArrowRight, Loader2, AlertTriangle, CheckCircle, ChevronUp }
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { useModularWizard } from '@/providers/modular-wizard-provider';
+import { useModularWizard, isPhoneOrderMode } from '@/providers/modular-wizard-provider';
 import { WizardProgress } from './wizard-progress-modular';
 import { PriceSidebarModular } from './price-sidebar-modular';
 import { SaveStatus } from './save-status';
@@ -197,6 +197,30 @@ export function ModularOrderWizard({ initialService, initialOptions, headerExtra
     }
 
     setIsSubmitting(true);
+
+    // Mod „comandă telefonică" (?telefonic=1): fără /submit (KYC-ul și
+    // semnătura vin ulterior prin link-ul de completare) — finalizăm ca
+    // comandă telefonică prin endpoint-ul de admin (cere orders.manage).
+    if (isPhoneOrderMode()) {
+      try {
+        const res = await fetch('/api/admin/orders/create-from-draft', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ orderId: state.orderId }),
+        });
+        const json = await res.json();
+        if (!res.ok || !json.success) {
+          toast.error(json.error || 'Finalizarea comenzii telefonice a eșuat. Ești logat ca admin?');
+          setIsSubmitting(false);
+          return;
+        }
+        window.location.href = `/admin/orders/${state.orderId}`;
+      } catch {
+        toast.error('Eroare de rețea la finalizarea comenzii telefonice.');
+        setIsSubmitting(false);
+      }
+      return;
+    }
 
     try {
       // Submit the order (change status from 'draft' to 'pending_payment')
@@ -524,7 +548,11 @@ export function ModularOrderWizard({ initialService, initialOptions, headerExtra
                     )}
                     {isLastStep ? (
                       <>
-                        {isSubmitting ? 'Se procesează...' : `Plătește ${Number(priceBreakdown.totalPrice).toFixed(2)} RON`}
+                        {isSubmitting
+                          ? 'Se procesează...'
+                          : isPhoneOrderMode()
+                            ? `Creează comanda (${Number(priceBreakdown.totalPrice).toFixed(2)} RON, fără plată)`
+                            : `Plătește ${Number(priceBreakdown.totalPrice).toFixed(2)} RON`}
                         {!isSubmitting && <ArrowRight className="h-4 w-4" />}
                       </>
                     ) : (

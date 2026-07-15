@@ -56,6 +56,23 @@ import { generateOrderId, getDraftStorageKey, validateOrderId } from '@/lib/orde
 // v5: Added company document uploads (uploadedDocuments) to CompanyKYCState
 const CACHE_VERSION = 5;
 
+// ── Mod „comandă telefonică” (?telefonic=1) ─────────────────────────────────
+// Echipa completează wizard-ul REAL în locul clientului (paritate 100%: PF/PJ,
+// CUI→ANAF, constatator/CF/imobil, opțiuni, cupoane, curier). Pașii de acte +
+// semnătură se SAR — clientul le face ulterior prin link-ul de completare
+// (/completare/[token]), după plată. Finalizarea NU merge la checkout, ci la
+// /api/admin/orders/create-from-draft (care cere orders.manage — un vizitator
+// cu ?telefonic=1 în URL nu poate finaliza nimic).
+export function isPhoneOrderMode(): boolean {
+  if (typeof window === 'undefined') return false;
+  return new URLSearchParams(window.location.search).get('telefonic') === '1';
+}
+const PHONE_MODE_SKIPPED_STEPS = new Set(['kyc-documents', 'signature']);
+
+function applyPhoneMode<T extends { id: string }>(steps: T[]): T[] {
+  return isPhoneOrderMode() ? steps.filter((s) => !PHONE_MODE_SKIPPED_STEPS.has(s.id)) : steps;
+}
+
 // ============================================================================
 // STATE INITIALIZATION
 // ============================================================================
@@ -342,7 +359,7 @@ function modularWizardReducer(
       const initClientType: ClientType | null = isPfLocked
         ? 'PF'
         : state.clientType ?? null;
-      const steps = buildWizardSteps(verificationConfig, initClientType);
+      const steps = applyPhoneMode(buildWizardSteps(verificationConfig, initClientType));
 
       // Initialize module states based on config
       const personalKyc = verificationConfig.personalKyc.enabled
@@ -435,7 +452,7 @@ function modularWizardReducer(
 
       // When client type changes, rebuild steps and initialize appropriate modules
       if (config) {
-        const steps = buildWizardSteps(config, newClientType);
+        const steps = applyPhoneMode(buildWizardSteps(config, newClientType));
 
         // Initialize modules based on client type
         let personalKyc = state.personalKyc;
