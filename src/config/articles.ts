@@ -25,6 +25,12 @@ export const ARTICLES: ArticleMeta[] = [
     category: 'Cadastru & imobiliare',
   },
   {
+    slug: 'sms-fals-amenda-ghiseul-ro',
+    title: 'SMS Fals cu Amendă de la „Ministerul Transporturilor”: frauda care imită Ghișeul.ro',
+    excerpt: 'DNSC avertizează: SMS-uri cu amenzi false trimit șoferii pe ghiiseul.cc, clonă care fură datele cardului. Cum recunoști mesajul și ce faci dacă ai introdus cardul.',
+    category: 'Auto & amenzi',
+  },
+  {
     slug: 'cat-costa-cadastrul-si-intabularea',
     title: 'Cât Costă Cadastrul și Intabularea în 2026? Prețuri reale + acte necesare',
     excerpt: 'Apartament 820–1.220 lei, casă cu teren 1.520–2.620 lei, intabulare după cumpărare 0,15% din preț. Taxele ANCPI exacte, actele pe scenarii + checklist descărcabil.',
