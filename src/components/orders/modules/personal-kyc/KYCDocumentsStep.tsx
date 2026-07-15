@@ -642,18 +642,25 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
                 {/* Exemplu vizual — cea mai eficientă instrucțiune: oamenii
                     copiază poza, nu citesc textul. Fișierul e generat separat;
                     dacă lipsește, blocul imaginii se ascunde singur. */}
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src="/images/upload-guides/selfie-cu-act-exemplu.webp"
-                  alt="Exemplu de selfie corect: persoana ține actul de identitate lângă față, ambele clar vizibile"
-                  width={640}
-                  height={400}
-                  loading="lazy"
-                  className="mx-auto mb-3 max-h-44 w-auto rounded-lg"
-                  onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-                />
+                <div className="relative mx-auto mb-3 inline-block">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src="/images/upload-guides/selfie-cu-act-exemplu.webp"
+                    alt="Exemplu de selfie corect: persoana ține actul de identitate lângă față, ambele clar vizibile"
+                    width={640}
+                    height={400}
+                    loading="lazy"
+                    className="max-h-44 w-auto rounded-lg"
+                    onError={(e) => { ((e.target as HTMLImageElement).parentElement as HTMLElement).style.display = 'none'; }}
+                  />
+                  {/* Eticheta EXEMPLU direct pe poză — altfel clienții cred că
+                      poza e deja încărcată sau nu înțeleg că e doar model. */}
+                  <span className="absolute left-1/2 top-2 -translate-x-1/2 rounded-full bg-secondary-900/85 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
+                    Exemplu
+                  </span>
+                </div>
                 <p className="text-sm font-medium text-secondary-900">
-                  Selfie cu actul de identitate în mână
+                  Așa trebuie să arate poza ta: selfie cu actul de identitate în mână
                 </p>
                 <p className="mt-0.5 text-xs text-neutral-500">
                   Fața și actul trebuie să fie clar vizibile, ca în exemplu. Aplici pentru altcineva
