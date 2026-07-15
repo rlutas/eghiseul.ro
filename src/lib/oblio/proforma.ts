@@ -127,13 +127,12 @@ export async function createInvoiceFromProforma(
         type: 'Card',
         documentNumber: input.paymentIntentId ?? input.orderNumber,
         documentDate: today,
-        // Without `value` Oblio can reject the collect block — the main
-        // invoice path (invoice.ts) always sends it and never failed; the
-        // extra path omitted it and the webhook emission failed silently
-        // (E-260714-WXGYQ: proforma issued, invoice null).
         value: input.amountRon,
       },
-      products: buildProducts(input),
+      // NO `products` here: with a referenceDocument, Oblio copies the lines
+      // FROM the proforma and rejects explicit products with 400 "Nu puteti
+      // adauga produse pentru facturare prin referinta" — the silent failure
+      // behind E-260714-WXGYQ (12+ cron runs).
     },
   });
   return { seriesName: data.seriesName, number: String(data.number), link: data.link ?? null };
