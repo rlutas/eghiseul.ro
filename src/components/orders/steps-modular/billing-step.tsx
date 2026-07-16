@@ -35,7 +35,10 @@ import {
 import { useModularWizard } from '@/providers/modular-wizard-provider';
 import { cn } from '@/lib/utils';
 import { COUNTIES, getLocalitiesForCounty, findCounty } from '@/lib/data/romania-counties';
-import { isPfBillingComplete } from '@/lib/orders/billing-validation';
+import { isPfBillingComplete, isForeignBillingCountry } from '@/lib/orders/billing-validation';
+import { COUNTRIES as WORLD_COUNTRIES } from '@/config/countries';
+import { SearchableSelect } from '@/components/shared/SearchableSelect';
+import { Checkbox } from '@/components/ui/checkbox';
 import type { BillingSource, BillingState } from '@/types/verification-modules';
 
 interface BillingStepProps {
@@ -321,10 +324,28 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
   const billingAddress = billing?.address;
   const billingCity = billing?.city;
   const billingCounty = billing?.county;
+  const billingCountry = billing?.country;
   const billingCuiVerified = billing?.cuiVerified;
   const billingCompanyName = billing?.companyName;
   const billingCui = billing?.cui;
   const billingIsValid = billing?.isValid;
+
+  // Foreign billing address (facturare pe altă țară). Derived from the saved
+  // country so a restored draft re-enters foreign mode without extra state;
+  // the toggle covers the moment between checking the box and picking a country.
+  const [foreignToggle, setForeignToggle] = useState(false);
+  const isForeignBilling = foreignToggle || isForeignBillingCountry(billingCountry);
+
+  const handleForeignToggle = (checked: boolean) => {
+    setForeignToggle(checked);
+    if (checked) {
+      // Clear RO county/city so stale domestic values don't ride into the
+      // foreign address; country stays empty until the client picks one.
+      updateBilling({ country: '', county: '', city: '', postalCode: '' });
+    } else {
+      updateBilling({ country: 'Romania', county: '', city: '', postalCode: '' });
+    }
+  };
 
   // Validate step (uses primitives to prevent infinite update loops)
   useEffect(() => {
@@ -336,8 +357,9 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
     let isValid = false;
 
     if (billingSource === 'self' || billingSource === 'other_pf') {
-      // PF: name + CNP + full address (street + locality + county) — Oblio
-      // refuses the invoice without a complete address.
+      // PF: name + full address — Oblio refuses the invoice without a complete
+      // address. CNP + county required only for domestic billing (foreign
+      // country → CNP optional, region free-text/'-').
       isValid = isPfBillingComplete({
         firstName: billingFirstName,
         lastName: billingLastName,
@@ -345,7 +367,13 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
         address: billingAddress,
         city: billingCity,
         county: billingCounty,
+        country: billingCountry,
       }, { cnpOptional: isCarteFunciara });
+      // Toggle checked but no country picked yet → must NOT validate under
+      // domestic rules with the old RO data.
+      if (foreignToggle && !isForeignBillingCountry(billingCountry)) {
+        isValid = false;
+      }
     } else if (billingSource === 'company') {
       // Company: must have verified CUI and company name
       isValid = Boolean(billingCuiVerified && billingCompanyName && billingCui);
@@ -357,10 +385,12 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
     }
 
     onValidChange(isValid);
-  }, [billingSource, billingFirstName, billingLastName, billingCnp, billingAddress, billingCity, billingCounty, billingCuiVerified, billingCompanyName, billingCui, billingIsValid, isCarteFunciara, onValidChange, updateBilling]);
+  }, [billingSource, billingFirstName, billingLastName, billingCnp, billingAddress, billingCity, billingCounty, billingCountry, foreignToggle, billingCuiVerified, billingCompanyName, billingCui, billingIsValid, isCarteFunciara, onValidChange, updateBilling]);
 
   // Handle source selection
   const handleSourceSelect = useCallback((source: BillingSource) => {
+    // Every source switch starts from a domestic (RO) address form.
+    setForeignToggle(false);
     if (source === 'self') {
       // Use data from ID scan (name/CNP authoritative; address prefilled when
       // the document carries one, otherwise left blank for the customer).
@@ -574,8 +604,12 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
   // if the blocker is an unverified CUI, verify it on the spot instead of
   // leaving a dead button.
   const [showStepErrors, setShowStepErrors] = useState(false);
+  // Baseline ref: the counter is global per wizard session — comparing to the
+  // value at mount (not 0) avoids flashing errors here because of a failed
+  // attempt on a PREVIOUS step.
+  const validationBaselineRef = useRef(validationAttempt);
   useEffect(() => {
-    if (validationAttempt === 0) return;
+    if (validationAttempt === validationBaselineRef.current) return;
     setShowStepErrors(true);
     if (
       billingSource === 'company' &&
@@ -665,7 +699,7 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
         </div>
 
         {showStepErrors && !selectedSource && (
-          <p className="text-sm text-red-500 flex items-center gap-1">
+          <p data-wizard-error className="text-sm text-red-500 flex items-center gap-1">
             <AlertCircle className="h-4 w-4 shrink-0" />
             Alege pe cine emitem factura: persoană fizică sau firmă.
           </p>
@@ -719,7 +753,9 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
 
           <div className="space-y-2">
             <Label htmlFor="cnp" className="text-secondary-900 font-medium">
-              CNP {isCarteFunciara ? <span className="text-neutral-400 text-xs">(opțional)</span> : <span className="text-red-500">*</span>}
+              CNP {(isCarteFunciara || isForeignBilling)
+                ? <span className="text-neutral-400 text-xs">(opțional{isForeignBilling && !isCarteFunciara ? ' — doar dacă ai CNP românesc' : ''})</span>
+                : <span className="text-red-500">*</span>}
             </Label>
             <Input
               id="cnp"
@@ -732,6 +768,22 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
               disabled={selectedSource === 'self'}
             />
           </div>
+
+          {/* Facturare pe altă țară — înlocuiește dropdown-urile RO cu țară +
+              câmpuri text libere (Oblio acceptă country + județ text liber). */}
+          <label className="flex items-start gap-2.5 cursor-pointer select-none py-1">
+            <Checkbox
+              checked={isForeignBilling}
+              onCheckedChange={(v) => handleForeignToggle(v === true)}
+              className="mt-0.5"
+            />
+            <span className="text-sm text-secondary-900">
+              Adresa de facturare este în afara României
+              <span className="block text-xs text-neutral-500 mt-0.5">
+                Factura va fi emisă cu adresa ta reală din străinătate.
+              </span>
+            </span>
+          </label>
 
           {/* Structured billing address — required for Oblio (street + locality
               + county sent separately). Always editable, even for "self": a
@@ -751,52 +803,110 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-3 sm:gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="county" className="text-secondary-900 font-medium">
-                Județ <span className="text-red-500">*</span>
-              </Label>
-              <Select
-                value={billing?.county || ''}
-                onValueChange={handleCountyChange}
-              >
-                <SelectTrigger id="county" className="w-full min-w-0 bg-white">
-                  <SelectValue placeholder="Alege județul" />
-                </SelectTrigger>
-                <SelectContent>
-                  {COUNTIES.map((c) => (
-                    <SelectItem key={c.code} value={c.name}>
-                      {c.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+          {!isForeignBilling && (
+            <div className="grid grid-cols-2 gap-3 sm:gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="county" className="text-secondary-900 font-medium">
+                  Județ <span className="text-red-500">*</span>
+                </Label>
+                <Select
+                  value={billing?.county || ''}
+                  onValueChange={handleCountyChange}
+                >
+                  <SelectTrigger id="county" className="w-full min-w-0 bg-white">
+                    <SelectValue placeholder="Alege județul" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {COUNTIES.map((c) => (
+                      <SelectItem key={c.code} value={c.name}>
+                        {c.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="city" className="text-secondary-900 font-medium">
-                Localitate <span className="text-red-500">*</span>
-              </Label>
-              <Select
-                value={billing?.city || ''}
-                onValueChange={(v) => updateField('city', v)}
-                disabled={!billing?.county}
-              >
-                <SelectTrigger id="city" className="w-full min-w-0 bg-white">
-                  <SelectValue
-                    placeholder={billing?.county ? 'Alege localitatea' : 'Alege întâi județul'}
-                  />
-                </SelectTrigger>
-                <SelectContent>
-                  {billingLocalities.map((loc) => (
-                    <SelectItem key={loc} value={loc}>
-                      {loc}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="space-y-2">
+                <Label htmlFor="city" className="text-secondary-900 font-medium">
+                  Localitate <span className="text-red-500">*</span>
+                </Label>
+                <Select
+                  value={billing?.city || ''}
+                  onValueChange={(v) => updateField('city', v)}
+                  disabled={!billing?.county}
+                >
+                  <SelectTrigger id="city" className="w-full min-w-0 bg-white">
+                    <SelectValue
+                      placeholder={billing?.county ? 'Alege localitatea' : 'Alege întâi județul'}
+                    />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {billingLocalities.map((loc) => (
+                      <SelectItem key={loc} value={loc}>
+                        {loc}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
-          </div>
+          )}
+
+          {isForeignBilling && (
+            <>
+              <div className="space-y-2">
+                <Label className="text-secondary-900 font-medium">
+                  Țara <span className="text-red-500">*</span>
+                </Label>
+                <SearchableSelect
+                  options={WORLD_COUNTRIES.filter((c) => c !== 'România')}
+                  value={billing?.country && isForeignBillingCountry(billing.country) ? billing.country : ''}
+                  placeholder="Caută țara..."
+                  onChange={(country) => updateField('country', country)}
+                />
+                {showStepErrors && !isForeignBillingCountry(billing?.country) && (
+                  <p data-wizard-error className="text-sm text-red-500 flex items-center gap-1">
+                    <AlertCircle className="h-4 w-4 shrink-0" />
+                    Alege țara de facturare.
+                  </p>
+                )}
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="foreign-city" className="text-secondary-900 font-medium">
+                    Localitate <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    id="foreign-city"
+                    type="text"
+                    value={billing?.city || ''}
+                    onChange={(e) => updateField('city', e.target.value)}
+                    placeholder="ex: München"
+                    className="bg-white"
+                  />
+                  {showStepErrors && !billing?.city?.trim() && (
+                    <p data-wizard-error className="text-xs text-red-500">
+                      Completează localitatea.
+                    </p>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="foreign-region" className="text-secondary-900 font-medium">
+                    Regiune / Provincie <span className="text-xs font-normal text-neutral-500">(opțional)</span>
+                  </Label>
+                  <Input
+                    id="foreign-region"
+                    type="text"
+                    value={billing?.county || ''}
+                    onChange={(e) => updateField('county', e.target.value)}
+                    placeholder="ex: Bavaria"
+                    className="bg-white"
+                  />
+                </div>
+              </div>
+            </>
+          )}
 
           <div className="space-y-2">
             <Label htmlFor="postalCode" className="text-secondary-900 font-medium">
@@ -805,11 +915,13 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
             <Input
               id="postalCode"
               type="text"
-              inputMode="numeric"
-              maxLength={6}
+              inputMode={isForeignBilling ? 'text' : 'numeric'}
+              maxLength={isForeignBilling ? 12 : 6}
               value={billing?.postalCode || ''}
-              onChange={(e) => updateField('postalCode', e.target.value.replace(/\D/g, ''))}
-              placeholder="ex: 900001"
+              onChange={(e) =>
+                updateField('postalCode', isForeignBilling ? e.target.value : e.target.value.replace(/\D/g, ''))
+              }
+              placeholder={isForeignBilling ? 'ex: 80331 / SW1A 1AA' : 'ex: 900001'}
               className="bg-white"
             />
           </div>
@@ -881,7 +993,7 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
               </p>
             )}
             {!billing?.cuiVerified && !cuiError && !cuiLoading && (
-              <p className={cn(
+              <p {...(showStepErrors ? { 'data-wizard-error': true } : {})} className={cn(
                 'text-sm flex items-center gap-1',
                 showStepErrors ? 'text-red-500' : 'text-neutral-500'
               )}>

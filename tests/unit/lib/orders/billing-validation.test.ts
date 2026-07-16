@@ -6,7 +6,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { isPfBillingComplete } from '@/lib/orders/billing-validation';
+import { isPfBillingComplete, isForeignBillingCountry } from '@/lib/orders/billing-validation';
 
 const complete = {
   firstName: 'Iulia',
@@ -45,5 +45,62 @@ describe('isPfBillingComplete', () => {
     expect(isPfBillingComplete(null)).toBe(false);
     expect(isPfBillingComplete(undefined)).toBe(false);
     expect(isPfBillingComplete({})).toBe(false);
+  });
+});
+
+describe('isForeignBillingCountry', () => {
+  it('treats empty/Romania variants as domestic', () => {
+    expect(isForeignBillingCountry(undefined)).toBe(false);
+    expect(isForeignBillingCountry(null)).toBe(false);
+    expect(isForeignBillingCountry('')).toBe(false);
+    expect(isForeignBillingCountry('   ')).toBe(false);
+    expect(isForeignBillingCountry('Romania')).toBe(false);
+    expect(isForeignBillingCountry('România')).toBe(false);
+    expect(isForeignBillingCountry('ROMÂNIA')).toBe(false);
+    expect(isForeignBillingCountry('ro')).toBe(false);
+    expect(isForeignBillingCountry('RO')).toBe(false);
+  });
+
+  it('treats any other country as foreign', () => {
+    expect(isForeignBillingCountry('Germania')).toBe(true);
+    expect(isForeignBillingCountry('Italia')).toBe(true);
+    expect(isForeignBillingCountry('Elveția')).toBe(true);
+    expect(isForeignBillingCountry('United Kingdom')).toBe(true);
+  });
+});
+
+describe('isPfBillingComplete — foreign billing country', () => {
+  const foreign = {
+    firstName: 'Miklos',
+    lastName: 'Nyeste',
+    address: 'Anger 5',
+    city: 'Töpen',
+    country: 'Germania',
+  };
+
+  it('is complete without CNP and without county when country is foreign', () => {
+    expect(isPfBillingComplete(foreign)).toBe(true);
+  });
+
+  it('accepts an optional region in county', () => {
+    expect(isPfBillingComplete({ ...foreign, county: 'Bavaria' })).toBe(true);
+  });
+
+  it('still requires name, address and city', () => {
+    expect(isPfBillingComplete({ ...foreign, address: '' })).toBe(false);
+    expect(isPfBillingComplete({ ...foreign, city: '' })).toBe(false);
+    expect(isPfBillingComplete({ ...foreign, firstName: '' })).toBe(false);
+  });
+
+  it('keeps domestic rules for Romania variants (CNP + county required)', () => {
+    for (const country of ['Romania', 'România', 'RO', '', undefined]) {
+      expect(
+        isPfBillingComplete({ ...complete, country, cnp: '' }),
+      ).toBe(false);
+      expect(
+        isPfBillingComplete({ ...complete, country, county: '' }),
+      ).toBe(false);
+      expect(isPfBillingComplete({ ...complete, country })).toBe(true);
+    }
   });
 });

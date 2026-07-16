@@ -756,6 +756,27 @@ testată în `tests/unit/lib/oblio/build-client.test.ts`). Reguli:
 - **Toate serviciile** folosesc aceeași funcție → fix-ul acoperă cazier PJ, constatator etc.
 - Facturile deja emise greșit (N/A) se **stornează + re-emit manual** în Oblio.
 
+### 2.0b Clienți străini — facturare pe altă țară (2026-07-16)
+
+Wizardul permite la PF (`self` + `other_pf`) checkbox **„Adresa de facturare este în
+afara României"**: țară din lista mondială (`src/config/countries.ts`), localitate +
+regiune text liber, cod poștal alfanumeric, **CNP opțional**. Reguli Oblio (verificate
+pe docs + FAQ oficial):
+
+- `country` = text liber acceptat de Oblio; `state` (județ) text liber pentru străini —
+  `buildOblioClient` trimite regiunea sau **`'-'`** când lipsește (convenția Oblio),
+  ceea ce ține guard-ul `getMissingInvoiceClientFields` satisfăcut fără modificări.
+- **CNP:** Oblio nu îl cere; la e-Factura/SPV completează automat 13 zerouri pentru
+  străini. ⚠️ La țară străină fără CNP pe billing, `cif` NU mai face fallback pe
+  CNP-ul din KYC (ar pune CNP-ul cumpărătorului pe factura altei persoane).
+- **TVA rămâne 21%** pe toate liniile (servicii B2C taxate la sediul prestatorului);
+  fără taxare inversă/OSS. Monedă RON, limbă RO.
+- Detecția: `isForeignBillingCountry()` în `src/lib/orders/billing-validation.ts`
+  (normalizare diacritice; gol/`Romania`/`România`/`RO` = domestic).
+- **PJ străine (VAT ID UE, VIES) NU sunt suportate** — flux manual prin admin.
+- Teste: `tests/unit/lib/orders/billing-validation.test.ts` +
+  `tests/unit/lib/oblio/build-client.test.ts` (secțiunile „foreign billing").
+
 ### 2.1 Oblio API Overview
 
 | Aspect | Details |

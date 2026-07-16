@@ -7,6 +7,7 @@
 
 import { oblioRequest, getOblioConfig } from './client';
 import { normalizeOrderOptions } from '@/lib/orders/normalize';
+import { isForeignBillingCountry } from '@/lib/orders/billing-validation';
 import type {
   OblioInvoiceInput,
   OblioInvoiceResponse,
@@ -201,15 +202,22 @@ export function buildOblioClient(customerData: CustomerData): OblioClient {
   }
 
   // Individual (PF) — fall back to KYC `personal` data for "self" billing.
+  // Foreign billing address (country outside Romania): state falls back to
+  // '-' (Oblio's documented convention for foreign clients — keeps the
+  // getMissingInvoiceClientFields guard satisfied) and the CNP does NOT fall
+  // back to the buyer's KYC CNP — a foreign billing person without CNP must
+  // not inherit someone else's CNP on the invoice (SPV fills 13 zeros).
+  const pfCountry = billing?.country || address?.country || 'Romania';
+  const pfIsForeign = isForeignBillingCountry(pfCountry);
   return {
     name:
       `${billing?.firstName || contact?.firstName || personal?.firstName || ''} ${billing?.lastName || contact?.lastName || personal?.lastName || ''}`.trim() ||
       'N/A',
-    cif: billing?.cnp || personal?.cnp || '',
+    cif: billing?.cnp || (pfIsForeign ? '' : personal?.cnp || ''),
     address: billing?.address || address?.street || '',
     city: billing?.city || address?.city || '',
-    state: billing?.county || address?.county || '',
-    country: billing?.country || address?.country || 'Romania',
+    state: billing?.county || address?.county || (pfIsForeign ? '-' : ''),
+    country: pfCountry,
     email: contact?.email,
     phone: contact?.phone,
     vatPayer: false,

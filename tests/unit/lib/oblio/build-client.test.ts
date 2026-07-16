@@ -64,6 +64,56 @@ describe('buildOblioClient', () => {
   });
 });
 
+describe('buildOblioClient — foreign billing country (facturare pe altă țară)', () => {
+  const foreignBilling = {
+    type: 'persoana_fizica' as const,
+    source: 'other_pf' as const,
+    firstName: 'Miklos',
+    lastName: 'Nyeste',
+    address: 'Anger 5',
+    city: 'Töpen',
+    country: 'Germania',
+  };
+
+  it('passes the country through and defaults state to "-" when no region given', () => {
+    const c = buildOblioClient({ billing: foreignBilling });
+    expect(c.country).toBe('Germania');
+    expect(c.state).toBe('-'); // Oblio FAQ convention for foreign clients
+    expect(c.city).toBe('Töpen');
+  });
+
+  it('uses the region as state when provided', () => {
+    const c = buildOblioClient({ billing: { ...foreignBilling, county: 'Bavaria' } });
+    expect(c.state).toBe('Bavaria');
+  });
+
+  it('does NOT inherit the buyer\'s KYC CNP for a foreign person without CNP', () => {
+    // other_pf abroad without CNP must not get the buyer's CNP on the invoice.
+    const c = buildOblioClient({
+      billing: foreignBilling,
+      personal: { firstName: 'Ana', lastName: 'Ionescu', cnp: '2900202080022' },
+    });
+    expect(c.cif).toBe('');
+  });
+
+  it('keeps the CNP when the foreign-billed person has one (diaspora)', () => {
+    const c = buildOblioClient({
+      billing: { ...foreignBilling, cnp: '1990623314029' },
+    });
+    expect(c.cif).toBe('1990623314029');
+  });
+
+  it('domestic self billing still falls back to the KYC CNP (regression)', () => {
+    const c = buildOblioClient({
+      billing: { type: 'persoana_fizica', source: 'self', country: 'Romania' },
+      personal: { firstName: 'Ana', lastName: 'Ionescu', cnp: '2900202080022' },
+    });
+    expect(c.cif).toBe('2900202080022');
+    expect(c.state).toBe('');
+    expect(c.country).toBe('Romania');
+  });
+});
+
 describe('getMissingInvoiceClientFields (server-side submit guard)', () => {
   it('flags the E-260712-VQ3WA shape: PF billing with only a partial last name', () => {
     // Exact billing block that reached payment on 2026-07-12 — client typed 4
@@ -116,5 +166,28 @@ describe('getMissingInvoiceClientFields (server-side submit guard)', () => {
       billing: { type: 'persoana_juridica', source: 'company', companyName: 'FĂRĂ CUI SRL' },
     });
     expect(missing).toEqual(['CUI-ul firmei']);
+  });
+
+  it('passes a foreign PF billing block without county and without CNP', () => {
+    // The '-' state fallback keeps the guard satisfied — no relaxation needed.
+    const missing = getMissingInvoiceClientFields({
+      billing: {
+        type: 'persoana_fizica', source: 'other_pf',
+        firstName: 'Miklos', lastName: 'Nyeste',
+        address: 'Anger 5', city: 'Töpen', country: 'Germania',
+      },
+    });
+    expect(missing).toEqual([]);
+  });
+
+  it('still flags a domestic PF billing block missing the county', () => {
+    const missing = getMissingInvoiceClientFields({
+      billing: {
+        type: 'persoana_fizica', source: 'self',
+        firstName: 'Ion', lastName: 'Pop',
+        address: 'Str. Lungă 1', city: 'Cluj-Napoca', country: 'Romania',
+      },
+    });
+    expect(missing).toEqual(['județul']);
   });
 });

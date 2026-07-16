@@ -21,6 +21,7 @@ import {
   isPJForDocumentGeneration,
 } from '@/lib/documents/delegation-items';
 import { isNoLawyerService } from '@/lib/documents/no-lawyer-services';
+import { isForeignBillingCountry } from '@/lib/orders/billing-validation';
 import { allocateNumber, getRegistryClient, formatRegistryNumber } from '@/lib/registry/client';
 
 /**
@@ -126,7 +127,14 @@ export async function autoGenerateOrderDocuments(
   const personalAddress = typeof personal.address === 'object' ? personal.address : undefined;
   const companyAddress = typeof company.address === 'object' ? company.address : undefined;
   // Flat billing address (street line + city + county + postal) → one string.
-  const billingAddressStr = [billing.address, billing.city, billing.county, billing.postalCode]
+  // Foreign billing: append the country so contracts carry the full address.
+  const billingAddressStr = [
+    billing.address,
+    billing.city,
+    billing.county,
+    billing.postalCode,
+    isForeignBillingCountry(billing.country) ? billing.country : null,
+  ]
     .filter(Boolean)
     .join(', ');
 

@@ -15,6 +15,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { getCountyFromCNP } from '@/lib/validations/cnp';
 import { estimateFromSelectedOptions } from '@/lib/delivery-calculator';
+import { isForeignBillingCountry } from '@/lib/orders/billing-validation';
 import { isNoLawyerService } from '@/lib/documents/no-lawyer-services';
 import { computeDelegationItems } from '@/lib/documents/delegation-items';
 import { REUPLOAD_DOC_SPECS, suggestedDocsForService } from '@/lib/reupload/doc-types';
@@ -1806,16 +1807,41 @@ export default function AdminOrderDetailPage() {
                   {order.delivery_address.country && (
                     <p className="text-muted-foreground">{order.delivery_address.country}</p>
                   )}
-                  {(order.delivery_address.name || order.delivery_address.phone) && (
-                    <p className="text-muted-foreground">
-                      {[order.delivery_address.name, order.delivery_address.phone].filter(Boolean).join(' · ')}
-                    </p>
-                  )}
+                  {/* Destinatar + telefon — needed for the AWB. Prefer the
+                      recipient the client typed in the delivery form (intl);
+                      fall back to the order's own client name/phone (domestic
+                      + old orders that predate recipient persistence). */}
+                  {(() => {
+                    const cd = order.customer_data as AnyObj | null;
+                    const personal = cd?.personal as AnyObj | null;
+                    const recipientName =
+                      order.delivery_address.recipientName ||
+                      order.delivery_address.name ||
+                      [personal?.firstName, personal?.lastName].filter(Boolean).join(' ') ||
+                      null;
+                    const recipientPhone =
+                      order.delivery_address.recipientPhone ||
+                      order.delivery_address.phone ||
+                      (cd?.contact as AnyObj | null)?.phone ||
+                      null;
+                    if (!recipientName && !recipientPhone) return null;
+                    return (
+                      <p className="text-muted-foreground">
+                        <span className="font-medium text-foreground">Destinatar:</span>{' '}
+                        {[recipientName, recipientPhone].filter(Boolean).join(' · ')}
+                      </p>
+                    );
+                  })()}
                   {/* Copy-paste friendly international label (name / street /
                       postal city / country / phone) for manual shipping (DHL etc.) */}
                   <CopyAddressButton
                     label={[
-                      order.delivery_address.name ||
+                      order.delivery_address.recipientName ||
+                        order.delivery_address.name ||
+                        [
+                          ((order.customer_data as AnyObj | null)?.personal as AnyObj | null)?.firstName,
+                          ((order.customer_data as AnyObj | null)?.personal as AnyObj | null)?.lastName,
+                        ].filter(Boolean).join(' ') ||
                         (order.customer_data as AnyObj | null)?.contact?.name ||
                         '',
                       [
@@ -1828,7 +1854,8 @@ export default function AdminOrderDetailPage() {
                       ].filter(Boolean).join(' '),
                       order.delivery_address.county,
                       order.delivery_address.country || 'România',
-                      order.delivery_address.phone ||
+                      order.delivery_address.recipientPhone ||
+                        order.delivery_address.phone ||
                         (order.customer_data as AnyObj | null)?.contact?.phone,
                     ]
                       .filter(Boolean)
@@ -1944,6 +1971,12 @@ export default function AdminOrderDetailPage() {
               const postalVal = isPJBilling
                 ? addrObj?.postalCode || addrObj?.postal_code
                 : billing?.postalCode || addrObj?.postalCode || addrObj?.postal_code;
+              // Foreign billing address (facturare pe altă țară) — show the
+              // country explicitly; hidden for domestic to avoid noise.
+              const countryVal = billing?.country;
+              const isForeignBilling = isForeignBillingCountry(
+                typeof countryVal === 'string' ? countryVal : undefined,
+              );
 
               return (
                 <>
@@ -1959,7 +1992,10 @@ export default function AdminOrderDetailPage() {
                   )}
                   {strada && <InfoRow label="Strada" value={strada} />}
                   {cityVal && <InfoRow label="Oraș" value={cityVal} />}
-                  {countyVal && <InfoRow label="Județ" value={countyVal} />}
+                  {countyVal && (
+                    <InfoRow label={isForeignBilling ? 'Regiune' : 'Județ'} value={countyVal} />
+                  )}
+                  {isForeignBilling && <InfoRow label="Țară" value={String(countryVal)} />}
                   {postalVal && (
                     <InfoRow label="Cod poștal" value={postalVal} />
                   )}
