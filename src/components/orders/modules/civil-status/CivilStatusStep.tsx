@@ -152,6 +152,10 @@ export default function CivilStatusStep({ config, onValidChange }: CivilStatusSt
     if (fields.marriageAbroadIntent && cs.marriageAbroadIntent === true) {
       req(!!cs.futureSpouseName?.trim(), 'Numele viitorului soț / viitoarei soții');
       if (fields.nationality) req(!!cs.nationality?.trim(), 'Cetățenia');
+      // Country of use is asked conditionally for the marriage-abroad flow
+      // even when the service config doesn't enable countryOfUse globally.
+      if (!fields.countryOfUse)
+        req(!!cs.countryOfUse?.trim(), 'Țara în care va avea loc căsătoria');
     }
     if (showCurrentlyMarried) req(cs.currentlyMarried !== undefined, 'Dacă ești căsătorit(ă) în prezent');
     if (fields.maritalStatus) req(!!cs.maritalStatus, 'Starea civilă');
@@ -533,7 +537,15 @@ export default function CivilStatusStep({ config, onValidChange }: CivilStatusSt
           <Field label="Solicitați certificatul în vederea încheierii căsătoriei în străinătate?" required>
             <ChoiceRow
               current={cs.marriageAbroadIntent === undefined ? undefined : cs.marriageAbroadIntent ? 'da' : 'nu'}
-              onChange={(v) => updateCivilStatus({ marriageAbroadIntent: v === 'da' })}
+              onChange={(v) =>
+                updateCivilStatus({
+                  marriageAbroadIntent: v === 'da',
+                  // Switching to "nu" drops the marriage country so stale data
+                  // doesn't ride into customer_data (unless the service asks
+                  // for countryOfUse independently via config).
+                  ...(v !== 'da' && !fields.countryOfUse ? { countryOfUse: undefined } : {}),
+                })
+              }
               options={YES_NO}
             />
           </Field>
@@ -557,6 +569,24 @@ export default function CivilStatusStep({ config, onValidChange }: CivilStatusSt
               />
             </Field>
           </div>
+        )}
+
+        {/* Căsătorie în străinătate = Da → țara unde va fi folosit actul
+            (unde are loc căsătoria). Necesară echipei pentru apostilă/
+            supralegalizare și mențiunile de pe cerere. Fără România — actul
+            e cerut explicit pentru străinătate. Randează doar când serviciul
+            nu are deja countryOfUse activat în config (evită dublura). */}
+        {!fields.countryOfUse &&
+          fields.marriageAbroadIntent &&
+          cs.marriageAbroadIntent === true && (
+          <Field label="În ce țară va avea loc căsătoria (unde va fi folosit certificatul)?" required>
+            <SearchableSelect
+              options={COUNTRIES.filter((c) => c !== 'România')}
+              value={cs.countryOfUse ?? ''}
+              placeholder="Caută țara..."
+              onChange={(country) => updateCivilStatus({ countryOfUse: country })}
+            />
+          </Field>
         )}
 
         {/* Scopul — apare DOAR dacă NU e pentru căsătorie în străinătate. */}
