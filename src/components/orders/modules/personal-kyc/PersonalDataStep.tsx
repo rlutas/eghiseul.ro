@@ -1206,7 +1206,7 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
       {/* Ce lipsește pentru a continua — apare după ce userul apasă „Continuă"
           pe un pas invalid; face scroll aici (mai ales pe mobil). */}
       {missingItems.length > 0 && (
-        <div ref={errorRef}>
+        <div ref={errorRef} data-wizard-error>
           <Alert variant="destructive" className="bg-red-50 border-red-300">
             <AlertCircle className="h-4 w-4" />
             <AlertDescription className="text-red-800">

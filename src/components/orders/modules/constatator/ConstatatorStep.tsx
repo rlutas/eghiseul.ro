@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Check } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -32,7 +32,7 @@ function Field({ label, required, children }: { label: string; required?: boolea
 }
 
 export default function ConstatatorStep({ config, onValidChange }: ConstatatorStepProps) {
-  const { state, updateConstatator } = useModularWizard();
+  const { state, updateConstatator, validationAttempt } = useModularWizard();
   const cs: ConstatatorState = useMemo(() => state.constatator ?? {}, [state.constatator]);
   const docTypes = useMemo(() => config?.documentTypes ?? [], [config]);
   const purposes = useMemo(() => config?.purposes ?? [], [config]);
@@ -62,26 +62,40 @@ export default function ConstatatorStep({ config, onValidChange }: ConstatatorSt
   const isIstoric = cs.documentType === 'istoric';
   const isPf = cs.documentType === 'pf';
 
-  useEffect(() => {
-    const checks: boolean[] = [];
-    checks.push(!!cs.documentType);
-    if (reportTypes.length > 0) checks.push(!!cs.reportType);
+  // Each check carries a label so a failed «Continuă» lists what's missing.
+  const missingItems = useMemo(() => {
+    const missing: string[] = [];
+    const req = (ok: boolean, label: string) => {
+      if (!ok) missing.push(label);
+    };
+    req(!!cs.documentType, 'Tipul documentului');
+    if (reportTypes.length > 0) req(!!cs.reportType, 'Tipul raportului');
     // "cu istoric" has NO purpose at ONRC (no Tip Document step) — don't require it.
-    if (!isIstoric) checks.push(!!cs.purpose);
-    if (!isIstoric && isOtherPurpose) checks.push(!!cs.otherPurpose?.trim());
+    if (!isIstoric) req(!!cs.purpose, 'Scopul solicitării');
+    if (!isIstoric && isOtherPurpose) req(!!cs.otherPurpose?.trim(), 'Detaliază scopul (ai ales „Altele")');
     if (isIstoric) {
-      checks.push(!!cs.period);
+      req(!!cs.period, 'Perioada certificatului istoric');
       if (cs.period === 'custom') {
-        checks.push(!!cs.periodFrom);
-        checks.push(!!cs.periodTo);
+        req(!!cs.periodFrom, 'Data de început a perioadei');
+        req(!!cs.periodTo, 'Data de sfârșit a perioadei');
       }
     }
     if (isPf) {
-      checks.push(!!cs.requesterName?.trim());
-      checks.push(!!cs.requesterCnp?.trim() && cs.requesterCnp!.trim().length === 13);
+      req(!!cs.requesterName?.trim(), 'Numele persoanei');
+      req(!!cs.requesterCnp?.trim() && cs.requesterCnp!.trim().length === 13, 'CNP-ul persoanei (13 cifre)');
     }
-    onValidChange(checks.every(Boolean));
-  }, [cs, reportTypes.length, isOtherPurpose, isIstoric, isPf, onValidChange]);
+    return missing;
+  }, [cs, reportTypes.length, isOtherPurpose, isIstoric, isPf]);
+
+  useEffect(() => {
+    onValidChange(missingItems.length === 0);
+  }, [missingItems, onValidChange]);
+
+  // «Continuă» tapped while incomplete → show the missing list below.
+  // Baseline captured at mount: counter is global, ignore attempts from
+  // previous steps.
+  const [validationBaseline] = useState(validationAttempt);
+  const showErrors = validationAttempt !== validationBaseline;
 
   return (
     <div className="space-y-6">
@@ -245,6 +259,19 @@ export default function ConstatatorStep({ config, onValidChange }: ConstatatorSt
               placeholder="13 cifre"
             />
           </Field>
+        </div>
+      )}
+
+      {/* What's blocking «Continuă» — shown only after a failed attempt;
+          data-wizard-error is the parent's scroll target. */}
+      {showErrors && missingItems.length > 0 && (
+        <div data-wizard-error className="rounded-lg border border-red-200 bg-red-50 p-4">
+          <p className="text-sm font-semibold text-red-800 mb-1">
+            Ca să poți continua, mai completează:
+          </p>
+          <ul className="text-sm text-red-700 list-disc pl-5 space-y-0.5">
+            {missingItems.map((m) => <li key={m}>{m}</li>)}
+          </ul>
         </div>
       )}
     </div>

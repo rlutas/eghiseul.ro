@@ -782,7 +782,7 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
     <div className="space-y-6">
       {/* Ce lipsește pentru a continua — apare la „Continuă" pe pas invalid + scroll. */}
       {missingItems.length > 0 && (
-        <div ref={errorRef}>
+        <div ref={errorRef} data-wizard-error>
           <Alert variant="destructive" className="bg-red-50 border-red-300">
             <AlertCircle className="h-4 w-4" />
             <AlertDescription className="text-red-800">

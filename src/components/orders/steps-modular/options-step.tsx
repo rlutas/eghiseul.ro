@@ -871,7 +871,7 @@ function LanguageDropdown({ value, onChange, error, id = 'opt-language' }: Langu
         ))}
       </select>
       {error && (
-        <p className="mt-1 text-xs text-red-600" role="alert">
+        <p data-wizard-error className="mt-1 text-xs text-red-600" role="alert">
           {error}
         </p>
       )}
@@ -911,7 +911,7 @@ function CountryDropdown({ id, label, value, onChange, error }: CountryDropdownP
         ))}
       </select>
       {error && (
-        <p className="mt-1 text-xs text-red-600" role="alert">
+        <p data-wizard-error className="mt-1 text-xs text-red-600" role="alert">
           {error}
         </p>
       )}

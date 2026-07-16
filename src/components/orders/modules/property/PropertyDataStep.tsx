@@ -726,7 +726,7 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
 
       {/* Validation Summary */}
       {!isFormValid() && (
-        <Alert>
+        <Alert data-wizard-error>
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
             {config.identificationService.enabled

@@ -41,7 +41,7 @@ interface CompanyDataStepProps {
 }
 
 export default function CompanyDataStep({ config, onValidChange }: CompanyDataStepProps) {
-  const { state, updateCompanyKyc } = useModularWizard();
+  const { state, updateCompanyKyc, validationAttempt } = useModularWizard();
   const companyKyc = state.companyKyc;
 
   const [isValidating, setIsValidating] = useState(false);
@@ -219,6 +219,13 @@ export default function CompanyDataStep({ config, onValidChange }: CompanyDataSt
   useEffect(() => {
     onValidChange(isFormValid());
   }, [isFormValid, onValidChange]);
+
+  // «Continuă» tapped while invalid → explain what's missing (CUI errors have
+  // their own Alert; the missing/unverified cases had no visible message).
+  // Baseline captured at mount: counter is global, ignore attempts from
+  // previous steps.
+  const [validationBaseline] = useState(validationAttempt);
+  const showStepErrors = validationAttempt !== validationBaseline;
 
   if (!companyKyc) {
     return (
@@ -399,6 +406,27 @@ export default function CompanyDataStep({ config, onValidChange }: CompanyDataSt
             )}
           </CardContent>
         </Card>
+      )}
+
+      {/* What's blocking «Continuă» — shown only after a failed attempt;
+          data-wizard-error is the parent's scroll target. */}
+      {showStepErrors && !isFormValid() && (
+        <div data-wizard-error className="rounded-lg border border-red-200 bg-red-50 p-4">
+          <p className="text-sm font-semibold text-red-800 mb-1">
+            Ca să poți continua:
+          </p>
+          <ul className="text-sm text-red-700 list-disc pl-5 space-y-0.5">
+            {(!companyKyc.cui || companyKyc.cui.length < 2) && (
+              <li>Introdu CUI-ul firmei.</li>
+            )}
+            {companyKyc.cui && companyKyc.cui.length >= 2 && !companyKyc.companyName.trim() && (
+              <li>Verifică CUI-ul (apasă butonul de căutare) ca să preluăm datele firmei.</li>
+            )}
+            {(companyKyc.validationStatus === 'blocked' || companyKyc.validationStatus === 'invalid') && (
+              <li>CUI-ul introdus nu a putut fi validat — corectează-l și încearcă din nou.</li>
+            )}
+          </ul>
+        </div>
       )}
     </div>
   );

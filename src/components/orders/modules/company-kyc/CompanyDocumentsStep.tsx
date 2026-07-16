@@ -89,7 +89,7 @@ const ACCEPTED_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf
 const ACCEPTED_EXTENSIONS = '.jpeg,.jpg,.png,.pdf';
 
 export default function CompanyDocumentsStep({ config, onValidChange }: CompanyDocumentsStepProps) {
-  const { state, updateCompanyKycDocuments, isPrefilled, prefillData } = useModularWizard();
+  const { state, updateCompanyKycDocuments, isPrefilled, prefillData, validationAttempt } = useModularWizard();
   const companyKyc = state.companyKyc;
 
   // Check if user has verified company docs from their account
@@ -149,6 +149,12 @@ export default function CompanyDocumentsStep({ config, onValidChange }: CompanyD
   useEffect(() => {
     onValidChange(isValid());
   }, [isValid, onValidChange]);
+
+  // «Continuă» tapped with documents missing → list them explicitly.
+  // Baseline captured at mount: counter is global, ignore attempts from
+  // previous steps.
+  const [validationBaseline] = useState(validationAttempt);
+  const showStepErrors = validationAttempt !== validationBaseline;
 
   // Handle file selection
   const handleFileSelect = useCallback(
@@ -646,6 +652,25 @@ export default function CompanyDocumentsStep({ config, onValidChange }: CompanyD
               />
             </div>
           </div>
+        </div>
+      )}
+
+      {/* What's blocking «Continuă» — shown only after a failed attempt;
+          data-wizard-error is the parent's scroll target. */}
+      {showStepErrors && !isValid() && (
+        <div data-wizard-error className="rounded-lg border border-red-200 bg-red-50 p-4">
+          <p className="text-sm font-semibold text-red-800 mb-1">
+            Ca să poți continua, mai încarcă:
+          </p>
+          <ul className="text-sm text-red-700 list-disc pl-5 space-y-0.5">
+            {requiredDocs
+              .filter((docType) => !companyKyc?.uploadedDocuments?.some((d) => d.type === docType))
+              .map((docType) => (
+                <li key={docType}>
+                  {COMPANY_DOC_CONFIG[docType as CompanyDocType]?.title ?? docType}
+                </li>
+              ))}
+          </ul>
         </div>
       )}
     </div>

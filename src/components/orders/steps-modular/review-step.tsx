@@ -31,7 +31,13 @@ interface ReviewStepProps {
 }
 
 export function ReviewStepModular({ onValidChange }: ReviewStepProps) {
-  const { state, service, priceBreakdown, goToStep, updateConsent, applyCoupon, clearCoupon } = useModularWizard();
+  const { state, service, priceBreakdown, goToStep, updateConsent, applyCoupon, clearCoupon, validationAttempt } = useModularWizard();
+
+  // «Plătește» tapped without the consent ticked → point at the checkbox.
+  // Baseline captured at mount so failed attempts on previous steps don't
+  // flash this immediately.
+  const [validationBaseline] = useState(validationAttempt);
+  const showConsentError = validationAttempt !== validationBaseline;
   const { termsAccepted, privacyAccepted, withdrawalWaiver } = state.consent;
 
   // Coupon input state
@@ -525,7 +531,19 @@ export function ReviewStepModular({ onValidChange }: ReviewStepProps) {
           Termeni și Condiții
         </h3>
 
-        <div className="rounded-lg border bg-muted/20 p-4">
+        <div
+          className={
+            showConsentError && !acceptAll
+              ? 'rounded-lg border-2 border-red-400 bg-red-50 p-4'
+              : 'rounded-lg border bg-muted/20 p-4'
+          }
+          {...(showConsentError && !acceptAll ? { 'data-wizard-error': true } : {})}
+        >
+          {showConsentError && !acceptAll && (
+            <p className="text-sm font-semibold text-red-700 mb-2" role="alert">
+              Bifează acordul de mai jos ca să poți plăti.
+            </p>
+          )}
           <label className="flex items-start gap-3 cursor-pointer group">
             <Checkbox
               checked={acceptAll}

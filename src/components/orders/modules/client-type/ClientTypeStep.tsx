@@ -7,7 +7,7 @@
  * This step is shown when a service supports both client types with different flows.
  */
 
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useModularWizard } from '@/providers/modular-wizard-provider';
 import {
   Card,
@@ -31,11 +31,17 @@ const DEFAULT_OPTIONS = [
 ];
 
 export default function ClientTypeStep({ config, onValidChange }: ClientTypeStepProps) {
-  const { state, setClientType } = useModularWizard();
+  const { state, setClientType, validationAttempt } = useModularWizard();
   const selectedType = state.clientType;
 
   // Use config options or defaults
   const options = config?.options ?? DEFAULT_OPTIONS;
+
+  // «Continuă» tapped with nothing selected → show why we're not advancing.
+  // Baseline captured at mount so attempts from previous steps don't flash
+  // errors here immediately (the counter is global per wizard session).
+  const [validationBaseline] = useState(validationAttempt);
+  const showErrors = validationAttempt !== validationBaseline;
 
   // Update validity when selection changes
   useEffect(() => {
@@ -99,6 +105,12 @@ export default function ClientTypeStep({ config, onValidChange }: ClientTypeStep
           );
         })}
       </div>
+
+      {showErrors && !selectedType && (
+        <p data-wizard-error className="text-sm text-red-600 text-center font-medium" role="alert">
+          Selectează una dintre opțiuni ca să poți continua.
+        </p>
+      )}
 
       {/* Selected Type Info */}
       {selectedType && (

@@ -22,6 +22,7 @@ import { OrderIdDisplay, OrderIdBadge } from './order-id-display';
 import { SaveDataModal } from './save-data-modal';
 import { Service, ServiceOption } from '@/types/services';
 import { MODULE_LOADERS, hasModuleLoader } from '@/lib/verification-modules/registry';
+import { scrollToFirstWizardError } from '@/lib/wizard/scroll-to-first-error';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { ModularStepId } from '@/types/verification-modules';
 import { createClient } from '@/lib/supabase/client';
@@ -276,6 +277,9 @@ export function ModularOrderWizard({ initialService, initialOptions, headerExtra
     if (!stepValid) {
       requestValidation();
       toast.error('Mai sunt câmpuri obligatorii necompletate pe acest pas.');
+      // After the step renders its errors, take the user to the first one —
+      // on mobile the problem field is usually off-screen.
+      scrollToFirstWizardError();
       return;
     }
     if (isLastStep) {

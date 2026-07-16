@@ -77,6 +77,7 @@ export function ContactStepModular({ onValidChange }: ContactStepProps) {
     setClientType,
     isPrefilled,
     priceBreakdown,
+    validationAttempt,
   } = useModularWizard();
   const [showEditMode, setShowEditMode] = useState(false);
 
@@ -193,6 +194,29 @@ export function ContactStepModular({ onValidChange }: ContactStepProps) {
     });
     return () => subscription.unsubscribe();
   }, [form, updateContact]);
+
+  // «Continuă» tapped while invalid → validate email/phone (marks untouched
+  // fields) and show the missing-selections summary. Baseline captured at
+  // mount: the counter is global, ignore attempts made on previous steps.
+  const [validationBaseline] = useState(validationAttempt);
+  const showStepErrors = validationAttempt !== validationBaseline;
+  useEffect(() => {
+    if (validationAttempt === validationBaseline) return;
+    void form.trigger();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [validationAttempt]);
+
+  // Missing custom (non react-hook-form) selections, with labels.
+  const stepMissingItems: string[] = [];
+  if (requiresClientType && !state.clientType) {
+    stepMissingItems.push('Alege tipul de client: persoană fizică sau juridică.');
+  }
+  if (showsPurpose && !purpose) {
+    stepMissingItems.push('Alege scopul solicitării.');
+  }
+  if (isForeign && !foreignBirthOk) {
+    stepMissingItems.push('Completează localitatea și țara nașterii.');
+  }
 
   const handleClientTypeSelect = (type: ClientType) => {
     setClientType(type);
@@ -316,6 +340,19 @@ export function ContactStepModular({ onValidChange }: ContactStepProps) {
             value={purpose}
             onChange={(v) => updateContact({ purpose: v })}
           />
+        )}
+
+        {/* Prefilled view can still be blocked by client type / purpose /
+            foreign-birth selections — list them after a failed «Continuă». */}
+        {showStepErrors && stepMissingItems.length > 0 && (
+          <div data-wizard-error className="rounded-lg border border-red-200 bg-red-50 p-4">
+            <p className="text-sm font-semibold text-red-800 mb-1">
+              Ca să poți continua, mai lipsește:
+            </p>
+            <ul className="text-sm text-red-700 list-disc pl-5 space-y-0.5">
+              {stepMissingItems.map((m) => <li key={m}>{m}</li>)}
+            </ul>
+          </div>
         )}
       </div>
     );
@@ -452,6 +489,21 @@ export function ContactStepModular({ onValidChange }: ContactStepProps) {
             value={purpose}
             onChange={(v) => updateContact({ purpose: v })}
           />
+        )}
+
+        {/* What's blocking «Continuă» (custom selections without inline field
+            errors) — shown only after a failed attempt; data-wizard-error is
+            the parent's scroll target. Email/phone errors render inline via
+            FormMessage after form.trigger(). */}
+        {showStepErrors && stepMissingItems.length > 0 && (
+          <div data-wizard-error className="rounded-lg border border-red-200 bg-red-50 p-4">
+            <p className="text-sm font-semibold text-red-800 mb-1">
+              Ca să poți continua, mai lipsește:
+            </p>
+            <ul className="text-sm text-red-700 list-disc pl-5 space-y-0.5">
+              {stepMissingItems.map((m) => <li key={m}>{m}</li>)}
+            </ul>
+          </div>
         )}
       </form>
     </Form>

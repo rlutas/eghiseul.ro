@@ -378,7 +378,7 @@ export default function SignatureStep({ config, onValidChange }: SignatureStepPr
 
       {/* Validation Message */}
       {!hasSignature && config.required && (
-        <Alert>
+        <Alert data-wizard-error>
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
             Semnătura ta este obligatorie pentru a continua.
@@ -386,7 +386,7 @@ export default function SignatureStep({ config, onValidChange }: SignatureStepPr
         </Alert>
       )}
       {hasSignature && !termsAccepted && config.required && (
-        <Alert>
+        <Alert data-wizard-error>
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
             Bifează acceptarea termenilor și condițiilor pentru a continua.
@@ -395,7 +395,7 @@ export default function SignatureStep({ config, onValidChange }: SignatureStepPr
       )}
       {hasSignature && termsAccepted && isCivilStatus &&
         (!oldCertVoidAccepted || !dataAccuracyAccepted) && config.required && (
-        <Alert>
+        <Alert data-wizard-error>
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
             Bifează ambele declarații suplimentare pentru a continua.

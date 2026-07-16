@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { AlertTriangle, Info } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -103,7 +103,7 @@ const PLACE = [
 ];
 
 export default function CivilStatusStep({ config, onValidChange }: CivilStatusStepProps) {
-  const { state, updateCivilStatus } = useModularWizard();
+  const { state, updateCivilStatus, validationAttempt } = useModularWizard();
   const cs: CivilStatusState = useMemo(() => state.civilStatus ?? {}, [state.civilStatus]);
   const fields = useMemo(() => config?.fields ?? {}, [config]);
   const docLabel = config ? DOC_LABEL[config.documentType] : 'documentul';
@@ -136,50 +136,66 @@ export default function CivilStatusStep({ config, onValidChange }: CivilStatusSt
     !!fields.marriagePlace &&
     (config?.documentType === 'casatorie' || !!cs.currentlyMarried || !!cs.wasMarriedBefore);
 
-  // Validity: every visible required control must be answered.
-  useEffect(() => {
-    const checks: boolean[] = [];
-    if (fields.applicantType) checks.push(!!cs.applicantType);
-    if (fields.birthPlace) checks.push(cs.bornAbroad !== undefined);
+  // Validity: every visible required control must be answered. Each check
+  // carries a label so a failed «Continuă» can list exactly what's missing.
+  const missingItems = useMemo(() => {
+    const missing: string[] = [];
+    const req = (ok: boolean, label: string) => {
+      if (!ok) missing.push(label);
+    };
+    if (fields.applicantType) req(!!cs.applicantType, 'Pentru cine se solicită certificatul');
+    if (fields.birthPlace) req(cs.bornAbroad !== undefined, 'Unde s-a înregistrat nașterea (România sau străinătate)');
     if (fields.birthLocality) {
-      checks.push(!!cs.birthLocality?.trim());
-      checks.push(bcComplete);
+      req(!!cs.birthLocality?.trim(), 'Localitatea nașterii');
+      req(bcComplete, 'Județul (și sectorul, pentru București) nașterii');
     }
     if (fields.marriageAbroadIntent && cs.marriageAbroadIntent === true) {
-      checks.push(!!cs.futureSpouseName?.trim());
-      if (fields.nationality) checks.push(!!cs.nationality?.trim());
+      req(!!cs.futureSpouseName?.trim(), 'Numele viitorului soț / viitoarei soții');
+      if (fields.nationality) req(!!cs.nationality?.trim(), 'Cetățenia');
     }
-    if (showCurrentlyMarried) checks.push(cs.currentlyMarried !== undefined);
-    if (fields.maritalStatus) checks.push(!!cs.maritalStatus);
+    if (showCurrentlyMarried) req(cs.currentlyMarried !== undefined, 'Dacă ești căsătorit(ă) în prezent');
+    if (fields.maritalStatus) req(!!cs.maritalStatus, 'Starea civilă');
     if (showMaritalHistory) {
-      checks.push(cs.wasMarriedBefore !== undefined);
+      req(cs.wasMarriedBefore !== undefined, 'Dacă ai mai fost căsătorit(ă)');
       if (cs.wasMarriedBefore) {
-        checks.push(!!cs.priorMarriagesCount?.trim());
-        checks.push(!!cs.lastMarriageEndedBy);
+        req(!!cs.priorMarriagesCount?.trim(), 'Numărul căsătoriilor anterioare');
+        req(!!cs.lastMarriageEndedBy, 'Cum s-a încheiat ultima căsătorie');
         if (cs.lastMarriageEndedBy === 'divort') {
-          checks.push(!!cs.divorcePlace);
-          if (cs.divorcePlace === 'strainatate') checks.push(cs.divorceRegisteredInRomania !== undefined);
+          req(!!cs.divorcePlace, 'Unde a avut loc divorțul');
+          if (cs.divorcePlace === 'strainatate')
+            req(cs.divorceRegisteredInRomania !== undefined, 'Dacă divorțul este înregistrat în România');
         }
-        if (fields.stillHaveOldMarriageCert) checks.push(cs.stillHaveOldMarriageCert !== undefined);
+        if (fields.stillHaveOldMarriageCert)
+          req(cs.stillHaveOldMarriageCert !== undefined, 'Dacă mai deții certificatul de căsătorie vechi');
       }
     }
-    if (fields.marriageAbroadIntent) checks.push(cs.marriageAbroadIntent !== undefined);
-    if (showMarriagePlace) checks.push(cs.marriageAbroad !== undefined);
-    if (fields.spouseName) checks.push(!!cs.spouseNameBeforeMarriage?.trim());
-    if (fields.marriageDate) checks.push(!!cs.marriageDate?.trim());
-    if (fields.registrationPlace) checks.push(rpComplete);
-    if (fields.birthName) checks.push(!!cs.birthName?.trim());
+    if (fields.marriageAbroadIntent) req(cs.marriageAbroadIntent !== undefined, 'Dacă intenționezi să te căsătorești în străinătate');
+    if (showMarriagePlace) req(cs.marriageAbroad !== undefined, 'Unde a avut loc căsătoria');
+    if (fields.spouseName) req(!!cs.spouseNameBeforeMarriage?.trim(), 'Numele soțului/soției dinaintea căsătoriei');
+    if (fields.marriageDate) req(!!cs.marriageDate?.trim(), 'Data căsătoriei');
+    if (fields.registrationPlace) req(rpComplete, 'Județul (și sectorul, pentru București) unde s-a înregistrat actul');
+    if (fields.birthName) req(!!cs.birthName?.trim(), 'Numele la naștere');
     if (fields.parentNames) {
-      checks.push(!!cs.fatherName?.trim());
-      checks.push(!!cs.motherName?.trim());
+      req(!!cs.fatherName?.trim(), 'Prenumele tatălui');
+      req(!!cs.motherName?.trim(), 'Prenumele mamei');
     }
-    if (fields.oldCertificateReason) checks.push(!!cs.oldCertificateReason);
-    if (fields.renouncedCitizenship) checks.push(cs.renouncedRomanianCitizenship !== undefined);
+    if (fields.oldCertificateReason) req(!!cs.oldCertificateReason, 'Motivul pentru care soliciți un certificat nou');
+    if (fields.renouncedCitizenship) req(cs.renouncedRomanianCitizenship !== undefined, 'Dacă ai renunțat la cetățenia română');
     if (fields.purpose && !(fields.marriageAbroadIntent && cs.marriageAbroadIntent === true))
-      checks.push(!!cs.purpose?.trim());
-    if (fields.countryOfUse) checks.push(!!cs.countryOfUse?.trim());
-    onValidChange(checks.every(Boolean));
-  }, [cs, fields, showCurrentlyMarried, showMaritalHistory, showMarriagePlace, onValidChange]);
+      req(!!cs.purpose?.trim(), 'Scopul solicitării');
+    if (fields.countryOfUse) req(!!cs.countryOfUse?.trim(), 'Țara unde va fi folosit documentul');
+    return missing;
+  }, [cs, fields, bcComplete, rpComplete, showCurrentlyMarried, showMaritalHistory, showMarriagePlace]);
+
+  useEffect(() => {
+    onValidChange(missingItems.length === 0);
+  }, [missingItems, onValidChange]);
+
+  // «Continuă» tapped while incomplete → show the missing list below.
+  // Baseline captured at mount: the counter is global, don't flash errors
+  // for attempts made on previous steps.
+  const [validationBaseline] = useState(validationAttempt);
+  const showErrors = validationAttempt !== validationBaseline;
 
   return (
     <div className="space-y-6">
@@ -565,6 +581,19 @@ export default function CivilStatusStep({ config, onValidChange }: CivilStatusSt
           </Field>
         )}
       </div>
+
+      {/* What's blocking «Continuă» — shown only after a failed attempt;
+          data-wizard-error is the parent's scroll target. */}
+      {showErrors && missingItems.length > 0 && (
+        <div data-wizard-error className="rounded-lg border border-red-200 bg-red-50 p-4">
+          <p className="text-sm font-semibold text-red-800 mb-1">
+            Ca să poți continua, mai completează:
+          </p>
+          <ul className="text-sm text-red-700 list-disc pl-5 space-y-0.5">
+            {missingItems.map((m) => <li key={m}>{m}</li>)}
+          </ul>
+        </div>
+      )}
     </div>
   );
 }

@@ -394,7 +394,7 @@ export default function VehicleDataStep({ config, onValidChange }: VehicleDataSt
 
       {/* Validation Summary */}
       {!isFormValid() && !isRedirectService && (
-        <Alert>
+        <Alert data-wizard-error>
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
             Completează toate câmpurile obligatorii și asigură-te că formatul este corect.
