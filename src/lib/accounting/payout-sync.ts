@@ -123,8 +123,19 @@ async function enrichEghiseul(rows: TxRow[]) {
     r.service_name = anyO.services?.name ?? r.service_name;
     const contact = anyO.customer_data?.contact ?? {};
     const personal = anyO.customer_data?.personal ?? {};
+    const billing = anyO.customer_data?.billing ?? {};
+    const company = anyO.customer_data?.company ?? {};
     r.client_email = contact.email ?? r.client_email;
-    const name = [personal.firstName, personal.lastName].filter(Boolean).join(' ');
+    // Name fallback chain: KYC scan → billing person → billing/company firm.
+    // Property services (Extras CF etc.) have NO ID scan, so `personal` is
+    // empty — the billing block is the only place the client's name exists
+    // (rows showed email-only in /admin/decontari until 2026-07-16).
+    const name =
+      [personal.firstName, personal.lastName].filter(Boolean).join(' ') ||
+      [billing.firstName, billing.lastName].filter(Boolean).join(' ') ||
+      billing.companyName ||
+      company.companyName ||
+      '';
     r.client_name = name || r.client_name;
   }
 }
@@ -215,7 +226,9 @@ export async function syncPayouts(opts: { sinceDays?: number } = {}): Promise<Pa
             platform,
             order_number: orderNumber,
             service_name: null,
-            client_name: null,
+            // Cardholder name from Stripe Checkout — baseline for orders where
+            // enrichment finds no name (e.g. WP-era or unmatched charges).
+            client_name: isCharge?.billing_details?.name ?? null,
             client_email: isCharge?.billing_details?.email ?? null,
             invoice_number: null,
             invoice_url: null,
