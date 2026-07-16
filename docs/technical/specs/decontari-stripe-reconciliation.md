@@ -22,6 +22,7 @@ eghiseul.ro + cazierjudiciaronline.com = aceeași firmă (EDIGITALIZARE SRL), ac
 **UI:**
 - Listă: dată, sumă, tranzacții, badge „X/Y facturate" (roșu când incomplet), status
 - Detaliu `/admin/decontari/[payoutId]`: Comandă (link) · Platformă (badge) · Client · Serviciu · Factură Oblio (link PDF) · Brut/Fee/Net + rambursări + TOTAL cu verificare `sum(net)==payout.amount` · **Print** (CSS print) · **Export CSV**
+  - **Numele clientului (eghiseul)** — lanț fallback în `payout-sync.ts` (fix 2026-07-16): `personal` (scanare CI) → `billing` persoană → `billing/company` firmă → numele de pe card din Stripe (`charge.billing_details.name`). Serviciile imobiliare nu au scanare CI — fără fallback rândurile arătau doar emailul. Backfill = re-sync (upsert).
 - Export lunar: `GET /api/admin/decontari/export?month=YYYY-MM` — CSV BOM UTF-8, toate tranzacțiile + rând TOTAL
 
 ## 2. Proformă → factură la extra charges (ambele platforme)

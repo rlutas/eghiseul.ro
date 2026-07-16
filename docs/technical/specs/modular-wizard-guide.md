@@ -504,6 +504,48 @@ if (config.newModule.enabled) {
 // - Adaugă în context value
 ```
 
+### 6. OBLIGATORIU: erori vizibile la „Continuă" blocat (convenție 2026-07-16)
+
+Butonul „Continuă" NU se dezactivează pe pas invalid — la click, părintele
+apelează `requestValidation()` (bump `validationAttempt`) + toast +
+`scrollToFirstWizardError()` (`src/lib/wizard/scroll-to-first-error.ts`), care
+face scroll/focus la primul `[data-wizard-error]` / `[aria-invalid="true"]` /
+mesaj shadcn `FormMessage`. **Orice pas nou trebuie să-și dezvăluie erorile:**
+
+```typescript
+const { validationAttempt } = useModularWizard();
+
+// Baseline capturat la mount — counterul e global pe sesiune; fără baseline,
+// un click eșuat pe un pas ANTERIOR ar aprinde erorile aici din prima.
+// NU citi ref în render și NU face setState în effect (pică lint react-hooks).
+const [validationBaseline] = useState(validationAttempt);
+const showErrors = validationAttempt !== validationBaseline;
+
+// Pașii react-hook-form validează și câmpurile neatinse:
+useEffect(() => {
+  if (validationAttempt === validationBaseline) return;
+  void form.trigger();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [validationAttempt]);
+```
+
+Și în JSX, lista lipsurilor într-un container marcat pentru scroll:
+
+```tsx
+{showErrors && missingItems.length > 0 && (
+  <div data-wizard-error className="rounded-lg border border-red-200 bg-red-50 p-4">
+    <p className="text-sm font-semibold text-red-800 mb-1">Ca să poți continua, mai completează:</p>
+    <ul className="text-sm text-red-700 list-disc pl-5 space-y-0.5">
+      {missingItems.map((m) => <li key={m}>{m}</li>)}
+    </ul>
+  </div>
+)}
+```
+
+Exemple de referință: `CivilStatusStep.tsx` (listă cu etichete din checks),
+`delivery-step.tsx` (RHF + selecții), `billing-step.tsx` (mesaje inline).
+Toți cei 13 pași existenți respectă convenția (changelog 2026-07-16).
+
 ## URL-uri
 
 - **Comandă nouă:** `/comanda/[service-slug]`
