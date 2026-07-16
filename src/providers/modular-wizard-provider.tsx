@@ -1084,6 +1084,8 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
                     methodName: dm.name,
                     price: dm.price,
                     estimatedDays: dm.estimated_days,
+                    courierProvider: dm.provider ?? undefined,
+                    courierService: dm.service ?? undefined,
                     address: order.delivery_address || undefined,
                   }
                 : createInitialDeliveryState();
@@ -1531,6 +1533,10 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
             name: state.delivery.methodName,
             price: state.delivery.price,
             estimated_days: state.delivery.estimatedDays,
+            // Needed to restore the courier selection (esp. international)
+            // on server resume — the display name alone is ambiguous.
+            provider: state.delivery.courierProvider ?? null,
+            service: state.delivery.courierService ?? null,
           } : null,
           delivery_address: state.delivery.address || null,
           // Don't send signature base64 in drafts - only at final submission

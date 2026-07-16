@@ -39,6 +39,12 @@ import { Button } from '@/components/ui/button';
 import { SearchableSelect } from '@/components/shared/SearchableSelect';
 import { useModularWizard } from '@/providers/modular-wizard-provider';
 import { cn } from '@/lib/utils';
+import {
+  internationalAddressSchema,
+  type InternationalAddressFormData,
+  deriveIntlProvider,
+  derivePhysicalRegion,
+} from '@/lib/delivery/international-delivery';
 
 // Romanian counties (sorted)
 const COUNTIES = [
@@ -245,27 +251,15 @@ const addressSchema = z.object({
 
 type AddressFormData = z.infer<typeof addressSchema>;
 
-// International address — no county code, free-text country.
-const internationalAddressSchema = z.object({
-  street: z.string().min(2, 'Strada este obligatorie'),
-  city: z.string().min(2, 'Localitatea este obligatorie'),
-  postalCode: z.string().min(2, 'Codul poștal este obligatoriu'),
-  country: z.string().min(2, 'Țara este obligatorie'),
-  recipientName: z.string().min(2, 'Numele destinatarului este obligatoriu'),
-  recipientPhone: z
-    .string()
-    .min(8, 'Telefonul este obligatoriu')
-    .regex(/^[+0-9\s\-()]+$/, 'Telefon invalid'),
-});
-
-type InternationalAddressFormData = z.infer<typeof internationalAddressSchema>;
+// International address schema shared with unit tests — see
+// src/lib/delivery/international-delivery.ts
 
 interface DeliveryStepProps {
   onValidChange: (valid: boolean) => void;
 }
 
 export function DeliveryStepModular({ onValidChange }: DeliveryStepProps) {
-  const { state, updateDelivery } = useModularWizard();
+  const { state, updateDelivery, validationAttempt } = useModularWizard();
   const { delivery } = state;
   // Stare civilă: livrare obligatoriu fizică + electronică împreună (o singură
   // opțiune „Electronic & Livrare la adresă"), fără alegere email-only.
@@ -282,7 +276,9 @@ export function DeliveryStepModular({ onValidChange }: DeliveryStepProps) {
     isCivilStatus ? 'physical' : delivery.method === 'email' ? 'email' : delivery.method ? 'physical' : null
   );
   const [physicalRegion, setPhysicalRegion] = useState<PhysicalRegion | null>(
-    delivery.method && delivery.method !== 'email' ? 'romania' : null
+    // Restore 'international' too — hardcoding 'romania' here lost the intl
+    // selection on every remount and dead-ended the step (E-260716-RAFUG).
+    derivePhysicalRegion(delivery.method, delivery.courierProvider, delivery.methodName)
   );
 
   // Courier quotes
@@ -341,9 +337,9 @@ export function DeliveryStepModular({ onValidChange }: DeliveryStepProps) {
 
   // International shipping (DHL / Poșta Română Internațional)
   const [intlProvider, setIntlProvider] = useState<InternationalProvider | null>(
-    (delivery.courierProvider === 'dhl_intl' || delivery.courierProvider === 'posta_intl')
-      ? (delivery.courierProvider as InternationalProvider)
-      : null,
+    // Server-resumed drafts saved before provider persistence carry only the
+    // method display name — derive the provider from it as fallback.
+    deriveIntlProvider(delivery.courierProvider, delivery.methodName),
   );
 
   const intlForm = useForm<InternationalAddressFormData>({
@@ -353,12 +349,37 @@ export function DeliveryStepModular({ onValidChange }: DeliveryStepProps) {
       city: delivery.address?.city || '',
       postalCode: delivery.address?.postalCode || '',
       country: delivery.address?.country || '',
-      recipientName: '',
-      recipientPhone: '',
+      recipientName: delivery.address?.recipientName || '',
+      recipientPhone: delivery.address?.recipientPhone || '',
     },
     mode: 'onChange',
   });
   const isIntlAddressValid = intlForm.formState.isValid;
+
+  // Restored draft with a partially filled intl address: surface the missing
+  // required fields immediately — otherwise the form sits invalid with zero
+  // visible errors and the Continue button is just silently disabled.
+  useEffect(() => {
+    if (intlProvider && Object.values(intlForm.getValues()).some(Boolean)) {
+      void intlForm.trigger();
+    }
+    // Run once on mount only — live typing shows errors via mode: 'onChange'.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // «Continuă» tapped while this step is invalid → reveal every problem:
+  // validate both address forms (marks untouched fields) and show the
+  // missing-selections summary below. Parent then scrolls to the first error.
+  // Baseline captured at mount: the counter is global per wizard session —
+  // without it a failed attempt on a PREVIOUS step would flash errors here.
+  const [validationBaseline] = useState(validationAttempt);
+  const showStepErrors = validationAttempt !== validationBaseline;
+  useEffect(() => {
+    if (validationAttempt === validationBaseline) return;
+    void form.trigger();
+    void intlForm.trigger();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [validationAttempt]);
 
   const { isValid: isAddressValid } = form.formState;
   const watchedCounty = form.watch('county');
@@ -885,45 +906,32 @@ export function DeliveryStepModular({ onValidChange }: DeliveryStepProps) {
     const courier = INTERNATIONAL_COURIERS.find((c) => c.provider === intlProvider);
     if (!courier) return;
 
-    const subscription = intlForm.watch((value) => {
-      updateDelivery({
-        method: 'courier',
-        methodName: `Livrare internațională · ${courier.name}`,
-        price: courier.price,
-        estimatedDays: 0, // free-text range stored in methodName; numeric used for SLA only
-        courierProvider: courier.provider,
-        courierService: courier.name,
-        courierQuote: undefined,
-        address: {
-          street: value.street || '',
-          number: '', // not used for international
-          city: value.city || '',
-          county: '', // not used for international
-          postalCode: value.postalCode || '',
-          country: value.country || '',
-        },
-      });
-    });
-
-    // Also push current values immediately so price flows even before next keystroke
-    const v = intlForm.getValues();
-    updateDelivery({
-      method: 'courier',
-      methodName: courier.name,
+    const toDeliveryUpdate = (value: Partial<InternationalAddressFormData>) => ({
+      method: 'courier' as const,
+      methodName: `Livrare internațională · ${courier.name}`,
       price: courier.price,
-      estimatedDays: 0,
+      estimatedDays: 0, // free-text range stored in methodName; numeric used for SLA only
       courierProvider: courier.provider,
       courierService: courier.name,
       courierQuote: undefined,
       address: {
-        street: v.street || '',
-        number: '',
-        city: v.city || '',
-        county: '',
-        postalCode: v.postalCode || '',
-        country: v.country || '',
+        street: value.street || '',
+        number: '', // not used for international
+        city: value.city || '',
+        county: '', // not used for international
+        postalCode: value.postalCode || '',
+        country: value.country || '',
+        recipientName: value.recipientName || '',
+        recipientPhone: value.recipientPhone || '',
       },
     });
+
+    const subscription = intlForm.watch((value) => {
+      updateDelivery(toDeliveryUpdate(value));
+    });
+
+    // Also push current values immediately so price flows even before next keystroke
+    updateDelivery(toDeliveryUpdate(intlForm.getValues()));
     return () => subscription.unsubscribe();
   }, [physicalRegion, intlProvider, intlForm, updateDelivery]);
 
@@ -2025,6 +2033,43 @@ export function DeliveryStepModular({ onValidChange }: DeliveryStepProps) {
           separate full-width block. The slim banner there is enough; the
           parent step's "Continuă" button is already enabled via
           onValidChange(true). */}
+
+      {/* What's blocking «Continuă» — rendered only after a failed attempt.
+          data-wizard-error makes it a scroll target for the parent. */}
+      {showStepErrors && (() => {
+        const missing: string[] = [];
+        if (!deliveryType) {
+          missing.push('Alege metoda de livrare: pe email sau fizic, prin curier.');
+        } else if (deliveryType === 'physical') {
+          if (!physicalRegion) {
+            missing.push('Alege destinația livrării: România sau internațional.');
+          } else if (physicalRegion === 'romania') {
+            if (!isAddressValid) missing.push('Completează adresa de livrare (câmpurile marcate cu roșu).');
+            if (!selectedQuoteService) {
+              missing.push('Alege un serviciu de curierat din listă.');
+            } else if (selectedQuote && isLockerQuote(selectedQuote) && !selectedLockerId) {
+              missing.push('Alege un easybox/locker din listă.');
+            }
+          } else {
+            if (!intlProvider) {
+              missing.push('Alege curierul internațional (DHL sau Poșta Română).');
+            } else if (!isIntlAddressValid) {
+              missing.push('Completează toate câmpurile adresei — inclusiv numele destinatarului, telefonul și țara.');
+            }
+          }
+        }
+        if (missing.length === 0) return null;
+        return (
+          <div data-wizard-error className="rounded-lg border border-red-200 bg-red-50 p-4">
+            <p className="text-sm font-semibold text-red-800 mb-1">
+              Ca să poți continua, mai lipsește:
+            </p>
+            <ul className="text-sm text-red-700 list-disc pl-5 space-y-0.5">
+              {missing.map((m) => <li key={m}>{m}</li>)}
+            </ul>
+          </div>
+        );
+      })()}
     </div>
   );
 }

@@ -425,6 +425,10 @@ export interface AddressState {
   // Set only for international shipping destinations (DHL Express,
   // Poșta Română International). Free-text — no enforced country list.
   country?: string;
+  // International only: recipient contact for the courier customs/AWB form.
+  // Persisted with the draft so a reload doesn't wipe them (E-260716-RAFUG).
+  recipientName?: string;
+  recipientPhone?: string;
 }
 
 export interface UploadedDocumentState {
