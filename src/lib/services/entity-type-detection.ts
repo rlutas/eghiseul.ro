@@ -95,14 +95,30 @@ function escapeRegex(s: string): string {
 }
 
 /**
+ * ANAF and legacy data use cedilla diacritics (Ş U+015E, Ţ U+0162) instead of
+ * the correct comma-below forms (Ș U+0218, Ț U+021A). Normalize so the
+ * word-boundary class treats both as letters — otherwise "CONSTRUCŢII" splits
+ * at Ţ and "II" false-matches as Întreprindere Individuală.
+ */
+function normalizeCedilla(s: string): string {
+  return s
+    .replace(/Ş/g, 'Ș')
+    .replace(/ş/g, 'ș')
+    .replace(/Ţ/g, 'Ț')
+    .replace(/ţ/g, 'ț');
+}
+
+/**
  * Build a word-boundary regex that matches `pattern` only when surrounded by
  * non-alphanumeric chars (Romanian alphabet) or string boundaries.
  *
  * Example: matches "II" in "ABC II SRL" but NOT in "EDITII".
  */
 function wordBoundaryRegex(pattern: string): RegExp {
+  // ȘȚ = comma-below, ŞŢ = cedilla (kept as safety net for callers that skip
+  // normalizeCedilla).
   return new RegExp(
-    `(^|[^A-ZĂÂÎȘȚ0-9])${escapeRegex(pattern)}([^A-ZĂÂÎȘȚ0-9]|$)`,
+    `(^|[^A-ZĂÂÎȘȚŞŢ0-9])${escapeRegex(pattern)}([^A-ZĂÂÎȘȚŞŢ0-9]|$)`,
   );
 }
 
@@ -127,7 +143,7 @@ export function matchesAnyWord(
  */
 export function detectEntityType(name: string): EntityType {
   if (!name) return null;
-  const upper = name.toUpperCase();
+  const upper = normalizeCedilla(name).toUpperCase();
   if (matchesAnyWord(upper, PFA_II_IF_PATTERNS)) return 'pfa';
   if (matchesAnyWord(upper, ONG_PATTERNS)) return 'ong';
   return null;

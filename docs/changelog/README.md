@@ -4,6 +4,7 @@
  
  | Data | Ce s-a livrat | Detalii |
  |---|---|---|
+ | 2026-07-16 | 🔴 **SRL blocat fals ca PFA — diacritice cedilla ANAF** (regex word-boundary cunoștea doar Ș/Ț comma-below; ANAF trimite Ş/Ţ cedilla → `CONSTRUCŢII` se rupea la Ţ și `II` se potrivea ca „Întreprindere Individuală"; fix: normalizare cedilla→comma-below + cedilla în clasa regex; 20 teste unit noi) | [2026-07-16-detectie-pfa-diacritice-cedilla.md](2026-07-16-detectie-pfa-diacritice-cedilla.md) |
  | 2026-07-16 | 🔴 **Decontări: nume client la comenzile fără scanare CI** (payout-sync lua numele doar din `personal`; acum fallback billing/firmă + numele de pe card din Stripe; după deploy: „Sincronizează" rescrie rândurile) | [2026-07-16-decontari-nume-client.md](2026-07-16-decontari-nume-client.md) |
  | 2026-07-16 | 🟣 **Celibat: țara căsătoriei** — întrebare extra obligatorie când intenția e căsătorie în străinătate (listă mondială, fără România; fără migrare config) + Palestina adăugată în lista de țări (196) | [2026-07-16-celibat-tara-casatorie.md](2026-07-16-celibat-tara-casatorie.md) |
  | 2026-07-16 | 🟣 **Facturare pe orice țară (PF)** — checkbox „adresă în afara României" în billing (țară + text liber, CNP opțional), Oblio `state='-'`, fix CNP moștenit greșit la other_pf străin; admin: rând Țară la Facturare + Destinatar la Livrare; TVA rămâne 21%, PJ străine manual | [2026-07-16-facturare-internationala.md](2026-07-16-facturare-internationala.md) + [spec §2.0b](../technical/specs/stripe-oblio-payment-invoicing.md) |
