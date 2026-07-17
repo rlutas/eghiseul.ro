@@ -132,12 +132,13 @@ export default function CivilStatusStep({ config, onValidChange }: CivilStatusSt
   const isAdult = !fields.applicantType || cs.applicantType === 'adult';
   const showCurrentlyMarried = !!fields.currentlyMarried && isAdult;
   const showMaritalHistory = !!fields.maritalHistory && isAdult;
-  // When the current marital status is asked (celibat), „căsătorit(ă)" or
-  // „divorțat(ă)" means a marriage exists whose transcription in Romania
-  // decides if we can issue — so that status drives the marriage-place
-  // question, right below. Other services keep the currentlyMarried /
-  // wasMarriedBefore triggers.
-  const statusImpliesMarriage = cs.maritalStatus === 'casatorit' || cs.maritalStatus === 'divortat';
+  // When the current marital status is asked (celibat), „căsătorit(ă)",
+  // „divorțat(ă)" or „văduv(ă)" means a marriage exists whose transcription
+  // in Romania decides if we can issue — so that status drives the
+  // marriage-place question, right below. Other services keep the
+  // currentlyMarried / wasMarriedBefore triggers.
+  const statusImpliesMarriage =
+    cs.maritalStatus === 'casatorit' || cs.maritalStatus === 'divortat' || cs.maritalStatus === 'vaduv';
   const showMarriagePlace =
     !!fields.marriagePlace &&
     (config?.documentType === 'casatorie' ||
@@ -317,7 +318,7 @@ export default function CivilStatusStep({ config, onValidChange }: CivilStatusSt
                   maritalStatus: v as CivilStatusState['maritalStatus'],
                   // The marriage-place answer only makes sense while the
                   // status implies a marriage.
-                  ...(v !== 'casatorit' && v !== 'divortat' ? { marriageAbroad: undefined } : {}),
+                  ...(v === 'necasatorit' ? { marriageAbroad: undefined } : {}),
                 })
               }
               options={[

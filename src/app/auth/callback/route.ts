@@ -11,7 +11,20 @@ export async function GET(request: Request) {
     const { error } = await supabase.auth.exchangeCodeForSession(code)
 
     if (!error) {
-      return NextResponse.redirect(`${origin}${next}`)
+      // Without an explicit next, collaborators land on their portal.
+      let target = next
+      if (!searchParams.get('next')) {
+        const { data: { user } } = await supabase.auth.getUser()
+        if (user) {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', user.id)
+            .single()
+          if (profile?.role === 'collaborator') target = '/colaborator'
+        }
+      }
+      return NextResponse.redirect(`${origin}${target}`)
     }
   }
 

@@ -6,7 +6,7 @@
 
 ## Implementare
 
-- `CivilStatusStep.tsx`: când serviciul are `fields.maritalStatus` activ (doar celibat azi), trigger-ul întrebării „Căsătoria a avut loc în:" devine `maritalStatus ∈ {casatorit, divortat}` și blocul se randează imediat sub starea civilă. Serviciile fără `maritalStatus` (naștere, căsătorie) păstrează trigger-ele vechi (`currentlyMarried` / `wasMarriedBefore`) și poziția veche — zero schimbări acolo.
+- `CivilStatusStep.tsx`: când serviciul are `fields.maritalStatus` activ (doar celibat azi), trigger-ul întrebării „Căsătoria a avut loc în:" devine `maritalStatus ∈ {casatorit, divortat, vaduv}` („văduv" adăugat la cererea lui Raul în follow-up — și căsătoria unui văduv trebuie transcrisă) și blocul se randează imediat sub starea civilă. Serviciile fără `maritalStatus` (naștere, căsătorie) păstrează trigger-ele vechi (`currentlyMarried` / `wasMarriedBefore`) și poziția veche — zero schimbări acolo.
 - La schimbarea stării civile pe „Necăsătorit(ă)"/„Văduv(ă)", răspunsul România/Străinătate se golește din state (fără date stale în `customer_data`).
 - Mesajul warning la „Străinătate" (căsătorie netranscrisă → nu putem elibera) rămâne același; fluxul de divorț din istoricul marital (divorț în străinătate → înregistrat în România? → warning) rămâne neatins.
 - Validare: „Unde a avut loc căsătoria" intră în lista „Ca să poți continua…" când e vizibilă și fără răspuns.

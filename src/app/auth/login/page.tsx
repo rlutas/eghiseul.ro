@@ -29,7 +29,7 @@ function LoginForm() {
 
     try {
       const supabase = createClient();
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
@@ -37,8 +37,18 @@ function LoginForm() {
       if (error) {
         setError(error.message);
       } else {
-        // Redirect to the original page or account
-        router.push(redirectTo);
+        // Redirect to the original page or account. Without an explicit
+        // redirect param, collaborators land on their portal, not /account.
+        let target = redirectTo;
+        if (!searchParams.get('redirect') && data.user) {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', data.user.id)
+            .single();
+          if (profile?.role === 'collaborator') target = '/colaborator';
+        }
+        router.push(target);
         router.refresh();
       }
     } catch {
