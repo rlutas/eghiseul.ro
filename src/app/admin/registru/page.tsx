@@ -561,8 +561,9 @@ function NumberRegistryContent() {
     finally { setSaving(false); }
   };
 
-  // Export CSV — pentru control/raportare la Barou. Contractele și
-  // delegațiile se exportă SEPARAT (două fișiere), fiecare complet pe an.
+  // Export CSV — pentru control/raportare la Barou. Un singur fișier grupat
+  // pe client/comandă: rând per delegație cu nr. contractului repetat,
+  // recente primele. Respectă filtrele active (an, sursă, căutare).
   const handleExport = async (exportType?: 'contract' | 'delegation') => {
     const params = new URLSearchParams({ year: String(filterYear) });
     if (exportType) params.set('type', exportType);
@@ -751,13 +752,9 @@ function NumberRegistryContent() {
             <CardDescription>Evidenta completa a numerelor alocate</CardDescription>
           </div>
           <div className="flex gap-2">
-            <Button size="sm" variant="outline" onClick={() => handleExport('contract')} title="Toate contractele de asistență din anul selectat — pentru control/Barou">
+            <Button size="sm" variant="outline" onClick={() => handleExport()} title="Toată evidența anului, grupată pe client: contract + delegațiile lui + pentru ce — recente primele. Pentru control/Barou.">
               <FileDown className="h-3.5 w-3.5 mr-1" />
-              Export Contracte
-            </Button>
-            <Button size="sm" variant="outline" onClick={() => handleExport('delegation')} title="Toate delegațiile din anul selectat — pentru control/Barou">
-              <FileDown className="h-3.5 w-3.5 mr-1" />
-              Export Delegatii
+              Export CSV
             </Button>
             <Button size="sm" onClick={() => setAddManualOpen(true)}>
               + Alocare manuala

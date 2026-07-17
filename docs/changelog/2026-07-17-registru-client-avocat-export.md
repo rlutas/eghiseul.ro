@@ -9,7 +9,11 @@
 - `POST number-registry`: flag `avocat_client` → forțează platform/order_ref null + prefixează descrierea cu **„Client avocat"** pe toate numerele alocării. Jurnalul afișează badge „Client avocat" în loc de „Manual" (grupuri + rânduri individuale).
 - **Combo-urile manuale fără comandă** primesc ref sintetic `MANUAL-XXXX` (analog `SHEET-` de la import) → contractul + delegația stau GRUPATE pe un singur rând în jurnal (înainte apăreau ca două rânduri separate, împrăștiate de sortarea pe număr). Indexul de idempotență cere `platform NOT NULL`, deci ref-ul sintetic (platform null) nu se ciocnește de nimic.
 
-## Export CSV (control / raportare Barou)
+## Export CSV v2 (același zi, format cerut de Raul)
+
+Înlocuiește formatul „un rând per număr" cu **grupare pe client/comandă**: un singur buton „Export CSV" (în loc de Export Contracte/Delegatii separate), un rând per delegație cu coloanele: **Client, CNP, CUI, Data, Nr Contract Asistenta, Serie (mereu SM), Nr Delegatie, Pentru ce**, Serviciu, Suma, Sursa („Client avocat" unde e cazul), Platforma, Comanda, Email, Anulat, Motiv, Creat de. Sortare **recente primele**. Grupurile doar-contract au rând propriu; delegațiile „Doar Delegatie" iau contractul din descriere. Verificat pe dev: 2335 rânduri/2026, primul rând = alocarea de azi, ultimul = 05.01.2026.
+
+## Export CSV v1 (înlocuit de v2 mai sus — istoric)
 
 - Coloană nouă **„Nr Contract"**: pe fiecare rând de delegație apare contractul de care ține (din același grup `order_ref`; fallback: trimiterea „Pentru contract NNNNNN" din descriere). La export filtrat „doar delegații", contractele-frate se aduc printr-un fetch suplimentar (altfel coloana rămânea goală).
 - Coloană nouă **„Creat de"** (cine a făcut alocarea — util la control).

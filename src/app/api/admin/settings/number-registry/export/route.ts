@@ -1,30 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { requirePermission } from '@/lib/admin/permissions';
 import { getRegistryClient } from '@/lib/registry/client';
 
-// The registry lives in the CENTRAL Supabase project. Local adminClient is
-// kept only for enriching eghiseul rows with document file names.
+// The registry lives in the CENTRAL Supabase project.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyClient = any;
 
 // ──────────────────────────────────────────────────────────────
 // GET /api/admin/settings/number-registry/export
-// Export registry entries as CSV
+// Export CSV pentru control/Barou — GRUPAT pe client/comandă:
+// un rând per delegație (client + dată + nr. contract repetate),
+// cele mai recente primele.
 // ──────────────────────────────────────────────────────────────
 
-// Mapping helpers
 const SOURCE_LABELS: Record<string, string> = {
   platform: 'Platforma',
   manual: 'Manual',
   reserved: 'Rezervat',
   voided: 'Anulat',
-};
-
-const TYPE_LABELS: Record<string, string> = {
-  contract: 'Contract',
-  delegation: 'Delegatie',
 };
 
 function formatDateRO(dateStr: string | null): string {
@@ -45,6 +39,14 @@ function escapeCsvField(value: string | number | null | undefined): string {
     return `"${str.replace(/"/g, '""')}"`;
   }
   return str;
+}
+
+// „Pentru ce" / „Serviciu" — aceleași etichete ca în jurnalul din admin.
+function prettyService(s: string | null | undefined): string {
+  if (!s) return '';
+  if (s.startsWith('apostila-haga')) return 'Apostilă Haga';
+  if (s.startsWith('bundled:')) return s.split(':').pop() || s;
+  return s;
 }
 
 export async function GET(request: NextRequest) {
@@ -83,10 +85,12 @@ export async function GET(request: NextRequest) {
     const orderRef = searchParams.get('order_ref');
 
     const registryClient: AnyClient = getRegistryClient();
-    const adminClient: AnyClient = createAdminClient();
 
     // Fetch ALL matching entries. Supabase taie la 1000 de rânduri per query —
     // exportul pentru control trebuie să fie COMPLET, deci paginăm în chunks.
+    // Ambele TIPURI se aduc mereu: exportul e grupat pe client/comandă
+    // (contract + delegațiile lui pe aceleași rânduri); filtrul `type` se
+    // aplică la final, pe rândurile generate.
     const CHUNK = 1000;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const entries: any[] = [];
@@ -98,9 +102,6 @@ export async function GET(request: NextRequest) {
         .order('number', { ascending: true })
         .range(offset, offset + CHUNK - 1);
 
-      if (type && (type === 'contract' || type === 'delegation')) {
-        query = query.eq('type', type);
-      }
       if (source && ['platform', 'manual', 'reserved', 'voided'].includes(source)) {
         query = query.eq('source', source);
       }
@@ -124,118 +125,157 @@ export async function GET(request: NextRequest) {
       if (!chunk || chunk.length < CHUNK) break;
     }
 
-    // Enrich EGHISEUL rows with local document file names (order_document_ref
-    // is a local order_documents.id stored as text).
-    const docIds = (entries || [])
-      .filter((e: AnyClient) => e.platform === 'eghiseul' && e.order_document_ref)
-      .map((e: AnyClient) => e.order_document_ref);
-
-    let docMap: Record<string, string> = {};
-    if (docIds.length > 0) {
-      const uniqueDocIds = [...new Set(docIds)];
-      const { data: docs } = await adminClient
-        .from('order_documents')
-        .select('id, file_name')
-        .in('id', uniqueDocIds);
-      if (docs) {
-        docMap = Object.fromEntries(
-          docs.map((d: AnyClient) => [d.id, d.file_name])
-        );
-      }
+    // ── Grupare pe client/comandă ─────────────────────────────
+    // Un grup = contractul + delegațiile lui (aceeași cheie platform:order_ref,
+    // inclusiv ref-urile sintetice SHEET-/MANUAL-). Intrările fără order_ref
+    // rămân grupuri de un singur număr.
+    interface ExportGroup {
+      client: string;
+      cnp: string;
+      cui: string;
+      email: string;
+      date: string;
+      contractNumber: string;
+      contractVoided: boolean;
+      contractVoidReason: string;
+      delegations: { number: string; series: string; forWhat: string; voided: boolean; voidReason: string }[];
+      serviceType: string;
+      amount: number | null;
+      source: string;
+      avocatClient: boolean;
+      platform: string;
+      orderRef: string;
+      createdBy: string;
+      /** Cel mai mare număr din grup — tiebreaker la „recente primele". */
+      maxNumber: number;
     }
 
-    // „Nr Contract" pe rândurile de DELEGAȚIE — la control se vede imediat de
-    // ce contract ține fiecare împuternicire. Sursa: contractul din același
-    // grup (order_ref, inclusiv SHEET-/MANUAL-), altfel trimiterea din
-    // descriere („Pentru contract 005771").
-    const contractByRef: Record<string, string> = {};
+    const groups = new Map<string, ExportGroup>();
     for (const e of entries as AnyClient[]) {
-      if (e.type === 'contract' && e.order_ref && !e.voided_at) {
-        contractByRef[`${e.platform ?? ''}:${e.order_ref}`] = String(e.number).padStart(6, '0');
+      const key = e.order_ref ? `${e.platform ?? ''}:${e.order_ref}` : `single:${e.id}`;
+      if (!groups.has(key)) {
+        groups.set(key, {
+          client: e.client_name || '',
+          cnp: e.client_cnp || '',
+          cui: e.client_cui || '',
+          email: e.client_email || '',
+          date: e.date,
+          contractNumber: '',
+          contractVoided: false,
+          contractVoidReason: '',
+          delegations: [],
+          serviceType: e.service_type || '',
+          amount: e.amount ?? null,
+          source: e.source,
+          avocatClient: false,
+          platform: e.platform || '',
+          // SHEET-/MANUAL- sunt ref-uri sintetice de grupare, nu comenzi reale.
+          orderRef: /^(SHEET|MANUAL)-/.test(e.order_ref || '') ? '' : (e.order_ref || ''),
+          createdBy: e.created_by || '',
+          maxNumber: 0,
+        });
+      }
+      const g = groups.get(key)!;
+      if ((e.description || '').startsWith('Client avocat')) g.avocatClient = true;
+      if (!g.client && e.client_name) g.client = e.client_name;
+      if (!g.cnp && e.client_cnp) g.cnp = e.client_cnp;
+      if (!g.serviceType && e.service_type) g.serviceType = e.service_type;
+      if (e.date > g.date) g.date = e.date;
+      if (e.number > g.maxNumber) g.maxNumber = e.number;
+      if (e.type === 'contract') {
+        g.contractNumber = String(e.number).padStart(6, '0');
+        g.contractVoided = !!e.voided_at;
+        g.contractVoidReason = e.void_reason || '';
+      } else {
+        g.delegations.push({
+          number: String(e.number).padStart(6, '0'),
+          series: e.series || 'SM',
+          forWhat: prettyService(e.service_type) || e.description || '',
+          voided: !!e.voided_at,
+          voidReason: e.void_reason || '',
+        });
       }
     }
-    // Filtrele (ex. „doar delegații", căutare) pot exclude contractele-frate
-    // din setul exportat — le aducem separat ca să nu rămână coloana goală.
-    const missingRefs = [
-      ...new Set(
-        (entries as AnyClient[])
-          .filter((e) => e.type === 'delegation' && e.order_ref && !contractByRef[`${e.platform ?? ''}:${e.order_ref}`])
-          .map((e) => e.order_ref as string)
-      ),
-    ];
-    for (let i = 0; i < missingRefs.length; i += 200) {
-      const { data: siblingContracts } = await registryClient
-        .from('number_registry')
-        .select('platform, order_ref, number, voided_at')
-        .eq('year', year)
-        .eq('type', 'contract')
-        .in('order_ref', missingRefs.slice(i, i + 200));
-      for (const c of (siblingContracts ?? []) as AnyClient[]) {
-        if (!c.voided_at) {
-          contractByRef[`${c.platform ?? ''}:${c.order_ref}`] = String(c.number).padStart(6, '0');
-        }
-      }
-    }
-    const linkedContract = (entry: AnyClient): string => {
-      if (entry.type !== 'delegation') return '';
-      if (entry.order_ref) {
-        const fromGroup = contractByRef[`${entry.platform ?? ''}:${entry.order_ref}`];
-        if (fromGroup) return fromGroup;
-      }
-      const m = (entry.description || '').match(/Pentru contract (\d+)/);
-      return m ? m[1].padStart(6, '0') : '';
-    };
 
-    // Generate CSV
+    // Delegații fără contract în grup (ex. „Doar Delegatie" legată prin
+    // descriere „Pentru contract NNNNNN") — completează nr. contractului.
+    const descContract = new Map<string, string>();
+    for (const e of entries as AnyClient[]) {
+      if (e.type !== 'delegation') continue;
+      const m = (e.description || '').match(/Pentru contract (\d+)/);
+      if (m) descContract.set(String(e.number).padStart(6, '0'), m[1].padStart(6, '0'));
+    }
+    for (const g of groups.values()) {
+      if (!g.contractNumber && g.delegations.length > 0) {
+        g.contractNumber = descContract.get(g.delegations[0].number) || '';
+      }
+    }
+
+    // Recente primele: după dată desc, apoi după cel mai mare număr desc.
+    const sortedGroups = [...groups.values()].sort(
+      (a, b) => (a.date === b.date ? b.maxNumber - a.maxNumber : (a.date < b.date ? 1 : -1))
+    );
+
+    // CSV — coloanele în ordinea cerută pentru control:
+    // client → dată → nr contract → serie → nr delegație → pentru ce.
     const CSV_HEADERS = [
-      'Nr',
-      'Tip',
-      'Serie',
-      'Nr Contract',
-      'Data',
       'Client',
-      'Email',
       'CNP',
       'CUI',
+      'Data',
+      'Nr Contract Asistenta',
+      'Serie',
+      'Nr Delegatie',
+      'Pentru ce',
       'Serviciu',
-      'Descriere',
       'Suma',
       'Sursa',
       'Platforma',
       'Comanda',
+      'Email',
       'Anulat',
       'Motiv Anulare',
-      'Document',
       'Creat de',
     ];
 
-    const rows = (entries || []).map((entry: AnyClient) => [
-      // Padded ca pe documente (005771) — evidența pentru control identică cu actele.
-      escapeCsvField(String(entry.number).padStart(6, '0')),
-      escapeCsvField(TYPE_LABELS[entry.type] || entry.type),
-      escapeCsvField(entry.series),
-      escapeCsvField(linkedContract(entry)),
-      escapeCsvField(formatDateRO(entry.date)),
-      escapeCsvField(entry.client_name),
-      escapeCsvField(entry.client_email),
-      escapeCsvField(entry.client_cnp),
-      escapeCsvField(entry.client_cui),
-      escapeCsvField(entry.service_type),
-      escapeCsvField(entry.description),
-      escapeCsvField(entry.amount),
-      escapeCsvField(SOURCE_LABELS[entry.source] || entry.source),
-      escapeCsvField(entry.platform || ''),
-      // SHEET-/MANUAL- sunt ref-uri sintetice de grupare, nu comenzi reale.
-      escapeCsvField(/^(SHEET|MANUAL)-/.test(entry.order_ref || '') ? '' : (entry.order_ref || '')),
-      escapeCsvField(entry.voided_at ? 'Da' : ''),
-      escapeCsvField(entry.void_reason),
-      escapeCsvField(
-        entry.platform === 'eghiseul' && entry.order_document_ref
-          ? (docMap[entry.order_document_ref] || '')
-          : ''
-      ),
-      escapeCsvField(entry.created_by || ''),
-    ]);
+    const rows: string[][] = [];
+    for (const g of sortedGroups) {
+      const sourceLabel = g.avocatClient ? 'Client avocat' : (SOURCE_LABELS[g.source] || g.source);
+      const makeRow = (deleg: ExportGroup['delegations'][number] | null): string[] => {
+        const voidedParts: string[] = [];
+        if (g.contractVoided) voidedParts.push('contract');
+        if (deleg?.voided) voidedParts.push('delegatie');
+        return [
+          escapeCsvField(g.client),
+          escapeCsvField(g.cnp),
+          escapeCsvField(g.cui),
+          escapeCsvField(formatDateRO(g.date)),
+          escapeCsvField(g.contractNumber),
+          escapeCsvField(deleg?.series || 'SM'),
+          escapeCsvField(deleg?.number || ''),
+          escapeCsvField(deleg?.forWhat || ''),
+          escapeCsvField(prettyService(g.serviceType)),
+          escapeCsvField(g.amount),
+          escapeCsvField(sourceLabel),
+          escapeCsvField(g.platform),
+          escapeCsvField(g.orderRef),
+          escapeCsvField(g.email),
+          escapeCsvField(voidedParts.length ? `Da (${voidedParts.join(' + ')})` : ''),
+          escapeCsvField(deleg?.voidReason || g.contractVoidReason),
+          escapeCsvField(g.createdBy),
+        ];
+      };
+      if (g.delegations.length === 0) {
+        // Grup doar cu contract — un rând, coloana de delegație goală.
+        if (type !== 'delegation') rows.push(makeRow(null));
+      } else {
+        const sorted = [...g.delegations].sort((a, b) => a.number.localeCompare(b.number));
+        for (const d of sorted) {
+          if (type === 'contract' && !g.contractNumber) continue;
+          rows.push(makeRow(d));
+        }
+      }
+    }
 
     // UTF-8 BOM for Excel compatibility + header + data rows
     const csvContent =
@@ -248,7 +288,7 @@ export async function GET(request: NextRequest) {
       status: 200,
       headers: {
         'Content-Type': 'text/csv; charset=utf-8',
-        'Content-Disposition': `attachment; filename="registru-${type === 'contract' ? 'contracte' : type === 'delegation' ? 'delegatii' : 'numere'}-${year}.csv"`,
+        'Content-Disposition': `attachment; filename="registru-${year}.csv"`,
       },
     });
   } catch (error) {

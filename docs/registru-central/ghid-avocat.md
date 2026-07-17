@@ -29,11 +29,11 @@ instanță), și primiți pe loc un număr de contract + unul de delegație, leg
 între ele. În registru apar marcate „Client avocat", ca să se vadă că sunt
 din activitatea dvs., nu de pe site-uri.
 
-**La control sau raportare la Barou:** apăsați „Export Contracte" și „Export
-Delegatii" — vă descarcă toată evidența anului în două fișiere Excel,
-cu numerele exact ca pe acte. La fiecare delegație apare și numărul de
-contract de care ține, plus clientul și serviciul — se vede tot ce s-a emis,
-pentru fiecare client.
+**La control sau raportare la Barou:** apăsați „Export CSV" — un singur
+fișier Excel cu toată evidența anului, aranjat pe client: numele, data,
+numărul contractului de asistență, seria SM și fiecare delegație pe rândul
+ei, cu ce s-a făcut pe ea. Cele mai recente sunt primele. Se vede tot ce
+s-a emis, pentru fiecare client, cu numerele exact ca pe acte.
 
 **Dacă s-a dat un număr greșit:** coșul roșu îl anulează (rămâne în evidență
 ca anulat, ca la registrul pe hârtie), iar creionul corectează datele.

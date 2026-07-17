@@ -185,12 +185,16 @@ eghiseul, generare împuternicire cu alt service_type).
   avocat" în descriere → badge „Client avocat" în jurnal + vizibil în export.
   Combo-urile manuale fără comandă primesc ref sintetic `MANUAL-XXXX` ca să
   rămână contract + delegație grupate pe un rând (ca `SHEET-` la import).
-- **Export CSV** (2026-07-17): coloană nouă **Nr Contract** pe rândurile de
-  delegație (contractul din același grup; fallback „Pentru contract NNNNNN"
-  din descriere; la filtrul „doar delegații" contractele-frate se aduc
-  separat) + coloană **Creat de**. Ref-urile sintetice SHEET-/MANUAL- nu se
-  exportă la Comanda. Exportul citește direct registrul (mereu la zi, complet
-  — paginat în chunks de 1000).
+- **Export CSV** (2026-07-17, format v2 — cerut de Raul pentru control): un
+  singur buton „Export CSV", fișier GRUPAT pe client/comandă — **un rând per
+  delegație** cu coloanele în ordinea: Client, CNP, CUI, Data, **Nr Contract
+  Asistenta**, Serie (mereu SM), **Nr Delegatie**, **Pentru ce** (serviciul
+  delegației), Serviciu, Suma, Sursa (inclusiv „Client avocat"), Platforma,
+  Comanda, Email, Anulat, Motiv, Creat de. Sortat **recente primele** (dată
+  desc). Grupurile doar-contract au rândul lor cu delegația goală; delegațiile
+  legate prin descriere („Pentru contract NNNNNN") primesc contractul de
+  acolo. Ref-urile sintetice SHEET-/MANUAL- nu se exportă la Comanda.
+  Exportul citește direct registrul (mereu la zi, complet — chunks de 1000).
 - Acțiuni per număr: ✏️ Editare (număr/serie/client/serviciu/descriere/sumă/
   dată — duplicatele respinse de UNIQUE), 🗑 Anulare (void, numărul NU se
   refolosește), pe anulate: ↩️ Restaurare, ❌ Ștergere definitivă (doar pentru
