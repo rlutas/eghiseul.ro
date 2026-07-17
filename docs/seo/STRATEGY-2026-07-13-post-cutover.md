@@ -92,7 +92,8 @@ AI Overview prezent pe TOATE 5 query-urile; eGhișeul citat nominal pe 4/5 (lips
 ### Front D — Autoritate + conținut (continuu; M–L)
 1. **Articole noi** (toate trecute prin **/humanizer** — anti-AI-detection, helpful-first):
    - Ce lipsește pe naștere: „certificat de naștere pierdut" e-n striking (poz 5,5) — refresh ghid existent; „certificat naștere copil născut în străinătate" (transcriere — volum diaspora).
-   - CF: „extras CF gratuit vs plătit", „verificare proprietar după adresă" (694 exp poz 9,2 pe „verificare carte funciara online").
+   - CF: ✅ „extras CF gratuit vs plătit" (13.07, `/extras-carte-funciara-gratuit/`) · ✅ „verificare proprietar după adresă" (17.07, `/verificare-proprietar-imobil/`).
+   - ✅ Constatator per-tip (17.07): landing-uri `/certificat-constatator-de-baza|insolventa|pfa/` + preselect `?tip=` în wizard (vezi `2026-07-17-analiza-verificare-proprietar-constatator-per-tip.md`).
    - Comparative pentru AI Mode: „Ghișeu vs online — costuri, timp, acte (tabel)" per serviciu.
 2. **Reddit/foruri RO** (r/Romania, forum.softpedia): răspunsuri autentice cu disclosure, 2–3h/lună — Perplexity/ChatGPT recommendations.
 3. **Digital PR**: pitch date proprii („câți români și-au scos cazierul online în 2026") către HotNews/Digi24/StartupCafe — sursele pe care se ancorează AIO.

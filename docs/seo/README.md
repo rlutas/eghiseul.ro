@@ -17,6 +17,7 @@ Index al documentației SEO. Status curent al expansiunii: [`SEO-STATUS-2026-06-
 | Fișier | Rol |
 |---|---|
 | [`STRATEGY-2026-07-13-post-cutover.md`](STRATEGY-2026-07-13-post-cutover.md) | **CURENT** — strategie post-cutover pe GSC live: indexare (66/204!), striking distance, GEO/AI, autoritate |
+| [`2026-07-17-analiza-verificare-proprietar-constatator-per-tip.md`](2026-07-17-analiza-verificare-proprietar-constatator-per-tip.md) | **EXECUTAT 17.07** — decizii format Front D: articol verificare-proprietar + 3 landing-uri constatator (de bază/insolvență/PFA) cu `?tip=` preselect în wizard |
 | [`2026-07-14-cluster-construire-cadastru.md`](2026-07-14-cluster-construire-cadastru.md) | **CURENT** — cluster nou „construire & cadastru": 4 calculatoare + 2 articole + serviciu urbanism + lead magnet + llms.txt; ce e de urmărit |
 | [`2026-07-13-analiza-competitie-cf-constatator.md`](2026-07-13-analiza-competitie-cf-constatator.md) | **CURENT** — analiză competiție SERP: extras CF (#14, plan recuperare) + certificat constatator (#3); profiluri competitori + plan de acțiune A-D |
 | [`SEO-ANALYSIS-2026-06-22.md`](SEO-ANALYSIS-2026-06-22.md) | Analiză GSC: ce rankează, ce merge, oportunități + plan go-live |

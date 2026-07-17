@@ -2,6 +2,8 @@
 
 Decizie de format pentru cele 2 piese rămase din Front D (STRATEGY-2026-07-13). SERP-uri live verificate 17.07 (WebSearch).
 
+> **STATUS: AMBELE EXECUTATE în aceeași zi.** Articolul: `/verificare-proprietar-imobil/` (commit `f6bb688` + imagine `8eae99b`). Landing-urile: commit `d13b7b0` — cu o schimbare față de analiza de mai jos: **al 3-lea landing e PFA, nu „fonduri IMM"** (IMM s-ar fi canibalizat cu use-case-ul `certificat-constatator-pentru-fonduri-europene` existent; „certificat constatator PFA" are cerere separată și flux PF automatizat pe CNP). Bonus: preselect `?tip=de-baza|imm|insolventa|pf|istoric` în ConstatatorStep, testat live. Detalii: `docs/changelog/2026-07-17-articol-verificare-proprietar-imobil.md` + `2026-07-17-constatator-landinguri-per-tip.md`.
+
 ## 1. „Verificare proprietar imobil după adresă" → ARTICOL (nu pagină serviciu)
 
 **SERP „verificare proprietar imobil / cine e proprietarul":** competitorii au pagini de SERVICIU (cfunciara `identificare-imobile-dupa-proprietar`, efunciara `identificare-imobil-dupa-adresa`, unclickdistanta) + ghiduri (Capital.ro „cum afli cine e proprietarul... 20 lei", extrase.ro/ajutor). **Articolul nostru `cum-aflam-numarul-carte-funciara-si-nr-cadastral` apare deja în acest SERP** — dar răspunde la altă întrebare (numărul CF, nu proprietarul).
