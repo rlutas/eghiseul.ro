@@ -564,8 +564,11 @@ function NumberRegistryContent() {
   // Export CSV — pentru control/raportare la Barou. Un singur fișier grupat
   // pe client/comandă: rând per delegație cu nr. contractului repetat,
   // recente primele. Respectă filtrele active (an, sursă, căutare).
+  // 2026 se exportă DOAR din 1 iulie — evidența ianuarie–iunie e ținută în
+  // fișierele vechi de pe Drive (era Google Sheets), nu se dublează aici.
   const handleExport = async (exportType?: 'contract' | 'delegation') => {
     const params = new URLSearchParams({ year: String(filterYear) });
+    if (filterYear === 2026) params.set('date_from', '2026-07-01');
     if (exportType) params.set('type', exportType);
     else if (filterType) params.set('type', filterType);
     if (filterSource) params.set('source', filterSource);

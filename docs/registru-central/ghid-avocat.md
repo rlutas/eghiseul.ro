@@ -30,7 +30,8 @@ instanță), și primiți pe loc un număr de contract + unul de delegație, leg
 din activitatea dvs., nu de pe site-uri.
 
 **La control sau raportare la Barou:** apăsați „Export CSV" — un singur
-fișier Excel cu toată evidența anului, aranjat pe client: numele, data,
+fișier Excel cu evidența de la 1 iulie încoace (ce e mai vechi rămâne în
+fișierele de pe Drive, ca până acum), aranjat pe client: numele, data,
 numărul contractului de asistență, seria SM și fiecare delegație pe rândul
 ei, cu ce s-a făcut pe ea. Cele mai recente sunt primele. Se vede tot ce
 s-a emis, pentru fiecare client, cu numerele exact ca pe acte.

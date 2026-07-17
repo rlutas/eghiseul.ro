@@ -195,6 +195,9 @@ eghiseul, generare împuternicire cu alt service_type).
   legate prin descriere („Pentru contract NNNNNN") primesc contractul de
   acolo. Ref-urile sintetice SHEET-/MANUAL- nu se exportă la Comanda.
   Exportul citește direct registrul (mereu la zi, complet — chunks de 1000).
+  **Anul 2026 se exportă DOAR din 1 iulie** (butonul trimite
+  `date_from=2026-07-01`): evidența ianuarie–iunie e în fișierele vechi de pe
+  Drive (era Google Sheets) și nu se dublează; anii următori se exportă complet.
 - Acțiuni per număr: ✏️ Editare (număr/serie/client/serviciu/descriere/sumă/
   dată — duplicatele respinse de UNIQUE), 🗑 Anulare (void, numărul NU se
   refolosește), pe anulate: ↩️ Restaurare, ❌ Ștergere definitivă (doar pentru

@@ -13,6 +13,8 @@
 
 Înlocuiește formatul „un rând per număr" cu **grupare pe client/comandă**: un singur buton „Export CSV" (în loc de Export Contracte/Delegatii separate), un rând per delegație cu coloanele: **Client, CNP, CUI, Data, Nr Contract Asistenta, Serie (mereu SM), Nr Delegatie, Pentru ce**, Serviciu, Suma, Sursa („Client avocat" unde e cazul), Platforma, Comanda, Email, Anulat, Motiv, Creat de. Sortare **recente primele**. Grupurile doar-contract au rând propriu; delegațiile „Doar Delegatie" iau contractul din descriere. Verificat pe dev: 2335 rânduri/2026, primul rând = alocarea de azi, ultimul = 05.01.2026.
 
+**Decizie Raul (follow-up):** 2026 se exportă **doar din 1 iulie** — ianuarie–iunie e în fișierele vechi de pe Drive (era Sheets), nu se dublează. Butonul trimite `date_from=2026-07-01` doar pentru anul 2026; anii următori se exportă complet. Verificat: 274 rânduri, 01.07→17.07, nimic înainte de iulie.
+
 ## Export CSV v1 (înlocuit de v2 mai sus — istoric)
 
 - Coloană nouă **„Nr Contract"**: pe fiecare rând de delegație apare contractul de care ține (din același grup `order_ref`; fallback: trimiterea „Pentru contract NNNNNN" din descriere). La export filtrat „doar delegații", contractele-frate se aduc printr-un fetch suplimentar (altfel coloana rămânea goală).
