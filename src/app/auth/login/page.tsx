@@ -38,7 +38,9 @@ function LoginForm() {
         setError(error.message);
       } else {
         // Redirect to the original page or account. Without an explicit
-        // redirect param, collaborators land on their portal, not /account.
+        // redirect param, land each role on its home: collaborators on their
+        // portal, admin roles on /admin (which routes avocat to Registru),
+        // customers on /account.
         let target = redirectTo;
         if (!searchParams.get('redirect') && data.user) {
           const { data: profile } = await supabase
@@ -47,6 +49,7 @@ function LoginForm() {
             .eq('id', data.user.id)
             .single();
           if (profile?.role === 'collaborator') target = '/colaborator';
+          else if (['super_admin', 'manager', 'operator', 'contabil', 'avocat', 'employee'].includes(profile?.role ?? '')) target = '/admin';
         }
         router.push(target);
         router.refresh();
