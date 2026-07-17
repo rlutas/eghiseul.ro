@@ -37,20 +37,28 @@ function LoginForm() {
       if (error) {
         setError(error.message);
       } else {
-        // Redirect to the original page or account. Without an explicit
-        // redirect param, land each role on its home: collaborators on their
-        // portal, admin roles on /admin (which routes avocat to Registru),
-        // customers on /account.
-        let target = redirectTo;
-        if (!searchParams.get('redirect') && data.user) {
+        // Land each role on its home: collaborators on their portal, admin
+        // roles on /admin (which routes avocat to Registru), customers on
+        // /account. An explicit ?redirect= wins ONLY if the role can actually
+        // access it — otherwise a stale /colaborator or /admin link bounces
+        // the user to the homepage via the layout guards.
+        const ADMIN_ROLES = ['super_admin', 'manager', 'operator', 'contabil', 'avocat', 'employee'];
+        let role = '';
+        if (data.user) {
           const { data: profile } = await supabase
             .from('profiles')
             .select('role')
             .eq('id', data.user.id)
             .single();
-          if (profile?.role === 'collaborator') target = '/colaborator';
-          else if (['super_admin', 'manager', 'operator', 'contabil', 'avocat', 'employee'].includes(profile?.role ?? '')) target = '/admin';
+          role = profile?.role ?? '';
         }
+        const roleHome =
+          role === 'collaborator' ? '/colaborator'
+          : ADMIN_ROLES.includes(role) ? '/admin'
+          : '/account';
+        let target = searchParams.get('redirect') ? redirectTo : roleHome;
+        if (target.startsWith('/colaborator') && role !== 'collaborator') target = roleHome;
+        if (target.startsWith('/admin') && !ADMIN_ROLES.includes(role)) target = roleHome;
         router.push(target);
         router.refresh();
       }

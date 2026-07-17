@@ -42,7 +42,9 @@ export default function CollaboratorLayout({ children }: { children: React.React
           .single();
 
         if (!profile || profile.role !== 'collaborator') {
-          router.replace('/');
+          // Admins who land here (stale link) belong in /admin, not on the homepage.
+          const adminRoles = ['super_admin', 'manager', 'operator', 'contabil', 'avocat', 'employee'];
+          router.replace(adminRoles.includes(profile?.role ?? '') ? '/admin' : '/');
           return;
         }
         setUser({
