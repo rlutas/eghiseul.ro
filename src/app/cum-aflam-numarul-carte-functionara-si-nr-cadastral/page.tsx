@@ -34,6 +34,7 @@ export default function Page() {
         { slug: 'identificare-imobil', label: 'Identificare Imobil după Adresă', desc: 'Nu știi numărul cadastral? Îl aflăm noi după adresă.' },
         { slug: 'extras-carte-funciara', label: 'Extras de Carte Funciară', desc: 'Document ANCPI, livrat pe email în câteva minute.' },
         { slug: 'extras-plan-cadastral', label: 'Extras de Plan Cadastral', desc: 'Localizezi terenul pe ortofotoplan după nr. cadastral.' },
+        { href: '/verificare-proprietar-imobil/', label: 'Cum afli cine e proprietarul unui imobil', desc: 'Metodele reale de verificare a proprietarului, după adresă sau CF.' },
       ]}
       faqs={[
         { q: 'Cum aflu numărul de carte funciară?', a: 'Cel mai simplu, din actul de proprietate (contract de vânzare-cumpărare, certificat de moștenitor) sau dintr-un extras de carte funciară mai vechi. Dacă nu le ai, îl poți afla după adresă prin serviciul de Identificare Imobil.' },

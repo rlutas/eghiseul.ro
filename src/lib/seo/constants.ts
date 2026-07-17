@@ -170,6 +170,7 @@ export const HARDCODED_TOOL_SLUGS = [
  * Blog articles at WP root path (no /articole/ prefix — preserves backlinks).
  */
 export const HARDCODED_ARTICLE_SLUGS = [
+  'verificare-proprietar-imobil',
   'extras-carte-funciara-gratuit',
   'certificat-constatator-cu-istoric',
   'tabel-varsta-pensionare-anticipata-femei',

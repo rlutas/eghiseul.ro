@@ -20,8 +20,14 @@ export interface ArticleMeta {
 export const ARTICLES: ArticleMeta[] = [
   {
     slug: 'ancpi-nu-functioneaza',
-    title: 'ANCPI nu funcționează: cădere națională a sistemelor (13–20 iulie 2026)',
-    excerpt: 'Sistemele ANCPI sunt picate în toată țara din 13 iulie; revenire estimată: 20 iulie. Comandă extrasul CF acum — îl eliberăm automat la revenire, fără să urmărești tu site-urile.',
+    title: 'ANCPI și e-Terra nu funcționează: atac cibernetic, sisteme picate național (13–20 iulie 2026)',
+    excerpt: 'ANCPI a confirmat un atac cibernetic; e-Terra e picat în toată țara din 13 iulie, revenire estimată: 20 iulie. Comandă extrasul CF acum — îl eliberăm automat la revenire.',
+    category: 'Cadastru & imobiliare',
+  },
+  {
+    slug: 'verificare-proprietar-imobil',
+    title: 'Cum Afli Cine e Proprietarul unui Imobil (după Adresă sau CF)',
+    excerpt: 'Numele proprietarului apare într-un singur document: extrasul de carte funciară — și îl poate cere oricine, legal. Metodele reale, cu costuri, plus ce NU îți arată geoportalul și primăria.',
     category: 'Cadastru & imobiliare',
   },
   {
