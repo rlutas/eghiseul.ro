@@ -1,4 +1,4 @@
-# 2026-07-17 — Colaborator: login → direct în portal, nu pe /account
+# 2026-07-17 — Login pe rol: colaborator → portal, admin → /admin
 
 **Cerință Raul:** după autentificare, un colaborator să ajungă direct în dashboard-ul lui (`/colaborator`), nu pe pagina publică/contul de client.
 
@@ -8,6 +8,6 @@
 
 - `src/app/auth/login/page.tsx`: după `signInWithPassword`, dacă **nu** există `?redirect=` explicit, citește `profiles.role`; `collaborator` → `router.push('/colaborator')`. Cu `?redirect=` explicit (ex. venit de pe o pagină protejată), parametrul are prioritate — comportament neschimbat.
 - `src/app/auth/callback/route.ts` (magic link / invite / reset): aceeași regulă — fără `?next=` explicit, colaboratorii ajung pe `/colaborator`. Relevant pentru fluxul de invitație (contul Mircea, încă OPEN).
-- Clienții/adminii: neatins — default rămâne `/account`.
+- **Extensie (același zi, cerere Raul după test)**: rolurile de admin (`super_admin`, `manager`, `operator`, `contabil`, `avocat`, `employee`) aterizează pe `/admin` (layoutul duce avocatul mai departe la Registru). Clienții rămân pe `/account`. Commit `202ff4f`.
 
 **Verificat manual** (Playwright pe dev): user temporar cu `role='collaborator'` → login → aterizează pe `/colaborator/orders/` (dashboard-ul portalului). User de test șters după verificare.
