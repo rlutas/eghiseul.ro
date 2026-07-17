@@ -132,9 +132,18 @@ export default function CivilStatusStep({ config, onValidChange }: CivilStatusSt
   const isAdult = !fields.applicantType || cs.applicantType === 'adult';
   const showCurrentlyMarried = !!fields.currentlyMarried && isAdult;
   const showMaritalHistory = !!fields.maritalHistory && isAdult;
+  // When the current marital status is asked (celibat), „căsătorit(ă)" or
+  // „divorțat(ă)" means a marriage exists whose transcription in Romania
+  // decides if we can issue — so that status drives the marriage-place
+  // question, right below. Other services keep the currentlyMarried /
+  // wasMarriedBefore triggers.
+  const statusImpliesMarriage = cs.maritalStatus === 'casatorit' || cs.maritalStatus === 'divortat';
   const showMarriagePlace =
     !!fields.marriagePlace &&
-    (config?.documentType === 'casatorie' || !!cs.currentlyMarried || !!cs.wasMarriedBefore);
+    (config?.documentType === 'casatorie' ||
+      (fields.maritalStatus
+        ? statusImpliesMarriage
+        : !!cs.currentlyMarried || !!cs.wasMarriedBefore));
 
   // Validity: every visible required control must be answered. Each check
   // carries a label so a failed «Continuă» can list exactly what's missing.
@@ -200,6 +209,24 @@ export default function CivilStatusStep({ config, onValidChange }: CivilStatusSt
   // for attempts made on previous steps.
   const [validationBaseline] = useState(validationAttempt);
   const showErrors = validationAttempt !== validationBaseline;
+
+  // Rendered right under „starea civilă actuală" when that question exists
+  // (celibat), otherwise in the legacy position after marital history.
+  const marriagePlaceField = showMarriagePlace && (
+    <Field label="Căsătoria a avut loc în:" required>
+      <ChoiceRow
+        current={cs.marriageAbroad === undefined ? undefined : cs.marriageAbroad ? 'strainatate' : 'ro'}
+        onChange={(v) => updateCivilStatus({ marriageAbroad: v === 'strainatate' })}
+        options={PLACE}
+      />
+      {cs.marriageAbroad && (
+        <Notice tone="warn">
+          Dacă căsătoria a avut loc în străinătate și <strong>nu a fost transcrisă</strong> în România,
+          nu putem elibera documentul solicitat.
+        </Notice>
+      )}
+    </Field>
+  );
 
   return (
     <div className="space-y-6">
@@ -285,7 +312,14 @@ export default function CivilStatusStep({ config, onValidChange }: CivilStatusSt
           <Field label="Care este starea civilă actuală?" required>
             <ChoiceRow
               current={cs.maritalStatus}
-              onChange={(v) => updateCivilStatus({ maritalStatus: v as CivilStatusState['maritalStatus'] })}
+              onChange={(v) =>
+                updateCivilStatus({
+                  maritalStatus: v as CivilStatusState['maritalStatus'],
+                  // The marriage-place answer only makes sense while the
+                  // status implies a marriage.
+                  ...(v !== 'casatorit' && v !== 'divortat' ? { marriageAbroad: undefined } : {}),
+                })
+              }
               options={[
                 { value: 'necasatorit', label: 'Necăsătorit(ă)' },
                 { value: 'casatorit', label: 'Căsătorit(ă)' },
@@ -295,6 +329,8 @@ export default function CivilStatusStep({ config, onValidChange }: CivilStatusSt
             />
           </Field>
         )}
+
+        {fields.maritalStatus && marriagePlaceField}
 
         {showCurrentlyMarried && (
           <Field label="Sunteți căsătorit(ă)?" required>
@@ -396,21 +432,7 @@ export default function CivilStatusStep({ config, onValidChange }: CivilStatusSt
           </Field>
         )}
 
-        {showMarriagePlace && (
-          <Field label="Căsătoria a avut loc în:" required>
-            <ChoiceRow
-              current={cs.marriageAbroad === undefined ? undefined : cs.marriageAbroad ? 'strainatate' : 'ro'}
-              onChange={(v) => updateCivilStatus({ marriageAbroad: v === 'strainatate' })}
-              options={PLACE}
-            />
-            {cs.marriageAbroad && (
-              <Notice tone="warn">
-                Dacă căsătoria a avut loc în străinătate și <strong>nu a fost transcrisă</strong> în România,
-                nu putem elibera documentul solicitat.
-              </Notice>
-            )}
-          </Field>
-        )}
+        {!fields.maritalStatus && marriagePlaceField}
 
         {fields.marriageDate && (
           <Field label="Data căsătoriei" required>

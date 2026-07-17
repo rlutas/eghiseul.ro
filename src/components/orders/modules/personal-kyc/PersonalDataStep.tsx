@@ -754,14 +754,17 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
     const uploadedDocs = personalKyc?.uploadedDocuments ?? [];
     // Mod telefonic: actul NU se cere aici — clientul îl încarcă prin link-ul
     // de completare. Echipa avansează doar cu datele tastate.
-    if (!phoneMode && acceptedDocs.length > 0 && uploadedDocs.length === 0 && !hasValidKycFromAccount) {
+    // Mod manual: la fel, actul se încarcă la pasul KYC (promisiunea din UI),
+    // nu aici — altfel „Completez manual" rămâne blocat pe scanare.
+    const skipDocsHere = phoneMode || mode === 'manual';
+    if (!skipDocsHere && acceptedDocs.length > 0 && uploadedDocs.length === 0 && !hasValidKycFromAccount) {
       return false;
     }
 
     // Scan mode: cere SETUL COMPLET de scanări pentru tipul de act ales — nu doar
     // „≥1 poză". Previne: a ales CI nou dar a urcat doar fața (sau aceeași poză de
     // 2 ori) → ne lipsesc date. CI nou cere și dovada de domiciliu (RO CEI PDF).
-    if (!phoneMode && !hasValidKycFromAccount && personalKyc.idDocumentType && !isForeignCitizen) {
+    if (!skipDocsHere && !hasValidKycFromAccount && personalKyc.idDocumentType && !isForeignCitizen) {
       const has = (t: string) => uploadedDocs.some((d) => d.type === t);
       if (personalKyc.idDocumentType === 'ci_vechi') {
         if (!has('ci_front')) return false;
@@ -807,7 +810,7 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
     }
 
     return true;
-  }, [personalKyc, config, hasValidKycFromAccount, phoneMode]);
+  }, [personalKyc, config, hasValidKycFromAccount, phoneMode, mode]);
 
   // Notify parent when validity changes
   useEffect(() => {
@@ -827,7 +830,7 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
     if (!personalKyc.birthDate) m.push('Data nașterii');
     const acceptedDocs = config?.acceptedDocuments ?? [];
     const docs = personalKyc.uploadedDocuments ?? [];
-    if (!phoneMode && acceptedDocs.length > 0 && !hasValidKycFromAccount) {
+    if (!phoneMode && mode !== 'manual' && acceptedDocs.length > 0 && !hasValidKycFromAccount) {
       const has = (t: string) => docs.some((d) => d.type === t);
       if (personalKyc.idDocumentType && !isForeign) {
         if (personalKyc.idDocumentType === 'ci_vechi' && !has('ci_front')) m.push('Scanarea CI (față)');
@@ -850,7 +853,7 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
       } else if (!personalKyc.foreignData?.foreignAddress?.trim()) m.push('Adresa din străinătate');
     }
     return m;
-  }, [personalKyc, config, hasValidKycFromAccount, phoneMode]);
+  }, [personalKyc, config, hasValidKycFromAccount, phoneMode, mode]);
 
   const [showErrors, setShowErrors] = useState(false);
   const errorRef = useRef<HTMLDivElement>(null);
