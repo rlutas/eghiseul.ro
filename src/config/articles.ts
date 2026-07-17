@@ -20,8 +20,8 @@ export interface ArticleMeta {
 export const ARTICLES: ArticleMeta[] = [
   {
     slug: 'ancpi-nu-functioneaza',
-    title: 'ANCPI Nu Funcționează: cădere națională a sistemelor (13–20 iulie 2026)',
-    excerpt: 'Sistemele ANCPI sunt picate în toată țara din 13 iulie; estimare oficială de revenire: 20 iulie. Ce înseamnă pentru extrase CF și tranzacții + ce se întâmplă cu comenzile.',
+    title: 'ANCPI nu funcționează: cădere națională a sistemelor (13–20 iulie 2026)',
+    excerpt: 'Sistemele ANCPI sunt picate în toată țara din 13 iulie; revenire estimată: 20 iulie. Comandă extrasul CF acum — îl eliberăm automat la revenire, fără să urmărești tu site-urile.',
     category: 'Cadastru & imobiliare',
   },
   {

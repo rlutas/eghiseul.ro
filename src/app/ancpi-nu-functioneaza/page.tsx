@@ -5,16 +5,19 @@ import { ArticleLayout } from '@/components/articole/article-layout';
 import { SystemStatus } from '@/components/services/system-status';
 
 const SLUG = 'ancpi-nu-functioneaza';
-const TITLE = 'ANCPI Nu Funcționează: cădere națională a sistemelor (13–20 iulie 2026)';
+// H1 — descriptive. The SERP <title> is shorter (META_TITLE): the long one
+// was 72 chars and Google rewrote it into a lowercase tail fragment.
+const TITLE = 'ANCPI nu funcționează: cădere națională a sistemelor (13–20 iulie 2026)';
+const META_TITLE = 'ANCPI Nu Funcționează — Până Când e Picat și Ce Poți Face';
 const DESCRIPTION =
-  'Sistemele informatice ANCPI sunt picate la nivel național din noaptea de 13 iulie. Estimare oficială de revenire: 20 iulie 2026. Ce înseamnă pentru extrase CF, cadastru și tranzacții imobiliare — și ce se întâmplă cu comenzile plasate acum.';
+  'Sistemele ANCPI sunt picate național din 13 iulie; revenire estimată: 20 iulie 2026. Comandă extrasul CF acum — îl eliberăm automat la revenire și îl primești pe email, fără să urmărești tu site-urile.';
 const DATE_PUBLISHED = '2026-07-15';
-const DATE_MODIFIED = '2026-07-15';
+const DATE_MODIFIED = '2026-07-17';
 
 export const revalidate = 3600; // outage news — refresh hourly
 
 export const metadata = buildPageMetadata({
-  title: TITLE,
+  title: META_TITLE,
   description: DESCRIPTION,
   path: `/${SLUG}/`,
   ogImage: `/images/articole/${SLUG}.webp`,
@@ -30,7 +33,7 @@ export default function Page() {
       datePublished={DATE_PUBLISHED}
       dateModified={DATE_MODIFIED}
       publishedLabel="15 iulie 2026"
-      updatedLabel="15 iulie 2026"
+      updatedLabel="17 iulie 2026"
       imageAlt="Sistem temporar nefuncțional — sistemele informatice ANCPI indisponibile la nivel național"
       relatedServices={[
         {
@@ -61,6 +64,10 @@ export default function Page() {
         {
           q: 'Pot obține un extras de carte funciară în această perioadă?',
           a: 'Nu, din nicio sursă — nici de la ghișeul OCPI, nici prin ANCPI online, nici prin intermediari, pentru că toate folosesc aceleași sisteme centrale. Poți plasa comanda acum: intră în coadă și se eliberează automat, cu prioritate, imediat ce sistemele revin.',
+        },
+        {
+          q: 'Cum primesc extrasul CF fără să urmăresc eu revenirea ANCPI?',
+          a: 'Plasezi comanda pe eGhișeul acum și ai terminat: intră în coadă cu prioritate, iar sistemul nostru monitorizează ANCPI continuu și eliberează documentul automat în momentul revenirii. Îl primești pe email — nu trebuie să verifici site-urile sau să reiei comanda.',
         },
         {
           q: 'Ce se întâmplă cu tranzacțiile imobiliare programate?',
@@ -94,6 +101,26 @@ export default function Page() {
         </a>
         ), dar problema e centrală — aceleași sisteme deservesc toate OCPI-urile din țară.
       </p>
+
+      {/* CTA principal — mesajul care ne diferențiază în SERP-ul de outage:
+          nu aștepta tu revenirea, comanda intră în coadă și se livrează singură. */}
+      <div className="not-prose my-8 rounded-2xl border-2 border-primary-500 bg-primary-50 p-6">
+        <p className="mb-1 text-lg font-bold text-secondary-900">
+          Nu sta să urmărești când revine ANCPI — urmărim noi pentru tine
+        </p>
+        <p className="mb-4 text-sm leading-relaxed text-secondary-900/80">
+          Plasezi comanda de extras CF acum și ai terminat: intră în coadă cu prioritate, iar în
+          secunda în care sistemele ANCPI revin, platforma noastră o eliberează <strong>automat</strong> și
+          primești documentul pe email. Fără refresh la site-uri, fără drumuri, fără să reiei
+          comanda.
+        </p>
+        <Link
+          href="/comanda/extras-carte-funciara/"
+          className="inline-flex items-center rounded-xl bg-primary-500 px-5 py-3 text-sm font-bold text-secondary-900 shadow-[0_6px_14px_rgba(236,185,95,0.35)] transition-all hover:bg-primary-600 hover:shadow-[0_10px_20px_rgba(236,185,95,0.45)]"
+        >
+          Comandă extras CF — se eliberează automat la revenire →
+        </Link>
+      </div>
 
       <figure className="not-prose my-6">
         <Image
@@ -152,9 +179,11 @@ export default function Page() {
         </li>
       </ul>
       <p>
-        Dacă ai nevoie de document imediat ce revine sistemul, cel mai sigur e să plasezi comanda
-        de <Link href="/servicii/extras-de-carte-funciara/">extras de carte funciară</Link> de pe
-        acum — coada se procesează în ordine.
+        Dacă ai nevoie de document imediat ce revine sistemul, cel mai sigur e să{' '}
+        <Link href="/comanda/extras-carte-funciara/">plasezi comanda de pe acum</Link> — coada se
+        procesează în ordinea plasării, iar tu primești extrasul pe email fără să mai faci nimic.
+        Detalii despre serviciu:{' '}
+        <Link href="/servicii/extras-de-carte-funciara/">extras de carte funciară</Link>.
       </p>
 
       <h2>Ce poți face între timp</h2>
@@ -179,9 +208,14 @@ export default function Page() {
 
       <h2>Actualizări</h2>
       <p>
-        <strong>15 iulie 2026:</strong> sistemele rămân indisponibile; estimarea oficială de
-        revenire este 20 iulie 2026. Actualizăm articolul când ANCPI publică informații noi sau
-        când monitorizarea noastră detectează revenirea sistemelor.
+        <strong>17 iulie 2026:</strong> sistemele rămân indisponibile; estimarea oficială de
+        revenire rămâne 20 iulie 2026. Comenzile plasate în această perioadă se acumulează în
+        coadă și se vor procesa automat, în ordinea plasării, la revenire.
+      </p>
+      <p>
+        <strong>15 iulie 2026:</strong> oficiile teritoriale au confirmat oficial indisponibilitatea
+        și estimarea de revenire 20 iulie 2026. Actualizăm articolul când ANCPI publică informații
+        noi sau când monitorizarea noastră detectează revenirea sistemelor.
       </p>
     </ArticleLayout>
   );
