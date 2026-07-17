@@ -7,10 +7,10 @@ import { SystemStatus } from '@/components/services/system-status';
 const SLUG = 'ancpi-nu-functioneaza';
 // H1 — descriptive. The SERP <title> is shorter (META_TITLE): the long one
 // was 72 chars and Google rewrote it into a lowercase tail fragment.
-const TITLE = 'ANCPI nu funcționează: cădere națională a sistemelor (13–20 iulie 2026)';
-const META_TITLE = 'ANCPI Nu Funcționează — Până Când e Picat și Ce Poți Face';
+const TITLE = 'ANCPI nu funcționează: atac cibernetic, sisteme picate național (13–20 iulie 2026)';
+const META_TITLE = 'ANCPI Picat După Atac Cibernetic — Până Când și Ce Poți Face';
 const DESCRIPTION =
-  'Sistemele ANCPI sunt picate național din 13 iulie; revenire estimată: 20 iulie 2026. Comandă extrasul CF acum — îl eliberăm automat la revenire și îl primești pe email, fără să urmărești tu site-urile.';
+  'ANCPI a confirmat un atac cibernetic: sistemele sunt picate național din 13 iulie; revenire estimată: 20 iulie 2026. Comandă extrasul CF acum — îl eliberăm automat la revenire și îl primești pe email.';
 const DATE_PUBLISHED = '2026-07-15';
 const DATE_MODIFIED = '2026-07-17';
 
@@ -55,7 +55,11 @@ export default function Page() {
       faqs={[
         {
           q: 'De ce nu funcționează ANCPI?',
-          a: 'ANCPI a comunicat oficial că „o parte din sistemele informatice sunt temporar indisponibile, ca urmare a unui incident tehnic aflat în curs de investigare". Natura exactă a incidentului nu a fost făcută publică. Căderea afectează aplicațiile la nivel național, nu doar un județ.',
+          a: 'ANCPI a confirmat că indisponibilitatea este cauzată de un atac cibernetic — pe care l-a descris drept cea mai amplă întrerupere tehnică din istoria instituției. Inițial, comunicarea vorbea doar despre „un incident tehnic aflat în curs de investigare". Căderea afectează aplicațiile la nivel național, nu doar un județ.',
+        },
+        {
+          q: 'Ce s-a întâmplat cu datele din cartea funciară? Sunt în pericol?',
+          a: 'ANCPI susține oficial că datele administrate prin sistemele sale sunt în siguranță și nu au fost compromise. În paralel, presa a relatat că un hacker susține că a obținut și a scos la vânzare date din rețelele ANCPI și codul sursă al aplicațiilor. Aceste susțineri nu au fost confirmate oficial; investigația este în curs, cu implicarea mai multor instituții. Important: înscrierile din cartea funciară rămân valabile — registrul juridic nu se pierde.',
         },
         {
           q: 'Până când e picat ANCPI?',
@@ -85,7 +89,7 @@ export default function Page() {
     >
       <h2>Ce s-a întâmplat, pe scurt</h2>
       <p>
-        Din noaptea de <strong>duminică, 13 iulie 2026</strong>, sistemele informatice ale ANCPI
+        Din noaptea de <strong>luni, 13 iulie 2026</strong>, sistemele informatice ale ANCPI
         (Agenția Națională de Cadastru și Publicitate Imobiliară) sunt indisponibile{' '}
         <strong>la nivel național</strong>. Monitorizarea noastră automată, care verifică
         constant portalul ePay ANCPI, a înregistrat căderea la <strong>ora 23:02</strong> — de
@@ -101,6 +105,47 @@ export default function Page() {
         </a>
         ), dar problema e centrală — aceleași sisteme deservesc toate OCPI-urile din țară.
       </p>
+
+      <h2>Cauza confirmată: atac cibernetic</h2>
+      <p>
+        Ce inițial a fost comunicat drept „incident tehnic” s-a dovedit a fi altceva:{' '}
+        <strong>ANCPI a confirmat oficial că este victima unui atac cibernetic</strong>, descris de
+        instituție drept cea mai amplă întrerupere tehnică din istoria sa (
+        <a href="https://www.mediafax.ro/social/atac-cibernetic-la-ancpi-institutia-anunta-ca-sistemele-sunt-nefunctionale-dar-datele-nu-au-fost-compromise-23772862" target="_blank" rel="nofollow noopener">
+          Mediafax
+        </a>
+        ). Directoratul Național de Securitate Cibernetică (DNSC) colaborează cu agenția pentru
+        gestionarea incidentului, iar investigația implică mai multe instituții ale statului.
+      </p>
+      <p>
+        Ce știm, cu atribuirea de rigoare:
+      </p>
+      <ul>
+        <li>
+          <strong>Poziția oficială ANCPI:</strong> datele administrate prin sistemele instituției
+          „sunt în siguranță și nu au fost compromise”.
+        </li>
+        <li>
+          <strong>Ce susține atacatorul:</strong> un actor cunoscut sub numele „ByteToBreach” a
+          anunțat pe 15 iulie, pe o platformă folosită pentru comercializarea datelor din atacuri
+          informatice, că vinde date obținute din rețelele ANCPI și codul sursă al aplicațiilor
+          (inclusiv o copie a serverelor GitLab), susținând că a instalat ransomware și a șters
+          backup-uri — relatare{' '}
+          <a href="https://publicrecord.ro/2026/07/17/atac-cibernetic-ancpi/" target="_blank" rel="nofollow noopener">
+            Public Record
+          </a>{' '}
+          și{' '}
+          <a href="https://hotnews.ro/datele-furate-dupa-atacul-cibernetic-asupra-agentiei-pentru-cadastru-scoase-la-vanzare-pe-internet-2302793" target="_blank" rel="nofollow noopener">
+            HotNews
+          </a>
+          . <strong>Aceste susțineri nu au fost confirmate oficial.</strong>
+        </li>
+        <li>
+          <strong>Ce nu se pierde:</strong> înscrierile din cartea funciară sunt registru juridic —
+          drepturile de proprietate nu dispar din cauza unui atac informatic. Problema e de{' '}
+          <em>acces</em> la sisteme, nu de valabilitate a înscrierilor.
+        </li>
+      </ul>
 
       {/* CTA principal — mesajul care ne diferențiază în SERP-ul de outage:
           nu aștepta tu revenirea, comanda intră în coadă și se livrează singură. */}
@@ -208,9 +253,13 @@ export default function Page() {
 
       <h2>Actualizări</h2>
       <p>
-        <strong>17 iulie 2026:</strong> sistemele rămân indisponibile; estimarea oficială de
-        revenire rămâne 20 iulie 2026. Comenzile plasate în această perioadă se acumulează în
-        coadă și se vor procesa automat, în ordinea plasării, la revenire.
+        <strong>17 iulie 2026:</strong> cauza e confirmată — <strong>atac cibernetic</strong>.
+        ANCPI recunoaște oficial atacul (după ce inițial comunicase „incident tehnic”) și susține
+        că datele nu au fost compromise; DNSC e implicat în investigație. În paralel, presa
+        relatează că un hacker a scos la vânzare date și cod sursă despre care susține că provin
+        din rețelele ANCPI — susțineri neconfirmate oficial. Sistemele rămân indisponibile;
+        estimarea de revenire rămâne 20 iulie 2026. Comenzile plasate în această perioadă se
+        acumulează în coadă și se vor procesa automat, în ordinea plasării, la revenire.
       </p>
       <p>
         <strong>15 iulie 2026:</strong> oficiile teritoriale au confirmat oficial indisponibilitatea
