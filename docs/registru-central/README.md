@@ -178,6 +178,19 @@ eghiseul, generare împuternicire cu alt service_type).
 - Alocare manuală: implicit „Contract + Delegatie (legate)"; „Doar Delegatie"
   cu nr. contract existent opțional; opțional legată de o comandă (platformă +
   nr. comandă). După alocare, jurnalul sare pe pagina 1 (numărul nou primul).
+- **Mod „Client avocat (personal)"** (2026-07-17): toggle în dialog — pentru
+  clienții PROPRII ai avocatei (fără legătură cu platformele). Formular redus:
+  nume + CNP + „pentru ce" + data (fără căutare comandă/email/CUI/sumă).
+  Rolul `avocat` intră implicit pe acest mod. Intrările primesc „Client
+  avocat" în descriere → badge „Client avocat" în jurnal + vizibil în export.
+  Combo-urile manuale fără comandă primesc ref sintetic `MANUAL-XXXX` ca să
+  rămână contract + delegație grupate pe un rând (ca `SHEET-` la import).
+- **Export CSV** (2026-07-17): coloană nouă **Nr Contract** pe rândurile de
+  delegație (contractul din același grup; fallback „Pentru contract NNNNNN"
+  din descriere; la filtrul „doar delegații" contractele-frate se aduc
+  separat) + coloană **Creat de**. Ref-urile sintetice SHEET-/MANUAL- nu se
+  exportă la Comanda. Exportul citește direct registrul (mereu la zi, complet
+  — paginat în chunks de 1000).
 - Acțiuni per număr: ✏️ Editare (număr/serie/client/serviciu/descriere/sumă/
   dată — duplicatele respinse de UNIQUE), 🗑 Anulare (void, numărul NU se
   refolosește), pe anulate: ↩️ Restaurare, ❌ Ștergere definitivă (doar pentru

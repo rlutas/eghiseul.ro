@@ -136,6 +136,11 @@ export default function AdminRegistruPage() {
 // ──────────────────────────────────────────────────────────────
 
 function NumberRegistryContent() {
+  // Avocata (rol 'avocat') alocă de regulă pentru clienții EI personali —
+  // formularul ei sare direct pe modul simplu (nume + CNP, fără comandă).
+  const { user } = useAdminPermissions();
+  const isAvocat = user.role === 'avocat';
+
   // Ranges
   const [ranges, setRanges] = useState<NumberRangeWithStats[]>([]);
   const [rangesLoading, setRangesLoading] = useState(true);
@@ -183,6 +188,9 @@ function NumberRegistryContent() {
     order_ref: '',
     linked_contract_number: '',
   });
+  // Modul dialogului de alocare manuală: client PERSONAL al avocatei (doar
+  // nume + CNP, marcat „Client avocat", fără comandă) vs client de platformă.
+  const [personalClient, setPersonalClient] = useState(isAvocat);
 
   const [saving, setSaving] = useState(false);
 
@@ -265,6 +273,8 @@ function NumberRegistryContent() {
     serviceType: string | null;
     amount: number | null;
     source: string;
+    /** Client personal al avocatei (marcat la alocarea manuală simplă). */
+    avocatClient: boolean;
     voided: boolean;
     voidedEntryIds: string[];
   }
@@ -283,14 +293,15 @@ function NumberRegistryContent() {
 
       const key = `${entry.platform ?? ''}:${entry.order_ref}`;
       if (!orderGroups.has(key)) {
-        // SHEET-XXXXXX = grupare sintetică pentru importul din Google Sheets
-        // (leagă contractul de delegațiile lui) — nu e o comandă reală.
-        const isSheetImport = (entry.order_ref || '').startsWith('SHEET-');
+        // SHEET-XXXXXX = grupare sintetică pentru importul din Google Sheets;
+        // MANUAL-XXXXXX = grupare sintetică pentru alocările manuale combo
+        // (contract + delegație legate) — nu sunt comenzi reale.
+        const isSyntheticRef = /^(SHEET|MANUAL)-/.test(entry.order_ref || '');
         orderGroups.set(key, {
           groupKey: key,
           orderId: entry.order_id ?? null,
           platform: entry.platform ?? null,
-          friendlyOrderId: isSheetImport ? '-' : (entry.friendly_order_id || entry.order_ref || '-'),
+          friendlyOrderId: isSyntheticRef ? '-' : (entry.friendly_order_id || entry.order_ref || '-'),
           contractNumber: null,
           contractEntryId: null,
           contractDocS3Key: null,
@@ -302,12 +313,14 @@ function NumberRegistryContent() {
           serviceType: entry.service_type,
           amount: entry.amount,
           source: entry.source,
+          avocatClient: false,
           voided: false,
           voidedEntryIds: [],
         });
       }
 
       const group = orderGroups.get(key)!;
+      if ((entry.description || '').startsWith('Client avocat')) group.avocatClient = true;
       if (entry.type === 'contract') {
         group.contractNumber = entry.number;
         group.contractEntryId = entry.id;
@@ -414,6 +427,10 @@ function NumberRegistryContent() {
         body: JSON.stringify({
           ...manualEntry,
           amount: manualEntry.amount ? parseFloat(manualEntry.amount) : undefined,
+          // Client personal al avocatei: fără comandă/platformă, marcat explicit.
+          ...(personalClient
+            ? { avocat_client: true, platform: '', order_ref: '', client_email: '', client_cui: '' }
+            : {}),
         }),
       });
       const json = await res.json();
@@ -428,6 +445,7 @@ function NumberRegistryContent() {
         }
         setAddManualOpen(false);
         setManualEntry({ type: 'contract_delegatie', client_name: '', client_email: '', client_cnp: '', client_cui: '', service_type: '', description: '', amount: '', date: new Date().toISOString().split('T')[0], platform: '', order_ref: '', linked_contract_number: '' });
+        setPersonalClient(isAvocat);
         setPickedOrder(null);
         setOrderSearch('');
         setOrderResults([]);
@@ -913,7 +931,7 @@ function NumberRegistryContent() {
                             }>
                               {group.source === 'platform'
                                 ? (group.platform === 'eghiseul' ? 'eGhișeul' : group.platform === 'ecazier' ? 'ecazier' : group.platform === 'cazierjudiciaronline' ? 'CJO' : 'Platforma')
-                                : group.source === 'manual' ? 'Manual'
+                                : group.source === 'manual' ? (group.avocatClient ? 'Client avocat' : 'Manual')
                                 : group.source === 'voided' ? 'Anulat' : 'Rezervat'}
                             </Badge>
                           </td>
@@ -981,7 +999,9 @@ function NumberRegistryContent() {
                         <td className="py-2 px-2 font-mono text-xs">{entry.client_cnp || entry.client_cui || '-'}</td>
                         <td className="py-2 px-2">{entry.service_type || '-'}</td>
                         <td className="py-2 px-2">
-                          <Badge variant="secondary">Manual</Badge>
+                          <Badge variant="secondary">
+                            {(entry.description || '').startsWith('Client avocat') ? 'Client avocat' : 'Manual'}
+                          </Badge>
                         </td>
                         <td className="py-2 px-2">
                           <EntryActions
@@ -1093,6 +1113,37 @@ function NumberRegistryContent() {
             <DialogTitle>Alocare Manuala Numar</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
+            {/* Pentru cine se alocă: clientul personal al avocatei (formular
+                simplu, marcat „Client avocat") sau un client de platformă. */}
+            <div>
+              <Label>Pentru cine</Label>
+              <div className="mt-1 flex gap-2" role="radiogroup">
+                <button
+                  type="button"
+                  role="radio"
+                  aria-checked={personalClient}
+                  onClick={() => setPersonalClient(true)}
+                  className={`rounded-lg border-2 px-3 py-2 text-sm font-medium ${personalClient ? 'border-primary bg-primary/10' : 'border-muted bg-white hover:border-primary/40'}`}
+                >
+                  Client avocat (personal)
+                </button>
+                <button
+                  type="button"
+                  role="radio"
+                  aria-checked={!personalClient}
+                  onClick={() => setPersonalClient(false)}
+                  className={`rounded-lg border-2 px-3 py-2 text-sm font-medium ${!personalClient ? 'border-primary bg-primary/10' : 'border-muted bg-white hover:border-primary/40'}`}
+                >
+                  Client platformă (comandă)
+                </button>
+              </div>
+              {personalClient && (
+                <p className="mt-1.5 text-xs text-muted-foreground">
+                  Client din activitatea proprie a cabinetului — fără legătură cu platformele.
+                  Apare în jurnal și în export ca <strong>„Client avocat&rdquo;</strong>.
+                </p>
+              )}
+            </div>
             <div>
               <Label>Tip</Label>
               <select className="w-full border rounded px-3 py-2 mt-1" value={manualEntry.type} onChange={e => setManualEntry({...manualEntry, type: e.target.value})}>
@@ -1113,8 +1164,9 @@ function NumberRegistryContent() {
               </div>
             )}
             {/* Căutare comandă → precompletează tot (nume, CNP/CUI, email,
-                serviciu, sumă, platformă + nr. comandă). Clientul manual e
-                oricum clientul avocatei — alocarea merge pe datele comenzii. */}
+                serviciu, sumă, platformă + nr. comandă). Doar în modul
+                „client platformă" — clientul personal n-are comandă. */}
+            {!personalClient && (
             <div className="rounded-lg border border-blue-200 bg-blue-50 p-3 space-y-2 relative">
               <Label>Caută comanda (nume client / nr. comandă / email)</Label>
               <Input
@@ -1150,10 +1202,18 @@ function NumberRegistryContent() {
                 </div>
               )}
             </div>
+            )}
             <div>
               <Label>Nume client *</Label>
               <Input value={manualEntry.client_name} onChange={e => setManualEntry({...manualEntry, client_name: e.target.value})} />
             </div>
+            {personalClient ? (
+              <div>
+                <Label>CNP</Label>
+                <Input value={manualEntry.client_cnp} onChange={e => setManualEntry({...manualEntry, client_cnp: e.target.value})} maxLength={13} />
+              </div>
+            ) : (
+            <>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label>CNP</Label>
@@ -1168,15 +1228,19 @@ function NumberRegistryContent() {
               <Label>Email</Label>
               <Input type="email" value={manualEntry.client_email} onChange={e => setManualEntry({...manualEntry, client_email: e.target.value})} />
             </div>
+            </>
+            )}
             <div>
-              <Label>Serviciu / Descriere</Label>
-              <Input value={manualEntry.service_type} onChange={e => setManualEntry({...manualEntry, service_type: e.target.value})} placeholder="Ex: Consultanta juridica / Apostila Haga extra" />
+              <Label>{personalClient ? 'Pentru ce (serviciu / scop)' : 'Serviciu / Descriere'}</Label>
+              <Input value={manualEntry.service_type} onChange={e => setManualEntry({...manualEntry, service_type: e.target.value})} placeholder={personalClient ? 'Ex: Reprezentare instanta / Consultanta juridica' : 'Ex: Consultanta juridica / Apostila Haga extra'} />
             </div>
             <div className="grid grid-cols-2 gap-4">
+              {!personalClient && (
               <div>
                 <Label>Suma (RON)</Label>
                 <Input type="number" step="0.01" value={manualEntry.amount} onChange={e => setManualEntry({...manualEntry, amount: e.target.value})} />
               </div>
+              )}
               <div>
                 <Label>Data</Label>
                 <Input type="date" value={manualEntry.date} onChange={e => setManualEntry({...manualEntry, date: e.target.value})} />
@@ -1186,6 +1250,7 @@ function NumberRegistryContent() {
                 extra neprevăzute adăugate ulterior (ex. apostilă cerută după
                 plasare). Serviciul de mai sus TREBUIE să difere de cele deja
                 alocate pe comandă (altfel primești numărul existent înapoi). */}
+            {!personalClient && (
             <div className="rounded-lg border border-dashed p-3 space-y-3">
               <p className="text-xs text-muted-foreground">Opțional: leagă de o comandă existentă (serviciu extra neprevăzut)</p>
               <div className="grid grid-cols-2 gap-4">
@@ -1204,6 +1269,7 @@ function NumberRegistryContent() {
                 </div>
               </div>
             </div>
+            )}
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setAddManualOpen(false)}>Anuleaza</Button>

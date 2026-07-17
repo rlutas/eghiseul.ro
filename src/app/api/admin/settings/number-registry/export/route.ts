@@ -144,11 +144,54 @@ export async function GET(request: NextRequest) {
       }
     }
 
+    // „Nr Contract" pe rândurile de DELEGAȚIE — la control se vede imediat de
+    // ce contract ține fiecare împuternicire. Sursa: contractul din același
+    // grup (order_ref, inclusiv SHEET-/MANUAL-), altfel trimiterea din
+    // descriere („Pentru contract 005771").
+    const contractByRef: Record<string, string> = {};
+    for (const e of entries as AnyClient[]) {
+      if (e.type === 'contract' && e.order_ref && !e.voided_at) {
+        contractByRef[`${e.platform ?? ''}:${e.order_ref}`] = String(e.number).padStart(6, '0');
+      }
+    }
+    // Filtrele (ex. „doar delegații", căutare) pot exclude contractele-frate
+    // din setul exportat — le aducem separat ca să nu rămână coloana goală.
+    const missingRefs = [
+      ...new Set(
+        (entries as AnyClient[])
+          .filter((e) => e.type === 'delegation' && e.order_ref && !contractByRef[`${e.platform ?? ''}:${e.order_ref}`])
+          .map((e) => e.order_ref as string)
+      ),
+    ];
+    for (let i = 0; i < missingRefs.length; i += 200) {
+      const { data: siblingContracts } = await registryClient
+        .from('number_registry')
+        .select('platform, order_ref, number, voided_at')
+        .eq('year', year)
+        .eq('type', 'contract')
+        .in('order_ref', missingRefs.slice(i, i + 200));
+      for (const c of (siblingContracts ?? []) as AnyClient[]) {
+        if (!c.voided_at) {
+          contractByRef[`${c.platform ?? ''}:${c.order_ref}`] = String(c.number).padStart(6, '0');
+        }
+      }
+    }
+    const linkedContract = (entry: AnyClient): string => {
+      if (entry.type !== 'delegation') return '';
+      if (entry.order_ref) {
+        const fromGroup = contractByRef[`${entry.platform ?? ''}:${entry.order_ref}`];
+        if (fromGroup) return fromGroup;
+      }
+      const m = (entry.description || '').match(/Pentru contract (\d+)/);
+      return m ? m[1].padStart(6, '0') : '';
+    };
+
     // Generate CSV
     const CSV_HEADERS = [
       'Nr',
       'Tip',
       'Serie',
+      'Nr Contract',
       'Data',
       'Client',
       'Email',
@@ -163,6 +206,7 @@ export async function GET(request: NextRequest) {
       'Anulat',
       'Motiv Anulare',
       'Document',
+      'Creat de',
     ];
 
     const rows = (entries || []).map((entry: AnyClient) => [
@@ -170,6 +214,7 @@ export async function GET(request: NextRequest) {
       escapeCsvField(String(entry.number).padStart(6, '0')),
       escapeCsvField(TYPE_LABELS[entry.type] || entry.type),
       escapeCsvField(entry.series),
+      escapeCsvField(linkedContract(entry)),
       escapeCsvField(formatDateRO(entry.date)),
       escapeCsvField(entry.client_name),
       escapeCsvField(entry.client_email),
@@ -180,7 +225,8 @@ export async function GET(request: NextRequest) {
       escapeCsvField(entry.amount),
       escapeCsvField(SOURCE_LABELS[entry.source] || entry.source),
       escapeCsvField(entry.platform || ''),
-      escapeCsvField(entry.order_ref || ''),
+      // SHEET-/MANUAL- sunt ref-uri sintetice de grupare, nu comenzi reale.
+      escapeCsvField(/^(SHEET|MANUAL)-/.test(entry.order_ref || '') ? '' : (entry.order_ref || '')),
       escapeCsvField(entry.voided_at ? 'Da' : ''),
       escapeCsvField(entry.void_reason),
       escapeCsvField(
@@ -188,6 +234,7 @@ export async function GET(request: NextRequest) {
           ? (docMap[entry.order_document_ref] || '')
           : ''
       ),
+      escapeCsvField(entry.created_by || ''),
     ]);
 
     // UTF-8 BOM for Excel compatibility + header + data rows

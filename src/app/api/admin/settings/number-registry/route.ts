@@ -292,14 +292,24 @@ export async function POST(request: NextRequest) {
     // Optional order link — lets the team allocate an EXTRA delegation for
     // unforeseen services on an existing order (e.g. apostilă adăugată
     // ulterior). service_type distinguishes it from the order's other numbers.
+    // avocat_client = clientul PERSONAL al avocatei (fără platformă/comandă);
+    // marcat în descriere ca „Client avocat" — vizibil în jurnal și export.
+    const isAvocatClient = body.avocat_client === true;
     const validPlatforms = ['eghiseul', 'cazierjudiciaronline', 'ecazier'];
-    const platform = body.platform && validPlatforms.includes(body.platform) ? body.platform : null;
-    const orderRef = platform && body.order_ref?.trim() ? body.order_ref.trim() : null;
+    const platform = !isAvocatClient && body.platform && validPlatforms.includes(body.platform) ? body.platform : null;
+    let orderRef = platform && body.order_ref?.trim() ? body.order_ref.trim() : null;
 
     const registryClient: AnyClient = getRegistryClient();
 
     // ── Allocate via CENTRAL RPC ──
     const isCombo = body.type === 'contract_delegatie';
+    // Combo fără comandă reală: ref sintetic MANUAL-XXXX ca să rămână contract
+    // + delegație GRUPATE în jurnal (același mecanism ca SHEET- la import).
+    // Indexul de idempotență cere platform NOT NULL, deci ref-ul cu platform
+    // null nu se ciocnește de nimic.
+    if (isCombo && !orderRef) {
+      orderRef = `MANUAL-${Date.now().toString(36).toUpperCase()}`;
+    }
     const baseParams = {
       p_platform: platform,
       p_order_ref: orderRef,
@@ -331,10 +341,16 @@ export async function POST(request: NextRequest) {
       );
     };
 
+    // Marker „Client avocat" — primul lucru din descriere, pe TOATE numerele
+    // alocării (jurnalul și exportul îl arată ca atare).
+    const avocatPrefix = isAvocatClient ? 'Client avocat' : null;
+    const withMarker = (desc: string | null): string | null =>
+      avocatPrefix ? (desc ? `${avocatPrefix}. ${desc}` : avocatPrefix) : desc;
+
     if (isCombo) {
       // Contract + delegatie legate: alocam contractul, apoi delegatia cu
       // trimitere la numarul contractului in descriere.
-      const contractRes = await allocate('contract', body.description || null);
+      const contractRes = await allocate('contract', withMarker(body.description || null));
       if (contractRes.error) {
         console.error('Combo contract allocation failed:', contractRes.error);
         return errorResponse(contractRes.error);
@@ -342,7 +358,7 @@ export async function POST(request: NextRequest) {
       const contractNr = String(contractRes.data[0].allocated_number).padStart(6, '0');
       const delegRes = await allocate(
         'delegation',
-        `Pentru contract ${contractNr}${body.service_type ? ` — ${body.service_type}` : ''}`
+        withMarker(`Pentru contract ${contractNr}${body.service_type ? ` — ${body.service_type}` : ''}`)
       );
       if (delegRes.error) {
         console.error('Combo delegation allocation failed (contract already allocated):', delegRes.error);
@@ -364,7 +380,7 @@ export async function POST(request: NextRequest) {
       description = `Pentru contract ${linked}${body.service_type ? ` — ${body.service_type}` : ''}${description ? `. ${description}` : ''}`;
     }
 
-    const { data, error } = await allocate(body.type, description);
+    const { data, error } = await allocate(body.type, withMarker(description));
     if (error) {
       console.error('Failed to allocate number:', error);
       return errorResponse(error);

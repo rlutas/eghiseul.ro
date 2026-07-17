@@ -23,12 +23,17 @@ completați nimic de mână și nu se mai pot încurca sau dubla numerele.
   Puteți căuta după nume.
 
 **Când aveți un caz personal** (din afara site-urilor) și vă trebuie număr:
-apăsați „+ Alocare manuala", scrieți numele clientului și serviciul, și
-primiți pe loc un număr de contract + unul de delegație, legate între ele.
+apăsați „+ Alocare manuala" — formularul e deja pe „Client avocat (personal)":
+scrieți doar numele clientului, CNP-ul și pentru ce este (ex. reprezentare
+instanță), și primiți pe loc un număr de contract + unul de delegație, legate
+între ele. În registru apar marcate „Client avocat", ca să se vadă că sunt
+din activitatea dvs., nu de pe site-uri.
 
 **La control sau raportare la Barou:** apăsați „Export Contracte" și „Export
 Delegatii" — vă descarcă toată evidența anului în două fișiere Excel,
-cu numerele exact ca pe acte.
+cu numerele exact ca pe acte. La fiecare delegație apare și numărul de
+contract de care ține, plus clientul și serviciul — se vede tot ce s-a emis,
+pentru fiecare client.
 
 **Dacă s-a dat un număr greșit:** coșul roșu îl anulează (rămâne în evidență
 ca anulat, ca la registrul pe hârtie), iar creionul corectează datele.

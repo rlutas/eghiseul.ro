@@ -4,6 +4,7 @@
  
  | Data | Ce s-a livrat | Detalii |
  |---|---|---|
+ | 2026-07-17 | 🟣 **Registru: alocare simplă „Client avocat" + export pt control** — toggle în dialogul de alocare manuală (doar nume+CNP+scop pt clienții proprii ai avocatei, marcați „Client avocat"; rolul avocat intră implicit pe modul simplu); combo-urile manuale grupate pe un rând (ref MANUAL-); export CSV cu coloanele noi **Nr Contract** (per delegație) + **Creat de** | [2026-07-17-registru-client-avocat-export.md](2026-07-17-registru-client-avocat-export.md) |
  | 2026-07-17 | 🟣 **Colaborator: login → direct în portal** — fără `?redirect=`/`?next=` explicit, `role='collaborator'` aterizează pe `/colaborator` (login + auth callback), nu pe `/account`; clienți/admini neschimbați | [2026-07-17-colaborator-login-redirect.md](2026-07-17-colaborator-login-redirect.md) |
  | 2026-07-17 | 🟣 **Celibat: „Căsătoria a avut loc în" sub starea civilă actuală** — trigger nou `maritalStatus ∈ {căsătorit, divorțat, văduv}` (înainte doar „am mai fost căsătorit = Da"), randată direct sub starea civilă, cu warning transcriere la Străinătate; golire la schimbarea stării; naștere/căsătorie neatinse | [2026-07-17-celibat-stare-civila-casatorie.md](2026-07-17-celibat-stare-civila-casatorie.md) |
  | 2026-07-17 | 🔴 **„Completez manual" bloca pasul 2 cerând scanarea CI** (validarea ignora `mode==='manual'`; actul se cere oricum la pasul KYC, deci fără gaură de verificare — toate serviciile personal-kyc afectate) | [2026-07-17-completare-manuala-blocata-scan.md](2026-07-17-completare-manuala-blocata-scan.md) |
