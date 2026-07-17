@@ -8,7 +8,7 @@ const DESCRIPTION =
   'Tipurile de certificat constatator pe care le poți comanda online: pe firmă (de bază, fonduri IMM, insolvență), ' +
   'pe persoană fizică și cu istoric — ce conține fiecare, pentru ce scopuri îl folosești, cât costă și cum îl primești pe email, 24/7.';
 const DATE_PUBLISHED = '2024-01-01';
-const DATE_MODIFIED = '2026-07-08';
+const DATE_MODIFIED = '2026-07-17';
 
 export const revalidate = 86400;
 
@@ -29,7 +29,7 @@ export default function Page() {
       datePublished={DATE_PUBLISHED}
       dateModified={DATE_MODIFIED}
       publishedLabel="ianuarie 2024"
-      updatedLabel="8 iulie 2026"
+      updatedLabel="17 iulie 2026"
       relatedServices={[
         { slug: 'certificat-constatator', label: 'Certificat Constatator ONRC', desc: 'Obține certificatul constatator online, fără drum la ghișeu.' },
         { href: '/eliberare-certificat-constatator-onrc-ghid/', label: 'Ghid eliberare certificat constatator', desc: 'Pașii compleți pentru obținere de la ONRC.' },
@@ -79,11 +79,12 @@ export default function Page() {
         notar public, obținere viză, ambasadă, instanță, parchet, poliție, eliberare cazier judiciar, ANAF /
         Administrația Finanțelor Publice, înregistrare în scopuri de TVA, Registrul Operatorilor Intracomunitari,
         autorizare, ARR, RAR, vamă, CNAS, Casa de Pensii, OCPI, primărie, informare</strong> și altele.
-        Se emite <strong>automat, de obicei în câteva minute, 24/7</strong> — inclusiv noaptea și în weekend.
+        Se emite <strong>automat, de obicei în câteva minute, 24/7</strong> — inclusiv noaptea și în weekend. Detalii
+        complete: <Link href="/certificat-constatator-de-baza/">certificatul constatator de bază</Link>.
       </p>
       <p>
           <Link
-            href="/comanda/certificat-constatator/"
+            href="/comanda/certificat-constatator/?tip=de-baza"
             className="not-prose inline-flex items-center justify-center rounded-xl bg-primary-500 hover:bg-primary-600 px-5 py-2.5 text-sm font-semibold text-secondary-900 transition-colors no-underline"
           >
             Comandă certificat de bază — 73,55 lei + TVA
@@ -100,7 +101,7 @@ export default function Page() {
       </p>
       <p>
           <Link
-            href="/comanda/certificat-constatator/"
+            href="/comanda/certificat-constatator/?tip=imm"
             className="not-prose inline-flex items-center justify-center rounded-xl bg-primary-500 hover:bg-primary-600 px-5 py-2.5 text-sm font-semibold text-secondary-900 transition-colors no-underline"
           >
             Comandă certificat fonduri IMM — 73,55 lei + TVA
@@ -112,11 +113,11 @@ export default function Page() {
         Necesar în procedurile de insolvență. Scopuri acceptate: <strong>licitație, birou notar public,
         tribunal</strong>. Include, pe lângă informațiile de bază, situațiile financiare anuale (cifră de afaceri,
         profit/pierderi). Se eliberează prin backoffice-ul ONRC, de regulă în <strong>maximum 24 de ore
-        lucrătoare</strong>.
+        lucrătoare</strong>. Detalii complete: <Link href="/certificat-constatator-insolventa/">certificatul pentru insolvență</Link>.
       </p>
       <p>
           <Link
-            href="/comanda/certificat-constatator/"
+            href="/comanda/certificat-constatator/?tip=insolventa"
             className="not-prose inline-flex items-center justify-center rounded-xl bg-primary-500 hover:bg-primary-600 px-5 py-2.5 text-sm font-semibold text-secondary-900 transition-colors no-underline"
           >
             Comandă certificat pentru insolvență — 73,55 lei + TVA
@@ -128,11 +129,12 @@ export default function Page() {
         Verifică dacă o <strong>persoană fizică</strong> deține calitatea de asociat, acționar sau administrator în
         firme înregistrate la Registrul Comerțului. Scopuri acceptate: <strong>informare, ANAF / Administrația
         Finanțelor Publice, înregistrare în scopuri de TVA, eliberare cazier judiciar, poliție, autorizare, AFIR,
-        primărie</strong> și altele. Se emite <strong>automat, în câteva minute, 24/7</strong>.
+        primărie</strong> și altele. Se emite <strong>automat, în câteva minute, 24/7</strong>. Detalii complete:
+        <Link href="/certificat-constatator-pfa/"> certificatul pentru PFA / persoană fizică</Link>.
       </p>
       <p>
           <Link
-            href="/comanda/certificat-constatator/"
+            href="/comanda/certificat-constatator/?tip=pf"
             className="not-prose inline-flex items-center justify-center rounded-xl bg-primary-500 hover:bg-primary-600 px-5 py-2.5 text-sm font-semibold text-secondary-900 transition-colors no-underline"
           >
             Comandă certificat persoană fizică — 73,55 lei + TVA
@@ -149,7 +151,7 @@ export default function Page() {
       </p>
       <p>
           <Link
-            href="/comanda/certificat-constatator/"
+            href="/comanda/certificat-constatator/?tip=istoric"
             className="not-prose inline-flex items-center justify-center rounded-xl bg-primary-500 hover:bg-primary-600 px-5 py-2.5 text-sm font-semibold text-secondary-900 transition-colors no-underline"
           >
             Comandă certificat cu istoric — 402,48 lei + TVA

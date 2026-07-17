@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Check } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -20,6 +20,15 @@ interface ConstatatorStepProps {
   onValidChange: (valid: boolean) => void;
 }
 
+// Landing pages link into the wizard with ?tip=… so the type arrives preselected.
+const TIP_PRESELECT: Record<string, { documentType: string; reportType?: string }> = {
+  'de-baza': { documentType: 'firma', reportType: 'Certificat constatator de bază' },
+  imm: { documentType: 'firma', reportType: 'Certificat constatator fonduri IMM' },
+  insolventa: { documentType: 'firma', reportType: 'Certificat constatator pentru insolvență' },
+  pf: { documentType: 'pf' },
+  istoric: { documentType: 'istoric' },
+};
+
 function Field({ label, required, children }: { label: string; required?: boolean; children: React.ReactNode }) {
   return (
     <div className="space-y-2">
@@ -36,6 +45,18 @@ export default function ConstatatorStep({ config, onValidChange }: ConstatatorSt
   const cs: ConstatatorState = useMemo(() => state.constatator ?? {}, [state.constatator]);
   const docTypes = useMemo(() => config?.documentTypes ?? [], [config]);
   const purposes = useMemo(() => config?.purposes ?? [], [config]);
+
+  // Apply ?tip= preselect once, only on a pristine step (never clobber a
+  // restored draft or a user choice).
+  const preselectApplied = useRef(false);
+  useEffect(() => {
+    if (preselectApplied.current || cs.documentType || docTypes.length === 0) return;
+    const tip = new URLSearchParams(window.location.search).get('tip');
+    const preset = tip ? TIP_PRESELECT[tip] : undefined;
+    if (!preset || !docTypes.some((t) => t.value === preset.documentType)) return;
+    preselectApplied.current = true;
+    updateConstatator({ documentType: preset.documentType, reportType: preset.reportType });
+  }, [cs.documentType, docTypes, updateConstatator]);
 
   const selectedType = docTypes.find((t) => t.value === cs.documentType);
   // Report types may be plain strings (legacy) or { name, purposes } objects.

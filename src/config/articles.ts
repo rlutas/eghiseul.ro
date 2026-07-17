@@ -192,6 +192,27 @@ export const ARTICLES: ArticleMeta[] = [
     image: '/og/services/certificat-casatorie.png',
   },
   {
+    slug: 'certificat-constatator-de-baza',
+    title: 'Certificat Constatator de Bază — Preț, Ce Conține, Eliberare în Minute',
+    excerpt: 'Tariful oficial ONRC e 30 lei (cu cont pe portal); la noi 89 lei cu tot cu taxe, emis automat în câteva minute, 24/7, doar cu CUI-ul. Ce conține și unde ți-l cer.',
+    category: 'Comercial / ONRC',
+    image: '/og/services/certificat-constatator.png',
+  },
+  {
+    slug: 'certificat-constatator-insolventa',
+    title: 'Certificat Constatator pentru Insolvență — Preț și Eliberare Online',
+    excerpt: 'Atestă oficial dacă firma e în insolvență, faliment sau reorganizare. Cerut la licitații, notar și tribunal. 89 lei, maximum 24 de ore lucrătoare.',
+    category: 'Comercial / ONRC',
+    image: '/og/services/certificat-constatator.png',
+  },
+  {
+    slug: 'certificat-constatator-pfa',
+    title: 'Certificat Constatator PFA — Cum Îl Obții Online, Preț, Ce Conține',
+    excerpt: 'PFA, II și IF primesc certificat pe persoană fizică, pe CNP-ul titularului — nu pe CUI. 89 lei cu taxe incluse, emis automat în câteva minute.',
+    category: 'Comercial / ONRC',
+    image: '/og/services/certificat-constatator.png',
+  },
+  {
     slug: 'certificat-constatator-pentru-banca',
     title: 'Certificat Constatator pentru Bancă: De Ce Îl Cere și Cum Îl Obții',
     excerpt: 'Banca cere un certificat emis în ultimele 30 de zile. Vezi ce versiune îți trebuie și cum îl obții online.',
