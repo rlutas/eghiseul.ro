@@ -7,10 +7,10 @@ import { SystemStatus } from '@/components/services/system-status';
 const SLUG = 'ancpi-nu-functioneaza';
 // H1 — descriptive. The SERP <title> is shorter (META_TITLE): the long one
 // was 72 chars and Google rewrote it into a lowercase tail fragment.
-const TITLE = 'ANCPI nu funcționează: atac cibernetic, sisteme picate național (13–20 iulie 2026)';
+const TITLE = 'ANCPI și e-Terra nu funcționează: atac cibernetic, sisteme picate național (13–20 iulie 2026)';
 const META_TITLE = 'ANCPI Picat După Atac Cibernetic — Până Când și Ce Poți Face';
 const DESCRIPTION =
-  'ANCPI a confirmat un atac cibernetic: sistemele sunt picate național din 13 iulie; revenire estimată: 20 iulie 2026. Comandă extrasul CF acum — îl eliberăm automat la revenire și îl primești pe email.';
+  'ANCPI a confirmat un atac cibernetic: e-Terra și restul sistemelor sunt picate național din 13 iulie; revenire estimată: 20 iulie 2026. Comandă extrasul CF acum — îl eliberăm automat la revenire și îl primești pe email.';
 const DATE_PUBLISHED = '2026-07-15';
 const DATE_MODIFIED = '2026-07-17';
 
@@ -60,6 +60,10 @@ export default function Page() {
         {
           q: 'Ce s-a întâmplat cu datele din cartea funciară? Sunt în pericol?',
           a: 'ANCPI susține oficial că datele administrate prin sistemele sale sunt în siguranță și nu au fost compromise. În paralel, presa a relatat că un hacker susține că a obținut și a scos la vânzare date din rețelele ANCPI și codul sursă al aplicațiilor. Aceste susțineri nu au fost confirmate oficial; investigația este în curs, cu implicarea mai multor instituții. Important: înscrierile din cartea funciară rămân valabile — registrul juridic nu se pierde.',
+        },
+        {
+          q: 'De ce nu funcționează e-Terra?',
+          a: 'e-Terra este aplicația centrală de cadastru și carte funciară a ANCPI — cea folosită de OCPI-uri, notari, topografi, bănci și cetățeni. E indisponibilă din același motiv: atacul cibernetic a picat sistemele centrale ale agenției, deci e-Terra, ePay și geoportalul sunt toate blocate. Nu e o problemă locală de cont sau de browser — nu funcționează pentru nimeni.',
         },
         {
           q: 'Până când e picat ANCPI?',
@@ -129,7 +133,7 @@ export default function Page() {
           <strong>Ce susține atacatorul:</strong> un actor cunoscut sub numele „ByteToBreach” a
           anunțat pe 15 iulie, pe o platformă folosită pentru comercializarea datelor din atacuri
           informatice, că vinde date obținute din rețelele ANCPI și codul sursă al aplicațiilor
-          (inclusiv o copie a serverelor GitLab), susținând că a instalat ransomware și a șters
+          (inclusiv e-Terra, printr-o copie a serverelor GitLab), susținând că a instalat ransomware și a șters
           backup-uri — relatare{' '}
           <a href="https://publicrecord.ro/2026/07/17/atac-cibernetic-ancpi/" target="_blank" rel="nofollow noopener">
             Public Record
@@ -194,7 +198,7 @@ export default function Page() {
       <ul>
         <li>eliberarea extraselor de carte funciară (informare și autentificare) — online și la ghișeu;</li>
         <li>recepțiile cadastrale și înscrierile în cartea funciară (intabulări, notări, radieri);</li>
-        <li>eTerra, ePay și geoportalul ANCPI;</li>
+        <li>aplicația e-Terra (cadastru și carte funciară), ePay și geoportalul ANCPI;</li>
         <li>implicit: autentificările notariale care au nevoie de extras de autentificare — semnările se reprogramează.</li>
       </ul>
       <p>
