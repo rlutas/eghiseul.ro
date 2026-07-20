@@ -230,8 +230,17 @@ export function buildWizardSteps(
 
   // Step 2d: Vehicle Data (if vehicle verification enabled)
   if (verificationConfig.vehicleVerification.enabled) {
+    // Same module, two very different meanings:
+    //   • Cazier auto — asks for the DRIVING LICENCE number; it's the driver's
+    //     record from the Traffic Police, not anything about a car. Labelling it
+    //     „Date Vehicul" confused customers (they looked for plate/VIN fields).
+    //   • Rovinietă — asks for plate + category; genuinely about the vehicle.
+    // Pick the label from what the step actually collects.
+    const vf = verificationConfig.vehicleVerification.fields;
+    const isDriverRecord = vf?.drivingLicense?.required && !vf?.plateNumber?.required;
     steps.push({
       ...ALL_STEPS['vehicle-data'],
+      ...(isDriverRecord ? { label: 'Driver Data', labelRo: 'Date Conducător Auto' } : {}),
       number: stepNumber++,
     });
   }

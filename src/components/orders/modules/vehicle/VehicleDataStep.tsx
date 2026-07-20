@@ -76,6 +76,12 @@ export default function VehicleDataStep({ config, onValidChange }: VehicleDataSt
   // Check if this is a redirect service (like Rovinieta)
   const isRedirectService = fullConfig?.externalRedirect?.enabled;
 
+  // Cazier auto colectează numărul permisului = fișa conducătorului de la
+  // Poliția Rutieră, nu date despre mașină. Titlul „Date Vehicul" trimitea
+  // clientul să caute plăcuța/VIN-ul care nu există aici. Aceeași distincție
+  // ca la eticheta pasului din step-builder.
+  const isDriverRecord = config.fields.drivingLicense?.required && !config.fields.plateNumber.required;
+
   // Validate Romanian plate format
   const validatePlate = useCallback((plate: string): boolean => {
     if (config.plateFormat === 'any') return true;
@@ -183,10 +189,12 @@ export default function VehicleDataStep({ config, onValidChange }: VehicleDataSt
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Car className="h-5 w-5" />
-            Date Vehicul
+            {isDriverRecord ? 'Date Conducător Auto' : 'Date Vehicul'}
           </CardTitle>
           <CardDescription>
-            Introdu datele vehiculului pentru verificare
+            {isDriverRecord
+              ? 'Introdu numărul permisului de conducere pentru care vrei cazierul auto'
+              : 'Introdu datele vehiculului pentru verificare'}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
