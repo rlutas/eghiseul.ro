@@ -10,9 +10,9 @@
 
 | Idee | Verdict | De ce |
 |---|---|---|
-| **RAR Auto-Pass** | 🟢 **PRIORITATE 1 (nou, nu era în discuție)** | **Obligatoriu legal** la ORICE vânzare SH din 1 dec 2024, 42 lei, sute de mii/an, concurență subțire, se pliază exact pe arhitectura worker→PDF (ONRC/ANCPI) |
+| ~~**RAR Auto-Pass**~~ | 🔴 **ANULAT 20.07 — NU facem** | **RAR denunță public revânzătorii.** Vezi §1 — corecție după verificare la sursă |
 | **Deblocare RCA pe erovinieta** | 🟢 **PRIORITATE 1** | 90% construit, blocat pe un email. **54–122 lei/poliță**, recurent anual. Cel mai aproape de venit din tot documentul |
-| **Pachet „vând mașina"** (contract + checklist + acte) | 🟢 **DA — pe erovinieta.net** | Pâlnie de achiziție pentru RCA + RAR, nu linie de venit în sine |
+| **Pachet „vând mașina"** (contract + checklist + acte) | 🟢 **DA** | Pâlnie de achiziție pentru RCA (+ rovinietă, cazier auto). Gazda: vezi doc-ul de implementare `2026-07-20-categoria-contracte-eghiseul.md` |
 | **Certificat urbanism** | 🟡 **NU E IDEE NOUĂ — deja în DB, 780 lei, 0 comenzi** | Serviciu activ dar invizibil: fără pagină, fără SEO. Problemă de distribuție, nu de produs. Cel mai ieftin venit potențial |
 | **Contestație amendă** | 🟡 **DA, dar doar cu avocatul nostru** | Singurul avantaj structural necopiabil (rol `avocat` + semnătură + contract asistență). Competiția vinde șabloane în zona gri a Legii 51/1995 |
 | **Teren: checklist + upsell CF** | 🟡 **DA — cost mic** | Alimentează extras CF + urbanism (servicii existente) |
@@ -24,17 +24,19 @@
 
 ---
 
-## 1. Descoperirea principală: RAR Auto-Pass
+## 1. RAR Auto-Pass — ❌ ANULAT (corecție 20.07)
 
-Nu era în discuția inițială și e cea mai bună oportunitate din tot research-ul.
+**Fusese marcat inițial „prioritate 1". Verificarea la sursă îl elimină complet.**
 
-- **Obligatoriu prin lege** (Legea 142/2023) din **1 decembrie 2024**, la ORICE vânzare de vehicul SH înmatriculat în România. Vânzătorul trebuie să-l aibă la semnarea contractului.
-- **42 lei** tarif oficial RAR, valabil **60 de zile**, se obține online pe rarom.ro cu VIN.
-- **Volum = numărul de tranzacții auto SH din România** (sute de mii/an). Cerere garantată prin lege, nu prin marketing.
-- **Concurență subțire**: rar-autopass.ro, semi-automat, suport doar L–V 9–17.
-- **Se pliază exact pe arhitectura pe care o avem deja**: comandă → plată → worker headless → PDF pe email. Identic cu ONRC și ANCPI.
+RAR a publicat o **informare oficială împotriva revânzătorilor** ([rarom.ro/?p=298753](https://www.rarom.ro/?p=298753)), citat direct:
 
-**Verificarea decisivă înainte de orice cod:** portalul RAR permite cont/automatizare? Dacă da, e cel mai direct produs nou din tot documentul. Dacă nu, devine fulfillment manual și scade în prioritate.
+> „Registrul Auto Român atrage atenția asupra unei situații în care anumite entități terțe **se interpun între R.A.R. și clienții de bună credință, folosind metode alternative și înșelătoare pentru a vă exploata din punct de vedere financiar**. […] recomandarea noastră este să descărcați RAR Auto-Pass doar de pe site-ul oficial al R.A.R."
+
+Certificatul e emis **exclusiv** de RAR (Legea 142/2003, OMTI 210/2024), la **42 lei**, tarif fixat de Consiliul de Administrație. Nu există program de partener, API sau reseller. Site-urile care îl revând (rar-autopass.ro, autopass-online.ro — 89,99 lei față de 42 oficial) sunt exact ținta informării.
+
+**Concluzie: nu intermediem.** Riscul reputațional și juridic e direct și explicit, iar noi avem expunere mai mare decât un site anonim — vindem servicii administrative sub nume propriu, cu avocat asociat.
+
+**Ce facem în schimb** — și e mai valoros pe termen lung: în checklist punem RAR Auto-Pass **primul, marcat „obligatoriu", cu prețul oficial de 42 lei și link direct la rarom.ro, fără niciun comision**. Exact modelul dosar-auto.ro: câștigi încrederea punând întâi opțiunea corectă și negeneratoare de venit. Un client care vede că l-am trimis la sursa oficială în loc să-i vindem cu 90 de lei ceva ce costă 42 are motiv să ne creadă și la restul.
 
 ---
 
@@ -181,15 +183,15 @@ Research-ul independent pe piață a ajuns la aceeași concluzie fără să ști
 3. **OCR CI + talon** — portat din eghiseul (Gemini), paritate obligatorie.
 4. **Contract editabil 30 de zile** din cont — răspunde fricii reale („greșesc VIN-ul după plată"); doar AutoX îl are.
 5. **Remindere automate**: ziua 20 (scoatere din rol / declarare primărie), ziua 60 și 80 (transcriere). Infrastructura de remindere există deja.
-6. **Cross-sell în fluxul natural**: RAR Auto-Pass la vânzător (obligatoriu!), RCA la cumpărător (obligatoriu!), transfer rovinietă la cumpărător.
+6. **Cross-sell în fluxul natural**: RCA la cumpărător (obligatoriu, marja reală), transfer rovinietă la cumpărător, cazier auto. RAR Auto-Pass **doar ca informare cu link oficial**, fără comision (§1).
 
 **Pricing — de decis între două modele:**
-- **A) Freemium (recomandat):** contract + checklist **gratuit**, monetizare exclusiv din RAR + RCA + rovinietă. Concurează direct cu cei doi jucători gratuiți, maximizează volumul pâlniei.
+- **A) Freemium (recomandat):** contract + checklist **gratuit**, monetizare din RCA + rovinietă + cazier auto + afiliere carVertical. Concurează direct cu cei doi jucători gratuiți, maximizează volumul pâlniei.
 - **B) Plătit:** 24,99 lei contract / 49 lei „dosar complet". Venit imediat, dar volum mai mic și luptă de preț cu gratuitul.
 
 **Recomandare: A**, cu condiția ca RCA-ul să fie deblocat. Fără RCA, pâlnia nu are unde să ducă și atunci B e singura variantă.
 
-**Măsurare (90 zile):** rata de atașare RCA din fluxul de contract (ținta ≥5%), rata de atașare RAR la vânzători (ținta ≥20% — e obligatoriu legal), conversie vizitator→contract generat, cost per contract din Ads sub 5 lei.
+**Măsurare (90 zile):** rata de atașare RCA din fluxul de contract (ținta ≥5%), conversie vizitator→contract generat, cost per contract din Ads sub 5 lei, venit din afiliere carVertical per 1.000 vizitatori (reper: 40–500 lei, caz de bază ~135 lei).
 
 ---
 
@@ -247,7 +249,7 @@ Nu am găsit jurisprudență sau decizie UNBR care să tranșeze cazul — de di
 
 1. **Deblochează RCA** — urmărește emailul către Dan Ciceu (18.07). Cel mai aproape de venit. Cere split-ul 85% în scris.
 2. **Verifică statutul CNAIR** (§5) — risc de reputație/contract, nu costă nimic de verificat.
-3. **Verifică dacă portalul RAR permite automatizare** — decide dacă Auto-Pass e produs automat sau manual.
+3. ~~Verifică dacă portalul RAR permite automatizare~~ — **închis 20.07: nu intermediem RAR Auto-Pass** (§1). Înlocuit cu: **aplică la afilierea carVertical** (Everflow) și negociază rata + cod de cupon dedicat.
 4. **Certificat urbanism: pagină + cluster SEO** — nu depinde de nimic, zile de muncă, serviciu deja în DB la 780 lei.
 5. **Portează OCR-ul** din eghiseul (`document-ocr.ts`) în erovinieta, peste `src/lib/contracts/` existent.
 6. **Pachetul „vând mașina"** — după ce RCA-ul e live, ca să aibă pâlnia unde să ducă.
