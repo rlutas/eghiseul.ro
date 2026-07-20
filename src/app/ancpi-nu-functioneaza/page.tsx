@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { buildPageMetadata } from '@/lib/seo';
 import { ArticleLayout } from '@/components/articole/article-layout';
 import { SystemStatus } from '@/components/services/system-status';
+import { OutageAlertSignup } from '@/components/articole/outage-alert-signup';
 
 const SLUG = 'ancpi-nu-functioneaza';
 // H1 — descriptive. The SERP <title> is shorter (META_TITLE): the long one
@@ -259,6 +260,12 @@ export default function Page() {
         ))}
       </div>
 
+      {/* Plasat imediat după cronologie: cititorul tocmai a aflat că nu există
+          termen ferm de revenire — exact momentul în care „te anunțăm noi" e
+          cel mai relevant. Prinde publicul care nu comandă acum și care altfel
+          pleca fără urmă. */}
+      <OutageAlertSignup service="ancpi" serviceLabel="ANCPI" sourcePage={`/${SLUG}/`} />
+
       <h2>Cauza confirmată: atac cibernetic</h2>
       <p>
         Ce inițial a fost comunicat drept „incident tehnic” s-a dovedit a fi altceva:{' '}
@@ -301,18 +308,43 @@ export default function Page() {
         </li>
       </ul>
 
-      {/* CTA principal — mesajul care ne diferențiază în SERP-ul de outage:
-          nu aștepta tu revenirea, comanda intră în coadă și se livrează singură. */}
+      {/* CTA principal. Adresează cele două obiecții reale ale unui outage:
+          „de ce aș plăti pentru ceva livrabil la o dată necunoscută?" (garanție
+          + preț afișat) și „de unde știu că nu mă păcălești?" (coada e ordinea
+          plasării, verificabilă). Fără astea, textul era doar promisiune. */}
       <div className="not-prose my-8 rounded-2xl border-2 border-primary-500 bg-primary-50 p-6">
         <p className="mb-1 text-lg font-bold text-secondary-900">
           Nu sta să urmărești când revine ANCPI — urmărim noi pentru tine
         </p>
         <p className="mb-4 text-sm leading-relaxed text-secondary-900/80">
-          Plasezi comanda de extras CF acum și ai terminat: intră în coadă cu prioritate, iar în
-          secunda în care sistemele ANCPI revin, platforma noastră o eliberează <strong>automat</strong> și
+          Plasezi comanda de extras CF acum și ai terminat: intră în coadă, iar în secunda în care
+          sistemele ANCPI revin, platforma noastră o eliberează <strong>automat</strong> și
           primești documentul pe email. Fără refresh la site-uri, fără drumuri, fără să reiei
           comanda.
         </p>
+        <ul className="mb-4 space-y-1.5 text-sm text-secondary-900/80">
+          <li className="flex gap-2">
+            <span aria-hidden className="text-primary-600">✓</span>
+            <span>
+              <strong>Coada se procesează în ordinea plasării</strong> — cine comandă azi primește
+              documentul înaintea celor care așteaptă revenirea ca să comande.
+            </span>
+          </li>
+          <li className="flex gap-2">
+            <span aria-hidden className="text-primary-600">✓</span>
+            <span>
+              <strong>Dacă nu livrăm, primești banii înapoi</strong> — integral, fără discuții.
+              Plata e blocată pe comandă, nu pe o promisiune.
+            </span>
+          </li>
+          <li className="flex gap-2">
+            <span aria-hidden className="text-primary-600">✓</span>
+            <span>
+              Monitorizare automată la <strong>15 minute</strong> — noi am detectat căderea cu ~10
+              ore înaintea primului comunicat oficial.
+            </span>
+          </li>
+        </ul>
         <Link
           href="/comanda/extras-carte-funciara/"
           className="inline-flex items-center rounded-xl bg-primary-500 px-5 py-3 text-sm font-bold text-secondary-900 shadow-[0_6px_14px_rgba(236,185,95,0.35)] transition-all hover:bg-primary-600 hover:shadow-[0_10px_20px_rgba(236,185,95,0.45)]"
