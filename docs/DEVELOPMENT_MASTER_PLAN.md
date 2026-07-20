@@ -625,6 +625,31 @@
 
 Features planned but not yet scheduled for a specific sprint.
 
+#### 🚗 DIRECȚIE NOUĂ (research complet 2026-07-20): Ecosistem auto + categoria „Contracte"
+
+**Index + status:** `docs/plans/README.md`. Documentul principal: `docs/plans/2026-07-20-ecosistem-auto-unelte-afiliere.md`.
+
+Primul produs: **„Dosar vânzare-cumpărare auto"** pe eghiseul (categorie nouă `contracte`,
+29 lei simplu / 69 lei dosar complet). Contractul e **declanșator, nu produs**: o tranzacție
+auto generează 4–5 nevoi obligatorii (istoric vehicul → contract → rovinietă → RCA →
+recurență anuală), ~170–235 lei la prima tranzacție. Handoff-ul spre erovinieta.net
+**există deja construit** (verificare CNAIR + checkout precompletat).
+
+Diferențiatorul: **instrucțiuni personalizate pe UAT** — SIRUTA de la INS (CC-BY 4.0) dă
+maparea sat → comuna cu primărie, deci spunem exact unde depune fiecare parte. Niciun
+competitor nu face asta.
+
+**Blocante (acțiune umană):**
+1. ⛔ Contradicția ITL-054 vs OUG 7/2026 — telefon la 2–3 DITL. Blochează template-ul.
+2. Migrarea categoriei: `services.category` are CHECK constraint pe 6 valori + listă
+   hardcodată în 8 fișiere (⚠️ `ensure-invoice.ts` = facturare Oblio, de citit întâi).
+3. Deblocare RCA pe erovinieta (email Dan Ciceu 18.07) + split 85% în scris.
+4. Verificare statut distribuitor CNAIR (rovinietă).
+
+**Corecții de reținut:** RAR Auto-Pass **ANULAT** (RAR denunță public revânzătorii — îl
+punem în checklist cu link oficial, zero comision). Certificat urbanism **există deja** în
+DB, activ, 780 lei, 0 comenzi — problemă de distribuție, nu de produs.
+
 #### ⏭️ URMĂTORUL (programat 2026-07-15): Cookie consent banner (GDPR)
 
 Plan complet gata: `docs/plans/2026-07-14-cookie-consent-gdpr.md`. GA4 se încarcă azi FĂRĂ

@@ -32,7 +32,7 @@ Index al documentației. Aceasta e o **hartă**, nu un jurnal — pentru jurnalu
 |---|---|
 | [`changelog/`](changelog/) | Livrări pe sesiuni (ce s-a făcut) |
 | [`session-logs/`](session-logs/) | Jurnale tehnice de sesiune (debugging, incidente) |
-| [`plans/`](plans/) | Planuri de implementare (location SEO engine etc.) |
+| [`plans/`](plans/) | Planuri de implementare — **[index cu status](plans/README.md)**. Curent: [ecosistem auto](plans/2026-07-20-ecosistem-auto-unelte-afiliere.md) + [categoria Contracte](plans/2026-07-20-categoria-contracte-eghiseul.md) |
 | [`archive/`](archive/) | Materiale istorice (paritate cazier 2026-04, sprints, catalog WPForms legacy, audituri vechi) |
 
 ## 🔑 Referințe rapide (din CLAUDE.md)
