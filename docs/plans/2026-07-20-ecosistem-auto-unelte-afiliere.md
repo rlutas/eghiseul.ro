@@ -13,6 +13,7 @@
 3. **Paginile lor pe județe conțin exact datele de care avem nevoie** pentru „unde depui" (adresă DITL, telefon, program, DGPCI cu subsedii). 257 din 335 pagini sunt geo.
 4. **Afilierea e venit accesoriu, nu linie de business**: 90–175 lei per 1.000 vizitatori. Un flux propriu de serviciu valorează cu un ordin de mărime mai mult.
 5. **Prioritate reală**: unelte gratuite ca top-funnel → servicii plătite. Nu copiem ca să câștigăm din afiliere.
+6. ✅ **„Unde depui" e rezolvat**: SIRUTA de la INS (CC-BY 4.0, comercial OK) dă maparea sat → comuna cu primărie, verificat pe Odoreu. Vezi §4.
 
 ---
 
@@ -126,13 +127,63 @@ Alimentează diferențiatorul din planul de contracte: **instrucțiuni personali
 - `src/lib/data/locality-fuzzy-match.ts` — potrivire aproximativă (folosit la curieri)
 - Nomenclatorul curierilor: `{ name, county, postalCode }` — **nu are comuna părinte**, deci nu putem deriva maparea de acolo
 
-**Ce lipsește:** maparea **localitate → UAT cu primărie**. 13.251 localități vs ~3.200 UAT-uri: un sat aparține de o comună, acolo se depune. Plus adresă, program, telefon, și dacă orașul are **DITL separat** (DITL Sector 3, SPIT Constanța).
+### ✅ REZOLVAT: SIRUTA de la INS dă exact maparea
+
+**Sursă:** [data.gov.ro — SIRUTA 2025](https://data.gov.ro/dataset/fcba1a54-cffd-422c-b3ac-920f63564085), publicat de **Institutul Național de Statistică**, licență **Creative Commons Attribution 4.0** → **utilizabil comercial**, cu atribuire. Actualizat anual (există și 2023, 2024).
+
+⚠️ **Capcană:** fișierul e servit ca `.csv` dar e de fapt **XLSX** (începe cu semnătura PK/zip). Se redenumește în `.xlsx` și se citește normal.
+
+**Structura — 16.978 rânduri, 12 coloane:**
+
+| Coloană | Ce e |
+|---|---|
+| `SIRUTA` | cod unic al localității |
+| `DENLOC` | denumire |
+| `CODP` | **cod poștal** (0 pentru UAT-uri și județe) |
+| `JUD` | cod județ |
+| **`SIRSUP`** | **codul SIRUTA al unității superioare ← MAPAREA** |
+| `NIV` | **1 = județ · 2 = UAT (are primărie) · 3 = localitate componentă** |
+| `TIP`, `MED`, `REGIUNE`, `NUTS` | tip, mediu urban/rural, regiune |
+
+**Distribuția pe nivel:** 42 județe · **3.181 UAT-uri** · 13.755 localități componente.
+
+**Verificat pe cazul real (Odoreu, jud. Satu Mare):**
+```
+ODOREU  SIRUTA 138280  NIV 2  → e UAT (comuna cu primărie)
+ODOREU  SIRUTA 138299  NIV 3  → satul, cod poștal 447210, SIRSUP = 138280
+
+Satele arondate comunei Odoreu (6): Odoreu, Berindan, Cucu,
+Eteni, Mărtinești, Vânătorești
+```
+
+Deci algoritmul e trivial: **localitate → dacă `NIV=3`, urcă pe `SIRSUP` → obții UAT-ul unde se depune.** Cineva din satul Cucu află corect că merge la Primăria Odoreu.
+
+**Bonus:** `CODP` (codul poștal) permite legarea de nomenclatorul curierilor, care are deja `postalCode` — deci putem determina UAT-ul și pornind de la adresa de livrare.
+
+**Ce rămâne de completat manual:** datele de contact ale primăriilor (adresă, telefon, program) și lista DITL-urilor separate (DITL Sector 3, SPIT Constanța). SIRUTA dă **cine** și **unde administrativ**, nu strada și programul.
 
 **Câmpurile de colectat** (derivate din ce afișează dosar-auto pe paginile lor de oraș): denumire instituție · adresă · telefon · program pe zile · site · dacă e DITL separat sau primărie · DGPCI-ul județean cu subsedii.
 
-**Strategie de acoperire progresivă** — nu blocăm lansarea: pornim cu orașele mari (acoperă majoritatea tranzacțiilor), pentru restul afișăm instrucțiunea generică („Primăria comunei de domiciliu — Direcția de Impozite și Taxe Locale"), completăm pe măsură ce apar comenzi reale.
+**Strategie de acoperire progresivă** — nu blocăm lansarea: cu SIRUTA spunem de la început corect **la ce primărie** merge fiecare parte (acoperire 100%, gratuit). Adresa și programul le adăugăm progresiv, începând cu orașele mari; unde lipsesc, afișăm doar numele instituției.
 
-⏳ **Research pe sursele deschise (SIRUTA, data.gov.ro, OSM) — în curs.** Contează licența: trebuie utilizabile comercial.
+**De reținut la implementare:** fișierul de pe data.gov.ro se descarcă cu extensia `.csv` dar e XLSX — se redenumește. Din el se generează o mapare compactă `{uat: {cod → nume, județ}, loc: [{nume, codPoștal, uat}]}` — **~800 KB JSON** pentru 3.181 UAT-uri + 13.755 localități. Nu l-am adăugat încă în repo (suntem în research, nu implementare).
+
+### 4.1 Depunerea online — excepție, nu regulă
+
+Verificat separat, pentru că schimbă felul în care formulăm instrucțiunile:
+
+- **ghiseul.ro / SNEP este DOAR platformă de PLATĂ, nu de depunere.** Cele ~2.093 de UAT-uri înrolate încasează obligații deja stabilite; nu primesc declarații. Distincția e esențială — nu putem spune „depune pe ghiseul.ro".
+- **Nu există punct de intrare național pentru depunere.** Fiecare portal capabil e un hostname per-primărie (vendori: Regista/Zitec, Indeco, Integrisoft, Industrial Software, CityOn).
+- **Estimare: 5–15% din cele ~3.200 UAT-uri** permit depunerea online a declarației fiscale auto. *Încredere scăzută*, declarată explicit de research.
+- **Confirmat DA:** Alba Iulia (`portal.apulum.ro`), Sibiu, Reșița, Târgu Neamț.
+- **Confirmat NU:** Cluj-Napoca (140+ formulare online, dar declarația de dobândire lipsește), Timișoara (textual: „cererea nu se poate depune din platforma actuală"), Brașov, Sectoarele 4 și 6.
+- **Semnătura electronică nu e blocant:** niciun portal verificat nu cere semnătură calificată de la cetățean — autentificare cont/parolă, link pe email sau ROeID.
+
+**Semnalul contraintuitiv:** cele mai mari și mai bine finanțate orașe sunt negative confirmate. Digitalizarea nu urmează capacitatea administrativă.
+
+**Concluzia întărește produsul, nu îl slăbește:** pentru marea majoritate a clienților **nu există rută online**, deci „unde mergi fizic, la ce adresă, în ce program" rămâne informația decisivă. Depunerea online se tratează ca **excepție curatată manual** — un câmp opțional `portal_url` pe câteva zeci de UAT-uri confirmate — nu ca ramură generalizabilă.
+
+**Asimetrie utilă:** certificatul vânzătorului e mai des disponibil online decât declarația de dobândire a cumpărătorului.
 
 ---
 
@@ -243,4 +294,6 @@ Sensibilitatea dominantă e **comisionul negociat** — între 4 EUR și 25% ven
 - Cataloagele RO Admitad și TradeDoubler (anti-bot)
 - Dacă veniturile UE neimpozabile intră în plafonul de 395.000 lei (de clarificat cu contabilul)
 - **Necercetate:** service auto/ITP, tractări, asistență rutieră (ACR, Allianz), parcări, Rabla lead-gen — întrebări deschise, nu negative
-- ⏳ Sursele de date UAT/primării — research în curs
+- **Datele de contact ale primăriilor** (adresă/telefon/program) — nu am găsit sursă centralizată; SIRUTA rezolvă maparea administrativă, nu contactul. De colectat progresiv sau prin scraping/Places API
+- **Lista DITL-urilor separate** de primărie la orașele mari — de construit manual
+- ⚠️ Bugetul de căutare web al sesiunii s-a epuizat (200/200) — verificările rămase s-au făcut prin acces direct la API-uri și fișiere
