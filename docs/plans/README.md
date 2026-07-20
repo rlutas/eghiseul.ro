@@ -20,8 +20,14 @@ Documente de design și plan, înainte de execuție. Ordine cronologică invers�
 2. `2026-07-20-categoria-contracte-eghiseul.md` — cum se implementează primul produs (dosar vânzare-cumpărare auto).
 3. `2026-07-20-produse-noi-auto-teren-contracte.md` — research-ul de bază (piață, procedura legală completă, RCA). Conține corecții importante: RAR Auto-Pass **ANULAT**, certificat urbanism **există deja în DB**.
 
+**Decizii luate:**
+- ✅ Istoric vehicul = **afiliere carVertical**, nu produs propriu (Raul, 20.07). Variantele de construit/revândut API sunt închise.
+- ❌ RAR Auto-Pass — nu intermediem (RAR denunță public revânzătorii)
+- ✅ Generare documente pe eghiseul · RCA + unelte gratuite pe erovinieta
+
 **Blocante deschise, toate necesită acțiune umană:**
 - ⛔ Contradicția ITL-054 vs OUG 7/2026 — telefon la 2–3 direcții de impozite locale
 - Deblocare RCA — email la Dan Ciceu (Casier Total), trimis 18.07 + split 85% în scris
 - Verificare statut distribuitor CNAIR pentru rovinietă
-- Cont 2Performant + aplicație afiliere carVertical (Everflow)
+- **Înscriere afiliere carVertical** (Everflow) — negociat rată, cod de cupon, clarificat cookie 30 vs 90 zile
+- Cont 2Performant (deblochează grilele a ~25 advertiseri auto)

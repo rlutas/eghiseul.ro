@@ -340,11 +340,25 @@ carVertical: fondată **2017**, ~**16M €** strânși, **159 angajați**, 28–
 
 **8 ani și zeci de milioane.** Un intrat nou nu prinde din urmă — cel mult revinde.
 
-### Cele patru variante, evaluate
+### ✅ DECIZIE (Raul, 20.07): AFILIERE carVertical
+
+**Variantele b, c, d sunt închise.** Nu construim, nu revindem API, nu agregăm surse ca produs plătit.
+
+Motivul, pe scurt: datele care vând produsul (kilometraj + daune) sunt închise în RO și vin din străinătate pentru importuri; niciun furnizor european nu are API cu preț public pentru istoric; iar carVertical vinde deja direct în România, deci ca revânzător am avea marjă subțire și l-am avea și concurent.
+
+**Ce facem concret:**
+1. Afiliere carVertical (Everflow) — vezi §5.1 pentru date de înscriere și ce se negociază
+2. Instrument gratuit „Verifică VIN-ul" pe date publice (furt Poliția + ITP RAR + decodare tehnică) → upsell spre raportul afiliat
+3. RNPM ca **instrucțiune gratuită** în checklist, nu ca produs (§5.7.1)
+4. RDW Olanda ca instrument de nișă pentru importuri (§5.7.2)
+
+Reevaluare 2027–2028, când EUCARIS „Mileage" se maturizează.
+
+### Cele patru variante, evaluate (păstrat pentru istoric)
 
 | Variantă | Efort | Cost | Calitate vs carVertical | Verdict |
 |---|---|---|---|---|
-| **a) Afiliere pură** | 1–3 zile | ~0 | 100% (e chiar el) | ✅ **FEZABIL** — singura cu ROI garantat |
+| **a) Afiliere pură** | 1–3 zile | ~0 | 100% (e chiar el) | ✅ **ALEASĂ** |
 | b) White-label API | 3–6 săpt. | €3–15/raport en-gros *(neconfirmat)* | 50–70% | 🟡 Economic dubios — plătești en-gros cât încasezi, fără brandul lor |
 | c) Produs propriu doar pe date RO | 2–4 săpt. | mic | <40% | ❌ **NEFEZABIL ca produs plătit.** Nimeni nu dă 100 lei pe „nu e furată și n-are gaj" când mașina vine din Germania |
 | d) Agregator surse gratuite + API | 6–10 săpt. | mic-mediu | <40% | 🟡 Bun ca lead magnet, nu ca produs |
