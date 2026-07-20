@@ -75,6 +75,15 @@ export default function Page() {
         apuci. Mai jos ai tot procesul, pas cu pas, plus situațiile în care varianta plătită rămâne alegerea practică.
       </p>
 
+      <div className="not-prose my-6 rounded-xl border border-amber-300 bg-amber-50 p-4">
+        <p className="text-sm leading-relaxed text-amber-950">
+          <strong>Atenție, iulie 2026:</strong> MyTerra nu funcționează. Sistemele ANCPI sunt
+          indisponibile la nivel național din 13 iulie, în urma unui atac cibernetic, deci nu se
+          poate obține niciun extras — nici gratuit, nici contra cost.{' '}
+          <Link href="/ancpi-nu-functioneaza/">Starea sistemelor și cronologia completă</Link>.
+        </p>
+      </div>
+
       <h2>Ce primești gratuit prin MyTerra</h2>
       <p>Două documente:</p>
       <ul>

@@ -141,6 +141,52 @@ export default function Page() {
         ), dar problema e centrală — aceleași sisteme deservesc toate OCPI-urile din țară.
       </p>
 
+      {/* Statusul live + CTA-ul stau ÎMPREUNĂ, imediat după intro. Cine intră pe
+          articol vrea două lucruri, în ordinea asta: „mai e picat?" și „ce fac
+          acum?". Le aveam la jumătatea paginii, după cronologie — prea jos
+          pentru cineva care caută răspunsul pe telefon. */}
+      <h2 id="status">Mai e picat ANCPI? Starea sistemelor, în timp real</h2>
+      <p>
+        Verificăm portalul ANCPI la fiecare 15 minute. Indicatorul de mai jos e live, cu momentul
+        exact de la care sistemele sunt indisponibile:
+      </p>
+      <div className="not-prose my-6">
+        <SystemStatus service="ancpi" />
+      </div>
+
+      <div className="not-prose my-8 rounded-2xl border-2 border-primary-500 bg-primary-50 p-6">
+        <p className="mb-1 text-lg font-bold text-secondary-900">
+          Ai nevoie de extras de carte funciară? Îl scoatem noi, imediat ce revine
+        </p>
+        <p className="mb-4 text-sm leading-relaxed text-secondary-900/80">
+          Nu poți grăbi revenirea ANCPI, dar poți fi primul în coadă când revine. Plasezi comanda
+          acum, iar platforma noastră o eliberează <strong>automat</strong>, în secunda în care
+          sistemele răspund. Primești documentul pe email, fără să reiei comanda și fără să
+          urmărești tu nimic.
+        </p>
+        <ul className="mb-4 space-y-1.5 text-sm text-secondary-900/80">
+          <li className="flex gap-2">
+            <span aria-hidden className="text-primary-600">✓</span>
+            <span>
+              <strong>Coada se procesează în ordinea plasării</strong> — cine comandă azi primește
+              documentul înaintea celor care așteaptă revenirea ca să comande.
+            </span>
+          </li>
+          <li className="flex gap-2">
+            <span aria-hidden className="text-primary-600">✓</span>
+            <span>
+              <strong>Dacă nu livrăm, primești banii înapoi</strong> — integral, fără discuții.
+            </span>
+          </li>
+        </ul>
+        <Link
+          href="/comanda/extras-carte-funciara/"
+          className="inline-flex items-center rounded-xl bg-primary-500 px-5 py-3 text-sm font-bold text-secondary-900 shadow-[0_6px_14px_rgba(236,185,95,0.35)] transition-all hover:bg-primary-600 hover:shadow-[0_10px_20px_rgba(236,185,95,0.45)]"
+        >
+          Comandă extras CF — se eliberează automat la revenire →
+        </Link>
+      </div>
+
       {/* Timeline — cronologia oficială a incidentului. Ține cititorul (și
           clientul cu comandă în coadă) la curent fără să reia tot articolul.
           Cel mai recent sus: cine revine pe pagină vede întâi ce e nou. */}
@@ -331,51 +377,6 @@ export default function Page() {
         </li>
       </ul>
 
-      {/* CTA principal. Adresează cele două obiecții reale ale unui outage:
-          „de ce aș plăti pentru ceva livrabil la o dată necunoscută?" (garanție
-          + preț afișat) și „de unde știu că nu mă păcălești?" (coada e ordinea
-          plasării, verificabilă). Fără astea, textul era doar promisiune. */}
-      <div className="not-prose my-8 rounded-2xl border-2 border-primary-500 bg-primary-50 p-6">
-        <p className="mb-1 text-lg font-bold text-secondary-900">
-          Nu sta să urmărești când revine ANCPI — urmărim noi pentru tine
-        </p>
-        <p className="mb-4 text-sm leading-relaxed text-secondary-900/80">
-          Plasezi comanda de extras CF acum și ai terminat: intră în coadă, iar în secunda în care
-          sistemele ANCPI revin, platforma noastră o eliberează <strong>automat</strong> și
-          primești documentul pe email. Fără refresh la site-uri, fără drumuri, fără să reiei
-          comanda.
-        </p>
-        <ul className="mb-4 space-y-1.5 text-sm text-secondary-900/80">
-          <li className="flex gap-2">
-            <span aria-hidden className="text-primary-600">✓</span>
-            <span>
-              <strong>Coada se procesează în ordinea plasării</strong> — cine comandă azi primește
-              documentul înaintea celor care așteaptă revenirea ca să comande.
-            </span>
-          </li>
-          <li className="flex gap-2">
-            <span aria-hidden className="text-primary-600">✓</span>
-            <span>
-              <strong>Dacă nu livrăm, primești banii înapoi</strong> — integral, fără discuții.
-              Plata e blocată pe comandă, nu pe o promisiune.
-            </span>
-          </li>
-          <li className="flex gap-2">
-            <span aria-hidden className="text-primary-600">✓</span>
-            <span>
-              Monitorizare automată la <strong>15 minute</strong> — noi am detectat căderea cu ~10
-              ore înaintea primului comunicat oficial.
-            </span>
-          </li>
-        </ul>
-        <Link
-          href="/comanda/extras-carte-funciara/"
-          className="inline-flex items-center rounded-xl bg-primary-500 px-5 py-3 text-sm font-bold text-secondary-900 shadow-[0_6px_14px_rgba(236,185,95,0.35)] transition-all hover:bg-primary-600 hover:shadow-[0_10px_20px_rgba(236,185,95,0.45)]"
-        >
-          Comandă extras CF — se eliberează automat la revenire →
-        </Link>
-      </div>
-
       <figure className="not-prose my-6">
         <Image
           src="/images/articole/ancpi-informare-oficiala-iulie-2026.webp"
@@ -390,15 +391,6 @@ export default function Page() {
           depășit.
         </figcaption>
       </figure>
-
-      <h2>Starea sistemelor ANCPI, în timp real</h2>
-      <p>
-        Monitorizarea noastră verifică portalul ANCPI continuu — indicatorul de mai jos e live, cu
-        momentul exact de la care sistemele sunt indisponibile:
-      </p>
-      <div className="not-prose my-6">
-        <SystemStatus service="ancpi" />
-      </div>
 
       <h2>Ce nu funcționează în acest interval</h2>
       <ul>

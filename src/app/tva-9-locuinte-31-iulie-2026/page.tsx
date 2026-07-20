@@ -45,6 +45,11 @@ export default function Page() {
           desc: 'Cronologia blocajului, actualizată la fiecare comunicat oficial.',
         },
         {
+          href: '/calculator/tva/',
+          label: 'Calculator TVA',
+          desc: 'Calculează diferența exactă între 9% și 21% pentru locuința ta.',
+        },
+        {
           href: '/calculator/valabilitate-documente/',
           label: 'Mai e valabil documentul meu?',
           desc: 'Verifică dacă extrasul CF pe care îl ai deja mai e în termen.',
@@ -228,7 +233,13 @@ export default function Page() {
       </div>
       <p>
         Atenție la plafon: <strong>600.000 lei este prag, nu tranșă</strong>. O locuință de 620.000
-        lei fără TVA nu primește 9% pe primii 600.000 și 21% pe rest — pierde integral cota redusă.
+        lei fără TVA nu primește 9% pe primii 600.000 și 21% pe rest, ci pierde integral cota
+        redusă.
+      </p>
+      <p>
+        Pentru suma ta exactă, folosește{' '}
+        <Link href="/calculator/tva/">calculatorul de TVA</Link> — adaugi sau scoți TVA din orice
+        valoare, la 21% sau la cotele reduse.
       </p>
 
       <h2>Problema din iulie 2026: ANCPI blocat cu 11 zile înainte de termen</h2>
@@ -247,6 +258,48 @@ export default function Page() {
 
       <div className="not-prose my-6">
         <SystemStatus service="ancpi" />
+      </div>
+
+      {/* CTA imediat sub status: cine vede indicatorul roșu are exact atunci
+          întrebarea „și ce fac?". Mesajul e specific termenului fiscal, nu
+          generic — miza aici e diferența de zeci de mii de lei, nu comoditatea. */}
+      <div className="not-prose my-8 rounded-2xl border-2 border-primary-500 bg-primary-50 p-6">
+        <p className="mb-1 text-lg font-bold text-secondary-900">
+          Extrasul CF îl scoatem noi, în secunda în care revine ANCPI
+        </p>
+        <p className="mb-4 text-sm leading-relaxed text-secondary-900/80">
+          Cu termenul pe 31 iulie, ordinea în coadă poate face diferența. Plasezi comanda acum,
+          intră în coadă, iar platforma noastră o eliberează <strong>automat</strong> imediat ce
+          sistemele răspund — nu aștepți să afli tu că a revenit și nu reiei comanda.
+        </p>
+        <ul className="mb-4 space-y-1.5 text-sm text-secondary-900/80">
+          <li className="flex gap-2">
+            <span aria-hidden className="text-primary-600">✓</span>
+            <span>
+              <strong>Se procesează în ordinea plasării</strong> — cine comandă azi e servit
+              înaintea celor care așteaptă revenirea ca să comande.
+            </span>
+          </li>
+          <li className="flex gap-2">
+            <span aria-hidden className="text-primary-600">✓</span>
+            <span>
+              <strong>Dacă nu livrăm, primești banii înapoi</strong> — integral.
+            </span>
+          </li>
+          <li className="flex gap-2">
+            <span aria-hidden className="text-primary-600">✓</span>
+            <span>
+              Monitorizăm ANCPI la <strong>15 minute</strong> — am detectat căderea cu ~10 ore
+              înaintea primului comunicat oficial.
+            </span>
+          </li>
+        </ul>
+        <Link
+          href="/comanda/extras-carte-funciara/"
+          className="inline-flex items-center rounded-xl bg-primary-500 px-5 py-3 text-sm font-bold text-secondary-900 shadow-[0_6px_14px_rgba(236,185,95,0.35)] transition-all hover:bg-primary-600 hover:shadow-[0_10px_20px_rgba(236,185,95,0.45)]"
+        >
+          Comandă extras CF — prioritate la revenire →
+        </Link>
       </div>
 
       <p>
@@ -310,23 +363,6 @@ export default function Page() {
             <p className="text-sm leading-relaxed text-secondary-900/75">{row.detail}</p>
           </div>
         ))}
-      </div>
-
-      <div className="not-prose my-8 rounded-2xl border-2 border-primary-500 bg-primary-50 p-6">
-        <p className="mb-1 text-lg font-bold text-secondary-900">
-          Extras de carte funciară — intră în coadă acum, se eliberează automat
-        </p>
-        <p className="mb-4 text-sm leading-relaxed text-secondary-900/80">
-          Nu poți grăbi revenirea ANCPI, dar poți fi primul în coadă când revine. Plasezi comanda
-          acum, iar sistemul nostru o eliberează <strong>automat</strong> în momentul în care
-          sistemele răspund — fără să reiei comanda și fără să urmărești tu nimic.
-        </p>
-        <Link
-          href="/comanda/extras-carte-funciara/"
-          className="inline-flex items-center rounded-xl bg-primary-500 px-5 py-3 text-sm font-bold text-secondary-900 shadow-[0_6px_14px_rgba(236,185,95,0.35)] transition-all hover:bg-primary-600 hover:shadow-[0_10px_20px_rgba(236,185,95,0.45)]"
-        >
-          Comandă extras CF — prioritate la revenire →
-        </Link>
       </div>
 
       <OutageAlertSignup service="ancpi" serviceLabel="ANCPI" sourcePage={`/${SLUG}/`} />

@@ -119,6 +119,16 @@ export default function Page() {
         prin platforme online sau a vizita sediile OCPI.
       </p>
 
+      <div className="not-prose my-6 rounded-xl border border-amber-300 bg-amber-50 p-4">
+        <p className="text-sm leading-relaxed text-amber-950">
+          <strong>Iulie 2026:</strong> sistemele ANCPI sunt indisponibile în urma unui atac
+          cibernetic, deci extrasele nu se pot elibera momentan din nicio sursă. Vezi{' '}
+          <Link href="/ancpi-nu-functioneaza/">starea sistemelor și cronologia</Link>. Dacă ai
+          antecontract cu TVA de 9%, termenul de 31 iulie e afectat direct —{' '}
+          <Link href="/tva-9-locuinte-31-iulie-2026/">detalii aici</Link>.
+        </p>
+      </div>
+
       <h2>Sfaturi pentru solicitarea online a extrasului de carte funciară</h2>
       <p>
         Când soliciți un <Link href={serviceUrl('extras-carte-funciara')}>extras de carte funciară online</Link>,

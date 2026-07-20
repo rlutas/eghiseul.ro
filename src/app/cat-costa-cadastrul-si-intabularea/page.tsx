@@ -145,6 +145,18 @@ export default function Page() {
         datele vechi (adresă, topografic) și îți găsește CF-ul actual.
       </p>
 
+      <div className="not-prose my-6 rounded-xl border border-amber-300 bg-amber-50 p-4">
+        <p className="text-sm leading-relaxed text-amber-950">
+          <strong>Iulie 2026:</strong> sistemele ANCPI sunt blocate din 13 iulie în urma unui atac
+          cibernetic. Nu se pot depune cereri noi de recepție sau înscriere și{' '}
+          <strong>nu se pot soluționa nici dosarele deja înregistrate</strong>. Termenele se
+          decalează, iar urgența plătită nu ajută cât timp sistemele sunt picate.{' '}
+          <Link href="/ancpi-nu-functioneaza/">Vezi starea sistemelor</Link>. Dacă ai antecontract
+          cu TVA de 9% și termen pe 31 iulie,{' '}
+          <Link href="/tva-9-locuinte-31-iulie-2026/">situația te privește direct</Link>.
+        </p>
+      </div>
+
       <h2>Taxele ANCPI exacte</h2>
       <p>
         Tarifele de mai jos sunt naționale (Ordin ANCPI 16/2019). Urgența costă 5× tariful normal —
