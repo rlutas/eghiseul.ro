@@ -158,46 +158,74 @@ export default function Page() {
             ),
           },
           {
-            date: '17 iulie 2026',
+            date: '17 iulie 2026, 15:01',
+            tag: 'Comunicat ANCPI',
+            body: (
+              <>
+                e-Terra, serviciile de e-mail și celelalte servicii informatice rămân indisponibile.
+                Precizare importantă pentru cine avea dosar depus: fluxul de lucru fiind complet
+                digitalizat, indisponibilitatea face imposibilă{' '}
+                <strong>atât înregistrarea unor cereri noi, cât și soluționarea celor deja
+                înregistrate</strong>. ANCPI anunță că va informa colaboratorii — persoane fizice
+                autorizate, notari, executori judecătorești, avocați — prin canalele oficiale.
+              </>
+            ),
+          },
+          {
+            date: '15 iulie 2026, 14:39',
             tag: 'Cauza confirmată',
             body: (
               <>
-                ANCPI confirmă oficial că este vorba despre un <strong>atac cibernetic</strong>,
-                după ce inițial comunicase „incident tehnic”. Îl descrie drept cea mai amplă
-                întrerupere din istoria instituției. <strong>DNSC</strong> este implicat în
-                gestionarea incidentului.
+                ANCPI confirmă oficial că a fost <strong>ținta unui atac cibernetic</strong>, „care
+                a generat cea mai amplă întrerupere tehnică din istoria instituției”. Precizează că
+                datele administrate prin sistemele sale „sunt în siguranță și nu au fost
+                compromise”. Estimarea comunicată: e-Terra nu va fi disponibilă{' '}
+                <strong>până la finalul săptămânii</strong>.
               </>
             ),
           },
           {
-            date: '15 iulie 2026',
-            tag: 'Revendicare atacator',
+            date: '15 iulie 2026, 12:59',
+            tag: 'Amploarea reală',
             body: (
               <>
-                Un actor cunoscut drept „ByteToBreach” anunță pe o platformă de comercializare a
-                datelor că vinde informații din rețelele ANCPI și codul sursă al aplicațiilor.{' '}
-                <strong>Susțineri neconfirmate oficial</strong>, dezmințite parțial de comunicatele
-                ulterioare ale agenției.
+                ANCPI anunță că, începând de marți <strong>14 iulie</strong>,{' '}
+                <strong>toate sistemele informatice</strong> gestionate de instituție —{' '}
+                <strong>inclusiv adresele de e-mail</strong> și aplicația e-Terra — sunt
+                nefuncționale. Despre cauză: „nu putem oferi detalii, întrucât situația este
+                investigată de instituțiile abilitate”.
               </>
             ),
           },
           {
-            date: '15 iulie 2026',
-            tag: 'Prima confirmare oficială',
+            date: '14 iulie 2026, 19:10',
+            tag: 'Comunicat ANCPI',
             body: (
               <>
-                Oficiile teritoriale comunică oficial indisponibilitatea și un termen estimat de
-                revenire: <strong>20 iulie 2026</strong> — termen care avea să fie depășit.
+                e-Terra nu va fi disponibilă <strong>până la finalul săptămânii</strong>, ca urmare
+                a unui <strong>„incident tehnic major”</strong> care a afectat o parte din sisteme.
+              </>
+            ),
+          },
+          {
+            date: '14 iulie 2026, 09:06',
+            tag: 'Primul comunicat',
+            body: (
+              <>
+                ANCPI anunță că o parte din sistemele informatice sunt „temporar indisponibile, ca
+                urmare a unui <strong>incident tehnic</strong> aflat în curs de investigare”.
+                Accesul la anumite aplicații „poate fi limitat sau indisponibil”.
               </>
             ),
           },
           {
             date: '13 iulie 2026, 23:02',
-            tag: 'Începutul căderii',
+            tag: 'Detectat de noi',
             body: (
               <>
-                Monitorizarea noastră automată înregistrează căderea portalului ePay ANCPI. De
-                atunci, serverele agenției nu mai răspund.
+                Monitorizarea noastră automată înregistrează căderea portalului ePay ANCPI — cu
+                aproape 10 ore înaintea primului comunicat oficial. ANCPI datează ulterior începutul
+                indisponibilității generalizate ca fiind <strong>marți, 14 iulie</strong>.
               </>
             ),
           },
@@ -322,8 +350,18 @@ export default function Page() {
         <li>eliberarea extraselor de carte funciară (informare și autentificare) — online și la ghișeu;</li>
         <li>recepțiile cadastrale și înscrierile în cartea funciară (intabulări, notări, radieri);</li>
         <li>aplicația e-Terra (cadastru și carte funciară), ePay și geoportalul ANCPI;</li>
+        <li>
+          <strong>adresele de e-mail ale instituției</strong> — ANCPI a confirmat că sunt și ele
+          nefuncționale, deci mesajele trimise către OCPI-uri în această perioadă nu ajung;
+        </li>
         <li>implicit: autentificările notariale care au nevoie de extras de autentificare — semnările se reprogramează.</li>
       </ul>
+      <p>
+        <strong>Dacă ai deja un dosar depus, stă și el.</strong> ANCPI a precizat pe 17 iulie că,
+        fluxul de lucru fiind complet digitalizat, indisponibilitatea face imposibilă{' '}
+        <em>atât înregistrarea unor cereri noi, cât și soluționarea celor deja înregistrate</em>.
+        Termenele de soluționare se decalează corespunzător — nu e nevoie să redepui.
+      </p>
       <p>
         Important de înțeles: <strong>nimeni nu poate ocoli căderea</strong>. Ghișeul OCPI,
         platformele online și intermediarii folosesc toți aceleași sisteme centrale. Cine promite
@@ -400,18 +438,28 @@ export default function Page() {
         copiile de siguranță. Investigațiile tehnice și penale continuă, fără concluzii oficiale.
       </p>
       <p>
-        <strong>17 iulie 2026:</strong> cauza e confirmată — <strong>atac cibernetic</strong>.
-        ANCPI recunoaște oficial atacul (după ce inițial comunicase „incident tehnic”) și susține
-        că datele nu au fost compromise; DNSC e implicat în investigație. În paralel, presa
+        <strong>17 iulie 2026:</strong> ANCPI precizează că, fluxul de lucru fiind complet
+        digitalizat, indisponibilitatea face imposibilă{' '}
+        <strong>atât înregistrarea unor cereri noi, cât și soluționarea celor deja
+        înregistrate</strong> — deci și dosarele depuse înainte de cădere stau. În paralel, presa
         relatează că un hacker a scos la vânzare date și cod sursă despre care susține că provin
-        din rețelele ANCPI — susțineri neconfirmate oficial. Sistemele rămân indisponibile;
-        estimarea de revenire rămâne 20 iulie 2026. Comenzile plasate în această perioadă se
-        acumulează în coadă și se vor procesa automat, în ordinea plasării, la revenire.
+        din rețelele ANCPI — susțineri neconfirmate oficial.
       </p>
       <p>
-        <strong>15 iulie 2026:</strong> oficiile teritoriale au confirmat oficial indisponibilitatea
-        și estimarea de revenire 20 iulie 2026. Actualizăm articolul când ANCPI publică informații
-        noi sau când monitorizarea noastră detectează revenirea sistemelor.
+        <strong>15 iulie 2026:</strong> ANCPI confirmă oficial (ora 14:39) că a fost{' '}
+        <strong>ținta unui atac cibernetic</strong>, „care a generat cea mai amplă întrerupere
+        tehnică din istoria instituției”, și susține că datele nu au fost compromise. Tot atunci
+        (ora 12:59) anunță amploarea reală: <strong>toate</strong> sistemele informatice sunt
+        nefuncționale din 14 iulie, <strong>inclusiv adresele de e-mail</strong> ale instituției.
+        Comenzile plasate în această perioadă se acumulează în coadă și se procesează automat, în
+        ordinea plasării, la revenire.
+      </p>
+      <p>
+        <strong>14 iulie 2026:</strong> primul comunicat (ora 09:06) vorbește despre „un incident
+        tehnic aflat în curs de investigare”, apoi seara (ora 19:10) despre un{' '}
+        <strong>„incident tehnic major”</strong>, cu e-Terra indisponibilă până la finalul
+        săptămânii. Actualizăm articolul la fiecare comunicat oficial nou sau când monitorizarea
+        noastră detectează revenirea sistemelor.
       </p>
     </ArticleLayout>
   );
