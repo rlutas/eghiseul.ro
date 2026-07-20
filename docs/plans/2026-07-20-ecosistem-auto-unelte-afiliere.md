@@ -14,6 +14,7 @@
 4. **Afilierea e venit accesoriu, nu linie de business**: 90–175 lei per 1.000 vizitatori. Un flux propriu de serviciu valorează cu un ordin de mărime mai mult.
 5. **Prioritate reală**: unelte gratuite ca top-funnel → servicii plătite. Nu copiem ca să câștigăm din afiliere.
 6. ✅ **„Unde depui" e rezolvat**: SIRUTA de la INS (CC-BY 4.0, comercial OK) dă maparea sat → comuna cu primărie, verificat pe Odoreu. Vezi §4.
+7. ⭐ **Contractul nu e produsul — e declanșatorul unui lanț.** O tranzacție auto generează 4-5 nevoi obligatorii (istoric vehicul, contract, rovinietă, RCA, apoi recurență anuală). **~170–235 lei la prima tranzacție** față de 69 izolat, plus venit recurent. Infrastructura de handoff spre erovinieta **există deja**. Vezi §5.6 — e cea mai importantă secțiune din document.
 
 ---
 
@@ -248,6 +249,57 @@ Sensibilitatea dominantă e **comisionul negociat** — între 4 EUR și 25% ven
 - **D390** simbol „P", până pe 25 ale lunii următoare, doar în lunile cu operațiuni. **D394 — nu.**
 - ⚠️ **ROI a fost desființat în 2017** (OUG 84/2016). Multe surse, **inclusiv help-ul 2Performant**, încă cer înscrierea — informație depășită.
 - Micro 2026 (OUG 89/2025): plafon **100.000 EUR**, cotă **1%**, minim 1 salariat.
+
+---
+
+## 5.6 ⭐ Lanțul complet de monetizare (completare Raul, 20.07)
+
+**Observația care schimbă modelul de business:** contractul de 69 lei nu e produsul — e **evenimentul care declanșează 4-5 nevoi obligatorii**, fiecare monetizabilă, majoritatea pe platformele noastre. O tranzacție auto nu e o vânzare, e un lanț.
+
+### Momentul 0 — ÎNAINTE de cumpărare (cumpărătorul)
+**Verificare istoric vehicul → afiliere carVertical (~20 lei).**
+Se prinde pe pagina de checklist „ce verifici înainte să cumperi o mașină", nu în fluxul de contract (acolo e prea târziu — decizia e luată). Alături, gratuit și fără comision: RAR Auto-Pass la 42 lei, link oficial.
+
+### Momentul 1 — Contractul (ambii)
+**69 lei, pe eghiseul.** Contract + toate cererile + checklist personalizat pe UAT.
+
+### Momentul 2 — Rovinieta (cumpărătorul) ⭐ nou
+Aici era greșeala din explicația inițială. Corect:
+
+- Rovinieta e legată de **VIN**, nu de numărul de înmatriculare → **rămâne valabilă** la schimbarea proprietarului.
+- Dacă mai are valabilitate: cumpărătorul doar **anunță noul număr la CNAIR** — noi generăm cererea, nu vindem nimic.
+- **Dacă e expirată sau expiră curând: are nevoie de una nouă → erovinieta.net**, cu date precompletate.
+
+**Infrastructura există deja pe erovinieta, integral:**
+- `POST /api/verificare/rovinieta` — interoghează CNAIR server-side după număr (+ VIN), returnează status + data expirării. Nu expune date personale, doar statusul vinietei.
+- `src/lib/verificare/checkout-link.ts` — `buildCheckoutPath({ plate, vin, category, source })` generează `/checkout?plate=…&vin=…&vehicleType=…&utm_source=…` cu **prefill complet și atribuire**.
+- Verificarea **înrolează automat** în reminderul de expirare (dacă e validă) sau trimite ofertă „cumpără acum" (dacă nu e).
+
+**Deci fluxul e:** în wizardul de contract avem deja numărul și VIN-ul → apelăm verificarea → dacă rovinieta expiră, afișăm în checklist un buton direct spre erovinieta cu totul precompletat. **Zero muncă nouă pe erovinieta** — doar apelul cross-platform și butonul.
+
+### Momentul 3 — RCA (cumpărătorul)
+**Obligatoriu din secunda dobândirii**, fără perioadă de grație (1.000–2.000 lei + plăcuțe). → erovinieta, când se deblochează. **54–122 lei/poliță**, cea mai mare marjă din tot lanțul.
+Până atunci: „verifică prețul RCA" ca link, apoi ca produs propriu.
+
+### Momentul 4 — Recurența anuală
+Cumpărătorul intră în baza de remindere a erovinieta (~6.000 abonați azi): rovinietă, RCA, ITP. **Fiecare an aduce din nou RCA + rovinietă**, fără cost de achiziție.
+
+### Valoarea reală per tranzacție
+
+| Moment | Produs | Venit | Platformă |
+|---|---|---|---|
+| 0 | carVertical (afiliere) | ~20 lei | oriunde |
+| 1 | Contract + dosar | **69 lei** | eghiseul |
+| 2 | Rovinietă nouă (markup 10%) | ~25 lei | erovinieta |
+| 3 | **RCA** | **54–122 lei** | erovinieta |
+| — | **Prima tranzacție** | **~170–235 lei** | — |
+| 4 | Recurență anuală (RCA + rovinietă) | ~80–150 lei/an | erovinieta |
+
+**Față de 69 de lei izolat, lanțul valorează de 2,5–3,4× la prima tranzacție, plus venit recurent.** Iar cumpărătorul e client nou intrat în ecosistem — nu doar o comandă.
+
+**Asta rezolvă și dilema de preț.** Nu mai trebuie să câștigăm din contract. Dacă rata de atașare RCA + rovinietă e bună, contractul poate deveni **gratuit** (varianta A de pricing) și devenim direct competitivi cu cei doi jucători gratuiți — dar cu monetizare de 3–50× mai bună per poliță decât afilierea lor.
+
+**Condiție tehnică:** un contract lucrat de client pe eghiseul trebuie să trimită corect spre erovinieta, cu atribuire. Există deja `utm_source`/`utm_medium` în builder — de folosit o sursă dedicată (ex. `source: 'contract-auto'`) ca să putem măsura exact ce aduce lanțul.
 
 ---
 
