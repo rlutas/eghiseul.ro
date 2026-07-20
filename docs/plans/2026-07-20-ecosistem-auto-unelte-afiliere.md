@@ -396,9 +396,39 @@ Nimeni din competiție nu dă instrucțiunea asta pas cu pas. Iar pentru noi cos
 
 **Rămâne de verificat manual (o singură dată):** dacă Ministerul Justiției acordă acces de operator/agent împuternicit cu interogare programatică — secțiunile „Operatori autorizați" și „Autorizarea operatorilor de Registru" există pe portal. Dacă da, ar permite includerea verificării direct în raportul nostru; dacă nu, rămâne instrucțiunea de mai sus.
 
+### 5.7.2 Furnizori europeni de date — ce există și ce nu
+
+| Furnizor | API | Preț | Acoperă | Ce dă |
+|---|---|---|---|---|
+| **RDW Olanda** ⭐ | ✅ **public, fără cheie** (Socrata REST) | **GRATUIT, CC0** — revânzare permisă | doar vehicule înmatriculate NL | vezi mai jos |
+| **carVertical** | ✅ pt. dealeri/leasing | la cerere („−73% vs retail" pt. parteneri) | 37 țări, RO inclus | km din 1.000+ surse, 330M daune, furt |
+| **CARFAX Europe** | ✅ „Vehicle Data Service", 35+ integrări | la cerere | 100k surse din 22 țări | km, daune, service, proprietari, import |
+| **autoDNA** | 🟡 neconfirmat (are „Business Offer") | 24,99 €/raport retail | **RO explicit** (autodna.ro), 26+ țări | km, daune, furt, ITP |
+| **Vindecoder/Vincario** | ✅ REST, trial | nepublicat | global | ❌ **DOAR decodare VIN** — declară explicit că nu are istoric/daune/proprietari |
+| **VinAudit** | ✅ | trial | ❌ doar America de Nord | titluri, odometru, salvage |
+| **HPI (UK)** | ✅ | la cerere | UK | km, write-off, furt, finanțare |
+| **Car-Pass (BE)** | ❌ doar *trimiterea* citirilor de service-uri | — | BE | **fără interogare publică** |
+| **EUCARIS** | ❌ stat-la-stat | — | — | inaccesibil privaților |
+| **KBA (DE)** | ❌ | — | — | doar auto-interogare |
+
+**Concluzie:** pentru istoric real (km + daune) **nu există niciun furnizor european cu API și preț public**. Toate merg pe contract B2B negociat. Vindecoder — pe care îl consideram candidat — face **doar decodare tehnică**, nu istoric.
+
+### RDW Olanda — testat direct, cu o limitare care contează
+
+`https://opendata.rdw.nl/resource/m9d7-ebf2.json` — **56 de câmpuri, gratuit, fără cheie, CC0** (reutilizare comercială explicit permisă). Testat live 20.07.
+
+Câmpuri utile: `datum_eerste_toelating` (prima înmatriculare), `vervaldatum_apk` (expirare ITP), `export_indicator`, `wam_verzekerd` (asigurare), `openstaande_terugroepactie_indicator` (recall deschis), `catalogusprijs`, plus **`tellerstandoordeel`** = verdictul RDW asupra kilometrajului (`Logisch` / `Onlogisch` — adică „plauzibil" sau **„suspect"**) și `jaar_laatste_registratie_tellerstand`.
+
+⚠️ **Limitarea decisivă: RDW NU expune VIN-ul.** Singurul câmp care sună a șasiu, `plaats_chassisnummer`, conține **unde e amplasat fizic** numărul pe mașină („r. tegen schutbord onder motorkap"), nu numărul în sine. Lookup-ul merge **exclusiv pe `kenteken`** — numărul de înmatriculare olandez.
+
+**Ce înseamnă practic:** util **doar pentru cineva care cumpără din Olanda** și are încă numărul olandez (sau cartea galbenă). Pentru o mașină deja înmatriculată în România, RDW e inutilizabil — nu poți face legătura VIN → kenteken.
+
+**Utilizare realistă:** un instrument gratuit „verifică o mașină din Olanda înainte s-o aduci" — nișă mică, dar zero cost, date oficiale, și verdictul de kilometraj e exact informația scumpă. Bun ca lead magnet pe segmentul de import, nu ca produs general.
+
 ### De verificat manual
 
 1. ~~Portalul RNPM~~ ✅ **verificat 20.07** — vezi §5.7.1. Rămâne doar întrebarea de acces ca operator autorizat.
+2. **Prețuri de partener la carVertical și CARFAX Europe** + dacă contractul permite **revânzarea către end-useri**. Ambele au program B2B confirmat, ambele cu preț doar la cerere. **Asta e întrebarea care decide dacă modelul de revânzare funcționează** — nu se poate afla din paginile publice.
 2. Dacă RAR licențiază datele de kilometraj de la ITP — **o cerere scrisă e ieftină și clarifică totul**
 3. Prețul real per apel la Vindecoder/Vincario (cere trial, nu e public)
 
