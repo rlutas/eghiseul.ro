@@ -362,9 +362,43 @@ carVertical: fondată **2017**, ~**16M €** strânși, **159 angajați**, 28–
 
 Riscul mai mare nu e ANSPDCP, ci **ToS-ul platformelor de anunțuri** (scraping poze) și **clauzele de revânzare** din contractele de date.
 
+### 5.7.1 RNPM — verificat direct în browser (20.07)
+
+**Portalul corect: `https://co.rnpm.ro`** (rnpm.ro redirecționează acolo). Operat de **Autoritatea de Supraveghere a RNPM — Ministerul Justiției** (str. Apollodor 17, București, cpm@just.ro). Domeniile `rnpm.just.ro`, `portal.rnpm.ro`, `rnpm.mfinante.gov.ro` **nu rezolvă** — de aici confuzia din research-ul anterior.
+
+**Căutarea e PUBLICĂ ȘI GRATUITĂ.** Nu cere cont, nu cere plată. Ruta: `#cautare/IM` (ipoteci mobiliare).
+
+**Formularul are tab „Bun" → sub-tab „Bun autovehicul"**, cu exact câmpurile care ne trebuie:
+
+| Câmp | Relevanță |
+|---|---|
+| **Serie șasiu** | ⭐ VIN — căutarea principală |
+| **Nr. de înmatriculare** | ⭐ alternativă |
+| Serie motor | secundar |
+| Model | secundar |
+| Descriere suplimentară | text liber |
+
+Se pot combina cu operatori SI/SAU. Filtre: „Numai active", „Nemodificate de alte înscrieri".
+
+⚠️ **Blocaj pentru automatizare: reCAPTCHA.** Butonul „Cauta inscrieri" e `disabled` până la validare. Nu există API public — endpointurile din bundle (`search/ipoteci/`, `search/creante/` etc.) se rezolvă printr-un `System.URL` neexpus, iar orice cale returnează HTML-ul aplicației (catch-all SPA). **Protecția e intenționată; nu o ocolim.**
+
+**Ce înseamnă pentru noi — recomandarea 3 se schimbă:**
+
+Verificarea de gaj **NU poate fi vândută ca serviciu**, fiindcă e gratuită și publică — clientul o face singur în 2 minute. Nici nu poate fi automatizată, din cauza reCAPTCHA.
+
+**Dar devine conținut valoros în checklist**, exact pe modelul „câștigi încrederea cu informația corectă":
+
+> **Înainte să plătești mașina, verifică gratuit dacă are gaj sau leasing neachitat.**
+> Intră pe co.rnpm.ro → Căutare aviz → Aviz de ipotecă mobiliară → tab „Bun" → „Bun autovehicul" → introdu seria de șasiu (VIN). Durează 2 minute și e gratuit.
+> *Dacă apare o înscriere activă, mașina are o sarcină — nu semna până nu se radiază.*
+
+Nimeni din competiție nu dă instrucțiunea asta pas cu pas. Iar pentru noi costă zero.
+
+**Rămâne de verificat manual (o singură dată):** dacă Ministerul Justiției acordă acces de operator/agent împuternicit cu interogare programatică — secțiunile „Operatori autorizați" și „Autorizarea operatorilor de Registru" există pe portal. Dacă da, ar permite includerea verificării direct în raportul nostru; dacă nu, rămâne instrucțiunea de mai sus.
+
 ### De verificat manual
 
-1. Portalul RNPM actual și condițiile de interogare programatică (blocant pentru punctul 3)
+1. ~~Portalul RNPM~~ ✅ **verificat 20.07** — vezi §5.7.1. Rămâne doar întrebarea de acces ca operator autorizat.
 2. Dacă RAR licențiază datele de kilometraj de la ITP — **o cerere scrisă e ieftină și clarifică totul**
 3. Prețul real per apel la Vindecoder/Vincario (cere trial, nu e public)
 
