@@ -9,7 +9,10 @@ const SLUG = 'ancpi-nu-functioneaza';
 // H1 — descriptive. The SERP <title> is shorter (META_TITLE): the long one
 // was 72 chars and Google rewrote it into a lowercase tail fragment.
 const TITLE = 'ANCPI și e-Terra nu funcționează: atac cibernetic, sisteme picate național (din 13 iulie 2026)';
-const META_TITLE = 'ANCPI Picat După Atac Cibernetic — Până Când și Ce Poți Face';
+// Titlul din SERP țintește starea + acțiunea, nu evenimentul: cine caută vrea
+// să știe dacă mai e picat și ce face, nu să citească încă o știre despre atac
+// (presa ocupă oricum acele poziții cu autoritate mai mare).
+const META_TITLE = 'ANCPI nu funcționează — status live, până când și ce faci';
 const DESCRIPTION =
   'ANCPI a confirmat un atac cibernetic: e-Terra și restul sistemelor sunt picate național din 13 iulie. Update 20 iulie: aplicațiile se mută în Cloudul Guvernamental, migrare estimată până pe 22 iulie; revenirea va fi etapizată. Comandă extrasul CF acum — îl eliberăm automat la revenire.';
 const DATE_PUBLISHED = '2026-07-15';
@@ -93,6 +96,26 @@ export default function Page() {
         {
           q: 'Extrasul CF pe care îl am deja mai e valabil?',
           a: 'Extrasul de informare nu are termen legal de valabilitate, dar instituțiile cer de regulă unul de maximum 30 de zile. Verifică rapid cu calculatorul nostru de valabilitate. Extrasul de autentificare (notar) e valabil 10 zile lucrătoare.',
+        },
+        {
+          q: 'Am antecontract cu termen de semnare care expiră în această perioadă. Ce fac?',
+          a: 'Vorbește cu notarul și cu cealaltă parte înainte să expire termenul. Imposibilitatea de a obține extrasul de autentificare este o cauză externă, independentă de voința părților — în practică se semnează un act adițional care prelungește termenul cu durata blocajului. Nu lăsa termenul să treacă fără document scris: o prelungire verbală nu te protejează dacă cealaltă parte se răzgândește. Notarii cunosc situația și au procedura pregătită.',
+        },
+        {
+          q: 'Am credit ipotecar aprobat. Se pierde aprobarea?',
+          a: 'Aprobarea de principiu are de regulă un termen de valabilitate (30–90 de zile, în funcție de bancă). Anunță banca în scris despre blocajul ANCPI cât mai devreme — băncile sunt la curent cu situația și pot prelungi valabilitatea ofertei fără reanalizare. Riscul real nu e blocajul în sine, ci să-l anunți după ce a expirat termenul.',
+        },
+        {
+          q: 'Notarul mi-a anulat programarea. Trebuie să reiau toată procedura?',
+          a: 'Nu. Documentele deja adunate (acte de identitate, acte de proprietate, certificate fiscale) rămân valabile în limita propriilor termene. Se reprogramează doar semnarea, iar extrasul de autentificare se cere din nou la momentul potrivit — oricum are doar 10 zile lucrătoare valabilitate, deci nu se putea obține „în avans" pentru o dată incertă.',
+        },
+        {
+          q: 'De ce durează atât reinstalarea? Nu aveau backup?',
+          a: 'ANCPI a precizat pe 19 iulie că dispunea de mai multe locații de backup. După un atac cibernetic, restaurarea nu înseamnă doar copierea datelor înapoi: fiecare sistem trebuie izolat, curățat, verificat pentru a nu reintroduce vulnerabilitatea exploatată, apoi validat de instituțiile abilitate. Migrarea în Cloudul Guvernamental, anunțată pe 20 iulie, adaugă un pas suplimentar — dar și un nivel de protecție pe care infrastructura veche nu îl avea.',
+        },
+        {
+          q: 'Cum aflu în secunda în care revine ANCPI?',
+          a: 'Ai două variante, ambele fără să verifici tu nimic. Dacă ai nevoie de document: plasezi comanda acum și se eliberează automat la revenire. Dacă vrei doar să știi: lasă-ți emailul în caseta de alertă de pe această pagină și primești un singur mesaj în momentul revenirii. Monitorizarea noastră verifică portalul ANCPI la fiecare 15 minute — am detectat căderea cu aproximativ 10 ore înaintea primului comunicat oficial.',
         },
       ]}
     >
@@ -427,6 +450,50 @@ export default function Page() {
         Detalii despre serviciu:{' '}
         <Link href="/servicii/extras-de-carte-funciara/">extras de carte funciară</Link>.
       </p>
+
+      {/* Publicul cel mai anxios și cel mai prost servit de presă: cine are o
+          tranzacție în derulare. Știrile spun „ANCPI e picat"; nimeni nu spune
+          ce faci cu termenul din antecontract care expiră marți. */}
+      <h2>Ești în mijlocul unei tranzacții? Ce înseamnă concret pentru tine</h2>
+      <p>
+        Cea mai mare problemă a acestui blocaj nu e așteptarea în sine, ci{' '}
+        <strong>termenele care curg</strong> indiferent dacă sistemele funcționează. Pe scurt, pe
+        situații:
+      </p>
+      <div className="not-prose my-6 space-y-3">
+        {[
+          {
+            situation: 'Ai antecontract cu termen de semnare care expiră acum',
+            action:
+              'Contactează notarul și cealaltă parte ÎNAINTE de expirare. Se semnează un act adițional care prelungește termenul cu durata blocajului. Imposibilitatea de a obține extrasul e o cauză externă, independentă de voința părților — dar o înțelegere verbală nu te protejează dacă cealaltă parte se răzgândește.',
+          },
+          {
+            situation: 'Ai credit ipotecar aprobat',
+            action:
+              'Anunță banca în scris acum, nu după ce expiră oferta. Aprobarea are termen (de regulă 30–90 de zile); băncile cunosc situația și prelungesc fără reanalizare. Riscul e întârzierea anunțului, nu blocajul.',
+          },
+          {
+            situation: 'Aveai programare la notar',
+            action:
+              'Se reprogramează doar semnarea. Documentele deja adunate rămân valabile în limita termenelor proprii — extrasul de autentificare oricum are 10 zile lucrătoare, deci nu se putea obține în avans pentru o dată incertă.',
+          },
+          {
+            situation: 'Ai depus dosar de intabulare înainte de cădere',
+            action:
+              'Stă și el. ANCPI a confirmat pe 17 iulie că nu se pot soluționa nici cererile deja înregistrate. Nu redepui și nu plăti din nou — termenele de soluționare se decalează cu durata blocajului.',
+          },
+          {
+            situation: 'Cumperi și vrei să verifici proprietarul înainte să plătești',
+            action:
+              'Extrasul CF nu se poate obține acum, din nicio sursă. Amână orice plată de avans până verifici — nu te baza pe un extras vechi de câteva luni și nici pe asigurările vânzătorului.',
+          },
+        ].map((row, i) => (
+          <div key={i} className="rounded-xl border border-neutral-200 bg-white p-4">
+            <p className="mb-1 font-bold text-secondary-900">{row.situation}</p>
+            <p className="text-sm leading-relaxed text-secondary-900/75">{row.action}</p>
+          </div>
+        ))}
+      </div>
 
       <h2>Ce poți face între timp</h2>
       <ul>
