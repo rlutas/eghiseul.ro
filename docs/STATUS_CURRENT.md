@@ -1,5 +1,28 @@
 # eGhiseul.ro - Status Curent
 
+> **⚡ Update 2026-07-20 — LIVRAT.** Detalii în [`changelog/`](changelog/README.md) (5 intrări din această zi).
+>
+> **🔴 Incidente găsite și reparate (toate erau tăcute — nimic nu semnala problema):**
+> - **TOATE cele 6 cron-uri Vercel erau moarte.** `next.config.ts` are `trailingSlash: true`, iar path-urile din `vercel.json` erau fără slash → 308 redirect, pe care Vercel Cron nu-l urmează. Sistemul de abandoned-cart, livrat pe 27 mai, **nu rulase niciodată**: 0 email-uri, 171 de drafturi (~60.500 lei) neatinse, comenzi `pending` vechi de 13 zile, heal-ul de facturi nefuncțional. Al doilea incident de cron-uri moarte după GET→POST din 12 iulie.
+> - **SPF nu acoperea Resend.** Trimitem de pe `comenzi@eghiseul.ro`, dar SPF-ul rădăcinii avea doar Zoho; Resend verificase doar subdomeniul `send.`. Fiecare email pica SPF (DMARC trecea prin DKIM, deci nu erau respinse, dar livrabilitatea suferea). Reparat în DNS.
+> - **Fișierele de 0 bytes ajungeau în storage.** Incident real pe CJO (comanda CJO-20260720-12500): telefonul a predat o poză aflată doar în cloud, cu nume și tip valide dar fără conținut. `if (fileSize && fileSize > MAX)` trata 0 ca absent și sărea peste validare. Reparat pe ambele platforme (S3-ul de aici era curat: 0/850).
+>
+> **🟣 Livrat:**
+> - **Recovery coșuri abandonate, extins la drafts** — idle ≥2h + progres dincolo de pasul contact, cupon 10%/48h auto-aplicat din `?coupon=`. **Prima recuperare confirmată la 16 minute după email** (250,20 lei, comandă moartă de 5 zile).
+> - **Alerte de outage** (migrarea 127) — „anunță-mă când revine ANCPI" pe articolul de outage + cron care trimite la revenire, pe baza monitorizării proprii, nu a comunicatelor.
+> - **Atribuire pe comandă** (migrarea 128) — nu aveam nimic. Acum știm de pe ce pagină și din ce sursă vine fiecare comandă (two-touch: first/last), vizibil în admin.
+> - **Conținut:** articol nou `/tva-9-locuinte-31-iulie-2026/` (termen fiscal + blocajul ANCPI) · articolul ANCPI refăcut pe cele 7 comunicate oficiale, cu o **eroare factuală corectată** (atacul confirmat pe 15.07, nu pe 17.07) · linkuri interne în clusterul imobiliar (un articol era fundătură).
+>
+> **🔵 Analize:**
+> - **Migrarea WP→Next NU a costat trafic** ([analiză pe date GSC](seo/ANALIZA-MIGRARE-WP-NEXT-2026-07-20.md)): 2.003 → 2.150 clicuri/zi, poziții cash-cow stabile, iar extras CF a urcat de la poziția 13,7 la **3**. Costul real e plafonarea creșterii YoY (+43% → +3% la cutover). Indexare: 66 → **194** pagini.
+> - **Direcție nouă documentată:** ecosistem auto + categoria „Contracte" — vezi [`plans/README.md`](plans/README.md). Corecții importante: RAR Auto-Pass **anulat** (RAR denunță public revânzătorii), certificat urbanism **există deja** în DB la 780 lei cu 0 comenzi (problemă de distribuție), istoric vehicul = **afiliere carVertical**, nu produs propriu.
+>
+> **📋 Rămas manual (acțiune umană):**
+> - Submit în Google Search Console pentru `/tva-9-locuinte-31-iulie-2026/` (IndexNow acoperă doar Bing/Yandex; pingul de sitemap a fost depreciat de Google în 2023)
+> - Telefon la 2–3 direcții de impozite: contradicția ITL-054 vs OUG 7/2026 (blochează template-ul de contract auto)
+> - Deblocare RCA pe erovinieta (email Dan Ciceu din 18.07) + split 85% în scris
+> - Parsarea rapoartelor DMARC + trecerea la `p=quarantine`; aceeași verificare SPF pe celelalte domenii din Resend
+>
 > **⚡ Update 2026-07-08 (după-amiază) — LIVRAT:**
 > - **Admin comandă — val de polish pe comenzi reale** (changelog §22–25, §27): ciclul „Solicită documente" confirmat cap-coadă (upload client → auto-exit standby → email echipă); fix badge PF/PJ + CUI; generarea cererii mută automat comanda pe „În procesare" (§23); dropdown rapid de status în header + cardul vechi eliminat, Detalii Serviciu lângă Note Echipă, **Date imobil = sub-secțiune în Detalii Serviciu**; constatator pe firmă arată firma-țintă; rândurile Urgenta/Livrare/Termen ascunse la serviciile instant + termen ascuns la comenzi terminate; istoric complet în RO; fix dropdown servicii gol pe lista de comenzi.
 > - **🔒 Status client — confidențialitate** (changelog §26): chitanța ANCPI nu mai apare clientului (doar admin); notele interne ale echipei filtrate din timeline-ul public; timeline dedupat (fiecare etapă o dată, tot în RO); footer pe pagina de status; badge verde doar pe documentul livrat.
