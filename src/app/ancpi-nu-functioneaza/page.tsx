@@ -487,6 +487,11 @@ export default function Page() {
             action:
               'Extrasul CF nu se poate obține acum, din nicio sursă. Amână orice plată de avans până verifici — nu te baza pe un extras vechi de câteva luni și nici pe asigurările vânzătorului.',
           },
+          {
+            situation: '⚠️ Ai antecontract cu TVA 9% și termenul fiscal expiră pe 31 iulie',
+            action:
+              'Situația cea mai presantă: cota redusă se aplică doar locuințelor livrate până pe 31 iulie 2026, iar fără extras de autentificare notarul nu poate semna. Diferența dintre 9% și 21% e de 48.000–72.000 lei. Detaliile complete, condițiile exacte și ce poți face — în articolul dedicat.',
+          },
         ].map((row, i) => (
           <div key={i} className="rounded-xl border border-neutral-200 bg-white p-4">
             <p className="mb-1 font-bold text-secondary-900">{row.situation}</p>
@@ -494,6 +499,14 @@ export default function Page() {
           </div>
         ))}
       </div>
+
+      <p>
+        Dacă ești în ultima situație, citește și{' '}
+        <Link href="/tva-9-locuinte-31-iulie-2026/">
+          ce înseamnă termenul de 31 iulie pentru TVA de 9%
+        </Link>{' '}
+        — condițiile exacte, cât pierzi dacă ratezi și dacă se prelungește termenul.
+      </p>
 
       <h2>Ce poți face între timp</h2>
       <ul>
