@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   CheckCircle,
   User,
@@ -45,12 +45,7 @@ export function ReviewStepModular({ onValidChange }: ReviewStepProps) {
   const [couponLoading, setCouponLoading] = useState(false);
   const [couponError, setCouponError] = useState<string | null>(null);
 
-  const handleApplyCoupon = async () => {
-    const code = couponInput.trim().toUpperCase();
-    if (!code) {
-      setCouponError('Introdu un cod de cupon');
-      return;
-    }
+  const applyCouponCode = async (code: string) => {
     setCouponLoading(true);
     setCouponError(null);
     try {
@@ -81,6 +76,31 @@ export function ReviewStepModular({ onValidChange }: ReviewStepProps) {
       setCouponLoading(false);
     }
   };
+
+  const handleApplyCoupon = async () => {
+    const code = couponInput.trim().toUpperCase();
+    if (!code) {
+      setCouponError('Introdu un cod de cupon');
+      return;
+    }
+    await applyCouponCode(code);
+  };
+
+  // Recovery emails deep-link back into the wizard with ?coupon=RECOVERY-XXX
+  // (the wizard's URL sync preserves foreign params across steps, so the code
+  // survives until the customer reaches this step). Apply it once, silently;
+  // if it fails (expired/used) the manual input stays prefilled so the
+  // customer sees the code and the error instead of a mystery.
+  const autoCouponTriedRef = useRef(false);
+  useEffect(() => {
+    if (autoCouponTriedRef.current || state.coupon) return;
+    const urlCode = new URLSearchParams(window.location.search).get('coupon')?.trim().toUpperCase();
+    if (!urlCode) return;
+    autoCouponTriedRef.current = true;
+    setCouponInput(urlCode);
+    applyCouponCode(urlCode);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.coupon]);
 
   const handleRemoveCoupon = () => {
     clearCoupon();

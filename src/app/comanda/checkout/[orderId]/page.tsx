@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { ArrowLeft, Loader2, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -168,6 +168,29 @@ export default function CheckoutPage() {
       fetchOrder();
     }
   }, [orderId, fetchOrder]);
+
+  // Recovery emails link here with ?coupon=RECOVERY-XXX — apply it once the
+  // order is loaded (and only if no coupon is applied yet), then re-fetch so
+  // the discounted total shows. A failed apply (expired/used code) is silent
+  // here; the CouponInput stays available for manual entry.
+  const autoCouponTriedRef = useRef(false);
+  useEffect(() => {
+    const code = searchParams.get('coupon')?.trim().toUpperCase();
+    if (!code || !order || order.coupon_code || autoCouponTriedRef.current) return;
+    autoCouponTriedRef.current = true;
+    (async () => {
+      try {
+        const res = await fetch(`/api/orders/${orderId}/coupon`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ code }),
+        });
+        if (res.ok) await fetchOrder();
+      } catch {
+        // manual input remains as fallback
+      }
+    })();
+  }, [order, orderId, searchParams, fetchOrder]);
 
   // Coupon change → re-fetch order so the total + summary update. There's
   // no PaymentIntent to invalidate any more (hosted Checkout creates a

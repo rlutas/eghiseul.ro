@@ -1,10 +1,17 @@
 /**
  * POST /api/cron/recovery-emails
  *
- * For each `status='abandoned'` order from the last 7 days with a customer
- * email and no recovery sent yet, generate a single-use coupon and send a
- * re-engagement email. Stamps `recovery_email_sent_at` so the next run
- * doesn't double-send.
+ * Two candidate pools, same treatment (coupon + re-engagement email, stamp
+ * `recovery_email_sent_at` so the next run doesn't double-send):
+ *
+ *   1. `status='abandoned'` — submitted but never paid (flipped by the
+ *      auto-abandon cron). Resume link goes to the checkout page.
+ *   2. `status='draft'` — abandoned mid-wizard, before submit. Only drafts
+ *      where the customer got PAST the contact step (some real field typed in
+ *      personal/property/vehicle/etc.) qualify — contact-only drafts are
+ *      window-shoppers and mailing them burns sender reputation for nothing.
+ *      Resume link goes back INTO the wizard (`/comanda/<slug>?order=&email=`),
+ *      the same cross-device resume the wizard already supports.
  *
  * Coupon:
  *   - code: RECOVERY-<8 chars random>
@@ -37,12 +44,72 @@ import { generateRecoveryCouponCode } from '@/lib/coupons/recovery-code';
 const MIN_AGE_MS = 30 * 60 * 1000;
 const MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
 
+// Drafts are only "abandoned" once the customer has been idle a while — the
+// created_at window above still applies, but we also require no wizard
+// activity (updated_at) for this long. 2h clears lunch breaks and slow KYC
+// uploads without mailing someone who's still mid-session.
+const DRAFT_MIN_IDLE_MS = 2 * 60 * 60 * 1000;
+
+// Internal test traffic — never send recovery to these.
+const TEST_EMAILS = new Set(['serviciiseonethut@gmail.com']);
+
 const DISCOUNT_PERCENT = 10;
 const COUPON_VALIDITY_HOURS = 48;
 
-function buildResumeUrl(orderId: string): string {
-  const base = process.env.NEXT_PUBLIC_APP_URL ?? 'https://eghiseul.ro';
-  return `${base}/comanda/checkout/${orderId}`;
+function appBase(): string {
+  return process.env.NEXT_PUBLIC_APP_URL ?? 'https://eghiseul.ro';
+}
+
+// Abandoned (post-submit) orders resume at checkout; drafts resume inside the
+// wizard via the ?order=&email= cross-device restore the provider already
+// supports (guest drafts require the matching email — anti-IDOR).
+function buildResumeUrl(order: {
+  id: string;
+  status: string;
+  friendly_order_id: string | null;
+  serviceSlug: string | null;
+  email: string;
+  couponCode: string;
+}): string {
+  // ?coupon= is auto-applied on landing (checkout page + wizard review step),
+  // so "cuponul se aplică automat" in the email copy is actually true.
+  if (order.status === 'draft' && order.serviceSlug && order.friendly_order_id) {
+    const qs = new URLSearchParams({
+      order: order.friendly_order_id,
+      email: order.email,
+      coupon: order.couponCode,
+    });
+    return `${appBase()}/comanda/${order.serviceSlug}?${qs.toString()}`;
+  }
+  return `${appBase()}/comanda/checkout/${order.id}?coupon=${encodeURIComponent(order.couponCode)}`;
+}
+
+// True when the customer typed something real beyond the contact step.
+// `contact` is step 1 (always present) and `billing` is auto-initialized with
+// defaults, so neither counts. Any other section counts if it holds at least
+// one non-empty string, number, `true`, or non-empty array — empty-string
+// scaffolding like {"plateNumber":""} does not qualify.
+function hasProgressBeyondContact(customerData: unknown): boolean {
+  if (!customerData || typeof customerData !== 'object') return false;
+  const sections = customerData as Record<string, unknown>;
+  const hasMeaningfulValue = (value: unknown): boolean => {
+    if (typeof value === 'string') return value.trim().length > 0;
+    if (typeof value === 'number') return true;
+    if (value === true) return true;
+    if (Array.isArray(value)) return value.length > 0;
+    if (value && typeof value === 'object') {
+      return Object.values(value).some(hasMeaningfulValue);
+    }
+    return false;
+  };
+  return Object.entries(sections).some(
+    ([key, value]) =>
+      key !== 'contact' &&
+      key !== 'billing' &&
+      value !== null &&
+      typeof value === 'object' &&
+      hasMeaningfulValue(value)
+  );
 }
 
 export async function POST(request: NextRequest) {
@@ -67,9 +134,9 @@ export async function POST(request: NextRequest) {
   const ordersTable = supabase.from('orders') as any;
   const { data: candidates, error: fetchError } = await ordersTable
     .select(
-      'id, order_number, friendly_order_id, total_price, customer_data, services(name)'
+      'id, order_number, friendly_order_id, status, total_price, customer_data, updated_at, services(name, slug)'
     )
-    .eq('status', 'abandoned')
+    .in('status', ['abandoned', 'draft'])
     .is('recovery_email_sent_at', null)
     .gte('created_at', minIso)
     .lte('created_at', maxIso)
@@ -96,6 +163,21 @@ export async function POST(request: NextRequest) {
     if (!email) {
       results.push({ orderId: order.id, status: 'skipped', reason: 'no email' });
       continue;
+    }
+    if (TEST_EMAILS.has(email.toLowerCase())) {
+      results.push({ orderId: order.id, status: 'skipped', reason: 'test email' });
+      continue;
+    }
+    if (order.status === 'draft') {
+      const lastActivity = Date.parse(order.updated_at ?? '') || 0;
+      if (now - lastActivity < DRAFT_MIN_IDLE_MS) {
+        results.push({ orderId: order.id, status: 'skipped', reason: 'draft still active' });
+        continue;
+      }
+      if (!hasProgressBeyondContact(order.customer_data)) {
+        results.push({ orderId: order.id, status: 'skipped', reason: 'contact-only draft' });
+        continue;
+      }
     }
     const firstName = cd.personal?.firstName ?? cd.contact?.firstName ?? null;
     const totalRon = Number(order.total_price ?? 0);
@@ -144,7 +226,15 @@ export async function POST(request: NextRequest) {
       totalRon,
       couponCode,
       discountPercent: DISCOUNT_PERCENT,
-      resumeUrl: buildResumeUrl(order.id),
+      resumeUrl: buildResumeUrl({
+        id: order.id,
+        status: order.status,
+        friendly_order_id: order.friendly_order_id ?? null,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        serviceSlug: (((order as any).services?.slug ?? null) as string | null),
+        email,
+        couponCode,
+      }),
       orderNumber: order.friendly_order_id ?? order.order_number ?? '',
     };
     try {

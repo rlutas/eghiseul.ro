@@ -1,0 +1,10 @@
+Motiv,Sursă,Validare,Pagini
+Nu a fost găsită (404),Site,Nu a început,12
+Pagină cu redirecționare,Site,Nu a început,5
+Blocată de robots.txt,Site,Nu a început,2
+Blocată din cauza unei alte erori 4xx,Site,Nu a început,1
+Exclusă pe baza etichetei „noindex”,Site,Nu a început,1
+Blocată din cauza accesului interzis (403),Site,Nu a început,1
+Accesată cu crawlere – nu este indexată,Sistemele Google,Nu a început,379
+Descoperită – nu este indexată,Sistemele Google,Nu a început,78
+Pagină alternativă cu etichetă canonică corespunzătoare,Site,Nu este cazul,0

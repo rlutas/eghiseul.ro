@@ -1,16 +1,33 @@
 # Coșuri Abandonate — Sistemul complet
 
-**Status:** ✅ Aplicat 2026-05-27
+**Status:** ✅ Aplicat 2026-05-27 · ⚠️ MORT în producție până 2026-07-20 (vezi incident mai jos) · ✅ Reparat + extins la drafts 2026-07-20
 **Inspirat din:** `cazierjudiciaronline.com/api/cron/abandonment` (cazierjudiciaronline foloseste un singur cron; noi am separat în două pentru claritate operațională)
+
+## ⚠️ Incident: cron-urile nu au rulat NICIODATĂ (până la 2026-07-20)
+
+Toate cele 6 cron-uri Vercel erau moarte: `next.config.ts` are `trailingSlash: true`, deci
+`/api/cron/auto-abandon` (path-ul din `vercel.json`, fără slash) răspundea cu **308 redirect**
+către varianta cu slash — iar invocarea Vercel Cron nu urmează redirecturi. Rezultat: 0 comenzi
+abandonate, 0 email-uri recovery, `pending` vechi de 13 zile, health-check facturi nefuncțional.
+
+**Fix:** slash final la TOATE path-urile cron din `vercel.json`. **Regulă permanentă: orice cron
+nou în `vercel.json` primește slash final** (pe lângă regula GET→POST passthrough din incidentul
+din 2026-07-12). Verificare rapidă: `curl -s -o /dev/null -w "%{http_code}" https://eghiseul.ro/<path>`
+— trebuie 401 (auth), nu 308.
 
 ## Ce este un coș abandonat
 
-O comandă în statusul `pending` care nu a primit confirmare de plată în 30 de minute. Cauze tipice:
-- Clientul a ajuns la pagina de plată dar a închis tab-ul înainte de redirect-ul Stripe
-- Cardul a fost respins și clientul n-a încercat altul
-- Clientul s-a răzgândit ultimul moment
+Două cazuri, tratate de același sistem:
 
-Aceste comenzi rămâneau în `pending` la nesfârșit și poluau lista admin „Toate". Acum:
+1. **`pending` neplătit** — comandă trimisă (submit + semnătură) fără confirmare de plată în 30 min. Cauze tipice:
+   - Clientul a ajuns la pagina de plată dar a închis tab-ul înainte de redirect-ul Stripe
+   - Cardul a fost respins și clientul n-a încercat altul
+   - Clientul s-a răzgândit ultimul moment
+2. **`draft` cu progres** (adăugat 2026-07-20) — abandon în wizard, ÎNAINTE de submit. Emailul și
+   telefonul există din pasul 1 (contact), deci clientul e recuperabil. Volume reale la data fix-ului:
+   171 drafts / 2 săptămâni, ~60.500 RON valoare, ~37% rată de finalizare a wizardului.
+
+Aceste comenzi rămâneau în `pending`/`draft` la nesfârșit și poluau lista admin „Toate". Acum:
 
 ## Cum funcționează (3 layere)
 
@@ -38,7 +55,19 @@ Răspuns: `{ success: true, data: { abandonedCount: N, processedAt, ids } }`.
 **Frecvență:** la fiecare 15 min (rulează după auto-abandon)
 **Auth:** `Authorization: Bearer ${CRON_SECRET}`
 
-Pentru fiecare comandă `status='abandoned'` din ultimele 7 zile cu email valid și fără recovery trimis (`recovery_email_sent_at IS NULL`):
+Două pool-uri de candidați din ultimele 7 zile, cu email valid și fără recovery trimis (`recovery_email_sent_at IS NULL`):
+
+- **`status='abandoned'`** — comportamentul original.
+- **`status='draft'`** (2026-07-20) — cu DOUĂ filtre suplimentare:
+  - **idle ≥ 2h** (`updated_at`) — nu trimitem cuiva care e încă în sesiune (pauză de masă, upload KYC lent);
+  - **progres dincolo de contact** (`hasProgressBeyondContact`) — draftul trebuie să aibă cel puțin o
+    secțiune în afara `contact`/`billing` cu o valoare reală (string non-gol, număr, `true`, array non-gol).
+    `{"plateNumber":""}` NU se califică (schelet inițializat); `{"county":"Prahova"}` DA. Cine a lăsat
+    doar emailul e window-shopper — nu-i ardem reputația de sender.
+
+**Excludere trafic intern:** `TEST_EMAILS` în rută (`serviciiseonethut@gmail.com`) — skip necondiționat.
+
+Pentru fiecare candidat:
 
 1. **Generează cupon unic**: `RECOVERY-XXXXXXXX` (8 caractere din alfabet curat fără 0/O/1/I/L). Retry o dată dacă collision UNIQUE (extrem de rar).
    - `discount_type: percentage`, `discount_value: 10`
@@ -47,7 +76,14 @@ Pentru fiecare comandă `status='abandoned'` din ultimele 7 zile cu email valid 
 2. **Trimite email** via Resend (subject + HTML + text plain):
    - Subject: „Ionel, ai uitat Cazier Judiciar — reducere 10% pe 48h"
    - Card cu codul cuponului (font mare, dashed border galben)
-   - Buton mare „Continuă comanda" → `/comanda/checkout/<orderId>` (cuponul se aplică automat în viitor; user poate introduce manual între timp)
+   - Buton mare „Continuă comanda", link diferit pe pool:
+     - `abandoned` → `/comanda/checkout/<orderId>?coupon=RECOVERY-XXX`
+     - `draft` → `/comanda/<serviceSlug>?order=<friendlyId>&email=<email>&coupon=RECOVERY-XXX`
+       (resume-ul cross-device pe care wizard-ul îl suportă deja; emailul e gate-ul anti-IDOR pentru guest drafts)
+   - **`?coupon=` se aplică AUTOMAT la aterizare** (2026-07-20): checkout page îl POST-ează la
+     `/api/orders/[id]/coupon` după load; în wizard, review-step îl citește din URL (parametrii străini
+     supraviețuiesc sincronizării de URL între pași) și îl validează singur. Dacă aplicarea eșuează
+     (expirat/folosit), inputul manual rămâne prefill-uit cu codul.
 3. **Marchează** `orders.recovery_email_sent_at = now()` pentru a nu re-trimite la următoarea rulare
 4. **Audit log**: `event_type='recovery_email_sent'`, `notes: 'Email recovery trimis cu cupon RECOVERY-XXX (-10%, 48h)'`
 
@@ -136,7 +172,7 @@ NEXT_PUBLIC_APP_URL=https://eghiseul.ro
 
 1. Setează env vars: `CRON_SECRET`, `RESEND_API_KEY`, `NEXT_PUBLIC_APP_URL`
 2. Configurează domeniul Resend (DNS records DKIM + DMARC)
-3. Verifică `vercel.json` are cele 3 cron-uri (`update-tracking`, `auto-abandon`, `recovery-emails`)
+3. Verifică `vercel.json` are cron-urile (`auto-abandon`, `recovery-emails`, ...) — **toate path-urile CU slash final** (site-ul are `trailingSlash: true`; fără slash = 308 = cron mort)
 4. După deploy, testează manual cu:
    ```bash
    curl -X POST -H "Authorization: Bearer $CRON_SECRET" \

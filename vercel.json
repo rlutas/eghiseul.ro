@@ -2,27 +2,27 @@
   "ignoreCommand": "if [ \"$VERCEL_ENV\" != \"production\" ]; then exit 0; fi; git diff --quiet HEAD^ HEAD -- ':!docs' ':!*.md' ':!supabase/migrations' ':!.claude'",
   "crons": [
     {
-      "path": "/api/cron/update-tracking",
+      "path": "/api/cron/update-tracking/",
       "schedule": "*/30 * * * *"
     },
     {
-      "path": "/api/cron/auto-abandon",
+      "path": "/api/cron/auto-abandon/",
       "schedule": "*/15 * * * *"
     },
     {
-      "path": "/api/cron/recovery-emails",
+      "path": "/api/cron/recovery-emails/",
       "schedule": "*/15 * * * *"
     },
     {
-      "path": "/api/cron/invoice-health-check",
+      "path": "/api/cron/invoice-health-check/",
       "schedule": "0 * * * *"
     },
     {
-      "path": "/api/cron/auto-finalize-delivered",
+      "path": "/api/cron/auto-finalize-delivered/",
       "schedule": "0 6 * * *"
     },
     {
-      "path": "/api/cron/payout-sync",
+      "path": "/api/cron/payout-sync/",
       "schedule": "30 5 * * *"
     }
   ]
