@@ -7,12 +7,12 @@ import { SystemStatus } from '@/components/services/system-status';
 const SLUG = 'ancpi-nu-functioneaza';
 // H1 — descriptive. The SERP <title> is shorter (META_TITLE): the long one
 // was 72 chars and Google rewrote it into a lowercase tail fragment.
-const TITLE = 'ANCPI și e-Terra nu funcționează: atac cibernetic, sisteme picate național (13–20 iulie 2026)';
+const TITLE = 'ANCPI și e-Terra nu funcționează: atac cibernetic, sisteme picate național (din 13 iulie 2026)';
 const META_TITLE = 'ANCPI Picat După Atac Cibernetic — Până Când și Ce Poți Face';
 const DESCRIPTION =
-  'ANCPI a confirmat un atac cibernetic: e-Terra și restul sistemelor sunt picate național din 13 iulie; revenire estimată: 20 iulie 2026. Comandă extrasul CF acum — îl eliberăm automat la revenire și îl primești pe email.';
+  'ANCPI a confirmat un atac cibernetic: e-Terra și restul sistemelor sunt picate național din 13 iulie. Update 20 iulie: aplicațiile se mută în Cloudul Guvernamental, migrare estimată până pe 22 iulie; revenirea va fi etapizată. Comandă extrasul CF acum — îl eliberăm automat la revenire.';
 const DATE_PUBLISHED = '2026-07-15';
-const DATE_MODIFIED = '2026-07-17';
+const DATE_MODIFIED = '2026-07-20';
 
 export const revalidate = 3600; // outage news — refresh hourly
 
@@ -33,7 +33,7 @@ export default function Page() {
       datePublished={DATE_PUBLISHED}
       dateModified={DATE_MODIFIED}
       publishedLabel="15 iulie 2026"
-      updatedLabel="17 iulie 2026"
+      updatedLabel="20 iulie 2026"
       imageAlt="Sistem temporar nefuncțional — sistemele informatice ANCPI indisponibile la nivel național"
       relatedServices={[
         {
@@ -67,7 +67,11 @@ export default function Page() {
         },
         {
           q: 'Până când e picat ANCPI?',
-          a: 'Oficiile teritoriale (OCPI) au comunicat prin informările oficiale că aplicațiile nu vor fi funcționale până în data de 20 iulie 2026. Termenul poate fi scurtat sau prelungit — ANCPI a promis informații actualizate.',
+          a: 'Termenul inițial comunicat de oficiile teritoriale — 20 iulie 2026 — a fost depășit. Pe 20 iulie, ANCPI a anunțat că aplicațiile se mută în Cloudul Guvernamental, operațiune coordonată de STS, cu estimarea de finalizare a migrării miercuri, 22 iulie. După migrare, sistemele vor fi verificate de instituțiile abilitate, care întocmesc un raport — abia pe baza acestuia ANCPI va comunica un termen de reluare. Repunerea în funcțiune se va face etapizat, pe componente, nu dintr-odată. Deci: 22 iulie este termenul migrării, NU al revenirii serviciilor.',
+        },
+        {
+          q: 'Datele mele din cartea funciară au fost afectate?',
+          a: 'ANCPI a comunicat pe 20 iulie că, în urma tuturor verificărilor efectuate până acum, bazele de date tehnice și juridice ale instituției nu au fost afectate. Instituția a precizat și că dispunea de mai multe locații de backup la momentul incidentului. Investigațiile tehnice și penale sunt însă în curs, iar concluziile oficiale nu au fost comunicate. Independent de asta, înscrierile din cartea funciară rămân valabile — registrul juridic nu se pierde printr-un atac informatic.',
         },
         {
           q: 'Pot obține un extras de carte funciară în această perioadă?',
@@ -100,15 +104,132 @@ export default function Page() {
         atunci, serverele agenției nu mai răspund.
       </p>
       <p>
-        Oficiile teritoriale au confirmat oficial: aplicațiile ANCPI{' '}
-        <strong>nu vor fi funcționale până în 20 iulie 2026</strong>, „ca urmare a unui incident
-        tehnic aflat în curs de investigare”. Presa locală a relatat blocajul în mai multe județe
+        Termenul comunicat inițial de oficiile teritoriale — <strong>20 iulie 2026</strong>, „ca
+        urmare a unui incident tehnic aflat în curs de investigare” — <strong>a fost depășit</strong>.
+        Situația la zi: aplicațiile se mută în Cloudul Guvernamental, migrare estimată până pe{' '}
+        <strong>22 iulie</strong>, iar revenirea serviciilor se va face etapizat, cu termen anunțat
+        abia după verificările instituțiilor abilitate (vezi <a href="#cronologie">cronologia</a>).
+        Presa locală a relatat blocajul în mai multe județe
         (printre primele,{' '}
         <a href="https://www.bihon.ro/stirile-judetului-bihor/bihorul-afectat-de-blocajul-national-al-ancpi-cadastrul-nu-functioneaza-pana-luni-5337687/" target="_blank" rel="nofollow noopener">
           Bihorul
         </a>
         ), dar problema e centrală — aceleași sisteme deservesc toate OCPI-urile din țară.
       </p>
+
+      {/* Timeline — cronologia oficială a incidentului. Ține cititorul (și
+          clientul cu comandă în coadă) la curent fără să reia tot articolul.
+          Cel mai recent sus: cine revine pe pagină vede întâi ce e nou. */}
+      <h2 id="cronologie">Cronologia incidentului</h2>
+      <p>
+        Actualizăm secțiunea la fiecare comunicat oficial ANCPI. Cel mai recent apare primul.
+      </p>
+      <div className="not-prose my-6 space-y-0">
+        {[
+          {
+            date: '20 iulie 2026',
+            tag: 'Comunicat ANCPI',
+            latest: true,
+            body: (
+              <>
+                <strong>Bazele de date nu au fost afectate</strong>, în urma tuturor verificărilor
+                efectuate până acum. A început <strong>migrarea aplicațiilor ANCPI în Cloudul
+                Guvernamental</strong>, operațiune coordonată de <strong>STS</strong>, cu estimare de
+                finalizare <strong>miercuri, 22 iulie</strong>. Urmează verificarea sistemelor de
+                către instituțiile abilitate și un raport — abia apoi se comunică termenul de
+                reluare. <strong>Repunerea în funcțiune va fi etapizată</strong>, în funcție de
+                prioritățile operaționale.
+              </>
+            ),
+          },
+          {
+            date: '19 iulie 2026',
+            tag: 'Comunicat ANCPI',
+            body: (
+              <>
+                Infrastructura informatică e într-un „amplu proces de reinstalare și consolidare”.
+                ANCPI precizează că, la momentul incidentului,{' '}
+                <strong>dispunea de mai multe locații de backup</strong> — contrazicând indirect
+                susținerea atacatorului că backup-urile ar fi fost șterse. Investigațiile tehnice
+                și penale sunt în curs, fără concluzii oficiale. Instituția atrage atenția că
+                informațiile din spațiul public despre consecințele atacului{' '}
+                <em>nu provin din surse oficiale</em>.
+              </>
+            ),
+          },
+          {
+            date: '17 iulie 2026',
+            tag: 'Cauza confirmată',
+            body: (
+              <>
+                ANCPI confirmă oficial că este vorba despre un <strong>atac cibernetic</strong>,
+                după ce inițial comunicase „incident tehnic”. Îl descrie drept cea mai amplă
+                întrerupere din istoria instituției. <strong>DNSC</strong> este implicat în
+                gestionarea incidentului.
+              </>
+            ),
+          },
+          {
+            date: '15 iulie 2026',
+            tag: 'Revendicare atacator',
+            body: (
+              <>
+                Un actor cunoscut drept „ByteToBreach” anunță pe o platformă de comercializare a
+                datelor că vinde informații din rețelele ANCPI și codul sursă al aplicațiilor.{' '}
+                <strong>Susțineri neconfirmate oficial</strong>, dezmințite parțial de comunicatele
+                ulterioare ale agenției.
+              </>
+            ),
+          },
+          {
+            date: '15 iulie 2026',
+            tag: 'Prima confirmare oficială',
+            body: (
+              <>
+                Oficiile teritoriale comunică oficial indisponibilitatea și un termen estimat de
+                revenire: <strong>20 iulie 2026</strong> — termen care avea să fie depășit.
+              </>
+            ),
+          },
+          {
+            date: '13 iulie 2026, 23:02',
+            tag: 'Începutul căderii',
+            body: (
+              <>
+                Monitorizarea noastră automată înregistrează căderea portalului ePay ANCPI. De
+                atunci, serverele agenției nu mai răspund.
+              </>
+            ),
+          },
+        ].map((e, i) => (
+          <div key={i} className="relative flex gap-4 pb-6 last:pb-0">
+            {/* linia verticală */}
+            <div className="flex flex-col items-center">
+              <div
+                className={`mt-1.5 h-3 w-3 shrink-0 rounded-full ${
+                  e.latest ? 'bg-primary-500 ring-4 ring-primary-100' : 'bg-neutral-300'
+                }`}
+              />
+              <div className="mt-1 w-px grow bg-neutral-200" />
+            </div>
+            <div className="grow pb-1">
+              <div className="mb-1 flex flex-wrap items-center gap-2">
+                <span className="text-sm font-bold text-secondary-900">{e.date}</span>
+                <span
+                  className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                    e.latest
+                      ? 'bg-primary-100 text-primary-900'
+                      : 'bg-neutral-100 text-neutral-600'
+                  }`}
+                >
+                  {e.tag}
+                </span>
+              </div>
+              <p className="text-sm leading-relaxed text-secondary-900/80">{e.body}</p>
+            </div>
+          </div>
+        ))}
+      </div>
 
       <h2>Cauza confirmată: atac cibernetic</h2>
       <p>
@@ -134,7 +255,8 @@ export default function Page() {
           anunțat pe 15 iulie, pe o platformă folosită pentru comercializarea datelor din atacuri
           informatice, că vinde date obținute din rețelele ANCPI și codul sursă al aplicațiilor
           (inclusiv e-Terra, printr-o copie a serverelor GitLab), susținând că a instalat ransomware și a șters
-          backup-uri — relatare{' '}
+          backup-uri — susținere pe care ANCPI a contrazis-o pe 19 iulie, precizând că{' '}
+          <strong>dispunea de mai multe locații de backup</strong> la momentul incidentului — relatare{' '}
           <a href="https://publicrecord.ro/2026/07/17/atac-cibernetic-ancpi/" target="_blank" rel="nofollow noopener">
             Public Record
           </a>{' '}
@@ -180,8 +302,9 @@ export default function Page() {
           className="w-full rounded-xl border border-neutral-200"
         />
         <figcaption className="mt-2 text-center text-sm text-neutral-500">
-          Informarea oficială distribuită de oficiile teritoriale ANCPI (aici, OCPI Bihor): sistemele
-          nefuncționale până în 20.07.2026.
+          Informarea oficială distribuită de oficiile teritoriale ANCPI (aici, OCPI Bihor) la
+          începutul incidentului: sistemele nefuncționale până în 20.07.2026 — termen ulterior
+          depășit.
         </figcaption>
       </figure>
 
@@ -256,6 +379,26 @@ export default function Page() {
       </ul>
 
       <h2>Actualizări</h2>
+      <p>
+        <strong>20 iulie 2026:</strong> ANCPI anunță că{' '}
+        <strong>bazele de date tehnice și juridice nu au fost afectate</strong>, în urma
+        verificărilor de până acum. A început <strong>migrarea aplicațiilor în Cloudul
+        Guvernamental</strong>, coordonată de STS, estimată să se încheie{' '}
+        <strong>miercuri, 22 iulie</strong>. Atenție la nuanță: 22 iulie e termenul{' '}
+        <em>migrării</em>, nu al revenirii serviciilor — după migrare urmează verificarea
+        sistemelor de către instituțiile abilitate și un raport, iar termenul de reluare se
+        comunică abia atunci. Repunerea va fi <strong>etapizată</strong>, pe componente. Sursă:{' '}
+        <a href="https://www.ancpi.ro/" target="_blank" rel="nofollow noopener">
+          comunicatele oficiale ANCPI
+        </a>
+        .
+      </p>
+      <p>
+        <strong>19 iulie 2026:</strong> infrastructura e în „amplu proces de reinstalare și
+        consolidare”. ANCPI precizează că avea <strong>mai multe locații de backup</strong> la
+        momentul incidentului — contrazicând indirect susținerea atacatorului că ar fi șters
+        copiile de siguranță. Investigațiile tehnice și penale continuă, fără concluzii oficiale.
+      </p>
       <p>
         <strong>17 iulie 2026:</strong> cauza e confirmată — <strong>atac cibernetic</strong>.
         ANCPI recunoaște oficial atacul (după ce inițial comunicase „incident tehnic”) și susține
