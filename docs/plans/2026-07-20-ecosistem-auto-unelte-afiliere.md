@@ -303,6 +303,73 @@ Cumpărătorul intră în baza de remindere a erovinieta (~6.000 abonați azi): 
 
 ---
 
+## 5.7 Un carVertical al nostru? — NU. Bariera sunt datele, nu codul
+
+Întrebare Raul (20.07): cât de greu e să facem noi un serviciu de verificare istoric vehicul?
+
+**Verdict: nu construim. Afiliem, și construim în jur — nu dedesubt.**
+
+### Ce se cumpără de fapt într-un raport
+
+În ordinea valorii reale pentru un cumpărător român: **kilometraj real** (frauda de km e problema #1 pe importuri), **daune + poze de la daună**, **furt/VIN clonat**, **gaj/leasing neachitat**. Restul (specificații, recalls, valoare estimată) e umplutură care ridică percepția, nu decizia.
+
+Primele două vin **aproape exclusiv din străinătate** pentru mașinile importate — adică exact partea pe care nu o poți construi din surse românești.
+
+### Sursele românești — ce e deschis și ce nu
+
+| Sursă | Ce dă | Acces |
+|---|---|---|
+| **RAR — kilometraj la ITP** | ⭐ cea mai valoroasă dată RO | ❌ **ÎNCHIS.** Km se înregistrează la ITP (Dir. 2014/45/UE) dar nu e expus public. Fără ofertă de API/parteneriat pe rarom.ro |
+| **AIDA / BAAR — daune** | ⭐ a doua ca valoare | ❌ **ÎNCHIS.** Verificarea RCA curentă e publică; istoricul de daune și bonus-malus = doar asigurători, prin protocol |
+| **Poliția Română — auto furate** | Furt (~2.290 vehicule) | ✅ **PUBLIC**, filtrabil după serie șasiu. Fără API → scrapeabil |
+| **RNPM — gaj/leasing** | Sarcini pe vehicul | 🟡 Consultare publică contra taxă. API: **neconfirmat** (DNS-ul nu rezolva la verificare) |
+| RAR — valabilitate ITP | Doar ITP valabil/nu | ✅ Public (cere CIV sau VIN), **fără kilometraj** |
+| DGPCI, ANAF/vamă | Proprietari, import | ❌ Date personale / închis |
+| Autovit, OLX, mobile.de | Poze + km declarat istoric | ⚠️ ToS interzic scraping; și drept de autor pe poze |
+
+**Din cele 4 date care contează, România îți dă una și jumătate**: furt (volum mic) și gaj (contra taxă). Cele două care vând produsul sunt închise.
+
+### Internațional
+
+- **EUCARIS nu e o bază de date** — e mecanism de schimb *stat-la-stat*, „developed by and for governmental authorities". Privații nu au acces. Există un serviciu **Mileage** în dezvoltare (Cipru conectat în martie 2026) — pe termen lung erodează avantajul agregatorilor privați, dar nu ne dă acces acum.
+- **Revânzători de API** (Vindecoder/Vincario, CarsXE, VINaudit, DataOne): decode tehnic VIN da, **istoric european real de km/daune — n-am găsit niciun furnizor cu preț public**. Exact ăsta e moatul.
+
+### De ce nu prindem din urmă
+
+carVertical: fondată **2017**, ~**16M €** strânși, **159 angajați**, 28–37 piețe, **54M € venit în 2024**. „Peste 1.000 de baze de date" — fiecare registru, fiecare asigurător, fiecare acreditare (sunt furnizor aprobat NMVTIS în SUA) e o negociere separată cu due diligence GDPR.
+
+**8 ani și zeci de milioane.** Un intrat nou nu prinde din urmă — cel mult revinde.
+
+### Cele patru variante, evaluate
+
+| Variantă | Efort | Cost | Calitate vs carVertical | Verdict |
+|---|---|---|---|---|
+| **a) Afiliere pură** | 1–3 zile | ~0 | 100% (e chiar el) | ✅ **FEZABIL** — singura cu ROI garantat |
+| b) White-label API | 3–6 săpt. | €3–15/raport en-gros *(neconfirmat)* | 50–70% | 🟡 Economic dubios — plătești en-gros cât încasezi, fără brandul lor |
+| c) Produs propriu doar pe date RO | 2–4 săpt. | mic | <40% | ❌ **NEFEZABIL ca produs plătit.** Nimeni nu dă 100 lei pe „nu e furată și n-are gaj" când mașina vine din Germania |
+| d) Agregator surse gratuite + API | 6–10 săpt. | mic-mediu | <40% | 🟡 Bun ca lead magnet, nu ca produs |
+
+### Planul recomandat
+
+1. **Afiliere carVertical** ca produs listat — venit imediat, zero risc. (§5.1)
+2. **Instrument gratuit „Verifică VIN-ul"**: furt (Poliția, scraping) + valabilitate ITP (RAR public) + decode tehnic VIN. Gratuit, SEO puternic pe „verificare VIN", „mașină furată verificare", cu **upsell direct spre raportul afiliat** pentru km și daune. Asta transformă varianta (c) — nefezabilă ca produs — în **cel mai bun canal de achiziție**.
+3. ⭐ **Produs propriu plătit doar pe RNPM (gaj/leasing)** — se încadrează perfect în modelul nostru existent (interogare de registru contra cost, exact ca ONRC și ANCPI), și e **serviciu distinct, nu imitație de carVertical**. **Condiție:** verificat manual dacă RNPM permite interogare programatică sau contract de operator.
+4. **Reevaluare 2027–2028**, când schimbul EUCARIS „Mileage" se maturizează — dacă apare acces reglementat la kilometraj transfrontalier, ecuația se schimbă complet.
+
+### GDPR
+
+**VIN-ul e dată cu caracter personal** când poate fi corelat cu o persoană — CJUE C-319/22 (2023) *(confidență medie, nereverificat)*. Practic: datele tehnice se pot publica liber; nume/adresă proprietar — nu. Kilometrajul și daunele sunt zonă gri, iar carVertical le publică **pseudonimizat** (fără identitatea proprietarilor) — abordarea defensabilă.
+
+Riscul mai mare nu e ANSPDCP, ci **ToS-ul platformelor de anunțuri** (scraping poze) și **clauzele de revânzare** din contractele de date.
+
+### De verificat manual
+
+1. Portalul RNPM actual și condițiile de interogare programatică (blocant pentru punctul 3)
+2. Dacă RAR licențiază datele de kilometraj de la ITP — **o cerere scrisă e ieftină și clarifică totul**
+3. Prețul real per apel la Vindecoder/Vincario (cere trial, nu e public)
+
+---
+
 ## 6. Unde punem fiecare produs
 
 | Produs | Gazdă | De ce |
