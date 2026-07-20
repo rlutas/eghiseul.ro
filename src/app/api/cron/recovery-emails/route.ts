@@ -53,6 +53,31 @@ const DRAFT_MIN_IDLE_MS = 2 * 60 * 60 * 1000;
 // Internal test traffic — never send recovery to these.
 const TEST_EMAILS = new Set(['serviciiseonethut@gmail.com']);
 
+// Reserved/undeliverable domains (RFC 2606 + local dev). Mailing them always
+// fails, and because a failed send deliberately leaves `recovery_email_sent_at`
+// NULL for a retry, the order would be re-picked every 15 min and burn a fresh
+// coupon each run. Skip them outright.
+const UNDELIVERABLE_DOMAINS = new Set([
+  'example.com',
+  'example.org',
+  'example.net',
+  'test.com',
+  'localhost',
+]);
+
+function isUndeliverable(email: string): boolean {
+  const at = email.lastIndexOf('@');
+  if (at < 1 || at === email.length - 1) return true; // no local part or no domain
+  const domain = email.slice(at + 1).toLowerCase();
+  return (
+    UNDELIVERABLE_DOMAINS.has(domain) ||
+    domain.endsWith('.test') ||
+    domain.endsWith('.invalid') ||
+    domain.endsWith('.local') ||
+    !domain.includes('.')
+  );
+}
+
 const DISCOUNT_PERCENT = 10;
 const COUPON_VALIDITY_HOURS = 48;
 
@@ -166,6 +191,10 @@ export async function POST(request: NextRequest) {
     }
     if (TEST_EMAILS.has(email.toLowerCase())) {
       results.push({ orderId: order.id, status: 'skipped', reason: 'test email' });
+      continue;
+    }
+    if (isUndeliverable(email)) {
+      results.push({ orderId: order.id, status: 'skipped', reason: 'undeliverable domain' });
       continue;
     }
     if (order.status === 'draft') {
