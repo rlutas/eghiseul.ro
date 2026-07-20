@@ -155,7 +155,16 @@ function CfSpecimenExplainer() {
 }
 
 export default function PropertyDataStep({ config, onValidChange }: PropertyDataStepProps) {
-  const { state, updateProperty, serviceOptions, updateOptions } = useModularWizard();
+  const { state, updateProperty, serviceOptions, updateOptions, validationAttempt } =
+    useModularWizard();
+
+  // Eroarea se arată abia după ce clientul a apăsat «Continuă» măcar o dată.
+  // Înainte, caseta roșie apărea din secunda în care intrai pe pas — te
+  // certa pentru un formular pe care nici nu apucaseși să-l începi.
+  // Baseline la mount, ca o încercare eșuată pe pasul anterior să nu se
+  // scurgă aici (același pattern ca în review-step).
+  const [validationBaseline] = useState(validationAttempt);
+  const showValidationError = validationAttempt !== validationBaseline;
   const router = useRouter();
 
   // „Nu știu" → jump to the right identification service, carrying the contact
@@ -725,7 +734,7 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
       )}
 
       {/* Validation Summary */}
-      {!isFormValid() && (
+      {showValidationError && !isFormValid() && (
         <Alert data-wizard-error>
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>

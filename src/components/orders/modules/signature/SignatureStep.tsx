@@ -28,7 +28,14 @@ interface SignatureStepProps {
 }
 
 export default function SignatureStep({ config, onValidChange }: SignatureStepProps) {
-  const { state, updateSignature, updateConsent } = useModularWizard();
+  const { state, updateSignature, updateConsent, validationAttempt } = useModularWizard();
+
+  // Vezi nota din PropertyDataStep: casetele de eroare apar abia după prima
+  // apăsare pe «Continuă». Aici conta mai mult decât oriunde — pasul se
+  // deschidea cu „Semnătura ta este obligatorie" pe un canvas gol, ceea ce
+  // citea a reproș, nu a instrucțiune.
+  const [validationBaseline] = useState(validationAttempt);
+  const showValidationError = validationAttempt !== validationBaseline;
   const signature = state.signature;
   const termsAccepted = !!state.consent?.termsAccepted;
 
@@ -377,7 +384,7 @@ export default function SignatureStep({ config, onValidChange }: SignatureStepPr
       )}
 
       {/* Validation Message */}
-      {!hasSignature && config.required && (
+      {showValidationError && !hasSignature && config.required && (
         <Alert data-wizard-error>
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
@@ -385,7 +392,7 @@ export default function SignatureStep({ config, onValidChange }: SignatureStepPr
           </AlertDescription>
         </Alert>
       )}
-      {hasSignature && !termsAccepted && config.required && (
+      {showValidationError && hasSignature && !termsAccepted && config.required && (
         <Alert data-wizard-error>
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
@@ -393,7 +400,7 @@ export default function SignatureStep({ config, onValidChange }: SignatureStepPr
           </AlertDescription>
         </Alert>
       )}
-      {hasSignature && termsAccepted && isCivilStatus &&
+      {showValidationError && hasSignature && termsAccepted && isCivilStatus &&
         (!oldCertVoidAccepted || !dataAccuracyAccepted) && config.required && (
         <Alert data-wizard-error>
           <AlertCircle className="h-4 w-4" />

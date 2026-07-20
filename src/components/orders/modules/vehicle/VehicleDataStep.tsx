@@ -61,7 +61,12 @@ const ROVINIETA_PERIODS = [
 const ROMANIAN_PLATE_REGEX = /^(B|[A-Z]{2})\s*\d{2,3}\s*[A-Z]{3}$/i;
 
 export default function VehicleDataStep({ config, onValidChange }: VehicleDataStepProps) {
-  const { state, updateVehicle } = useModularWizard();
+  const { state, updateVehicle, validationAttempt } = useModularWizard();
+
+  // Vezi nota din PropertyDataStep: caseta de eroare apare abia după prima
+  // apăsare pe «Continuă», nu din secunda în care intri pe pas.
+  const [validationBaseline] = useState(validationAttempt);
+  const showValidationError = validationAttempt !== validationBaseline;
   const vehicle = state.vehicle;
   const fullConfig = state.verificationConfig;
 
@@ -393,7 +398,7 @@ export default function VehicleDataStep({ config, onValidChange }: VehicleDataSt
       )}
 
       {/* Validation Summary */}
-      {!isFormValid() && !isRedirectService && (
+      {showValidationError && !isFormValid() && !isRedirectService && (
         <Alert data-wizard-error>
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
