@@ -75,6 +75,7 @@ import {
   Camera,
   MessageCircle,
   Handshake,
+  TrendingUp,
 } from 'lucide-react';
 
 // ---------- Types ----------
@@ -82,10 +83,29 @@ import {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyObj = Record<string, any>;
 
+/** Atribuire marketing scrisă la crearea draftului (migrarea 128). */
+interface OrderAttribution {
+  first?: AttributionTouch;
+  last?: AttributionTouch;
+}
+interface AttributionTouch {
+  utm_source?: string;
+  utm_medium?: string;
+  utm_campaign?: string;
+  utm_term?: string;
+  utm_content?: string;
+  click_id?: string;
+  click_platform?: string;
+  referrer?: string;
+  landing?: string;
+  at?: string;
+}
+
 interface OrderDetail {
   id: string;
   friendly_order_id: string | null;
   order_number: string;
+  attribution?: OrderAttribution | null;
   status: string | null;
   total_price: number;
   base_price: number;
@@ -1117,6 +1137,31 @@ export default function AdminOrderDetailPage() {
             indented add-ons). Same shape used on /comanda, /comanda/checkout
             and the success page so admin reads the order the same way the
             customer placed it. */}
+        {/* De unde a venit clientul. Doar pentru comenzile de după migrarea
+            128 — cele vechi nu au atribuire, deci ascundem cardul complet în
+            loc să arătăm „necunoscut" pe jumătate din listă. */}
+        {order.attribution?.first && (
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base flex items-center gap-2">
+                <TrendingUp className="h-4 w-4" />
+                Proveniență client
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <AttributionBlock label="Prima vizită" touch={order.attribution.first} />
+              {/* `last` se afișează doar dacă diferă — altfel e zgomot. */}
+              {order.attribution.last &&
+                order.attribution.last.at !== order.attribution.first.at && (
+                  <AttributionBlock
+                    label="Ultima vizită (înainte de comandă)"
+                    touch={order.attribution.last}
+                  />
+                )}
+            </CardContent>
+          </Card>
+        )}
+
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-base flex items-center gap-2">
@@ -4433,6 +4478,73 @@ function CourierIcon({ provider }: { provider: string | null }) {
   if (provider === 'fancourier') return <Truck className="h-4 w-4 text-orange-600" />;
   if (provider === 'sameday') return <Package className="h-4 w-4 text-blue-600" />;
   return <Truck className="h-4 w-4" />;
+}
+
+/**
+ * Un punct de atribuire, în limbaj de om.
+ *
+ * Traduce mecanica (utm_medium=organic, referrer=google.com) într-un rând pe
+ * care îl citește oricine din echipă: „Google (căutare) → /ancpi-nu-functioneaza/".
+ */
+function AttributionBlock({ label, touch }: { label: string; touch: AttributionTouch }) {
+  // Sursa, în ordinea de încredere: campanie marcată > click ID de ads >
+  // referrer > direct.
+  let sourceText: string;
+  if (touch.utm_source) {
+    sourceText = touch.utm_medium
+      ? `${touch.utm_source} (${touch.utm_medium})`
+      : touch.utm_source;
+  } else if (touch.click_platform) {
+    sourceText = `${touch.click_platform} ads`;
+  } else if (touch.referrer) {
+    try {
+      sourceText = new URL(touch.referrer).hostname.replace(/^www\./, '');
+    } catch {
+      sourceText = touch.referrer;
+    }
+  } else {
+    sourceText = 'direct / necunoscut';
+  }
+
+  return (
+    <div className="rounded-lg border border-neutral-200 bg-neutral-50/60 p-3">
+      <p className="mb-1.5 text-xs font-medium uppercase tracking-wide text-neutral-500">
+        {label}
+      </p>
+      <div className="space-y-1 text-sm">
+        <div className="flex flex-wrap items-baseline gap-x-2">
+          <span className="text-neutral-500">Sursă:</span>
+          <span className="font-medium text-neutral-900">{sourceText}</span>
+        </div>
+        {touch.landing && (
+          <div className="flex flex-wrap items-baseline gap-x-2">
+            <span className="text-neutral-500">A intrat pe:</span>
+            <span className="font-mono text-xs text-neutral-900">{touch.landing}</span>
+          </div>
+        )}
+        {touch.utm_campaign && (
+          <div className="flex flex-wrap items-baseline gap-x-2">
+            <span className="text-neutral-500">Campanie:</span>
+            <span className="text-neutral-900">{touch.utm_campaign}</span>
+          </div>
+        )}
+        {touch.at && (
+          <div className="flex flex-wrap items-baseline gap-x-2">
+            <span className="text-neutral-500">Când:</span>
+            <span className="text-neutral-900">
+              {new Date(touch.at).toLocaleString('ro-RO', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+              })}
+            </span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
 }
 
 // ---------- Timeline Component ----------

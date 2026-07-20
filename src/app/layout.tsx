@@ -5,6 +5,7 @@ import { QueryProvider } from "@/providers/query-provider";
 import { Header } from "@/components/shared/header";
 import { WhatsAppFloat } from "@/components/shared/whatsapp-float";
 import { CookieConsent } from "@/components/consent/cookie-consent";
+import { AttributionTracker } from "@/components/analytics/attribution-tracker";
 
 const inter = Inter({
   subsets: ["latin", "latin-ext"],
@@ -77,6 +78,11 @@ export default function RootLayout({
           {children}
           <WhatsAppFloat />
           <CookieConsent />
+          {/* Atribuire proprie (ce canal aduce comenzi). Nu e profilare
+              cross-site și nu implică terți, deci nu depinde de consimțământul
+              pentru cookies de marketing — spre deosebire de GA4, care e
+              încărcat din CookieConsent doar după opt-in. */}
+          <AttributionTracker />
         </QueryProvider>
       </body>
     </html>

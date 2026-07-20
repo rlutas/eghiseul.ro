@@ -282,6 +282,16 @@ export async function POST(request: NextRequest) {
       payment_status: 'unpaid',
     };
 
+    // Atribuire — scrisă DOAR aici, la creare. Update-urile ulterioare ale
+    // draftului nu o ating: pe parcursul completării, `last` din client s-ar
+    // putea schimba (client care revine din altă sursă) și am pierde canalul
+    // care a generat efectiv comanda.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const attribution = (body as any)?.attribution;
+    if (attribution && typeof attribution === 'object') {
+      insertData.attribution = attribution;
+    }
+
     console.log('Attempting to insert draft order with data:', JSON.stringify(insertData, null, 2));
 
     const { data: order, error: orderError } = await adminClient
@@ -328,6 +338,9 @@ export async function POST(request: NextRequest) {
           delivery_price: data.delivery_price || 0,
           total_price: data.total_price || 0,
           payment_status: 'unpaid',
+          // Aceeași atribuire ca pe calea principală — altfel comenzile care
+          // trec prin retry (coliziune de ID) ar rămâne fără sursă.
+          ...(attribution && typeof attribution === 'object' ? { attribution } : {}),
         };
         const { data: retryOrder, error: retryError } = await adminClient
           .from('orders')

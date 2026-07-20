@@ -49,6 +49,7 @@ import {
   renumberSteps,
 } from '@/lib/verification-modules/step-builder';
 import { generateOrderId, getDraftStorageKey, validateOrderId } from '@/lib/order-id';
+import { getAttribution } from '@/lib/analytics/attribution';
 
 // Cache version for migrations
 // v3: Added clientType to cache for proper step reconstruction
@@ -1484,6 +1485,10 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
           friendly_order_id: state.friendlyOrderId,
           service_id: state.serviceId,
           current_step: state.currentStepId,
+          // De unde a venit clientul. Serverul îl scrie o singură dată, la
+          // crearea draftului — un PATCH ulterior nu-l rescrie, ca sursa
+          // originală să nu fie pierdută pe parcursul completării.
+          attribution: getAttribution(),
           customer_data: customerData,
           selected_options: state.selectedOptions.map(opt => ({
             option_id: opt.optionId,
