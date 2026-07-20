@@ -39,7 +39,7 @@ const DEFAULT_QUALITY = 0.85;
 const HEIC_RX = /heic|heif/i;
 
 export class ImageCompressionError extends Error {
-  constructor(public code: 'HEIC_UNSUPPORTED' | 'DECODE_FAILED' | 'CANVAS_UNAVAILABLE' | 'ENCODE_FAILED', message: string) {
+  constructor(public code: 'EMPTY_FILE' | 'HEIC_UNSUPPORTED' | 'DECODE_FAILED' | 'CANVAS_UNAVAILABLE' | 'ENCODE_FAILED', message: string) {
     super(message);
     this.name = 'ImageCompressionError';
   }
@@ -49,6 +49,17 @@ export async function compressImage(file: File, opts: CompressOptions = {}): Pro
   const maxEdge = opts.maxEdge ?? DEFAULT_MAX_EDGE;
   const quality = opts.quality ?? DEFAULT_QUALITY;
   const sizeBefore = file.size;
+
+  // A 0-byte File is what phones hand over when the photo lives only in the
+  // cloud (Google Photos / iCloud, not downloaded locally) or sits on removed
+  // storage. Decoding would fail anyway, but with a generic message — this
+  // check names the actual cause so the customer knows to retake the photo.
+  if (file.size === 0) {
+    throw new ImageCompressionError(
+      'EMPTY_FILE',
+      'Fișierul este gol. Dacă ai ales poza din galerie, poate fi salvată doar în cloud — fă poza direct cu camera sau descarc-o întâi pe telefon.'
+    );
+  }
 
   if (HEIC_RX.test(file.type) || /\.heic$|\.heif$/i.test(file.name)) {
     throw new ImageCompressionError(

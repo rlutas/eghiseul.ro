@@ -99,7 +99,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate file size
+    // Validate file size. The empty check is deliberate and must come first:
+    // `fileSize && ...` treats 0 as absent, so a 0-byte upload used to slip
+    // through and land in S3 as an unopenable file (CJO-20260720-12500 —
+    // phone handed over a cloud-only photo with no local bytes). Images are
+    // caught client-side by compressImage, but PDFs never touch it, so this
+    // is the only guard covering them.
+    if (fileSize === 0) {
+      return NextResponse.json(
+        { error: 'Fișierul este gol (0 KB). Încarcă din nou documentul — dacă l-ai ales din galerie, fă poza direct cu camera.' },
+        { status: 400 }
+      );
+    }
     if (fileSize && fileSize > MAX_FILE_SIZE) {
       return NextResponse.json(
         { error: `File too large. Maximum size: ${MAX_FILE_SIZE / 1024 / 1024}MB` },
