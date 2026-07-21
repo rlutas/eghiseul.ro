@@ -36,3 +36,12 @@ urce în Google Drive ca să le vadă/printeze. O colegă nu are deloc Word.
 conversia CJO returnează null în prod (rămâne DOCX, fără regresie). De copiat
 cheia din env-ul eghiseul → Vercel CJO (Production + Preview) + `.env.local`,
 apoi redeploy.
+
+## Addendum — nume fișiere descărcate (CJO) + reordonare admin (eghiseul)
+- **CJO** `doc/route.ts`: nume de descărcare prietenoase ca pe eghiseul, via
+  `createSignedUrl(..., { download })` — `cerere-eliberare-pf-<nr>.pdf`,
+  `imputernicire-<nr>.pdf`, `imputernicire-integritate-<nr>.pdf`,
+  `contract-<nr>.pdf`. Operatorul diferențiază ușor documentele. Imaginile
+  (CI/selfie) rămân inline neschimbate.
+- **eghiseul** admin comandă: cardul „Proveniență client" mutat din grila de sus
+  la baza paginii (info de context, nu operațional — sus îngreuna citirea).

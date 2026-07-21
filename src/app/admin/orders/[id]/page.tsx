@@ -1137,31 +1137,6 @@ export default function AdminOrderDetailPage() {
             indented add-ons). Same shape used on /comanda, /comanda/checkout
             and the success page so admin reads the order the same way the
             customer placed it. */}
-        {/* De unde a venit clientul. Doar pentru comenzile de după migrarea
-            128 — cele vechi nu au atribuire, deci ascundem cardul complet în
-            loc să arătăm „necunoscut" pe jumătate din listă. */}
-        {order.attribution?.first && (
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base flex items-center gap-2">
-                <TrendingUp className="h-4 w-4" />
-                Proveniență client
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <AttributionBlock label="Prima vizită" touch={order.attribution.first} />
-              {/* `last` se afișează doar dacă diferă — altfel e zgomot. */}
-              {order.attribution.last &&
-                order.attribution.last.at !== order.attribution.first.at && (
-                  <AttributionBlock
-                    label="Ultima vizită (înainte de comandă)"
-                    touch={order.attribution.last}
-                  />
-                )}
-            </CardContent>
-          </Card>
-        )}
-
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-base flex items-center gap-2">
@@ -2526,6 +2501,31 @@ export default function AdminOrderDetailPage() {
           </CardHeader>
           <CardContent>
             <p className="text-sm whitespace-pre-wrap">{order.admin_notes}</p>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Proveniență client (atribuire marketing) — mutat la baza paginii:
+          e info de context, nu operațional, și sus îngreuna citirea comenzii.
+          Doar pentru comenzile de după migrarea 128 (cele vechi n-au atribuire). */}
+      {order.attribution?.first && (
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base flex items-center gap-2">
+              <TrendingUp className="h-4 w-4" />
+              Proveniență client
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <AttributionBlock label="Prima vizită" touch={order.attribution.first} />
+            {/* `last` se afișează doar dacă diferă — altfel e zgomot. */}
+            {order.attribution.last &&
+              order.attribution.last.at !== order.attribution.first.at && (
+                <AttributionBlock
+                  label="Ultima vizită (înainte de comandă)"
+                  touch={order.attribution.last}
+                />
+              )}
           </CardContent>
         </Card>
       )}
