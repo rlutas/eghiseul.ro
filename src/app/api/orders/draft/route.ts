@@ -213,6 +213,9 @@ export async function POST(request: NextRequest) {
           total_price: data.total_price || 0,
           coupon_code: data.coupon_code ?? null,
           discount_amount: data.discount_amount || 0,
+          // Pasul curent din wizard — ca admin-ul să vadă unde s-a blocat clientul
+          // și ca resume-ul să revină la pasul corect (nu la 'contact').
+          current_step: data.current_step || 'contact',
           updated_at: new Date().toISOString(),
         };
         const { data: updatedOrder, error: updateError } = await adminClient
@@ -280,6 +283,8 @@ export async function POST(request: NextRequest) {
       coupon_code: data.coupon_code ?? null,
       discount_amount: data.discount_amount || 0,
       payment_status: 'unpaid',
+      // Pasul curent din wizard (vezi nota de la updatePayload).
+      current_step: data.current_step || 'contact',
     };
 
     // Atribuire — scrisă DOAR aici, la creare. Update-urile ulterioare ale
@@ -520,6 +525,11 @@ export async function PATCH(request: NextRequest) {
     const updateData: Record<string, unknown> = {
       updated_at: new Date().toISOString(),
     };
+
+    if (body.current_step !== undefined) {
+      // Pasul curent — pt „unde s-a blocat clientul" + resume la pasul corect.
+      updateData.current_step = body.current_step;
+    }
 
     if (body.customer_data !== undefined) {
       // Never let an empty client section wipe a non-empty stored one.

@@ -682,13 +682,12 @@ function modularWizardReducer(
       // Guard: if the cached step ID is no longer in the visible step list
       // (e.g. legacy 'client-type' step which was merged into contact), fall
       // back to 'contact' so the wizard doesn't render a blank loading screen.
-      const cachedStepStillExists = steps.some(
-        (s) => s.id === cache.currentStepId
-      );
-      const safeStepId = cachedStepStillExists ? cache.currentStepId : 'contact';
-      const safeStepNumber = cachedStepStillExists
-        ? cache.currentStepNumber
-        : 1;
+      // Derivăm numărul pasului din step-ul real (nu ne bazăm pe
+      // cache.currentStepNumber, care poate fi stale la resume server-side unde
+      // avem doar stepId din DB `current_step`).
+      const matchedStep = steps.find((s) => s.id === cache.currentStepId);
+      const safeStepId = matchedStep ? cache.currentStepId : 'contact';
+      const safeStepNumber = matchedStep ? matchedStep.number : 1;
 
       return {
         ...state,
@@ -1094,7 +1093,9 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
                 orderId: order.id,
                 friendlyOrderId: order.friendly_order_id,
                 serviceSlug: state.serviceSlug!,
-                currentStepId: 'contact',
+                // Revenim la pasul la care era clientul (din DB `current_step`),
+                // nu forțat la 'contact'. Reducerul validează + derivă numărul.
+                currentStepId: (order.current_step as ModularStepId) || 'contact',
                 currentStepNumber: 1,
                 clientType: cd.company ? 'PJ' : cd.contact || cd.personal ? 'PF' : null,
                 data: {

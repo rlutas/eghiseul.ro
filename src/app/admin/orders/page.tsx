@@ -76,6 +76,7 @@ interface OrderRow {
   friendly_order_id: string | null;
   order_number: string;
   status: string | null;
+  current_step: string | null;
   total_price: number;
   payment_status: string | null;
   payment_method: string | null;
@@ -607,6 +608,13 @@ export default function AdminOrdersPage() {
                   </TableCell>
                   <TableCell>
                     <StatusBadge status={order.status || 'draft'} />
+                    {/* Pt comenzile neterminate: pasul la care s-a oprit clientul
+                        — ca echipa să vadă unde s-a blocat. */}
+                    {['draft', 'pending', 'abandoned'].includes(order.status || '') && order.current_step && (
+                      <div className="mt-0.5 text-[10px] text-muted-foreground whitespace-nowrap">
+                        pas: {stepLabel(order.current_step)}
+                      </div>
+                    )}
                   </TableCell>
                   <TableCell>
                     <PaymentBadge status={order.payment_status} method={order.payment_method} />
@@ -915,6 +923,26 @@ function ServiceBadge({ name, slug }: { name: string | null | undefined; slug: s
       {label}
     </span>
   );
+}
+
+// Etichete lizibile pt pasul din wizard (draft) — „unde s-a blocat clientul".
+const STEP_LABELS: Record<string, string> = {
+  'contact': 'Contact',
+  'client-type': 'Tip client',
+  'personal-data': 'Date personale',
+  'company-kyc': 'Date firmă',
+  'civil-status': 'Stare civilă',
+  'constatator': 'Date constatator',
+  'property': 'Date imobil',
+  'vehicle': 'Date vehicul',
+  'options': 'Opțiuni',
+  'delivery': 'Livrare',
+  'billing': 'Facturare',
+  'signature': 'Semnătură',
+  'review': 'Verificare',
+};
+function stepLabel(id: string): string {
+  return STEP_LABELS[id] || id;
 }
 
 function StatusBadge({ status }: { status: string }) {

@@ -66,6 +66,7 @@ export async function GET(request: NextRequest) {
         friendly_order_id,
         order_number,
         status,
+        current_step,
         total_price,
         payment_status,
         payment_method,
