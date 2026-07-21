@@ -29,6 +29,9 @@ export const HARDCODED_SERVICE_SLUGS = [
   'certificat-de-integritate-comportamentala',
   'extras-multilingv-certificat-nastere',
   'extras-multilingv-certificat-casatorie',
+  // Urbanism (2026-07-21) — pagină nouă; 7 pagini interne + footer-ul legau
+  // deja acest slug (link mort până acum).
+  'certificat-urbanism-informare',
   // Servicii cadastrale topograf (folder == slug DB, fără redirect) — pagini
   // hand-tuned 1000+ cuvinte, merită prioritate 0.9 în sitemap.
   'certificat-sarcini',
