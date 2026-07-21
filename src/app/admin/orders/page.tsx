@@ -595,8 +595,8 @@ export default function AdminOrdersPage() {
                       </button>
                     ) : null}
                   </TableCell>
-                  <TableCell className="max-w-[180px] truncate text-sm">
-                    {order.services?.name || '-'}
+                  <TableCell className="text-sm">
+                    <ServiceBadge name={order.services?.name} slug={order.services?.slug} />
                   </TableCell>
                   <TableCell>
                     <StatusBadge status={order.status || 'draft'} />
@@ -867,6 +867,48 @@ function getCustomerName(order: OrderRow): string {
   if (billing?.type === 'persoana_juridica' && billing?.companyName) return billing.companyName;
   if (b?.name) return b.name;
   return 'N/A';
+}
+
+// Badge colorat pe serviciu — culorile de la cazierjudiciaronline.com pentru
+// judiciar/auto/fiscal/integritate; roz nou pentru stare civilă. Restul
+// serviciilor (extras CF, constatator, identificare imobil, rovinietă...) rămân
+// gri neutru. „Cazier Judiciar Persoană Fizică/Juridică" e prescurtat PF/PJ —
+// textul complet e prea lung și se tăia în coloană.
+function ServiceBadge({ name, slug }: { name: string | null | undefined; slug: string | null | undefined }) {
+  const s = (slug || '').toLowerCase();
+  const n = (name || '').toLowerCase();
+  let className = 'bg-neutral-100 text-neutral-600';
+  let label = name || '-';
+
+  if (s.startsWith('cazier-judiciar')) {
+    className = 'bg-blue-100 text-blue-800';
+    label =
+      s.includes('juridica') || n.includes('juridic')
+        ? 'Cazier Judiciar PJ'
+        : s.includes('fizica') || n.includes('fizic')
+        ? 'Cazier Judiciar PF'
+        : 'Cazier Judiciar';
+  } else if (s.startsWith('cazier-auto')) {
+    className = 'bg-amber-100 text-amber-800';
+    label = 'Cazier Auto';
+  } else if (s.startsWith('cazier-fiscal')) {
+    className = 'bg-emerald-100 text-emerald-800';
+    label = 'Cazier Fiscal';
+  } else if (s.includes('integritate')) {
+    className = 'bg-violet-100 text-violet-800';
+    label = 'Certificat Integritate';
+  } else if (s.includes('nastere') || s.includes('casatorie') || s.includes('celibat')) {
+    className = 'bg-pink-100 text-pink-800';
+    label = name || 'Stare civilă';
+  }
+
+  return (
+    <span
+      className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium whitespace-nowrap ${className}`}
+    >
+      {label}
+    </span>
+  );
 }
 
 function StatusBadge({ status }: { status: string }) {
