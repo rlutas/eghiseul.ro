@@ -187,7 +187,9 @@ export default function Page() {
         istoricul complet al firmei e{' '}
         <Link href="/certificat-constatator-cu-istoric/">documentul cu istoric</Link>. Ghidul
         complet al tipurilor e{' '}
-        <Link href="/cele-4-tipuri-de-certificat-constatator-online/">aici</Link>.
+        <Link href="/cele-4-tipuri-de-certificat-constatator-online/">aici</Link>, iar toate
+        variantele se comandă din pagina de{' '}
+        <Link href="/servicii/certificat-constatator-online/">certificat constatator online</Link>.
       </p>
     </ArticleLayout>
   );

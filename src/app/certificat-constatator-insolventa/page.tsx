@@ -155,7 +155,9 @@ export default function Page() {
         Termenul de 24 de ore nu e artificiu de vânzare, e circuitul real: rapoartele de
         insolvență trec prin backoffice-ul ONRC, nu se emit instant ca{' '}
         <Link href="/certificat-constatator-de-baza/">certificatul de bază</Link>. Dacă ai termen
-        de depunere, comandă cu o zi-două înainte.
+        de depunere, comandă cu o zi-două înainte. Toate tipurile — de bază, PFA, cu istoric — se
+        comandă din pagina de{' '}
+        <Link href="/servicii/certificat-constatator-online/">certificat constatator online</Link>.
       </p>
 
       <h2>Verificarea gratuită vs. documentul oficial</h2>

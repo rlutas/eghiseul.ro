@@ -161,7 +161,9 @@ export default function Page() {
         primește certificat pe persoană fizică, pe CNP. Dacă instituția vrea situația ambelor,
         comanzi două certificate. Iar dacă ai nevoie de istoricul complet al unei firme (asociați
         vechi, sedii schimbate), acela e{' '}
-        <Link href="/certificat-constatator-cu-istoric/">certificatul cu istoric</Link>.
+        <Link href="/certificat-constatator-cu-istoric/">certificatul cu istoric</Link>. Toate
+        tipurile se comandă din pagina de{' '}
+        <Link href="/servicii/certificat-constatator-online/">certificat constatator online</Link>.
       </p>
     </ArticleLayout>
   );
