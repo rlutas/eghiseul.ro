@@ -131,3 +131,12 @@ lunară în GSC (raportul nou „AI generativ").
 
 **Skills la execuție:** fiecare pagină nouă/refresh = /seo-geo + /humanizer +
 /seo (audit final pe pagină). Nu s-au încărcat la planificare (economie context).
+
+---
+## STATUS EXECUȚIE (2026-07-21, seara)
+- ✅ #1 cazier-auto: bug reparat (KYC suprascriere), emailuri trimise de Raul — monitorizare 72h.
+- ✅ #2 pagina certificat urbanism LIVE (+ reparate 7 link-uri moarte, în sitemap).
+- ✅ #3 punți+email: EXISTAU deja în CalculatorLayout (RELATED_BY_SLUG + NewsletterPopup, 40 pagini);
+  gap-ul real era /tools/verificare-rovinieta-online (13,8k clicuri, fără layout) — închis azi
+  (grilă 3 servicii + NewsletterPopup).
+- ⏭️ URMEAZĂ: #4 constatator on-page refresh; #5 CF location pages (10-15 județe); #6 backlink sprint.
