@@ -140,3 +140,7 @@ lunară în GSC (raportul nou „AI generativ").
   gap-ul real era /tools/verificare-rovinieta-online (13,8k clicuri, fără layout) — închis azi
   (grilă 3 servicii + NewsletterPopup).
 - ⏭️ URMEAZĂ: #4 constatator on-page refresh; #5 CF location pages (10-15 județe); #6 backlink sprint.
+- ✅ #4 constatator refresh (5b6dea2): title/meta intenție, tabel comparativ, FAQ 17, interlink landing-uri.
+- ✅ #5 CF location pages (1cd2526): AUDIT — paginile existau ca doorway (~40-50 cuvinte unice/județ);
+  primele 15 județe au acum localități reale + highlight factual + 2 FAQ locale (~200-250 cuvinte unice).
+  Restul de 27 rămân pe template subțire — de extins în valul 2. Rămas din plan: #6 backlink sprint, #7 test conversie naștere.
