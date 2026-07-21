@@ -39,6 +39,7 @@ import {
 } from 'lucide-react';
 import { STATUS_TABS, type OrdersCounts } from '@/lib/admin/orders-tabs';
 import { formatRelative } from '@/lib/relative-time';
+import { stepLabel } from '@/lib/admin/wizard-steps';
 
 const STATUS_CONFIG: Record<
   string,
@@ -923,26 +924,6 @@ function ServiceBadge({ name, slug }: { name: string | null | undefined; slug: s
       {label}
     </span>
   );
-}
-
-// Etichete lizibile pt pasul din wizard (draft) — „unde s-a blocat clientul".
-const STEP_LABELS: Record<string, string> = {
-  'contact': 'Contact',
-  'client-type': 'Tip client',
-  'personal-data': 'Date personale',
-  'company-kyc': 'Date firmă',
-  'civil-status': 'Stare civilă',
-  'constatator': 'Date constatator',
-  'property': 'Date imobil',
-  'vehicle': 'Date vehicul',
-  'options': 'Opțiuni',
-  'delivery': 'Livrare',
-  'billing': 'Facturare',
-  'signature': 'Semnătură',
-  'review': 'Verificare',
-};
-function stepLabel(id: string): string {
-  return STEP_LABELS[id] || id;
 }
 
 function StatusBadge({ status }: { status: string }) {

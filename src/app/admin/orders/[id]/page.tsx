@@ -19,6 +19,7 @@ import { isForeignBillingCountry } from '@/lib/orders/billing-validation';
 import { isNoLawyerService } from '@/lib/documents/no-lawyer-services';
 import { computeDelegationItems } from '@/lib/documents/delegation-items';
 import { REUPLOAD_DOC_SPECS, suggestedDocsForService } from '@/lib/reupload/doc-types';
+import { STEP_LABELS } from '@/lib/admin/wizard-steps';
 import {
   type KycPerDoc,
   extractKycByDocType,
@@ -107,6 +108,7 @@ interface OrderDetail {
   order_number: string;
   attribution?: OrderAttribution | null;
   status: string | null;
+  current_step: string | null;
   total_price: number;
   base_price: number;
   options_price: number | null;
@@ -1098,6 +1100,44 @@ export default function AdminOrderDetailPage() {
           click processes the Stripe refund (70%) and flips to 'refunded'. */}
       {order.status === 'cancellation_requested' && (
         <CancellationRequestedBanner order={order} onProcessed={refreshSilent} />
+      )}
+
+      {/* „Unde s-a blocat clientul" — pt comenzile neterminate (draft/pending/
+          abandoned): arată pasul din wizard la care s-a oprit, ca echipa să
+          știe exact unde a rămas fără să caute prin customer_data. */}
+      {['draft', 'pending', 'abandoned'].includes(order.status || '') && (
+        <div className="rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm">
+          <span className="font-semibold text-amber-900">Comandă neterminată</span>
+          {order.current_step && (
+            <span className="text-amber-800">
+              {' '}— clientul s-a oprit la pasul <strong>{STEP_LABELS[order.current_step] || order.current_step}</strong>.
+              Verifică datele completate mai jos ca să vezi unde s-a blocat.
+            </span>
+          )}
+          <div className="mt-2">
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-7 text-xs"
+              onClick={() => {
+                const email = encodeURIComponent((order.customer_data as AnyObj | null)?.contact?.email || '');
+                const friendly = order.friendly_order_id || order.order_number;
+                const slug = order.services?.slug || 'cazier-judiciar';
+                // Draft = înapoi în formular la pasul salvat; pending/abandoned
+                // (dincolo de formular) = pagina de checkout. Link-ul cere
+                // email-ul comenzii (guard hardening draft — vezi 88007c4).
+                const url =
+                  order.status === 'draft'
+                    ? `${window.location.origin}/comanda/${slug}?order=${encodeURIComponent(friendly)}&email=${email}`
+                    : `${window.location.origin}/comanda/checkout/${order.id}`;
+                navigator.clipboard?.writeText(url);
+                toast.success('Link de continuare copiat — trimite-l clientului (WhatsApp/email)');
+              }}
+            >
+              Copiază link continuare
+            </Button>
+          </div>
+        </div>
       )}
 
       {/* Extra-payment banners (parity with CJO admin): pending link the

@@ -72,11 +72,14 @@ vezi pasul, nu blocajul. Și „operator continuă în locul clientului".
    (migrarea 129, rulată în prod); draft route o persistă (3 căi de scriere);
    lista admin arată „pas: X" pe draft/pending/abandoned; resume server-side
    revine la pasul salvat (reducerul RESTORE derivă numărul din stepId, nu mai
-   hardcodează 'contact'). Rămas: panou detaliu (Faza 2), editare (2.5), buton
-   link (3), apoi CJO.
-2. **Faza 2** — panou admin „unde s-a blocat" (pas + câmpuri grupate + lipsuri).
-3. **Faza 2.5** — operator editează date formular (fără KYC/contract/plată).
-4. **Faza 3** — buton „Trimite link continuare" (+cupon), model securizat eghiseul.
+   hardcodează 'contact').
+2. **Faza 2 — LIVRAT (eghiseul):** banner pe detaliu („Comandă neterminată —
+   oprit la pasul X") + pas în listă; câmpurile completate se văd deja pe detaliu.
+3. **Faza 3 minimal — LIVRAT (eghiseul):** buton „Copiază link continuare" în
+   banner (draft → wizard la pas; pending/abandoned → checkout). Email+cupon cu
+   un click = extensie viitoare.
+4. **RĂMAS: Faza 2.5** — operator editează câmpuri formular (fără KYC/contract/
+   plată). Refolosește `ModifyOrderDialog` extins pt drafturi + audit.
 5. (CJO e mai aproape: are `last_step` + `/admin/abandoned`; primește editarea +
    butonul de link cu securitatea întărită.)
 
