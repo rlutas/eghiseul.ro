@@ -1106,38 +1106,7 @@ export default function AdminOrderDetailPage() {
           abandoned): arată pasul din wizard la care s-a oprit, ca echipa să
           știe exact unde a rămas fără să caute prin customer_data. */}
       {['draft', 'pending', 'abandoned'].includes(order.status || '') && (
-        <div className="rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm">
-          <span className="font-semibold text-amber-900">Comandă neterminată</span>
-          {order.current_step && (
-            <span className="text-amber-800">
-              {' '}— clientul s-a oprit la pasul <strong>{STEP_LABELS[order.current_step] || order.current_step}</strong>.
-              Verifică datele completate mai jos ca să vezi unde s-a blocat.
-            </span>
-          )}
-          <div className="mt-2">
-            <Button
-              size="sm"
-              variant="outline"
-              className="h-7 text-xs"
-              onClick={() => {
-                const email = encodeURIComponent((order.customer_data as AnyObj | null)?.contact?.email || '');
-                const friendly = order.friendly_order_id || order.order_number;
-                const slug = order.services?.slug || 'cazier-judiciar';
-                // Draft = înapoi în formular la pasul salvat; pending/abandoned
-                // (dincolo de formular) = pagina de checkout. Link-ul cere
-                // email-ul comenzii (guard hardening draft — vezi 88007c4).
-                const url =
-                  order.status === 'draft'
-                    ? `${window.location.origin}/comanda/${slug}?order=${encodeURIComponent(friendly)}&email=${email}`
-                    : `${window.location.origin}/comanda/checkout/${order.id}`;
-                navigator.clipboard?.writeText(url);
-                toast.success('Link de continuare copiat — trimite-l clientului (WhatsApp/email)');
-              }}
-            >
-              Copiază link continuare
-            </Button>
-          </div>
-        </div>
+        <StuckClientBanner order={order} onChanged={refreshSilent} />
       )}
 
       {/* Extra-payment banners (parity with CJO admin): pending link the
@@ -4610,6 +4579,145 @@ function AttributionBlock({ label, touch }: { label: string; touch: AttributionT
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+// ---------- „Comandă neterminată" (client blocat) ----------
+// Banner pe draft/pending/abandoned: pasul la care s-a oprit clientul + link de
+// continuare (draft → token admin-emis care hidratează indiferent de email;
+// pending/abandoned → checkout) + editor de date formular (Faza 2.5): operatorul
+// corectează nume/CNP/adresă/contact, clientul continuă cu datele de pe server.
+// NU se ating KYC / semnătură / plată — rămân la client.
+function StuckClientBanner({ order, onChanged }: { order: OrderDetail; onChanged: () => void }) {
+  const [generating, setGenerating] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const cd = (order.customer_data as AnyObj | null) ?? {};
+  const contact = (cd.contact as AnyObj | null) ?? {};
+  const personal = (cd.personal as AnyObj | null) ?? {};
+  const addr = (personal.address as AnyObj | null) ?? {};
+  const [form, setForm] = useState({
+    contactFirstName: String(contact.firstName ?? ''),
+    contactLastName: String(contact.lastName ?? ''),
+    contactEmail: String(contact.email ?? ''),
+    contactPhone: String(contact.phone ?? ''),
+    personalFirstName: String(personal.firstName ?? ''),
+    personalLastName: String(personal.lastName ?? ''),
+    personalCnp: String(personal.cnp ?? ''),
+    street: String(addr.street ?? ''),
+    number: String(addr.number ?? ''),
+    city: String(addr.city ?? ''),
+    county: String(addr.county ?? ''),
+    postalCode: String(addr.postalCode ?? ''),
+  });
+  const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) =>
+    setForm((p) => ({ ...p, [k]: e.target.value }));
+
+  const copyResumeLink = async () => {
+    if (order.status !== 'draft') {
+      const url = `${window.location.origin}/comanda/checkout/${order.id}`;
+      navigator.clipboard?.writeText(url);
+      toast.success('Link de checkout copiat — trimite-l clientului');
+      return;
+    }
+    setGenerating(true);
+    try {
+      const res = await fetch(`/api/admin/orders/${order.id}/resume-link`, { method: 'POST' });
+      const json = await res.json();
+      if (!json.success) throw new Error(json.error || 'Eroare');
+      await navigator.clipboard?.writeText(json.data.resumeUrl);
+      toast.success('Link de continuare copiat (valabil 48h) — merge chiar dacă clientul nu apucase să-și pună emailul');
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Nu am putut genera linkul');
+    } finally {
+      setGenerating(false);
+    }
+  };
+
+  const save = async () => {
+    setSaving(true);
+    try {
+      const res = await fetch(`/api/admin/orders/${order.id}/edit-draft`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contact: {
+            firstName: form.contactFirstName, lastName: form.contactLastName,
+            email: form.contactEmail, phone: form.contactPhone,
+          },
+          personal: {
+            firstName: form.personalFirstName, lastName: form.personalLastName,
+            cnp: form.personalCnp,
+          },
+          personalAddress: {
+            street: form.street, number: form.number, city: form.city,
+            county: form.county, postalCode: form.postalCode,
+          },
+        }),
+      });
+      const json = await res.json();
+      if (!json.success) throw new Error(json.error || 'Eroare');
+      toast.success(`Date corectate (${json.data.changedFields.length} câmpuri) — clientul primește varianta de pe server la revenire`);
+      setEditOpen(false);
+      onChanged();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Nu am putut salva');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className="rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm">
+      <span className="font-semibold text-amber-900">Comandă neterminată</span>
+      {order.current_step && (
+        <span className="text-amber-800">
+          {' '}— clientul s-a oprit la pasul <strong>{STEP_LABELS[order.current_step] || order.current_step}</strong>.
+        </span>
+      )}
+      <div className="mt-2 flex flex-wrap gap-2">
+        <Button size="sm" variant="outline" className="h-7 text-xs" onClick={copyResumeLink} disabled={generating}>
+          {generating ? <Loader2 className="mr-1 h-3 w-3 animate-spin" /> : null}
+          Copiază link continuare
+        </Button>
+        <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => setEditOpen((v) => !v)}>
+          {editOpen ? 'Închide editarea' : 'Editează datele clientului'}
+        </Button>
+      </div>
+
+      {editOpen && (
+        <div className="mt-3 space-y-3 rounded-lg border border-amber-200 bg-white p-3">
+          <p className="text-xs text-muted-foreground">
+            Corectezi doar date de formular (contact, nume/CNP, adresă). KYC-ul,
+            semnătura și plata rămân la client. La revenire, clientul primește
+            automat datele corectate de pe server.
+          </p>
+          <div className="grid grid-cols-2 gap-2">
+            <Input value={form.contactFirstName} onChange={set('contactFirstName')} placeholder="Prenume (contact)" className="h-8 text-xs" />
+            <Input value={form.contactLastName} onChange={set('contactLastName')} placeholder="Nume (contact)" className="h-8 text-xs" />
+            <Input value={form.contactEmail} onChange={set('contactEmail')} placeholder="Email" className="h-8 text-xs" />
+            <Input value={form.contactPhone} onChange={set('contactPhone')} placeholder="Telefon" className="h-8 text-xs" />
+            <Input value={form.personalFirstName} onChange={set('personalFirstName')} placeholder="Prenume (act)" className="h-8 text-xs" />
+            <Input value={form.personalLastName} onChange={set('personalLastName')} placeholder="Nume (act)" className="h-8 text-xs" />
+            <Input value={form.personalCnp} onChange={set('personalCnp')} placeholder="CNP" className="h-8 text-xs col-span-2" />
+            <Input value={form.street} onChange={set('street')} placeholder="Stradă" className="h-8 text-xs" />
+            <Input value={form.number} onChange={set('number')} placeholder="Nr." className="h-8 text-xs" />
+            <Input value={form.city} onChange={set('city')} placeholder="Localitate" className="h-8 text-xs" />
+            <Input value={form.county} onChange={set('county')} placeholder="Județ" className="h-8 text-xs" />
+            <Input value={form.postalCode} onChange={set('postalCode')} placeholder="Cod poștal" className="h-8 text-xs" />
+          </div>
+          <div className="flex gap-2">
+            <Button size="sm" className="h-7 text-xs" onClick={save} disabled={saving}>
+              {saving ? <Loader2 className="mr-1 h-3 w-3 animate-spin" /> : null}
+              Salvează corecturile
+            </Button>
+            <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => setEditOpen(false)} disabled={saving}>
+              Renunță
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

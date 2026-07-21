@@ -42,8 +42,12 @@ plătească din nou — doar reîncarcă documentele cerute.
 4. Dacă i-a plecat link de continuare (email de recuperare), acum îl duce înapoi
    **la pasul corect**, nu de la început.
 
-**În curând** (următoarele faze): veți putea **repara direct câmpuri greșite**
-(nume/adresă/CNP) din admin + **trimite link de continuare cu un click**.
+**5. Ajutor direct (nou):** pe bannerul galben „Comandă neterminată" aveți:
+- **„Copiază link continuare"** — pe ciorne generează un link special (valabil
+  48h) care îl duce pe client înapoi în formular, la pasul lui, cu datele lui —
+  **merge chiar dacă clientul nu apucase să-și pună emailul**.
+- **„Editează datele clientului"** — corectați nume / CNP / adresă / contact
+  direct din admin; la revenire clientul primește automat datele corectate.
 (Contractul, KYC-ul și plata rămân mereu la client — pe astea nu le facem noi.)
 
 ---

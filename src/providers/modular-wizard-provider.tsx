@@ -893,6 +893,69 @@ const ModularWizardContext = createContext<ModularWizardContextType | null>(null
 // HELPERS
 // ============================================================================
 
+// Mapare payload server (GET /api/orders/draft) → ModularDraftCache. Folosită
+// de resume-ul via ?order=/?resume= ȘI de verificarea de prospețime a
+// localStorage-ului (editările operatorului de pe server bat cache-ul local).
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function serverOrderToCache(order: any, serviceSlug: string): ModularDraftCache {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const cd = (order.customer_data as any) || {};
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const selectedOptions = ((order.selected_options as any[]) || []).map((o) => ({
+    optionId: o.option_id,
+    optionName: o.option_name,
+    optionDescription: o.option_description || '',
+    quantity: o.quantity || 1,
+    priceModifier: o.price_modifier ?? 0,
+    code: o.code,
+    isAutoApplied: o.is_auto_applied ?? undefined,
+    bundledFor: o.bundled_for
+      ? {
+          parentOptionId: o.bundled_for.parent_option_id,
+          bundledServiceSlug: o.bundled_for.bundled_service_slug,
+          bundledOptionCode: o.bundled_for.bundled_option_code,
+        }
+      : undefined,
+    metadata: o.metadata,
+  }));
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const dm = order.delivery_method as any;
+  const delivery = dm
+    ? {
+        ...createInitialDeliveryState(),
+        method: dm.type,
+        methodName: dm.name,
+        price: dm.price,
+        estimatedDays: dm.estimated_days,
+        courierProvider: dm.provider ?? undefined,
+        courierService: dm.service ?? undefined,
+        address: order.delivery_address || undefined,
+      }
+    : createInitialDeliveryState();
+  return {
+    orderId: order.id,
+    friendlyOrderId: order.friendly_order_id,
+    serviceSlug,
+    currentStepId: (order.current_step as ModularStepId) || 'contact',
+    currentStepNumber: 1,
+    clientType: cd.company ? 'PJ' : cd.contact || cd.personal ? 'PF' : null,
+    data: {
+      contact: cd.contact,
+      personalKyc: cd.personal ?? null,
+      civilStatus: cd.civil_status ?? null,
+      constatator: cd.constatator ?? null,
+      companyKyc: cd.company ?? null,
+      property: cd.property ?? null,
+      vehicle: cd.vehicle ?? null,
+      billing: cd.billing ?? null,
+      selectedOptions,
+      delivery,
+    },
+    lastSavedAt: order.last_saved_at || new Date(0).toISOString(),
+    version: CACHE_VERSION,
+  };
+}
+
 function hasValidContactData(contact: ModularWizardState['contact']): boolean {
   return Boolean(
     contact.email &&
@@ -1047,76 +1110,21 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
         const urlParams = new URLSearchParams(window.location.search);
         const orderParam = urlParams.get('order');
         const emailParam = urlParams.get('email');
-        if (orderParam && validateOrderId(orderParam)) {
-          const qs = new URLSearchParams({ id: orderParam });
-          if (emailParam) qs.set('email', emailParam);
+        // Token de continuare emis de admin (?resume=) — hidratează draftul
+        // indiferent de email (clienți blocați înainte de pasul contact).
+        const resumeParam = urlParams.get('resume');
+        if (resumeParam || (orderParam && validateOrderId(orderParam))) {
+          const qs = resumeParam
+            ? new URLSearchParams({ resume: resumeParam })
+            : new URLSearchParams({ id: orderParam! });
+          if (!resumeParam && emailParam) qs.set('email', emailParam);
           const res = await fetch(`/api/orders/draft?${qs.toString()}`);
           if (res.ok) {
             const json = await res.json();
             const order = json?.data?.order;
             if (order && order.status === 'draft') {
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              const cd = (order.customer_data as any) || {};
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              const selectedOptions = ((order.selected_options as any[]) || []).map((o) => ({
-                optionId: o.option_id,
-                optionName: o.option_name,
-                optionDescription: o.option_description || '',
-                quantity: o.quantity || 1,
-                priceModifier: o.price_modifier ?? 0,
-                code: o.code,
-                isAutoApplied: o.is_auto_applied ?? undefined,
-                bundledFor: o.bundled_for
-                  ? {
-                      parentOptionId: o.bundled_for.parent_option_id,
-                      bundledServiceSlug: o.bundled_for.bundled_service_slug,
-                      bundledOptionCode: o.bundled_for.bundled_option_code,
-                    }
-                  : undefined,
-                metadata: o.metadata,
-              }));
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              const dm = order.delivery_method as any;
-              const delivery = dm
-                ? {
-                    ...createInitialDeliveryState(),
-                    method: dm.type,
-                    methodName: dm.name,
-                    price: dm.price,
-                    estimatedDays: dm.estimated_days,
-                    courierProvider: dm.provider ?? undefined,
-                    courierService: dm.service ?? undefined,
-                    address: order.delivery_address || undefined,
-                  }
-                : createInitialDeliveryState();
-              const cache: ModularDraftCache = {
-                orderId: order.id,
-                friendlyOrderId: order.friendly_order_id,
-                serviceSlug: state.serviceSlug!,
-                // Revenim la pasul la care era clientul (din DB `current_step`),
-                // nu forțat la 'contact'. Reducerul validează + derivă numărul.
-                currentStepId: (order.current_step as ModularStepId) || 'contact',
-                currentStepNumber: 1,
-                clientType: cd.company ? 'PJ' : cd.contact || cd.personal ? 'PF' : null,
-                data: {
-                  contact: cd.contact,
-                  personalKyc: cd.personal ?? null,
-                  civilStatus: cd.civil_status ?? null,
-                  constatator: cd.constatator ?? null,
-                  companyKyc: cd.company ?? null,
-                  // property/vehicle were missing here → every server resume of
-                  // a property/vehicle service restored EMPTY module state and
-                  // the next autosave wiped the server copy (incident
-                  // E-260710-2S5EH, 2026-07-10).
-                  property: cd.property ?? null,
-                  vehicle: cd.vehicle ?? null,
-                  billing: cd.billing ?? null,
-                  selectedOptions,
-                  delivery,
-                },
-                lastSavedAt: order.last_saved_at || new Date(0).toISOString(),
-                version: CACHE_VERSION,
-              };
+              // property/vehicle incluse în mapare (incident E-260710-2S5EH).
+              const cache = serverOrderToCache(order, state.serviceSlug!);
               console.log('Restoring draft from server:', order.friendly_order_id);
               dispatch({ type: 'RESTORE_FROM_CACHE', payload: cache });
               return;
@@ -1143,21 +1151,39 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
                 localStorage.removeItem(key);
                 continue;
               }
-              // Verify with server that this order is still a draft (only for logged-in users)
+              // Verify with server: (a) still a draft? (b) server newer than the
+              // local cache? Un operator poate corecta date în admin
+              // (admin_edited_at bump-uie updated_at) — atunci serverul e sursa
+              // de adevăr și cache-ul local mai vechi NU are voie să-l bată
+              // (decizie Raul 2026-07-21). Guests folosesc email-ul din cache.
               if (cacheData.friendlyOrderId) {
                 try {
                   const supabase = createClient();
                   const { data: { session } } = await supabase.auth.getSession();
+                  const cachedEmail = cacheData.data?.contact?.email;
 
-                  if (session) {
-                    const response = await fetch(`/api/orders/draft?id=${encodeURIComponent(cacheData.friendlyOrderId)}`);
+                  const qs = new URLSearchParams({ id: cacheData.friendlyOrderId });
+                  if (!session && cachedEmail) qs.set('email', cachedEmail);
+                  if (session || cachedEmail) {
+                    const response = await fetch(`/api/orders/draft?${qs.toString()}`);
                     if (response.ok) {
                       const data = await response.json();
+                      const serverOrder = data.data?.order;
                       // If order exists but is NOT a draft anymore, clear cache and start fresh
-                      if (data.data?.order?.status && data.data.order.status !== 'draft') {
+                      if (serverOrder?.status && serverOrder.status !== 'draft') {
                         console.log('Order is no longer a draft, clearing cache:', cacheData.friendlyOrderId);
                         localStorage.removeItem(key);
                         dispatch({ type: 'MARK_INITIALIZED' });
+                        return;
+                      }
+                      // Server mai nou decât cache-ul local (ex. editare
+                      // operator) → hidratăm de pe SERVER, nu din localStorage.
+                      const serverSavedAt = Date.parse(serverOrder?.last_saved_at || '') || 0;
+                      const cacheSavedAt = Date.parse(cacheData.lastSavedAt || '') || 0;
+                      if (serverOrder?.status === 'draft' && serverSavedAt > cacheSavedAt) {
+                        console.log('Server draft newer than local cache — restoring from server:', cacheData.friendlyOrderId);
+                        const cache = serverOrderToCache(serverOrder, state.serviceSlug!);
+                        dispatch({ type: 'RESTORE_FROM_CACHE', payload: cache });
                         return;
                       }
                     } else if (response.status === 404) {
@@ -1168,7 +1194,6 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
                       return;
                     }
                   }
-                  // Guest users: skip server verify, restore directly from localStorage
                 } catch (fetchError) {
                   console.warn('Failed to verify draft status:', fetchError);
                   // On network error, still try to restore from cache

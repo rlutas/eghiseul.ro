@@ -78,8 +78,19 @@ vezi pasul, nu blocajul. Și „operator continuă în locul clientului".
 3. **Faza 3 minimal — LIVRAT (eghiseul):** buton „Copiază link continuare" în
    banner (draft → wizard la pas; pending/abandoned → checkout). Email+cupon cu
    un click = extensie viitoare.
-4. **RĂMAS: Faza 2.5** — operator editează câmpuri formular (fără KYC/contract/
-   plată). Refolosește `ModifyOrderDialog` extins pt drafturi + audit.
+4. **Faza 2.5 + token resume — LIVRAT 2026-07-21 (eghiseul):**
+   - Migrarea 130 (rulată): `resume_token`/`resume_token_expires_at`/`admin_edited_at`.
+   - **Link continuare cu token admin-emis** (48h, POST `/resume-link`): hidratează
+     draftul indiferent de email → acoperă clienții blocați ÎNAINTE de pasul
+     contact + verificarea de operator. `?resume=<token>` în wizard.
+   - **Editor date formular** în bannerul „Comandă neterminată" (PATCH
+     `/edit-draft`): whitelist strict contact/nume/CNP/adresă/billing; merge
+     non-distructiv; audit în order_history (căi, fără PII). KYC/semnătură/plată
+     rămân la client.
+   - **Invalidare localStorage**: la restore, provider-ul verifică serverul
+     (guests cu email-ul din cache); dacă serverul e mai nou (editare operator →
+     `admin_edited_at`/`updated_at` bump) → hidratează de pe SERVER, nu din
+     cache-ul local (decizie Raul).
 5. (CJO e mai aproape: are `last_step` + `/admin/abandoned`; primește editarea +
    butonul de link cu securitatea întărită.)
 

@@ -649,8 +649,12 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const friendlyOrderId = searchParams.get('id');
     const email = searchParams.get('email');
+    // Token de continuare emis de ADMIN (migrarea 130): hidratează draftul
+    // indiferent de email — acoperă clienții blocați înainte de pasul contact
+    // (fără email salvat) și verificarea de către operator. Opac, 48h.
+    const resumeToken = searchParams.get('resume');
 
-    if (!friendlyOrderId) {
+    if (!friendlyOrderId && !resumeToken) {
       return NextResponse.json(
         {
           success: false,
@@ -667,7 +671,7 @@ export async function GET(request: NextRequest) {
     const { data: { user } } = await supabase.auth.getUser();
 
     // Fetch the order (use admin client to bypass RLS for guest orders)
-    const { data: order, error: orderError } = await adminClient
+    let orderQuery = adminClient
       .from('orders')
       .select(`
         *,
@@ -679,9 +683,11 @@ export async function GET(request: NextRequest) {
           currency
         )
       `)
-      .eq('friendly_order_id', friendlyOrderId)
-      .eq('status', 'draft')
-      .single();
+      .eq('status', 'draft');
+    orderQuery = resumeToken
+      ? orderQuery.eq('resume_token', resumeToken)
+      : orderQuery.eq('friendly_order_id', friendlyOrderId!);
+    const { data: order, error: orderError } = await orderQuery.single();
 
     if (orderError || !order) {
       return NextResponse.json(
@@ -693,6 +699,21 @@ export async function GET(request: NextRequest) {
           },
         },
         { status: 404 }
+      );
+    }
+
+    // Token expirat → refuză (operatorul generează unul nou din admin).
+    if (
+      resumeToken &&
+      (!order.resume_token_expires_at ||
+        new Date(order.resume_token_expires_at).getTime() < Date.now())
+    ) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: { code: 'TOKEN_EXPIRED', message: 'Linkul de continuare a expirat. Cere unul nou.' },
+        },
+        { status: 410 }
       );
     }
 
@@ -709,7 +730,10 @@ export async function GET(request: NextRequest) {
 
     let isOwner = false;
 
-    if (user && order.user_id === user.id) {
+    if (resumeToken) {
+      // Token admin-emis, neghicibil, cu expirare — echivalent de ownership.
+      isOwner = true;
+    } else if (user && order.user_id === user.id) {
       // Authenticated user accessing their own order
       isOwner = true;
     } else if (!order.user_id && orderEmail && email && email.toLowerCase() === orderEmail) {
