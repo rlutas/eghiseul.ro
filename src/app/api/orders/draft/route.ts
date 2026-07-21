@@ -747,6 +747,9 @@ export async function GET(request: NextRequest) {
           friendly_order_id: order.friendly_order_id,
           service: order.service,
           status: order.status,
+          // Pasul salvat — fără el, resume-ul server-side ateriza mereu pe
+          // 'contact' (finding code-review 2026-07-21).
+          current_step: order.current_step,
           customer_data: order.customer_data,
           selected_options: order.selected_options,
           kyc_documents: order.kyc_documents,

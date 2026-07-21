@@ -131,6 +131,7 @@ export type Database = {
           delivery_tracking_events: Json | null
           delivery_tracking_last_update: string | null
           delivery_tracking_number: string | null
+          current_step: string | null
           delivery_tracking_status: string | null
           delivery_tracking_url: string | null
           courier_provider: string | null
@@ -191,6 +192,7 @@ export type Database = {
           delivery_tracking_events?: Json | null
           delivery_tracking_last_update?: string | null
           delivery_tracking_number?: string | null
+          current_step?: string | null
           delivery_tracking_status?: string | null
           delivery_tracking_url?: string | null
           courier_provider?: string | null
@@ -251,6 +253,7 @@ export type Database = {
           delivery_tracking_events?: Json | null
           delivery_tracking_last_update?: string | null
           delivery_tracking_number?: string | null
+          current_step?: string | null
           delivery_tracking_status?: string | null
           delivery_tracking_url?: string | null
           courier_provider?: string | null
