@@ -3711,6 +3711,22 @@ function ProcessingSection({
   const handleDownloadDocument = async (doc: OrderDocument) => {
     setDownloadingDoc(doc.id);
     try {
+      const isWordDoc = /\.docx?$/i.test(doc.s3_key);
+      if (isWordDoc) {
+        // Word documents (cereri, împuternicire, contracte) are unusable for
+        // colleagues without Microsoft Word. Serve the faithfully-rendered PDF
+        // instead — opens + prints anywhere, no Word, no Google Drive detour.
+        // The route falls back to the DOCX if PDF conversion is unavailable.
+        const pdfUrl = `/api/admin/orders/${order.id}/preview-document?key=${encodeURIComponent(doc.s3_key)}&download=1`;
+        const a = document.createElement('a');
+        a.href = pdfUrl;
+        a.download = doc.file_name.replace(/\.docx?$/i, '.pdf');
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        return;
+      }
+      // Already a PDF / other file — download the stored object directly.
       const res = await fetch(`/api/upload/download?key=${encodeURIComponent(doc.s3_key)}`);
       const json = await res.json();
       if (!json.success) throw new Error(json.error || 'Eroare');
@@ -3877,7 +3893,7 @@ function ProcessingSection({
                           disabled={downloadingDoc === doc.id}
                         >
                           {downloadingDoc === doc.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Download className="h-3 w-3" />}
-                          <span className="ml-1">Descarca</span>
+                          <span className="ml-1">{/\.docx?$/i.test(doc.s3_key) ? 'Descarcă PDF' : 'Descarcă'}</span>
                         </Button>
                       </>
                     )}
@@ -3934,7 +3950,7 @@ function ProcessingSection({
                       disabled={downloadingDoc === doc.id}
                     >
                       {downloadingDoc === doc.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Download className="h-3 w-3" />}
-                      <span className="ml-1">Descarca</span>
+                      <span className="ml-1">{/\.docx?$/i.test(doc.s3_key) ? 'Descarcă PDF' : 'Descarcă'}</span>
                     </Button>
                   </div>
                 </div>
@@ -3978,7 +3994,7 @@ function ProcessingSection({
                       disabled={downloadingDoc === doc.id}
                     >
                       {downloadingDoc === doc.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Download className="h-3 w-3" />}
-                      <span className="ml-1">Descarca</span>
+                      <span className="ml-1">{/\.docx?$/i.test(doc.s3_key) ? 'Descarcă PDF' : 'Descarcă'}</span>
                     </Button>
                   </div>
                 </div>
@@ -3998,7 +4014,7 @@ function ProcessingSection({
                     <Eye className="h-3 w-3" /><span className="ml-1">Previzualizare</span>
                   </Button>
                   <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => handleDownloadDocument(doc)} disabled={downloadingDoc === doc.id}>
-                    {downloadingDoc === doc.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Download className="h-3 w-3" />}<span className="ml-1">Descarca</span>
+                    {downloadingDoc === doc.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Download className="h-3 w-3" />}<span className="ml-1">{/\.docx?$/i.test(doc.s3_key) ? 'Descarcă PDF' : 'Descarcă'}</span>
                   </Button>
                 </div>
               </div>

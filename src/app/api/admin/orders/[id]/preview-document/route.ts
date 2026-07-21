@@ -45,6 +45,11 @@ export async function GET(
 
     const s3Key = request.nextUrl.searchParams.get('key');
     const autoPrint = request.nextUrl.searchParams.get('print') === '1';
+    // `?download=1` → serve the PDF as an attachment (a real file) instead of
+    // inline. This is what colleagues without Microsoft Word use: the DOCX is
+    // unusable for them, but the rendered PDF opens + prints anywhere.
+    const download = request.nextUrl.searchParams.get('download') === '1';
+    const disposition = download ? 'attachment' : 'inline';
     if (!s3Key) {
       return new NextResponse('Missing key parameter', { status: 400 });
     }
@@ -69,7 +74,7 @@ export async function GET(
         status: 200,
         headers: {
           'Content-Type': 'application/pdf',
-          'Content-Disposition': `inline; filename="${s3Key.split('/').pop() || 'document.pdf'}"`,
+          'Content-Disposition': `${disposition}; filename="${s3Key.split('/').pop() || 'document.pdf'}"`,
           'Content-Length': String(pdf.length),
           'Cache-Control': 'private, max-age=300',
         },
@@ -105,7 +110,7 @@ export async function GET(
             status: 200,
             headers: {
               'Content-Type': 'application/pdf',
-              'Content-Disposition': `inline; filename="${fileNameForPdf}"`,
+              'Content-Disposition': `${disposition}; filename="${fileNameForPdf}"`,
               'Content-Length': String(pdf.length),
               'Cache-Control': 'private, max-age=300',
             },
@@ -113,6 +118,29 @@ export async function GET(
         }
       } catch (e) {
         console.error('PDF preview failed, falling back to HTML:', e);
+      }
+
+      // Download mode: the caller wants a FILE, not a preview page. If PDF
+      // conversion is unavailable/failed, serve the original DOCX as an
+      // attachment rather than an HTML page (which would download as a broken
+      // ".pdf"). Word users still get a usable file; the PDF path above is the
+      // happy path for those without Word.
+      if (download) {
+        try {
+          const docx = await downloadFile(s3Key);
+          const docxName = s3Key.split('/').pop() || 'document.docx';
+          return new NextResponse(new Uint8Array(docx), {
+            status: 200,
+            headers: {
+              'Content-Type': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+              'Content-Disposition': `attachment; filename="${docxName}"`,
+              'Content-Length': String(docx.length),
+            },
+          });
+        } catch (e) {
+          console.error('Download fallback (DOCX) failed:', e);
+          return new NextResponse('Nu s-a putut genera PDF-ul', { status: 502 });
+        }
       }
       // fall through to HTML preview
     }
