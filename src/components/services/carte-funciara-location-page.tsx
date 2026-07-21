@@ -34,19 +34,23 @@ const STEPS = [
   'Primești extrasul de carte funciară oficial, pe email, în câteva minute.',
 ];
 
-function faqs(judet: string, office: string) {
-  return [
+function faqs(county: OcpiCounty) {
+  const { judet, office } = county;
+  const generic = [
     { q: 'Cât durează obținerea extrasului de carte funciară online?', a: 'Prin eGhișeul.ro, de regulă câteva minute — interogăm direct sistemul oficial ANCPI și primești extrasul pe email.' },
     { q: `Trebuie să merg la ${office}?`, a: `Nu. Extrasul de carte funciară de informare se obține integral online, fără drum la ${office} și fără cont ANCPI. La ghișeu mergi doar dacă ai nevoie de servicii care necesită prezență fizică.` },
     { q: 'Ce conține extrasul de carte funciară?', a: 'Datele de identificare ale imobilului (suprafață, adresă, număr cadastral), proprietarii înscriși și cotele lor, precum și sarcinile — ipoteci, sechestre, servituți, interdicții.' },
     { q: 'Care e diferența dintre extrasul de informare și cel de autentificare?', a: 'Extrasul de informare poate fi cerut de oricine, online, și are caracter informativ. Extrasul de autentificare se obține prin notar pentru încheierea unui act (vânzare), blochează temporar cartea funciară și are valabilitate scurtă.' },
     { q: 'Documentul este oficial?', a: `Da. Extrasul provine din sistemul oficial ANCPI și este același document gestionat de ${office} (Oficiul de Cadastru și Publicitate Imobiliară ${judet}).` },
   ];
+  // FAQ-urile specifice județului intră după primele două întrebări generale.
+  const local = county.localFaq ?? [];
+  return [...generic.slice(0, 2), ...local, ...generic.slice(2)];
 }
 
 export function CarteFunciaraLocationPage({ county, others }: { county: OcpiCounty; others: { slug: string; judet: string }[] }) {
   const path = `${HUB_PATH}${county.slug}/`;
-  const title = `Extras Carte Funciară Online ${county.judet}`;
+  const title = `Extras de Carte Funciară Online ${county.judet}`;
   const description = `Obține extrasul de carte funciară pentru un imobil din județul ${county.judet}, online, fără drum la ${county.office}. 89 RON, taxe incluse, livrare în câteva minute.`;
 
   const jsonLd = buildLocationPageGraph({
@@ -81,7 +85,7 @@ export function CarteFunciaraLocationPage({ county, others }: { county: OcpiCoun
               <span className="text-white/80">{county.judet}</span>
             </nav>
             <h1 className="text-3xl sm:text-4xl lg:text-[2.75rem] font-extrabold text-white leading-tight mb-5">
-              Extras Carte Funciară Online {county.judet}
+              Extras de Carte Funciară Online {county.judet}
             </h1>
             <p className="text-lg text-white/85 leading-relaxed mb-6">
               Obține extrasul de carte funciară pentru un imobil din județul {county.judet} fără drum la {county.office}.
@@ -146,6 +150,8 @@ export function CarteFunciaraLocationPage({ county, others }: { county: OcpiCoun
               Pentru imobilele din județul {county.judet}, evidența este ținută de {county.office}.
             </p>
 
+            {county.highlight && <p>{county.highlight}</p>}
+
             <h2>Tipuri de extras de carte funciară</h2>
             <ul>
               <li><strong>Extras de informare</strong> — poate fi cerut de oricine, online; arată situația juridică la zi. Acesta se obține prin eGhișeul.ro, fără drum la ghișeu.</li>
@@ -187,6 +193,31 @@ export function CarteFunciaraLocationPage({ county, others }: { county: OcpiCoun
               </table>
             </div>
 
+            {county.localities && county.localities.length > 0 && (
+              <>
+                <h2>Ce localități acoperim în {county.judet}</h2>
+                <p>
+                  Toate. Interogarea se face în e-Terra, sistemul electronic național al ANCPI, așa că{' '}
+                  {county.slug === 'bucuresti'
+                    ? 'nu contează sectorul — cărțile funciare din toate cele 6 sectoare sunt în același sistem.'
+                    : `nu contează unde se află imobilul în județ: în ${county.resedinta}, într-un oraș mic sau într-o comună.`}
+                  {county.bcpi && county.slug !== 'bucuresti'
+                    ? ` La ghișeu, evidența locală este administrată de ${county.office} prin ${county.bcpi} birouri teritoriale de carte funciară — online nu depinzi de niciunul dintre ele.`
+                    : ''}
+                </p>
+                <div className="not-prose flex flex-wrap gap-2 my-5">
+                  {county.localities.map((l) => (
+                    <span key={l} className="rounded-full border border-neutral-200 bg-neutral-50 px-3.5 py-1.5 text-sm text-neutral-700">
+                      {l}
+                    </span>
+                  ))}
+                </div>
+                <p className="text-sm text-neutral-500">
+                  Lista de mai sus este orientativă — comanda funcționează pentru orice localitate din {county.judet}.
+                </p>
+              </>
+            )}
+
             <h2>Cum obții extrasul online, în {county.judet}</h2>
             <ol>
               {STEPS.map((s) => (<li key={s}>{s}</li>))}
@@ -200,7 +231,9 @@ export function CarteFunciaraLocationPage({ county, others }: { county: OcpiCoun
             </p>
 
             <p>
-              Vezi și <Link href={HUB_PATH}>pagina principală Extras Carte Funciară</Link> sau{' '}
+              Nu cunoști numărul cărții funciare? Cu <Link href="/servicii/identificare-imobil/">identificarea imobilului</Link>{' '}
+              afli numărul CF pornind de la adresă. Vezi și{' '}
+              <Link href={HUB_PATH}>pagina principală Extras Carte Funciară</Link> sau{' '}
               <Link href="/calculator/taxe-notariale/">calculatorul de taxe notariale</Link> (util la vânzarea unui imobil
               din {county.judet}).
             </p>
@@ -212,7 +245,7 @@ export function CarteFunciaraLocationPage({ county, others }: { county: OcpiCoun
           </div>
         </article>
 
-        <ServiceFAQ title="Întrebări frecvente" faqs={faqs(county.judet, county.office)} />
+        <ServiceFAQ title="Întrebări frecvente" faqs={faqs(county)} />
 
         {/* Other counties */}
         {others.length > 0 && (
