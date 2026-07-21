@@ -166,6 +166,18 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
   const { state, updatePersonalKyc, isPrefilled, prefillData, validationAttempt } = useModularWizard();
   const personalKyc = state.personalKyc;
 
+  // handleFileSelect has empty deps (stable identity), so it permanently calls
+  // the FIRST render's handleUpload — whose closure captured an EMPTY
+  // uploadedDocuments. Reading personalKyc directly inside handleUpload would
+  // therefore always start from [] and each new upload would WIPE the previous
+  // docs (foreign flow: passport → selfie → residence_permit overwrote each
+  // other, leaving only the last; order E-260721-VJWWN got stuck). Read the
+  // LATEST state through a ref instead so appends are always additive.
+  const personalKycRef = useRef(personalKyc);
+  useEffect(() => {
+    personalKycRef.current = personalKyc;
+  }, [personalKyc]);
+
   // Check if user has valid KYC from their account
   const hasValidAccountKyc = isPrefilled && prefillData?.has_valid_kyc;
   const [showReuploadOption, setShowReuploadOption] = useState(false);
@@ -407,7 +419,7 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
         // confirms identity. We still record a `selfie` validation entry with
         // `needsManualReview: true` so admin's `needsKycReview()` surfaces it.
         if (type === 'selfie') {
-          const existingValidation = personalKyc?.kycValidation || {};
+          const existingValidation = personalKycRef.current?.kycValidation || {};
           updatePersonalKyc({
             kycValidation: {
               ...existingValidation,
@@ -439,8 +451,10 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
           base64,
         };
 
-        // Update state - remove existing document of same type
-        const filteredDocs = personalKyc?.uploadedDocuments.filter(doc => doc.type !== type) || [];
+        // Update state - remove existing document of same type. Read the LATEST
+        // docs via ref (not the stale closure) so this append never wipes docs
+        // uploaded earlier in this same step.
+        const filteredDocs = personalKycRef.current?.uploadedDocuments.filter(doc => doc.type !== type) || [];
         updatePersonalKyc({
           uploadedDocuments: [...filteredDocs, newDoc],
         });

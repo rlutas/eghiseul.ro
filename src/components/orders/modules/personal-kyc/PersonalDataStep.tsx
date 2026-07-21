@@ -151,6 +151,17 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
   const { state, updatePersonalKyc, isPrefilled, prefillData, validationAttempt } = useModularWizard();
   const personalKyc = state.personalKyc;
 
+  // OCR scan handler commits `uploadedDocuments`/`ocrResults` as REPLACEMENT
+  // arrays built from the current state. OCR takes 2–10s, so if the user starts
+  // a second scan before the first commits, both would close over the same
+  // pre-commit array and the second commit would WIPE the first doc. Read the
+  // LATEST arrays through this ref at commit time so appends stay additive
+  // regardless of overlap (same guard as KYCDocumentsStep).
+  const personalKycRef = useRef(personalKyc);
+  useEffect(() => {
+    personalKycRef.current = personalKyc;
+  }, [personalKyc]);
+
   // Check if we have valid KYC from user's account
   const hasValidKycFromAccount = isPrefilled && prefillData?.has_valid_kyc;
 
@@ -427,7 +438,7 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           uploadedDocuments: [
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            ...(personalKyc?.uploadedDocuments || []).filter((d: any) => d.type !== type),
+            ...(personalKycRef.current?.uploadedDocuments || []).filter((d: any) => d.type !== type),
             {
               id: randomId(), type, fileName: file.name, fileSize: compressed.sizeAfter,
               mimeType: compressed.mimeType, uploadedAt: new Date().toISOString(), base64,
@@ -435,7 +446,7 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
           ],
           ocrResults: [
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            ...(personalKyc?.ocrResults || []).filter((r: any) => r.documentType !== type),
+            ...(personalKycRef.current?.ocrResults || []).filter((r: any) => r.documentType !== type),
             {
               documentType: type, success: !!ocr?.success, confidence: ocr?.confidence || 0,
               extractedData: ex || {}, issues: ocr?.issues || [], processedAt: new Date().toISOString(),
@@ -507,7 +518,7 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
           // Add to uploaded documents — indexat pe `type` request, vezi nota de mai sus.
           uploadedDocuments: [
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            ...(personalKyc?.uploadedDocuments || []).filter((d: any) => d.type !== type),
+            ...(personalKycRef.current?.uploadedDocuments || []).filter((d: any) => d.type !== type),
             {
               id: randomId(),
               type,
@@ -520,7 +531,7 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
           ],
           ocrResults: [
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            ...(personalKyc?.ocrResults || []).filter((r: any) => r.documentType !== type),
+            ...(personalKycRef.current?.ocrResults || []).filter((r: any) => r.documentType !== type),
             {
               documentType: type,
               success: true,
@@ -532,7 +543,7 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
           ],
           // Update kycValidation with per-document confidence
           kycValidation: {
-            ...personalKyc?.kycValidation,
+            ...personalKycRef.current?.kycValidation,
             ...(type === 'ci_front' ? {
               ciFront: {
                 valid: ocr.success && (ocr.confidence || 0) >= 50,

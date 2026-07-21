@@ -92,6 +92,16 @@ export default function CompanyDocumentsStep({ config, onValidChange }: CompanyD
   const { state, updateCompanyKycDocuments, isPrefilled, prefillData, validationAttempt } = useModularWizard();
   const companyKyc = state.companyKyc;
 
+  // The upload handler commits `uploadedDocuments` as a REPLACEMENT array built
+  // from the current docs. The FileReader step is async, so two overlapping
+  // uploads (different doc types) could both close over the same pre-commit
+  // array and the second commit would WIPE the first. Read the latest docs
+  // through this ref at commit time so appends stay additive.
+  const companyKycRef = useRef(companyKyc);
+  useEffect(() => {
+    companyKycRef.current = companyKyc;
+  }, [companyKyc]);
+
   // Check if user has verified company docs from their account
   const hasVerifiedCompanyDocs = isPrefilled && prefillData?.company?.verified;
   const [showReuploadOption, setShowReuploadOption] = useState(false);
@@ -228,8 +238,10 @@ export default function CompanyDocumentsStep({ config, onValidChange }: CompanyD
           base64,
         };
 
-        // Update state - remove existing document of same type, add new one
-        const currentDocs = companyKyc?.uploadedDocuments || [];
+        // Update state - remove existing document of same type, add new one.
+        // Read the LATEST docs via ref (not the possibly-stale closure) so an
+        // overlapping upload of another doc type doesn't wipe this one.
+        const currentDocs = companyKycRef.current?.uploadedDocuments || [];
         const filteredDocs = currentDocs.filter(doc => doc.type !== type);
         updateCompanyKycDocuments([...filteredDocs, newDoc]);
 

@@ -566,7 +566,9 @@ function ForeignCitizenCheckbox({ isForeign, onChange, extraDays = 0 }: ForeignC
             Sunt cetățean străin
           </span>
           <span className="block text-xs text-neutral-500 mt-0.5 leading-snug">
-            Bifează doar dacă nu ești cetățean român.
+            Bifează doar dacă nu ești cetățean român. Ești român, dar ai doar
+            pașaport străin? <strong>NU bifa</strong> — alegi „Pașaport” la pasul
+            următor și îl scanăm pe acela.
             {extraDays > 0 &&
               ` Cetățenii străini necesită verificări suplimentare (procesare cu până la ${extraDays} zile lucrătoare în plus).`}
           </span>
