@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Footer } from '@/components/home/footer';
 import { ServiceFAQ } from '@/components/services/service-faq';
 import { ErovinietaEmbed } from '@/components/tools/erovinieta-embed';
+import { NewsletterPopup } from '@/components/calculators/newsletter-popup';
 import { buildPageMetadata, BASE_URL } from '@/lib/seo';
 import { organizationNode, websiteNode, breadcrumbNode } from '@/lib/seo/schema';
 
@@ -259,6 +260,34 @@ export default function VerificareRovinietaPage() {
           </div>
         </article>
 
+        {/* Punte servicii — pagina asta e cea mai vizitată din site (13,8k
+            clicuri/28z în GSC), dar nu folosea CalculatorLayout, deci nu avea
+            nicio legătură spre serviciile plătite. Context auto → cazier auto
+            + cazier judiciar. */}
+        <section className="py-12 bg-neutral-50 border-t border-neutral-200">
+          <div className="container mx-auto px-4 max-w-[1100px]">
+            <h2 className="text-xl sm:text-2xl font-bold text-secondary-900 mb-6 text-center">
+              Ai nevoie și de alte documente auto?
+            </h2>
+            <div className="grid sm:grid-cols-3 gap-4">
+              {[
+                { href: '/servicii/cazier-auto-online/', label: 'Cazier auto online', desc: 'Istoricul sancțiunilor rutiere, fără drum la poliție.' },
+                { href: '/servicii/cazier-judiciar-online/', label: 'Cazier judiciar online', desc: 'Pentru angajare, permis sau străinătate — 100% online.' },
+                { href: '/calculator/calculator-impozit-auto/', label: 'Calculator impozit auto', desc: 'Afli în câteva secunde cât plătești pe mașină în 2026.' },
+              ].map((s) => (
+                <Link
+                  key={s.href}
+                  href={s.href}
+                  className="rounded-2xl border border-neutral-200 bg-white p-5 hover:border-primary-300 hover:shadow-lg hover:-translate-y-1 transition-all duration-200"
+                >
+                  <p className="font-bold text-secondary-900 mb-1">{s.label}</p>
+                  <p className="text-sm text-neutral-600">{s.desc}</p>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+
         {/* FAQ */}
         <ServiceFAQ title="Întrebări Frecvente — Verificare Rovinietă" faqs={FAQS} />
 
@@ -284,6 +313,9 @@ export default function VerificareRovinietaPage() {
         </section>
       </main>
 
+      {/* Colectare emailuri — același popup ca pe calculatoare (GDPR opt-in,
+          /api/newsletter → newsletter_subscribers). */}
+      <NewsletterPopup />
       <Footer />
     </>
   );
