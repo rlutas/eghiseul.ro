@@ -3733,9 +3733,20 @@ function ProcessingSection({
   // — comanda PF cu factura pe angajator primește cerere PF.
   const isPJ = !!order.customer_data?.companyData?.companyName || !!order.customer_data?.company?.companyName;
 
-  // Show for all processable statuses
-  const processableStatuses = ['pending', 'paid', 'processing', 'documents_generated', 'submitted_to_institution', 'document_received', 'extras_in_progress', 'document_ready'];
-  if (!processableStatuses.includes(status)) {
+  // Ascundem secțiunea DOAR pe comenzile unde nu are absolut niciun sens:
+  // neplătite (draft/abandoned) sau moarte (anulate/rambursate). Pentru orice
+  // altă comandă — inclusiv cele în standby („Solicită documente"), în
+  // traducere/apostilă (la_tradus / la_legalizat / la_apostila_notari /
+  // eliberat_apostila_haga), livrate sau finalizate — secțiunea rămâne
+  // vizibilă, ca echipa să vadă și să descarce documentele generate.
+  //
+  // Înainte era listă albă (`processableStatuses`): orice status nou adăugat
+  // ulterior (standby pe 16.07, statusurile add-on pe 15.07) NU era inclus, deci
+  // secțiunea — cu tot cu lista de documente — dispărea. De aici „câteodată
+  // dispare și nu o mai găsești". Butonul de acțiune are deja gate propriu
+  // (`buttonConfig &&`), deci pe statusurile fără acțiune apar doar documentele.
+  const hiddenStatuses = ['draft', 'abandoned', 'cancelled', 'refunded'];
+  if (hiddenStatuses.includes(status)) {
     return null;
   }
 
