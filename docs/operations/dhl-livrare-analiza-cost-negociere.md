@@ -42,7 +42,26 @@ Cerere: revizuire ofertă pe baza volumului (~25–30 colete/lună, ~500/24 luni
 4. account manager dedicat.
 Menționat că evaluăm alternative (FedEx/UPS) dacă nu primim ofertă competitivă.
 
-## Ce așteptăm de la ei
+## Update 2026-07-21 (după-amiază) — răspuns DHL
+Account manager: **Adrian Tircavu** (SME Business Development Executive, DHL
+International Romania) — adrian.tircavu@dhl.com, tel +40 21 2221777, mobil
++40 752 305 881. El se ocupă de relația pe **EDIGITALIZARE**.
+
+Răspuns:
+- **Plafonarea indicelui de combustibil NU se poate** (nu primește aprobare).
+- **Poate rediscuta tarifele de bază** — rulează simulări pe ultimele trimiteri
+  și revine cu un discount extra **până mâine după-amiază (22.07)**.
+- Conturile **NETHUT sunt închise** — Raul a confirmat că NU le reactivăm.
+- Contact actualizat de la raul@seohut.ro → **serviciiseonethut@gmail.com**.
+
+Răspuns trimis de Raul: OK pe simulări tarif de bază; NETHUT nu; email actualizat;
+argument de volum — documente livrate la ~198 RON valoare comandă vs livrare DHL
+care depășește uneori 250 RON/colet → un tarif mai bun deschide zona
+internațională (diaspora) și crește volumul către DHL (câștig ambele părți).
+
+**Următorul pas: așteptăm simulările de tarif de bază de la Adrian (22.07 p.m.).**
+
+## Ce așteptam de la ei (istoric)
 - Răspuns de la un agent de **Vânzări** DHL Express RO cu o **propunere de tarif**
   (ofertă de cont/contract), ideal cu fuel plafonat.
 - Dacă NU vine ofertă bună → cerem alternative (FedEx / UPS / Poșta EMS) și
