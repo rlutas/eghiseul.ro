@@ -38,6 +38,7 @@ import {
   FileText,
 } from 'lucide-react';
 import { STATUS_TABS, type OrdersCounts } from '@/lib/admin/orders-tabs';
+import { formatRelative } from '@/lib/relative-time';
 
 const STATUS_CONFIG: Record<
   string,
@@ -537,6 +538,12 @@ export default function AdminOrdersPage() {
                         </span>
                       )}
                     </div>
+                    {/* Cât timp a trecut de la plasarea comenzii — sub nr., ca pe CJO. */}
+                    {order.created_at && (
+                      <div className="mt-0.5 text-[11px] font-normal text-muted-foreground">
+                        {formatRelative(order.created_at)}
+                      </div>
+                    )}
                     {/* Nr. contract asistență · delegație — sub nr. comandă, ca pe CJO */}
                     {(order.barou?.contract || order.barou?.delegation) && (
                       <div
@@ -621,12 +628,11 @@ export default function AdminOrdersPage() {
                   <TableCell>
                     <DeadlineCell iso={order.estimated_completion_date} status={order.status} />
                   </TableCell>
-                  <TableCell className="text-sm text-muted-foreground">
+                  <TableCell className="whitespace-nowrap text-sm text-muted-foreground">
                     {order.created_at
                       ? new Date(order.created_at).toLocaleDateString('ro-RO', {
                           day: '2-digit',
                           month: '2-digit',
-                          year: 'numeric',
                           timeZone: 'Europe/Bucharest',
                         })
                       : '-'}

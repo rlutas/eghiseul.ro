@@ -25,3 +25,10 @@ Alte modificări:
   PF" / „Cazier Judiciar PJ" (textul complet se tăia).
 - Scos `max-w-[180px] truncate` de pe celulă → badge-ul se vede întreg,
   aliniat la stânga (mai vizibil).
+
+## Timp relativ sub nr. comandă + dată scurtată
+- Sub numărul comenzii apare acum **timpul relativ** de la plasare („acum 5
+  zile", „acum 2h", „ieri", „chiar acum") — ca pe CJO. Helper nou
+  `src/lib/relative-time.ts` (`formatRelative`, portat din CJO).
+- Coloana „Dată" afișează doar `DD.MM` (fără an) — încape mai bine în rând.
+  „Termenul" era deja scurt (DeadlineCell = DD.MM).
