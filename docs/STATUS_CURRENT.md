@@ -1,5 +1,29 @@
 # eGhiseul.ro - Status Curent
 
+> **⚡ Update 2026-07-21 — ZI MARE, LIVRAT TOT.** Detalii: [`changelog/2026-07-21-sumar-sesiune.md`](changelog/2026-07-21-sumar-sesiune.md) + [`plans/2026-07-21-seo-plan-servicii-date-reale.md`](plans/2026-07-21-seo-plan-servicii-date-reale.md).
+>
+> **🔴 Bug critic găsit + reparat: încărcările KYC se suprascriau** (stale closure) — fiecare document nou îl ștergea pe precedentul. **Omorâse cazier-auto complet** (0 plăți din 9 iul, 15 pierdute/7z, toate blocate la documente — serviciul cere 3+ documente în pasul KYC) și bloca cetățenii cu pașaport străin (E-260721-VJWWN). + 2 race-uri preventive reparate + code-review cu 3 findinguri, toate fixate.
+>
+> **🟣 Livrat azi (eghiseul):**
+> - **„Ajutare client blocat" — flux complet, testat e2e pe prod:** pasul din wizard persistat pe draft (migrarea 129), banner „Comandă neterminată — oprit la pasul X" în admin, **link continuare cu token 48h** (merge și fără email — migrarea 130), **editor date client** (nume/CNP/adresă — KYC/contract/plată rămân la client), invalidare localStorage (serverul editat de operator bate cache-ul), resume la pasul corect. Audit reparat (migrarea 131).
+> - **Pagina Certificat Urbanism LIVE** (780 lei, serviciu invizibil până azi + 7 link-uri interne moarte reparate, în sitemap).
+> - **Punte servicii + newsletter pe verificare-rovinietă** (cea mai vizitată pagină, 13,8k clicuri/28z, nu avea nimic).
+> - Admin: standby doar în „Așteptare client" · badge culori pe serviciu · „pas: X" în listă · timp relativ sub nr. comandă · dată DD.MM · „Proveniență client" mutat jos · descărcare PDF cereri/împuterniciri (blocat de cheia CloudConvert — vezi Rămas).
+>
+> **🟣 Livrat azi (CJO + ecazier):** **„Solicită documente" (reupload) LIVE** — operatorul cere documente specifice, client primește link+email cu gate, comandă în standby, progres per-document, OCR merge pe documentele reîncărcate. Nume PDF prietenoase la descărcare. Fix deploy (funcție >250MB — loop existsSync/Turbopack). Meniu diaspora clarificat. Note Echipă = doar note manuale (evenimentele automate mutate în Istoric).
+>
+> **🔵 Diagnostic SEO pe date reale (GSC):** 48k din 58,8k clicuri = calculatoare (nu cumpărători). **Extras CF = top seller de pe poziția 12,8** (pagina 2!) · constatator poz 12,1 · cazier-judiciar CTR 1,1%. Plan complet cu 8 acțiuni în `plans/2026-07-21-seo-plan-servicii-date-reale.md`.
+>
+> **👀 CE URMĂRIM (zilele următoare):**
+> - **Cazier-auto își revine după fix?** (48-72h; emailuri de recovery trimise de Raul)
+> - **Simulările DHL de la Adrian Tircavu** (tarif de bază, promis 22.07 p.m.) — analiza: `operations/dhl-livrare-analiza-cost-negociere.md` (fuel 27%→47%, pierdem pe destinații >250 lei)
+> - Echipa testează: „Solicită documente" (CJO) + fluxul client-blocat (eghiseul) — ghid: `admin/ghid-echipa-ajutare-client-blocat.md`
+> - Prima comandă pe pagina de urbanism + indexarea ei
+>
+> **⏭️ URMEAZĂ (confirmate):** constatator on-page refresh (poz 12→top7) · CF location pages 10-15 județe · backlink sprint 90 zile · test conversie naștere/căsătorie · Faza 4 client-blocat = paritate CJO.
+>
+> **📋 Rămas manual (Raul):** cont CloudConvert + `CLOUDCONVERT_API_KEY` pe ambele platforme (deblochează PDF-urile pt colegi fără Word) · răspuns DHL · decizie transliterare e-Factura non-latin (documentat, amânat).
+
 > **⚡ Update 2026-07-20 — LIVRAT.** Detalii în [`changelog/`](changelog/README.md) (5 intrări din această zi).
 >
 > **🔴 Incidente găsite și reparate (toate erau tăcute — nimic nu semnala problema):**
