@@ -4,11 +4,11 @@
 // Team rule: while there is STILL WORK to do on an order, it stays in the
 // "În procesare" tab — every active workflow status between paid and shipped
 // (incl. depus la instituție + the granular add-on stages). 'standby'
-// (waiting on customer documents) counts as work-in-flight too — team asked
-// (2026-07-08) that parked orders remain visible under În procesare.
+// (waiting on customer documents) is DELIBERATELY excluded — team asked
+// (2026-07-21) that parked orders show ONLY under the dedicated "Așteptare
+// client" tab, not double-listed in „În procesare".
 export const PROCESSING_GROUP = [
   'processing',
-  'standby',
   'documents_generated',
   'submitted_to_institution',
   'document_received',
@@ -57,8 +57,8 @@ export const STATUS_TABS: StatusTab[] = [
   // the team can follow up / recover.
   { value: 'abandoned', label: 'Neplătite', countKey: 'abandoned' },
   // Comenzile parcate în așteptarea clientului (acte expirate, documente
-  // cerute). Rămân ȘI în „În procesare" (PROCESSING_GROUP) — tab-ul ăsta e
-  // vederea dedicată pentru follow-up.
+  // cerute). Apar DOAR aici, nu și în „În procesare" (excluse din
+  // PROCESSING_GROUP) — vederea dedicată pentru follow-up.
   { value: 'standby', label: 'Așteptare client', countKey: 'standby' },
 ];
 
