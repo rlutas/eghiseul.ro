@@ -54,6 +54,10 @@ export interface ClientData {
   // Extended fields for cerere templates
   father_name?: string;
   mother_name?: string;
+  /** Marital status raw value from the civil-status wizard step
+   *  ('necasatorit' | 'casatorit' | 'divortat' | 'vaduv'). Used by the
+   *  stare-civilă împuternicire (UNBR Anexa II) template. */
+  civil_status?: string;
   previous_name?: string;
   birth_date?: string;
   birth_county?: string;
@@ -329,7 +333,73 @@ const INSTITUTIE_MAP: Record<string, { authority: string; document: string }> = 
   'certificat-integritate': { authority: 'IPJ SATU MARE', document: 'Certificat de Integritate Comportamentală' },
   'extras-carte-funciara': { authority: 'OCPI SATU MARE', document: 'Extras de Carte Funciară' },
   'certificat-constatator': { authority: 'ONRC SATU MARE', document: 'Certificat Constatator' },
+  'extras-multilingv-certificat-nastere': { authority: 'OFICIUL DE STARE CIVILĂ', document: 'Extras Multilingv de Naștere' },
+  'extras-multilingv-certificat-casatorie': { authority: 'OFICIUL DE STARE CIVILĂ', document: 'Extras Multilingv de Căsătorie' },
 };
+
+// ──────────────────────────────────────────────────────────────
+// Stare civilă — împuternicire UNBR (Anexa II la Statutul profesiei)
+// ──────────────────────────────────────────────────────────────
+
+/** Documentul de obținut, per serviciu de stare civilă — pentru textul
+ *  „să exercite următoarele activități: să obțină {document}" de pe
+ *  împuternicirea avocațială model UNBR. Doar aceste 5 slug-uri au
+ *  template-ul nou (src/templates/<slug>/imputernicire.docx). */
+const CIVIL_STATUS_DOCUMENT_MAP: Record<string, string> = {
+  'certificat-nastere': 'certificatul de naștere',
+  'certificat-casatorie': 'certificatul de căsătorie',
+  'certificat-celibat': 'certificatul de celibat',
+  'extras-multilingv-certificat-nastere': 'extrasul multilingv de naștere',
+  'extras-multilingv-certificat-casatorie': 'extrasul multilingv de căsătorie',
+};
+
+/** Autoritatea în fața căreia avocatul asistă/reprezintă clientul la
+ *  serviciile de stare civilă. */
+export const AUTORITATE_STARE_CIVILA = 'OFICIUL DE STARE CIVILĂ SATU MARE';
+
+/** Gender from the CNP's first digit (1/3/5/7 = M, 2/4/6/8 = F). */
+function genderFromCnp(cnp?: string): 'm' | 'f' | null {
+  const first = (cnp || '').trim()[0];
+  if ('1357'.includes(first || '')) return 'm';
+  if ('2468'.includes(first || '')) return 'f';
+  return null;
+}
+
+/** Romanian label for the wizard's maritalStatus value, gendered via CNP
+ *  when possible ('casatorit' → „căsătorit"/„căsătorită"). */
+export function buildStareCivilaLabel(civilStatus?: string, cnp?: string): string {
+  const labels: Record<string, { m: string; f: string }> = {
+    necasatorit: { m: 'necăsătorit', f: 'necăsătorită' },
+    casatorit: { m: 'căsătorit', f: 'căsătorită' },
+    divortat: { m: 'divorțat', f: 'divorțată' },
+    vaduv: { m: 'văduv', f: 'văduvă' },
+  };
+  const entry = labels[(civilStatus || '').trim().toLowerCase()];
+  if (!entry) return '';
+  return genderFromCnp(cnp) === 'f' ? entry.f : entry.m;
+}
+
+/** Filiation line for the împuternicire: „fiul/fiica lui {tată} și {mamă}".
+ *  Gendered via CNP when known. Placeholder "-" values (the cerere templates'
+ *  visible-dash default) count as missing. Empty string when no parent known. */
+export function buildFiliatie(fatherName?: string, motherName?: string, cnp?: string): string {
+  const clean = (v?: string) => {
+    const t = (v || '').trim();
+    return t && t !== '-' ? t : '';
+  };
+  const parents = [clean(fatherName), clean(motherName)].filter(Boolean);
+  if (parents.length === 0) return '';
+  const gender = genderFromCnp(cnp);
+  const fiu = gender === 'f' ? 'fiica' : gender === 'm' ? 'fiul' : 'fiul/fiica';
+  return `${fiu} lui ${parents.join(' și ')}`;
+}
+
+/** Activity text for the stare-civilă împuternicire — „să obțină
+ *  certificatul de naștere" etc. Empty for non-stare-civilă services. */
+export function buildActivitatiStareCivila(serviceSlug?: string): string {
+  const doc = CIVIL_STATUS_DOCUMENT_MAP[serviceSlug || ''];
+  return doc ? `să obțină ${doc}` : '';
+}
 
 /**
  * Textul complet al activităților de pe împuternicire — placeholder
@@ -634,6 +704,27 @@ function buildPlaceholderData(ctx: DocumentContext) {
     MOTIV: ctx.motiv_solicitare || 'Interes personal',
     DATAGENERAT: dateFormatted,
     INSTITUTIE: buildInstitutie(ctx.order.service_slug, ctx.motiv_solicitare),
+
+    // Stare civilă — împuternicire model UNBR (Anexa II). Populated always;
+    // only the per-service templates in src/templates/<slug-stare-civila>/
+    // actually reference these tags, older templates ignore them.
+    AN_CURENT: String(now.getFullYear()),
+    STARE_CIVILA: buildStareCivilaLabel(ctx.client.civil_status, ctx.client.cnp),
+    // „Nume Client (căsătorit)" — client name with the marital status from
+    // the wizard's civil-status step, when collected.
+    CLIENT_STARE_CIVILA: (() => {
+      const label = buildStareCivilaLabel(ctx.client.civil_status, ctx.client.cnp);
+      return label ? `${ctx.client.name} (${label})` : ctx.client.name;
+    })(),
+    FILIATIE: buildFiliatie(ctx.client.father_name, ctx.client.mother_name, ctx.client.cnp),
+    hasFiliatie: buildFiliatie(ctx.client.father_name, ctx.client.mother_name, ctx.client.cnp) !== '',
+    // Template-ul final al lui Raul (22.07) cere numele părinților și separat.
+    NUMEMAMA: ctx.client.mother_name && ctx.client.mother_name !== '-' ? ctx.client.mother_name : '',
+    NUMETATA: ctx.client.father_name && ctx.client.father_name !== '-' ? ctx.client.father_name : '',
+    ACTIVITATI_SC: buildActivitatiStareCivila(ctx.order.service_slug),
+    AUTORITATE_SC: CIVIL_STATUS_DOCUMENT_MAP[ctx.order.service_slug || '']
+      ? AUTORITATE_STARE_CIVILA
+      : '',
 
     // Dates
     DATA: dateFormatted,

@@ -162,6 +162,9 @@ export async function autoGenerateOrderDocuments(
     // "-" to print a clean dash on the cerere instead of an empty line.
     father_name: personal.fatherName || civil.fatherName || '-',
     mother_name: personal.motherName || civil.motherName || '-',
+    // Marital status from the civil-status wizard step — feeds the
+    // stare-civilă împuternicire (UNBR Anexa II) template.
+    civil_status: civil.maritalStatus || personal.maritalStatus || '',
     previous_name: personal.previousName || civil.birthName || '',
     birth_date: personal.birthDate || '',
     birth_county: personal.birthPlace || personal.birthCounty || '',
