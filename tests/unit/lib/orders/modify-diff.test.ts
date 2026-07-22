@@ -149,6 +149,62 @@ describe('computeModifyDiff — extra_payment path (diff > 0)', () => {
   });
 });
 
+describe('computeModifyDiff — customExtra (free-form service)', () => {
+  it('adds the custom price to the new total → extra_payment', () => {
+    // Customer paid 198 + 21.9 = 219.9. Admin adds a custom "traducere
+    // legalizată maghiară" at 150 RON → new total 369.9, diff +150.
+    const order: OrderForDiff = {
+      ...baseOrder,
+      total_price: 219.9,
+      selected_options: [],
+    };
+    const result = computeModifyDiff(order, {
+      selectedOptions: [],
+      deliveryPrice: 21.9,
+      customExtra: { name: 'traducere legalizată maghiară', price: 150 },
+    });
+    expect(result.action).toBe('extra_payment');
+    expect(result.diff).toBe(150);
+    expect(result.newTotal).toBe(369.9);
+  });
+
+  it('stacks customExtra with catalog addons and delivery change', () => {
+    // 198 + apostila 198 + custom 99.5 + delivery 100 = 595.5; paid 219.9 → +375.6
+    const order: OrderForDiff = {
+      ...baseOrder,
+      total_price: 219.9,
+      selected_options: [],
+    };
+    const result = computeModifyDiff(order, {
+      selectedOptions: [APOSTILA],
+      deliveryPrice: 100,
+      customExtra: { name: 'serviciu special', price: 99.5 },
+    });
+    expect(result.newTotal).toBe(595.5);
+    expect(result.diff).toBe(375.6);
+    expect(result.action).toBe('extra_payment');
+  });
+
+  it('is a no-op when customExtra is absent (undefined)', () => {
+    const order: OrderForDiff = {
+      ...baseOrder,
+      total_price: 299.9,
+      selected_options: [URGENTA],
+    };
+    const withOut = computeModifyDiff(order, {
+      selectedOptions: [URGENTA],
+      deliveryPrice: 21.9,
+    });
+    const withUndefined = computeModifyDiff(order, {
+      selectedOptions: [URGENTA],
+      deliveryPrice: 21.9,
+      customExtra: undefined,
+    });
+    expect(withUndefined).toEqual(withOut);
+    expect(withUndefined.action).toBe('none');
+  });
+});
+
 describe('computeModifyDiff — defensive', () => {
   it('caps currentNetPaid at 0 when refunded > paid (data corruption)', () => {
     // Defensive guard: bad data shouldn't make diff math negative.
@@ -239,6 +295,29 @@ describe('describeChanges — humanization', () => {
         newDeliveryPrice: 0,
       })
     ).toBe('adăugat: mystery_addon');
+  });
+
+  it('mentions the custom extra service with name + price', () => {
+    const text = describeChanges({
+      oldOptions: [],
+      newOptions: [],
+      oldDeliveryPrice: 21.9,
+      newDeliveryPrice: 21.9,
+      customExtra: { name: 'traducere legalizată maghiară', price: 150 },
+    });
+    expect(text).toBe('serviciu extra: traducere legalizată maghiară (+150.00 RON)');
+  });
+
+  it('combines custom extra with added options', () => {
+    const text = describeChanges({
+      oldOptions: [],
+      newOptions: [URGENTA],
+      oldDeliveryPrice: 21.9,
+      newDeliveryPrice: 21.9,
+      customExtra: { name: 'serviciu special', price: 99.5 },
+    });
+    expect(text).toContain('adăugat: urgență');
+    expect(text).toContain('serviciu extra: serviciu special (+99.50 RON)');
   });
 
   it('truncates ridiculously long change lists to ~200 chars', () => {

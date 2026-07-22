@@ -19,6 +19,8 @@ export interface OrderOptionForDiff {
   code?: string;
   optionId?: string;
   option_id?: string;
+  optionName?: string;
+  option_name?: string;
 }
 
 export interface OrderForDiff {
@@ -36,11 +38,20 @@ export interface OrderForDiff {
   selected_options?: OrderOptionForDiff[] | null;
 }
 
+/** Ad-hoc service the operator types in free-form (not in the addon
+ *  catalog) — e.g. "Traducere legalizată maghiară". Price in RON. */
+export interface CustomExtraForDiff {
+  name: string;
+  price: number;
+}
+
 export interface ModifyChanges {
   /** Desired new options list (full replacement, not a delta). */
   selectedOptions: OrderOptionForDiff[];
   /** New delivery price in RON (e.g. 21.90 for Sameday). */
   deliveryPrice?: number;
+  /** Optional free-form extra service; its price is added to the new total. */
+  customExtra?: CustomExtraForDiff;
 }
 
 export interface DiffResult {
@@ -76,7 +87,9 @@ export function computeModifyDiff(order: OrderForDiff, changes: ModifyChanges): 
   const basePrice = Number(order.base_price ?? 0);
   const newOptionsSum = sumOptions(changes.selectedOptions);
   const newDelivery = changes.deliveryPrice ?? Number(order.delivery_price ?? 0);
-  const newTotal = Math.round((basePrice + newOptionsSum + newDelivery) * 100) / 100;
+  const customExtraPrice = changes.customExtra ? Number(changes.customExtra.price) : 0;
+  const newTotal =
+    Math.round((basePrice + newOptionsSum + customExtraPrice + newDelivery) * 100) / 100;
 
   const refunded = Number(order.refunded_amount ?? 0);
   const additionalPaid = Number(order.additional_paid_amount ?? 0);
@@ -114,6 +127,8 @@ export function describeChanges(args: {
   newOptions: OrderOptionForDiff[];
   oldDeliveryPrice: number;
   newDeliveryPrice: number;
+  /** Free-form extra service added by the operator (name + RON price). */
+  customExtra?: CustomExtraForDiff;
 }): string {
   const oldCodes = new Set(args.oldOptions.map((o) => o.code).filter(Boolean) as string[]);
   const newCodes = new Set(args.newOptions.map((o) => o.code).filter(Boolean) as string[]);
@@ -136,6 +151,11 @@ export function describeChanges(args: {
   const parts: string[] = [];
   if (added.length > 0) parts.push(`adăugat: ${added.map(fmt).join(', ')}`);
   if (removed.length > 0) parts.push(`scos: ${removed.map(fmt).join(', ')}`);
+  if (args.customExtra) {
+    parts.push(
+      `serviciu extra: ${args.customExtra.name} (+${args.customExtra.price.toFixed(2)} RON)`
+    );
+  }
   if (args.oldDeliveryPrice !== args.newDeliveryPrice) {
     parts.push(`livrare ${args.oldDeliveryPrice.toFixed(2)} → ${args.newDeliveryPrice.toFixed(2)} RON`);
   }

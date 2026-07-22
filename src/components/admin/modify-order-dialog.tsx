@@ -90,6 +90,11 @@ export function ModifyOrderDialog({
   const [note, setNote] = useState('');
   const [refundReason, setRefundReason] = useState('');
 
+  // Free-form extra service — for things that aren't in the addon catalog
+  // (e.g. "traducere legalizată maghiară"). Both empty = not sent at all.
+  const [customExtraName, setCustomExtraName] = useState('');
+  const [customExtraPrice, setCustomExtraPrice] = useState('');
+
   // Full addon catalog for the service. Fetched on open so the dialog can
   // show options the customer DIDN'T buy initially — admin can add them as
   // upsells (a common phone-call workflow: client adds apostila / traducere
@@ -111,6 +116,8 @@ export function ModifyOrderDialog({
     setDeliveryPrice(initialDeliveryPrice);
     setNote('');
     setRefundReason('');
+    setCustomExtraName('');
+    setCustomExtraPrice('');
     setDiff(null);
     setSummary('');
     setError(null);
@@ -158,7 +165,34 @@ export function ModifyOrderDialog({
     });
   }
 
+  /**
+   * Build the optional `customExtra` payload from the two free-form inputs.
+   * Both empty → `{ customExtra: undefined }` (nothing sent). Partially or
+   * badly filled → `{ error }` so the caller can surface it BEFORE hitting
+   * the API (server re-validates anyway: name 3–120 chars, price 1–20000).
+   */
+  function resolveCustomExtra():
+    | { customExtra: { name: string; price: number } | undefined; error?: undefined }
+    | { customExtra?: undefined; error: string } {
+    const name = customExtraName.trim();
+    const priceRaw = customExtraPrice.trim();
+    if (!name && !priceRaw) return { customExtra: undefined };
+    if (name.length < 3) {
+      return { error: 'Denumirea serviciului extra trebuie să aibă minim 3 caractere.' };
+    }
+    const price = parseFloat(priceRaw);
+    if (!Number.isFinite(price) || price <= 0) {
+      return { error: 'Prețul serviciului extra trebuie să fie un număr mai mare ca 0.' };
+    }
+    return { customExtra: { name, price } };
+  }
+
   async function runPreview() {
+    const resolved = resolveCustomExtra();
+    if (resolved.error) {
+      setError(resolved.error);
+      return;
+    }
     setPreviewing(true);
     setError(null);
     try {
@@ -169,6 +203,7 @@ export function ModifyOrderDialog({
           action: 'preview',
           selectedOptions: options,
           deliveryPrice,
+          customExtra: resolved.customExtra,
           note: note || undefined,
         }),
       });
@@ -191,6 +226,11 @@ export function ModifyOrderDialog({
       setError('Pentru refund trebuie să introduci un motiv (apare pe Stripe).');
       return;
     }
+    const resolved = resolveCustomExtra();
+    if (resolved.error) {
+      setError(resolved.error);
+      return;
+    }
     setApplying(true);
     setError(null);
     try {
@@ -201,6 +241,7 @@ export function ModifyOrderDialog({
           action: 'apply',
           selectedOptions: options,
           deliveryPrice,
+          customExtra: resolved.customExtra,
           note: note || undefined,
           refundReason: refundReason || undefined,
         }),
@@ -332,6 +373,54 @@ export function ModifyOrderDialog({
                   );
                 })
               )}
+            </div>
+          </div>
+
+          {/* Custom extra service — free-form name + price for services that
+              aren't in the addon catalog. Goes into the extra-payment link
+              and onto the order as a `custom_extra` option. */}
+          <div>
+            <Label className="text-sm font-semibold">Serviciu extra (custom)</Label>
+            <p className="text-xs text-muted-foreground mb-2">
+              Pentru un serviciu care nu apare în lista de mai sus. Intră în
+              plata suplimentară și pe comandă. Lasă ambele câmpuri goale dacă
+              nu e cazul.
+            </p>
+            <div className="flex gap-2">
+              <div className="flex-1">
+                <Label htmlFor="custom-extra-name" className="text-xs text-muted-foreground">
+                  Denumire serviciu
+                </Label>
+                <Input
+                  id="custom-extra-name"
+                  value={customExtraName}
+                  onChange={(e) => {
+                    setCustomExtraName(e.target.value);
+                    markDirty();
+                  }}
+                  placeholder="ex: traducere legalizată maghiară"
+                  maxLength={120}
+                  className="mt-1"
+                />
+              </div>
+              <div className="w-32">
+                <Label htmlFor="custom-extra-price" className="text-xs text-muted-foreground">
+                  Preț (RON)
+                </Label>
+                <Input
+                  id="custom-extra-price"
+                  type="number"
+                  min="1"
+                  step="0.01"
+                  value={customExtraPrice}
+                  onChange={(e) => {
+                    setCustomExtraPrice(e.target.value);
+                    markDirty();
+                  }}
+                  placeholder="ex: 150"
+                  className="mt-1"
+                />
+              </div>
             </div>
           </div>
 

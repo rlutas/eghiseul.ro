@@ -28,6 +28,7 @@ import { createProformaForExtra } from '@/lib/oblio/proforma';
 import {
   computeModifyDiff,
   describeChanges,
+  type CustomExtraForDiff,
   type OrderForDiff,
   type OrderOptionForDiff,
 } from '@/lib/orders/modify-diff';
@@ -48,6 +49,30 @@ interface ModifyBody {
   deliveryPrice?: number;
   note?: string;
   refundReason?: string;
+  /** Optional free-form extra service typed by the operator (not in the
+   *  addon catalog). Validated server-side: name 3–120 chars, price 1–20000. */
+  customExtra?: { name?: unknown; price?: unknown } | null;
+}
+
+/** Validate + normalize the optional customExtra from the request body.
+ *  Returns `{ ok: true, value }` (value undefined when absent) or an error
+ *  message ready for a 400 response. */
+function parseCustomExtra(
+  raw: ModifyBody['customExtra']
+): { ok: true; value: CustomExtraForDiff | undefined } | { ok: false; message: string } {
+  if (raw === undefined || raw === null) return { ok: true, value: undefined };
+  if (typeof raw !== 'object') {
+    return { ok: false, message: '`customExtra` must be an object with name + price' };
+  }
+  const name = typeof raw.name === 'string' ? raw.name.trim() : '';
+  if (name.length < 3 || name.length > 120) {
+    return { ok: false, message: '`customExtra.name` must be 3–120 characters' };
+  }
+  const price = Number(raw.price);
+  if (!Number.isFinite(price) || price < 1 || price > 20000) {
+    return { ok: false, message: '`customExtra.price` must be a number between 1 and 20000 (RON)' };
+  }
+  return { ok: true, value: { name, price: Math.round(price * 100) / 100 } };
 }
 
 export async function POST(request: NextRequest, { params }: RouteParams) {
@@ -94,6 +119,14 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       { status: 400 }
     );
   }
+  const customExtraParsed = parseCustomExtra(body.customExtra);
+  if (!customExtraParsed.ok) {
+    return NextResponse.json(
+      { success: false, error: { code: 'BAD_CUSTOM_EXTRA', message: customExtraParsed.message } },
+      { status: 400 }
+    );
+  }
+  const customExtra = customExtraParsed.value;
 
   // ── Fetch order ────────────────────────────────────────────────────────────
   const admin = createAdminClient();
@@ -139,6 +172,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
   const diff = computeModifyDiff(orderForDiff, {
     selectedOptions: body.selectedOptions,
     deliveryPrice: body.deliveryPrice,
+    customExtra,
   });
 
   // ── Preview mode ──────────────────────────────────────────────────────────
@@ -153,6 +187,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
           newOptions: body.selectedOptions,
           oldDeliveryPrice: orderForDiff.delivery_price,
           newDeliveryPrice: body.deliveryPrice ?? orderForDiff.delivery_price,
+          customExtra,
         }),
       },
     });
@@ -165,7 +200,24 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     newOptions: body.selectedOptions,
     oldDeliveryPrice: orderForDiff.delivery_price,
     newDeliveryPrice: body.deliveryPrice ?? orderForDiff.delivery_price,
+    customExtra,
   });
+
+  // The custom service becomes a real row in `selected_options` (canonical
+  // camelCase shape) so it shows up in admin, on the generated contract's
+  // price breakdown, and in order history — same as catalog addons.
+  const finalOptions: OrderOptionForDiff[] = customExtra
+    ? [
+        ...body.selectedOptions,
+        {
+          optionId: `custom-${Date.now()}`,
+          code: 'custom_extra',
+          optionName: customExtra.name,
+          priceModifier: customExtra.price,
+          quantity: 1,
+        },
+      ]
+    : body.selectedOptions;
 
   let stripeRefundId: string | null = null;
   let pendingPaymentClientSecret: string | null = null;
@@ -344,12 +396,12 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
   // receipt + accounting reconciles. The `refunded_amount` /
   // `additional_paid_amount` columns track the deltas. New options sum
   // is reflected via `options_price` for display in the admin list.
-  const newOptionsTotal = body.selectedOptions.reduce(
+  const newOptionsTotal = finalOptions.reduce(
     (sum, o) => sum + (o.priceModifier ?? o.price_modifier ?? 0) * (o.quantity ?? 1),
     0
   );
   const updatePayload: Record<string, unknown> = {
-    selected_options: body.selectedOptions,
+    selected_options: finalOptions,
     options_price: Math.round(newOptionsTotal * 100) / 100,
     last_modified_at: new Date().toISOString(),
     last_modified_by: adminEmail,
