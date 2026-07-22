@@ -5,6 +5,7 @@ import { requirePermission, getUserPermissions } from '@/lib/admin/permissions';
 import { parseTestFilter, resolveStatusFilter } from '@/lib/admin/orders-tabs';
 import { NO_LAWYER_SERVICE_SLUGS } from '@/lib/documents/no-lawyer-services';
 import { applyQuickOrStage } from '@/lib/admin/order-quick-filters';
+import { getOpenOutages } from '@/lib/services/platform-services';
 
 /**
  * GET /api/admin/orders/list - List all orders (for admin)
@@ -212,6 +213,11 @@ export async function GET(request: NextRequest) {
       }
     }
 
+    // Open ANCPI/ONRC outage windows — the list UI shows instant services
+    // (extras CF / plan cadastral / constatator) as "on hold" instead of a
+    // deadline while the backing platform is down.
+    const openOutages = await getOpenOutages(adminClient);
+
     return NextResponse.json({
       success: true,
       data: orderRows.map((o) => ({
@@ -220,6 +226,7 @@ export async function GET(request: NextRequest) {
         barou: barouByOrder[o.id] ?? null,
       })),
       total: count || 0,
+      openOutages,
     });
   } catch (error) {
     console.error('List orders error:', error);

@@ -36,7 +36,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     // Include service fields so we can compute the estimated completion date.
     const { data: order, error: orderError } = await adminClient
       .from('orders')
-      .select('*, services(estimated_days, urgent_days, urgent_available)')
+      .select('*, services(slug, estimated_days, urgent_days, urgent_available)')
       .eq('id', id)
       .single();
 

@@ -129,6 +129,8 @@ interface OrderData {
     expiresAt: string;
   } | null;
   estimatedCompletionDate?: string | null;
+  isInstantService?: boolean;
+  platformHold?: { provider: string; label: string; since: string } | null;
   delivery: {
     method: string | null;
     methodName: string | null;
@@ -464,8 +466,31 @@ function OrderStatusContent() {
                   <p className="text-sm text-muted-foreground mt-1">
                     Comandat pe {formatDate(orderData.createdAt)}
                   </p>
+                  {/* Instant auto-issued services: no calendar estimate.
+                      During an ANCPI/ONRC outage the term is ON HOLD — the
+                      document is issued automatically the moment the platform
+                      recovers. */}
+                  {orderData.platformHold ? (
+                    <div className="mt-2 rounded-lg bg-amber-50 px-3 py-2 text-sm leading-relaxed text-amber-900">
+                      <strong>Termen în așteptare:</strong> sistemele naționale{' '}
+                      {orderData.platformHold.label} sunt temporar indisponibile (din{' '}
+                      {new Date(orderData.platformHold.since).toLocaleDateString('ro-RO', {
+                        day: 'numeric',
+                        month: 'long',
+                        timeZone: 'Europe/Bucharest',
+                      })}
+                      ). Comanda dumneavoastră este înregistrată și se eliberează{' '}
+                      <strong>automat, cu prioritate</strong>, imediat ce platforma redevine
+                      funcțională. Vă anunțăm pe email.
+                    </div>
+                  ) : orderData.isInstantService &&
+                    !['document_ready', 'shipped', 'completed'].includes(orderData.status) ? (
+                    <p className="text-sm text-muted-foreground">
+                      Eliberare automată — de regulă în câteva minute
+                    </p>
+                  ) : null}
                   {/* Processing time */}
-                  {orderData.estimatedCompletionDate ? (
+                  {!orderData.isInstantService && orderData.estimatedCompletionDate ? (
                     <p className="text-sm text-muted-foreground">
                       Estimat: {new Intl.DateTimeFormat('ro-RO', {
                         weekday: 'long',
@@ -479,7 +504,7 @@ function OrderStatusContent() {
                         </span>
                       )}
                     </p>
-                  ) : orderData.processingDays && (
+                  ) : !orderData.isInstantService && orderData.processingDays && (
                     <p className="text-sm text-muted-foreground">
                       Timp estimat procesare: {orderData.processingDays} zile lucrătoare
                       {orderData.hasUrgent && (

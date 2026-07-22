@@ -142,6 +142,21 @@ describe('computeEstimatedCompletionISOForOrder — civil tier resolution', () =
     expect(iso?.slice(0, 10)).toBe('2026-07-24');
   });
 
+  it.each([
+    ['extras-carte-funciara'],
+    ['extras-plan-cadastral'],
+    ['certificat-constatator'],
+  ])('instant service %s gets NO estimate (delivered in minutes / on hold during outage)', async (slug) => {
+    const iso = await computeEstimatedCompletionISOForOrder(
+      mockClient(TIERS),
+      { customer_data: { personal: {} }, selected_options: null, delivery_method: null },
+      { slug, estimated_days: 1, urgent_days: 2, urgent_available: false },
+      MONDAY
+    );
+
+    expect(iso).toBe(null);
+  });
+
   it('falls back to default tiers when admin_settings row is missing', async () => {
     const iso = await computeEstimatedCompletionISOForOrder(
       mockClient(null),

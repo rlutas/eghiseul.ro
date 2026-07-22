@@ -22,6 +22,7 @@ import {
   computeEstimatedCompletionISO,
   type ComputeEstimateInput,
 } from '@/lib/delivery-estimate-helper';
+import { instantPlatformProvider } from '@/lib/services/platform-services';
 
 /**
  * Extract the civil-status registration place from an order's customer_data.
@@ -69,6 +70,7 @@ export interface OrderForEstimate {
 }
 
 export interface ServiceForEstimate {
+  slug?: string | null;
   estimated_days?: number | null;
   urgent_days?: number | null;
   urgent_available?: boolean | null;
@@ -88,6 +90,12 @@ export async function computeEstimatedCompletionISOForOrder(
   svc: ServiceForEstimate | null,
   placedAt: Date = new Date()
 ): Promise<string | null> {
+  // Instant auto-issued services (extras CF / plan cadastral / constatator)
+  // deliver in minutes, not business days — a calendar date is meaningless
+  // and, during a platform outage, misleading ("expirat" noise in admin).
+  // They get NO estimate; the UI shows "câteva minute" or the on-hold state.
+  if (instantPlatformProvider(svc?.slug)) return null;
+
   let serviceDaysRange: { minDays: number; maxDays: number } | null = null;
 
   const registrationPlace = extractCivilRegistrationPlace(order.customer_data);

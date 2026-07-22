@@ -15,6 +15,7 @@ import { OrderSidebar } from './order-sidebar';
 import { SystemStatus } from '@/components/services/system-status';
 import { useCivilStatusTerms } from '@/hooks/use-civil-status-terms';
 import { resolveCivilTermTier } from '@/lib/civil-status/delivery-terms';
+import { instantPlatformProvider } from '@/lib/services/platform-services';
 import { getServiceSpecimen } from '@/config/service-specimens';
 import Image from 'next/image';
 
@@ -66,7 +67,7 @@ export function PriceSidebarModular({ service, variant = 'full' }: PriceSidebarM
   // business days: base processing (or "urgent" if the user toggled it) +
   // each document add-on (traducere/legalizare/apostila*) + courier leg.
   // Bundled add-ons share the parent's processing slot (deduped by code).
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   const hasUrgentaMain = state.selectedOptions.some(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (o: any) => o.code === 'urgenta' && !o.bundledFor
@@ -81,10 +82,10 @@ export function PriceSidebarModular({ service, variant = 'full' }: PriceSidebarM
     courier: courierCode,
     includeCourierLeg: !!courierCode,
   });
-  // Constatator is digital + auto-issued — minutes, not business days.
-  // Constatator + extras carte funciară are digital + auto-issued — minutes, not days.
-  const isInstantDigital =
-    service.slug === 'certificat-constatator' || service.slug === 'extras-carte-funciara';
+  // Digital + auto-issued services (constatator, extras CF, plan cadastral) —
+  // minutes, not business days. Single source: INSTANT_PLATFORM_SERVICES.
+  const instantProvider = instantPlatformProvider(service.slug);
+  const isInstantDigital = !!instantProvider;
 
   // Civil-status (naștere/căsătorie/celibat): termenul de procesare depinde de
   // oficiul de înregistrare (registrationPlace). Suprascrie calculul numeric.
@@ -131,9 +132,9 @@ export function PriceSidebarModular({ service, variant = 'full' }: PriceSidebarM
         hideTrustBadges={isInstantDigital}
       />
       {/* Live system status — replaces the delivery-time card for instant-digital
-          services. ANCPI for carte funciară, ONRC for constatator. */}
-      {isInstantDigital && variant === 'full' && (
-        <SystemStatus service={service.slug === 'extras-carte-funciara' ? 'ancpi' : 'onrc'} />
+          services. ANCPI for carte funciară / plan cadastral, ONRC for constatator. */}
+      {instantProvider && variant === 'full' && (
+        <SystemStatus service={instantProvider} />
       )}
 
       {/* Specimen document — așa arată ce primește clientul (sidebar desktop +

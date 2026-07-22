@@ -40,6 +40,11 @@ import {
 import { STATUS_TABS, type OrdersCounts } from '@/lib/admin/orders-tabs';
 import { formatRelative } from '@/lib/relative-time';
 import { stepLabel } from '@/lib/admin/wizard-steps';
+import {
+  instantPlatformProvider,
+  PROVIDER_LABEL,
+  type OpenOutages,
+} from '@/lib/services/platform-services';
 
 const STATUS_CONFIG: Record<
   string,
@@ -151,6 +156,7 @@ export default function AdminOrdersPage() {
   const [totalCount, setTotalCount] = useState(0);
   const [counts, setCounts] = useState<OrdersCounts | null>(null);
   const [services, setServices] = useState<ServiceOption[]>([]);
+  const [openOutages, setOpenOutages] = useState<OpenOutages>({ ancpi: null, onrc: null });
   // Local-only search input — live-debounced into the URL: filtrează singur
   // de la 3 caractere (400ms după ce te oprești din tastat), fără Enter.
   // Enter/blur rămân pentru căutări de 1-2 caractere și golire instantă.
@@ -221,6 +227,7 @@ export default function AdminOrdersPage() {
       })) as OrderRow[];
       setOrders(typedOrders);
       setTotalCount(json.total || 0);
+      setOpenOutages((json.openOutages as OpenOutages | undefined) ?? { ancpi: null, onrc: null });
     } catch (err) {
       console.error('Failed to fetch orders:', err);
     } finally {
@@ -635,7 +642,7 @@ export default function AdminOrdersPage() {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <DeadlineCell iso={order.estimated_completion_date} status={order.status} />
+                    <DeadlineCell iso={order.estimated_completion_date} status={order.status} slug={order.services?.slug} outages={openOutages} />
                   </TableCell>
                   <TableCell className="whitespace-nowrap text-sm text-muted-foreground">
                     {order.created_at
@@ -724,7 +731,7 @@ export default function AdminOrdersPage() {
                 <DetailRow label="Sumă" value={`${detailOrder.total_price.toFixed(2)} RON`} />
                 <DetailRow
                   label="Termen"
-                  value={<DeadlineCell iso={detailOrder.estimated_completion_date} status={detailOrder.status} />}
+                  value={<DeadlineCell iso={detailOrder.estimated_completion_date} status={detailOrder.status} slug={detailOrder.services?.slug} outages={openOutages} />}
                 />
                 <DetailRow
                   label="Factură"
@@ -795,7 +802,44 @@ function DetailRow({ label, value }: { label: string; value: React.ReactNode }) 
 
 // Helper components
 
-function DeadlineCell({ iso, status }: { iso: string | null; status: string | null }) {
+// Statuses where the document is already out the door (or the order is dead) —
+// no deadline/hold display needed.
+const DEADLINE_DONE_STATUSES = [
+  'document_ready', 'shipped', 'completed', 'refunded', 'cancelled', 'abandoned', 'cancellation_requested',
+];
+
+function DeadlineCell({
+  iso,
+  status,
+  slug,
+  outages,
+}: {
+  iso: string | null;
+  status: string | null;
+  slug?: string | null;
+  outages?: OpenOutages;
+}) {
+  // Instant auto-issued services (extras CF / plan cadastral / constatator):
+  // no calendar deadline — delivered in minutes, or ON HOLD during an open
+  // ANCPI/ONRC outage (issuance resumes automatically at recovery).
+  const provider = instantPlatformProvider(slug);
+  if (provider) {
+    const done = DEADLINE_DONE_STATUSES.includes(status || '') || status === 'draft' || status === 'pending';
+    const outageSince = outages?.[provider] ?? null;
+    if (!done && outageSince) {
+      const sinceStr = new Date(outageSince).toLocaleDateString('ro-RO', {
+        day: '2-digit', month: '2-digit', timeZone: 'Europe/Bucharest',
+      });
+      return (
+        <span className="inline-flex items-center gap-1 rounded bg-amber-50 px-1.5 py-0.5 text-xs font-semibold text-amber-700">
+          ⏸ {PROVIDER_LABEL[provider]} din {sinceStr}
+        </span>
+      );
+    }
+    if (!done) return <span className="text-xs text-muted-foreground">auto · min</span>;
+    return <span className="text-xs text-muted-foreground">—</span>;
+  }
+
   if (!iso) return <span className="text-xs text-muted-foreground">—</span>;
   const d = new Date(iso);
   const now = new Date();

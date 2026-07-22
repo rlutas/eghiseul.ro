@@ -34,7 +34,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     // Fetch order (include service fields for estimate computation)
     const { data: order, error: fetchError } = await supabaseAdmin
       .from('orders')
-      .select('*, services(name, estimated_days, urgent_days, urgent_available)')
+      .select('*, services(name, slug, estimated_days, urgent_days, urgent_available)')
       .eq('id', orderId)
       .single();
 

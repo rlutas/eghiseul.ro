@@ -295,7 +295,7 @@ async function handlePaymentSucceeded(paymentIntent: Stripe.PaymentIntent) {
   // 1. Fetch full order data for invoice (with service name + estimate fields)
   const { data: order, error: fetchError } = await supabaseAdmin
     .from('orders')
-    .select('*, services(name, estimated_days, urgent_days, urgent_available, lawyer_fee_ron)')
+    .select('*, services(name, slug, estimated_days, urgent_days, urgent_available, lawyer_fee_ron)')
     .eq('id', orderId)
     .single()
 

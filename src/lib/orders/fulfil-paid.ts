@@ -30,7 +30,7 @@ export async function fulfilManuallyPaidOrder(
 
   const { data: order, error: fetchError } = await supabaseAdmin
     .from('orders')
-    .select('*, services(name, estimated_days, urgent_days, urgent_available)')
+    .select('*, services(name, slug, estimated_days, urgent_days, urgent_available)')
     .eq('id', orderId)
     .single();
 

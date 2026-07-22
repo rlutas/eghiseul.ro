@@ -1,5 +1,6 @@
 import { createClient as createServiceClient } from '@supabase/supabase-js';
 import { normalizeOrderOptions } from '@/lib/orders/normalize';
+import { instantPlatformProvider, getOpenOutages, PROVIDER_LABEL } from '@/lib/services/platform-services';
 import { NextRequest, NextResponse } from 'next/server';
 import { reuploadDocLabel } from '@/lib/reupload/doc-types';
 
@@ -322,6 +323,20 @@ export async function GET(request: NextRequest) {
     const subtotalWithoutVat = Math.round((totalPrice / (1 + VAT_RATE)) * 100) / 100;
     const vatAmount = Math.round((totalPrice - subtotalWithoutVat) * 100) / 100;
 
+    // Instant auto-issued services (extras CF / plan cadastral / constatator):
+    // no calendar estimate — delivered in minutes, or ON HOLD while the
+    // backing ANCPI/ONRC platform has an open outage window. The status page
+    // shows the hold banner instead of an estimated date.
+    const instantProvider = instantPlatformProvider(serviceData?.slug);
+    let platformHold: { provider: string; label: string; since: string } | null = null;
+    if (instantProvider && !['document_ready', 'shipped', 'completed', 'refunded', 'cancelled'].includes(order.status || '')) {
+      const outages = await getOpenOutages(supabase);
+      const since = outages[instantProvider];
+      if (since) {
+        platformHold = { provider: instantProvider, label: PROVIDER_LABEL[instantProvider], since };
+      }
+    }
+
     return NextResponse.json({
       success: true,
       data: {
@@ -367,7 +382,11 @@ export async function GET(request: NextRequest) {
         processingDays,
         hasUrgent,
         pendingReupload,
-        estimatedCompletionDate: order.estimated_completion_date
+        isInstantService: !!instantProvider,
+        platformHold,
+        // Instant services never show a calendar estimate (legacy rows may
+        // still have one persisted — suppress it).
+        estimatedCompletionDate: !instantProvider && order.estimated_completion_date
           ? new Date(order.estimated_completion_date).toISOString()
           : null,
         delivery: {
