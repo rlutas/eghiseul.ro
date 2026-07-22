@@ -52,3 +52,20 @@ celibat ×2 (selecție automată pe scop), naștere (Anexa 59), căsătorie.
 - Decizii deschise: câmp „stare civilă" în wizard la naștere/căsătorie/multilingv
   (azi doar celibat); semnăturile ca imagini pe împuternicirea nouă (template-ul
   n-are tag-urile).
+
+## CUM FUNCȚIONEAZĂ (pentru echipă)
+**Generarea e MANUALĂ, din admin** — nu la plasarea comenzii:
+1. Admin → comanda → „Documente generate" → butonul **Generează** la Împuternicire
+   / Cerere eliberare PF. (La submit se generează automat DOAR contractele —
+   prestări + asistență; împuternicirea cere numărul Barou, alocat DOAR pe
+   comenzi plătite.)
+2. **Automată e SELECȚIA**: sistemul alege singur template-ul corect după
+   serviciu (naștere→Anexa 59, căsătorie→a lui, multilingv→ale lui) și după
+   date (celibat: scop căsătorie în străinătate → varianta 1, altfel varianta 2
+   cu motivul clientului). Câmpurile se completează singure din comandă
+   (client, filiație, date naștere/căsătorie, soț, țară, motiv).
+3. **Comenzi cu servicii EXTRA** (naștere + multilingv/celibat): în lucru —
+   câte un rând de cerere per serviciu în admin (ca la împuterniciri), fiecare
+   generat cu template-ul + datele serviciului lui. Tot manual, per buton.
+4. Regenerarea suprascrie documentul aceluiași serviciu (numerele din registru
+   se refolosesc — nu se consumă numere noi).
