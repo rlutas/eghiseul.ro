@@ -3,7 +3,7 @@ import { ensureInvoiceForPaidOrder } from '@/lib/oblio';
 import { upsertContactForPaidOrder } from '@/lib/contacts/upsert';
 import { ensureOnrcJobForPaidOrder } from '@/lib/onrc/ensure-onrc-job';
 import { ensureAncpiJobForPaidOrder } from '@/lib/ancpi/ensure-ancpi-job';
-import { computeEstimatedCompletionISO } from '@/lib/delivery-estimate-helper';
+import { computeEstimatedCompletionISOForOrder } from '@/lib/orders/order-estimate';
 
 /**
  * Post-payment fulfilment chain for MANUALLY-collected payments (comenzi
@@ -50,16 +50,12 @@ export async function fulfilManuallyPaidOrder(
     urgent_days?: number | null;
     urgent_available?: boolean | null;
   } | null;
-  const estimatedCompletionISO = computeEstimatedCompletionISO({
-    placedAt: new Date(),
-    serviceDays: svc?.estimated_days ?? null,
-    urgentDays: svc?.urgent_days ?? null,
-    urgentAvailable: svc?.urgent_available ?? null,
+  const estimatedCompletionISO = await computeEstimatedCompletionISOForOrder(
+    supabaseAdmin,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    selectedOptions: ((order as any).selected_options as Array<Record<string, unknown>> | null) ?? null,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    deliveryMethod: (order as any).delivery_method ?? null,
-  });
+    order as any,
+    svc
+  );
 
   const paidAtNow = new Date().toISOString();
   const { error: updateError } = await supabaseAdmin

@@ -40,6 +40,12 @@ export interface DeliveryStep {
 export interface DeliveryEstimateParams {
   /** Business days for the core service processing (from `services.estimated_days`). */
   baseDays?: number
+  /**
+   * Min/max range for the core processing step — wins over `baseDays`.
+   * Used by civil-status services whose term depends on the registration
+   * office tier (5-7 / 7-15 / 15-30 zile), not a flat `estimated_days`.
+   */
+  baseRange?: { minDays: number; maxDays: number }
   /** Legacy urgency mode — used only when `baseDays` is not provided. */
   urgency?: UrgencyMode
   /** Selected service options with their time impact in business days. */
@@ -366,7 +372,14 @@ export function calculateEstimatedCompletion(
   const breakdown: DeliveryStep[] = []
 
   // 1. Core processing step
-  if (typeof params.baseDays === 'number' && params.baseDays > 0) {
+  if (params.baseRange && params.baseRange.maxDays > 0) {
+    const min = Math.max(0, params.baseRange.minDays)
+    breakdown.push({
+      step: 'Procesare',
+      minDays: min,
+      maxDays: Math.max(min, params.baseRange.maxDays),
+    })
+  } else if (typeof params.baseDays === 'number' && params.baseDays > 0) {
     breakdown.push({
       step: 'Procesare',
       minDays: params.baseDays,
@@ -426,12 +439,19 @@ export function calculateEstimatedCompletion(
   const minDays = breakdown.reduce((sum, s) => sum + s.minDays, 0)
   const maxDays = breakdown.reduce((sum, s) => sum + s.maxDays, 0)
 
+  // The start day IS the first working day (getProcessingStartISO guarantees
+  // it's a business day), so an N-day promise completes N-1 business days
+  // AFTER the start — not N. Counting the start as day zero inflated every
+  // promised date by one business day (off-by-one, fixed 2026-07-22).
+  const projectFromStart = (days: number): string =>
+    days <= 0 ? startIso : addBusinessDaysISO(startIso, days - 1)
+
   return {
     minDays,
     maxDays,
     startDate: startIso,
-    minDate: addBusinessDaysISO(startIso, minDays),
-    maxDate: addBusinessDaysISO(startIso, maxDays),
+    minDate: projectFromStart(minDays),
+    maxDate: projectFromStart(maxDays),
     breakdown,
   }
 }

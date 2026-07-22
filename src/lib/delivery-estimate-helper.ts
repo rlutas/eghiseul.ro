@@ -62,6 +62,13 @@ export interface ComputeEstimateInput {
   placedAt: Date | string;
   /** Base service processing days (from `services.estimated_days`). */
   serviceDays?: number | null;
+  /**
+   * Min/max override for the core processing step — wins over `serviceDays`.
+   * Civil-status services (naștere/căsătorie/celibat/extras multilingv) pass
+   * the term tier resolved from the registration office here, because their
+   * flat `estimated_days` doesn't reflect the promised 5-7/7-15/15-30 range.
+   */
+  serviceDaysRange?: { minDays: number; maxDays: number } | null;
   /** Urgent-only override days (from `services.urgent_days`). Applied when an urgent option is selected. */
   urgentDays?: number | null;
   /** Whether the service exposes an urgent path. */
@@ -224,8 +231,16 @@ export function computeOrderEstimate(input: ComputeEstimateInput): {
   const courier = normalizeCourierCode(input.deliveryMethod);
   const orderDate = typeof input.placedAt === 'string' ? new Date(input.placedAt) : input.placedAt;
 
+  // Civil-status tier range wins over the flat serviceDays (those services
+  // have no urgent path, so urgentSelected is never true for them).
+  const baseRange =
+    !urgentSelected && input.serviceDaysRange && input.serviceDaysRange.maxDays > 0
+      ? input.serviceDaysRange
+      : undefined;
+
   const estimate = calculateEstimatedCompletion({
-    baseDays,
+    baseDays: baseRange ? undefined : baseDays,
+    baseRange,
     urgency: urgentSelected ? 'urgent' : 'standard',
     options: mapOptions(input.selectedOptions),
     courier,

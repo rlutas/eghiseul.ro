@@ -5,7 +5,7 @@ import { logAudit, getAuditContext } from '@/lib/security/audit-logger';
 import { createHash } from 'crypto';
 import { autoGenerateOrderDocuments } from '@/lib/documents/auto-generate';
 import { uploadOrderSignature, uploadBase64 } from '@/lib/aws/s3';
-import { computeEstimatedCompletionISO } from '@/lib/delivery-estimate-helper';
+import { computeEstimatedCompletionISOForOrder } from '@/lib/orders/order-estimate';
 import { getMissingInvoiceClientFields } from '@/lib/oblio/invoice';
 import { emailDomainAcceptsMail } from '@/lib/email-mx';
 
@@ -215,14 +215,13 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       urgent_days?: number | null;
       urgent_available?: boolean | null;
     } | null;
-    const estimatedCompletionISO = computeEstimatedCompletionISO({
-      placedAt: new Date(now),
-      serviceDays: svc?.estimated_days ?? null,
-      urgentDays: svc?.urgent_days ?? null,
-      urgentAvailable: svc?.urgent_available ?? null,
-      selectedOptions: (order.selected_options as Array<Record<string, unknown>> | null) ?? null,
-      deliveryMethod: order.delivery_method ?? null,
-    });
+    const estimatedCompletionISO = await computeEstimatedCompletionISOForOrder(
+      adminClient,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      order as any,
+      svc,
+      new Date(now)
+    );
 
     // Build update object
     // Use 'pending' status (valid in database constraint)

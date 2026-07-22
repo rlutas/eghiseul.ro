@@ -138,9 +138,9 @@ describe('calculateEstimatedCompletion — base service days', () => {
     expect(result.minDays).toBe(3);
     expect(result.maxDays).toBe(3);
     expect(result.startDate).toBe('2026-05-11');
-    // Mon + 3 business days = Thu
-    expect(result.minDate).toBe('2026-05-14');
-    expect(result.maxDate).toBe('2026-05-14');
+    // Start day counts as day 1: Mon(1) → Tue(2) → Wed(3)
+    expect(result.minDate).toBe('2026-05-13');
+    expect(result.maxDate).toBe('2026-05-13');
     expect(result.breakdown[0].step).toBe('Procesare');
   });
 
@@ -312,7 +312,8 @@ describe('calculateEstimatedCompletion — full integration scenarios', () => {
     expect(result.minDays).toBe(4); // 3 + 1
     expect(result.maxDays).toBe(4);
     expect(result.startDate).toBe('2026-05-11');
-    expect(result.minDate).toBe('2026-05-15'); // Fri
+    // Start day counts as day 1: Mon(1) Tue(2) Wed(3) Thu(4)
+    expect(result.minDate).toBe('2026-05-14'); // Thu
   });
 
   it('urgent + Fan Courier on Friday afternoon pushes to next week', () => {
@@ -339,7 +340,52 @@ describe('calculateEstimatedCompletion — full integration scenarios', () => {
 
     // Saturday → next business day = Tue Apr 14 (skip Sun, Easter Mon)
     expect(result.startDate).toBe('2026-04-14');
-    expect(result.minDate).toBe('2026-04-15'); // +1 business day
+    // 1 business day of processing = done the same start day (day 1)
+    expect(result.minDate).toBe('2026-04-14');
+  });
+
+  // Regression (2026-07-22): the projected dates counted the processing-start
+  // day as day ZERO, so every promised date landed one business day later
+  // than the advertised "N zile lucrătoare". Worst case: urgent (1-2 zile)
+  // paid Wednesday 13:14 RO showed Monday — 3 business days away.
+  it('REGRESSION: urgent paid Wed 13:14 RO lands Thu-Fri, NOT Fri-Mon', () => {
+    const order = new Date('2026-07-22T13:14:00+03:00'); // Wed after noon
+    const result = calculateEstimatedCompletion({
+      urgency: 'urgent',
+      includeCourierLeg: false,
+      orderDate: order,
+    });
+
+    expect(result.startDate).toBe('2026-07-23'); // Thu (noon cutoff)
+    expect(result.minDate).toBe('2026-07-23'); // Thu = day 1
+    expect(result.maxDate).toBe('2026-07-24'); // Fri = day 2
+  });
+
+  it('REGRESSION: 1-day service paid Wed 09:58 RO completes SAME day', () => {
+    // Real order E-260722-UDVVD (extras CF, estimated_days=1) was promised
+    // Thursday instead of Wednesday.
+    const order = new Date('2026-07-22T09:58:00+03:00'); // Wed before noon
+    const result = calculateEstimatedCompletion({
+      baseDays: 1,
+      includeCourierLeg: false,
+      orderDate: order,
+    });
+
+    expect(result.startDate).toBe('2026-07-22');
+    expect(result.minDate).toBe('2026-07-22');
+    expect(result.maxDate).toBe('2026-07-22');
+  });
+
+  it('zero total days returns the start date itself', () => {
+    const result = calculateEstimatedCompletion({
+      baseDays: 1,
+      options: [{ name: 'Reducere', deliveryDaysImpact: -1 }],
+      includeCourierLeg: false,
+      orderDate: new Date('2026-05-11T09:00:00+03:00'), // Mon morning
+    });
+
+    expect(result.minDays).toBe(0);
+    expect(result.minDate).toBe('2026-05-11');
   });
 
   it('cetățean străin + posta worst case (15+15 = 30 business days projected)', () => {

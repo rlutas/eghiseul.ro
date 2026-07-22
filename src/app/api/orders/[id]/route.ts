@@ -2,29 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { normalizeOrderOptions } from '@/lib/orders/normalize'
-
-// Calculate business days (skip weekends)
-function addBusinessDays(startDate: Date, days: number): Date {
-  const result = new Date(startDate)
-
-  // Start from next business day
-  result.setDate(result.getDate() + 1)
-  while (result.getDay() === 0 || result.getDay() === 6) {
-    result.setDate(result.getDate() + 1)
-  }
-
-  // Add business days
-  let addedDays = 0
-  while (addedDays < days) {
-    result.setDate(result.getDate() + 1)
-    // Skip weekends (0 = Sunday, 6 = Saturday)
-    if (result.getDay() !== 0 && result.getDay() !== 6) {
-      addedDays++
-    }
-  }
-
-  return result
-}
+import { calculateEstimatedCompletion } from '@/lib/delivery-calculator'
 
 interface RouteParams {
   params: Promise<{ id: string }>
@@ -147,8 +125,16 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     const bufferDays = 2 // Add 2 days buffer for safety
     const totalBusinessDays = processingDays + bufferDays
 
-    // Calculate estimated completion with business days only
-    const estimatedCompletion = addBusinessDays(createdAt, totalBusinessDays)
+    // Calculate estimated completion via the shared holiday/cutoff-aware
+    // calculator (fallback only — used when estimated_completion_date is NULL
+    // on pre-migration orders).
+    const estimatedCompletion = new Date(
+      `${calculateEstimatedCompletion({
+        baseDays: totalBusinessDays,
+        includeCourierLeg: false,
+        orderDate: createdAt,
+      }).maxDate}T16:00:00Z`
+    )
 
     // Use friendly_order_id from DB if available, otherwise construct from order_number
     const displayOrderNumber = order.friendly_order_id ||

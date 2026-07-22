@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { stripe } from '@/lib/stripe';
-import { computeEstimatedCompletionISO } from '@/lib/delivery-estimate-helper';
+import { computeEstimatedCompletionISOForOrder } from '@/lib/orders/order-estimate';
 import { ensureInvoiceForPaidOrder } from '@/lib/oblio';
 import { upsertContactForPaidOrder } from '@/lib/contacts/upsert';
 import { ensureOnrcJobForPaidOrder } from '@/lib/onrc/ensure-onrc-job';
@@ -150,14 +150,12 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     } | null;
     const estimatedCompletionISO = order.estimated_completion_date
       ? null
-      : computeEstimatedCompletionISO({
-          placedAt: new Date(),
-          serviceDays: svc?.estimated_days ?? null,
-          urgentDays: svc?.urgent_days ?? null,
-          urgentAvailable: svc?.urgent_available ?? null,
-          selectedOptions: (order.selected_options as Array<Record<string, unknown>> | null) ?? null,
-          deliveryMethod: order.delivery_method ?? null,
-        });
+      : await computeEstimatedCompletionISOForOrder(
+          supabaseAdmin,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          order as any,
+          svc
+        );
 
     // Payment succeeded - update order. Also stash paid_at + the PI id
     // if it wasn't there before (Hosted Checkout webhook-miss path).

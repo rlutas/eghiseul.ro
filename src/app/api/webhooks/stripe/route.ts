@@ -6,7 +6,7 @@ import { ensureInvoiceForPaidOrder } from '@/lib/oblio'
 import { upsertContactForPaidOrder } from '@/lib/contacts/upsert'
 import { ensureOnrcJobForPaidOrder } from '@/lib/onrc/ensure-onrc-job'
 import { ensureAncpiJobForPaidOrder } from '@/lib/ancpi/ensure-ancpi-job'
-import { computeEstimatedCompletionISO } from '@/lib/delivery-estimate-helper'
+import { computeEstimatedCompletionISOForOrder } from '@/lib/orders/order-estimate'
 
 // Use service role for webhook handler (bypasses RLS)
 const supabaseAdmin = createClient(
@@ -251,7 +251,7 @@ async function handleExtraChargePaid(
 
   await supabaseAdmin
     .from('orders')
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     .update({
       additional_paid_amount: Number(anyOrder.additional_paid_amount ?? 0) + amountRon,
       pending_extra_payment_intent_id: null,
@@ -265,7 +265,7 @@ async function handleExtraChargePaid(
 
   await supabaseAdmin
     .from('order_history')
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     .insert({
       order_id: orderId,
       event_type: 'extra_payment_received',
@@ -318,16 +318,12 @@ async function handlePaymentSucceeded(paymentIntent: Stripe.PaymentIntent) {
     urgent_days?: number | null
     urgent_available?: boolean | null
   } | null
-  const estimatedCompletionISO = computeEstimatedCompletionISO({
-    placedAt: new Date(),
-    serviceDays: svc?.estimated_days ?? null,
-    urgentDays: svc?.urgent_days ?? null,
-    urgentAvailable: svc?.urgent_available ?? null,
+  const estimatedCompletionISO = await computeEstimatedCompletionISOForOrder(
+    supabaseAdmin,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    selectedOptions: ((order as any).selected_options as Array<Record<string, unknown>> | null) ?? null,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    deliveryMethod: (order as any).delivery_method ?? null,
-  })
+    order as any,
+    svc
+  )
 
   // 2. Update order status to paid
   const paidAtNow = new Date().toISOString()
