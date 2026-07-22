@@ -156,6 +156,14 @@ export async function POST(
       spouse_name: civil.spouseNameBeforeMarriage || '',
       marriage_date: civil.marriageDate || '',
       marriage_place: civil.registrationPlace || '',
+      // Certificat de celibat (ANEXA 9): scopul alege varianta de cerere
+      // (căsătorie în străinătate vs. „alte situații" — vezi
+      // resolveTemplateName în generator.ts) + datele viitorului soț.
+      marriage_abroad_intent: civil.marriageAbroadIntent === true,
+      future_spouse_name: civil.futureSpouseName || '',
+      future_spouse_citizenship: civil.nationality || '',
+      marriage_country: civil.countryOfUse || '',
+      celibacy_purpose: civil.purpose || '',
       address_parts: personalAddress ? {
         county: personalAddress.county, city: personalAddress.city,
         sector: personalAddress.sector,

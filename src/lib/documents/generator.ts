@@ -82,6 +82,26 @@ export interface ClientData {
    *  Pasul civil-status NU colectează localitatea separat, deci același
    *  string alimentează și localitatea, și județul căsătoriei pe cerere. */
   marriage_place?: string;
+  /** Certificat de celibat (ANEXA 9): scopul e căsătoria în străinătate?
+   *  (civil_status.marriageAbroadIntent). true → cererea pe varianta
+   *  „încheierea căsătoriei în străinătate"; altfel varianta „alte situații"
+   *  (cerere-eliberare-pf-alt-motiv.docx). */
+  marriage_abroad_intent?: boolean;
+  /** Viitorul soț/viitoarea soție (civil_status.futureSpouseName) —
+   *  {{SOT_VIITOR}} pe cererea de celibat pentru căsătorie în străinătate. */
+  future_spouse_name?: string;
+  /** Cetățenia/naționalitatea viitorului soț (civil_status.nationality,
+   *  colectată DOAR în fluxul căsătorie-în-străinătate al pasului
+   *  civil-status) — {{CETATENIE_SOT}}. */
+  future_spouse_citizenship?: string;
+  /** Țara unde va avea loc căsătoria (civil_status.countryOfUse — întrebarea
+   *  există din 16.07.2026; comenzile mai vechi nu o au → tag gol) —
+   *  {{TARA_CASATORIE}}. */
+  marriage_country?: string;
+  /** Motivul liber al solicitării certificatului de celibat când scopul NU e
+   *  căsătoria în străinătate (civil_status.purpose, ex. „Pentru viza") —
+   *  {{MOTIV_CELIBAT}} pe varianta „alte situații" a cererii. */
+  celibacy_purpose?: string;
   address_parts?: { county?: string; city?: string; sector?: string; street?: string; number?: string; building?: string; staircase?: string; floor?: string; apartment?: string; postalCode?: string };
   company_address_parts?: { county?: string; city?: string; street?: string; number?: string; building?: string; apartment?: string };
 }
@@ -180,6 +200,37 @@ function loadTemplate(serviceSlug: string, templateName: string): Buffer {
   }
 
   throw new Error(`Template not found: ${serviceSlug}/${templateName}`);
+}
+
+/**
+ * Per-order template variant selection.
+ *
+ * Certificat de celibat (ANEXA 9) are DOUĂ cereri, alese după scopul din
+ * pasul civil-status (customer_data.civil_status.marriageAbroadIntent):
+ *  - scop „încheierea căsătoriei în străinătate" (marriageAbroadIntent=true)
+ *    → certificat-celibat/cerere-eliberare-pf.docx (varianta cu viitorul soț,
+ *      cetățenia lui și țara căsătoriei);
+ *  - orice alt scop (false sau necompletat) →
+ *    certificat-celibat/cerere-eliberare-pf-alt-motiv.docx (varianta „alte
+ *    situații" cu {{MOTIV_CELIBAT}} = civil_status.purpose).
+ *
+ * Rezolvarea stă AICI (în generateDocument), nu în rute, ca selecția să fie
+ * identică pentru toți apelanții (admin generate-document, auto-generate,
+ * preview) fără ca vreunul să știe de variante.
+ */
+function resolveTemplateName(
+  serviceSlug: string,
+  templateName: string,
+  ctx: DocumentContext
+): string {
+  if (
+    serviceSlug === 'certificat-celibat' &&
+    templateName === 'cerere-eliberare-pf' &&
+    ctx.client.marriage_abroad_intent !== true
+  ) {
+    return 'cerere-eliberare-pf-alt-motiv';
+  }
+  return templateName;
 }
 
 // ──────────────────────────────────────────────────────────────
@@ -860,6 +911,21 @@ function buildPlaceholderData(ctx: DocumentContext) {
     LOC_CASATORIE: buildLocCasatorie(ctx.client),
     JUDET_CASATORIE: buildJudetCasatorie(ctx.client),
 
+    // Certificat de celibat — cererea ANEXA 9 (template-ele lui Raul, 22.07).
+    // Ambele variante scriu {{DATA_NASTERE}} (fără I final — a treia grafie,
+    // după DATA_NASTERI/DATA_NASTERII; toate trei rămân populate identic).
+    // Varianta „căsătorie în străinătate": {{SOT_VIITOR}} =
+    // civil_status.futureSpouseName, {{CETATENIE_SOT}} =
+    // civil_status.nationality (naționalitatea viitorului soț),
+    // {{TARA_CASATORIE}} = civil_status.countryOfUse (întrebare adăugată
+    // 16.07.2026 — comenzile mai vechi nu o au, tagul rămâne gol).
+    // Varianta „alte situații": {{MOTIV_CELIBAT}} = civil_status.purpose.
+    DATA_NASTERE: buildBirthDateRo(ctx.client.birth_date, ctx.client.cnp),
+    SOT_VIITOR: ctx.client.future_spouse_name || '',
+    CETATENIE_SOT: ctx.client.future_spouse_citizenship || '',
+    TARA_CASATORIE: ctx.client.marriage_country || '',
+    MOTIV_CELIBAT: ctx.client.celibacy_purpose || '',
+
     // Dates
     DATA: dateFormatted,
     DATACOMANDA: new Date(ctx.order.created_at).toLocaleDateString('ro-RO', { day: '2-digit', month: '2-digit', year: 'numeric' }),
@@ -981,7 +1047,10 @@ export function generateDocument(
   context: DocumentContext,
   options?: GenerateDocumentOptions
 ): Buffer {
-  const templateBuffer = loadTemplate(serviceSlug, templateName);
+  const templateBuffer = loadTemplate(
+    serviceSlug,
+    resolveTemplateName(serviceSlug, templateName, context)
+  );
   const zip = new PizZip(templateBuffer);
 
   const doc = new Docxtemplater(zip, {
