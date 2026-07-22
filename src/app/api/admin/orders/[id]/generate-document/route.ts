@@ -153,6 +153,9 @@ export async function POST(
       birth_judet: civil.birthCounty || '',
       // Extras multilingv căsătorie (ANEXA 4): soțul/soția + data + locul
       // căsătoriei (registrationPlace = județul care a înregistrat actul).
+      // La certificat-nastere registrationPlace = județul actului de NAȘTERE
+      // și intră în {{JUDET_NASTERE}} pe cererea ANEXA 59 — vezi
+      // buildJudetNastereCertificat în generator.ts.
       spouse_name: civil.spouseNameBeforeMarriage || '',
       marriage_date: civil.marriageDate || '',
       marriage_place: civil.registrationPlace || '',

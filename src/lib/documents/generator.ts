@@ -429,14 +429,18 @@ const CIVIL_STATUS_DOCUMENT_MAP: Record<string, string> = {
 export const AUTORITATE_STARE_CIVILA = 'OFICIUL DE STARE CIVILĂ SATU MARE';
 
 // ──────────────────────────────────────────────────────────────
-// Extras multilingv — cerere de eliberare (ANEXA 4)
+// Extras multilingv (ANEXA 4) + duplicat certificat (ANEXA 59) —
+// cereri de eliberare
 // ──────────────────────────────────────────────────────────────
 
-/** Tipul actului de pe cererea de extras multilingv — {{TIP ACT}}/{{TIP_ACT}}.
+/** Tipul actului de pe cererile de eliberare — {{TIP ACT}}/{{TIP_ACT}}.
+ *  Folosit de cererea de extras multilingv (ANEXA 4) și de cererea de
+ *  duplicat certificat de naștere (ANEXA 59, „certificatul de {{TIP ACT}}").
  *  Gol la orice alt serviciu (nullGetter golește oricum tag-urile lipsă). */
-const EXTRAS_MULTILINGV_TIP_ACT: Record<string, string> = {
+const CERERE_TIP_ACT: Record<string, string> = {
   'extras-multilingv-certificat-nastere': 'naștere',
   'extras-multilingv-certificat-casatorie': 'căsătorie',
+  'certificat-nastere': 'naștere',
 };
 
 /** Data nașterii formatată DD.MM.YYYY — din client.birth_date (ISO sau RO)
@@ -477,6 +481,20 @@ export function buildJudetNastere(client: ClientData): string {
     judet = getCountyFromCNP(client.cnp || '') || '';
   }
   return judet.replace(/^Bucure[sș]ti\b.*$/i, 'București');
+}
+
+/** Județul nașterii pe cererea de duplicat certificat de naștere (ANEXA 59).
+ *  Pasul civil-status al serviciului certificat-nastere NU colectează
+ *  birthLocality/birthCounty — colectează registrationPlace = județul unde e
+ *  înregistrat actul de naștere (același câmp JSON pe care căsătoria îl
+ *  folosește pentru județul căsătoriei; ajunge în client.marriage_place).
+ *  Îl preferăm codului de județ din CNP (alegerea explicită a clientului
+ *  bate derivarea); fallback: buildJudetNastere (birth_judet/CNP). */
+export function buildJudetNastereCertificat(client: ClientData): string {
+  const reg = (client.marriage_place || '')
+    .trim()
+    .replace(/^Bucure[sș]ti\b.*$/i, 'București');
+  return reg || buildJudetNastere(client);
 }
 
 /** „{client} și {soț/soție}" — {{SOTI}} pe cererea de extras multilingv de
@@ -895,8 +913,8 @@ function buildPlaceholderData(ctx: DocumentContext) {
     // cele două taguri primesc deci LOCUL CĂSĂTORIEI, nu al nașterii.
     // DATA_CASATORIE = scrierea lui Raul (fără I final); DATA_CASATORIEI +
     // LOC_CASATORIE/JUDET_CASATORIE = aliasurile canonice pt template viitoare.
-    'TIP ACT': EXTRAS_MULTILINGV_TIP_ACT[ctx.order.service_slug || ''] || '',
-    TIP_ACT: EXTRAS_MULTILINGV_TIP_ACT[ctx.order.service_slug || ''] || '',
+    'TIP ACT': CERERE_TIP_ACT[ctx.order.service_slug || ''] || '',
+    TIP_ACT: CERERE_TIP_ACT[ctx.order.service_slug || ''] || '',
     DATA_NASTERI: buildBirthDateRo(ctx.client.birth_date, ctx.client.cnp),
     DATA_NASTERII: buildBirthDateRo(ctx.client.birth_date, ctx.client.cnp),
     LOC_NASTERE: ctx.order.service_slug === 'extras-multilingv-certificat-casatorie'
@@ -904,7 +922,9 @@ function buildPlaceholderData(ctx: DocumentContext) {
       : buildLocNastere(ctx.client),
     JUDET_NASTERE: ctx.order.service_slug === 'extras-multilingv-certificat-casatorie'
       ? buildJudetCasatorie(ctx.client)
-      : buildJudetNastere(ctx.client),
+      : ctx.order.service_slug === 'certificat-nastere'
+        ? buildJudetNastereCertificat(ctx.client)
+        : buildJudetNastere(ctx.client),
     SOTI: buildSoti(ctx.client),
     DATA_CASATORIE: buildMarriageDateRo(ctx.client.marriage_date),
     DATA_CASATORIEI: buildMarriageDateRo(ctx.client.marriage_date),
@@ -925,6 +945,17 @@ function buildPlaceholderData(ctx: DocumentContext) {
     CETATENIE_SOT: ctx.client.future_spouse_citizenship || '',
     TARA_CASATORIE: ctx.client.marriage_country || '',
     MOTIV_CELIBAT: ctx.client.celibacy_purpose || '',
+
+    // Certificat de naștere — cererea de duplicat ANEXA 59 (template-ul lui
+    // Raul, 22.07: certificat-nastere/cerere-eliberare-pf.docx). Tag-uri
+    // partajate cu ANEXA 4: {{TIP ACT}}, {{DATA_NASTERI}}, {{LOC_NASTERE}},
+    // {{JUDET_NASTERE}} (la certificat-nastere județul vine din
+    // registrationPlace — vezi buildJudetNastereCertificat), {{DATAGENERAT}}.
+    // {{NUME_NASTERE}} = numele la naștere de pe rândul „m-am născut cu
+    // numele de familie ..." — civil_status.birthName (colectat ca nume
+    // COMPLET la naștere, ex. „MOLDOVAN IONEL-ALIN"; nu doar numele de
+    // familie — pasul nu le colectează separat). Fallback: numele curent.
+    NUME_NASTERE: ctx.client.previous_name || ctx.client.name || '',
 
     // Dates
     DATA: dateFormatted,
