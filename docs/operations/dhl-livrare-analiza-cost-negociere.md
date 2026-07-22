@@ -92,3 +92,10 @@ ușor sub apă (Andorra ~307, Brazilia ~300) → se rezolvă cu pricing pe zone.
 2. tarif CONTRACTUAL (anexă tarifară permanentă), nu promo;
 3. prețurile includ fuel + TVA sau indicele se aplică peste?
 Următorul pas: răspunsul lui Adrian → decizie finală.
+
+## Update 2026-07-22 (seara) — răspuns trimis + serviciu import explorat
+Raul a trimis clarificările (1-3 de mai sus) + întrebare nouă: colectare DHL de
+la adresa clientului din străinătate pe contul EDIGITALIZARE (import/pickup,
+ex. Germania→Satu Mare) pentru un serviciu viitor de procesare documente
+originale cu retur — explorare, fără angajamente. Așteptăm: simulări DE/UK/ES/CH
++ worldwide, confirmare contractual + fuel/TVA, fezabilitate + tarife import.
