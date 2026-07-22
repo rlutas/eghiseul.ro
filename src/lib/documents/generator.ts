@@ -3,6 +3,7 @@ import PizZip from 'pizzip';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import { insertSignatureImages, type SignatureEntry } from './signature-inserter';
+import { validateCNP, getCountyFromCNP } from '@/lib/validations/cnp';
 
 // ──────────────────────────────────────────────────────────────
 // Types
@@ -62,6 +63,13 @@ export interface ClientData {
   birth_date?: string;
   birth_county?: string;
   birth_country?: string;
+  /** Localitatea nașterii (brută) — OCR-ul CI (personal.birthPlace, poate veni
+   *  cu prefix „Jud. XX " / „Mun. ") sau civil_status.birthLocality. Curățată
+   *  de buildLocNastere înainte de a intra pe cererea de extras multilingv. */
+  birth_locality?: string;
+  /** Județul nașterii colectat de pasul civil-status (birthCounty), când
+   *  serviciul îl cere. Fallback: codul de județ din CNP (buildJudetNastere). */
+  birth_judet?: string;
   address_parts?: { county?: string; city?: string; sector?: string; street?: string; number?: string; building?: string; staircase?: string; floor?: string; apartment?: string; postalCode?: string };
   company_address_parts?: { county?: string; city?: string; street?: string; number?: string; building?: string; apartment?: string };
 }
@@ -356,6 +364,57 @@ const CIVIL_STATUS_DOCUMENT_MAP: Record<string, string> = {
 /** Autoritatea în fața căreia avocatul asistă/reprezintă clientul la
  *  serviciile de stare civilă. */
 export const AUTORITATE_STARE_CIVILA = 'OFICIUL DE STARE CIVILĂ SATU MARE';
+
+// ──────────────────────────────────────────────────────────────
+// Extras multilingv — cerere de eliberare (ANEXA 4)
+// ──────────────────────────────────────────────────────────────
+
+/** Tipul actului de pe cererea de extras multilingv — {{TIP ACT}}/{{TIP_ACT}}.
+ *  Gol la orice alt serviciu (nullGetter golește oricum tag-urile lipsă). */
+const EXTRAS_MULTILINGV_TIP_ACT: Record<string, string> = {
+  'extras-multilingv-certificat-nastere': 'naștere',
+  'extras-multilingv-certificat-casatorie': 'căsătorie',
+};
+
+/** Data nașterii formatată DD.MM.YYYY — din client.birth_date (ISO sau RO)
+ *  când există; altfel derivată dintr-un CNP valid. Gol când nu se știe. */
+export function buildBirthDateRo(birthDateStr?: string, cnp?: string): string {
+  const parsed = parseBirthDate(birthDateStr);
+  if (parsed.day && parsed.month && parsed.year) {
+    return `${parsed.day}.${parsed.month}.${parsed.year}`;
+  }
+  const result = validateCNP(cnp || '');
+  if (result.valid && result.data) {
+    const d = result.data.birthDate;
+    const dd = String(d.getDate()).padStart(2, '0');
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    return `${dd}.${mm}.${d.getFullYear()}`;
+  }
+  return '';
+}
+
+/** Localitatea nașterii pentru cerere — birth_locality curățată de prefixele
+ *  pe care OCR-ul CI le include uneori („Jud. SM ", „Mun. ", „Com. "...).
+ *  Aceleași regex-uri ca în cardul „Date extrase" din PersonalDataStep. */
+export function buildLocNastere(client: ClientData): string {
+  return (client.birth_locality || '')
+    .replace(/^Jud\.\s*[A-ZĂÂÎȘȚ]{1,3}\s*/i, '')
+    .replace(/^Județ\s+[A-ZĂÂÎȘȚa-zăâîșț]+\s*/i, '')
+    .replace(/^(Mun|Or|Oraș|Com|Loc|Sat)\.\s*/i, '')
+    .trim();
+}
+
+/** Județul nașterii — birth_judet (pasul civil-status) când e colectat,
+ *  altfel din codul de județ al CNP-ului. „București (Sectorul N)" /
+ *  „București Sector N" se normalizează la „București" (rubrica de pe
+ *  cererea ANEXA 4 este „județul"). */
+export function buildJudetNastere(client: ClientData): string {
+  let judet = (client.birth_judet || '').trim();
+  if (!judet && validateCNP(client.cnp || '').valid) {
+    judet = getCountyFromCNP(client.cnp || '') || '';
+  }
+  return judet.replace(/^Bucure[sș]ti\b.*$/i, 'București');
+}
 
 /** Gender from the CNP's first digit (1/3/5/7 = M, 2/4/6/8 = F). */
 function genderFromCnp(cnp?: string): 'm' | 'f' | null {
@@ -727,6 +786,18 @@ function buildPlaceholderData(ctx: DocumentContext) {
     AUTORITATE_SC: CIVIL_STATUS_DOCUMENT_MAP[ctx.order.service_slug || '']
       ? AUTORITATE_STARE_CIVILA
       : '',
+
+    // Extras multilingv — cererea de eliberare (ANEXA 4). Template-ul lui Raul
+    // (extras-multilingv-certificat-nastere/cerere-eliberare-pf.docx) folosește
+    // {{TIP ACT}} (cu spațiu) și {{DATA_NASTERI}} (un singur I); alias-urile
+    // canonice TIP_ACT/DATA_NASTERII sunt populate și ele pentru template-ele
+    // viitoare (ex. varianta de căsătorie).
+    'TIP ACT': EXTRAS_MULTILINGV_TIP_ACT[ctx.order.service_slug || ''] || '',
+    TIP_ACT: EXTRAS_MULTILINGV_TIP_ACT[ctx.order.service_slug || ''] || '',
+    DATA_NASTERI: buildBirthDateRo(ctx.client.birth_date, ctx.client.cnp),
+    DATA_NASTERII: buildBirthDateRo(ctx.client.birth_date, ctx.client.cnp),
+    LOC_NASTERE: buildLocNastere(ctx.client),
+    JUDET_NASTERE: buildJudetNastere(ctx.client),
 
     // Dates
     DATA: dateFormatted,

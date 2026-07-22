@@ -169,6 +169,11 @@ export async function autoGenerateOrderDocuments(
     birth_date: personal.birthDate || '',
     birth_county: personal.birthPlace || personal.birthCounty || '',
     birth_country: personal.birthCountry || 'ROMANIA',
+    // Extras multilingv (ANEXA 4): localitatea + județul nașterii, separate.
+    // Localitatea = pasul civil-status (celibat) sau OCR-ul CI (birthPlace,
+    // curățat de prefixe în generator); județul = civil-status sau CNP.
+    birth_locality: civil.birthLocality || personal.birthPlace || '',
+    birth_judet: civil.birthCounty || '',
     address_parts: personalAddress ? {
       county: personalAddress.county, city: personalAddress.city,
       sector: personalAddress.sector,
