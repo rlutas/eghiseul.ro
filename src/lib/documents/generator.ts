@@ -70,6 +70,18 @@ export interface ClientData {
   /** Județul nașterii colectat de pasul civil-status (birthCounty), când
    *  serviciul îl cere. Fallback: codul de județ din CNP (buildJudetNastere). */
   birth_judet?: string;
+  /** Numele soțului/soției dinaintea căsătoriei
+   *  (civil_status.spouseNameBeforeMarriage) — intră în {{SOTI}} pe cererea
+   *  de extras multilingv de căsătorie. */
+  spouse_name?: string;
+  /** Data căsătoriei (civil_status.marriageDate, ISO sau RO) —
+   *  {{DATA_CASATORIE}} pe cererea de extras multilingv de căsătorie. */
+  marriage_date?: string;
+  /** Județul care a înregistrat actul de căsătorie
+   *  (civil_status.registrationPlace: „Sibiu" / „București (Sectorul N)").
+   *  Pasul civil-status NU colectează localitatea separat, deci același
+   *  string alimentează și localitatea, și județul căsătoriei pe cerere. */
+  marriage_place?: string;
   address_parts?: { county?: string; city?: string; sector?: string; street?: string; number?: string; building?: string; staircase?: string; floor?: string; apartment?: string; postalCode?: string };
   company_address_parts?: { county?: string; city?: string; street?: string; number?: string; building?: string; apartment?: string };
 }
@@ -414,6 +426,39 @@ export function buildJudetNastere(client: ClientData): string {
     judet = getCountyFromCNP(client.cnp || '') || '';
   }
   return judet.replace(/^Bucure[sș]ti\b.*$/i, 'București');
+}
+
+/** „{client} și {soț/soție}" — {{SOTI}} pe cererea de extras multilingv de
+ *  căsătorie. Doar numele clientului când soțul/soția nu e colectat(ă). */
+export function buildSoti(client: ClientData): string {
+  const name = (client.name || '').trim();
+  const spouse = (client.spouse_name || '').trim();
+  if (!spouse) return name;
+  return `${name} și ${spouse}`;
+}
+
+/** Data căsătoriei formatată DD.MM.YYYY — civil_status.marriageDate (ISO din
+ *  input-ul de dată al pasului civil-status, sau deja RO). Gol când lipsește. */
+export function buildMarriageDateRo(marriageDateStr?: string): string {
+  const parsed = parseBirthDate(marriageDateStr);
+  if (parsed.day && parsed.month && parsed.year) {
+    return `${parsed.day}.${parsed.month}.${parsed.year}`;
+  }
+  return '';
+}
+
+/** Locul căsătoriei pentru cerere — civil_status.registrationPlace. Pasul
+ *  colectează DOAR județul care a înregistrat actul (SearchableSelect de
+ *  județe + sector pt București), fără localitate, deci același text intră
+ *  și la „localitatea", și la „județul" de pe rândul căsătoriei.
+ *  „București (Sectorul N)" se normalizează la „București" (ca la naștere). */
+export function buildLocCasatorie(client: ClientData): string {
+  return (client.marriage_place || '').trim().replace(/^Bucure[sș]ti\b.*$/i, 'București');
+}
+
+/** Județul căsătoriei — identic cu buildLocCasatorie (vezi nota de acolo). */
+export function buildJudetCasatorie(client: ClientData): string {
+  return buildLocCasatorie(client);
 }
 
 /** Gender from the CNP's first digit (1/3/5/7 = M, 2/4/6/8 = F). */
@@ -791,13 +836,29 @@ function buildPlaceholderData(ctx: DocumentContext) {
     // (extras-multilingv-certificat-nastere/cerere-eliberare-pf.docx) folosește
     // {{TIP ACT}} (cu spațiu) și {{DATA_NASTERI}} (un singur I); alias-urile
     // canonice TIP_ACT/DATA_NASTERII sunt populate și ele pentru template-ele
-    // viitoare (ex. varianta de căsătorie).
+    // viitoare.
+    // Varianta de CĂSĂTORIE (extras-multilingv-certificat-casatorie/
+    // cerere-eliberare-pf.docx, 22.07) REFOLOSEȘTE tagurile LOC_NASTERE/
+    // JUDET_NASTERE pe rândul „titularul este căsătorit cu {{SOTI}} la data de
+    // {{DATA_CASATORIE}}, în localitatea ..., județul ..." — la acel serviciu
+    // cele două taguri primesc deci LOCUL CĂSĂTORIEI, nu al nașterii.
+    // DATA_CASATORIE = scrierea lui Raul (fără I final); DATA_CASATORIEI +
+    // LOC_CASATORIE/JUDET_CASATORIE = aliasurile canonice pt template viitoare.
     'TIP ACT': EXTRAS_MULTILINGV_TIP_ACT[ctx.order.service_slug || ''] || '',
     TIP_ACT: EXTRAS_MULTILINGV_TIP_ACT[ctx.order.service_slug || ''] || '',
     DATA_NASTERI: buildBirthDateRo(ctx.client.birth_date, ctx.client.cnp),
     DATA_NASTERII: buildBirthDateRo(ctx.client.birth_date, ctx.client.cnp),
-    LOC_NASTERE: buildLocNastere(ctx.client),
-    JUDET_NASTERE: buildJudetNastere(ctx.client),
+    LOC_NASTERE: ctx.order.service_slug === 'extras-multilingv-certificat-casatorie'
+      ? buildLocCasatorie(ctx.client)
+      : buildLocNastere(ctx.client),
+    JUDET_NASTERE: ctx.order.service_slug === 'extras-multilingv-certificat-casatorie'
+      ? buildJudetCasatorie(ctx.client)
+      : buildJudetNastere(ctx.client),
+    SOTI: buildSoti(ctx.client),
+    DATA_CASATORIE: buildMarriageDateRo(ctx.client.marriage_date),
+    DATA_CASATORIEI: buildMarriageDateRo(ctx.client.marriage_date),
+    LOC_CASATORIE: buildLocCasatorie(ctx.client),
+    JUDET_CASATORIE: buildJudetCasatorie(ctx.client),
 
     // Dates
     DATA: dateFormatted,

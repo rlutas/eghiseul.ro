@@ -151,6 +151,11 @@ export async function POST(
       // curățat de prefixe în generator); județul = civil-status sau CNP.
       birth_locality: civil.birthLocality || personal.birthPlace || '',
       birth_judet: civil.birthCounty || '',
+      // Extras multilingv căsătorie (ANEXA 4): soțul/soția + data + locul
+      // căsătoriei (registrationPlace = județul care a înregistrat actul).
+      spouse_name: civil.spouseNameBeforeMarriage || '',
+      marriage_date: civil.marriageDate || '',
+      marriage_place: civil.registrationPlace || '',
       address_parts: personalAddress ? {
         county: personalAddress.county, city: personalAddress.city,
         sector: personalAddress.sector,
