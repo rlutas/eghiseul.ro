@@ -712,15 +712,17 @@ function buildPlaceholderData(ctx: DocumentContext) {
     STARE_CIVILA: buildStareCivilaLabel(ctx.client.civil_status, ctx.client.cnp),
     // „Nume Client (căsătorit)" — client name with the marital status from
     // the wizard's civil-status step, when collected.
-    CLIENT_STARE_CIVILA: (() => {
-      const label = buildStareCivilaLabel(ctx.client.civil_status, ctx.client.cnp);
-      return label ? `${ctx.client.name} (${label})` : ctx.client.name;
-    })(),
-    FILIATIE: buildFiliatie(ctx.client.father_name, ctx.client.mother_name, ctx.client.cnp),
+    // Semantica tag-urilor = layoutul v3 al lui Raul (22.07):
+    //  - CLIENT_STARE_CIVILA (randul 1) = DOAR numele clientului, fara paranteza;
+    //  - NUMETATA+NUMEMAMA (randul 2, adiacente) = filiatia intreaga (fiul/fiica
+    //    lui X si Y) - livrata prin NUMETATA, NUMEMAMA ramane gol;
+    //  - FILIATIE (jos, dupa "status civil:") = eticheta starii civile
+    //    (casatorit/a etc., acordata pe gen din CNP).
+    CLIENT_STARE_CIVILA: ctx.client.name,
+    FILIATIE: buildStareCivilaLabel(ctx.client.civil_status, ctx.client.cnp) || '-',
     hasFiliatie: buildFiliatie(ctx.client.father_name, ctx.client.mother_name, ctx.client.cnp) !== '',
-    // Template-ul final al lui Raul (22.07) cere numele părinților și separat.
-    NUMEMAMA: ctx.client.mother_name && ctx.client.mother_name !== '-' ? ctx.client.mother_name : '',
-    NUMETATA: ctx.client.father_name && ctx.client.father_name !== '-' ? ctx.client.father_name : '',
+    NUMETATA: buildFiliatie(ctx.client.father_name, ctx.client.mother_name, ctx.client.cnp),
+    NUMEMAMA: '',
     ACTIVITATI_SC: buildActivitatiStareCivila(ctx.order.service_slug),
     AUTORITATE_SC: CIVIL_STATUS_DOCUMENT_MAP[ctx.order.service_slug || '']
       ? AUTORITATE_STARE_CIVILA
