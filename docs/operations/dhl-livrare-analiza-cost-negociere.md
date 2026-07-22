@@ -80,3 +80,15 @@ internațională (diaspora) și crește volumul către DHL (câștig ambele păr
 2. **Tagging curier în DB incomplet:** doar 12 din ~496 colete DHL sunt marcate `dhl`
    (eghiseul `courier_provider`, CJO `awb_courier`). Fără AWB nu se izolează costul
    livrare per comandă în admin — de curățat dacă vrem reconciliere per comandă.
+
+## Update 2026-07-22 — OFERTA DHL primită (Adrian, 13:42)
+Simulări pe 3 AWB-uri: Italia 200,75→165 · Moldova 225→183 · Luxemburg 209→170
+= **~-18%**. La volumul nostru ≈ 900-1.000 lei/lună economie (~11-12k/an).
+UE devine marjă 100+ lei/colet la 250 încasați; destinațiile exotice rămân
+ușor sub apă (Andorra ~307, Brazilia ~300) → se rezolvă cu pricing pe zone.
+
+**Clarificări cerute înainte de accept (răspuns trimis de Raul):**
+1. discount pe TOATE destinațiile (UE+worldwide)? + simulări DE/UK/ES/CH + una worldwide;
+2. tarif CONTRACTUAL (anexă tarifară permanentă), nu promo;
+3. prețurile includ fuel + TVA sau indicele se aplică peste?
+Următorul pas: răspunsul lui Adrian → decizie finală.
