@@ -20,6 +20,15 @@
 > - Echipa testează: „Solicită documente" (CJO) + fluxul client-blocat (eghiseul) — ghid: `admin/ghid-echipa-ajutare-client-blocat.md`
 > - Prima comandă pe pagina de urbanism + indexarea ei
 >
+> **🟣 Livrat 21.07 seara (SEO, cu agenți):** constatator on-page refresh (title intenție + tabel comparativ + FAQ 17 + interlink landing-uri) · CF location pages: audit → paginile existau ca doorway (~40 cuvinte unice); primele 15 județe au acum localități reale + particularități factuale + 2 FAQ locale · **redesign complet pagini județ** (hero dark, card OCPI ca price-card, timeline, chips, CTA — limbajul vizual al serviciilor).
+>
+> **📈 REZULTATE AȘTEPTATE (de verificat în GSC la 2 și 4 săptămâni — ~4 și ~18 aug):**
+> - Constatator: poz 12,1 → țintă top 5-7 („certificat constatator online")
+> - Extras CF principal: poz 12,8 → pagina 1; long-tail „extras carte funciara {judet}" pe cele 15 județe începe să afișeze
+> - Urbanism: indexare + primele afișări pe „certificat de urbanism online"
+> - Cazier-auto: conversii revenite în 72h de la fix (baseline: 0 plăți/7z)
+> - Newsletter: abonați noi din verificare-rovinietă (13,8k clicuri/28z)
+>
 > **⏭️ URMEAZĂ (confirmate):** constatator on-page refresh (poz 12→top7) · CF location pages 10-15 județe · backlink sprint 90 zile · test conversie naștere/căsătorie · Faza 4 client-blocat = paritate CJO.
 >
 > **📋 Rămas manual (Raul):** cont CloudConvert + `CLOUDCONVERT_API_KEY` pe ambele platforme (deblochează PDF-urile pt colegi fără Word) · răspuns DHL · decizie transliterare e-Factura non-latin (documentat, amânat).
