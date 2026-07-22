@@ -6,6 +6,7 @@ import { generateDocument, type DocumentContext, type ClientData, type CompanyDa
 import { uploadFile, generateDocumentKey, downloadFile, deleteFile, getClientSignatureBase64 } from '@/lib/aws/s3';
 import { allocateNumber, findExistingNumber, getRegistryClient } from '@/lib/registry/client';
 import { isPJForDocumentGeneration } from '@/lib/documents/delegation-items';
+import { computeCerereItems } from '@/lib/documents/cerere-items';
 
 /**
  * Format an AddressState object (or string) into a human-readable Romanian address.
@@ -74,6 +75,37 @@ export async function POST(
     if (orderError || !order) {
       return NextResponse.json({ success: false, error: 'Order not found' }, { status: 404 });
     }
+
+    // COMBINED civil-status orders (certificat + extras multilingv etc.) need
+    // one cerere PER service — mirror of the per-service împuternicire flow.
+    // `service_slug` (fallback `service_type`) selects WHICH service's cerere
+    // to generate; it is validated against the order's own services, which
+    // also blocks path traversal into arbitrary template folders.
+    const mainServiceSlug: string = order.services?.slug || 'cazier-judiciar';
+    let cerereServiceSlug: string | null = null;
+    if (template === 'cerere-eliberare-pf' && (body.service_slug || body.service_type)) {
+      const requested = String(body.service_slug || body.service_type);
+      const allowedCereri = computeCerereItems({
+        services: order.services,
+        selected_options: order.selected_options,
+      });
+      if (!allowedCereri.some((i) => i.serviceSlug === requested)) {
+        return NextResponse.json(
+          { success: false, error: 'Serviciul cerut nu face parte din această comandă' },
+          { status: 400 }
+        );
+      }
+      cerereServiceSlug = requested;
+    }
+    // Secondary = cerere for one of the order's ADDITIONAL services. The main
+    // service's cerere keeps today's unsuffixed file name + null metadata so
+    // existing orders/documents keep matching (legacy compat).
+    const isSecondaryCerere = !!cerereServiceSlug && cerereServiceSlug !== mainServiceSlug;
+    // Template folder + placeholder context slug: the ADDITIONAL service's
+    // slug when generating its cerere (TIP_ACT/INSTITUTIE/celibat variant
+    // resolve for THAT service), the main service's slug otherwise.
+    const serviceSlug =
+      isSecondaryCerere && cerereServiceSlug ? cerereServiceSlug : mainServiceSlug;
 
     // Fetch company and lawyer data from admin_settings
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -312,7 +344,9 @@ export async function POST(
         friendly_order_id: order.friendly_order_id || '',
         total_price: order.total_price || 0,
         service_name: order.services?.name || '',
-        service_slug: order.services?.slug || 'cazier-judiciar',
+        // Effective slug: on a secondary cerere this is the ADDITIONAL
+        // service so its placeholders (TIP_ACT, INSTITUTIE...) come out right.
+        service_slug: serviceSlug,
         service_price: order.services?.base_price || order.base_price || 0,
         created_at: order.created_at,
         estimated_days: order.services?.estimated_days,
@@ -334,8 +368,6 @@ export async function POST(
       motiv_solicitare: body.motiv_solicitare || contact.purpose || 'Interes personal',
       client_ip: cd.signature_metadata?.ip_address || 'N/A',
     };
-
-    const serviceSlug = order.services?.slug || 'cazier-judiciar';
 
     // Get client signature from S3 (new) or inline base64 (legacy)
     const clientSignatureBase64 = await getClientSignatureBase64(cd);
@@ -374,10 +406,15 @@ export async function POST(
     // împuternicirii #2 o ștergea pe #1).
     const docType = template.replace(/-/g, '_');
     const friendlyId = order.friendly_order_id || orderId;
+    // Cererile comenzilor combinate la fel: cererea serviciului SUPLIMENTAR
+    // primește sufixul slug-ului lui; cererea serviciului principal rămâne
+    // fără sufix (compatibil cu documentele deja generate).
     const serviceSuffix =
       template === 'imputernicire' && body.service_type
         ? '-' + String(body.service_type).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40)
-        : '';
+        : isSecondaryCerere && cerereServiceSlug
+          ? '-' + cerereServiceSlug.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40)
+          : '';
     const fileName = `${template}${serviceSuffix}-${friendlyId}.docx`;
 
     // Upload generated document to S3
@@ -467,7 +504,12 @@ export async function POST(
         generated_by: user.id,
         metadata: {
           template,
-          service_type: template === 'imputernicire' ? (body.service_type || order.services?.name || null) : null,
+          service_type:
+            template === 'imputernicire'
+              ? (body.service_type || order.services?.name || null)
+              : isSecondaryCerere
+                ? cerereServiceSlug
+                : null,
           document_numbers: documentNumbers,
           registry_id: documentNumbers.registry_ids?.contract || documentNumbers.registry_ids?.delegation || null,
         },

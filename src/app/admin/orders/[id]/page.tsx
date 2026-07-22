@@ -18,6 +18,7 @@ import { estimateFromSelectedOptions } from '@/lib/delivery-calculator';
 import { isForeignBillingCountry } from '@/lib/orders/billing-validation';
 import { isNoLawyerService } from '@/lib/documents/no-lawyer-services';
 import { computeDelegationItems } from '@/lib/documents/delegation-items';
+import { computeCerereItems } from '@/lib/documents/cerere-items';
 import { REUPLOAD_DOC_SPECS, suggestedDocsForService } from '@/lib/reupload/doc-types';
 import { STEP_LABELS } from '@/lib/admin/wizard-steps';
 import {
@@ -3690,7 +3691,17 @@ function ProcessingSection({
       const res = await fetch(`/api/admin/orders/${order.id}/generate-document`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ template, ...(serviceType ? { service_type: serviceType } : {}) }),
+        // Împuternicirile identifică serviciul prin `service_type` (cheia de
+        // delegație); cererile combinate prin `service_slug` (folderul de
+        // template al serviciului suplimentar).
+        body: JSON.stringify({
+          template,
+          ...(serviceType
+            ? template === 'cerere-eliberare-pf'
+              ? { service_slug: serviceType }
+              : { service_type: serviceType }
+            : {}),
+        }),
       });
 
       if (!res.ok) {
@@ -3837,20 +3848,38 @@ function ProcessingSection({
           <div className="space-y-1.5">
             {/* Auto-generated contracts. Împuternicirile sunt PER SERVICIU —
                 fiecare document oficial (cazier, apostilă, integritate...) are
-                delegația și fișierul lui, deci un rând per serviciu. */}
+                delegația și fișierul lui, deci un rând per serviciu. Cererile
+                de eliberare la fel: comenzile combinate de stare civilă
+                (certificat + extras multilingv etc.) au câte o cerere pe
+                serviciu, fiecare pe template-ul serviciului ei. */}
             {generableDocTypes.flatMap(docType => {
-              if (docType !== 'imputernicire') return [{ docType, serviceType: undefined as string | undefined, label: DOC_TYPE_LABELS[docType] || docType }];
-              const items = computeDelegationItems({
-                services: order.services,
-                selected_options: (order.selected_options as AnyObj[]) || [],
-              });
-              return items.map((item) => ({
-                docType,
-                serviceType: item.serviceType,
-                label: items.length > 1
-                  ? `Imputernicire — ${item.label}`
-                  : (DOC_TYPE_LABELS[docType] || docType),
-              }));
+              if (docType === 'imputernicire') {
+                const items = computeDelegationItems({
+                  services: order.services,
+                  selected_options: (order.selected_options as AnyObj[]) || [],
+                });
+                return items.map((item) => ({
+                  docType,
+                  serviceType: item.serviceType,
+                  label: items.length > 1
+                    ? `Imputernicire — ${item.label}`
+                    : (DOC_TYPE_LABELS[docType] || docType),
+                }));
+              }
+              if (docType === 'cerere_eliberare_pf') {
+                const items = computeCerereItems({
+                  services: order.services,
+                  selected_options: (order.selected_options as AnyObj[]) || [],
+                });
+                return items.map((item) => ({
+                  docType,
+                  serviceType: item.serviceSlug,
+                  label: items.length > 1
+                    ? `Cerere — ${item.label}`
+                    : (DOC_TYPE_LABELS[docType] || docType),
+                }));
+              }
+              return [{ docType, serviceType: undefined as string | undefined, label: DOC_TYPE_LABELS[docType] || docType }];
             }).map(({ docType, serviceType, label }) => {
               const doc = docType === 'imputernicire' && serviceType
                 ? documents.find(d =>
@@ -3859,6 +3888,14 @@ function ProcessingSection({
                       // legacy docs generated before per-service metadata
                       (!(d.metadata as AnyObj | null)?.service_type &&
                         serviceType === (order.services?.slug || order.services?.name))))
+                : docType === 'cerere_eliberare_pf' && serviceType
+                ? documents.find(d =>
+                    d.type === docType &&
+                    ((d.metadata as AnyObj | null)?.service_type === serviceType ||
+                      // cererea serviciului PRINCIPAL nu poartă service_type
+                      // (nume de fișier/metadata neschimbate față de legacy)
+                      (!(d.metadata as AnyObj | null)?.service_type &&
+                        serviceType === order.services?.slug)))
                 : documents.find(d => d.type === docType);
               const template = DOC_TEMPLATE_MAP[docType];
               const isGenerating = generatingDoc === (serviceType ? `${template}:${serviceType}` : template);

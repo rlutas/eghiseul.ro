@@ -64,8 +64,13 @@ celibat ×2 (selecție automată pe scop), naștere (Anexa 59), căsătorie.
    date (celibat: scop căsătorie în străinătate → varianta 1, altfel varianta 2
    cu motivul clientului). Câmpurile se completează singure din comandă
    (client, filiație, date naștere/căsătorie, soț, țară, motiv).
-3. **Comenzi cu servicii EXTRA** (naștere + multilingv/celibat): în lucru —
-   câte un rând de cerere per serviciu în admin (ca la împuterniciri), fiecare
-   generat cu template-ul + datele serviciului lui. Tot manual, per buton.
+3. **Comenzi cu servicii EXTRA** (LIVE): în „Documente generate" apare câte un
+   rând de cerere per serviciu („Cerere — Certificat de Naștere", „Cerere —
+   Extras Multilingv"...), fiecare cu Generează/Regenerează + Previzualizare
+   proprii, pe template-ul + datele serviciului lui (inclusiv varianta corectă
+   la celibat ca serviciu secundar). Derivare: computeCerereItems
+   (src/lib/documents/cerere-items.ts) din selected_options (extras_multilingv,
+   certificat_pachet, bundled). Serviciile fără template propriu NU primesc rând
+   (evită cererea de cazier greșită legal).
 4. Regenerarea suprascrie documentul aceluiași serviciu (numerele din registru
    se refolosesc — nu se consumă numere noi).
