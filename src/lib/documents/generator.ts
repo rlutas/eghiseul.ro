@@ -434,13 +434,14 @@ export const AUTORITATE_STARE_CIVILA = 'OFICIUL DE STARE CIVILĂ SATU MARE';
 // ──────────────────────────────────────────────────────────────
 
 /** Tipul actului de pe cererile de eliberare — {{TIP ACT}}/{{TIP_ACT}}.
- *  Folosit de cererea de extras multilingv (ANEXA 4) și de cererea de
- *  duplicat certificat de naștere (ANEXA 59, „certificatul de {{TIP ACT}}").
+ *  Folosit de cererea de extras multilingv (ANEXA 4) și de cererile de
+ *  duplicat certificat (ANEXA 59, „certificatul de {{TIP ACT}}").
  *  Gol la orice alt serviciu (nullGetter golește oricum tag-urile lipsă). */
 const CERERE_TIP_ACT: Record<string, string> = {
   'extras-multilingv-certificat-nastere': 'naștere',
   'extras-multilingv-certificat-casatorie': 'căsătorie',
   'certificat-nastere': 'naștere',
+  'certificat-casatorie': 'căsătorie',
 };
 
 /** Data nașterii formatată DD.MM.YYYY — din client.birth_date (ISO sau RO)
@@ -930,6 +931,16 @@ function buildPlaceholderData(ctx: DocumentContext) {
     DATA_CASATORIEI: buildMarriageDateRo(ctx.client.marriage_date),
     LOC_CASATORIE: buildLocCasatorie(ctx.client),
     JUDET_CASATORIE: buildJudetCasatorie(ctx.client),
+    // Certificat de căsătorie — cererea de duplicat ANEXA 59 (template-ul lui
+    // Raul, 22.07: certificat-casatorie/cerere-eliberare-pf.docx). Rândul
+    // „m-am căsătorit cu {{SOT}} la data de {{DATA_CASATORIE}}, în localitatea
+    // {{LOC_CASATORIE}} judeţul {{JUDET_CASATORIE}}". {{SOT}} = DOAR numele
+    // soțului/soției (civil_status.spouseNameBeforeMarriage — aceeași sursă ca
+    // {{SOTI}} de pe ANEXA 4, dar FĂRĂ numele clientului: subsemnatul e deja
+    // clientul). LOC/JUDET_CASATORIE primesc ambele registrationPlace (pasul
+    // colectează doar județul care a înregistrat actul). Rândul nașterii de pe
+    // acest template e lăsat cu puncte (fără taguri).
+    SOT: (ctx.client.spouse_name || '').trim(),
 
     // Certificat de celibat — cererea ANEXA 9 (template-ele lui Raul, 22.07).
     // Ambele variante scriu {{DATA_NASTERE}} (fără I final — a treia grafie,

@@ -29,8 +29,26 @@ alt-motiv). Reparat la instalare: DATAGENERAT lipsea din T2 (puncte în loc de
 tag). Notă: countryOfUse există în formular abia din 16.07 — comenzile mai vechi
 vor avea țara goală. A treia grafie de dată (DATA_NASTERE) = alias nou.
 
+## Cerere certificat NAȘTERE (LIVE — 4ef2dae)
+Anexa 59 a lui Raul, byte-identic la certificat-nastere. Tag nou NUME_NASTERE
+(birthName din formular); JUDET_NASTERE preferat din registrationPlace la acest
+slug; TIP ACT extins pe serviciile clasice.
+
+## Cerere certificat CĂSĂTORIE (LIVE)
+Template-ul lui Raul byte-identic la certificat-casatorie. Tag nou SOT (doar
+numele soțului — spouseNameBeforeMarriage, confirmat pe comenzi reale);
+DATA/LOC/JUDET_CASATORIE refolosite; TIP ACT=căsătorie. Rândul nașterii lăsat
+cu puncte (intenționat, fără tag-uri).
+
+## BILANȚ: stare civilă COMPLETĂ pe modelele lui Raul
+Împuternicire UNBR ×5 + cereri: multilingv naștere, multilingv căsătorie,
+celibat ×2 (selecție automată pe scop), naștere (Anexa 59), căsătorie.
+
 ## URMEAZĂ
-- Raul livrează încă 2 formulare: cereri NAȘTERE și CĂSĂTORIE clasice.
+- Cereri MULTI-SERVICIU: comenzile combinate (ex. naștere + extras multilingv
+  sau + celibat ca serviciu suplimentar) trebuie să genereze cererea fiecărui
+  serviciu din comandă, ca la împuterniciri (computeDelegationItems) — cerință
+  Raul 22.07, în lucru.
 - Decizii deschise: câmp „stare civilă" în wizard la naștere/căsătorie/multilingv
   (azi doar celibat); semnăturile ca imagini pe împuternicirea nouă (template-ul
   n-are tag-urile).

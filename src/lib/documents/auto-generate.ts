@@ -179,6 +179,8 @@ export async function autoGenerateOrderDocuments(
     // La certificat-nastere registrationPlace = județul actului de NAȘTERE
     // și intră în {{JUDET_NASTERE}} pe cererea ANEXA 59 — vezi
     // buildJudetNastereCertificat în generator.ts.
+    // La certificat-casatorie aceleași trei câmpuri alimentează cererea de
+    // duplicat ANEXA 59 ({{SOT}}/{{DATA_CASATORIE}}/{{LOC/JUDET_CASATORIE}}).
     spouse_name: civil.spouseNameBeforeMarriage || '',
     marriage_date: civil.marriageDate || '',
     marriage_place: civil.registrationPlace || '',
