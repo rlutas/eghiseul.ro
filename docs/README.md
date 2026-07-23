@@ -23,6 +23,7 @@ Index al documentației. Aceasta e o **hartă**, nu un jurnal — pentru jurnalu
 | **Design** | [`design/`](design/) | sistem de design, ghiduri vizuale |
 | **PRD / Business** | [`prd/`](prd/), [`business/`](business/), [`legal/`](legal/) | cerințe produs, business, legal |
 | **Registru central Barou** | [`registru-central/`](registru-central/) | registru numere partajat pe 3 platforme, alocare post-plată, cutover |
+| **Serviciu NOU: traduceri+apostile** | [`serviciu-traduceri-apostile/`](serviciu-traduceri-apostile/) | analiză & plan (benchmark Kenna, liste documente/limbi, întrebări traducător+notar, flow, pricing draft) — în negociere |
 | **Curieri** | [`fancourier/`](fancourier/), [`sameday/`](sameday/) | integrări curier |
 | **Testing** | [`testing/`](testing/) | ghiduri de testare |
 | **Agenți** | [`agents/`](agents/) | orchestrare agenți |
