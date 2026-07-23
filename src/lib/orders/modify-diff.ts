@@ -21,6 +21,10 @@ export interface OrderOptionForDiff {
   option_id?: string;
   optionName?: string;
   option_name?: string;
+  /** Per-option details collected at selection time — same shape the wizard
+   *  persists (traducere → language, apostilă → country). Flows through to
+   *  selected_options so admin/contract/factură show it. */
+  metadata?: { language?: string; country?: string } | null;
 }
 
 export interface OrderForDiff {
@@ -145,8 +149,16 @@ export function describeChanges(args: {
     verificare_expert: 'verificare expert',
     addon_certificat_integritate: 'certificat integritate',
     addon_cazier_judiciar: 'cazier judiciar (add-on)',
+    custom_extra: 'serviciu extra',
   };
-  const fmt = (c: string) => labels[c] ?? c;
+  // Added options carry their selection details (language/country) so the
+  // team + customer email say WHICH translation/apostille was bought.
+  const fmt = (c: string) => {
+    const row = args.newOptions.find((o) => o.code === c) ?? args.oldOptions.find((o) => o.code === c);
+    const base = labels[c] ?? row?.optionName ?? row?.option_name ?? c;
+    const detail = [row?.metadata?.language, row?.metadata?.country].filter(Boolean).join(', ');
+    return detail ? `${base} (${detail})` : base;
+  };
 
   const parts: string[] = [];
   if (added.length > 0) parts.push(`adăugat: ${added.map(fmt).join(', ')}`);
@@ -162,4 +174,37 @@ export function describeChanges(args: {
   if (parts.length === 0) return 'modificare comandă';
   const joined = parts.join(' · ');
   return joined.length > 200 ? joined.slice(0, 197) + '...' : joined;
+}
+
+/**
+ * Business days to extend the order's estimated completion by when the admin
+ * ADDS time-impacting options via Modify. Pessimistic (maxDays) — the team
+ * gets a deadline it can hold. Removals do NOT shorten the estimate (the
+ * work may already be under way; the operator can adjust manually).
+ *
+ * Mirrors OPTION_DELIVERY_IMPACT + the cetățean-străin surcharge used by the
+ * wizard-side calculator, kept literal here so this stays a pure module.
+ */
+const ADDED_OPTION_TERM_DAYS: Record<string, number> = {
+  traducere: 2,
+  legalizare: 1,
+  apostila_haga: 1,
+  apostila_notari: 1,
+  cetatean_strain: 7,
+};
+
+export function computeAddedTermShiftDays(
+  oldOptions: OrderOptionForDiff[],
+  newOptions: OrderOptionForDiff[]
+): number {
+  const oldCodes = new Set(oldOptions.map((o) => o.code).filter(Boolean) as string[]);
+  let days = 0;
+  const counted = new Set<string>();
+  for (const o of newOptions) {
+    const code = o.code ?? '';
+    if (!code || oldCodes.has(code) || counted.has(code)) continue;
+    counted.add(code);
+    days += ADDED_OPTION_TERM_DAYS[code] ?? 0;
+  }
+  return days;
 }

@@ -27,11 +27,13 @@ import { createRefund, stripe } from '@/lib/stripe';
 import { createProformaForExtra } from '@/lib/oblio/proforma';
 import {
   computeModifyDiff,
+  computeAddedTermShiftDays,
   describeChanges,
   type CustomExtraForDiff,
   type OrderForDiff,
   type OrderOptionForDiff,
 } from '@/lib/orders/modify-diff';
+import { addBusinessDaysISO } from '@/lib/delivery-calculator';
 import { sendEmail } from '@/lib/email/resend';
 import {
   buildExtraPaymentSubject,
@@ -169,6 +171,32 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     additional_paid_amount: Number(orderRow.additional_paid_amount ?? 0),
     selected_options: (orderRow.selected_options as OrderForDiff['selected_options']) ?? [],
   };
+  // Options ADDED via Modify must carry their selection details, same as the
+  // wizard requires from the customer: traducere → language, apostilă →
+  // country. Existing (legacy) rows are exempt — old orders may predate the
+  // metadata convention, and blocking an unrelated delivery tweak on them
+  // would be wrong.
+  const oldCodesSet = new Set(
+    ((orderForDiff.selected_options ?? []) as OrderOptionForDiff[])
+      .map((o) => o.code)
+      .filter(Boolean) as string[]
+  );
+  for (const o of body.selectedOptions) {
+    if (!o.code || oldCodesSet.has(o.code)) continue;
+    if (o.code === 'traducere' && !o.metadata?.language) {
+      return NextResponse.json(
+        { success: false, error: { code: 'MISSING_LANGUAGE', message: 'Selectează limba pentru Traducere Autorizată' } },
+        { status: 400 }
+      );
+    }
+    if ((o.code === 'apostila_haga' || o.code === 'apostila_notari') && !o.metadata?.country) {
+      return NextResponse.json(
+        { success: false, error: { code: 'MISSING_COUNTRY', message: 'Selectează țara pentru apostilă' } },
+        { status: 400 }
+      );
+    }
+  }
+
   const diff = computeModifyDiff(orderForDiff, {
     selectedOptions: body.selectedOptions,
     deliveryPrice: body.deliveryPrice,
@@ -424,6 +452,28 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     }
   }
 
+  // Added time-impacting options (traducere/legalizare/apostilă/cetățean
+  // străin) extend the promised completion date so the team sees the real
+  // deadline. Pessimistic maxDays per added code; removals never shorten.
+  const termShiftDays = computeAddedTermShiftDays(
+    (orderForDiff.selected_options ?? []) as OrderOptionForDiff[],
+    body.selectedOptions
+  );
+  let termShiftNote: string | null = null;
+  const existingEstimate = orderRow.estimated_completion_date as string | null;
+  if (termShiftDays > 0 && existingEstimate) {
+    // RO-local calendar day of the stored estimate (persisted at ~16:00Z).
+    const oldDay = new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'Europe/Bucharest',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    }).format(new Date(existingEstimate));
+    const newDay = addBusinessDaysISO(oldDay, termShiftDays);
+    updatePayload.estimated_completion_date = new Date(`${newDay}T16:00:00Z`).toISOString();
+    termShiftNote = `termen extins cu ${termShiftDays} zile lucrătoare (${oldDay} → ${newDay})`;
+  }
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { error: updateErr } = await (admin.from('orders') as any)
     .update(updatePayload)
@@ -445,6 +495,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         : 'fără diferență de bani',
     body.note ? `notă: ${body.note}` : null,
     `modificări: ${changesSummary}`,
+    termShiftNote,
   ].filter(Boolean) as string[];
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -475,6 +526,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       pendingPaymentIntentId,
       pendingPaymentClientSecret,
       extraPaymentEmailSent,
+      termShift: termShiftNote,
     },
   });
 }

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   computeModifyDiff,
+  computeAddedTermShiftDays,
   describeChanges,
   type OrderForDiff,
   type OrderOptionForDiff,
@@ -334,5 +335,51 @@ describe('describeChanges — humanization', () => {
     });
     expect(text.length).toBeLessThanOrEqual(200);
     expect(text.endsWith('...')).toBe(true);
+  });
+
+  it('includes language/country details on added options (team must know WHICH translation)', () => {
+    const text = describeChanges({
+      oldOptions: [],
+      newOptions: [
+        { code: 'traducere', priceModifier: 178.5, quantity: 1, metadata: { language: 'Germană' } },
+        { code: 'apostila_haga', priceModifier: 150, quantity: 1, metadata: { country: 'Italia' } },
+      ],
+      oldDeliveryPrice: 0,
+      newDeliveryPrice: 0,
+    });
+    expect(text).toContain('traducere (Germană)');
+    expect(text).toContain('apostilă Haga (Italia)');
+  });
+});
+
+describe('computeAddedTermShiftDays', () => {
+  const TRAD: OrderOptionForDiff = { code: 'traducere', priceModifier: 178.5, quantity: 1 };
+  const LEG: OrderOptionForDiff = { code: 'legalizare', priceModifier: 100, quantity: 1 };
+  const HAGA: OrderOptionForDiff = { code: 'apostila_haga', priceModifier: 150, quantity: 1 };
+
+  it('added traducere extends the term by 2 business days', () => {
+    expect(computeAddedTermShiftDays([], [TRAD])).toBe(2);
+  });
+
+  it('sums the impact of multiple added codes (traducere + legalizare + haga = 4)', () => {
+    expect(computeAddedTermShiftDays([], [TRAD, LEG, HAGA])).toBe(4);
+  });
+
+  it('options already on the order add nothing', () => {
+    expect(computeAddedTermShiftDays([TRAD], [TRAD, LEG])).toBe(1);
+  });
+
+  it('removals never shorten (returns 0, not negative)', () => {
+    expect(computeAddedTermShiftDays([TRAD, LEG], [])).toBe(0);
+  });
+
+  it('non-time-impacting codes (urgenta, copii, custom) add nothing', () => {
+    expect(
+      computeAddedTermShiftDays([], [
+        { code: 'urgenta', priceModifier: 80, quantity: 1 },
+        { code: 'copii_suplimentare', priceModifier: 50, quantity: 2 },
+        { code: 'custom_extra', priceModifier: 99, quantity: 1 },
+      ])
+    ).toBe(0);
   });
 });

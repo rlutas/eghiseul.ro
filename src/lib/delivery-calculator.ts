@@ -250,7 +250,13 @@ function addDaysISO(iso: string, days: number): string {
   })
 }
 
-function addBusinessDaysISO(fromIso: string, days: number): string {
+/**
+ * Shift an ISO calendar date (YYYY-MM-DD) forward by N business days.
+ * Shift semantics: the result is N business days AFTER `fromIso` — used for
+ * standby/modify extensions, NOT for projecting a processing window (the
+ * projection counts the start day as day 1; see calculateEstimatedCompletion).
+ */
+export function addBusinessDaysISO(fromIso: string, days: number): string {
   if (days <= 0) return fromIso
   let result = fromIso
   let remaining = days

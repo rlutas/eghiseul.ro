@@ -25,8 +25,11 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Loader2, AlertTriangle, ArrowRight, RotateCcw, Send } from 'lucide-react';
+import { Loader2, AlertTriangle, ArrowRight, RotateCcw, Send, Clock } from 'lucide-react';
 import { toast } from 'sonner';
+import { TRANSLATION_LANGUAGES } from '@/config/translation-languages';
+import { APOSTILA_COUNTRIES } from '@/config/apostila-countries';
+import { computeAddedTermShiftDays } from '@/lib/orders/modify-diff';
 
 interface OptionRow {
   optionId?: string;
@@ -37,6 +40,9 @@ interface OptionRow {
   priceModifier?: number;
   price_modifier?: number;
   quantity?: number;
+  /** Selection details — traducere → language, apostilă → country. Same
+   *  shape the wizard persists; flows into selected_options on apply. */
+  metadata?: { language?: string; country?: string } | null;
 }
 
 interface CatalogOption {
@@ -148,7 +154,15 @@ export function ModifyOrderDialog({
     setOptions((prev) => {
       const present = prev.some((o) => (o.optionId ?? o.option_id) === id);
       if (present) {
-        return prev.filter((o) => (o.optionId ?? o.option_id) !== id);
+        let next = prev.filter((o) => (o.optionId ?? o.option_id) !== id);
+        // Dependency cascade (same rules as the wizard): traducere off drops
+        // legalizare + apostila notari; legalizare off drops apostila notari.
+        if (opt.code === 'traducere') {
+          next = next.filter((o) => o.code !== 'legalizare' && o.code !== 'apostila_notari');
+        } else if (opt.code === 'legalizare') {
+          next = next.filter((o) => o.code !== 'apostila_notari');
+        }
+        return next;
       }
       // Adding from catalog — make sure the row we send to the API has the
       // canonical shape (optionId + optionName + priceModifier + quantity).
@@ -163,6 +177,19 @@ export function ModifyOrderDialog({
         },
       ];
     });
+  }
+
+  /** Patch metadata (language/country) on selected rows. Country is shared
+   *  between apostila_haga + apostila_notari — same convention as the wizard. */
+  function setOptionMetadata(codes: string[], patch: { language?: string; country?: string }) {
+    markDirty();
+    setOptions((prev) =>
+      prev.map((o) =>
+        o.code && codes.includes(o.code)
+          ? { ...o, metadata: { ...(o.metadata ?? {}), ...patch } }
+          : o
+      )
+    );
   }
 
   /**
@@ -187,7 +214,34 @@ export function ModifyOrderDialog({
     return { customExtra: { name, price } };
   }
 
+  // Details required on NEWLY added options (parity with the wizard):
+  // traducere → limbă, apostilă → țară. Existing (already-paid) rows are
+  // exempt — legacy orders may predate the metadata convention.
+  function validateOptionDetails(): string | null {
+    const originalCodes = new Set(seed.map((o) => o.code).filter(Boolean));
+    const byCode = (c: string) => options.find((o) => o.code === c);
+    const trad = byCode('traducere');
+    if (trad && !originalCodes.has('traducere') && !trad.metadata?.language) {
+      return 'Selectează limba pentru Traducere Autorizată.';
+    }
+    const haga = byCode('apostila_haga');
+    const notari = byCode('apostila_notari');
+    const country = haga?.metadata?.country ?? notari?.metadata?.country ?? '';
+    const newApostila =
+      (haga && !originalCodes.has('apostila_haga')) ||
+      (notari && !originalCodes.has('apostila_notari'));
+    if (newApostila && !country) {
+      return 'Selectează țara pentru apostilă.';
+    }
+    return null;
+  }
+
   async function runPreview() {
+    const detailsError = validateOptionDetails();
+    if (detailsError) {
+      setError(detailsError);
+      return;
+    }
     const resolved = resolveCustomExtra();
     if (resolved.error) {
       setError(resolved.error);
@@ -226,6 +280,11 @@ export function ModifyOrderDialog({
       setError('Pentru refund trebuie să introduci un motiv (apare pe Stripe).');
       return;
     }
+    const detailsError = validateOptionDetails();
+    if (detailsError) {
+      setError(detailsError);
+      return;
+    }
     const resolved = resolveCustomExtra();
     if (resolved.error) {
       setError(resolved.error);
@@ -261,6 +320,9 @@ export function ModifyOrderDialog({
         });
       } else {
         toast.success('Modificare aplicată (fără diferență de bani)');
+      }
+      if (data.termShift) {
+        toast.info(`Termen actualizat: ${data.termShift}`);
       }
       onApplied?.();
       onOpenChange(false);
@@ -308,6 +370,25 @@ export function ModifyOrderDialog({
     }));
   }, [seed, options, catalog]);
 
+  // Live math while the admin toggles — instant feedback before the
+  // authoritative server preview. Options sum + custom extra + term impact
+  // of the newly added codes (traducere +2z, legalizare/apostile +1z,
+  // cetățean străin +7z — pessimistic, mirrors the server shift).
+  const liveOptionsTotal = options.reduce(
+    (sum, o) => sum + (o.priceModifier ?? o.price_modifier ?? 0) * (o.quantity ?? 1),
+    0
+  );
+  const liveCustomPrice = parseFloat(customExtraPrice) || 0;
+  const liveTermShift = computeAddedTermShiftDays(seed, options);
+
+  const selectedTraducere = options.find((o) => o.code === 'traducere');
+  const selectedHaga = options.find((o) => o.code === 'apostila_haga');
+  const selectedNotari = options.find((o) => o.code === 'apostila_notari');
+  const sharedCountry =
+    selectedHaga?.metadata?.country ?? selectedNotari?.metadata?.country ?? '';
+  const traducereOn = !!selectedTraducere;
+  const legalizareOn = options.some((o) => o.code === 'legalizare');
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -339,41 +420,134 @@ export function ModifyOrderDialog({
                   const id = (o.optionId ?? o.option_id ?? `o-${i}`) as string;
                   const name = (o.option_name ?? o.optionName ?? 'Opțiune') as string;
                   const price = (o.priceModifier ?? o.price_modifier ?? 0) * (o.quantity ?? 1);
+                  // Wizard dependency rules: legalizare needs traducere;
+                  // apostila notari needs legalizare.
+                  const depDisabled =
+                    !o.selected &&
+                    ((o.code === 'legalizare' && !traducereOn) ||
+                      (o.code === 'apostila_notari' && !legalizareOn));
+                  // Detail selects shown under the selected row. Country is
+                  // shared between the two apostille types — render it under
+                  // Haga when selected, else under Notari.
+                  const showLanguage = o.selected && o.code === 'traducere';
+                  const showCountry =
+                    o.selected &&
+                    ((o.code === 'apostila_haga') ||
+                      (o.code === 'apostila_notari' && !selectedHaga));
                   return (
-                    <label
-                      key={id}
-                      className={`flex items-start gap-3 cursor-pointer text-sm rounded px-2 py-1 ${
-                        o.addable && o.selected
-                          ? 'bg-emerald-50 ring-1 ring-emerald-200'
-                          : ''
-                      }`}
-                    >
-                      <Checkbox
-                        checked={o.selected}
-                        onCheckedChange={() => toggleOption(o)}
-                        className="mt-0.5"
-                      />
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium">{name}</span>
-                          {o.addable && (
-                            <span className="rounded-full bg-emerald-600 px-1.5 py-0 text-[9px] font-bold uppercase tracking-wide text-white">
-                              Nou
-                            </span>
+                    <div key={id}>
+                      <label
+                        className={`flex items-start gap-3 text-sm rounded px-2 py-1 ${
+                          depDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
+                        } ${
+                          o.addable && o.selected
+                            ? 'bg-emerald-50 ring-1 ring-emerald-200'
+                            : ''
+                        }`}
+                      >
+                        <Checkbox
+                          checked={o.selected}
+                          disabled={depDisabled}
+                          onCheckedChange={() => toggleOption(o)}
+                          className="mt-0.5"
+                        />
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium">{name}</span>
+                            {o.addable ? (
+                              <span className="rounded-full bg-emerald-600 px-1.5 py-0 text-[9px] font-bold uppercase tracking-wide text-white">
+                                Nou
+                              </span>
+                            ) : (
+                              <span className="rounded-full bg-neutral-200 px-1.5 py-0 text-[9px] font-bold uppercase tracking-wide text-neutral-600">
+                                Plătit deja
+                              </span>
+                            )}
+                          </div>
+                          {o.description && (
+                            <p className="mt-0.5 text-xs text-muted-foreground">{o.description}</p>
+                          )}
+                          {depDisabled && (
+                            <p className="mt-0.5 text-[11px] text-muted-foreground">
+                              {o.code === 'legalizare'
+                                ? 'Necesită Traducere Autorizată selectată.'
+                                : 'Necesită Legalizare Notarială selectată.'}
+                            </p>
                           )}
                         </div>
-                        {o.description && (
-                          <p className="mt-0.5 text-xs text-muted-foreground">{o.description}</p>
-                        )}
-                      </div>
-                      <span className="font-medium tabular-nums whitespace-nowrap pt-0.5">
-                        +{price.toFixed(2)} RON
-                      </span>
-                    </label>
+                        <span className="font-medium tabular-nums whitespace-nowrap pt-0.5">
+                          +{price.toFixed(2)} RON
+                        </span>
+                      </label>
+                      {showLanguage && (
+                        <div className="ml-9 mt-1 mb-1">
+                          <Label htmlFor={`lang-${id}`} className="text-xs text-muted-foreground">
+                            Limba traducerii
+                          </Label>
+                          <select
+                            id={`lang-${id}`}
+                            value={selectedTraducere?.metadata?.language ?? ''}
+                            onChange={(e) => setOptionMetadata(['traducere'], { language: e.target.value })}
+                            className="mt-1 block w-full max-w-xs rounded-md border border-input bg-background px-3 py-1.5 text-sm"
+                          >
+                            <option value="">— Selectează limba —</option>
+                            {TRANSLATION_LANGUAGES.map((lang) => (
+                              <option key={lang} value={lang}>{lang}</option>
+                            ))}
+                          </select>
+                        </div>
+                      )}
+                      {showCountry && (
+                        <div className="ml-9 mt-1 mb-1">
+                          <Label htmlFor={`country-${id}`} className="text-xs text-muted-foreground">
+                            Țara de utilizare (apostilă)
+                          </Label>
+                          <select
+                            id={`country-${id}`}
+                            value={sharedCountry}
+                            onChange={(e) =>
+                              setOptionMetadata(['apostila_haga', 'apostila_notari'], { country: e.target.value })
+                            }
+                            className="mt-1 block w-full max-w-xs rounded-md border border-input bg-background px-3 py-1.5 text-sm"
+                          >
+                            <option value="">— Selectează țara —</option>
+                            {APOSTILA_COUNTRIES.map((country) => (
+                              <option key={country} value={country}>{country}</option>
+                            ))}
+                          </select>
+                        </div>
+                      )}
+                    </div>
                   );
                 })
               )}
             </div>
+            {/* Live math — instant feedback while toggling; the authoritative
+                diff still comes from "Calculează diferența". */}
+            {optionRows.length > 0 && (
+              <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                <span>
+                  Opțiuni selectate:{' '}
+                  <span className="font-semibold text-foreground tabular-nums">
+                    {liveOptionsTotal.toFixed(2)} RON
+                  </span>
+                  {liveCustomPrice > 0 && (
+                    <>
+                      {' '}+ custom{' '}
+                      <span className="font-semibold text-foreground tabular-nums">
+                        {liveCustomPrice.toFixed(2)} RON
+                      </span>
+                    </>
+                  )}
+                </span>
+                {liveTermShift > 0 && (
+                  <span className="inline-flex items-center gap-1 font-medium text-amber-700">
+                    <Clock className="h-3.5 w-3.5" />
+                    termen +{liveTermShift} zile lucrătoare
+                  </span>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Custom extra service — free-form name + price for services that
