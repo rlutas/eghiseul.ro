@@ -128,10 +128,21 @@ Economie estimată confirmată: ~35 lei/colet ≈ 900-1.000 lei/lună (~11-12k/a
 + 155 export). De cerut: UK/ES/CH→RO + detaliile operaționale (pickup programat
 de noi din MyDHL+, AWB generat de noi, etichetă pe email la client).
 
-**Rămas ÎNAINTE de semnare (răspuns de trimis):**
-1. Termenii contractului nou: durată, angajament volum minim, penalități,
-   preaviz ieșire (avem luni cu 20 și luni cu 35+ colete).
-2. Confirmare explicită: prețul nou rămâne fix indiferent de indicele de
-   combustibil (istoric: 27%→47% într-un an — exact riscul care ne-a adus aici).
-3. Tarife import UK/ES/CH→RO + fluxul operațional de colectare.
-→ Apoi: draft contract + anexa tarifară la parcurs + semnat.
+## Decizie 2026-07-23 — OFERTA ACCEPTATĂ
+Raul a decis acceptarea fără alte runde („prețurile-s clar mai bune, avem
+comenzi de trimis"). Email de confirmare trimis lui Adrian: pregătește
+contractul nou + anexa tarifară, **cu partea de import inclusă**; menționat în
+accept că înțelegem prețurile ca finale cu toate taxele incluse (ancoră scrisă).
+
+**La primirea draftului de contract, verifică înainte de semnat:**
+- durată / volum minim angajat / penalități / preaviz ieșire;
+- prețurile din anexă = cele din simulări (DE 155, UK 172, ES 168, CH 171,
+  BR 256) și marcate ca finale (fuel + TVA incluse), nu bază + indice;
+- tarifele de import prezente în anexă (DE→RO 207 confirmat pe email).
+
+**După semnare (acțiuni interne):**
+1. Pricing pe zone rămâne de făcut (250 UE / 350-400 non-UE) — Brazilia e
+   ~break-even chiar și cu noile tarife.
+2. Tagging curier `dhl` în DB la expediere (acum există AWB manual în admin —
+   setează courier_provider) pentru reconciliere cost/comandă.
+3. Recalculare marjă livrare internațională în configs când intră contractul.
