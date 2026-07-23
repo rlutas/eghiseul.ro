@@ -23,6 +23,11 @@ import Stripe from 'stripe';
 import { stripe } from '@/lib/stripe';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createCjoClient } from '@/lib/supabase/cjo';
+import {
+  extraInvoiceForRow,
+  parseOblioProformaDesc,
+  type ExtraBillingEntry,
+} from '@/lib/accounting/extra-invoice-match';
 
 /** Order-number regex: E-260710-F3AYS, EJC-..., CJO-20260710-86615, CAO-, CFO-, CIC- */
 const ORDER_RE = /\b(E|EJC|CJO|CAO|CFO|CIC)-[A-Z0-9-]+\b/i;
@@ -84,7 +89,7 @@ async function enrichEghiseul(rows: TxRow[]) {
   const orderNumbers = [...new Set(rows.map((r) => r.order_number).filter(Boolean))] as string[];
   const orderIds = [...new Set(rows.filter((r) => !r.order_number && r._orderId).map((r) => r._orderId))] as string[];
   if (!orderNumbers.length && !orderIds.length) return;
-  const select = 'id, friendly_order_id, order_number, invoice_number, invoice_url, customer_data, services(name)';
+  const select = 'id, friendly_order_id, order_number, invoice_number, invoice_url, customer_data, extra_billing, stripe_payment_intent_id, services(name)';
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const numberQuery = orderNumbers.length
     ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -118,8 +123,20 @@ async function enrichEghiseul(rows: TxRow[]) {
     if (!r.order_number) r.order_number = ((o as any).friendly_order_id ?? (o as any).order_number) as string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const anyO = o as any;
-    r.invoice_number = anyO.invoice_number ?? r.invoice_number;
-    r.invoice_url = anyO.invoice_url ?? r.invoice_url;
+    // Extra-payment rows get THEIR invoice from extra_billing (matched by
+    // PaymentIntent, else unambiguous amount) — the main order invoice would
+    // be the wrong document for that money.
+    const extra = extraInvoiceForRow(
+      anyO.extra_billing as ExtraBillingEntry[] | null,
+      { payment_intent_id: r.payment_intent_id, gross_bani: r.gross_bani }
+    );
+    if (extra && r.payment_intent_id !== (anyO as { stripe_payment_intent_id?: string }).stripe_payment_intent_id) {
+      r.invoice_number = extra.invoiceNumber;
+      r.invoice_url = extra.invoiceUrl;
+    } else {
+      r.invoice_number = anyO.invoice_number ?? r.invoice_number;
+      r.invoice_url = anyO.invoice_url ?? r.invoice_url;
+    }
     r.service_name = anyO.services?.name ?? r.service_name;
     const contact = anyO.customer_data?.contact ?? {};
     const personal = anyO.customer_data?.personal ?? {};
@@ -151,7 +168,7 @@ async function enrichCjo(rows: TxRow[], errors: string[]) {
   if (!orderNumbers.length) return;
   const { data: orders, error } = await cjo
     .from('orders')
-    .select('order_number, prenume, nume, email, service_type, oblio_invoice_number, oblio_invoice_link, invoice_series, invoice_number, invoice_url')
+    .select('order_number, prenume, nume, email, service_type, oblio_invoice_number, oblio_invoice_link, invoice_series, invoice_number, invoice_url, extra_billing, stripe_payment_intent_id')
     .in('order_number', orderNumbers);
   if (error) {
     errors.push(`CJO lookup: ${error.message}`);
@@ -161,14 +178,128 @@ async function enrichCjo(rows: TxRow[], errors: string[]) {
   for (const r of rows) {
     const o = r.order_number ? byNumber.get(r.order_number.toUpperCase()) : undefined;
     if (!o) continue;
-    r.invoice_number =
-      o.oblio_invoice_number ||
-      (o.invoice_series && o.invoice_number ? `${o.invoice_series}-${o.invoice_number}` : o.invoice_number) ||
-      r.invoice_number;
-    r.invoice_url = o.oblio_invoice_link || o.invoice_url || r.invoice_url;
+    // Extra-payment rows: their invoice lives in extra_billing, not on the
+    // order's main invoice columns. CJO entries store amount_bani (+
+    // paymentIntentId going forward); never applied to the main charge row.
+    const extra = extraInvoiceForRow(
+      o.extra_billing as ExtraBillingEntry[] | null,
+      { payment_intent_id: r.payment_intent_id, gross_bani: r.gross_bani }
+    );
+    if (extra && r.payment_intent_id !== o.stripe_payment_intent_id) {
+      r.invoice_number = extra.invoiceNumber;
+      r.invoice_url = extra.invoiceUrl;
+    } else {
+      r.invoice_number =
+        o.oblio_invoice_number ||
+        (o.invoice_series && o.invoice_number ? `${o.invoice_series}-${o.invoice_number}` : o.invoice_number) ||
+        r.invoice_number;
+      r.invoice_url = o.oblio_invoice_link || o.invoice_url || r.invoice_url;
+    }
     r.service_name = o.service_type ?? r.service_name;
     r.client_name = [o.prenume, o.nume].filter(Boolean).join(' ') || r.client_name;
     r.client_email = o.email ?? r.client_email;
+  }
+}
+
+/**
+ * Attach invoices for card payments made through OBLIO's own proforma
+ * payment link (success_url oblio.eu, session metadata = Oblio's numeric
+ * orderId — no app order exists). The Checkout line item reads
+ * "Plata cu card-ul pentru Proforma EGIP 0319"; we parse the proforma ref,
+ * then find the fiscal invoice Oblio issued at collection by scanning the
+ * invoice list around the payment date for an exact total + email match.
+ *
+ * Only runs on still-unmatched charge rows whose metadata orderId is purely
+ * numeric (Oblio's signature) — WP-era rows (no metadata) are untouched.
+ * Best-effort: ambiguity leaves the row unmatched but marks service_name so
+ * the operator sees it's an Oblio-proforma payment.
+ */
+async function attachOblioProformaInvoices(rows: TxRow[], errors: string[]) {
+  const CHARGE_LIKE = new Set(['charge', 'payment']);
+  const candidates = rows.filter(
+    (r) =>
+      CHARGE_LIKE.has(r.type) &&
+      !r.invoice_number &&
+      !r.order_number &&
+      r.payment_intent_id &&
+      r._orderId &&
+      /^\d+$/.test(r._orderId)
+  );
+  if (!candidates.length) return;
+
+  const clientId = process.env.OBLIO_CLIENT_ID;
+  const clientSecret = process.env.OBLIO_CLIENT_SECRET;
+  const cif = process.env.OBLIO_COMPANY_CIF;
+  if (!clientId || !clientSecret || !cif) {
+    errors.push('Oblio-proforma matching sărit: OBLIO_* lipsesc din env');
+    return;
+  }
+
+  let token: string | null = null;
+  // Invoice list cache per sync run — one fetch covers all candidates.
+  let invoiceList: Array<Record<string, unknown>> | null = null;
+
+  for (const r of candidates) {
+    try {
+      // 1. Confirm it's an Oblio session + read the proforma ref.
+      const sessions = await stripe.checkout.sessions.list({
+        payment_intent: r.payment_intent_id!,
+        limit: 1,
+        expand: ['data.line_items'],
+      });
+      const sess = sessions.data[0];
+      if (!sess) continue;
+      const isOblio = (sess.success_url ?? '').includes('oblio.eu');
+      const lineDesc = sess.line_items?.data?.[0]?.description ?? null;
+      const ref = parseOblioProformaDesc(lineDesc);
+      if (!isOblio && !ref) continue;
+      if (ref) r.service_name = r.service_name ?? `Proformă Oblio ${ref.series} ${ref.number}`;
+      else r.service_name = r.service_name ?? 'Plată proformă Oblio';
+
+      // 2. Find the invoice Oblio issued at collection: exact total + email.
+      if (!token) {
+        const tokRes = await fetch('https://www.oblio.eu/api/authorize/token', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ client_id: clientId, client_secret: clientSecret }),
+        });
+        token = ((await tokRes.json()) as { access_token?: string }).access_token ?? null;
+        if (!token) {
+          errors.push('Oblio-proforma matching: token indisponibil');
+          return;
+        }
+      }
+      if (!invoiceList) {
+        // Look back far enough to cover the payout window (payments settle
+        // ~2-7 days before the payout).
+        const after = new Date(Date.now() - 45 * 24 * 3600 * 1000).toISOString().slice(0, 10);
+        const listRes = await fetch(
+          `https://www.oblio.eu/api/docs/invoice/list?cif=${encodeURIComponent(cif)}&issuedAfter=${after}&limitPerPage=100&orderBy=id&orderDir=DESC`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        const listJson = (await listRes.json()) as { data?: Array<Record<string, unknown>> };
+        invoiceList = listJson.data ?? [];
+      }
+
+      const grossRon = r.gross_bani / 100;
+      const email = (r.client_email ?? sess.customer_details?.email ?? '').toLowerCase();
+      const matches = invoiceList.filter((d) => {
+        if (Number(d.total) !== grossRon) return false;
+        if (String(d.canceled ?? '0') === '1') return false;
+        const client = d.client as { email?: string } | undefined;
+        return !email || (client?.email ?? '').toLowerCase() === email;
+      });
+      if (matches.length === 1) {
+        const inv = matches[0] as { seriesName?: string; number?: string; link?: string };
+        r.invoice_number = `${inv.seriesName ?? ''}-${inv.number ?? ''}`.replace(/^-/, '');
+        r.invoice_url = inv.link ?? null;
+      }
+      // 0 or >1 matches: leave unmatched — service_name already flags it.
+    } catch (err) {
+      errors.push(
+        `Oblio-proforma ${r.id}: ${err instanceof Error ? err.message : String(err)}`
+      );
+    }
   }
 }
 
@@ -264,6 +395,10 @@ export async function syncPayouts(opts: { sinceDays?: number } = {}): Promise<Pa
 
       await enrichEghiseul(rows.filter((r) => r.platform === 'eghiseul'));
       await enrichCjo(rows.filter((r) => r.platform === 'cjo'), errors);
+
+      // Payments collected through Oblio's own proforma card link — no app
+      // order exists, but Oblio issued a fiscal invoice we can look up.
+      await attachOblioProformaInvoices(rows, errors);
 
 
       // Preserve manually-attached invoices (WP-era links added by the
