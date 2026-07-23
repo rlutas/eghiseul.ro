@@ -75,6 +75,7 @@ export interface OrdersCounts {
   overdue: number;
   deadline_soon: number;
   with_coupon: number;
+  extra_pending: number;
   // Workflow-stage chip badges ("Stadiu")
   stage_documents_generated: number;
   stage_submitted: number;

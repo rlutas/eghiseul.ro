@@ -77,7 +77,7 @@ export async function GET(request: NextRequest) {
 
     const [
       allRes, paidRes, processingRes, shippedRes, completedRes, abandonedRes, standbyRes, testOnlyRes,
-      overdueRes, deadlineSoonRes, withCouponRes,
+      overdueRes, deadlineSoonRes, withCouponRes, extraPendingRes,
       stageDocsRes, stageSubmittedRes, stageReceivedRes,
       stageTradusRes, stageLegalizatRes, stageApostilaNotariRes, stageApostilaHagaRes,
       stageReadyRes,
@@ -104,6 +104,7 @@ export async function GET(request: NextRequest) {
         applyQuickOrStage(buildQuery(), 'overdue'),
         applyQuickOrStage(buildQuery(), 'deadline_soon'),
         applyQuickOrStage(buildQuery(), 'with_coupon'),
+        applyQuickOrStage(buildQuery(), 'extra_pending'),
         // Workflow-stage chip counts
         applyQuickOrStage(buildQuery(), 'documents_generated'),
         applyQuickOrStage(buildQuery(), 'submitted'),
@@ -127,6 +128,7 @@ export async function GET(request: NextRequest) {
       overdue: overdueRes.count || 0,
       deadline_soon: deadlineSoonRes.count || 0,
       with_coupon: withCouponRes.count || 0,
+      extra_pending: extraPendingRes.count || 0,
       stage_documents_generated: stageDocsRes.count || 0,
       stage_submitted: stageSubmittedRes.count || 0,
       stage_received: stageReceivedRes.count || 0,

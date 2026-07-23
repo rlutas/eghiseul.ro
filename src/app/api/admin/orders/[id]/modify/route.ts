@@ -23,7 +23,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { requirePermission } from '@/lib/admin/permissions';
-import { createRefund, stripe } from '@/lib/stripe';
+import { createRefund } from '@/lib/stripe';
 import { createProformaForExtra } from '@/lib/oblio/proforma';
 import {
   computeModifyDiff,
@@ -35,6 +35,7 @@ import {
 } from '@/lib/orders/modify-diff';
 import { addBusinessDaysISO } from '@/lib/delivery-calculator';
 import { sendEmail } from '@/lib/email/resend';
+import { createExtraPaymentSession } from '@/lib/orders/extra-payment-link';
 import {
   buildExtraPaymentSubject,
   buildExtraPaymentHtml,
@@ -250,6 +251,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
   let stripeRefundId: string | null = null;
   let pendingPaymentClientSecret: string | null = null;
   let pendingPaymentIntentId: string | null = null;
+  let pendingPaymentExpiresAt: string | null = null;
 
   // Diff < 0 → refund the difference.
   if (diff.action === 'refund') {
@@ -308,7 +310,6 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       };
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const orderNum = ((order as any).friendly_order_id ?? (order as any).order_number ?? '') as string;
-      const base = process.env.NEXT_PUBLIC_APP_URL ?? 'https://eghiseul.ro';
 
       const clientName = [
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -316,45 +317,18 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         ((order as any).customer_data?.personal?.lastName as string) ?? '',
       ].filter(Boolean).join(' ');
-      const session = await stripe.checkout.sessions.create({
-        mode: 'payment',
-        line_items: [
-          {
-            price_data: {
-              currency: 'ron',
-              product_data: {
-                // Numele liniei = CE se plătește — apare la client în Checkout
-                // și în Stripe dashboard (ușor de identificat în decontări).
-                name: `Extra ${orderNum}: ${changesSummary}`.slice(0, 250),
-                description: `Comanda ${orderNum}${clientName ? ` · ${clientName}` : ''}`.slice(0, 500),
-              },
-              unit_amount: Math.round(diff.diff * 100),
-            },
-            quantity: 1,
-          },
-        ],
-        success_url: `${base}/comanda/status?order=${encodeURIComponent(orderNum)}&email=${encodeURIComponent(cd.contact?.email ?? '')}`,
-        cancel_url: `${base}/comanda/status?order=${encodeURIComponent(orderNum)}&email=${encodeURIComponent(cd.contact?.email ?? '')}`,
-        locale: 'ro',
-        payment_method_types: ['card'],
-        metadata: {
-          purpose: 'extra_charge',
-          orderId: order.id,
-          orderNumber: orderNum,
-          adminEmail,
-        },
-        payment_intent_data: {
-          description: `Extra ${orderNum}: ${changesSummary}${clientName ? ` · ${clientName}` : ''}`.slice(0, 999),
-          metadata: {
-            purpose: 'extra_charge',
-            orderId: order.id,
-            orderNumber: orderNum,
-          },
-          receipt_email: cd.contact?.email ?? undefined,
-        },
+      const session = await createExtraPaymentSession({
+        orderId: order.id,
+        orderNumber: orderNum,
+        amountRon: diff.diff,
+        description: changesSummary,
+        clientName,
+        customerEmail: cd.contact?.email ?? null,
+        adminEmail,
       });
-      pendingPaymentIntentId = session.id;
+      pendingPaymentIntentId = session.sessionId;
       pendingPaymentClientSecret = session.url;
+      pendingPaymentExpiresAt = session.expiresAt;
 
       // Oblio proforma for the extra amount (best-effort: a missing proforma
       // series must not block the payment link; the webhook issues the fiscal
@@ -401,7 +375,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
               changesDescription: changesSummary,
               paymentUrl,
             }),
-            idempotencyKey: `extra-payment-${session.id}`,
+            idempotencyKey: `extra-payment-${session.sessionId}`,
           });
           extraPaymentEmailSent = !result.skipped;
         } catch (emailErr) {
@@ -447,6 +421,10 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     updatePayload.pending_extra_payment_amount = diff.diff;
     // Hosted Checkout URL — shareable directly with the customer.
     updatePayload.pending_extra_payment_url = pendingPaymentClientSecret;
+    // Session expiry (24h) — drives the admin alert + pre-expiry reminder cron.
+    updatePayload.pending_extra_payment_expires_at = pendingPaymentExpiresAt;
+    // Fresh link → the reminder for it hasn't been sent yet.
+    updatePayload.pending_extra_reminder_sent_at = null;
     if (extraProforma) {
       updatePayload.pending_extra_proforma = { ...extraProforma, amount: diff.diff };
     }

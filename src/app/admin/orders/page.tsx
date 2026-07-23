@@ -405,6 +405,15 @@ export default function AdminOrdersPage() {
           count={counts?.with_coupon}
           onClick={() => updateParams({ quick: urlQuick === 'with_coupon' ? null : 'with_coupon' })}
         />
+        {/* Plăți extra neîncasate — link-ul Stripe moare în 24h; echipa
+            trebuie să contacteze clientul / să regenereze link-ul. */}
+        <SandboxChip
+          active={urlQuick === 'extra_pending'}
+          label="Plată extra în așteptare"
+          count={counts?.extra_pending}
+          tone="warn"
+          onClick={() => updateParams({ quick: urlQuick === 'extra_pending' ? null : 'extra_pending' })}
+        />
 
         <span className="ml-1 text-[11px] font-medium uppercase tracking-wide text-slate-400">Stadiu:</span>
         <SandboxChip

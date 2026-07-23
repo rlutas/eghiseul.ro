@@ -49,6 +49,59 @@ export function buildExtraPaymentHtml(input: ExtraPaymentEmailInput): string {
   });
 }
 
+// ─── Pre-expiry reminder (cron) ──────────────────────────────────────────────
+// Sent once per link, a few hours before the Stripe Checkout Session dies
+// (24h lifetime) — the original email promised "valid 24h" but customers
+// let it lapse silently (incident E-260719-LS53Y).
+
+export interface ExtraPaymentReminderInput extends ExtraPaymentEmailInput {
+  /** Whole hours until the link expires (>= 1). */
+  hoursLeft: number;
+}
+
+export function buildExtraPaymentReminderSubject(input: ExtraPaymentReminderInput): string {
+  return `⏰ Link-ul de plată pentru comanda ${input.orderNumber} expiră în ~${input.hoursLeft}h`;
+}
+
+export function buildExtraPaymentReminderHtml(input: ExtraPaymentReminderInput): string {
+  const greeting = input.customerFirstName
+    ? `Salut ${escapeHtml(input.customerFirstName)},`
+    : 'Salut,';
+  return brandedEmailHtml({
+    preheader: `Link-ul de plată de ${input.amountRon.toFixed(2)} RON expiră în ~${input.hoursLeft} ore`,
+    content: `
+        <p style="margin:0 0 10px;font-size:13px;color:#64748b;">Comanda <span style="font-family:monospace;font-weight:700;color:#0f172a;">${escapeHtml(input.orderNumber)}</span></p>
+        <h1 style="margin:0 0 12px;color:#0B1B33;font-size:20px;">${greeting}</h1>
+        <p style="margin:0 0 16px;color:#475569;font-size:14px;line-height:1.6;">Reminder prietenos: link-ul de plată pentru serviciile adăugate pe comanda ta <strong>expiră în aproximativ ${input.hoursLeft} ore</strong>. După expirare va trebui să îți generăm unul nou.</p>
+        <div style="background:#fffbeb;border:2px solid #fcd34d;border-radius:10px;padding:18px;margin:0 0 20px;">
+          <p style="margin:0 0 6px;font-size:12px;text-transform:uppercase;letter-spacing:1px;color:#92400e;">Sumă de plată</p>
+          <p style="margin:0;font-size:32px;font-weight:bold;color:#78350f;">${input.amountRon.toFixed(2)} RON</p>
+          <p style="margin:8px 0 0;font-size:13px;color:#92400e;">${escapeHtml(input.changesDescription)}</p>
+        </div>
+        ${ctaButton(`Plătește ${input.amountRon.toFixed(2)} RON`, input.paymentUrl)}
+        <p style="margin:14px 0 0;text-align:center;font-size:12px;color:#9ca3af;">Dacă link-ul a expirat deja sau ai întrebări — răspunde la acest email și îți trimitem unul nou.</p>`,
+  });
+}
+
+export function buildExtraPaymentReminderText(input: ExtraPaymentReminderInput): string {
+  const greeting = input.customerFirstName ? `Salut ${input.customerFirstName},` : 'Salut,';
+  return [
+    `Comanda ${input.orderNumber}`,
+    '',
+    greeting,
+    '',
+    `Reminder: link-ul de plată pentru serviciile adăugate (${input.amountRon.toFixed(2)} RON) expiră în aproximativ ${input.hoursLeft} ore.`,
+    '',
+    `Modificări: ${input.changesDescription}`,
+    '',
+    `Plătește aici: ${input.paymentUrl}`,
+    '',
+    'Dacă link-ul a expirat deja, răspunde la acest email și îți trimitem unul nou.',
+    '',
+    '— Echipa eGhișeul.ro',
+  ].join('\n');
+}
+
 export function buildExtraPaymentText(input: ExtraPaymentEmailInput): string {
   const greeting = input.customerFirstName
     ? `Salut ${input.customerFirstName},`

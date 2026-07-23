@@ -1112,7 +1112,7 @@ export default function AdminOrderDetailPage() {
 
       {/* Extra-payment banners (parity with CJO admin): pending link the
           operator can re-share + green summary once the extra was paid. */}
-      <ExtraPaymentBanners order={order} />
+      <ExtraPaymentBanners order={order} onRefresh={() => fetchOrder()} />
 
       {/* Comenzi telefonice: card de plată (link / manual) cât timp e neplătită
           + trimiterea link-ului de completare (acte + semnătură) după plată. */}
@@ -2896,13 +2896,46 @@ function PhoneOrderActions({ order, onChanged }: { order: OrderDetail; onChanged
   );
 }
 
-function ExtraPaymentBanners({ order }: { order: OrderDetail }) {
+function ExtraPaymentBanners({ order, onRefresh }: { order: OrderDetail; onRefresh?: () => void }) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const o = order as any;
   const pendingUrl: string | null = o.pending_extra_payment_url ?? null;
   const pendingAmount: number | null = o.pending_extra_payment_amount ?? null;
   const additionalPaid: number = Number(o.additional_paid_amount ?? 0);
   const email = (order.customer_data as AnyObj | null)?.contact as AnyObj | null;
+  const [regenerating, setRegenerating] = useState(false);
+
+  // Stripe Checkout links die after 24h. Expiry drives the alert level:
+  // expired → red "contactează clientul"; <6h left → amber countdown;
+  // null (pre-migration-133 link) → unknown age, offer regenerate.
+  const expiresAtMs = o.pending_extra_payment_expires_at
+    ? new Date(o.pending_extra_payment_expires_at).getTime()
+    : null;
+  const nowMs = Date.now();
+  const isExpired = expiresAtMs !== null && expiresAtMs <= nowMs;
+  const hoursLeft = expiresAtMs && expiresAtMs > nowMs ? Math.max(1, Math.round((expiresAtMs - nowMs) / 3_600_000)) : null;
+  const reminderSent = !!o.pending_extra_reminder_sent_at;
+
+  const regenerate = async () => {
+    setRegenerating(true);
+    try {
+      const res = await fetch(`/api/admin/orders/${order.id}/regenerate-extra-payment`, { method: 'POST' });
+      const json = await res.json();
+      if (!res.ok || !json.success) {
+        throw new Error(json.error?.message || 'Regenerarea a eșuat');
+      }
+      toast.success(
+        json.data.emailSent
+          ? 'Link nou generat + email trimis clientului'
+          : 'Link nou generat — trimite-l manual clientului (emailul nu a plecat)'
+      );
+      onRefresh?.();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Regenerarea a eșuat');
+    } finally {
+      setRegenerating(false);
+    }
+  };
 
   if (!pendingUrl && additionalPaid <= 0) return null;
 
@@ -2925,30 +2958,54 @@ function ExtraPaymentBanners({ order }: { order: OrderDetail }) {
         </div>
       )}
       {pendingUrl && (
-        <div className="rounded-lg border-2 border-amber-400 bg-amber-50 p-4">
-          <p className="text-sm font-semibold text-amber-900">
-            ⏳ Așteptăm plată extra{pendingAmount ? <>: <span className="font-mono">{Number(pendingAmount).toFixed(2)} RON</span></> : null}
+        <div className={`rounded-lg border-2 p-4 ${isExpired ? 'border-red-400 bg-red-50' : 'border-amber-400 bg-amber-50'}`}>
+          <p className={`text-sm font-semibold ${isExpired ? 'text-red-900' : 'text-amber-900'}`}>
+            {isExpired ? '🔴 LINK DE PLATĂ EXPIRAT' : '⏳ Așteptăm plată extra'}
+            {pendingAmount ? <>: <span className="font-mono">{Number(pendingAmount).toFixed(2)} RON</span></> : null}
           </p>
-          <p className="mt-1 text-xs text-amber-800">
-            Linkul a fost trimis pe emailul clientului{email?.email ? ` (${String(email.email)})` : ''}. Dacă nu l-a
-            primit, copiază-l de aici:
-          </p>
+          {isExpired ? (
+            <p className="mt-1 text-xs text-red-800">
+              Link-ul Stripe a expirat (durata de viață e 24h) și clientul NU a plătit —{' '}
+              <strong>contactează clientul</strong>{email?.email ? ` (${String(email.email)})` : ''} și
+              generează un link nou cu butonul de mai jos (se trimite automat pe email).
+            </p>
+          ) : (
+            <p className="mt-1 text-xs text-amber-800">
+              Linkul a fost trimis pe emailul clientului{email?.email ? ` (${String(email.email)})` : ''}
+              {hoursLeft !== null && <> · expiră în <strong>~{hoursLeft}h</strong></>}
+              {expiresAtMs === null && ' · vechime necunoscută (link generat înainte de urmărirea expirării — regenerează dacă e mai vechi de o zi)'}
+              {reminderSent && ' · reminder trimis'}
+              . Dacă nu l-a primit, copiază-l de aici:
+            </p>
+          )}
           <div className="mt-2 flex items-center gap-2">
             <input
               readOnly
               value={pendingUrl}
               onFocus={(e) => e.currentTarget.select()}
-              className="h-8 flex-1 rounded border border-amber-300 bg-white px-2 font-mono text-xs"
+              className={`h-8 flex-1 rounded border bg-white px-2 font-mono text-xs ${isExpired ? 'border-red-300 line-through text-muted-foreground' : 'border-amber-300'}`}
             />
+            {!isExpired && (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  navigator.clipboard.writeText(pendingUrl);
+                  toast.success('Link de plată copiat');
+                }}
+              >
+                Copiază
+              </Button>
+            )}
             <Button
               size="sm"
-              variant="outline"
-              onClick={() => {
-                navigator.clipboard.writeText(pendingUrl);
-                toast.success('Link de plată copiat');
-              }}
+              className={isExpired ? 'bg-red-600 hover:bg-red-700 text-white' : ''}
+              variant={isExpired ? 'default' : 'outline'}
+              onClick={regenerate}
+              disabled={regenerating}
             >
-              Copiază
+              {regenerating ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+              Generează link nou
             </Button>
           </div>
         </div>

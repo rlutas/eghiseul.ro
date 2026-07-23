@@ -27,10 +27,10 @@ const TERMINAL_OR_INACTIVE = [
   'pending',
 ] as const;
 
-export type QuickFilter = 'overdue' | 'deadline_soon' | 'with_coupon';
+export type QuickFilter = 'overdue' | 'deadline_soon' | 'with_coupon' | 'extra_pending';
 
 export function isQuickFilter(v: string | null | undefined): v is QuickFilter {
-  return v === 'overdue' || v === 'deadline_soon' || v === 'with_coupon';
+  return v === 'overdue' || v === 'deadline_soon' || v === 'with_coupon' || v === 'extra_pending';
 }
 
 /**
@@ -86,6 +86,15 @@ export function applyQuickOrStage(query: Query, quick: string | null | undefined
   }
   if (quick === 'with_coupon') {
     return query.not('coupon_code', 'is', null);
+  }
+  if (quick === 'extra_pending') {
+    // Extra payment requested (Modifică) but not yet paid — the Stripe link
+    // dies after 24h, so these need the team's eye (contact client /
+    // regenerate). Cleared automatically when the webhook settles the payment.
+    return query
+      .not('pending_extra_payment_url', 'is', null)
+      .gt('pending_extra_payment_amount', 0)
+      .not('status', 'in', `("cancelled","refunded","abandoned")`);
   }
   if (isStageFilter(quick)) {
     return query.eq('status', STAGE_FILTERS[quick]);

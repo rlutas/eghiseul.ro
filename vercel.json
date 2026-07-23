@@ -28,6 +28,10 @@
     {
       "path": "/api/cron/payout-sync/",
       "schedule": "30 5 * * *"
+    },
+    {
+      "path": "/api/cron/extra-payment-reminders/",
+      "schedule": "15 * * * *"
     }
   ]
 }
