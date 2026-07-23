@@ -99,3 +99,39 @@ la adresa clientului din străinătate pe contul EDIGITALIZARE (import/pickup,
 ex. Germania→Satu Mare) pentru un serviciu viitor de procesare documente
 originale cu retur — explorare, fără angajamente. Așteptăm: simulări DE/UK/ES/CH
 + worldwide, confirmare contractual + fuel/TVA, fezabilitate + tarife import.
+
+## Update 2026-07-23 — răspunsul lui Adrian la clarificări (09:34)
+
+**Toate cele 3 clarificări confirmate favorabil:**
+1. Reducerea se aplică pe **TOATE destinațiile** (UE + worldwide). ✓
+2. Contractual — dar **necesită semnarea unui CONTRACT NOU** „cu reduceri mai
+   mari" (nu doar anexă pe contul existent). ⚠️ termenii contractului = necunoscuți.
+3. **Prețurile sunt FINALE, cu toate taxele incluse** (fuel + TVA). ✓ — de
+   confirmat explicit că rămân fixe indiferent de evoluția lunară a indicelui.
+
+**Simulările cerute (actual → nou, final all-in):**
+| Destinație | Actual | Nou | Reducere | Marjă la 250 încasați |
+|---|---|---|---|---|
+| Germania | 190 | **155** | −18,4% | **+95** |
+| UK | 211 | **172** | −18,5% | +78 |
+| Spania | 206 | **168** | −18,4% | +82 |
+| Elveția | 211 | **171** | −19,0% | +79 |
+| Brazilia | 317 | **256** | −19,2% | −6 (era −67…−116!) |
+
+Concluzii: destinațiile principale (DE/UK/ES/CH) intră toate pe marjă 78-95
+lei/colet; worldwide-ul scump (Brazilia) devine ~break-even la 250 — pricing-ul
+pe zone (350-400 non-UE) rămâne recomandat dar nu mai e urgent-critic.
+Economie estimată confirmată: ~35 lei/colet ≈ 900-1.000 lei/lună (~11-12k/an).
+
+**Import (serviciul de retur documente):** plic documente **Germania→România =
+207 RON**. Prima cifră concretă; dus-întors DE ≈ 362 RON transport (207 import
++ 155 export). De cerut: UK/ES/CH→RO + detaliile operaționale (pickup programat
+de noi din MyDHL+, AWB generat de noi, etichetă pe email la client).
+
+**Rămas ÎNAINTE de semnare (răspuns de trimis):**
+1. Termenii contractului nou: durată, angajament volum minim, penalități,
+   preaviz ieșire (avem luni cu 20 și luni cu 35+ colete).
+2. Confirmare explicită: prețul nou rămâne fix indiferent de indicele de
+   combustibil (istoric: 27%→47% într-un an — exact riscul care ne-a adus aici).
+3. Tarife import UK/ES/CH→RO + fluxul operațional de colectare.
+→ Apoi: draft contract + anexa tarifară la parcurs + semnat.
