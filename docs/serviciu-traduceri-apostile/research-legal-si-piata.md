@@ -74,6 +74,35 @@ NU au trecut verificarea → **research separat înainte de a o vinde** (faza 3)
 
 ---
 
+## 1b. Per document: lanț + COSTUL nostru real + ce cere piața + preț recomandat
+
+Costul nostru = traducere (grupa I ~45 azi, țintă 30) + legalizare (~50) +
+apostilă (prefectură GRATIS / Cameră 50+TVA). Piața = ce taxează concurența
+pentru același lanț. Preț recomandat = poziționarea noastră (preț FIX, online).
+
+| Document (grupa I, țară Haga) | Lanț corect | **Cost nostru real** | Piața cere | **Preț recomandat** |
+|---|---|---|---|---|
+| Cazier judiciar — doar traducere | trad. autorizată | ~45 | 60-120 | **99** |
+| Cazier — trad. legalizată | trad. + legalizare | ~95 | 120-200 | **169** |
+| Cazier — trad. leg. + apostilă | trad. + leg. + apostilă prefectură (GRATIS) | ~95 | 220-330 | **249** |
+| Certificat naștere/căsătorie (Haga non-UE) | apostilă original (prefectură GRATIS) + trad. legalizată + apostilă trad. (Cameră 60) | ~155 | 250-400 | **299** |
+| Certificat naștere/căsătorie (**UE**) | DOAR traducere (apostila inutilă legal) | ~45 | — | **99** |
+| CI / pașaport | copie legalizată (~25) + apostilă Cameră (60) + trad. | ~130 | 200-350 | **229** |
+| Permis conducere | idem CI | ~130 | 200-350 | **229** |
+| Diplomă + foaie matricolă | **viză CNRED (50)** + trad. (per pag) + leg. + apostilă prefectură | ~200+ (variază pagini) | 350-600 | **de la 349** |
+| Sentință divorț | legalizată instanță + apostilă Tribunal + trad. legalizată | ~150 | 250-400 | **299** |
+| Constatator ONRC | apostilă Tribunal + trad. legalizată | ~150 | 250-400 | **299** |
+
+**Observații cheie:**
+- La **cazier + stare civilă** costul apostilei e ZERO (prefectură) → marja pe
+  „pachetul complet" e enormă. Aici e produsul-vedetă.
+- **UE**: nu vinde apostilă (Reg. 2016/1191) — vinde doar traducerea. Filtrare
+  obligatorie pe țară în wizard.
+- **Diplome**: cel mai scump lanț (CNRED + pagini multe la foaia matricolă) →
+  valoare mare per comandă, dar termen lung (nu-l promite scurt).
+- Documentele „per pagină variabile" (foaie matricolă, sentințe, contracte):
+  preț estimat la upload, nu fix.
+
 ## 2. Lanțul corect per document (Haga vs non-Haga)
 
 | Document | Haga | non-Haga | Capcană |
@@ -96,28 +125,75 @@ ca apostilabile la Prefectura București — nu construi ofertă pe apostilarea 
 
 ---
 
-## 3. Competiția — prețuri concrete (verificate pe site-uri)
+## 3. Competiția — prețuri concrete (extrase live 2026-07-23)
 
-| Firmă | Traducere/pag grupa I | Limbi rare | Legalizare | Apostilă | Model vânzare |
+### 3a. Traducere per pagină, pe grupe de limbi (RON, fără TVA)
+
+| Limbi | traduceria.ro | Kenna | traducerilegalizate | traducerisupralegalizari | codess.ro |
 |---|---|---|---|---|---|
-| **Kenna** | 20-25 | arabă 70-80 | 40-45/act | — | listă publică, per pagină |
-| **traducerilegalizate.com** | 20 | RU/HU 50, TR/EL 40 | ~30/doc | 50+TVA/ex. | listă publică |
-| **traduceria.ro** | **29** (EN/FR/ES/IT) | arabă/greacă 82 | — | — | **preț fix online** |
-| **codess.ro** | **50** | — | **36/doc** | **59/doc + comision 150!** | listă publică |
-| **traducerisupralegalizari.ro** | 30-35 (pag=300 cuv!) | arabă/chineză 150-160 | — | — | listă |
-| **centruldevize.ro** (T&B) | — | — | — | „cere ofertă" | **fără prețuri**, plată după |
-| **cabinettraduceri.ro** | — | — | opțional | „cere ofertă" WhatsApp | fără prețuri |
+| EN/FR | **29** | 20-25 | 20 | 30-35 | 50 |
+| IT/ES | 29 | 20-25 | 20 | 35-40 | 50 |
+| Germană | 39-42 | 20-25 | 20 | 40-45 | 55 |
+| RU/HU/TR | 62 | 35-50 | 40-50 | 40-45 (RU/HU), 75-80 (TR) | 70 |
+| Greacă | 82 | 50-65 | 40 | 75-80 | 80 |
+| Nordice (NO/SE/FI) | 77 | 50-65 | — | 90-95 | 85 |
+| **Arabă** | 82 | 70-80 | — | **150-160** | 80 |
+| Chineză/Japoneză | — | 85-90 | — | 150-160 | 90 |
+| Ebraică | 77 | 85-90 | — | 90-95 | 85 |
 
-**Concluzii competiție:**
-1. Prețul „per pagină" domină și variază enorm (20 la codess 50) — clientul nu
-   știe totalul până nu se numără paginile. **Nimeni nu vinde preț fix per
-   document cu checkout+plată online** — exact golul nostru.
-2. Apostila la codess = 59/doc + **comision 150** → ei taxează ~209/apostilă
-   pe o taxă oficială GRATUITĂ la prefectură. Marja pe apostilă e uriașă.
-3. Legalizarea în piață: 30-45/doc, pe un cost notarial de ~60 cu TVA — unii
-   sunt sub cost (loss-leader) ca să vândă pachetul.
-4. Jucătorii de „apostilă/vize" (centruldevize, cabinettraduceri) merg toți pe
-   „cere ofertă" — friction mare, exact ce evităm.
+Pagina = **2.000 caractere cu spații** (traduceria/Kenna) SAU **300 cuvinte**
+(traducerisupralegalizari — mai scumpă pe pagină fiindcă pagina e mai mică!).
+`traduceria.ro` = cel mai ieftin + **preț fix afișat online** (dar tot per pagină).
+
+### 3b. Servicii conexe — prețuri (RON, fără TVA)
+
+| Serviciu | traduceria | codess | traducerisupralegalizari | Kenna | **Cost oficial real** |
+|---|---|---|---|---|---|
+| **Legalizare notarială** | 36 + **100 taxă agenție** | 75 | 85 | 40-45 | ~50 (+TVA) |
+| **Apostilă prefectură** | 59 + **150 agenție** | 120 | **100** (Buc), 130 (alt județ) | — | **GRATIS** |
+| **Apostilă tribunal** | idem | 120 | 100 | — | neconfirmat |
+| **Apostilă Cameră Notari** | idem | 150-200 | 180 | — | 50 (+TVA) |
+| **Supralegalizare MAE** | — | 150 | 80 | — | neconfirmat (mic) |
+| **Supralegalizare Cameră** | — | 150-200 | 180 | — | 50 (+TVA) |
+| **Vizare CNRED** | — | 150 | 100 | — | **50** (oficial) |
+| Urgent | +50% | +50% | +30-40% | +25% | — |
+
+### 3c. Cum vând
+| Firmă | Model | Diaspora |
+|---|---|---|
+| traduceria.ro | preț fix afișat, per pagină | nu evidențiat |
+| codess / traducerisupralegalizari | listă publică per pagină | curier |
+| Kenna / traducerilegalizate | listă per pagină | curier |
+| **centruldevize / cabinettraduceri** | **„cere ofertă"** (WhatsApp/email), plată DUPĂ | da (vize+diaspora) |
+
+**Concluziile care contează:**
+1. **Nimeni nu vinde preț FIX per DOCUMENT cu checkout+plată online** — toți per
+   pagină (clientul nu știe totalul) sau „cere ofertă". Golul nostru, confirmat.
+2. **Apostila = mina de aur:** taxa la prefectură e GRATIS, dar piața o vinde cu
+   **100-209 lei** (traduceria 59+150 agenție = 209, codess 120,
+   traducerisupralegalizari 100). Marjă ~100-200 lei pe o taxă de stat zero.
+3. **Taxele „de agenție" ascunse:** traduceria pune 100 lei agenție pe legalizare
+   + 150 pe apostilă PESTE prețul afișat — clientul descoperă la final. Noi putem
+   fi transparenți și tot cu marjă (costul nostru real e mic).
+4. Legalizarea în piață: 36-85/doc, cost oficial ~50+TVA — unii sub cost (momeală
+   pt. pachet), alții (codess 75, traducerisupralegalizari 85) cu marjă bună.
+5. **Arabă**: 80-160/pag — puțini o fac, preț mare, cerere reală la noi.
+
+## 3d. Taxe oficiale — completate (2026-07-23)
+
+| Serviciu | Taxă oficială | Termen | Sursă |
+|---|---|---|---|
+| Apostilă prefectură | **GRATIS** | aceeași zi | mai.gov.ro (3-0) |
+| Apostilă Cameră Notari | 50+TVA/ex. | prin poștă | cnpb.ro (3-0) |
+| **Vizare CNRED acte studii** | **50 lei/act** | aceeași zi la sediu (~10 zile prin universitate) | edirect.e-guvernare.ro |
+| Legalizare semnătură traducător | 50 (+TVA) minimal | pe loc | OMJ 177/C/2024 (3-0) |
+| Copie legalizată | 5 lei/pag (+TVA) | pe loc | OMJ 177/C/2024 (3-0) |
+| Supralegalizare MAE | mic (piața taxează 80-150 ca serviciu) | 2-4 zile | infocontact |
+| Consular ambasadă (non-Haga) | **5-60 EUR/doc**, variază pe țară | săptămâni | e-studii, MAE |
+
+⚠️ **CAPCANĂ 2026:** Ministerul Educației are proiect de ordin să **DUBLEZE
+taxele CNRED** (echivalare/avizare diplome) — de urmărit înainte de a fixa
+prețul pe diplome. [edupedu.ro]
 
 ---
 
