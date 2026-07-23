@@ -241,6 +241,52 @@ urgență), pagină SEO (keyword research separat: „traduceri legalizate onlin
 Research separat MAE + ambasade (Emirate/Qatar/China...) — costuri, termene,
 împuterniciri. Se lansează doar după ce faza 2 rulează.
 
+## 11b. NEGOCIEREA — ținte concrete (23.07, seara)
+
+**⚠️ Descoperire care schimbă discuția:** site-urile afișează „de la 20-25
+lei/pag", dar NOUĂ ni s-a facturat **minim 45 RON** pe lista traducătoarei —
+prețurile publice sunt teaser, realele diferă. De-asta lista Excel
+(`lista-preturi-traducator.csv`, în acest folder + pe Desktop): o completează
+EA, negru pe alb, per limbă și per document — fără „depinde".
+
+### Ce negociezi la TRADUCĂTOARE (ținte)
+| Punct | Ancoră | Țintă | Walk-away |
+|---|---|---|---|
+| Doc standard grupa I (EN/DE/FR/IT/ES) | „pe site-uri e 20-25/pag" | **30-35 RON/doc** | 45 (statu-quo — nu acceptăm, la 45 marja la 89-119 moare) |
+| Per pagină variabile grupa I | 20-25 piața | 30-35 | 45 |
+| Arabă /doc | Kenna 70-80/pag | **≤100/doc** | 150 |
+| Exemplar suplimentar | Kenna +5 | 5-10 | 20 |
+| Termen | piața 24h/5 pag | 24-48h standard | 72h |
+| Volum | — | −10% la 30/lună, −15% la 50+ | fără discount = căutăm al 2-lea traducător |
+| Model | — | **preț per DOCUMENT fix în scris** (lista Excel semnată/confirmată pe email) | doar per pagină „depinde" |
+
+Pârghii: (1) volum existent (traducerile de pe caziere, în creștere) +
+serviciu dedicat nou = flux constant, nu ocazional; (2) plată centralizată
+lunară, fără discuții per act; (3) există alternativă — birourile mari
+(Kenna & co) lucrează cu firme la prețurile de pe site; (4) ancora „ni s-a
+facturat 45 la ce piața dă cu 20-25".
+
+### Ce negociezi la NOTAR (ținte)
+| Punct | Referință piață | Țintă |
+|---|---|---|
+| Legalizare semnătură traducător | 30-45/act | **≤35/act** + tarif redus exemplar 2+ (Kenna: 6!) |
+| Copie legalizată | — | preț/pagină clar |
+| Apostilă notarială (prin el la Cameră) | taxa oficială 50+TVA | 50+TVA + comision fix mic (≤30) pentru drum |
+| SLA | — | batch zilnic predat dimineața → gata în aceeași zi |
+| Specimen | — | confirmare că traducătoarea (și colaboratorii ei pe limbi rare!) au specimen la notariatul lui — altfel lanțul se rupe pe arabă etc. |
+
+### Ce servicii putem oferi + competiția (sinteză decizie)
+| Serviciu | Competiția cere | Noi putem vinde | Condiție |
+|---|---|---|---|
+| Traducere autorizată doc standard, grupa I | 20-35/pag (site) — real mai mult; nimeni cu preț fix online | **89-119/doc** fix, checkout online | cost ≤35-40 |
+| Traducere grupa II-III (RU/TR/EL/nordice) | 40-65/pag | 149-199/doc | cost ≤70 |
+| Arabă + rare (grupa IV-V) | 70-90/pag, greu de găsit | **249-299/doc** (cerere nedeservită) | colaborator cu specimen |
+| Legalizare notarială | 30-45 | 99 (există) — marjă 55-65 | notar ≤35 |
+| Apostilă notarială pe traducere | 50+TVA taxă | 149-179 (taxă+drum+marjă) | SLA notar |
+| Apostilă pe original | 50+TVA / prefectură | 179-249 | de clarificat per tip act |
+| Pachet „totul inclus" (trad+leg+apostilă) | nimeni online | ~349-399 grupa I — ancora ofertei | tot lanțul funcțional |
+| Dus-întors original diaspora | nimeni | + livrare (DHL import 207 + export 155 DE) | contract DHL semnat |
+
 ## 12. Mesaj DRAFT către doamna de la traduceri
 
 > Bună ziua, [nume],
