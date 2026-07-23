@@ -73,6 +73,19 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; icon: typeof
   // Document events
   document_generated: { label: 'Documente generate', color: 'bg-blue-100 text-blue-800', icon: FileText },
 
+  // Post-issuance processing stages
+  la_tradus: { label: 'La tradus', color: 'bg-cyan-100 text-cyan-800', icon: FileText },
+  la_legalizat: { label: 'La legalizat', color: 'bg-cyan-100 text-cyan-800', icon: FileText },
+  la_apostilat: { label: 'La apostilat', color: 'bg-cyan-100 text-cyan-800', icon: FileText },
+
+  // Extra payments (admin added services on request)
+  extra_payment_sent: { label: 'Plată suplimentară solicitată', color: 'bg-amber-100 text-amber-800', icon: CreditCard },
+  extra_payment_received: { label: 'Plată suplimentară confirmată', color: 'bg-green-100 text-green-800', icon: CheckCircle },
+
+  // Shipping
+  awb_created: { label: 'Colet predat curierului', color: 'bg-blue-100 text-blue-800', icon: Truck },
+  cancellation_requested: { label: 'Anulare solicitată', color: 'bg-orange-100 text-orange-800', icon: AlertCircle },
+
   // Legacy/fallback
   submitted: { label: 'Trimis la autorități', color: 'bg-indigo-100 text-indigo-800', icon: Truck },
   status_changed: { label: 'Status actualizat', color: 'bg-gray-100 text-gray-800', icon: Clock },

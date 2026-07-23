@@ -1919,6 +1919,7 @@ export default function AdminOrderDetailPage() {
               onCancelAwb={handleCancelAwb}
               onCopyAwb={handleCopyAwb}
               onMarkDelivered={handleMarkDelivered}
+              onManualAwbSaved={() => fetchOrder()}
             />
           </CardContent>
         </Card>
@@ -4119,6 +4120,58 @@ interface AwbSectionProps {
   onCancelAwb: () => void;
   onCopyAwb: () => void;
   onMarkDelivered?: () => void;
+  /** Refetch the order after a manual AWB save. */
+  onManualAwbSaved?: () => void;
+}
+
+/** Inline form for recording an AWB the platform can't generate (DHL /
+ *  Poșta / other international couriers). Posts to set-awb. */
+function ManualAwbForm({ orderId, courier, onSaved }: { orderId: string; courier: string; onSaved?: () => void }) {
+  const [awb, setAwb] = useState('');
+  const [saving, setSaving] = useState(false);
+
+  const save = async () => {
+    if (awb.trim().length < 5) {
+      toast.error('Introdu un AWB valid (minim 5 caractere).');
+      return;
+    }
+    setSaving(true);
+    try {
+      const res = await fetch(`/api/admin/orders/${orderId}/set-awb`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ awb: awb.trim(), courier }),
+      });
+      const json = await res.json();
+      if (!res.ok || !json.success) {
+        throw new Error(json.error?.message || 'Salvarea AWB a eșuat');
+      }
+      toast.success(`AWB salvat: ${json.data.awb}`);
+      onSaved?.();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Salvarea AWB a eșuat');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className="mt-2 flex items-end gap-2">
+      <div className="flex-1">
+        <Label htmlFor="manual-awb" className="text-xs">Număr AWB</Label>
+        <Input
+          id="manual-awb"
+          value={awb}
+          onChange={(e) => setAwb(e.target.value)}
+          placeholder="ex: 1234567890"
+          className="mt-1 h-8"
+        />
+      </div>
+      <Button size="sm" onClick={save} disabled={saving}>
+        {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Salvează AWB'}
+      </Button>
+    </div>
+  );
 }
 
 function AwbSection({
@@ -4137,6 +4190,7 @@ function AwbSection({
   onCancelAwb,
   onCopyAwb,
   onMarkDelivered,
+  onManualAwbSaved,
 }: AwbSectionProps) {
   // Nested inside the Livrare card — returns just the inner section
   // (separator + title + content) without an outer Card wrapper.
@@ -4157,9 +4211,11 @@ function AwbSection({
         <div className="rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
           <p className="font-semibold">AWB manual ({provider.toUpperCase()})</p>
           <p className="mt-1 text-xs">
-            Generarea automată de AWB funcționează doar pentru Fan Courier și Sameday. Pentru acest
-            curier, expedierea se face manual — folosește adresa de livrare de mai sus (buton „Copiază adresa”).
+            Generarea automată de AWB funcționează doar pentru Fan Courier și Sameday. Expediază
+            manual (adresa de livrare de mai sus), apoi introdu AWB-ul aici — clientul îl vede
+            imediat pe pagina de status, cu link de urmărire.
           </p>
+          <ManualAwbForm orderId={order.id} courier={provider} onSaved={onManualAwbSaved} />
         </div>
       </>
     );
@@ -4190,10 +4246,14 @@ function AwbSection({
             )}
           </div>
           <div className="flex flex-wrap gap-2">
-            <Button variant="outline" size="sm" onClick={onPrintLabel} disabled={downloading}>
-              {downloading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Printer className="h-4 w-4" />}
-              Printeaza eticheta
-            </Button>
+            {/* Label printing + cancel go through Fan/Sameday APIs — hidden
+                for manually-recorded AWBs (DHL/Poșta), where they'd just fail. */}
+            {AWB_CAPABLE.includes(provider) && (
+              <Button variant="outline" size="sm" onClick={onPrintLabel} disabled={downloading}>
+                {downloading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Printer className="h-4 w-4" />}
+                Printeaza eticheta
+              </Button>
+            )}
             {order.delivery_tracking_url && (
               <Button variant="outline" size="sm" asChild>
                 <Link href={order.delivery_tracking_url} target="_blank" rel="noopener noreferrer">
@@ -4215,16 +4275,18 @@ function AwbSection({
                 Marchează livrat
               </Button>
             )}
-            <Button
-              variant="outline"
-              size="sm"
-              className="text-destructive hover:text-destructive hover:bg-destructive/10"
-              onClick={onCancelAwb}
-              disabled={cancelling}
-            >
-              {cancelling ? <Loader2 className="h-4 w-4 animate-spin" /> : <XCircle className="h-4 w-4" />}
-              Anuleaza AWB
-            </Button>
+            {AWB_CAPABLE.includes(provider) && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                onClick={onCancelAwb}
+                disabled={cancelling}
+              >
+                {cancelling ? <Loader2 className="h-4 w-4 animate-spin" /> : <XCircle className="h-4 w-4" />}
+                Anuleaza AWB
+              </Button>
+            )}
           </div>
           {isLockerDelivery && courierQuote?.lockerName && (
             <p className="text-xs text-muted-foreground">Locker: {courierQuote.lockerName}</p>

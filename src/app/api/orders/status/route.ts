@@ -138,13 +138,49 @@ export async function GET(request: NextRequest) {
 
     // Internal/team-only events must NEVER reach the public timeline — team
     // notes (note_added) can contain operational details (e.g. corrected
-    // phone numbers), and the reupload/kyc events use team-facing wording.
+    // phone numbers), the reupload/kyc events use team-facing wording, and
+    // the abandoned-cart machinery (abandonment + recovery email with coupon)
+    // is pre-payment noise the paying customer should never see.
     const INTERNAL_EVENTS = new Set([
       'note_added',
       'admin_action',
       'reupload_requested',
       'kyc_photo_resubmitted',
+      'abandoned',
+      'recovery_email_sent',
+      'resume_link_generated',
+      'document_viewed_by_client',
+      'extra_invoice_issued',
+      'standby_started',
     ]);
+    // Statuses that are pre-payment cart states — never part of the paid
+    // order's story (they also arrive via status_changed rows).
+    const HIDDEN_STATUSES = new Set(['abandoned', 'draft']);
+
+    // Admin-generated events carry operational notes (admin email, Stripe
+    // ids, internal diffs) — replace with client-safe wording.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const clientSafeNote = (h: any): string | null => {
+      if (h.event_type === 'extra_payment_sent') {
+        const amount = Number((h.new_value as { diff?: number } | null)?.diff);
+        return Number.isFinite(amount) && amount > 0
+          ? `Ți-am trimis pe email un link de plată pentru serviciile adăugate (${amount.toFixed(2)} RON).`
+          : 'Ți-am trimis pe email un link de plată pentru serviciile adăugate.';
+      }
+      if (h.event_type === 'extra_payment_received') {
+        return 'Plata suplimentară a fost confirmată. Mulțumim!';
+      }
+      if (h.event_type === 'awb_created') {
+        return 'Coletul tău a fost predat curierului. Urmărește-l în secțiunea de mai jos.';
+      }
+      if (h.event_type === 'refunded' || h.event_type === 'status_changed') {
+        return h.notes;
+      }
+      // Default: keep the stored note only for events written with
+      // customer-facing wording (order_created, document_generated etc.).
+      const CUSTOMER_WORDED = new Set(['order_created', 'draft_created', 'document_generated', 'order_submitted', 'payment_confirmed']);
+      return CUSTOMER_WORDED.has(h.event_type) ? h.notes : null;
+    };
 
     // Build timeline from history - extract status from new_value when available
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -162,10 +198,10 @@ export async function GET(request: NextRequest) {
       return {
         status,
         event: h.event_type,
-        note: h.notes,
+        note: clientSafeNote(h),
         createdAt: h.created_at,
       };
-    });
+    }).filter((t) => !HIDDEN_STATUSES.has(t.status));
 
     // Add initial order creation if not in timeline
     if (timeline.length === 0 || !timeline.find(t => t.event === 'order_created' || t.event === 'draft_created')) {
