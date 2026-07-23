@@ -78,7 +78,18 @@ import {
   MessageCircle,
   Handshake,
   TrendingUp,
+  Coins,
+  Plus,
+  Trash2,
 } from 'lucide-react';
+import {
+  SUPPLIER_CATEGORIES,
+  SUPPLIER_CATEGORY_LABELS,
+  totalSupplierCost,
+  serviceRevenueForMargin,
+  computeMargin,
+  type SupplierCostRow,
+} from '@/lib/admin/supplier-costs';
 
 // ---------- Types ----------
 
@@ -2095,6 +2106,10 @@ export default function AdminOrderDetailPage() {
             })()}
           </CardContent>
         </Card>
+
+        {/* Cost intern furnizori + marjă — echipa înregistrează cât ne-a
+            costat traducerea/legalizarea/apostila; doar admin. */}
+        <SupplierCostsCard order={order} />
         </div>
       </div>
 
@@ -3011,6 +3026,192 @@ function ExtraPaymentBanners({ order, onRefresh }: { order: OrderDetail; onRefre
         </div>
       )}
     </>
+  );
+}
+
+// ---------- Supplier Costs & Margin Card ----------
+// Team records what each collaborator (translator/notary/…) charged US for
+// this order → per-order margin + fuels the monthly supplier report.
+function SupplierCostsCard({ order }: { order: OrderDetail }) {
+  const [costs, setCosts] = useState<SupplierCostRow[]>([]);
+  const [suppliers, setSuppliers] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [adding, setAdding] = useState(false);
+  // Add-form state
+  const [supplier, setSupplier] = useState('');
+  const [category, setCategory] = useState<string>('traducere');
+  const [amount, setAmount] = useState('');
+  const [description, setDescription] = useState('');
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    try {
+      const [cRes, sRes] = await Promise.all([
+        fetch(`/api/admin/orders/${order.id}/supplier-costs`),
+        fetch('/api/admin/settings'),
+      ]);
+      const cJson = await cRes.json();
+      if (cJson.success) setCosts(cJson.data as SupplierCostRow[]);
+      const sJson = await sRes.json();
+      const list = (sJson?.data?.suppliers as Array<{ name: string; active?: boolean }>) || [];
+      const names = list.filter((s) => s.active !== false).map((s) => s.name);
+      setSuppliers(names);
+      if (names.length && !supplier) setSupplier(names[0]);
+    } catch {
+      /* non-fatal */
+    } finally {
+      setLoading(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [order.id]);
+
+  useEffect(() => { load(); }, [load]);
+
+  const addCost = async () => {
+    const amt = parseFloat(amount.replace(',', '.'));
+    if (!supplier.trim()) { toast.error('Alege furnizorul'); return; }
+    if (!Number.isFinite(amt) || amt < 0) { toast.error('Sumă invalidă'); return; }
+    setAdding(true);
+    try {
+      const res = await fetch(`/api/admin/orders/${order.id}/supplier-costs`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ supplier: supplier.trim(), category, amountRon: amt, description: description.trim() || null }),
+      });
+      const json = await res.json();
+      if (!res.ok || !json.success) throw new Error(json.error || 'Eroare');
+      toast.success('Cost adăugat');
+      setAmount(''); setDescription('');
+      load();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Eroare la adăugare');
+    } finally {
+      setAdding(false);
+    }
+  };
+
+  const removeCost = async (costId: string) => {
+    try {
+      const res = await fetch(`/api/admin/orders/${order.id}/supplier-costs?costId=${costId}`, { method: 'DELETE' });
+      const json = await res.json();
+      if (!res.ok || !json.success) throw new Error(json.error || 'Eroare');
+      setCosts((prev) => prev.filter((c) => c.id !== costId));
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Eroare la ștergere');
+    }
+  };
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const o = order as any;
+  const totalCost = totalSupplierCost(costs);
+  const revenue = serviceRevenueForMargin(
+    o.selected_options as Parameters<typeof serviceRevenueForMargin>[0],
+    Number(o.additional_paid_amount ?? 0)
+  );
+  const margin = computeMargin(revenue, totalCost);
+
+  return (
+    <Card>
+      <CardHeader className="pb-3">
+        <CardTitle className="text-base flex items-center gap-2">
+          <Coins className="h-4 w-4" />
+          Cost intern & marjă
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        {loading ? (
+          <Skeleton className="h-24 w-full" />
+        ) : (
+          <>
+            {costs.length > 0 && (
+              <div className="space-y-1.5">
+                {costs.map((c) => (
+                  <div key={c.id} className="flex items-center gap-2 text-sm">
+                    <Badge variant="secondary" className="shrink-0">
+                      {SUPPLIER_CATEGORY_LABELS[c.category as keyof typeof SUPPLIER_CATEGORY_LABELS] || c.category}
+                    </Badge>
+                    <span className="flex-1 min-w-0 truncate">
+                      <span className="font-medium">{c.supplier}</span>
+                      {c.description && <span className="text-muted-foreground"> · {c.description}</span>}
+                    </span>
+                    <span className="font-medium tabular-nums whitespace-nowrap">{Number(c.amount_ron).toFixed(2)} lei</span>
+                    <Button variant="ghost" size="icon-sm" className="text-destructive" onClick={() => removeCost(c.id)} title="Șterge">
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Margin summary */}
+            <div className="grid grid-cols-3 gap-2 rounded-md border bg-neutral-50 p-2 text-center text-xs">
+              <div>
+                <p className="text-muted-foreground">Încasat servicii</p>
+                <p className="font-semibold tabular-nums">{revenue.toFixed(2)}</p>
+              </div>
+              <div>
+                <p className="text-muted-foreground">Cost intern</p>
+                <p className="font-semibold tabular-nums">{totalCost.toFixed(2)}</p>
+              </div>
+              <div>
+                <p className="text-muted-foreground">Marjă</p>
+                <p className={`font-semibold tabular-nums ${margin.margin >= 0 ? 'text-emerald-700' : 'text-red-600'}`}>
+                  {margin.margin.toFixed(2)}
+                  {margin.marginPct != null && <span className="ml-1 text-[10px] font-normal">({margin.marginPct}%)</span>}
+                </p>
+              </div>
+            </div>
+
+            {/* Add form */}
+            <div className="space-y-2 rounded-md border border-dashed p-2">
+              <div className="grid grid-cols-2 gap-2">
+                <select
+                  value={supplier}
+                  onChange={(e) => setSupplier(e.target.value)}
+                  className="h-8 rounded-md border border-input bg-background px-2 text-sm"
+                >
+                  {suppliers.length === 0 && <option value="">— fără furnizori —</option>}
+                  {suppliers.map((s) => <option key={s} value={s}>{s}</option>)}
+                </select>
+                <select
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                  className="h-8 rounded-md border border-input bg-background px-2 text-sm"
+                >
+                  {SUPPLIER_CATEGORIES.map((c) => (
+                    <option key={c} value={c}>{SUPPLIER_CATEGORY_LABELS[c]}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="flex gap-2">
+                <Input
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="descriere (ex: certificat naștere - Germană)"
+                  className="h-8 flex-1"
+                  maxLength={300}
+                />
+                <Input
+                  type="number"
+                  min="0"
+                  step="0.5"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  placeholder="lei"
+                  className="h-8 w-24"
+                />
+                <Button size="sm" onClick={addCost} disabled={adding}>
+                  {adding ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+                </Button>
+              </div>
+            </div>
+            <p className="text-[11px] text-muted-foreground">
+              Vizibil doar echipei. Raport lunar per furnizor: <Link href="/admin/costuri-furnizori" className="underline">Costuri furnizori</Link>.
+            </p>
+          </>
+        )}
+      </CardContent>
+    </Card>
   );
 }
 

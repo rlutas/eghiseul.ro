@@ -64,6 +64,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: '/admin/colaboratori', label: 'Colaboratori', icon: Handshake, permission: 'orders.view', hideForRoles: ['avocat'] },
   { href: '/admin/status-portaluri', label: 'Stare portaluri', icon: Activity, permission: 'orders.view', hideForRoles: ['avocat'] },
   { href: '/admin/decontari', label: 'Decontări', icon: Banknote, permission: 'payments.verify', hideForRoles: ['avocat'] },
+  { href: '/admin/costuri-furnizori', label: 'Costuri furnizori', icon: Coins, permission: 'payments.verify', hideForRoles: ['avocat'] },
   { href: '/admin/coupons', label: 'Cupoane', icon: Ticket, permission: 'settings.manage' },
   { href: '/admin/marketing', label: 'Marketing', icon: Mail, permission: 'settings.manage' },
   { href: '/admin/clienti', label: 'Clienți', icon: Users, permission: 'users.manage' },

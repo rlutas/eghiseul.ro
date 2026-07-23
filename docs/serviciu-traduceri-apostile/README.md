@@ -254,11 +254,14 @@ listă (inactivă, marcată „CERUTĂ — prioritate").
 
 ### Faza 0 — negociere (ACUM)
 1. ✅ Benchmark concurență (Kenna + centruldevize + traducerilegalizate + taxe oficiale).
-2. ✅ Query DB cerere reală (EN 9 / IT 6 din 20; limbile lipsă nu-s măsurabile).
-3. ✅ Lista de prețuri în admin settings (unealta de negociere).
-4. ⬜ **Mesaj către doamna de la traduceri** (§12) cu lista §6 → completezi
-   costurile în settings pe măsură ce vin.
-5. ⬜ Discuție notar (§7) → costuri legalizare/apostilă + specimenul de semnătură.
+2. ✅ **Research legal + piață verificat** ([research-legal-si-piata.md](research-legal-si-piata.md)).
+3. ✅ Query DB cerere reală (EN 9 / IT 6 din 20; limbile lipsă nu-s măsurabile).
+4. ✅ Lista de prețuri în admin settings — 37 limbi, cost actual 45 pe cele
+   active, paritate completă cu grupele Kenna (unealta de negociere).
+5. ✅ **Costuri furnizori + marjă pe comandă + raport lunar** (LIVRAT — vezi §13).
+6. ⬜ **Mesaj către doamna de la traduceri** (§12) + lista Excel de completat
+   (`lista-preturi-traducator.csv`) → completezi costurile în settings.
+7. ⬜ Discuție notar (§7) → costuri legalizare/apostilă + specimenul de semnătură.
 
 **Criteriu GO faza 1:** cost grupa I ≤ ~40 lei/doc standard (marjă 2×+ la
 89-119) ȘI acoperire arabă (direct sau colaborator).
@@ -359,3 +362,40 @@ facturat 45 la ce piața dă cu 20-25".
 **Legături:** [analiza DHL](../operations/dhl-livrare-analiza-cost-negociere.md)
 (tarife noi + import) · [ghid wizard modular](../technical/specs/modular-wizard-guide.md)
 · prețuri opțiuni existente: `/admin/settings` → Servicii.
+
+---
+
+## 13. Costuri furnizori + marjă (LIVRAT 2026-07-23)
+
+Ca să știm profitul real (nu doar prețul de vânzare) și să combatem factura
+colaboratorilor la sfârșit de lună. Vizibil DOAR echipei.
+
+**Pe fiecare comandă** (`/admin/orders/[id]` → cardul „Cost intern & marjă"):
+echipa înregistrează cât ne-a costat pe noi fiecare serviciu prestat de un
+colaborator — furnizor (din lista `suppliers`) + categorie
+(traducere/legalizare/apostilă/supralegalizare/copie legalizată/curier/alt) +
+descriere + sumă. Cardul arată automat: **Încasat servicii** (suma opțiunilor
+cu valoare adăugată de pe comandă + plăți extra) − **Cost intern** = **Marjă**
+(RON + %).
+
+**Raport lunar** (`/admin/costuri-furnizori`, permisiune `payments.verify`):
+selector de lună → toate costurile grupate pe furnizor, cu comandă + client +
+categorie + descriere + total per furnizor + total lună. Exact ce trebuie ca
+la sfârșit de lună să vezi „traducătoarea X: 23 lucrări, 1.035 lei" și să
+compari cu factura ei.
+
+**Tehnic:**
+- Tabel `order_supplier_costs` (migrația 136) — service-role only (RLS blocat).
+- Lista de furnizori: `admin_settings.suppliers` (editabilă; seed: traducător +
+  notar principal).
+- API: `GET/POST/DELETE /api/admin/orders/[id]/supplier-costs` (orders.manage) +
+  `GET /api/admin/supplier-costs?month=YYYY-MM` (payments.verify).
+- Logica pură + testată: `src/lib/admin/supplier-costs.ts` (12 teste).
+- **De ce ajută pe viitor:** orice serviciu nou cu costuri de la colaboratori
+  (apostilă, curieri speciali, alți furnizori) folosește aceeași infrastructură
+  — înregistrezi costul pe comandă, vezi marja, raport lunar per furnizor.
+
+**Marja — ce intră în „Încasat servicii":** doar opțiunile cu valoare adăugată
+(traducere, legalizare, apostilă Haga/Notari, cetățean străin, custom_extra) +
+plățile extra — NU prețul de bază al serviciului. Așa marja reflectă exact
+serviciile pentru care înregistrezi cost, nu tot coșul.

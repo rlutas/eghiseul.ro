@@ -119,6 +119,7 @@ export async function PATCH(request: NextRequest) {
       // key but it was never whitelisted — every save 400'd "Cheie invalida".
       'civil_status_term_tiers',
       'translation_price_list',
+      'suppliers',
     ];
 
     if (!ALLOWED_KEYS.includes(key)) {
