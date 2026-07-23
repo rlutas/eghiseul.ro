@@ -57,7 +57,13 @@ import {
   X,
   FileText,
   Eye,
+  Languages,
+  Plus,
 } from 'lucide-react';
+import {
+  DEFAULT_TRANSLATION_PRICE_LIST,
+  type TranslationPriceRow,
+} from '@/config/translation-languages';
 import { toast } from 'sonner';
 import { useAdminPermissions } from '@/hooks/use-admin-permissions';
 
@@ -206,6 +212,10 @@ export default function AdminSettingsPage() {
             <Clock className="h-4 w-4 mr-1.5" />
             Termene stare civilă
           </TabsTrigger>
+          <TabsTrigger value="translation-prices">
+            <Languages className="h-4 w-4 mr-1.5" />
+            Traduceri
+          </TabsTrigger>
           <TabsTrigger value="system">
             <Settings className="h-4 w-4 mr-1.5" />
             Sistem
@@ -226,6 +236,9 @@ export default function AdminSettingsPage() {
         </TabsContent>
         <TabsContent value="civil-terms">
           <CivilTermsTab />
+        </TabsContent>
+        <TabsContent value="translation-prices">
+          <TranslationPricesTab />
         </TabsContent>
         <TabsContent value="system">
           <SystemTab />
@@ -973,6 +986,217 @@ function CivilTermsTab() {
               )}
             </Button>
           </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════════════════════
+// TRANSLATION PRICES TAB — per-language list: our negotiated cost vs client
+// price + active flag (drives the wizard language dropdown via
+// GET /api/translation-prices). Context: docs/serviciu-traduceri-apostile/.
+// ══════════════════════════════════════════════════════════════
+
+function TranslationPricesTab() {
+  const [rows, setRows] = useState<TranslationPriceRow[]>(DEFAULT_TRANSLATION_PRICE_LIST);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      setLoading(true);
+      try {
+        const res = await fetch('/api/admin/settings');
+        const json = await res.json();
+        const v = json?.data?.translation_price_list;
+        if (Array.isArray(v) && v.length) setRows(v as TranslationPriceRow[]);
+      } catch {
+        toast.error('Eroare la încărcarea listei de traduceri');
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
+
+  const update = (idx: number, patch: Partial<TranslationPriceRow>) => {
+    setRows((prev) => prev.map((r, i) => (i === idx ? { ...r, ...patch } : r)));
+  };
+
+  const numOrNull = (s: string): number | null => {
+    if (s.trim() === '') return null;
+    const n = parseFloat(s.replace(',', '.'));
+    return Number.isFinite(n) ? n : null;
+  };
+
+  const addRow = () => {
+    setRows((prev) => [
+      ...prev,
+      { language: '', group: 'I', active: false, ourCostDoc: null, ourCostPage: null, clientPriceDoc: null, notes: '' },
+    ]);
+  };
+
+  const removeRow = (idx: number) => {
+    setRows((prev) => prev.filter((_, i) => i !== idx));
+  };
+
+  const save = async () => {
+    setSaving(true);
+    try {
+      const res = await fetch('/api/admin/settings', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key: 'translation_price_list', value: rows }),
+      });
+      const json = await res.json();
+      if (json.success) {
+        toast.success('Lista de traduceri a fost salvată');
+      } else {
+        toast.error(json.error || 'Eroare la salvare');
+      }
+    } catch {
+      toast.error('Eroare de rețea');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) {
+    return <Skeleton className="h-64 w-full rounded-lg mt-4" />;
+  }
+
+  const activeCount = rows.filter((r) => r.active).length;
+  const missingCost = rows.filter((r) => r.active && r.ourCostDoc == null).length;
+
+  return (
+    <div className="space-y-4 mt-4">
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <Languages className="h-5 w-5 text-primary-600" />
+            <div>
+              <CardTitle>Limbi & prețuri traduceri</CardTitle>
+              <CardDescription>
+                Costul NOSTRU per document standard (negociat cu traducătoarea) vs prețul
+                client. „Activ&rdquo; = limba apare în wizard la opțiunea de traducere.
+                {' '}{activeCount} limbi active
+                {missingCost > 0 && (
+                  <span className="text-amber-600"> · {missingCost} active fără cost negociat</span>
+                )}
+              </CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          {/* Header row */}
+          <div className="hidden md:grid md:grid-cols-[1fr_70px_70px_90px_90px_90px_80px_1fr_36px] gap-2 px-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+            <span>Limba</span>
+            <span>Grupă</span>
+            <span>Activ</span>
+            <span>Cost/doc</span>
+            <span>Cost/pag</span>
+            <span>Preț client</span>
+            <span>Marjă</span>
+            <span>Note</span>
+            <span />
+          </div>
+          {rows.map((r, i) => {
+            const margin =
+              r.ourCostDoc != null && r.clientPriceDoc != null
+                ? r.clientPriceDoc - r.ourCostDoc
+                : null;
+            return (
+              <div
+                key={i}
+                className={`grid grid-cols-2 md:grid-cols-[1fr_70px_70px_90px_90px_90px_80px_1fr_36px] items-center gap-2 rounded-md border px-2 py-1.5 ${
+                  r.active ? 'bg-white' : 'bg-neutral-50 opacity-80'
+                }`}
+              >
+                <Input
+                  value={r.language}
+                  onChange={(e) => update(i, { language: e.target.value })}
+                  placeholder="ex: Arabă"
+                  className="h-8"
+                />
+                <select
+                  value={r.group}
+                  onChange={(e) => update(i, { group: e.target.value as TranslationPriceRow['group'] })}
+                  className="h-8 rounded-md border border-input bg-background px-2 text-sm"
+                >
+                  {['I', 'II', 'III', 'IV', 'V', 'VI'].map((g) => (
+                    <option key={g} value={g}>{g}</option>
+                  ))}
+                </select>
+                <div className="flex justify-center">
+                  <Switch checked={r.active} onCheckedChange={(v) => update(i, { active: v })} />
+                </div>
+                <Input
+                  type="number"
+                  min="0"
+                  step="0.5"
+                  value={r.ourCostDoc ?? ''}
+                  onChange={(e) => update(i, { ourCostDoc: numOrNull(e.target.value) })}
+                  placeholder="—"
+                  className="h-8"
+                />
+                <Input
+                  type="number"
+                  min="0"
+                  step="0.5"
+                  value={r.ourCostPage ?? ''}
+                  onChange={(e) => update(i, { ourCostPage: numOrNull(e.target.value) })}
+                  placeholder="—"
+                  className="h-8"
+                />
+                <Input
+                  type="number"
+                  min="0"
+                  step="0.5"
+                  value={r.clientPriceDoc ?? ''}
+                  onChange={(e) => update(i, { clientPriceDoc: numOrNull(e.target.value) })}
+                  placeholder="—"
+                  className="h-8"
+                />
+                <span
+                  className={`text-sm font-medium tabular-nums ${
+                    margin == null ? 'text-muted-foreground' : margin >= 0 ? 'text-emerald-700' : 'text-red-600'
+                  }`}
+                >
+                  {margin == null ? '—' : `${margin.toFixed(0)} lei`}
+                </span>
+                <Input
+                  value={r.notes ?? ''}
+                  onChange={(e) => update(i, { notes: e.target.value })}
+                  placeholder="note"
+                  className="h-8"
+                />
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  className="text-destructive"
+                  onClick={() => removeRow(i)}
+                  title="Șterge limba"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+            );
+          })}
+          <div className="flex items-center justify-between pt-3">
+            <Button variant="outline" size="sm" onClick={addRow}>
+              <Plus className="h-4 w-4 mr-1" />
+              Adaugă limbă
+            </Button>
+            <Button onClick={save} disabled={saving}>
+              {saving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
+              Salvează lista
+            </Button>
+          </div>
+          <p className="pt-1 text-xs text-muted-foreground">
+            Prețul din wizard rămâne deocamdată cel al opțiunii de traducere (flat) — lista
+            de aici alimentează dropdown-ul de limbi (Activ) și pregătește pricing-ul per
+            limbă. Plan: docs/serviciu-traduceri-apostile/.
+          </p>
         </CardContent>
       </Card>
     </div>

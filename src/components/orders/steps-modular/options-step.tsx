@@ -32,7 +32,7 @@ import {
   cascadeDropCodes,
 } from '@/lib/services/option-dependencies';
 import { APOSTILA_COUNTRIES } from '@/config/apostila-countries';
-import { TRANSLATION_LANGUAGES } from '@/config/translation-languages';
+import { useTranslationLanguages } from '@/hooks/use-translation-languages';
 import { SpecimenInfoButton } from '@/components/orders/specimen-info-button';
 
 interface OptionsStepProps {
@@ -848,6 +848,8 @@ interface LanguageDropdownProps {
 }
 
 function LanguageDropdown({ value, onChange, error, id = 'opt-language' }: LanguageDropdownProps) {
+  // DB-driven list (admin settings → Traduceri); static fallback until loaded.
+  const languages = useTranslationLanguages();
   return (
     <div className="border-l-2 border-primary-200 pl-4">
       <label htmlFor={id} className="text-sm font-medium text-secondary-900">
@@ -864,7 +866,7 @@ function LanguageDropdown({ value, onChange, error, id = 'opt-language' }: Langu
         )}
       >
         <option value="">Selectați limba</option>
-        {TRANSLATION_LANGUAGES.map((lang) => (
+        {languages.map((lang) => (
           <option key={lang} value={lang}>
             {lang}
           </option>

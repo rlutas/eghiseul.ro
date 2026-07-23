@@ -57,6 +57,29 @@ Extra Kenna: legalizare notarială locală **40 RON** prima copie + 6 RON/copie
 suplimentară; legalizare per act **45 RON**; +5 RON/exemplar de la al 3-lea;
 curier +16 RON.
 
+### Research extins (23.07, după-amiază)
+
+**centruldevize.ro (T&B Visa International, București):** apostilare +
+supralegalizare + traduceri pentru 100+ țări, vize (specialitate: invitații
+Rusia), **„servicii diaspora" remote** — concurent direct pe nișa noastră.
+FĂRĂ prețuri publice (pagina de traduceri = 404); vând prin „cere ofertă".
+Confirmă diferențiatorul nostru: preț fix + checkout online.
+
+**traducerilegalizate.com (București):** documente standard (certificat
+naștere, CI, permis, **cazier**) de la **20 lei/pag**; acte auto/bancare 30;
+diplome 30; contracte 35; medicale 40. Limbi: FR/IT/ES/DE de la 20, TR/EL 40,
+RU/HU/PL/BG 50. **Legalizare ~30 lei/doc; apostilă/supralegalizare 50
+lei+TVA/exemplar.** Urgent +50%; străină→străină +50%.
+
+**Taxa oficială apostilă Camera Notarilor (CNPB): 50 lei+TVA per exemplar**
+(pe acte notariale, copii legalizate și traduceri legalizate). Supralegalizare
+non-Haga: lanț Cameră → MAE → misiunea diplomatică a statului (confirmat).
+
+**Concluzie piață:** nimeni nu vinde online cu preț fix per document +
+checkout — toți per pagină / „cere ofertă". Costul de achiziție pe grupa I e
+mic (20-30/pag) → marja reală vine din convenience + bundling
+(traducere+legalizare+apostilă+livrare+import DHL), nu din traducerea în sine.
+
 **Observații strategice vs Kenna:**
 - Ei vând per pagină → clientul nu știe cât plătește până nu-i numără paginile.
   **Oportunitatea noastră: preț FIX per document standard** (un buletin = 1
@@ -181,18 +204,42 @@ Egipt, Iordania...): lanțul e MAE (supralegalizare) → ambasada/consulatul ț�
 înainte s-o vindem (o putem lansa în faza 2; faza 1 = traduceri + legalizare +
 apostilă).
 
-## 11. Plan de acțiune
+## 11. Plan CONCRET de lansare (pe faze) — actualizat 23.07 p.m.
 
-1. ✅ Benchmark Kenna + structura documentului (azi).
-2. ⬜ Query DB: distribuția limbilor cerute până acum + purpose-uri (cerere reală).
-3. ⬜ **Mesaj către doamna de la traduceri** (draft în §12) cu lista §6 → primim prețuri + limbi.
-4. ⬜ Discuție notar (lista §7) → prețuri legalizare/apostilă + logistica specimenului.
-5. ⬜ Decizie pricing final (completăm §9) + care limbi intră în faza 1.
-6. ⬜ Research supralegalizare (faza 2).
-7. ⬜ Implementare: serviciu nou în platformă (wizard modular — ghid existent
-   `docs/technical/specs/modular-wizard-guide.md`), pagină SEO („traduceri
-   legalizate online", „traducere buletin engleză" etc. — de făcut keyword
-   research separat), integrare import DHL după semnarea contractului.
+**Unealta internă (LIVRATĂ 23.07):** `/admin/settings` → tab **„Traduceri"** —
+lista celor 29 de limbi (9 active + 20 neoferite pe grupele de cost I-VI) cu
+coloanele: cost/doc NOSTRU, cost/pag, preț client, marjă calculată, activ,
+note. Acolo intri prețurile când vine oferta traducătoarei; flag-ul „Activ"
+alimentează LIVE dropdown-ul de limbi din wizard + dialogul Modifică (API
+public `/api/translation-prices`; fallback lista statică). Araba e deja în
+listă (inactivă, marcată „CERUTĂ — prioritate").
+
+### Faza 0 — negociere (ACUM)
+1. ✅ Benchmark concurență (Kenna + centruldevize + traducerilegalizate + taxe oficiale).
+2. ✅ Query DB cerere reală (EN 9 / IT 6 din 20; limbile lipsă nu-s măsurabile).
+3. ✅ Lista de prețuri în admin settings (unealta de negociere).
+4. ⬜ **Mesaj către doamna de la traduceri** (§12) cu lista §6 → completezi
+   costurile în settings pe măsură ce vin.
+5. ⬜ Discuție notar (§7) → costuri legalizare/apostilă + specimenul de semnătură.
+
+**Criteriu GO faza 1:** cost grupa I ≤ ~40 lei/doc standard (marjă 2×+ la
+89-119) ȘI acoperire arabă (direct sau colaborator).
+
+### Faza 1 — soft-launch, ZERO build
+Activezi limbile noi din settings pe opțiunea de traducere EXISTENTĂ (cazier,
+certificate) — dropdown-ul se extinde instant, fără deploy. Preț rămâne flat
+178,50 → validare cerere reală pe limbile noi înainte de orice investiție.
+
+### Faza 2 — serviciul de sine stătător
+Wizard nou „Traduceri documente" (upload multi-doc, preț FIX per document
+standard pe grupe de limbi, trepte autorizată→legalizată→apostilă, exemplare,
+urgență), pagină SEO (keyword research separat: „traduceri legalizate online",
+„traducere cazier engleză"...), livrare + **import DHL** pentru originale
+(contract semnat → DE→RO 207). Pricing per limbă din lista de settings.
+
+### Faza 3 — supralegalizare non-Haga
+Research separat MAE + ambasade (Emirate/Qatar/China...) — costuri, termene,
+împuterniciri. Se lansează doar după ce faza 2 rulează.
 
 ## 12. Mesaj DRAFT către doamna de la traduceri
 

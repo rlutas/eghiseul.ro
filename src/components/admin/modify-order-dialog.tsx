@@ -27,7 +27,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Loader2, AlertTriangle, ArrowRight, RotateCcw, Send, Clock } from 'lucide-react';
 import { toast } from 'sonner';
-import { TRANSLATION_LANGUAGES } from '@/config/translation-languages';
+import { useTranslationLanguages } from '@/hooks/use-translation-languages';
 import { APOSTILA_COUNTRIES } from '@/config/apostila-countries';
 import { computeAddedTermShiftDays } from '@/lib/orders/modify-diff';
 
@@ -95,6 +95,8 @@ export function ModifyOrderDialog({
   const [deliveryPrice, setDeliveryPrice] = useState<number>(initialDeliveryPrice);
   const [note, setNote] = useState('');
   const [refundReason, setRefundReason] = useState('');
+  // DB-driven language list (admin settings → Traduceri); static fallback.
+  const translationLanguages = useTranslationLanguages();
 
   // Free-form extra service — for things that aren't in the addon catalog
   // (e.g. "traducere legalizată maghiară"). Both empty = not sent at all.
@@ -491,7 +493,7 @@ export function ModifyOrderDialog({
                             className="mt-1 block w-full max-w-xs rounded-md border border-input bg-background px-3 py-1.5 text-sm"
                           >
                             <option value="">— Selectează limba —</option>
-                            {TRANSLATION_LANGUAGES.map((lang) => (
+                            {translationLanguages.map((lang) => (
                               <option key={lang} value={lang}>{lang}</option>
                             ))}
                           </select>

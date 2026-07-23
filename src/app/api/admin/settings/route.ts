@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { requirePermission } from '@/lib/admin/permissions';
+import { validateTranslationPriceList } from '@/lib/admin/translation-price-list';
 
 // admin_settings table exists in DB (migration 023) but is not yet
 // in the generated Supabase types. We cast through `any` for now.
@@ -114,6 +115,10 @@ export async function PATCH(request: NextRequest) {
       'document_counters',
       'document_templates',
       'invoicing',
+      // Fixed 2026-07-23: the "Termene stare civilă" tab always saved this
+      // key but it was never whitelisted — every save 400'd "Cheie invalida".
+      'civil_status_term_tiers',
+      'translation_price_list',
     ];
 
     if (!ALLOWED_KEYS.includes(key)) {
@@ -121,6 +126,15 @@ export async function PATCH(request: NextRequest) {
         { success: false, error: `Cheie invalida: ${key}` },
         { status: 400 }
       );
+    }
+
+    // Per-key shape validation — the price list feeds public dropdowns, so a
+    // malformed save must not poison the wizard.
+    if (key === 'translation_price_list') {
+      const err = validateTranslationPriceList(value);
+      if (err) {
+        return NextResponse.json({ success: false, error: err }, { status: 400 });
+      }
     }
 
     const adminClient: AnyClient = createAdminClient();
