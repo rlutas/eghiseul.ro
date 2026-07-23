@@ -59,6 +59,7 @@ import {
   Eye,
   Languages,
   Plus,
+  Handshake,
 } from 'lucide-react';
 import {
   DEFAULT_TRANSLATION_PRICE_LIST,
@@ -216,6 +217,10 @@ export default function AdminSettingsPage() {
             <Languages className="h-4 w-4 mr-1.5" />
             Traduceri
           </TabsTrigger>
+          <TabsTrigger value="suppliers">
+            <Handshake className="h-4 w-4 mr-1.5" />
+            Furnizori
+          </TabsTrigger>
           <TabsTrigger value="system">
             <Settings className="h-4 w-4 mr-1.5" />
             Sistem
@@ -239,6 +244,9 @@ export default function AdminSettingsPage() {
         </TabsContent>
         <TabsContent value="translation-prices">
           <TranslationPricesTab />
+        </TabsContent>
+        <TabsContent value="suppliers">
+          <SuppliersTab />
         </TabsContent>
         <TabsContent value="system">
           <SystemTab />
@@ -1197,6 +1205,135 @@ function TranslationPricesTab() {
             de aici alimentează dropdown-ul de limbi (Activ) și pregătește pricing-ul per
             limbă. Plan: docs/serviciu-traduceri-apostile/.
           </p>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════════════════════
+// SUPPLIERS TAB — colaboratorii/furnizorii (traducător/notar/…) al căror
+// cost îl înregistrăm pe comenzi. Feed pt. dropdown-ul „Cost intern & marjă".
+// admin_settings.suppliers. Context: docs/serviciu-traduceri-apostile/.
+// ══════════════════════════════════════════════════════════════
+
+interface SupplierEntry {
+  name: string;
+  type: string;
+  active: boolean;
+}
+
+const SUPPLIER_TYPES = ['traducator', 'notar', 'apostila', 'curier', 'alt'] as const;
+const SUPPLIER_TYPE_LABELS: Record<string, string> = {
+  traducator: 'Traducător',
+  notar: 'Notar',
+  apostila: 'Apostilă',
+  curier: 'Curier',
+  alt: 'Alt',
+};
+
+function SuppliersTab() {
+  const [rows, setRows] = useState<SupplierEntry[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      setLoading(true);
+      try {
+        const res = await fetch('/api/admin/settings');
+        const json = await res.json();
+        const v = json?.data?.suppliers;
+        if (Array.isArray(v)) setRows(v as SupplierEntry[]);
+      } catch {
+        toast.error('Eroare la încărcarea furnizorilor');
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
+
+  const update = (i: number, patch: Partial<SupplierEntry>) =>
+    setRows((prev) => prev.map((r, idx) => (idx === i ? { ...r, ...patch } : r)));
+  const addRow = () =>
+    setRows((prev) => [...prev, { name: '', type: 'traducator', active: true }]);
+  const removeRow = (i: number) => setRows((prev) => prev.filter((_, idx) => idx !== i));
+
+  const save = async () => {
+    setSaving(true);
+    try {
+      const clean = rows.filter((r) => r.name.trim());
+      const res = await fetch('/api/admin/settings', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key: 'suppliers', value: clean }),
+      });
+      const json = await res.json();
+      if (json.success) toast.success('Furnizorii au fost salvați');
+      else toast.error(json.error || 'Eroare la salvare');
+    } catch {
+      toast.error('Eroare de rețea');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) return <Skeleton className="h-64 w-full rounded-lg mt-4" />;
+
+  return (
+    <div className="space-y-4 mt-4">
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <Handshake className="h-5 w-5 text-primary-600" />
+            <div>
+              <CardTitle>Furnizori / colaboratori</CardTitle>
+              <CardDescription>
+                Firmele/persoanele al căror cost îl înregistrăm pe comenzi (traducător,
+                notar, apostilă…). Apar în lista din cardul &bdquo;Cost intern &amp; marjă&rdquo; de pe
+                fiecare comandă și în raportul lunar &bdquo;Costuri furnizori&rdquo;.
+              </CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          {rows.map((r, i) => (
+            <div key={i} className="grid grid-cols-[1fr_140px_70px_36px] items-center gap-2 rounded-md border px-2 py-1.5">
+              <Input
+                value={r.name}
+                onChange={(e) => update(i, { name: e.target.value })}
+                placeholder="ex: Firma Traduceri SRL"
+                className="h-8"
+              />
+              <select
+                value={r.type}
+                onChange={(e) => update(i, { type: e.target.value })}
+                className="h-8 rounded-md border border-input bg-background px-2 text-sm"
+              >
+                {SUPPLIER_TYPES.map((t) => (
+                  <option key={t} value={t}>{SUPPLIER_TYPE_LABELS[t]}</option>
+                ))}
+              </select>
+              <div className="flex justify-center">
+                <Switch checked={r.active} onCheckedChange={(v) => update(i, { active: v })} />
+              </div>
+              <Button variant="ghost" size="icon-sm" className="text-destructive" onClick={() => removeRow(i)} title="Șterge">
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
+          ))}
+          {rows.length === 0 && (
+            <p className="text-sm text-muted-foreground">Niciun furnizor. Adaugă unul mai jos.</p>
+          )}
+          <div className="flex items-center justify-between pt-3">
+            <Button variant="outline" size="sm" onClick={addRow}>
+              <Plus className="h-4 w-4 mr-1" /> Adaugă furnizor
+            </Button>
+            <Button onClick={save} disabled={saving}>
+              {saving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
+              Salvează
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </div>

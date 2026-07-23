@@ -137,6 +137,17 @@ export async function PATCH(request: NextRequest) {
         return NextResponse.json({ success: false, error: err }, { status: 400 });
       }
     }
+    if (key === 'suppliers') {
+      if (!Array.isArray(value) || value.length > 100) {
+        return NextResponse.json({ success: false, error: 'Lista de furnizori e invalidă' }, { status: 400 });
+      }
+      for (const r of value) {
+        const name = r && typeof r === 'object' ? String((r as { name?: unknown }).name ?? '').trim() : '';
+        if (name.length < 2 || name.length > 120) {
+          return NextResponse.json({ success: false, error: 'Fiecare furnizor trebuie să aibă un nume (2-120 caractere)' }, { status: 400 });
+        }
+      }
+    }
 
     const adminClient: AnyClient = createAdminClient();
 

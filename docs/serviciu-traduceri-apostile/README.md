@@ -367,6 +367,10 @@ facturat 45 la ce piața dă cu 20-25".
 
 ## 13. Costuri furnizori + marjă (LIVRAT 2026-07-23)
 
+> **📘 Ghid pas-cu-pas pentru echipă (de trimis colegilor):**
+> [`costuri-furnizori-cum-functioneaza.md`](costuri-furnizori-cum-functioneaza.md)
+
+
 Ca să știm profitul real (nu doar prețul de vânzare) și să combatem factura
 colaboratorilor la sfârșit de lună. Vizibil DOAR echipei.
 
