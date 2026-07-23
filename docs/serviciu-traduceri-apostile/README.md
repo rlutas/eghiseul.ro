@@ -3,6 +3,14 @@
 **Status:** 📋 ANALIZĂ — 2026-07-23. Nimic implementat; documentul e baza pentru
 negocierea cu traducătoarea + notarul și pentru decizia de pricing.
 
+> **📊 Research legal + piață verificat** (deep-research, 24 afirmații 3-0 pe
+> surse guvernamentale): [`research-legal-si-piata.md`](research-legal-si-piata.md)
+> — procedurile oficiale exacte, taxele, lanțul per document, prețurile
+> competiției. Descoperiri cheie: apostila la prefectură e **GRATUITĂ** și se
+> poate la ORICE prefectură; UE nu cere apostilă pe stare civilă/cazier
+> (Reg. 2016/1191); nimeni nu vinde preț fix online (toți per pagină / „cere
+> ofertă"); codess taxează apostila 59+comision 150 pe o taxă de stat gratuită.
+
 ## 1. Conceptul
 
 Clientul urcă documentul (buletin/CI, pașaport, cazier, certificat, acte auto,

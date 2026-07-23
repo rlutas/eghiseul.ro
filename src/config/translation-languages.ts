@@ -49,6 +49,9 @@ export interface TranslationPriceRow {
 }
 
 const CURRENT_PRICE = 178.5;
+// Cost real facturat de traducătoarea actuală (minimul văzut pe lista ei,
+// 2026-07) — ținta de negociere e 30-35; vezi docs/serviciu-traduceri-apostile/.
+const CURRENT_COST = 45;
 
 export const DEFAULT_TRANSLATION_PRICE_LIST: TranslationPriceRow[] = [
   // ── Oferite azi (lista statică istorică) ─────────────────────────────────
@@ -56,10 +59,10 @@ export const DEFAULT_TRANSLATION_PRICE_LIST: TranslationPriceRow[] = [
     language,
     group: 'I' as const,
     active: true,
-    ourCostDoc: null,
+    ourCostDoc: CURRENT_COST,
     ourCostPage: null,
     clientPriceDoc: CURRENT_PRICE,
-    notes: '',
+    notes: 'cost actual facturat — de renegociat (țintă 30-35)',
   })),
   // ── Neoferite încă — gap de acoperire vs piață (Kenna) ──────────────────
   { language: 'Maghiară', group: 'I', active: false, ourCostDoc: null, ourCostPage: null, clientPriceDoc: null, notes: '' },
@@ -82,4 +85,13 @@ export const DEFAULT_TRANSLATION_PRICE_LIST: TranslationPriceRow[] = [
   { language: 'Daneză', group: 'V', active: false, ourCostDoc: null, ourCostPage: null, clientPriceDoc: null, notes: '' },
   { language: 'Japoneză', group: 'V', active: false, ourCostDoc: null, ourCostPage: null, clientPriceDoc: null, notes: '' },
   { language: 'Persană', group: 'VI', active: false, ourCostDoc: null, ourCostPage: null, clientPriceDoc: null, notes: '' },
+  // Restul limbilor din oferta Kenna (paritate completă de acoperire):
+  { language: 'Albaneză', group: 'V', active: false, ourCostDoc: null, ourCostPage: null, clientPriceDoc: null, notes: 'Kenna gr. V' },
+  { language: 'Hindi', group: 'V', active: false, ourCostDoc: null, ourCostPage: null, clientPriceDoc: null, notes: 'Kenna gr. V' },
+  { language: 'Latină', group: 'V', active: false, ourCostDoc: null, ourCostPage: null, clientPriceDoc: null, notes: 'Kenna gr. V' },
+  { language: 'Slovenă', group: 'V', active: false, ourCostDoc: null, ourCostPage: null, clientPriceDoc: null, notes: 'Kenna gr. V' },
+  { language: 'Lituaniană', group: 'VI', active: false, ourCostDoc: null, ourCostPage: null, clientPriceDoc: null, notes: 'Kenna gr. VI' },
+  { language: 'Macedoneană', group: 'VI', active: false, ourCostDoc: null, ourCostPage: null, clientPriceDoc: null, notes: 'Kenna gr. VI' },
+  { language: 'Vietnameză', group: 'VI', active: false, ourCostDoc: null, ourCostPage: null, clientPriceDoc: null, notes: 'Kenna gr. VI' },
+  { language: 'Urdu', group: 'VI', active: false, ourCostDoc: null, ourCostPage: null, clientPriceDoc: null, notes: 'Kenna gr. VI' },
 ];
