@@ -108,6 +108,32 @@ extras multilingv · adeverință medicală · recomandare
 diplomă · contract vânzare auto · sentință divorț · acte firmă (CUI,
 constatator) · procuri · documente medicale · orice alt document
 
+## 4b. Harta apostilării — CE se apostilează UNDE (și ce NU se poate)
+
+Apostila Haga se aplică în România de TREI autorități diferite, după tipul
+actului — asta dictează logistica per document (de VERIFICAT cu notarul, §7):
+
+| Autoritate | Ce apostilează | Documentele noastre |
+|---|---|---|
+| **Instituția Prefectului** | acte administrative ORIGINALE | certificate stare civilă (naștere/căsătorie/deces), cazier judiciar, adeverințe, certificate de rezidență |
+| **Camera Notarilor Publici** (50+TVA/ex.) | acte notariale, **copii legalizate**, **traduceri legalizate** | traducerile noastre legalizate + copiile legalizate ale originalelor |
+| **Tribunal** | hotărâri judecătorești | sentințe divorț, hotărâri |
+
+**Capcane cunoscute (de confirmat):**
+- **Diplomele NU se apostilează direct** — întâi viză CNRED (Ministerul
+  Educației) / inspectorat, apoi apostila la prefectură. Flux mai lung —
+  termen separat în wizard.
+- CI/pașaport/permis: originalul NU se apostilează (act de identitate) — se
+  face **copie legalizată la notar → apostilă pe copia legalizată** la Cameră.
+- Actele mai vechi de un anumit format (certificate stare civilă vechi) pot
+  necesita preschimbare înainte de apostilare.
+- Pentru țările NON-Haga nimic din tabel nu ajunge — lanțul e supralegalizare
+  (MAE + ambasadă), faza 3.
+
+Consecință pentru wizard: câmpul „țara de utilizare" decide automat lanțul
+corect (Haga → apostilă la autoritatea potrivită tipului de act; non-Haga →
+supralegalizare/faza 3 → deocamdată mesaj + contact manual).
+
 ## 5. Limbile — ce avem, ce lipsește, ce cerem
 
 - **Avem (9):** EN (UK/SUA/AUS), FR, IT, ES, PT, DE, NL.
@@ -148,13 +174,17 @@ per pagină pentru rest; termen standard + termen urgent; pe fiecare limbă.
 1. Legalizarea semnăturii traducătorului: preț per act + per exemplar
    suplimentar (benchmark Kenna: 40-45 RON). Cerință: traducătorul trebuie să
    aibă specimen de semnătură depus la notarul respectiv — traducătoarea
-   noastră ÎL ARE? La ce notari?
+   noastră ÎL ARE? La ce notari? Dar colaboratorii ei pe limbi rare (arabă)?
 2. Copii legalizate după originale (des cerute împreună cu traducerea) — preț.
 3. Apostilă notarială (Camera Notarilor) prin notar: preț + termen + pe ce
    acte se aplică (traduceri legalizate, copii legalizate).
-4. Apostilă pe ORIGINALE: ce se duce la Camera Notarilor vs prefectură
-   (instituția 1) vs tribunal — cine din echipă poate depune, împuternicire?
-5. Program/SLA: putem duce zilnic un batch? termen de întoarcere?
+4. **Validarea hărții din §4b**: confirmă per tip de document unde se
+   apostilează originalul (prefectură/Cameră/tribunal), că CI/pașaport merg pe
+   copie legalizată + apostilă pe copie, fluxul CNRED la diplome, și ce acte
+   NU se pot apostila deloc.
+5. Apostilă pe ORIGINALE la prefectură/tribunal: cine din echipă poate depune,
+   împuternicire necesară? Termene per autoritate.
+6. Program/SLA: putem duce zilnic un batch? termen de întoarcere?
 
 ## 8. Flow-ul clientului (draft wizard)
 

@@ -1,6 +1,6 @@
 ﻿LISTĂ PREȚURI TRADUCERI — de completat
 Firma: EDIGITALIZARE S.R.L. (eghiseul.ro)
-Instrucțiuni: completați pentru fiecare limbă pe care o acoperiți. Preț per DOCUMENT = act standard de 1 pagină (buletin/CI, pașaport, cazier, certificat naștere/căsătorie/deces, permis de conducere). Preț per PAGINĂ = 2.000 caractere cu spații, pentru documente variabile (foi matricole, sentințe, contracte).
+Instrucțiuni: Secțiunea 1 = prețul pe limbă. Secțiunea 2 = confirmați pentru fiecare document uzual dacă se încadrează la prețul per DOCUMENT standard (act de 1 pagină) sau cum îl tarifați. Secțiunea 3 = servicii conexe. Secțiunea 4 = colaborare.
 
 SECȚIUNEA 1 — PREȚURI PE LIMBĂ
 Limbă;Traducător autorizat MJ? (da/nu);Direct sau prin colaborator?;Preț / DOCUMENT standard 1 pag (RON);Preț / PAGINĂ 2.000 car. (RON);Termen standard (zile lucr.);Urgent posibil? (da/nu);Preț urgent (RON sau +%);Observații
@@ -34,21 +34,55 @@ Persană;;;;;;;;
 Altă limbă (completați):;;;;;;;;
 Altă limbă (completați):;;;;;;;;
 
-SECȚIUNEA 2 — SERVICII CONEXE
+SECȚIUNEA 2 — DOCUMENTE UZUALE (confirmați tarifarea)
+Pentru fiecare document: se încadrează la prețul per DOCUMENT standard din Secțiunea 1? Dacă nu — cum îl tarifați (câte pagini / preț fix propriu)?
+Document;Preț DOCUMENT standard? (da/nu);Dacă nu — pagini tarifate de regulă / preț fix (RON);Observații
+Carte de identitate / buletin;;;
+Pașaport (pagina de date);;;
+Permis de conducere;;;
+Permis de ședere / certificat înregistrare;;;
+Certificat de naștere;;;
+Certificat de căsătorie;;;
+Certificat de deces;;;
+Certificat de divorț;;;
+Certificat de celibat;;;
+Cazier judiciar;;;
+Cazier auto;;;
+Certificat de integritate comportamentală;;;
+Cazier fiscal;;;
+Talon auto (CIV);;;
+Contract vânzare-cumpărare auto (tipizat);;;
+Atestat profesional transport;;;
+Diplomă (bac / licență / master);;;
+Certificat de calificare;;;
+Adeverință student / salariat;;;
+Recomandare angajator (1 pag);;;
+Adeverință medicală (tipizată);;;
+Certificat de cutumă;;;
+Adeverință de venit / ANAF;;;
+Foaie matricolă / supliment diplomă (variabil);;;
+Sentință divorț / hotărâre judecătorească (variabil);;;
+Certificat constatator / acte firmă (variabil);;;
+Procură / declarație notarială (variabil);;;
+Documente medicale complexe (variabil);;;
+
+SECȚIUNEA 3 — SERVICII CONEXE
 Serviciu;Îl faceți? (da/nu);Preț (RON);Termen;Observații
 Exemplar suplimentar traducere;;;;
 Legalizare notarială a traducerii (mergeți dvs. la notar);;;;
 Apostilă pe traducerea legalizată (Camera Notarilor);;;;
+Obținere apostilă pe ORIGINAL (Prefectură / Cameră / Tribunal);;;;
 Colaționare / verificare traducere adusă de client;;;;
 Traducere din limbă străină în altă limbă străină;;;;
 Traducere inversă (străină → română, pt. recunoaștere în RO);;;;
 
-SECȚIUNEA 3 — COLABORARE & VOLUM
+SECȚIUNEA 4 — COLABORARE & VOLUM
 Întrebare;Răspuns
 Discount la 30 documente/lună (%);
 Discount la 50 documente/lună (%);
 Discount la 100 documente/lună (%);
 Aveți specimen de semnătură depus la notar? La care notariate?;
+Colaboratorii pe limbi rare au și ei specimen depus? Unde?;
 Putem primi scan-ul traducerii pe email înainte de predarea fizică?;
 Program de predare/ridicare documente (zile, interval orar);
 Facturare: per comandă sau centralizat lunar?;
