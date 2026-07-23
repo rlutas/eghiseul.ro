@@ -894,9 +894,12 @@ export default function AdminOrderDetailPage() {
   const isLockerDelivery = !!courierQuote?.lockerId || deliveryMethodParsed?.name?.toLowerCase().includes('box') || deliveryMethodParsed?.name?.toLowerCase().includes('locker');
   const hasAwb = !!order.delivery_tracking_number;
   const hasCourier = !!order.courier_provider || deliveryMethodParsed?.type === 'courier';
+  const _dmName = (deliveryMethodParsed?.name || '').toLowerCase();
   const detectedCourierProvider = order.courier_provider ||
-    (deliveryMethodParsed?.name?.toLowerCase().includes('fan') ? 'fancourier' :
-     deliveryMethodParsed?.name?.toLowerCase().includes('sameday') ? 'sameday' : null);
+    (_dmName.includes('fan') ? 'fancourier' :
+     _dmName.includes('sameday') || _dmName.includes('easybox') ? 'sameday' :
+     _dmName.includes('poșta') || _dmName.includes('posta') ? 'posta' :
+     _dmName.includes('dhl') ? 'dhl' : null);
 
   // All client-uploaded documents
   const clientDocs = extractClientDocuments(order.customer_data);
@@ -4458,22 +4461,27 @@ function AwbSection({
   }
 
   // Automatic AWB generation only works for Fan Courier + Sameday. DHL /
-  // Poșta / other international couriers are handled MANUALLY by the team —
-  // show a clear note instead of a button that would fail.
+  // Poșta / other international couriers — AND anything we can't clearly
+  // detect (delivery_method has only a name, no provider code) — are handled
+  // MANUALLY by the team: show the manual AWB form instead of a generate
+  // button that would fail. (Fix: Poșta Română Internațional wasn't detected,
+  // so orders wrongly showed the Fan „Generează AWB" button — E-260716-RAFUG.)
   const provider = (order.courier_provider || detectedCourierProvider || '').toLowerCase();
-  const AWB_CAPABLE = ['fancourier', 'fan_courier', 'fan', 'sameday'];
-  if (!hasAwb && provider && !AWB_CAPABLE.includes(provider)) {
+  const AWB_CAPABLE = ['fancourier', 'fan_courier', 'fan', 'sameday', 'easybox'];
+  if (!hasAwb && !AWB_CAPABLE.includes(provider)) {
+    const label = provider ? provider.toUpperCase() : 'curier internațional / manual';
     return (
       <>
         <Separator className="my-2" />
         <div className="rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
-          <p className="font-semibold">AWB manual ({provider.toUpperCase()})</p>
+          <p className="font-semibold">AWB manual ({label})</p>
           <p className="mt-1 text-xs">
-            Generarea automată de AWB funcționează doar pentru Fan Courier și Sameday. Expediază
-            manual (adresa de livrare de mai sus), apoi introdu AWB-ul aici — clientul îl vede
-            imediat pe pagina de status, cu link de urmărire.
+            Generarea automată de AWB funcționează doar pentru Fan Courier și Sameday. Pentru
+            Poșta Română, DHL sau alt curier internațional: expediază manual (adresa + destinatarul
+            de mai sus), apoi introdu AWB-ul aici — clientul îl vede imediat pe pagina de status,
+            cu link de urmărire.
           </p>
-          <ManualAwbForm orderId={order.id} courier={provider} onSaved={onManualAwbSaved} />
+          <ManualAwbForm orderId={order.id} courier={provider || 'manual'} onSaved={onManualAwbSaved} />
         </div>
       </>
     );

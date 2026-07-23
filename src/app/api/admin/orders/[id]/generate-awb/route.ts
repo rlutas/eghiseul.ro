@@ -133,6 +133,12 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       apartment?: string;
       postalCode?: string;
       sector?: string;
+      // Recipient the client/team entered in the delivery form — the AWB must
+      // ship to THIS name/phone, not the account/orderer contact.
+      recipientName?: string;
+      recipientPhone?: string;
+      name?: string;
+      phone?: string;
     } | null;
 
     // For locker deliveries, address may not be required
@@ -191,13 +197,21 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     } | null;
 
     const contact = customerData?.contact;
-    const personalData = customerData?.personalData;
-    const recipientName = contact?.name ||
+    // personal is stored under `personal` (wizard); accept `personalData` too.
+    const personalData = customerData?.personalData ||
+      (order.customer_data as { personal?: { firstName?: string; lastName?: string } } | null)?.personal;
+    // Recipient priority (same as the admin "Date livrare" card): the name the
+    // client/team typed for THIS delivery wins over the orderer contact — a
+    // client can ship to another person / their own name-abroad.
+    const recipientName =
+      deliveryAddress?.recipientName ||
+      deliveryAddress?.name ||
+      contact?.name ||
       [contact?.firstName || personalData?.firstName, contact?.lastName || personalData?.lastName]
         .filter(Boolean)
         .join(' ') ||
       'Destinatar';
-    const recipientPhone = contact?.phone || '';
+    const recipientPhone = deliveryAddress?.recipientPhone || deliveryAddress?.phone || contact?.phone || '';
     const recipientEmail = contact?.email || '';
 
     // 6. Build recipient address
