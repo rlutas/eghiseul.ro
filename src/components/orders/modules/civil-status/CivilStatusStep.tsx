@@ -193,7 +193,7 @@ export default function CivilStatusStep({ config, onValidChange }: CivilStatusSt
       req(!!cs.fatherName?.trim(), 'Prenumele tatălui');
       req(!!cs.motherName?.trim(), 'Prenumele mamei');
     }
-    if (fields.oldCertificateReason) req(!!cs.oldCertificateReason, 'Motivul pentru care soliciți un certificat nou');
+    if (fields.oldCertificateReason) req(!!cs.oldCertificateReason, 'Vechiul certificat mi-a fost (pierdut/distrus/furat)');
     if (fields.renouncedCitizenship) req(cs.renouncedRomanianCitizenship !== undefined, 'Dacă ai renunțat la cetățenia română');
     if (fields.purpose && !(fields.marriageAbroadIntent && cs.marriageAbroadIntent === true))
       req(!!cs.purpose?.trim(), 'Scopul solicitării');
@@ -204,6 +204,22 @@ export default function CivilStatusStep({ config, onValidChange }: CivilStatusSt
   useEffect(() => {
     onValidChange(missingItems.length === 0);
   }, [missingItems, onValidChange]);
+
+  // Naștere/căsătorie: „Vechiul certificat mi-a fost" are o SINGURĂ opțiune
+  // („Pierdut"). Un radio cu o singură opțiune, ne-preselectat, arată ca o
+  // etichetă → clienții nu-l bifează și rămân blocați la «Continuă» cu un mesaj
+  // care nici nu se potrivea cu eticheta (incident 2026-07-24, fdvasiliu –
+  // certificat naștere). Îl pre-selectăm automat: nu mai e blocaj, iar UI-ul îl
+  // arată bifat. Celibat păstrează alegerea manuală (pierdut/distrus/furat).
+  useEffect(() => {
+    if (
+      fields.oldCertificateReason &&
+      config?.documentType !== 'celibat' &&
+      !cs.oldCertificateReason
+    ) {
+      updateCivilStatus({ oldCertificateReason: 'pierdut' });
+    }
+  }, [fields.oldCertificateReason, config?.documentType, cs.oldCertificateReason, updateCivilStatus]);
 
   // «Continuă» tapped while incomplete → show the missing list below.
   // Baseline captured at mount: the counter is global, don't flash errors
