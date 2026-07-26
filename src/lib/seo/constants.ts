@@ -173,6 +173,8 @@ export const HARDCODED_TOOL_SLUGS = [
  * Blog articles at WP root path (no /articole/ prefix — preserves backlinks).
  */
 export const HARDCODED_ARTICLE_SLUGS = [
+  'cazier-judiciar-online-gratuit',
+  'certificat-de-nastere-din-strainatate',
   'tva-9-locuinte-31-iulie-2026',
   'verificare-proprietar-imobil',
   'extras-carte-funciara-gratuit',

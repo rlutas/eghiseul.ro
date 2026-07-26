@@ -351,6 +351,21 @@ export default function Page() {
           label: 'Anii lucrați în străinătate se pun la pensie în România?',
           desc: 'Cum se iau în calcul perioadele lucrate în UE la pensia din România.',
         },
+        {
+          slug: 'certificat-nastere',
+          label: 'Certificat de naștere (duplicat)',
+          desc: 'Cerut la dosarul de pensie. Îl scoatem noi de la Starea Civilă, fără drum la primăria de naștere.',
+        },
+        {
+          slug: 'certificat-casatorie',
+          label: 'Certificat de căsătorie (duplicat)',
+          desc: 'Necesar când numele din acte diferă de cel din certificatul de naștere.',
+        },
+        {
+          slug: 'extras-multilingv-certificat-nastere',
+          label: 'Extras multilingv de naștere',
+          desc: 'Pentru stagiul lucrat în UE — valabil direct, fără traducere și fără apostilă.',
+        },
       ]}
       faqs={[
         {

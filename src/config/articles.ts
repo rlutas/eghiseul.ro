@@ -19,6 +19,20 @@ export interface ArticleMeta {
 
 export const ARTICLES: ArticleMeta[] = [
   {
+    slug: 'cazier-judiciar-online-gratuit',
+    title: 'Cazier judiciar online gratuit: cum îl scoți prin ghiseul.ro sau HUB MAI',
+    excerpt:
+      'Certificatul e gratuit online pentru persoane fizice cu cetățenie română și cont validat. Cum îl scoți singur, ce înseamnă „cont validat” și cele șase situații în care ruta gratuită nu se aplică deloc.',
+    category: 'Cazier judiciar',
+  },
+  {
+    slug: 'certificat-de-nastere-din-strainatate',
+    title: 'Certificat de naștere când ești plecat din țară: duplicat, extras multilingv sau apostilă',
+    excerpt:
+      'Cele trei rute reale (consulat, împuternicit, intermediar), diferența dintre duplicat și extrasul multilingv, și în ce state extrasul circulă fără traducere și fără apostilă.',
+    category: 'Stare civilă',
+  },
+  {
     slug: 'tva-9-locuinte-31-iulie-2026',
     title: 'TVA 9% la locuințe expiră pe 31 iulie 2026 — iar ANCPI e picat',
     excerpt:
@@ -129,8 +143,8 @@ export const ARTICLES: ArticleMeta[] = [
   },
   {
     slug: 'cele-4-tipuri-de-certificat-constatator-online',
-    title: 'Cele 4 Tipuri de Certificat Constatator Online',
-    excerpt: 'Furnizare informații, de bază, pentru fonduri IMM și pentru insolvență — ce conține fiecare și când îl folosești.',
+    title: 'Tipurile de Certificat Constatator Online',
+    excerpt: 'De bază, fonduri IMM, insolvență, pe persoană fizică și cu istoric — ce conține fiecare, când îl folosești și când merită luat direct de la ONRC prin InfoCert.',
     category: 'Comercial / ONRC',
   },
   {

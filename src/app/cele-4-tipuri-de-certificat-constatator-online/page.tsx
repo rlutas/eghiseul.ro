@@ -5,10 +5,10 @@ import { ArticleLayout } from '@/components/articole/article-layout';
 const SLUG = 'cele-4-tipuri-de-certificat-constatator-online';
 const TITLE = 'Tipurile de Certificat Constatator Online — Ghid Actualizat';
 const DESCRIPTION =
-  'Tipurile de certificat constatator pe care le poți comanda online: pe firmă (de bază, fonduri IMM, insolvență), ' +
-  'pe persoană fizică și cu istoric — ce conține fiecare, pentru ce scopuri îl folosești, cât costă și cum îl primești pe email, 24/7.';
+  'Cele cinci rapoarte care se numesc toate „certificat constatator”: pe firmă (de bază, fonduri IMM, insolvență), ' +
+  'pe persoană fizică și cu istoric. Ce conține fiecare, la ce ți-l cer instituțiile, cât costă și când merită luat direct de la ONRC prin InfoCert.';
 const DATE_PUBLISHED = '2024-01-01';
-const DATE_MODIFIED = '2026-07-17';
+const DATE_MODIFIED = '2026-07-26';
 
 export const revalidate = 86400;
 
@@ -29,7 +29,7 @@ export default function Page() {
       datePublished={DATE_PUBLISHED}
       dateModified={DATE_MODIFIED}
       publishedLabel="ianuarie 2024"
-      updatedLabel="17 iulie 2026"
+      updatedLabel="26 iulie 2026"
       relatedServices={[
         { slug: 'certificat-constatator', label: 'Certificat Constatator ONRC', desc: 'Obține certificatul constatator online, fără drum la ghișeu.' },
         { href: '/eliberare-certificat-constatator-onrc-ghid/', label: 'Ghid eliberare certificat constatator', desc: 'Pașii compleți pentru obținere de la ONRC.' },
@@ -42,17 +42,19 @@ export default function Page() {
         { q: 'Cât durează eliberarea certificatului constatator?', a: 'Certificatul de bază, cel pe persoană fizică și cel cu istoric se emit automat, de obicei în câteva minute, 24/7 — inclusiv noaptea și în weekend. Rapoartele pentru fonduri IMM și insolvență trec prin backoffice-ul ONRC și durează de regulă până la 24 de ore lucrătoare.' },
       ]}
     >
+      {/* Intro rescris 26 iulie 2026: varianta veche pornea cu două fraze despre
+          „rolul esențial al ONRC” înainte de orice informație utilă. Query-ul
+          „certificat constatator online” are 17.884 expuneri/3 luni la CTR 0,56% —
+          omul vrea să știe ce tip îi trebuie, nu ce rol are instituția. */}
       <p>
-        ONRC (Oficiul Național al Registrului Comerțului) joacă un rol esențial în cadrul activităților comerciale
-        din România, oferind certificate constatatoare care reflectă starea actuală și conformitatea legală a unei
-        firme. Acest articol își propune să exploreze și să clarifice cele patru tipuri principale de certificate
-        constatatoare pe care le puteți solicita de la ONRC, fiecare cu particularitățile și importanța sa specifică.
+        Există cinci rapoarte diferite care se numesc, toate, „certificat constatator”, iar dacă
+        alegi greșit îl plătești de două ori. Pe firmă (după CUI) sunt trei: cel de bază, cel pentru
+        fonduri IMM și cel pentru insolvență. Separat, mai există certificatul pe persoană fizică
+        (după CNP) și cel cu istoric.
       </p>
       <p>
-        Pe scurt: dacă știi deja ce tip îți trebuie, poți obține un{' '}
-        <Link href="/servicii/certificat-constatator-online/">certificat constatator online</Link> prin
-        eGhișeul — doar cu CUI-ul firmei, emis de obicei în câteva minute, de la 89 RON cu taxele ONRC incluse.
-        Mai jos găsești ghidul complet al celor 4 tipuri, ca să alegi corect.
+        Mai jos: ce conține fiecare, la ce anume ți-l cer instituțiile, și — pentru că e întrebarea
+        care apare mereu — <a href="#infocert">când merită să-l iei direct de la ONRC</a> și când nu.
       </p>
 
       <h2>Ce este un Certificat Constatator?</h2>
@@ -158,11 +160,90 @@ export default function Page() {
           </Link>
       </p>
 
-      <h2>Rolul eGhișeul în Simplificarea Procurării Certificatelor</h2>
+      {/* Secțiune nouă 26 iulie 2026: intenția „ruta oficială ONRC/InfoCert” are
+          peste 8.000 de expuneri/3 luni („certificat constatator onrc” 4.953,
+          „constatator online” 3.288) și nu era acoperită nicăieri pe site.
+          Comparație onestă — cine poate lua singur de la ONRC, ia. */}
+      <h2 id="infocert">Direct de la ONRC (InfoCert) sau printr-un intermediar</h2>
       <p>
-        eGhișeul, ca prestator de servicii, facilitează procesul de obținere a certificatelor constatatoare de la
-        ONRC, oferind sprijin și asistență clienților în navigarea procedurilor și cerințelor necesare.
+        ONRC are propriul serviciu online, InfoCert, accesibil prin myportal.onrc.ro. Emite
+        certificate semnate electronic, 24 de ore din 24, fără să-ți ceară semnătură electronică
+        proprie, iar plata se face exclusiv cu cardul. Tariful pentru certificatul constatator
+        standard este de 30 de lei, conform Ordinului MJ nr. 380/C/2024.
       </p>
+      <p>
+        Spus direct: dacă ai CUI-ul, ai card, știi exact ce tip de raport îți trebuie și îți convine
+        să-ți faci cont pe portal, ia-l de acolo. E mai ieftin și e sursa.
+      </p>
+
+      <div className="not-prose my-6 overflow-x-auto">
+        <table className="w-full border-collapse text-sm">
+          <thead>
+            <tr className="bg-neutral-100 text-left">
+              <th className="border border-neutral-200 p-3 font-bold">&nbsp;</th>
+              <th className="border border-neutral-200 p-3 font-bold">InfoCert (ONRC)</th>
+              <th className="border border-neutral-200 p-3 font-bold">Prin eGhișeul</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td className="border border-neutral-200 p-3 font-semibold">Cost certificat de bază</td>
+              <td className="border border-neutral-200 p-3">30 lei (Ordin MJ 380/C/2024)</td>
+              <td className="border border-neutral-200 p-3">73,55 lei + TVA, taxa ONRC inclusă</td>
+            </tr>
+            <tr className="bg-neutral-50">
+              <td className="border border-neutral-200 p-3 font-semibold">Cont pe portal</td>
+              <td className="border border-neutral-200 p-3">Da</td>
+              <td className="border border-neutral-200 p-3">Nu</td>
+            </tr>
+            <tr>
+              <td className="border border-neutral-200 p-3 font-semibold">Alegerea tipului de raport</td>
+              <td className="border border-neutral-200 p-3">O faci tu, din nomenclatorul portalului</td>
+              <td className="border border-neutral-200 p-3">Îți spunem noi ce se cere pentru scopul tău</td>
+            </tr>
+            <tr className="bg-neutral-50">
+              <td className="border border-neutral-200 p-3 font-semibold">Factură pe firmă</td>
+              <td className="border border-neutral-200 p-3">Prin portal</td>
+              <td className="border border-neutral-200 p-3">Automat, la fiecare comandă</td>
+            </tr>
+            <tr>
+              <td className="border border-neutral-200 p-3 font-semibold">Rapoarte IMM / insolvență</td>
+              <td className="border border-neutral-200 p-3" colSpan={2}>
+                La fel în ambele cazuri: trec prin backoffice-ul ONRC și durează până la 24 de ore
+                lucrătoare. Nimeni nu le poate emite instant.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>
+        Diferența de preț plătește trei lucruri concrete: nu-ți faci cont, nu alegi singur tipul de
+        raport (și nu-l plătești de două ori dacă greșeai), și primești factură fără să te ocupi de
+        ea. Pentru o comandă pe an, probabil nu merită. Pentru contabili și firme care scot
+        certificate săptămânal, de obicei merită.
+      </p>
+      <p>
+        Un lucru pe care nu ți-l poate promite nimeni, nici noi, nici alt intermediar: emiterea
+        instantanee a rapoartelor pentru fonduri IMM și insolvență. Ele trec prin backoffice-ul ONRC
+        și durează. Dacă vezi „instant” lipit pe ele, e marketing, nu procedură.
+      </p>
+
+      <div className="not-prose my-8 rounded-2xl border-2 border-primary-500 bg-primary-50 p-6">
+        <p className="mb-1 text-lg font-bold text-secondary-900">
+          Știi ce tip îți trebuie? Comanda durează un minut
+        </p>
+        <p className="mb-4 text-sm leading-relaxed text-secondary-900/80">
+          Doar cu CUI-ul firmei. Certificatul de bază, cel pe persoană fizică și cel cu istoric se
+          emit automat, de regulă în câteva minute, inclusiv noaptea și în weekend.
+        </p>
+        <Link
+          href={serviceUrl('certificat-constatator')}
+          className="inline-flex items-center rounded-xl bg-primary-500 px-5 py-3 text-sm font-bold text-secondary-900 shadow-[0_6px_14px_rgba(236,185,95,0.35)] transition-all hover:bg-primary-600 hover:shadow-[0_10px_20px_rgba(236,185,95,0.45)]"
+        >
+          Comandă certificat constatator →
+        </Link>
+      </div>
 
       <h2>Procesul de Aplicare: Ghid Pas cu Pas</h2>
       <p>

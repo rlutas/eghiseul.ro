@@ -47,6 +47,8 @@ const SVC = {
   extrasCF: { href: '/servicii/extras-de-carte-funciara/', label: 'Extras de carte funciară online', desc: 'Automat, în câteva minute, 24/7 — fără cont ANCPI.' },
   constatator: { href: '/servicii/certificat-constatator-online/', label: 'Certificat constatator online', desc: 'De la ONRC, doar cu CUI-ul firmei — eliberare instant, 24/7.' },
   nastere: { href: '/servicii/eliberare-certificat-de-nastere/', label: 'Certificat de naștere online', desc: 'Duplicat eliberat oficial, livrat oriunde.' },
+  casatorie: { href: '/servicii/eliberare-certificat-de-casatorie/', label: 'Certificat de căsătorie online', desc: 'Duplicat de la Starea Civilă — cerut la dosarul de pensie când numele diferă de cel din acte.' },
+  multilingvNastere: { href: '/servicii/extras-multilingv-certificat-nastere/', label: 'Extras multilingv de naștere', desc: 'Valabil direct în UE, fără traducere și fără apostilă — pentru dosare depuse în străinătate.' },
   identificareImobil: { href: '/servicii/identificare-imobil/', label: 'Identificare imobil', desc: 'Afli numărul de CF și cadastral când ai doar date vechi.' },
   copieCF: { href: '/servicii/copie-carte-funciara/', label: 'Copie carte funciară', desc: 'Copia CF-ului vechi, cu istoricul înscrierilor.' },
   urbanism: { href: '/servicii/certificat-urbanism-informare/', label: 'Certificat de urbanism pentru informare', desc: 'Afli ce se poate construi pe teren ÎNAINTE să cumperi — restricții, POT/CUT, interdicții.' },
@@ -86,6 +88,16 @@ const RELATED_BY_SLUG: Record<string, RelatedService[]> = {
   'vechime-in-munca': [SVC.cazier, SVC.extrasCF],
   'zile-concediu-odihna': [SVC.cazier, SVC.constatator],
   'indemnizatie-somaj': [SVC.cazier, SVC.cazierFiscal],
+  // Pensii → acte de stare civilă. Calculatoarele de pensie sunt al treilea bloc
+  // de trafic al site-ului (~32k clicuri/3 luni în GSC) și cădeau pe setul
+  // DEFAULT (cazier / extras CF / constatator), irelevant pentru publicul lor.
+  // Dosarul de pensie cere certificat de naștere, plus cel de căsătorie când
+  // numele diferă; pentru stagiul lucrat în UE se cere extrasul multilingv.
+  'varsta-pensionare': [SVC.nastere, SVC.casatorie, SVC.multilingvNastere],
+  'pensie-invaliditate': [SVC.nastere, SVC.casatorie, SVC.multilingvNastere],
+  'estimare-pensie': [SVC.nastere, SVC.casatorie, SVC.multilingvNastere],
+  'impozit-pensie': [SVC.nastere, SVC.casatorie],
+  'concediu-medical': [SVC.nastere, SVC.cazier],
   // Familie → certificat naștere
   'concediu-maternitate': [SVC.nastere, SVC.cazier],
   'concediu-paternal': [SVC.nastere, SVC.cazier],

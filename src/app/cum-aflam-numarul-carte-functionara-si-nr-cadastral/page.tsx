@@ -3,12 +3,12 @@ import { buildPageMetadata, serviceUrl } from '@/lib/seo';
 import { ArticleLayout } from '@/components/articole/article-layout';
 
 const SLUG = 'cum-aflam-numarul-carte-functionara-si-nr-cadastral';
-const TITLE = 'Cum Afli Numărul de Carte Funciară și Numărul Cadastral';
+const TITLE = 'Numărul cadastral și numărul de carte funciară: cum le afli și cum localizezi terenul';
 const DESCRIPTION =
-  'Cum afli numărul de carte funciară și numărul cadastral al unui imobil: din actul de proprietate, ' +
-  'dintr-un extras CF mai vechi sau după adresă. Ghid complet + unde apar aceste numere în extras.';
+  'Cum afli numărul cadastral și numărul de carte funciară: din actul de proprietate, dintr-un extras CF ' +
+  'mai vechi sau după adresă. Plus cum localizezi terenul pe hartă după numărul cadastral, pas cu pas.';
 const DATE_PUBLISHED = '2023-12-01';
-const DATE_MODIFIED = '2026-07-08';
+const DATE_MODIFIED = '2026-07-26';
 
 export const revalidate = 86400;
 
@@ -29,7 +29,7 @@ export default function Page() {
       datePublished={DATE_PUBLISHED}
       dateModified={DATE_MODIFIED}
       publishedLabel="decembrie 2023"
-      updatedLabel="8 iulie 2026"
+      updatedLabel="26 iulie 2026"
       relatedServices={[
         { slug: 'identificare-imobil', label: 'Identificare Imobil după Adresă', desc: 'Nu știi numărul cadastral? Îl aflăm noi după adresă.' },
         { slug: 'extras-carte-funciara', label: 'Extras de Carte Funciară', desc: 'Document ANCPI, livrat pe email în câteva minute.' },
@@ -41,14 +41,24 @@ export default function Page() {
         { q: 'Care e diferența dintre numărul cadastral și numărul de carte funciară?', a: 'Numărul cadastral este codul unic atribuit unității de proprietate pentru identificare geografică și administrativă. Numărul de carte funciară identifică înregistrarea imobilului în registrul de publicitate imobiliară. Ambele apar în extrasul de carte funciară.' },
         { q: 'Cum aflu numărul cadastral după adresă?', a: 'Dacă ai doar adresa, prin serviciul de Identificare Imobil aflăm parcela/construcția și numărul de carte funciară, apoi îți eliberăm extrasul CF.' },
         { q: 'Unde găsesc numărul cadastral într-un extras de carte funciară?', a: 'În Partea I a extrasului (descrierea imobilului) — acolo apar numărul cadastral și suprafața. Numărul de carte funciară apare în antetul extrasului, alături de localitate.' },
+        { q: 'Cum localizez terenul pe hartă după numărul cadastral?', a: 'Pe geoportalul ANCPI (geoportal.ancpi.ro) cauți după județ, unitate administrativ-teritorială și numărul cadastral, iar parcela apare conturată peste ortofotoplan. Vezi forma și poziția, dar nu și limitele exacte în teren. Pentru un document care arată parcela cu coordonate, îți trebuie extrasul de plan cadastral.' },
+        { q: 'Am numărul cadastral, dar nu apare nimic pe geoportal. De ce?', a: 'Cel mai des, numărul e dintr-un act vechi și nu e cel actual: imobilul a fost dezmembrat, alipit sau renumerotat la intabulare, ori nu e încă înregistrat în sistemul integrat de cadastru. Verifică întâi ce număr apare în extrasul CF actual — dacă nu ai unul, se poate afla după adresă.' },
         { q: 'Cât costă identificarea imobilului dacă nu am numărul de carte funciară?', a: 'Identificarea imobilului costă 163,64 lei + TVA — același preț și după adresă, și după numele proprietarului. În ambele cazuri primești numărul de carte funciară al imobilului, apoi poți comanda extrasul CF.' },
       ]}
     >
+      {/* Intro răspuns-întâi: varianta veche (moștenită din WP) începea cu două
+          fraze de umplutură înainte de orice informație. Query-ul „localizare
+          teren după număr cadastral" are 6.222 expuneri și CTR 0,21% — omul vrea
+          răspunsul, nu introducerea. */}
       <p>
-        În lumea vastă și adesea complicată a tranzacțiilor imobiliare, două elemente sunt esențiale pentru
-        claritatea și siguranța juridică a oricărei proprietăți: <strong>numărul de carte funciară și numărul
-        cadastral</strong>. Acestea servesc drept o carte de identitate a imobilului, oferind informații vitale
-        despre statutul și istoricul proprietății. Dar cum le putem afla când nu sunt la îndemână?
+        Numărul cadastral și numărul de carte funciară le găsești în trei locuri: în actul de
+        proprietate, într-un extras de carte funciară mai vechi sau, dacă nu ai niciunul, se pot
+        afla după adresa imobilului. Iar dacă ai deja numărul cadastral și vrei să vezi unde cade
+        terenul pe hartă, îl cauți pe geoportalul ANCPI.
+      </p>
+      <p>
+        Mai jos: unde apare fiecare număr, ce faci când actele sunt vechi și numerele nu mai
+        corespund, și cum localizezi efectiv parcela.
       </p>
 
       <h2>Ce sunt cartea funciară și numărul cadastral?</h2>
@@ -128,6 +138,34 @@ export default function Page() {
           <Link href="/tva-9-locuinte-31-iulie-2026/">detalii aici</Link>.
         </p>
       </div>
+
+      {/* Secțiune nouă (26 iulie 2026): acoperă „localizare teren după numărul
+          cadastral" — 6.222 expuneri/3 luni la CTR 0,21%, pentru că articolul
+          răspundea la „cum aflu numărul", nu la „unde e terenul". */}
+      <h2>Cum localizezi terenul după numărul cadastral</h2>
+      <p>
+        Ai numărul cadastral și vrei să vezi unde cade parcela. Se face pe geoportalul ANCPI
+        (geoportal.ancpi.ro), gratuit și fără cont:
+      </p>
+      <ol>
+        <li>alegi județul și unitatea administrativ-teritorială (comuna sau orașul);</li>
+        <li>cauți după numărul cadastral, nu după numele proprietarului — datele de proprietar nu sunt publice;</li>
+        <li>parcela apare conturată peste ortofotoplan, cu suprafața înregistrată.</li>
+      </ol>
+      <p>
+        Ce vezi acolo e orientativ: forma și poziția parcelei, nu limitele exacte din teren. Pentru
+        un document cu coordonate și vecinătăți, îți trebuie{' '}
+        <Link href={serviceUrl('extras-plan-cadastral')}>extrasul de plan cadastral</Link>. Iar
+        pentru situația juridică (proprietar, ipoteci, sarcini) e nevoie de{' '}
+        <Link href={serviceUrl('extras-carte-funciara')}>extrasul de carte funciară</Link> —
+        geoportalul nu arată nimic din toate astea.
+      </p>
+      <p>
+        <strong>Când numărul nu găsește nimic</strong>, aproape întotdeauna e unul vechi. Imobilul a
+        fost între timp dezmembrat, alipit sau renumerotat la intabulare, ori pur și simplu nu a
+        ajuns încă în sistemul integrat. Nu insista pe numărul din actul vechi: pornește de la
+        adresă și află numărul actual, apoi caută din nou.
+      </p>
 
       <h2>Sfaturi pentru solicitarea online a extrasului de carte funciară</h2>
       <p>

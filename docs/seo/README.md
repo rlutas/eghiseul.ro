@@ -17,6 +17,8 @@ Index al documentației SEO. Status curent al expansiunii: [`SEO-STATUS-2026-06-
 | Fișier | Rol |
 |---|---|
 | [`ANALIZA-MIGRARE-WP-NEXT-2026-07-20.md`](ANALIZA-MIGRARE-WP-NEXT-2026-07-20.md) | **CURENT** — a afectat migrarea SEO-ul? Verdict pe date: trafic existent intact (−2%), gol vs trend YoY +32%→+3% (~300–450 cl/zi, confundat cu AIO), CF/cazier fiscal = probleme pre-existente; re-măsurare 4 aug |
+| [`2026-07-26-analiza-organic-servicii.md`](2026-07-26-analiza-organic-servicii.md) | **CURENT** — de ce paginile de servicii nu vând: GSC + comenzi DB + SERP verificat manual; 62% trafic pe calculatoare fără punți, canibalizare articol↔serviciu, plan P0/P1/P2 |
+| [`2026-07-26-conformitate-si-sesizari-concurenta.md`](2026-07-26-conformitate-si-sesizari-concurenta.md) | **CURENT** — politica Google „government documents" (oct. 2025), dovezi pe competitori, expunerea noastră, plan self-audit → dosar → sesizări |
 | [`STRATEGY-2026-07-13-post-cutover.md`](STRATEGY-2026-07-13-post-cutover.md) | **CURENT** — strategie post-cutover pe GSC live: indexare (66/204!), striking distance, GEO/AI, autoritate |
 | [`2026-07-17-analiza-verificare-proprietar-constatator-per-tip.md`](2026-07-17-analiza-verificare-proprietar-constatator-per-tip.md) | **EXECUTAT 17.07** — decizii format Front D: articol verificare-proprietar + 3 landing-uri constatator (de bază/insolvență/PFA) cu `?tip=` preselect în wizard |
 | [`2026-07-14-cluster-construire-cadastru.md`](2026-07-14-cluster-construire-cadastru.md) | **CURENT** — cluster nou „construire & cadastru": 4 calculatoare + 2 articole + serviciu urbanism + lead magnet + llms.txt; ce e de urmărit |
