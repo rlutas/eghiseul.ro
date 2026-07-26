@@ -14,11 +14,21 @@ const TITLE = 'ANCPI și e-Terra nu funcționează: atac cibernetic, sisteme pic
 // (presa ocupă oricum acele poziții cu autoritate mai mare).
 const META_TITLE = 'ANCPI nu funcționează — status live, până când și ce faci';
 const DESCRIPTION =
-  'ANCPI a confirmat un atac cibernetic: e-Terra și restul sistemelor sunt picate național din 13 iulie. Update 20 iulie: aplicațiile se mută în Cloudul Guvernamental, migrare estimată până pe 22 iulie; revenirea va fi etapizată. Comandă extrasul CF acum — îl eliberăm automat la revenire.';
+  'ANCPI a confirmat un atac cibernetic: e-Terra și restul sistemelor sunt picate național din 14 iulie. Update 26 iulie: migrarea în Cloudul Guvernamental s-a încheiat, dar serviciile nu au revenit; premierul Bolojan estimează reluarea în săptămâna 27–31 iulie. Comandă extrasul CF acum — îl eliberăm automat la revenire.';
 const DATE_PUBLISHED = '2026-07-15';
-const DATE_MODIFIED = '2026-07-20';
+const DATE_MODIFIED = '2026-07-26';
 
 export const revalidate = 3600; // outage news — refresh hourly
+
+// Contor zile de blocaj. Cifra e primul lucru pe care îl caută cineva care
+// revine pe pagină, iar un număr scris de mână se învechește în 24h —
+// revalidate=3600 îl ține exact fără să atingem articolul zilnic.
+// Referință: 14 iulie, data de la care ANCPI datează indisponibilitatea
+// generalizată (noi detectasem căderea în noaptea de 13 spre 14, ora 23:02).
+const OUTAGE_START_UTC = Date.UTC(2026, 6, 14);
+function outageDayCount(): number {
+  return Math.floor((Date.now() - OUTAGE_START_UTC) / 86_400_000) + 1;
+}
 
 export const metadata = buildPageMetadata({
   title: META_TITLE,
@@ -28,6 +38,8 @@ export const metadata = buildPageMetadata({
 });
 
 export default function Page() {
+  const outageDays = outageDayCount();
+
   return (
     <ArticleLayout
       slug={SLUG}
@@ -37,7 +49,7 @@ export default function Page() {
       datePublished={DATE_PUBLISHED}
       dateModified={DATE_MODIFIED}
       publishedLabel="15 iulie 2026"
-      updatedLabel="20 iulie 2026"
+      updatedLabel="26 iulie 2026"
       imageAlt="Sistem temporar nefuncțional — sistemele informatice ANCPI indisponibile la nivel național"
       relatedServices={[
         {
@@ -71,7 +83,11 @@ export default function Page() {
         },
         {
           q: 'Până când e picat ANCPI?',
-          a: 'Termenul inițial comunicat de oficiile teritoriale — 20 iulie 2026 — a fost depășit. Pe 20 iulie, ANCPI a anunțat că aplicațiile se mută în Cloudul Guvernamental, operațiune coordonată de STS, cu estimarea de finalizare a migrării miercuri, 22 iulie. După migrare, sistemele vor fi verificate de instituțiile abilitate, care întocmesc un raport — abia pe baza acestuia ANCPI va comunica un termen de reluare. Repunerea în funcțiune se va face etapizat, pe componente, nu dintr-odată. Deci: 22 iulie este termenul migrării, NU al revenirii serviciilor.',
+          a: 'Nu există încă un termen ferm asumat de ANCPI. Două termene au fost deja depășite: 20 iulie (estimarea inițială a oficiilor teritoriale) și 22 iulie (finalizarea migrării în Cloudul Guvernamental — termen al migrării, nu al revenirii). Cea mai recentă estimare publică vine de la premierul Bolojan, pe 23 iulie: „în cursul săptămânii viitoare se va relua activitatea agenției”, adică în intervalul 27–31 iulie 2026. Este o estimare guvernamentală, nu un comunicat ANCPI. Repunerea se va face etapizat, pe componente — deci probabil nu toate serviciile în aceeași zi.',
+        },
+        {
+          q: 'Migrarea în Cloudul Guvernamental s-a terminat pe 22 iulie. De ce tot nu funcționează?',
+          a: 'Pentru că migrarea muta infrastructura, nu repunea serviciile. După mutare urmează pașii care durează efectiv: verificarea fiecărui sistem de către instituțiile abilitate, raportul tehnic pe baza căruia se decide reluarea, apoi repunerea etapizată, pe componente, pe măsură ce fiecare element de infrastructură e confirmat ca fiind sigur. Într-un incident de securitate, a reporni prea repede înseamnă riscul de a reintroduce exact vulnerabilitatea exploatată — de aceea termenul se comunică după raport, nu înainte.',
         },
         {
           q: 'Datele mele din cartea funciară au fost afectate?',
@@ -128,12 +144,14 @@ export default function Page() {
         atunci, serverele agenției nu mai răspund.
       </p>
       <p>
-        Termenul comunicat inițial de oficiile teritoriale — <strong>20 iulie 2026</strong>, „ca
-        urmare a unui incident tehnic aflat în curs de investigare” — <strong>a fost depășit</strong>.
-        Situația la zi: aplicațiile se mută în Cloudul Guvernamental, migrare estimată până pe{' '}
-        <strong>22 iulie</strong>, iar revenirea serviciilor se va face etapizat, cu termen anunțat
-        abia după verificările instituțiilor abilitate (vezi <a href="#cronologie">cronologia</a>).
-        Presa locală a relatat blocajul în mai multe județe
+        Suntem în <strong>ziua {outageDays}</strong> de blocaj. Termenul comunicat inițial de
+        oficiile teritoriale — <strong>20 iulie 2026</strong>, „ca urmare a unui incident tehnic
+        aflat în curs de investigare” — a fost depășit, la fel și termenul migrării în Cloudul
+        Guvernamental (<strong>22 iulie</strong>), care s-a încheiat fără ca serviciile să revină.
+        Situația la zi: <strong>ANCPI nu a comunicat încă o dată fermă de repunere</strong>, iar
+        singura estimare publică e cea a premierului Bolojan din 23 iulie — reluarea activității
+        agenției <strong>în cursul săptămânii 27–31 iulie</strong>, etapizat, pe componente (vezi{' '}
+        <a href="#cronologie">cronologia</a>). Presa locală a relatat blocajul în mai multe județe
         (printre primele,{' '}
         <a href="https://www.bihon.ro/stirile-judetului-bihor/bihorul-afectat-de-blocajul-national-al-ancpi-cadastrul-nu-functioneaza-pana-luni-5337687/" target="_blank" rel="nofollow noopener">
           Bihorul
@@ -147,8 +165,9 @@ export default function Page() {
           pentru cineva care caută răspunsul pe telefon. */}
       <h2 id="status">Mai e picat ANCPI? Starea sistemelor, în timp real</h2>
       <p>
-        Verificăm portalul ANCPI la fiecare 15 minute. Indicatorul de mai jos e live, cu momentul
-        exact de la care sistemele sunt indisponibile:
+        Da — sistemele sunt indisponibile de <strong>{outageDays} zile</strong>, fără dată oficială
+        de revenire. Verificăm portalul ANCPI la fiecare 15 minute. Indicatorul de mai jos e live,
+        cu momentul exact de la care sistemele sunt indisponibile:
       </p>
       <div className="not-prose my-6">
         <SystemStatus service="ancpi" />
@@ -197,9 +216,39 @@ export default function Page() {
       <div className="not-prose my-6 space-y-0">
         {[
           {
+            date: '23 iulie 2026',
+            tag: 'Estimare guvern',
+            latest: true,
+            body: (
+              <>
+                Premierul <strong>Bolojan</strong> anunță că{' '}
+                <strong>„în cursul săptămânii viitoare se va relua activitatea agenției”</strong> —
+                deci în intervalul <strong>27–31 iulie</strong> — și că accesul la baze de date va
+                redeveni posibil. Precizează durata: „marți în această săptămână am avut o
+                săptămână de când activitatea agenției este blocată; până marți săptămâna viitoare
+                vor fi două săptămâni”. Reconfirmă că datele legate de proprietăți nu au fost
+                afectate. Atenție: e o <strong>estimare guvernamentală</strong>, nu un termen
+                asumat de ANCPI printr-un comunicat.
+              </>
+            ),
+          },
+          {
+            date: '22 iulie 2026',
+            tag: 'Termen depășit',
+            body: (
+              <>
+                Data la care era estimată finalizarea migrării în Cloudul Guvernamental{' '}
+                <strong>trece fără repunerea serviciilor</strong>. Era, de altfel, exact ce
+                anunțase ANCPI: 22 iulie era termenul migrării, nu al revenirii. Urmează
+                verificarea sistemelor de către instituțiile abilitate și raportul tehnic pe baza
+                căruia se comunică termenul de reluare. e-Terra, ePay și geoportalul rămân
+                indisponibile.
+              </>
+            ),
+          },
+          {
             date: '20 iulie 2026',
             tag: 'Comunicat ANCPI',
-            latest: true,
             body: (
               <>
                 <strong>Bazele de date nu au fost afectate</strong>, în urma tuturor verificărilor
@@ -482,7 +531,7 @@ export default function Page() {
           {
             situation: '⚠️ Ai antecontract cu TVA 9% și termenul fiscal expiră pe 31 iulie',
             action:
-              'Situația cea mai presantă: cota redusă se aplică doar locuințelor livrate până pe 31 iulie 2026, iar fără extras de autentificare notarul nu poate semna. Diferența dintre 9% și 21% e de 48.000–72.000 lei. Detaliile complete, condițiile exacte și ce poți face — în articolul dedicat.',
+              'Situația cea mai presantă: cota redusă se aplică doar locuințelor livrate până pe 31 iulie 2026, iar fără extras de autentificare notarul nu poate semna. Diferența dintre 9% și 21% e de 48.000–72.000 lei. Chiar dacă ANCPI revine în intervalul estimat (27–31 iulie), rămân zile foarte puține și o coadă națională de dosare amânate — nu miza pe „se rezolvă în ultima zi”. Vorbește ACUM cu notarul și cu dezvoltatorul despre soluțiile de rezervă. Detaliile complete și condițiile exacte — în articolul dedicat.',
           },
         ].map((row, i) => (
           <div key={i} className="rounded-xl border border-neutral-200 bg-white p-4">
@@ -521,6 +570,29 @@ export default function Page() {
       </ul>
 
       <h2>Actualizări</h2>
+      <p>
+        <strong>26 iulie 2026:</strong> sistemele ANCPI sunt în continuare picate — ziua{' '}
+        <strong>{outageDays}</strong> de blocaj. Nu există comunicat ANCPI cu dată fermă de
+        repunere; cel mai recent anunț de pe site-ul instituției rămâne cel privind migrarea
+        încheiată pe 22 iulie. Ce e realist de așteptat: reluare <strong>în cursul săptămânii
+        27–31 iulie</strong>, conform estimării premierului, și <strong>etapizat</strong> — adică
+        e posibil ca unele servicii să revină înaintea altora. Monitorizarea noastră verifică
+        portalul la fiecare 15 minute; comenzile deja plasate se eliberează automat, în ordinea
+        plasării, în momentul revenirii.
+      </p>
+      <p>
+        <strong>23 iulie 2026:</strong> premierul <strong>Bolojan</strong> declară că{' '}
+        <strong>„în cursul săptămânii viitoare se va relua activitatea agenției”</strong> (deci
+        27–31 iulie) și că accesul la bazele de date va redeveni posibil, reconfirmând că datele
+        legate de proprietăți nu au fost afectate. Rămâne o estimare guvernamentală — ANCPI nu a
+        confirmat o dată prin comunicat propriu.
+      </p>
+      <p>
+        <strong>22 iulie 2026:</strong> termenul migrării în Cloudul Guvernamental trece{' '}
+        <strong>fără repunerea serviciilor</strong> — exact cum anunțase ANCPI: 22 iulie era
+        termenul migrării, nu al revenirii. Urmează verificarea sistemelor de instituțiile
+        abilitate și raportul tehnic.
+      </p>
       <p>
         <strong>20 iulie 2026:</strong> ANCPI anunță că{' '}
         <strong>bazele de date tehnice și juridice nu au fost afectate</strong>, în urma
