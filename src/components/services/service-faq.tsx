@@ -1,6 +1,3 @@
-'use client';
-
-import { useState } from 'react';
 import {
   ChevronDown,
   MessageCircle,
@@ -73,6 +70,7 @@ const COLOR_THEMES = {
     headerText: 'text-primary-700',
     headerIcon: 'text-primary-600',
     openBorder: 'border-primary-300',
+    openBorderVariant: 'open:border-primary-300',
     hoverBorder: 'hover:border-primary-200',
     chevron: 'text-primary-500',
   },
@@ -81,6 +79,7 @@ const COLOR_THEMES = {
     headerText: 'text-blue-700',
     headerIcon: 'text-blue-600',
     openBorder: 'border-blue-300',
+    openBorderVariant: 'open:border-blue-300',
     hoverBorder: 'hover:border-blue-200',
     chevron: 'text-blue-500',
   },
@@ -89,6 +88,7 @@ const COLOR_THEMES = {
     headerText: 'text-green-700',
     headerIcon: 'text-green-600',
     openBorder: 'border-green-300',
+    openBorderVariant: 'open:border-green-300',
     hoverBorder: 'hover:border-green-200',
     chevron: 'text-green-500',
   },
@@ -97,6 +97,7 @@ const COLOR_THEMES = {
     headerText: 'text-purple-700',
     headerIcon: 'text-purple-600',
     openBorder: 'border-purple-300',
+    openBorderVariant: 'open:border-purple-300',
     hoverBorder: 'hover:border-purple-200',
     chevron: 'text-purple-500',
   },
@@ -105,6 +106,7 @@ const COLOR_THEMES = {
     headerText: 'text-rose-700',
     headerIcon: 'text-rose-600',
     openBorder: 'border-rose-300',
+    openBorderVariant: 'open:border-rose-300',
     hoverBorder: 'hover:border-rose-200',
     chevron: 'text-rose-500',
   },
@@ -113,6 +115,7 @@ const COLOR_THEMES = {
     headerText: 'text-teal-700',
     headerIcon: 'text-teal-600',
     openBorder: 'border-teal-300',
+    openBorderVariant: 'open:border-teal-300',
     hoverBorder: 'hover:border-teal-200',
     chevron: 'text-teal-500',
   },
@@ -120,25 +123,46 @@ const COLOR_THEMES = {
 
 interface FAQItemProps {
   faq: FAQ;
-  isOpen: boolean;
-  onToggle: () => void;
+  /** Deschis implicit (primul element) — restul se deschid la click. */
+  defaultOpen?: boolean;
+  /** Grup de acordeon: `name` identic = deschidere exclusivă, NATIV, fără JS. */
+  groupName: string;
   theme: typeof COLOR_THEMES[keyof typeof COLOR_THEMES];
 }
 
-function FAQItem({ faq, isOpen, onToggle, theme }: FAQItemProps) {
+/**
+ * Un element de FAQ, randat server-side cu `<details>`.
+ *
+ * Înainte era componentă client cu `useState`: întrebările și răspunsurile
+ * ajungeau de două ori în pagină — o dată ca HTML, o dată serializate în
+ * payload-ul RSC pentru hidratare (~11 KB per pagină doar FAQ-ul, măsurat la
+ * auditul din 28.07.2026 pe /servicii/cazier-judiciar-online/). În plus,
+ * conținutul depindea de JS, deci crawlerele AI care nu execută JS vedeau
+ * întrebările, dar nu neapărat în forma finală.
+ *
+ * `<details name="...">` dă acordeon exclusiv nativ (un singur răspuns deschis
+ * la un moment dat) în browserele moderne; unde `name` nu e suportat, pot rămâne
+ * mai multe deschise — degradare acceptabilă, fără JS de întreținut.
+ */
+function FAQItem({ faq, defaultOpen, groupName, theme }: FAQItemProps) {
   return (
-    <div
+    <details
+      name={groupName}
+      open={defaultOpen}
       className={cn(
-        'bg-white rounded-2xl border transition-all duration-300 h-fit',
-        isOpen
-          ? cn(theme.openBorder, 'shadow-lg')
-          : cn('border-neutral-200', theme.hoverBorder),
+        'group bg-white rounded-2xl border transition-all duration-300 h-fit',
+        'border-neutral-200',
+        theme.hoverBorder,
+        'open:shadow-lg',
+        theme.openBorderVariant,
       )}
     >
-      <button
-        onClick={onToggle}
-        className="w-full px-6 py-5 flex items-center justify-between text-left"
-        aria-expanded={isOpen}
+      <summary
+        className={cn(
+          'w-full px-6 py-5 flex items-center justify-between text-left cursor-pointer',
+          'list-none [&::-webkit-details-marker]:hidden',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 rounded-2xl',
+        )}
       >
         <span className="text-base font-semibold text-secondary-900 pr-4">
           {faq.q}
@@ -147,20 +171,13 @@ function FAQItem({ faq, isOpen, onToggle, theme }: FAQItemProps) {
           className={cn(
             'w-5 h-5 flex-shrink-0 transition-transform duration-200',
             theme.chevron,
-            isOpen && 'rotate-180',
+            'group-open:rotate-180',
           )}
           aria-hidden="true"
         />
-      </button>
-      <div
-        className={cn(
-          'overflow-hidden transition-all duration-300',
-          isOpen ? 'max-h-[800px]' : 'max-h-0',
-        )}
-      >
-        <p className="px-6 pb-5 text-neutral-600 leading-relaxed">{faq.a}</p>
-      </div>
-    </div>
+      </summary>
+      <p className="px-6 pb-5 text-neutral-600 leading-relaxed">{faq.a}</p>
+    </details>
   );
 }
 
@@ -170,7 +187,6 @@ export function ServiceFAQ({
   categories,
   twoColumns,
 }: ServiceFAQProps) {
-  const [openKey, setOpenKey] = useState<string | null>(faqs.length > 0 ? `0` : null);
   // Auto-enable 2 columns for long FAQ sections unless caller forces single
   const useTwoCols = twoColumns ?? faqs.length >= 10;
 
@@ -255,8 +271,8 @@ export function ServiceFAQ({
                         <FAQItem
                           key={itemKey}
                           faq={faq}
-                          isOpen={openKey === itemKey}
-                          onToggle={() => setOpenKey(openKey === itemKey ? null : itemKey)}
+                          groupName={`faq-${group.category.key}`}
+                          defaultOpen={idx === 0}
                           theme={theme}
                         />
                       );
@@ -277,8 +293,8 @@ export function ServiceFAQ({
               <FAQItem
                 key={index}
                 faq={faq}
-                isOpen={openKey === `${index}`}
-                onToggle={() => setOpenKey(openKey === `${index}` ? null : `${index}`)}
+                groupName="faq"
+                defaultOpen={index === 0}
                 theme={COLOR_THEMES.gold}
               />
             ))}

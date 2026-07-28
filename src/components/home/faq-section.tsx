@@ -1,6 +1,3 @@
-'use client';
-
-import { useState } from 'react';
 import { ChevronDown, MessageCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { HOMEPAGE_FAQ_ITEMS } from './faq-data';
@@ -14,8 +11,17 @@ const ANSWER_PROSE =
   '[&_ul]:my-3 [&_ul]:pl-5 [&_ul]:list-disc [&_ul]:space-y-1.5 [&_li]:pl-1 ' +
   '[&_strong]:text-secondary-900 [&_strong]:font-semibold';
 
+/**
+ * FAQ-ul de pe homepage, randat server-side cu `<details>`.
+ *
+ * Înainte era componentă client cu `useState` și randa răspunsul DOAR când era
+ * deschis (`{open && ...}`) — adică 11 din 12 răspunsuri nu existau deloc în
+ * HTML-ul livrat. Google le vedea (execută JS), dar crawlerele AI nu, iar
+ * conținutul se dubla în payload-ul RSC pentru hidratare (audit 28.07.2026).
+ *
+ * `name="homepage-faq"` dă acordeon exclusiv nativ, fără JS.
+ */
 export function FAQSection() {
-  const [openIndex, setOpenIndex] = useState<number | null>(0);
 
   return (
     <section id="intrebari" className="bg-white py-16 lg:py-20">
@@ -33,37 +39,40 @@ export function FAQSection() {
 
         {/* FAQ List */}
         <div className="space-y-4">
-          {HOMEPAGE_FAQ_ITEMS.map((faq, index) => {
-            const open = openIndex === index;
-            return (
-              <div
-                key={faq.question}
+          {HOMEPAGE_FAQ_ITEMS.map((faq, index) => (
+            <details
+              key={faq.question}
+              name="homepage-faq"
+              open={index === 0}
+              className={cn(
+                'group rounded-2xl border bg-neutral-50 transition-all duration-300',
+                'border-neutral-200 hover:border-primary-300',
+                'open:border-primary-500 open:shadow-[0_6px_20px_rgba(236,185,95,0.15)]'
+              )}
+            >
+              <summary
                 className={cn(
-                  'rounded-2xl border bg-neutral-50 transition-all duration-300',
-                  open ? 'border-primary-500 shadow-[0_6px_20px_rgba(236,185,95,0.15)]' : 'border-neutral-200 hover:border-primary-300'
+                  'w-full flex items-center justify-between gap-4 px-6 py-5 text-left cursor-pointer',
+                  'list-none [&::-webkit-details-marker]:hidden',
+                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 rounded-2xl'
                 )}
               >
-                <button
-                  onClick={() => setOpenIndex(open ? null : index)}
-                  aria-expanded={open}
-                  className="w-full flex items-center justify-between gap-4 px-6 py-5 text-left"
+                <h3 className="text-base sm:text-[17px] font-bold text-secondary-900 leading-snug">{faq.question}</h3>
+                <span
+                  className={cn(
+                    'flex h-8 w-8 min-w-8 items-center justify-center rounded-lg transition-all duration-300',
+                    'bg-primary-500/15 group-open:bg-primary-500'
+                  )}
                 >
-                  <h3 className="text-base sm:text-[17px] font-bold text-secondary-900 leading-snug">{faq.question}</h3>
-                  <span
-                    className={cn(
-                      'flex h-8 w-8 min-w-8 items-center justify-center rounded-lg transition-all duration-300',
-                      open ? 'bg-primary-500' : 'bg-primary-500/15'
-                    )}
-                  >
-                    <ChevronDown
-                      className={cn('h-4 w-4 transition-transform duration-300', open ? 'rotate-180 text-secondary-900' : 'text-primary-600')}
-                    />
-                  </span>
-                </button>
-                {open && <div className={cn('px-6 pb-6', ANSWER_PROSE)}>{faq.answer}</div>}
-              </div>
-            );
-          })}
+                  <ChevronDown
+                    className="h-4 w-4 transition-transform duration-300 text-primary-600 group-open:rotate-180 group-open:text-secondary-900"
+                    aria-hidden="true"
+                  />
+                </span>
+              </summary>
+              <div className={cn('px-6 pb-6', ANSWER_PROSE)}>{faq.answer}</div>
+            </details>
+          ))}
         </div>
 
         {/* CTA WhatsApp */}
