@@ -313,8 +313,11 @@ active, nume care nu se potrivește). Probă live: `npx tsx src/probe-company.ts
 `/api/onrc/pending?portal=up|down` + `platform_outages` există din 19.06, dar
 worker-ul nu raporta nimic (jumătatea lui a stat necommisă ~6 săptămâni) → în tabelă
 erau **doar rânduri `ancpi`**. Acum worker-ul probează SSO-ul ONRC o dată la
-`PROBE_INTERVAL_MS` (implicit 5 min, cache între tick-uri) și marchează `down` doar
-după **două** eșecuri consecutive, ca un hop de rețea să nu deschidă fereastră falsă.
+`PROBE_INTERVAL_MS` (implicit **15 min**, ca la ANCPI; cache între tick-uri) și
+marchează `down` doar după **două** eșecuri consecutive, ca un hop de rețea să nu
+deschidă fereastră falsă. Când depune efectiv o cerere, contactul reușit cu portalul
+ține loc de probă (`notePortalReachable()` la obținerea token-ului), deci în
+perioadele cu comenzi nu se mai trimit probe redundante.
 Efect: banner de hold pentru client + „⏸ ONRC din …" în admin, ca la ANCPI.
 
 ## Formular site sincronizat cu ONRC (firmă / istoric / pf)

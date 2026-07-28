@@ -92,11 +92,18 @@ a rămas necommisă ~6 săptămâni. Consecință măsurabilă: în `platform_ou
 **doar rânduri `ancpi`, zero `onrc`** — în timpul unei căderi ONRC clientul nu vedea
 banner de hold pe constatator, iar adminul afișa „auto · min".
 
-Livrat acum, cu două întăriri față de varianta inițială:
-- proba lovește SSO-ul ONRC o dată la `PROBE_INTERVAL_MS` (implicit **5 min**) și e
-  servită din cache între tick-uri — altfel însemna ~2.900 cereri/zi degeaba;
+Livrat acum, cu trei întăriri față de varianta inițială:
+- proba lovește SSO-ul ONRC o dată la `PROBE_INTERVAL_MS` (implicit **15 min**,
+  același interval ca la worker-ul ANCPI) și e servită din cache între tick-uri —
+  varianta WIP proba la fiecare tick, adică ~2.900 cereri/zi degeaba;
+- **contactul real ține loc de probă**: când worker-ul depune efectiv o cerere și
+  obține token-ul, `notePortalReachable()` marchează `up` și amână următoarea probă
+  cu un interval întreg. Nu mai întrebăm ceva ce tocmai am aflat (observația lui Raul);
 - `down` se raportează abia după **două** probe eșuate consecutiv; un singur hop de
   rețea deschidea o fereastră falsă (se vede la ANCPI: ferestre de 1 minut în iulie).
+
+Net: ~96 de probe pe zi în loc de ~288, și zero probe redundante în perioadele cu
+comenzi.
 
 Proba nu poate bloca procesarea — erorile sunt prinse înăuntru, iar rezultatul
 călătorește doar ca parametru de query. Confirmat în logurile Railway: `No pending
