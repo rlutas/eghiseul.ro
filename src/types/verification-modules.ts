@@ -171,6 +171,23 @@ export interface VehicleVerificationConfig {
     drivingLicense?: { required: boolean };
   };
 
+  /**
+   * Cazier auto — permis emis în străinătate. Fișa se cere autorității care a
+   * emis permisul, deci tariful și termenul sunt altele (paritate cu
+   * cazierjudiciaronline.com: 350 RON / 7-10 zile lucrătoare vs 198 / 3-5).
+   *
+   * `price` înlocuiește base_price-ul serviciului (același mecanism ca
+   * variantele de constatator), `minDays/maxDays` intră în estimarea datei de
+   * finalizare, iar `daysDisplay` e textul din sidebar-ul wizardului.
+   */
+  foreignLicense?: {
+    enabled: boolean;
+    price: number;
+    minDays: number;
+    maxDays: number;
+    daysDisplay?: string;
+  };
+
   // Validation
   plateFormat: 'romanian' | 'any';
   vinValidation: boolean;
@@ -513,6 +530,9 @@ export interface PropertyState {
 export interface VehicleState {
   plateNumber: string;
   drivingLicense?: string;  // Numărul permisului de conducere (cazier auto)
+  /** Cazier auto: permisul e emis în străinătate (alt tarif + alt termen).
+   *  undefined = clientul n-a răspuns încă (pasul cere un răspuns explicit). */
+  licenseIssuedAbroad?: boolean;
   vin?: string;
   brand?: string;
   model?: string;

@@ -237,10 +237,16 @@ export function buildWizardSteps(
     //   • Rovinietă — asks for plate + category; genuinely about the vehicle.
     // Pick the label from what the step actually collects.
     const vf = verificationConfig.vehicleVerification.fields;
-    const isDriverRecord = vf?.drivingLicense?.required && !vf?.plateNumber?.required;
+    // Cazier auto: din 28.07.2026 numărul permisului NU se mai cere manual (se
+    // citește din poza permisului), deci semnalul „e despre conducător" e și
+    // întrebarea „permis emis în România/străinătate" (foreignLicense).
+    const asksForeignLicense =
+      !!verificationConfig.vehicleVerification.foreignLicense?.enabled;
+    const isDriverRecord =
+      (vf?.drivingLicense?.required || asksForeignLicense) && !vf?.plateNumber?.required;
     steps.push({
       ...ALL_STEPS['vehicle-data'],
-      ...(isDriverRecord ? { label: 'Driver Data', labelRo: 'Date Conducător Auto' } : {}),
+      ...(isDriverRecord ? { label: 'Driving Licence', labelRo: 'Permis de Conducere' } : {}),
       number: stepNumber++,
     });
   }

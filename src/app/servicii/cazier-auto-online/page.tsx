@@ -98,6 +98,10 @@ const jsonLdGraph = buildServicePageGraph({
   ],
   offers: [
     { name: 'Cazier Auto — Fișa Conducătorului Auto (Standard)', price: 198, url: `${BASE_URL}${PAGE_PATH}` },
+    // Permis emis în străinătate: fișa se cere autorității emitente, deci alt
+    // tarif și alt termen (7-10 zile lucrătoare). Paritate cu
+    // cazierjudiciaronline.com; config în vehicleVerification.foreignLicense.
+    { name: 'Cazier Auto — permis emis în străinătate', price: 350, url: `${BASE_URL}${PAGE_PATH}` },
   ],
   aggregateRating: { ratingValue: 4.9, reviewCount: 450 },
 });
@@ -571,7 +575,10 @@ export default async function CazierAutoOnlinePage() {
                   în timpul programului de lucru, cu așteptare la ghișeu. Dacă ești plecat din țară, lucrezi în
                   alt oraș sau pur și simplu nu ai timp de drumuri, varianta online prin avocat rezolvă totul
                   de la distanță — inclusiv pentru <strong>permise emise în străinătate</strong>, caz în care
-                  documentul atestă faptele comise pe teritoriul României.
+                  documentul atestă faptele comise pe teritoriul României. Pentru un permis emis în
+                  străinătate tariful este <strong>350 RON</strong> și termenul{' '}
+                  <strong>7-10 zile lucrătoare</strong>, pentru că fișa se solicită autorității care a
+                  emis permisul.
                 </p>
               </div>
             </div>
@@ -613,14 +620,14 @@ export default async function CazierAutoOnlinePage() {
           title="Întrebări Frecvente — Cazier Auto"
           faqs={[
             { q: 'Ce este cazierul auto?', a: 'Este fișa de evidență a conducătorului auto, un document eliberat de Poliția Rutieră despre șofer: istoricul sancțiunilor rutiere (amenzi, contravenții), punctele de penalizare active și suspendările permisului de conducere. Se obține pe baza permisului, nu pe numărul mașinii.' },
-            { q: 'Ce acte îmi trebuie pentru a comanda?', a: 'Ai nevoie de actul de identitate, permisul de conducere (numărul permisului) și un selfie cu actul în mână, pentru verificarea identității. Totul se încarcă direct în formular, de pe telefon sau calculator.' },
+            { q: 'Ce acte îmi trebuie pentru a comanda?', a: 'Ai nevoie de actul de identitate, o poză cu fața permisului de conducere și un selfie cu actul în mână, pentru verificarea identității. Datele permisului le citim din poză, nu trebuie să le tastezi. Totul se încarcă direct în formular, de pe telefon sau calculator.' },
             { q: 'Cât durează să primesc cazierul auto?', a: `${formatEstimatedDays(service)} în mod standard. Dacă te grăbește un termen, există și procesare urgentă, cu livrare în ${formatUrgentDays(service) ?? 'regim prioritar'}.` },
-            { q: 'Am permis emis în străinătate. Pot obține cazierul auto din România?', a: 'Da. Documentul atestă faptele comise pe teritoriul României, indiferent de statul care a emis permisul. Pentru permisele emise în străinătate termenul de procesare este mai lung decât cel standard.' },
+            { q: 'Am permis emis în străinătate. Pot obține cazierul auto din România?', a: 'Da. Documentul atestă faptele comise pe teritoriul României, indiferent de statul care a emis permisul. Pentru permisele emise în străinătate tariful este 350 RON și termenul 7-10 zile lucrătoare (în loc de 198 RON și termenul standard), pentru că fișa se solicită autorității care a emis permisul. Alegi varianta direct în formular, la pasul „Permis de Conducere", iar prețul se actualizează pe loc. Procesarea urgentă nu se aplică în acest caz.' },
             { q: 'Care e diferența dintre cazierul auto și cazierul judiciar?', a: 'Cazierul auto (fișa conducătorului auto) arată sancțiunile rutiere: amenzi, puncte de penalizare, suspendări ale permisului. Cazierul judiciar arată infracțiunile și condamnările penale și se eliberează de poliție pe alt circuit. Sunt documente diferite, cerute în situații diferite — pe eGhișeul le poți comanda pe amândouă.' },
             { q: 'Care e diferența dintre cazierul auto și istoricul vehiculului?', a: 'Cazierul auto este despre șofer: sancțiunile și punctele de pe permisul tău. Istoricul vehiculului este despre o mașină (accidente, daune, rulaj), verificat după numărul de înmatriculare sau seria de șasiu — un alt tip de raport, pe care nu îl oferim.' },
             { q: 'Cât este valabil cazierul auto?', a: 'Legea nu fixează un termen, dar în practică instituțiile cer un document emis în ultimele 30 de zile, pentru că punctele de penalizare și sancțiunile se schimbă în timp. Comandă-l cu puțin timp înainte de depunerea dosarului.' },
             { q: 'Îmi trebuie cazier auto pentru atestatul profesional?', a: 'Da. Pentru atestatul profesional de taxi sau de transport marfă și persoane, fișa de evidență a conducătorului auto este document obligatoriu la dosar. Și angajatorii din transport sau ride-sharing o cer frecvent la angajare.' },
-            { q: 'Cât costă cazierul auto?', a: 'Prin eGhișeul, cazierul auto costă 198 RON cu TVA inclus, o singură taxă, fără costuri ascunse. Prețul acoperă întreaga procedură prin avocatul colaborator și livrarea documentului PDF pe email.' },
+            { q: 'Cât costă cazierul auto?', a: 'Prin eGhișeul, cazierul auto costă 198 RON cu TVA inclus, o singură taxă, fără costuri ascunse. Prețul acoperă întreaga procedură prin avocatul colaborator și livrarea documentului PDF pe email. Pentru un permis de conducere emis în străinătate tariful este 350 RON, cu termen de 7-10 zile lucrătoare.' },
             { q: 'Cum primesc cazierul auto?', a: 'Îl primești pe email, în format PDF, fără să te deplasezi la vreun ghișeu. Dacă ai nevoie și de exemplarul fizic, îl putem trimite opțional prin curier, oriunde în țară sau în străinătate.' },
             { q: 'Trebuie să merg personal la Poliția Rutieră?', a: 'Nu. Avocatul nostru colaborator, înscris în Barou, depune cererea în numele tău pe baza împuternicirii semnate online în formular. Tu doar completezi datele, încarci actele și primești documentul pe email.' },
             { q: 'Pot vedea punctele mele de penalizare în cazierul auto?', a: 'Da, acesta este unul dintre cele mai frecvente motive de comandă. Fișa arată punctele de penalizare active la data eliberării — punctele se anulează la 6 luni de la data constatării, deci cele expirate nu mai apar.' },

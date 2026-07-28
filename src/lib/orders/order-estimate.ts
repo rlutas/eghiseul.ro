@@ -39,6 +39,19 @@ export function extractCivilRegistrationPlace(customerData: unknown): string | n
 }
 
 /**
+ * Cazier auto: permisul e emis în străinătate? Fișa se cere autorității
+ * emitente, deci termenul e altul (7-10 zile vs 3-5) — configurat în
+ * `verification_config.vehicleVerification.foreignLicense`.
+ */
+export function hasForeignDrivingLicense(customerData: unknown): boolean {
+  if (!customerData || typeof customerData !== 'object') return false;
+  const cd = customerData as Record<string, unknown>;
+  const vehicle = (cd.vehicle ?? cd.vehicleData) as Record<string, unknown> | undefined;
+  if (!vehicle || typeof vehicle !== 'object') return false;
+  return vehicle.licenseIssuedAbroad === true;
+}
+
+/**
  * Minimal client shape — any Supabase client (typed or admin) satisfies it.
  * Loose on purpose: PostgrestBuilder is PromiseLike, not Promise, and its
  * generated row types would otherwise leak into every caller.
@@ -74,6 +87,12 @@ export interface ServiceForEstimate {
   estimated_days?: number | null;
   urgent_days?: number | null;
   urgent_available?: boolean | null;
+  /** Doar `vehicleVerification.foreignLicense` ne interesează aici. */
+  verification_config?: {
+    vehicleVerification?: {
+      foreignLicense?: { enabled?: boolean; minDays?: number; maxDays?: number } | null;
+    } | null;
+  } | null;
 }
 
 /**
@@ -103,6 +122,22 @@ export async function computeEstimatedCompletionISOForOrder(
     const tiers = await loadCivilTermTiers(client);
     const tier = resolveCivilTermTier(registrationPlace, tiers);
     serviceDaysRange = { minDays: tier.minDays, maxDays: tier.maxDays };
+  }
+
+  // Cazier auto cu permis din străinătate — termenul autorității emitente
+  // înlocuiește `estimated_days` (și nu se scurtează cu urgență: opțiunea e
+  // ascunsă în wizard pentru acest caz).
+  const fl = svc?.verification_config?.vehicleVerification?.foreignLicense;
+  if (
+    fl?.enabled &&
+    typeof fl.maxDays === 'number' &&
+    fl.maxDays > 0 &&
+    hasForeignDrivingLicense(order.customer_data)
+  ) {
+    serviceDaysRange = {
+      minDays: typeof fl.minDays === 'number' && fl.minDays > 0 ? fl.minDays : fl.maxDays,
+      maxDays: fl.maxDays,
+    };
   }
 
   return computeEstimatedCompletionISO({

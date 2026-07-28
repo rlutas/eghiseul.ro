@@ -508,6 +508,14 @@ export type SelectedOptionForEstimate = {
 export function estimateFromSelectedOptions(params: {
   selectedOptions: readonly SelectedOptionForEstimate[]
   baseDays?: number
+  /**
+   * Interval de procesare pentru pasul de bază, când serviciul nu are un număr
+   * fix de zile: stare civilă (tier pe oficiu) și cazier auto cu permis emis în
+   * străinătate (7-10 zile la autoritatea emitentă). Bate `baseDays` ȘI
+   * urgența — un termen impus de o autoritate externă nu se scurtează plătind
+   * procesare urgentă.
+   */
+  baseRange?: { minDays: number; maxDays: number }
   courier?: CourierCode | string | null
   orderDate?: Date
   includeCourierLeg?: boolean
@@ -530,8 +538,9 @@ export function estimateFromSelectedOptions(params: {
   }))
 
   return calculateEstimatedCompletion({
+    baseRange: params.baseRange,
     baseDays: isUrgent ? undefined : params.baseDays,
-    urgency: isUrgent ? 'urgent' : 'standard',
+    urgency: isUrgent && !params.baseRange ? 'urgent' : 'standard',
     options,
     courier: params.courier,
     orderDate: params.orderDate,

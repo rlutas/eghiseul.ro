@@ -4,10 +4,13 @@
 |---|---|
 | **Slug DB** | `cazier-auto` |
 | **URL SEO** | `/servicii/cazier-auto-online/` |
-| **Preț** | 198 RON (fără taxe ascunse) |
-| **Categorie** | Auto (istoric vehicul) |
+| **Preț** | 198 RON standard · **350 RON pentru permis emis în străinătate** |
+| **Termen** | 3-5 zile lucrătoare (1-2 urgent) · **7-10 zile la permis emis în străinătate** (fără urgență) |
+| **Categorie** | Auto — fișa de evidență a conducătorului auto |
 
-Raport cu istoricul complet al unui vehicul: **accidente și daune, kilometraj real (alerte fraudă km), proprietari anteriori**, plus verificări de furt, leasing și gajuri. Comanda pe baza numărului de înmatriculare sau a seriei de șasiu (VIN).
+**Fișa de evidență a conducătorului auto** eliberată de Poliția Rutieră: sancțiuni rutiere, puncte de penalizare active, suspendări ale permisului. Este despre **șofer**, se obține pe baza permisului de conducere — NU e un raport despre vehicul (fără VIN/număr de înmatriculare; descrierea din DB a fost corectată prin migrarea 120, iar VIN-ul scos prin 121).
+
+⚠️ Secțiunile de SEO mai jos au fost scrise când pagina era poziționată pe „istoric vehicul"; pagina actuală descrie corect fișa conducătorului auto. De reverificat clusterele când se atinge din nou SEO-ul acestui serviciu.
 
 ## SEO
 
@@ -26,10 +29,18 @@ Raport cu istoricul complet al unui vehicul: **accidente și daune, kilometraj r
 ## Flux comandă (module wizard)
 
 Comandă personal-KYC pe slug DB (`/comanda/cazier-auto`):
-1. **Date vehicul** — număr de înmatriculare sau serie de șasiu (VIN).
-2. **Verificare identitate (KYC)** — pas comun fluxului personal-KYC.
-3. **Plată securizată** — Stripe (card / Apple Pay / Google Pay), fără taxe ascunse.
-4. **Livrare** — raport PDF complet pe email.
+1. **Date contact** — email, telefon, motivul solicitării. ⚠️ NU are „Sunt cetățean străin" (`personalKyc.allowForeignCitizen = false`, migrarea 139): la auto contează unde a fost emis permisul, nu cetățenia.
+2. **Date personale** — scan CI (OCR) sau completare manuală.
+3. **Permis de Conducere** — o singură întrebare: **„Permisul de conducere a fost emis în: România / Străinătate"**. Numărul permisului NU se mai cere (se citește din poza permisului — `drivingLicense.required = false` din migrarea 139).
+   - „Străinătate" → preț **350 RON** și termen **7-10 zile lucrătoare**, actualizate live în sidebar; procesarea urgentă se ascunde (termenul e al autorității emitente). Config:
+     `verification_config.vehicleVerification.foreignLicense` = `{enabled, price, minDays, maxDays, daysDisplay}`.
+   - Prețul e recalculat server-side la `/submit` (un payload modificat nu poate plăti tariful de permis românesc).
+4. **Opțiuni** — urgență (doar la permis românesc) + traducere/legalizare/apostile.
+5. **Documente KYC** — act de identitate (față + spate), selfie cu actul, **poza feței permisului**. Versoul permisului NU se cere (migrarea 139).
+6. **Plată securizată** — Stripe (card / Apple Pay / Google Pay), fără taxe ascunse.
+7. **Livrare** — document PDF pe email (opțional și fizic prin curier).
+
+Paritate cu `cazierjudiciaronline.com` (`src/config/auto.config.ts`: `enablePermisStrain`, tarif 350, termen 7-10 zile).
 
 ## Status & rămas
 

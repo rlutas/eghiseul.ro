@@ -365,9 +365,18 @@ export function OptionsStepModular({ onValidChange }: OptionsStepProps) {
   // Whether cetatean_strain is auto-applied (suppresses urgenta).
   const hasCetateanStrain = autoAppliedSelections.some((o) => o.code === 'cetatean_strain');
 
-  // Defense: if cetatean_strain is active and urgenta was somehow selected, auto-remove it.
+  // Cazier auto cu permis emis în străinătate: termenul e al autorității care a
+  // emis permisul (7-10 zile lucrătoare), deci procesarea urgentă n-ar scurta
+  // nimic — ar fi bani luați pe o promisiune imposibilă. O ascundem, exact ca
+  // la cetățean străin.
+  const foreignLicenseCfg = state.verificationConfig?.vehicleVerification?.foreignLicense;
+  const hasForeignLicense =
+    !!foreignLicenseCfg?.enabled && state.vehicle?.licenseIssuedAbroad === true;
+  const suppressUrgenta = hasCetateanStrain || hasForeignLicense;
+
+  // Defense: if urgenta is suppressed but somehow selected, auto-remove it.
   useEffect(() => {
-    if (!hasCetateanStrain) return;
+    if (!suppressUrgenta) return;
     const urgentaOpt = optionsByCode.get('urgenta');
     if (!urgentaOpt) return;
     const urgentaSelected = selectedOptions.some(
@@ -376,7 +385,7 @@ export function OptionsStepModular({ onValidChange }: OptionsStepProps) {
     if (urgentaSelected) {
       commit(selectedOptions.filter((o) => o.code !== 'urgenta' || !!o.bundledFor));
     }
-  }, [hasCetateanStrain, optionsByCode, selectedOptions, commit]);
+  }, [suppressUrgenta, optionsByCode, selectedOptions, commit]);
 
   // Sweep deprecated codes from draft selections (one-time, on mount/sync).
   useEffect(() => {
@@ -417,7 +426,7 @@ export function OptionsStepModular({ onValidChange }: OptionsStepProps) {
       {/* ────────────────────────────────────────────────────────────── */}
       {/* Procesare Rapidă — urgența (hidden when cetatean_strain)       */}
       {/* ────────────────────────────────────────────────────────────── */}
-      {urgenta && !hasCetateanStrain && (
+      {urgenta && !suppressUrgenta && (
         <section className="space-y-3">
           <SectionHeader
             icon={Clock}
@@ -467,6 +476,35 @@ export function OptionsStepModular({ onValidChange }: OptionsStepProps) {
                 </p>
               </div>
             </div>
+          </div>
+        </section>
+      )}
+
+      {/* ────────────────────────────────────────────────────────────── */}
+      {/* Permis emis în străinătate — înlocuiește urgența                */}
+      {/* ────────────────────────────────────────────────────────────── */}
+      {hasForeignLicense && (
+        <section className="space-y-3">
+          <div className="flex items-start gap-3 border-b border-amber-100 pb-2.5">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-amber-100 shrink-0">
+              <Globe className="h-4.5 w-4.5 text-amber-700" />
+            </div>
+            <div className="flex-1 min-w-0 pt-0.5">
+              <h3 className="text-base font-semibold text-secondary-900 leading-tight">
+                Permis din străinătate — procesare{' '}
+                {foreignLicenseCfg?.daysDisplay ||
+                  `${foreignLicenseCfg?.minDays}-${foreignLicenseCfg?.maxDays} zile lucrătoare`}
+              </h3>
+              <p className="text-xs text-neutral-500 mt-0.5">
+                Procesarea urgentă nu este disponibilă pentru permisele emise în străinătate
+              </p>
+            </div>
+          </div>
+          <div className="rounded-xl border-2 border-amber-300 bg-amber-50 p-4">
+            <p className="text-sm text-amber-800">
+              Fișa conducătorului auto se solicită autorității care a emis permisul,
+              iar termenul depinde de ea — nu poate fi scurtat.
+            </p>
           </div>
         </section>
       )}

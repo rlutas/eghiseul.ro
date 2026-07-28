@@ -5,7 +5,7 @@ import { logAudit, getAuditContext } from '@/lib/security/audit-logger';
 import { createHash } from 'crypto';
 import { autoGenerateOrderDocuments } from '@/lib/documents/auto-generate';
 import { uploadOrderSignature, uploadBase64 } from '@/lib/aws/s3';
-import { computeEstimatedCompletionISOForOrder } from '@/lib/orders/order-estimate';
+import { computeEstimatedCompletionISOForOrder, hasForeignDrivingLicense } from '@/lib/orders/order-estimate';
 import { getMissingInvoiceClientFields } from '@/lib/oblio/invoice';
 import { emailDomainAcceptsMail } from '@/lib/email-mx';
 
@@ -36,7 +36,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     // Include service fields so we can compute the estimated completion date.
     const { data: order, error: orderError } = await adminClient
       .from('orders')
-      .select('*, services(slug, estimated_days, urgent_days, urgent_available)')
+      .select('*, services(slug, estimated_days, urgent_days, urgent_available, verification_config)')
       .eq('id', id)
       .single();
 
@@ -196,6 +196,38 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
               },
             },
             { status: 400 }
+          );
+        }
+      }
+    }
+
+    // ── Tarif „permis emis în străinătate" (cazier auto) ────────────────
+    // Prețul de bază e calculat în wizard (ca la variantele de constatator) și
+    // persistat pe comandă, deci un client care umblă la payload-ul draftului ar
+    // putea plăti tariful de permis românesc pentru o fișă cerută în străinătate.
+    // Recalculăm din config înainte de plată și corectăm în sus dacă e nevoie.
+    {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const o = order as any;
+      const fl = o.services?.verification_config?.vehicleVerification?.foreignLicense;
+      if (
+        fl?.enabled &&
+        typeof fl.price === 'number' &&
+        fl.price > 0 &&
+        hasForeignDrivingLicense(o.customer_data)
+      ) {
+        const currentBase = Number(o.base_price ?? 0);
+        if (currentBase + 0.01 < fl.price) {
+          const diff = Math.round((fl.price - currentBase) * 100) / 100;
+          const newTotal = Math.round((Number(o.total_price ?? 0) + diff) * 100) / 100;
+          await adminClient
+            .from('orders')
+            .update({ base_price: fl.price, total_price: newTotal })
+            .eq('id', id);
+          o.base_price = fl.price;
+          o.total_price = newTotal;
+          console.warn(
+            `[submit] tarif permis străin corectat pe ${id}: base ${currentBase} → ${fl.price} (total ${newTotal})`
           );
         }
       }

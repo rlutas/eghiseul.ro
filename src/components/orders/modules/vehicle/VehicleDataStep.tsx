@@ -80,7 +80,15 @@ export default function VehicleDataStep({ config, onValidChange }: VehicleDataSt
   // Poliția Rutieră, nu date despre mașină. Titlul „Date Vehicul" trimitea
   // clientul să caute plăcuța/VIN-ul care nu există aici. Aceeași distincție
   // ca la eticheta pasului din step-builder.
-  const isDriverRecord = config.fields.drivingLicense?.required && !config.fields.plateNumber.required;
+  // Cazier auto: pasul e despre PERMISUL clientului (numărul lui și/sau unde a
+  // fost emis), nu despre mașină. `drivingLicense.required` a fost dezactivat
+  // (numărul se citește din poza permisului), deci întrebarea „emis unde?" e
+  // singurul semnal rămas — fără ea pasul s-ar reintitula „Date Vehicul".
+  const foreign = config.foreignLicense;
+  const asksForeignLicense = !!foreign?.enabled;
+  const isDriverRecord =
+    (config.fields.drivingLicense?.required || asksForeignLicense) &&
+    !config.fields.plateNumber.required;
 
   // Validate Romanian plate format
   const validatePlate = useCallback((plate: string): boolean => {
@@ -133,6 +141,7 @@ export default function VehicleDataStep({ config, onValidChange }: VehicleDataSt
     // Check required fields based on config
     if (config.fields.plateNumber.required && !vehicle.plateNumber) return false;
     if (config.fields.drivingLicense?.required && !vehicle.drivingLicense) return false;
+    if (asksForeignLicense && vehicle.licenseIssuedAbroad === undefined) return false;
     if (config.fields.vin.required && !vehicle.vin) return false;
     if (config.fields.category.required && !vehicle.category) return false;
     if (config.fields.period.required && !vehicle.period) return false;
@@ -142,7 +151,7 @@ export default function VehicleDataStep({ config, onValidChange }: VehicleDataSt
     if (vehicle.vin && !validateVIN(vehicle.vin)) return false;
 
     return true;
-  }, [vehicle, config, validatePlate, validateVIN]);
+  }, [vehicle, config, asksForeignLicense, validatePlate, validateVIN]);
 
   // Notify parent of validation changes
   useEffect(() => {
@@ -189,11 +198,11 @@ export default function VehicleDataStep({ config, onValidChange }: VehicleDataSt
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Car className="h-5 w-5" />
-            {isDriverRecord ? 'Date Conducător Auto' : 'Date Vehicul'}
+            {isDriverRecord ? 'Permis de Conducere' : 'Date Vehicul'}
           </CardTitle>
           <CardDescription>
             {isDriverRecord
-              ? 'Introdu numărul permisului de conducere pentru care vrei cazierul auto'
+              ? 'Spune-ne unde a fost emis permisul — restul datelor le citim din poza permisului'
               : 'Introdu datele vehiculului pentru verificare'}
           </CardDescription>
         </CardHeader>
@@ -220,6 +229,54 @@ export default function VehicleDataStep({ config, onValidChange }: VehicleDataSt
                   <CheckCircle className="h-3 w-3" />
                   Format valid
                 </p>
+              )}
+            </div>
+          )}
+
+          {/* Unde a fost emis permisul. Fișa conducătorului auto se cere
+              autorității emitente, deci un permis străin = alt tarif + alt
+              termen (paritate cu cazierjudiciaronline.com). */}
+          {asksForeignLicense && (
+            <div className="space-y-2">
+              <Label>
+                Permisul de conducere a fost emis în: <span className="text-red-500">*</span>
+              </Label>
+              <div className="flex flex-wrap gap-2" role="radiogroup">
+                {[
+                  { value: false, label: 'România' },
+                  { value: true, label: 'Străinătate' },
+                ].map((opt) => {
+                  const active = vehicle.licenseIssuedAbroad === opt.value;
+                  return (
+                    <button
+                      key={String(opt.value)}
+                      type="button"
+                      role="radio"
+                      aria-checked={active}
+                      onClick={() => updateVehicle?.({ licenseIssuedAbroad: opt.value })}
+                      className={
+                        'min-h-11 cursor-pointer rounded-xl border-2 px-4 py-2.5 text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 ' +
+                        (active
+                          ? 'border-primary-500 bg-primary-50 text-secondary-900'
+                          : 'border-neutral-200 bg-white text-neutral-700 hover:border-primary-300')
+                      }
+                    >
+                      {opt.label}
+                    </button>
+                  );
+                })}
+              </div>
+              {vehicle.licenseIssuedAbroad === true && (
+                <Alert className="border-amber-200 bg-amber-50">
+                  <AlertCircle className="h-4 w-4 text-amber-600" />
+                  <AlertDescription className="text-amber-800">
+                    Pentru permisele emise în străinătate fișa se solicită autorității
+                    care a emis permisul: tariful este{' '}
+                    <strong>{Number(foreign?.price ?? 0).toFixed(2)} RON</strong> și termenul{' '}
+                    <strong>{foreign?.daysDisplay || `${foreign?.minDays}-${foreign?.maxDays} zile lucrătoare`}</strong>.
+                    Prețul din dreapta s-a actualizat deja.
+                  </AlertDescription>
+                </Alert>
               )}
             </div>
           )}

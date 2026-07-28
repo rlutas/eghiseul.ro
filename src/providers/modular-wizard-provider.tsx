@@ -1378,7 +1378,16 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
     const docTypePrice = constatatorTypes?.find(
       (t) => t.value === state.constatator?.documentType
     )?.price;
-    const basePrice = docTypePrice ?? service?.base_price ?? 0;
+    // Cazier auto cu permis emis în străinătate: fișa se cere autorității
+    // emitente, deci alt tarif (350 vs 198) și alt termen — vezi
+    // vehicleVerification.foreignLicense. Același mecanism de override ca la
+    // variantele de constatator.
+    const foreignLicense = state.verificationConfig?.vehicleVerification?.foreignLicense;
+    const foreignLicensePrice =
+      foreignLicense?.enabled && state.vehicle?.licenseIssuedAbroad === true
+        ? foreignLicense.price
+        : undefined;
+    const basePrice = foreignLicensePrice ?? docTypePrice ?? service?.base_price ?? 0;
     const optionsPrice = state.selectedOptions.reduce(
       (sum, opt) => {
         // Defensive: handle undefined/NaN priceModifier from old cached data
@@ -1420,7 +1429,7 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
       currency: service?.currency ?? 'RON',
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state.serviceId, state.selectedOptions, state.delivery, state.coupon, state.constatator?.documentType, state.verificationConfig]);
+  }, [state.serviceId, state.selectedOptions, state.delivery, state.coupon, state.constatator?.documentType, state.vehicle?.licenseIssuedAbroad, state.verificationConfig]);
 
   // Save to localStorage
   const saveToLocalStorage = useCallback(() => {

@@ -1209,6 +1209,15 @@ export default function AdminOrderDetailPage() {
               return (
                 <>
                   {v.drivingLicense && <InfoRow label="Nr. permis de conducere" value={String(v.drivingLicense)} mono />}
+                  {/* Permis emis în străinătate = alt tarif (350) + alt termen
+                      (7-10 zile) și fișa se cere autorității emitente — echipa
+                      trebuie să vadă asta din prima. */}
+                  {v.licenseIssuedAbroad !== undefined && (
+                    <InfoRow
+                      label="Permis emis în"
+                      value={v.licenseIssuedAbroad ? 'Străinătate' : 'România'}
+                    />
+                  )}
                   {v.plateNumber && <InfoRow label="Nr. inmatriculare" value={String(v.plateNumber)} mono />}
                   {v.vin && <InfoRow label="Serie sasiu (VIN)" value={String(v.vin)} mono />}
                 </>

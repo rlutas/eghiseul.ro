@@ -73,12 +73,22 @@ export function PriceSidebarModular({ service, variant = 'full' }: PriceSidebarM
     (o: any) => o.code === 'urgenta' && !o.bundledFor
   );
   const courierCode = (state.delivery.method as string | undefined) || null;
+  // Cazier auto cu permis emis în străinătate: procesarea de bază nu mai e cea
+  // a serviciului (3-5 zile), ci termenul autorității emitente (7-10) — vezi
+  // vehicleVerification.foreignLicense. Add-on-urile și cureierul se adaugă
+  // peste, ca de obicei.
+  const foreignLicenseCfg = state.verificationConfig?.vehicleVerification?.foreignLicense;
+  const foreignLicenseActive =
+    !!foreignLicenseCfg?.enabled && state.vehicle?.licenseIssuedAbroad === true;
   const estimate = estimateFromSelectedOptions({
     selectedOptions:
       state.selectedOptions as unknown as Parameters<
         typeof estimateFromSelectedOptions
       >[0]['selectedOptions'],
     baseDays: service.estimated_days,
+    baseRange: foreignLicenseActive
+      ? { minDays: foreignLicenseCfg!.minDays, maxDays: foreignLicenseCfg!.maxDays }
+      : undefined,
     courier: courierCode,
     includeCourierLeg: !!courierCode,
   });
