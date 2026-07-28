@@ -167,8 +167,32 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     const orderRowMeta = order as typeof order & { client_type?: string | null }
     const clientType = orderRowMeta.client_type || null
     const baseServiceName = order.services?.name || ''
+    // Sufixul PF/PJ are sens DOAR la serviciile care chiar oferă alegerea
+    // (cazier judiciar). La cazier auto sau fiscal — care sunt doar pentru
+    // persoane fizice — „Cazier Auto PF" e zgomot: nu există varianta PJ de
+    // care să-l deosebești. Aceeași regulă ca în sidebar-ul wizardului.
+    // `verification_config` lipsește din tipurile generate Supabase, iar
+    // adăugarea lui în select-ul tipizat de mai sus rupe inferența pentru toate
+    // celelalte coloane. Îl citim separat, cu client necastrat.
+    let offersClientType = false
+    // Cazier auto cu permis emis în străinătate: termenul e al autorității
+    // emitente (7-10 zile), nu cel standard al serviciului. Checkout-ul îl
+    // calcula din `estimated_days`, deci clientul vedea 3-5 zile pentru o
+    // comandă care durează dublu. Vezi vehicleVerification.foreignLicense.
+    let foreignLicense: { enabled?: boolean; minDays?: number; maxDays?: number; daysDisplay?: string } | null = null
+    if (order.services?.id) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: svcCfg } = await (supabase.from('services') as any)
+        .select('verification_config')
+        .eq('id', order.services.id)
+        .maybeSingle()
+      offersClientType =
+        svcCfg?.verification_config?.clientTypeSelection?.enabled === true
+      foreignLicense =
+        svcCfg?.verification_config?.vehicleVerification?.foreignLicense ?? null
+    }
     const serviceDisplayName =
-      clientType && (clientType === 'PF' || clientType === 'PJ')
+      offersClientType && clientType && (clientType === 'PF' || clientType === 'PJ')
         ? `${baseServiceName} ${clientType}`
         : baseServiceName
 
@@ -182,6 +206,10 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         slug: order.services.slug,
         name: serviceDisplayName,
         baseName: baseServiceName,
+        /** True doar când serviciul oferă alegerea PF/PJ (vezi mai sus). */
+        offersClientType,
+        /** Config pentru permis emis în străinătate (cazier auto), dacă există. */
+        foreignLicense,
         description: order.services.description,
         category: order.services.category,
         basePrice: parseFloat(String(order.services.base_price)),

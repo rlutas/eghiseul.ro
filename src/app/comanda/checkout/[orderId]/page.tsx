@@ -41,6 +41,9 @@ interface OrderData {
   client_type?: string | null;
   /** Service's base estimated days — feeds the delivery-time calculator. */
   service_estimated_days?: number;
+  /** Interval de procesare care ÎNLOCUIEȘTE zilele standard (cazier auto cu
+   *  permis emis în străinătate: 7-10 zile la autoritatea emitentă). */
+  service_days_range?: { minDays: number; maxDays: number } | null;
   delivery_method?: string;
   delivery_price?: number;
   subtotal_without_vat?: number;
@@ -123,9 +126,16 @@ export default function CheckoutPage() {
         billing?: { type?: string };
         client_type?: string;
       };
-      const inferredClientType =
-        cd.client_type ||
-        (cd.company?.cui ? 'PJ' : cd.personal?.cnp ? 'PF' : null);
+      // Sufixul PF/PJ doar la serviciile care oferă alegerea (cazier judiciar).
+      // Înainte se deducea „PF" din simpla prezență a unui CNP, deci comenzile
+      // de cazier auto — serviciu exclusiv pentru persoane fizice — apăreau ca
+      // „Cazier Auto PF", un sufix fără niciun sens: nu există varianta PJ de
+      // care să-l deosebești. Flagul vine din verification_config (API).
+      const offersClientType = apiOrder.service?.offersClientType === true;
+      const inferredClientType = offersClientType
+        ? cd.client_type ||
+          (cd.company?.cui ? 'PJ' : cd.personal?.cnp ? 'PF' : null)
+        : null;
 
       const orderData: OrderData = {
         id: apiOrder.id,
@@ -134,6 +144,15 @@ export default function CheckoutPage() {
         service_name: apiOrder.service?.name || 'Serviciu',
         client_type: inferredClientType,
         service_estimated_days: apiOrder.service?.estimatedDays ?? apiOrder.service?.estimated_days,
+        service_days_range: (() => {
+          const fl = apiOrder.service?.foreignLicense;
+          const abroad =
+            (apiOrder.customerData as { vehicle?: { licenseIssuedAbroad?: boolean } } | null)
+              ?.vehicle?.licenseIssuedAbroad === true;
+          return fl?.enabled && abroad && fl.maxDays
+            ? { minDays: fl.minDays ?? fl.maxDays, maxDays: fl.maxDays }
+            : null;
+        })(),
         base_price: apiOrder.breakdown?.basePrice || apiOrder.totalAmount,
         total_price: apiOrder.totalAmount,
         payment_status: apiOrder.paymentStatus || 'unpaid',
@@ -496,6 +515,10 @@ export default function CheckoutPage() {
                     : o.bundledFor ?? null,
                 })),
                 baseDays,
+                // Permis străin → intervalul autorității emitente bate zilele
+                // standard ale serviciului (și urgența, care oricum e ascunsă
+                // în wizard pentru acest caz).
+                baseRange: order.service_days_range ?? undefined,
                 courier: order.delivery_method ?? null,
                 includeCourierLeg: !!order.delivery_method,
               });

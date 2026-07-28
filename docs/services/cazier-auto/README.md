@@ -42,6 +42,18 @@ Comandă personal-KYC pe slug DB (`/comanda/cazier-auto`):
 
 Paritate cu `cazierjudiciaronline.com` (`src/config/auto.config.ts`: `enablePermisStrain`, tarif 350, termen 7-10 zile).
 
+## Fixuri 28.07.2026 (raportate de Raul)
+
+- **„Cazier Auto PF" în rezumatul comenzii** — sufixul PF/PJ se adăuga oriunde exista un CNP, fiindcă
+  pagina de checkout îl DEDUCEA (`cd.personal?.cnp ? 'PF' : null`), nu îl citea din configul serviciului.
+  La un serviciu care există doar pentru persoane fizice, „PF" e zgomot: nu există varianta PJ de care
+  să-l deosebești. Acum sufixul apare doar când `verification_config.clientTypeSelection.enabled === true`
+  (adică la cazierul judiciar), iar flagul vine din API ca `service.offersClientType`.
+- **Termen greșit la checkout pentru permis străin** — estimarea se calcula din `estimated_days` al
+  serviciului (3-5 zile), deci clientul cu permis emis în străinătate vedea 3-5 zile la plată, deși
+  comanda durează 7-10. API-ul expune acum `service.foreignLicense`, iar checkout-ul îl folosește ca
+  `baseRange` (același mecanism ca în wizard).
+
 ## Status & rămas
 
 - Pagină SEO + schema + redirect: **gata** (batch 2, 2026-06-14).
