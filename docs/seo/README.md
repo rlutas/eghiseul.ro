@@ -16,6 +16,7 @@ Index al documentației SEO. Status curent al expansiunii: [`SEO-STATUS-2026-06-
 ## Planuri & referințe (vii)
 | Fișier | Rol |
 |---|---|
+| [`TOOLING-claude-seo.md`](TOOLING-claude-seo.md) | **CURENT** — tooling SEO pe date reale (claude-seo v2.2.4, instalat 28.07): Search Console prin API, CrUX 25 săpt., PageSpeed/Lighthouse. Unde stau credențialele, capcanele (Python 3.10+, proprietate URL-prefix nu Domain, API de activat în GCP), comenzile, măsurătorile de referință |
 | [`ANALIZA-MIGRARE-WP-NEXT-2026-07-20.md`](ANALIZA-MIGRARE-WP-NEXT-2026-07-20.md) | **CURENT** — a afectat migrarea SEO-ul? Verdict pe date: trafic existent intact (−2%), gol vs trend YoY +32%→+3% (~300–450 cl/zi, confundat cu AIO), CF/cazier fiscal = probleme pre-existente; re-măsurare 4 aug |
 | [`2026-07-26-analiza-organic-servicii.md`](2026-07-26-analiza-organic-servicii.md) | **CURENT** — de ce paginile de servicii nu vând: GSC + comenzi DB + SERP verificat manual; 62% trafic pe calculatoare fără punți, canibalizare articol↔serviciu, plan P0/P1/P2 |
 | [`2026-07-26-conformitate-si-sesizari-concurenta.md`](2026-07-26-conformitate-si-sesizari-concurenta.md) | **CURENT** — politica Google „government documents" (oct. 2025), dovezi pe competitori, expunerea noastră, plan self-audit → dosar → sesizări |
