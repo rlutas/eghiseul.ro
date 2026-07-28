@@ -28,7 +28,7 @@ Config-driven din `verification_config.civilStatus` (migrarea 053). Câmpuri act
 
 - **Pentru cine se solicită?** — Minor (sub 18) / Adult. (`applicantType`) Dacă e Minor, întrebările de istoric marital se ascund (`isAdult` gating).
 - **Nașterea a avut loc în:** România / Străinătate. (`birthPlace`) → la „Străinătate" apare ⚠️ avertisment de **transcriere**: dacă nașterea din străinătate nu a fost transcrisă în RO (Ambasadă/Consulat/DEP), documentul nu poate fi eliberat.
-- **Sunteți căsătorit(ă)?** Da/Nu. (`currentlyMarried`, doar adulți)
+- **Sunteți căsătorit(ă) în prezent?** Da/Nu. (`currentlyMarried`, doar adulți; eticheta a primit „în prezent" pe 28.07.2026, când întrebarea a fost extinsă la căsătorie + ambele extrase multilingve — migrarea 137)
 - **Istoric marital** (`maritalHistory`, doar adulți): „Ați mai fost căsătorit(ă) anterior?" → Da deschide: de câte ori (count) + „Ultima căsătorie s-a încheiat prin" Divorț/Deces. La **Divorț** → ⚠️ divorțul pronunțat în străinătate trebuie recunoscut/transcris în RO.
 - **Locul căsătoriei** (`marriagePlace`) — apare condițional doar dacă e/a fost căsătorit(ă); RO/Străinătate + ⚠️ transcriere.
 - **Numele de naștere** (`birthName`).

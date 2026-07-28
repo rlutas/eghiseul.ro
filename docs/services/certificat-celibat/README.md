@@ -28,7 +28,7 @@ Config-driven din `verification_config.civilStatus` (migrarea 053). Câmpuri act
 
 - **Localitatea + Județul/Sectorul nașterii** (`birthLocality`, două inputuri).
 - **Naționalitatea** (`nationality`).
-- **Care este starea civilă actuală?** Necăsătorit(ă) / Căsătorit(ă) / Divorțat(ă) / Văduv(ă). (`maritalStatus`)
+- **Care este starea civilă actuală?** Necăsătorit(ă) / Căsătorit(ă) / Divorțat(ă) / Văduv(ă). (`maritalStatus`) — **doar aici**: celelalte servicii de stare civilă folosesc varianta da/nu „Sunteți căsătorit(ă) în prezent?" (`currentlyMarried`, migrarea 137). Cele două nu se cumulează niciodată pe același serviciu (dublură pentru client).
 - **Istoric marital** (`maritalHistory`): „Ați mai fost căsătorit(ă) anterior?" → Da deschide: de câte ori (count) + „Ultima căsătorie s-a încheiat prin" Divorț/Deces. La **Divorț** → ⚠️ divorțul din străinătate trebuie recunoscut în RO. Sub-întrebare specifică celibatului: **„Mai dețineți vechiul certificat de căsătorie?"** (`stillHaveOldMarriageCert`).
 - **Locul căsătoriei** (`marriagePlace`) — apare condițional dacă a existat o căsătorie anterioară; RO/Străinătate + ⚠️ transcriere.
 - **Solicitați certificatul în vederea căsătoriei în străinătate?** Da/Nu. (`marriageAbroadIntent`)

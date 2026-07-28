@@ -24,8 +24,9 @@ Flux modular PF: contact → date personale (CNP) → **Date Stare Civilă** →
 
 ### Pasul „Date Stare Civilă" (modul `civil-status`, `documentType: 'casatorie'`)
 
-Config-driven din `verification_config.civilStatus` (migrarea 053). Câmpuri activate pentru căsătorie:
+Config-driven din `verification_config.civilStatus` (migrările 053 + 137). Câmpuri activate pentru căsătorie:
 
+- **Sunteți căsătorit(ă) în prezent?** (`currentlyMarried`, migrarea 137 — 28.07.2026): da/nu, randată prima. Aceeași întrebare ca la naștere + ambele extrase multilingve. Varianta cu 4 opțiuni (`maritalStatus`) e dezactivată aici intenționat — rămâne exclusiv la celibat, altfel clientul răspunde de două ori la aceeași informație.
 - **Istoric marital** (`maritalHistory`): „Ați mai fost căsătorit(ă) anterior?" → Da deschide: de câte ori (count) + „Ultima căsătorie s-a încheiat prin" Divorț/Deces. La **Divorț** → ⚠️ divorțul pronunțat în străinătate trebuie recunoscut/transcris în RO, altfel căsătoria anterioară figurează în vigoare.
 - **Locul căsătoriei** (`marriagePlace`): România / Străinătate. Pentru `documentType === 'casatorie'` câmpul e **mereu vizibil** → la „Străinătate" apare ⚠️ avertisment de **transcriere** (dacă actul din străinătate nu e transcris în RO, nu se poate elibera).
 - **Data căsătoriei** (`marriageDate`, input `type="date"`).

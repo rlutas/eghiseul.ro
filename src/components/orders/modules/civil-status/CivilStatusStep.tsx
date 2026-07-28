@@ -350,7 +350,7 @@ export default function CivilStatusStep({ config, onValidChange }: CivilStatusSt
         {fields.maritalStatus && marriagePlaceField}
 
         {showCurrentlyMarried && (
-          <Field label="Sunteți căsătorit(ă)?" required>
+          <Field label="Sunteți căsătorit(ă) în prezent?" required>
             <ChoiceRow
               current={cs.currentlyMarried === undefined ? undefined : cs.currentlyMarried ? 'da' : 'nu'}
               onChange={(v) => updateCivilStatus({ currentlyMarried: v === 'da' })}

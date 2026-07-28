@@ -223,8 +223,8 @@ export interface CivilStatusConfig {
     birthPlace?: boolean;         // Born in RO / abroad — warns about transcription
     birthLocality?: boolean;      // Birth locality + county/sector (celibat)
     nationality?: boolean;        // Nationality (celibat)
-    currentlyMarried?: boolean;   // "Sunteți căsătorit?" (naștere, adults)
-    maritalStatus?: boolean;      // Current marital status (celibat)
+    currentlyMarried?: boolean;   // "Sunteți căsătorit(ă) în prezent?" (naștere + căsătorie + extrase, adults)
+    maritalStatus?: boolean;      // Current marital status, 4 options (celibat only — nu se cumulează cu currentlyMarried)
     maritalHistory?: boolean;     // Prior marriages: yes/no → count + ended-by
     stillHaveOldMarriageCert?: boolean; // "Mai dețineți vechiul certificat de căsătorie?"
     marriageAbroadIntent?: boolean; // "Solicitați în vederea căsătoriei în străinătate?" (celibat)
