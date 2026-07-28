@@ -260,6 +260,47 @@ Flux capturat live + implementat în `worker-onrc/src/onrc/api-submit.ts` (commi
 
 ---
 
+## ⚠️ Incident 2026-07-28 — certificat emis pe firma RADIATĂ (E-260728-CEB26)
+
+**Ce s-a întâmplat:** clientul a cerut certificat constatator pentru licitație
+(ALEXSOFIA LOGISTIC S.R.L., CUI 37135520). Worker-ul a emis documentul pe
+înregistrarea **radiată** a firmei. Documentul corect a fost obținut și trimis
+manual de echipă.
+
+**Cauza:** `searchFirm()` lua orb `content[0]` din căutarea RECOM. Pentru un CUI
+pot exista **mai multe înregistrări cu același nume**: numărul de ordine vechi,
+radiat, și cel nou, în funcţiune. Verificat live (probă read-only,
+`worker-onrc/src/probe-company.ts`):
+
+| # | registrationCode | stare |
+|---|---|---|
+| 0 | `J29/391/2017` | **radiată** (code 1084) |
+| 1 | `J2018000506398` | **funcţiune** (code 1048) |
+
+Trei capcane confirmate pe API-ul real:
+- **`active=true` din query NU filtrează** — întoarce ambele înregistrări.
+- **`companyStatus` e `undefined`** pe hit-ul de search (apare doar în payload-ul
+  Step 3 capturat din UI). Starea reală e în `companyStatusList[].firmStatus`
+  (`{name, code}`), cu **cedilla legacy** în nume: `funcţiune` (ţ U+0163) — deci
+  orice comparație pe text trebuie normalizată (aceeași capcană ca la ANAF).
+- Ordinea rezultatelor nu e garantată; radiata a venit prima.
+
+**Fix (worker, commit `e5aa4d6`):** `pickFirmHit()` alege în ordine — filtru pe
+numele firmei din comandă → exact una în funcţiune = aleasă → mai multe în
+funcţiune = `NEEDS_OPERATOR` → o singură înregistrare, chiar radiată = folosită
+(firma chiar e radiată, certificatul care spune asta e răspunsul corect) → mai
+multe și niciuna activă = `NEEDS_OPERATOR`. Nu ghicește între două candidate.
+Regula „activă" e strictă: o înregistrare care poartă și „radiată", și
+„funcţiune" pleacă la operator.
+
+**Vizibilitate:** înregistrarea aleasă apare acum în Slack la plată și în
+jurnalul jobului din `/admin/onrc` („Depus pe înregistrarea J… (funcţiune)"),
+prin câmpul nou `note` pe `POST /api/onrc/result` (status `CHECKPOINT`).
+
+**Verificare:** `npx tsx src/check-pick-firm.ts` în `worker-onrc` — 10 cazuri cu
+datele reale din probă (inclusiv ordinea inversă, firmă realmente radiată, două
+active, nume care nu se potrivește). Probă live: `npx tsx src/probe-company.ts <CUI>`.
+
 ## Formular site sincronizat cu ONRC (firmă / istoric / pf)
 
 `scripts/sync-constatator-pf-istoric.mjs` (+ `sync-constatator-purposes.mjs` pt. firmă) aliniază `services.verification_config.constatator` la ONRC:

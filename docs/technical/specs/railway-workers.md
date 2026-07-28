@@ -29,6 +29,7 @@ Avem **2 workeri persistenți pe Railway**, în **repo-uri separate** (NU în ac
 - **Ce face:** ia datele dintr-o comandă, depune cererea pe ONRC RECOM prin **REST API** (submit + plată din credit), ONRC emite documentul, workerul îl ia prin API, îl urcă în S3 și îl atașează comenzii (`document_ready`) + email client.
 - **Automatizat & LIVE:** firmă — **de bază (30 lei)**, **fonduri IMM**, **insolvență**. Confirmat în producție (ex. `E-260615-GL74D` IMM, ~3 min A→Z).
 - **Implementat + dry-run (necesită 1 test real fiecare):** „cu istoric" (taxă 7715 = 250 lei, necesită wallet ≥250) și „persoană fizică" (NATURAL/CNP, taxă 7515 = 30 lei).
+- **Subtilitate „firmă radiată" (incident 28.07.2026):** un CUI poate avea în ONRC **două înregistrări** — numărul vechi, radiat, și cel nou, în funcţiune. Worker-ul lua prima din listă și a emis pe firma radiată (`E-260728-CEB26`). Acum alege prin `pickFirmHit()` starea din `companyStatusList[].firmStatus` (1048 funcţiune / 1084 radiată); ambiguu → `NEEDS_OPERATOR`. Vezi `onrc-automation-plan.md`.
 - **Subtilitate IMM:** filtrul de motiv trebuie să fie `cc-reasons/active` ∩ subtip — un motiv INACTIV („Accesare Fonduri") trimitea cererea în backoffice și o bloca. Vezi `onrc-automation-plan.md`.
 - **Detalii:** [`onrc-automation-plan.md`](onrc-automation-plan.md) + `worker-onrc/ONRC-FLOW.md` + `ONRC-API-SUBMIT.md`.
 

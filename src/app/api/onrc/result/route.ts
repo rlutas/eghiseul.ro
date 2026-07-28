@@ -40,6 +40,8 @@ export async function POST(req: NextRequest) {
     requestId?: string;
     draftId?: string;
     calculationNote?: string;
+    /** Linie liberă pentru jurnal (ex. înregistrarea ONRC aleasă la depunere). */
+    note?: string;
   };
   try {
     body = await req.json();
@@ -68,6 +70,13 @@ export async function POST(req: NextRequest) {
     const { error } = await supabase.from('onrc_jobs').update(patch).eq('id', jobId);
     if (error) {
       return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    }
+    // Nota vine de la worker după ce a ales înregistrarea ONRC (un CUI poate avea
+    // și una radiată, și una în funcţiune — vezi incidentul E-260728-CEB26).
+    // Se vede în jurnalul din /admin/onrc, ca echipa să știe pe ce firmă s-a depus.
+    if (body.note) {
+      const { data: j } = await supabase.from('onrc_jobs').select('order_id').eq('id', jobId).maybeSingle();
+      await logOnrcEvent(supabase, jobId, 'info', body.note, j?.order_id);
     }
     return NextResponse.json({ success: true });
   }
