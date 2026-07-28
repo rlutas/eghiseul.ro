@@ -104,14 +104,16 @@ Deci integrarea merge cap-coadă: autentificare live -> serviciu 15 -> `oohLastM
 
 Costul real (24,76 cu TVA) e sub cât s-a încasat pe comandă (33,48) — marja e acoperită.
 
-**AWB-ul de test NU a fost scris în baza de date** (nici status `shipped`, nici tracking
-la client), tocmai ca echipa să nu vadă o expediere pe care n-a făcut-o. Două variante:
-- se șterge (`scripts/test-sameday-awb-locker.ts --delete 1ONBLN519983355`) și echipa
-  generează AWB-ul normal din admin;
-- sau se păstrează și se trece manual pe comandă.
+**Confirmat de Raul în contul Sameday** — AWB-ul a apărut acolo, apoi l-a șters manual.
+Deci lanțul e validat cap-coadă pe producție, iar contul rămâne curat.
 
-Ștergerea funcționează: `DELETE /api/awb/{awb}` există și răspunde corect (testat cu
-un număr inexistent -> 404 „Couldn't determine an AWB").
+AWB-ul de test **nu a fost scris în baza de date** (nici status `shipped`, nici tracking
+la client), ca echipa să nu vadă o expediere pe care n-a făcut-o. Prima emitere reală
+o face echipa din admin, pe butonul normal.
+
+Ștergerea se poate face și din cod dacă mai e nevoie: `DELETE /api/awb/{awb}` există
+(testat cu un număr inexistent -> 404 „Couldn't determine an AWB"), iar scriptul are
+comanda gata: `scripts/test-sameday-awb-locker.ts --delete <AWB>`.
 
 ## Verificare
 
