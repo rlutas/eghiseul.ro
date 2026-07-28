@@ -47,6 +47,30 @@ arheologie: în alerta Slack de la plată și în jurnalul comenzii din `/admin/
 („Depus pe înregistrarea J2018000506398 (funcţiune)"). A fost adăugat câmpul
 opțional `note` pe `POST /api/onrc/result` (status `CHECKPOINT`), logat ca eveniment.
 
+## Audit pe tot istoricul — a doua comandă afectată
+
+După fix am rulat selectorul peste **toate cele 21 de CUI-uri** din istoricul cozii
+ONRC (probă live, doar GET-uri). Rezultat: **2 CUI-uri au dublură**, iar în ambele
+cazuri înregistrarea radiată era prima în listă — deci ambele comenzi au primit
+documentul greșit.
+
+| CUI | Firmă | Comandă | Ce s-a livrat |
+|---|---|---|---|
+| 37135520 | ALEXSOFIA LOGISTIC S.R.L. | `E-260728-CEB26` (28.07, licitație) | radiată `J29/391/2017` — retrimis manual |
+| 12664800 | ROMINSEM SRL | `E-260720-2ZVY9` (20.07, birou notar public) | radiată `J27/48/2000` — **nedescoperită până acum** |
+
+A doua a fost confirmată citind PDF-ul livrat din S3: „Număr de ordine în Registrul
+Comerţului: **J27/48/2000**… Stare firmă: **radiată** în data de 09.01.2001, având ca
+motiv schimbare sediu în alt judet". Firma s-a mutat în alt județ, înregistrarea veche
+a rămas radiată, iar cea nouă (`J2000000384090`) e în funcţiune.
+
+⚠️ **De făcut manual:** clientul de la `E-260720-2ZVY9` (violeta.verona@rominsem.ro)
+are un certificat inutilizabil la notar. Documentul corect se obține din `/admin/onrc`
+(upload manual) sau printr-o comandă nouă pe înregistrarea activă.
+
+Restul de 19 CUI-uri au o singură înregistrare, în funcţiune — comportamentul nu se
+schimbă pentru ele. Rata dublurilor în traficul nostru real: **2 din 21 (~10%)**.
+
 ## Verificare
 
 `npx tsx src/check-pick-firm.ts` în `worker-onrc` — 10 cazuri construite din datele
@@ -54,7 +78,29 @@ reale ale probei: cazul incidentului, ordinea inversă a rezultatelor, firmă cu
 singură înregistrare radiată, două înregistrări active, stare lipsă, nume care nu
 se potrivește, zero rezultate. Toate trec; `tsc` curat pe ambele repo-uri.
 
+Confirmat live după deploy: selectorul rulat peste rezultatele reale ale portalului
+alege `J2018000506398 (funcţiune)` pentru CUI-ul incidentului și `J2000000384090
+(funcţiune)` pentru ROMINSEM.
+
 Deploy worker: `git push` (NU „Redeploy" din Railway — rulează build-ul vechi).
+
+## Bonus livrat în aceeași sesiune: downtime-ul ONRC devine vizibil
+
+Partea din eghiseul.ro pentru logarea căderilor de portal există din **19 iunie**
+(`/api/onrc/pending?portal=up|down` → `platform_outages`), dar jumătatea din worker
+a rămas necommisă ~6 săptămâni. Consecință măsurabilă: în `platform_outages` existau
+**doar rânduri `ancpi`, zero `onrc`** — în timpul unei căderi ONRC clientul nu vedea
+banner de hold pe constatator, iar adminul afișa „auto · min".
+
+Livrat acum, cu două întăriri față de varianta inițială:
+- proba lovește SSO-ul ONRC o dată la `PROBE_INTERVAL_MS` (implicit **5 min**) și e
+  servită din cache între tick-uri — altfel însemna ~2.900 cereri/zi degeaba;
+- `down` se raportează abia după **două** probe eșuate consecutiv; un singur hop de
+  rețea deschidea o fereastră falsă (se vede la ANCPI: ferestre de 1 minut în iulie).
+
+Proba nu poate bloca procesarea — erorile sunt prinse înăuntru, iar rezultatul
+călătorește doar ca parametru de query. Confirmat în logurile Railway: `No pending
+ONRC jobs. (portal: up)`.
 
 ## Ce NU acoperă
 

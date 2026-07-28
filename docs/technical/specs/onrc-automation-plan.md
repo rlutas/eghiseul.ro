@@ -297,9 +297,25 @@ Regula „activă" e strictă: o înregistrare care poartă și „radiată", ș
 jurnalul jobului din `/admin/onrc` („Depus pe înregistrarea J… (funcţiune)"),
 prin câmpul nou `note` pe `POST /api/onrc/result` (status `CHECKPOINT`).
 
+**Audit pe tot istoricul:** selectorul rulat peste **toate cele 21 de CUI-uri** din
+coadă → **2 au dublură**, ambele cu radiata prima, deci ambele comenzi livrate greșit:
+`E-260728-CEB26` (ALEXSOFIA, 28.07) și **`E-260720-2ZVY9`** (ROMINSEM, 20.07, birou
+notarial) — a doua nedescoperită până la audit, confirmată citind PDF-ul din S3
+(„Stare firmă: radiată în data de 09.01.2001… schimbare sediu în alt judet").
+Restul de 19 au o singură înregistrare activă. Rată reală a dublurilor: ~10%.
+
 **Verificare:** `npx tsx src/check-pick-firm.ts` în `worker-onrc` — 10 cazuri cu
 datele reale din probă (inclusiv ordinea inversă, firmă realmente radiată, două
 active, nume care nu se potrivește). Probă live: `npx tsx src/probe-company.ts <CUI>`.
+
+## Downtime ONRC vizibil (livrat 2026-07-28)
+
+`/api/onrc/pending?portal=up|down` + `platform_outages` există din 19.06, dar
+worker-ul nu raporta nimic (jumătatea lui a stat necommisă ~6 săptămâni) → în tabelă
+erau **doar rânduri `ancpi`**. Acum worker-ul probează SSO-ul ONRC o dată la
+`PROBE_INTERVAL_MS` (implicit 5 min, cache între tick-uri) și marchează `down` doar
+după **două** eșecuri consecutive, ca un hop de rețea să nu deschidă fereastră falsă.
+Efect: banner de hold pentru client + „⏸ ONRC din …" în admin, ca la ANCPI.
 
 ## Formular site sincronizat cu ONRC (firmă / istoric / pf)
 

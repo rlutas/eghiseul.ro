@@ -31,6 +31,7 @@ Avem **2 workeri persistenți pe Railway**, în **repo-uri separate** (NU în ac
 - **Implementat + dry-run (necesită 1 test real fiecare):** „cu istoric" (taxă 7715 = 250 lei, necesită wallet ≥250) și „persoană fizică" (NATURAL/CNP, taxă 7515 = 30 lei).
 - **Subtilitate „firmă radiată" (incident 28.07.2026):** un CUI poate avea în ONRC **două înregistrări** — numărul vechi, radiat, și cel nou, în funcţiune. Worker-ul lua prima din listă și a emis pe firma radiată (`E-260728-CEB26`). Acum alege prin `pickFirmHit()` starea din `companyStatusList[].firmStatus` (1048 funcţiune / 1084 radiată); ambiguu → `NEEDS_OPERATOR`. Vezi `onrc-automation-plan.md`.
 - **Subtilitate IMM:** filtrul de motiv trebuie să fie `cc-reasons/active` ∩ subtip — un motiv INACTIV („Accesare Fonduri") trimitea cererea în backoffice și o bloca. Vezi `onrc-automation-plan.md`.
+- **Probă de portal (2026-07-28):** worker-ul raportează starea SSO-ului ONRC la `/api/onrc/pending?portal=up|down` → ferestre în `platform_outages` (badge public + „⏸ ONRC din …" în admin). Probă la 5 min (`PROBE_INTERVAL_MS`), cache între tick-uri, `down` abia după 2 eșecuri consecutive. Până acum tabela avea doar rânduri `ancpi` — căderile ONRC erau invizibile.
 - **Detalii:** [`onrc-automation-plan.md`](onrc-automation-plan.md) + `worker-onrc/ONRC-FLOW.md` + `ONRC-API-SUBMIT.md`.
 
 ## worker-ancpi
