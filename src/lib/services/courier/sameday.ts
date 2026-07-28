@@ -220,7 +220,10 @@ export class SamedayProvider implements CourierProvider {
     name: 'Sameday',
     type: 'domestic',
     logo: '/images/couriers/sameday.webp',
-    trackingUrl: 'https://sameday.ro/tracking/awb/',
+    // Formatul oficial din documentatia Sameday v3.1, sectiunea 'URL tracking':
+    // https://sameday.ro/#awb=<AWB>. Ce era aici ('/tracking/awb/') nu e o ruta
+    // reala - ar fi ajuns ca link de urmarire la client.
+    trackingUrl: 'https://sameday.ro/#awb=',
     supportedCountries: ['RO'],
   };
 

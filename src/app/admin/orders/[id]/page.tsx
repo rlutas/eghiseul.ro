@@ -4633,6 +4633,24 @@ function AwbSection({
           {generating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Truck className="h-4 w-4" />}
           {awbError ? 'Incearca din nou' : 'Genereaza AWB'}
         </Button>
+
+        {/* Plasă de siguranță pentru Fan/Sameday: dacă generarea automată nu
+            merge (locker fără ID, cont/API picat, AWB făcut deja din contul
+            curierului), echipa trebuie să poată introduce AWB-ul manual —
+            altfel comanda rămâne blocată. Ascunsă în <details> ca să nu
+            concureze vizual cu butonul normal. */}
+        <details className="group">
+          <summary className="cursor-pointer list-none text-xs text-muted-foreground underline underline-offset-2 hover:text-foreground">
+            Nu merge generarea? Introdu AWB-ul manual
+          </summary>
+          <div className="mt-2 rounded-md border border-border/60 p-3">
+            <p className="text-xs text-muted-foreground">
+              Folosește-l când AWB-ul a fost emis din contul curierului. Clientul îl vede
+              imediat pe pagina de status, cu link de urmărire.
+            </p>
+            <ManualAwbForm orderId={order.id} courier={provider || 'manual'} onSaved={onManualAwbSaved} />
+          </div>
+        </details>
       </div>
     </>
   );

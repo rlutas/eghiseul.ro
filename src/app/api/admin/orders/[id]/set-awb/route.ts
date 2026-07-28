@@ -27,6 +27,15 @@ function defaultTrackingUrl(courier: string | null, awb: string): string | null 
   if (c.includes('posta')) {
     return `https://www.posta-romana.ro/awb.html?awb=${encodeURIComponent(awb)}`;
   }
+  // Fan/Sameday au generare automată, dar AWB-ul poate ajunge aici când aceasta
+  // eșuează (ex. locker fără ID) sau când echipa l-a emis din contul curierului.
+  // Fără link, clientul ar vedea doar un număr pe pagina de status.
+  if (c.includes('sameday') || c.includes('easybox')) {
+    return `https://sameday.ro/#awb=${encodeURIComponent(awb)}`;
+  }
+  if (c.includes('fan')) {
+    return `https://www.fancourier.ro/awb-tracking/?awb=${encodeURIComponent(awb)}`;
+  }
   return null;
 }
 

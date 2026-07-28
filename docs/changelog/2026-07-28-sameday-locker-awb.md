@@ -115,6 +115,35 @@ o face echipa din admin, pe butonul normal.
 (testat cu un număr inexistent -> 404 „Couldn't determine an AWB"), iar scriptul are
 comanda gata: `scripts/test-sameday-awb-locker.ts --delete <AWB>`.
 
+## AWB manual: acum și pentru Fan / Sameday
+
+Formularul de introducere manuală a AWB-ului exista din 23.07, dar **doar** pentru
+curierii fără generare automată (DHL, Poșta, internațional). La Fan și Sameday se
+afișa exclusiv butonul „Generează AWB" — deci dacă generarea pica, comanda rămânea
+blocată, fără nicio cale de ieșire. Exact cazul comenzilor în locker fără ID.
+
+Acum, sub buton, apare discret „Nu merge generarea? Introdu AWB-ul manual". Se
+folosește când AWB-ul a fost emis din contul curierului; clientul îl vede imediat pe
+pagina de status, cu link de urmărire.
+
+Completat și linkurile de urmărire la introducerea manuală: existau doar pentru DHL
+și Poșta, acum și Sameday și Fan Courier — altfel clientul vedea doar un număr.
+
+⚠️ **Bug găsit citind documentația:** linkul de urmărire Sameday era construit ca
+`https://sameday.ro/tracking/awb/<AWB>`, o rută care nu există. Formatul oficial
+(secțiunea „URL tracking" din doc) e `https://sameday.ro/#awb=<AWB>`. Corectat în
+`factory.ts` și `sameday.ts`. Nicio comandă n-a fost afectată — niciun AWB Sameday
+nu apucase să fie emis.
+
+## Stadiul pe curieri (28.07.2026)
+
+| Curier | Generare automată | Comenzi expediate |
+|---|---|---|
+| Fan Courier | ✅ + manual ca rezervă | — |
+| Sameday | ✅ (reparat azi) + manual ca rezervă | 0 din 3 (de emis din admin) |
+| DHL internațional | manual (prin formular) | 2 din 4 cu AWB, restul încă la instituție |
+| Poșta Română internațional | manual (prin formular) | 0 din 2, ambele încă la instituție |
+
 ## Verificare
 
 `1.361` teste trec (6 noi), `tsc` curat, build verde.
