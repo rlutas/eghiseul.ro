@@ -469,6 +469,10 @@ IMPORTANT: NU căuta adresa de domiciliu. Pașapoartele NU au adresă printată 
 
 MRZ-ul (Machine Readable Zone) ICAO 9303-1 (TD3, 2 rânduri × 44 caractere):
   Linia 1: P<<COD_TARA><NUME><<PRENUME><<<...
+  ATENTIE: "P<ROU" de la inceputul liniei 1 este TIPUL ACTULUI (P = pasaport) +
+     TARA EMITENTA (ROU = Romania). NU face parte din numele de familie.
+     Exemplu: MRZ "P<ROUPOPA<<ADRIAN<MIHAIL" -> lastName="POPA", firstName="ADRIAN MIHAIL".
+     GRESIT: lastName="PEROUPOPA" sau "P<ROUPOPA" sau "PEROU POPA".
   Linia 2: <NR_PAȘAPORT(9)><check><COD_TARA(3)><DATA_NAȘTERE(6)><check><SEX><DATA_EXPIRARE(6)><check><PERSONAL_NUMBER(14)><check><check>
   La pașaportul ROMÂNESC câmpul PERSONAL_NUMBER conține CNP-ul (13 cifre).
 
@@ -513,7 +517,9 @@ Răspunde în acest format JSON:
 
     const response = await result.response;
     const text = response.text();
-    return applyMrzCnpFallback(parseGeminiOCRResponse(text, 'passport'));
+    // Corectia din MRZ ruleaza si aici: prefixul de tip act + tara ajungea
+    // lipit de numele de familie (PEROUPOPA) - vezi correctNamesFromMrz.
+    return correctNamesFromMrz(applyMrzCnpFallback(parseGeminiOCRResponse(text, 'passport')));
   } catch (error) {
     console.error('Passport Opened OCR error:', error);
     return createErrorResult('passport', 'Eroare la procesarea documentului');
@@ -771,9 +777,13 @@ export function recoverNamesFromMrz(
   for (const raw of lines) {
     let l = (raw || '').toUpperCase().replace(/\s/g, '');
     if (!l.includes('<<')) continue; // a name field always has surname<<given
-    // Strip the document-type + issuing-country prefix of a TD2 line-1 name
-    // field. Only the specific "IDROU"/"IROU"/"I<ROU" forms — NOT a bare "I".
-    l = l.replace(/^I[D<]?ROU/, '');
+    // Strip the document-type + issuing-country prefix of the line-1 name field.
+    //  - TD2 / carte de identitate: "IDROU" / "IROU" / "I<ROU"
+    //  - TD3 / pașaport:            "P<ROU" (ICAO: tip act + țară emitentă),
+    //    inclusiv varianta fără "<" pe care o întoarce uneori OCR-ul.
+    // Doar formele astea specifice — NU un "I" sau "P" simplu, care ar mânca
+    // prima literă dintr-un nume real.
+    l = l.replace(/^I[D<]?ROU/, '').replace(/^P<?[A-Z]{3}(?=[A-Z])/, '');
     const trimmed = l.replace(/<+$/, '');
     if (/\d/.test(trimmed)) continue; // names never contain digits → skip MRZ data lines
     const parts = trimmed.split(/<{2,}/).filter(Boolean);
@@ -809,6 +819,20 @@ function deburrName(s: string): string {
  * given name AND the visual split disagrees with it — otherwise it's a no-op.
  */
 export function correctCiFrontNames(result: OCRResult): OCRResult {
+  return correctNamesFromMrz(result);
+}
+
+/**
+ * Aceeași corecție, pentru orice act cu MRZ (CI sau pașaport).
+ *
+ * ⚠️ Incidentul care a impus extinderea la pașapoarte (raportat de 3 ori de
+ * echipă — comenzile `E-260713-NYT6R`, `E-260718-ZZ4C5`, `E-260728-YFHH2`):
+ * MRZ-ul TD3 începe cu `P<ROU` (tip act + țară emitentă), iar modelul îl
+ * returna lipit de numele de familie, ca **„PEROU"**: POPA → „PEROUPOPA",
+ * ZAVATE → „PEROUZAVATE", MIHAI → „PEROU MIHAI". Mergea așa mai departe în
+ * contracte, împuterniciri și facturi.
+ */
+export function correctNamesFromMrz(result: OCRResult): OCRResult {
   const data = result.extractedData as ExtractedPersonalData & {
     mrz?: { line1?: string | null; line2?: string | null; line3?: string | null };
   };
@@ -1156,7 +1180,9 @@ Răspunde în acest format JSON:
 
     const response = await result.response;
     const text = response.text();
-    return applyMrzCnpFallback(parseGeminiOCRResponse(text, 'passport'));
+    // Corectia din MRZ ruleaza si aici: prefixul de tip act + tara ajungea
+    // lipit de numele de familie (PEROUPOPA) - vezi correctNamesFromMrz.
+    return correctNamesFromMrz(applyMrzCnpFallback(parseGeminiOCRResponse(text, 'passport')));
   } catch (error) {
     console.error('Passport OCR error:', error);
     return createErrorResult('passport', 'Eroare la procesarea documentului');
@@ -1384,6 +1410,28 @@ const NAME_FIELDS = [
   'spouseName',
 ] as const;
 
+/**
+ * Prefixe MRZ (tip act + țară emitentă) lipite de numele de familie.
+ *
+ * Modelul citește începutul liniei 1 din MRZ — `P<ROU` la pașaport, `IDROU` la
+ * cartea de identitate — și îl scrie ca parte din nume. La pașapoarte apare cel
+ * mai des ca **„PEROU"** (P + ROU, cu `<` pierdut), uneori urmat de spațiu:
+ * „PEROUPOPA", „PEROUZAVATE", „PEROU MIHAI". Corecția din MRZ rezolvă cazul când
+ * avem liniile MRZ; asta e plasa pentru când nu le avem sau nu se parsează.
+ *
+ * Deliberat restrâns la combinațiile tip-act+țară: un nume românesc real nu
+ * începe cu „PEROU"/„IDROU". Nu atingem „ROU…" singur — există nume ca „Roua".
+ */
+const MRZ_NAME_PREFIX = /^(?:P<?E?ROU|PROU|ID<?ROU|I<ROU)\s*/;
+
+/** Taie prefixul MRZ dintr-un nume de familie, dacă a rămas ceva după el. */
+export function stripMrzCountryPrefix(value: string): string {
+  const stripped = value.replace(MRZ_NAME_PREFIX, '').trim();
+  // Dacă tot numele ERA prefixul, îl lăsăm cum e — mai bine un nume ciudat
+  // decât un câmp gol, pe care operatorul nu-l mai poate corecta din context.
+  return stripped.length >= 2 ? stripped : value;
+}
+
 function sanitizeNameFields(
   data: ExtractedPersonalData | undefined,
 ): ExtractedPersonalData | undefined {
@@ -1392,7 +1440,11 @@ function sanitizeNameFields(
   for (const key of NAME_FIELDS) {
     const value = out[key];
     if (typeof value === 'string') {
-      const cleaned = cleanNamePart(value);
+      let cleaned = cleanNamePart(value);
+      // Prefixul tip-act+țară apare pe numele de familie (începutul liniei MRZ).
+      if (key === 'lastName' || key === 'previousName' || key === 'birthName') {
+        cleaned = stripMrzCountryPrefix(cleaned);
+      }
       if (cleaned !== value) out[key] = cleaned;
     }
   }

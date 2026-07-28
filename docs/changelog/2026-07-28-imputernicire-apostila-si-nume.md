@@ -52,6 +52,47 @@ Reparat în două locuri:
 Scanarea întregului istoric: **o singură comandă** avea chevroni în nume (aceasta).
 Datele ei au fost corectate în DB.
 
+## 2b. „PEROU" lipit de numele de familie — a treia raportare, acum reparat
+
+Aceeași comandă a scos la iveală un defect mai vechi, semnalat de colegi de **trei
+ori** fără să fie prins: la pașapoarte, numele de familie venea cu „PEROU" în față.
+
+| Comandă | Ce scria | Corect |
+|---|---|---|
+| `E-260713-NYT6R` | PEROU**ZAVATE** | ZAVATE |
+| `E-260716-ENUUE` | PEROU**CIOBANU** | CIOBANU |
+| `E-260718-ZZ4C5` | PEROU **MIHAI** | MIHAI |
+| `E-260723-BM9UT` | PEROU**DUCIUC** | DUCIUC |
+| `E-260728-YFHH2` | PEROU**POPA** | POPA |
+| `E-260728-RAJ26` | IDROU**COMAN** | COMAN (carte de identitate) |
+
+**Cauza:** linia 1 din MRZ-ul de pașaport (TD3) începe cu `P<ROU` — `P` = tipul
+actului, `ROU` = țara emitentă. Modelul îl citea ca parte din nume și, pierzând `<`,
+îl scria „PEROU". Exact același tipar exista deja la cărțile de identitate („IDROU"),
+unde fusese reparat în iunie — dar corecția rula **doar** pe `ci_front`, nu și pe
+pașapoarte. Ultimul rând din tabel arată că și varianta de CI mai scăpa când MRZ-ul
+nu se parsa.
+
+**Fix, pe trei niveluri:**
+1. `recoverNamesFromMrz()` taie acum și prefixul de pașaport (`P<ROU`, generic
+   `P<XXX` pentru orice țară emitentă), nu doar `IDROU`;
+2. corecția din MRZ rulează și pe pașapoarte (`extractFromPassportOpened` +
+   `extractFromPassport`), nu doar pe CI;
+3. plasă de siguranță când MRZ-ul lipsește sau nu se parsează: `stripMrzCountryPrefix()`
+   taie prefixul direct din numele de familie. Restrâns deliberat la combinațiile
+   tip-act+țară — „Roua", „Peruzzi", „Idriceanu" rămân neatinse (testate).
+
+Promptul de pașaport spune acum explicit că `P<ROU` nu face parte din nume, cu exemplu
+corect și greșit — aceeași abordare ca la CI.
+
+**Date corectate:** scanarea întregului istoric a găsit **6 comenzi** (nu 3, cât
+raportase echipa). Toate au fost corectate în DB, în `personal` și `billing`.
+
+⚠️ Patru dintre ele au deja documente generate pe numele greșit
+(`E-260713-NYT6R` — depusă la instituție, `E-260718-ZZ4C5` — finalizată,
+`E-260728-YFHH2`, `E-260728-RAJ26` — abandonată). Regenerarea din admin păstrează
+numărul de delegație, deci e sigură.
+
 ## 3. Ordinea numelui: familie întâi
 
 Documentele și listele scriau „Prenume Nume". Convenția românească în acte e invers:
