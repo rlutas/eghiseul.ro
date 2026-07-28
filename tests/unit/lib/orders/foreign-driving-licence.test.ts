@@ -40,7 +40,7 @@ describe('estimateFromSelectedOptions — baseRange', () => {
   // vechi o cară după el.
   it('urgența NU scurtează intervalul de bază', () => {
     const est = estimateFromSelectedOptions({
-      selectedOptions: [{ code: 'urgenta', option_name: 'Procesare Urgentă' }],
+      selectedOptions: [{ code: 'urgenta', optionName: 'Procesare Urgentă' }],
       baseDays: 5,
       baseRange: { minDays: 7, maxDays: 10 },
       orderDate,
@@ -51,7 +51,7 @@ describe('estimateFromSelectedOptions — baseRange', () => {
 
   it('fără baseRange, urgența funcționează ca înainte', () => {
     const est = estimateFromSelectedOptions({
-      selectedOptions: [{ code: 'urgenta', option_name: 'Procesare Urgentă' }],
+      selectedOptions: [{ code: 'urgenta', optionName: 'Procesare Urgentă' }],
       baseDays: 5,
       orderDate,
     });
@@ -60,7 +60,7 @@ describe('estimateFromSelectedOptions — baseRange', () => {
 
   it('add-on-urile se adaugă peste intervalul de bază', () => {
     const withAddon = estimateFromSelectedOptions({
-      selectedOptions: [{ code: 'traducere', option_name: 'Traducere Autorizată' }],
+      selectedOptions: [{ code: 'traducere', optionName: 'Traducere Autorizată' }],
       baseRange: { minDays: 7, maxDays: 10 },
       orderDate,
     });
