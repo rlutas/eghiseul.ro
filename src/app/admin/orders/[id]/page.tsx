@@ -894,7 +894,26 @@ export default function AdminOrderDetailPage() {
   })();
 
   const deliveryMethodParsed = parseDeliveryMethod(order.delivery_method);
-  const courierQuote = order.courier_quote as AnyObj | null;
+  // Lockerul: din cotația salvată, altfel din câmpurile noi de pe delivery_method,
+  // altfel din denumirea afișată („… EasyBox (easybox Kripton)"). Comenzile de
+  // dinainte de 28.07.2026 n-au nici cotație, nici id de locker — dar măcar
+  // numele lockerului trebuie să se vadă, altfel cardul de livrare arată doar
+  // metoda și prețul (raport Raul).
+  const courierQuote = (() => {
+    const saved = order.courier_quote as AnyObj | null;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const dm = deliveryMethodParsed as any;
+    const fromName = dm?.name?.match(/\(([^)]+)\)\s*$/)?.[1]?.trim();
+    const merged: AnyObj = {
+      ...(saved || {}),
+      ...(dm?.locker_id && !saved?.lockerId ? { lockerId: dm.locker_id } : {}),
+      ...((dm?.locker_name || fromName) && !saved?.lockerName
+        ? { lockerName: dm?.locker_name || fromName }
+        : {}),
+      ...(dm?.locker_address && !saved?.lockerAddress ? { lockerAddress: dm.locker_address } : {}),
+    };
+    return Object.keys(merged).length ? merged : null;
+  })();
   const isLockerDelivery = !!courierQuote?.lockerId || deliveryMethodParsed?.name?.toLowerCase().includes('box') || deliveryMethodParsed?.name?.toLowerCase().includes('locker');
   const hasAwb = !!order.delivery_tracking_number;
   const hasCourier = !!order.courier_provider || deliveryMethodParsed?.type === 'courier';
@@ -1838,7 +1857,13 @@ export default function AdminOrderDetailPage() {
                 )}
               </>
             )}
-            {order.delivery_address && !isLockerDelivery && (
+            {isLockerDelivery && !courierQuote?.lockerId && (
+              <p className="text-xs text-amber-600 dark:text-amber-500">
+                ⚠️ Lockerul ales nu are ID salvat — AWB-ul nu se poate genera automat.
+                Emite-l din contul curierului și adaugă-l manual.
+              </p>
+            )}
+            {order.delivery_address && (
               <>
                 <Separator className="my-2" />
                 <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Adresa livrare</p>

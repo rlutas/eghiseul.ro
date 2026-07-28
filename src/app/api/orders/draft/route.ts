@@ -12,8 +12,11 @@ interface DraftOrderData {
   customer_data?: Record<string, unknown>;
   selected_options?: unknown[];
   kyc_documents?: unknown;
-  delivery_method?: unknown;
+  /** Include `locker_id`/`locker_name` la livrarea în easybox/fanbox. */
+  delivery_method?: { provider?: string | null; service?: string | null; [k: string]: unknown } | null;
   delivery_address?: unknown;
+  /** Cotația curierului cu tot cu lockerul ales — necesară la generarea AWB. */
+  courier_quote?: unknown;
   signature?: string | null;
   base_price?: number;
   options_price?: number;
@@ -207,6 +210,11 @@ export async function POST(request: NextRequest) {
           kyc_documents: data.kyc_documents || {},
           delivery_method: data.delivery_method || null,
           delivery_address: data.delivery_address || null,
+          // Cotația curierului (inclusiv lockerul ales) — fără ea nu se poate
+          // genera AWB pentru easybox/fanbox. Vezi 2026-07-28-sameday-locker.
+          courier_quote: data.courier_quote ?? null,
+          courier_provider: data.delivery_method?.provider ?? null,
+          courier_service: data.delivery_method?.service ?? null,
           base_price: data.base_price || 0,
           options_price: data.options_price || 0,
           delivery_price: data.delivery_price || 0,
@@ -338,6 +346,11 @@ export async function POST(request: NextRequest) {
           kyc_documents: data.kyc_documents || {},
           delivery_method: data.delivery_method || null,
           delivery_address: data.delivery_address || null,
+          // Cotația curierului (inclusiv lockerul ales) — fără ea nu se poate
+          // genera AWB pentru easybox/fanbox. Vezi 2026-07-28-sameday-locker.
+          courier_quote: data.courier_quote ?? null,
+          courier_provider: data.delivery_method?.provider ?? null,
+          courier_service: data.delivery_method?.service ?? null,
           base_price: data.base_price || 0,
           options_price: data.options_price || 0,
           delivery_price: data.delivery_price || 0,
@@ -546,6 +559,15 @@ export async function PATCH(request: NextRequest) {
     }
     if (body.delivery_method !== undefined) {
       updateData.delivery_method = body.delivery_method;
+      // Provider/serviciu în coloane proprii — ruta de AWB le citește de acolo.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const dm = body.delivery_method as any;
+      if (dm?.provider) updateData.courier_provider = dm.provider;
+      if (dm?.service) updateData.courier_service = dm.service;
+    }
+    if (body.courier_quote !== undefined) {
+      // Include lockerul ales; fără el AWB-ul de easybox/fanbox nu se poate emite.
+      updateData.courier_quote = body.courier_quote;
     }
     if (body.delivery_address !== undefined) {
       updateData.delivery_address = body.delivery_address;

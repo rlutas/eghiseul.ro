@@ -189,7 +189,10 @@ describe('POST /api/admin/orders/[id]/generate-awb — courier provider derivati
     setupMocks({
       id: 'o1',
       delivery_tracking_number: null,
-      delivery_method: { type: 'home', name: 'Sameday EasyBox' },
+      // Livrare la adresă. NU folosi un nume de easybox aici: o comandă în
+      // locker fără id de locker e respinsă mai devreme (NO_LOCKER_ID), iar
+      // testul ăsta e despre derivarea curierului, nu despre lockere.
+      delivery_method: { type: 'home', name: 'Sameday Next Day' },
       delivery_address: { county: 'IL', city: 'Slobozia', street: 'X' },
       courier_provider: 'fancourier', // explicit
       customer_data: { contact: { name: 'X', phone: '0700' } },

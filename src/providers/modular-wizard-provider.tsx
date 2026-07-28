@@ -1577,7 +1577,18 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
             // on server resume — the display name alone is ambiguous.
             provider: state.delivery.courierProvider ?? null,
             service: state.delivery.courierService ?? null,
+            // Lockerul ales (easybox/fanbox). FĂRĂ el nu se poate genera AWB
+            // la livrarea în locker: Sameday cere `oohLastMile` = id-ul
+            // lockerului, iar din denumirea afișată nu se poate reconstitui.
+            // Toate cele 5 comenzi Sameday din iulie au rămas fără AWB din
+            // cauza asta (raport Raul, 28.07.2026).
+            locker_id: state.delivery.courierQuote?.lockerId ?? null,
+            locker_name: state.delivery.courierQuote?.lockerName ?? null,
+            locker_address: state.delivery.courierQuote?.lockerAddress ?? null,
           } : null,
+          // Cotația curierului, cu tot cu locker — sursa pentru generarea AWB
+          // din admin (`orders.courier_quote`).
+          courier_quote: state.delivery.courierQuote ?? null,
           delivery_address: state.delivery.address || null,
           // Don't send signature base64 in drafts - only at final submission
           signature: state.signature?.signatureBase64 ? 'pending' : null,

@@ -21,6 +21,7 @@ import {
   Address,
 } from '@/lib/services/courier';
 import { DEFAULT_DOCUMENT_PACKAGE, extractCourierProviderFromDeliveryMethod } from '@/lib/services/courier/utils';
+import { extractCourierQuote } from '@/lib/courier/quote-from-delivery';
 
 // eGhiseul.ro company address (sender)
 const EGHISEUL_SENDER: SenderAddress = {
@@ -149,7 +150,31 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       serviceName?: string;
     } | null;
 
+    // Livrare în locker = fie avem id-ul, fie denumirea trădează un easybox/fanbox.
+    // „box" simplu ar prinde fals și denumiri de servicii obișnuite — cerem
+    // easybox/fanbox/locker explicit, sau un serviciu de tip locker.
+    const looksLikeLocker =
+      /easybox|fanbox|locker/i.test(deliveryMethod?.name || '') ||
+      /locker|fanbox/i.test(courierQuote?.service || '');
     const isLockerDelivery = !!courierQuote?.lockerId;
+
+    // Comandă în locker fără id-ul lockerului: curierul nu poate emite AWB-ul
+    // (Sameday cere `oohLastMile`). Se întâmpla la TOATE comenzile de dinainte
+    // de 28.07.2026, fiindcă lockerul ales nu se salva nicăieri.
+    if (!isLockerDelivery && looksLikeLocker) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: {
+            code: 'NO_LOCKER_ID',
+            message: courierQuote?.lockerName
+              ? `Comanda are livrare în locker („${courierQuote.lockerName}") dar nu are ID-ul lockerului salvat, deci AWB-ul nu poate fi emis automat. Generează AWB-ul din contul curierului și adaugă-l manual, sau schimbă livrarea pe adresă.`
+              : 'Comanda are livrare în locker, dar lockerul ales nu a fost salvat. Generează AWB-ul din contul curierului și adaugă-l manual, sau schimbă livrarea pe adresă.',
+          },
+        },
+        { status: 400 }
+      );
+    }
 
     if (!isLockerDelivery && (!deliveryAddress || !deliveryAddress.county || !deliveryAddress.city)) {
       return NextResponse.json(
@@ -358,22 +383,3 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
   }
 }
 
-/**
- * Extract courier quote from delivery_method JSON.
- * When courier_quote column is not set, try to reconstruct from delivery_method.
- */
-function extractCourierQuote(
-  deliveryMethod: { type?: string; name?: string } | null
-): { service?: string; lockerId?: string } | null {
-  if (!deliveryMethod) return null;
-
-  const name = (deliveryMethod.name || '').toLowerCase();
-
-  // Try to determine service from name
-  if (name.includes('fanbox')) return { service: 'FANbox' };
-  if (name.includes('easybox')) return { service: 'LOCKER_NEXTDAY' };
-  if (name.includes('standard 24h')) return { service: 'STANDARD_24H' };
-  if (name.includes('standard')) return { service: 'Standard' };
-
-  return null;
-}
