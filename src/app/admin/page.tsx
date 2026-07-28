@@ -31,6 +31,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { formatPersonName, cleanNamePart } from '@/lib/format/person-name';
 
 
 // ──────────────────────────────────────────────────────────────
@@ -145,10 +146,13 @@ function formatRON(amount: number): string {
 function getCustomerName(order: RecentOrder): string {
   const contact = order.customer_data?.contact;
   const personalData = order.customer_data?.personalData;
-  if (contact?.name) return contact.name;
-  const firstName = contact?.firstName || personalData?.firstName || '';
-  const lastName = contact?.lastName || personalData?.lastName || '';
-  if (firstName || lastName) return `${firstName} ${lastName}`.trim();
+  if (contact?.name) return cleanNamePart(contact.name);
+  // Ordinea românească: familie întâi (vezi src/lib/format/person-name.ts).
+  const name = formatPersonName(
+    contact?.lastName || personalData?.lastName,
+    contact?.firstName || personalData?.firstName,
+  );
+  if (name) return name;
   return 'N/A';
 }
 

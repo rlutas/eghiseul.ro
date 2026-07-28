@@ -3,6 +3,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { generateDocument, type DocumentContext, type ClientData, type CompanyData, type LawyerData } from '@/lib/documents/generator';
 import { downloadFile } from '@/lib/aws/s3';
 import mammoth from 'mammoth';
+import { formatPersonName } from '@/lib/format/person-name';
 
 // Cache the company/lawyer signature PNGs (base64) — they almost never change,
 // so re-downloading them from S3 on every contract preview is wasteful and a
@@ -132,7 +133,7 @@ export async function POST(request: NextRequest) {
     const companyAddress = typeof company.address === 'object' ? company.address : undefined;
 
     const clientData: ClientData = {
-      name: `${personal.firstName || ''} ${personal.lastName || ''}`.trim() || company.companyName || 'N/A',
+      name: formatPersonName(personal.lastName, personal.firstName) || company.companyName || 'N/A',
       firstName: personal.firstName || '',
       lastName: personal.lastName || '',
       cnp: personal.cnp || '',

@@ -82,6 +82,7 @@ import {
   Plus,
   Trash2,
 } from 'lucide-react';
+import { formatPersonName, cleanNamePart } from '@/lib/format/person-name';
 import {
   SUPPLIER_CATEGORIES,
   SUPPLIER_CATEGORY_LABELS,
@@ -341,10 +342,13 @@ function getCustomerDisplayName(contact: AnyObj | null, personal: AnyObj | null,
   if (contact?.name) return contact.name;
   // Billing name as final fallback — services without a personal-KYC step
   // (e.g. identificare imobil) only collect the customer's name at billing.
-  const firstName = contact?.firstName || personal?.firstName || billing?.firstName || '';
-  const lastName = contact?.lastName || personal?.lastName || billing?.lastName || '';
-  if (firstName || lastName) return `${firstName} ${lastName}`.trim();
-  if (billing?.name) return String(billing.name);
+  // Ordinea românească: familie întâi (vezi src/lib/format/person-name.ts).
+  const name = formatPersonName(
+    contact?.lastName || personal?.lastName || billing?.lastName,
+    contact?.firstName || personal?.firstName || billing?.firstName,
+  );
+  if (name) return name;
+  if (billing?.name) return cleanNamePart(String(billing.name));
   return 'N/A';
 }
 
@@ -1870,7 +1874,7 @@ export default function AdminOrderDetailPage() {
                     const recipientName =
                       order.delivery_address.recipientName ||
                       order.delivery_address.name ||
-                      [personal?.firstName, personal?.lastName].filter(Boolean).join(' ') ||
+                      formatPersonName(personal?.lastName, personal?.firstName) ||
                       null;
                     const recipientPhone =
                       order.delivery_address.recipientPhone ||

@@ -29,6 +29,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { requirePermission } from '@/lib/admin/permissions';
 import { parseTestFilter, resolveStatusFilter } from '@/lib/admin/orders-tabs';
+import { formatPersonName } from '@/lib/format/person-name';
 
 const MAX_EXPORT_ROWS = 10_000;
 
@@ -157,9 +158,9 @@ export async function GET(request: NextRequest) {
       const isPJ = billing.type === 'company' || !!company.companyName;
       const clientName = isPJ
         ? company.companyName
-        : (personal.firstName || personal.lastName)
-          ? `${personal.lastName ?? ''} ${personal.firstName ?? ''}`.trim()
-          : contact.name || `${contact.lastName ?? ''} ${contact.firstName ?? ''}`.trim();
+        // Familie întâi + curățat de separatori MRZ (src/lib/format/person-name.ts).
+        : formatPersonName(personal.lastName, personal.firstName) ||
+          formatPersonName(contact.lastName, contact.firstName, contact.name);
       const idType =
         personal.idDocumentType === 'ci_vechi' ? 'CI vechi' :
         personal.idDocumentType === 'ci_nou' ? 'CI nou eCI' :

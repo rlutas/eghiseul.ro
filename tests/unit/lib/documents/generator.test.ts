@@ -79,7 +79,8 @@ describe('buildClientDetailsBlock — PF (persoană fizică)', () => {
       firstName: 'ION',
       lastName: 'POPESCU',
     });
-    expect(text).toContain('ION POPESCU');
+    // Ordinea românească: familie întâi (28.07.2026 — src/lib/format/person-name.ts).
+    expect(text).toContain('POPESCU ION');
   });
 
   it('omits CI block entirely when both series and number missing', () => {
@@ -128,7 +129,7 @@ describe('buildClientDetailsBlock — PJ (persoană juridică)', () => {
 
   it('appends representative with full CI + CNP (legal requirement for PJ)', () => {
     const text = buildClientDetailsBlock(basePJ);
-    expect(text).toContain('reprezentată prin ION POPESCU');
+    expect(text).toContain('reprezentată prin POPESCU ION');
     expect(text).toContain('legitimat/ă cu CI seria IF nr. 999999');
     expect(text).toContain('CNP 1820507211209');
   });
@@ -294,9 +295,19 @@ describe('buildInstitutie', () => {
       );
     });
 
-    it('apostila Haga → prefectură, „în vederea aplicării"', () => {
+    // Apostila se aplică PE un document, deci împuternicirea trebuie să spună pe
+    // care — chiar și când e apostilă pe serviciul principal, nu pe un add-on
+    // (raport Raul, comanda E-260728-YFHH2, 28.07.2026: textul se oprea la
+    // „aplicării Apostilei de la Haga.", fără obiect).
+    it('apostila Haga pe serviciul principal → spune pe CE document se aplică', () => {
       expect(buildInstitutie('cazier-judiciar', undefined, 'apostila_haga')).toBe(
-        'să se prezinte la INSTITUȚIA PREFECTULUI - JUDEȚUL SATU MARE, în vederea aplicării Apostilei de la Haga.'
+        'să se prezinte la INSTITUȚIA PREFECTULUI - JUDEȚUL SATU MARE, în vederea aplicării Apostilei de la Haga pe Cazier Judiciar.'
+      );
+    });
+
+    it('apostila Haga pe certificat de naștere → documentul corect în text', () => {
+      expect(buildInstitutie('certificat-nastere', undefined, 'apostila_haga')).toBe(
+        'să se prezinte la INSTITUȚIA PREFECTULUI - JUDEȚUL SATU MARE, în vederea aplicării Apostilei de la Haga pe Certificat de Naștere.'
       );
     });
 

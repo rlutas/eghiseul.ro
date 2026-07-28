@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { requirePermission, getCollaboratorServices } from '@/lib/admin/permissions';
+import { formatPersonName } from '@/lib/format/person-name';
 
 /**
  * Orders handled by a collaborator (across all their assigned services), with a
@@ -87,7 +88,7 @@ export async function GET(request: NextRequest) {
         id: o.id,
         friendlyOrderId: o.friendly_order_id || o.id.slice(0, 8),
         service: o.services?.name || '—',
-        client: [c.firstName, c.lastName].filter(Boolean).join(' ') || c.email || '—',
+        client: formatPersonName(c.lastName, c.firstName) || c.email || '—',
         email: c.email || '',
         status: o.status,
         total: Number(o.total_price) || 0,

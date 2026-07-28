@@ -23,6 +23,7 @@ import {
 import { isNoLawyerService } from '@/lib/documents/no-lawyer-services';
 import { isForeignBillingCountry } from '@/lib/orders/billing-validation';
 import { allocateNumber, getRegistryClient, formatRegistryNumber } from '@/lib/registry/client';
+import { formatPersonName, cleanNamePart } from '@/lib/format/person-name';
 
 /**
  * Format an AddressState object (or string) into a human-readable Romanian address.
@@ -141,9 +142,14 @@ export async function autoGenerateOrderDocuments(
   const clientData: ClientData = {
     name: isPJ
       ? (company.companyName || billing.companyName || 'N/A')
-      : (`${personal.firstName || billing.firstName || ''} ${personal.lastName || billing.lastName || ''}`.trim() || 'N/A'),
-    firstName: personal.firstName || billing.firstName || '',
-    lastName: personal.lastName || billing.lastName || '',
+      // Ordinea românească (familie întâi) + curățare separatori MRZ — vezi
+      // src/lib/format/person-name.ts și incidentul E-260728-YFHH2.
+      : (formatPersonName(
+          personal.lastName || billing.lastName,
+          personal.firstName || billing.firstName
+        ) || 'N/A'),
+    firstName: cleanNamePart(personal.firstName || billing.firstName),
+    lastName: cleanNamePart(personal.lastName || billing.lastName),
     cnp: personal.cnp || billing.cnp || '',
     cui: company.cui || billing.cui || '',
     email: contact.email || '',

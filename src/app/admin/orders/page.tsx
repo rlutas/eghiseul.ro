@@ -45,6 +45,7 @@ import {
   PROVIDER_LABEL,
   type OpenOutages,
 } from '@/lib/services/platform-services';
+import { formatPersonName, cleanNamePart } from '@/lib/format/person-name';
 
 const STATUS_CONFIG: Record<
   string,
@@ -925,11 +926,14 @@ function getCustomerName(order: OrderRow): string {
   // factura pe INTERTEK). Firma e clientul DOAR când serviciul e pe firmă
   // (există company KYC).
   if (company?.companyName) return company.companyName;
-  if (contact?.name) return contact.name;
+  if (contact?.name) return cleanNamePart(contact.name);
   const b = billing as { firstName?: string; lastName?: string; name?: string; companyName?: string } | undefined;
-  const firstName = contact?.firstName || personal?.firstName || b?.firstName || '';
-  const lastName = contact?.lastName || personal?.lastName || b?.lastName || '';
-  if (firstName || lastName) return `${firstName} ${lastName}`.trim();
+  // Ordinea românească: familie întâi (vezi src/lib/format/person-name.ts).
+  const name = formatPersonName(
+    contact?.lastName || personal?.lastName || b?.lastName,
+    contact?.firstName || personal?.firstName || b?.firstName,
+  );
+  if (name) return name;
   // Fallback final — servicii fără pas personal (ex. constatator pe firmă,
   // identificare imobil): numele există doar la facturare.
   if (billing?.type === 'persoana_juridica' && billing?.companyName) return billing.companyName;

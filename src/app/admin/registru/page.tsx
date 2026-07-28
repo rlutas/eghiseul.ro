@@ -34,6 +34,7 @@ import {
 import { toast } from 'sonner';
 import { useAdminPermissions } from '@/hooks/use-admin-permissions';
 import type { NumberRangeWithStats, NumberRegistryEntry } from '@/types/number-registry';
+import { formatPersonName, cleanNamePart } from '@/lib/format/person-name';
 
 // ──────────────────────────────────────────────────────────────
 // Order search (manual allocation dialog)
@@ -58,8 +59,10 @@ function mapOrderSearchRow(o: any): OrderSearchRow {
   const personal = cd.personal || cd.personalData || {};
   const billing = cd.billing || {};
   const name =
-    `${contact.firstName || personal.firstName || ''} ${contact.lastName || personal.lastName || ''}`.trim() ||
-    billing.companyName || '';
+    formatPersonName(
+      contact.lastName || personal.lastName,
+      contact.firstName || personal.firstName,
+    ) || billing.companyName || '';
   return {
     orderNumber: o.order_number,
     friendlyId: o.friendly_order_id || null,

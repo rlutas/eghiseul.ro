@@ -4,6 +4,7 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 import { insertSignatureImages, type SignatureEntry } from './signature-inserter';
 import { validateCNP, getCountyFromCNP } from '@/lib/validations/cnp';
+import { formatPersonName } from '@/lib/format/person-name';
 
 // ──────────────────────────────────────────────────────────────
 // Types
@@ -264,7 +265,7 @@ export function buildClientDetailsBlock(client: ClientData): string {
     if (client.company_reg) parts.push(`Nr. Reg. Com.: ${client.company_reg}`);
     if (client.company_address) parts.push(`cu sediul în ${client.company_address}`);
     // Representative with CI details
-    const repName = `${client.firstName || ''} ${client.lastName || ''}`.trim();
+    const repName = formatPersonName(client.lastName, client.firstName);
     if (repName) {
       let repText = `reprezentată prin ${repName}`;
       if (client.ci_series && client.ci_number) {
@@ -276,7 +277,7 @@ export function buildClientDetailsBlock(client: ClientData): string {
     }
   } else {
     // PF format: proper legal identification
-    parts.push(client.name || `${client.firstName || ''} ${client.lastName || ''}`.trim());
+    parts.push(formatPersonName(client.lastName, client.firstName, client.name));
 
     // CI details
     if (client.ci_series && client.ci_number) {
@@ -437,7 +438,7 @@ const INSTITUTIE_MAP: Record<
  */
 const DELEGATION_INSTITUTIE_MAP: Record<
   string,
-  { authority: string; document: string; action?: string }
+  { authority: string; document: string; action?: string; appliesToDocument?: boolean }
 > = {
   addon_certificat_integritate: INSTITUTIE_MAP['certificat-integritate'],
   addon_certificat_nastere: INSTITUTIE_MAP['certificat-nastere'],
@@ -449,6 +450,11 @@ const DELEGATION_INSTITUTIE_MAP: Record<
     authority: 'INSTITUȚIA PREFECTULUI - JUDEȚUL SATU MARE',
     document: 'Apostilei de la Haga',
     action: 'aplicării',
+    // Apostila se aplică PE alt document, deci împuternicirea trebuie să spună
+    // pe care: „...aplicării Apostilei de la Haga pe Cazier Judiciar". Fără
+    // asta, textul era „...aplicării Apostilei de la Haga." — fără obiect
+    // (raport Raul, comanda E-260728-YFHH2, 28.07.2026).
+    appliesToDocument: true,
   },
 };
 
@@ -649,10 +655,15 @@ export function buildInstitutie(
     const bundledSlug = bundled ? bundled[2] : '';
     const entry = DELEGATION_INSTITUTIE_MAP[code] || INSTITUTIE_MAP[code];
     if (entry) {
-      const onDoc =
-        bundledSlug && INSTITUTIE_MAP[bundledSlug]
-          ? ` pe ${INSTITUTIE_MAP[bundledSlug].document}`
-          : '';
+      // Pentru operațiunile care se aplică PE un document (apostilă), spune pe
+      // care: add-on-ul bundled dă slug-ul explicit, altfel e documentul
+      // serviciului principal al comenzii.
+      const targetSlug =
+        bundledSlug && INSTITUTIE_MAP[bundledSlug] ? bundledSlug : serviceSlug || '';
+      const target = INSTITUTIE_MAP[targetSlug];
+      const wantsTarget =
+        ('appliesToDocument' in entry && entry.appliesToDocument) || Boolean(bundledSlug);
+      const onDoc = wantsTarget && target ? ` pe ${target.document}` : '';
       return `să se prezinte la ${entry.authority}, în vederea ${entry.action || 'ridicării'} ${entry.document}${onDoc}.${motivPart}`;
     }
   }

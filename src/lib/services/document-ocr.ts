@@ -17,6 +17,7 @@
 
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { validateCNP } from '@/lib/validations/cnp';
+import { cleanNamePart } from '@/lib/format/person-name';
 
 // Initialize Gemini AI with the 2.5 Flash Lite model for OCR
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY || '');
@@ -1354,12 +1355,48 @@ export function parseGeminiOCRResponse(
     documentType,
     confidence: parsed.confidence ?? 0,
     extractedData: {
-      ...(parsed.extractedData as ExtractedPersonalData | undefined),
+      ...sanitizeNameFields(parsed.extractedData as ExtractedPersonalData | undefined),
       documentType,
     },
     issues: parsed.issues ?? [],
     suggestions: parsed.suggestions ?? [],
   };
+}
+
+/**
+ * Câmpurile de nume, curățate de separatorii MRZ.
+ *
+ * Zona citibilă automat folosește `<` ca separator între prenume și ca
+ * umplutură. Gemini îl întoarce uneori ca atare — pe comanda `E-260728-YFHH2`
+ * (pașaport) prenumele a intrat în baza de date ca „ADRIAN<MIHAIL" și a ajuns
+ * exact așa pe împuternicirea avocațială. Curățăm la intrare, o singură dată,
+ * ca să nu depindem de fiecare loc care afișează numele.
+ *
+ * `mrz` rămâne neatins — acolo `<` e informație, nu gunoi.
+ */
+const NAME_FIELDS = [
+  'firstName',
+  'lastName',
+  'previousName',
+  'fatherName',
+  'motherName',
+  'birthName',
+  'spouseName',
+] as const;
+
+function sanitizeNameFields(
+  data: ExtractedPersonalData | undefined,
+): ExtractedPersonalData | undefined {
+  if (!data) return data;
+  const out = { ...data } as Record<string, unknown>;
+  for (const key of NAME_FIELDS) {
+    const value = out[key];
+    if (typeof value === 'string') {
+      const cleaned = cleanNamePart(value);
+      if (cleaned !== value) out[key] = cleaned;
+    }
+  }
+  return out as unknown as ExtractedPersonalData;
 }
 
 /**

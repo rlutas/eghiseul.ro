@@ -10,6 +10,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { requirePermission } from '@/lib/admin/permissions';
+import { formatPersonName } from '@/lib/format/person-name';
 
 export async function GET(request: NextRequest) {
   const supabase = await createClient();
@@ -60,8 +61,8 @@ export async function GET(request: NextRequest) {
     for (const o of orders ?? []) {
       const cd = o.customer_data ?? {};
       const client =
-        [cd.personal?.firstName, cd.personal?.lastName].filter(Boolean).join(' ') ||
-        [cd.billing?.firstName, cd.billing?.lastName].filter(Boolean).join(' ') ||
+        formatPersonName(cd.personal?.lastName, cd.personal?.firstName) ||
+        formatPersonName(cd.billing?.lastName, cd.billing?.firstName) ||
         cd.billing?.companyName ||
         cd.contact?.email ||
         '';

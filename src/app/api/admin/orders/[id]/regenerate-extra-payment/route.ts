@@ -22,6 +22,7 @@ import {
   buildExtraPaymentHtml,
   buildExtraPaymentText,
 } from '@/lib/email/templates/extra-payment';
+import { formatPersonName } from '@/lib/format/person-name';
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -91,7 +92,7 @@ export async function POST(_request: NextRequest, { params }: RouteParams) {
     personal?: { firstName?: string; lastName?: string };
   };
   const orderNum = (anyOrder.friendly_order_id ?? anyOrder.order_number ?? '') as string;
-  const clientName = [cd.personal?.firstName, cd.personal?.lastName].filter(Boolean).join(' ');
+  const clientName = formatPersonName(cd.personal?.lastName, cd.personal?.firstName);
   const description = `Servicii suplimentare comanda ${orderNum}`;
 
   let session;

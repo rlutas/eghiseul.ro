@@ -7,6 +7,7 @@ import { uploadFile, generateDocumentKey, downloadFile, deleteFile, getClientSig
 import { allocateNumber, findExistingNumber, getRegistryClient } from '@/lib/registry/client';
 import { isPJForDocumentGeneration } from '@/lib/documents/delegation-items';
 import { computeCerereItems } from '@/lib/documents/cerere-items';
+import { formatPersonName } from '@/lib/format/person-name';
 
 /**
  * Format an AddressState object (or string) into a human-readable Romanian address.
@@ -149,7 +150,7 @@ export async function POST(
     const clientData: ClientData = {
       name: isPJ
         ? (company.companyName || billing.companyName || 'N/A')
-        : (`${personal.firstName || ''} ${personal.lastName || ''}`.trim() || 'N/A'),
+        : (formatPersonName(personal.lastName, personal.firstName) || 'N/A'),
       firstName: personal.firstName || '',
       lastName: personal.lastName || '',
       cnp: personal.cnp || '',
