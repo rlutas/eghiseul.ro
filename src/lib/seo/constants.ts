@@ -86,6 +86,10 @@ export const DB_SLUGS_WITH_HARDCODED_PAGE = [
   // să dubleze conținutul.
   'extras-multilingv-certificat-nastere',
   'extras-multilingv-certificat-casatorie',
+  // Rovinietă: pagina reală e /servicii/rovinieta-online/. Fără slug-ul ăsta
+  // aici, /servicii/[slug] servea un duplicat live (200, în sitemap, titlu
+  // „Rovinieta Online Online") — audit 28.07.2026.
+  'rovinieta',
 ] as const;
 
 /**
@@ -107,6 +111,7 @@ const SERVICE_URL_OVERRIDES: Record<string, string> = {
   'certificat-celibat': '/servicii/eliberare-certificat-de-celibat/',
   'certificat-constatator': '/servicii/certificat-constatator-online/',
   'certificat-integritate': '/servicii/certificat-de-integritate-comportamentala/',
+  'rovinieta': '/servicii/rovinieta-online/',
 };
 
 /** Canonical on-site URL for a service, given its DB slug. */
@@ -250,4 +255,30 @@ export const ORGANIZATION = {
   sameAs: [
     'https://share.google/stngA2rQbVPY2l57p', // Google Business Profile (recenzii)
   ],
+} as const;
+
+/**
+ * Dovada socială — recenziile REALE din Google Business Profile.
+ *
+ * Sursă unică, fiindcă înainte cifra era scrisă de mână în 6 componente + 28 de
+ * pagini de servicii și ajunsese să difere („450" într-un loc, „400+" în altul —
+ * audit 28.07.2026). Orice text sau schema care afișează numărul de recenzii
+ * citește de AICI.
+ *
+ * ⚠️ Actualizare: cere numărul curent din profilul Google și schimbă DOAR aici.
+ * Ultima verificare: 28.07.2026 (Raul, din profil).
+ */
+export const SOCIAL_PROOF = {
+  ratingValue: 4.9,
+  reviewCount: 457,
+  /** Formă „peste 450" — rotunjit în jos la zeci, ca să rămână adevărat între actualizări. */
+  get roundedDown(): number {
+    return Math.floor(this.reviewCount / 10) * 10;
+  },
+} as const;
+
+/** Nodul `aggregateRating` pentru schema paginilor de servicii. */
+export const SERVICE_AGGREGATE_RATING = {
+  ratingValue: SOCIAL_PROOF.ratingValue,
+  reviewCount: SOCIAL_PROOF.reviewCount,
 } as const;

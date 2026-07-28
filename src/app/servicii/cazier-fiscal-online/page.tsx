@@ -31,7 +31,7 @@ import { GoogleReviewsBadge } from '@/components/services/google-reviews-badge';
 import { OrderButton } from '@/components/services/order-button';
 import { ServiceFAQ } from '@/components/services/service-faq';
 import { ReviewsSection } from '@/components/services/reviews-section';
-import { buildPageMetadata, buildServicePageGraph, BASE_URL } from '@/lib/seo';
+import { buildPageMetadata, buildServicePageGraph, BASE_URL, SERVICE_AGGREGATE_RATING } from '@/lib/seo';
 import { ServicePrice } from '@/components/services/service-price';
 
 // Database slug (order pipeline identifier). URL path uses the WP slug
@@ -100,7 +100,7 @@ const jsonLdGraph = buildServicePageGraph({
   offers: [
     { name: 'Cazier Fiscal Persoană Fizică (Standard)', price: 198, url: `${BASE_URL}${PAGE_PATH}` },
   ],
-  aggregateRating: { ratingValue: 4.9, reviewCount: 450 },
+  aggregateRating: SERVICE_AGGREGATE_RATING,
 });
 
 export default async function CazierFiscalOnlinePage() {
@@ -166,7 +166,7 @@ export default async function CazierFiscalOnlinePage() {
                 </div>
 
                 <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-tight mb-5">
-                  Cazier Fiscal Online
+                  Cazier Fiscal Online{' '}
                   <span className="block text-primary-500">Persoană Fizică</span>
                 </h1>
 

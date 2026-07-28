@@ -28,7 +28,7 @@ import { ServiceFAQ } from '@/components/services/service-faq';
 import { ReviewsSection } from '@/components/services/reviews-section';
 import { ServiceOptionsSection } from '@/components/services/service-options-section';
 import { ServicePrice } from '@/components/services/service-price';
-import { buildPageMetadata, buildServicePageGraph, BASE_URL } from '@/lib/seo';
+import { buildPageMetadata, buildServicePageGraph, BASE_URL, SERVICE_AGGREGATE_RATING } from '@/lib/seo';
 
 // Slug DB = segmentul URL (7 pagini interne + footer-ul leagă deja aici).
 const SERVICE_SLUG = 'certificat-urbanism-informare';
@@ -74,7 +74,7 @@ const buildJsonLd = (basePrice: number) =>
         url: `${BASE_URL}${PAGE_PATH}`,
       },
     ],
-    aggregateRating: { ratingValue: 4.9, reviewCount: 450 },
+    aggregateRating: SERVICE_AGGREGATE_RATING,
   });
 
 async function getService(): Promise<{ service: Service; options: ServiceOption[] } | null> {
@@ -262,7 +262,7 @@ export default async function CertificatUrbanismPage() {
                   </Badge>
                 </div>
                 <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-tight mb-5">
-                  Certificat de Urbanism
+                  Certificat de Urbanism{' '}
                   <span className="block text-primary-500">Online</span>
                 </h1>
                 <p className="text-lg sm:text-xl text-white/85 mb-6">

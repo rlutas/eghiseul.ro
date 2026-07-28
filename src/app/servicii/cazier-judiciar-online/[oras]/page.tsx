@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { buildPageMetadata } from '@/lib/seo';
-import { getCity, allCitySlugs, CITIES } from '@/lib/seo/locations';
+import { getCity, allCitySlugs, CITIES, isCityIndexable } from '@/lib/seo/locations';
 import { CazierLocationPage } from '@/components/services/cazier-location-page';
 
 export const revalidate = 86400;
@@ -23,6 +23,11 @@ export async function generateMetadata({
     description: `Obține cazierul judiciar în ${city.name} online, fără cozi la IPJ ${city.judet}. Depunem cererea în numele tău, livrare în 3-5 zile pe email sau curier. Comandă în 5 minute.`,
     path: `/servicii/cazier-judiciar-online/${city.slug}/`,
     ogImage: '/og/services/cazier-judiciar.png',
+    // Doar orașele care chiar sunt indexate (și aduc afișări) rămân
+    // indexabile; restul primesc `noindex, follow` — Google le-a refuzat deja
+    // ca fiind cvasi-duplicate, iar în index n-ar face decât să dilueze
+    // calitatea domeniului. Lista + dovezile: lib/seo/locations/index.ts.
+    noindexFollow: !isCityIndexable(city.slug),
   });
 }
 

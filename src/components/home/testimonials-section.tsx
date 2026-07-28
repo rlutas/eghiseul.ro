@@ -1,10 +1,11 @@
 import { Star, MessageSquare, Users, PenLine, ArrowUpRight } from 'lucide-react';
 import { REVIEWS } from '@/config/reviews';
 import { GOOGLE_REVIEWS_URL, GOOGLE_REVIEW_WRITE_URL, GOOGLE_RATING } from '@/config/contact';
+import { SOCIAL_PROOF } from '@/lib/seo';
 
 const STATS = [
   { icon: Star, value: `${GOOGLE_RATING}/5`, label: 'Rating mediu' },
-  { icon: MessageSquare, value: '400+', label: 'Recenzii Google' },
+  { icon: MessageSquare, value: String(SOCIAL_PROOF.reviewCount), label: 'Recenzii Google' },
   { icon: Users, value: '150k+', label: 'Clienți mulțumiți' },
 ];
 

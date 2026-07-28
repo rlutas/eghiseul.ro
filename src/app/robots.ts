@@ -47,6 +47,9 @@ export default function robots(): MetadataRoute.Robots {
       { userAgent: 'Applebot-Extended', allow: '/', disallow: DISALLOW_PATHS },
     ],
     sitemap: `${BASE_URL}/sitemap.xml`,
-    host: BASE_URL,
+    // `host` era emis ca `Host: https://eghiseul.ro` — sintaxă greșită pentru o
+    // directivă oricum depreciată (era Yandex-only și cerea doar domeniul, fără
+    // schemă). Google o ignoră; o scoatem ca să nu rămână balast într-un fișier
+    // pe care îl citesc și crawlerele AI. Audit 28.07.2026.
   };
 }

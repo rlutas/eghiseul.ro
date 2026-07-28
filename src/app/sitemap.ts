@@ -23,7 +23,8 @@ import {
   HARDCODED_TOOL_SLUGS,
   HARDCODED_ARTICLE_SLUGS,
 } from '@/lib/seo/constants';
-import { allCitySlugs } from '@/lib/seo/locations';
+import { pageLastModified } from '@/lib/seo/last-modified';
+import { allCitySlugs, isCityIndexable } from '@/lib/seo/locations';
 import { allOcpiSlugs } from '@/lib/seo/locations/ocpi';
 
 type SitemapEntry = MetadataRoute.Sitemap[number];
@@ -86,6 +87,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   for (const slug of HARDCODED_ARTICLE_SLUGS) {
     entries.push({
       url: `${BASE_URL}/${slug}/`,
+      // Data reală de modificare a articolului (registru sincronizat cu
+      // `DATE_MODIFIED` din pagină — vezi lib/seo/last-modified.ts). Fără ea,
+      // Google n-avea niciun semnal de prospețime pe conținutul pe care chiar
+      // îl actualizăm (audit 28.07.2026).
+      lastModified: pageLastModified(slug),
       changeFrequency: 'monthly',
       priority: 0.7,
     });
@@ -93,7 +99,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // 4b. Location pages (cazier judiciar pe oraș) — segmentate ca să poți
   // diagnostica indexarea per-tip în GSC. Vezi src/lib/seo/locations.
-  for (const oras of allCitySlugs()) {
+  // Doar orașele indexabile — restul sunt `noindex, follow` (Google le-a refuzat
+  // ca doorway pages), iar un sitemap care insistă pe URL-uri noindex e semnal
+  // contradictoriu. Vezi INDEXABLE_CITY_SLUGS pentru date și criteriu de promovare.
+  for (const oras of allCitySlugs().filter(isCityIndexable)) {
     entries.push({
       url: `${BASE_URL}/servicii/cazier-judiciar-online/${oras}/`,
       changeFrequency: 'monthly',

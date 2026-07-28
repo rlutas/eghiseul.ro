@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { serviceUrl } from '@/lib/seo';
+import { serviceUrl, SOCIAL_PROOF } from '@/lib/seo';
 import { GOOGLE_REVIEWS_URL } from '@/config/contact';
 import { Clock, Monitor, Users, ArrowRight } from 'lucide-react';
 
@@ -51,7 +51,7 @@ export function HeroSection() {
                 href={GOOGLE_REVIEWS_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="Vezi recenziile pe Google (4,9 din peste 450)"
+                aria-label={`Vezi recenziile pe Google (4,9 din ${SOCIAL_PROOF.reviewCount})`}
                 className="inline-flex items-center gap-2 sm:gap-3 bg-white rounded-full px-4 sm:px-6 py-2.5 sm:py-3 shadow-lg hover:shadow-xl transition-shadow"
               >
                 <div className="flex items-center gap-1.5 sm:gap-2">
@@ -89,7 +89,7 @@ export function HeroSection() {
                   ))}
                 </div>
                 <span className="text-xs sm:text-sm font-bold text-secondary-900">4.9</span>
-                <span className="text-[10px] sm:text-xs text-neutral-500">• 450+ recenzii</span>
+                <span className="text-[10px] sm:text-xs text-neutral-500">• {SOCIAL_PROOF.reviewCount} recenzii</span>
               </a>
             </div>
           </div>

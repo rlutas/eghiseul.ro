@@ -107,8 +107,7 @@ export default function ContactPage() {
               <div className="rounded-2xl border border-neutral-200 bg-neutral-50 p-6">
                 <div className="flex items-center gap-2 mb-3"><Clock className="w-5 h-5 text-primary-600" aria-hidden="true" /><h2 className="text-lg font-bold text-secondary-900">Program de lucru</h2></div>
                 <ul className="text-sm text-neutral-700 space-y-1">
-                  <li>Luni – Joi: 08:00 – 16:00</li>
-                  <li>Vineri: 08:00 – 15:00</li>
+                  <li>Luni – Vineri: 08:00 – 16:00</li>
                   <li>Sâmbătă, Duminică: închis</li>
                 </ul>
                 <p className="text-xs text-neutral-500 mt-3">Termenele de livrare se calculează pe baza programului de lucru.</p>

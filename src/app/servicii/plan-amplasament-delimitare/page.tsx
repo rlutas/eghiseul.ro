@@ -27,7 +27,7 @@ import { MobileStickyCTA } from '@/components/services/mobile-sticky-cta';
 import { WhatsAppButton } from '@/components/services/whatsapp-button';
 import { GoogleReviewsBadge } from '@/components/services/google-reviews-badge';
 import { OrderButton } from '@/components/services/order-button';
-import { buildPageMetadata, buildServicePageGraph, BASE_URL, serviceUrl } from '@/lib/seo';
+import { buildPageMetadata, buildServicePageGraph, BASE_URL, serviceUrl, SERVICE_AGGREGATE_RATING } from '@/lib/seo';
 import { getImobiliareServices } from '@/lib/services/imobiliare';
 import { ServiceSwitcher } from '@/components/services/service-switcher';
 
@@ -91,7 +91,7 @@ const buildJsonLd = (basePrice: number) => buildServicePageGraph({
   offers: [
     { name: 'Plan de Amplasament și Delimitare', price: basePrice, url: `${BASE_URL}${PAGE_PATH}` },
   ],
-  aggregateRating: { ratingValue: 4.9, reviewCount: 450 },
+  aggregateRating: SERVICE_AGGREGATE_RATING,
 });
 
 export default async function PlanAmplasamentDelimitarePage() {
@@ -167,7 +167,7 @@ export default async function PlanAmplasamentDelimitarePage() {
                 </div>
 
                 <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-tight mb-5">
-                  Plan de Amplasament
+                  Plan de Amplasament{' '}
                   <span className="block text-primary-500">și Delimitare (PAD)</span>
                 </h1>
 

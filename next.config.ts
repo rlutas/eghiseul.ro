@@ -29,6 +29,16 @@ const nextConfig: NextConfig = {
         destination: '/tools/verificare-rovinieta-online/',
         permanent: true,
       },
+      // Slug-ul DB `rovinieta` era servit de /servicii/[slug] ÎN PARALEL cu
+      // pagina reală, ambele 200 și ambele în sitemap — duplicat live, cu titlu
+      // stricat („Rovinieta Online Online"). Găsit la auditul din 28.07.2026.
+      // Zero trafic pe URL-ul dinamic în GSC (28 zile), deci redirectul nu
+      // pierde nimic.
+      {
+        source: '/servicii/rovinieta',
+        destination: '/servicii/rovinieta-online/',
+        permanent: true,
+      },
       // Certificat de Integritate — canonical SEO page is at the WP-parity URL
       // /servicii/certificat-de-integritate-comportamentala/. Both the DB slug
       // and the no-"de" variant collapse there (single hop, no redirect chain).

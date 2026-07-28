@@ -1,4 +1,5 @@
 import { Users, FileText, Star, Clock, Shield, Award } from 'lucide-react';
+import { SOCIAL_PROOF } from '@/lib/seo';
 
 const stats = [
   {
@@ -17,7 +18,7 @@ const stats = [
     icon: Star,
     value: '4.9/5',
     label: 'Rating Google',
-    description: 'Peste 450 recenzii',
+    description: `Peste ${SOCIAL_PROOF.roundedDown} recenzii`,
   },
   {
     icon: Clock,

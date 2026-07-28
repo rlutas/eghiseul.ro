@@ -60,9 +60,22 @@ export function organizationNode() {
     legalName: ORGANIZATION.legalName,
     url: ORGANIZATION.url,
     logo: ORGANIZATION.logo,
+    // Adresa + emailul existau DOAR pe nodul Organization de pe homepage
+    // (homepage-schema.ts), deși nodul ăsta e folosit pe /contact/ și pe toate
+    // paginile de servicii — adică exact acolo unde un client (sau Google)
+    // caută dovada că în spate e o firmă reală. Aliniat la auditul din
+    // 28.07.2026; aceleași valori, o singură sursă (`ORGANIZATION`).
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: ORGANIZATION.address.street,
+      addressLocality: ORGANIZATION.address.locality,
+      addressRegion: ORGANIZATION.address.region,
+      addressCountry: ORGANIZATION.address.country,
+    },
     contactPoint: {
       '@type': 'ContactPoint',
       telephone: ORGANIZATION.contactPoint.telephone,
+      email: ORGANIZATION.contactPoint.email,
       contactType: ORGANIZATION.contactPoint.contactType,
       areaServed: ORGANIZATION.contactPoint.areaServed,
       availableLanguage: ORGANIZATION.contactPoint.availableLanguage,

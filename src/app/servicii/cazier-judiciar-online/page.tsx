@@ -8,7 +8,7 @@ import { MobileStickyCTA } from '@/components/services/mobile-sticky-cta';
 import { ServiceFAQ, type FAQ } from '@/components/services/service-faq';
 import { ReviewsSection } from '@/components/services/reviews-section';
 import { GoogleReviewsBadge } from '@/components/services/google-reviews-badge';
-import { buildPageMetadata, buildServicePageGraph, BASE_URL } from '@/lib/seo';
+import { buildPageMetadata, buildServicePageGraph, BASE_URL, SERVICE_AGGREGATE_RATING } from '@/lib/seo';
 import { CITIES as CAZIER_CITIES } from '@/lib/seo/locations';
 import { cn } from '@/lib/utils';
 import {
@@ -102,7 +102,7 @@ const jsonLdGraph = buildServicePageGraph({
     },
   ],
   // 450+ recenzii pozitive 4.9★ — agregate din Google Business Profile + Trustpilot
-  aggregateRating: { ratingValue: 4.9, reviewCount: 450 },
+  aggregateRating: SERVICE_AGGREGATE_RATING,
 });
 
 // =============================================================================
@@ -357,7 +357,7 @@ export default function CazierJudiciarHubPage() {
                 </div>
 
                 <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-tight mb-5">
-                  Cazier Judiciar
+                  Cazier Judiciar{' '}
                   <span className="block text-primary-500">Online</span>
                 </h1>
 

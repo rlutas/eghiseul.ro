@@ -26,7 +26,7 @@ import { MobileStickyCTA } from '@/components/services/mobile-sticky-cta';
 import { WhatsAppButton } from '@/components/services/whatsapp-button';
 import { GoogleReviewsBadge } from '@/components/services/google-reviews-badge';
 import { OrderButton } from '@/components/services/order-button';
-import { buildPageMetadata, buildServicePageGraph, BASE_URL, serviceUrl } from '@/lib/seo';
+import { buildPageMetadata, buildServicePageGraph, BASE_URL, serviceUrl, SERVICE_AGGREGATE_RATING } from '@/lib/seo';
 import { getImobiliareServices } from '@/lib/services/imobiliare';
 import { ServiceSwitcher } from '@/components/services/service-switcher';
 
@@ -89,7 +89,7 @@ const buildJsonLd = (basePrice: number) => buildServicePageGraph({
   offers: [
     { name: 'Copie Carte Funciară (in extenso)', price: basePrice, url: `${BASE_URL}${PAGE_PATH}` },
   ],
-  aggregateRating: { ratingValue: 4.9, reviewCount: 450 },
+  aggregateRating: SERVICE_AGGREGATE_RATING,
 });
 
 export default async function CopieCarteFunciaraPage() {
@@ -165,7 +165,7 @@ export default async function CopieCarteFunciaraPage() {
                 </div>
 
                 <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-tight mb-5">
-                  Copie Carte Funciară
+                  Copie Carte Funciară{' '}
                   <span className="block text-primary-500">in extenso (integrală)</span>
                 </h1>
 

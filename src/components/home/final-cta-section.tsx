@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { FileText, Zap, MessageCircle, ShieldCheck, Clock, Star } from 'lucide-react';
+import { SOCIAL_PROOF } from '@/lib/seo';
 
 const WHATSAPP =
   'https://wa.me/40757708181?text=' +
@@ -9,7 +10,7 @@ const TRUST = [
   { icon: ShieldCheck, label: 'Avocat înscris în Barou' },
   { icon: FileText, label: 'Documente emise de autorități' },
   { icon: Clock, label: 'Livrare 24-48h' },
-  { icon: Star, label: '4.9/5 din 400+ recenzii' },
+  { icon: Star, label: `${SOCIAL_PROOF.ratingValue}/5 din ${SOCIAL_PROOF.reviewCount} recenzii` },
 ];
 
 export function FinalCTASection() {

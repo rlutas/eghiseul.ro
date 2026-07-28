@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import { Zap, ShieldCheck, MessageCircle, Globe, BadgeCheck } from 'lucide-react';
+import { SOCIAL_PROOF } from '@/lib/seo';
 
 const BENEFITS = [
   {
@@ -26,7 +27,7 @@ const BENEFITS = [
 
 const STATS = [
   { value: '4.9/5', label: 'Rating Google' },
-  { value: '400+', label: 'Recenzii' },
+  { value: String(SOCIAL_PROOF.reviewCount), label: 'Recenzii' },
   { value: '24h', label: 'Timp răspuns' },
 ];
 

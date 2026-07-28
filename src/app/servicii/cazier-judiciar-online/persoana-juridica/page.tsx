@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { createPublicClient } from '@/lib/supabase/public';
-import { buildPageMetadata, buildServicePageGraph, BASE_URL } from '@/lib/seo';
+import { buildPageMetadata, buildServicePageGraph, BASE_URL, SERVICE_AGGREGATE_RATING } from '@/lib/seo';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -112,7 +112,7 @@ const jsonLdGraph = buildServicePageGraph({
     { name: 'Cazier Judiciar Persoană Juridică (Standard 3-5 zile)', price: 198, url: `${BASE_URL}${PAGE_PATH}` },
     { name: 'Cazier Judiciar Persoană Juridică (Urgent 1-2 zile)', price: 278, url: `${BASE_URL}${PAGE_PATH}` },
   ],
-  aggregateRating: { ratingValue: 4.9, reviewCount: 450 },
+  aggregateRating: SERVICE_AGGREGATE_RATING,
 });
 
 export default async function CazierJudiciarPJPage() {
@@ -228,7 +228,7 @@ export default async function CazierJudiciarPJPage() {
 
                 {/* H1 */}
                 <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-tight mb-5">
-                  Cazier Judiciar Online
+                  Cazier Judiciar Online{' '}
                   <span className="block text-blue-400">Persoană Juridică / Firmă</span>
                 </h1>
 

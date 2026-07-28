@@ -31,7 +31,8 @@ export default function Page() {
       publishedLabel="ianuarie 2024"
       updatedLabel="16 iunie 2026"
       relatedServices={[
-        { slug: 'cazier-auto', label: 'Cazier Auto Online', desc: 'Istoricul oficial al vehiculului, online.' },
+        { slug: 'cazier-auto', label: 'Cazier Auto Online', desc: 'Fișa conducătorului auto: sancțiuni, puncte de penalizare, suspendări.' },
+        { slug: 'cazier-judiciar', label: 'Cazier Judiciar Online', desc: 'Documentul cerut la angajare, vize și dosare — livrat pe email.' },
       ]}
       faqs={[
         {

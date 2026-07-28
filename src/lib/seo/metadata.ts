@@ -25,6 +25,13 @@ export interface PageMetadataInput {
   ogImage?: string;
   /** Set `noindex: true` for staging or temporary pages. */
   noindex?: boolean;
+  /**
+   * `noindex, follow` — pagina nu intră în index, dar linkurile ei contează.
+   * Pentru pagini reale, utile omului, pe care Google le refuză oricum
+   * (ex. cele 40 de pagini-oraș cvasi-duplicate, audit 28.07.2026). Diferă de
+   * `noindex`, care taie și follow — ăla e pentru staging/pagini temporare.
+   */
+  noindexFollow?: boolean;
 }
 
 export function buildPageMetadata(input: PageMetadataInput): Metadata {
@@ -54,6 +61,8 @@ export function buildPageMetadata(input: PageMetadataInput): Metadata {
     },
     robots: input.noindex
       ? { index: false, follow: false }
+      : input.noindexFollow
+      ? { index: false, follow: true }
       : {
           index: true,
           follow: true,

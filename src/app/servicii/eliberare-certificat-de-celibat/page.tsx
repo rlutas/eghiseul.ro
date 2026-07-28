@@ -30,7 +30,7 @@ import { GoogleReviewsBadge } from '@/components/services/google-reviews-badge';
 import { OrderButton } from '@/components/services/order-button';
 import { ServiceFAQ } from '@/components/services/service-faq';
 import { ReviewsSection } from '@/components/services/reviews-section';
-import { buildPageMetadata, buildServicePageGraph, BASE_URL } from '@/lib/seo';
+import { buildPageMetadata, buildServicePageGraph, BASE_URL, SERVICE_AGGREGATE_RATING } from '@/lib/seo';
 import { ServicePrice } from '@/components/services/service-price';
 
 // Database slug (order pipeline identifier). URL path uses the SEO-friendly
@@ -98,7 +98,7 @@ const buildJsonLd = (basePrice: number) => buildServicePageGraph({
   offers: [
     { name: 'Certificat de Celibat (Standard)', price: basePrice, url: `${BASE_URL}${PAGE_PATH}` },
   ],
-  aggregateRating: { ratingValue: 4.9, reviewCount: 450 },
+  aggregateRating: SERVICE_AGGREGATE_RATING,
 });
 
 export default async function CertificatCelibatPage() {
@@ -166,7 +166,7 @@ export default async function CertificatCelibatPage() {
                 </div>
 
                 <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-tight mb-5">
-                  Certificat de Celibat
+                  Certificat de Celibat{' '}
                   <span className="block text-primary-500">Online</span>
                 </h1>
 

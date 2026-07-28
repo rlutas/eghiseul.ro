@@ -143,14 +143,14 @@ export function Footer() {
               <ul className="space-y-2.5 text-sm">
                 {group.items.map((s) => (
                   <li key={s.name}>
-                    <Link href={s.href} className="text-white/70 hover:text-primary-500 transition-colors inline-block py-0.5">
+                    <Link href={s.href} prefetch={false} className="text-white/70 hover:text-primary-500 transition-colors inline-block py-0.5">
                       {s.name}
                     </Link>
                     {s.children && (
                       <ul className="mt-1.5 ml-1.5 space-y-1.5 border-l border-white/10 pl-3">
                         {s.children.map((c) => (
                           <li key={c.name}>
-                            <Link href={c.href} className="text-white/55 hover:text-primary-500 transition-colors text-[13px]">
+                            <Link href={c.href} prefetch={false} className="text-white/55 hover:text-primary-500 transition-colors text-[13px]">
                               {c.name}
                             </Link>
                           </li>
@@ -199,7 +199,7 @@ export function Footer() {
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-5">
             <nav className="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-white/60">
               {legalLinks.map((l) => (
-                <Link key={l.name} href={l.href} className="hover:text-primary-500 transition-colors">{l.name}</Link>
+                <Link key={l.name} href={l.href} prefetch={false} className="hover:text-primary-500 transition-colors">{l.name}</Link>
               ))}
               <CookieSettingsLink className="hover:text-primary-500 transition-colors" />
             </nav>
