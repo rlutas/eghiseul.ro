@@ -812,9 +812,16 @@ export class SamedayProvider implements CourierProvider {
       if (pickupPointId) awbRequest.pickupPoint = pickupPointId;
       if (contactPersonId) awbRequest.contactPerson = contactPersonId;
 
-      // For locker delivery, add oohLastMile with locker ID
-      if (isLocker && request.lockerId) {
+      // Livrare Out-Of-Home (easybox / PUDO): `oohLastMile` = ID-ul locației.
+      // Parametrii vechi lockerFirstMile/lockerLastMile sunt declarați depreciați
+      // în documentația Sameday (v3.1, 21.03.2025) — NU îi folosim.
+      // `oohType`: 0 = easybox, 1 = PUDO. Exemplele din doc îl omit (Sameday îl
+      // deduce din interval: easybox sub 500.000, PUDO peste), dar îl trimitem
+      // explicit ca să nu depindem de deducere când adăugăm PUDO.
+      const isOoh = isLocker || serviceId === SAMEDAY_SERVICES.PUDO_NEXTDAY;
+      if (isOoh && request.lockerId) {
         awbRequest.oohLastMile = request.lockerId;
+        awbRequest.oohType = isLocker ? 0 : 1;
       }
 
       const data = await this.apiRequest<{

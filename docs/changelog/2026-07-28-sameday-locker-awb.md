@@ -66,6 +66,23 @@ Potrivire pe nume exact; dacă numele apare la mai multe lockere, comanda e rapo
 | `E-260727-734K8` | „Locker" | ⏭ ciornă neplătită, clientul n-a apucat să aleagă |
 | `E-260717-YKNZ7` | „Locker" | ⏭ idem |
 
+## Verificat față de documentația oficială (v3.1, 21.03.2025)
+
+| Ce spune documentația | Ce facem |
+|---|---|
+| Serviciul easybox are **ID 15** (home = 7, PUDO = 57) | `SAMEDAY_SERVICES.LOCKER_NEXTDAY = 15` ✅ |
+| `oohLastMile` = ID-ul locației la emiterea AWB-ului | trimis ✅ |
+| `lockerFirstMile`/`lockerLastMile` sunt **depreciate** din 2025, „implementați oohFirstMile/oohLastMile în toate integrările" | nu le mai folosim nicăieri ✅ |
+| `oohType`: 0 = easybox, 1 = PUDO | **adăugat acum** — exemplele din doc îl omit (Sameday îl deduce din interval: easybox sub 500.000, PUDO peste), dar îl trimitem explicit ca să nu depindem de deducere |
+| La livrarea în locker, `awbRecipient` are doar nume, telefon, `personType`, email — fără adresă | exact așa construim payload-ul ✅ |
+| ID-urile se iau din `GET /api/client/ooh-locations` (înlocuiește `/lockers`) | wizardul folosește deja `ooh-locations` ✅ |
+
+⚠️ Verificare încrucișată care merita făcută: wizardul citește lockerele din
+`ooh-locations` (câmp `oohId`), iar scriptul de recuperare le-a căutat în
+`/api/client/lockers` (câmp `lockerId`). Am comparat aceeași locație în ambele
+endpointuri — **`lockerId 3386` == `oohId 3386`**, deci ID-urile scrise de backfill
+sunt cele bune.
+
 ## Verificare
 
 `1.361` teste trec (6 noi), `tsc` curat, build verde. Autentificarea și listarea
