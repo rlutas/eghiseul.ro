@@ -20,6 +20,7 @@
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createInvoiceFromOrder } from './invoice';
 import { isInvoicingEnabled } from './invoicing-enabled';
+import { checkEinvoiceExport } from './einvoice-check';
 
 type PaymentMethodType = 'Card' | 'Transfer bancar' | 'Cash';
 
@@ -197,6 +198,35 @@ export async function ensureInvoiceForPaidOrder(
         opts?.historyNote ?? `Factură emisă automat: ${invoice.invoiceNumber}`,
       new_value: JSON.stringify({ invoice_number: invoice.invoiceNumber }),
     });
+
+    // Verificăm imediat dacă factura poate fi trimisă în SPV. Oblio o emite și
+    // cu date de client pe care ANAF le refuză (județ/localitate/țară), iar
+    // blocajul se vedea abia când echipa apăsa „Trimite în SPV" — zile mai
+    // târziu. Best-effort: nu afectează rezultatul emiterii.
+    try {
+      const spv = await checkEinvoiceExport(invoice.seriesName, invoice.number);
+      await admin
+        .from('orders')
+        .update({
+          invoice_spv_status: spv.ok ? 'ok' : 'blocked',
+          invoice_spv_error: spv.ok ? null : (spv.error ?? 'Export e-Factura respins'),
+          invoice_spv_checked_at: new Date().toISOString(),
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } as any)
+        .eq('id', orderId);
+      if (!spv.ok) {
+        console.warn(
+          `[ensure-invoice] ${invoice.invoiceNumber} NU se poate trimite în SPV: ${spv.error}`
+        );
+        await admin.from('order_history').insert({
+          order_id: orderId,
+          event_type: 'payment_confirmed',
+          notes: `⚠️ Factura ${invoice.invoiceNumber} nu poate fi trimisă în SPV: ${(spv.error ?? '').slice(0, 400)}`,
+        });
+      }
+    } catch (spvErr) {
+      console.error('[ensure-invoice] verificarea SPV a eșuat (ignorată):', spvErr);
+    }
 
     console.log(`[ensure-invoice] Invoice ${invoice.invoiceNumber} created for order ${orderId}`);
     return {

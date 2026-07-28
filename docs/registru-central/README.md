@@ -170,6 +170,19 @@ per delegație, fișiere separate). Serviciu extra neprevăzut după plasare →
 `/admin/registru` → Alocare Manuală cu platformă + nr. comandă (sau, pe
 eghiseul, generare împuternicire cu alt service_type).
 
+⚠️ **Textul activităților trebuie să fie al documentului din delegație** (fix
+2026-07-28). Numărul, fișierul și metadata erau per add-on, dar fraza
+„să se prezinte la ... în vederea ridicării ..." se construia din slug-ul
+serviciului PRINCIPAL → pe E-260725-9BGGD ambele împuterniciri (SM007426 cazier
++ SM007427 integritate) scriau „ridicării Cazier Judiciar". Acum
+`service_type`-ul delegației ajunge la generator prin
+`DocumentContext.delegation_service_type` și `buildInstitutie` are hartă per cod
+de add-on (integritate/cazier fiscal/stare civilă/apostilă, inclusiv
+`bundled:...` → „aplicării Apostilei de la Haga **pe** \<document\>").
+Orice add-on nou care primește delegație trebuie adăugat ȘI în
+`DELEGATION_INSTITUTIE_MAP` (`src/lib/documents/generator.ts`), nu doar în
+`DELEGATION_REQUIRING_OPTION_CODES`.
+
 ## Jurnalul din /admin/registru — funcții
 
 - Grupare pe comandă: contract + toate delegațiile lui pe UN rând (API-ul

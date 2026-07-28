@@ -36,6 +36,7 @@ import { useModularWizard } from '@/providers/modular-wizard-provider';
 import { cn } from '@/lib/utils';
 import { COUNTIES, getLocalitiesForCounty, findCounty } from '@/lib/data/romania-counties';
 import { isPfBillingComplete, isForeignBillingCountry } from '@/lib/orders/billing-validation';
+import { isBucharestCounty, formatSector, BUCHAREST_SECTORS_BILLING } from '@/lib/oblio/address';
 import { COUNTRIES as WORLD_COUNTRIES } from '@/config/countries';
 import { SearchableSelect } from '@/components/shared/SearchableSelect';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -218,7 +219,14 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
       personalKyc.address?.building ? `Bl. ${personalKyc.address.building}` : null,
       personalKyc.address?.apartment ? `Ap. ${personalKyc.address.apartment}` : null,
     ].filter(Boolean).join(', '),
-    city: personalKyc.address?.city || '',
+    // La București localitatea trebuie să fie „Sector N" (cerință SPV, vezi
+    // lib/oblio/address.ts). OCR-ul CI dă „București, Sector 5" / „Sectorul 5",
+    // care nu s-ar potrivi cu nicio opțiune din dropdown → prefill pierdut.
+    city:
+      (isBucharestCounty(personalKyc.address?.county) || isBucharestCounty(personalKyc.address?.city)
+        ? formatSector(personalKyc.address?.city) ??
+          formatSector(personalKyc.address?.sector != null ? `Sector ${personalKyc.address.sector}` : '')
+        : null) ?? personalKyc.address?.city ?? '',
     // Normalize the scanned county to the canonical name so it matches a
     // dropdown option (OCR may return a code "SM" or a "Jud. ..." prefix).
     county: findCounty(personalKyc.address?.county)?.name || '',
@@ -521,16 +529,27 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
     }
   }, [updateBilling]);
 
+  // Localitățile județului selectat (dropdown dependent).
+  //
+  // București: ANAF refuză exportul e-Factura când Localitatea nu e „Sector N"
+  // („Pentru ca judetul clientului este Bucuresti, modifica campul Localitate
+  // de forma Sector 1, Sector 2, etc." — factura EGH-0048). Lista brută de
+  // localități conține „Municipiul Bucuresti" + „Sectorul 1..6", deci
+  // înlocuim cu exact cele 6 valori acceptate.
+  const localitiesFor = useCallback((county?: string | null): string[] => {
+    if (isBucharestCounty(county)) return BUCHAREST_SECTORS_BILLING;
+    return getLocalitiesForCounty(county);
+  }, []);
+
   // County → reset locality when it no longer belongs to the new county.
   const handleCountyChange = useCallback((countyName: string) => {
-    const stillValid = getLocalitiesForCounty(countyName).includes(billing?.city || '');
+    const stillValid = localitiesFor(countyName).includes(billing?.city || '');
     updateBilling({ county: countyName, city: stillValid ? billing?.city : '' });
-  }, [billing?.city, updateBilling]);
+  }, [billing?.city, updateBilling, localitiesFor]);
 
-  // Localities for the currently selected billing county (dependent dropdown).
   const billingLocalities = useMemo(
-    () => getLocalitiesForCounty(billing?.county),
-    [billing?.county],
+    () => localitiesFor(billing?.county),
+    [billing?.county, localitiesFor],
   );
 
   // Validate CUI and fetch company data

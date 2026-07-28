@@ -264,6 +264,64 @@ describe('buildInstitutie', () => {
     expect(buildInstitutie()).toBe('');
     expect(buildInstitutie(undefined)).toBe('');
   });
+
+  // E-260725-9BGGD: comandă de cazier judiciar + add-on certificat de
+  // integritate. Ambele împuterniciri (SM007426 și SM007427) au ieșit cu
+  // „în vederea ridicării Cazier Judiciar", fiindcă textul se construia numai
+  // din slug-ul serviciului principal.
+  describe('împuterniciri per add-on (delegationServiceType)', () => {
+    it('add-on integritate → textul certificatului de integritate, nu al cazierului', () => {
+      expect(
+        buildInstitutie('cazier-judiciar-persoana-fizica', 'D.G.A.S.P.C.', 'addon_certificat_integritate')
+      ).toBe(
+        'să se prezinte la IPJ SATU MARE, în vederea ridicării Certificat de Integritate Comportamentală. Motivul solicitării: D.G.A.S.P.C..'
+      );
+    });
+
+    it('add-on cazier fiscal → ANAF', () => {
+      expect(buildInstitutie('cazier-judiciar', undefined, 'addon_cazier_fiscal')).toBe(
+        'să se prezinte la ANAF SATU MARE, în vederea ridicării Cazier Fiscal.'
+      );
+    });
+
+    it.each([
+      ['addon_certificat_nastere', 'Certificat de Naștere'],
+      ['addon_certificat_casatorie', 'Certificat de Căsătorie'],
+      ['addon_certificat_celibat', 'Certificat de Celibat'],
+    ])('%s → %s la starea civilă', (code, doc) => {
+      expect(buildInstitutie('cazier-judiciar', undefined, code)).toBe(
+        `să se prezinte la OFICIUL DE STARE CIVILĂ, în vederea ridicării ${doc}.`
+      );
+    });
+
+    it('apostila Haga → prefectură, „în vederea aplicării"', () => {
+      expect(buildInstitutie('cazier-judiciar', undefined, 'apostila_haga')).toBe(
+        'să se prezinte la INSTITUȚIA PREFECTULUI - JUDEȚUL SATU MARE, în vederea aplicării Apostilei de la Haga.'
+      );
+    });
+
+    it('apostila bundled pe alt serviciu spune pe CE document se aplică', () => {
+      expect(
+        buildInstitutie('cazier-judiciar', undefined, 'bundled:opt-1:certificat-integritate:apostila_haga')
+      ).toBe(
+        'să se prezinte la INSTITUȚIA PREFECTULUI - JUDEȚUL SATU MARE, în vederea aplicării Apostilei de la Haga pe Certificat de Integritate Comportamentală.'
+      );
+    });
+
+    it('delegația serviciului principal (slug) păstrează textul de azi', () => {
+      expect(
+        buildInstitutie('cazier-judiciar-persoana-fizica', 'D.G.A.S.P.C.', 'cazier-judiciar-persoana-fizica')
+      ).toBe(
+        'să se prezinte la IPJ SATU MARE, în vederea ridicării Cazier Judiciar. Motivul solicitării: D.G.A.S.P.C..'
+      );
+    });
+
+    it('service_type necunoscut → fallback pe serviciul principal', () => {
+      expect(buildInstitutie('cazier-auto', undefined, 'cod_inexistent')).toBe(
+        'să se prezinte la IPJ SATU MARE, în vederea ridicării Cazier Auto.'
+      );
+    });
+  });
 });
 
 describe('buildCIInfo', () => {

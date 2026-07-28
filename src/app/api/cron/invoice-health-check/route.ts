@@ -37,6 +37,29 @@ interface AffectedOrder {
   email: string | null;
 }
 
+/** Alertă pentru facturile emise care nu trec validarea e-Factura (SPV). */
+async function postSpvSlackAlert(
+  blocked: { ref: string; invoice: string; error: string }[]
+): Promise<void> {
+  const webhook = process.env.SLACK_WEBHOOK_URL;
+  if (!webhook) return;
+  const text =
+    `:rotating_light: ${blocked.length} factur${blocked.length === 1 ? 'ă' : 'i'} nu se pot trimite în SPV\n` +
+    blocked
+      .slice(0, 20)
+      .map((b) => `• ${b.invoice} (${b.ref}) — ${b.error}`)
+      .join('\n');
+  try {
+    await fetch(webhook, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text }),
+    });
+  } catch (err) {
+    console.error('[invoice-health-check] Slack SPV alert failed:', err);
+  }
+}
+
 async function postSlackAlert(orders: AffectedOrder[]): Promise<void> {
   const webhook = process.env.SLACK_WEBHOOK_URL;
   if (!webhook) return;
@@ -134,6 +157,65 @@ export async function POST(request: NextRequest) {
     console.error('[invoice-health-check] barou sweep failed:', err);
   }
 
+  // SPV SWEEP: facturi emise care NU pot fi trimise în SPV (județ/localitate/
+  // țară refuzate de ANAF). Oblio le emite oricum, iar blocajul se vedea abia
+  // când echipa apăsa manual „Trimite în SPV" — de unde facturile blocate din
+  // 8/10/12/14/25 iulie descoperite toate pe 27. Verificăm facturile din
+  // ultimele 30 de zile care nu au fost încă validate SAU au fost blocate
+  // (recheck: după ce echipa corectează clientul în Oblio, trec pe 'ok').
+  let spvChecked = 0;
+  const spvBlocked: { ref: string; invoice: string; error: string }[] = [];
+  try {
+    const { data: toCheck } = await ordersTable
+      .select('id, friendly_order_id, order_number, invoice_number, invoice_spv_status')
+      .not('invoice_number', 'is', null)
+      .gte('invoice_issued_at', new Date(now - 30 * 24 * 60 * 60 * 1000).toISOString())
+      .or('invoice_spv_status.is.null,invoice_spv_status.eq.blocked')
+      .order('invoice_issued_at', { ascending: false })
+      .limit(40);
+
+    if (toCheck?.length) {
+      const { checkEinvoiceExport, splitInvoiceNumber } = await import('@/lib/oblio/einvoice-check');
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      for (const o of toCheck as any[]) {
+        const parts = splitInvoiceNumber(o.invoice_number as string);
+        if (!parts) continue;
+        const res = await checkEinvoiceExport(parts.seriesName, parts.number);
+        spvChecked++;
+        await ordersTable
+          .update({
+            invoice_spv_status: res.ok ? 'ok' : 'blocked',
+            invoice_spv_error: res.ok ? null : (res.error ?? 'Export e-Factura respins'),
+            invoice_spv_checked_at: new Date().toISOString(),
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          } as any)
+          .eq('id', o.id);
+        if (!res.ok) {
+          spvBlocked.push({
+            ref: (o.friendly_order_id ?? o.order_number ?? o.id) as string,
+            invoice: o.invoice_number as string,
+            error: (res.error ?? '').slice(0, 200),
+          });
+          // Notă în istoric doar la prima detectare, ca să nu spameze orar.
+          if (o.invoice_spv_status !== 'blocked') {
+            await (supabase.from('order_history') as ReturnType<typeof supabase.from>).insert({
+              order_id: o.id,
+              event_type: 'payment_confirmed',
+              notes: `⚠️ Factura ${o.invoice_number} nu poate fi trimisă în SPV: ${(res.error ?? '').slice(0, 400)}`,
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            } as any);
+          }
+        }
+      }
+    }
+  } catch (err) {
+    console.error('[invoice-health-check] spv sweep failed:', err);
+  }
+  if (spvBlocked.length) {
+    console.warn('[invoice-health-check] facturi blocate în SPV:', spvBlocked);
+    await postSpvSlackAlert(spvBlocked);
+  }
+
   // EXTRA-INVOICE SWEEP: paid extra charges whose fiscal invoice failed at the
   // webhook (extra_billing entries with invoice:null — e.g. E-260714-WXGYQ,
   // where only the proforma existed). Issues the invoice from the proforma and
@@ -207,7 +289,11 @@ export async function POST(request: NextRequest) {
   if (affected.length === 0) {
     return NextResponse.json({
       success: true,
-      data: { affectedCount: 0, healedCount: 0, barouHealed, extraHealed, processedAt: new Date().toISOString() },
+      data: {
+        affectedCount: 0, healedCount: 0, barouHealed, extraHealed,
+        spvChecked, spvBlocked,
+        processedAt: new Date().toISOString(),
+      },
     });
   }
 
@@ -249,6 +335,8 @@ export async function POST(request: NextRequest) {
       healedCount: healed.length,
       barouHealed,
       extraHealed,
+      spvChecked,
+      spvBlocked,
       healed,
       stillMissing: stillMissing.map((o) => ({
         id: o.id,

@@ -777,6 +777,48 @@ pe docs + FAQ oficial):
 - Teste: `tests/unit/lib/orders/billing-validation.test.ts` +
   `tests/unit/lib/oblio/build-client.test.ts` (secțiunile „foreign billing").
 
+### 2.0c ⚠️ Adresa clientului pentru e-Factura/SPV (2026-07-28)
+
+Oblio **emite** factura chiar dacă ANAF o va refuza la export; blocajul apare doar la
+„Trimite în SPV". Cele 4 motive de respingere întâlnite real (facturi EGH-0013 /
+0028 / 0048 / 0172 + EGI2024-24312 pe CJO) și regulile care le previn — toate în
+**`src/lib/oblio/address.ts`** (`resolveInvoiceAddress`, 49 de teste în
+`tests/unit/lib/oblio/address.test.ts`):
+
+1. **Județ invalid/gol** → trimitem doar cele **42 de județe** în scriere canonică
+   (`canonicalCounty` acceptă „Jud. Cluj", „Timiş" cedilla, „Bucuresti", „B").
+2. **Localitate goală**.
+3. **București fără sector** → la județul București, „Localitate" trebuie să fie exact
+   `Sector 1..6`. Wizard-ul oferă doar cele 6 sectoare (lista brută de localități
+   conținea „Municipiul Bucuresti", acceptat în UI dar refuzat în SPV); la emitere
+   orice formă („Sectorul 5", „București, Sector 5", sector din OCR) → „Sector 5".
+4. **Țara** → lista Oblio e în română **FĂRĂ diacritice** („Franta", „Elvetia",
+   „Cehia", „Olanda"), iar UK e **„Regatul Unit (UK)"**. `countryForOblio()` face
+   maparea. ⚠️ **NU trimite coduri ISO** (DE/FR/GB) — Oblio nu le acceptă la e-Factura.
+
+**Combinarea billing + KYC se face după CONTRADICȚIE, nu orbește pe câmp.**
+`billing.city || kyc.city` producea adrese inexistente: județ „București" (facturare) +
+localitate „Ditrau", Harghita (KYC) — EGH-0048. Regula: (1) bloc de facturare complet →
+el; (2) județe DIFERITE → nu se amestecă, se ia întreg blocul complet; (3) altfel
+completare câmp-cu-câmp (cazul corect „județ în facturare, localitate doar în KYC" —
+EGH-0078/0095/0152; interzicerea totală a amestecului le-ar lăsa fără localitate).
+
+**Verificare automată** — `checkEinvoiceExport()` în `src/lib/oblio/einvoice-check.ts`
+cere linkul e-Factura al facturii: XML = exportabil, HTML cu `<error>` = blocat (cu
+exact mesajul din interfața Oblio). Rulează la emitere (`ensureInvoiceForPaidOrder`) și
+orar în cron `invoice-health-check` (40/rulare, 30 de zile, re-verifică și blocatele).
+Rezultat pe comandă: `invoice_spv_status` / `invoice_spv_error` /
+`invoice_spv_checked_at` (migrarea 138) → banner roșu în admin + notă în istoric +
+alertă Slack. Fail-open pe erori de rețea.
+
+⚠️ **API-ul Oblio NU permite editarea unei facturi emise** (doar create/cancel), deci
+facturile deja blocate se corectează manual în interfață (Editează Client →
+Previzualizare Factură → Trimite în SPV).
+
+Backfill/diagnostic: `scripts/check-spv-invoices-2026-07-28.ts` (verifică + scrie
+statusul), `scripts/audit-invoice-spv-2026-07-28.ts` (rulează `buildOblioClient` pe
+istoric și arată ce câmpuri ar fi refuzate).
+
 ### 2.1 Oblio API Overview
 
 | Aspect | Details |

@@ -62,7 +62,7 @@ describe('createInvoiceFromOrder — PF (individual)', () => {
         lastName: 'Popescu',
         cnp: '1820507211209',
         address: 'Str. Test 1',
-        city: 'București',
+        city: 'Sector 3',
         county: 'București',
       },
     },
@@ -84,9 +84,95 @@ describe('createInvoiceFromOrder — PF (individual)', () => {
     const payload = oblioRequest.mock.calls[0][0].body;
     expect(payload.client.email).toBe('ion@example.com');
     expect(payload.client.phone).toBe('+40712345678');
-    expect(payload.client.city).toBe('București');
+    expect(payload.client.city).toBe('Sector 3');
     expect(payload.client.state).toBe('București');
     expect(payload.client.country).toBe('Romania'); // default when not set
+  });
+
+  // SPV refuză „Localitate = București" când județul e București: cere
+  // „Sector N" (eroarea Oblio pe EGH-0048). Fără sector identificabil trimitem
+  // localitatea goală, ca guard-ul de la submit să o ceară explicit.
+  it('București: localitatea „București" NU pleacă spre Oblio (cere Sector N)', async () => {
+    const order = {
+      ...baseOrder,
+      customer_data: {
+        ...baseOrder.customer_data,
+        billing: { ...baseOrder.customer_data.billing, city: 'București' },
+      },
+    };
+    await createInvoiceFromOrder(order, 'Card');
+    const payload = oblioRequest.mock.calls[0][0].body;
+    expect(payload.client.state).toBe('București');
+    expect(payload.client.city).toBe('');
+  });
+
+  it('București: sectorul din adresa KYC ajunge în Localitate', async () => {
+    const order = {
+      ...baseOrder,
+      customer_data: {
+        contact: { firstName: 'Ion', lastName: 'Popescu', email: 'ion@example.com' },
+        billing: { type: 'individual' as const, firstName: 'Ion', lastName: 'Popescu' },
+        personal: {
+          address: { street: 'Str. Lujerului 2', city: 'București, Sector 5', county: 'București' },
+        },
+      },
+    };
+    await createInvoiceFromOrder(order, 'Card');
+    const payload = oblioRequest.mock.calls[0][0].body;
+    expect(payload.client.city).toBe('Sector 5');
+    expect(payload.client.state).toBe('București');
+  });
+
+  // EGH-0048: județ „București" din facturare + localitate „Ditrau" din KYC
+  // (Harghita) = adresă inexistentă. Fallback-ul se face PE BLOC.
+  it('nu amestecă blocurile de adresă (județ billing + localitate KYC)', async () => {
+    const order = {
+      ...baseOrder,
+      customer_data: {
+        contact: { firstName: 'Dora', lastName: 'Dugaia', email: 'd@x.ro' },
+        billing: {
+          type: 'persoana_fizica' as const,
+          firstName: 'Dora',
+          lastName: 'Dugaia',
+          address: 'LUJERULUI NR. 2',
+          city: '',
+          county: 'București',
+        },
+        personal: {
+          address: { street: 'Salciei', number: '59', city: 'Ditrau', county: 'Harghita' },
+        },
+      },
+    };
+    await createInvoiceFromOrder(order, 'Card');
+    const payload = oblioRequest.mock.calls[0][0].body;
+    // blocul KYC e complet → se folosește ÎNTREG, nu doar localitatea din el
+    expect(payload.client.state).toBe('Harghita');
+    expect(payload.client.city).toBe('Ditrau');
+    expect(payload.client.address).toBe('Salciei 59');
+  });
+
+  // EGH-0172: „Marea Britanie" nu e în lista Oblio → țara rămânea goală și
+  // exportul e-Factura era blocat.
+  it('traduce țara în denumirea din lista Oblio', async () => {
+    const order = {
+      ...baseOrder,
+      customer_data: {
+        contact: { firstName: 'Luiza', lastName: 'Vâlceanu', email: 'l@x.ro' },
+        billing: {
+          type: 'persoana_fizica' as const,
+          firstName: 'Luiza',
+          lastName: 'Vâlceanu',
+          address: '3 Clifton Lodge, 12 Clifton Road',
+          city: 'Slough',
+          county: 'Berkshire',
+          country: 'Marea Britanie',
+        },
+      },
+    };
+    await createInvoiceFromOrder(order, 'Card');
+    const payload = oblioRequest.mock.calls[0][0].body;
+    expect(payload.client.country).toBe('Regatul Unit (UK)');
+    expect(payload.client.city).toBe('Slough');
   });
 
   it('falls back to "N/A" when no name available', async () => {

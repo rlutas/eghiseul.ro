@@ -8,6 +8,14 @@
 import { oblioRequest, getOblioConfig } from './client';
 import { normalizeOrderOptions } from '@/lib/orders/normalize';
 import { isForeignBillingCountry } from '@/lib/orders/billing-validation';
+import {
+  resolveInvoiceAddress,
+  canonicalCounty,
+  isBucharestCounty,
+  hasBucharestSector,
+  countryForOblio,
+  isForeignCountry,
+} from './address';
 import type {
   OblioInvoiceInput,
   OblioInvoiceResponse,
@@ -182,6 +190,19 @@ export function buildOblioClient(customerData: CustomerData): OblioClient {
   const billingCui = (billing?.cui || company?.cui || '').trim();
   const isPJ = isPJBillingData(customerData);
 
+  // Adresa efectivă, rezolvată PE BLOC + normalizată pentru SPV (județ canonic,
+  // „Sector N" la București, denumire de țară din lista Oblio). Vezi
+  // lib/oblio/address.ts pentru cele 4 motive reale de respingere în SPV.
+  const resolved = resolveInvoiceAddress(
+    {
+      street: billing?.address || billing?.companyAddress,
+      city: billing?.city,
+      county: billing?.county,
+      country: billing?.country,
+    },
+    address,
+  );
+
   if (isPJ) {
     const isVatPayer =
       company?.vatPayer ?? company?.autoCompleteData?.vatPayer ?? billingCui.toUpperCase().startsWith('RO');
@@ -190,10 +211,10 @@ export function buildOblioClient(customerData: CustomerData): OblioClient {
       name: billing?.companyName || company?.companyName || 'N/A',
       cif,
       rc: billing?.regCom,
-      address: billing?.address || billing?.companyAddress || address?.street || '',
-      city: billing?.city || address?.city || '',
-      state: billing?.county || address?.county || '',
-      country: billing?.country || address?.country || 'Romania',
+      address: resolved.address,
+      city: resolved.city,
+      state: resolved.state,
+      country: resolved.country,
       email: contact?.email,
       phone: contact?.phone,
       vatPayer: isVatPayer,
@@ -207,17 +228,16 @@ export function buildOblioClient(customerData: CustomerData): OblioClient {
   // getMissingInvoiceClientFields guard satisfied) and the CNP does NOT fall
   // back to the buyer's KYC CNP — a foreign billing person without CNP must
   // not inherit someone else's CNP on the invoice (SPV fills 13 zeros).
-  const pfCountry = billing?.country || address?.country || 'Romania';
-  const pfIsForeign = isForeignBillingCountry(pfCountry);
+  const pfIsForeign = isForeignBillingCountry(billing?.country || address?.country);
   return {
     name:
       `${billing?.firstName || contact?.firstName || personal?.firstName || ''} ${billing?.lastName || contact?.lastName || personal?.lastName || ''}`.trim() ||
       'N/A',
     cif: billing?.cnp || (pfIsForeign ? '' : personal?.cnp || ''),
-    address: billing?.address || address?.street || '',
-    city: billing?.city || address?.city || '',
-    state: billing?.county || address?.county || (pfIsForeign ? '-' : ''),
-    country: pfCountry,
+    address: resolved.address,
+    city: resolved.city,
+    state: resolved.state,
+    country: resolved.country,
     email: contact?.email,
     phone: contact?.phone,
     vatPayer: false,
@@ -236,6 +256,12 @@ export function buildOblioClient(customerData: CustomerData): OblioClient {
  * address on individuals). CNP is NOT required here — real paid orders exist
  * where the CNP lives only in encrypted columns, and Oblio accepts PF clients
  * without one.
+ *
+ * Verificările sunt aliniate cu ce refuză ANAF la „Trimite în SPV" (vezi
+ * lib/oblio/address.ts): județ dintre cele 42, localitate „Sector N" când
+ * județul e București, țară completată la clienții străini. Altfel factura se
+ * emite, dar rămâne blocată la export și o descoperă echipa zile mai târziu
+ * (EGH-0013/0028/0048/0172).
  */
 export function getMissingInvoiceClientFields(customerData: CustomerData): string[] {
   const c = buildOblioClient(customerData);
@@ -250,8 +276,26 @@ export function getMissingInvoiceClientFields(customerData: CustomerData): strin
   const nameParts = (c.name || '').trim().split(/\s+/).filter(Boolean);
   if (nameParts.length < 2) missing.push('numele complet');
   if (!c.address?.trim()) missing.push('adresa (stradă, număr)');
-  if (!c.city?.trim()) missing.push('localitatea');
+
+  if (isForeignCountry(c.country)) {
+    if (!c.city?.trim()) missing.push('localitatea');
+    if (!countryForOblio(c.country).trim()) missing.push('țara');
+    return missing;
+  }
+
+  if (!c.city?.trim()) {
+    missing.push(
+      isBucharestCounty(c.state)
+        ? 'sectorul (la București, localitatea trebuie să fie „Sector 1"..."Sector 6")'
+        : 'localitatea'
+    );
+  } else if (isBucharestCounty(c.state) && !hasBucharestSector(c.city)) {
+    missing.push('sectorul (la București, localitatea trebuie să fie „Sector 1"..."Sector 6")');
+  }
+
   if (!c.state?.trim()) missing.push('județul');
+  else if (!canonicalCounty(c.state)) missing.push('un județ valid din cele 42');
+
   return missing;
 }
 

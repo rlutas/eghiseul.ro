@@ -172,6 +172,17 @@ export interface DocumentContext {
   };
   /** Reason for request (used in cerere-eliberare templates) */
   motiv_solicitare?: string;
+  /**
+   * Pentru CE document s-a alocat delegația de pe această împuternicire
+   * (`number_registry.service_type`: cod de add-on precum
+   * `addon_certificat_integritate`, sau `bundled:...` — vezi
+   * delegation-items.ts). Gol/absent = serviciul principal.
+   *
+   * Fără el, împuternicirea unui add-on iese cu textul serviciului principal
+   * („în vederea ridicării Cazier Judiciar" pe delegația de integritate —
+   * E-260725-9BGGD).
+   */
+  delegation_service_type?: string | null;
   /** Client IP address (for contract legal validity) */
   client_ip?: string;
 }
@@ -392,7 +403,10 @@ export function buildDeliveryTerms(order: DocumentContext['order'], selectedOpti
 
 /** Autoritatea + documentul de ridicat, per serviciu — pentru textul
  *  activităților de pe împuternicire. */
-const INSTITUTIE_MAP: Record<string, { authority: string; document: string }> = {
+const INSTITUTIE_MAP: Record<
+  string,
+  { authority: string; document: string; action?: string }
+> = {
   'cazier-judiciar': { authority: 'IPJ SATU MARE', document: 'Cazier Judiciar' },
   'cazier-judiciar-persoana-fizica': { authority: 'IPJ SATU MARE', document: 'Cazier Judiciar' },
   'cazier-judiciar-persoana-juridica': { authority: 'IPJ SATU MARE', document: 'Cazier Judiciar' },
@@ -406,6 +420,36 @@ const INSTITUTIE_MAP: Record<string, { authority: string; document: string }> = 
   'certificat-constatator': { authority: 'ONRC SATU MARE', document: 'Certificat Constatator' },
   'extras-multilingv-certificat-nastere': { authority: 'OFICIUL DE STARE CIVILĂ', document: 'Extras Multilingv de Naștere' },
   'extras-multilingv-certificat-casatorie': { authority: 'OFICIUL DE STARE CIVILĂ', document: 'Extras Multilingv de Căsătorie' },
+};
+
+/**
+ * Aceeași hartă, dar cheia e CODUL ADD-ON-ULUI pentru care s-a alocat
+ * delegația (`number_registry.service_type` — vezi delegation-items.ts).
+ *
+ * De ce există: o comandă cu add-on-uri primește câte o împuternicire per
+ * document oficial obținut, fiecare cu numărul ei de delegație. Textul
+ * activităților se construia însă DOAR din slug-ul serviciului principal, deci
+ * împuternicirea add-on-ului ieșea identică cu cea a serviciului principal —
+ * pe E-260725-9BGGD, delegația SM007427 „pentru certificat de integritate"
+ * scria „în vederea ridicării Cazier Judiciar" (raport echipă 27.07.2026).
+ *
+ * `action` = ce face avocatul la autoritate (implicit „ridicării").
+ */
+const DELEGATION_INSTITUTIE_MAP: Record<
+  string,
+  { authority: string; document: string; action?: string }
+> = {
+  addon_certificat_integritate: INSTITUTIE_MAP['certificat-integritate'],
+  addon_certificat_nastere: INSTITUTIE_MAP['certificat-nastere'],
+  addon_certificat_casatorie: INSTITUTIE_MAP['certificat-casatorie'],
+  addon_certificat_celibat: INSTITUTIE_MAP['certificat-celibat'],
+  addon_cazier_fiscal: INSTITUTIE_MAP['cazier-fiscal'],
+  cazier_secundar: INSTITUTIE_MAP['cazier-judiciar'],
+  apostila_haga: {
+    authority: 'INSTITUȚIA PREFECTULUI - JUDEȚUL SATU MARE',
+    document: 'Apostilei de la Haga',
+    action: 'aplicării',
+  },
 };
 
 // ──────────────────────────────────────────────────────────────
@@ -581,12 +625,41 @@ export function buildActivitatiStareCivila(serviceSlug?: string): string {
  *   „să se prezinte la IPJ SATU MARE, în vederea ridicării Cazier Judiciar.
  *    Motivul solicitării: AUTORITATI."
  * Înainte scria doar „IPJ SATU MARE - CAZIER AUTO", fără motiv.
+ *
+ * `delegationServiceType` = pentru CE s-a alocat delegația. Pe împuternicirile
+ * add-on-urilor (certificat de integritate, cazier fiscal, apostilă...) textul
+ * trebuie să fie al ADD-ON-ULUI, nu al serviciului principal — altfel ies două
+ * împuterniciri identice cu numere de delegație diferite (E-260725-9BGGD).
+ * Formatul cheii pentru opțiunile bundled e
+ * `bundled:<parentId>:<serviceSlug>:<code>` (vezi delegation-items.ts).
  */
-export function buildInstitutie(serviceSlug?: string, motiv?: string): string {
+export function buildInstitutie(
+  serviceSlug?: string,
+  motiv?: string,
+  delegationServiceType?: string | null,
+): string {
+  const motivPart = motiv?.trim() ? ` Motivul solicitării: ${motiv.trim()}.` : '';
+
+  const dt = (delegationServiceType || '').trim();
+  if (dt) {
+    // bundled:<parentId>:<serviceSlug>:<code> → contează codul opțiunii, iar
+    // slug-ul spune pe CE document se aplică (ex. apostilă pe integritate).
+    const bundled = dt.startsWith('bundled:') ? dt.split(':') : null;
+    const code = bundled ? bundled[3] : dt;
+    const bundledSlug = bundled ? bundled[2] : '';
+    const entry = DELEGATION_INSTITUTIE_MAP[code] || INSTITUTIE_MAP[code];
+    if (entry) {
+      const onDoc =
+        bundledSlug && INSTITUTIE_MAP[bundledSlug]
+          ? ` pe ${INSTITUTIE_MAP[bundledSlug].document}`
+          : '';
+      return `să se prezinte la ${entry.authority}, în vederea ${entry.action || 'ridicării'} ${entry.document}${onDoc}.${motivPart}`;
+    }
+  }
+
   const entry = INSTITUTIE_MAP[serviceSlug || ''];
   if (!entry) return serviceSlug || '';
-  const motivPart = motiv?.trim() ? ` Motivul solicitării: ${motiv.trim()}.` : '';
-  return `să se prezinte la ${entry.authority}, în vederea ridicării ${entry.document}.${motivPart}`;
+  return `să se prezinte la ${entry.authority}, în vederea ${entry.action || 'ridicării'} ${entry.document}.${motivPart}`;
 }
 
 /**
@@ -877,7 +950,11 @@ function buildPlaceholderData(ctx: DocumentContext) {
     CLIENT: ctx.client.name,
     MOTIV: ctx.motiv_solicitare || 'Interes personal',
     DATAGENERAT: dateFormatted,
-    INSTITUTIE: buildInstitutie(ctx.order.service_slug, ctx.motiv_solicitare),
+    INSTITUTIE: buildInstitutie(
+      ctx.order.service_slug,
+      ctx.motiv_solicitare,
+      ctx.delegation_service_type,
+    ),
 
     // Stare civilă — împuternicire model UNBR (Anexa II). Populated always;
     // only the per-service templates in src/templates/<slug-stare-civila>/

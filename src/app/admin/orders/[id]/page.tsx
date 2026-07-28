@@ -2065,6 +2065,24 @@ export default function AdminOrderDetailPage() {
                   ) : (
                     <InfoRow label="Nr. factură Oblio" value="—" />
                   )}
+                  {/* Blocaj e-Factura (SPV): Oblio emite factura chiar dacă
+                      ANAF refuză datele clientului, iar mesajul se vedea doar
+                      la „Trimite în SPV" — zile mai târziu. Verificarea rulează
+                      la emitere + orar (cron invoice-health-check). */}
+                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                  {(order as any).invoice_spv_status === 'blocked' && (
+                    <div className="mt-2 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-800">
+                      <p className="font-semibold mb-1">Factura NU se poate trimite în SPV</p>
+                      <p className="whitespace-pre-line">
+                        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                        {(order as any).invoice_spv_error || 'Datele clientului sunt respinse de validările ANAF.'}
+                      </p>
+                      <p className="mt-1.5 text-xs text-red-700">
+                        Corectează clientul în Oblio (Editează Client → Previzualizare Factură →
+                        Trimite în SPV). Verificarea se reia automat în ora următoare.
+                      </p>
+                    </div>
+                  )}
                   {/* Extra-charge invoices (Modify flow) — listed under the main
                       invoice so the team sees the full fiscal picture. */}
                   {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}

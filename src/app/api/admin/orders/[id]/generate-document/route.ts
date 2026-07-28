@@ -366,6 +366,12 @@ export async function POST(
       // Fall back to the purpose the customer picked in the wizard (e.g.
       // cazier-fiscal "Informare") before the generic default.
       motiv_solicitare: body.motiv_solicitare || contact.purpose || 'Interes personal',
+      // Împuternicirile per add-on: textul activităților trebuie să fie al
+      // documentului pentru care s-a alocat delegația, nu al serviciului
+      // principal (E-260725-9BGGD: delegația de integritate scria „ridicării
+      // Cazier Judiciar"). Vezi buildInstitutie în generator.ts.
+      delegation_service_type:
+        template === 'imputernicire' ? (body.service_type ?? null) : null,
       client_ip: cd.signature_metadata?.ip_address || 'N/A',
     };
 
