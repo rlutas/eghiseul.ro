@@ -83,8 +83,36 @@ Potrivire pe nume exact; dacă numele apare la mai multe lockere, comanda e rapo
 endpointuri — **`lockerId 3386` == `oohId 3386`**, deci ID-urile scrise de backfill
 sunt cele bune.
 
+## Test REAL de emitere, pe contul live (28.07.2026, ora 21:21)
+
+La cererea lui Raul s-a emis un AWB adevărat prin exact același drum de cod ca butonul
+din admin (`SamedayProvider.createShipment`), cu datele reale ale comenzii
+`E-260728-YFHH2`: **`1ONBLN519983355`**.
+
+Eticheta descărcată de la Sameday confirmă că a plecat **către locker**, nu la adresă:
+
+```
+Expediere:     NextDay Locker NextDay
+Adresa locker: Str. Octavian Augustus, Nr. 3, (Brasov), 500327   <- easybox Kripton
+DESTINATAR:    POPA ADRIAN MIHAIL                                 <- numele corectat azi
+EXPEDITOR:     EDIGITALIZARE S.R.L. - punct ridicare SM_SATUMARE_A01
+Cost:          20,46 RON net / 24,76 cu TVA
+```
+
+Deci integrarea merge cap-coadă: autentificare live -> serviciu 15 -> `oohLastMile`
+3386 -> AWB emis -> PDF generat. Rută: `SM_SATUMARE_A01 -> SB_SIBIU_H01 -> BV_BRASOV_A01`.
+
+Costul real (24,76 cu TVA) e sub cât s-a încasat pe comandă (33,48) — marja e acoperită.
+
+**AWB-ul de test NU a fost scris în baza de date** (nici status `shipped`, nici tracking
+la client), tocmai ca echipa să nu vadă o expediere pe care n-a făcut-o. Două variante:
+- se șterge (`scripts/test-sameday-awb-locker.ts --delete 1ONBLN519983355`) și echipa
+  generează AWB-ul normal din admin;
+- sau se păstrează și se trece manual pe comandă.
+
+Ștergerea funcționează: `DELETE /api/awb/{awb}` există și răspunde corect (testat cu
+un număr inexistent -> 404 „Couldn't determine an AWB").
+
 ## Verificare
 
-`1.361` teste trec (6 noi), `tsc` curat, build verde. Autentificarea și listarea
-lockerelor testate pe API-ul live; **nu s-a emis niciun AWB automat** — prima emitere
-o face echipa din admin, ca să nu creăm expedieri reale din script.
+`1.361` teste trec (6 noi), `tsc` curat, build verde.
