@@ -59,6 +59,62 @@ Acoperea doar servicii + calculatoare. Lipseau **tool-ul de verificare roviniet�
 - `prefetch={false}` pe linkurile de footer (desktop transfera 2-3× mai multe request-uri decât mobil — prefetch agresiv pe viewport lat).
 - Link intern nou de la articolul de cazier auto către pagina de cazier judiciar + corectat descrierea care spunea greșit „istoricul vehiculului" (cazierul auto e fișa conducătorului).
 
+### 8. TTFB: middleware-ul de sesiune rula pe fiecare pagină publică
+
+`src/proxy.ts` avea matcher „tot ce nu e asset static", deci `updateSession()` — care apelează
+`supabase.auth.getUser()` — rula la **fiecare cerere**: homepage, 40+ calculatoare, articole,
+`/servicii/*`, `sitemap.xml`, `llms.txt`. Muncă de autentificare pe ~toate cele 54.000 de vizite
+organice lunare, cu rezultatul aruncat — paginile publice nu citesc niciodată sesiunea.
+
+⚠️ De ce n-a găsit-o auditul: **Next 16 a redenumit `middleware.ts` în `proxy.ts`**, iar căutarea
+inițială după `middleware.ts` n-a întors nimic, așa că raportul a marcat cauza „neverificată".
+
+Matcher restrâns la zonele cu sesiune: `/admin`, `/account`, `/kyc`, `/orders`, `/auth`,
+`/colaborator`, `/comanda`, `/completare`, `/reincarca-poza`, `/api`. (`/api` rămâne: wizardul salvează
+draft-uri des și are nevoie de token proaspăt.)
+
+Măsurat pe producție, mediana din 5 cereri după încălzire:
+
+| Pagină | Înainte | După | |
+|---|---|---|---|
+| Homepage | 237 ms | 180 ms | −24% |
+| `/contact/` | 233 ms | 179 ms | −23% |
+| `/servicii/cazier-judiciar-online/` | 207 ms | 177 ms | −15% |
+| `/calculator/varsta-pensionare/` | 198 ms | 175 ms | −12% |
+
+Măsurătorile sunt dintr-un singur punct, cu zgomot vizibil (min-max 0,09–0,58 s); cifra care
+contează rămâne CrUX-ul, de re-verificat peste ~3 săptămâni (baseline 266 ms).
+
+Verificat că nu s-a rupt autentificarea: `/account/` → 307 către login, `/admin` protejat,
+`/comanda/` și homepage 200.
+
+**CSS render-blocking — testat și respins.** `experimental.optimizeCss` construiește fără eroare dar
+**nu inline-uiește nimic** (0 taguri `<style>` în HTML-ul generat) — flag fără efect, ar cere
+dependența `beasties`. CSS-ul real: 211 KB brut / **33 KB gzip**, un singur bundle. De testat pe
+preview, nu pe main.
+
+### 9. FAQ-urile randate server-side, fără JS de acordeon
+
+`ServiceFAQ` (33 de pagini + toate articolele) și `FAQSection` (homepage) erau componente client cu
+`useState`. Problema reală, descoperită la măsurare: FAQ-ul de pe homepage randa răspunsul **doar când
+era deschis** (`{open && ...}`), deci **11 din 12 răspunsuri nu existau deloc în HTML-ul livrat** —
+Google le vede (execută JS), crawlerele AI nu.
+
+Acum `<details>` + `<summary>` randate pe server, cu `name` pentru acordeon exclusiv **nativ** (zero JS).
+Aspect identic: chevron rotit, bordură aurie pe elementul deschis, aceleași tranziții.
+
+Verificat în browser pe build de producție: 15 `<details>` pe homepage / 20 pe pagina de cazier, unul
+singur deschis, click-ul îl închide pe precedent, `rotate: 180deg` după tranziție, bordură
+`rgb(243, 210, 102)`, iar codul de acordeon a dispărut din bundle-urile client (0 chunk-uri).
+
+⚠️ Capcană evitată: prima versiune construia clasa dinamic (`open:${theme.openBorder}`), pe care
+Tailwind NU o compilează — exact ce avertiza un comentariu existent în fișier. Înlocuit cu literali
+`openBorderVariant` per temă.
+
+**Onest despre efect:** NU reduce greutatea paginii, cum estimasem („~11 KB per pagină") — payload-ul
+RSC serializează și arborele randat pe server. Câștigul real: toate răspunsurile ajung în HTML (pentru
+AI) și dispare JS-ul de acordeon.
+
 ---
 
 ## Corecții la propriile constatări intermediare

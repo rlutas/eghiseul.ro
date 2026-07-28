@@ -60,16 +60,17 @@ de zile e anormal chiar și pentru conținut slab. Merită un `gsc_inspect` + ce
 | 5.1 | Critical CSS — 751 ms render-blocking | ⚠️ **testat 28.07: `experimental.optimizeCss` NU face nimic** (build trece, dar 0 taguri `<style>` inline în HTML). Cere dependența `beasties`. CSS-ul e 211 KB brut / **33 KB gzip**, un singur bundle. De testat pe preview, nu pe main. |
 | 5.2 | Code-split `QueryProvider` / `Header` — ~450 ms JS neutilizat | `src/app/layout.tsx` |
 | 5.3 | Banner cookie pe `position:fixed` + animație pe `transform/opacity` | `src/components/consent/cookie-consent.tsx` |
-| 5.4 | `prefetch={false}` pe footer + grila de servicii | componentele de navigație |
+| ~~5.4~~ | ✅ **FĂCUT 28.07** — `prefetch={false}` pe linkurile de footer. | |
 | ~~5.5~~ | ~~Investighează cauza TTFB~~ | **REZOLVAT 28.07** — cauza: `src/proxy.ts` (Next 16 a redenumit `middleware.ts` → `proxy.ts`, de-aia n-a fost găsit la audit) rula `supabase.auth.getUser()` pe FIECARE cerere, inclusiv pagini publice. Matcher restrâns la zonele cu sesiune. Măsurat live, mediana din 5 cereri după încălzire: homepage 237→180 ms (−24%), /contact/ 233→179 ms (−23%), calculator 198→175 ms (−12%), pagină serviciu 207→177 ms (−15%). Confirmare finală în CrUX peste ~3 săptămâni. |
 
 ## Faza 6 — AI search (ieftin, efect pe citări)
 
 | # | Ce |
 |---|---|
-| 6.1 | Extinde `llms.txt` cu articolele care aduc trafic (ANCPI, pensionare, taxe) — acum acoperă doar servicii + calculatoare |
+| ~~6.1~~ | ✅ **FĂCUT 28.07** — 11 ghiduri + 3 instrumente (inclusiv tool-ul de rovinietă, 11.309 clicuri/lună, care lipsea complet). |
 | 6.2 | Rescrie intro-ul `/taxa-cazier-judiciar/` ca răspuns direct în primele 40-60 de cuvinte (acum are ~65 de cuvinte de intro generic) |
-| 6.3 | Randează server-side elementele-cheie ale tool-ului de rovinietă (acum `BAILOUT_TO_CLIENT_SIDE_RENDERING`, 0 `<input>` în HTML) — crawlerele AI nu execută JS |
+| ~~6.3~~ | ⚠️ **Finding greșit, închis 28.07.** Tool-ul e un **iframe terț** (erovinieta.net) — nu poate fi randat de noi. Conținutul editorial și JSON-LD-ul SUNT server-rendered; bailout-ul din HTML vine de la un widget client-only, nu de la conținut. |
+| 6.4 | ✅ **FĂCUT 28.07** — FAQ-urile mutate pe `<details>` server-side: pe homepage 11 din 12 răspunsuri NU existau în HTML (`{open && ...}`), invizibile pentru crawlerele AI. Acum toate sunt în HTML, acordeon exclusiv nativ, zero JS. |
 
 ## Faza 7 — securitate (nu SEO, dar a ieșit la audit)
 
@@ -101,5 +102,15 @@ Auditul ăsta e **baseline-ul**. De acum:
 ~/.claude/skills/seo/bin/claude-seo run gsc_query.py --days 28 --dimensions query --limit 100
 ```
 
-Metrici de urmărit, cu valorile de plecare de azi: **28/44 URL-uri indexate în eșantion**, afișări pagină de
-serviciu cazier **495**, LCP lab **3,5 s**, TTFB CrUX **266 ms**, CLS **0,02**.
+Metrici de urmărit, cu valorile de plecare de azi: **8/48 pagini-oraș indexate**, afișări pagină de
+serviciu cazier **495** (vs 19.243 homepage pe aceeași interogare), LCP lab **3,5 s**, TTFB CrUX
+**266 ms**, CLS **0,02**, sitemap **182 URL-uri**.
+
+### Ce s-a livrat pe 28.07 (rezumat)
+
+Fazele 1 (integral), 3 (paginile-oraș), 5.4 + 5.5 (prefetch + TTFB), 6.1 + 6.4 (llms.txt + FAQ), plus
+H1-ul rupt pe 30 de pagini — descoperit în timpul lucrului, nu în audit. Detalii și măsurători:
+[`docs/changelog/2026-07-28-audit-seo-si-fixuri.md`](../../changelog/2026-07-28-audit-seo-si-fixuri.md).
+
+Rămase deschise: 2 (canibalizarea — de re-măsurat), 4 (E-E-A-T, la Raul), 5.1-5.3 (CSS/JS/CLS),
+6.2, 7 (CSP + HSTS), 8 (verificări manuale GBP).
