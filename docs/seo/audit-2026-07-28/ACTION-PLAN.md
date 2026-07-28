@@ -57,11 +57,11 @@ de zile e anormal chiar și pentru conținut slab. Merită un `gsc_inspect` + ce
 
 | # | Ce | Unde |
 |---|---|---|
-| 5.1 | Critical CSS / `optimizeCss` — 751 ms render-blocking | `next.config.ts` |
+| 5.1 | Critical CSS — 751 ms render-blocking | ⚠️ **testat 28.07: `experimental.optimizeCss` NU face nimic** (build trece, dar 0 taguri `<style>` inline în HTML). Cere dependența `beasties`. CSS-ul e 211 KB brut / **33 KB gzip**, un singur bundle. De testat pe preview, nu pe main. |
 | 5.2 | Code-split `QueryProvider` / `Header` — ~450 ms JS neutilizat | `src/app/layout.tsx` |
 | 5.3 | Banner cookie pe `position:fixed` + animație pe `transform/opacity` | `src/components/consent/cookie-consent.tsx` |
 | 5.4 | `prefetch={false}` pe footer + grila de servicii | componentele de navigație |
-| 5.5 | Investighează cauza TTFB +19,9% (`middleware.ts`, ISR/revalidate) | neverificat în audit |
+| ~~5.5~~ | ~~Investighează cauza TTFB~~ | **REZOLVAT 28.07** — cauza: `src/proxy.ts` (Next 16 a redenumit `middleware.ts` → `proxy.ts`, de-aia n-a fost găsit la audit) rula `supabase.auth.getUser()` pe FIECARE cerere, inclusiv pagini publice. Matcher restrâns la zonele cu sesiune. Măsurat live, mediana din 5 cereri după încălzire: homepage 237→180 ms (−24%), /contact/ 233→179 ms (−23%), calculator 198→175 ms (−12%), pagină serviciu 207→177 ms (−15%). Confirmare finală în CrUX peste ~3 săptămâni. |
 
 ## Faza 6 — AI search (ieftin, efect pe citări)
 
