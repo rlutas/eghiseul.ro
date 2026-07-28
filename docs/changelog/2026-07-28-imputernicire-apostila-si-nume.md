@@ -111,11 +111,31 @@ Nou: `src/lib/format/person-name.ts` — `cleanNamePart()`, `formatPersonName()`
 Când avem doar un câmp `name` compus, îl curățăm dar **nu** îl reordonăm: într-un șir
 liber nu poți ști unde se termină numele de familie.
 
-## De făcut manual
+## Documentele deja emise — ce s-a refăcut și ce NU
 
-Împuternicirea deja generată pentru `E-260728-YFHH2` are textul și numele vechi.
-Regenerarea din admin e sigură: alocarea de numere e idempotentă per (comandă, tip),
-deci documentul refăcut **păstrează seria SM 007442** — nu consumă un număr nou.
+La cererea lui Raul, documentele au fost regenerate **doar pentru comenzile depuse**
+(ciornele și cea abandonată se regenerează oricum când merg mai departe).
+
+Scriptul `scripts/regenerate-imputerniciri-name-fix.ts` reface documentele pe același
+drum de cod ca ruta din admin (`generateDocument`), cu aceleași numere — alocarea din
+registrul central e idempotentă per (comandă, tip, serviciu). Are o **poartă de
+siguranță**: documentul nou e comparat cu cel de pe S3 înainte de upload, iar dacă
+diferă altceva decât numele, nu se urcă nimic. Poarta a prins două cazuri reale:
+
+| Comandă | Rezultat |
+|---|---|
+| `E-260728-YFHH2` | ✅ **refăcute 3 documente** (împuternicire cazier, cerere, împuternicire apostilă) — singura schimbare a fost numele; seria SM 007441/007442 păstrată, iar textul apostilei a intrat corect: „…aplicării Apostilei de la Haga **pe Cazier Judiciar**" |
+| `E-260718-ZZ4C5` | ⏭ **sărit** — regenerarea ar fi rescris și **data delegației** din 20.07 în ziua de azi, deși a fost emisă atunci |
+| `E-260713-NYT6R` | ⏭ **sărit** — între timp s-a schimbat **șablonul** împuternicirii pentru stare civilă (model UNBR Anexa II), deci documentul ar fi ieșit cu totul altfel decât cel depus la instituție (30 de linii diferite) |
+
+Contractele de asistență au fost regenerate pentru toate trei
+(`scripts/regenerate-docs-name-fix-2026-07-28.ts`), acolo data nu e parte din
+identitatea documentului.
+
+**Decizie umană rămasă:** pentru cele două sărite, dacă echipa vrea documentele cu
+numele corect, regenerarea din admin funcționează — dar acceptând schimbarea de dată,
+respectiv de șablon. Pentru `E-260713-NYT6R` merită întâi verificat dacă instituția
+a acceptat documentul depus cu numele greșit.
 
 ## Verificare
 
