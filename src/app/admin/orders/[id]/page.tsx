@@ -83,6 +83,7 @@ import {
   Trash2,
 } from 'lucide-react';
 import { formatPersonName, cleanNamePart } from '@/lib/format/person-name';
+import { hasDeliveryAddressData, isEmailOnlyDelivery } from '@/lib/delivery/address';
 import {
   SUPPLIER_CATEGORIES,
   SUPPLIER_CATEGORY_LABELS,
@@ -1808,13 +1809,17 @@ export default function AdminOrderDetailPage() {
         {/* Delivery Address — hidden entirely for email-only deliveries
             (certificat constatator, extras CF: PDF-ul e singura metodă, cardul
             ar arăta doar "Metoda: Email (PDF)" = zgomot). Reapare dacă există
-            orice semnal fizic: adresă, curier sau AWB. */}
-        {!(
-          deliveryMethodParsed?.type === 'email' &&
-          !order.delivery_address &&
-          !detectedCourierProvider &&
-          !order.delivery_tracking_number
-        ) && (
+            orice semnal fizic: adresă, curier sau AWB.
+            Adresa se judecă pe conținut, nu pe existența obiectului: wizardul
+            salvează `{street:'', city:'', ...}` și pe comenzile pe email, iar
+            obiectul gol e truthy — de-aia cardul reapărea, cu un destinatar
+            dedus din datele clientului (E-260721-VJWWN). */}
+        {!isEmailOnlyDelivery({
+          deliveryType: deliveryMethodParsed?.type,
+          address: order.delivery_address as AnyObj | null,
+          courierProvider: detectedCourierProvider,
+          trackingNumber: order.delivery_tracking_number,
+        }) && (
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-base flex items-center gap-2">
@@ -1863,7 +1868,7 @@ export default function AdminOrderDetailPage() {
                 Emite-l din contul curierului și adaugă-l manual.
               </p>
             )}
-            {order.delivery_address && (
+            {order.delivery_address && hasDeliveryAddressData(order.delivery_address as AnyObj) && (
               <>
                 <Separator className="my-2" />
                 <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Adresa livrare</p>
