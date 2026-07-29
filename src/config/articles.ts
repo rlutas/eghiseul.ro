@@ -31,7 +31,6 @@ export const ARTICLES: ArticleMeta[] = [
     excerpt:
       'Cine trebuie să le prezinte la angajarea în învățământ, de ce nu se depun din nou la fiecare 6 luni și când să le ceri ca să le ai la 1 septembrie. Plus rutele gratuite.',
     category: 'Juridice',
-    image: '/images/articole/ghid-complet-certificat-de-integritate-comportamentala.webp',
   },
   {
     slug: 'certificat-de-nastere-din-strainatate',

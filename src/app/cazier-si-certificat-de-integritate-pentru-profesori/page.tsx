@@ -16,7 +16,7 @@ export const metadata = buildPageMetadata({
   title: 'Cazier și Certificat de Integritate pentru Profesori (Ghid)',
   description: DESCRIPTION,
   path: `/${SLUG}/`,
-  ogImage: '/images/articole/ghid-complet-certificat-de-integritate-comportamentala.webp',
+  ogImage: `/images/articole/${SLUG}.webp`,
 });
 
 export default function Page() {
@@ -30,7 +30,6 @@ export default function Page() {
       dateModified={DATE_MODIFIED}
       publishedLabel="29 iulie 2026"
       updatedLabel="29 iulie 2026"
-      image="/images/articole/ghid-complet-certificat-de-integritate-comportamentala.webp"
       imageAlt="Cazier judiciar și certificat de integritate comportamentală pentru cadre didactice"
       relatedServices={[
         {
@@ -81,9 +80,29 @@ export default function Page() {
         În fiecare an, la final de august și început de septembrie, mii de profesori, educatori și angajați din
         școli au de pregătit același dosar: <strong>cazierul judiciar</strong> și{' '}
         <strong>certificatul de integritate comportamentală</strong>. Ambele sunt valabile doar 6 luni, așa că nu
-        pot fi scoase „din timp" în primăvară — iar în septembrie cozile la ghișeele de cazier sunt cele mai lungi
-        din an. Ghidul de mai jos îți spune exact cine are nevoie de ele, când și cum le obții fără drumuri.
+        pot fi scoase „din timp" în primăvară. Am strâns aici regulile care se aplică de fapt — inclusiv două pe
+        care mulți le știu greșit — și datele care arată de ce nu merită să lași totul pe septembrie.
       </p>
+
+      <h2>Ce arată datele: interesul explodează înainte de școală</h2>
+      <p>Nu e o impresie, se vede în cifre:</p>
+      <ul>
+        <li>
+          în ultimele 3 luni (mai–iulie 2026), căutările Google legate de certificatul de integritate
+          comportamentală au generat <strong>21.715 afișări</strong> și aproape 1.600 de accesări doar către
+          paginile eGhișeul.ro — 23 de formulări diferite ale aceleiași nevoi (date proprii, Google Search
+          Console);
+        </li>
+        <li>
+          interesul de căutare pentru „certificat de integritate comportamentală" atinge vârful anual în{' '}
+          <strong>septembrie</strong>, odată cu angajările din învățământ (Google Trends, România);
+        </li>
+        <li>
+          a doua cea mai frecventă căutare din serie este „certificat de integritate comportamentala online{' '}
+          <strong>gratuit</strong>" — majoritatea caută întâi ruta fără costuri. E mai jos în ghid, cu condițiile
+          ei reale.
+        </li>
+      </ul>
 
       <h2>Cine trebuie să prezinte cele două documente</h2>
       <p>

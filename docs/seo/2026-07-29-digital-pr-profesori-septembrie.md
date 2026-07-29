@@ -7,9 +7,12 @@
 - La 1 septembrie se semnează contractele noi în învățământ; cazier + certificat de
   integritate comportamentală sunt obligatorii la angajare (Legea 118/2019) și valabile
   doar 6 luni — deci NU pot fi scoase din primăvară. Vârful de cereri e august–septembrie.
-- Date GSC proprii (iul 2026): „certificat de integritate comportamentala" =
-  **9.677 afișări/lună** doar la noi, poziție medie 3,44. Interesul de căutare explodează
-  sezonier în august–septembrie (Google Trends, verificat 29.07).
+- Date GSC proprii (mai–iul 2026, 3 luni): **23 de interogări** cu „integritate" =
+  **21.715 afișări** și **1.598 clicuri** doar către paginile noastre; interogarea principală
+  „certificat de integritate comportamentala" are poziție medie 3,44. Interesul de căutare
+  explodează sezonier în august–septembrie (Google Trends, verificat 29.07).
+- ⚠️ Cifrele de mai sus sunt TOTALURI PE 3 LUNI, nu pe lună — nu le prezenta „pe lună"
+  în pitch (jurnaliștii verifică).
 - Presa de educație scrie deja despre dosare (Edupedu: titularizare, evaluare
   psihiatrică obligatorie 2026) — subiectul „cum îți scoți actele la timp" e complementar,
   nu concurent.
@@ -36,9 +39,11 @@ să le prezinte, clarificarea ME (nu se redepun la 6 luni), excepția de la titu
 >
 > Bună ziua,
 >
-> Pe platforma noastră, căutările pentru „certificat de integritate comportamentală"
-> depășesc 9.500 de afișări pe lună, iar vârful vine în fiecare an în august–septembrie,
-> odată cu dosarele de angajare din învățământ. Problema practică: ambele documente
+> În ultimele 3 luni, căutările Google legate de certificatul de integritate
+> comportamentală au generat peste 21.700 de afișări doar către paginile platformei
+> noastre, în 23 de formulări diferite — iar vârful vine în fiecare an în septembrie,
+> odată cu dosarele de angajare din învățământ (Google Trends). Problema practică:
+> ambele documente
 > cerute la angajare (cazier judiciar + certificat de integritate) sunt valabile doar
 > 6 luni, deci nu pot fi pregătite din timp — iar în prima săptămână de septembrie
 > ghișeele de cazier au cel mai mare volum din an.
