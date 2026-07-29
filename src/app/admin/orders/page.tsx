@@ -123,6 +123,9 @@ interface OrderRow {
     billing?: { type?: string; companyName?: string };
   } | null;
   created_at: string | null;
+  /** Momentul plății — ce interesează echipa. O ciornă începută acum 6 zile și
+   *  plătită azi e o comandă de AZI (E-260723-HM6X7). */
+  paid_at?: string | null;
   estimated_completion_date: string | null;
   invoice_number: string | null;
   invoice_url: string | null;
@@ -557,10 +560,22 @@ export default function AdminOrdersPage() {
                         </span>
                       )}
                     </div>
-                    {/* Cât timp a trecut de la plasarea comenzii — sub nr., ca pe CJO. */}
-                    {order.created_at && (
-                      <div className="mt-0.5 text-[11px] font-normal text-muted-foreground">
-                        {formatRelative(order.created_at)}
+                    {/* Cât timp a trecut de la PLATĂ (nu de la începerea ciornei):
+                        o comandă începută acum 6 zile și plătită azi e de azi. */}
+                    {(order.paid_at || order.created_at) && (
+                      <div
+                        className="mt-0.5 text-[11px] font-normal text-muted-foreground"
+                        title={
+                          order.paid_at
+                            ? `Plătită ${new Date(order.paid_at).toLocaleString('ro-RO', { timeZone: 'Europe/Bucharest' })}${
+                                order.created_at
+                                  ? ` · începută ${new Date(order.created_at).toLocaleDateString('ro-RO', { timeZone: 'Europe/Bucharest' })}`
+                                  : ''
+                              }`
+                            : 'Comandă neplătită — timpul curge de la începerea ei'
+                        }
+                      >
+                        {formatRelative(order.paid_at || order.created_at!)}
                       </div>
                     )}
                     {/* Nr. contract asistență · delegație — sub nr. comandă, ca pe CJO */}
@@ -655,13 +670,37 @@ export default function AdminOrdersPage() {
                     <DeadlineCell iso={order.estimated_completion_date} status={order.status} slug={order.services?.slug} outages={openOutages} />
                   </TableCell>
                   <TableCell className="whitespace-nowrap text-sm text-muted-foreground">
-                    {order.created_at
-                      ? new Date(order.created_at).toLocaleDateString('ro-RO', {
-                          day: '2-digit',
-                          month: '2-digit',
-                          timeZone: 'Europe/Bucharest',
-                        })
-                      : '-'}
+                    {/* Data plății — nu a începerii ciornei. */}
+                    {(() => {
+                      const iso = order.paid_at || order.created_at;
+                      if (!iso) return '-';
+                      const shown = new Date(iso).toLocaleDateString('ro-RO', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        timeZone: 'Europe/Bucharest',
+                      });
+                      const startedEarlier =
+                        !!order.paid_at &&
+                        !!order.created_at &&
+                        new Date(order.created_at).toDateString() !==
+                          new Date(order.paid_at).toDateString();
+                      return (
+                        <span
+                          title={
+                            order.paid_at
+                              ? `Plătită ${new Date(order.paid_at).toLocaleString('ro-RO', { timeZone: 'Europe/Bucharest' })}${
+                                  startedEarlier
+                                    ? ` · începută ${new Date(order.created_at!).toLocaleDateString('ro-RO', { timeZone: 'Europe/Bucharest' })}`
+                                    : ''
+                                }`
+                              : 'Neplătită — data începerii'
+                          }
+                        >
+                          {shown}
+                          {startedEarlier && <span className="ml-0.5 text-[10px]">*</span>}
+                        </span>
+                      );
+                    })()}
                   </TableCell>
                   <TableCell className="text-right">
                     <Button

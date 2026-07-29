@@ -79,6 +79,7 @@ export async function GET(request: NextRequest) {
         customer_data,
         selected_options,
         created_at,
+        paid_at,
         estimated_completion_date,
         invoice_number,
         invoice_url,

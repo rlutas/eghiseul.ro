@@ -1046,6 +1046,14 @@ export default function AdminOrderDetailPage() {
             </div>
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1 text-sm text-muted-foreground">
               <span>Creata: {formatDateLong(order.created_at)}</span>
+              {/* Data plății, separat de cea a creării: clientul poate începe
+                  comanda azi și plăti peste o săptămână (E-260723-HM6X7 —
+                  începută pe 23, plătită pe 29). Pentru echipă contează plata. */}
+              {order.paid_at && (
+                <span className="font-medium text-emerald-700">
+                  Plătită: {formatDate(order.paid_at)}
+                </span>
+              )}
               {order.submitted_at && <span>Trimisa: {formatDate(order.submitted_at)}</span>}
               {/* Termen estimat — up top, right under the order number (sister
                   parity). Hidden once the order reached a terminal state — a
