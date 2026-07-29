@@ -9,7 +9,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { Coins } from 'lucide-react';
@@ -33,11 +33,18 @@ interface SupplierGroup {
   total: number;
   rows: CostRow[];
 }
+interface MissingRow {
+  orderId: string;
+  orderNumber: string;
+  categories: string[];
+}
 interface Report {
   month: string;
   grandTotal: number;
   count: number;
   suppliers: SupplierGroup[];
+  /** Comenzi finalizate în lună care ar trebui să aibă cost, dar nu au. */
+  missing?: MissingRow[];
 }
 
 function currentMonth(): string {
@@ -162,6 +169,35 @@ export default function CosturiFurnizoriPage() {
               </CardContent>
             </Card>
           ))}
+
+          {/* Ce a rămas de completat — comenzi finalizate cu cost intern
+              neînregistrat. Derivat din comandă, nu dintr-un flag: nu poate
+              rămâne în urmă față de realitate. */}
+          {(report.missing?.length ?? 0) > 0 && (
+            <Card className="border-amber-200 bg-amber-50/40">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">
+                  De completat ({report.missing!.length})
+                </CardTitle>
+                <CardDescription>
+                  Comenzi finalizate luna asta care au traducere, legalizare, apostilă
+                  notarială sau taxă de instituție, dar niciun cost înregistrat.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-1.5">
+                {report.missing!.map((m) => (
+                  <div key={m.orderId} className="flex items-center gap-2 text-sm">
+                    <Link href={`/admin/orders/${m.orderId}`} className="font-mono text-xs underline shrink-0">
+                      {m.orderNumber}
+                    </Link>
+                    <span className="text-muted-foreground truncate">
+                      {m.categories.join(' · ')}
+                    </span>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          )}
         </>
       )}
     </div>

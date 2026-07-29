@@ -12,6 +12,7 @@ export const SUPPLIER_CATEGORIES = [
   'apostila',
   'supralegalizare',
   'copie_legalizata',
+  'taxa_institutie',
   'curier',
   'alt',
 ] as const;
@@ -24,8 +25,50 @@ export const SUPPLIER_CATEGORY_LABELS: Record<SupplierCategory, string> = {
   apostila: 'Apostilă',
   supralegalizare: 'Supralegalizare',
   copie_legalizata: 'Copie legalizată',
+  taxa_institutie: 'Taxă instituție',
   curier: 'Curier',
   alt: 'Alt cost',
+};
+
+/** Canonical supplier names — seeded in admin_settings.suppliers (migration 137). */
+export const SUPPLIER_TRADUCATOR = 'Traducător';
+export const SUPPLIER_NOTAR = 'Notar';
+export const SUPPLIER_CAMERA_NOTARILOR = 'Camera Notarilor';
+export const SUPPLIER_ONRC = 'ONRC';
+export const SUPPLIER_ANCPI = 'ANCPI';
+
+/**
+ * Which supplier a category is normally paid to. The team never picks this by
+ * hand in the finalize dialog — legalizarea se face la notar, apostila
+ * notarială la Camera Notarilor.
+ */
+export const CATEGORY_DEFAULT_SUPPLIER: Record<SupplierCategory, string | null> = {
+  traducere: SUPPLIER_TRADUCATOR,
+  legalizare: SUPPLIER_NOTAR,
+  copie_legalizata: SUPPLIER_NOTAR,
+  apostila: SUPPLIER_CAMERA_NOTARILOR,
+  supralegalizare: SUPPLIER_CAMERA_NOTARILOR,
+  taxa_institutie: null, // depends on the service (ONRC vs ANCPI)
+  curier: null,
+  alt: null,
+};
+
+/**
+ * Order options that cost US money, mapped to the cost category they create.
+ *
+ * `apostila_haga` is deliberately absent: the Hague apostille costs us nothing,
+ * so it must not make the cost card appear. It stays in MARGIN_OPTION_CODES
+ * below — on an order that also has a translation, those 198 lei are real
+ * revenue at zero cost and excluding them would understate the margin.
+ * Same for `urgenta` / `cetatean_strain` / `extras_*`: our own fees, no supplier.
+ */
+export const COST_BEARING_OPTION_CATEGORY: Record<string, SupplierCategory> = {
+  traducere: 'traducere',
+  legalizare: 'legalizare',
+  apostila_notari: 'apostila',
+  supralegalizare: 'supralegalizare',
+  copie_legalizata: 'copie_legalizata',
+  custom_extra: 'alt',
 };
 
 export interface SupplierCostRow {
@@ -109,6 +152,200 @@ export function serviceRevenueForMargin(
     sum += unit * qty;
   }
   return Math.round(sum * 100) / 100;
+}
+
+/* ------------------------------------------------------------------ *
+ * Tariffs (admin_settings.supplier_tariffs) + finalize-dialog rows
+ * ------------------------------------------------------------------ */
+
+/**
+ * A configured tariff. Two shapes share one list:
+ *  - per page (translator/notary): firstPageRon + extraPageRon
+ *  - flat per service (ONRC/ANCPI institution fee): serviceSlug + amountRon
+ */
+export interface SupplierTariff {
+  supplier: string;
+  category: string;
+  /** Only for translations — a tariff can differ per language. */
+  language?: string | null;
+  /** Only for institution fees — which service this fee belongs to. */
+  serviceSlug?: string | null;
+  firstPageRon?: number | null;
+  extraPageRon?: number | null;
+  amountRon?: number | null;
+}
+
+/**
+ * Cost of `pages` pages under a tariff. First page costs firstPageRon, each
+ * further page extraPageRon (ex. notar: 45 + 5 + 5 = 55 lei for 3 pages).
+ * Flat tariffs (amountRon) ignore the page count. Returns null when the tariff
+ * cannot produce a number — the caller then falls back to history.
+ */
+export function tariffAmount(tariff: SupplierTariff | null | undefined, pages = 1): number | null {
+  if (!tariff) return null;
+  const n = Math.max(1, Math.floor(Number(pages) || 1));
+  if (tariff.amountRon != null && Number.isFinite(Number(tariff.amountRon))) {
+    return Math.round(Number(tariff.amountRon) * 100) / 100;
+  }
+  const first = Number(tariff.firstPageRon);
+  if (!Number.isFinite(first)) return null;
+  const extra = Number.isFinite(Number(tariff.extraPageRon)) ? Number(tariff.extraPageRon) : 0;
+  return Math.round((first + extra * (n - 1)) * 100) / 100;
+}
+
+/** Find the tariff matching a category (+ language / service), if configured. */
+export function findTariff(
+  tariffs: SupplierTariff[] | null | undefined,
+  match: { category: string; language?: string | null; serviceSlug?: string | null }
+): SupplierTariff | null {
+  const list = tariffs ?? [];
+  const sameCategory = list.filter((t) => t.category === match.category);
+  if (sameCategory.length === 0) return null;
+
+  const norm = (v: string | null | undefined) => (v ?? '').trim().toLowerCase();
+
+  if (match.serviceSlug) {
+    const byService = sameCategory.find((t) => norm(t.serviceSlug) === norm(match.serviceSlug));
+    if (byService) return byService;
+  }
+  if (match.language) {
+    const byLanguage = sameCategory.find((t) => norm(t.language) === norm(match.language));
+    if (byLanguage) return byLanguage;
+  }
+  // A tariff with neither language nor service set is the category-wide default.
+  return sameCategory.find((t) => !t.language && !t.serviceSlug) ?? null;
+}
+
+/** One line the team is asked to price when finalizing an order. */
+export interface PendingCostRow {
+  category: SupplierCategory;
+  /** Option code or service slug this row came from — for the description. */
+  sourceCode: string;
+  label: string;
+  supplier: string | null;
+  language: string | null;
+  serviceSlug: string | null;
+  /** Pre-filled amount: tariff first, last recorded amount second, else null. */
+  suggestedAmount: number | null;
+  suggestionSource: 'tarif' | 'istoric' | null;
+  /** The tariff behind the suggestion, so the dialog can re-price on page count. */
+  tariff: SupplierTariff | null;
+}
+
+interface OptionWithMeta extends OptionLike {
+  option_name?: string | null;
+  optionName?: string | null;
+  metadata?: { language?: string | null; country?: string | null } | null;
+}
+
+/**
+ * Which cost lines an order still needs. Empty array = no dialog, no card:
+ * a plain cazier + urgency order never asks the team for anything.
+ *
+ * `existingCategories` are the categories already recorded on the order, so a
+ * second finalize pass doesn't ask twice.
+ */
+export function pendingCostRows(params: {
+  options: OptionWithMeta[] | null | undefined;
+  serviceSlug?: string | null;
+  /** Services whose institution fee we pay (ONRC / ANCPI), from tariffs. */
+  institutionFeeSuppliers?: Record<string, string>;
+  existingCategories?: string[];
+  tariffs?: SupplierTariff[] | null;
+  lastAmounts?: Record<string, number>;
+}): PendingCostRow[] {
+  const done = new Set(params.existingCategories ?? []);
+  const rows: PendingCostRow[] = [];
+
+  const suggest = (
+    category: SupplierCategory,
+    supplier: string | null,
+    language: string | null,
+    serviceSlug: string | null
+  ): Pick<PendingCostRow, 'suggestedAmount' | 'suggestionSource' | 'tariff'> => {
+    const tariff = findTariff(params.tariffs, { category, language, serviceSlug });
+    const fromTariff = tariffAmount(tariff, 1);
+    if (fromTariff != null) {
+      return { suggestedAmount: fromTariff, suggestionSource: 'tarif', tariff };
+    }
+    const key = lastAmountKey(supplier, category, language);
+    const historic = params.lastAmounts?.[key];
+    if (historic != null && Number.isFinite(historic)) {
+      return { suggestedAmount: historic, suggestionSource: 'istoric', tariff: null };
+    }
+    return { suggestedAmount: null, suggestionSource: null, tariff: null };
+  };
+
+  // 1. Institution fee for the service itself (ONRC certificat constatator,
+  //    ANCPI extras CF & co) — we pay it on every single one of these orders.
+  const feeSupplier = params.serviceSlug
+    ? params.institutionFeeSuppliers?.[params.serviceSlug]
+    : undefined;
+  if (feeSupplier && !done.has('taxa_institutie')) {
+    rows.push({
+      category: 'taxa_institutie',
+      sourceCode: params.serviceSlug!,
+      label: `Taxă ${feeSupplier}`,
+      supplier: feeSupplier,
+      language: null,
+      serviceSlug: params.serviceSlug!,
+      ...suggest('taxa_institutie', feeSupplier, null, params.serviceSlug!),
+    });
+  }
+
+  // 2. Options bought from a collaborator.
+  for (const option of params.options ?? []) {
+    const code = option.code ?? '';
+    const category = COST_BEARING_OPTION_CATEGORY[code];
+    if (!category || done.has(category)) continue;
+    if (rows.some((r) => r.category === category)) continue;
+    const language = option.metadata?.language ?? null;
+    const supplier = CATEGORY_DEFAULT_SUPPLIER[category];
+    const name = option.option_name ?? option.optionName ?? SUPPLIER_CATEGORY_LABELS[category];
+    rows.push({
+      category,
+      sourceCode: code,
+      label: language ? `${name} · ${language}` : name,
+      supplier,
+      language,
+      serviceSlug: null,
+      ...suggest(category, supplier, language, null),
+    });
+  }
+
+  return rows;
+}
+
+/**
+ * Which services carry an institution fee, and to whom — derived from the
+ * configured tariffs (`taxa_institutie` entries with a serviceSlug) rather than
+ * hardcoded, so adding an ANCPI service is a settings change, not a deploy.
+ * The amount may still be unset: the row then shows up with an empty field.
+ */
+export function institutionFeeMap(
+  tariffs: SupplierTariff[] | null | undefined
+): Record<string, string> {
+  const map: Record<string, string> = {};
+  for (const t of tariffs ?? []) {
+    if (t.category !== 'taxa_institutie') continue;
+    const slug = (t.serviceSlug ?? '').trim();
+    const supplier = (t.supplier ?? '').trim();
+    if (slug && supplier) map[slug] = supplier;
+  }
+  return map;
+}
+
+/** Key for the "last amount used" lookup: supplier + category + language. */
+export function lastAmountKey(
+  supplier: string | null | undefined,
+  category: string,
+  language?: string | null
+): string {
+  return [
+    (supplier ?? '').trim().toLowerCase(),
+    category,
+    (language ?? '').trim().toLowerCase(),
+  ].join('|');
 }
 
 /** Margin = revenue − cost. Returns nulls when there's nothing to compare. */

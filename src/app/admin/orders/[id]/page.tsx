@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback, useMemo } from 'react';
+import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { toast } from 'sonner';
@@ -84,6 +84,7 @@ import {
 } from 'lucide-react';
 import { formatPersonName, cleanNamePart } from '@/lib/format/person-name';
 import { hasDeliveryAddressData, isEmailOnlyDelivery } from '@/lib/delivery/address';
+import { SupplierCostsDialog } from '@/components/admin/supplier-costs-dialog';
 import {
   SUPPLIER_CATEGORIES,
   SUPPLIER_CATEGORY_LABELS,
@@ -91,6 +92,7 @@ import {
   serviceRevenueForMargin,
   computeMargin,
   type SupplierCostRow,
+  type PendingCostRow,
 } from '@/lib/admin/supplier-costs';
 
 // ---------- Types ----------
@@ -646,6 +648,15 @@ export default function AdminOrderDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Cost dialog on finalize. Triggered by the STATUS TRANSITION into
+  // `completed`, not by any particular button — the order can be finalized from
+  // the processing button, the AWB card or the status dropdown, and a per-button
+  // hook would silently miss whichever path is added next (same trap as the
+  // status allow-list that made the processing section disappear).
+  const [pendingCosts, setPendingCosts] = useState<PendingCostRow[]>([]);
+  const [costDialogOpen, setCostDialogOpen] = useState(false);
+  const prevStatusRef = useRef<string | null>(null);
+
   // AWB state
   const [generating, setGenerating] = useState(false);
   const [modifyDialogOpen, setModifyDialogOpen] = useState(false);
@@ -676,6 +687,27 @@ export default function AdminOrderDetailPage() {
           ? (orderData.services[0] as OrderDetail['services']) || null
           : (orderData.services as OrderDetail['services']),
       } as unknown as OrderDetail;
+
+      // Ask for the internal costs the first time this order turns completed
+      // in front of us. Never on plain page loads of an already-finished order
+      // — that would nag on every visit; those show up in /admin/costuri-furnizori.
+      const previousStatus = prevStatusRef.current;
+      prevStatusRef.current = normalizedOrder.status ?? null;
+      if (previousStatus && previousStatus !== 'completed' && normalizedOrder.status === 'completed') {
+        void (async () => {
+          try {
+            const costRes = await fetch(`/api/admin/orders/${orderId}/supplier-costs`);
+            const costJson = await costRes.json();
+            const rows = (costJson?.pending ?? []) as PendingCostRow[];
+            if (rows.length > 0) {
+              setPendingCosts(rows);
+              setCostDialogOpen(true);
+            }
+          } catch {
+            /* costurile se pot completa oricând din card — nu blocăm finalizarea */
+          }
+        })();
+      }
 
       setOrder(normalizedOrder);
       setAccount(json.data.account || null);
@@ -2643,6 +2675,22 @@ export default function AdminOrderDetailPage() {
         onApplied={refreshSilent}
       />
 
+      {/* „Cât ne-a costat?" — se deschide la trecerea comenzii pe finalizat,
+          doar dacă are linii cu cost intern nepreţuite. */}
+      {costDialogOpen && pendingCosts.length > 0 && (
+        <SupplierCostsDialog
+          open={costDialogOpen}
+          orderId={order.id}
+          orderNumber={displayOrderNumber}
+          rows={pendingCosts}
+          onClose={() => setCostDialogOpen(false)}
+          onSaved={() => {
+            setCostDialogOpen(false);
+            refreshSilent();
+          }}
+        />
+      )}
+
     </div>
   );
 }
@@ -3098,6 +3146,7 @@ function ExtraPaymentBanners({ order, onRefresh }: { order: OrderDetail; onRefre
 // this order → per-order margin + fuels the monthly supplier report.
 function SupplierCostsCard({ order }: { order: OrderDetail }) {
   const [costs, setCosts] = useState<SupplierCostRow[]>([]);
+  const [pending, setPending] = useState<PendingCostRow[]>([]);
   const [suppliers, setSuppliers] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(false);
@@ -3115,7 +3164,10 @@ function SupplierCostsCard({ order }: { order: OrderDetail }) {
         fetch('/api/admin/settings'),
       ]);
       const cJson = await cRes.json();
-      if (cJson.success) setCosts(cJson.data as SupplierCostRow[]);
+      if (cJson.success) {
+        setCosts(cJson.data as SupplierCostRow[]);
+        setPending((cJson.pending ?? []) as PendingCostRow[]);
+      }
       const sJson = await sRes.json();
       const list = (sJson?.data?.suppliers as Array<{ name: string; active?: boolean }>) || [];
       const names = list.filter((s) => s.active !== false).map((s) => s.name);
@@ -3173,6 +3225,13 @@ function SupplierCostsCard({ order }: { order: OrderDetail }) {
     Number(o.additional_paid_amount ?? 0)
   );
   const margin = computeMargin(revenue, totalCost);
+
+  // Nothing to track, nothing to show. A cazier + urgency order pays no
+  // supplier, so the card would be pure noise on it — which is why nobody
+  // filled it in when it sat on every single order.
+  if (!loading && costs.length === 0 && pending.length === 0) {
+    return null;
+  }
 
   return (
     <Card>

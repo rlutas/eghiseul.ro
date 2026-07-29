@@ -4,6 +4,10 @@ import {
   totalSupplierCost,
   serviceRevenueForMargin,
   computeMargin,
+  pendingCostRows,
+  tariffAmount,
+  findTariff,
+  lastAmountKey,
 } from '@/lib/admin/supplier-costs';
 
 describe('validateSupplierCost', () => {
@@ -65,5 +69,150 @@ describe('computeMargin', () => {
   });
   it('zero revenue → null pct', () => {
     expect(computeMargin(0, 45).marginPct).toBe(null);
+  });
+});
+
+describe('pendingCostRows — ce cere echipei la finalizare', () => {
+  it('nu cere nimic pe o comandă simplă (cazier + urgență)', () => {
+    expect(
+      pendingCostRows({
+        options: [{ code: 'urgenta', option_name: 'Procesare Urgentă' }],
+        serviceSlug: 'cazier-judiciar',
+      }),
+    ).toEqual([]);
+  });
+
+  it('apostila Haga NU declanșează nimic — nu ne costă', () => {
+    expect(
+      pendingCostRows({
+        options: [
+          { code: 'apostila_haga', option_name: 'Apostilă de la Haga', metadata: { country: 'Brazilia' } },
+        ],
+        serviceSlug: 'cazier-judiciar',
+      }),
+    ).toEqual([]);
+  });
+
+  it('cere traducerea cu limba din comandă și furnizorul implicit', () => {
+    const rows = pendingCostRows({
+      options: [
+        { code: 'traducere', option_name: 'Traducere Autorizată', metadata: { language: 'Italiană' } },
+      ],
+      serviceSlug: 'certificat-nastere',
+    });
+    expect(rows).toHaveLength(1);
+    expect(rows[0]).toMatchObject({
+      category: 'traducere',
+      supplier: 'Traducător',
+      language: 'Italiană',
+      label: 'Traducere Autorizată · Italiană',
+    });
+  });
+
+  it('mapează legalizarea la notar și apostila notarială la Camera Notarilor', () => {
+    const rows = pendingCostRows({
+      options: [
+        { code: 'legalizare', option_name: 'Legalizare Notarială' },
+        { code: 'apostila_notari', option_name: 'Apostilă Notari' },
+      ],
+    });
+    expect(rows.map((r) => [r.category, r.supplier])).toEqual([
+      ['legalizare', 'Notar'],
+      ['apostila', 'Camera Notarilor'],
+    ]);
+  });
+
+  it('cere taxa de instituție pe comenzile ONRC/ANCPI, fără nicio opțiune', () => {
+    const rows = pendingCostRows({
+      options: [],
+      serviceSlug: 'extras-carte-funciara',
+      institutionFeeSuppliers: { 'extras-carte-funciara': 'ANCPI' },
+    });
+    expect(rows).toHaveLength(1);
+    expect(rows[0]).toMatchObject({ category: 'taxa_institutie', supplier: 'ANCPI' });
+  });
+
+  it('nu cere din nou o categorie deja înregistrată', () => {
+    const rows = pendingCostRows({
+      options: [
+        { code: 'traducere', option_name: 'Traducere' },
+        { code: 'legalizare', option_name: 'Legalizare' },
+      ],
+      existingCategories: ['traducere'],
+    });
+    expect(rows.map((r) => r.category)).toEqual(['legalizare']);
+  });
+
+  it('pre-completează din tarif, cu prioritate față de istoric', () => {
+    const rows = pendingCostRows({
+      options: [{ code: 'legalizare', option_name: 'Legalizare' }],
+      tariffs: [{ supplier: 'Notar', category: 'legalizare', firstPageRon: 45, extraPageRon: 5 }],
+      lastAmounts: { [lastAmountKey('Notar', 'legalizare', null)]: 90 },
+    });
+    expect(rows[0]).toMatchObject({ suggestedAmount: 45, suggestionSource: 'tarif' });
+  });
+
+  it('cade pe ultima sumă folosită când nu există tarif', () => {
+    const rows = pendingCostRows({
+      options: [{ code: 'traducere', option_name: 'Traducere', metadata: { language: 'Italiană' } }],
+      lastAmounts: { [lastAmountKey('Traducător', 'traducere', 'Italiană')]: 180 },
+    });
+    expect(rows[0]).toMatchObject({ suggestedAmount: 180, suggestionSource: 'istoric' });
+  });
+
+  it('rămâne gol când nu știe nimic', () => {
+    const rows = pendingCostRows({ options: [{ code: 'traducere', option_name: 'Traducere' }] });
+    expect(rows[0]).toMatchObject({ suggestedAmount: null, suggestionSource: null });
+  });
+});
+
+describe('tariffAmount — prima pagină + pagini suplimentare', () => {
+  const notar = { supplier: 'Notar', category: 'legalizare', firstPageRon: 45, extraPageRon: 5 };
+
+  it('o pagină = prima pagină', () => {
+    expect(tariffAmount(notar, 1)).toBe(45);
+  });
+
+  it('3 pagini = 45 + 5 + 5', () => {
+    expect(tariffAmount(notar, 3)).toBe(55);
+  });
+
+  it('tratează 0 / valori absurde ca o pagină', () => {
+    expect(tariffAmount(notar, 0)).toBe(45);
+    expect(tariffAmount(notar, -4)).toBe(45);
+  });
+
+  it('tariful fix ignoră numărul de pagini', () => {
+    const ancpi = { supplier: 'ANCPI', category: 'taxa_institutie', serviceSlug: 'extras-carte-funciara', amountRon: 20 };
+    expect(tariffAmount(ancpi, 5)).toBe(20);
+  });
+
+  it('null când tariful nu produce un număr', () => {
+    expect(tariffAmount(null)).toBeNull();
+    expect(tariffAmount({ supplier: 'X', category: 'traducere' })).toBeNull();
+  });
+});
+
+describe('findTariff', () => {
+  const tariffs = [
+    { supplier: 'Traducător', category: 'traducere', firstPageRon: 60 },
+    { supplier: 'Traducător', category: 'traducere', language: 'Italiană', firstPageRon: 80 },
+    { supplier: 'ANCPI', category: 'taxa_institutie', serviceSlug: 'extras-carte-funciara', amountRon: 20 },
+  ];
+
+  it('preferă tariful pe limbă', () => {
+    expect(findTariff(tariffs, { category: 'traducere', language: 'Italiană' })?.firstPageRon).toBe(80);
+  });
+
+  it('cade pe tariful general al categoriei', () => {
+    expect(findTariff(tariffs, { category: 'traducere', language: 'Suedeză' })?.firstPageRon).toBe(60);
+  });
+
+  it('găsește taxa după serviciu', () => {
+    expect(findTariff(tariffs, { category: 'taxa_institutie', serviceSlug: 'extras-carte-funciara' })?.amountRon).toBe(20);
+  });
+
+  it('null când categoria nu e configurată', () => {
+    expect(findTariff(tariffs, { category: 'curier' })).toBeNull();
   });
 });

@@ -11,6 +11,11 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { requirePermission } from '@/lib/admin/permissions';
 import { formatPersonName } from '@/lib/format/person-name';
+import {
+  institutionFeeMap,
+  pendingCostRows,
+  type SupplierTariff,
+} from '@/lib/admin/supplier-costs';
 
 export async function GET(request: NextRequest) {
   const supabase = await createClient();
@@ -98,6 +103,68 @@ export async function GET(request: NextRequest) {
       grandTotal,
       count: rows.length,
       suppliers: Object.values(bySupplier).sort((a, b) => b.total - a.total),
+      missing: await ordersMissingCosts(admin, start, end),
     },
   });
+}
+
+/**
+ * Orders finalized in this window that should carry an internal cost but
+ * don't — the "completez mai târziu" pile.
+ *
+ * Derived, never stored: an order qualifies when it has cost-bearing options
+ * (or an institution fee) and no recorded cost for them. A stored "completed
+ * costs" flag would drift the moment someone deletes a cost row; this cannot.
+ */
+async function ordersMissingCosts(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  admin: any,
+  start: string,
+  end: string
+) {
+  const { data: tariffRow } = await admin
+    .from('admin_settings')
+    .select('value')
+    .eq('key', 'supplier_tariffs')
+    .maybeSingle();
+  const feeMap = institutionFeeMap((tariffRow?.value ?? []) as SupplierTariff[]);
+
+  const { data: orders } = await admin
+    .from('orders')
+    .select('id, order_number, friendly_order_id, selected_options, updated_at, services(slug)')
+    .eq('status', 'completed')
+    .gte('updated_at', start)
+    .lt('updated_at', end)
+    .limit(500);
+  if (!orders?.length) return [];
+
+  const { data: recorded } = await admin
+    .from('order_supplier_costs')
+    .select('order_id, category')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    .in('order_id', orders.map((o: any) => o.id));
+  const byOrder = new Map<string, string[]>();
+  for (const r of recorded ?? []) {
+    byOrder.set(r.order_id, [...(byOrder.get(r.order_id) ?? []), r.category]);
+  }
+
+  const missing: Array<{ orderId: string; orderNumber: string; categories: string[] }> = [];
+  for (const o of orders) {
+    const service = o.services as { slug?: string } | { slug?: string }[] | null;
+    const slug = Array.isArray(service) ? service[0]?.slug : service?.slug;
+    const pending = pendingCostRows({
+      options: o.selected_options ?? [],
+      serviceSlug: slug ?? null,
+      institutionFeeSuppliers: feeMap,
+      existingCategories: byOrder.get(o.id) ?? [],
+    });
+    if (pending.length > 0) {
+      missing.push({
+        orderId: o.id,
+        orderNumber: o.friendly_order_id || o.order_number || '',
+        categories: pending.map((p) => p.label),
+      });
+    }
+  }
+  return missing;
 }

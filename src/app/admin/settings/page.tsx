@@ -60,6 +60,7 @@ import {
   Languages,
   Plus,
   Handshake,
+  Coins,
 } from 'lucide-react';
 import {
   DEFAULT_TRANSLATION_PRICE_LIST,
@@ -1336,7 +1337,154 @@ function SuppliersTab() {
           </div>
         </CardContent>
       </Card>
+
+      <SupplierTariffsCard />
     </div>
+  );
+}
+
+// ══════════════════════════════════════════════════════════════
+// TARIFE FURNIZORI — ce plătim, ca echipa să nu tasteze de fiecare dată.
+// Două forme în aceeași listă: per pagină (notar: prima 45, următoarele 5) și
+// sumă fixă per serviciu (taxa ONRC/ANCPI). admin_settings.supplier_tariffs.
+// ══════════════════════════════════════════════════════════════
+
+interface TariffEntry {
+  supplier: string;
+  category: string;
+  language?: string | null;
+  serviceSlug?: string | null;
+  firstPageRon?: number | null;
+  extraPageRon?: number | null;
+  amountRon?: number | null;
+}
+
+function SupplierTariffsCard() {
+  const [rows, setRows] = useState<TariffEntry[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      setLoading(true);
+      try {
+        const res = await fetch('/api/admin/settings');
+        const json = await res.json();
+        const v = json?.data?.supplier_tariffs;
+        if (Array.isArray(v)) setRows(v as TariffEntry[]);
+      } catch {
+        toast.error('Eroare la încărcarea tarifelor');
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
+
+  const update = (i: number, patch: Partial<TariffEntry>) =>
+    setRows((prev) => prev.map((r, idx) => (idx === i ? { ...r, ...patch } : r)));
+  const addRow = () =>
+    setRows((prev) => [
+      ...prev,
+      { supplier: 'Notar', category: 'legalizare', firstPageRon: null, extraPageRon: null },
+    ]);
+  const removeRow = (i: number) => setRows((prev) => prev.filter((_, idx) => idx !== i));
+
+  const num = (v: string) => (v.trim() === '' ? null : Number(v));
+
+  const save = async () => {
+    setSaving(true);
+    try {
+      const res = await fetch('/api/admin/settings', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key: 'supplier_tariffs', value: rows.filter((r) => r.supplier.trim()) }),
+      });
+      const json = await res.json();
+      if (json.success) toast.success('Tarife salvate');
+      else toast.error(json.error || 'Eroare la salvare');
+    } catch {
+      toast.error('Eroare de rețea');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) return <Skeleton className="h-64 w-full rounded-lg" />;
+
+  const fees = rows.filter((r) => r.category === 'taxa_institutie');
+  const perPage = rows.filter((r) => r.category !== 'taxa_institutie');
+
+  return (
+    <Card>
+      <CardHeader>
+        <div className="flex items-center gap-3">
+          <Coins className="h-5 w-5 text-primary-600" />
+          <div>
+            <CardTitle>Tarife furnizori</CardTitle>
+            <CardDescription>
+              Cât plătim, ca sumele să vină pre-completate la finalizarea comenzii.
+              Traducător/notar se tarifează pe pagini (prima pagină + fiecare pagină
+              următoare); taxele ONRC/ANCPI sunt sumă fixă pe serviciu. Suma rămâne
+              editabilă pe fiecare comandă — urgența ANCPI costă 5× tariful normal.
+            </CardDescription>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="space-y-2">
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            Pe pagină (traducător, notar, Camera Notarilor)
+          </p>
+          {perPage.map((r) => {
+            const i = rows.indexOf(r);
+            return (
+              <div key={i} className="grid grid-cols-[1fr_1fr_110px_100px_100px_36px] items-center gap-2 rounded-md border px-2 py-1.5">
+                <Input value={r.supplier} onChange={(e) => update(i, { supplier: e.target.value })} placeholder="furnizor" className="h-8" />
+                <Input value={r.category} onChange={(e) => update(i, { category: e.target.value })} placeholder="categorie" className="h-8" />
+                <Input value={r.language ?? ''} onChange={(e) => update(i, { language: e.target.value || null })} placeholder="limbă (opț.)" className="h-8" />
+                <Input type="number" step="0.01" value={r.firstPageRon ?? ''} onChange={(e) => update(i, { firstPageRon: num(e.target.value) })} placeholder="pag. 1" className="h-8" />
+                <Input type="number" step="0.01" value={r.extraPageRon ?? ''} onChange={(e) => update(i, { extraPageRon: num(e.target.value) })} placeholder="pag. next" className="h-8" />
+                <Button variant="ghost" size="icon-sm" className="text-destructive" onClick={() => removeRow(i)} title="Șterge">
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+            );
+          })}
+          {perPage.length === 0 && (
+            <p className="text-sm text-muted-foreground">Niciun tarif pe pagină. Adaugă unul mai jos.</p>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            Taxe instituție (per serviciu)
+          </p>
+          {fees.map((r) => {
+            const i = rows.indexOf(r);
+            return (
+              <div key={i} className="grid grid-cols-[110px_1fr_110px_36px] items-center gap-2 rounded-md border px-2 py-1.5">
+                <Input value={r.supplier} onChange={(e) => update(i, { supplier: e.target.value })} className="h-8" />
+                <Input value={r.serviceSlug ?? ''} onChange={(e) => update(i, { serviceSlug: e.target.value || null })} placeholder="slug serviciu" className="h-8 font-mono text-xs" />
+                <Input type="number" step="0.01" value={r.amountRon ?? ''} onChange={(e) => update(i, { amountRon: num(e.target.value) })} placeholder="lei" className="h-8" />
+                <Button variant="ghost" size="icon-sm" className="text-destructive" onClick={() => removeRow(i)} title="Șterge">
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="flex items-center justify-between pt-1">
+          <Button variant="outline" size="sm" onClick={addRow}>
+            <Plus className="h-4 w-4 mr-1" /> Adaugă tarif
+          </Button>
+          <Button onClick={save} disabled={saving}>
+            {saving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
+            Salvează tarifele
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
 
