@@ -1,7 +1,23 @@
 # Serviciu NOU: Traduceri autorizate + legalizări + apostile (analiză & plan)
 
-**Status:** 📋 ANALIZĂ — 2026-07-23. Nimic implementat; documentul e baza pentru
-negocierea cu traducătoarea + notarul și pentru decizia de pricing.
+**Status:** 📋 ANALIZĂ — 2026-07-23. Serviciul în sine e neimplementat; documentul
+rămâne baza pentru negocierea cu traducătoarea + notarul și pentru pricing.
+
+> **⏳ 2026-07-29 — trimis, așteptăm răspuns.** I s-a trimis traducătoarei
+> [`Preturi-traduceri-eghiseul.xlsx`](Preturi-traduceri-eghiseul.xlsx) (9 limbi
+> active pe site + documente complexe + rânduri libere pentru limbi noi) cu
+> rugămintea să confirme prețurile **pe document** și să atașeze pe fiecare
+> traducere o notiță cu costul. Textul e în
+> [`tabel-simplu-traducatoare.md`](tabel-simplu-traducatoare.md).
+> **Blochează:** prețurile ferme pe site + grila de tarife din admin.
+> **Următorul pas: Raul revine cu Excel-ul completat**, apoi se încarcă în
+> Setări → Furnizori → Tarife.
+>
+> Tot pe 29 iul, infrastructura de costuri a fost refăcută ca să se completeze
+> singură la finalizare (0 costuri înregistrate în prima săptămână de la
+> livrare): vezi [`costuri-furnizori-cum-functioneaza.md`](costuri-furnizori-cum-functioneaza.md)
+> și mesajul pentru echipă [`mesaj-echipa-costuri.md`](mesaj-echipa-costuri.md).
+> Costurile ONRC/ANCPI intră acum în aceeași evidență.
 
 > **📊 Research legal + piață verificat** (deep-research, 24 afirmații 3-0 pe
 > surse guvernamentale): [`research-legal-si-piata.md`](research-legal-si-piata.md)

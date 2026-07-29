@@ -1,5 +1,15 @@
 # eGhiseul.ro - Status Curent
 
+> **⚡ Update 2026-07-29 — costuri interne + fixuri facturare/livrare.** Detalii: [`changelog/2026-07-29-costuri-interne-pe-comanda.md`](changelog/2026-07-29-costuri-interne-pe-comanda.md) · [`changelog/2026-07-29-oblio-nume-produse-memorate.md`](changelog/2026-07-29-oblio-nume-produse-memorate.md).
+>
+> **🔴 Factura scria „Chile" pe o comandă pentru Brazilia** (E-260728-YFHH2 / EGH-0194) — DB și codul erau corecte; **Oblio cheiază nomenclatorul pe `code` și tipărește numele MEMORAT**, salvat înainte de fixul din 14 iul. Reparat pe două căi (liniile nu mai trimit `code` + produsele redenumite în Oblio) + gardă în teste. CJO verificat, neafectat.
+>
+> **🔴 Cardul Livrare apărea pe comenzile pe email (PDF)** cu adresă goală și destinatar dedus → echipa credea că e ceva de expediat. Cauza: garda testa `!delivery_address`, dar wizardul salvează `{street:'', …}` — obiect gol, truthy. Reparat pe eghiseul + CJO/ecazier.
+>
+> **🟣 Costurile interne se cer acum singure la finalizare.** De la livrarea feature-ului (23 iul) până pe 29 iul: **0 costuri înregistrate** — cardul apărea pe toate comenzile, inclusiv pe cele fără furnizor. Acum apare doar unde chiar plătim pe cineva (traducere, legalizare, apostilă notarială — **Haga NU, ne costă 0**, dar rămâne la venit) + **taxele ONRC/ANCPI**, neurmărite până acum. Pop-up la finalizare cu sume pre-completate din tarife sau din ultima sumă folosită, furnizor dedus din categorie, **cost separat pe fiecare act** când comanda are două servicii (folosind `bundled_for` din wizard). Migrări 140 + 141.
+>
+> **📨 Trimis:** mesaj echipă (fereastra de costuri) + email traducătoarei cu Excel de completat — `serviciu-traduceri-apostile/`. **Așteptăm Excel-ul completat** ca să punem tarifele ferme.
+
 > **⚡ Update 2026-07-21 — ZI MARE, LIVRAT TOT.** Detalii: [`changelog/2026-07-21-sumar-sesiune.md`](changelog/2026-07-21-sumar-sesiune.md) + [`plans/2026-07-21-seo-plan-servicii-date-reale.md`](plans/2026-07-21-seo-plan-servicii-date-reale.md).
 >
 > **🔴 Bug critic găsit + reparat: încărcările KYC se suprascriau** (stale closure) — fiecare document nou îl ștergea pe precedentul. **Omorâse cazier-auto complet** (0 plăți din 9 iul, 15 pierdute/7z, toate blocate la documente — serviciul cere 3+ documente în pasul KYC) și bloca cetățenii cu pașaport străin (E-260721-VJWWN). + 2 race-uri preventive reparate + code-review cu 3 findinguri, toate fixate.

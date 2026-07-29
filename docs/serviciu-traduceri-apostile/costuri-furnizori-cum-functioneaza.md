@@ -7,6 +7,28 @@ de lună, cât datorăm fiecărui furnizor — ca să combatem factura lui.
 
 Livrat 2026-07-23. Vizibil doar rolurilor cu drepturi (nu apare la avocat).
 
+> **⚡ Actualizat 2026-07-29** — sistemul nu mai așteaptă să-ți amintești tu de el:
+> întreabă singur la finalizarea comenzii. Vezi secțiunea 0 și 2b. Motivul
+> schimbării: de la livrare până pe 29 iulie s-au înregistrat **0 costuri** —
+> cardul apărea pe toate comenzile, inclusiv pe cele fără niciun furnizor, deci
+> nu-l completa nimeni. Detalii: `docs/changelog/2026-07-29-costuri-interne-pe-comanda.md`.
+
+## 0. Ce s-a schimbat pe 29 iulie (citește întâi asta)
+
+- **Cardul apare doar unde chiar avem un cost**: traducere, legalizare, apostilă
+  notarială, supralegalizare, copie legalizată, serviciu extra — plus **taxele
+  ONRC și ANCPI**, care înainte nu erau urmărite nicăieri. Un cazier simplu cu
+  urgență nu mai afișează nimic.
+- **Apostila de la Haga nu se trece nicăieri** — pe noi ne costă 0. Rămâne însă
+  la „Încasat servicii", pentru că e venit real.
+- **La finalizarea comenzii apare o fereastră** cu sumele de completat (secțiunea 2b).
+- **Sumele vin pre-completate** din tarifele configurate (secțiunea 1b) sau din
+  ultima sumă folosită pentru același serviciu.
+- **Furnizorul e ales automat**: legalizare → Notar, apostilă notarială → Camera
+  Notarilor, traducere → Traducător.
+- **Pe comenzile cu două acte** (ex. cazier + certificat de integritate, fiecare
+  cu traducerea lui) costul se cere **separat pe fiecare act**.
+
 ---
 
 ## 1. Întâi: adaugă furnizorii (o singură dată)
@@ -20,6 +42,21 @@ Livrat 2026-07-23. Vizibil doar rolurilor cu drepturi (nu apare la avocat).
   eventual cine face apostilele.
 - Numele contează — sub el se grupează totul în raportul lunar, deci scrie-l
   consecvent (nu „Traduceri SRL" azi și „firma trad" mâine).
+
+## 1b. Tarifele (o singură dată, ca să nu mai tastezi sumele)
+
+**Setări → Furnizori → cardul „Tarife furnizori"**. Două feluri:
+
+- **pe pagină** (traducător, notar): prima pagină + fiecare pagină următoare.
+  Ex. notar 45 + 5 → o legalizare de 3 pagini iese automat 55 lei.
+- **sumă fixă pe serviciu** (ONRC, ANCPI): taxa pe care o plătim per document.
+
+Cele 17 servicii ANCPI/ONRC sunt deja mapate, dar **fără sume** — se completează
+după confirmarea de la furnizori. Până atunci sistemul folosește ultima sumă
+introdusă manual.
+
+⚠️ **Urgența ANCPI costă 5× tariful normal** (Ordin 16/2019). De aceea suma
+rămâne editabilă pe fiecare comandă și nu se înregistrează automat.
 
 ## 2. Pe fiecare comandă: adaugă costul
 
@@ -43,6 +80,29 @@ traducător + legalizare de la notar). Ștergi un cost cu coșul de gunoi.
 - **Cost intern** = suma costurilor pe care le-ai introdus.
 - **Marjă** = Încasat − Cost (în lei și %). Verde = profit, roșu = pierdere.
 
+## 2b. Fereastra de la finalizare (calea normală, de acum)
+
+Când marchezi comanda ca **finalizată**, dacă are costuri neînregistrate apare
+automat fereastra „Cât ne-a costat comanda X?", cu câte un rând per cost:
+
+```
+Traducere Autorizată · Italiană — Cazier Judiciar         [pagini: 2]  [ 180 ] lei
+Legalizare Notarială — Cazier Judiciar                    [pagini: 3]  [  55 ] lei
+Taxă ANCPI                                                             [  20 ] lei
+```
+
+Completezi sumele → **Salvează costurile**. Numărul de pagini recalculează
+singur suma, cât timp n-ai scris tu una proprie.
+
+**Dacă nu știi o sumă: „Completez mai târziu".** Comanda se finalizează normal,
+iar ea rămâne în lista **„De completat"** din raportul lunar. **Nu inventa
+cifre** — o sumă greșită e mai rea decât una lipsă, fiindcă nu se mai poate
+verifica ulterior. Suma **0** e valabilă și se salvează ca atare: „am verificat,
+n-a costat nimic" e altceva decât „n-am completat încă".
+
+Fereastra apare doar la trecerea comenzii pe finalizat, nu de fiecare dată când
+deschizi o comandă veche.
+
 ## 3. La sfârșit de lună: raportul per furnizor
 
 **Meniu → „Costuri furnizori"** (`/admin/costuri-furnizori`, drept „Verificare
@@ -54,8 +114,14 @@ plăți").
   fiecare comandă (număr + client + categorie + descriere + sumă).
 - Apeși pe numărul comenzii ca să sari direct la ea.
 
+- Jos apare și **„De completat"**: comenzile finalizate în luna aceea care ar
+  trebui să aibă un cost și n-au. Lista se calculează din comandă, nu dintr-un
+  bifat manual, deci nu poate rămâne în urmă față de realitate.
+
 Exact ce trebuie ca să iei factura traducătoarei și să verifici: „mi-a trecut
 23 de traduceri, 1.035 lei — la mine în raport apar tot 23, 1.035 lei" ✅ / ❌.
+Din 29 iulie, traducătoarea atașează pe fiecare document o notiță cu costul,
+deci suma se ia de acolo, nu din memorie.
 
 ---
 
