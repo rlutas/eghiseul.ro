@@ -65,6 +65,9 @@ export interface ClientData {
    *  pe restul serviciilor eticheta împuternicirii se deduce de aici. */
   currently_married?: boolean;
   was_married_before?: boolean;
+  /** „Ultima căsătorie s-a încheiat prin" — 'divort' | 'deces'. Distinge
+   *  divorțat de văduv fără să mai întrebăm nimic în plus. */
+  last_marriage_ended_by?: string;
   previous_name?: string;
   birth_date?: string;
   birth_county?: string;
@@ -602,7 +605,11 @@ export function buildStareCivilaLabel(
   /** Fallback for services that never ask „starea civilă actuală" outright —
    *  only certificat-celibat sets `maritalStatus`, so on căsătorie/naștere the
    *  label used to come out empty and the delegation printed a bare „-". */
-  civil?: { currentlyMarried?: boolean; wasMarriedBefore?: boolean }
+  civil?: {
+    currentlyMarried?: boolean;
+    wasMarriedBefore?: boolean;
+    lastMarriageEndedBy?: string;
+  }
 ): string {
   const labels: Record<string, { m: string; f: string }> = {
     necasatorit: { m: 'necăsătorit', f: 'necăsătorită' },
@@ -616,13 +623,25 @@ export function buildStareCivilaLabel(
   const explicit = labels[(civilStatus || '').trim().toLowerCase()];
   if (explicit) return gendered(explicit);
 
-  // Derived, and only where the answer is unambiguous. „Nu sunt căsătorit
-  // acum, dar am fost" could mean divorced OR widowed — we do not guess a
-  // civil status on a legal document; the line stays blank for the clerk.
+  // Derived from what the wizard already asks — no extra question needed.
+  // „Sunt căsătorit acum?" wins (a remarried client is simply „căsătorit"),
+  // and for a past marriage the step already records HOW it ended
+  // („Ultima căsătorie s-a încheiat prin": divorț / deces).
   if (civil?.currentlyMarried === true) return gendered(labels.casatorit);
-  if (civil?.currentlyMarried === false && civil?.wasMarriedBefore === false) {
-    return gendered(labels.necasatorit);
+  if (civil?.currentlyMarried === false) {
+    if (civil?.wasMarriedBefore === false) return gendered(labels.necasatorit);
+    if (civil?.wasMarriedBefore === true) {
+      // Older orders stored the label („Divorț") instead of the code.
+      const ended = (civil.lastMarriageEndedBy || '')
+        .trim()
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[̀-ͯ]/g, '');
+      if (ended.startsWith('divort')) return gendered(labels.divortat);
+      if (ended.startsWith('deces')) return gendered(labels.vaduv);
+    }
   }
+  // Nothing conclusive — leave it blank rather than guess on a legal document.
   return '';
 }
 
@@ -1044,6 +1063,7 @@ function buildPlaceholderData(ctx: DocumentContext) {
     FILIATIE: buildStareCivilaLabel(ctx.client.civil_status, ctx.client.cnp, {
       currentlyMarried: ctx.client.currently_married,
       wasMarriedBefore: ctx.client.was_married_before,
+      lastMarriageEndedBy: ctx.client.last_marriage_ended_by,
     }),
     hasFiliatie: buildFiliatie(ctx.client.father_name, ctx.client.mother_name, ctx.client.cnp) !== '',
     NUMETATA: buildFiliatie(ctx.client.father_name, ctx.client.mother_name, ctx.client.cnp),

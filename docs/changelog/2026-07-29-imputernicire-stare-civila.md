@@ -23,8 +23,16 @@ Acum eticheta se deduce din răspunsurile pe care le avem:
 | `maritalStatus` declarat (celibat) | valoarea declarată, acordată pe gen din CNP |
 | căsătorit în prezent | căsătorit / căsătorită |
 | nu acum **și** nici înainte | necăsătorit / necăsătorită |
-| nu acum, **dar** a fost | *gol* — nu ghicim între divorțat și văduv |
+| nu acum, a fost, încheiată prin **divorț** | divorțat / divorțată |
+| nu acum, a fost, încheiată prin **deces** | văduv / văduvă |
+| nu acum, a fost, dar nu știm cum | *gol* |
 | nimic cunoscut | *gol* |
+
+**Fără nicio întrebare nouă în wizard.** Cele patru stări civile se deduc din
+răspunsuri care se colectează deja: „Sunt căsătorit(ă) în prezent?", „Am mai fost
+căsătorit(ă)?" și „Ultima căsătorie s-a încheiat prin: divorț / deces". Un client
+recăsătorit rămâne „căsătorit" — răspunsul despre prezent are prioritate. Se acceptă
+și forma veche cu diacritice („Divorț"), salvată de versiuni anterioare ale pasului.
 
 Fără `-` de umplutură: template-ul are deja punctele de completare, iar o liniuță arată
 ca un câmp uitat. Pe un act juridic preferăm un spațiu liber unei presupuneri.

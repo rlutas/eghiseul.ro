@@ -173,6 +173,7 @@ export async function autoGenerateOrderDocuments(
     civil_status: civil.maritalStatus || personal.maritalStatus || '',
     currently_married: typeof civil.currentlyMarried === 'boolean' ? civil.currentlyMarried : undefined,
     was_married_before: typeof civil.wasMarriedBefore === 'boolean' ? civil.wasMarriedBefore : undefined,
+    last_marriage_ended_by: civil.lastMarriageEndedBy || undefined,
     previous_name: personal.previousName || civil.birthName || '',
     birth_date: personal.birthDate || '',
     birth_county: personal.birthPlace || personal.birthCounty || '',

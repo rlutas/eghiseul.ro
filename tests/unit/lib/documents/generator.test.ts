@@ -401,8 +401,45 @@ describe('buildStareCivilaLabel — fără liniuță pe împuternicire', () => {
     ).toBe('necăsătorit');
   });
 
-  it('NU ghicește între divorțat și văduv', () => {
-    // „nu sunt căsătorit acum, dar am fost" — pe un act juridic nu presupunem.
+  it('distinge divorțat de văduv din „ultima căsătorie s-a încheiat prin"', () => {
+    // Informația se colectează deja în pas — nicio întrebare nouă.
+    expect(
+      buildStareCivilaLabel('', CNP_F, {
+        currentlyMarried: false,
+        wasMarriedBefore: true,
+        lastMarriageEndedBy: 'divort',
+      })
+    ).toBe('divorțată');
+    expect(
+      buildStareCivilaLabel('', CNP_M, {
+        currentlyMarried: false,
+        wasMarriedBefore: true,
+        lastMarriageEndedBy: 'deces',
+      })
+    ).toBe('văduv');
+  });
+
+  it('acceptă și eticheta veche cu diacritice („Divorț")', () => {
+    expect(
+      buildStareCivilaLabel('', CNP_M, {
+        currentlyMarried: false,
+        wasMarriedBefore: true,
+        lastMarriageEndedBy: 'Divorț',
+      })
+    ).toBe('divorțat');
+  });
+
+  it('recăsătorit rămâne „căsătorit", nu divorțat', () => {
+    expect(
+      buildStareCivilaLabel('', CNP_M, {
+        currentlyMarried: true,
+        wasMarriedBefore: true,
+        lastMarriageEndedBy: 'divort',
+      })
+    ).toBe('căsătorit');
+  });
+
+  it('rămâne gol când a fost căsătorit dar nu știm cum s-a încheiat', () => {
     expect(
       buildStareCivilaLabel('', CNP_F, { currentlyMarried: false, wasMarriedBefore: true })
     ).toBe('');
