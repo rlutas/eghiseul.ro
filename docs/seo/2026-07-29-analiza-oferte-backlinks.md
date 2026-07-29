@@ -312,17 +312,23 @@ Articolele le scriem NOI (800–1.200 cuvinte, pass humanizer, fără perechea
 „documente/acte + oficiale" — politica Google Ads). Cristina doar publică.
 Publicare eșalonată pe 3–4 săptămâni, nu toate odată.
 
-| Publicație | Unghi articol | Pagina țintă | Ancoră |
-|---|---|---|---|
-| **economica.net** | „Blocajul ANCPI: ce înseamnă pentru tranzacțiile imobiliare" — subiectul zilei, avem monitorizarea + datele proprii | /servicii/extras-de-carte-funciara/ | brand („eGhișeul.ro") |
-| **money.ro** | „Ce verifici înainte să cumperi o locuință" (extras CF, proprietar, sarcini; context TVA 9%) | /servicii/extras-de-carte-funciara/ | naturală („poți obține extrasul online") |
-| **startupcafe.ro** | „Actele de care firma ta are nevoie la bancă, licitații și fonduri: certificatul constatator, explicat" | /servicii/certificat-constatator-online/ | brand |
-| **start-up.ro** | „Checklist după înființarea firmei: ce acte îți cer partenerii în primul an" | /servicii/certificat-constatator-online/ | comercială exactă („certificat constatator online") — SINGURA din pachet |
-| **risco.ro** | „Cum verifici un partener de afaceri înainte de contract" (date financiare + constatator + cazier fiscal) | /servicii/certificat-constatator-online/ | naturală |
-| **click.ro** | „Actele pe care le poți scoate de acasă în 2026" (cazier, stare civilă — public larg) | /servicii/cazier-judiciar-online/ | brand |
+Câte **3 linkuri per articol** (formula: serviciu-țintă + ghid din cluster + brand
+pe homepage — arată editorial, nu comercial):
 
-Regulă respectată: 1 ancoră comercială exactă din 6 (~17%, sub pragul de 20% din
-[lista de ținte](2026-07-29-lista-tinte-backlinks.md)); restul brand/naturale.
+| Publicație | Unghi articol | Link 1 — serviciu (ancora) | Link 2 — ghid propriu | Link 3 |
+|---|---|---|---|---|
+| **economica.net** | „Blocajul ANCPI: ce înseamnă pentru tranzacțiile imobiliare" — subiectul zilei | extras carte funciară (naturală) | /ancpi-nu-functioneaza/ — cităm monitorizarea noastră ca sursă | homepage (brand) |
+| **money.ro** | „Ce verifici înainte să cumperi o locuință" (context TVA 9%) | extras carte funciară (naturală) | /verificare-proprietar-imobil/ | homepage |
+| **startupcafe.ro** | „Actele firmei la bancă, licitații, fonduri: constatatorul explicat" | certificat constatator (brand) | /cele-4-tipuri-de-certificat-constatator-online/ | homepage |
+| **start-up.ro** | „Checklist acte în primul an de firmă" | certificat constatator — **ancora comercială exactă, SINGURA din pachet** | /eliberare-certificat-constatator-onrc-ghid/ | homepage |
+| **risco.ro** | „Cum verifici un partener de afaceri înainte de contract" | certificat constatator (naturală) | serviciul cazier fiscal | homepage |
+| **click.ro** | „Actele pe care le poți scoate de acasă în 2026" (public larg) | cazier judiciar (brand) | /cazier-judiciar-online-gratuit/ | homepage |
+
+De ce servicii și nu homepage: homepage-ul primește oricum grosul linkurilor
+(advertoriale vechi, comunicate, directoare); paginile de bani stau pe poziția 12
+fiindcă ELE n-au linkuri. Bilanț: 5 linkuri noi pe paginile de bani, 6 pe ghiduri
+(clusterul), 6 de brand pe homepage. 1 ancoră comercială din 18 — mult sub pragul
+de 20% din [lista de ținte](2026-07-29-lista-tinte-backlinks.md).
 
 **După confirmare comandă:** scriem cele 6 articole (eu, la cerere), Raul le
 trimite Cristinei; verificăm la publicare dofollow + secțiune indexabilă pe fiecare.
