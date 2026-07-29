@@ -313,8 +313,30 @@ describe('createInvoiceFromOrder — products / line items', () => {
 
     const products = oblioRequest.mock.calls[0][0].body.products;
     expect(products).toHaveLength(3); // service + 2 options
-    expect(products[1]).toMatchObject({ name: 'Urgentă', code: 'urgent', price: 50 });
-    expect(products[2]).toMatchObject({ name: 'Apostila Haga', code: 'apostila', price: 100 });
+    expect(products[1]).toMatchObject({ name: 'Urgentă', price: 50 });
+    expect(products[2]).toMatchObject({ name: 'Apostila Haga', price: 100 });
+  });
+
+  it('option lines carry NO product code (Oblio would print the stored name)', async () => {
+    // E-260728-YFHH2: comandă pentru Brazilia, factura EGH-0194 a tipărit
+    // „Apostilă de la Haga — Chile" — Oblio potrivește produsul din nomenclator
+    // după `code` și folosește numele memorat, nu cel trimis.
+    const order = {
+      ...baseOrder,
+      selected_options: [
+        {
+          code: 'apostila_haga',
+          option_name: 'Apostilă de la Haga',
+          price_modifier: 198,
+          metadata: { country: 'Brazilia' },
+        },
+      ],
+    };
+    await createInvoiceFromOrder(order, 'Card');
+
+    const products = oblioRequest.mock.calls[0][0].body.products;
+    expect(products[1].name).toBe('Apostilă de la Haga');
+    expect(products[1].code).toBeUndefined();
   });
 
   it('invoice lines DROP the country/language metadata suffix', async () => {

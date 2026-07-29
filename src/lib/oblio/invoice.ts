@@ -359,8 +359,14 @@ export async function createInvoiceFromOrder(
       // baseName (no country/language suffix) — a wrong metadata detail on a
       // fiscal document is worse than none (E-260714-WXGYQ: „— Chile" pe
       // factura unei comenzi pentru Italia).
+      //
+      // NO `code`: Oblio keys its product nomenclature by `code` and, on a
+      // match, prints the STORED name instead of the one we send. Codes like
+      // `apostila_haga` were saved before the fix above with the country
+      // suffix baked in, so every later invoice kept printing the stale
+      // country (E-260728-YFHH2: comandă Brazilia, factura EGH-0194 „— Chile").
+      // Without a code, Oblio uses the name we send.
       name: option.baseName,
-      code: option.code,
       price: option.unitPrice,
       measuringUnit: 'buc',
       currency: 'RON',
