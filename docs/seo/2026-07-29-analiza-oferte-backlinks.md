@@ -208,6 +208,59 @@ Top-ul, după autoritate:
 - Ținta realistă pe 90 de zile: **20-30 de domenii noi**, din care 6-7 plătite din
   pachet, restul din relații + presă locală.
 
+## ⚠️ DATE REALE din Search Console (29 iul) — schimbă decizia
+
+Export: `gsc-data/top-linking-sites-2026-07-29.csv`. **50 de domenii referitoare.**
+
+Verificat fiecare poziție din oferta 5148 față de ce avem deja:
+
+| Poziție ofertă | Preț | Îl avem deja? |
+|---|---|---|
+| adevarul.ro | 400 € | ✅ **DA** (1 pagină) |
+| ziare.com | 200 € | ✅ DA (5 pagini) |
+| libertatea.ro | 150 € | ✅ **DA** (1 pagină) |
+| antena3.ro | 99 € | ✅ DA (6 pagini) |
+| prosport.ro | 150 € | ❌ nu (dar avem gsp.ro — tot sport) |
+| click.ro | 130 € | ❌ nu |
+| money.ro | 90 € | ❌ nu |
+
+**Din 955 € (după discount), ~849 € brut merg pe patru domenii pe care le avem deja.**
+Singurele cu adevărat noi: click.ro, money.ro și prosport.ro (irelevant tematic).
+
+### Ce mai avem, și nu știam
+
+Presă mare: **protv.ro** (3) + **stirileprotv.ro** (3), **hotnews.ro**, romanialibera.ro
+(3), jurnalul.ro, cotidianul.ro, gsp.ro, playtech.ro, bzi.ro, gazetadebucuresti.ro,
+punctul.ro, mesagerulneamt.ro.
+
+**desteptarea.ro cu 8 pagini** — exact publicația locală pe care o recomandam ca țintă
+nouă; o avem deja, ca și concurentul (el are 15 pagini acolo).
+
+Alte surse utile: **reddit.com (18 pagini)**, infopensii.ro (10), softpedia.com,
+tpu.ro, vwforum.ro, zoso.ro, telework.ro — link-uri de comunitate, câștigate natural.
+
+Proprietăți proprii: cazierjudiciaronline.com (6), avocat-tarta.ro (2),
+comunicatedepresa.ro (3).
+
+### Zgomot / de curățat
+
+`atsameip.com` (19 pagini) și IP-urile brute (13.53.72.49, 54.173.208.43 etc.) sunt
+scrapere de IP lookup — zero valoare. `trustedrevie.ws` apare și la noi, și la
+concurent (site adult, nofollow) — spam comun, nu ne afectează.
+`scamadviser.com` / `scam-detector.com` — agregatoare de „este site-ul sigur?"; merită
+verificat ce scriu despre noi, nu pentru SEO, ci pentru reputație.
+
+### Recomandarea FINALĂ, pe date
+
+Din pachet mai are sens **doar money.ro** (90 €, direct 75 €, financiar-relevant,
+domeniu nou). Restul e bani pe domenii deja acoperite sau irelevante.
+
+**Nu cumpăra pachetul 5148 ca atare.** Cere înlocuirea a **patru** poziții
+(adevarul, ziare.com, libertatea, antena3 = 849 € brut) cu domenii pe care nu le avem:
+digi24.ro, avocatnet.ro, startupcafe.ro, imobiliare.ro, profit.ro, economedia.ro,
+juridice.ro, storia.ro. Dacă nu le are, ia doar money.ro și mută restul bugetului în
+presă locală directă + digital PR.
+
 ## Ce nu am putut verifica
 
 - **Profilul complet de backlinkuri** — nu avem chei Moz/Ahrefs (confirmat și în
