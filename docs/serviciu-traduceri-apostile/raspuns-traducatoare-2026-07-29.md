@@ -7,7 +7,7 @@ iar costul ei se scade din net. Toate marjele de mai jos țin cont de asta.
 
 ## Prețurile confirmate (per DOCUMENT simplu, 1 pagină, fără TVA)
 
-| Limbă | Cost/doc | Termen | „Apostilă" (col. 2 din Excel) |
+| Limbă | Cost/doc | Termen | Suprataxă când comanda are și Apostilă Haga |
 |---|---|---|---|
 | Engleză (UK/SUA/AUS), Franceză, Italiană, Spaniolă, Germană, **Maghiară** | 45 | 1 zi | 20 (DE: 35) |
 | Portugheză | 65 | 1 zi | 35 |
@@ -26,9 +26,15 @@ Reguli suplimentare din mesaj:
 - Tarifele „pot fi ușor mărite în funcție de complexitate".
 - Secțiunea 2 (diplome/contracte/sentințe) — **NECOMPLETATĂ**; acoperită doar de regula caracterelor.
 
-⚠️ De clarificat cu Iudith: coloana „apostilă" — e costul lor pentru apostilarea
-traducerii legalizate (Camera Notarilor) sau altceva? Cum se împacă cu fluxul și
-costurile noastre de apostilă notarială?
+**Coloana „apostilă" (clarificat de Raul, 29 iul):** e SUPRATAXA traducătoarei când
+comanda include și **Apostila de la Haga** — se traduce și apostila, deci costul
+traducerii crește cu suma din coloană (+20 EN/FR/IT/ES/HU … +75 DA/NO; RU/UA +70 cu
+cod QR). Consecință pe marjă: apostila Haga rămâne venit ~198 lei cu cost instituțional
+zero, dar pe comenzile traducere+apostilă costul REAL al traducerii = cost/doc +
+suprataxa limbii. Ex. engleză: 45+20=65 → marja traducerii scade din 102,52 la 82,52,
+compensată de marja apostilei. **Regulă pentru echipă la pop-up-ul de costuri:** dacă
+comanda are și apostilă Haga, adaugă suprataxa limbii peste suma pre-completată
+(sugestia automată nu o știe încă).
 
 ## Marja pe limbile ACTIVE azi (client plătește 178,50 cu TVA → net 147,52)
 
@@ -71,6 +77,9 @@ Câmpul `clientPriceDoc` din listă EXISTĂ dar wizardul NU-l folosește la pre�
    ca la CUI/prețuri). Condiție pentru activarea limbilor din treapta 2-3.
 2. **Bulgară + legalizare = combinație imposibilă** — dacă activăm bulgara, wizardul
    trebuie să blocheze/ascundă legalizarea la ea.
+2b. **Suprataxa de apostilă în sugestia de cost** — când comanda are traducere +
+   apostilă Haga, pop-up-ul să pre-completeze cost/doc + suprataxa limbii (azi echipa
+   o adaugă manual, după regula din secțiunea de prețuri).
 3. Termen per limbă (1–4 zile) — afișat la selecție; azi termenul traducerii e unic.
 4. Acte medicale +10 lei — deocamdată doar în evidența internă de costuri, nu în preț.
 
