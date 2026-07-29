@@ -179,6 +179,7 @@ export const HARDCODED_TOOL_SLUGS = [
  */
 export const HARDCODED_ARTICLE_SLUGS = [
   'cazier-judiciar-online-gratuit',
+  'cazier-si-certificat-de-integritate-pentru-profesori',
   'certificat-de-nastere-din-strainatate',
   'tva-9-locuinte-31-iulie-2026',
   'verificare-proprietar-imobil',

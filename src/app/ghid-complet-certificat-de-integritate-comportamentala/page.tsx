@@ -8,7 +8,7 @@ const DESCRIPTION =
   'Ce este certificatul de integritate comportamentală, în ce diferă de cazierul judiciar, cine are nevoie de el ' +
   '(inclusiv pentru lucrul cu minori) și cum îl obții online. Ghid complet + perioada de valabilitate.';
 const DATE_PUBLISHED = '2024-01-01';
-const DATE_MODIFIED = '2026-06-16';
+const DATE_MODIFIED = '2026-07-29';
 
 export const revalidate = 86400;
 
@@ -29,7 +29,7 @@ export default function Page() {
       datePublished={DATE_PUBLISHED}
       dateModified={DATE_MODIFIED}
       publishedLabel="ianuarie 2024"
-      updatedLabel="16 iunie 2026"
+      updatedLabel="29 iulie 2026"
       relatedServices={[
         {
           slug: 'certificat-integritate',
@@ -103,6 +103,14 @@ export default function Page() {
         <li>Posturi de îngrijire a persoanelor vârstnice</li>
         <li>Angajări în ONG-uri care lucrează cu categorii vulnerabile</li>
       </ul>
+      <p>
+        Pentru cadrele didactice și restul personalului din școli și grădinițe am scris un ghid separat, cu
+        regulile de la angajare și calendarul de dinaintea lui 1 septembrie:{' '}
+        <Link href="/cazier-si-certificat-de-integritate-pentru-profesori/">
+          cazier și certificat de integritate pentru profesori
+        </Link>
+        .
+      </p>
 
       <h2>Cum îl obții online</h2>
       <p>
