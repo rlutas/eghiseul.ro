@@ -202,6 +202,43 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     }
   }
 
+  // ── Preț traducere per limbă (+ supliment Apostilă Haga) ─────────────────
+  // Dialogul trimite prețul flat al opțiunii din catalog; sursa de adevăr e
+  // translation_price_list (aceeași logică precum garda de la submit). Fără
+  // corecția asta, o traducere daneză adăugată telefonic s-ar factura 178,50.
+  {
+    const hasTranslation = body.selectedOptions.some((o) => o.code === 'traducere');
+    if (hasTranslation) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: plRow } = await (admin as any)
+        .from('admin_settings')
+        .select('value')
+        .eq('key', 'translation_price_list')
+        .maybeSingle();
+      const priceByLang = new Map<string, number>();
+      const extraByLang = new Map<string, number>();
+      for (const row of (plRow?.value as Array<{ language?: string; active?: boolean; clientPriceDoc?: number | null; clientPriceApostilaExtra?: number | null }> | null) ?? []) {
+        if (row?.language && row.active && row.clientPriceDoc != null) {
+          priceByLang.set(row.language, Number(row.clientPriceDoc));
+          if (row.clientPriceApostilaExtra != null) extraByLang.set(row.language, Number(row.clientPriceApostilaExtra));
+        }
+      }
+      const hasHaga = body.selectedOptions.some((o) => o.code === 'apostila_haga');
+      for (const o of body.selectedOptions) {
+        if (o.code !== 'traducere') continue;
+        const lang = (o.metadata as { language?: string } | undefined)?.language ?? '';
+        const base = priceByLang.get(lang);
+        if (base == null) continue;
+        const expected = base + (hasHaga ? extraByLang.get(lang) ?? 0 : 0);
+        const current = Number(o.priceModifier ?? o.price_modifier ?? 0);
+        if (Math.abs(current - expected) >= 0.01) {
+          o.priceModifier = expected;
+          if ('price_modifier' in o) o.price_modifier = expected;
+        }
+      }
+    }
+  }
+
   const diff = computeModifyDiff(orderForDiff, {
     selectedOptions: body.selectedOptions,
     deliveryPrice: body.deliveryPrice,
