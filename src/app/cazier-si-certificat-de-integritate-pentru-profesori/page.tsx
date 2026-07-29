@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { buildPageMetadata } from '@/lib/seo';
+import { buildPageMetadata, serviceUrl } from '@/lib/seo';
 import { ArticleLayout } from '@/components/articole/article-layout';
 
 const SLUG = 'cazier-si-certificat-de-integritate-pentru-profesori';
@@ -197,7 +197,10 @@ export default function Page() {
         singură cerere:
       </p>
       <ol>
-        <li>completezi formularul pe eGhișeul.ro — durează câteva minute;</li>
+        <li>
+          completezi <Link href={serviceUrl('certificat-integritate')}>formularul pentru certificatul de
+          integritate</Link> pe eGhișeul.ro — durează câteva minute, iar cazierul îl bifezi în aceeași cerere;
+        </li>
         <li>încarci actul de identitate și un selfie pentru verificarea identității;</li>
         <li>semnezi împuternicirea electronic, direct în formular;</li>
         <li>primești documentele pe email și WhatsApp, iar la cerere și în original, prin curier.</li>
@@ -219,7 +222,11 @@ export default function Page() {
         </li>
         <li>
           <strong>lăsat pe ultima sută:</strong> în prima săptămână de septembrie, ghișeele de cazier au cel mai
-          mare volum din an — iar contul HUB MAI nevalidat nu se rezolvă în ziua depunerii dosarului;
+          mare volum din an — iar contul{' '}
+          <a href="https://hub.mai.gov.ro/serviciu/view?id=90" target="_blank" rel="noopener noreferrer">
+            HUB MAI
+          </a>{' '}
+          nevalidat nu se rezolvă în ziua depunerii dosarului;
         </li>
         <li>
           <strong>nume neactualizat:</strong> după schimbarea numelui (căsătorie, divorț), actul de identitate
