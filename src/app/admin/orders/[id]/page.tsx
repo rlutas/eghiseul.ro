@@ -4111,11 +4111,11 @@ function ProcessingSection({
     window.open(previewUrl, '_blank');
   };
 
-  const handleDownloadDocument = async (doc: OrderDocument) => {
+  const handleDownloadDocument = async (doc: OrderDocument, format: 'pdf' | 'original' = 'pdf') => {
     setDownloadingDoc(doc.id);
     try {
       const isWordDoc = /\.docx?$/i.test(doc.s3_key);
-      if (isWordDoc) {
+      if (isWordDoc && format === 'pdf') {
         // Word documents (cereri, împuternicire, contracte) are unusable for
         // colleagues without Microsoft Word. Serve the faithfully-rendered PDF
         // instead — opens + prints anywhere, no Word, no Google Drive detour.
@@ -4129,6 +4129,9 @@ function ProcessingSection({
         a.remove();
         return;
       }
+      // Either a non-Word file, or Word requested AS Word: the team needs the
+      // editable original when a cerere has to be adjusted before submission
+      // (cazier fiscal — colegii completează/corectează în Word).
       // Already a PDF / other file — download the stored object directly.
       const res = await fetch(`/api/upload/download?key=${encodeURIComponent(doc.s3_key)}`);
       const json = await res.json();
@@ -4324,6 +4327,22 @@ function ProcessingSection({
                           {downloadingDoc === doc.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Download className="h-3 w-3" />}
                           <span className="ml-1">{/\.docx?$/i.test(doc.s3_key) ? 'Descarcă PDF' : 'Descarcă'}</span>
                         </Button>
+                        {/* Varianta editabilă — PDF-ul e pentru cine nu are
+                            Word, Word-ul pentru cine trebuie să modifice
+                            cererea înainte de depunere. */}
+                        {/\.docx?$/i.test(doc.s3_key) && (
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="h-7 text-xs"
+                            onClick={() => handleDownloadDocument(doc, 'original')}
+                            disabled={downloadingDoc === doc.id}
+                            title="Descarcă fișierul Word, ca să-l poți modifica"
+                          >
+                            <FileText className="h-3 w-3" />
+                            <span className="ml-1">Word</span>
+                          </Button>
+                        )}
                       </>
                     )}
                     {template && (
@@ -4381,6 +4400,19 @@ function ProcessingSection({
                       {downloadingDoc === doc.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Download className="h-3 w-3" />}
                       <span className="ml-1">{/\.docx?$/i.test(doc.s3_key) ? 'Descarcă PDF' : 'Descarcă'}</span>
                     </Button>
+                    {/\.docx?$/i.test(doc.s3_key) && (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="h-7 text-xs"
+                        onClick={() => handleDownloadDocument(doc, 'original')}
+                        disabled={downloadingDoc === doc.id}
+                        title="Descarcă fișierul Word, ca să-l poți modifica"
+                      >
+                        <FileText className="h-3 w-3" />
+                        <span className="ml-1">Word</span>
+                      </Button>
+                    )}
                   </div>
                 </div>
               ))
