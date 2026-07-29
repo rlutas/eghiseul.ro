@@ -160,6 +160,54 @@ relevante — adevarul.ro (secțiune relevantă) + money.ro — și aș pune res
 în digital PR pe calculatoarele noastre, cum era planificat în
 `docs/plans/2026-07-21-seo-plan-servicii-date-reale.md` §6.
 
+## Ce face concurentul care ne bate pe „cazier judiciar online" (caziere.ro)
+
+Profil verificat de Raul în Ahrefs/Semrush (29 iul): **214 domenii referitoare**.
+Top-ul, după autoritate:
+
+| AS | Domeniu | Linkuri | Tip |
+|---|---|---|---|
+| 78 | digi24.ro | 1 | presă |
+| 73 | hotnews.ro | 1 | presă |
+| 73 | stirileprotv.ro | 3 | presă |
+| 64 | adevarul.ro | 1 | presă |
+| 54 | zf.ro | 1 | presă |
+| 45 | desteptarea.ro | **15** | presă locală |
+| 43 | comisarul.ro | 1 | presă |
+| **43** | **primariaclujnapoca.ro** | **24** | **instituțional** |
+| 42 | stirideCluj.ro | 1 | presă locală |
+| 40 | tribuna.ro | 1 | presă |
+| 38 | romanialibera.ro | 1 | presă |
+| 35 | svnews.ro | 5 | presă locală |
+| 32 | trustedrevie.ws | 2 | **adult, nofollow** |
+
+### Ce învățăm
+
+1. **Strategia lor e exact pachetul care ni se oferă** — advertoriale în presă mare
+   generalistă. Deci concluzia mea anterioară („doar nișă relevantă") trebuie nuanțată:
+   în segmentul ăsta presa generalistă chiar funcționează, pentru că o folosesc toți și
+   Google acordă greutate menționărilor de brand. **Diferența e volumul: ei au 214
+   domenii, noi avem o mână.**
+2. **primariaclujnapoca.ro cu 24 de linkuri** e cea mai valoroasă poziție din tot
+   profilul lor — link instituțional, imposibil de cumpărat, aproape sigur dintr-o
+   pagină de „linkuri utile" / furnizori. **Se poate replica gratuit**, cu efort de
+   relații: primării, camere de comerț, barouri, asociații. Un asemenea link bate 400 €
+   pe adevarul.ro.
+3. **Presa locală e ieftină și dă volum** — desteptarea.ro 15 linkuri, svnews.ro 5.
+   Nu apar în oferta Cristinei, dar se cumpără direct, la fracțiune de preț.
+4. Au și linkuri toxice (site adult, nofollow) — deci profilul lor nu e „curat"; nu
+   trebuie copiat orbește, dar arată că nici Google nu-i penalizează pentru asta.
+
+### Recomandarea revizuită
+
+- **Ia pachetul** (5148 renegociat) — presa generalistă are sens aici, dovada e chiar
+  concurentul care ne depășește.
+- **Dar nu te opri la el.** Cu ~950 € cumperi 6-7 domenii. Ei au 214. Diferența se
+  acoperă cu ce **nu costă bani**: linkuri instituționale (primării, barou, camere de
+  comerț) și presă locală ieftină, cumpărată direct.
+- Ținta realistă pe 90 de zile: **20-30 de domenii noi**, din care 6-7 plătite din
+  pachet, restul din relații + presă locală.
+
 ## Ce nu am putut verifica
 
 - **Profilul complet de backlinkuri** — nu avem chei Moz/Ahrefs (confirmat și în
