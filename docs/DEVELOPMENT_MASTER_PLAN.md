@@ -625,6 +625,24 @@
 
 Features planned but not yet scheduled for a specific sprint.
 
+#### 📝 Editarea cererilor fără Word (amânat 2026-07-29)
+
+Colegii care nu au Word nu pot modifica cererea descărcată. Butonul „Word" (29 iul)
+livrează originalul editabil, dar rămâne problema mașinilor fără Word instalat.
+
+Variante analizate, de reluat când revenim:
+1. **Previzualizare editabilă + print** — previzualizarea DOCX→HTML există deja
+   (`/api/admin/orders/[id]/preview-document`, cu buton „Printează"); a o face
+   `contenteditable` ar permite corectură + tipărire fără cont și fără ca datele să
+   iasă din platformă. Modificările n-ar fi salvate înapoi în comandă.
+2. **Google Docs / Drive** — cerut inițial, dar înseamnă urcarea unor documente cu CNP
+   și date personale în Drive: transfer de date către Google, deci temei GDPR și,
+   ideal, conturi Workspace ale firmei, nu personale.
+3. **Editabil + salvare în comandă** — cel mai complet; necesită urmă de audit (cine a
+   modificat un document avocațial și când).
+
+Decizie amânată de Raul: „o să vedem o soluție pe viitor".
+
 #### 🚗 DIRECȚIE NOUĂ (research complet 2026-07-20): Ecosistem auto + categoria „Contracte"
 
 **Index + status:** `docs/plans/README.md`. Documentul principal: `docs/plans/2026-07-20-ecosistem-auto-unelte-afiliere.md`.
