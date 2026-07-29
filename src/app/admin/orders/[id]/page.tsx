@@ -3179,6 +3179,10 @@ function SupplierCostsCard({ order }: { order: OrderDetail }) {
   // tariff/history so the team confirms a figure instead of guessing one.
   const [pendingAmounts, setPendingAmounts] = useState<Record<string, string>>({});
   const [savingPendingKey, setSavingPendingKey] = useState<string | null>(null);
+  // The free-form entry is hidden by default: the team should price the rows
+  // DERIVED from the order, not guess categories. Only unforeseen costs
+  // (courier surcharge, odd notary fee) need the manual form.
+  const [showFreeForm, setShowFreeForm] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -3399,7 +3403,19 @@ function SupplierCostsCard({ order }: { order: OrderDetail }) {
               </div>
             </div>
 
-            {/* Add form */}
+            {/* Free-form entry — hidden behind a toggle so the team prices the
+                order-linked rows above instead of guessing here. */}
+            {!showFreeForm ? (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 px-2 text-xs text-muted-foreground"
+                onClick={() => setShowFreeForm(true)}
+              >
+                <Plus className="mr-1 h-3.5 w-3.5" />
+                Cost neprevăzut (alt furnizor / altă categorie)
+              </Button>
+            ) : (
             <div className="space-y-2 rounded-md border border-dashed p-2">
               <div className="grid grid-cols-2 gap-2">
                 <select
@@ -3442,6 +3458,7 @@ function SupplierCostsCard({ order }: { order: OrderDetail }) {
                 </Button>
               </div>
             </div>
+            )}
             <p className="text-[11px] text-muted-foreground">
               Vizibil doar echipei. Raport lunar per furnizor: <Link href="/admin/costuri-furnizori" className="underline">Costuri furnizori</Link>.
             </p>
