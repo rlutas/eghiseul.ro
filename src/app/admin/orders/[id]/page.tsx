@@ -91,6 +91,7 @@ import {
   totalSupplierCost,
   serviceRevenueForMargin,
   computeMargin,
+  pendingRowKey,
   type SupplierCostRow,
   type PendingCostRow,
 } from '@/lib/admin/supplier-costs';
@@ -688,12 +689,22 @@ export default function AdminOrderDetailPage() {
           : (orderData.services as OrderDetail['services']),
       } as unknown as OrderDetail;
 
-      // Ask for the internal costs the first time this order turns completed
-      // in front of us. Never on plain page loads of an already-finished order
-      // — that would nag on every visit; those show up in /admin/costuri-furnizori.
+      // Ask for the internal costs the first time this order turns shipped OR
+      // completed in front of us. Shipped matters more than completed: la AWB
+      // traducerea/apostila/legalizarea sunt deja făcute (altfel n-aveai ce
+      // expedia), deci sumele sunt proaspete. Never on plain page loads of an
+      // already-finished order — that would nag on every visit; those show up
+      // in /admin/costuri-furnizori. A doua tranziție (shipped→completed) nu
+      // mai întreabă: liniile deja înregistrate ies din `pending` prin
+      // existingKeys, iar cu pending gol dialogul nu se deschide.
+      const COST_ASK_STATUSES = ['shipped', 'completed'];
       const previousStatus = prevStatusRef.current;
       prevStatusRef.current = normalizedOrder.status ?? null;
-      if (previousStatus && previousStatus !== 'completed' && normalizedOrder.status === 'completed') {
+      if (
+        previousStatus &&
+        !COST_ASK_STATUSES.includes(previousStatus) &&
+        COST_ASK_STATUSES.includes(normalizedOrder.status ?? '')
+      ) {
         void (async () => {
           try {
             const costRes = await fetch(`/api/admin/orders/${orderId}/supplier-costs`);
@@ -3164,6 +3175,10 @@ function SupplierCostsCard({ order }: { order: OrderDetail }) {
   const [category, setCategory] = useState<string>('traducere');
   const [amount, setAmount] = useState('');
   const [description, setDescription] = useState('');
+  // Per-pending-row amount inputs (key = category|document), prefilled from
+  // tariff/history so the team confirms a figure instead of guessing one.
+  const [pendingAmounts, setPendingAmounts] = useState<Record<string, string>>({});
+  const [savingPendingKey, setSavingPendingKey] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -3175,7 +3190,16 @@ function SupplierCostsCard({ order }: { order: OrderDetail }) {
       const cJson = await cRes.json();
       if (cJson.success) {
         setCosts(cJson.data as SupplierCostRow[]);
-        setPending((cJson.pending ?? []) as PendingCostRow[]);
+        const rows = (cJson.pending ?? []) as PendingCostRow[];
+        setPending(rows);
+        setPendingAmounts(
+          Object.fromEntries(
+            rows.map((r) => [
+              pendingRowKey(r.category, r.documentLabel),
+              r.suggestedAmount != null ? String(r.suggestedAmount) : '',
+            ])
+          )
+        );
       }
       const sJson = await sRes.json();
       const list = (sJson?.data?.suppliers as Array<{ name: string; active?: boolean }>) || [];
@@ -3212,6 +3236,37 @@ function SupplierCostsCard({ order }: { order: OrderDetail }) {
       toast.error(e instanceof Error ? e.message : 'Eroare la adăugare');
     } finally {
       setAdding(false);
+    }
+  };
+
+  // One-click save for a derived (order-linked) cost line — same payload the
+  // finalize dialog sends, so the row lands with document + language attached.
+  const savePending = async (row: PendingCostRow) => {
+    const key = pendingRowKey(row.category, row.documentLabel);
+    const amt = parseFloat((pendingAmounts[key] ?? '').replace(',', '.'));
+    if (!Number.isFinite(amt) || amt < 0) { toast.error('Completează suma'); return; }
+    setSavingPendingKey(key);
+    try {
+      const res = await fetch(`/api/admin/orders/${order.id}/supplier-costs`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          supplier: row.supplier || 'Nespecificat',
+          category: row.category,
+          description: row.label,
+          documentLanguage: row.language,
+          documentLabel: row.documentLabel,
+          amountRon: amt,
+        }),
+      });
+      const json = await res.json();
+      if (!res.ok || !json.success) throw new Error(json.error || 'Eroare');
+      toast.success('Cost înregistrat');
+      load();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Eroare la salvare');
+    } finally {
+      setSavingPendingKey(null);
     }
   };
 
@@ -3272,6 +3327,56 @@ function SupplierCostsCard({ order }: { order: OrderDetail }) {
                     </Button>
                   </div>
                 ))}
+              </div>
+            )}
+
+            {/* Cost lines the ORDER still expects — derived from its options
+                (traducere/legalizare/apostilă + taxa ONRC/ANCPI), not typed by
+                hand. This is what links the card to the order's contents. */}
+            {pending.length > 0 && (
+              <div className="space-y-1.5 rounded-md border border-amber-200 bg-amber-50/60 p-2">
+                <p className="text-xs font-semibold text-amber-900">
+                  De completat — de pe această comandă:
+                </p>
+                {pending.map((row) => {
+                  const key = pendingRowKey(row.category, row.documentLabel);
+                  return (
+                    <div key={key} className="flex items-center gap-2 text-sm">
+                      <Badge variant="secondary" className="shrink-0">
+                        {SUPPLIER_CATEGORY_LABELS[row.category] || row.category}
+                      </Badge>
+                      <span className="flex-1 min-w-0 truncate" title={row.label}>
+                        {row.label}
+                        {row.supplier && <span className="text-muted-foreground"> · {row.supplier}</span>}
+                      </span>
+                      <Input
+                        type="number"
+                        min="0"
+                        step="0.5"
+                        value={pendingAmounts[key] ?? ''}
+                        onChange={(e) =>
+                          setPendingAmounts((prev) => ({ ...prev, [key]: e.target.value }))
+                        }
+                        placeholder="lei"
+                        className="h-8 w-24"
+                      />
+                      <Button
+                        size="sm"
+                        onClick={() => savePending(row)}
+                        disabled={savingPendingKey === key}
+                      >
+                        {savingPendingKey === key ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          'Salvează'
+                        )}
+                      </Button>
+                    </div>
+                  );
+                })}
+                <p className="text-[11px] text-amber-900/70">
+                  Sumele sunt pre-completate din tarif sau din ultima plată către furnizor — corectează-le dacă diferă.
+                </p>
               </div>
             )}
 

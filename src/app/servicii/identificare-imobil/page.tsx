@@ -29,6 +29,7 @@ import { OrderButton } from '@/components/services/order-button';
 import { buildPageMetadata, buildServicePageGraph, BASE_URL, serviceUrl, SERVICE_AGGREGATE_RATING } from '@/lib/seo';
 import { getImobiliareServices } from '@/lib/services/imobiliare';
 import { ServiceSwitcher } from '@/components/services/service-switcher';
+import { SystemStatus } from '@/components/services/system-status';
 
 // New service — no WP legacy URL, so the folder name matches the DB slug and
 // serviceUrl() resolves to this page with no redirect/override needed.
@@ -183,6 +184,10 @@ export default async function IdentificareImobilPage() {
                     îți livrăm extrasul CF — fără cont ANCPI și fără drum la OCPI.
                   </p>
                 </div>
+
+                {/* Identificarea se face în e-Terra — în timpul unei căderi ANCPI
+                    clientul trebuie să vadă ASTA înainte să plătească. */}
+                <SystemStatus service="ancpi" autoIssued={false} className="mb-6" />
 
                 <div className="bg-white/10 backdrop-blur-sm rounded-xl p-5 border border-white/20 mb-6">
                   <p className="text-white/90 leading-relaxed text-sm sm:text-base">

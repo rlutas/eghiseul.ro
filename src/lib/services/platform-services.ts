@@ -25,6 +25,27 @@ export const PROVIDER_LABEL: Readonly<Record<PlatformProvider, string>> = Object
   onrc: 'ONRC',
 });
 
+/**
+ * Services that are NOT instant (own delivery term, worked by the team) but
+ * still cannot be fulfilled while the platform is down — identificarea unui
+ * imobil se face tot în e-Terra. They keep their normal estimate, on-hold
+ * logic and admin flow; the ONLY thing this list drives is the live status
+ * badge in the order wizard, so the client sees the outage before paying.
+ */
+export const PLATFORM_DEPENDENT_SERVICES: Readonly<Record<string, PlatformProvider>> = Object.freeze({
+  'identificare-imobil': 'ancpi',
+  'identificare-imobile-proprietar': 'ancpi',
+  'copie-carte-funciara': 'ancpi',
+  'copie-plan-cadastral': 'ancpi',
+  'certificat-detineri-imobile': 'ancpi',
+});
+
+/** Provider whose live status is relevant to this service (instant OR dependent). */
+export function platformStatusProvider(slug: string | null | undefined): PlatformProvider | null {
+  if (!slug) return null;
+  return INSTANT_PLATFORM_SERVICES[slug] ?? PLATFORM_DEPENDENT_SERVICES[slug] ?? null;
+}
+
 /** Provider for an instant auto-issued service, or null for normal services. */
 export function instantPlatformProvider(slug: string | null | undefined): PlatformProvider | null {
   if (!slug) return null;

@@ -15,7 +15,7 @@ import { OrderSidebar } from './order-sidebar';
 import { SystemStatus } from '@/components/services/system-status';
 import { useCivilStatusTerms } from '@/hooks/use-civil-status-terms';
 import { resolveCivilTermTier } from '@/lib/civil-status/delivery-terms';
-import { instantPlatformProvider } from '@/lib/services/platform-services';
+import { instantPlatformProvider, platformStatusProvider } from '@/lib/services/platform-services';
 import { getServiceSpecimen } from '@/config/service-specimens';
 import Image from 'next/image';
 
@@ -141,10 +141,12 @@ export function PriceSidebarModular({ service, variant = 'full' }: PriceSidebarM
         hideDeliveryTimeCard={isInstantDigital}
         hideTrustBadges={isInstantDigital}
       />
-      {/* Live system status — replaces the delivery-time card for instant-digital
-          services. ANCPI for carte funciară / plan cadastral, ONRC for constatator. */}
-      {instantProvider && variant === 'full' && (
-        <SystemStatus service={instantProvider} />
+      {/* Live system status — for instant-digital services it replaces the
+          delivery-time card; for ANCPI-dependent manual services (identificare
+          imobil, copii CF/plan) it sits alongside it, so the client sees an
+          outage before paying. */}
+      {platformStatusProvider(service.slug) && variant === 'full' && (
+        <SystemStatus service={platformStatusProvider(service.slug)!} autoIssued={isInstantDigital} />
       )}
 
       {/* Specimen document — așa arată ce primește clientul (sidebar desktop +

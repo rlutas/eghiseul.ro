@@ -17,10 +17,17 @@ interface StatusResponse {
 export function SystemStatus({
   className = '',
   service = 'onrc',
+  autoIssued = true,
 }: {
   className?: string;
   /** Which provider's status to show: 'onrc' (constatator) or 'ancpi' (carte funciară). */
   service?: 'onrc' | 'ancpi';
+  /**
+   * False for manual services that merely DEPEND on the portal (identificare
+   * imobil, copii CF) — hides the „Eliberare automată · 24/7" claim, which is
+   * only true for worker-issued services.
+   */
+  autoIssued?: boolean;
 }) {
   const [status, setStatus] = useState<StatusResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -69,7 +76,7 @@ export function SystemStatus({
           </span>
         </div>
         <span className={`text-xs font-medium ${operational ? 'text-green-700' : 'text-neutral-500'}`}>
-          Eliberare automată · 24/7
+          {autoIssued ? 'Eliberare automată · 24/7' : `Portal ${service === 'ancpi' ? 'ANCPI' : 'ONRC'}`}
         </span>
       </div>
 
