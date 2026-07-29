@@ -57,35 +57,31 @@ deliberat: când omul nu știe cifra, o inventează ca să poată închide coman
 costuri false sunt mai rele decât costuri lipsă. Suma `0` e valoare validă și se
 salvează ca atare — „am verificat, n-a costat nimic" e altceva decât „n-am completat".
 
-## Un rând per document, când comanda are mai multe
+## Costul se atribuie actului pentru care a fost cumpărat
 
-O comandă poate produce mai multe documente: cazier + certificat de integritate
-adăugat ca add-on, cazier secundar, pachet naștere. Traducerea și legalizarea se pot
-face pe fiecare dintre ele.
+O comandă poate conține două servicii: cazier judiciar + certificat de integritate.
+Wizardul oferă opțiunile de traducere/legalizare/apostilă **pe fiecare dintre ele**
+(`BUNDLED_OPTION_CODES` în `src/lib/services/bundled-options.ts`), iar opțiunile alese
+sub al doilea serviciu se salvează cu `bundled_for.parent_option_id` = id-ul add-on-ului.
 
-Verificat pe date: toate opțiunile există câte una per comandă, cu `quantity: 1`
-(26 traduceri, 12 legalizări, 4 apostile notariale), iar `bundled_for` — câmpul care
-ar lega o opțiune de un anumit document — **nu apare în nicio comandă reală**. Deci o
-comandă cu două documente ar fi produs o singură linie „Traducere", iar costul ar fi
-ieșit o sumă globală, fără să se știe cât a costat fiecare act.
-
-Acum, când comanda conține un add-on de tip document separat, fiecare linie de cost
-se cere per document:
+Deci fiecare opțiune spune deja singură pentru ce act a fost cumpărată, iar costurile
+se atribuie exact așa:
 
 ```
-Traducere Autorizată · Italiană — Cazier Judiciar        [ 180 ] lei
-Traducere Autorizată · Italiană — Certificat Integritate [ 180 ] lei
-Legalizare Notarială — Cazier Judiciar                   [  55 ] lei
-Legalizare Notarială — Certificat Integritate            [  55 ] lei
+Traducere Autorizată · Italiană — Cazier Judiciar          [ 180 ] lei
+Traducere Autorizată · Italiană — Certificat Integritate   [ 180 ] lei
+Legalizare Notarială — Cazier Judiciar                     [  55 ] lei
 ```
 
-Pe comenzile cu un singur document nu apare niciun sufix — fără zgomot acolo unde
-întrebarea nu se pune. Apostila de la Haga NU creează un document în plus: e o
-procedură aplicată pe un act, nu un act separat.
+Dacă legalizarea e bifată doar pe cazier, se cere doar pentru cazier — nu inventăm
+linii pentru acte care n-au opțiunea. Pe comenzile cu un singur serviciu nu apare
+niciun sufix. Apostila de la Haga nu creează un act în plus: e o procedură aplicată
+pe un act existent.
 
-Documentul se salvează în `order_supplier_costs.document_label` (migrarea 141), deci
-raportul lunar arată pe ce act s-a lucrat — util și la verificarea facturii
-traducătoarei. Costul deja înregistrat pe un document nu se mai cere; celălalt, da.
+Se acceptă ambele forme ale metadatelor (`bundled_for` din DB și `bundledFor` din
+API). Documentul se salvează în `order_supplier_costs.document_label` (migrarea 141),
+deci raportul lunar arată pe ce act s-a lucrat — util la verificarea facturii
+traducătoarei. Costul înregistrat pe un act nu îl ascunde pe celălalt.
 
 ## Echipa poate adăuga un serviciu pentru un anumit act
 

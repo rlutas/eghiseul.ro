@@ -257,6 +257,8 @@ export interface PendingCostRow {
 }
 
 interface OptionWithMeta extends OptionLike {
+  option_id?: string | null;
+  optionId?: string | null;
   option_name?: string | null;
   optionName?: string | null;
   metadata?: {
@@ -265,6 +267,30 @@ interface OptionWithMeta extends OptionLike {
     /** Set by the team when an option is bought for one specific document. */
     document?: string | null;
   } | null;
+  /**
+   * Set by the wizard when the option was chosen for a SECOND, bundled service
+   * (cazier + certificat de integritate: traducerea bifată sub integritate
+   * carries the add-on's option id here). Absent = belongs to the main service.
+   */
+  bundled_for?: {
+    parent_option_id?: string | null;
+    bundled_service_slug?: string | null;
+    bundled_option_code?: string | null;
+  } | null;
+  bundledFor?: {
+    parentOptionId?: string | null;
+    bundledServiceSlug?: string | null;
+    bundledOptionCode?: string | null;
+  } | null;
+}
+
+/** The add-on an option was bundled under, in whichever casing it was stored. */
+function bundleParentId(option: OptionWithMeta): string | null {
+  return (
+    option.bundled_for?.parent_option_id ??
+    option.bundledFor?.parentOptionId ??
+    null
+  );
 }
 
 /**
@@ -289,19 +315,18 @@ export function pendingCostRows(params: {
   const done = new Set(params.existingKeys ?? []);
   const rows: PendingCostRow[] = [];
 
-  // The documents this order produces. More than one → every cost line is
-  // asked per document, so „cât a costat traducerea cazierului vs. a
-  // certificatului de integritate" has an answer.
-  const documents: string[] = [];
+  // The documents this order produces, indexed by the add-on's option id —
+  // that is exactly what the wizard writes into `bundled_for.parent_option_id`
+  // when the client picks translation/legalisation under the SECOND service.
+  const documentsById = new Map<string, string>();
   for (const option of params.options ?? []) {
     if (!option.code || !DOCUMENT_ADDON_CODES.has(option.code)) continue;
-    documents.push(option.option_name ?? option.optionName ?? option.code);
+    const id = option.option_id ?? option.optionId ?? null;
+    const name = option.option_name ?? option.optionName ?? option.code;
+    if (id) documentsById.set(id, name);
   }
-  const hasMultipleDocuments = documents.length > 0;
+  const hasMultipleDocuments = documentsById.size > 0;
   const mainDocument = params.serviceName ?? 'Serviciu principal';
-  const documentTargets: Array<string | null> = hasMultipleDocuments
-    ? [mainDocument, ...documents]
-    : [null];
 
   const suggest = (
     category: SupplierCategory,
@@ -350,30 +375,31 @@ export function pendingCostRows(params: {
     const supplier = CATEGORY_DEFAULT_SUPPLIER[category];
     const name = option.option_name ?? option.optionName ?? SUPPLIER_CATEGORY_LABELS[category];
 
-    // An option the team tied to one document (added from the modify dialog)
-    // asks for that document ONLY — no point pricing it against the others.
-    const explicitDocument = option.metadata?.document?.trim() || null;
-    const targets: Array<string | null> = explicitDocument
-      ? [explicitDocument]
-      : documentTargets;
+    // Which document this option was bought for. The wizard already answers
+    // this: an option picked under the bundled service carries that add-on's
+    // id in `bundled_for`; one without it belongs to the main service. The
+    // team can also pin a free-form extra to a document from the modify dialog.
+    const parentId = bundleParentId(option);
+    const documentLabel = hasMultipleDocuments
+      ? option.metadata?.document?.trim() ||
+        (parentId ? documentsById.get(parentId) ?? mainDocument : mainDocument)
+      : option.metadata?.document?.trim() || null;
 
-    for (const documentLabel of targets) {
-      const key = pendingRowKey(category, documentLabel);
-      if (done.has(key) || rows.some((r) => pendingRowKey(r.category, r.documentLabel) === key)) {
-        continue;
-      }
-      const base = language ? `${name} · ${language}` : name;
-      rows.push({
-        category,
-        sourceCode: code,
-        label: documentLabel ? `${base} — ${documentLabel}` : base,
-        documentLabel,
-        supplier,
-        language,
-        serviceSlug: null,
-        ...suggest(category, supplier, language, null),
-      });
+    const key = pendingRowKey(category, documentLabel);
+    if (done.has(key) || rows.some((r) => pendingRowKey(r.category, r.documentLabel) === key)) {
+      continue;
     }
+    const base = language ? `${name} · ${language}` : name;
+    rows.push({
+      category,
+      sourceCode: code,
+      label: documentLabel ? `${base} — ${documentLabel}` : base,
+      documentLabel,
+      supplier,
+      language,
+      serviceSlug: null,
+      ...suggest(category, supplier, language, null),
+    });
   }
 
   return rows;

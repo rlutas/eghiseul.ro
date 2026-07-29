@@ -218,53 +218,76 @@ describe('findTariff', () => {
   });
 });
 
-describe('pendingCostRows — comandă cu mai multe documente', () => {
-  // Scenariul lui Raul: cazier + certificat de integritate în aceeași comandă,
-  // cu servicii suplimentare. Fără un rând per document, cele două traduceri
-  // s-ar contopi într-o singură sumă și n-ai ști cât a costat fiecare act.
+describe('pendingCostRows — comandă cu două servicii (bundled)', () => {
+  // Scenariul real: cazier judiciar + certificat de integritate, iar clientul
+  // bifează traducere/legalizare pe FIECARE serviciu. Wizardul salvează
+  // opțiunile celui de-al doilea serviciu cu `bundled_for.parent_option_id` =
+  // id-ul add-on-ului, deci fiecare opțiune spune singură pentru ce act e.
+  const INTEGRITATE_ID = 'af01bb9e-addon-integritate';
   const order = {
     serviceName: 'Cazier Judiciar',
     serviceSlug: 'cazier-judiciar',
     options: [
-      { code: 'addon_certificat_integritate', option_name: 'Certificat Integritate' },
+      {
+        code: 'addon_certificat_integritate',
+        option_id: INTEGRITATE_ID,
+        option_name: 'Certificat Integritate',
+      },
       { code: 'traducere', option_name: 'Traducere Autorizată', metadata: { language: 'Italiană' } },
+      {
+        code: 'traducere',
+        option_name: 'Traducere Autorizată',
+        metadata: { language: 'Italiană' },
+        bundled_for: { parent_option_id: INTEGRITATE_ID, bundled_option_code: 'traducere' },
+      },
       { code: 'legalizare', option_name: 'Legalizare Notarială' },
     ],
   };
 
-  it('cere traducerea și legalizarea SEPARAT pentru fiecare document', () => {
+  it('atribuie fiecare opțiune actului pentru care a fost cumpărată', () => {
     const rows = pendingCostRows(order);
-    expect(rows.map((r) => r.label)).toEqual([
-      'Traducere Autorizată · Italiană — Cazier Judiciar',
-      'Traducere Autorizată · Italiană — Certificat Integritate',
-      'Legalizare Notarială — Cazier Judiciar',
-      'Legalizare Notarială — Certificat Integritate',
+    expect(rows.map((r) => [r.category, r.documentLabel])).toEqual([
+      ['traducere', 'Cazier Judiciar'],
+      ['traducere', 'Certificat Integritate'],
+      ['legalizare', 'Cazier Judiciar'],
     ]);
   });
 
-  it('fiecare rând poartă documentul, ca raportul să-l poată arăta', () => {
+  it('NU inventează costuri pentru acte fără opțiunea respectivă', () => {
+    // Legalizarea e bifată doar pe cazier → nu se cere și pe integritate.
     const rows = pendingCostRows(order);
-    expect(rows.map((r) => r.documentLabel)).toEqual([
-      'Cazier Judiciar',
-      'Certificat Integritate',
-      'Cazier Judiciar',
-      'Certificat Integritate',
-    ]);
+    expect(
+      rows.filter((r) => r.category === 'legalizare').map((r) => r.documentLabel)
+    ).toEqual(['Cazier Judiciar']);
   });
 
-  it('costul deja pus pe un document nu se mai cere, celălalt da', () => {
+  it('acceptă și forma camelCase a metadatelor de bundling', () => {
+    const rows = pendingCostRows({
+      serviceName: 'Cazier Judiciar',
+      options: [
+        { code: 'addon_certificat_integritate', optionId: INTEGRITATE_ID, optionName: 'Certificat Integritate' },
+        {
+          code: 'traducere',
+          optionName: 'Traducere Autorizată',
+          bundledFor: { parentOptionId: INTEGRITATE_ID },
+        },
+      ],
+    });
+    expect(rows.map((r) => r.documentLabel)).toEqual(['Certificat Integritate']);
+  });
+
+  it('costul pus pe un act nu îl ascunde pe celălalt', () => {
     const rows = pendingCostRows({
       ...order,
       existingKeys: [pendingRowKey('traducere', 'Cazier Judiciar')],
     });
-    expect(rows.map((r) => r.label)).toEqual([
-      'Traducere Autorizată · Italiană — Certificat Integritate',
-      'Legalizare Notarială — Cazier Judiciar',
-      'Legalizare Notarială — Certificat Integritate',
+    expect(rows.map((r) => [r.category, r.documentLabel])).toEqual([
+      ['traducere', 'Certificat Integritate'],
+      ['legalizare', 'Cazier Judiciar'],
     ]);
   });
 
-  it('un singur document → un singur rând, fără sufix (fără zgomot)', () => {
+  it('un singur serviciu → fără sufix de document', () => {
     const rows = pendingCostRows({
       serviceName: 'Cazier Judiciar',
       options: [{ code: 'traducere', option_name: 'Traducere Autorizată' }],
@@ -274,7 +297,7 @@ describe('pendingCostRows — comandă cu mai multe documente', () => {
     expect(rows[0].documentLabel).toBeNull();
   });
 
-  it('apostila Haga nu creează un document în plus', () => {
+  it('apostila Haga nu creează un act în plus', () => {
     const rows = pendingCostRows({
       serviceName: 'Cazier Judiciar',
       options: [
@@ -295,7 +318,7 @@ describe('pendingCostRows — extra legat explicit de un document', () => {
     const rows = pendingCostRows({
       serviceName: 'Cazier Judiciar',
       options: [
-        { code: 'addon_certificat_integritate', option_name: 'Certificat Integritate' },
+        { code: 'addon_certificat_integritate', option_id: 'addon-1', option_name: 'Certificat Integritate' },
         {
           code: 'custom_extra',
           option_name: 'Traducere legalizată maghiară',
@@ -310,14 +333,14 @@ describe('pendingCostRows — extra legat explicit de un document', () => {
     });
   });
 
-  it('fără document indicat, întreabă pentru fiecare act', () => {
+  it('fără document indicat, extra-ul cade pe serviciul principal', () => {
     const rows = pendingCostRows({
       serviceName: 'Cazier Judiciar',
       options: [
-        { code: 'addon_certificat_integritate', option_name: 'Certificat Integritate' },
+        { code: 'addon_certificat_integritate', option_id: 'addon-1', option_name: 'Certificat Integritate' },
         { code: 'custom_extra', option_name: 'Serviciu extra' },
       ],
     });
-    expect(rows.map((r) => r.documentLabel)).toEqual(['Cazier Judiciar', 'Certificat Integritate']);
+    expect(rows.map((r) => r.documentLabel)).toEqual(['Cazier Judiciar']);
   });
 });
