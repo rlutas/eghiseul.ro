@@ -65,7 +65,30 @@ Sănătos peste tot. Nota veche „de renegociat, țintă 30-35" e ISTORIE — 4
 | 2 (nou) | RU, UA, BG, PL, CS, SK, EL | **249** | 205,79 | 96–116 lei (47–56%) |
 | 3 (nou) | SV, DA, NO | **349** | 288,43 | 138–158 lei (48–55%), cu evaluare prealabilă |
 
-## Cum funcționează logica AZI + ce trebuie îmbunătățit
+## ✅ IMPLEMENTAT 29 iul seara (commit `8f629c8`) — eghiseul.ro
+
+- **Preț per limbă în wizard**: opțiunea traducere își ia prețul din
+  `translation_price_list.clientPriceDoc` (dropdown cu preț lângă limbă,
+  se aplică și pe opțiunile bundled). Gardă server-side la submit — corectează
+  în sus dacă payload-ul a fost umblat.
+- **20 de limbi ACTIVE** pe toate cele 9 servicii cu opțiune de traducere
+  (cazier PF/PJ/auto/fiscal, integritate, naștere, căsătorie, celibat) —
+  lista e GLOBALĂ, nu per serviciu. Trepte: 178,50 / 249 / 349.
+- **Bulgară**: legalizarea notarială blocată în wizard (card dezactivat +
+  explicație + auto-drop).
+- **Setări → Traduceri**: coloană „Cost apostilă" (suprataxa Haga per limbă,
+  completată pe toate 20) + marja afișată e NETĂ (÷1,21). Switch-ul „Activ"
+  per limbă controlează live dropdown-ul din wizard — dezactivarea unei limbi
+  nu cere deploy.
+- Tarifele traducătoarei în Setări → Furnizori (pop-up-ul de costuri
+  pre-completează costul real per limbă).
+
+**RĂMAS:** portarea pe cazierjudiciaronline.com + ecazier.ro (liste proprii,
+probabil hardcodate) · suprataxa de apostilă în sugestia automată din pop-up
+(azi echipa o adaugă manual) · termen per limbă afișat în wizard (1–4 zile) ·
+acte medicale +10 lei (doar în evidența internă).
+
+## Cum funcționa logica ÎNAINTE (istoric) + restul îmbunătățirilor
 
 **Azi:** opțiunea `traducere` = **178,50 flat pe 9 servicii**, indiferent de limbă;
 limba e doar metadata (dropdown din `translation_price_list` → limbile active).
