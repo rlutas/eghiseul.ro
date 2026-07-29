@@ -289,6 +289,44 @@ publicitate sunt marcate în portofoliul lor per site (de verificat individual).
 money + economica → extras carte funciară (poz. 12,8); click.ro → brand/homepage.
 Ancore: max 1 comercială din 5, restul brand/URL.
 
+## ⏳ TRIMIS Cristinei (29 iul, după-amiază) — așteptăm prețul final
+
+Raul a trimis lista finală de 6, cu cerere de discount pe pachet + confirmările
+scrise (dofollow, secțiuni editoriale indexabile, risco = advertorial, nu director):
+
+| # | Domeniu | Format | Preț listă | DA (Moz, 29 iul) | Spam |
+|---|---|---|---|---|---|
+| 1 | money.ro | advertorial | 75 € | 54 · 6k domenii | ⚠️ 28% — de întrebat de ce |
+| 2 | startupcafe.ro | articol SEO | 235 € | 49 · 5,6k | 1% (cel mai curat) |
+| 3 | economica.net | advertorial | 220 € | 57 · 8,9k | 4% (cel mai puternic) |
+| 4 | start-up.ro | advertorial | 210 € | neverificat (limită Moz 3/zi) | — |
+| 5 | click.ro | articol SEO | 130 € | neverificat | — |
+| 6 | risco.ro | advertorial | 50 € | neverificat | — |
+
+Total listă 920 € înainte de discount. Respinse: prosport (sport), digi24 (2.135 €
+fără discount), comunicat Mediafax (doar dacă e articol editorial dofollow).
+
+## Planul de conținut — ce scriem și unde duce fiecare link
+
+Articolele le scriem NOI (800–1.200 cuvinte, pass humanizer, fără perechea
+„documente/acte + oficiale" — politica Google Ads). Cristina doar publică.
+Publicare eșalonată pe 3–4 săptămâni, nu toate odată.
+
+| Publicație | Unghi articol | Pagina țintă | Ancoră |
+|---|---|---|---|
+| **economica.net** | „Blocajul ANCPI: ce înseamnă pentru tranzacțiile imobiliare" — subiectul zilei, avem monitorizarea + datele proprii | /servicii/extras-de-carte-funciara/ | brand („eGhișeul.ro") |
+| **money.ro** | „Ce verifici înainte să cumperi o locuință" (extras CF, proprietar, sarcini; context TVA 9%) | /servicii/extras-de-carte-funciara/ | naturală („poți obține extrasul online") |
+| **startupcafe.ro** | „Actele de care firma ta are nevoie la bancă, licitații și fonduri: certificatul constatator, explicat" | /servicii/certificat-constatator-online/ | brand |
+| **start-up.ro** | „Checklist după înființarea firmei: ce acte îți cer partenerii în primul an" | /servicii/certificat-constatator-online/ | comercială exactă („certificat constatator online") — SINGURA din pachet |
+| **risco.ro** | „Cum verifici un partener de afaceri înainte de contract" (date financiare + constatator + cazier fiscal) | /servicii/certificat-constatator-online/ | naturală |
+| **click.ro** | „Actele pe care le poți scoate de acasă în 2026" (cazier, stare civilă — public larg) | /servicii/cazier-judiciar-online/ | brand |
+
+Regulă respectată: 1 ancoră comercială exactă din 6 (~17%, sub pragul de 20% din
+[lista de ținte](2026-07-29-lista-tinte-backlinks.md)); restul brand/naturale.
+
+**După confirmare comandă:** scriem cele 6 articole (eu, la cerere), Raul le
+trimite Cristinei; verificăm la publicare dofollow + secțiune indexabilă pe fiecare.
+
 ## Ce nu am putut verifica
 
 - **Profilul complet de backlinkuri** — nu avem chei Moz/Ahrefs (confirmat și în
