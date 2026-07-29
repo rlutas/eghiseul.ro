@@ -85,7 +85,7 @@ export default function Page() {
         },
         {
           q: 'Până când e picat ANCPI?',
-          a: 'Nu există un termen ferm — iar pe 27 iulie Guvernul a refuzat explicit să mai dea unul: „nu putem încă anunța o oră sau o dată fermă de repunere în funcțiune — nu dorim să facem promisiuni pe care condițiile tehnice ne pot obliga să le amânăm”. Estimarea anterioară a premierului Bolojan (reluare în săptămâna 27–31 iulie) nu s-a confirmat până acum, la fel ca termenele din 20 și 22 iulie. Reconstrucția infrastructurii se face integral în Cloudul Guvernamental, iar repunerea va fi etapizată, pe componente.',
+          a: 'Nu există un termen ferm — iar pe 27 iulie Guvernul a refuzat explicit să mai dea unul: „nu putem încă anunța o oră sau o dată fermă de repunere în funcțiune — nu dorim să facem promisiuni pe care condițiile tehnice ne pot obliga să le amânăm”. Estimarea anterioară a premierului Bolojan (reluare în săptămâna 27–31 iulie) nu s-a confirmat până acum, la fel ca termenele din 20 și 22 iulie. Reconstrucția infrastructurii se face integral în Cloudul Guvernamental, iar repunerea va fi etapizată, pe componente. Pe 29 iulie, nici notarii publici — informați printr-o comunicare internă a profesiei, după o nouă rundă de discuții cu ANCPI — nu au primit o dată; se discută soluții alternative de deblocare.',
         },
         {
           q: 'Migrarea în Cloudul Guvernamental s-a terminat pe 22 iulie. De ce tot nu funcționează?',
@@ -218,9 +218,25 @@ export default function Page() {
       <div className="not-prose my-6 space-y-0">
         {[
           {
+            date: '29 iulie 2026',
+            tag: 'Informare notari',
+            latest: true,
+            body: (
+              <>
+                Notarii publici sunt informați, printr-o comunicare internă transmisă camerelor
+                notarilor publici (consultată de noi), că în cursul zilei a avut loc o nouă rundă
+                de discuții cu ANCPI: echipele tehnice au înregistrat progrese, dar{' '}
+                <strong>„nu pot preciza o dată de la care aplicația informatică va fi
+                funcțională”</strong>. Se discută și <strong>soluții alternative</strong> pentru
+                deblocarea situației. Semnificația practică: nici profesioniștii care depind
+                direct de e-Terra nu au primit un termen — confirmă poziția Guvernului din 27
+                iulie.
+              </>
+            ),
+          },
+          {
             date: '27 iulie 2026',
             tag: 'Confirmare ransomware',
-            latest: true,
             body: (
               <>
                 Guvernul confirmă natura atacului: <strong>ransomware</strong> — „atacatorii au{' '}
@@ -634,6 +650,15 @@ export default function Page() {
       </ul>
 
       <h2>Actualizări</h2>
+      <p>
+        <strong>29 iulie 2026 (după-amiază):</strong> potrivit unei informări interne transmise
+        camerelor notarilor publici, pe care am consultat-o, în cursul zilei a avut loc o nouă
+        rundă de discuții cu ANCPI: progrese tehnice, dar{' '}
+        <strong>fără o dată la care aplicația va fi funcțională</strong> — nici notarii, care
+        depind direct de e-Terra pentru autentificări, nu au primit un termen. În discuție sunt și{' '}
+        <strong>soluții alternative</strong> pentru deblocarea situației; dacă apar concret, le
+        documentăm aici.
+      </p>
       <p>
         <strong>29 iulie 2026:</strong> ziua <strong>{outageDays}</strong> de blocaj, fără termen
         de repornire. Pe <strong>27 iulie</strong>, Guvernul a confirmat că atacul a fost de tip{' '}
