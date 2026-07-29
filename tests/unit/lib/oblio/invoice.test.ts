@@ -339,6 +339,36 @@ describe('createInvoiceFromOrder — products / line items', () => {
     expect(products[1].code).toBeUndefined();
   });
 
+  it('GUARD: no invoice line carries a code that is stable across orders', async () => {
+    // Orice `code` reutilizat de la o comandă la alta creează o intrare
+    // permanentă în nomenclatorul Oblio, iar Oblio tipărește apoi numele
+    // MEMORAT, nu cel trimis — exact regresia din E-260728-YFHH2. Un cod e
+    // acceptabil doar dacă e legat de comandă (nr. comandă) sau de cupon
+    // (numele liniei conține oricum codul, deci nu poate deriva).
+    const order = {
+      ...baseOrder,
+      coupon_code: 'RECOVERY-TEST',
+      discount_amount: 10,
+      delivery_price: 25,
+      selected_options: [
+        { code: 'apostila_haga', option_name: 'Apostilă de la Haga', price_modifier: 198 },
+        { code: 'traducere', option_name: 'Traducere Autorizată', price_modifier: 178.5 },
+        { code: 'urgenta', option_name: 'Procesare Urgentă', price_modifier: 80 },
+      ],
+    };
+    await createInvoiceFromOrder(order, 'Card');
+
+    const products = oblioRequest.mock.calls[0][0].body.products;
+    const orderScoped = [order.friendly_order_id, order.coupon_code];
+    for (const p of products) {
+      if (p.code === undefined) continue;
+      expect(
+        orderScoped.includes(p.code),
+        `linia „${p.name}" trimite codul stabil „${p.code}" — Oblio va tipări numele memorat în nomenclator`,
+      ).toBe(true);
+    }
+  });
+
   it('invoice lines DROP the country/language metadata suffix', async () => {
     // Incident E-260714-WXGYQ: „Apostilă de la Haga — Chile" pe factura unei
     // comenzi pentru Italia. Pe documentul fiscal linia rămâne fără detaliu;
