@@ -609,6 +609,12 @@ export function buildStareCivilaLabel(
     currentlyMarried?: boolean;
     wasMarriedBefore?: boolean;
     lastMarriageEndedBy?: string;
+    /** True when the order itself proves a marriage exists (marriage
+     *  certificate with date/spouse collected). „Necăsătorit" is then a
+     *  contradiction on the same line as „certificatul de căsătorie încheiată
+     *  cu X" — we print nothing instead of an absurdity (E-260728-Z77WC had
+     *  both answers on „nu" while giving the date and the spouse). */
+    marriageOnRecord?: boolean;
   }
 ): string {
   const labels: Record<string, { m: string; f: string }> = {
@@ -620,8 +626,11 @@ export function buildStareCivilaLabel(
   const gendered = (entry: { m: string; f: string }) =>
     genderFromCnp(cnp) === 'f' ? entry.f : entry.m;
 
+  const contradictsRecord = (label: { m: string; f: string }) =>
+    civil?.marriageOnRecord === true && label === labels.necasatorit;
+
   const explicit = labels[(civilStatus || '').trim().toLowerCase()];
-  if (explicit) return gendered(explicit);
+  if (explicit) return contradictsRecord(explicit) ? '' : gendered(explicit);
 
   // Derived from what the wizard already asks — no extra question needed.
   // „Sunt căsătorit acum?" wins (a remarried client is simply „căsătorit"),
@@ -629,7 +638,9 @@ export function buildStareCivilaLabel(
   // („Ultima căsătorie s-a încheiat prin": divorț / deces).
   if (civil?.currentlyMarried === true) return gendered(labels.casatorit);
   if (civil?.currentlyMarried === false) {
-    if (civil?.wasMarriedBefore === false) return gendered(labels.necasatorit);
+    if (civil?.wasMarriedBefore === false) {
+      return contradictsRecord(labels.necasatorit) ? '' : gendered(labels.necasatorit);
+    }
     if (civil?.wasMarriedBefore === true) {
       // Older orders stored the label („Divorț") instead of the code.
       const ended = (civil.lastMarriageEndedBy || '')
@@ -658,6 +669,17 @@ export function buildFiliatie(fatherName?: string, motherName?: string, cnp?: st
   const gender = genderFromCnp(cnp);
   const fiu = gender === 'f' ? 'fiica' : gender === 'm' ? 'fiul' : 'fiul/fiica';
   return `${fiu} lui ${parents.join(' și ')}`;
+}
+
+/** True when the ORDER itself proves a marriage: a marriage certificate with
+ *  the date or the spouse collected. Used to suppress a „necăsătorit" label
+ *  that would contradict the very document being requested. */
+function hasMarriageOnRecord(ctx: DocumentContext): boolean {
+  const slug = ctx.order.service_slug || '';
+  const isMarriageDoc =
+    slug === 'certificat-casatorie' || slug === 'extras-multilingv-certificat-casatorie';
+  if (!isMarriageDoc) return false;
+  return !!(ctx.client.marriage_date?.trim() || ctx.client.spouse_name?.trim());
 }
 
 /** Activity text for the stare-civilă împuternicire — „să obțină
@@ -1064,6 +1086,7 @@ function buildPlaceholderData(ctx: DocumentContext) {
       currentlyMarried: ctx.client.currently_married,
       wasMarriedBefore: ctx.client.was_married_before,
       lastMarriageEndedBy: ctx.client.last_marriage_ended_by,
+      marriageOnRecord: hasMarriageOnRecord(ctx),
     }),
     hasFiliatie: buildFiliatie(ctx.client.father_name, ctx.client.mother_name, ctx.client.cnp) !== '',
     NUMETATA: buildFiliatie(ctx.client.father_name, ctx.client.mother_name, ctx.client.cnp),

@@ -445,6 +445,21 @@ describe('buildStareCivilaLabel — fără liniuță pe împuternicire', () => {
     ).toBe('');
   });
 
+  it('NU scrie „necăsătorit" pe o comandă care dovedește o căsătorie', () => {
+    // E-260728-Z77WC: ambele răspunsuri pe „nu", dar cu data căsătoriei și
+    // numele soțului completate. „certificatul de căsătorie încheiată cu X …
+    // stare status civil: necăsătorită" ar fi absurd pe același rând.
+    expect(
+      buildStareCivilaLabel('', CNP_F, {
+        currentlyMarried: false,
+        wasMarriedBefore: false,
+        marriageOnRecord: true,
+      })
+    ).toBe('');
+    // și când starea civilă e declarată explicit, tot contrazice actul
+    expect(buildStareCivilaLabel('necasatorit', CNP_F, { marriageOnRecord: true })).toBe('');
+  });
+
   it('gol când nu se știe nimic (nu „-")', () => {
     expect(buildStareCivilaLabel('', CNP_F)).toBe('');
     expect(buildStareCivilaLabel(undefined, undefined, {})).toBe('');

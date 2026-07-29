@@ -37,6 +37,21 @@ recăsătorit rămâne „căsătorit" — răspunsul despre prezent are priorit
 Fără `-` de umplutură: template-ul are deja punctele de completare, iar o liniuță arată
 ca un câmp uitat. Pe un act juridic preferăm un spațiu liber unei presupuneri.
 
+### Verificat generând documentul, nu doar funcțiile
+
+Prima variantă trecea testele unitare, dar documentul real ieșea așa:
+
+```
+să obțină certificatul de căsătorie încheiată cu MUSAT DUMITRU la data de
+28.03.1992, în Brăila, stare status civil:necăsătorită
+```
+
+Pe comanda cu răspunsuri contradictorii, eticheta dedusă („ambele nu" →
+necăsătorită) ajungea pe același rând cu dovada căsătoriei. De aceea, când comanda
+**demonstrează** o căsătorie (certificat de căsătorie cu data sau soțul completate),
+eticheta „necăsătorit" e suprimată — inclusiv când ar fi declarată explicit. Rândul
+rămâne gol, iar operatorul îl completează după acte.
+
 ## Care căsătorie
 
 `ACTIVITATI_SC` numește acum și actul, pe cele două servicii de căsătorie:
