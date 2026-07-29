@@ -261,6 +261,34 @@ digi24.ro, avocatnet.ro, startupcafe.ro, imobiliare.ro, profit.ro, economedia.ro
 juridice.ro, storia.ro. Dacă nu le are, ia doar money.ro și mută restul bugetului în
 presă locală directă + digital PR.
 
+## Contra-oferta Cristinei (29 iul, 13:49) + decizia
+
+Raul a cerut ofertă pe 5 domenii noi; Cristina a răspuns (toate domeniile de mai jos
+sunt NOI — verificat contra celor 50 din GSC, zero suprapunere):
+
+| Domeniu | Preț | Verdict |
+|---|---|---|
+| money.ro | 75 € | ✅ IA — financiar, cel mai bun raport |
+| startupcafe.ro | 235 € | ✅ IA — antreprenori → constatator |
+| economica.net | 220 € | ✅ IA — economic-administrativ |
+| start-up.ro | 210 € | ✅ IA — antreprenori → constatator |
+| click.ro | 130 € | ✅ IA — brand/trafic, ieftin |
+| bursa.ro | 230 € | opțional — dublează nișa financiară |
+| Mediafax „comunicat cu brand" | 270 € | ❌ ca comunicat (marcat/sindicalizat); doar dacă e articol editorial dofollow |
+| prosport.ro | 125 € | ❌ sport, zero relevanță |
+| digi24.ro | 2.135 €, fără discount | ❌ la prețul ăsta — un link = ~20 linkuri presă locală; diferența față de caziere.ro e volumul, nu un trofeu |
+
+**Pachet ales: 5 domenii = 870 € brut** (vs 955 € oferta inițială din care 849 € pe
+domenii deja avute). Cerut în plus: discount pe pachet + confirmare scrisă
+dofollow + secțiune editorială indexabilă; întrebat de juridic/imobiliare.
+
+Confirmat de Cristina în scris: articolele rămân permanent; secțiunile de
+publicitate sunt marcate în portofoliul lor per site (de verificat individual).
+
+**Direcționare:** startupcafe + start-up.ro → certificat constatator (poz. 12,1);
+money + economica → extras carte funciară (poz. 12,8); click.ro → brand/homepage.
+Ancore: max 1 comercială din 5, restul brand/URL.
+
 ## Ce nu am putut verifica
 
 - **Profilul complet de backlinkuri** — nu avem chei Moz/Ahrefs (confirmat și în
