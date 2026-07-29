@@ -122,6 +122,44 @@ Dacă acceptă înlocuirile, pachetul devine ~5-6 domenii **noi**, dintre care c
 două relevante tematic — asta chiar mișcă poziția 12 spre pagina 1. Fără înlocuiri,
 plătim ~450 € pentru linkuri cu valoare marginală.
 
+## Actualizare 29 iul: linkurile sunt DOFOLLOW (confirmat de Raul)
+
+Asta schimbă valoarea în sus — transmit autoritate — dar face alegerea domeniilor
+și mai importantă: un dofollow de pe un site fără legătură tematică rămâne un
+dofollow slab, iar plătit rămâne tehnic împotriva ghidului Google.
+
+### NU romaniatv.net / stiripesurse.ro ca înlocuitori
+
+Sunt exact profilul pe care voiam să-l evităm: știri generaliste, 449 € împreună,
+relevanță tematică zero față de acte/juridic. Am înlocui două domenii slabe cu alte
+două domenii slabe, la preț mai mare.
+
+### Domenii de cerut în schimb (nișe relevante)
+
+| Nișă | Exemple de cerut | Pentru ce serviciu |
+|---|---|---|
+| Juridic / administrativ | **avocatnet.ro**, juridice.ro, legestart.ro | cazier judiciar, stare civilă, împuterniciri |
+| Antreprenoriat / firme | **startupcafe.ro**, profit.ro, economedia.ro | certificat constatator (ONRC) |
+| Imobiliare | imobiliare.ro (blog), storia.ro, agenții/portaluri | **extras carte funciară**, urbanism |
+| Financiar | zf.ro, wall-street.ro, capital.ro | cazier fiscal, ANAF |
+| Auto | promotor.ro, autoexpert.ro | cazier auto, rovinietă |
+
+**avocatnet.ro** ar fi cel mai valoros din listă: publicul lui e fix omul care caută
+„de unde iau cazierul" sau „ce acte îmi trebuie" — relevanță tematică maximă, plus
+autoritate reală în zona administrativă.
+
+Formularea pentru Cristina: *„Aveți în portofoliu site-uri pe zona juridic /
+administrativ / imobiliare / antreprenoriat? Ne interesează mai mult relevanța
+tematică decât traficul generalist."*
+
+### Dacă nu are astfel de domenii
+
+Atunci pachetul rămâne util doar pentru **brand și menționări** (inclusiv pentru
+citarea în AI Overviews), nu pentru poziții. În cazul ăsta aș lua doar pozițiile
+relevante — adevarul.ro (secțiune relevantă) + money.ro — și aș pune restul bugetului
+în digital PR pe calculatoarele noastre, cum era planificat în
+`docs/plans/2026-07-21-seo-plan-servicii-date-reale.md` §6.
+
 ## Ce nu am putut verifica
 
 - **Profilul complet de backlinkuri** — nu avem chei Moz/Ahrefs (confirmat și în
