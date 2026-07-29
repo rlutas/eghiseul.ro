@@ -41,15 +41,15 @@ export const ARTICLES: ArticleMeta[] = [
   },
   {
     slug: 'tva-9-locuinte-31-iulie-2026',
-    title: 'TVA 9% la locuințe expiră pe 31 iulie 2026 — iar ANCPI e picat',
+    title: 'TVA 9% la locuințe: Senatul a votat prelungirea până pe 30 septembrie 2026',
     excerpt:
-      'Cota redusă se aplică doar locuințelor livrate până pe 31 iulie 2026. Diferența față de 21%: 48.000–72.000 lei. Atenție la confuzia frecventă: antecontractul trebuia încheiat până la 1 august 2025.',
+      'Vot 126 la 1 pe 27 iulie, din cauza blocajului ANCPI — dar nu e încă lege: urmează Camera Deputaților și Monitorul Oficial. Condițiile rămân neschimbate; antecontractul trebuia încheiat până la 1 august 2025.',
     category: 'Cadastru & imobiliare',
   },
   {
     slug: 'ancpi-nu-functioneaza',
-    title: 'ANCPI și e-Terra nu funcționează: atac cibernetic, sisteme picate național (13–20 iulie 2026)',
-    excerpt: 'ANCPI a confirmat un atac cibernetic; e-Terra e picat în toată țara din 13 iulie, revenire estimată: 20 iulie. Comandă extrasul CF acum — îl eliberăm automat la revenire.',
+    title: 'ANCPI și e-Terra nu funcționează: atac ransomware, sisteme picate național (din 13 iulie 2026)',
+    excerpt: 'Guvernul a confirmat atac ransomware: infrastructură de virtualizare criptată și ștearsă, fără dată de repornire pentru e-Terra. Comandă extrasul CF acum — îl eliberăm automat la revenire.',
     category: 'Cadastru & imobiliare',
   },
   {

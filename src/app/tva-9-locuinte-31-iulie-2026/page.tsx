@@ -6,12 +6,12 @@ import { OutageAlertSignup } from '@/components/articole/outage-alert-signup';
 
 const SLUG = 'tva-9-locuinte-31-iulie-2026';
 const TITLE =
-  'TVA 9% la locuințe expiră pe 31 iulie 2026 — iar ANCPI e picat. Ce faci dacă ai antecontract';
-const META_TITLE = 'TVA 9% Locuințe — Termen 31 Iulie 2026 și Blocajul ANCPI';
+  'TVA 9% la locuințe: Senatul a votat prelungirea până pe 30 septembrie 2026. Ce e sigur și ce nu';
+const META_TITLE = 'TVA 9% Locuințe — Prelungire 30 Septembrie 2026 (vot Senat)';
 const DESCRIPTION =
-  'Cota redusă de 9% se aplică doar locuințelor livrate până pe 31 iulie 2026 inclusiv. Diferența față de 21%: 48.000–72.000 lei. Ce faci dacă notarul nu poate autentifica din cauza blocajului ANCPI.';
+  'Senatul a adoptat pe 27 iulie prelungirea termenului de livrare cu TVA 9% de la 31 iulie la 30 septembrie 2026, din cauza blocajului ANCPI. Nu e încă lege: urmează Camera Deputaților și Monitorul Oficial. Condițiile rămân neschimbate, iar antecontractul trebuia încheiat până la 1 august 2025.';
 const DATE_PUBLISHED = '2026-07-20';
-const DATE_MODIFIED = '2026-07-20';
+const DATE_MODIFIED = '2026-07-29';
 
 export const revalidate = 3600; // subiect cu termen — se poate schimba oricând
 
@@ -31,7 +31,7 @@ export default function Page() {
       datePublished={DATE_PUBLISHED}
       dateModified={DATE_MODIFIED}
       publishedLabel="20 iulie 2026"
-      updatedLabel="20 iulie 2026"
+      updatedLabel="29 iulie 2026"
       imageAlt="Termen fiscal 31 iulie 2026 pentru cota redusă de TVA la locuințe"
       relatedServices={[
         {
@@ -74,7 +74,7 @@ export default function Page() {
         },
         {
           q: 'ANCPI e picat și notarul nu poate autentifica. Se prelungește termenul?',
-          a: 'La data publicării acestui articol (20 iulie 2026) NU există niciun act normativ publicat care să prelungească termenul. Presa relatează, pe surse, că premierul nu intenționează o prelungire — dar nu am identificat un comunicat oficial al Guvernului sau al Ministerului Finanțelor pe această temă. Există și o propunere privată de prelungire până în 2027, fără statut legislativ. Tratează termenul ca ferm și acționează în consecință; dacă apare o prelungire, actualizăm articolul.',
+          a: 'Foarte probabil da. Senatul a adoptat pe 27 iulie 2026, cu 126 de voturi la 1, prelungirea termenului de livrare de la 31 iulie la 30 septembrie 2026, exact din cauza blocajului ANCPI; ministrul Finanțelor a susținut măsura. Proiectul prevede și restituirea diferenței de TVA pentru cei nevoiți să plătească 21% înainte de intrarea în vigoare. Atenție însă: nu e încă lege — urmează votul decisiv în Camera Deputaților, promulgarea și publicarea în Monitorul Oficial. Până la publicare, termenul legal în vigoare rămâne 31 iulie 2026.',
         },
         {
           q: 'Am antecontract din iunie 2025 fără avans de 20%. Mai am dreptul la 9%?',
@@ -99,10 +99,15 @@ export default function Page() {
       ]}
     >
       <p>
-        <strong>Cota redusă de TVA de 9% pentru locuințe expiră pe 31 iulie 2026.</strong> Peste
-        acest termen se aplică 21%, iar diferența pe o singură locuință ajunge la{' '}
-        <strong>48.000–72.000 lei</strong>. Complicația de acum: ANCPI e blocat din 13 iulie, iar
-        fără extras de carte funciară notarii nu pot autentifica actele. Au rămas 11 zile.
+        <strong>Actualizare 29 iulie:</strong> Senatul a adoptat pe 27 iulie, cu 126 de voturi la
+        1, prelungirea termenului de livrare cu TVA 9% <strong>de la 31 iulie la 30 septembrie
+        2026</strong> — reacție directă la blocajul ANCPI, care ține notarii fără extrase de
+        autentificare din 13 iulie. Ministrul Finanțelor, Alexandru Nazare, a susținut public
+        măsura: românii afectați de blocaj „să nu suporte costuri suplimentare". Un singur lucru
+        lipsește, și e cel decisiv: <strong>nu e încă lege</strong> — proiectul merge la Camera
+        Deputaților (camera decizională), apoi la promulgare și în Monitorul Oficial. Până la
+        publicare, termenul legal în vigoare rămâne 31 iulie, iar diferența pe o singură locuință
+        rămâne <strong>48.000–72.000 lei</strong>.
       </p>
 
       {/* Bloc de sinteză auto-conținut, ~150 cuvinte: răspunde complet la cele
@@ -124,9 +129,10 @@ export default function Page() {
           <div>
             <dt className="inline font-semibold">Se prelungește termenul? </dt>
             <dd className="inline">
-              La 20 iulie 2026 nu există niciun act normativ publicat care să prelungească
-              termenul. Presa relatează pe surse că Guvernul nu intenționează o prelungire, fără
-              comunicat oficial.
+              Foarte probabil, până la 30 septembrie 2026: Senatul a adoptat proiectul pe 27 iulie
+              (126 la 1), cu susținerea ministrului Finanțelor. Dar nu e încă lege — urmează votul
+              decisiv în Camera Deputaților, promulgarea și Monitorul Oficial. Până la publicare,
+              termenul legal rămâne 31 iulie 2026.
             </dd>
           </div>
           <div>
@@ -242,12 +248,14 @@ export default function Page() {
         valoare, la 21% sau la cotele reduse.
       </p>
 
-      <h2>Problema din iulie 2026: ANCPI blocat cu 11 zile înainte de termen</h2>
+      <h2>Problema care a declanșat totul: ANCPI, blocat de un atac ransomware</h2>
       <p>
-        Din <strong>13 iulie 2026</strong>, sistemele ANCPI sunt indisponibile la nivel național în
-        urma unui atac cibernetic confirmat oficial. Pentru cine are termen fiscal, consecința e
-        directă: <strong>extrasul de carte funciară de autentificare nu se poate obține</strong>,
-        iar fără el <strong>notarul nu poate autentifica actul de vânzare</strong>.
+        Din <strong>13 iulie 2026</strong>, sistemele ANCPI sunt indisponibile la nivel național.
+        Pe 27 iulie, Guvernul a confirmat natura atacului — <strong>ransomware</strong>, cu o parte
+        din infrastructura de virtualizare criptată și ștearsă — și a anunțat că{' '}
+        <strong>nu poate da o dată fermă de repornire</strong>. Pentru cine are termen fiscal,
+        consecința e directă: <strong>extrasul de carte funciară de autentificare nu se poate
+        obține</strong>, iar fără el <strong>notarul nu poate autentifica actul de vânzare</strong>.
       </p>
       <p>
         Adică oameni cu antecontract valabil din 2025, care au plătit avansul și au respectat toate
@@ -302,31 +310,56 @@ export default function Page() {
         </Link>
       </div>
 
+      <h2>Se prelungește termenul pentru TVA de 9%? Statusul la zi</h2>
       <p>
-        Cumpărătorii și dezvoltatorii au cerut public prelungirea termenului. La data publicării,{' '}
-        <strong>nu există niciun act normativ care să prelungească</strong> — vezi mai jos.
+        <strong>Da, prelungirea e pe drum — dar nu e încă în vigoare.</strong> Cronologia:
       </p>
-
-      <h2>Se prelungește termenul pentru TVA de 9%?</h2>
       <ul>
         <li>
-          <strong>Nu există niciun OUG, lege sau ordin publicat</strong> care să prelungească
-          termenul de 31 iulie 2026.
+          <strong>21 iulie:</strong> primele inițiative parlamentare cer prelungirea, invocând
+          explicit blocajul ANCPI — cumpărători cu antecontracte valabile riscau să piardă cota
+          redusă dintr-un motiv care nu ține de ei.
         </li>
         <li>
-          Presa relatează, <em>pe surse</em>, că premierul nu intenționează o prelungire. Nu am
-          identificat un <strong>comunicat oficial</strong> al Guvernului sau al Ministerului
-          Finanțelor pe această temă.
+          <strong>27 iulie:</strong> <strong>Senatul adoptă proiectul cu 126 de voturi la 1</strong>:
+          termenul de livrare se prelungește de la 31 iulie la <strong>30 septembrie 2026</strong>.
+          Ministrul Finanțelor, Alexandru Nazare, susține măsura: „nu am creat o nouă facilitate
+          fiscală, ci am propus prelungirea termenului cu o perioadă rezonabilă" (
+          <a
+            href="https://startupcafe.ro/termenul-pentru-tva-de-9-la-locuinte-prelungit-pana-la-30-septembrie-senatul-a-adoptat-proiectul-romanii-afectati-de-blocajul-ancpi-sa-nu-suporte-costuri-suplimentare-ministru-104015"
+            target="_blank"
+            rel="nofollow noopener"
+          >
+            StartupCafe
+          </a>
+          ).
         </li>
         <li>
-          Există o <strong>propunere privată</strong> de prelungire a regimului până în 2027,
-          depusă la Ministerul Finanțelor — fără statut legislativ.
+          <strong>Ce mai lipsește:</strong> votul decisiv în <strong>Camera Deputaților</strong>,
+          promulgarea prin decret prezidențial și publicarea în <strong>Monitorul Oficial</strong>.
+          Abia atunci prelungirea devine drept aplicabil.
+        </li>
+      </ul>
+      <p>Ce prevede proiectul adoptat de Senat, pe lângă noul termen:</p>
+      <ul>
+        <li>
+          <strong>restituirea diferenței de TVA</strong> pentru cumpărătorii nevoiți să plătească
+          21% înainte de intrarea în vigoare a prelungirii;
+        </li>
+        <li>
+          <strong>restul condițiilor rămân neschimbate</strong>: 120 mp, 600.000 lei fără TVA,
+          antecontract până la 1 august 2025, o singură achiziție cu cotă redusă din 2023 — deci
+          prelungirea <strong>nu deschide ușa unor cumpărători noi</strong>, doar dă timp celor
+          prinși de blocaj.
         </li>
       </ul>
       <p>
-        <strong>Recomandarea practică: tratează termenul ca ferm.</strong> A aștepta o prelungire
-        care poate să nu vină, când miza e de zeci de mii de lei, e un pariu prost. Dacă apare un act
-        normativ, actualizăm articolul.
+        <strong>Recomandarea practică până la publicarea în Monitorul Oficial:</strong> nu semna
+        nimic la 21% fără să discuți cu notarul clauza de ajustare — dacă legea intră în vigoare cu
+        prevederea de restituire, diferența se recuperează, dar drumul cel mai simplu rămâne să nu
+        o plătești deloc. Și nu amâna livrarea mizând pe 30 septembrie înainte ca legea să fie
+        publicată: dacă proiectul se modifică la Camera Deputaților, termenul aplicabil rămâne cel
+        din legea în vigoare.
       </p>
 
       <h2>Ce faci concret, dacă ai antecontract și termenul se apropie</h2>

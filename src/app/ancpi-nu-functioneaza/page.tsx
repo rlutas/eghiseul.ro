@@ -14,9 +14,9 @@ const TITLE = 'ANCPI și e-Terra nu funcționează: atac cibernetic, sisteme pic
 // (presa ocupă oricum acele poziții cu autoritate mai mare).
 const META_TITLE = 'ANCPI nu funcționează — status live, până când și ce faci';
 const DESCRIPTION =
-  'ANCPI a confirmat un atac cibernetic: e-Terra și restul sistemelor sunt picate național din 14 iulie. Update 26 iulie: migrarea în Cloudul Guvernamental s-a încheiat, dar serviciile nu au revenit; premierul Bolojan estimează reluarea în săptămâna 27–31 iulie. Comandă extrasul CF acum — îl eliberăm automat la revenire.';
+  'Guvernul a confirmat pe 27 iulie: atac ransomware — o parte din infrastructura de virtualizare a fost criptată și ștearsă, fără dată fermă de repornire pentru e-Terra. Termenul TVA 9% se prelungește: Senatul a votat 30 septembrie. Comandă extrasul CF acum — îl eliberăm automat la revenire.';
 const DATE_PUBLISHED = '2026-07-15';
-const DATE_MODIFIED = '2026-07-26';
+const DATE_MODIFIED = '2026-07-29';
 
 export const revalidate = 3600; // outage news — refresh hourly
 
@@ -49,7 +49,7 @@ export default function Page() {
       datePublished={DATE_PUBLISHED}
       dateModified={DATE_MODIFIED}
       publishedLabel="15 iulie 2026"
-      updatedLabel="26 iulie 2026"
+      updatedLabel="29 iulie 2026"
       imageAlt="Sistem temporar nefuncțional — sistemele informatice ANCPI indisponibile la nivel național"
       relatedServices={[
         {
@@ -83,7 +83,7 @@ export default function Page() {
         },
         {
           q: 'Până când e picat ANCPI?',
-          a: 'Nu există încă un termen ferm asumat de ANCPI. Două termene au fost deja depășite: 20 iulie (estimarea inițială a oficiilor teritoriale) și 22 iulie (finalizarea migrării în Cloudul Guvernamental — termen al migrării, nu al revenirii). Cea mai recentă estimare publică vine de la premierul Bolojan, pe 23 iulie: „în cursul săptămânii viitoare se va relua activitatea agenției”, adică în intervalul 27–31 iulie 2026. Este o estimare guvernamentală, nu un comunicat ANCPI. Repunerea se va face etapizat, pe componente — deci probabil nu toate serviciile în aceeași zi.',
+          a: 'Nu există un termen ferm — iar pe 27 iulie Guvernul a refuzat explicit să mai dea unul: „nu putem încă anunța o oră sau o dată fermă de repunere în funcțiune — nu dorim să facem promisiuni pe care condițiile tehnice ne pot obliga să le amânăm”. Estimarea anterioară a premierului Bolojan (reluare în săptămâna 27–31 iulie) nu s-a confirmat până acum, la fel ca termenele din 20 și 22 iulie. Reconstrucția infrastructurii se face integral în Cloudul Guvernamental, iar repunerea va fi etapizată, pe componente.',
         },
         {
           q: 'Migrarea în Cloudul Guvernamental s-a terminat pe 22 iulie. De ce tot nu funcționează?',
@@ -148,10 +148,10 @@ export default function Page() {
         oficiile teritoriale — <strong>20 iulie 2026</strong>, „ca urmare a unui incident tehnic
         aflat în curs de investigare” — a fost depășit, la fel și termenul migrării în Cloudul
         Guvernamental (<strong>22 iulie</strong>), care s-a încheiat fără ca serviciile să revină.
-        Situația la zi: <strong>ANCPI nu a comunicat încă o dată fermă de repunere</strong>, iar
-        singura estimare publică e cea a premierului Bolojan din 23 iulie — reluarea activității
-        agenției <strong>în cursul săptămânii 27–31 iulie</strong>, etapizat, pe componente (vezi{' '}
-        <a href="#cronologie">cronologia</a>). Presa locală a relatat blocajul în mai multe județe
+        Situația la zi: pe <strong>27 iulie</strong>, Guvernul a confirmat că atacul a fost de tip{' '}
+        <strong>ransomware</strong> — o parte din infrastructura de virtualizare a fost criptată și
+        ștearsă — și a anunțat că <strong>nu poate da o dată fermă de repunere</strong>; estimarea
+        anterioară (27–31 iulie) a devenit incertă (vezi <a href="#cronologie">cronologia</a>). Presa locală a relatat blocajul în mai multe județe
         (printre primele,{' '}
         <a href="https://www.bihon.ro/stirile-judetului-bihor/bihorul-afectat-de-blocajul-national-al-ancpi-cadastrul-nu-functioneaza-pana-luni-5337687/" target="_blank" rel="nofollow noopener">
           Bihorul
@@ -216,9 +216,38 @@ export default function Page() {
       <div className="not-prose my-6 space-y-0">
         {[
           {
+            date: '27 iulie 2026',
+            tag: 'Confirmare ransomware',
+            latest: true,
+            body: (
+              <>
+                Guvernul confirmă natura atacului: <strong>ransomware</strong> — „atacatorii au{' '}
+                <strong>criptat și șters o parte din infrastructura de virtualizare</strong> care
+                găzduiește aplicațiile agenției”. Baza cadastrală centrală nu a fost afectată.
+                Reconstrucția se face <strong>integral în Cloudul Guvernamental</strong>, dar{' '}
+                <strong>fără termen</strong>: „nu putem încă anunța o oră sau o dată fermă de
+                repunere în funcțiune — nu dorim să facem promisiuni pe care condițiile tehnice ne
+                pot obliga să le amânăm”. Estimarea 27–31 iulie devine astfel incertă.
+              </>
+            ),
+          },
+          {
+            date: '27 iulie 2026',
+            tag: 'TVA 9% — Senat',
+            body: (
+              <>
+                Senatul adoptă aproape unanim (126 la 1) prelungirea termenului pentru{' '}
+                <strong>TVA 9% la locuințe: de la 31 iulie la 30 septembrie 2026</strong>, tocmai
+                din cauza blocajului ANCPI. Proiectul include și restituirea diferenței de TVA
+                pentru cei nevoiți să plătească 21% între timp. Atenție:{' '}
+                <strong>nu e încă lege</strong> — urmează votul decisiv în Camera Deputaților,
+                promulgarea și Monitorul Oficial.
+              </>
+            ),
+          },
+          {
             date: '23 iulie 2026',
             tag: 'Estimare guvern',
-            latest: true,
             body: (
               <>
                 Premierul <strong>Bolojan</strong> anunță că{' '}
@@ -529,9 +558,9 @@ export default function Page() {
               'Extrasul CF nu se poate obține acum, din nicio sursă. Amână orice plată de avans până verifici — nu te baza pe un extras vechi de câteva luni și nici pe asigurările vânzătorului.',
           },
           {
-            situation: '⚠️ Ai antecontract cu TVA 9% și termenul fiscal expiră pe 31 iulie',
+            situation: '⚠️ Ai antecontract cu TVA 9% și termenul fiscal expira pe 31 iulie',
             action:
-              'Situația cea mai presantă: cota redusă se aplică doar locuințelor livrate până pe 31 iulie 2026, iar fără extras de autentificare notarul nu poate semna. Diferența dintre 9% și 21% e de 48.000–72.000 lei. Chiar dacă ANCPI revine în intervalul estimat (27–31 iulie), rămân zile foarte puține și o coadă națională de dosare amânate — nu miza pe „se rezolvă în ultima zi”. Vorbește ACUM cu notarul și cu dezvoltatorul despre soluțiile de rezervă. Detaliile complete și condițiile exacte — în articolul dedicat.',
+              'Vești bune, cu o rezervă: Senatul a adoptat pe 27 iulie prelungirea termenului de livrare de la 31 iulie la 30 septembrie 2026, exact din cauza blocajului ANCPI, plus restituirea diferenței pentru cei care apucă să plătească 21%. NU e încă lege — mai trebuie votul Camerei Deputaților, promulgarea și publicarea în Monitorul Oficial. Până nu apare în Monitor, nu semna nimic pe 21% fără să vorbești cu notarul și cu dezvoltatorul despre clauze de ajustare. Detaliile la zi — în articolul dedicat.',
           },
         ].map((row, i) => (
           <div key={i} className="rounded-xl border border-neutral-200 bg-white p-4">
@@ -570,6 +599,17 @@ export default function Page() {
       </ul>
 
       <h2>Actualizări</h2>
+      <p>
+        <strong>29 iulie 2026:</strong> ziua <strong>{outageDays}</strong> de blocaj, fără termen
+        de repornire. Pe <strong>27 iulie</strong>, Guvernul a confirmat că atacul a fost de tip{' '}
+        <strong>ransomware</strong> — atacatorii au criptat și șters o parte din infrastructura de
+        virtualizare — și a refuzat explicit să mai avanseze o dată: „nu dorim să facem promisiuni
+        pe care condițiile tehnice ne pot obliga să le amânăm”. Baza cadastrală centrală rămâne
+        neafectată. Tot pe 27 iulie, <strong>Senatul a votat prelungirea termenului TVA 9% până la
+        30 septembrie</strong> (detalii în{' '}
+        <Link href="/tva-9-locuinte-31-iulie-2026/">articolul despre TVA</Link> — nu e încă lege,
+        urmează Camera Deputaților).
+      </p>
       <p>
         <strong>26 iulie 2026:</strong> sistemele ANCPI sunt în continuare picate — ziua{' '}
         <strong>{outageDays}</strong> de blocaj. Nu există comunicat ANCPI cu dată fermă de
