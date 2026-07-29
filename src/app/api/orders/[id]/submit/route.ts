@@ -253,16 +253,25 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
           .eq('key', 'translation_price_list')
           .maybeSingle();
         const priceByLang = new Map<string, number>();
-        for (const row of (plRow?.value as Array<{ language?: string; active?: boolean; clientPriceDoc?: number | null }> | null) ?? []) {
+        const extraByLang = new Map<string, number>();
+        for (const row of (plRow?.value as Array<{ language?: string; active?: boolean; clientPriceDoc?: number | null; clientPriceApostilaExtra?: number | null }> | null) ?? []) {
           if (row?.language && row.active && row.clientPriceDoc != null) {
             priceByLang.set(row.language, Number(row.clientPriceDoc));
+            if (row.clientPriceApostilaExtra != null) {
+              extraByLang.set(row.language, Number(row.clientPriceApostilaExtra));
+            }
           }
         }
+        // Cu Apostilă Haga pe comandă, traducerea are supliment (se traduce și apostila).
+        const hasHaga = opts.some((op: { code?: string }) => op?.code === 'apostila_haga');
         let totalDiff = 0;
         const corrected = opts.map(
           (op: { code?: string; priceModifier?: number; quantity?: number; metadata?: { language?: string } }) => {
             if (op?.code !== 'traducere') return op;
-            const expected = priceByLang.get(op.metadata?.language ?? '');
+            const lang = op.metadata?.language ?? '';
+            const base = priceByLang.get(lang);
+            const expected =
+              base == null ? undefined : base + (hasHaga ? extraByLang.get(lang) ?? 0 : 0);
             const current = Number(op.priceModifier ?? 0);
             if (expected == null || current + 0.01 >= expected) return op;
             totalDiff += (expected - current) * Number(op.quantity ?? 1);

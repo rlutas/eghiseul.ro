@@ -1098,12 +1098,13 @@ function TranslationPricesTab() {
         </CardHeader>
         <CardContent className="space-y-2">
           {/* Header row */}
-          <div className="hidden md:grid md:grid-cols-[1fr_60px_60px_80px_80px_90px_80px_80px_1fr_36px] gap-2 px-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+          <div className="hidden md:grid md:grid-cols-[1fr_55px_55px_72px_72px_78px_85px_72px_72px_1fr_36px] gap-2 px-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
             <span>Limba</span>
             <span>Grupă</span>
             <span>Activ</span>
             <span>Cost/doc</span>
             <span title="Suprataxa traducătorului când comanda are și Apostilă Haga (se traduce și apostila)">Cost apostilă</span>
+            <span title="Supliment adăugat la prețul CLIENTULUI când comanda are și Apostilă Haga">Supl. client</span>
             <span>Preț client</span>
             <span title="Preț client fără TVA (÷1,21) minus cost/doc — traducătorul e neplătitor de TVA">Marjă netă</span>
             <span>Cost/pag</span>
@@ -1121,7 +1122,7 @@ function TranslationPricesTab() {
             return (
               <div
                 key={i}
-                className={`grid grid-cols-2 md:grid-cols-[1fr_60px_60px_80px_80px_90px_80px_80px_1fr_36px] items-center gap-2 rounded-md border px-2 py-1.5 ${
+                className={`grid grid-cols-2 md:grid-cols-[1fr_55px_55px_72px_72px_78px_85px_72px_72px_1fr_36px] items-center gap-2 rounded-md border px-2 py-1.5 ${
                   r.active ? 'bg-white' : 'bg-neutral-50 opacity-80'
                 }`}
               >
@@ -1160,6 +1161,16 @@ function TranslationPricesTab() {
                   onChange={(e) => update(i, { ourCostApostila: numOrNull(e.target.value) })}
                   placeholder="—"
                   title="Suprataxa traducătorului când comanda are și Apostilă Haga"
+                  className="h-8"
+                />
+                <Input
+                  type="number"
+                  min="0"
+                  step="0.5"
+                  value={r.clientPriceApostilaExtra ?? ''}
+                  onChange={(e) => update(i, { clientPriceApostilaExtra: numOrNull(e.target.value) })}
+                  placeholder="—"
+                  title="Supliment la prețul clientului când comanda are și Apostilă Haga"
                   className="h-8"
                 />
                 <Input

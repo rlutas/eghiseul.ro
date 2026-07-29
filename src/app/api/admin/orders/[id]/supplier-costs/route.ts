@@ -61,7 +61,7 @@ async function buildPending(
   const service = order.services as Svc | Svc[] | null;
   const svc = Array.isArray(service) ? service[0] : service;
 
-  return pendingCostRows({
+  const rows = pendingCostRows({
     options: order.selected_options ?? [],
     serviceSlug: svc?.slug ?? null,
     serviceName: svc?.name ?? null,
@@ -70,6 +70,39 @@ async function buildPending(
     tariffs,
     lastAmounts,
   });
+
+  // Suprataxa de apostilă (29.07): când comanda are și Apostilă Haga,
+  // traducătoarea traduce și apostila — costul real al traducerii =
+  // cost/doc + „cost apostilă" per limbă (Setări → Traduceri). Pre-completăm
+  // suma corectă ca echipa să nu o mai adune de mână.
+  const hasHaga = (order.selected_options ?? []).some(
+    (o: { code?: string } | null) => o?.code === 'apostila_haga'
+  );
+  if (hasHaga && rows.some((r) => r.category === 'traducere')) {
+    const { data: plRow } = await admin
+      .from('admin_settings')
+      .select('value')
+      .eq('key', 'translation_price_list')
+      .maybeSingle();
+    const surchargeByLang = new Map<string, number>();
+    for (const l of (plRow?.value as Array<{ language?: string; ourCostApostila?: number | null }> | null) ?? []) {
+      if (l?.language && l.ourCostApostila != null && Number.isFinite(Number(l.ourCostApostila))) {
+        surchargeByLang.set(l.language, Number(l.ourCostApostila));
+      }
+    }
+    for (const r of rows) {
+      if (r.category !== 'traducere' || !r.language) continue;
+      const extra = surchargeByLang.get(r.language);
+      if (extra == null || r.suggestedAmount == null) continue;
+      r.suggestedAmount = Math.round((r.suggestedAmount + extra) * 100) / 100;
+      r.label = `${r.label} (+ apostilă ${extra} lei)`;
+      // Page-count re-pricing in the dialog would drop the surcharge — the
+      // tariff doesn't know about it, so detach it for these rows.
+      r.tariff = null;
+    }
+  }
+
+  return rows;
 }
 
 interface RouteParams {

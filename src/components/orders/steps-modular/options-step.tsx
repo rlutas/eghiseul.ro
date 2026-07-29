@@ -276,14 +276,18 @@ export function OptionsStepModular({ onValidChange }: OptionsStepProps) {
   // propriu în admin_settings.translation_price_list; fără asta daneza s-ar
   // vinde sub costul traducătoarei. Prețul opțiunii urmează limba selectată;
   // fallback = prețul de bază al opțiunii. Server-side guard la submit.
-  const { prices: translationPrices } = useTranslationData();
+  const { prices: translationPrices, apostilaExtras } = useTranslationData();
   const priceForLanguage = useCallback(
-    (language: string | null | undefined): number | null => {
+    (language: string | null | undefined, withApostila = false): number | null => {
       if (!language) return null;
       const p = translationPrices[language];
-      return Number.isFinite(p) ? p : null;
+      if (!Number.isFinite(p)) return null;
+      // Cu Apostilă Haga pe comandă, traducerea e mai scumpă: se traduce și
+      // apostila (cost suplimentar la traducător → supliment la client).
+      const extra = withApostila ? apostilaExtras[language] ?? 0 : 0;
+      return p + extra;
     },
-    [translationPrices]
+    [translationPrices, apostilaExtras]
   );
 
   useEffect(() => {
@@ -291,14 +295,14 @@ export function OptionsStepModular({ onValidChange }: OptionsStepProps) {
     const next = selectedOptions.map((o) => {
       if (o.code !== 'traducere') return o;
       const expected =
-        priceForLanguage(o.metadata?.language as string | undefined) ??
+        priceForLanguage(o.metadata?.language as string | undefined, hagaSelected) ??
         (o.bundledFor ? Number(o.priceModifier) : traducere?.price);
       if (expected == null || Math.abs(Number(o.priceModifier) - expected) < 0.01) return o;
       changed = true;
       return { ...o, priceModifier: expected };
     });
     if (changed) commit(next);
-  }, [selectedOptions, priceForLanguage, traducere, commit]);
+  }, [selectedOptions, priceForLanguage, hagaSelected, traducere, commit]);
 
   // Bulgară = doar traducere autorizată, FĂRĂ legalizare notarială (limitare
   // confirmată de traducătoare, 29.07). Dacă limba devine bulgară cu
@@ -654,8 +658,10 @@ export function OptionsStepModular({ onValidChange }: OptionsStepProps) {
                   name="Traducere Autorizată"
                   hint={CODE_HINTS.traducere}
                   price={
-                    priceForLanguage(traducereState?.metadata?.language as string | undefined) ??
-                    traducere.price
+                    priceForLanguage(
+                      traducereState?.metadata?.language as string | undefined,
+                      hagaSelected
+                    ) ?? traducere.price
                   }
                   selected={traducereSelected}
                   onClick={toggleTraducere}

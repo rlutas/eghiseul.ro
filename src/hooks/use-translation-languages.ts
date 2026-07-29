@@ -16,15 +16,18 @@ interface PublicRow {
   language: string;
   active: boolean;
   clientPriceDoc: number | null;
+  clientPriceApostilaExtra: number | null;
 }
 
 interface TranslationData {
   languages: string[];
   /** Client price per language (RON, VAT included). Missing = use option's base price. */
   prices: Record<string, number>;
+  /** Extra client price when the order also has Apostilă Haga (translator translates the apostille too). */
+  apostilaExtras: Record<string, number>;
 }
 
-const FALLBACK_DATA: TranslationData = { languages: FALLBACK, prices: {} };
+const FALLBACK_DATA: TranslationData = { languages: FALLBACK, prices: {}, apostilaExtras: {} };
 
 let cached: TranslationData | null = null;
 let inflight: Promise<TranslationData> | null = null;
@@ -38,13 +41,17 @@ async function loadData(): Promise<TranslationData> {
       const rows = (json?.data as PublicRow[]) || [];
       const active = rows.filter((r) => r.active && r.language?.trim());
       const prices: Record<string, number> = {};
+      const apostilaExtras: Record<string, number> = {};
       for (const r of active) {
         if (r.clientPriceDoc != null && Number.isFinite(Number(r.clientPriceDoc))) {
           prices[r.language] = Number(r.clientPriceDoc);
         }
+        if (r.clientPriceApostilaExtra != null && Number.isFinite(Number(r.clientPriceApostilaExtra))) {
+          apostilaExtras[r.language] = Number(r.clientPriceApostilaExtra);
+        }
       }
       cached = active.length
-        ? { languages: active.map((r) => r.language), prices }
+        ? { languages: active.map((r) => r.language), prices, apostilaExtras }
         : FALLBACK_DATA;
       return cached;
     })

@@ -51,6 +51,12 @@ export interface TranslationPriceRow {
    * +75 DA/NO). Null = unknown/not applicable.
    */
   ourCostApostila?: number | null;
+  /**
+   * Client-facing SURCHARGE added to the translation price when the order
+   * also has Apostilă Haga (covers ourCostApostila + margin). Null = no
+   * surcharge applied.
+   */
+  clientPriceApostilaExtra?: number | null;
   notes: string;
 }
 

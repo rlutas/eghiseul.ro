@@ -18,14 +18,16 @@ interface PublicRow {
   group: string;
   active: boolean;
   clientPriceDoc: number | null;
+  clientPriceApostilaExtra: number | null;
 }
 
 function toPublic(rows: TranslationPriceRow[]): PublicRow[] {
-  return rows.map(({ language, group, active, clientPriceDoc }) => ({
+  return rows.map(({ language, group, active, clientPriceDoc, clientPriceApostilaExtra }) => ({
     language,
     group,
     active,
     clientPriceDoc,
+    clientPriceApostilaExtra: clientPriceApostilaExtra ?? null,
   }));
 }
 
