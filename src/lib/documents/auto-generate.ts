@@ -171,6 +171,8 @@ export async function autoGenerateOrderDocuments(
     // Marital status from the civil-status wizard step — feeds the
     // stare-civilă împuternicire (UNBR Anexa II) template.
     civil_status: civil.maritalStatus || personal.maritalStatus || '',
+    currently_married: typeof civil.currentlyMarried === 'boolean' ? civil.currentlyMarried : undefined,
+    was_married_before: typeof civil.wasMarriedBefore === 'boolean' ? civil.wasMarriedBefore : undefined,
     previous_name: personal.previousName || civil.birthName || '',
     birth_date: personal.birthDate || '',
     birth_county: personal.birthPlace || personal.birthCounty || '',

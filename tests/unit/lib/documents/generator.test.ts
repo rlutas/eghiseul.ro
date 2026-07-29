@@ -6,6 +6,8 @@ import {
   buildInstitutie,
   buildCIInfo,
   buildOptionsText,
+  buildStareCivilaLabel,
+  buildActivitatiStareCivila,
 } from '@/lib/documents/generator';
 
 // These helpers produce the actual TEXT that ends up in legal contracts.
@@ -376,5 +378,85 @@ describe('buildOptionsText', () => {
   it('returns empty string for empty / undefined options', () => {
     expect(buildOptionsText()).toBe('');
     expect(buildOptionsText([])).toBe('');
+  });
+});
+
+describe('buildStareCivilaLabel — fără liniuță pe împuternicire', () => {
+  // CNP feminin / masculin pentru acordare
+  const CNP_F = '2820507211209';
+  const CNP_M = '1820507211209';
+
+  it('folosește starea civilă declarată, când există (celibat)', () => {
+    expect(buildStareCivilaLabel('casatorit', CNP_F)).toBe('căsătorită');
+    expect(buildStareCivilaLabel('vaduv', CNP_M)).toBe('văduv');
+  });
+
+  it('o deduce când clientul e căsătorit în prezent (căsătorie/naștere nu întreabă direct)', () => {
+    expect(buildStareCivilaLabel('', CNP_F, { currentlyMarried: true })).toBe('căsătorită');
+  });
+
+  it('o deduce ca necăsătorit când ambele răspunsuri sunt „nu"', () => {
+    expect(
+      buildStareCivilaLabel('', CNP_M, { currentlyMarried: false, wasMarriedBefore: false })
+    ).toBe('necăsătorit');
+  });
+
+  it('NU ghicește între divorțat și văduv', () => {
+    // „nu sunt căsătorit acum, dar am fost" — pe un act juridic nu presupunem.
+    expect(
+      buildStareCivilaLabel('', CNP_F, { currentlyMarried: false, wasMarriedBefore: true })
+    ).toBe('');
+  });
+
+  it('gol când nu se știe nimic (nu „-")', () => {
+    expect(buildStareCivilaLabel('', CNP_F)).toBe('');
+    expect(buildStareCivilaLabel(undefined, undefined, {})).toBe('');
+  });
+});
+
+describe('buildActivitatiStareCivila — care căsătorie', () => {
+  const marriage = {
+    spouseName: 'MUSAT DUMITRU',
+    marriageDate: '1992-03-28',
+    marriagePlace: 'Brăila',
+  };
+
+  it('numește soțul, data și locul pe certificatul de căsătorie', () => {
+    expect(buildActivitatiStareCivila('certificat-casatorie', marriage)).toBe(
+      'să obțină certificatul de căsătorie încheiată cu MUSAT DUMITRU la data de 28.03.1992, în Brăila'
+    );
+  });
+
+  it('la fel pe extrasul multilingv de căsătorie', () => {
+    expect(buildActivitatiStareCivila('extras-multilingv-certificat-casatorie', marriage))
+      .toContain('încheiată cu MUSAT DUMITRU');
+  });
+
+  it('adaugă doar ce s-a colectat, fără puncte de umplutură', () => {
+    expect(buildActivitatiStareCivila('certificat-casatorie', { spouseName: 'POPA ION' })).toBe(
+      'să obțină certificatul de căsătorie încheiată cu POPA ION'
+    );
+    expect(buildActivitatiStareCivila('certificat-casatorie', { marriageDate: '1992-03-28' })).toBe(
+      'să obțină certificatul de căsătorie la data de 28.03.1992'
+    );
+  });
+
+  it('rămâne textul simplu când nu avem detalii', () => {
+    expect(buildActivitatiStareCivila('certificat-casatorie', {})).toBe(
+      'să obțină certificatul de căsătorie'
+    );
+    expect(buildActivitatiStareCivila('certificat-casatorie')).toBe(
+      'să obțină certificatul de căsătorie'
+    );
+  });
+
+  it('nu adaugă detalii de căsătorie pe naștere sau celibat', () => {
+    expect(buildActivitatiStareCivila('certificat-nastere', marriage)).toBe(
+      'să obțină certificatul de naștere'
+    );
+  });
+
+  it('gol pentru servicii care nu sunt de stare civilă', () => {
+    expect(buildActivitatiStareCivila('cazier-judiciar', marriage)).toBe('');
   });
 });

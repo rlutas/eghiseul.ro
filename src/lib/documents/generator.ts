@@ -60,6 +60,11 @@ export interface ClientData {
    *  ('necasatorit' | 'casatorit' | 'divortat' | 'vaduv'). Used by the
    *  stare-civilă împuternicire (UNBR Anexa II) template. */
   civil_status?: string;
+  /** „Sunt căsătorit(ă) în prezent?" / „Am mai fost căsătorit(ă)?" din pasul
+   *  civil-status. Doar certificat-celibat întreabă direct starea civilă, deci
+   *  pe restul serviciilor eticheta împuternicirii se deduce de aici. */
+  currently_married?: boolean;
+  was_married_before?: boolean;
   previous_name?: string;
   birth_date?: string;
   birth_county?: string;
@@ -591,16 +596,34 @@ function genderFromCnp(cnp?: string): 'm' | 'f' | null {
 
 /** Romanian label for the wizard's maritalStatus value, gendered via CNP
  *  when possible ('casatorit' → „căsătorit"/„căsătorită"). */
-export function buildStareCivilaLabel(civilStatus?: string, cnp?: string): string {
+export function buildStareCivilaLabel(
+  civilStatus?: string,
+  cnp?: string,
+  /** Fallback for services that never ask „starea civilă actuală" outright —
+   *  only certificat-celibat sets `maritalStatus`, so on căsătorie/naștere the
+   *  label used to come out empty and the delegation printed a bare „-". */
+  civil?: { currentlyMarried?: boolean; wasMarriedBefore?: boolean }
+): string {
   const labels: Record<string, { m: string; f: string }> = {
     necasatorit: { m: 'necăsătorit', f: 'necăsătorită' },
     casatorit: { m: 'căsătorit', f: 'căsătorită' },
     divortat: { m: 'divorțat', f: 'divorțată' },
     vaduv: { m: 'văduv', f: 'văduvă' },
   };
-  const entry = labels[(civilStatus || '').trim().toLowerCase()];
-  if (!entry) return '';
-  return genderFromCnp(cnp) === 'f' ? entry.f : entry.m;
+  const gendered = (entry: { m: string; f: string }) =>
+    genderFromCnp(cnp) === 'f' ? entry.f : entry.m;
+
+  const explicit = labels[(civilStatus || '').trim().toLowerCase()];
+  if (explicit) return gendered(explicit);
+
+  // Derived, and only where the answer is unambiguous. „Nu sunt căsătorit
+  // acum, dar am fost" could mean divorced OR widowed — we do not guess a
+  // civil status on a legal document; the line stays blank for the clerk.
+  if (civil?.currentlyMarried === true) return gendered(labels.casatorit);
+  if (civil?.currentlyMarried === false && civil?.wasMarriedBefore === false) {
+    return gendered(labels.necasatorit);
+  }
+  return '';
 }
 
 /** Filiation line for the împuternicire: „fiul/fiica lui {tată} și {mamă}".
@@ -619,10 +642,41 @@ export function buildFiliatie(fatherName?: string, motherName?: string, cnp?: st
 }
 
 /** Activity text for the stare-civilă împuternicire — „să obțină
- *  certificatul de naștere" etc. Empty for non-stare-civilă services. */
-export function buildActivitatiStareCivila(serviceSlug?: string): string {
+ *  certificatul de naștere" etc. Empty for non-stare-civilă services.
+ *
+ *  On the marriage certificates the delegation also names WHICH marriage, so
+ *  the clerk can find the record without a second phone call:
+ *  „să obțină certificatul de căsătorie încheiată cu X la data de DD.MM.YYYY,
+ *   în localitatea Y". Every part is optional — we only add what the wizard
+ *  actually collected, never dots or empty labels. */
+export function buildActivitatiStareCivila(
+  serviceSlug?: string,
+  marriage?: { spouseName?: string; marriageDate?: string; marriagePlace?: string }
+): string {
   const doc = CIVIL_STATUS_DOCUMENT_MAP[serviceSlug || ''];
-  return doc ? `să obțină ${doc}` : '';
+  if (!doc) return '';
+
+  const isMarriageDoc =
+    serviceSlug === 'certificat-casatorie' ||
+    serviceSlug === 'extras-multilingv-certificat-casatorie';
+  if (!isMarriageDoc || !marriage) return `să obțină ${doc}`;
+
+  const spouse = (marriage.spouseName || '').trim();
+  const date = buildMarriageDateRo(marriage.marriageDate);
+  const place = (marriage.marriagePlace || '')
+    .trim()
+    .replace(/^Bucure[sș]ti\b.*$/i, 'București');
+
+  const parts: string[] = [];
+  if (spouse) parts.push(`încheiată cu ${spouse}`);
+  if (date) parts.push(`la data de ${date}`);
+  if (place) parts.push(`în ${place}`);
+  if (parts.length === 0) return `să obțină ${doc}`;
+
+  // „încheiată cu X" glues to the noun; the rest is a comma-separated tail.
+  const [head, ...tail] = parts;
+  const detail = tail.length > 0 ? `${head} ${tail.join(', ')}` : head;
+  return `să obțină ${doc} ${detail}`;
 }
 
 /**
@@ -971,7 +1025,10 @@ function buildPlaceholderData(ctx: DocumentContext) {
     // only the per-service templates in src/templates/<slug-stare-civila>/
     // actually reference these tags, older templates ignore them.
     AN_CURENT: String(now.getFullYear()),
-    STARE_CIVILA: buildStareCivilaLabel(ctx.client.civil_status, ctx.client.cnp),
+    STARE_CIVILA: buildStareCivilaLabel(ctx.client.civil_status, ctx.client.cnp, {
+      currentlyMarried: ctx.client.currently_married,
+      wasMarriedBefore: ctx.client.was_married_before,
+    }),
     // „Nume Client (căsătorit)" — client name with the marital status from
     // the wizard's civil-status step, when collected.
     // Semantica tag-urilor = layoutul v3 al lui Raul (22.07):
@@ -981,11 +1038,21 @@ function buildPlaceholderData(ctx: DocumentContext) {
     //  - FILIATIE (jos, dupa "status civil:") = eticheta starii civile
     //    (casatorit/a etc., acordata pe gen din CNP).
     CLIENT_STARE_CIVILA: ctx.client.name,
-    FILIATIE: buildStareCivilaLabel(ctx.client.civil_status, ctx.client.cnp) || '-',
+    // Fără „-" de umplutură: când starea civilă nu se poate deduce cu
+    // certitudine, linia rămâne goală (template-ul are deja punctele) în loc
+    // să tipărească o liniuță care arată ca un câmp uitat.
+    FILIATIE: buildStareCivilaLabel(ctx.client.civil_status, ctx.client.cnp, {
+      currentlyMarried: ctx.client.currently_married,
+      wasMarriedBefore: ctx.client.was_married_before,
+    }),
     hasFiliatie: buildFiliatie(ctx.client.father_name, ctx.client.mother_name, ctx.client.cnp) !== '',
     NUMETATA: buildFiliatie(ctx.client.father_name, ctx.client.mother_name, ctx.client.cnp),
     NUMEMAMA: '',
-    ACTIVITATI_SC: buildActivitatiStareCivila(ctx.order.service_slug),
+    ACTIVITATI_SC: buildActivitatiStareCivila(ctx.order.service_slug, {
+      spouseName: ctx.client.spouse_name,
+      marriageDate: ctx.client.marriage_date,
+      marriagePlace: ctx.client.marriage_place,
+    }),
     AUTORITATE_SC: CIVIL_STATUS_DOCUMENT_MAP[ctx.order.service_slug || '']
       ? AUTORITATE_STARE_CIVILA
       : '',

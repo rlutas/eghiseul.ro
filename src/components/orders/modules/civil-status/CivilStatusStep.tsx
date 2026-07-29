@@ -198,8 +198,22 @@ export default function CivilStatusStep({ config, onValidChange }: CivilStatusSt
     if (fields.purpose && !(fields.marriageAbroadIntent && cs.marriageAbroadIntent === true))
       req(!!cs.purpose?.trim(), 'Scopul solicitării');
     if (fields.countryOfUse) req(!!cs.countryOfUse?.trim(), 'Țara unde va fi folosit documentul');
+
+    // Ceri certificatul de căsătorie, dar declari că nu ești și nici n-ai fost
+    // căsătorit(ă) — combinație imposibilă, care până acum trecea și lăsa
+    // împuternicirea fără stare civilă (E-260728-Z77WC: data căsătoriei și
+    // numele soțului completate, ambele bife pe „Nu").
+    if (
+      config?.documentType === 'casatorie' &&
+      cs.currentlyMarried === false &&
+      cs.wasMarriedBefore === false
+    ) {
+      missing.push(
+        'Ai bifat că nu ești și nu ai fost căsătorit(ă), dar ceri certificatul de căsătorie — corectează una dintre cele două întrebări'
+      );
+    }
     return missing;
-  }, [cs, fields, bcComplete, rpComplete, showCurrentlyMarried, showMaritalHistory, showMarriagePlace]);
+  }, [cs, fields, bcComplete, rpComplete, showCurrentlyMarried, showMaritalHistory, showMarriagePlace, config?.documentType]);
 
   useEffect(() => {
     onValidChange(missingItems.length === 0);
