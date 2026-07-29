@@ -83,10 +83,18 @@ Sănătos peste tot. Nota veche „de renegociat, țintă 30-35" e ISTORIE — 4
 - Tarifele traducătoarei în Setări → Furnizori (pop-up-ul de costuri
   pre-completează costul real per limbă).
 
+**Completat seara (commits `e523add`, `f4d660c`):**
+- **Supliment CLIENT la Apostilă Haga** per limbă (`clientPriceApostilaExtra` =
+  2× costul, rotunjit la 10: EN +40 … DA/NO +150) — aplicat automat în wizard la
+  bifarea apostilei, în garda de la submit și în **ruta Modifică** (plata extra
+  trimitea flat-ul din catalog). Editabil în Setări → Traduceri („Supl. client").
+- **Pop-up-ul de costuri** pre-completează cost/doc + suprataxa de apostilă când
+  comanda are Haga (nu se mai adună de mână).
+
 **RĂMAS:** portarea pe cazierjudiciaronline.com + ecazier.ro (liste proprii,
-probabil hardcodate) · suprataxa de apostilă în sugestia automată din pop-up
-(azi echipa o adaugă manual) · termen per limbă afișat în wizard (1–4 zile) ·
-acte medicale +10 lei (doar în evidența internă).
+probabil hardcodate) · termen per limbă afișat în wizard (1–4 zile) ·
+acte medicale +10 lei (doar în evidența internă). Changelog complet:
+[2026-07-29-traduceri-pret-per-limba.md](../changelog/2026-07-29-traduceri-pret-per-limba.md).
 
 ## Cum funcționa logica ÎNAINTE (istoric) + restul îmbunătățirilor
 
