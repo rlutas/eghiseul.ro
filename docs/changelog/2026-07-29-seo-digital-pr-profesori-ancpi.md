@@ -69,3 +69,14 @@ eslint-disable în ruta embed — toate din sesiunea de azi; CI roșu pe ultimel
   la publicarea în Monitorul Oficial.
 - Pitch-urile de presă (widget ANCPI acum, profesori în august) — de trimis de Raul.
 - Efect: interogări „profesor/învățământ" în GSC + domenii referitoare noi (azi: 50).
+
+## Addendum (după-amiază): traduceri — preț per limbă + 11 limbi noi
+
+Prețurile confirmate de traducătoare au declanșat refactorul: flat 178,50 ar fi
+vândut daneza (cost 150) în pierdere. Livrat: preț per limbă în wizard (din
+`translation_price_list.clientPriceDoc`, până azi nefolosit) + trepte
+178,50/249/349 + gardă server-side la submit + bulgară fără legalizare +
+coloană „Cost apostilă" și marjă netă (÷1,21) în Setări. 20 limbi active
+(erau 9). Analiza: `docs/serviciu-traduceri-apostile/raspuns-traducatoare-2026-07-29.md`.
+⚠️ RĂMAS: portarea pe cazierjudiciaronline.com + ecazier.ro (au liste de limbi
+proprii, probabil hardcodate).
