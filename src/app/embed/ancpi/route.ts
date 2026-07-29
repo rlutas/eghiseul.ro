@@ -52,6 +52,7 @@ export async function GET() {
   try {
     // `as any`: platform_outages is missing from the generated Database types —
     // same workaround as /api/status and record-outage.ts.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const supabase = createAdminClient() as any;
     const { data } = await supabase
       .from('platform_outages')

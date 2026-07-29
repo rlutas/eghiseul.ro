@@ -103,7 +103,7 @@ export default function Page() {
         1, prelungirea termenului de livrare cu TVA 9% <strong>de la 31 iulie la 30 septembrie
         2026</strong> — reacție directă la blocajul ANCPI, care ține notarii fără extrase de
         autentificare din 13 iulie. Ministrul Finanțelor, Alexandru Nazare, a susținut public
-        măsura: românii afectați de blocaj „să nu suporte costuri suplimentare". Un singur lucru
+        măsura: românii afectați de blocaj „să nu suporte costuri suplimentare&rdquo;. Un singur lucru
         lipsește, și e cel decisiv: <strong>nu e încă lege</strong> — proiectul merge la Camera
         Deputaților (camera decizională), apoi la promulgare și în Monitorul Oficial. Până la
         publicare, termenul legal în vigoare rămâne 31 iulie, iar diferența pe o singură locuință
@@ -324,7 +324,7 @@ export default function Page() {
           <strong>27 iulie:</strong> <strong>Senatul adoptă proiectul cu 126 de voturi la 1</strong>:
           termenul de livrare se prelungește de la 31 iulie la <strong>30 septembrie 2026</strong>.
           Ministrul Finanțelor, Alexandru Nazare, susține măsura: „nu am creat o nouă facilitate
-          fiscală, ci am propus prelungirea termenului cu o perioadă rezonabilă" (
+          fiscală, ci am propus prelungirea termenului cu o perioadă rezonabilă&rdquo; (
           <a
             href="https://startupcafe.ro/termenul-pentru-tva-de-9-la-locuinte-prelungit-pana-la-30-septembrie-senatul-a-adoptat-proiectul-romanii-afectati-de-blocajul-ancpi-sa-nu-suporte-costuri-suplimentare-ministru-104015"
             target="_blank"

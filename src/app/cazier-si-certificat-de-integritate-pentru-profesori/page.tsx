@@ -80,7 +80,7 @@ export default function Page() {
         În fiecare an, la final de august și început de septembrie, mii de profesori, educatori și angajați din
         școli au de pregătit același dosar: <strong>cazierul judiciar</strong> și{' '}
         <strong>certificatul de integritate comportamentală</strong>. Ambele sunt valabile doar 6 luni, așa că nu
-        pot fi scoase „din timp" în primăvară. Am strâns aici regulile care se aplică de fapt — inclusiv două pe
+        pot fi scoase „din timp&rdquo; în primăvară. Am strâns aici regulile care se aplică de fapt — inclusiv două pe
         care mulți le știu greșit — și datele care arată de ce nu merită să lași totul pe septembrie.
       </p>
 
@@ -94,12 +94,12 @@ export default function Page() {
           Console);
         </li>
         <li>
-          interesul de căutare pentru „certificat de integritate comportamentală" atinge vârful anual în{' '}
+          interesul de căutare pentru „certificat de integritate comportamentală&rdquo; atinge vârful anual în{' '}
           <strong>septembrie</strong>, odată cu angajările din învățământ (Google Trends, România);
         </li>
         <li>
           a doua cea mai frecventă căutare din serie este „certificat de integritate comportamentala online{' '}
-          <strong>gratuit</strong>" — majoritatea caută întâi ruta fără costuri. E mai jos în ghid, cu condițiile
+          <strong>gratuit</strong>&rdquo; — majoritatea caută întâi ruta fără costuri. E mai jos în ghid, cu condițiile
           ei reale.
         </li>
       </ul>
