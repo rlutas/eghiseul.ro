@@ -30,6 +30,7 @@ import { toast } from 'sonner';
 import { useTranslationLanguages } from '@/hooks/use-translation-languages';
 import { APOSTILA_COUNTRIES } from '@/config/apostila-countries';
 import { computeAddedTermShiftDays } from '@/lib/orders/modify-diff';
+import { DOCUMENT_ADDON_CODES } from '@/lib/admin/supplier-costs';
 
 interface OptionRow {
   optionId?: string;
@@ -42,7 +43,7 @@ interface OptionRow {
   quantity?: number;
   /** Selection details — traducere → language, apostilă → country. Same
    *  shape the wizard persists; flows into selected_options on apply. */
-  metadata?: { language?: string; country?: string } | null;
+  metadata?: { language?: string; country?: string; document?: string } | null;
 }
 
 interface CatalogOption {
@@ -74,6 +75,8 @@ interface ModifyOrderDialogProps {
   initialOptions: OptionRow[];
   /** Current delivery price (RON). Used to seed the input. */
   initialDeliveryPrice: number;
+  /** Main service name — first document of the order, for the per-document picker. */
+  serviceName?: string | null;
   /** Refresh hook the parent passes — admin order detail re-fetches after apply. */
   onApplied?: () => void;
 }
@@ -85,6 +88,7 @@ export function ModifyOrderDialog({
   orderNumber,
   initialOptions,
   initialDeliveryPrice,
+  serviceName,
   onApplied,
 }: ModifyOrderDialogProps) {
   // Normalize the initial option list — caller passes snake_case from DB OR
@@ -102,12 +106,24 @@ export function ModifyOrderDialog({
   // (e.g. "traducere legalizată maghiară"). Both empty = not sent at all.
   const [customExtraName, setCustomExtraName] = useState('');
   const [customExtraPrice, setCustomExtraPrice] = useState('');
+  const [customExtraDocument, setCustomExtraDocument] = useState('');
 
   // Full addon catalog for the service. Fetched on open so the dialog can
   // show options the customer DIDN'T buy initially — admin can add them as
   // upsells (a common phone-call workflow: client adds apostila / traducere
   // after paying).
   const [catalog, setCatalog] = useState<CatalogOption[] | null>(null);
+
+  // Documentele comenzii (serviciul principal + add-on-urile care sunt acte
+  // separate). Când sunt mai multe, echipa poate spune PENTRU CARE act adaugă
+  // traducerea/legalizarea — altfel costul intern nu se poate atribui.
+  const orderDocuments = useMemo(() => {
+    const docs = options
+      .filter((o) => o.code && DOCUMENT_ADDON_CODES.has(o.code))
+      .map((o) => o.optionName ?? o.option_name ?? o.code ?? '')
+      .filter(Boolean) as string[];
+    return docs.length > 0 && serviceName ? [serviceName, ...docs] : [];
+  }, [options, serviceName]);
   const [loadingCatalog, setLoadingCatalog] = useState(false);
 
   const [diff, setDiff] = useState<DiffResult | null>(null);
@@ -126,6 +142,7 @@ export function ModifyOrderDialog({
     setRefundReason('');
     setCustomExtraName('');
     setCustomExtraPrice('');
+    setCustomExtraDocument('');
     setDiff(null);
     setSummary('');
     setError(null);
@@ -201,7 +218,7 @@ export function ModifyOrderDialog({
    * the API (server re-validates anyway: name 3–120 chars, price 1–20000).
    */
   function resolveCustomExtra():
-    | { customExtra: { name: string; price: number } | undefined; error?: undefined }
+    | { customExtra: { name: string; price: number; document?: string } | undefined; error?: undefined }
     | { customExtra?: undefined; error: string } {
     const name = customExtraName.trim();
     const priceRaw = customExtraPrice.trim();
@@ -213,7 +230,8 @@ export function ModifyOrderDialog({
     if (!Number.isFinite(price) || price <= 0) {
       return { error: 'Prețul serviciului extra trebuie să fie un număr mai mare ca 0.' };
     }
-    return { customExtra: { name, price } };
+    const document = customExtraDocument.trim();
+    return { customExtra: { name, price, ...(document ? { document } : {}) } };
   }
 
   // Details required on NEWLY added options (parity with the wizard):
@@ -579,6 +597,30 @@ export function ModifyOrderDialog({
                   className="mt-1"
                 />
               </div>
+              {/* Comanda are mai multe acte (ex. cazier + certificat de
+                  integritate) → spune pentru care e serviciul, ca să știm
+                  ulterior cât ne-a costat FIECARE act, nu doar totalul. */}
+              {orderDocuments.length > 0 && (
+                <div className="w-48">
+                  <Label htmlFor="custom-extra-doc" className="text-xs text-muted-foreground">
+                    Pentru documentul
+                  </Label>
+                  <select
+                    id="custom-extra-doc"
+                    value={customExtraDocument}
+                    onChange={(e) => {
+                      setCustomExtraDocument(e.target.value);
+                      markDirty();
+                    }}
+                    className="mt-1 h-10 w-full rounded-md border border-input bg-background px-2 text-sm"
+                  >
+                    <option value="">— toată comanda —</option>
+                    {orderDocuments.map((d) => (
+                      <option key={d} value={d}>{d}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
               <div className="w-32">
                 <Label htmlFor="custom-extra-price" className="text-xs text-muted-foreground">
                   Preț (RON)

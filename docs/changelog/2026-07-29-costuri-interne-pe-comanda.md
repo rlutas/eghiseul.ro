@@ -87,6 +87,21 @@ Documentul se salvează în `order_supplier_costs.document_label` (migrarea 141)
 raportul lunar arată pe ce act s-a lucrat — util și la verificarea facturii
 traducătoarei. Costul deja înregistrat pe un document nu se mai cere; celălalt, da.
 
+## Echipa poate adăuga un serviciu pentru un anumit act
+
+În dialogul de modificare a comenzii, „Serviciu extra (custom)" primește un selector
+**„Pentru documentul"**, care apare doar când comanda are mai multe acte. Așa echipa
+adaugă, de exemplu, „traducere legalizată maghiară" explicit pentru certificatul de
+integritate: intră în plata suplimentară, iar la finalizare costul se cere pentru
+acel act, nu pentru toate.
+
+De ce prin serviciul extra și nu prin dublarea opțiunii din catalog: `toggleOption`
+este pornit/oprit pe `optionId`, iar diferența de preț (`modify-diff.ts`) lucrează pe
+mulțimi de coduri — două opțiuni `traducere` pe aceeași comandă ar fi fost numărate ca
+una singură și clientul ar fi fost taxat greșit. Serviciul extra are preț propriu,
+e deja proiectat pentru exact acest caz (exemplul din cod e „traducere legalizată
+maghiară") și nu atinge calculul diferenței.
+
 ## Tarife, ca să nu se tasteze de fiecare dată
 
 Setări → Furnizori, secțiune nouă. Două forme:

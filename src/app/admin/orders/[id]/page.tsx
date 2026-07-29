@@ -2672,6 +2672,7 @@ export default function AdminOrderDetailPage() {
         orderNumber={displayOrderNumber}
         initialOptions={(order.selected_options ?? []) as Parameters<typeof ModifyOrderDialog>[0]['initialOptions']}
         initialDeliveryPrice={Number(order.delivery_price ?? 0)}
+        serviceName={order.services?.name ?? null}
         onApplied={refreshSilent}
       />
 

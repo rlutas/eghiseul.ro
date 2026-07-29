@@ -259,7 +259,12 @@ export interface PendingCostRow {
 interface OptionWithMeta extends OptionLike {
   option_name?: string | null;
   optionName?: string | null;
-  metadata?: { language?: string | null; country?: string | null } | null;
+  metadata?: {
+    language?: string | null;
+    country?: string | null;
+    /** Set by the team when an option is bought for one specific document. */
+    document?: string | null;
+  } | null;
 }
 
 /**
@@ -345,7 +350,14 @@ export function pendingCostRows(params: {
     const supplier = CATEGORY_DEFAULT_SUPPLIER[category];
     const name = option.option_name ?? option.optionName ?? SUPPLIER_CATEGORY_LABELS[category];
 
-    for (const documentLabel of documentTargets) {
+    // An option the team tied to one document (added from the modify dialog)
+    // asks for that document ONLY — no point pricing it against the others.
+    const explicitDocument = option.metadata?.document?.trim() || null;
+    const targets: Array<string | null> = explicitDocument
+      ? [explicitDocument]
+      : documentTargets;
+
+    for (const documentLabel of targets) {
       const key = pendingRowKey(category, documentLabel);
       if (done.has(key) || rows.some((r) => pendingRowKey(r.category, r.documentLabel) === key)) {
         continue;

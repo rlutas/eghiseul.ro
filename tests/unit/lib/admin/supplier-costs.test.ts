@@ -286,3 +286,38 @@ describe('pendingCostRows — comandă cu mai multe documente', () => {
     expect(rows[0].documentLabel).toBeNull();
   });
 });
+
+describe('pendingCostRows — extra legat explicit de un document', () => {
+  // Echipa adaugă din admin „traducere maghiară" pentru certificatul de
+  // integritate. Odată ce spune PENTRU CE act e, nu mai are sens să întrebăm
+  // și pentru celelalte acte ale comenzii.
+  it('cere costul doar pentru documentul indicat', () => {
+    const rows = pendingCostRows({
+      serviceName: 'Cazier Judiciar',
+      options: [
+        { code: 'addon_certificat_integritate', option_name: 'Certificat Integritate' },
+        {
+          code: 'custom_extra',
+          option_name: 'Traducere legalizată maghiară',
+          metadata: { document: 'Certificat Integritate' },
+        },
+      ],
+    });
+    expect(rows).toHaveLength(1);
+    expect(rows[0]).toMatchObject({
+      documentLabel: 'Certificat Integritate',
+      label: 'Traducere legalizată maghiară — Certificat Integritate',
+    });
+  });
+
+  it('fără document indicat, întreabă pentru fiecare act', () => {
+    const rows = pendingCostRows({
+      serviceName: 'Cazier Judiciar',
+      options: [
+        { code: 'addon_certificat_integritate', option_name: 'Certificat Integritate' },
+        { code: 'custom_extra', option_name: 'Serviciu extra' },
+      ],
+    });
+    expect(rows.map((r) => r.documentLabel)).toEqual(['Cazier Judiciar', 'Certificat Integritate']);
+  });
+});

@@ -24,7 +24,7 @@ export interface OrderOptionForDiff {
   /** Per-option details collected at selection time — same shape the wizard
    *  persists (traducere → language, apostilă → country). Flows through to
    *  selected_options so admin/contract/factură show it. */
-  metadata?: { language?: string; country?: string } | null;
+  metadata?: { language?: string; country?: string; document?: string } | null;
 }
 
 export interface OrderForDiff {
@@ -47,6 +47,9 @@ export interface OrderForDiff {
 export interface CustomExtraForDiff {
   name: string;
   price: number;
+  /** Documentul comenzii pentru care s-a adăugat (comenzi cu mai multe acte).
+   *  Ajunge în metadata opțiunii, ca să se știe pe ce act e cheltuiala. */
+  document?: string;
 }
 
 export interface ModifyChanges {

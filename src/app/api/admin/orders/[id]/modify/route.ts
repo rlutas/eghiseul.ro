@@ -54,7 +54,7 @@ interface ModifyBody {
   refundReason?: string;
   /** Optional free-form extra service typed by the operator (not in the
    *  addon catalog). Validated server-side: name 3–120 chars, price 1–20000. */
-  customExtra?: { name?: unknown; price?: unknown } | null;
+  customExtra?: { name?: unknown; price?: unknown; document?: unknown } | null;
 }
 
 /** Validate + normalize the optional customExtra from the request body.
@@ -75,7 +75,11 @@ function parseCustomExtra(
   if (!Number.isFinite(price) || price < 1 || price > 20000) {
     return { ok: false, message: '`customExtra.price` must be a number between 1 and 20000 (RON)' };
   }
-  return { ok: true, value: { name, price: Math.round(price * 100) / 100 } };
+  const document = typeof raw.document === 'string' ? raw.document.trim().slice(0, 120) : '';
+  return {
+    ok: true,
+    value: { name, price: Math.round(price * 100) / 100, ...(document ? { document } : {}) },
+  };
 }
 
 export async function POST(request: NextRequest, { params }: RouteParams) {
@@ -244,6 +248,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
           optionName: customExtra.name,
           priceModifier: customExtra.price,
           quantity: 1,
+          ...(customExtra.document ? { metadata: { document: customExtra.document } } : {}),
         },
       ]
     : body.selectedOptions;
