@@ -157,6 +157,17 @@ const nextConfig: NextConfig = {
           },
         ],
       },
+      {
+        // /embed/* is MEANT to be framed by third parties (press embeds the
+        // live ANCPI status widget). Later rule overrides the catch-all above.
+        // ALLOWALL is intentionally invalid — browsers ignore it and fall back
+        // to the CSP frame-ancestors, which is the real policy.
+        source: '/embed/:path*',
+        headers: [
+          { key: 'X-Frame-Options', value: 'ALLOWALL' },
+          { key: 'Content-Security-Policy', value: 'frame-ancestors *' },
+        ],
+      },
     ];
   },
 };

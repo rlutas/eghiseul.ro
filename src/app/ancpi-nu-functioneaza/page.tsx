@@ -578,6 +578,39 @@ export default function Page() {
         — condițiile exacte, cât pierzi dacă ratezi și dacă se prelungește termenul.
       </p>
 
+      {/* Digital PR: „cadastru" e în Google Trends pe fondul crizei, iar noi
+          suntem singurii cu monitorizare independentă la 15 min. Widgetul e
+          gratuit la embed; linkul de atribuire din snippet e backlink-ul. */}
+      <h2 id="embed">Pentru redacții și site-uri: widget live, gratuit de preluat</h2>
+      <p>
+        Monitorizăm independent sistemele ANCPI la fiecare 15 minute, din prima noapte a căderii —
+        am detectat blocajul cu ~10 ore înaintea primului comunicat oficial. Widgetul de mai jos
+        arată starea în timp real și contorul zilelor de blocaj, se actualizează singur și poate fi
+        preluat gratuit de orice publicație. Singura condiție: păstrați linkul de atribuire.
+      </p>
+      <div className="not-prose my-6">
+        <iframe
+          src="/embed/ancpi/"
+          width="400"
+          height="150"
+          style={{ border: 0, borderRadius: 12, overflow: 'hidden', maxWidth: '100%' }}
+          title="Starea sistemelor ANCPI — monitorizare live eGhișeul.ro"
+          loading="lazy"
+        />
+      </div>
+      <p>Codul de preluare (copiază și lipește în pagină):</p>
+      <div className="not-prose my-4 overflow-x-auto rounded-xl bg-neutral-900 p-4">
+        <pre className="whitespace-pre-wrap break-all text-xs leading-relaxed text-neutral-100">{`<iframe src="https://eghiseul.ro/embed/ancpi/" width="400" height="150"
+  style="border:0;border-radius:12px;max-width:100%"
+  title="Starea sistemelor ANCPI — monitorizare live eGhișeul.ro" loading="lazy"></iframe>
+<p style="font-size:12px;margin:4px 0 0">Sursa: <a href="https://eghiseul.ro/ancpi-nu-functioneaza/">monitorizare ANCPI live — eGhișeul.ro</a></p>`}</pre>
+      </div>
+      <p>
+        Pentru redacții avem și <strong>datele brute de monitorizare</strong> (ferestrele exacte de
+        indisponibilitate, cu timestamp) și un interlocutor pentru context — scrieți-ne la{' '}
+        <a href="mailto:contact@eghiseul.ro">contact@eghiseul.ro</a>.
+      </p>
+
       <h2>Ce poți face între timp</h2>
       <ul>
         <li>
