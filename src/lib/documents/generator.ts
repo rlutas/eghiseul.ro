@@ -671,6 +671,28 @@ export function buildFiliatie(fatherName?: string, motherName?: string, cnp?: st
   return `${fiu} lui ${parents.join(' și ')}`;
 }
 
+/**
+ * Fraza «, motivul solicitării: X» de pe împuternicire, ca ÎNTREG.
+ *
+ * Trăia ca text fix în șablon lângă {{MOTIV}}, iar buildInstitutie o adăuga și
+ * el — deci pe fiecare împuternicire de cazier motivul apărea de DOUĂ ori.
+ * Acum e un singur tag, {{MOTIV_FRAZA}}, deci poate lipsi cu totul:
+ * pe apostila de la Haga motivul nu are ce căuta (ține de actul de bază, nu de
+ * apostilare — prefectura o aplică indiferent de motiv).
+ */
+export function buildMotivFraza(
+  motiv?: string,
+  delegationServiceType?: string | null
+): string {
+  const dt = (delegationServiceType || '').trim();
+  const code = dt.startsWith('bundled:') ? dt.split(':')[3] : dt;
+  // Punctul final aparține frazei: „…Cazier Judiciar, motivul solicitării: X."
+  // sau, fără motiv, doar „…Cazier Judiciar." — niciodată „Judiciar., motivul".
+  if (code === 'apostila_haga') return '.';
+  const value = (motiv || '').trim();
+  return value ? `, motivul solicitării: ${value}.` : '.';
+}
+
 /** True when the ORDER itself proves a marriage: a marriage certificate with
  *  the date or the spouse collected. Used to suppress a „necăsătorit" label
  *  that would contradict the very document being requested. */
@@ -739,8 +761,6 @@ export function buildInstitutie(
   motiv?: string,
   delegationServiceType?: string | null,
 ): string {
-  const motivPart = motiv?.trim() ? ` Motivul solicitării: ${motiv.trim()}.` : '';
-
   const dt = (delegationServiceType || '').trim();
   if (dt) {
     // bundled:<parentId>:<serviceSlug>:<code> → contează codul opțiunii, iar
@@ -759,13 +779,13 @@ export function buildInstitutie(
       const wantsTarget =
         ('appliesToDocument' in entry && entry.appliesToDocument) || Boolean(bundledSlug);
       const onDoc = wantsTarget && target ? ` pe ${target.document}` : '';
-      return `să se prezinte la ${entry.authority}, în vederea ${entry.action || 'ridicării'} ${entry.document}${onDoc}.${motivPart}`;
+      return `să se prezinte la ${entry.authority}, în vederea ${entry.action || 'ridicării'} ${entry.document}${onDoc}`;
     }
   }
 
   const entry = INSTITUTIE_MAP[serviceSlug || ''];
   if (!entry) return serviceSlug || '';
-  return `să se prezinte la ${entry.authority}, în vederea ${entry.action || 'ridicării'} ${entry.document}.${motivPart}`;
+  return `să se prezinte la ${entry.authority}, în vederea ${entry.action || 'ridicării'} ${entry.document}`;
 }
 
 /**
@@ -1055,6 +1075,7 @@ function buildPlaceholderData(ctx: DocumentContext) {
     NRDELEGATIE: impNum ? String(impNum).padStart(6, '0') : '',
     CLIENT: ctx.client.name,
     MOTIV: ctx.motiv_solicitare || 'Interes personal',
+    MOTIV_FRAZA: buildMotivFraza(ctx.motiv_solicitare, ctx.delegation_service_type),
     DATAGENERAT: dateFormatted,
     INSTITUTIE: buildInstitutie(
       ctx.order.service_slug,

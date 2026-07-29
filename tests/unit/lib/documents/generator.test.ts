@@ -4,6 +4,7 @@ import {
   hasUrgentOption,
   buildDeliveryTerms,
   buildInstitutie,
+  buildMotivFraza,
   buildCIInfo,
   buildOptionsText,
   buildStareCivilaLabel,
@@ -228,7 +229,7 @@ describe('buildDeliveryTerms', () => {
 describe('buildInstitutie', () => {
   // 2026-07-09: textul activităților de pe împuternicire e acum FRAZA
   // completă (cerință echipă): „să se prezinte la <autoritate>, în vederea
-  // ridicării <document>. Motivul solicitării: <motiv>."
+  // ridicării <document>"
   it.each([
     ['cazier-judiciar', 'IPJ SATU MARE', 'Cazier Judiciar'],
     ['cazier-judiciar-persoana-fizica', 'IPJ SATU MARE', 'Cazier Judiciar'],
@@ -241,21 +242,17 @@ describe('buildInstitutie', () => {
     ['certificat-integritate', 'IPJ SATU MARE', 'Certificat de Integritate Comportamentală'],
     ['extras-carte-funciara', 'OCPI SATU MARE', 'Extras de Carte Funciară'],
     ['certificat-constatator', 'ONRC SATU MARE', 'Certificat Constatator'],
-  ])('slug "%s" → „să se prezinte la %s, în vederea ridicării %s."', (slug, authority, document) => {
+  ])('slug "%s" → „să se prezinte la %s, în vederea ridicării %s"', (slug, authority, document) => {
+    // Punctul final NU mai aparține acestei fraze: îl aduce {{MOTIV_FRAZA}},
+    // ca „…Cazier Judiciar, motivul solicitării: X." să iasă corect punctuat.
     expect(buildInstitutie(slug)).toBe(
-      `să se prezinte la ${authority}, în vederea ridicării ${document}.`
+      `să se prezinte la ${authority}, în vederea ridicării ${document}`
     );
   });
 
-  it('appends the motiv when provided', () => {
+  it('nu mai adaugă motivul — îl aduce {{MOTIV_FRAZA}}, ca să nu apară de două ori', () => {
     expect(buildInstitutie('cazier-judiciar', 'AUTORITATI')).toBe(
-      'să se prezinte la IPJ SATU MARE, în vederea ridicării Cazier Judiciar. Motivul solicitării: AUTORITATI.'
-    );
-  });
-
-  it('trims and skips empty motiv', () => {
-    expect(buildInstitutie('cazier-auto', '  ')).toBe(
-      'să se prezinte la IPJ SATU MARE, în vederea ridicării Cazier Auto.'
+      'să se prezinte la IPJ SATU MARE, în vederea ridicării Cazier Judiciar'
     );
   });
 
@@ -277,13 +274,13 @@ describe('buildInstitutie', () => {
       expect(
         buildInstitutie('cazier-judiciar-persoana-fizica', 'D.G.A.S.P.C.', 'addon_certificat_integritate')
       ).toBe(
-        'să se prezinte la IPJ SATU MARE, în vederea ridicării Certificat de Integritate Comportamentală. Motivul solicitării: D.G.A.S.P.C..'
+        'să se prezinte la IPJ SATU MARE, în vederea ridicării Certificat de Integritate Comportamentală'
       );
     });
 
     it('add-on cazier fiscal → ANAF', () => {
       expect(buildInstitutie('cazier-judiciar', undefined, 'addon_cazier_fiscal')).toBe(
-        'să se prezinte la ANAF SATU MARE, în vederea ridicării Cazier Fiscal.'
+        'să se prezinte la ANAF SATU MARE, în vederea ridicării Cazier Fiscal'
       );
     });
 
@@ -293,7 +290,7 @@ describe('buildInstitutie', () => {
       ['addon_certificat_celibat', 'Certificat de Celibat'],
     ])('%s → %s la starea civilă', (code, doc) => {
       expect(buildInstitutie('cazier-judiciar', undefined, code)).toBe(
-        `să se prezinte la OFICIUL DE STARE CIVILĂ, în vederea ridicării ${doc}.`
+        `să se prezinte la OFICIUL DE STARE CIVILĂ, în vederea ridicării ${doc}`
       );
     });
 
@@ -303,13 +300,13 @@ describe('buildInstitutie', () => {
     // „aplicării Apostilei de la Haga.", fără obiect).
     it('apostila Haga pe serviciul principal → spune pe CE document se aplică', () => {
       expect(buildInstitutie('cazier-judiciar', undefined, 'apostila_haga')).toBe(
-        'să se prezinte la INSTITUȚIA PREFECTULUI - JUDEȚUL SATU MARE, în vederea aplicării Apostilei de la Haga pe Cazier Judiciar.'
+        'să se prezinte la INSTITUȚIA PREFECTULUI - JUDEȚUL SATU MARE, în vederea aplicării Apostilei de la Haga pe Cazier Judiciar'
       );
     });
 
     it('apostila Haga pe certificat de naștere → documentul corect în text', () => {
       expect(buildInstitutie('certificat-nastere', undefined, 'apostila_haga')).toBe(
-        'să se prezinte la INSTITUȚIA PREFECTULUI - JUDEȚUL SATU MARE, în vederea aplicării Apostilei de la Haga pe Certificat de Naștere.'
+        'să se prezinte la INSTITUȚIA PREFECTULUI - JUDEȚUL SATU MARE, în vederea aplicării Apostilei de la Haga pe Certificat de Naștere'
       );
     });
 
@@ -317,7 +314,7 @@ describe('buildInstitutie', () => {
       expect(
         buildInstitutie('cazier-judiciar', undefined, 'bundled:opt-1:certificat-integritate:apostila_haga')
       ).toBe(
-        'să se prezinte la INSTITUȚIA PREFECTULUI - JUDEȚUL SATU MARE, în vederea aplicării Apostilei de la Haga pe Certificat de Integritate Comportamentală.'
+        'să se prezinte la INSTITUȚIA PREFECTULUI - JUDEȚUL SATU MARE, în vederea aplicării Apostilei de la Haga pe Certificat de Integritate Comportamentală'
       );
     });
 
@@ -325,13 +322,13 @@ describe('buildInstitutie', () => {
       expect(
         buildInstitutie('cazier-judiciar-persoana-fizica', 'D.G.A.S.P.C.', 'cazier-judiciar-persoana-fizica')
       ).toBe(
-        'să se prezinte la IPJ SATU MARE, în vederea ridicării Cazier Judiciar. Motivul solicitării: D.G.A.S.P.C..'
+        'să se prezinte la IPJ SATU MARE, în vederea ridicării Cazier Judiciar'
       );
     });
 
     it('service_type necunoscut → fallback pe serviciul principal', () => {
       expect(buildInstitutie('cazier-auto', undefined, 'cod_inexistent')).toBe(
-        'să se prezinte la IPJ SATU MARE, în vederea ridicării Cazier Auto.'
+        'să se prezinte la IPJ SATU MARE, în vederea ridicării Cazier Auto'
       );
     });
   });
@@ -510,5 +507,35 @@ describe('buildActivitatiStareCivila — care căsătorie', () => {
 
   it('gol pentru servicii care nu sunt de stare civilă', () => {
     expect(buildActivitatiStareCivila('cazier-judiciar', marriage)).toBe('');
+  });
+});
+
+describe('buildMotivFraza — motivul NU apare pe apostila Haga', () => {
+  it('apostila Haga: doar punctul final, fără motiv', () => {
+    // Motivul ține de actul de bază (de ce ceri cazierul), nu de apostilare:
+    // prefectura aplică apostila indiferent de motiv, iar „ALTE MOTIVE" pe
+    // împuternicire arăta ca un câmp completat aiurea (semnalat 29.07).
+    expect(buildMotivFraza('ALTE MOTIVE', 'apostila_haga')).toBe('.');
+  });
+
+  it('nici pe apostila aplicată pe alt act din comandă (bundled)', () => {
+    expect(
+      buildMotivFraza('ANGAJARE', 'bundled:parent-1:certificat-integritate:apostila_haga')
+    ).toBe('.');
+  });
+
+  it('rămâne pe delegația serviciului principal', () => {
+    expect(buildMotivFraza('ANGAJARE')).toBe(', motivul solicitării: ANGAJARE.');
+  });
+
+  it('rămâne pe apostila notarială (altă instituție, alt flux)', () => {
+    expect(buildMotivFraza('ANGAJARE', 'apostila_notari')).toBe(
+      ', motivul solicitării: ANGAJARE.'
+    );
+  });
+
+  it('fără motiv completat, doar punctul final', () => {
+    expect(buildMotivFraza('   ')).toBe('.');
+    expect(buildMotivFraza(undefined)).toBe('.');
   });
 });
