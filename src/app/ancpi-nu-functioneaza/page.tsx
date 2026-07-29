@@ -12,7 +12,9 @@ const TITLE = 'ANCPI și e-Terra nu funcționează: atac cibernetic, sisteme pic
 // Titlul din SERP țintește starea + acțiunea, nu evenimentul: cine caută vrea
 // să știe dacă mai e picat și ce face, nu să citească încă o știre despre atac
 // (presa ocupă oricum acele poziții cu autoritate mai mare).
-const META_TITLE = 'ANCPI nu funcționează — status live, până când și ce faci';
+// „Cadastru" adăugat 29.07: e numele sub care presa și Google Trends numesc
+// criza („atacul de la Cadastru", trend 2K+/24h) — căutarea vine pe el.
+const META_TITLE = 'ANCPI / Cadastru nu funcționează — status live și ce faci';
 const DESCRIPTION =
   'Guvernul a confirmat pe 27 iulie: atac ransomware — o parte din infrastructura de virtualizare a fost criptată și ștearsă, fără dată fermă de repornire pentru e-Terra. Termenul TVA 9% se prelungește: Senatul a votat 30 septembrie. Comandă extrasul CF acum — îl eliberăm automat la revenire.';
 const DATE_PUBLISHED = '2026-07-15';
