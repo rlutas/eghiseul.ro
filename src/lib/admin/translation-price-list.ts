@@ -22,7 +22,7 @@ export function validateTranslationPriceList(value: unknown): string | null {
     seen.add(langKey);
     if (!VALID_GROUPS.has(String(r.group))) return `Rândul ${i + 1} (${lang}): grupa trebuie să fie I-VI`;
     if (typeof r.active !== 'boolean') return `Rândul ${i + 1} (${lang}): activ trebuie să fie da/nu`;
-    for (const f of ['ourCostDoc', 'ourCostPage', 'clientPriceDoc'] as const) {
+    for (const f of ['ourCostDoc', 'ourCostPage', 'clientPriceDoc', 'ourCostApostila'] as const) {
       const v = r[f];
       if (v !== null && v !== undefined && (typeof v !== 'number' || !Number.isFinite(v) || v < 0 || v > 10000)) {
         return `Rândul ${i + 1} (${lang}): ${f} trebuie să fie număr 0-10000 sau gol`;

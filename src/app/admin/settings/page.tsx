@@ -1098,26 +1098,30 @@ function TranslationPricesTab() {
         </CardHeader>
         <CardContent className="space-y-2">
           {/* Header row */}
-          <div className="hidden md:grid md:grid-cols-[1fr_70px_70px_90px_90px_90px_80px_1fr_36px] gap-2 px-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+          <div className="hidden md:grid md:grid-cols-[1fr_60px_60px_80px_80px_90px_80px_80px_1fr_36px] gap-2 px-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
             <span>Limba</span>
             <span>Grupă</span>
             <span>Activ</span>
             <span>Cost/doc</span>
-            <span>Cost/pag</span>
+            <span title="Suprataxa traducătorului când comanda are și Apostilă Haga (se traduce și apostila)">Cost apostilă</span>
             <span>Preț client</span>
-            <span>Marjă</span>
+            <span title="Preț client fără TVA (÷1,21) minus cost/doc — traducătorul e neplătitor de TVA">Marjă netă</span>
+            <span>Cost/pag</span>
             <span>Note</span>
             <span />
           </div>
           {rows.map((r, i) => {
+            // Marja NETĂ: traducătorul facturează fără TVA (neplătitor), dar noi
+            // datorăm 21% din prețul de vânzare — deci comparația corectă e
+            // preț/1,21 − cost, nu preț − cost (aia ar umfla marja cu ~21%).
             const margin =
               r.ourCostDoc != null && r.clientPriceDoc != null
-                ? r.clientPriceDoc - r.ourCostDoc
+                ? r.clientPriceDoc / 1.21 - r.ourCostDoc
                 : null;
             return (
               <div
                 key={i}
-                className={`grid grid-cols-2 md:grid-cols-[1fr_70px_70px_90px_90px_90px_80px_1fr_36px] items-center gap-2 rounded-md border px-2 py-1.5 ${
+                className={`grid grid-cols-2 md:grid-cols-[1fr_60px_60px_80px_80px_90px_80px_80px_1fr_36px] items-center gap-2 rounded-md border px-2 py-1.5 ${
                   r.active ? 'bg-white' : 'bg-neutral-50 opacity-80'
                 }`}
               >
@@ -1152,9 +1156,10 @@ function TranslationPricesTab() {
                   type="number"
                   min="0"
                   step="0.5"
-                  value={r.ourCostPage ?? ''}
-                  onChange={(e) => update(i, { ourCostPage: numOrNull(e.target.value) })}
+                  value={r.ourCostApostila ?? ''}
+                  onChange={(e) => update(i, { ourCostApostila: numOrNull(e.target.value) })}
                   placeholder="—"
+                  title="Suprataxa traducătorului când comanda are și Apostilă Haga"
                   className="h-8"
                 />
                 <Input
@@ -1173,6 +1178,16 @@ function TranslationPricesTab() {
                 >
                   {margin == null ? '—' : `${margin.toFixed(0)} lei`}
                 </span>
+                <Input
+                  type="number"
+                  min="0"
+                  step="0.5"
+                  value={r.ourCostPage ?? ''}
+                  onChange={(e) => update(i, { ourCostPage: numOrNull(e.target.value) })}
+                  placeholder="—"
+                  title="Cost per pagină suplimentară (1 pag = 2.000 caractere cu spații)"
+                  className="h-8"
+                />
                 <Input
                   value={r.notes ?? ''}
                   onChange={(e) => update(i, { notes: e.target.value })}

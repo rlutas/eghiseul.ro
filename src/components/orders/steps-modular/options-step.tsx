@@ -32,7 +32,7 @@ import {
   cascadeDropCodes,
 } from '@/lib/services/option-dependencies';
 import { APOSTILA_COUNTRIES } from '@/config/apostila-countries';
-import { useTranslationLanguages } from '@/hooks/use-translation-languages';
+import { useTranslationData, useTranslationLanguages } from '@/hooks/use-translation-languages';
 import { SpecimenInfoButton } from '@/components/orders/specimen-info-button';
 
 interface OptionsStepProps {
@@ -272,6 +272,44 @@ export function OptionsStepModular({ onValidChange }: OptionsStepProps) {
   const sharedCountry =
     hagaState?.metadata?.country ?? notariState?.metadata?.country ?? '';
 
+  // Per-language pricing (2026-07-29): limbile scumpe (nordice, slave) au preț
+  // propriu în admin_settings.translation_price_list; fără asta daneza s-ar
+  // vinde sub costul traducătoarei. Prețul opțiunii urmează limba selectată;
+  // fallback = prețul de bază al opțiunii. Server-side guard la submit.
+  const { prices: translationPrices } = useTranslationData();
+  const priceForLanguage = useCallback(
+    (language: string | null | undefined): number | null => {
+      if (!language) return null;
+      const p = translationPrices[language];
+      return Number.isFinite(p) ? p : null;
+    },
+    [translationPrices]
+  );
+
+  useEffect(() => {
+    let changed = false;
+    const next = selectedOptions.map((o) => {
+      if (o.code !== 'traducere') return o;
+      const expected =
+        priceForLanguage(o.metadata?.language as string | undefined) ??
+        (o.bundledFor ? Number(o.priceModifier) : traducere?.price);
+      if (expected == null || Math.abs(Number(o.priceModifier) - expected) < 0.01) return o;
+      changed = true;
+      return { ...o, priceModifier: expected };
+    });
+    if (changed) commit(next);
+  }, [selectedOptions, priceForLanguage, traducere, commit]);
+
+  // Bulgară = doar traducere autorizată, FĂRĂ legalizare notarială (limitare
+  // confirmată de traducătoare, 29.07). Dacă limba devine bulgară cu
+  // legalizarea deja bifată, o scoatem (împreună cu apostila notarială).
+  const bulgaraSelected = (traducereState?.metadata?.language as string | undefined) === 'Bulgară';
+  useEffect(() => {
+    if (!bulgaraSelected || !legalizareSelected) return;
+    const dropCodes = new Set(['legalizare', 'apostila_notari']);
+    commit(selectedOptions.filter((o) => !(o.code && dropCodes.has(o.code) && !o.bundledFor)));
+  }, [bulgaraSelected, legalizareSelected, selectedOptions, commit]);
+
   const toggleTraducere = useCallback(() => {
     if (!traducere) return;
     if (traducereSelected) {
@@ -292,7 +330,7 @@ export function OptionsStepModular({ onValidChange }: OptionsStepProps) {
   }, [traducere, traducereSelected, selectedOptions, commit]);
 
   const toggleLegalizare = useCallback(() => {
-    if (!legalizare || !traducereSelected) return;
+    if (!legalizare || !traducereSelected || bulgaraSelected) return;
     if (legalizareSelected) {
       // Deselecting Legalizare also drops Apostila Notari.
       const dropCodes = new Set(['legalizare', 'apostila_notari']);
@@ -308,7 +346,7 @@ export function OptionsStepModular({ onValidChange }: OptionsStepProps) {
       };
       commit([...selectedOptions, next]);
     }
-  }, [legalizare, traducereSelected, legalizareSelected, selectedOptions, commit]);
+  }, [legalizare, traducereSelected, legalizareSelected, bulgaraSelected, selectedOptions, commit]);
 
   const toggleNotari = useCallback(() => {
     if (!apostilaNotari || !traducereSelected || !legalizareSelected) return;
@@ -615,7 +653,10 @@ export function OptionsStepModular({ onValidChange }: OptionsStepProps) {
                   icon={Languages}
                   name="Traducere Autorizată"
                   hint={CODE_HINTS.traducere}
-                  price={traducere.price}
+                  price={
+                    priceForLanguage(traducereState?.metadata?.language as string | undefined) ??
+                    traducere.price
+                  }
                   selected={traducereSelected}
                   onClick={toggleTraducere}
                 />
@@ -629,19 +670,22 @@ export function OptionsStepModular({ onValidChange }: OptionsStepProps) {
               </>
             )}
 
-            {/* 3. Legalizare Notarială — requires Traducere */}
+            {/* 3. Legalizare Notarială — requires Traducere; indisponibilă la
+                bulgară (traducătoarea nu poate legaliza traducerile în bulgară). */}
             {legalizare && (
               <OptionCard
                 icon={Scale}
                 name="Legalizare Notarială"
                 hint={
-                  traducereSelected
-                    ? CODE_HINTS.legalizare
-                    : 'Necesită Traducere Autorizată'
+                  bulgaraSelected
+                    ? 'Indisponibilă pentru bulgară — doar traducere autorizată'
+                    : traducereSelected
+                      ? CODE_HINTS.legalizare
+                      : 'Necesită Traducere Autorizată'
                 }
                 price={legalizare.price}
-                selected={legalizareSelected && traducereSelected}
-                disabled={!traducereSelected}
+                selected={legalizareSelected && traducereSelected && !bulgaraSelected}
+                disabled={!traducereSelected || bulgaraSelected}
                 onClick={toggleLegalizare}
               />
             )}
@@ -887,7 +931,9 @@ interface LanguageDropdownProps {
 
 function LanguageDropdown({ value, onChange, error, id = 'opt-language' }: LanguageDropdownProps) {
   // DB-driven list (admin settings → Traduceri); static fallback until loaded.
-  const languages = useTranslationLanguages();
+  // Prețul apare lângă limbă — limbile rare (nordice, slave) costă mai mult,
+  // iar clientul trebuie să vadă asta ÎNAINTE să selecteze.
+  const { languages, prices } = useTranslationData();
   return (
     <div className="border-l-2 border-primary-200 pl-4">
       <label htmlFor={id} className="text-sm font-medium text-secondary-900">
@@ -906,7 +952,7 @@ function LanguageDropdown({ value, onChange, error, id = 'opt-language' }: Langu
         <option value="">Selectați limba</option>
         {languages.map((lang) => (
           <option key={lang} value={lang}>
-            {lang}
+            {prices[lang] != null ? `${lang} — ${prices[lang]} lei` : lang}
           </option>
         ))}
       </select>

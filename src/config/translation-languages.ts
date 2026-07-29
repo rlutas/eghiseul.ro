@@ -45,6 +45,12 @@ export interface TranslationPriceRow {
   ourCostPage: number | null;
   /** Client price per standard document (RON). */
   clientPriceDoc: number | null;
+  /**
+   * OUR extra cost when the order also carries an Apostilă Haga — the
+   * translator translates the apostille too (confirmed 29.07: +20 EN/FR/…,
+   * +75 DA/NO). Null = unknown/not applicable.
+   */
+  ourCostApostila?: number | null;
   notes: string;
 }
 

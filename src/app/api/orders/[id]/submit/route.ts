@@ -233,6 +233,57 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       }
     }
 
+    // ── Preț traducere per limbă ────────────────────────────────────────
+    // Limbile scumpe (nordice/slave) au preț propriu în admin_settings.
+    // translation_price_list; wizardul îl aplică, dar payload-ul draftului e
+    // editabil de client — recalculăm și corectăm ÎN SUS înainte de plată,
+    // altfel daneza (cost 150 la traducător) s-ar plăti ca engleza.
+    {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const o = order as any;
+      const opts = Array.isArray(o.selected_options) ? o.selected_options : [];
+      const hasTranslation = opts.some(
+        (op: { code?: string }) => op?.code === 'traducere'
+      );
+      if (hasTranslation) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { data: plRow } = await (adminClient as any)
+          .from('admin_settings')
+          .select('value')
+          .eq('key', 'translation_price_list')
+          .maybeSingle();
+        const priceByLang = new Map<string, number>();
+        for (const row of (plRow?.value as Array<{ language?: string; active?: boolean; clientPriceDoc?: number | null }> | null) ?? []) {
+          if (row?.language && row.active && row.clientPriceDoc != null) {
+            priceByLang.set(row.language, Number(row.clientPriceDoc));
+          }
+        }
+        let totalDiff = 0;
+        const corrected = opts.map(
+          (op: { code?: string; priceModifier?: number; quantity?: number; metadata?: { language?: string } }) => {
+            if (op?.code !== 'traducere') return op;
+            const expected = priceByLang.get(op.metadata?.language ?? '');
+            const current = Number(op.priceModifier ?? 0);
+            if (expected == null || current + 0.01 >= expected) return op;
+            totalDiff += (expected - current) * Number(op.quantity ?? 1);
+            return { ...op, priceModifier: expected };
+          }
+        );
+        if (totalDiff > 0) {
+          const newTotal = Math.round((Number(o.total_price ?? 0) + totalDiff) * 100) / 100;
+          await adminClient
+            .from('orders')
+            .update({ selected_options: corrected, total_price: newTotal })
+            .eq('id', id);
+          o.selected_options = corrected;
+          o.total_price = newTotal;
+          console.warn(
+            `[submit] preț traducere corectat pe ${id}: +${totalDiff.toFixed(2)} lei (total ${newTotal})`
+          );
+        }
+      }
+    }
+
     // Capture audit context (IP, user agent) from request
     const auditCtx = getAuditContext(request);
     const now = new Date().toISOString();
