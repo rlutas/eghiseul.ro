@@ -14,6 +14,7 @@ import { formatPersonName } from '@/lib/format/person-name';
 import {
   institutionFeeMap,
   pendingCostRows,
+  pendingRowKey,
   type SupplierTariff,
 } from '@/lib/admin/supplier-costs';
 
@@ -131,7 +132,7 @@ async function ordersMissingCosts(
 
   const { data: orders } = await admin
     .from('orders')
-    .select('id, order_number, friendly_order_id, selected_options, updated_at, services(slug)')
+    .select('id, order_number, friendly_order_id, selected_options, updated_at, services(slug, name)')
     .eq('status', 'completed')
     .gte('updated_at', start)
     .lt('updated_at', end)
@@ -140,23 +141,28 @@ async function ordersMissingCosts(
 
   const { data: recorded } = await admin
     .from('order_supplier_costs')
-    .select('order_id, category')
+    .select('order_id, category, document_label')
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     .in('order_id', orders.map((o: any) => o.id));
   const byOrder = new Map<string, string[]>();
   for (const r of recorded ?? []) {
-    byOrder.set(r.order_id, [...(byOrder.get(r.order_id) ?? []), r.category]);
+    byOrder.set(r.order_id, [
+      ...(byOrder.get(r.order_id) ?? []),
+      pendingRowKey(r.category, r.document_label),
+    ]);
   }
 
   const missing: Array<{ orderId: string; orderNumber: string; categories: string[] }> = [];
   for (const o of orders) {
-    const service = o.services as { slug?: string } | { slug?: string }[] | null;
-    const slug = Array.isArray(service) ? service[0]?.slug : service?.slug;
+    type Svc = { slug?: string; name?: string };
+    const service = o.services as Svc | Svc[] | null;
+    const svc = Array.isArray(service) ? service[0] : service;
     const pending = pendingCostRows({
       options: o.selected_options ?? [],
-      serviceSlug: slug ?? null,
+      serviceSlug: svc?.slug ?? null,
+      serviceName: svc?.name ?? null,
       institutionFeeSuppliers: feeMap,
-      existingCategories: byOrder.get(o.id) ?? [],
+      existingKeys: byOrder.get(o.id) ?? [],
     });
     if (pending.length > 0) {
       missing.push({

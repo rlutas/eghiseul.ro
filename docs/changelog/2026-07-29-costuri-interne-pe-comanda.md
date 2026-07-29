@@ -57,6 +57,36 @@ deliberat: când omul nu știe cifra, o inventează ca să poată închide coman
 costuri false sunt mai rele decât costuri lipsă. Suma `0` e valoare validă și se
 salvează ca atare — „am verificat, n-a costat nimic" e altceva decât „n-am completat".
 
+## Un rând per document, când comanda are mai multe
+
+O comandă poate produce mai multe documente: cazier + certificat de integritate
+adăugat ca add-on, cazier secundar, pachet naștere. Traducerea și legalizarea se pot
+face pe fiecare dintre ele.
+
+Verificat pe date: toate opțiunile există câte una per comandă, cu `quantity: 1`
+(26 traduceri, 12 legalizări, 4 apostile notariale), iar `bundled_for` — câmpul care
+ar lega o opțiune de un anumit document — **nu apare în nicio comandă reală**. Deci o
+comandă cu două documente ar fi produs o singură linie „Traducere", iar costul ar fi
+ieșit o sumă globală, fără să se știe cât a costat fiecare act.
+
+Acum, când comanda conține un add-on de tip document separat, fiecare linie de cost
+se cere per document:
+
+```
+Traducere Autorizată · Italiană — Cazier Judiciar        [ 180 ] lei
+Traducere Autorizată · Italiană — Certificat Integritate [ 180 ] lei
+Legalizare Notarială — Cazier Judiciar                   [  55 ] lei
+Legalizare Notarială — Certificat Integritate            [  55 ] lei
+```
+
+Pe comenzile cu un singur document nu apare niciun sufix — fără zgomot acolo unde
+întrebarea nu se pune. Apostila de la Haga NU creează un document în plus: e o
+procedură aplicată pe un act, nu un act separat.
+
+Documentul se salvează în `order_supplier_costs.document_label` (migrarea 141), deci
+raportul lunar arată pe ce act s-a lucrat — util și la verificarea facturii
+traducătoarei. Costul deja înregistrat pe un document nu se mai cere; celălalt, da.
+
 ## Tarife, ca să nu se tasteze de fiecare dată
 
 Setări → Furnizori, secțiune nouă. Două forme:

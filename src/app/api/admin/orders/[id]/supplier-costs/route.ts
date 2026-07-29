@@ -15,6 +15,7 @@ import {
   pendingCostRows,
   institutionFeeMap,
   lastAmountKey,
+  pendingRowKey,
   type SupplierTariff,
 } from '@/lib/admin/supplier-costs';
 
@@ -27,11 +28,11 @@ async function buildPending(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   admin: any,
   orderId: string,
-  existingCategories: string[]
+  existingKeys: string[]
 ) {
   const { data: order } = await admin
     .from('orders')
-    .select('selected_options, service_id, services(slug)')
+    .select('selected_options, service_id, services(slug, name)')
     .eq('id', orderId)
     .single();
   if (!order) return [];
@@ -56,14 +57,16 @@ async function buildPending(
     if (!(key in lastAmounts)) lastAmounts[key] = Number(row.amount_ron);
   }
 
-  const service = order.services as { slug?: string } | { slug?: string }[] | null;
-  const serviceSlug = Array.isArray(service) ? service[0]?.slug : service?.slug;
+  type Svc = { slug?: string; name?: string };
+  const service = order.services as Svc | Svc[] | null;
+  const svc = Array.isArray(service) ? service[0] : service;
 
   return pendingCostRows({
     options: order.selected_options ?? [],
-    serviceSlug: serviceSlug ?? null,
+    serviceSlug: svc?.slug ?? null,
+    serviceName: svc?.name ?? null,
     institutionFeeSuppliers: institutionFeeMap(tariffs),
-    existingCategories,
+    existingKeys,
     tariffs,
     lastAmounts,
   });
@@ -105,7 +108,12 @@ export async function GET(_req: NextRequest, { params }: RouteParams) {
   }
   const costs = data ?? [];
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const pending = await buildPending(admin, id, costs.map((c: any) => c.category));
+  const pending = await buildPending(
+    admin,
+    id,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    costs.map((c: any) => pendingRowKey(c.category, c.document_label))
+  );
   return NextResponse.json({ success: true, data: costs, pending });
 }
 
@@ -136,6 +144,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     category: string;
     description?: string | null;
     documentLanguage?: string | null;
+    documentLabel?: string | null;
     amountRon: number;
   }>).map((b) => ({
     order_id: id,
@@ -143,6 +152,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     category: b.category,
     description: b.description?.trim() || null,
     document_language: b.documentLanguage?.trim() || null,
+    document_label: b.documentLabel?.trim() || null,
     amount_ron: Math.round(Number(b.amountRon) * 100) / 100,
     recorded_by: auth.email,
   }));

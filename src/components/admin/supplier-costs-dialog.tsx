@@ -26,7 +26,7 @@ import {
 } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Coins } from 'lucide-react';
-import { tariffAmount, type PendingCostRow } from '@/lib/admin/supplier-costs';
+import { tariffAmount, pendingRowKey, type PendingCostRow } from '@/lib/admin/supplier-costs';
 
 interface Props {
   orderId: string;
@@ -46,15 +46,15 @@ export function SupplierCostsDialog({ orderId, orderNumber, rows, open, onClose,
   const [state, setState] = useState<Record<string, RowState>>(() =>
     Object.fromEntries(
       rows.map((r) => [
-        r.category,
+        pendingRowKey(r.category, r.documentLabel),
         { pages: '1', amount: r.suggestedAmount != null ? String(r.suggestedAmount) : '' },
       ])
     )
   );
   const [saving, setSaving] = useState(false);
 
-  const setRow = (category: string, patch: Partial<RowState>) =>
-    setState((s) => ({ ...s, [category]: { ...s[category], ...patch } }));
+  const setRow = (key: string, patch: Partial<RowState>) =>
+    setState((s) => ({ ...s, [key]: { ...s[key], ...patch } }));
 
   /**
    * Page count re-prices the line, but ONLY when the amount still is what the
@@ -62,22 +62,26 @@ export function SupplierCostsDialog({ orderId, orderNumber, rows, open, onClose,
    * charged something else), we stop overwriting it.
    */
   const setPages = (row: PendingCostRow, pages: string) => {
-    const current = state[row.category];
+    const key = pendingRowKey(row.category, row.documentLabel);
+    const current = state[key];
     const priced = tariffAmount(row.tariff, Number(current?.pages ?? 1));
     const untouched = priced != null && current?.amount === String(priced);
     const next = tariffAmount(row.tariff, Number(pages) || 1);
-    setRow(row.category, {
+    setRow(key, {
       pages,
       ...(untouched && next != null ? { amount: String(next) } : {}),
     });
   };
 
   const filled = rows.filter((r) => {
-    const raw = state[r.category]?.amount ?? '';
+    const raw = state[pendingRowKey(r.category, r.documentLabel)]?.amount ?? '';
     return raw.trim() !== '' && Number.isFinite(Number(raw));
   });
 
-  const total = filled.reduce((sum, r) => sum + Number(state[r.category].amount), 0);
+  const total = filled.reduce(
+    (sum, r) => sum + Number(state[pendingRowKey(r.category, r.documentLabel)].amount),
+    0
+  );
 
   const save = async () => {
     if (filled.length === 0) {
@@ -91,7 +95,8 @@ export function SupplierCostsDialog({ orderId, orderNumber, rows, open, onClose,
         category: r.category,
         description: r.label,
         documentLanguage: r.language,
-        amountRon: Number(state[r.category].amount),
+        documentLabel: r.documentLabel,
+        amountRon: Number(state[pendingRowKey(r.category, r.documentLabel)].amount),
       }));
       const res = await fetch(`/api/admin/orders/${orderId}/supplier-costs`, {
         method: 'POST',
@@ -130,8 +135,10 @@ export function SupplierCostsDialog({ orderId, orderNumber, rows, open, onClose,
         </DialogHeader>
 
         <div className="space-y-3">
-          {rows.map((r) => (
-            <div key={r.category} className="rounded-md border p-3 space-y-2">
+          {rows.map((r) => {
+            const key = pendingRowKey(r.category, r.documentLabel);
+            return (
+            <div key={key} className="rounded-md border p-3 space-y-2">
               <div className="flex items-center justify-between gap-2">
                 <span className="text-sm font-medium">{r.label}</span>
                 {r.supplier && (
@@ -143,7 +150,7 @@ export function SupplierCostsDialog({ orderId, orderNumber, rows, open, onClose,
                 <Input
                   type="number"
                   min={1}
-                  value={state[r.category]?.pages ?? '1'}
+                  value={state[key]?.pages ?? '1'}
                   onChange={(e) => setPages(r, e.target.value)}
                   className="h-8 w-16"
                 />
@@ -152,8 +159,8 @@ export function SupplierCostsDialog({ orderId, orderNumber, rows, open, onClose,
                   min={0}
                   step="0.01"
                   placeholder="sumă"
-                  value={state[r.category]?.amount ?? ''}
-                  onChange={(e) => setRow(r.category, { amount: e.target.value })}
+                  value={state[key]?.amount ?? ''}
+                  onChange={(e) => setRow(key, { amount: e.target.value })}
                   className="h-8 flex-1"
                 />
                 <span className="text-xs text-muted-foreground">lei</span>
@@ -166,7 +173,8 @@ export function SupplierCostsDialog({ orderId, orderNumber, rows, open, onClose,
                 </p>
               )}
             </div>
-          ))}
+            );
+          })}
         </div>
 
         {filled.length > 0 && (

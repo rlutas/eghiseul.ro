@@ -78,6 +78,8 @@ export interface SupplierCostRow {
   category: string;
   description: string | null;
   document_language: string | null;
+  /** Which document of the order this cost belongs to (migration 141). */
+  document_label: string | null;
   amount_ron: number;
   recorded_by: string | null;
   created_at: string;
@@ -216,12 +218,34 @@ export function findTariff(
   return sameCategory.find((t) => !t.language && !t.serviceSlug) ?? null;
 }
 
+/**
+ * Add-on codes that represent a SEPARATE document obtained in the same order
+ * (cazier + certificat de integritate, pachet naștere…). Each such document can
+ * carry its own translation/legalisation, so each gets its own cost line —
+ * otherwise a two-document order collapses into one "Traducere" figure and you
+ * can never tell what each document cost.
+ *
+ * `apostila_haga` is intentionally NOT here: it is a procedure applied to a
+ * document, not a document of its own (and it costs us nothing anyway).
+ */
+export const DOCUMENT_ADDON_CODES: ReadonlySet<string> = new Set([
+  'addon_certificat_integritate',
+  'addon_certificat_nastere',
+  'addon_certificat_casatorie',
+  'addon_certificat_celibat',
+  'addon_cazier_fiscal',
+  'cazier_secundar',
+  'certificat_pachet',
+]);
+
 /** One line the team is asked to price when finalizing an order. */
 export interface PendingCostRow {
   category: SupplierCategory;
   /** Option code or service slug this row came from — for the description. */
   sourceCode: string;
   label: string;
+  /** Which document this cost belongs to; null when the order has only one. */
+  documentLabel: string | null;
   supplier: string | null;
   language: string | null;
   serviceSlug: string | null;
@@ -248,14 +272,31 @@ interface OptionWithMeta extends OptionLike {
 export function pendingCostRows(params: {
   options: OptionWithMeta[] | null | undefined;
   serviceSlug?: string | null;
+  /** Name of the main service — first document of the order. */
+  serviceName?: string | null;
   /** Services whose institution fee we pay (ONRC / ANCPI), from tariffs. */
   institutionFeeSuppliers?: Record<string, string>;
-  existingCategories?: string[];
+  /** Already-recorded lines, as `pendingRowKey()` values. */
+  existingKeys?: string[];
   tariffs?: SupplierTariff[] | null;
   lastAmounts?: Record<string, number>;
 }): PendingCostRow[] {
-  const done = new Set(params.existingCategories ?? []);
+  const done = new Set(params.existingKeys ?? []);
   const rows: PendingCostRow[] = [];
+
+  // The documents this order produces. More than one → every cost line is
+  // asked per document, so „cât a costat traducerea cazierului vs. a
+  // certificatului de integritate" has an answer.
+  const documents: string[] = [];
+  for (const option of params.options ?? []) {
+    if (!option.code || !DOCUMENT_ADDON_CODES.has(option.code)) continue;
+    documents.push(option.option_name ?? option.optionName ?? option.code);
+  }
+  const hasMultipleDocuments = documents.length > 0;
+  const mainDocument = params.serviceName ?? 'Serviciu principal';
+  const documentTargets: Array<string | null> = hasMultipleDocuments
+    ? [mainDocument, ...documents]
+    : [null];
 
   const suggest = (
     category: SupplierCategory,
@@ -281,11 +322,12 @@ export function pendingCostRows(params: {
   const feeSupplier = params.serviceSlug
     ? params.institutionFeeSuppliers?.[params.serviceSlug]
     : undefined;
-  if (feeSupplier && !done.has('taxa_institutie')) {
+  if (feeSupplier && !done.has(pendingRowKey('taxa_institutie', null))) {
     rows.push({
       category: 'taxa_institutie',
       sourceCode: params.serviceSlug!,
       label: `Taxă ${feeSupplier}`,
+      documentLabel: null,
       supplier: feeSupplier,
       language: null,
       serviceSlug: params.serviceSlug!,
@@ -293,27 +335,41 @@ export function pendingCostRows(params: {
     });
   }
 
-  // 2. Options bought from a collaborator.
+  // 2. Options bought from a collaborator — one line per document when the
+  //    order carries more than one.
   for (const option of params.options ?? []) {
     const code = option.code ?? '';
     const category = COST_BEARING_OPTION_CATEGORY[code];
-    if (!category || done.has(category)) continue;
-    if (rows.some((r) => r.category === category)) continue;
+    if (!category) continue;
     const language = option.metadata?.language ?? null;
     const supplier = CATEGORY_DEFAULT_SUPPLIER[category];
     const name = option.option_name ?? option.optionName ?? SUPPLIER_CATEGORY_LABELS[category];
-    rows.push({
-      category,
-      sourceCode: code,
-      label: language ? `${name} · ${language}` : name,
-      supplier,
-      language,
-      serviceSlug: null,
-      ...suggest(category, supplier, language, null),
-    });
+
+    for (const documentLabel of documentTargets) {
+      const key = pendingRowKey(category, documentLabel);
+      if (done.has(key) || rows.some((r) => pendingRowKey(r.category, r.documentLabel) === key)) {
+        continue;
+      }
+      const base = language ? `${name} · ${language}` : name;
+      rows.push({
+        category,
+        sourceCode: code,
+        label: documentLabel ? `${base} — ${documentLabel}` : base,
+        documentLabel,
+        supplier,
+        language,
+        serviceSlug: null,
+        ...suggest(category, supplier, language, null),
+      });
+    }
   }
 
   return rows;
+}
+
+/** Identity of a cost line: category + document. */
+export function pendingRowKey(category: string, documentLabel: string | null | undefined): string {
+  return `${category}|${(documentLabel ?? '').trim().toLowerCase()}`;
 }
 
 /**
