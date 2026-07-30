@@ -68,6 +68,11 @@ etichete goale.
 **Template-ele .docx rămân neatinse** — textul intră prin tag-uri existente, deci nu e
 nevoie să reîncarce nimeni vreun șablon.
 
+> **Update 30.07**: formatul a fost adus la modelul completat de mână (Title Case,
+> „Localitatea: X, Județul: X", „Stare Status Civil:" pe rând nou) — de data asta CU
+> modificarea celor două template-uri de căsătorie. Vezi
+> [2026-07-30-imputernicire-casatorie-format.md](2026-07-30-imputernicire-casatorie-format.md).
+
 ## Cauza din spate: formularul accepta o combinație imposibilă
 
 Comanda avea data căsătoriei și numele soțului completate, dar **ambele** bife pe „Nu":

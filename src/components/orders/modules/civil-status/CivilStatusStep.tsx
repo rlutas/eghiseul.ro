@@ -187,6 +187,11 @@ export default function CivilStatusStep({ config, onValidChange }: CivilStatusSt
     if (showMarriagePlace) req(cs.marriageAbroad !== undefined, 'Unde a avut loc căsătoria');
     if (fields.spouseName) req(!!cs.spouseNameBeforeMarriage?.trim(), 'Numele soțului/soției dinaintea căsătoriei');
     if (fields.marriageDate) req(!!cs.marriageDate?.trim(), 'Data căsătoriei');
+    // Localitatea reală a căsătoriei — cerută pe împuternicire și pe cererea
+    // ANEXA 4/59 („Localitatea: Oradea, Județul: Bihor"); până pe 30.07.2026
+    // județul umplea ambele rubrici.
+    if (fields.registrationPlace && config?.documentType === 'casatorie')
+      req(!!cs.marriageLocality?.trim(), 'Localitatea în care a avut loc căsătoria');
     if (fields.registrationPlace) req(rpComplete, 'Județul (și sectorul, pentru București) unde s-a înregistrat actul');
     if (fields.birthName) req(!!cs.birthName?.trim(), 'Numele la naștere');
     if (fields.parentNames) {
@@ -529,6 +534,16 @@ export default function CivilStatusStep({ config, onValidChange }: CivilStatusSt
                     ]
                   : [{ value: 'pierdut', label: 'Pierdut' }]
               }
+            />
+          </Field>
+        )}
+
+        {fields.registrationPlace && config?.documentType === 'casatorie' && (
+          <Field label="Localitatea în care a avut loc căsătoria" required>
+            <Input
+              value={cs.marriageLocality ?? ''}
+              onChange={(e) => updateCivilStatus({ marriageLocality: e.target.value })}
+              placeholder="Oraș / comună (ex. Oradea)"
             />
           </Field>
         )}

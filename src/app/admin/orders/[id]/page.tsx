@@ -5090,6 +5090,7 @@ const CIVIL_STATUS_LABELS: Array<[string, string]> = [
   ['marriageAbroadIntent', 'Pentru căsătorie în străinătate'],
   ['futureSpouseName', 'Viitorul soț/soție'],
   ['oldCertificateReason', 'Vechiul certificat a fost'],
+  ['marriageLocality', 'Localitatea căsătoriei'],
   ['registrationPlace', 'Județul care a înregistrat actul'],
   ['renouncedRomanianCitizenship', 'A renunțat la cetățenia română'],
   ['purpose', 'Scopul obținerii'],

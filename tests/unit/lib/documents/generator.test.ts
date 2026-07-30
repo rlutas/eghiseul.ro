@@ -470,38 +470,53 @@ describe('buildActivitatiStareCivila — care căsătorie', () => {
     marriagePlace: 'Brăila',
   };
 
-  it('numește soțul, data și locul pe certificatul de căsătorie', () => {
+  it('numește soțul, data și locul (Localitatea + Județul) pe certificatul de căsătorie', () => {
     expect(buildActivitatiStareCivila('certificat-casatorie', marriage)).toBe(
-      'să obțină certificatul de căsătorie încheiată cu MUSAT DUMITRU la data de 28.03.1992, în Brăila'
+      'Să obțină Certificatul de Căsătorie încheiată cu MUSAT DUMITRU la data de 28.03.1992, în Localitatea: Brăila, Județul: Brăila.'
+    );
+  });
+
+  it('localitatea reală separată de județ, când e colectată (din 30.07.2026)', () => {
+    expect(
+      buildActivitatiStareCivila('extras-multilingv-certificat-casatorie', {
+        spouseName: 'TAKACS ENIKO NICOLETA',
+        marriageDate: '1987-02-07',
+        marriagePlace: 'Bihor',
+        marriageLocality: 'Oradea',
+      })
+    ).toBe(
+      'Să obțină Extrasul Multilingv de Căsătorie încheiată cu TAKACS ENIKO NICOLETA la data de 07.02.1987, în Localitatea: Oradea, Județul: Bihor.'
     );
   });
 
   it('la fel pe extrasul multilingv de căsătorie', () => {
-    expect(buildActivitatiStareCivila('extras-multilingv-certificat-casatorie', marriage))
-      .toContain('încheiată cu MUSAT DUMITRU');
+    const text = buildActivitatiStareCivila('extras-multilingv-certificat-casatorie', marriage);
+    expect(text).toContain('Să obțină Extrasul Multilingv de Căsătorie');
+    expect(text).toContain('încheiată cu MUSAT DUMITRU');
+    expect(text).toContain('în Localitatea: Brăila, Județul: Brăila.');
   });
 
   it('adaugă doar ce s-a colectat, fără puncte de umplutură', () => {
     expect(buildActivitatiStareCivila('certificat-casatorie', { spouseName: 'POPA ION' })).toBe(
-      'să obțină certificatul de căsătorie încheiată cu POPA ION'
+      'Să obțină Certificatul de Căsătorie încheiată cu POPA ION.'
     );
     expect(buildActivitatiStareCivila('certificat-casatorie', { marriageDate: '1992-03-28' })).toBe(
-      'să obțină certificatul de căsătorie la data de 28.03.1992'
+      'Să obțină Certificatul de Căsătorie la data de 28.03.1992.'
     );
   });
 
   it('rămâne textul simplu când nu avem detalii', () => {
     expect(buildActivitatiStareCivila('certificat-casatorie', {})).toBe(
-      'să obțină certificatul de căsătorie'
+      'Să obțină Certificatul de Căsătorie.'
     );
     expect(buildActivitatiStareCivila('certificat-casatorie')).toBe(
-      'să obțină certificatul de căsătorie'
+      'Să obțină Certificatul de Căsătorie.'
     );
   });
 
-  it('nu adaugă detalii de căsătorie pe naștere sau celibat', () => {
+  it('nu adaugă detalii de căsătorie pe naștere sau celibat (și fără punct final — templateul are virgulă după tag)', () => {
     expect(buildActivitatiStareCivila('certificat-nastere', marriage)).toBe(
-      'să obțină certificatul de naștere'
+      'Să obțină Certificatul de Naștere'
     );
   });
 

@@ -193,6 +193,9 @@ export async function autoGenerateOrderDocuments(
     spouse_name: civil.spouseNameBeforeMarriage || '',
     marriage_date: civil.marriageDate || '',
     marriage_place: civil.registrationPlace || '',
+    // Localitatea reală a căsătoriei (colectată din 30.07.2026); comenzile
+    // vechi n-o au — builderii cad pe marriage_place (județul).
+    marriage_locality: civil.marriageLocality || '',
     // Certificat de celibat (ANEXA 9): scopul alege varianta de cerere
     // (căsătorie în străinătate vs. „alte situații" — vezi
     // resolveTemplateName în generator.ts) + datele viitorului soț.

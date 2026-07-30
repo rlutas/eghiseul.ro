@@ -10,7 +10,7 @@
 
 import { useEffect, useState, Suspense, useCallback, useRef } from 'react';
 import { toast } from 'sonner';
-import { ArrowLeft, ArrowRight, Loader2, AlertTriangle, CheckCircle, ChevronUp } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Loader2, AlertTriangle, CheckCircle, ChevronUp, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -629,10 +629,22 @@ export function ModularOrderWizard({ initialService, initialOptions, headerExtra
         )}
         <div className="relative z-10 border-t border-neutral-200 bg-white/95 backdrop-blur shadow-[0_-4px_20px_-8px_rgba(0,0,0,0.08)]">
           {/* Expanded summary panel — price breakdown only (clean). The
-              estimated time + trust badges live in the form below. */}
+              estimated time + trust badges live in the form below. Visible X
+              in the top-right corner: a client got stuck with the panel open
+              (30.07.2026) — the backdrop + bottom chevron weren't obvious. */}
           {summaryOpen && (
-            <div className="max-h-[60vh] overflow-y-auto border-b border-neutral-100 p-4">
-              <PriceSidebarModular service={initialService} variant="summary" />
+            <div className="relative border-b border-neutral-100">
+              <button
+                type="button"
+                aria-label="Închide rezumatul"
+                onClick={() => setSummaryOpen(false)}
+                className="absolute top-2 right-2 z-10 rounded-full p-2 text-neutral-500 bg-white/90 shadow-sm border border-neutral-200 hover:bg-neutral-100"
+              >
+                <X className="h-5 w-5" />
+              </button>
+              <div className="max-h-[60vh] overflow-y-auto p-4">
+                <PriceSidebarModular service={initialService} variant="summary" />
+              </div>
             </div>
           )}
           <button

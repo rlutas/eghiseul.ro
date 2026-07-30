@@ -611,6 +611,7 @@ export interface CivilStatusState {
   spouseNameBeforeMarriage?: string;
   futureSpouseName?: string;        // celibat: numele viitorului soț/soție (căsătorie în străinătate)
   marriageDate?: string;
+  marriageLocality?: string;        // Localitatea în care a avut loc căsătoria (casatorie)
   registrationPlace?: string;
   birthName?: string;
   fatherName?: string;

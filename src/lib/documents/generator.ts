@@ -87,10 +87,12 @@ export interface ClientData {
    *  {{DATA_CASATORIE}} pe cererea de extras multilingv de căsătorie. */
   marriage_date?: string;
   /** Județul care a înregistrat actul de căsătorie
-   *  (civil_status.registrationPlace: „Sibiu" / „București (Sectorul N)").
-   *  Pasul civil-status NU colectează localitatea separat, deci același
-   *  string alimentează și localitatea, și județul căsătoriei pe cerere. */
+   *  (civil_status.registrationPlace: „Sibiu" / „București (Sectorul N)"). */
   marriage_place?: string;
+  /** Localitatea în care a avut loc căsătoria (civil_status.marriageLocality,
+   *  colectată din 30.07.2026 la serviciile de căsătorie). Comenzile mai vechi
+   *  nu o au — fallback: marriage_place (județul) umple și localitatea. */
+  marriage_locality?: string;
   /** Certificat de celibat (ANEXA 9): scopul e căsătoria în străinătate?
    *  (civil_status.marriageAbroadIntent). true → cererea pe varianta
    *  „încheierea căsătoriei în străinătate"; altfel varianta „alte situații"
@@ -475,11 +477,13 @@ const DELEGATION_INSTITUTIE_MAP: Record<
  *  împuternicirea avocațială model UNBR. Doar aceste 5 slug-uri au
  *  template-ul nou (src/templates/<slug>/imputernicire.docx). */
 const CIVIL_STATUS_DOCUMENT_MAP: Record<string, string> = {
-  'certificat-nastere': 'certificatul de naștere',
-  'certificat-casatorie': 'certificatul de căsătorie',
-  'certificat-celibat': 'certificatul de celibat',
-  'extras-multilingv-certificat-nastere': 'extrasul multilingv de naștere',
-  'extras-multilingv-certificat-casatorie': 'extrasul multilingv de căsătorie',
+  // Title Case — pe împuternicirea completată de mână colega scrie „Extrasul
+  // Multilingv de Căsătorie", nu „extrasul multilingv..." (model 30.07.2026).
+  'certificat-nastere': 'Certificatul de Naștere',
+  'certificat-casatorie': 'Certificatul de Căsătorie',
+  'certificat-celibat': 'Certificatul de Celibat',
+  'extras-multilingv-certificat-nastere': 'Extrasul Multilingv de Naștere',
+  'extras-multilingv-certificat-casatorie': 'Extrasul Multilingv de Căsătorie',
 };
 
 /** Autoritatea în fața căreia avocatul asistă/reprezintă clientul la
@@ -575,18 +579,26 @@ export function buildMarriageDateRo(marriageDateStr?: string): string {
   return '';
 }
 
-/** Locul căsătoriei pentru cerere — civil_status.registrationPlace. Pasul
- *  colectează DOAR județul care a înregistrat actul (SearchableSelect de
- *  județe + sector pt București), fără localitate, deci același text intră
- *  și la „localitatea", și la „județul" de pe rândul căsătoriei.
+/** Localitatea căsătoriei pentru cerere — civil_status.marriageLocality
+ *  (colectată din 30.07.2026). Comenzile mai vechi n-o au: fallback pe
+ *  registrationPlace (județul), comportamentul de dinainte.
  *  „București (Sectorul N)" se normalizează la „București" (ca la naștere). */
 export function buildLocCasatorie(client: ClientData): string {
+  const locality = (client.marriage_locality || '').trim();
+  if (locality) return locality.replace(/^Bucure[sș]ti\b.*$/i, 'București');
   return (client.marriage_place || '').trim().replace(/^Bucure[sș]ti\b.*$/i, 'București');
 }
 
-/** Județul căsătoriei — identic cu buildLocCasatorie (vezi nota de acolo). */
+/** Județul căsătoriei — civil_status.registrationPlace (județul care a
+ *  înregistrat actul). */
 export function buildJudetCasatorie(client: ClientData): string {
-  return buildLocCasatorie(client);
+  return (client.marriage_place || '').trim().replace(/^Bucure[sș]ti\b.*$/i, 'București');
+}
+
+/** „căsătorită" → „Căsătorită" — the împuternicire prints the marital-status
+ *  label after „Stare Status Civil:", capitalized like the hand-filled model. */
+export function capitalizeFirst(value: string): string {
+  return value ? value.charAt(0).toUpperCase() + value.slice(1) : value;
 }
 
 /** Gender from the CNP's first digit (1/3/5/7 = M, 2/4/6/8 = F). */
@@ -708,13 +720,24 @@ function hasMarriageOnRecord(ctx: DocumentContext): boolean {
  *  certificatul de naștere" etc. Empty for non-stare-civilă services.
  *
  *  On the marriage certificates the delegation also names WHICH marriage, so
- *  the clerk can find the record without a second phone call:
- *  „să obțină certificatul de căsătorie încheiată cu X la data de DD.MM.YYYY,
- *   în localitatea Y". Every part is optional — we only add what the wizard
- *  actually collected, never dots or empty labels. */
+ *  the clerk can find the record without a second phone call (format = the
+ *  hand-filled model from the team, 30.07.2026):
+ *  „Să obțină Certificatul de Căsătorie încheiată cu X la data de DD.MM.YYYY,
+ *   în Localitatea: Oradea, Județul: Bihor."
+ *  marriageLocality e colectată din 30.07.2026; pe comenzile mai vechi județul
+ *  umple ambele etichete (fallback), ca pe cererea ANEXA 4.
+ *  Every part is optional — we only add what the wizard actually collected,
+ *  never dots or empty labels. The marriage text ends with a period because
+ *  the marriage împuternicire templates put „Stare Status Civil:" on the NEXT
+ *  line. */
 export function buildActivitatiStareCivila(
   serviceSlug?: string,
-  marriage?: { spouseName?: string; marriageDate?: string; marriagePlace?: string }
+  marriage?: {
+    spouseName?: string;
+    marriageDate?: string;
+    marriagePlace?: string;
+    marriageLocality?: string;
+  }
 ): string {
   const doc = CIVIL_STATUS_DOCUMENT_MAP[serviceSlug || ''];
   if (!doc) return '';
@@ -722,24 +745,26 @@ export function buildActivitatiStareCivila(
   const isMarriageDoc =
     serviceSlug === 'certificat-casatorie' ||
     serviceSlug === 'extras-multilingv-certificat-casatorie';
-  if (!isMarriageDoc || !marriage) return `să obțină ${doc}`;
+  if (!isMarriageDoc) return `Să obțină ${doc}`;
 
-  const spouse = (marriage.spouseName || '').trim();
-  const date = buildMarriageDateRo(marriage.marriageDate);
-  const place = (marriage.marriagePlace || '')
-    .trim()
-    .replace(/^Bucure[sș]ti\b.*$/i, 'București');
+  const spouse = (marriage?.spouseName || '').trim();
+  const date = buildMarriageDateRo(marriage?.marriageDate);
+  const cleanPlace = (v?: string) =>
+    (v || '').trim().replace(/^Bucure[sș]ti\b.*$/i, 'București');
+  const judet = cleanPlace(marriage?.marriagePlace);
+  const localitate = cleanPlace(marriage?.marriageLocality) || judet;
 
   const parts: string[] = [];
   if (spouse) parts.push(`încheiată cu ${spouse}`);
   if (date) parts.push(`la data de ${date}`);
-  if (place) parts.push(`în ${place}`);
-  if (parts.length === 0) return `să obțină ${doc}`;
+  if (judet || localitate)
+    parts.push(`în Localitatea: ${localitate || judet}, Județul: ${judet || localitate}`);
+  if (parts.length === 0) return `Să obțină ${doc}.`;
 
   // „încheiată cu X" glues to the noun; the rest is a comma-separated tail.
   const [head, ...tail] = parts;
   const detail = tail.length > 0 ? `${head} ${tail.join(', ')}` : head;
-  return `să obțină ${doc} ${detail}`;
+  return `Să obțină ${doc} ${detail}.`;
 }
 
 /**
@@ -1103,12 +1128,14 @@ function buildPlaceholderData(ctx: DocumentContext) {
     // Fără „-" de umplutură: când starea civilă nu se poate deduce cu
     // certitudine, linia rămâne goală (template-ul are deja punctele) în loc
     // să tipărească o liniuță care arată ca un câmp uitat.
-    FILIATIE: buildStareCivilaLabel(ctx.client.civil_status, ctx.client.cnp, {
-      currentlyMarried: ctx.client.currently_married,
-      wasMarriedBefore: ctx.client.was_married_before,
-      lastMarriageEndedBy: ctx.client.last_marriage_ended_by,
-      marriageOnRecord: hasMarriageOnRecord(ctx),
-    }),
+    FILIATIE: capitalizeFirst(
+      buildStareCivilaLabel(ctx.client.civil_status, ctx.client.cnp, {
+        currentlyMarried: ctx.client.currently_married,
+        wasMarriedBefore: ctx.client.was_married_before,
+        lastMarriageEndedBy: ctx.client.last_marriage_ended_by,
+        marriageOnRecord: hasMarriageOnRecord(ctx),
+      })
+    ),
     hasFiliatie: buildFiliatie(ctx.client.father_name, ctx.client.mother_name, ctx.client.cnp) !== '',
     NUMETATA: buildFiliatie(ctx.client.father_name, ctx.client.mother_name, ctx.client.cnp),
     NUMEMAMA: '',
@@ -1116,6 +1143,7 @@ function buildPlaceholderData(ctx: DocumentContext) {
       spouseName: ctx.client.spouse_name,
       marriageDate: ctx.client.marriage_date,
       marriagePlace: ctx.client.marriage_place,
+      marriageLocality: ctx.client.marriage_locality,
     }),
     AUTORITATE_SC: CIVIL_STATUS_DOCUMENT_MAP[ctx.order.service_slug || '']
       ? AUTORITATE_STARE_CIVILA
