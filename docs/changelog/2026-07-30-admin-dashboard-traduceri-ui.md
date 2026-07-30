@@ -39,3 +39,23 @@ ce workflow-ul real are 26. Orice comandă în `submitted_to_institution`,
 
 Verificat: `tsc --noEmit` + `eslint --quiet` curate. Vizual: de confirmat pe
 producție după deploy (admin are login wall, nu s-a putut screenshotui local).
+
+## Completare (aceeași zi): incident + cifrele de vânzări reparate
+
+**Incident post-deploy**: dashboardul a picat în error boundary („A apărut o
+eroare") — React #31: `order_history.new_value` nu e mereu string (evenimentele
+de recovery scriu acolo `{coupon_code, discount_percent}`), iar feedul de
+activitate îl punea în JSX prin fallback. Hotfix `2ecd6ac`: doar string-urile trec.
+Lecție: `new_value` e coloană polimorfă — NU se randează fără typeof check.
+
+**Cifrele de vânzări — auditate pe DB și reparate** (`c48b613`), semnalate de
+Raul („rezultatele cu vânzări azi erau greșite"):
+
+| Problemă | Efect | Fix |
+|---|---|---|
+| lista „plătite" avea 5/16 statusuri | iulie afișa 43.056 RON; real **54.623 RON** (comenzile în depus/standby/traducere invizibile) | listă completă + venit ancorat pe `paid_at` (fallback `created_at` legacy) |
+| „Comenzi azi" = create azi non-draft, zi UTC | afișa 6; plătite real 4 (număra coșuri neplătite + granița 03:00) | `paid_at` în ziua României (Europe/Bucharest via Intl); etichetă „Comenzi plătite azi" |
+| `is_test` numărat peste tot | test în venit/total/distribuții | exclus cu `.not('is_test','is',true)` (atenție: `.neq(true)` ar fi scos și NULL-urile) |
+| rata recovery pe lista scurtă | „recuperate" subnumărat | aceeași listă completă |
+
+Iunie = 0 e corect (platforma a pornit în iulie) — „prima lună" în card.
