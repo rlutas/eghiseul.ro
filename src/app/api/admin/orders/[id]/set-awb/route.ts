@@ -25,7 +25,10 @@ function defaultTrackingUrl(courier: string | null, awb: string): string | null 
     return `https://www.dhl.com/ro-ro/home/tracking/tracking-express.html?submit=1&tracking-id=${encodeURIComponent(awb)}`;
   }
   if (c.includes('posta')) {
-    return `https://www.posta-romana.ro/awb.html?awb=${encodeURIComponent(awb)}`;
+    // awb.html a fost retras (soft-404 „Pagina pe care o cauți nu există" cu
+    // status 200) — raportat de echipă 30.07.2026 pe RN7556879850RO.
+    // track-trace.html e trackerul oficial curent și citește ?awb= din URL.
+    return `https://www.posta-romana.ro/track-trace.html?awb=${encodeURIComponent(awb)}`;
   }
   // Fan/Sameday au generare automată, dar AWB-ul poate ajunge aici când aceasta
   // eșuează (ex. locker fără ID) sau când echipa l-a emis din contul curierului.
