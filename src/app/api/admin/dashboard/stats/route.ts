@@ -43,16 +43,58 @@ export async function GET() {
 
     const adminClient = createAdminClient();
 
-    // Date boundaries
+    // Date boundaries — Romania-local. Vercel runs in UTC, so a plain
+    // `new Date(y, m, d)` starts "today" at 03:00 Romania time and orders
+    // paid between 00:00–03:00 slid into yesterday (team report 30.07.2026).
     const now = new Date();
-    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
-    const yesterdayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1).toISOString();
-    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
-    const prevMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString();
-    const prevMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59, 999).toISOString();
+    const roOffset =
+      new Intl.DateTimeFormat('en', { timeZone: 'Europe/Bucharest', timeZoneName: 'longOffset' })
+        .formatToParts(now)
+        .find((p) => p.type === 'timeZoneName')?.value.replace('GMT', '') || '+03:00';
+    const roParts = new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'Europe/Bucharest',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    }).format(now); // YYYY-MM-DD in RO
+    const [roY, roM, roD] = roParts.split('-').map(Number);
+    const roDate = (y: number, m: number, d: number) =>
+      new Date(
+        `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}T00:00:00${roOffset}`
+      );
+    const todayStart = roDate(roY, roM, roD).toISOString();
+    const yesterdayStart = new Date(roDate(roY, roM, roD).getTime() - 24 * 60 * 60 * 1000).toISOString();
+    const monthStart = roDate(roY, roM, 1).toISOString();
+    const prevMonthStart = (roM === 1 ? roDate(roY - 1, 12, 1) : roDate(roY, roM - 1, 1)).toISOString();
 
-    // Paid statuses for revenue calculation
-    const paidStatuses = ['paid', 'processing', 'document_ready', 'shipped', 'completed'];
+    // Every status that means "the client's money is with us" — the old list
+    // had only 5 of them, so an order sitting in submitted_to_institution /
+    // standby / la_tradus… silently DISAPPEARED from revenue (July was
+    // under-reported by ~11.000 RON when audited on 30.07.2026). Excludes
+    // draft/pending/abandoned (never paid) and cancelled/refunded/
+    // cancellation_requested (money returned or on the way back).
+    const paidStatuses = [
+      'paid',
+      'processing',
+      'documents_generated',
+      'submitted_to_institution',
+      'document_received',
+      'extras_in_progress',
+      'la_tradus',
+      'la_legalizat',
+      'la_apostila_notari',
+      'eliberat_apostila_haga',
+      'document_ready',
+      'shipped',
+      'delivered',
+      'standby',
+      'in_progress',
+      'completed',
+    ];
+    // Revenue is anchored on paid_at (when the money actually arrived), with
+    // created_at as fallback for legacy rows that predate the paid_at column.
+    const paidInWindow = (from: string) =>
+      `and(paid_at.gte.${from}),and(paid_at.is.null,created_at.gte.${from})`;
     // Statuses that hide from default operational view — same set the orders
     // list uses (HIDDEN_FROM_DEFAULT). Counts derived against this set keep
     // the dashboard aligned with what the operator sees in the list.
@@ -68,8 +110,7 @@ export async function GET() {
     const [
       ordersTodayRes,
       ordersYesterdayRes,
-      revenueMonthRes,
-      revenuePrevMonthRes,
+      revenueRowsRes,
       pendingShipmentsRes,
       pendingPaymentsRes,
       totalOrdersRes,
@@ -80,38 +121,35 @@ export async function GET() {
       recoveryEmailsSent30dRes,
       recoveryRecovered30dRes,
       statusDistRes,
-      serviceBreakdownRes,
       testOrdersRes,
     ] = await Promise.all([
-      // Orders today (non-draft)
+      // Orders PAID today — „Comenzi azi" counted pending/abandoned carts and
+      // used the UTC day, so the tile disagreed with actual sales (6 shown vs
+      // 4 paid on 30.07.2026). Test orders excluded.
       adminClient
         .from('orders')
         .select('id', { count: 'exact', head: true })
-        .gte('created_at', todayStart)
-        .neq('status', 'draft'),
+        .gte('paid_at', todayStart)
+        .not('is_test', 'is', true),
 
-      // Orders yesterday (non-draft)
+      // Orders paid yesterday
       adminClient
         .from('orders')
         .select('id', { count: 'exact', head: true })
-        .gte('created_at', yesterdayStart)
-        .lt('created_at', todayStart)
-        .neq('status', 'draft'),
+        .gte('paid_at', yesterdayStart)
+        .lt('paid_at', todayStart)
+        .not('is_test', 'is', true),
 
-      // Revenue this month
+      // Revenue rows since the start of the PREVIOUS month, anchored on
+      // paid_at (created_at fallback for legacy rows). One query feeds
+      // current-month revenue, previous-month revenue AND the per-service
+      // breakdown — partitioned in JS below.
       adminClient
         .from('orders')
-        .select('total_price')
-        .gte('created_at', monthStart)
-        .in('status', paidStatuses),
-
-      // Revenue previous month
-      adminClient
-        .from('orders')
-        .select('total_price')
-        .gte('created_at', prevMonthStart)
-        .lte('created_at', prevMonthEnd)
-        .in('status', paidStatuses),
+        .select('total_price, paid_at, created_at, services(slug, name)')
+        .in('status', paidStatuses)
+        .not('is_test', 'is', true)
+        .or(`paid_at.gte.${prevMonthStart},and(paid_at.is.null,created_at.gte.${prevMonthStart})`),
 
       // Pending shipments (document_ready)
       adminClient
@@ -126,11 +164,12 @@ export async function GET() {
         .eq('status', 'pending')
         .eq('payment_method', 'bank_transfer'),
 
-      // Total orders (excludes everything hidden from the default list).
+      // Total orders (excludes everything hidden from the default list + test).
       adminClient
         .from('orders')
         .select('id', { count: 'exact', head: true })
-        .not('status', 'in', `(${HIDDEN_FROM_DEFAULT.map((s) => `"${s}"`).join(',')})`),
+        .not('status', 'in', `(${HIDDEN_FROM_DEFAULT.map((s) => `"${s}"`).join(',')})`)
+        .not('is_test', 'is', true),
 
       // Total customers
       adminClient
@@ -174,22 +213,14 @@ export async function GET() {
 
       // Status distribution — single SELECT, count happens client-side
       // (we want the labels regardless of how many orders are in each
-      // bucket). Excludes drafts to keep the chart focused on operational
-      // work.
+      // bucket). Excludes drafts + test orders to keep the chart focused on
+      // operational work.
       adminClient
         .from('orders')
         .select('status')
         .neq('status', 'draft')
+        .not('is_test', 'is', true)
         .gte('created_at', thirtyDaysAgo),
-
-      // Service breakdown for the current month: count + revenue per
-      // service slug. We fetch base_price + total_price and group client-side
-      // since PostgREST doesn't expose grouping primitives natively.
-      adminClient
-        .from('orders')
-        .select('total_price, services(slug, name)')
-        .gte('created_at', monthStart)
-        .in('status', paidStatuses),
 
       // Test orders count — surfaces the size of the sandbox cohort so an
       // operator can spot when test orders leak into live (or vice versa).
@@ -199,15 +230,23 @@ export async function GET() {
         .eq('is_test', true),
     ]);
 
-    // Sum revenue
-    const revenueMonth = (revenueMonthRes.data || []).reduce(
-      (sum, row) => sum + (row.total_price || 0),
-      0
-    );
-    const revenuePrevMonth = (revenuePrevMonthRes.data || []).reduce(
-      (sum, row) => sum + (row.total_price || 0),
-      0
-    );
+    // Partition the revenue rows by when the money ARRIVED (paid_at, with
+    // created_at fallback for legacy rows without it).
+    type RevenueRow = {
+      total_price: number | null;
+      paid_at: string | null;
+      created_at: string | null;
+      services: unknown;
+    };
+    const monthStartMs = new Date(monthStart).getTime();
+    const revenueRows = (revenueRowsRes.data ?? []) as unknown as RevenueRow[];
+    const isCurrentMonth = (row: RevenueRow) =>
+      new Date(row.paid_at ?? row.created_at ?? 0).getTime() >= monthStartMs;
+    const currentMonthRows = revenueRows.filter(isCurrentMonth);
+    const revenueMonth = currentMonthRows.reduce((sum, row) => sum + (row.total_price || 0), 0);
+    const revenuePrevMonth = revenueRows
+      .filter((row) => !isCurrentMonth(row))
+      .reduce((sum, row) => sum + (row.total_price || 0), 0);
 
     // Aggregations are extracted to pure helpers in
     // `lib/admin/dashboard-aggregators.ts` so the grouping logic is
@@ -216,7 +255,7 @@ export async function GET() {
       (statusDistRes.data ?? []) as StatusRow[]
     );
     const serviceBreakdown = aggregateServiceRevenue(
-      (serviceBreakdownRes.data ?? []) as unknown as ServiceRevenueRow[]
+      currentMonthRows as unknown as ServiceRevenueRow[]
     );
     const emailsSent = recoveryEmailsSent30dRes.count || 0;
     const recovered = recoveryRecovered30dRes.count || 0;

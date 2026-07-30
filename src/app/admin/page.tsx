@@ -328,7 +328,7 @@ export default function AdminDashboardPage() {
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between gap-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
-                Comenzi azi
+                Comenzi plătite azi
               </CardTitle>
               <KpiIcon icon={ShoppingCart} tint="blue" />
             </div>
@@ -367,7 +367,7 @@ export default function AdminDashboardPage() {
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between gap-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
-                Venituri luna curentă
+                Venituri luna curentă (după data plății)
               </CardTitle>
               <KpiIcon icon={CreditCard} tint="emerald" />
             </div>
