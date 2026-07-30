@@ -45,7 +45,7 @@ import {
   PROVIDER_LABEL,
   type OpenOutages,
 } from '@/lib/services/platform-services';
-import { formatPersonName, cleanNamePart } from '@/lib/format/person-name';
+import { getCustomerName } from '@/lib/admin/customer-name';
 // Single source for status pills (shared with the dashboard) — the dashboard
 // used to carry a stale 9-entry copy that showed newer statuses as raw slugs.
 import { STATUS_BADGES as STATUS_CONFIG } from '@/lib/admin/status-badges';
@@ -564,7 +564,7 @@ export default function AdminOrdersPage() {
                   <TableCell>
                     <div className="flex flex-col">
                       <span className="text-sm font-medium">
-                        {getCustomerName(order)}
+                        {getCustomerName(order.customer_data)}
                         {/* Fulger PORTOCALIU doar la comenzile cu procesare urgentă
                             (paritate cu admin-ul cazierjudiciaronline). */}
                         {Array.isArray(order.selected_options) &&
@@ -740,7 +740,7 @@ export default function AdminOrdersPage() {
                 </DialogTitle>
               </DialogHeader>
               <div className="space-y-1.5 text-sm">
-                <DetailRow label="Client" value={getCustomerName(detailOrder)} />
+                <DetailRow label="Client" value={getCustomerName(detailOrder.customer_data)} />
                 <DetailRow label="Email" value={detailOrder.customer_data?.contact?.email || '—'} />
                 <DetailRow label="Telefon" value={detailOrder.customer_data?.contact?.phone || '—'} />
                 <DetailRow label="Serviciu" value={detailOrder.services?.name || '—'} />
@@ -924,33 +924,8 @@ function SandboxChip({
   );
 }
 
-function getCustomerName(order: OrderRow): string {
-  const cd = order.customer_data;
-  const contact = cd?.contact;
-  const personal = cd?.personalData || cd?.personal;
-  const company = cd?.companyData || cd?.company;
-  const billing = cd?.billing;
-
-  // Clientul afișat = BENEFICIARUL serviciului, nu entitatea de facturare.
-  // O comandă PF (cazier pe persoană) poate avea factura pe angajator
-  // (billing PJ) — afișam greșit firma (ex. E-260709-V9G9M: comanda Biancăi,
-  // factura pe INTERTEK). Firma e clientul DOAR când serviciul e pe firmă
-  // (există company KYC).
-  if (company?.companyName) return company.companyName;
-  if (contact?.name) return cleanNamePart(contact.name);
-  const b = billing as { firstName?: string; lastName?: string; name?: string; companyName?: string } | undefined;
-  // Ordinea românească: familie întâi (vezi src/lib/format/person-name.ts).
-  const name = formatPersonName(
-    contact?.lastName || personal?.lastName || b?.lastName,
-    contact?.firstName || personal?.firstName || b?.firstName,
-  );
-  if (name) return name;
-  // Fallback final — servicii fără pas personal (ex. constatator pe firmă,
-  // identificare imobil): numele există doar la facturare.
-  if (billing?.type === 'persoana_juridica' && billing?.companyName) return billing.companyName;
-  if (b?.name) return b.name;
-  return 'N/A';
-}
+// getCustomerName a fost extras în @/lib/admin/customer-name.ts (sursă unică,
+// partajată cu dashboardul — care avea o copie veche ce afișa N/A pe tot).
 
 // Badge colorat pe serviciu — culorile de la cazierjudiciaronline.com pentru
 // judiciar/auto/fiscal/integritate; roz nou pentru stare civilă. Restul

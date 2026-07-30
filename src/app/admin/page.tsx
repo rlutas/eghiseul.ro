@@ -40,8 +40,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { formatPersonName, cleanNamePart } from '@/lib/format/person-name';
 import { statusBadge, statusLabel } from '@/lib/admin/status-badges';
+import { getCustomerName, type CustomerNameData } from '@/lib/admin/customer-name';
 
 
 // ──────────────────────────────────────────────────────────────
@@ -88,18 +88,7 @@ interface RecentOrder {
   status: string | null;
   total_price: number;
   created_at: string | null;
-  customer_data: {
-    contact?: {
-      email?: string;
-      firstName?: string;
-      lastName?: string;
-      name?: string;
-    };
-    personalData?: {
-      firstName?: string;
-      lastName?: string;
-    };
-  } | null;
+  customer_data: CustomerNameData | null;
   services: { name: string; slug: string } | null;
 }
 
@@ -163,19 +152,6 @@ function formatRON(amount: number): string {
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(amount);
-}
-
-function getCustomerName(order: RecentOrder): string {
-  const contact = order.customer_data?.contact;
-  const personalData = order.customer_data?.personalData;
-  if (contact?.name) return cleanNamePart(contact.name);
-  // Ordinea românească: familie întâi (vezi src/lib/format/person-name.ts).
-  const name = formatPersonName(
-    contact?.lastName || personalData?.lastName,
-    contact?.firstName || personalData?.firstName,
-  );
-  if (name) return name;
-  return 'N/A';
 }
 
 /** Tinted icon chip on the KPI cards — same visual weight on all four. */
@@ -694,7 +670,7 @@ export default function AdminDashboardPage() {
                           {order.friendly_order_id || order.order_number}
                         </TableCell>
                         <TableCell>
-                          <span className="text-sm">{getCustomerName(order)}</span>
+                          <span className="text-sm">{getCustomerName(order.customer_data)}</span>
                         </TableCell>
                         <TableCell className="max-w-[160px] truncate text-sm">
                           {order.services?.name || '-'}
