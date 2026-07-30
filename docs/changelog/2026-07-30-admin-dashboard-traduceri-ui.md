@@ -59,3 +59,21 @@ Raul („rezultatele cu vânzări azi erau greșite"):
 | rata recovery pe lista scurtă | „recuperate" subnumărat | aceeași listă completă |
 
 Iunie = 0 e corect (platforma a pornit în iulie) — „prima lună" în card.
+
+## Completare 2: coloana „Client" afișa N/A pe toate comenzile (`29514e6`)
+
+A treia copie divergentă găsită în aceeași zi: dashboardul avea o versiune
+simplificată a lui `getCustomerName` care citea doar `customer_data.personalData`
+— dar wizardul actual scrie persoana în **`personal`**, iar comenzile pe firmă /
+fără pas personal țin numele în `company`/`billing`. Pagina de comenzi avea
+versiunea corectă.
+
+Fix: `src/lib/admin/customer-name.ts` — sursă unică cu lanțul complet de
+fallback (firmă KYC → contact.name → nume+prenume din contact/personal/billing →
+firmă facturare → billing.name), importată de dashboard + orders list; copiile
+locale șterse.
+
+**Lecția zilei (de 3 ori aceeași boală)**: dashboardul clona config-uri din
+pagina de comenzi (statusuri, evenimente, numele clientului) și copiile
+rămâneau în urmă. Orice config partajat între suprafețe admin merge în
+`src/lib/admin/`, nu se copiază în pagină.
