@@ -46,37 +46,9 @@ import {
   type OpenOutages,
 } from '@/lib/services/platform-services';
 import { formatPersonName, cleanNamePart } from '@/lib/format/person-name';
-
-const STATUS_CONFIG: Record<
-  string,
-  { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline'; className?: string }
-> = {
-  draft: { label: 'Ciornă', variant: 'secondary' },
-  pending: { label: 'În așteptare', variant: 'outline' },
-  abandoned: { label: 'Abandonată', variant: 'secondary', className: 'bg-neutral-200 text-neutral-700' },
-  paid: { label: 'Plătită', variant: 'default', className: 'bg-green-600 text-white' },
-  processing: { label: 'În procesare', variant: 'default', className: 'bg-blue-600 text-white' },
-  documents_generated: { label: 'Documente generate', variant: 'default', className: 'bg-cyan-600 text-white' },
-  submitted_to_institution: { label: 'Depus la instituție', variant: 'default', className: 'bg-indigo-500 text-white' },
-  document_received: { label: 'Document primit', variant: 'default', className: 'bg-teal-600 text-white' },
-  extras_in_progress: { label: 'Extras în lucru', variant: 'default', className: 'bg-orange-500 text-white' },
-  la_tradus: { label: 'La traducere', variant: 'default', className: 'bg-sky-500 text-white' },
-  la_legalizat: { label: 'La legalizare', variant: 'default', className: 'bg-fuchsia-500 text-white' },
-  la_apostila_notari: { label: 'Apostilă Notari', variant: 'default', className: 'bg-pink-500 text-white' },
-  eliberat_apostila_haga: { label: 'Apostilă Haga', variant: 'default', className: 'bg-purple-500 text-white' },
-  delivered: { label: 'Livrată', variant: 'default', className: 'bg-green-600 text-white' },
-  standby: { label: 'Așteptare client', variant: 'outline', className: 'border-amber-400 text-amber-800' },
-  cancellation_requested: { label: 'Anulare solicitată', variant: 'destructive' },
-  kyc_pending: { label: 'KYC Pending', variant: 'outline' },
-  kyc_approved: { label: 'KYC Aprobat', variant: 'default', className: 'bg-green-600 text-white' },
-  kyc_rejected: { label: 'KYC Respins', variant: 'destructive' },
-  document_ready: { label: 'Document gata', variant: 'default', className: 'bg-indigo-600 text-white' },
-  shipped: { label: 'Expediată', variant: 'default', className: 'bg-purple-600 text-white' },
-  in_progress: { label: 'În lucru', variant: 'default', className: 'bg-blue-600 text-white' },
-  completed: { label: 'Finalizată', variant: 'default', className: 'bg-green-700 text-white' },
-  cancelled: { label: 'Anulată', variant: 'destructive' },
-  refunded: { label: 'Rambursată', variant: 'destructive' },
-};
+// Single source for status pills (shared with the dashboard) — the dashboard
+// used to carry a stale 9-entry copy that showed newer statuses as raw slugs.
+import { STATUS_BADGES as STATUS_CONFIG } from '@/lib/admin/status-badges';
 
 interface OrderRow {
   id: string;

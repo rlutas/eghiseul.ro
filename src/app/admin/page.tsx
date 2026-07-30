@@ -18,6 +18,15 @@ import {
   Building,
   ArrowRight,
   Loader2,
+  Mail,
+  StickyNote,
+  ScanLine,
+  Link2,
+  Undo2,
+  Camera,
+  Receipt,
+  BellRing,
+  UserCog,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -32,6 +41,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { formatPersonName, cleanNamePart } from '@/lib/format/person-name';
+import { statusBadge, statusLabel } from '@/lib/admin/status-badges';
 
 
 // ──────────────────────────────────────────────────────────────
@@ -66,6 +76,7 @@ interface ActivityItem {
   orderNumber: string;
   event: string;
   details: Record<string, unknown> | null;
+  newValue: string | null;
   createdAt: string;
 }
 
@@ -91,37 +102,46 @@ interface RecentOrder {
 }
 
 // ──────────────────────────────────────────────────────────────
-// Status badge config (reused from orders page)
-// ──────────────────────────────────────────────────────────────
-
-const STATUS_CONFIG: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline'; className?: string }> = {
-  draft: { label: 'Ciorna', variant: 'secondary' },
-  pending: { label: 'In asteptare', variant: 'outline' },
-  abandoned: { label: 'Abandonata', variant: 'secondary', className: 'bg-neutral-200 text-neutral-700' },
-  paid: { label: 'Platita', variant: 'default', className: 'bg-green-600' },
-  processing: { label: 'In procesare', variant: 'default', className: 'bg-blue-600' },
-  document_ready: { label: 'Document gata', variant: 'default', className: 'bg-indigo-600' },
-  shipped: { label: 'Expediata', variant: 'default', className: 'bg-purple-600' },
-  completed: { label: 'Finalizata', variant: 'default', className: 'bg-green-700' },
-  cancelled: { label: 'Anulata', variant: 'destructive' },
-};
-
-// ──────────────────────────────────────────────────────────────
-// Activity event config
+// Activity event config — every event_type written to order_history has a
+// Romanian label here; unknown ones fall back to the raw slug so a new event
+// is visible (and obviously untranslated) instead of hidden.
 // ──────────────────────────────────────────────────────────────
 
 const EVENT_CONFIG: Record<string, { icon: typeof FileText; label: string; color: string }> = {
-  draft_created: { icon: FileText, label: 'Draft creat', color: 'text-gray-400' },
-  order_created: { icon: ShoppingCart, label: 'Comanda noua', color: 'text-blue-500' },
-  payment_confirmed: { icon: CreditCard, label: 'Plata confirmata', color: 'text-green-500' },
-  payment_failed: { icon: XCircle, label: 'Plata esuata', color: 'text-red-500' },
+  draft_created: { icon: FileText, label: 'Ciornă creată', color: 'text-gray-400' },
+  draft_edited_by_admin: { icon: UserCog, label: 'Ciornă editată de admin', color: 'text-gray-500' },
+  order_created: { icon: ShoppingCart, label: 'Comandă nouă', color: 'text-blue-500' },
+  order_submitted: { icon: ShoppingCart, label: 'Comandă trimisă', color: 'text-blue-500' },
+  payment_confirmed: { icon: CreditCard, label: 'Plată confirmată', color: 'text-green-500' },
+  payment_received: { icon: CreditCard, label: 'Plată încasată', color: 'text-green-500' },
+  payment_verified: { icon: CheckCircle, label: 'Plată verificată', color: 'text-green-600' },
+  payment_rejected: { icon: XCircle, label: 'Plată respinsă', color: 'text-red-500' },
+  payment_failed: { icon: XCircle, label: 'Plată eșuată', color: 'text-red-500' },
+  payment_proof_submitted: { icon: Receipt, label: 'Dovadă de plată trimisă', color: 'text-amber-500' },
+  bank_transfer_submitted: { icon: Building, label: 'Transfer bancar', color: 'text-amber-500' },
+  extra_payment_sent: { icon: Link2, label: 'Link plată extra trimis', color: 'text-amber-500' },
+  extra_payment_reminder_sent: { icon: BellRing, label: 'Reminder plată extra', color: 'text-amber-500' },
+  extra_payment_received: { icon: CreditCard, label: 'Plată extra încasată', color: 'text-green-500' },
+  extra_invoice_issued: { icon: Receipt, label: 'Factură extra emisă', color: 'text-emerald-500' },
+  extra_invoice_failed: { icon: XCircle, label: 'Factură extra eșuată', color: 'text-red-500' },
   awb_created: { icon: Truck, label: 'AWB generat', color: 'text-indigo-500' },
   awb_cancelled: { icon: XCircle, label: 'AWB anulat', color: 'text-red-500' },
+  tracking_update: { icon: Truck, label: 'Actualizare tracking', color: 'text-indigo-400' },
   status_changed: { icon: RefreshCw, label: 'Status schimbat', color: 'text-amber-500' },
-  document_ready: { icon: FileCheck, label: 'Document pregatit', color: 'text-emerald-500' },
+  status_change: { icon: RefreshCw, label: 'Status schimbat', color: 'text-amber-500' },
+  document_generated: { icon: FileCheck, label: 'Document generat', color: 'text-emerald-500' },
+  document_ready: { icon: FileCheck, label: 'Document pregătit', color: 'text-emerald-500' },
+  documents_requested: { icon: Mail, label: 'Documente cerute clientului', color: 'text-amber-500' },
+  reupload_requested: { icon: Camera, label: 'Poză nouă cerută', color: 'text-amber-500' },
+  kyc_photo_resubmitted: { icon: Camera, label: 'Poză reîncărcată', color: 'text-blue-500' },
+  ocr_rerun: { icon: ScanLine, label: 'OCR rulat din nou', color: 'text-gray-500' },
   shipped: { icon: Package, label: 'Expediat', color: 'text-blue-500' },
   delivered: { icon: CheckCircle, label: 'Livrat', color: 'text-green-600' },
-  bank_transfer_submitted: { icon: Building, label: 'Transfer bancar', color: 'text-amber-500' },
+  refunded: { icon: Undo2, label: 'Rambursată', color: 'text-red-500' },
+  note_added: { icon: StickyNote, label: 'Notă adăugată', color: 'text-gray-500' },
+  recovery_email_sent: { icon: Mail, label: 'Email recuperare trimis', color: 'text-blue-400' },
+  resume_link_generated: { icon: Link2, label: 'Link de reluare generat', color: 'text-gray-500' },
+  admin_action: { icon: UserCog, label: 'Acțiune admin', color: 'text-gray-500' },
 };
 
 // ──────────────────────────────────────────────────────────────
@@ -154,6 +174,27 @@ function getCustomerName(order: RecentOrder): string {
   );
   if (name) return name;
   return 'N/A';
+}
+
+/** Tinted icon chip on the KPI cards — same visual weight on all four. */
+function KpiIcon({
+  icon: Icon,
+  tint,
+}: {
+  icon: typeof ShoppingCart;
+  tint: 'blue' | 'emerald' | 'purple' | 'amber';
+}) {
+  const tints: Record<string, string> = {
+    blue: 'bg-blue-50 text-blue-600',
+    emerald: 'bg-emerald-50 text-emerald-600',
+    purple: 'bg-purple-50 text-purple-600',
+    amber: 'bg-amber-50 text-amber-600',
+  };
+  return (
+    <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${tints[tint]}`}>
+      <Icon className="h-4 w-4" aria-hidden="true" />
+    </div>
+  );
 }
 
 // ──────────────────────────────────────────────────────────────
@@ -245,8 +286,7 @@ export default function AdminDashboardPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header — match cazierjudiciaronline.com layout: title + subtitle
-          on the left, "Total (all time)" stat + refresh button on the right. */}
+      {/* Header: title left; all-time totals + refresh right. */}
       <div className="flex items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold">Dashboard</h1>
@@ -256,9 +296,11 @@ export default function AdminDashboardPage() {
         </div>
         <div className="flex items-center gap-4">
           <div className="text-right text-xs text-slate-500 hidden md:block">
-            <div className="uppercase tracking-wide">Total (all time)</div>
+            <div className="uppercase tracking-wide">Total istoric</div>
             <div className="text-sm font-semibold text-slate-900 tabular-nums">
-              {stats ? `${stats.totalOrders} comenzi · ${formatRON(stats.revenueMonth)} RON luna` : '—'}
+              {stats
+                ? `${stats.totalOrders} comenzi · ${stats.totalCustomers} clienți`
+                : '—'}
             </div>
           </div>
           <Button
@@ -272,21 +314,21 @@ export default function AdminDashboardPage() {
             ) : (
               <RefreshCw className="h-4 w-4" />
             )}
-            Actualizeaza
+            Actualizează
           </Button>
         </div>
       </div>
 
-      {/* Row 1: Stats Cards */}
+      {/* Row 1: KPI cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {/* Card 1: Comenzi azi */}
         <Card className="py-4">
           <CardHeader className="pb-2">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
                 Comenzi azi
               </CardTitle>
-              <ShoppingCart className="h-4 w-4 text-muted-foreground" />
+              <KpiIcon icon={ShoppingCart} tint="blue" />
             </div>
           </CardHeader>
           <CardContent>
@@ -294,17 +336,17 @@ export default function AdminDashboardPage() {
               <Skeleton className="h-8 w-20" />
             ) : (
               <>
-                <p className="text-3xl font-bold">{stats?.ordersToday ?? 0}</p>
+                <p className="text-3xl font-bold tabular-nums">{stats?.ordersToday ?? 0}</p>
                 <div className="mt-1 flex items-center gap-1 text-xs">
                   {ordersDiff > 0 ? (
                     <>
                       <TrendingUp className="h-3 w-3 text-green-600" />
-                      <span className="text-green-600">+{ordersDiff} fata de ieri</span>
+                      <span className="text-green-600">+{ordersDiff} față de ieri</span>
                     </>
                   ) : ordersDiff < 0 ? (
                     <>
                       <TrendingDown className="h-3 w-3 text-red-500" />
-                      <span className="text-red-500">{ordersDiff} fata de ieri</span>
+                      <span className="text-red-500">{ordersDiff} față de ieri</span>
                     </>
                   ) : (
                     <>
@@ -318,14 +360,14 @@ export default function AdminDashboardPage() {
           </CardContent>
         </Card>
 
-        {/* Card 2: Venituri luna */}
+        {/* Card 2: Venituri luna curentă */}
         <Card className="py-4">
           <CardHeader className="pb-2">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
-                Venituri luna
+                Venituri luna curentă
               </CardTitle>
-              <CreditCard className="h-4 w-4 text-muted-foreground" />
+              <KpiIcon icon={CreditCard} tint="emerald" />
             </div>
           </CardHeader>
           <CardContent>
@@ -333,25 +375,25 @@ export default function AdminDashboardPage() {
               <Skeleton className="h-8 w-28" />
             ) : (
               <>
-                <p className="text-3xl font-bold">
+                <p className="text-3xl font-bold tabular-nums">
                   {formatRON(stats?.revenueMonth ?? 0)} <span className="text-lg font-normal text-muted-foreground">RON</span>
                 </p>
                 <div className="mt-1 flex items-center gap-1 text-xs">
                   {revenueChange > 0 ? (
                     <>
                       <TrendingUp className="h-3 w-3 text-green-600" />
-                      <span className="text-green-600">+{revenueChange}% fata de luna trecuta</span>
+                      <span className="text-green-600">+{revenueChange}% față de luna trecută</span>
                     </>
                   ) : revenueChange < 0 ? (
                     <>
                       <TrendingDown className="h-3 w-3 text-red-500" />
-                      <span className="text-red-500">{revenueChange}% fata de luna trecuta</span>
+                      <span className="text-red-500">{revenueChange}% față de luna trecută</span>
                     </>
                   ) : (
                     <>
                       <Minus className="h-3 w-3 text-muted-foreground" />
                       <span className="text-muted-foreground">
-                        {stats?.revenuePrevMonth === 0 ? 'prima luna' : 'la fel ca luna trecuta'}
+                        {stats?.revenuePrevMonth === 0 ? 'prima lună' : 'la fel ca luna trecută'}
                       </span>
                     </>
                   )}
@@ -361,15 +403,18 @@ export default function AdminDashboardPage() {
           </CardContent>
         </Card>
 
-        {/* Card 3: De expediat */}
-        <Link href="/admin/orders?status=document_ready">
-          <Card className="py-4 hover:shadow-md transition-shadow cursor-pointer">
+        {/* Card 3: De expediat (click → orders filtered) */}
+        <Link
+          href="/admin/orders?status=document_ready"
+          className="rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
+        >
+          <Card className="h-full py-4 cursor-pointer transition-all hover:border-primary-300 hover:shadow-md">
             <CardHeader className="pb-2">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between gap-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
                   De expediat
                 </CardTitle>
-                <Truck className="h-4 w-4 text-muted-foreground" />
+                <KpiIcon icon={Truck} tint="purple" />
               </div>
             </CardHeader>
             <CardContent>
@@ -377,7 +422,7 @@ export default function AdminDashboardPage() {
                 <Skeleton className="h-8 w-12" />
               ) : (
                 <>
-                  <p className="text-3xl font-bold">{stats?.pendingShipments ?? 0}</p>
+                  <p className="text-3xl font-bold tabular-nums">{stats?.pendingShipments ?? 0}</p>
                   <p className="mt-1 text-xs text-muted-foreground">
                     documente gata, AWB de generat
                   </p>
@@ -387,15 +432,18 @@ export default function AdminDashboardPage() {
           </Card>
         </Link>
 
-        {/* Card 4: Plati de verificat */}
-        <Link href="/admin/orders?status=pending">
-          <Card className="py-4 hover:shadow-md transition-shadow cursor-pointer">
+        {/* Card 4: Plăți de verificat (click → orders filtered) */}
+        <Link
+          href="/admin/orders?status=pending"
+          className="rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
+        >
+          <Card className="h-full py-4 cursor-pointer transition-all hover:border-primary-300 hover:shadow-md">
             <CardHeader className="pb-2">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between gap-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
-                  Plati de verificat
+                  Plăți de verificat
                 </CardTitle>
-                <Building className="h-4 w-4 text-muted-foreground" />
+                <KpiIcon icon={Building} tint="amber" />
               </div>
             </CardHeader>
             <CardContent>
@@ -403,9 +451,9 @@ export default function AdminDashboardPage() {
                 <Skeleton className="h-8 w-12" />
               ) : (
                 <>
-                  <p className="text-3xl font-bold">{stats?.pendingPayments ?? 0}</p>
+                  <p className="text-3xl font-bold tabular-nums">{stats?.pendingPayments ?? 0}</p>
                   <p className="mt-1 text-xs text-muted-foreground">
-                    transfer bancar in asteptare
+                    transfer bancar în așteptare
                   </p>
                 </>
               )}
@@ -476,7 +524,7 @@ export default function AdminDashboardPage() {
                   {stats?.recoveryRecovered30d ?? 0}
                 </p>
                 <p className="mt-0.5 text-[11px] text-emerald-700/80">
-                  rate: {stats?.recoveryRatePercent ?? 0}%
+                  rată: {stats?.recoveryRatePercent ?? 0}%
                 </p>
               </div>
             </div>
@@ -511,27 +559,26 @@ export default function AdminDashboardPage() {
                 {(() => {
                   const maxCount = Math.max(...stats.statusDistribution.map((s) => s.count), 1);
                   return stats.statusDistribution.map((row) => {
-                    const cfg = STATUS_CONFIG[row.status] ?? {
-                      label: row.status,
-                      variant: 'outline' as const,
-                    };
+                    const cfg = statusBadge(row.status);
                     return (
                       <div key={row.status} className="flex items-center gap-3 text-sm">
-                        <div className="w-32 shrink-0">
+                        <div className="w-40 shrink-0">
                           <Badge variant={cfg.variant} className={cfg.className}>
                             {cfg.label}
                           </Badge>
                         </div>
-                        <div
-                          className="h-5 rounded bg-primary-100 transition-all"
-                          style={{ width: `${Math.max((row.count / maxCount) * 100, 2)}%` }}
-                          role="progressbar"
-                          aria-valuenow={row.count}
-                          aria-valuemin={0}
-                          aria-valuemax={maxCount}
-                          aria-label={`${cfg.label}: ${row.count} comenzi`}
-                        />
-                        <span className="ml-auto shrink-0 text-sm font-medium tabular-nums">
+                        <div className="flex-1">
+                          <div
+                            className="h-5 rounded bg-primary-100 transition-all"
+                            style={{ width: `${Math.max((row.count / maxCount) * 100, 2)}%` }}
+                            role="progressbar"
+                            aria-valuenow={row.count}
+                            aria-valuemin={0}
+                            aria-valuemax={maxCount}
+                            aria-label={`${cfg.label}: ${row.count} comenzi`}
+                          />
+                        </div>
+                        <span className="shrink-0 text-sm font-medium tabular-nums">
                           {row.count}
                         </span>
                       </div>
@@ -547,7 +594,7 @@ export default function AdminDashboardPage() {
           <CardHeader className="pb-3">
             <CardTitle className="text-base">Servicii (luna curentă)</CardTitle>
             <p className="mt-0.5 text-xs text-muted-foreground">
-              Câte comenzi și ce revenue per serviciu — sortate după venit.
+              Câte comenzi și ce venit per serviciu — sortate după venit.
             </p>
           </CardHeader>
           <CardContent>
@@ -568,16 +615,18 @@ export default function AdminDashboardPage() {
                       <div className="w-40 shrink-0 truncate" title={row.name}>
                         {row.name}
                       </div>
-                      <div
-                        className="h-5 rounded bg-emerald-100 transition-all"
-                        style={{ width: `${Math.max((row.revenue / maxRev) * 100, 2)}%` }}
-                        role="progressbar"
-                        aria-valuenow={row.revenue}
-                        aria-valuemin={0}
-                        aria-valuemax={maxRev}
-                        aria-label={`${row.name}: ${row.count} comenzi, ${row.revenue} RON`}
-                      />
-                      <div className="ml-auto shrink-0 text-right text-xs">
+                      <div className="flex-1">
+                        <div
+                          className="h-5 rounded bg-emerald-100 transition-all"
+                          style={{ width: `${Math.max((row.revenue / maxRev) * 100, 2)}%` }}
+                          role="progressbar"
+                          aria-valuenow={row.revenue}
+                          aria-valuemin={0}
+                          aria-valuemax={maxRev}
+                          aria-label={`${row.name}: ${row.count} comenzi, ${row.revenue} RON`}
+                        />
+                      </div>
+                      <div className="shrink-0 text-right text-xs">
                         <p className="font-medium tabular-nums">{formatRON(row.revenue)} RON</p>
                         <p className="text-muted-foreground tabular-nums">{row.count} comenzi</p>
                       </div>
@@ -609,7 +658,7 @@ export default function AdminDashboardPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="pl-6">Nr. Comanda</TableHead>
+                  <TableHead className="pl-6">Nr. comandă</TableHead>
                   <TableHead>Client</TableHead>
                   <TableHead>Serviciu</TableHead>
                   <TableHead>Status</TableHead>
@@ -631,15 +680,12 @@ export default function AdminDashboardPage() {
                 ) : recentOrders.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
-                      Nicio comanda inca.
+                      Nicio comandă încă.
                     </TableCell>
                   </TableRow>
                 ) : (
                   recentOrders.map((order) => {
-                    const statusCfg = STATUS_CONFIG[order.status || 'draft'] || {
-                      label: order.status || 'N/A',
-                      variant: 'outline' as const,
-                    };
+                    const statusCfg = statusBadge(order.status || 'draft');
                     return (
                       <TableRow key={order.order_number}>
                         <TableCell className="pl-6 font-mono text-sm font-medium">
@@ -656,7 +702,7 @@ export default function AdminDashboardPage() {
                             {statusCfg.label}
                           </Badge>
                         </TableCell>
-                        <TableCell className="text-right font-medium text-sm">
+                        <TableCell className="text-right font-medium text-sm tabular-nums">
                           {order.total_price?.toFixed(2)} RON
                         </TableCell>
                         <TableCell className="pr-6 text-sm text-muted-foreground">
@@ -680,7 +726,7 @@ export default function AdminDashboardPage() {
         {/* Right: Activity Feed */}
         <Card className="py-4">
           <CardHeader className="pb-2">
-            <CardTitle className="text-base">Activitate recenta</CardTitle>
+            <CardTitle className="text-base">Activitate recentă</CardTitle>
           </CardHeader>
           <CardContent>
             {activityLoading ? (
@@ -697,7 +743,7 @@ export default function AdminDashboardPage() {
               </div>
             ) : activity.length === 0 ? (
               <p className="text-center py-8 text-sm text-muted-foreground">
-                Nicio activitate recenta.
+                Nicio activitate recentă.
               </p>
             ) : (
               <div className="relative space-y-0">
@@ -711,6 +757,12 @@ export default function AdminDashboardPage() {
                     color: 'text-gray-400',
                   };
                   const Icon = config.icon;
+                  // Status changes carry the target status in new_value (or
+                  // metadata.new_status on older rows) — show it translated.
+                  const rawNewStatus =
+                    item.newValue ||
+                    (item.details as Record<string, string> | null)?.new_status ||
+                    null;
 
                   return (
                     <div
@@ -721,7 +773,7 @@ export default function AdminDashboardPage() {
                     >
                       {/* Icon circle */}
                       <div className="relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white border border-border">
-                        <Icon className={`h-3.5 w-3.5 ${config.color}`} />
+                        <Icon className={`h-3.5 w-3.5 ${config.color}`} aria-hidden="true" />
                       </div>
 
                       {/* Content */}
@@ -731,10 +783,8 @@ export default function AdminDashboardPage() {
                         </p>
                         <p className="text-xs text-muted-foreground mt-0.5 truncate">
                           <span className="font-mono">{item.orderNumber}</span>
-                          {item.details && (item.details as Record<string, string>).new_status && (
-                            <span className="ml-1">
-                              &rarr; {(item.details as Record<string, string>).new_status}
-                            </span>
+                          {rawNewStatus && (
+                            <span className="ml-1">&rarr; {statusLabel(rawNewStatus)}</span>
                           )}
                         </p>
                         <p className="text-xs text-muted-foreground/70 mt-0.5">
@@ -749,14 +799,6 @@ export default function AdminDashboardPage() {
           </CardContent>
         </Card>
       </div>
-
-      {/* Summary row */}
-      {!statsLoading && stats && (
-        <div className="flex items-center gap-6 text-sm text-muted-foreground">
-          <span>Total comenzi: <strong className="text-foreground">{stats.totalOrders}</strong></span>
-          <span>Total clienti: <strong className="text-foreground">{stats.totalCustomers}</strong></span>
-        </div>
-      )}
     </div>
   );
 }
