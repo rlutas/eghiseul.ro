@@ -11,6 +11,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { deliverAncpiResult } from '@/lib/ancpi/deliver';
+import { recordInstitutionFeeAuto, ancpiFeeRon } from '@/lib/admin/auto-supplier-cost';
 import { sendEmail } from '@/lib/email/resend';
 import { brandedEmailHtml, infoRows } from '@/lib/email/templates/branded-layout';
 import { logAncpiEvent } from '@/lib/ancpi/log-event';
@@ -143,13 +144,26 @@ export async function POST(req: NextRequest) {
         updated_at: now,
       })
       .eq('id', jobId)
-      .select('order_id')
+      .select('order_id, detail, service_type')
       .maybeSingle();
     if (error) {
       return NextResponse.json({ success: false, error: error.message }, { status: 500 });
     }
     if (updated?.order_id) {
       await deliverAncpiResult(updated.order_id, documentUrls, body.registrationNumber, body.chitantaUrl);
+      // Taxa ANCPI plătită de worker — înregistrată automat ca cost intern:
+      // taxa fixă per imobil (extras CF = 20 lei; chitanța ePay arată 0,00 la
+      // preplătit, deci NU e sursa sumei), fallback chitanță → tarif Setări.
+      // Nu blochează livrarea.
+      const imobile = (updated.detail as { imobile?: unknown[] } | null)?.imobile;
+      await recordInstitutionFeeAuto(supabase, {
+        orderId: updated.order_id,
+        supplier: 'ANCPI',
+        amountRon: ancpiFeeRon(updated.service_type as string),
+        quantity: Array.isArray(imobile) ? imobile.length : 1,
+        chitantaKey: body.chitantaUrl ?? null,
+        reference: body.registrationNumber ?? null,
+      });
     }
     await logAncpiEvent(
       supabase,

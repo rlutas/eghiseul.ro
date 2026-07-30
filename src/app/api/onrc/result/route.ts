@@ -10,6 +10,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { deliverOnrcResult } from '@/lib/onrc/deliver';
+import { recordInstitutionFeeAuto, onrcFeeRon } from '@/lib/admin/auto-supplier-cost';
 import { sendEmail } from '@/lib/email/resend';
 import { brandedEmailHtml, infoRows } from '@/lib/email/templates/branded-layout';
 import { logOnrcEvent } from '@/lib/onrc/log-event';
@@ -164,7 +165,7 @@ export async function POST(req: NextRequest) {
         updated_at: now,
       })
       .eq('id', jobId)
-      .select('order_id')
+      .select('order_id, detail')
       .maybeSingle();
     if (error) {
       return NextResponse.json({ success: false, error: error.message }, { status: 500 });
@@ -172,6 +173,16 @@ export async function POST(req: NextRequest) {
     // Deliver to the customer: attach the PDF to the order + email them.
     if (updated?.order_id) {
       await deliverOnrcResult(updated.order_id, body.documentUrl, body.registrationNumber);
+      // Taxa ONRC plătită de worker (fixă per variantă: de bază/PF 30, istoric
+      // 250) — înregistrată automat ca cost intern, ca echipa să n-o mai
+      // introducă manual la finalizare. Nu blochează livrarea.
+      const documentType = (updated.detail as { documentType?: string } | null)?.documentType;
+      await recordInstitutionFeeAuto(supabase, {
+        orderId: updated.order_id,
+        supplier: 'ONRC',
+        amountRon: onrcFeeRon(documentType),
+        reference: body.registrationNumber ?? null,
+      });
     }
     await logOnrcEvent(
       supabase,
