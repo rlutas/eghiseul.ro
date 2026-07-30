@@ -76,7 +76,9 @@ interface ActivityItem {
   orderNumber: string;
   event: string;
   details: Record<string, unknown> | null;
-  newValue: string | null;
+  /** order_history.new_value — string for status changes, but OBJECT on some
+   *  events (recovery: {coupon_code, discount_percent}); never render as-is. */
+  newValue: unknown;
   createdAt: string;
 }
 
@@ -759,10 +761,13 @@ export default function AdminDashboardPage() {
                   const Icon = config.icon;
                   // Status changes carry the target status in new_value (or
                   // metadata.new_status on older rows) — show it translated.
+                  // new_value is NOT always a string: recovery events store an
+                  // object ({coupon_code, discount_percent}) there, and putting
+                  // that in JSX crashes the whole dashboard (React #31,
+                  // 30.07.2026) — only strings pass.
+                  const candidates = [item.newValue, (item.details as Record<string, unknown> | null)?.new_status];
                   const rawNewStatus =
-                    item.newValue ||
-                    (item.details as Record<string, string> | null)?.new_status ||
-                    null;
+                    (candidates.find((v) => typeof v === 'string' && v.trim() !== '') as string | undefined) ?? null;
 
                   return (
                     <div
