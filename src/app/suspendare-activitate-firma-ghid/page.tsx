@@ -73,7 +73,7 @@ export default function Page() {
         Dosarul e scurt: decizia asociatului unic sau hotărârea adunării generale privind suspendarea
         (cu data de început și durata), declarația-tip pe propria răspundere și cererea de înregistrare
         a mențiunii. Se depune la ghișeu sau online, în portalul ONRC, iar mențiunea se înregistrează de
-        regulă în câteva zile lucrătoare. Din acel moment, starea de „activitate suspendată" devine
+        regulă în câteva zile lucrătoare. Din acel moment, starea de „activitate suspendată” devine
         publică — orice partener care scoate un{' '}
         <Link href="/servicii/certificat-constatator-online/">certificat constatator</Link> al firmei o
         vede negru pe alb.
@@ -131,7 +131,7 @@ export default function Page() {
           după ea nu mai există nicio obligație.
         </li>
         <li>
-          <strong>Nu lăsa firma „în aer"</strong> — nici suspendată, nici radiată, doar nefolosită:
+          <strong>Nu lăsa firma „în aer”</strong> — nici suspendată, nici radiată, doar nefolosită:
           declarațiile curg, amenzile se adună, iar administratorul poate ajunge cu fapte înscrise în{' '}
           <Link href="/servicii/cazier-fiscal-online/">cazierul fiscal</Link>, ceea ce blochează
           înființarea altor firme în viitor.

@@ -203,7 +203,7 @@ export default function Page() {
       </p>
       <p>
         O regulă pe care mulți o află târziu: din perioada totală a concediului,{' '}
-        <strong>cel puțin două luni revin celuilalt părinte</strong> („luna tatălui", extinsă la două
+        <strong>cel puțin două luni revin celuilalt părinte</strong> („luna tatălui”, extinsă la două
         din 2022). Dacă celălalt părinte nu își ia cele două luni, ele <strong>se pierd</strong> — nu se
         transferă. Practic, un singur părinte poate sta acasă cel mult până la vârsta de 2 ani minus
         două luni, iar planificarea acestor luni merită discutată din timp cu angajatorii amândurora.

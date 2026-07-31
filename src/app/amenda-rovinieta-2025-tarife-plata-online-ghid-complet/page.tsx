@@ -237,7 +237,7 @@ export default function Page() {
       <p>
         Ministerul Transporturilor a pus în dezbatere un proiect de ordin care ar diferenția tariful
         rovinietei în funcție de norma de poluare EURO a vehiculului (EURO VI, V–IV, III–0), pe
-        principiul „poluatorul plătește". Proiectul viza data de 1 iulie 2026, dar <strong>nu a intrat
+        principiul „poluatorul plătește”. Proiectul viza data de 1 iulie 2026, dar <strong>nu a intrat
         în vigoare</strong> — tarifele rămân deocamdată cele de mai sus, identice indiferent de norma
         EURO. Actualizăm acest ghid când apar modificări oficiale. Cuantumul amenzilor este stabilit
         prin OG 15/2002, modificată prin OG 23/2025.

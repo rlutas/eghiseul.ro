@@ -63,7 +63,7 @@ export default function Page() {
     >
       <p>
         Închiderea unei firme e procedura pe care nimeni nu o învață până nu ajunge la ea — iar atunci
-        descoperă că „radierea" e de fapt capătul unui lanț cu trei verigi: dizolvare, lichidare,
+        descoperă că „radierea” e de fapt capătul unui lanț cu trei verigi: dizolvare, lichidare,
         radiere. Pentru un SRL fără datorii și fără activitate, drumul e previzibil și se termină în
         două-trei luni. Pentru unul cu datorii sau cu acte neglijate ani la rând, fiecare verigă se
         poate transforma într-un șantier. Ghidul de mai jos acoperă varianta voluntară, cea aleasă de
@@ -90,7 +90,7 @@ export default function Page() {
         </li>
       </ul>
 
-      <h2>Termenul de 30 de zile: de ce nu se poate „repede"</h2>
+      <h2>Termenul de 30 de zile: de ce nu se poate „repede”</h2>
       <p>
         De la publicarea hotărârii de dizolvare în Monitorul Oficial curge un termen de{' '}
         <strong>30 de zile</strong> în care orice creditor poate face opoziție. Termenul e fix și nu se
@@ -121,7 +121,7 @@ export default function Page() {
           ANAF înainte de închidere; procedura uitată reînvie dosarul.
         </li>
         <li>
-          <strong>Declarațiile „din oficiu".</strong> Firmele lăsate ani de zile fără declarații
+          <strong>Declarațiile „din oficiu”.</strong> Firmele lăsate ani de zile fără declarații
           acumulează impuneri estimate de ANAF, care apar ca datorii reale la certificatul fiscal, deși
           firma n-a avut activitate. Corectarea lor durează mai mult decât radierea în sine — și e
           motivul pentru care o firmă nefolosită merită măcar{' '}
@@ -151,7 +151,7 @@ export default function Page() {
         <Link href="/suspendare-activitate-firma-ghid/">suspendarea activității</Link> (maximum 3 ani),
         iar pentru firmele cu istoric bun există și varianta cesiunii părților sociale către un
         cumpărător. Regula practică: vinde doar ce are valoare reală (istoric, autorizații, contracte),
-        suspendă doar ce are șanse reale de reluare, radiază tot restul — o firmă „ținută de rezervă"
+        suspendă doar ce are șanse reale de reluare, radiază tot restul — o firmă „ținută de rezervă”
         fără plan costă timp și expune administratorul la riscuri fără niciun câștig.
       </p>
     </ArticleLayout>

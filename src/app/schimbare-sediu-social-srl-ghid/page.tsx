@@ -64,7 +64,7 @@ export default function Page() {
       <p>
         Mutarea sediului social pare o formalitate până în ziua în care chiar trebuie făcută: contractul
         de comodat a expirat, firma s-a mutat în alt oraș sau contabilul anunță că nu mai poate depune
-        nimic pentru că sediul „a picat". Procedura la Registrul Comerțului este previzibilă, dar are o
+        nimic pentru că sediul „a picat”. Procedura la Registrul Comerțului este previzibilă, dar are o
         ordine precisă a actelor și câteva capcane care întorc dosarele din drum.
       </p>
 

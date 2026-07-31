@@ -76,7 +76,7 @@ export default function Page() {
     >
       <p>
         Cine a lucrat, s-a căsătorit sau și-a depus dosarul de cetățenie în străinătate s-a lovit de
-        cerința care derutează pe toată lumea prima dată: „actul trebuie să aibă apostilă". În spatele
+        cerința care derutează pe toată lumea prima dată: „actul trebuie să aibă apostilă”. În spatele
         denumirii pompoase stă un mecanism simplu, dar cu reguli precise despre cine o aplică, pe ce
         acte și în ce ordine față de traducere. Ghidul de mai jos le ia pe rând.
       </p>
@@ -84,7 +84,7 @@ export default function Page() {
       <h2>Ce este apostila și când îți trebuie</h2>
       <p>
         Apostila este o ștampilă specială (sau, mai nou, un certificat electronic) aplicată pe un act
-        românesc pentru ca acesta să fie recunoscut oficial în alt stat. Ea nu „traduce" și nu
+        românesc pentru ca acesta să fie recunoscut oficial în alt stat. Ea nu „traduce” și nu
         certifică conținutul actului: confirmă doar că semnătura, ștampila și calitatea emitentului
         sunt autentice. Funcționează exclusiv între statele membre ale Convenției de la Haga din 1961,
         peste 120 de țări, de la SUA și Marea Britanie până la Australia și Brazilia.
