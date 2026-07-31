@@ -3,12 +3,12 @@ import { buildPageMetadata } from '@/lib/seo';
 import { ArticleLayout } from '@/components/articole/article-layout';
 
 const SLUG = 'amenda-rovinieta-2025-tarife-plata-online-ghid-complet';
-const TITLE = 'Amendă Rovinietă 2025: Tarife, Plată Online și Contestație';
+const TITLE = 'Amendă Rovinietă 2026: Tarife, Plată Online și Contestație';
 const DESCRIPTION =
-  'Ghid complet despre amenda pentru rovinietă în 2025: cuantumul amenzii pe categorii de vehicule, ' +
+  'Ghid complet despre amenda pentru rovinietă în 2026: cuantumul amenzii pe categorii de vehicule, ' +
   'reducerea de 50% în 15 zile, modalitățile de plată online și termenele de contestație.';
 const DATE_PUBLISHED = '2025-01-01';
-const DATE_MODIFIED = '2026-06-16';
+const DATE_MODIFIED = '2026-07-31';
 
 export const revalidate = 86400;
 
@@ -29,7 +29,7 @@ export default function Page() {
       datePublished={DATE_PUBLISHED}
       dateModified={DATE_MODIFIED}
       publishedLabel="ianuarie 2025"
-      updatedLabel="16 iunie 2026"
+      updatedLabel="31 iulie 2026"
       relatedServices={[
         {
           href: '/tools/verificare-rovinieta-online/',
@@ -39,7 +39,7 @@ export default function Page() {
       ]}
       faqs={[
         {
-          q: 'Cât este amenda pentru lipsa rovinietei în 2025?',
+          q: 'Cât este amenda pentru lipsa rovinietei în 2026?',
           a: 'Pentru autoturisme (categoria A), amenda este cuprinsă între 500 și 1.000 lei. Pentru celelalte categorii de vehicule cuantumul crește în funcție de masa totală maximă autorizată și numărul de locuri, ajungând până la 14.250–28.500 lei pentru vehiculele de minimum 12 tone cu cel puțin 4 axe.',
         },
         {
@@ -55,21 +55,21 @@ export default function Page() {
           a: 'Procesul-verbal poate fi contestat în termen de 15 zile de la primire. După acest termen amenda rămâne definitivă, iar după 30 de zile fără plată pot începe procedurile de executare silită.',
         },
         {
-          q: 'Cât costă rovinieta în 2025?',
-          a: 'Pentru autoturisme, rovinieta costă 3,5€ (aprox. 18 lei) pentru o zi, 6€ (aprox. 30 lei) pentru 10 zile și 50€ (aprox. 250 lei) pentru 12 luni.',
+          q: 'Cât costă rovinieta în 2026?',
+          a: 'Pentru autoturisme, rovinieta costă 3,5€ (aprox. 18 lei) pentru o zi, 6€ (aprox. 31 lei) pentru 10 zile, 9,5€ (aprox. 50 lei) pentru 30 de zile, 15€ (aprox. 79 lei) pentru 60 de zile și 50€ (aprox. 262 lei) pentru 12 luni. Plata se face în lei, la cursul BNR din ziua achiziției.',
         },
       ]}
     >
       <p>
         Circulația fără rovinietă valabilă pe drumurile naționale din România se sancționează cu amendă.
-        În acest ghid găsești <strong>cuantumul amenzii pe categorii de vehicule în 2025</strong>, cum
+        În acest ghid găsești <strong>cuantumul amenzii pe categorii de vehicule în 2026</strong>, cum
         beneficiezi de reducerea de 50%, ce modalități de plată ai la dispoziție și care sunt termenele de
         contestație.
       </p>
 
       <h2>Pe scurt</h2>
       <p>
-        Pentru autoturismele fără rovinietă valabilă în 2025, amenzile sunt cuprinse între{' '}
+        Pentru autoturismele fără rovinietă valabilă în 2026, amenzile sunt cuprinse între{' '}
         <strong>500 și 1.000 lei</strong>. Achitarea în termen de 15 zile dă dreptul la o{' '}
         <strong>reducere de 50%</strong>. Plata online este disponibilă 24/7, iar fereastra de contestație
         este de 15 zile.
@@ -191,10 +191,10 @@ export default function Page() {
         </li>
       </ul>
 
-      <h2>Prețul rovinietei în 2025</h2>
+      <h2>Prețul rovinietei în 2026</h2>
       <p>
         Cea mai sigură metodă de a evita amenda este să ai rovinieta valabilă. Tabelul de mai jos prezintă
-        prețurile pentru autoturisme în 2025.
+        prețurile pentru autoturisme în 2026. Plata se face în lei, la cursul BNR din ziua achiziției.
       </p>
       <table>
         <thead>
@@ -212,16 +212,36 @@ export default function Page() {
           </tr>
           <tr>
             <td>10 zile</td>
-            <td>6€ (~30 lei)</td>
+            <td>6€ (~31 lei)</td>
             <td>Vacanțe scurte</td>
           </tr>
           <tr>
+            <td>30 de zile</td>
+            <td>9,5€ (~50 lei)</td>
+            <td>O lună de condus</td>
+          </tr>
+          <tr>
+            <td>60 de zile</td>
+            <td>15€ (~79 lei)</td>
+            <td>Două luni, sezon</td>
+          </tr>
+          <tr>
             <td>12 luni</td>
-            <td>50€ (~250 lei)</td>
+            <td>50€ (~262 lei)</td>
             <td>Utilizare frecventă</td>
           </tr>
         </tbody>
       </table>
+
+      <h2>Se schimbă tarifele? Proiectul cu norme EURO</h2>
+      <p>
+        Ministerul Transporturilor a pus în dezbatere un proiect de ordin care ar diferenția tariful
+        rovinietei în funcție de norma de poluare EURO a vehiculului (EURO VI, V–IV, III–0), pe
+        principiul „poluatorul plătește". Proiectul viza data de 1 iulie 2026, dar <strong>nu a intrat
+        în vigoare</strong> — tarifele rămân deocamdată cele de mai sus, identice indiferent de norma
+        EURO. Actualizăm acest ghid când apar modificări oficiale. Cuantumul amenzilor este stabilit
+        prin OG 15/2002, modificată prin OG 23/2025.
+      </p>
 
       <h2>Verifică-ți rovinieta înainte de a pleca la drum</h2>
       <p>

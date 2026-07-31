@@ -37,6 +37,8 @@ export default function Page() {
         { q: 'Indemnizația de creștere a copilului se cumulează cu alocația de stat?', a: 'Da. Alocația de stat pentru copii este un drept separat și se acordă în plus față de indemnizația de creștere a copilului sau față de stimulentul de inserție.' },
         { q: 'Până la ce vârstă a copilului se acordă indemnizația?', a: 'Indemnizația se acordă până când copilul împlinește 2 ani. În cazul copilului cu handicap, perioada se extinde până la 3 ani. Dacă te întorci la muncă mai devreme, poți opta pentru stimulentul de inserție.' },
         { q: 'Cât este stimulentul de inserție dacă mă întorc la muncă?', a: 'Stimulentul de inserție este 1.500 lei pe lună dacă obții venituri înainte ca bebelușul să împlinească 6 luni și 650 lei pe lună dacă te întorci mai târziu. Spre deosebire de ICC, stimulentul nu depinde de venitul tău anterior și se acordă în sumă fixă.' },
+        { q: 'Poate tatăl să ia concediul de creștere a copilului?', a: 'Da. Concediul poate fi luat de oricare dintre părinți, dacă a realizat venituri 12 luni din ultimele 24. În plus, cel puțin două luni din perioada totală revin obligatoriu celuilalt părinte — dacă nu le folosește, se pierd, nu se transferă.' },
+        { q: 'Ce acte trebuie la dosarul de indemnizație?', a: 'Certificatul de naștere al copilului, actele de identitate ale părinților, adeverința de venituri pentru cele 12 luni, dovada suspendării contractului de muncă, cererea tip și extrasul de cont. Dosarul se depune la AJPIS în cel mult 60 de zile de la finalul concediului de maternitate.' },
       ]}
     >
       <h2>Cum se calculează indemnizația de creștere a copilului</h2>
@@ -189,6 +191,53 @@ export default function Page() {
           nu poate depăși 8.500 lei, deci net încasezi cel mult 7.650 lei pe lună.
         </li>
       </ul>
+
+      <h2>Concediul de creștere a copilului: cine poate beneficia și cât durează</h2>
+      <p>
+        Concediul de creștere a copilului (CCC) poate fi luat de <strong>oricare dintre părinți</strong>,
+        cu o condiție de bază: să fi realizat venituri impozabile timp de <strong>12 luni din ultimele
+        24</strong> dinaintea nașterii — din salarii, activități independente, drepturi de autor sau
+        combinații între ele. Concediul durează până când copilul împlinește <strong>2 ani</strong>{' '}
+        (3 ani pentru copilul cu handicap), iar pe toată perioada contractul de muncă este suspendat,
+        cu interdicția concedierii.
+      </p>
+      <p>
+        O regulă pe care mulți o află târziu: din perioada totală a concediului,{' '}
+        <strong>cel puțin două luni revin celuilalt părinte</strong> („luna tatălui", extinsă la două
+        din 2022). Dacă celălalt părinte nu își ia cele două luni, ele <strong>se pierd</strong> — nu se
+        transferă. Practic, un singur părinte poate sta acasă cel mult până la vârsta de 2 ani minus
+        două luni, iar planificarea acestor luni merită discutată din timp cu angajatorii amândurora.
+        Pentru cele 10 zile lucrătoare de la naștere, vezi și calculatorul de{' '}
+        <Link href="/calculator/concediu-paternal/">concediu paternal</Link>.
+      </p>
+
+      <h2>Actele pentru dosarul de indemnizație</h2>
+      <p>
+        Dosarul se depune la AJPIS (agenția județeană pentru plăți și inspecție socială), de regulă prin
+        primărie sau direct, în termen de 60 de zile de la finalul concediului de maternitate. Pe scurt,
+        ai nevoie de:
+      </p>
+      <ul>
+        <li>
+          <strong>certificatul de naștere al copilului</strong> (original și copie) — piesa centrală a
+          dosarului; dacă nu l-ai ridicat încă sau ai nevoie de un duplicat, îl poți obține și online,
+          prin serviciul de{' '}
+          <Link href="/servicii/eliberare-certificat-de-nastere/">eliberare a certificatului de naștere</Link>,
+          fără drumuri la starea civilă;
+        </li>
+        <li>actele de identitate ale ambilor părinți și, după caz, certificatul de căsătorie;</li>
+        <li>
+          <strong>adeverința de venituri</strong> de la angajator (sau documentele ANAF pentru veniturile
+          independente) pentru cele 12 luni luate în calcul;
+        </li>
+        <li>dovada suspendării activității (decizia angajatorului de suspendare a contractului);</li>
+        <li>cererea tip și extrasul de cont pentru plata indemnizației.</li>
+      </ul>
+      <p>
+        Pașii administrativi de dinaintea dosarului — de la maternitate până la certificatul de naștere —
+        sunt descriși pe larg în ghidul nostru despre{' '}
+        <Link href="/inregistrare-nastere-copil-nou-nascut/">înregistrarea nașterii unui copil nou-născut</Link>.
+      </p>
 
       <h2>Context legal și actualizări</h2>
       <p>

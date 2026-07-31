@@ -332,6 +332,15 @@ export default function Page() {
         <Link href={serviceUrl('certificat-constatator')}>certificat constatator</Link>: completezi datele, plătești
         securizat cu cardul și primești documentul pe email — fără drumuri la ONRC și fără program de ghișeu.
       </p>
+
+      <p>
+        Constatatorul apare aproape întotdeauna în mijlocul unei proceduri mai mari la Registrul
+        Comerțului. Dacă fix asta pregătești, avem ghiduri separate pentru{' '}
+        <Link href="/schimbare-sediu-social-srl-ghid/">schimbarea sediului social</Link>,{' '}
+        <Link href="/suspendare-activitate-firma-ghid/">suspendarea activității firmei</Link> și{' '}
+        <Link href="/radiere-firma-srl-ghid/">radierea unui SRL</Link> — cu actele, termenele și
+        greșelile care întorc dosarele.
+      </p>
     </ArticleLayout>
   );
 }

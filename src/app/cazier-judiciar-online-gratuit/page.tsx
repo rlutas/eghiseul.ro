@@ -254,9 +254,9 @@ export default function Page() {
       </p>
       <p>
         Un serviciu ca al nostru are sens exact în situațiile în care statul nu ți-a deschis o ușă
-        online: firmă, cetățean străin, plecat din țară fără card românesc, nevoie de hârtie cu
-        apostilă, cerere pentru altcineva. Atunci alternativa reală nu e „gratuit versus plătit”, ci
-        „împuternicit versus drum în țară”.
+        online: firmă, cetățean străin, plecat din țară fără card românesc, nevoie de hârtie cu{' '}
+        <Link href="/apostila-de-la-haga-ghid-acte-obtinere/">apostilă</Link>, cerere pentru altcineva.
+        Atunci alternativa reală nu e „gratuit versus plătit”, ci „împuternicit versus drum în țară”.
       </p>
 
       <h2>Ce ne întreabă oamenii cel mai des</h2>

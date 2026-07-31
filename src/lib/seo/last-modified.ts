@@ -22,7 +22,11 @@
 export const PAGE_LAST_MODIFIED: Record<string, string> = {
   'acte-necesare-casatorie': '2026-06-22',
   'acte-necesare-certificat-de-nastere': '2026-06-19',
-  'amenda-rovinieta-2025-tarife-plata-online-ghid-complet': '2026-06-16',
+  'amenda-rovinieta-2025-tarife-plata-online-ghid-complet': '2026-07-31',
+  'apostila-de-la-haga-ghid-acte-obtinere': '2026-07-31',
+  'schimbare-sediu-social-srl-ghid': '2026-07-31',
+  'suspendare-activitate-firma-ghid': '2026-07-31',
+  'radiere-firma-srl-ghid': '2026-07-31',
   'ancpi-nu-functioneaza': '2026-07-29',
   'anii-lucrati-in-strainatate-se-pun-la-pensie-in-romania': '2026-06-16',
   'cat-costa-cadastrul-si-intabularea': '2026-07-14',

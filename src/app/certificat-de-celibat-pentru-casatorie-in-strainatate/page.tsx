@@ -153,7 +153,9 @@ export default function Page() {
       </table>
       <p>
         Greșeala clasică este să mergi cu certificatul la primărie pentru apostilă — primăria nu pune
-        apostila. Apostila este atribuția <strong>exclusivă a Prefecturii</strong>.
+        apostila. Apostila este atribuția <strong>exclusivă a Prefecturii</strong>. Regulile complete —
+        care instituție apostilează ce, în ce ordine față de traducere și când nu e nevoie deloc — sunt
+        în <Link href="/apostila-de-la-haga-ghid-acte-obtinere/">ghidul despre apostila de la Haga</Link>.
       </p>
 
       <h2>Cât este valabil certificatul de celibat</h2>

@@ -210,6 +210,8 @@ export default function Page() {
       <p>
         În ambele cazuri ordinea e: întâi duplicatul, apoi apostila, apoi traducerea autorizată.
         Inversată, o iei de la capăt — traducerea făcută înainte de apostilă nu acoperă apostila.
+        Cine aplică apostila, cât durează și când poți sări pasul complet — în{' '}
+        <Link href="/apostila-de-la-haga-ghid-acte-obtinere/">ghidul despre apostila de la Haga</Link>.
       </p>
 
       <div className="not-prose my-8 rounded-2xl border-2 border-primary-500 bg-primary-50 p-6">

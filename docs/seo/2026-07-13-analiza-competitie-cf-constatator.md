@@ -136,3 +136,51 @@ Noi avem conținut superior (3.200-4.000 cuvinte, comparații, specimene, recenz
 | certificat dețineri imobile | NEINDEXATĂ → **request indexing cerut 14 iul** | |
 
 **Concluzie:** portofoliul rankează excelent (5 poziții #1-#2). Slabe doar 3 pagini topograf foarte tinere (sub 3 săpt): plan-amplasament, copie-arhiva-ocpi, certificat-detineri. Acțiuni: indexare cerută (dețineri), restul = timp + interlinking din articolele CF (deja făcut parțial) — re-check la 27 iul odată cu CF/constatator.
+
+---
+
+## Update 31 iul 2026: anatomia dianex.ro și cfunciara.ro (cerut de Raul)
+
+### dianex.ro (constatator #7) — puterea NU vine din articole
+
+Sitemap complet analizat (168 articole + ~120 pagini):
+- **Blogul lor e despre ALTCEVA**: contabilitate, PFA, SSM, case de marcat. Pe constatator
+  au DOAR 3 articole subțiri (cum obții, tipurile, PF) din 2025, neactualizate.
+- **Puterea = arhitectura de servicii ONRC**: 30+ pagini de serviciu interconectate —
+  înființări (SRL/PFA/ONG/IF), TOATE mențiunile (schimbare sediu/denumire/CAEN/administrator,
+  cesiune, majorare capital, suspendare/reluare/radiere, punct de lucru), documente ONRC.
+  Domeniul întreg „respiră" registrul comerțului → relevanță topică pe care Google o
+  răsplătește la constatator, deși pagina lor în sine nu-i specială.
+- Sunt firmă reală de contabilitate (Ploiești, top CECCAR) = E-E-A-T de business real.
+
+**Lecție pentru noi:** nu-i batem copiindu-le blogul (n-au blog pe subiect). Diferența lor
+= lățimea serviciilor ONRC. Opțiuni: (a) acceptăm — noi nu facem mențiuni ONRC; (b) construim
+lățimea prin CONȚINUT (ghiduri: schimbare sediu, radiere, suspendare — fără să vindem
+serviciul, cu CTA pe constatator/cazier fiscal, care se cer în fix procesele alea). Varianta
+(b) = cluster ONRC de 6-8 ghiduri, cost doar timp de scris.
+
+### cfunciara.ro (CF #15 head, dar mașină de long-tail) — programmatic pe geografie
+
+Sitemap: **~1.500 URL-uri**, fără lastmod, toate changefreq=daily:
+- Matrice serviciu × județ/oraș pentru TOATE serviciile topograf (extras CF, copie
+  intabulare, certificat sarcini, plan cadastral, inventar coordonate, plan amplasament,
+  releveu, identificare după adresă, copie contract v-c — fix portofoliul nostru din
+  migrarea 084!).
+- **Pagini per instituție: OCPI și BCPI pentru fiecare birou** — „OCPI Cluj", „BCPI Turda"
+  etc. Cerere locală+instituțională pe care noi n-o atingem deloc.
+- Pe head terms NU domină (#15) — 1.500 de pagini le aduc long-tail-ul, nu head-ul.
+
+**Lecție pentru noi:** modelul serviciu×județ îl avem doar pe extras CF (42 pagini).
+Extinderea pe TOATE serviciile topograf = capcana quality-gates (30+ pagini/serviciu ×
+14 servicii = mii de pagini thin — exact ce ne-am interzis în location-seo-scope).
+Ce MERITĂ copiat, țintit:
+1. **Pagini OCPI per județ (42)** — „OCPI [Județ]: program, contact, taxe, cum obții
+   extrasul online" — informațional-instituțional, se leagă natural de paginile CF
+   județene EXISTENTE (pereche ghid↔serviciu), cerere reală („ocpi cluj program").
+   Pilot pe 5 județe mari înainte de rollout.
+2. Identificare după adresă per oraș — DOAR dacă pilotul OCPI performează.
+
+### Ce NU s-a schimbat
+Concluziile din 13-14 iul rămân: portofoliul nostru rankează bine pe long-tail
+(5× #1-#2), problema e head terms (extras CF, constatator) = autoritate → linkurile
+plătite trimise pe 31 iul + timpul.
