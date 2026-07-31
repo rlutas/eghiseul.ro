@@ -19,6 +19,34 @@ export interface ArticleMeta {
 
 export const ARTICLES: ArticleMeta[] = [
   {
+    slug: 'apostila-de-la-haga-ghid-acte-obtinere',
+    title: 'Apostila de la Haga: pe ce acte se aplică, unde o obții și cât costă',
+    excerpt:
+      'Prefectură, tribunal sau Camera Notarilor — cine apostilează ce, în ce ordine față de traducere și situațiile în care nu ai nevoie de apostilă deloc (UE, extrase multilingve).',
+    category: 'Documente pentru străinătate',
+  },
+  {
+    slug: 'schimbare-sediu-social-srl-ghid',
+    title: 'Schimbarea sediului social la SRL: acte, pași la ONRC și ce urmează după',
+    excerpt:
+      'Actele în ordinea corectă, diferența dintre mutarea în același județ și în alt județ, capcanele care întorc dosarul și instituțiile de anunțat după înregistrare.',
+    category: 'Firme & ONRC',
+  },
+  {
+    slug: 'suspendare-activitate-firma-ghid',
+    title: 'Suspendarea activității firmei: procedură, acte și ce obligații rămân',
+    excerpt:
+      'Pauza oficială de maximum 3 ani: mențiunea la ONRC, pasul uitat de la ANAF, obligațiile care NU dispar în suspendare și cum alegi între suspendare și radiere.',
+    category: 'Firme & ONRC',
+  },
+  {
+    slug: 'radiere-firma-srl-ghid',
+    title: 'Radierea unei firme (SRL): etape, acte, durată și greșeli de evitat',
+    excerpt:
+      'Dizolvare, lichidare, radiere — cele trei etape pas cu pas, termenul de opoziție de 30 de zile, certificatul fiscal fără datorii și greșelile care lungesc procesul cu luni.',
+    category: 'Firme & ONRC',
+  },
+  {
     slug: 'cazier-judiciar-online-gratuit',
     title: 'Cazier judiciar online gratuit: cum îl scoți prin ghiseul.ro sau HUB MAI',
     excerpt:
