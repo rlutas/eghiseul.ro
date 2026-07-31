@@ -105,12 +105,30 @@ Prompturi imagini pentru cele 4 articole (cu persoane, per fișier .webp țintă
 
 Amânate explicit (Raul): ghid harta cadastrală + testul de plată pe wizard topograf.
 
+## 3e. Finalizare: imagini generate + homepage + LIVE
+
+- Raul a generat cele 4 imagini cu ChatGPT (din prompturile pregătite); convertite la
+  webp 1600×900 (58–90 KB) și puse în `public/images/articole/` pe numele exacte
+  referențiate de pagini.
+- Articolele noi adăugate în `src/config/articles.ts` (manifestul /blog + homepage) —
+  homepage-ul afișează acum primele 3: apostilă, schimbare sediu, suspendare.
+- **Commit + push: `5489675`** (pachetul întreg: 49 fișiere — articole, imagini,
+  refresh amendă, ICC, interlinking, sitemap, toate docs + articolele backlinks cu
+  DOCX-uri) **+ `b0f6738`** (homepage manifest). Typecheck 0 erori pe ambele.
+  Deploy Vercel automat din push.
+
 ## 4. Status la finalul zilei
 
 - **Trimise spre publicare: 5** (click — cu articolul greșit, în clarificare cu Cristina —
   money, risco, start-up, startupcafe). **economica.net: în așteptare** până se rezolvă
   mutarea articolului CF/ANCPI de pe click.
-- Urmează: linkurile de publicare de la Raul → verificare per articol (dofollow real în
-  sursă, secțiune indexabilă, articol nemarcat „publicitate" unde s-a plătit așa) →
-  snapshot lunar poziții („extras carte funciara" 13,7 head / 10,8 pagină; constatator
-  serviciu 17,5) pentru măsurarea efectului.
+- **Pe site, LIVE (după deploy): 4 articole noi + refresh amendă + secțiuni ICC**,
+  toate cu imagini, sitemap și interlinking la zi.
+- Urmează: (1) linkurile de publicare de la Raul → verificare per articol (dofollow real
+  în sursă, secțiune indexabilă, articol nemarcat „publicitate" unde s-a plătit așa);
+  (2) imaginile pentru cele 6 advertoriale (prompturi în `articole-backlinks/00-imagini-prompturi.md`);
+  (3) snapshot poziții T+2/T+4/T+8 după calendarul din plan §7 („extras carte funciara"
+  13,7 head / 10,8 pagină; constatator serviciu 17,5);
+  (4) valul 2 conținut: restul clusterului ONRC (denumire/CAEN/cesiune), pilot OCPI
+  5 județe, harta cadastrală, succesiune/deces;
+  (5) test plată wizard topograf (blocajul de conversie 8% vs 26%).
