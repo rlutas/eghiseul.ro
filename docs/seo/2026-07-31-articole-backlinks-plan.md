@@ -121,6 +121,17 @@ urbanism (money).
   licență și scriem sursa în document (ex. „Sursă foto: arhiva proprie" / licență stock).
 - Fără branding eGhișeul pe imaginile pentru click.ro și startupcafe.ro.
 
+## 4b. Tracker publicare (se completează pe măsură ce apar linkurile)
+
+| Publicație | Status | URL publicat | Verificat |
+|---|---|---|---|
+| **money.ro** | ✅ PUBLICAT 31 iul / verificat 1 aug | [ce-verifici-inainte-sa-dai-avansul…](https://www.money.ro/stiri/ce-verifici-inainte-sa-dai-avansul-pe-o-locuinta-sau-pe-un-teren-sase-pasi-care--msa03z1c) | ✅ TOATE: 3 dofollow (fără nofollow/sponsored), ancore exacte, fără link în §1 (primul după ~2 paragrafe), index+follow, canonical propriu, text integral, 4× brand, imagine |
+| click.ro | ⏳ trimis (articolul GREȘIT — economica; în clarificare) | — | — |
+| risco.ro | ⏳ trimis | — | — |
+| start-up.ro | ⏳ trimis | — | — |
+| startupcafe.ro | ⏳ trimis | — | — |
+| economica.net | ⏸ în așteptare (după rezolvarea click) | — | — |
+
 ## 5. Flux de lucru
 
 1. ✅ **SCRISE 31.07** — toate 6, în `articole-backlinks/01..06-*.md`, fiecare cu
