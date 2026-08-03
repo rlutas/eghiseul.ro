@@ -51,6 +51,7 @@ The Admin Panel (`/admin`) is the management interface for eGhiseul.ro, providin
 | AWB generation (Fan Courier + Sameday) | `src/components/admin/awb-section.tsx` | One-click AWB with auto-detect |
 | AWB label download (PDF) | `/api/admin/orders/[id]/awb-label` | Print-ready labels |
 | AWB cancellation | `/api/admin/orders/[id]/cancel-awb` | Cancel AWB and revert status |
+| AWB manual + edit/replace | `/api/admin/orders/[id]/set-awb` | Manual AWB (DHL/Poșta/internațional) + „Modifică / înlocuiește AWB-ul" în cardul verde după salvare (paritate CJO, 2026-08-03); înlocuirea se loghează în `order_history` |
 | Payment verification (bank transfer) | `/api/admin/orders/[id]/verify-payment` | Approve/reject with reason |
 | Oblio invoicing toggle (Setări → Plăți) | `src/app/admin/settings/page.tsx` (PaymentsTab) | Switch „Facturare automată"; pauses auto Oblio invoices in test. Gate in `ensureInvoiceForPaidOrder` via `isInvoicingEnabled()`; setting `invoicing.oblio_enabled` in `admin_settings`. Default ON. See spec §2.7. |
 | GDPR cleanup | `/api/admin/cleanup` | Manual + automatic draft cleanup |
@@ -191,6 +192,7 @@ The `employee` role has been replaced by specialized roles. See [Workflow Design
 | `/api/admin/orders/[id]/generate-awb` | POST | `orders.manage` | Generate shipping AWB |
 | `/api/admin/orders/[id]/awb-label` | GET | `orders.manage` | Download AWB label PDF |
 | `/api/admin/orders/[id]/cancel-awb` | POST | `orders.manage` | Cancel AWB |
+| `/api/admin/orders/[id]/set-awb` | POST | `orders.manage` | Manual AWB save/replace (logged in order_history) |
 | `/api/admin/cleanup` | GET, POST | `settings.manage` | GDPR cleanup |
 | `/api/admin/dashboard/stats` | GET | Any admin | Dashboard statistics |
 | `/api/admin/dashboard/activity` | GET | Any admin | Recent activity feed |

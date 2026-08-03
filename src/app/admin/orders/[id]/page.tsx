@@ -4670,8 +4670,19 @@ interface AwbSectionProps {
 
 /** Inline form for recording an AWB the platform can't generate (DHL /
  *  Poșta / other international couriers). Posts to set-awb. */
-function ManualAwbForm({ orderId, courier, onSaved }: { orderId: string; courier: string; onSaved?: () => void }) {
-  const [awb, setAwb] = useState('');
+function ManualAwbForm({
+  orderId,
+  courier,
+  initialAwb,
+  onSaved,
+}: {
+  orderId: string;
+  courier: string;
+  /** Prefill for the edit/replace flow — the form overwrites the saved AWB. */
+  initialAwb?: string;
+  onSaved?: () => void;
+}) {
+  const [awb, setAwb] = useState(initialAwb ?? '');
   const [saving, setSaving] = useState(false);
 
   const save = async () => {
@@ -4840,6 +4851,29 @@ function AwbSection({
           {isLockerDelivery && courierQuote?.lockerName && (
             <p className="text-xs text-muted-foreground">Locker: {courierQuote.lockerName}</p>
           )}
+
+          {/* AWB-ul salvat trebuie să rămână editabil (paritate cu CJO):
+              la Fan/Sameday există „Anulează AWB", dar AWB-urile manuale
+              (DHL/Poșta/internațional) nu aveau NICIO cale de corecție —
+              un număr greșit rămânea blocat pe comandă. Înlocuirea trece
+              tot prin set-awb, care o loghează în istoric. */}
+          <details className="group">
+            <summary className="cursor-pointer list-none text-xs text-muted-foreground underline underline-offset-2 hover:text-foreground">
+              Modifică / înlocuiește AWB-ul
+            </summary>
+            <div className="mt-2 rounded-md border border-border/60 bg-white p-3">
+              <p className="text-xs text-muted-foreground">
+                Noul număr îl înlocuiește pe cel curent și apare imediat pe pagina de status a
+                clientului, cu link de urmărire. Înlocuirea rămâne în istoricul comenzii.
+              </p>
+              <ManualAwbForm
+                orderId={order.id}
+                courier={provider || 'manual'}
+                initialAwb={order.delivery_tracking_number ?? ''}
+                onSaved={onManualAwbSaved}
+              />
+            </div>
+          </details>
         </div>
       </>
     );
