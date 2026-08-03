@@ -129,7 +129,7 @@ urbanism (money).
 | click.ro | ⏳ trimis (articolul GREȘIT — economica; în clarificare) | — | — |
 | **risco.ro** | ✅ PUBLICAT / verificat 3 aug | [cum-verifici-un-partener-de-afaceri…](https://www.risco.ro/suport/parteneri/cum-verifici-un-partener-de-afaceri-inainte-de-contract-patru-pasi-care-costa-sub-500-de-lei-6684) | ✅ versiunea PUBLICĂ: 3 dofollow (constatator + cazier fiscal + homepage), ancore corecte, fără link în §1, index+follow, canonical, imagine featured OK (620×345). ⚠️ preview-ul `?admin=` arată o REVIZIE VECHE (imagine 404, linkuri lipsă ca text simplu) — cerut la risco să nu suprascrie versiunea live cu draftul |
 | start-up.ro | ⏳ trimis | — | — |
-| startupcafe.ro | ⏳ trimis | — | — |
+| **startupcafe.ro** | ✅ PUBLICAT 3 aug / verificat 3 aug | [p-certificatul-constatator…](https://startupcafe.ro/p-certificatul-constatator-actul-pe-care-banca-primaria-si-finantatorul-ti-l-cer-in-acelasi-an-ce-contine-si-cum-il-obtii-104392) | ✅ 2 dofollow (serviciu constatator + ghid 4 tipuri), ancore naturale, fără link în §1, index+follow, canonical, imagine OK cu credit „Sursă: eghiseul.ro". Note: titlu marcat `[P]` (politica lor de advertorial); creditul foto = mențiune brand bonus deși site-ul nu accepta brand în text |
 | economica.net | ⏸ în așteptare (după rezolvarea click) | — | — |
 
 ## 5. Flux de lucru
