@@ -127,7 +127,7 @@ urbanism (money).
 |---|---|---|---|
 | **money.ro** | ✅ PUBLICAT 31 iul / verificat 1 aug | [ce-verifici-inainte-sa-dai-avansul…](https://www.money.ro/stiri/ce-verifici-inainte-sa-dai-avansul-pe-o-locuinta-sau-pe-un-teren-sase-pasi-care--msa03z1c) | ✅ TOATE: 3 dofollow (fără nofollow/sponsored), ancore exacte, fără link în §1 (primul după ~2 paragrafe), index+follow, canonical propriu, text integral, 4× brand, imagine |
 | click.ro | ⏳ trimis (articolul GREȘIT — economica; în clarificare) | — | — |
-| risco.ro | ⏳ trimis | — | — |
+| **risco.ro** | ✅ PUBLICAT / verificat 3 aug | [cum-verifici-un-partener-de-afaceri…](https://www.risco.ro/suport/parteneri/cum-verifici-un-partener-de-afaceri-inainte-de-contract-patru-pasi-care-costa-sub-500-de-lei-6684) | ✅ versiunea PUBLICĂ: 3 dofollow (constatator + cazier fiscal + homepage), ancore corecte, fără link în §1, index+follow, canonical, imagine featured OK (620×345). ⚠️ preview-ul `?admin=` arată o REVIZIE VECHE (imagine 404, linkuri lipsă ca text simplu) — cerut la risco să nu suprascrie versiunea live cu draftul |
 | start-up.ro | ⏳ trimis | — | — |
 | startupcafe.ro | ⏳ trimis | — | — |
 | economica.net | ⏸ în așteptare (după rezolvarea click) | — | — |
