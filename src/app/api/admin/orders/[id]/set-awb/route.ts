@@ -25,8 +25,17 @@ function defaultTrackingUrl(courier: string | null, awb: string): string | null 
     return `https://www.dhl.com/ro-ro/home/tracking/tracking-express.html?submit=1&tracking-id=${encodeURIComponent(awb)}`;
   }
   if (c.includes('posta')) {
-    // awb.html a fost retras (soft-404 „Pagina pe care o cauți nu există" cu
-    // status 200) — raportat de echipă 30.07.2026 pe RN7556879850RO.
+    // Internațional (format UPU S10, ex. RN755687985RO): trackerul Poștei
+    // răspunde „nu a fost încă înregistrată în baza de date poștală" pe toată
+    // durata tranzitului — evenimentele reale vin de la poșta de DESTINAȚIE,
+    // prin UPU, pe care posta-romana.ro nu le afișează (raportat de echipă
+    // 04.08.2026 pe RN755687985RO: parcelsapp arăta vamă + 2 încercări de
+    // livrare în Elveția, Poșta nimic). parcelsapp agregă UPU + poșta de
+    // destinație și are deep-link stabil per AWB.
+    if (/^[A-Z]{2}\d{9}RO$/i.test(awb)) {
+      return `https://parcelsapp.com/en/tracking/${encodeURIComponent(awb)}`;
+    }
+    // Intern: awb.html a fost retras (soft-404 cu status 200, 30.07.2026);
     // track-trace.html e trackerul oficial curent și citește ?awb= din URL.
     return `https://www.posta-romana.ro/track-trace.html?awb=${encodeURIComponent(awb)}`;
   }
