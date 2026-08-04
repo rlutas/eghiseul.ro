@@ -737,10 +737,21 @@ export function buildActivitatiStareCivila(
     marriageDate?: string;
     marriagePlace?: string;
     marriageLocality?: string;
-  }
+  },
+  delegationServiceType?: string | null
 ): string {
   const doc = CIVIL_STATUS_DOCUMENT_MAP[serviceSlug || ''];
   if (!doc) return '';
+
+  // Împuternicirea delegației de APOSTILĂ pe un serviciu de stare civilă
+  // trebuie să spună apostila, nu actul de bază — altfel iese identică cu
+  // împuternicirea principală („Să obțină Certificatul de Celibat" de două
+  // ori, cu numere de delegație diferite; raport echipă E-260802-B5VNY,
+  // 04.08.2026). Detaliile căsătoriei nu-și au locul aici: actul e deja
+  // emis, apostila doar se aplică pe el.
+  if (extractDelegationCode(delegationServiceType) === 'apostila_haga') {
+    return `Să obțină Apostila de la Haga pe ${doc}`;
+  }
 
   const isMarriageDoc =
     serviceSlug === 'certificat-casatorie' ||
@@ -781,6 +792,14 @@ export function buildActivitatiStareCivila(
  * Formatul cheii pentru opțiunile bundled e
  * `bundled:<parentId>:<serviceSlug>:<code>` (vezi delegation-items.ts).
  */
+/** Codul opțiunii dintr-un delegation_service_type — direct (`apostila_haga`)
+ *  sau bundled (`bundled:<parentId>:<serviceSlug>:<code>` → `<code>`). */
+function extractDelegationCode(delegationServiceType?: string | null): string {
+  const dt = (delegationServiceType || '').trim();
+  if (!dt) return '';
+  return dt.startsWith('bundled:') ? dt.split(':')[3] || '' : dt;
+}
+
 export function buildInstitutie(
   serviceSlug?: string,
   motiv?: string,
@@ -1139,15 +1158,23 @@ function buildPlaceholderData(ctx: DocumentContext) {
     hasFiliatie: buildFiliatie(ctx.client.father_name, ctx.client.mother_name, ctx.client.cnp) !== '',
     NUMETATA: buildFiliatie(ctx.client.father_name, ctx.client.mother_name, ctx.client.cnp),
     NUMEMAMA: '',
-    ACTIVITATI_SC: buildActivitatiStareCivila(ctx.order.service_slug, {
-      spouseName: ctx.client.spouse_name,
-      marriageDate: ctx.client.marriage_date,
-      marriagePlace: ctx.client.marriage_place,
-      marriageLocality: ctx.client.marriage_locality,
-    }),
-    AUTORITATE_SC: CIVIL_STATUS_DOCUMENT_MAP[ctx.order.service_slug || '']
-      ? AUTORITATE_STARE_CIVILA
-      : '',
+    ACTIVITATI_SC: buildActivitatiStareCivila(
+      ctx.order.service_slug,
+      {
+        spouseName: ctx.client.spouse_name,
+        marriageDate: ctx.client.marriage_date,
+        marriagePlace: ctx.client.marriage_place,
+        marriageLocality: ctx.client.marriage_locality,
+      },
+      ctx.delegation_service_type
+    ),
+    // Pe delegația de apostilă autoritatea e prefectura (acolo se aplică
+    // apostila), nu oficiul de stare civilă — pereche cu ACTIVITATI_SC.
+    AUTORITATE_SC: !CIVIL_STATUS_DOCUMENT_MAP[ctx.order.service_slug || '']
+      ? ''
+      : extractDelegationCode(ctx.delegation_service_type) === 'apostila_haga'
+        ? DELEGATION_INSTITUTIE_MAP.apostila_haga.authority
+        : AUTORITATE_STARE_CIVILA,
 
     // Extras multilingv — cererea de eliberare (ANEXA 4). Template-ul lui Raul
     // (extras-multilingv-certificat-nastere/cerere-eliberare-pf.docx) folosește

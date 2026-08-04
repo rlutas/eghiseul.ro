@@ -525,6 +525,46 @@ describe('buildActivitatiStareCivila — care căsătorie', () => {
   });
 });
 
+describe('buildActivitatiStareCivila — delegația de apostilă (E-260802-B5VNY)', () => {
+  it('spune apostila, nu actul de bază, pe împuternicirea delegației de apostilă', () => {
+    expect(buildActivitatiStareCivila('certificat-celibat', undefined, 'apostila_haga')).toBe(
+      'Să obțină Apostila de la Haga pe Certificatul de Celibat'
+    );
+    expect(buildActivitatiStareCivila('certificat-nastere', undefined, 'apostila_haga')).toBe(
+      'Să obțină Apostila de la Haga pe Certificatul de Naștere'
+    );
+  });
+
+  it('fără detaliile căsătoriei pe apostila de căsătorie (actul e deja emis)', () => {
+    expect(
+      buildActivitatiStareCivila(
+        'certificat-casatorie',
+        { spouseName: 'MUSAT DUMITRU', marriageDate: '1992-03-28', marriagePlace: 'Brăila' },
+        'apostila_haga'
+      )
+    ).toBe('Să obțină Apostila de la Haga pe Certificatul de Căsătorie');
+  });
+
+  it('și în forma bundled a delegației', () => {
+    expect(
+      buildActivitatiStareCivila(
+        'certificat-celibat',
+        undefined,
+        'bundled:parent-1:certificat-celibat:apostila_haga'
+      )
+    ).toBe('Să obțină Apostila de la Haga pe Certificatul de Celibat');
+  });
+
+  it('împuternicirea principală rămâne neschimbată (delegația serviciului)', () => {
+    expect(buildActivitatiStareCivila('certificat-celibat', undefined, 'certificat-celibat')).toBe(
+      'Să obțină Certificatul de Celibat'
+    );
+    expect(buildActivitatiStareCivila('certificat-celibat', undefined, null)).toBe(
+      'Să obțină Certificatul de Celibat'
+    );
+  });
+});
+
 describe('buildMotivFraza — motivul NU apare pe apostila Haga', () => {
   it('apostila Haga: doar punctul final, fără motiv', () => {
     // Motivul ține de actul de bază (de ce ceri cazierul), nu de apostilare:
