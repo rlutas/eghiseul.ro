@@ -16,9 +16,9 @@ const TITLE = 'ANCPI și e-Terra nu funcționează: atac cibernetic, sisteme pic
 // criza („atacul de la Cadastru", trend 2K+/24h) — căutarea vine pe el.
 const META_TITLE = 'ANCPI / Cadastru nu funcționează — status live și ce faci';
 const DESCRIPTION =
-  'Guvernul a confirmat pe 27 iulie: atac ransomware — o parte din infrastructura de virtualizare a fost criptată și ștearsă, fără dată fermă de repornire pentru e-Terra. Termenul TVA 9% se prelungește: Senatul a votat 30 septembrie. Comandă extrasul CF acum — îl eliberăm automat la revenire.';
+  'Update 3 august: e-Terra, reinstalată în Cloudul Guvernamental, a trecut o nouă rundă de teste STS/DNSC/Cyberint — constatările se remediază, încă fără dată de repornire; informare nouă promisă pe 5 august. Comandă extrasul CF acum — îl eliberăm automat la revenire.';
 const DATE_PUBLISHED = '2026-07-15';
-const DATE_MODIFIED = '2026-07-29';
+const DATE_MODIFIED = '2026-08-04';
 
 export const revalidate = 3600; // outage news — refresh hourly
 
@@ -85,7 +85,7 @@ export default function Page() {
         },
         {
           q: 'Până când e picat ANCPI?',
-          a: 'Nu există un termen ferm — iar pe 27 iulie Guvernul a refuzat explicit să mai dea unul: „nu putem încă anunța o oră sau o dată fermă de repunere în funcțiune — nu dorim să facem promisiuni pe care condițiile tehnice ne pot obliga să le amânăm”. Estimarea anterioară a premierului Bolojan (reluare în săptămâna 27–31 iulie) nu s-a confirmat până acum, la fel ca termenele din 20 și 22 iulie. Reconstrucția infrastructurii se face integral în Cloudul Guvernamental, iar repunerea va fi etapizată, pe componente. Pe 29 iulie, nici notarii publici — informați printr-o comunicare internă a profesiei, după o nouă rundă de discuții cu ANCPI — nu au primit o dată; se discută soluții alternative de deblocare.',
+          a: 'Nu există un termen ferm. Cel mai recent semnal, pe 3 august: Guvernul a anunțat că e-Terra, reinstalată în Cloudul Guvernamental, a parcurs o nouă rundă de teste de securitate, funcționalitate și performanță (STS, DNSC, Cyberint), iar constatările se remediază și se retestează — repunerea se face „imediat ce toate testele și validările tehnice sunt finalizate cu succes”, cu o nouă informare publică promisă cel târziu miercuri, 5 august. Termenele anterioare (20 iulie, 22 iulie, estimarea premierului 27–31 iulie) au trecut toate fără repunere, iar pe 27 iulie Guvernul a refuzat explicit să mai avanseze o dată. Repunerea va fi etapizată, pe componente.',
         },
         {
           q: 'Migrarea în Cloudul Guvernamental s-a terminat pe 22 iulie. De ce tot nu funcționează?',
@@ -150,10 +150,13 @@ export default function Page() {
         oficiile teritoriale — <strong>20 iulie 2026</strong>, „ca urmare a unui incident tehnic
         aflat în curs de investigare” — a fost depășit, la fel și termenul migrării în Cloudul
         Guvernamental (<strong>22 iulie</strong>), care s-a încheiat fără ca serviciile să revină.
-        Situația la zi: pe <strong>27 iulie</strong>, Guvernul a confirmat că atacul a fost de tip{' '}
+        Situația la zi: atacul a fost confirmat pe <strong>27 iulie</strong> ca fiind de tip{' '}
         <strong>ransomware</strong> — o parte din infrastructura de virtualizare a fost criptată și
-        ștearsă — și a anunțat că <strong>nu poate da o dată fermă de repunere</strong>; estimarea
-        anterioară (27–31 iulie) a devenit incertă (vezi <a href="#cronologie">cronologia</a>). Presa locală a relatat blocajul în mai multe județe
+        ștearsă — iar pe <strong>3 august</strong> Guvernul a anunțat că e-Terra, reinstalată în
+        Cloudul Guvernamental, a parcurs <strong>o nouă rundă de teste</strong> (STS, DNSC,
+        Cyberint); constatările sunt în curs de remediere și retestare, <strong>tot fără dată
+        fermă de repunere</strong>, cu o nouă informare promisă{' '}
+        <strong>cel târziu miercuri, 5 august</strong> (vezi <a href="#cronologie">cronologia</a>). Presa locală a relatat blocajul în mai multe județe
         (printre primele,{' '}
         <a href="https://www.bihon.ro/stirile-judetului-bihor/bihorul-afectat-de-blocajul-national-al-ancpi-cadastrul-nu-functioneaza-pana-luni-5337687/" target="_blank" rel="nofollow noopener">
           Bihorul
@@ -218,9 +221,27 @@ export default function Page() {
       <div className="not-prose my-6 space-y-0">
         {[
           {
+            date: '3 august 2026',
+            tag: 'Comunicat Guvern',
+            latest: true,
+            body: (
+              <>
+                Guvernul anunță că testele de <strong>securitate, funcționalitate și
+                performanță</strong> efectuate de <strong>STS, DNSC și Cyberint</strong> asupra
+                aplicației e-Terra, în infrastructura din Cloudul Guvernamental, „au parcurs o
+                nouă rundă de evaluare”. Constatările au fost transmise ANCPI, care lucrează cu
+                cele trei instituții la <strong>remedierea și retestarea fiecărui aspect
+                identificat</strong> — fiecare corecție trece printr-o validare înainte de etapa
+                următoare. Repunerea în funcțiune se va face „imediat ce toate testele și
+                validările tehnice sunt finalizate cu succes”, deci <strong>tot fără o dată
+                anunțată</strong>; Guvernul promite o nouă informare publică{' '}
+                <strong>cel târziu miercuri, 5 august</strong>.
+              </>
+            ),
+          },
+          {
             date: '29 iulie 2026',
             tag: 'Informare notari',
-            latest: true,
             body: (
               <>
                 Notarii publici sunt informați, printr-o comunicare internă transmisă camerelor
@@ -650,6 +671,18 @@ export default function Page() {
       </ul>
 
       <h2>Actualizări</h2>
+      <p>
+        <strong>4 august 2026:</strong> ziua <strong>{outageDays}</strong> de blocaj. Pe{' '}
+        <strong>3 august</strong>, Guvernul a comunicat oficial (gov.ro) că testele de{' '}
+        <strong>securitate, funcționalitate și performanță</strong> derulate de STS, DNSC și
+        Cyberint asupra e-Terra, în infrastructura din Cloudul Guvernamental, au parcurs{' '}
+        <strong>o nouă rundă de evaluare</strong>; constatările au fost transmise ANCPI, care
+        lucrează cu cele trei instituții la remedierea și retestarea fiecărui aspect. Semnal
+        pozitiv: aplicația e instalată în cloud și se testează efectiv — dar repunerea rămâne
+        condiționată de finalizarea cu succes a tuturor validărilor, <strong>fără dată
+        anunțată</strong>. Guvernul promite o nouă informare publică{' '}
+        <strong>cel târziu miercuri, 5 august</strong> — o documentăm aici imediat ce apare.
+      </p>
       <p>
         <strong>29 iulie 2026 (după-amiază):</strong> potrivit unei informări interne transmise
         camerelor notarilor publici, pe care am consultat-o, în cursul zilei a avut loc o nouă
