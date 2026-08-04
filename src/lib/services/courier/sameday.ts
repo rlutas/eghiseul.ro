@@ -503,6 +503,16 @@ export class SamedayProvider implements CourierProvider {
     );
     if (partial) return partial.id;
 
+    // București: Sameday n-are orașul „Bucuresti", doar „Sectorul 1..6".
+    // „Sector 6" nu prinde partial pe „Sectorul 6", deci mapăm cifra explicit.
+    const sectorMatch = normalized.match(/sector\D*(\d)/);
+    if (sectorMatch) {
+      const sector = cities.find(
+        (c) => normalizeForMatch(c.name) === `sectorul ${sectorMatch[1]}`
+      );
+      if (sector) return sector.id;
+    }
+
     console.warn(`[Sameday] Could not resolve city: ${cityName} in county ${countyId}`);
     return null;
   }
@@ -711,17 +721,37 @@ export class SamedayProvider implements CourierProvider {
     }
 
     try {
-      // Resolve county and city IDs
-      const countyId = await this.resolveCountyId(request.recipient.county);
-      const cityId = countyId
-        ? await this.resolveCityId(request.recipient.city, countyId)
-        : null;
+      // Determine service ID
+      let serviceId: number = SAMEDAY_SERVICES.STANDARD_24H;
+      if (request.service === 'LOCKER_NEXTDAY' || request.service === String(SAMEDAY_SERVICES.LOCKER_NEXTDAY)) {
+        serviceId = SAMEDAY_SERVICES.LOCKER_NEXTDAY;
+      } else if (request.service === 'PUDO_NEXTDAY' || request.service === String(SAMEDAY_SERVICES.PUDO_NEXTDAY)) {
+        serviceId = SAMEDAY_SERVICES.PUDO_NEXTDAY;
+      }
 
-      if (!countyId || !cityId) {
-        throw new ShipmentError(
-          'sameday',
-          `Could not resolve location: ${request.recipient.city}, ${request.recipient.county}`
-        );
+      const isLocker = serviceId === SAMEDAY_SERVICES.LOCKER_NEXTDAY;
+      const isOoh = isLocker || serviceId === SAMEDAY_SERVICES.PUDO_NEXTDAY;
+      // Livrarea în locker/PUDO nu poartă adresă de domiciliu — destinatarul e
+      // doar nume/telefon/email, iar locația e `oohLastMile`. Rezolvarea
+      // județ/oraș ar pica degeaba (ex. București: Sameday are doar
+      // „Sectorul 1..6", nu „Bucuresti" — E-260723-VJ39N), așa că o sărim.
+      const isOohWithLocker = isOoh && !!request.lockerId;
+
+      // Resolve county and city IDs (home delivery only)
+      let countyId: number | null = null;
+      let cityId: number | null = null;
+      if (!isOohWithLocker) {
+        countyId = await this.resolveCountyId(request.recipient.county);
+        cityId = countyId
+          ? await this.resolveCityId(request.recipient.city, countyId)
+          : null;
+
+        if (!countyId || !cityId) {
+          throw new ShipmentError(
+            'sameday',
+            `Could not resolve location: ${request.recipient.city}, ${request.recipient.county}`
+          );
+        }
       }
 
       // Get pickup points to find default
@@ -755,17 +785,7 @@ export class SamedayProvider implements CourierProvider {
       );
       const totalParcels = request.packages.reduce((sum, pkg) => sum + pkg.quantity, 0);
 
-      // Determine service ID
-      let serviceId: number = SAMEDAY_SERVICES.STANDARD_24H;
-      if (request.service === 'LOCKER_NEXTDAY' || request.service === String(SAMEDAY_SERVICES.LOCKER_NEXTDAY)) {
-        serviceId = SAMEDAY_SERVICES.LOCKER_NEXTDAY;
-      } else if (request.service === 'PUDO_NEXTDAY' || request.service === String(SAMEDAY_SERVICES.PUDO_NEXTDAY)) {
-        serviceId = SAMEDAY_SERVICES.PUDO_NEXTDAY;
-      }
-
       // Build AWB request
-      const isLocker = serviceId === SAMEDAY_SERVICES.LOCKER_NEXTDAY;
-
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const awbRequest: Record<string, any> = {
         packageType: totalWeight <= 1 ? '1' : '0',
@@ -782,9 +802,9 @@ export class SamedayProvider implements CourierProvider {
           name: request.recipient.name,
           phoneNumber: request.recipient.phone,
           personType: '0', // natural person
-          ...(isLocker
+          ...(isOohWithLocker
             ? {
-                // Locker delivery: no address needed, just name/phone/email
+                // Locker/PUDO delivery: no address needed, just name/phone/email
                 email: request.recipient.email || '',
               }
             : {
@@ -821,8 +841,7 @@ export class SamedayProvider implements CourierProvider {
       // `oohType`: 0 = easybox, 1 = PUDO. Exemplele din doc îl omit (Sameday îl
       // deduce din interval: easybox sub 500.000, PUDO peste), dar îl trimitem
       // explicit ca să nu depindem de deducere când adăugăm PUDO.
-      const isOoh = isLocker || serviceId === SAMEDAY_SERVICES.PUDO_NEXTDAY;
-      if (isOoh && request.lockerId) {
+      if (isOohWithLocker) {
         awbRequest.oohLastMile = request.lockerId;
         awbRequest.oohType = isLocker ? 0 : 1;
       }

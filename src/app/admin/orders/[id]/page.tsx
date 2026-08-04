@@ -1911,6 +1911,28 @@ export default function AdminOrderDetailPage() {
                 {courierQuote?.lockerAddress && (
                   <p className="text-sm text-muted-foreground">{courierQuote.lockerAddress}</p>
                 )}
+                {(() => {
+                  const cd = order.customer_data as AnyObj | null;
+                  const personal = cd?.personal as AnyObj | null;
+                  const addr = order.delivery_address as AnyObj | null;
+                  const recipientName =
+                    addr?.recipientName ||
+                    addr?.name ||
+                    formatPersonName(personal?.lastName, personal?.firstName) ||
+                    null;
+                  const recipientPhone =
+                    addr?.recipientPhone ||
+                    addr?.phone ||
+                    (cd?.contact as AnyObj | null)?.phone ||
+                    null;
+                  if (!recipientName && !recipientPhone) return null;
+                  return (
+                    <p className="text-sm text-muted-foreground">
+                      <span className="font-medium text-foreground">Destinatar:</span>{' '}
+                      {[recipientName, recipientPhone].filter(Boolean).join(' · ')}
+                    </p>
+                  );
+                })()}
               </>
             )}
             {isLockerDelivery && !courierQuote?.lockerId && (
@@ -1919,7 +1941,10 @@ export default function AdminOrderDetailPage() {
                 Emite-l din contul curierului și adaugă-l manual.
               </p>
             )}
-            {order.delivery_address && hasDeliveryAddressData(order.delivery_address as AnyObj) && (
+            {/* La livrarea în locker adresa de domiciliu doar încurcă operatorul
+                (coletul merge la easybox, nu la client acasă) — o ascundem;
+                destinatarul rămâne afișat în secțiunea Locker. */}
+            {!isLockerDelivery && order.delivery_address && hasDeliveryAddressData(order.delivery_address as AnyObj) && (
               <>
                 <Separator className="my-2" />
                 <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Adresa livrare</p>

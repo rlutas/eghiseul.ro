@@ -441,6 +441,8 @@ POST /api/awb
 
 When delivering to a locker, the address fields are omitted. The locker is specified via the `oohLastMile` parameter at the top level of the request.
 
+**County/city resolution is skipped entirely for locker/PUDO shipments** (fix 2026-08-03, order E-260723-VJ39N): the home address is irrelevant for OOH delivery, and resolving it anyway made every Bucharest locker order fail — Sameday's `Bucuresti` county (id 1) contains only the cities `Sectorul 1..6`, never a city named "Bucuresti". For home deliveries, `resolveCityId` maps "Sector N" (any variant containing the digit) onto Sameday's "Sectorul N" as a fallback.
+
 ### parcels Array
 
 Each parcel entry:
