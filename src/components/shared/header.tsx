@@ -20,7 +20,6 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
-import { createClient } from '@/lib/supabase/client';
 import type { User as SupabaseUser } from '@supabase/supabase-js';
 
 type NavLink = { href: string; label: string; type: 'route' | 'hash' };
@@ -70,17 +69,42 @@ export function Header() {
   const pathname = usePathname();
   const router = useRouter();
 
-  // Check auth state
+  // Check auth state. Supabase-js is ~52KB gz — the dynamic import keeps it
+  // out of the initial bundle, and the idle callback keeps its parse/eval off
+  // the critical path (TBT) on slow devices. Logged-out visitors see the
+  // default CTA instantly; logged-in users get their avatar a moment later.
   useEffect(() => {
-    const supabase = createClient();
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      setUser(user);
-      setIsLoading(false);
-    });
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-    });
-    return () => subscription.unsubscribe();
+    let cancelled = false;
+    let unsubscribe: (() => void) | undefined;
+
+    const loadAuth = async () => {
+      const { createClient } = await import('@/lib/supabase/client');
+      if (cancelled) return;
+      const supabase = createClient();
+      supabase.auth.getUser().then(({ data: { user } }) => {
+        if (cancelled) return;
+        setUser(user);
+        setIsLoading(false);
+      });
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+        setUser(session?.user ?? null);
+      });
+      unsubscribe = () => subscription.unsubscribe();
+    };
+
+    const idleId = typeof requestIdleCallback === 'function'
+      ? requestIdleCallback(() => { void loadAuth(); }, { timeout: 2000 })
+      : setTimeout(() => { void loadAuth(); }, 200);
+
+    return () => {
+      cancelled = true;
+      if (typeof requestIdleCallback === 'function') {
+        cancelIdleCallback(idleId as number);
+      } else {
+        clearTimeout(idleId as ReturnType<typeof setTimeout>);
+      }
+      unsubscribe?.();
+    };
   }, []);
 
   useEffect(() => {
@@ -99,6 +123,7 @@ export function Header() {
 
   // Handle logout
   const handleLogout = async () => {
+    const { createClient } = await import('@/lib/supabase/client');
     const supabase = createClient();
     await supabase.auth.signOut();
     router.push('/');
