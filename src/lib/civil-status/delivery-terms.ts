@@ -26,9 +26,13 @@ export interface CivilTermTiers {
 }
 
 export const DEFAULT_CIVIL_TERM_TIERS: CivilTermTiers = {
-  slow: { display: '15-30 zile lucrătoare', minDays: 15, maxDays: 30 },
+  // Realiniat 05.08.2026 (cerere echipă): comenzile depuse pe 22.06/06-08.07
+  // n-au venit nici în 15 zile lucrătoare — oficiile livrează efectiv în
+  // 15-30, Bucureștiul și peste 30. Valorile vechi (7-15 default, 15-30 BUC)
+  // promiteau termene pe care nu le puteam ține.
+  slow: { display: '30-45 zile lucrătoare', minDays: 30, maxDays: 45 },
   fast: { display: '5-7 zile lucrătoare', minDays: 5, maxDays: 7, counties: ['Satu Mare'] },
-  default: { display: '7-15 zile lucrătoare', minDays: 7, maxDays: 15 },
+  default: { display: '15-30 zile lucrătoare', minDays: 15, maxDays: 30 },
 };
 
 /**

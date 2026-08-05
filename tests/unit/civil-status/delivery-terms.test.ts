@@ -15,13 +15,13 @@ import {
  */
 
 describe('resolveCivilTermTier', () => {
-  it('treats any București sector as SLOW (15-30)', () => {
+  it('treats any București sector as SLOW (30-45)', () => {
     for (let i = 1; i <= 6; i++) {
       const r = resolveCivilTermTier(`București (Sectorul ${i})`);
       expect(r.tier).toBe('slow');
-      expect(r.display).toBe('15-30 zile lucrătoare');
-      expect(r.minDays).toBe(15);
-      expect(r.maxDays).toBe(30);
+      expect(r.display).toBe('30-45 zile lucrătoare');
+      expect(r.minDays).toBe(30);
+      expect(r.maxDays).toBe(45);
     }
   });
 
@@ -42,10 +42,10 @@ describe('resolveCivilTermTier', () => {
     expect(resolveCivilTermTier('SATU MARE').tier).toBe('fast');
   });
 
-  it('falls back to DEFAULT (7-15) for any other county', () => {
+  it('falls back to DEFAULT (15-30) for any other county', () => {
     const r = resolveCivilTermTier('Cluj');
     expect(r.tier).toBe('default');
-    expect(r.display).toBe('7-15 zile lucrătoare');
+    expect(r.display).toBe('15-30 zile lucrătoare');
   });
 
   it('returns DEFAULT for empty / undefined input', () => {
@@ -111,9 +111,9 @@ describe('CIVIL_COUNTY_OPTIONS + BUCHAREST_SECTORS (cascade UI)', () => {
 
 describe('DEFAULT_CIVIL_TERM_TIERS', () => {
   it('has the expected baseline displays', () => {
-    expect(DEFAULT_CIVIL_TERM_TIERS.slow.display).toBe('15-30 zile lucrătoare');
+    expect(DEFAULT_CIVIL_TERM_TIERS.slow.display).toBe('30-45 zile lucrătoare');
     expect(DEFAULT_CIVIL_TERM_TIERS.fast.display).toBe('5-7 zile lucrătoare');
-    expect(DEFAULT_CIVIL_TERM_TIERS.default.display).toBe('7-15 zile lucrătoare');
+    expect(DEFAULT_CIVIL_TERM_TIERS.default.display).toBe('15-30 zile lucrătoare');
     expect(DEFAULT_CIVIL_TERM_TIERS.fast.counties).toContain('Satu Mare');
   });
 });

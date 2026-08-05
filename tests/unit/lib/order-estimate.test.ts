@@ -169,7 +169,7 @@ describe('computeEstimatedCompletionISOForOrder — civil tier resolution', () =
       MONDAY
     );
 
-    // Default tier 7-15 → 15 business days from Mon Jul 20 (day 1) = Fri Aug 7.
-    expect(iso?.slice(0, 10)).toBe('2026-08-07');
+    // Default tier 15-30 (realiniat 05.08.2026) → 30 business days from Mon Jul 20 (day 1) = Fri Aug 28.
+    expect(iso?.slice(0, 10)).toBe('2026-08-28');
   });
 });

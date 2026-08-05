@@ -856,9 +856,9 @@ interface CivilTiers {
 }
 
 const CIVIL_TIERS_DEFAULT: CivilTiers = {
-  slow: { display: '15-30 zile lucrătoare', minDays: 15, maxDays: 30 },
+  slow: { display: '30-45 zile lucrătoare', minDays: 30, maxDays: 45 },
   fast: { display: '5-7 zile lucrătoare', minDays: 5, maxDays: 7, counties: ['Satu Mare'] },
-  default: { display: '7-15 zile lucrătoare', minDays: 7, maxDays: 15 },
+  default: { display: '15-30 zile lucrătoare', minDays: 15, maxDays: 30 },
 };
 
 function CivilTermsTab() {
