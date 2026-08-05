@@ -38,6 +38,21 @@ export const PLATFORM_DEPENDENT_SERVICES: Readonly<Record<string, PlatformProvid
   'copie-carte-funciara': 'ancpi',
   'copie-plan-cadastral': 'ancpi',
   'certificat-detineri-imobile': 'ancpi',
+  // Restul serviciilor topograf (colaborator) — toate lucrează prin e-Terra,
+  // deci în timpul blocajului ANCPI nu se poate face NIMIC pe ele; clienții
+  // trebuie să vadă bannerul de indisponibilitate (cerere echipă 05.08.2026,
+  // incidentul ANCPI din 13.07).
+  'actualizare-adresa-cf': 'ancpi',
+  'certificat-sarcini': 'ancpi',
+  'certificat-urbanism-informare': 'ancpi',
+  'copie-arhiva-ocpi': 'ancpi',
+  'copie-contract-vanzare': 'ancpi',
+  'copie-intabulare': 'ancpi',
+  'copie-inventar-coordonate': 'ancpi',
+  'copie-plan-incadrare': 'ancpi',
+  'copie-releveu': 'ancpi',
+  'extras-cf-colectiv': 'ancpi',
+  'plan-amplasament-delimitare': 'ancpi',
 });
 
 /** Provider whose live status is relevant to this service (instant OR dependent). */

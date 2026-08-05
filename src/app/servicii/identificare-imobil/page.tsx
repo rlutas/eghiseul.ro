@@ -187,7 +187,7 @@ export default async function IdentificareImobilPage() {
 
                 {/* Identificarea se face în e-Terra — în timpul unei căderi ANCPI
                     clientul trebuie să vadă ASTA înainte să plătească. */}
-                <SystemStatus service="ancpi" autoIssued={false} className="mb-6" />
+                <SystemStatus service="ancpi" autoIssued={false} compact className="mb-6" />
 
                 <div className="bg-white/10 backdrop-blur-sm rounded-xl p-5 border border-white/20 mb-6">
                   <p className="text-white/90 leading-relaxed text-sm sm:text-base">

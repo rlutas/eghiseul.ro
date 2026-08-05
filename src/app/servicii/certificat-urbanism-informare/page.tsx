@@ -24,6 +24,7 @@ import { MobileStickyCTA } from '@/components/services/mobile-sticky-cta';
 import { WhatsAppButton } from '@/components/services/whatsapp-button';
 import { GoogleReviewsBadge } from '@/components/services/google-reviews-badge';
 import { OrderButton } from '@/components/services/order-button';
+import { SystemStatus } from '@/components/services/system-status';
 import { ServiceFAQ } from '@/components/services/service-faq';
 import { ReviewsSection } from '@/components/services/reviews-section';
 import { ServiceOptionsSection } from '@/components/services/service-options-section';
@@ -323,6 +324,9 @@ export default async function CertificatUrbanismPage() {
                         <p className="text-xs text-neutral-500">documentul scanat, imediat ce e emis</p>
                       </div>
                     </div>
+                    {/* Lucrarea trece prin e-Terra — în timpul unei căderi ANCPI clientul
+                        trebuie să vadă asta înainte să plătească. */}
+                    <SystemStatus service="ancpi" autoIssued={false} compact className="mb-3" />
                     <OrderButton href={`/comanda/${SERVICE_SLUG}`} className="w-full mt-4">
                       Comandă Acum
                     </OrderButton>

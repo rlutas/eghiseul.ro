@@ -18,6 +18,7 @@ export function SystemStatus({
   className = '',
   service = 'onrc',
   autoIssued = true,
+  compact = false,
 }: {
   className?: string;
   /** Which provider's status to show: 'onrc' (constatator) or 'ancpi' (carte funciară). */
@@ -28,6 +29,13 @@ export function SystemStatus({
    * only true for worker-issued services.
    */
   autoIssued?: boolean;
+  /**
+   * O singură linie: bulină + „Sistem ANCPI indisponibil (din 14 iulie)".
+   * Pentru cardul de preț de pe paginile de servicii, unde varianta completă
+   * (griduri + paragraful amber) lungea prea mult secțiunea (feedback Raul,
+   * 05.08.2026). Când sistemul e operațional nu randează NIMIC — nu ocupă loc.
+   */
+  compact?: boolean;
 }) {
   const [status, setStatus] = useState<StatusResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -55,6 +63,32 @@ export function SystemStatus({
 
   const operational = status?.operational ?? true; // optimistic before first load
   const dot = (up: boolean) => (up ? 'bg-green-500' : 'bg-red-500');
+
+  if (compact) {
+    // Nimic cât timp e operațional (sau încă verificăm) — linia apare doar la
+    // căderi. Detaliile complete rămân în wizard (varianta full din sidebar).
+    if (loading || operational) return null;
+    const since = status?.outageSince
+      ? new Date(status.outageSince).toLocaleString('ro-RO', {
+          day: 'numeric',
+          month: 'long',
+          timeZone: 'Europe/Bucharest',
+        })
+      : null;
+    return (
+      <div
+        role="status"
+        aria-live="polite"
+        className={`flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 ${className}`}
+      >
+        <span className="inline-block h-2 w-2 flex-shrink-0 rounded-full bg-red-500" aria-hidden="true" />
+        <span className="text-xs font-medium text-red-900">
+          Sistemul {service === 'ancpi' ? 'ANCPI' : 'ONRC'} este momentan indisponibil
+          {since ? ` (din ${since})` : ''}
+        </span>
+      </div>
+    );
+  }
 
   return (
     <div

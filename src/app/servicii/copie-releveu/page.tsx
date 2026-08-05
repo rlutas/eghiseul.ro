@@ -27,6 +27,7 @@ import { MobileStickyCTA } from '@/components/services/mobile-sticky-cta';
 import { WhatsAppButton } from '@/components/services/whatsapp-button';
 import { GoogleReviewsBadge } from '@/components/services/google-reviews-badge';
 import { OrderButton } from '@/components/services/order-button';
+import { SystemStatus } from '@/components/services/system-status';
 import { buildPageMetadata, buildServicePageGraph, BASE_URL, serviceUrl, SERVICE_AGGREGATE_RATING } from '@/lib/seo';
 import { getImobiliareServices } from '@/lib/services/imobiliare';
 import { ServiceSwitcher } from '@/components/services/service-switcher';
@@ -245,6 +246,9 @@ export default async function CopieReleveuPage() {
                       </div>
                     </div>
 
+                    {/* Lucrarea trece prin e-Terra — în timpul unei căderi ANCPI clientul
+                        trebuie să vadă asta înainte să plătească. */}
+                    <SystemStatus service="ancpi" autoIssued={false} compact className="mb-3" />
                     <OrderButton href={`/comanda/${SERVICE_SLUG}`} className="w-full mt-4">Comandă Acum</OrderButton>
 
                     <div className="flex items-center justify-center gap-4 pt-3 border-t border-neutral-100">

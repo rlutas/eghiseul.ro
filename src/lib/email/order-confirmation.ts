@@ -9,9 +9,63 @@
  */
 import { sendEmail } from '@/lib/email/resend';
 import { renderOrderConfirmationEmail } from '@/lib/email/templates/order-confirmation';
+import { brandedEmailHtml, ctaButton, infoRows, escHtml } from '@/lib/email/templates/branded-layout';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AdminClient = any;
+
+/**
+ * Heads-up către colaboratorul serviciului (ex. Mircea, topograf) la fiecare
+ * comandă PLĂTITĂ pe un serviciu din collaborator_service_assignments.
+ * Până acum emailul pleca DOAR la asignarea manuală din admin — comenzile din
+ * 04.08 (plan-amplasament, copie-inventar-coordonate) au stat nevăzute deși
+ * apăreau în portalul lui (raport echipă 05.08.2026). Best effort: nu blochează
+ * și nu eliberează claim-ul confirmării clientului.
+ */
+async function notifyCollaboratorsOfPaidOrder(
+  adminClient: AdminClient,
+  order: { id: string; friendly_order_id?: string | null; service_id?: string | null },
+  serviceName: string
+): Promise<void> {
+  if (!order.service_id) return;
+  const { data: assignments } = await adminClient
+    .from('collaborator_service_assignments')
+    .select('collaborator_id')
+    .eq('service_id', order.service_id);
+  if (!assignments?.length) return;
+
+  const friendly = order.friendly_order_id || order.id;
+  const portalUrl = `https://eghiseul.ro/colaborator/orders/${order.id}`;
+  for (const a of assignments) {
+    try {
+      const { data: authUser } = await adminClient.auth.admin.getUserById(a.collaborator_id);
+      const email = authUser?.user?.email;
+      if (!email) continue;
+      const html = brandedEmailHtml({
+        preheader: `Comandă nouă plătită: ${friendly} — ${serviceName}`,
+        content: `
+        <h1 style="margin:0 0 6px;color:#0B1B33;font-size:20px;">Comandă nouă pe serviciul tău</h1>
+        <p style="margin:0 0 18px;color:#475569;font-size:14px;line-height:1.6;">Salut! A intrat o comandă nouă plătită pe unul din serviciile tale din portalul de colaborator.</p>
+        ${infoRows([
+          { label: 'Comandă', value: friendly, mono: true },
+          { label: 'Serviciu', value: escHtml(serviceName) },
+        ])}
+        <p style="margin:18px 0 0;color:#475569;font-size:14px;line-height:1.6;">Toate datele pentru lucrare (imobil, adresă, proprietar) sunt în portal:</p>
+        ${ctaButton('Deschide comanda', portalUrl)}`,
+      });
+      await sendEmail({
+        to: email,
+        subject: `Comandă nouă: ${friendly} — ${serviceName}`,
+        html,
+        text: `Salut! A intrat comanda plătită ${friendly} (${serviceName}) pe serviciul tău. Datele lucrării sunt în portal: ${portalUrl}`,
+        idempotencyKey: `collab-newpaid-${order.id}-${a.collaborator_id}`,
+      });
+      console.log(`[order-confirmation] collaborator heads-up sent for ${friendly} → ${email}`);
+    } catch (e) {
+      console.warn(`[order-confirmation] collaborator heads-up failed for ${friendly}:`, e instanceof Error ? e.message : e);
+    }
+  }
+}
 
 export async function sendOrderConfirmationIfNeeded(adminClient: AdminClient, orderId: string): Promise<void> {
   // Atomic claim: only rows still unclaimed AND paid get stamped.
@@ -21,7 +75,7 @@ export async function sendOrderConfirmationIfNeeded(adminClient: AdminClient, or
     .eq('id', orderId)
     .is('confirmation_email_sent_at', null)
     .eq('payment_status', 'paid')
-    .select('id, friendly_order_id, total_price, estimated_completion_date, customer_data, services(name)')
+    .select('id, friendly_order_id, service_id, total_price, estimated_completion_date, customer_data, services(name)')
     .maybeSingle();
 
   if (claimError) {
@@ -55,6 +109,13 @@ export async function sendOrderConfirmationIfNeeded(adminClient: AdminClient, or
 
     await sendEmail({ to: email, subject: mail.subject, html: mail.html, text: mail.text });
     console.log(`[order-confirmation] sent for ${friendly} → ${email}`);
+
+    // Heads-up colaborator (după emailul clientului; nu afectează claim-ul).
+    await notifyCollaboratorsOfPaidOrder(
+      adminClient,
+      { id: claimed.id, friendly_order_id: claimed.friendly_order_id, service_id: claimed.service_id },
+      service?.name || 'Serviciu eGhișeul.ro'
+    );
   } catch (err) {
     console.error(`[order-confirmation] send failed for ${orderId}, releasing claim:`, err instanceof Error ? err.message : err);
     // Release the claim so a later trigger (webhook retry / confirm-payment)
