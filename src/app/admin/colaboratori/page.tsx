@@ -146,7 +146,7 @@ function AvocatDecont() {
     status: string; isTest: boolean; cazier: number; urgenta: number; apostila: number;
     total: number; totalNet: number;
   }[]>([]);
-  const [summary, setSummary] = useState({ count: 0, total: 0, totalNet: 0, onorarii: 0, onorariuPerComanda: 15 });
+  const [summary, setSummary] = useState({ count: 0, total: 0, totalNet: 0, totalCazier: 0, totalUrgenta: 0, totalApostila: 0, apostilaCount: 0, onorarii: 0, onorariuPerComanda: 15 });
   const [loading, setLoading] = useState(true);
   const months = useMemo(() => monthOptions(), []);
 
@@ -189,7 +189,7 @@ function AvocatDecont() {
         </a>
       </div>
 
-      <div className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <div className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-5">
         <div className="rounded-xl border border-slate-200 bg-white p-5">
           <div className="flex items-center gap-2 text-slate-500"><ClipboardList className="h-4 w-4" /><span className="text-xs uppercase tracking-wide">Comenzi</span></div>
           <p className="mt-1 text-2xl font-extrabold text-slate-900">{summary.count}</p>
@@ -201,6 +201,11 @@ function AvocatDecont() {
         <div className="rounded-xl border border-slate-200 bg-white p-5">
           <div className="flex items-center gap-2 text-slate-500"><Wallet className="h-4 w-4" /><span className="text-xs uppercase tracking-wide">Servicii (fără TVA)</span></div>
           <p className="mt-1 text-2xl font-extrabold text-slate-900">{fmt(summary.totalNet)} <span className="text-sm font-bold text-slate-400">RON</span></p>
+        </div>
+        <div className="rounded-xl border border-slate-200 bg-white p-5">
+          <div className="flex items-center gap-2 text-slate-500"><Receipt className="h-4 w-4" /><span className="text-xs uppercase tracking-wide">Apostile Haga</span></div>
+          <p className="mt-1 text-2xl font-extrabold text-slate-900">{fmt(summary.totalApostila)} <span className="text-sm font-bold text-slate-400">RON</span></p>
+          <p className="mt-1 text-[11px] text-slate-400">{summary.apostilaCount} apostile · incluse în total</p>
         </div>
         <div className="rounded-xl border border-slate-200 bg-white p-5">
           <div className="flex items-center gap-2 text-slate-500"><Receipt className="h-4 w-4" /><span className="text-xs uppercase tracking-wide">Onorarii (15 × comandă)</span></div>
@@ -248,6 +253,18 @@ function AvocatDecont() {
               </tr>
             ))}
           </tbody>
+          {rows.length > 0 && (
+            <tfoot className="border-t-2 border-slate-300 bg-slate-50 font-semibold text-slate-900">
+              <tr>
+                <td colSpan={5} className="px-3 py-2 text-right text-xs uppercase text-slate-500">Total componente:</td>
+                <td className="px-3 py-2 text-right">{fmt(summary.totalCazier)}</td>
+                <td className="px-3 py-2 text-right">{fmt(summary.totalUrgenta)}</td>
+                <td className="px-3 py-2 text-right">{fmt(summary.totalApostila)}</td>
+                <td className="px-3 py-2 text-right">{fmt(summary.total)}</td>
+                <td className="px-3 py-2 text-right text-slate-500">{fmt(summary.totalNet)}</td>
+              </tr>
+            </tfoot>
+          )}
         </table>
       </div>
     </>

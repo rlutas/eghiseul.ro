@@ -148,10 +148,16 @@ export async function GET(request: NextRequest) {
   }
 
   const real = rows.filter((r) => !r.isTest);
+  const sum = (f: (r: DecontRow) => number) => round2(real.reduce((s, r) => s + f(r), 0));
   const summary = {
     count: real.length,
-    total: round2(real.reduce((s, r) => s + r.total, 0)),
-    totalNet: round2(real.reduce((s, r) => s + r.total, 0) / TVA),
+    total: sum((r) => r.total),
+    totalNet: round2(sum((r) => r.total) / TVA),
+    totalCazier: sum((r) => r.cazier),
+    totalUrgenta: sum((r) => r.urgenta),
+    // Totalul apostilelor Haga — cerut explicit de Raul (se urmăresc separat).
+    totalApostila: sum((r) => r.apostila),
+    apostilaCount: real.filter((r) => r.apostila > 0).length,
     onorarii: round2(real.length * ONORARIU_PER_COMANDA),
     onorariuPerComanda: ONORARIU_PER_COMANDA,
   };
@@ -161,7 +167,8 @@ export async function GET(request: NextRequest) {
     const lines = rows.map((r) =>
       [r.orderNumber, (r.paidAt || '').slice(0, 10), r.client, r.service, r.status, r.cazier, r.urgenta, r.apostila, r.total, r.totalNet, ONORARIU_PER_COMANDA].join('\t')
     );
-    lines.push('', ['TOTAL SERVICII', '', '', '', '', '', '', '', summary.total, summary.totalNet, ''].join('\t'));
+    lines.push('', ['TOTAL PE COMPONENTE', '', '', '', '', summary.totalCazier, summary.totalUrgenta, summary.totalApostila, summary.total, summary.totalNet, ''].join('\t'));
+    lines.push([`  din care APOSTILE HAGA (${summary.apostilaCount} buc)`, '', '', '', '', '', '', summary.totalApostila, '', round2(summary.totalApostila / TVA), ''].join('\t'));
     lines.push(['ONORARII (se scad la decontare)', '', '', '', '', '', '', '', '', '', summary.onorarii].join('\t'));
     return new NextResponse([head.join('\t'), ...lines].join('\n'), {
       headers: {
