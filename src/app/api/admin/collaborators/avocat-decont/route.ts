@@ -17,12 +17,25 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { requirePermission } from '@/lib/admin/permissions';
 
 const CAZIER_SLUGS = [
+  // Tot ce trece prin cabinetul avocatei (confirmat Raul 05.08.2026, după
+  // lista de iunie a contabililor): caziere + integritate + stare civilă.
   'cazier-judiciar',
   'cazier-judiciar-persoana-fizica',
   'cazier-judiciar-persoana-juridica',
   'cazier-auto',
   'cazier-fiscal',
+  'certificat-integritate',
+  'certificat-nastere',
+  'certificat-casatorie',
+  'certificat-celibat',
+  'extras-multilingv-certificat-nastere',
+  'extras-multilingv-certificat-casatorie',
 ];
+
+/** Opțiuni care NU sunt ale cabinetului (prestate de terți / livrare). Orice
+ *  alt add-on (urgență, apostilă Haga, addon integritate/naștere/…, extras
+ *  multilingv, cazier secundar) e muncă de cabinet. */
+const EXCLUDED_OPTION_CODES = new Set(['traducere', 'legalizare', 'apostila_notari', 'custom_extra']);
 
 /** Onorariul avocatei per comandă (RON). */
 const ONORARIU_PER_COMANDA = 15;
@@ -108,12 +121,12 @@ export async function GET(request: NextRequest) {
     let apostila = 0;
     let extraCazier = 0;
     for (const opt of o.selected_options ?? []) {
-      const code = opt?.code;
+      const code = opt?.code as string;
       const pm = Number(opt?.price_modifier ?? opt?.priceModifier) || 0;
+      if (EXCLUDED_OPTION_CODES.has(code)) continue; // terți / livrare
       if (code === 'urgenta') urgenta += pm * factor;
       else if (code === 'apostila_haga') apostila += pm * factor;
-      else if (code === 'cazier_secundar' || code === 'addon_cazier_fiscal') extraCazier += pm * factor;
-      // traducere / legalizare / apostila_notari / livrare — EXCLUSE
+      else extraCazier += pm * factor; // addon-uri de cabinet (integritate, stare civilă, extras multilingv, cazier secundar…)
     }
     const cazier = base * factor + extraCazier;
     const total = cazier + urgenta + apostila;

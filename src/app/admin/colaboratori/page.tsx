@@ -131,7 +131,7 @@ function ServiceAssignments({ collaboratorId, onChanged }: { collaboratorId: str
   );
 }
 
-/** Decontul avocatei colaboratoare (cazier judiciar/auto/fiscal) — cerut de
+/** Decontul avocatei colaboratoare (caziere + integritate + stare civilă) — cerut de
  *  Raul 05.08.2026. Componentele cabinetului (cazier + urgență + apostilă
  *  Haga, cu reducerile aplicate), FĂRĂ livrare/traducere/legalizare/apostilă
  *  notarilor. Onorariul 15 RON/comandă e separat — se scade la decontare.
@@ -175,7 +175,7 @@ function AvocatDecont() {
           </select>
         </div>
         <p className="text-xs text-slate-400">
-          Doar comenzile eghiseul · fără livrare/traducere/legalizare/apostilă notarilor · reducerile aplicate
+          Tot cabinetul (caziere, integritate, stare civilă) · doar eghiseul · fără livrare/traducere/legalizare/apostilă notarilor · reducerile aplicate
         </p>
         <a
           href={`/api/admin/collaborators/avocat-decont?month=${month}&format=tsv`}
@@ -312,7 +312,7 @@ export default function CollaboratorsAdminPage() {
 
       {/* Tab: colaboratori pe servicii (topograf) vs decontul avocatei */}
       <div className="mb-6 flex gap-2">
-        {([['servicii', 'Colaboratori servicii'], ['avocat', 'Avocat — decont cazier']] as const).map(([key, label]) => (
+        {([['servicii', 'Colaboratori servicii'], ['avocat', 'Avocat — decont cabinet']] as const).map(([key, label]) => (
           <button
             key={key}
             onClick={() => setTab(key)}
