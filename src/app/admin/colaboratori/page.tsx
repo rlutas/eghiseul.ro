@@ -131,6 +131,125 @@ function ServiceAssignments({ collaboratorId, onChanged }: { collaboratorId: str
   );
 }
 
+/** Decontul avocatei colaboratoare (cazier judiciar/auto/fiscal) — cerut de
+ *  Raul 05.08.2026. Componentele cabinetului (cazier + urgență + apostilă
+ *  Haga, cu reducerile aplicate), FĂRĂ livrare/traducere/legalizare/apostilă
+ *  notarilor. Onorariul 15 RON/comandă e separat — se scade la decontare.
+ *  Doar comenzile eghiseul; decontul CJO se scoate separat (alt DB). */
+function AvocatDecont() {
+  const [month, setMonth] = useState(() => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+  });
+  const [rows, setRows] = useState<{
+    id: string; orderNumber: string; paidAt: string; client: string; service: string;
+    status: string; isTest: boolean; cazier: number; urgenta: number; apostila: number;
+    total: number; totalNet: number;
+  }[]>([]);
+  const [summary, setSummary] = useState({ count: 0, total: 0, totalNet: 0, onorarii: 0, onorariuPerComanda: 15 });
+  const [loading, setLoading] = useState(true);
+  const months = useMemo(() => monthOptions(), []);
+
+  useEffect(() => {
+    let alive = true;
+    setLoading(true);
+    (async () => {
+      const res = await fetch(`/api/admin/collaborators/avocat-decont?month=${month}`);
+      const json = await res.json();
+      if (!alive) return;
+      if (json.success) { setRows(json.data.rows); setSummary(json.data.summary); }
+      setLoading(false);
+    })();
+    return () => { alive = false; };
+  }, [month]);
+
+  const fmt = (n: number) => n.toLocaleString('ro-RO', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+  return (
+    <>
+      <div className="mb-6 flex flex-wrap items-end gap-3">
+        <div>
+          <label className="mb-1 block text-xs font-medium text-slate-500">Lună</label>
+          <select value={month} onChange={(e) => setMonth(e.target.value)} className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm">
+            {months.map((m) => <option key={m.value} value={m.value}>{m.label}</option>)}
+          </select>
+        </div>
+        <p className="text-xs text-slate-400">
+          Doar comenzile eghiseul · fără livrare/traducere/legalizare/apostilă notarilor · reducerile aplicate
+        </p>
+        <a
+          href={`/api/admin/collaborators/avocat-decont?month=${month}&format=tsv`}
+          className="ml-auto inline-flex items-center gap-2 rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800"
+        >
+          <Download className="h-4 w-4" /> Export
+        </a>
+      </div>
+
+      <div className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <div className="rounded-xl border border-slate-200 bg-white p-5">
+          <div className="flex items-center gap-2 text-slate-500"><ClipboardList className="h-4 w-4" /><span className="text-xs uppercase tracking-wide">Comenzi</span></div>
+          <p className="mt-1 text-2xl font-extrabold text-slate-900">{summary.count}</p>
+        </div>
+        <div className="rounded-xl border border-slate-200 bg-white p-5">
+          <div className="flex items-center gap-2 text-slate-500"><Wallet className="h-4 w-4" /><span className="text-xs uppercase tracking-wide">Servicii (cu TVA)</span></div>
+          <p className="mt-1 text-2xl font-extrabold text-slate-900">{fmt(summary.total)} <span className="text-sm font-bold text-slate-400">RON</span></p>
+        </div>
+        <div className="rounded-xl border border-slate-200 bg-white p-5">
+          <div className="flex items-center gap-2 text-slate-500"><Wallet className="h-4 w-4" /><span className="text-xs uppercase tracking-wide">Servicii (fără TVA)</span></div>
+          <p className="mt-1 text-2xl font-extrabold text-slate-900">{fmt(summary.totalNet)} <span className="text-sm font-bold text-slate-400">RON</span></p>
+        </div>
+        <div className="rounded-xl border border-slate-200 bg-white p-5">
+          <div className="flex items-center gap-2 text-slate-500"><Receipt className="h-4 w-4" /><span className="text-xs uppercase tracking-wide">Onorarii (15 × comandă)</span></div>
+          <p className="mt-1 text-2xl font-extrabold text-slate-900">{fmt(summary.onorarii)} <span className="text-sm font-bold text-slate-400">RON</span></p>
+          <p className="mt-1 text-[11px] text-slate-400">Nu se adună la total — se scad la decontare.</p>
+        </div>
+      </div>
+
+      <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
+        <table className="w-full text-sm">
+          <thead className="bg-slate-50 text-left text-xs uppercase text-slate-500">
+            <tr>
+              <th className="px-3 py-3">Comandă</th>
+              <th className="px-3 py-3">Dată</th>
+              <th className="px-3 py-3">Client</th>
+              <th className="px-3 py-3">Serviciu</th>
+              <th className="px-3 py-3">Status</th>
+              <th className="px-3 py-3 text-right">Cazier</th>
+              <th className="px-3 py-3 text-right">Urgență</th>
+              <th className="px-3 py-3 text-right">Apostilă</th>
+              <th className="px-3 py-3 text-right">Total cu TVA</th>
+              <th className="px-3 py-3 text-right">fără TVA</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-100">
+            {loading ? (
+              <tr><td colSpan={10} className="px-4 py-10 text-center text-slate-500">Se încarcă...</td></tr>
+            ) : rows.length === 0 ? (
+              <tr><td colSpan={10} className="px-4 py-10 text-center text-slate-500">Nicio comandă în perioada selectată.</td></tr>
+            ) : rows.map((r) => (
+              <tr key={r.id} className="hover:bg-slate-50">
+                <td className="px-3 py-2 font-medium">
+                  <a href={`/admin/orders/${r.id}`} className="text-primary-700 hover:underline">{r.orderNumber}</a>
+                  {r.isTest && <span className="ml-2 rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-bold text-amber-700">TEST</span>}
+                </td>
+                <td className="px-3 py-2 text-slate-500">{(r.paidAt || '').slice(0, 10)}</td>
+                <td className="px-3 py-2 text-slate-700">{r.client}</td>
+                <td className="px-3 py-2 text-slate-700">{r.service}</td>
+                <td className="px-3 py-2"><span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-700">{findStatusLabel(r.status)}</span></td>
+                <td className="px-3 py-2 text-right text-slate-700">{fmt(r.cazier)}</td>
+                <td className="px-3 py-2 text-right text-slate-700">{r.urgenta ? fmt(r.urgenta) : '—'}</td>
+                <td className="px-3 py-2 text-right text-slate-700">{r.apostila ? fmt(r.apostila) : '—'}</td>
+                <td className="px-3 py-2 text-right font-semibold text-slate-900">{fmt(r.total)}</td>
+                <td className="px-3 py-2 text-right text-slate-500">{fmt(r.totalNet)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </>
+  );
+}
+
 export default function CollaboratorsAdminPage() {
   const { hasPermission } = useAdminPermissions();
   const [collaborators, setCollaborators] = useState<Collaborator[]>([]);
@@ -139,6 +258,7 @@ export default function CollaboratorsAdminPage() {
   const [orders, setOrders] = useState<CollabOrder[]>([]);
   const [summary, setSummary] = useState<Summary>({ count: 0, revenue: 0, fees: 0 });
   const [loading, setLoading] = useState(true);
+  const [tab, setTab] = useState<'servicii' | 'avocat'>('servicii');
   const months = useMemo(() => monthOptions(), []);
 
   const reloadCollaborators = async (keepSelection = false) => {
@@ -190,7 +310,22 @@ export default function CollaboratorsAdminPage() {
         </div>
       </div>
 
-      {loading ? (
+      {/* Tab: colaboratori pe servicii (topograf) vs decontul avocatei */}
+      <div className="mb-6 flex gap-2">
+        {([['servicii', 'Colaboratori servicii'], ['avocat', 'Avocat — decont cazier']] as const).map(([key, label]) => (
+          <button
+            key={key}
+            onClick={() => setTab(key)}
+            className={`rounded-lg px-4 py-2 text-sm font-medium ${tab === key ? 'bg-slate-900 text-white' : 'border border-slate-300 bg-white text-slate-700 hover:bg-slate-50'}`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {tab === 'avocat' ? (
+        <AvocatDecont />
+      ) : loading ? (
         <p className="text-sm text-slate-500">Se încarcă...</p>
       ) : collaborators.length === 0 ? (
         <div className="rounded-lg border border-dashed border-slate-300 bg-white p-10 text-center text-sm text-slate-500">
