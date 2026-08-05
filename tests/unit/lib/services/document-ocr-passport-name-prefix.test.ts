@@ -21,6 +21,10 @@ import {
   correctNamesFromMrz,
   stripMrzCountryPrefix,
   type OCRResult,
+  applyCiDeterministicCorrections,
+  deriveCityFromFullAddress,
+  extractDocNumberFromMrz,
+  parseGeminiOCRResponse,
 } from '@/lib/services/document-ocr';
 
 type PassportResult = OCRResult & {
@@ -133,5 +137,47 @@ describe('recoverNamesFromMrz — numele în P nu se mutilează după IDROU (CJO
   it('prefixul de pașaport se taie în continuare când linia chiar începe cu P<ROU', () => {
     const out = recoverNamesFromMrz({ line1: 'P<ROUPOPA<<ION<<<<<<' });
     expect(out.surname).toBe('POPA');
+  });
+});
+
+describe('corecții deterministe CI — port CJO 05.08.2026', () => {
+  it('seria/numărul din MRZ TD2 bat citirea vizuală, localitatea din adresa brută', () => {
+    const raw = JSON.stringify({
+      success: true, confidence: 0.9,
+      extractedData: {
+        lastName: 'PARASCHIV', firstName: 'CĂTĂLIN-ALEXANDRU',
+        series: 'IL', number: '699332',
+        address: { fullAddress: 'Jud.IL Sat.Vlădeni (Com.Vlădeni) Str.Mihai Viteazul nr.130', county: 'Ialomița', city: 'Slobozia' },
+        mrz: { line1: 'IDROUPARASCHIV<<CATALIN<ALEXANDRU<<<', line2: 'SZ699332<7ROU0004145M3108033521118' },
+      },
+    });
+    const r = applyCiDeterministicCorrections(parseGeminiOCRResponse(raw, 'ci_front'));
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const d = r.extractedData as any;
+    expect(d.series).toBe('SZ');
+    expect(d.number).toBe('699332');
+    expect(d.address.city).toBe('Vlădeni');
+  });
+
+  it('TD1 eCI: seria din linia 1; fără MRZ → null', () => {
+    expect(extractDocNumberFromMrz({ line1: 'IDROUMB113912841710211434518<<<<' })).toEqual({ series: 'MB', number: '1139128' });
+    expect(extractDocNumberFromMrz(undefined)).toBeNull();
+  });
+
+  it('deriveCityFromFullAddress: sat > comună > municipiu', () => {
+    expect(deriveCityFromFullAddress('Jud.IL Sat.Vlădeni (Com.Vlădeni) Str.Mihai Viteazul nr.130')).toBe('Vlădeni');
+    expect(deriveCityFromFullAddress('Jud.CJ Mun.Cluj-Napoca Str.Memorandumului nr.2')).toBe('Cluj-Napoca');
+  });
+
+  it('numele compus cu cratimă păstrează diacriticele la corecția din MRZ', () => {
+    const raw = JSON.stringify({
+      success: true, confidence: 0.9,
+      extractedData: {
+        lastName: 'PARASCHIV', firstName: 'CĂTĂLIN-ALEXANDRU',
+        mrz: { line1: 'IDROUPARASCHIV<<CATALIN<ALEXANDRU<<<' },
+      },
+    });
+    const r = correctNamesFromMrz(parseGeminiOCRResponse(raw, 'ci_front'));
+    expect(r.extractedData?.firstName).toBe('CĂTĂLIN-ALEXANDRU');
   });
 });

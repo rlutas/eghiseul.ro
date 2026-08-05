@@ -244,9 +244,9 @@ Răspunde în acest format JSON:
     // the CNP — recover it deterministically if Gemini missed the printed one.
     // Then correct the name: Gemini often leaks the "IDROU" (doc-type+country)
     // MRZ prefix into the surname on old TD2 cards — fix it from the MRZ.
-    return correctCiFrontNames(
+    return applyCiDeterministicCorrections(correctCiFrontNames(
       applyMrzCnpFallback(parseGeminiOCRResponse(text, 'ci_front')),
-    );
+    ));
   } catch (error) {
     console.error('CI Front OCR error:', error);
     return createErrorResult('ci_front', 'Eroare la procesarea documentului');
@@ -332,7 +332,7 @@ Răspunde în acest format JSON:
 
     const response = await result.response;
     const text = response.text();
-    return parseGeminiOCRResponse(text, 'ci_back');
+    return applyCiDeterministicCorrections(parseGeminiOCRResponse(text, 'ci_back'));
   } catch (error) {
     console.error('CI Back OCR error:', error);
     return createErrorResult('ci_back', 'Eroare la procesarea documentului');
@@ -825,6 +825,77 @@ function deburrName(s: string): string {
  * (matched de-diacritic). We only act when the MRZ yields BOTH a surname and a
  * given name AND the visual split disagrees with it — otherwise it's a no-op.
  */
+/**
+ * Serie + număr CI din MRZ — sursa de adevăr (poartă cifră de control).
+ * Gemini citește uneori JUDEȚUL din adresă drept serie: „IL" în loc de „SZ"
+ * pe CJO-20260804-61939 (port de pe CJO, 05.08.2026). Acoperă ambele
+ * formate: TD1 (eCI nou: linia 1 = IDROU + docnum + CNP) și TD2 (CI vechi:
+ * linia 1 = IDROU + nume, linia 2 începe cu seria+numărul).
+ */
+export function extractDocNumberFromMrz(mrz?: {
+  line1?: string | null;
+  line2?: string | null;
+  line3?: string | null;
+}): { series: string; number: string } | null {
+  if (!mrz) return null;
+  const l1 = (mrz.line1 || '').toUpperCase().replace(/\s/g, '');
+  const l2 = (mrz.line2 || '').toUpperCase().replace(/\s/g, '');
+  const l1core = l1.replace(/<+$/, '');
+  // TD1: după IDROU urmează direct documentul (litere+cifre), NU nume cu «<<».
+  if (/^IDROU[A-Z]{2}\d/.test(l1core) && !l1core.includes('<<')) {
+    const parsed = parseRomanianEciMrz([l1]);
+    const m = (parsed.documentNumber || '').match(/^([A-Z]{2})(\d{6,8})$/);
+    if (m) return { series: m[1], number: m[2] };
+  }
+  // TD2: linia 2 = docnum(9, cu < pad) + check + ROU + ...
+  const m2 = l2.match(/^([A-Z]{2})(\d{6})<?\d?ROU/);
+  if (m2) return { series: m2[1], number: m2[2] };
+  return null;
+}
+
+/**
+ * Localitatea de DOMICILIU derivată determinist din adresa brută de pe act.
+ * Modelul confundă des localitatea domiciliului cu locul nașterii (ambele pe
+ * față): „Slobozia" (naștere) în loc de „Vlădeni" din „Jud.IL Sat.Vlădeni
+ * (Com.Vlădeni)". Adresa brută (fullAddress) se extrage corect, deci o parsăm
+ * noi: Sat > Com > Mun/Orș, în ordinea asta (satul e localitatea, comuna doar
+ * o conține).
+ */
+export function deriveCityFromFullAddress(fullAddress?: string | null): string | null {
+  if (!fullAddress) return null;
+  const pick = (re: RegExp) => {
+    const m = fullAddress.match(re);
+    return m ? m[1].trim().replace(/[.,]+$/, '') : null;
+  };
+  return (
+    pick(/\bSat[\s.]+([^(,]+?)\s*(?:\(|,|\bStr\b|\bnr\b|$)/i) ||
+    pick(/\bCom[\s.]+([^(,)]+?)\s*(?:\)|,|\bStr\b|\bnr\b|$)/i) ||
+    pick(/\b(?:Mun|Or[sș]|Ora[sș])[\s.]+([^(,]+?)\s*(?:\(|,|\bStr\b|\bnr\b|$)/i)
+  );
+}
+
+/**
+ * Corecții deterministe pe extracția CI: seria/numărul din MRZ + localitatea
+ * din adresa brută. Rulate după corecțiile de nume, pe față și pe verso.
+ */
+export function applyCiDeterministicCorrections(result: OCRResult): OCRResult {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const data = result.extractedData as any;
+  if (!data) return result;
+  const doc = extractDocNumberFromMrz(data.mrz);
+  if (doc && (data.series !== doc.series || String(data.number ?? '') !== doc.number)) {
+    data.series = doc.series;
+    data.number = doc.number;
+    result.issues = [...(result.issues ?? []), 'Seria/numărul CI corectate din MRZ'];
+  }
+  const city = deriveCityFromFullAddress(data.address?.fullAddress);
+  if (city && data.address && data.address.city !== city) {
+    data.address.city = city;
+    result.issues = [...(result.issues ?? []), 'Localitatea de domiciliu corectată din adresa de pe act'];
+  }
+  return result;
+}
+
 export function correctCiFrontNames(result: OCRResult): OCRResult {
   return correctNamesFromMrz(result);
 }
@@ -854,12 +925,18 @@ export function correctNamesFromMrz(result: OCRResult): OCRResult {
   const visFirst = (data.firstName || '').trim();
 
   // Visual split already agrees with the MRZ → keep visual (has diacritics).
-  if (deburrName(visLast) === mrzSur && deburrName(visFirst) === mrzGiv) {
+  // Hyphen-tolerant: MRZ scrie „CATALIN<ALEXANDRU" și pentru „CĂTĂLIN-ALEXANDRU";
+  // fără toleranță, numele compuse pierdeau cratima ȘI diacriticele la rebuild
+  // (CJO-20260804-61939, port 05.08.2026).
+  const hyphEq = (a: string, b: string) => a.replace(/-/g, ' ') === b.replace(/-/g, ' ');
+  if (hyphEq(deburrName(visLast), mrzSur) && hyphEq(deburrName(visFirst), mrzGiv)) {
     return result;
   }
 
   // Disagreement → rebuild from MRZ, recovering diacritics from the visual text.
-  const visualTokens = `${visLast} ${visFirst}`.trim().split(/\s+/).filter(Boolean);
+  // Split pe cratimă la potrivire, ca „CĂTĂLIN-ALEXANDRU" să dea spellingul
+  // pentru ambele token-uri MRZ.
+  const visualTokens = `${visLast} ${visFirst}`.trim().split(/[\s-]+/).filter(Boolean);
   const pickSpelling = (mrzToken: string): string => {
     const hit = visualTokens.find((t) => deburrName(t) === mrzToken);
     return hit || mrzToken; // CI names are printed upper-case → MRZ form is fine
