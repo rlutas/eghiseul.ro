@@ -39,6 +39,19 @@ export function extractCivilRegistrationPlace(customerData: unknown): string | n
 }
 
 /**
+ * Actul original e din străinătate, transcris în România (naștere sau
+ * căsătorie) — se solicită prin București → tier slow indiferent de oficiul
+ * transcrierii.
+ */
+export function extractCivilActFromAbroad(customerData: unknown): boolean {
+  if (!customerData || typeof customerData !== 'object') return false;
+  const cd = customerData as Record<string, unknown>;
+  const civil = (cd.civil_status ?? cd.civilStatus) as Record<string, unknown> | undefined;
+  if (!civil || typeof civil !== 'object') return false;
+  return civil.bornAbroad === true || civil.marriageAbroad === true;
+}
+
+/**
  * Cazier auto: permisul e emis în străinătate? Fișa se cere autorității
  * emitente, deci termenul e altul (7-10 zile vs 3-5) — configurat în
  * `verification_config.vehicleVerification.foreignLicense`.
@@ -118,9 +131,10 @@ export async function computeEstimatedCompletionISOForOrder(
   let serviceDaysRange: { minDays: number; maxDays: number } | null = null;
 
   const registrationPlace = extractCivilRegistrationPlace(order.customer_data);
-  if (registrationPlace) {
+  const actFromAbroad = extractCivilActFromAbroad(order.customer_data);
+  if (registrationPlace || actFromAbroad) {
     const tiers = await loadCivilTermTiers(client);
-    const tier = resolveCivilTermTier(registrationPlace, tiers);
+    const tier = resolveCivilTermTier(registrationPlace, tiers, actFromAbroad);
     serviceDaysRange = { minDays: tier.minDays, maxDays: tier.maxDays };
   }
 

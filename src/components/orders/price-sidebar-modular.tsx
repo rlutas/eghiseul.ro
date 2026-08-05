@@ -101,9 +101,12 @@ export function PriceSidebarModular({ service, variant = 'full' }: PriceSidebarM
   // oficiul de înregistrare (registrationPlace). Suprascrie calculul numeric.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const isCivilStatus = !!(state.verificationConfig as any)?.civilStatus;
+  // Act original din străinătate (transcris) → tier slow indiferent de oficiu.
+  const civilActFromAbroad =
+    state.civilStatus?.bornAbroad === true || state.civilStatus?.marriageAbroad === true;
   const civilTerm =
-    isCivilStatus && state.civilStatus?.registrationPlace
-      ? resolveCivilTermTier(state.civilStatus.registrationPlace, civilTiers)
+    isCivilStatus && (state.civilStatus?.registrationPlace || civilActFromAbroad)
+      ? resolveCivilTermTier(state.civilStatus?.registrationPlace, civilTiers, civilActFromAbroad)
       : null;
 
   const deliveryTimeText: string = isInstantDigital

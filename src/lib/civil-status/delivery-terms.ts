@@ -64,11 +64,21 @@ export type CivilTermResolution = CivilTermTier & {
 /**
  * Determină tier-ul de termen pentru un loc de înregistrare.
  * București (orice sector) → slow; județ în lista fast → fast; altfel default.
+ *
+ * `actFromAbroad`: actul original e din străinătate și a fost TRANSCRIS în
+ * România (wizard: `bornAbroad`/`marriageAbroad` = true). Actele transcrise se
+ * solicită prin București indiferent de oficiul transcrierii → tier slow
+ * (cerere echipă 05.08.2026: naștere în Moldova + transcriere = 30-45, nu
+ * 15-30).
  */
 export function resolveCivilTermTier(
   registrationPlace: string | undefined | null,
-  tiers: CivilTermTiers = DEFAULT_CIVIL_TERM_TIERS
+  tiers: CivilTermTiers = DEFAULT_CIVIL_TERM_TIERS,
+  actFromAbroad?: boolean
 ): CivilTermResolution {
+  if (actFromAbroad === true) {
+    return { tier: 'slow', ...tiers.slow };
+  }
   const value = (registrationPlace ?? '').trim();
   if (!value) {
     return { tier: 'default', ...tiers.default };

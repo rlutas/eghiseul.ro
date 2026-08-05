@@ -109,10 +109,13 @@ export default function CivilStatusStep({ config, onValidChange }: CivilStatusSt
   const docLabel = config ? DOC_LABEL[config.documentType] : 'documentul';
 
   // Termen de eliberare estimat în funcție de oficiul (registrationPlace) ales.
+  // Act original din străinătate (transcris) → se solicită prin București →
+  // tier slow indiferent de oficiul transcrierii (echipă, 05.08.2026).
   const termTiers = useCivilStatusTerms();
+  const actFromAbroad = cs.bornAbroad === true || cs.marriageAbroad === true;
   const resolvedTerm = useMemo(
-    () => resolveCivilTermTier(cs.registrationPlace, termTiers),
-    [cs.registrationPlace, termTiers]
+    () => resolveCivilTermTier(cs.registrationPlace, termTiers, actFromAbroad),
+    [cs.registrationPlace, termTiers, actFromAbroad]
   );
   // Cascadă județ → sector pentru registrationPlace. Pt București stocăm
   // „București (Sectorul N)"; pt rest = numele județului.

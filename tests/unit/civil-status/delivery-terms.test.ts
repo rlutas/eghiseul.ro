@@ -117,3 +117,25 @@ describe('DEFAULT_CIVIL_TERM_TIERS', () => {
     expect(DEFAULT_CIVIL_TERM_TIERS.fast.counties).toContain('Satu Mare');
   });
 });
+
+describe('resolveCivilTermTier — act transcris din străinătate (05.08.2026)', () => {
+  it('actFromAbroad forțează tier-ul slow indiferent de oficiul transcrierii', () => {
+    const r = resolveCivilTermTier('Sibiu', undefined, true);
+    expect(r.tier).toBe('slow');
+    expect(r.display).toBe('30-45 zile lucrătoare');
+  });
+
+  it('slow rămâne slow, fast e suprascris', () => {
+    expect(resolveCivilTermTier('București (Sectorul 3)', undefined, true).tier).toBe('slow');
+    expect(resolveCivilTermTier('Satu Mare', undefined, true).tier).toBe('slow');
+  });
+
+  it('și fără registrationPlace completat', () => {
+    expect(resolveCivilTermTier(undefined, undefined, true).tier).toBe('slow');
+  });
+
+  it('flag absent sau false = comportamentul vechi', () => {
+    expect(resolveCivilTermTier('Sibiu', undefined, false).tier).toBe('default');
+    expect(resolveCivilTermTier('Sibiu').tier).toBe('default');
+  });
+});

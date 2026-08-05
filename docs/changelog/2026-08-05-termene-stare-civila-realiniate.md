@@ -26,6 +26,10 @@ Echipa: comenzile de stare civilă depuse pe 22.06 / 06.07 / 08.07 n-au venit ni
 
 **Excluse intenționat:** `WP-199959` (import WP, fără registrationPlace — nu se poate calcula) și `E-260803-4RHJY` (cazier PJ care s-ar fi SCURTAT cu 2 zile din alt motiv — promisiunea făcută nu se atinge).
 
+## Completare (aceeași zi): act transcris din străinătate → tier slow
+
+Cazul semnalat de echipă: naștere în Moldova + transcriere → cererea merge prin București → 30-45, nu 15-30. Wizardul colecta deja `bornAbroad`/`marriageAbroad` (fără transcriere nici nu putem obține actul); acum `resolveCivilTermTier(place, tiers, actFromAbroad)` forțează tier-ul slow când actul original e din străinătate, indiferent de oficiul transcrierii — aplicat în wizard (CivilStatusStep + price-sidebar) și la persistare (`order-estimate.ts`, helper `extractCivilActFromAbroad`). O comandă activă afectată: `E-260720-M9KCQ` (căsătorie transcrisă, Sibiu) → termen extins 03.09→24.09.
+
 ## Notă
 
 Clienții comenzilor deja expirate văd acum noul termen pe pagina de status — dar au primit promisiunea veche la checkout; de apreciat un email de informare de la echipă pentru cele 3-4 cele mai vechi (GJ54C plătită 08.07, VTQJQ 13.07).
