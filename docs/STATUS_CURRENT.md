@@ -1,5 +1,21 @@
 # eGhiseul.ro - Status Curent
 
+> **⚡ Update 2026-08-04/05 — perf, curieri, termene stare civilă, colaborator.** Changelog-uri: [PSI 57→90](changelog/2026-08-04-psi-mobile-supabase-lazy.md) · [tracking Poșta](changelog/2026-08-04-tracking-posta-international-parcelsapp.md) · [împuternicire apostilă SC](changelog/2026-08-04-imputernicire-apostila-stare-civila.md) · [termene SC](changelog/2026-08-05-termene-stare-civila-realiniate.md) · [colaborator+banner ANCPI](changelog/2026-08-05-colaborator-email-si-banner-ancpi.md) · [Sameday locker geo](changelog/2026-08-03-sameday-locker-geo-fix.md).
+>
+> **🟣 PSI mobile homepage 57 → 90** — supabase-js (52KB gz) era în bundle-ul inițial doar pentru avatarul din header; mutat pe dynamic import + idle. CWV real-user erau deja PASSED.
+>
+> **🔴 Tracking Poșta internațional** — trackerul Poștei e orb pe internațional (evenimentele vin de la poșta de destinație prin UPU); AWB-urile UPU (`XX#########RO`) primesc link **parcelsapp**; backfill 4 comenzi. Descoperit colateral: coletul T5BVW aștepta la punct de ridicare în Elveția din 29.07. ⚠️ De portat pe CJO+ecazier.
+>
+> **🔴 Împuternicirea de apostilă pe stare civilă** ieșea identică cu cea principală (template-ul UNBR ignora delegația — pe judiciar mergea prin `INSTITUTIE`); acum „Să obțină Apostila de la Haga pe <act>" + prefectura. **De regenerat din admin: B5VNY + M9KCQ.**
+>
+> **✅ Termene stare civilă realiniate** (~8 comenzi expirate): default 7-15→**15-30 zile lucrătoare**, București→**30-45**, act transcris din străinătate→30-45 indiferent de oficiu (bornAbroad/marriageAbroad, colectate deja). 8+1 comenzi active recalculate; editabil din /admin/settings.
+>
+> **🔴 Colaborator (Mircea)** — emailul pleca doar la asignarea manuală; acum heads-up automat la fiecare comandă plătită pe serviciile cu assignment. **Toate cele 13 servicii imobiliare** au badge ANCPI: linie compactă roșie pe landing (dispare când e operațional), detalii complete în wizard.
+>
+> **🔴 AWB Sameday easybox** (comis 04.08, scris 03.08): rezolvarea geo se sare la locker/PUDO (București n-are orașul „Bucuresti" la Sameday, doar „Sectorul 1..6"); necomis inițial fiindcă testul pica typecheck-ul CI.
+>
+> **📰 Articol ANCPI actualizat** cu comunicatul gov.ro din 3 aug (rundă nouă de teste e-Terra, fără dată) — **de urmărit informarea promisă pe 5 aug**.
+
 > **⚡ Update 2026-07-29 — costuri interne + fixuri facturare/livrare.** Detalii: [`changelog/2026-07-29-costuri-interne-pe-comanda.md`](changelog/2026-07-29-costuri-interne-pe-comanda.md) · [`changelog/2026-07-29-oblio-nume-produse-memorate.md`](changelog/2026-07-29-oblio-nume-produse-memorate.md).
 >
 > **🔴 Factura scria „Chile" pe o comandă pentru Brazilia** (E-260728-YFHH2 / EGH-0194) — DB și codul erau corecte; **Oblio cheiază nomenclatorul pe `code` și tipărește numele MEMORAT**, salvat înainte de fixul din 14 iul. Reparat pe două căi (liniile nu mai trimit `code` + produsele redenumite în Oblio) + gardă în teste. CJO verificat, neafectat.

@@ -12,16 +12,16 @@ Inventar complet al serviciilor active + capabilitățile platformei. Pentru doc
 | Cazier Fiscal | 198 | 2-4 zile lucrătoare | — | da | apostilă/traducere/legalizare | — |
 | Cazier Auto | 198 | 2-4 zile lucrătoare | 1-2 zile | da | număr permis | — |
 | Certificat Integritate | 198 | 2-4 zile lucrătoare | 1-2 zile | da | +Cazier Judiciar | — |
-| Certificat Naștere | 998 | 7-15 zile* | — | da | **+Extras Multilingv 399** | — |
-| Certificat Căsătorie | 998 | 7-15 zile* | — | da | **+Extras Multilingv 399** | — |
-| Certificat Celibat | 698 | 7-15 zile* | — | da | — | — |
+| Certificat Naștere | 998 | 15-30 zile* | — | da | **+Extras Multilingv 399** | — |
+| Certificat Căsătorie | 998 | 15-30 zile* | — | da | **+Extras Multilingv 399** | — |
+| Certificat Celibat | 698 | 15-30 zile* | — | da | — | — |
 | Certificat Constatator | 89+ (pe tip) | câteva minute (24/7) | — | nu | preț pe tip document | **worker ONRC** A→Z |
 | Extras Carte Funciară | 89 | câteva minute (24/7) | — | nu | extra imobil (multi-imobil) | **worker ANCPI** A→Z |
 | Extras Plan Cadastral | 79.99 | câteva minute (24/7) | — | nu | — | ANCPI |
 | Identificare Imobil | 198 | 2-4 zile lucrătoare | — | nu | — | — |
 | Verificare Rovinietă (tool) | 0 (gratuit) | instant | — | nu | widget erovinieta.net | — |
 
-\* **Termen dinamic pe oficiul de stare civilă** (naștere/căsătorie/celibat): București + sectoare = 15-30 zile, oficii rapide (listă editabilă admin, ex. Satu Mare) = 5-7 zile, restul = 7-15 zile. Logică: `src/lib/civil-status/delivery-terms.ts`; editabil din `/admin/settings` → „Termene stare civilă".
+\* **Termen dinamic pe oficiul de stare civilă** (naștere/căsătorie/celibat): București + sectoare = 30-45 zile, oficii rapide (listă editabilă admin, ex. Satu Mare) = 5-7 zile, restul = 15-30 zile (realiniate 05.08.2026); act transcris din străinătate = 30-45 indiferent de oficiu. Logică: `src/lib/civil-status/delivery-terms.ts`; editabil din `/admin/settings` → „Termene stare civilă".
 
 ## Capabilități platformă (features)
 
