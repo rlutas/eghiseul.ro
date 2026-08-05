@@ -152,15 +152,19 @@ function AvocatDecont() {
 
   useEffect(() => {
     let alive = true;
-    setLoading(true);
-    (async () => {
-      const res = await fetch(`/api/admin/collaborators/avocat-decont?month=${month}`);
-      const json = await res.json();
-      if (!alive) return;
-      if (json.success) { setRows(json.data.rows); setSummary(json.data.summary); }
-      setLoading(false);
-    })();
-    return () => { alive = false; };
+    // Deferred a tick — react-compiler flags sync setState in effects (același
+    // pattern ca reloadCollaborators mai jos).
+    const t = setTimeout(() => {
+      setLoading(true);
+      void (async () => {
+        const res = await fetch(`/api/admin/collaborators/avocat-decont?month=${month}`);
+        const json = await res.json();
+        if (!alive) return;
+        if (json.success) { setRows(json.data.rows); setSummary(json.data.summary); }
+        setLoading(false);
+      })();
+    }, 0);
+    return () => { alive = false; clearTimeout(t); };
   }, [month]);
 
   const fmt = (n: number) => n.toLocaleString('ro-RO', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
