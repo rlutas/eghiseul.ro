@@ -15,6 +15,8 @@
 > **🔴 AWB Sameday easybox** (comis 04.08, scris 03.08): rezolvarea geo se sare la locker/PUDO (București n-are orașul „Bucuresti" la Sameday, doar „Sectorul 1..6"); necomis inițial fiindcă testul pica typecheck-ul CI.
 >
 > **📰 Articol ANCPI actualizat** cu comunicatul gov.ro din 3 aug (rundă nouă de teste e-Terra, fără dată) — **de urmărit informarea promisă pe 5 aug**.
+>
+> **🟣 CJO+ecazier (05.08): PSI 80→93, a11y 85→97, OCR nume** — lista easybox (152KB gz) scoasă din first-load (528→376KB), zoom deblocat + label telefon + heading-uri footer, `sanitizeNameFields` portat (separatorii `<` din prenume). Toate prin cherry-pick pe origin/main — **migrarea ecazier (`a14a1c5b`) rămâne NEPUSHATĂ local**, cu 9 fișiere necomise. Rămase CJO: contrast (design), termene „ziua 0" nealiniate pe eghiseul.
 
 > **⚡ Update 2026-07-29 — costuri interne + fixuri facturare/livrare.** Detalii: [`changelog/2026-07-29-costuri-interne-pe-comanda.md`](changelog/2026-07-29-costuri-interne-pe-comanda.md) · [`changelog/2026-07-29-oblio-nume-produse-memorate.md`](changelog/2026-07-29-oblio-nume-produse-memorate.md).
 >
