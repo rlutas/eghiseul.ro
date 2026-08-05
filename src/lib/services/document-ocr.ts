@@ -783,7 +783,14 @@ export function recoverNamesFromMrz(
     //    inclusiv varianta fără "<" pe care o întoarce uneori OCR-ul.
     // Doar formele astea specifice — NU un "I" sau "P" simplu, care ar mânca
     // prima literă dintr-un nume real.
-    l = l.replace(/^I[D<]?ROU/, '').replace(/^P<?[A-Z]{3}(?=[A-Z])/, '');
+    // EITHER-OR, nu secvențial: după tăierea «IDROU», restul poate începe cu
+    // un nume real în P + 3 litere („PARASCHIV") pe care regexul de pașaport
+    // l-ar mutila („SCHIV") — prins pe CJO-20260804-61939 (05.08.2026).
+    if (/^I[D<]?ROU/.test(l)) {
+      l = l.replace(/^I[D<]?ROU/, '');
+    } else {
+      l = l.replace(/^P<?[A-Z]{3}(?=[A-Z])/, '');
+    }
     const trimmed = l.replace(/<+$/, '');
     if (/\d/.test(trimmed)) continue; // names never contain digits → skip MRZ data lines
     const parts = trimmed.split(/<{2,}/).filter(Boolean);

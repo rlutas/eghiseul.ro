@@ -120,3 +120,18 @@ describe('correctNamesFromMrz — end-to-end pe rezultatul OCR', () => {
     expect(out.issues ?? []).toHaveLength(0);
   });
 });
+
+describe('recoverNamesFromMrz — numele în P nu se mutilează după IDROU (CJO-20260804-61939)', () => {
+  it('PARASCHIV rămâne PARASCHIV pe CI TD2', () => {
+    const out = recoverNamesFromMrz({
+      line1: 'IDROUPARASCHIV<<CATALIN<ALEXANDRU<<<',
+    });
+    expect(out.surname).toBe('PARASCHIV');
+    expect(out.givenNames).toBe('CATALIN ALEXANDRU');
+  });
+
+  it('prefixul de pașaport se taie în continuare când linia chiar începe cu P<ROU', () => {
+    const out = recoverNamesFromMrz({ line1: 'P<ROUPOPA<<ION<<<<<<' });
+    expect(out.surname).toBe('POPA');
+  });
+});
