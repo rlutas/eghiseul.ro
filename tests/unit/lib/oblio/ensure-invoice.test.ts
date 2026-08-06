@@ -20,6 +20,9 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 const createInvoiceMock = vi.fn();
 vi.mock('@/lib/oblio/invoice', () => ({
   createInvoiceFromOrder: (...args: unknown[]) => createInvoiceMock(...args),
+  // Garda de totaluri e testată separat (invoice-totals-guard.test.ts); aici o
+  // ținem permisivă ca să nu mascheze comportamentul lock-ului.
+  findInvoiceTotalsMismatch: () => null,
 }));
 
 // ---------------------------------------------------------------------------

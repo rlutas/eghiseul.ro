@@ -140,6 +140,43 @@ describe('recoverNamesFromMrz — numele în P nu se mutilează după IDROU (CJO
   });
 });
 
+describe('MRZ reconstruit din citirea greșită (E-260805-AX99C)', () => {
+  // Modelul a returnat linia 1 ca prefix canonic PESTE numele deja contaminat:
+  // „P<ROU" + „PEROUPOPESCU". Tăierea unui singur prefix lăsa „PEROUPOPESCU",
+  // iar rescrierea din MRZ bătea curățarea făcută la parsare.
+  it('taie și copia mâzgălită a prefixului, nu doar pe cea canonică', () => {
+    const out = recoverNamesFromMrz({
+      line1: 'P<ROUPEROUPOPESCU<<MARIA<ELENA<<<<<<<<<<<<<<<<<<<<<<<<<<<<<',
+      line2: '2000000000000<9807306ROU<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<',
+    });
+    expect(out.surname).toBe('POPESCU');
+    expect(out.givenNames).toBe('MARIA ELENA');
+  });
+
+  it('numele final scris în rezultat e curat', () => {
+    const out = correctNamesFromMrz({
+      success: true,
+      documentType: 'passport',
+      confidence: 99,
+      extractedData: {
+        documentType: 'passport',
+        lastName: 'PEROUPOPESCU',
+        firstName: 'MARIA ELENA',
+        mrz: { line1: 'P<ROUPEROUPOPESCU<<MARIA<ELENA<<<<<<<<', line2: null, line3: null },
+      },
+      issues: [],
+      suggestions: [],
+    } as PassportResult);
+    expect(out.extractedData.lastName).toBe('POPESCU');
+    expect(out.extractedData.firstName).toBe('MARIA ELENA');
+  });
+
+  it('un nume real care începe cu ROU rămâne intact', () => {
+    const out = recoverNamesFromMrz({ line1: 'P<ROUROUA<<ION<<<<<<<<<<' });
+    expect(out.surname).toBe('ROUA');
+  });
+});
+
 describe('corecții deterministe CI — port CJO 05.08.2026', () => {
   it('seria/numărul din MRZ TD2 bat citirea vizuală, localitatea din adresa brută', () => {
     const raw = JSON.stringify({

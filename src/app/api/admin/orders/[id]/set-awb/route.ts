@@ -14,6 +14,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { requirePermission } from '@/lib/admin/permissions';
+import { shouldMarkShippedOnAwb } from '@/lib/orders/shipping-status';
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -97,7 +98,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
   const admin = createAdminClient();
   const { data: order, error: fetchErr } = await admin
     .from('orders')
-    .select('id, order_number, friendly_order_id, delivery_tracking_number')
+    .select('id, order_number, friendly_order_id, delivery_tracking_number, status')
     .eq('id', id)
     .single();
   if (fetchErr || !order) {
@@ -107,12 +108,19 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     );
   }
 
+  // AWB salvat manual = colet plecat, exact ca la generarea automată Fan/Sameday
+  // (care trece comanda pe `shipped`). Fără asta, comenzile DHL/Poșta rămâneau
+  // în starea veche deși aveau AWB, iar echipa le muta de mână.
+  const previousStatus = (order as { status?: string }).status ?? null;
+  const shouldShip = shouldMarkShippedOnAwb(previousStatus);
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { error: updateErr } = await (admin.from('orders') as any)
     .update({
       delivery_tracking_number: awb,
       delivery_tracking_url: trackingUrl,
       ...(courier ? { courier_provider: courier } : {}),
+      ...(shouldShip ? { status: 'shipped', shipped_at: new Date().toISOString() } : {}),
       updated_at: new Date().toISOString(),
     })
     .eq('id', id);
@@ -133,5 +141,25 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     }`,
   });
 
-  return NextResponse.json({ success: true, data: { awb, trackingUrl } });
+  if (shouldShip) {
+    // `status_changed` — NU `status_change`: constrângerea CHECK de pe
+    // order_history.event_type respinge varianta la singular, iar inserarea ar
+    // eșua tăcut (fără await pe eroare), lăsând timeline-ul fără tranziție.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (admin.from('order_history') as any).insert({
+      order_id: id,
+      event_type: 'status_changed',
+      changed_by: user.email ?? 'admin',
+      notes: 'Comanda a fost expediată (AWB introdus manual)',
+      // obiecte, nu string-uri JSON — convenția coloanelor jsonb din
+      // /process (timeline-ul citește `new_value.status`)
+      old_value: { status: previousStatus },
+      new_value: { status: 'shipped' },
+    });
+  }
+
+  return NextResponse.json({
+    success: true,
+    data: { awb, trackingUrl, status: shouldShip ? 'shipped' : previousStatus },
+  });
 }

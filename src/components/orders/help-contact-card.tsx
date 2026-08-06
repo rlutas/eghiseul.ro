@@ -32,7 +32,7 @@ export function HelpContactCard({ orderCode }: { orderCode?: string }) {
         <div>
           <p className="text-sm font-semibold text-green-900">Ai întrebări despre comandă?</p>
           <p className="mt-0.5 text-xs text-green-800">
-            Răspundem rapid pe WhatsApp în zilele lucrătoare 09–17.
+            Răspundem pe WhatsApp în zilele lucrătoare, între 08:00 și 16:00.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">

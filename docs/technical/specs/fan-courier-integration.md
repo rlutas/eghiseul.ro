@@ -279,6 +279,21 @@ Verificați:
 2. Verificați `/api/courier/quote` direct cu parametri
 3. Token-ul expirat se regenerează automat
 
+### Eticheta AWB Nu Se Descarcă (401)
+
+Endpoint-ul `GET /awb/label` acceptă token-ul **doar** ca header
+`Authorization: Bearer <token>`. Pus în query (`?token=…`) răspunde
+**401 `"These credentials do not match our records."`** — nu există URL semnat
+care să poată fi dat browserului, deci eticheta se descarcă server-side
+(`getAwbLabel()` întoarce `{ body, contentType }`) și se streamează prin
+`/api/admin/orders/[id]/awb-label`.
+
+`GET /reports/awb/label` **nu există** (404) — path-ul corect e `/awb/label`.
+
+Bug real reparat 06.08.2026: butonul „Printează eticheta" din admin dădea
+eroare deși AWB-ul se genera corect (generarea trece prin `apiRequest()`, care
+punea header-ul corect; doar eticheta ocolea helperul).
+
 ### FANbox-uri Nu Apar
 
 1. Verificați dacă județul selectat are FANbox-uri

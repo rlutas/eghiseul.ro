@@ -791,6 +791,14 @@ export function recoverNamesFromMrz(
     } else {
       l = l.replace(/^P<?[A-Z]{3}(?=[A-Z])/, '');
     }
+    // Al doilea strat: modelul întoarce uneori linia MRZ *reconstruită din
+    // propria citire greșită* — prefixul canonic pus la loc peste numele deja
+    // contaminat: „P<ROU" + „PEROUSTANCIU". După tăierea prefixului canonic mai
+    // rămâne o copie mâzgălită, care ajungea în nume (E-260805-AX99C: real
+    // STANCIU). Tăiem repetat formele cunoscute, cât timp rămâne un nume.
+    while (MRZ_NAME_PREFIX.test(l) && l.replace(MRZ_NAME_PREFIX, '').length >= 2) {
+      l = l.replace(MRZ_NAME_PREFIX, '');
+    }
     const trimmed = l.replace(/<+$/, '');
     if (/\d/.test(trimmed)) continue; // names never contain digits → skip MRZ data lines
     const parts = trimmed.split(/<{2,}/).filter(Boolean);
@@ -942,7 +950,10 @@ export function correctNamesFromMrz(result: OCRResult): OCRResult {
     return hit || mrzToken; // CI names are printed upper-case → MRZ form is fine
   };
 
-  data.lastName = mrzSur.split(' ').map(pickSpelling).join(' ');
+  // Plasa de siguranță la scriere: MRZ-ul poate fi el însuși contaminat (vezi
+  // recoverNamesFromMrz), iar rescrierea de aici bate curățarea făcută deja în
+  // parseGeminiOCRResponse — fără asta, un prefix nou l-ar reintroduce în nume.
+  data.lastName = stripMrzCountryPrefix(mrzSur.split(' ').map(pickSpelling).join(' '));
   data.firstName = mrzGiv.split(' ').map(pickSpelling).join(' ');
 
   result.issues = [

@@ -32,7 +32,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { requirePermission } from '@/lib/admin/permissions';
-import { cancelInvoice, createInvoiceFromOrder } from '@/lib/oblio';
+import { cancelInvoice, createInvoiceFromOrder, findInvoiceTotalsMismatch } from '@/lib/oblio';
 import { parseInvoiceNumber } from '@/lib/oblio/parse-number';
 
 interface RouteParams {
@@ -158,6 +158,24 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
   }
 
   const adminEmail = user.email ?? 'admin';
+
+  // Gardă fiscală: nu reemite o factură al cărei total n-ar da suma încasată.
+  const totalsMismatch = findInvoiceTotalsMismatch({
+    id: o.id,
+    order_number: o.order_number ?? undefined,
+    friendly_order_id: o.friendly_order_id ?? undefined,
+    base_price: o.base_price ?? undefined,
+    total_price: o.total_price,
+    selected_options: o.selected_options ?? undefined,
+    delivery_price: o.delivery_price ?? undefined,
+    discount_amount: o.discount_amount ?? undefined,
+  });
+  if (totalsMismatch) {
+    return NextResponse.json(
+      { success: false, error: { code: 'TOTALS_MISMATCH', message: totalsMismatch } },
+      { status: 400 }
+    );
+  }
 
   // ── STEP 1: Storno (Oblio cancel) ─────────────────────────────────────────
   let stornoDoc: unknown = null;

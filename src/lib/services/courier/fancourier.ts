@@ -1112,19 +1112,42 @@ export class FanCourierProvider implements CourierProvider {
 
   /**
    * Print AWB label
-   * Uses GET /awb/label endpoint
+   * Uses GET /awb/label endpoint.
+   *
+   * The API only accepts the token as an `Authorization: Bearer` header —
+   * passing it as a `?token=` query param answers 401 ("These credentials do
+   * not match our records"), so the label has to be fetched server-side and
+   * streamed to the caller instead of handing out a signed URL.
    */
-  async getAwbLabel(awbs: string[], format: 'html' | 'pdf' | 'zpl' = 'pdf'): Promise<string> {
+  async getAwbLabel(
+    awbs: string[],
+    format: 'html' | 'pdf' | 'zpl' = 'pdf'
+  ): Promise<{ body: ArrayBuffer; contentType: string }> {
     const { clientId } = getCredentials();
     const token = await this.ensureAuthenticated();
 
-    const awbParams = awbs.map((awb) => `awbs[]=${awb}`).join('&');
+    const awbParams = awbs.map((awb) => `awbs[]=${encodeURIComponent(awb)}`).join('&');
     const formatParam = format === 'pdf' ? 'pdf=1' : format === 'zpl' ? 'zpl=1' : '';
 
     const url = `${FANCOURIER_API_URL}/awb/label?clientId=${clientId}&${awbParams}&${formatParam}`;
 
-    // Return URL for direct download
-    return `${url}&token=${token}`;
+    const response = await fetch(url, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (!response.ok) {
+      const detail = await response.text().catch(() => '');
+      throw new CourierError(
+        `Failed to fetch AWB label (${response.status}): ${detail.slice(0, 200)}`,
+        'LABEL_FETCH_FAILED',
+        'fancourier'
+      );
+    }
+
+    return {
+      body: await response.arrayBuffer(),
+      contentType: response.headers.get('content-type') || 'application/octet-stream',
+    };
   }
 
   /**

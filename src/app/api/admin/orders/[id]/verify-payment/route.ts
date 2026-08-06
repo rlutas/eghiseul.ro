@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requirePermission } from '@/lib/admin/permissions';
-import { createInvoiceFromOrder } from '@/lib/oblio';
+import { createInvoiceFromOrder, findInvoiceTotalsMismatch } from '@/lib/oblio';
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -145,6 +145,19 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       // Get service name + lawyer fee from joined relation
       const svcRel = order.services as { name: string; lawyer_fee_ron?: number | null } | null;
       const serviceName = svcRel?.name || 'Serviciu eGhiseul';
+
+      // Gardă fiscală înainte de emitere — vezi findInvoiceTotalsMismatch.
+      const totalsMismatch = findInvoiceTotalsMismatch({
+        id: order.id,
+        order_number: order.order_number ?? undefined,
+        friendly_order_id: order.friendly_order_id ?? undefined,
+        base_price: order.base_price ?? undefined,
+        total_price: order.total_price,
+        selected_options: order.selected_options ?? undefined,
+        delivery_price: order.delivery_price ?? undefined,
+        discount_amount: (order as unknown as { discount_amount?: number | null }).discount_amount ?? undefined,
+      });
+      if (totalsMismatch) throw new Error(totalsMismatch);
 
       invoice = await createInvoiceFromOrder(
         {

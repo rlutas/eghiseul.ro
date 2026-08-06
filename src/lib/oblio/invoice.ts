@@ -465,6 +465,59 @@ export async function createInvoiceFromOrder(
   };
 }
 
+/**
+ * Verifică dacă liniile facturii ar da exact suma încasată.
+ *
+ * Fără verificarea asta, o comandă cu câmpuri de preț inconsistente emite o
+ * factură cu alt total decât încasarea din `collect` — Oblio o acceptă, iar
+ * factura greșită nu mai poate fi editată prin API (doar stornată).
+ *
+ * Caz real: `WP-260707-99959`, import din WordPress cu `base_price` 998 și
+ * `delivery_price` 0, deși s-au încasat 1.049 → EGI2024-24314 emisă pe 998 lei,
+ * cu încasare de 1.049.
+ *
+ * Se aplică pe CALEA DE EMITERE (automată și din admin), nu în construirea
+ * payload-ului: mai bine o comandă rămâne fără factură, cu eroarea vizibilă în
+ * `order_history` și în cron-ul de health-check, decât un document fiscal
+ * greșit.
+ *
+ * @returns mesajul de eroare, sau `null` dacă totalurile se potrivesc.
+ */
+export function findInvoiceTotalsMismatch(order: {
+  id?: string;
+  order_number?: string;
+  friendly_order_id?: string;
+  base_price?: number | null;
+  total_price: number;
+  selected_options?: unknown;
+  delivery_price?: number | null;
+  discount_amount?: number | null;
+}): string | null {
+  const total = Number(order.total_price);
+  if (!Number.isFinite(total)) return null; // fără total nu avem cu ce compara
+
+  const base = Number(order.base_price) || total;
+  const options = normalizeOrderOptions(
+    order.selected_options as Parameters<typeof normalizeOrderOptions>[0],
+  ).reduce(
+    (sum, o) => sum + o.unitPrice * o.quantity,
+    0,
+  );
+  const delivery = Number(order.delivery_price) > 0 ? Number(order.delivery_price) : 0;
+  const discount = Number(order.discount_amount) > 0 ? Number(order.discount_amount) : 0;
+
+  const lines = base + options + delivery - discount;
+  if (Math.abs(lines - total) <= 0.01) return null;
+
+  return (
+    `Suma liniilor (${lines.toFixed(2)} RON) nu corespunde cu totalul plătit ` +
+    `(${total.toFixed(2)} RON) pentru comanda ` +
+    `${order.friendly_order_id || order.order_number || order.id}. ` +
+    'Factura NU a fost emisă — verifică base_price / selected_options / ' +
+    'delivery_price / discount_amount.'
+  );
+}
+
 // ============================================================================
 // Invoice Retrieval
 // ============================================================================

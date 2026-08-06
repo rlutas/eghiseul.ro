@@ -87,23 +87,13 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     const format = (request.nextUrl.searchParams.get('format') || 'pdf') as 'pdf' | 'html' | 'zpl';
 
     if (providerCode === 'fancourier') {
-      // Fan Courier: getAwbLabel returns a URL with embedded token
+      // Fan Courier: the label is fetched server-side (the API only accepts the
+      // token as an Authorization header, so there is no shareable URL) and
+      // streamed back to the browser.
       const provider = getCourierProvider('fancourier') as FanCourierProvider;
-      const labelUrl = await provider.getAwbLabel([awb], format);
 
-      // Fetch the label and stream it back
       try {
-        const response = await fetch(labelUrl);
-
-        if (!response.ok) {
-          return NextResponse.json(
-            {
-              success: false,
-              error: { code: 'LABEL_FETCH_FAILED', message: `Failed to fetch label: ${response.status}` },
-            },
-            { status: 502 }
-          );
-        }
+        const label = await provider.getAwbLabel([awb], format);
 
         const contentType = format === 'pdf'
           ? 'application/pdf'
@@ -114,9 +104,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         const extension = format === 'pdf' ? 'pdf' : format === 'zpl' ? 'zpl' : 'html';
         const filename = `AWB-${awb}.${extension}`;
 
-        const body = await response.arrayBuffer();
-
-        return new NextResponse(body, {
+        return new NextResponse(label.body, {
           status: 200,
           headers: {
             'Content-Type': contentType,
@@ -126,16 +114,16 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         });
       } catch (fetchError) {
         console.error('[AWB Label] Failed to fetch Fan Courier label:', fetchError);
-        // Fallback: return the URL for the client to open directly
-        return NextResponse.json({
-          success: true,
-          data: {
-            type: 'url',
-            url: labelUrl,
-            awb,
-            provider: providerCode,
+        return NextResponse.json(
+          {
+            success: false,
+            error: {
+              code: 'LABEL_FETCH_FAILED',
+              message: fetchError instanceof Error ? fetchError.message : 'Failed to fetch label',
+            },
           },
-        });
+          { status: 502 }
+        );
       }
     } else if (providerCode === 'sameday') {
       // Sameday: use the /api/awb/download/{awb}/pdf endpoint

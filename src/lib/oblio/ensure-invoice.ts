@@ -18,7 +18,7 @@
  */
 
 import { createAdminClient } from '@/lib/supabase/admin';
-import { createInvoiceFromOrder } from './invoice';
+import { createInvoiceFromOrder, findInvoiceTotalsMismatch } from './invoice';
 import { isInvoicingEnabled } from './invoicing-enabled';
 import { checkEinvoiceExport } from './einvoice-check';
 
@@ -142,6 +142,19 @@ export async function ensureInvoiceForPaidOrder(
 
   // 3. Create the invoice (only the lock winner reaches here).
   try {
+    // Gardă fiscală înainte de emitere — vezi findInvoiceTotalsMismatch.
+    const mismatch = findInvoiceTotalsMismatch({
+      id: o.id,
+      order_number: o.order_number ?? undefined,
+      friendly_order_id: o.friendly_order_id ?? undefined,
+      base_price: o.base_price ?? undefined,
+      total_price: o.total_price,
+      selected_options: o.selected_options ?? undefined,
+      delivery_price: o.delivery_price ?? undefined,
+      discount_amount: o.discount_amount ?? undefined,
+    });
+    if (mismatch) throw new Error(mismatch);
+
     const svcRel = o.services as { name: string; lawyer_fee_ron?: number | null; category?: string | null } | null;
     // Cadastral (imobiliare) services are handled by the topograph collaborator,
     // so their carved fee line reads "Onorariu Topograf" instead of "Avocat".

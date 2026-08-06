@@ -343,16 +343,19 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       }),
     });
 
-    // Also log status change
+    // Also log status change.
+    // `status_changed`, NU `status_change`: constrângerea CHECK de pe
+    // order_history.event_type respinge singularul, iar inserarea eșua tăcut —
+    // de-aia nicio comandă cu AWB generat n-avea tranziția în timeline
+    // (0 rânduri `status_change` în tabel, față de 21 `awb_created`).
     await adminClient.from('order_history').insert({
       order_id: id,
-      event_type: 'status_change',
-      notes: 'Comanda a fost expediata',
+      event_type: 'status_changed',
+      notes: 'Comanda a fost expediată (AWB generat automat)',
       changed_by: user.id,
-      new_value: JSON.stringify({
-        status: 'shipped',
-        previous_status: order.status,
-      }),
+      // obiecte, nu string-uri JSON — convenția coloanelor jsonb din /process
+      old_value: { status: order.status },
+      new_value: { status: 'shipped' },
     });
 
     return NextResponse.json({

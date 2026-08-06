@@ -801,15 +801,6 @@ export default function AdminOrderDetailPage() {
         }
         throw new Error(`Eroare HTTP: ${res.status}`);
       }
-      const ct = res.headers.get('content-type') || '';
-      if (ct.includes('application/json')) {
-        const data = await res.json();
-        if (data.data?.url) {
-          window.open(data.data.url, '_blank');
-          toast.success('Eticheta deschisa in tab nou');
-          return;
-        }
-      }
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');

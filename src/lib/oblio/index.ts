@@ -17,6 +17,7 @@ export {
 export {
   createInvoice,
   createInvoiceFromOrder,
+  findInvoiceTotalsMismatch,
   getInvoice,
   getInvoicePdfUrl,
   cancelInvoice,

@@ -31,6 +31,10 @@ yarn-error.log*
 # Local env files
 .env*.local
 .env
+# `vercel env pull` scrie implicit în rădăcina repo-ului — fără regula asta,
+# un `.env.prod` cu chei live (Stripe, Oblio, service role) ar fi comitabil.
+.env.prod
+.env.production
 
 # Vercel
 .vercel
