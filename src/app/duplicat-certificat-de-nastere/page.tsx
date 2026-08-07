@@ -8,7 +8,7 @@ const DESCRIPTION =
   'Ghid complet pentru duplicatul certificatului de naștere: din 2023 îl ceri de la orice primărie cu stare civilă, în ~30 de zile, adesea gratuit. Acte, pași și varianta online.';
 const DATE_PUBLISHED = '2026-06-22';
 const DATE_MODIFIED = '2026-06-22';
-const OGIMAGE = '/og/services/certificat-nastere.png';
+const OGIMAGE = '/images/articole/duplicat-certificat-de-nastere.webp';
 
 export const revalidate = 86400;
 
@@ -25,6 +25,7 @@ export default function Page() {
       slug={SLUG}
       category="Stare civilă"
       image={OGIMAGE}
+      imageAlt="Funcționară de stare civilă înmânând un certificat prin geamul ghișeului, cu rafturile de arhivă în spate — eliberarea duplicatului de certificat de naștere"
       title={TITLE}
       description={DESCRIPTION}
       datePublished={DATE_PUBLISHED}
