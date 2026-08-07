@@ -4,6 +4,7 @@ import { ArrowRight, ChevronRight } from 'lucide-react';
 import { Footer } from '@/components/home/footer';
 import { ARTICLES } from '@/config/articles';
 import { buildPageMetadata } from '@/lib/seo';
+import { pageLastModified } from '@/lib/seo/last-modified';
 
 const TITLE = 'Blog — Informații utile despre documente';
 const DESCRIPTION =
@@ -19,7 +20,15 @@ export const metadata = buildPageMetadata({
 });
 
 export default function BlogPage() {
+  // Featured = primul din manifest, ales editorial (rămâne fix).
+  // Restul grilei se sortează cronologic, cel mai recent primul, folosind datele
+  // reale din registrul de sitemap — altfel articolele noi rămâneau îngropate
+  // la mijlocul listei ordonate manual după trafic.
   const [featured, ...rest] = ARTICLES;
+  const sorted = [...rest].sort(
+    (a, b) =>
+      (pageLastModified(b.slug)?.getTime() ?? 0) - (pageLastModified(a.slug)?.getTime() ?? 0),
+  );
 
   return (
     <>
@@ -86,7 +95,7 @@ export default function BlogPage() {
 
             {/* Rest grid */}
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-              {rest.map((a) => (
+              {sorted.map((a) => (
                 <Link
                   key={a.slug}
                   href={`/${a.slug}/`}
