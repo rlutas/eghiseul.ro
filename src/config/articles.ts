@@ -147,7 +147,6 @@ export const ARTICLES: ArticleMeta[] = [
     title: 'Cazier fiscal din SPV: cum îl ceri online și ce faci fără cont',
     excerpt:
       'Pașii din Spațiul Privat Virtual, formularele 502 și 504, și alternativele când nu poți trece de activarea contului.',
-    image: '/og/services/cazier-fiscal.png',
     category: 'Documente fiscale',
   },
   {

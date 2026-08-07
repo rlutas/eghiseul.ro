@@ -33,7 +33,7 @@ export default function Page() {
       dateModified={DATE_MODIFIED}
       publishedLabel="august 2026"
       updatedLabel="7 august 2026"
-      imageAlt="Bărbat la birou completând o cerere electronică pe laptop, cu buletinul și telefonul alături, în timpul înrolării în Spațiul Privat Virtual ANAF"
+      imageAlt="Bărbat la masa din bucătărie, seara, comparând buletinul cu ecranul telefonului în fața laptopului, blocat la activarea contului SPV"
       relatedServices={[
         {
           href: '/servicii/cazier-fiscal-online/',
