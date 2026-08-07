@@ -8,7 +8,7 @@ const DESCRIPTION =
   'Cum înregistrezi nașterea copilului nou-născut: termenul legal de 30 de zile, actele necesare, CNP-ul și primul certificat de naștere, care este gratuit. Ghid pas cu pas.';
 const DATE_PUBLISHED = '2026-06-22';
 const DATE_MODIFIED = '2026-06-22';
-const OGIMAGE = '/og/services/certificat-nastere.png';
+const OGIMAGE = '/images/articole/inregistrare-nastere-copil-nou-nascut.webp';
 
 export const revalidate = 86400;
 
@@ -25,6 +25,7 @@ export default function Page() {
       slug={SLUG}
       category="Stare civilă"
       image={OGIMAGE}
+      imageAlt="Tată ținând nou-născutul la piept și completând un formular sprijinit pe o carte, în dormitorul din primele zile acasă — înregistrarea nașterii"
       title={TITLE}
       description={DESCRIPTION}
       datePublished={DATE_PUBLISHED}
