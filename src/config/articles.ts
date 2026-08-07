@@ -19,13 +19,6 @@ export interface ArticleMeta {
 
 export const ARTICLES: ArticleMeta[] = [
   {
-    slug: 'cazier-fiscal-persoana-fizica',
-    title: 'Cazier fiscal pentru persoană fizică: ce este, cine îl cere și cum îl obții',
-    excerpt:
-      'Ce fapte se înscriu de fapt în cazierul fiscal și când se radiază, de ce nu se confundă cu certificatul de atestare fiscală și cum îl obții dacă nu poți activa contul SPV.',
-    category: 'Documente fiscale',
-  },
-  {
     slug: 'apostila-de-la-haga-ghid-acte-obtinere',
     title: 'Apostila de la Haga: pe ce acte se aplică, unde o obții și cât costă',
     excerpt:
@@ -134,6 +127,13 @@ export const ARTICLES: ArticleMeta[] = [
     title: 'Cum Afli Numărul de Carte Funciară și Numărul Cadastral',
     excerpt: 'Din actul de proprietate, dintr-un extras vechi sau după adresă — unde apar aceste numere și cum le obții.',
     category: 'Cadastru & imobiliare',
+  },
+  {
+    slug: 'cazier-fiscal-persoana-fizica',
+    title: 'Cazier fiscal pentru persoană fizică: ce este și cum îl obții',
+    excerpt:
+      'Ce fapte se înscriu, când se radiază, de ce nu se confundă cu atestarea fiscală și cum îl obții fără cont SPV.',
+    category: 'Documente fiscale',
   },
   {
     slug: 'anii-lucrati-in-strainatate-se-pun-la-pensie-in-romania',
