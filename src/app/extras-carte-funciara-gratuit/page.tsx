@@ -79,7 +79,7 @@ export default function Page() {
         <p className="text-sm leading-relaxed text-amber-950">
           <strong>Atenție, iulie 2026:</strong> MyTerra nu funcționează. Sistemele ANCPI sunt
           indisponibile la nivel național din 13 iulie, în urma unui atac cibernetic, deci nu se
-          poate obține niciun extras — nici gratuit, nici contra cost.{' '}
+          poate obține niciun extras, nici gratuit, nici contra cost.{' '}
           <Link href="/ancpi-nu-functioneaza/">Starea sistemelor și cronologia completă</Link>.
         </p>
       </div>
@@ -125,7 +125,7 @@ export default function Page() {
       </ol>
       <p>
         Dacă ai deja ROeID sau semnătură calificată, treaba se rezolvă din fotoliu. Dacă nu ai niciuna, apare drumul
-        la ghișeu — exact lucrul pe care voiai să-l eviți cerând documentul online.
+        la ghișeu, exact lucrul pe care voiai să-l eviți cerând documentul online.
       </p>
 
       <h2>Pașii, după ce ai contul</h2>
@@ -168,20 +168,20 @@ export default function Page() {
       <p>
         Varianta plătită are sens când timpul contează mai mult decât taxa. Prin{' '}
         <Link href={serviceUrl('extras-carte-funciara')}>serviciul nostru de extras de carte funciară online</Link>{' '}
-        documentul se eliberează automat, în câteva minute, la orice oră — inclusiv noaptea, în weekend și de
+        documentul se eliberează automat, în câteva minute, la orice oră, inclusiv noaptea, în weekend și de
         sărbători. Fără cont ANCPI, fără ROeID, fără drum la ghișeu. În plus, putem identifica imobilul și după
         adresă, când nu ai numărul de carte funciară. Costă 89 lei cu toate taxele incluse, iar documentul este
         extrasul oficial ANCPI, cu semnătură electronică, verificabil.
       </p>
 
-      <h2>Gratuit prin MyTerra vs. eGhișeul — comparația onestă</h2>
+      <h2>Gratuit prin MyTerra vs. eGhișeul, comparația onestă</h2>
       <ul>
         <li><strong>Preț:</strong> MyTerra 0 lei · eGhișeul 89 lei, taxe incluse.</li>
         <li><strong>Cont:</strong> MyTerra cere cont cu identitate verificată (ROeID / semnătură calificată / ghișeu) · eGhișeul nu cere niciun cont.</li>
-        <li><strong>Timp până la document:</strong> MyTerra — rapid după ce ai cont, dar contul poate însemna drum la ghișeu și până la 72 de ore · eGhișeul — câteva minute de la comandă.</li>
+        <li><strong>Timp până la document:</strong> MyTerra, rapid după ce ai cont, dar contul poate însemna drum la ghișeu și până la 72 de ore · eGhișeul, câteva minute de la comandă.</li>
         <li><strong>Program:</strong> MyTerra funcționează non-stop pentru conturi existente · eGhișeul eliberează automat 24/7, fără nicio condiție prealabilă.</li>
         <li><strong>Identificare după adresă:</strong> MyTerra nu · eGhișeul da.</li>
-        <li><strong>Documentul:</strong> identic — extrasul oficial ANCPI de informare, în format electronic.</li>
+        <li><strong>Documentul:</strong> identic, extrasul oficial ANCPI de informare, în format electronic.</li>
       </ul>
       <p>
         Alegerea e simplă: ai cont verificat și răbdare → gratuit. Îți trebuie acum, la orice oră, fără birocrație →{' '}

@@ -100,7 +100,7 @@ export default function Page() {
           <strong>capitalul social</strong> și structura asociaților;
         </li>
         <li>
-          <strong>codurile CAEN</strong> autorizate — obiectul de activitate al firmei;
+          <strong>codurile CAEN</strong> autorizate, obiectul de activitate al firmei;
         </li>
         <li>
           <strong>beneficiarii reali</strong>, esențiali pentru verificările antispălare de bani.
@@ -147,7 +147,7 @@ export default function Page() {
       </p>
       <p>
         <strong>Nu ai nevoie de versiunea cu istoric</strong> (mai scumpă și mai amplă) decât dacă
-        banca îți cere în mod explicit acest lucru — situație rară pentru un cont obișnuit sau un
+        banca îți cere în mod explicit acest lucru, situație rară pentru un cont obișnuit sau un
         credit standard. Înainte să comanzi o variantă scumpă „ca să fii sigur”, întreabă consilierul
         bancar ce versiune acceptă; aproape întotdeauna răspunsul este cea de bază.
       </p>
@@ -195,7 +195,7 @@ export default function Page() {
       <h2>De câte zile trebuie să fie certificatul</h2>
       <p>
         Băncile cer, de regulă, un certificat constatator <strong>emis în ultimele 30 de zile</strong>.
-        Documentul nu „expiră” oficial — informația rămâne valabilă cât timp firma nu se schimbă — dar
+        Documentul nu „expiră” oficial, informația rămâne valabilă cât timp firma nu se schimbă, dar
         banca vrea o <strong>fotografie recentă</strong> a societății, ca să fie sigură că datele sunt
         actuale la momentul deschiderii contului sau al acordării creditului.
       </p>
@@ -215,7 +215,7 @@ export default function Page() {
       </p>
       <p>
         Nu trebuie să tipărești PDF-ul, să-l ștampilezi sau să-l legalizezi. Îl trimiți băncii exact
-        așa cum l-ai primit — fișierul PDF cu semnătură electronică. Multe bănci preferă chiar acest
+        așa cum l-ai primit, fișierul PDF cu semnătură electronică. Multe bănci preferă chiar acest
         format, pentru că pot verifica automat valabilitatea semnăturii. Dacă un funcționar insistă pe
         „original pe hârtie”, poți explica liniștit că documentul electronic <em>este</em> originalul,
         conform reglementărilor ONRC.
@@ -279,7 +279,7 @@ export default function Page() {
         <strong>certificat constatator de bază, emis în ultimele 30 de zile</strong>, prin care
         confirmă că firma este Activă, cine semnează, ce coduri CAEN are și cine sunt beneficiarii
         reali. Versiunea de bază (30 lei la ONRC) este suficientă, iar{' '}
-        <strong>PDF-ul e-semnat este originalul</strong> acceptat de bancă — nu trebuie tipărit sau
+        <strong>PDF-ul e-semnat este originalul</strong> acceptat de bancă, nu trebuie tipărit sau
         ștampilat. Cel mai simplu îl obții{' '}
         <Link href="/servicii/certificat-constatator-online/">online, prin eGhișeul.ro</Link>, de
         regulă în aceeași zi.

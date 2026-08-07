@@ -16,9 +16,9 @@ const TITLE = 'ANCPI și e-Terra nu funcționează: atac cibernetic, sisteme pic
 // criza („atacul de la Cadastru", trend 2K+/24h) — căutarea vine pe el.
 const META_TITLE = 'ANCPI / Cadastru nu funcționează — status live și ce faci';
 const DESCRIPTION =
-  'Update 3 august: e-Terra, reinstalată în Cloudul Guvernamental, a trecut o nouă rundă de teste STS/DNSC/Cyberint — constatările se remediază, încă fără dată de repornire; informare nouă promisă pe 5 august. Comandă extrasul CF acum — îl eliberăm automat la revenire.';
+  'Update 7 august: e-Terra rămâne oprită. Guvernul a anunțat pe 5 august că testele STS/DNSC/Cyberint au găsit „un număr limitat de aspecte tehnice” de corectat; repornire fără dată, informare nouă promisă pe 7 august. Comandă extrasul CF acum — îl eliberăm automat la revenire.';
 const DATE_PUBLISHED = '2026-07-15';
-const DATE_MODIFIED = '2026-08-04';
+const DATE_MODIFIED = '2026-08-07';
 
 export const revalidate = 3600; // outage news — refresh hourly
 
@@ -51,7 +51,7 @@ export default function Page() {
       datePublished={DATE_PUBLISHED}
       dateModified={DATE_MODIFIED}
       publishedLabel="15 iulie 2026"
-      updatedLabel="29 iulie 2026"
+      updatedLabel="7 august 2026"
       imageAlt="Sistem temporar nefuncțional — sistemele informatice ANCPI indisponibile la nivel național"
       relatedServices={[
         {
@@ -85,7 +85,7 @@ export default function Page() {
         },
         {
           q: 'Până când e picat ANCPI?',
-          a: 'Nu există un termen ferm. Cel mai recent semnal, pe 3 august: Guvernul a anunțat că e-Terra, reinstalată în Cloudul Guvernamental, a parcurs o nouă rundă de teste de securitate, funcționalitate și performanță (STS, DNSC, Cyberint), iar constatările se remediază și se retestează — repunerea se face „imediat ce toate testele și validările tehnice sunt finalizate cu succes”, cu o nouă informare publică promisă cel târziu miercuri, 5 august. Termenele anterioare (20 iulie, 22 iulie, estimarea premierului 27–31 iulie) au trecut toate fără repunere, iar pe 27 iulie Guvernul a refuzat explicit să mai avanseze o dată. Repunerea va fi etapizată, pe componente.',
+          a: 'Nu există un termen ferm. Cel mai recent semnal, pe 5 august: Guvernul a confirmat că testele independente derulate de STS, DNSC și Cyberint într-un mediu controlat au identificat „un număr limitat de aspecte tehnice” care trebuie corectate înainte de expunerea publică a aplicației; repunerea se face „imediat ce toate testele tehnice și validările vor fi finalizate cu succes”, cu o informare publică promisă cel târziu vineri, 7 august. Termenele anterioare (20 iulie, 22 iulie, estimarea premierului 27–31 iulie) au trecut toate fără repunere, iar pe 27 iulie Guvernul a refuzat explicit să mai avanseze o dată. Repunerea va fi etapizată, pe componente.',
         },
         {
           q: 'Migrarea în Cloudul Guvernamental s-a terminat pe 22 iulie. De ce tot nu funcționează?',
@@ -152,7 +152,7 @@ export default function Page() {
         Guvernamental (<strong>22 iulie</strong>), care s-a încheiat fără ca serviciile să revină.
         Situația la zi: atacul a fost confirmat pe <strong>27 iulie</strong> ca fiind de tip{' '}
         <strong>ransomware</strong> — o parte din infrastructura de virtualizare a fost criptată și
-        ștearsă — iar pe <strong>3 august</strong> Guvernul a anunțat că e-Terra, reinstalată în
+        ștearsă, iar pe <strong>3 august</strong> Guvernul a anunțat că e-Terra, reinstalată în
         Cloudul Guvernamental, a parcurs <strong>o nouă rundă de teste</strong> (STS, DNSC,
         Cyberint); constatările sunt în curs de remediere și retestare, <strong>tot fără dată
         fermă de repunere</strong>, cu o nouă informare promisă{' '}
@@ -161,16 +161,16 @@ export default function Page() {
         <a href="https://www.bihon.ro/stirile-judetului-bihor/bihorul-afectat-de-blocajul-national-al-ancpi-cadastrul-nu-functioneaza-pana-luni-5337687/" target="_blank" rel="nofollow noopener">
           Bihorul
         </a>
-        ), dar problema e centrală — aceleași sisteme deservesc toate OCPI-urile din țară.
+        ), dar problema e centrală, aceleași sisteme deservesc toate OCPI-urile din țară.
       </p>
 
       {/* Statusul live + CTA-ul stau ÎMPREUNĂ, imediat după intro. Cine intră pe
           articol vrea două lucruri, în ordinea asta: „mai e picat?" și „ce fac
-          acum?". Le aveam la jumătatea paginii, după cronologie — prea jos
+          acum?". Le aveam la jumătatea paginii, după cronologie, prea jos
           pentru cineva care caută răspunsul pe telefon. */}
       <h2 id="status">Mai e picat ANCPI? Starea sistemelor, în timp real</h2>
       <p>
-        Da — sistemele sunt indisponibile de <strong>{outageDays} zile</strong>, fără dată oficială
+        Da, sistemele sunt indisponibile de <strong>{outageDays} zile</strong>, fără dată oficială
         de revenire. Verificăm portalul ANCPI la fiecare 15 minute. Indicatorul de mai jos e live,
         cu momentul exact de la care sistemele sunt indisponibile:
       </p>
@@ -211,7 +211,7 @@ export default function Page() {
         </Link>
       </div>
 
-      {/* Timeline — cronologia oficială a incidentului. Ține cititorul (și
+      {/* Timeline, cronologia oficială a incidentului. Ține cititorul (și
           clientul cu comandă în coadă) la curent fără să reia tot articolul.
           Cel mai recent sus: cine revine pe pagină vede întâi ce e nou. */}
       <h2 id="cronologie">Cronologia incidentului</h2>
@@ -250,7 +250,7 @@ export default function Page() {
                 <strong>„nu pot preciza o dată de la care aplicația informatică va fi
                 funcțională”</strong>. Se discută și <strong>soluții alternative</strong> pentru
                 deblocarea situației. Semnificația practică: nici profesioniștii care depind
-                direct de e-Terra nu au primit un termen — confirmă poziția Guvernului din 27
+                direct de e-Terra nu au primit un termen, confirmă poziția Guvernului din 27
                 iulie.
               </>
             ),
@@ -265,7 +265,7 @@ export default function Page() {
                 găzduiește aplicațiile agenției”. Baza cadastrală centrală nu a fost afectată.
                 Reconstrucția se face <strong>integral în Cloudul Guvernamental</strong>, dar{' '}
                 <strong>fără termen</strong>: „nu putem încă anunța o oră sau o dată fermă de
-                repunere în funcțiune — nu dorim să facem promisiuni pe care condițiile tehnice ne
+                repunere în funcțiune, nu dorim să facem promisiuni pe care condițiile tehnice ne
                 pot obliga să le amânăm”. Estimarea 27–31 iulie devine astfel incertă.
               </>
             ),
@@ -323,7 +323,7 @@ export default function Page() {
                 efectuate până acum. A început <strong>migrarea aplicațiilor ANCPI în Cloudul
                 Guvernamental</strong>, operațiune coordonată de <strong>STS</strong>, cu estimare de
                 finalizare <strong>miercuri, 22 iulie</strong>. Urmează verificarea sistemelor de
-                către instituțiile abilitate și un raport — abia apoi se comunică termenul de
+                către instituțiile abilitate și un raport, abia apoi se comunică termenul de
                 reluare. <strong>Repunerea în funcțiune va fi etapizată</strong>, în funcție de
                 prioritățile operaționale.
               </>
@@ -353,8 +353,8 @@ export default function Page() {
                 Precizare importantă pentru cine avea dosar depus: fluxul de lucru fiind complet
                 digitalizat, indisponibilitatea face imposibilă{' '}
                 <strong>atât înregistrarea unor cereri noi, cât și soluționarea celor deja
-                înregistrate</strong>. ANCPI anunță că va informa colaboratorii — persoane fizice
-                autorizate, notari, executori judecătorești, avocați — prin canalele oficiale.
+                înregistrate</strong>. ANCPI anunță că va informa colaboratorii, persoane fizice
+                autorizate, notari, executori judecătorești, avocați, prin canalele oficiale.
               </>
             ),
           },
@@ -378,7 +378,7 @@ export default function Page() {
               <>
                 ANCPI anunță că, începând de marți <strong>14 iulie</strong>,{' '}
                 <strong>toate sistemele informatice</strong> gestionate de instituție —{' '}
-                <strong>inclusiv adresele de e-mail</strong> și aplicația e-Terra — sunt
+                <strong>inclusiv adresele de e-mail</strong> și aplicația e-Terra, sunt
                 nefuncționale. Despre cauză: „nu putem oferi detalii, întrucât situația este
                 investigată de instituțiile abilitate”.
               </>
@@ -447,7 +447,7 @@ export default function Page() {
       </div>
 
       {/* Plasat imediat după cronologie: cititorul tocmai a aflat că nu există
-          termen ferm de revenire — exact momentul în care „te anunțăm noi" e
+          termen ferm de revenire, exact momentul în care „te anunțăm noi" e
           cel mai relevant. Prinde publicul care nu comandă acum și care altfel
           pleca fără urmă. */}
       <OutageAlertSignup service="ancpi" serviceLabel="ANCPI" sourcePage={`/${SLUG}/`} />
@@ -476,8 +476,8 @@ export default function Page() {
           anunțat pe 15 iulie, pe o platformă folosită pentru comercializarea datelor din atacuri
           informatice, că vinde date obținute din rețelele ANCPI și codul sursă al aplicațiilor
           (inclusiv e-Terra, printr-o copie a serverelor GitLab), susținând că a instalat ransomware și a șters
-          backup-uri — susținere pe care ANCPI a contrazis-o pe 19 iulie, precizând că{' '}
-          <strong>dispunea de mai multe locații de backup</strong> la momentul incidentului — relatare{' '}
+          backup-uri, susținere pe care ANCPI a contrazis-o pe 19 iulie, precizând că{' '}
+          <strong>dispunea de mai multe locații de backup</strong> la momentul incidentului, relatare{' '}
           <a href="https://publicrecord.ro/2026/07/17/atac-cibernetic-ancpi/" target="_blank" rel="nofollow noopener">
             Public Record
           </a>{' '}
@@ -504,7 +504,7 @@ export default function Page() {
         />
         <figcaption className="mt-2 text-center text-sm text-neutral-500">
           Informarea oficială distribuită de oficiile teritoriale ANCPI (aici, OCPI Bihor) la
-          începutul incidentului: sistemele nefuncționale până în 20.07.2026 — termen ulterior
+          începutul incidentului: sistemele nefuncționale până în 20.07.2026, termen ulterior
           depășit.
         </figcaption>
       </figure>
@@ -518,13 +518,13 @@ export default function Page() {
           <strong>adresele de e-mail ale instituției</strong> — ANCPI a confirmat că sunt și ele
           nefuncționale, deci mesajele trimise către OCPI-uri în această perioadă nu ajung;
         </li>
-        <li>implicit: autentificările notariale care au nevoie de extras de autentificare — semnările se reprogramează.</li>
+        <li>implicit: autentificările notariale care au nevoie de extras de autentificare, semnările se reprogramează.</li>
       </ul>
       <p>
         <strong>Dacă ai deja un dosar depus, stă și el.</strong> ANCPI a precizat pe 17 iulie că,
         fluxul de lucru fiind complet digitalizat, indisponibilitatea face imposibilă{' '}
         <em>atât înregistrarea unor cereri noi, cât și soluționarea celor deja înregistrate</em>.
-        Termenele de soluționare se decalează corespunzător — nu e nevoie să redepui.
+        Termenele de soluționare se decalează corespunzător, nu e nevoie să redepui.
       </p>
       <p>
         Important de înțeles: <strong>nimeni nu poate ocoli căderea</strong>. Ghișeul OCPI,
@@ -544,7 +544,7 @@ export default function Page() {
         </li>
         <li>
           <strong>Comenzile plasate acum intră în coadă</strong> și se eliberează automat, cu
-          prioritate, în momentul în care ANCPI revine — nu trebuie să reiei comanda sau să ne
+          prioritate, în momentul în care ANCPI revine, nu trebuie să reiei comanda sau să ne
           suni.
         </li>
         <li>
@@ -574,7 +574,7 @@ export default function Page() {
           {
             situation: 'Ai antecontract cu termen de semnare care expiră acum',
             action:
-              'Contactează notarul și cealaltă parte ÎNAINTE de expirare. Se semnează un act adițional care prelungește termenul cu durata blocajului. Imposibilitatea de a obține extrasul e o cauză externă, independentă de voința părților — dar o înțelegere verbală nu te protejează dacă cealaltă parte se răzgândește.',
+              'Contactează notarul și cealaltă parte ÎNAINTE de expirare. Se semnează un act adițional care prelungește termenul cu durata blocajului. Imposibilitatea de a obține extrasul e o cauză externă, independentă de voința părților, dar o înțelegere verbală nu te protejează dacă cealaltă parte se răzgândește.',
           },
           {
             situation: 'Ai credit ipotecar aprobat',
@@ -584,22 +584,22 @@ export default function Page() {
           {
             situation: 'Aveai programare la notar',
             action:
-              'Se reprogramează doar semnarea. Documentele deja adunate rămân valabile în limita termenelor proprii — extrasul de autentificare oricum are 10 zile lucrătoare, deci nu se putea obține în avans pentru o dată incertă.',
+              'Se reprogramează doar semnarea. Documentele deja adunate rămân valabile în limita termenelor proprii, extrasul de autentificare oricum are 10 zile lucrătoare, deci nu se putea obține în avans pentru o dată incertă.',
           },
           {
             situation: 'Ai depus dosar de intabulare înainte de cădere',
             action:
-              'Stă și el. ANCPI a confirmat pe 17 iulie că nu se pot soluționa nici cererile deja înregistrate. Nu redepui și nu plăti din nou — termenele de soluționare se decalează cu durata blocajului.',
+              'Stă și el. ANCPI a confirmat pe 17 iulie că nu se pot soluționa nici cererile deja înregistrate. Nu redepui și nu plăti din nou, termenele de soluționare se decalează cu durata blocajului.',
           },
           {
             situation: 'Cumperi și vrei să verifici proprietarul înainte să plătești',
             action:
-              'Extrasul CF nu se poate obține acum, din nicio sursă. Amână orice plată de avans până verifici — nu te baza pe un extras vechi de câteva luni și nici pe asigurările vânzătorului.',
+              'Extrasul CF nu se poate obține acum, din nicio sursă. Amână orice plată de avans până verifici, nu te baza pe un extras vechi de câteva luni și nici pe asigurările vânzătorului.',
           },
           {
             situation: '⚠️ Ai antecontract cu TVA 9% și termenul fiscal expira pe 31 iulie',
             action:
-              'Vești bune, cu o rezervă: Senatul a adoptat pe 27 iulie prelungirea termenului de livrare de la 31 iulie la 30 septembrie 2026, exact din cauza blocajului ANCPI, plus restituirea diferenței pentru cei care apucă să plătească 21%. NU e încă lege — mai trebuie votul Camerei Deputaților, promulgarea și publicarea în Monitorul Oficial. Până nu apare în Monitor, nu semna nimic pe 21% fără să vorbești cu notarul și cu dezvoltatorul despre clauze de ajustare. Detaliile la zi — în articolul dedicat.',
+              'Vești bune, cu o rezervă: Senatul a adoptat pe 27 iulie prelungirea termenului de livrare de la 31 iulie la 30 septembrie 2026, exact din cauza blocajului ANCPI, plus restituirea diferenței pentru cei care apucă să plătească 21%. NU e încă lege, mai trebuie votul Camerei Deputaților, promulgarea și publicarea în Monitorul Oficial. Până nu apare în Monitor, nu semna nimic pe 21% fără să vorbești cu notarul și cu dezvoltatorul despre clauze de ajustare. Detaliile la zi, în articolul dedicat.',
           },
         ].map((row, i) => (
           <div key={i} className="rounded-xl border border-neutral-200 bg-white p-4">
@@ -642,11 +642,11 @@ export default function Page() {
         <pre className="whitespace-pre-wrap break-all text-xs leading-relaxed text-neutral-100">{`<iframe src="https://eghiseul.ro/embed/ancpi/" width="400" height="150"
   style="border:0;border-radius:12px;max-width:100%"
   title="Starea sistemelor ANCPI — monitorizare live eGhișeul.ro" loading="lazy"></iframe>
-<p style="font-size:12px;margin:4px 0 0">Sursa: <a href="https://eghiseul.ro/ancpi-nu-functioneaza/">monitorizare ANCPI live — eGhișeul.ro</a></p>`}</pre>
+<p style="font-size:12px;margin:4px 0 0">Sursa: <a href="https://eghiseul.ro/ancpi-nu-functioneaza/">monitorizare ANCPI live, eGhișeul.ro</a></p>`}</pre>
       </div>
       <p>
         Pentru redacții avem și <strong>datele brute de monitorizare</strong> (ferestrele exacte de
-        indisponibilitate, cu timestamp) și un interlocutor pentru context — scrieți-ne la{' '}
+        indisponibilitate, cu timestamp) și un interlocutor pentru context, scrieți-ne la{' '}
         <a href="mailto:contact@eghiseul.ro">contact@eghiseul.ro</a>.
       </p>
 
@@ -672,13 +672,27 @@ export default function Page() {
 
       <h2>Actualizări</h2>
       <p>
+        <strong>7 august 2026:</strong> ziua <strong>{outageDays}</strong> de blocaj. Marți,{' '}
+        <strong>5 august</strong>, Guvernul a confirmat că e-Terra rămâne oprită și că sistemul se
+        redeschide „imediat ce toate testele tehnice și validările vor fi finalizate cu succes”, fără
+        să avanseze o dată. Formularea folosită de autorități: la testele independente derulate de{' '}
+        <strong>STS, DNSC și Cyberint</strong> într-un mediu controlat s-a identificat{' '}
+        <strong>„un număr limitat de aspecte tehnice”</strong> care trebuie corectate înainte de
+        expunerea publică a aplicației. Motivul invocat pentru prudență e rezonabil: mai bine găsesc
+        problemele în teste decât după redeschidere, ca să nu urmeze o a doua cădere. În paralel, ANCPI
+        poartă discuții cu notarii și cu specialiștii cadastrali despre procedurile de lucru la
+        repornire. Guvernul a promis o informare publică{' '}
+        <strong>cel târziu vineri, 7 august</strong>, cu stadiul concret al remedierilor, o adăugăm
+        aici imediat ce apare.
+      </p>
+      <p>
         <strong>4 august 2026:</strong> ziua <strong>{outageDays}</strong> de blocaj. Pe{' '}
         <strong>3 august</strong>, Guvernul a comunicat oficial (gov.ro) că testele de{' '}
         <strong>securitate, funcționalitate și performanță</strong> derulate de STS, DNSC și
         Cyberint asupra e-Terra, în infrastructura din Cloudul Guvernamental, au parcurs{' '}
         <strong>o nouă rundă de evaluare</strong>; constatările au fost transmise ANCPI, care
         lucrează cu cele trei instituții la remedierea și retestarea fiecărui aspect. Semnal
-        pozitiv: aplicația e instalată în cloud și se testează efectiv — dar repunerea rămâne
+        pozitiv: aplicația e instalată în cloud și se testează efectiv, dar repunerea rămâne
         condiționată de finalizarea cu succes a tuturor validărilor, <strong>fără dată
         anunțată</strong>. Guvernul promite o nouă informare publică{' '}
         <strong>cel târziu miercuri, 5 august</strong> — o documentăm aici imediat ce apare.
@@ -696,7 +710,7 @@ export default function Page() {
         <strong>29 iulie 2026:</strong> ziua <strong>{outageDays}</strong> de blocaj, fără termen
         de repornire. Pe <strong>27 iulie</strong>, Guvernul a confirmat că atacul a fost de tip{' '}
         <strong>ransomware</strong> — atacatorii au criptat și șters o parte din infrastructura de
-        virtualizare — și a refuzat explicit să mai avanseze o dată: „nu dorim să facem promisiuni
+        virtualizare, și a refuzat explicit să mai avanseze o dată: „nu dorim să facem promisiuni
         pe care condițiile tehnice ne pot obliga să le amânăm”. Baza cadastrală centrală rămâne
         neafectată. Tot pe 27 iulie, <strong>Senatul a votat prelungirea termenului TVA 9% până la
         30 septembrie</strong> (detalii în{' '}
@@ -704,7 +718,7 @@ export default function Page() {
         urmează Camera Deputaților).
       </p>
       <p>
-        <strong>26 iulie 2026:</strong> sistemele ANCPI sunt în continuare picate — ziua{' '}
+        <strong>26 iulie 2026:</strong> sistemele ANCPI sunt în continuare picate, ziua{' '}
         <strong>{outageDays}</strong> de blocaj. Nu există comunicat ANCPI cu dată fermă de
         repunere; cel mai recent anunț de pe site-ul instituției rămâne cel privind migrarea
         încheiată pe 22 iulie. Ce e realist de așteptat: reluare <strong>în cursul săptămânii
@@ -717,7 +731,7 @@ export default function Page() {
         <strong>23 iulie 2026:</strong> premierul <strong>Bolojan</strong> declară că{' '}
         <strong>„în cursul săptămânii viitoare se va relua activitatea agenției”</strong> (deci
         27–31 iulie) și că accesul la bazele de date va redeveni posibil, reconfirmând că datele
-        legate de proprietăți nu au fost afectate. Rămâne o estimare guvernamentală — ANCPI nu a
+        legate de proprietăți nu au fost afectate. Rămâne o estimare guvernamentală, ANCPI nu a
         confirmat o dată prin comunicat propriu.
       </p>
       <p>
@@ -732,7 +746,7 @@ export default function Page() {
         verificărilor de până acum. A început <strong>migrarea aplicațiilor în Cloudul
         Guvernamental</strong>, coordonată de STS, estimată să se încheie{' '}
         <strong>miercuri, 22 iulie</strong>. Atenție la nuanță: 22 iulie e termenul{' '}
-        <em>migrării</em>, nu al revenirii serviciilor — după migrare urmează verificarea
+        <em>migrării</em>, nu al revenirii serviciilor, după migrare urmează verificarea
         sistemelor de către instituțiile abilitate și un raport, iar termenul de reluare se
         comunică abia atunci. Repunerea va fi <strong>etapizată</strong>, pe componente. Sursă:{' '}
         <a href="https://www.ancpi.ro/" target="_blank" rel="nofollow noopener">
@@ -743,7 +757,7 @@ export default function Page() {
       <p>
         <strong>19 iulie 2026:</strong> infrastructura e în „amplu proces de reinstalare și
         consolidare”. ANCPI precizează că avea <strong>mai multe locații de backup</strong> la
-        momentul incidentului — contrazicând indirect susținerea atacatorului că ar fi șters
+        momentul incidentului, contrazicând indirect susținerea atacatorului că ar fi șters
         copiile de siguranță. Investigațiile tehnice și penale continuă, fără concluzii oficiale.
       </p>
       <p>
