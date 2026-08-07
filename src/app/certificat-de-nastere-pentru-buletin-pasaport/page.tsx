@@ -34,7 +34,7 @@ export default function Page() {
       dateModified={DATE_MODIFIED}
       publishedLabel="august 2026"
       updatedLabel="7 august 2026"
-      imageAlt="Bărbat la masa din bucătărie verificând un dosar cu acte înainte de a merge la ghișeu, cu buletinul și certificatul de naștere alături"
+      imageAlt="Bărbat la ghișeul de evidența populației, cu dosarul deschis pe tejghea, aflând că îi lipsește un act din dosar"
       relatedServices={[
         {
           href: '/servicii/eliberare-certificat-de-nastere/',

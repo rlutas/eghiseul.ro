@@ -161,7 +161,6 @@ export const ARTICLES: ArticleMeta[] = [
     title: 'Certificat de naștere pentru buletin sau pașaport: când se cere',
     excerpt:
       'Unde se cere în original și unde ajunge o copie, plus cum ieși din cercul în care ai pierdut și buletinul, și certificatul.',
-    image: '/og/services/certificat-nastere.png',
     category: 'Stare civilă',
   },
   {
