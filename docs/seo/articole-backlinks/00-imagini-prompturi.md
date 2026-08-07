@@ -16,7 +16,19 @@ e cea a ARTICOLELOR, nu a site-urilor. Maparea corectă azi:
 | 03 constatator | startupcafe.ro | Antreprenor la birou cu laptopul deschis și un document ștampilat al firmei |
 | 04 checklist firmă | start-up.ro | Fondator de firmă organizând dosarele și lista de acte necesare în primul an |
 | 05 partener afaceri | risco.ro | Doi oameni de afaceri analizând un contract înainte de semnare |
-| 06 acte de acasă | **economica.net** | Femeie acasă, la masa din bucătărie, rezolvând formalități pe laptop |
+| 06 acte de acasă | **economica.net** | Femeie la biroul de acasă completând pe laptop o cerere pentru un document, fără drum la ghișeu |
+
+**Alt text economica.net — variante**, în funcție de care prompt a ieșit mai bine:
+- *varianta principală (birou acasă):* „Femeie la biroul de acasă completând pe laptop o cerere
+  pentru un document, fără drum la ghișeu"
+- *alternativa 1 (sala de așteptare goală):* „Sală de așteptare goală la un ghișeu public, cu
+  scaunele neocupate — tot mai multe acte se obțin online"
+- *alternativa 2 (top-down birou):* „Laptop, acte și chei pe un birou de acasă, pregătite pentru
+  o cerere online către instituțiile statului"
+
+Reguli alt text: descriptiv și natural, 90–125 caractere, fără listă de cuvinte-cheie, fără
+„click aici"/„imagine cu", fără brand (nu ajută la nimic în alt) și — regula de casă — NICIODATĂ
+„oficiale" lângă „acte"/„documente" (politica Google Ads).
 
 Reguli generale, valabile la toate:
 - Cere formatul **landscape 16:9** și exportă la rezoluția maximă oferită.
