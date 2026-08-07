@@ -31,6 +31,7 @@ export default function Page() {
       dateModified={DATE_MODIFIED}
       publishedLabel="19 iunie 2026"
       updatedLabel="19 iunie 2026"
+      imageAlt="Bărbat căutând printre acte vechi scoase dintr-o cutie de carton și din dulap, pe podeaua din living — certificatul de naștere pierdut"
       relatedServices={[
         {
           slug: 'certificat-nastere',
