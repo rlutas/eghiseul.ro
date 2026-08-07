@@ -105,6 +105,58 @@ Aliniate și lungimile la norma site-ului: titlu ~60 caractere (mediana 64), exc
 - **Humanizer** pe 4 articole: ANCPI 68 → 35 linii de pauză, `extras-carte-funciara-gratuit` 14 → 7,
   `certificat-constatator-pentru-banca` 13 → 7, articolul nou 20 → 1.
 
+## 6b. Punctul 1 din master list: rovinieta — investigat și parțial livrat
+
+**Ce s-a dovedit fals din diagnosticul inițial.** Auditul de dimineață spunea că
+`/servicii/rovinieta-online/` „nu are niciun buton de comandă". Greșit: pagina **are** formular,
+`RovinietaPurchaseForm`, doar că e componentă separată și grep-ul după `Link`/`Button` nu l-a prins.
+
+**Ce s-a verificat live pe checkout** (`erovinieta.net`, NETHUT DIGITAL SRL, CUI RO47872731):
+handoff-ul **funcționează** — formularul trimite
+`erovinieta.net/checkout?category=A&period=TWELVE_MONTHS&plate=...&utm_*`, iar la destinație
+categoria, perioada și numărul de înmatriculare se pre-completează corect, iar checkout-ul sare
+direct la pasul 2.
+
+| Ce | Stare |
+|---|---|
+| CTA imediat sub widget pe pagina tool-ului | ✅ **livrat** — primul link spre cumpărare era abia la jumătatea paginii |
+| Coloana „Total la plată" pe tabelele de tarife | ❌ **livrat și apoi scos** — decizie Raul: prețurile rămân doar tariful CNAIR, suma finală o vede clientul la checkout |
+| UTM-urile pierdute la destinație | ⚠️ **nerezolvat, nu ține de noi** |
+
+**Problema de atribuire, deschisă:** linkul pleacă cu
+`utm_source=eghiseul&utm_medium=referral&utm_campaign=rovinieta-landing&utm_content=hero-form`,
+dar checkout-ul rescrie URL-ul în `erovinieta.net/checkout` curat. Numărul de înmatriculare
+supraviețuiește, deci aplicația citește parametrii, însă **dacă analytics-ul de pe erovinieta.net se
+declanșează după rescrierea URL-ului, atribuirea se pierde** și nu vom ști niciodată câte comenzi
+vin de la eghiseul. Se rezolvă pe partea lor: salvarea UTM-urilor în `sessionStorage` la încărcare,
+înainte de `replaceState`. Până atunci, tot traficul trimis de aici rămâne nemăsurabil.
+
+Diferența de preț observată la verificare, pentru referință internă (tarif CNAIR vs. total la
+checkout, categoria A, 7 aug 2026): 18 → 20,55 · 31 → 35,24 · 48 → 55,80 · 76 → 88,10 ·
+255 → 293,66 lei. Diferența e TVA 21% plus serviciul de eliberare.
+
+## 6c. ANCPI — primul semnal de dată (7 august)
+
+Sursă: **circulara UNNPR nr. 4979 din 6 august 2026** către camerele notarilor publici. După
+întâlnirea din 6 august cu ANCPI, implementarea măsurilor tehnice „se apropie de final, fiind la
+momentul actual în etapa de pregătire a reluării activității", iar reprezentanții ANCPI **propun
+repornirea e-Terra săptămâna viitoare**, cu reluare treptată.
+
+Verificat în presă: Digi24, Forbes, ProTV, StartupCafe s-au oprit la comunicatul guvernamental din
+5 august. **Partea cu „săptămâna viitoare" nu era publicată de nimeni** la momentul scrierii — avans
+real pe subiect, ca și pe 29 iulie.
+
+Scris cu nuanța corectă: e o **propunere dintr-o ședință de lucru**, nu un comunicat ANCPI cu dată
+fermă. Toate termenele anterioare au picat (20 iulie, 22 iulie, estimarea premierului 27–31 iulie),
+iar UNNPR însăși scrie că estimările anterioare „au fost pur speculative și au creat confuzie".
+
+Confirmat independent și al doilea element: ANCPI lucrează cu Ministerul Dezvoltării la o
+**procedură de reluare a activității**, elaborată și testată cu notarii și specialiștii cadastrali —
+adică se pregătește și tratarea cozii de dosare acumulate în peste trei săptămâni.
+
+Actualizate: intrarea din „Actualizări", meta description și răspunsul din FAQ. Articolul are
+`revalidate = 3600`, deci se împrospătează din oră în oră fără redeploy.
+
 ## 7. Trimis la indexare în GSC — 7 august
 
 Prin Verificarea adresei URL → Solicită indexarea, pe proprietatea `sc-domain:eghiseul.ro`

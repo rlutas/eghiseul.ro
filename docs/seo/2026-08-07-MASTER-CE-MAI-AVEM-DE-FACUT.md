@@ -39,6 +39,8 @@ calculatoare și pe verificarea rovinietei, unde nimeni nu cumpără nimic.
 | 11 | Comasare pierdut + duplicat | ❌ **anulat** — decizie Raul, rămân separate |
 | 14 | 23 imagini featured | 🔄 **13 din 27** (23 inițiale + 4 pt. articolele noi) |
 | — | Trimis la indexare în GSC | ✅ **făcut** — 5 URL-uri + sitemap retrimis |
+| 5 | Punte tool → serviciu pe rovinietă | 🔄 **parțial** — CTA sub widget livrat; handoff-ul verificat live și funcționează. ⚠️ UTM-urile se pierd la destinație, deci traficul rămâne nemăsurabil (fix pe partea erovinieta.net) |
+| — | ANCPI: primul semnal de dată | ✅ **făcut** — circulara UNNPR 6 aug, repornire propusă săptămâna viitoare |
 
 Restul punctelor de mai jos sunt **neatinse**. Detaliile a ce s-a livrat:
 [jurnal de livrare](2026-08-07-jurnal-livrare.md).
