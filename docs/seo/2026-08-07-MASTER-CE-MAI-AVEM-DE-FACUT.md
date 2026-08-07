@@ -26,6 +26,29 @@ calculatoare și pe verificarea rovinietei, unde nimeni nu cumpără nimic.
 
 ---
 
+---
+
+## STARE 7 aug, seara — ce s-a bifat din lista de mai jos
+
+| # | Punct | Stare |
+|---|---|---|
+| 1 | `www.eghiseul.ro` în Vercel | ✅ **făcut** — cert valid, 308 → root, 1 hop |
+| 4 | Deploy fix lanțuri redirect | ✅ **făcut** — 14 reguli, 2 → 1 hop |
+| 10 | 3 articole pe cazier fiscal | ✅ **făcut** — firmă, fără SPV, verificare |
+| 12 | Articol „certificat de naștere pentru buletin/pașaport" | ✅ **făcut** |
+| 11 | Comasare pierdut + duplicat | ❌ **anulat** — decizie Raul, rămân separate |
+| 14 | 23 imagini featured | 🔄 **13 din 27** (23 inițiale + 4 pt. articolele noi) |
+| — | Trimis la indexare în GSC | ✅ **făcut** — 5 URL-uri + sitemap retrimis |
+
+Restul punctelor de mai jos sunt **neatinse**. Detaliile a ce s-a livrat:
+[jurnal de livrare](2026-08-07-jurnal-livrare.md).
+
+**Următoarele trei, în ordinea impactului:** #5 puntea tool → serviciu pe rovinietă,
+#6 și #7 title+meta pe cazier judiciar și constatator, #8 trimis articolele la click.ro și
+economica.net.
+
+---
+
 ## Nivelul 0 — de făcut azi sau mâine (minute, nu zile)
 
 | # | Ce | De ce | Unde |
