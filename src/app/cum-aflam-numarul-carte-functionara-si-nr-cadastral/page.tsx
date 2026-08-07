@@ -8,7 +8,7 @@ const DESCRIPTION =
   'Cum afli numărul cadastral și numărul de carte funciară: din actul de proprietate, dintr-un extras CF ' +
   'mai vechi sau după adresă. Plus cum localizezi terenul pe hartă după numărul cadastral, pas cu pas.';
 const DATE_PUBLISHED = '2023-12-01';
-const DATE_MODIFIED = '2026-07-26';
+const DATE_MODIFIED = '2026-08-07';
 
 export const revalidate = 86400;
 
@@ -29,7 +29,7 @@ export default function Page() {
       datePublished={DATE_PUBLISHED}
       dateModified={DATE_MODIFIED}
       publishedLabel="decembrie 2023"
-      updatedLabel="26 iulie 2026"
+      updatedLabel="7 august 2026"
       relatedServices={[
         { slug: 'identificare-imobil', label: 'Identificare Imobil după Adresă', desc: 'Nu știi numărul cadastral? Îl aflăm noi după adresă.' },
         { slug: 'extras-carte-funciara', label: 'Extras de Carte Funciară', desc: 'Document ANCPI, livrat pe email în câteva minute.' },
@@ -165,6 +165,90 @@ export default function Page() {
         fost între timp dezmembrat, alipit sau renumerotat la intabulare, ori pur și simplu nu a
         ajuns încă în sistemul integrat. Nu insista pe numărul din actul vechi: pornește de la
         adresă și află numărul actual, apoi caută din nou.
+      </p>
+
+      <h3>Numărul nu apare pe hartă: cele cinci cauze, în ordinea frecvenței</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Cauză</th>
+            <th>Cum îți dai seama</th>
+            <th>Ce faci</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Ai selectat altă unitate administrativ-teritorială</td>
+            <td>numărul e valid, dar parcela cade în altă localitate</td>
+            <td>verifică UAT-ul exact din actul de proprietate — numerele se repetă de la o comună la alta</td>
+          </tr>
+          <tr>
+            <td>Numărul e de carte funciară, nu cadastral</td>
+            <td>apare lângă mențiunea „CF nr." sau e vizibil mai scurt</td>
+            <td>caută în act numărul cadastral sau cel topografic</td>
+          </tr>
+          <tr>
+            <td>Imobilul nu e intabulat</td>
+            <td>întreaga zonă apare fără parcele desenate</td>
+            <td>e nevoie de cadastru și intabulare — vezi <Link href="/cat-costa-cadastrul-si-intabularea/">cât costă</Link></td>
+          </tr>
+          <tr>
+            <td>Geometria nu e digitizată încă</td>
+            <td>cartea funciară există pe hârtie, parcela lipsește de pe hartă</td>
+            <td>identificare în evidențele OCPI, nu pe geoportal</td>
+          </tr>
+          <tr>
+            <td>Număr vechi, înlocuit la renumerotare</td>
+            <td>actul e anterior anilor 2010–2015</td>
+            <td>pornește de la adresă și află numărul actual</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Sufixele din numărul cadastral</h3>
+      <p>
+        Un număr de forma <strong>123456-C1-U5</strong> nu e o eroare de tipărire:{' '}
+        <strong>123456</strong> e terenul, <strong>C1</strong> e prima construcție ridicată pe el, iar{' '}
+        <strong>U5</strong> e unitatea individuală cinci din acea construcție, adică apartamentul. Când
+        cauți un apartament pe hartă vei găsi conturul blocului, nu al locuinței — planul interior apare
+        doar în <Link href={serviceUrl('copie-releveu')}>releveu</Link>.
+      </p>
+
+      <h3>După ce ai localizat imobilul: ce document îți trebuie mai departe</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Vrei să afli</th>
+            <th>Documentul potrivit</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>cine e proprietarul, ce ipoteci și interdicții are imobilul</td>
+            <td><Link href={serviceUrl('extras-carte-funciara')}>extras de carte funciară de informare</Link></td>
+          </tr>
+          <tr>
+            <td>limitele și vecinătățile, pentru un proiect sau o dispută</td>
+            <td><Link href={serviceUrl('extras-plan-cadastral')}>extras de plan cadastral</Link></td>
+          </tr>
+          <tr>
+            <td>configurația interioară a construcției</td>
+            <td><Link href={serviceUrl('copie-releveu')}>copie după releveu</Link></td>
+          </tr>
+          <tr>
+            <td>poziționarea exactă în teren, cu coordonate</td>
+            <td><Link href={serviceUrl('plan-amplasament-delimitare')}>plan de amplasament și delimitare</Link></td>
+          </tr>
+          <tr>
+            <td>dacă imobilul are sarcini înainte de o tranzacție</td>
+            <td><Link href={serviceUrl('certificat-sarcini')}>certificat de sarcini</Link></td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        Pentru o vânzare, extrasul de carte funciară nu trebuie să fie mai vechi de 30 de zile la data
+        semnării la notar — detaliile și excepțiile sunt în ghidul despre{' '}
+        <Link href="/valabilitate-extras-de-carte-funciara/">valabilitatea extrasului de carte funciară</Link>.
       </p>
 
       <h2>Sfaturi pentru solicitarea online a extrasului de carte funciară</h2>

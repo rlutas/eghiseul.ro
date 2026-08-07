@@ -129,7 +129,7 @@ export default async function AccountPage() {
                 </Link>
 
                 <Link
-                  href="/account/settings"
+                  href="/account/"
                   className="flex items-center gap-3 p-3 rounded-xl hover:bg-neutral-50 transition-colors group"
                 >
                   <div className="w-10 h-10 rounded-xl bg-neutral-100 flex items-center justify-center">

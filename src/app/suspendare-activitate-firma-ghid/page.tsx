@@ -133,7 +133,7 @@ export default function Page() {
         <li>
           <strong>Nu lăsa firma „în aer”</strong> — nici suspendată, nici radiată, doar nefolosită:
           declarațiile curg, amenzile se adună, iar administratorul poate ajunge cu fapte înscrise în{' '}
-          <Link href="/servicii/cazier-fiscal-online/">cazierul fiscal</Link>, ceea ce blochează
+          <Link href="/cazier-fiscal-persoana-fizica/">cazierul fiscal</Link>, ceea ce blochează
           înființarea altor firme în viitor.
         </li>
       </ul>

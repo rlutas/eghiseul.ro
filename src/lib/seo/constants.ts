@@ -178,6 +178,7 @@ export const HARDCODED_TOOL_SLUGS = [
  * Blog articles at WP root path (no /articole/ prefix — preserves backlinks).
  */
 export const HARDCODED_ARTICLE_SLUGS = [
+  'cazier-fiscal-persoana-fizica',
   'apostila-de-la-haga-ghid-acte-obtinere',
   'schimbare-sediu-social-srl-ghid',
   'suspendare-activitate-firma-ghid',

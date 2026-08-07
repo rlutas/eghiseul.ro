@@ -293,11 +293,16 @@ export default async function CazierFiscalOnlinePage() {
             <div className="space-y-4 text-neutral-700 leading-relaxed">
               <p>
                 <strong>Cazierul fiscal</strong> (sau „certificat de cazier fiscal”) este documentul
-                eliberat de <strong>ANAF</strong> care atestă <strong>lipsa datoriilor fiscale</strong> ale unei
-                persoane la bugetul general consolidat al statului. Practic, certificatul confirmă că persoana
-                fizică nu figurează cu obligații fiscale restante, fapte sancționate de legile fiscale, contravenții
-                sau infracțiuni de natură economică. Este unul dintre cele mai cerute documente la
-                <strong> înființarea unei firme</strong> sau la numirea ca asociat ori administrator.
+                eliberat de <strong>ANAF</strong> care atestă că o persoană <strong>nu are înscrise fapte
+                sancționate</strong> de legislația fiscală, contabilă, vamală sau de disciplină financiară.
+                Atenție la o confuzie frecventă: cazierul arată <em>sancțiuni</em>, nu datorii — datoriile la
+                buget se dovedesc cu certificatul de atestare fiscală, document separat. Cazierul fiscal este
+                unul dintre cele mai cerute acte la <strong>înființarea unei firme</strong> sau la numirea ca
+                asociat ori administrator. Am detaliat ce fapte se înscriu, când se radiază și cine îl cere în{' '}
+                <Link href="/cazier-fiscal-persoana-fizica/">
+                  ghidul despre cazierul fiscal al persoanei fizice
+                </Link>
+                .
               </p>
               <p>
                 Prin eGhișeul obții <strong>cazierul fiscal online</strong>, fără drum la ghișeul ANAF. Ai nevoie

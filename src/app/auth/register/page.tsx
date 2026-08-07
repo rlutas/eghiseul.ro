@@ -303,11 +303,11 @@ export default function RegisterPage() {
                 />
                 <label htmlFor="terms" className="text-sm text-neutral-600 cursor-pointer">
                   Accept{' '}
-                  <Link href="/terms" className="text-primary-600 hover:text-primary-700 font-medium">
+                  <Link href="/termeni-si-conditii/" className="text-primary-600 hover:text-primary-700 font-medium">
                     Termenii și Condițiile
                   </Link>{' '}
                   și{' '}
-                  <Link href="/privacy" className="text-primary-600 hover:text-primary-700 font-medium">
+                  <Link href="/politica-de-confidentialitate/" className="text-primary-600 hover:text-primary-700 font-medium">
                     Politica de Confidențialitate
                   </Link>
                 </label>
