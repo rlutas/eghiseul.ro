@@ -361,6 +361,7 @@ export const ARTICLES: ArticleMeta[] = [
   },
   {
     slug: 'ce-este-planul-cadastral',
+    image: '/og/services/extras-cf.png',
     title: 'Ce este planul cadastral (și diferența față de releveu și extras CF)',
     excerpt:
       'Ce arată planul cadastral, prin ce se deosebește de releveu și de extrasul de carte funciară, și în ce situații ți se cere fiecare dintre ele.',
@@ -368,6 +369,7 @@ export const ARTICLES: ArticleMeta[] = [
   },
   {
     slug: 'ce-este-un-releveu',
+    image: '/og/services/extras-cf.png',
     title: 'Ce este un releveu și cum îl obții (apartament, casă)',
     excerpt:
       'Planul interior al locuinței, cu camerele și suprafețele lor: la ce folosește, cine îl întocmește și cum obții o copie din arhiva OCPI.',
