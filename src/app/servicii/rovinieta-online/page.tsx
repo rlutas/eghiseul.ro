@@ -85,16 +85,12 @@ const CATEGORII = [
 
 // Tarife CNAIR autoturisme (categoria A), ianuarie 2026. EUR fix prin lege; lei la
 // cursul de referință (ian. 2026: 1 EUR = 5,0963 RON). Se actualizează lunar.
-// Coloana „tarif CNAIR" e taxa de stat; „total la plată" e suma reală de la
-// finalizarea comenzii, care include TVA 21% și serviciul de eliberare. Fără a
-// doua coloană, omul vedea 255 lei aici și 293,66 lei la checkout — verificat
-// pe 7 aug 2026, exact la pasul de plată.
 const TARIFE_A = [
-  { perioada: '1 zi', eur: '3,5 €', ron: '≈ 18 lei', total: '20,55 lei' },
-  { perioada: '10 zile', eur: '6 €', ron: '≈ 31 lei', total: '35,24 lei' },
-  { perioada: '30 zile', eur: '9,5 €', ron: '≈ 48 lei', total: '55,80 lei' },
-  { perioada: '60 zile', eur: '15 €', ron: '≈ 76 lei', total: '88,10 lei' },
-  { perioada: '12 luni', eur: '50 €', ron: '≈ 255 lei', total: '293,66 lei' },
+  { perioada: '1 zi', eur: '3,5 €', ron: '≈ 18 lei' },
+  { perioada: '10 zile', eur: '6 €', ron: '≈ 31 lei' },
+  { perioada: '30 zile', eur: '9,5 €', ron: '≈ 48 lei' },
+  { perioada: '60 zile', eur: '15 €', ron: '≈ 76 lei' },
+  { perioada: '12 luni', eur: '50 €', ron: '≈ 255 lei' },
 ];
 
 const FAQS = [
@@ -234,9 +230,8 @@ export default function RovinietaOnlinePage() {
                 <thead>
                   <tr className="bg-neutral-100 text-secondary-900">
                     <th className="text-left px-4 py-2.5 font-semibold">Perioadă</th>
-                    <th className="text-left px-4 py-2.5 font-semibold">Tarif CNAIR (euro)</th>
-                    <th className="text-left px-4 py-2.5 font-semibold">Tarif CNAIR (lei)</th>
-                    <th className="text-left px-4 py-2.5 font-semibold">Total la plată</th>
+                    <th className="text-left px-4 py-2.5 font-semibold">Preț (euro)</th>
+                    <th className="text-left px-4 py-2.5 font-semibold">Preț (lei, ian. 2026)</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-neutral-100">
@@ -245,18 +240,11 @@ export default function RovinietaOnlinePage() {
                       <td className="px-4 py-2.5 font-medium text-secondary-900">{t.perioada}</td>
                       <td className="px-4 py-2.5 text-neutral-700">{t.eur}</td>
                       <td className="px-4 py-2.5 text-neutral-700">{t.ron}</td>
-                      <td className="px-4 py-2.5 font-semibold text-secondary-900">{t.total}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
-            <p className="text-sm text-neutral-600 mt-3">
-              Coloana <strong>tarif CNAIR</strong> este taxa de stat. Coloana{' '}
-              <strong>total la plată</strong> este suma pe care o achiți efectiv la finalizarea comenzii și
-              include, pe lângă tarif, TVA 21% și serviciul de eliberare. Valorile sunt cele afișate la
-              checkout în august 2026 și se actualizează odată cu cursul de referință.
-            </p>
             <p className="text-sm text-neutral-500 mt-3">
               <strong>Atenție:</strong> de la 1 iulie 2026 tarifele rovinietei se schimbă, urmând să fie
               diferențiate în funcție de norma de poluare (Euro) a vehiculului. Verifică prețul actualizat la

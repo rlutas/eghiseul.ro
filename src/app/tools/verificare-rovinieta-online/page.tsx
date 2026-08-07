@@ -80,15 +80,12 @@ const INFO_CARDS = [
   { icon: ShieldCheck, title: 'Date oficiale CNAIR', desc: 'Rezultatul se bazează pe evidența oficială a rovinietelor din România.' },
 ];
 
-// Coloanele A și B sunt tariful CNAIR (taxa de stat). `total` e suma reală
-// plătită la finalizarea comenzii pentru categoria A: tarif + TVA 21% +
-// serviciul de eliberare. Verificat la checkout pe 7 aug 2026.
 const TARIFE_AB = [
-  { p: '1 zi', a: '3,5 € (≈18 lei)', b: '8,6 € (≈44 lei)', total: '20,55 lei' },
-  { p: '10 zile', a: '6 € (≈31 lei)', b: '11,5 € (≈58 lei)', total: '35,24 lei' },
-  { p: '30 zile', a: '9,5 € (≈48 lei)', b: '18,2 € (≈92 lei)', total: '55,80 lei' },
-  { p: '60 zile', a: '15 € (≈76 lei)', b: '28,8 € (≈146 lei)', total: '88,10 lei' },
-  { p: '12 luni', a: '50 € (≈255 lei)', b: '96 € (≈486 lei)', total: '293,66 lei' },
+  { p: '1 zi', a: '3,5 € (≈18 lei)', b: '8,6 € (≈44 lei)' },
+  { p: '10 zile', a: '6 € (≈31 lei)', b: '11,5 € (≈58 lei)' },
+  { p: '30 zile', a: '9,5 € (≈48 lei)', b: '18,2 € (≈92 lei)' },
+  { p: '60 zile', a: '15 € (≈76 lei)', b: '28,8 € (≈146 lei)' },
+  { p: '12 luni', a: '50 € (≈255 lei)', b: '96 € (≈486 lei)' },
 ];
 
 const FAQS = [
@@ -260,7 +257,6 @@ export default function VerificareRovinietaPage() {
                     <th>Perioadă</th>
                     <th>Categoria A (autoturism)</th>
                     <th>Categoria B (marfă ≤ 3,5 t)</th>
-                    <th>Total la plată (cat. A)</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -269,16 +265,13 @@ export default function VerificareRovinietaPage() {
                       <td>{t.p}</td>
                       <td>{t.a}</td>
                       <td>{t.b}</td>
-                      <td><strong>{t.total}</strong></td>
                     </tr>
                   ))}
                 </tbody>
               </table>
               <p className="text-sm text-neutral-500">
-                Coloanele A și B arată <strong>tariful CNAIR</strong>, adică taxa de stat. Ultima coloană e{' '}
-                <strong>totalul plătit efectiv</strong> la finalizarea comenzii pentru un autoturism: tarif plus TVA
-                21% și serviciul de eliberare. Pentru categoriile de marfă și transport persoane peste 3,5 t (C-H),
-                tariful crește în funcție de masă și numărul de axe. <strong>Atenție:</strong> de la 1 iulie 2026
+                Pentru categoriile de marfă și transport persoane peste 3,5 t (C-H), tariful crește în funcție de masă
+                și numărul de axe. <strong>Atenție:</strong> de la 1 iulie 2026
                 tarifele se schimbă, diferențiate pe norma de poluare (Euro). Vezi prețul exact la finalizarea comenzii.
               </p>
             </div>
