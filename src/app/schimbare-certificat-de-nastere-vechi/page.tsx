@@ -25,7 +25,7 @@ export default function Page() {
       slug={SLUG}
       category="Stare civilă"
       image="/images/articole/schimbare-certificat-de-nastere-vechi.webp"
-      imageAlt="Certificat de naștere model vechi, îngălbenit și îndoit, alături de modelul nou tipizat — specimenul actual emis prin SIIEASC"
+      imageAlt="Certificat vechi, îngălbenit și îndoit, alături de o hârtie nouă și curată, pe o masă de lemn — schimbarea certificatului de naștere de model vechi"
       title={TITLE}
       description={DESCRIPTION}
       datePublished={DATE_PUBLISHED}

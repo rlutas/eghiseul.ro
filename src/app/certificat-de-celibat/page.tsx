@@ -24,7 +24,7 @@ export default function Page() {
       slug={SLUG}
       category="Stare civilă"
       image="/images/articole/certificat-de-celibat.webp"
-      imageAlt="Femeie așezată pe covor în living, ținând certificatul de celibat (Anexa 9) și pregătind dosarul pentru căsătoria în străinătate"
+      imageAlt="Femeie așezată pe covor în living, verificând un document din dosarul pregătit pentru căsătoria în străinătate"
       title={TITLE}
       description={DESCRIPTION}
       datePublished={DATE_PUBLISHED}
