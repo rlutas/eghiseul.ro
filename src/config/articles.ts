@@ -19,6 +19,13 @@ export interface ArticleMeta {
 
 export const ARTICLES: ArticleMeta[] = [
   {
+    slug: 'cazier-fiscal-persoana-fizica',
+    title: 'Cazier fiscal pentru persoană fizică: ce este, cine îl cere și cum îl obții',
+    excerpt:
+      'Ce fapte se înscriu de fapt în cazierul fiscal și când se radiază, de ce nu se confundă cu certificatul de atestare fiscală și cum îl obții dacă nu poți activa contul SPV.',
+    category: 'Documente fiscale',
+  },
+  {
     slug: 'apostila-de-la-haga-ghid-acte-obtinere',
     title: 'Apostila de la Haga: pe ce acte se aplică, unde o obții și cât costă',
     excerpt:
@@ -351,5 +358,19 @@ export const ARTICLES: ArticleMeta[] = [
     excerpt: 'Termen legal de 30 de zile, actele necesare și cum obții primul certificat de naștere (gratuit) + CNP-ul.',
     category: 'Stare civilă',
     image: '/og/services/certificat-nastere.png',
+  },
+  {
+    slug: 'ce-este-planul-cadastral',
+    title: 'Ce este planul cadastral (și diferența față de releveu și extras CF)',
+    excerpt:
+      'Ce arată planul cadastral, prin ce se deosebește de releveu și de extrasul de carte funciară, și în ce situații ți se cere fiecare dintre ele.',
+    category: 'Cadastru & imobiliare',
+  },
+  {
+    slug: 'ce-este-un-releveu',
+    title: 'Ce este un releveu și cum îl obții (apartament, casă)',
+    excerpt:
+      'Planul interior al locuinței, cu camerele și suprafețele lor: la ce folosește, cine îl întocmește și cum obții o copie din arhiva OCPI.',
+    category: 'Cadastru & imobiliare',
   },
 ];
