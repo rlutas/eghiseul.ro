@@ -19,6 +19,19 @@ interior".
 
 ---
 
+## Stare — 9 din 23 livrate (7 aug 2026)
+
+| ✅ Gata | ⏳ Rămase |
+|---|---|
+| cazier-fiscal-persoana-fizica · certificat-de-nastere-pierdut · duplicat-certificat-de-nastere · acte-necesare-certificat-de-nastere · schimbare-certificat-de-nastere-vechi · model-certificat-de-casatorie · transcriere-certificat-de-nastere · inregistrare-nastere-copil-nou-nascut · certificat-de-celibat | valabilitate-certificat-de-celibat · certificat-de-celibat-pentru-casatorie-in-strainatate · transcriere-certificat-de-casatorie · duplicat-certificat-de-casatorie · acte-necesare-casatorie · certificat-constatator-de-baza · certificat-constatator-pfa · certificat-constatator-pentru-banca · certificat-constatator-pentru-licitatie · certificat-constatator-pentru-notar · certificat-constatator-pentru-fonduri-europene · certificat-constatator-insolventa · ce-este-un-releveu · ce-este-planul-cadastral |
+
+⚠️ **Nu compune specimene peste hârtiile din poze.** S-a încercat pe 7 aug (transformare de
+perspectivă + păstrarea luminii) și arăta artificial; a fost respins. Pozele rămân foto simplă, cu
+documentul gol. Singura excepție validă: articolele unde specimenul **este** subiectul, ca
+`model-certificat-de-casatorie`.
+
+---
+
 ## Blocul de stil — se lipește la FINALUL fiecărui prompt
 
 ```
