@@ -221,9 +221,47 @@ export default function Page() {
       <div className="not-prose my-6 space-y-0">
         {[
           {
+            date: '6 august 2026',
+            tag: 'Circulară notari',
+            latest: true,
+            body: (
+              <>
+                Prin circulara nr. 4979, transmisă camerelor notarilor publici și consultată de
+                noi, <strong>Uniunea Națională a Notarilor Publici</strong> comunică rezultatul
+                întâlnirii de miercuri cu reprezentanții ANCPI: implementarea măsurilor tehnice
+                pentru reoperaționalizarea e-Terra <strong>„se apropie de final, fiind la momentul
+                actual în etapa de pregătire a reluării activității”</strong>. Potrivit aceleiași
+                circulare, reprezentanții ANCPI{' '}
+                <strong>propun ca repornirea aplicației să aibă loc săptămâna viitoare</strong>,
+                cu reluare treptată. Primul semnal de dată de la începutul crizei, dar rămâne o{' '}
+                <strong>propunere dintr-o ședință de lucru</strong>, nu un comunicat cu dată fermă:
+                toate termenele anterioare au fost depășite, iar UNNPR însăși scrie că estimările
+                de până acum „au fost pur speculative și au creat confuzie”.
+              </>
+            ),
+          },
+          {
+            date: '5 august 2026',
+            tag: 'Comunicat Guvern',
+            body: (
+              <>
+                Guvernul confirmă că e-Terra rămâne oprită. La testele independente derulate de{' '}
+                <strong>STS, DNSC și Cyberint</strong> într-un mediu controlat s-a identificat{' '}
+                <strong>„un număr limitat de aspecte tehnice”</strong> care trebuie corectate
+                înainte ca aplicația să fie expusă public. Repunerea se face „imediat ce toate
+                testele tehnice și validările vor fi finalizate cu succes”, cu o informare nouă
+                promisă <strong>cel târziu vineri, 7 august</strong>. În paralel, ANCPI și
+                Ministerul Dezvoltării elaborează și testează, împreună cu notarii și cu
+                specialiștii cadastrali, o <strong>procedură de reluare a activității</strong>,
+                astfel încât înregistrarea operațiunilor să se facă cu respectarea strictă a legii
+                și cu perturbări minime — adică se pregătește și modul în care se tratează coada de
+                dosare acumulată.
+              </>
+            ),
+          },
+          {
             date: '3 august 2026',
             tag: 'Comunicat Guvern',
-            latest: true,
             body: (
               <>
                 Guvernul anunță că testele de <strong>securitate, funcționalitate și
