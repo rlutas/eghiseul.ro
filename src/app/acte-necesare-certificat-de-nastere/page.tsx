@@ -24,7 +24,8 @@ export default function Page() {
     <ArticleLayout
       slug={SLUG}
       category="Stare civilă"
-      image="/og/services/certificat-nastere.png"
+      image="/images/articole/acte-necesare-certificat-de-nastere.webp"
+      imageAlt="Femeie aliniind pe blatul din bucătărie actele pentru dosar — buletin, certificat, carnet și folie de documente — verificându-le după o listă"
       title={TITLE}
       description={DESCRIPTION}
       datePublished={DATE_PUBLISHED}
