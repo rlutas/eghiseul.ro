@@ -16,7 +16,7 @@ const TITLE = 'ANCPI și e-Terra nu funcționează: atac cibernetic, sisteme pic
 // criza („atacul de la Cadastru", trend 2K+/24h) — căutarea vine pe el.
 const META_TITLE = 'ANCPI / Cadastru nu funcționează — status live și ce faci';
 const DESCRIPTION =
-  'Update 7 august: e-Terra rămâne oprită. Guvernul a anunțat pe 5 august că testele STS/DNSC/Cyberint au găsit „un număr limitat de aspecte tehnice” de corectat; repornire fără dată, informare nouă promisă pe 7 august. Comandă extrasul CF acum — îl eliberăm automat la revenire.';
+  'Update 7 august: primul semnal de dată. Circulara UNNPR din 6 august arată că ANCPI propune repornirea e-Terra săptămâna viitoare, cu reluare treptată — încă neconfirmat oficial. Comandă extrasul CF acum, îl eliberăm automat la revenire.';
 const DATE_PUBLISHED = '2026-07-15';
 const DATE_MODIFIED = '2026-08-07';
 
@@ -85,7 +85,7 @@ export default function Page() {
         },
         {
           q: 'Până când e picat ANCPI?',
-          a: 'Nu există un termen ferm. Cel mai recent semnal, pe 5 august: Guvernul a confirmat că testele independente derulate de STS, DNSC și Cyberint într-un mediu controlat au identificat „un număr limitat de aspecte tehnice” care trebuie corectate înainte de expunerea publică a aplicației; repunerea se face „imediat ce toate testele tehnice și validările vor fi finalizate cu succes”, cu o informare publică promisă cel târziu vineri, 7 august. Termenele anterioare (20 iulie, 22 iulie, estimarea premierului 27–31 iulie) au trecut toate fără repunere, iar pe 27 iulie Guvernul a refuzat explicit să mai avanseze o dată. Repunerea va fi etapizată, pe componente.',
+          a: 'Nu există încă un termen oficial, dar există primul semnal concret. Potrivit circularei transmise camerelor notarilor publici pe 6 august, în urma întâlnirii cu ANCPI, reprezentanții agenției propun ca repornirea aplicației e-Terra să aibă loc săptămâna viitoare, cu reluare treptată a activității. Atenție: e o propunere dintr-o ședință de lucru, nu un comunicat ANCPI cu dată fermă. Toate termenele avansate până acum (20 iulie, 22 iulie, estimarea premierului 27–31 iulie) au fost depășite, iar pe 27 iulie Guvernul a refuzat explicit să mai avanseze o dată. Repunerea va fi etapizată, pe componente.',
         },
         {
           q: 'Migrarea în Cloudul Guvernamental s-a terminat pe 22 iulie. De ce tot nu funcționează?',
@@ -671,6 +671,33 @@ export default function Page() {
       </ul>
 
       <h2>Actualizări</h2>
+      <p>
+        <strong>7 august 2026, primul semnal de dată concretă:</strong> printr-o circulară transmisă
+        camerelor notarilor publici (nr. 4979 din 6 august), pe care am consultat-o,{' '}
+        <strong>Uniunea Națională a Notarilor Publici</strong> anunță rezultatul întâlnirii de miercuri,
+        6 august, cu reprezentanții ANCPI: implementarea măsurilor tehnice pentru reoperaționalizarea
+        e-Terra <strong>„se apropie de final, fiind la momentul actual în etapa de pregătire a reluării
+        activității”</strong>. Iar, potrivit aceleiași circulare, reprezentanții ANCPI{' '}
+        <strong>propun ca repornirea aplicației să aibă loc săptămâna viitoare</strong>, cu reluare
+        treptată a activității.
+      </p>
+      <p>
+        Nuanța contează, și o spunem răspicat: e o <strong>propunere</strong> formulată într-o
+        ședință de lucru, nu un comunicat ANCPI cu dată fermă. Toate termenele avansate până acum au
+        fost depășite: 20 iulie, 22 iulie, estimarea premierului pentru 27–31 iulie. În plus, UNNPR
+        însăși scrie în circulară că estimările anterioare „au fost pur speculative și au creat
+        confuzie”, motiv pentru care comunicatele către notari au fost temporizate până la primirea
+        unor elemente concrete din surse oficiale. Deci: primul semnal serios de dată, dar încă
+        neconfirmat printr-un act oficial al ANCPI.
+      </p>
+      <p>
+        Tot pe 7 august, ANCPI a confirmat public că lucrează, împreună cu Ministerul Dezvoltării, la
+        o <strong>procedură de reluare a activității</strong>, elaborată și testată în consultare cu
+        notarii și cu specialiștii cadastrali, astfel încât înregistrarea operațiunilor să se facă cu
+        respectarea strictă a legii și cu perturbări minime. Practic, se pregătește nu doar repornirea
+        tehnică, ci și modul în care se va trata coada de dosare acumulată în cele peste trei
+        săptămâni de blocaj.
+      </p>
       <p>
         <strong>7 august 2026:</strong> ziua <strong>{outageDays}</strong> de blocaj. Marți,{' '}
         <strong>5 august</strong>, Guvernul a confirmat că e-Terra rămâne oprită și că sistemul se
