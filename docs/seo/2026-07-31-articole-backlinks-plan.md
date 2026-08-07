@@ -126,11 +126,18 @@ urbanism (money).
 | Publicație | Status | URL publicat | Verificat |
 |---|---|---|---|
 | **money.ro** | ✅ PUBLICAT 31 iul / verificat 1 aug | [ce-verifici-inainte-sa-dai-avansul…](https://www.money.ro/stiri/ce-verifici-inainte-sa-dai-avansul-pe-o-locuinta-sau-pe-un-teren-sase-pasi-care--msa03z1c) | ✅ TOATE: 3 dofollow (fără nofollow/sponsored), ancore exacte, fără link în §1 (primul după ~2 paragrafe), index+follow, canonical propriu, text integral, 4× brand, imagine |
-| click.ro | ⏳ trimis (articolul GREȘIT — economica; în clarificare) | — | — |
+| click.ro | 🔁 RETRIMIS 7 aug — articolul greșit (varianta economica: 3 linkuri + brand) a fost respins de redacție („maxim 2 link-uri și eliminat brandul"). Fișier corect de trimis: `articole-backlinks/docx/TRIMITE-click.ro-FINAL-2linkuri-fara-brand.docx` (= `01B-varianta-click-ro.md`, același subiect CF/ANCPI, 943 cuvinte, 0 mențiuni de brand în text, 2 dofollow: `/ancpi-nu-functioneaza/` + `/servicii/extras-de-carte-funciara/`). ⚠️ widgetul iframe din antetul .md NU se trimite — ar face al 3-lea link | — | — |
 | **risco.ro** | ✅ PUBLICAT / verificat 3 aug | [cum-verifici-un-partener-de-afaceri…](https://www.risco.ro/suport/parteneri/cum-verifici-un-partener-de-afaceri-inainte-de-contract-patru-pasi-care-costa-sub-500-de-lei-6684) | ✅ versiunea PUBLICĂ: 3 dofollow (constatator + cazier fiscal + homepage), ancore corecte, fără link în §1, index+follow, canonical, imagine featured OK (620×345). ⚠️ preview-ul `?admin=` arată o REVIZIE VECHE (imagine 404, linkuri lipsă ca text simplu) — cerut la risco să nu suprascrie versiunea live cu draftul |
-| start-up.ro | ⏳ trimis | — | — |
+| **start-up.ro** | ✅ PUBLICAT 3 aug / verificat 7 aug | [checklist-de-acte-pentru-primul-an-de-firma…](https://start-up.ro/checklist-de-acte-pentru-primul-an-de-firma-ce-ti-se-cere-cand-si-de-unde-iei-fiecare-document) | ✅ 2 dofollow (fără rel): ancora comercială exactă „certificat constatator online" → pagina de serviciu + „ghidul de eliberare a certificatului constatator" → ghid ONRC. Fără link în §1, ambele la mijlocul articolului (secțiunea „Luna 1"). Fără noindex. ⚠️ fără canonical explicit |
 | **startupcafe.ro** | ✅ PUBLICAT 3 aug / verificat 3 aug | [p-certificatul-constatator…](https://startupcafe.ro/p-certificatul-constatator-actul-pe-care-banca-primaria-si-finantatorul-ti-l-cer-in-acelasi-an-ce-contine-si-cum-il-obtii-104392) | ✅ 2 dofollow (serviciu constatator + ghid 4 tipuri), ancore naturale, fără link în §1, index+follow, canonical, imagine OK cu credit „Sursă: eghiseul.ro". Note: titlu marcat `[P]` (politica lor de advertorial); creditul foto = mențiune brand bonus deși site-ul nu accepta brand în text |
-| economica.net | ⏸ în așteptare (după rezolvarea click) | — | — |
+| economica.net | ⏳ DE TRIMIS (deblocat 7 aug — click rămâne pe CF/ANCPI, deci economica primește varianta B) — fișier: `articole-backlinks/docx/TRIMITE-economica.net-FINAL-3linkuri-cu-brand.docx` (= `06B-varianta-economica-net.md`, „Actele pe care le poți obține de acasă în 2026", 964 cuvinte, 3 dofollow: cazier judiciar + certificat naștere + homepage cu brand) | — | — |
+
+**Stare la 7 aug 2026: 4/6 publicate și verificate** (money, risco, startupcafe, start-up).
+Rămân click.ro (retrimitere cu articolul corect) și economica.net (de trimis).
+Bilanț linkuri live: 10 dofollow — 3 money (CF + verificare proprietar + urbanism), 3 risco
+(constatator + cazier fiscal + homepage), 2 startupcafe (constatator serviciu + ghid 4 tipuri),
+2 start-up (constatator serviciu cu ancoră comercială + ghid ONRC). Pagina de serviciu
+constatator a primit deja 3 linkuri, extras CF doar 1 (al doilea vine de la click).
 
 ## 5. Flux de lucru
 
