@@ -154,7 +154,6 @@ export const ARTICLES: ArticleMeta[] = [
     title: 'Verificare cazier fiscal: ce ai înscris și cât mai e valabil',
     excerpt:
       'Cum afli dacă ai fapte înscrise, cum verifici autenticitatea certificatului și de ce nu poți interoga cazierul unui partener.',
-    image: '/og/services/cazier-fiscal.png',
     category: 'Documente fiscale',
   },
   {

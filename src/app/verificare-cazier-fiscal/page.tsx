@@ -12,7 +12,7 @@ const DESCRIPTION =
   'rămâne valabil și ce faci dacă apare o faptă pe care o credeai radiată.';
 const DATE_PUBLISHED = '2026-08-07';
 const DATE_MODIFIED = '2026-08-07';
-const OGIMAGE = '/images/articole/cazier-fiscal-persoana-fizica.webp';
+const OGIMAGE = `/images/articole/${SLUG}.webp`;
 
 export const revalidate = 86400;
 
@@ -35,7 +35,7 @@ export default function Page() {
       dateModified={DATE_MODIFIED}
       publishedLabel="august 2026"
       updatedLabel="7 august 2026"
-      imageAlt="Persoană verificând pe laptop un certificat de cazier fiscal primit în format electronic de la ANAF"
+      imageAlt="Femeie la birou lângă fereastră comparând un certificat tipărit cu documentul de pe ecranul laptopului, cu imprimanta alături"
       relatedServices={[
         {
           href: '/servicii/cazier-fiscal-online/',
