@@ -15,7 +15,7 @@ export const metadata = buildPageMetadata({
   title: TITLE,
   description: DESCRIPTION,
   path: `/${SLUG}/`,
-  ogImage: '/og/services/certificat-casatorie.png',
+  ogImage: '/images/articole/model-certificat-de-casatorie.webp',
 });
 
 export default function Page() {
@@ -24,7 +24,8 @@ export default function Page() {
     <ArticleLayout
       slug={SLUG}
       category="Stare civilă"
-      image="/og/services/certificat-casatorie.png"
+      image="/images/articole/model-certificat-de-casatorie.webp"
+      imageAlt="Specimen al certificatului de căsătorie emis în România, model actual tipizat, așezat pe o masă de lemn"
       title={TITLE}
       description={DESCRIPTION}
       datePublished={DATE_PUBLISHED}
