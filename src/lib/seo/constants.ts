@@ -179,6 +179,10 @@ export const HARDCODED_TOOL_SLUGS = [
  */
 export const HARDCODED_ARTICLE_SLUGS = [
   'cazier-fiscal-persoana-fizica',
+  'cazier-fiscal-firma',
+  'cazier-fiscal-fara-spv',
+  'verificare-cazier-fiscal',
+  'certificat-de-nastere-pentru-buletin-pasaport',
   'apostila-de-la-haga-ghid-acte-obtinere',
   'schimbare-sediu-social-srl-ghid',
   'suspendare-activitate-firma-ghid',

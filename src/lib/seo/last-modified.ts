@@ -24,6 +24,9 @@ export const PAGE_LAST_MODIFIED: Record<string, string> = {
   'acte-necesare-certificat-de-nastere': '2026-06-19',
   'amenda-rovinieta-2025-tarife-plata-online-ghid-complet': '2026-07-31',
   'apostila-de-la-haga-ghid-acte-obtinere': '2026-07-31',
+  'cazier-fiscal-fara-spv': '2026-08-07',
+  'cazier-fiscal-firma': '2026-08-07',
+  'certificat-de-nastere-pentru-buletin-pasaport': '2026-08-07',
   'schimbare-sediu-social-srl-ghid': '2026-07-31',
   'suspendare-activitate-firma-ghid': '2026-07-31',
   'radiere-firma-srl-ghid': '2026-07-31',
@@ -73,6 +76,7 @@ export const PAGE_LAST_MODIFIED: Record<string, string> = {
   'tva-9-locuinte-31-iulie-2026': '2026-07-29',
   'valabilitate-certificat-de-celibat': '2026-06-22',
   'valabilitate-extras-de-carte-funciara': '2026-06-16',
+  'verificare-cazier-fiscal': '2026-08-07',
   'verificare-proprietar-imobil': '2026-07-17',
 };
 

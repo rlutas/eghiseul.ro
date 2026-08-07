@@ -184,7 +184,7 @@ export default function Page() {
           </tr>
           <tr>
             <td>Numărul e de carte funciară, nu cadastral</td>
-            <td>apare lângă mențiunea „CF nr." sau e vizibil mai scurt</td>
+            <td>apare lângă mențiunea „CF nr.&rdquo; sau e vizibil mai scurt</td>
             <td>caută în act numărul cadastral sau cel topografic</td>
           </tr>
           <tr>

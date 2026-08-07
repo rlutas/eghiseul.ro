@@ -136,6 +136,38 @@ export const ARTICLES: ArticleMeta[] = [
     category: 'Documente fiscale',
   },
   {
+    slug: 'cazier-fiscal-firma',
+    title: 'Cazier fiscal pentru firmă: când se cere și cine îl semnează',
+    excerpt:
+      'Cazierul societății vs. cel al asociaților, ce verifică Registrul Comerțului la înmatriculare și ce se schimbă la firma inactivă.',
+    image: '/og/services/cazier-fiscal.png',
+    category: 'Firme & ONRC',
+  },
+  {
+    slug: 'cazier-fiscal-fara-spv',
+    title: 'Cazier fiscal din SPV: cum îl ceri online și ce faci fără cont',
+    excerpt:
+      'Pașii din Spațiul Privat Virtual, formularele 502 și 504, și alternativele când nu poți trece de activarea contului.',
+    image: '/og/services/cazier-fiscal.png',
+    category: 'Documente fiscale',
+  },
+  {
+    slug: 'verificare-cazier-fiscal',
+    title: 'Verificare cazier fiscal: ce ai înscris și cât mai e valabil',
+    excerpt:
+      'Cum afli dacă ai fapte înscrise, cum verifici autenticitatea certificatului și de ce nu poți interoga cazierul unui partener.',
+    image: '/og/services/cazier-fiscal.png',
+    category: 'Documente fiscale',
+  },
+  {
+    slug: 'certificat-de-nastere-pentru-buletin-pasaport',
+    title: 'Certificat de naștere pentru buletin sau pașaport: când se cere',
+    excerpt:
+      'Unde se cere în original și unde ajunge o copie, plus cum ieși din cercul în care ai pierdut și buletinul, și certificatul.',
+    image: '/og/services/certificat-nastere.png',
+    category: 'Stare civilă',
+  },
+  {
     slug: 'anii-lucrati-in-strainatate-se-pun-la-pensie-in-romania',
     title: 'Anii Lucrați în Străinătate se Pun la Pensie în România?',
     excerpt: 'Cum se iau în calcul perioadele lucrate în UE/SEE la pensia din România: totalizare și pro rata temporis.',
