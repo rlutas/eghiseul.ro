@@ -140,7 +140,6 @@ export const ARTICLES: ArticleMeta[] = [
     title: 'Cazier fiscal pentru firmă: când se cere și cine îl semnează',
     excerpt:
       'Cazierul societății vs. cel al asociaților, ce verifică Registrul Comerțului la înmatriculare și ce se schimbă la firma inactivă.',
-    image: '/og/services/cazier-fiscal.png',
     category: 'Firme & ONRC',
   },
   {

@@ -19,7 +19,7 @@ export const metadata = buildPageMetadata({
   title: META_TITLE,
   description: DESCRIPTION,
   path: `/${SLUG}/`,
-  ogImage: '/og/services/cazier-fiscal.png',
+  ogImage: `/images/articole/${SLUG}.webp`,
 });
 
 export default function Page() {
@@ -33,8 +33,7 @@ export default function Page() {
       dateModified={DATE_MODIFIED}
       publishedLabel="august 2026"
       updatedLabel="7 august 2026"
-      image="/og/services/cazier-fiscal.png"
-      imageAlt="Cazier fiscal pentru persoană juridică: certificatul cerut la Registrul Comerțului pentru firme, asociați și administratori"
+      imageAlt="Femeie la ghișeul Registrului Comerțului răsfoind un dosar cu documente pentru firmă, cu coada de așteptare în spate"
       relatedServices={[
         {
           href: '/servicii/cazier-fiscal-online/',
