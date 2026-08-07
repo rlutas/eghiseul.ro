@@ -15,7 +15,7 @@ export const metadata = buildPageMetadata({
   title: TITLE,
   description: DESCRIPTION,
   path: `/${SLUG}/`,
-  ogImage: '/og/services/certificat-nastere.png',
+  ogImage: '/images/articole/transcriere-certificat-de-nastere.webp',
 });
 
 export default function Page() {
@@ -24,7 +24,8 @@ export default function Page() {
     <ArticleLayout
       slug={SLUG}
       category="Stare civilă"
-      image="/og/services/certificat-nastere.png"
+      image="/images/articole/transcriere-certificat-de-nastere.webp"
+      imageAlt="Bărbat într-un apartament din străinătate, seara, ținând un certificat străin și căutând pe laptop procedura de transcriere în România"
       title={TITLE}
       description={DESCRIPTION}
       datePublished={DATE_PUBLISHED}
