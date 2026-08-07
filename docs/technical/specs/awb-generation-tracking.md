@@ -995,6 +995,13 @@ export async function POST(
 **Auth:** Admin only
 **File:** `/Users/raul/Projects/eghiseul.ro/src/app/api/admin/orders/[id]/awb-label/route.ts`
 
+> **Actualizat 2026-08-06 — Fan Courier.** API-ul Fan acceptă token-ul **doar** ca header
+> `Authorization: Bearer`; pus in query (`?token=`) raspunde 401
+> („These credentials do not match our records."). Nu exista URL semnat care sa poata fi dat
+> browserului, deci `getAwbLabel()` intoarce `{ body, contentType }` — eticheta se descarca
+> server-side si se streameaza prin ruta. Path corect: `/awb/label` (`/reports/awb/label` = 404).
+> Codul de mai jos e din specul initial si NU mai reflecta implementarea.
+
 #### Request
 
 ```
@@ -1161,6 +1168,27 @@ export async function POST(
   }
 }
 ```
+
+### 3b. Set AWB manual (DHL / Poșta / internațional)
+
+**Endpoint:** `POST /api/admin/orders/[id]/set-awb`
+**Auth:** `orders.manage`
+**Fișier:** `src/app/api/admin/orders/[id]/set-awb/route.ts`
+
+Pentru livrările pe care platforma nu le poate genera automat (DHL, Poșta, orice curier
+internațional) sau când generarea automată eșuează și AWB-ul a fost emis din contul curierului.
+
+Salvează `delivery_tracking_number` + `delivery_tracking_url` (construit automat pentru curierii
+cunoscuți) și, **din 2026-08-06, trece comanda pe `shipped` + `shipped_at`** — exact ca generarea
+automată Fan/Sameday. Înainte, comenzile DHL/Poșta rămâneau în starea veche deși coletul plecase.
+
+Decizia stă în `shouldMarkShippedOnAwb()` (`src/lib/orders/shipping-status.ts`), pe **listă neagră**:
+`draft`, `abandoned`, `cancelled`, `refunded` (stări moarte) + `shipped`, `completed` (deja la/după
+expediere). Orice altă stare de lucru — inclusiv `standby` sau stări adăugate ulterior — devine
+`shipped`. Listă neagră, nu albă, ca stările noi să nu blocheze tăcut tranziția.
+
+Istoric: `awb_created` + (la tranziție) `status_changed`. ⚠️ `event_type` are CHECK constraint —
+`status_change` la singular e respins, iar inserarea eșuează **tăcut**. Vezi §Database Changes.
 
 ### 4. Customer Tracking Endpoint
 

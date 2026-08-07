@@ -198,6 +198,36 @@ speed — different concern.)
 
 ---
 
+## 8b. Numele din MRZ — prefixul tip-act + țară
+
+Linia 1 din MRZ începe cu tipul actului + codul țării: `IDROU` la carte de identitate,
+`P<ROU` la pașaport. Modelul îl scrie frecvent lipit de numele de familie („PEROUPOPA",
+„IDROUCOMAN"), iar numele contaminat ajunge în contracte, împuterniciri și **facturi**.
+
+Două apărări în `src/lib/services/document-ocr.ts`:
+
+1. `recoverNamesFromMrz()` — reconstruiește separarea nume/prenume din MRZ (ancora e `<<`),
+   tăind prefixul. Strip-ul e **either-or** (IDROU **sau** P<XXX), nu secvențial: secvențial,
+   regexul de pașaport mai mânca P+3 litere din nume reale („PARASCHIV" → „SCHIV").
+2. `stripMrzCountryPrefix()` — plasa de siguranță când MRZ-ul lipsește sau nu se parsează;
+   restrânsă la combinațiile tip-act+țară, ca „Roua"/„Peruzzi"/„Idriceanu" să rămână intacte.
+
+⚠️ **Două capcane, ambele întâlnite real:**
+
+- **Pașapoartele cu tip act „PE"** au MRZ care CHIAR începe cu `PEROU` (PE = tip act,
+  ROU = țara) — deci „PEROU" nu e mereu un `P<ROU` prost citit.
+- Modelul poate întoarce linia 1 **reconstruită din propria citire greșită**: prefixul canonic
+  pus PESTE numele deja contaminat (`P<ROU` + `PEROUxxx`). De aceea prefixul se taie
+  **repetat**, cât timp rămâne un nume, iar `correctNamesFromMrz()` trece numele final încă o
+  dată prin `stripMrzCountryPrefix()` — altfel rescrierea din MRZ anulează curățarea făcută
+  deja la parsare (`sanitizeNameFields` în `parseGeminiOCRResponse`).
+
+Când apare iar un nume ciudat: verifică `documentType` (pașaport vs CI), dacă modelul a
+returnat MRZ-ul, și compară cu poza din S3 (`kyc/<orderId>/passport_opened.jpg`) — pagina de
+date e sursa de adevăr. Istoric complet: changelog-urile din 28.07, 05.08 și 06.08.2026.
+
+---
+
 ## 9. Tests
 
 | File | Covers |
@@ -206,6 +236,7 @@ speed — different concern.)
 | `tests/unit/lib/kyc/review.test.ts` | `extractKycByDocType`, `needsKycReview`, `kycConfidenceClass` (9 cases) |
 | `tests/unit/lib/kyc/passport-face-match-regression.test.ts` | The passport-PDF report end-to-end (lookup + decision) |
 | `tests/unit/lib/services/kyc-validation.test.ts` | Gemini validation prompt/parse |
+| `tests/unit/lib/services/document-ocr-passport-name-prefix.test.ts` | Prefixul MRZ în nume (§8b), inclusiv MRZ-ul reconstruit greșit |
 | `tests/integration/kyc-face-match.test.mjs` | Full path against a live dev server (opt-in: `RUN_INTEGRATION=1`) |
 
 Run: `npx vitest run tests/unit/lib/kyc/`

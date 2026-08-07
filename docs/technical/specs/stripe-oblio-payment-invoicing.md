@@ -819,6 +819,30 @@ Backfill/diagnostic: `scripts/check-spv-invoices-2026-07-28.ts` (verifică + scr
 statusul), `scripts/audit-invoice-spv-2026-07-28.ts` (rulează `buildOblioClient` pe
 istoric și arată ce câmpuri ar fi refuzate).
 
+### 2.0d ⚠️ Liniile facturii trebuie să dea suma încasată (2026-08-06)
+
+Oblio acceptă o factură al cărei total NU corespunde cu blocul `collect` (încasarea), iar
+facturile emise **nu pot fi editate prin API** — doar stornate. Caz real: comanda
+`WP-260707-99959` (import din WordPress) avea `base_price` 998 și `delivery_price` 0, deși
+se încasaseră 1.049 → EGI2024-24314 emisă pe 998 lei, cu încasare de 1.049.
+
+`findInvoiceTotalsMismatch()` (`src/lib/oblio/invoice.ts`) recalculează
+`base_price (sau total) + opțiuni + livrare − discount` și compară cu `total_price`
+(toleranță 0,01). Aplicată pe **toate cele 3 căi de emitere**:
+
+| Cale | Comportament la nepotrivire |
+|---|---|
+| `ensureInvoiceForPaidOrder` (automat: webhook + heal cron) | aruncă → `status: 'failed'`, eroarea în `order_history`, comanda rămâne fără factură și reapare în health-check |
+| `POST /verify-payment` (admin) | aceeași eroare, factura nu se emite |
+| `POST /reissue-invoice` (admin) | 400 `TOTALS_MISMATCH` — verificarea rulează **înainte** de storno, altfel am anula factura veche și am refuza-o pe cea nouă |
+
+Preferăm o comandă fără factură, cu eroarea vizibilă, în locul unui document fiscal greșit.
+
+Validat pe cele 206 comenzi plătite din 01.06.2026: singura blocată ar fi fost chiar
+`WP-260707-99959`. Comenzile cărora li se adaugă opțiuni **după** facturare (plăți extra,
+facturate separat) nu declanșează garda la emitere. Teste:
+`tests/unit/lib/oblio/invoice-totals-guard.test.ts`.
+
 ### 2.1 Oblio API Overview
 
 | Aspect | Details |
