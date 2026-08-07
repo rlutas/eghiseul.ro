@@ -1,15 +1,22 @@
 # Prompturi imagini (ChatGPT / DALL-E) — per articol
 
+⚠️ **ATENȚIE — articolele 01 și 06 au fost INTERSCHIMBATE pe 7 aug 2026.** Numerotarea de mai jos
+e cea a ARTICOLELOR, nu a site-urilor. Maparea corectă azi:
+- **click.ro** primește articolul CF/ANCPI → folosește promptul **01** (cerință click: min 900 px
+  lățime, 16:9, max 2500 px, DOAR jpg/jpeg → 1600×900 e perfect)
+- **economica.net** primește articolul „acte de acasă" → folosește promptul **06** (cerință
+  economica: min 1200×800 → 1600×900 acoperă)
+
 ## Alt text / descriere imagine (text simplu, se pune la încărcare)
 
-| Articol | Alt text |
-|---|---|
-| 01 economica.net | Documente de proprietate pe biroul unui notar, pregătite pentru o tranzacție imobiliară |
-| 02 money.ro | Chei de casă deasupra unor acte de proprietate, înainte de semnarea tranzacției |
-| 03 startupcafe.ro | Antreprenor la birou cu laptopul deschis și un document ștampilat al firmei |
-| 04 start-up.ro | Fondator de firmă organizând dosarele și lista de acte necesare în primul an |
-| 05 risco.ro | Doi oameni de afaceri analizând un contract înainte de semnare |
-| 06 click.ro | Femeie acasă, la masa din bucătărie, obținând acte pe laptop |
+| Articol | Site (după rocada din 7 aug) | Alt text |
+|---|---|---|
+| 01 CF/ANCPI | **click.ro** | Documente de proprietate pe biroul unui notar, pregătite pentru o tranzacție imobiliară |
+| 02 avans locuință | money.ro | Chei de casă deasupra unor acte de proprietate, înainte de semnarea tranzacției |
+| 03 constatator | startupcafe.ro | Antreprenor la birou cu laptopul deschis și un document ștampilat al firmei |
+| 04 checklist firmă | start-up.ro | Fondator de firmă organizând dosarele și lista de acte necesare în primul an |
+| 05 partener afaceri | risco.ro | Doi oameni de afaceri analizând un contract înainte de semnare |
+| 06 acte de acasă | **economica.net** | Femeie acasă, la masa din bucătărie, rezolvând formalități pe laptop |
 
 Reguli generale, valabile la toate:
 - Cere formatul **landscape 16:9** și exportă la rezoluția maximă oferită.
@@ -108,9 +115,40 @@ metaphor for due diligence, neutral office background, 16:9 landscape, papers bl
 with no readable text, no logos, faces not visible.
 ```
 
-## 06 — click.ro (acte obținute de acasă)
-Cerință site: principală min 900 px lățime, 16:9, max 2500 px, DOAR jpg/jpeg;
-secundare (dacă se adaugă) min 900 px lățime.
+## 06 — ECONOMICA.NET (acte obținute de acasă)
+Cerință site: min 1200×800 → generează 16:9 și exportă 1600×900 jpg.
+Public economica = cititor de business/economic, nu tabloid → ton editorial sobru, nu „lifestyle".
+
+**Varianta principală (recomandată):**
+```
+Photorealistic editorial photo for an economic news article about digital public
+services: a woman in her thirties working at a home desk near a window, laptop open
+in front of her showing a blurred generic web form, a printed blank document and a
+cup of coffee beside the laptop, a smartphone face-down on the desk, calm morning
+daylight, shot on a 35mm lens, shallow depth of field, 16:9 landscape, seen from a
+three-quarter angle with her face not clearly visible, all papers completely blank
+with no readable text, no logos, no flags, no brand names anywhere in frame.
+```
+
+**Alternativă 1 (contrastul coadă vs. acasă — cel mai „editorial"):**
+```
+Photorealistic editorial photo: an empty public service waiting room with a row of
+plastic chairs and a blank take-a-number display, shot through a doorway, warm light
+falling on the empty seats, wide 16:9 landscape composition, no readable text on any
+sign or screen, no logos, no people, no flags.
+```
+
+**Alternativă 2 (metafora „totul într-un ecran"):**
+```
+Photorealistic top-down editorial photo of a wooden home desk: a laptop with a blank
+neutral screen, a stack of blank printed documents, a passport-sized blank card, a
+pen, house keys and a coffee cup arranged neatly around it, soft natural window
+light, 16:9 landscape, absolutely no readable text or numbers on any object, no
+logos, no flags, no faces.
+```
+
+## 06-vechi — click.ro (variantă „acte de acasă", NU se mai folosește pe click)
+Păstrat doar ca referință; click.ro a primit articolul CF/ANCPI (prompt 01).
 
 ```
 Photorealistic lifestyle photo for a general-audience article: a woman in casual
