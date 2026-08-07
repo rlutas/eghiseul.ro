@@ -15,7 +15,7 @@ export const metadata = buildPageMetadata({
   title: TITLE,
   description: DESCRIPTION,
   path: `/${SLUG}/`,
-  ogImage: '/og/services/certificat-nastere.png',
+  ogImage: '/images/articole/schimbare-certificat-de-nastere-vechi.webp',
 });
 
 export default function Page() {
@@ -24,7 +24,8 @@ export default function Page() {
     <ArticleLayout
       slug={SLUG}
       category="Stare civilă"
-      image="/og/services/certificat-nastere.png"
+      image="/images/articole/schimbare-certificat-de-nastere-vechi.webp"
+      imageAlt="Certificat de naștere model vechi, îngălbenit și îndoit, alături de modelul nou tipizat — specimenul actual emis prin SIIEASC"
       title={TITLE}
       description={DESCRIPTION}
       datePublished={DATE_PUBLISHED}
