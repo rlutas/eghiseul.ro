@@ -80,12 +80,15 @@ const INFO_CARDS = [
   { icon: ShieldCheck, title: 'Date oficiale CNAIR', desc: 'Rezultatul se bazează pe evidența oficială a rovinietelor din România.' },
 ];
 
+// Coloanele A și B sunt tariful CNAIR (taxa de stat). `total` e suma reală
+// plătită la finalizarea comenzii pentru categoria A: tarif + TVA 21% +
+// serviciul de eliberare. Verificat la checkout pe 7 aug 2026.
 const TARIFE_AB = [
-  { p: '1 zi', a: '3,5 € (≈18 lei)', b: '8,6 € (≈44 lei)' },
-  { p: '10 zile', a: '6 € (≈31 lei)', b: '11,5 € (≈58 lei)' },
-  { p: '30 zile', a: '9,5 € (≈48 lei)', b: '18,2 € (≈92 lei)' },
-  { p: '60 zile', a: '15 € (≈76 lei)', b: '28,8 € (≈146 lei)' },
-  { p: '12 luni', a: '50 € (≈255 lei)', b: '96 € (≈486 lei)' },
+  { p: '1 zi', a: '3,5 € (≈18 lei)', b: '8,6 € (≈44 lei)', total: '20,55 lei' },
+  { p: '10 zile', a: '6 € (≈31 lei)', b: '11,5 € (≈58 lei)', total: '35,24 lei' },
+  { p: '30 zile', a: '9,5 € (≈48 lei)', b: '18,2 € (≈92 lei)', total: '55,80 lei' },
+  { p: '60 zile', a: '15 € (≈76 lei)', b: '28,8 € (≈146 lei)', total: '88,10 lei' },
+  { p: '12 luni', a: '50 € (≈255 lei)', b: '96 € (≈486 lei)', total: '293,66 lei' },
 ];
 
 const FAQS = [
@@ -145,6 +148,24 @@ export default function VerificareRovinietaPage() {
                 rovinietă validă și data exactă de expirare. Datele provin din evidența oficială CNAIR, iar serviciul
                 e disponibil 24/7.
               </p>
+            </div>
+
+            {/* CTA imediat sub widget. Până acum, primul link spre cumpărare era
+                abia la jumătatea paginii: cine afla că rovinieta e expirată nu
+                avea unde să meargă fără să deruleze. */}
+            <div className="mt-5 rounded-2xl border border-amber-300 bg-amber-50 p-5 sm:flex sm:items-center sm:justify-between sm:gap-5">
+              <div className="flex items-start gap-3">
+                <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" aria-hidden="true" />
+                <p className="text-[15px] leading-relaxed text-amber-900">
+                  <strong>A ieșit expirată sau expiră în curând?</strong> Circulația fără rovinietă validă se
+                  sancționează cu amendă între 250 și 1.500 lei. O cumperi în două minute, cu activare imediată.
+                </p>
+              </div>
+              <Button asChild size="lg" className="mt-4 sm:mt-0 shrink-0 w-full sm:w-auto">
+                <Link href="/servicii/rovinieta-online/">
+                  Cumpără rovinieta <ChevronRight className="w-5 h-5 ml-1" aria-hidden="true" />
+                </Link>
+              </Button>
             </div>
           </div>
         </section>
@@ -239,6 +260,7 @@ export default function VerificareRovinietaPage() {
                     <th>Perioadă</th>
                     <th>Categoria A (autoturism)</th>
                     <th>Categoria B (marfă ≤ 3,5 t)</th>
+                    <th>Total la plată (cat. A)</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -247,14 +269,17 @@ export default function VerificareRovinietaPage() {
                       <td>{t.p}</td>
                       <td>{t.a}</td>
                       <td>{t.b}</td>
+                      <td><strong>{t.total}</strong></td>
                     </tr>
                   ))}
                 </tbody>
               </table>
               <p className="text-sm text-neutral-500">
-                Pentru categoriile de marfă și transport persoane peste 3,5 t (C-H), tariful crește în funcție de masă
-                și numărul de axe. <strong>Atenție:</strong> de la 1 iulie 2026 tarifele se schimbă, diferențiate pe
-                norma de poluare (Euro). Vezi prețul exact la finalizarea comenzii.
+                Coloanele A și B arată <strong>tariful CNAIR</strong>, adică taxa de stat. Ultima coloană e{' '}
+                <strong>totalul plătit efectiv</strong> la finalizarea comenzii pentru un autoturism: tarif plus TVA
+                21% și serviciul de eliberare. Pentru categoriile de marfă și transport persoane peste 3,5 t (C-H),
+                tariful crește în funcție de masă și numărul de axe. <strong>Atenție:</strong> de la 1 iulie 2026
+                tarifele se schimbă, diferențiate pe norma de poluare (Euro). Vezi prețul exact la finalizarea comenzii.
               </p>
             </div>
           </div>
