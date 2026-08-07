@@ -31,6 +31,7 @@ export default function Page() {
       dateModified={DATE_MODIFIED}
       publishedLabel="august 2026"
       updatedLabel="7 august 2026"
+      imageAlt="Femeie citind acasă un certificat proaspăt tipărit, cu laptopul și imprimanta pe masă — cazierul fiscal obținut online, fără drum la ANAF"
       relatedServices={[
         {
           href: '/servicii/cazier-fiscal-online/',
