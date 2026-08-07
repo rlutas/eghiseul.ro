@@ -1,10 +1,24 @@
-# VARIANTA B — articolul „acte de acasă" adaptat pentru ECONOMICA.NET (dacă CF-ul rămâne pe click)
+# VARIANTA B — articolul „acte de acasă" pentru ECONOMICA.NET (versiunea finală, 7 aug 2026)
 
 **INSTRUCȚIUNI PUBLICARE (nu fac parte din articol):**
-- Folosește DOAR dacă articolul CF/ANCPI rămâne publicat pe click.ro — atunci acesta intră pe economica.net în locul lui
+- Confirmat 7 aug: articolul CF/ANCPI rămâne pe click.ro (varianta 01B), deci acesta intră pe economica.net
 - Conform regulilor economica.net: advertorial CU brand, NEmarcat ca publicitate, 3 linkuri dofollow, diacritice, imagine min 1200×800, fără link în primul paragraf
-- Linkuri (3/3): `/servicii/cazier-judiciar-online/` + `/servicii/eliberare-certificat-de-nastere/` + homepage (brand)
-- Cuvinte: ~950
+- Linkuri (3/3), toate pe pagini de bani: `/servicii/cazier-judiciar-online/` +
+  `/servicii/eliberare-certificat-de-nastere/` + `/servicii/cazier-fiscal-online/`
+- **Homepage-ul NU mai primește link** (l-a primit deja de la risco.ro pe 3 aug); brandul rămâne
+  menționat în text ca simplu text, exact ca pe money.ro
+- Cuvinte: ~965
+
+**De ce aceste 3 ținte** (GSC 3 luni, export 31 iul — poziții la nivel de pagină):
+| Pagină | Expuneri | Poziție | Linkuri primite din pachet până acum |
+|---|---|---|---|
+| `/servicii/cazier-judiciar-online/` | 43.540 | 8,30 | **0** — cea mai mare pagină nelegată |
+| `/servicii/eliberare-certificat-de-nastere/` | 83.736 | 7,11 | 0 |
+| `/servicii/cazier-fiscal-online/` | 24.009 | 8,85 | 1 (risco.ro) |
+Toate trei stau pe muchia paginii 1. Naștere pare saturat pe interogarea-cap (2,3), dar media pe
+pagină e 7,11 pe 83k expuneri — coada lungă (orașe, „pierdut", multilingv) e nerezolvată.
+⚠️ URL-ul corect e `/servicii/cazier-fiscal-online/`, nu `/servicii/cazier-fiscal/` (acela e doar
+un redirect 301 din `next.config.ts`).
 
 ---
 
@@ -36,11 +50,13 @@ Rovinieta se cumpără de ani buni online și din benzinării, dar mai puțin ș
 
 Prin Spațiul Privat Virtual, contul online al ANAF, se obțin gratuit cazierul fiscal, certificatul de atestare fiscală și adeverințele de venit. Contul se activează online cu video-identificare sau la orice administrație financiară. Odată activat, hârtiile care altădată cereau drum la Fisc vin în format electronic în câteva minute, semnate digital.
 
+Blocajul apare tot la activare. Cine nu trece de video-identificare, cine are nevoie de cazier fiscal pentru firmă înainte de o licitație sau de un contract și nu are administratorul disponibil, ori cine îl cere pentru o societate în care nu figurează ca reprezentant legal, rămâne cu drumul la administrația financiară. În aceste cazuri, cazierul fiscal poate fi [obținut online, prin împuternicit](https://eghiseul.ro/servicii/cazier-fiscal-online/), contra cost, cu depunerea cererii și ridicarea documentului făcute de intermediar.
+
 ### Amenzile, taxele și restul mărunțișului
 
 Platforma ghiseul.ro, contul de plăți al statului, acoperă azi amenzi de circulație, impozite locale, taxe de timbru și alte obligații către stat, cu cardul, fără drum la casierie. Multe primării mari au în plus propriile portaluri de taxe locale. Iar programările, acolo unde prezența fizică rămâne obligatorie, se fac aproape peste tot online: la evidența populației, la pașapoarte, la înmatriculări. Chiar și când nu scapi de drum, scapi măcar de coadă.
 
-Un avertisment care ține de siguranță: căutările pe internet pentru acte scot în față și site-uri care imită platformele statului sau vând servicii fără să livreze nimic. Regula simplă: platformele instituțiilor au domenii care se termină în „.gov.ro" sau aparțin clar instituției, iar serviciile private serioase, precum [eGhișeul.ro](https://eghiseul.ro/), afișează firma, datele de contact și prețul final înainte de plată. Cine cere plata în avans fără să spună clar cine e și ce livrează nu merită banii tăi.
+Un avertisment care ține de siguranță: căutările pe internet pentru acte scot în față și site-uri care imită platformele statului sau vând servicii fără să livreze nimic. Regula simplă: platformele instituțiilor au domenii care se termină în „.gov.ro" sau aparțin clar instituției, iar serviciile private serioase, precum eGhișeul.ro, afișează firma, datele de contact și prețul final înainte de plată. Cine cere plata în avans fără să spună clar cine e și ce livrează nu merită banii tăi.
 
 ### Ce NU se poate încă de acasă
 

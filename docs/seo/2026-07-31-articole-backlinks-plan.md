@@ -130,7 +130,7 @@ urbanism (money).
 | **risco.ro** | ✅ PUBLICAT / verificat 3 aug | [cum-verifici-un-partener-de-afaceri…](https://www.risco.ro/suport/parteneri/cum-verifici-un-partener-de-afaceri-inainte-de-contract-patru-pasi-care-costa-sub-500-de-lei-6684) | ✅ versiunea PUBLICĂ: 3 dofollow (constatator + cazier fiscal + homepage), ancore corecte, fără link în §1, index+follow, canonical, imagine featured OK (620×345). ⚠️ preview-ul `?admin=` arată o REVIZIE VECHE (imagine 404, linkuri lipsă ca text simplu) — cerut la risco să nu suprascrie versiunea live cu draftul |
 | **start-up.ro** | ✅ PUBLICAT 3 aug / verificat 7 aug | [checklist-de-acte-pentru-primul-an-de-firma…](https://start-up.ro/checklist-de-acte-pentru-primul-an-de-firma-ce-ti-se-cere-cand-si-de-unde-iei-fiecare-document) | ✅ 2 dofollow (fără rel): ancora comercială exactă „certificat constatator online" → pagina de serviciu + „ghidul de eliberare a certificatului constatator" → ghid ONRC. Fără link în §1, ambele la mijlocul articolului (secțiunea „Luna 1"). Fără noindex. ⚠️ fără canonical explicit |
 | **startupcafe.ro** | ✅ PUBLICAT 3 aug / verificat 3 aug | [p-certificatul-constatator…](https://startupcafe.ro/p-certificatul-constatator-actul-pe-care-banca-primaria-si-finantatorul-ti-l-cer-in-acelasi-an-ce-contine-si-cum-il-obtii-104392) | ✅ 2 dofollow (serviciu constatator + ghid 4 tipuri), ancore naturale, fără link în §1, index+follow, canonical, imagine OK cu credit „Sursă: eghiseul.ro". Note: titlu marcat `[P]` (politica lor de advertorial); creditul foto = mențiune brand bonus deși site-ul nu accepta brand în text |
-| economica.net | ⏳ DE TRIMIS (deblocat 7 aug — click rămâne pe CF/ANCPI, deci economica primește varianta B) — fișier: `articole-backlinks/docx/TRIMITE-economica.net-FINAL-3linkuri-cu-brand.docx` (= `06B-varianta-economica-net.md`, „Actele pe care le poți obține de acasă în 2026", 964 cuvinte, 3 dofollow: cazier judiciar + certificat naștere + homepage cu brand) | — | — |
+| economica.net | ⏳ DE TRIMIS (deblocat 7 aug — click rămâne pe CF/ANCPI, deci economica primește varianta B) — fișier: `articole-backlinks/docx/TRIMITE-economica.net-FINAL-3linkuri-cu-brand.docx` (= `06B-varianta-economica-net.md`, „Actele pe care le poți obține de acasă în 2026", 961 cuvinte). **Ținte reajustate 7 aug pe date GSC:** cazier judiciar + certificat naștere + **cazier fiscal** (înlocuiește linkul de homepage, pe care risco.ro l-a dat deja) | — | — |
 
 **Stare la 7 aug 2026: 4/6 publicate și verificate** (money, risco, startupcafe, start-up).
 Rămân click.ro (retrimitere cu articolul corect) și economica.net (de trimis).
@@ -138,6 +138,44 @@ Bilanț linkuri live: 10 dofollow — 3 money (CF + verificare proprietar + urba
 (constatator + cazier fiscal + homepage), 2 startupcafe (constatator serviciu + ghid 4 tipuri),
 2 start-up (constatator serviciu cu ancoră comercială + ghid ONRC). Pagina de serviciu
 constatator a primit deja 3 linkuri, extras CF doar 1 (al doilea vine de la click).
+
+## 4c. Reajustarea țintelor economica.net (decizie 7 aug 2026)
+
+Planul inițial dădea economica linkuri pe CF/ANCPI. După ce click.ro a păstrat subiectul CF,
+economica preia articolul „acte de acasă", iar țintele au fost recalculate pe **datele GSC de
+la nivel de pagină** (export 31 iul, 3 luni) — nu pe interogarea-cap, care induce în eroare:
+
+| Pagină | Clicuri | Expuneri | Poziție | Linkuri din pachet |
+|---|---|---|---|---|
+| `/servicii/eliberare-certificat-de-nastere/` | 2.623 | 83.736 | 7,11 | 0 |
+| `/servicii/cazier-judiciar-online/` | 393 | 43.540 | **8,30** (CTR 0,9%) | **0** |
+| `/servicii/cazier-fiscal-online/` | 803 | 24.009 | **8,85** | 1 (risco) |
+
+- **Cazierul judiciar rămăsese complet fără linkuri** — era planificat pe click.ro, care acum
+  duce articolul CF. 43k expuneri blocate pe poziția 8,3, cu CTR 0,9% → și titlul/meta au nevoie
+  de lucru, nu doar autoritate.
+- **Cazierul fiscal NU stă bine**, contrar notei din §1: 8,85 pe pagină și 8,12 pe „cazier fiscal
+  online". Nota veche („deja top 10, nu are nevoie de linkuri") venea dintr-un snapshot de 28 de
+  zile; pe 3 luni imaginea e alta.
+- **Naștere pare saturat doar pe interogarea-cap** (2,3); media paginii e 7,11 pe 83k expuneri —
+  coada lungă (orașe, „pierdut", multilingv) e nerezolvată. Merită linkul.
+- Homepage-ul iese din schemă: a primit deja dofollow de la risco.ro pe 3 aug. Brandul rămâne
+  menționat în text fără link (precedentul money.ro, acceptat).
+
+### De ce NU punem cazierjudiciaronline.com în acest slot
+
+| Domeniu | „cazier judiciar online" | CTR |
+|---|---|---|
+| eghiseul.ro | poz. 6,34 (67k expuneri) | 2,76% |
+| cazierjudiciaronline.com | poz. 7,68 (69k expuneri) | **0,40%** |
+
+⚠️ Cifrele CJO sunt din exportul GSC de 25 mai — vechi de 2,5 luni, dinainte de cutover-ul WP.
+Ocupăm deja două poziții pe pagina 1 cu aceeași interogare. Problema CJO nu e autoritatea, ci
+**CTR-ul de 0,4%** (titlu/meta description) — un backlink plătit nu repară asta. Ordinea
+corectă: (1) export GSC proaspăt pentru CJO, (2) rescris title+meta pe pagina de cazier
+judiciar, (3) abia apoi, dacă mai e cazul, un slot de backlink cumpărat separat pentru CJO.
+Amestecarea a două domenii în același advertorial plătit diluează și linkurile, și poate încălca
+regula „1 site client" din comandă.
 
 ## 5. Flux de lucru
 
