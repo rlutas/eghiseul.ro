@@ -95,7 +95,7 @@ export default function Page() {
         Cazierul fiscal al unei persoane fizice este documentul prin care ANAF confirmă dacă acea
         persoană a fost sau nu sancționată pentru fapte fiscale, contabile, vamale sau de disciplină
         financiară. În practică, aproape toate certificatele se eliberează <strong>fără mențiuni</strong>,
-        iar cel care îl cere — Registrul Comerțului, o autoritate contractantă, o bancă — vrea exact
+        iar cel care îl cere (Registrul Comerțului, o autoritate contractantă, o bancă) vrea exact
         această confirmare pe hârtie.
       </p>
       <p>
@@ -108,19 +108,19 @@ export default function Page() {
       <p>
         Cazierul fiscal este o evidență ținută de ANAF în care se înscriu faptele sancționate de
         legislația financiară, în condițiile stabilite de Ordonanța Guvernului nr. 39/2015. Fiecare
-        persoană fizică și juridică are o poziție în această evidență — asta nu înseamnă că are „ceva la
+        persoană fizică și juridică are o poziție în această evidență, asta nu înseamnă că are „ceva la
         dosar&rdquo;. Poziția e goală atâta timp cât nu există o sancțiune definitivă înscrisă, iar certificatul
         eliberat în acest caz spune explicit că titularul nu are fapte înscrise.
       </p>
       <p>
         Confuzia cea mai frecventă e cu <strong>certificatul de atestare fiscală</strong>. Sunt două
         documente diferite: cazierul arată sancțiuni, atestarea arată datorii. Poți avea cazier curat și
-        datorii la stat, sau invers. Unele dosare — licitații publice, mai ales — le cer pe amândouă, iar
-        cine aduce doar unul se întoarce.
+        datorii la stat, sau invers. Unele dosare le cer pe amândouă, mai ales la
+        licitații publice, iar cine aduce doar unul se întoarce.
       </p>
       <p>
         A doua confuzie e cu <Link href="/servicii/cazier-judiciar-online/">cazierul judiciar</Link>,
-        cerut la angajare și eliberat de Poliție. Nu au nicio legătură între ele: unul ține de ANAF și de
+        cerut la angajare și eliberat de Poliție. Nu au nicio legătură între ele. Unul ține de ANAF și de
         fapte fiscale, celălalt de MAI și de fapte penale.
       </p>
 
@@ -134,14 +134,14 @@ export default function Page() {
         <li>atragerea răspunderii solidare sau patrimoniale, stabilită prin decizie definitivă;</li>
         <li>inactivitatea fiscală declarată de ANAF;</li>
         <li>
-          contravențiile la regimul fiscal, contabil, vamal și de disciplină financiară — dar numai cele
+          contravențiile la regimul fiscal, contabil, vamal și de disciplină financiară, dar numai cele
           prevăzute expres, și numai după ce sancțiunea a rămas definitivă.
         </li>
       </ul>
       <p>
         Pentru persoanele fizice care nu au avut niciodată o firmă, cazierul este aproape întotdeauna
         curat. Situațiile problematice apar la cei care au fost asociați sau administratori într-o
-        societate declarată inactivă ori sancționată — faptul se răsfrânge asupra persoanei fizice și
+        societate declarată inactivă ori sancționată, faptul se răsfrânge asupra persoanei fizice și
         poate bloca ulterior înființarea unei firme noi.
       </p>
 
@@ -173,7 +173,7 @@ export default function Page() {
         </tbody>
       </table>
       <p>
-        Radierea se face <strong>din oficiu</strong>, nu la cerere. Nu trebuie să depui nimic — dar merită
+        Radierea se face <strong>din oficiu</strong>, nu la cerere. Nu trebuie să depui nimic, dar merită
         să ceri un certificat înainte de a intra într-un dosar important, ca să vezi dacă ștergerea a fost
         operată. Dacă o faptă apare deși termenul a trecut, se depune o cerere de rectificare la
         administrația financiară.
@@ -186,7 +186,7 @@ export default function Page() {
           schimbarea asociaților ori a administratorului. Aici se blochează cele mai multe dosare.
         </li>
         <li>
-          <strong>Autoritățile contractante</strong>, la licitații publice — de regulă împreună cu
+          <strong>Autoritățile contractante</strong>, la licitații publice , de regulă împreună cu
           certificatul de atestare fiscală și cu{' '}
           <Link href="/servicii/certificat-constatator-online/">certificatul constatator</Link>.
         </li>
@@ -204,19 +204,19 @@ export default function Page() {
       </ul>
 
       <h2>Cum îl obții: cele trei căi</h2>
-      <h3>1. Prin Spațiul Privat Virtual — gratuit, dacă ai cont</h3>
+      <h3>1. Prin Spațiul Privat Virtual, gratuit, dacă ai cont</h3>
       <p>
         Din SPV, cererea se depune electronic, iar certificatul vine semnat digital, de regulă în câteva
         ore până la o zi lucrătoare. Este cea mai simplă cale <em>dacă</em> ai deja contul activat.
         Activarea se face online, prin video-identificare, sau la orice administrație financiară.
       </p>
-      <h3>2. La ghișeul administrației financiare — gratuit, cu deplasare</h3>
+      <h3>2. La ghișeul administrației financiare, gratuit, cu deplasare</h3>
       <p>
         Se depune cererea tip, cu actul de identitate. Termenul legal este de până la 5 zile lucrătoare,
         în practică deseori mai scurt. Dezavantajul e evident: program cu publicul și deplasare la
         administrația de domiciliu fiscal.
       </p>
-      <h3>3. Prin împuternicit — contra cost, fără deplasare și fără SPV</h3>
+      <h3>3. Prin împuternicit, contra cost, fără deplasare și fără SPV</h3>
       <p>
         Aici intră situațiile în care primele două căi nu funcționează: românii plecați din țară care nu
         pot trece de video-identificare, persoanele care au nevoie de document rapid și nu sunt în
@@ -227,25 +227,18 @@ export default function Page() {
         taxe incluse, cu livrare în 1–3 zile lucrătoare.
       </p>
 
-      <h2>Greșeli care costă timp</h2>
-      <ul>
-        <li>
-          <strong>Îl ceri prea devreme.</strong> Valabilitatea e de 30 de zile. Un cazier scos „ca să îl
-          am&rdquo; expiră până se adună restul dosarului.
-        </li>
-        <li>
-          <strong>Îl cauți pe ghiseul.ro.</strong> Platforma aceea e pentru plăți către stat. Cazierul
-          fiscal se eliberează de ANAF.
-        </li>
-        <li>
-          <strong>Confunzi persoana fizică cu firma.</strong> Pentru o societate se cere cazierul fiscal
-          al persoanei juridice — document separat, chiar dacă ești singurul asociat.
-        </li>
-        <li>
-          <strong>Presupui că ai cazier „murdar&rdquo; pentru că ai avut datorii.</strong> Datoriile nu se
-          înscriu. Cel mai simplu mod de a afla e să ceri certificatul.
-        </li>
-      </ul>
+      <h2>Patru greșeli care costă timp</h2>
+      <p>
+        Prima: îl ceri prea devreme. Valabilitatea e de 30 de zile, așa că un cazier scos „ca să îl
+        am&rdquo; expiră până se adună restul dosarului. A doua: îl cauți pe ghiseul.ro. Platforma aceea
+        e pentru plăți către stat, iar cazierul fiscal îl eliberează ANAF.
+      </p>
+      <p>
+        A treia, cea mai costisitoare: confunzi persoana fizică cu firma. Pentru o societate se cere
+        cazierul fiscal al persoanei juridice, care e alt document, chiar dacă ești singurul asociat.
+        Și a patra: presupui că ai cazier „murdar&rdquo; fiindcă ai avut datorii la stat. Datoriile nu se
+        înscriu nicăieri în cazier. Cel mai simplu mod de a te lămuri e să ceri certificatul.
+      </p>
 
       <h2>Pe scurt</h2>
       <p>
