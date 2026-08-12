@@ -16,7 +16,7 @@
 >
 > **🔴 AWB Sameday easybox** (comis 04.08, scris 03.08): rezolvarea geo se sare la locker/PUDO (București n-are orașul „Bucuresti" la Sameday, doar „Sectorul 1..6"); necomis inițial fiindcă testul pica typecheck-ul CI.
 >
-> **📰 Articol ANCPI actualizat** cu comunicatul gov.ro din 3 aug (rundă nouă de teste e-Terra, fără dată) — **de urmărit informarea promisă pe 5 aug**.
+> **📰 ANCPI, situația la 12 august: e-Terra a repornit ETAPIZAT, dar NU pentru public.** 11 aug ora 15:00 — acces pentru personalul ANCPI, OCPI și notarii publici; 12 aug ora 8:30 — extins la topografii autorizați, experții tehnici judiciari și executorii judecătorești. **Platformele online destinate publicului rămân oprite** (se repun „etapizat, cu anunț prealabil”), inclusiv portalul ePay pe care lucrează worker-ul nostru — verificat 12.08, `epay.ancpi.ro` nu răspunde deloc. ~94.000 de cereri își păstrează rangul, cu termenele legale prelungite; extrasele emise înainte de incident primesc prelungire de valabilitate egală cu durata blocajului. ⚠️ **Backlog propriu: 71 de joburi ANCPI în `FAILED`** (15 iul → 12 aug), pe comenzi de **6.518,96 RON** — de repus în coadă când revine portalul public. Articolul `/ancpi-nu-functioneaza/` e actualizat (cronologie 11–12 aug, FAQ nou, status „parțial”).
 >
 > **🟣 CJO+ecazier (05.08): PSI 80→93, a11y 85→97, OCR nume** — lista easybox (152KB gz) scoasă din first-load (528→376KB), zoom deblocat + label telefon + heading-uri footer, `sanitizeNameFields` portat (separatorii `<` din prenume). Toate prin cherry-pick pe origin/main — **migrarea ecazier (`a14a1c5b`) rămâne NEPUSHATĂ local**, cu 9 fișiere necomise. Rămase CJO: contrast (design), termene „ziua 0" nealiniate pe eghiseul.
 

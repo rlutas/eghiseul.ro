@@ -10,6 +10,22 @@
 
 ---
 
+## 0. Stare operațională (12 august 2026) — blocaj ANCPI în curs
+
+> Worker-ul e funcțional și corect; ce lipsește e portalul ANCPI.
+
+- **13 iulie, 23:02** — monitorizarea noastră detectează căderea portalului ePay (cu ~10 ore înaintea primului comunicat oficial). Atac cibernetic, confirmat ulterior ca ransomware.
+- **11 august, 15:00** — ANCPI repornește **e-Terra**, etapizat, pentru personalul propriu, pentru OCPI și pentru **notarii publici**. Prima zi e dedicată înregistrării actelor restante; solicitările de extrase sunt blocate chiar și pentru notari.
+- **12 august, 8:30** — acces extins la persoanele autorizate să execute lucrări de cadastru, experții tehnici judiciari și executorii judecătorești.
+- **Ce NU a revenit:** celelalte platforme online destinate publicului, care „se repun etapizat, cu anunț prealabil" — **inclusiv ePay ANCPI**, singurul pe care lucrează worker-ul nostru. Verificat 12.08: `https://epay.ancpi.ro/` nu răspunde (fără răspuns HTTP).
+- **Cereri în lucru la ANCPI:** ~94.000, cu rangul păstrat și termenele legale prelungite. Extrasele emise înainte de incident și valabile atunci primesc prelungire egală cu durata indisponibilității.
+
+**Backlog propriu de recuperat la revenire:** `select status, count(*) from ancpi_jobs group by 1` → **71 de joburi `FAILED`** (15 iulie → 12 august), pe comenzi însumând **6.518,96 RON**. Joburile au epuizat retry-urile în timpul blocajului, deci NU se reiau singure — la revenirea portalului trebuie repuse explicit în coadă (`PENDING`), verificând întâi că plata e confirmată. ⚠️ Nu reseta un job deja plătit la ANCPI — vezi regula de dublă-plată din `railway-workers.md`.
+
+Comunicarea către clienți e actualizată în articolul `/ancpi-nu-functioneaza/` (cronologie, FAQ, status live „parțial") — vezi `docs/changelog/2026-08-12-servicii-fara-avocat-si-numere-eliberate.md` §8.
+
+---
+
 ## 1. Rezumat & decizie produs
 
 Un operator uman ia acum manual datele dintr-o comandă de **extras de carte funciară**, se loghează pe **ePay ANCPI** (`https://epay.ancpi.ro/epay`), caută imobilul, plătește din creditul preîncărcat (puncte), descarcă PDF-ul și îl livrează clientului. Înlocuim operatorul cu un **worker** identic conceptual cu cel ONRC.

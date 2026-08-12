@@ -79,10 +79,17 @@ Actualizat în `src/app/ancpi-nu-functioneaza/page.tsx`:
 - „Actualizări": secțiune nouă pentru 12 august
 - FAQ: întrebare nouă („am citit că e-Terra a repornit, de ce tot nu-mi iau extrasul?") + rescrise răspunsurile despre obținerea extrasului și despre tranzacțiile programate (notarii pot înregistra din nou actele, dar extrasele de autentificare n-au fost disponibile din prima zi)
 
+## 9. CI roșu după actualizarea articolului (și de ce)
+
+Push-ul cu §8 a picat pe GitHub Actions: 4 erori `react/no-unescaped-entities` în `ancpi-nu-functioneaza/page.tsx` — scrisesem ghilimele românești deschise („) închise cu `"` ASCII în text JSX. Plus testul `PAGE_LAST_MODIFIED`, care cere ca registrul din `src/lib/seo/last-modified.ts` să fie sincronizat cu `DATE_MODIFIED` al paginii (altfel `sitemap.xml` raportează o dată veche pentru un articol actualizat azi).
+
+Ambele reparate (`03409a5`), CI verde. **Lecția, pentru data viitoare:** `next build` NU rulează eslint, deci *build verde ≠ CI verde*. După editări în JSX se rulează `npm run lint` **și** `npx vitest run`, nu doar build-ul.
+
 ## Verificare
 
 - `npx tsc --noEmit` curat, `npm run lint` 0 erori, `npm run build` OK, 1483 teste verzi (34 noi).
 - Reutilizarea numerelor testată pe tranzacție cu ROLLBACK pe registrul real: contract → 005907, delegație → SM007408, a doua alocare → 005986, `next_number` neatins, lista de libere neschimbată după rollback.
 - Audit re-rulat după curățenie: **0** numere pe servicii fără avocat, **0** documente avocațiale rămase.
+- Articolul ANCPI verificat live după deploy (apar 11/12 august + „repornită etapizat" + „rămân oprite"); CI verde după fixul de lint (run `31583098936`).
 - CJO/ecazier: `tsc` curat, 422 teste verzi (5 noi).
 - Eticheta GSC confirmată în HTML-ul de producție; GA4 verificat live în browser (page_view → 204).
