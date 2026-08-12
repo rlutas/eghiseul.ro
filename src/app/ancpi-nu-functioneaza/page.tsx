@@ -162,7 +162,7 @@ export default function Page() {
         accesul s-a extins la persoanele autorizate să execute lucrări de cadastru, experții
         tehnici judiciari și executorii judecătorești. Atenție însă la ce NU s-a repornit:{' '}
         <strong>celelalte platforme online destinate publicului rămân oprite</strong> și revin
-        „etapizat, cu anunț prealabil" — inclusiv portalul prin care se eliberează online extrasele
+        „etapizat, cu anunț prealabil” — inclusiv portalul prin care se eliberează online extrasele
         de carte funciară (vezi <a href="#cronologie">cronologia</a>). Presa locală a relatat blocajul în mai multe județe
         (printre primele,{' '}
         <a href="https://www.bihon.ro/stirile-judetului-bihor/bihorul-afectat-de-blocajul-national-al-ancpi-cadastrul-nu-functioneaza-pana-luni-5337687/" target="_blank" rel="nofollow noopener">
@@ -243,7 +243,7 @@ export default function Page() {
                 <strong>persoanele autorizate să execute lucrări de cadastru, experții tehnici
                 judiciari și executorii judecătorești</strong> care aveau acces înainte de
                 incident. <strong>Celelalte platforme online ale ANCPI destinate publicului rămân
-                oprite</strong> și vor fi repuse „etapizat, cu anunț prealabil" — inclusiv cea prin
+                oprite</strong> și vor fi repuse „etapizat, cu anunț prealabil” — inclusiv cea prin
                 care se eliberează online extrasele de carte funciară. Verificarea noastră din
                 această zi: portalul ePay ANCPI tot nu răspunde. ANCPI avertizează că pot apărea{' '}
                 <strong>timpi de răspuns mai mari</strong>, iar unele documente PDF pot fi
@@ -262,7 +262,7 @@ export default function Page() {
                 pentru oficiile de cadastru și publicitate imobiliară (OCPI) și pentru{' '}
                 <strong>notarii publici</strong>. Repornirea vizează exclusiv e-Terra — sistemul
                 prin care se fac înregistrarea, gestiunea și evidența cadastrală și publicitatea
-                imobiliară — și e „un prim pas către reluarea completă". Prima zi e dedicată{' '}
+                imobiliară — și e „un prim pas către reluarea completă”. Prima zi e dedicată{' '}
                 <strong>înregistrării actelor din perioada de indisponibilitate</strong>: OCPI
                 prioritizează actele primite prin corespondență, iar notarii pot înregistra actele
                 instrumentate cât timp sistemul a fost blocat. Consecință directă pentru public:{' '}
@@ -774,7 +774,7 @@ export default function Page() {
       <p>
         Partea pe care o omit majoritatea titlurilor din presă:{' '}
         <strong>platformele online destinate publicului rămân oprite</strong>. ANCPI scrie explicit
-        că vor fi repuse „etapizat, cu anunț prealabil". Am verificat noi portalul ePay în ziua{' '}
+        că vor fi repuse „etapizat, cu anunț prealabil”. Am verificat noi portalul ePay în ziua{' '}
         <strong>{outageDays}</strong> — tot nu răspunde. Deci un extras de carte funciară încă nu
         se poate scoate online, nici de tine, nici de noi. Prima zi de funcționare a fost oricum
         dedicată înregistrării actelor restante, cu <strong>solicitările de extrase blocate</strong>{' '}
