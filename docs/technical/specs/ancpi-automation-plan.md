@@ -356,7 +356,7 @@ Testat pe 19.528 CF reale: 89% valid, 4% format vechi, 7% suspect. **Decizie: nu
 
 ## 11c. Fără documente avocațiale (ca la constatator)
 
-Extras carte funciară e serviciu **fără implicare avocațială** → la submit NU se generează **contract de asistență juridică**, **împuternicire avocațială**, **cerere** și NU se alocă **număr de Barou** (delegație). `lib/documents/auto-generate.ts`: slug-ul e în `NO_LAWYER_SERVICES` (`certificat-constatator`, `extras-carte-funciara` — atenție: slug DB e fără „de") → se generează doar `contract-prestari`; `delegationItems = []` pentru aceste servicii. (Bug reparat 2026-06-16: lista folosea greșit `extras-de-carte-funciara`, deci CF primea contract de asistență.)
+Extras carte funciară e serviciu **fără implicare avocațială** → la submit NU se generează **contract de asistență juridică**, **împuternicire avocațială**, **cerere** și NU se alocă **număr de Barou** (delegație). `lib/documents/no-lawyer-services.ts` (sursa unică): lista e inversată — whitelist `LAWYER_SERVICE_SLUGS` (cazier judiciar/auto/fiscal + stare civilă), **restul catalogului = fără avocat** → se generează doar `contract-prestari`; `delegationItems = []` pentru aceste servicii. (Bug reparat 2026-06-16: lista folosea greșit `extras-de-carte-funciara`, deci CF primea contract de asistență. Bug reparat 2026-08-12: lista enumera doar 5 slug-uri, deci serviciile imobiliare prin topograf primeau contract de asistență + număr de Barou — de aici inversarea. Vezi `admin-document-system.md` §4.)
 
 ## 11d. Identificare imobil după adresă (serviciu nou, 198 RON)
 

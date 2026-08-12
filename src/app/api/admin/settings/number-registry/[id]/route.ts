@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requirePermission } from '@/lib/admin/permissions';
-import { getRegistryClient } from '@/lib/registry/client';
+import { getRegistryClient, releaseNumber } from '@/lib/registry/client';
 
 // The registry lives in the CENTRAL Supabase project.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -115,14 +115,23 @@ export async function DELETE(
     const registry: AnyClient = getRegistryClient();
     const { data, error } = await registry
       .from('number_registry')
-      .delete()
-      .eq('id', id)
       .select('id, number, type')
+      .eq('id', id)
       .single();
 
     if (error || !data) {
       return NextResponse.json({ success: false, error: 'Inregistrarea nu a fost gasita' }, { status: 404 });
     }
+
+    // Ștergerea unei intrări GREȘITE scoate rândul din jurnal ȘI pune numărul
+    // înapoi în circulație (released_numbers) — altfel rămânea un gol
+    // nejustificat în registrul fizic al cabinetului. Contractele reale
+    // anulate se anulează cu „Anulare" (void), nu se șterg.
+    await releaseNumber(
+      id,
+      auth.user.email ?? 'admin',
+      'Șters din jurnal ca intrare greșită — număr pus înapoi în circulație'
+    );
 
     return NextResponse.json({ success: true, data });
   } catch (error) {

@@ -7,6 +7,7 @@ import { uploadFile, generateDocumentKey, downloadFile, deleteFile, getClientSig
 import { allocateNumber, findExistingNumber, getRegistryClient } from '@/lib/registry/client';
 import { isPJForDocumentGeneration } from '@/lib/documents/delegation-items';
 import { computeCerereItems } from '@/lib/documents/cerere-items';
+import { isNoLawyerService } from '@/lib/documents/no-lawyer-services';
 import { formatPersonName } from '@/lib/format/person-name';
 
 /**
@@ -75,6 +76,23 @@ export async function POST(
 
     if (orderError || !order) {
       return NextResponse.json({ success: false, error: 'Order not found' }, { status: 404 });
+    }
+
+    // Serviciile FĂRĂ avocat (topograf/imobiliare, ANCPI, ONRC) primesc DOAR
+    // contract-prestari. Blocat și server-side, nu doar ascuns în UI — altfel
+    // un POST direct ar arde un număr de Barou pe o comandă care nu-l cere.
+    if (
+      isNoLawyerService(order.services?.slug) &&
+      template !== 'contract-prestari'
+    ) {
+      return NextResponse.json(
+        {
+          success: false,
+          error:
+            'Acest serviciu nu se face prin avocat — se generează doar contractul de prestări servicii.',
+        },
+        { status: 400 }
+      );
     }
 
     // COMBINED civil-status orders (certificat + extras multilingv etc.) need

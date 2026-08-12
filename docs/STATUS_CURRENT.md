@@ -1,5 +1,7 @@
 # eGhiseul.ro - Status Curent
 
+> **🔴 Update 2026-08-12 — serviciile fără avocat + numere de Barou reutilizabile.** Serviciile prin topograf primeau contract de asistență juridică și ardeau numere din registrul central (lista „fără avocat" era incompletă); lista e acum inversată — doar `LAWYER_SERVICE_SLUGS` primesc setul avocațial. 5 comenzi curățate, 10 numere (5 contracte + 5 delegații) puse ÎNAPOI în circulație prin mecanismul nou `released_numbers`, deci registrul nu mai rămâne cu goluri. [changelog](changelog/2026-08-12-servicii-fara-avocat-si-numere-eliberate.md)
+>
 > **⚡ Update 2026-08-04/05 — perf, curieri, termene stare civilă, colaborator.** Changelog-uri: [PSI 57→90](changelog/2026-08-04-psi-mobile-supabase-lazy.md) · [tracking Poșta](changelog/2026-08-04-tracking-posta-international-parcelsapp.md) · [împuternicire apostilă SC](changelog/2026-08-04-imputernicire-apostila-stare-civila.md) · [termene SC](changelog/2026-08-05-termene-stare-civila-realiniate.md) · [colaborator+banner ANCPI](changelog/2026-08-05-colaborator-email-si-banner-ancpi.md) · [Sameday locker geo](changelog/2026-08-03-sameday-locker-geo-fix.md).
 >
 > **🟣 PSI mobile homepage 57 → 90** — supabase-js (52KB gz) era în bundle-ul inițial doar pentru avatarul din header; mutat pe dynamic import + idle. CWV real-user erau deja PASSED.

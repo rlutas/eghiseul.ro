@@ -1,27 +1,55 @@
 /**
- * Fully-automated services with NO lawyer involvement (ANCPI carte funciară /
- * plan cadastral / identificare imobil, ONRC certificat constatator).
+ * Which services involve the lawyer (avocat) — and which do NOT.
  *
- * These get ONLY a "contract-prestari" (service-provision) document — never a
- * legal-assistance contract, împuternicire avocațială, cerere de eliberare, or
- * an allocated Barou delegation number.
+ * ONLY services handled THROUGH the lawyer get the full legal document set:
+ * contract de asistență juridică (with an allocated Barou number), împuternicire
+ * avocațială (Barou delegation number) and cerere de eliberare.
  *
- * Single source of truth: both the auto-generation at submit
- * (`auto-generate.ts`) and the admin "Procesare comanda" UI
- * (`admin/orders/[id]/page.tsx`) read this list, so they cannot drift apart.
+ * Everything else — fully-automated services (ONRC certificat constatator,
+ * ANCPI carte funciară / plan cadastral / identificare imobil) and all the
+ * imobiliare services fulfilled by the topograf collaborator — gets ONLY a
+ * "contract-prestari" (service-provision) document + the invoice. No Barou
+ * number is ever burned on them.
  *
- * NB: values are the exact DB `services.slug`. `extras-de-carte-funciara` is
- * kept as a safety alias for any caller that passes the route slug (with "de")
- * instead of the DB slug.
+ * The list is INVERTED on purpose (whitelist of lawyer services, everything
+ * else = no lawyer): the imobiliare/automated catalogue keeps growing, and a
+ * new service silently inheriting the lawyer document set is exactly the bug
+ * this file exists to prevent (E-260810-EP896 — Plan de Amplasament got a
+ * contract de asistență + Barou number 006024).
+ *
+ * Single source of truth: auto-generation at submit/post-payment
+ * (`auto-generate.ts`), the Barou sweep (`ensure-barou-documents.ts`), the
+ * manual generator (`api/admin/orders/[id]/generate-document`), the admin
+ * "Procesare comandă" UI and the avocat order scoping all read from here.
+ *
+ * Values are the exact DB `services.slug`.
  */
-export const NO_LAWYER_SERVICE_SLUGS = [
-  'certificat-constatator', // ONRC certificat constatator
-  'extras-carte-funciara', // ANCPI extras de carte funciară (DB slug)
-  'extras-de-carte-funciara', // alias (route slug variant)
-  'extras-plan-cadastral', // ANCPI extras de plan cadastral
-  'identificare-imobil', // ANCPI identificare imobil după adresă
+export const LAWYER_SERVICE_SLUGS = [
+  'cazier-judiciar', // legacy/generic cazier judiciar
+  'cazier-judiciar-persoana-fizica',
+  'cazier-judiciar-persoana-juridica',
+  'cazier-auto',
+  'cazier-fiscal',
+  'certificat-nastere',
+  'certificat-casatorie',
+  'certificat-celibat',
+  'certificat-integritate',
+  'extras-multilingv-certificat-nastere',
+  'extras-multilingv-certificat-casatorie',
 ] as const;
 
+export function isLawyerService(slug: string | null | undefined): boolean {
+  return !!slug && (LAWYER_SERVICE_SLUGS as readonly string[]).includes(slug);
+}
+
+/**
+ * True for every service that does NOT go through the lawyer.
+ *
+ * A missing/empty slug is deliberately NOT treated as "no lawyer": the caller
+ * failed to resolve the service, and skipping the legal documents would be the
+ * damaging direction of the error.
+ */
 export function isNoLawyerService(slug: string | null | undefined): boolean {
-  return !!slug && (NO_LAWYER_SERVICE_SLUGS as readonly string[]).includes(slug);
+  if (!slug) return false;
+  return !isLawyerService(slug);
 }

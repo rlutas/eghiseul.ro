@@ -181,6 +181,34 @@ export async function voidNumber(
   }
 }
 
+/**
+ * Pune un număr ÎNAPOI în circulație: scoate intrarea din jurnal și o trece în
+ * `released_numbers`, de unde `allocate_number` o reconsumă la următoarea
+ * comandă (cel mai mic număr liber întâi). Folosește-o DOAR pentru alocări care
+ * n-ar fi trebuit să existe — pentru contracte reale anulate folosește
+ * `voidNumber` (numărul rămâne consumat, cu mențiune, cum cere registrul).
+ *
+ * Returnează false dacă numărul era deja eliberat.
+ */
+export async function releaseNumber(
+  registryId: string,
+  releasedBy: string,
+  reason?: string
+): Promise<boolean> {
+  const registry = getRegistryClient();
+
+  const { data, error } = await registry.rpc('release_number', {
+    p_registry_id: registryId,
+    p_released_by: releasedBy,
+    p_reason: reason ?? null,
+  });
+
+  if (error) {
+    throw new Error(`Registry release_number failed: ${error.message}`);
+  }
+  return data === true;
+}
+
 /** Zero-padded display form: contract '004271', delegation 'SM005757'. */
 export function formatRegistryNumber(
   type: RegistryNumberType,

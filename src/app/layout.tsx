@@ -32,6 +32,12 @@ export const metadata: Metadata = {
   authors: [{ name: "eGhiseul.ro" }],
   creator: "eGhiseul.ro",
   alternates: { canonical: "https://eghiseul.ro/" },
+  // Confirmarea proprietății în Google Search Console. Stă în cod, nu ca fișier
+  // răzleț în public/ — fișierul googleXXXX.html a rămas pe WordPress la
+  // migrare și proprietatea a picat pe „neverificat" (12.08.2026). Nu șterge.
+  verification: {
+    google: "w6SjQgz9vo_z7BX04cgbOvc81kBNJjdYbJOxcVrG7NY",
+  },
   openGraph: {
     type: "website",
     locale: "ro_RO",

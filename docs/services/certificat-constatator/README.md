@@ -36,7 +36,7 @@ Comandă company-KYC pe slug DB (`/comanda/certificat-constatator`):
 > **Serviciu digital — pașii Opțiuni și Livrare sunt SĂRITE** (constatatorul e auto-emis, doar email PDF, fără
 > curier). Vezi `step-builder.ts` (`isConstatator`). La fel ca extras carte funciară.
 
-**Fără documente avocațiale** (în `NO_LAWYER_SERVICES`): se generează doar `contract-prestari`, fără contract de
+**Fără documente avocațiale** (nu e în `LAWYER_SERVICE_SLUGS` — `lib/documents/no-lawyer-services.ts`): se generează doar `contract-prestari`, fără contract de
 asistență juridică / împuternicire / cerere / nr. Barou. **Partea contractantă din contract = datele de facturare**
 (PF: nume+CNP / PJ: firmă+CUI) — nu există buletin scanat. Admin: cardul „Date personale" e ascuns când e gol.
 

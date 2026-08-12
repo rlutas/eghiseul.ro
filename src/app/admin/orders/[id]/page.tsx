@@ -4097,11 +4097,28 @@ const PROCESSING_ACTION_BUTTONS: Record<string, {
   },
 };
 
-/** Trimite comanda la un colaborator (topograf) sau o retrage. */
+/**
+ * Cine face lucrarea: topograful (colaborator) sau echipa internă.
+ *
+ * Regula reală vine din `collaborator_service_assignments`: serviciile alocate
+ * unui colaborator (plan amplasament, copiile OCPI, certificat sarcini etc.)
+ * apar AUTOMAT în portalul lui — `/api/collaborator/orders` filtrează pe
+ * `service_id IN (serviciile lui) OR assigned_collaborator_id = el`. Restul
+ * (cazier, extras CF, constatator) le facem noi.
+ *
+ * Înainte, caseta scria „nealocat (echipa internă)" pe orice comandă, deci
+ * părea că o lucrare de topograf n-are stăpân — deși topograful o vedea deja.
+ * Acum textul spune cine o are, iar trimiterea explicită la topograf pe un
+ * serviciu intern rămâne posibilă, dar ca EXCEPȚIE (ex. identificare imobil pe
+ * care echipa n-o poate rezolva), nu ca opțiune la egalitate.
+ */
 function CollaboratorAssign({ order, onChanged }: { order: OrderDetail; onChanged: () => void }) {
-  const [collabs, setCollabs] = useState<{ id: string; name: string; email: string }[]>([]);
+  const [collabs, setCollabs] = useState<
+    { id: string; name: string; email: string; services?: { service_id: string }[] }[]
+  >([]);
   const [selected, setSelected] = useState<string>(order.assigned_collaborator_id || '');
   const [saving, setSaving] = useState(false);
+  const [showException, setShowException] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -4120,6 +4137,14 @@ function CollaboratorAssign({ order, onChanged }: { order: OrderDetail; onChange
   }, []);
 
   if (collabs.length === 0) return null;
+
+  // Colaboratorii care au serviciul acestei comenzi alocat prin
+  // collaborator_service_assignments — ei o văd deja în portal.
+  const serviceOwners = collabs.filter((c) =>
+    (c.services || []).some((s) => s.service_id === order.services?.id)
+  );
+  const isCollaboratorService = serviceOwners.length > 0;
+  const ownerName = serviceOwners[0]?.name || serviceOwners[0]?.email || '';
 
   const save = async (collaboratorId: string | null) => {
     setSaving(true);
@@ -4142,36 +4167,69 @@ function CollaboratorAssign({ order, onChanged }: { order: OrderDetail; onChange
   };
 
   const current = order.assigned_collaborator_id || '';
+  // Pe serviciile interne caseta rămâne strânsă până o ceri — altfel pare că
+  // lucrarea așteaptă o alocare pe care nimeni n-o face.
+  const showPicker = isCollaboratorService || showException || !!current;
 
   return (
     <div className="rounded-lg border border-slate-200 bg-white px-4 py-3">
       <h4 className="text-sm font-semibold mb-2 flex items-center gap-2">
         <Users className="h-4 w-4" />
-        Colaborator (topograf)
+        Cine face lucrarea
       </h4>
-      <div className="flex flex-wrap items-center gap-2">
-        <select
-          value={selected}
-          onChange={(e) => setSelected(e.target.value)}
-          className="flex-1 min-w-[180px] rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm"
-        >
-          <option value="">— nealocat (echipa internă) —</option>
-          {collabs.map((c) => (
-            <option key={c.id} value={c.id}>{c.name || c.email}</option>
-          ))}
-        </select>
+
+      <p className="mb-2 text-xs text-slate-600">
+        {isCollaboratorService ? (
+          <>
+            <span className="font-medium text-slate-800">Topograf{ownerName ? ` — ${ownerName}` : ''}</span>
+            {' · '}serviciu alocat colaboratorului, comanda îi apare automat în portal
+          </>
+        ) : (
+          <>
+            <span className="font-medium text-slate-800">Echipa internă</span>
+            {' · '}serviciul se face la noi (cazier, extras CF, constatator etc.)
+          </>
+        )}
+      </p>
+
+      {showPicker ? (
+        <>
+          <div className="flex flex-wrap items-center gap-2">
+            <select
+              value={selected}
+              onChange={(e) => setSelected(e.target.value)}
+              className="flex-1 min-w-[180px] rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm"
+            >
+              <option value="">
+                {isCollaboratorService
+                  ? `— implicit${ownerName ? `: ${ownerName}` : ''} (prin serviciu) —`
+                  : '— echipa internă —'}
+              </option>
+              {collabs.map((c) => (
+                <option key={c.id} value={c.id}>{c.name || c.email}</option>
+              ))}
+            </select>
+            <button
+              onClick={() => save(selected || null)}
+              disabled={saving || selected === current}
+              className="rounded-lg bg-blue-600 px-3 py-2 text-sm font-medium text-white disabled:opacity-50"
+            >
+              {saving ? 'Se salvează...' : selected ? 'Trimite' : 'Retrage'}
+            </button>
+          </div>
+          {current && (
+            <p className="mt-1.5 text-xs text-slate-500">
+              Trimisă nominal colaboratorului; la încărcarea PDF-ului se livrează automat clientului.
+            </p>
+          )}
+        </>
+      ) : (
         <button
-          onClick={() => save(selected || null)}
-          disabled={saving || selected === current}
-          className="rounded-lg bg-blue-600 px-3 py-2 text-sm font-medium text-white disabled:opacity-50"
+          onClick={() => setShowException(true)}
+          className="text-xs font-medium text-blue-600 hover:underline"
         >
-          {saving ? 'Se salvează...' : selected ? 'Trimite' : 'Retrage'}
+          Trimite totuși la topograf (excepție)
         </button>
-      </div>
-      {current && (
-        <p className="mt-1.5 text-xs text-slate-500">
-          Comanda e vizibilă în portalul colaboratorului; la încărcarea PDF-ului se livrează automat clientului.
-        </p>
       )}
     </div>
   );
@@ -4321,7 +4379,7 @@ function ProcessingSection({
   // Determine which document types to show. Fully-automated services with no
   // lawyer involvement (ONRC constatator, ANCPI carte funciară / plan cadastral /
   // identificare imobil) get NO legal-assistance contract / împuternicire /
-  // cerere and NO Barou number — see NO_LAWYER_SERVICE_SLUGS.
+  // cerere and NO Barou number — see LAWYER_SERVICE_SLUGS.
   const noLawyerService = isNoLawyerService(order.services?.slug);
   const generableDocTypes = noLawyerService
     ? ['contract_prestari']

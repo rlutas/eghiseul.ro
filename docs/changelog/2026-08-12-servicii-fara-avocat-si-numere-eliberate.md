@@ -1,0 +1,51 @@
+# 2026-08-12 — Serviciile prin topograf primeau documente avocațiale; numerele de Barou arse se pun înapoi în circulație
+
+## 1. Cauza: lista „fără avocat" enumera doar 5 servicii
+
+Semnalat de Raul pe `E-260810-EP896` (Plan de Amplasament și Delimitare): comanda avea contract de asistență juridică generat, plus butoanele de împuternicire avocațială și cerere PF în „Procesare comandă".
+
+`src/lib/documents/no-lawyer-services.ts` era o listă albă de 5 slug-uri (`certificat-constatator`, `extras-carte-funciara` + alias, `extras-plan-cadastral`, `identificare-imobil`). Cele 14 servicii imobiliare adăugate prin migrarea 084 (topograf) nu erau în ea → cădeau pe ramura „cu avocat": contract de asistență + număr de Barou din registrul central + numere de delegație.
+
+**Fix — lista e acum INVERSATĂ:** whitelist `LAWYER_SERVICE_SLUGS` (cazier judiciar PF/PJ/legacy, cazier auto, cazier fiscal, naștere, căsătorie, celibat, integritate, extras multilingv ×2), **tot restul catalogului = fără avocat**, doar `contract-prestari` + factură. Catalogul imobiliar crește constant, deci default-ul sigur e „fără avocat". Slug lipsă/gol e tratat ca „cu avocat" (fail-safe — mai bine un document în plus decât unul legal lipsă).
+
+Consumatori aliniați:
+- `auto-generate.ts` (submit + post-payment), `ensure-barou-documents.ts` (sweep-ul de după plată)
+- `api/admin/orders/[id]/generate-document` — **gardă server-side nouă**: 400 pe orice template ≠ `contract-prestari` la serviciile fără avocat (până acum butoanele erau doar ascunse în UI, un POST direct trecea)
+- UI „Procesare comandă" (lista de documente generabile)
+- `api/admin/orders/list` — rolul `avocat` vede acum DOAR serviciile prin avocat (include-only, nu excludere pe listă)
+
+Test nou: `tests/unit/lib/documents/no-lawyer-services.test.ts` mapează TOT catalogul real (11 servicii cu avocat + 20 fără), ca lista să nu mai poată rămâne în urmă.
+
+## 2. Curățenie: 5 comenzi, 10 numere de Barou
+
+Auditul (`scripts/audit-registry-no-lawyer.mjs`) a găsit exact 10 numere alocate pe servicii fără avocat, pe 5 comenzi (`E-260722-M58C5`, `E-260804-YEYBF`, `E-260804-9K23B`, `E-260810-EP896`, `E-260811-U2AWZ`): 5 contracte (005907, 005986, 005989, 006024, 006028) + **5 delegații** (SM007408, SM007496, SM007499, SM007538, SM007542) — delegațiile erau încă ACTIVE, deși împuternicirile nu existau ca documente.
+
+- Documentele: 6 rânduri `order_documents` + fișierele din S3 șterse (`scripts/cleanup-wrong-lawyer-docs.ts`). Niciunul nu fusese vizibil clientului (`visible_to_client = false`).
+- Comenzile rămân cu `contract_prestari` + factură, cum trebuie.
+
+## 3. Numerele nu mai rămân goluri în registru
+
+`void_number` marchează numărul consumat pe veci — corect pentru un contract REAL anulat (rămâne cu mențiune în registrul fizic), dar nejustificat pentru o alocare care n-ar fi trebuit să existe.
+
+Migrare nouă `supabase/registry/002_released_numbers.sql` (aplicată pe proiectul dedicat de registru):
+- tabel `released_numbers` — lista de numere libere, cu urma greșelii (platformă, comandă, client, motiv, cine, când)
+- RPC `release_number(registry_id, released_by, reason)` — scoate rândul din jurnal și pune numărul în listă (idempotent pe număr)
+- `allocate_number` consumă **întâi cel mai mic număr liber** (`FOR UPDATE SKIP LOCKED`), abia apoi avansează `next_number`
+
+Efect: golul se umple singur la următoarele comenzi plătite prin avocat, fără intervenție. ❌ „Ștergere definitivă" din `/admin/registru` trece acum tot prin `release_number` — numerele nu se mai pierd nici acolo.
+
+Client: `releaseNumber()` în `src/lib/registry/client.ts` (fișier identic în repo-urile surori — de copiat și acolo).
+
+## 4. Admin: cine face lucrarea
+
+Caseta scria „nealocat (echipa internă)" pe orice comandă — inclusiv pe un PAD, deși topograful o vedea deja în portal (`/api/collaborator/orders` filtrează pe `service_id IN (serviciile lui) OR assigned_collaborator_id = el`). Părea că lucrarea n-are stăpân.
+
+Acum secțiunea se numește „Cine face lucrarea" și spune direct:
+- serviciu alocat colaboratorului → „**Topograf — <nume>** · comanda îi apare automat în portal", iar opțiunea implicită din select scrie `— implicit: <nume> (prin serviciu) —`
+- serviciu intern (cazier, extras CF, constatator) → „**Echipa internă** · serviciul se face la noi", cu selectorul strâns sub „Trimite totuși la topograf (excepție)" — escape hatch-ul pentru identificare imobil rămâne intact
+
+## Verificare
+
+- `npx tsc --noEmit` curat, `npm run lint` 0 erori, `npm run build` OK, 1483 teste verzi (34 noi).
+- Reutilizarea numerelor testată pe tranzacție cu ROLLBACK pe registrul real: contract → 005907, delegație → SM007408, a doua alocare → 005986, `next_number` neatins, lista de libere neschimbată după rollback.
+- Audit re-rulat după curățenie: **0** numere pe servicii fără avocat, **0** documente avocațiale rămase.

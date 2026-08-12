@@ -277,7 +277,7 @@ export async function autoGenerateOrderDocuments(
   // Determine which templates to generate for this phase.
   // Fully-automated services with no lawyer involvement (ONRC constatator,
   // ANCPI carte funciară / plan cadastral / identificare imobil) must NOT get a
-  // legal-assistance contract or a Barou number — see NO_LAWYER_SERVICE_SLUGS.
+  // legal-assistance contract or a Barou number — see LAWYER_SERVICE_SLUGS.
   //
   // 'submit' = pre-payment → only contract-prestari (no Barou numbers burned
   // on orders that never pay). 'post-payment' → contract-asistenta with a

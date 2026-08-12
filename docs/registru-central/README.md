@@ -216,6 +216,34 @@ Orice add-on nou care primește delegație trebuie adăugat ȘI în
   refolosește), pe anulate: ↩️ Restaurare, ❌ Ștergere definitivă (doar pentru
   intrări greșite/test).
 
+### Numere ELIBERATE (fără goluri în registru) — 2026-08-12
+
+Migrarea `supabase/registry/002_released_numbers.sql`.
+
+- `void_number` = contract REAL anulat: numărul rămâne consumat, cu mențiune
+  (așa cere registrul fizic). Lasă un gol, justificat.
+- `release_number(registry_id, released_by, reason)` = alocare care n-ar fi
+  trebuit să existe: scoate rândul din jurnal și trece numărul în
+  `released_numbers`. `allocate_number` consumă **întâi cel mai mic număr
+  liber** (`FOR UPDATE SKIP LOCKED`) și abia apoi avansează `next_number`, deci
+  golul se umple singur la următoarea comandă plătită. Urma greșelii rămâne în
+  `released_numbers` (platformă, comandă, client, motiv, cine, când).
+- ❌ Ștergerea definitivă din `/admin/registru` trece ACUM prin
+  `release_number` — numărul nu se mai pierde.
+- Client: `releaseNumber()` în `src/lib/registry/client.ts` (fișier identic în
+  repo-urile surori — copiază-l și acolo).
+- Aplicare migrări pe proiectul de registru:
+  `node scripts/apply-registry-migration.mjs supabase/registry/002_released_numbers.sql`
+  (host pooler `aws-1-eu-west-2`, credențiale `REGISTRY_*` din `.env.local`).
+
+**Prima folosire (2026-08-12):** 10 numere alocate greșit pe servicii fără
+avocat (5 contracte 005907/005986/005989/006024/006028 + 5 delegații
+SM007408/SM007496/SM007499/SM007538/SM007542) au fost puse înapoi în
+circulație — `scripts/release-wrong-lawyer-numbers.mjs`, audit cu
+`scripts/audit-registry-no-lawyer.mjs`. Reutilizarea a fost verificată pe o
+tranzacție cu ROLLBACK (contract → 005907, delegație → SM007408, `next_number`
+neatins).
+
 ## Acces
 
 - Pagina `/admin/registru` + toate API-urile de registru cer permisiunea

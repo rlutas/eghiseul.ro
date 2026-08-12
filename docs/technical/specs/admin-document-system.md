@@ -201,6 +201,34 @@ The admin document generation system handles automated creation of legal documen
 | `cerere-eliberare-pf` | `cerere-eliberare-pf.docx` | Cerere eliberare cazier judiciar - Persoana Fizica | Manual by operator |
 | `cerere-eliberare-pj` | `cerere-eliberare-pj.docx` | Cerere eliberare cazier judiciar - Persoana Juridica | Manual by operator |
 
+### Servicii CU avocat vs FĂRĂ avocat
+
+Sursa unică: `src/lib/documents/no-lawyer-services.ts`.
+
+Lista e **inversată** (whitelist `LAWYER_SERVICE_SLUGS`, restul = fără avocat), fiindcă
+catalogul imobiliar/automatizat crește constant și un serviciu nou nu trebuie să
+moștenească tăcut setul avocațial.
+
+- **CU avocat** (contract asistență + împuternicire + cerere + numere de Barou):
+  cazier judiciar (PF/PJ/legacy), cazier auto, cazier fiscal, certificat naștere /
+  căsătorie / celibat / integritate, extras multilingv naștere / căsătorie.
+- **FĂRĂ avocat** (DOAR `contract-prestari` + factură): ONRC certificat constatator,
+  ANCPI (extras CF, plan cadastral, identificare imobil / imobile după proprietar),
+  toate serviciile imobiliare prin topograf (plan amplasament, copii OCPI,
+  certificat sarcini/dețineri/urbanism, actualizare adresă CF, extras CF colectiv),
+  rovinieta.
+
+Consumatori: `auto-generate.ts`, `ensure-barou-documents.ts`,
+`api/admin/orders/[id]/generate-document` (gardă server-side, HTTP 400 pe orice
+template ≠ `contract-prestari`), UI „Procesare comandă", scoparea rolului `avocat`
+în `api/admin/orders/list` (vede DOAR serviciile prin avocat).
+
+> Regresie 2026-08-12: lista veche enumera doar 5 slug-uri, deci serviciile prin
+> topograf (adăugate în migrarea 084) primeau contract de asistență juridică și
+> ardeau numere de Barou din registrul central — 5 comenzi afectate
+> (E-260722-M58C5, E-260804-YEYBF, E-260804-9K23B, E-260810-EP896, E-260811-U2AWZ).
+> Test: `tests/unit/lib/documents/no-lawyer-services.test.ts` mapează tot catalogul.
+
 ### Template File Structure
 
 ```
