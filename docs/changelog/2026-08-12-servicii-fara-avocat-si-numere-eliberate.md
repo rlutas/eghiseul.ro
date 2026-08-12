@@ -54,9 +54,22 @@ Același fix pe CJO/ecazier (repo `cazierjudiciaronline.com`): lista era duplica
 
 Nemodificat intenționat: `cancellation_requested` rămâne cu deadline-ul oprit și în afara statusurilor de venit — schimbăm doar vizibilitatea, nu contabilitatea. Teste de regresie pe ambele codebase-uri.
 
+## 6. Search Console: proprietatea eghiseul.ro picase pe „neverificat"
+
+Metoda de confirmare era „fișier HTML", iar `googleXXXX.html` trăia pe WordPress — la migrarea pe Next.js n-a fost portat, deci Google nu mai găsea nimic la adresa aia (`public/` n-avea niciun `google*.html`). Nu era problemă de hosting: `/73975f21070e43bc6ecac26b917d8cf1.txt` răspunde 200, iar `www` merge (308 → apex).
+
+Confirmarea stă acum **în cod**: `metadata.verification.google` în `src/app/layout.tsx`, deci pleacă la fiecare deploy și nu se mai poate pierde la o migrare. Verificat în HTML-ul de producție după deploy.
+
+Confirmarea prin Google Analytics NU e o opțiune aici: `gtag.js` se încarcă doar după acceptul de cookie-uri (Consent Mode v2), deci robotul Google nu-l vede. GA4 (`G-8LFRWD479Z`) funcționează — verificat live în browser: `gtag/js` 200 + `page_view` → 204. GTM nu e folosit deloc; tag-ul Google Ads `AW-11464910041` vine din legătura GA4↔Ads, nu din cod.
+
+## 7. Certificat constatator „fonduri IMM" — verificare, nu bug
+
+Semnalat că `E-260811-GC4MA` (ELIEZER PROD SRL) pare emis „de bază" deși s-a cerut „fonduri IMM", și că cele două comenzi ale firmei par identice. Verificat pe documentele reale din S3, comparativ cu două certificate „de bază" emise în aceleași zile: **ambele sunt corect IMM** (13 pagini + secțiunea „ISTORIC PE SEDII SI/SAU ACTIVITATI AUTORIZATE"; „de bază" = 5 pagini, fără). Par identice fiindcă sunt pe aceeași firmă, la o zi distanță — diferă scopul tipărit la final (Fonduri Europene vs AFIR), numărul de raport și codul de verificare. Detalii + capcana din worker: `docs/services/certificat-constatator/README.md`.
+
 ## Verificare
 
 - `npx tsc --noEmit` curat, `npm run lint` 0 erori, `npm run build` OK, 1483 teste verzi (34 noi).
 - Reutilizarea numerelor testată pe tranzacție cu ROLLBACK pe registrul real: contract → 005907, delegație → SM007408, a doua alocare → 005986, `next_number` neatins, lista de libere neschimbată după rollback.
 - Audit re-rulat după curățenie: **0** numere pe servicii fără avocat, **0** documente avocațiale rămase.
 - CJO/ecazier: `tsc` curat, 422 teste verzi (5 noi).
+- Eticheta GSC confirmată în HTML-ul de producție; GA4 verificat live în browser (page_view → 204).
