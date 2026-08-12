@@ -66,6 +66,19 @@ Confirmarea prin Google Analytics NU e o opțiune aici: `gtag.js` se încarcă d
 
 Semnalat că `E-260811-GC4MA` (ELIEZER PROD SRL) pare emis „de bază" deși s-a cerut „fonduri IMM", și că cele două comenzi ale firmei par identice. Verificat pe documentele reale din S3, comparativ cu două certificate „de bază" emise în aceleași zile: **ambele sunt corect IMM** (13 pagini + secțiunea „ISTORIC PE SEDII SI/SAU ACTIVITATI AUTORIZATE"; „de bază" = 5 pagini, fără). Par identice fiindcă sunt pe aceeași firmă, la o zi distanță — diferă scopul tipărit la final (Fonduri Europene vs AFIR), numărul de raport și codul de verificare. Detalii + capcana din worker: `docs/services/certificat-constatator/README.md`.
 
+## 8. Articolul ANCPI actualizat: e-Terra a repornit, platformele publice NU
+
+Comunicat ANCPI/Guvern: marți **11 august, ora 15:00**, e-Terra a fost repornită **etapizat** pentru personalul ANCPI, OCPI și notarii publici; de **miercuri 12 august, ora 8:30**, accesul s-a extins la topografii autorizați, experții tehnici judiciari și executorii judecătorești.
+
+Nuanța pe care o ratează majoritatea titlurilor din presă și pe care articolul o pune în față: **platformele online destinate publicului rămân oprite** („se repun etapizat, cu anunț prealabil"), inclusiv cea prin care se eliberează extrasele de carte funciară. Verificat de noi în aceeași zi: `epay.ancpi.ro` nu răspunde deloc. Deci serviciul nostru rămâne blocat, comenzile stau în coadă.
+
+Actualizat în `src/app/ancpi-nu-functioneaza/page.tsx`:
+- H1 + titlul SERP („ce funcționează azi"), descrierea, `dateModified` → 12.08
+- intro „situația la zi" + secțiunea de status live: răspunsul la „mai e picat?" e acum **„parțial"**, cu explicația cine are acces și cine nu
+- cronologie: două intrări noi (11 și 12 august), cu ~94.000 de cereri cu rang protejat, termene prelungite, prelungirea valabilității extraselor emise înainte de incident, avertismentul privind timpii de răspuns și PDF-urile temporar indisponibile, plus numerele de call center
+- „Actualizări": secțiune nouă pentru 12 august
+- FAQ: întrebare nouă („am citit că e-Terra a repornit, de ce tot nu-mi iau extrasul?") + rescrise răspunsurile despre obținerea extrasului și despre tranzacțiile programate (notarii pot înregistra din nou actele, dar extrasele de autentificare n-au fost disponibile din prima zi)
+
 ## Verificare
 
 - `npx tsc --noEmit` curat, `npm run lint` 0 erori, `npm run build` OK, 1483 teste verzi (34 noi).

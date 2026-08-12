@@ -8,17 +8,17 @@ import { OutageAlertSignup } from '@/components/articole/outage-alert-signup';
 const SLUG = 'ancpi-nu-functioneaza';
 // H1 — descriptive. The SERP <title> is shorter (META_TITLE): the long one
 // was 72 chars and Google rewrote it into a lowercase tail fragment.
-const TITLE = 'ANCPI și e-Terra nu funcționează: atac cibernetic, sisteme picate național (din 13 iulie 2026)';
+const TITLE = 'ANCPI și e-Terra: atac cibernetic, blocaj național din 13 iulie — e-Terra repornită etapizat din 11 august, platformele publice încă oprite';
 // Titlul din SERP țintește starea + acțiunea, nu evenimentul: cine caută vrea
 // să știe dacă mai e picat și ce face, nu să citească încă o știre despre atac
 // (presa ocupă oricum acele poziții cu autoritate mai mare).
 // „Cadastru" adăugat 29.07: e numele sub care presa și Google Trends numesc
 // criza („atacul de la Cadastru", trend 2K+/24h) — căutarea vine pe el.
-const META_TITLE = 'ANCPI / Cadastru nu funcționează — status live și ce faci';
+const META_TITLE = 'ANCPI / Cadastru: ce funcționează azi — status live';
 const DESCRIPTION =
-  'Update 7 august: primul semnal de dată. Circulara UNNPR din 6 august arată că ANCPI propune repornirea e-Terra săptămâna viitoare, cu reluare treptată — încă neconfirmat oficial. Comandă extrasul CF acum, îl eliberăm automat la revenire.';
+  'Update 12 august: e-Terra a fost repornită etapizat (11 august, ora 15:00) pentru ANCPI, OCPI și notari, iar de azi, ora 8:30, și pentru topografi, experți judiciari și executori. Platformele online pentru public rămân OPRITE — verificat azi. Comandă extrasul CF acum, îl eliberăm automat la revenire.';
 const DATE_PUBLISHED = '2026-07-15';
-const DATE_MODIFIED = '2026-08-07';
+const DATE_MODIFIED = '2026-08-12';
 
 export const revalidate = 3600; // outage news — refresh hourly
 
@@ -51,7 +51,7 @@ export default function Page() {
       datePublished={DATE_PUBLISHED}
       dateModified={DATE_MODIFIED}
       publishedLabel="15 iulie 2026"
-      updatedLabel="7 august 2026"
+      updatedLabel="12 august 2026"
       imageAlt="Sistem temporar nefuncțional — sistemele informatice ANCPI indisponibile la nivel național"
       relatedServices={[
         {
@@ -97,7 +97,7 @@ export default function Page() {
         },
         {
           q: 'Pot obține un extras de carte funciară în această perioadă?',
-          a: 'Nu, din nicio sursă — nici de la ghișeul OCPI, nici prin ANCPI online, nici prin intermediari, pentru că toate folosesc aceleași sisteme centrale. Poți plasa comanda acum: intră în coadă și se eliberează automat, cu prioritate, imediat ce sistemele revin.',
+          a: 'Încă nu online. Din 11 august e-Terra a repornit etapizat, dar DOAR pentru profesioniști (ANCPI, OCPI, notari, iar din 12 august topografi, experți judiciari și executori), iar platformele online pentru public rămân oprite până la un anunț separat — verificat de noi, portalul ePay nu răspunde nici azi. În plus, prima zi de funcționare a fost dedicată înregistrării actelor restante, cu solicitările de extrase blocate inclusiv pentru notari. Poți plasa comanda acum: intră în coadă și se eliberează automat, cu prioritate, imediat ce portalul public revine.',
         },
         {
           q: 'Cum primesc extrasul CF fără să urmăresc eu revenirea ANCPI?',
@@ -105,7 +105,7 @@ export default function Page() {
         },
         {
           q: 'Ce se întâmplă cu tranzacțiile imobiliare programate?',
-          a: 'Notarii nu pot obține extrasele de autentificare, deci semnările programate în acest interval se amână de regulă după restabilirea sistemelor. OCPI-urile au recomandat oficial reprogramarea operațiunilor.',
+          a: 'Situația s-a deblocat parțial: din 11 august notarii au din nou acces la e-Terra și pot înregistra actele instrumentate în perioada blocajului, iar cererile aflate în lucru (~94.000) și-au păstrat rangul, cu termenele legale prelungite. Extrasele de autentificare nu s-au putut cere însă din prima zi, iar timpii de răspuns pot fi mai mari în perioada următoare — deci întreabă notarul înainte să confirmi o dată de semnare. Extrasele emise înainte de incident și valabile atunci au primit o prelungire egală cu durata indisponibilității.',
         },
         {
           q: 'Am comandat un extras CF pe eGhișeul înainte de cădere. Ce se întâmplă cu el?',
@@ -132,6 +132,10 @@ export default function Page() {
           a: 'ANCPI a precizat pe 19 iulie că dispunea de mai multe locații de backup. După un atac cibernetic, restaurarea nu înseamnă doar copierea datelor înapoi: fiecare sistem trebuie izolat, curățat, verificat pentru a nu reintroduce vulnerabilitatea exploatată, apoi validat de instituțiile abilitate. Migrarea în Cloudul Guvernamental, anunțată pe 20 iulie, adaugă un pas suplimentar — dar și un nivel de protecție pe care infrastructura veche nu îl avea.',
         },
         {
+          q: 'Am citit că e-Terra a repornit. De ce tot nu-mi pot lua extrasul?',
+          a: 'Fiindcă „e-Terra a repornit" nu înseamnă „ANCPI online a repornit". Repornirea din 11 august vizează exclusiv aplicația internă folosită de personalul ANCPI/OCPI, de notari și, din 12 august, de topografii autorizați, experții tehnici judiciari și executorii judecătorești. Platformele online destinate publicului — inclusiv cea prin care se eliberează extrasele de carte funciară — rămân oprite și revin, spune ANCPI, etapizat și cu anunț prealabil.',
+        },
+        {
           q: 'Cum aflu în secunda în care revine ANCPI?',
           a: 'Ai două variante, ambele fără să verifici tu nimic. Dacă ai nevoie de document: plasezi comanda acum și se eliberează automat la revenire. Dacă vrei doar să știi: lasă-ți emailul în caseta de alertă de pe această pagină și primești un singur mesaj în momentul revenirii. Monitorizarea noastră verifică portalul ANCPI la fiecare 15 minute — am detectat căderea cu aproximativ 10 ore înaintea primului comunicat oficial.',
         },
@@ -152,11 +156,14 @@ export default function Page() {
         Guvernamental (<strong>22 iulie</strong>), care s-a încheiat fără ca serviciile să revină.
         Situația la zi: atacul a fost confirmat pe <strong>27 iulie</strong> ca fiind de tip{' '}
         <strong>ransomware</strong> — o parte din infrastructura de virtualizare a fost criptată și
-        ștearsă, iar pe <strong>3 august</strong> Guvernul a anunțat că e-Terra, reinstalată în
-        Cloudul Guvernamental, a parcurs <strong>o nouă rundă de teste</strong> (STS, DNSC,
-        Cyberint); constatările sunt în curs de remediere și retestare, <strong>tot fără dată
-        fermă de repunere</strong>, cu o nouă informare promisă{' '}
-        <strong>cel târziu miercuri, 5 august</strong> (vezi <a href="#cronologie">cronologia</a>). Presa locală a relatat blocajul în mai multe județe
+        ștearsă. <strong>Marți, 11 august, ora 15:00</strong>, e-Terra a fost{' '}
+        <strong>repornită etapizat</strong> pentru personalul ANCPI, pentru oficiile de cadastru
+        (OCPI) și pentru notarii publici, iar de <strong>miercuri, 12 august, ora 8:30</strong>,
+        accesul s-a extins la persoanele autorizate să execute lucrări de cadastru, experții
+        tehnici judiciari și executorii judecătorești. Atenție însă la ce NU s-a repornit:{' '}
+        <strong>celelalte platforme online destinate publicului rămân oprite</strong> și revin
+        „etapizat, cu anunț prealabil" — inclusiv portalul prin care se eliberează online extrasele
+        de carte funciară (vezi <a href="#cronologie">cronologia</a>). Presa locală a relatat blocajul în mai multe județe
         (printre primele,{' '}
         <a href="https://www.bihon.ro/stirile-judetului-bihor/bihorul-afectat-de-blocajul-national-al-ancpi-cadastrul-nu-functioneaza-pana-luni-5337687/" target="_blank" rel="nofollow noopener">
           Bihorul
@@ -170,9 +177,15 @@ export default function Page() {
           pentru cineva care caută răspunsul pe telefon. */}
       <h2 id="status">Mai e picat ANCPI? Starea sistemelor, în timp real</h2>
       <p>
-        Da, sistemele sunt indisponibile de <strong>{outageDays} zile</strong>, fără dată oficială
-        de revenire. Verificăm portalul ANCPI la fiecare 15 minute. Indicatorul de mai jos e live,
-        cu momentul exact de la care sistemele sunt indisponibile:
+        <strong>Parțial.</strong> De marți, 11 august, e-Terra merge din nou — dar{' '}
+        <strong>doar pentru profesioniști</strong>: personalul ANCPI și OCPI, notarii publici și,
+        din 12 august, topografii autorizați, experții tehnici judiciari și executorii
+        judecătorești. Pentru public,{' '}
+        <strong>platformele online ale ANCPI sunt în continuare oprite</strong> — am verificat
+        portalul ePay și în ziua <strong>{outageDays}</strong> de blocaj, iar serverele tot nu
+        răspund. Practic: notarul tău poate lucra din nou, dar un extras de carte funciară nu se
+        poate încă scoate online. Verificăm portalul la fiecare 15 minute; indicatorul de mai jos e
+        live:
       </p>
       <div className="not-prose my-6">
         <SystemStatus service="ancpi" />
@@ -221,9 +234,49 @@ export default function Page() {
       <div className="not-prose my-6 space-y-0">
         {[
           {
+            date: '12 august 2026',
+            tag: 'Acces extins',
+            latest: true,
+            body: (
+              <>
+                De la <strong>ora 8:30</strong>, e-Terra devine disponibilă și pentru{' '}
+                <strong>persoanele autorizate să execute lucrări de cadastru, experții tehnici
+                judiciari și executorii judecătorești</strong> care aveau acces înainte de
+                incident. <strong>Celelalte platforme online ale ANCPI destinate publicului rămân
+                oprite</strong> și vor fi repuse „etapizat, cu anunț prealabil" — inclusiv cea prin
+                care se eliberează online extrasele de carte funciară. Verificarea noastră din
+                această zi: portalul ePay ANCPI tot nu răspunde. ANCPI avertizează că pot apărea{' '}
+                <strong>timpi de răspuns mai mari</strong>, iar unele documente PDF pot fi
+                temporar indisponibile până la finalizarea migrării în cloud. Call center:{' '}
+                0749 012 525, 0749 016 331, 0735 950 582.
+              </>
+            ),
+          },
+          {
+            date: '11 august 2026',
+            tag: 'Repornire etapizată',
+            body: (
+              <>
+                <strong>Prima veste bună în 29 de zile.</strong> De la <strong>ora 15:00</strong>,
+                aplicația e-Terra este <strong>repornită etapizat</strong> pentru personalul ANCPI,
+                pentru oficiile de cadastru și publicitate imobiliară (OCPI) și pentru{' '}
+                <strong>notarii publici</strong>. Repornirea vizează exclusiv e-Terra — sistemul
+                prin care se fac înregistrarea, gestiunea și evidența cadastrală și publicitatea
+                imobiliară — și e „un prim pas către reluarea completă". Prima zi e dedicată{' '}
+                <strong>înregistrării actelor din perioada de indisponibilitate</strong>: OCPI
+                prioritizează actele primite prin corespondență, iar notarii pot înregistra actele
+                instrumentate cât timp sistemul a fost blocat. Consecință directă pentru public:{' '}
+                <strong>în prima zi nu se pot solicita extrase de carte funciară</strong>. Cele
+                aproximativ <strong>94.000 de cereri</strong> aflate în lucru la momentul
+                incidentului își păstrează <strong>rangul</strong>, cu termenele legale prelungite;
+                extrasele emise înainte și valabile la data incidentului primesc o prelungire de
+                valabilitate egală cu numărul zilelor de indisponibilitate.
+              </>
+            ),
+          },
+          {
             date: '6 august 2026',
             tag: 'Circulară notari',
-            latest: true,
             body: (
               <>
                 Prin circulara nr. 4979, transmisă camerelor notarilor publici și consultată de
@@ -709,6 +762,39 @@ export default function Page() {
       </ul>
 
       <h2>Actualizări</h2>
+      <p>
+        <strong>12 august 2026 — e-Terra a repornit, dar nu pentru tine (încă).</strong> Marți,{' '}
+        <strong>11 august, ora 15:00</strong>, aplicația e-Terra a fost repornită etapizat pentru
+        personalul ANCPI, pentru OCPI-uri și pentru notarii publici. De{' '}
+        <strong>miercuri, 12 august, ora 8:30</strong>, accesul s-a extins la persoanele autorizate
+        să execute lucrări de cadastru, la experții tehnici judiciari și la executorii
+        judecătorești. E prima veste bună în 29 de zile și înseamnă că actele blocate încep să se
+        înregistreze.
+      </p>
+      <p>
+        Partea pe care o omit majoritatea titlurilor din presă:{' '}
+        <strong>platformele online destinate publicului rămân oprite</strong>. ANCPI scrie explicit
+        că vor fi repuse „etapizat, cu anunț prealabil". Am verificat noi portalul ePay în ziua{' '}
+        <strong>{outageDays}</strong> — tot nu răspunde. Deci un extras de carte funciară încă nu
+        se poate scoate online, nici de tine, nici de noi. Prima zi de funcționare a fost oricum
+        dedicată înregistrării actelor restante, cu <strong>solicitările de extrase blocate</strong>{' '}
+        chiar și pentru notari.
+      </p>
+      <p>
+        Ce se întâmplă cu dosarele care așteaptă: cele aproximativ{' '}
+        <strong>94.000 de cereri</strong> aflate în lucru la momentul incidentului își păstrează{' '}
+        <strong>rangul</strong>, iar termenele legale au fost prelungite. Extrasele emise înainte de
+        incident și valabile la acea dată primesc o prelungire de valabilitate egală cu numărul
+        zilelor de indisponibilitate — adică nu-ți pică autentificarea din cauza unui document
+        expirat între timp. ANCPI avertizează că, în prima perioadă, pot apărea{' '}
+        <strong>timpi de răspuns mai mari</strong>, iar unele PDF-uri pot fi temporar indisponibile
+        până la finalizarea migrării în cloud.
+      </p>
+      <p>
+        Ce facem noi: comenzile rămân în coadă și se eliberează automat, în ordinea plasării, în
+        momentul în care portalul public revine. Monitorizarea rulează la fiecare 15 minute, deci
+        vei afla de la noi, nu invers.
+      </p>
       <p>
         <strong>7 august 2026, primul semnal de dată concretă:</strong> printr-o circulară transmisă
         camerelor notarilor publici (nr. 4979 din 6 august), pe care am consultat-o,{' '}
