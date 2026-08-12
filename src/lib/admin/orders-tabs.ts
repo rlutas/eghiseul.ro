@@ -7,8 +7,15 @@
 // (waiting on customer documents) is DELIBERATELY excluded — team asked
 // (2026-07-21) that parked orders show ONLY under the dedicated "Așteptare
 // client" tab, not double-listed in „În procesare".
+//
+// 'cancellation_requested' e INCLUS (2026-08-12, cerere Raul): o cerere de
+// anulare e muncă de făcut — cineva trebuie să decidă și să dea refund. Înainte
+// cădea doar în „Toate", sortată după paid_at, deci ajungea jos în listă și era
+// ușor de ratat (CJO-20260811-23113). Rândul poartă badge-ul roșu „Anulare
+// solicitată", deci se distinge imediat în tab.
 export const PROCESSING_GROUP = [
   'processing',
+  'cancellation_requested',
   'documents_generated',
   'submitted_to_institution',
   'document_received',

@@ -44,8 +44,19 @@ Acum secțiunea se numește „Cine face lucrarea" și spune direct:
 - serviciu alocat colaboratorului → „**Topograf — <nume>** · comanda îi apare automat în portal", iar opțiunea implicită din select scrie `— implicit: <nume> (prin serviciu) —`
 - serviciu intern (cazier, extras CF, constatator) → „**Echipa internă** · serviciul se face la noi", cu selectorul strâns sub „Trimite totuși la topograf (excepție)" — escape hatch-ul pentru identificare imobil rămâne intact
 
+## 5. Cererile de anulare rămân la vedere în „În procesare"
+
+Când clientul cere anularea, comanda trece pe `cancellation_requested` — status care nu era în niciun grup de tab, deci pica doar în „Toate", sortată după `paid_at`. Adică jos în listă, ușor de ratat, deși e muncă de făcut (cineva trebuie să decidă și să dea refundul). Semnalat pe `CJO-20260811-23113`.
+
+`cancellation_requested` e acum în `PROCESSING_GROUP` (`src/lib/admin/orders-tabs.ts`) — sursă unică pentru listă, pentru badge-ul de pe tab și pentru dashboard. Rândul poartă deja badge-ul roșu „Anulare solicitată", deci se distinge imediat între celelalte.
+
+Același fix pe CJO/ecazier (repo `cazierjudiciaronline.com`): lista era duplicată în `api/admin/orders/route.ts` și `api/admin/orders/counts/route.ts` — au fost înlocuite cu `PROCESSING_TAB_STATUSES` din `src/lib/order-status.ts`, ca să nu mai poată diverge.
+
+Nemodificat intenționat: `cancellation_requested` rămâne cu deadline-ul oprit și în afara statusurilor de venit — schimbăm doar vizibilitatea, nu contabilitatea. Teste de regresie pe ambele codebase-uri.
+
 ## Verificare
 
 - `npx tsc --noEmit` curat, `npm run lint` 0 erori, `npm run build` OK, 1483 teste verzi (34 noi).
 - Reutilizarea numerelor testată pe tranzacție cu ROLLBACK pe registrul real: contract → 005907, delegație → SM007408, a doua alocare → 005986, `next_number` neatins, lista de libere neschimbată după rollback.
 - Audit re-rulat după curățenie: **0** numere pe servicii fără avocat, **0** documente avocațiale rămase.
+- CJO/ecazier: `tsc` curat, 422 teste verzi (5 noi).

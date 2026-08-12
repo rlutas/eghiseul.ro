@@ -117,3 +117,21 @@ describe('group invariants', () => {
     }
   });
 });
+
+// Cerere de anulare = muncă de făcut, nu comandă moartă. Trebuie să rămână sub
+// „În procesare", altfel cade doar în „Toate", sortată după paid_at, și se
+// pierde jos în listă — cazul CJO-20260811-23113 (refund cerut, observat târziu).
+describe('cereri de anulare rămân vizibile', () => {
+  it('cancellation_requested e în grupul „În procesare"', () => {
+    expect(PROCESSING_GROUP).toContain('cancellation_requested');
+  });
+
+  it('tabul „În procesare" filtrează pe grupul care include cererile de anulare', () => {
+    const filter = resolveStatusFilter('processing');
+    expect(filter.in).toContain('cancellation_requested');
+  });
+
+  it('cancellation_requested NU e ascuns din tabul „Toate"', () => {
+    expect(HIDDEN_FROM_DEFAULT).not.toContain('cancellation_requested');
+  });
+});
