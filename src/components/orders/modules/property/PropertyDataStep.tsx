@@ -261,7 +261,9 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
 
   // Validate form
   const isFormValid = useCallback(() => {
-    if (!property) return false;
+    // Aceeași gardă ca la randare: efectul de validare rulează chiar și când
+    // componenta a ieșit devreme, iar `config` poate fi al altui modul.
+    if (!property || !config?.fields) return false;
 
     // Check required fields based on config
     if (config.fields.county.required && !property.county) return false;
@@ -290,7 +292,9 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
     onValidChange(isFormValid());
   }, [isFormValid, onValidChange]);
 
-  if (!property) {
+  // `config` lipsă = pasul nu e (încă) al acestui modul — nu randăm nimic, ca
+  // să nu citim `config.fields` / `config.identificationService` din nimic.
+  if (!property || !config?.fields) {
     return (
       <Alert variant="destructive">
         <AlertCircle className="h-4 w-4" />

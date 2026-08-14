@@ -70,8 +70,20 @@ export function ModularOrderWizard({ initialService, initialOptions, headerExtra
   } = useModularWizard();
 
   const [stepValid, setStepValid] = useState(false);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [DynamicComponent, setDynamicComponent] = useState<React.ComponentType<any> | null>(null);
+  // Componenta modulului curent, ÎMPREUNĂ cu pasul pentru care a fost
+  // încărcată. Perechea contează: încărcarea e asincronă, deci între
+  // schimbarea pasului și sosirea noii componente React re-randează componenta
+  // VECHE cu configul pasului NOU. Așa a crăpat wizardul pe serviciile prin
+  // topograf (2026-08-14): pasul de semnătură venea imediat după „Date imobil"
+  // — două module dinamice consecutive — și PropertyDataStep primea configul de
+  // semnătură (`config.identificationService` undefined → ecran de eroare).
+  // Înainte, după „Date imobil" urma întotdeauna un pas core (facturare), deci
+  // combinația nu apărea.
+  const [dynamicModule, setDynamicModule] = useState<{
+    stepId: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    Component: React.ComponentType<any>;
+  } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   // Mod telefonic: citit post-mount (SSR nu vede URL-ul → hydration-safe;
   // setTimeout 0 pt react-compiler — fără setState sincron în effect).
@@ -112,7 +124,7 @@ export function ModularOrderWizard({ initialService, initialOptions, headerExtra
 
       // Core steps don't use dynamic loading
       if (['contact', 'options', 'delivery', 'review'].includes(stepId)) {
-        setDynamicComponent(null);
+        setDynamicModule(null);
         return;
       }
 
@@ -122,10 +134,10 @@ export function ModularOrderWizard({ initialService, initialOptions, headerExtra
         if (loader) {
           try {
             const module = await loader();
-            setDynamicComponent(() => module.default);
+            setDynamicModule({ stepId, Component: module.default });
           } catch (error) {
             console.error(`Failed to load module for step ${stepId}:`, error);
-            setDynamicComponent(null);
+            setDynamicModule(null);
           }
         }
       }
@@ -180,10 +192,13 @@ export function ModularOrderWizard({ initialService, initialOptions, headerExtra
         return <ReviewStepModular onValidChange={setStepValid} />;
     }
 
-    // Dynamic modules
-    if (DynamicComponent) {
+    // Dynamic modules — randăm DOAR componenta încărcată pentru pasul curent.
+    // Cât timp se încarcă modulul următor rămâne spinnerul; altfel modulul
+    // vechi ar primi configul pasului nou (vezi nota de la `dynamicModule`).
+    if (dynamicModule && dynamicModule.stepId === stepId) {
+      const { Component } = dynamicModule;
       const config = getModuleConfig();
-      return <DynamicComponent config={config} onValidChange={setStepValid} />;
+      return <Component key={stepId} config={config} onValidChange={setStepValid} />;
     }
 
     return <StepLoading />;

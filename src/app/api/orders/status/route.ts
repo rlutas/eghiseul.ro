@@ -256,6 +256,7 @@ export async function GET(request: NextRequest) {
       imputernicire: 'Împuternicire',
       cerere_eliberare_pf: 'Cerere Eliberare PF',
       cerere_eliberare_pj: 'Cerere Eliberare PJ',
+      conventie: 'Angajament de Execuție Documentație',
       'collaborator-document': 'Document eliberat',
       'extras-carte-funciara': 'Extras de Carte Funciară',
       'ancpi-chitanta': 'Chitanță ANCPI',
