@@ -1376,6 +1376,7 @@ User raportat o eroare punctuală: poză CI clară, OCR throw „Nu am putut ext
 - **docxtemplater** - DOCX generation with placeholder replacement
 - **Auto-generated at submit:** `contract-prestari`, `contract-asistenta`
 - **Admin-generated (custom templates):** `imputernicire`, `cerere-eliberare-pf`, `cerere-eliberare-pj`
+- **Fără cerere de eliberare (14.08):** `cazier-auto` și `certificat-integritate` se ridică DOAR pe împuternicire — butonul de cerere e ascuns și blocat server-side (`SERVICES_WITHOUT_CERERE` în `src/lib/documents/cerere-items.ts`); excepție: integritate + add-on cazier judiciar. Aceeași regulă pe CJO/ecazier (`src/lib/cerere-required.ts`)
 - **Multi-signature embedding** - Client (drawn) + company + lawyer signatures as DrawingML inline images
 - **Signature sizing** - Per-placeholder (client 240x80pt, company/lawyer 180x60pt)
 - **Contract v1.2** - CI "emis de" info, 20+ template placeholders

@@ -50,19 +50,59 @@ export const CERERE_CAPABLE_CIVIL_SLUGS: ReadonlySet<string> = new Set([
 ]);
 
 /**
+ * Non-civil slugs that can appear as an ADDITIONAL service and own a real
+ * cerere template (`src/templates/<slug>/cerere-eliberare-pf.docx`).
+ * Today only cazier judiciar, added as an add-on on certificat-integritate.
+ */
+const CERERE_CAPABLE_EXTRA_SLUGS: ReadonlySet<string> = new Set([
+  'cazier-judiciar',
+]);
+
+function isCerereCapableExtra(slug: string): boolean {
+  return (
+    CERERE_CAPABLE_CIVIL_SLUGS.has(slug) || CERERE_CAPABLE_EXTRA_SLUGS.has(slug)
+  );
+}
+
+/**
+ * Services that are obtained with an împuternicire ONLY — no cerere de
+ * eliberare at all.
+ *
+ * Cazierul auto (fișa de evidență a conducătorului auto) și certificatul de
+ * integritate comportamentală se ridică de avocat pe baza împuternicirii; IPJ
+ * nu cere formular de eliberare pentru ele. Fără această listă, cererea cădea
+ * pe `templates/shared/cerere-eliberare-pf.docx` — formularul de CAZIER
+ * JUDICIAR — deci se genera un document greșit, care încurca echipa.
+ *
+ * Excepție (păstrată deliberat): o comandă de certificat integritate cu
+ * add-on-ul `addon_cazier_judiciar` chiar are nevoie de cererea de cazier
+ * judiciar — apare ca item SECUNDAR, pe template-ul `cazier-judiciar`.
+ */
+export const SERVICES_WITHOUT_CERERE: ReadonlySet<string> = new Set([
+  'cazier-auto',
+  'certificat-integritate',
+]);
+
+/**
  * Returns the list of cereri (one per service) this order needs.
- * Item 0 is always the MAIN service; extra items are appended for options
- * that add a separate civil-status service to the same order.
+ * Item 0 is the MAIN service (unless that service needs no cerere at all —
+ * see SERVICES_WITHOUT_CERERE); extra items are appended for options that add
+ * a separate service with its own cerere to the same order.
+ *
+ * An EMPTY array means "această comandă nu are nicio cerere de eliberare" —
+ * callers must hide/refuse the cerere generation entirely.
  */
 export function computeCerereItems(order: OrderForDelegations): CerereItem[] {
   const mainSlug = order.services?.slug || '';
 
-  const items: CerereItem[] = [
-    {
-      serviceSlug: mainSlug,
-      label: order.services?.name || 'Serviciu principal',
-    },
-  ];
+  const items: CerereItem[] = SERVICES_WITHOUT_CERERE.has(mainSlug)
+    ? []
+    : [
+        {
+          serviceSlug: mainSlug,
+          label: order.services?.name || 'Serviciu principal',
+        },
+      ];
 
   const selectedOptions = Array.isArray(order.selected_options)
     ? order.selected_options
@@ -99,15 +139,19 @@ export function computeCerereItems(order: OrderForDelegations): CerereItem[] {
       extraSlug = 'certificat-casatorie';
     } else if (code === 'addon_certificat_celibat') {
       extraSlug = 'certificat-celibat';
+    } else if (code === 'addon_cazier_judiciar') {
+      // Cazier judiciar adăugat pe o comandă de certificat integritate: e
+      // singurul document din comandă care CHIAR are cerere de eliberare.
+      extraSlug = 'cazier-judiciar';
     } else if (
       bundledServiceSlug &&
-      CERERE_CAPABLE_CIVIL_SLUGS.has(bundledServiceSlug)
+      isCerereCapableExtra(bundledServiceSlug)
     ) {
       // Generic bundled-service option pointing at a civil-status service.
       extraSlug = bundledServiceSlug;
     }
 
-    if (!extraSlug || !CERERE_CAPABLE_CIVIL_SLUGS.has(extraSlug)) continue;
+    if (!extraSlug || !isCerereCapableExtra(extraSlug)) continue;
     if (extraSlug === mainSlug) continue;
     if (items.some((i) => i.serviceSlug === extraSlug)) continue;
 

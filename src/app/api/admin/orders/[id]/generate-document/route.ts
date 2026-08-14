@@ -101,13 +101,28 @@ export async function POST(
     // to generate; it is validated against the order's own services, which
     // also blocks path traversal into arbitrary template folders.
     const mainServiceSlug: string = order.services?.slug || 'cazier-judiciar';
+    const allowedCereri = computeCerereItems({
+      services: order.services,
+      selected_options: order.selected_options,
+    });
+
+    // Cazier auto / certificat integritate: doar împuternicire, fără cerere de
+    // eliberare. Blocat și server-side — altfel un POST direct ar produce
+    // formularul de cazier judiciar (fallback pe templates/shared).
+    if (template.startsWith('cerere-eliberare') && allowedCereri.length === 0) {
+      return NextResponse.json(
+        {
+          success: false,
+          error:
+            'Acest serviciu nu are cerere de eliberare — se ridică doar pe baza împuternicirii.',
+        },
+        { status: 400 }
+      );
+    }
+
     let cerereServiceSlug: string | null = null;
     if (template === 'cerere-eliberare-pf' && (body.service_slug || body.service_type)) {
       const requested = String(body.service_slug || body.service_type);
-      const allowedCereri = computeCerereItems({
-        services: order.services,
-        selected_options: order.selected_options,
-      });
       if (!allowedCereri.some((i) => i.serviceSlug === requested)) {
         return NextResponse.json(
           { success: false, error: 'Serviciul cerut nu face parte din această comandă' },

@@ -4381,9 +4381,26 @@ function ProcessingSection({
   // identificare imobil) get NO legal-assistance contract / împuternicire /
   // cerere and NO Barou number — see LAWYER_SERVICE_SLUGS.
   const noLawyerService = isNoLawyerService(order.services?.slug);
+  // Cazierul auto și certificatul de integritate se ridică DOAR pe
+  // împuternicire — nu există cerere de eliberare pentru ele (înainte se
+  // genera formularul de cazier judiciar din templates/shared și încurca
+  // echipa). computeCerereItems întoarce listă goală în acel caz; rămâne
+  // nevidă doar dacă în comandă intră un serviciu care chiar are cerere
+  // (ex: integritate + add-on cazier judiciar).
+  const cerereItems = computeCerereItems({
+    services: order.services,
+    selected_options: (order.selected_options as AnyObj[]) || [],
+  });
   const generableDocTypes = noLawyerService
     ? ['contract_prestari']
-    : ['contract_prestari', 'contract_asistenta', 'imputernicire', isPJ ? 'cerere_eliberare_pj' : 'cerere_eliberare_pf'];
+    : [
+        'contract_prestari',
+        'contract_asistenta',
+        'imputernicire',
+        ...(cerereItems.length > 0
+          ? [isPJ ? 'cerere_eliberare_pj' : 'cerere_eliberare_pf']
+          : []),
+      ];
 
   return (
     <Card className="border-blue-200 bg-blue-50/30">
@@ -4457,10 +4474,7 @@ function ProcessingSection({
                 }));
               }
               if (docType === 'cerere_eliberare_pf') {
-                const items = computeCerereItems({
-                  services: order.services,
-                  selected_options: (order.selected_options as AnyObj[]) || [],
-                });
+                const items = cerereItems;
                 return items.map((item) => ({
                   docType,
                   serviceType: item.serviceSlug,
@@ -4483,9 +4497,14 @@ function ProcessingSection({
                     d.type === docType &&
                     ((d.metadata as AnyObj | null)?.service_type === serviceType ||
                       // cererea serviciului PRINCIPAL nu poartă service_type
-                      // (nume de fișier/metadata neschimbate față de legacy)
+                      // (nume de fișier/metadata neschimbate față de legacy).
+                      // `cerereItems.length === 1` prinde și cazul comenzilor
+                      // de integritate cu add-on cazier judiciar: singura lor
+                      // cerere e acum item secundar, dar documentul generat
+                      // înainte de 14.08 a rămas fără service_type.
                       (!(d.metadata as AnyObj | null)?.service_type &&
-                        serviceType === order.services?.slug)))
+                        (serviceType === order.services?.slug ||
+                          cerereItems.length === 1))))
                 : documents.find(d => d.type === docType);
               const template = DOC_TEMPLATE_MAP[docType];
               const isGenerating = generatingDoc === (serviceType ? `${template}:${serviceType}` : template);

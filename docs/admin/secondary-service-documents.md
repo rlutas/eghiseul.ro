@@ -10,7 +10,13 @@ Sister project (`cazierjudiciaronline.com`) implementează asta cu **flag-uri bo
 - `delegation_pdf_path` — delegația pentru Cazier (autoritate: IGPR)
 - `delegation_integritate_pdf_path` — delegația pentru Integritate (autoritate: tot IGPR dar document diferit)
 
-Plus **2 butoane separate** în admin („Delegatie Cazier" / „Delegatie Integritate") și **2 cereri** (cerere PF/PJ pentru cazier + cerere integritate).
+Plus **2 butoane separate** în admin („Delegatie Cazier" / „Delegatie Integritate").
+
+> ⚠️ Corecție 2026-08-14: **NU există „cerere integritate"** (și nici cerere pentru
+> cazierul auto) — ambele se ridică doar pe baza împuternicirii. Într-o comandă
+> combinată, cererea de eliberare există o singură dată, pentru partea de **cazier
+> judiciar**. Vezi `SERVICES_WITHOUT_CERERE` în `src/lib/documents/cerere-items.ts`
+> și secțiunea din `docs/technical/specs/admin-document-system.md`.
 
 ## Modelul nostru (umbrella platform)
 

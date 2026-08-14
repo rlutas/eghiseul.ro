@@ -198,8 +198,8 @@ The admin document generation system handles automated creation of legal documen
 | `contract-prestari` | `contract-prestari.docx` | Contract de prestari servicii (between EDIGITALIZARE SRL and client) | At payment (planned) |
 | `contract-asistenta` | `contract-asistenta.docx` | Contract de asistenta juridica + Nota GDPR (between Cabinet Avocat and client) | At payment (planned) |
 | `imputernicire` | `imputernicire.docx` | Imputernicire avocatiala (power of attorney) | At payment (planned) |
-| `cerere-eliberare-pf` | `cerere-eliberare-pf.docx` | Cerere eliberare cazier judiciar - Persoana Fizica | Manual by operator |
-| `cerere-eliberare-pj` | `cerere-eliberare-pj.docx` | Cerere eliberare cazier judiciar - Persoana Juridica | Manual by operator |
+| `cerere-eliberare-pf` | `cerere-eliberare-pf.docx` | Cerere eliberare cazier judiciar - Persoana Fizica (NU pe cazier auto / certificat integritate — vezi mai jos) | Manual by operator |
+| `cerere-eliberare-pj` | `cerere-eliberare-pj.docx` | Cerere eliberare cazier judiciar - Persoana Juridica (idem) | Manual by operator |
 
 ### Servicii CU avocat vs FĂRĂ avocat
 
@@ -228,6 +228,35 @@ template ≠ `contract-prestari`), UI „Procesare comandă", scoparea rolului `
 > ardeau numere de Barou din registrul central — 5 comenzi afectate
 > (E-260722-M58C5, E-260804-YEYBF, E-260804-9K23B, E-260810-EP896, E-260811-U2AWZ).
 > Test: `tests/unit/lib/documents/no-lawyer-services.test.ts` mapează tot catalogul.
+
+### Servicii fără cerere de eliberare (2026-08-14)
+
+Sursa unică: `SERVICES_WITHOUT_CERERE` + `computeCerereItems()` în
+`src/lib/documents/cerere-items.ts`.
+
+**Cazier auto** (`cazier-auto`) și **certificat de integritate**
+(`certificat-integritate`) se ridică DOAR pe baza împuternicirii — IPJ nu are
+formular de eliberare pentru ele. Până acum, butonul „Cerere eliberare PF" de pe
+aceste comenzi cădea pe `templates/shared/cerere-eliberare-pf.docx`, adică pe
+formularul de **cazier judiciar** — document greșit, care încurca echipa (6
+cereri generate greșit pe comenzile de integritate).
+
+Setul de documente rămâne: `contract-prestari` + `contract-asistenta` +
+`imputernicire` (+ număr de Barou — ambele servicii rămân prin avocat).
+
+Excepție păstrată deliberat: comanda de **certificat integritate cu add-on-ul
+`addon_cazier_judiciar`** chiar are nevoie de cererea de cazier judiciar —
+`computeCerereItems` o întoarce ca item SECUNDAR pe template-ul `cazier-judiciar`
+(fișier cu sufix + `metadata.service_type`).
+
+Consumatori: UI „Procesare comandă" (`generableDocTypes` ascunde ambele tipuri de
+cerere când lista e goală) + gardă server-side în
+`api/admin/orders/[id]/generate-document` (HTTP 400 pe orice template
+`cerere-eliberare*`). Test: `tests/unit/lib/documents/cerere-items.test.ts`.
+
+Pereche pe cazierjudiciaronline.com / ecazier: `src/lib/cerere-required.ts`
+(`orderNeedsCerere`) — ascunde tot cardul „Cerere" din admin și blochează
+`POST /api/admin/cerere`, cu aceeași excepție (integritate + `cazier_judiciar`).
 
 ### Template File Structure
 
