@@ -57,6 +57,31 @@ Test nou: `tests/unit/cerere-required.test.ts`.
   cerere de eliberare" + notă în tabelul de template-uri;
 - CJO: `docs/technical/specs/cerere-pdf-system.md` — aceeași secțiune.
 
+## Bonus: împuternicirile ieșeau pe antetul vechi
+
+Semnalat de Raul în aceeași sesiune: toate împuternicirile generate arătau vechi,
+deși pe cazierjudiciaronline.com antetul e cel nou (logo cabinet + bloc de contact
++ Baroul Satu Mare).
+
+Cauza: `loadTemplate()` încearcă `src/templates/<slug>/imputernicire.docx` și abia
+apoi `shared/`. Slug-urile reale din DB sunt `cazier-judiciar-persoana-fizica` /
+`-persoana-juridica`, `cazier-auto`, `cazier-fiscal`, `certificat-integritate` —
+**niciunul nu are folder propriu**, deci toate comenzile luau
+`shared/imputernicire.docx`, rămas pe antetul vechi (text simplu, adresa veche
+„Str. Aurel Popp, nr.2"). Folderul `cazier-judiciar/`, singurul cu antetul nou,
+corespunde slug-ului legacy — 1 comandă, neplătită.
+
+Fix: `shared/imputernicire.docx` sincronizat cu varianta cu antet (corp și
+placeholder-e identice, verificat). Randare de control (LibreOffice) — identică cu
+împuternicirea de pe CJO. Afectate: cazier judiciar PF/PJ, cazier auto, cazier
+fiscal, certificat integritate.
+
+Test de regresie: `tests/unit/lib/documents/imputernicire-antet.test.ts` (antet
+prezent, cu imagini, fără adresa veche + identic cu `cazier-judiciar/`).
+
+Împuternicirile de **stare civilă** nu se schimbă: sunt formularul oficial UNBR
+„Anexa nr. II", alt document, cu antetul Baroului.
+
 ## Rămas de decis
 
 Cele 6 cereri generate greșit pe comenzile de integritate sunt încă în

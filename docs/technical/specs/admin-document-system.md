@@ -258,6 +258,34 @@ Pereche pe cazierjudiciaronline.com / ecazier: `src/lib/cerere-required.ts`
 (`orderNeedsCerere`) — ascunde tot cardul „Cerere" din admin și blochează
 `POST /api/admin/cerere`, cu aceeași excepție (integritate + `cazier_judiciar`).
 
+### ⚠️ Rezoluția template-urilor: `shared/` este calea REALĂ (2026-08-14)
+
+`loadTemplate()` (`generator.ts`) caută `src/templates/<service-slug>/<template>.docx`
+și abia apoi `src/templates/shared/<template>.docx`. Slug-urile REALE din DB sunt
+`cazier-judiciar-persoana-fizica` / `-persoana-juridica`, `cazier-auto`,
+`cazier-fiscal`, `certificat-integritate` — **niciunul nu are folder propriu**, deci
+toate comenzile de cazier iau șabloanele din `shared/`.
+
+Folderul `src/templates/cazier-judiciar/` corespunde slug-ului legacy
+`cazier-judiciar` (1 comandă, neplătită) — practic **mort** pentru comenzile reale.
+Îl mai folosește doar cererea secundară de cazier judiciar de pe comenzile de
+integritate cu add-on.
+
+Consecință concretă: împuternicirea avocațială ieșea pe **antetul vechi** (text
+simplu, adresa veche „Str. Aurel Popp, nr.2"), deși `cazier-judiciar/imputernicire.docx`
+avea deja antetul nou (logo cabinet + bloc de contact + Baroul Satu Mare, ca pe
+cazierjudiciaronline.com). Reparat prin sincronizarea `shared/imputernicire.docx`
+cu varianta cu antet. Test de regresie:
+`tests/unit/lib/documents/imputernicire-antet.test.ts`.
+
+> Când modifici un șablon de cazier, modifică-l în `shared/` (sau sincronizează
+> ambele). Un fișier pus doar în `cazier-judiciar/` NU ajunge în producție.
+
+Împuternicirile de **stare civilă** (naștere / căsătorie / celibat / extras
+multilingv) sunt un document diferit — formularul oficial UNBR „Anexa nr. II", cu
+antetul Baroului și alte placeholder-e (`ACTIVITATI_SC`, `AUTORITATE_SC`,
+`LAWYER_CABINET`) — și rămân pe modelul lor.
+
 ### Template File Structure
 
 ```
