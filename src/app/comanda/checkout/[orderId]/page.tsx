@@ -18,6 +18,8 @@ import {
 // (redirect-based). Keeping the component file for now in case we ever revisit
 // the embedded UX for a different flow.
 import { OrderSidebar } from '@/components/orders/order-sidebar';
+import { SystemStatus } from '@/components/services/system-status';
+import { instantPlatformProvider, platformStatusProvider } from '@/lib/services/platform-services';
 import { estimateFromSelectedOptions } from '@/lib/delivery-calculator';
 import { cn } from '@/lib/utils';
 
@@ -26,6 +28,8 @@ interface OrderData {
   order_number: string;
   friendly_order_id: string;
   service_name: string;
+  /** Slug-ul serviciului — decide dacă arătăm badge-ul de stare ANCPI/ONRC. */
+  service_slug?: string | null;
   base_price: number;
   total_price: number;
   payment_status: string;
@@ -142,6 +146,7 @@ export default function CheckoutPage() {
         order_number: apiOrder.orderNumber,
         friendly_order_id: apiOrder.orderNumber,
         service_name: apiOrder.service?.name || 'Serviciu',
+        service_slug: apiOrder.service?.slug ?? null,
         client_type: inferredClientType,
         service_estimated_days: apiOrder.service?.estimatedDays ?? apiOrder.service?.estimated_days,
         service_days_range: (() => {
@@ -495,6 +500,16 @@ export default function CheckoutPage() {
               wizard. On mobile it's FIRST (order-1) with the coupon, so the
               customer reviews + discounts before paying. Desktop = sticky right. */}
           <div className="space-y-4 order-1 lg:order-2 lg:sticky lg:top-4 lg:self-start">
+            {/* Starea portalului, chiar înainte de plată. Coloana asta e prima
+                pe mobil, deci badge-ul se vede pe telefon fără să derulezi.
+                Lipsea complet aici — clientul îl vedea în wizard (doar pe
+                desktop) și îl pierdea exact în ecranul unde dă banii. */}
+            {platformStatusProvider(order.service_slug) && (
+              <SystemStatus
+                service={platformStatusProvider(order.service_slug)!}
+                autoIssued={!!instantPlatformProvider(order.service_slug)}
+              />
+            )}
             {(() => {
               // Compute delivery estimate from raw options (need `code` +
               // `bundledFor` which the UI-shaped list doesn't carry).

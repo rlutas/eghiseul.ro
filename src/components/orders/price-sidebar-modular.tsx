@@ -147,7 +147,11 @@ export function PriceSidebarModular({ service, variant = 'full' }: PriceSidebarM
       {/* Live system status — for instant-digital services it replaces the
           delivery-time card; for ANCPI-dependent manual services (identificare
           imobil, copii CF/plan) it sits alongside it, so the client sees an
-          outage before paying. */}
+          outage before paying.
+          Pe mobil apare separat, deasupra formularului (vezi
+          modular-order-wizard.tsx): aici era legat de `variant === 'full'`,
+          adică DOAR de sidebarul de desktop, deci clienții de pe telefon
+          comandau fără să afle că portalul ANCPI e picat (raportat 12.08). */}
       {platformStatusProvider(service.slug) && variant === 'full' && (
         <SystemStatus service={platformStatusProvider(service.slug)!} autoIssued={isInstantDigital} />
       )}

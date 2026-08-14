@@ -33,6 +33,8 @@ import { OptionsStepModular } from './steps-modular/options-step';
 import { DeliveryStepModular } from './steps-modular/delivery-step';
 import BillingStepModular from './steps-modular/billing-step';
 import { ReviewStepModular } from './steps-modular/review-step';
+import { SystemStatus } from '@/components/services/system-status';
+import { instantPlatformProvider, platformStatusProvider } from '@/lib/services/platform-services';
 
 // Loading fallback
 function StepLoading() {
@@ -68,6 +70,11 @@ export function ModularOrderWizard({ initialService, initialOptions, headerExtra
     isLastStep,
     requestValidation,
   } = useModularWizard();
+
+  // Platforma de care depinde serviciul (ANCPI / ONRC), pentru badge-ul de
+  // stare afișat pe mobil deasupra formularului.
+  const statusProvider = platformStatusProvider(initialService?.slug);
+  const isInstantService = !!instantPlatformProvider(initialService?.slug);
 
   const [stepValid, setStepValid] = useState(false);
   // Componenta modulului curent, ÎMPREUNĂ cu pasul pentru care a fost
@@ -505,6 +512,18 @@ export function ModularOrderWizard({ initialService, initialOptions, headerExtra
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
         {/* Step Content */}
         <div className="lg:col-span-2">
+          {/* Starea portalului (ANCPI/ONRC) pe MOBIL — deasupra formularului.
+              Pe desktop trăiește în sidebarul din dreapta, care pe telefon nu
+              se randează deloc: clienții comandau servicii de cadastru fără să
+              vadă că e-Terra e picat, apoi scriau ca să întrebe de ce întârzie
+              (raportat de echipă 12.08.2026). Se randează pe toate serviciile
+              dependente de platformă — vezi PLATFORM_DEPENDENT_SERVICES — și
+              dispare singur când portalul e funcțional. */}
+          {statusProvider && (
+            <div className="lg:hidden mb-4">
+              <SystemStatus service={statusProvider} autoIssued={isInstantService} />
+            </div>
+          )}
           <Card className="border border-neutral-200 shadow-sm overflow-hidden !p-0 !gap-0">
             <div className="border-b border-neutral-100 bg-neutral-50/50 py-3 px-6">
               <div className="flex items-center justify-between min-h-[40px]">
