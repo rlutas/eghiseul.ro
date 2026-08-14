@@ -27,6 +27,8 @@ interface OrderDetail {
   services: { name: string; slug: string } | null;
   deliverable: string | null;
   documents: OrderDoc[];
+  /** Angajamentul de execuție semnat de client (convenția cu executantul). */
+  conventii: OrderDoc[];
 }
 
 function Field({ label, value }: { label: string; value?: string | null }) {
@@ -55,6 +57,20 @@ export default function CollaboratorOrderDetail() {
     if (json.success) setOrder(json.data);
     else toast.error(json.error || 'Eroare la încărcare');
     setLoading(false);
+  };
+
+  /** Varianta editabilă (.docx) a convenției — PDF-ul e pentru tipărit. */
+  const downloadOriginal = async (docId: string) => {
+    try {
+      const res = await fetch(
+        `/api/collaborator/orders/${orderId}/document?docId=${docId}&format=docx`
+      );
+      const json = await res.json();
+      if (!json.success) throw new Error(json.error);
+      window.open(json.data.url, '_blank');
+    } catch {
+      toast.error('Nu s-a putut descărca documentul');
+    }
   };
 
   useEffect(() => {
@@ -137,12 +153,57 @@ export default function CollaboratorOrderDetail() {
           <Field label="Carte Funciară" value={property.carteFunciara} />
           <Field label="Nr. cadastral" value={property.cadastral} />
           <Field label="Nr. topografic" value={property.topografic} />
-          <Field label="Adresă imobil" value={property.propertyAddress ?? property.address} />
-          <Field label="Proprietar" value={property.ownerName} />
+          <Field
+            label="Adresă imobil"
+            value={
+              property.propertyAddress ||
+              property.address ||
+              [property.imobilStreet, property.imobilLocality].filter(Boolean).join(', ') ||
+              undefined
+            }
+          />
+          <Field label="Proprietar" value={property.ownerName ?? property.beneficiaryName} />
           <Field label="Motivul solicitării" value={property.motiv} />
           <Field label="Alte informații de la client" value={property.additionalInfo} />
         </dl>
       </div>
+
+      {/* Angajamentul de execuție — contractul dintre client și executant,
+          semnat de client în comandă. Exemplarul lui, de descărcat/tipărit. */}
+      {(order.conventii?.length ?? 0) > 0 && (
+        <div className="mb-6 rounded-lg border border-slate-200 bg-white p-5">
+          <h2 className="mb-1 text-sm font-semibold text-slate-900">
+            Angajament de execuție documentație
+          </h2>
+          <p className="mb-3 text-xs text-slate-500">
+            Semnat electronic de client odată cu comanda. Îl poți descărca și tipări pentru dosarul
+            de la BCPI.
+          </p>
+          <ul className="space-y-2">
+            {order.conventii.map((d) => (
+              <li key={d.id} className="flex items-center gap-2 text-sm text-slate-700">
+                <FileText className="h-4 w-4 text-slate-400" />
+                <span className="flex-1">{d.file_name}</span>
+                <a
+                  href={`/api/collaborator/orders/${orderId}/document?docId=${d.id}`}
+                  target="_blank"
+                  rel="noopener"
+                  className="text-xs font-medium text-primary-700 hover:underline"
+                >
+                  Deschide PDF
+                </a>
+                <button
+                  type="button"
+                  onClick={() => downloadOriginal(d.id)}
+                  className="text-xs text-slate-500 hover:underline"
+                >
+                  Word
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {/* Deliverable — what Mircea must obtain + upload for this order */}
       {order.deliverable && (

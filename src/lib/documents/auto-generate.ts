@@ -78,7 +78,7 @@ export async function autoGenerateOrderDocuments(
   // Fetch order with service
   const { data: order, error: orderError } = await adminClient
     .from('orders')
-    .select('*, services(id, name, slug, base_price, estimated_days, urgent_days, urgent_available)')
+    .select('*, services(id, name, slug, base_price, estimated_days, urgent_days, urgent_available, verification_config)')
     .eq('id', orderId)
     .single();
 
@@ -283,9 +283,19 @@ export async function autoGenerateOrderDocuments(
   // on orders that never pay). 'post-payment' → contract-asistenta with a
   // real Barou number from the central registry.
   const noLawyer = isNoLawyerService(serviceSlug);
+  // Serviciile prin topograf nu au împuternicire avocațială; în locul ei,
+  // clientul semnează „angajamentul de execuție documentație" (convenția cu
+  // PFA-ul executant), fără de care topograful nu poate cere date din arhiva
+  // BCPI și nu poate depune documentația în numele proprietarului.
+  // Flagul stă în services.verification_config.conventie.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const conventieConfig = (order.services?.verification_config as any)?.conventie ?? null;
+  const needsConventie = !!conventieConfig?.enabled;
   const templates =
     mode === 'submit'
-      ? ['contract-prestari']
+      ? needsConventie
+        ? ['contract-prestari', 'conventie']
+        : ['contract-prestari']
       : noLawyer
         ? []
         : ['contract-asistenta'];
@@ -351,6 +361,14 @@ export async function autoGenerateOrderDocuments(
         document_numbers: documentNumbers,
         motiv_solicitare: contact.purpose || 'Interes personal',
         client_ip: clientIp,
+        // Datele imobilului + ale proprietarului care semnează convenția.
+        property: (cd.property as DocumentContext['property']) ?? null,
+        conventie: conventieConfig
+          ? {
+              executantName: conventieConfig.executantName ?? null,
+              executantAuthorization: conventieConfig.executantAuthorization ?? null,
+            }
+          : null,
       };
 
       // Generate DOCX
@@ -382,6 +400,10 @@ export async function autoGenerateOrderDocuments(
       let docNumber: string | null = null;
       if (template === 'contract-prestari') {
         docNumber = order.friendly_order_id;
+      } else if (template === 'conventie') {
+        // Convenția nu consumă numere de Barou — se identifică prin comandă,
+        // iar numărul ei de registru îl trece topograful pe hârtie (pct. 7).
+        docNumber = order.friendly_order_id;
       } else if (template === 'contract-asistenta') {
         docNumber = documentNumbers.contract_number
           ? String(documentNumbers.contract_number).padStart(6, '0')
@@ -399,7 +421,9 @@ export async function autoGenerateOrderDocuments(
         // Only the service contract is exposed to the customer on the status
         // page. Contract de asistență juridică, împuternicirea și cererile
         // conțin date cu caracter personal / acte interne — NU se publică.
-        visible_to_client: docType === 'contract_prestari',
+        // Excepție: convenția cu topograful — clientul o semnează, deci e
+        // documentul LUI; îi rămâne disponibilă în pagina de status.
+        visible_to_client: docType === 'contract_prestari' || docType === 'conventie',
         generated_by: generatedBy,
         metadata: {
           template,

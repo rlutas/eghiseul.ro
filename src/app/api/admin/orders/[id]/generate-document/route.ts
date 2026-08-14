@@ -70,7 +70,7 @@ export async function POST(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: order, error: orderError } = await (adminClient as any)
       .from('orders')
-      .select('*, services(id, name, slug, base_price, estimated_days, urgent_days, urgent_available)')
+      .select('*, services(id, name, slug, base_price, estimated_days, urgent_days, urgent_available, verification_config)')
       .eq('id', orderId)
       .single();
 
@@ -81,9 +81,17 @@ export async function POST(
     // Serviciile FĂRĂ avocat (topograf/imobiliare, ANCPI, ONRC) primesc DOAR
     // contract-prestari. Blocat și server-side, nu doar ascuns în UI — altfel
     // un POST direct ar arde un număr de Barou pe o comandă care nu-l cere.
+    // Convenția cu topograful e singurul document „de semnat" pe serviciile
+    // fără avocat — nu consumă numere de Barou, deci trece de gardă.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const conventieConfig = (order.services?.verification_config as any)?.conventie ?? null;
+    const allowedNoLawyerTemplates = conventieConfig?.enabled
+      ? ['contract-prestari', 'conventie']
+      : ['contract-prestari'];
+
     if (
       isNoLawyerService(order.services?.slug) &&
-      template !== 'contract-prestari'
+      !allowedNoLawyerTemplates.includes(template)
     ) {
       return NextResponse.json(
         {
@@ -410,6 +418,14 @@ export async function POST(
       delegation_service_type:
         template === 'imputernicire' ? (body.service_type ?? null) : null,
       client_ip: cd.signature_metadata?.ip_address || 'N/A',
+      // Convenția cu topograful: imobilul + datele proprietarului semnatar.
+      property: (cd.property as DocumentContext['property']) ?? null,
+      conventie: conventieConfig
+        ? {
+            executantName: conventieConfig.executantName ?? null,
+            executantAuthorization: conventieConfig.executantAuthorization ?? null,
+          }
+        : null,
     };
 
     // Get client signature from S3 (new) or inline base64 (legacy)

@@ -229,6 +229,18 @@ template ≠ `contract-prestari`), UI „Procesare comandă", scoparea rolului `
 > (E-260722-M58C5, E-260804-YEYBF, E-260804-9K23B, E-260810-EP896, E-260811-U2AWZ).
 > Test: `tests/unit/lib/documents/no-lawyer-services.test.ts` mapează tot catalogul.
 
+### Servicii prin topograf: convenția în locul împuternicirii (2026-08-14)
+
+Cele 14 servicii imobiliare fulfilate de colaboratorul topograf nu au
+împuternicire avocațială, dar primesc **„Angajament de execuție documentație"** —
+convenția dintre client și PFA-ul executant, semnată de client odată cu
+contractul de prestări. Fără ea, topograful nu poate cere date din arhiva BCPI
+și nu poate depune documentația în numele proprietarului.
+
+Configurare: `services.verification_config.conventie` (migrarea 142). Detalii
+complete — câmpuri colectate, șablon, cine o vede:
+[`conventie-topograf.md`](conventie-topograf.md).
+
 ### Servicii fără cerere de eliberare (2026-08-14)
 
 Sursa unică: `SERVICES_WITHOUT_CERERE` + `computeCerereItems()` în

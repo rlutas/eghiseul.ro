@@ -39,6 +39,7 @@ Index al documentației. Aceasta e o **hartă**, nu un jurnal — pentru jurnalu
 ## 🔑 Referințe rapide (din CLAUDE.md)
 - **Cum adaug un serviciu nou:** [`technical/specs/modular-wizard-guide.md`](technical/specs/modular-wizard-guide.md)
 - **Document generation:** [`technical/specs/admin-document-system.md`](technical/specs/admin-document-system.md)
+- **Convenția cu topograful (angajament de execuție):** [`technical/specs/conventie-topograf.md`](technical/specs/conventie-topograf.md)
 - **Solicită documente (cerere de la client + standby):** [`technical/specs/document-request-system.md`](technical/specs/document-request-system.md)
 - **RBAC & permisiuni:** [`admin/rbac-permissions.md`](admin/rbac-permissions.md)
 - **Plăți & facturare:** [`technical/specs/stripe-oblio-payment-invoicing.md`](technical/specs/stripe-oblio-payment-invoicing.md)

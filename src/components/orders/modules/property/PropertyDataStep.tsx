@@ -28,8 +28,9 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Home, AlertCircle, HelpCircle, Plus, Trash2 } from 'lucide-react';
+import { Home, AlertCircle, HelpCircle, Plus, Trash2, FileSignature } from 'lucide-react';
 import type { PropertyVerificationConfig, AdditionalImobil } from '@/types/verification-modules';
+import { validateCNP } from '@/lib/validations/cnp';
 import { normalizeJudet } from '@/lib/ancpi/judete';
 import uatNomenclator from '@/lib/ancpi/uat-nomenclator.json';
 import { checkCf, normalizeCf } from '@/lib/ancpi/cf-format';
@@ -246,6 +247,18 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
     }
   }, [extraCount, serviceOptions, state.selectedOptions, updateOptions]);
 
+  // Convenția cu topograful (angajament de execuție) — când e activă, pasul
+  // cere și datele de identificare ale proprietarului, care apar în document.
+  const conventie = state.verificationConfig?.conventie;
+  const cnpValid = validateCNP(property?.beneficiaryCnp || '').valid;
+  const conventieDataComplete = !conventie?.enabled
+    ? true
+    : cnpValid &&
+      !!property?.beneficiaryName?.trim() &&
+      !!property?.beneficiaryAddress?.trim() &&
+      !!property?.beneficiaryIdSeries?.trim() &&
+      !!property?.beneficiaryIdNumber?.trim();
+
   // Validate form
   const isFormValid = useCallback(() => {
     if (!property) return false;
@@ -255,6 +268,7 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
     if (config.fields.locality.required && !property.locality) return false;
     if (config.fields.cadastral.required && !property.cadastral) return false;
     if (config.fields.carteFunciara.required && !property.carteFunciara) return false;
+    if (!conventieDataComplete) return false;
 
     const hasIdentifier = !!(property.cadastral || property.carteFunciara);
     const hasAddress = !!property.propertyAddress?.trim();
@@ -269,7 +283,7 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
     }
 
     return true;
-  }, [property, config]);
+  }, [property, config, conventieDataComplete]);
 
   // Notify parent of validation changes
   useEffect(() => {
@@ -733,14 +747,137 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
       </Card>
       )}
 
+      {/* Date pentru convenția cu topograful (angajamentul de execuție).
+          Apar DOAR pe serviciile fulfilate de colaboratorul topograf, unde
+          executantul are nevoie de mandatul scris al proprietarului ca să
+          ceară date din arhiva BCPI și să depună documentația în numele lui.
+          Fără ele convenția ar ieși cu spații goale. */}
+      {conventie?.enabled && (
+        <Card className="py-4 gap-4 sm:py-6 sm:gap-6">
+          <CardHeader className="px-4 sm:px-6">
+            <CardTitle className="flex items-center gap-2">
+              <FileSignature className="h-5 w-5" />
+              Date pentru angajamentul de execuție
+            </CardTitle>
+            <CardDescription>
+              Lucrarea se execută de {conventie.executantName} (persoană fizică autorizată,{' '}
+              {conventie.executantAuthorization}). La pasul următor semnezi angajamentul prin
+              care îl împuternicești să ceară date din arhiva OCPI/BCPI și să depună
+              documentația pentru imobilul tău.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="px-4 sm:px-6 space-y-4">
+            <div className="grid grid-cols-2 gap-3 md:gap-4">
+              <div className="space-y-2 col-span-2">
+                <Label htmlFor="beneficiary-name">
+                  Nume și prenume proprietar <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="beneficiary-name"
+                  value={property.beneficiaryName || ''}
+                  onChange={(e) => updateProperty?.({ beneficiaryName: e.target.value })}
+                  placeholder="ex: Popescu Ion"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Persoana din cartea funciară. Poate fi diferită de cine plătește comanda.
+                </p>
+              </div>
+              <div className="space-y-2 col-span-2">
+                <Label htmlFor="beneficiary-address">
+                  Domiciliul proprietarului <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="beneficiary-address"
+                  value={property.beneficiaryAddress || ''}
+                  onChange={(e) => updateProperty?.({ beneficiaryAddress: e.target.value })}
+                  placeholder="strada, nr., bloc/ap., localitate, județ"
+                />
+              </div>
+              <div className="space-y-2 col-span-2 md:col-span-1">
+                <Label htmlFor="beneficiary-cnp">
+                  CNP proprietar <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="beneficiary-cnp"
+                  inputMode="numeric"
+                  maxLength={13}
+                  value={property.beneficiaryCnp || ''}
+                  onChange={(e) =>
+                    updateProperty?.({ beneficiaryCnp: e.target.value.replace(/\D/g, '') })
+                  }
+                  placeholder="13 cifre"
+                />
+                {!!property.beneficiaryCnp && !cnpValid && (
+                  <p className="text-xs text-amber-700">
+                    CNP-ul pare incomplet sau greșit — verifică cifrele.
+                  </p>
+                )}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="beneficiary-id-series">
+                  Serie CI <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="beneficiary-id-series"
+                  maxLength={3}
+                  value={property.beneficiaryIdSeries || ''}
+                  onChange={(e) =>
+                    updateProperty?.({ beneficiaryIdSeries: e.target.value.toUpperCase() })
+                  }
+                  placeholder="ex: SM"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="beneficiary-id-number">
+                  Număr CI <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="beneficiary-id-number"
+                  inputMode="numeric"
+                  maxLength={9}
+                  value={property.beneficiaryIdNumber || ''}
+                  onChange={(e) =>
+                    updateProperty?.({ beneficiaryIdNumber: e.target.value.replace(/\D/g, '') })
+                  }
+                  placeholder="ex: 123456"
+                />
+              </div>
+              <div className="space-y-2 col-span-2 md:col-span-1">
+                <Label htmlFor="imobil-locality">Localitatea imobilului</Label>
+                <Input
+                  id="imobil-locality"
+                  value={property.imobilLocality || ''}
+                  onChange={(e) => updateProperty?.({ imobilLocality: e.target.value })}
+                  placeholder={property.locality ? `ex: ${property.locality}` : 'satul / orașul'}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Satul sau orașul, dacă diferă de UAT-ul ales mai sus.
+                </p>
+              </div>
+              <div className="space-y-2 col-span-2 md:col-span-1">
+                <Label htmlFor="imobil-street">Strada și numărul imobilului</Label>
+                <Input
+                  id="imobil-street"
+                  value={property.imobilStreet || ''}
+                  onChange={(e) => updateProperty?.({ imobilStreet: e.target.value })}
+                  placeholder="ex: Grivitei nr. 1"
+                />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Validation Summary */}
       {showValidationError && !isFormValid() && (
         <Alert data-wizard-error>
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
-            {config.identificationService.enabled
-              ? 'Completează județul, localitatea și adresa imobilului (sau numărul cadastral / CF, dacă îl știi).'
-              : 'Completează cel puțin județul, localitatea și unul din: număr cadastral sau număr CF.'}
+            {conventie?.enabled && !conventieDataComplete
+              ? 'Completează numele, domiciliul, CNP-ul și seria/numărul actului de identitate ale proprietarului — apar în angajamentul de execuție pe care îl semnezi la pasul următor.'
+              : config.identificationService.enabled
+                ? 'Completează județul, localitatea și adresa imobilului (sau numărul cadastral / CF, dacă îl știi).'
+                : 'Completează cel puțin județul, localitatea și unul din: număr cadastral sau număr CF.'}
           </AlertDescription>
         </Alert>
       )}

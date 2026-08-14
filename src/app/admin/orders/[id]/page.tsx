@@ -4028,6 +4028,7 @@ const DOC_TYPE_LABELS: Record<string, string> = {
   'cerere_eliberare_pf': 'Cerere eliberare PF',
   'cerere_eliberare_pj': 'Cerere eliberare PJ',
   'cerere_eliberare': 'Cerere eliberare',
+  'conventie': 'Angajament de executie (conventie topograf)',
   'document_received': 'Document primit de la institutie',
   'document_final': 'Document final',
   'constatator': 'Certificat Constatator (ONRC)',
@@ -4044,6 +4045,7 @@ const DOC_TEMPLATE_MAP: Record<string, string> = {
   'imputernicire': 'imputernicire',
   'cerere_eliberare_pf': 'cerere-eliberare-pf',
   'cerere_eliberare_pj': 'cerere-eliberare-pj',
+  'conventie': 'conventie',
 };
 
 const PROCESSING_ACTION_BUTTONS: Record<string, {
@@ -4381,6 +4383,11 @@ function ProcessingSection({
   // identificare imobil) get NO legal-assistance contract / împuternicire /
   // cerere and NO Barou number — see LAWYER_SERVICE_SLUGS.
   const noLawyerService = isNoLawyerService(order.services?.slug);
+  // Serviciile prin topograf: în locul împuternicirii avocațiale, clientul
+  // semnează „angajamentul de execuție documentație" (convenția cu executantul).
+  const hasConventie = !!(
+    (order.services?.verification_config as AnyObj | undefined)?.conventie as AnyObj | undefined
+  )?.enabled;
   // Cazierul auto și certificatul de integritate se ridică DOAR pe
   // împuternicire — nu există cerere de eliberare pentru ele (înainte se
   // genera formularul de cazier judiciar din templates/shared și încurca
@@ -4392,7 +4399,9 @@ function ProcessingSection({
     selected_options: (order.selected_options as AnyObj[]) || [],
   });
   const generableDocTypes = noLawyerService
-    ? ['contract_prestari']
+    ? hasConventie
+      ? ['contract_prestari', 'conventie']
+      : ['contract_prestari']
     : [
         'contract_prestari',
         'contract_asistenta',

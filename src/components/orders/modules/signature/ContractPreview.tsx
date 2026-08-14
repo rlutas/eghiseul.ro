@@ -75,6 +75,9 @@ export default function ContractPreview() {
           servicePrice: priceBreakdown.basePrice,
           orderId: state.orderId || undefined,
           friendlyOrderId: state.friendlyOrderId || undefined,
+          // Imobilul + proprietarul semnatar — apar în convenția cu topograful,
+          // deci trebuie să se vadă completate încă din previzualizare.
+          property: state.property || undefined,
           // PF/PJ pe contract = tipul SERVICIULUI (nu al facturării)
           clientType: state.clientType || undefined,
         };

@@ -4,6 +4,7 @@ import { generateDocument, type DocumentContext, type ClientData, type CompanyDa
 import { downloadFile } from '@/lib/aws/s3';
 import mammoth from 'mammoth';
 import { formatPersonName } from '@/lib/format/person-name';
+import { isNoLawyerService } from '@/lib/documents/no-lawyer-services';
 
 // Cache the company/lawyer signature PNGs (base64) — they almost never change,
 // so re-downloading them from S3 on every contract preview is wasteful and a
@@ -82,6 +83,8 @@ interface PreviewRequestBody {
   servicePrice: number;
   orderId?: string;
   friendlyOrderId?: string;
+  /** Date imobil + proprietar semnatar — pentru convenția cu topograful. */
+  property?: DocumentContext['property'];
 }
 
 /**
@@ -119,6 +122,16 @@ export async function POST(request: NextRequest) {
 
     const companyData: CompanyData = settingsMap.company_data || {};
     const lawyerData: LawyerData = settingsMap.lawyer_data || {};
+
+    // Convenția cu topograful — executantul + flagul vin din configurarea
+    // serviciului, ca la generarea reală (auto-generate.ts).
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: serviceRow } = await (adminClient as any)
+      .from('services')
+      .select('verification_config')
+      .eq('slug', body.serviceSlug)
+      .maybeSingle();
+    const conventieConfig = serviceRow?.verification_config?.conventie ?? null;
 
     // Build client data from request
     const personal = body.personalData || {};
@@ -186,6 +199,13 @@ export async function POST(request: NextRequest) {
         imputernicire_number: 0,
       },
       client_ip: clientIp,
+      property: body.property ?? null,
+      conventie: conventieConfig
+        ? {
+            executantName: conventieConfig.executantName ?? null,
+            executantAuthorization: conventieConfig.executantAuthorization ?? null,
+          }
+        : null,
     };
 
     // Download company/lawyer signatures from S3 in PARALLEL (cached) — these
@@ -195,9 +215,18 @@ export async function POST(request: NextRequest) {
       loadSignatureBase64(lawyerData.signature_s3_key),
     ]);
 
-    // Generate both contract-prestari and contract-asistenta in PARALLEL
-    // (same templates as auto-generate.ts, which use CLIENT_DETAILS_BLOCK).
-    const templates = ['contract-prestari', 'contract-asistenta'];
+    // Ce semnează clientul, pe fiecare tip de serviciu (aceleași șabloane ca
+    // auto-generate.ts):
+    //   - prin avocat → contract prestări + contract de asistență juridică;
+    //   - prin topograf → contract prestări + convenția cu executantul;
+    //   - restul serviciilor fără avocat → doar contractul de prestări.
+    // Până la 2026-08-14 preview-ul arăta contract de asistență juridică pe
+    // TOATE serviciile, inclusiv pe cele care nu-l primesc niciodată.
+    const templates = isNoLawyerService(body.serviceSlug)
+      ? conventieConfig?.enabled
+        ? ['contract-prestari', 'conventie']
+        : ['contract-prestari']
+      : ['contract-prestari', 'contract-asistenta'];
     const htmlParts = await Promise.all(
       templates.map(async (template) => {
         const buffer = generateDocument(body.serviceSlug, template, context, {

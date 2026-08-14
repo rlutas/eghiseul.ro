@@ -196,6 +196,32 @@ export interface DocumentContext {
   delegation_service_type?: string | null;
   /** Client IP address (for contract legal validity) */
   client_ip?: string;
+  /**
+   * Date imobil + beneficiar, din `customer_data.property`. Alimentează
+   * convenția cu topograful („angajament de execuție documentație"): identifică
+   * imobilul (CF / nr. cadastral / UAT) și proprietarul care semnează.
+   * Absent pe restul serviciilor.
+   */
+  property?: {
+    county?: string | null;
+    locality?: string | null;
+    beneficiaryName?: string | null;
+    beneficiaryAddress?: string | null;
+    carteFunciara?: string | null;
+    cadastral?: string | null;
+    topografic?: string | null;
+    motiv?: string | null;
+    beneficiaryCnp?: string | null;
+    beneficiaryIdSeries?: string | null;
+    beneficiaryIdNumber?: string | null;
+    imobilLocality?: string | null;
+    imobilStreet?: string | null;
+  } | null;
+  /** Executantul din convenție (services.verification_config.conventie). */
+  conventie?: {
+    executantName?: string | null;
+    executantAuthorization?: string | null;
+  } | null;
 }
 
 // ──────────────────────────────────────────────────────────────
@@ -833,6 +859,20 @@ export function buildInstitutie(
 }
 
 /**
+ * Obiectul lucrării, pentru pct. 1 din convenția cu topograful.
+ *
+ * Modelul lui Mircea scrie liber ce anume se execută („Obtinere schita PAD").
+ * Îl compunem din numele serviciului comandat — singura sursă care descrie
+ * exact lucrarea — plus scopul declarat de client, când l-a completat.
+ */
+export function buildObiectLucrare(ctx: DocumentContext): string {
+  const serviceName = ctx.order.service_name?.trim();
+  if (!serviceName) return '……………';
+  const scop = ctx.property?.motiv?.trim();
+  return scop ? `Obținerea ${serviceName} (scop: ${scop})` : `Obținerea ${serviceName}`;
+}
+
+/**
  * Build a CI/ID document info string: "seria XX nr. YYYYYY, emisă de ZZZZ"
  */
 export function buildCIInfo(client: ClientData): string {
@@ -991,7 +1031,10 @@ function buildPlaceholderData(ctx: DocumentContext) {
     // Client data
     NUMECLIENT: ctx.client.name,
     'CNP/CUI': ctx.client.is_pj ? ctx.client.cui : ctx.client.cnp,
-    CLIENT_CNP: ctx.client.cnp || '',
+    // Pe serviciile prin topograf nu rulează KYC-ul, deci CNP-ul și actul de
+    // identitate vin din pasul „Date imobil" (blocul convenției), nu din
+    // `client`. Fallback-ul e inofensiv pe restul serviciilor (property = null).
+    CLIENT_CNP: ctx.client.cnp || ctx.property?.beneficiaryCnp || '',
     CLIENT_CUI: ctx.client.cui || '',
     EMAIL: ctx.client.email,
     CLIENT_PHONE: ctx.client.phone,
@@ -1010,8 +1053,8 @@ function buildPlaceholderData(ctx: DocumentContext) {
     // CI full info: "seria XX nr. YYYYYY, emisă de ZZZZ"
     CLIENT_CI_INFO: buildCIInfo(ctx.client),
     // Aliases for CI - templates may use SERIE_CI/NUMAR_CI
-    SERIE_CI: ctx.client.ci_series || '',
-    NUMAR_CI: ctx.client.ci_number || '',
+    SERIE_CI: ctx.client.ci_series || ctx.property?.beneficiaryIdSeries || '',
+    NUMAR_CI: ctx.client.ci_number || ctx.property?.beneficiaryIdNumber || '',
 
     // Client name parts (for cerere-eliberare-pf)
     CLIENT_FIRSTNAME: ctx.client.firstName || '',
@@ -1252,6 +1295,31 @@ function buildPlaceholderData(ctx: DocumentContext) {
     // Client IP (for contract legal validity)
     CLIENT_IP: ctx.client_ip || 'N/A',
 
+    // ── Convenția cu topograful (angajament de execuție documentație) ──
+    // Identificarea imobilului. Punctele rămân vizibile pe hârtie când
+    // clientul n-a completat un câmp opțional (nr. cadastral, strada), ca
+    // executantul să le poată scrie de mână.
+    CF_NUMAR: ctx.property?.carteFunciara || '……………',
+    NR_CADASTRAL: ctx.property?.cadastral || ctx.property?.topografic || '……………',
+    UAT: ctx.property?.locality || '……………',
+    LOCALITATE_IMOBIL:
+      ctx.property?.imobilLocality || ctx.property?.locality || '……………',
+    STRADA_IMOBIL: ctx.property?.imobilStreet || '……………',
+    OBIECT_LUCRARE: buildObiectLucrare(ctx),
+    // Variante „de tipar" ale datelor beneficiarului: pe hârtie, un câmp gol
+    // lasă fraza ciuntită („identificat cu CNP  și având seria  nr. .").
+    // Punctele arată clar ce a rămas de completat de mână.
+    // Partea din convenție e PROPRIETARUL din cartea funciară, nu plătitorul
+    // comenzii — de aceea numele/domiciliul lui bat datele clientului.
+    CONV_NUME: ctx.property?.beneficiaryName || ctx.client.name || '……………',
+    CONV_ADRESA: ctx.property?.beneficiaryAddress || ctx.client.address || '……………',
+    CONV_CNP: ctx.client.cnp || ctx.property?.beneficiaryCnp || '……………',
+    CONV_SERIE_CI: ctx.client.ci_series || ctx.property?.beneficiaryIdSeries || '……',
+    CONV_NUMAR_CI: ctx.client.ci_number || ctx.property?.beneficiaryIdNumber || '……………',
+    ONORARIU: (ctx.order.total_price || 0).toFixed(2).replace('.', ','),
+    EXECUTANT_NUME: ctx.conventie?.executantName || '……………',
+    EXECUTANT_AUTORIZARE: ctx.conventie?.executantAuthorization || '……………',
+
     // Request reason (for cerere templates)
     MOTIV_SOLICITARE: ctx.motiv_solicitare || 'Interes personal',
 
@@ -1325,18 +1393,18 @@ function parseBirthDate(dateStr?: string): { year: string; month: string; day: s
 // Address Parsing Helpers
 // ──────────────────────────────────────────────────────────────
 
-function extractJudet(address: string): string {
-  const match = address.match(/Jud\.\s*([^,]+)/i);
+function extractJudet(address: string | undefined | null): string {
+  const match = (address || '').match(/Jud\.\s*([^,]+)/i);
   return match ? match[1].trim() : '';
 }
 
-function extractComuna(address: string): string {
-  const match = address.match(/com\.\s*([^,]+)/i);
+function extractComuna(address: string | undefined | null): string {
+  const match = (address || '').match(/com\.\s*([^,]+)/i);
   return match ? match[1].trim() : '';
 }
 
-function extractStrada(address: string): string {
-  const match = address.match(/str\.\s*(.+)/i);
+function extractStrada(address: string | undefined | null): string {
+  const match = (address || '').match(/str\.\s*(.+)/i);
   return match ? match[1].trim() : '';
 }
 

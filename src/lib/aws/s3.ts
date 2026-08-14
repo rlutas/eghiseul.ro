@@ -132,6 +132,7 @@ export function generateContractKey(
  * - contract_prestari, contract_asistenta, contract_complet → contracte/
  * - imputernicire → imputerniciri/
  * - cerere_eliberare_pf, cerere_eliberare_pj → cereri/
+ * - conventie → conventii/
  * - anything else → documente/
  */
 export function generateDocumentKey(
@@ -146,6 +147,7 @@ export function generateDocumentKey(
     imputernicire: 'imputerniciri',
     cerere_eliberare_pf: 'cereri',
     cerere_eliberare_pj: 'cereri',
+    conventie: 'conventii',
   };
   const subfolder = subfolderMap[docType] || 'documente';
   return `orders/${friendlyOrderId}/${subfolder}/${fileName}`;

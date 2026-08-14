@@ -127,6 +127,26 @@ export interface CompanySpecialRule {
 }
 
 /**
+ * „Angajament de execuție documentație" — convenția pe care clientul o semnează
+ * cu topograful (PFA-ul executant), odată cu contractul nostru de prestări.
+ *
+ * Serviciile prin topograf nu merg prin avocat, deci nu au împuternicire; în
+ * schimb executantul are nevoie de mandatul scris al proprietarului ca să poată
+ * cere date din arhiva BCPI și să depună documentația în numele lui.
+ *
+ * Prezența ei ACTIVEAZĂ și câmpurile suplimentare din pasul „Date imobil"
+ * (CNP + act de identitate + adresa imobilului), fără de care convenția ar
+ * ieși cu spații goale.
+ */
+export interface ConventieConfig {
+  enabled: boolean;
+  /** Numele executantului, așa cum apare în convenție. */
+  executantName: string;
+  /** Certificatul de autorizare al executantului (seria + nr). */
+  executantAuthorization: string;
+}
+
+/**
  * Property Verification Module Configuration
  * Used for property/land data (Carte Funciară)
  */
@@ -292,6 +312,9 @@ export interface ServiceVerificationConfig {
   propertyVerification: PropertyVerificationConfig;
   vehicleVerification: VehicleVerificationConfig;
   signature: SignatureConfig;
+
+  /** Angajament de execuție documentație (convenția cu topograful). */
+  conventie?: ConventieConfig;
 
   // External redirect (e.g., Rovinieta)
   externalRedirect?: {
@@ -515,6 +538,28 @@ export interface PropertyState {
 
   // Multi-extract: extra imobile in the same county ("Adaugă un extras").
   additionalImobile?: AdditionalImobil[];
+
+  // Convenție cu topograful (ConventieConfig.enabled) — date care apar în
+  // „Angajamentul de execuție documentație", nu în extrasul propriu-zis.
+  /**
+   * Numele proprietarului care semnează convenția. Se cere separat de datele
+   * de facturare pentru că partea din convenție e PROPRIETARUL imobilului, nu
+   * plătitorul (comandă plătită de copil pentru părinte, de firmă pentru
+   * asociat etc.) — și pentru că pasul de semnătură vine înaintea facturării.
+   */
+  beneficiaryName?: string;
+  /** Domiciliul proprietarului, așa cum apare pe actul de identitate. */
+  beneficiaryAddress?: string;
+  /** CNP-ul proprietarului/beneficiarului care semnează convenția. */
+  beneficiaryCnp?: string;
+  /** Seria actului de identitate al beneficiarului. */
+  beneficiaryIdSeries?: string;
+  /** Numărul actului de identitate al beneficiarului. */
+  beneficiaryIdNumber?: string;
+  /** Localitatea imobilului (satul/orașul din UAT — poate diferi de UAT). */
+  imobilLocality?: string;
+  /** Strada și numărul imobilului. */
+  imobilStreet?: string;
 
   // For identification services
   ownerName?: string;

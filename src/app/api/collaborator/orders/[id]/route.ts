@@ -52,6 +52,19 @@ export async function GET(
       .eq('metadata->>source', 'collaborator')
       .order('created_at', { ascending: false });
 
+    // Convenția („angajament de execuție documentație") face excepție de la
+    // regula de mai sus: e contractul dintre CLIENT și EXECUTANT, deci
+    // colaboratorul e parte în ea și are nevoie de exemplarul lui semnat —
+    // fără el nu poate cere date din arhiva BCPI și nu poate depune
+    // documentația în numele proprietarului.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: conventii } = await (admin as any)
+      .from('order_documents')
+      .select('id, type, file_name, file_size, mime_type, visible_to_client, metadata, created_at')
+      .eq('order_id', orderId)
+      .eq('type', 'conventie')
+      .order('created_at', { ascending: false });
+
     // Privacy: only the work data (property) reaches the collaborator —
     // contact/billing/personal client data stays server-side. ownerName/address
     // inside property ARE the object of the work on identificare services.
@@ -60,7 +73,15 @@ export async function GET(
       customer_data: { property: order.customer_data?.property ?? null },
     };
 
-    return NextResponse.json({ success: true, data: { ...sanitizedOrder, deliverable, documents: documents ?? [] } });
+    return NextResponse.json({
+      success: true,
+      data: {
+        ...sanitizedOrder,
+        deliverable,
+        documents: documents ?? [],
+        conventii: conventii ?? [],
+      },
+    });
   } catch (error) {
     console.error('[collaborator] order detail error:', error);
     return NextResponse.json({ success: false, error: 'Eroare internă' }, { status: 500 });
