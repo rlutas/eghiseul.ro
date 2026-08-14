@@ -131,3 +131,16 @@ soffice --headless --convert-to pdf --outdir /tmp /tmp/conventie-E-260810-EP896.
 
 Teste: `tests/unit/lib/documents/conventie.test.ts` (conținutul DOCX-ului
 generat, nu doar helperii).
+
+## Capcană: două module dinamice consecutive
+
+Activarea semnăturii a pus, pe aceste servicii, două module încărcate dinamic
+unul după altul („Date imobil" → „Semnătură"). Încărcarea e asincronă, deci
+componenta veche se re-randa cu configul pasului nou și cădea
+(`config.identificationService` undefined). Reparat în
+`modular-order-wizard.tsx`: componenta dinamică se ține împreună cu `stepId`-ul
+pentru care a fost încărcată și se randează doar la potrivire.
+
+**Dacă mai activezi un modul pe un serviciu**, verifică fluxul în browser, nu
+doar tipurile: un modul nou lipit de altul e exact combinația care nu se testa
+niciodată înainte.

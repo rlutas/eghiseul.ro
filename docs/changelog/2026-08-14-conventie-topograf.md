@@ -50,6 +50,24 @@ descărcare și buton de regenerare.
 și generează (prin avocat → prestări + asistență; prin topograf → prestări +
 convenție; restul → doar prestări).
 
+## Bug găsit la testarea fluxului real (reparat)
+
+Testul end-to-end a scos un bug **latent, nu introdus de convenție**: pe
+serviciile topograf, după „Date imobil" urmează acum semnătura — două module
+încărcate dinamic unul după altul. Încărcarea componentei e asincronă, deci
+între schimbarea pasului și sosirea noii componente React re-randa componenta
+VECHE cu configul pasului NOU: `PropertyDataStep` primea configul de semnătură,
+`config.identificationService` era `undefined` și wizardul cădea pe ecranul „A
+apărut o eroare".
+
+Nu apărea până acum fiindcă după „Date imobil" urma întotdeauna un pas core
+(facturare), care nu trece prin același mecanism.
+
+Fix: componenta dinamică se ține împreună cu pasul pentru care a fost încărcată
+și se randează doar dacă pasul se potrivește (`key={stepId}` la montare), plus
+gărzi pe `config.fields` în `PropertyDataStep` — inclusiv în `isFormValid`, care
+rulează din efect chiar și după early-return.
+
 ## Verificare
 
 - `tests/unit/lib/documents/conventie.test.ts` — verifică textul DOCX-ului
@@ -57,6 +75,18 @@ convenție; restul → doar prestări).
 - `scripts/preview-conventie.ts <FRIENDLY_ORDER_ID>` — randează convenția pentru
   o comandă reală, local, fără să atingă S3 sau DB. Rulat pe `E-260810-EP896`
   (comanda pentru care Mircea completase convenția de mână) — iese identic.
+- **Flux complet parcurs în browser** (comandă de test `E-260814-QD8A5`, marcată
+  `is_test` + abandonată după verificare):
+  1. pasul „Date imobil" afișează blocul convenției, cu executantul din config;
+  2. CNP-ul e validat pe cifra de control (un CNP inventat e respins);
+  3. pasul de semnătură apare (nu exista înainte pe aceste servicii);
+  4. previzualizarea arată contractul de prestări **+ convenția**, cu numele
+     proprietarului, CF-ul și executantul completate, și **fără** contractul de
+     asistență juridică;
+  5. la submit s-au generat automat ambele documente (`contract_prestari` +
+     `conventie`), vizibile clientului;
+  6. în DOCX-ul final semnătura desenată apare sub „Proprietar/Beneficiar",
+     alături de numele proprietarului, cu linia de audit (dată, IP, comandă).
 
 Spec: [`technical/specs/conventie-topograf.md`](../technical/specs/conventie-topograf.md).
 
