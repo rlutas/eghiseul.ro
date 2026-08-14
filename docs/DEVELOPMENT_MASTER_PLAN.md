@@ -625,6 +625,28 @@
 
 Features planned but not yet scheduled for a specific sprint.
 
+#### 💰 Grila de urgență la serviciile prin topograf (audit 2026-08-14)
+
+Audit complet: [`services/2026-08-14-audit-preturi-cfunciara.md`](services/2026-08-14-audit-preturi-cfunciara.md).
+
+Prețurile noastre (bază, urgență, termene) sunt **identice cu cfunciara.ro**, la
+leu, pe toate cele 14 servicii prin topograf — verificat live pe paginile lor.
+Nu sunt valori placeholder, cum păreau: urgențele „ciudate" (134,31 / 255,31 /
+423,50) sunt taxele lor de prioritate (+111 / +211 / +350) convertite cu TVA.
+
+Ce rămâne de decis, ca business:
+
+1. **Urgența dublează factura** (109–140% din preț la majoritatea copiilor, față
+   de 40% la cazier) — și **0 din 126 de comenzi imobiliare plătite au bifat-o**.
+   De stabilit dacă ținem grila lor sau punem una vandabilă.
+2. **Trei servicii sub prețul lor**: certificat urbanism informare (780 vs
+   943,80), identificare imobil și identificare imobile după proprietar (198 vs
+   302,50) — sunt servicii vechi, rămase pe grila proprie.
+3. **Identificare imobil promite 3 zile**, ei promit 10. De confirmat că îl
+   susținem, mai ales cât timp e-Terra e oprit.
+
+Vezi și [[collaborator-topograf-system]].
+
 #### 📝 Editarea cererilor fără Word (amânat 2026-07-29)
 
 Colegii care nu au Word nu pot modifica cererea descărcată. Butonul „Word" (29 iul)

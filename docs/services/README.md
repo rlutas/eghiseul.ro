@@ -3,6 +3,8 @@
 Inventar complet al serviciilor active + capabilitățile platformei. Pentru documentația detaliată per serviciu, vezi folderele de mai jos (fiecare cu `README.md`: SEO, flux comandă, câmpuri speciale).
 
 > **Sursă de adevăr pentru preț/termen:** tabela `services` din DB (coloanele `base_price`, `estimated_days`, `processing_config`). Editabile din `/admin/settings` → Servicii (preț, zile, termen afișat). Valorile de mai jos = snapshot 2026-06-23 (migrațiile 077-079).
+>
+> **Comparație cu concurența (imobiliare):** [`2026-08-14-audit-preturi-cfunciara.md`](2026-08-14-audit-preturi-cfunciara.md) — grila noastră e identică la leu cu cfunciara.ro (bază, urgență, termene) pe cele 14 servicii prin topograf; 3 servicii sunt sub prețul lor, iar urgența (109–140% din preț) n-a fost bifată de nicio comandă.
 
 ## Servicii active (DB)
 
