@@ -68,3 +68,18 @@ Reparat:
 lor (`pickupPoint` 476043 = C. Brâncoveanu 18, Satu Mare). Adresa din setări e folosită de restul
 fluxurilor de curierat. Cele trei adrese ale firmei (sediu Odoreu, pickup Sameday Satu Mare, cea
 hardcodată în `generate-awb`) sunt diferite — de aliniat separat, dacă deranjează.
+
+## Adresa de expediere, clarificată (tot 17.08)
+
+Confirmat de Raul: **de la C. Brâncoveanu 18, Satu Mare** pleacă plicurile — aceeași adresă cu
+punctul de ridicare din contul Sameday (`pickupPoint` 476043). Sediul social (Odoreu, str.
+Salcâmilor 2) nu are treabă cu expedierea.
+
+- `admin_settings.sender_address` populat cu adresa reală (firma EDIGITALIZARE SRL, 0757708181,
+  contact@eghiseul.ro, C. Brâncoveanu 18, Satu Mare);
+- `EGHISEUL_SENDER` din `generate-awb/route.ts` actualizat de la „Mihai Eminescu 1" (adresă veche,
+  greșită) la aceeași adresă — contează la Fan Courier, care primește expeditorul din payload;
+- precompletarea din Setări folosește adresa de expediere, nu sediul social.
+
+Easybox-uri „Someș" în Satu Mare (județul are 65 în total): `2556` Centrul Comercial Someșul
+(C. Coposu 14) și `1485` Piața Someș (Prahova 18).

@@ -24,17 +24,19 @@ import { DEFAULT_DOCUMENT_PACKAGE, extractCourierProviderFromDeliveryMethod } fr
 import { extractCourierQuote } from '@/lib/courier/quote-from-delivery';
 import { getSamedayDropoff } from '@/lib/admin/sameday-dropoff';
 
-// eGhiseul.ro company address (sender)
+// Adresa de expediere REALĂ (de aici pleacă plicurile), nu sediul social din
+// Odoreu. La Sameday nu contează — ei ridică din punctul de ridicare din contul
+// lor (`pickupPoint` 476043, aceeași adresă); Fan Courier folosește ce trimitem.
 const EGHISEUL_SENDER: SenderAddress = {
   name: 'eGhiseul.ro',
-  phone: '0740000000', // Company phone
+  phone: '0757708181',
   email: 'comenzi@eghiseul.ro',
-  company: 'eGhiseul.ro SRL',
-  street: 'Strada Mihai Eminescu',
-  streetNo: '1',
+  company: 'EDIGITALIZARE SRL',
+  street: 'Constantin Brancoveanu',
+  streetNo: '18',
   city: 'Satu Mare',
   county: 'Satu Mare',
-  postalCode: '440014',
+  postalCode: '',
   country: 'RO',
   contactPerson: 'eGhiseul.ro',
 };

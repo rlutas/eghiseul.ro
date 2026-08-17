@@ -3765,16 +3765,17 @@ function maskEnv(value: string | undefined): string {
  * datele publice de contact. Rămân toate editabile.
  */
 function senderAddressDefaults(company?: CompanyDataForSender): SenderAddress {
-  const parsed = parseCompanyAddress(company?.address || '');
   return {
     company: company?.name || 'EDIGITALIZARE SRL',
     contact: 'eGhiseul.ro',
     phone: company?.phone || '0757708181',
     email: company?.email || 'contact@eghiseul.ro',
-    street: parsed.street,
-    streetNo: parsed.streetNo,
-    city: parsed.city,
-    county: parsed.county,
+    // Adresa de EXPEDIERE, nu sediul social din Odoreu: de aici pleacă plicurile
+    // și tot aici e punctul de ridicare din contul Sameday.
+    street: 'Constantin Brancoveanu',
+    streetNo: '18',
+    city: 'Satu Mare',
+    county: 'Satu Mare',
     postalCode: '',
   };
 }
@@ -3786,25 +3787,6 @@ interface CompanyDataForSender {
   address?: string;
 }
 
-/**
- * Sparge adresa firmei („Jud. Satu Mare, com. Odoreu, str. Salcamilor, Nr. 2")
- * în câmpurile cerute de curieri. Best-effort — omul verifică oricum înainte
- * de salvare.
- */
-function parseCompanyAddress(address: string): {
-  street: string; streetNo: string; city: string; county: string;
-} {
-  const out = { street: '', streetNo: '', city: '', county: '' };
-  if (!address) return out;
-  for (const raw of address.split(',')) {
-    const part = raw.trim();
-    if (/^jud\.?/i.test(part)) out.county = part.replace(/^jud\.?\s*/i, '').trim();
-    else if (/^(com|mun|ors|oras|sat)\.?/i.test(part)) out.city = part.replace(/^(com|mun|ors|oras|sat)\.?\s*/i, '').trim();
-    else if (/^(str|bd|blvd|calea|ale?e?a)\.?/i.test(part)) out.street = part.replace(/^(str|bd|blvd)\.?\s*/i, '').trim();
-    else if (/^nr\.?/i.test(part)) out.streetNo = part.replace(/^nr\.?\s*/i, '').trim();
-  }
-  return out;
-}
 
 function bankDetailsDefaults(): BankDetails {
   return {
