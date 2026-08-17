@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { Layers } from 'lucide-react';
+import { usePreviewAs, withPreview } from '@/lib/collaborator/preview';
 
 interface CollabService {
   id: string;
@@ -13,14 +14,16 @@ interface CollabService {
 }
 
 export default function CollaboratorServicesPage() {
+  const previewAs = usePreviewAs();
   const [services, setServices] = useState<CollabService[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (typeof window !== 'undefined' && !previewAs && window.location.search.includes('as=')) return;
     (async () => {
       try {
-        const res = await fetch('/api/collaborator/services');
+        const res = await fetch(withPreview('/api/collaborator/services', previewAs));
         const json = await res.json();
         if (!json.success) throw new Error(json.error || 'Eroare');
         setServices(json.data);
@@ -30,7 +33,7 @@ export default function CollaboratorServicesPage() {
         setLoading(false);
       }
     })();
-  }, []);
+  }, [previewAs]);
 
   return (
     <div className="mx-auto max-w-5xl">

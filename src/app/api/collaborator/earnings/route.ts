@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { getUserPermissions, getCollaboratorServices } from '@/lib/admin/permissions';
+import { getCollaboratorServices } from '@/lib/admin/permissions';
+import { resolveCollaboratorContext } from '@/lib/admin/collaborator-context';
 
 /**
  * Monthly settlement view for the authenticated collaborator (topograph):
@@ -22,14 +23,18 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'Authentication required' }, { status: 401 });
     }
 
-    const { role } = await getUserPermissions(user.id);
-    if (role !== 'collaborator') {
-      return NextResponse.json({ success: false, error: 'Collaborator access required' }, { status: 403 });
+    const { searchParams } = new URL(request.url);
+
+    let collaboratorId: string;
+    try {
+      ({ collaboratorId } = await resolveCollaboratorContext(user.id, searchParams.get('as')));
+    } catch (e) {
+      if (e instanceof Response) return e;
+      throw e;
     }
 
-    const serviceIds = await getCollaboratorServices(user.id);
+    const serviceIds = await getCollaboratorServices(collaboratorId);
 
-    const { searchParams } = new URL(request.url);
     const now = new Date();
     const defaultMonth = `${now.getUTCFullYear()}-${String(now.getUTCMonth() + 1).padStart(2, '0')}`;
     const month = /^\d{4}-\d{2}$/.test(searchParams.get('month') || '')
@@ -42,8 +47,8 @@ export async function GET(request: NextRequest) {
 
     // Same scope as the orders list: own services OR orders assigned directly.
     const scopeFilter = serviceIds.length > 0
-      ? `service_id.in.(${serviceIds.join(',')}),assigned_collaborator_id.eq.${user.id}`
-      : `assigned_collaborator_id.eq.${user.id}`;
+      ? `service_id.in.(${serviceIds.join(',')}),assigned_collaborator_id.eq.${collaboratorId}`
+      : `assigned_collaborator_id.eq.${collaboratorId}`;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const admin = createAdminClient() as any;

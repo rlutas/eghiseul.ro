@@ -21,6 +21,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { requireCollaboratorForOrder } from '@/lib/admin/permissions';
+import { resolveCollaboratorContext } from '@/lib/admin/collaborator-context';
 import { downloadFile, uploadFile, fileExists, getDownloadUrl } from '@/lib/aws/s3';
 import { convertDocxToPdf } from '@/lib/documents/docx-to-pdf';
 
@@ -47,7 +48,11 @@ export async function GET(
     }
 
     try {
-      await requireCollaboratorForOrder(user.id, orderId);
+      const { collaboratorId } = await resolveCollaboratorContext(
+        user.id,
+        request.nextUrl.searchParams.get('as')
+      );
+      await requireCollaboratorForOrder(collaboratorId, orderId);
     } catch (error) {
       if (error instanceof Response) return error;
       throw error;

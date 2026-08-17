@@ -1,12 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { getUserPermissions, getCollaboratorServices } from '@/lib/admin/permissions';
+import { getCollaboratorServices } from '@/lib/admin/permissions';
+import { resolveCollaboratorContext } from '@/lib/admin/collaborator-context';
 
 /**
  * Lists orders for the services assigned to the authenticated collaborator.
- * Scoping is by service_id via collaborator_service_assignments. Only paid+
- * orders are relevant for fulfilment (drafts/unpaid are hidden).
+ * Scoping is by service_id via collaborator_service_assignments. Only PAID
+ * orders are relevant for fulfilment — drafts, coșuri abandonate și comenzile
+ * neplătite nu-l privesc pe colaborator (nu are ce lucra la ele).
+ *
+ * `?as=<collaboratorId>` = preview de admin (vezi collaborator-context.ts).
  */
 export async function GET(request: NextRequest) {
   try {
@@ -16,22 +20,26 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'Authentication required' }, { status: 401 });
     }
 
-    const { role } = await getUserPermissions(user.id);
-    if (role !== 'collaborator') {
-      return NextResponse.json({ success: false, error: 'Collaborator access required' }, { status: 403 });
+    const { searchParams } = new URL(request.url);
+
+    let collaboratorId: string;
+    try {
+      ({ collaboratorId } = await resolveCollaboratorContext(user.id, searchParams.get('as')));
+    } catch (e) {
+      if (e instanceof Response) return e;
+      throw e;
     }
 
-    const serviceIds = await getCollaboratorServices(user.id);
+    const serviceIds = await getCollaboratorServices(collaboratorId);
 
-    const { searchParams } = new URL(request.url);
     const status = searchParams.get('status');
 
     // Scope: orders of the collaborator's services OR orders sent to them
     // explicitly from admin (assigned_collaborator_id — e.g. identificare
     // orders the internal team couldn't solve).
     const scopeFilter = serviceIds.length > 0
-      ? `service_id.in.(${serviceIds.join(',')}),assigned_collaborator_id.eq.${user.id}`
-      : `assigned_collaborator_id.eq.${user.id}`;
+      ? `service_id.in.(${serviceIds.join(',')}),assigned_collaborator_id.eq.${collaboratorId}`
+      : `assigned_collaborator_id.eq.${collaboratorId}`;
 
     const admin = createAdminClient();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -39,7 +47,8 @@ export async function GET(request: NextRequest) {
       .from('orders')
       .select('id, friendly_order_id, status, created_at, service_id, customer_data, services:service_id(name, slug)')
       .or(scopeFilter)
-      .neq('status', 'draft')
+      // Doar comenzi plătite: draft/pending/abandoned = coșuri neplătite, nu lucrări.
+      .eq('payment_status', 'paid')
       .order('created_at', { ascending: false })
       .limit(200);
 

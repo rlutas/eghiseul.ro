@@ -177,6 +177,8 @@ The `employee` role has been replaced by specialized roles. See [Workflow Design
 | Settings | `/admin/settings` | `settings.manage` | Implemented |
 | Invite Accept | `/admin/invite/accept` | Public (token-based) | Implemented |
 | Tarife ANCPI (referință Ordin 16/2019, taxe + urgență) | `/admin/tarife-ancpi` | `orders.view` | Implemented (2026-07-14; aceeași listă la `/colaborator/tarife`) |
+| Colaboratori (comenzi + onorarii, tab avocat) | `/admin/colaboratori` | `orders.view` | Implemented |
+| Previzualizare portal colaborator (`/colaborator/*?as=<id>`, read-only) | buton în `/admin/colaboratori` | `users.manage` | Implemented (2026-08-17) |
 
 ---
 

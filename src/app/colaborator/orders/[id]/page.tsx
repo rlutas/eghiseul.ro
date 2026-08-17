@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import { ArrowLeft, Upload, CheckCircle2, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { findStatusLabel } from '@/lib/admin/status-options';
+import { usePreviewAs, withPreview } from '@/lib/collaborator/preview';
 
 interface OrderDoc {
   id: string;
@@ -44,6 +45,8 @@ function Field({ label, value }: { label: string; value?: string | null }) {
 export default function CollaboratorOrderDetail() {
   const params = useParams<{ id: string }>();
   const orderId = params.id;
+  const previewAs = usePreviewAs();
+  const readOnly = !!previewAs; // preview de admin: fără acțiuni de lucru
   const [order, setOrder] = useState<OrderDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
@@ -52,7 +55,7 @@ export default function CollaboratorOrderDetail() {
   const fileRef = useRef<HTMLInputElement>(null);
 
   const load = async () => {
-    const res = await fetch(`/api/collaborator/orders/${orderId}`);
+    const res = await fetch(withPreview(`/api/collaborator/orders/${orderId}`, previewAs));
     const json = await res.json();
     if (json.success) setOrder(json.data);
     else toast.error(json.error || 'Eroare la încărcare');
@@ -63,7 +66,7 @@ export default function CollaboratorOrderDetail() {
   const downloadOriginal = async (docId: string) => {
     try {
       const res = await fetch(
-        `/api/collaborator/orders/${orderId}/document?docId=${docId}&format=docx`
+        withPreview(`/api/collaborator/orders/${orderId}/document?docId=${docId}&format=docx`, previewAs)
       );
       const json = await res.json();
       if (!json.success) throw new Error(json.error);
@@ -74,9 +77,11 @@ export default function CollaboratorOrderDetail() {
   };
 
   useEffect(() => {
+    // Așteaptă citirea `?as=` din URL înainte de fetch (altfel adminul ar primi 403).
+    if (typeof window !== 'undefined' && !previewAs && window.location.search.includes('as=')) return;
     load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [orderId]);
+  }, [orderId, previewAs]);
 
   const handleUpload = async (file: File) => {
     setUploading(true);
@@ -130,7 +135,7 @@ export default function CollaboratorOrderDetail() {
 
   return (
     <div className="mx-auto max-w-3xl">
-      <Link href="/colaborator/orders" className="mb-4 inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-800">
+      <Link href={withPreview('/colaborator/orders', previewAs)} className="mb-4 inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-800">
         <ArrowLeft className="h-4 w-4" /> Înapoi la comenzi
       </Link>
 
@@ -185,7 +190,7 @@ export default function CollaboratorOrderDetail() {
                 <FileText className="h-4 w-4 text-slate-400" />
                 <span className="flex-1">{d.file_name}</span>
                 <a
-                  href={`/api/collaborator/orders/${orderId}/document?docId=${d.id}`}
+                  href={withPreview(`/api/collaborator/orders/${orderId}/document?docId=${d.id}`, previewAs)}
                   target="_blank"
                   rel="noopener"
                   className="text-xs font-medium text-primary-700 hover:underline"
@@ -244,6 +249,7 @@ export default function CollaboratorOrderDetail() {
       </div>
 
       {/* Note for the team */}
+      {!readOnly && (
       <div className="mb-6 rounded-lg border border-slate-200 bg-white p-5">
         <h2 className="mb-2 text-sm font-semibold text-slate-900">Notă pentru echipă</h2>
         <p className="mb-3 text-xs text-slate-500">Ex: nr. înregistrare, observații, dacă lipsește ceva. Apare în istoricul comenzii în admin.</p>
@@ -260,8 +266,10 @@ export default function CollaboratorOrderDetail() {
           </Button>
         </div>
       </div>
+      )}
 
       {/* Actions — one step: upload = deliver (docs visible + status + email) */}
+      {!readOnly && (
       <div className="flex flex-wrap items-center gap-3">
         <input
           ref={fileRef}
@@ -282,7 +290,8 @@ export default function CollaboratorOrderDetail() {
               : 'Încarcă PDF și trimite clientului'}
         </Button>
       </div>
-      {!hasDocs && !delivered && (
+      )}
+      {!readOnly && !hasDocs && !delivered && (
         <p className="mt-2 text-xs text-slate-400">
           La încărcare, documentul se trimite automat clientului și statusul comenzii se actualizează.
         </p>

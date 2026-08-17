@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { requireCollaboratorForOrder } from '@/lib/admin/permissions';
+import { resolveCollaboratorContext } from '@/lib/admin/collaborator-context';
 
 /**
  * Single order detail for the collaborator: customer + property data needed to
@@ -21,8 +22,13 @@ export async function GET(
       return NextResponse.json({ success: false, error: 'Authentication required' }, { status: 401 });
     }
 
+    let collaboratorId: string;
     try {
-      await requireCollaboratorForOrder(user.id, orderId);
+      ({ collaboratorId } = await resolveCollaboratorContext(
+        user.id,
+        request.nextUrl.searchParams.get('as')
+      ));
+      await requireCollaboratorForOrder(collaboratorId, orderId);
     } catch (error) {
       if (error instanceof Response) return error;
       throw error;
@@ -32,11 +38,17 @@ export async function GET(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: order, error } = await (admin as any)
       .from('orders')
-      .select('id, friendly_order_id, status, created_at, service_id, customer_data, selected_options, services:service_id(name, slug, processing_config)')
+      .select('id, friendly_order_id, status, payment_status, created_at, service_id, customer_data, selected_options, services:service_id(name, slug, processing_config)')
       .eq('id', orderId)
       .single();
 
     if (error || !order) {
+      return NextResponse.json({ success: false, error: 'Comanda nu a fost găsită' }, { status: 404 });
+    }
+
+    // Coșurile neplătite (draft/pending/abandonate) nu sunt lucrări: nici prin
+    // link direct nu trebuie să ajungă la colaborator.
+    if (order.payment_status !== 'paid') {
       return NextResponse.json({ success: false, error: 'Comanda nu a fost găsită' }, { status: 404 });
     }
 

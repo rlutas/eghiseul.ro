@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { usePreviewAs, withPreview } from '@/lib/collaborator/preview';
 import Link from 'next/link';
 import { Wallet, ClipboardList } from 'lucide-react';
 import { findStatusLabel } from '@/lib/admin/status-options';
@@ -42,6 +43,7 @@ function monthOptions(): { value: string; label: string }[] {
 }
 
 export default function CollaboratorDecontPage() {
+  const previewAs = usePreviewAs();
   const months = useMemo(monthOptions, []);
   const [month, setMonth] = useState(months[0]!.value);
   const [data, setData] = useState<EarningsData | null>(null);
@@ -49,11 +51,12 @@ export default function CollaboratorDecontPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (typeof window !== 'undefined' && !previewAs && window.location.search.includes('as=')) return;
     setLoading(true);
     setError(null);
     (async () => {
       try {
-        const res = await fetch(`/api/collaborator/earnings?month=${month}`);
+        const res = await fetch(withPreview(`/api/collaborator/earnings?month=${month}`, previewAs));
         const json = await res.json();
         if (!json.success) throw new Error(json.error || 'Eroare');
         setData(json.data);
@@ -63,7 +66,7 @@ export default function CollaboratorDecontPage() {
         setLoading(false);
       }
     })();
-  }, [month]);
+  }, [month, previewAs]);
 
   const summary = data?.summary ?? { count: 0, totalFees: 0, totalCollected: 0 };
 

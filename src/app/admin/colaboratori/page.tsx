@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { Download, Users, ClipboardList, Wallet, Receipt, ListChecks } from 'lucide-react';
+import { Download, Users, ClipboardList, Wallet, Receipt, ListChecks, Eye } from 'lucide-react';
 import { useAdminPermissions } from '@/hooks/use-admin-permissions';
 import { findStatusLabel } from '@/lib/admin/status-options';
 
@@ -370,9 +370,21 @@ export default function CollaboratorsAdminPage() {
                 {months.map((m) => <option key={m.value} value={m.value}>{m.label}</option>)}
               </select>
             </div>
+            {/* Preview: portalul colaboratorului, exact cum îl vede el (read-only). */}
+            {hasPermission('users.manage') && selectedId && (
+              <a
+                href={`/colaborator/orders?as=${selectedId}`}
+                target="_blank"
+                rel="noopener"
+                className="ml-auto inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                title="Deschide portalul colaboratorului în modul previzualizare (doar citire)"
+              >
+                <Eye className="h-4 w-4" /> Vezi ce vede colaboratorul
+              </a>
+            )}
             <a
               href={exportUrl}
-              className="ml-auto inline-flex items-center gap-2 rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800"
+              className={`inline-flex items-center gap-2 rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800${hasPermission('users.manage') ? '' : ' ml-auto'}`}
             >
               <Download className="h-4 w-4" /> Export CSV/TSV
             </a>

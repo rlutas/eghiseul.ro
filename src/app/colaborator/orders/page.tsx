@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { findStatusLabel } from '@/lib/admin/status-options';
+import { usePreviewAs, withPreview } from '@/lib/collaborator/preview';
 
 interface CollabOrder {
   id: string;
@@ -21,14 +22,17 @@ function propertyLocation(o: CollabOrder): string {
 }
 
 export default function CollaboratorOrdersPage() {
+  const previewAs = usePreviewAs();
   const [orders, setOrders] = useState<CollabOrder[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // Așteaptă citirea `?as=` din URL înainte de fetch (altfel adminul ar primi 403).
+    if (typeof window !== 'undefined' && !previewAs && window.location.search.includes('as=')) return;
     (async () => {
       try {
-        const res = await fetch('/api/collaborator/orders');
+        const res = await fetch(withPreview('/api/collaborator/orders', previewAs));
         const json = await res.json();
         if (!json.success) throw new Error(json.error || 'Eroare');
         setOrders(json.data);
@@ -38,7 +42,7 @@ export default function CollaboratorOrdersPage() {
         setLoading(false);
       }
     })();
-  }, []);
+  }, [previewAs]);
 
   return (
     <div className="mx-auto max-w-5xl">
@@ -70,7 +74,7 @@ export default function CollaboratorOrdersPage() {
               {orders.map((o) => (
                 <tr key={o.id} className="hover:bg-slate-50">
                   <td className="px-4 py-3">
-                    <Link href={`/colaborator/orders/${o.id}`} className="font-medium text-primary-700 hover:underline">
+                    <Link href={withPreview(`/colaborator/orders/${o.id}`, previewAs)} className="font-medium text-primary-700 hover:underline">
                       {o.friendly_order_id || o.id.slice(0, 8)}
                     </Link>
                   </td>

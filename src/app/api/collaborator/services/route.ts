@@ -1,14 +1,15 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { getUserPermissions, getCollaboratorServices } from '@/lib/admin/permissions';
+import { getCollaboratorServices } from '@/lib/admin/permissions';
+import { resolveCollaboratorContext } from '@/lib/admin/collaborator-context';
 
 /**
  * The collaborator's assigned services with the client price and THEIR
  * per-order fee (services.lawyer_fee_ron — the "Onorariu Topograf" line on the
  * invoice). Read-only info page data.
  */
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     const supabase = await createClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -16,12 +17,18 @@ export async function GET() {
       return NextResponse.json({ success: false, error: 'Authentication required' }, { status: 401 });
     }
 
-    const { role } = await getUserPermissions(user.id);
-    if (role !== 'collaborator') {
-      return NextResponse.json({ success: false, error: 'Collaborator access required' }, { status: 403 });
+    let collaboratorId: string;
+    try {
+      ({ collaboratorId } = await resolveCollaboratorContext(
+        user.id,
+        request.nextUrl.searchParams.get('as')
+      ));
+    } catch (e) {
+      if (e instanceof Response) return e;
+      throw e;
     }
 
-    const serviceIds = await getCollaboratorServices(user.id);
+    const serviceIds = await getCollaboratorServices(collaboratorId);
     if (serviceIds.length === 0) {
       return NextResponse.json({ success: true, data: [] });
     }

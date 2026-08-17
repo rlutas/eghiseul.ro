@@ -5,28 +5,40 @@ import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { Toaster } from '@/components/ui/sonner';
-import { ClipboardList, Coins, Layers, LogOut, Menu, Wallet, X } from 'lucide-react';
+import { ClipboardList, Coins, Eye, Layers, LogOut, Menu, Wallet, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { usePreviewAs, withPreview } from '@/lib/collaborator/preview';
 
 interface CollabUser {
   email: string;
   name: string;
 }
 
+const ADMIN_ROLES = ['super_admin', 'manager', 'operator', 'contabil', 'avocat', 'employee'];
+
 /**
  * Portal for collaborators (e.g. authorized topographs). Strictly gated to
  * role === 'collaborator'. Collaborators do NOT have access to /admin; this is
  * their separate, minimal workspace for the orders of their assigned services.
+ *
+ * Excepție: `?as=<collaboratorId>` = PREVIEW pentru admin — vede portalul cu
+ * ochii colaboratorului, read-only (API-ul cere `users.manage`, iar acțiunile
+ * de lucru sunt ascunse).
  */
 export default function CollaboratorLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
+  const previewAs = usePreviewAs();
   const [user, setUser] = useState<CollabUser | null>(null);
   const [loading, setLoading] = useState(true);
+  const [preview, setPreview] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
+    // Așteaptă citirea query-ului (usePreviewAs rulează într-un effect).
+    if (typeof window !== 'undefined' && !previewAs && window.location.search.includes('as=')) return;
+
     const checkAuth = async () => {
       try {
         const supabase = createClient();
@@ -41,16 +53,33 @@ export default function CollaboratorLayout({ children }: { children: React.React
           .eq('id', authUser.id)
           .single();
 
-        if (!profile || profile.role !== 'collaborator') {
+        const isPreview = !!previewAs && ADMIN_ROLES.includes(profile?.role ?? '');
+
+        if (!profile || (profile.role !== 'collaborator' && !isPreview)) {
           // Admins who land here (stale link) belong in /admin, not on the homepage.
-          const adminRoles = ['super_admin', 'manager', 'operator', 'contabil', 'avocat', 'employee'];
-          router.replace(adminRoles.includes(profile?.role ?? '') ? '/admin' : '/');
+          router.replace(ADMIN_ROLES.includes(profile?.role ?? '') ? '/admin' : '/');
           return;
         }
-        setUser({
-          email: profile.email || authUser.email || '',
-          name: [profile.first_name, profile.last_name].filter(Boolean).join(' ') || profile.email || '',
-        });
+
+        if (isPreview) {
+          // Numele colaboratorului previzualizat (endpoint de admin).
+          let name = 'Colaborator';
+          try {
+            const res = await fetch('/api/admin/collaborators');
+            const json = await res.json();
+            if (json.success) {
+              const target = (json.data as { id: string; name: string }[]).find((c) => c.id === previewAs);
+              if (target?.name) name = target.name;
+            }
+          } catch { /* banner-ul merge și fără nume */ }
+          setPreview(true);
+          setUser({ email: '', name });
+        } else {
+          setUser({
+            email: profile.email || authUser.email || '',
+            name: [profile.first_name, profile.last_name].filter(Boolean).join(' ') || profile.email || '',
+          });
+        }
       } catch {
         router.replace('/auth/login?redirect=/colaborator');
       } finally {
@@ -58,7 +87,7 @@ export default function CollaboratorLayout({ children }: { children: React.React
       }
     };
     checkAuth();
-  }, [router]);
+  }, [router, previewAs]);
 
   const handleLogout = async () => {
     const supabase = createClient();
@@ -92,7 +121,7 @@ export default function CollaboratorLayout({ children }: { children: React.React
         )}
       >
         <div className="flex h-16 items-center justify-between border-b border-slate-800 px-4">
-          <Link href="/colaborator/orders" className="flex items-center gap-2">
+          <Link href={withPreview("/colaborator/orders", previewAs)} className="flex items-center gap-2">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-500 text-sm font-bold text-secondary-900">
               eG
             </div>
@@ -105,7 +134,7 @@ export default function CollaboratorLayout({ children }: { children: React.React
 
         <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
           <Link
-            href="/colaborator/orders"
+            href={withPreview("/colaborator/orders", previewAs)}
             onClick={() => setSidebarOpen(false)}
             className={cn(
               'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
@@ -118,7 +147,7 @@ export default function CollaboratorLayout({ children }: { children: React.React
             Comenzi
           </Link>
           <Link
-            href="/colaborator/decont"
+            href={withPreview("/colaborator/decont", previewAs)}
             onClick={() => setSidebarOpen(false)}
             className={cn(
               'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
@@ -131,7 +160,7 @@ export default function CollaboratorLayout({ children }: { children: React.React
             Decont lunar
           </Link>
           <Link
-            href="/colaborator/servicii"
+            href={withPreview("/colaborator/servicii", previewAs)}
             onClick={() => setSidebarOpen(false)}
             className={cn(
               'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
@@ -144,7 +173,7 @@ export default function CollaboratorLayout({ children }: { children: React.React
             Serviciile mele
           </Link>
           <Link
-            href="/colaborator/tarife"
+            href={withPreview("/colaborator/tarife", previewAs)}
             onClick={() => setSidebarOpen(false)}
             className={cn(
               'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
@@ -165,20 +194,42 @@ export default function CollaboratorLayout({ children }: { children: React.React
             </div>
             <div className="flex-1 min-w-0">
               <p className="truncate text-sm font-medium text-slate-100">{user.name}</p>
-              <p className="text-xs text-slate-400">Colaborator</p>
+              <p className="text-xs text-slate-400">{preview ? 'Previzualizare' : 'Colaborator'}</p>
             </div>
           </div>
-          <button
-            onClick={handleLogout}
-            className="mt-1 flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-400 transition-colors hover:bg-slate-800/50 hover:text-white"
-          >
-            <LogOut className="h-5 w-5" />
-            Deconectare
-          </button>
+          {preview ? (
+            <Link
+              href="/admin/colaboratori"
+              className="mt-1 flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-400 transition-colors hover:bg-slate-800/50 hover:text-white"
+            >
+              <LogOut className="h-5 w-5" />
+              Înapoi în admin
+            </Link>
+          ) : (
+            <button
+              onClick={handleLogout}
+              className="mt-1 flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-400 transition-colors hover:bg-slate-800/50 hover:text-white"
+            >
+              <LogOut className="h-5 w-5" />
+              Deconectare
+            </button>
+          )}
         </div>
       </aside>
 
       <div className="flex flex-1 flex-col overflow-hidden">
+        {preview && (
+          <div className="flex flex-wrap items-center gap-2 border-b border-amber-300 bg-amber-100 px-4 py-2 text-sm text-amber-900">
+            <Eye className="h-4 w-4 shrink-0" />
+            <span>
+              Previzualizare: vezi portalul lui <strong>{user.name}</strong> exact cum îl vede el.
+              Doar citire — nu poți încărca documente sau trimite comanda în locul lui.
+            </span>
+            <Link href="/admin/colaboratori" className="ml-auto font-medium underline underline-offset-2">
+              Ieși din previzualizare
+            </Link>
+          </div>
+        )}
         <header className="flex h-16 items-center border-b bg-white px-4 lg:hidden">
           <Button variant="ghost" size="icon" onClick={() => setSidebarOpen(true)}>
             <Menu className="h-5 w-5" />
