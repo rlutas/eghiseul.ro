@@ -21,6 +21,7 @@ import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { Skeleton } from '@/components/ui/skeleton';
+import { COUNTIES } from '@/lib/data/romania-counties';
 import {
   Dialog,
   DialogContent,
@@ -1532,6 +1533,10 @@ function CouriersTab() {
   const [dropoff, setDropoff] = useState<SamedayDropoff>({ enabled: false, oohId: '', name: '' });
   const [lockers, setLockers] = useState<{ id: string; name: string; address: string; city: string }[]>([]);
   const [lockersLoading, setLockersLoading] = useState(false);
+  // Județul din care listăm easybox-urile. Pornește de la adresa expeditorului,
+  // dar e independent: adresa poate fi necompletată, lista tot trebuie să meargă.
+  const [lockerCounty, setLockerCounty] = useState('Satu Mare');
+  const [senderPrefilled, setSenderPrefilled] = useState(false);
   const [savingDropoff, setSavingDropoff] = useState(false);
   const [senderAddress, setSenderAddress] = useState<SenderAddress>({
     company: '',
@@ -1551,9 +1556,16 @@ function CouriersTab() {
       const res = await fetch('/api/admin/settings');
       const json = await res.json();
       if (json.success) {
-        if (json.data?.sender_address) {
-          setSenderAddress({ ...senderAddressDefaults(), ...json.data.sender_address });
+        const company = json.data?.company_data as CompanyDataForSender | undefined;
+        const defaults = senderAddressDefaults(company);
+        // Câmpurile goale din DB cad pe precompletarea din datele firmei.
+        const saved = (json.data?.sender_address || {}) as Partial<SenderAddress>;
+        const merged = { ...defaults };
+        for (const [k, v] of Object.entries(saved)) {
+          if (v) (merged as Record<string, string>)[k] = String(v);
         }
+        setSenderAddress(merged);
+        if (!json.data?.sender_address) setSenderPrefilled(true);
         if (json.data?.sameday_dropoff) {
           const d = json.data.sameday_dropoff as Partial<SamedayDropoff>;
           setDropoff({ enabled: !!d.enabled, oohId: d.oohId ? String(d.oohId) : '', name: d.name || '' });
@@ -1590,9 +1602,14 @@ function CouriersTab() {
     }
   }, []);
 
+  // Adresa expeditorului dictează județul implicit, o singură dată (după load).
   useEffect(() => {
-    if (senderAddress.county) void loadLockers(senderAddress.county);
-  }, [senderAddress.county, loadLockers]);
+    if (senderAddress.county) setLockerCounty(senderAddress.county);
+  }, [senderAddress.county]);
+
+  useEffect(() => {
+    void loadLockers(lockerCounty);
+  }, [lockerCounty, loadLockers]);
 
   const saveDropoff = async (next: SamedayDropoff) => {
     setSavingDropoff(true);
@@ -1630,6 +1647,7 @@ function CouriersTab() {
       });
       const json = await res.json();
       if (json.success) {
+        setSenderPrefilled(false);
         toast.success('Adresa de expediere a fost salvata');
       } else {
         toast.error(json.error || 'Eroare la salvare');
@@ -1738,8 +1756,22 @@ function CouriersTab() {
           </div>
 
           <div className="space-y-1.5">
+            <Label htmlFor="dropoff-county">Judet</Label>
+            <select
+              id="dropoff-county"
+              value={lockerCounty}
+              onChange={(e) => setLockerCounty(e.target.value)}
+              className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm"
+            >
+              {COUNTIES.map((c) => (
+                <option key={c.code} value={c.name}>{c.name}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="space-y-1.5">
             <Label htmlFor="dropoff-locker">
-              Easybox unde predam ({senderAddress.county || 'judetul expeditorului'})
+              Easybox unde predam ({lockersLoading ? 'se incarca...' : `${lockers.length} disponibile`})
             </Label>
             <select
               id="dropoff-locker"
@@ -1778,6 +1810,12 @@ function CouriersTab() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          {senderPrefilled && (
+            <p className="rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-800">
+              Adresa nu era salvata &mdash; am precompletat-o din datele firmei. Verific-o si apasa
+              &bdquo;Salveaza&rdquo;.
+            </p>
+          )}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <Label htmlFor="sender-company">Firma</Label>
@@ -3721,18 +3759,51 @@ function maskEnv(value: string | undefined): string {
   return value.substring(0, 4) + '****';
 }
 
-function senderAddressDefaults(): SenderAddress {
+/**
+ * Adresa de expediere e goală în DB la majoritatea instalărilor, iar un formular
+ * gol nu ajută pe nimeni: precompletăm din datele firmei (tabul „Firmă") și din
+ * datele publice de contact. Rămân toate editabile.
+ */
+function senderAddressDefaults(company?: CompanyDataForSender): SenderAddress {
+  const parsed = parseCompanyAddress(company?.address || '');
   return {
-    company: '',
-    contact: '',
-    phone: '',
-    email: '',
-    street: '',
-    streetNo: '',
-    city: '',
-    county: '',
+    company: company?.name || 'EDIGITALIZARE SRL',
+    contact: 'eGhiseul.ro',
+    phone: company?.phone || '0757708181',
+    email: company?.email || 'contact@eghiseul.ro',
+    street: parsed.street,
+    streetNo: parsed.streetNo,
+    city: parsed.city,
+    county: parsed.county,
     postalCode: '',
   };
+}
+
+interface CompanyDataForSender {
+  name?: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+}
+
+/**
+ * Sparge adresa firmei („Jud. Satu Mare, com. Odoreu, str. Salcamilor, Nr. 2")
+ * în câmpurile cerute de curieri. Best-effort — omul verifică oricum înainte
+ * de salvare.
+ */
+function parseCompanyAddress(address: string): {
+  street: string; streetNo: string; city: string; county: string;
+} {
+  const out = { street: '', streetNo: '', city: '', county: '' };
+  if (!address) return out;
+  for (const raw of address.split(',')) {
+    const part = raw.trim();
+    if (/^jud\.?/i.test(part)) out.county = part.replace(/^jud\.?\s*/i, '').trim();
+    else if (/^(com|mun|ors|oras|sat)\.?/i.test(part)) out.city = part.replace(/^(com|mun|ors|oras|sat)\.?\s*/i, '').trim();
+    else if (/^(str|bd|blvd|calea|ale?e?a)\.?/i.test(part)) out.street = part.replace(/^(str|bd|blvd)\.?\s*/i, '').trim();
+    else if (/^nr\.?/i.test(part)) out.streetNo = part.replace(/^nr\.?\s*/i, '').trim();
+  }
+  return out;
 }
 
 function bankDetailsDefaults(): BankDetails {

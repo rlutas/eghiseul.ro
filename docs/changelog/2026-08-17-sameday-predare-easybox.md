@@ -50,3 +50,21 @@ preț mai mic**. Dacă economia e reală, vine din contract (ridicarea de la sed
 - [ ] Alege easybox-ul de predare din Setări → Curieri (Satu Mare: `1012` OMV Coandă, `308` MOL Satu Mare)
 - [ ] La primul AWB emis cu setarea activă, verifică pe eticheta Sameday că apare predarea în easybox
 - [ ] Verifică pe factura următoare dacă dispare/scade linia de ridicare
+
+## Fix la scurt timp după livrare (aceeași zi)
+
+Lista de easybox-uri apărea goală. Cauza: selectorul se alimenta din județul din
+**Adresa expeditor**, iar cheia `sender_address` nu exista deloc în `admin_settings` (nu fusese
+salvată niciodată) → județ gol → lista nu se încărca.
+
+Reparat:
+- selectorul de easybox are propriul selector de **județ** (implicit Satu Mare, sincronizat cu
+  adresa expeditorului dacă e completată) — nu mai depinde de o setare nesalvată;
+- **Adresa expeditor se precompletează** din `company_data` (EDIGITALIZARE SRL, contact@eghiseul.ro,
+  telefonul public 0757708181, adresa spartă în stradă/număr/localitate/județ) când nu există
+  nimic salvat, cu o notă galbenă „verifică și salvează".
+
+⚠️ De reținut: la Sameday, adresa de ridicare NU e cea din setări, ci punctul de ridicare din contul
+lor (`pickupPoint` 476043 = C. Brâncoveanu 18, Satu Mare). Adresa din setări e folosită de restul
+fluxurilor de curierat. Cele trei adrese ale firmei (sediu Odoreu, pickup Sameday Satu Mare, cea
+hardcodată în `generate-awb`) sunt diferite — de aliniat separat, dacă deranjează.
