@@ -846,6 +846,14 @@ export class SamedayProvider implements CourierProvider {
         awbRequest.oohType = isLocker ? 0 : 1;
       }
 
+      // Primul kilometru Out-Of-Home: predăm noi plicul în easybox, deci
+      // curierul nu mai vine să-l ridice de la birou. `pickupPoint` rămâne
+      // OBLIGATORIU chiar și așa (Sameday întoarce 400 fără el — verificat
+      // live 2026-08-17), e doar adresa de client din cont.
+      if (request.dropoffLockerId) {
+        awbRequest.oohFirstMile = String(request.dropoffLockerId);
+      }
+
       const data = await this.apiRequest<{
         awbNumber: string;
         awbCost: number;

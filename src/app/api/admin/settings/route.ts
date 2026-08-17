@@ -120,6 +120,8 @@ export async function PATCH(request: NextRequest) {
       'civil_status_term_tiers',
       'translation_price_list',
       'suppliers',
+      // Predarea coletelor Sameday în easybox (primul kilometru OOH).
+      'sameday_dropoff',
     ];
 
     if (!ALLOWED_KEYS.includes(key)) {

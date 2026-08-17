@@ -1518,9 +1518,21 @@ function SupplierTariffsCard() {
 // COURIERS TAB
 // ══════════════════════════════════════════════════════════════
 
+interface SamedayDropoff {
+  enabled: boolean;
+  oohId: string;
+  name: string;
+}
+
 function CouriersTab() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  // Predare colete în easybox (primul kilometru) — noi ducem plicul la locker,
+  // curierul nu mai vine să-l ridice. Nu are legătură cu livrarea aleasă de client.
+  const [dropoff, setDropoff] = useState<SamedayDropoff>({ enabled: false, oohId: '', name: '' });
+  const [lockers, setLockers] = useState<{ id: string; name: string; address: string; city: string }[]>([]);
+  const [lockersLoading, setLockersLoading] = useState(false);
+  const [savingDropoff, setSavingDropoff] = useState(false);
   const [senderAddress, setSenderAddress] = useState<SenderAddress>({
     company: '',
     contact: '',
@@ -1542,6 +1554,10 @@ function CouriersTab() {
         if (json.data?.sender_address) {
           setSenderAddress({ ...senderAddressDefaults(), ...json.data.sender_address });
         }
+        if (json.data?.sameday_dropoff) {
+          const d = json.data.sameday_dropoff as Partial<SamedayDropoff>;
+          setDropoff({ enabled: !!d.enabled, oohId: d.oohId ? String(d.oohId) : '', name: d.name || '' });
+        }
       }
     } catch {
       toast.error('Eroare la incarcarea setarilor');
@@ -1553,6 +1569,56 @@ function CouriersTab() {
   useEffect(() => {
     fetchSettings();
   }, [fetchSettings]);
+
+  /** Lista de easybox-uri din județul expeditorului, pentru alegerea locului de predare. */
+  const loadLockers = useCallback(async (county: string) => {
+    if (!county) return;
+    setLockersLoading(true);
+    try {
+      const res = await fetch(`/api/courier/pickup-points?provider=sameday&county=${encodeURIComponent(county)}`);
+      const json = await res.json();
+      if (json.success) {
+        setLockers(
+          (json.data as { id: string; name: string; address: string; city: string }[])
+            .map((p) => ({ id: p.id, name: p.name, address: p.address, city: p.city }))
+        );
+      }
+    } catch {
+      toast.error('Nu s-au putut incarca easybox-urile');
+    } finally {
+      setLockersLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (senderAddress.county) void loadLockers(senderAddress.county);
+  }, [senderAddress.county, loadLockers]);
+
+  const saveDropoff = async (next: SamedayDropoff) => {
+    setSavingDropoff(true);
+    try {
+      const res = await fetch('/api/admin/settings', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key: 'sameday_dropoff', value: next }),
+      });
+      const json = await res.json();
+      if (json.success) {
+        setDropoff(next);
+        toast.success(
+          next.enabled
+            ? `AWB-urile Sameday se emit cu predare la ${next.name || 'easybox-ul ales'}`
+            : 'Predarea in easybox a fost dezactivata (revine ridicarea de la sediu)'
+        );
+      } else {
+        toast.error(json.error || 'Eroare la salvare');
+      }
+    } catch {
+      toast.error('Eroare de retea');
+    } finally {
+      setSavingDropoff(false);
+    }
+  };
 
   const saveSenderAddress = async () => {
     setSaving(true);
@@ -1642,6 +1708,64 @@ function CouriersTab() {
           >
             Test conexiune
           </Button>
+        </CardContent>
+      </Card>
+
+      {/* Predare colete in easybox (primul kilometru Sameday) */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Predare colete Sameday (easybox)</CardTitle>
+          <CardDescription>
+            Ducem noi plicul la easybox in loc sa vina curierul sa-l ridice de la sediu.
+            Nu schimba livrarea aleasa de client &mdash; el primeste tot acasa sau in easybox, cum a ales.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center justify-between rounded-lg border p-3">
+            <div>
+              <p className="text-sm font-medium">Predare in easybox</p>
+              <p className="text-xs text-muted-foreground">
+                {dropoff.enabled
+                  ? `Activ: ${dropoff.name || dropoff.oohId}`
+                  : 'Inactiv — AWB-urile se emit cu ridicare de la sediu'}
+              </p>
+            </div>
+            <Switch
+              checked={dropoff.enabled}
+              disabled={savingDropoff || (!dropoff.oohId && !dropoff.enabled)}
+              onCheckedChange={(checked) => saveDropoff({ ...dropoff, enabled: checked })}
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="dropoff-locker">
+              Easybox unde predam ({senderAddress.county || 'judetul expeditorului'})
+            </Label>
+            <select
+              id="dropoff-locker"
+              value={dropoff.oohId}
+              disabled={lockersLoading || savingDropoff}
+              onChange={(e) => {
+                const picked = lockers.find((l) => l.id === e.target.value);
+                void saveDropoff({
+                  enabled: dropoff.enabled,
+                  oohId: e.target.value,
+                  name: picked ? `${picked.name} (${picked.city})` : '',
+                });
+              }}
+              className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm"
+            >
+              <option value="">{lockersLoading ? 'Se incarca...' : 'Alege easybox-ul'}</option>
+              {lockers.map((l) => (
+                <option key={l.id} value={l.id}>
+                  {l.name} &mdash; {l.address}, {l.city}
+                </option>
+              ))}
+            </select>
+            <p className="text-xs text-muted-foreground">
+              Se aplica doar la AWB-urile Sameday. Fan Courier nu are echivalent in API.
+            </p>
+          </div>
         </CardContent>
       </Card>
 

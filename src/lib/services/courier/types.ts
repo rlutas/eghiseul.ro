@@ -85,6 +85,13 @@ export interface ShipmentRequest {
   // Locker delivery
   lockerId?: string; // Service point ID for locker/EasyBox/FANbox delivery
 
+  /**
+   * Primul kilometru: predăm NOI coletul într-un locker, în loc să vină
+   * curierul să-l ridice de la birou. Sameday: `oohFirstMile` (ID easybox).
+   * Independent de `lockerId` — clientul poate primi acasă sau tot în locker.
+   */
+  dropoffLockerId?: string;
+
   // Additional options
   saturdayDelivery?: boolean;
   openAtDelivery?: boolean;

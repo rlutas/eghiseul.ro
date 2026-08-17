@@ -26,6 +26,7 @@ import {
   SenderAddress,
   Package,
 } from '@/lib/services/courier';
+import { getSamedayDropoff } from '@/lib/admin/sameday-dropoff';
 
 interface ShipRequestBody {
   provider: CourierCode;
@@ -99,6 +100,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Predare în easybox (primul kilometru), dacă e activată în setări —
+    // doar Sameday o suportă (`oohFirstMile`).
+    const dropoff = body.provider === 'sameday' ? await getSamedayDropoff() : null;
+
     // Build shipment request
     const shipmentRequest: ShipmentRequest = {
       sender: body.sender,
@@ -109,6 +114,7 @@ export async function POST(request: NextRequest) {
       paymentBy: body.paymentBy || 'sender',
       cod: body.cod,
       lockerId: body.lockerId,
+      dropoffLockerId: dropoff?.oohId,
       notes: body.notes,
       openAtDelivery: body.openAtDelivery,
       returnOnFail: body.returnOnFail,

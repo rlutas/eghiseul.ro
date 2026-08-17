@@ -66,6 +66,34 @@ Auth → geolocation/county → city → pickup-points → estimate-cost. Confir
 ## Monitoring (implementat)
 - La creare AWB (`api/courier/ship`): compară `result.priceWithVAT` (cost real curier) cu `orders.delivery_price` (încasat). Dacă real − încasat > 1 RON → `console.warn [Courier cost mismatch]` (audit „nu pierdem bani").
 
+## Predare în easybox (primul kilometru) — `oohFirstMile`
+
+Implicit, AWB-ul iese cu **ridicare de la sediu** (`pickupPoint` = punctul din cont, „Pickup ONB
+RO49278701", Satu Mare). Dacă vrem să ducem noi plicul la un easybox, AWB-ul trebuie emis cu
+`oohFirstMile` = ID-ul easybox-ului (`oohId` din `ooh-locations`).
+
+Setare: **Admin → Setări → Curieri → „Predare colete Sameday (easybox)"** (cheia `sameday_dropoff`
+în `admin_settings`). Când e activă, TOATE AWB-urile Sameday primesc `oohFirstMile`, indiferent
+dacă livrarea aleasă de client e acasă (service 7) sau în easybox (service 15 + `oohLastMile`).
+Cod: `src/lib/admin/sameday-dropoff.ts` + `sameday.ts` (`createAWB`).
+
+Verificat live pe `api.sameday.ro` (2026-08-17), `POST /api/awb/estimate-cost`:
+
+| Test | Rezultat |
+|---|---|
+| service 7 (acasă), fără `oohFirstMile` | 200 → 28,75 RON net |
+| service 7 (acasă), cu `oohFirstMile=1012` | 200 → **28,75 RON** (identic) |
+| orice payload **fără** `pickupPoint` | 400 „PickupPoint este invalid!" |
+| service 15 + `oohLastMile` (estimare) | 400 — limitarea deja cunoscută a estimării pe locker |
+
+⚠️ Două lucruri de reținut:
+1. `pickupPoint` rămâne **obligatoriu** chiar și cu predare în easybox — nu-l scoate din payload.
+2. Estimarea întoarce **același tarif** cu și fără predare în easybox. Dacă economia există, e în
+   contract (ridicarea de la sediu facturată separat), nu în tariful AWB-ului. De confirmat pe
+   prima factură după activare.
+
+Easybox-uri în Satu Mare: `1012` = easybox OMV Coandă, `308` = easybox MOL Satu Mare.
+
 ## Backlog
 - Preț real locker: estimate-cost cu service=15 + `oohLastMile` întoarce încă 400 (validare strictă Sameday, fără eroare pe câmp). Acum fallback `standard*0.85`. De reluat cu payload-ul exact din AWB locker reușit (după prima livrare locker reală).
 - Monitoring quote vs `awbCost` real la creare AWB.

@@ -22,6 +22,7 @@ import {
 } from '@/lib/services/courier';
 import { DEFAULT_DOCUMENT_PACKAGE, extractCourierProviderFromDeliveryMethod } from '@/lib/services/courier/utils';
 import { extractCourierQuote } from '@/lib/courier/quote-from-delivery';
+import { getSamedayDropoff } from '@/lib/admin/sameday-dropoff';
 
 // eGhiseul.ro company address (sender)
 const EGHISEUL_SENDER: SenderAddress = {
@@ -264,6 +265,10 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     const orderReference = (order.friendly_order_id || order.order_number || order.id) as string;
     const serviceName = (order.services as { name?: string } | null)?.name || '';
 
+    // Predare în easybox (primul kilometru): plicul îl ducem noi la locker,
+    // curierul nu mai vine la birou. Doar Sameday are `oohFirstMile`.
+    const dropoff = courierProviderCode === 'sameday' ? await getSamedayDropoff() : null;
+
     // 7. Build shipment request
     const shipmentRequest: ShipmentRequest = {
       sender: EGHISEUL_SENDER,
@@ -276,10 +281,12 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       service: courierService,
       paymentBy: 'sender',
       lockerId: courierQuote?.lockerId,
+      dropoffLockerId: dropoff?.oohId,
       orderReference,
-      notes: isLockerDelivery && courierQuote?.lockerName
-        ? `Locker: ${courierQuote.lockerName}`
-        : undefined,
+      notes: [
+        isLockerDelivery && courierQuote?.lockerName ? `Locker: ${courierQuote.lockerName}` : '',
+        dropoff ? `Predare: ${dropoff.name || dropoff.oohId}` : '',
+      ].filter(Boolean).join(' · ') || undefined,
     };
 
     // 8. Create shipment
