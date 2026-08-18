@@ -11,6 +11,11 @@ import {
 } from '@/lib/consent';
 
 const GA_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
+// Google Ads: eticheta de conversie a contului 677-995-5005. Se încarcă DOAR
+// cu consimțământ de marketing; conversia „Purchase" se declanșează din pagina
+// de succes a comenzii. Lipsea complet după migrarea de pe WordPress — contul
+// nu mai primea nicio conversie din iulie 2026.
+const ADS_ID = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID;
 
 // The success page already declares a narrower Window.gtag type — use a
 // local view instead of a conflicting global declaration.
@@ -35,16 +40,32 @@ function ensureGtagStub() {
   }
 }
 
-let gaLoaded = false;
-function loadGa() {
-  if (!GA_ID || gaLoaded) return;
-  gaLoaded = true;
+let gtagScriptLoaded = false;
+/** Injectează gtag.js o singură dată, indiferent care etichetă îl cere prima. */
+function loadGtagScript(firstId: string) {
+  if (gtagScriptLoaded) return;
+  gtagScriptLoaded = true;
   const s = document.createElement('script');
   s.async = true;
-  s.src = `https://www.googletagmanager.com/gtag/js?id=${GA_ID}`;
+  s.src = `https://www.googletagmanager.com/gtag/js?id=${firstId}`;
   document.head.appendChild(s);
   win().gtag!('js', new Date());
+}
+
+let gaConfigured = false;
+function loadGa() {
+  if (!GA_ID || gaConfigured) return;
+  gaConfigured = true;
+  loadGtagScript(GA_ID);
   win().gtag!('config', GA_ID);
+}
+
+let adsConfigured = false;
+function loadAds() {
+  if (!ADS_ID || adsConfigured) return;
+  adsConfigured = true;
+  loadGtagScript(ADS_ID);
+  win().gtag!('config', ADS_ID);
 }
 
 function applyConsent(state: ConsentState) {
@@ -60,6 +81,8 @@ function applyConsent(state: ConsentState) {
   } else {
     deleteAnalyticsCookies();
   }
+  // Eticheta Google Ads ține de marketing, nu de analytics.
+  if (state.marketing) loadAds();
 }
 
 /**

@@ -276,6 +276,19 @@ export default function SuccessPage() {
         items: gaItems,
       });
 
+      // Conversia Google Ads (cont 677-995-5005). Separată de evenimentul GA4:
+      // `send_to` cu eticheta de conversie, valoarea reală a comenzii și
+      // `transaction_id` ca să nu se numere de două ori la refresh.
+      const adsLabel = process.env.NEXT_PUBLIC_GOOGLE_ADS_PURCHASE_LABEL;
+      if (adsLabel) {
+        window.gtag('event', 'conversion', {
+          send_to: adsLabel,
+          value: order.total_price,
+          currency: 'RON',
+          transaction_id: order.friendly_order_id || order.id,
+        });
+      }
+
       setPurchaseTracked(true);
       console.log('GA4 Purchase tracked:', order.friendly_order_id);
     }
