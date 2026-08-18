@@ -1,7 +1,12 @@
 # Campania „Search-Constatator-2026-08" — ce e construit și ce mai lipsește
 
 Construită pe 18.08.2026 în contul **eGhiseul 677-995-5005**.
-`campaignId=281499126339525`, `draftId=10209835597`. **Nu e pornită** (nu s-a ajuns la publicare).
+`campaignId=281499126339525`, `draftId=10209835597`.
+
+> **Depășit de evenimente (18.08, seara):** campania a fost publicată, cu buget **100 lei/zi** (nu 50),
+> alături de încă două. Starea curentă a tuturor campaniilor e în
+> [2026-08-18-campanii-live-status.md](2026-08-18-campanii-live-status.md) — documentul ăsta rămâne
+> ca istoric al construcției.
 
 ## 0. Blocant: tracking-ul de conversii era mort (reparat în cod)
 
