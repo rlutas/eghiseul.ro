@@ -80,3 +80,45 @@ Nu introduc eu credențiale — pasul îl face Raul. Până atunci, bugetul nu e
 - **Constatator PF** — `[certificat constatator persoana fizica]`, `[constatator pe cnp]`
 - **Istoric** — `[certificat constatator cu istoric]`, `[raport istoric onrc]`; aici marja suportă
   CPC-ul de 9 lei, spre deosebire de produsul de bază
+
+---
+
+## Stare la final de sesiune (18.08, seara)
+
+### Search-Constatator-2026-08 — **LIVE** (`campaignId=24154670632`)
+
+- Stare: **Activată**, „Eligibilă (învață)"; anunțul e **În curs de examinare**
+- Buget **100 RON/zi**, Maximize Clicks cu **plafon CPC 6 lei**, obiectiv doar `Achiziții`
+- Rețea: doar Căutare Google (parteneri + display OFF) · Locație: **România**, doar „Prezență" · Limba RO
+- 8 cuvinte cheie (exact + frază), 1 anunț RSA (8 titluri, 4 descrieri)
+- **26 de excluderi** adăugate la nivel de campanie: `gratis`, `gratuit`, `online gratuit`, `ghiseul`,
+  `ghiseul ro`, `ghiseul.ro`, `portal onrc`, `myportal`, `recom`, `anaf`, `spv`, `model`, `formular`,
+  `pdf`, `ce este`, `cat costa`, `cat costa la stat`, `termen valabilitate`, `verificare firma gratis`,
+  `date firma gratis`, `cui gratis`, `lista firme`, `angajare`, `salariu`, `curs`, `tutorial`
+
+### Search-Constatator-Istoric-2026-08 — **SCHIȚĂ, nepublicată** (`draftId=10209735057`)
+
+Motivul campaniei separate: plafonul de CPC se setează **la nivel de campanie**, deci un grup de
+istoric în campania de bază ar fi rămas legat de 6 lei. Aici marja permite mult mai mult:
+**preț 487 lei − taxă ONRC 250 lei ≈ 230 lei marjă** ⇒ CPA maxim ~90 lei (verificat pe comanda
+`E-260728-JU3JU`: 487 lei încasați, 250 lei taxă ONRC).
+
+- Buget **80 RON/zi**, Maximize Clicks cu **plafon CPC 12 lei** (estimare Google: 40 clicuri/săpt. la 12,28)
+- Rețea doar Căutare, România/Prezență, obiectiv doar `Achiziții`
+- 7 cuvinte cheie: `[certificat constatator cu istoric]`, `[certificat constatator istoric]`,
+  `[raport istoric onrc]`, `[istoric firma onrc]`, `"certificat constatator cu istoric online"`,
+  `"raport istoric registrul comertului"`, `"istoric certificat constatator"`
+- Anunț: 6 titluri + 2 descrieri, cu „Serviciu privat, nu ONRC" și prețul 487 lei afișat
+
+**Capcană de UI descoperită aici:** în al doilea wizard, blocul de sugestii de cuvinte cheie împinge
+câmpurile în jos, iar titlurile introduse „pe poziții" ajung în gol — sumarul arăta `Anunțuri: Niciunul`
+deși completasem tot. **Verifică întotdeauna contorul `Titluri X/15` înainte de a da Terminat.**
+
+### Rămas de făcut
+
+- [ ] Publicat campania de istoric (schița e completă)
+- [ ] Verificat că **AI Max e OFF** pe istoric — sumarul afișa „Personalizarea textului și extinderea
+      adresei URL finale au fost activate", deși comutatoarele apar dezactivate; de reverificat după publicare
+- [ ] Copiat cele 26 de excluderi și pe campania de istoric
+- [ ] 4 sitelinkuri pe ambele campanii
+- [ ] Verificat că `Purchase` primește conversii de la site (tag `AW-11464910041` livrat azi)
