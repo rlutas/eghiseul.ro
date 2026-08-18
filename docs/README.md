@@ -15,6 +15,7 @@ Index al documentației. Aceasta e o **hartă**, nu un jurnal — pentru jurnalu
 | Domeniu | Folder | Conținut |
 |---|---|---|
 | **Tehnic** | [`technical/`](technical/) | `specs/` (arhitecturi servicii), `api/`, `webmcp.md` |
+| **Marketing / Ads** | [`marketing/`](marketing/) | Google Ads: analiza contului vechi, economia pe serviciu (CPA maxim), politica documentelor guvernamentale |
 | **SEO** | [`seo/`](seo/) | location pages (CF/cazier), clustere (ONRC/stare civilă/rovinietă), keywords, GSC, planuri, [tooling pe date reale](seo/TOOLING-claude-seo.md) (GSC API/CrUX/PageSpeed) |
 | **Servicii** | [`services/`](services/) | catalog viu, folder-per-serviciu |
 | **Admin** | [`admin/`](admin/) | RBAC, handbook-uri operaționale (storno, modifică comandă, coșuri abandonate) |
