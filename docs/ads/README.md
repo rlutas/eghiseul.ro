@@ -7,6 +7,7 @@ Contul: **eGhiseul, 677-995-5005** (eghiseul@gmail.com). Toate analizele se scri
 | [2026-08-18-analiza-cont-si-repornire.md](2026-08-18-analiza-cont-si-repornire.md) | starea contului (toate anunțurile respinse pe politica documentelor guvernamentale), istoricul de 2,09M lei la ROAS 1,41, economia pe serviciu (CPA maxim), unde s-au pierdut banii pe termeni de căutare, lista de excluderi |
 | [2026-08-18-constatator-analiza-concurenta.md](2026-08-18-constatator-analiza-concurenta.md) | certificat constatator: cei 4 advertiseri, prețurile lor, statistici de licitație, aritmetica CPC vs marjă, anunț + structură de campanie conforme cu politica |
 | [2026-08-18-constatator-campanie-construita.md](2026-08-18-constatator-campanie-construita.md) | campania Search-Constatator-2026-08: ce e configurat (licitare, rețele, AI Max, cuvinte cheie, anunț), fixul de tracking `AW-11464910041` și lista de pași rămași |
+| [2026-08-18-strategie-licitare-decizie.md](2026-08-18-strategie-licitare-decizie.md) | de ce plafonăm CPC-ul la pornire, ce spun Google și practicienii US/UK, planul de trecere la Smart Bidding pe etape |
 
 ## Reguli fixe (nu se negociază)
 
