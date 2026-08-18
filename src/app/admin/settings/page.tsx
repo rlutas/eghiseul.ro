@@ -137,8 +137,12 @@ interface SenderAddress {
 }
 
 interface BankDetails {
+  /** Contul în lei — cel folosit implicit la plata prin transfer. */
   iban: string;
+  /** Contul în euro, pentru clienții care plătesc din străinătate. Opțional. */
+  iban_eur: string;
   bank_name: string;
+  swift: string;
   account_holder: string;
 }
 
@@ -1959,11 +1963,7 @@ function CouriersTab() {
 function PaymentsTab() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [bankDetails, setBankDetails] = useState<BankDetails>({
-    iban: '',
-    bank_name: '',
-    account_holder: '',
-  });
+  const [bankDetails, setBankDetails] = useState<BankDetails>(bankDetailsDefaults());
   // Automatic Oblio invoicing toggle (default ON). Pause in test to avoid
   // creating invoices that then have to be deleted.
   const [invoicingEnabled, setInvoicingEnabled] = useState(true);
@@ -2114,6 +2114,18 @@ function PaymentsTab() {
               />
             </div>
             <div className="space-y-1.5">
+              <Label htmlFor="bank-iban-eur">IBAN euro (optional)</Label>
+              <Input
+                id="bank-iban-eur"
+                value={bankDetails.iban_eur}
+                onChange={(e) =>
+                  setBankDetails((p) => ({ ...p, iban_eur: e.target.value }))
+                }
+                placeholder="RO00BTRLEUR0000000000000"
+                className="font-mono text-sm"
+              />
+            </div>
+            <div className="space-y-1.5">
               <Label htmlFor="bank-name">Banca</Label>
               <Input
                 id="bank-name"
@@ -2122,6 +2134,18 @@ function PaymentsTab() {
                   setBankDetails((p) => ({ ...p, bank_name: e.target.value }))
                 }
                 placeholder="ING Bank / BCR / etc."
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="bank-swift">SWIFT / BIC</Label>
+              <Input
+                id="bank-swift"
+                value={bankDetails.swift}
+                onChange={(e) =>
+                  setBankDetails((p) => ({ ...p, swift: e.target.value }))
+                }
+                placeholder="BTRLRO22"
+                className="font-mono text-sm"
               />
             </div>
           </div>
@@ -2138,6 +2162,10 @@ function PaymentsTab() {
               }
               placeholder="SC Exemplu SRL"
             />
+            <p className="text-xs text-muted-foreground">
+              Datele astea se afiseaza clientului la plata prin transfer. Daca e completat si contul
+              in euro, clientul poate alege moneda; suma in euro se calculeaza la cursul BNR al zilei.
+            </p>
           </div>
 
           <div className="flex justify-end">
@@ -3791,7 +3819,9 @@ interface CompanyDataForSender {
 function bankDetailsDefaults(): BankDetails {
   return {
     iban: '',
+    iban_eur: '',
     bank_name: '',
+    swift: '',
     account_holder: '',
   };
 }
