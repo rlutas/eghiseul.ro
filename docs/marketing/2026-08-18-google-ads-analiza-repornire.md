@@ -141,3 +141,63 @@ depășește pragul serviciului, se oprește grupul, nu se „mai dă o șansă"
 Cea mai scumpă problemă din tot documentul ăsta nu e Google Ads: sunt **97 de comenzi plătite
 (~8.900 lei) pe care nu le putem livra**, care cresc cu ~4/zi. Ori repornim ANCPI, ori oprim vânzarea
 extrasului CF până revine portalul.
+
+---
+
+## 6. Da, se poate mult mai bine: unde s-au pierdut banii (termeni de căutare, lifetime)
+
+Verificat în raportul de termeni de căutare, sortat după cost, toată perioada.
+
+| Termen căutat | Potrivire | Clicuri | CTR | CPC | Cost | Verdict |
+|---|---|---|---|---|---|---|
+| cazier judiciar online | exactă | 135.045 | 29,1% | 2,28 | ~308.000 | păstrat |
+| extras de carte funciara | exactă | 19.641 | 16,2% | 4,79 | 93.994 | ⛔ ROAS 0,48 |
+| certificat constatator online | exactă | 9.700 | 12,1% | **9,12** | 88.489 | ⚠️ peste marjă |
+| cazier online | exactă | 33.716 | 29,4% | 1,30 | 43.751 | păstrat |
+| extras carte funciara online | exactă | 7.653 | 17,5% | 5,08 | 38.912 | ⛔ |
+| cazier judiciar | exactă | 15.717 | 17,9% | 2,13 | 33.403 | păstrat |
+| **cazier fiscal online** | exactă | 16.411 | **40,0%** | **1,73** | 28.344 | ✅ subfinanțat |
+| **onrc** | **amplă** | 8.250 | **5,8%** | 3,05 | **25.193** | ⛔ caută instituția |
+| cf online | exactă | 4.195 | 11,2% | 4,52 | 18.951 | ⛔ |
+| certificat constatator onrc | exactă (variantă) | 1.778 | 12,4% | **8,55** | 15.199 | ⚠️ |
+| **ghiseul ro cazier judiciar** | expresie | 6.307 | 30,6% | 2,40 | **15.135** | ⛔ caută portalul statului |
+| **ghiseul ro cazier** | exactă | 6.233 | 19,4% | 1,95 | **12.151** | ⛔ idem |
+| carte funciara | exactă | 4.504 | 9,0% | 3,29 | 14.808 | ⛔ |
+
+### Ce e de reparat, concret
+
+1. **Nu s-a exclus niciodată nimic.** Coloana „Adăugate/Excluse" arată `Niciuna` pe toți termenii
+   problematici (`onrc`, `ghiseul ro cazier`, `certificat constatator onrc`). Peste **52.000 lei** duși
+   pe oameni care căutau instituția sau portalul statului, nu un serviciu plătit.
+2. **Alocarea a fost pe dos.** Pe cel mai bun cuvânt cheie din cont (cazier fiscal, ROAS 3,37,
+   CTR 40%, CPC 1,73) s-au cheltuit **28.000 lei**, în timp ce pe clusterul de carte funciară
+   (ROAS 0,48) s-au dus **~166.000 lei**, iar pe constatator (ROAS 1,18) **~104.000 lei**.
+3. **Conversiile amestecate au stricat licitarea automată.** Campania de CF raportează 12.280
+   „conversii" la o valoare de 237.876 lei — adică ~19 lei/conversie pe un produs de 89 lei: se
+   numărau și coșuri, apeluri, formulare. Algoritmul a optimizat spre evenimente ieftine, nu spre
+   vânzări. CPA real pe vânzare acolo: **~185 lei** (pe o marjă de ~65 lei).
+4. **Potrivire amplă** pe termeni generici (`onrc`) într-o verticală unde jumătate din căutări sunt
+   „unde iau gratis de la stat".
+
+### Ce ROAS e realist după curățare
+
+Ținând doar ce a fost deja profitabil, cu potriviri exacte, listă de excluderi și licitare pe
+`Purchase` cu valoare:
+
+| Serviciu | ROAS istoric | ROAS țintă după curățare | Cum |
+|---|---|---|---|
+| Cazier fiscal | 3,37 | **3,5–4** | buget mutat aici, exact + frază, excluderi „gratis/anaf/spv" |
+| Cazier judiciar PF | 1,77 | **2,5–3** | excluderi „ghiseul ro / gratis / online gratuit", prețul de azi (358 vs 184 istoric) |
+| Stare civilă | netestat separat | 2–3 | marjă mare (500–600), CPA maxim 200 |
+| Certificat constatator | 1,18 | 1,3–1,5, volum mic | doar exact, tCPA 25, fără `onrc` |
+| Extras CF / topograf | 0,48 | — | oprit până revine ANCPI |
+
+Estimare grosieră: aceiași bani, dar fără clusterul CF, fără termenii de instituție și cu bugetul
+mutat pe fiscal, ar fi însemnat un ROAS pe cont de **2,5–3 în loc de 1,41** — adică profit, nu pierdere.
+
+### Lista de excluderi de pornire (negative keywords)
+
+`gratis`, `gratuit`, `online gratuit`, `ghiseul.ro`, `ghiseul ro`, `ghișeul`, `onrc` (singur),
+`anaf`, `spv`, `portal`, `formular`, `model`, `pdf`, `cerere tip`, `unde se depune`, `program`,
+`ce acte trebuie`, `cat costa la stat`, `taxa`, `politie`, `primarie`, `ambasada`, `oficiu`,
+`aplicatie`, `verificare gratuita`.
