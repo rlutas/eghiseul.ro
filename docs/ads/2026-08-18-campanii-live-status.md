@@ -82,3 +82,66 @@ anunțul rămâne fără URL și pică la validare cu „Acest câmp nu poate r�
 - [ ] La 30+ conversii pe campanie ⇒ trecere pe **CPA vizat** (constatator 24 lei, fiscal 70 lei),
       cu plafonul de CPC scos.
 - [ ] Rămâne interdicția: **zero reclamă la extras CF / topograf** cât timp ANCPI e picat.
+
+---
+
+## 19.08 — Respinse pe politica documentelor guvernamentale. Ce am aflat
+
+A doua zi după publicare, Google a respins **3 din 4 campanii**:
+
+| Campanie | Stare anunț | Afișări | Clicuri |
+|---|---|---|---|
+| Search-Cadastru-Documente-2026-08 (PAD) | **Eligibilă** | 107 | 9 |
+| Search-Constatator-2026-08 | Respins — documente guvernamentale | 0 | 0 |
+| Search-Constatator-Istoric-2026-08 | Respins | 0 | 0 |
+| Search-Cazier-Fiscal-2026-08 | Respins | 99 | 19 |
+
+Total cheltuit: **79,70 lei, 0 conversii**.
+
+### De ce a trecut cadastrul și n-au trecut celelalte
+
+Nu e o chestiune de cuvinte, ci de **ce vinde anunțul**. Cadastru/PAD vinde **munca topografului**
+(„Ridicat de Topograf Autorizat", „Serviciu Privat, Nu ANCPI"). Celelalte trei vând **obținerea unui
+document de la o instituție** — exact ce interzice politica.
+
+Mailul cere „**un certificat**" — certificarea aia e doar pentru instituții guvernamentale sau
+furnizori delegați oficial. **Noi nu suntem niciuna, deci calea e închisă.** Un cont nou ar fi
+eludarea sistemelor: suspendare permanentă, inclusiv a conturilor asociate.
+
+Politica exceptează explicit: consultanță fiscală, servicii juridice, B2B, servicii de avocat. La
+cazier judiciar chiar avem cabinetul; la constatator, argumentul B2B e real. Dar exceptarea se
+judecă **după pagina de destinație**, iar paginile noastre vând procurarea documentului — deci o
+retrimitere fără rescrierea paginilor pică din nou și strică reputația contului.
+
+### ⚠️ Capcana sitelinkurilor la nivel de cont
+
+Cele 4 sitelinkuri create pe 18.08 sunt la **nivel de cont**, deci se atașează automat pe **toate**
+campaniile. Trei au fost respinse pe aceeași politică:
+
+| Sitelink | Stare |
+|---|---|
+| Constatator PFA — „Pentru PFA, II și IF / Doar cu CUI-ul, în minute" | **Eligibilă** |
+| Constatator pentru bancă — „Acceptat de bănci și notari / **Emis** în câteva minute, 24/7" | Respins |
+| Constatator cu istoric — „Raport cu toate mențiunile firmei / Cronologic, **487 lei taxe incluse**" | Respins |
+| Tipurile de constatator — „De bază, IMM, insolvență, PF" | Respins |
+
+Alea 3 = „Elemente (3)" din mailul de respingere primit **pe campania de cazier fiscal**, cu care
+n-aveau nicio legătură. Sitelinkurile de cont propagă respingerile în tot contul, iar anunțul de
+cadastru (aprobat) afișa sitelinkuri de constatator.
+
+Din nou, diferența: cel aprobat spune **cui i se potrivește**; cele respinse promit **livrarea
+documentului oficial** („Emis în câteva minute", „taxe incluse").
+
+**Regulă de acum înainte: sitelinkuri per campanie, niciodată la nivel de cont**, cât timp în cont
+coexistă servicii cu risc de politică.
+
+Cele 3 au fost **întrerupte** pe 19.08 (nu șterse, ca să rămână istoricul).
+
+### De făcut
+
+- [ ] Sitelinkuri proprii, la nivel de campanie, pentru cadastru (nu de constatator)
+- [ ] Decis dacă rescriem paginile de fiscal + constatator ca servicii profesionale (consultanță
+      fiscală / B2B / asistență juridică) înainte de orice retrimitere
+- [ ] Pus pe pauză cele 3 campanii respinse
+- [ ] Extins cadastrul cu grupurile rămase (releveu, plan cadastral, coordonate Stereo 70, copii CF)
+      și campania de certificat de urbanism
