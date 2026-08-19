@@ -145,3 +145,34 @@ Cele 3 au fost **întrerupte** pe 19.08 (nu șterse, ca să rămână istoricul)
 - [ ] Pus pe pauză cele 3 campanii respinse
 - [ ] Extins cadastrul cu grupurile rămase (releveu, plan cadastral, coordonate Stereo 70, copii CF)
       și campania de certificat de urbanism
+
+### Curățenia făcută pe 19.08 — starea finală a contului
+
+| Ce | Stare |
+|---|---|
+| **Search-Cadastru-Documente-2026-08** | **Activă**, 40 lei/zi, anunț Eligibil |
+| Search-Constatator-2026-08 | Întreruptă |
+| Search-Constatator-Istoric-2026-08 | Întreruptă |
+| Search-Cazier-Fiscal-2026-08 | Întreruptă |
+| Cele 4 sitelinkuri de constatator (nivel **cont**) | Toate **întrerupte**, inclusiv cel aprobat |
+| 4 sitelinkuri noi de cadastru (nivel **campanie**) | În examinare |
+
+Bugetul contului a scăzut de la **320 la 40 lei/zi**. În cont nu mai există **niciun** element la
+nivel de cont care să se propage pe campanii.
+
+Sitelinkurile noi, toate pe `Search-Cadastru-Documente-2026-08`:
+
+| Text | Rânduri | Pagină |
+|---|---|---|
+| Copie plan cadastral | Planul imobilului din arhiva OCPI / Comandat online, fara drumuri | `/servicii/copie-plan-cadastral/` |
+| Releveu apartament | Planul interior al locuintei / Scanat si trimis pe email | `/servicii/copie-releveu/` |
+| Coordonate Stereo 70 | Inventarul de coordonate al lotului / Pentru proiectanti si topografi | `/servicii/copie-inventar-coordonate/` |
+| Copie carte funciara | Varianta in extenso, din arhiva / Completezi datele, ne ocupam noi | `/servicii/copie-carte-funciara/` |
+
+Niciunul nu promite emiterea documentului, termen sau „taxe incluse" — exact tiparul care a trecut
+de examinare la anunțul de PAD.
+
+⚠️ **Certificatul de urbanism, reconsiderat.** În cercetarea de pe 18.08 îl recomandasem ca a doua
+campanie (1K–10K căutări, concurență redusă, 943,50 lei). După respingerile de azi: e un document
+emis de **primărie**, deci intră direct sub aceeași politică. **Nu se face campanie pe el** fără
+aceeași discuție despre pagina de destinație.
