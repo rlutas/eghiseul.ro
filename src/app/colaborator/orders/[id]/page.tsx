@@ -51,7 +51,10 @@ export default function CollaboratorOrderDetail() {
   const params = useParams<{ id: string }>();
   const orderId = params.id;
   const previewAs = usePreviewAs();
-  const readOnly = !!previewAs; // preview de admin: fără acțiuni de lucru
+  // Preview de admin: secțiunile de lucru se VĂD (altfel adminul nu poate
+  // verifica ce are colaboratorul la dispoziție), dar comenzile sunt
+  // dezactivate; rutele care scriu cer oricum rol de colaborator.
+  const readOnly = !!previewAs;
   const [order, setOrder] = useState<OrderDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
@@ -273,7 +276,7 @@ export default function CollaboratorOrderDetail() {
       {/* Depunerea la OCPI — nr. de înregistrare + cât ne-a costat eliberarea.
           Mută comanda în „Trimis instituție", ca statusul clientului să nu mai
           arate „în procesare" cât timp lucrarea e la ghișeu. */}
-      {!readOnly && (order.cereri?.length ?? 0) > 0 && !delivered && (
+      {(order.cereri?.length ?? 0) > 0 && !delivered && (
         <div className="mb-6 rounded-lg border border-slate-200 bg-white p-5">
           <h2 className="mb-1 text-sm font-semibold text-slate-900">Am depus cererea la OCPI</h2>
           <p className="mb-3 text-xs text-slate-500">
@@ -288,6 +291,7 @@ export default function CollaboratorOrderDetail() {
                 id="reg-number"
                 value={regNumber}
                 onChange={(e) => setRegNumber(e.target.value)}
+                disabled={readOnly}
                 placeholder="ex. 84512/12.09.2026"
                 className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/30"
               />
@@ -304,12 +308,13 @@ export default function CollaboratorOrderDetail() {
                 inputMode="decimal"
                 value={costRon}
                 onChange={(e) => setCostRon(e.target.value)}
+                disabled={readOnly}
                 className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/30"
               />
             </div>
             <Button
               onClick={handleDepunere}
-              disabled={savingDepunere || (!regNumber.trim() && !costRon.trim())}
+              disabled={readOnly || savingDepunere || (!regNumber.trim() && !costRon.trim())}
               variant="outline"
               className="h-10"
             >
@@ -358,27 +363,25 @@ export default function CollaboratorOrderDetail() {
       </div>
 
       {/* Note for the team */}
-      {!readOnly && (
       <div className="mb-6 rounded-lg border border-slate-200 bg-white p-5">
         <h2 className="mb-2 text-sm font-semibold text-slate-900">Notă pentru echipă</h2>
         <p className="mb-3 text-xs text-slate-500">Ex: nr. înregistrare, observații, dacă lipsește ceva. Apare în istoricul comenzii în admin.</p>
         <textarea
           value={note}
           onChange={(e) => setNote(e.target.value)}
+          disabled={readOnly}
           rows={3}
           placeholder="Scrie o notă pentru echipă..."
           className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/30"
         />
         <div className="mt-2 flex justify-end">
-          <Button onClick={handleAddNote} disabled={savingNote || !note.trim()} variant="outline" size="sm">
+          <Button onClick={handleAddNote} disabled={readOnly || savingNote || !note.trim()} variant="outline" size="sm">
             {savingNote ? 'Se salvează...' : 'Adaugă notă'}
           </Button>
         </div>
       </div>
-      )}
 
       {/* Actions — one step: upload = deliver (docs visible + status + email) */}
-      {!readOnly && (
       <div className="flex flex-wrap items-center gap-3">
         <input
           ref={fileRef}
@@ -390,7 +393,7 @@ export default function CollaboratorOrderDetail() {
             if (f) handleUpload(f);
           }}
         />
-        <Button onClick={() => fileRef.current?.click()} disabled={uploading} className="h-11">
+        <Button onClick={() => fileRef.current?.click()} disabled={readOnly || uploading} className="h-11">
           {delivered ? <CheckCircle2 className="mr-2 h-4 w-4" /> : <Upload className="mr-2 h-4 w-4" />}
           {uploading
             ? 'Se încarcă și se trimite...'
@@ -399,10 +402,15 @@ export default function CollaboratorOrderDetail() {
               : 'Încarcă PDF și trimite clientului'}
         </Button>
       </div>
-      )}
-      {!readOnly && !hasDocs && !delivered && (
+      {!hasDocs && !delivered && (
         <p className="mt-2 text-xs text-slate-400">
           La încărcare, documentul se trimite automat clientului și statusul comenzii se actualizează.
+        </p>
+      )}
+      {readOnly && (
+        <p className="mt-3 rounded-md bg-amber-50 px-3 py-2 text-xs text-amber-800">
+          Previzualizare de admin: vezi tot ce are colaboratorul la dispoziție, dar acțiunile sunt
+          dezactivate. Descărcarea cererilor funcționează.
         </p>
       )}
     </div>
