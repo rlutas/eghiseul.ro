@@ -250,6 +250,12 @@ export default function CompanyDataStep({ config, onValidChange }: CompanyDataSt
     }
   };
 
+  // Câmpurile preluate din ANAF sunt read-only. Când vin GOALE (instituții
+  // publice: fără formă juridică și fără nr. Registrul Comerțului), exemplul
+  // gri „SRL" / „J40/12345/2020" se citea ca date reale ale clientului — pe o
+  // școală arăta ca un SRL cu un J inventat (raport Raul, 20.08.2026).
+  const isAutoFilled = config.autoComplete && !!companyKyc.autoCompleteData;
+
   return (
     <div className="space-y-6">
       {/* Company Search */}
@@ -328,7 +334,12 @@ export default function CompanyDataStep({ config, onValidChange }: CompanyDataSt
               <CheckCircle className="h-4 w-4 text-green-600" />
               <AlertTitle>Firmă găsită</AlertTitle>
               <AlertDescription>
-                Datele firmei au fost preluate automat din Registrul Comerțului.
+                {/* Instituțiile publice (școli, primării, spitale) NU sunt la
+                    Registrul Comerțului — ANAF le întoarce fără nr. de
+                    înregistrare. Sursa trebuie numită corect. */}
+                {companyKyc.registrationNumber
+                  ? 'Datele firmei au fost preluate automat din Registrul Comerțului.'
+                  : 'Datele au fost preluate automat din baza de date ANAF.'}
               </AlertDescription>
             </Alert>
           )}
@@ -368,7 +379,7 @@ export default function CompanyDataStep({ config, onValidChange }: CompanyDataSt
                   type="text"
                   value={companyKyc.companyType}
                   onChange={(e) => updateCompanyKyc?.({ companyType: e.target.value })}
-                  placeholder="SRL"
+                  placeholder={isAutoFilled ? 'Nu se aplică' : 'SRL'}
                   readOnly={config.autoComplete && !!companyKyc.autoCompleteData}
                   className={config.autoComplete && companyKyc.autoCompleteData ? 'bg-muted' : ''}
                 />
@@ -380,7 +391,7 @@ export default function CompanyDataStep({ config, onValidChange }: CompanyDataSt
                   type="text"
                   value={companyKyc.registrationNumber}
                   onChange={(e) => updateCompanyKyc?.({ registrationNumber: e.target.value })}
-                  placeholder="J40/12345/2020"
+                  placeholder={isAutoFilled ? 'Nu se aplică' : 'J40/12345/2020'}
                   readOnly={config.autoComplete && !!companyKyc.autoCompleteData}
                   className={config.autoComplete && companyKyc.autoCompleteData ? 'bg-muted' : ''}
                 />

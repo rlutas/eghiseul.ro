@@ -78,6 +78,45 @@ const ANAF_V9_DIZOLVAT_RESPONSE = {
   notFound: [],
 };
 
+// Real v9 response captured 2026-08-20 from CUI 13378912 — a public school.
+// ANAF returns it with EMPTY nrRegCom and no legal form: it is not registered
+// at Registrul Comerțului at all.
+const ANAF_V9_PUBLIC_INSTITUTION_RESPONSE = {
+  found: [
+    {
+      date_generale: {
+        cui: 13378912,
+        denumire: 'SCOALA GIMNAZIALA FULOP ARON FELICENI',
+        adresa: 'JUD. HARGHITA, SAT FELICENI COM. FELICENI, NR.9',
+        nrRegCom: '',
+        stare_inregistrare: 'MODIFICARE PUBLICI din data 21.09.2000',
+        data_inregistrare: '2000-09-21',
+      },
+      inregistrare_scop_Tva: { scpTVA: false },
+    },
+  ],
+  notFound: [],
+};
+
+// A commercial company whose name contains the letters "SA" inside a word —
+// the old substring matching returned type "SA" (societate pe acțiuni) for it.
+const ANAF_V9_CASA_SRL_RESPONSE = {
+  found: [
+    {
+      date_generale: {
+        cui: 49278701,
+        denumire: 'CASA DE CULTURA IMOBILIARE S.R.L.',
+        adresa: 'JUD. CLUJ, MUN. CLUJ-NAPOCA',
+        nrRegCom: 'J12/500/2015',
+        stare_inregistrare: 'INREGISTRAT din data 01.01.2015',
+        data_inregistrare: '2015-01-01',
+      },
+      inregistrare_scop_Tva: { scpTVA: true },
+    },
+  ],
+  notFound: [],
+};
+
 beforeEach(() => {
   vi.spyOn(console, 'warn').mockImplementation(() => {});
   vi.spyOn(console, 'log').mockImplementation(() => {});
@@ -183,5 +222,63 @@ describe('fetchCompanyData — ANAF v9 endpoint', () => {
     const result = await fetchCompanyData('49278701');
     expect(result.found).toBe(false);
     expect(result.error).toMatch(/inexistent/i);
+  });
+});
+
+describe('fetchCompanyData — entități fără Registrul Comerțului', () => {
+  it('marks a public school as INSTITUȚIE PUBLICĂ instead of leaving the form blank', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ANAF_V9_PUBLIC_INSTITUTION_RESPONSE,
+    }));
+
+    const result = await fetchCompanyData('13378912');
+
+    expect(result.found).toBe(true);
+    // Fără asta, forma juridică ieșea goală și wizardul afișa exemplul gri
+    // „SRL" / „J40/12345/2020" ca și cum ar fi datele școlii.
+    expect(result.data?.type).toBe('INSTITUȚIE PUBLICĂ');
+    expect(result.data?.registrationNumber).toBe('');
+  });
+
+  it('does not read "SA" out of the middle of a word', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ANAF_V9_CASA_SRL_RESPONSE,
+    }));
+
+    const result = await fetchCompanyData('49278701');
+
+    // "CASA" conține "SA": substring matching întorcea societate pe acțiuni.
+    expect(result.data?.type).toBe('SRL');
+  });
+
+  it('never labels a trade-registered company as a public institution', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({
+        found: [
+          {
+            date_generale: {
+              cui: 49278701,
+              // Nume de instituție, dar CU număr la Registrul Comerțului.
+              denumire: 'CENTRUL MEDICAL DIRECTIA NOUA',
+              adresa: 'JUD. CLUJ',
+              nrRegCom: 'J12/900/2019',
+              stare_inregistrare: 'INREGISTRAT din data 01.01.2019',
+            },
+            inregistrare_scop_Tva: { scpTVA: true },
+          },
+        ],
+        notFound: [],
+      }),
+    }));
+
+    const result = await fetchCompanyData('49278701');
+
+    expect(result.data?.type).toBe('');
   });
 });

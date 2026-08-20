@@ -322,4 +322,6 @@ eghiseul și sheet se rezolvă cu echipa).
 | Script migrare | `eghiseul.ro/scripts/migrate-registry-to-central.ts` |
 | Spec registru original (istoric, doar eghiseul, pre-central) | `docs/technical/specs/number-registry-system.md` |
 
+**Update 2026-08-20 (CJO):** împuternicirea de Apostilă Haga se și GENEREAZĂ din admin, nu doar afișează numărul. `/api/admin/delegation` acceptă `type: "apostila-haga:<target>"`, ia numărul prin `find_existing_number` pe aceeași cheie și îl **alocă la cerere** (`allocate_number`) când lipsește — cazul apostilei adăugate DUPĂ plată, unde `ensureBarouNumbersForOrder` no-op-uie pe `barou_numbers_allocated_at`. Căile PDF: `orders.delegation_apostila_paths` (jsonb, migrarea CJO 033), fiindcă o comandă dublă poate avea două apostile. Textul e acum identic cu eghiseul („aplicării Apostilei de la Haga **pe** \<document\>", fără motivul solicitării). Commit CJO `aa2a5291`.
+
 **Update 2026-07-13 (CJO):** numerele de delegație pentru Apostila Haga (alocate doar în registrul central, serviceType `apostila-haga:<target>`, fără coloană pe orders) sunt acum AFIȘATE în admin CJO pe cardul de împuternicire — endpoint nou `GET /api/admin/registry-numbers` (lookup `find_existing_number` per target). Commit CJO 349b4d82.

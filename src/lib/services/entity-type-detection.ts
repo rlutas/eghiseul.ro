@@ -100,7 +100,7 @@ function escapeRegex(s: string): string {
  * word-boundary class treats both as letters — otherwise "CONSTRUCŢII" splits
  * at Ţ and "II" false-matches as Întreprindere Individuală.
  */
-function normalizeCedilla(s: string): string {
+export function normalizeCedilla(s: string): string {
   return s
     .replace(/Ş/g, 'Ș')
     .replace(/ş/g, 'ș')

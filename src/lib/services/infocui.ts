@@ -17,6 +17,8 @@
  * Falls back to mock data in development if ANAF is unreachable.
  */
 
+import { matchesAnyWord, normalizeCedilla } from '@/lib/services/entity-type-detection';
+
 // ============================================================================
 // Company Data Types
 // ============================================================================
@@ -189,7 +191,7 @@ async function fetchFromANAF(cui: string): Promise<CompanyLookupResponse> {
     data: {
       cui,
       name,
-      type: extractCompanyType(name),
+      type: extractCompanyType(name, general.nrRegCom || ''),
       registrationNumber: general.nrRegCom || '',
       address: general.adresa || '',
       status: stare,
@@ -223,33 +225,65 @@ export function isCompanyActive(stare: string, inInactiveRegister: boolean): boo
 }
 
 /**
- * Extract company type from company name
+ * Entities that are NOT registered at Registrul Comerțului — public
+ * institutions. ANAF returns them with `nrRegCom` and `forma_juridica` EMPTY,
+ * so without this they came back with no legal form at all and the wizard's
+ * grey example text ("SRL", "J40/12345/2020") read like real data on a school
+ * (SCOALA GIMNAZIALA FULOP ARON FELICENI, CUI 13378912, 20.08.2026).
+ *
+ * Matched with word boundaries and ONLY when ANAF gives no `nrRegCom`, so a
+ * commercial "Centrul Medical X SRL" can never be mislabelled.
  */
-function extractCompanyType(name: string): string {
-  const upperName = name.toUpperCase();
+const PUBLIC_INSTITUTION_PATTERNS: readonly string[] = [
+  'SCOALA', 'ȘCOALA', 'SCOALĂ', 'ȘCOALĂ',
+  'LICEUL', 'COLEGIUL', 'GRADINITA', 'GRĂDINIȚA', 'GRADINITĂ',
+  'UNIVERSITATEA', 'INSTITUTUL',
+  'PRIMARIA', 'PRIMĂRIA', 'COMUNA', 'ORASUL', 'ORAȘUL', 'MUNICIPIUL', 'JUDETUL', 'JUDEȚUL',
+  'CONSILIUL',
+  'SPITALUL', 'POLICLINICA', 'DISPENSARUL',
+  'INSPECTORATUL', 'DIRECTIA', 'DIRECȚIA', 'AGENTIA', 'AGENȚIA',
+  'MINISTERUL', 'PREFECTURA', 'PENITENCIARUL',
+  'BIBLIOTECA', 'MUZEUL', 'TEATRUL', 'FILARMONICA',
+];
 
-  const types = [
-    'S.R.L.', 'SRL',
-    'S.A.', 'SA',
-    'S.C.S.', 'SCS',
-    'S.N.C.', 'SNC',
-    'S.C.A.', 'SCA',
-    'P.F.A.', 'PFA',
-    'I.I.', 'II',
-    'I.F.', 'IF',
-    'COOPERATIVA',
-    'O.N.G.', 'ONG',
-    'ASOCIATIE', 'ASOCIAȚIA',
-    'FUNDATIE', 'FUNDAȚIA',
-    'CABINET',
-    'PAROHIE',
-    'SINDICAT',
-  ];
+/** Legal forms, longest/dotted variants first so "S.R.L." wins over "SRL". */
+const LEGAL_FORM_PATTERNS: readonly string[] = [
+  'S.R.L.', 'SRL',
+  'S.A.', 'SA',
+  'S.C.S.', 'SCS',
+  'S.N.C.', 'SNC',
+  'S.C.A.', 'SCA',
+  'P.F.A.', 'PFA',
+  'I.I.', 'II',
+  'I.F.', 'IF',
+  'COOPERATIVA',
+  'O.N.G.', 'ONG',
+  'ASOCIATIE', 'ASOCIAȚIA',
+  'FUNDATIE', 'FUNDAȚIA',
+  'CABINET',
+  'PAROHIE',
+  'SINDICAT',
+];
 
-  for (const type of types) {
-    if (upperName.includes(type)) {
-      return type.replace(/\./g, '');
-    }
+/**
+ * Extract the legal form from a company name.
+ *
+ * Matching is on WHOLE WORDS: plain `includes()` returned "SA" for any name
+ * containing those two letters (a "CASA DE …" would come back a joint-stock
+ * company). `matchesAnyWord` also normalizes ANAF's cedilla diacritics.
+ *
+ * `nrRegCom` (may be empty) tells commercial entities from public ones: no
+ * trade-register number and an institution name ⇒ "INSTITUȚIE PUBLICĂ".
+ */
+function extractCompanyType(name: string, nrRegCom = ''): string {
+  const upperName = normalizeCedilla(name).toUpperCase();
+
+  for (const type of LEGAL_FORM_PATTERNS) {
+    if (matchesAnyWord(upperName, [type])) return type.replace(/\./g, '');
+  }
+
+  if (!nrRegCom.trim() && matchesAnyWord(upperName, PUBLIC_INSTITUTION_PATTERNS)) {
+    return 'INSTITUȚIE PUBLICĂ';
   }
 
   return '';
