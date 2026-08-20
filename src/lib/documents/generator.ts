@@ -1000,7 +1000,8 @@ export function buildServicesBreakdown(
 /**
  * Build the full placeholder data object from the document context.
  */
-function buildPlaceholderData(ctx: DocumentContext) {
+/** Exported for tests: pure mapping DocumentContext → template placeholders. */
+export function buildPlaceholderData(ctx: DocumentContext) {
   const now = new Date();
   const dateFormatted = now.toLocaleDateString('ro-RO', { day: '2-digit', month: '2-digit', year: 'numeric' });
   const dateLong = now.toLocaleDateString('ro-RO', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -1042,7 +1043,11 @@ function buildPlaceholderData(ctx: DocumentContext) {
     CLIENT_CI_SERIES: ctx.client.ci_series || '',
     CLIENT_CI_NUMBER: ctx.client.ci_number || '',
     CLIENT_COMPANY_NAME: ctx.client.company_name || '',
-    CLIENT_COMPANY_REG: ctx.client.company_reg || '',
+    // Cererea PJ tipărește „număr de ordine în Registrul Comerţului
+    // {{CLIENT_COMPANY_REG}}"; instituțiile publice nu au unul, iar gol lăsa
+    // un spațiu care arăta a câmp uitat. „N/A" e formatul folosit deja în
+    // șablon pentru „denumirea anterioară".
+    CLIENT_COMPANY_REG: ctx.client.company_reg || (ctx.client.is_pj ? 'N/A' : ''),
     CLIENT_COMPANY_ADDRESS: ctx.client.company_address || '',
 
     // CI document details (issued by)

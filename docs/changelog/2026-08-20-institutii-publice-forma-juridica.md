@@ -45,19 +45,34 @@ ANAF**" — sursa corectă pentru instituții.
 Documentele generate nu erau afectate: `generator.ts` tipărește
 „Nr. Reg. Com.: …" doar dacă valoarea există.
 
-## Rămâne de decis (ops, nu cod)
+## Pasul de documente + documentele generate
 
-Serviciul **Cazier Judiciar PJ** cere la pasul 3 documentul
-`company_registration_cert` = „Certificat de Înregistrare (firmă), emis de
-Registrul Comerțului". O școală **nu are** așa ceva — are certificat de
-înregistrare fiscală (ANAF) + act de înființare. Clientul se blochează acolo
-sau încarcă alt act. Dacă acceptăm instituții publice, `requiredDocuments` din
-`verification_config` are nevoie de o variantă pentru ele (printr-o **migrare**,
-nu editat direct în DB) și, eventual, de un `specialRule` cu mesajul de
-documente, cum e cel pentru ONG-uri.
+**4. „Documente Firmă"** cerea `company_registration_cert` = „Certificat de
+Înregistrare, emis de Registrul Comerțului". O școală nu are așa ceva, deci
+rămânea blocată pe un document care nu există. Când entitatea e instituție
+publică, aceeași casetă își schimbă textul: **„Certificat de Înregistrare
+Fiscală (CIF)"** — certificatul ANAF sau actul de înființare. Configurația din
+DB rămâne neatinsă (nu e nevoie de migrare): se schimbă doar ce i se cere
+omului pe ecran.
+
+**5. Avertisment încă de la pasul „Date Firmă"**, ca la ONG-uri: „Instituție
+publică: nu are certificat de la Registrul Comerțului. La pasul următor
+încarcă certificatul de înregistrare fiscală (CIF) emis de ANAF sau actul de
+înființare." Clientul află ce să pregătească înainte să ajungă la upload.
+
+**6. Cererea de eliberare PJ** are în șablon „număr de ordine în Registrul
+Comerţului {{CLIENT_COMPANY_REG}} codul unic de înregistrare …". Gol, ieșea o
+pauză care arăta a câmp uitat de operator. Pe PJ fără număr se tipărește acum
+**N/A** — formatul folosit deja în șablon pentru „denumirea anterioară".
+Contractele nu se schimbă: acolo linia „Nr. Reg. Com.:" se adaugă doar dacă
+valoarea există.
 
 ## Teste
 
-`tests/unit/lib/services/infocui-anaf-v9.test.ts`: școala → `INSTITUȚIE
-PUBLICĂ`; „CASA … S.R.L." → `SRL` (nu `SA`); nume de instituție **cu** J la
-Registrul Comerțului → nu e etichetat instituție publică.
+- `infocui-anaf-v9.test.ts`: școala → `INSTITUȚIE PUBLICĂ`; „CASA … S.R.L." →
+  `SRL` (nu `SA`); nume de instituție **cu** J la Registrul Comerțului → nu e
+  etichetat instituție publică.
+- `entity-type-detection.test.ts`: 6 tipuri de instituții recunoscute; „SCOALA
+  DE SOFERI RAPID SRL" **cu** J → firmă, nu instituție.
+- `documents/generator.test.ts`: `CLIENT_COMPANY_REG` = `N/A` pe PJ fără număr,
+  numărul real când există, gol pe PF.

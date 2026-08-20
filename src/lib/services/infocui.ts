@@ -17,7 +17,12 @@
  * Falls back to mock data in development if ANAF is unreachable.
  */
 
-import { matchesAnyWord, normalizeCedilla } from '@/lib/services/entity-type-detection';
+import {
+  matchesAnyWord,
+  normalizeCedilla,
+  isPublicInstitution,
+  PUBLIC_INSTITUTION_TYPE,
+} from '@/lib/services/entity-type-detection';
 
 // ============================================================================
 // Company Data Types
@@ -224,28 +229,6 @@ export function isCompanyActive(stare: string, inInactiveRegister: boolean): boo
   );
 }
 
-/**
- * Entities that are NOT registered at Registrul Comerțului — public
- * institutions. ANAF returns them with `nrRegCom` and `forma_juridica` EMPTY,
- * so without this they came back with no legal form at all and the wizard's
- * grey example text ("SRL", "J40/12345/2020") read like real data on a school
- * (SCOALA GIMNAZIALA FULOP ARON FELICENI, CUI 13378912, 20.08.2026).
- *
- * Matched with word boundaries and ONLY when ANAF gives no `nrRegCom`, so a
- * commercial "Centrul Medical X SRL" can never be mislabelled.
- */
-const PUBLIC_INSTITUTION_PATTERNS: readonly string[] = [
-  'SCOALA', 'ȘCOALA', 'SCOALĂ', 'ȘCOALĂ',
-  'LICEUL', 'COLEGIUL', 'GRADINITA', 'GRĂDINIȚA', 'GRADINITĂ',
-  'UNIVERSITATEA', 'INSTITUTUL',
-  'PRIMARIA', 'PRIMĂRIA', 'COMUNA', 'ORASUL', 'ORAȘUL', 'MUNICIPIUL', 'JUDETUL', 'JUDEȚUL',
-  'CONSILIUL',
-  'SPITALUL', 'POLICLINICA', 'DISPENSARUL',
-  'INSPECTORATUL', 'DIRECTIA', 'DIRECȚIA', 'AGENTIA', 'AGENȚIA',
-  'MINISTERUL', 'PREFECTURA', 'PENITENCIARUL',
-  'BIBLIOTECA', 'MUZEUL', 'TEATRUL', 'FILARMONICA',
-];
-
 /** Legal forms, longest/dotted variants first so "S.R.L." wins over "SRL". */
 const LEGAL_FORM_PATTERNS: readonly string[] = [
   'S.R.L.', 'SRL',
@@ -282,9 +265,10 @@ function extractCompanyType(name: string, nrRegCom = ''): string {
     if (matchesAnyWord(upperName, [type])) return type.replace(/\./g, '');
   }
 
-  if (!nrRegCom.trim() && matchesAnyWord(upperName, PUBLIC_INSTITUTION_PATTERNS)) {
-    return 'INSTITUȚIE PUBLICĂ';
-  }
+  // Instituțiile publice (școli, primării, spitale) nu sunt la Registrul
+  // Comerțului: ANAF le dă fără nrRegCom și fără formă juridică, iar câmpul
+  // gol lăsa exemplul gri „SRL" să pară dată reală (raport Raul, 20.08.2026).
+  if (isPublicInstitution(name, nrRegCom)) return PUBLIC_INSTITUTION_TYPE;
 
   return '';
 }

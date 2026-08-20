@@ -10,6 +10,7 @@
  * Simpler than KYCDocumentsStep - no OCR, no face matching.
  */
 
+import { PUBLIC_INSTITUTION_TYPE } from '@/lib/services/entity-type-detection';
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { useModularWizard } from '@/providers/modular-wizard-provider';
 import { Button } from '@/components/ui/button';
@@ -54,6 +55,15 @@ const initialUploadState: UploadState = {
   error: null,
 };
 
+/** Aceleași reguli ca la pasul „Date Firmă": o instituție publică n-are
+ *  certificat de la Registrul Comerțului, deci nu i-l putem cere. */
+function isPublicInstitutionOrder(
+  companyType?: string,
+  registrationNumber?: string,
+): boolean {
+  return !registrationNumber?.trim() && companyType === PUBLIC_INSTITUTION_TYPE;
+}
+
 const COMPANY_DOC_CONFIG: Record<
   CompanyDocType,
   {
@@ -77,6 +87,27 @@ const COMPANY_DOC_CONFIG: Record<
     tips: [
       'Certificatul trebuie să fie în termen de valabilitate',
       'Toate paginile trebuie incluse',
+      'Acceptăm și copie scanată',
+    ],
+  },
+};
+
+/** Varianta pentru instituții publice: nefiind la Registrul Comerțului, actul
+ *  echivalent e certificatul de înregistrare fiscală (CIF) de la ANAF sau
+ *  actul de înființare. Fără asta, o școală rămânea blocată la un document pe
+ *  care nu-l poate produce (raport Raul, 20.08.2026). */
+const PUBLIC_INSTITUTION_DOC_CONFIG: Partial<Record<CompanyDocType, {
+  title: string;
+  description: string;
+  tips: string[];
+}>> = {
+  company_registration_cert: {
+    title: 'Certificat de Înregistrare Fiscală (CIF)',
+    description:
+      'Certificatul de înregistrare fiscală emis de ANAF sau actul de înființare al instituției',
+    tips: [
+      'Instituțiile publice nu au certificat de la Registrul Comerțului',
+      'CUI-ul / codul fiscal să fie citibil',
       'Acceptăm și copie scanată',
     ],
   },
@@ -109,6 +140,19 @@ export default function CompanyDocumentsStep({ config, onValidChange }: CompanyD
   // Required documents from config
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const requiredDocs = config.requiredDocuments || [];
+
+  // Instituție publică → cerem actul pe care îl are (CIF/act de înființare),
+  // nu certificatul ONRC pe care nu-l poate produce.
+  const isPublicInstitutionEntity = isPublicInstitutionOrder(
+    companyKyc?.companyType,
+    companyKyc?.registrationNumber,
+  );
+  const docConfigFor = useCallback(
+    (type: CompanyDocType) =>
+      (isPublicInstitutionEntity ? PUBLIC_INSTITUTION_DOC_CONFIG[type] : undefined) ??
+      COMPANY_DOC_CONFIG[type],
+    [isPublicInstitutionEntity],
+  );
 
   const [uploads, setUploads] = useState<Record<string, UploadState>>(() => {
     const initial: Record<string, UploadState> = {};
@@ -302,7 +346,7 @@ export default function CompanyDocumentsStep({ config, onValidChange }: CompanyD
 
   // Render upload card for a document type
   const renderUploadCard = (type: CompanyDocType) => {
-    const docConfig = COMPANY_DOC_CONFIG[type];
+    const docConfig = docConfigFor(type);
     if (!docConfig) return null;
 
     const uploadState = uploads[type] || initialUploadState;
@@ -591,7 +635,7 @@ export default function CompanyDocumentsStep({ config, onValidChange }: CompanyD
       {(!hasVerifiedCompanyDocs || showReuploadOption) && requiredDocs.length > 0 && (
         <div className="flex items-center justify-center gap-4 py-4">
           {requiredDocs.map((docType, index) => {
-            const docConfig = COMPANY_DOC_CONFIG[docType];
+            const docConfig = docConfigFor(docType);
             const hasDoc = !!getDocumentByType(docType);
             return (
               <div key={docType} className="flex items-center gap-2">
@@ -644,7 +688,7 @@ export default function CompanyDocumentsStep({ config, onValidChange }: CompanyD
           >
             <div className="flex items-center justify-between p-4 border-b">
               <h3 className="font-semibold text-secondary-900">
-                {previewModal.type && COMPANY_DOC_CONFIG[previewModal.type]?.title}
+                {previewModal.type && docConfigFor(previewModal.type)?.title}
               </h3>
               <Button
                 variant="ghost"
@@ -679,7 +723,7 @@ export default function CompanyDocumentsStep({ config, onValidChange }: CompanyD
               .filter((docType) => !companyKyc?.uploadedDocuments?.some((d) => d.type === docType))
               .map((docType) => (
                 <li key={docType}>
-                  {COMPANY_DOC_CONFIG[docType as CompanyDocType]?.title ?? docType}
+                  {docConfigFor(docType as CompanyDocType)?.title ?? docType}
                 </li>
               ))}
           </ul>

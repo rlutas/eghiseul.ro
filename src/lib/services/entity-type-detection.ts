@@ -150,6 +150,50 @@ export function detectEntityType(name: string): EntityType {
 }
 
 /**
+ * Legal form we report for entities that are NOT at Registrul Comerțului.
+ * Public institutions (schools, town halls, hospitals) come back from ANAF
+ * with `nrRegCom` and `forma_juridica` EMPTY, so without a value of our own
+ * the wizard printed nothing at all and the grey example text read as data
+ * (raport Raul, 20.08.2026 — SCOALA GIMNAZIALA FULOP ARON FELICENI).
+ */
+export const PUBLIC_INSTITUTION_TYPE = 'INSTITUȚIE PUBLICĂ';
+
+/**
+ * Name patterns of public institutions. Matched with word boundaries and
+ * ONLY together with an empty trade-register number — that condition is what
+ * keeps a commercial "Centrul Medical X SRL" (which HAS a J number) from
+ * being mislabelled.
+ */
+export const PUBLIC_INSTITUTION_PATTERNS: readonly string[] = [
+  'SCOALA', 'ȘCOALA', 'SCOALĂ', 'ȘCOALĂ',
+  'LICEUL', 'COLEGIUL', 'GRADINITA', 'GRĂDINIȚA', 'GRADINITĂ',
+  'UNIVERSITATEA', 'INSTITUTUL',
+  'PRIMARIA', 'PRIMĂRIA', 'COMUNA', 'ORASUL', 'ORAȘUL', 'MUNICIPIUL',
+  'JUDETUL', 'JUDEȚUL',
+  'CONSILIUL',
+  'SPITALUL', 'POLICLINICA', 'DISPENSARUL',
+  'INSPECTORATUL', 'DIRECTIA', 'DIRECȚIA', 'AGENTIA', 'AGENȚIA',
+  'MINISTERUL', 'PREFECTURA', 'PENITENCIARUL',
+  'BIBLIOTECA', 'MUZEUL', 'TEATRUL', 'FILARMONICA',
+];
+
+/**
+ * True when the entity looks like a public institution: an institution name
+ * AND no trade-register number.
+ */
+export function isPublicInstitution(name: string, nrRegCom = ''): boolean {
+  if (!name || nrRegCom.trim()) return false;
+  return matchesAnyWord(normalizeCedilla(name).toUpperCase(), PUBLIC_INSTITUTION_PATTERNS);
+}
+
+/** Documents a public institution can actually produce instead of the ONRC
+ *  registration certificate it does not have. Shown in the upload step. */
+export const PUBLIC_INSTITUTION_DOC_MESSAGE =
+  'Instituție publică: nu are certificat de la Registrul Comerțului. ' +
+  'La pasul următor încarcă certificatul de înregistrare fiscală (CIF) emis ' +
+  'de ANAF sau actul de înființare.';
+
+/**
  * Human-readable Romanian message for a detected entity type. Used to
  * populate the warning/blocking UI in the company-kyc step.
  */

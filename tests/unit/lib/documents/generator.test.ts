@@ -9,6 +9,7 @@ import {
   buildOptionsText,
   buildStareCivilaLabel,
   buildActivitatiStareCivila,
+  buildPlaceholderData,
 } from '@/lib/documents/generator';
 
 // These helpers produce the actual TEXT that ends up in legal contracts.
@@ -592,5 +593,40 @@ describe('buildMotivFraza — motivul NU apare pe apostila Haga', () => {
   it('fără motiv completat, doar punctul final', () => {
     expect(buildMotivFraza('   ')).toBe('.');
     expect(buildMotivFraza(undefined)).toBe('.');
+  });
+});
+
+
+describe('CLIENT_COMPANY_REG — instituții publice fără Registrul Comerțului', () => {
+  // Cererea PJ tipărește „număr de ordine în Registrul Comerţului
+  // {{CLIENT_COMPANY_REG}} codul unic de înregistrare …". Gol, rămânea o
+  // pauză care arăta a câmp uitat de operator (o școală nu are nr. ORC).
+  const ctx = (over: Record<string, unknown>) =>
+    ({
+      order: { total_price: 0, service_price: 0, order_number: 'E-TEST', service_name: 'Test' },
+      company: {},
+      lawyer: {},
+      client: {
+        name: 'SCOALA GIMNAZIALA FULOP ARON FELICENI',
+        email: 'test@example.com',
+        phone: '+40740000000',
+        ...over,
+      },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    }) as any;
+
+  it('prints N/A for a PJ without a trade-register number', () => {
+    const data = buildPlaceholderData(ctx({ is_pj: true, company_reg: '' }));
+    expect(data.CLIENT_COMPANY_REG).toBe('N/A');
+  });
+
+  it('keeps the real number when the company has one', () => {
+    const data = buildPlaceholderData(ctx({ is_pj: true, company_reg: 'J40/1234/2020' }));
+    expect(data.CLIENT_COMPANY_REG).toBe('J40/1234/2020');
+  });
+
+  it('stays empty for PF — the tag is not on their forms', () => {
+    const data = buildPlaceholderData(ctx({ is_pj: false, company_reg: '' }));
+    expect(data.CLIENT_COMPANY_REG).toBe('');
   });
 });

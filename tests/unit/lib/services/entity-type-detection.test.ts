@@ -5,6 +5,7 @@ import {
   PFA_II_IF_PATTERNS,
   ONG_PATTERNS,
   entityTypeMessage,
+  isPublicInstitution,
 } from '@/lib/services/entity-type-detection';
 
 describe('detectEntityType', () => {
@@ -165,5 +166,32 @@ describe('Pattern lists (smoke)', () => {
     expect(ONG_PATTERNS).toContain('FUNDATIE');
     expect(ONG_PATTERNS).toContain('ONG');
     expect(ONG_PATTERNS).toContain('SINDICAT');
+  });
+});
+
+
+describe('isPublicInstitution', () => {
+  // Ce a pornit asta: o școală (CUI 13378912) apărea în wizard ca SRL cu un
+  // număr de Registrul Comerțului inventat — pentru că ANAF o dă fără nimic.
+  it.each([
+    ['SCOALA GIMNAZIALA FULOP ARON FELICENI'],
+    ['ȘCOALA GIMNAZIALĂ NR 1'],
+    ['LICEUL TEORETIC MIHAI EMINESCU'],
+    ['PRIMARIA COMUNEI FELICENI'],
+    ['SPITALUL JUDETEAN DE URGENTA'],
+    ['INSPECTORATUL SCOLAR JUDETEAN HARGHITA'],
+  ])('recognises %s (no trade-register number)', (name) => {
+    expect(isPublicInstitution(name, '')).toBe(true);
+  });
+
+  it('never applies when the entity HAS a trade-register number', () => {
+    // Numele sună a instituție, dar are J → e firmă comercială.
+    expect(isPublicInstitution('CENTRUL MEDICAL DIRECTIA NOUA', 'J12/900/2019')).toBe(false);
+    expect(isPublicInstitution('SCOALA DE SOFERI RAPID SRL', 'J12/100/2010')).toBe(false);
+  });
+
+  it('does not fire on ordinary companies without a number', () => {
+    expect(isPublicInstitution('ACME CONSULTING', '')).toBe(false);
+    expect(isPublicInstitution('', '')).toBe(false);
   });
 });

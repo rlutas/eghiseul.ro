@@ -33,6 +33,8 @@ import {
   detectEntityType,
   entityTypeMessage,
   matchesAnyWord,
+  isPublicInstitution,
+  PUBLIC_INSTITUTION_DOC_MESSAGE,
 } from '@/lib/services/entity-type-detection';
 
 interface CompanyDataStepProps {
@@ -129,6 +131,11 @@ export default function CompanyDataStep({ config, onValidChange }: CompanyDataSt
             } else if (specialRule.action === 'warn') {
               setWarning(specialRule.message);
             }
+          } else if (isPublicInstitution(companyData.name || '', companyData.registrationNumber || '')) {
+            // Instituție publică: n-are certificat ONRC, deci spune-i din
+            // start ce act să pregătească — altfel se blochează la pasul de
+            // documente pe un document care nu există (raport Raul, 20.08.2026).
+            setWarning(PUBLIC_INSTITUTION_DOC_MESSAGE);
           } else if (detected === 'ong') {
             // Fallback: even if config didn't list ONG, surface the extra-docs
             // requirement so the user knows what to bring.
