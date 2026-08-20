@@ -28,12 +28,18 @@ export function uatWithCounty(uat: string | null | undefined, county: string | n
   if (!locality) return judet ? `jud. ${judet}` : '';
   if (!judet) return locality;
 
-  // Bucharest sectors already carry the county in their name ("București
-  // Sectorul 3"). A plain substring test would be wrong — Cluj-Napoca contains
-  // "Cluj" but is still correctly written "Cluj-Napoca, jud. Cluj".
+  // Only Bucharest sectors are exempt — their name already contains it
+  // ("București Sectorul 3").
+  //
+  // Everything else gets the county, even when it looks redundant ("Iași, jud.
+  // Iași"): the nomenclator has a Satu Mare in Harghita AND in Suceava, and a
+  // Călărași in Botoșani, Cluj and Dolj. Dropping the county on the one that
+  // matches its own county would make the county seat the ambiguous case —
+  // worst of all on a cerere filed at BCPI Satu Mare, whose header already says
+  // Satu Mare. A substring test would be wrong too: Cluj-Napoca contains
+  // "Cluj" but is still written "Cluj-Napoca, jud. Cluj".
   const l = fold(locality);
   const j = fold(judet);
-  if (l === j) return locality;
   if (j === 'BUCURESTI' && l.startsWith('BUCURESTI')) return locality;
 
   return `${locality}, jud. ${judet}`;

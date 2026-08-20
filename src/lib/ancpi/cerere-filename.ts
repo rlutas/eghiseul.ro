@@ -50,6 +50,10 @@ export function normalizeCfForCerere(raw: string | null | undefined): string {
 function needsReview(identifier: string): boolean {
   if (!identifier) return true;
   if (/[/\\<>:"|?*]/.test(identifier)) return true;
+  // A one-to-three digit "CF" is either a typo or an old paper number: on
+  // E-260803-KLJAW the client put "1" in the CF field and the real identifier
+  // (175587-C1-U9) in the cadastral one. e-Terra numbers are longer.
+  if (/^\d{1,3}$/.test(identifier)) return true;
   return checkCf(identifier).status !== 'valid';
 }
 

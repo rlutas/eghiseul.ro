@@ -13,8 +13,8 @@ describe('buildCerereFilename', () => {
   });
 
   it('strips diacritics from UAT and county', () => {
-    expect(buildCerereFilename({ carteFunciara: '55', uat: 'Târgu Mureș', county: 'Mureș' }))
-      .toBe('cf 55 - Targu Mures-Mures.pdf');
+    expect(buildCerereFilename({ carteFunciara: '55123', uat: 'Târgu Mureș', county: 'Mureș' }))
+      .toBe('cf 55123 - Targu Mures-Mures.pdf');
   });
 
   it('keeps the electronic identifier suffixes of a unit CF', () => {
@@ -35,8 +35,8 @@ describe('buildCerereFilename', () => {
   });
 
   it('collapses whitespace instead of emitting double spaces', () => {
-    expect(buildCerereFilename({ carteFunciara: ' 900 ', uat: '  Baile   Govora ', county: ' Valcea ' }))
-      .toBe('cf 900 - Baile Govora-Valcea.pdf');
+    expect(buildCerereFilename({ carteFunciara: ' 9001 ', uat: '  Baile   Govora ', county: ' Valcea ' }))
+      .toBe('cf 9001 - Baile Govora-Valcea.pdf');
   });
 
   /**
@@ -61,6 +61,12 @@ describe('buildCerereFilename', () => {
         .toBe('verifica cf 9000-U2 - Tarnaveni-Mures.pdf');
     });
 
+    it('marchează un CF de 1-3 cifre — numărul real e în alt câmp', () => {
+      // E-260803-KLJAW: CF "1", cadastral "175587-C1-U9"
+      expect(buildCerereFilename({ carteFunciara: '1', cadastral: '175587-C1-U9', uat: 'Brasov', county: 'Brașov' }))
+        .toBe('verifica cf 1 - Brasov-Brasov.pdf');
+    });
+
     it('marchează text liber în loc să inventeze un număr', () => {
       expect(buildCerereFilename({ carteFunciara: 'CF vechi 21 FUNDATICA', uat: 'Fundata', county: 'Brașov' }))
         .toBe('verifica cf CF VECHI 21 FUNDATICA - Fundata-Brasov.pdf');
@@ -76,9 +82,9 @@ describe('buildCerereFilename', () => {
 describe('disambiguateFilenames', () => {
   it('leaves distinct names untouched', () => {
     expect(disambiguateFilenames([
-      { name: 'cf 1 - A-Cluj.pdf', orderRef: 'E-1' },
-      { name: 'cf 2 - A-Cluj.pdf', orderRef: 'E-2' },
-    ])).toEqual(['cf 1 - A-Cluj.pdf', 'cf 2 - A-Cluj.pdf']);
+      { name: 'cf 1001 - A-Cluj.pdf', orderRef: 'E-1' },
+      { name: 'cf 1002 - A-Cluj.pdf', orderRef: 'E-2' },
+    ])).toEqual(['cf 1001 - A-Cluj.pdf', 'cf 1002 - A-Cluj.pdf']);
   });
 
   it('appends the order ref when two orders carry the same CF', () => {

@@ -51,6 +51,8 @@ argument — sursa nu e în git (dublează datele lui personale fără câștig)
 Rulat generatorul peste tot ce e plătit și nelivrat (cea mai veche: 14 iulie,
 a doua zi după ce a picat portalul): **117 cereri din 109 comenzi**, toate cu
 județ, UAT și identificator completate — niciuna nu blochează generarea.
+Verificare finală, cu PDF-urile chiar randate: **117/117 generate, 0 eșecuri,
+0 nume duplicate, 0 cereri fără județ, 7 marcate `verifica`**.
 
 Datele reale au scos și un bug: `normalizeCf` (cea folosită de worker) șterge
 toate spațiile interne, deci CF-uri tastate ca **„431001 C1 U2"** sau
@@ -83,6 +85,15 @@ nu era teoretică.
   Bucureștiului îl au deja în nume, nu se dublează. Liniile erau exact la
   marginea din dreapta, așa că valorile mai lungi scurtează automat punctele de
   umplutură din formular, fără să atingă textul real.
+- 🔴 **Județul lipsea tocmai la reședințele de județ**: prima variantă sărea
+  peste el când localitatea se numea ca județul („Iași"), dar nomenclatorul are
+  un **Satu Mare în Harghita și în Suceava** și un **Călărași în Botoșani, Cluj
+  și Dolj** — deci exact reședința devenea cazul ambiguu, pe o cerere depusă la
+  BCPI Satu Mare. Acum județul se scrie mereu, mai puțin la sectoarele
+  Bucureștiului.
+- 🔴 **CF de 1–3 cifre marcat pentru verificare**: pe `E-260803-KLJAW` clientul a
+  scris „1" la carte funciară și identificatorul real (`175587-C1-U9`) la
+  cadastral — denumirea ar fi trimis topograful să ceară CF 1 în Brașov.
 - 🔴 **Previzualizarea de admin ascundea secțiunile de lucru** (`?as=`), deci nu
   se putea verifica din admin dacă topograful chiar are formularul de depunere și
   butonul de încărcare — acum se văd, dezactivate, cu notă.

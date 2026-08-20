@@ -31,20 +31,20 @@ describe('cereriForOrder', () => {
         property: {
           county: 'Cluj',
           locality: 'Cluj-Napoca',
-          carteFunciara: '1',
-          additionalImobile: [{ locality: 'Florești', carteFunciara: '2' }],
+          carteFunciara: '1001',
+          additionalImobile: [{ locality: 'Florești', carteFunciara: '1002' }],
         },
       },
     }, DATE);
 
     expect(second.data.uat).toBe('Florești, jud. Cluj');
-    expect(second.name).toBe('cf 2 - Floresti-Cluj.pdf');
+    expect(second.name).toBe('cf 1002 - Floresti-Cluj.pdf');
   });
 
   it('scrie județul chiar când numele localității îl conține (Cluj-Napoca, jud. Cluj)', () => {
     const [only] = cereriForOrder({
       friendly_order_id: 'E-1',
-      customer_data: { property: { county: 'Cluj', locality: 'Cluj-Napoca', carteFunciara: '1' } },
+      customer_data: { property: { county: 'Cluj', locality: 'Cluj-Napoca', carteFunciara: '1001' } },
     }, DATE);
     expect(only.data.uat).toBe('Cluj-Napoca, jud. Cluj');
   });
@@ -56,8 +56,8 @@ describe('cereriForOrder', () => {
         property: {
           county: 'Cluj',
           locality: 'Cluj-Napoca',
-          carteFunciara: '1',
-          additionalImobile: [{ carteFunciara: '2' }],
+          carteFunciara: '1001',
+          additionalImobile: [{ carteFunciara: '1002' }],
         },
       },
     }, DATE);
@@ -81,11 +81,25 @@ describe('cereriForOrder', () => {
     expect(stalpu.data.uat).toBe('Stâlpu, jud. Buzău');
   });
 
+  it('scrie județul și la reședința de județ — nomenclatorul are Satu Mare în 3 județe', () => {
+    const [satuMare] = cereriForOrder({
+      friendly_order_id: 'E-1',
+      customer_data: { property: { county: 'Suceava', locality: 'Satu Mare', carteFunciara: '1001' } },
+    }, DATE);
+    expect(satuMare.data.uat).toBe('Satu Mare, jud. Suceava');
+
+    const [iasi] = cereriForOrder({
+      friendly_order_id: 'E-2',
+      customer_data: { property: { county: 'Iași', locality: 'Iași', carteFunciara: '1002' } },
+    }, DATE);
+    expect(iasi.data.uat).toBe('Iași, jud. Iași');
+  });
+
   it('nu repetă județul la sectoarele Bucureștiului', () => {
     const [only] = cereriForOrder({
       friendly_order_id: 'E-1',
       customer_data: {
-        property: { county: 'București', locality: 'București Sectorul 3', carteFunciara: '1' },
+        property: { county: 'București', locality: 'București Sectorul 3', carteFunciara: '1001' },
       },
     }, DATE);
     expect(only.data.uat).toBe('București Sectorul 3');
@@ -107,7 +121,7 @@ describe('cereriForOrder', () => {
     const [only] = cereriForOrder({
       friendly_order_id: 'E-1',
       customer_data: {
-        property: { county: 'Cluj', locality: 'Cluj-Napoca', carteFunciara: '1', topografic: '4567/2' },
+        property: { county: 'Cluj', locality: 'Cluj-Napoca', carteFunciara: '1001', topografic: '4567/2' },
       },
     }, DATE);
 
@@ -117,7 +131,7 @@ describe('cereriForOrder', () => {
   it('stamps every cerere with the given date', () => {
     const [only] = cereriForOrder({
       friendly_order_id: 'E-1',
-      customer_data: { property: { county: 'Cluj', locality: 'Cluj-Napoca', carteFunciara: '1' } },
+      customer_data: { property: { county: 'Cluj', locality: 'Cluj-Napoca', carteFunciara: '1001' } },
     }, DATE);
 
     expect(only.data.date).toBe(DATE);
@@ -135,7 +149,7 @@ describe('cereriForOrder', () => {
         property: {
           county: 'Cluj',
           locality: 'Cluj-Napoca',
-          carteFunciara: '1',
+          carteFunciara: '1001',
           additionalImobile: [{ locality: 'Florești', carteFunciara: '', cadastral: '' }],
         },
       },
@@ -151,8 +165,8 @@ describe('cereriForOrder', () => {
         property: {
           county: 'Cluj',
           locality: 'Cluj-Napoca',
-          carteFunciara: '1',
-          additionalImobile: [{ carteFunciara: '2' }],
+          carteFunciara: '1001',
+          additionalImobile: [{ carteFunciara: '1002' }],
         },
       },
     }, DATE);

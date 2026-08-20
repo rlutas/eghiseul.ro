@@ -114,8 +114,11 @@ de ea la runtime.
   repară doar ce e neambiguu (separatoare, localitatea lipită după număr) și
   altfel lasă valoarea verbatim.
 - **Prefixul `verifica `** pe denumire = singurul caz în care VREM să deschidă
-  cererea: carte funciară veche (cu `/`), text liber, CF colectivă. La rularea
-  peste cele 109 comenzi în așteptare: **117 cereri, 6 marcate**.
+  cererea: carte funciară veche (cu `/`), text liber, CF colectivă, sau un CF de
+  1–3 cifre (pe `E-260803-KLJAW` clientul a pus „1" la carte funciară și
+  identificatorul real, `175587-C1-U9`, la cadastral). La rularea peste cele 109
+  comenzi în așteptare: **117 cereri generate, 0 eșecuri, 0 nume duplicate, 7
+  marcate**.
 - Costul eliberării se scrie în `order_supplier_costs` (`ANCPI` /
   `taxa_institutie`), deci intră direct în marja pe comandă și în raportul de
   costuri furnizori.
