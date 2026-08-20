@@ -76,3 +76,9 @@ valoarea există.
   DE SOFERI RAPID SRL" **cu** J → firmă, nu instituție.
 - `documents/generator.test.ts`: `CLIENT_COMPANY_REG` = `N/A` pe PJ fără număr,
   numărul real când există, gol pe PF.
+
+## Decizie confirmată (20.08.2026)
+
+Raul: **acceptăm instituții publice pe cazierul PJ** — documentul a fost
+obținut cu succes pentru școală. Deci fluxul de mai sus (CIF/act de înființare
+în loc de certificat ONRC) este comportamentul dorit, nu un paliativ.
