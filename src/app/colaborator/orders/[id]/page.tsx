@@ -30,7 +30,12 @@ interface OrderDetail {
   documents: OrderDoc[];
   /** Angajamentul de execuție semnat de client (convenția cu executantul). */
   conventii: OrderDoc[];
+  /** Cererile de depus la OCPI (Anexa 6) — una per imobil de pe comandă. */
+  cereri: { index: number; name: string }[];
 }
+
+/** Taxa standard OCPI pentru un extras de carte funciară pentru informare. */
+const DEFAULT_COST_RON = '20';
 
 function Field({ label, value }: { label: string; value?: string | null }) {
   if (!value) return null;
@@ -52,6 +57,11 @@ export default function CollaboratorOrderDetail() {
   const [uploading, setUploading] = useState(false);
   const [note, setNote] = useState('');
   const [savingNote, setSavingNote] = useState(false);
+  const [regNumber, setRegNumber] = useState('');
+  // Taxa OCPI pentru extrasul de informare e 20 lei — precompletată, ca să nu
+  // o tasteze de 109 ori; rămâne editabilă pentru cazurile în care diferă.
+  const [costRon, setCostRon] = useState(DEFAULT_COST_RON);
+  const [savingDepunere, setSavingDepunere] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const load = async () => {
@@ -127,6 +137,27 @@ export default function CollaboratorOrderDetail() {
   };
 
   if (loading) return <p className="text-sm text-slate-500">Se încarcă...</p>;
+  const handleDepunere = async () => {
+    setSavingDepunere(true);
+    try {
+      const res = await fetch(withPreview(`/api/collaborator/orders/${orderId}/depunere`, previewAs), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ registrationNumber: regNumber.trim(), costRon: costRon.trim() }),
+      });
+      const json = await res.json();
+      if (!json.success) throw new Error(json.error || 'Eroare');
+      toast.success('Depunerea a fost înregistrată.');
+      setRegNumber('');
+      setCostRon(DEFAULT_COST_RON);
+      await load();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Eroare la salvare');
+    } finally {
+      setSavingDepunere(false);
+    }
+  };
+
   if (!order) return <p className="text-sm text-red-600">Comanda nu a fost găsită.</p>;
 
   const property = order.customer_data?.property ?? {};
@@ -207,6 +238,84 @@ export default function CollaboratorOrderDetail() {
               </li>
             ))}
           </ul>
+        </div>
+      )}
+
+      {/* Cererile de depus la OCPI — generate din datele comenzii, denumite
+          după convenția lui (nr. CF - UAT-Județ), câte una per imobil. */}
+      {(order.cereri?.length ?? 0) > 0 && (
+        <div className="mb-6 rounded-lg border border-slate-200 bg-white p-5">
+          <h2 className="mb-1 text-sm font-semibold text-slate-900">Cerere pentru OCPI</h2>
+          <p className="mb-3 text-xs text-slate-500">
+            Completată cu datele imobilului și denumită după numărul de carte funciară, UAT și
+            județ. O descarci, o semnezi electronic și o depui — nu mai trebuie să o completezi.
+          </p>
+          <ul className="space-y-2">
+            {order.cereri.map((c) => (
+              <li key={c.index} className="flex items-center gap-2 text-sm text-slate-700">
+                <FileText className="h-4 w-4 text-slate-400" />
+                <span className="flex-1 break-all">{c.name}</span>
+                <a
+                  href={withPreview(
+                    `/api/collaborator/orders/${orderId}/cerere?imobil=${c.index}`,
+                    previewAs
+                  )}
+                  className="text-xs font-medium text-primary-700 hover:underline"
+                >
+                  Descarcă
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* Depunerea la OCPI — nr. de înregistrare + cât ne-a costat eliberarea.
+          Mută comanda în „Trimis instituție", ca statusul clientului să nu mai
+          arate „în procesare" cât timp lucrarea e la ghișeu. */}
+      {!readOnly && (order.cereri?.length ?? 0) > 0 && !delivered && (
+        <div className="mb-6 rounded-lg border border-slate-200 bg-white p-5">
+          <h2 className="mb-1 text-sm font-semibold text-slate-900">Am depus cererea la OCPI</h2>
+          <p className="mb-3 text-xs text-slate-500">
+            Trece comanda în &bdquo;Trimis instituție&rdquo; și înregistrează costul eliberării.
+          </p>
+          <div className="flex flex-wrap items-end gap-3">
+            <div className="min-w-[200px] flex-1">
+              <label htmlFor="reg-number" className="mb-1 block text-xs text-slate-500">
+                Nr. de înregistrare OCPI
+              </label>
+              <input
+                id="reg-number"
+                value={regNumber}
+                onChange={(e) => setRegNumber(e.target.value)}
+                placeholder="ex. 84512/12.09.2026"
+                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/30"
+              />
+            </div>
+            <div className="w-36">
+              <label htmlFor="cost-ron" className="mb-1 block text-xs text-slate-500">
+                Cost eliberare (lei)
+              </label>
+              <input
+                id="cost-ron"
+                type="number"
+                min="0"
+                step="0.01"
+                inputMode="decimal"
+                value={costRon}
+                onChange={(e) => setCostRon(e.target.value)}
+                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/30"
+              />
+            </div>
+            <Button
+              onClick={handleDepunere}
+              disabled={savingDepunere || (!regNumber.trim() && !costRon.trim())}
+              variant="outline"
+              className="h-10"
+            >
+              {savingDepunere ? 'Se salvează...' : 'Salvează depunerea'}
+            </Button>
+          </div>
         </div>
       )}
 

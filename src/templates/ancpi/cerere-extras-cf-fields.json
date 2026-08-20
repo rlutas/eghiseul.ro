@@ -1,0 +1,76 @@
+{
+  "lines": [
+    {
+      "y": 491,
+      "size": 11.258625,
+      "startX": 85.19999849999999,
+      "segments": [
+        {
+          "literal": "comuna/orașul/municipiul … ",
+          "gapAfter": 0
+        },
+        {
+          "field": "UAT",
+          "gapAfter": 0
+        },
+        {
+          "literal": " … …, str. … … … … … … … …, nr. .... bl……,scara ....,",
+          "gapAfter": 0
+        }
+      ]
+    },
+    {
+      "y": 478,
+      "size": 11.258625,
+      "startX": 85.19999849999999,
+      "segments": [
+        {
+          "literal": "ap. ......, având cartea funciară nr. … …",
+          "gapAfter": 3
+        },
+        {
+          "field": "CF_NR",
+          "gapAfter": 3.1
+        },
+        {
+          "literal": "… … a localității … ",
+          "gapAfter": 0
+        },
+        {
+          "field": "CF_LOCALITATE",
+          "gapAfter": 0
+        },
+        {
+          "literal": " …, cu nr. cadastral …",
+          "gapAfter": 0
+        }
+      ]
+    },
+    {
+      "y": 465,
+      "size": 11.258625,
+      "startX": 85.19999849999999,
+      "segments": [
+        {
+          "field": "CADASTRAL",
+          "gapAfter": 2.9
+        },
+        {
+          "literal": ". . . , fiindu-mi necesar la … informare …",
+          "gapAfter": 0
+        }
+      ]
+    },
+    {
+      "y": 329,
+      "size": 11.258625,
+      "startX": 85.19999849999999,
+      "segments": [
+        {
+          "field": "DATA",
+          "gapAfter": 0
+        }
+      ]
+    }
+  ]
+}

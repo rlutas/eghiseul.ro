@@ -3,7 +3,11 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { findStatusLabel } from '@/lib/admin/status-options';
+import { Download } from 'lucide-react';
 import { usePreviewAs, withPreview } from '@/lib/collaborator/preview';
+import { CERERE_CF_SLUG, CERERE_DONE_STATUSES } from '@/lib/ancpi/cerere-scope';
+import { cereriForOrder, type PropertyLike } from '@/lib/ancpi/cereri-for-order';
+import { cerereDateRo } from '@/lib/ancpi/cerere-date';
 
 interface CollabOrder {
   id: string;
@@ -12,7 +16,7 @@ interface CollabOrder {
   created_at: string;
   service_id: string;
   // API-ul returnează DOAR datele de lucrare (property) — fără date de client.
-  customer_data: { property?: { county?: string; locality?: string } | null } | null;
+  customer_data: { property?: PropertyLike | null } | null;
   services: { name: string; slug: string } | null;
 }
 
@@ -44,10 +48,48 @@ export default function CollaboratorOrdersPage() {
     })();
   }, [previewAs]);
 
+  // Câte CERERI are de depus, nu câte comenzi: o comandă cu mai multe imobile
+  // înseamnă mai multe cereri, iar el numără hârtii, nu comenzi.
+  const deDepus = orders
+    .filter((o) => o.services?.slug === CERERE_CF_SLUG && !CERERE_DONE_STATUSES.includes(o.status as never))
+    .flatMap((o) =>
+      cereriForOrder(
+        { friendly_order_id: o.friendly_order_id ?? o.id, customer_data: o.customer_data },
+        cerereDateRo()
+      )
+    );
+  const cfDeDepus = deDepus.length;
+  const deVerificat = deDepus.filter((c) => c.name.startsWith('verifica ')).length;
+
   return (
     <div className="mx-auto max-w-5xl">
       <h1 className="mb-1 text-xl font-semibold text-slate-900">Comenzi</h1>
       <p className="mb-6 text-sm text-slate-500">Comenzile serviciilor alocate ție.</p>
+
+      {cfDeDepus > 0 && (
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-primary-200 bg-primary-50 p-4">
+          <div>
+            <p className="text-sm font-semibold text-secondary-900">
+              {cfDeDepus} {cfDeDepus === 1 ? 'cerere de depus' : 'cereri de depus'} la OCPI
+            </p>
+            <p className="text-xs text-slate-600">
+              Completate și denumite după nr. CF, UAT și județ — le semnezi și le depui.
+            </p>
+            {deVerificat > 0 && (
+              <p className="mt-1 text-xs text-amber-700">
+                {deVerificat} {deVerificat === 1 ? 'cerere are' : 'cereri au'} numărul de carte funciară
+                neobișnuit (carte veche sau text liber) — denumirea începe cu &bdquo;verifica&rdquo;, deschide-le.
+              </p>
+            )}
+          </div>
+          <a
+            href={withPreview('/api/collaborator/cereri', previewAs)}
+            className="inline-flex items-center gap-2 rounded-md bg-primary-700 px-4 py-2 text-sm font-medium text-white hover:bg-primary-800"
+          >
+            <Download className="h-4 w-4" /> Descarcă toate cererile (ZIP)
+          </a>
+        </div>
+      )}
 
       {loading && <p className="text-sm text-slate-500">Se încarcă...</p>}
       {error && <p className="text-sm text-red-600">{error}</p>}

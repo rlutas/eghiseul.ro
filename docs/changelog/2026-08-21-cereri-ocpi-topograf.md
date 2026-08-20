@@ -1,0 +1,99 @@
+# 2026-08-21 — Cererile de extras CF se generează singure pentru topograf
+
+Portalul ANCPI e picat din 13 iulie, iar comenzile de extras carte funciară se
+adună plătite (87 nelivrate, 8.034 lei, la analiza din 14 august). Mircea le
+poate depune manual — semnează electronic cererea și creează lucrarea — dar a
+cerut ajutor la partea care nu scalează:
+
+> „Am nevoie de ajutor daca aveti cereri multe. Va trimit modelul de cerere care
+> trebuie completat." … „Ma intereseaza sa fie corect trecut in denumirea
+> fisierului pdf numarul de carte funciara, uat-ul localitatii si judetul …
+> pentru ca eu imi iau informatia direct din denumirea pdf-ului, nu mai deschid
+> cererea sa o citesc."
+
+## Ce face acum platforma
+
+- **Generează cererea completată** (Anexa nr. 6, „extras de carte funciara
+  pentru informare") din datele imobilului de pe comandă. El doar o semnează.
+- **O denumește în convenția lui**: `cf 101010 - Baile Govora-Valcea.pdf`.
+  UAT-ul vine din nomenclatorul ANCPI validat în wizard, deci nu poate fi scris
+  greșit de mână, iar numele și conținutul ies din aceleași date — nu pot
+  diverge.
+- **Un imobil = o cerere** (cerința lui). Comenzile cu mai multe imobile dau mai
+  multe cereri, indexate.
+- **ZIP cu toate cererile de depus**, din lista de comenzi — partea de „cereri
+  multe". Numele care s-ar suprapune (același CF pe două comenzi) primesc
+  numărul comenzii în paranteză, ca ZIP-ul să nu piardă o lucrare plătită.
+- **Raportarea depunerii**: nr. de înregistrare OCPI + costul eliberării. Trece
+  comanda în „Trimis instituție" (statusul clientului nu mai stă în „procesare"
+  cât e lucrarea la ghișeu) și scrie costul în `order_supplier_costs`
+  (ANCPI / taxă instituție), deci marja pe comandă rămâne reală.
+
+## Detaliul tehnic care contează
+
+PDF-ul primit de la el **nu e completabil** (`AcroForm` fără niciun widget — el
+scrie peste cu typewriter-ul Foxit), și are datele lui de solicitant tipărite în
+text. Așa că baza rămâne forma lui, cu **cele 4 linii variabile șterse din
+content stream** — nu acoperite cu alb: un dreptunghi alb lasă „108465" din
+exemplul lui extractibil la copy-paste, adică exact greșeala de număr CF pe care
+fluxul ăsta o previne. Peste ele se desenează valorile comenzii, cu
+LiberationSerif (metric Times, 0,3% diferență față de sursă), deci literalele se
+reașază pe aceleași poziții și o localitate lungă împinge eticheta următoare, nu
+o suprapune.
+
+Mecanismul e cel de la cererea de cazier fiscal: bază înghețată + hartă de
+segmente. Asset-urile se reconstruiesc cu
+`scripts/build-cf-cerere-pdf-template.ts`, care primește PDF-ul sursă ca
+argument — sursa nu e în git (dublează datele lui personale fără câștig).
+
+## Verificat pe cele 109 comenzi reale în așteptare
+
+Rulat generatorul peste tot ce e plătit și nelivrat (cea mai veche: 14 iulie,
+a doua zi după ce a picat portalul): **117 cereri din 109 comenzi**, toate cu
+județ, UAT și identificator completate — niciuna nu blochează generarea.
+
+Datele reale au scos și un bug: `normalizeCf` (cea folosită de worker) șterge
+toate spațiile interne, deci CF-uri tastate ca **„431001 C1 U2"** sau
+**„41971 Moara"** ar fi ieșit pe cerere ca `431001C1U2` / `41971MOARA` — număr
+greșit pe o cerere depusă. Fluxul are acum normalizare proprie, care repară doar
+ce e neambiguu și lasă restul verbatim.
+
+**6 cereri** au numere pe care nu le putem garanta (carte veche cu `/`, „CF vechi
+21 FUNDATICA", CF colectivă) — denumirea lor începe cu `verifica `, singurul caz
+în care vrem ca el să deschidă documentul. Iar două comenzi diferite chiar au
+același CF (424643-C1-U1, Moșnița Nouă) — dezambiguizarea pe numărul comenzii
+nu era teoretică.
+
+## Decizii luate cu Raul (21.08)
+
+| Întrebare | Răspuns |
+|---|---|
+| Antetul OCPI/BCPI pe județul imobilului? | Nu — rămâne Satu Mare, de acolo depune |
+| Serie CI / CNP | Rămân goale (de reconfirmat cu Mircea) |
+| „fiindu-mi necesar la" | Mereu „informare" |
+| Plan cadastral / identificare imobil | **Nu acum** — formulare diferite, pe care nu le avem |
+| Mai multe CF-uri pe o cerere? | Nu, un imobil per cerere |
+
+## Predarea, executată în aceeași zi
+
+- Serviciul `extras-carte-funciara` **alocat lui Mircea** → cele 109 comenzi îi
+  apar în portal, cu cererile generate.
+- Cele **109 joburi ANCPI `FAILED` → `NEEDS_OPERATOR`** (nu `PENDING`: un retry
+  automat le-ar depune a doua oară, adică am plăti de două ori la ANCPI).
+- **Nu se mai pun joburi în coadă** pentru comenzile noi de extras CF
+  (`HANDED_OVER_TO_COLLABORATOR` în `ensure-ancpi-job.ts`) — altfel, la revenirea
+  portalului, worker-ul ar depune peste ce a depus topograful.
+- Costul eliberării e **precompletat cu 20 lei** (taxa OCPI standard), editabil.
+- Încărcarea PDF-ului **finalizează singură** comanda: document vizibil clientului,
+  status `document_ready`, e-mail — nu mai e nevoie de niciun buton în plus.
+
+## Rămas de făcut
+
+- Când revine portalul ANCPI: flagul pe `false` + de decis ce se face cu
+  lucrările aflate la topograf.
+- De reconfirmat cu Mircea: serie CI / CNP goale și localitatea de pe CF.
+- Localitatea de pe cartea funciară o completăm cu UAT-ul, fiindcă wizardul nu
+  cere satul (în exemplul lui: UAT Odoreu, CF a localității Eteni). De văzut
+  dacă e o problemă la ghișeu.
+
+Detalii: [spec](../technical/specs/cereri-ocpi-colaborator.md)

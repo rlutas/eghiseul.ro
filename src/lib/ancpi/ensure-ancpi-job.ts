@@ -21,6 +21,21 @@ import { effectiveIdentifier } from '@/lib/ancpi/cf-format';
 // Only this service slug is an ANCPI service.
 const ANCPI_SLUG = 'extras-carte-funciara';
 
+/**
+ * HANDOVER 2026-08-21: portalul ePay ANCPI e picat din 13 iulie, iar comenzile
+ * de extras CF le depune manual topograful — vede fiecare comandă plătită în
+ * portalul lui, cu cererea generată (docs/technical/specs/cereri-ocpi-colaborator.md).
+ *
+ * Cât timp e așa, NU mai punem joburi în coadă: ar sta PENDING până revine
+ * portalul, iar atunci worker-ul ar depune a doua oară ceva ce topograful a
+ * depus deja — adică plătim de două ori la ANCPI. Cele 109 joburi vechi au fost
+ * trecute pe NEEDS_OPERATOR din același motiv.
+ *
+ * Când revine portalul: pune la loc `false` ȘI decide cine preia comenzile în
+ * lucru la topograf, ca să nu se suprapună.
+ */
+const HANDED_OVER_TO_COLLABORATOR = true;
+
 // v1 scope: the standard "extras de carte funciară pentru informare" is automated
 // via the prepaid product (14200, 1 point/extras). Plan cadastral / colectivă are
 // handled by an operator for now (the worker routes them to NEEDS_OPERATOR).
@@ -77,6 +92,11 @@ export async function ensureAncpiJobForPaidOrder(orderId: string): Promise<void>
     const svc = order.services as { slug?: string } | { slug?: string }[] | null;
     const slug = Array.isArray(svc) ? svc[0]?.slug : svc?.slug;
     if (slug !== ANCPI_SLUG) return; // not an ANCPI service — nothing to queue
+
+    if (HANDED_OVER_TO_COLLABORATOR) {
+      console.log(`[ancpi] order ${orderId} not queued — extras CF handed over to the collaborator`);
+      return;
+    }
 
     const p = (order.customer_data as CustomerData)?.property ?? {};
 
