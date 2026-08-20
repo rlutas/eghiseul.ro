@@ -37,8 +37,16 @@ describe('cereriForOrder', () => {
       },
     }, DATE);
 
-    expect(second.data.uat).toBe('Florești');
+    expect(second.data.uat).toBe('Florești, jud. Cluj');
     expect(second.name).toBe('cf 2 - Floresti-Cluj.pdf');
+  });
+
+  it('scrie județul chiar când numele localității îl conține (Cluj-Napoca, jud. Cluj)', () => {
+    const [only] = cereriForOrder({
+      friendly_order_id: 'E-1',
+      customer_data: { property: { county: 'Cluj', locality: 'Cluj-Napoca', carteFunciara: '1' } },
+    }, DATE);
+    expect(only.data.uat).toBe('Cluj-Napoca, jud. Cluj');
   });
 
   it('falls back to the order locality when an additional imobil has none', () => {
@@ -54,7 +62,33 @@ describe('cereriForOrder', () => {
       },
     }, DATE);
 
-    expect(second.data.uat).toBe('Cluj-Napoca');
+    expect(second.data.uat).toBe('Cluj-Napoca, jud. Cluj');
+  });
+
+  it('scrie județul pe cerere — Anexa 6 nu are câmp separat pentru el', () => {
+    const [otopeni] = cereriForOrder({
+      friendly_order_id: 'E-260820-HRHDX',
+      customer_data: { property: { county: 'Ilfov', locality: 'Otopeni', carteFunciara: '8377' } },
+    }, DATE);
+    expect(otopeni.data.uat).toBe('Otopeni, jud. Ilfov');
+    // localitatea cărții funciare rămâne curată
+    expect(otopeni.data.cfLocalitate).toBe('Otopeni');
+
+    const [stalpu] = cereriForOrder({
+      friendly_order_id: 'E-260820-YXEUS',
+      customer_data: { property: { county: 'Buzău', locality: 'Stâlpu', carteFunciara: '21926' } },
+    }, DATE);
+    expect(stalpu.data.uat).toBe('Stâlpu, jud. Buzău');
+  });
+
+  it('nu repetă județul la sectoarele Bucureștiului', () => {
+    const [only] = cereriForOrder({
+      friendly_order_id: 'E-1',
+      customer_data: {
+        property: { county: 'București', locality: 'București Sectorul 3', carteFunciara: '1' },
+      },
+    }, DATE);
+    expect(only.data.uat).toBe('București Sectorul 3');
   });
 
   it('printează pe cerere exact numărul din denumire, normalizat la fel', () => {

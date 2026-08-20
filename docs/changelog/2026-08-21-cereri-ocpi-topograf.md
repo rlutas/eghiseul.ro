@@ -74,6 +74,19 @@ nu era teoretică.
 | Plan cadastral / identificare imobil | **Nu acum** — formulare diferite, pe care nu le avem |
 | Mai multe CF-uri pe o cerere? | Nu, un imobil per cerere |
 
+## Corecții după prima verificare pe comenzi reale
+
+- 🔴 **Județul lipsea de pe cerere** (`E-260820-HRHDX` scria doar „Otopeni", fără
+  Ilfov; la fel `E-260820-YXEUS` cu Stâlpu/Buzău). Anexa 6 nu are câmp de județ
+  pentru imobil, iar cererile se depun la Satu Mare pentru toată țara — deci
+  județul merge lângă localitate: **„Otopeni, jud. Ilfov"**. Sectoarele
+  Bucureștiului îl au deja în nume, nu se dublează. Liniile erau exact la
+  marginea din dreapta, așa că valorile mai lungi scurtează automat punctele de
+  umplutură din formular, fără să atingă textul real.
+- 🔴 **Previzualizarea de admin ascundea secțiunile de lucru** (`?as=`), deci nu
+  se putea verifica din admin dacă topograful chiar are formularul de depunere și
+  butonul de încărcare — acum se văd, dezactivate, cu notă.
+
 ## Predarea, executată în aceeași zi
 
 - Serviciul `extras-carte-funciara` **alocat lui Mircea** → cele 109 comenzi îi

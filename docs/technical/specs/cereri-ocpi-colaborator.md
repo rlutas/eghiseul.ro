@@ -94,6 +94,13 @@ de ea la runtime.
   acolo indiferent de județul imobilului. Județul contează în **denumire**.
 - **Serie CI / CNP rămân goale**, iar scopul e mereu „informare" — la fel ca în
   cererile pe care le depune azi.
+- **Județul se scrie lângă localitate** („Otopeni, jud. Ilfov"): Anexa 6 NU are
+  câmp de județ pentru imobil, iar cererea se depune la Satu Mare pentru imobile
+  din toată țara — fără el, funcționarul nu știe ce Drăgănești e (semnalat pe
+  `E-260820-HRHDX` și `E-260820-YXEUS`). Excepție: sectoarele Bucureștiului, care
+  îl au deja în nume. Liniile fiind exact la marginea din dreapta, valorile mai
+  lungi scurtează automat punctele de umplutură (`cerere-line-fit.ts`) — textul
+  formularului nu se pierde niciodată.
 - **Localitatea CF = UAT-ul.** Wizardul cere doar UAT-ul, nu satul de pe carte
   (în exemplul lui: UAT Odoreu, CF a localității Eteni). Dacă devine o problemă
   la ghișeu, ne trebuie un câmp separat în wizard.

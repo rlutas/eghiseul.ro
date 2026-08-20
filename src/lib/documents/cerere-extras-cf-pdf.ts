@@ -24,6 +24,7 @@ import { PDFDocument } from 'pdf-lib';
 import fontkit from '@pdf-lib/fontkit';
 import { readFileSync } from 'fs';
 import { join } from 'path';
+import { fitLine, type FitPiece } from '@/lib/documents/cerere-line-fit';
 
 export interface CerereExtrasCfData {
   /** UAT (comuna/orașul/municipiul) where the property is located */
@@ -49,6 +50,12 @@ interface LineMap {
 }
 
 const ASSET_DIR = join(process.cwd(), 'src', 'templates', 'ancpi');
+
+/**
+ * Right text margin of the form (612pt page, 85pt margins) — every original
+ * line ends at ~527. Values longer than the sample ones must not cross it.
+ */
+const RIGHT_MARGIN = 527.5;
 
 export async function generateCerereExtrasCfPdf(data: CerereExtrasCfData): Promise<Buffer> {
   const basePdf = readFileSync(join(ASSET_DIR, 'cerere-extras-cf-base.pdf'));
@@ -77,16 +84,28 @@ export async function generateCerereExtrasCfPdf(data: CerereExtrasCfData): Promi
 
   const page = pdf.getPages()[0];
   for (const line of map.lines) {
+    const pieces: FitPiece[] = line.segments.map(seg => ({
+      text: seg.field !== undefined ? values[seg.field] ?? '' : seg.literal ?? '',
+      isValue: seg.field !== undefined,
+      gapAfter: seg.gapAfter,
+    }));
+
+    const fitted = fitLine(pieces, line.startX, RIGHT_MARGIN, (text, isValue) =>
+      (isValue ? bold : regular).widthOfTextAtSize(text, line.size)
+    );
+
     let x = line.startX;
-    for (const seg of line.segments) {
-      const isField = seg.field !== undefined;
-      const text = isField ? values[seg.field!] ?? '' : seg.literal ?? '';
-      const font = isField ? bold : regular;
-      if (text) {
-        page.drawText(text, { x, y: line.y, size: line.size, font });
-        x += font.widthOfTextAtSize(text, line.size);
+    for (const piece of fitted) {
+      if (piece.text) {
+        page.drawText(piece.text, {
+          x,
+          y: line.y,
+          size: line.size,
+          font: piece.isValue ? bold : regular,
+        });
+        x += (piece.isValue ? bold : regular).widthOfTextAtSize(piece.text, line.size);
       }
-      x += seg.gapAfter;
+      x += piece.gapAfter;
     }
   }
 

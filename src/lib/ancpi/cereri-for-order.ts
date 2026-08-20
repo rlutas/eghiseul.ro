@@ -10,6 +10,7 @@
  */
 import type { CerereExtrasCfData } from '@/lib/documents/cerere-extras-cf-pdf';
 import { buildCerereFilename, normalizeCfForCerere } from '@/lib/ancpi/cerere-filename';
+import { uatWithCounty } from '@/lib/ancpi/uat-label';
 
 interface AdditionalImobil {
   locality?: string | null;
@@ -75,7 +76,10 @@ export function cereriForOrder(order: OrderForCereri, date: string): CerereForOr
         orderRef: order.friendly_order_id,
         name: buildCerereFilename({ carteFunciara, cadastral, uat, county }),
         data: {
-          uat,
+          // Anexa 6 has no county field for the imobil, so it rides along with
+          // the locality — otherwise a cerere filed at Satu Mare for Otopeni
+          // never names Ilfov, and UAT names repeat across counties.
+          uat: uatWithCounty(uat, county),
           carteFunciara,
           // The wizard only knows the UAT, not the village a CF may belong to.
           cfLocalitate: uat,
