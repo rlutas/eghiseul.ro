@@ -170,7 +170,7 @@ describe('validateCNP — date errors', () => {
   });
 });
 
-describe('validateCNP — county code errors', () => {
+describe('validateCNP — county code', () => {
   function craftWithCounty(county: string): string {
     const base = `2960507${county}001`;
     const weights = [2, 7, 9, 1, 4, 6, 3, 5, 8, 2, 7, 9];
@@ -178,12 +178,6 @@ describe('validateCNP — county code errors', () => {
     for (let i = 0; i < 12; i++) sum += parseInt(base[i], 10) * weights[i];
     return base + (sum % 11 === 10 ? 1 : sum % 11);
   }
-
-  it.each(['47', '48', '49', '50', '53', '99'])('rejects unknown county code "%s"', (code) => {
-    const r = validateCNP(craftWithCounty(code));
-    expect(r.valid).toBe(false);
-    expect(r.errors.some((e) => e.match(/jude/i))).toBe(true);
-  });
 
   it.each([
     ['01', 'Alba'],
@@ -197,6 +191,34 @@ describe('validateCNP — county code errors', () => {
   ])('accepts county code "%s" (%s)', (code, _name) => {
     const r = validateCNP(craftWithCounty(code));
     expect(r.valid).toBe(true);
+  });
+
+  // Codurile din afara listei clasice EXISTĂ. Pe CJO/ecazier avem comenzi
+  // PLĂTITE și finalizate cu 47 (trei) și 80 (patru), toate cu cifra de
+  // control corectă. Le refuzam, iar clientul rămânea blocat: MARIN
+  // CONSTANTIN nu putea trimite comanda E-260819-XHHD5 cu propriul CNP.
+  it.each(['47', '48', '49', '50', '53', '80', '99'])(
+    'accepts county code "%s" — outside the classic list, but the register issues it',
+    (code) => {
+      const r = validateCNP(craftWithCounty(code));
+      expect(r.valid).toBe(true);
+    },
+  );
+
+  it('accepts the real CNP from order E-260819-XHHD5 (county 47)', () => {
+    const r = validateCNP('1860125471335');
+    expect(r.valid).toBe(true);
+    expect(r.data!.countyCode).toBe('47');
+  });
+
+  it('still rejects "00" — never assigned, used by placeholder data', () => {
+    const r = validateCNP(craftWithCounty('00'));
+    expect(r.valid).toBe(false);
+    expect(r.errors.some((e) => e.match(/jude/i))).toBe(true);
+  });
+
+  it('has no county NAME for codes outside the list, without failing', () => {
+    expect(getCountyFromCNP('1860125471335')).toBeNull();
   });
 });
 

@@ -7,7 +7,8 @@
  * AA = Year (2 digits)
  * LL = Month (01-12)
  * ZZ = Day (01-31)
- * JJ = County code (01-52)
+ * JJ = County code (01-52 în lista clasică, dar registrul emite și altele —
+ *      vezi validarea de mai jos; „00" e singurul refuzat)
  * NNN = Sequence number (001-999)
  * C = Checksum digit
  */
@@ -26,7 +27,12 @@ export interface CNPValidationResult {
   };
 }
 
-// County codes
+/**
+ * County code → name, used ONLY to display where the CNP was issued
+ * (`getCountyFromCNP`). Deliberately NOT a validation whitelist: the register
+ * issues codes outside this list (47, 80 seen on real orders) and an unknown
+ * code just means we have no name for it.
+ */
 const COUNTY_CODES: Record<string, string> = {
   '01': 'Alba',
   '02': 'Arad',
@@ -190,8 +196,19 @@ export function validateCNP(cnp: string): CNPValidationResult {
     return { valid: false, errors };
   }
 
-  // County code validation
-  if (!COUNTY_CODES[countyCode]) {
+  // County code: the classic list (01–46, 51, 52) is NOT exhaustive.
+  //
+  // Real cards carry codes outside it. On CJO/ecazier we have PAID, COMPLETED
+  // orders with `47` (three of them, Romanian-born) and `80` (four, including
+  // people born in Moldova and Morocco) — all with correct check digits.
+  // Refusing those is us pretending to know the population register better
+  // than the register does; the check digit below is the real integrity test.
+  //
+  // What broke: MARIN CONSTANTIN (CNP …47133…, CI IF 542802) could not finish
+  // order E-260819-XHHD5 — he typed his own CNP and the wizard told him the
+  // county code is invalid (raport Raul, 20.08.2026). Only `00` stays refused:
+  // never assigned, and what placeholder/test data uses.
+  if (countyCode === '00') {
     errors.push('Codul județului din CNP este invalid');
     return { valid: false, errors };
   }

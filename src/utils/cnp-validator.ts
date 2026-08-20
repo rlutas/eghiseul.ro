@@ -49,9 +49,11 @@ export function validateCNP(cnp: string): { valid: boolean; error?: string; data
     return { valid: false, error: 'Ziua este invalidă' }
   }
 
-  // Validate county code (01-52, with some exceptions)
+  // Validate county code. The 01–52 list is not exhaustive — the register
+  // issues codes outside it (47, 80 appear on real, paid orders with correct
+  // check digits), so only `00` is refused. See lib/validations/cnp.ts.
   const county = j1 * 10 + j2
-  if (!isValidCounty(county)) {
+  if (county === 0) {
     return { valid: false, error: 'Codul județului este invalid' }
   }
 
@@ -111,11 +113,6 @@ function getMaxDaysInMonth(month: number, year: number): number {
 
 function isLeapYear(year: number): boolean {
   return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0
-}
-
-function isValidCounty(code: number): boolean {
-  // Valid county codes: 01-46, 51, 52
-  return (code >= 1 && code <= 46) || code === 51 || code === 52
 }
 
 const COUNTIES: Record<number, string> = {
