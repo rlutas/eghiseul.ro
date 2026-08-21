@@ -78,7 +78,7 @@ export async function POST(
 
     const { data: order } = await admin
       .from('orders')
-      .select('id, friendly_order_id, status')
+      .select('id, friendly_order_id, status, services:service_id(name)')
       .eq('id', orderId)
       .single();
     if (!order) {
@@ -95,7 +95,10 @@ export async function POST(
       || 'colaborator';
 
     if (costRon !== null) {
-      const description = `Taxă OCPI extras CF ${order.friendly_order_id ?? ''}`.trim();
+      const svc = Array.isArray(order.services) ? order.services[0] : order.services;
+      const description = `Taxă OCPI ${svc?.name ?? ''} ${order.friendly_order_id ?? ''}`
+        .replace(/\s+/g, ' ')
+        .trim();
       const { data: existing } = await admin
         .from('order_supplier_costs')
         .select('id')

@@ -120,6 +120,15 @@ nu era teoretică.
   prin 100 de rânduri. Aplicat pe `E-260817-RP38U` și `E-260819-FJZ8P` (clienți
   care au scris supărați).
 
+## Taxa de eliberare, pe serviciu
+
+Era fixă la 20 de lei. Tariful oficial (Ordin ANCPI 16/2019) diferă:
+**2.7.6 extras CF pentru informare = 20 lei**, **2.7.7 extras din planul
+cadastral = 15 lei** — acum se precompletează după serviciul comenzii
+(`taxe-eliberare.ts`), rămâne editabilă. Formularul de depunere apare de acum și
+la plan cadastral, unde încă nu generăm cererea — altfel taxa plătită la ghișeu
+rămânea neînregistrată și marja ieșea în plus.
+
 ## Predarea, executată în aceeași zi
 
 - Serviciul `extras-carte-funciara` **alocat lui Mircea** → cele 109 comenzi îi

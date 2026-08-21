@@ -130,7 +130,10 @@ de ea la runtime.
   marcate**.
 - Costul eliberării se scrie în `order_supplier_costs` (`ANCPI` /
   `taxa_institutie`), deci intră direct în marja pe comandă și în raportul de
-  costuri furnizori.
+  costuri furnizori. Se precompletează din `taxe-eliberare.ts`, pe serviciu:
+  **20 lei** extras CF (cod 2.7.6), **15 lei** extras din planul cadastral
+  (cod 2.7.7). Formularul de depunere apare la orice serviciu cu taxă cunoscută,
+  chiar dacă nu-i generăm cererea.
 
 ## Ordinea de lucru
 

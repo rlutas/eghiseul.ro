@@ -8,6 +8,7 @@ import { ArrowLeft, Upload, CheckCircle2, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { findStatusLabel } from '@/lib/admin/status-options';
 import { usePreviewAs, withPreview } from '@/lib/collaborator/preview';
+import { taxaEliberare } from '@/lib/ancpi/taxe-eliberare';
 
 interface OrderDoc {
   id: string;
@@ -34,9 +35,6 @@ interface OrderDetail {
   cereri: { index: number; name: string }[];
 }
 
-/** Taxa standard OCPI pentru un extras de carte funciară pentru informare. */
-const DEFAULT_COST_RON = '20';
-
 function Field({ label, value }: { label: string; value?: string | null }) {
   if (!value) return null;
   return (
@@ -61,16 +59,22 @@ export default function CollaboratorOrderDetail() {
   const [note, setNote] = useState('');
   const [savingNote, setSavingNote] = useState(false);
   const [regNumber, setRegNumber] = useState('');
-  // Taxa OCPI pentru extrasul de informare e 20 lei — precompletată, ca să nu
-  // o tasteze de 109 ori; rămâne editabilă pentru cazurile în care diferă.
-  const [costRon, setCostRon] = useState(DEFAULT_COST_RON);
+  // Taxa OCPI diferă pe serviciu (20 lei extras CF, 15 lei plan cadastral) —
+  // se precompletează după ce se încarcă comanda, ca să nu o tasteze de o sută
+  // de ori; rămâne editabilă pentru cazurile în care diferă.
+  const [costRon, setCostRon] = useState('');
   const [savingDepunere, setSavingDepunere] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const load = async () => {
     const res = await fetch(withPreview(`/api/collaborator/orders/${orderId}`, previewAs));
     const json = await res.json();
-    if (json.success) setOrder(json.data);
+    if (json.success) {
+      setOrder(json.data);
+      const taxa = taxaEliberare(json.data?.services?.slug);
+      // Doar cât timp câmpul e neatins — nu suprascriem ce a tastat el.
+      setCostRon((current) => (current === '' && taxa !== null ? String(taxa) : current));
+    }
     else toast.error(json.error || 'Eroare la încărcare');
     setLoading(false);
   };
@@ -152,7 +156,9 @@ export default function CollaboratorOrderDetail() {
       if (!json.success) throw new Error(json.error || 'Eroare');
       toast.success('Depunerea a fost înregistrată.');
       setRegNumber('');
-      setCostRon(DEFAULT_COST_RON);
+      setCostRon(taxaEliberare(order?.services?.slug) !== null
+        ? String(taxaEliberare(order?.services?.slug))
+        : '');
       await load();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : 'Eroare la salvare');
@@ -276,7 +282,10 @@ export default function CollaboratorOrderDetail() {
       {/* Depunerea la OCPI — nr. de înregistrare + cât ne-a costat eliberarea.
           Mută comanda în „Trimis instituție", ca statusul clientului să nu mai
           arate „în procesare" cât timp lucrarea e la ghișeu. */}
-      {(order.cereri?.length ?? 0) > 0 && !delivered && (
+      {/* Apare pentru serviciile pe care le depunem la OCPI — și acolo unde
+          generăm cererea (extras CF), și unde încă nu (plan cadastral), ca taxa
+          plătită la ghișeu să nu rămână neînregistrată. */}
+      {((order.cereri?.length ?? 0) > 0 || taxaEliberare(order.services?.slug) !== null) && !delivered && (
         <div className="mb-6 rounded-lg border border-slate-200 bg-white p-5">
           <h2 className="mb-1 text-sm font-semibold text-slate-900">Am depus cererea la OCPI</h2>
           <p className="mb-3 text-xs text-slate-500">
