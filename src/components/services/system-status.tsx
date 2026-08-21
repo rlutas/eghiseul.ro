@@ -83,8 +83,17 @@ export function SystemStatus({
       >
         <span className="inline-block h-2 w-2 flex-shrink-0 rounded-full bg-red-500" aria-hidden="true" />
         <span className="text-xs font-medium text-red-900">
-          Sistemul {service === 'ancpi' ? 'ANCPI' : 'ONRC'} este momentan indisponibil
-          {since ? ` (din ${since})` : ''}
+          {service === 'ancpi' ? (
+            <>
+              Platformele online ANCPI pentru public sunt încă oprite
+              {since ? ` (din ${since})` : ''} — extrasul îl obținem în{' '}
+              <strong>2 zile lucrătoare</strong>, prin partener autorizat.
+            </>
+          ) : (
+            <>
+              Sistemul ONRC este momentan indisponibil{since ? ` (din ${since})` : ''}
+            </>
+          )}
         </span>
       </div>
     );
@@ -141,20 +150,35 @@ export function SystemStatus({
               timeZone: 'Europe/Bucharest',
             })}
           </span>{' '}
-          — monitorizăm continuu și reluăm eliberarea automat la revenire.
+          {service === 'ancpi'
+            ? ' — monitorizăm continuu, iar între timp eliberăm extrasul prin partener autorizat.'
+            : ' — monitorizăm continuu și reluăm eliberarea automat la revenire.'}
         </p>
       )}
 
       {/* Reassurance while the provider portal is down: orders keep queuing and
           the worker issues them automatically the moment the portal recovers —
           the customer doesn't need to wait or come back. */}
-      {!loading && !operational && (
+      {/* ANCPI, din 21.08: nu mai așteptăm portalul public — cererea o depune
+          la OCPI un partener autorizat, cu acces la e-Terra din 12 august.
+          Promisiunea „se eliberează automat la revenire" devenise falsă. */}
+      {!loading && !operational && service === 'ancpi' && (
         <p className="mt-3 rounded-lg bg-amber-50 px-3 py-2 text-xs leading-relaxed text-amber-900">
-          <strong>Atenție:</strong> sistemele naționale {service === 'ancpi' ? 'ANCPI' : 'ONRC'} sunt
-          temporar indisponibile, însă <strong>poți plasa comanda în continuare</strong>. Cererea ta
-          este înregistrată și va fi procesată <strong>cu prioritate, automat</strong>, imediat ce
-          sistemele redevin funcționale. Monitorizăm permanent situația și te anunțăm pe email când
-          documentul este eliberat. Mulțumim pentru înțelegere!
+          <strong>Atenție:</strong> sistemele ANCPI revin <strong>etapizat</strong>, dar încă cu
+          probleme — platformele online pentru public rămân oprite, iar la ghișee s-au adunat
+          cererile din perioada blocajului. <strong>Poți comanda în continuare:</strong> cererea o
+          depune la OCPI un <strong>partener autorizat</strong>, iar termenul nostru este de{' '}
+          <strong>2 zile lucrătoare</strong>. Primești extrasul pe email.
+        </p>
+      )}
+
+      {!loading && !operational && service !== 'ancpi' && (
+        <p className="mt-3 rounded-lg bg-amber-50 px-3 py-2 text-xs leading-relaxed text-amber-900">
+          <strong>Atenție:</strong> sistemele naționale ONRC sunt temporar indisponibile, însă{' '}
+          <strong>poți plasa comanda în continuare</strong>. Cererea ta este înregistrată și va fi
+          procesată <strong>cu prioritate, automat</strong>, imediat ce sistemele redevin
+          funcționale. Monitorizăm permanent situația și te anunțăm pe email când documentul este
+          eliberat. Mulțumim pentru înțelegere!
         </p>
       )}
     </div>

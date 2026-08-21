@@ -13,8 +13,19 @@ export const TAXA_ELIBERARE_RON: Record<string, number> = {
   'extras-plan-cadastral': 15,
 };
 
-/** Taxa pentru un serviciu, sau null dacă nu plătim o taxă fixă la OCPI. */
-export function taxaEliberare(slug: string | null | undefined): number | null {
+/**
+ * Taxa pentru un serviciu, sau null dacă nu plătim o taxă fixă la OCPI.
+ *
+ * Sursa principală e `services.processing_config.ancpi_cost_ron`, ca o
+ * modificare de tarif să se facă din admin, nu printr-un deploy. Lista de mai
+ * sus rămâne plasă de siguranță pentru configurările incomplete.
+ */
+export function taxaEliberare(
+  slug: string | null | undefined,
+  processingConfig?: { ancpi_cost_ron?: number | string | null } | null
+): number | null {
+  const dinConfig = Number(processingConfig?.ancpi_cost_ron);
+  if (Number.isFinite(dinConfig) && dinConfig > 0) return dinConfig;
   if (!slug) return null;
   return TAXA_ELIBERARE_RON[slug] ?? null;
 }

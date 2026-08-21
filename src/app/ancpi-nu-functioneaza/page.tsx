@@ -8,7 +8,7 @@ import { OutageAlertSignup } from '@/components/articole/outage-alert-signup';
 const SLUG = 'ancpi-nu-functioneaza';
 // H1 — descriptive. The SERP <title> is shorter (META_TITLE): the long one
 // was 72 chars and Google rewrote it into a lowercase tail fragment.
-const TITLE = 'ANCPI și e-Terra: atac cibernetic, blocaj național din 13 iulie — e-Terra repornită etapizat din 11 august, platformele publice încă oprite';
+const TITLE = 'ANCPI și e-Terra: atac cibernetic, blocaj național din 13 iulie — sistemele revin etapizat, dar încă cu probleme; extrasul de carte funciară se poate obține în 2 zile lucrătoare';
 // Titlul din SERP țintește starea + acțiunea, nu evenimentul: cine caută vrea
 // să știe dacă mai e picat și ce face, nu să citească încă o știre despre atac
 // (presa ocupă oricum acele poziții cu autoritate mai mare).
@@ -16,9 +16,9 @@ const TITLE = 'ANCPI și e-Terra: atac cibernetic, blocaj național din 13 iulie
 // criza („atacul de la Cadastru", trend 2K+/24h) — căutarea vine pe el.
 const META_TITLE = 'ANCPI / Cadastru: ce funcționează azi — status live';
 const DESCRIPTION =
-  'Update 12 august: e-Terra a fost repornită etapizat (11 august, ora 15:00) pentru ANCPI, OCPI și notari, iar de azi, ora 8:30, și pentru topografi, experți judiciari și executori. Platformele online pentru public rămân OPRITE — verificat azi. Comandă extrasul CF acum, îl eliberăm automat la revenire.';
+  'Update 21 august: e-Terra merge din nou pentru profesioniști, iar din 20 august a fost reactivat și „Link de plată". Platformele online pentru public rămân OPRITE, iar între 11 și 19 august OCPI-urile au înregistrat 329.476 de cereri — deci întârzierile continuă. Noi eliberăm extrasul de carte funciară în 2 zile lucrătoare, prin partener autorizat.';
 const DATE_PUBLISHED = '2026-07-15';
-const DATE_MODIFIED = '2026-08-12';
+const DATE_MODIFIED = '2026-08-21';
 
 export const revalidate = 3600; // outage news — refresh hourly
 
@@ -51,13 +51,13 @@ export default function Page() {
       datePublished={DATE_PUBLISHED}
       dateModified={DATE_MODIFIED}
       publishedLabel="15 iulie 2026"
-      updatedLabel="12 august 2026"
+      updatedLabel="21 august 2026"
       imageAlt="Sistem temporar nefuncțional — sistemele informatice ANCPI indisponibile la nivel național"
       relatedServices={[
         {
           slug: 'extras-carte-funciara',
           label: 'Extras de Carte Funciară',
-          desc: 'Comanda se pune în coadă și se eliberează automat, cu prioritate, la revenirea ANCPI.',
+          desc: 'Îl obținem în 2 zile lucrătoare, prin partener autorizat — nu aștepți revenirea platformelor publice.',
         },
         {
           slug: 'identificare-imobil',
@@ -97,7 +97,7 @@ export default function Page() {
         },
         {
           q: 'Pot obține un extras de carte funciară în această perioadă?',
-          a: 'Încă nu online. Din 11 august e-Terra a repornit etapizat, dar DOAR pentru profesioniști (ANCPI, OCPI, notari, iar din 12 august topografi, experți judiciari și executori), iar platformele online pentru public rămân oprite până la un anunț separat — verificat de noi, portalul ePay nu răspunde nici azi. În plus, prima zi de funcționare a fost dedicată înregistrării actelor restante, cu solicitările de extrase blocate inclusiv pentru notari. Poți plasa comanda acum: intră în coadă și se eliberează automat, cu prioritate, imediat ce portalul public revine.',
+          a: 'Încă nu online. Din 11 august e-Terra a repornit etapizat, dar DOAR pentru profesioniști (ANCPI, OCPI, notari, iar din 12 august topografi, experți judiciari și executori), iar platformele online pentru public rămân oprite până la un anunț separat — verificat de noi, portalul ePay nu răspunde nici azi. În plus, prima zi de funcționare a fost dedicată înregistrării actelor restante, cu solicitările de extrase blocate inclusiv pentru notari. Poți comanda însă în continuare de la noi: cererea o depune la OCPI un partener autorizat, care are acces la e-Terra din 12 august, iar termenul nostru este de 2 zile lucrătoare — nu depinde de repornirea platformelor pentru public.',
         },
         {
           q: 'Cum primesc extrasul CF fără să urmăresc eu revenirea ANCPI?',
@@ -137,7 +137,7 @@ export default function Page() {
         },
         {
           q: 'Cum aflu în secunda în care revine ANCPI?',
-          a: 'Ai două variante, ambele fără să verifici tu nimic. Dacă ai nevoie de document: plasezi comanda acum și se eliberează automat la revenire. Dacă vrei doar să știi: lasă-ți emailul în caseta de alertă de pe această pagină și primești un singur mesaj în momentul revenirii. Monitorizarea noastră verifică portalul ANCPI la fiecare 15 minute — am detectat căderea cu aproximativ 10 ore înaintea primului comunicat oficial.',
+          a: 'Ai două variante, ambele fără să verifici tu nimic. Dacă ai nevoie de extras: îl comanzi acum și îl obținem în 2 zile lucrătoare, prin partener autorizat. Dacă vrei doar să știi: lasă-ți emailul în caseta de alertă de pe această pagină și primești un singur mesaj în momentul revenirii. Monitorizarea noastră verifică portalul ANCPI la fiecare 15 minute — am detectat căderea cu aproximativ 10 ore înaintea primului comunicat oficial.',
         },
       ]}
     >
@@ -177,15 +177,22 @@ export default function Page() {
           pentru cineva care caută răspunsul pe telefon. */}
       <h2 id="status">Mai e picat ANCPI? Starea sistemelor, în timp real</h2>
       <p>
-        <strong>Parțial.</strong> De marți, 11 august, e-Terra merge din nou — dar{' '}
-        <strong>doar pentru profesioniști</strong>: personalul ANCPI și OCPI, notarii publici și,
-        din 12 august, topografii autorizați, experții tehnici judiciari și executorii
-        judecătorești. Pentru public,{' '}
+        <strong>Parțial, și încă cu probleme.</strong> De marți, 11 august, e-Terra merge din nou —
+        dar <strong>doar pentru profesioniști</strong>: personalul ANCPI și OCPI, notarii publici
+        și, din 12 august, topografii autorizați, experții tehnici judiciari și executorii
+        judecătorești. Din <strong>20 august</strong> a fost reactivată și funcționalitatea{' '}
+        <strong>&bdquo;Link de plată&rdquo;</strong> din e-Terra. Restul sistemelor — RTI, MyeTerra, Registrul
+        proprietarilor, Titluri de proprietate, Geoportal — <strong>rămân oprite</strong> și revin
+        etapizat, pe măsură ce trec verificările.
+      </p>
+      <p>
+        Pentru public,{' '}
         <strong>platformele online ale ANCPI sunt în continuare oprite</strong> — am verificat
         portalul ePay și în ziua <strong>{outageDays}</strong> de blocaj, iar serverele tot nu
-        răspund. Practic: notarul tău poate lucra din nou, dar un extras de carte funciară nu se
-        poate încă scoate online. Verificăm portalul la fiecare 15 minute; indicatorul de mai jos e
-        live:
+        răspund. Iar presiunea pe ghișee e reală: între 11 și 19 august, oficiile de cadastru au
+        înregistrat <strong>329.476 de cereri</strong>, din care au soluționat 279.242 — ANCPI
+        anunță ea însăși că pot apărea &bdquo;temporar, timpi de așteptare mai mari&rdquo;. Verificăm portalul
+        la fiecare 15 minute; indicatorul de mai jos e live:
       </p>
       <div className="not-prose my-6">
         <SystemStatus service="ancpi" />
@@ -193,20 +200,19 @@ export default function Page() {
 
       <div className="not-prose my-8 rounded-2xl border-2 border-primary-500 bg-primary-50 p-6">
         <p className="mb-1 text-lg font-bold text-secondary-900">
-          Ai nevoie de extras de carte funciară? Îl scoatem noi, imediat ce revine
+          Ai nevoie de extras de carte funciară? Îl obținem în 2 zile lucrătoare
         </p>
         <p className="mb-4 text-sm leading-relaxed text-secondary-900/80">
-          Nu poți grăbi revenirea ANCPI, dar poți fi primul în coadă când revine. Plasezi comanda
-          acum, iar platforma noastră o eliberează <strong>automat</strong>, în secunda în care
-          sistemele răspund. Primești documentul pe email, fără să reiei comanda și fără să
-          urmărești tu nimic.
+          Nu mai aștepți revenirea platformelor publice: cererea o depune la OCPI un{' '}
+          <strong>partener autorizat</strong>, care are acces la e-Terra din 12 august. Termenul
+          nostru este de <strong>2 zile lucrătoare</strong>, iar extrasul îți vine pe email.
         </p>
         <ul className="mb-4 space-y-1.5 text-sm text-secondary-900/80">
           <li className="flex gap-2">
             <span aria-hidden className="text-primary-600">✓</span>
             <span>
-              <strong>Coada se procesează în ordinea plasării</strong> — cine comandă azi primește
-              documentul înaintea celor care așteaptă revenirea ca să comande.
+              <strong>2 zile lucrătoare</strong>, prin partener autorizat — nu depinzi de repornirea
+              platformelor online pentru public.
             </span>
           </li>
           <li className="flex gap-2">
@@ -220,7 +226,7 @@ export default function Page() {
           href="/comanda/extras-carte-funciara/"
           className="inline-flex items-center rounded-xl bg-primary-500 px-5 py-3 text-sm font-bold text-secondary-900 shadow-[0_6px_14px_rgba(236,185,95,0.35)] transition-all hover:bg-primary-600 hover:shadow-[0_10px_20px_rgba(236,185,95,0.45)]"
         >
-          Comandă extras CF — se eliberează automat la revenire →
+          Comandă extras CF — în 2 zile lucrătoare →
         </Link>
       </div>
 
@@ -234,9 +240,29 @@ export default function Page() {
       <div className="not-prose my-6 space-y-0">
         {[
           {
+            date: '20 august 2026',
+            tag: 'Link de plată reactivat',
+            latest: true,
+            body: (
+              <>
+                ANCPI anunță reactivarea funcționalității <strong>&bdquo;Link de plată&rdquo;</strong> din
+                e-Terra: persoanele autorizate și notarii pot trimite beneficiarului, prin e-mail
+                sau SMS, un link unic prin care acesta plătește tarifele direct către ANCPI, cu
+                cardul. Comunicatul dă și dimensiunea aglomerării: între{' '}
+                <strong>11 și 19 august</strong>, oficiile de cadastru din țară au înregistrat{' '}
+                <strong>329.476 de cereri</strong>, din care au soluționat <strong>279.242</strong>
+                {' '}— volumul vine, spune agenția, în principal din cererile acumulate cât timp
+                e-Terra a fost indisponibilă. De aceea „pot apărea, temporar, timpi de așteptare
+                mai mari, atât pentru accesarea aplicației, cât și pentru procesarea unor cereri&rdquo;.
+                Restul sistemelor — <strong>RTI, MyeTerra, Registrul proprietarilor, Titluri de
+                proprietate și Geoportal</strong> — rămân oprite și vor fi repornite etapizat,
+                după verificări.
+              </>
+            ),
+          },
+          {
             date: '12 august 2026',
             tag: 'Acces extins',
-            latest: true,
             body: (
               <>
                 De la <strong>ora 8:30</strong>, e-Terra devine disponibilă și pentru{' '}
@@ -634,9 +660,9 @@ export default function Page() {
           ANCPI” arată roșu, în timp real, cât timp sistemele sunt picate.
         </li>
         <li>
-          <strong>Comenzile plasate acum intră în coadă</strong> și se eliberează automat, cu
-          prioritate, în momentul în care ANCPI revine, nu trebuie să reiei comanda sau să ne
-          suni.
+          <strong>Extrasul de carte funciară se eliberează în 2 zile lucrătoare</strong>, prin
+          partener autorizat care depune cererea la OCPI — nu aștepți repornirea platformelor
+          online pentru public și nu trebuie să reiei comanda.
         </li>
         <li>
           <strong>Clienții cu comenzi în așteptare au fost notificați</strong> pe email despre
@@ -791,9 +817,10 @@ export default function Page() {
         până la finalizarea migrării în cloud.
       </p>
       <p>
-        Ce facem noi: comenzile rămân în coadă și se eliberează automat, în ordinea plasării, în
-        momentul în care portalul public revine. Monitorizarea rulează la fiecare 15 minute, deci
-        vei afla de la noi, nu invers.
+        Ce facem noi: extrasul de carte funciară nu mai așteaptă portalul public — cererea o depune
+        la OCPI un partener autorizat, cu acces la e-Terra din 12 august, iar termenul nostru este
+        de <strong>2 zile lucrătoare</strong>. Monitorizarea portalului rulează în continuare la
+        fiecare 15 minute, deci vei afla de la noi când revine, nu invers.
       </p>
       <p>
         <strong>7 august 2026, primul semnal de dată concretă:</strong> printr-o circulară transmisă

@@ -26,7 +26,7 @@ interface OrderDetail {
   status: string;
   created_at: string;
   customer_data: Record<string, any> | null; // eslint-disable-line @typescript-eslint/no-explicit-any
-  services: { name: string; slug: string } | null;
+  services: { name: string; slug: string; processing_config?: { ancpi_cost_ron?: number | string | null } | null } | null;
   deliverable: string | null;
   documents: OrderDoc[];
   /** Angajamentul de execuție semnat de client (convenția cu executantul). */
@@ -71,7 +71,7 @@ export default function CollaboratorOrderDetail() {
     const json = await res.json();
     if (json.success) {
       setOrder(json.data);
-      const taxa = taxaEliberare(json.data?.services?.slug);
+      const taxa = taxaEliberare(json.data?.services?.slug, json.data?.services?.processing_config);
       // Doar cât timp câmpul e neatins — nu suprascriem ce a tastat el.
       setCostRon((current) => (current === '' && taxa !== null ? String(taxa) : current));
     }
@@ -156,9 +156,8 @@ export default function CollaboratorOrderDetail() {
       if (!json.success) throw new Error(json.error || 'Eroare');
       toast.success('Depunerea a fost înregistrată.');
       setRegNumber('');
-      setCostRon(taxaEliberare(order?.services?.slug) !== null
-        ? String(taxaEliberare(order?.services?.slug))
-        : '');
+      const taxa = taxaEliberare(order?.services?.slug, order?.services?.processing_config);
+      setCostRon(taxa !== null ? String(taxa) : '');
       await load();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : 'Eroare la salvare');
@@ -285,7 +284,9 @@ export default function CollaboratorOrderDetail() {
       {/* Apare pentru serviciile pe care le depunem la OCPI — și acolo unde
           generăm cererea (extras CF), și unde încă nu (plan cadastral), ca taxa
           plătită la ghișeu să nu rămână neînregistrată. */}
-      {((order.cereri?.length ?? 0) > 0 || taxaEliberare(order.services?.slug) !== null) && !delivered && (
+      {((order.cereri?.length ?? 0) > 0
+        || taxaEliberare(order.services?.slug, order.services?.processing_config) !== null)
+        && !delivered && (
         <div className="mb-6 rounded-lg border border-slate-200 bg-white p-5">
           <h2 className="mb-1 text-sm font-semibold text-slate-900">Am depus cererea la OCPI</h2>
           <p className="mb-3 text-xs text-slate-500">

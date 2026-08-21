@@ -148,6 +148,30 @@ cadastral = 15 lei** — acum se precompletează după serviciul comenzii
 la plan cadastral, unde încă nu generăm cererea — altfel taxa plătită la ghișeu
 rămânea neînregistrată și marja ieșea în plus.
 
+## Ce spunem public: 2 zile lucrătoare, nu „câteva minute"
+
+Site-ul promitea în continuare că extrasul CF se eliberează în **„câteva minute
+(24/7)"** — adevărat cât timp îl scotea worker-ul, fals de pe 13 iulie. Aliniat
+la realitate (migrarea 146, aplicată): `estimated_days = 2` și afișajul
+**„2 zile lucrătoare"** pe extras CF și pe extras plan cadastral.
+
+Actualizat și **articolul `/ancpi-nu-functioneaza/`** cu comunicatul ANCPI din
+**20 august**: „Link de plată" reactivat în e-Terra; între 11 și 19 august
+oficiile au înregistrat **329.476 de cereri** din care au soluționat 279.242, cu
+avertismentul agenției că „pot apărea, temporar, timpi de așteptare mai mari";
+RTI, MyeTerra, Registrul proprietarilor, Titluri de proprietate și Geoportal
+rămân oprite. Peste tot în articol, promisiunea „se eliberează automat la
+revenire" a fost înlocuită cu termenul real de 2 zile lucrătoare prin partener
+autorizat.
+
+**Badge-ul „Stare sistem"** spunea și el că lucrarea se procesează automat la
+revenirea sistemelor. Pe ANCPI zice acum că serviciile revin etapizat dar încă
+cu probleme, și că extrasul se eliberează în 2 zile lucrătoare. ONRC rămâne
+neschimbat — acolo chiar worker-ul emite.
+
+Taxa de eliberare se citește acum întâi din `services.processing_config.ancpi_cost_ron`
+(20 și 15, deja configurate), deci un tarif nou se schimbă din admin, fără deploy.
+
 ## Predarea, executată în aceeași zi
 
 - Serviciul `extras-carte-funciara` **alocat lui Mircea** → cele 109 comenzi îi
