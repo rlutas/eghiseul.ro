@@ -11,6 +11,7 @@
 import type { CerereExtrasCfData } from '@/lib/documents/cerere-extras-cf-pdf';
 import { buildCerereFilename, normalizeCfForCerere } from '@/lib/ancpi/cerere-filename';
 import { uatWithCounty } from '@/lib/ancpi/uat-label';
+import { ocpiName, bcpiName } from '@/lib/ancpi/ocpi-header';
 
 interface AdditionalImobil {
   locality?: string | null;
@@ -76,6 +77,9 @@ export function cereriForOrder(order: OrderForCereri, date: string): CerereForOr
         orderRef: order.friendly_order_id,
         name: buildCerereFilename({ carteFunciara, cadastral, uat, county }),
         data: {
+          // Antetul urmează județul imobilului, nu biroul unde depune el.
+          ocpi: ocpiName(county),
+          bcpi: bcpiName(county, uat),
           // Anexa 6 has no county field for the imobil, so it rides along with
           // the locality — otherwise a cerere filed at Satu Mare for Otopeni
           // never names Ilfov, and UAT names repeat across counties.

@@ -70,7 +70,7 @@ nu era teoretică.
 
 | Întrebare | Răspuns |
 |---|---|
-| Antetul OCPI/BCPI pe județul imobilului? | Nu — rămâne Satu Mare, de acolo depune |
+| Antetul OCPI/BCPI pe județul imobilului? | **Da** (revenire asupra deciziei inițiale) — OCPI și BCPI urmează județul comenzii; la București, sectorul |
 | Serie CI / CNP | Rămân goale (de reconfirmat cu Mircea) |
 | „fiindu-mi necesar la" | Mereu „informare" |
 | Plan cadastral / identificare imobil | **Nu acum** — formulare diferite, pe care nu le avem |
@@ -97,6 +97,20 @@ nu era teoretică.
 - 🔴 **Previzualizarea de admin ascundea secțiunile de lucru** (`?as=`), deci nu
   se putea verifica din admin dacă topograful chiar are formularul de depunere și
   butonul de încărcare — acum se văd, dezactivate, cu notă.
+
+## Antetul pe județul imobilului + prioritizarea pe vechime
+
+- 🟣 **Antetul nu mai e fix Satu Mare**: `OFICIUL … IMOBILIARĂ ILFOV` /
+  `BIROUL … IMOBILIARĂ ILFOV`, centrat, din județul ales de client în
+  nomenclatorul ANCPI. La **București** biroul e exact, fiindcă acolo BCPI-urile
+  chiar sunt sectoarele, iar sectorul e în numele UAT-ului. Verificat pe toată
+  coada: **34 de antete distincte, 0 probleme**.
+  ⚠️ BCPI-ul nu e unul per județ (Cluj are 5 birouri, Ilfov n-are niciunul numit
+  „Ilfov"), iar maparea UAT → BCPI nu e publicată de ANCPI — adresăm biroul
+  județean, topograful corectează excepțiile.
+- 🟣 **Comenzile, de la cea mai veche la cea mai nouă** în portalul
+  colaboratorului, plus coloana **„Așteaptă"** (roșu peste 21 de zile, portocaliu
+  peste 7): clientul care așteaptă de o lună se vede primul, fără căutat.
 
 ## Predarea, executată în aceeași zi
 

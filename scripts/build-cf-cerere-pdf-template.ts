@@ -7,6 +7,8 @@
  * appears on this cerere). Only the property lines vary per order, so the base
  * keeps his data baked in and we DELETE + redraw just four lines:
  *
+ *   y=702  OFICIUL ... IMOBILIARĂ    → OCPI_JUDET   (centrat)
+ *   y=676  BIROUL  ... IMOBILIARĂ    → BCPI         (centrat)
  *   y=491  comuna/orașul/municipiul  → UAT
  *   y=478  cartea funciară nr.       → CF_NR (bold) + localitatea → CF_LOCALITATE
  *   y=465  nr. cadastral             → CADASTRAL (bold)
@@ -42,7 +44,14 @@ const SRC = process.argv[2];
 if (!SRC) throw new Error('usage: build-cf-cerere-pdf-template.ts <path-to-source-cerere.pdf>');
 
 interface Seg { literal?: string; field?: string; gapAfter: number }
-interface LineSpec { y: number; segments: Seg[] }
+interface LineSpec {
+  y: number;
+  segments: Seg[];
+  /** Antetul e centrat pe pagină, nu aliniat la stânga ca restul formularului. */
+  align?: 'center';
+  /** Antetul e integral cu font normal; în corp valorile se scriu bold. */
+  valuesBold?: boolean;
+}
 
 /**
  * Per line: the ordered segments, with the applicant's sample values replaced
@@ -50,6 +59,24 @@ interface LineSpec { y: number; segments: Seg[] }
  * in at build time for multi-item lines; splits inside one item get gap 0).
  */
 const SPEC: LineSpec[] = [
+  {
+    y: 702,
+    align: 'center',
+    valuesBold: false,
+    segments: [
+      { literal: 'OFICIUL DE CADASTRU ȘI PUBLICITATE IMOBILIARĂ ', gapAfter: 0 },
+      { field: 'OCPI_JUDET', gapAfter: 0 },
+    ],
+  },
+  {
+    y: 676,
+    align: 'center',
+    valuesBold: false,
+    segments: [
+      { literal: 'BIROUL DE CADASTRU ȘI PUBLICITATE IMOBILIARĂ ', gapAfter: 0 },
+      { field: 'BCPI', gapAfter: 0 },
+    ],
+  },
   {
     y: 491,
     segments: [
@@ -105,10 +132,17 @@ const SPEC: LineSpec[] = [
     console.log(
       `line y=${spec.y}: ` + lineItems.map(i => JSON.stringify(i.str)).join(' + ')
     );
+    const x1 = Math.min(...lineItems.map(i => i.x));
+    const x2 = Math.max(...lineItems.map(i => i.x + i.width));
+
     return {
       y: spec.y,
       size: Math.max(...lineItems.map(i => i.size)),
       startX: lineItems[0].x,
+      // Pentru liniile centrate contează centrul originalului, nu startul:
+      // „CARAȘ-SEVERIN" e mult mai lung decât „SATU MARE".
+      ...(spec.align === 'center' ? { centerX: (x1 + x2) / 2 } : {}),
+      ...(spec.valuesBold === false ? { valuesBold: false } : {}),
       segments: spec.segments,
     };
   });

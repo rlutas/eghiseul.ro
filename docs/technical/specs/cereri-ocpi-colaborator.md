@@ -90,8 +90,16 @@ de ea la runtime.
 - **Doar extras CF.** Plan cadastral și identificare imobil folosesc alte
   formulare, pe care nu le avem — o comandă de tipul ăla nu trebuie să primească
   tăcut o Anexă 6. Ruta dă 400 pe orice alt slug.
-- **Antetul rămâne OCPI/BCPI Satu Mare** (decizia lui, 21.08) — el depune de
-  acolo indiferent de județul imobilului. Județul contează în **denumire**.
+- **Antetul urmează județul imobilului** (decizie 21.08, revizuită în aceeași zi):
+  `OFICIUL … IMOBILIARĂ <JUDEȚ>` / `BIROUL … IMOBILIARĂ <JUDEȚ>`, centrat, luat
+  din județul ales de client în nomenclatorul ANCPI. La **București** biroul e
+  exact — BCPI-urile CHIAR sunt sectoarele, iar sectorul e în numele UAT-ului
+  („București Sectorul 6" → `BIROUL … SECTORUL 6`).
+  ⚠️ **BCPI-ul nu e unul per județ** (Cluj are Cluj-Napoca, Turda, Dej, Gherla,
+  Huedin; Ilfov are Buftea și Cornetu). ANCPI nu publică maparea UAT → BCPI
+  într-o formă utilizabilă, iar nomenclatorul de la ei pe care îl avem ține doar
+  județ → UAT (3185 de intrări, fără birou). Adresăm deci biroul județean;
+  dacă un birou secundar e competent, topograful corectează. `ocpi-header.ts`.
 - **Serie CI / CNP rămân goale**, iar scopul e mereu „informare" — la fel ca în
   cererile pe care le depune azi.
 - **Județul se scrie lângă localitate** („Otopeni, jud. Ilfov"): Anexa 6 NU are

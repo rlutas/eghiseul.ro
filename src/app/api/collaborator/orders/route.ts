@@ -49,7 +49,9 @@ export async function GET(request: NextRequest) {
       .or(scopeFilter)
       // Doar comenzi plătite: draft/pending/abandoned = coșuri neplătite, nu lucrări.
       .eq('payment_status', 'paid')
-      .order('created_at', { ascending: false })
+      // Cea mai veche întâi: clientul care așteaptă de o lună are prioritate,
+      // iar colaboratorul lucrează de sus în jos fără să caute prin listă.
+      .order('created_at', { ascending: true })
       .limit(200);
 
     if (status) query = query.eq('status', status);

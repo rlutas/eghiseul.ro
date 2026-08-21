@@ -27,6 +27,10 @@ import { join } from 'path';
 import { fitLine, type FitPiece } from '@/lib/documents/cerere-line-fit';
 
 export interface CerereExtrasCfData {
+  /** OCPI the cerere is addressed to — the property's county, in capitals. */
+  ocpi: string;
+  /** BCPI — the county office, or the sector in Bucharest. */
+  bcpi: string;
   /** UAT (comuna/orașul/municipiul) where the property is located */
   uat: string;
   /** Carte funciară number, as filed */
@@ -46,7 +50,16 @@ interface LineSegment {
 }
 
 interface LineMap {
-  lines: Array<{ y: number; size: number; startX: number; segments: LineSegment[] }>;
+  lines: Array<{
+    y: number;
+    size: number;
+    startX: number;
+    /** Set on the centred header lines: the centre the text must sit on. */
+    centerX?: number;
+    /** The header is entirely regular weight; body values are bold. */
+    valuesBold?: boolean;
+    segments: LineSegment[];
+  }>;
 }
 
 const ASSET_DIR = join(process.cwd(), 'src', 'templates', 'ancpi');
@@ -75,6 +88,8 @@ export async function generateCerereExtrasCfPdf(data: CerereExtrasCfData): Promi
   );
 
   const values: Record<string, string> = {
+    OCPI_JUDET: (data.ocpi || '').trim(),
+    BCPI: (data.bcpi || '').trim(),
     UAT: (data.uat || '').trim(),
     CF_NR: (data.carteFunciara || '').trim(),
     CF_LOCALITATE: (data.cfLocalitate || data.uat || '').trim(),
@@ -84,26 +99,33 @@ export async function generateCerereExtrasCfPdf(data: CerereExtrasCfData): Promi
 
   const page = pdf.getPages()[0];
   for (const line of map.lines) {
+    // The header is set in one weight; only body values are bold.
+    const boldValues = line.valuesBold !== false;
+    const fontFor = (isValue: boolean) => (isValue && boldValues ? bold : regular);
+
     const pieces: FitPiece[] = line.segments.map(seg => ({
       text: seg.field !== undefined ? values[seg.field] ?? '' : seg.literal ?? '',
       isValue: seg.field !== undefined,
       gapAfter: seg.gapAfter,
     }));
 
-    const fitted = fitLine(pieces, line.startX, RIGHT_MARGIN, (text, isValue) =>
-      (isValue ? bold : regular).widthOfTextAtSize(text, line.size)
-    );
+    const width = (current: FitPiece[]) =>
+      current.reduce((w, p) => w + (p.text ? fontFor(p.isValue).widthOfTextAtSize(p.text, line.size) : 0) + p.gapAfter, 0);
 
-    let x = line.startX;
+    // A centred line has the whole page to grow into, so it is never squeezed;
+    // the left-aligned body lines must stay inside the right margin.
+    const fitted = line.centerX !== undefined
+      ? pieces
+      : fitLine(pieces, line.startX, RIGHT_MARGIN, (text, isValue) =>
+          fontFor(isValue).widthOfTextAtSize(text, line.size)
+        );
+
+    let x = line.centerX !== undefined ? line.centerX - width(fitted) / 2 : line.startX;
     for (const piece of fitted) {
       if (piece.text) {
-        page.drawText(piece.text, {
-          x,
-          y: line.y,
-          size: line.size,
-          font: piece.isValue ? bold : regular,
-        });
-        x += (piece.isValue ? bold : regular).widthOfTextAtSize(piece.text, line.size);
+        const font = fontFor(piece.isValue);
+        page.drawText(piece.text, { x, y: line.y, size: line.size, font });
+        x += font.widthOfTextAtSize(piece.text, line.size);
       }
       x += piece.gapAfter;
     }

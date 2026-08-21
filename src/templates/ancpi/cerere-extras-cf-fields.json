@@ -1,6 +1,40 @@
 {
   "lines": [
     {
+      "y": 702,
+      "size": 11.258625,
+      "startX": 124.50899849999996,
+      "centerX": 300.5852076678383,
+      "valuesBold": false,
+      "segments": [
+        {
+          "literal": "OFICIUL DE CADASTRU ȘI PUBLICITATE IMOBILIARĂ ",
+          "gapAfter": 0
+        },
+        {
+          "field": "OCPI_JUDET",
+          "gapAfter": 0
+        }
+      ]
+    },
+    {
+      "y": 676,
+      "size": 11.258625,
+      "startX": 127.43624099999995,
+      "centerX": 302.1551481668182,
+      "valuesBold": false,
+      "segments": [
+        {
+          "literal": "BIROUL DE CADASTRU ȘI PUBLICITATE IMOBILIARĂ ",
+          "gapAfter": 0
+        },
+        {
+          "field": "BCPI",
+          "gapAfter": 0
+        }
+      ]
+    },
+    {
       "y": 491,
       "size": 11.258625,
       "startX": 85.19999849999999,

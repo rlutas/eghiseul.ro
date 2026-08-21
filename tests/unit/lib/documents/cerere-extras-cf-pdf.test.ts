@@ -11,6 +11,7 @@ import { generateCerereExtrasCfPdf } from '@/lib/documents/cerere-extras-cf-pdf'
 describe('generateCerereExtrasCfPdf', () => {
   it('produces a single-page A4-ish PDF', async () => {
     const buffer = await generateCerereExtrasCfPdf({
+      ocpi: 'VÂLCEA', bcpi: 'VÂLCEA',
       uat: 'Baile Govora',
       carteFunciara: '101010',
       cfLocalitate: 'Baile Govora',
@@ -30,6 +31,7 @@ describe('generateCerereExtrasCfPdf', () => {
   it('renders Romanian diacritics without throwing (Ș/Ț are outside WinAnsi)', async () => {
     await expect(
       generateCerereExtrasCfPdf({
+        ocpi: 'MUREȘ', bcpi: 'MUREȘ',
         uat: 'Târgu Mureș',
         carteFunciara: '55',
         cfLocalitate: 'Sânpaul',
@@ -41,9 +43,11 @@ describe('generateCerereExtrasCfPdf', () => {
 
   it('leaves the cadastral slot empty instead of inventing a number', async () => {
     const withCadastral = await generateCerereExtrasCfPdf({
+      ocpi: 'SATU MARE', bcpi: 'SATU MARE',
       uat: 'Odoreu', carteFunciara: '108465', cfLocalitate: 'Odoreu', cadastral: '108465', date: '21.08.2026',
     });
     const without = await generateCerereExtrasCfPdf({
+      ocpi: 'SATU MARE', bcpi: 'SATU MARE',
       uat: 'Odoreu', carteFunciara: '108465', cfLocalitate: 'Odoreu', cadastral: '', date: '21.08.2026',
     });
 

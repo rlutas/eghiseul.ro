@@ -20,6 +20,11 @@ interface CollabOrder {
   services: { name: string; slug: string } | null;
 }
 
+/** Câte zile așteaptă clientul de la plată — coloana după care se prioritizează. */
+function daysWaiting(createdAt: string): number {
+  return Math.max(0, Math.floor((Date.now() - new Date(createdAt).getTime()) / 86_400_000));
+}
+
 function propertyLocation(o: CollabOrder): string {
   const p = o.customer_data?.property;
   return [p?.locality, p?.county].filter(Boolean).join(', ') || '—';
@@ -64,7 +69,10 @@ export default function CollaboratorOrdersPage() {
   return (
     <div className="mx-auto max-w-5xl">
       <h1 className="mb-1 text-xl font-semibold text-slate-900">Comenzi</h1>
-      <p className="mb-6 text-sm text-slate-500">Comenzile serviciilor alocate ție.</p>
+      <p className="mb-6 text-sm text-slate-500">
+        Comenzile serviciilor alocate ție, cele mai vechi primele — clientul care așteaptă de cel mai
+        mult timp are prioritate.
+      </p>
 
       {cfDeDepus > 0 && (
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-primary-200 bg-primary-50 p-4">
@@ -110,6 +118,7 @@ export default function CollaboratorOrdersPage() {
                 <th className="px-4 py-3">Localitate</th>
                 <th className="px-4 py-3">Status</th>
                 <th className="px-4 py-3">Dată</th>
+                <th className="px-4 py-3">Așteaptă</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -129,6 +138,19 @@ export default function CollaboratorOrdersPage() {
                   </td>
                   <td className="px-4 py-3 text-slate-500">
                     {new Date(o.created_at).toLocaleDateString('ro-RO')}
+                  </td>
+                  <td className="px-4 py-3">
+                    {(() => {
+                      const zile = daysWaiting(o.created_at);
+                      const tone = zile >= 21 ? 'bg-red-100 text-red-800'
+                        : zile >= 7 ? 'bg-amber-100 text-amber-800'
+                        : 'text-slate-500';
+                      return (
+                        <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${tone}`}>
+                          {zile === 0 ? 'azi' : `${zile} zile`}
+                        </span>
+                      );
+                    })()}
                   </td>
                 </tr>
               ))}
