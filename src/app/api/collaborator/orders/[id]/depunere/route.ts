@@ -99,18 +99,26 @@ export async function POST(
       const description = `Taxă OCPI ${svc?.name ?? ''} ${order.friendly_order_id ?? ''}`
         .replace(/\s+/g, ' ')
         .trim();
-      const { data: existing } = await admin
+      // Doar rândul înregistrat de EL, nu tot ce e pe comandă: echipa poate
+      // adăuga din admin taxe separate (o comandă cu două imobile are două
+      // rânduri de 20 lei), iar `maybeSingle()` peste toate ar da eroare pe
+      // „multiple rows" și i-ar refuza salvarea.
+      const recordedBy = profile?.email ?? who;
+      const { data: existingRows } = await admin
         .from('order_supplier_costs')
         .select('id')
         .eq('order_id', orderId)
         .eq('supplier', SUPPLIER_ANCPI)
         .eq('category', 'taxa_institutie')
-        .maybeSingle();
+        .eq('recorded_by', recordedBy)
+        .order('created_at', { ascending: true })
+        .limit(1);
+      const existing = existingRows?.[0] ?? null;
 
       const { error: costError } = existing
         ? await admin
             .from('order_supplier_costs')
-            .update({ amount_ron: costRon, description, recorded_by: profile?.email ?? who })
+            .update({ amount_ron: costRon, description, recorded_by: recordedBy })
             .eq('id', existing.id)
         : await admin.from('order_supplier_costs').insert({
             order_id: orderId,
@@ -118,7 +126,7 @@ export async function POST(
             category: 'taxa_institutie',
             description,
             amount_ron: costRon,
-            recorded_by: profile?.email ?? who,
+            recorded_by: recordedBy,
           });
 
       if (costError) {

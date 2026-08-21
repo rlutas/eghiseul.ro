@@ -71,9 +71,11 @@ export default function CollaboratorOrderDetail() {
     const json = await res.json();
     if (json.success) {
       setOrder(json.data);
+      // Taxa e PE IMOBIL: o comandă cu două cărți funciare costă 2×20 la OCPI.
       const taxa = taxaEliberare(json.data?.services?.slug, json.data?.services?.processing_config);
+      const imobile = Math.max(1, json.data?.cereri?.length ?? 1);
       // Doar cât timp câmpul e neatins — nu suprascriem ce a tastat el.
-      setCostRon((current) => (current === '' && taxa !== null ? String(taxa) : current));
+      setCostRon((current) => (current === '' && taxa !== null ? String(taxa * imobile) : current));
     }
     else toast.error(json.error || 'Eroare la încărcare');
     setLoading(false);
@@ -157,7 +159,8 @@ export default function CollaboratorOrderDetail() {
       toast.success('Depunerea a fost înregistrată.');
       setRegNumber('');
       const taxa = taxaEliberare(order?.services?.slug, order?.services?.processing_config);
-      setCostRon(taxa !== null ? String(taxa) : '');
+      const imobile = Math.max(1, order?.cereri?.length ?? 1);
+      setCostRon(taxa !== null ? String(taxa * imobile) : '');
       await load();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : 'Eroare la salvare');
@@ -309,6 +312,11 @@ export default function CollaboratorOrderDetail() {
             <div className="w-36">
               <label htmlFor="cost-ron" className="mb-1 block text-xs text-slate-500">
                 Cost eliberare (lei)
+                {(order.cereri?.length ?? 0) > 1 && (
+                  <span className="ml-1 font-medium text-amber-700">
+                    · {order.cereri.length} imobile
+                  </span>
+                )}
               </label>
               <input
                 id="cost-ron"

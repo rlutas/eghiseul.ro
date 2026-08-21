@@ -172,6 +172,24 @@ neschimbat — acolo chiar worker-ul emite.
 Taxa de eliberare se citește acum întâi din `services.processing_config.ancpi_cost_ron`
 (20 și 15, deja configurate), deci un tarif nou se schimbă din admin, fără deploy.
 
+## Taxa e pe imobil, nu pe comandă
+
+Verificând `E-260719-VF9ZL` (Râmnicu Vâlcea, două cărți funciare) au ieșit două
+probleme din același loc:
+
+- **Formularul precompleta 20 de lei și pe comenzile cu două imobile**, deși la
+  OCPI plătim taxa **per imobil**. Acum se precompletează `taxă × nr. de cereri`
+  (40 lei la două imobile), cu eticheta „· 2 imobile" lângă câmp.
+- **Salvarea depunerii ar fi picat pe astfel de comenzi**: căutam rândul de cost
+  existent cu `maybeSingle()` peste toate rândurile ANCPI ale comenzii, iar o
+  comandă cu două taxe are două rânduri → eroare „multiple rows" și mesajul
+  „Costul nu a putut fi salvat". Acum căutăm doar rândul înregistrat de el
+  (`recorded_by`), ca să nu se încurce cu ce adaugă echipa din admin.
+
+⚠️ Găsit la aceeași verificare: `E-260820-LH4GM` are două extrase încărcate
+(56742 și 62216, Luduș) dar **un singur cost de 20 lei** — lipsesc 20 de lei din
+costuri, deci marja apare umflată.
+
 ## Predarea, executată în aceeași zi
 
 - Serviciul `extras-carte-funciara` **alocat lui Mircea** → cele 109 comenzi îi
