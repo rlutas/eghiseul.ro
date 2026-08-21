@@ -186,9 +186,27 @@ probleme din același loc:
   „Costul nu a putut fi salvat". Acum căutăm doar rândul înregistrat de el
   (`recorded_by`), ca să nu se încurce cu ce adaugă echipa din admin.
 
-⚠️ Găsit la aceeași verificare: `E-260820-LH4GM` are două extrase încărcate
-(56742 și 62216, Luduș) dar **un singur cost de 20 lei** — lipsesc 20 de lei din
-costuri, deci marja apare umflată.
+Găsit la aceeași verificare și corectat: `E-260820-LH4GM` avea două extrase
+încărcate (56742 și 62216, Luduș) dar **un singur cost de 20 lei**, deci marja
+pe comandă apărea cu 20 de lei mai mare decât în realitate. Rândul lipsă a fost
+adăugat (`scripts/fix-cost-lipsa-E-260820-LH4GM.cjs`, idempotent), marcat
+`recorded_by = 'corectie-audit'` ca să se vadă că nu vine de la operator.
+
+**Audit pe toate cele 47 de comenzi lucrate**: singura cu diferență era aceasta.
+Evidența e acum completă — **980 lei înregistrați, 980 așteptați**, la 20 de lei
+per imobil.
+
+Interogarea de audit, de refolosit când se pune întrebarea din nou:
+
+```sql
+SELECT o.friendly_order_id, o.status,
+  1 + jsonb_array_length(coalesce(o.customer_data->'property'->'additionalImobile','[]'::jsonb)) AS imobile,
+  (SELECT coalesce(sum(amount_ron),0) FROM order_supplier_costs s WHERE s.order_id=o.id) AS cost_inregistrat,
+  20 * (1 + jsonb_array_length(coalesce(o.customer_data->'property'->'additionalImobile','[]'::jsonb))) AS cost_asteptat
+FROM orders o JOIN services sv ON sv.id = o.service_id
+WHERE sv.slug='extras-carte-funciara' AND o.payment_status='paid'
+  AND o.status IN ('completed','document_ready','submitted_to_institution');
+```
 
 ## Predarea, executată în aceeași zi
 
