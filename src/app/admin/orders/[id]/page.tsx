@@ -122,6 +122,8 @@ interface AttributionTouch {
 interface OrderDetail {
   id: string;
   friendly_order_id: string | null;
+  /** >0 = urcă prima în lista de lucru a colaboratorului (client nemulțumit). */
+  priority?: number | null;
   order_number: string;
   attribution?: OrderAttribution | null;
   status: string | null;
@@ -1016,6 +1018,35 @@ export default function AdminOrderDetailPage() {
                   Factură → {billing?.companyName || 'PJ'}
                 </Badge>
               )}
+              {/* Urgent: urcă comanda prima în coada colaboratorului, peste
+                  regula „cea mai veche întâi". Pentru clienții care au scris. */}
+              <button
+                type="button"
+                title="Marchează comanda urgentă — trece prima în lista colaboratorului"
+                onClick={async () => {
+                  const urgent = !((order.priority ?? 0) > 0);
+                  try {
+                    const res = await fetch(`/api/admin/orders/${order.id}/priority`, {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ urgent }),
+                    });
+                    const json = await res.json();
+                    if (!json.success) throw new Error(json.error || 'Eroare');
+                    toast.success(urgent ? 'Marcată urgentă' : 'Marcaj de urgență scos');
+                    await fetchOrder();
+                  } catch (e) {
+                    toast.error(e instanceof Error ? e.message : 'Eroare');
+                  }
+                }}
+                className={`inline-flex items-center gap-1 rounded border px-2 py-0.5 text-xs font-semibold ${
+                  (order.priority ?? 0) > 0
+                    ? 'border-red-300 bg-red-600 text-white hover:bg-red-700'
+                    : 'border-neutral-200 text-slate-600 hover:bg-slate-50'
+                }`}
+              >
+                {(order.priority ?? 0) > 0 ? 'URGENT' : 'Marchează urgent'}
+              </button>
               {order.friendly_order_id && (
                 <a
                   href={`/comanda/status?order=${encodeURIComponent(order.friendly_order_id)}&email=${encodeURIComponent(order.customer_data?.contact?.email ?? '')}`}

@@ -1,12 +1,15 @@
 /**
- * GET /api/collaborator/cereri
+ * GET /api/collaborator/cereri[?judet=<județ>]
  *
  * Every cerere the topograph still has to file, as one ZIP. His own words:
  * "am nevoie de ajutor dacă aveți cereri multe" — downloading them one by one
  * is the part that does not scale, so this is the bulk path: unzip, batch-sign,
  * file.
  *
- * Scope = paid extras-CF orders of his, minus the ones already delivered. Names
+ * Scope = paid extras-CF orders of his, minus the ones already delivered,
+ * flagged-urgent first and then oldest — the client who complained, then the
+ * one who has waited longest. `judet`
+ * narrows it to one county, which is how a batch actually gets filed. Names
  * follow his convention and are de-duplicated across orders, so a ZIP can never
  * overwrite one paid job with another that happens to share a CF number.
  */
@@ -55,12 +58,14 @@ export async function GET(request: NextRequest) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data, error } = await (admin as any)
       .from('orders')
-      .select('id, friendly_order_id, status, created_at, customer_data, services:service_id!inner(slug)')
+      .select('id, friendly_order_id, status, created_at, priority, customer_data, services:service_id!inner(slug)')
       .or(scopeFilter)
       .eq('payment_status', 'paid')
       .eq('services.slug', CERERE_CF_SLUG)
       .not('status', 'in', `(${CERERE_DONE_STATUSES.join(',')})`)
-      // oldest first: the client who has been waiting longest gets filed first
+      // urgent first, then oldest: the client who complained, then the one who
+      // has been waiting longest
+      .order('priority', { ascending: false })
       .order('created_at', { ascending: true })
       .limit(MAX_ORDERS);
 
@@ -69,13 +74,23 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'Eroare la încărcarea comenzilor' }, { status: 500 });
     }
 
-    const orders = (data ?? []) as OrderForCereri[];
+    const judet = (request.nextUrl.searchParams.get('judet') ?? '').trim();
+    const all = (data ?? []) as (OrderForCereri & { customer_data?: { property?: { county?: string } } })[];
+    const orders = judet
+      ? all.filter(o => (o.customer_data?.property?.county ?? '') === judet)
+      : all;
+
     const date = cerereDateRo();
     const cereri = orders.flatMap(order => cereriForOrder(order, date));
 
     if (cereri.length === 0) {
       return NextResponse.json(
-        { success: false, error: 'Nu ai cereri de depus în acest moment' },
+        {
+          success: false,
+          error: judet
+            ? `Nu ai cereri de depus pentru județul ${judet}`
+            : 'Nu ai cereri de depus în acest moment',
+        },
         { status: 404 }
       );
     }
@@ -89,10 +104,11 @@ export async function GET(request: NextRequest) {
     const buffer: Buffer = zip.generate({ type: 'nodebuffer', compression: 'DEFLATE' });
 
     const stamp = new Date().toISOString().slice(0, 10);
+    const label = judet ? `cereri extras cf ${judet} ${stamp}` : `cereri extras cf ${stamp}`;
     return new NextResponse(new Uint8Array(buffer), {
       headers: {
         'Content-Type': 'application/zip',
-        'Content-Disposition': contentDisposition(`cereri extras cf ${stamp} (${cereri.length}).zip`),
+        'Content-Disposition': contentDisposition(`${label} (${cereri.length}).zip`),
         'Cache-Control': 'no-store',
       },
     });

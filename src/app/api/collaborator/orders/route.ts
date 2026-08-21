@@ -45,12 +45,14 @@ export async function GET(request: NextRequest) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let query = (admin as any)
       .from('orders')
-      .select('id, friendly_order_id, status, created_at, service_id, customer_data, services:service_id(name, slug)')
+      .select('id, friendly_order_id, status, created_at, priority, service_id, customer_data, services:service_id(name, slug)')
       .or(scopeFilter)
       // Doar comenzi plătite: draft/pending/abandoned = coșuri neplătite, nu lucrări.
       .eq('payment_status', 'paid')
-      // Cea mai veche întâi: clientul care așteaptă de o lună are prioritate,
-      // iar colaboratorul lucrează de sus în jos fără să caute prin listă.
+      // Marcate urgent întâi (client nemulțumit), apoi cea mai veche: clientul
+      // care așteaptă de o lună are prioritate, iar colaboratorul lucrează de
+      // sus în jos fără să caute prin listă.
+      .order('priority', { ascending: false })
       .order('created_at', { ascending: true })
       .limit(200);
 

@@ -111,6 +111,14 @@ nu era teoretică.
 - 🟣 **Comenzile, de la cea mai veche la cea mai nouă** în portalul
   colaboratorului, plus coloana **„Așteaptă"** (roșu peste 21 de zile, portocaliu
   peste 7): clientul care așteaptă de o lună se vede primul, fără căutat.
+- 🟣 **Filtre în lista lui**: etapă (De depus / Depuse la OCPI / Livrate / Toate),
+  județ și căutare liberă (nr. comandă, CF, localitate). Filtrul de județ se
+  aplică și pe ZIP — descarcă doar cererile pentru un OCPI, cum și le depune.
+- 🟣 **Marcaj URGENT pe comandă** (migrarea 145, `orders.priority`): comenzile
+  marcate trec primele, peste regula vechimii, cu badge roșu în lista lui.
+  Buton în admin, pe pagina comenzii, ca echipa să nu mai ceară „caut-o pe asta"
+  prin 100 de rânduri. Aplicat pe `E-260817-RP38U` și `E-260819-FJZ8P` (clienți
+  care au scris supărați).
 
 ## Predarea, executată în aceeași zi
 

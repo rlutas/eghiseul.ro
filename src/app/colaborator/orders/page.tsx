@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { findStatusLabel } from '@/lib/admin/status-options';
 import { Download } from 'lucide-react';
@@ -14,6 +14,8 @@ interface CollabOrder {
   friendly_order_id: string | null;
   status: string;
   created_at: string;
+  /** >0 = urcată în capul listei de echipă (client nemulțumit, termen ratat). */
+  priority: number | null;
   service_id: string;
   // API-ul returnează DOAR datele de lucrare (property) — fără date de client.
   customer_data: { property?: PropertyLike | null } | null;
@@ -30,11 +32,28 @@ function propertyLocation(o: CollabOrder): string {
   return [p?.locality, p?.county].filter(Boolean).join(', ') || '—';
 }
 
+/** Grupele după care filtrează: unde e lucrarea în drumul ei. */
+type Etapa = 'toate' | 'de_depus' | 'depuse' | 'livrate';
+
+function etapaOf(status: string): Exclude<Etapa, 'toate'> {
+  if (CERERE_DONE_STATUSES.includes(status as never)) return 'livrate';
+  if (status === 'submitted_to_institution') return 'depuse';
+  return 'de_depus';
+}
+
+/** Fold pentru căutare: fără diacritice, lowercase. */
+function fold(value: string): string {
+  return value.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+}
+
 export default function CollaboratorOrdersPage() {
   const previewAs = usePreviewAs();
   const [orders, setOrders] = useState<CollabOrder[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [etapa, setEtapa] = useState<Etapa>('de_depus');
+  const [judet, setJudet] = useState('');
+  const [cauta, setCauta] = useState('');
 
   useEffect(() => {
     // Așteaptă citirea `?as=` din URL înainte de fetch (altfel adminul ar primi 403).
@@ -66,12 +85,35 @@ export default function CollaboratorOrdersPage() {
   const cfDeDepus = deDepus.length;
   const deVerificat = deDepus.filter((c) => c.name.startsWith('verifica ')).length;
 
+  const judete = useMemo(
+    () => [...new Set(orders.map((o) => o.customer_data?.property?.county).filter(Boolean))].sort() as string[],
+    [orders]
+  );
+
+  // Filtrarea e locală: API-ul întoarce deja doar lucrările lui, iar așa
+  // comutarea e instantanee. Ordinea (cea mai veche prima) vine de la API.
+  const vizibile = useMemo(() => {
+    const q = fold(cauta.trim());
+    return orders.filter((o) => {
+      if (etapa !== 'toate' && etapaOf(o.status) !== etapa) return false;
+      if (judet && o.customer_data?.property?.county !== judet) return false;
+      if (!q) return true;
+      const p = o.customer_data?.property;
+      const haystack = fold(
+        [o.friendly_order_id, p?.locality, p?.county, p?.carteFunciara, p?.cadastral, o.services?.name]
+          .filter(Boolean)
+          .join(' ')
+      );
+      return haystack.includes(q);
+    });
+  }, [orders, etapa, judet, cauta]);
+
   return (
     <div className="mx-auto max-w-5xl">
       <h1 className="mb-1 text-xl font-semibold text-slate-900">Comenzi</h1>
       <p className="mb-6 text-sm text-slate-500">
-        Comenzile serviciilor alocate ție, cele mai vechi primele — clientul care așteaptă de cel mai
-        mult timp are prioritate.
+        Comenzile serviciilor alocate ție: marcate <span className="font-semibold text-red-600">Urgent</span>{' '}
+        primele, apoi cele mai vechi — clientul care așteaptă de cel mai mult timp are prioritate.
       </p>
 
       {cfDeDepus > 0 && (
@@ -91,11 +133,61 @@ export default function CollaboratorOrdersPage() {
             )}
           </div>
           <a
-            href={withPreview('/api/collaborator/cereri', previewAs)}
+            href={withPreview(
+              judet ? `/api/collaborator/cereri?judet=${encodeURIComponent(judet)}` : '/api/collaborator/cereri',
+              previewAs
+            )}
             className="inline-flex items-center gap-2 rounded-md bg-primary-700 px-4 py-2 text-sm font-medium text-white hover:bg-primary-800"
           >
-            <Download className="h-4 w-4" /> Descarcă toate cererile (ZIP)
+            <Download className="h-4 w-4" />
+            {judet ? `Descarcă cererile pentru ${judet} (ZIP)` : 'Descarcă toate cererile (ZIP)'}
           </a>
+        </div>
+      )}
+
+      {!loading && !error && orders.length > 0 && (
+        <div className="mb-4 flex flex-wrap items-center gap-2">
+          <div className="flex rounded-lg border border-slate-200 bg-white p-0.5">
+            {([
+              ['de_depus', 'De depus'],
+              ['depuse', 'Depuse la OCPI'],
+              ['livrate', 'Livrate'],
+              ['toate', 'Toate'],
+            ] as [Etapa, string][]).map(([value, label]) => (
+              <button
+                key={value}
+                type="button"
+                onClick={() => setEtapa(value)}
+                className={`rounded-md px-3 py-1.5 text-xs font-medium ${
+                  etapa === value ? 'bg-primary-700 text-white' : 'text-slate-600 hover:bg-slate-50'
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+
+          <select
+            value={judet}
+            onChange={(e) => setJudet(e.target.value)}
+            className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700"
+          >
+            <option value="">Toate județele</option>
+            {judete.map((j) => (
+              <option key={j} value={j}>{j}</option>
+            ))}
+          </select>
+
+          <input
+            value={cauta}
+            onChange={(e) => setCauta(e.target.value)}
+            placeholder="Caută nr. comandă, CF, localitate..."
+            className="min-w-[220px] flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/30"
+          />
+
+          <span className="text-xs text-slate-500">
+            {vizibile.length} din {orders.length}
+          </span>
         </div>
       )}
 
@@ -108,7 +200,13 @@ export default function CollaboratorOrdersPage() {
         </div>
       )}
 
-      {!loading && orders.length > 0 && (
+      {!loading && orders.length > 0 && vizibile.length === 0 && (
+        <div className="rounded-lg border border-dashed border-slate-300 bg-white p-10 text-center text-sm text-slate-500">
+          Nicio comandă pentru filtrul ales.
+        </div>
+      )}
+
+      {!loading && vizibile.length > 0 && (
         <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
           <table className="w-full text-sm">
             <thead className="bg-slate-50 text-left text-xs uppercase text-slate-500">
@@ -122,12 +220,17 @@ export default function CollaboratorOrdersPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {orders.map((o) => (
+              {vizibile.map((o) => (
                 <tr key={o.id} className="hover:bg-slate-50">
                   <td className="px-4 py-3">
                     <Link href={withPreview(`/colaborator/orders/${o.id}`, previewAs)} className="font-medium text-primary-700 hover:underline">
                       {o.friendly_order_id || o.id.slice(0, 8)}
                     </Link>
+                    {(o.priority ?? 0) > 0 && (
+                      <span className="ml-2 rounded-full bg-red-600 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
+                        Urgent
+                      </span>
+                    )}
                   </td>
                   <td className="px-4 py-3 text-slate-700">{o.services?.name ?? '—'}</td>
                   <td className="px-4 py-3 text-slate-700">{propertyLocation(o)}</td>

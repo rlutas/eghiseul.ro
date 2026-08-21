@@ -81,7 +81,8 @@ de ea la runtime.
 | `src/lib/ancpi/cerere-scope.ts` | slug-ul acoperit + stările „gata" |
 | `src/lib/ancpi/cerere-date.ts` | data, în fusul Bucureștiului |
 | `GET /api/collaborator/orders/[id]/cerere?imobil=N` | o cerere |
-| `GET /api/collaborator/cereri` | ZIP cu tot ce are de depus (max 100 comenzi) |
+| `GET /api/collaborator/cereri[?judet=]` | ZIP cu tot ce are de depus (max 100 comenzi), opțional pe județ |
+| `POST /api/admin/orders/[id]/priority` | marchează comanda urgentă (`orders.priority`, migrarea 145) |
 | `POST /api/collaborator/orders/[id]/depunere` | nr. înregistrare + cost |
 | `scripts/build-cf-cerere-pdf-template.ts` | builder-ul asset-urilor |
 
@@ -130,6 +131,13 @@ de ea la runtime.
 - Costul eliberării se scrie în `order_supplier_costs` (`ANCPI` /
   `taxa_institutie`), deci intră direct în marja pe comandă și în raportul de
   costuri furnizori.
+
+## Ordinea de lucru
+
+`priority DESC, created_at ASC`, peste tot (listă, ZIP): întâi comenzile marcate
+urgent din admin, apoi cea mai veche. Coloana „Așteaptă" arată vechimea, roșu
+peste 21 de zile. Lista are filtre pe etapă, județ și căutare liberă, iar
+filtrul de județ se propagă în ZIP — el depune pe județe.
 
 ## Predarea către topograf (21.08, executată)
 
