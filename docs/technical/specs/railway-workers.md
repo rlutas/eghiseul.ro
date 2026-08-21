@@ -1,5 +1,14 @@
 # Workeri Railway — ONRC & ANCPI (overview)
 
+> ⚠️ **worker-ancpi e OPRIT din flux de la 21.08.2026.** Portalul ePay e picat din
+> 13 iulie, iar extrasele CF le depune manual topograful colaborator. Cele 109
+> joburi eșuate sunt pe `NEEDS_OPERATOR` (nu `PENDING` — un retry ar depune și ar
+> plăti a doua oară), iar comenzile noi nu mai intră în coadă
+> (`HANDED_OVER_TO_COLLABORATOR = true` în `src/lib/ancpi/ensure-ancpi-job.ts`).
+> **La revenirea portalului:** flagul pe `false` ȘI decide ce se face cu
+> lucrările aflate la topograf. Vezi
+> [`cereri-ocpi-colaborator.md`](cereri-ocpi-colaborator.md).
+
 > ⚠️ **INCIDENT 2026-07-08:** ambii workeri au murit ~19h pentru că `SOURCE_API_URL` era setat pe `eghiseul-ro.vercel.app`, care a primit Vercel SSO la lansare. `SOURCE_API_URL` TREBUIE să fie `https://eghiseul.ro` (domeniul public). Debugging: joburi PENDING → verifică `system_heartbeats` primul.
 
 

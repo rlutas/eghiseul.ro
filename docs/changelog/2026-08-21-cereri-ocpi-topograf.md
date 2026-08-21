@@ -46,6 +46,25 @@ segmente. Asset-urile se reconstruiesc cu
 `scripts/build-cf-cerere-pdf-template.ts`, care primește PDF-ul sursă ca
 argument — sursa nu e în git (dublează datele lui personale fără câștig).
 
+## Rezultatul primei nopți
+
+Topograful a lucrat de la 02:47 la 07:30 fără pauză: **39 de comenzi finalizate,
+35 de documente încărcate** (unele comenzi au două imobile). Cele două marcate
+urgent au fost rezolvate la 04:04 și 04:14 — marcajul și-a făcut treaba.
+
+Verificat că au ajuns la clienți, pe două căi:
+- **Resend: 33 de e-mailuri „…este gata 🎉", toate livrate.** Singurul bounce din
+  noapte e pe un e-mail de coș abandonat către o adresă falsă (`xx@xx.xn`), nu pe
+  o livrare.
+- **Toate documentele au `visible_to_client = true`**, iar căutarea de comenzi
+  finalizate FĂRĂ document vizibil întoarce **zero** — nimic nu s-a marcat gata
+  pe gol.
+
+Toate cele 40 sunt comenzi guest (`user_id` null): clienții le văd pe pagina de
+status din e-mail, nu într-un cont — normal pentru fluxul nostru.
+
+Rămân **76 de comenzi** de extras CF în coadă.
+
 ## Verificat pe cele 109 comenzi reale în așteptare
 
 Rulat generatorul peste tot ce e plătit și nelivrat (cea mai veche: 14 iulie,
