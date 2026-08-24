@@ -1003,9 +1003,14 @@ export function buildServicesBreakdown(
 /** Exported for tests: pure mapping DocumentContext → template placeholders. */
 export function buildPlaceholderData(ctx: DocumentContext) {
   const now = new Date();
-  const dateFormatted = now.toLocaleDateString('ro-RO', { day: '2-digit', month: '2-digit', year: 'numeric' });
-  const dateLong = now.toLocaleDateString('ro-RO', { day: 'numeric', month: 'long', year: 'numeric' });
+  // Europe/Bucharest explicitly: Vercel runs in UTC, so without it DATASIORA
+  // printed the generation hour 3h behind and DATA slid to yesterday for
+  // anything generated between 00:00 and 03:00 local.
+  const TZ = { timeZone: 'Europe/Bucharest' } as const;
+  const dateFormatted = now.toLocaleDateString('ro-RO', { ...TZ, day: '2-digit', month: '2-digit', year: 'numeric' });
+  const dateLong = now.toLocaleDateString('ro-RO', { ...TZ, day: 'numeric', month: 'long', year: 'numeric' });
   const dateTimeFormatted = now.toLocaleString('ro-RO', {
+    ...TZ,
     day: '2-digit', month: '2-digit', year: 'numeric',
     hour: '2-digit', minute: '2-digit', second: '2-digit',
   });
