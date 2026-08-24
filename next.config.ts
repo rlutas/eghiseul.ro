@@ -8,6 +8,13 @@ const nextConfig: NextConfig = {
 
   async redirects() {
     return [
+      // Consolidare (24.08.2026, curatenie post spam-update): articol thin
+      // (474 cuvinte), duplicat al ghidului principal de CF colectivă.
+      {
+        source: '/importanta-extras-de-carte-funciara-colectiva/',
+        destination: '/totul-despre-cartea-funciara-colectiva/',
+        permanent: true,
+      },
       // Orphan English route from an early iteration — collapse into the
       // Romanian canonical /servicii/[slug]/ to avoid duplicate content.
       {

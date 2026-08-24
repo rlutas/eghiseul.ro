@@ -3,12 +3,12 @@ import { buildPageMetadata } from '@/lib/seo';
 import { ArticleLayout } from '@/components/articole/article-layout';
 
 const SLUG = 'rolul-si-atributiile-onrc-romania';
-const TITLE = 'Rolul și Atribuțiile ONRC în România';
+const TITLE = 'Ce face ONRC, de fapt: registrul, înmatriculările și certificatul constatator';
 const DESCRIPTION =
-  'Ce este Oficiul Național al Registrului Comerțului (ONRC), ce rol are în economie, ce atribuții ' +
-  'îndeplinește și ce documente eliberează — inclusiv certificatul constatator.';
+  'ONRC ține Registrul Comerțului: acolo se înmatriculează firmele, se înscriu modificările și de acolo ies ' +
+  'certificatele constatatoare. Ce atribuții are instituția și ce documente eliberează.';
 const DATE_PUBLISHED = '2024-01-01';
-const DATE_MODIFIED = '2026-06-16';
+const DATE_MODIFIED = '2026-08-24';
 
 export const revalidate = 86400;
 
@@ -29,72 +29,79 @@ export default function Page() {
       datePublished={DATE_PUBLISHED}
       dateModified={DATE_MODIFIED}
       publishedLabel="ianuarie 2024"
-      updatedLabel="16 iunie 2026"
+      updatedLabel="24 august 2026"
       relatedServices={[
         { slug: 'certificat-constatator', label: 'Certificat Constatator ONRC', desc: 'Obține certificatul constatator online, fără drum la ghișeu.' },
         { href: '/cele-4-tipuri-de-certificat-constatator-online/', label: 'Tipurile de certificat constatator', desc: 'Ce tip de certificat constatator îți trebuie.' },
       ]}
       faqs={[
-        { q: 'Care este rolul ONRC în economia României?', a: 'ONRC are rolul de a gestiona evidența și înregistrarea operatorilor economici, precum și de a monitoriza activitatea acestora în conformitate cu prevederile legale.' },
-        { q: 'Ce proceduri implică înregistrarea unei societăți comerciale la ONRC?', a: 'Procedurile includ depunerea unui dosar cu documentele necesare și plata taxelor aferente, conform legislației în vigoare.' },
-        { q: 'Cum pot accesa serviciile ONRC?', a: 'Serviciile ONRC pot fi accesate prin intermediul portalului electronic al instituției, disponibil la adresa www.onrc.ro.' },
-        { q: 'Care sunt documentele necesare pentru obținerea unui certificat constatator de la ONRC?', a: 'Documentele necesare variază în funcție de solicitare, însă în general includ actul constitutiv al societății, certificatele de înmatriculare și alte documente relevante.' },
-        { q: 'Cât durează procesul de înregistrare la ONRC?', a: 'Durata procesului poate varia în funcție de complexitatea dosarului și de volumul de solicitări, însă ONRC se străduiește să ofere servicii eficiente și în timp util.' },
+        { q: 'Care este rolul ONRC în economia României?', a: 'ONRC ține Registrul Comerțului — evidența oficială a firmelor, PFA-urilor și celorlalți profesioniști. Orice firmă există legal din momentul înmatriculării acolo, iar datele ei publice pot fi consultate de oricine.' },
+        { q: 'Ce proceduri implică înregistrarea unei societăți comerciale la ONRC?', a: 'Rezervi denumirea, întocmești actul constitutiv, depui dosarul (la ghișeu sau prin portal) și primești certificatul de înmatriculare cu CUI. De la eliminarea taxelor de înmatriculare, depunerea în sine nu mai costă nimic.' },
+        { q: 'Cum pot accesa serviciile ONRC?', a: 'Prin portalul portal.onrc.ro (cu cont și, pentru unele operațiuni, semnătură electronică) sau la ghișeele oficiilor din fiecare județ.' },
+        { q: 'Care sunt documentele necesare pentru obținerea unui certificat constatator de la ONRC?', a: 'Doar datele de identificare ale firmei — denumirea sau CUI-ul. Certificatul constatator conține informații publice, deci îl poate cere oricine, nu doar administratorul.' },
+        { q: 'Cât durează eliberarea unui certificat constatator?', a: 'Cel de bază, cerut online, se emite de regulă în aceeași zi. Certificatele cu istoric sau cele pentru insolvență trec prin backoffice-ul ONRC și pot dura o zi lucrătoare în plus.' },
       ]}
     >
       <p>
-        Oficiul Național al Registrului Comerțului (ONRC) reprezintă o instituție vitală pentru economia României,
-        având responsabilitatea de a gestiona evidența și înregistrarea operatorilor economici din țară. În acest
-        articol, vom explora rolul și atribuțiile ONRC, subliniind importanța sa în contextul economic actual din
-        România.
+        Oficiul Național al Registrului Comerțului e instituția la care se „naște” oficial orice firmă din România:
+        acolo se înmatriculează, acolo se înscriu toate modificările din viața ei și tot de acolo ies documentele
+        care dovedesc ce scrie în registru. Funcționează în subordinea Ministerului Justiției, cu câte un oficiu în
+        fiecare județ.
       </p>
 
-      <h2>Rolul ONRC</h2>
-      <h3>1. Importanța ONRC în economia românească</h3>
+      <h2>Registrul Comerțului: evidența în sine</h2>
       <p>
-        ONRC joacă un rol crucial în menținerea transparenței și funcționării corespunzătoare a mediului de afaceri
-        din România. Prin gestionarea Registrului Comerțului și a altor proceduri asociate, ONRC facilitează
-        înregistrarea și monitorizarea societăților comerciale, asigurând respectarea prevederilor legale în domeniu.
+        Miezul instituției e registrul electronic central în care figurează societățile, PFA-urile, întreprinderile
+        individuale și familiale. Pentru fiecare: denumirea, CUI-ul, numărul de ordine (J/F/C), sediul,
+        administratorii, asociații, obiectul de activitate pe coduri CAEN și starea firmei — în funcțiune,
+        suspendată, în insolvență, radiată.
       </p>
-      <h3>2. Organizarea și subordonarea ONRC</h3>
       <p>
-        Instituția funcționează sub autoritatea Ministerului Justiției și este structurată în așa fel încât să poată
-        gestiona eficient fluxul de informații și documente necesare pentru înregistrarea și funcționarea
-        societăților comerciale din România.
-      </p>
-
-      <h2>Atribuțiile ONRC</h2>
-      <h3>1. Înregistrarea și autorizarea societăților comerciale</h3>
-      <p>
-        ONRC înregistrează și autorizează funcționarea societăților comerciale, ținând evidența centralizată a
-        operatorilor economici și a modificărilor survenite pe parcursul activității acestora.
-      </p>
-      <h3>2. Înscrierea și publicarea actelor juridice</h3>
-      <p>
-        ONRC are în responsabilitatea sa înscrierea și publicarea actelor juridice referitoare la societățile
-        comerciale. Acest lucru asigură transparența și accesul public la informații relevante despre activitatea
-        acestora.
-      </p>
-      <h3>3. Procedurile de înregistrare</h3>
-      <p>
-        Procedurile de înregistrare a unei societăți comerciale se realizează prin intermediul Registrului
-        Comerțului, o evidență electronică centralizată a operatorilor economici. Acest proces implică depunerea
-        documentelor necesare și completarea formalităților legale.
-      </p>
-      <h3>4. Emiterea de certificate constatatoare</h3>
-      <p>
-        Instituția emite certificate constatatoare privind situația juridică a societăților comerciale, documente
-        extrem de importante pentru diverse tranzacții comerciale sau solicitări de finanțare. Poți obține un{' '}
-        <Link href="/servicii/certificat-constatator-online/">certificat constatator de la ONRC</Link> direct online,
-        fără deplasare la ghișeu.
+        Ce e înscris acolo e opozabil terților: dacă registrul spune că X e administrator, partenerii de afaceri se
+        pot baza pe asta. De aceea modificările — schimbare de sediu, cesiune de părți sociale, numire de
+        administrator — nu produc efecte față de terți până nu sunt înregistrate.
       </p>
 
-      <h2>Concluzie</h2>
+      <h2>Ce face concret</h2>
       <p>
-        ONRC reprezintă o piesă esențială în puzzle-ul economiei românești, garantând evidența și monitorizarea
-        corectă a operatorilor economici și a activității acestora. Prin intermediul Registrului Comerțului și a
-        altor servicii oferite, instituția contribuie la facilitarea și protejarea activității firmelor din România,
-        fiind un factor crucial în dezvoltarea economică a țării.
+        Patru lucruri acoperă aproape tot ce atinge un antreprenor:
+      </p>
+      <ul>
+        <li>
+          Înmatriculează firme noi. Dosarul se depune la ghișeu sau prin portal, iar la final primești certificatul
+          de înmatriculare cu CUI.
+        </li>
+        <li>
+          Înscrie mențiuni: orice schimbare în actele firmei (sediu, denumire, asociați, CAEN, dizolvare) trece
+          printr-o cerere de mențiuni.
+        </li>
+        <li>
+          Publică actele: extrase din înregistrări ajung în Buletinul Electronic al Registrului Comerțului, ca
+          informația să fie publică.
+        </li>
+        <li>
+          Eliberează documente care atestă ce scrie în registru — cel mai cerut fiind certificatul constatator.
+        </li>
+      </ul>
+
+      <h2>Certificatul constatator</h2>
+      <p>
+        E fotografia oficială a firmei la zi: cine o administrează, unde are sediul, ce stare are. Îl cer băncile la
+        deschiderea de conturi și credite, primăriile la autorizații, finanțatorii la fonduri europene, notarii la
+        tranzacții. Vine în mai multe variante — de bază, cu istoric, pentru insolvență — și am scris separat{' '}
+        <Link href="/cele-4-tipuri-de-certificat-constatator-online/">care tip îți trebuie în fiecare situație</Link>.
+      </p>
+      <p>
+        Îl poți obține singur prin portalul ONRC, cu cont și plata online, sau prin noi:{' '}
+        <Link href="/servicii/certificat-constatator-online/">comanzi certificatul constatator online</Link> și îl
+        primești pe email, fără să-ți faci cont pe portal.
+      </p>
+
+      <h2>Unde îl găsești</h2>
+      <p>
+        Portalul e la portal.onrc.ro, iar oficiile județene au program cu publicul în timpul săptămânii. Pentru
+        verificări rapide, gratuite, există și serviciul de căutare după denumire sau CUI — util când vrei doar să
+        vezi dacă o firmă există și ce stare are, fără un document oficial.
       </p>
     </ArticleLayout>
   );

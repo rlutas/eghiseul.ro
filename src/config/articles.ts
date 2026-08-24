@@ -195,8 +195,8 @@ export const ARTICLES: ArticleMeta[] = [
   },
   {
     slug: 'taxa-cazier-judiciar',
-    title: 'Taxa Cazier Judiciar: Cost, Plată și Obținere',
-    excerpt: 'Cât costă cazierul judiciar, unde se plătește și ce acte sunt necesare.',
+    title: 'Taxa pentru cazier judiciar: cât e de fapt',
+    excerpt: 'La ghișeu, cazierul e gratuit din 2017. Ce plătești când îl obții online și ce acte îți trebuie.',
     category: 'Juridice',
   },
   {
@@ -219,8 +219,8 @@ export const ARTICLES: ArticleMeta[] = [
   },
   {
     slug: 'totul-despre-cartea-funciara-colectiva',
-    title: 'Tot Ce Trebuie Să Știi Despre Cartea Funciară Colectivă',
-    excerpt: 'Ce este CF colectivă, ce conține extrasul, rolul asociației de proprietari și cotele indivize.',
+    title: 'Cartea funciară colectivă, pe înțeles',
+    excerpt: 'Ce descrie cartea colectivă a blocului, ce găsești în părțile A, B și C și cum obții extrasul.',
     category: 'Cadastru & imobiliare',
   },
   {
@@ -230,12 +230,6 @@ export const ARTICLES: ArticleMeta[] = [
     category: 'Juridice',
   },
   {
-    slug: 'importanta-extras-de-carte-funciara-colectiva',
-    title: 'De Ce Este Esențial un Extras de Carte Funciară Colectivă',
-    excerpt: 'Situația tehnică, economică și juridică a imobilelor dintr-un condominiu și când îți trebuie.',
-    category: 'Cadastru & imobiliare',
-  },
-  {
     slug: 'extras-de-carte-funciara-pentru-casa-verde',
     title: 'Extras de Carte Funciară pentru Casa Verde',
     excerpt: 'De ce ai nevoie de extrasul CF la dosarul Casa Verde, ce condiții îndeplinește și cum îl obții rapid.',
@@ -243,8 +237,8 @@ export const ARTICLES: ArticleMeta[] = [
   },
   {
     slug: 'rolul-si-atributiile-onrc-romania',
-    title: 'Rolul și Atribuțiile ONRC în România',
-    excerpt: 'Ce este Registrul Comerțului, ce atribuții are și ce documente eliberează.',
+    title: 'Ce face ONRC, de fapt',
+    excerpt: 'Registrul Comerțului, înmatriculările, mențiunile și certificatul constatator — pe scurt.',
     category: 'Comercial / ONRC',
   },
   {
