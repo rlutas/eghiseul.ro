@@ -35,7 +35,7 @@ export default function Page() {
         { href: '/cele-4-tipuri-de-certificat-constatator-online/', label: 'Tipurile de certificat constatator', desc: 'Ce tip de certificat constatator îți trebuie.' },
       ]}
       faqs={[
-        { q: 'Care este rolul ONRC în economia României?', a: 'ONRC ține Registrul Comerțului — evidența oficială a firmelor, PFA-urilor și celorlalți profesioniști. Orice firmă există legal din momentul înmatriculării acolo, iar datele ei publice pot fi consultate de oricine.' },
+        { q: 'Care este rolul ONRC în economia României?', a: 'ONRC ține Registrul Comerțului, evidența oficială a firmelor, PFA-urilor și celorlalți profesioniști. Orice firmă există legal din momentul înmatriculării acolo, iar datele ei publice pot fi consultate de oricine.' },
         { q: 'Ce proceduri implică înregistrarea unei societăți comerciale la ONRC?', a: 'Rezervi denumirea, întocmești actul constitutiv, depui dosarul (la ghișeu sau prin portal) și primești certificatul de înmatriculare cu CUI. De la eliminarea taxelor de înmatriculare, depunerea în sine nu mai costă nimic.' },
         { q: 'Cum pot accesa serviciile ONRC?', a: 'Prin portalul portal.onrc.ro (cu cont și, pentru unele operațiuni, semnătură electronică) sau la ghișeele oficiilor din fiecare județ.' },
         { q: 'Care sunt documentele necesare pentru obținerea unui certificat constatator de la ONRC?', a: 'Doar datele de identificare ale firmei — denumirea sau CUI-ul. Certificatul constatator conține informații publice, deci îl poate cere oricine, nu doar administratorul.' },
@@ -53,13 +53,13 @@ export default function Page() {
       <p>
         Miezul instituției e registrul electronic central în care figurează societățile, PFA-urile, întreprinderile
         individuale și familiale. Pentru fiecare: denumirea, CUI-ul, numărul de ordine (J/F/C), sediul,
-        administratorii, asociații, obiectul de activitate pe coduri CAEN și starea firmei — în funcțiune,
+        administratorii, asociații, obiectul de activitate pe coduri CAEN și starea firmei: în funcțiune,
         suspendată, în insolvență, radiată.
       </p>
       <p>
         Ce e înscris acolo e opozabil terților: dacă registrul spune că X e administrator, partenerii de afaceri se
-        pot baza pe asta. De aceea modificările — schimbare de sediu, cesiune de părți sociale, numire de
-        administrator — nu produc efecte față de terți până nu sunt înregistrate.
+        pot baza pe asta. De aceea o schimbare de sediu, o cesiune de părți sociale sau numirea unui
+        administrator nu produc efecte față de terți până nu sunt înregistrate.
       </p>
 
       <h2>Ce face concret</h2>
@@ -80,7 +80,7 @@ export default function Page() {
           informația să fie publică.
         </li>
         <li>
-          Eliberează documente care atestă ce scrie în registru — cel mai cerut fiind certificatul constatator.
+          Eliberează documente care atestă ce scrie în registru, cel mai cerut fiind certificatul constatator.
         </li>
       </ul>
 
@@ -88,7 +88,7 @@ export default function Page() {
       <p>
         E fotografia oficială a firmei la zi: cine o administrează, unde are sediul, ce stare are. Îl cer băncile la
         deschiderea de conturi și credite, primăriile la autorizații, finanțatorii la fonduri europene, notarii la
-        tranzacții. Vine în mai multe variante — de bază, cu istoric, pentru insolvență — și am scris separat{' '}
+        tranzacții. Vine în mai multe variante (de bază, cu istoric, pentru insolvență) și am scris separat{' '}
         <Link href="/cele-4-tipuri-de-certificat-constatator-online/">care tip îți trebuie în fiecare situație</Link>.
       </p>
       <p>
@@ -100,7 +100,7 @@ export default function Page() {
       <h2>Unde îl găsești</h2>
       <p>
         Portalul e la portal.onrc.ro, iar oficiile județene au program cu publicul în timpul săptămânii. Pentru
-        verificări rapide, gratuite, există și serviciul de căutare după denumire sau CUI — util când vrei doar să
+        verificări rapide, gratuite, există și serviciul de căutare după denumire sau CUI, util când vrei doar să
         vezi dacă o firmă există și ce stare are, fără un document oficial.
       </p>
     </ArticleLayout>

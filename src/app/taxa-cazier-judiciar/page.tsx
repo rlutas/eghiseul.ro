@@ -40,7 +40,7 @@ export default function Page() {
       faqs={[
         {
           q: 'Cât costă cazierul judiciar la ghișeu?',
-          a: 'Nimic. Taxa de eliberare (fostă 10 lei) și timbrul fiscal au fost eliminate la 1 februarie 2017. La ghișeul de cazier al poliției, certificatul se eliberează gratuit, de regulă pe loc.',
+          a: 'Nimic. Taxa de eliberare (fostă 10 lei) și timbrul fiscal au fost eliminate la 1 februarie 2017. La ghișeul de cazier al poliției, certificatul se eliberează gratuit, în multe cazuri chiar pe loc.',
         },
         {
           q: 'Atunci ce plătesc dacă îl cer online?',
@@ -67,8 +67,8 @@ export default function Page() {
         certificatul gratuit, de regulă pe loc.
       </p>
       <p>
-        Ce se plătește astăzi nu e o taxă către stat, ci — dacă alegi varianta online — serviciul cuiva care face
-        drumul în locul tău.
+        Ce se plătește astăzi nu e o taxă către stat. E serviciul cuiva care face drumul în locul tău, dacă alegi
+        varianta online.
       </p>
 
       <h2>De unde vine confuzia cu „taxa”</h2>
@@ -87,7 +87,7 @@ export default function Page() {
       <h2>Ce plătești când îl obții online</h2>
       <p>
         Statul nu eliberează cazierul printr-un click pentru oricine: îl primești la ghișeu, personal, sau prin
-        împuternicit. Serviciile online — al nostru inclusiv — funcționează pe a doua cale: semnezi electronic o
+        împuternicit. Serviciile online, al nostru inclusiv, funcționează pe a doua cale: semnezi electronic o
         împuternicire avocațială, avocatul depune cererea, ridică certificatul și ți-l trimite pe email, semnat
         electronic.
       </p>
@@ -105,7 +105,7 @@ export default function Page() {
 
       <h2>Ce acte îți trebuie</h2>
       <p>
-        Pentru persoane fizice: actul de identitate valabil — carte de identitate sau pașaport. Atât, la ghișeu.
+        Pentru persoane fizice: actul de identitate valabil, buletin sau pașaport. Atât, la ghișeu.
         Online mai semnezi împuternicirea (electronic, în formular) și încarci o poză a actului.
       </p>
       <p>
@@ -113,7 +113,7 @@ export default function Page() {
       </p>
       <ul>
         <li>
-          Minorii nu își pot cere singuri cazierul — cererea o depune părintele sau reprezentantul legal, cu
+          Minorii nu își pot cere singuri cazierul: cererea o depune părintele sau reprezentantul legal, cu
           certificatul de naștere al copilului.
         </li>
         <li>
@@ -124,13 +124,13 @@ export default function Page() {
         </li>
         <li>
           Firmele primesc certificat de cazier pe persoana juridică, în baza CUI-ului și a împuternicirii semnate de
-          reprezentantul legal — îl cer mai ales la licitații și autorizări.
+          reprezentantul legal. Îl cer mai ales la licitații și autorizări.
         </li>
       </ul>
 
       <h2>Unde ți se cere cazierul</h2>
       <p>
-        Cel mai des la angajare — mai ales în pază, transport, educație, sănătate și instituții publice. Apoi la
+        Cel mai des la angajare, mai ales în pază, transport, educație, sănătate și instituții publice. Apoi la
         concursuri pentru posturi la stat, la dosarele de cetățenie sau rezidență, la autorizarea pentru arme, la
         adopție sau tutelă și la unele vize. Firmele îl depun la licitații publice și la autorizările din domeniile
         reglementate.
@@ -142,7 +142,7 @@ export default function Page() {
 
       <h2>Pe scurt</h2>
       <p>
-        Taxa de cazier judiciar nu mai există din 2017 — la ghișeu, documentul e gratuit. Online plătești serviciul
+        Taxa de cazier judiciar nu mai există din 2017; la ghișeu, documentul e gratuit. Online plătești serviciul
         de obținere prin avocat, util când nu poți ajunge personal. Dacă asta e situația ta, poți{' '}
         <Link href="/servicii/cazier-judiciar-online/">comanda cazierul judiciar aici</Link>; dacă nu, ghișeul
         poliției rămâne varianta corectă și fără niciun cost.

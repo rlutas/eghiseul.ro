@@ -41,7 +41,7 @@ export default function Page() {
         },
         {
           q: 'Care este diferența dintre un extras de carte funciară și un extras de carte funciară colectivă?',
-          a: 'Extrasul obișnuit descrie o singură unitate — apartamentul tău, cu proprietarii și sarcinile lui. Extrasul colectiv descrie clădirea și terenul comun, cu cota fiecărui apartament din ele.',
+          a: 'Extrasul obișnuit descrie o singură unitate: apartamentul tău, cu proprietarii și sarcinile lui. Extrasul colectiv descrie clădirea și terenul comun, cu cota fiecărui apartament din ele.',
         },
         {
           q: 'Ce fac dacă datele din extras nu sunt actualizate?',
@@ -49,7 +49,7 @@ export default function Page() {
         },
         {
           q: 'Când e nevoie de carte funciară colectivă?',
-          a: 'Cel mai des la vânzarea unui apartament, la credit ipotecar, la dezmembrări sau alipiri de spații și în litigii pe părțile comune — de exemplu când se dispută cota de teren aferentă unui apartament.',
+          a: 'Cel mai des la vânzarea unui apartament, la credit ipotecar, la dezmembrări sau alipiri de spații și în litigii pe părțile comune, de exemplu când se dispută cota de teren aferentă unui apartament.',
         },
         {
           q: 'De ce informații am nevoie pentru a scoate un extras de carte funciară colectivă?',
@@ -73,13 +73,13 @@ export default function Page() {
       <h2>Cum apare cartea funciară colectivă</h2>
       <p>
         La un bloc, lucrurile se împart în două. Apartamentul tău are cartea lui funciară individuală. Dar casa
-        scării, acoperișul, terenul de sub bloc — părțile comune — nu aparțin nimănui în întregime, ci tuturor, în
+        scării, acoperișul și terenul de sub bloc (părțile comune) nu aparțin nimănui în întregime, ci tuturor, în
         cote. Evidența lor se ține într-o carte funciară separată, cea colectivă, deschisă la OCPI odată cu prima
         carte funciară individuală din condominiu.
       </p>
       <p>
         În ea găsești terenul pe care stă construcția, clădirea în ansamblu și cota-parte din părțile comune care
-        revine fiecărui apartament. Când cumperi un apartament, cumperi de fapt și cota lui din cartea colectivă —
+        revine fiecărui apartament. Când cumperi un apartament, cumperi de fapt și cota lui din cartea colectivă,
         chiar dacă în actul de vânzare scrie doar „apartament nr. 12”.
       </p>
 
@@ -90,14 +90,14 @@ export default function Page() {
       </p>
       <ul>
         <li>
-          Partea A — descrierea imobilului: terenul, construcția, numărul cadastral, suprafețele.
+          Partea A, descrierea imobilului: terenul, construcția, numărul cadastral, suprafețele.
         </li>
         <li>
-          Partea B — proprietatea: lista unităților individuale din condominiu, cu cota fiecăreia din părțile
+          Partea B, proprietatea: lista unităților individuale din condominiu, cu cota fiecăreia din părțile
           comune. La un bloc mare, partea asta se poate întinde pe zeci de pagini.
         </li>
         <li>
-          Partea C — sarcinile: ipoteci, servituți sau alte drepturi înscrise asupra imobilului în ansamblu.
+          Partea C, sarcinile: ipoteci, servituți sau alte drepturi înscrise asupra imobilului în ansamblu.
         </li>
       </ul>
       <p>
@@ -121,7 +121,7 @@ export default function Page() {
       <h3>Cum obții extrasul</h3>
       <p>
         Ai trei căi. La ghișeul OCPI din județul imobilului, cu cerere și taxa plătită la casierie. Prin notar, care
-        îl obține pentru actele pe care le întocmește. Sau online — noi îl obținem de la ANCPI și ți-l trimitem pe
+        îl obține pentru actele pe care le întocmește. Sau online: noi îl obținem de la ANCPI și ți-l trimitem pe
         email, semnat electronic:{' '}
         <Link href="/servicii/extras-cf-colectiv/">extras de carte funciară colectivă online</Link>. Pentru
         apartamentul în sine, separat, există{' '}
@@ -130,7 +130,7 @@ export default function Page() {
 
       <h2>Intabularea schimbărilor</h2>
       <p>
-        Orice schimbare — vânzare, moștenire, dezmembrare, modificarea cotelor — produce efecte față de terți doar
+        Orice schimbare (vânzare, moștenire, dezmembrare, modificarea cotelor) produce efecte față de terți doar
         după ce e înscrisă. Procedura la OCPI arată așa:
       </p>
       <ol>
@@ -155,8 +155,8 @@ export default function Page() {
         Înainte să cumperi un apartament, extrasul colectiv îți spune lucruri pe care extrasul individual nu le
         arată: dacă terenul de sub bloc e în proprietatea condominiului sau doar în folosință, dacă blocul are
         sarcini înscrise asupra ansamblului și dacă cota de părți comune din anunț chiar există în acte. Am văzut
-        tranzacții blocate la notar fix pe diferența dintre cota din contract și cea din cartea colectivă — o
-        verificare de câteva zeci de lei făcută la timp scutește luni de corespondență cu OCPI.
+        tranzacții blocate la notar fix pe diferența dintre cota din contract și cea din cartea colectivă. O
+        verificare de câteva zeci de lei, făcută la timp, scutește luni de corespondență cu OCPI.
       </p>
       <p>
         Dacă vrei să afli întâi numărul cărții funciare sau numărul cadastral al imobilului, am scris separat{' '}
