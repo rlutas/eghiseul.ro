@@ -19,6 +19,9 @@ import { buildOblioClient } from './invoice';
 import type { OblioClient, OblioProduct } from './types';
 
 const RO_VAT_RATE = 21;
+// Numele cotei din Oblio. Trimis explicit pe fiecare linie ca nomenclatorul
+// (cheiat pe `code`) sa nu poata suprascrie cota cu una memorata gresit.
+const RO_VAT_NAME = 'Normala';
 
 export interface ProformaRef {
   seriesName: string;
@@ -51,6 +54,7 @@ function buildProducts(input: ExtraDocInput): OblioProduct[] {
       price: input.amountRon,
       measuringUnit: 'buc',
       currency: 'RON',
+      vatName: RO_VAT_NAME,
       vatPercentage: RO_VAT_RATE,
       vatIncluded: true,
       quantity: 1,

@@ -60,7 +60,7 @@ describe('createInvoiceFromOrder — PF (individual)', () => {
         type: 'individual' as const,
         firstName: 'Ion',
         lastName: 'Popescu',
-        cnp: '1820507211209',
+        cnp: '1820507211208',
         address: 'Str. Test 1',
         city: 'Sector 3',
         county: 'București',
@@ -73,7 +73,7 @@ describe('createInvoiceFromOrder — PF (individual)', () => {
 
     const payload = oblioRequest.mock.calls[0][0].body;
     expect(payload.client.name).toBe('Ion Popescu');
-    expect(payload.client.cif).toBe('1820507211209');
+    expect(payload.client.cif).toBe('1820507211208');
     expect(payload.client.vatPayer).toBe(false);
     expect(payload.client.save).toBe(false); // PF clients are NOT saved in Oblio
   });
@@ -273,7 +273,7 @@ describe('createInvoiceFromOrder — products / line items', () => {
     total_price: 480,
     customer_data: {
       contact: { firstName: 'X', lastName: 'Y', email: 'x@y.com' },
-      billing: { type: 'individual' as const, firstName: 'X', lastName: 'Y', cnp: '1820507211209' },
+      billing: { type: 'individual' as const, firstName: 'X', lastName: 'Y', cnp: '1820507211208' },
     },
   };
 
@@ -315,6 +315,30 @@ describe('createInvoiceFromOrder — products / line items', () => {
     expect(products).toHaveLength(3); // service + 2 options
     expect(products[1]).toMatchObject({ name: 'Urgentă', price: 50 });
     expect(products[2]).toMatchObject({ name: 'Apostila Haga', price: 100 });
+  });
+
+  it('every line carries an explicit 21% Normala VAT (nomenclatorul nu poate suprascrie cota)', async () => {
+    // Iunie–iulie 2026: 129 de facturi au ieșit cu 0% fiindcă produsele
+    // `prod_*` erau memorate în nomenclatorul Oblio ca „Scutita", iar Oblio
+    // aplică TVA-ul memorat când se potrivește `code`. `vatName` trimis
+    // explicit pe fiecare linie taie calea asta.
+    const order = {
+      ...baseOrder,
+      lawyer_fee_ron: 20,
+      delivery_price: 25,
+      discount_amount: 10,
+      coupon_code: 'TEST10',
+      selected_options: [{ code: 'urgent', name: 'Urgentă', price: 50 }],
+    };
+    await createInvoiceFromOrder(order, 'Card');
+
+    const products = oblioRequest.mock.calls[0][0].body.products;
+    expect(products.length).toBeGreaterThan(3);
+    for (const p of products) {
+      expect(p.vatName).toBe('Normala');
+      expect(p.vatPercentage).toBe(21);
+      expect(p.vatIncluded).toBe(true);
+    }
   });
 
   it('option lines carry NO product code (Oblio would print the stored name)', async () => {
@@ -437,7 +461,7 @@ describe('createInvoiceFromOrder — payment + return shape', () => {
     total_price: 302.5,
     customer_data: {
       contact: { email: 'a@b.com' },
-      billing: { type: 'individual' as const, firstName: 'A', lastName: 'B', cnp: '1820507211209' },
+      billing: { type: 'individual' as const, firstName: 'A', lastName: 'B', cnp: '1820507211208' },
     },
   };
 

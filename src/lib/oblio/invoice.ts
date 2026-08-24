@@ -8,6 +8,7 @@
 import { oblioRequest, getOblioConfig } from './client';
 import { normalizeOrderOptions } from '@/lib/orders/normalize';
 import { isForeignBillingCountry } from '@/lib/orders/billing-validation';
+import { validateCNP } from '@/lib/validations/cnp';
 import {
   resolveInvoiceAddress,
   canonicalCounty,
@@ -27,6 +28,9 @@ import type {
 
 // Romanian VAT rate (changed from 19% to 21% in 2026).
 const RO_VAT_RATE = 21;
+// Numele cotei din Oblio. Trimis explicit pe fiecare linie ca nomenclatorul
+// (cheiat pe `code`) sa nu poata suprascrie cota cu una memorata gresit.
+const RO_VAT_NAME = 'Normala';
 
 // ============================================================================
 // Invoice Creation
@@ -180,6 +184,23 @@ export function isPJBillingData(customerData: CustomerData): boolean {
   );
 }
 
+/** ANAF's placeholder identifier for a buyer without a valid CNP. */
+export const CNP_PLACEHOLDER = '0000000000000';
+
+/**
+ * The CNP as it should appear on the invoice.
+ *
+ * An empty CNP stays empty (Oblio accepts PF clients without one, and foreign
+ * billing persons must not inherit anyone's CNP). A CNP that fails the check
+ * digit becomes 13 zeros — otherwise Oblio blocks the invoice at "Trimite în
+ * SPV" and it never reaches ANAF.
+ */
+export function sanitizePfCnp(raw: string | undefined | null): string {
+  const cnp = (raw || '').replace(/[\s-]/g, '');
+  if (!cnp) return '';
+  return validateCNP(cnp).valid ? cnp : CNP_PLACEHOLDER;
+}
+
 export function buildOblioClient(customerData: CustomerData): OblioClient {
   const billing = customerData.billing;
   const contact = customerData.contact;
@@ -223,6 +244,13 @@ export function buildOblioClient(customerData: CustomerData): OblioClient {
   }
 
   // Individual (PF) — fall back to KYC `personal` data for "self" billing.
+  //
+  // A mistyped CNP is not our problem to solve at invoicing time, but it IS
+  // ours to keep out of the invoice: Oblio refuses to push such an invoice to
+  // SPV ("Introdu un CNP valid Clientului tau") and it sits there blocked
+  // until somebody notices days later (EGH-0438, EGH-0524). `sanitizePfCnp`
+  // swaps an invalid CNP for the 13 zeros ANAF uses for a buyer without a
+  // valid identifier, so the invoice leaves for SPV either way.
   // Foreign billing address (country outside Romania): state falls back to
   // '-' (Oblio's documented convention for foreign clients — keeps the
   // getMissingInvoiceClientFields guard satisfied) and the CNP does NOT fall
@@ -233,7 +261,7 @@ export function buildOblioClient(customerData: CustomerData): OblioClient {
     name:
       `${billing?.firstName || contact?.firstName || personal?.firstName || ''} ${billing?.lastName || contact?.lastName || personal?.lastName || ''}`.trim() ||
       'N/A',
-    cif: billing?.cnp || (pfIsForeign ? '' : personal?.cnp || ''),
+    cif: sanitizePfCnp(billing?.cnp || (pfIsForeign ? '' : personal?.cnp || '')),
     address: resolved.address,
     city: resolved.city,
     state: resolved.state,
@@ -332,6 +360,7 @@ export async function createInvoiceFromOrder(
     price: servicePrice,
     measuringUnit: 'buc',
     currency: 'RON',
+    vatName: RO_VAT_NAME,
     vatPercentage: RO_VAT_RATE,
     vatIncluded: true,
     quantity: 1,
@@ -345,6 +374,7 @@ export async function createInvoiceFromOrder(
       price: lawyerFee,
       measuringUnit: 'buc',
       currency: 'RON',
+      vatName: RO_VAT_NAME,
       vatPercentage: RO_VAT_RATE,
       vatIncluded: true,
       quantity: 1,
@@ -370,6 +400,7 @@ export async function createInvoiceFromOrder(
       price: option.unitPrice,
       measuringUnit: 'buc',
       currency: 'RON',
+      vatName: RO_VAT_NAME,
       vatPercentage: RO_VAT_RATE,
       vatIncluded: true,
       quantity: option.quantity,
@@ -396,6 +427,7 @@ export async function createInvoiceFromOrder(
       price: order.delivery_price,
       measuringUnit: 'buc',
       currency: 'RON',
+      vatName: RO_VAT_NAME,
       vatPercentage: RO_VAT_RATE,
       vatIncluded: true,
       quantity: 1,
@@ -418,6 +450,7 @@ export async function createInvoiceFromOrder(
       price: -Math.abs(order.discount_amount),
       measuringUnit: 'buc',
       currency: 'RON',
+      vatName: RO_VAT_NAME,
       vatPercentage: RO_VAT_RATE,
       vatIncluded: true,
       quantity: 1,

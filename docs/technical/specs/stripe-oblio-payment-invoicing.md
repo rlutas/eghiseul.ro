@@ -777,6 +777,34 @@ pe docs + FAQ oficial):
 - Teste: `tests/unit/lib/orders/billing-validation.test.ts` +
   `tests/unit/lib/oblio/build-client.test.ts` (secțiunile „foreign billing").
 
+### 2.0b-bis ⚠️ Cota TVA: `vatName` obligatoriu pe fiecare linie (2026-08-24)
+
+**Oblio ignoră `vatPercentage` dacă `code`-ul liniei se potrivește cu un produs
+din nomenclator** — aplică TVA-ul memorat pe acel produs. Așa au ieșit 129 de
+facturi cu 0% în iunie–iulie 2026 (32.281,29 RON brut, 5.602,28 RON TVA
+necolectat): produsele `prod_*` create de fluxul vechi Stripe→Oblio de pe
+WordPress erau salvate în nomenclator ca „Scutita".
+
+Regula: **fiecare linie trimite `vatName: 'Normala'` + `vatPercentage: 21`**
+(constantele `RO_VAT_NAME` / `RO_VAT_RATE` din `invoice.ts` și `proforma.ts`).
+Cu `vatName` explicit, nomenclatorul nu mai poate suprascrie cota, indiferent ce
+`code` ajunge pe linie. Test: `tests/unit/lib/oblio/invoice.test.ts` verifică
+toate liniile din payload (serviciu, onorariu, opțiuni, livrare, reducere).
+
+Detalii + lista facturilor afectate:
+`docs/changelog/2026-08-24-facturi-fara-tva-nomenclator-oblio.md`.
+
+### 2.0c-bis CNP invalid → 13 zerouri (2026-08-24)
+
+Un CNP tastat greșit de client nu mai blochează factura în SPV. `sanitizePfCnp`
+(`invoice.ts`) verifică cifra de control și, la eșec, trimite `0000000000000` —
+identificatorul ANAF pentru cumpărător fără CNP valid. Un CNP **lipsă** rămâne
+gol (Oblio acceptă PF fără CNP).
+
+Fără fix, Oblio răspunde *„Pentru a putea trimite Factura in SPV, editeaza
+Factura: Introdu un CNP valid Clientului tau"* și factura stă blocată zile
+întregi (`EGH-0438`, `EGH-0524`).
+
 ### 2.0c ⚠️ Adresa clientului pentru e-Factura/SPV (2026-07-28)
 
 Oblio **emite** factura chiar dacă ANAF o va refuza la export; blocajul apare doar la

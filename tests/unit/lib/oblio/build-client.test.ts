@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { buildOblioClient, getMissingInvoiceClientFields } from '@/lib/oblio/invoice';
+import { buildOblioClient, getMissingInvoiceClientFields, sanitizePfCnp, CNP_PLACEHOLDER } from '@/lib/oblio/invoice';
 
 describe('buildOblioClient', () => {
   it('issues to the firm for a PJ order (type persoana_juridica) — regression: not N/A', () => {
@@ -46,10 +46,10 @@ describe('buildOblioClient', () => {
 
   it('builds a PF client from billing name + CNP', () => {
     const c = buildOblioClient({
-      billing: { type: 'persoana_fizica', firstName: 'Ion', lastName: 'Pop', cnp: '1900101080011' },
+      billing: { type: 'persoana_fizica', firstName: 'Ion', lastName: 'Pop', cnp: '1900101080012' },
     });
     expect(c.name).toBe('Ion Pop');
-    expect(c.cif).toBe('1900101080011');
+    expect(c.cif).toBe('1900101080012');
     expect(c.vatPayer).toBe(false);
     expect(c.save).toBe(false);
   });
@@ -57,10 +57,10 @@ describe('buildOblioClient', () => {
   it('falls back to KYC personal data for PF "self" billing', () => {
     const c = buildOblioClient({
       billing: { type: 'persoana_fizica', source: 'self' },
-      personal: { firstName: 'Ana', lastName: 'Ionescu', cnp: '2900202080022' },
+      personal: { firstName: 'Ana', lastName: 'Ionescu', cnp: '2900202080029' },
     });
     expect(c.name).toBe('Ana Ionescu');
-    expect(c.cif).toBe('2900202080022');
+    expect(c.cif).toBe('2900202080029');
   });
 });
 
@@ -91,7 +91,7 @@ describe('buildOblioClient — foreign billing country (facturare pe altă țar�
     // other_pf abroad without CNP must not get the buyer's CNP on the invoice.
     const c = buildOblioClient({
       billing: foreignBilling,
-      personal: { firstName: 'Ana', lastName: 'Ionescu', cnp: '2900202080022' },
+      personal: { firstName: 'Ana', lastName: 'Ionescu', cnp: '2900202080029' },
     });
     expect(c.cif).toBe('');
   });
@@ -106,9 +106,9 @@ describe('buildOblioClient — foreign billing country (facturare pe altă țar�
   it('domestic self billing still falls back to the KYC CNP (regression)', () => {
     const c = buildOblioClient({
       billing: { type: 'persoana_fizica', source: 'self', country: 'Romania' },
-      personal: { firstName: 'Ana', lastName: 'Ionescu', cnp: '2900202080022' },
+      personal: { firstName: 'Ana', lastName: 'Ionescu', cnp: '2900202080029' },
     });
-    expect(c.cif).toBe('2900202080022');
+    expect(c.cif).toBe('2900202080029');
     expect(c.state).toBe('');
     expect(c.country).toBe('Romania');
   });
@@ -145,7 +145,7 @@ describe('getMissingInvoiceClientFields (server-side submit guard)', () => {
     const missing = getMissingInvoiceClientFields({
       billing: { type: 'persoana_fizica', source: 'self' },
       personal: {
-        firstName: 'Ana', lastName: 'Ionescu', cnp: '2900202080022',
+        firstName: 'Ana', lastName: 'Ionescu', cnp: '2900202080029',
         address: { street: 'Str. Lungă 1', city: 'Cluj-Napoca', county: 'Cluj' },
       },
     });
@@ -189,5 +189,40 @@ describe('getMissingInvoiceClientFields (server-side submit guard)', () => {
       },
     });
     expect(missing).toEqual(['județul']);
+  });
+});
+
+describe('CNP pe factură (blocaj SPV „Introdu un CNP valid")', () => {
+  it('keeps a valid CNP untouched', () => {
+    const c = buildOblioClient({
+      billing: { type: 'persoana_fizica', firstName: 'Ion', lastName: 'Popescu', cnp: '1870712030017', address: 'str. A 1', city: 'Cluj-Napoca', county: 'Cluj', country: 'Romania' },
+    });
+    expect(c.cif).toBe('1870712030017');
+  });
+
+  it('replaces a CNP with a broken check digit with 13 zeros', () => {
+    // Same CNP, last digit bumped — Oblio would refuse to send this to SPV.
+    const c = buildOblioClient({
+      billing: { type: 'persoana_fizica', firstName: 'Ion', lastName: 'Popescu', cnp: '1870712030016', address: 'str. A 1', city: 'Cluj-Napoca', county: 'Cluj', country: 'Romania' },
+    });
+    expect(c.cif).toBe(CNP_PLACEHOLDER);
+  });
+
+  it('replaces a too-short CNP with 13 zeros', () => {
+    const c = buildOblioClient({
+      billing: { type: 'persoana_fizica', firstName: 'Ion', lastName: 'Popescu', cnp: '187071203', address: 'str. A 1', city: 'Cluj-Napoca', county: 'Cluj', country: 'Romania' },
+    });
+    expect(c.cif).toBe(CNP_PLACEHOLDER);
+  });
+
+  it('leaves a missing CNP empty — does not invent zeros', () => {
+    const c = buildOblioClient({
+      billing: { type: 'persoana_fizica', firstName: 'Ion', lastName: 'Popescu', address: 'str. A 1', city: 'Cluj-Napoca', county: 'Cluj', country: 'Romania' },
+    });
+    expect(c.cif).toBe('');
+  });
+
+  it('sanitizePfCnp accepts a spaced CNP and strips the separators', () => {
+    expect(sanitizePfCnp('1870712 030017')).toBe('1870712030017');
   });
 });

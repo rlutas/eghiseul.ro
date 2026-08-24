@@ -44,6 +44,14 @@ export interface OblioProduct {
   price: number;
   measuringUnit: string;
   currency: string;
+  /**
+   * Numele cotei din lista firmei ("Normala", "Redusa", "Scutita", ...).
+   * OBLIGATORIU pe fiecare linie: Oblio cheiază nomenclatorul pe `code` și, la
+   * potrivire, aplică TVA-ul MEMORAT pe produs, ignorând `vatPercentage`.
+   * Așa au ieșit 129 de facturi cu 0% în iunie–iulie 2026 (produse `prod_*`
+   * salvate ca „Scutita" de integrarea veche Stripe→Oblio de pe WordPress).
+   */
+  vatName?: string;
   vatPercentage?: number;
   vatIncluded?: boolean;
   quantity: number;
