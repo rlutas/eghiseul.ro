@@ -47,6 +47,8 @@ interface LineSegment {
   literal?: string;
   field?: string;
   gapAfter: number;
+  /** Literal drawn in bold — the plan-cadastral title keeps the form's weight. */
+  bold?: boolean;
 }
 
 interface LineMap {
@@ -65,15 +67,32 @@ interface LineMap {
 const ASSET_DIR = join(process.cwd(), 'src', 'templates', 'ancpi');
 
 /**
+ * Which frozen base + line map to render. 'cf' is the collaborator's Anexa 6;
+ * 'plan' is the same form with the object swapped to "extras din planul
+ * cadastral, pe ortofotoplan" (built by
+ * scripts/build-plan-cadastral-cerere-template.ts from the committed CF base).
+ */
+export type CerereTemplate = 'cf' | 'plan';
+
+const TEMPLATE_ASSETS: Record<CerereTemplate, { base: string; fields: string }> = {
+  cf: { base: 'cerere-extras-cf-base.pdf', fields: 'cerere-extras-cf-fields.json' },
+  plan: { base: 'cerere-extras-plan-base.pdf', fields: 'cerere-extras-plan-fields.json' },
+};
+
+/**
  * Right text margin of the form (612pt page, 85pt margins) — every original
  * line ends at ~527. Values longer than the sample ones must not cross it.
  */
 const RIGHT_MARGIN = 527.5;
 
-export async function generateCerereExtrasCfPdf(data: CerereExtrasCfData): Promise<Buffer> {
-  const basePdf = readFileSync(join(ASSET_DIR, 'cerere-extras-cf-base.pdf'));
+export async function generateCerereExtrasCfPdf(
+  data: CerereExtrasCfData,
+  template: CerereTemplate = 'cf',
+): Promise<Buffer> {
+  const assets = TEMPLATE_ASSETS[template];
+  const basePdf = readFileSync(join(ASSET_DIR, assets.base));
   const map = JSON.parse(
-    readFileSync(join(ASSET_DIR, 'cerere-extras-cf-fields.json'), 'utf8')
+    readFileSync(join(ASSET_DIR, assets.fields), 'utf8')
   ) as LineMap;
 
   const pdf = await PDFDocument.load(basePdf);
@@ -101,7 +120,11 @@ export async function generateCerereExtrasCfPdf(data: CerereExtrasCfData): Promi
   for (const line of map.lines) {
     // The header is set in one weight; only body values are bold.
     const boldValues = line.valuesBold !== false;
-    const fontFor = (isValue: boolean) => (isValue && boldValues ? bold : regular);
+    const boldLiterals = new Set(
+      line.segments.filter(seg => seg.bold).map(seg => seg.literal ?? '')
+    );
+    const fontFor = (isValue: boolean, text?: string) =>
+      (isValue && boldValues) || (text !== undefined && boldLiterals.has(text)) ? bold : regular;
 
     const pieces: FitPiece[] = line.segments.map(seg => ({
       text: seg.field !== undefined ? values[seg.field] ?? '' : seg.literal ?? '',
@@ -110,20 +133,20 @@ export async function generateCerereExtrasCfPdf(data: CerereExtrasCfData): Promi
     }));
 
     const width = (current: FitPiece[]) =>
-      current.reduce((w, p) => w + (p.text ? fontFor(p.isValue).widthOfTextAtSize(p.text, line.size) : 0) + p.gapAfter, 0);
+      current.reduce((w, p) => w + (p.text ? fontFor(p.isValue, p.text).widthOfTextAtSize(p.text, line.size) : 0) + p.gapAfter, 0);
 
     // A centred line has the whole page to grow into, so it is never squeezed;
     // the left-aligned body lines must stay inside the right margin.
     const fitted = line.centerX !== undefined
       ? pieces
       : fitLine(pieces, line.startX, RIGHT_MARGIN, (text, isValue) =>
-          fontFor(isValue).widthOfTextAtSize(text, line.size)
+          fontFor(isValue, text).widthOfTextAtSize(text, line.size)
         );
 
     let x = line.centerX !== undefined ? line.centerX - width(fitted) / 2 : line.startX;
     for (const piece of fitted) {
       if (piece.text) {
-        const font = fontFor(piece.isValue);
+        const font = fontFor(piece.isValue, piece.text);
         page.drawText(piece.text, { x, y: line.y, size: line.size, font });
         x += font.widthOfTextAtSize(piece.text, line.size);
       }

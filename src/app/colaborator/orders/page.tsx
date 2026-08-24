@@ -5,8 +5,8 @@ import Link from 'next/link';
 import { findStatusLabel } from '@/lib/admin/status-options';
 import { Download } from 'lucide-react';
 import { usePreviewAs, withPreview } from '@/lib/collaborator/preview';
-import { CERERE_CF_SLUG, CERERE_DONE_STATUSES } from '@/lib/ancpi/cerere-scope';
-import { cereriForOrder, type PropertyLike } from '@/lib/ancpi/cereri-for-order';
+import { CERERE_DONE_STATUSES } from '@/lib/ancpi/cerere-scope';
+import { cereriForOrderSlug, type PropertyLike } from '@/lib/ancpi/cereri-for-order';
 import { cerereDateRo } from '@/lib/ancpi/cerere-date';
 
 interface CollabOrder {
@@ -74,11 +74,14 @@ export default function CollaboratorOrdersPage() {
 
   // Câte CERERI are de depus, nu câte comenzi: o comandă cu mai multe imobile
   // înseamnă mai multe cereri, iar el numără hârtii, nu comenzi.
+  // cereriForOrderSlug acoperă acum și plan cadastral + identificările cu
+  // CF raportat — exact ce intră și în ZIP.
   const deDepus = orders
-    .filter((o) => o.services?.slug === CERERE_CF_SLUG && !CERERE_DONE_STATUSES.includes(o.status as never))
+    .filter((o) => !CERERE_DONE_STATUSES.includes(o.status as never))
     .flatMap((o) =>
-      cereriForOrder(
+      cereriForOrderSlug(
         { friendly_order_id: o.friendly_order_id ?? o.id, customer_data: o.customer_data },
+        o.services?.slug,
         cerereDateRo()
       )
     );

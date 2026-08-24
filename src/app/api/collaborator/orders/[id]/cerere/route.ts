@@ -20,10 +20,10 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { requireCollaboratorForOrder } from '@/lib/admin/permissions';
 import { resolveCollaboratorContext } from '@/lib/admin/collaborator-context';
-import { cereriForOrder, type OrderForCereri } from '@/lib/ancpi/cereri-for-order';
+import { cereriForOrderSlug, type OrderForCereri } from '@/lib/ancpi/cereri-for-order';
 import { cerereDateRo } from '@/lib/ancpi/cerere-date';
 import { generateCerereExtrasCfPdf } from '@/lib/documents/cerere-extras-cf-pdf';
-import { CERERE_CF_SLUG } from '@/lib/ancpi/cerere-scope';
+import { CERERE_SLUGS, IDENTIFICARE_SLUGS } from '@/lib/ancpi/cerere-scope';
 import { contentDisposition } from '@/lib/http/content-disposition';
 
 export async function GET(
@@ -63,23 +63,30 @@ export async function GET(
 
     const svc = order.services as { slug?: string } | { slug?: string }[] | null;
     const slug = Array.isArray(svc) ? svc[0]?.slug : svc?.slug;
-    if (slug !== CERERE_CF_SLUG) {
+    const isIdentificare = (IDENTIFICARE_SLUGS as readonly string[]).includes(slug ?? '');
+    if (!slug || (!CERERE_SLUGS[slug] && !isIdentificare)) {
       return NextResponse.json(
-        { success: false, error: 'Cererea de extras CF se generează doar pentru comenzile de extras de carte funciară' },
+        { success: false, error: 'Serviciul comenzii nu are cerere OCPI generabilă' },
         { status: 400 }
       );
     }
 
-    const cereri = cereriForOrder(
+    const cereri = cereriForOrderSlug(
       {
         friendly_order_id: order.friendly_order_id ?? orderId,
         customer_data: order.customer_data as OrderForCereri['customer_data'],
       },
+      slug,
       cerereDateRo()
     );
     if (cereri.length === 0) {
       return NextResponse.json(
-        { success: false, error: 'Comanda nu are date de imobil (nr. CF / cadastral) — nu se poate genera cererea' },
+        {
+          success: false,
+          error: isIdentificare
+            ? 'Completează întâi identificarea imobilului (nr. CF găsit) — cererea de extras CF se generează din ea'
+            : 'Comanda nu are date de imobil (nr. CF / cadastral) — nu se poate genera cererea',
+        },
         { status: 400 }
       );
     }
@@ -93,7 +100,7 @@ export async function GET(
       return NextResponse.json({ success: false, error: 'Imobilul cerut nu există pe comandă' }, { status: 404 });
     }
 
-    const pdf = await generateCerereExtrasCfPdf(cerere.data);
+    const pdf = await generateCerereExtrasCfPdf(cerere.data, cerere.template);
 
     return new NextResponse(new Uint8Array(pdf), {
       headers: {

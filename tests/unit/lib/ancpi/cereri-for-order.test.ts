@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { cereriForOrder } from '@/lib/ancpi/cereri-for-order';
+import { cereriForOrder, cereriForOrderSlug } from '@/lib/ancpi/cereri-for-order';
 
 const DATE = '21.08.2026';
 
@@ -172,5 +172,65 @@ describe('cereriForOrder', () => {
     }, DATE);
 
     expect(cereri.map(c => c.index)).toEqual([0, 1]);
+  });
+});
+
+describe('cereriForOrderSlug — ce serviciu primește ce cerere', () => {
+  const order = {
+    friendly_order_id: 'E-2',
+    customer_data: {
+      property: {
+        county: 'Constanța',
+        locality: 'Medgidia',
+        carteFunciara: '108650',
+        cadastral: '108650',
+      },
+    },
+  };
+
+  it('extras CF stays on the Anexa 6 template with the plain filename', () => {
+    const cereri = cereriForOrderSlug(order, 'extras-carte-funciara', DATE);
+    expect(cereri).toHaveLength(1);
+    expect(cereri[0].template).toBe('cf');
+    expect(cereri[0].name).toBe('cf 108650 - Medgidia-Constanta.pdf');
+  });
+
+  it('extras plan cadastral renders on the plan template and the filename says so', () => {
+    // El citește serviciul din DENUMIRE, nu din document — fără prefix ar
+    // depune o cerere de ortofotoplan crezând că e un extras CF.
+    const cereri = cereriForOrderSlug(order, 'extras-plan-cadastral', DATE);
+    expect(cereri).toHaveLength(1);
+    expect(cereri[0].template).toBe('plan');
+    expect(cereri[0].name).toBe('plan cf 108650 - Medgidia-Constanta.pdf');
+  });
+
+  it('identificare has NO cerere until the collaborator reports the CF', () => {
+    const identificare = {
+      friendly_order_id: 'E-3',
+      customer_data: {
+        // Ce dă clientul pe identificare: adresă, nu CF — nu e o cerere.
+        property: { county: 'Olt', locality: 'Caracal', carteFunciara: '', cadastral: '' },
+      },
+    };
+    expect(cereriForOrderSlug(identificare, 'identificare-imobil', DATE)).toHaveLength(0);
+  });
+
+  it('identificare reads the COLLABORATOR-identified property, not the client fields', () => {
+    const identificare = {
+      friendly_order_id: 'E-3',
+      customer_data: {
+        property: { county: 'Olt', locality: 'Caracal', carteFunciara: '', cadastral: '' },
+        identified_property: { county: 'Olt', locality: 'Caracal', carteFunciara: '54321' },
+      },
+    };
+    const cereri = cereriForOrderSlug(identificare, 'identificare-imobil', DATE);
+    expect(cereri).toHaveLength(1);
+    expect(cereri[0].template).toBe('cf');
+    expect(cereri[0].name).toBe('cf 54321 - Caracal-Olt.pdf');
+  });
+
+  it('unknown services get nothing — no silent Anexa 6 for a form we do not have', () => {
+    expect(cereriForOrderSlug(order, 'certificat-sarcini', DATE)).toHaveLength(0);
+    expect(cereriForOrderSlug(order, undefined, DATE)).toHaveLength(0);
   });
 });

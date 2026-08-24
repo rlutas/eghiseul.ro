@@ -69,7 +69,12 @@ export async function GET(request: NextRequest) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const sanitized = (data ?? []).map((o: any) => ({
       ...o,
-      customer_data: { property: o.customer_data?.property ?? null },
+      customer_data: {
+        property: o.customer_data?.property ?? null,
+        // Identificarea raportată de colaborator — din ea se numără cererile
+        // de depus pe comenzile de identificare imobil.
+        identified_property: o.customer_data?.identified_property ?? null,
+      },
     }));
 
     return NextResponse.json({ success: true, data: sanitized });

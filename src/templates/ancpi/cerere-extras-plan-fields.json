@@ -1,0 +1,135 @@
+{
+  "lines": [
+    {
+      "y": 702,
+      "size": 11.258625,
+      "startX": 124.50899849999996,
+      "centerX": 300.5852076678383,
+      "valuesBold": false,
+      "segments": [
+        {
+          "literal": "OFICIUL DE CADASTRU ȘI PUBLICITATE IMOBILIARĂ ",
+          "gapAfter": 0
+        },
+        {
+          "field": "OCPI_JUDET",
+          "gapAfter": 0
+        }
+      ]
+    },
+    {
+      "y": 676,
+      "size": 11.258625,
+      "startX": 127.43624099999995,
+      "centerX": 302.1551481668182,
+      "valuesBold": false,
+      "segments": [
+        {
+          "literal": "BIROUL DE CADASTRU ȘI PUBLICITATE IMOBILIARĂ ",
+          "gapAfter": 0
+        },
+        {
+          "field": "BCPI",
+          "gapAfter": 0
+        }
+      ]
+    },
+    {
+      "y": 491,
+      "size": 11.258625,
+      "startX": 85.19999849999999,
+      "segments": [
+        {
+          "literal": "comuna/orașul/municipiul … ",
+          "gapAfter": 0
+        },
+        {
+          "field": "UAT",
+          "gapAfter": 0
+        },
+        {
+          "literal": " … …, str. … … … … … … … …, nr. .... bl……,scara ....,",
+          "gapAfter": 0
+        }
+      ]
+    },
+    {
+      "y": 478,
+      "size": 11.258625,
+      "startX": 85.19999849999999,
+      "segments": [
+        {
+          "literal": "ap. ......, având cartea funciară nr. … …",
+          "gapAfter": 3
+        },
+        {
+          "field": "CF_NR",
+          "gapAfter": 3.1
+        },
+        {
+          "literal": "… … a localității … ",
+          "gapAfter": 0
+        },
+        {
+          "field": "CF_LOCALITATE",
+          "gapAfter": 0
+        },
+        {
+          "literal": " …, cu nr. cadastral …",
+          "gapAfter": 0
+        }
+      ]
+    },
+    {
+      "y": 465,
+      "size": 11.258625,
+      "startX": 85.19999849999999,
+      "segments": [
+        {
+          "field": "CADASTRAL",
+          "gapAfter": 2.9
+        },
+        {
+          "literal": ". . . , fiindu-mi necesar la … informare …",
+          "gapAfter": 0
+        }
+      ]
+    },
+    {
+      "y": 329,
+      "size": 11.258625,
+      "startX": 85.19999849999999,
+      "segments": [
+        {
+          "field": "DATA",
+          "gapAfter": 0
+        }
+      ]
+    },
+    {
+      "y": 604.9199985,
+      "size": 11.258625,
+      "startX": 165.24000525,
+      "centerX": 306.5884798116104,
+      "valuesBold": false,
+      "segments": [
+        {
+          "literal": "pentru eliberare extras din planul cadastral, pe ortofotoplan",
+          "gapAfter": 0,
+          "bold": true
+        }
+      ]
+    },
+    {
+      "y": 503.51998875,
+      "size": 11.258625,
+      "startX": 85.19999849999999,
+      "segments": [
+        {
+          "literal": "eliberați un extras din planul cadastral, pe ortofotoplan, privind imobilul situat în",
+          "gapAfter": 0
+        }
+      ]
+    }
+  ]
+}

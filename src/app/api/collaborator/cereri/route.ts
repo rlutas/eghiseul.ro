@@ -20,11 +20,11 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { getCollaboratorServices } from '@/lib/admin/permissions';
 import { resolveCollaboratorContext } from '@/lib/admin/collaborator-context';
-import { cereriForOrder, type OrderForCereri } from '@/lib/ancpi/cereri-for-order';
+import { cereriForOrderSlug, type OrderForCereri } from '@/lib/ancpi/cereri-for-order';
 import { disambiguateFilenames } from '@/lib/ancpi/cerere-filename';
 import { cerereDateRo } from '@/lib/ancpi/cerere-date';
 import { generateCerereExtrasCfPdf } from '@/lib/documents/cerere-extras-cf-pdf';
-import { CERERE_CF_SLUG, CERERE_DONE_STATUSES } from '@/lib/ancpi/cerere-scope';
+import { CERERE_SLUGS, IDENTIFICARE_SLUGS, CERERE_DONE_STATUSES } from '@/lib/ancpi/cerere-scope';
 import { contentDisposition } from '@/lib/http/content-disposition';
 
 /** Ceiling per ZIP — a few hundred cereri would time out the function. */
@@ -61,7 +61,7 @@ export async function GET(request: NextRequest) {
       .select('id, friendly_order_id, status, created_at, priority, customer_data, services:service_id!inner(slug)')
       .or(scopeFilter)
       .eq('payment_status', 'paid')
-      .eq('services.slug', CERERE_CF_SLUG)
+      .in('services.slug', [...Object.keys(CERERE_SLUGS), ...IDENTIFICARE_SLUGS])
       .not('status', 'in', `(${CERERE_DONE_STATUSES.join(',')})`)
       // urgent first, then oldest: the client who complained, then the one who
       // has been waiting longest
@@ -75,13 +75,30 @@ export async function GET(request: NextRequest) {
     }
 
     const judet = (request.nextUrl.searchParams.get('judet') ?? '').trim();
-    const all = (data ?? []) as (OrderForCereri & { customer_data?: { property?: { county?: string } } })[];
-    const orders = judet
-      ? all.filter(o => (o.customer_data?.property?.county ?? '') === judet)
-      : all;
+    type Row = OrderForCereri & {
+      customer_data?: {
+        property?: { county?: string };
+        identified_property?: { county?: string };
+      };
+      services?: { slug?: string } | { slug?: string }[] | null;
+    };
+    const all = (data ?? []) as Row[];
+    const slugOf = (o: Row) => {
+      const svc = o.services;
+      return Array.isArray(svc) ? svc[0]?.slug : svc?.slug;
+    };
+    // Filtrul pe județ urmează sursa cererii: la identificări contează județul
+    // raportat de topograf, nu cel (posibil gol) al clientului.
+    const countyOf = (o: Row) =>
+      ((IDENTIFICARE_SLUGS as readonly string[]).includes(slugOf(o) ?? '')
+        ? o.customer_data?.identified_property?.county
+        : o.customer_data?.property?.county) ?? '';
+    const orders = judet ? all.filter(o => countyOf(o) === judet) : all;
 
     const date = cerereDateRo();
-    const cereri = orders.flatMap(order => cereriForOrder(order, date));
+    // Identificările fără raport de identificare dau liste goale aici — corect:
+    // nu există încă nimic de depus pentru ele.
+    const cereri = orders.flatMap(order => cereriForOrderSlug(order, slugOf(order), date));
 
     if (cereri.length === 0) {
       return NextResponse.json(
@@ -99,12 +116,12 @@ export async function GET(request: NextRequest) {
 
     const zip = new PizZip();
     for (let i = 0; i < cereri.length; i++) {
-      zip.file(names[i], await generateCerereExtrasCfPdf(cereri[i].data));
+      zip.file(names[i], await generateCerereExtrasCfPdf(cereri[i].data, cereri[i].template));
     }
     const buffer: Buffer = zip.generate({ type: 'nodebuffer', compression: 'DEFLATE' });
 
     const stamp = new Date().toISOString().slice(0, 10);
-    const label = judet ? `cereri extras cf ${judet} ${stamp}` : `cereri extras cf ${stamp}`;
+    const label = judet ? `cereri ocpi ${judet} ${stamp}` : `cereri ocpi ${stamp}`;
     return new NextResponse(new Uint8Array(buffer), {
       headers: {
         'Content-Type': 'application/zip',

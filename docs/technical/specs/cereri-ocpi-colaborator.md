@@ -1,6 +1,9 @@
-# Cereri OCPI generate pentru topograf (extras carte funciară)
+# Cereri OCPI generate pentru topograf (extras CF, plan cadastral, identificări)
 
-**Status:** livrat 2026-08-21 · **Scope:** doar `extras-carte-funciara`
+**Status:** livrat 2026-08-21 (extras CF); extins 2026-08-24 (plan cadastral +
+identificări) · **Scope:** `extras-carte-funciara`, `extras-plan-cadastral`,
+`identificare-imobil`/`identificare-imobile-proprietar` (după raportarea
+identificării)
 
 ## De ce
 
@@ -88,9 +91,28 @@ de ea la runtime.
 
 ## Reguli de reținut
 
-- **Doar extras CF.** Plan cadastral și identificare imobil folosesc alte
-  formulare, pe care nu le avem — o comandă de tipul ăla nu trebuie să primească
-  tăcut o Anexă 6. Ruta dă 400 pe orice alt slug.
+- **Extras CF + plan cadastral + identificări** (din 24.08). Harta slug →
+  template e `CERERE_SLUGS` în `cerere-scope.ts`; orice alt slug dă 400 — o
+  comandă de alt tip nu primește tăcut o Anexă 6.
+- **Plan cadastral** („extras din planul cadastral, pe ortofotoplan", cod
+  2.7.7, taxă 15 lei): ANCPI nu are anexă dedicată în ODG 700/2014 — OCPI-urile
+  folosesc un derivat al Anexei 1.30 „Cerere de informații" cu același corp.
+  Baza noastră e derivată DIN BAZA CF din git
+  (`scripts/build-plan-cadastral-cerere-template.ts`, reproductibil fără PDF-ul
+  sursă al lui Mircea): se șterg din content stream eticheta „ANEXA NR. 6",
+  titlul și fraza cu obiectul, și se redesenează cu „extras din planul
+  cadastral, pe ortofotoplan". Denumirea primește prefixul `plan`
+  (`plan cf 108650 - Medgidia-Constanta.pdf`) — el citește serviciul din nume.
+  ⚠️ Prima cerere de plan depusă trebuie validată de Mircea (formatul e derivat,
+  nu modelul lui).
+- **Identificările** pornesc de la adresă/proprietar, fără CF — nu au ce depune
+  până nu identifică imobilul. El raportează CF-ul găsit în portal („Am
+  identificat imobilul": județ + UAT + nr. CF/cadastral →
+  `POST /api/collaborator/orders/[id]/identificare`, salvat în
+  `customer_data.identified_property`, NICIODATĂ peste `property`-ul
+  clientului), iar platforma îi generează pe loc cererea de extras CF (Anexa 6)
+  din datele raportate — după identificare are nevoie de extras ca să livreze.
+  Județul se validează pe nomenclatorul ANCPI (antetul OCPI/BCPI iese din el).
 - **Antetul urmează județul imobilului** (decizie 21.08, revizuită în aceeași zi):
   `OFICIUL … IMOBILIARĂ <JUDEȚ>` / `BIROUL … IMOBILIARĂ <JUDEȚ>`, centrat, luat
   din județul ales de client în nomenclatorul ANCPI. La **București** biroul e

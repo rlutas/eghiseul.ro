@@ -8,10 +8,11 @@
  * Pure (no fs, no S3) so it can be unit-tested and reused by both the
  * single-order download and the bulk ZIP.
  */
-import type { CerereExtrasCfData } from '@/lib/documents/cerere-extras-cf-pdf';
+import type { CerereExtrasCfData, CerereTemplate } from '@/lib/documents/cerere-extras-cf-pdf';
 import { buildCerereFilename, normalizeCfForCerere } from '@/lib/ancpi/cerere-filename';
 import { uatWithCounty } from '@/lib/ancpi/uat-label';
 import { ocpiName, bcpiName } from '@/lib/ancpi/ocpi-header';
+import { CERERE_SLUGS, IDENTIFICARE_SLUGS } from '@/lib/ancpi/cerere-scope';
 
 interface AdditionalImobil {
   locality?: string | null;
@@ -32,7 +33,16 @@ export interface PropertyLike {
 
 export interface OrderForCereri {
   friendly_order_id: string;
-  customer_data?: { property?: PropertyLike | null } | null;
+  customer_data?: {
+    property?: PropertyLike | null;
+    /**
+     * On identificare services the client gives an address/owner, not a CF —
+     * the collaborator reports what he identified here (POST …/identificare),
+     * and the extras-CF cerere is generated from THIS, never from the client's
+     * empty property fields.
+     */
+    identified_property?: PropertyLike | null;
+  } | null;
 }
 
 export interface CerereForOrder {
@@ -41,11 +51,25 @@ export interface CerereForOrder {
   /** Filename in the collaborator's convention, before collision handling. */
   name: string;
   orderRef: string;
+  /** Which frozen base the PDF renders on (Anexa 6 vs plan cadastral). */
+  template: CerereTemplate;
   data: CerereExtrasCfData;
 }
 
-export function cereriForOrder(order: OrderForCereri, date: string): CerereForOrder[] {
-  const property = order.customer_data?.property;
+export function cereriForOrder(
+  order: OrderForCereri,
+  date: string,
+  opts?: {
+    /** 'plan' renders + names the cerere as an ortofotoplan request. */
+    template?: CerereTemplate;
+    /** Read the collaborator-identified property instead of the client's. */
+    source?: 'property' | 'identified_property';
+  },
+): CerereForOrder[] {
+  const template = opts?.template ?? 'cf';
+  const property = opts?.source === 'identified_property'
+    ? order.customer_data?.identified_property
+    : order.customer_data?.property;
   if (!property) return [];
 
   const county = (property.county ?? '').trim();
@@ -75,7 +99,8 @@ export function cereriForOrder(order: OrderForCereri, date: string): CerereForOr
       return {
         index,
         orderRef: order.friendly_order_id,
-        name: buildCerereFilename({ carteFunciara, cadastral, uat, county }),
+        template,
+        name: buildCerereFilename({ carteFunciara, cadastral, uat, county, kind: template }),
         data: {
           // Antetul urmează județul imobilului, nu biroul unde depune el.
           ocpi: ocpiName(county),
@@ -93,4 +118,29 @@ export function cereriForOrder(order: OrderForCereri, date: string): CerereForOr
       };
     })
     .filter((c): c is CerereForOrder => c !== null);
+}
+
+/**
+ * The cereri to file for an order of ANY collaborator service — the single
+ * place that knows which slug reads which data on which template:
+ *
+ * - extras CF / extras plan cadastral → the client's property, on the slug's
+ *   template;
+ * - identificare (după adresă / proprietar) → the property the COLLABORATOR
+ *   identified (empty list until he reports it), always on the Anexa 6
+ *   template — after identification he needs a CF extract to deliver;
+ * - anything else → no cereri (other services use forms we do not have).
+ */
+export function cereriForOrderSlug(
+  order: OrderForCereri,
+  slug: string | undefined,
+  date: string,
+): CerereForOrder[] {
+  if (!slug) return [];
+  const template = CERERE_SLUGS[slug];
+  if (template) return cereriForOrder(order, date, { template });
+  if ((IDENTIFICARE_SLUGS as readonly string[]).includes(slug)) {
+    return cereriForOrder(order, date, { template: 'cf', source: 'identified_property' });
+  }
+  return [];
 }

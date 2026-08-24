@@ -3,9 +3,9 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { requireCollaboratorForOrder } from '@/lib/admin/permissions';
 import { resolveCollaboratorContext } from '@/lib/admin/collaborator-context';
-import { cereriForOrder, type OrderForCereri } from '@/lib/ancpi/cereri-for-order';
+import { cereriForOrderSlug, type OrderForCereri } from '@/lib/ancpi/cereri-for-order';
 import { cerereDateRo } from '@/lib/ancpi/cerere-date';
-import { CERERE_CF_SLUG } from '@/lib/ancpi/cerere-scope';
+
 
 /**
  * Single order detail for the collaborator: customer + property data needed to
@@ -85,21 +85,24 @@ export async function GET(
     // inside property ARE the object of the work on identificare services.
     const sanitizedOrder = {
       ...order,
-      customer_data: { property: order.customer_data?.property ?? null },
+      customer_data: {
+        property: order.customer_data?.property ?? null,
+        // What HE reported on identificare orders — the source of the cerere.
+        identified_property: order.customer_data?.identified_property ?? null,
+      },
     };
 
     // Cererile de depus la OCPI (Anexa 6), una per imobil. Doar numele +
     // indexul — PDF-ul se generează la descărcare, din aceleași date, ca
     // denumirea și conținutul să nu poată diverge.
-    const cereri = order.services?.slug === CERERE_CF_SLUG
-      ? cereriForOrder(
-          {
-            friendly_order_id: order.friendly_order_id ?? orderId,
-            customer_data: order.customer_data as OrderForCereri['customer_data'],
-          },
-          cerereDateRo()
-        ).map(({ index, name }) => ({ index, name }))
-      : [];
+    const cereri = cereriForOrderSlug(
+      {
+        friendly_order_id: order.friendly_order_id ?? orderId,
+        customer_data: order.customer_data as OrderForCereri['customer_data'],
+      },
+      order.services?.slug,
+      cerereDateRo()
+    ).map(({ index, name }) => ({ index, name }));
 
     return NextResponse.json({
       success: true,

@@ -9,6 +9,8 @@ import { Button } from '@/components/ui/button';
 import { findStatusLabel } from '@/lib/admin/status-options';
 import { usePreviewAs, withPreview } from '@/lib/collaborator/preview';
 import { taxaEliberare } from '@/lib/ancpi/taxe-eliberare';
+import { IDENTIFICARE_SLUGS } from '@/lib/ancpi/cerere-scope';
+import { COUNTY_NAMES } from '@/lib/ancpi/judete';
 
 interface OrderDoc {
   id: string;
@@ -64,6 +66,13 @@ export default function CollaboratorOrderDetail() {
   // de ori; rămâne editabilă pentru cazurile în care diferă.
   const [costRon, setCostRon] = useState('');
   const [savingDepunere, setSavingDepunere] = useState(false);
+  // Identificarea raportată de el pe comenzile de identificare imobil — din ea
+  // se generează apoi cererea de extras CF pe care o depune.
+  const [identCounty, setIdentCounty] = useState('');
+  const [identLocality, setIdentLocality] = useState('');
+  const [identCf, setIdentCf] = useState('');
+  const [identCad, setIdentCad] = useState('');
+  const [savingIdent, setSavingIdent] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const load = async () => {
@@ -71,6 +80,13 @@ export default function CollaboratorOrderDetail() {
     const json = await res.json();
     if (json.success) {
       setOrder(json.data);
+      const identified = json.data?.customer_data?.identified_property;
+      if (identified) {
+        setIdentCounty((c: string) => c || identified.county || '');
+        setIdentLocality((c: string) => c || identified.locality || '');
+        setIdentCf((c: string) => c || identified.carteFunciara || '');
+        setIdentCad((c: string) => c || identified.cadastral || '');
+      }
       // Taxa e PE IMOBIL: o comandă cu două cărți funciare costă 2×20 la OCPI.
       const taxa = taxaEliberare(json.data?.services?.slug, json.data?.services?.processing_config);
       const imobile = Math.max(1, json.data?.cereri?.length ?? 1);
@@ -146,6 +162,30 @@ export default function CollaboratorOrderDetail() {
   };
 
   if (loading) return <p className="text-sm text-slate-500">Se încarcă...</p>;
+  const handleIdentificare = async () => {
+    setSavingIdent(true);
+    try {
+      const res = await fetch(withPreview(`/api/collaborator/orders/${orderId}/identificare`, previewAs), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          county: identCounty,
+          locality: identLocality,
+          carteFunciara: identCf,
+          cadastral: identCad,
+        }),
+      });
+      const json = await res.json();
+      if (!json.success) throw new Error(json.error || 'Eroare la salvare');
+      toast.success('Identificare salvată — cererea de extras CF e mai jos, gata de descărcat.');
+      await load();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Eroare la salvare');
+    } finally {
+      setSavingIdent(false);
+    }
+  };
+
   const handleDepunere = async () => {
     setSavingDepunere(true);
     try {
@@ -249,6 +289,74 @@ export default function CollaboratorOrderDetail() {
               </li>
             ))}
           </ul>
+        </div>
+      )}
+
+      {/* Identificarea imobilului — pe comenzile de identificare clientul dă o
+          adresă sau un proprietar, nu un CF. După ce topograful găsește
+          imobilul, raportează aici CF-ul, iar platforma îi generează pe loc
+          cererea de extras CF (Anexa 6) din datele raportate. */}
+      {(IDENTIFICARE_SLUGS as readonly string[]).includes(order.services?.slug ?? '') && !delivered && (
+        <div className="mb-6 rounded-lg border border-slate-200 bg-white p-5">
+          <h2 className="mb-1 text-sm font-semibold text-slate-900">Am identificat imobilul</h2>
+          <p className="mb-3 text-xs text-slate-500">
+            Completează ce ai găsit — din aceste date se generează cererea de extras CF pe care o
+            depui la OCPI. Poți corecta și retrimite oricând.
+          </p>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div>
+              <label htmlFor="ident-county" className="mb-1 block text-xs text-slate-500">Județ</label>
+              <select
+                id="ident-county"
+                value={identCounty}
+                onChange={(e) => setIdentCounty(e.target.value)}
+                className="w-full rounded border border-slate-300 px-2 py-1.5 text-sm"
+              >
+                <option value="">Alege județul…</option>
+                {COUNTY_NAMES.map((c) => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label htmlFor="ident-locality" className="mb-1 block text-xs text-slate-500">UAT (comuna/orașul/municipiul)</label>
+              <input
+                id="ident-locality"
+                value={identLocality}
+                onChange={(e) => setIdentLocality(e.target.value)}
+                className="w-full rounded border border-slate-300 px-2 py-1.5 text-sm"
+                placeholder="ex. Apahida"
+              />
+            </div>
+            <div>
+              <label htmlFor="ident-cf" className="mb-1 block text-xs text-slate-500">Nr. carte funciară</label>
+              <input
+                id="ident-cf"
+                value={identCf}
+                onChange={(e) => setIdentCf(e.target.value)}
+                className="w-full rounded border border-slate-300 px-2 py-1.5 text-sm"
+                placeholder="ex. 108650"
+              />
+            </div>
+            <div>
+              <label htmlFor="ident-cad" className="mb-1 block text-xs text-slate-500">Nr. cadastral (opțional)</label>
+              <input
+                id="ident-cad"
+                value={identCad}
+                onChange={(e) => setIdentCad(e.target.value)}
+                className="w-full rounded border border-slate-300 px-2 py-1.5 text-sm"
+              />
+            </div>
+          </div>
+          <Button
+            type="button"
+            size="sm"
+            className="mt-3"
+            onClick={handleIdentificare}
+            disabled={readOnly || savingIdent || !identCounty || !identLocality.trim() || (!identCf.trim() && !identCad.trim())}
+          >
+            {savingIdent ? 'Se salvează...' : 'Salvează identificarea'}
+          </Button>
         </div>
       )}
 

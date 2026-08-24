@@ -62,6 +62,12 @@ export interface CerereFilenameInput {
   cadastral?: string | null;
   uat: string;
   county: string;
+  /**
+   * 'plan' prefixes the name ("plan cf 108650 - Medgidia-Constanta.pdf") so he
+   * can tell an ortofotoplan request from a CF extract without opening it —
+   * the filename is his interface.
+   */
+  kind?: 'cf' | 'plan';
 }
 
 /** Strip diacritics and collapse whitespace, keeping the original casing. */
@@ -96,7 +102,9 @@ export function buildCerereFilename(input: CerereFilenameInput): string {
       ? `cad ${filesystemSafe(ascii(cad))}`
       : 'cerere fara numar';
 
-  const prefix = value && needsReview(value) ? 'verifica ' : '';
+  const review = value && needsReview(value) ? 'verifica ' : '';
+  const kind = input.kind === 'plan' ? 'plan ' : '';
+  const prefix = `${review}${kind}`;
 
   const uat = filesystemSafe(ascii(input.uat)) || 'UAT necunoscut';
   const county = filesystemSafe(ascii(input.county)) || 'judet necunoscut';
