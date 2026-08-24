@@ -9,6 +9,7 @@ import { oblioRequest, getOblioConfig } from './client';
 import { normalizeOrderOptions } from '@/lib/orders/normalize';
 import { isForeignBillingCountry } from '@/lib/orders/billing-validation';
 import { validateCNP } from '@/lib/validations/cnp';
+import { RO_VAT_NAME, RO_VAT_RATE, assertVatOnAllLines } from './vat';
 import {
   resolveInvoiceAddress,
   canonicalCounty,
@@ -26,11 +27,6 @@ import type {
   StoredInvoice,
 } from './types';
 
-// Romanian VAT rate (changed from 19% to 21% in 2026).
-const RO_VAT_RATE = 21;
-// Numele cotei din Oblio. Trimis explicit pe fiecare linie ca nomenclatorul
-// (cheiat pe `code`) sa nu poata suprascrie cota cu una memorata gresit.
-const RO_VAT_NAME = 'Normala';
 
 // ============================================================================
 // Invoice Creation
@@ -42,6 +38,7 @@ const RO_VAT_NAME = 'Normala';
 export async function createInvoice(
   input: OblioInvoiceInput
 ): Promise<OblioInvoiceResponse['data']> {
+  assertVatOnAllLines(input.products ?? [], 'createInvoice');
   return oblioRequest<OblioInvoiceResponse['data']>({
     endpoint: '/docs/invoice',
     method: 'POST',

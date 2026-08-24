@@ -16,12 +16,11 @@
  */
 import { oblioRequest, getOblioConfig } from './client';
 import { buildOblioClient } from './invoice';
+import { RO_VAT_NAME, RO_VAT_RATE, assertVatOnAllLines } from './vat';
 import type { OblioClient, OblioProduct } from './types';
 
-const RO_VAT_RATE = 21;
-// Numele cotei din Oblio. Trimis explicit pe fiecare linie ca nomenclatorul
-// (cheiat pe `code`) sa nu poata suprascrie cota cu una memorata gresit.
-const RO_VAT_NAME = 'Normala';
+
+
 
 export interface ProformaRef {
   seriesName: string;
@@ -80,6 +79,8 @@ export async function createProformaForExtra(input: ExtraDocInput): Promise<Prof
   const today = new Date().toISOString().slice(0, 10);
   const due = new Date(Date.now() + 7 * 24 * 3600 * 1000).toISOString().slice(0, 10);
 
+  const proformaProducts = buildProducts(input);
+  assertVatOnAllLines(proformaProducts, 'createProformaForExtra');
   const data = await oblioRequest<OblioDocResponse>({
     endpoint: '/docs/proforma',
     method: 'POST',
@@ -92,7 +93,7 @@ export async function createProformaForExtra(input: ExtraDocInput): Promise<Prof
       language: 'RO',
       currency: 'RON',
       mentions: `Plată suplimentară comanda ${input.orderNumber}`,
-      products: buildProducts(input),
+      products: proformaProducts,
     },
   });
   return { seriesName: data.seriesName, number: String(data.number), link: data.link ?? null };

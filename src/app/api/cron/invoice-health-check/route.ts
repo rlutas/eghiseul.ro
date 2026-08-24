@@ -23,6 +23,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { ensureInvoiceForPaidOrder } from '@/lib/oblio';
+import type { ZeroVatInvoice } from '@/lib/oblio/vat';
 
 const MIN_AGE_MS = 30 * 60 * 1000;
 const MAX_LOOKBACK_MS = 7 * 24 * 60 * 60 * 1000; // don't keep alerting on ancient orders
@@ -57,6 +58,38 @@ async function postSpvSlackAlert(
     });
   } catch (err) {
     console.error('[invoice-health-check] Slack SPV alert failed:', err);
+  }
+}
+
+/**
+ * Alertă pentru facturi emise cu altă cotă decât 21% Normala.
+ *
+ * Verifică ce a ÎNREGISTRAT Oblio, nu ce i-am trimis: nomenclatorul, cheiat pe
+ * `code`, poate suprascrie cota trimisă în request. Așa au ieșit 129 de facturi
+ * cu 0% în iunie–iulie 2026 și le-a găsit contabilul două luni mai târziu, pe
+ * jurnalul de vânzări. Acum le găsim în cel mult o oră.
+ */
+async function postVatSlackAlert(bad: ZeroVatInvoice[]): Promise<void> {
+  const webhook = process.env.SLACK_WEBHOOK_URL;
+  if (!webhook) return;
+  const text =
+    `:rotating_light: ${bad.length} factur${bad.length === 1 ? 'ă emisă' : 'i emise'} FĂRĂ TVA 21%\n` +
+    bad
+      .slice(0, 20)
+      .map(
+        (b) =>
+          `• ${b.seriesName}-${b.number} (${b.issueDate}, ${b.total} RON, ${b.clientName}) — ` +
+          b.lines.map((l) => `${l.name}: ${l.vatName} ${l.vatPercentage}%`).join(' | ')
+      )
+      .join('\n');
+  try {
+    await fetch(webhook, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text }),
+    });
+  } catch (err) {
+    console.error('[invoice-health-check] Slack VAT alert failed:', err);
   }
 }
 
@@ -216,6 +249,24 @@ export async function POST(request: NextRequest) {
     await postSpvSlackAlert(spvBlocked);
   }
 
+  // VAT SWEEP: facturi emise în ultimele 3 zile cu vreo linie în afara cotei
+  // standard. Nu ne uităm la ce am trimis (garda din `assertVatOnAllLines`
+  // acoperă asta) ci la ce a ÎNREGISTRAT Oblio — nomenclatorul cheiat pe `code`
+  // poate suprascrie cota, iar diferența asta a ținut 129 de facturi cu 0%
+  // ascunse din iunie până în august 2026. Fail-soft: o eroare de rețea la
+  // Oblio nu are voie să oprească restul cronului.
+  let vatBad: ZeroVatInvoice[] = [];
+  try {
+    const { auditIssuedInvoiceVat } = await import('@/lib/oblio/vat');
+    vatBad = await auditIssuedInvoiceVat(3);
+    if (vatBad.length) {
+      console.error('[invoice-health-check] FACTURI FĂRĂ TVA 21%:', vatBad);
+      await postVatSlackAlert(vatBad);
+    }
+  } catch (err) {
+    console.error('[invoice-health-check] vat sweep failed:', err);
+  }
+
   // EXTRA-INVOICE SWEEP: paid extra charges whose fiscal invoice failed at the
   // webhook (extra_billing entries with invoice:null — e.g. E-260714-WXGYQ,
   // where only the proforma existed). Issues the invoice from the proforma and
@@ -291,7 +342,7 @@ export async function POST(request: NextRequest) {
       success: true,
       data: {
         affectedCount: 0, healedCount: 0, barouHealed, extraHealed,
-        spvChecked, spvBlocked,
+        spvChecked, spvBlocked, vatBad,
         processedAt: new Date().toISOString(),
       },
     });
@@ -337,6 +388,7 @@ export async function POST(request: NextRequest) {
       extraHealed,
       spvChecked,
       spvBlocked,
+      vatBad,
       healed,
       stillMissing: stillMissing.map((o) => ({
         id: o.id,

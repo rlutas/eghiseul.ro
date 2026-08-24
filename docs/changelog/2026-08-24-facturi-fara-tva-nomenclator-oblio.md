@@ -69,11 +69,41 @@ plătită din platformă nu e nefacturată (verificat: 0 comenzi `paid` fără
    Efect colateral util: fixture-urile din teste aveau CNP-uri inventate cu
    cifra de control greșită — au fost corectate.
 
+## Straturi suplimentare (a doua trecere, aceeași zi)
+
+Politica e simplă: firma (EDIGITALIZARE S.R.L.) e plătitoare de TVA — TOT ce se
+emite are 21% Normala, fără excepții. Trei straturi o impun, pe AMBELE
+platforme (eghiseul + cazierjudiciaronline/ecazier — toate facturează pe
+aceeași firmă):
+
+1. **`vatName: 'Normala'` pe fiecare linie** (pasul 1, deja descris mai sus) —
+   portat și pe CJO (`src/lib/oblio/client.ts` avea deja vatName pe liniile
+   principale; acum și liniile de plăți extra din `proforma.ts`).
+2. **`assertVatOnAllLines()`** (`src/lib/oblio/vat.ts` pe ambele repo-uri) —
+   rulează înainte de fiecare POST care creează document (factură, proformă,
+   factură extra). O linie fără 21% Normala = documentul NU se emite, eroarea
+   ajunge în fluxul normal de „comandă plătită fără factură" (vizibil, spre
+   deosebire de o factură emisă greșit).
+3. **`auditIssuedInvoiceVat()`** în cronul orar de health-check (ambele
+   platforme) — citește din Oblio facturile emise în ultimele 3 zile și
+   alertează pe Slack dacă vreo linie e în afara cotei. Verifică ce a MEMORAT
+   Oblio, nu ce am trimis — singurul strat care ar fi prins bug-ul original.
+   Storno-urile sunt excluse (oglindesc cota documentului anulat).
+
+## Verificat (24.08, a doua trecere)
+
+- **Nomenclator Oblio**: toate cele 522 de produse sunt pe „21% - Normala"
+  (28 corectate manual de Raul + prin UI). Zero rămase pe 0%.
+- **Integrarea nativă Oblio↔Stripe**: încă conectată (raportul vede plățile),
+  dar **„Generare facturi din Stripe" e DEBIFAT** → nu mai poate emite nimic,
+  nici dublu peste aplicație. În configurarea ei: „Tip TVA 0% = Scutita" +
+  seria EGI2024 — exact amprenta celor 129 de facturi. NU rebifa opțiunea.
+- **Audit pe 90 de zile** prin API: singurele facturi cu linii ≠21% sunt lotul
+  istoric iunie–iulie (corecția contabilului); ultimele 3 zile: zero.
+- **0 comenzi plătite fără factură** în DB.
+
 ## Ce rămâne de făcut manual
 
-- **Nomenclator Oblio**: 22 din 28 de produse `prod_*` trecute pe „21% -
-  Normala"; mai sunt 6 (`Traducere Autorizata (Franceză / Engleză UK / Germană
-  / Italiană / Engleză SUA)` + `Traducere Autorizată — Franceză`).
 - **Corecția fiscală** a celor 129 de facturi — o face contabilul din
   contabilitate (D300/D394 rectificativ pe iunie și iulie). Facturile au
   `indexUpload`, deci au ajuns în SPV.
