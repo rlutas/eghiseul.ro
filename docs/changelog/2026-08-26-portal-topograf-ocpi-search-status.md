@@ -54,4 +54,16 @@ timeline cine și de ce. Statusurile de bani (`cancelled`, `refunded`,
 - `src/app/colaborator/orders/[id]/page.tsx` — card status, prefill nr., hint cost automat
 
 Spec actualizat: `docs/technical/specs/cereri-ocpi-colaborator.md`.
-Fără migrări — totul în `customer_data` (jsonb) și tabele existente.
+Fără migrări pe partea de feature — totul în `customer_data` (jsonb) și tabele
+existente.
+
+## Clarificare onorariu extras CF (aceeași seară)
+
+Coloana „Onorariu" arăta 0.00 pe extras CF și a părut bug. **Nu e**: pe extras
+CF nu există onorariu per comandă (înțelegerea cu Mircea = 50/50 pe profit),
+iar „20 lei/extras CF" din discuție = **costul de eliberare ANCPI**, deja
+corect în `taxe-eliberare.ts` + `order_supplier_costs`. Migrarea 148 (care
+pusese greșit 20 la `lawyer_fee_ron`) a fost anulată de 149 — ambele rulate,
+starea finală = cea dinainte (0 pe extras CF, 15 pe restul serviciilor
+cadastrale). Detaliu și în `docs/operations/decont-mircea-2026-08-26.md`
+(problema deschisă #1, închisă).
