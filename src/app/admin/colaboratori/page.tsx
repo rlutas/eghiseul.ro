@@ -20,10 +20,23 @@ interface CollabOrder {
   status: string;
   total: number;
   fee: number;
+  ocpiCost: number;
   isTest: boolean;
   createdAt: string;
 }
-interface Summary { count: number; revenue: number; fees: number }
+interface Breakdown {
+  collectedWithVat: number;
+  netOfVat: number;
+  vat: number;
+  ocpiCosts: number;
+  grossProfit: number;
+  profitTax: number;
+  netProfit: number;
+  dividendTax: number;
+  distributable: number;
+  sharePerSide: number;
+}
+interface Summary { count: number; revenue: number; fees: number; breakdown: Breakdown | null }
 
 function monthOptions(): { value: string; label: string }[] {
   const opts = [{ value: '', label: 'Toate lunile' }];
@@ -277,7 +290,7 @@ export default function CollaboratorsAdminPage() {
   const [selectedId, setSelectedId] = useState('');
   const [month, setMonth] = useState('');
   const [orders, setOrders] = useState<CollabOrder[]>([]);
-  const [summary, setSummary] = useState<Summary>({ count: 0, revenue: 0, fees: 0 });
+  const [summary, setSummary] = useState<Summary>({ count: 0, revenue: 0, fees: 0, breakdown: null });
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<'servicii' | 'avocat'>('servicii');
   const months = useMemo(() => monthOptions(), []);
@@ -395,8 +408,10 @@ export default function CollaboratorsAdminPage() {
             <ServiceAssignments collaboratorId={selectedId} onChanged={() => reloadCollaborators(true)} />
           )}
 
-          {/* Summary */}
-          <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
+          {/* Summary — modelul 50/50 din lib-ul de decont (aceleași cifre ca
+              pagina colaboratorului); onorariul per comandă rămâne doar unde
+              nu există breakdown (avocat). */}
+          <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-4">
             <div className="rounded-xl border border-slate-200 bg-white p-5">
               <div className="flex items-center gap-2 text-slate-500"><ClipboardList className="h-4 w-4" /><span className="text-xs uppercase tracking-wide">Comenzi</span></div>
               <p className="mt-1 text-2xl font-extrabold text-slate-900">{summary.count}</p>
@@ -406,10 +421,42 @@ export default function CollaboratorsAdminPage() {
               <p className="mt-1 text-2xl font-extrabold text-slate-900">{fmt(summary.revenue)} <span className="text-sm font-bold text-slate-400">RON</span></p>
             </div>
             <div className="rounded-xl border border-slate-200 bg-white p-5">
-              <div className="flex items-center gap-2 text-slate-500"><Receipt className="h-4 w-4" /><span className="text-xs uppercase tracking-wide">{feeLabel}</span></div>
-              <p className="mt-1 text-2xl font-extrabold text-slate-900">{fmt(summary.fees)} <span className="text-sm font-bold text-slate-400">RON</span></p>
+              <div className="flex items-center gap-2 text-slate-500"><Receipt className="h-4 w-4" /><span className="text-xs uppercase tracking-wide">{summary.breakdown ? 'Taxe OCPI' : feeLabel}</span></div>
+              <p className="mt-1 text-2xl font-extrabold text-slate-900">{fmt(summary.breakdown ? summary.breakdown.ocpiCosts : summary.fees)} <span className="text-sm font-bold text-slate-400">RON</span></p>
             </div>
+            {summary.breakdown && (
+              <div className="rounded-xl border border-primary-200 bg-primary-50 p-5">
+                <div className="flex items-center gap-2 text-primary-700"><Wallet className="h-4 w-4" /><span className="text-xs uppercase tracking-wide">Partea fiecăruia (50% net)</span></div>
+                <p className="mt-1 text-2xl font-extrabold text-secondary-900">{fmt(summary.breakdown.sharePerSide)} <span className="text-sm font-bold text-primary-700/60">RON</span></p>
+              </div>
+            )}
           </div>
+
+          {/* Împărțeala 50/50 pas cu pas — sursa unică: lib/collaborator/settlement */}
+          {summary.breakdown && (
+            <div className="mb-6 rounded-xl border border-slate-200 bg-white p-5">
+              <h2 className="mb-2 text-sm font-semibold text-slate-900">Împărțeala 50/50 (perioada selectată)</h2>
+              <div className="grid grid-cols-2 gap-x-8 gap-y-1 text-sm sm:grid-cols-4">
+                {([
+                  ['Net fără TVA', summary.breakdown.netOfVat],
+                  ['− Taxe OCPI', -summary.breakdown.ocpiCosts],
+                  ['Profit brut', summary.breakdown.grossProfit],
+                  ['− Impozit profit 16%', -summary.breakdown.profitTax],
+                  ['− Impozit dividende 16%', -summary.breakdown.dividendTax],
+                  ['Net de distribuit', summary.breakdown.distributable],
+                  ['Partea colaboratorului', summary.breakdown.sharePerSide],
+                  ['Partea eGhiseul', summary.breakdown.sharePerSide],
+                ] as [string, number][]).map(([label, value]) => (
+                  <div key={label} className="flex items-center justify-between border-b border-slate-100 py-1">
+                    <span className="text-slate-500">{label}</span>
+                    <span className="tabular-nums font-medium text-slate-900">
+                      {value < 0 ? `−${fmt(Math.abs(value))}` : fmt(value)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Orders table */}
           <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
@@ -421,7 +468,7 @@ export default function CollaboratorsAdminPage() {
                   <th className="px-4 py-3">Client</th>
                   <th className="px-4 py-3">Status</th>
                   <th className="px-4 py-3 text-right">Preț</th>
-                  <th className="px-4 py-3 text-right">Onorariu</th>
+                  <th className="px-4 py-3 text-right">{summary.breakdown ? 'Taxă OCPI' : 'Onorariu'}</th>
                   <th className="px-4 py-3">Dată</th>
                 </tr>
               </thead>
@@ -438,7 +485,7 @@ export default function CollaboratorsAdminPage() {
                     <td className="px-4 py-3 text-slate-700">{o.client}</td>
                     <td className="px-4 py-3"><span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-700">{findStatusLabel(o.status)}</span></td>
                     <td className="px-4 py-3 text-right text-slate-700">{fmt(o.total)}</td>
-                    <td className="px-4 py-3 text-right text-slate-700">{fmt(o.fee)}</td>
+                    <td className="px-4 py-3 text-right text-slate-700">{summary.breakdown ? (o.ocpiCost > 0 ? fmt(o.ocpiCost) : '—') : fmt(o.fee)}</td>
                     <td className="px-4 py-3 text-slate-500">{new Date(o.createdAt).toLocaleDateString('ro-RO')}</td>
                   </tr>
                 ))}

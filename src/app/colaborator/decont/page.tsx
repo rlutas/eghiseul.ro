@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { usePreviewAs, withPreview } from '@/lib/collaborator/preview';
 import Link from 'next/link';
-import { Wallet, ClipboardList } from 'lucide-react';
+import { Wallet, ClipboardList, Scale } from 'lucide-react';
 import { findStatusLabel } from '@/lib/admin/status-options';
 
 interface EarningOrder {
@@ -13,15 +13,34 @@ interface EarningOrder {
   locality: string;
   status: string;
   paidAt: string | null;
-  fee: number;
   clientTotal: number;
+  ocpiCost: number;
   isTest: boolean;
+}
+
+interface Breakdown {
+  collectedWithVat: number;
+  netOfVat: number;
+  vat: number;
+  ocpiCosts: number;
+  grossProfit: number;
+  profitTax: number;
+  netProfit: number;
+  dividendTax: number;
+  distributable: number;
+  sharePerSide: number;
 }
 
 interface EarningsData {
   month: string | null;
   orders: EarningOrder[];
-  summary: { count: number; totalFees: number; totalCollected: number };
+  summary: { count: number; totalCollected: number };
+  breakdown: Breakdown;
+  lastSettlement: {
+    settledOn: string;
+    cutoffFriendlyOrderId: string;
+    sharePerSideRon: number;
+  } | null;
 }
 
 /** Last 12 months as YYYY-MM options, newest first. */
@@ -41,6 +60,8 @@ function monthOptions(): { value: string; label: string }[] {
   }
   return out;
 }
+
+const lei = (n: number) => `${n.toFixed(2)} RON`;
 
 export default function CollaboratorDecontPage() {
   const previewAs = usePreviewAs();
@@ -68,15 +89,17 @@ export default function CollaboratorDecontPage() {
     })();
   }, [month, previewAs]);
 
-  const summary = data?.summary ?? { count: 0, totalFees: 0, totalCollected: 0 };
+  const summary = data?.summary ?? { count: 0, totalCollected: 0 };
+  const b = data?.breakdown ?? null;
 
   return (
     <div className="mx-auto max-w-5xl">
       <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="mb-1 text-xl font-semibold text-slate-900">Decont lunar</h1>
+          <h1 className="mb-1 text-xl font-semibold text-slate-900">Decont</h1>
           <p className="text-sm text-slate-500">
-            Comenzile plătite din serviciile tale și onorariul aferent, pe luna selectată.
+            Împărțeala 50/50 pe profit: încasări minus TVA, minus taxele OCPI, minus impozitele
+            firmei — jumătate ție, jumătate eGhiseul.
           </p>
         </div>
         <select
@@ -84,6 +107,7 @@ export default function CollaboratorDecontPage() {
           onChange={(e) => setMonth(e.target.value)}
           className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:border-primary-500 focus:outline-none"
         >
+          <option value="all">Toată perioada (de la 07.07.2026)</option>
           {months.map((m) => (
             <option key={m.value} value={m.value}>{m.label}</option>
           ))}
@@ -102,24 +126,62 @@ export default function CollaboratorDecontPage() {
             <Wallet className="h-4 w-4" /> Încasat servicii (TVA incl.)
           </div>
           <p className="text-2xl font-bold text-slate-900">
-            {loading ? '…' : `${summary.totalCollected.toFixed(2)} RON`}
+            {loading ? '…' : lei(summary.totalCollected)}
           </p>
         </div>
         <div className="rounded-lg border border-primary-200 bg-primary-50 p-4 sm:p-5">
           <div className="mb-1 flex items-center gap-2 text-xs uppercase text-primary-700">
-            <Wallet className="h-4 w-4" /> Onorariu total
+            <Scale className="h-4 w-4" /> Partea ta (50% din net)
           </div>
           <p className="text-2xl font-bold text-secondary-900">
-            {loading ? '…' : `${summary.totalFees.toFixed(2)} RON`}
+            {loading || !b ? '…' : lei(b.sharePerSide)}
           </p>
         </div>
       </div>
+
+      {/* Calculul complet — aceeași metodologie ca decontul oficial (26.08),
+          transparentă pas cu pas, ca cifrele să nu poată diverge. */}
+      {!loading && b && (
+        <div className="mb-6 rounded-lg border border-slate-200 bg-white p-5">
+          <h2 className="mb-3 text-sm font-semibold text-slate-900">Calculul împărțelii 50/50</h2>
+          <dl className="divide-y divide-slate-100 text-sm">
+            {([
+              ['Încasat de la clienți (cu TVA)', b.collectedWithVat, ''],
+              [`− TVA 21%`, -b.vat, ''],
+              ['= Net fără TVA', b.netOfVat, 'font-medium'],
+              ['− Taxe OCPI plătite', -b.ocpiCosts, ''],
+              ['= Profit brut', b.grossProfit, 'font-medium'],
+              ['− Impozit pe profit 16%', -b.profitTax, ''],
+              ['− Impozit pe dividende 16%', -b.dividendTax, ''],
+              ['= Net de distribuit', b.distributable, 'font-semibold'],
+            ] as [string, number, string][]).map(([label, value, cls]) => (
+              <div key={label} className="flex items-center justify-between py-1.5">
+                <dt className={`text-slate-600 ${cls}`}>{label}</dt>
+                <dd className={`tabular-nums text-slate-900 ${cls}`}>
+                  {value < 0 ? `−${lei(Math.abs(value))}` : lei(value)}
+                </dd>
+              </div>
+            ))}
+            <div className="flex items-center justify-between bg-primary-50 px-2 py-2">
+              <dt className="font-bold text-secondary-900">Partea ta (50%)</dt>
+              <dd className="tabular-nums font-bold text-secondary-900">{lei(b.sharePerSide)}</dd>
+            </div>
+          </dl>
+          {data?.lastSettlement && (
+            <p className="mt-3 text-xs text-slate-400">
+              Ultimul decont închis: {data.lastSettlement.settledOn}, până la comanda{' '}
+              {data.lastSettlement.cutoffFriendlyOrderId} inclusiv —{' '}
+              {lei(data.lastSettlement.sharePerSideRon)} de fiecare parte.
+            </p>
+          )}
+        </div>
+      )}
 
       {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
 
       {!loading && !error && (data?.orders.length ?? 0) === 0 && (
         <div className="rounded-lg border border-dashed border-slate-300 bg-white p-10 text-center text-sm text-slate-500">
-          Nicio comandă plătită în luna selectată.
+          Nicio comandă plătită în perioada selectată.
         </div>
       )}
 
@@ -134,14 +196,14 @@ export default function CollaboratorDecontPage() {
                 <th className="px-4 py-3">Status</th>
                 <th className="px-4 py-3">Plătită la</th>
                 <th className="px-4 py-3 text-right">Încasat client (TVA incl.)</th>
-                <th className="px-4 py-3 text-right">Onorariu</th>
+                <th className="px-4 py-3 text-right">Taxă OCPI</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {data!.orders.map((o) => (
                 <tr key={o.id} className="hover:bg-slate-50">
                   <td className="px-4 py-3">
-                    <Link href={`/colaborator/orders/${o.id}`} className="font-medium text-primary-700 hover:underline">
+                    <Link href={withPreview(`/colaborator/orders/${o.id}`, previewAs)} className="font-medium text-primary-700 hover:underline">
                       {o.friendlyOrderId}
                     </Link>
                     {o.isTest && (
@@ -159,10 +221,10 @@ export default function CollaboratorDecontPage() {
                     {o.paidAt ? new Date(o.paidAt).toLocaleDateString('ro-RO') : '—'}
                   </td>
                   <td className="px-4 py-3 text-right text-slate-600">
-                    {o.isTest ? '—' : `${o.clientTotal.toFixed(2)} RON`}
+                    {o.isTest ? '—' : lei(o.clientTotal)}
                   </td>
-                  <td className="px-4 py-3 text-right font-medium text-slate-900">
-                    {o.isTest ? '—' : `${o.fee.toFixed(2)} RON`}
+                  <td className="px-4 py-3 text-right text-slate-600">
+                    {o.isTest ? '—' : o.ocpiCost > 0 ? lei(o.ocpiCost) : <span className="text-slate-300">—</span>}
                   </td>
                 </tr>
               ))}
@@ -172,8 +234,10 @@ export default function CollaboratorDecontPage() {
       )}
 
       <p className="mt-4 text-xs text-slate-400">
-        Onorariul se calculează per comandă plătită (luna plății), fără comenzile anulate,
-        rambursate sau de test. Decontarea se face la sfârșitul lunii.
+        Comenzile plătite din serviciile tale (luna plății), fără anulate, rambursate sau de test.
+        Taxa OCPI apare pe comandă după ce o raportezi la depunere sau la livrarea directă —
+        comenzile încă nelucrate nu au taxa înregistrată, deci profitul perioadei mai scade puțin
+        pe măsură ce le lucrezi. Impozitele (16% profit + 16% dividende) sunt cotele legale 2026.
       </p>
     </div>
   );

@@ -57,6 +57,31 @@ Spec actualizat: `docs/technical/specs/cereri-ocpi-colaborator.md`.
 Fără migrări pe partea de feature — totul în `customer_data` (jsonb) și tabele
 existente.
 
+## Decontul pe modelul real 50/50, cu sursă unică de adevăr (aceeași seară)
+
+Pagina `/colaborator/decont` arăta „onorariu per comandă" din `lawyer_fee_ron`
+(330 lei total — irelevant: înțelegerea cu Mircea e **împărțeala 50/50 pe
+profit**). Refăcut pe modelul real, cu calculul într-un singur loc:
+
+- **`src/lib/collaborator/settlement.ts`** — SURSA UNICĂ: cote (TVA 21%,
+  impozit profit 16%, dividende 16%, split 50%), metodologia pas cu pas
+  (precizie completă în lanț, rotunjire doar la afișare — altfel diverge cu
+  un ban față de decontul de referință), `sumAncpiCosts`, începutul perioadei
+  (07.07.2026) și ultimul cutoff închis (`E-260826-F7GHD`, 4.316,61/parte).
+- **`/api/collaborator/earnings`** — rescris: comenzi + taxe OCPI reale din
+  `order_supplier_costs` + breakdown-ul complet; `month=all` pentru toată
+  perioada.
+- **Pagina lui** — cardul „Partea ta (50% din net)", calculul transparent pas
+  cu pas (încasat → −TVA → −OCPI → profit brut → −impozite → net → 50%),
+  coloana „Taxă OCPI" în loc de „Onorariu", nota cu ultimul decont închis.
+- **Admin `/admin/colaboratori`** — același breakdown din aceeași lib (carduri
+  + împărțeala pas cu pas + TSV extins); onorariul per comandă rămâne DOAR pe
+  fluxul de avocat, unde chiar e modelul (15 lei/comandă).
+
+Verificat pe producție: metodologia reproduce exact decontul de referință
+(8.633,21 net distribuit / 4.316,61 pe parte), iar augustul dă 105 comenzi /
+11.280,07 încasat / 1.070 OCPI → 2.911,44 lei/parte.
+
 ## Clarificare onorariu extras CF (aceeași seară)
 
 Coloana „Onorariu" arăta 0.00 pe extras CF și a părut bug. **Nu e**: pe extras

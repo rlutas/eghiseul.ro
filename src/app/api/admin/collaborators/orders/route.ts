@@ -3,11 +3,18 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { requirePermission, getCollaboratorServices } from '@/lib/admin/permissions';
 import { formatPersonName } from '@/lib/format/person-name';
+import { computeSettlementBreakdown, sumAncpiCosts } from '@/lib/collaborator/settlement';
 
 /**
  * Orders handled by a collaborator (across all their assigned services), with a
- * monthly summary (count, revenue, fees). Supports ?format=tsv for CSV/TSV
- * download. Admin-only (orders.view).
+ * monthly summary. Supports ?format=tsv for CSV/TSV download. Admin-only
+ * (orders.view).
+ *
+ * For service collaborators (topograf) the summary carries the 50/50 profit
+ * `breakdown` from `@/lib/collaborator/settlement` — the SAME single source of
+ * truth as the collaborator's own /colaborator/decont page, so the two views
+ * can never disagree. The per-order `fee` (lawyer_fee_ron) stays in the
+ * response for the __avocat__ path, where 15 RON/order IS the deal.
  *
  * Query: collaboratorId (required), month=YYYY-MM (optional), format=tsv (optional).
  */
@@ -49,7 +56,7 @@ export async function GET(request: NextRequest) {
       serviceIds = await getCollaboratorServices(collaboratorId);
     }
     if (serviceIds.length === 0) {
-      return NextResponse.json({ success: true, data: { orders: [], summary: { count: 0, revenue: 0, fees: 0 } } });
+      return NextResponse.json({ success: true, data: { orders: [], summary: { count: 0, revenue: 0, fees: 0, breakdown: null } } });
     }
 
     // Settlement rule (agreed 2026-07-10): a fee is owed per PAID order,
@@ -80,6 +87,25 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'Eroare la încărcarea comenzilor' }, { status: 500 });
     }
 
+    // Taxele OCPI plătite pe comenzile perioadei — partea de cost a modelului
+    // 50/50 (doar la colaboratorii pe servicii; avocatul n-are taxe ANCPI).
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const orderIds = (data || []).map((o: any) => o.id);
+    const costsByOrder = new Map<string, number>();
+    for (let i = 0; i < orderIds.length; i += 200) {
+      const { data: costRows } = await admin
+        .from('order_supplier_costs')
+        .select('order_id, supplier, category, amount_ron')
+        .in('order_id', orderIds.slice(i, i + 200));
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      for (const row of (costRows ?? []) as any[]) {
+        const amount = sumAncpiCosts([row]);
+        if (amount > 0) {
+          costsByOrder.set(row.order_id, (costsByOrder.get(row.order_id) ?? 0) + amount);
+        }
+      }
+    }
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const orders = (data || []).map((o: any) => {
       const c = o.customer_data?.contact || {};
@@ -93,6 +119,7 @@ export async function GET(request: NextRequest) {
         status: o.status,
         total: Number(o.total_price) || 0,
         fee,
+        ocpiCost: Math.round((costsByOrder.get(o.id) ?? 0) * 100) / 100,
         isTest: !!o.is_test,
         createdAt: o.created_at,
         paidAt: o.paid_at,
@@ -101,24 +128,40 @@ export async function GET(request: NextRequest) {
 
     // Test orders stay visible in the list (flagged) but owe no fee.
     const billable = orders.filter((o: { isTest: boolean }) => !o.isTest);
+    const revenue = billable.reduce((s: number, o: { total: number }) => s + o.total, 0);
+    const ocpiTotal = billable.reduce((s: number, o: { ocpiCost: number }) => s + o.ocpiCost, 0);
     const summary = {
       count: billable.length,
-      revenue: Math.round(billable.reduce((s: number, o: { total: number }) => s + o.total, 0) * 100) / 100,
+      revenue: Math.round(revenue * 100) / 100,
       fees: Math.round(billable.reduce((s: number, o: { fee: number }) => s + o.fee, 0) * 100) / 100,
+      // The 50/50 profit model — irrelevant for __avocat__ (fee-based deal).
+      breakdown: collaboratorId === '__avocat__' ? null : computeSettlementBreakdown(revenue, ocpiTotal),
     };
 
     if (format === 'tsv') {
-      const COLUMNS = ['Comandă', 'Serviciu', 'Client', 'Email', 'Status', 'Preț (RON)', 'Onorariu (RON)', 'Test', 'Dată'];
+      const COLUMNS = ['Comandă', 'Serviciu', 'Client', 'Email', 'Status', 'Preț (RON)', 'Taxă OCPI (RON)', 'Onorariu (RON)', 'Test', 'Dată'];
       const lines = [COLUMNS.join('\t')];
       for (const o of orders) {
         lines.push([
           tsvCell(o.friendlyOrderId), tsvCell(o.service), tsvCell(o.client), tsvCell(o.email),
-          tsvCell(o.status), tsvCell(o.total.toFixed(2)), tsvCell(o.fee.toFixed(2)),
+          tsvCell(o.status), tsvCell(o.total.toFixed(2)), tsvCell(o.ocpiCost.toFixed(2)), tsvCell(o.fee.toFixed(2)),
           o.isTest ? 'da' : 'nu', tsvCell(new Date(o.paidAt || o.createdAt).toLocaleDateString('ro-RO')),
         ].join('\t'));
       }
       lines.push('');
-      lines.push(['TOTAL', '', '', '', String(summary.count), summary.revenue.toFixed(2), summary.fees.toFixed(2), '', ''].join('\t'));
+      lines.push(['TOTAL', '', '', '', String(summary.count), summary.revenue.toFixed(2), summary.breakdown ? summary.breakdown.ocpiCosts.toFixed(2) : '', summary.fees.toFixed(2), '', ''].join('\t'));
+      if (summary.breakdown) {
+        const b = summary.breakdown;
+        lines.push('');
+        lines.push(['Împărțeala 50/50:', '', '', '', '', '', '', '', '', ''].join('\t'));
+        lines.push(['Net fără TVA', b.netOfVat.toFixed(2)].join('\t'));
+        lines.push(['Taxe OCPI', b.ocpiCosts.toFixed(2)].join('\t'));
+        lines.push(['Profit brut', b.grossProfit.toFixed(2)].join('\t'));
+        lines.push(['Impozit profit 16%', b.profitTax.toFixed(2)].join('\t'));
+        lines.push(['Impozit dividende 16%', b.dividendTax.toFixed(2)].join('\t'));
+        lines.push(['Net de distribuit', b.distributable.toFixed(2)].join('\t'));
+        lines.push(['Partea fiecăruia (50%)', b.sharePerSide.toFixed(2)].join('\t'));
+      }
       const fname = `colaborator-${collaboratorId.slice(0, 8)}${month ? '-' + month : ''}.tsv`;
       return new Response('﻿' + lines.join('\n'), {
         headers: {

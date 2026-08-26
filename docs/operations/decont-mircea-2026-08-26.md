@@ -21,6 +21,12 @@ Aceeași regulă ca `/api/collaborator/earnings`:
 Script: rulat ad-hoc cu `pg` pe pooler (vezi memoria proiectului); raport vizual:
 https://claude.ai/code/artifact/e541ea9b-c68c-49a1-8ca6-57007d7d025c
 
+**Din 26.08 (seara), metodologia trăiește în cod:**
+`src/lib/collaborator/settlement.ts` e sursa unică de adevăr (cote, formulă,
+cutoff) — `/colaborator/decont` și `/admin/colaboratori` o folosesc amândouă,
+deci următorul decont se citește direct din pagină, nu se mai calculează
+ad-hoc. La schimbarea cotelor (ex. micro în loc de 16%), se modifică DOAR acolo.
+
 ## Cifre
 
 | | Sumă (lei) |
