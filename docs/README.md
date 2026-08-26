@@ -49,6 +49,7 @@ Index al documentației. Aceasta e o **hartă**, nu un jurnal — pentru jurnalu
 - **Runbook schimbare firmă (Stripe/Oblio/bancă noi):** [`technical/specs/schimbare-firma-runbook.md`](technical/specs/schimbare-firma-runbook.md)
 - **ANCPI automation:** [`technical/specs/ancpi-automation-plan.md`](technical/specs/ancpi-automation-plan.md)
 - **Cereri OCPI pentru topograf (extras CF, cât e ANCPI picat):** [`technical/specs/cereri-ocpi-colaborator.md`](technical/specs/cereri-ocpi-colaborator.md)
+- **Decont Mircea (topograf) — primul calcul + cutoff:** [`operations/decont-mircea-2026-08-26.md`](operations/decont-mircea-2026-08-26.md)
 - **Cookie consent (GDPR, banner + consent receipts):** [`technical/specs/cookie-consent.md`](technical/specs/cookie-consent.md)
 - **Deploy:** [`deployment/VERCEL_DEPLOYMENT.md`](deployment/VERCEL_DEPLOYMENT.md)
 - **Email (Resend + Zoho) setup:** [`deployment/EMAIL_RESEND_ZOHO_SETUP.md`](deployment/EMAIL_RESEND_ZOHO_SETUP.md)
