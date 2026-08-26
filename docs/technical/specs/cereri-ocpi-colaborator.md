@@ -88,6 +88,7 @@ de ea la runtime.
 | `POST /api/admin/orders/[id]/priority` | marchează comanda urgentă (`orders.priority`, migrarea 145) |
 | `POST /api/collaborator/orders/[id]/depunere` | nr. înregistrare + cost; numărul se salvează și în `customer_data.ocpi_submission` |
 | `POST /api/collaborator/orders/[id]/status` | colaboratorul schimbă statusul (subset din lista admin) |
+| `GET /api/collaborator/earnings[?month=YYYY-MM\|all]` | decontul 50/50 (breakdown din `lib/collaborator/settlement.ts` — sursa unică, folosită și de `/admin/colaboratori`) |
 | `scripts/build-cf-cerere-pdf-template.ts` | builder-ul asset-urilor |
 
 ## Reguli de reținut
