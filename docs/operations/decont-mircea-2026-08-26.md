@@ -70,12 +70,13 @@ https://claude.ai/code/artifact/e541ea9b-c68c-49a1-8ca6-57007d7d025c
 
 ## Rezerve / de clarificat (rămase deschise la 26.08)
 
-1. ~~**Extras CF are comision 0 în sistem**~~ **REZOLVAT 26.08 (seara):** decizia
-   Raul–Mircea = **20 lei/extras CF** (peste tariful de 15 al celorlalte servicii
-   cadastrale). Setat în DB prin migrarea 148 (`services.lawyer_fee_ron = 20`).
-   Onorariul se citește live la afișare, deci se aplică retroactiv pe toate cele
-   124 de comenzi lucrate manual: 124 × 20 = **2.480 lei** onorariu de decontat
-   (nu 1.860 cum era estimat la 15 lei).
+1. ~~**Extras CF are comision 0 în sistem**~~ **CLARIFICAT 26.08 (seara):**
+   0 e CORECT — pe extras CF nu există onorariu per comandă (nici avocat, nici
+   topograf; înțelegerea cu Mircea e împărțeala 50/50, nu tarif pe comandă).
+   Cei „20 lei/extras CF" din discuție sunt **costul de eliberare ANCPI**, care
+   e deja în sistem (`taxe-eliberare.ts`, precompletat la depunere, salvat în
+   `order_supplier_costs`) și deja scăzut în calculul decontului. Migrarea 148
+   (care pusese greșit 20 la onorariu) a fost anulată prin migrarea 149.
 2. **Cele 53 de comenzi nelucrate** nu au taxă OCPI înregistrată încă — costurile
    reale ale perioadei vor crește când le lucrează (deci profitul de mai sus e
    supraevaluat cu ~1.000+ lei).
