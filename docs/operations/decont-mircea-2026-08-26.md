@@ -70,10 +70,12 @@ https://claude.ai/code/artifact/e541ea9b-c68c-49a1-8ca6-57007d7d025c
 
 ## Rezerve / de clarificat (rămase deschise la 26.08)
 
-1. **Extras CF are comision 0 în sistem** (serviciu marcat automat pe workerul
-   ANCPI), dar din 13.07 ePay e picat și Mircea le lucrează manual. 124 comenzi
-   × 15 lei = 1.860 lei dacă se decontează la același tarif — decizie de business,
-   nu e în DB.
+1. ~~**Extras CF are comision 0 în sistem**~~ **REZOLVAT 26.08 (seara):** decizia
+   Raul–Mircea = **20 lei/extras CF** (peste tariful de 15 al celorlalte servicii
+   cadastrale). Setat în DB prin migrarea 148 (`services.lawyer_fee_ron = 20`).
+   Onorariul se citește live la afișare, deci se aplică retroactiv pe toate cele
+   124 de comenzi lucrate manual: 124 × 20 = **2.480 lei** onorariu de decontat
+   (nu 1.860 cum era estimat la 15 lei).
 2. **Cele 53 de comenzi nelucrate** nu au taxă OCPI înregistrată încă — costurile
    reale ale perioadei vor crește când le lucrează (deci profitul de mai sus e
    supraevaluat cu ~1.000+ lei).
