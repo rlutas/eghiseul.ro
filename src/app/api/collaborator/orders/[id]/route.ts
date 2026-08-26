@@ -89,6 +89,8 @@ export async function GET(
         property: order.customer_data?.property ?? null,
         // What HE reported on identificare orders — the source of the cerere.
         identified_property: order.customer_data?.identified_property ?? null,
+        // OCPI submission number he reported — shown back so he can correct it.
+        ocpi_submission: order.customer_data?.ocpi_submission ?? null,
       },
     };
 

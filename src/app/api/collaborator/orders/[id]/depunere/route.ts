@@ -38,8 +38,9 @@ export async function POST(
     }
 
     let collaboratorId: string;
+    let preview: boolean;
     try {
-      ({ collaboratorId } = await resolveCollaboratorContext(
+      ({ collaboratorId, preview } = await resolveCollaboratorContext(
         user.id,
         request.nextUrl.searchParams.get('as')
       ));
@@ -47,6 +48,14 @@ export async function POST(
     } catch (error) {
       if (error instanceof Response) return error;
       throw error;
+    }
+    // Preview-ul de admin e STRICT READ-ONLY: costul și istoricul s-ar semna
+    // fals pe numele colaboratorului.
+    if (preview) {
+      return NextResponse.json(
+        { success: false, error: 'Previzualizarea e doar pentru citire' },
+        { status: 403 }
+      );
     }
 
     const body = await request.json().catch(() => ({}));
@@ -78,7 +87,7 @@ export async function POST(
 
     const { data: order } = await admin
       .from('orders')
-      .select('id, friendly_order_id, status, services:service_id(name)')
+      .select('id, friendly_order_id, status, customer_data, services:service_id(name)')
       .eq('id', orderId)
       .single();
     if (!order) {
@@ -113,7 +122,24 @@ export async function POST(
         .eq('recorded_by', recordedBy)
         .order('created_at', { ascending: true })
         .limit(1);
-      const existing = existingRows?.[0] ?? null;
+      let existing = existingRows?.[0] ?? null;
+
+      // Rândul auto de la livrarea directă (upload-pdf/autoBookAncpiCost) e
+      // tot „al lui", dar recorded_by poate diferi (fallback la fetch de
+      // profil eșuat) — fără verificarea asta, un post ulterior de depunere
+      // ar insera AL DOILEA rând și ar dubla costul pe marjă.
+      if (!existing) {
+        const { data: autoRows } = await admin
+          .from('order_supplier_costs')
+          .select('id')
+          .eq('order_id', orderId)
+          .eq('supplier', SUPPLIER_ANCPI)
+          .eq('category', 'taxa_institutie')
+          .like('description', '%(auto, livrare directă)%')
+          .order('created_at', { ascending: true })
+          .limit(1);
+        existing = autoRows?.[0] ?? null;
+      }
 
       const { error: costError } = existing
         ? await admin
@@ -132,6 +158,44 @@ export async function POST(
       if (costError) {
         console.error('[collaborator] depunere cost error:', costError.message);
         return NextResponse.json({ success: false, error: 'Costul nu a putut fi salvat' }, { status: 500 });
+      }
+    }
+
+    // Numărul de depunere OCPI se salvează PE COMANDĂ, nu doar în istoric:
+    // după el caută topograful comanda peste 2 zile, când OCPI îi eliberează
+    // documentul și tot ce are în mână e numărul de înregistrare.
+    if (registrationNumber) {
+      // Re-citim customer_data chiar înainte de scriere: de la SELECT-ul de
+      // sus au trecut mai multe drumuri la DB, iar spread-ul peste o citire
+      // veche ar suprascrie ce a intrat între timp (ex. identified_property).
+      const { data: fresh } = await admin
+        .from('orders')
+        .select('customer_data')
+        .eq('id', orderId)
+        .single();
+      const { error: regErr } = await admin
+        .from('orders')
+        .update({
+          customer_data: {
+            ...((fresh?.customer_data ?? order.customer_data) ?? {}),
+            ocpi_submission: {
+              registration_number: registrationNumber,
+              submitted_at: new Date().toISOString(),
+              by: who,
+            },
+          },
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', orderId);
+      if (regErr) {
+        // Numărul e exact ce caută el peste 2 zile — o pierdere tăcută aici
+        // ar însemna comandă negăsibilă. Costul (dacă a fost trimis) e deja
+        // salvat; re-postarea e corecție, nu dublare.
+        console.error('[collaborator] depunere reg-number save error:', regErr.message);
+        return NextResponse.json(
+          { success: false, error: 'Numărul de înregistrare nu a putut fi salvat — reîncearcă' },
+          { status: 500 }
+        );
       }
     }
 

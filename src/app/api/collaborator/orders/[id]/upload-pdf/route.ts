@@ -5,6 +5,89 @@ import { requireCollaboratorForOrder, checkPermission } from '@/lib/admin/permis
 import { uploadFile, generateFinalDocumentKey } from '@/lib/aws/s3';
 import { compressPdf } from '@/lib/documents/pdf-compress';
 import { deliverCollaboratorResult } from '@/lib/collaborator/deliver';
+import { taxaEliberare } from '@/lib/ancpi/taxe-eliberare';
+import { cereriForOrderSlug, type OrderForCereri } from '@/lib/ancpi/cereri-for-order';
+import { cerereDateRo } from '@/lib/ancpi/cerere-date';
+import { SUPPLIER_ANCPI } from '@/lib/admin/supplier-costs';
+
+/**
+ * CF obținut ONLINE, pe loc: colaboratorul sare peste „Am depus cererea la
+ * OCPI" (nu există nr. de depunere) și încarcă direct documentul. Taxa plătită
+ * o știm oricum (20 lei/imobil extras CF, 15 plan cadastral), deci o
+ * înregistrăm automat la livrare — o singură dată: dacă există deja un rând
+ * ANCPI pe comandă (din depunere sau pus de echipă), nu ne atingem de el.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function autoBookAncpiCost(admin: any, orderId: string, userId: string): Promise<void> {
+  try {
+    const { data: order } = await admin
+      .from('orders')
+      .select('id, friendly_order_id, customer_data, services:service_id(name, slug, processing_config)')
+      .eq('id', orderId)
+      .single();
+    if (!order) return;
+
+    const svc = Array.isArray(order.services) ? order.services[0] : order.services;
+    const taxa = taxaEliberare(svc?.slug, svc?.processing_config);
+    if (taxa === null) return;
+
+    const { data: existing } = await admin
+      .from('order_supplier_costs')
+      .select('id')
+      .eq('order_id', orderId)
+      .eq('supplier', SUPPLIER_ANCPI)
+      .eq('category', 'taxa_institutie')
+      .limit(1);
+    if (existing && existing.length > 0) return;
+
+    // Taxa e PE IMOBIL — o comandă cu două cărți funciare costă 2×20 la OCPI.
+    const imobile = Math.max(
+      1,
+      cereriForOrderSlug(
+        {
+          friendly_order_id: order.friendly_order_id ?? orderId,
+          customer_data: order.customer_data as OrderForCereri['customer_data'],
+        },
+        svc?.slug,
+        cerereDateRo()
+      ).length
+    );
+    const amount = Math.round(taxa * imobile * 100) / 100;
+
+    const { data: profile } = await admin
+      .from('profiles')
+      .select('email')
+      .eq('id', userId)
+      .single();
+
+    const description = `Taxă OCPI ${svc?.name ?? ''} ${order.friendly_order_id ?? ''} (auto, livrare directă)`
+      .replace(/\s+/g, ' ')
+      .trim();
+    const { error: costError } = await admin.from('order_supplier_costs').insert({
+      order_id: orderId,
+      supplier: SUPPLIER_ANCPI,
+      category: 'taxa_institutie',
+      description,
+      amount_ron: amount,
+      recorded_by: profile?.email ?? 'colaborator',
+    });
+    if (costError) {
+      console.error('[collaborator] auto-cost insert error:', costError.message);
+      return;
+    }
+
+    const { error: histErr } = await admin.from('order_history').insert({
+      order_id: orderId,
+      event_type: 'note_added',
+      changed_by: 'sistem',
+      notes: `Cost eliberare ${amount.toFixed(2)} lei (${imobile > 1 ? `${imobile} imobile × ` : ''}${taxa} lei) înregistrat automat la livrarea documentului.`,
+    });
+    if (histErr) console.error('[collaborator] auto-cost history insert error:', histErr.message);
+  } catch (e) {
+    // Costul e contabilitate internă — nu blochează niciodată livrarea.
+    console.error('[collaborator] auto-cost error:', e);
+  }
+}
 
 /**
  * Collaborator (topograph) uploads the scanned result PDF for one of their
@@ -86,6 +169,9 @@ export async function POST(
       console.error('[collaborator] attach doc error:', insErr.message);
       return NextResponse.json({ success: false, error: 'Eroare la salvarea documentului' }, { status: 500 });
     }
+
+    // Livrare directă (fără depunere OCPI) → taxa se înregistrează singură.
+    await autoBookAncpiCost(admin, orderId, user.id);
 
     // One-step flow: uploading IS delivering. If delivery fails the document
     // is already attached — surface the error so the collaborator retries via

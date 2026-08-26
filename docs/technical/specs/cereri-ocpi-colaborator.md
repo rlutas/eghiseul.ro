@@ -86,7 +86,8 @@ de ea la runtime.
 | `GET /api/collaborator/orders/[id]/cerere?imobil=N` | o cerere |
 | `GET /api/collaborator/cereri[?judet=]` | ZIP cu tot ce are de depus (max 100 comenzi), opțional pe județ |
 | `POST /api/admin/orders/[id]/priority` | marchează comanda urgentă (`orders.priority`, migrarea 145) |
-| `POST /api/collaborator/orders/[id]/depunere` | nr. înregistrare + cost |
+| `POST /api/collaborator/orders/[id]/depunere` | nr. înregistrare + cost; numărul se salvează și în `customer_data.ocpi_submission` |
+| `POST /api/collaborator/orders/[id]/status` | colaboratorul schimbă statusul (subset din lista admin) |
 | `scripts/build-cf-cerere-pdf-template.ts` | builder-ul asset-urilor |
 
 ## Reguli de reținut
@@ -156,6 +157,22 @@ de ea la runtime.
   **20 lei** extras CF (cod 2.7.6), **15 lei** extras din planul cadastral
   (cod 2.7.7). Formularul de depunere apare la orice serviciu cu taxă cunoscută,
   chiar dacă nu-i generăm cererea.
+- **Nr. de depunere OCPI e căutabil** (26.08): `depunere` îl salvează în
+  `customer_data.ocpi_submission` (nu doar în istoric), lista îl expune și
+  intră în haystack-ul căutării din portal — peste 2 zile, când ridică
+  documentul, el caută după numărul de la ghișeu, nu după comanda noastră.
+  Apare și sub nr. comenzii în tabel. Re-post = corecție.
+- **CF obținut direct online = fără depunere, cost automat** (26.08): la
+  `upload-pdf`, dacă serviciul are taxă cunoscută și comanda n-are niciun rând
+  `ANCPI/taxa_institutie`, costul (taxă × nr. imobile) se inserează singur
+  (`autoBookAncpiCost`), cu notă în istoric. Dacă depunerea a înregistrat deja
+  costul (sau echipa a pus unul), nu se atinge — zero dublă contabilizare.
+- **Statusul îl schimbă și el** (26.08): `POST …/status` cu subset din
+  statusurile de admin (`processing`, `submitted_to_institution`, `standby`,
+  `document_ready`, `completed`) — aceleași valori, deci echipa vede în admin
+  exact ce a selectat, cu istoricul semnat `colaborator: <nume>`. `standby`
+  cere obligatoriu notă (ce lipsește de la client). Statusurile de bani
+  (`cancelled`/`refunded`/`cancellation_requested`) sunt blocate.
 
 ## Ordinea de lucru
 

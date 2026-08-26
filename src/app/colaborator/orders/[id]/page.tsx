@@ -37,6 +37,19 @@ interface OrderDetail {
   cereri: { index: number; name: string }[];
 }
 
+/**
+ * Statusurile pe care le poate seta colaboratorul — subset din lista de admin
+ * (aceleași valori, ca echipa să vadă în admin exact ce a ales el). Lista
+ * serverului e în api/collaborator/orders/[id]/status/route.ts.
+ */
+const STATUS_CHOICES: { value: string; label: string; needsNote?: boolean }[] = [
+  { value: 'processing', label: 'În lucru (în procesare)' },
+  { value: 'submitted_to_institution', label: 'Depusă la OCPI (trimis instituție)' },
+  { value: 'standby', label: 'Problemă — necesare informații de la client', needsNote: true },
+  { value: 'document_ready', label: 'Documentul este eliberat' },
+  { value: 'completed', label: 'Finalizată' },
+];
+
 function Field({ label, value }: { label: string; value?: string | null }) {
   if (!value) return null;
   return (
@@ -73,6 +86,11 @@ export default function CollaboratorOrderDetail() {
   const [identCf, setIdentCf] = useState('');
   const [identCad, setIdentCad] = useState('');
   const [savingIdent, setSavingIdent] = useState(false);
+  // Statusul pe care ÎL SETEAZĂ EL (finalizat / așteptare info client / în
+  // lucru) — aceleași statusuri ca în admin, ca echipa să vadă exact ce alege.
+  const [newStatus, setNewStatus] = useState('');
+  const [statusNote, setStatusNote] = useState('');
+  const [savingStatus, setSavingStatus] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const load = async () => {
@@ -87,6 +105,9 @@ export default function CollaboratorOrderDetail() {
         setIdentCf((c: string) => c || identified.carteFunciara || '');
         setIdentCad((c: string) => c || identified.cadastral || '');
       }
+      // Nr. de depunere deja raportat — îl vede și îl poate corecta.
+      const savedReg = json.data?.customer_data?.ocpi_submission?.registration_number;
+      if (savedReg) setRegNumber((current: string) => current || savedReg);
       // Taxa e PE IMOBIL: o comandă cu două cărți funciare costă 2×20 la OCPI.
       const taxa = taxaEliberare(json.data?.services?.slug, json.data?.services?.processing_config);
       const imobile = Math.max(1, json.data?.cereri?.length ?? 1);
@@ -196,8 +217,7 @@ export default function CollaboratorOrderDetail() {
       });
       const json = await res.json();
       if (!json.success) throw new Error(json.error || 'Eroare');
-      toast.success('Depunerea a fost înregistrată.');
-      setRegNumber('');
+      toast.success('Depunerea a fost înregistrată — după acest număr poți căuta comanda în listă.');
       const taxa = taxaEliberare(order?.services?.slug, order?.services?.processing_config);
       const imobile = Math.max(1, order?.cereri?.length ?? 1);
       setCostRon(taxa !== null ? String(taxa * imobile) : '');
@@ -206,6 +226,28 @@ export default function CollaboratorOrderDetail() {
       toast.error(e instanceof Error ? e.message : 'Eroare la salvare');
     } finally {
       setSavingDepunere(false);
+    }
+  };
+
+  const handleStatus = async () => {
+    if (!newStatus) return;
+    setSavingStatus(true);
+    try {
+      const res = await fetch(withPreview(`/api/collaborator/orders/${orderId}/status`, previewAs), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus, note: statusNote.trim() }),
+      });
+      const json = await res.json();
+      if (!json.success) throw new Error(json.error || 'Eroare');
+      toast.success('Status actualizat — echipa vede schimbarea în admin.');
+      setNewStatus('');
+      setStatusNote('');
+      await load();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Eroare la salvare');
+    } finally {
+      setSavingStatus(false);
     }
   };
 
@@ -402,7 +444,15 @@ export default function CollaboratorOrderDetail() {
           <h2 className="mb-1 text-sm font-semibold text-slate-900">Am depus cererea la OCPI</h2>
           <p className="mb-3 text-xs text-slate-500">
             Trece comanda în &bdquo;Trimis instituție&rdquo; și înregistrează costul eliberării.
+            După numărul de depunere poți căuta comanda în listă când ridici documentul.
           </p>
+          {order.customer_data?.ocpi_submission?.registration_number && (
+            <p className="mb-3 rounded-md bg-slate-50 px-3 py-2 text-xs text-slate-600">
+              Nr. depunere salvat:{' '}
+              <span className="font-semibold">{order.customer_data.ocpi_submission.registration_number}</span>
+              {' '}— îl poți corecta mai jos și salva din nou.
+            </p>
+          )}
           <div className="flex flex-wrap items-end gap-3">
             <div className="min-w-[200px] flex-1">
               <label htmlFor="reg-number" className="mb-1 block text-xs text-slate-500">
@@ -449,6 +499,67 @@ export default function CollaboratorOrderDetail() {
           </div>
         </div>
       )}
+
+      {/* Statusul comenzii — el îl schimbă singur (în lucru, problemă/info
+          client, finalizată); aceleași statusuri ca în admin, deci echipa vede
+          exact ce a selectat, cu nota lui în istoricul comenzii. */}
+      <div className="mb-6 rounded-lg border border-slate-200 bg-white p-5">
+        <h2 className="mb-1 text-sm font-semibold text-slate-900">Schimbă statusul comenzii</h2>
+        <p className="mb-3 text-xs text-slate-500">
+          Statusul curent: <span className="font-medium text-slate-700">{findStatusLabel(order.status)}</span>.
+          Schimbarea se vede imediat și la echipă, în admin.
+        </p>
+        <div className="flex flex-wrap items-end gap-3">
+          <div className="min-w-[240px] flex-1">
+            <label htmlFor="new-status" className="mb-1 block text-xs text-slate-500">Status nou</label>
+            <select
+              id="new-status"
+              value={newStatus}
+              onChange={(e) => setNewStatus(e.target.value)}
+              disabled={readOnly}
+              className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/30"
+            >
+              <option value="">Alege statusul…</option>
+              {STATUS_CHOICES.map((s) => (
+                <option key={s.value} value={s.value} disabled={s.value === order.status}>
+                  {s.label}{s.value === order.status ? ' (actual)' : ''}
+                </option>
+              ))}
+            </select>
+          </div>
+          <Button
+            onClick={handleStatus}
+            disabled={
+              readOnly
+              || savingStatus
+              || !newStatus
+              || (STATUS_CHOICES.find((s) => s.value === newStatus)?.needsNote === true && !statusNote.trim())
+            }
+            variant="outline"
+            className="h-10"
+          >
+            {savingStatus ? 'Se salvează...' : 'Salvează statusul'}
+          </Button>
+        </div>
+        {newStatus && (
+          <div className="mt-3">
+            <label htmlFor="status-note" className="mb-1 block text-xs text-slate-500">
+              {STATUS_CHOICES.find((s) => s.value === newStatus)?.needsNote
+                ? 'Ce informații lipsesc de la client? (obligatoriu — echipa îl contactează)'
+                : 'Notă pentru echipă (opțional)'}
+            </label>
+            <textarea
+              id="status-note"
+              value={statusNote}
+              onChange={(e) => setStatusNote(e.target.value)}
+              disabled={readOnly}
+              rows={2}
+              placeholder="ex. lipsește nr. cadastral corect / adresa imobilului e incompletă"
+              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/30"
+            />
+          </div>
+        )}
+      </div>
 
       {/* Deliverable — what Mircea must obtain + upload for this order */}
       {order.deliverable && (
@@ -531,6 +642,10 @@ export default function CollaboratorOrderDetail() {
       {!hasDocs && !delivered && (
         <p className="mt-2 text-xs text-slate-400">
           La încărcare, documentul se trimite automat clientului și statusul comenzii se actualizează.
+          {taxaEliberare(order.services?.slug, order.services?.processing_config) !== null && (
+            <> Dacă ai obținut documentul direct online (fără depunere la ghișeu), nu mai completa
+            nr. de depunere — taxa OCPI se înregistrează automat la livrare.</>
+          )}
         </p>
       )}
       {readOnly && (

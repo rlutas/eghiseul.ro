@@ -18,7 +18,11 @@ interface CollabOrder {
   priority: number | null;
   service_id: string;
   // API-ul returnează DOAR datele de lucrare (property) — fără date de client.
-  customer_data: { property?: PropertyLike | null } | null;
+  customer_data: {
+    property?: PropertyLike | null;
+    /** Nr. de depunere raportat de el — după el caută când ridică documentul. */
+    ocpi_submission?: { registration_number?: string | null } | null;
+  } | null;
   services: { name: string; slug: string } | null;
 }
 
@@ -103,7 +107,15 @@ export default function CollaboratorOrdersPage() {
       if (!q) return true;
       const p = o.customer_data?.property;
       const haystack = fold(
-        [o.friendly_order_id, p?.locality, p?.county, p?.carteFunciara, p?.cadastral, o.services?.name]
+        [
+          o.friendly_order_id,
+          p?.locality,
+          p?.county,
+          p?.carteFunciara,
+          p?.cadastral,
+          o.customer_data?.ocpi_submission?.registration_number,
+          o.services?.name,
+        ]
           .filter(Boolean)
           .join(' ')
       );
@@ -184,7 +196,7 @@ export default function CollaboratorOrdersPage() {
           <input
             value={cauta}
             onChange={(e) => setCauta(e.target.value)}
-            placeholder="Caută nr. comandă, CF, localitate..."
+            placeholder="Caută nr. depunere OCPI, comandă, CF, localitate..."
             className="min-w-[220px] flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/30"
           />
 
@@ -233,6 +245,11 @@ export default function CollaboratorOrdersPage() {
                       <span className="ml-2 rounded-full bg-red-600 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
                         Urgent
                       </span>
+                    )}
+                    {o.customer_data?.ocpi_submission?.registration_number && (
+                      <div className="mt-0.5 text-xs text-slate-400">
+                        OCPI {o.customer_data.ocpi_submission.registration_number}
+                      </div>
                     )}
                   </td>
                   <td className="px-4 py-3 text-slate-700">{o.services?.name ?? '—'}</td>

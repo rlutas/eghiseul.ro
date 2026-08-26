@@ -74,6 +74,9 @@ export async function GET(request: NextRequest) {
         // Identificarea raportată de colaborator — din ea se numără cererile
         // de depus pe comenzile de identificare imobil.
         identified_property: o.customer_data?.identified_property ?? null,
+        // Nr. de depunere OCPI raportat de el — după el caută comanda când
+        // ridică documentul de la ghișeu.
+        ocpi_submission: o.customer_data?.ocpi_submission ?? null,
       },
     }));
 
