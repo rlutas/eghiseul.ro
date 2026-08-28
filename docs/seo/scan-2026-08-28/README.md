@@ -61,3 +61,16 @@ profilul „scaled content" pe care îl lovește update-ul.
 
 Monitorizare: expuneri GSC pe `/servicii/` zilnic (checkpoint 28.08: 99–172
 expuneri/zi, plat). Vezi și `../2026-08-24-spam-update-prabusire-organica.md`.
+
+## Lotul 2 — livrat 28.08 (commit 5478b6e)
+
+Cele 8 articole non-calculator cu scorul cel mai mare, rescrise: constatator de
+bază / cu istoric / insolvență / PFA / cele-4-tipuri, anii-lucrați-în-străinătate
+(rescriere completă, conținutul vechi era filler WP), sms-fals-amenda,
+verificare-proprietar-imobil. Scor după: **0–3,4/1k** (înainte: 18,9–25,3).
+
+Următoarele: articolele rămase ≥15 (tva-9-locuinte 17,7; schimbare-sediu 17,6;
+cazier-profesori 17,8; cat-poti-construi 17,8; transcriere-nastere 16,8;
+cat-costa-cadastrul 16,4; radiere-firma 16,9; extras-carte-funciara-gratuit 15,6;
+model-certificat-casatorie 15,4 — thin), apoi clusterul de 42 pagini locație
+extras CF + 16 cazier.
