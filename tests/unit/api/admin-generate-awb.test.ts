@@ -195,7 +195,7 @@ describe('POST /api/admin/orders/[id]/generate-awb — courier provider derivati
       delivery_method: { type: 'home', name: 'Sameday Next Day' },
       delivery_address: { county: 'IL', city: 'Slobozia', street: 'X' },
       courier_provider: 'fancourier', // explicit
-      customer_data: { contact: { name: 'X', phone: '0700' } },
+      customer_data: { contact: { name: 'X', phone: '0722123456' } },
     });
     getCourierProvider.mockReturnValue({
       createShipment: vi.fn().mockResolvedValue({ success: true, awb: 'AWB-NEW', price: 18, priceWithVAT: 21.42, currency: 'RON', estimatedDays: 1 }),
@@ -215,7 +215,7 @@ describe('POST /api/admin/orders/[id]/generate-awb — courier provider derivati
       delivery_method: { type: 'home', name: 'Fan Courier Standard' },
       delivery_address: { county: 'IL', city: 'Slobozia', street: 'X' },
       courier_provider: null,
-      customer_data: { contact: { name: 'X', phone: '0700' } },
+      customer_data: { contact: { name: 'X', phone: '0722123456' } },
     });
     extractCourierProviderFromDeliveryMethod.mockReturnValue('fancourier');
     getCourierProvider.mockReturnValue({
@@ -246,7 +246,7 @@ describe('POST /api/admin/orders/[id]/generate-awb — locker delivery (no addre
       delivery_address: null,
       courier_provider: 'sameday',
       courier_quote: { lockerId: 'EBX-1234', lockerName: 'EasyBox Piata' },
-      customer_data: { contact: { name: 'X', phone: '0700' } },
+      customer_data: { contact: { name: 'X', phone: '0722123456' } },
     });
     getCourierProvider.mockReturnValue({ createShipment });
 
@@ -254,5 +254,58 @@ describe('POST /api/admin/orders/[id]/generate-awb — locker delivery (no addre
 
     expect(res.status).toBe(200);
     expect(createShipment).toHaveBeenCalled();
+  });
+});
+
+describe('POST /api/admin/orders/[id]/generate-awb — Romanian recipient phone required', () => {
+  it('rejects with 400 when the resolved recipient phone is not a Romanian number', async () => {
+    const createShipment = vi.fn();
+    setupMocks({
+      id: 'o1',
+      delivery_tracking_number: null,
+      delivery_method: { type: 'locker', name: 'Sameday EasyBox Piata' },
+      delivery_address: null,
+      courier_provider: 'sameday',
+      courier_quote: { lockerId: 'EBX-1234', lockerName: 'EasyBox Piata' },
+      customer_data: { contact: { name: 'X', phone: '+491701234567' } },
+    });
+    getCourierProvider.mockReturnValue({ createShipment });
+
+    const res = await callRoute('o1');
+    const body = await res.json();
+
+    expect(res.status).toBe(400);
+    expect(body.error).toMatch(/număr românesc/);
+    expect(createShipment).not.toHaveBeenCalled();
+  });
+
+  it('prefers delivery_address.recipientPhone over a foreign contact phone', async () => {
+    const createShipment = vi.fn().mockResolvedValue({
+      success: true,
+      awb: 'AWB-RO',
+      price: 12.5,
+      priceWithVAT: 14.88,
+      currency: 'RON',
+      estimatedDays: 1,
+    });
+    setupMocks({
+      id: 'o1',
+      delivery_tracking_number: null,
+      delivery_method: { type: 'locker', name: 'Sameday EasyBox Piata' },
+      delivery_address: { recipientPhone: '+40722123456' },
+      courier_provider: 'sameday',
+      courier_quote: { lockerId: 'EBX-1234', lockerName: 'EasyBox Piata' },
+      customer_data: { contact: { name: 'X', phone: '+491701234567' } },
+    });
+    getCourierProvider.mockReturnValue({ createShipment });
+
+    const res = await callRoute('o1');
+
+    expect(res.status).toBe(200);
+    expect(createShipment).toHaveBeenCalledWith(
+      expect.objectContaining({
+        recipient: expect.objectContaining({ phone: '+40722123456' }),
+      })
+    );
   });
 });
