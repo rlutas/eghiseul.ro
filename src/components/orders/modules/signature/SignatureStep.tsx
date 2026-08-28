@@ -43,6 +43,10 @@ export default function SignatureStep({ config, onValidChange }: SignatureStepPr
   // la semnătură: vechiul certificat devine nul + corectitudinea datelor.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const isCivilStatus = !!(state.verificationConfig as any)?.civilStatus;
+  // Extrasul multilingv NU anulează certificatul original (nu e duplicat),
+  // deci declarația „actul anterior devine nul" nu se aplică acolo.
+  const requiresOldCertVoid =
+    isCivilStatus && !state.serviceSlug?.startsWith('extras-multilingv');
   const oldCertVoidAccepted = !!state.consent?.oldCertVoidAccepted;
   const dataAccuracyAccepted = !!state.consent?.dataAccuracyAccepted;
 
@@ -225,10 +229,10 @@ export default function SignatureStep({ config, onValidChange }: SignatureStepPr
     if (!signature) return false;
     if (config.required && !hasSignature) return false;
     if (config.required && !termsAccepted) return false;
-    if (config.required && isCivilStatus && (!oldCertVoidAccepted || !dataAccuracyAccepted))
-      return false;
+    if (config.required && requiresOldCertVoid && !oldCertVoidAccepted) return false;
+    if (config.required && isCivilStatus && !dataAccuracyAccepted) return false;
     return true;
-  }, [signature, config, hasSignature, termsAccepted, isCivilStatus, oldCertVoidAccepted, dataAccuracyAccepted]);
+  }, [signature, config, hasSignature, termsAccepted, isCivilStatus, requiresOldCertVoid, oldCertVoidAccepted, dataAccuracyAccepted]);
 
   // Notify parent of validation changes
   useEffect(() => {
@@ -346,24 +350,28 @@ export default function SignatureStep({ config, onValidChange }: SignatureStepPr
         </label>
       </div>
 
-      {/* Declarații suplimentare — doar stare civilă (naștere/căsătorie/celibat) */}
+      {/* Declarații suplimentare — doar stare civilă (naștere/căsătorie/celibat).
+          Anularea vechiului certificat NU se cere la extrasul multilingv:
+          extrasul nu înlocuiește originalul. */}
       {isCivilStatus && (
         <>
-          <div className="rounded-lg border bg-muted/20 p-4">
-            <label className={`flex items-start gap-3 group ${hasSignature ? 'cursor-pointer' : 'cursor-not-allowed opacity-60'}`}>
-              <Checkbox
-                checked={oldCertVoidAccepted}
-                disabled={!hasSignature}
-                onCheckedChange={(checked) =>
-                  hasSignature && updateConsent?.({ oldCertVoidAccepted: checked === true })
-                }
-                className="mt-0.5 shrink-0"
-              />
-              <span className="text-sm leading-relaxed text-neutral-700 group-hover:text-neutral-900">
-                <span className="text-red-500">*</span> Înțeleg și sunt de acord că, odată cu înregistrarea comenzii pentru emiterea unui nou certificat, documentul anterior își pierde valabilitatea (devine nul), chiar dacă este identificat ulterior, și trebuie distrus.
-              </span>
-            </label>
-          </div>
+          {requiresOldCertVoid && (
+            <div className="rounded-lg border bg-muted/20 p-4">
+              <label className={`flex items-start gap-3 group ${hasSignature ? 'cursor-pointer' : 'cursor-not-allowed opacity-60'}`}>
+                <Checkbox
+                  checked={oldCertVoidAccepted}
+                  disabled={!hasSignature}
+                  onCheckedChange={(checked) =>
+                    hasSignature && updateConsent?.({ oldCertVoidAccepted: checked === true })
+                  }
+                  className="mt-0.5 shrink-0"
+                />
+                <span className="text-sm leading-relaxed text-neutral-700 group-hover:text-neutral-900">
+                  <span className="text-red-500">*</span> Înțeleg și sunt de acord că, odată cu înregistrarea comenzii pentru emiterea unui nou certificat, documentul anterior își pierde valabilitatea (devine nul), chiar dacă este identificat ulterior, și trebuie distrus.
+                </span>
+              </label>
+            </div>
+          )}
 
           <div className="rounded-lg border bg-muted/20 p-4">
             <label className={`flex items-start gap-3 group ${hasSignature ? 'cursor-pointer' : 'cursor-not-allowed opacity-60'}`}>
@@ -401,11 +409,13 @@ export default function SignatureStep({ config, onValidChange }: SignatureStepPr
         </Alert>
       )}
       {showValidationError && hasSignature && termsAccepted && isCivilStatus &&
-        (!oldCertVoidAccepted || !dataAccuracyAccepted) && config.required && (
+        ((requiresOldCertVoid && !oldCertVoidAccepted) || !dataAccuracyAccepted) && config.required && (
         <Alert data-wizard-error>
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
-            Bifează ambele declarații suplimentare pentru a continua.
+            {requiresOldCertVoid
+              ? 'Bifează ambele declarații suplimentare pentru a continua.'
+              : 'Bifează declarația privind corectitudinea datelor pentru a continua.'}
           </AlertDescription>
         </Alert>
       )}
