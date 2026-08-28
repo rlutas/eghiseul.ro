@@ -77,6 +77,10 @@ Setare: **Admin → Setări → Curieri → „Predare colete Sameday (easybox)"
 dacă livrarea aleasă de client e acasă (service 7) sau în easybox (service 15 + `oohLastMile`).
 Cod: `src/lib/admin/sameday-dropoff.ts` + `sameday.ts` (`createAWB`).
 
+**Status: ACTIVĂ din 28.08.2026** — `{enabled: true, oohId: "2556"}` = Easybox Centrul Comercial
+Someșul (C. Coposu 14, Satu Mare). Între 17–28.08 setarea NU exista în DB (checklist nebifat),
+deci AWB-urile ieșeau în continuare cu ridicare de la sediu — ăsta era „bug-ul" resemnalat pe 28.08.
+
 Verificat live pe `api.sameday.ro` (2026-08-17), `POST /api/awb/estimate-cost`:
 
 | Test | Rezultat |

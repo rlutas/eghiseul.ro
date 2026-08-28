@@ -47,9 +47,22 @@ preț mai mic**. Dacă economia e reală, vine din contract (ridicarea de la sed
 
 ## De făcut
 
-- [ ] Alege easybox-ul de predare din Setări → Curieri (Satu Mare: `1012` OMV Coandă, `308` MOL Satu Mare)
+- [x] Alege easybox-ul de predare din Setări → Curieri — **făcut abia pe 28.08** (vezi mai jos)
 - [ ] La primul AWB emis cu setarea activă, verifică pe eticheta Sameday că apare predarea în easybox
 - [ ] Verifică pe factura următoare dacă dispare/scade linia de ridicare
+
+## Follow-up 28.08 — setarea nu fusese niciodată activată
+
+Semnalat din nou: AWB Sameday generat din platformă iese tot cu „Un curier a fost
+alocat pentru ridicarea coletelor". Verificat: codul e corect, dar cheia
+`sameday_dropoff` **nu exista deloc** în `admin_settings` — checklist-ul de mai
+sus rămăsese nebifat din 17.08, deci `getSamedayDropoff()` întorcea `null` și
+fiecare AWB se emitea fără `oohFirstMile`.
+
+Activat pe 28.08 direct în DB, la alegerea lui Raul:
+`{enabled: true, oohId: "2556", name: "Easybox Centrul Comercial Someșul (C. Coposu 14, Satu Mare)"}`.
+De la următorul AWB Sameday, plicul se predă la easybox-ul Someșul — de bifat
+punctele 2 și 3 de mai sus la primul AWB/prima factură.
 
 ## Fix la scurt timp după livrare (aceeași zi)
 
