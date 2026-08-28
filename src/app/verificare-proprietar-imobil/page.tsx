@@ -3,12 +3,12 @@ import { buildPageMetadata, serviceUrl } from '@/lib/seo';
 import { ArticleLayout } from '@/components/articole/article-layout';
 
 const SLUG = 'verificare-proprietar-imobil';
-const TITLE = 'Cum Afli Cine e Proprietarul unui Imobil (după Adresă sau CF)';
+const TITLE = 'Cum afli cine e proprietarul unui imobil (după adresă sau CF)';
 const DESCRIPTION =
-  'Singura metodă oficială care îți arată numele proprietarului este extrasul de carte funciară — și îl poate cere oricine, e legal. ' +
+  'Singura metodă oficială care îți arată numele proprietarului este extrasul de carte funciară, și îl poate cere oricine, legal. ' +
   'Cum verifici proprietarul unui apartament sau teren, chiar dacă ai doar adresa.';
 const DATE_PUBLISHED = '2026-07-17';
-const DATE_MODIFIED = '2026-07-17';
+const DATE_MODIFIED = '2026-08-28';
 
 export const revalidate = 86400;
 
@@ -29,7 +29,7 @@ export default function Page() {
       datePublished={DATE_PUBLISHED}
       dateModified={DATE_MODIFIED}
       publishedLabel="17 iulie 2026"
-      updatedLabel="17 iulie 2026"
+      updatedLabel="28 august 2026"
       relatedServices={[
         {
           slug: 'extras-carte-funciara',
@@ -50,7 +50,7 @@ export default function Page() {
       faqs={[
         {
           q: 'Cum aflu cine este proprietarul unui imobil?',
-          a: 'Din extrasul de carte funciară pentru informare — singurul document oficial care arată numele proprietarului actual, plus ipotecile și sarcinile. Îl poate cere oricine, pentru orice imobil înscris în cartea funciară. Ai nevoie de numărul de carte funciară sau de numărul cadastral; dacă ai doar adresa, se face întâi o identificare a imobilului.',
+          a: 'Din extrasul de carte funciară pentru informare, singurul document oficial care arată numele proprietarului actual, plus ipotecile și sarcinile. Îl poate cere oricine, pentru orice imobil înscris în cartea funciară. Ai nevoie de numărul de carte funciară sau de numărul cadastral; dacă ai doar adresa, se face întâi o identificare a imobilului.',
         },
         {
           q: 'Pot afla proprietarul doar după adresă?',
@@ -62,15 +62,15 @@ export default function Page() {
         },
         {
           q: 'Cât costă să afli proprietarul unui imobil?',
-          a: 'Extrasul de informare este gratuit prin platforma MyTerra a ANCPI, dacă ai cont cu identitate verificată (ROeID, semnătură electronică sau drum la ghișeu). Fără cont, un serviciu online ți-l eliberează în câteva minute contra unei taxe — la eGhișeul, 89 lei cu tot cu taxe. Identificarea după adresă e serviciu separat.',
+          a: 'Extrasul de informare este gratuit prin platforma MyTerra a ANCPI, dacă ai cont cu identitate verificată (ROeID, semnătură electronică sau drum la ghișeu). Fără cont, un serviciu online ți-l eliberează în câteva minute contra unei taxe; la eGhișeul, 89 lei cu tot cu taxe. Identificarea după adresă e serviciu separat.',
         },
         {
           q: 'Terenul nu are carte funciară. Cum aflu al cui e?',
-          a: 'Dacă imobilul nu a fost niciodată înscris în cartea funciară (cadastru nefinalizat), nu există o evidență centralizată cu proprietarul. Rămân registrul agricol de la primărie (acces limitat, de regulă doar cu interes dovedit), actele vechi de proprietate și, practic, discuția cu vecinii. Verifică întâi dacă există CF — multe terenuri au fost înscrise prin programul național de cadastru.',
+          a: 'Dacă imobilul nu a fost niciodată înscris în cartea funciară (cadastru nefinalizat), nu există o evidență centralizată cu proprietarul. Rămân registrul agricol de la primărie (acces limitat, de regulă doar cu interes dovedit), actele vechi de proprietate și, practic, discuția cu vecinii. Verifică întâi dacă există CF, pentru că multe terenuri au fost înscrise prin programul național de cadastru.',
         },
         {
           q: 'Pot vedea toate proprietățile unei persoane?',
-          a: 'Da — căutarea inversă, de la persoană la imobile, există ca serviciu ANCPI de identificare a imobilelor după numele proprietarului (163,64 lei + TVA, același tarif ca identificarea după adresă). Primești cărțile funciare găsite pe numele respectiv, apoi poți comanda extrasul pentru oricare dintre ele.',
+          a: 'Da. Căutarea inversă, de la persoană la imobile, există ca serviciu ANCPI de identificare a imobilelor după numele proprietarului (163,64 lei + TVA, același tarif ca identificarea după adresă). Primești cărțile funciare găsite pe numele respectiv, apoi poți comanda extrasul pentru oricare dintre ele.',
         },
         {
           q: 'Sistemele ANCPI sunt picate. Mai pot verifica proprietarul?',
@@ -79,14 +79,14 @@ export default function Page() {
       ]}
     >
       <p>
-        Răspunsul scurt: numele proprietarului unui imobil apare într-un singur document oficial —{' '}
-        <strong>extrasul de carte funciară pentru informare</strong>. Îl poate cere oricine, pentru
+        Răspunsul scurt: numele proprietarului unui imobil apare într-un singur document oficial:
+        extrasul de carte funciară pentru informare. Îl poate cere oricine, pentru
         orice apartament sau teren înscris în cartea funciară, fără să justifice vreun motiv. Ai
         nevoie doar de numărul de carte funciară sau de cel cadastral; dacă ai doar adresa, se
         rezolvă și asta, cu un pas în plus.
       </p>
       <p>
-        Mai jos ai toate metodele, cu ce arată fiecare, cât costă și unde te blochezi — plus partea
+        Mai jos ai toate metodele, cu ce arată fiecare, cât costă și unde te blochezi, plus partea
         legală, pentru că întrebarea „am voie să verific?” apare de fiecare dată.
       </p>
 
@@ -112,14 +112,14 @@ export default function Page() {
       </p>
       <ul>
         <li>
-          <strong>Gratuit, prin MyTerra</strong> — platforma ANCPI eliberează extrasul de informare
-          fără taxă din iunie 2025, cu condiția să ai cont cu identitatea verificată. Dacă nu ai
-          ROeID sau semnătură electronică, verificarea înseamnă drum la ghișeu. Am scris{' '}
+          Gratuit, prin MyTerra: platforma ANCPI eliberează extrasul de informare fără taxă din
+          iunie 2025, cu condiția să ai cont cu identitatea verificată. Dacă nu ai ROeID sau
+          semnătură electronică, verificarea înseamnă drum la ghișeu. Am scris{' '}
           <Link href="/extras-carte-funciara-gratuit/">un ghid separat despre varianta gratuită</Link>{' '}
           și limitele ei.
         </li>
         <li>
-          <strong>Plătit, fără cont</strong> — prin{' '}
+          Plătit, fără cont: prin{' '}
           <Link href={serviceUrl('extras-carte-funciara')}>serviciul nostru de extras de carte funciară</Link>{' '}
           documentul se eliberează automat în câteva minute, la orice oră, 89 lei cu taxe incluse.
           Același extras oficial ANCPI, cu semnătură electronică.
@@ -128,7 +128,7 @@ export default function Page() {
 
       <h2>Metoda 2: ai doar adresa</h2>
       <p>
-        Aici se împiedică majoritatea. Sistemul ANCPI nu caută după „strada X nr. 5” — caută după
+        Aici se împiedică majoritatea. Sistemul ANCPI nu caută după „strada X nr. 5”, ci după
         numărul de carte funciară. Așa că procesul are doi pași: întâi{' '}
         <Link href={serviceUrl('identificare-imobil')}>identificarea imobilului după adresă</Link>,
         care îți dă numărul de CF și numărul cadastral, apoi extrasul pe numărul găsit.
@@ -136,31 +136,23 @@ export default function Page() {
       <p>
         Un caz aparte sunt apartamentele: blocul are o carte funciară colectivă, iar fiecare
         apartament are cartea lui individuală. Proprietarul apartamentului apare în CF-ul
-        individual — detalii în{' '}
+        individual; detalii în{' '}
         <Link href="/totul-despre-cartea-funciara-colectiva/">ghidul despre cartea funciară colectivă</Link>.
       </p>
 
       <h2>Ce NU îți arată proprietarul (dar pare că ar trebui)</h2>
-      <ul>
-        <li>
-          <strong>Geoportalul ANCPI</strong> — harta publică de pe geoportal.ancpi.ro arată
-          conturul parcelelor și, unde există, numărul cadastral. Atât. Numele proprietarului nu
-          apare nicăieri pe geoportal, oricât ai da zoom. E util doar ca prim pas, ca să vezi dacă
-          imobilul e cadastrat.
-        </li>
-        <li>
-          <strong>Primăria și taxele locale</strong> — direcția de taxe știe cine plătește
-          impozitul, dar nu îți dă informația: datele fiscale sunt protejate și nu țin loc de
-          evidență de proprietate. Cine plătește impozitul nu e neapărat proprietarul.
-        </li>
-        <li>
-          <strong>Asociația de proprietari sau vecinii</strong> — afli un nume, poate chiar cel
-          corect. Dar pentru orice pas juridic (ofertă de cumpărare, notificare, proces) îți
-          trebuie numele din cartea funciară, nu cel din auzite.
-        </li>
-      </ul>
+      <p>
+        Geoportalul ANCPI, harta publică de pe geoportal.ancpi.ro, arată conturul parcelelor și,
+        unde există, numărul cadastral. Atât. Numele proprietarului nu apare nicăieri pe geoportal,
+        oricât ai da zoom; e util doar ca prim pas, ca să vezi dacă imobilul e cadastrat. Primăria
+        și direcția de taxe știu cine plătește impozitul, dar nu îți dau informația: datele fiscale
+        sunt protejate și nu țin loc de evidență de proprietate, iar cine plătește impozitul nu e
+        neapărat proprietarul. Iar de la asociația de proprietari sau de la vecini afli un nume,
+        poate chiar cel corect, dar pentru orice pas juridic (ofertă de cumpărare, notificare,
+        proces) îți trebuie numele din cartea funciară, nu cel din auzite.
+      </p>
 
-      <h2>E legal? Da — și e chiar scopul cărții funciare</h2>
+      <h2>E legal? Da, e chiar scopul cărții funciare</h2>
       <p>
         Codul civil, articolul 883: orice persoană poate cerceta cartea funciară,{' '}
         <em>fără a fi ținută să justifice vreun interes</em>. Cartea funciară e registru public
@@ -174,20 +166,23 @@ export default function Page() {
       </p>
 
       <h2>Comparația pe scurt</h2>
-      <ul>
-        <li><strong>Extras CF de informare:</strong> arată proprietarul — da, cu nume complet · oficial · gratuit cu cont MyTerra sau 89 lei fără cont, în câteva minute.</li>
-        <li><strong>Identificare imobil după adresă:</strong> nu arată proprietarul direct, îți dă numărul de CF · pasul obligatoriu când ai doar adresa.</li>
-        <li><strong>Geoportal ANCPI:</strong> gratuit, fără cont · doar contur și număr cadastral, fără nume.</li>
-        <li><strong>Identificare după numele proprietarului:</strong> căutarea inversă — afli ce imobile sunt înscrise pe o persoană · 163,64 lei + TVA, prin <Link href="/comanda/identificare-imobile-proprietar/">același serviciu de identificare</Link>.</li>
-        <li><strong>Primărie / taxe locale:</strong> nu eliberează date despre proprietar.</li>
-        <li><strong>Registrul agricol:</strong> doar pentru terenuri neînscrise în CF, acces limitat, la primărie.</li>
-      </ul>
+      <p>
+        Extrasul CF de informare e singurul care arată proprietarul cu nume complet: oficial,
+        gratuit cu cont MyTerra sau 89 lei fără cont, în câteva minute. Identificarea imobilului
+        după adresă nu arată proprietarul direct, ci îți dă numărul de CF; e pasul obligatoriu când
+        ai doar adresa. Geoportalul ANCPI e gratuit și fără cont, dar afișează doar conturul și
+        numărul cadastral, fără nume. Căutarea inversă, adică identificarea după numele
+        proprietarului, îți spune ce imobile sunt înscrise pe o persoană (163,64 lei + TVA, prin{' '}
+        <Link href="/comanda/identificare-imobile-proprietar/">același serviciu de identificare</Link>).
+        Primăria și taxele locale nu eliberează date despre proprietar, iar registrul agricol
+        acoperă doar terenurile neînscrise în CF, cu acces limitat, la primărie.
+      </p>
 
       <h2>Dacă imobilul nu are carte funciară</h2>
       <p>
         Se întâmplă încă des la terenuri agricole și în sate unde cadastrul sistematic nu s-a
         finalizat. Fără înscriere în cartea funciară nu există o evidență centralizată a
-        proprietarului — rămân registrul agricol de la primărie, actele vechi (titluri de
+        proprietarului. Rămân registrul agricol de la primărie, actele vechi (titluri de
         proprietate, certificate de moștenitor) și memoria locului. Merită totuși verificat întâi
         dacă există CF: programul național de cadastru a înscris multe zone în ultimii ani, iar o{' '}
         <Link href={serviceUrl('identificare-imobil')}>identificare după adresă</Link> îți spune
@@ -197,7 +192,7 @@ export default function Page() {
       <h2>Nota momentului: căderea ANCPI din iulie 2026</h2>
       <p>
         În perioada în care <Link href="/ancpi-nu-functioneaza/">sistemele ANCPI sunt picate</Link>{' '}
-        (atac cibernetic, revenire estimată 20 iulie), nimeni nu poate elibera extrase — nici
+        (atac cibernetic, revenire estimată 20 iulie), nimeni nu poate elibera extrase, nici
         ghișeul, nici MyTerra, nici intermediarii. Comenzile plasate la noi intră în coadă și se
         eliberează automat imediat ce sistemele revin, cu documentul trimis pe email.
       </p>

@@ -2,12 +2,12 @@ import { buildPageMetadata } from '@/lib/seo';
 import { ArticleLayout } from '@/components/articole/article-layout';
 
 const SLUG = 'anii-lucrati-in-strainatate-se-pun-la-pensie-in-romania';
-const TITLE = 'Anii Lucrați în Străinătate se Pun la Pensie în România?';
+const TITLE = 'Anii lucrați în străinătate se pun la pensie în România?';
 const DESCRIPTION =
   'Da, anii lucrați în străinătate (UE/SEE/Elveția) se iau în calcul la pensia din România. ' +
   'Vezi procedura de solicitare, totalizarea perioadelor de asigurare, calculul pro rata temporis și plata pensiei.';
 const DATE_PUBLISHED = '2024-01-01';
-const DATE_MODIFIED = '2026-06-16';
+const DATE_MODIFIED = '2026-08-28';
 
 export const revalidate = 86400;
 
@@ -28,138 +28,118 @@ export default function Page() {
       datePublished={DATE_PUBLISHED}
       dateModified={DATE_MODIFIED}
       publishedLabel="ianuarie 2024"
-      updatedLabel="16 iunie 2026"
+      updatedLabel="28 august 2026"
       relatedServices={[
         {
+          href: '/calculator/varsta-pensionare/',
+          label: 'Calculator vârstă de pensionare',
+          desc: 'Află când poți ieși la pensie după legea nouă.',
+        },
+        {
           href: '/tabel-varsta-pensionare-anticipata-femei/',
-          label: 'Tabel vârstă de pensionare anticipată — femei',
+          label: 'Tabel vârstă de pensionare anticipată pentru femei',
           desc: 'Vârsta de pensionare anticipată în funcție de stagiul de cotizare.',
         },
       ]}
       faqs={[
         {
           q: 'Anii lucrați în străinătate se pun la pensie în România?',
-          a: 'Da. Anii lucrați în străinătate se iau în calcul pentru stabilirea dreptului la pensie în România. Prin acordurile bilaterale și regulamentele europene, perioadele de muncă din alte state sunt recunoscute și contabilizate.',
+          a: 'Da. Pentru statele UE/SEE și Elveția, Regulamentul (CE) 883/2004 obligă la totalizarea perioadelor de asigurare: anii lucrați acolo se adună cu cei din România la stabilirea dreptului de pensie. Pentru alte state (Canada, Turcia, Coreea de Sud, Israel ș.a.) funcționează acordurile bilaterale de securitate socială.',
+        },
+        {
+          q: 'Primesc o singură pensie sau mai multe?',
+          a: 'Câte una din fiecare stat în care ai cotizat suficient. Fiecare stat plătește partea lui, calculată pro rata temporis, adică proporțional cu anii lucrați pe teritoriul lui. România nu îți plătește pensia pentru anii munciți în Germania; ți-o plătește Germania, iar România pe cei de acasă.',
         },
         {
           q: 'Unde depun cererea de pensionare dacă locuiesc în alt stat membru?',
-          a: 'Cererea de pensionare se depune la instituția de asigurări sociale de la locul de domiciliu. Aceasta coordonează procesul cu instituția competentă din România, astfel încât nu este nevoie să te deplasezi în România.',
-        },
-        {
-          q: 'Cum se calculează pensia pentru perioadele lucrate în mai multe state?',
-          a: 'Fiecare stat implicat calculează drepturile de pensie proporțional cu perioadele de asigurare realizate pe teritoriul său, aplicând principiul pro rata temporis. Se iau în considerare toate perioadele de asigurare realizate, prin totalizare.',
+          a: 'La instituția de pensii din statul unde locuiești. Ea devine „instituție de instrumentare” și trimite dosarul, prin sistemul electronic EESSI, către toate statele în care ai cotizat, inclusiv României. Nu trebuie să vii în țară pentru asta.',
         },
         {
           q: 'Ce documente sunt necesare pentru recunoașterea anilor lucrați în străinătate?',
-          a: 'Sunt necesare documente doveditoare ale perioadelor de activitate din România (carnet de muncă, adeverințe de vechime) și din străinătate, pentru a solicita revizuirea drepturilor de pensie.',
+          a: 'Pentru anii din România: carnetul de muncă și adeverințele de vechime. Pentru anii din străinătate: dovezile de asigurare de acolo (numărul de asigurat, fluturași, adeverințe de la angajatori sau de la instituția de pensii a statului respectiv). Perioadele se confirmă între instituții prin formulare standardizate, dar dosarul merge mult mai repede dacă vii cu actele tale.',
         },
         {
           q: 'Unde se plătește pensia?',
-          a: 'Pensia poate fi primită fie în România, fie în statul de domiciliu al beneficiarului, în funcție de preferințele acestuia. Pentru transferul pensiei în străinătate este necesară comunicarea detaliilor contului bancar.',
+          a: 'Unde vrei tu: în cont în România sau în contul din statul de domiciliu. Pensia din România se poate exporta în orice stat UE/SEE și în statele cu acord bilateral; comunici casei de pensii datele contului (IBAN) și moneda urmează regulile băncii tale.',
         },
       ]}
     >
-      <h2>Condiții de pensionare potrivit legislației în vigoare</h2>
       <p>
-        Conform noii legi a pensiilor, se propune o vârstă standard de pensionare de 65 de ani, atât pentru
-        femei, cât și pentru bărbați. Totuși, pensionarea anticipată poate fi solicitată cu cel mult cinci ani
-        înainte de împlinirea vârstei standard de pensionare, cu condiția realizării unui stagiu de cotizare de
-        cel puțin 9 ani peste stagiul complet de cotizare. De asemenea, pentru stabilirea dreptului la pensie,
-        sunt luați în considerare și anii lucrați în străinătate.
+        Răspunsul scurt: da. Dacă ai lucrat legal în alt stat UE, în SEE sau în Elveția, anii ăia
+        se adună cu cei din România la stabilirea dreptului de pensie. Nu e o favoare a casei de
+        pensii, e obligație din Regulamentul (CE) nr. 883/2004 privind coordonarea sistemelor de
+        securitate socială. Pentru state din afara UE, România are acorduri bilaterale cu efect
+        similar, printre care Canada, Turcia, Coreea de Sud, Israel, Macedonia de Nord și Serbia.
+      </p>
+      <p>
+        Ce nu se întâmplă, și aici se nasc cele mai multe confuzii: România nu îți plătește pensie
+        pentru anii lucrați afară. Fiecare stat plătește partea lui. Din Italia primești pensia
+        italiană pentru anii din Italia, din România pe cea pentru anii de acasă. Anii din
+        străinătate contează în România la un singur lucru, dar unul decisiv: îndeplinirea
+        condițiilor de stagiu.
       </p>
 
-      <h2>Procedura de solicitare a pensiei pentru cetățenii români care au lucrat în străinătate</h2>
-      <ol>
-        <li>
-          <strong>Depunerea cererii de pensionare:</strong> Cei care locuiesc pe teritoriul unui alt stat membru
-          trebuie să depună cererea de pensionare la instituția de asigurări sociale de la locul de domiciliu.
-          Instituția respectivă va coordona procesul cu instituția competentă din România, evitând astfel
-          necesitatea deplasării în România.
-        </li>
-        <li>
-          <strong>Prezentarea documentelor necesare:</strong> Printre actele necesare se numără documente
-          doveditoare ale perioadelor de activitate din România (carnet de muncă, adeverințe de vechime) și din
-          străinătate, pentru a solicita revizuirea drepturilor de pensie. Este crucială o bună colaborare între
-          instituțiile de securitate socială ale statelor implicate.
-        </li>
-        <li>
-          <strong>Comunicarea între instituții:</strong> Prin intermediul sistemului informatic EESSI pentru
-          statele UE/SEE/Elveția sau prin formulare bilingve pentru statele cu acorduri bilaterale, se asigură
-          schimbul de informații între instituțiile competente.
-        </li>
-        <li>
-          <strong>Calculul drepturilor de pensie:</strong> Fiecare stat implicat calculează drepturile de pensie
-          proporțional cu perioadele de asigurare realizate pe teritoriul său, aplicând principiul pro rata
-          temporis.
-        </li>
-        <li>
-          <strong>Emiterea deciziilor de pensie:</strong> Instituțiile competente emit decizii de pensie care
-          sunt comunicate beneficiarilor.
-        </li>
-      </ol>
-
-      <h2>Avantajele pensionării anticipate</h2>
-      <ul>
-        <li>
-          <strong>Reducerea vârstei standard de pensionare:</strong> Permite retragerea din activitate cu până la
-          cinci ani înainte de împlinirea vârstei standard de pensionare, oferind mai mult timp pentru activități
-          personale și relaxare.
-        </li>
-        <li>
-          <strong>Contabilizarea anilor lucrați în străinătate:</strong> Prin acordurile bilaterale și
-          regulamentele europene, anii lucrați în străinătate se pun la pensie, asigurând astfel o pensie mai
-          mare pentru cei care au lucrat și în alte țări.
-        </li>
-      </ul>
-
-      <h2>Dezavantajele pensionării anticipate</h2>
-      <ul>
-        <li>
-          <strong>Reducerea cuantumului pensiei:</strong> Pensia anticipată poate fi mai mică decât pensia pentru
-          limită de vârstă, din cauza reducerii vârstei de pensionare și a eventualelor perioade de cotizare mai
-          scurte, care afectează calculul pensiei în România.
-        </li>
-        <li>
-          <strong>Necesitatea unui stagiu complet de cotizare:</strong> Pentru a beneficia de pensionare
-          anticipată fără penalizare, este necesar să fi realizat un stagiu complet de cotizare de 35 de ani.
-        </li>
-      </ul>
-
-      <h2>Coordonarea între statele membre și acordurile bilaterale</h2>
-      <p>Principiile fundamentale stabilite de regulamentele europene și acordurile bilaterale includ:</p>
-      <ul>
-        <li>
-          <strong>Egalitatea de tratament:</strong> Toți cetățenii statelor membre beneficiază de aceleași
-          drepturi și obligații în ceea ce privește securitatea socială.
-        </li>
-        <li>
-          <strong>Totalizarea perioadelor de asigurare:</strong> Se iau în considerare toate perioadele de
-          asigurare realizate atât în propriul stat, cât și în celelalte state membre.
-        </li>
-        <li>
-          <strong>Exportul prestațiilor:</strong> Pensia poate fi plătită în orice stat membru în care
-          beneficiarul are domiciliul.
-        </li>
-        <li>
-          <strong>Cooperarea administrativă:</strong> Instituțiile de securitate socială ale statelor membre
-          colaborează pentru a asigura drepturile beneficiarilor.
-        </li>
-      </ul>
-
-      <h2>Plata pensiei</h2>
+      <h2>Totalizarea: la ce ajută concret anii din străinătate</h2>
       <p>
-        Pensia poate fi primită fie în România, fie în statul de domiciliu al beneficiarului, în funcție de
-        preferințele acestuia. Pentru transferul pensiei în străinătate, este necesară comunicarea detaliilor
-        contului bancar.
+        Legea pensiilor (Legea 360/2023) cere un stagiu minim de cotizare de 15 ani ca să primești
+        pensie din sistemul românesc. Să zicem că ai 12 ani munciți în România și 20 în Spania. Doar
+        cu cei 12 ani românești n-ai avea drept de pensie aici. Prin totalizare, România numără
+        12 + 20 = 32 de ani la verificarea condiției de stagiu, deci dreptul există; plata rămâne
+        însă proporțională, adică România îți plătește pensie doar pentru cei 12 ani ai ei.
+      </p>
+      <p>
+        Același mecanism funcționează și la pensia anticipată: stagiul realizat în alte state
+        membre intră în calculul stagiului total care îți dă dreptul să te retragi mai devreme.
+        Vârsta standard rămâne cea din legea română (65 de ani, cu creșterea etapizată pentru
+        femei), iar condițiile de anticipată le poți verifica în{' '}
+        <a href="/calculator/varsta-pensionare/">calculatorul nostru de vârstă de pensionare</a>.
       </p>
 
-      <h2>Concluzii</h2>
+      <h2>Cum se calculează: pro rata temporis</h2>
       <p>
-        Anii lucrați în străinătate se pun la pensie în România, asigurând astfel recunoașterea și contabilizarea
-        perioadelor de muncă din străinătate. Acest proces, facilitat de acordurile bilaterale și regulamentele
-        europene, implică o strânsă colaborare între instituțiile de securitate socială ale statelor implicate
-        pentru a beneficia de pensia corectă. Este important ca beneficiarii să fie bine informați și să urmeze
-        procedurile corecte pentru a-și asigura drepturile de pensie.
+        Fiecare stat face două calcule. Întâi calculează pensia „națională”, doar după regulile și
+        anii lui. Apoi calculează pensia „teoretică”, ca și cum toți anii tăi, de peste tot, ar fi
+        fost lucrați la el, și din ea îți dă partea proporțională cu anii lucrați efectiv acolo.
+        Primești varianta mai avantajoasă. Asta e „pro rata temporis” din deciziile de pensie.
+      </p>
+      <p>
+        Practic: la 10 ani în România și 30 în Germania, România îți datorează aproximativ 10/40
+        din pensia teoretică românească, Germania 30/40 din cea germană, fiecare după propria
+        formulă de calcul. De aici și diferențele mari între cele două sume.
+      </p>
+
+      <h2>Unde depui cererea</h2>
+      <p>
+        Regula e simplă: depui o singură cerere, la instituția de pensii din statul unde locuiești.
+        Dacă locuiești în România, la casa teritorială de pensii; ea contactează instituțiile din
+        celelalte state prin sistemul electronic EESSI. Dacă locuiești în Germania, depui la
+        Deutsche Rentenversicherung și ea anunță România. Nu depui câte o cerere în fiecare țară și
+        nu trebuie să te deplasezi.
+      </p>
+      <p>
+        Pentru statele cu acorduri bilaterale (în afara UE), schimbul se face prin formulare
+        convenite între instituții, pe hârtie sau electronic, și durează de regulă mai mult decât
+        prin EESSI. Termenele reale de soluționare a unui dosar internațional se măsoară în luni,
+        uneori peste un an când un stat răspunde greu la confirmarea perioadelor.
+      </p>
+
+      <h2>Actele care fac diferența</h2>
+      <p>
+        Pentru anii românești: carnetul de muncă, adeverințele de vechime și, pentru perioada de
+        după 2001, datele sunt deja în sistemul caselor de pensii. Pentru anii din străinătate,
+        strânge de pe acum numărul de asigurat din fiecare țară, adeverințele de la angajatori și
+        orice extras de cont de asigurare emis de instituția de pensii de acolo. Instituțiile își
+        confirmă perioadele între ele, dar un dosar cu dovezi complete se soluționează vizibil mai
+        repede decât unul în care România așteaptă răspuns de la trei state.
+      </p>
+
+      <h2>Plata pensiei în străinătate</h2>
+      <p>
+        Pensia românească se exportă: o poți primi în contul tău din statul de domiciliu, în orice
+        țară UE/SEE și în statele cu acord bilateral. Comunici casei de pensii IBAN-ul, iar cursul
+        și comisioanele urmează regulile băncii. Reversul e la fel de valabil: pensiile din alte
+        state se pot plăti în România. Mulți pensionari întorși acasă primesc lunar două sau trei
+        pensii, fiecare de la statul unde au cotizat.
       </p>
     </ArticleLayout>
   );
