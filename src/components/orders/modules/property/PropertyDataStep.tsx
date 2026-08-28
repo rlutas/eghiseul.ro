@@ -207,6 +207,14 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
   // itself — no cadastral/topografic disambiguation needed.
   const isElectronicUnit = /^\d{1,7}-C\d+-U\d+$/.test(normalizeCf(property?.carteFunciara ?? ''));
 
+  // Extras de plan cadastral: OCPI îl eliberează DOAR pentru teren (parcelă).
+  // Un CF de apartament (…-C1-U2) sau de construcție (…-C1) = respingere
+  // automată la OCPI, deci blocăm comanda din start, cu mesaj clar — singura
+  // excepție de la principiul „warn, don't block" al checkCf.
+  const isLandOnlyService = state.serviceSlug === 'extras-plan-cadastral';
+  const landOnlyBlocked =
+    isLandOnlyService && /-C\d+(-U\d+)?$/.test(normalizeCf(property?.carteFunciara ?? ''));
+
   // ── Multi-imobil ("Adaugă un extras") — all in the SAME county (ANCPI rule) ──
   const additional = property?.additionalImobile ?? [];
   const setAdditional = useCallback(
@@ -271,6 +279,8 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
     if (config.fields.cadastral.required && !property.cadastral) return false;
     if (config.fields.carteFunciara.required && !property.carteFunciara) return false;
     if (!conventieDataComplete) return false;
+    // Plan cadastral pe apartament/construcție = respingere automată OCPI.
+    if (landOnlyBlocked) return false;
 
     const hasIdentifier = !!(property.cadastral || property.carteFunciara);
     const hasAddress = !!property.propertyAddress?.trim();
@@ -285,7 +295,7 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
     }
 
     return true;
-  }, [property, config, conventieDataComplete]);
+  }, [property, config, conventieDataComplete, landOnlyBlocked]);
 
   // Notify parent of validation changes
   useEffect(() => {
@@ -439,7 +449,18 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
                   arată ca <code className="bg-neutral-100 px-1 rounded">123456-C1-U2</code>) — extrasul
                   se emite exact pe el, fără risc de confuzie.
                 </p>
-                {isColectivService && cfCheck.status === 'collective' ? (
+                {landOnlyBlocked ? (
+                  <Alert variant="destructive" data-wizard-error className="py-2">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription className="text-xs">
+                      Extrasul de plan cadastral se eliberează <strong>doar pentru teren (parcelă)</strong>.
+                      Numărul introdus ({normalizeCf(property.carteFunciara)}) este al unui{' '}
+                      {isElectronicUnit ? 'apartament (unitate individuală)' : 'ansamblu de construcție'} —
+                      OCPI respinge automat astfel de cereri. Introdu numărul cărții funciare a terenului
+                      (doar cifre, ex. 123456).
+                    </AlertDescription>
+                  </Alert>
+                ) : isColectivService && cfCheck.status === 'collective' ? (
                   <p className="text-xs text-green-600">
                     ✓ Format corect — vei primi extrasul CF colectiv pentru întreaga clădire
                   </p>
@@ -474,7 +495,7 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
                   the worker matches it against BOTH ePay columns.
                   HIDDEN when the CF is already an electronic UNIT identifier
                   (123456-C1-U2) — that pinpoints the apartment by itself. */}
-              {isElectronicUnit || (isColectivService && cfCheck.status === 'collective') ? (
+              {landOnlyBlocked ? null : isElectronicUnit || (isColectivService && cfCheck.status === 'collective') ? (
                 <p className="text-xs text-green-700 bg-green-50 border border-green-200 rounded-lg px-3 py-2">
                   {isElectronicUnit
                     ? '✓ Ai introdus numărul electronic al unității — identifică exact apartamentul, nu mai e nevoie de alte numere.'
@@ -877,7 +898,9 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
         <Alert data-wizard-error>
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
-            {conventie?.enabled && !conventieDataComplete
+            {landOnlyBlocked
+              ? 'Extrasul de plan cadastral se eliberează doar pentru teren — introdu numărul CF al terenului (doar cifre), nu al apartamentului sau construcției.'
+              : conventie?.enabled && !conventieDataComplete
               ? 'Completează numele, domiciliul, CNP-ul și seria/numărul actului de identitate ale proprietarului — apar în angajamentul de execuție pe care îl semnezi la pasul următor.'
               : config.identificationService.enabled
                 ? 'Completează județul, localitatea și adresa imobilului (sau numărul cadastral / CF, dacă îl știi).'
