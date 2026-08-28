@@ -164,6 +164,14 @@ interface ServiceDeliveryConfig {
 
 ### 2.3 Romania Delivery - Address & Pricing
 
+> **Telefon destinatar RO (28.08.2026):** Fan Courier și Sameday anunță livrarea
+> doar pe numere românești. Dacă telefonul din pasul Contact nu e un număr RO
+> valid (client diaspora), pasul de livrare cere obligatoriu un „Telefon
+> destinatar în România" (validat cu libphonenumber-js, country === 'RO'),
+> salvat E.164 în `delivery.address.recipientPhone` — sursa preferată de
+> `generate-awb`. Server-side, `generate-awb` refuză cu 400 orice AWB domestic
+> al cărui telefon rezolvat nu e număr RO valid (acoperă comenzile vechi).
+
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
 │          LIVRARE ROMÂNIA - Fan Courier                                   │
