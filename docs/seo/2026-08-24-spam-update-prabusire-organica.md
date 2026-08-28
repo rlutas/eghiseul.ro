@@ -110,3 +110,22 @@ a schimba paginile.
 - blog.on-page.ai/august-2026-spam-update/ (cele 14 politici, cazul site-ului
   de calculatoare, „recovery is measured in months, across refreshes")
 - keywordseverywhere.com/news/google-algorithm-updates/august-2026-spam-update/
+
+## Checkpoint 28.08 (GSC export, date până la 26.08)
+
+Site întreg, pe zile: 21.08 = 573 clicuri / 4.266 expuneri; 22.08 = 416/2.640
+(fundul); 24–26.08 = 682–731 clicuri / ~4.300–4.500 expuneri pe zi. CTR 15–16%
+= se servesc doar calculatoarele + brandul.
+
+**Clusterul /servicii/ pe zile (filtrat în GSC):** 20.08 = 146 clicuri/5.658
+expuneri → 21.08 = 7/178 → 22.08 = 2/69 → 23–26.08 = **9–10 clicuri /
+99–172 expuneri pe zi, PLAT**. Nicio revenire pe servicii; pozițiile pe
+interogările rămase: 7–10 (față de 1–3 înainte).
+
+Comenzi plătite (DB): 14–20/zi înainte → 0–6/zi după; 27.08 = **0**.
+
+**Stadiu remediere:** din planul de mai sus s-a livrat DOAR primul lot
+(24.08: 3 articole rescrise + coada tăiată din ghidul constatator + 301 pe
+duplicatul CF colectivă). Restul listei (articole >10/1k, cele 16 pagini de
+locație cazier) — NEATINS între 25–28.08. Fără schimbarea paginilor, refresh-ul
+SpamBrain nu are ce re-evalua; platoul e cel așteptat.
