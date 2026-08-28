@@ -44,7 +44,8 @@ export type StatusTabValue =
   | 'shipped'
   | 'completed'
   | 'abandoned'
-  | 'standby';
+  | 'standby'
+  | 'on_hold';
 
 export interface StatusTab {
   value: StatusTabValue;
@@ -67,6 +68,10 @@ export const STATUS_TABS: StatusTab[] = [
   // cerute). Apar DOAR aici, nu și în „În procesare" (excluse din
   // PROCESSING_GROUP) — vederea dedicată pentru follow-up.
   { value: 'standby', label: 'Așteptare client', countKey: 'standby' },
+  // Blocate de instituție (ANCPI picat, registru inaccesibil) — pauză care nu
+  // e din vina clientului; separat de standby ca echipa/topograful să distingă
+  // „așteptăm clientul" de „așteptăm instituția" (28.08.2026).
+  { value: 'on_hold', label: 'Blocat instituție', countKey: 'on_hold' },
 ];
 
 export interface OrdersCounts {
@@ -77,6 +82,7 @@ export interface OrdersCounts {
   completed: number;
   abandoned: number;
   standby: number;
+  on_hold: number;
   test_only: number;
   // Quick-filter chip badges ("Filtre rapide")
   overdue: number;
@@ -125,6 +131,8 @@ export function resolveStatusFilter(tab: string | null | undefined): StatusFilte
       return { eq: 'completed' };
     case 'standby':
       return { eq: 'standby' };
+    case 'on_hold':
+      return { eq: 'on_hold_institution' };
     case 'abandoned':
       // "Neplătite" tab — draft + pending + abandoned (all incomplete/unpaid).
       return { in: HIDDEN_FROM_DEFAULT };

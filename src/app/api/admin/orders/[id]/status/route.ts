@@ -52,7 +52,13 @@ const VALID_STATUSES = new Set([
   'cancellation_requested',
   'refunded',
   'standby',
+  'on_hold_institution',
 ]);
+
+// Statuses that pause the SLA clock. Both use the same standby_* columns —
+// the clock measures "paused", regardless of WHO we're waiting on (client vs
+// institution).
+const PAUSED_STATUSES = new Set(['standby', 'on_hold_institution']);
 
 interface RouteContext {
   params: Promise<{ id: string }>;
@@ -128,11 +134,11 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
     let auditEventType: string = 'status_changed';
     let standbyInfo: { pausedSeconds: number; pausedBusinessDays: number } | null = null;
 
-    if (newStatus === 'standby' && prevStatus !== 'standby') {
+    if (PAUSED_STATUSES.has(newStatus) && !PAUSED_STATUSES.has(prevStatus)) {
       const r = enterStandby();
       updates.standby_started_at = r.standby_started_at;
       auditEventType = 'standby_started';
-    } else if (prevStatus === 'standby' && newStatus !== 'standby') {
+    } else if (PAUSED_STATUSES.has(prevStatus) && !PAUSED_STATUSES.has(newStatus)) {
       const o = orderData;
       if (o.standby_started_at) {
         const result = exitStandby({

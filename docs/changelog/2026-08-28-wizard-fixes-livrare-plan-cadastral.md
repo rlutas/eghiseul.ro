@@ -48,3 +48,24 @@ Fix în `PropertyDataStep.tsx`, doar pe slug `extras-plan-cadastral`: un CF care
 sub input + mesaj în sumarul de validare: „introdu numărul CF al terenului (doar cifre)".
 E singura excepție de la principiul „warn, don't block" al `checkCf` — aici respingerea
 OCPI e certă, nu doar probabilă. Celelalte servicii cadastrale rămân neblocate.
+
+## 5. Status nou: „Blocat — instituție indisponibilă" (`on_hold_institution`)
+
+Mircea (pe grup): lucrările pe care NU le poate onora acum (ANCPI picat, registrul
+proprietarilor inaccesibil) rămâneau pe „Plătită" și se amestecau cu cele lucrabile —
+„nu pot să îi dau nimic": `standby` înseamnă „lipsesc informații de la CLIENT" (cere
+notă despre client), iar restul statusurilor lui sunt flux normal. Nu era bug de select.
+
+Livrat (migrarea 150, RULATĂ):
+- status nou `on_hold_institution` în CHECK-ul `orders_status_check`;
+- **SLA pauzat** exact ca la standby (aceleași coloane `standby_started_at` /
+  `standby_total_seconds`) — și în ruta de admin, și în cea de colaborator;
+  bonus fix: ruta de colaborator NU pauza SLA nici la standby până acum;
+- **admin**: opțiune în „Actualizează Status" (grup special, cu avertismentul de SLA),
+  badge roșu „Blocat instituție", tab dedicat în /admin/orders (separat de „Așteptare
+  client"), banner SLA pe detaliu, exclus din alertele overdue/deadline;
+- **portal colaborator**: opțiune nouă în „Schimbă statusul comenzii" („Blocată —
+  instituția indisponibilă"), fără notă obligatorie; listă: etapă nouă
+  „Blocate/așteptare" (on_hold + standby), scoase din „De depus";
+- **client** (/comanda/status): „În așteptare — instituția emitentă e momentan
+  indisponibilă".

@@ -15,6 +15,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { requireCollaboratorForOrder } from '@/lib/admin/permissions';
 import { resolveCollaboratorContext } from '@/lib/admin/collaborator-context';
+import { enterStandby, exitStandby } from '@/lib/orders/standby';
 
 /** Statuses the collaborator may set, with the reason each exists for him. */
 // NOT exported: route files may only export HTTP handlers (Next.js constraint);
@@ -23,9 +24,13 @@ const COLLABORATOR_STATUSES = [
   'processing', // o ia (înapoi) în lucru
   'submitted_to_institution', // depusă la OCPI (fără cost/nr — pentru corecții)
   'standby', // lipsesc informații de la client — SLA pauzat, echipa contactează
+  'on_hold_institution', // blocat de ANCPI/registru — SLA pauzat, nu e vina clientului
   'document_ready', // documentul e eliberat (ex. încărcat pe altă cale)
   'completed', // lucrare închisă
 ] as const;
+
+// Ambele pauzează SLA pe aceleași coloane standby_* (vezi ruta de admin).
+const PAUSED_STATUSES = ['standby', 'on_hold_institution'];
 
 /**
  * He can never touch an order whose money side is settled or in dispute, nor
@@ -97,7 +102,7 @@ export async function POST(
 
     const { data: order } = await admin
       .from('orders')
-      .select('id, status')
+      .select('id, status, standby_started_at, standby_total_seconds, estimated_completion_date')
       .eq('id', orderId)
       .single();
     if (!order) {
@@ -123,9 +128,31 @@ export async function POST(
       || 'colaborator';
 
     if (order.status !== status) {
+      // Pauza de SLA (aceeași mecanică precum în ruta de admin): intrarea
+      // într-un status de pauză pornește ceasul, ieșirea îl adună și decalează
+      // termenul cu zilele lucrătoare pauzate. Înainte (26-28.08) statusul se
+      // scria direct și pauza NU se înregistra — SLA curgea pe comenzi blocate.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const updates: Record<string, any> = { status, updated_at: new Date().toISOString() };
+      const wasPaused = PAUSED_STATUSES.includes(order.status);
+      const isPaused = PAUSED_STATUSES.includes(status);
+      if (isPaused && !wasPaused) {
+        updates.standby_started_at = enterStandby().standby_started_at;
+      } else if (wasPaused && !isPaused && order.standby_started_at) {
+        const result = exitStandby({
+          standby_started_at: order.standby_started_at,
+          standby_total_seconds: order.standby_total_seconds || 0,
+          estimated_completion_date: order.estimated_completion_date || null,
+        });
+        updates.standby_started_at = null;
+        updates.standby_total_seconds = result.standby_total_seconds;
+        if (result.estimated_completion_date !== order.estimated_completion_date) {
+          updates.estimated_completion_date = result.estimated_completion_date;
+        }
+      }
       const { error: updErr } = await admin
         .from('orders')
-        .update({ status, updated_at: new Date().toISOString() })
+        .update(updates)
         .eq('id', orderId);
       if (updErr) {
         console.error('[collaborator] status update error:', updErr.message);

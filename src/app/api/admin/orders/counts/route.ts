@@ -76,7 +76,7 @@ export async function GET(request: NextRequest) {
     };
 
     const [
-      allRes, paidRes, processingRes, shippedRes, completedRes, abandonedRes, standbyRes, testOnlyRes,
+      allRes, paidRes, processingRes, shippedRes, completedRes, abandonedRes, standbyRes, onHoldRes, testOnlyRes,
       overdueRes, deadlineSoonRes, withCouponRes, extraPendingRes,
       stageDocsRes, stageSubmittedRes, stageReceivedRes,
       stageTradusRes, stageLegalizatRes, stageApostilaNotariRes, stageApostilaHagaRes,
@@ -92,6 +92,8 @@ export async function GET(request: NextRequest) {
         buildQuery().filter('status', 'in', hiddenList),
         // "Așteptare client" — parked orders waiting on the customer.
         buildQuery().eq('status', 'standby'),
+        // "Blocat instituție" — parked because ANCPI/OCPI/registry is down.
+        buildQuery().eq('status', 'on_hold_institution'),
         // test_only ignores the active testFilter and just counts sandbox rows
         // so the user knows how many are out there even when on "hide".
         adminClient
@@ -124,6 +126,7 @@ export async function GET(request: NextRequest) {
       completed: completedRes.count || 0,
       abandoned: abandonedRes.count || 0,
       standby: standbyRes.count || 0,
+      on_hold: onHoldRes.count || 0,
       test_only: testOnlyRes.count || 0,
       overdue: overdueRes.count || 0,
       deadline_soon: deadlineSoonRes.count || 0,

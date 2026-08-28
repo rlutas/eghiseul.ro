@@ -865,7 +865,7 @@ function DeadlineCell({
   const d = new Date(iso);
   const now = new Date();
   const inactive = [
-    'completed', 'refunded', 'cancelled', 'abandoned', 'cancellation_requested', 'standby', 'draft', 'pending',
+    'completed', 'refunded', 'cancelled', 'abandoned', 'cancellation_requested', 'standby', 'on_hold_institution', 'draft', 'pending',
   ].includes(status || '');
   const ms = d.getTime() - now.getTime();
   const days = Math.round(ms / 86_400_000);

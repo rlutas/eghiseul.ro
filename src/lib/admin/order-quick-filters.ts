@@ -23,6 +23,7 @@ const TERMINAL_OR_INACTIVE = [
   'abandoned',
   'cancellation_requested',
   'standby',
+  'on_hold_institution',
   'draft',
   'pending',
 ] as const;

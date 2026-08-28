@@ -31,6 +31,7 @@ export const STATUS_BADGES: Record<string, StatusBadge> = {
   eliberat_apostila_haga: { label: 'Apostilă Haga', variant: 'default', className: 'bg-purple-500 text-white' },
   delivered: { label: 'Livrată', variant: 'default', className: 'bg-green-600 text-white' },
   standby: { label: 'Așteptare client', variant: 'outline', className: 'border-amber-400 text-amber-800' },
+  on_hold_institution: { label: 'Blocat instituție', variant: 'outline', className: 'border-red-400 text-red-800' },
   cancellation_requested: { label: 'Anulare solicitată', variant: 'destructive' },
   kyc_pending: { label: 'KYC în așteptare', variant: 'outline' },
   kyc_approved: { label: 'KYC aprobat', variant: 'default', className: 'bg-green-600 text-white' },

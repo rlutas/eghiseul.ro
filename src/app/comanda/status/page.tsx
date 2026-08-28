@@ -64,6 +64,8 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; icon: typeof
 
   // Waiting on the customer (SLA paused) — set when the team requests documents
   standby: { label: 'Așteptăm documente de la tine', color: 'bg-orange-100 text-orange-800', icon: Upload },
+  // Paused because the issuing institution is unavailable (e.g. ANCPI outage)
+  on_hold_institution: { label: 'În așteptare — instituția emitentă e momentan indisponibilă', color: 'bg-amber-100 text-amber-800', icon: Clock },
 
   // Final statuses
   completed: { label: 'Finalizat', color: 'bg-green-100 text-green-800', icon: CheckCircle },

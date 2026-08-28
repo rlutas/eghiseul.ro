@@ -30,6 +30,10 @@ export const STATUS_OPTIONS: StatusOption[] = [
   { value: 'completed', label: 'Finalizată', group: 'normal' },
   // Special states — pause / customer-initiated cancel
   { value: 'standby', label: 'În așteptare client (SLA pauzat)', group: 'special' },
+  // Blocat de instituție (ANCPI picat, registru inaccesibil) — pauză care NU
+  // e din vina clientului; SLA pauzat la fel ca la standby. Setabil și de
+  // colaborator din portal (28.08.2026).
+  { value: 'on_hold_institution', label: 'Blocat — instituție indisponibilă (SLA pauzat)', group: 'special' },
   { value: 'cancellation_requested', label: 'Anulare solicitată', group: 'special' },
   // Terminal — money side already settled
   { value: 'cancelled', label: 'Anulată', group: 'terminal' },

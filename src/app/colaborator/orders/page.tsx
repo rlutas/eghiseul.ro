@@ -37,11 +37,14 @@ function propertyLocation(o: CollabOrder): string {
 }
 
 /** Grupele după care filtrează: unde e lucrarea în drumul ei. */
-type Etapa = 'toate' | 'de_depus' | 'depuse' | 'livrate';
+type Etapa = 'toate' | 'de_depus' | 'depuse' | 'blocate' | 'livrate';
 
 function etapaOf(status: string): Exclude<Etapa, 'toate'> {
   if (CERERE_DONE_STATUSES.includes(status as never)) return 'livrate';
   if (status === 'submitted_to_institution') return 'depuse';
+  // Parcate: blocate de instituție sau în așteptarea clientului — separate de
+  // „de depus" ca să nu se amestece cu lucrările efectiv lucrabile (28.08).
+  if (status === 'on_hold_institution' || status === 'standby') return 'blocate';
   return 'de_depus';
 }
 
@@ -166,6 +169,7 @@ export default function CollaboratorOrdersPage() {
             {([
               ['de_depus', 'De depus'],
               ['depuse', 'Depuse la OCPI'],
+              ['blocate', 'Blocate/așteptare'],
               ['livrate', 'Livrate'],
               ['toate', 'Toate'],
             ] as [Etapa, string][]).map(([value, label]) => (

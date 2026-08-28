@@ -298,6 +298,7 @@ const STATUS_CONFIG: Record<string, { label: string; variant: 'default' | 'secon
   cancelled: { label: 'Anulata', variant: 'destructive' },
   refunded: { label: 'Rambursata', variant: 'destructive' },
   standby: { label: 'In asteptare client', variant: 'default', className: 'bg-amber-500 text-white' },
+  on_hold_institution: { label: 'Blocat institutie', variant: 'default', className: 'bg-red-600 text-white' },
   cancellation_requested: { label: 'Anulare solicitata', variant: 'default', className: 'bg-red-500 text-white' },
   delivered: { label: 'Livrata', variant: 'default', className: 'bg-emerald-600 text-white' },
   abandoned: { label: 'Abandonata', variant: 'secondary' },
@@ -1231,15 +1232,18 @@ export default function AdminOrderDetailPage() {
 
       {/* Standby banner — shown when SLA is paused. Reminds operators that
           the deadline isn't ticking down. */}
-      {order.status === 'standby' && (
+      {(order.status === 'standby' || order.status === 'on_hold_institution') && (
         <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
           <div className="flex items-center gap-2 font-semibold">
             <RefreshCw className="h-4 w-4" />
-            SLA pauzat — comanda este în „standby”
+            {order.status === 'standby'
+              ? 'SLA pauzat — comanda este în „standby”'
+              : 'SLA pauzat — blocat de instituție (ANCPI/registru indisponibil)'}
           </div>
           <p className="mt-1 text-xs">
-            Termenul de livrare nu avansează. Folosește butonul „Forțează status” pentru a relua
-            comanda când blocajul cu clientul este rezolvat.
+            {order.status === 'standby'
+              ? 'Termenul de livrare nu avansează. Folosește butonul „Forțează status” pentru a relua comanda când blocajul cu clientul este rezolvat.'
+              : 'Termenul de livrare nu avansează. Reia comanda (alt status) când instituția redevine disponibilă.'}
           </p>
         </div>
       )}

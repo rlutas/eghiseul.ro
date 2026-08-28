@@ -100,7 +100,7 @@ export function UpdateStatusCard({
 
   const sameStatus = newStatus === currentStatus;
   const selected = STATUS_OPTIONS.find((o) => o.value === newStatus);
-  const isStandby = newStatus === 'standby';
+  const isStandby = newStatus === 'standby' || newStatus === 'on_hold_institution';
   const isTerminal = selected?.group === 'terminal';
 
   const apply = async () => {
@@ -177,8 +177,8 @@ export function UpdateStatusCard({
           <div className="flex items-start gap-2 rounded-md border border-amber-200 bg-amber-50 p-2.5 text-xs text-amber-900">
             <PauseCircle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
             <p>
-              SLA se pauzează cât timp comanda este în standby. La revenirea într-un alt status,
-              termenul de livrare se decalează cu zilele lucrătoare petrecute în pauză.
+              SLA se pauzează cât timp comanda stă în acest status. La revenirea într-un alt
+              status, termenul de livrare se decalează cu zilele lucrătoare petrecute în pauză.
             </p>
           </div>
         )}

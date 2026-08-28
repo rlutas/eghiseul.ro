@@ -88,6 +88,7 @@ export async function GET() {
       'shipped',
       'delivered',
       'standby',
+      'on_hold_institution',
       'in_progress',
       'completed',
     ];

@@ -46,6 +46,7 @@ const STATUS_CHOICES: { value: string; label: string; needsNote?: boolean }[] = 
   { value: 'processing', label: 'În lucru (în procesare)' },
   { value: 'submitted_to_institution', label: 'Depusă la OCPI (trimis instituție)' },
   { value: 'standby', label: 'Problemă — necesare informații de la client', needsNote: true },
+  { value: 'on_hold_institution', label: 'Blocată — instituția indisponibilă (nu pot lucra acum)' },
   { value: 'document_ready', label: 'Documentul este eliberat' },
   { value: 'completed', label: 'Finalizată' },
 ];
