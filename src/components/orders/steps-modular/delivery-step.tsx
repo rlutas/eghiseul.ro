@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback, useRef } from 'react';
+import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -45,6 +45,17 @@ import {
   deriveIntlProvider,
   derivePhysicalRegion,
 } from '@/lib/delivery/international-delivery';
+import { parsePhoneNumberFromString } from 'libphonenumber-js';
+
+// Fan Courier și Sameday sună/trimit SMS doar către numere românești — AWB-ul
+// domestic are nevoie de un număr RO valid. `parse` + check pe country (nu
+// `isValidPhoneNumber(value, 'RO')`): acela ar accepta orice număr străin
+// scris cu prefix internațional (+49...), fiindcă prefixul bate default-ul.
+function isRomanianPhone(value: string | undefined | null): boolean {
+  if (!value) return false;
+  const parsed = parsePhoneNumberFromString(value, 'RO');
+  return !!parsed && parsed.country === 'RO' && parsed.isValid();
+}
 
 // Romanian counties (sorted)
 const COUNTIES = [
@@ -280,6 +291,20 @@ export function DeliveryStepModular({ onValidChange }: DeliveryStepProps) {
     // selection on every remount and dead-ended the step (E-260716-RAFUG).
     derivePhysicalRegion(delivery.method, delivery.courierProvider, delivery.methodName)
   );
+
+  // Livrare domestică cu telefon de contact străin (diaspora care trimite
+  // documentul cuiva din țară): cerem separat un număr RO de destinatar.
+  // Se salvează în address.recipientPhone — generate-awb îl preferă oricum
+  // peste contact.phone.
+  const contactPhoneIsRo = isRomanianPhone(state.contact?.phone);
+  const [roPhone, setRoPhone] = useState(delivery.address?.recipientPhone || '');
+  const isRoPhoneValid = isRomanianPhone(roPhone);
+  const roPhoneE164 = useMemo(() => {
+    const parsed = parsePhoneNumberFromString(roPhone, 'RO');
+    return parsed && parsed.country === 'RO' && parsed.isValid() ? parsed.number : roPhone;
+  }, [roPhone]);
+  const needsRoPhone =
+    deliveryType === 'physical' && physicalRegion === 'romania' && !contactPhoneIsRo;
 
   // Courier quotes
   const [quotes, setQuotes] = useState<CourierQuote[]>([]);
@@ -828,19 +853,21 @@ export function DeliveryStepModular({ onValidChange }: DeliveryStepProps) {
     } else if (deliveryType === 'physical' && physicalRegion === 'romania') {
       // For locker services (FANbox/EasyBox), require locker selection; for Standard, require valid address
       const isLocker = selectedQuote ? isLockerQuote(selectedQuote) : false;
+      // Contact străin → AWB-ul domestic cere un număr RO de destinatar.
+      const roPhoneOk = !needsRoPhone || isRoPhoneValid;
       if (isLocker) {
         // Locker doesn't need full address, just locker selection
-        onValidChange(selectedQuoteService !== null && selectedLockerId !== null);
+        onValidChange(selectedQuoteService !== null && selectedLockerId !== null && roPhoneOk);
       } else {
         // Standard delivery needs full address
-        onValidChange(isAddressValid && selectedQuoteService !== null);
+        onValidChange(isAddressValid && selectedQuoteService !== null && roPhoneOk);
       }
     } else if (deliveryType === 'physical' && physicalRegion === 'international') {
       onValidChange(intlProvider !== null && isIntlAddressValid);
     } else {
       onValidChange(false);
     }
-  }, [deliveryType, physicalRegion, isAddressValid, selectedQuoteService, selectedQuote, selectedLockerId, intlProvider, isIntlAddressValid, onValidChange]);
+  }, [deliveryType, physicalRegion, isAddressValid, selectedQuoteService, selectedQuote, selectedLockerId, intlProvider, isIntlAddressValid, needsRoPhone, isRoPhoneValid, onValidChange]);
 
   // Update context when selections change
   useEffect(() => {
@@ -893,12 +920,32 @@ export function DeliveryStepModular({ onValidChange }: DeliveryStepProps) {
             city: value.city || '',
             county: value.county || '',
             postalCode: value.postalCode || '',
+            // Contact străin: păstrează numărul RO de destinatar — altfel
+            // fiecare tastă în formularul de adresă l-ar șterge din context.
+            recipientPhone: needsRoPhone ? roPhoneE164 : undefined,
           },
         });
       }
     });
     return () => subscription.unsubscribe();
-  }, [form, updateDelivery, physicalRegion]);
+  }, [form, updateDelivery, physicalRegion, needsRoPhone, roPhoneE164]);
+
+  // Numărul RO de destinatar se schimbă fără ca formularul de adresă să se
+  // atingă (ex. locker) — împinge-l în context separat, cu guard anti-loop.
+  useEffect(() => {
+    if (!needsRoPhone) return;
+    if ((delivery.address?.recipientPhone || '') === roPhoneE164) return;
+    updateDelivery({
+      address: {
+        street: '',
+        number: '',
+        city: '',
+        county: '',
+        ...(delivery.address ?? {}),
+        recipientPhone: roPhoneE164,
+      },
+    });
+  }, [needsRoPhone, roPhoneE164, delivery.address, updateDelivery]);
 
   // International: sync selection + address to context
   useEffect(() => {
@@ -1263,6 +1310,35 @@ export function DeliveryStepModular({ onValidChange }: DeliveryStepProps) {
               <p className="text-sm text-neutral-500">Fan Courier & Sameday - cele mai bune prețuri</p>
             </div>
           </div>
+
+          {/* Telefonul de contact nu e RO → curierul are nevoie de un număr
+              românesc pentru SMS/apel la livrare. */}
+          {needsRoPhone && (
+            <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 space-y-2">
+              <label htmlFor="ro-recipient-phone" className="text-sm font-medium text-secondary-900 block">
+                Telefon destinatar în România <span className="text-red-500">*</span>
+              </label>
+              <Input
+                id="ro-recipient-phone"
+                type="tel"
+                inputMode="tel"
+                placeholder="07xx xxx xxx"
+                value={roPhone}
+                onChange={(e) => setRoPhone(e.target.value)}
+                className="bg-white"
+              />
+              <p className="text-xs text-amber-800">
+                Numărul tău de contact ({state.contact?.phone}) nu este din România.
+                Fan Courier și Sameday anunță livrarea prin SMS și telefon doar pe
+                numere românești — introdu numărul persoanei care primește plicul.
+              </p>
+              {roPhone.length > 0 && !isRoPhoneValid && (
+                <p className="text-xs text-red-600 font-medium">
+                  Număr invalid — folosește formatul 07xx xxx xxx (sau +40 7xx xxx xxx).
+                </p>
+              )}
+            </div>
+          )}
 
           {/* Address Form */}
           <div className="space-y-4">
@@ -2044,6 +2120,9 @@ export function DeliveryStepModular({ onValidChange }: DeliveryStepProps) {
           if (!physicalRegion) {
             missing.push('Alege destinația livrării: România sau internațional.');
           } else if (physicalRegion === 'romania') {
+            if (needsRoPhone && !isRoPhoneValid) {
+              missing.push('Introdu un număr de telefon românesc (07xx xxx xxx) pentru destinatarul livrării — curierul anunță livrarea doar pe numere din România.');
+            }
             if (!isAddressValid) missing.push('Completează adresa de livrare (câmpurile marcate cu roșu).');
             if (!selectedQuoteService) {
               missing.push('Alege un serviciu de curierat din listă.');

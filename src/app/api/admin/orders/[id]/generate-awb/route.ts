@@ -23,6 +23,7 @@ import {
 import { DEFAULT_DOCUMENT_PACKAGE, extractCourierProviderFromDeliveryMethod } from '@/lib/services/courier/utils';
 import { extractCourierQuote } from '@/lib/courier/quote-from-delivery';
 import { getSamedayDropoff } from '@/lib/admin/sameday-dropoff';
+import { parsePhoneNumberFromString } from 'libphonenumber-js';
 
 // Adresa de expediere REALĂ (de aici pleacă plicurile), nu sediul social din
 // Odoreu. La Sameday nu contează — ei ridică din punctul de ridicare din contul
@@ -241,6 +242,22 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       'Destinatar';
     const recipientPhone = deliveryAddress?.recipientPhone || deliveryAddress?.phone || contact?.phone || '';
     const recipientEmail = contact?.email || '';
+
+    // AWB domestic (Fan Courier/Sameday): curierul sună/trimite SMS doar pe
+    // numere RO. Un număr străin (client din diaspora, comandă veche fără
+    // recipientPhone) ar produce un AWB pe care destinatarul nu e anunțat.
+    {
+      const parsedPhone = parsePhoneNumberFromString(recipientPhone, 'RO');
+      if (!parsedPhone || parsedPhone.country !== 'RO' || !parsedPhone.isValid()) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: `Telefonul destinatarului (${recipientPhone || 'lipsă'}) nu este un număr românesc valid. Completează un număr RO în datele de livrare înainte de a genera AWB-ul.`,
+          },
+          { status: 400 }
+        );
+      }
+    }
 
     // 6. Build recipient address
     // Map wizard address fields to courier Address fields
