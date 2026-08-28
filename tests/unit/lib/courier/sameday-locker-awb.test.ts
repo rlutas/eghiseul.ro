@@ -122,6 +122,27 @@ describe('SamedayProvider.createShipment — locker (OOH)', () => {
     expect(payload.awbRecipient.name).toBe('Test Client');
   });
 
+  it('predarea în easybox (dropoffLockerId) pune oohFirstMile pe AWB', async () => {
+    const provider = new SamedayProvider();
+    const request: ShipmentRequest = {
+      sender: SENDER,
+      recipient: { ...BUCHAREST_RECIPIENT, city: 'Sector 6' },
+      packages: [PACKAGE],
+      content: { description: 'Documente', isDocument: true },
+      service: 'STANDARD_24H',
+      paymentBy: 'sender',
+      dropoffLockerId: '2556',
+      orderReference: 'E-TEST-DROPOFF',
+    };
+
+    const result = await provider.createShipment(request);
+
+    expect(result.success).toBe(true);
+    const awbCall = fetchCalls.find((c) => c.url.endsWith('/api/awb') && c.body);
+    const payload = JSON.parse(awbCall!.body!);
+    expect(payload.oohFirstMile).toBe('2556');
+  });
+
   it('livrare la domiciliu în București cu „Sector 6" se mapează pe „Sectorul 6"', async () => {
     const provider = new SamedayProvider();
     const request: ShipmentRequest = {
