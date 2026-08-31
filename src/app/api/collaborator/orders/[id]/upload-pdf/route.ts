@@ -5,7 +5,7 @@ import { requireCollaboratorForOrder, checkPermission } from '@/lib/admin/permis
 import { uploadFile, generateFinalDocumentKey } from '@/lib/aws/s3';
 import { compressPdf } from '@/lib/documents/pdf-compress';
 import { deliverCollaboratorResult } from '@/lib/collaborator/deliver';
-import { taxaEliberare } from '@/lib/ancpi/taxe-eliberare';
+import { taxaLivrareDirecta } from '@/lib/ancpi/taxe-eliberare';
 import { cereriForOrderSlug, type OrderForCereri } from '@/lib/ancpi/cereri-for-order';
 import { cerereDateRo } from '@/lib/ancpi/cerere-date';
 import { SUPPLIER_ANCPI } from '@/lib/admin/supplier-costs';
@@ -28,7 +28,10 @@ async function autoBookAncpiCost(admin: any, orderId: string, userId: string): P
     if (!order) return;
 
     const svc = Array.isArray(order.services) ? order.services[0] : order.services;
-    const taxa = taxaEliberare(svc?.slug, svc?.processing_config);
+    // DOAR taxele fixe de livrare directă — NU tariful informativ din
+    // processing_config (acela e taxa depunerii la ghișeu; pe identificare
+    // punea automat 100 lei în loc de 20 — corecții manuale pe fiecare comandă).
+    const taxa = taxaLivrareDirecta(svc?.slug);
     if (taxa === null) return;
 
     const { data: existing } = await admin

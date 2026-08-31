@@ -14,7 +14,36 @@ export const TAXA_ELIBERARE_RON: Record<string, number> = {
 };
 
 /**
+ * Taxe FIXE plătite online la livrarea DIRECTĂ (fără depunere OCPI) — singurele
+ * care se înregistrează AUTOMAT la upload-ul PDF-ului de către colaborator.
+ *
+ * NU folosi `ancpi_cost_ron` din processing_config aici: acela e tariful
+ * INFORMATIV al depunerii la ghișeu (ex. identificare după adresă, cod 2.7.8 =
+ * 100 lei), nu ce plătim când colaboratorul rezolvă online pe loc. Incident
+ * 28.08 (E-260812-QFDXD + altele): identificare-imobil primea automat cost 100
+ * deși taxa reală era 20 (extrasul CF al imobilului identificat) — echipa a
+ * corectat manual fiecare comandă, iar Mircea a fost suspectat pe nedrept.
+ */
+export const TAXA_LIVRARE_DIRECTA_RON: Record<string, number> = {
+  'extras-carte-funciara': 20,
+  'extras-cf-colectiv': 20,
+  'extras-plan-cadastral': 15,
+  // Identificarea livrată direct = un extras CF (20 lei) pentru imobilul
+  // identificat, nu certificatul 2.7.8 de 100 lei de la ghișeu.
+  'identificare-imobil': 20,
+};
+
+/** Taxa de înregistrat automat la livrarea directă, sau null → nimic automat
+ *  (serviciul rămâne pe introducere manuală în admin / formularul de depunere). */
+export function taxaLivrareDirecta(slug: string | null | undefined): number | null {
+  if (!slug) return null;
+  return TAXA_LIVRARE_DIRECTA_RON[slug] ?? null;
+}
+
+/**
  * Taxa pentru un serviciu, sau null dacă nu plătim o taxă fixă la OCPI.
+ * Precompletare EDITABILĂ în formularele colaboratorului — nu pentru
+ * înregistrare automată (vezi taxaLivrareDirecta).
  *
  * Sursa principală e `services.processing_config.ancpi_cost_ron`, ca o
  * modificare de tarif să se facă din admin, nu printr-un deploy. Lista de mai
