@@ -139,3 +139,23 @@ Grup suplimentar pentru SC-CazierFiscal (cuvintele câștigătoare istoric): `"c
 
 ## Istoric decizii
 - 31.08: preț headline rămâne ex-TVA pe site (decizie Raul); dacă review-ul pică pe „taxe ascunse", primul fix e afișarea prețului cu TVA pe paginile din campanie.
+
+---
+
+## UPDATE 31.08 seara — STRATEGIA S-A SCHIMBAT: rămânem pe contul vechi, campania e LIVE
+
+Descoperiri care au răsturnat planul de cont nou:
+1. Contul vechi 677-995-5005 NU e suspendat — campania Search-Cadastru-Documente-2026-08 rula și convertea („ăla cadastral merge").
+2. Advertiserul e DEJA verificat pe EDIGITALIZARE SRL.
+3. Sursa reală a blocărilor: **4 sitelinkuri la NIVEL DE CONT respinse pe politica documentelor guvernamentale** (adăugate 19.08) — se atașau automat pe orice campanie. ELIMINATE.
+
+Acțiuni executate (decizia lui Raul: „faci nou, nu contești" + „fă curat"):
+- Export complet date (vezi `data/2026-08-31/`), apoi **21 campanii junk eliminate** (Search-N, v2/v3, PMax-uri, cele 3 respinse din 2026-08). Păstrate: OPT-* istorice, Extras CF, OTP-Fiscal, ASSISTENTA NOU, cadastru (activă).
+- **Campania NOUĂ „SEARCH-2026-NOU" publicată LIVE** (id 24198871352, start 31.08): Search-only, Clicuri cu CPC max 3 RON, 100 RON/zi, RO + doar prezență, română, AI Max off, 8 cuvinte expresie pe certificat de naștere, RSA 7 titluri + 4 descrieri conforme, landing /servicii/eliberare-certificat-de-nastere/.
+- ⚠️ Capcana wizardului A LOVIT DE 2 ORI în aceeași sesiune: anunțul ȘI cuvintele s-au resetat la re-deschiderea draftului (dialogul de confirmare a identității a forțat re-navigarea). La orice re-deschidere de draft: RE-VERIFICĂ cuvintele și anunțul înainte de publicare.
+
+Următorii pași:
+1. Primele 72h: urmărit statusul de politică al anunțurilor (Eligibil vs Respins). Dacă respins → contestație cu landing-urile conforme.
+2. De adăugat: grupul Căsătorie (ad group 2 în SEARCH-2026-NOU), sitelinkuri conforme LA NIVEL DE CAMPANIE, negativele din planul de mai sus (gratuit, hub mai, ghiseul.ro etc.).
+3. După ~20 conversii: comutare pe „Maximizați valoarea conversiilor".
+4. Env-urile de conversie NEXT_PUBLIC_GOOGLE_ADS_* rămân pe contul vechi — NU se schimbă nimic pe site.
