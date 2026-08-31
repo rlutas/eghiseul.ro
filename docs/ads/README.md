@@ -1,6 +1,6 @@
 # Google Ads — index
 
-Contul: **eGhiseul, 677-995-5005** (eghiseul@gmail.com). Toate analizele se scriu aici.
+Contul vechi: **eGhiseul, 677-995-5005** (eghiseul@gmail.com) — BLOCAT pe politica documentelor guvernamentale; decizie 31.08: **cont NOU pe EDIGITALIZARE SRL** (vezi planul de lansare). Toate analizele se scriu aici.
 
 | Doc | Ce conține |
 |---|---|
@@ -10,6 +10,7 @@ Contul: **eGhiseul, 677-995-5005** (eghiseul@gmail.com). Toate analizele se scri
 | [2026-08-18-campanii-live-status.md](2026-08-18-campanii-live-status.md) | **starea finală**: cele 3 campanii pornite (constatator, constatator cu istoric, cazier fiscal), bugete/plafoane CPC, cuvinte cheie, anunțuri, excluderi, plus cele două capcane ale wizardului Google (pasul cu anunțul nu se salvează la refresh) |
 | [2026-08-18-topograf-cadastru-research.md](2026-08-18-topograf-cadastru-research.md) | servicii topograf/OCPI (PAD, coordonate Stereo 70, releveu, copii CF): volume și concurență din Planificator, cine licitează în SERP, aritmetica marjei, structura de campanie propusă — plus anunțurile vechi găsite live care duc pe un 404 |
 | [2026-08-18-strategie-licitare-decizie.md](2026-08-18-strategie-licitare-decizie.md) | de ce plafonăm CPC-ul la pornire, ce spun Google și practicienii US/UK, planul de trecere la Smart Bidding pe etape |
+| [2026-08-31-cont-nou-lansare.md](2026-08-31-cont-nou-lansare.md) | **planul curent**: cont NOU pe EDIGITALIZARE (677-995-5005 rămâne blocat), fixurile de conformitate pe landing (commit `5e81b91`, pattern-ul competitorilor aprobați), campanii StareCivila + CazierFiscal + Constatator cu RSA-uri gata scrise, cuvinte, negative, ținte CPA din analiza 18.08 |
 
 ## Reguli fixe (nu se negociază)
 
