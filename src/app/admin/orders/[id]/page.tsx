@@ -1295,7 +1295,7 @@ export default function AdminOrderDetailPage() {
                 Pe serviciile care cer motiv (cazier/integritate), lipsa lui e
                 semnalată explicit — echipa trebuie să-l ceară clientului. */}
             {sheetMotiv ? (
-              <InfoRow label="Motivul solicitarii" value={sheetMotiv} />
+              <InfoRow label="Motivul solicitarii" value={sheetMotiv} wrap />
             ) : /cazier|integritate/.test(order.services?.slug || '') ? (
               <div className="flex items-center justify-between gap-4 text-sm border-b border-border/60 py-1.5 last:border-b-0">
                 <span className="text-muted-foreground">Motivul solicitarii</span>
@@ -1712,7 +1712,7 @@ export default function AdminOrderDetailPage() {
               />
             )}
             {contact?.purpose && (
-              <InfoRow label="Motivul solicitarii" value={String(contact.purpose)} />
+              <InfoRow label="Motivul solicitarii" value={String(contact.purpose)} wrap />
             )}
 
             {/* Date personale — continuare în același card. Datele de firmă
@@ -5222,10 +5222,10 @@ function PropertySection({ property }: { property: AnyObj | null }) {
         Date imobil
       </p>
       {ordered.map(([label, value]) => (
-        <InfoRow key={label} label={label} value={value} />
+        <InfoRow key={label} label={label} value={value} wrap />
       ))}
       {extraImobile.map((im, i) => (
-        <InfoRow key={`extra-${i}`} label={`Imobil suplimentar #${i + 2}`} value={imobilSummary(im)} />
+        <InfoRow key={`extra-${i}`} label={`Imobil suplimentar #${i + 2}`} value={imobilSummary(im)} wrap />
       ))}
     </>
   );
@@ -5320,21 +5320,28 @@ function CivilStatusCard({ civilStatus }: { civilStatus: AnyObj | null }) {
       </CardHeader>
       <CardContent className="space-y-1">
         {ordered.map(([label, value]) => (
-          <InfoRow key={label} label={label} value={value} />
+          <InfoRow key={label} label={label} value={value} wrap />
         ))}
       </CardContent>
     </Card>
   );
 }
 
-function InfoRow({ label, value, icon, mono = false }: { label: string; value: string; icon?: React.ReactNode; mono?: boolean }) {
+function InfoRow({ label, value, icon, mono = false, wrap = false }: { label: string; value: string; icon?: React.ReactNode; mono?: boolean; wrap?: boolean }) {
   return (
-    <div className="flex items-center justify-between gap-4 text-sm border-b border-border/60 py-1.5 last:border-b-0">
+    <div className="flex items-start justify-between gap-4 text-sm border-b border-border/60 py-1.5 last:border-b-0">
       <span className="text-muted-foreground flex items-center gap-1.5 shrink-0">
         {icon}
         {label}
       </span>
-      <span className={`text-right truncate max-w-[60%] ${mono ? 'font-mono text-xs' : ''}`}>{value}</span>
+      {/* wrap: client free-text (motiv, alte informații, adrese) must be fully
+          readable — truncating it hides operational info (E-260814-UFKZ5). */}
+      <span
+        className={`text-right ${wrap ? 'whitespace-pre-wrap break-words min-w-0' : 'truncate max-w-[60%]'} ${mono ? 'font-mono text-xs' : ''}`}
+        title={wrap ? undefined : value}
+      >
+        {value}
+      </span>
     </div>
   );
 }
