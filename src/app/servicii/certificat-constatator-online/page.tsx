@@ -31,6 +31,7 @@ import { ServiceFAQ } from '@/components/services/service-faq';
 import { ReviewsSection } from '@/components/services/reviews-section';
 import { buildPageMetadata, buildServicePageGraph, BASE_URL, SERVICE_AGGREGATE_RATING } from '@/lib/seo';
 import { ServicePrice } from '@/components/services/service-price';
+import { PrivateServiceNotice } from '@/components/services/private-service-notice';
 import { GOOGLE_RATING, GOOGLE_REVIEW_COUNT_LABEL } from '@/config/contact';
 
 // Database slug (order pipeline identifier). URL path uses the WP slug
@@ -40,10 +41,10 @@ const PAGE_PATH = '/servicii/certificat-constatator-online/';
 const SCHEMA_SLUG = 'certificat-constatator-online';
 const TITLE = 'Certificat Constatator Online în Câteva Minute — 89 RON (2026)';
 const DESCRIPTION =
-  'Certificat constatator eliberat automat de la ONRC în câteva minute, 24/7 — inclusiv noaptea ' +
+  'Obținem certificatul constatator de la ONRC în câteva minute, 24/7 — inclusiv noaptea ' +
   'și în weekend. Doar cu CUI-ul firmei: pe firmă, PF sau cu istoric. 89 RON, taxe ONRC incluse.';
 const DATE_PUBLISHED = '2026-06-14';
-const DATE_MODIFIED = '2026-07-21';
+const DATE_MODIFIED = '2026-08-31';
 
 export const revalidate = 3600;
 
@@ -207,8 +208,8 @@ export default async function CertificatConstatatorPage() {
 
                 <p className="text-lg sm:text-xl text-white/85 leading-relaxed mb-6">
                   Certificatul constatator este documentul ONRC cu datele la zi ale unei firme:
-                  sediu, asociați, administratori, coduri CAEN și stare. Îl obții online cu{' '}
-                  {basePrice} RON (taxe ONRC incluse), eliberat automat în câteva minute, 24/7 —
+                  sediu, asociați, administratori, coduri CAEN și stare. Îl obținem pentru tine de
+                  la ONRC cu {basePrice} RON (taxe ONRC incluse), în câteva minute, 24/7 —
                   ai nevoie doar de CUI-ul firmei.
                 </p>
 
@@ -291,6 +292,11 @@ export default async function CertificatConstatatorPage() {
             </div>
           </div>
         </section>
+
+        <PrivateServiceNotice
+          institutionLabel="la ghișeele ONRC sau prin portalul RECOM online"
+          institutionUrl="https://portal.onrc.ro"
+        />
 
         {/* Trust strip */}
         <section className="bg-white border-b border-neutral-200">
@@ -689,7 +695,7 @@ export default async function CertificatConstatatorPage() {
                 ))}
               </ul>
               <p>
-                Pentru că emitem certificatul pe firmă în câteva minute, <strong>îl ai mereu actualizat la zi</strong>
+                Pentru că obținem certificatul de la ONRC în câteva minute, <strong>îl ai mereu actualizat la zi</strong>
                 {' '}exact când ai nevoie de el — fără să riști să prezinți un document expirat.
               </p>
             </div>
@@ -713,7 +719,7 @@ export default async function CertificatConstatatorPage() {
                 <div>
                   <h3 className="font-bold text-secondary-900 mb-1.5">Fără taxă de urgență</h3>
                   <p className="text-sm text-neutral-700 leading-relaxed">
-                    Sistemul nostru depune și emite cererile <strong>automat, 24/7</strong> — primești certificatul în
+                    Sistemul nostru depune cererile la ONRC <strong>automat, 24/7</strong> — primești certificatul în
                     câteva minute, <strong>fără taxă de urgență</strong>. La alți operatori, urgența costă în plus.
                   </p>
                 </div>

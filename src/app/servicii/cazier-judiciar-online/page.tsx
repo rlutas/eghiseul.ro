@@ -5,6 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Footer } from '@/components/home/footer';
 import { MobileStickyCTA } from '@/components/services/mobile-sticky-cta';
+import { PrivateServiceNotice } from '@/components/services/private-service-notice';
 import { ServiceFAQ, type FAQ } from '@/components/services/service-faq';
 import { ReviewsSection } from '@/components/services/reviews-section';
 import { GoogleReviewsBadge } from '@/components/services/google-reviews-badge';
@@ -49,8 +50,8 @@ const DESCRIPTION =
   'Persoane fizice și firme, livrare în 3-5 zile pe email sau curier. Comandă în 5 minute.';
 
 const DATE_PUBLISHED = '2026-04-16';
-const DATE_MODIFIED = '2026-07-13';
-const DATE_MODIFIED_DISPLAY = '13 iulie 2026';
+const DATE_MODIFIED = '2026-08-31';
+const DATE_MODIFIED_DISPLAY = '31 august 2026';
 
 export const metadata: Metadata = buildPageMetadata({
   title: TITLE,
@@ -344,7 +345,10 @@ export default function CazierJudiciarHubPage() {
                 <div className="flex flex-wrap gap-2 mb-4">
                   <Badge className="bg-primary-500 text-secondary-900 font-bold px-3 py-1">
                     <Scale className="h-3.5 w-3.5 mr-1" />
-                    Serviciu Juridic Oficial
+                    {/* NU „Serviciu Juridic Oficial" — „oficial" despre serviciu (nu despre
+                        document) declanșează politica Google Ads „Documente guvernamentale
+                        și servicii oficiale" (vezi memoria google-ads-documente-oficiale). */}
+                    Asistență prin Avocat în Barou
                   </Badge>
                   <Badge className="bg-green-600 text-white font-bold px-3 py-1">
                     <Clock className="h-3.5 w-3.5 mr-1" />
@@ -465,8 +469,13 @@ export default function CazierJudiciarHubPage() {
           </div>
         </section>
 
+        <PrivateServiceNotice
+          institutionLabel="gratuit, la ghișeul IPJ sau online pe hub.mai.gov.ro"
+          institutionUrl="https://hub.mai.gov.ro"
+        />
+
         {/* ──────────────── ALEGE TIPUL DE CAZIER ──────────────── */}
-        <section id="alege-tip" className="py-12 lg:py-20 bg-white -mt-8 scroll-mt-24">
+        <section id="alege-tip" className="py-12 lg:py-20 bg-white scroll-mt-24">
           <div className="container mx-auto px-4 max-w-[1000px]">
             <div className="text-center mb-10">
               <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-3">

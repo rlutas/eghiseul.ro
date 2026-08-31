@@ -31,6 +31,7 @@ import { ServiceFAQ } from '@/components/services/service-faq';
 import { ReviewsSection } from '@/components/services/reviews-section';
 import { buildPageMetadata, buildServicePageGraph, BASE_URL, SERVICE_AGGREGATE_RATING } from '@/lib/seo';
 import { ServicePrice } from '@/components/services/service-price';
+import { PrivateServiceNotice } from '@/components/services/private-service-notice';
 
 // Database slug (order pipeline identifier). URL path uses the descriptive
 // SEO slug (eliberare-certificat-DE-nastere) to target the search intent.
@@ -42,7 +43,7 @@ const DESCRIPTION =
   'Duplicat certificat de naștere online de la Starea Civilă, 998 RON, fără deplasare. ' +
   'Pentru act pierdut, din altă localitate sau diaspora. Email + curier.';
 const DATE_PUBLISHED = '2026-06-14';
-const DATE_MODIFIED = '2026-07-13';
+const DATE_MODIFIED = '2026-08-31';
 
 export const revalidate = 3600;
 
@@ -174,8 +175,8 @@ export default async function CertificatNasterePage() {
 
                 <div className="bg-white/10 backdrop-blur-sm rounded-xl p-5 border border-white/20 mb-6">
                   <p className="text-white/90 leading-relaxed text-sm sm:text-base">
-                    <strong className="text-primary-500">Duplicatul certificatului de naștere</strong> îl obții
-                    rapid de la noi, fără drum la Starea Civilă:
+                    <strong className="text-primary-500">Duplicatul certificatului de naștere</strong> — te ajutăm
+                    să-l obții rapid de la Starea Civilă, fără niciun drum:
                   </p>
                   <ul className="mt-3 space-y-1.5 text-white/85 text-sm">
                     {[
@@ -262,6 +263,11 @@ export default async function CertificatNasterePage() {
             </div>
           </div>
         </section>
+
+        <PrivateServiceNotice
+          institutionLabel="la Starea Civilă din localitatea de înregistrare sau pe hub.mai.gov.ro"
+          institutionUrl="https://hub.mai.gov.ro"
+        />
 
         {/* Trust strip */}
         <section className="bg-white border-b border-neutral-200">

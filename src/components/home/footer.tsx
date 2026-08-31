@@ -235,11 +235,16 @@ export function Footer() {
                 </a>
               </div>
             </div>
-            <p className="text-white/40 text-[11px] leading-relaxed mt-4">
+            {/* Disclaimer de neafiliere — cerut de politica Google Ads „Documente
+                guvernamentale și servicii oficiale"; ținut LIZIBIL (13px, contrast
+                normal), nu decorativ — competitorii aprobați îl au la vedere. */}
+            <p className="text-white/70 text-[13px] leading-relaxed mt-4">
               eGhișeul.ro este un serviciu privat de asistență la obținerea de documente. Nu suntem o instituție de
               stat și nu suntem afiliați cu vreun organ guvernamental. Documentele sunt emise exclusiv de
-              autoritățile competente din România. Lucrăm cu avocați colaboratori înscriși în Barou și topografi
-              autorizați ANCPI/OCPI, care gestionează procedurile în numele tău.
+              autoritățile competente din România, iar serviciile noastre sunt opționale — documentele pot fi
+              solicitate și direct la instituțiile emitente. Tarifele noastre acoperă exclusiv asistența,
+              reprezentarea prin avocați colaboratori înscriși în Barou sau topografi autorizați ANCPI/OCPI și
+              livrarea.
             </p>
           </div>
         </div>
