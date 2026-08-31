@@ -10,9 +10,7 @@ ca economia celor **2.089.538,89 RON cheltuiți / 962.647 clicuri / 7,42M afiș�
 | `cuvinte-cheie-toata-perioada.tsv` | toate cele ~640 cuvinte cheie cu statistici complete (QS, cotă afișări, conversii) |
 | `anunturi-toata-perioada.tsv` | toate cele ~44 anunțuri cu textele și performanța lor |
 
-Campaniile (nivel agregat) NU s-au putut exporta din UI (butonul de download a refuzat de
-2 ori pe pagina Campanii); cifrele per campanie sunt în capturile din analiza
-`../../2026-08-18-analiza-cont-si-repornire.md` și pot fi reconstruite din cele două TSV-uri.
+`campanii-toata-perioada.tsv` conține raportul la nivel de campanie (toate cele 37, cu conversii segmentate pe acțiune).
 
 ## Cifrele care contează (din termeni)
 
