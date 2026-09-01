@@ -159,3 +159,11 @@ Următorii pași:
 2. De adăugat: grupul Căsătorie (ad group 2 în SEARCH-2026-NOU), sitelinkuri conforme LA NIVEL DE CAMPANIE, negativele din planul de mai sus (gratuit, hub mai, ghiseul.ro etc.).
 3. După ~20 conversii: comutare pe „Maximizați valoarea conversiilor".
 4. Env-urile de conversie NEXT_PUBLIC_GOOGLE_ADS_* rămân pe contul vechi — NU se schimbă nimic pe site.
+
+## UPDATE 01.09 — anunț respins automat → contestație trimisă (În curs)
+
+- Anunțul din SEARCH-2026-NOU: **Respins (Documente guvernamentale și servicii oficiale)** la reviewul automat — pattern normal pe categoria asta; competitorii trec prin re-review.
+- **Contestație trimisă 01.09**: motiv „Am făcut modificări pentru a respecta politica" (banda de neafiliere + poziționarea de asistență, commit `5e81b91`), scope = doar Grupul de anunțuri 1. Stare: **În curs** (Politică → Anunțuri → Istoricul contestațiilor). Termen tipic: 1–3 zile lucrătoare.
+- Istoricul contului: 7+ contestații eșuate (aug 2025 – ian 2026) — TOATE înainte de fixul de landing și de eliminarea sitelinkurilor de cont; una „Parțial reușită" (21 aug 2025). Prima contestație pe teren conform e asta.
+- **Certificarea NU e o cale**: formularul „Solicitați certificarea" acoperă doar criptomonede / produse financiare speculative / jocuri de noroc. Pe documente guvernamentale nu există certificare self-service — conformitate + contestație e singurul mecanism.
+- Dacă și contestația asta pică: cerem detaliile exacte prin „Contactați-ne" (suport Ads, chat) cu referință la landing-ul conform, și comparăm literal cu landingul caziere.ro. NU facem cont nou (risc circumvenire).
