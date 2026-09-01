@@ -229,6 +229,21 @@ export function isCompanyActive(stare: string, inInactiveRegister: boolean): boo
   );
 }
 
+/**
+ * Firmă care NU mai există ca entitate în funcțiune la ONRC (radiată,
+ * dizolvată, în lichidare). DOAR pentru acestea comanda se blochează.
+ *
+ * Suspendarea activității sau inactivarea fiscală ANAF NU intră aici: firma
+ * rămâne înregistrată la ONRC și poate primi certificat constatator / cazier —
+ * documentul doar constată starea. (Caz real: CUI 43216955, „SUSPENDARE
+ * ACTIVITATE" + inactiv fiscal, comandă de constatator blocată greșit,
+ * 01.09.2026.)
+ */
+export function isCompanyDeregistered(stare: string): boolean {
+  const u = (stare || '').toUpperCase();
+  return u.includes('RADIAT') || u.includes('DIZOLVAT') || u.includes('LICHIDARE');
+}
+
 /** Legal forms, longest/dotted variants first so "S.R.L." wins over "SRL". */
 const LEGAL_FORM_PATTERNS: readonly string[] = [
   'S.R.L.', 'SRL',

@@ -36,6 +36,7 @@ import {
   isPublicInstitution,
   PUBLIC_INSTITUTION_DOC_MESSAGE,
 } from '@/lib/services/entity-type-detection';
+import { isCompanyDeregistered } from '@/lib/services/infocui';
 
 interface CompanyDataStepProps {
   config: CompanyKYCConfig;
@@ -142,6 +143,12 @@ export default function CompanyDataStep({ config, onValidChange }: CompanyDataSt
             setWarning(entityTypeMessage('ong')!);
           }
 
+          // Radiată/dizolvată/în lichidare = nu mai există în funcțiune la
+          // ONRC → block. Suspendare activitate sau inactiv fiscal ANAF =
+          // firma EXISTĂ la ONRC și poate primi certificat (constatatorul
+          // doar constată starea) → warning, comanda continuă.
+          const deregistered = isCompanyDeregistered(companyData.status || '');
+
           // Auto-fill company data
           updateCompanyKyc?.({
             cui: cleanCUI,
@@ -149,8 +156,10 @@ export default function CompanyDataStep({ config, onValidChange }: CompanyDataSt
             companyType: companyData.type || '',
             registrationNumber: companyData.registrationNumber || '',
             isActive: companyData.isActive,
-            validationStatus: companyData.isActive ? 'valid' : 'invalid',
-            validationMessage: companyData.isActive ? undefined : 'Firma nu este activă',
+            validationStatus: deregistered ? 'invalid' : 'valid',
+            validationMessage: deregistered
+              ? 'Firma este radiată din Registrul Comerțului'
+              : undefined,
             autoCompleteData: companyData,
             address: {
               county: '',
@@ -160,8 +169,21 @@ export default function CompanyDataStep({ config, onValidChange }: CompanyDataSt
             },
           });
 
-          if (!companyData.isActive) {
-            setError('Firma nu este activă în Registrul Comerțului.');
+          if (deregistered) {
+            setError(
+              `Firma figurează ca ${(companyData.status || 'radiată').toLowerCase()} — nu mai este în funcțiune la Registrul Comerțului. Verifică CUI-ul introdus.`,
+            );
+          } else if (!companyData.isActive) {
+            // Stare tip „SUSPENDARE ACTIVITATE din data ..." e informativă;
+            // inactivarea pur fiscală vine cu stare „INREGISTRAT ..." — acolo
+            // nu cităm starea, ar deruta.
+            const stareUpper = (companyData.status || '').toUpperCase();
+            const detail = stareUpper.includes('SUSPENDARE')
+              ? `„${companyData.status}”`
+              : 'inactivă fiscal în evidența ANAF';
+            setWarning(
+              `Firma figurează cu starea: ${detail}. Poți continua comanda — documentul eliberat va reflecta această stare.`,
+            );
           }
 
         } else {
@@ -405,11 +427,25 @@ export default function CompanyDataStep({ config, onValidChange }: CompanyDataSt
               </div>
             </div>
 
-            {/* Status */}
+            {/* Status: verde = activă; galben = suspendată/inactivă fiscal
+                (comanda poate continua); roșu = radiată/dizolvată (blocat). */}
             <div className="flex items-center gap-2 p-3 rounded-lg bg-muted">
-              <div className={`w-3 h-3 rounded-full ${companyKyc.isActive ? 'bg-green-500' : 'bg-red-500'}`} />
+              <div
+                className={`w-3 h-3 rounded-full ${
+                  companyKyc.isActive
+                    ? 'bg-green-500'
+                    : companyKyc.validationStatus === 'valid'
+                      ? 'bg-yellow-500'
+                      : 'bg-red-500'
+                }`}
+              />
               <span className="text-sm">
-                Status: {companyKyc.isActive ? 'Firmă activă' : 'Firmă inactivă'}
+                Status:{' '}
+                {companyKyc.isActive
+                  ? 'Firmă activă'
+                  : companyKyc.validationStatus === 'valid'
+                    ? 'Activitate suspendată / inactivă fiscal'
+                    : 'Firmă radiată'}
               </span>
             </div>
 
