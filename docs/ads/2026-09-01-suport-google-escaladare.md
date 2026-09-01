@@ -82,3 +82,33 @@ Reply pe threadul 1-6533000041865 (redeschide cazul), semnat Raul, telefon
 | 01.09 ~09:40 | Contestație 58971307 depusă (anunț certificat naștere, cont nou) |
 | 01.09 ~12:20 | Răspuns AI pe caz 1-6533000041865; caz închis automat |
 | 01.09 | Aflat spend total 2,09M RON; pregătit reply de escaladare (om + telefon + DSA/P2B) |
+
+## Addendum 01.09 după-amiază — testul pe ecazier + descoperirea „Cabinet de Avocat"
+
+- **Cont ecazier.ro = 885-622-8494** (login serviciiseonethut@gmail.com). Stare campanii:
+  Search-1/2/3 eliminate, Search-4/5 fără anunțuri, PMax-2 + Search-6 întrerupte cu
+  „limitate de politică". Singurul RSA din Search-6: Neeligibil pe aceeași politică.
+- **DESCOPERIRE: advertiserul verificat pe ecazier e „Cabinet De Avocat Tarta Ana
+  Gabriela"** — identitate de cabinet de avocatură, exact modelul infocazier. Cel mai
+  valoros activ al contului pentru politica de documente. ⚠️ De aceea schimbarea
+  plătitorului pe EDIGITALIZARE (cerută de Raul) e AMÂNATĂ: poate declanșa
+  re-verificarea advertiserului și pierderea identității de cabinet. De discutat cu
+  avocata Țarța înainte de orice.
+- **Test lansat**: RSA NOU în Search-6 (campania rămâne pe pauză → zero spend), unghi
+  „asistență / serviciu privat / cabinet de avocat", fără „eliberare/obținere/oficial":
+  10 titluri (Asistență Cazier Judiciar, Serviciu Privat de Asistență, Cazier Judiciar
+  Fără Drumuri, Formular Online în 5 Minute, Primești Documentul pe Email, Suport
+  Telefonic Dedicat, Preț Final Afișat Transparent, Fără Cozi Fără Stres, Comandă 100%
+  Online, Verificare Juridică Inclusă) + 4 descrieri (prima: „Serviciu de asistență
+  printr-un cabinet de avocat. Nu suntem instituție publică."). URL final:
+  https://www.ecazier.ro/comanda. Stare la salvare: fără etichetă de politică încă
+  (doar „campania este întreruptă") → în review, verdict de verificat în 1-2 zile
+  lucrătoare în Anunțuri → Search-6.
+- Capcane de UI întâlnite: (1) salvarea cere „Confirmați-vă identitatea" — a blocat
+  prima încercare până a confirmat Raul; (2) pagina de anunțuri avea filtru salvat
+  „Motivul stării conține Politică" care ASCUNDEA anunțul nou — părea că salvarea a
+  eșuat; s-a salvat de 2 ori, duplicatul a fost eliminat definitiv.
+- **Dacă anunțul nou trece review-ul** = avem poartă pe ecazier sub identitatea de
+  cabinet → pornim Search-6 cu buget mic și replicăm modelul. Dacă pică pe aceeași
+  politică = încă o dovadă pentru dosarul de escaladare (anunț fără niciun cuvânt de
+  „obținere documente", tot respins).
