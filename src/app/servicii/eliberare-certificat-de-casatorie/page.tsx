@@ -169,8 +169,10 @@ export default async function CertificatCasatoriePage() {
                   Certificat de Căsătorie{' '}
                   <span className="block text-primary-500">Online</span>
                 </h1>
+                {/* Copia legalizată e OPȚIUNE (doar la cerere), nu serviciul de bază —
+                    subtitlul nu o promite (feedback Raul 01.09). */}
                 <p className="text-lg sm:text-xl text-primary-500 font-semibold mb-5">
-                  Duplicat &amp; Copie Legalizată
+                  Duplicat de la Starea Civilă
                 </p>
 
                 <p className="text-lg sm:text-xl text-white/85 leading-relaxed mb-6">
