@@ -167,3 +167,29 @@ Următorii pași:
 - Istoricul contului: 7+ contestații eșuate (aug 2025 – ian 2026) — TOATE înainte de fixul de landing și de eliminarea sitelinkurilor de cont; una „Parțial reușită" (21 aug 2025). Prima contestație pe teren conform e asta.
 - **Certificarea NU e o cale**: formularul „Solicitați certificarea" acoperă doar criptomonede / produse financiare speculative / jocuri de noroc. Pe documente guvernamentale nu există certificare self-service — conformitate + contestație e singurul mecanism.
 - Dacă și contestația asta pică: cerem detaliile exacte prin „Contactați-ne" (suport Ads, chat) cu referință la landing-ul conform, și comparăm literal cu landingul caziere.ro. NU facem cont nou (risc circumvenire).
+
+## UPDATE 01.09 (după-amiază) — CONT NOU testat → răspunsul definitiv: CERTIFICAREA
+
+Raul a creat contul nou **243-638-4990** (tot pe eghiseul@gmail.com). Am construit campania
+SC-Nastere-2026-09 identică (Search, Clicuri CPC max 3, 100 RON/zi, RO, 8 cuvinte expresie,
+RSA conform) și am publicat-o. Respinsă PE LOC, dar de data asta Google a afișat motivul complet:
+
+> **„Documente guvernamentale și servicii oficiale — Este obligatoriu un CERTIFICAT."**
+> Tip de decizie: Investigație Google (verificări automatizate).
+
+**Concluzia întregii saga: nu contul, nu landing-ul, nu wordingul — categoria cere CERTIFICAREA
+Google „Government documents and services".** Competitorii care rulează (roghiseul, infocazier,
+caziere.ro) o AU. Politica + formularul de aplicare: https://support.google.com/adspolicy/answer/13156083
+
+Cum se obține (proces în 2 pași, ~10-12 zile lucrătoare):
+1. **Advertiser verification** — pe contul vechi EXISTĂ deja (EDIGITALIZARE); pe cel nou trebuie făcută.
+2. **Aplicația de certificare** din pagina politicii, opțiunea **„authorized, non-government provider"** —
+   argumentul nostru: reprezentare legală prin avocat înscris în Barou (Legea 51/1995, art. 27 — dreptul
+   avocatului de a reprezenta clienți în fața autorităților), contract de colaborare cu Cabinetul de avocat,
+   împuternicirile avocațiale. Exact modelul infocazier (cabinet de avocat certificat).
+   ⚠️ Enforcement înăsprit din 5 oct 2026 — aplicăm ACUM.
+
+Recomandare: aplicația se depune de pe CONTUL VECHI (677-995-5005) — advertiser verification e deja
+făcută acolo, iar certificatul se aplică pe cont. Contul nou 243-638-4990 rămâne de rezervă/pauză.
+Ambele campanii (SEARCH-2026-NOU pe vechi + SC-Nastere-2026-09 pe nou) rămân publicate dar nedifuzate
+până vine certificatul — nu consumă nimic.
