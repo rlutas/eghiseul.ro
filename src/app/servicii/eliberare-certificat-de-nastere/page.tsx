@@ -165,10 +165,10 @@ export default async function CertificatNasterePage() {
                 </div>
 
                 <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-tight mb-5">
-                  Certificat de Naștere{' '}
                   {/* Copia legalizată e OPȚIUNE (doar la cerere), nu serviciul de bază —
-                      H1-ul nu o promite (feedback Raul 01.09). */}
-                  <span className="block text-primary-500">Duplicat de la Starea Civilă</span>
+                      H1-ul promite exact serviciul: duplicatul (feedback Raul 01.09). */}
+                  Duplicat Certificat de Naștere{' '}
+                  <span className="block text-primary-500">de la Starea Civilă, Online</span>
                 </h1>
 
                 <p className="text-lg sm:text-xl text-white/85 leading-relaxed mb-6">

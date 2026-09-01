@@ -170,9 +170,9 @@ export default async function CertificatCasatoriePage() {
                   <span className="block text-primary-500">Online</span>
                 </h1>
                 {/* Copia legalizată e OPȚIUNE (doar la cerere), nu serviciul de bază —
-                    subtitlul nu o promite (feedback Raul 01.09). */}
+                    subtitlul promite exact serviciul: duplicatul (feedback Raul 01.09). */}
                 <p className="text-lg sm:text-xl text-primary-500 font-semibold mb-5">
-                  Duplicat de la Starea Civilă
+                  Duplicat Certificat de Căsătorie
                 </p>
 
                 <p className="text-lg sm:text-xl text-white/85 leading-relaxed mb-6">
