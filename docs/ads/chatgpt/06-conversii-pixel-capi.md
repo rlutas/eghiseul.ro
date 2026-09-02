@@ -10,7 +10,8 @@ oficiale (https://developers.openai.com/ads/measurement-pixel , https://develope
 | Data source (pixel) | **eghiseul.ro web** — Pixel ID `QzXwAbRL9bRrWomdusTNSY` (public, e în snippet) |
 | Conversion event | **Order CreatedPurchase** (id `6a985f4f0e7c8196b93217e061820220`), base event `order_created`, fereastră click 30 zile |
 | Conversion key (API) | **creată 02.09** („eghiseul-stripe-webhook"), pusă în Vercel `OPENAI_ADS_API_KEY` (production + preview) și `.env.local` prin clipboard (n-a trecut prin chat). Validată: `validate_only` → `200 {"accepted_events":1}`. Dacă se pierde: Conversions → Conversion keys → Create new key, apoi `vercel env add OPENAI_ADS_API_KEY production` (+ preview). |
-| Link event → campanie | doar pentru obiectivul Conversions; campania noastră e pe Clicks, raportarea merge pe `oppref` fără link |
+| Link event → campanie | **făcut 02.09**: Edit campaign → „Conversion event" → Order CreatedPurchase (coloana Conversions arată acum 0 în loc de „Set up") |
+| Pasul 3 din checklist („Implement and log the event") | se bifează singur la primul eveniment REAL primit (testul `validate_only` nu contează). Nu trimitem evenimente artificiale sau comenzi vechi — prima comandă plătită venită din ChatGPT îl închide. |
 
 ## Cum funcționează pe site
 
