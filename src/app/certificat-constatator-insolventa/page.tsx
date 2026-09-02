@@ -66,7 +66,7 @@ export default function Page() {
         },
         {
           q: 'Pot verifica gratuit dacă o firmă e în insolvență?',
-          a: 'Orientativ, da: Buletinul Procedurilor de Insolvență (BPI) are un motor de căutare, iar starea apare și în surse publice. Dar pentru un dosar de licitație sau pentru notar îți trebuie certificatul oficial ONRC, semnat electronic. Căutarea în BPI nu ține loc de document.',
+          a: 'Orientativ, da: Buletinul Procedurilor de Insolvență (BPI) are un motor de căutare, iar starea apare și în surse publice. Dar pentru un dosar de licitație sau pentru notar îți trebuie certificatul ONRC semnat electronic. Căutarea în BPI nu ține loc de document.',
         },
         {
           q: 'Ce valabilitate are certificatul?',

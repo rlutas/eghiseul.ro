@@ -16,6 +16,7 @@ Index al documentației. Aceasta e o **hartă**, nu un jurnal — pentru jurnalu
 |---|---|---|
 | **Tehnic** | [`technical/`](technical/) | `specs/` (arhitecturi servicii), `api/`, `webmcp.md` |
 | **Google Ads** | [`ads/`](ads/) | starea contului, economia pe serviciu (CPA maxim), analize de concurenta pe serviciu, reguli de politica |
+| **ChatGPT Ads (OpenAI)** | [`ads/chatgpt/`](ads/chatgpt/) | politica OpenAI citată, eligibilitate servicii (avocat = legal services), audit landing, campania constatator, roadmap |
 | **SEO** | [`seo/`](seo/) | location pages (CF/cazier), clustere (ONRC/stare civilă/rovinietă), keywords, GSC, planuri, [tooling pe date reale](seo/TOOLING-claude-seo.md) (GSC API/CrUX/PageSpeed) |
 | **Servicii** | [`services/`](services/) | catalog viu, folder-per-serviciu |
 | **Admin** | [`admin/`](admin/) | RBAC, handbook-uri operaționale (storno, modifică comandă, coșuri abandonate) |
