@@ -13,6 +13,7 @@ Contul vechi: **eGhiseul, 677-995-5005** (eghiseul@gmail.com) — BLOCAT pe poli
 | [2026-08-31-cont-nou-lansare.md](2026-08-31-cont-nou-lansare.md) | plan 31.08: cont NOU pe EDIGITALIZARE (677-995-5005 rămâne blocat), fixurile de conformitate pe landing (commit `5e81b91`, pattern-ul competitorilor aprobați), campanii StareCivila + CazierFiscal + Constatator cu RSA-uri gata scrise, cuvinte, negative, ținte CPA din analiza 18.08 |
 | [2026-09-01-suport-google-escaladare.md](2026-09-01-suport-google-escaladare.md) | **starea curentă**: verdictul suportului (intermediarii privați NU se pot certifica; disclaimerele nu ajută), spend total confirmat 2,09M RON / ROAS 1,41, reply-ul de escaladare (om + telefon + DSA art. 21/P2B), scenariile de răspuns A–D, contestația 58971307 pending |
 | [chatgpt/](chatgpt/README.md) | **ChatGPT Ads (OpenAI)** — canal nou, self-serve în RO din 31.08: politica (legal services interzis în afara US; „documente de stat" NU e categorie), audit landing, campania constatator gata de introdus, roadmap servicii |
+| [2026-09-02-meta-ads-evaluare.md](2026-09-02-meta-ads-evaluare.md) | Meta Ads: politica NU e blocaj (nu există categorie de documente guvernamentale), Ad Library RO = zero concurență pe cazier/constatator, CFunciara.ro activ de 19 luni pe CF; verdict: nu acum, doar retargeting după ChatGPT |
 
 ## Reguli fixe (nu se negociază)
 
