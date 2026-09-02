@@ -31,8 +31,8 @@ servicii), nu un truc de copy. Vezi 05.
 
 ## Aritmetica (constatator de bază, din analiza 18.08)
 
-- Preț 89 lei (medie încasată 98) − taxă ONRC 35 − procesare ~3 = **marjă ~55–60 lei**
-- CPA maxim sănătos (40 % din marjă) = **~24 lei**; CPA tolerabil pe B2B recurent = ~marja (55–60 lei)
+- ⚠️ Corectat 02.09 seara (Raul): **89 lei include TVA 21 %** → net 73,55 − taxă ONRC ~30 − procesare ~3 = **~40 lei brut** înainte de impozit și cheltuieli. Analiza din 18.08 (marjă 55–60) nu scăzuse TVA-ul.
+- CPA sănătos = **≤ 15 lei**; tolerabil doar pe B2B recurent = ≤ 25; **> 40 lei = pierdere pe comandă**.
 - CPC „recomandat" OpenAI 3–5 $ ≈ 14–23 RON → la 25 % conversie click→plată CPA = 56–92 lei = pierdere.
 - De aceea **licităm noi**: max CPC ~1,2 $ (≈5,5 RON), ca în planul Google (plafon 6 lei). La 5,5 RON și
   20–25 % conversie ⇒ CPA 22–28 lei. Dacă la bidul ăsta nu livrează, aflăm rapid (3 zile fără afișări).
@@ -51,9 +51,9 @@ Referință volum: ultimele 60 zile, constatator: 55 comenzi finalizate, 24 draf
    istoric, scop bancă/licitație), buget 100 RON/zi, max CPC 1,2 $ (istoric 3 $). Tot conținutul în 04.
 4. **Măsurare** — `orders.attribution` cu `utm_source=chatgpt` (SQL în 04) + GA4. Fără pixel în runda 1.
 5. **Decizie la ziua 14** — CPA pe comenzi plătite:
-   - ≤ 30 lei → scalăm (buget ×2, adăugăm rovinieta)
-   - 30–60 lei → continuăm doar dacă apar clienți recurenți (notari/contabili) sau istoric
-   - > 60 lei sau 0 conversii la ≥ 150 clicuri → oprim de bază, păstrăm istoric 7 zile, apoi concluzie
+   - ≤ 15 lei → scalăm (buget ×2, adăugăm rovinieta)
+   - 15–25 lei → continuăm doar dacă apar clienți recurenți (notari/contabili) sau istoric
+   - > 25 lei sau 0 conversii la ≥ 150 clicuri → oprim de bază, păstrăm istoric 7 zile, apoi concluzie
 
 ## Riscuri
 

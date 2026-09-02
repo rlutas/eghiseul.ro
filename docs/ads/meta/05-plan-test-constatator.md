@@ -52,9 +52,11 @@ Interzis: oficial, avocat, juridic, garantat, instant, „cel mai".
 |---|---|
 | CTR < 0,8 % și CPM > 45 RON | creativul nu rupe scroll-ul → schimbăm unghiurile, nu bugetul |
 | CTR ok, InitiateCheckout < 3 % din clicuri | landing/preț → verificăm primul ecran, prețul în anunț |
-| CPA ≤ 30 lei (comenzi plătite) | scalăm +25 % la 3–5 zile; pornim retargeting pe toate serviciile |
-| CPA 30–60 lei | continuăm doar retargeting + lookalike, oprim rece |
-| CPA > 60 lei sau 0 conversii la 150 clicuri | oprim rece; păstrăm retargeting 7 zile; concluzie scrisă aici |
+| CPA ≤ 15 lei (comenzi plătite) | scalăm +25 % la 3–5 zile; pornim retargeting pe toate serviciile |
+| CPA 15–25 lei | continuăm doar retargeting + lookalike, oprim rece |
+| CPA > 25 lei sau 0 conversii la 150 clicuri | oprim rece; păstrăm retargeting 7 zile; concluzie scrisă aici |
+
+Aritmetica: 89 lei cu TVA 21 % → 73,55 net − 30 taxa ONRC − ~3 procesare ≈ **40 lei brut** înainte de impozit/cheltuieli. 30 lei CPA ar mânca aproape toată marja.
 
 ## 5. Jurnal
 

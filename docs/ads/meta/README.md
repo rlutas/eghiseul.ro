@@ -25,4 +25,4 @@ Deschis 02.09.2026 ca posibil al doilea canal după ChatGPT Ads. Evaluarea scurt
 
 | Data | Ce |
 |---|---|
-| 02.09 | Cercetare + plan. Nimic implementat, nimic pornit. Următorul pas când decidem: precondițiile din 05 §0 (o zi). |
+| 02.09 | Cercetare + plan. Nimic implementat, nimic pornit. **Decizie Raul: așteptăm verdictul ChatGPT Ads, apoi vedem.** Praguri CPA corectate la 15/25 lei (marjă reală ~40 lei brut după TVA + taxa ONRC). |

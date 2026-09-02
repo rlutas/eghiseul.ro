@@ -131,9 +131,11 @@ din Ads Manager; GA4 doar ca sanity check pe sesiuni cu `utm_source=chatgpt`.
 
 | CPA (lei / comandă plătită) | Acțiune |
 |---|---|
-| ≤ 30 | scalăm: buget 200 RON/zi, adăugăm rovinieta (05) |
-| 30–60 | continuăm 14 zile doar AG2 + AG3; urmărim clienții recurenți |
-| > 60 sau 0 conversii la ≥ 150 clicuri | oprim de bază; AG2 încă 7 zile; concluzie scrisă aici |
+| ≤ 15 | scalăm: buget 200 RON/zi, adăugăm rovinieta (05) |
+| 15–25 | continuăm 14 zile doar AG2 (istoric, marjă mare) + AG3; urmărim clienții recurenți |
+| > 25 sau 0 conversii la ≥ 150 clicuri | oprim de bază; AG2 încă 7 zile; concluzie scrisă aici |
+
+Aritmetica (corectată 02.09): 89 lei cu TVA → 73,55 net − 30 ONRC − 3 procesare ≈ **40 lei brut**; la CPC €1,95 (~9,7 RON) trebuie conversie ≥ 40 % ca să nu pierdem pe prima comandă → de bază e test de repeat/B2B, istoricul (487 lei) e unde e marja.
 
 ## J. Jurnal
 
