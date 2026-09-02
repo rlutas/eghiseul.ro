@@ -205,6 +205,8 @@ RESEND_API_KEY=
 RESEND_WEBHOOK_SECRET=       # Svix secret pt /api/webhooks/resend (bounce alerts)
 SMSLINK_API_KEY=
 CLOUDCONVERT_API_KEY=        # DOCX→PDF preview in admin (optional; dev uses local LibreOffice)
+NEXT_PUBLIC_OPENAI_ADS_PIXEL_ID=  # ChatGPT Ads pixel (public); docs/ads/chatgpt/06
+OPENAI_ADS_API_KEY=          # ChatGPT Ads Conversions API (secret; fără ea serverul nu trimite conversii)
 ```
 
 ---

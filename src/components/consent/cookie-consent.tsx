@@ -60,6 +60,34 @@ function loadGa() {
   win().gtag!('config', GA_ID);
 }
 
+const OPENAI_PIXEL_ID = process.env.NEXT_PUBLIC_OPENAI_ADS_PIXEL_ID;
+type OaiqWindow = { oaiq?: ((...args: unknown[]) => void) & { q?: unknown[] } };
+
+let openAiPixelLoaded = false;
+/**
+ * Pixelul OpenAI Ads (ChatGPT Ads) — marketing, ca eticheta Google Ads.
+ * Snippet-ul oficial (developers.openai.com/ads/measurement-pixel): stub +
+ * coadă, apoi SDK-ul async. Conversia `order_created` pleacă din pagina de
+ * succes; serverul o trimite și prin Conversions API (dedup pe order_number).
+ */
+function loadOpenAiPixel() {
+  if (!OPENAI_PIXEL_ID || openAiPixelLoaded) return;
+  openAiPixelLoaded = true;
+  const w = window as unknown as OaiqWindow;
+  if (!w.oaiq) {
+    const q = function oaiq(...args: unknown[]) {
+      (q.q as unknown[]).push(args);
+    } as OaiqWindow['oaiq'] & { q: unknown[] };
+    q.q = [];
+    w.oaiq = q;
+    const s = document.createElement('script');
+    s.async = true;
+    s.src = 'https://bzrcdn.openai.com/sdk/oaiq.min.js';
+    document.head.appendChild(s);
+  }
+  w.oaiq!('init', { pixelId: OPENAI_PIXEL_ID });
+}
+
 let adsConfigured = false;
 function loadAds() {
   if (!ADS_ID || adsConfigured) return;
@@ -81,8 +109,11 @@ function applyConsent(state: ConsentState) {
   } else {
     deleteAnalyticsCookies();
   }
-  // Eticheta Google Ads ține de marketing, nu de analytics.
-  if (state.marketing) loadAds();
+  // Eticheta Google Ads și pixelul OpenAI Ads țin de marketing, nu de analytics.
+  if (state.marketing) {
+    loadAds();
+    loadOpenAiPixel();
+  }
 }
 
 /**

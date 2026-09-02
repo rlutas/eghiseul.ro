@@ -31,6 +31,8 @@ export interface TouchPoint {
   /** Click ID-uri de platformă: Google (gclid/gbraid/wbraid), Meta (fbclid). */
   click_id?: string;
   click_platform?: string;
+  /** ChatGPT Ads: identificatorul de atribuire OpenAI (`?oppref=`), trimis server-side la plată. */
+  oppref?: string;
   referrer?: string;
   /** Pagina pe care a aterizat. */
   landing?: string;
@@ -71,6 +73,12 @@ function readCurrentTouch(): TouchPoint {
     }
   }
 
+  // OpenAI (ChatGPT Ads) pune `oppref` pe URL-ul de aterizare. Îl păstrăm
+  // separat de click_id: nu e un click id clasic, ci cheia de atribuire pentru
+  // Conversions API, și poate coexista cu UTM-urile noastre.
+  const oppref = params.get('oppref');
+  if (oppref) touch.oppref = oppref.slice(0, 500);
+
   // Referrer intern nu e o sursă nouă — ne interesează doar de unde a venit
   // în site, nu cum navighează prin el.
   const ref = document.referrer;
@@ -84,7 +92,7 @@ function readCurrentTouch(): TouchPoint {
 
 /** True dacă touch-ul poartă o sursă reală (nu doar navigare directă). */
 function hasSource(t: TouchPoint): boolean {
-  return Boolean(t.utm_source || t.click_id || t.referrer);
+  return Boolean(t.utm_source || t.click_id || t.oppref || t.referrer);
 }
 
 function read(): Attribution | null {

@@ -98,6 +98,8 @@ declare global {
       action: string,
       params?: Record<string, unknown>
     ) => void;
+    /** Pixelul OpenAI Ads (ChatGPT Ads) — încărcat doar cu consimțământ de marketing. */
+    oaiq?: (...args: unknown[]) => void;
   }
 }
 
@@ -293,6 +295,38 @@ export default function SuccessPage() {
       console.log('GA4 Purchase tracked:', order.friendly_order_id);
     }
   }, [order, isPaid, purchaseTracked]);
+
+  // OpenAI Ads (ChatGPT Ads) — `order_created` prin pixel. Independent de gtag:
+  // pixelul există doar cu consimțământ de marketing. `event_id` = numărul
+  // comenzii, același pe care îl trimite serverul prin Conversions API →
+  // OpenAI dedup-uiește (și la refresh).
+  const [openAiTracked, setOpenAiTracked] = useState(false);
+  useEffect(() => {
+    if (!order || openAiTracked || !isPaid) return;
+    if (typeof window === 'undefined' || !window.oaiq) return;
+    const amountMinor = Math.round((order.breakdown?.total ?? order.total_price) * 100);
+    const eventId = order.friendly_order_id || order.order_number || order.id;
+    window.oaiq(
+      'measure',
+      'order_created',
+      {
+        type: 'contents',
+        amount: amountMinor,
+        currency: 'RON',
+        contents: [
+          {
+            id: order.service_id || order.id,
+            name: order.service_name,
+            quantity: 1,
+            amount: amountMinor,
+            currency: 'RON',
+          },
+        ],
+      },
+      { event_id: eventId }
+    );
+    setOpenAiTracked(true);
+  }, [order, isPaid, openAiTracked]);
 
   // Clear localStorage draft after successful order
   useEffect(() => {

@@ -355,6 +355,26 @@ async function handlePaymentSucceeded(paymentIntent: Stripe.PaymentIntent) {
 
   console.log(`Order ${orderId} marked as paid and processing`)
 
+  // 2a. OpenAI Ads (ChatGPT Ads) Conversions API — doar pentru comenzile venite
+  // din ChatGPT (oppref / utm_source=chatgpt în orders.attribution). Non-fatal;
+  // dedup cu pixelul din pagina de succes pe order_number.
+  try {
+    const { sendOpenAiPurchaseEvent } = await import('@/lib/analytics/openai-conversions')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const o = order as any
+    await sendOpenAiPurchaseEvent({
+      orderNumber: o.friendly_order_id || o.order_number || orderId,
+      totalRon: Number(o.total_price ?? 0),
+      serviceSlug: o.services?.slug ?? null,
+      serviceName: o.services?.name ?? null,
+      email: o.customer_data?.contact?.email ?? null,
+      phone: o.customer_data?.contact?.phone ?? null,
+      attribution: o.attribution ?? null,
+    })
+  } catch (e) {
+    console.error(`Order ${orderId}: openai conversion failed (non-fatal):`, e instanceof Error ? e.message : e)
+  }
+
   // 2b. Increment coupon usage if one was applied.
   // Idempotency is provided by the early return on line 135 (checks invoice_number):
   // coupon increment only runs when invoice_number is null (i.e. first-time payment webhook).
