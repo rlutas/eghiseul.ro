@@ -9,7 +9,7 @@ oficiale (https://developers.openai.com/ads/measurement-pixel , https://develope
 |---|---|
 | Data source (pixel) | **eghiseul.ro web** — Pixel ID `QzXwAbRL9bRrWomdusTNSY` (public, e în snippet) |
 | Conversion event | **Order CreatedPurchase** (id `6a985f4f0e7c8196b93217e061820220`), base event `order_created`, fereastră click 30 zile |
-| Conversion key (API) | ⚠️ **de creat de Raul**: Conversions → „Conversion keys" → Create new key → valoarea în Vercel ca `OPENAI_ADS_API_KEY` (production + preview) și în `.env.local`. Cheia se vede o singură dată. |
+| Conversion key (API) | **creată 02.09** („eghiseul-stripe-webhook"), pusă în Vercel `OPENAI_ADS_API_KEY` (production + preview) și `.env.local` prin clipboard (n-a trecut prin chat). Validată: `validate_only` → `200 {"accepted_events":1}`. Dacă se pierde: Conversions → Conversion keys → Create new key, apoi `vercel env add OPENAI_ADS_API_KEY production` (+ preview). |
 | Link event → campanie | doar pentru obiectivul Conversions; campania noastră e pe Clicks, raportarea merge pe `oppref` fără link |
 
 ## Cum funcționează pe site
@@ -42,7 +42,7 @@ primul, ignoră restul (inclusiv refresh pe pagina de succes și cele două webh
 | `src/app/api/webhooks/stripe/route.ts` | apel non-fatal după ce comanda e marcată plătită |
 
 Env: `NEXT_PUBLIC_OPENAI_ADS_PIXEL_ID` (pus în Vercel production+preview și `.env.local`),
-`OPENAI_ADS_API_KEY` (**lipsă** până o creează Raul; fără ea, serverul nu trimite nimic — pixelul merge oricum).
+`OPENAI_ADS_API_KEY` (în Vercel production + preview din 02.09; deploy-ul de după commit-ul docs o preia).
 
 ## Verificare după deploy
 
