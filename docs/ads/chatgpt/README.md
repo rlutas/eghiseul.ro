@@ -27,4 +27,4 @@ Google Ads (blocat pe politica documentelor guvernamentale, vezi `../README.md`)
 
 | Data | Ce |
 |---|---|
-| 02.09 | Politica verificată direct pe openai.com; România „Available" pe help.openai.com; landing constatator curățat (de comis + push); campania scrisă în 04. **Următorul pas: Raul creează contul pe ads.openai.com.** |
+| 02.09 | Politica verificată direct pe openai.com; România „Available" pe help.openai.com; landing constatator curățat (de comis + push); campania scrisă în 04. Contul exista deja; campania introdusă în Ads Manager (jurnal în 04), billing făcut de Raul. **Următorul pas: verificăm statusul de review a doua zi + testul UTM.** ⚠️ Advertiserul apare ca „EDIGITALIZARE SRL" — de verificat dacă în Business information se poate afișa „eGhișeul.ro". ⚠️ OG-ul site-ului (`public/og/default.png`, tras automat de Ads Manager la primul anunț) zice „Documente oficiale online" — încalcă regula noastră; de refăcut separat. |

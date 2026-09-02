@@ -101,7 +101,7 @@ Domeniul e `eghiseul.ro` (nu `www`, nu `eghiseul-ro.vercel.app` — SSO wall), c
 
 ## G. Licitare & buget
 
-- Obiectiv **Clicks** (CPC). Max CPC **1,2 $** pe AG1/AG3, **3 $** pe AG2. Nu urcăm bidul în primele 3 zile.
+- Obiectiv **Clicks** (CPC). Plan inițial: max CPC 1,2 $ — dar Ads Manager marchează sub ~€1,95 „May not deliver" (preț de rezervă, nu concurență pe nișă: licităm pe slotul din conversație contra oricui targetează conversații de business în română). Pornit la **€1,95** (~9,7 RON) pe AG1; după 3 zile cu livrare coborâm la €1,50 și vedem dacă mai livrează. AG2 (istoric) poate merge la €3.
 - Dacă după 3 zile AG1 are 0 afișări → bid 2 $ pentru încă 3 zile; dacă tot nimic → concluzie „la marja
   noastră nu se livrează pe de bază", păstrăm doar AG2.
 - Buget zilnic 100 RON. Nu creștem în primele 7 zile indiferent de rezultate.
@@ -139,4 +139,5 @@ din Ads Manager; GA4 doar ca sanity check pe sesiuni cu `utm_source=chatgpt`.
 
 | Data | Ce s-a întâmplat |
 |---|---|
-| 02.09 | Campania scrisă; landing curățat (necomis); cont NEcreat încă |
+| 02.09 | Campania scrisă; landing curățat și pushat (commit 5043331) |
+| 02.09 seara | Cont EXISTA deja (EDIGITALIZARE SRL, `adacct_6a9803d500b88196a0106a3aba6413b5`, monedă **EUR**). Introdus în onboarding: campanie `OAI_Click_Constatator_2026-09`, Clicks, România, **€20/zi**, Text customization **Off** (altfel AI-ul rescrie/traduce anunțul fără review); AG1 cu URL constatator + UTM + context hints; **Max CPC €1,95** — la €1,10 și €1,50 Ads Manager arată „May not deliver", la €1,95 „Strong Delivery" (probabil preț de rezervă; coborâm după 3 zile); anunț T „Certificat constatator online" (29) + D1 (90); imagine `assets/ad-constatator-1024.png` (document stilizat + logo, FĂRĂ siglele ONRC/Ministerului — risc „impersonate official entities"). Billing + termeni: Raul. |
