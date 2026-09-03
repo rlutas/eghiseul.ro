@@ -40,3 +40,13 @@ ONRC — risc de impersonare). Status la final de zi: **Not serving** (brand rev
 ## Rămas
 
 Review-ul OpenAI (1–2 zile). Apoi test în incognito cu `?utm_source=chatgpt&oppref=test123`.
+
+## Addendum 03.09 — „Copie Carte Funciară" fără „in extenso" în rezumat (E-260903-56MGJ)
+
+Clientul a ezitat la plată: pagina promite „Copie Carte Funciară in extenso (integrală)", dar rezumatul
+comenzii/adminul afișau doar `services.name` = „Copie Carte Funciară". Serviciul ESTE copia in extenso
+(descrierea din DB, 168,19 lei cu TVA), fără opțiuni — doar eticheta era ambiguă. Fix: `services.name`
+→ „Copie Carte Funciară (in extenso)" (DB). Bonus: bannerul ANCPI din checkout spunea „2 zile
+lucrătoare… primești extrasul", contrazicând „4 zile" din rezumat → `SystemStatus` primește `termDays`
+din `services.estimated_days`. Comanda intră la Mircea (copie-carte-funciara e în
+`collaborator_service_assignments`).

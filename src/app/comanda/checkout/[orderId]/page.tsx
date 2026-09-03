@@ -508,6 +508,7 @@ export default function CheckoutPage() {
               <SystemStatus
                 service={platformStatusProvider(order.service_slug)!}
                 autoIssued={!!instantPlatformProvider(order.service_slug)}
+                termDays={order.service_estimated_days || 2}
               />
             )}
             {(() => {

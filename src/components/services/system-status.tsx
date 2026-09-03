@@ -19,7 +19,14 @@ export function SystemStatus({
   service = 'onrc',
   autoIssued = true,
   compact = false,
+  termDays = 2,
 }: {
+  /**
+   * Termenul promis în bannerul ANCPI (zile lucrătoare). Default 2 = extrasul
+   * CF prin partener; copiile in extenso / din arhivă au 4 (services.estimated_days)
+   * — checkout-ul îl pasează ca să nu contrazică rezumatul comenzii.
+   */
+  termDays?: number;
   className?: string;
   /** Which provider's status to show: 'onrc' (constatator) or 'ancpi' (carte funciară). */
   service?: 'onrc' | 'ancpi';
@@ -168,7 +175,7 @@ export function SystemStatus({
           probleme — platformele online pentru public rămân oprite, iar la ghișee s-au adunat
           cererile din perioada blocajului. <strong>Poți comanda în continuare:</strong> cererea o
           depune la OCPI un <strong>partener autorizat</strong>, iar termenul nostru este de{' '}
-          <strong>2 zile lucrătoare</strong>. Primești extrasul pe email.
+          <strong>{termDays} zile lucrătoare</strong>. Primești documentul pe email.
         </p>
       )}
 
