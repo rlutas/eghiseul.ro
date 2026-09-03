@@ -50,6 +50,7 @@ import {
 } from '@/lib/verification-modules/step-builder';
 import { generateOrderId, getDraftStorageKey, validateOrderId } from '@/lib/order-id';
 import { getAttribution } from '@/lib/analytics/attribution';
+import { trackMeta } from '@/lib/analytics/meta-pixel';
 
 // Cache version for migrations
 // v3: Added clientType to cache for proper step reconstruction
@@ -1509,6 +1510,12 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
       );
       if (bundledServices.length > 0) {
         customerData.bundled_services = bundledServices;
+      }
+
+      // Meta Pixel: prima salvare a draftului = intrarea în checkout (no-op fără
+      // consimțământ de marketing). Semnalul de optimizare pentru testul Meta.
+      if (method === 'POST') {
+        trackMeta('InitiateCheckout', { content_ids: [state.serviceId], content_type: 'product', currency: 'RON' });
       }
 
       const response = await fetch('/api/orders/draft', {

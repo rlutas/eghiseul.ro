@@ -375,6 +375,25 @@ async function handlePaymentSucceeded(paymentIntent: Stripe.PaymentIntent) {
     console.error(`Order ${orderId}: openai conversion failed (non-fatal):`, e instanceof Error ? e.message : e)
   }
 
+  // 2a'. Meta Conversions API — doar pentru comenzile venite din Meta (fbclid /
+  // utm_source=meta). Non-fatal; dedup cu pixelul pe order_number.
+  try {
+    const { sendMetaPurchaseEvent } = await import('@/lib/analytics/meta-conversions')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const o = order as any
+    await sendMetaPurchaseEvent({
+      orderNumber: o.friendly_order_id || o.order_number || orderId,
+      totalRon: Number(o.total_price ?? 0),
+      serviceSlug: o.services?.slug ?? null,
+      serviceName: o.services?.name ?? null,
+      email: o.customer_data?.contact?.email ?? null,
+      phone: o.customer_data?.contact?.phone ?? null,
+      attribution: o.attribution ?? null,
+    })
+  } catch (e) {
+    console.error(`Order ${orderId}: meta conversion failed (non-fatal):`, e instanceof Error ? e.message : e)
+  }
+
   // 2b. Increment coupon usage if one was applied.
   // Idempotency is provided by the early return on line 135 (checks invoice_number):
   // coupon increment only runs when invoice_number is null (i.e. first-time payment webhook).

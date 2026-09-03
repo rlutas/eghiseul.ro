@@ -88,6 +88,47 @@ function loadOpenAiPixel() {
   w.oaiq!('init', { pixelId: OPENAI_PIXEL_ID });
 }
 
+const META_PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID;
+type FbqWindow = {
+  fbq?: ((...args: unknown[]) => void) & {
+    callMethod?: (...args: unknown[]) => void;
+    queue?: unknown[];
+    loaded?: boolean;
+    version?: string;
+  };
+  _fbq?: unknown;
+};
+
+let metaPixelLoaded = false;
+/**
+ * Meta Pixel (Facebook/Instagram Ads) — marketing, ca Google Ads și OpenAI.
+ * Snippet-ul oficial (stub + coadă, apoi fbevents.js async). PageView aici;
+ * InitiateCheckout la crearea draftului, Purchase pe pagina de succes; serverul
+ * trimite Purchase și prin Conversions API (dedup pe order_number).
+ */
+function loadMetaPixel() {
+  if (!META_PIXEL_ID || metaPixelLoaded) return;
+  metaPixelLoaded = true;
+  const w = window as unknown as FbqWindow;
+  if (!w.fbq) {
+    const n = function fbq(...args: unknown[]) {
+      if (n.callMethod) n.callMethod(...args);
+      else (n.queue as unknown[]).push(args);
+    } as NonNullable<FbqWindow['fbq']>;
+    n.queue = [];
+    n.loaded = true;
+    n.version = '2.0';
+    w.fbq = n;
+    w._fbq = n;
+    const s = document.createElement('script');
+    s.async = true;
+    s.src = 'https://connect.facebook.net/en_US/fbevents.js';
+    document.head.appendChild(s);
+  }
+  w.fbq!('init', META_PIXEL_ID);
+  w.fbq!('track', 'PageView');
+}
+
 let adsConfigured = false;
 function loadAds() {
   if (!ADS_ID || adsConfigured) return;
@@ -113,6 +154,7 @@ function applyConsent(state: ConsentState) {
   if (state.marketing) {
     loadAds();
     loadOpenAiPixel();
+    loadMetaPixel();
   }
 }
 

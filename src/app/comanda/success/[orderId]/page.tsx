@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { trackMeta } from '@/lib/analytics/meta-pixel';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import {
   CheckCircle,
@@ -327,6 +328,28 @@ export default function SuccessPage() {
     );
     setOpenAiTracked(true);
   }, [order, isPaid, openAiTracked]);
+
+  // Meta Pixel — Purchase, cu eventID = numărul comenzii (dedup cu Conversions API
+  // din webhook). No-op fără consimțământ de marketing.
+  const [metaTracked, setMetaTracked] = useState(false);
+  useEffect(() => {
+    if (!order || metaTracked || !isPaid) return;
+    const eventId = order.friendly_order_id || order.order_number || order.id;
+    trackMeta(
+      'Purchase',
+      {
+        value: Number((order.breakdown?.total ?? order.total_price).toFixed(2)),
+        currency: 'RON',
+        content_type: 'product',
+        content_ids: [order.service_id || order.id],
+        content_name: order.service_name,
+        num_items: 1,
+        order_id: eventId,
+      },
+      eventId
+    );
+    setMetaTracked(true);
+  }, [order, isPaid, metaTracked]);
 
   // Clear localStorage draft after successful order
   useEffect(() => {

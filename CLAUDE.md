@@ -207,6 +207,8 @@ SMSLINK_API_KEY=
 CLOUDCONVERT_API_KEY=        # DOCX→PDF preview in admin (optional; dev uses local LibreOffice)
 NEXT_PUBLIC_OPENAI_ADS_PIXEL_ID=  # ChatGPT Ads pixel (public); docs/ads/chatgpt/06
 OPENAI_ADS_API_KEY=          # ChatGPT Ads Conversions API (secret; fără ea serverul nu trimite conversii)
+NEXT_PUBLIC_META_PIXEL_ID=   # Meta Pixel (public); docs/ads/meta/05
+META_CAPI_ACCESS_TOKEN=      # Meta Conversions API (secret)
 ```
 
 ---
