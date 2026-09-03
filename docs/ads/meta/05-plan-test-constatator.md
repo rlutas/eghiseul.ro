@@ -63,4 +63,4 @@ Aritmetica: 89 lei cu TVA 21 % → 73,55 net − 30 taxa ONRC − ~3 procesare �
 | Data | Ce |
 |---|---|
 | 02.09 | Plan scris. Precondițiile 2–4 (pixel, evenimente, CAPI) NU sunt implementate. Nu s-a pornit nimic. |
-| 03.09 | Precondițiile 2–5 implementate în cod (commit `ccd920d`); 1 (portofoliu + pagină + cont reclame) făcute; pixel `2319629835442431`; creative C1–C4 în `assets/`. Lipsă: card, token CAPI, campania. |
+| 03.09 | Precondițiile 2–5 implementate în cod (commit `ccd920d`); 1 (portofoliu + pagină + cont reclame) făcute; pixel `2319629835442431`; creative C1–C4 în `assets/`. Token CAPI generat + validat. Deploy prin `vercel --prod`. **Test live 03.09 10:06** pe `/servicii/certificat-constatator-online/?utm_source=meta&fbclid=TEST…&oppref=test…`: `eg_attribution.last` = {utm_source: meta, click_id, click_platform: meta, oppref} ✓; cu marketing acceptat se încarcă `fbevents.js` + config pixel 2319629835442431 (`fbq.loaded=true`), `oaiq.min.js` + config, gtag ✓. Lipsă: card, campania. |
