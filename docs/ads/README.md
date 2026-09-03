@@ -27,7 +27,7 @@ Contul vechi: **eGhiseul, 677-995-5005** (eghiseul@gmail.com) — BLOCAT pe poli
 
 ## Ce urmărim (din 03.09.2026) — ChatGPT Ads + Meta
 
-Stare la 03.09 15:00: **OpenAI** — campania Active, „Not serving" doar pentru brand review + „account getting ready" (5–7 zile, fără acțiune); motivul de politică a dispărut. **Meta** — campania + ad setul publicate, anunțul In draft până la card pe contul 1562160259035101.
+Stare la 03.09 15:00: **OpenAI** — campania Active, „Not serving" doar pentru brand review + „account getting ready" (5–7 zile, fără acțiune); motivul de politică a dispărut. **Meta** — campania publicată 03.09 15:15, anunțul C0 în review (Processing).
 
 | Când | Unde | Ce verificăm | Prag / acțiune |
 |---|---|---|---|
@@ -40,4 +40,4 @@ Stare la 03.09 15:00: **OpenAI** — campania Active, „Not serving" doar pentr
 | ziua 7 | ambele | citim decizia din `chatgpt/04` §I și `meta/05` §4 | scriem concluzia în jurnal |
 | ziua 14 | ambele | verdict final per canal | scalăm / oprim / rămânem doar retargeting (Meta) |
 
-Ce NU e încă la punct: (1) Meta — cardul pe contul de reclame; creativele pătrate c1–c4 de urcat (imaginea curentă e coperta 2,63:1 → nu livrează pe Stories/WhatsApp Status/Threads); (2) OpenAI — nimic, așteptăm review-ul; (3) comun — `public/og/default.png` zice „Documente oficiale online" (încalcă regula 1, de refăcut).
+Ce NU e încă la punct: (1) Meta — creativele pătrate c1–c4 de urcat (imaginea curentă e coperta 2,63:1 → nu livrează pe Stories/WhatsApp Status/Threads); (2) OpenAI — nimic, așteptăm review-ul; (3) comun — `public/og/default.png` zice „Documente oficiale online" (încalcă regula 1, de refăcut).
