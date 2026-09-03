@@ -60,9 +60,9 @@ UTM în Tracking → URL parameters, enhancements OFF, „Optimise text per pers
 
 Când C1–C5 sunt „Active": **oprim C0** (coperta). Nu ștergem, ca să păstrăm istoricul.
 
-C5 e produs local, reproductibil: `assets/c5-record.js` (Playwright, mobil 540×675 @2x → 1080×1350,
+C5 e produs local, reproductibil: `assets/c5-record.mjs` (Playwright, mobil 540×675 @2x → 1080×1350,
 landing → scroll → wizard pasul 1) + overlay-uri PNG (PIL) + ffmpeg (concat cu end card). 18 s, H.264.
-Regenerare când se schimbă landing-ul: `NODE_PATH=./node_modules node docs/ads/meta/assets/c5-record.js <dir>`.
+Regenerare când se schimbă landing-ul: `NODE_PATH=./node_modules node docs/ads/meta/assets/c5-record.mjs <dir>`.
 
 ## D. Stare 03.09 16:10
 
