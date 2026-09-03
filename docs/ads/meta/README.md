@@ -10,6 +10,8 @@ Deschis 02.09.2026 ca posibil al doilea canal după ChatGPT Ads. Evaluarea scurt
 | [03-ad-library-us-uk.md](03-ad-library-us-uk.md) | **ce rulează LIVE** în Ad Library US/UK/RO: citate din anunțuri, de când rulează (durata = proxy pentru „merge"), cine ține luni/ani (Texas Tower 22 luni, CFunciara 19 luni, UK Deed Poll 6+) |
 | [04-playbook-ce-merge.md](04-playbook-ce-merge.md) | sinteza: ce merge / ce nu / ce e diferit la noi / ce aflăm doar testând |
 | [05-plan-test-constatator.md](05-plan-test-constatator.md) | planul de test: precondiții tehnice (pixel consent-gated, evenimente, CAPI), structura, 4 creative scrise, măsurare în DB, praguri de decizie |
+| [06-audit-si-plan-creativ.md](06-audit-si-plan-creativ.md) | **audit 03.09** campanie vs research (conform pe structură/tracking/buget, NEconform pe creativ: 1 anunț cu coperta), static vs carusel vs video (decizie: screencast, nu cinematic), anunțurile C1–C5 gata de introdus, video C5 produs local (Playwright + ffmpeg), prompturi Higgsfield |
+| [07-pagina-facebook-postari.md](07-pagina-facebook-postari.md) | 12 postări gata de copiat pentru pagina EGhiseul (platformă nouă, 40 calculatoare, servicii, transparență), reguli, cadență, cum se programează |
 
 ## Concluzia în 5 rânduri
 
