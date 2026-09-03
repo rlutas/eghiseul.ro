@@ -94,7 +94,20 @@ Peste [N] comenzi livrate din 2019. Din iulie 2026, pe platforma nouă: [392] co
 în medie în [X] ore. Mulțumim.
 *Nu se publică fără cifre verificate.*
 
-## Publicare
+## Publicate 03.09 (de Claude, prin www.facebook.com → composer, input de fișier real)
+
+| Post | Imagine | Ora |
+|---|---|---|
+| P2 constatator bancă | c1 | 15:30 |
+| P5 cum funcționează (carusel 4) | c2-1..4 | 15:33 |
+| P11 licitație/fonduri | c3 | 15:38 |
+| P9 verificare partener | c4 | 15:41 |
+| P1 platformă nouă — **pinned** | fb-cover | 15:47 |
+| P13 (nou) constatator, 3 scene Higgsfield | c6, c7, c8 | 16:08 |
+
+Rămase pentru săptămânile următoare (Planner, luni/miercuri/vineri): P3 calculatoare, P4 extras CF, P6 cazier, P7 traduceri/apostilă, P8 transparență, P10 rovinietă, P12 cifre (după Oblio).
+
+## Publicare (note)
 
 - Extensia Chrome nu are acces la business.facebook.com / www.facebook.com → postările le publică Raul
   din Meta Business Suite (Planner → programare) sau îmi dai acces la domeniu și le programez eu.

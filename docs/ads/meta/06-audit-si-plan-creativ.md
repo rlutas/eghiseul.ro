@@ -64,7 +64,14 @@ C5 e produs local, reproductibil: `assets/c5-record.js` (Playwright, mobil 540×
 landing → scroll → wizard pasul 1) + overlay-uri PNG (PIL) + ffmpeg (concat cu end card). 18 s, H.264.
 Regenerare când se schimbă landing-ul: `NODE_PATH=./node_modules node docs/ads/meta/assets/c5-record.js <dir>`.
 
-## D. Pași
+## D. Stare 03.09 16:10
+
+- Upload: rezolvat prin postări pe pagina de Facebook (www.facebook.com are input real de fișiere) → imaginile apar în Ads Manager la „Page images". Ads Manager/Media Library rămân inaccesibile pentru upload direct.
+- Live/în review: C1, C3, C4 (statice din `assets/`). C0 respins (forged goods), contestat.
+- Higgsfield: `product-photoshoot` indisponibil (endpoint enhance cade), `generate create gpt_image_2` merge → C6–C8 compuse local. De adăugat ca anunțuri după ce C1/C3/C4 trec review-ul (nu aglomerăm review-ul cu 6 anunțuri simultan).
+- De urcat de Raul: `c5-screencast-4x5.mp4` / `9x16` (video; pagina acceptă video prin același input, dar 800 KB × 3 formate — le urcăm când C1–C4 sunt aprobate).
+
+## D0. Pași (istoric)
 
 1. **Raul (2 min)**: Ads Manager → anunțul C0 → Media → Edit → Edit media → **Upload** → selectezi toate:
    `c1-deadline-banca.png`, `c2-pas-1..4.png`, `c3-licitatie-checklist.png`, `c4-verificare-partener.png`,
