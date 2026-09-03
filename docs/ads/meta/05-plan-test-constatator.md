@@ -63,3 +63,4 @@ Aritmetica: 89 lei cu TVA 21 % → 73,55 net − 30 taxa ONRC − ~3 procesare �
 | Data | Ce |
 |---|---|
 | 02.09 | Plan scris. Precondițiile 2–4 (pixel, evenimente, CAPI) NU sunt implementate. Nu s-a pornit nimic. |
+| 03.09 | Precondițiile 2–5 implementate în cod (commit `ccd920d`); 1 (portofoliu + pagină + cont reclame) făcute; pixel `2319629835442431`; creative C1–C4 în `assets/`. Lipsă: card, token CAPI, campania. |
