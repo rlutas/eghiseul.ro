@@ -77,7 +77,7 @@ serviciu; comenzile finalizate fără taxă rămân la 0 (serviciul chiar nu are
 
 Mirandsof SRL, seria SM nr. 153 / 28.08.2026: **525,00 fără TVA + 110,25 TVA = 635,25 lei**.
 Înțelegerea era 15 lei/comandă **cu TVA inclus** (35 comenzi = 525 total, adică 433,88 net).
-**Decizia lui Raul (07.09): se plătește ca atare, fără refacerea facturii.** TVA-ul se
+**Factura a fost PLĂTITĂ pe 07.09**, ca atare, fără refacere. TVA-ul se
 deduce, deci costul rămas al firmei e 525 lei — exact suma scăzută din partea lui Mircea.
 
 **Regula comisionului (Raul, 07.09):** comisionul de 15 lei/comandă NU e cost înainte de

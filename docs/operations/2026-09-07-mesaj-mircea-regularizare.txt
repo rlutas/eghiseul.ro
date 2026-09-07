@@ -1,37 +1,17 @@
 Salut Mircea,
 
-Am refăcut decontul pentru 7 iulie – 31 august. Ți-am pus tot într-un raport, ca să vezi exact de unde vine fiecare cifră, inclusiv lista completă cu toate cele 162 de comenzi:
+Am refăcut decontul pentru 7 iulie – 31 august. Ai tot aici, inclusiv lista cu toate cele 162 de comenzi:
 
 https://claude.ai/code/artifact/7af1f9b5-d533-4689-b4f6-540bfba0854f
 
-Ce s-a schimbat față de calculul din 26 august, două lucruri:
+Pe scurt, două lucruri s-au schimbat față de 26 august: au intrat taxele OCPI ale comenzilor care erau nelucrate atunci (2.035 → 3.055 lei) și am uitat data trecută să scad comisionul Stripe, 451,55 lei pe toată perioada.
 
-1. Atunci erau 53 de comenzi plătite dar încă nelucrate, deci taxele lor OCPI nu apăruseră în sistem. Între timp le-ai lucrat și au intrat: taxele au urcat de la 2.035 la 3.055 lei.
+Deci partea corectă e 3.907,07 lei de fiecare. Tu ai primit 3.791,61 în cont plus 525 prin factură, adică 4.316,61 — exact cât am luat și eu. Se reglează 409,54 lei la amândoi, din care la tine se scad 30 de lei de comision pe care îi mai ai de facturat (2 comenzi au intrat după data facturii). Rămân 379,54 lei, pe care îi scădem din decontul pe septembrie. Nu ai de returnat nimic.
 
-2. Am uitat să scad comisionul procesatorului de plăți. Stripe reține un comision la fiecare încasare cu cardul, 451,55 lei pe toată perioada. E un cost real al fiecărei comenzi, ca și taxa la OCPI, doar că se ia automat din bani înainte să ajungă la noi, așa că nu se vedea nicăieri.
+Factura de 635,25 ți-am plătit-o. Doar pentru viitor: 15 lei pe comandă înseamnă 15 lei cu TVA inclus, nu 15 plus TVA.
 
-Cu astea două puse la punct: profit de împărțit 7.814,15 lei, adică 3.907,07 lei de fiecare.
+De acum vezi tot în portal, la Decont — încasări, taxe, comisioane, impozite și partea ta, pas cu pas. Am început să înregistrez acolo și banii pe care ți-i trimit pentru taxe, ca să vedem mereu soldul; deocamdată am pus transferurile din 21 august încoace (3.240 lei), dacă ai evidența ta din iulie trimite-mi-o.
 
-Tu ai primit pe 26 august 3.791,61 lei în cont, adică partea calculată atunci minus comisionul de 525 pe care îl iei prin factură. Deci în total ai primit 4.316,61 lei, exact ca mine.
+Am schimbat și modul de calcul ca să nu se mai repete: taxa se scade în decontul în care a fost plătită, iar decontul se face cumulat, scăzând ce s-a distribuit deja. Așa orice cost întârziat se corectează singur.
 
-Se reglează 409,54 lei, aceeași sumă la amândoi. Din ei se scad 30 de lei de comision pe care îi mai ai de facturat: în perioadă sunt 37 de comenzi cu comision, iar factura ta din 28 august acoperă 35, două au intrat după. Rămân 379,54 lei.
-
-Nu trebuie să returnezi nimic acum. Factura de 635,25 ți-o plătesc la termen, ca atare, iar diferența o scădem pur și simplu din decontul pe septembrie. Fără stres.
-
-O singură mențiune pentru facturile următoare: înțelegerea e 15 lei pe comandă cu TVA inclus, deci pe factură suma finală trebuie să fie 15 lei pe comandă, nu 15 plus TVA. De data asta nu contează, se compensează oricum în reglarea de mai sus.
-
-Două lucruri practice:
-
-- De acum vezi tot în portal, la Decont: încasările, taxele OCPI, comisioanele Stripe, impozitele și partea ta, pas cu pas. Verifici singur oricând, fără să aștepți un raport de la mine.
-
-- Am început să înregistrez în platformă și banii pe care ți-i trimit pentru taxe, ca să vedem mereu soldul: cât ai primit și cât s-a consumat efectiv. Am pus deocamdată transferurile din 21 august încoace (3.240 lei). Dacă ai evidența ta pe iulie și începutul lui august, trimite-mi-o și o punem la punct.
-
-Am schimbat și felul în care socotim, ca să nu mai apară situația asta:
-
-Taxa la OCPI se scade în decontul în care a fost plătită efectiv, nu în luna comenzii, iar decontul se calculează cumulat de la 7 iulie încoace, scăzând ce s-a distribuit deja. Așa, dacă o comandă din august se lucrează abia în septembrie, costul ei intră automat în calcul atunci și se corectează singur — nu mai depinde de ce ținem noi minte.
-
-Ca exemplu: cu comenzile din 1-7 septembrie deja incluse, partea cuvenită cumulat urcă la 4.181,59 lei, iar diferența de reglat scade de la 409,54 la 135,02 lei. Se așază singură pe măsură ce intră comenzi.
-
-Mai sunt 12 comenzi încasate dar nelucrate (10 identificări de imobil, 2 după proprietar). La identificare plătim un extras de carte funciară, 20 de lei, deci vor aduce în jur de 240 de lei de taxe când se lucrează. Nu le-am scăzut acum, tocmai pentru că unele stau în așteptarea clientului și s-ar putea să nu se facă deloc.
-
-Zi-mi dacă vezi ceva care nu-ți iese la calcul.
+Zi-mi dacă ceva nu-ți iese la calcul.
