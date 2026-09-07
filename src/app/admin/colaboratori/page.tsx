@@ -150,6 +150,150 @@ function ServiceAssignments({ collaboratorId, onChanged }: { collaboratorId: str
   );
 }
 
+/** Avansurile trimise colaboratorului pentru taxele instituțiilor (OCPI).
+ *  Banii pleacă din contul lui Raul (de regulă Revolut) ca el să poată plăti
+ *  taxa la depunere; consumul e în order_supplier_costs, per comandă. Soldul
+ *  arată cât mai are la el, neconsumat — se confruntă la decont. */
+interface Advance {
+  id: string; amount_ron: number; sent_at: string; method: string; note: string | null;
+}
+
+const ADVANCE_METHODS: [string, string][] = [
+  ['revolut', 'Transfer Revolut'],
+  ['card', 'Taxă plătită cu cardul'],
+  ['transfer', 'Transfer bancar'],
+  ['numerar', 'Numerar'],
+  ['alt', 'Altfel'],
+];
+
+function AdvancesPanel({ collaboratorId }: { collaboratorId: string }) {
+  const [advances, setAdvances] = useState<Advance[]>([]);
+  const [summary, setSummary] = useState({ sent: 0, spent: 0, balance: 0 });
+  const [loading, setLoading] = useState(true);
+  const [amount, setAmount] = useState('');
+  const [sentAt, setSentAt] = useState(() => new Date().toISOString().slice(0, 10));
+  const [method, setMethod] = useState('revolut');
+  const [note, setNote] = useState('');
+  const [saving, setSaving] = useState(false);
+
+  const load = async () => {
+    const res = await fetch(`/api/admin/collaborators/advances?collaboratorId=${collaboratorId}`);
+    const json = await res.json();
+    if (json.success) { setAdvances(json.data.advances); setSummary(json.data.summary); }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    let alive = true;
+    const t = setTimeout(() => {
+      setLoading(true);
+      void (async () => { if (alive) await load(); })();
+    }, 0);
+    return () => { alive = false; clearTimeout(t); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [collaboratorId]);
+
+  const add = async () => {
+    const value = Number(amount.replace(',', '.'));
+    if (!Number.isFinite(value) || value <= 0) return;
+    setSaving(true);
+    try {
+      const res = await fetch('/api/admin/collaborators/advances', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ collaboratorId, amountRon: value, sentAt, method, note }),
+      });
+      if (!res.ok) { alert('Nu s-a putut salva avansul.'); return; }
+      setAmount(''); setNote('');
+      await load();
+    } finally { setSaving(false); }
+  };
+
+  const remove = async (id: string) => {
+    const res = await fetch(`/api/admin/collaborators/advances?id=${id}`, { method: 'DELETE' });
+    if (res.ok) await load();
+  };
+
+  const fmt2 = (n: number) => n.toLocaleString('ro-RO', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+  return (
+    <div className="mb-6 rounded-xl border border-slate-200 bg-white p-5">
+      <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
+        <div>
+          <h2 className="text-sm font-semibold text-slate-900">Avansuri pentru taxe</h2>
+          <p className="text-xs text-slate-500">Banii trimiși colaboratorului ca să plătească taxele la instituții. Consumul se ia din taxele înregistrate pe comenzi.</p>
+        </div>
+      </div>
+
+      <div className="mb-4 grid gap-3 sm:grid-cols-3">
+        <div className="rounded-lg border border-slate-200 p-3">
+          <p className="text-[11px] uppercase tracking-wide text-slate-500">Trimis</p>
+          <p className="text-lg font-bold text-slate-900">{fmt2(summary.sent)} <span className="text-xs font-semibold text-slate-400">RON</span></p>
+        </div>
+        <div className="rounded-lg border border-slate-200 p-3">
+          <p className="text-[11px] uppercase tracking-wide text-slate-500">Consumat în taxe</p>
+          <p className="text-lg font-bold text-slate-900">{fmt2(summary.spent)} <span className="text-xs font-semibold text-slate-400">RON</span></p>
+        </div>
+        <div className={`rounded-lg border p-3 ${summary.balance < 0 ? 'border-rose-300 bg-rose-50' : 'border-emerald-300 bg-emerald-50'}`}>
+          <p className="text-[11px] uppercase tracking-wide text-slate-500">Sold la colaborator</p>
+          <p className={`text-lg font-bold ${summary.balance < 0 ? 'text-rose-700' : 'text-emerald-700'}`}>{fmt2(summary.balance)} <span className="text-xs font-semibold text-slate-400">RON</span></p>
+        </div>
+      </div>
+
+      <div className="mb-4 flex flex-wrap items-end gap-2">
+        <div>
+          <label className="mb-1 block text-xs font-medium text-slate-500">Sumă (RON)</label>
+          <input value={amount} onChange={(e) => setAmount(e.target.value)} inputMode="decimal" placeholder="500" className="w-28 rounded-lg border border-slate-300 px-3 py-2 text-sm" />
+        </div>
+        <div>
+          <label className="mb-1 block text-xs font-medium text-slate-500">Data</label>
+          <input type="date" value={sentAt} onChange={(e) => setSentAt(e.target.value)} className="rounded-lg border border-slate-300 px-3 py-2 text-sm" />
+        </div>
+        <div>
+          <label className="mb-1 block text-xs font-medium text-slate-500">Cum</label>
+          <select value={method} onChange={(e) => setMethod(e.target.value)} className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm">
+            {ADVANCE_METHODS.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+          </select>
+        </div>
+        <div className="min-w-[180px] flex-1">
+          <label className="mb-1 block text-xs font-medium text-slate-500">Mențiune (opțional)</label>
+          <input value={note} onChange={(e) => setNote(e.target.value)} placeholder="ex. taxe OCPI Ilfov" className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" />
+        </div>
+        <button type="button" onClick={() => void add()} disabled={saving || !amount} className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-50">
+          {saving ? 'Se salvează...' : 'Adaugă'}
+        </button>
+      </div>
+
+      <div className="overflow-hidden rounded-lg border border-slate-200">
+        <table className="w-full text-sm">
+          <thead className="bg-slate-50 text-left text-xs uppercase text-slate-500">
+            <tr><th className="px-3 py-2">Data</th><th className="px-3 py-2">Cum</th><th className="px-3 py-2">Mențiune</th><th className="px-3 py-2 text-right">Sumă</th><th className="px-3 py-2"></th></tr>
+          </thead>
+          <tbody className="divide-y divide-slate-100">
+            {loading ? (
+              <tr><td colSpan={5} className="px-3 py-6 text-center text-slate-500">Se încarcă...</td></tr>
+            ) : advances.length === 0 ? (
+              <tr><td colSpan={5} className="px-3 py-6 text-center text-slate-500">Niciun avans înregistrat.</td></tr>
+            ) : advances.map((a) => (
+              <tr key={a.id} className="hover:bg-slate-50">
+                <td className="px-3 py-2 text-slate-600">{a.sent_at}</td>
+                <td className="px-3 py-2 text-slate-700">{ADVANCE_METHODS.find(([v]) => v === a.method)?.[1] ?? a.method}</td>
+                <td className="px-3 py-2 text-slate-500">{a.note || '—'}</td>
+                <td className="px-3 py-2 text-right font-medium text-slate-900">{fmt2(Number(a.amount_ron))}</td>
+                <td className="px-3 py-2 text-right">
+                  <button type="button" onClick={() => void remove(a.id)} className="text-slate-400 hover:text-rose-600" title="Șterge">
+                    <X className="h-4 w-4" />
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
 /** Decontul avocatei colaboratoare (caziere + integritate + stare civilă) — cerut de
  *  Raul 05.08.2026. Componentele cabinetului (serviciu + urgență + apostilă
  *  Haga, cu reducerile aplicate), FĂRĂ livrare/traducere/legalizare/apostilă
@@ -596,6 +740,8 @@ export default function CollaboratorsAdminPage() {
           {hasPermission('users.manage') && selectedId && (
             <ServiceAssignments collaboratorId={selectedId} onChanged={() => reloadCollaborators(true)} />
           )}
+
+          {selectedId && selectedId !== '__avocat__' && <AdvancesPanel collaboratorId={selectedId} />}
 
           {/* Summary — modelul 50/50 din lib-ul de decont (aceleași cifre ca
               pagina colaboratorului); onorariul per comandă rămâne doar unde

@@ -73,6 +73,19 @@ că el îl încasează prin factură către EDIGITALIZARE — aceeași convenți
 Pe extrasele de carte funciară nu s-a facturat comision — coerent cu clarificarea din 26.08
 (acolo nu există onorariu per comandă).
 
+## Avansurile pentru taxe se urmăresc în platformă (migrarea 151)
+
+Tabela `collaborator_advances` ține banii TRIMIȘI colaboratorului (Revolut, card, transfer,
+numerar); consumul rămâne în `order_supplier_costs` (taxele per comandă), iar soldul e
+diferența. UI: **/admin/colaboratori → colaborator selectat → „Avansuri pentru taxe"** —
+trei carduri (trimis / consumat / sold) + formular + listă. API:
+`/api/admin/collaborators/advances` (GET/POST/DELETE, `orders.view`).
+
+Seed la creare: cele 10 mișcări din extrasele Revolut 21.08–07.09 (**3.240 lei**, din care
+40 lei taxe OCPI plătite direct cu cardul). Consumat pe tot istoricul: **3.275 lei** → sold
+**−35 lei**, dar cifra e incompletă: transferurile dinainte de 21 august nu sunt introduse
+(extrasele lipsesc), deci soldul real e în favoarea lui Mircea.
+
 ## Reconciliere cu Revolut (parțială)
 
 Transferuri către Mircea în extrasele disponibile (21.08 – 07.09): **3.200 lei**, plus 40 lei
