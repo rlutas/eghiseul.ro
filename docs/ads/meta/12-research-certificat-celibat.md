@@ -801,53 +801,198 @@ Targetare Meta relevantă: „recently engaged (1 year)", interese nuntă/weddin
 Coordonatorul a cerut explicit textul complet al anunțului și linkul din Ads Transparency Center.
 Iată ce am și ce **nu** am.
 
-### Ce am confirmat direct
+### A. Identificarea advertiserului
 
-**Advertiser:** cazierjudiciarfirma.ro — SC Web Clerk SRL, CUI RO39710178, Iași.
-Avocat partener declarat pe site: **Cabinet Avocat Chende Ciprian-Dumitru, Baroul Sălaj**.
+**Advertiser:** SC Web Clerk SRL · CUI RO39710178 · sediu în Iași · domeniu
+`cazierjudiciarfirma.ro`.
+Footer verbatim de pe site: *„© 2026 SC Web Clerk SRL · CUI RO39710178 · Sediu în Iași ·
+cazierjudiciarfirma.ro"*.
+Avocat partener declarat: **Cabinet Avocat Chende Ciprian-Dumitru, Baroul Sălaj**.
+Title tag al landing page-ului: *„Certificat de Celibat Online | 999 Lei, prin Avocat — Anexa 9"*.
+Disclaimer sub H1: *„Serviciu privat de asistență — nu suntem instituție de stat."*
 
-**Landing page:** `https://www.cazierjudiciarfirma.ro/celibat-online/`
+**Landing page real:** `https://www.cazierjudiciarfirma.ro/celibat-online/`
 
-**Anunțul**, capturat din SERP prin browser real, prezent **top + bottom** pe fiecare din
-interogările: `certificat de celibat`, `certificat de celibat online`,
-`obtinere certificat de celibat online pret`, `adeverinta de celibat online urgent firma`,
-`certificat de celibat pentru casatorie in strainatate online`.
+### B. Google Ads Transparency Center — dovada centrală
 
-Titluri rotite:
-- „999 Lei, Totul Inclus – Comanzi Online în 3 Minute – Valabil 6 Luni"
-- „999 Lei, Totul Inclus | Scan pe Email + Curier"
-- „999 Lei, Totul Inclus | Oriunde Te Afli în Lume"
+**Pagina advertiserului:**
+`https://adstransparency.google.com/advertiser/AR07537185674789650433?region=RO`
 
-Descriere: *„999 lei totul inclus, afișat înainte de plată. Opțional apostilă și traducere
-autorizată."*
+Captat 07.09.2026, ~20:11 UTC. Ce afișează:
 
-Callout-uri: `Curier Internațional` · `Preț Fix 999 Lei` · `Scan pe Email` · `Totul Inclus` ·
-`Răspuns pe WhatsApp`
+- „SC Web Clerk SRL"
+- „Numele oficial: SC Web Clerk SRL"
+- „Are sediul în: România"
+- **„Advertiserul și-a confirmat identitatea"** ← advertiser VERIFICAT
+- **„38 de anunțuri"** (filtru: anunțuri din România, oricând, toate platformele și formatele)
 
-Structured snippet (Services): `Certificat de celibat, Apostilă Haga, Traducere autorizată,
-Legalizare notarială`
+**Pagina filtrată pe domeniu:**
+`https://adstransparency.google.com/?region=RO&domain=cazierjudiciarfirma.ro`
+- „16 anunțuri"
+- „Acest domeniu include rezultate pentru mai multe conturi de advertiser cu anunțuri care fac
+  trimitere la acest domeniu."
+- Toate cardurile vizibile: „SC Web Clerk SRL / Confirmat"
 
-Sitelink-uri:
-- **Cazier Auto** — 149 lei, totul inclus, pentru Uber/Bolt/Glovo
-- **Cazier Judiciar Firmă** — pentru SRL, SA, PFA, 249 lei, prin avocat
-- **Comandă Online** — formular direct pe pagină, buletin + certificat naștere
+**Creativul relevant:**
+`https://adstransparency.google.com/advertiser/AR07537185674789650433/creative/CR13829396334903296001?region=RO`
 
-Extensie de apel activă („Apelează-ne").
+- „Prima afișare: **2 aug. 2026**"
+- „Ultima afișare: **6 sept. 2026**"
+- „Format: Text"
+- **„Subiect (etichetat de Google): Legi și guvernare"** ← 🔴 **punctul central al plângerii**
+- „Număr de afișări — Veți putea vedea aceste date începând din 31 oct. 2026."
+
+Alte creative ID-uri ale aceluiași advertiser, accesibile pe același format de URL:
+`CR02206793169218043905`, `CR08233269727372247041`, `CR02056555900398731265`.
+
+> **Ce demonstrează:** un advertiser **cu identitate confirmată** rulează **neîntrerupt peste o lună**
+> (2 aug. – 6 sept. 2026), pe interogări de tip „certificat de celibat", anunțuri pe care **Google
+> însuși le clasifică la subiectul „Legi și guvernare"** — exact categoria pe care noi am fost
+> blocați („Documente guvernamentale și servicii oficiale", tichet 1-6533000041865, vezi memoria
+> `google-ads-escaladare-tratament-egal`).
+
+### C. Textul anunțului — capturi brute din SERP
+
+Captate prin browser real (Playwright) pe `google.com` cu `hl=ro&gl=ro&num=30`, **07.09.2026,
+19:59–20:02 UTC**. Mai jos e `innerText`-ul brut al containerelor `#tads` / `#bottomads`,
+nereformatat. Google nu expune separat „headline 1/2/3" în DOM — prima linie după „Rezultat
+Sponsorizat" este blocul de headline-uri așa cum l-a randat Google.
+
+**Captura A** — interogare `certificat de celibat`, poziție **TOP** (`#tads`):
+```
+Rezultat Sponsorizat
+999 Lei, Totul Inclus | Scan pe Email + Curier
+cazierjudiciarfirma.ro
+https://www.cazierjudiciarfirma.ro › certificat › celibat
+999 lei totul inclus, afișat înainte de plată. Opțional apostilă și traducere autorizată.
+Apelează-ne
+Ascunde rezultatul sponsorizat
+```
+
+**Captura B** — interogare `certificat de celibat`, poziție **BOTTOM** (`#bottomads`):
+```
+Rezultat Sponsorizat
+999 Lei, Totul Inclus | Oriunde Te Afli în Lume
+cazierjudiciarfirma.ro
+https://www.cazierjudiciarfirma.ro › certificat › celibat
+999 lei totul inclus, afișat înainte de plată. Opțional apostilă și traducere autorizată. Curier
+Internațional. Preț Fix 999 Lei. Scan pe Email. Totul Inclus. Răspuns pe WhatsApp. Services:
+Certificat de celibat, Apostilă Haga, Traducere autorizată, Legalizare notarială.
+Apelează-ne
+Ascunde rezultatul sponsorizat
+```
+
+**Captura C** — interogare `obtinere certificat de celibat online pret`, **TOP** (bottom: niciun anunț):
+```
+Rezultat Sponsorizat
+999 Lei, Totul Inclus - Comanzi Online în 3 Minute - Valabil 6 Luni
+cazierjudiciarfirma.ro
+https://www.cazierjudiciarfirma.ro › certificat › celibat
+999 lei totul inclus, afișat înainte de plată. Opțional apostilă și traducere autorizată.
+Ascunde rezultatul sponsorizat
+```
+
+**Captura D** — interogare `certificat de celibat online`, **TOP** — varianta cea mai completă, cu
+toate sitelink-urile:
+```
+Rezultat Sponsorizat
+999 Lei, Totul Inclus - Comanzi Online în 3 Minute - Valabil 6 Luni
+cazierjudiciarfirma.ro
+https://www.cazierjudiciarfirma.ro › certificat › celibat
+999 lei totul inclus, afișat înainte de plată. Opțional apostilă și traducere autorizată. Preț Fix
+999 Lei. Totul Inclus. Curier Internațional. Scan pe Email. Răspuns pe WhatsApp. Services:
+Certificat de celibat, Apostilă Haga, Traducere autorizată, Legalizare notarială.
+Apelează-ne
+Cazier Auto
+149 lei, totul inclus Pentru Uber, Bolt, Glovo
+Comandă Online
+Formular direct pe pagină Buletin + certificat naștere
+Cazier Judiciar Firmă
+Pentru SRL, SA, PFA 249 lei, prin avocat
+Ascunde rezultatul sponsorizat
+```
+
+**Captura E** — interogare `certificat de celibat pentru casatorie in strainatate online`, **TOP**:
+```
+Rezultat Sponsorizat
+999 Lei, Totul Inclus - Comanzi Online în 3 Minute - Valabil 6 Luni
+cazierjudiciarfirma.ro
+https://www.cazierjudiciarfirma.ro › certificat › celibat
+999 lei totul inclus, afișat înainte de plată. Opțional apostilă și traducere autorizată. Curier
+Internațional. Preț Fix 999 Lei. Totul Inclus. Răspuns pe WhatsApp. Scan pe Email.
+Apelează-ne
+Cazier Auto
+149 lei, totul inclus Pentru Uber, Bolt, Glovo
+Ascunde rezultatul sponsorizat
+```
+
+**Captura F** — interogare `adeverinta de celibat online urgent firma`, **TOP**:
+```
+Rezultat Sponsorizat
+999 Lei, Totul Inclus - Comanzi Online în 3 Minute - Valabil 6 Luni
+cazierjudiciarfirma.ro
+https://www.cazierjudiciarfirma.ro › certificat › celibat
+999 lei totul inclus, afișat înainte de plată. Opțional apostilă și traducere autorizată. Curier
+Internațional. Scan pe Email. Preț Fix 999 Lei. Răspuns pe WhatsApp. Totul Inclus. Services:
+Certificat de celibat, Apostilă Haga, Traducere autorizată, Legalizare notarială.
+Apelează-ne
+Cazier Auto
+149 lei, totul inclus Pentru Uber, Bolt, Glovo
+Ascunde rezultatul sponsorizat
+```
+
+### D. Sinteza pe componente
+
+*Dedusă din capturile de mai sus — Google nu le expune separat în DOM.*
+
+- **Headline-uri rotite (3 variante observate):**
+  - „999 Lei, Totul Inclus - Comanzi Online în 3 Minute - Valabil 6 Luni"
+  - „999 Lei, Totul Inclus | Scan pe Email + Curier"
+  - „999 Lei, Totul Inclus | Oriunde Te Afli în Lume"
+- **Descriere** (identică în toate cele 6 capturi): „999 lei totul inclus, afișat înainte de plată.
+  Opțional apostilă și traducere autorizată."
+- **URL afișat:** `cazierjudiciarfirma.ro` + breadcrumb
+  `https://www.cazierjudiciarfirma.ro › certificat › celibat`
+- **Callout-uri (rotite):** `Curier Internațional` · `Preț Fix 999 Lei` · `Scan pe Email` ·
+  `Totul Inclus` · `Răspuns pe WhatsApp`
+- **Structured snippet:** `Services: Certificat de celibat, Apostilă Haga, Traducere autorizată,
+  Legalizare notarială.`
+- **Sitelink-uri (titlu / descriere / URL real):**
+  - „Cazier Auto" / „149 lei, totul inclus Pentru Uber, Bolt, Glovo" →
+    `https://www.cazierjudiciarfirma.ro/cazier-auto/`
+  - „Comandă Online" / „Formular direct pe pagină Buletin + certificat naștere" →
+    `https://www.cazierjudiciarfirma.ro/celibat-online/#formular`
+  - „Cazier Judiciar Firmă" / „Pentru SRL, SA, PFA 249 lei, prin avocat" →
+    `https://www.cazierjudiciarfirma.ro/cazier-judiciar-firma/`
+- **Extensie de apel:** „Apelează-ne" — prezentă în 5 din 6 capturi (absentă în Captura C)
 
 Zero anunțuri pe `certificat de cutuma` și pe `apostila haga acte romania diaspora servicii pret`.
 
-### Ce NU am
+> 📌 **Observație suplimentară, posibil relevantă pentru plângere:** URL-ul **afișat** în SERP
+> (`› certificat › celibat`) **nu este path-ul real** — landing-ul efectiv din href este
+> `/celibat-online/`, iar path-ul afișat dă **404**. Politica Google privind URL-ul afișat cere ca
+> acesta să reflecte domeniul și destinația reală. Merită verificat de un jurist dacă se califică
+> drept încălcare separată — ar întări dosarul, arătând că anunțul e aprobat în ciuda unei
+> neconformități tehnice, în timp ce nouă ni se refuză anunțuri conforme.
 
-> 🔴 **N-am obținut un link din Google Ads Transparency Center** către advertiserul
-> cazierjudiciarfirma.ro / SC Web Clerk SRL. `adstransparency.google.com` e SPA JS-only și nu s-a
-> lăsat citit din acest mediu; nu am un URL de forma `/advertiser/AR...`.
-> **Nu îl inventez.** Pentru plângere, el trebuie obținut manual: căutare după domeniu pe
-> [adstransparency.google.com](https://adstransparency.google.com/?region=RO), apoi salvat URL-ul
-> advertiserului + screenshot cu perioada de rulare și statutul de verificare.
+### E. Limitele dovezii — de citit înainte de a depune plângerea
 
-De asemenea, textele de mai sus provin dintr-o **captură de SERP**, nu dintr-o sursă oficială Google.
-Pentru un dosar de plângere, ele trebuie **refăcute cu screenshot datat** (SERP + Ads Transparency),
-altfel nu au valoare probatorie.
+> 🔴 **Textul anunțului NU provine din Ads Transparency Center**, ci dintr-o captură a SERP-ului live.
+> Previzualizarea creativului din Transparency Center este servită într-un iframe cross-origin
+> (`adframe`), al cărui `contentDocument` nu a putut fi citit. Cele două seturi de dovezi
+> (Transparency Center = existența, perioada, verificarea și eticheta „Legi și guvernare"; SERP =
+> textul efectiv) sunt **complementare, nu identice**.
+>
+> 🔴 **Browserul era autentificat pe contul Google `serviciiseonethut@gmail.com`** în momentul
+> capturii SERP. Dacă rezultatele personalizate contează pentru modul în care se prezintă dovada,
+> capturile trebuie refăcute **delogat și cu `&pws=0`** (vezi și memoria `serp-real-vs-gsc`).
+>
+> 🔴 **Pentru un dosar formal, toate capturile trebuie refăcute cu screenshot datat** — text extras
+> din DOM nu are valoare probatorie. Necesare: (1) screenshot SERP pe fiecare interogare, delogat,
+> cu data vizibilă; (2) screenshot al paginii de advertiser din Transparency Center cu „Advertiserul
+> și-a confirmat identitatea" și numărul de anunțuri; (3) screenshot al creativului
+> `CR13829396334903296001` cu „Subiect (etichetat de Google): Legi și guvernare" și intervalul de
+> afișare.
 
 ### De ce contează pentru plângere
 
@@ -864,8 +1009,21 @@ piață, pe aceleași interogări.
 
 ### Despre termenul lui de „5 zile" — e credibil?
 
-**Sursa:** pagina lui publică, citat exact: **„circa 5 zile lucrătoare"** — dar formularea completă
-este *de la semnarea împuternicirii*, iar mecanismul de reprezentare declarat pe aceeași pagină este:
+**Sursa: pagina lui publică — nu anunțul, nu presupunere.** Confirmat prin `curl` pe HTML-ul brut al
+`https://www.cazierjudiciarfirma.ro/celibat-online/` (nu doar prin rezumat), în **patru locuri
+distincte**, verbatim:
+
+1. Sub hero: *„Termen estimat: circa 5 zile lucrătoare. Onorariu: 999 lei."*
+2. Pasul 4 din flux: *„4️⃣ Primești certificatul ~5 zile lucrătoare"*
+3. Tabelul de tarife: *„Certificat de celibat (Anexa 9) onorariu 999 lei — totul inclus circa 5 zile
+   lucrătoare"*, rândul următor *„Pachet internațional: apostilă + traducere autorizată + legalizare
+   notarială +500 lei +câteva zile lucrătoare"*
+4. FAQ, la „În cât timp primesc certificatul de celibat?": *„Termenul estimat este de **circa 5 zile
+   lucrătoare de la semnarea împuternicirii și completarea dosarului**. Apostila, traducerea
+   autorizată și legalizarea adaugă câteva zile lucrătoare."*
+
+Formularea din FAQ e cheia: termenul curge **de la semnarea împuternicirii**, iar mecanismul de
+reprezentare declarat pe aceeași pagină este:
 
 > „o redactăm noi — **o semnezi la notar sau la consulat**"
 
@@ -973,3 +1131,68 @@ rămâne cu nunta anulată și invitațiile deja trimise**.
 [Gazeta Românească Italia](https://www.gazetaromaneasca.com/observator/comunitate/la-consulatul-de-la-milano-se-fac-reguli-proprii-se-comporta-ca-stat-in-stat-in-loc-sa-respecte-directivele-mae/)
 
 **Concurenți:** linkurile din tabelele de la punctul 4.
+
+
+---
+
+# Corecții și date interne (07.09, Raul + interogare DB)
+
+Secțiunea asta a fost rescrisă odată de research și readăugată. **Are prioritate față de estimările
+din corpul raportului acolo unde se contrazic**, pentru că vine din operațiunile noastre, nu de pe web.
+
+## Termenul nostru real: 7–15 zile
+
+**Decizie Raul:** termenul de lucru e **7–15 zile**; 30 de zile e doar cazul excepțional. Nu
+comunicăm 30.
+
+Măsurat în DB pe tot istoricul (`payment_status='paid'`, plată → `completed`):
+
+| Comandă | Status | Plătit | Zile |
+|---|---|---|---|
+| E-260810-3LHKF | completed | 09.08 | 23,7 |
+| E-260802-B5VNY | completed | 01.08 | **8,6** |
+| E-260726-FHD3D | completed | 25.07 | 15,0 |
+| E-260716-RAFUG | completed | 15.07 | 28,0 |
+| E-260714-TCQJV | completed | 13.07 | 19,4 |
+| E-260711-TFVDH | **standby** | 10.07 | 24,8 (blocat pe client) |
+
+Media brută iese 18,9 zile calendaristice, dar e trasă în sus de comenzile blocate pe client
+(1 din 6) și de `services.estimated_days = 30`, care e marjă de siguranță, nu promisiune.
+
+Context, restul serviciilor de stare civilă: naștere 20,7 zile medie (9 finalizate, 5 în lucru) ·
+căsătorie 26,1 · extras multilingv naștere 24,9 (un caz de 55,8).
+
+**1 din 6 comenzi a stat în standby.** La 17% rată de blocaj, un follow-up mai strâns scurtează
+media mai mult decât orice optimizare de reclamă.
+
+## „5 zile" la concurent nu e comparabil cu termenul nostru
+
+Confirmat pe pagina lor, în patru locuri: *„circa 5 zile lucrătoare **de la semnarea împuternicirii**
+și completarea dosarului"*, iar mecanismul lor declarat e *„o redactăm noi — **o semnezi la notar sau
+la consulat**"* — adică **procură notarială**.
+
+Pentru un client din diaspora, ceasul lor pornește **abia după** ce prinde programare la notar sau
+consulat. Ei afișează doar segmentul de după procură; noi afișăm termenul total.
+
+🎯 **Unghiul care neutralizează simultan avantajul lor de termen și de preț:**
+**„0 zile de așteptat la notar sau consulat"** — temei: Legea 120/2026, împuternicire avocațială.
+
+## Prețurile rămân cum sunt
+
+Decizie Raul: nu coborâm prețurile, inclusiv add-on-ul de apostilă. (Recomandarea din raport de a nu
+vinde apostilă pe dosare UE — Reg. 2016/1191 — rămâne de discutat separat, ca decizie de produs.)
+
+## Al patrulea argument: recenziile Google
+
+Avem **recenzii Google reale, multe**. Testimonial e formatul #3 la Motion (6,5% hit rate) și e
+singurul care răspunde la „de ce să dau 698 lei online unei firme". Devine unul din cele 6 creative.
+
+## Poziționarea finală — 4 puncte
+
+1. **Preț** — 698 vs 999 la singurul concurent care face reclamă
+2. **Termen** — de obicei 7–15 zile, **și 0 zile de așteptat la notar sau consulat**
+3. **Prin avocat înscris în Barou**, fără procură notarială (Legea 120/2026)
+4. **Recenzii Google reale** — dovada că livrăm
+
+Și tratăm frontal obiecția „la consulat e gratis": răspunsul nu e prețul, e programarea, drumul și
+timpul.
