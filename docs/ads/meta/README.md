@@ -39,3 +39,36 @@ Deschis 02.09.2026 ca posibil al doilea canal după ChatGPT Ads. Evaluarea scurt
 | 07.09 seara | **Verificare după 4 zile** → `08-verificare-campanie-07-09.md`. 235,47 lei, 191 clicuri link, **25 LP views**, 1 InitiateCheckout, 0 vânzări. Două probleme structurale: (a) **Audience Network** ia 65% din bugetul lui C0 cu clicuri false (79 clicuri → 4 LP views); C0 e cel mai prost anunț, nu cel mai bun. (b) **Pixelul se încarcă doar după acceptul de cookies** → Meta optimizează pe ~13% din semnal, inclusiv pe chiar obiectivul InitiateCheckout. C4 „Verificare partener" e singurul cu Above average ×3 și singurul cu IC. Fix: exclude Audience Network + trimite InitiateCheckout prin CAPI. |
 | 07.09 seara | **Research creative 2026** -> `10-research-creative-2026.md`. Mixul de formate bate monocultura (Meta: CPA cu 9,1% mai mic cu imagine 4:5 + video 4:5 + video 9:16 cu audio); Offer-First Banner = 29,3% din spend la Motion (578.750 creative); regula de 20% text e MOARTA din 2020, textul nu e penalizat, textul prost e; AI creative nedetectabil (Ipsos: doar 25% banuiesc) DAR cu 14-17% mai slab, gap-ul e pe EMOTIE -> Higgsfield doar pentru fundaluri/obiecte, NU scene emotionale cu oameni; hook-uri-intrebare = doar 8% supravietuire la 30+ zile; unghiul „dor de casa” = risc mare de comentarii negative; la 75 lei/zi: 1 ad set, 5-6 UNGHIURI diferite (nu variante), 7 zile fara atingeri, judeci dupa distributia spend-ului. Cele 6 creative propuse, cadru cu cadru. |
 | 07.09 seara | **Research piata certificat celibat** (partial) -> `12-research-certificat-celibat.md`. **Meta Ad Library: ZERO reclame in nisa** — terenul e complet gol. Pe Google: UN SINGUR advertiser, cazierjudiciarfirma.ro, 999 lei / ~5 zile / „obtinut prin Avocat” / 5,0 din 165 recenzii — si anuntul lui TRECE politica pe exact categoria pe care noi suntem blocati (dovada de tratament inegal pentru tichetul Google 1-6533000041865). Banda de pret 500-650-698(noi)-999; **suntem ULTIMII pe termen** (15-30 zile vs 5). Add-on-ul nostru de apostila (198) e peste piata (100-180). Frana nr.1 in SERP: toateactele.ro scrie ca la consulat e GRATUIT. |
+
+---
+
+## Reguli Meta (sinteza research-ului 07.09)
+
+**Creative** — detalii în `10-research-creative-2026.md`
+- Amestecul bate monocultura: imagine 4:5 + video 4:5 + video 9:16 cu audio în același ad set =
+  CPA cu 9,1% mai mic (cifra Meta). Nu „video în loc de static".
+- Offer-First Banner (oferta scrisă mare) = formatul cu cel mai bun hit rate, 29,3% din spend.
+- Regula de 20% text e moartă din septembrie 2020. Un mesaj pe imagine, nu trei.
+- Fără hook-uri de tip întrebare (8% rată de supraviețuire la 30+ zile). Fără carusele.
+- AI (Higgsfield) doar pentru fundaluri, obiecte, bannere. **Niciodată scene emoționale cu oameni** —
+  publicul nu detectează AI-ul (Ipsos: 25%), dar performanța scade 14–17%, iar gap-ul e pe emoție.
+- Diaspora: emoția implicită, nu explicită. „Nu te întorci în România pentru o hârtie", nu
+  „te întorci pentru ei". Unghiul „dor de casă" atrage comentarii negative, care urcă costul.
+- Targetare: **limba română** + țară, nu interese „Romania" (interesele închid audiența).
+
+**Buget și învățare** — detalii în `11-research-learning-phase.md`
+- 50 de conversii/ad set/7 zile ca să iasă din învățare. `buget săptămânal ÷ 50 = CPA maxim`.
+- Pragul de „20% modificare de buget" e folclor — Meta nu publică niciun procent.
+- Sub volumul necesar: coboară evenimentul de optimizare, nu crește bugetul degeaba.
+- Audience Network: excluderea costă (CPM 2×, CPC 3–4× la restricționare, date Loomer). Dar la noi
+  ia 65% din bugetul unui anunț fără să producă nimic — **datele contului bat regula generală**.
+  Întâi repari semnalul, apoi decizi.
+- Un creativ se judecă de la ~500 de afișări. La buget mic, semnalul principal nu e ROAS, e
+  **distribuția spend-ului** între creative.
+
+**Măsurare** — detalii în `../technical/specs/meta-capi-tracking.md`
+- Pixelul e gated pe consimțământ. `InitiateCheckout` și `Purchase` pleacă și server-side prin CAPI,
+  cu `event_id` identic pentru dedup.
+- `PageView`/`ViewContent`/`LandingPageView` rămân doar pe pixel → **nu optimiza pe Landing Page
+  View**.
+- Rata corectă e LPV ÷ **Outbound Clicks** (nu Link Clicks). Prag: sub 70% = problemă.

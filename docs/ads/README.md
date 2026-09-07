@@ -1,6 +1,11 @@
-# Google Ads — index
+# Reclamă plătită — index (Google · Meta · ChatGPT)
 
-Contul vechi: **eGhiseul, 677-995-5005** (eghiseul@gmail.com) — BLOCAT pe politica documentelor guvernamentale; decizie 31.08: **cont NOU pe EDIGITALIZARE SRL** (vezi planul de lansare). Toate analizele se scriu aici.
+**Conturi:** Google Ads **677-995-5005** (eghiseul@gmail.com) — majoritatea anunțurilor blocate pe
+politica documentelor guvernamentale, dar campaniile imobiliare rulează; Meta **eGhiseul.ro Ads
+(1562160259035101)**; OpenAI/ChatGPT Ads. Toate analizele se scriu aici.
+
+**Dacă citești un singur lucru:** [regulile fixe](#reguli-fixe-nu-se-negociază) de mai jos și
+[ce am învățat pe 07.09](#ce-am-învățat-0709--lecții-transversale).
 
 | Doc | Ce conține |
 |---|---|
@@ -21,30 +26,118 @@ Contul vechi: **eGhiseul, 677-995-5005** (eghiseul@gmail.com) — BLOCAT pe poli
 | [2026-09-07-autorizare-guvernamentala-cai-si-contacte.md](2026-09-07-autorizare-guvernamentala-cai-si-contacte.md) | **cercetare**: pe cazier judiciar (IGPR) și stare civilă (DEPABD) NU există niciun mecanism de autorizare a firmelor private; pe **cazier fiscal DA** — societate de consultanță fiscală autorizată de CCF, cu registru public (O.G. 71/2001). Firul comun: avocatul din tabloul public. Strategia cererilor 544/2001 („nu există" = dovadă oficială pentru dosarul Google) + contacte. Emailuri gata de trimis: [`2026-09-07-emailuri-institutii.txt`](2026-09-07-emailuri-institutii.txt) |
 | [2026-09-07-raspuns-google-tratament-egal.md](2026-09-07-raspuns-google-tratament-egal.md) | **cel mai recent**: răspunsul lui Prakhar (poziția se mută la „certificare posibilă, criteriu = link de pe site guvernamental") + răspunsul nostru: criteriul nu e îndeplinit de niciun competitor, în RO nu există mecanism de autorizare, toți lucrăm prin avocat colaborator → cerem tratament egal, P2B art. 11, altfel Consiliul Concurenței + DSA art. 21. Excepția reală: rovinieta (CNAIR listează distribuitori autorizați) |
 | [2026-09-02-meta-ads-evaluare.md](2026-09-02-meta-ads-evaluare.md) | Meta Ads: politica NU e blocaj (nu există categorie de documente guvernamentale), Ad Library RO = zero concurență pe cazier/constatator, CFunciara.ro activ de 19 luni pe CF; verdict: nu acum, doar retargeting după ChatGPT |
-| [meta/](meta/README.md) | **Meta Ads — dosar complet** (02.09): cercetare US/UK (LegalZoom, ZenBusiness, RushMyPassport, UK), mecanica Meta 2026 + UE, Ad Library live (citate, durate), playbook, plan de test constatator ≤ €300 cu precondiții tehnice |
+| [meta/](meta/README.md) | **Meta Ads — dosar complet**: cercetare US/UK, mecanica Meta 2026 + UE, Ad Library live, playbook, planul de test constatator. Din 07.09 conține și: verificarea campaniei după 4 zile (`08`), analiza /paid-ads + direcția stare civilă (`09`), research creative 2026 (`10`), research faza de învățare / GDPR / CAPI (`11`), research piața certificatului de celibat (`12`) |
+| [../technical/specs/meta-capi-tracking.md](../technical/specs/meta-capi-tracking.md) | **tracking server-side**: de ce trimitem InitiateCheckout + Purchase prin Conversions API (pixelul e blocat de bannerul de cookies), unde e codul, dedup pe `event_id`, cum verifici în Events Manager |
 
 ## Reguli fixe (nu se negociază)
+
+### Conținut (toate platformele)
 
 1. **Niciodată „oficial/oficiale" lângă „documente/acte"** — a limitat contul o dată. Vezi memoria
    proiectului și `../seo/2026-07-26-conformitate-si-sesizari-concurenta.md`.
 2. Anunțurile spun clar că suntem **serviciu privat de intermediere**, nu instituția.
 3. Prețul afișat e cel final, cu taxa instituției inclusă.
-4. Nu se pornește nicio campanie fără conversie `Purchase` cu valoare, măsurată corect.
-5. Nu se face reclamă la servicii pe care nu le putem livra (azi: tot ce ține de ANCPI).
+4. **Zero imagini cu documente**: fără stemă, sigiliu, antet, ștampilă, semnătură, hologramă — nici
+   reale, nici generate AI, nici stilizate, nici blurate. Clasificatorul Meta „forged goods" ne-a
+   respins deja un anunț (C0) și nu poate distinge un act obținut legal de unul fals. Pentru a
+   sugera „hârtia": plic **închis**, colț de foaie fără text lizibil, iconiță, dosar.
+5. **Fără claim-uri nesubstanțiate**: „garantat", „100% aprobare", termene pe care nu le-am atins
+   niciodată. Din martie 2026 Meta declanșează verificare obligatorie pe ele. Termenul comunicat
+   trebuie să fie adevărat pe comenzile deja livrate — verifică în DB, nu în `estimated_days`.
+6. **Fără atribute personale.** „Ești român în Italia?" e la limită; „Pentru românii care se
+   căsătoresc în străinătate" e sigur — descrii cui i se adresează serviciul, nu îi spui
+   cititorului cine e. Cazierul judiciar nu se promovează pe Meta din acest motiv (istoric
+   infracțional = categorie sensibilă).
 
-## Ce urmărim (din 03.09.2026) — ChatGPT Ads + Meta
+### Operare
 
-Stare la 03.09 15:00: **OpenAI** — campania Active, „Not serving" doar pentru brand review + „account getting ready" (5–7 zile, fără acțiune); motivul de politică a dispărut. **Meta** — campania publicată 03.09 15:15, anunțul C0 în review (Processing).
+7. Nu se pornește nicio campanie fără conversie măsurată corect. **Pe Meta asta înseamnă și canalul
+   server-side** — pixelul se încarcă doar cu consimțământ de marketing, iar bannerul e neblocant.
+8. Nu se face reclamă la servicii pe care nu le putem livra.
+9. **Alege evenimentul de optimizare din buget:** `buget săptămânal ÷ 50 = CPA maxim pe evenimentul
+   ales`. Meta cere 50 de conversii/ad set/7 zile ca să iasă din faza de învățare. La 75 lei/zi →
+   525/50 = **10,50 lei**; orice eveniment mai scump de atât nu iese niciodată din Learning Limited.
+10. **Nu promovăm pe Meta produse cu AOV mic.** La CPM 20–40 lei în RO, un produs de ~96 lei
+    (constatator) nu are matematică. Google Search da (intenție directă, click ieftin), Meta nu.
+11. **Consolidare, nu fragmentare:** 1–3 ad seturi per campanie. La buget mic, un singur ad set cu
+    5–6 **unghiuri** diferite (nu variante ale aceleiași idei), lansat și neatins 7 zile.
+12. **Nu atinge o campanie în învățare.** Modificările de buget, targetare, plasamente sau
+    adăugarea/oprirea de anunțuri resetează faza de învățare.
 
-| Când | Unde | Ce verificăm | Prag / acțiune |
+## Ce am învățat 07.09 — lecții transversale
+
+**Măsurarea înaintea optimizării.** Pe Meta, 191 de clicuri pe link au produs 25 de vizualizări de
+pagină raportate. Cauza: pixelul e gated pe consimțământ. Optimizam pe un eveniment
+(`InitiateCheckout`) pe care îl vedeam parțial — algoritmul n-avea ce învăța și livra pe cel mai
+ieftin inventar (Audience Network, 65% din bugetul unui anunț). Fixul e în producție din 07.09:
+`InitiateCheckout` pleacă acum și prin Conversions API.
+⚠️ Numitorul corect pentru rata asta e **Outbound Clicks**, nu Link Clicks (prag Loomer: sub 70% =
+rău). Cifra de 13% trebuie recalculată; concluzia de fond rămâne.
+
+**Metricii de suprafață mint.** Anunțul cu cel mai bun CTR (4,91%) era cel mai prost: 65% din buget
+în Audience Network, 79 de clicuri → 4 vizualizări de pagină. Anunțul cu cel mai slab CTR (1,28%)
+era singurul cu **Above average** la toate trei rankingurile și singurul cu o conversie.
+**Verifică întotdeauna defalcarea pe plasament înainte de a declara un câștigător.**
+
+**Produsul contează mai mult decât creativul.** Promovam serviciul cu cel mai mic AOV din catalog
+(95,86 lei). Grupul stare civilă are AOV 698–998 și a făcut 34.920 lei în 90 de zile — de 6× mai
+mult, cu de 1,5× mai puține comenzi. La 868 lei AOV, un CPA de 200–250 lei e încă profitabil.
+
+**Verifică ce presupui despre propriul produs.** Credeam că n-avem urgență pe serviciile imobiliare
+— o aveam, activă pe 11 servicii; citisem coloana greșită (`price_modifier` în loc de `price`).
+La fel, `estimated_days = 30` la certificatul de celibat e marjă de siguranță; termenul real e
+7–15 zile.
+
+**Terenul gol nu înseamnă cerere.** Meta Ad Library: zero reclame pe certificat de celibat,
+adeverință de celibat, acte stare civilă străinătate. Nu e piață saturată — e una pe care nimeni
+n-o cumpără. Riscul nu e concurența, e clasificarea greșită a creativului.
+
+**Dovadă pentru dosarul Google.** `cazierjudiciarfirma.ro` rulează pe Google Ads, top și bottom, cu
+„999 Lei, Totul Inclus – Comanzi Online în 3 Minute" și unghiul **„obținut prin Avocat"** — exact
+categoria pe care noi suntem blocați. De anexat la escaladarea din tichetul 1-6533000041865.
+
+**Research-ul nu bate observația.** Regula lui Jon Loomer („nu exclude Audience Network când
+optimizezi pe conversie — algoritmul îl abandonează singur") e contrazisă direct de datele contului
+nostru. Probabil pentru că mecanismul lui cere semnal de conversie, iar al nostru era rupt. Când
+sursa și contul nu se aliniază, **câștigă contul** — dar întâi repari măsurarea, altfel iei decizii
+pe o metrică ruptă.
+
+**Atenție la „datele 2026" de pe net.** Există zeci de articole SEO generate cu AI care se contrazic
+între ele pe cifre de CPM/CTR și citează rapoarte inexistente. Surse verificabile: Motion Creative
+Benchmarks, Meta Creative Diversification Playbook, EDPB, Ipsos/HBR. Restul, nu.
+
+## Starea canalelor (07.09.2026)
+
+| Canal | Campanie | Buget | Stare |
 |---|---|---|---|
-| zilnic | OpenAI Ads Manager → Campaigns → Ads | statusul anunțului `Ad1 T1-D1 pe email` (click pe „+N" lângă Not serving) | dacă reapare „cannot serve in targeted countries" → contestație (docs `chatgpt/01`); dacă „Serving" → începe urmărirea de mai jos |
-| zilnic | Meta Ads Manager → Ads | Delivery: In review / Active / Rejected; Amount spent | Rejected → citim motivul, NU republicăm pe orb; Active → urmărim CPM/CTR |
-| zilnic (când livrează) | OpenAI: Overview (Spend, Clicks, CPC); Meta: coloanele Results / Cost per result / CTR / CPM | cost, clicuri, CTR | OpenAI: 0 afișări după 3 zile de Serving → bid €2 (docs `chatgpt/04` G). Meta: CTR < 0,8 % și CPM > 45 lei → schimbăm creativul, nu bugetul (`meta/05` §4) |
-| zilnic | DB (`orders.attribution`) — SQL din `chatgpt/04` §H; pentru Meta același SQL cu `utm_source = 'meta'` sau `click_platform = 'meta'` | comenzi (draft → paid) pe canal, `utm_content` = anunțul | KPI unic = **cost / comenzi plătite**; ≤ 15 lei scalăm, 15–25 tolerăm, > 25 sau 0 conversii la 150 clicuri → oprim |
-| zilnic | OpenAI: Tools → Conversions (Data source Healthy, Event Stream); Meta: Events Manager → dataset 2319629835442431 (PageView, InitiateCheckout, Purchase; Purchase trebuie să apară dedup — browser + server) | evenimentele ajung? | OpenAI „No recent server-to-server events" dispare la prima comandă chatgpt; comenzi plătite cu `utm_source=chatgpt/meta` în DB dar 0 evenimente server → verificăm logurile Vercel pentru `[openai-conversions]` / `[meta-conversions]` |
-| săptămânal | Vercel logs filtrate pe `openai-conversions` / `meta-conversions` | erori 4xx/5xx la trimitere | 5xx repetat → notăm și verificăm cheia/token-ul |
-| ziua 7 | ambele | citim decizia din `chatgpt/04` §I și `meta/05` §4 | scriem concluzia în jurnal |
-| ziua 14 | ambele | verdict final per canal | scalăm / oprim / rămânem doar retargeting (Meta) |
+| Google | Search-Cadastru-Documente-2026-08 (PAD + grup nou Coordonate Stereo 70) | 20 lei/zi | activă |
+| Google | Search-Certificat-Urbanism-2026-09 | 20 lei/zi | activă din 07.09, „Eligibilă (învață)" |
+| Google | restul contului | — | blocat pe politica documentelor guvernamentale; tichet 1-6533000041865, termen de răspuns 21.09 |
+| Meta | New Sales campaign (constatator, 4 anunțuri) | 75 lei/zi | activă, **neatinsă până în ziua 5** (planul din `meta/05`) |
+| ChatGPT | campania constatator | — | vezi `chatgpt/` |
 
-Ce NU e încă la punct: (1) Meta — creativele pătrate c1–c4 de urcat (imaginea curentă e coperta 2,63:1 → nu livrează pe Stories/WhatsApp Status/Threads); (2) OpenAI — nimic, așteptăm review-ul; (3) comun — `public/og/default.png` zice „Documente oficiale online" (încalcă regula 1, de refăcut).
+**Total Google: 40 lei/zi.** Costul de reclamă pe serviciile imobiliare intră în decontul cu Mircea
+prin `PeriodCostsPanel` (`/admin/colaboratori`) — nimic seedat retroactiv încă.
+
+### Ce urmează, în ordine
+
+1. **Meta, ziua 5** — evaluăm campania de constatator. Recomandarea din `meta/09`: oprim
+   constatatorul (AOV prea mic pentru Meta) și mutăm bugetul pe stare civilă.
+2. **Campania nouă `META_StareCivila_Diaspora`** — certificat de celibat, 698 lei, diaspora
+   IT/ES/DE/UK, un singur ad set, 6 creative pe unghiuri diferite. Detalii în `meta/10` (creative)
+   și `meta/12` (piață). Precondiția — InitiateCheckout prin CAPI — e livrată.
+3. **Anexarea dovezii** la escaladarea Google: anunțul `cazierjudiciarfirma.ro` care trece politica
+   pe categoria pe care noi suntem blocați (`meta/12`).
+4. **De verificat**: recalcularea LPV/Outbound Clicks; urgența pe `extras-carte-funciara` (rândul
+   există, e inactiv); add-on-ul de apostilă la 198 lei vs 100–180 în piață.
+
+### Verificări zilnice (când o campanie livrează)
+
+| Unde | Ce | Prag / acțiune |
+|---|---|---|
+| Meta Ads Manager → Ads | Delivery, Amount spent, **defalcare pe plasament** | Rejected → citim motivul, NU republicăm pe orb. Audience Network peste ~20% din buget → semn că lipsește semnalul de conversie |
+| Meta → Columns: Performance and clicks | Outbound clicks, Landing page views, CTR outbound | LPV ÷ Outbound Clicks sub 70% → problemă de măsurare sau de pagină, nu de creativ |
+| Google Ads → Termeni de căutare | risipa pe termeni irelevanți | adăugăm negative |
+| DB (`orders.attribution`) | comenzi draft → paid pe canal | KPI unic = **cost / comenzi plătite** |
+| Events Manager → dataset 2319629835442431 | PageView, InitiateCheckout, Purchase — dedup browser + server | `InitiateCheckout` trebuie să apară acum și cu sursa **Server** |
+| Vercel logs, filtru `meta-conversions` / `openai-conversions` | erori la trimitere | 5xx repetat → verificăm token-ul |
