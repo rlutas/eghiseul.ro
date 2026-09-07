@@ -48,6 +48,15 @@ nu acoperă conținutul public al unui site guvernamental. Dacă acea pagină
 există, este publică; dacă nu există, atunci criteriul pe care mi-l aplicați mie
 nu este aplicat și lor.
 
+Precizez, iar această poziție îmi este confirmată și de avocatul colaborator al
+societății, că **nu am solicitat datele de identificare ale acelor firme**.
+Denumirile și domeniile lor sunt deja publice — sunt afișate chiar în anunțurile
+difuzate de Google și în Ads Transparency Center. Ceea ce solicit este existența
+sau inexistența unei **autorizări acordate de o autoritate publică din România**,
+adică o **informație de interes public**, nu o dată protejată de confidențialitate
+comercială. Un act de autorizare emis de o instituție publică nu poate fi
+confidențial prin natura lui: el produce efecte tocmai prin faptul că este public.
+
 **2. În România, autorizarea pe care o descrieți nu există pentru nimeni.**
 
 Pentru cazierul judiciar, certificatele de naștere/căsătorie și celelalte
