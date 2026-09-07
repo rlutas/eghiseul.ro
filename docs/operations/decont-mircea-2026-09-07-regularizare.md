@@ -50,13 +50,17 @@ au intrat în sistem — exact rezerva #2 din documentul precedent.
 
 ### Cine cât rămâne de dat/luat
 
-| | Parte | Comision | Rest din profit | Primit la 26.08 | De reținut |
-|---|---|---|---|---|---|
-| Raul | 3.497,88 | — | 3.497,88 | 4.316,61 | **818,73** |
-| Mircea | 3.497,88 | −555,00 | 2.942,88 | 4.316,61 | **1.373,73** |
+**Ce s-a plătit efectiv pe 26.08** (confirmat de Raul, 07.09): lui Mircea i s-au virat
+**3.791,61 lei** = partea calculată atunci (4.316,61) **minus comisionul de 525**, pe care îl
+încasează prin factură. Raul a luat 4.316,61 direct. Deci amândoi au primit aceeași valoare.
 
-Mircea încasează separat factura de comision (635,25 lei cu TVA). Comisionul perioadei e **555 lei**
-(37 comenzi × 15), din care factura din 28.08 acoperă 525 — diferența de 30 lei se facturează ulterior.
+| | Cuvenit | Cash primit | Comision prin factură | Total primit | De reglat |
+|---|---|---|---|---|---|
+| Raul | 3.497,88 | 4.316,61 | — | 4.316,61 | **818,73** |
+| Mircea | 3.497,88 | 3.791,61 | 525,00 (net) | 4.316,61 | **818,73** |
+
+Comisionul perioadei e **555 lei** (37 comenzi × 15); factura din 28.08 acoperă 525, deci Mircea mai
+are de facturat **30 lei**. Poziția lui netă: 818,73 − 30 = **788,73 de returnat**.
 
 ### Provizionul de 240 lei
 
