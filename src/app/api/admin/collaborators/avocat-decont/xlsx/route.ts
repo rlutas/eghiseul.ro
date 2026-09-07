@@ -151,7 +151,7 @@ export async function POST(request: NextRequest) {
     return r;
   };
 
-  line(`DECONT AVOCATĂ — ${month || 'toate lunile'}`, null, '', { bold: true });
+  line(`DECONT GABRIELA — ${month || 'toate lunile'}`, null, '', { bold: true });
   line('');
   line('Servicii cabinet (cu TVA)', summary.total, `${summary.count} comenzi`, { bold: true });
   line('  din care serviciu', summary.totalCazier);
@@ -179,14 +179,14 @@ export async function POST(request: NextRequest) {
   const partRaul = round2((dupaImpozit * splitRaul) / 100);
   const partGabi = round2(dupaImpozit - partRaul);
   line(`RAUL (${splitRaul}%)`, partRaul, '', { bold: true });
-  line(`AVOCATĂ (${round2(100 - splitRaul)}%)`, partGabi, '', { bold: true });
+  line(`GABRIELA (${round2(100 - splitRaul)}%)`, partGabi, '', { bold: true });
   line(`− Factura cabinet (${summary.count} × ${ONORARIU_PER_COMANDA})`, -summary.onorarii, 'onorariile, facturate separat de cabinet');
   const dupaOnorarii = round2(partGabi - summary.onorarii);
-  line('RĂMAS AVOCATĂ', dupaOnorarii);
+  line('RĂMAS GABRIELA', dupaOnorarii);
   const dividende = round2((dupaOnorarii * dividendTax) / 100);
   line(`Impozit dividende ${dividendTax}%`, -dividende);
   const dupaDividende = round2(dupaOnorarii - dividende);
-  line('RĂMAS AVOCATĂ după dividende', dupaDividende);
+  line('RĂMAS GABRIELA după dividende', dupaDividende);
   if (facturaCabinet) {
     line('− Factura cabinet (curentă)', -Math.abs(facturaCabinet));
     line('RĂMAS TOTAL DUPĂ TOT', round2(dupaDividende - Math.abs(facturaCabinet)), '', { bold: true, top: true });
