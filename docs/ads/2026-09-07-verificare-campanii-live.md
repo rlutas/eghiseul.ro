@@ -50,6 +50,29 @@ Doar ~3 din primii 10 termeni sunt pe intenția reală. Restul e trafic informa�
 | restul (5 cuvinte) | — | 0 | — | — | 0 | 0 |
 | **TOTAL** | | **264** | | | **739,12** | **1** |
 
+### Ce a adus efectiv reclama (comenzi cu `click_platform=google`)
+
+| Comandă | Data | Serviciu | Valoare | Stare |
+|---|---|---|---|---|
+| E-260820-9B4TM | 20.08 | extras carte funciară | 89,00 | **plătită** |
+| E-260824-8CEE5 | 24.08 | **plan de amplasament** | 216,59 | abandonată |
+| E-260827-UAB7U | 27.08 | extras plan cadastral | 89,00 | **plătită** ← conversia raportată de Google |
+| E-260827-WKZ7Q | 27.08 | **plan de amplasament** | 216,59 | abandonată |
+| E-260831-7PMM8 | 31.08 | **plan de amplasament** | 216,59 | abandonată |
+| E-260831-CKWVJ | 31.08 | extras plan cadastral | 89,00 | abandonată |
+| E-260903-EHFK4 | 03.09 | extras carte funciară | 89,00 | **plătită** |
+
+**7 comenzi începute, 3 plătite (267 lei), 4 abandonate (738,77 lei).** Conversia de 89 lei
+raportată de Google e `E-260827-UAB7U` — **extras de plan cadastral, nu PAD**: omul a intrat pe
+pagina de PAD dintr-un click de reclamă și a cumpărat produsul de 89 de lei.
+
+**Diagnosticul real:** campania aduce oameni care chiar vor PAD — 3 comenzi de 216,59 lei au fost
+începute. **Toate trei au fost abandonate la plată.** Nu traficul e problema, ci conversia pe
+prețul de 216,59. Cine cumpără, cumpără produsul ieftin.
+
+⚠️ Corecție față de nota inițială: atribuirea NU salvează cheia „gclid", ci `click_id` +
+`click_platform`. Căutarea după „gclid" a dat fals-negativ — datele există.
+
 ### Ce s-a schimbat în cont (07.09, executat)
 
 1. **Auto-tagging: VERIFICAT — este PORNIT** („Etichetare automată: Da"). Deci gclid chiar se
@@ -61,6 +84,10 @@ Doar ~3 din primii 10 termeni sunt pe intenția reală. Restul e trafic informa�
    `map`, `terra`, `rgi`, `"cadastru online"`, `"cadastre online"`, `"cf online"`,
    `"ocpi online"`, `"cadastral map"`, `"carte funciara"`.
 4. Rămân active doar variantele de „plan de amplasament și delimitare" (1 expresie + 3 exacte).
+5. **Buget redus de la 40 la 20 lei/zi** (decizia lui Raul).
+6. **Plafonul CPC scăzut de la 3,00 la 1,80 lei.** Strategia e „Maximizați clicurile" cu plafon —
+   plafonul de 3 lei nu limita nimic (CPC realizat 2,80). La 1,80 obținem mai multe clicuri pe
+   același buget, doar pe termenii exacti rămași.
 
 ## Meta — cont eGhiseul.ro Ads (1562160259035101)
 
@@ -95,15 +122,17 @@ Traficul din motoarele AI convertește fără să plătim clicul.
 
 ## Ce facem
 
-**Google, imediat:**
-1. Negative keywords: `asigurare`, `polita`, `map`, `harta`, `terra`, `rgi`, `ocpi`, `gratuit`,
-   `model`, `formular`, `anaf`.
-2. Restrânge la potrivire exactă pe „plan de amplasament și delimitare" (+ variante) și scoate
-   frazele generice de cadastru.
-3. **Verifică auto-tagging-ul** (Administrator → Setări cont → Etichetare automată). Fără gclid nu
-   știm niciodată ce aduce campania.
-4. Dacă după încă 2 săptămâni nu apare o comandă de PAD: oprit. Volumul căutărilor (100–1K/lună)
-   nu susține 40 lei/zi.
+**Google — făcut pe 07.09** (negative, „pad imobil" întrerupt, buget 20 lei/zi, plafon CPC 1,80).
+
+**Ce rămâne de făcut, în ordinea impactului:**
+1. **Checkout-ul de PAD** — 3 din 3 comenzi de 216,59 lei au fost abandonate la plată. Aici se
+   pierd banii, nu în Ads. De verificat: prețul e vizibil înainte de formular? Câți pași are?
+   Se cere ceva ce omul nu are la îndemână (număr cadastral, act de proprietate)?
+2. **Anunțul NU se atinge** deocamdată: CTR 8,61% e bun, iar orice editare a unui RSA trece prin
+   review — pe o politică unde restul contului e deja respins, riscul e să pierdem singura
+   campanie care difuzează.
+3. **Verdict în 2 săptămâni:** la ~280 lei cheltuiți cu setarea nouă, dacă nu apare o comandă de
+   PAD plătită, se oprește. Volumul (100–1K căutări/lună) nu susține mai mult.
 
 **Meta:** rămâne 5 zile fără modificări, conform planului din `meta/05-plan-test-constatator.md`.
 La evaluare se judecă CTR și CPM, nu vânzările (bugetul e prea mic pentru concluzii). C4
