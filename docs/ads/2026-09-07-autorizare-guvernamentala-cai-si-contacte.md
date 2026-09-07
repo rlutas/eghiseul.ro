@@ -1,104 +1,142 @@
-# Există o cale de autorizare guvernamentală? Cercetare + plan de contact (07.09.2026)
+# Există o cale de autorizare de la stat? Cercetare + plan de contact (07.09.2026)
 
-Context: Google cere, ca să deblocheze anunțurile, ca un **site guvernamental oficial
-să listeze domeniul nostru ca sursă autorizată** (vezi
+Context: Google cere, ca să deblocheze anunțurile, ca un **site guvernamental oficial să
+listeze domeniul/firma noastră ca sursă autorizată** (vezi
 [`2026-09-07-raspuns-google-tratament-egal.md`](2026-09-07-raspuns-google-tratament-egal.md)).
-Documentul ăsta răspunde la întrebarea: **se poate așa ceva în România, și dacă nu, la
+Documentul răspunde la: **se poate așa ceva pe cazier judiciar (MAI/IGPR), cazier fiscal
+(ANAF) și certificate de stare civilă (oficiile de stare civilă / DEPABD) — și dacă nu, la
 cine batem la ușă.**
 
-## Concluzia, pe scurt
+## Concluzia, pe cele trei
 
-**Pe serviciile noastre principale (cazier judiciar, cazier auto, certificate de stare
-civilă, certificat constatator) NU există în legislația română niciun mecanism prin care
-o firmă privată să fie autorizată, acreditată sau recunoscută de stat ca furnizor.**
-Nu există registru, nu există procedură, nu există formular. Legea prevede doar cine
-poate depune cererea: titularul, un împuternicit cu procură notarială, sau **avocatul cu
-împuternicire avocațială** — exact mecanismul pe care îl folosim noi (Legea 290/2004
-art. 31 pentru cazier; Legea 119/1996 pentru stare civilă).
+| Serviciu | Instituție | Există autorizare pentru firme private? | Ce putem face |
+|---|---|---|---|
+| Cazier judiciar | IGPR (Direcția Cazier Judiciar) / MAI | **NU** | Cerere 544/2001 → dovadă scrisă că nu există |
+| Certificate de stare civilă | Oficii stare civilă / DEPABD / MAI | **NU** | Cerere 544/2001 → dovadă scrisă că nu există |
+| **Cazier fiscal** | ANAF | **DA, două forme reale** | Împuternicit înregistrat la ANAF **+ societate de consultanță fiscală autorizată de CCF (registru PUBLIC)** |
 
-Există însă **trei căi reale de autorizare** pe zone adiacente și **una de explorat**:
+Peste toate trei stă un fir comun, cel mai puternic: **avocatul**. Împuternicirea
+avocațială e canalul legal recunoscut expres de toate cele trei instituții, iar avocatul
+figurează în **tabloul public al avocaților**, ținut de Barou/UNBR în baza Legii 51/1995.
 
-| # | Cale | Instituție | Realistă? | Ce ne dă |
-|---|---|---|---|---|
-| 1 | **Distribuitor autorizat de rovinietă** | CNAIR | **DA** — există procedură și listă publică | Exact ce cere Google: listare publică pe site guvernamental |
-| 2 | **Persoană juridică autorizată** (cadastru/geodezie) | ANCPI / OCPI | **DA** — dar cere angajat autorizat | Firma apare în listele publice OCPI; acoperă extras CF, plan cadastral etc. |
-| 3 | **Contract de abonament RECOM** | ONRC | **DA** — contract standard, depozit 300 lei | Relație contractuală formală cu instituția emitentă (nu listare publică) |
-| 4 | **Protocol de colaborare ca furnizor de servicii de e-guvernare** | ADR | de explorat | ADR semnează protocoale cu furnizori (ROeID); dacă acceptă și privați, e listare publică |
-| — | Cazier judiciar / stare civilă | IGPR / DEPABD | **NU EXISTĂ** | — |
+## 1. Cazier judiciar — MAI / IGPR
 
-## Cea mai valoroasă mișcare: cererile pe Legea 544/2001
+**Nu există niciun mecanism de autorizare a firmelor private.** Legea 290/2004 (art. 31)
+prevede exclusiv: titularul personal, împuternicit cu **procură notarială**, sau **avocat
+cu împuternicire avocațială**. Nu există registru de operatori acreditați, nu există
+formular de solicitare a unui asemenea statut.
 
-Indiferent de răspuns, **cererea de informații de interes public (Legea 544/2001) e
-instrumentul cel mai puternic din tot dosarul**, pentru că instituțiile sunt OBLIGATE să
-răspundă în scris (10 zile, maxim 30).
+**Nuanța care ne ajută:** IGPR *chiar* autorizează operatori economici — dar pe alte
+domenii (sisteme de securitate, instalații de stingere a incendiilor, instalații
+electrice). Deci instrumentul „autorizare de operator economic" există la MAI ca practică
+administrativă; pur și simplu **nu a fost creat pentru cazier**. Asta e util de spus atât
+în cererea către IGPR, cât și în dosarul Google: nu e o imposibilitate tehnică, e o
+inexistență a procedurii.
 
-- Dacă răspunsul e **„nu există o astfel de procedură"** → avem **document oficial de la
-  statul român** care demonstrează că criteriul cerut de Google este imposibil de
-  îndeplinit de oricine, deci aplicarea lui selectivă e discriminatorie. Asta merge direct
-  în dosarul Google, în plângerea la Consiliul Concurenței și în procedura DSA art. 21.
-- Dacă răspunsul e **„da, uite procedura"** → o urmăm și rezolvăm problema la rădăcină.
+**Contact:**
+- Direcția Cazier Judiciar, Statistică și Evidențe Operative (unitate centrală IGPR) —
+  https://politiaromana.ro/ro/politia-romana/unitati-centrale/directia-cazier-judiciar-statistica-si-evidente-operative
+- Telefon: **021 208 25 25** · Email: **suport.hub@mai.gov.ro** (platforma hub.mai.gov.ro)
+- Formular contact/petiții: https://www.politiaromana.ro/ro/contact
 
-Ambele rezultate sunt bune. De asta trimitem cererile chiar dacă ne așteptăm la „nu".
+## 2. Cazier fiscal — ANAF (cea mai bună situație dintre cele trei)
 
-## Contactele, pe instituții
+Aici există **două statuturi reale**, iar al doilea e chiar ce cere Google.
 
-### IGPR — cazier judiciar
-- Telefon: **021 208 25 25**
-- Email: **suport.hub@mai.gov.ro** (platforma hub.mai.gov.ro)
-- Contact/petiții: https://www.politiaromana.ro/ro/contact
-- Cadru legal: Legea 290/2004 (art. 31 — cererea prin avocat cu împuternicire avocațială),
-  Ordin 150/21.085/2023 (certificate electronice)
+### a) Împuternicit înregistrat la ANAF (SPV)
+Un terț (contabil, avocat, consultant, firmă) poate fi înregistrat ca **împuternicit** al
+contribuabilului în Spațiul Privat Virtual. ANAF a precizat expres că, pentru înregistrarea
+în SPV în calitate de împuternicit, **nu e necesară procura notarială** — e suficientă
+împuternicirea sub semnătură privată, prezentată la unitatea fiscală unde e arondat
+contribuabilul. Pentru persoane juridice, cazierul fiscal se obține **exclusiv prin SPV**;
+pentru persoane fizice, prin SPV sau formularul 502 la ghișeu.
 
-### DEPABD / DGEP — certificate de stare civilă
+Statut formal față de stat — dar **nu e listă publică**, deci nu satisface singur criteriul
+Google.
+
+### b) Societate de consultanță fiscală autorizată de CCF ← ținta reală
+**Camera Consultanților Fiscali** este autoritatea care reglementează, organizează și
+**autorizează** activitatea de consultanță fiscală (O.G. 71/2001, modificată prin O.U.G.
+49/2025). O societate poate fi **autorizată ca societate de consultanță fiscală** și este
+înscrisă în **Registrul public al consultanților fiscali și al societăților de consultanță
+fiscală**.
+
+- Condiția-cheie: **cel puțin un asociat/acționar CARE ESTE ȘI administrator trebuie să
+  aibă calitatea de consultant fiscal**, fără sancțiuni în registru, fără datorii la
+  Cameră și fără cazier judiciar.
+- Registrul e public: https://www.ccfiscali.ro/registrul-consultantilor-fiscali-si-al-societatilor-comerciale-de-consultanta-fiscala
+  (portal membri: https://membri.ccfiscali.ro/)
+- **Procedura de înscriere a persoanelor juridice este publicată chiar pe portalul
+  guvernamental PCUe** (`edirect.e-guvernare.ro`) — adică pe un domeniu al statului.
+
+**De ce contează:** dacă EDIGITALIZARE devine societate de consultanță fiscală autorizată,
+avem exact ce cere Google pentru cazierul fiscal — o **autorizare emisă de o autoritate
+competentă** și o **listare publică verificabilă**. E singura dintre cele trei zone unde
+criteriul lor poate fi bifat cu adevărat.
+
+**Ce ne trebuie:** un consultant fiscal care să fie asociat ȘI administrator. Fie aducem
+unul (colaboratorul contabil?), fie dai tu examenul CCF.
+
+**Contact ANAF / CCF:**
+- ANAF: prin SPV (secțiunea Solicitări) și administrația financiară teritorială;
+  procedura curentă a cazierului fiscal — OPANAF 508/2026
+- CCF: Str. Alexandru Constantinescu nr. 61, sector 1, București ·
+  https://www.ccfiscali.ro/contact/ · formulare: https://www.ccfiscali.ro/formulare
+
+## 3. Certificate de stare civilă — oficiile de stare civilă / DEPABD
+
+**Nu există autorizare pentru firme.** Certificatele (naștere, căsătorie, deces, extrase
+multilingve) se eliberează titularului, unui **împuternicit cu procură specială** sau
+**avocatului cu împuternicire avocațială**; pentru cei din străinătate, și pe cale
+diplomatică. Cererea se poate depune la orice primărie/SPCLEP din țară, indiferent unde e
+înregistrat actul. Nicio listă de operatori privați.
+
+**Contact DEPABD / DGEP:**
 - Adresă: str. Obcina Mare nr. 2, sector 6, București
-- Telefon: **021/440.27.70**, 021/440.24.40, 021/413.54.42
-- Email: **dgep@mai.gov.ro**
-- Sesizări: 021/413.56.49 (08:00–16:00)
+- Telefon: **021/440.27.70**, 021/440.24.40, 021/413.54.42 · Fax: 021/413.50.49
+- Email: **dgep@mai.gov.ro** · Sesizări: 021/413.56.49 (08:00–16:00)
 
-### ONRC — certificat constatator
-- Abonament RECOM: contract-tip descărcat din portal.onrc.ro, depozit minim **300 lei**,
-  două exemplare originale trimise la sediul din București, apoi activare pe email
-- Email: **recom@onrc.ro**
-- Portal: https://portal.onrc.ro
+## 4. Firul comun: avocatul și tabloul public al avocaților
 
-### ANCPI / OCPI — extras CF, plan cadastral, servicii imobiliare
-- Autorizarea persoanelor **juridice** se face de comisia de la nivelul ANCPI; dosarul se
-  depune la **OCPI-ul din județul sediului** (pentru noi: Satu Mare)
-- Email dosar autorizare: `dosar.autorizare.<cod județ>@ancpi.ro` (ex. `dosar.autorizare.sm@ancpi.ro`)
-- Informații: **(021) 317.31.62**
-- Cadru legal: Regulamentul aprobat prin Ordinul 107/2010, modificat prin Ordinul 1607/2018
-- Condiție-cheie: firma trebuie să aibă ca obiect principal „Activități de inginerie și
-  consultanță tehnică" și **personal de specialitate autorizat**
-- ⚠️ **Avantajul nostru**: colaboratorul topograf (Mircea) este deja persoană fizică
-  autorizată. De verificat dacă poate fi angajat/asociat în forma cerută de regulament,
-  caz în care EDIGITALIZARE poate deveni **persoană juridică autorizată**, iar firma apare
-  în listele publice de pe site-urile OCPI (ex. `cj.ancpi.ro/liste-persoane-autorizate/`).
+Toate trei instituțiile recunosc expres **împuternicirea avocațială** ca modalitate legală
+de depunere a cererii. Avocatul colaborator figurează în **tabloul avocaților**, registru
+public ținut de Barou și UNBR conform Legii 51/1995.
 
-### CNAIR — rovinietă
-- Email roviniete: **roviniete@andnet.ro**
-- Telefon: **021.264.33.44** (L–J 08:30–16:30, V 08:30–14:00)
-- Registratură: **registraturacnair@andnet.ro** · General: office@andnet.ro
-- Pe site există pagina „Condiții distribuitori" + „Puncte de distribuție" (lista publică)
-- Precedente: Lukoil România, Casier Total — firme private devenite distribuitori autorizați
-- ⚠️ Dublu interes: (1) deblochează rovinieta la Google; (2) ne scoate din categoria
-  portalurilor neautorizate pe care CNAIR le denunță public în comunicate
+Asta ne dă un argument pe care Google nu-l poate ignora: serviciul se prestează printr-un
+profesionist **înscris într-un registru public oficial**, iar mecanismul e prevăzut expres
+de lege. Se leagă direct de testul deja pornit pe ecazier, unde advertiserul verificat este
+**„Cabinet De Avocat Tarta Ana Gabriela"**.
 
-### ADR — Autoritatea pentru Digitalizarea României
-- Email general: **contact@adr.gov.ro** · Cabinet președinte: **cabinet.presedinte@adr.gov.ro**
-- PCUe: edirect.info@adr.gov.ro · SNEP/ghiseul.ro: suport@ghiseul.ro
-- Call center: **+40 21 303 29 97**
-- Sedii: B-dul Libertății nr. 14, sector 5 · str. Italiană nr. 22, București
-- De întrebat: ADR încheie **protocoale de colaborare** cu furnizori de servicii de
-  e-guvernare (modelul ROeID). Există o formă prin care un operator privat poate fi
-  recunoscut/listat public ca furnizor? Dacă da, e fix criteriul Google.
+**De cerut:** o adeverință de la Baroul Satu Mare care atestă înscrierea în tablou +
+linkul public al tabloului. E hârtie oficială, se obține în câteva zile.
+
+## 5. Arma principală: cererile pe Legea 544/2001
+
+Instituțiile sunt **obligate** să răspundă în scris (10 zile, maxim 30). Ambele răspunsuri
+posibile ne folosesc:
+
+- **„Nu există o astfel de procedură"** → avem **document oficial de la statul român** că
+  cerința Google e imposibil de îndeplinit de oricine în România. Merge direct în dosarul
+  Google, în plângerea la Consiliul Concurenței și în procedura DSA art. 21. Practic:
+  demontează criteriul lor cu hârtie de la stat.
+- **„Da, uite procedura"** → o urmăm și rezolvăm problema la rădăcină.
 
 ## Ordinea în care le facem
 
-1. **CNAIR** (telefon + email) — cea mai concretă și cu cel mai mare câștig imediat.
-2. **ADR** (email către contact@ + cabinet.presedinte@) — singura instituție cu mandat
-   transversal pe digitalizare; dacă cineva poate crea o formă de recunoaștere, ei sunt.
-3. **544/2001 la IGPR și DEPABD** — obținem în scris că mecanismul nu există. Muniție.
-4. **ANCPI** — verificăm întâi cu Mircea dacă se poate autorizarea firmei, apoi dosar.
-5. **ONRC** — contractul RECOM oricum e util operațional, nu doar pentru Ads.
+1. **ANAF + CCF** — singura cale care poate produce o autorizare reală. Întâi întrebăm CCF
+   condițiile exacte, apoi vedem dacă avem/aducem consultantul fiscal.
+2. **544/2001 la IGPR și DEPABD** — obținem în scris că mecanismul nu există. Muniție.
+3. **Baroul Satu Mare** — adeverință + link public către tablou.
+4. **544/2001 la ANAF** — întrebăm explicit dacă statutul de împuternicit înregistrat sau
+   de societate de consultanță fiscală constituie o recunoaștere oficială pe care o putem
+   invoca. Un „da" scris de la ANAF valorează cât toată corespondența cu Google.
 
 Textele gata de trimis: [`2026-09-07-emailuri-institutii.txt`](2026-09-07-emailuri-institutii.txt).
+
+---
+
+*Notă laterală, în afara celor trei:* pe **rovinietă** CNAIR chiar autorizează distribuitori
+și publică lista (roviniete@andnet.ro, 021.264.33.44) — util pentru serviciul de rovinietă,
+dar nu ajută pe cazier/stare civilă. Pe **extras CF**, ANCPI autorizează persoane juridice
+(dosar la OCPI-ul de sediu, `dosar.autorizare.<județ>@ancpi.ro`), condiția fiind personal
+de specialitate autorizat — pe care îl avem prin colaboratorul topograf.

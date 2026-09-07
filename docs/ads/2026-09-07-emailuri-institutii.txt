@@ -1,63 +1,8 @@
 ===========================================================================
-1. CNAIR - cerere de a deveni distribuitor autorizat de rovinieta
-   Catre: roviniete@andnet.ro
-   Cc: registraturacnair@andnet.ro
-   Subiect: Solicitare informatii privind procedura de autorizare ca distribuitor de rovinieta
-===========================================================================
-
-In atentia Companiei Nationale de Administrare a Infrastructurii Rutiere,
-
-Subscrisa EDIGITALIZARE SRL, CUI 49278701, cu sediul in judetul Satu Mare, operator al platformei eghiseul.ro, va solicita informatii privind procedura prin care o societate comerciala poate deveni distribuitor autorizat pentru incasarea tarifului de utilizare a retelei de drumuri nationale (rovinieta).
-
-Va rugam sa ne comunicati:
-
-1. Conditiile pe care trebuie sa le indeplineasca o societate pentru a fi autorizata ca distribuitor, inclusiv pentru distributia online (portal web autorizat).
-2. Documentele necesare si formularul de cerere.
-3. Eventualele garantii, depozite sau contracte-cadru solicitate.
-4. Termenul estimativ de solutionare.
-5. Daca, in urma autorizarii, societatea si domeniul web sunt publicate in lista distribuitorilor autorizati de pe site-ul oficial CNAIR.
-
-Ultimul punct are pentru noi o importanta deosebita: platformele de publicitate online (Google) conditioneaza difuzarea anunturilor pentru servicii publice de existenta unei mentiuni oficiale, pe un site guvernamental, care sa ateste calitatea de furnizor autorizat. Listarea publica in registrul dumneavoastra ar rezolva aceasta cerinta.
-
-Va multumim si asteptam raspunsul dumneavoastra.
-
-Cu stima,
-Raul Lutas
-EDIGITALIZARE SRL - eghiseul.ro
-Telefon: +40 745 850 700
-
-
-===========================================================================
-2. ADR - exista o forma de recunoastere a unui furnizor privat?
-   Catre: contact@adr.gov.ro
-   Cc: cabinet.presedinte@adr.gov.ro
-   Subiect: Solicitare privind recunoasterea operatorilor privati care faciliteaza accesul cetatenilor la servicii publice
-===========================================================================
-
-In atentia Autoritatii pentru Digitalizarea Romaniei,
-
-Subscrisa EDIGITALIZARE SRL, CUI 49278701, operator al platformei eghiseul.ro, desfasoara activitati de asistenta si intermediere prin care cetatenii pot solicita documente publice (cazier judiciar, certificate de stare civila, certificat constatator, extras de carte funciara), cererile fiind depuse la institutiile emitente prin avocat colaborator, in baza imputernicirii avocatiale, conform legii.
-
-Ne confruntam cu urmatoarea situatie: platformele de publicitate online, in special Google, restrictioneaza difuzarea anunturilor pentru aceste servicii si conditioneaza deblocarea lor de existenta unei recunoasteri oficiale - concret, de o mentiune publicata pe un site guvernamental care sa ateste calitatea de furnizor autorizat. In lipsa acestei mentiuni, activitatea noastra online este blocata publicitar, desi este perfect legala.
-
-Va solicitam sa ne comunicati:
-
-1. Daca exista, la nivelul ADR sau al altei institutii, o procedura prin care un operator economic privat poate fi recunoscut, acreditat sau listat public ca furnizor de servicii care faciliteaza accesul cetatenilor la servicii publice.
-2. Daca protocoalele de colaborare pe care ADR le incheie cu furnizori de servicii de e-guvernare (de exemplu in cadrul platformei ROeID) sunt accesibile si operatorilor privati, si in ce conditii.
-3. In lipsa unui astfel de mecanism, daca ADR considera oportuna crearea lui, avand in vedere ca absenta oricarei forme de recunoastere oficiala permite platformelor internationale sa blocheze discretionar activitatea unor operatori romani legali.
-
-Precizam ca nu solicitam niciun drept exclusiv si nicio derogare. Solicitam existenta unui cadru prin care legalitatea activitatii noastre sa poata fi atestata public.
-
-Cu stima,
-Raul Lutas
-EDIGITALIZARE SRL - eghiseul.ro
-Telefon: +40 745 850 700
-
-
-===========================================================================
-3. IGPR - cerere Legea 544/2001 (cazier judiciar)
+1. IGPR - cerere Legea 544/2001 (CAZIER JUDICIAR)
    Catre: suport.hub@mai.gov.ro
-   (sau formularul de la https://www.politiaromana.ro/ro/contact)
+   Alternativ: formularul de la https://www.politiaromana.ro/ro/contact
+   In atentia: Directia Cazier Judiciar, Statistica si Evidente Operative
    Subiect: Cerere de informatii de interes public - Legea 544/2001
 ===========================================================================
 
@@ -71,7 +16,9 @@ In temeiul Legii nr. 544/2001 privind liberul acces la informatiile de interes p
 
 4. Va rugam sa ne comunicati daca IGPR publica sau a publicat vreodata o lista a operatorilor privati autorizati pentru astfel de servicii.
 
-Motivul solicitarii: o platforma internationala de publicitate online conditioneaza accesul nostru la serviciile sale de existenta unei autorizari oficiale de acest tip. Avem nevoie de un raspuns oficial care sa clarifice daca o astfel de autorizare exista sau nu in Romania.
+5. Constatam ca IGPR autorizeaza operatori economici in alte domenii (sisteme de securitate, instalatii de stingere a incendiilor). Va rugam sa ne comunicati daca a fost analizata vreodata posibilitatea unui mecanism similar pentru operatorii care asista cetatenii la obtinerea certificatelor de cazier judiciar.
+
+Motivul solicitarii: o platforma internationala de publicitate online (Google) conditioneaza accesul nostru la serviciile sale de existenta unei autorizari oficiale de acest tip, mentionata pe un site guvernamental. Avem nevoie de un raspuns oficial care sa clarifice daca o astfel de autorizare exista sau nu in Romania.
 
 Raspunsul poate fi transmis pe email la adresa contact@eghiseul.ro.
 
@@ -82,7 +29,33 @@ Telefon: +40 745 850 700
 
 
 ===========================================================================
-4. DEPABD / DGEP - cerere Legea 544/2001 (stare civila)
+2. ANAF - cerere Legea 544/2001 (CAZIER FISCAL)
+   Catre: administratia financiara teritoriala / prin SPV, sectiunea Solicitari
+   Subiect: Cerere de informatii de interes public - Legea 544/2001
+===========================================================================
+
+In temeiul Legii nr. 544/2001 privind liberul acces la informatiile de interes public, subscrisa EDIGITALIZARE SRL, CUI 49278701, va solicita urmatoarele informatii:
+
+1. Exista un mecanism prin care o persoana juridica de drept privat sa poata fi autorizata, acreditata sau recunoscuta oficial de ANAF pentru a solicita, in numele contribuabililor, eliberarea certificatelor de cazier fiscal?
+
+2. Inregistrarea unei societati in calitate de imputernicit al contribuabilului in Spatiul Privat Virtual constituie o forma de recunoastere oficiala a calitatii de reprezentant? Exista o lista publica a societatilor inregistrate in aceasta calitate?
+
+3. Calitatea de societate de consultanta fiscala autorizata de Camera Consultantilor Fiscali (O.G. nr. 71/2001) constituie, in relatia cu ANAF, o recunoastere a dreptului de a asista contribuabilii inclusiv in obtinerea certificatelor de cazier fiscal?
+
+4. In caz negativ la punctele 1-3, va rugam sa confirmati in scris ca ANAF nu autorizeaza si nu listeaza public operatori privati pentru aceste servicii, singurele modalitati fiind cererea depusa de titular, prin SPV, sau prin imputernicit.
+
+Motivul solicitarii: o platforma internationala de publicitate online (Google) conditioneaza difuzarea anunturilor pentru astfel de servicii de existenta unei autorizari oficiale mentionate pe un site guvernamental. Avem nevoie de un raspuns oficial care sa clarifice situatia din Romania.
+
+Raspunsul poate fi transmis pe email la adresa contact@eghiseul.ro.
+
+Cu stima,
+Raul Lutas
+EDIGITALIZARE SRL - eghiseul.ro
+Telefon: +40 745 850 700
+
+
+===========================================================================
+3. DEPABD / DGEP - cerere Legea 544/2001 (STARE CIVILA)
    Catre: dgep@mai.gov.ro
    Subiect: Cerere de informatii de interes public - Legea 544/2001
 ===========================================================================
@@ -93,11 +66,11 @@ In temeiul Legii nr. 544/2001 privind liberul acces la informatiile de interes p
 
 2. In caz afirmativ, va rugam sa ne comunicati temeiul legal si procedura.
 
-3. In caz negativ, va rugam sa confirmati in scris ca un asemenea mecanism nu exista, singurele modalitati fiind cererea depusa personal, prin imputernicit cu procura speciala sau prin avocat cu imputernicire avocatiala.
+3. In caz negativ, va rugam sa confirmati in scris ca un asemenea mecanism nu exista, singurele modalitati fiind cererea depusa personal de titular, prin imputernicit cu procura speciala sau prin avocat cu imputernicire avocatiala.
 
-4. Va rugam sa ne comunicati daca DEPABD publica vreo lista a operatorilor privati autorizati pentru astfel de servicii.
+4. Va rugam sa ne comunicati daca DEPABD sau oficiile de stare civila publica vreo lista a operatorilor privati autorizati pentru astfel de servicii.
 
-Motivul solicitarii: o platforma internationala de publicitate online conditioneaza accesul nostru la serviciile sale de existenta unei autorizari oficiale de acest tip. Avem nevoie de un raspuns oficial care sa clarifice daca o astfel de autorizare exista sau nu in Romania.
+Motivul solicitarii: o platforma internationala de publicitate online (Google) conditioneaza accesul nostru la serviciile sale de existenta unei autorizari oficiale de acest tip, mentionata pe un site guvernamental. Avem nevoie de un raspuns oficial care sa clarifice daca o astfel de autorizare exista sau nu in Romania.
 
 Raspunsul poate fi transmis pe email la adresa contact@eghiseul.ro.
 
@@ -108,20 +81,49 @@ Telefon: +40 745 850 700
 
 
 ===========================================================================
-5. ONRC - cerere Legea 544/2001 (certificat constatator)
-   Catre: recom@onrc.ro
-   Subiect: Cerere de informatii de interes public - Legea 544/2001
+4. CAMERA CONSULTANTILOR FISCALI - conditii de autorizare a societatii
+   Catre: prin formularul de la https://www.ccfiscali.ro/contact/
+   Adresa: Str. Alexandru Constantinescu nr. 61, sector 1, Bucuresti
+   Subiect: Solicitare informatii - autorizarea unei societati de consultanta fiscala
 ===========================================================================
 
-In temeiul Legii nr. 544/2001, subscrisa EDIGITALIZARE SRL, CUI 49278701, va solicita:
+In atentia Camerei Consultantilor Fiscali,
 
-1. Daca exista un mecanism prin care o societate comerciala poate fi autorizata, acreditata sau recunoscuta oficial de ONRC pentru a solicita si furniza catre terti certificate constatatoare si informatii din registrul comertului.
+Subscrisa EDIGITALIZARE SRL, CUI 49278701, doreste sa obtina calitatea de societate de consultanta fiscala autorizata si va solicita urmatoarele clarificari:
 
-2. Daca incheierea contractului de abonament RECOM Online confera o astfel de calitate si daca societatile care au incheiat acest contract sunt publicate intr-o lista pe site-ul ONRC.
+1. Conditiile complete pe care trebuie sa le indeplineasca societatea, conform O.G. nr. 71/2001 astfel cum a fost modificata prin O.U.G. nr. 49/2025, inclusiv cerintele privind asociatii si administratorii care trebuie sa aiba calitatea de consultant fiscal.
 
-3. In caz negativ, confirmarea in scris ca ONRC nu autorizeaza si nu listeaza public operatori privati pentru aceste servicii.
+2. Documentele necesare, taxele si termenul de solutionare a cererii de autorizare.
 
-Raspunsul poate fi transmis pe email la adresa contact@eghiseul.ro.
+3. Modalitatea prin care o persoana poate dobandi calitatea de consultant fiscal (conditii de acces, sesiuni de examen, calendar).
+
+4. Confirmarea ca societatile autorizate sunt inscrise in Registrul consultantilor fiscali si al societatilor de consultanta fiscala si ca acest registru este public si accesibil online.
+
+Va rugam sa ne comunicati si daca exista posibilitatea obtinerii, dupa autorizare, a unui document care sa ateste calitatea de societate autorizata, utilizabil in relatia cu terti.
+
+Cu stima,
+Raul Lutas
+EDIGITALIZARE SRL - eghiseul.ro
+Telefon: +40 745 850 700
+
+
+===========================================================================
+5. BAROUL SATU MARE - adeverinta privind avocatul colaborator
+   Catre: baroul de care apartine av. Tarta Ana-Gabriela
+   Subiect: Solicitare adeverinta privind inscrierea in tabloul avocatilor
+===========================================================================
+
+In atentia Baroului Satu Mare,
+
+Subscrisa EDIGITALIZARE SRL, CUI 49278701, colaboreaza cu Cabinetul de Avocat Tarta Ana-Gabriela pentru asistenta juridica acordata clientilor, inclusiv pentru depunerea, in baza imputernicirii avocatiale, a cererilor de eliberare a certificatelor de cazier judiciar, cazier fiscal si a certificatelor de stare civila.
+
+Va solicitam eliberarea unei adeverinte care sa ateste:
+
+1. Inscrierea doamnei avocat Tarta Ana-Gabriela in tabloul avocatilor din cadrul Baroului, cu drept de exercitare a profesiei;
+2. Faptul ca tabloul avocatilor este public si accesibil online, cu indicarea adresei web unde poate fi consultat;
+3. Faptul ca depunerea cererilor si ridicarea documentelor de la institutii publice, in baza imputernicirii avocatiale, reprezinta o activitate profesionala prevazuta de Legea nr. 51/1995.
+
+Motivul solicitarii: o platforma internationala de publicitate online contesta legalitatea serviciilor noastre si solicita dovezi oficiale privind cadrul in care acestea sunt prestate.
 
 Cu stima,
 Raul Lutas
