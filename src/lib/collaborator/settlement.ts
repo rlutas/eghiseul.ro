@@ -32,9 +32,10 @@ export const DIVIDEND_TAX_RATE = 0.16;
 export const PROFIT_SPLIT = 0.5;
 
 /**
- * Cota lunară de găzduire/infrastructură alocată serviciilor imobiliare
- * (Netlify + Supabase + Prisma costă ~730 lei/lună pentru TOATE platformele;
- * 500 e partea convenită cu Raul pentru zona asta, 07.09.2026).
+ * Costul LUNAR al platformei alocat serviciilor imobiliare: găzduire +
+ * programe de dezvoltare, 500 lei/lună în total (confirmat de Raul,
+ * 07.09.2026). Infrastructura reală (Netlify + Supabase + Prisma) costă
+ * ~730 lei/lună, dar deservește toate platformele — 500 e partea alocată aici.
  */
 export const PLATFORM_COST_PER_MONTH = 500;
 
@@ -55,9 +56,16 @@ export const LAST_SETTLEMENT = {
 
 /** Costurile care se scad din venitul net, în afara taxelor OCPI. */
 export interface SettlementExtraCosts {
+  /** Taxe OCPI estimate pentru comenzile încasate dar încă nelucrate. */
+  pendingOcpi?: number;
   /** Comisioanele procesatorului de plăți (Stripe), reale, per comandă. */
   stripeFees?: number;
-  /** Comisionul colaboratorului (15 lei/comandă unde e setat), facturat separat. */
+  /**
+   * Comisionul colaboratorului (15 lei/comandă unde e setat). NU e cost
+   * înainte de împărțeală: se calculează DUPĂ ce se știe partea lui și se
+   * scade din ea, pentru că îl încasează prin factură către EDIGITALIZARE
+   * (regula Raul, 07.09.2026 — aceeași convenție ca la avocată).
+   */
   commission?: number;
   /** Cota de găzduire/infrastructură pentru perioadă. */
   platformCost?: number;
@@ -73,10 +81,12 @@ export interface SettlementBreakdown {
   ocpiCosts: number;
   /** Comisioanele Stripe pe comenzile perioadei. */
   stripeFees: number;
-  /** Comisionul colaboratorului (facturat separat de împărțeală). */
+  /** Comisionul colaboratorului — se scade din partea LUI, nu din profit. */
   commission: number;
   /** Cota de găzduire/infrastructură. */
   platformCost: number;
+  /** Provizion pentru taxele OCPI ale comenzilor încă nelucrate. */
+  pendingOcpi: number;
   /** Suma tuturor costurilor scăzute din net. */
   totalCosts: number;
   grossProfit: number;
@@ -85,8 +95,10 @@ export interface SettlementBreakdown {
   dividendTax: number;
   /** Net de distribuit după toate taxele. */
   distributable: number;
-  /** Partea fiecăruia (50%). */
+  /** Partea fiecăruia (50%), înainte de comision. */
   sharePerSide: number;
+  /** Partea colaboratorului după scăderea comisionului pe care îl facturează. */
+  collaboratorShare: number;
 }
 
 const round2 = (n: number) => Math.round(n * 100) / 100;
@@ -106,7 +118,9 @@ export function computeSettlementBreakdown(
   const stripeFees = Number(extra.stripeFees) || 0;
   const commission = Number(extra.commission) || 0;
   const platformCost = Number(extra.platformCost) || 0;
-  const totalCosts = ocpi + stripeFees + commission + platformCost;
+  const pendingOcpi = Number(extra.pendingOcpi) || 0;
+  // Comisionul NU intră aici: el se scade din partea colaboratorului, la final.
+  const totalCosts = ocpi + stripeFees + platformCost + pendingOcpi;
 
   const netOfVat = collected / (1 + VAT_RATE);
   const grossProfit = netOfVat - totalCosts;
@@ -123,6 +137,7 @@ export function computeSettlementBreakdown(
     stripeFees: round2(stripeFees),
     commission: round2(commission),
     platformCost: round2(platformCost),
+    pendingOcpi: round2(pendingOcpi),
     totalCosts: round2(totalCosts),
     grossProfit: round2(grossProfit),
     profitTax: round2(profitTax),
@@ -130,6 +145,7 @@ export function computeSettlementBreakdown(
     dividendTax: round2(dividendTax),
     distributable: round2(distributable),
     sharePerSide: round2(distributable * PROFIT_SPLIT),
+    collaboratorShare: round2(distributable * PROFIT_SPLIT - commission),
   };
 }
 
@@ -159,4 +175,35 @@ export function platformCostForRange(startIso: string, endIso: string): number {
   if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start) return 0;
   const days = (end - start) / 86_400_000;
   return round2((days / 30.44) * PLATFORM_COST_PER_MONTH);
+}
+
+/**
+ * Provizion pentru taxele OCPI care ABIA URMEAZĂ: comenzile încasate dar
+ * nelucrate încă nu au taxă înregistrată, așa că profitul perioadei apare mai
+ * mare decât e (lecția decontului din 26.08 — 53 de comenzi nelucrate au adus
+ * +1.020 lei de taxe după închiderea decontului).
+ *
+ * Estimarea folosește taxa medie deja plătită pe același serviciu; comenzile
+ * finalizate fără taxă rămân la 0 (serviciul chiar nu are taxă la OCPI).
+ */
+export function estimatePendingOcpi(
+  orders: { serviceSlug: string; status: string; ocpiCost: number }[]
+): number {
+  const avg = new Map<string, { sum: number; n: number }>();
+  for (const o of orders) {
+    if (!(o.ocpiCost > 0)) continue;
+    const a = avg.get(o.serviceSlug) ?? { sum: 0, n: 0 };
+    a.sum += o.ocpiCost;
+    a.n += 1;
+    avg.set(o.serviceSlug, a);
+  }
+  const SETTLED = new Set(['completed', 'delivered', 'refunded', 'cancelled']);
+  let total = 0;
+  for (const o of orders) {
+    if (o.ocpiCost > 0 || SETTLED.has(o.status)) continue;
+    const a = avg.get(o.serviceSlug);
+    if (!a) continue;
+    total += a.sum / a.n;
+  }
+  return round2(total);
 }

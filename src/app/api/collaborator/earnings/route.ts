@@ -7,6 +7,7 @@ import {
   computeSettlementBreakdown,
   sumAncpiCosts,
   platformCostForRange,
+  estimatePendingOcpi,
   SETTLEMENT_PERIOD_START,
   LAST_SETTLEMENT,
 } from '@/lib/collaborator/settlement';
@@ -69,7 +70,7 @@ export async function GET(request: NextRequest) {
     const admin = createAdminClient() as any;
     let query = admin
       .from('orders')
-      .select('id, friendly_order_id, order_number, status, paid_at, is_test, total_price, customer_data, services:service_id(name, lawyer_fee_ron)')
+      .select('id, friendly_order_id, order_number, status, paid_at, is_test, total_price, customer_data, services:service_id(name, slug, lawyer_fee_ron)')
       .or(scopeFilter)
       .eq('payment_status', 'paid')
       .neq('status', 'cancelled')
@@ -141,6 +142,7 @@ export async function GET(request: NextRequest) {
         stripeFee: Math.round(((feeByRef.get(o.friendly_order_id) ?? feeByRef.get(o.order_number) ?? 0)) * 100) / 100,
         // Comisionul de 15 lei/comandă, unde serviciul îl are setat.
         commission: Number(o.services?.lawyer_fee_ron) || 0,
+        serviceSlug: o.services?.slug || '',
         isTest: !!o.is_test,
       };
     });
@@ -157,11 +159,17 @@ export async function GET(request: NextRequest) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const commissionTotal = billable.reduce((s: number, o: any) => s + o.commission, 0);
     const platformCost = platformCostForRange(start, end ?? new Date().toISOString());
+    // Taxele care abia urmează pe comenzile încasate dar nelucrate.
+    const pendingOcpi = estimatePendingOcpi(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      billable.map((o: any) => ({ serviceSlug: o.serviceSlug, status: o.status, ocpiCost: o.ocpiCost }))
+    );
 
     const breakdown = computeSettlementBreakdown(collected, ocpiTotal, {
       stripeFees: stripeTotal,
       commission: commissionTotal,
       platformCost,
+      pendingOcpi,
     });
 
     return NextResponse.json({

@@ -32,6 +32,7 @@ interface Breakdown {
   stripeFees: number;
   commission: number;
   platformCost: number;
+  pendingOcpi: number;
   totalCosts: number;
   grossProfit: number;
   profitTax: number;
@@ -39,6 +40,7 @@ interface Breakdown {
   dividendTax: number;
   distributable: number;
   sharePerSide: number;
+  collaboratorShare: number;
 }
 interface Summary { count: number; revenue: number; fees: number; breakdown: Breakdown | null }
 
@@ -628,13 +630,15 @@ export default function CollaboratorsAdminPage() {
                   ['Net fără TVA', summary.breakdown.netOfVat],
                   ['− Taxe OCPI', -summary.breakdown.ocpiCosts],
                   ['− Comisioane Stripe', -summary.breakdown.stripeFees],
-                  ['− Comision colaborator', -summary.breakdown.commission],
-                  ['− Găzduire platformă', -summary.breakdown.platformCost],
+                  ['− Găzduire + programe', -summary.breakdown.platformCost],
+                  ['− Provizion taxe nelucrate', -summary.breakdown.pendingOcpi],
                   ['Profit brut', summary.breakdown.grossProfit],
                   ['− Impozit profit 16%', -summary.breakdown.profitTax],
                   ['− Impozit dividende 16%', -summary.breakdown.dividendTax],
                   ['Net de distribuit', summary.breakdown.distributable],
-                  ['Partea colaboratorului', summary.breakdown.sharePerSide],
+                  ['Partea colaboratorului (50%)', summary.breakdown.sharePerSide],
+                  ['− Comision facturat de el', -summary.breakdown.commission],
+                  ['Rest de plată colaborator', summary.breakdown.collaboratorShare],
                   ['Partea eGhiseul', summary.breakdown.sharePerSide],
                 ] as [string, number][]).map(([label, value]) => (
                   <div key={label} className="flex items-center justify-between border-b border-slate-100 py-1">

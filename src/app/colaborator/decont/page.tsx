@@ -26,6 +26,7 @@ interface Breakdown {
   stripeFees: number;
   commission: number;
   platformCost: number;
+  pendingOcpi: number;
   totalCosts: number;
   grossProfit: number;
   profitTax: number;
@@ -33,6 +34,7 @@ interface Breakdown {
   dividendTax: number;
   distributable: number;
   sharePerSide: number;
+  collaboratorShare: number;
 }
 
 interface EarningsData {
@@ -155,12 +157,15 @@ export default function CollaboratorDecontPage() {
               ['= Net fără TVA', b.netOfVat, 'font-medium'],
               ['− Taxe OCPI plătite', -b.ocpiCosts, ''],
               ['− Comisioane procesator plată (Stripe)', -b.stripeFees, ''],
-              ['− Comision 15 lei/comandă (facturat separat)', -b.commission, ''],
-              ['− Găzduire și infrastructură platformă', -b.platformCost, ''],
+              ['− Găzduire și programe de dezvoltare (500 lei/lună)', -b.platformCost, ''],
+              ['− Provizion taxe OCPI pentru comenzile nelucrate', -b.pendingOcpi, ''],
               ['= Profit brut', b.grossProfit, 'font-medium'],
               ['− Impozit pe profit 16%', -b.profitTax, ''],
               ['− Impozit pe dividende 16%', -b.dividendTax, ''],
               ['= Net de distribuit', b.distributable, 'font-semibold'],
+              ['Partea ta (50%)', b.sharePerSide, ''],
+              ['− Comision 15 lei/comandă (îl facturezi separat)', -b.commission, ''],
+              ['= Rest de primit din profit', b.collaboratorShare, 'font-semibold'],
             ] as [string, number, string][]).map(([label, value, cls]) => (
               <div key={label} className="flex items-center justify-between py-1.5">
                 <dt className={`text-slate-600 ${cls}`}>{label}</dt>

@@ -19,8 +19,8 @@ perioada, iar din el se scade ce s-a distribuit deja.
 | Încasat cu TVA | 17.267,04 | 17.643,04 | +376,00 |
 | Taxe OCPI | 2.035,00 | **3.055,00** | +1.020,00 |
 | Comisioane Stripe | nescăzute | **451,55** | +451,55 |
-| Comision 15 lei/comandă | nescăzut | **525,00** | +525,00 |
-| Găzduire/infrastructură | nescăzută | **919,84** | +919,84 |
+| Găzduire + programe dezvoltare | nescăzută | **919,84** | +919,84 |
+| Provizion taxe comenzi nelucrate | nescăzut | **240,00** | +240,00 |
 
 Cele 53 de comenzi plătite-nelucrate de la primul cutoff au fost lucrate; taxele lor OCPI
 au intrat în sistem — exact rezerva #2 din documentul precedent.
@@ -34,22 +34,41 @@ au intrat în sistem — exact rezerva #2 din documentul precedent.
 | **= Net fără TVA** | **14.581,02** |
 | − Taxe OCPI | −3.055,00 |
 | − Comisioane Stripe | −451,55 |
-| − Comision colaborator (factură SM 153) | −525,00 |
-| − Găzduire (500 lei/lună × 56 zile) | −919,84 |
-| **= Profit brut** | **9.629,63** |
-| − Impozit profit 16% | −1.540,74 |
-| − Impozit dividende 16% | −1.294,22 |
-| **= De distribuit** | **6.794,67** |
-| **Parte/cap** | **3.397,34** |
-| − distribuit la 26.08 | −4.316,61 |
-| **= De recuperat de la fiecare** | **−919,27** |
+| − Găzduire + programe dezvoltare (500 lei/lună × 56 zile) | −919,84 |
+| − Provizion taxe OCPI pe comenzile nelucrate | −240,00 |
+| **= Profit brut** | **9.914,63** |
+| − Impozit profit 16% | −1.586,34 |
+| − Impozit dividende 16% | −1.332,53 |
+| **= De distribuit** | **6.995,77** |
+| **Parte/cap (înainte de comision)** | **3.497,88** |
+
+### Cine cât rămâne de dat/luat
+
+| | Parte | Comision | Rest din profit | Primit la 26.08 | De reținut |
+|---|---|---|---|---|---|
+| Raul | 3.497,88 | — | 3.497,88 | 4.316,61 | **818,73** |
+| Mircea | 3.497,88 | −525,00 | 2.972,88 | 4.316,61 | **1.343,73** |
+
+Mircea încasează separat factura de comision (635,25 lei cu TVA).
+
+### Provizionul de 240 lei
+
+12 comenzi încasate dar nelucrate la 31.08 (10 identificare-imobil, 2
+identificare-imobile-proprietar), la taxa medie de 20 lei pe serviciu. Exact rezerva care a
+umflat primul decont: se împărțea profit pe comenzi ale căror costuri nu apăruseră încă.
+Se calculează automat (`estimatePendingOcpi`), din taxa medie deja plătită pe același
+serviciu; comenzile finalizate fără taxă rămân la 0 (serviciul chiar nu are taxă).
 
 ## Factura de comision
 
 Mirandsof SRL, seria SM nr. 153 / 28.08.2026: **525,00 fără TVA + 110,25 TVA = 635,25 lei**.
 Înțelegerea era 15 lei/comandă **cu TVA inclus** (35 comenzi = 525 total, adică 433,88 net).
-**Decizia lui Raul (07.09): se plătește ca atare, fără refacerea facturii**; diferența intră
-în costurile perioadei, deci se suportă din profitul comun (efect ~32 lei/parte).
+**Decizia lui Raul (07.09): se plătește ca atare, fără refacerea facturii.** TVA-ul se
+deduce, deci costul rămas al firmei e 525 lei — exact suma scăzută din partea lui Mircea.
+
+**Regula comisionului (Raul, 07.09):** comisionul de 15 lei/comandă NU e cost înainte de
+împărțeală. Se calculează DUPĂ ce se știe partea colaboratorului și se scade din ea, pentru
+că el îl încasează prin factură către EDIGITALIZARE — aceeași convenție ca la avocată.
 
 Pe extrasele de carte funciară nu s-a facturat comision — coerent cu clarificarea din 26.08
 (acolo nu există onorariu per comandă).
@@ -70,16 +89,19 @@ costurile: `computeSettlementBreakdown(collected, ocpi, { stripeFees, commission
 platformCost })`, plus `PLATFORM_COST_PER_MONTH = 500` și `platformCostForRange()`.
 
 - Comisioanele Stripe vin reale, per comandă, din `stripe_payout_transactions`.
-- Comisionul colaboratorului = suma `services.lawyer_fee_ron` pe comenzile perioadei.
-- Găzduirea se alocă proporțional cu zilele din perioadă.
+- Comisionul colaboratorului = suma `services.lawyer_fee_ron`, dar se scade din partea LUI
+  (`collaboratorShare`), nu din profitul comun.
+- Găzduirea + programele de dezvoltare: `PLATFORM_COST_PER_MONTH = 500` (lunar, confirmat de
+  Raul 07.09), alocat proporțional cu zilele din perioadă.
+- `estimatePendingOcpi()` calculează provizionul pentru comenzile încasate dar nelucrate.
 - Ambele UI-uri (`/colaborator/decont` și `/admin/colaboratori`) afișează pașii separat,
   deci Mircea vede aceleași cifre ca în raport, fără document separat.
 
 ## Deschise
 
 1. **Soldul avansurilor pentru taxe** — de reconciliat cu evidența lui Mircea (vezi mai sus).
-2. **Găzduirea**: 500 lei/lună e alocarea convenită pentru zona imobiliară; costul real de
-   infrastructură (Netlify + Supabase + Prisma) e ~730 lei/lună, dar deservește toate
-   platformele. Dacă se schimbă alocarea, se modifică `PLATFORM_COST_PER_MONTH`.
+2. **Găzduirea + programele**: 500 lei/lună în total, alocarea convenită pentru zona
+   imobiliară; costul real de infrastructură (Netlify + Supabase + Prisma) e ~730 lei/lună,
+   dar deservește toate platformele. Se modifică din `PLATFORM_COST_PER_MONTH`.
 3. **Volumul a căzut după 20.08** (de la ~10 comenzi/zi la 1–2) — efectul actualizării Google
    din 20 august asupra traficului organic, nu o problemă de execuție.

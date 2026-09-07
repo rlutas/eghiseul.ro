@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { requirePermission, getCollaboratorServices } from '@/lib/admin/permissions';
 import { formatPersonName } from '@/lib/format/person-name';
-import { computeSettlementBreakdown, sumAncpiCosts, platformCostForRange, SETTLEMENT_PERIOD_START } from '@/lib/collaborator/settlement';
+import { computeSettlementBreakdown, sumAncpiCosts, platformCostForRange, estimatePendingOcpi, SETTLEMENT_PERIOD_START } from '@/lib/collaborator/settlement';
 
 /**
  * Orders handled by a collaborator (across all their assigned services), with a
@@ -137,6 +137,7 @@ export async function GET(request: NextRequest) {
         total: Number(o.total_price) || 0,
         fee,
         ocpiCost: Math.round((costsByOrder.get(o.id) ?? 0) * 100) / 100,
+        serviceSlug: o.services?.slug || '',
         stripeFee: Math.round((feeByRef.get(o.friendly_order_id) ?? feeByRef.get(o.order_number) ?? 0) * 100) / 100,
         isTest: !!o.is_test,
         createdAt: o.created_at,
@@ -157,9 +158,14 @@ export async function GET(request: NextRequest) {
       // The 50/50 profit model — irrelevant for __avocat__ (fee-based deal).
       breakdown: collaboratorId === '__avocat__' ? null : computeSettlementBreakdown(revenue, ocpiTotal, {
         stripeFees: stripeTotal,
-        // Comisionul lui e facturat separat, deci e cost înainte de împărțeală.
+        // Comisionul se scade din partea colaboratorului, nu din profit.
         commission: commissionTotal,
         platformCost: platformCostForRange(rangeStart, rangeEnd),
+        pendingOcpi: estimatePendingOcpi(
+          billable.map((o: { serviceSlug: string; status: string; ocpiCost: number }) => ({
+            serviceSlug: o.serviceSlug, status: o.status, ocpiCost: o.ocpiCost,
+          }))
+        ),
       }),
     };
 
