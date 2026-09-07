@@ -1196,3 +1196,14 @@ singurul care răspunde la „de ce să dau 698 lei online unei firme". Devine u
 
 Și tratăm frontal obiecția „la consulat e gratis": răspunsul nu e prețul, e programarea, drumul și
 timpul.
+
+## Decizie Raul 07.09 — riscul „locul nașterii" NU se confirmă
+
+Research-ul avertiza (🔴, secțiunea „Trei decizii") că Germania și Franța ar cere adeverința de la
+**locul nașterii**, nu de la domiciliu, cu risc de dosare respinse.
+
+**Raul: „am emis multe documente celibat și nu am avut probleme."** Experiența operațională bate
+avertismentul teoretic din surse. Nu schimbăm procedura și nu comunicăm nicio rezervă în copy.
+
+Rămâne valabil ca observație de urmărit dacă apare vreodată o respingere pe Germania sau Franța —
+atunci se redeschide, nu înainte.
