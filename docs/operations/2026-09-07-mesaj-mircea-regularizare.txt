@@ -1,0 +1,23 @@
+Salut Mircea,
+
+Am refăcut decontul, cu toate costurile la zi. Ți-am pus tot într-un raport, ca să vezi exact de unde vine fiecare cifră:
+
+https://claude.ai/code/artifact/7af1f9b5-d533-4689-b4f6-540bfba0854f
+
+Pe scurt ce s-a schimbat față de 26 august:
+
+Când am împărțit prima dată, erau 53 de comenzi plătite dar încă nelucrate, deci taxele lor OCPI nu apăruseră în sistem. Între timp le-ai lucrat și au intrat: taxele au urcat de la 2.035 la 3.055 lei. Plus, în primul calcul nu scăzusem deloc comisioanele Stripe (451 lei), găzduirea și programele platformei (500 lei/lună) și n-aveam nicio rezervă pentru taxele comenzilor care încă nu s-au lucrat (240 lei).
+
+Cu toate astea la zi, pentru 7 iulie – 31 august: profit de împărțit 6.995,77 lei, adică 3.497,88 lei de fiecare.
+
+Din partea ta se scade comisionul de 15 lei/comandă (525 lei), pe care oricum îl încasezi prin factură. Deci din profit îți mai revin 2.972,88 lei, plus factura de 635,25 lei pe care ți-o plătesc la termen.
+
+Cum ai primit deja 4.316,61 lei pe 26 august, rămâne să se rețină 1.343,73 lei din decontul următor. La mine se reține 818,73 lei, pentru același motiv — am împărțit înainte să intre toate costurile. Nu e nimic în neregulă cu munca ta, e o greșeală de calendar la calcul, pe care am corectat-o acum și n-o să se mai repete: sistemul face automat rezerva pentru taxele comenzilor nelucrate.
+
+Două lucruri practice:
+
+1. De acum vezi tot în portal, la Decont — încasările, taxele, comisioanele, găzduirea, impozitele și partea ta, pas cu pas. Nu mai e nevoie de raport separat, verifici singur oricând.
+
+2. Am început să înregistrez în platformă și banii pe care ți-i trimit pentru taxe, ca să vedem mereu soldul: cât ai primit și cât s-a consumat efectiv în taxe. Am introdus deocamdată transferurile din 21 august încoace (3.240 lei). Dacă ai evidența ta pe iulie și începutul lui august, trimite-mi-o și o punem la punct, ca să știm exact unde stăm.
+
+Zi-mi dacă vezi ceva care nu-ți iese la calcul.
