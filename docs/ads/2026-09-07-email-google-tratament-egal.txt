@@ -1,0 +1,63 @@
+Bună ziua, Prakhar,
+
+Vă mulțumesc pentru răspuns. Este primul răspuns în care primim un criteriu concret, și tocmai de aceea vă rog să mergem până la capăt cu el, pentru că acest criteriu ridică o problemă pe care nu o putem trece cu vederea.
+
+1. Vă rog să îmi arătați un singur exemplu care îndeplinește criteriul pe care mi-l cereți mie.
+
+În acest moment, pe cuvinte-cheie precum "cazier judiciar online", "certificat de naștere online", "certificat constatator", rulează în România anunțuri ale unor operatori privați - printre alții: roghiseul.ro, caziere.ro, eliberarecazier.ro, infocazier.ro, cfunciara.ro. Sunt vizibili public în Ads Transparency Center.
+
+Vă rog să îmi indicați, pentru oricare dintre ei, pagina de pe un site guvernamental românesc unde domeniul lor este listat ca sursă autorizată.
+
+Vă rog să observați că nu vă cer nicio informație despre contul lor de publicitate. Nu cer bugete, setări, istoric sau date de facturare. Vă cer o pagină publică de pe un site al statului român - o informație care, prin definiție, nu este confidențială. Politica de confidențialitate a advertiserilor nu acoperă conținutul public al unui site guvernamental. Dacă acea pagină există, este publică; dacă nu există, atunci criteriul pe care mi-l aplicați mie nu este aplicat și lor.
+
+2. În România, autorizarea pe care o descrieți nu există pentru nimeni.
+
+Pentru cazierul judiciar, certificatele de naștere/căsătorie și celelalte documente în discuție, statul român nu are un mecanism de autorizare sau certificare a furnizorilor privați. Nu există registru public de "furnizori autorizați", nu există procedură prin care o firmă privată să poată cere această calitate, și nicio instituție emitentă (IGPR, DEPABD, ONRC, ANCPI) nu publică linkuri către portaluri private ca surse autorizate.
+
+Cu alte cuvinte: criteriul pe care ni-l cereți este imposibil de îndeplinit de către oricine pe această piață. Nu este un standard pe care noi nu l-am atins - este un standard pe care nimeni nu îl poate atinge, pentru că mecanismul legal corespunzător nu există în legislația română.
+
+3. Toți operatorii din piață funcționează exact la fel - inclusiv noi.
+
+Serviciul nostru nu este emiterea documentului. Documentul este eliberat exclusiv de instituția publică. Rolul nostru este de asistență și intermediere, iar cererea se depune prin avocat colaborator, în baza împuternicirii avocațiale (Legea 51/1995 privind profesia de avocat). Exact același mecanism juridic este folosit de toți competitorii menționați mai sus. Nu există nicio diferență de model, de serviciu sau de conformitate între noi și ei.
+
+4. Concluzia care rezultă din propriile dumneavoastră criterii.
+
+Din cele de mai sus rezultă una din două situații, și ambele cer o acțiune din partea Google:
+
+- Fie politica este aplicată corect, și atunci niciunul dintre operatorii privați din România nu are dreptul să ruleze anunțuri în această categorie - caz în care vă rog să o aplicați uniform, pe toată piața;
+- Fie acei operatori rulează fără să îndeplinească criteriul, și atunci politica este aplicată selectiv, ceea ce înseamnă că Google decide, de facto, care firme din această piață pot exista comercial și care nu.
+
+Nu cer o excepție. Cer tratament egal. Oricare dintre cele două variante este acceptabilă pentru noi, atât timp cât se aplică tuturor.
+
+5. Contextul relației noastre.
+
+Încerc să rezolv această problemă de peste un an. Contul 677-995-5005 are peste 2.000.000 RON investiți din 2024 și peste 33.000 de conversii. Din august 2026 este blocat. În tot acest timp, operatori aflați în situație juridică identică rulează neîntrerupt, iar răspunsurile primite de noi au fost fie automate, fie trimiteri către o certificare care, în România, nu poate fi obținută de nimeni.
+
+6. Ce solicit concret, în 10 zile lucrătoare:
+
+a) Linkul guvernamental oficial pentru cel puțin unul dintre advertiserii care rulează în prezent în această categorie în România - sau confirmarea în scris că un astfel de link nu există și că acei advertiseri rulează fără să îndeplinească criteriul.
+
+b) În lipsa lui: aplicarea uniformă a politicii pe întreaga piață din România.
+
+c) Escaladarea către echipa de politici responsabilă de piața din România și un apel telefonic cu un specialist uman (+40 745 850 700).
+
+d) Înregistrarea oficială a acestei sesizări în sistemul intern de soluționare a plângerilor, conform art. 11 din Regulamentul (UE) 2019/1150 (P2B), cu număr de înregistrare comunicat în scris.
+
+7. Dacă nu primim un răspuns pe fond.
+
+Vă comunic, corect și din timp, ce vom face în lipsa unui răspuns pe fond:
+
+- Plângere la Consiliul Concurenței din România, pe tratament discriminatoriu aplicat unor întreprinderi aflate în situație identică, de către o platformă cu poziție dominantă pe piața publicității online - Alphabet/Google fiind desemnat gatekeeper în sensul Regulamentului (UE) 2022/1925 (DMA);
+- Procedura de soluționare extrajudiciară a litigiilor prevăzută de art. 21 din Regulamentul (UE) 2022/2065 (DSA), la un organism certificat, la care Google este obligat să participe;
+- Invocarea art. 4 din Regulamentul (UE) 2019/1150 (P2B), privind obligația de motivare a restricționării serviciilor pentru un utilizator comercial.
+
+Precizez că nu formulez aceste demersuri ca pe o amenințare, ci ca pe consecința firească a unei situații în care, de peste un an, o firmă cu un istoric substanțial pe platformă nu poate obține nici acces, nici o explicație verificabilă, în timp ce concurenții aflați în aceeași situație juridică rulează fără restricții.
+
+Aștept răspunsul dumneavoastră.
+
+Cu stimă,
+Raul Luțaș
+EDIGITALIZARE SRL - eghiseul.ro
+Telefon: +40 745 850 700
+Cont Google Ads: 677-995-5005
+Tichet: 1-6533000041865
