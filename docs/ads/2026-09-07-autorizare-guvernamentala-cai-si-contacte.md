@@ -187,21 +187,27 @@ posibile ne folosesc:
 
 ## Ordinea în care le facem
 
-**Săptămâna asta (gratis, doar timp):**
-1. **544/2001 la IGPR, ANAF și DEPABD** — obținem în scris că mecanismul nu există (sau
-   care este). Termen legal de răspuns: 10 zile, maxim 30. Astea sunt fundația dosarului.
-2. **Baroul Satu Mare** — adeverință + link public către tabloul avocaților.
-3. **MEDAT** — sesizarea de politică publică. Nu așteptăm minuni, dar intră la dosar și
-   e singura instituție care poate crea mecanismul care lipsește.
+**Decizia lui Raul (07.09): prioritare sunt IGPR și DEPABD — ambele în subordinea MAI.**
+Dacă cele două confirmă în scris că nu există mecanism de autorizare a firmelor private,
+dosarul e complet și putem trece la escaladare. ANAF nu intră pe traseul critic.
 
-**După ce vin răspunsurile (2–4 săptămâni):**
+**Pasul 1 — acum (gratis, doar de trimis):**
+1. **IGPR** — cerere 544/2001 la `suport.hub@mai.gov.ro`, cu **cc la `petitii@mai.gov.ro`**
+   (Ministerul Afacerilor Interne), în atenția Direcției Cazier Judiciar. Termen legal de
+   răspuns: 10 zile, maxim 30.
+2. **DEPABD / DGEP** — cerere 544/2001 la `dgep@mai.gov.ro`, **cc `petitii@mai.gov.ro`**.
+3. **Baroul** — adeverința privind înscrierea avocatei în tabloul public (o cere ea).
+
+**Pasul 2 — după ce vin răspunsurile (2–4 săptămâni):**
 4. **ANCOM (DSA)** — plângerea împotriva Google, cu răspunsurile oficiale atașate ca probe.
-   Fără ele plângerea e o opinie; cu ele e un dosar.
-5. **Consiliul Concurenței** — formularul de plângere, cu aceleași probe.
+   Fără ele e o opinie; cu ele e dosar.
+5. **Consiliul Concurenței** — formularul tipizat, aceleași probe.
+6. **MEDAT** — sesizarea de politică publică (se poate trimite și mai devreme, nu blochează
+   nimic).
 
-**În paralel, singura cale de autorizare reală:**
-6. **CCF** — condițiile de autorizare ca societate de consultanță fiscală; dacă găsim
-   consultantul fiscal asociat-administrator, cazierul fiscal se deblochează legitim.
+**Opțional, doar dacă vrem să deblocăm separat cazierul fiscal:**
+7. **ANAF** (544/2001) și **CCF** (autorizare ca societate de consultanță fiscală). Rămân
+   în dosar ca variantă, dar nu sunt necesare pentru demersul principal.
 
 Textele gata de trimis: [`2026-09-07-emailuri-institutii.txt`](2026-09-07-emailuri-institutii.txt).
 

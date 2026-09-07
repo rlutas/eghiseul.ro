@@ -1,6 +1,15 @@
+PRIORITATE: intai 1 si 2 (IGPR + DEPABD, ambele in subordinea MAI).
+Daca acestea confirma in scris ca nu exista mecanism de autorizare a firmelor
+private, dosarul este complet si putem trece la escaladare (ANCOM / Consiliul
+Concurentei). 3 se cere in paralel de la Barou.
+Punctele 4 si 5 (ANAF, CCF) sunt OPTIONALE - se trimit doar daca vrem sa
+deblocam separat cazierul fiscal.
+
+
 ===========================================================================
-1. IGPR - cerere Legea 544/2001 (CAZIER JUDICIAR)
+1. IGPR - cerere Legea 544/2001 (CAZIER JUDICIAR) *** PRIORITAR ***
    Catre: suport.hub@mai.gov.ro
+   Cc: petitii@mai.gov.ro (Ministerul Afacerilor Interne)
    Alternativ: formularul de la https://www.politiaromana.ro/ro/contact
    In atentia: Directia Cazier Judiciar, Statistica si Evidente Operative
    Subiect: Cerere de informatii de interes public - Legea 544/2001
@@ -29,7 +38,61 @@ Telefon: +40 745 850 700
 
 
 ===========================================================================
-2. ANAF - cerere Legea 544/2001 (CAZIER FISCAL)
+2. DEPABD / DGEP - cerere Legea 544/2001 (STARE CIVILA) *** PRIORITAR ***
+   Catre: dgep@mai.gov.ro
+   Cc: petitii@mai.gov.ro (Ministerul Afacerilor Interne)
+   Adresa: str. Obcina Mare nr. 2, sector 6, Bucuresti
+   Subiect: Cerere de informatii de interes public - Legea 544/2001
+===========================================================================
+
+In temeiul Legii nr. 544/2001 privind liberul acces la informatiile de interes public, subscrisa EDIGITALIZARE SRL, CUI 49278701, va solicita urmatoarele informatii:
+
+1. Va rugam sa ne confirmati care sunt modalitatile legale prin care poate fi solicitata eliberarea certificatelor de stare civila (nastere, casatorie, deces) si a extraselor multilingve: personal de catre titular, prin imputernicit cu procura speciala, respectiv prin avocat in baza imputernicirii avocatiale.
+
+2. Va rugam sa confirmati ca depunerea cererii si ridicarea certificatului de catre un avocat, in baza imputernicirii avocatiale intocmite conform Legii nr. 51/1995, este pe deplin legala si este acceptata in practica curenta a oficiilor de stare civila.
+
+3. Va rugam sa ne comunicati daca legislatia prevede vreo interdictie ca o persoana juridica sa ofere clientilor sai servicii de asistenta si intermediere in acest domeniu, in conditiile in care cererea este depusa la oficiul de stare civila de catre un avocat, in baza imputernicirii avocatiale.
+
+4. Exista, in legislatia in vigoare, un regim distinct de autorizare, acreditare sau atestare a persoanelor juridice de drept privat pentru acest tip de activitate? In caz afirmativ, va rugam sa ne indicati temeiul legal si procedura. In caz negativ, va rugam sa confirmati in scris ca un asemenea regim nu este prevazut de lege, accesul fiind reglementat exclusiv prin modalitatile mentionate la punctul 1.
+
+5. Va rugam sa ne comunicati daca DEPABD sau oficiile de stare civila publica vreo lista a operatorilor privati autorizati pentru astfel de servicii.
+
+Motivul solicitarii: o platforma internationala de publicitate online (Google) conditioneaza difuzarea anunturilor noastre de existenta unei autorizari guvernamentale mentionate pe un site oficial. Avem nevoie de un raspuns oficial care sa clarifice atat legalitatea modalitatii prin care lucram (prin avocat), cat si faptul ca legislatia romana nu prevede un regim de autorizare de tipul celui invocat de platforma.
+
+Raspunsul poate fi transmis pe email la adresa contact@eghiseul.ro.
+
+Cu stima,
+Raul Lutas
+EDIGITALIZARE SRL - eghiseul.ro
+Telefon: +40 745 850 700
+
+
+===========================================================================
+3. BAROUL - adeverinta privind avocatul colaborator
+   Catre: baroul de care apartine av. Tarta Ana-Gabriela
+   Subiect: Solicitare adeverinta privind inscrierea in tabloul avocatilor
+===========================================================================
+
+In atentia Baroului Satu Mare,
+
+Subscrisa EDIGITALIZARE SRL, CUI 49278701, colaboreaza cu Cabinetul de Avocat Tarta Ana-Gabriela pentru asistenta juridica acordata clientilor, inclusiv pentru depunerea, in baza imputernicirii avocatiale, a cererilor de eliberare a certificatelor de cazier judiciar, cazier fiscal si a certificatelor de stare civila.
+
+Va solicitam eliberarea unei adeverinte care sa ateste:
+
+1. Inscrierea doamnei avocat Tarta Ana-Gabriela in tabloul avocatilor din cadrul Baroului, cu drept de exercitare a profesiei;
+2. Faptul ca tabloul avocatilor este public si accesibil online, cu indicarea adresei web unde poate fi consultat;
+3. Faptul ca depunerea cererilor si ridicarea documentelor de la institutii publice, in baza imputernicirii avocatiale, reprezinta o activitate profesionala prevazuta de Legea nr. 51/1995.
+
+Motivul solicitarii: o platforma internationala de publicitate online contesta legalitatea serviciilor noastre si solicita dovezi oficiale privind cadrul in care acestea sunt prestate.
+
+Cu stima,
+Raul Lutas
+EDIGITALIZARE SRL - eghiseul.ro
+Telefon: +40 745 850 700
+
+
+===========================================================================
+4. ANAF - cerere Legea 544/2001 (CAZIER FISCAL) [OPTIONAL]
    Catre: administratia financiara teritoriala / prin SPV, sectiunea Solicitari
    Subiect: Cerere de informatii de interes public - Legea 544/2001
 ===========================================================================
@@ -57,35 +120,7 @@ Telefon: +40 745 850 700
 
 
 ===========================================================================
-3. DEPABD / DGEP - cerere Legea 544/2001 (STARE CIVILA)
-   Catre: dgep@mai.gov.ro
-   Subiect: Cerere de informatii de interes public - Legea 544/2001
-===========================================================================
-
-In temeiul Legii nr. 544/2001 privind liberul acces la informatiile de interes public, subscrisa EDIGITALIZARE SRL, CUI 49278701, va solicita urmatoarele informatii:
-
-1. Va rugam sa ne confirmati care sunt modalitatile legale prin care poate fi solicitata eliberarea certificatelor de stare civila (nastere, casatorie, deces) si a extraselor multilingve: personal de catre titular, prin imputernicit cu procura speciala, respectiv prin avocat in baza imputernicirii avocatiale.
-
-2. Va rugam sa confirmati ca depunerea cererii si ridicarea certificatului de catre un avocat, in baza imputernicirii avocatiale intocmite conform Legii nr. 51/1995, este pe deplin legala si este acceptata in practica curenta a oficiilor de stare civila.
-
-3. Va rugam sa ne comunicati daca legislatia prevede vreo interdictie ca o persoana juridica sa ofere clientilor sai servicii de asistenta si intermediere in acest domeniu, in conditiile in care cererea este depusa la oficiul de stare civila de catre un avocat, in baza imputernicirii avocatiale.
-
-4. Exista, in legislatia in vigoare, un regim distinct de autorizare, acreditare sau atestare a persoanelor juridice de drept privat pentru acest tip de activitate? In caz afirmativ, va rugam sa ne indicati temeiul legal si procedura. In caz negativ, va rugam sa confirmati in scris ca un asemenea regim nu este prevazut de lege, accesul fiind reglementat exclusiv prin modalitatile mentionate la punctul 1.
-
-5. Va rugam sa ne comunicati daca DEPABD sau oficiile de stare civila publica vreo lista a operatorilor privati autorizati pentru astfel de servicii.
-
-Motivul solicitarii: o platforma internationala de publicitate online (Google) conditioneaza difuzarea anunturilor noastre de existenta unei autorizari guvernamentale mentionate pe un site oficial. Avem nevoie de un raspuns oficial care sa clarifice atat legalitatea modalitatii prin care lucram (prin avocat), cat si faptul ca legislatia romana nu prevede un regim de autorizare de tipul celui invocat de platforma.
-
-Raspunsul poate fi transmis pe email la adresa contact@eghiseul.ro.
-
-Cu stima,
-Raul Lutas
-EDIGITALIZARE SRL - eghiseul.ro
-Telefon: +40 745 850 700
-
-
-===========================================================================
-4. CAMERA CONSULTANTILOR FISCALI - conditii de autorizare a societatii
+5. CAMERA CONSULTANTILOR FISCALI - autorizare societate [OPTIONAL]
    Catre: prin formularul de la https://www.ccfiscali.ro/contact/
    Adresa: Str. Alexandru Constantinescu nr. 61, sector 1, Bucuresti
    Subiect: Solicitare informatii - autorizarea unei societati de consultanta fiscala
@@ -104,30 +139,6 @@ Subscrisa EDIGITALIZARE SRL, CUI 49278701, doreste sa obtina calitatea de societ
 4. Confirmarea ca societatile autorizate sunt inscrise in Registrul consultantilor fiscali si al societatilor de consultanta fiscala si ca acest registru este public si accesibil online.
 
 Va rugam sa ne comunicati si daca exista posibilitatea obtinerii, dupa autorizare, a unui document care sa ateste calitatea de societate autorizata, utilizabil in relatia cu terti.
-
-Cu stima,
-Raul Lutas
-EDIGITALIZARE SRL - eghiseul.ro
-Telefon: +40 745 850 700
-
-
-===========================================================================
-5. BAROUL SATU MARE - adeverinta privind avocatul colaborator
-   Catre: baroul de care apartine av. Tarta Ana-Gabriela
-   Subiect: Solicitare adeverinta privind inscrierea in tabloul avocatilor
-===========================================================================
-
-In atentia Baroului Satu Mare,
-
-Subscrisa EDIGITALIZARE SRL, CUI 49278701, colaboreaza cu Cabinetul de Avocat Tarta Ana-Gabriela pentru asistenta juridica acordata clientilor, inclusiv pentru depunerea, in baza imputernicirii avocatiale, a cererilor de eliberare a certificatelor de cazier judiciar, cazier fiscal si a certificatelor de stare civila.
-
-Va solicitam eliberarea unei adeverinte care sa ateste:
-
-1. Inscrierea doamnei avocat Tarta Ana-Gabriela in tabloul avocatilor din cadrul Baroului, cu drept de exercitare a profesiei;
-2. Faptul ca tabloul avocatilor este public si accesibil online, cu indicarea adresei web unde poate fi consultat;
-3. Faptul ca depunerea cererilor si ridicarea documentelor de la institutii publice, in baza imputernicirii avocatiale, reprezinta o activitate profesionala prevazuta de Legea nr. 51/1995.
-
-Motivul solicitarii: o platforma internationala de publicitate online contesta legalitatea serviciilor noastre si solicita dovezi oficiale privind cadrul in care acestea sunt prestate.
 
 Cu stima,
 Raul Lutas
