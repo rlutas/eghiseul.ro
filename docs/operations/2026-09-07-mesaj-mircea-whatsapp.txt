@@ -1,0 +1,17 @@
+Salut Mircea,
+
+Am refacut decontul pentru 7 iulie - 31 august. Ai tot aici, inclusiv lista cu toate cele 162 de comenzi:
+
+https://claude.ai/code/artifact/7af1f9b5-d533-4689-b4f6-540bfba0854f
+
+Pe scurt, doua lucruri s-au schimbat fata de 26 august: au intrat taxele OCPI ale comenzilor care erau nelucrate atunci (de la 2.035 la 3.055 lei) si am uitat data trecuta sa scad comisionul Stripe, 451,55 lei pe toata perioada.
+
+Deci partea corecta e 3.907,07 lei de fiecare. Tu ai primit 3.791,61 in cont plus 525 prin factura, adica 4.316,61, exact cat am luat si eu. Se regleaza 409,54 lei la amandoi, din care la tine se scad 30 de lei de comision pe care ii mai ai de facturat (2 comenzi au intrat dupa data facturii). Raman 379,54 lei, pe care ii scadem din decontul pe septembrie. Nu ai de returnat nimic.
+
+Factura de 635,25 ti-am platit-o. Doar pentru viitor: 15 lei pe comanda inseamna 15 lei cu TVA inclus, nu 15 plus TVA.
+
+De acum vezi tot in portal, la Decont: incasari, taxe, comisioane, impozite si partea ta, pas cu pas. Am inceput sa inregistrez acolo si banii pe care ti-i trimit pentru taxe, ca sa vedem mereu soldul. Deocamdata am pus transferurile din 21 august incoace (3.240 lei), daca ai evidenta ta din iulie trimite-mi-o.
+
+Am schimbat si modul de calcul ca sa nu se mai repete: taxa se scade in decontul in care a fost platita, iar decontul se face cumulat, scazand ce s-a distribuit deja. Asa orice cost intarziat se corecteaza singur.
+
+Zi-mi daca ceva nu-ti iese la calcul.
