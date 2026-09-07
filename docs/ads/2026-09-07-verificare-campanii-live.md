@@ -156,3 +156,26 @@ scade din profit înainte de împărțeala 50/50. Mecanism nou (07.09):
 ⚠️ **Nu au fost introduse retroactiv.** Decontul comunicat lui Mircea pe 07.09 (3.907,07 lei/parte)
 NU conține cei 688,33 lei de Google Ads din august. Dacă intră, partea fiecăruia scade cu ~240 lei.
 Decizia e a lui Raul.
+
+---
+
+## UPDATE 07.09, seara — ce s-a construit după verificare
+
+Concluziile de mai sus au fost puse în practică în aceeași zi:
+
+1. **Comparativul cu CFunciara a fost corectat** — greșisem: urgența (Procesare Prioritară)
+   EXISTĂ la noi, activă pe 11 servicii imobiliare. Citisem coloana `price_modifier` (inexistentă)
+   în loc de `price`. Suntem chiar puțin mai scumpi la urgent decât ei (PAD 471,90 vs 427,59;
+   coordonate 350,90 vs 327,59). Detalii: `2026-09-07-cfunciara-oferta-comparativ.md`.
+2. **CNP/CI rămâne în formular** — decizie Raul: avem nevoie de date pentru cererea la OCPI și
+   pentru împuternicire. Recomandarea de a-l scoate a fost retrasă din documente.
+3. **Două campanii noi, live** — vezi `2026-09-07-campanii-noi-imobiliare.md`:
+   - grup **Coordonate Stereo 70** în campania asta (`Search-Cadastru-Documente-2026-08`),
+     buget partajat, aceleași 46 de negative
+   - campania nouă **Search-Certificat-Urbanism-2026-09** (ID 24231111265), 20 lei/zi,
+     plafon CPC 2,50, RO „Prezență", fără Display, AI Max OFF, 28 de negative proprii
+
+Buget total Google după modificări: **40 lei/zi**.
+
+**Rămâne deschis:** dacă cei 688,33 lei de Google Ads din august intră retroactiv în decontul
+lui Mircea (mecanismul e construit, nimic seedat).
