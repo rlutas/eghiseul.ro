@@ -44,6 +44,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "docxtemplater": "^3.68.1",
+    "exceljs": "^4.4.0",
     "libphonenumber-js": "^1.13.7",
     "lucide-react": "^0.561.0",
     "mammoth": "^1.11.0",

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { Download, Users, ClipboardList, Wallet, Receipt, ListChecks, Eye } from 'lucide-react';
+import { Download, Users, ClipboardList, Wallet, Receipt, ListChecks, Eye, FileSpreadsheet, Plus, X, Loader2 } from 'lucide-react';
 import { useAdminPermissions } from '@/hooks/use-admin-permissions';
 import { findStatusLabel } from '@/lib/admin/status-options';
 
@@ -177,7 +177,53 @@ function AvocatDecont() {
   const [byPlatform, setByPlatform] = useState<{ eghiseul: DecontSummary; cjo: DecontSummary }>({ eghiseul: EMPTY_DECONT_SUMMARY, cjo: EMPTY_DECONT_SUMMARY });
   const [warnings, setWarnings] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showExport, setShowExport] = useState(false);
+  const [exporting, setExporting] = useState(false);
+  // Cheltuielile lunii — se tastează la generare (nu sunt fixe în cod);
+  // valorile de start sunt cele din foaia de iunie 2026.
+  const [costs, setCosts] = useState<{ label: string; amount: string }[]>([
+    { label: 'Taxe angajați', amount: '12000' },
+    { label: 'Programe / hosting / domenii', amount: '1000' },
+    { label: 'Contabilitate', amount: '2500' },
+  ]);
+  const [splitRaul, setSplitRaul] = useState('55');
+  const [profitTax, setProfitTax] = useState('16');
+  const [dividendTax, setDividendTax] = useState('16');
+  const [facturaCabinet, setFacturaCabinet] = useState('');
   const months = useMemo(() => monthOptions(), []);
+
+  async function downloadXlsx() {
+    setExporting(true);
+    try {
+      const res = await fetch('/api/admin/collaborators/avocat-decont/xlsx', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          month,
+          platform,
+          costs: costs
+            .filter((c) => c.label.trim() && Number(c.amount))
+            .map((c) => ({ label: c.label.trim(), amount: Number(c.amount) })),
+          splitRaulPercent: Number(splitRaul) || 55,
+          profitTaxPercent: Number(profitTax) || 0,
+          dividendTaxPercent: Number(dividendTax) || 0,
+          facturaCabinet: Number(facturaCabinet) || 0,
+        }),
+      });
+      if (!res.ok) { alert('Exportul a eșuat. Încearcă din nou.'); return; }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `decont-avocat-${month}.xlsx`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } finally {
+      setExporting(false);
+    }
+  }
 
   useEffect(() => {
     let alive = true;
@@ -223,13 +269,88 @@ function AvocatDecont() {
         <p className="max-w-sm text-xs text-slate-400">
           Doar <strong>serviciu + urgență + apostilă Haga + add-on-uri de cabinet</strong>, cu reducerile aplicate. Livrarea, traducerea, legalizarea, apostila notarilor și orice alt extra NU intră. ecazier NU intră (cabinetul ei).
         </p>
+        <button
+          type="button"
+          onClick={() => setShowExport((v) => !v)}
+          className="ml-auto inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700"
+        >
+          <FileSpreadsheet className="h-4 w-4" /> Decont Excel
+        </button>
         <a
           href={`/api/admin/collaborators/avocat-decont?month=${month}&platform=${platform}&format=tsv`}
-          className="ml-auto inline-flex items-center gap-2 rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800"
+          className="inline-flex items-center gap-2 rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800"
         >
-          <Download className="h-4 w-4" /> Export
+          <Download className="h-4 w-4" /> Export TSV
         </a>
       </div>
+
+      {showExport && (
+        <div className="mb-6 rounded-xl border border-emerald-200 bg-emerald-50/50 p-5">
+          <div className="mb-3 flex items-center justify-between">
+            <div>
+              <p className="text-sm font-semibold text-slate-900">Decont Excel — {month}</p>
+              <p className="text-xs text-slate-500">
+                Fila „Comenzi” (cu numerele de contract și delegație din registru) + fila „Decont” (totaluri, cheltuieli, împărțire profit).
+                Comisionul Stripe se ia automat, real, din tranzacțiile sincronizate.
+              </p>
+            </div>
+            <button type="button" onClick={() => setShowExport(false)} className="rounded p-1 text-slate-400 hover:bg-white hover:text-slate-700"><X className="h-4 w-4" /></button>
+          </div>
+
+          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">Cheltuielile lunii</p>
+          <div className="space-y-2">
+            {costs.map((c, i) => (
+              <div key={i} className="flex gap-2">
+                <input
+                  value={c.label}
+                  onChange={(e) => setCosts(costs.map((x, j) => (j === i ? { ...x, label: e.target.value } : x)))}
+                  placeholder="Denumire cheltuială"
+                  className="flex-1 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm"
+                />
+                <input
+                  value={c.amount}
+                  onChange={(e) => setCosts(costs.map((x, j) => (j === i ? { ...x, amount: e.target.value } : x)))}
+                  placeholder="RON"
+                  inputMode="decimal"
+                  className="w-32 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm"
+                />
+                <button type="button" onClick={() => setCosts(costs.filter((_, j) => j !== i))} className="rounded-lg border border-slate-300 bg-white px-2 text-slate-400 hover:text-rose-600"><X className="h-4 w-4" /></button>
+              </div>
+            ))}
+          </div>
+          <button
+            type="button"
+            onClick={() => setCosts([...costs, { label: '', amount: '' }])}
+            className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-emerald-700 hover:underline"
+          >
+            <Plus className="h-3 w-3" /> Adaugă cheltuială
+          </button>
+
+          <div className="mt-4 grid gap-3 sm:grid-cols-4">
+            {([
+              ['Partea Raul (%)', splitRaul, setSplitRaul],
+              ['Impozit profit (%)', profitTax, setProfitTax],
+              ['Impozit dividende (%)', dividendTax, setDividendTax],
+              ['Factura cabinet (RON)', facturaCabinet, setFacturaCabinet],
+            ] as const).map(([label, value, setter]) => (
+              <div key={label}>
+                <label className="mb-1 block text-xs font-medium text-slate-500">{label}</label>
+                <input value={value} onChange={(e) => setter(e.target.value)} inputMode="decimal" className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm" />
+              </div>
+            ))}
+          </div>
+
+          <button
+            type="button"
+            onClick={() => void downloadXlsx()}
+            disabled={exporting}
+            className="mt-4 inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 disabled:opacity-60"
+          >
+            {exporting ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileSpreadsheet className="h-4 w-4" />}
+            {exporting ? 'Se generează...' : 'Descarcă Excel'}
+          </button>
+        </div>
+      )}
 
       <div className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-5">
         <div className="rounded-xl border border-slate-200 bg-white p-5">

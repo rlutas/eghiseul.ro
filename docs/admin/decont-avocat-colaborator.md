@@ -66,6 +66,15 @@ Identitatea care închide reconcilierea: `Stripe 63.567,49 + 198 (comanda lipsă
 
 **Gardă nouă (07.09.2026)**: dacă suma componentelor facturate depășește banii încasați (comandă + plăți extra), raportul dă avertisment — opțiune adăugată fără link de plată. Găsit pe august: `CIC-20260807-86855` (add-on cazier 100 RON în contract, niciodată încasat).
 
+## Export Excel (foaia lunară)
+
+**/admin/colaboratori → Avocat — decont cabinet → butonul „Decont Excel"** generează fișierul `.xlsx` care înlocuiește foaia făcută manual (referință: `IUNIE - Foaie2`). API: `POST /api/admin/collaborators/avocat-decont/xlsx`; calculul e comun cu raportul, în `src/lib/admin/avocat-decont.ts`.
+
+- **Fila „Comenzi"**: un rând per comandă — dată, oră, platformă, nr. comandă, serviciu, componentele (serviciu / urgență / apostilă / add-on), total cu și fără TVA, **nr. contract + nr. delegație din registrul central Barou**, client, email, telefon, onorariu, retur, observații. Filtru automat pe cap de tabel + rând de total.
+- **Fila „Decont"**: totalurile pe componente și pe platforme, apoi TVA 21%, **comisionul Stripe real** (din `stripe_payout_transactions`, sincronizat de /admin/decontari), cheltuielile lunii, `TOTAL RĂMAS`, impozit pe profit, împărțirea Raul/avocată, factura cabinetului (nr. comenzi × 15), impozit pe dividende și `RĂMAS TOTAL DUPĂ TOT`. La final, avertismentele lunii.
+- **Cheltuielile se tastează la generare** (nu sunt fixe în cod): taxe angajați, programe/hosting, contabilitate + oricâte linii libere. Tot acolo se setează procentul lui Raul (implicit **55%**, restul avocatei), impozitul pe profit (16%), pe dividende (16%) și factura cabinetului.
+- Verificat pe august 2026: **186/186 comenzi au contract + delegație** în registru și comision Stripe real (1.250,38 RON).
+
 ## Istoric decontări
 
 | Luna | Poziții | Servicii cu TVA | fără TVA | Onorarii | Notă |
