@@ -35,6 +35,8 @@ interface Breakdown {
   distributable: number;
   sharePerSide: number;
   collaboratorShare: number;
+  alreadyDistributed: number;
+  toSettle: number;
 }
 
 interface EarningsData {
@@ -164,6 +166,8 @@ export default function CollaboratorDecontPage() {
               ['Partea ta (50%)', b.sharePerSide, ''],
               ['− Comision 15 lei/comandă (îl facturezi separat)', -b.commission, ''],
               ['= Rest de primit din profit', b.collaboratorShare, 'font-semibold'],
+              ['Distribuit deja', -b.alreadyDistributed, ''],
+              [b.toSettle >= 0 ? '= De primit la decontul următor' : '= De reglat la decontul următor', b.toSettle, 'font-semibold'],
             ] as [string, number, string][]).map(([label, value, cls]) => (
               <div key={label} className="flex items-center justify-between py-1.5">
                 <dt className={`text-slate-600 ${cls}`}>{label}</dt>

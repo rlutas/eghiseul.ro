@@ -41,6 +41,8 @@ interface Breakdown {
   distributable: number;
   sharePerSide: number;
   collaboratorShare: number;
+  alreadyDistributed: number;
+  toSettle: number;
 }
 interface Summary { count: number; revenue: number; fees: number; breakdown: Breakdown | null }
 
@@ -785,6 +787,8 @@ export default function CollaboratorsAdminPage() {
                   ['− Comision facturat de el', -summary.breakdown.commission],
                   ['Rest de plată colaborator', summary.breakdown.collaboratorShare],
                   ['Partea eGhiseul', summary.breakdown.sharePerSide],
+                  ['Distribuit deja (fiecare)', -summary.breakdown.alreadyDistributed],
+                  ['De reglat (fiecare)', summary.breakdown.toSettle],
                 ] as [string, number][]).map(([label, value]) => (
                   <div key={label} className="flex items-center justify-between border-b border-slate-100 py-1">
                     <span className="text-slate-500">{label}</span>

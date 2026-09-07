@@ -124,6 +124,27 @@ platformCost })`, plus `PLATFORM_COST_PER_MONTH = 500` și `platformCostForRange
 - Ambele UI-uri (`/colaborator/decont` și `/admin/colaboratori`) afișează pașii separat,
   deci Mircea vede aceleași cifre ca în raport, fără document separat.
 
+## Regula pentru costurile întârziate (stabilită 07.09)
+
+Problema de fond: comanda se încasează într-o lună, taxa OCPI se plătește când se lucrează —
+uneori luna următoare. Soluția adoptată, în ordinea importanței:
+
+1. **Costul intră în decontul în care a fost înregistrat**, nu în luna comenzii. Nu se
+   provizionează nimic: comenzile blocate în așteptarea clientului s-ar putea să nu se lucreze
+   niciodată (și atunci n-au nici cost, iar uneori nici venit — se rambursează).
+2. **Decontul e CUMULATIV**, nu pe felii de perioadă: se recalculează toată perioada de la
+   `SETTLEMENT_PERIOD_START` și din partea cuvenită se scade `DISTRIBUTED_PER_SIDE` (lista
+   `DISTRIBUTIONS` din `settlement.ts`). Orice cost întârziat se corectează singur la decontul
+   următor — nu se poate pierde și nu se poate număra de două ori.
+3. **Se vede în ambele UI**: „Distribuit deja" și „De reglat" apar direct în portal și în admin.
+
+Verificare la 07.09: cu comenzile din 1–7 septembrie incluse, partea cuvenită cumulat urcă la
+**4.181,59** lei, iar diferența de reglat scade de la 409,54 la **135,02** lei — mecanismul se
+așază singur.
+
+**La fiecare distribuire se adaugă o intrare în `DISTRIBUTIONS`** (dată, sumă/parte, cât cash și
+cât prin factură la colaborator). Ăsta e singurul pas manual rămas.
+
 ## Deschise
 
 1. **Soldul avansurilor pentru taxe** — de reconciliat cu evidența lui Mircea (vezi mai sus).

@@ -26,6 +26,12 @@ Două lucruri practice:
 
 - Am început să înregistrez în platformă și banii pe care ți-i trimit pentru taxe, ca să vedem mereu soldul: cât ai primit și cât s-a consumat efectiv. Am pus deocamdată transferurile din 21 august încoace (3.240 lei). Dacă ai evidența ta pe iulie și începutul lui august, trimite-mi-o și o punem la punct.
 
-Un singur lucru de reținut pentru decontul următor: mai sunt 12 comenzi încasate dar nelucrate (10 identificări de imobil, 2 după proprietar). Taxele lor, în jur de 240 de lei, intră în costuri când se lucrează.
+Am schimbat și felul în care socotim, ca să nu mai apară situația asta:
+
+Taxa la OCPI se scade în decontul în care a fost plătită efectiv, nu în luna comenzii, iar decontul se calculează cumulat de la 7 iulie încoace, scăzând ce s-a distribuit deja. Așa, dacă o comandă din august se lucrează abia în septembrie, costul ei intră automat în calcul atunci și se corectează singur — nu mai depinde de ce ținem noi minte.
+
+Ca exemplu: cu comenzile din 1-7 septembrie deja incluse, partea cuvenită cumulat urcă la 4.181,59 lei, iar diferența de reglat scade de la 409,54 la 135,02 lei. Se așază singură pe măsură ce intră comenzi.
+
+Mai sunt 12 comenzi încasate dar nelucrate (10 identificări de imobil, 2 după proprietar). La identificare plătim un extras de carte funciară, 20 de lei, deci vor aduce în jur de 240 de lei de taxe când se lucrează. Nu le-am scăzut acum, tocmai pentru că unele stau în așteptarea clientului și s-ar putea să nu se facă deloc.
 
 Zi-mi dacă vezi ceva care nu-ți iese la calcul.

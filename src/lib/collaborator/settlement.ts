@@ -17,6 +17,8 @@
 
 import { SUPPLIER_ANCPI } from '@/lib/admin/supplier-costs';
 
+const round2 = (n: number) => Math.round(n * 100) / 100;
+
 /** TVA-ul din prețul încasat de la client (cota 2026). */
 export const VAT_RATE = 0.21;
 
@@ -45,8 +47,36 @@ export const PLATFORM_COST_PER_MONTH = 0;
 export const SETTLEMENT_PERIOD_START = '2026-07-07T00:00:00.000Z';
 
 /**
- * Ultimul decont închis. Următorul decont = comenzile plătite DUPĂ
- * cutoffPaidAt. Se actualizează la fiecare decont nou.
+ * Cât s-a distribuit deja fiecărei părți, cumulat de la începutul colaborării.
+ *
+ * **Decontul se calculează CUMULAT, nu pe felii de perioadă** (regula stabilită
+ * după regularizarea din 07.09.2026): partea cuvenită se recalculează pe toată
+ * perioada, iar din ea se scade ce s-a distribuit deja. Așa, un cost care intră
+ * târziu — taxa OCPI a unei comenzi lucrate abia luna viitoare — se corectează
+ * singur la decontul următor, fără provizioane și fără riscul de a-l scăpa sau
+ * de a-l număra de două ori.
+ *
+ * Se adaugă o intrare la fiecare distribuire.
+ */
+export const DISTRIBUTIONS = [
+  {
+    on: '2026-08-26',
+    perSideRon: 4316.61,
+    /** Colaboratorul a primit partea minus comisionul, pe care îl facturează. */
+    collaboratorCashRon: 3791.61,
+    collaboratorCommissionRon: 525,
+    reference: 'docs/operations/decont-mircea-2026-08-26.md',
+  },
+] as const;
+
+/** Total distribuit fiecărei părți până acum. */
+export const DISTRIBUTED_PER_SIDE = round2(
+  DISTRIBUTIONS.reduce((sum, d) => sum + d.perSideRon, 0)
+);
+
+/**
+ * Ultimul decont închis — păstrat pentru referință istorică. Cutoff-ul NU mai e
+ * folosit la calcul: decontul e cumulativ (vezi `DISTRIBUTIONS`).
  */
 export const LAST_SETTLEMENT = {
   settledOn: '2026-08-26',
@@ -105,9 +135,11 @@ export interface SettlementBreakdown {
   sharePerSide: number;
   /** Partea colaboratorului după scăderea comisionului pe care îl facturează. */
   collaboratorShare: number;
+  /** Cât s-a distribuit deja fiecărei părți (cumulat). */
+  alreadyDistributed: number;
+  /** Pozitiv = mai are de primit; negativ = s-a distribuit în plus. */
+  toSettle: number;
 }
-
-const round2 = (n: number) => Math.round(n * 100) / 100;
 
 /**
  * The settlement waterfall, exactly as in the 26.08 reference settlement.
@@ -154,6 +186,8 @@ export function computeSettlementBreakdown(
     distributable: round2(distributable),
     sharePerSide: round2(distributable * PROFIT_SPLIT),
     collaboratorShare: round2(distributable * PROFIT_SPLIT - commission),
+    alreadyDistributed: DISTRIBUTED_PER_SIDE,
+    toSettle: round2(distributable * PROFIT_SPLIT - DISTRIBUTED_PER_SIDE),
   };
 }
 
