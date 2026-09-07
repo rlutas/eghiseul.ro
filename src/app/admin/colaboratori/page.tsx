@@ -29,6 +29,10 @@ interface Breakdown {
   netOfVat: number;
   vat: number;
   ocpiCosts: number;
+  stripeFees: number;
+  commission: number;
+  platformCost: number;
+  totalCosts: number;
   grossProfit: number;
   profitTax: number;
   netProfit: number;
@@ -623,6 +627,9 @@ export default function CollaboratorsAdminPage() {
                 {([
                   ['Net fără TVA', summary.breakdown.netOfVat],
                   ['− Taxe OCPI', -summary.breakdown.ocpiCosts],
+                  ['− Comisioane Stripe', -summary.breakdown.stripeFees],
+                  ['− Comision colaborator', -summary.breakdown.commission],
+                  ['− Găzduire platformă', -summary.breakdown.platformCost],
                   ['Profit brut', summary.breakdown.grossProfit],
                   ['− Impozit profit 16%', -summary.breakdown.profitTax],
                   ['− Impozit dividende 16%', -summary.breakdown.dividendTax],

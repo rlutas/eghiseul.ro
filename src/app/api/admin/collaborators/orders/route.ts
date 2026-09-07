@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { requirePermission, getCollaboratorServices } from '@/lib/admin/permissions';
 import { formatPersonName } from '@/lib/format/person-name';
-import { computeSettlementBreakdown, sumAncpiCosts } from '@/lib/collaborator/settlement';
+import { computeSettlementBreakdown, sumAncpiCosts, platformCostForRange, SETTLEMENT_PERIOD_START } from '@/lib/collaborator/settlement';
 
 /**
  * Orders handled by a collaborator (across all their assigned services), with a
@@ -67,18 +67,20 @@ export async function GET(request: NextRequest) {
     const admin = createAdminClient() as any;
     let query = admin
       .from('orders')
-      .select('id, friendly_order_id, status, total_price, customer_data, created_at, paid_at, is_test, services:service_id(name, slug, lawyer_fee_ron)')
+      .select('id, friendly_order_id, order_number, status, total_price, customer_data, created_at, paid_at, is_test, services:service_id(name, slug, lawyer_fee_ron)')
       .in('service_id', serviceIds)
       .eq('payment_status', 'paid')
       .neq('status', 'cancelled')
       .is('refunded_at', null)
       .order('paid_at', { ascending: false });
 
+    let rangeStart = SETTLEMENT_PERIOD_START;
+    let rangeEnd = new Date().toISOString();
     if (/^\d{4}-\d{2}$/.test(month)) {
       const [y, m] = month.split('-').map(Number);
-      const start = new Date(Date.UTC(y, m - 1, 1)).toISOString();
-      const end = new Date(Date.UTC(y, m, 1)).toISOString();
-      query = query.gte('paid_at', start).lt('paid_at', end);
+      rangeStart = new Date(Date.UTC(y, m - 1, 1)).toISOString();
+      rangeEnd = new Date(Date.UTC(y, m, 1)).toISOString();
+      query = query.gte('paid_at', rangeStart).lt('paid_at', rangeEnd);
     }
 
     const { data, error } = await query;
@@ -106,6 +108,21 @@ export async function GET(request: NextRequest) {
       }
     }
 
+    // Comisioanele procesatorului (Stripe) — cost real al perioadei, la fel ca
+    // taxele OCPI. Sincronizate de /admin/decontari.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const orderRefs = [...new Set((data || []).flatMap((o: any) => [o.friendly_order_id, o.order_number].filter(Boolean)))] as string[];
+    const feeByRef = new Map<string, number>();
+    for (let i = 0; i < orderRefs.length; i += 200) {
+      const { data: txRows } = await admin
+        .from('stripe_payout_transactions')
+        .select('order_number, fee_bani')
+        .in('order_number', orderRefs.slice(i, i + 200));
+      for (const t of (txRows ?? []) as Array<{ order_number: string; fee_bani: number | null }>) {
+        feeByRef.set(t.order_number, (feeByRef.get(t.order_number) ?? 0) + (Number(t.fee_bani) || 0) / 100);
+      }
+    }
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const orders = (data || []).map((o: any) => {
       const c = o.customer_data?.contact || {};
@@ -120,6 +137,7 @@ export async function GET(request: NextRequest) {
         total: Number(o.total_price) || 0,
         fee,
         ocpiCost: Math.round((costsByOrder.get(o.id) ?? 0) * 100) / 100,
+        stripeFee: Math.round((feeByRef.get(o.friendly_order_id) ?? feeByRef.get(o.order_number) ?? 0) * 100) / 100,
         isTest: !!o.is_test,
         createdAt: o.created_at,
         paidAt: o.paid_at,
@@ -130,12 +148,19 @@ export async function GET(request: NextRequest) {
     const billable = orders.filter((o: { isTest: boolean }) => !o.isTest);
     const revenue = billable.reduce((s: number, o: { total: number }) => s + o.total, 0);
     const ocpiTotal = billable.reduce((s: number, o: { ocpiCost: number }) => s + o.ocpiCost, 0);
+    const stripeTotal = billable.reduce((s: number, o: { stripeFee: number }) => s + o.stripeFee, 0);
+    const commissionTotal = billable.reduce((s: number, o: { fee: number }) => s + o.fee, 0);
     const summary = {
       count: billable.length,
       revenue: Math.round(revenue * 100) / 100,
-      fees: Math.round(billable.reduce((s: number, o: { fee: number }) => s + o.fee, 0) * 100) / 100,
+      fees: Math.round(commissionTotal * 100) / 100,
       // The 50/50 profit model — irrelevant for __avocat__ (fee-based deal).
-      breakdown: collaboratorId === '__avocat__' ? null : computeSettlementBreakdown(revenue, ocpiTotal),
+      breakdown: collaboratorId === '__avocat__' ? null : computeSettlementBreakdown(revenue, ocpiTotal, {
+        stripeFees: stripeTotal,
+        // Comisionul lui e facturat separat, deci e cost înainte de împărțeală.
+        commission: commissionTotal,
+        platformCost: platformCostForRange(rangeStart, rangeEnd),
+      }),
     };
 
     if (format === 'tsv') {

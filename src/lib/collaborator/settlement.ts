@@ -31,6 +31,13 @@ export const DIVIDEND_TAX_RATE = 0.16;
 /** Împărțeala Raul / Mircea. */
 export const PROFIT_SPLIT = 0.5;
 
+/**
+ * Cota lunară de găzduire/infrastructură alocată serviciilor imobiliare
+ * (Netlify + Supabase + Prisma costă ~730 lei/lună pentru TOATE platformele;
+ * 500 e partea convenită cu Raul pentru zona asta, 07.09.2026).
+ */
+export const PLATFORM_COST_PER_MONTH = 500;
+
 /** Prima comandă plătită pe serviciile lui — începutul colaborării. */
 export const SETTLEMENT_PERIOD_START = '2026-07-07T00:00:00.000Z';
 
@@ -46,6 +53,16 @@ export const LAST_SETTLEMENT = {
   reference: 'docs/operations/decont-mircea-2026-08-26.md',
 } as const;
 
+/** Costurile care se scad din venitul net, în afara taxelor OCPI. */
+export interface SettlementExtraCosts {
+  /** Comisioanele procesatorului de plăți (Stripe), reale, per comandă. */
+  stripeFees?: number;
+  /** Comisionul colaboratorului (15 lei/comandă unde e setat), facturat separat. */
+  commission?: number;
+  /** Cota de găzduire/infrastructură pentru perioadă. */
+  platformCost?: number;
+}
+
 export interface SettlementBreakdown {
   /** Încasat de la clienți, cu TVA. */
   collectedWithVat: number;
@@ -54,6 +71,14 @@ export interface SettlementBreakdown {
   vat: number;
   /** Taxe OCPI/ANCPI plătite (order_supplier_costs, furnizor ANCPI). */
   ocpiCosts: number;
+  /** Comisioanele Stripe pe comenzile perioadei. */
+  stripeFees: number;
+  /** Comisionul colaboratorului (facturat separat de împărțeală). */
+  commission: number;
+  /** Cota de găzduire/infrastructură. */
+  platformCost: number;
+  /** Suma tuturor costurilor scăzute din net. */
+  totalCosts: number;
   grossProfit: number;
   profitTax: number;
   netProfit: number;
@@ -73,13 +98,18 @@ const round2 = (n: number) => Math.round(n * 100) / 100;
  */
 export function computeSettlementBreakdown(
   collectedWithVat: number,
-  ocpiCosts: number
+  ocpiCosts: number,
+  extra: SettlementExtraCosts = {}
 ): SettlementBreakdown {
   const collected = Number(collectedWithVat) || 0;
   const ocpi = Number(ocpiCosts) || 0;
+  const stripeFees = Number(extra.stripeFees) || 0;
+  const commission = Number(extra.commission) || 0;
+  const platformCost = Number(extra.platformCost) || 0;
+  const totalCosts = ocpi + stripeFees + commission + platformCost;
 
   const netOfVat = collected / (1 + VAT_RATE);
-  const grossProfit = netOfVat - ocpi;
+  const grossProfit = netOfVat - totalCosts;
   const profitTax = grossProfit > 0 ? grossProfit * PROFIT_TAX_RATE : 0;
   const netProfit = grossProfit - profitTax;
   const dividendTax = netProfit > 0 ? netProfit * DIVIDEND_TAX_RATE : 0;
@@ -90,6 +120,10 @@ export function computeSettlementBreakdown(
     netOfVat: round2(netOfVat),
     vat: round2(collected - netOfVat),
     ocpiCosts: round2(ocpi),
+    stripeFees: round2(stripeFees),
+    commission: round2(commission),
+    platformCost: round2(platformCost),
+    totalCosts: round2(totalCosts),
     grossProfit: round2(grossProfit),
     profitTax: round2(profitTax),
     netProfit: round2(netProfit),
@@ -113,4 +147,16 @@ export function sumAncpiCosts(
     sum += Number(r.amount_ron) || 0;
   }
   return round2(sum);
+}
+
+/**
+ * Cota de găzduire pentru un interval — proporțional cu numărul de zile,
+ * la `PLATFORM_COST_PER_MONTH` pe lună (30,44 zile în medie).
+ */
+export function platformCostForRange(startIso: string, endIso: string): number {
+  const start = new Date(startIso).getTime();
+  const end = new Date(endIso).getTime();
+  if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start) return 0;
+  const days = (end - start) / 86_400_000;
+  return round2((days / 30.44) * PLATFORM_COST_PER_MONTH);
 }

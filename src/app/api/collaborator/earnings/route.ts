@@ -6,6 +6,7 @@ import { resolveCollaboratorContext } from '@/lib/admin/collaborator-context';
 import {
   computeSettlementBreakdown,
   sumAncpiCosts,
+  platformCostForRange,
   SETTLEMENT_PERIOD_START,
   LAST_SETTLEMENT,
 } from '@/lib/collaborator/settlement';
@@ -68,7 +69,7 @@ export async function GET(request: NextRequest) {
     const admin = createAdminClient() as any;
     let query = admin
       .from('orders')
-      .select('id, friendly_order_id, status, paid_at, is_test, total_price, customer_data, services:service_id(name)')
+      .select('id, friendly_order_id, order_number, status, paid_at, is_test, total_price, customer_data, services:service_id(name, lawyer_fee_ron)')
       .or(scopeFilter)
       .eq('payment_status', 'paid')
       .neq('status', 'cancelled')
@@ -107,6 +108,21 @@ export async function GET(request: NextRequest) {
       }
     }
 
+    // Comisioanele procesatorului (Stripe) pe comenzile perioadei — cost real,
+    // sincronizat de /admin/decontari în stripe_payout_transactions.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const orderRefs = [...new Set((data ?? []).flatMap((o: any) => [o.friendly_order_id, o.order_number].filter(Boolean)))] as string[];
+    const feeByRef = new Map<string, number>();
+    for (let i = 0; i < orderRefs.length; i += 200) {
+      const { data: txRows } = await admin
+        .from('stripe_payout_transactions')
+        .select('order_number, fee_bani')
+        .in('order_number', orderRefs.slice(i, i + 200));
+      for (const t of (txRows ?? []) as Array<{ order_number: string; fee_bani: number | null }>) {
+        feeByRef.set(t.order_number, (feeByRef.get(t.order_number) ?? 0) + (Number(t.fee_bani) || 0) / 100);
+      }
+    }
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const orders = (data ?? []).map((o: any) => {
       const p = o.customer_data?.property ?? {};
@@ -121,6 +137,10 @@ export async function GET(request: NextRequest) {
         clientTotal: Number(o.total_price) || 0,
         // Taxa OCPI plătită pe comanda asta (0 = încă neînregistrată).
         ocpiCost: Math.round((costsByOrder.get(o.id) ?? 0) * 100) / 100,
+        // Comisionul Stripe reținut pe încasarea comenzii.
+        stripeFee: Math.round(((feeByRef.get(o.friendly_order_id) ?? feeByRef.get(o.order_number) ?? 0)) * 100) / 100,
+        // Comisionul de 15 lei/comandă, unde serviciul îl are setat.
+        commission: Number(o.services?.lawyer_fee_ron) || 0,
         isTest: !!o.is_test,
       };
     });
@@ -132,7 +152,17 @@ export async function GET(request: NextRequest) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const ocpiTotal = billable.reduce((s: number, o: any) => s + o.ocpiCost, 0);
 
-    const breakdown = computeSettlementBreakdown(collected, ocpiTotal);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const stripeTotal = billable.reduce((s: number, o: any) => s + o.stripeFee, 0);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const commissionTotal = billable.reduce((s: number, o: any) => s + o.commission, 0);
+    const platformCost = platformCostForRange(start, end ?? new Date().toISOString());
+
+    const breakdown = computeSettlementBreakdown(collected, ocpiTotal, {
+      stripeFees: stripeTotal,
+      commission: commissionTotal,
+      platformCost,
+    });
 
     return NextResponse.json({
       success: true,
