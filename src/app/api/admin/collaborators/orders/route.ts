@@ -149,6 +149,19 @@ export async function GET(request: NextRequest) {
     const billable = orders.filter((o: { isTest: boolean }) => !o.isTest);
     const revenue = billable.reduce((s: number, o: { total: number }) => s + o.total, 0);
     const ocpiTotal = billable.reduce((s: number, o: { ocpiCost: number }) => s + o.ocpiCost, 0);
+    // Cheltuielile de perioadă (reclamă etc.) pentru zona colaboratorului.
+    let periodCosts = 0;
+    if (collaboratorId !== '__avocat__') {
+      const { data: costRows } = await admin
+        .from('collaborator_period_costs')
+        .select('amount_ron, period_start')
+        .eq('collaborator_id', collaboratorId);
+      for (const c of (costRows ?? []) as Array<{ amount_ron: number; period_start: string }>) {
+        if (/^\d{4}-\d{2}$/.test(month) && !c.period_start.startsWith(month)) continue;
+        periodCosts += Number(c.amount_ron) || 0;
+      }
+    }
+
     const stripeTotal = billable.reduce((s: number, o: { stripeFee: number }) => s + o.stripeFee, 0);
     const commissionTotal = billable.reduce((s: number, o: { fee: number }) => s + o.fee, 0);
     const summary = {
@@ -161,6 +174,7 @@ export async function GET(request: NextRequest) {
         // Comisionul se scade din partea colaboratorului, nu din profit.
         commission: commissionTotal,
         platformCost: platformCostForRange(rangeStart, rangeEnd),
+        otherCosts: periodCosts,
         pendingOcpi: estimatePendingOcpi(
           billable.map((o: { serviceSlug: string; status: string; ocpiCost: number }) => ({
             serviceSlug: o.serviceSlug, status: o.status, ocpiCost: o.ocpiCost,

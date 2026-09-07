@@ -32,6 +32,7 @@ interface Breakdown {
   stripeFees: number;
   commission: number;
   platformCost: number;
+  otherCosts: number;
   pendingOcpi: number;
   totalCosts: number;
   grossProfit: number;
@@ -284,6 +285,131 @@ function AdvancesPanel({ collaboratorId }: { collaboratorId: string }) {
                 <td className="px-3 py-2 text-right font-medium text-slate-900">{fmt2(Number(a.amount_ron))}</td>
                 <td className="px-3 py-2 text-right">
                   <button type="button" onClick={() => void remove(a.id)} className="text-slate-400 hover:text-rose-600" title="Șterge">
+                    <X className="h-4 w-4" />
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+/** Cheltuielile de perioadă pe zona colaboratorului — bugetul de reclamă în
+ *  primul rând. Nu se leagă de o comandă, dar se scad din profit înainte de
+ *  împărțeală, ca orice cost real (cerut de Raul, 07.09.2026). */
+interface PeriodCost {
+  id: string; label: string; amount_ron: number; period_start: string; period_end: string;
+  category: string; note: string | null;
+}
+
+const COST_CATEGORIES: [string, string][] = [
+  ['reclama', 'Reclamă'],
+  ['abonament', 'Abonament'],
+  ['instrumente', 'Instrumente'],
+  ['alt', 'Altceva'],
+];
+
+function PeriodCostsPanel({ collaboratorId }: { collaboratorId: string }) {
+  const [costs, setCosts] = useState<PeriodCost[]>([]);
+  const [total, setTotal] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [label, setLabel] = useState('');
+  const [amount, setAmount] = useState('');
+  const [category, setCategory] = useState('reclama');
+  const [periodStart, setPeriodStart] = useState(() => new Date().toISOString().slice(0, 8) + '01');
+  const [saving, setSaving] = useState(false);
+
+  const load = async () => {
+    const res = await fetch(`/api/admin/collaborators/costs?collaboratorId=${collaboratorId}`);
+    const json = await res.json();
+    if (json.success) { setCosts(json.data.costs); setTotal(json.data.total); }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    let alive = true;
+    const t = setTimeout(() => { setLoading(true); void (async () => { if (alive) await load(); })(); }, 0);
+    return () => { alive = false; clearTimeout(t); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [collaboratorId]);
+
+  const add = async () => {
+    const value = Number(amount.replace(',', '.'));
+    if (!label.trim() || !Number.isFinite(value) || value <= 0) return;
+    setSaving(true);
+    try {
+      const end = new Date(Date.UTC(Number(periodStart.slice(0, 4)), Number(periodStart.slice(5, 7)), 0))
+        .toISOString().slice(0, 10);
+      const res = await fetch('/api/admin/collaborators/costs', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ collaboratorId, label, amountRon: value, category, periodStart, periodEnd: end }),
+      });
+      if (!res.ok) { alert('Nu s-a putut salva cheltuiala.'); return; }
+      setLabel(''); setAmount('');
+      await load();
+    } finally { setSaving(false); }
+  };
+
+  const remove = async (id: string) => {
+    const res = await fetch(`/api/admin/collaborators/costs?id=${id}`, { method: 'DELETE' });
+    if (res.ok) await load();
+  };
+
+  const fmt2 = (n: number) => n.toLocaleString('ro-RO', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+  return (
+    <div className="mb-6 rounded-xl border border-slate-200 bg-white p-5">
+      <div className="mb-3">
+        <h2 className="text-sm font-semibold text-slate-900">Cheltuieli de perioadă</h2>
+        <p className="text-xs text-slate-500">Reclamă și alte cheltuieli care țin de serviciile lucrate împreună. Se scad din profit înainte de împărțeală. Total înregistrat: <strong>{fmt2(total)} RON</strong></p>
+      </div>
+
+      <div className="mb-4 flex flex-wrap items-end gap-2">
+        <div className="min-w-[200px] flex-1">
+          <label className="mb-1 block text-xs font-medium text-slate-500">Denumire</label>
+          <input value={label} onChange={(e) => setLabel(e.target.value)} placeholder="Google Ads — cadastru/PAD" className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" />
+        </div>
+        <div>
+          <label className="mb-1 block text-xs font-medium text-slate-500">Sumă (RON)</label>
+          <input value={amount} onChange={(e) => setAmount(e.target.value)} inputMode="decimal" placeholder="688,33" className="w-28 rounded-lg border border-slate-300 px-3 py-2 text-sm" />
+        </div>
+        <div>
+          <label className="mb-1 block text-xs font-medium text-slate-500">Luna</label>
+          <input type="month" value={periodStart.slice(0, 7)} onChange={(e) => setPeriodStart(`${e.target.value}-01`)} className="rounded-lg border border-slate-300 px-3 py-2 text-sm" />
+        </div>
+        <div>
+          <label className="mb-1 block text-xs font-medium text-slate-500">Categorie</label>
+          <select value={category} onChange={(e) => setCategory(e.target.value)} className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm">
+            {COST_CATEGORIES.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+          </select>
+        </div>
+        <button type="button" onClick={() => void add()} disabled={saving || !label || !amount} className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-50">
+          {saving ? 'Se salvează...' : 'Adaugă'}
+        </button>
+      </div>
+
+      <div className="overflow-hidden rounded-lg border border-slate-200">
+        <table className="w-full text-sm">
+          <thead className="bg-slate-50 text-left text-xs uppercase text-slate-500">
+            <tr><th className="px-3 py-2">Luna</th><th className="px-3 py-2">Denumire</th><th className="px-3 py-2">Categorie</th><th className="px-3 py-2 text-right">Sumă</th><th className="px-3 py-2"></th></tr>
+          </thead>
+          <tbody className="divide-y divide-slate-100">
+            {loading ? (
+              <tr><td colSpan={5} className="px-3 py-6 text-center text-slate-500">Se încarcă...</td></tr>
+            ) : costs.length === 0 ? (
+              <tr><td colSpan={5} className="px-3 py-6 text-center text-slate-500">Nicio cheltuială înregistrată.</td></tr>
+            ) : costs.map((c) => (
+              <tr key={c.id} className="hover:bg-slate-50">
+                <td className="px-3 py-2 text-slate-600">{c.period_start.slice(0, 7)}</td>
+                <td className="px-3 py-2 text-slate-800">{c.label}</td>
+                <td className="px-3 py-2 text-slate-500">{COST_CATEGORIES.find(([v]) => v === c.category)?.[1] ?? c.category}</td>
+                <td className="px-3 py-2 text-right font-medium text-slate-900">{fmt2(Number(c.amount_ron))}</td>
+                <td className="px-3 py-2 text-right">
+                  <button type="button" onClick={() => void remove(c.id)} className="text-slate-400 hover:text-rose-600" title="Șterge">
                     <X className="h-4 w-4" />
                   </button>
                 </td>
@@ -744,6 +870,7 @@ export default function CollaboratorsAdminPage() {
           )}
 
           {selectedId && selectedId !== '__avocat__' && <AdvancesPanel collaboratorId={selectedId} />}
+          {selectedId && selectedId !== '__avocat__' && <PeriodCostsPanel collaboratorId={selectedId} />}
 
           {/* Summary — modelul 50/50 din lib-ul de decont (aceleași cifre ca
               pagina colaboratorului); onorariul per comandă rămâne doar unde
@@ -778,6 +905,7 @@ export default function CollaboratorsAdminPage() {
                   ['Net fără TVA', summary.breakdown.netOfVat],
                   ['− Taxe OCPI', -summary.breakdown.ocpiCosts],
                   ['− Comisioane Stripe', -summary.breakdown.stripeFees],
+                  ['− Reclamă și alte cheltuieli', -summary.breakdown.otherCosts],
                   ['Profit brut', summary.breakdown.grossProfit],
                   ['Taxe estimate pe comenzi nelucrate (informativ)', summary.breakdown.pendingOcpi],
                   ['− Impozit profit 16%', -summary.breakdown.profitTax],

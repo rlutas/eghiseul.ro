@@ -159,6 +159,14 @@ export async function GET(request: NextRequest) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const commissionTotal = billable.reduce((s: number, o: any) => s + o.commission, 0);
     const platformCost = platformCostForRange(start, end ?? new Date().toISOString());
+    // Cheltuielile de perioadă (reclamă etc.) — transparente și pentru el.
+    const { data: periodCostRows } = await admin
+      .from('collaborator_period_costs')
+      .select('amount_ron, period_start')
+      .eq('collaborator_id', collaboratorId);
+    const otherCosts = ((periodCostRows ?? []) as Array<{ amount_ron: number; period_start: string }>)
+      .filter((c) => (month === 'all' ? true : c.period_start.startsWith(month)))
+      .reduce((s, c) => s + (Number(c.amount_ron) || 0), 0);
     // Taxele care abia urmează pe comenzile încasate dar nelucrate.
     const pendingOcpi = estimatePendingOcpi(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -169,6 +177,7 @@ export async function GET(request: NextRequest) {
       stripeFees: stripeTotal,
       commission: commissionTotal,
       platformCost,
+      otherCosts,
       pendingOcpi,
     });
 

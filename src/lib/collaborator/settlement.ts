@@ -105,6 +105,13 @@ export interface SettlementExtraCosts {
   commission?: number;
   /** Cota de găzduire/infrastructură pentru perioadă. */
   platformCost?: number;
+  /**
+   * Cheltuieli de perioadă pe serviciile lucrate împreună — în primul rând
+   * bugetul de reclamă (Google Ads, Meta). Nu se pot lega de o comandă anume,
+   * dar sunt cost real: se scad înainte de împărțeală
+   * (`collaborator_period_costs`).
+   */
+  otherCosts?: number;
 }
 
 export interface SettlementBreakdown {
@@ -121,6 +128,8 @@ export interface SettlementBreakdown {
   commission: number;
   /** Cota de găzduire/infrastructură. */
   platformCost: number;
+  /** Cheltuieli de perioadă (reclamă, abonamente). */
+  otherCosts: number;
   /** Taxe OCPI estimate pe comenzile nelucrate — informativ, NU scăzute. */
   pendingOcpi: number;
   /** Suma tuturor costurilor scăzute din net. */
@@ -157,10 +166,11 @@ export function computeSettlementBreakdown(
   const commission = Number(extra.commission) || 0;
   const platformCost = Number(extra.platformCost) || 0;
   const pendingOcpi = Number(extra.pendingOcpi) || 0;
+  const otherCosts = Number(extra.otherCosts) || 0;
   // Costurile care se scad efectiv: taxele plătite la instituție și comisionul
   // procesatorului de plăți. Comisionul colaboratorului se scade din partea
   // LUI, la final; taxele estimate pe comenzile nelucrate rămân informative.
-  const totalCosts = ocpi + stripeFees + platformCost;
+  const totalCosts = ocpi + stripeFees + platformCost + otherCosts;
 
   const netOfVat = collected / (1 + VAT_RATE);
   const grossProfit = netOfVat - totalCosts;
@@ -177,6 +187,7 @@ export function computeSettlementBreakdown(
     stripeFees: round2(stripeFees),
     commission: round2(commission),
     platformCost: round2(platformCost),
+    otherCosts: round2(otherCosts),
     pendingOcpi: round2(pendingOcpi),
     totalCosts: round2(totalCosts),
     grossProfit: round2(grossProfit),

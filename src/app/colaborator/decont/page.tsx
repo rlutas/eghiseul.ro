@@ -26,6 +26,7 @@ interface Breakdown {
   stripeFees: number;
   commission: number;
   platformCost: number;
+  otherCosts: number;
   pendingOcpi: number;
   totalCosts: number;
   grossProfit: number;
@@ -159,6 +160,7 @@ export default function CollaboratorDecontPage() {
               ['= Net fără TVA', b.netOfVat, 'font-medium'],
               ['− Taxe OCPI plătite', -b.ocpiCosts, ''],
               ['− Comisioane procesator plată (Stripe)', -b.stripeFees, ''],
+              ['− Reclamă și alte cheltuieli ale perioadei', -b.otherCosts, ''],
               ['= Profit brut', b.grossProfit, 'font-medium'],
               ['− Impozit pe profit 16%', -b.profitTax, ''],
               ['− Impozit pe dividende 16%', -b.dividendTax, ''],
