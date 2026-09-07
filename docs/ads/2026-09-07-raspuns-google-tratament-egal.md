@@ -57,6 +57,27 @@ adică o **informație de interes public**, nu o dată protejată de confidenți
 comercială. Un act de autorizare emis de o instituție publică nu poate fi
 confidențial prin natura lui: el produce efecte tocmai prin faptul că este public.
 
+Lista de mai sus este **exemplificativă, nu exhaustivă**. Aceeași situație se
+regăsește pe toate serviciile publice acoperite de această politică: cazier
+judiciar, cazier auto, certificate de stare civilă, certificat constatator,
+extras de carte funciară — și, la fel, **rovinieta**. Sunt zeci de domenii care
+difuzează astăzi anunțuri pe aceste servicii fără să fie autorizate de vreo
+instituție publică.
+
+Pe rovinietă, verificarea este chiar simplă și poate fi făcută de dumneavoastră
+în câteva minute: **CNAIR publică pe site-ul oficial lista distribuitorilor
+autorizați, inclusiv a portalurilor web autorizate**. Vă rog să comparați acea
+listă publică cu domeniile care difuzează în prezent anunțuri pentru rovinietă
+în România. Veți constata că multe dintre ele nu figurează acolo. Este singurul
+serviciu din piață unde criteriul dumneavoastră poate fi verificat obiectiv, pe
+o sursă guvernamentală existentă — iar rezultatul verificării arată exact
+aceeași concluzie: politica nu se aplică uniform.
+
+Precizez că, dacă în urma acestei verificări rezultă că anumite domenii nu
+îndeplinesc criteriul, **inclusiv vreunul dintre ale noastre**, acceptăm
+aplicarea uniformă a politicii. Nu cer o excepție pentru mine; cer ca regula să
+fie aceeași pentru toți.
+
 **2. În România, autorizarea pe care o descrieți nu există pentru nimeni.**
 
 Pentru cazierul judiciar, certificatele de naștere/căsătorie și celelalte
