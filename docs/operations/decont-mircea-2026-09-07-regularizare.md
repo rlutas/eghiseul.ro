@@ -3,7 +3,13 @@
 Recalcularea decontului din 26.08 (`decont-mircea-2026-08-26.md`), după ce au intrat
 toate taxele OCPI și după ce au fost adăugate costurile care lipseau din primul calcul.
 
-**Raport pentru Mircea:** https://claude.ai/code/artifact/7af1f9b5-d533-4689-b4f6-540bfba0854f
+**Raport pentru Mircea (valabil):** https://claude.ai/code/artifact/7af1f9b5-d533-4689-b4f6-540bfba0854f
+— conține și lista completă a celor 162 de comenzi (încasat, taxă OCPI, comision Stripe, comision 15 lei).
+
+**Raportul din 26.08** (https://claude.ai/code/artifact/e541ea9b-c68c-49a1-8ca6-57007d7d025c) a rămas
+online ca istoric, cu banner în capul paginii care trimite la cel nou. ⚠️ Artifactul e partajat prin
+link, iar vizitatorii văd versiunea „pinned" — după republicare trebuie mutat pin-ul din meniul de
+share, altfel Mircea vede tot varianta veche.
 
 ## Perioada
 
@@ -47,9 +53,10 @@ au intrat în sistem — exact rezerva #2 din documentul precedent.
 | | Parte | Comision | Rest din profit | Primit la 26.08 | De reținut |
 |---|---|---|---|---|---|
 | Raul | 3.497,88 | — | 3.497,88 | 4.316,61 | **818,73** |
-| Mircea | 3.497,88 | −525,00 | 2.972,88 | 4.316,61 | **1.343,73** |
+| Mircea | 3.497,88 | −555,00 | 2.942,88 | 4.316,61 | **1.373,73** |
 
-Mircea încasează separat factura de comision (635,25 lei cu TVA).
+Mircea încasează separat factura de comision (635,25 lei cu TVA). Comisionul perioadei e **555 lei**
+(37 comenzi × 15), din care factura din 28.08 acoperă 525 — diferența de 30 lei se facturează ulterior.
 
 ### Provizionul de 240 lei
 
