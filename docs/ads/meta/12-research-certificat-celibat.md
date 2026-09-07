@@ -17,7 +17,7 @@ Cercetare 07.09.2026, pentru campania Meta pe `certificat-celibat` (698 lei).
 |---|---|---|---|
 | LaGhiseu | 500 lei | 10–20 zile | — |
 | GhișeuRapid | 650 lei | 10–20 zile | — |
-| **noi (eghiseul.ro)** | **698 lei** | **15–30 zile** | — |
+| **noi (eghiseul.ro)** | **698 lei** | **7–15 zile** (30 doar excepțional) | — |
 | **cazierjudiciarfirma.ro** (SC Web Clerk SRL, Iași; av. Chende Ciprian-Dumitru, Baroul Sălaj) | **999 lei „totul inclus"** · pachet internațional (apostilă + traducere + legalizare) **+500 lei** | **~5 zile lucrătoare** | „Certificat de Celibat Online, **obținut prin Avocat**" · preț fix afișat înainte de plată · **5,0/5 din 165 recenzii** |
 
 Alți jucători, fără preț afișat: Inter Lexis, IB Legal Family (CA Ioana Bărbulescu),
@@ -141,3 +141,28 @@ Nu vindem viteza. Vindem:
 
 Și tratăm frontal obiecția „la consulat e gratis": răspunsul e programarea, drumul și timpul, nu
 prețul.
+
+---
+
+## CORECȚIE 07.09 (Raul) — termenul e 7–15 zile
+
+Termenul de lucru real e **7–15 zile**; 30 de zile e doar cazul excepțional. Media măsurată de
+18,9 zile din tabelul de mai sus e trasă în sus de comenzile blocate pe client (1 din 6 în standby)
+și de `estimated_days = 30` din DB, care e marjă de siguranță, nu promisiune.
+
+**Ce schimbă asta:** putem comunica **„de obicei 7–15 zile"** — și atunci nu mai suntem ultimii pe
+termen, ci competitivi. Cei ~5 zile ai lui cazierjudiciarfirma.ro sunt o afirmație de marketing
+neverificată, nu un fapt (decizie Raul: nu ne luăm după ei).
+
+Prețurile noastre rămân cum sunt — inclusiv add-on-ul de apostilă.
+
+**Al patrulea argument de vânzare, care lipsea:** avem **recenzii Google reale**, multe. Testimonial
+e formatul #3 la Motion (6,5% hit rate) și e singurul care răspunde la „de ce să am încredere să dau
+698 lei online". De folosit ca creative, cu capturi reale.
+
+### Poziționarea finală (4 puncte)
+
+1. **Preț** — 698 vs 999 la singurul concurent care face reclamă
+2. **Termen** — de obicei 7–15 zile
+3. **Prin avocat înscris în Barou**, fără procură notarială (Legea 120/2026)
+4. **Recenzii Google reale** — dovada că livrăm
