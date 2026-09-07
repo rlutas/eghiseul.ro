@@ -1,9 +1,20 @@
 /**
  * Meta (Facebook/Instagram Ads) — Conversions API, server-side.
  *
- * Trimitem `Purchase` din webhook-ul Stripe după ce comanda e marcată plătită.
- * Dedup cu pixelul din browser: același `event_id` (order_number) pe ambele
- * canale; Meta păstrează primul, ignoră duplicatul.
+ * Trimitem două evenimente:
+ *  - `InitiateCheckout` la crearea draftului (ruta /api/orders/draft)
+ *  - `Purchase` din webhook-ul Stripe după ce comanda e marcată plătită.
+ * Dedup cu pixelul din browser: același `event_id` pe ambele canale
+ * (`<order_number>` pentru Purchase, `ic_<order_number>` pentru
+ * InitiateCheckout); Meta păstrează primul, ignoră duplicatul.
+ *
+ * DE CE server-side și pentru InitiateCheckout: pixelul din browser se încarcă
+ * doar după consimțământul de marketing (cookie-consent.tsx), iar bannerul e
+ * neblocant — în practică majoritatea vizitatorilor nu apasă „Accept toate".
+ * Măsurat pe campania din 03–07.09.2026: 191 clicuri pe link → 25 vizualizări
+ * de pagină raportate (13%). Fără canalul server-side, evenimentul pe care
+ * optimizează campania e sub-raportat masiv și algoritmul nu are ce învăța.
+ * Vezi `docs/ads/meta/08-verificare-campanie-07-09.md`.
  *
  * Trimitem DOAR pentru comenzile venite din Meta (fbclid în atribuire sau
  * utm_source=meta/facebook/instagram) — minimizarea datelor (GDPR). Hash-urile
@@ -87,41 +98,50 @@ function buildFbc(touch: TouchLike | undefined): string | undefined {
   return `fb.1.${Number.isFinite(ts) ? ts : Date.now()}.${touch.click_id}`;
 }
 
-/** Niciodată nu aruncă; true doar când Meta a acceptat request-ul. */
-export async function sendMetaPurchaseEvent(input: MetaPurchaseInput): Promise<boolean> {
-  const pixelId = process.env.NEXT_PUBLIC_META_PIXEL_ID;
-  const token = process.env.META_CAPI_ACCESS_TOKEN;
-  if (!pixelId || !token) return false;
-  const touch = metaTouch(input.attribution);
-  if (!touch) return false;
+export interface MetaInitiateCheckoutInput {
+  /** `friendly_order_id` al draftului — cheia de dedup cu pixelul. */
+  orderNumber: string;
+  /** Valoarea coșului în momentul creării draftului, RON (poate fi 0). */
+  totalRon: number;
+  serviceSlug?: string | null;
+  serviceName?: string | null;
+  email?: string | null;
+  phone?: string | null;
+  attribution?: AttributionLike | null;
+}
 
-  const em = input.email ? [hashEmail(input.email)].filter(Boolean) : [];
-  const ph = input.phone ? [hashPhone(input.phone)].filter(Boolean) : [];
+interface MetaEvent {
+  event_name: string;
+  event_time: number;
+  event_id: string;
+  action_source: 'website';
+  event_source_url: string;
+  user_data: Record<string, unknown>;
+  custom_data: Record<string, unknown>;
+}
+
+/** Datele de utilizator, hash-uite conform regulilor Meta. */
+function buildUserData(
+  touch: TouchLike,
+  email?: string | null,
+  phone?: string | null
+): Record<string, unknown> {
+  const em = email ? [hashEmail(email)].filter(Boolean) : [];
+  const ph = phone ? [hashPhone(phone)].filter(Boolean) : [];
   const fbc = buildFbc(touch);
-
-  const event = {
-    event_name: 'Purchase',
-    event_time: Math.floor(Date.now() / 1000),
-    event_id: input.orderNumber,
-    action_source: 'website',
-    event_source_url: 'https://eghiseul.ro/comanda/success/',
-    user_data: {
-      ...(em.length ? { em } : {}),
-      ...(ph.length ? { ph } : {}),
-      ...(fbc ? { fbc } : {}),
-      country: [sha256('ro')],
-    },
-    custom_data: {
-      currency: 'RON',
-      value: Number(input.totalRon.toFixed(2)),
-      content_type: 'product',
-      content_ids: [input.serviceSlug || 'serviciu'],
-      content_name: input.serviceName || 'Serviciu eGhișeul',
-      num_items: 1,
-      order_id: input.orderNumber,
-    },
+  return {
+    ...(em.length ? { em } : {}),
+    ...(ph.length ? { ph } : {}),
+    ...(fbc ? { fbc } : {}),
+    country: [sha256('ro')],
   };
+}
 
+/**
+ * POST către Graph API. Nu aruncă niciodată — analytics-ul nu are voie să rupă
+ * nici plata, nici salvarea draftului.
+ */
+async function postEvent(event: MetaEvent, pixelId: string, token: string, label: string): Promise<boolean> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
   try {
@@ -136,15 +156,80 @@ export async function sendMetaPurchaseEvent(input: MetaPurchaseInput): Promise<b
     );
     if (!res.ok) {
       const text = await res.text().catch(() => '');
-      console.error(`[meta-conversions] ${res.status} for order ${input.orderNumber}: ${text.slice(0, 300)}`);
+      console.error(`[meta-conversions] ${res.status} for ${label}: ${text.slice(0, 300)}`);
       return false;
     }
-    console.log(`[meta-conversions] Purchase sent for ${input.orderNumber}${fbc ? ' (fbclid)' : ' (utm only)'}`);
+    console.log(`[meta-conversions] ${label} sent`);
     return true;
   } catch (e) {
-    console.error(`[meta-conversions] failed for order ${input.orderNumber}:`, e instanceof Error ? e.message : e);
+    console.error(`[meta-conversions] failed for ${label}:`, e instanceof Error ? e.message : e);
     return false;
   } finally {
     clearTimeout(timer);
   }
+}
+
+/**
+ * `InitiateCheckout` la crearea draftului. Fire-and-forget din ruta de draft:
+ * apelantul NU așteaptă rezultatul, ca salvarea să nu depindă de Meta.
+ *
+ * `event_id` = `ic_<friendly_order_id>`, același cu cel trimis de pixel după
+ * primul POST reușit (modular-wizard-provider) — Meta ține un singur eveniment.
+ */
+export async function sendMetaInitiateCheckoutEvent(
+  input: MetaInitiateCheckoutInput
+): Promise<boolean> {
+  const pixelId = process.env.NEXT_PUBLIC_META_PIXEL_ID;
+  const token = process.env.META_CAPI_ACCESS_TOKEN;
+  if (!pixelId || !token) return false;
+  const touch = metaTouch(input.attribution);
+  if (!touch) return false;
+
+  const event: MetaEvent = {
+    event_name: 'InitiateCheckout',
+    event_time: Math.floor(Date.now() / 1000),
+    event_id: `ic_${input.orderNumber}`,
+    action_source: 'website',
+    event_source_url: 'https://eghiseul.ro/comanda/',
+    user_data: buildUserData(touch, input.email, input.phone),
+    custom_data: {
+      currency: 'RON',
+      value: Number((input.totalRon || 0).toFixed(2)),
+      content_type: 'product',
+      content_ids: [input.serviceSlug || 'serviciu'],
+      content_name: input.serviceName || 'Serviciu eGhișeul',
+      num_items: 1,
+    },
+  };
+
+  return postEvent(event, pixelId, token, `InitiateCheckout ${input.orderNumber}`);
+}
+
+/** Niciodată nu aruncă; true doar când Meta a acceptat request-ul. */
+export async function sendMetaPurchaseEvent(input: MetaPurchaseInput): Promise<boolean> {
+  const pixelId = process.env.NEXT_PUBLIC_META_PIXEL_ID;
+  const token = process.env.META_CAPI_ACCESS_TOKEN;
+  if (!pixelId || !token) return false;
+  const touch = metaTouch(input.attribution);
+  if (!touch) return false;
+
+  const event: MetaEvent = {
+    event_name: 'Purchase',
+    event_time: Math.floor(Date.now() / 1000),
+    event_id: input.orderNumber,
+    action_source: 'website',
+    event_source_url: 'https://eghiseul.ro/comanda/success/',
+    user_data: buildUserData(touch, input.email, input.phone),
+    custom_data: {
+      currency: 'RON',
+      value: Number(input.totalRon.toFixed(2)),
+      content_type: 'product',
+      content_ids: [input.serviceSlug || 'serviciu'],
+      content_name: input.serviceName || 'Serviciu eGhișeul',
+      num_items: 1,
+      order_id: input.orderNumber,
+    },
+  };
+
+  return postEvent(event, pixelId, token, `Purchase ${input.orderNumber}`);
 }

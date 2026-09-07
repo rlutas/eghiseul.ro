@@ -1512,12 +1512,6 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
         customerData.bundled_services = bundledServices;
       }
 
-      // Meta Pixel: prima salvare a draftului = intrarea în checkout (no-op fără
-      // consimțământ de marketing). Semnalul de optimizare pentru testul Meta.
-      if (method === 'POST') {
-        trackMeta('InitiateCheckout', { content_ids: [state.serviceId], content_type: 'product', currency: 'RON' });
-      }
-
       const response = await fetch('/api/orders/draft', {
         method,
         headers: { 'Content-Type': 'application/json' },
@@ -1652,6 +1646,27 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
               friendlyOrderId: data.data.order.friendly_order_id || state.friendlyOrderId,
             },
           });
+        }
+      }
+
+      // Meta Pixel: draft CREAT (201) = intrarea în checkout. No-op fără
+      // consimțământ de marketing — de aceea serverul trimite același eveniment
+      // prin Conversions API din /api/orders/draft. `eventID` identic pe ambele
+      // canale (`ic_<friendly_order_id>`), deci Meta păstrează un singur
+      // eveniment. Vezi docs/ads/meta/08-verificare-campanie-07-09.md.
+      if (response.status === 201) {
+        const icOrderId = data.data?.order?.friendly_order_id || state.friendlyOrderId;
+        if (icOrderId) {
+          trackMeta(
+            'InitiateCheckout',
+            {
+              content_ids: [state.serviceId],
+              content_type: 'product',
+              currency: 'RON',
+              value: priceBreakdown.totalPrice,
+            },
+            `ic_${icOrderId}`
+          );
         }
       }
 

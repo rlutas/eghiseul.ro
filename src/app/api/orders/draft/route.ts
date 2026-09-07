@@ -26,6 +26,58 @@ interface DraftOrderData {
   discount_amount?: number;
 }
 
+/**
+ * `InitiateCheckout` prin Meta Conversions API, la crearea draftului.
+ *
+ * Fire-and-forget: nu așteptăm răspunsul Meta, ca salvarea draftului să nu
+ * depindă de el. `sendMetaInitiateCheckoutEvent` filtrează singur comenzile
+ * care NU vin din Meta și nu aruncă niciodată.
+ *
+ * DE CE aici și nu doar din pixel: pixelul se încarcă doar cu consimțământ de
+ * marketing, iar bannerul e neblocant — evenimentul pe care optimizează
+ * campania ajungea sub-raportat masiv (13% din clicuri).
+ * Vezi `docs/ads/meta/08-verificare-campanie-07-09.md`.
+ */
+function fireMetaInitiateCheckout(
+  adminClient: ReturnType<typeof createAdminClient>,
+  args: {
+    friendlyOrderId: string;
+    serviceId: string;
+    totalPrice: number;
+    customerData: Record<string, unknown> | undefined;
+    attribution: unknown;
+  }
+): void {
+  void (async () => {
+    try {
+      const { sendMetaInitiateCheckoutEvent, cameFromMeta } = await import(
+        '@/lib/analytics/meta-conversions'
+      );
+      const attribution = (args.attribution ?? null) as Parameters<typeof cameFromMeta>[0];
+      if (!cameFromMeta(attribution)) return;
+
+      const contact = (args.customerData?.contact ?? {}) as { email?: string; phone?: string };
+      const { data: service } = await adminClient
+        .from('services')
+        .select('slug, name')
+        .eq('id', args.serviceId)
+        .single();
+
+      await sendMetaInitiateCheckoutEvent({
+        orderNumber: args.friendlyOrderId,
+        totalRon: args.totalPrice,
+        serviceSlug: service?.slug ?? null,
+        serviceName: service?.name ?? null,
+        email: contact.email ?? null,
+        phone: contact.phone ?? null,
+        attribution,
+      });
+    } catch (e) {
+      console.error('[meta-capi] InitiateCheckout failed:', e instanceof Error ? e.message : e);
+    }
+  })();
+}
+
 /** True when a value carries no actual data (recursively): null/''/[]/{} of empties. */
 function isEmptyDeep(v: unknown): boolean {
   if (v == null || v === '') return true;
@@ -313,6 +365,16 @@ export async function POST(request: NextRequest) {
       .select()
       .single();
 
+    if (!orderError && order) {
+      fireMetaInitiateCheckout(adminClient, {
+        friendlyOrderId: order.friendly_order_id ?? friendlyOrderId,
+        serviceId: data.service_id,
+        totalPrice: data.total_price || 0,
+        customerData: data.customer_data as Record<string, unknown> | undefined,
+        attribution,
+      });
+    }
+
     if (orderError) {
       console.error('Draft creation error:', orderError);
 
@@ -365,6 +427,16 @@ export async function POST(request: NextRequest) {
           .insert(retryInsertData)
           .select()
           .single();
+
+        if (!retryError && retryOrder) {
+          fireMetaInitiateCheckout(adminClient, {
+            friendlyOrderId: retryOrder.friendly_order_id ?? newFriendlyOrderId,
+            serviceId: data.service_id,
+            totalPrice: data.total_price || 0,
+            customerData: data.customer_data as Record<string, unknown> | undefined,
+            attribution,
+          });
+        }
 
         if (retryError) {
           return NextResponse.json(
