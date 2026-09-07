@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
   const dividendTax = clamp(Number(body.dividendTaxPercent ?? 16), 0, 100);
   const facturaCabinet = Number(body.facturaCabinet ?? 0) || 0;
 
-  const { rows, summary, byPlatform, warnings } = await buildDecont({ month, platform, enrich: true });
+  const { rows, summary, byPlatform } = await buildDecont({ month, platform, enrich: true });
   const real = rows.filter((r) => !r.isTest);
 
   const stripeFeeReal = round2(real.reduce((s, r) => s + (r.stripeFee ?? 0), 0));
@@ -194,14 +194,8 @@ export async function POST(request: NextRequest) {
     line('RĂMAS TOTAL DUPĂ TOT', dupaDividende, '', { bold: true, top: true });
   }
 
-  if (warnings.length) {
-    line('');
-    line('DE VERIFICAT', null, '', { bold: true, top: true });
-    for (const w of warnings) line(w);
-  }
-  line('');
-  line('Excluse din decont', null, 'livrare, traducere, legalizare, apostilă notari, alte extra');
-  line('Retururi', null, 'se scad întâi din ce nu e al cabinetului; restul taie partea ei');
+  // Avertismentele și notele de metodologie rămân DOAR în admin (Raul le vrea
+  // afară din fișierul care pleacă la cabinet).
 
   const buffer = await wb.xlsx.writeBuffer();
   const name = `decont-avocat-${month || 'toate'}.xlsx`;
