@@ -1,7 +1,17 @@
 # Regularizarea decontului cu Mircea — 07.09.2026
 
-Recalcularea decontului din 26.08 (`decont-mircea-2026-08-26.md`), după ce au intrat
-toate taxele OCPI și după ce au fost adăugate costurile care lipseau din primul calcul.
+> **STARE LA 7 SEPTEMBRIE 2026, 21:00**
+> - Decont recalculat pe 07.07–31.08: **3.907,07 lei/parte** (față de 4.316,61 distribuit pe 26.08).
+> - **De reglat: 409,54 lei de fiecare.** La Mircea rămân **379,54** după cei 30 lei de comision
+>   nefacturați. **Nu se returnează nimic** — se scade din decontul pe septembrie.
+> - **Factura Mirandsof SM 153 (635,25 lei): PLĂTITĂ pe 07.09.**
+> - Raport trimis lui Mircea (public): https://claude.ai/code/artifact/7af1f9b5-d533-4689-b4f6-540bfba0854f
+> - Mesaj trimis: `2026-09-07-mesaj-mircea-whatsapp.txt` (variantă ASCII, fără diacritice).
+> - Raportul din 26.08 (https://claude.ai/code/artifact/e541ea9b-c68c-49a1-8ca6-57007d7d025c)
+>   are banner de recalculare; ⚠️ verifică pin-ul de share ca să arate versiunea nouă.
+
+Recalcularea decontului din 26.08 (`decont-mircea-2026-08-26.md`), după ce au intrat toate
+taxele OCPI și după ce a fost adăugat comisionul procesatorului de plăți.
 
 **Raport pentru Mircea (valabil):** https://claude.ai/code/artifact/7af1f9b5-d533-4689-b4f6-540bfba0854f
 — conține și lista completă a celor 162 de comenzi (încasat, taxă OCPI, comision Stripe, comision 15 lei).
@@ -144,6 +154,23 @@ așază singur.
 
 **La fiecare distribuire se adaugă o intrare în `DISTRIBUTIONS`** (dată, sumă/parte, cât cash și
 cât prin factură la colaborator). Ăsta e singurul pas manual rămas.
+
+## Unde stăm acum (checklist)
+
+| | Stare |
+|---|---|
+| Decont recalculat 07.07–31.08 | ✅ 3.907,07/parte |
+| Raport trimis lui Mircea | ✅ artifact public, mesaj pe WhatsApp |
+| Factura de comision 635,25 | ✅ plătită 07.09 |
+| Cei 409,54 / 379,54 de reglat | ⏳ se scad din decontul pe septembrie |
+| Comision rămas de facturat de Mircea | ⏳ 30 lei (2 comenzi după data facturii) |
+| Avansuri pentru taxe în platformă | ⚠️ doar 21.08–07.09 (3.240 lei); lipsesc iulie–20.08 |
+| Găzduire/programe în decont | ❌ scoase, rămân cheltuială generală |
+| Model în cod | ✅ cumulativ, cu `DISTRIBUTIONS` + `toSettle` în ambele UI |
+
+**Următorul decont (septembrie):** se ia partea cuvenită cumulat din portal, se scade
+`DISTRIBUTED_PER_SIDE` (4.316,61) și, la Mircea, comisionul perioadei. La 07.09 cifra cumulată
+era deja 4.181,59/parte, deci diferența scăzuse la 135,02.
 
 ## Deschise
 
