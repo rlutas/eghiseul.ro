@@ -1,5 +1,12 @@
 # 07.09.2026 — Răspunsul nostru către Google (caz 1-6533000041865)
 
+> **STARE: TRIMIS pe 07.09.2026 (luni), pe threadul tichetului 1-6533000041865.**
+> Așteptăm răspuns. Termenul cerut de noi: **10 zile lucrătoare → 21.09.2026**.
+> Dacă nu vine răspuns pe fond până atunci, urmează pașii de la secțiunea 7
+> (Consiliul Concurenței, DSA art. 21, P2B art. 4).
+> Textul exact trimis, în format simplu pentru copiere:
+> [`2026-09-07-email-google-tratament-egal.txt`](2026-09-07-email-google-tratament-egal.txt).
+
 Context: pe 07.09 a venit răspunsul lui **Prakhar** (om, nu AI) — vezi
 `2026-09-01-suport-google-escaladare.md` pentru istoricul cazului. Poziția s-a
 mutat: de la „intermediarii privați NU sunt eligibili pentru certificare" (AI,
@@ -170,6 +177,6 @@ Cont Google Ads: 677-995-5005 · Tichet: 1-6533000041865
 
 | Termen | Ce verificăm |
 |---|---|
-| 10 zile lucrătoare | Răspuns pe fond / număr de înregistrare P2B art. 11 |
+| **21.09.2026** (10 zile lucrătoare de la trimitere) | Răspuns pe fond / număr de înregistrare P2B art. 11. Fără el → Consiliul Concurenței + DSA art. 21 |
 | Imediat | Verdictul RSA-ului de test din Search-6 (ecazier, identitate „Cabinet De Avocat Tarta Ana Gabriela") |
 | Paralel | Statutul de distribuitor CNAIR pentru rovinietă (singura cale reală de certificare) |

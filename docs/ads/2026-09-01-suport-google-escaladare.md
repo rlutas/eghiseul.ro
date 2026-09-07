@@ -82,6 +82,7 @@ Reply pe threadul 1-6533000041865 (redeschide cazul), semnat Raul, telefon
 | 01.09 ~09:40 | Contestație 58971307 depusă (anunț certificat naștere, cont nou) |
 | 01.09 ~12:20 | Răspuns AI pe caz 1-6533000041865; caz închis automat |
 | 01.09 | Aflat spend total 2,09M RON; pregătit reply de escaladare (om + telefon + DSA/P2B) |
+| 07.09 | Răspuns de la **Prakhar** (om): certificarea E posibilă pentru privați, criteriul = link de autorizare de pe un site guvernamental. Trimis răspunsul nostru pe tratament egal — vezi [`2026-09-07-raspuns-google-tratament-egal.md`](2026-09-07-raspuns-google-tratament-egal.md). **Așteptăm răspuns până la 21.09.2026** |
 
 ## Addendum 01.09 după-amiază — testul pe ecazier + descoperirea „Cabinet de Avocat"
 
