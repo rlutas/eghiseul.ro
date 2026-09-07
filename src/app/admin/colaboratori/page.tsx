@@ -145,21 +145,37 @@ function ServiceAssignments({ collaboratorId, onChanged }: { collaboratorId: str
 }
 
 /** Decontul avocatei colaboratoare (caziere + integritate + stare civilă) — cerut de
- *  Raul 05.08.2026. Componentele cabinetului (cazier + urgență + apostilă
+ *  Raul 05.08.2026. Componentele cabinetului (serviciu + urgență + apostilă
  *  Haga, cu reducerile aplicate), FĂRĂ livrare/traducere/legalizare/apostilă
  *  notarilor. Onorariul 15 RON/comandă e separat — se scade la decontare.
- *  Doar comenzile eghiseul; decontul CJO se scoate separat (alt DB). */
+ *  Din 07.09.2026: eghiseul + cazierjudiciaronline în același raport (ecazier
+ *  NU — e cabinetul ei propriu). */
+type DecontPlatform = 'all' | 'eghiseul' | 'cjo';
+
+interface DecontSummary {
+  count: number; total: number; totalNet: number; totalCazier: number; totalUrgenta: number;
+  totalApostila: number; totalAddon: number; apostilaCount: number; onorarii: number; onorariuPerComanda: number;
+}
+
+const EMPTY_DECONT_SUMMARY: DecontSummary = {
+  count: 0, total: 0, totalNet: 0, totalCazier: 0, totalUrgenta: 0,
+  totalApostila: 0, totalAddon: 0, apostilaCount: 0, onorarii: 0, onorariuPerComanda: 15,
+};
+
 function AvocatDecont() {
   const [month, setMonth] = useState(() => {
     const d = new Date();
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
   });
+  const [platform, setPlatform] = useState<DecontPlatform>('all');
   const [rows, setRows] = useState<{
-    id: string; orderNumber: string; paidAt: string; client: string; service: string;
-    status: string; isTest: boolean; cazier: number; urgenta: number; apostila: number;
-    total: number; totalNet: number;
+    id: string; platform: 'eghiseul' | 'cjo'; orderNumber: string; paidAt: string; client: string;
+    service: string; status: string; isTest: boolean; cazier: number; urgenta: number;
+    apostila: number; addon: number; total: number; totalNet: number; refunded: number;
   }[]>([]);
-  const [summary, setSummary] = useState({ count: 0, total: 0, totalNet: 0, totalCazier: 0, totalUrgenta: 0, totalApostila: 0, apostilaCount: 0, onorarii: 0, onorariuPerComanda: 15 });
+  const [summary, setSummary] = useState<DecontSummary>(EMPTY_DECONT_SUMMARY);
+  const [byPlatform, setByPlatform] = useState<{ eghiseul: DecontSummary; cjo: DecontSummary }>({ eghiseul: EMPTY_DECONT_SUMMARY, cjo: EMPTY_DECONT_SUMMARY });
+  const [warnings, setWarnings] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const months = useMemo(() => monthOptions(), []);
 
@@ -170,15 +186,20 @@ function AvocatDecont() {
     const t = setTimeout(() => {
       setLoading(true);
       void (async () => {
-        const res = await fetch(`/api/admin/collaborators/avocat-decont?month=${month}`);
+        const res = await fetch(`/api/admin/collaborators/avocat-decont?month=${month}&platform=${platform}`);
         const json = await res.json();
         if (!alive) return;
-        if (json.success) { setRows(json.data.rows); setSummary(json.data.summary); }
+        if (json.success) {
+          setRows(json.data.rows);
+          setSummary(json.data.summary);
+          setByPlatform(json.data.byPlatform ?? { eghiseul: EMPTY_DECONT_SUMMARY, cjo: EMPTY_DECONT_SUMMARY });
+          setWarnings(json.data.warnings ?? []);
+        }
         setLoading(false);
       })();
     }, 0);
     return () => { alive = false; clearTimeout(t); };
-  }, [month]);
+  }, [month, platform]);
 
   const fmt = (n: number) => n.toLocaleString('ro-RO', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
@@ -191,11 +212,19 @@ function AvocatDecont() {
             {months.map((m) => <option key={m.value} value={m.value}>{m.label}</option>)}
           </select>
         </div>
-        <p className="text-xs text-slate-400">
-          Tot cabinetul (caziere, integritate, stare civilă) · doar eghiseul · fără livrare/traducere/legalizare/apostilă notarilor · reducerile aplicate
+        <div>
+          <label className="mb-1 block text-xs font-medium text-slate-500">Platformă</label>
+          <select value={platform} onChange={(e) => setPlatform(e.target.value as DecontPlatform)} className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm">
+            <option value="all">Ambele (eghiseul + CJO)</option>
+            <option value="eghiseul">eghiseul.ro</option>
+            <option value="cjo">cazierjudiciaronline.com</option>
+          </select>
+        </div>
+        <p className="max-w-sm text-xs text-slate-400">
+          Doar <strong>serviciu + urgență + apostilă Haga + add-on-uri de cabinet</strong>, cu reducerile aplicate. Livrarea, traducerea, legalizarea, apostila notarilor și orice alt extra NU intră. ecazier NU intră (cabinetul ei).
         </p>
         <a
-          href={`/api/admin/collaborators/avocat-decont?month=${month}&format=tsv`}
+          href={`/api/admin/collaborators/avocat-decont?month=${month}&platform=${platform}&format=tsv`}
           className="ml-auto inline-flex items-center gap-2 rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800"
         >
           <Download className="h-4 w-4" /> Export
@@ -227,32 +256,63 @@ function AvocatDecont() {
         </div>
       </div>
 
+      {platform === 'all' && (byPlatform.eghiseul.count > 0 || byPlatform.cjo.count > 0) && (
+        <div className="mb-6 grid gap-4 sm:grid-cols-2">
+          {([['eghiseul.ro', byPlatform.eghiseul], ['cazierjudiciaronline.com', byPlatform.cjo]] as const).map(([label, s]) => (
+            <div key={label} className="rounded-xl border border-slate-200 bg-white p-4">
+              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{label}</p>
+              <p className="mt-1 text-lg font-bold text-slate-900">{fmt(s.total)} <span className="text-xs font-semibold text-slate-400">RON cu TVA</span></p>
+              <p className="text-xs text-slate-500">{s.count} comenzi · {fmt(s.totalNet)} fără TVA · serviciu {fmt(s.totalCazier)} · urgență {fmt(s.totalUrgenta)} · apostile {fmt(s.totalApostila)} ({s.apostilaCount}) · add-on {fmt(s.totalAddon)} · onorarii {fmt(s.onorarii)}</p>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {warnings.length > 0 && (
+        <div className="mb-6 rounded-lg border border-amber-200 bg-amber-50 p-4 text-xs text-amber-800">
+          <p className="mb-1 font-semibold">De verificat manual:</p>
+          <ul className="list-disc pl-4">{warnings.map((w) => <li key={w}>{w}</li>)}</ul>
+        </div>
+      )}
+
       <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
         <table className="w-full text-sm">
           <thead className="bg-slate-50 text-left text-xs uppercase text-slate-500">
             <tr>
               <th className="px-3 py-3">Comandă</th>
+              <th className="px-3 py-3">Platformă</th>
               <th className="px-3 py-3">Dată</th>
               <th className="px-3 py-3">Client</th>
               <th className="px-3 py-3">Serviciu</th>
               <th className="px-3 py-3">Status</th>
-              <th className="px-3 py-3 text-right">Cazier</th>
+              <th className="px-3 py-3 text-right">Serviciu</th>
               <th className="px-3 py-3 text-right">Urgență</th>
               <th className="px-3 py-3 text-right">Apostilă</th>
+              <th className="px-3 py-3 text-right">Add-on</th>
               <th className="px-3 py-3 text-right">Total cu TVA</th>
               <th className="px-3 py-3 text-right">fără TVA</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
             {loading ? (
-              <tr><td colSpan={10} className="px-4 py-10 text-center text-slate-500">Se încarcă...</td></tr>
+              <tr><td colSpan={12} className="px-4 py-10 text-center text-slate-500">Se încarcă...</td></tr>
             ) : rows.length === 0 ? (
-              <tr><td colSpan={10} className="px-4 py-10 text-center text-slate-500">Nicio comandă în perioada selectată.</td></tr>
+              <tr><td colSpan={12} className="px-4 py-10 text-center text-slate-500">Nicio comandă în perioada selectată.</td></tr>
             ) : rows.map((r) => (
-              <tr key={r.id} className="hover:bg-slate-50">
+              <tr key={`${r.platform}-${r.id}`} className="hover:bg-slate-50">
                 <td className="px-3 py-2 font-medium">
-                  <a href={`/admin/orders/${r.id}`} className="text-primary-700 hover:underline">{r.orderNumber}</a>
+                  {r.platform === 'eghiseul' ? (
+                    <a href={`/admin/orders/${r.id}`} className="text-primary-700 hover:underline">{r.orderNumber}</a>
+                  ) : (
+                    <span className="text-slate-700">{r.orderNumber}</span>
+                  )}
                   {r.isTest && <span className="ml-2 rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-bold text-amber-700">TEST</span>}
+                  {r.refunded > 0 && <span className="ml-2 rounded bg-rose-100 px-1.5 py-0.5 text-[10px] font-bold text-rose-700">RETUR {fmt(r.refunded)}</span>}
+                </td>
+                <td className="px-3 py-2">
+                  <span className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${r.platform === 'cjo' ? 'bg-indigo-50 text-indigo-700' : 'bg-emerald-50 text-emerald-700'}`}>
+                    {r.platform === 'cjo' ? 'CJO' : 'eghiseul'}
+                  </span>
                 </td>
                 <td className="px-3 py-2 text-slate-500">{(r.paidAt || '').slice(0, 10)}</td>
                 <td className="px-3 py-2 text-slate-700">{r.client}</td>
@@ -261,6 +321,7 @@ function AvocatDecont() {
                 <td className="px-3 py-2 text-right text-slate-700">{fmt(r.cazier)}</td>
                 <td className="px-3 py-2 text-right text-slate-700">{r.urgenta ? fmt(r.urgenta) : '—'}</td>
                 <td className="px-3 py-2 text-right text-slate-700">{r.apostila ? fmt(r.apostila) : '—'}</td>
+                <td className="px-3 py-2 text-right text-slate-700">{r.addon ? fmt(r.addon) : '—'}</td>
                 <td className="px-3 py-2 text-right font-semibold text-slate-900">{fmt(r.total)}</td>
                 <td className="px-3 py-2 text-right text-slate-500">{fmt(r.totalNet)}</td>
               </tr>
@@ -269,10 +330,11 @@ function AvocatDecont() {
           {rows.length > 0 && (
             <tfoot className="border-t-2 border-slate-300 bg-slate-50 font-semibold text-slate-900">
               <tr>
-                <td colSpan={5} className="px-3 py-2 text-right text-xs uppercase text-slate-500">Total componente:</td>
+                <td colSpan={6} className="px-3 py-2 text-right text-xs uppercase text-slate-500">Total componente:</td>
                 <td className="px-3 py-2 text-right">{fmt(summary.totalCazier)}</td>
                 <td className="px-3 py-2 text-right">{fmt(summary.totalUrgenta)}</td>
                 <td className="px-3 py-2 text-right">{fmt(summary.totalApostila)}</td>
+                <td className="px-3 py-2 text-right">{fmt(summary.totalAddon)}</td>
                 <td className="px-3 py-2 text-right">{fmt(summary.total)}</td>
                 <td className="px-3 py-2 text-right text-slate-500">{fmt(summary.totalNet)}</td>
               </tr>
