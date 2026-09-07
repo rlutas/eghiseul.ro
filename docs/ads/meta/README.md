@@ -72,3 +72,4 @@ Deschis 02.09.2026 ca posibil al doilea canal după ChatGPT Ads. Evaluarea scurt
 - `PageView`/`ViewContent`/`LandingPageView` rămân doar pe pixel → **nu optimiza pe Landing Page
   View**.
 - Rata corectă e LPV ÷ **Outbound Clicks** (nu Link Clicks). Prag: sub 70% = problemă.
+| 07.09 noapte | **Campania de celibat, specificatie completa** -> `13-campanie-celibat-diaspora.md`. META_Celibat_Diaspora_2026-09: obiectiv Vanzari/InitiateCheckout (singurul semnal adevarat de cand avem CAPI), un singur ad set broad, limba romana + IT/ES/DE/UK/FR/BE/AT, 25-45, plasamente MANUALE fara Audience Network, 5 creative pe unghiuri diferite randate din cod (~/Projects/eghiseul-ads-video). Texte de anunt, URL final corect (`/servicii/eliberare-certificat-de-celibat/`, nu varianta care da 308), si ce urmarim in ziua 7 (distributia spend-ului, nu ROAS). |
