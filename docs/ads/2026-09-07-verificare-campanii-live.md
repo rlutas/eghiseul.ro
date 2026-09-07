@@ -38,6 +38,30 @@ un extras CF, nu un PAD (216,59 lei). Cele 39 de comenzi imobiliare din perioad�
 Doar ~3 din primii 10 termeni sunt pe intenția reală. Restul e trafic informațional plătit la
 2,80 lei clicul.
 
+### Toată perioada campaniei (18.08 – 07.09) — pe cuvânt cheie
+
+| Cuvânt cheie | Potrivire | Clicuri | CTR | CPC | Cost | Conv. |
+|---|---|---|---|---|---|---|
+| "plan de amplasament si delimitare online" | expresie | 118 | 8,20% | 2,85 | **335,92** | 1 (89 lei) |
+| [plan de amplasament si delimitare] | exactă | 80 | 8,05% | 2,67 | **213,67** | 0 |
+| [plan amplasament si delimitare] | exactă | 31 | 10,47% | 2,85 | 88,30 | 0 |
+| "pad imobil" | expresie | 21 | 10,19% | 2,96 | 62,07 | 0 |
+| [plan de amplasament si delimitare a imobilului] | exactă | 14 | 11,02% | 2,80 | 39,16 | 0 |
+| restul (5 cuvinte) | — | 0 | — | — | 0 | 0 |
+| **TOTAL** | | **264** | | | **739,12** | **1** |
+
+### Ce s-a schimbat în cont (07.09, executat)
+
+1. **Auto-tagging: VERIFICAT — este PORNIT** („Etichetare automată: Da"). Deci gclid chiar se
+   adaugă pe linkuri. Testat și lanțul de redirect: `?gclid=` supraviețuiește atât pe 308-ul de
+   trailing slash, cât și pe cel de la `www`. **Concluzia dură: cele 264 de clicuri chiar nu au
+   produs comenzi** — nu e o problemă de măsurare.
+2. **Întrerupt „pad imobil"** (expresie) — sursa termenului „asigurare locuinta pad".
+3. **Adăugate cuvinte cheie negative** la nivel de campanie: `asigurare`, `polita`, `harta`,
+   `map`, `terra`, `rgi`, `"cadastru online"`, `"cadastre online"`, `"cf online"`,
+   `"ocpi online"`, `"cadastral map"`, `"carte funciara"`.
+4. Rămân active doar variantele de „plan de amplasament și delimitare" (1 expresie + 3 exacte).
+
 ## Meta — cont eGhiseul.ro Ads (1562160259035101)
 
 Campania `New Sales campaign` (META_Constatator_2026-09) — **activă**, 75 lei/zi.
@@ -58,8 +82,9 @@ Comenzi de constatator plătite de la 03.09: 3 × 89 lei — fără dovadă că 
 Din **721 de comenzi** cu date de atribuire de la 1 august:
 
 - **0 cu `gclid`** — niciun click din Google Ads nu ajunge identificat în comenzi. Codul
-  `src/lib/analytics/attribution.ts` **chiar captează** gclid/gbraid/wbraid, deci cauza e în cont:
-  **auto-tagging-ul pare oprit**, sau clicurile pur și simplu nu produc comenzi.
+  `src/lib/analytics/attribution.ts` chiar captează gclid/gbraid/wbraid, auto-tagging-ul e pornit,
+  iar parametrul supraviețuiește redirectărilor (testat). **Deci clicurile chiar nu produc
+  comenzi** — 264 de clicuri, zero comenzi de PAD.
 - **10 cu `utm_`**, iar una are `click_id` de Meta (`m.facebook.com`) — deci pe Meta lanțul merge.
 
 **Descoperire laterală, mai valoroasă decât ambele campanii:** printre cele 10 apar comenzi
