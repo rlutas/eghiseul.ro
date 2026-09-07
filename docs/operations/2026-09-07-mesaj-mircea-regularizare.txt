@@ -1,29 +1,31 @@
 Salut Mircea,
 
-Am refăcut decontul, cu toate costurile la zi. Ți-am pus tot într-un raport, ca să vezi exact de unde vine fiecare cifră:
+Am refăcut decontul pentru 7 iulie – 31 august. Ți-am pus tot într-un raport, ca să vezi exact de unde vine fiecare cifră, inclusiv lista completă cu toate cele 162 de comenzi:
 
 https://claude.ai/code/artifact/7af1f9b5-d533-4689-b4f6-540bfba0854f
 
-Pe scurt ce s-a schimbat față de 26 august:
+Ce s-a schimbat față de calculul din 26 august, două lucruri:
 
-Când am împărțit prima dată, erau 53 de comenzi plătite dar încă nelucrate, deci taxele lor OCPI nu apăruseră în sistem. Între timp le-ai lucrat și au intrat: taxele au urcat de la 2.035 la 3.055 lei. Plus, în primul calcul nu scăzusem deloc comisioanele Stripe (451 lei), găzduirea și programele platformei (500 lei/lună) și n-aveam nicio rezervă pentru taxele comenzilor care încă nu s-au lucrat (240 lei).
+1. Atunci erau 53 de comenzi plătite dar încă nelucrate, deci taxele lor OCPI nu apăruseră în sistem. Între timp le-ai lucrat și au intrat: taxele au urcat de la 2.035 la 3.055 lei.
 
-Cu toate astea la zi, pentru 7 iulie – 31 august: profit de împărțit 6.995,77 lei, adică 3.497,88 lei de fiecare.
+2. Am uitat să scad comisionul procesatorului de plăți. Stripe reține un comision la fiecare încasare cu cardul, 451,55 lei pe toată perioada. E un cost real al fiecărei comenzi, ca și taxa la OCPI, doar că se ia automat din bani înainte să ajungă la noi, așa că nu se vedea nicăieri.
 
-Tu ai primit pe 26 august 3.791,61 lei în cont, adică partea calculată atunci (4.316,61) minus comisionul de 525 pe care îl iei prin factură. Deci în total ai primit tot 4.316,61 lei, ca și mine.
+Cu astea două puse la punct: profit de împărțit 7.814,15 lei, adică 3.907,07 lei de fiecare.
 
-Se reglează 818,73 lei — exact aceeași sumă la amândoi, pentru că am primit la fel. Din ei se scad 30 de lei de comision pe care îi mai ai de facturat (2 comenzi au intrat după data facturii tale), deci rămân 788,73 lei de reținut din decontul următor.
+Tu ai primit pe 26 august 3.791,61 lei în cont, adică partea calculată atunci minus comisionul de 525 pe care îl iei prin factură. Deci în total ai primit 4.316,61 lei, exact ca mine.
 
-Factura de 635,25 lei ți-o plătesc la termen, ca atare. O singură mențiune pentru viitor: înțelegerea e 15 lei pe comandă cu TVA inclus, deci pe factură suma trebuie să fie 15 lei totalul, nu 15 lei plus TVA. De data asta nu contează, pentru că se reglează oricum în suma de mai sus. La mine se reține 818,73 lei, pentru același motiv — am împărțit înainte să intre toate costurile. Nu e nimic în neregulă cu munca ta, e o greșeală de calendar la calcul, pe care am corectat-o acum și n-o să se mai repete: sistemul face automat rezerva pentru taxele comenzilor nelucrate.
+Se reglează 409,54 lei, aceeași sumă la amândoi. Din ei se scad 30 de lei de comision pe care îi mai ai de facturat: în perioadă sunt 37 de comenzi cu comision, iar factura ta din 28 august acoperă 35, două au intrat după. Rămân 379,54 lei.
+
+Nu trebuie să returnezi nimic acum. Factura de 635,25 ți-o plătesc la termen, ca atare, iar diferența o scădem pur și simplu din decontul pe septembrie. Fără stres.
+
+O singură mențiune pentru facturile următoare: înțelegerea e 15 lei pe comandă cu TVA inclus, deci pe factură suma finală trebuie să fie 15 lei pe comandă, nu 15 plus TVA. De data asta nu contează, se compensează oricum în reglarea de mai sus.
 
 Două lucruri practice:
 
-1. De acum vezi tot în portal, la Decont — încasările, taxele, comisioanele, găzduirea, impozitele și partea ta, pas cu pas. Nu mai e nevoie de raport separat, verifici singur oricând.
+- De acum vezi tot în portal, la Decont: încasările, taxele OCPI, comisioanele Stripe, impozitele și partea ta, pas cu pas. Verifici singur oricând, fără să aștepți un raport de la mine.
 
-2. Am început să înregistrez în platformă și banii pe care ți-i trimit pentru taxe, ca să vedem mereu soldul: cât ai primit și cât s-a consumat efectiv în taxe. Am introdus deocamdată transferurile din 21 august încoace (3.240 lei). Dacă ai evidența ta pe iulie și începutul lui august, trimite-mi-o și o punem la punct, ca să știm exact unde stăm.
+- Am început să înregistrez în platformă și banii pe care ți-i trimit pentru taxe, ca să vedem mereu soldul: cât ai primit și cât s-a consumat efectiv. Am pus deocamdată transferurile din 21 august încoace (3.240 lei). Dacă ai evidența ta pe iulie și începutul lui august, trimite-mi-o și o punem la punct.
 
-In raport ai și lista completă cu toate cele 162 de comenzi: fiecare comandă, cât s-a încasat, ce taxă OCPI s-a plătit, cât a reținut procesatorul de plăți și unde intră comisionul tău. Din rândurile alea ies exact totalurile, poți verifica orice poziție.
-
-Raportul vechi din 26 august a rămas online, dar are sus o notă că a fost recalculat și link către cel nou, ca să nu se încurce cifrele.
+Un singur lucru de reținut pentru decontul următor: mai sunt 12 comenzi încasate dar nelucrate (10 identificări de imobil, 2 după proprietar). Taxele lor, în jur de 240 de lei, intră în costuri când se lucrează.
 
 Zi-mi dacă vezi ceva care nu-ți iese la calcul.

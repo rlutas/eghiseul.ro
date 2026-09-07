@@ -157,8 +157,6 @@ export default function CollaboratorDecontPage() {
               ['= Net fără TVA', b.netOfVat, 'font-medium'],
               ['− Taxe OCPI plătite', -b.ocpiCosts, ''],
               ['− Comisioane procesator plată (Stripe)', -b.stripeFees, ''],
-              ['− Găzduire și programe de dezvoltare (500 lei/lună)', -b.platformCost, ''],
-              ['− Provizion taxe OCPI pentru comenzile nelucrate', -b.pendingOcpi, ''],
               ['= Profit brut', b.grossProfit, 'font-medium'],
               ['− Impozit pe profit 16%', -b.profitTax, ''],
               ['− Impozit pe dividende 16%', -b.dividendTax, ''],

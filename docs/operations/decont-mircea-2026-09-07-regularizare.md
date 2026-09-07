@@ -25,8 +25,7 @@ perioada, iar din el se scade ce s-a distribuit deja.
 | Încasat cu TVA | 17.267,04 | 17.643,04 | +376,00 |
 | Taxe OCPI | 2.035,00 | **3.055,00** | +1.020,00 |
 | Comisioane Stripe | nescăzute | **451,55** | +451,55 |
-| Găzduire + programe dezvoltare | nescăzută | **919,84** | +919,84 |
-| Provizion taxe comenzi nelucrate | nescăzut | **240,00** | +240,00 |
+| Parte de persoană | 4.316,61 | **3.907,07** | −409,54 |
 
 Cele 53 de comenzi plătite-nelucrate de la primul cutoff au fost lucrate; taxele lor OCPI
 au intrat în sistem — exact rezerva #2 din documentul precedent.
@@ -40,13 +39,16 @@ au intrat în sistem — exact rezerva #2 din documentul precedent.
 | **= Net fără TVA** | **14.581,02** |
 | − Taxe OCPI | −3.055,00 |
 | − Comisioane Stripe | −451,55 |
-| − Găzduire + programe dezvoltare (500 lei/lună × 56 zile) | −919,84 |
-| − Provizion taxe OCPI pe comenzile nelucrate | −240,00 |
-| **= Profit brut** | **9.914,63** |
-| − Impozit profit 16% | −1.586,34 |
-| − Impozit dividende 16% | −1.332,53 |
-| **= De distribuit** | **6.995,77** |
-| **Parte/cap (înainte de comision)** | **3.497,88** |
+| **= Profit brut** | **11.074,47** |
+| − Impozit profit 16% | −1.771,92 |
+| − Impozit dividende 16% | −1.488,41 |
+| **= De distribuit** | **7.814,15** |
+| **Parte/cap (comisionul inclus)** | **3.907,07** |
+
+> **Decizia lui Raul (07.09):** găzduirea și programele de dezvoltare (500 lei/lună) **NU** se
+> alocă zonei imobiliare — rămân cheltuială generală a firmei. `PLATFORM_COST_PER_MONTH = 0`.
+> Taxele estimate pe comenzile nelucrate (240 lei) rămân **informative**, nu se provizionează:
+> intră în costuri când se lucrează comenzile.
 
 ### Cine cât rămâne de dat/luat
 
@@ -56,11 +58,12 @@ au intrat în sistem — exact rezerva #2 din documentul precedent.
 
 | | Cuvenit | Cash primit | Comision prin factură | Total primit | De reglat |
 |---|---|---|---|---|---|
-| Raul | 3.497,88 | 4.316,61 | — | 4.316,61 | **818,73** |
-| Mircea | 3.497,88 | 3.791,61 | 525,00 (net) | 4.316,61 | **818,73** |
+| Raul | 3.907,07 | 4.316,61 | — | 4.316,61 | **409,54** |
+| Mircea | 3.907,07 | 3.791,61 | 525,00 (net) | 4.316,61 | **409,54** |
 
 Comisionul perioadei e **555 lei** (37 comenzi × 15); factura din 28.08 acoperă 525, deci Mircea mai
-are de facturat **30 lei**. Poziția lui netă: 818,73 − 30 = **788,73 de returnat**.
+are de facturat **30 lei**. Poziția lui netă: 409,54 − 30 = **379,54**. Nu se returnează nimic: factura se plătește la termen,
+ca atare, iar diferența **se scade din decontul pe septembrie** (decizia lui Raul, 07.09).
 
 ### Provizionul de 240 lei
 
@@ -124,8 +127,8 @@ platformCost })`, plus `PLATFORM_COST_PER_MONTH = 500` și `platformCostForRange
 ## Deschise
 
 1. **Soldul avansurilor pentru taxe** — de reconciliat cu evidența lui Mircea (vezi mai sus).
-2. **Găzduirea + programele**: 500 lei/lună în total, alocarea convenită pentru zona
-   imobiliară; costul real de infrastructură (Netlify + Supabase + Prisma) e ~730 lei/lună,
-   dar deservește toate platformele. Se modifică din `PLATFORM_COST_PER_MONTH`.
+2. **Găzduirea + programele NU se alocă** aici (decizie 07.09) — costul real de infrastructură
+   (~730 lei/lună) deservește toate platformele și rămâne cheltuială generală. Dacă se revine,
+   se schimbă doar `PLATFORM_COST_PER_MONTH`.
 3. **Volumul a căzut după 20.08** (de la ~10 comenzi/zi la 1–2) — efectul actualizării Google
    din 20 august asupra traficului organic, nu o problemă de execuție.

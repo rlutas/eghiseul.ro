@@ -32,12 +32,14 @@ export const DIVIDEND_TAX_RATE = 0.16;
 export const PROFIT_SPLIT = 0.5;
 
 /**
- * Costul LUNAR al platformei alocat serviciilor imobiliare: găzduire +
- * programe de dezvoltare, 500 lei/lună în total (confirmat de Raul,
- * 07.09.2026). Infrastructura reală (Netlify + Supabase + Prisma) costă
- * ~730 lei/lună, dar deservește toate platformele — 500 e partea alocată aici.
+ * Costul lunar de platformă alocat serviciilor imobiliare.
+ *
+ * **0 din decizia lui Raul (07.09.2026):** găzduirea și programele de
+ * dezvoltare (~730 lei/lună real, pentru TOATE platformele) NU se repartizează
+ * pe zona imobiliară — rămân cheltuială generală a firmei. Mecanismul de
+ * alocare rămâne în cod; se schimbă doar valoarea de aici dacă se revine.
  */
-export const PLATFORM_COST_PER_MONTH = 500;
+export const PLATFORM_COST_PER_MONTH = 0;
 
 /** Prima comandă plătită pe serviciile lui — începutul colaborării. */
 export const SETTLEMENT_PERIOD_START = '2026-07-07T00:00:00.000Z';
@@ -56,7 +58,11 @@ export const LAST_SETTLEMENT = {
 
 /** Costurile care se scad din venitul net, în afara taxelor OCPI. */
 export interface SettlementExtraCosts {
-  /** Taxe OCPI estimate pentru comenzile încasate dar încă nelucrate. */
+  /**
+   * Taxe OCPI estimate pentru comenzile încasate dar încă nelucrate.
+   * INFORMATIV — nu se scade din profit (decizia lui Raul, 07.09.2026); e
+   * avertismentul că profitul perioadei va scădea când intră taxele.
+   */
   pendingOcpi?: number;
   /** Comisioanele procesatorului de plăți (Stripe), reale, per comandă. */
   stripeFees?: number;
@@ -85,7 +91,7 @@ export interface SettlementBreakdown {
   commission: number;
   /** Cota de găzduire/infrastructură. */
   platformCost: number;
-  /** Provizion pentru taxele OCPI ale comenzilor încă nelucrate. */
+  /** Taxe OCPI estimate pe comenzile nelucrate — informativ, NU scăzute. */
   pendingOcpi: number;
   /** Suma tuturor costurilor scăzute din net. */
   totalCosts: number;
@@ -119,8 +125,10 @@ export function computeSettlementBreakdown(
   const commission = Number(extra.commission) || 0;
   const platformCost = Number(extra.platformCost) || 0;
   const pendingOcpi = Number(extra.pendingOcpi) || 0;
-  // Comisionul NU intră aici: el se scade din partea colaboratorului, la final.
-  const totalCosts = ocpi + stripeFees + platformCost + pendingOcpi;
+  // Costurile care se scad efectiv: taxele plătite la instituție și comisionul
+  // procesatorului de plăți. Comisionul colaboratorului se scade din partea
+  // LUI, la final; taxele estimate pe comenzile nelucrate rămân informative.
+  const totalCosts = ocpi + stripeFees + platformCost;
 
   const netOfVat = collected / (1 + VAT_RATE);
   const grossProfit = netOfVat - totalCosts;
