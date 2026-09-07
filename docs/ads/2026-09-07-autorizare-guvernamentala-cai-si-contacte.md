@@ -110,7 +110,71 @@ de lege. Se leagă direct de testul deja pornit pe ecazier, unde advertiserul ve
 **De cerut:** o adeverință de la Baroul Satu Mare care atestă înscrierea în tablou +
 linkul public al tabloului. E hârtie oficială, se obține în câteva zile.
 
-## 5. Arma principală: cererile pe Legea 544/2001
+## 5. Peste instituțiile emitente: unde scriem mai sus
+
+IGPR și DEPABD nu pot crea singure un mecanism care nu există în lege. Pentru asta, și
+pentru presiune reală pe Google, sunt trei uși mai sus — toate cu procedură formală și
+gratuită:
+
+### ANCOM — Coordonatorul pentru Servicii Digitale din România (DSA)
+Cea mai directă. Prin **Legea nr. 50/2024** (punerea în aplicare a Regulamentului DSA),
+**ANCOM este autoritatea națională pentru supravegherea platformelor online**. Orice
+persoană poate depune plângere împotriva unui furnizor de servicii digitale.
+
+- Se depune prin **formularul online dedicat serviciilor digitale**, pe InfoCentru ANCOM:
+  https://infocentru.ancom.ro/regulament-servicii-digitale/
+- Termen: **90 de zile**, prelungibil cu încă 90 în cazuri complexe
+- Google e stabilit în Irlanda → ANCOM transmite plângerea coordonatorului irlandez
+  (Coimisiún na Meán) și **intermediază comunicarea între părți**. Adică: dosarul intră pe
+  circuitul oficial european, nu mai depinde de bunăvoința suportului Google.
+- Temeiul concret: DSA **art. 17** (obligația de a motiva restricțiile impuse
+  beneficiarilor serviciului — noi suntem beneficiari, ca advertiseri), **art. 20**
+  (mecanism intern de contestare eficient), **art. 21** (soluționare extrajudiciară).
+
+### Consiliul Concurenței
+- Se depune un **formular de plângere tipizat** (anexă la Regulamentul privind analiza și
+  soluționarea plângerilor) — comunicarea informațiilor din formular e condiția ca sesizarea
+  să fie tratată ca plângere.
+- Email: **office@consiliulconcurentei.ro** · Portal: https://portal.consiliulconcurentei.ro
+- Adresă: Piața Presei Libere nr. 1, corp D1, sector 1, București, 013701
+- Program registratură: L–J 8:30–17:00, V 8:30–14:30
+- Argumentul: tratament discriminatoriu între întreprinderi aflate în situație identică, de
+  către o platformă cu poziție dominantă (Alphabet = **gatekeeper** conform DMA, Reg. UE
+  2022/1925). Consiliul are deja studii publicate exact pe tema **barierelor de autorizare**
+  ca problemă de concurență, deci subiectul nu le e străin.
+
+### MEDAT — Ministerul Economiei, Digitalizării, Antreprenoriatului și Turismului
+Ministerul care coordonează digitalizarea (și în subordinea căruia lucrează ADR). Aici
+mergem pe latura de **politică publică**: nu cerem să ne rezolve cu Google, cerem să
+constate golul legislativ.
+
+- Email registratură: **registratura@economie.gov.ro** · Telefon: **0372 492 630**
+- Adresă: Calea Victoriei nr. 152, sector 1, București, 010096
+- Formular petiții: https://economie.gov.ro/formular-petitii/
+- De adresat: **Direcția Generală Comunicații Electronice, Politici și Strategii în
+  Digitalizare**
+- Mesajul: în lipsa oricărei forme de recunoaștere oficială a operatorilor privați care
+  asistă cetățenii la obținerea documentelor publice, platformele internaționale blochează
+  discreționar firme românești perfect legale. Cerem analizarea creării unui registru sau
+  atestat.
+
+*Ministerele de resort, dacă vrem și acolo:* **MAI** (pentru IGPR și DEPABD) și
+**Ministerul Finanțelor** (pentru ANAF). Utile ca presiune, dar MEDAT e adresa corectă
+pentru problema de fond.
+
+## 6. Arma principală: cererile pe Legea 544/2001
+
+> **Observația avocatei (07.09, Tarța Gabriela):** în prima variantă a cererilor,
+> punctul 1 („poate fi o firmă autorizată?") se contrazicea cu punctul 3 („singura cale e
+> personal / procură / avocat"). Formulate așa, riscam un răspuns care să pară că firmele
+> nu au dreptul să presteze — exact opusul a ce vrem să demonstrăm. **Noi trebuie să
+> arătăm că lucrăm prin avocat**, iar asta e legal și recunoscut.
+>
+> **Cererile au fost rescrise în consecință**: întâi cerem confirmarea căii legale pe care
+> o folosim (depunerea prin avocat, cu împuternicire avocațială), apoi confirmarea că nu
+> există nicio interdicție ca o firmă să ofere asistență în acest cadru, și abia la final
+> întrebarea despre un eventual regim de autorizare. Ordinea contează: răspunsul devine o
+> confirmare a legalității noastre, nu o constatare a lipsei unui drept.
 
 Instituțiile sunt **obligate** să răspundă în scris (10 zile, maxim 30). Ambele răspunsuri
 posibile ne folosesc:
@@ -123,13 +187,21 @@ posibile ne folosesc:
 
 ## Ordinea în care le facem
 
-1. **ANAF + CCF** — singura cale care poate produce o autorizare reală. Întâi întrebăm CCF
-   condițiile exacte, apoi vedem dacă avem/aducem consultantul fiscal.
-2. **544/2001 la IGPR și DEPABD** — obținem în scris că mecanismul nu există. Muniție.
-3. **Baroul Satu Mare** — adeverință + link public către tablou.
-4. **544/2001 la ANAF** — întrebăm explicit dacă statutul de împuternicit înregistrat sau
-   de societate de consultanță fiscală constituie o recunoaștere oficială pe care o putem
-   invoca. Un „da" scris de la ANAF valorează cât toată corespondența cu Google.
+**Săptămâna asta (gratis, doar timp):**
+1. **544/2001 la IGPR, ANAF și DEPABD** — obținem în scris că mecanismul nu există (sau
+   care este). Termen legal de răspuns: 10 zile, maxim 30. Astea sunt fundația dosarului.
+2. **Baroul Satu Mare** — adeverință + link public către tabloul avocaților.
+3. **MEDAT** — sesizarea de politică publică. Nu așteptăm minuni, dar intră la dosar și
+   e singura instituție care poate crea mecanismul care lipsește.
+
+**După ce vin răspunsurile (2–4 săptămâni):**
+4. **ANCOM (DSA)** — plângerea împotriva Google, cu răspunsurile oficiale atașate ca probe.
+   Fără ele plângerea e o opinie; cu ele e un dosar.
+5. **Consiliul Concurenței** — formularul de plângere, cu aceleași probe.
+
+**În paralel, singura cale de autorizare reală:**
+6. **CCF** — condițiile de autorizare ca societate de consultanță fiscală; dacă găsim
+   consultantul fiscal asociat-administrator, cazierul fiscal se deblochează legitim.
 
 Textele gata de trimis: [`2026-09-07-emailuri-institutii.txt`](2026-09-07-emailuri-institutii.txt).
 
