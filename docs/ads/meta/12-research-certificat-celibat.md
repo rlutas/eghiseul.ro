@@ -91,3 +91,53 @@ notarială.**
   se schimbă complet poziționarea față de concurentul de 999 lei.
 - **Apostila:** ori coborâm add-on-ul la nivelul pieței, ori explicăm de ce nu e nevoie de ea în UE
   (a doua variantă e și mai onestă, și mai bună comercial).
+
+---
+
+## Termenul REAL, măsurat în baza noastră (nu estimat)
+
+Interogat pe tot istoricul, `orders.payment_status='paid'`, durata de la plată la `completed`:
+
+| Serviciu | Finalizate | Zile med. | Min | Max | În lucru |
+|---|---|---|---|---|---|
+| certificat-nastere | 9 | 20,7 | 13,8 | 31,7 | 5 |
+| extras-multilingv-nastere | 9 | 24,9 | 12,9 | 55,8 | 4 |
+| **certificat-celibat** | **5** | **18,9** | **8,6** | **28,0** | 1 |
+| certificat-casatorie | 4 | 26,1 | 19,4 | 40,6 | 0 |
+| extras-multilingv-casatorie | 2 | 9,1 | 6,6 | 11,7 | 1 |
+
+Cele 6 comenzi de celibat, una câte una:
+
+| Comandă | Status | Plătit | Zile |
+|---|---|---|---|
+| E-260810-3LHKF | completed | 09.08 | 23,7 |
+| E-260802-B5VNY | completed | 01.08 | 8,6 |
+| E-260726-FHD3D | completed | 25.07 | 15,0 |
+| E-260716-RAFUG | completed | 15.07 | 28,0 |
+| E-260714-TCQJV | completed | 13.07 | 19,4 |
+| E-260711-TFVDH | **standby** | 10.07 | 24,8 (blocat pe client) |
+
+### Ce înseamnă
+
+- **Media reală e 18,9 zile calendaristice** (≈13–14 zile lucrătoare), nu 30. Cei 30 din
+  `services.estimated_days` sunt marja de siguranță, nu realitatea.
+- **Cel mai rapid am livrat în 8,6 zile.** Deci ~9 zile e posibil, dar s-a întâmplat o singură dată
+  din cinci — **nu se poate promite**.
+- **Nu putem concura pe viteză cu cele ~5 zile ale lui cazierjudiciarfirma.ro.** Nu am atins
+  niciodată pragul ăsta. Orice anunț care promite „5 zile" ar fi un claim nesubstanțiat — exact ce
+  declanșează verificarea obligatorie la Meta din martie 2026.
+- Formularea onestă și totuși mai bună decât „30 de zile": **„de obicei în 2–4 săptămâni"** sau
+  **„în medie ~3 săptămâni"**. E adevărată pe toate cele 5 comenzi finalizate.
+- 1 din 6 comenzi a rămas în `standby` (așteaptă ceva de la client). La 17% rată de blocaj, un
+  proces de follow-up mai strâns scurtează media mai mult decât orice optimizare de reclamă.
+
+### Poziționarea care rezultă
+
+Nu vindem viteza. Vindem:
+1. **Preț** — 698 vs 999 la singurul concurent care face reclamă (−30%).
+2. **Prin avocat înscris în Barou**, fără procură notarială (Legea 120/2026) — argument pe care
+   concurentul nu îl are.
+3. **Nu te întorci în România** — comparativ cu drumul, nu cu consulatul.
+
+Și tratăm frontal obiecția „la consulat e gratis": răspunsul e programarea, drumul și timpul, nu
+prețul.
