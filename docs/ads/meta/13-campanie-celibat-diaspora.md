@@ -155,3 +155,67 @@ nimic. Am tăiat la **6 replici**: prețul intră la secunda ~6, cardul final la
 
 Ce urmărim ca să validăm alegerea: **hook rate** (3-sec plays ÷ afișări) și dacă Meta alocă spend
 video-ului față de statice. Dacă hook rate-ul e slab, problema e primul cadru, nu durata.
+
+---
+
+## STARE 08.09 — campania e construită, în draft
+
+**Campanie `META_Celibat_Diaspora_2026-09`** (ID 120252416632790556) — `In draft`, nu cheltuie nimic.
+
+| Nivel | Setare | Valoare |
+|---|---|---|
+| Campanie | Obiectiv | Vânzări |
+| | Buget | **75 lei/zi**, la nivel de campanie |
+| | Strategie | Highest volume |
+| Ad set | Nume | `Diaspora RO - broad - IT/ES/DE/UK/FR/BE/AT` |
+| | Conversie | Website → **Initiate checkout** (dataset `eghiseul.ro web`) |
+| | Locații | Austria, Belgia, Germania, Spania, Franța, Marea Britanie, Italia — **fără România** |
+| | Limbă | **Română** ← audiența a scăzut de la 204.200.000 la **3,2–3,7 mil.** |
+| | Vârstă | 18+ (broad, conform recomandării de consolidare) |
+| | Interese | niciunul |
+| | Plasamente | Facebook, Instagram, Threads. **Audience Network și Messenger EXCLUSE** |
+| | „Allow limited spending to excluded placements" | **debifat** — altfel trimitea ~5% din buget înapoi în Audience Network |
+| | Plasamente | 18 incluse, 0 cu cheltuire limitată, 3 excluse |
+| | Start | 8 septembrie 2026, 08:56 |
+| | Advertiser (cerință UE) | EDIGITALIZARE SRL |
+| Anunț | Nume | `C1 Conversatie - video 9x16` |
+| | Identitate | EGhiseul (FB) + eghiseul33 (IG) |
+| | URL | `https://eghiseul.ro/servicii/eliberare-certificat-de-celibat/` |
+| | Multi-advertiser ads | **debifat** (ne-ar fi tăiat creativul, iar noi am calculat safe zones) |
+| | Media | ⛔ **lipsește — vezi mai jos** |
+
+Scorul de campanie a scăzut de la 100 la 75 pentru că am exclus Audience Network. **E intenționat.**
+Meta insistă cu „+25 points: turn on Advantage+ placements" — se ignoră.
+
+### ⛔ Ce NU pot face eu: urcarea creativelor
+
+Meta nu expune un `input[type=file]` în pagină — butonul „Upload" deschide selectorul nativ de
+fișiere al sistemului de operare, pe care extensia de browser nu îl poate controla. Confirmat și
+pe 03.09, acum reconfirmat.
+
+**Pașii pe care îi face Raul** (5 minute):
+
+1. Ads Manager → campania `META_Celibat_Diaspora_2026-09` → anunțul `C1 Conversatie - video 9x16`
+2. **Ad creative → Set up creative → Video ad → Next → Upload**
+3. Alege `~/Projects/eghiseul-ads-video/out/celibat-conversatie-9x16.mp4`
+4. La pasul **Text**, pune (copy-paste din secțiunea „Textele anunțului" de mai sus):
+   - Primary text, Headline, Description
+   - CTA: `Comandă acum`
+5. **Publish**
+
+Pentru celelalte 4 creative: duplică anunțul și schimbă doar media + numele:
+
+| Nume anunț | Fișier |
+|---|---|
+| `C2 Oferta - static 4x5` | `celibat-OfertaBanner-4x5.png` |
+| `C3 UsVsThem - static 4x5` | `celibat-UsVsThem-4x5.png` |
+| `C4 Recenzii - static 4x5` | `celibat-Recenzii-4x5.png` |
+| `C5 Listicle - static 4x5` | `celibat-Listicle-4x5.png` |
+
+Toate cele 5 în ACELAȘI ad set. Textul rămâne identic pe toate — testăm creativul, nu copy-ul.
+
+⚠️ **După publicare, 7 zile fără nicio modificare.** Orice schimbare de buget, targetare sau
+plasamente resetează faza de învățare.
+
+⚠️ **Bugetul total devine 150 lei/zi** cât timp rulează și constatatorul. Recomandarea din `09`
+rămâne: oprește constatatorul (AOV 96 lei, nerentabil pe Meta) și lasă doar celibatul.
