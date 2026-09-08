@@ -1,0 +1,59 @@
+Catre: ads-support@openai.com
+Subiect: Account stuck on "Getting your account ready" for 6 days - no delivery (adacct_6a9803d500b88196a0106a3aba6413b5)
+
+
+Hello,
+
+Our ad account has been stuck on "Getting your account ready" since 2 September and has
+never delivered a single impression. We would like to know whether account verification
+is complete and what is currently blocking delivery.
+
+ACCOUNT
+- Ad account ID: adacct_6a9803d500b88196a0106a3aba6413b5
+- Account name: EDIGITALIZARE SRL
+- Advertiser type: Business
+- Timezone: Bucharest (UTC+03:00)
+- Country: Romania
+
+CAMPAIGN
+- Campaign: OAI_Click_Constatator_2026-09 (type: Clicks)
+- Ad: "Ad1 T1-D1 pe email"
+- Created and launched: 2 September 2026
+- Campaign toggle: ON. Ad toggle: ON.
+- No end date set, budget never reached (zero spend).
+
+CURRENT STATUS
+Both the campaign and the ad show "Not serving" with a single reason:
+
+  "Getting your account ready
+   Getting your account ready. No further action is expected from you at this time.
+   This may take between 5-7 days.
+   Updated: 2026-09-02T11:09:09.496718+00:00"
+
+That timestamp has not changed in 6 days, and the stated 5-7 day window ends today.
+
+DELIVERY: 0 impressions, 0 clicks, EUR 0.00 spend since creation (2 Sep - 8 Sep).
+
+WHAT WE ALREADY CHECKED (per your Troubleshooting Common Issues guide)
+- Billing profile created, payment method valid: Visa ****0827 on file
+- Outstanding balance EUR 0.00, billing threshold EUR 15, next automatic payment Sep 30
+- Campaign budget not reached (zero spend), no end date passed
+- Well past the 24-hour post-launch window and the 7-hour reporting delay
+- Two earlier "Not serving" reasons have already cleared on their own:
+  * "Ad cannot serve in targeted countries - policy restrictions" (cleared 3 Sep)
+  * "Account brand review in progress" (cleared after 3 Sep)
+  Only the account-readiness reason remains.
+
+QUESTIONS
+1. Has account verification completed successfully? If not, what is outstanding?
+2. Is there anything on our side blocking activation that is not surfaced in the UI?
+3. If the account is ready, why does the ad still show "Not serving"?
+
+We are not asking for a policy review - the ad already passed review. We only need the
+account activated so the campaign can start delivering.
+
+Happy to provide screenshots of the status tooltip and the billing page on request.
+
+Thank you,
+Raul Lutas
+EDIGITALIZARE SRL
