@@ -79,7 +79,7 @@ Toate în `~/Projects/eghiseul-ads-video`, randate din cod. Prețul și termenul
 
 | # | Fișier | Format | Unghi |
 |---|---|---|---|
-| 1 | `celibat-conversatie-9x16.mp4` | video 9:16, 12s | conversație — Confession/Relatability |
+| 1 | `celibat-conversatie-9x16.mp4` | video 9:16, **10s** | conversație — Confession/Relatability |
 | 2 | `celibat-OfertaBanner-4x5.png` | static 4:5 | Offer-First Banner (preț dominant) |
 | 3 | `celibat-UsVsThem-4x5.png` | static 4:5 | alternativa reală: „mă duc eu în țară" |
 | 4 | `celibat-Recenzii-4x5.png` | static 4:5 | testimoniale reale |
@@ -93,18 +93,22 @@ Niciunul nu conține document, ștampilă sau sigiliu.
 **URL final:** `https://eghiseul.ro/servicii/eliberare-certificat-de-celibat/`
 ⚠️ NU `/servicii/certificat-celibat/` — face 308 spre cel de mai sus, pierdem un hop.
 
-**Primary text (același pe toate, testăm creativul nu copy-ul):**
+**Primary text (același pe toate, testăm creativul nu copy-ul).**
+⚠️ Scris FĂRĂ DIACRITICE, ca și creativele — decizie Raul: cu diacritice „se vede ciudat scrisul",
+iar logo-ul e oricum „eGHISEUL".
 
-> Te căsătorești în străinătate și primăria îți cere dovada că ești necăsătorit din România.
-> O obținem noi și ți-o trimitem acasă. Nu te întorci în țară și nu aștepți la notar sau consulat.
+> Te casatoresti in strainatate si primaria iti cere dovada ca esti necasatorit din Romania.
+> O obtinem noi si ti-o trimitem acasa. Nu te intorci in tara si nu astepti la notar sau consulat.
 >
-> 698 lei, de obicei în 7–15 zile. Opțional: traducere, apostilă și livrare la adresa ta.
+> 698 lei, de obicei in 7-15 zile. Optional: traducere, apostila si livrare la adresa ta.
 >
-> Serviciu privat de intermediere și asistență, prin avocat colaborator. Nu suntem instituție publică.
+> 4,9 din 457 de recenzii Google.
+>
+> Serviciu privat de intermediere si asistenta, prin avocat colaborator. Nu suntem institutie publica.
 
-**Headline:** `Adeverința de celibat, fără drum în România`
-**Description:** `698 lei · 7–15 zile · prin avocat, fără procură notarială`
-**CTA:** `Comandă acum` (Shop Now / Order now)
+**Headline:** `Adeverinta de celibat, fara drum in Romania`
+**Description:** `698 lei · 7-15 zile · prin avocat, fara procura notariala`
+**CTA:** `Comandă acum` (butonul e ales dintr-o listă fixă a Meta, nu îl scriem noi)
 
 ### Reguli respectate în copy
 - fără „documente oficiale" / „acte oficiale" / „eliberat de stat"
@@ -135,3 +139,19 @@ nu creativul. Nu producem încă 5 creative noi.
    Recomandarea din `09`: oprim constatatorul la ziua 5 și mutăm.
 2. **Uploadul creativelor.** Din experiența de pe 03.09, încărcarea imaginilor din extensia de
    browser nu funcționează pe Meta — pasul ăsta îl face Raul manual.
+
+---
+
+## Nota despre durata video-ului (08.09)
+
+Research-ul **nu conține** un benchmark de durată pentru reclamele Meta pe servicii — nici Motion,
+nici Meta nu publică unul. Nu inventăm o cifră.
+
+Conține însă ceva care ne-a obligat să scurtăm: Motion, pe 578.750 de creative, constată că
+**„mesajele care întârzie claritatea sau cer interpretare tind să sufere când atenția e limitată"**.
+
+Prima versiune avea 8 replici, iar prețul apărea în secunda 8 — cine se uita 3 secunde nu afla
+nimic. Am tăiat la **6 replici**: prețul intră la secunda ~6, cardul final la ~7, total **10s**.
+
+Ce urmărim ca să validăm alegerea: **hook rate** (3-sec plays ÷ afișări) și dacă Meta alocă spend
+video-ului față de statice. Dacă hook rate-ul e slab, problema e primul cadru, nu durata.
