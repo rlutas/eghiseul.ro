@@ -219,3 +219,53 @@ plasamente resetează faza de învățare.
 
 ⚠️ **Bugetul total devine 150 lei/zi** cât timp rulează și constatatorul. Recomandarea din `09`
 rămâne: oprește constatatorul (AOV 96 lei, nerentabil pe Meta) și lasă doar celibatul.
+
+---
+
+## ✅ PUBLICAT 08.09, ora 09:07
+
+Campania e **live**, `Processing` (Meta procesează/verifică anunțul).
+
+| | |
+|---|---|
+| Campanie | `META_Celibat_Diaspora_2026-09` — activă, 75 lei/zi |
+| Ad set | `Diaspora RO - broad - IT/ES/DE/UK/FR/BE/AT` — activ, Processing |
+| Anunț | `C1 Conversatie - video 9x16` — activ, Processing |
+
+### Ce s-a mai făcut la publicare
+
+**Trei variante de video, una per raport de aspect** (Raul le-a urcat, eu le-am randat):
+`celibat-conversatie-9x16.mp4` (Reels/Stories), `-1x1.mp4` (feed), `-16x9.mp4` (coloana din
+dreapta, in-stream). Marginile sigure sunt prop în cod: 250/350px pe vertical, 96/44 pe pătrat,
+96/48 cu coloană centrată pe orizontal. Fără varianta 16:9 nativă, Meta avertiza că anunțul nu va
+rula pe unele plasamente.
+
+**Textele** — primary text, headline, description, CTA `Order now`. Toate fără diacritice.
+
+🔴 **Advantage+ creative enhancements — TOATE OPRITE.** Erau pornite implicit:
+- `Text improvements` (Meta AI) — ar fi rearanjat/generat textul. Pe un serviciu juridic, un
+  headline inventat de AI devine claim nesubstanțiat.
+- `Video touch-ups` (Meta AI) — ar fi modificat un video compus cu safe zones calculate.
+- `Flex media`, `Add details to ad layout` — ar fi rearanjat sau adăugat imagini.
+
+🔴 **Advantage+ creative image generation — nicio imagine selectată.** Meta oferea imagini generate
+cu AI. Refuzate: exact tipul de creativ care poate declanșa clasificatorul „forged goods" care ne-a
+respins deja C0, iar research-ul Ipsos arată că AI-ul pierde tocmai pe partea emoțională.
+
+Scorul de campanie: 98. Meta insistă în continuare cu „+22 puncte" pentru enhancements și
+Advantage+ placements. **Se ignoră** — sunt exact lucrurile pe care le-am oprit deliberat.
+
+### Observație colaterală: fixul de CAPI se vede deja
+
+Campania de constatator arată acum **2 InitiateCheckout la 146,95 lei**, față de 1 la 235,47 lei
+înainte de 07.09. Același buget, același creativ — diferența e că evenimentul pleacă acum și
+server-side. Nu e o îmbunătățire de performanță, e măsurare care înainte lipsea.
+
+### Ce urmează
+
+1. **7 zile fără nicio modificare.** Orice schimbare resetează faza de învățare.
+2. Celelalte 4 creative (staticele 4:5) se adaugă ca anunțuri noi în ACELAȘI ad set — duplici
+   anunțul și schimbi doar media și numele. Nu e urgent; se poate face și mâine.
+3. La ziua 7 citim: distribuția spend-ului între creative, cost per InitiateCheckout, hook rate,
+   CTR outbound, LPV ÷ Outbound Clicks.
+4. **Decizia rămasă:** constatatorul rulează în paralel, deci total 150 lei/zi.
