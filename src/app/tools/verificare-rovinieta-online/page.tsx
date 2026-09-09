@@ -188,23 +188,29 @@ export default function VerificareRovinietaPage() {
         <article className="py-12 lg:py-16 bg-neutral-50">
           <div className="container mx-auto px-4 max-w-[760px]">
             <div className="prose prose-neutral max-w-none prose-headings:font-bold prose-headings:text-secondary-900 prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-4 prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-3 prose-p:text-neutral-700 prose-p:leading-relaxed prose-li:text-neutral-700 prose-li:marker:text-primary-500 prose-a:text-primary-700 prose-a:font-medium prose-strong:text-secondary-900 prose-table:text-sm prose-th:bg-neutral-100 prose-th:text-secondary-900 prose-td:align-top">
-              <h2>Ce este rovinieta și cum verifici valabilitatea</h2>
-              <h3>Definiția și importanța rovinietei</h3>
+              <h2>Ce este rovinieta și ce înseamnă rezultatul verificării</h2>
               <p>
-                Rovinieta este un document electronic care atestă plata tarifului de utilizare a rețelei de drumuri
-                naționale din România. Este obligatorie pentru toate vehiculele care circulă pe drumurile naționale
-                și are rolul de a contribui la întreținerea și modernizarea infrastructurii rutiere. Neplata
-                rovinietei poate atrage amenzi substanțiale și restricții de circulație.
-              </p>
-              <h3>Procesul de verificare a valabilității rovinietei online</h3>
-              <p>
-                Verificarea valabilității rovinietei online este un proces simplu și rapid. Poți verifica instant dacă
-                rovinieta ta este validă, folosind doar numărul de înmatriculare. Serviciul este disponibil 24/7 și te
-                ajută să eviți amenzile cauzate de expirarea rovinietei.
+                Rovinieta e taxa de drum din România, plătită pentru rețeaua de drumuri naționale.
+                Nu mai există autocolant pe parbriz din 2010: e o înregistrare electronică legată de{' '}
+                <strong>numărul de înmatriculare</strong>, pe care camerele și patrulele o citesc
+                direct din baza de date CNAIR.
               </p>
               <p>
-                Pașii sunt simpli: introduci numărul de înmatriculare, primești rezultatul verificării instant pe
-                ecran și poți repeta procesul pentru a verifica o altă mașină.
+                Asta explică și partea care încurcă lumea la vânzarea mașinii: rovinieta urmează
+                numărul, nu proprietarul. Dacă mașina se vinde cu aceleași plăcuțe, rovinieta rămâne
+                valabilă până la data ei. Dacă se reînmatriculează, rovinieta veche nu se transferă și
+                nu se restituie.
+              </p>
+              <p>
+                Verificarea de mai sus îți spune trei lucruri: dacă există o rovinietă activă pe numărul
+                introdus, până când e valabilă și pe ce categorie de vehicul a fost cumpărată. Ultima
+                contează mai mult decât pare: o rovinietă luată pe categoria greșită e tratată ca
+                inexistentă la control.
+              </p>
+              <p>
+                Dacă tocmai ai plătit și verificarea spune că nu există, mai așteaptă. Înregistrarea nu
+                e instantanee în toate cazurile, iar între plată și apariția în sistem pot trece câteva
+                minute. Reia verificarea, nu cumpăra a doua oară.
               </p>
 
               <div className="not-prose rounded-2xl border border-amber-200 bg-amber-50 p-5 flex items-start gap-3 my-6">
@@ -226,15 +232,25 @@ export default function VerificareRovinietaPage() {
                 <li>Drumuri naționale principale</li>
                 <li>Drumuri naționale secundare</li>
               </ul>
-              <p>Practic, rovinieta este echivalentul taxei de autostradă în România.</p>
+              <p>
+                Spre deosebire de sistemele cu bariere din alte țări, rovinieta se plătește pe
+                perioadă, nu pe kilometri: aceeași sumă, indiferent dacă faci zece kilometri sau o mie
+                în intervalul cumpărat.
+              </p>
 
               <h3>Drumuri unde NU este necesară rovinieta</h3>
               <p>Nu ai nevoie de rovinietă dacă circuli pe:</p>
               <ul>
-                <li>Drumuri județene</li>
-                <li>Drumuri comunale</li>
-                <li>Drumuri naționale la trecerea prin municipii</li>
+                <li>Drumuri județene (DJ) și comunale (DC)</li>
+                <li>Străzi din interiorul localităților</li>
+                <li>Porțiunea de drum național care traversează un municipiu</li>
               </ul>
+              <p>
+                Ultima e capcana. Un drum național care intră în oraș rămâne drum național, dar pe
+                porțiunea din interiorul municipiului nu se cere rovinietă. Problema e că tot el iese
+                din oraș, iar acolo se cere din nou — motiv pentru care „am mers doar prin oraș" nu
+                ține la control dacă ai fost prins pe centură sau la ieșire.
+              </p>
 
               <h3>Excepții de la plata rovinietei</h3>
               <p>Sunt scutite de plata rovinietei:</p>
