@@ -1,0 +1,677 @@
+{
+ "EGH": {
+  "totalPairsOver25": 972,
+  "nonLocationPairsOver25": 83,
+  "allNonLocation": [
+   {
+    "a": "https://eghiseul.ro/servicii/extras-multilingv-certificat-casatorie",
+    "b": "https://eghiseul.ro/servicii/extras-multilingv-certificat-nastere",
+    "j": 0.713,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/cazier-judiciar-online/persoana-fizica",
+    "b": "https://eghiseul.ro/servicii/cazier-judiciar-online/persoana-juridica",
+    "j": 0.409,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/copie-plan-incadrare",
+    "b": "https://eghiseul.ro/servicii/plan-amplasament-delimitare",
+    "j": 0.363,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/copie-plan-incadrare",
+    "b": "https://eghiseul.ro/servicii/extras-plan-cadastral",
+    "j": 0.361,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/copie-plan-cadastral",
+    "b": "https://eghiseul.ro/servicii/extras-plan-cadastral",
+    "j": 0.353,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/copie-plan-cadastral",
+    "b": "https://eghiseul.ro/servicii/copie-plan-incadrare",
+    "j": 0.352,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/copie-inventar-coordonate",
+    "b": "https://eghiseul.ro/servicii/copie-plan-incadrare",
+    "j": 0.341,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/copie-plan-cadastral",
+    "b": "https://eghiseul.ro/servicii/plan-amplasament-delimitare",
+    "j": 0.341,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/extras-plan-cadastral",
+    "b": "https://eghiseul.ro/servicii/plan-amplasament-delimitare",
+    "j": 0.33,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/certificat-sarcini",
+    "b": "https://eghiseul.ro/servicii/extras-plan-cadastral",
+    "j": 0.329,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/certificat-sarcini",
+    "b": "https://eghiseul.ro/servicii/copie-plan-incadrare",
+    "j": 0.325,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/copie-inventar-coordonate",
+    "b": "https://eghiseul.ro/servicii/copie-plan-cadastral",
+    "j": 0.325,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/certificat-sarcini",
+    "b": "https://eghiseul.ro/servicii/copie-plan-cadastral",
+    "j": 0.322,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/certificat-sarcini",
+    "b": "https://eghiseul.ro/servicii/plan-amplasament-delimitare",
+    "j": 0.318,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/copie-inventar-coordonate",
+    "b": "https://eghiseul.ro/servicii/plan-amplasament-delimitare",
+    "j": 0.316,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/copie-inventar-coordonate",
+    "b": "https://eghiseul.ro/servicii/extras-plan-cadastral",
+    "j": 0.314,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/copie-contract-vanzare",
+    "b": "https://eghiseul.ro/servicii/copie-plan-cadastral",
+    "j": 0.312,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/copie-plan-incadrare",
+    "b": "https://eghiseul.ro/servicii/copie-releveu",
+    "j": 0.31,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/copie-contract-vanzare",
+    "b": "https://eghiseul.ro/servicii/copie-intabulare",
+    "j": 0.307,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/copie-plan-cadastral",
+    "b": "https://eghiseul.ro/servicii/copie-releveu",
+    "j": 0.305,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/copie-carte-funciara",
+    "b": "https://eghiseul.ro/servicii/copie-plan-cadastral",
+    "j": 0.304,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/copie-intabulare",
+    "b": "https://eghiseul.ro/servicii/copie-plan-cadastral",
+    "j": 0.303,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/copie-contract-vanzare",
+    "b": "https://eghiseul.ro/servicii/copie-plan-incadrare",
+    "j": 0.302,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/certificat-sarcini",
+    "b": "https://eghiseul.ro/servicii/copie-inventar-coordonate",
+    "j": 0.301,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/copie-carte-funciara",
+    "b": "https://eghiseul.ro/servicii/copie-contract-vanzare",
+    "j": 0.3,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/copie-releveu",
+    "b": "https://eghiseul.ro/servicii/extras-plan-cadastral",
+    "j": 0.298,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/copie-releveu",
+    "b": "https://eghiseul.ro/servicii/plan-amplasament-delimitare",
+    "j": 0.294,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/copie-arhiva-ocpi",
+    "b": "https://eghiseul.ro/servicii/copie-plan-cadastral",
+    "j": 0.293,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/copie-contract-vanzare",
+    "b": "https://eghiseul.ro/servicii/plan-amplasament-delimitare",
+    "j": 0.293,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/copie-contract-vanzare",
+    "b": "https://eghiseul.ro/servicii/copie-inventar-coordonate",
+    "j": 0.292,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/copie-inventar-coordonate",
+    "b": "https://eghiseul.ro/servicii/copie-releveu",
+    "j": 0.292,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/copie-contract-vanzare",
+    "b": "https://eghiseul.ro/servicii/extras-plan-cadastral",
+    "j": 0.291,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/copie-arhiva-ocpi",
+    "b": "https://eghiseul.ro/servicii/copie-plan-incadrare",
+    "j": 0.29,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/eliberare-certificat-de-casatorie",
+    "b": "https://eghiseul.ro/servicii/eliberare-certificat-de-nastere",
+    "j": 0.29,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/copie-intabulare",
+    "b": "https://eghiseul.ro/servicii/extras-plan-cadastral",
+    "j": 0.289,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/copie-carte-funciara",
+    "b": "https://eghiseul.ro/servicii/copie-intabulare",
+    "j": 0.288,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/copie-intabulare",
+    "b": "https://eghiseul.ro/servicii/copie-plan-incadrare",
+    "j": 0.288,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/copie-arhiva-ocpi",
+    "b": "https://eghiseul.ro/servicii/extras-plan-cadastral",
+    "j": 0.287,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/copie-carte-funciara",
+    "b": "https://eghiseul.ro/servicii/copie-plan-incadrare",
+    "j": 0.287,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/certificat-sarcini",
+    "b": "https://eghiseul.ro/servicii/copie-intabulare",
+    "j": 0.286,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/copie-carte-funciara",
+    "b": "https://eghiseul.ro/servicii/extras-plan-cadastral",
+    "j": 0.285,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/extras-cf-colectiv",
+    "b": "https://eghiseul.ro/servicii/extras-plan-cadastral",
+    "j": 0.285,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/certificat-sarcini",
+    "b": "https://eghiseul.ro/servicii/copie-releveu",
+    "j": 0.284,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/copie-intabulare",
+    "b": "https://eghiseul.ro/servicii/plan-amplasament-delimitare",
+    "j": 0.284,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/certificat-sarcini",
+    "b": "https://eghiseul.ro/servicii/copie-carte-funciara",
+    "j": 0.283,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/certificat-sarcini",
+    "b": "https://eghiseul.ro/servicii/copie-contract-vanzare",
+    "j": 0.283,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/copie-carte-funciara",
+    "b": "https://eghiseul.ro/servicii/plan-amplasament-delimitare",
+    "j": 0.282,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/copie-plan-incadrare",
+    "b": "https://eghiseul.ro/servicii/extras-cf-colectiv",
+    "j": 0.282,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/copie-contract-vanzare",
+    "b": "https://eghiseul.ro/servicii/copie-releveu",
+    "j": 0.281,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/copie-arhiva-ocpi",
+    "b": "https://eghiseul.ro/servicii/copie-contract-vanzare",
+    "j": 0.28,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/copie-arhiva-ocpi",
+    "b": "https://eghiseul.ro/servicii/plan-amplasament-delimitare",
+    "j": 0.28,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/copie-intabulare",
+    "b": "https://eghiseul.ro/servicii/copie-releveu",
+    "j": 0.279,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/copie-arhiva-ocpi",
+    "b": "https://eghiseul.ro/servicii/copie-inventar-coordonate",
+    "j": 0.278,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/copie-intabulare",
+    "b": "https://eghiseul.ro/servicii/copie-inventar-coordonate",
+    "j": 0.278,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/certificat-sarcini",
+    "b": "https://eghiseul.ro/servicii/extras-cf-colectiv",
+    "j": 0.275,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/copie-arhiva-ocpi",
+    "b": "https://eghiseul.ro/servicii/copie-intabulare",
+    "j": 0.275,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/copie-arhiva-ocpi",
+    "b": "https://eghiseul.ro/servicii/copie-releveu",
+    "j": 0.275,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/copie-carte-funciara",
+    "b": "https://eghiseul.ro/servicii/copie-inventar-coordonate",
+    "j": 0.274,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/copie-plan-cadastral",
+    "b": "https://eghiseul.ro/servicii/extras-cf-colectiv",
+    "j": 0.274,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/certificat-sarcini",
+    "b": "https://eghiseul.ro/servicii/copie-arhiva-ocpi",
+    "j": 0.273,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/copie-carte-funciara",
+    "b": "https://eghiseul.ro/servicii/copie-releveu",
+    "j": 0.271,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/copie-releveu",
+    "b": "https://eghiseul.ro/servicii/extras-cf-colectiv",
+    "j": 0.271,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/extras-cf-colectiv",
+    "b": "https://eghiseul.ro/servicii/plan-amplasament-delimitare",
+    "j": 0.268,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/actualizare-adresa-cf",
+    "b": "https://eghiseul.ro/servicii/copie-contract-vanzare",
+    "j": 0.264,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/actualizare-adresa-cf",
+    "b": "https://eghiseul.ro/servicii/copie-intabulare",
+    "j": 0.264,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/copie-carte-funciara",
+    "b": "https://eghiseul.ro/servicii/extras-cf-colectiv",
+    "j": 0.264,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/copie-intabulare",
+    "b": "https://eghiseul.ro/servicii/extras-cf-colectiv",
+    "j": 0.264,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/actualizare-adresa-cf",
+    "b": "https://eghiseul.ro/servicii/copie-plan-incadrare",
+    "j": 0.263,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/actualizare-adresa-cf",
+    "b": "https://eghiseul.ro/servicii/extras-plan-cadastral",
+    "j": 0.263,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/copie-arhiva-ocpi",
+    "b": "https://eghiseul.ro/servicii/copie-carte-funciara",
+    "j": 0.263,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/copie-inventar-coordonate",
+    "b": "https://eghiseul.ro/servicii/extras-cf-colectiv",
+    "j": 0.262,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/actualizare-adresa-cf",
+    "b": "https://eghiseul.ro/servicii/certificat-sarcini",
+    "j": 0.261,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/actualizare-adresa-cf",
+    "b": "https://eghiseul.ro/servicii/copie-plan-cadastral",
+    "j": 0.26,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/actualizare-adresa-cf",
+    "b": "https://eghiseul.ro/servicii/plan-amplasament-delimitare",
+    "j": 0.259,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/copie-contract-vanzare",
+    "b": "https://eghiseul.ro/servicii/extras-cf-colectiv",
+    "j": 0.259,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/extras-plan-cadastral",
+    "b": "https://eghiseul.ro/servicii/identificare-imobil",
+    "j": 0.255,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/actualizare-adresa-cf",
+    "b": "https://eghiseul.ro/servicii/copie-inventar-coordonate",
+    "j": 0.253,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/actualizare-adresa-cf",
+    "b": "https://eghiseul.ro/servicii/copie-carte-funciara",
+    "j": 0.252,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/actualizare-adresa-cf",
+    "b": "https://eghiseul.ro/servicii/copie-releveu",
+    "j": 0.252,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/certificat-detineri-imobile",
+    "b": "https://eghiseul.ro/servicii/certificat-sarcini",
+    "j": 0.252,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/certificat-detineri-imobile",
+    "b": "https://eghiseul.ro/servicii/copie-plan-cadastral",
+    "j": 0.252,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/copie-plan-cadastral",
+    "b": "https://eghiseul.ro/servicii/identificare-imobil",
+    "j": 0.252,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   },
+   {
+    "a": "https://eghiseul.ro/servicii/copie-arhiva-ocpi",
+    "b": "https://eghiseul.ro/servicii/extras-cf-colectiv",
+    "j": 0.251,
+    "loc": false,
+    "ca": "service",
+    "cb": "service"
+   }
+  ]
+ },
+ "CJO": {
+  "totalPairsOver25": 741,
+  "nonLocationPairsOver25": 0,
+  "allNonLocation": []
+ }
+}

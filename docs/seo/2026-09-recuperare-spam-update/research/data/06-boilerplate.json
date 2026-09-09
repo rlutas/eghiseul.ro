@@ -1,0 +1,741 @@
+{
+ "EGH cazier orase (8)": {
+  "n": 8,
+  "medianUniquePct": 23.5,
+  "medianBoilerPct": 75.7,
+  "medianUniqueShingles": 316,
+  "medianWords": 1373,
+  "rows": [
+   {
+    "page": "servicii__cazier-judiciar-online__cluj-napoca.html",
+    "words": 1359,
+    "shingles": 1342,
+    "uniquePct": 22.8,
+    "boilerPct": 76.2,
+    "uniqueShingles": 306
+   },
+   {
+    "page": "servicii__cazier-judiciar-online__constanta.html",
+    "words": 1373,
+    "shingles": 1361,
+    "uniquePct": 24,
+    "boilerPct": 74.7,
+    "uniqueShingles": 327
+   },
+   {
+    "page": "servicii__cazier-judiciar-online__focsani.html",
+    "words": 1333,
+    "shingles": 1316,
+    "uniquePct": 20.1,
+    "boilerPct": 78.2,
+    "uniqueShingles": 264
+   },
+   {
+    "page": "servicii__cazier-judiciar-online__iasi.html",
+    "words": 1375,
+    "shingles": 1364,
+    "uniquePct": 24.3,
+    "boilerPct": 75.1,
+    "uniqueShingles": 331
+   },
+   {
+    "page": "servicii__cazier-judiciar-online__piatra-neamt.html",
+    "words": 1375,
+    "shingles": 1359,
+    "uniquePct": 23,
+    "boilerPct": 75.6,
+    "uniqueShingles": 313
+   },
+   {
+    "page": "servicii__cazier-judiciar-online__ramnicu-valcea.html",
+    "words": 1352,
+    "shingles": 1337,
+    "uniquePct": 21.5,
+    "boilerPct": 76.9,
+    "uniqueShingles": 288
+   },
+   {
+    "page": "servicii__cazier-judiciar-online__satu-mare.html",
+    "words": 1382,
+    "shingles": 1363,
+    "uniquePct": 23.6,
+    "boilerPct": 75.4,
+    "uniqueShingles": 322
+   },
+   {
+    "page": "servicii__cazier-judiciar-online__timisoara.html",
+    "words": 1364,
+    "shingles": 1344,
+    "uniquePct": 23.5,
+    "boilerPct": 75.7,
+    "uniqueShingles": 316
+   }
+  ]
+ },
+ "EGH extras CF judete (42)": {
+  "n": 42,
+  "medianUniquePct": 20.5,
+  "medianBoilerPct": 76.9,
+  "medianUniqueShingles": 147,
+  "medianWords": 746,
+  "rows": [
+   {
+    "page": "servicii__extras-de-carte-funciara__alba.html",
+    "words": 747,
+    "shingles": 733,
+    "uniquePct": 19.9,
+    "boilerPct": 76.7,
+    "uniqueShingles": 146
+   },
+   {
+    "page": "servicii__extras-de-carte-funciara__arad.html",
+    "words": 747,
+    "shingles": 733,
+    "uniquePct": 19.9,
+    "boilerPct": 76.7,
+    "uniqueShingles": 146
+   },
+   {
+    "page": "servicii__extras-de-carte-funciara__arges.html",
+    "words": 924,
+    "shingles": 908,
+    "uniquePct": 32.6,
+    "boilerPct": 60.7,
+    "uniqueShingles": 296
+   },
+   {
+    "page": "servicii__extras-de-carte-funciara__bacau.html",
+    "words": 737,
+    "shingles": 712,
+    "uniquePct": 20.5,
+    "boilerPct": 77.9,
+    "uniqueShingles": 146
+   },
+   {
+    "page": "servicii__extras-de-carte-funciara__bihor.html",
+    "words": 937,
+    "shingles": 910,
+    "uniquePct": 31.9,
+    "boilerPct": 59.9,
+    "uniqueShingles": 290
+   },
+   {
+    "page": "servicii__extras-de-carte-funciara__bistrita-nasaud.html",
+    "words": 736,
+    "shingles": 730,
+    "uniquePct": 22.6,
+    "boilerPct": 76,
+    "uniqueShingles": 165
+   },
+   {
+    "page": "servicii__extras-de-carte-funciara__botosani.html",
+    "words": 735,
+    "shingles": 708,
+    "uniquePct": 20.2,
+    "boilerPct": 78.4,
+    "uniqueShingles": 143
+   },
+   {
+    "page": "servicii__extras-de-carte-funciara__braila.html",
+    "words": 735,
+    "shingles": 708,
+    "uniquePct": 20.2,
+    "boilerPct": 78.4,
+    "uniqueShingles": 143
+   },
+   {
+    "page": "servicii__extras-de-carte-funciara__brasov.html",
+    "words": 961,
+    "shingles": 945,
+    "uniquePct": 32,
+    "boilerPct": 58.4,
+    "uniqueShingles": 302
+   },
+   {
+    "page": "servicii__extras-de-carte-funciara__bucuresti.html",
+    "words": 930,
+    "shingles": 904,
+    "uniquePct": 31.1,
+    "boilerPct": 61.1,
+    "uniqueShingles": 281
+   },
+   {
+    "page": "servicii__extras-de-carte-funciara__buzau.html",
+    "words": 745,
+    "shingles": 730,
+    "uniquePct": 21,
+    "boilerPct": 77,
+    "uniqueShingles": 153
+   },
+   {
+    "page": "servicii__extras-de-carte-funciara__calarasi.html",
+    "words": 744,
+    "shingles": 725,
+    "uniquePct": 22.2,
+    "boilerPct": 76.6,
+    "uniqueShingles": 161
+   },
+   {
+    "page": "servicii__extras-de-carte-funciara__caras-severin.html",
+    "words": 746,
+    "shingles": 750,
+    "uniquePct": 22,
+    "boilerPct": 74.9,
+    "uniqueShingles": 165
+   },
+   {
+    "page": "servicii__extras-de-carte-funciara__cluj.html",
+    "words": 944,
+    "shingles": 927,
+    "uniquePct": 32.4,
+    "boilerPct": 58.8,
+    "uniqueShingles": 300
+   },
+   {
+    "page": "servicii__extras-de-carte-funciara__constanta.html",
+    "words": 954,
+    "shingles": 935,
+    "uniquePct": 32.1,
+    "boilerPct": 59,
+    "uniqueShingles": 300
+   },
+   {
+    "page": "servicii__extras-de-carte-funciara__covasna.html",
+    "words": 748,
+    "shingles": 730,
+    "uniquePct": 19.9,
+    "boilerPct": 77,
+    "uniqueShingles": 145
+   },
+   {
+    "page": "servicii__extras-de-carte-funciara__dambovita.html",
+    "words": 747,
+    "shingles": 731,
+    "uniquePct": 20,
+    "boilerPct": 76.9,
+    "uniqueShingles": 146
+   },
+   {
+    "page": "servicii__extras-de-carte-funciara__dolj.html",
+    "words": 929,
+    "shingles": 909,
+    "uniquePct": 32,
+    "boilerPct": 60.7,
+    "uniqueShingles": 291
+   },
+   {
+    "page": "servicii__extras-de-carte-funciara__galati.html",
+    "words": 935,
+    "shingles": 917,
+    "uniquePct": 28.5,
+    "boilerPct": 60.2,
+    "uniqueShingles": 261
+   },
+   {
+    "page": "servicii__extras-de-carte-funciara__giurgiu.html",
+    "words": 742,
+    "shingles": 718,
+    "uniquePct": 20.1,
+    "boilerPct": 78.3,
+    "uniqueShingles": 144
+   },
+   {
+    "page": "servicii__extras-de-carte-funciara__gorj.html",
+    "words": 736,
+    "shingles": 709,
+    "uniquePct": 20.5,
+    "boilerPct": 78.3,
+    "uniqueShingles": 145
+   },
+   {
+    "page": "servicii__extras-de-carte-funciara__harghita.html",
+    "words": 737,
+    "shingles": 710,
+    "uniquePct": 20.4,
+    "boilerPct": 78.2,
+    "uniqueShingles": 145
+   },
+   {
+    "page": "servicii__extras-de-carte-funciara__hunedoara.html",
+    "words": 740,
+    "shingles": 718,
+    "uniquePct": 19.9,
+    "boilerPct": 77.3,
+    "uniqueShingles": 143
+   },
+   {
+    "page": "servicii__extras-de-carte-funciara__ialomita.html",
+    "words": 741,
+    "shingles": 718,
+    "uniquePct": 19.9,
+    "boilerPct": 78.3,
+    "uniqueShingles": 143
+   },
+   {
+    "page": "servicii__extras-de-carte-funciara__iasi.html",
+    "words": 951,
+    "shingles": 929,
+    "uniquePct": 32.6,
+    "boilerPct": 59.4,
+    "uniqueShingles": 303
+   },
+   {
+    "page": "servicii__extras-de-carte-funciara__ilfov.html",
+    "words": 919,
+    "shingles": 891,
+    "uniquePct": 33.1,
+    "boilerPct": 61.2,
+    "uniqueShingles": 295
+   },
+   {
+    "page": "servicii__extras-de-carte-funciara__maramures.html",
+    "words": 737,
+    "shingles": 709,
+    "uniquePct": 20.3,
+    "boilerPct": 78.3,
+    "uniqueShingles": 144
+   },
+   {
+    "page": "servicii__extras-de-carte-funciara__mehedinti.html",
+    "words": 743,
+    "shingles": 722,
+    "uniquePct": 20.4,
+    "boilerPct": 77.8,
+    "uniqueShingles": 147
+   },
+   {
+    "page": "servicii__extras-de-carte-funciara__mures.html",
+    "words": 946,
+    "shingles": 926,
+    "uniquePct": 31.2,
+    "boilerPct": 58.9,
+    "uniqueShingles": 289
+   },
+   {
+    "page": "servicii__extras-de-carte-funciara__neamt.html",
+    "words": 738,
+    "shingles": 711,
+    "uniquePct": 20.5,
+    "boilerPct": 78.1,
+    "uniqueShingles": 146
+   },
+   {
+    "page": "servicii__extras-de-carte-funciara__olt.html",
+    "words": 742,
+    "shingles": 719,
+    "uniquePct": 20,
+    "boilerPct": 78.2,
+    "uniqueShingles": 144
+   },
+   {
+    "page": "servicii__extras-de-carte-funciara__prahova.html",
+    "words": 915,
+    "shingles": 888,
+    "uniquePct": 32,
+    "boilerPct": 61.4,
+    "uniqueShingles": 284
+   },
+   {
+    "page": "servicii__extras-de-carte-funciara__salaj.html",
+    "words": 742,
+    "shingles": 719,
+    "uniquePct": 20,
+    "boilerPct": 78.2,
+    "uniqueShingles": 144
+   },
+   {
+    "page": "servicii__extras-de-carte-funciara__satu-mare.html",
+    "words": 764,
+    "shingles": 740,
+    "uniquePct": 22.4,
+    "boilerPct": 75.9,
+    "uniqueShingles": 166
+   },
+   {
+    "page": "servicii__extras-de-carte-funciara__sibiu.html",
+    "words": 950,
+    "shingles": 932,
+    "uniquePct": 31.2,
+    "boilerPct": 59.2,
+    "uniqueShingles": 291
+   },
+   {
+    "page": "servicii__extras-de-carte-funciara__suceava.html",
+    "words": 944,
+    "shingles": 922,
+    "uniquePct": 29.7,
+    "boilerPct": 59.9,
+    "uniqueShingles": 274
+   },
+   {
+    "page": "servicii__extras-de-carte-funciara__teleorman.html",
+    "words": 734,
+    "shingles": 707,
+    "uniquePct": 20.1,
+    "boilerPct": 78.5,
+    "uniqueShingles": 142
+   },
+   {
+    "page": "servicii__extras-de-carte-funciara__timis.html",
+    "words": 938,
+    "shingles": 910,
+    "uniquePct": 32,
+    "boilerPct": 59.9,
+    "uniqueShingles": 291
+   },
+   {
+    "page": "servicii__extras-de-carte-funciara__tulcea.html",
+    "words": 736,
+    "shingles": 710,
+    "uniquePct": 20.4,
+    "boilerPct": 78.2,
+    "uniqueShingles": 145
+   },
+   {
+    "page": "servicii__extras-de-carte-funciara__valcea.html",
+    "words": 741,
+    "shingles": 720,
+    "uniquePct": 20.1,
+    "boilerPct": 78.1,
+    "uniqueShingles": 145
+   },
+   {
+    "page": "servicii__extras-de-carte-funciara__vaslui.html",
+    "words": 735,
+    "shingles": 708,
+    "uniquePct": 20.2,
+    "boilerPct": 78.4,
+    "uniqueShingles": 143
+   },
+   {
+    "page": "servicii__extras-de-carte-funciara__vrancea.html",
+    "words": 746,
+    "shingles": 731,
+    "uniquePct": 19.8,
+    "boilerPct": 76.9,
+    "uniqueShingles": 145
+   }
+  ]
+ },
+ "CJO cazier orase (39)": {
+  "n": 39,
+  "medianUniquePct": 13.8,
+  "medianBoilerPct": 86,
+  "medianUniqueShingles": 182,
+  "medianWords": 1381,
+  "rows": [
+   {
+    "page": "cazier-judiciar-online__alba-iulia.html",
+    "words": 1383,
+    "shingles": 1314,
+    "uniquePct": 13.9,
+    "boilerPct": 86,
+    "uniqueShingles": 183
+   },
+   {
+    "page": "cazier-judiciar-online__alexandria.html",
+    "words": 1359,
+    "shingles": 1295,
+    "uniquePct": 11.8,
+    "boilerPct": 87.3,
+    "uniqueShingles": 153
+   },
+   {
+    "page": "cazier-judiciar-online__arad.html",
+    "words": 1453,
+    "shingles": 1412,
+    "uniquePct": 18.8,
+    "boilerPct": 78.6,
+    "uniqueShingles": 266
+   },
+   {
+    "page": "cazier-judiciar-online__bacau.html",
+    "words": 1434,
+    "shingles": 1392,
+    "uniquePct": 17.8,
+    "boilerPct": 79.7,
+    "uniqueShingles": 248
+   },
+   {
+    "page": "cazier-judiciar-online__baia-mare.html",
+    "words": 1381,
+    "shingles": 1310,
+    "uniquePct": 12.2,
+    "boilerPct": 86.3,
+    "uniqueShingles": 160
+   },
+   {
+    "page": "cazier-judiciar-online__bistrita.html",
+    "words": 1358,
+    "shingles": 1294,
+    "uniquePct": 12.5,
+    "boilerPct": 87.4,
+    "uniqueShingles": 162
+   },
+   {
+    "page": "cazier-judiciar-online__botosani.html",
+    "words": 1365,
+    "shingles": 1300,
+    "uniquePct": 12.8,
+    "boilerPct": 87,
+    "uniqueShingles": 166
+   },
+   {
+    "page": "cazier-judiciar-online__braila.html",
+    "words": 1361,
+    "shingles": 1297,
+    "uniquePct": 12.7,
+    "boilerPct": 87.2,
+    "uniqueShingles": 165
+   },
+   {
+    "page": "cazier-judiciar-online__brasov.html",
+    "words": 1434,
+    "shingles": 1388,
+    "uniquePct": 18.4,
+    "boilerPct": 79.1,
+    "uniqueShingles": 255
+   },
+   {
+    "page": "cazier-judiciar-online__bucuresti.html",
+    "words": 1491,
+    "shingles": 1440,
+    "uniquePct": 22.4,
+    "boilerPct": 75.7,
+    "uniqueShingles": 322
+   },
+   {
+    "page": "cazier-judiciar-online__buzau.html",
+    "words": 1360,
+    "shingles": 1296,
+    "uniquePct": 12.5,
+    "boilerPct": 87.3,
+    "uniqueShingles": 162
+   },
+   {
+    "page": "cazier-judiciar-online__calarasi.html",
+    "words": 1357,
+    "shingles": 1292,
+    "uniquePct": 12.5,
+    "boilerPct": 87.5,
+    "uniqueShingles": 161
+   },
+   {
+    "page": "cazier-judiciar-online__cluj.html",
+    "words": 1441,
+    "shingles": 1414,
+    "uniquePct": 19.3,
+    "boilerPct": 77.2,
+    "uniqueShingles": 273
+   },
+   {
+    "page": "cazier-judiciar-online__constanta.html",
+    "words": 1437,
+    "shingles": 1388,
+    "uniquePct": 17.7,
+    "boilerPct": 80,
+    "uniqueShingles": 246
+   },
+   {
+    "page": "cazier-judiciar-online__craiova.html",
+    "words": 1423,
+    "shingles": 1369,
+    "uniquePct": 15.6,
+    "boilerPct": 81.7,
+    "uniqueShingles": 214
+   },
+   {
+    "page": "cazier-judiciar-online__deva.html",
+    "words": 1361,
+    "shingles": 1294,
+    "uniquePct": 12.6,
+    "boilerPct": 87.4,
+    "uniqueShingles": 163
+   },
+   {
+    "page": "cazier-judiciar-online__drobeta-turnu-severin.html",
+    "words": 1379,
+    "shingles": 1322,
+    "uniquePct": 14.6,
+    "boilerPct": 85.4,
+    "uniqueShingles": 193
+   },
+   {
+    "page": "cazier-judiciar-online__focsani.html",
+    "words": 1359,
+    "shingles": 1294,
+    "uniquePct": 12.2,
+    "boilerPct": 87.4,
+    "uniqueShingles": 158
+   },
+   {
+    "page": "cazier-judiciar-online__galati.html",
+    "words": 1416,
+    "shingles": 1362,
+    "uniquePct": 14.5,
+    "boilerPct": 81.6,
+    "uniqueShingles": 197
+   },
+   {
+    "page": "cazier-judiciar-online__giurgiu.html",
+    "words": 1361,
+    "shingles": 1294,
+    "uniquePct": 12.1,
+    "boilerPct": 87.4,
+    "uniqueShingles": 157
+   },
+   {
+    "page": "cazier-judiciar-online__iasi.html",
+    "words": 1477,
+    "shingles": 1431,
+    "uniquePct": 19.8,
+    "boilerPct": 76.3,
+    "uniqueShingles": 284
+   },
+   {
+    "page": "cazier-judiciar-online__miercurea-ciuc.html",
+    "words": 1381,
+    "shingles": 1314,
+    "uniquePct": 13.9,
+    "boilerPct": 86,
+    "uniqueShingles": 182
+   },
+   {
+    "page": "cazier-judiciar-online__oradea.html",
+    "words": 1421,
+    "shingles": 1364,
+    "uniquePct": 16,
+    "boilerPct": 81.5,
+    "uniqueShingles": 218
+   },
+   {
+    "page": "cazier-judiciar-online__piatra-neamt.html",
+    "words": 1381,
+    "shingles": 1313,
+    "uniquePct": 13.8,
+    "boilerPct": 86.1,
+    "uniqueShingles": 181
+   },
+   {
+    "page": "cazier-judiciar-online__pitesti.html",
+    "words": 1436,
+    "shingles": 1400,
+    "uniquePct": 18.1,
+    "boilerPct": 79.3,
+    "uniqueShingles": 253
+   },
+   {
+    "page": "cazier-judiciar-online__ploiesti.html",
+    "words": 1540,
+    "shingles": 1500,
+    "uniquePct": 23.7,
+    "boilerPct": 73.7,
+    "uniqueShingles": 356
+   },
+   {
+    "page": "cazier-judiciar-online__ramnicu-valcea.html",
+    "words": 1378,
+    "shingles": 1311,
+    "uniquePct": 13.8,
+    "boilerPct": 86.2,
+    "uniqueShingles": 181
+   },
+   {
+    "page": "cazier-judiciar-online__resita.html",
+    "words": 1368,
+    "shingles": 1304,
+    "uniquePct": 13.3,
+    "boilerPct": 86.7,
+    "uniqueShingles": 173
+   },
+   {
+    "page": "cazier-judiciar-online__satu-mare.html",
+    "words": 1450,
+    "shingles": 1404,
+    "uniquePct": 17.7,
+    "boilerPct": 79,
+    "uniqueShingles": 249
+   },
+   {
+    "page": "cazier-judiciar-online__sfantu-gheorghe.html",
+    "words": 1384,
+    "shingles": 1314,
+    "uniquePct": 14,
+    "boilerPct": 86,
+    "uniqueShingles": 184
+   },
+   {
+    "page": "cazier-judiciar-online__sibiu.html",
+    "words": 1423,
+    "shingles": 1368,
+    "uniquePct": 15.4,
+    "boilerPct": 81.3,
+    "uniqueShingles": 211
+   },
+   {
+    "page": "cazier-judiciar-online__slobozia.html",
+    "words": 1361,
+    "shingles": 1297,
+    "uniquePct": 12.5,
+    "boilerPct": 87.2,
+    "uniqueShingles": 162
+   },
+   {
+    "page": "cazier-judiciar-online__suceava.html",
+    "words": 1358,
+    "shingles": 1289,
+    "uniquePct": 11.9,
+    "boilerPct": 87.7,
+    "uniqueShingles": 153
+   },
+   {
+    "page": "cazier-judiciar-online__targoviste.html",
+    "words": 1363,
+    "shingles": 1295,
+    "uniquePct": 12.7,
+    "boilerPct": 87.3,
+    "uniqueShingles": 164
+   },
+   {
+    "page": "cazier-judiciar-online__targu-mures.html",
+    "words": 1383,
+    "shingles": 1315,
+    "uniquePct": 13.8,
+    "boilerPct": 85.9,
+    "uniqueShingles": 182
+   },
+   {
+    "page": "cazier-judiciar-online__timisoara.html",
+    "words": 1435,
+    "shingles": 1395,
+    "uniquePct": 17.6,
+    "boilerPct": 78.5,
+    "uniqueShingles": 245
+   },
+   {
+    "page": "cazier-judiciar-online__tulcea.html",
+    "words": 1358,
+    "shingles": 1291,
+    "uniquePct": 12.3,
+    "boilerPct": 87.6,
+    "uniqueShingles": 159
+   },
+   {
+    "page": "cazier-judiciar-online__vaslui.html",
+    "words": 1362,
+    "shingles": 1294,
+    "uniquePct": 11.7,
+    "boilerPct": 87.4,
+    "uniqueShingles": 151
+   },
+   {
+    "page": "cazier-judiciar-online__zalau.html",
+    "words": 1364,
+    "shingles": 1300,
+    "uniquePct": 12.8,
+    "boilerPct": 87,
+    "uniqueShingles": 167
+   }
+  ]
+ }
+}

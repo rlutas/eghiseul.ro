@@ -1,0 +1,143 @@
+2026-06-22|feat(seo): cazier 37→48 orașe + 2 ghiduri stare civilă (#2 + #4)|src/app/acte-necesare-casatorie/page.tsx
+2026-06-19|feat(seo): pagină acte necesare certificat naștere + status build cluster|src/app/acte-necesare-certificat-de-nastere/page.tsx
+2026-06-16|feat(articole): migrate 14 top-performing WP articles to Next.js (root-path parity)|src/app/amenda-rovinieta-2025-tarife-plata-online-ghid-complet/page.tsx
+2026-07-15|feat(seo): articol breaking — ANCPI nu funcționează (cădere națională 13-20 iulie)|src/app/ancpi-nu-functioneaza/page.tsx
+2026-06-16|feat(articole): migrate 14 top-performing WP articles to Next.js (root-path parity)|src/app/anii-lucrati-in-strainatate-se-pun-la-pensie-in-romania/page.tsx
+2026-07-31|feat(seo): 4 articole noi + refresh amendă rovinietă + secțiuni ICC + pachet backlinks|src/app/apostila-de-la-haga-ghid-acte-obtinere/page.tsx
+2026-06-16|feat(blog): /blog archive + article featured images (webp/OG) + verbatim cele-4 fix + rolul ONRC|src/app/blog/page.tsx
+2026-06-21|feat(calc): gap calculators — contribuții PFA, concediu medical, amendă circulație|src/app/calculator/amenda-circulatie/page.tsx
+2026-06-22|feat(calc): 8 calculatoare noi (top 8 din gap analysis) + redesign index|src/app/calculator/calculator-data/page.tsx
+2026-06-21|feat(calc): calculator impozit auto 2026 + indemnizație creștere copil|src/app/calculator/calculator-impozit-auto/page.tsx
+2026-06-21|feat(calc): calculator impozit auto 2026 + indemnizație creștere copil|src/app/calculator/calculator-indemnizatie-crestere-copil/page.tsx
+2026-06-21|feat(seo): +4 orașe cazier (Craiova/Sibiu/Oradea/Arad) + infra calculatoare + calculator procente|src/app/calculator/calculator-procente/page.tsx
+2026-07-14|feat(seo): calculator „Cât pot construi" (POT/CUT) + articol + upsell pe extras CF|src/app/calculator/cat-pot-construi/page.tsx
+2026-06-22|feat(calc): 8 calculatoare noi (top 8 din gap analysis) + redesign index|src/app/calculator/concediu-maternitate/page.tsx
+2026-06-21|feat(calc): gap calculators — contribuții PFA, concediu medical, amendă circulație|src/app/calculator/concediu-medical/page.tsx
+2026-06-22|feat(calc): 8 calculatoare noi (top 8 din gap analysis) + redesign index|src/app/calculator/concediu-paternal/page.tsx
+2026-06-21|feat(calc): gap calculators — contribuții PFA, concediu medical, amendă circulație|src/app/calculator/contributii-pfa/page.tsx
+2026-07-14|feat(seo): cost cadastru + valabilitate documente + checklist lead magnet + llms.txt|src/app/calculator/cost-cadastru-intabulare/page.tsx
+2026-06-22|feat(calc): 8 calculatoare noi (top 8 din gap analysis) + redesign index|src/app/calculator/credit-ipotecar/page.tsx
+2026-06-22|feat(calc): calculatoare diurnă + impozit pe casă (clădiri)|src/app/calculator/diurna/page.tsx
+2026-06-22|feat(calc): calculatoare dividende + taxe SRL (2026)|src/app/calculator/dividende/page.tsx
+2026-06-22|feat(calc): 8 calculatoare noi (top 8 din gap analysis) + redesign index|src/app/calculator/dobanda-legala/page.tsx
+2026-06-22|feat(calc): estimare pensie + pensie invaliditate (Legea 360/2023) — cluster pensii complet|src/app/calculator/estimare-pensie/page.tsx
+2026-06-22|feat(calc): 8 calculatoare noi (top 8 din gap analysis) + redesign index|src/app/calculator/grad-indatorare/page.tsx
+2026-06-22|feat(calc): calculatoare diurnă + impozit pe casă (clădiri)|src/app/calculator/impozit-casa/page.tsx
+2026-06-21|feat(calc): penalități ANAF + indemnizație șomaj + impozit chirie (verificate legal)|src/app/calculator/impozit-chirie/page.tsx
+2026-06-22|feat(calc): calculatoare impozit pensie + inflație|src/app/calculator/impozit-pensie/page.tsx
+2026-06-21|feat(calc): penalități ANAF + indemnizație șomaj + impozit chirie (verificate legal)|src/app/calculator/indemnizatie-somaj/page.tsx
+2026-06-22|feat(calc): calculatoare impozit pensie + inflație|src/app/calculator/inflatie/page.tsx
+2026-07-14|feat: convertor unități vechi de teren + tarife oficiale ANCPI + căutare calculatoare|src/app/calculator/jugar-stanjen-in-mp/page.tsx
+2026-06-21|feat(seo): +4 orașe cazier (Craiova/Sibiu/Oradea/Arad) + infra calculatoare + calculator procente|src/app/calculator/page.tsx
+2026-06-21|feat(calc): penalități ANAF + indemnizație șomaj + impozit chirie (verificate legal)|src/app/calculator/penalitati-anaf/page.tsx
+2026-06-22|feat(calc): calculator pensie alimentară (Cod Civil art. 529)|src/app/calculator/pensie-alimentara/page.tsx
+2026-06-22|feat(calc): estimare pensie + pensie invaliditate (Legea 360/2023) — cluster pensii complet|src/app/calculator/pensie-invaliditate/page.tsx
+2026-06-22|feat(calc): calculator rambursare anticipată credit|src/app/calculator/rambursare-anticipata/page.tsx
+2026-06-21|feat(calc): taxă judiciară de timbru + reabilitare cazier (verificate legal)|src/app/calculator/reabilitare/page.tsx
+2026-06-21|feat(calc): calculatoare TVA + salariu net/brut 2026 (formule verificate)|src/app/calculator/salariu/page.tsx
+2026-06-22|feat(calc): 8 calculatoare noi (top 8 din gap analysis) + redesign index|src/app/calculator/spor-salarial/page.tsx
+2026-06-21|feat(calc): taxă judiciară de timbru + reabilitare cazier (verificate legal)|src/app/calculator/taxa-judiciara-de-timbru/page.tsx
+2026-06-22|feat(calc): calculator taxe notariale (vânzare/donație/succesiune/partaj)|src/app/calculator/taxe-notariale/page.tsx
+2026-06-22|feat(calc): calculatoare dividende + taxe SRL (2026)|src/app/calculator/taxe-srl/page.tsx
+2026-06-22|feat(calc): calculator termene judiciare (procedurale)|src/app/calculator/termene-judiciare/page.tsx
+2026-06-21|feat(calc): calculatoare TVA + salariu net/brut 2026 (formule verificate)|src/app/calculator/tva/page.tsx
+2026-07-14|feat(seo): cost cadastru + valabilitate documente + checklist lead magnet + llms.txt|src/app/calculator/valabilitate-documente/page.tsx
+2026-06-22|feat(calc): calculator vârstă de pensionare (Anexa 5, Legea 360/2023)|src/app/calculator/varsta-pensionare/page.tsx
+2026-06-21|feat(calc): vechime în muncă + zile concediu de odihnă (date math, fără risc legal)|src/app/calculator/vechime-in-munca/page.tsx
+2026-06-21|feat(calc): vechime în muncă + zile concediu de odihnă (date math, fără risc legal)|src/app/calculator/zile-concediu-odihna/page.tsx
+2026-06-22|feat(calc): 8 calculatoare noi (top 8 din gap analysis) + redesign index|src/app/calculator/zile-lucratoare/page.tsx
+2026-07-14|feat(seo): cost cadastru + valabilitate documente + checklist lead magnet + llms.txt|src/app/cat-costa-cadastrul-si-intabularea/page.tsx
+2026-07-14|feat(seo): calculator „Cât pot construi" (POT/CUT) + articol + upsell pe extras CF|src/app/cat-poti-construi-pe-teren/page.tsx
+2026-08-07|feat(seo): 4 articole noi pe golurile identificate in research|src/app/cazier-fiscal-fara-spv/page.tsx
+2026-08-07|feat(seo): 4 articole noi pe golurile identificate in research|src/app/cazier-fiscal-firma/page.tsx
+2026-08-07|feat(seo): ghid cazier fiscal persoana fizica + intarire articol cadastral + fix linkuri interne|src/app/cazier-fiscal-persoana-fizica/page.tsx
+2026-07-26|feat(seo): două articole noi pe intenția „ruta oficială", fix canibalizare constatator, punți pensii|src/app/cazier-judiciar-online-gratuit/page.tsx
+2026-06-16|feat(articole): migrate 14 top-performing WP articles to Next.js (root-path parity)|src/app/cazier-judiciar-vs-certificat-integritate-comportamentala/page.tsx
+2026-07-29|feat(seo): articol cazier + certificat integritate pentru profesori (fereastra septembrie)|src/app/cazier-si-certificat-de-integritate-pentru-profesori/page.tsx
+2026-06-25|seo(cadastru): keyword research + 2 articole (releveu, plan cadastral)|src/app/ce-este-planul-cadastral/page.tsx
+2026-06-25|seo(cadastru): keyword research + 2 articole (releveu, plan cadastral)|src/app/ce-este-un-releveu/page.tsx
+2026-06-16|feat(articole): migrate 14 top-performing WP articles to Next.js (root-path parity)|src/app/cele-4-tipuri-de-certificat-constatator-online/page.tsx
+2026-07-13|feat(seo): 2 articole noi (CF gratuit MyTerra, constatator istoric) + interlinking calculatoare→servicii|src/app/certificat-constatator-cu-istoric/page.tsx
+2026-07-17|feat(seo): 3 landing-uri constatator per tip + preselect ?tip= în wizard|src/app/certificat-constatator-de-baza/page.tsx
+2026-07-17|feat(seo): 3 landing-uri constatator per tip + preselect ?tip= în wizard|src/app/certificat-constatator-insolventa/page.tsx
+2026-06-22|feat(seo): cluster ONRC use-case (4) + stare civilă (6) — 10 ghiduri noi|src/app/certificat-constatator-pentru-banca/page.tsx
+2026-06-22|feat(seo): cluster ONRC use-case (4) + stare civilă (6) — 10 ghiduri noi|src/app/certificat-constatator-pentru-fonduri-europene/page.tsx
+2026-06-22|feat(seo): cluster ONRC use-case (4) + stare civilă (6) — 10 ghiduri noi|src/app/certificat-constatator-pentru-licitatie/page.tsx
+2026-06-22|feat(seo): cluster ONRC use-case (4) + stare civilă (6) — 10 ghiduri noi|src/app/certificat-constatator-pentru-notar/page.tsx
+2026-07-17|feat(seo): 3 landing-uri constatator per tip + preselect ?tip= în wizard|src/app/certificat-constatator-pfa/page.tsx
+2026-06-22|feat(seo): cluster ONRC use-case (4) + stare civilă (6) — 10 ghiduri noi|src/app/certificat-de-celibat-pentru-casatorie-in-strainatate/page.tsx
+2026-06-22|feat(seo): cluster ONRC use-case (4) + stare civilă (6) — 10 ghiduri noi|src/app/certificat-de-celibat/page.tsx
+2026-07-26|feat(seo): două articole noi pe intenția „ruta oficială", fix canibalizare constatator, punți pensii|src/app/certificat-de-nastere-din-strainatate/page.tsx
+2026-08-07|feat(seo): 4 articole noi pe golurile identificate in research|src/app/certificat-de-nastere-pentru-buletin-pasaport/page.tsx
+2026-06-19|feat(seo): plan location-engine + cluster naștere (pagina certificat pierdut)|src/app/certificat-de-nastere-pierdut/page.tsx
+2026-06-22|fix(seo go-live): 3 ship-blockers sitemap + titluri CTR + pagina /contact/|src/app/contact/page.tsx
+2026-06-16|feat(articole): article infrastructure + migrate flagship cadastre article (33k clicks)|src/app/cum-aflam-numarul-carte-functionara-si-nr-cadastral/page.tsx
+2026-06-16|feat(articole): migrate 14 top-performing WP articles to Next.js (root-path parity)|src/app/cum-vor-arata-documentele-de-stare-civila-2025/page.tsx
+2026-06-22|feat(curs-valutar): pagină curs BNR (toate valutele) + feed extins reutilizabil|src/app/curs-valutar/page.tsx
+2026-06-22|feat(seo): cluster ONRC use-case (4) + stare civilă (6) — 10 ghiduri noi|src/app/duplicat-certificat-de-casatorie/page.tsx
+2026-06-22|feat(seo): cluster ONRC use-case (4) + stare civilă (6) — 10 ghiduri noi|src/app/duplicat-certificat-de-nastere/page.tsx
+2026-06-16|feat(articole): migrate 14 top-performing WP articles to Next.js (root-path parity)|src/app/eliberare-certificat-constatator-onrc-ghid/page.tsx
+2026-07-13|feat(seo): 2 articole noi (CF gratuit MyTerra, constatator istoric) + interlinking calculatoare→servicii|src/app/extras-carte-funciara-gratuit/page.tsx
+2026-06-16|feat(articole): migrate 14 top-performing WP articles to Next.js (root-path parity)|src/app/extras-de-carte-funciara-pentru-casa-verde/page.tsx
+2026-06-16|fix(footer): correct service links (serviceUrl) + create legal pages (no more 404s)|src/app/gdpr/page.tsx
+2026-06-16|feat(articole): migrate 14 top-performing WP articles to Next.js (root-path parity)|src/app/ghid-complet-certificat-de-integritate-comportamentala/page.tsx
+2026-06-16|feat(articole): migrate 14 top-performing WP articles to Next.js (root-path parity)|src/app/informatii-cazier-auto-online/page.tsx
+2026-06-22|feat(seo): cazier 37→48 orașe + 2 ghiduri stare civilă (#2 + #4)|src/app/inregistrare-nastere-copil-nou-nascut/page.tsx
+2026-06-20|feat(seo): pagină model certificat căsătorie + OG brandate per serviciu|src/app/model-certificat-de-casatorie/page.tsx
+2026-06-16|fix(footer): correct service links (serviceUrl) + create legal pages (no more 404s)|src/app/politica-cookies/page.tsx
+2026-07-15|feat(legal): pagina dedicata /politica-de-anulare/ + link footer + sitemap|src/app/politica-de-anulare/page.tsx
+2026-06-16|fix(footer): correct service links (serviceUrl) + create legal pages (no more 404s)|src/app/politica-de-confidentialitate/page.tsx
+2026-07-31|feat(seo): 4 articole noi + refresh amendă rovinietă + secțiuni ICC + pachet backlinks|src/app/radiere-firma-srl-ghid/page.tsx
+2026-06-16|feat(blog): /blog archive + article featured images (webp/OG) + verbatim cele-4 fix + rolul ONRC|src/app/rolul-si-atributiile-onrc-romania/page.tsx
+2026-06-19|feat(seo): pagină schimbare certificat naștere vechi + keywords căsătorie|src/app/schimbare-certificat-de-nastere-vechi/page.tsx
+2026-07-31|feat(seo): 4 articole noi + refresh amendă rovinietă + secțiuni ICC + pachet backlinks|src/app/schimbare-sediu-social-srl-ghid/page.tsx
+2026-04-17|feat(sprint-6): Service alignment, coupon system, delivery calculator, foreign citizen flow|src/app/servicii/[slug]/page.tsx
+2026-06-25|feat(imobiliare): catalog topograf/ANCPI + cont colaborator + facturare/switcher|src/app/servicii/actualizare-adresa-cf/page.tsx
+2026-06-14|feat(seo): hardcoded SEO pages for remaining 7 services (batch 2)|src/app/servicii/cazier-auto-online/page.tsx
+2026-06-14|feat(seo): hardcoded SEO pages for remaining 7 services (batch 2)|src/app/servicii/cazier-fiscal-online/page.tsx
+2026-06-20|feat(seo): engine localizare + pilot 5 orașe cazier judiciar (date IPJ reale)|src/app/servicii/cazier-judiciar-online/[oras]/page.tsx
+2026-01-05|feat(wizard): Implement modular verification wizard system|src/app/servicii/cazier-judiciar-online/page.tsx
+2026-01-05|feat(wizard): Implement modular verification wizard system|src/app/servicii/cazier-judiciar-online/persoana-fizica/page.tsx
+2026-01-05|feat(wizard): Implement modular verification wizard system|src/app/servicii/cazier-judiciar-online/persoana-juridica/page.tsx
+2026-06-14|feat(seo): hardcoded SEO pages for remaining 7 services (batch 2)|src/app/servicii/certificat-constatator-online/page.tsx
+2026-06-14|feat(seo): hardcoded SEO pages for remaining 7 services (batch 2)|src/app/servicii/certificat-de-integritate-comportamentala/page.tsx
+2026-06-25|feat(imobiliare): catalog topograf/ANCPI + cont colaborator + facturare/switcher|src/app/servicii/certificat-detineri-imobile/page.tsx
+2026-06-25|feat(imobiliare): catalog topograf/ANCPI + cont colaborator + facturare/switcher|src/app/servicii/certificat-sarcini/page.tsx
+2026-07-21|feat(seo): pagină serviciu Certificat de Urbanism (780 lei, era invizibil)|src/app/servicii/certificat-urbanism-informare/page.tsx
+2026-06-25|feat(imobiliare): catalog topograf/ANCPI + cont colaborator + facturare/switcher|src/app/servicii/copie-arhiva-ocpi/page.tsx
+2026-06-25|feat(imobiliare): catalog topograf/ANCPI + cont colaborator + facturare/switcher|src/app/servicii/copie-carte-funciara/page.tsx
+2026-06-25|feat(imobiliare): catalog topograf/ANCPI + cont colaborator + facturare/switcher|src/app/servicii/copie-contract-vanzare/page.tsx
+2026-06-25|feat(imobiliare): catalog topograf/ANCPI + cont colaborator + facturare/switcher|src/app/servicii/copie-intabulare/page.tsx
+2026-06-25|feat(imobiliare): catalog topograf/ANCPI + cont colaborator + facturare/switcher|src/app/servicii/copie-inventar-coordonate/page.tsx
+2026-06-25|feat(imobiliare): catalog topograf/ANCPI + cont colaborator + facturare/switcher|src/app/servicii/copie-plan-cadastral/page.tsx
+2026-06-25|feat(imobiliare): catalog topograf/ANCPI + cont colaborator + facturare/switcher|src/app/servicii/copie-plan-incadrare/page.tsx
+2026-06-25|feat(imobiliare): catalog topograf/ANCPI + cont colaborator + facturare/switcher|src/app/servicii/copie-releveu/page.tsx
+2026-06-14|feat(seo): hardcoded SEO pages for remaining 7 services (batch 2)|src/app/servicii/eliberare-certificat-de-casatorie/page.tsx
+2026-06-14|feat(seo): hardcoded SEO pages for remaining 7 services (batch 2)|src/app/servicii/eliberare-certificat-de-celibat/page.tsx
+2026-06-14|feat(seo): hardcoded SEO pages for remaining 7 services (batch 2)|src/app/servicii/eliberare-certificat-de-nastere/page.tsx
+2026-06-25|feat(imobiliare): catalog topograf/ANCPI + cont colaborator + facturare/switcher|src/app/servicii/extras-cf-colectiv/page.tsx
+2026-06-22|feat(seo): 43 pagini extras carte funciară pe județe (date OCPI reale)|src/app/servicii/extras-de-carte-funciara/[judet]/page.tsx
+2026-06-13|feat(seo): Extras Carte Funciară — hardcoded SEO page at WP-parity slug|src/app/servicii/extras-de-carte-funciara/page.tsx
+2026-06-22|feat(seo): #1 CWV verificat + #2 internal linking (11) + #4 pagini extras-multilingv|src/app/servicii/extras-multilingv-certificat-casatorie/page.tsx
+2026-06-22|feat(seo): #1 CWV verificat + #2 internal linking (11) + #4 pagini extras-multilingv|src/app/servicii/extras-multilingv-certificat-nastere/page.tsx
+2026-06-16|feat(seo): dedicated landing pages for identificare-imobil + plan-cadastral (cluster cadastru)|src/app/servicii/extras-plan-cadastral/page.tsx
+2026-06-16|feat(seo): dedicated landing pages for identificare-imobil + plan-cadastral (cluster cadastru)|src/app/servicii/identificare-imobil/page.tsx
+2026-06-25|feat(imobiliare): catalog topograf/ANCPI + cont colaborator + facturare/switcher|src/app/servicii/identificare-imobile-proprietar/page.tsx
+2026-04-17|feat(sprint-6): Service alignment, coupon system, delivery calculator, foreign citizen flow|src/app/servicii/page.tsx
+2026-06-25|feat(imobiliare): catalog topograf/ANCPI + cont colaborator + facturare/switcher|src/app/servicii/plan-amplasament-delimitare/page.tsx
+2026-06-22|feat(rovinieta): pagină Rovinietă Online (cumpărare) + repară redirect 404|src/app/servicii/rovinieta-online/page.tsx
+2026-07-15|feat(seo): articol avertisment DNSC — SMS fals cu amenzi care imită Ghișeul.ro|src/app/sms-fals-amenda-ghiseul-ro/page.tsx
+2026-07-31|feat(seo): 4 articole noi + refresh amendă rovinietă + secțiuni ICC + pachet backlinks|src/app/suspendare-activitate-firma-ghid/page.tsx
+2026-06-16|feat(articole): migrate 14 top-performing WP articles to Next.js (root-path parity)|src/app/tabel-varsta-pensionare-anticipata-femei/page.tsx
+2026-06-16|feat(articole): migrate 14 top-performing WP articles to Next.js (root-path parity)|src/app/taxa-cazier-judiciar/page.tsx
+2026-06-16|fix(footer): correct service links (serviceUrl) + create legal pages (no more 404s)|src/app/termeni-si-conditii/page.tsx
+2026-06-22|feat: pagină /tools/ (Instrumente) + limitează calculatoarele din meniu la cele populare|src/app/tools/page.tsx
+2026-06-14|feat(tools): rovinietă verification widget + WP form gap analysis|src/app/tools/verificare-rovinieta-online/page.tsx
+2026-06-16|feat(articole): migrate 14 top-performing WP articles to Next.js (root-path parity)|src/app/totul-despre-cartea-funciara-colectiva/page.tsx
+2026-06-19|feat(seo): transcriere căsătorie + secțiune sectoare naștere + fix OG|src/app/transcriere-certificat-de-casatorie/page.tsx
+2026-06-22|feat(seo): cluster ONRC use-case (4) + stare civilă (6) — 10 ghiduri noi|src/app/transcriere-certificat-de-nastere/page.tsx
+2026-07-20|feat(seo): articol nou — TVA 9% locuințe, termen 31 iulie 2026 + blocajul ANCPI|src/app/tva-9-locuinte-31-iulie-2026/page.tsx
+2026-06-22|feat(seo): cluster ONRC use-case (4) + stare civilă (6) — 10 ghiduri noi|src/app/valabilitate-certificat-de-celibat/page.tsx
+2026-06-16|feat(articole): migrate 14 top-performing WP articles to Next.js (root-path parity)|src/app/valabilitate-extras-de-carte-funciara/page.tsx
+2026-08-07|feat(seo): 4 articole noi pe golurile identificate in research|src/app/verificare-cazier-fiscal/page.tsx
+2026-07-17|feat(seo): articol nou — Cum afli cine e proprietarul unui imobil|src/app/verificare-proprietar-imobil/page.tsx

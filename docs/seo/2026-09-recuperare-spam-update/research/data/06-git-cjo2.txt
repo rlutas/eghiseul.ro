@@ -1,0 +1,51 @@
+2026-04-18|feat(seo): Sprint 1 delivery — 4 new keyword-driven pages (18K/mo greenfield)|src/app/acte-necesare-cazier-judiciar/page.tsx
+2026-04-05|feat: cazier auto service, contract system, document generation, blog, SEO optimization|src/app/blog/page.tsx
+2026-03-31|feat: Cazier Auto, Cazier Fiscal, Contact, T&C, Privacy Policy pages|src/app/cazier-auto-online/page.tsx
+2026-03-31|feat: Cazier Auto, Cazier Fiscal, Contact, T&C, Privacy Policy pages|src/app/cazier-fiscal-online/page.tsx
+2026-05-25|feat(seo): 3 articole noi cluster cazier fiscal|src/app/cazier-fiscal-pentru-cetatean-strain/page.tsx
+2026-05-25|feat(seo): 3 articole noi cluster cazier fiscal|src/app/cazier-fiscal-pentru-credit-bancar/page.tsx
+2026-05-25|feat(seo): 3 articole noi cluster cazier fiscal|src/app/cazier-fiscal-pentru-licitatii-publice/page.tsx
+2026-04-29|feat(seo): consolidate fiscal page + 3 P1 cluster articles + GEO foundations|src/app/cazier-fiscal-persoana-juridica/page.tsx
+2026-04-29|feat(seo): consolidate fiscal page + 3 P1 cluster articles + GEO foundations|src/app/cazier-fiscal-vs-cazier-judiciar/page.tsx
+2026-04-08|feat: diaspora page, extended taxa article, eliberare→obtinere, PPC cleanup|src/app/cazier-judiciar-diaspora/page.tsx
+2026-04-05|feat: cazier auto service, contract system, document generation, blog, SEO optimization|src/app/cazier-judiciar-gratuit/page.tsx
+2026-03-31|fix: section backgrounds visual distinction + URL structure /cazier-judiciar-online/[city]|src/app/cazier-judiciar-online/[city]/page.tsx
+2026-04-18|feat(seo): new blog article — cazier judiciar pentru angajare (Codul Muncii)|src/app/cazier-judiciar-pentru-angajare/page.tsx
+2026-04-17|feat(seo): new blog article — cazier judiciar pentru viză SUA/CA/UK/AU|src/app/cazier-judiciar-pentru-viza/page.tsx
+2026-04-05|feat: cazier auto service, contract system, document generation, blog, SEO optimization|src/app/cazier-judiciar-persoane-fizice-ghid/page.tsx
+2026-04-05|feat: cazier auto service, contract system, document generation, blog, SEO optimization|src/app/cazier-judiciar-persoane-juridice-ghid/page.tsx
+2026-04-29|feat(seo): SEO sprint — intent title, /cazier-judiciar-urgent, blog redesign, delivery fix|src/app/cazier-judiciar-urgent/page.tsx
+2026-04-18|feat(seo): Sprint 1 delivery — 4 new keyword-driven pages (18K/mo greenfield)|src/app/cerere-cazier-judiciar-model/page.tsx
+2026-04-05|feat: cazier auto service, contract system, document generation, blog, SEO optimization|src/app/certificat-integritate-comportamentala/page.tsx
+2026-04-05|feat: cazier auto service, contract system, document generation, blog, SEO optimization|src/app/comparatie-servicii/page.tsx
+2026-04-05|feat: cazier auto service, contract system, document generation, blog, SEO optimization|src/app/conditii-de-calatorie-cu-minori/page.tsx
+2026-03-31|feat: Cazier Auto, Cazier Fiscal, Contact, T&C, Privacy Policy pages|src/app/contact/page.tsx
+2026-04-05|feat: cazier auto service, contract system, document generation, blog, SEO optimization|src/app/corectarea-informatiilor-din-cazierul-judiciar/page.tsx
+2026-04-05|feat: cazier auto service, contract system, document generation, blog, SEO optimization|src/app/dupa-cat-timp-se-sterge-cazierul/page.tsx
+2026-08-03|feat(ecazier)!: migrare pe EDIGITALIZARE S.R.L. (Oblio EGH, Stripe comun) + SEO organic deschis + cazier auto|src/app/ecazier/acte-necesare-cazier-auto/page.tsx
+2026-08-03|feat(ecazier)!: migrare pe EDIGITALIZARE S.R.L. (Oblio EGH, Stripe comun) + SEO organic deschis + cazier auto|src/app/ecazier/cazier-auto-strainatate-preschimbare-permis/page.tsx
+2026-08-03|feat(ecazier)!: migrare pe EDIGITALIZARE S.R.L. (Oblio EGH, Stripe comun) + SEO organic deschis + cazier auto|src/app/ecazier/cazier-auto-uber-bolt/page.tsx
+2026-08-03|feat(ecazier)!: migrare pe EDIGITALIZARE S.R.L. (Oblio EGH, Stripe comun) + SEO organic deschis + cazier auto|src/app/ecazier/cazier-auto-vs-cazier-judiciar/page.tsx
+2026-08-03|feat(ecazier)!: migrare pe EDIGITALIZARE S.R.L. (Oblio EGH, Stripe comun) + SEO organic deschis + cazier auto|src/app/ecazier/cazier-auto/page.tsx
+2026-07-07|feat(ecazier): cazier fiscal flow — landing + config, priced 248 (BMR untouched)|src/app/ecazier/cazier-fiscal/page.tsx
+2026-08-03|feat(ecazier)!: migrare pe EDIGITALIZARE S.R.L. (Oblio EGH, Stripe comun) + SEO organic deschis + cazier auto|src/app/ecazier/fisa-evidenta-conducator-auto/page.tsx
+2026-08-03|feat(ecazier)!: migrare pe EDIGITALIZARE S.R.L. (Oblio EGH, Stripe comun) + SEO organic deschis + cazier auto|src/app/ecazier/ghid-alegere-tip-cazier/page.tsx
+2026-08-03|feat(ecazier)!: migrare pe EDIGITALIZARE S.R.L. (Oblio EGH, Stripe comun) + SEO organic deschis + cazier auto|src/app/ecazier/ghiduri/page.tsx
+2026-04-30|feat(ecazier.ro): Phase 1 + 2 — multi-tenant DB isolation + Cabinet UI|src/app/ecazier/page.tsx
+2026-07-15|feat(legal): pagini dedicate /politica-de-anulare (CJO + ecazier) + linkuri footer + sitemap|src/app/ecazier/politica-de-anulare/page.tsx
+2026-06-26|feat(ecazier): pagină Politica de Confidențialitate (GDPR)|src/app/ecazier/politica-de-confidentialitate/page.tsx
+2026-08-03|feat(ecazier)!: migrare pe EDIGITALIZARE S.R.L. (Oblio EGH, Stripe comun) + SEO organic deschis + cazier auto|src/app/ecazier/puncte-penalizare-cazier-auto/page.tsx
+2026-06-26|feat(ecazier): pagină Termeni și Condiții + FAQ anulare 30 min|src/app/ecazier/termeni-si-conditii/page.tsx
+2026-08-03|feat(ecazier)!: migrare pe EDIGITALIZARE S.R.L. (Oblio EGH, Stripe comun) + SEO organic deschis + cazier auto|src/app/ecazier/valabilitate-cazier-auto/page.tsx
+2026-04-18|feat(seo): Sprint 1 delivery — 4 new keyword-driven pages (18K/mo greenfield)|src/app/eliberare-cazier-judiciar-online/page.tsx
+2026-03-31|feat: SEO content — 4 new homepage sections for organic ranking parity|src/app/ghid-reabilitare-cazier/page.tsx
+2026-04-05|feat: cazier auto service, contract system, document generation, blog, SEO optimization|src/app/impact-cazier-angajare/page.tsx
+2026-07-15|feat(legal): pagini dedicate /politica-de-anulare (CJO + ecazier) + linkuri footer + sitemap|src/app/politica-de-anulare/page.tsx
+2026-03-31|feat: Cazier Auto, Cazier Fiscal, Contact, T&C, Privacy Policy pages|src/app/politica-de-confidentialitate/page.tsx
+2026-04-05|feat: cazier auto service, contract system, document generation, blog, SEO optimization|src/app/tari-pentru-care-este-nevoie-de-apostila/page.tsx
+2026-04-05|feat: cazier auto service, contract system, document generation, blog, SEO optimization|src/app/taxa-cazier-judiciar/page.tsx
+2026-03-31|feat: Cazier Auto, Cazier Fiscal, Contact, T&C, Privacy Policy pages|src/app/termeni-si-conditii/page.tsx
+2026-04-05|feat: cazier auto service, contract system, document generation, blog, SEO optimization|src/app/totul-despre-cazier-fiscal-online/page.tsx
+2026-04-29|feat(seo): consolidate fiscal page + 3 P1 cluster articles + GEO foundations|src/app/valabilitate-cazier-fiscal/page.tsx
+2026-04-05|feat: cazier auto service, contract system, document generation, blog, SEO optimization|src/app/valabilitate-cazier-judiciar/page.tsx
+2026-05-25|feat(seo): 301 1-hop + sticky mobile CTA + 2 pagini noi + refresh eliberare|src/app/verificare-cazier-fiscal-online/page.tsx

@@ -1,0 +1,110 @@
+['Cele mai populare interogări', '23.08.2026 - 08.09.2026 Clicuri', '01.08.2026 - 17.08.2026 Clicuri', '23.08.2026 - 08.09.2026 Expuneri', '01.08.2026 - 17.08.2026 Expuneri', '23.08.2026 - 08.09.2026 CTR', '01.08.2026 - 17.08.2026 CTR', '23.08.2026 - 08.09.2026 Poziție', '01.08.2026 - 17.08.2026 Poziție']
+
+=== TOP 30 interogari dupa clicuri PRE, ce s-a intamplat ===
+interogare                                         clic pre clic post  poz pre poz post
+ancpi                                                  3735         0     6.74     4.71
+verificare rovinieta                                   2038         6        6     26.3
+ancpi functioneaza                                     1816         0     3.94        0
+impozit auto 2026                                      1156       917        2     2.02
+geoportal ancpi                                         684         0     5.77     30.4
+eterra                                                  634         0     7.59        0
+verificare rovinieta fara serie sasiu                   612         4     4.43     15.4
+calcul varsta pensionare legea noua                     555      1405     2.33     2.03
+calculator varsta pensionare anticipata                 436         2     3.21     13.5
+verificare rovinieta online                             431         2     5.42    24.36
+calculator impozit auto 2026                            353       590     2.02     1.64
+calculator varsta pensionare                            353       466     2.18     2.18
+calculator pensie online                                298         1      4.7    10.29
+calculator pensie alimentara                            296       212     1.17     1.02
+ancpi online                                            286         0        6        0
+ancpi geoportal                                         278         0     6.24    10.75
+verificare rovinieta dupa numar                         265        12     5.84    11.04
+eterra ancpi                                            259         1     7.45     24.5
+impozit auto                                            249         0     2.48     4.38
+e terra                                                 243         0     7.97        0
+e-terra                                                 226         0     8.08        9
+cand ies la pensie                                      221       286     2.13     1.93
+calcul varsta pensionare                                213        53     2.17     2.72
+calculator indemnizatie crestere copil                  199       240     2.22     1.61
+calculator pensie                                       192         0     7.08     9.67
+calculator indemnizatie crestere copil 2026             187       261        2     1.15
+calcul concediu medical 2026                            183       122     1.18     1.15
+calculator concediu medical 2026                        179       149     1.16     1.17
+calculator pensie 2026                                  173         2     2.26     4.71
+epay ancpi                                              172         1     5.91        1
+
+=== interogari care SUPRAVIETUIESC (clic post > 20) ===
+calcul varsta pensionare legea noua                     555      1405     2.33     2.03
+impozit auto 2026                                      1156       917        2     2.02
+calculator impozit auto 2026                            353       590     2.02     1.64
+calculator varsta pensionare                            353       466     2.18     2.18
+cand ies la pensie                                      221       286     2.13     1.93
+calculator indemnizatie crestere copil 2026             187       261        2     1.15
+calculator indemnizatie crestere copil                  199       240     2.22     1.61
+calculator pensie alimentara                            296       212     1.17     1.02
+impozit dividende 2026                                  105       161     1.89     1.37
+cand ma pot pensiona                                    119       158     2.09     2.23
+eghiseul.ro                                             101       157     1.03     1.06
+calculator concediu medical 2026                        179       149     1.16     1.17
+calcul indemnizatie crestere copil                      170       141     2.39     1.73
+tabel varsta pensionare anticipata femei                126       141     3.76     2.48
+calculator pensie invaliditate                          120       123     1.73     1.48
+calcul concediu medical 2026                            183       122     1.18     1.15
+cand pot iesi la pensie                                 122       119     3.15     1.91
+calculator pensie alimentara 2026                       150       114     1.44        1
+calcul impozit auto 2026                                113       100     2.04     1.93
+pensie de invaliditate gradul 2 suma forum               61        88     2.29     2.01
+impozit masina 2026                                      66        76     1.53     1.37
+pensie alimentara 1 copil                                63        69     1.83     1.51
+pensie de invaliditate gradul 3 suma calculator          46        61     1.35      1.6
+calcul varsta pensionare                                213        53     2.17     2.72
+calculator varsta pensionare femei                       40        52     2.01      2.1
+calcul varsta pensionare legea noua 2026                 69        51     2.31     2.74
+calcul pensie alimentara                                 66        50     1.06     1.03
+pensie alimentara 2 copii                                46        47     2.13     1.35
+pensie de invaliditate gradul 3 suma forum               91        45     3.14     3.61
+cass dividende 2026                                      32        44     1.67     1.21
+
+interogari in raport: pre=1269  post=544
+
+=== zilnic (ultimele 40 zile) === ['Data', 'Clicuri', 'Expuneri', 'CTR', 'Poziție']
+2026-07-29 2174 86756 2.51% 5.9
+2026-07-30 2832 103566 2.73% 6
+2026-07-31 2795 97954 2.85% 6.2
+2026-08-01 1738 56145 3.1% 6.2
+2026-08-02 2229 77807 2.86% 6.1
+2026-08-03 3353 137629 2.44% 6.3
+2026-08-04 3534 143810 2.46% 6.1
+2026-08-05 4228 157905 2.68% 6
+2026-08-06 3292 131343 2.51% 6.2
+2026-08-07 5122 124774 4.11% 5.9
+2026-08-08 1818 62218 2.92% 6.2
+2026-08-09 2836 88894 3.19% 6.1
+2026-08-10 5067 167468 3.03% 5.9
+2026-08-11 4421 174913 2.53% 6.3
+2026-08-12 3360 135130 2.49% 6.5
+2026-08-13 3027 113762 2.66% 6.7
+2026-08-14 2265 89368 2.53% 6.6
+2026-08-15 1828 58182 3.14% 6.3
+2026-08-16 2548 75511 3.37% 6.3
+2026-08-17 3634 126629 2.87% 6.3
+2026-08-18 3391 119798 2.83% 6.2
+2026-08-19 3457 108807 3.18% 6
+2026-08-20 2890 92944 3.11% 6.1
+2026-08-21 573 4266 13.43% 5.8
+2026-08-22 416 2640 15.76% 7.9
+2026-08-23 472 3071 15.37% 6
+2026-08-24 691 4312 16.03% 4.9
+2026-08-25 731 4546 16.08% 4.4
+2026-08-26 682 4328 15.76% 5.3
+2026-08-27 635 4160 15.26% 4.4
+2026-08-28 460 3648 12.61% 7.8
+2026-08-29 431 2950 14.61% 7.6
+2026-08-30 593 3419 17.34% 5.9
+2026-08-31 772 4994 15.46% 5.7
+2026-09-01 843 5101 16.53% 4
+2026-09-02 881 5272 16.71% 3.8
+2026-09-03 766 5276 14.52% 4.8
+2026-09-04 755 4285 17.62% 5.3
+2026-09-05 619 3257 19.01% 5.1
+2026-09-06 763 3797 20.09% 4.2

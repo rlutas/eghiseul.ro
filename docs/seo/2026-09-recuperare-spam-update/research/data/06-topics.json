@@ -1,0 +1,45 @@
+{
+ "EGH": {
+  "verticale": {
+   "stare civila": 21,
+   "auto & rovinieta": 8,
+   "ALTELE": 7,
+   "munca & pensii": 18,
+   "cazier judiciar & integritate": 19,
+   "utilitare diverse": 5,
+   "imobiliare / cadastru": 74,
+   "firme / ONRC": 18,
+   "fiscal-financiar general": 9,
+   "cazier fiscal": 5,
+   "legal / contact": 6,
+   "home": 1
+  },
+  "paginiInVerticaleMonetizate": 145,
+  "paginiInVerticaleNemonetizate": 39,
+  "neclasificate": [
+   "/ancpi-nu-functioneaza",
+   "/blog",
+   "/calculator",
+   "/servicii",
+   "/servicii/extras-cf-colectiv",
+   "/tools",
+   "/totul-despre-cartea-funciara-colectiva"
+  ]
+ },
+ "CJO": {
+  "verticale": {
+   "cazier judiciar & integritate": 59,
+   "ALTELE": 2,
+   "auto & rovinieta": 1,
+   "cazier fiscal": 3,
+   "legal / contact": 5,
+   "home": 1
+  },
+  "paginiInVerticaleMonetizate": 63,
+  "paginiInVerticaleNemonetizate": 2,
+  "neclasificate": [
+   "/blog",
+   "/comparatie-servicii"
+  ]
+ }
+}

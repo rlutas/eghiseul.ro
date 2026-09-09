@@ -1,5 +1,13 @@
 # 2026-08-24 — Prăbușirea organică: Google August 2026 Spam Update
 
+> ⚠️ **DEPĂȘIT PARȚIAL (09.09.2026).** Cronologia și cifrele de impact rămân valabile.
+> Diagnosticul NU: măsurate identic pe ambele site-uri, tiparele „AI" ies **13,8/1k la
+> CJO vs 10,4/1k la noi** (deci invers), iar paginile de locație ale CJO sunt **mai**
+> duplicate decât ale noastre. Cauza reală identificată: **clusterul comercial generat
+> din template, la scară** + coeziune internă de 7× mai slabă. Vezi
+> [`2026-09-recuperare-spam-update/PLAN-RECUPERARE.md`](2026-09-recuperare-spam-update/PLAN-RECUPERARE.md)
+> și [`.../research/06-comparatie-eghiseul-vs-cjo.md`](2026-09-recuperare-spam-update/research/06-comparatie-eghiseul-vs-cjo.md).
+
 ## Ce s-a întâmplat (cronologie verificată)
 
 | Zi | Clicuri GSC | Expuneri | Comenzi create (DB) |
