@@ -197,4 +197,57 @@ de la 1.10 și amenda nu mai e sumă fixă (2–4× rovinieta pe 12 luni, indexa
 cu IPC). Pagina de amendă spune asta, dar tabelul de cuantumuri trebuie refăcut
 după ce apar cifrele CNAIR. Nu înainte.
 
-Din 32: 3 erau cadastrale (făcute la pasul 3), 6 livrate → rămân 23.
+### 5.1 Stadiul celor 32 de pagini REWRITE (09.09, 13:05)
+
+Lucrăm pe loturi de 3–5 pagini, un agent per lot, surse primare fetch-uite
+pentru fiecare cifră, humanizer, verificare tsc + build + teste, apoi UN commit
+și UN push per lot (bugetul de build Vercel).
+
+| # | Rută | Stare | Lot / commit |
+|---|---|---|---|
+| 1 | `/tools/verificare-rovinieta-online` | ✅ livrat | `63f8f20` |
+| 2 | `/cum-aflam-numarul-carte-functionara-si-nr-cadastral` | ✅ livrat | lot 1, `65a3700` |
+| 3 | `/amenda-rovinieta-2025-tarife-plata-online-ghid-complet` | ✅ livrat (⏰ refă tabelul după 01.10) | lot 1 |
+| 4 | `/ghid-complet-certificat-de-integritate-comportamentala` | ✅ livrat | lot 1 |
+| 5 | `/informatii-cazier-auto-online` | ✅ livrat | lot 1 |
+| 6 | `/cum-vor-arata-documentele-de-stare-civila-2025` | ✅ livrat | lot 1 |
+| 7 | `/servicii/extras-multilingv-certificat-nastere` | ✅ livrat (D3) | `3a28be1` |
+| 8 | `/servicii/extras-multilingv-certificat-casatorie` | ✅ livrat (D3) | `3a28be1` |
+| 9 | `/servicii/extras-plan-cadastral` | ✅ livrat (pasul 3, cadastrale) | `4b9f392` |
+| 10 | `/servicii/copie-carte-funciara` | ✅ livrat (pasul 3) | `4b9f392` |
+| 11 | `/servicii/plan-amplasament-delimitare` | ✅ livrat (pasul 3) | `4b9f392` |
+| 12 | `/servicii/actualizare-adresa-cf` | ✅ livrat (pasul 3) | `4b9f392` |
+| 13 | `/servicii/certificat-urbanism-informare` | ✅ livrat (pasul 3) | `4b9f392` |
+| 14 | `/rolul-si-atributiile-onrc-romania` | 🔄 lot 2A (umbrelă ONRC: radiere, sediu, suspendare) | în lucru |
+| 15 | `/eliberare-certificat-constatator-onrc-ghid` | 🔄 lot 2A (backlink start-up.ro, URL neatins) | în lucru |
+| 16 | `/cazier-fiscal-fara-spv` | 🔄 lot 2A (umbrelă fiscal: PF, verificare, firmă) | în lucru |
+| 17 | `/cat-costa-cadastrul-si-intabularea` | 🔄 lot 2A | în lucru |
+| 18 | `/acte-necesare-certificat-de-nastere` | 🔄 lot 2B (umbrelă naștere: 6 articole) | în lucru |
+| 19 | `/acte-necesare-casatorie` | 🔄 lot 2B (umbrelă căsătorie: 3 articole) | în lucru |
+| 20 | `/tva-9-locuinte-31-iulie-2026` | 🔄 lot 2B (fiscal datat, ⚠️ citit de owner înainte de push) | în lucru |
+| 21 | `/` (homepage) | ⬜ lot 3 | AI 14,4; poziție 9,27→23,91 |
+| 22 | `/curs-valutar` | ⬜ lot 3 | 487 cuv. pe 186k expuneri |
+| 23 | `/servicii/rovinieta-online` | ⬜ lot 3 | 759 cuv., singura pagină de serviciu sub 800 |
+| 24 | `/servicii/cazier-judiciar-online` | ⬜ lot 4 (servicii) | AI 21,3 — cel mai prost scor, pagina comercială #1 |
+| 25 | `/servicii/cazier-fiscal-online` | ⬜ lot 4 | căzută 8,48→48,42 |
+| 26 | `/servicii/extras-de-carte-funciara` | ⬜ lot 4 | căzută 7,84→22,32; backlink money.ro |
+| 27 | `/servicii/eliberare-certificat-de-nastere` | ⬜ lot 4 | 1.714 clicuri, AI 13,5 |
+| 28 | `/servicii/cazier-auto-online` | ⬜ lot 4 | 1.692 clicuri, AI 13,8 |
+| 29 | `/servicii/eliberare-certificat-de-casatorie` | ⬜ lot 4 | AI 14,6; Jaccard 0,32 cu naștere |
+| 30 | `/servicii/eliberare-certificat-de-celibat` | ⬜ lot 4 | AI 14,0 |
+| 31 | `/servicii/certificat-de-integritate-comportamentala` | ⬜ lot 4 | 0 clicuri post-update |
+| 32 | `/servicii/certificat-constatator-online` | ⬜ lot 4 | 3 backlinkuri dofollow; 14,3→21,2 |
+
+**Bilanț:** 13 livrate, 7 în lucru (lot 2), 12 rămase (lot 3: 3 pagini de alt
+tip; lot 4: 9 pagini `/servicii/`, șablonul de serviciu cu wizard, preț,
+`ReviewsSection`; se lucrează diferit de articole, cu grijă la componentele
+partajate).
+
+**Regula de lot:** agentul NU atinge `src/lib/seo/last-modified.ts`,
+`src/config/articles.ts`, `/servicii/` (când face articole), nu rulează
+`npm run build`, nu face commit. La final: build + `vitest run tests/unit` +
+registrul last-modified + `articles.ts` + acest jurnal → un commit, un push.
+
+**Semnal păstrat din plan:** Faza 3 zicea 1–2 pagini/săptămână, ca să poată fi
+citite de un om. Ownerul a ales loturi; compensăm cu surse primare pe fiecare
+cifră și cu citirea paginilor sensibile (TVA, ONRC) înainte de push.
