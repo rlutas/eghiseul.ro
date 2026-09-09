@@ -29,6 +29,7 @@ import {
   Award,
 } from 'lucide-react';
 import type { Service, ServiceOption, ServiceCategory } from '@/types/services';
+import { serviceHasDedicatedPage } from '@/lib/seo';
 
 // Revalidate once per hour — services rarely change
 export const revalidate = 3600;
@@ -88,6 +89,23 @@ async function getServiceOptions(serviceId: string): Promise<ServiceOption[]> {
   return data as ServiceOption[];
 }
 
+/**
+ * Doar slug-urile din `generateStaticParams()` sunt rute valide.
+ *
+ * Fără asta, `/servicii/<orice>/` răspundea **HTTP 200** — un spațiu INFINIT de
+ * URL-uri „valide", fix forma de conținut la scară pe care am curățat-o din site.
+ * `notFound()` în `generateMetadata` a reparat titlul și `robots`, dar 404-ul
+ * prerandat continua să fie servit cu 200; doar închiderea parametrilor dă
+ * statusul corect.
+ *
+ * ⚠️ Compromisul, ca să nu surprindă pe nimeni: un serviciu activat din admin
+ * (`is_active = true`) NU va fi accesibil până la următorul deploy, fiindcă
+ * lista de rute se citește din DB la BUILD. Adăugarea unui serviciu e oricum o
+ * schimbare de cod (modul de wizard, șabloane) — vezi
+ * docs/technical/specs/modular-wizard-guide.md — deci deploy-ul vine oricum.
+ */
+export const dynamicParams = false;
+
 export async function generateStaticParams(): Promise<{ slug: string }[]> {
   const supabase = createPublicClient();
 
@@ -96,18 +114,28 @@ export async function generateStaticParams(): Promise<{ slug: string }[]> {
     .select('slug')
     .eq('is_active', true);
 
-  return (data || []).map((s: { slug: string }) => ({ slug: s.slug }));
+  return (data || [])
+    .filter((s: { slug: string }) => !serviceHasDedicatedPage(s.slug))
+    .map((s: { slug: string }) => ({ slug: s.slug }));
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
   const service = await getServiceBySlug(slug);
 
+  // 404 REAL, nu metadata de consolare.
+  //
+  // Aici se întorcea `{ title: 'Serviciu indisponibil' }`, iar Next servea
+  // răspunsul cu **HTTP 200** — pagina randa 404-ul, dar statusul spunea „există".
+  // Efectul: `/servicii/<orice>/` răspundea 200, adică un spațiu INFINIT de
+  // URL-uri valide, cu două `<meta robots>` contradictorii (`index, follow` din
+  // layout + `noindex` din not-found). Exact forma de conținut la scară pe care
+  // tocmai am curățat-o din site (verificare 09.09.2026).
+  //
+  // `notFound()` aici face ca toată ruta să se rezolve ca 404: status corect,
+  // titlu corect, un singur `robots`.
   if (!service) {
-    return {
-      title: 'Serviciu indisponibil',
-      description: 'Serviciul solicitat nu este disponibil.',
-    };
+    notFound();
   }
 
   const title =

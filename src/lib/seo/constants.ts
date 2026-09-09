@@ -120,6 +120,16 @@ export function serviceUrl(slug: string): string {
 }
 
 /**
+ * Slug-urile de DB care au pagină dedicată la alt URL (deci `/servicii/<slug>/`
+ * doar redirectează acolo). Ruta `[slug]` le exclude din `generateStaticParams`:
+ * altfel le prerandează degeaba, iar fișierele astea inaccesibile au poluat
+ * auditul (4 H1 duplicate și 3 titluri dublu-sufixate care nu existau live).
+ */
+export function serviceHasDedicatedPage(slug: string): boolean {
+  return slug in SERVICE_URL_OVERRIDES;
+}
+
+/**
  * Calculator pages (ported from WP /calculator/*).
  * GOL intenționat: paginile NU sunt încă construite — listarea lor în sitemap
  * trimitea 404-uri la Google. Adaugă slug-ul AICI doar când pagina
