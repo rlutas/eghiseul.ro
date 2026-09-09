@@ -106,15 +106,15 @@ export default async function ActualizareAdresaCfPage() {
 
   // Ways to identify the property
   const identifiers = [
-    { icon: ScrollText, title: 'Număr de carte funciară', desc: 'Numărul CF al imobilului din localitate (ex: 12783).' },
-    { icon: KeyRound, title: 'Număr cadastral', desc: 'Identificatorul unic al imobilului, dacă nu ai numărul CF.' },
+    { icon: ScrollText, title: 'Numărul de carte funciară', desc: 'Al imobilului a cărui adresă trebuie corectată.' },
+    { icon: KeyRound, title: 'Numărul cadastral', desc: 'Ne folosim de el dacă numărul CF nu îl mai găsești.' },
   ];
 
   const useCases = [
-    { icon: MapPin, title: 'Strada a fost redenumită', items: ['Renumerotare imobile', 'Redenumire stradă', 'Comasare străzi'] },
-    { icon: ScrollText, title: 'Dosar la notar sau bancă', items: ['Adresă corectă în CF', 'Credit ipotecar', 'Act de vânzare-cumpărare'] },
-    { icon: Home, title: 'Vrei să vinzi imobilul', items: ['Date CF actualizate', 'Evitarea respingerii dosarului', 'Tranzacție fără blocaje'] },
-    { icon: Layers, title: 'Aliniere cu nomenclatorul', items: ['Adresa reală vs. CF', 'Nomenclator stradal nou', 'Corespondență adrese'] },
+    { icon: MapPin, title: 'Primăria a schimbat strada', items: ['Redenumire după 1990', 'Renumerotarea caselor', 'Două artere comasate'] },
+    { icon: ScrollText, title: 'Notarul a oprit dosarul', items: ['Adresa din act nu bate cu CF', 'Autentificare amânată', 'Se cere corectarea întâi'] },
+    { icon: Home, title: 'Vinzi sau ipotechezi', items: ['Banca verifică potrivirea', 'Cumpărătorul cere claritate', 'Rezolvi înainte de semnare'] },
+    { icon: Layers, title: 'Ai observat singur diferența', items: ['Extrasul arată altă stradă', 'Actul arată alt număr', 'Rezolvi fără presiune de timp'] },
   ];
 
   return (
@@ -169,18 +169,17 @@ export default async function ActualizareAdresaCfPage() {
                 </h1>
 
                 <p className="text-lg sm:text-xl text-white/85 leading-relaxed mb-6">
-                  Aducem adresa imobilului din cartea funciară la zi cu nomenclatorul stradal. Pregătim și
-                  depunem cererea la OCPI, apoi ne ocupăm de tot procesul. Nu trebuie să mergi la ghișeu.
+                  Singurul serviciu de aici care schimbă ceva în registru, nu doar scoate o copie. Pregătim
+                  cererea și o depunem la OCPI în numele tău.
                 </p>
 
                 {/* USP */}
                 <div className="flex items-start gap-3 rounded-xl bg-primary-500/15 border border-primary-500/40 p-4 mb-6">
                   <MapPin className="h-5 w-5 text-primary-500 flex-shrink-0 mt-0.5" />
                   <p className="text-white/95 text-sm sm:text-base leading-relaxed">
-                    Adresa din CF nu mai corespunde realității după o{' '}
-                    <strong className="text-primary-500">renumerotare sau redenumire de stradă</strong>?
-                    Depunem cererea de <strong>actualizare a adresei</strong> la OCPI ca să eviți respingerea
-                    dosarului la notar sau la bancă.
+                    Cel mai des ajunge lumea aici <strong className="text-primary-500">după ce notarul a
+                    oprit dosarul</strong>, fiindcă adresa din act nu bate cu cea din registru. Se rezolvă, dar{' '}
+                    <strong>trebuie început de la primărie</strong>.
                   </p>
                 </div>
 
@@ -190,10 +189,10 @@ export default async function ActualizareAdresaCfPage() {
                   </p>
                   <ul className="mt-3 space-y-1.5 text-white/85 text-sm">
                     {[
-                      'Ne dai numărul de carte funciară sau cadastral și adresa corectă',
-                      'Confirmăm județul, localitatea și datele imobilului',
-                      'Plătești securizat (taxele OCPI sunt incluse)',
-                      'Depunem cererea la OCPI; primești confirmarea pe email',
+                      'Ne spui ce adresă apare acum și care e cea corectă',
+                      'Verificăm ce dovadă de la primărie e nevoie',
+                      'Achiți online partea care ține de noi',
+                      'Depunem cererea și îți trimitem confirmarea',
                     ].map((step) => (
                       <li key={step} className="flex items-center gap-2">
                         <CheckCircle className="w-4 h-4 text-primary-500 flex-shrink-0" />
@@ -309,71 +308,83 @@ export default async function ActualizareAdresaCfPage() {
         <section className="py-12 lg:py-16 bg-neutral-50">
           <div className="container mx-auto px-4 max-w-[820px]">
             <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-5">
-              Ce înseamnă actualizarea adresei în cartea funciară
+              Aici nu scoatem o hârtie, aici modificăm registrul
             </h2>
             <div className="space-y-4 text-neutral-700 leading-relaxed">
               <p>
-                <strong>Actualizarea adresei în cartea funciară</strong> (numită și notarea adresei poștale) este
-                operațiunea prin care adresa imobilului înscrisă în CF se aliniază cu{' '}
-                <strong>nomenclatorul stradal actual</strong>. În timp, primăriile renumerotează imobilele,
-                redenumesc sau comasează străzi, iar adresa veche rămasă în cartea funciară nu mai corespunde cu
-                cea reală. Această neconcordanță poate bloca dosare la notar, la bancă sau la vânzare.
+                Toate celelalte servicii de pe site îți aduc o copie a ceva ce există deja. Acesta e altfel: e o{' '}
+                <strong>operațiune de carte funciară</strong>. Se depune o cerere la Oficiul de Cadastru și
+                Publicitate Imobiliară, iar dacă e admisă, adresa înscrisă în registru se schimbă și corespunde de
+                atunci cu strada și numărul real.
               </p>
               <p>
-                Spre deosebire de o simplă copie de pe cartea funciară, aceasta este o{' '}
-                <strong>operațiune de carte funciară</strong> — o cerere care se depune la Oficiul de Cadastru și
-                Publicitate Imobiliară (<strong>OCPI / ANCPI</strong>) și pe baza căreia adresa din CF se modifică
-                pentru a reflecta strada și numărul corect. Prin eGhișeul pregătim și depunem cererea în numele
-                tău, fără cont ANCPI și fără deplasare la ghișeul OCPI.
+                Nevoia apare pentru că localitățile se schimbă, iar registrul nu se schimbă singur. Primăriile
+                redenumesc străzi, renumerotează case, comasează două artere într-una singură. Adresa rămasă în
+                cartea funciară e cea de la data înscrierii, uneori de acum treizeci de ani. Cât timp nu ai treabă
+                cu ea, nu deranjează pe nimeni.
               </p>
-              <div className="rounded-2xl border border-neutral-200 bg-white p-5">
+
+              <h3 className="text-xl font-bold text-secondary-900 pt-2">
+                Problema apare exact în ziua în care ai nevoie de act
+              </h3>
+              <p>
+                Notarul compară adresa din actul de proprietate, pe cea din cartea funciară și pe cea din
+                nomenclatorul primăriei. Dacă cele trei nu spun același lucru, autentificarea se amână până se
+                lămurește situația. Banca face aceeași verificare la un credit ipotecar. De aici vine majoritatea
+                cererilor pe care le primim: oameni care aflaseră de nepotrivire cu o zi înainte de semnare.
+              </p>
+              <p>
+                De asta merită rezolvată din timp, nu în ziua tranzacției. Dacă ai observat pe un extras mai vechi
+                că strada e alta decât cea de pe poartă, ăla e momentul bun.
+              </p>
+
+              <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5">
                 <h3 className="font-bold text-secondary-900 mb-2">
-                  Actualizare adresă vs. simplă consultare a CF
+                  Se începe de la primărie, nu de la noi
                 </h3>
                 <p className="text-sm text-neutral-700">
-                  O <strong>copie de pe cartea funciară</strong> îți arată situația așa cum este înscrisă acum,
-                  inclusiv adresa veche. <strong>Actualizarea adresei</strong> schimbă efectiv adresa din CF pe
-                  baza unei cereri la OCPI, astfel încât cartea funciară să arate adresa reală.{' '}
-                  <Link href={serviceUrl('copie-carte-funciara')} className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
-                    Vezi copia de carte funciară
-                  </Link>
-                  .
+                  OCPI nu decide singur cum se numește o stradă. Pentru actualizare este nevoie, de regulă, de o
+                  dovadă de la primărie, un <strong>certificat de nomenclatură stradală</strong> care atestă
+                  denumirea și numărul corect al imobilului. Fără el, cererea nu are pe ce să se sprijine. Dacă nu
+                  ai încă documentul, îți spunem exact ce să ceri la primărie și cum se leagă de cererea depusă la
+                  OCPI.
                 </p>
               </div>
 
               <h3 className="text-xl font-bold text-secondary-900 pt-2">
-                Când ai nevoie să actualizezi adresa din CF
+                Ce nu se schimbă odată cu adresa
               </h3>
               <p>
-                Cel mai des, nevoia apare atunci când <strong>adresa din cartea funciară nu mai corespunde
-                realității</strong>: strada a fost redenumită, imobilele au fost renumerotate sau două artere au
-                fost comasate. Notarii și băncile verifică concordanța dintre adresa din actul de proprietate,
-                cartea funciară și nomenclatorul primăriei — iar o diferență duce frecvent la amânarea sau
-                respingerea dosarului.
+                Nimic altceva. Actualizarea atinge doar adresa poștală înscrisă în registru. Proprietarul rămâne
+                același, suprafața rămâne aceeași, sarcinile rămân unde erau, iar actul tău de proprietate nu se
+                rescrie. Nu e o corectare de suprafață, nu e o dezmembrare și nu repară o greșeală din contract.
               </p>
               <p>
-                Recomandăm actualizarea înainte de o <strong>tranzacție imobiliară</strong>, înainte de
-                semnarea unui credit ipotecar sau ori de câte ori observi că adresa de pe extras diferă de cea pe
-                care o folosești în acte. Datele corecte îți scutesc timp și evită blocajele de ultim moment la
-                notar.
-              </p>
-              <p>
-                Pentru actualizare poate fi necesară o <strong>dovadă de la primărie</strong> — de regulă un
-                certificat de nomenclatură stradală care atestă noua denumire și numărul corect al imobilului.
-                Dacă nu o ai încă, echipa noastră îți îndrumă pașii: îți spunem exact ce document trebuie cerut la
-                primărie și cum se corelează cu cererea depusă la OCPI.
-              </p>
-              <p>
-                Dacă vrei să verifici mai întâi situația juridică completă a imobilului — proprietar, suprafață,
-                sarcini — îți recomandăm{' '}
+                Nu confunda operațiunea nici cu o simplă consultare. O copie de pe cartea funciară îți arată
+                situația așa cum e înscrisă acum, cu tot cu adresa veche.{' '}
+                <Link href={serviceUrl('copie-carte-funciara')} className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
+                  Vezi copia de carte funciară
+                </Link>
+                . Dacă vrei mai întâi să verifici situația juridică sau eventualele ipoteci, ai{' '}
                 <Link href={serviceUrl('extras-carte-funciara')} className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
                   extrasul de carte funciară
                 </Link>
-                , iar dacă te interesează strict eventualele ipoteci sau interdicții,{' '}
+                {' '}și{' '}
                 <Link href={serviceUrl('certificat-sarcini')} className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
                   certificatul de sarcini
                 </Link>
                 .
+              </p>
+              <h3 className="text-xl font-bold text-secondary-900 pt-2">
+                Ordinea pașilor, ca să nu pierzi timp
+              </h3>
+              <p>
+                Mai întâi primăria, apoi noi. Compartimentul care se ocupă de nomenclatorul stradal îți
+                eliberează dovada că strada se numește acum altfel sau că imobilul a primit alt număr. Abia cu
+                documentul acela cererea depusă la registru are pe ce sta. Dacă începi invers, ajungi să aștepți
+                oricum după primărie, doar că mai stresat. Un detaliu care se uită des: cere dovada pe numele
+                proprietarului înscris în registru, nu pe numele celui care locuiește acolo acum. Când cele două
+                nu coincid, mai e ceva de lămurit înainte.
               </p>
             </div>
           </div>
@@ -387,11 +398,10 @@ export default async function ActualizareAdresaCfPage() {
                 Ce îți trebuie
               </span>
               <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-3">
-                Ce date ne trebuie pentru actualizarea adresei
+                Ce ne trimiți ca să pregătim cererea
               </h2>
               <p className="text-neutral-600 max-w-2xl mx-auto">
-                Un singur identificator al imobilului, județul și localitatea, plus adresa nouă (corectă). Dacă nu
-                cunoști numărul CF, îl putem afla după adresă.
+                Un număr al imobilului, localitatea, adresa scrisă acum în registru și cea corectă.
               </p>
             </div>
 
@@ -410,7 +420,7 @@ export default async function ActualizareAdresaCfPage() {
             <div className="mt-6 p-5 bg-primary-50 rounded-2xl border border-primary-200 max-w-2xl mx-auto flex items-start gap-3">
               <Search className="w-5 h-5 text-primary-600 flex-shrink-0 mt-0.5" />
               <p className="text-sm text-secondary-700">
-                <strong>Nu știi numărul de carte funciară?</strong> Îl putem afla după adresă prin serviciul de{' '}
+                <strong>Nu mai ai numărul de CF la îndemână?</strong> Îl scoatem cu serviciul de{' '}
                 <Link href={serviceUrl('identificare-imobil')} className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
                   Identificare Imobil
                 </Link>
@@ -428,7 +438,7 @@ export default async function ActualizareAdresaCfPage() {
                 Când ai nevoie
               </span>
               <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-3">
-                Când trebuie să actualizezi adresa din CF?
+                Cele patru situații în care se ajunge aici
               </h2>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -463,15 +473,15 @@ export default async function ActualizareAdresaCfPage() {
                 Proces simplu
               </span>
               <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white mb-3">Cum Funcționează?</h2>
-              <p className="text-white/70 max-w-2xl mx-auto">Actualizezi adresa din CF în 4 pași, 100% online</p>
+              <p className="text-white/70 max-w-2xl mx-auto">Cererea o pregătim și o depunem noi, în numele tău</p>
             </div>
             <div className="relative grid sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-6">
               <div className="hidden lg:block absolute top-8 left-[12.5%] right-[12.5%] h-0.5 bg-gradient-to-r from-primary-500/0 via-primary-500/50 to-primary-500/0" aria-hidden="true" />
               {[
-                { step: 1, title: 'Datele Imobilului', desc: 'Ne dai numărul de carte funciară sau cadastral și adresa corectă.', icon: KeyRound },
-                { step: 2, title: 'Confirmăm Detaliile', desc: 'Verificăm județul, localitatea și adresa nouă înainte de depunere.', icon: MapPin },
-                { step: 3, title: 'Plătești Securizat', desc: 'Card, Apple Pay, Google Pay — taxele OCPI sunt incluse.', icon: Shield },
-                { step: 4, title: 'Depunem Cererea', desc: `Depunem cererea la OCPI și în ${formatEstimatedDays(service)} primești confirmarea pe email.`, icon: CheckCircle },
+                { step: 1, title: 'Cele două adrese', desc: 'Cea scrisă acum în registru și cea corectă, de pe stradă.', icon: KeyRound },
+                { step: 2, title: 'Dovada de la primărie', desc: 'Verificăm ce document e nevoie și îți spunem ce să ceri.', icon: MapPin },
+                { step: 3, title: 'Plata', desc: 'Acoperă depunerea. Ce cere primăria pentru dovadă rămâne separat.', icon: Shield },
+                { step: 4, title: 'Depunerea', desc: `Ducem cererea la OCPI, iar confirmarea îți vine în ${formatEstimatedDays(service)}.`, icon: CheckCircle },
               ].map((item) => (
                 <div key={item.step} className="relative text-center">
                   <div className="relative z-10 mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-400 to-primary-600 text-secondary-900 shadow-[0_8px_24px_rgba(236,185,95,0.35)]">
@@ -492,7 +502,7 @@ export default async function ActualizareAdresaCfPage() {
         <section className="py-12 lg:py-16 bg-white">
           <div className="container mx-auto px-4 max-w-[1000px]">
             <h2 className="text-xl sm:text-2xl font-bold text-secondary-900 mb-6 text-center">
-              Servicii pentru imobile
+              De verificat înainte sau după actualizare
             </h2>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <Link
@@ -534,17 +544,15 @@ export default async function ActualizareAdresaCfPage() {
 
         {/* FAQ */}
         <ServiceFAQ
-          title="Întrebări Frecvente — Actualizare Adresă în Cartea Funciară"
+          title="Întrebări despre corectarea adresei din registru"
           faqs={[
-            { q: 'Ce presupune actualizarea adresei în cartea funciară?', a: 'Este o operațiune de carte funciară: depunem la OCPI/ANCPI o cerere prin care adresa imobilului din CF se aliniază cu nomenclatorul stradal actual. Nu este o simplă copie, ci o modificare efectivă a adresei înscrise în cartea funciară.' },
-            { q: 'Când am nevoie de această actualizare?', a: 'Atunci când adresa din CF nu mai corespunde realității — de regulă după renumerotări sau redenumiri de străzi — sau când ai un dosar la notar ori la bancă care cere o adresă corectă, precum și înainte de o vânzare a imobilului.' },
-            { q: 'Ce acte sunt necesare?', a: 'De obicei este necesară o dovadă de la primărie privind adresa corectă, cel mai frecvent un certificat de nomenclatură stradală care atestă noua denumire și numărul imobilului. Echipa noastră îți spune exact ce trebuie cerut la primărie și cum se corelează cu cererea depusă la OCPI.' },
-            { q: 'Cât durează actualizarea adresei?', a: `${formatEstimatedDays(service)}. Cererea este procesată de un operator, iar confirmarea o primești pe email.` },
-            { q: 'Cât costă serviciul?', a: `${service.base_price} RON, cu taxele OCPI incluse. Fără costuri ascunse.` },
-            { q: 'Cine poate cere actualizarea adresei?', a: 'Proprietarul imobilului sau o persoană împuternicită de acesta. Ne ocupăm noi de pregătirea și depunerea cererii la OCPI în numele tău.' },
-            { q: 'Am nevoie de cont ANCPI?', a: 'Nu. Ne ocupăm noi de tot procesul; tu ai nevoie doar de numărul de carte funciară sau cadastral și de adresa corectă.' },
-            { q: 'Nu știu numărul de carte funciară. Ce fac?', a: 'Îl putem afla după adresă prin serviciul de Identificare Imobil, apoi pregătim cererea de actualizare a adresei.' },
-            { q: 'Ce primesc la final?', a: 'Primești pe email încheierea de carte funciară prin care OCPI confirmă modificarea, împreună cu un extras de carte funciară în care apare adresa corectată și factura. La cerere, putem trimite documentele și pe WhatsApp.' },
+            { q: 'Ce document îmi trebuie de la primărie?', a: 'De regulă un certificat de nomenclatură stradală, care atestă denumirea actuală a străzii și numărul corect al imobilului. Fără o dovadă emisă de primărie, cererea la OCPI nu are pe ce să se sprijine. Dacă nu îl ai încă, îți spunem exact ce să ceri și de la ce compartiment.' },
+            { q: 'Se schimbă și altceva în cartea funciară?', a: 'Nu. Se atinge doar adresa poștală înscrisă. Proprietarul, suprafața, numărul cadastral și sarcinile rămân neatinse. Actul tău de proprietate nu se rescrie și nu se înlocuiește.' },
+            { q: 'Notarul mi-a amânat semnarea din cauza asta. Cât durează până se rezolvă?', a: `Depinde de cât de repede obții dovada de la primărie. Partea care ține de noi durează ${formatEstimatedDays(service)}, socotit de la depunerea cererii cu documentația completă. Spune-i notarului că actualizarea este în curs.` },
+            { q: 'Cine poate cere actualizarea?', a: 'Proprietarul înscris în cartea funciară sau cineva împuternicit de el. Fiind o operațiune care modifică registrul, nu se poate face de oricine, spre deosebire de o simplă consultare.' },
+            { q: 'Adresa din contractul meu e greșită. Se repară tot aici?', a: 'Nu. O eroare din actul de proprietate se îndreaptă la notarul care l-a autentificat sau, după caz, în instanță. Serviciul de față aliniază registrul la nomenclatorul stradal, nu corectează un act semnat.' },
+            { q: 'Nu vând nimic acum. Merită să o fac?', a: 'Merită tocmai fiindcă nu ai presiune de timp. Când apare tranzacția, lipsa de potrivire dintre adrese devine urgentă și scumpă în nervi. Făcută din timp, e o formalitate.' },
+            { q: 'Cât costă și ce primesc la final?', a: `${service.base_price} RON pentru partea care ține de noi; ce cere primăria pentru certificatul de nomenclatură se plătește separat, acolo. La final primești pe email confirmarea soluționării, iar orice extras nou scos pentru imobil va arăta adresa corectată.` },
           ]}
         />
 
@@ -562,11 +570,11 @@ export default async function ActualizareAdresaCfPage() {
           <div className="relative container mx-auto px-4 max-w-[900px]">
             <div className="text-center">
               <h2 className="text-2xl lg:text-4xl font-extrabold text-white mb-4">
-                Gata să actualizezi adresa din CF?
+                Ți-a spus notarul că adresa nu se potrivește?
               </h2>
               <p className="text-lg text-white/80 mb-8 max-w-xl mx-auto">
-                Ai nevoie doar de numărul de carte funciară sau cadastral și de adresa corectă. Primești
-                confirmarea în {formatEstimatedDays(service)}.
+                Trimite-ne cele două adrese și numărul imobilului. Pregătim cererea, o depunem, iar confirmarea
+                vine în {formatEstimatedDays(service)}.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
                 <OrderButton href={`/comanda/${SERVICE_SLUG}`}>Comandă Acum</OrderButton>

@@ -104,15 +104,15 @@ export default async function ExtrasCfColectivPage() {
 
   // Ways to identify the property (the building, not the apartment)
   const identifiers = [
-    { icon: ScrollText, title: 'Număr de carte funciară colectivă', desc: 'Numărul CF al construcției-condominiu (blocul), nu cel al apartamentului tău.' },
-    { icon: KeyRound, title: 'Număr cadastral al blocului', desc: 'Identificatorul unic al construcției înscrise în cadastru.' },
+    { icon: ScrollText, title: 'CF-ul blocului', desc: 'Nu cel al apartamentului. Apare de obicei pe extrasul tău individual.' },
+    { icon: KeyRound, title: 'Numărul cadastral al construcției', desc: 'Partea din numărul apartamentului dinaintea sufixului de unitate.' },
   ];
 
   const useCases = [
-    { icon: Home, title: 'Tranzacții apartamente', items: ['Vânzare-cumpărare', 'Verificare cote indivize', 'Dosar notarial complet'] },
-    { icon: Layers, title: 'Asociații de proprietari', items: ['Părțile comune', 'Cote din proprietate', 'Administrarea blocului'] },
-    { icon: Landmark, title: 'Dosare bancare', items: ['Credit ipotecar', 'Refinanțare', 'Garanții imobiliare'] },
-    { icon: ScrollText, title: 'Litigii condominiu', items: ['Spații comune', 'Cote contestate', 'Documentare juridică'] },
+    { icon: Home, title: 'Notarul îl cere la vânzare', items: ['Verificarea cotei indivize', 'Alături de extrasul individual', 'Dosar complet de tranzacție'] },
+    { icon: Layers, title: 'Asociația vrea claritate', items: ['Ce e parte comună', 'Cum se împart cotele', 'Terenul de sub bloc'] },
+    { icon: ScrollText, title: 'Dispută pe spații comune', items: ['Uscătorie sau boxă', 'Mansardă revendicată', 'Cote contestate'] },
+    { icon: Landmark, title: 'Dosar de credit', items: ['Banca verifică blocul', 'Sarcini pe părțile comune', 'Refinanțare'] },
   ];
 
   return (
@@ -167,18 +167,17 @@ export default async function ExtrasCfColectivPage() {
                 </h1>
 
                 <p className="text-lg sm:text-xl text-white/85 leading-relaxed mb-6">
-                  Cartea funciară a întregii construcții-condominiu, adică a blocului, cu părțile comune și
-                  cotele indivize. Este un document separat de cartea funciară a apartamentului tău. O obții
-                  100% online, fără cont ANCPI.
+                  Un bloc are două niveluri de înscriere: unul pentru clădire, altul pentru fiecare apartament.
+                  Aici e vorba de primul, cel cu părțile comune și cotele indivize.
                 </p>
 
                 {/* USP */}
                 <div className="flex items-start gap-3 rounded-xl bg-primary-500/15 border border-primary-500/40 p-4 mb-6">
                   <Layers className="h-5 w-5 text-primary-500 flex-shrink-0 mt-0.5" />
                   <p className="text-white/95 text-sm sm:text-base leading-relaxed">
-                    Vezi <strong className="text-primary-500">părțile comune și cotele indivize</strong> ale
-                    blocului — esențial pentru <strong>tranzacții de apartamente</strong>, asociații de
-                    proprietari, dosare bancare și verificarea situației juridice a condominiului.
+                    Când vinzi un apartament, notarul se uită și la{' '}
+                    <strong className="text-primary-500">ce cotă din bloc</strong> pleacă odată cu el. Cota aia se
+                    citește aici, <strong>nu în extrasul apartamentului</strong>.
                   </p>
                 </div>
 
@@ -188,10 +187,10 @@ export default async function ExtrasCfColectivPage() {
                   </p>
                   <ul className="mt-3 space-y-1.5 text-white/85 text-sm">
                     {[
-                      'Introduci numărul de carte funciară sau cadastral al blocului',
-                      'Confirmi județul și localitatea',
-                      'Plătești securizat (taxe OCPI incluse)',
-                      'Primești extrasul CF colectivă pe email',
+                      'Ne dai CF-ul sau numărul cadastral al construcției',
+                      'Ne spui județul și localitatea',
+                      'Achiți o singură dată, fără costuri ulterioare',
+                      'Îți trimitem extrasul blocului, pe email',
                     ].map((step) => (
                       <li key={step} className="flex items-center gap-2">
                         <CheckCircle className="w-4 h-4 text-primary-500 flex-shrink-0" />
@@ -307,71 +306,80 @@ export default async function ExtrasCfColectivPage() {
         <section className="py-12 lg:py-16 bg-neutral-50">
           <div className="container mx-auto px-4 max-w-[820px]">
             <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-5">
-              Ce este extrasul de carte funciară colectivă și când îți trebuie
+              Un bloc are două cărți funciare, iar tu o cunoști doar pe una
             </h2>
             <div className="space-y-4 text-neutral-700 leading-relaxed">
               <p>
-                <strong>Extrasul de carte funciară colectivă</strong> este extrasul CF al imobilului-bloc, adică
-                al întregii <strong>construcții-condominiu</strong> în care se află apartamentul tău. Spre deosebire
-                de cartea funciară individuală, care descrie un singur apartament și proprietarul lui, cartea
-                funciară colectivă cuprinde <strong>părțile comune</strong> ale blocului (fundație, structură,
-                acoperiș, casa scării, lift, terenul de sub bloc) și <strong>cotele indivize</strong> care revin
-                fiecărui apartament din aceste părți comune.
+                Când se înscrie în cadastru o clădire cu mai multe locuințe, se deschid două niveluri de evidență.
+                Unul pentru construcția întreagă, numit <strong>carte funciară colectivă</strong>, și câte unul
+                pentru fiecare apartament în parte. Extrasul individual, cel pe care îl are aproape toată lumea,
+                vine din al doilea nivel. Aici e vorba de primul.
               </p>
               <p>
-                Fiecare bloc de locuințe are, practic, două niveluri de înscriere în cartea funciară: o
-                <strong> CF colectivă</strong> pentru construcția în ansamblu și câte o <strong>CF individuală</strong>
-                {' '}pentru fiecare unitate locativă. Extrasul colectiv arată cum se împarte proprietatea comună între
-                apartamente, ce cotă din teren și din părțile comune îți revine și care este situația juridică a
-                blocului în ansamblu. Este eliberat de Oficiul de Cadastru și Publicitate Imobiliară
-                (<strong>OCPI / ANCPI</strong>).
+                Cartea funciară colectivă ține evidența a ceea ce nu aparține nimănui în particular: fundația,
+                structura, acoperișul, casa scării, liftul, terenul de sub bloc. Și, mai important pentru
+                proprietari, ține <strong>cotele indivize</strong>, adică felul în care partea aceea comună se
+                împarte între apartamente. Cota ta din bloc nu e o cifră pe care o alege administratorul, ci una
+                înscrisă în registrul ținut de Oficiul de Cadastru și Publicitate Imobiliară.
               </p>
+
+              <h3 className="text-xl font-bold text-secondary-900 pt-2">
+                Unde intervine, practic
+              </h3>
               <p>
-                Ai nevoie de extrasul CF colectivă în special la <strong>tranzacțiile de apartamente</strong> (notarul
-                îl cere alături de extrasul individual pentru a verifica cotele indivize), în activitatea
-                <strong> asociațiilor de proprietari</strong>, pentru <strong>dosarele bancare</strong> de credit
-                ipotecar, precum și în <strong>litigiile de condominiu</strong> legate de spațiile comune sau de cotele
-                din proprietate. Prin eGhișeul îl obții online, fără cont ANCPI și fără deplasare la ghișeul OCPI.
+                La <strong>vânzarea unui apartament</strong>, în primul rând. Când vinzi, pleacă odată cu
+                apartamentul și cota din părțile comune, iar notarul vrea să vadă cât înseamnă ea, deci cere
+                extrasul colectiv alături de cel individual. Apoi în viața{' '}
+                <strong>asociației de proprietari</strong>, ori de câte ori se pune întrebarea ce este parte comună
+                și cine cât deține din ea. Și, destul de des, în <strong>dispute</strong>: o uscătorie transformată
+                în boxă, o mansardă revendicată de cineva, o cotă contestată. Toate se lămuresc pornind de la ce
+                este înscris pentru clădire.
               </p>
+
               <div className="rounded-2xl border border-neutral-200 bg-white p-5">
                 <h3 className="font-bold text-secondary-900 mb-2">
-                  CF colectivă vs. CF individuală
+                  De unde iei numărul, dacă nu îl ai
                 </h3>
                 <p className="text-sm text-neutral-700">
-                  <strong>CF colectivă</strong> = cartea funciară a întregului bloc (părțile comune și cotele
-                  indivize ale construcției-condominiu). <strong>CF individuală</strong> = cartea funciară a unui
-                  singur apartament (proprietar, suprafață utilă, sarcini). Sunt documente complementare — pentru
-                  o tranzacție completă ai de obicei nevoie de amândouă.{' '}
-                  <Link href={serviceUrl('extras-carte-funciara')} className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
-                    Vezi extrasul de carte funciară individuală
-                  </Link>
-                  .
+                  Numărul cărții funciare colective apare de obicei chiar în{' '}
+                  <strong>extrasul apartamentului tău</strong>, la rubrica unde se identifică construcția. Tot
+                  acolo se vede și numărul cadastral al clădirii: la apartamente, identificatorul are formă
+                  compusă, iar partea dinaintea sufixului de unitate este chiar construcția. Dacă nu îl găsești,
+                  trimite-ne datele blocului și îl căutăm noi.
                 </p>
               </div>
 
               <h3 className="text-xl font-bold text-secondary-900 pt-2">
-                Ce conține extrasul de carte funciară colectivă
+                Ce nu găsești în extrasul colectiv
               </h3>
               <p>
-                Documentul descrie construcția-condominiu pe cele trei părți ale cărții funciare: partea de
-                <strong> descriere a imobilului</strong> (blocul, terenul aferent, numărul cadastral), partea
-                referitoare la <strong>proprietate și cotele indivize</strong> (cum se împarte proprietatea comună
-                între unitățile locative) și partea privind <strong>sarcinile</strong> care grevează părțile comune.
-                Pe scurt, vezi <strong>cine deține ce cotă din părțile comune</strong> și care este situația juridică
-                a blocului ca ansamblu.
-              </p>
-              <p>
-                Pentru a comanda extrasul colectiv ai nevoie de <strong>numărul de carte funciară colectivă</strong> sau
-                de <strong>numărul cadastral al blocului</strong>. Atenție, acestea sunt diferite de numărul CF al
-                apartamentului. Dacă deții doar datele apartamentului, numărul CF colectivă apare de regulă chiar în
-                extrasul individual al apartamentului, la rubrica de identificare a construcției.
-              </p>
-              <p>
-                Dacă vrei mai întâi situația juridică a propriului apartament, comandă{' '}
+                Apartamentul tău. Proprietarul lui, suprafața utilă și sarcinile care îl grevează se citesc în
+                cartea funciară individuală, nu aici. Cele două documente se completează, iar pentru o tranzacție
+                sunt cerute de obicei împreună.{' '}
                 <Link href={serviceUrl('extras-carte-funciara')} className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
-                  extrasul de carte funciară individuală
+                  Vezi extrasul de carte funciară individuală
                 </Link>
-                , iar pentru tranzacție completezi cu extrasul colectiv pe care îl obții de aici.
+                .
+              </p>
+              <p>
+                Nu găsești nici planul locuinței. Compartimentarea, camerele și suprafețele pe încăperi sunt pe
+                releveu, care e altă planșă și se cere separat. Iar dacă întrebarea ta este strict ce ipoteci sau
+                interdicții există, mergi pe{' '}
+                <Link href={serviceUrl('certificat-sarcini')} className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
+                  certificatul de sarcini
+                </Link>
+                , care merge direct la partea aceea.
+              </p>
+              <h3 className="text-xl font-bold text-secondary-900 pt-2">
+                Ce te uiți pe el, concret
+              </h3>
+              <p>
+                Prima dată la teren: dacă parcela de sub bloc figurează în proprietatea condominiului sau dacă
+                apare altcineva pe ea. Diferența contează în blocurile mai vechi și în cele construite pe teren
+                închiriat. Apoi la lista părților comune, ca să vezi dacă spațiul despre care se discută în
+                asociație e trecut acolo. La final, la partea de sarcini: dacă pe clădire ca ansamblu există o
+                ipotecă sau o notare, ea privește indirect și cota ta. Sunt trei lucruri, se citesc în zece
+                minute, și de obicei ele închid discuția din ședința de asociație.
               </p>
             </div>
           </div>
@@ -385,10 +393,10 @@ export default async function ExtrasCfColectivPage() {
                 Ce îți trebuie
               </span>
               <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-3">
-                Cum identifici blocul pentru extrasul CF colectivă
+                Ne trebuie datele clădirii, nu ale locuinței
               </h2>
               <p className="text-neutral-600 max-w-2xl mx-auto">
-                Ai nevoie de un singur identificator al construcției, nu cel al apartamentului tău.
+                Aici se greșește cel mai des: numărul apartamentului nu ne duce la cartea funciară a blocului.
               </p>
             </div>
 
@@ -407,9 +415,9 @@ export default async function ExtrasCfColectivPage() {
             <div className="mt-6 p-5 bg-primary-50 rounded-2xl border border-primary-200 max-w-2xl mx-auto flex items-start gap-3">
               <Search className="w-5 h-5 text-primary-600 flex-shrink-0 mt-0.5" />
               <p className="text-sm text-secondary-700">
-                <strong>Ai doar numărul CF al apartamentului?</strong> Numărul de carte funciară colectivă apare de
-                obicei chiar în extrasul individual, la identificarea construcției. Dacă nu îl găsești, scrie-ne
-                datele blocului și te ajutăm să îl identifici.
+                <strong>Ai numai extrasul apartamentului?</strong> Uită-te pe el la rubrica unde se identifică
+                construcția: numărul colectiv e de obicei chiar acolo. Dacă nu îl vezi, trimite-ne adresa blocului
+                și îl căutăm noi.
               </p>
             </div>
           </div>
@@ -423,7 +431,7 @@ export default async function ExtrasCfColectivPage() {
                 Când ai nevoie
               </span>
               <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-3">
-                Când ai nevoie de extrasul CF colectivă
+                Cine se uită la cotele indivize
               </h2>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -458,15 +466,15 @@ export default async function ExtrasCfColectivPage() {
                 Proces simplu
               </span>
               <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white mb-3">Cum Funcționează?</h2>
-              <p className="text-white/70 max-w-2xl mx-auto">Obții extrasul CF colectivă în 4 pași, 100% online</p>
+              <p className="text-white/70 max-w-2xl mx-auto">Cerem noi extrasul clădirii de la biroul teritorial</p>
             </div>
             <div className="relative grid sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-6">
               <div className="hidden lg:block absolute top-8 left-[12.5%] right-[12.5%] h-0.5 bg-gradient-to-r from-primary-500/0 via-primary-500/50 to-primary-500/0" aria-hidden="true" />
               {[
-                { step: 1, title: 'Identifici Blocul', desc: 'Introduci numărul de carte funciară colectivă sau cadastral al construcției.', icon: KeyRound },
-                { step: 2, title: 'Confirmi Localitatea', desc: 'Alegi județul și localitatea. Verificăm datele înainte de depunere.', icon: MapPin },
-                { step: 3, title: 'Plătești Securizat', desc: 'Card, Apple Pay, Google Pay — taxele OCPI sunt incluse.', icon: Shield },
-                { step: 4, title: 'Primești Extrasul', desc: `În ${formatEstimatedDays(service)} primești extrasul CF colectivă pe email.`, icon: CheckCircle },
+                { step: 1, title: 'Datele clădirii', desc: 'CF-ul colectiv sau numărul cadastral al construcției.', icon: KeyRound },
+                { step: 2, title: 'Unde e blocul', desc: 'Județul și localitatea. Le potrivim cu evidența înainte de depunere.', icon: MapPin },
+                { step: 3, title: 'Plata', desc: 'O plată online, care acoperă și tariful cerut de instituție.', icon: Shield },
+                { step: 4, title: 'Extrasul blocului', desc: `Cu părți comune și cote indivize, pe email în ${formatEstimatedDays(service)}.`, icon: CheckCircle },
               ].map((item) => (
                 <div key={item.step} className="relative text-center">
                   <div className="relative z-10 mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-400 to-primary-600 text-secondary-900 shadow-[0_8px_24px_rgba(236,185,95,0.35)]">
@@ -487,7 +495,7 @@ export default async function ExtrasCfColectivPage() {
         <section className="py-12 lg:py-16 bg-white">
           <div className="container mx-auto px-4 max-w-[900px]">
             <h2 className="text-xl sm:text-2xl font-bold text-secondary-900 mb-6 text-center">
-              Servicii pentru imobile
+              Ce se cere împreună cu extrasul blocului
             </h2>
             <div className="grid sm:grid-cols-2 gap-4">
               <Link
@@ -529,17 +537,15 @@ export default async function ExtrasCfColectivPage() {
 
         {/* FAQ */}
         <ServiceFAQ
-          title="Întrebări Frecvente — Extras de Carte Funciară Colectivă"
+          title="Întrebări despre cartea funciară a blocului"
           faqs={[
-            { q: 'Ce este extrasul de carte funciară colectivă?', a: 'Este extrasul CF al întregului bloc (construcția-condominiu), care cuprinde părțile comune și cotele indivize aferente fiecărui apartament. Este distinct de cartea funciară individuală a unui singur apartament și este eliberat de OCPI/ANCPI.' },
-            { q: 'Cu ce diferă de extrasul de carte funciară individuală?', a: 'CF colectivă descrie întreaga construcție-condominiu (părți comune, cote indivize, terenul de sub bloc), iar CF individuală descrie un singur apartament (proprietar, suprafață utilă, sarcini). Sunt documente complementare; la o tranzacție notarul cere de obicei ambele.' },
-            { q: 'Ce conține extrasul CF colectivă?', a: 'Conține descrierea construcției-condominiu și a terenului aferent, modul în care se împart proprietatea comună și cotele indivize între apartamente, precum și sarcinile care grevează părțile comune ale blocului.' },
-            { q: 'Ce sunt părțile comune și cotele indivize?', a: 'Părțile comune sunt elementele blocului folosite de toți proprietarii: structura, fundația, acoperișul, casa scării, liftul, terenul de sub bloc. Cota indiviză este partea din aceste părți comune care revine fiecărui apartament, proporțional cu suprafața deținută.' },
-            { q: 'De ce am nevoie de extrasul colectiv la vânzarea apartamentului?', a: 'Notarul verifică prin extrasul colectiv cota indiviză din părțile comune și terenul care se transmit odată cu apartamentul. Fără el, situația juridică a tranzacției nu este completă.' },
-            { q: 'Cât costă extrasul CF colectivă?', a: `${service.base_price} RON, cu taxele OCPI incluse. Fără costuri ascunse.` },
-            { q: 'Cât durează eliberarea?', a: `${formatEstimatedDays(service)}. Documentul este procesat de un operator și livrat pe email.` },
-            { q: 'Nu știu numărul CF colectivă. Ce fac?', a: 'Numărul de carte funciară colectivă apare de regulă chiar în extrasul individual al apartamentului, la identificarea construcției. Dacă nu îl găsești, scrie-ne datele blocului (CF sau cadastral apartament, adresă) și te ajutăm să îl identificăm.' },
-            { q: 'Am nevoie de cont ANCPI?', a: 'Nu. Ne ocupăm noi de tot procesul; tu ai nevoie doar de numărul de carte funciară colectivă sau cadastral al blocului.' },
+            { q: 'Ce sunt cotele indivize și de ce mă interesează?', a: 'Sunt felul în care părțile comune ale clădirii se împart între apartamente. Cota ta pleacă odată cu locuința când o vinzi și determină, printre altele, cât reprezinți în deciziile care privesc blocul. Nu e o cifră stabilită de administrator, ci una înscrisă în registru.' },
+            { q: 'Nu găsesc numărul de CF colectivă. Unde scrie?', a: 'De obicei chiar în extrasul apartamentului tău, la rubrica unde se identifică construcția. Tot acolo apare și numărul cadastral al clădirii: la apartamente identificatorul e compus, iar partea dinaintea sufixului de unitate este construcția.' },
+            { q: 'Extrasul colectiv îmi arată cine deține apartamentul meu?', a: 'Nu. Proprietarul, suprafața utilă și sarcinile locuinței tale se citesc în cartea funciară individuală. Extrasul colectiv se ocupă de clădire ca ansamblu și de împărțirea părților comune.' },
+            { q: 'De ce mi-l cere notarul dacă eu vând doar apartamentul?', a: 'Fiindcă odată cu apartamentul se transmite și cota din părțile comune, iar notarul trebuie să vadă cât înseamnă. De aceea extrasul colectiv se cere de regulă alături de cel individual, nu în locul lui.' },
+            { q: 'Vecinul a închis uscătoria. Extrasul lămurește ceva?', a: 'Ajută, fiindcă arată ce este înscris ca parte comună a clădirii. Dacă spațiul figurează acolo, e un punct de plecare solid în discuția din asociație sau, la nevoie, în instanță. Ce s-a construit fără drept rămâne totuși o chestiune de dovedit separat.' },
+            { q: 'Blocul meu e vechi. Are carte funciară colectivă?', a: 'De regulă da, dar la construcții vechi înscrierile pot fi incomplete sau făcute altfel decât la blocurile noi. Dacă la verificare descoperim o situație neobișnuită, îți spunem ce am găsit înainte să mergem mai departe.' },
+            { q: 'Cât costă extrasul clădirii și cât aștept?', a: `${service.base_price} RON pentru extrasul clădirii; cel individual se comandă separat. Îți ajunge pe email în ${formatEstimatedDays(service)}, în forma eliberată de instituție.` },
           ]}
         />
 
@@ -557,10 +563,10 @@ export default async function ExtrasCfColectivPage() {
           <div className="relative container mx-auto px-4 max-w-[900px]">
             <div className="text-center">
               <h2 className="text-2xl lg:text-4xl font-extrabold text-white mb-4">
-                Gata să obții Extrasul CF Colectivă?
+                Vrei să vezi cotele indivize ale blocului?
               </h2>
               <p className="text-lg text-white/80 mb-8 max-w-xl mx-auto">
-                Ai nevoie doar de numărul de carte funciară colectivă sau cadastral al blocului. Primești documentul în {formatEstimatedDays(service)}.
+                Ne trebuie CF-ul sau numărul cadastral al clădirii, plus localitatea. Extrasul vine pe email în {formatEstimatedDays(service)}.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
                 <OrderButton href={`/comanda/${SERVICE_SLUG}`}>Comandă Acum</OrderButton>

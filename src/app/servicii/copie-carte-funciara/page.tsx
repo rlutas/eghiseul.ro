@@ -189,7 +189,7 @@ export default async function CopieCarteFunciaraPage() {
                     {[
                       'Ne dai numărul cărții funciare sau pe cel cadastral',
                       'Adaugi județul și localitatea imobilului',
-                      'Plătești o singură dată, cu taxa OCPI inclusă',
+                      'Achiți o singură sumă, în care intră și taxa instituției',
                       'Copia integrală a registrului ajunge pe email',
                     ].map((step) => (
                       <li key={step} className="flex items-center gap-2">
@@ -472,7 +472,7 @@ export default async function CopieCarteFunciaraPage() {
               {[
                 { step: 1, title: 'Ne dai numărul', desc: 'Numărul cărții funciare sau cel cadastral al imobilului.', icon: KeyRound },
                 { step: 2, title: 'Spui unde este', desc: 'Județul și localitatea. Verificăm potrivirea înainte să depunem cererea.', icon: MapPin },
-                { step: 3, title: 'Plătești o dată', desc: 'Card, Apple Pay sau Google Pay. Taxa OCPI este deja în preț.', icon: Shield },
+                { step: 3, title: 'Plătești o dată', desc: 'Suma afișată acoperă și taxa pe care o achită operatorul la registru.', icon: Shield },
                 { step: 4, title: 'Primești registrul', desc: `Copia integrală ajunge pe email în ${formatEstimatedDays(service)}.`, icon: CheckCircle },
               ].map((item) => (
                 <div key={item.step} className="relative text-center">
@@ -577,8 +577,7 @@ export default async function CopieCarteFunciaraPage() {
             { q: 'Pot cere copia pentru un imobil care nu este al meu?', a: 'Cartea funciară este un registru public, iar informarea asupra conținutului ei nu este rezervată proprietarului. Practic, poți cere copia și pentru un imobil pe care doar îl verifici, înainte de o cumpărare sau într-un litigiu.' },
             { q: 'Imobilul are două numere de carte funciară. Care este cel bun?', a: 'Se întâmplă des după dezmembrări și alipiri: numărul vechi s-a închis, iar imobilul a trecut într-unul nou. Trimite-ne toate numerele pe care le ai, chiar dacă par să nu se potrivească. Operatorul verifică în evidență care este CF-ul activ și din ce provine.' },
             { q: 'Copia are un termen de valabilitate?', a: 'Nu are un termen scris pe ea. Contează data la care a fost scoasă din arhivă, pentru că orice înscriere făcută după acea dată nu are cum să apară în ea. Instanțele și notarii se uită la cât de recentă este, nu la un termen.' },
-            { q: 'Cât plătesc pentru copia integrală?', a: `${service.base_price} RON, cu taxa OCPI inclusă. Fără costuri ascunse.` },
-            { q: 'În cât timp o primesc?', a: `${formatEstimatedDays(service)}. Un operator depune cererea la OCPI, achită taxa și îți trimite copia pe email, în format electronic.` },
+            { q: 'Cât plătesc și în cât timp o primesc?', a: `${service.base_price} RON, indiferent de câte file are registrul. Un operator depune cererea la OCPI, achită taxa și îți trimite copia pe email, în format electronic, în ${formatEstimatedDays(service)}.` },
           ]}
         />
 

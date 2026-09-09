@@ -104,16 +104,16 @@ export default async function CopieIntabularePage() {
 
   // Ways to identify the property
   const identifiers = [
-    { icon: ScrollText, title: 'Număr de carte funciară', desc: 'Numărul CF al proprietății din localitatea respectivă.' },
-    { icon: KeyRound, title: 'Număr cadastral', desc: 'Identificatorul unic al imobilului, de exemplu 12783.' },
-    { icon: Layers, title: 'Număr încheiere (opțional)', desc: 'Dacă îl ai, numărul încheierii de intabulare scurtează căutarea.' },
+    { icon: ScrollText, title: 'Numărul cărții funciare', desc: 'Cel din care s-a făcut înscrierea. Îl vezi pe orice extras mai vechi.' },
+    { icon: KeyRound, title: 'Numărul cadastral', desc: 'Merge și el, dacă CF-ul nu îl mai găsești prin acte.' },
+    { icon: Layers, title: 'Numărul încheierii, dacă îl ai', desc: 'Nu e obligatoriu, dar cu el operatorul nimerește direct fila căutată.' },
   ];
 
   const useCases = [
-    { icon: Landmark, title: 'Bancă și notariat', items: ['Dovada intabulării pentru credit', 'Dosar notarial', 'Constituire ipotecă'] },
-    { icon: ScrollText, title: 'Succesiuni și moșteniri', items: ['Dezbatere succesorală', 'Transmiterea dreptului', 'Partaj între moștenitori'] },
-    { icon: Shield, title: 'Litigii și dosare', items: ['Probarea dreptului în instanță', 'Dosar de fond funciar', 'Apărarea proprietății'] },
-    { icon: Search, title: 'Refacerea actelor', items: ['Înlocuirea actelor pierdute', 'Verificarea înscrierii', 'Istoricul dreptului'] },
+    { icon: Landmark, title: 'Banca cere dovada înscrierii', items: ['Constituirea ipotecii', 'Tragerea creditului', 'Verificarea garanției'] },
+    { icon: Search, title: 'Ai pierdut actele', items: ['Nu mai știi ce ai semnat', 'Nu mai știi când', 'Registrul păstrează amândouă'] },
+    { icon: Shield, title: 'Dispută pe proprietate', items: ['Când s-a înscris dreptul', 'În baza cărui titlu', 'În ce cotă'] },
+    { icon: ScrollText, title: 'Dosar de succesiune', items: ['Cum a dobândit defunctul', 'Actul din spatele înscrierii', 'Transmiterea către moștenitori'] },
   ];
 
   return (
@@ -168,17 +168,17 @@ export default async function CopieIntabularePage() {
                 </h1>
 
                 <p className="text-lg sm:text-xl text-white/85 leading-relaxed mb-6">
-                  Copie certificată din arhiva OCPI a încheierii prin care dreptul tău de proprietate a fost
-                  înscris în cartea funciară.
+                  Actul prin care registratorul de carte funciară a hotărât că dreptul tău intră în registru.
+                  Îl scoatem din arhiva OCPI, cu număr, dată și soluție cu tot.
                 </p>
 
                 {/* USP */}
                 <div className="flex items-start gap-3 rounded-xl bg-primary-500/15 border border-primary-500/40 p-4 mb-6">
                   <ScrollText className="h-5 w-5 text-primary-500 flex-shrink-0 mt-0.5" />
                   <p className="text-white/95 text-sm sm:text-base leading-relaxed">
-                    Primești <strong className="text-primary-500">dovada că dreptul a fost înscris</strong> în
-                    cartea funciară: copia încheierii de intabulare din arhivă. O folosești la bancă, la notar,
-                    în succesiuni sau când vrei să refaci actele pierdute.
+                    Un extras spune cine e proprietar acum. Încheierea spune{' '}
+                    <strong className="text-primary-500">când și pe ce temei</strong> a devenit. Diferența contează
+                    la bancă, în instanță și <strong>când nu mai ai actele</strong>.
                   </p>
                 </div>
 
@@ -188,10 +188,10 @@ export default async function CopieIntabularePage() {
                   </p>
                   <ul className="mt-3 space-y-1.5 text-white/85 text-sm">
                     {[
-                      'Introduci numărul de carte funciară sau cel cadastral',
-                      'Confirmi județul și localitatea imobilului',
-                      'Plătești securizat, cu taxele OCPI deja incluse',
-                      'Primești copia încheierii de intabulare pe email',
+                      'Ne dai CF-ul, numărul cadastral sau pe cel al încheierii',
+                      'Precizezi județul și localitatea',
+                      'Achiți suma afișată, fără costuri adăugate ulterior',
+                      'Îți trimitem încheierea scanată, pe email',
                     ].map((step) => (
                       <li key={step} className="flex items-center gap-2">
                         <CheckCircle className="w-4 h-4 text-primary-500 flex-shrink-0" />
@@ -307,69 +307,82 @@ export default async function CopieIntabularePage() {
         <section className="py-12 lg:py-16 bg-neutral-50">
           <div className="container mx-auto px-4 max-w-[820px]">
             <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-5">
-              Ce este copia de intabulare și la ce folosește
+              Încheierea de intabulare: decizia care a băgat dreptul în registru
             </h2>
             <div className="space-y-4 text-neutral-700 leading-relaxed">
               <p>
-                <strong>Intabularea</strong> este procedura prin care dreptul de proprietate sau un alt drept real
-                asupra unui imobil se <strong>înscrie în cartea funciară</strong> ținută de Oficiul de Cadastru și
-                Publicitate Imobiliară (<strong>OCPI / ANCPI</strong>). După ce analizează cererea, registratorul de
-                carte funciară emite o <strong>încheiere de intabulare</strong>, iar din acel moment dreptul devine
-                opozabil terților. <strong>Copia de intabulare</strong> este reproducerea certificată a acelei
-                încheieri, scoasă din arhiva OCPI.
+                Un contract semnat la notar nu te face automat proprietar în ochii registrului. Actul se depune la
+                Oficiul de Cadastru și Publicitate Imobiliară, un <strong>registrator de carte funciară</strong> îl
+                analizează și, dacă totul e în regulă, dă o <strong>încheiere de intabulare</strong>. Din clipa aceea
+                dreptul e înscris și devine opozabil altora. Copia de intabulare este reproducerea acelei încheieri,
+                scoasă din arhiva OCPI.
               </p>
               <p>
-                Pe scurt, copia de intabulare arată <strong>că dreptul tău a fost înscris</strong> în cartea
-                funciară. Conține titularul dreptului, actul în baza căruia s-a făcut înscrierea (contract de
-                vânzare, donație, certificat de moștenitor, hotărâre judecătorească) și încheierea care a confirmat
-                operațiunea. Prin eGhișeul o ceri online, fără cont ANCPI și fără drum la ghișeul OCPI.
+                Pe ea găsești numărul și data de înregistrare a cererii, soluția registratorului, titularul dreptului,
+                cota înscrisă și actul care a stat la baza operațiunii: contract de vânzare, donație, certificat de
+                moștenitor, hotărâre judecătorească. Practic, e fișa unei singure operațiuni din viața imobilului,
+                nu o privire generală asupra lui.
               </p>
+
+              <h3 className="text-xl font-bold text-secondary-900 pt-2">
+                Când ajunge cineva să o ceară
+              </h3>
+              <p>
+                Cel mai frecvent, la bancă. Într-un credit cu ipotecă, banca vrea negru pe alb momentul în care
+                dreptul a intrat în registru, ca să știe pe ce se așază garanția ei. Al doilea caz e mult mai
+                banal: oameni care și-au pierdut dosarul de la cumpărare și nu mai știu nici de la cine au luat
+                imobilul, nici în ce an. Registrul le ține minte pe amândouă. Al treilea e disputa, unde întrebarea
+                nu e cine e proprietar, ci <em>de când</em> și <em>în baza cărui titlu</em> — exact ce scrie în
+                încheiere. Iar la succesiuni, notarul se uită la ea ca să vadă cum a dobândit defunctul.
+              </p>
+
               <div className="rounded-2xl border border-neutral-200 bg-white p-5">
                 <h3 className="font-bold text-secondary-900 mb-2">
-                  Copie de intabulare sau extras de carte funciară
+                  Nu e același lucru cu contractul, deși lumea le zice la fel
                 </h3>
                 <p className="text-sm text-neutral-700">
-                  <strong>Extrasul de carte funciară</strong> îți arată situația juridică <em>de astăzi</em> a
-                  imobilului: proprietar, suprafață, sarcini, la zi. <strong>Copia de intabulare</strong> redă chiar
-                  încheierea care a stat la baza dobândirii dreptului, așa că o folosești când trebuie să dovedești{' '}
-                  <em>cum și când</em> a fost înscris dreptul.{' '}
-                  <Link href={serviceUrl('extras-carte-funciara')} className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
-                    Vezi extrasul de carte funciară
+                  Mulți spun „actul de intabulare” gândindu-se la contractul de vânzare. Sunt două hârtii diferite:
+                  contractul e ce ai semnat la notar, încheierea e ce a decis registratorul după ce a primit
+                  contractul. Dacă ai nevoie de contract, el se cere separat din arhivă.{' '}
+                  <Link href={serviceUrl('copie-contract-vanzare')} className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
+                    Vezi copia contractului de vânzare
                   </Link>
                   .
                 </p>
               </div>
 
               <h3 className="text-xl font-bold text-secondary-900 pt-2">
-                Ce conține copia de intabulare
+                Ce nu dovedește copia încheierii
               </h3>
               <p>
-                Copia scoasă din arhiva OCPI cuprinde <strong>încheierea de intabulare</strong>, cu numărul și data
-                înregistrării cererii și soluția registratorului, plus <strong>actul în temeiul căruia s-a
-                înscris</strong> dreptul în cartea funciară. Așa vezi că proprietatea a fost înscrisă corect, în ce
-                cotă și pe baza cărui titlu. Sunt detalii pe care un extras la zi nu le arată mereu.
+                Că mai ești proprietar astăzi. Încheierea îngheață un moment din trecut: la data aceea, dreptul a
+                fost înscris pe numele acela. Dacă imobilul a fost vândut sau ipotecat de atunci, copia încheierii
+                nu are de unde să știe. Pentru situația de acum ai nevoie de{' '}
+                <Link href={serviceUrl('extras-carte-funciara')} className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
+                  extrasul de carte funciară
+                </Link>
+                . Tot așa, încheierea nu îți spune ce sarcini apasă imobilul în prezent și nu ține loc de contract.
               </p>
               <p>
-                Primești documentul în <strong>format electronic, pe email</strong>. Un operator depune cererea la
-                OCPI în numele tău și urmărește soluționarea. Taxele OCPI intră în preț, iar tu nu ai nevoie de cont
-                ANCPI și nici de semnătură electronică.
-              </p>
-
-              <h3 className="text-xl font-bold text-secondary-900 pt-2">
-                Când îți cere cineva copia de intabulare
-              </h3>
-              <p>
-                Cel mai des o cere <strong>banca</strong> la un credit ipotecar, <strong>notarul</strong> într-un
-                dosar de vânzare sau de succesiune și <strong>instanța</strong> într-un litigiu legat de
-                proprietate. Dacă ți-ai pierdut actele, copia din arhiva OCPI te ajută să{' '}
-                <strong>refaci</strong> dovada dreptului și să verifici cum a fost el înscris în cartea funciară.
-              </p>
-              <p>
-                Dacă nu știi numărul de carte funciară sau pe cel cadastral, îl aflăm după adresă prin serviciul de{' '}
+                Cererea o depune un operator de-al nostru la biroul teritorial care ține cartea funciară a
+                imobilului, achită taxa și urmărește soluționarea. Tu nu ai nevoie de cont ANCPI și nici de
+                semnătură electronică. Dacă nu mai ai la îndemână numărul de CF sau pe cel cadastral, îl aflăm după
+                adresă prin serviciul de{' '}
                 <Link href={serviceUrl('identificare-imobil')} className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
                   identificare imobil
                 </Link>
-                , apoi îți obținem copia de intabulare pentru imobilul găsit.
+                .
+              </p>
+              <h3 className="text-xl font-bold text-secondary-900 pt-2">
+                Ce faci când imobilul are mai multe încheieri
+              </h3>
+              <p>
+                Un imobil cu istorie strânge, în timp, mai multe încheieri: una pentru cumpărare, alta pentru
+                ipotecă, alta pentru radierea ei, alta pentru o notare. Toate sunt în evidență, iar dacă ceri
+                „încheierea” fără să spui care, riscăm să scoatem alta decât cea de care ai nevoie. Ajută mult
+                dacă ne dai un reper: anul aproximativ, tipul operațiunii sau numele persoanei pe care s-a
+                înscris dreptul. Când nu ai niciunul, spune-ne pentru ce îți trebuie documentul, fiindcă din scop
+                se deduce de obicei operațiunea căutată.
               </p>
             </div>
           </div>
@@ -383,10 +396,10 @@ export default async function CopieIntabularePage() {
                 Ce îți trebuie
               </span>
               <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-3">
-                Cum identifici imobilul pentru copia de intabulare
+                Cu ce date găsim încheierea în arhivă
               </h2>
               <p className="text-neutral-600 max-w-2xl mx-auto">
-                Îți trebuie numărul de carte funciară sau cel cadastral și localitatea. Dacă nu le ai la îndemână, le aflăm după adresă.
+                Oricare dintre numerele de mai jos ne pune pe drumul bun. Al treilea doar scurtează căutarea.
               </p>
             </div>
 
@@ -405,7 +418,7 @@ export default async function CopieIntabularePage() {
             <div className="mt-6 p-5 bg-primary-50 rounded-2xl border border-primary-200 max-w-2xl mx-auto flex items-start gap-3">
               <Search className="w-5 h-5 text-primary-600 flex-shrink-0 mt-0.5" />
               <p className="text-sm text-secondary-700">
-                <strong>Nu știi numărul de carte funciară?</strong> Îl putem afla după adresă prin serviciul de{' '}
+                <strong>Nu mai ai niciun act la îndemână?</strong> Pornim de la adresă, prin serviciul de{' '}
                 <Link href={serviceUrl('identificare-imobil')} className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
                   Identificare Imobil
                 </Link>
@@ -423,7 +436,7 @@ export default async function CopieIntabularePage() {
                 Când ai nevoie
               </span>
               <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-3">
-                Când Ai Nevoie de Copia de Intabulare?
+                Cine cere dovada că înscrierea s-a făcut
               </h2>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -458,15 +471,15 @@ export default async function CopieIntabularePage() {
                 Proces simplu
               </span>
               <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white mb-3">Cum Funcționează?</h2>
-              <p className="text-white/70 max-w-2xl mx-auto">Obții copia de intabulare în 4 pași, 100% online</p>
+              <p className="text-white/70 max-w-2xl mx-auto">Depunem noi cererea la biroul teritorial. Tu aștepți emailul.</p>
             </div>
             <div className="relative grid sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-6">
               <div className="hidden lg:block absolute top-8 left-[12.5%] right-[12.5%] h-0.5 bg-gradient-to-r from-primary-500/0 via-primary-500/50 to-primary-500/0" aria-hidden="true" />
               {[
-                { step: 1, title: 'Identifici Imobilul', desc: 'Introduci numărul de carte funciară sau cadastral.', icon: KeyRound },
-                { step: 2, title: 'Confirmi Localitatea', desc: 'Alegi județul și localitatea. Verificăm datele înainte de depunere.', icon: MapPin },
-                { step: 3, title: 'Plătești Securizat', desc: 'Card, Apple Pay, Google Pay — taxele OCPI sunt incluse.', icon: Shield },
-                { step: 4, title: 'Primești Copia', desc: `În ${formatEstimatedDays(service)} primești copia de intabulare pe email.`, icon: CheckCircle },
+                { step: 1, title: 'Ce numere ai', desc: 'CF-ul, numărul cadastral sau numărul încheierii.', icon: KeyRound },
+                { step: 2, title: 'Ce birou teritorial', desc: 'Din județ și localitate deducem unde se ține cartea funciară.', icon: MapPin },
+                { step: 3, title: 'Plata', desc: 'Se face online. Ce achită operatorul la registru e deja acoperit.', icon: Shield },
+                { step: 4, title: 'Încheierea scanată', desc: `Ajunge pe email în ${formatEstimatedDays(service)}, după soluționare.`, icon: CheckCircle },
               ].map((item) => (
                 <div key={item.step} className="relative text-center">
                   <div className="relative z-10 mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-400 to-primary-600 text-secondary-900 shadow-[0_8px_24px_rgba(236,185,95,0.35)]">
@@ -487,7 +500,7 @@ export default async function CopieIntabularePage() {
         <section className="py-12 lg:py-16 bg-white">
           <div className="container mx-auto px-4 max-w-[900px]">
             <h2 className="text-xl sm:text-2xl font-bold text-secondary-900 mb-6 text-center">
-              Servicii pentru imobile
+              Documentele care se cer alături de încheiere
             </h2>
             <div className="grid sm:grid-cols-2 gap-4">
               <Link
@@ -540,17 +553,15 @@ export default async function CopieIntabularePage() {
 
         {/* FAQ */}
         <ServiceFAQ
-          title="Întrebări Frecvente — Copie Intabulare"
+          title="Întrebări despre încheierea de intabulare"
           faqs={[
-            { q: 'Ce este intabularea?', a: 'Intabularea este procedura prin care dreptul de proprietate (sau alt drept real) asupra unui imobil se înscrie în cartea funciară ținută de OCPI. În urma cererii, registratorul emite o încheiere de intabulare, iar dreptul devine opozabil terților.' },
-            { q: 'Ce conține copia de intabulare?', a: 'Copia eliberată din arhiva OCPI cuprinde încheierea de intabulare (număr, dată, soluția registratorului) și reproducerea actului care a stat la baza înscrierii dreptului în cartea funciară.' },
-            { q: 'Cu ce diferă de extrasul de carte funciară?', a: 'Extrasul de carte funciară arată situația juridică actuală a imobilului (proprietar, suprafață, sarcini), la zi. Copia de intabulare reproduce actul de înscriere și încheierea care au stat la baza dobândirii dreptului — utilă pentru a proba cum și când a fost înscris dreptul.' },
-            { q: 'La ce îmi folosește copia de intabulare?', a: 'Este dovada că dreptul tău a fost înscris în cartea funciară. Este cerută frecvent de bancă la credit ipotecar, de notar în dosare de vânzare sau succesiune, în litigii privind proprietatea sau pentru reconstituirea actelor pierdute.' },
-            { q: 'Cât durează eliberarea?', a: `${formatEstimatedDays(service)}. Cererea este depusă la OCPI și procesată manual de un operator, iar copia îți este livrată pe email.` },
-            { q: 'Cât costă copia de intabulare?', a: `${service.base_price} RON, cu taxele OCPI incluse. Fără costuri ascunse.` },
-            { q: 'Nu știu numărul de carte funciară. Ce fac?', a: 'Îl putem afla după adresă prin serviciul de Identificare Imobil, apoi îți obținem copia de intabulare pentru imobilul găsit.' },
-            { q: 'Am nevoie de cont ANCPI?', a: 'Nu. Ne ocupăm noi de tot procesul; tu ai nevoie doar de numărul de carte funciară sau cadastral și de localitate.' },
-            { q: 'Este valabilă la notar și la bancă?', a: 'Da. Copia de intabulare provine din arhiva OCPI și servește ca dovadă a înscrierii dreptului în cartea funciară pentru dosare notariale și pentru bancă. Dacă instituția cere un anumit format sau o anumită vechime, confirmă cerința înainte de a comanda.' },
+            { q: 'Copia încheierii dovedește că sunt proprietar astăzi?', a: 'Nu. Dovedește că la o anumită dată dreptul a fost înscris pe numele cuiva, în baza unui anumit act. Dacă imobilul a fost vândut sau grevat după aceea, încheierea nu are cum să arate. Pentru situația de acum îți trebuie extrasul de carte funciară.' },
+            { q: 'Care e diferența dintre încheiere și contractul de vânzare?', a: 'Contractul este ce ai semnat la notar. Încheierea este decizia registratorului de carte funciară după ce a primit contractul și a admis cererea de înscriere. Prima creează dreptul între părți, a doua îl trece în registru. Se cer separat din arhivă.' },
+            { q: 'Ce scrie, concret, pe încheiere?', a: 'Numărul și data de înregistrare a cererii, soluția registratorului, titularul dreptului, cota înscrisă și actul în temeiul căruia s-a făcut înscrierea. La imobile cu mai multe operațiuni, fiecare are încheierea ei.' },
+            { q: 'Am pierdut toate actele de la cumpărare. Mă ajută?', a: 'Da, e unul dintre motivele obișnuite pentru care se cere. Din încheiere afli în ce an s-a înscris dreptul și pe baza cărui act, iar de acolo poți merge mai departe către notarul care l-a autentificat sau către copia contractului din arhivă.' },
+            { q: 'Trebuie să fiu eu titularul dreptului ca să cer copia?', a: 'Nu neapărat. Încheierea face parte din evidența de carte funciară, care este publică. Dacă însă ai nevoie de actul din spatele ei, acolo intervin datele personale și regulile sunt mai stricte.' },
+            { q: 'Am numărul încheierii. Ajută la ceva?', a: 'Ajută mult. Cu el operatorul merge direct la fila căutată, în loc să parcurgă toate operațiunile înscrise pe imobil. Dacă nu îl ai, ne descurcăm cu numărul de carte funciară sau cu cel cadastral.' },
+            { q: 'Cât plătesc și cât aștept?', a: `${service.base_price} RON, sumă din care se achită și tariful de la registru. Operatorul depune cererea la biroul teritorial care ține cartea funciară a imobilului, iar copia îți vine pe email în ${formatEstimatedDays(service)}.` },
           ]}
         />
 
@@ -568,10 +579,10 @@ export default async function CopieIntabularePage() {
           <div className="relative container mx-auto px-4 max-w-[900px]">
             <div className="text-center">
               <h2 className="text-2xl lg:text-4xl font-extrabold text-white mb-4">
-                Gata să obții Copia de Intabulare?
+                Vrei dovada că dreptul a fost înscris?
               </h2>
               <p className="text-lg text-white/80 mb-8 max-w-xl mx-auto">
-                Ai nevoie doar de numărul de carte funciară sau cadastral. Primești documentul în {formatEstimatedDays(service)}.
+                Ne ajunge un număr de CF sau unul cadastral. Încheierea îți vine pe email în {formatEstimatedDays(service)}.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
                 <OrderButton href={`/comanda/${SERVICE_SLUG}`}>Comandă Acum</OrderButton>

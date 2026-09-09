@@ -104,15 +104,15 @@ export default async function CopieInventarCoordonatePage() {
 
   // Ways to identify the property
   const identifiers = [
-    { icon: KeyRound, title: 'Număr cadastral', desc: 'Identificatorul unic al imobilului din OCPI (ex: 12783).' },
-    { icon: ScrollText, title: 'Număr de carte funciară', desc: 'Numărul CF asociat proprietății din localitate.' },
+    { icon: KeyRound, title: 'Numărul cadastral', desc: 'Cel sub care parcela figurează în evidența de cadastru.' },
+    { icon: ScrollText, title: 'Numărul de carte funciară', desc: 'Îl folosim la fel de bine, dacă cel cadastral nu îl ai la îndemână.' },
   ];
 
   const useCases = [
-    { icon: Ruler, title: 'Trasare limite în teren', items: ['Materializarea hotarelor', 'Puncte de contur X/Y', 'Verificare cu stația GPS'] },
-    { icon: Home, title: 'Proiectare & construcții', items: ['Documentații tehnice', 'Studii topografice', 'Certificat de urbanism'] },
-    { icon: MapIcon, title: 'Dezmembrare / alipire', items: ['Recalcul suprafețe', 'Trasarea noilor loturi', 'Documentații cadastrale'] },
-    { icon: ScrollText, title: 'Verificare suprapuneri', items: ['Comparare cu vecinii', 'Conflicte de hotar', 'Repoziționare imobil'] },
+    { icon: Ruler, title: 'Se pune gardul', items: ['Trasarea hotarului pe teren', 'Țăruși în punctele reale', 'Discuție încheiată cu vecinul'] },
+    { icon: MapIcon, title: 'Dezmembrare sau alipire', items: ['Se recalculează loturile', 'Coordonatele de pornire', 'Documentația nouă'] },
+    { icon: ScrollText, title: 'Suprapunere cu parcela vecină', items: ['Compari contururile', 'Vezi unde se calcă', 'Ai cifre, nu impresii'] },
+    { icon: Home, title: 'Proiectare pe teren', items: ['Poziționarea construcției', 'Retrageri față de limite', 'Studiu topografic'] },
   ];
 
   return (
@@ -167,18 +167,17 @@ export default async function CopieInventarCoordonatePage() {
                 </h1>
 
                 <p className="text-lg sm:text-xl text-white/85 leading-relaxed mb-6">
-                  Lista punctelor de contur ale imobilului, cu coordonate X/Y în sistemul de proiecție
-                  Stereo 70. Sunt valorile pe care le folosesc topografii și proiectanții ca să traseze
-                  și să verifice limitele în teren.
+                  Colțurile parcelei tale, scrise ca perechi de numere. Cu ele, un topograf regăsește hotarul
+                  pe teren fără să întrebe pe nimeni unde era.
                 </p>
 
                 {/* USP */}
                 <div className="flex items-start gap-3 rounded-xl bg-primary-500/15 border border-primary-500/40 p-4 mb-6">
                   <Ruler className="h-5 w-5 text-primary-500 flex-shrink-0 mt-0.5" />
                   <p className="text-white/95 text-sm sm:text-base leading-relaxed">
-                    Primești <strong className="text-primary-500">coordonatele tuturor punctelor de hotar</strong> ale
-                    parcelei în Stereo 70. Le folosești la <strong>trasarea limitelor în teren</strong>, la proiectare,
-                    la dezmembrare sau alipire și ca să verifici suprapunerile cu vecinii.
+                    Un plan se poate interpreta. O pereche de coordonate, nu. De asta se cer cifrele{' '}
+                    <strong className="text-primary-500">când se pune un gard</strong>, când se împarte un teren
+                    sau <strong>când doi vecini nu se înțeleg</strong>.
                   </p>
                 </div>
 
@@ -188,10 +187,10 @@ export default async function CopieInventarCoordonatePage() {
                   </p>
                   <ul className="mt-3 space-y-1.5 text-white/85 text-sm">
                     {[
-                      'Introduci numărul de carte funciară sau cadastral',
-                      'Confirmi județul și localitatea',
-                      'Plătești securizat (taxe OCPI incluse)',
-                      'Primești inventarul de coordonate pe email',
+                      'Ne dai numărul cadastral sau pe cel de CF',
+                      'Adaugi județul și localitatea parcelei',
+                      'Achiți suma afișată, fără alte costuri pe parcurs',
+                      'Îți trimitem tabelul de coordonate, pe email',
                     ].map((step) => (
                       <li key={step} className="flex items-center gap-2">
                         <CheckCircle className="w-4 h-4 text-primary-500 flex-shrink-0" />
@@ -307,44 +306,52 @@ export default async function CopieInventarCoordonatePage() {
         <section className="py-12 lg:py-16 bg-neutral-50">
           <div className="container mx-auto px-4 max-w-[820px]">
             <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-5">
-              Ce este inventarul de coordonate Stereo 70 și la ce folosește
+              Colțurile parcelei, scrise ca numere
             </h2>
             <div className="space-y-4 text-neutral-700 leading-relaxed">
               <p>
-                <strong>Copia inventarului de coordonate</strong> în sistemul de proiecție{' '}
-                <strong>Stereo 70</strong> este lista punctelor de contur ale imobilului, adică{' '}
-                <strong>punctele de hotar</strong> care delimitează parcela, exprimate prin coordonate{' '}
-                <strong>X și Y</strong>. Fiecare colț al terenului are o pereche de coordonate raportată la
-                sistemul național de referință, așa că poziția exactă a imobilului poate fi reconstituită
-                matematic, oricine ar face măsurătoarea.
+                Fiecare colț al unui teren măsurat are o pereche de valori, X și Y, raportate la sistemul național
+                de proiecție <strong>Stereo 70</strong>. Puse una sub alta, valorile astea formează inventarul de
+                coordonate: lista punctelor de hotar ale parcelei, așa cum au fost înregistrate în evidența
+                OCPI / ANCPI. Documentul mai conține de obicei distanțele dintre puncte și suprafața rezultată din
+                calcul, ca să poți închide conturul și verifica dacă îți iese.
               </p>
               <p>
-                Pe scurt, inventarul de coordonate este „scheletul numeric” al limitei tale de proprietate.
-                Planul de amplasament arată grafic forma parcelei, în timp ce inventarul de coordonate
-                conține valorile precise pe care un topograf le încarcă în stația totală sau în
-                receptorul GPS ca să regăsească sau să materializeze hotarele pe teren.
+                Diferența practică față de orice planșă e că un desen se poate citi greșit, iar o pereche de numere
+                nu. Topograful încarcă valorile în stația totală sau în receptorul GPS, iese pe teren și pune
+                țărușii exact acolo unde spun cifrele. Doi ingineri diferiți, cu aparate diferite, ajung în același
+                punct.
               </p>
 
               <h3 className="text-xl font-bold text-secondary-900 pt-2">
-                Ce conține inventarul de coordonate
+                Trei momente în care lumea le cere
               </h3>
               <p>
-                Documentul cuprinde un tabel cu toate punctele de contur ale imobilului, numerotate de regulă
-                1, 2, 3 și așa mai departe. Pentru fiecare punct sunt trecute coordonatele <strong>X (nord)</strong> și{' '}
-                <strong>Y (est)</strong> în sistemul Stereo 70. De multe ori apar și distanțele dintre
-                puncte, plus suprafața rezultată din calcul, ca să poți verifica și închide conturul
-                geometric. Aceste valori sunt cele înregistrate în baza de date OCPI/ANCPI pentru imobilul tău.
+                <strong>Se pune un gard.</strong> Cel mai banal motiv și, de departe, cel mai frecvent. Nimeni nu
+                mai știe pe unde trecea hotarul, iar discuția cu vecinul se termină în momentul în care apar
+                țărușii puși pe coordonate.
+              </p>
+              <p>
+                <strong>Se împarte un teren.</strong> La o dezmembrare sau la o alipire, expertul pornește de la
+                conturul înregistrat și recalculează loturile. Fără coordonatele existente, lucrarea începe cu o
+                măsurătoare nouă care poate să nu se potrivească cu ce e în evidență.
+              </p>
+              <p>
+                <strong>Două parcele par să se calce.</strong> Când suspectezi o suprapunere cu vecinul, compararea
+                se face pe coordonate, nu pe desen. Abia atunci se vede dacă e o problemă reală sau doar o
+                impresie de pe hartă.
               </p>
 
               <div className="rounded-2xl border border-neutral-200 bg-white p-5">
                 <h3 className="font-bold text-secondary-900 mb-2">
-                  Inventar de coordonate vs. plan de amplasament
+                  Coordonatele nu sunt planul de amplasament
                 </h3>
                 <p className="text-sm text-neutral-700">
-                  <strong>Inventarul de coordonate</strong> înseamnă valorile numerice X/Y ale punctelor de hotar,
-                  pentru trasare și calcul. <strong>Planul de amplasament și delimitare</strong> este reprezentarea
-                  grafică a aceleiași parcele, la scară, cu vecinătăți. Se completează reciproc, iar multe documentații
-                  cadastrale le folosesc împreună.{' '}
+                  Se cer adesea împreună și de aceea se amestecă. Inventarul de coordonate e un{' '}
+                  <strong>tabel</strong>, folosit pentru trasare și calcul.{' '}
+                  <strong>Planul de amplasament și delimitare</strong> e un <strong>desen</strong> la scară, cu
+                  vecinătăți și cote, folosit ca piesă în dosare. Dacă lucrarea o face un inginer, îi trebuie
+                  tabelul. Dacă documentul merge la notar sau la primărie, îi trebuie desenul.{' '}
                   <Link href={serviceUrl('plan-amplasament-delimitare')} className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
                     Vezi planul de amplasament și delimitare
                   </Link>
@@ -353,28 +360,34 @@ export default async function CopieInventarCoordonatePage() {
               </div>
 
               <h3 className="text-xl font-bold text-secondary-900 pt-2">
-                Cui îi folosește și când
+                Ce nu dovedesc coordonatele
               </h3>
               <p>
-                Inventarul de coordonate este folosit mai ales de <strong>topografi, ingineri geodezi și
-                proiectanți</strong>, însă îți este util și ție, ca proprietar, când ai o lucrare în teren.
-                Îl ceri pentru <strong>trasarea limitelor</strong>, când vrei să marchezi exact pe unde
-                trece hotarul, pentru <strong>proiectarea</strong> unei construcții sau pentru operațiuni de{' '}
-                <strong>dezmembrare ori alipire</strong>, unde se recalculează loturi și suprafețe. La fel,
-                ajută la <strong>verificarea suprapunerilor</strong> cu parcelele vecine și la orice
-                documentație de cadastru sau topografie care are nevoie de poziția numerică a punctelor de hotar.
+                Sunt valorile din evidență, nu o măsurătoare făcută azi. Dacă hotarul real diferă de cel
+                înregistrat, cifrele nu îți spun asta, ci abia comparația dintre ele și teren. Trasarea propriu-zisă
+                o face un expert autorizat, cu aparat; noi îți dăm datele cu care lucrează el. Iar dacă din
+                comparație rezultă o eroare, corectarea cere o documentație cadastrală nouă, nu o nouă copie a
+                aceluiași tabel.
               </p>
               <p>
-                Prin eGhișeul îl obții <strong>100% online</strong>, fără cont la ANCPI și fără drum la
-                ghișeul OCPI. Ne ocupăm noi de proces, tu ai nevoie doar de numărul cadastral sau de numărul de
-                carte funciară al imobilului.
-              </p>
-              <p>
-                Dacă nu cunoști numărul cadastral, îl putem afla după adresă prin serviciul de{' '}
+                Nu îți spun nici cine e proprietar și nici ce sarcini apasă terenul. Alea se citesc în cartea
+                funciară. Ne trebuie numărul cadastral sau cel de CF, plus localitatea; dacă nu le ai, le scoatem
+                după adresă prin serviciul de{' '}
                 <Link href={serviceUrl('identificare-imobil')} className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
                   identificare imobil
                 </Link>
-                , apoi îți obținem copia inventarului de coordonate pentru parcela găsită.
+                .
+              </p>
+              <h3 className="text-xl font-bold text-secondary-900 pt-2">
+                Ce face topograful cu ele
+              </h3>
+              <p>
+                Dacă lucrarea o comanzi pentru altcineva, merită să știi ce urmează. Inginerul preia valorile,
+                le încarcă în aparat și iese pe teren cu ele. Acolo caută punctele unul câte unul și le
+                materializează, cu țăruș sau cu bornă. Când terenul e liber, treaba durează o oră. Când e plin de
+                vegetație sau când există deja construcții pe limită, durează mai mult și pot apărea surprize:
+                un colț cade în interiorul unui gard existent, alt colț cade pe drum. Surprizele astea nu vin din
+                cifre, ci din ce s-a construit între timp fără să fie înscris.
               </p>
             </div>
           </div>
@@ -388,10 +401,10 @@ export default async function CopieInventarCoordonatePage() {
                 Ce îți trebuie
               </span>
               <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-3">
-                Cum identifici imobilul pentru inventarul de coordonate
+                Ce ne trebuie ca să scoatem tabelul
               </h2>
               <p className="text-neutral-600 max-w-2xl mx-auto">
-                Ai nevoie de un singur identificator. Dacă nu îl știi, îl putem afla după adresă.
+                Un singur număr al parcelei. Coordonatele le luăm noi din evidență.
               </p>
             </div>
 
@@ -410,7 +423,7 @@ export default async function CopieInventarCoordonatePage() {
             <div className="mt-6 p-5 bg-primary-50 rounded-2xl border border-primary-200 max-w-2xl mx-auto flex items-start gap-3">
               <Search className="w-5 h-5 text-primary-600 flex-shrink-0 mt-0.5" />
               <p className="text-sm text-secondary-700">
-                <strong>Nu știi numărul cadastral?</strong> Îl putem afla după adresă prin serviciul de{' '}
+                <strong>Ai doar adresa terenului?</strong> Îl scoatem prin serviciul de{' '}
                 <Link href={serviceUrl('identificare-imobil')} className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
                   Identificare Imobil
                 </Link>
@@ -428,7 +441,7 @@ export default async function CopieInventarCoordonatePage() {
                 Când ai nevoie
               </span>
               <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-3">
-                Când Ai Nevoie de Inventarul de Coordonate?
+                Situațiile în care cifrele închid discuția
               </h2>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -463,15 +476,15 @@ export default async function CopieInventarCoordonatePage() {
                 Proces simplu
               </span>
               <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white mb-3">Cum Funcționează?</h2>
-              <p className="text-white/70 max-w-2xl mx-auto">Obții inventarul de coordonate în 4 pași, 100% online</p>
+              <p className="text-white/70 max-w-2xl mx-auto">Fără cont ANCPI și fără drum la biroul teritorial</p>
             </div>
             <div className="relative grid sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-6">
               <div className="hidden lg:block absolute top-8 left-[12.5%] right-[12.5%] h-0.5 bg-gradient-to-r from-primary-500/0 via-primary-500/50 to-primary-500/0" aria-hidden="true" />
               {[
-                { step: 1, title: 'Identifici Imobilul', desc: 'Introduci numărul cadastral sau de carte funciară.', icon: KeyRound },
-                { step: 2, title: 'Confirmi Localitatea', desc: 'Alegi județul și localitatea. Verificăm datele înainte de depunere.', icon: MapPin },
-                { step: 3, title: 'Plătești Securizat', desc: 'Card, Apple Pay, Google Pay — taxele OCPI sunt incluse.', icon: Shield },
-                { step: 4, title: 'Primești Coordonatele', desc: `În ${formatEstimatedDays(service)} primești inventarul de coordonate pe email.`, icon: CheckCircle },
+                { step: 1, title: 'Numărul parcelei', desc: 'Ne trebuie unul singur, ca să ajungem la punctele înregistrate.', icon: KeyRound },
+                { step: 2, title: 'Unde e terenul', desc: 'Județul și localitatea, ca să știm la ce birou mergem.', icon: MapPin },
+                { step: 3, title: 'Plata', desc: 'Se face din browser, într-un singur pas, fără alte formalități.', icon: Shield },
+                { step: 4, title: 'Tabelul pe email', desc: `Punctele de hotar îți ajung în ${formatEstimatedDays(service)}.`, icon: CheckCircle },
               ].map((item) => (
                 <div key={item.step} className="relative text-center">
                   <div className="relative z-10 mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-400 to-primary-600 text-secondary-900 shadow-[0_8px_24px_rgba(236,185,95,0.35)]">
@@ -492,7 +505,7 @@ export default async function CopieInventarCoordonatePage() {
         <section className="py-12 lg:py-16 bg-white">
           <div className="container mx-auto px-4 max-w-[900px]">
             <h2 className="text-xl sm:text-2xl font-bold text-secondary-900 mb-6 text-center">
-              Servicii pentru imobile
+              Ce se comandă de obicei alături de coordonate
             </h2>
             <div className="grid sm:grid-cols-2 gap-4">
               <Link
@@ -534,17 +547,15 @@ export default async function CopieInventarCoordonatePage() {
 
         {/* FAQ */}
         <ServiceFAQ
-          title="Întrebări Frecvente — Copie Inventar de Coordonate Stereo 70"
+          title="Întrebări despre coordonatele punctelor de hotar"
           faqs={[
-            { q: 'Ce este sistemul de proiecție Stereo 70?', a: 'Stereo 70 este sistemul național de coordonate folosit în România pentru cadastru și topografie. Toate punctele de hotar ale imobilelor sunt raportate la acest sistem, prin coordonate X (nord) și Y (est), pentru a putea fi regăsite cu precizie pe teren.' },
-            { q: 'Ce conține inventarul de coordonate?', a: 'Un tabel cu toate punctele de contur ale imobilului (punctele de hotar), iar pentru fiecare punct coordonatele X și Y în sistem Stereo 70. De regulă include și distanțele dintre puncte și suprafața rezultată din calcul.' },
-            { q: 'Cui îi folosește inventarul de coordonate?', a: 'În principal topografilor, inginerilor geodezi și proiectanților, pentru trasarea limitelor în teren, proiectare, dezmembrare/alipire și verificarea suprapunerilor cu parcelele vecine. Îți este util și ca proprietar când ai o lucrare în teren.' },
-            { q: 'Cu ce diferă de planul de amplasament și delimitare?', a: 'Inventarul de coordonate conține valorile numerice X/Y ale punctelor de hotar (pentru trasare și calcul), iar planul de amplasament și delimitare este reprezentarea grafică a aceleiași parcele, la scară, cu vecinătăți. Sunt complementare.' },
-            { q: 'Cât costă copia inventarului de coordonate?', a: `${service.base_price} RON, cu taxele OCPI incluse. Fără costuri ascunse.` },
-            { q: 'Cât durează eliberarea?', a: `${formatEstimatedDays(service)}. Cererea este procesată de un operator, iar inventarul de coordonate este livrat pe email.` },
-            { q: 'Nu știu numărul cadastral. Ce fac?', a: 'Îl putem afla după adresă prin serviciul de Identificare Imobil, apoi îți obținem copia inventarului de coordonate.' },
-            { q: 'Am nevoie de cont ANCPI?', a: 'Nu. Ne ocupăm noi de tot procesul; tu ai nevoie doar de numărul cadastral sau de numărul de carte funciară.' },
-            { q: 'În ce format primesc inventarul de coordonate?', a: 'În format electronic, pe email — fără deplasare la ghișeul OCPI. Tabelul cu punctele de hotar și coordonatele X/Y poate fi încărcat direct în stația totală sau în software-ul de topografie.' },
+            { q: 'Ce este, de fapt, sistemul Stereo 70?', a: 'Este proiecția în care se raportează în România pozițiile din cadastru. Practic, dă fiecărui punct de pe teren o pereche de valori X și Y într-un sistem național unic, așa că două măsurători corecte, făcute de oameni diferiți, ajung la aceleași numere.' },
+            { q: 'Coordonatele îmi arată unde e gardul acum?', a: 'Nu. Îți arată unde a fost înregistrat hotarul. Dacă gardul a fost pus altundeva, diferența apare abia când un topograf compară valorile cu terenul. Exact de asta se cer înainte de o trasare, nu după.' },
+            { q: 'Pot să trasez singur, cu telefonul?', a: 'GPS-ul unui telefon are o eroare mult prea mare pentru un hotar. Trasarea se face cu stație totală sau cu receptor GNSS de precizie, de un expert autorizat. Noi îți dăm datele exacte cu care lucrează el.' },
+            { q: 'Îmi trebuie tabelul sau planul de amplasament?', a: 'Dacă lucrarea o face un inginer, tabelul. Dacă documentul merge la notar, la primărie sau într-un dosar, desenul. Se cer des împreună, dar răspund la lucruri diferite: unul se încarcă în aparat, celălalt se depune la dosar.' },
+            { q: 'Ce fac dacă suprafața calculată din coordonate nu se potrivește cu cea din acte?', a: 'Se întâmplă la lucrări vechi și înseamnă că undeva există o neconcordanță de rezolvat. Corectarea trece printr-o documentație cadastrală întocmită de un expert și înscrisă la OCPI. O copie nouă a aceluiași tabel nu schimbă nimic.' },
+            { q: 'Câte puncte are un inventar?', a: 'Câte colțuri are parcela. Un teren dreptunghiular are patru, unul cu formă neregulată poate avea zeci. Toate punctele înregistrate ajung în tabel, numerotate, cu distanțele dintre ele.' },
+            { q: 'Cât costă și în ce formă primesc valorile?', a: `${service.base_price} RON, oricâte puncte de hotar ar avea parcela. Le primești electronic, pe email, în ${formatEstimatedDays(service)}, și le poți trimite mai departe topografului exact așa cum îți ajung.` },
           ]}
         />
 
@@ -562,10 +573,10 @@ export default async function CopieInventarCoordonatePage() {
           <div className="relative container mx-auto px-4 max-w-[900px]">
             <div className="text-center">
               <h2 className="text-2xl lg:text-4xl font-extrabold text-white mb-4">
-                Gata să obții Inventarul de Coordonate?
+                Ai nevoie de punctele de hotar?
               </h2>
               <p className="text-lg text-white/80 mb-8 max-w-xl mx-auto">
-                Ai nevoie doar de numărul cadastral sau de carte funciară. Primești documentul în {formatEstimatedDays(service)}.
+                Un număr al parcelei și localitatea. Tabelul cu coordonate îți ajunge pe email în {formatEstimatedDays(service)}.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
                 <OrderButton href={`/comanda/${SERVICE_SLUG}`}>Comandă Acum</OrderButton>

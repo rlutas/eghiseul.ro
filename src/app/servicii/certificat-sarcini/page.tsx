@@ -103,15 +103,15 @@ export default async function CertificatSarciniPage() {
 
   // Ways to identify the property
   const identifiers = [
-    { icon: KeyRound, title: 'Număr cadastral', desc: 'Identificatorul unic al imobilului (ex: 12783).' },
-    { icon: ScrollText, title: 'Număr de carte funciară', desc: 'Numărul CF asociat proprietății din localitate.' },
+    { icon: KeyRound, title: 'Numărul cadastral', desc: 'Al imobilului pe care vrei să îl verifici, nu neapărat al tău.' },
+    { icon: ScrollText, title: 'Numărul de carte funciară', desc: 'Îl găsești pe orice extras al imobilului, oricât de vechi.' },
   ];
 
   const useCases = [
-    { icon: Home, title: 'Înainte de vânzare-cumpărare', items: ['Verifici grevările', 'Eviți surprize la notar', 'Negociezi în cunoștință de cauză'] },
-    { icon: Landmark, title: 'Credit ipotecar', items: ['Cerut de bancă', 'Verificarea garanției', 'Dosar de finanțare'] },
-    { icon: Search, title: 'Due diligence imobil', items: ['Verificare înainte de tranzacție', 'Investiții imobiliare', 'Audit proprietate'] },
-    { icon: ScrollText, title: 'Dosar notarial', items: ['Autentificare contract', 'Acte de dezmembrare/alipire', 'Succesiuni'] },
+    { icon: Home, title: 'Dai un avans pe o casă', items: ['Verifici înainte, nu după', 'Vezi ipoteca băncii', 'Negociezi știind ce cumperi'] },
+    { icon: Landmark, title: 'Banca cere garanția curată', items: ['Interdicții de înstrăinare', 'Ipoteci anterioare', 'Dosar de finanțare'] },
+    { icon: Shield, title: 'Suspectezi un proces', items: ['Notări de litigiu', 'Sechestre', 'Popriri înscrise'] },
+    { icon: ScrollText, title: 'Închei un act la notar', items: ['Autentificare', 'Dezmembrare sau alipire', 'Dosar de succesiune'] },
   ];
 
   return (
@@ -166,18 +166,17 @@ export default async function CertificatSarciniPage() {
                 </h1>
 
                 <p className="text-lg sm:text-xl text-white/85 leading-relaxed mb-6">
-                  Vezi exact ce sarcini sunt înscrise asupra unui imobil — ipoteci, privilegii, servituți,
-                  interdicții sau litigii notate — după numărul cadastral sau de carte funciară.
+                  Documentul care răspunde la o singură întrebare: ce apasă imobilul ăsta. Ipoteci, interdicții,
+                  servituți, sechestre, procese notate.
                 </p>
 
                 {/* USP */}
                 <div className="flex items-start gap-3 rounded-xl bg-primary-500/15 border border-primary-500/40 p-4 mb-6">
                   <Shield className="h-5 w-5 text-primary-500 flex-shrink-0 mt-0.5" />
                   <p className="text-white/95 text-sm sm:text-base leading-relaxed">
-                    Înainte să cumperi sau să garantezi un imobil, verifică dacă are{' '}
-                    <strong className="text-primary-500">ipoteci, interdicții sau litigii notate</strong> — ca să
-                    nu ai surprize la notar sau la bancă. Documentul provine direct din{' '}
-                    <strong>cartea funciară</strong>.
+                    Îl poate cere oricine, nu doar proprietarul. Practic, e verificarea pe care o faci{' '}
+                    <strong className="text-primary-500">înainte să dai un avans</strong>, nu după ce ai ajuns la
+                    notar și <strong>afli că imobilul are ipotecă</strong>.
                   </p>
                 </div>
 
@@ -187,10 +186,10 @@ export default async function CertificatSarciniPage() {
                   </p>
                   <ul className="mt-3 space-y-1.5 text-white/85 text-sm">
                     {[
-                      'Introduci numărul de carte funciară sau cadastral',
-                      'Confirmi județul și localitatea',
-                      'Plătești securizat (taxe OCPI incluse)',
-                      'Primești certificatul de sarcini pe email',
+                      'Ne dai numărul de CF sau pe cel cadastral',
+                      'Ne spui județul și localitatea imobilului',
+                      'Achiți online, fără sume adăugate pe parcurs',
+                      'Îți trimitem certificatul pe email',
                     ].map((step) => (
                       <li key={step} className="flex items-center gap-2">
                         <CheckCircle className="w-4 h-4 text-primary-500 flex-shrink-0" />
@@ -306,72 +305,89 @@ export default async function CertificatSarciniPage() {
         <section className="py-12 lg:py-16 bg-neutral-50">
           <div className="container mx-auto px-4 max-w-[820px]">
             <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-5">
-              Ce este certificatul de sarcini și la ce folosește
+              Ce apasă imobilul, pe scurt și fără restul poveștii
             </h2>
             <div className="space-y-4 text-neutral-700 leading-relaxed">
               <p>
-                <strong>Certificatul de sarcini</strong> este documentul care arată ce sarcini și grevări sunt
-                înscrise asupra unui imobil — adică ce drepturi sau restricții ale unor terți apasă asupra
-                proprietății. Este eliberat de Oficiul de Cadastru și Publicitate Imobiliară
-                (<strong>OCPI / ANCPI</strong>) pe baza datelor din <strong>cartea funciară</strong> a imobilului.
+                Partea C a cărții funciare adună tot ce limitează dreptul proprietarului. Certificatul de sarcini
+                scoate exact acea parte, eliberată de Oficiul de Cadastru și Publicitate Imobiliară pe baza a ce e
+                înscris în registru. Dacă nu e nimic, certificatul spune și asta, iar propoziția „liber de sarcini”
+                cântărește mult într-o negociere.
               </p>
               <p>
-                În practică, certificatul îți spune dacă terenul sau apartamentul are{' '}
-                <strong>ipoteci</strong> (de regulă în favoarea unei bănci), <strong>privilegii imobiliare</strong>,{' '}
-                <strong>sechestre sau popriri</strong>, <strong>servituți</strong> (de exemplu drept de trecere),{' '}
-                <strong>drept de uzufruct</strong>, <strong>interdicții</strong> de înstrăinare sau de grevare, ori{' '}
-                <strong>litigii și procese notate</strong> în cartea funciară. Dacă imobilul este „liber de sarcini”,
-                certificatul confirmă tocmai acest lucru, un argument solid la negociere și la notar.
+                Ce poate să apară acolo: <strong>ipoteci</strong>, de obicei în favoarea unei bănci;{' '}
+                <strong>privilegii imobiliare</strong>; <strong>sechestre sau popriri</strong> puse de un
+                executor; <strong>servituți</strong>, cum e dreptul de trecere al vecinului;{' '}
+                <strong>uzufruct</strong> sau drept de abitație, care lasă pe altcineva să folosească imobilul;{' '}
+                <strong>interdicții</strong> de înstrăinare sau de grevare; și <strong>notări de litigiu</strong>,
+                adică procese în curs care privesc proprietatea.
               </p>
 
               <h3 className="text-xl font-bold text-secondary-900 pt-2">
-                Când ai nevoie de un certificat de sarcini
+                Momentul potrivit e înainte de avans
               </h3>
               <p>
-                Certificatul de sarcini este cerut sau recomandat în momentele importante legate de un imobil:{' '}
-                <strong>înainte de o vânzare-cumpărare</strong>, ca să știi exact ce cumperi; la{' '}
-                <strong>contractarea unui credit ipotecar</strong>, când banca verifică garanția; la o{' '}
-                <strong>verificare a imobilului înainte de tranzacție</strong> (due diligence); sau pentru{' '}
-                <strong>dosarul notarial</strong>, la autentificarea unui act ori într-o succesiune. Mai poate fi
-                folosit ca document justificativ în instanță sau pur și simplu pentru informare, când vrei să afli ce
-                sarcini are un imobil. Poate fi cerut de orice persoană fizică sau juridică interesată de situația
-                proprietății.
+                Cele mai neplăcute discuții apar la notar, când cineva descoperă atunci că imobilul are ipotecă sau
+                interdicție de înstrăinare, iar avansul e deja dat. Certificatul se poate cere de{' '}
+                <strong>orice persoană interesată</strong>, nu doar de proprietar, tocmai fiindcă e menit să fie
+                verificat de partea care riscă bani. Îl cer cumpărătorii înainte de antecontract, băncile când
+                evaluează o garanție, notarii în dosare și, uneori, chiar proprietarii care vor să confirme că o
+                ipotecă veche a fost radiată.
               </p>
 
-              <div className="rounded-2xl border border-neutral-200 bg-white p-5">
+              <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5">
                 <h3 className="font-bold text-secondary-900 mb-2">
-                  Certificat de sarcini vs. extras de carte funciară
+                  Datoriile la asociație și impozitul nu sunt sarcini
                 </h3>
                 <p className="text-sm text-neutral-700">
-                  <strong>Extrasul de carte funciară</strong> complet conține întreaga situație a imobilului,
-                  inclusiv proprietarii, suprafața și sarcinile. <strong>Certificatul de sarcini</strong> este
-                  focusat strict pe partea de grevări — exact secțiunea care arată ipotecile, interdicțiile și
-                  litigiile. Dacă ai nevoie de imaginea juridică completă, alegi extrasul; dacă te interesează
-                  doar dacă imobilul are sarcini, certificatul de sarcini este mai direct.{' '}
-                  <Link href={serviceUrl('extras-carte-funciara')} className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
-                    Vezi extrasul de carte funciară
-                  </Link>
-                  .
+                  E cea mai costisitoare neînțelegere legată de documentul ăsta. Cartea funciară ține evidența
+                  drepturilor asupra imobilului, nu a facturilor. <strong>Restanțele la întreținere</strong>, la
+                  gaze, la curent sau <strong>impozitul neplătit</strong> nu apar în certificatul de sarcini, decât
+                  în situația rară în care s-a ajuns la un sechestru înscris. Pentru datoriile curente ceri
+                  adeverință de la asociația de proprietari și de la direcția de taxe a primăriei.
                 </p>
               </div>
 
               <h3 className="text-xl font-bold text-secondary-900 pt-2">
-                De ce să îl obții online prin eGhișeul
+                Certificat de sarcini sau extras de informare
               </h3>
               <p>
-                Prin eGhișeul comanzi certificatul de sarcini 100% online, <strong>fără cont ANCPI</strong> și
-                fără deplasare la ghișeul OCPI. Tu introduci numărul cadastral sau de carte funciară și
-                localitatea, iar un <strong>operator</strong> se ocupă de cererea către OCPI și de obținerea
-                documentului. <strong>Taxele OCPI sunt incluse</strong> în preț, fără costuri ascunse, iar
-                certificatul de sarcini îți este livrat pe email în formatul eliberat de instituție.
+                Extrasul de informare îți dă toată situația imobilului: cine e proprietar, ce suprafață are, ce
+                sarcini sunt. Certificatul de sarcini se uită doar la ultima parte. Alegi extrasul când ai nevoie
+                de imaginea completă și certificatul când întrebarea ta e strict „e curat sau nu”.{' '}
+                <Link href={serviceUrl('extras-carte-funciara')} className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
+                  Vezi extrasul de carte funciară
+                </Link>
+                .
+              </p>
+
+              <h3 className="text-xl font-bold text-secondary-900 pt-2">
+                Ce nu prinde certificatul
+              </h3>
+              <p>
+                Tot ce nu a ajuns în registru. Un contract de închiriere nenotat, o promisiune de vânzare făcută
+                altcuiva și nenotată, o înțelegere verbală între moștenitori rămân invizibile. La fel, certificatul
+                reflectă situația din ziua în care a fost emis: o ipotecă înscrisă a doua zi nu are cum să apară în
+                el, motiv pentru care notarii lucrează cu documente cât mai proaspete.
               </p>
               <p>
-                Dacă nu cunoști numărul cadastral sau cel de carte funciară al imobilului, îl putem afla după
-                adresă prin serviciul de{' '}
+                Ne trebuie numărul cadastral sau cel de carte funciară și localitatea. Dacă vrei să verifici un
+                imobil pentru care ai doar adresa, îl identificăm întâi prin serviciul de{' '}
                 <Link href={serviceUrl('identificare-imobil')} className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
                   identificare imobil
                 </Link>
-                , iar apoi îți obținem certificatul de sarcini pentru proprietatea găsită.
+                .
+              </p>
+              <h3 className="text-xl font-bold text-secondary-900 pt-2">
+                Când merită repetată verificarea
+              </h3>
+              <p>
+                Un certificat scos cu două luni înainte de semnare nu mai spune mare lucru. Între timp se poate
+                înscrie o ipotecă, se poate nota un litigiu, se poate pune un sechestru. Practica rezonabilă e să
+                verifici o dată la început, ca să știi dacă merită să continui, și încă o dată cât mai aproape de
+                momentul în care dai bani. Prima verificare te scutește de pierdut timpul pe un imobil imposibil.
+                A doua te scutește de surprize apărute exact în perioada în care negociai. Între cele două,
+                schimbă-ți atitudinea doar dacă vânzătorul devine grăbit fără motiv.
               </p>
             </div>
           </div>
@@ -385,10 +401,10 @@ export default async function CertificatSarciniPage() {
                 Ce îți trebuie
               </span>
               <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-3">
-                Cum identifici imobilul pentru certificatul de sarcini
+                Ce ne trebuie ca să facem verificarea
               </h2>
               <p className="text-neutral-600 max-w-2xl mx-auto">
-                Ai nevoie de un singur identificator. Dacă nu îl știi, îl putem afla după adresă.
+                Un număr al imobilului. Nu trebuie să fii proprietarul lui.
               </p>
             </div>
 
@@ -407,7 +423,7 @@ export default async function CertificatSarciniPage() {
             <div className="mt-6 p-5 bg-primary-50 rounded-2xl border border-primary-200 max-w-2xl mx-auto flex items-start gap-3">
               <Search className="w-5 h-5 text-primary-600 flex-shrink-0 mt-0.5" />
               <p className="text-sm text-secondary-700">
-                <strong>Nu știi numărul cadastral?</strong> Îl putem afla după adresă prin serviciul de{' '}
+                <strong>Verifici o casă pe care vrei să o cumperi?</strong> Dacă ai doar adresa, o identificăm cu serviciul de{' '}
                 <Link href={serviceUrl('identificare-imobil')} className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
                   Identificare Imobil
                 </Link>
@@ -425,7 +441,7 @@ export default async function CertificatSarciniPage() {
                 Când ai nevoie
               </span>
               <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-3">
-                Când Ai Nevoie de Certificat de Sarcini?
+                Când merită să verifici înainte
               </h2>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -460,15 +476,15 @@ export default async function CertificatSarciniPage() {
                 Proces simplu
               </span>
               <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white mb-3">Cum Funcționează?</h2>
-              <p className="text-white/70 max-w-2xl mx-auto">Obții certificatul de sarcini în 4 pași, 100% online</p>
+              <p className="text-white/70 max-w-2xl mx-auto">Verificarea se face la biroul care ține cartea funciară</p>
             </div>
             <div className="relative grid sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-6">
               <div className="hidden lg:block absolute top-8 left-[12.5%] right-[12.5%] h-0.5 bg-gradient-to-r from-primary-500/0 via-primary-500/50 to-primary-500/0" aria-hidden="true" />
               {[
-                { step: 1, title: 'Identifici Imobilul', desc: 'Introduci numărul cadastral sau de carte funciară.', icon: KeyRound },
-                { step: 2, title: 'Confirmi Localitatea', desc: 'Alegi județul și localitatea. Verificăm datele înainte de depunere.', icon: MapPin },
-                { step: 3, title: 'Plătești Securizat', desc: 'Card, Apple Pay, Google Pay — taxele OCPI sunt incluse.', icon: Shield },
-                { step: 4, title: 'Primești Certificatul', desc: `În ${formatEstimatedDays(service)} primești certificatul de sarcini pe email.`, icon: CheckCircle },
+                { step: 1, title: 'Numărul imobilului', desc: 'Al celui pe care îl verifici, chiar dacă nu e al tău.', icon: KeyRound },
+                { step: 2, title: 'Județ și localitate', desc: 'Ne spun unde se ține cartea funciară a imobilului.', icon: MapPin },
+                { step: 3, title: 'Plata', desc: 'Se achită online; tariful instituției e cuprins în sumă.', icon: Shield },
+                { step: 4, title: 'Răspunsul pe email', desc: `Afli ce e înscris, sau că nu e nimic, în ${formatEstimatedDays(service)}.`, icon: CheckCircle },
               ].map((item) => (
                 <div key={item.step} className="relative text-center">
                   <div className="relative z-10 mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-400 to-primary-600 text-secondary-900 shadow-[0_8px_24px_rgba(236,185,95,0.35)]">
@@ -489,7 +505,7 @@ export default async function CertificatSarciniPage() {
         <section className="py-12 lg:py-16 bg-white">
           <div className="container mx-auto px-4 max-w-[900px]">
             <h2 className="text-xl sm:text-2xl font-bold text-secondary-900 mb-6 text-center">
-              Servicii pentru imobile
+              Ce se mai verifică înainte de o tranzacție
             </h2>
             <div className="grid sm:grid-cols-2 gap-4">
               <Link
@@ -531,17 +547,15 @@ export default async function CertificatSarciniPage() {
 
         {/* FAQ */}
         <ServiceFAQ
-          title="Întrebări Frecvente — Certificat de Sarcini"
+          title="Întrebări despre verificarea sarcinilor"
           faqs={[
-            { q: 'Ce sunt sarcinile unui imobil?', a: 'Sarcinile sunt drepturile sau restricțiile unor terți înscrise asupra imobilului în cartea funciară: ipoteci, privilegii imobiliare, sechestre, popriri, servituți (ex: drept de trecere), drept de uzufruct, interdicții de înstrăinare ori de grevare și litigii sau procese notate. Ele „grevează” proprietatea și pot limita ce poate face proprietarul cu ea.' },
-            { q: 'Ce conține certificatul de sarcini?', a: 'Conține situația grevărilor înscrise asupra imobilului din cartea funciară: ipotecile, privilegiile, sechestrele, popririle, servituțile, dreptul de uzufruct, interdicțiile și litigiile notate. Dacă imobilul nu are sarcini, certificatul confirmă că este liber de sarcini.' },
-            { q: 'Cu ce diferă de extrasul de carte funciară?', a: 'Extrasul de carte funciară complet conține întreaga situație a imobilului, inclusiv proprietarii, suprafața și sarcinile. Certificatul de sarcini este focusat strict pe partea de grevări (ipoteci, interdicții, litigii). Dacă vrei imaginea juridică completă, alegi extrasul; dacă te interesează doar sarcinile, certificatul este mai direct.' },
-            { q: 'Cât durează eliberarea certificatului de sarcini?', a: `${formatEstimatedDays(service)}. Documentul este procesat de un operator și livrat pe email.` },
-            { q: 'Cât costă certificatul de sarcini?', a: `${service.base_price} RON, cu taxele OCPI incluse. Fără costuri ascunse.` },
-            { q: 'Nu știu numărul cadastral. Ce fac?', a: 'Îl putem afla după adresă prin serviciul de Identificare Imobil, apoi îți obținem certificatul de sarcini pentru proprietatea găsită.' },
-            { q: 'Am nevoie de cont ANCPI?', a: 'Nu. Ne ocupăm noi de tot procesul; tu ai nevoie doar de numărul cadastral sau de carte funciară și de localitate.' },
-            { q: 'Certificatul de sarcini este valabil la notar și la bancă?', a: 'Da. Certificatul de sarcini este documentul OCPI/ANCPI emis din cartea funciară și este folosit în mod curent în dosarele notariale și de credit ipotecar pentru a dovedi situația grevărilor imobilului.' },
-            { q: 'Cine poate cere un certificat de sarcini?', a: 'Îl poate cere orice persoană fizică sau juridică interesată de situația imobilului, nu doar proprietarul. Ai nevoie de numărul cadastral sau de carte funciară și de localitate, iar un operator se ocupă de cererea către OCPI.' },
+            { q: 'Apar în certificat datoriile la întreținere sau impozitul neplătit?', a: 'Nu. Cartea funciară ține evidența drepturilor asupra imobilului, nu a facturilor. Restanțele la asociație, la utilități sau impozitul se cer separat, cu adeverință de la asociația de proprietari și de la direcția de taxe a primăriei. Excepția rară e când s-a ajuns deja la un sechestru înscris.' },
+            { q: 'Pot verifica un imobil care nu este al meu?', a: 'Da. Certificatul poate fi cerut de orice persoană interesată de situația proprietății, tocmai fiindcă rostul lui e să fie verificat de cine riscă bani. Nu ai nevoie de acordul proprietarului.' },
+            { q: 'Ce înseamnă „liber de sarcini”?', a: 'Că în partea C a cărții funciare nu e înscris nimic la data emiterii: nici ipotecă, nici interdicție, nici litigiu notat. Este un argument bun la negociere, dar se raportează la ziua aceea, nu la viitor.' },
+            { q: 'Certificat de sarcini sau extras de carte funciară?', a: 'Extrasul îți dă toată situația imobilului, inclusiv proprietarul și suprafața. Certificatul se uită doar la sarcini. Dacă întrebarea ta este strict dacă imobilul e grevat, certificatul e mai direct; dacă vrei imaginea completă, ia extrasul.' },
+            { q: 'Ce este o notare de litigiu?', a: 'Este mențiunea că asupra imobilului există un proces în curs. Nu înseamnă că proprietarul a pierdut, dar înseamnă că dreptul e contestat, iar cine cumpără intră peste o dispută deschisă. Merită citită cu un avocat înainte de orice avans.' },
+            { q: 'O chirie sau o promisiune de vânzare apar în certificat?', a: 'Doar dacă au fost notate în cartea funciară. Un contract de închiriere nenotat sau o promisiune făcută altcuiva și nenotată nu se văd. De aceea verificarea din registru nu înlocuiește complet întrebările puse direct vânzătorului.' },
+            { q: 'Cât costă verificarea și cât de repede am răspunsul?', a: `${service.base_price} RON, tarif de instituție cuprins, iar răspunsul vine pe email în ${formatEstimatedDays(service)}, în forma eliberată de instituție.` },
           ]}
         />
 
@@ -559,10 +573,10 @@ export default async function CertificatSarciniPage() {
           <div className="relative container mx-auto px-4 max-w-[900px]">
             <div className="text-center">
               <h2 className="text-2xl lg:text-4xl font-extrabold text-white mb-4">
-                Gata să obții Certificatul de Sarcini?
+                Vrei să știi dacă imobilul e curat?
               </h2>
               <p className="text-lg text-white/80 mb-8 max-w-xl mx-auto">
-                Ai nevoie doar de numărul cadastral sau de carte funciară. Primești documentul în {formatEstimatedDays(service)}.
+                Un număr al imobilului și localitatea. Răspunsul îți vine pe email în {formatEstimatedDays(service)}.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
                 <OrderButton href={`/comanda/${SERVICE_SLUG}`}>Comandă Acum</OrderButton>

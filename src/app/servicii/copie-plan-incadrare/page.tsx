@@ -105,15 +105,15 @@ export default async function CopiePlanIncadrarePage() {
 
   // Ways to identify the property
   const identifiers = [
-    { icon: KeyRound, title: 'Număr cadastral', desc: 'Identificatorul unic al imobilului (ex: 12783).' },
-    { icon: ScrollText, title: 'Număr de carte funciară', desc: 'Numărul CF asociat proprietății din localitate.' },
+    { icon: KeyRound, title: 'Numărul cadastral', desc: 'După el găsim documentația din care face parte planșa.' },
+    { icon: ScrollText, title: 'Numărul de carte funciară', desc: 'Ne duce în același dosar, dacă pe celălalt nu îl mai ai.' },
   ];
 
   const useCases = [
-    { icon: MapIcon, title: 'Localizezi imobilul în zonă', items: ['Poziția în cvartal', 'Context urban sau rural', 'Repere și vecinătăți'] },
-    { icon: Home, title: 'Construcție și autorizare', items: ['Certificat de urbanism', 'Autorizație de construire', 'Autorizație de demolare'] },
-    { icon: Ruler, title: 'Proiectare și cadastru', items: ['Planuri la scară mică', 'Suport pentru proiectanți', 'Documentație cadastrală'] },
-    { icon: ScrollText, title: 'Bancă și utilități', items: ['Dosar de credit bancar', 'Racordare la utilități', 'Avize și acorduri'] },
+    { icon: Home, title: 'Ceri certificat de urbanism', items: ['Piesă din dosarul depus', 'Confirmă unde e terenul', 'Cerută de multe primării'] },
+    { icon: Ruler, title: 'Pregătești autorizația de construire', items: ['Proiectantul o pune la dosar', 'Context de amplasare', 'Faza de proiectare'] },
+    { icon: MapIcon, title: 'Explici cuiva unde e terenul', items: ['Străzile din jur', 'Poziția în cvartal', 'Repere ușor de recunoscut'] },
+    { icon: ScrollText, title: 'Ceri un aviz sau un acord', items: ['Furnizori de utilități', 'Instituții care cer localizarea', 'Anexă la cerere'] },
   ];
 
   return (
@@ -168,17 +168,17 @@ export default async function CopiePlanIncadrarePage() {
                 </h1>
 
                 <p className="text-lg sm:text-xl text-white/85 leading-relaxed mb-6">
-                  Planul la scară mică arată unde se află imobilul în zonă și în cvartal, împreună cu
-                  terenurile din jur. Comanzi copia din arhiva OCPI după numărul cadastral sau de carte funciară.
+                  Planșa care iese din parcelă și arată strada, cvartalul și terenurile din jur. Se cere aproape
+                  întotdeauna într-un dosar de urbanism.
                 </p>
 
                 {/* USP */}
                 <div className="flex items-start gap-3 rounded-xl bg-primary-500/15 border border-primary-500/40 p-4 mb-6">
                   <MapIcon className="h-5 w-5 text-primary-500 flex-shrink-0 mt-0.5" />
                   <p className="text-white/95 text-sm sm:text-base leading-relaxed">
-                    Vezi <strong className="text-primary-500">unde se încadrează imobilul în zonă</strong>.
-                    Planul este cerut la <strong>certificatul de urbanism, autorizația de construire</strong> și
-                    în proiectare.
+                    E singura piesă din documentație care răspunde la{' '}
+                    <strong className="text-primary-500">„unde anume, în localitate”</strong>. De asta o cere
+                    primăria la <strong>certificatul de urbanism</strong>, înainte de orice altceva.
                   </p>
                 </div>
 
@@ -188,10 +188,10 @@ export default async function CopiePlanIncadrarePage() {
                   </p>
                   <ul className="mt-3 space-y-1.5 text-white/85 text-sm">
                     {[
-                      'Introduci numărul de carte funciară sau cadastral',
-                      'Confirmi județul și localitatea',
-                      'Plătești securizat (taxe OCPI incluse)',
-                      'Primești copia planului de încadrare pe email',
+                      'Ne dai numărul cadastral sau pe cel de CF',
+                      'Precizezi județul și localitatea',
+                      'Achiți online, într-o singură tranșă',
+                      'Îți trimitem planșa scanată, pe email',
                     ].map((step) => (
                       <li key={step} className="flex items-center gap-2">
                         <CheckCircle className="w-4 h-4 text-primary-500 flex-shrink-0" />
@@ -307,63 +307,77 @@ export default async function CopiePlanIncadrarePage() {
         <section className="py-12 lg:py-16 bg-neutral-50">
           <div className="container mx-auto px-4 max-w-[820px]">
             <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-5">
-              Ce este planul de încadrare în zonă și la ce folosește
+              Planșa care iese din parcelă și arată strada
             </h2>
             <div className="space-y-4 text-neutral-700 leading-relaxed">
               <p>
-                <strong>Planul de încadrare în zonă</strong> este planul desenat la o{' '}
-                <strong>scară mică</strong> (de regulă 1:2000 sau 1:5000) care arată{' '}
-                <strong>poziția imobilului în contextul zonei și al cvartalului</strong> — străzile învecinate,
-                reperele din jur și raportul parcelei cu terenurile alăturate. Este una dintre piesele
-                <strong> documentației cadastrale</strong>, alături de planul de amplasament și delimitare.
-                Copia se eliberează din <strong>arhiva OCPI</strong> (Oficiul de Cadastru și Publicitate Imobiliară).
+                O documentație cadastrală are mai multe piese desenate, iar una dintre ele face pasul înapoi:{' '}
+                <strong>planul de încadrare în zonă</strong>. E desenat la scară mică, de regulă 1:2000 sau
+                1:5000, și arată unde stă imobilul în raport cu străzile din jur, cu cvartalul și cu terenurile
+                vecine. Copia lui se scoate din arhiva Oficiului de Cadastru și Publicitate Imobiliară.
               </p>
               <p>
-                Spre deosebire de planul de amplasament — care detaliază conturul exact al parcelei la scară mare —
-                planul de încadrare „dă zoom out” și plasează imobilul în teritoriu, astfel încât oricine îl
-                consultă să înțeleagă rapid <strong>unde anume se află proprietatea</strong> și cum se raportează
-                la zona din jur. Prin eGhișeul îl obții 100% online, fără cont ANCPI și fără deplasare la ghișeul OCPI.
+                Toate celelalte planșe se ocupă de parcelă. Asta se ocupă de context. Cine se uită pe ea nu află
+                cât e latura din spate, ci pe ce stradă e terenul și în ce parte a localității. Din motivul ăsta e
+                prima piesă pe care o cere un funcționar care nu cunoaște zona.
               </p>
+
+              <h3 className="text-xl font-bold text-secondary-900 pt-2">
+                Aproape întotdeauna o cere un dosar de urbanism
+              </h3>
+              <p>
+                Cererea pentru <strong>certificatul de urbanism</strong> este locul unde apare cel mai des:
+                primăria vrea să vadă amplasarea înainte să spună ce se poate construi acolo. Vine apoi{' '}
+                <strong>autorizația de construire</strong>, unde proiectantul o include în dosar, și faza de
+                proiectare, când arhitectul are nevoie de contextul din jurul terenului. Uneori o cer și
+                furnizorii de utilități sau alte instituții care trebuie să confirme unde se află imobilul înainte
+                de a emite un aviz.
+              </p>
+
               <div className="rounded-2xl border border-neutral-200 bg-white p-5">
                 <h3 className="font-bold text-secondary-900 mb-2">
-                  Plan de încadrare vs. plan de amplasament și delimitare
+                  Nu are legătură cu PUZ-ul, deși sună asemănător
                 </h3>
                 <p className="text-sm text-neutral-700">
-                  <strong>Planul de încadrare în zonă</strong> = imaginea de ansamblu, la scară mică, ce arată
-                  poziția imobilului în zonă/cvartal.{' '}
-                  <strong>Planul de amplasament și delimitare</strong> = detaliul parcelei la scară mare, cu
-                  dimensiuni, vecinătăți și puncte de contur. Sunt piese complementare ale aceleiași documentații
-                  cadastrale.{' '}
-                  <Link href={serviceUrl('plan-amplasament-delimitare')} className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
-                    Vezi planul de amplasament și delimitare
-                  </Link>
-                  .
+                  Confuzia apare des la ghișeu. <strong>Planul urbanistic zonal</strong> este o documentație de
+                  urbanism, întocmită de un urbanist și aprobată de consiliul local, care stabilește ce și cum se
+                  poate construi într-o zonă. <strong>Planul de încadrare în zonă</strong> nu stabilește nimic: e o
+                  piesă din documentația cadastrală, care doar arată unde se află imobilul. Dacă ți s-a cerut PUZ,
+                  la primărie trebuie mers.
                 </p>
               </div>
 
               <h3 className="text-xl font-bold text-secondary-900 pt-2">
-                Când ai nevoie de planul de încadrare în zonă
+                Ce nu poți face cu ea
               </h3>
               <p>
-                Planul de încadrare este cerut frecvent la întocmirea <strong>documentațiilor tehnice</strong>,
-                pentru obținerea <strong>certificatului de urbanism</strong> și a{' '}
-                <strong>autorizației de construire</strong>, precum și în fazele de{' '}
-                <strong>proiectare</strong>. Multe primării și proiectanți îl solicită pentru a confirma{' '}
-                <strong>localizarea imobilului în zonă</strong> înainte de a emite avize sau acorduri.
+                Nu poți măsura nimic util pe ea. La 1:5000, un milimetru de creion înseamnă cinci metri pe teren,
+                deci lungimile laturilor și suprafața se citesc pe altă planșă. Nu îți spune ce ai voie să
+                construiești, fiindcă asta scrie în certificatul de urbanism. Și nu ține locul{' '}
+                <Link href={serviceUrl('plan-amplasament-delimitare')} className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
+                  planului de amplasament și delimitare
+                </Link>
+                , care e cel cu cotele și vecinătățile. În dosarele serioase apar amândouă, fiindcă răspund la
+                întrebări diferite.
               </p>
               <p>
-                Pentru a-l comanda ai nevoie de un singur identificator: <strong>numărul cadastral</strong>{' '}
-                sau <strong>numărul de carte funciară</strong>, plus județul și localitatea. Dacă nu cunoști
-                numărul cadastral, îl putem afla după adresă, apoi îți obținem copia planului de încadrare din
-                arhiva OCPI.
-              </p>
-              <p>
-                Dacă vrei doar să <strong>verifici dacă un imobil este înscris în cadastru</strong> ori să afli
-                numărul cadastral după adresă, folosește serviciul de{' '}
+                Ca să o găsim ne trebuie numărul cadastral sau cel de carte funciară, plus localitatea. Dacă vrei
+                doar să afli dacă imobilul e înscris în cadastru ori să obții numărul după adresă, pornește de la{' '}
                 <Link href={serviceUrl('identificare-imobil')} className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
                   identificare imobil
                 </Link>
-                , apoi îți obținem planul de încadrare pentru terenul găsit.
+                .
+              </p>
+              <h3 className="text-xl font-bold text-secondary-900 pt-2">
+                Întreabă la primărie înainte să comanzi
+              </h3>
+              <p>
+                Cerințele diferă de la o primărie la alta și chiar de la un compartiment la altul. Înainte să
+                comanzi, întreabă exact ce piese vor la dosar și în câte exemplare, fiindcă unele cer copii
+                tipărite, altele acceptă fișier electronic. Mai întreabă dacă acceptă planșa din arhivă sau dacă
+                vor una întocmită de un proiectant pentru lucrarea ta: sunt situații, mai ales la proiecte mai
+                mari, în care se cere piesa nouă. Cinci minute de întrebări la ghișeu îți economisesc un drum și
+                o comandă făcută degeaba.
               </p>
             </div>
           </div>
@@ -377,10 +391,10 @@ export default async function CopiePlanIncadrarePage() {
                 Ce îți trebuie
               </span>
               <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-3">
-                Cum identifici imobilul pentru planul de încadrare
+                Datele cu care găsim planșa
               </h2>
               <p className="text-neutral-600 max-w-2xl mx-auto">
-                Ai nevoie de un singur identificator. Dacă nu îl știi, îl putem afla după adresă.
+                Un număr al imobilului și localitatea în care se află.
               </p>
             </div>
 
@@ -399,7 +413,7 @@ export default async function CopiePlanIncadrarePage() {
             <div className="mt-6 p-5 bg-primary-50 rounded-2xl border border-primary-200 max-w-2xl mx-auto flex items-start gap-3">
               <Search className="w-5 h-5 text-primary-600 flex-shrink-0 mt-0.5" />
               <p className="text-sm text-secondary-700">
-                <strong>Nu știi numărul cadastral?</strong> Îl putem afla după adresă prin serviciul de{' '}
+                <strong>Ai numai adresa?</strong> Aflăm întâi numărul, prin serviciul de{' '}
                 <Link href={serviceUrl('identificare-imobil')} className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
                   Identificare Imobil
                 </Link>
@@ -417,7 +431,7 @@ export default async function CopiePlanIncadrarePage() {
                 Când ai nevoie
               </span>
               <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-3">
-                Când Ai Nevoie de Planul de Încadrare?
+                Unde ți se cere planșa de context
               </h2>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -452,15 +466,15 @@ export default async function CopiePlanIncadrarePage() {
                 Proces simplu
               </span>
               <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white mb-3">Cum Funcționează?</h2>
-              <p className="text-white/70 max-w-2xl mx-auto">Obții planul de încadrare în 4 pași, 100% online</p>
+              <p className="text-white/70 max-w-2xl mx-auto">Depunem noi cererea la biroul teritorial de cadastru</p>
             </div>
             <div className="relative grid sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-6">
               <div className="hidden lg:block absolute top-8 left-[12.5%] right-[12.5%] h-0.5 bg-gradient-to-r from-primary-500/0 via-primary-500/50 to-primary-500/0" aria-hidden="true" />
               {[
-                { step: 1, title: 'Identifici Imobilul', desc: 'Introduci numărul cadastral sau de carte funciară.', icon: KeyRound },
-                { step: 2, title: 'Confirmi Localitatea', desc: 'Alegi județul și localitatea. Verificăm datele înainte de depunere.', icon: MapPin },
-                { step: 3, title: 'Plătești Securizat', desc: 'Card, Apple Pay, Google Pay — taxele OCPI sunt incluse.', icon: Shield },
-                { step: 4, title: 'Primești Planul', desc: `În ${formatEstimatedDays(service)} primești copia planului de încadrare pe email.`, icon: CheckCircle },
+                { step: 1, title: 'Numărul imobilului', desc: 'Așa cum îl ai: din cadastru sau din registru.', icon: KeyRound },
+                { step: 2, title: 'Județ și localitate', desc: 'De acolo știm la ce birou teritorial se află documentația.', icon: MapPin },
+                { step: 3, title: 'Plata', desc: 'Cu cardul sau din portofelul telefonului, tariful instituției inclus.', icon: Shield },
+                { step: 4, title: 'Planșa pe email', desc: `Îți ajunge scanată, în ${formatEstimatedDays(service)}.`, icon: CheckCircle },
               ].map((item) => (
                 <div key={item.step} className="relative text-center">
                   <div className="relative z-10 mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-400 to-primary-600 text-secondary-900 shadow-[0_8px_24px_rgba(236,185,95,0.35)]">
@@ -481,7 +495,7 @@ export default async function CopiePlanIncadrarePage() {
         <section className="py-12 lg:py-16 bg-white">
           <div className="container mx-auto px-4 max-w-[1000px]">
             <h2 className="text-xl sm:text-2xl font-bold text-secondary-900 mb-6 text-center">
-              Servicii pentru imobile
+              Celelalte piese ale aceleiași documentații
             </h2>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <Link
@@ -523,17 +537,15 @@ export default async function CopiePlanIncadrarePage() {
 
         {/* FAQ */}
         <ServiceFAQ
-          title="Întrebări Frecvente — Copie Plan de Încadrare"
+          title="Întrebări despre planul de încadrare în zonă"
           faqs={[
-            { q: 'Ce este planul de încadrare în zonă?', a: 'Este planul desenat la scară mică (de regulă 1:2000 sau 1:5000) care arată poziția imobilului în contextul zonei și al cvartalului — străzi învecinate, repere și terenuri alăturate. Face parte din documentația cadastrală, iar copia se eliberează din arhiva OCPI.' },
-            { q: 'Cu ce diferă de planul de amplasament și delimitare?', a: 'Planul de încadrare oferă imaginea de ansamblu, la scară mică, plasând imobilul în zonă. Planul de amplasament și delimitare detaliază parcela la scară mare, cu dimensiuni, contur și vecinătăți. Sunt piese complementare ale aceleiași documentații cadastrale.' },
-            { q: 'Cu ce diferă de extrasul de plan cadastral pe ortofotoplan?', a: 'Extrasul de plan cadastral arată imobilul suprapus peste o imagine aeriană (ortofotoplan), util pentru localizarea vizuală. Planul de încadrare este reprezentarea desenată la scară mică a poziției în zonă/cvartal, parte din documentația cadastrală cerută la urbanism și autorizare.' },
-            { q: 'La ce îmi folosește planul de încadrare?', a: 'Este cerut frecvent pentru documentații tehnice, certificat de urbanism, autorizație de construire și în fazele de proiectare, pentru a confirma localizarea imobilului în zonă.' },
-            { q: 'Cât costă copia planului de încadrare?', a: `${service.base_price} RON, cu taxele OCPI incluse. Fără costuri ascunse.` },
-            { q: 'Cât durează eliberarea?', a: `${formatEstimatedDays(service)}. Documentul este procesat de un operator și livrat pe email.` },
-            { q: 'Nu știu numărul cadastral. Ce fac?', a: 'Îl putem afla după adresă prin serviciul de Identificare Imobil, apoi îți obținem copia planului de încadrare.' },
-            { q: 'Am nevoie de cont ANCPI?', a: 'Nu. Ne ocupăm noi de tot procesul; tu ai nevoie doar de numărul cadastral sau de carte funciară.' },
-            { q: 'În ce format primesc planul de încadrare?', a: 'Primești copia în format electronic (PDF) pe email, gata de tipărit și de atașat la dosarul tău.' },
+            { q: 'Planul de încadrare este același lucru cu PUZ-ul?', a: 'Nu, și confuzia asta se face des. Planul urbanistic zonal este o documentație de urbanism aprobată de consiliul local, care stabilește ce se poate construi într-o zonă. Planul de încadrare este o piesă din documentația cadastrală și doar arată unde se află imobilul. Dacă ți s-a cerut PUZ, se ia de la primărie.' },
+            { q: 'Pot măsura pe el lungimea laturilor?', a: 'Nu în mod util. La scară 1:5000, un milimetru pe hârtie înseamnă cinci metri pe teren. Cotele laturilor și suprafața se citesc pe planul de amplasament și delimitare, care e desenat la scară mare tocmai pentru asta.' },
+            { q: 'Îmi trebuie și planul de amplasament, sau e de ajuns ăsta?', a: 'În dosarele de urbanism apar de obicei amândouă. Cel de încadrare arată unde e terenul în localitate, cel de amplasament arată cum e delimitat. Proiectantul îți spune exact ce cere autoritatea în cazul tău.' },
+            { q: 'La ce scară este desenat?', a: 'De regulă 1:2000 sau 1:5000, în funcție de zonă și de cum a fost întocmită documentația. Scara apare pe planșă.' },
+            { q: 'Din el aflu ce am voie să construiesc pe teren?', a: 'Nu. Regimul de construire, retragerile, înălțimea și restul condițiilor sunt în certificatul de urbanism eliberat de primărie. Planul de încadrare este doar una dintre piesele pe care le depui ca să obții acel certificat.' },
+            { q: 'Imobilul e la țară, fără nume de stradă. Mai are rost?', a: 'Are. În extravilan planșa arată poziția față de drumuri, tarlale și parcelele din jur, ceea ce e exact informația de care are nevoie cineva care nu cunoaște locul. Contextul se desenează cu ce există acolo.' },
+            { q: 'Cât costă și cum îmi ajunge?', a: `${service.base_price} RON, indiferent de localitate. Planșa vine scanată, pe email, în ${formatEstimatedDays(service)}, iar de acolo o tipărești și o atașezi la dosarul depus la primărie.` },
           ]}
         />
 
@@ -551,10 +563,10 @@ export default async function CopiePlanIncadrarePage() {
           <div className="relative container mx-auto px-4 max-w-[900px]">
             <div className="text-center">
               <h2 className="text-2xl lg:text-4xl font-extrabold text-white mb-4">
-                Gata să obții Planul de Încadrare?
+                Îți cere primăria planul de încadrare?
               </h2>
               <p className="text-lg text-white/80 mb-8 max-w-xl mx-auto">
-                Ai nevoie doar de numărul cadastral sau de carte funciară. Primești documentul în {formatEstimatedDays(service)}.
+                Un număr al imobilului și localitatea. Planșa îți vine scanată pe email în {formatEstimatedDays(service)}.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
                 <OrderButton href={`/comanda/${SERVICE_SLUG}`}>Comandă Acum</OrderButton>

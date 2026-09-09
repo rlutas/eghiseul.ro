@@ -104,15 +104,15 @@ export default async function CopieContractVanzarePage() {
 
   // Ways to identify the property
   const identifiers = [
-    { icon: ScrollText, title: 'Număr de carte funciară', desc: 'Numărul CF al imobilului din localitate (ex: 54321).' },
-    { icon: KeyRound, title: 'Număr cadastral', desc: 'Identificatorul unic al imobilului (ex: 12783).' },
+    { icon: ScrollText, title: 'Numărul de carte funciară', desc: 'Cel al imobilului cumpărat, așa cum apare pe orice extras mai vechi.' },
+    { icon: KeyRound, title: 'Numărul cadastral', desc: 'Alternativa, dacă din toată documentația ți-a rămas doar el.' },
   ];
 
   const useCases = [
-    { icon: Search, title: 'Ai pierdut contractul', items: ['Exemplar rătăcit', 'Mutare / inundație / incendiu', 'Reconstituire act'] },
-    { icon: Layers, title: 'Succesiuni & moșteniri', items: ['Dosar la notar', 'Dezbatere succesorală', 'Partaj între moștenitori'] },
-    { icon: Landmark, title: 'Bancă & notariat', items: ['Dosar de credit ipotecar', 'Refinanțare', 'Autentificare act nou'] },
-    { icon: Shield, title: 'Litigii & verificări', items: ['Dosar în instanță', 'Verificarea tranzacției', 'Clauze și preț istoric'] },
+    { icon: Search, title: 'Exemplarul tău nu mai există', items: ['Rătăcit la o mutare', 'Distrus de apă sau de foc', 'Rămas la cineva care nu îl mai dă'] },
+    { icon: Layers, title: 'A murit proprietarul', items: ['Moștenitorii nu găsesc actele', 'Notarul cere titlul defunctului', 'Dezbatere blocată'] },
+    { icon: Landmark, title: 'Dosar la bancă', items: ['Refinanțare', 'Ipotecă pe imobilul vechi', 'Verificarea titlului'] },
+    { icon: Shield, title: 'Se discută clauzele', items: ['Prețul declarat atunci', 'Servituți convenite', 'Ce scria, cuvânt cu cuvânt'] },
   ];
 
   return (
@@ -167,18 +167,17 @@ export default async function CopieContractVanzarePage() {
                 </h1>
 
                 <p className="text-lg sm:text-xl text-white/85 leading-relaxed mb-6">
-                  Obținem copia certificată a contractului de vânzare-cumpărare al imobilului din arhiva OCPI,
-                  actul notarial în baza căruia s-a intabulat dreptul de proprietate. Ai nevoie doar de numărul
-                  de carte funciară sau cadastral.
+                  Exemplarul depus la cadastru atunci când s-a înscris proprietatea a rămas în dosarul imobilului.
+                  De acolo îți aducem o copie, când al tău nu se mai găsește.
                 </p>
 
                 {/* USP */}
                 <div className="flex items-start gap-3 rounded-xl bg-primary-500/15 border border-primary-500/40 p-4 mb-6">
                   <ScrollText className="h-5 w-5 text-primary-500 flex-shrink-0 mt-0.5" />
                   <p className="text-white/95 text-sm sm:text-base leading-relaxed">
-                    Recuperezi <strong className="text-primary-500">actul de proprietate din arhivă</strong> când
-                    nu mai ai exemplarul propriu. Este util pentru <strong>succesiuni, dosare la bancă sau notar</strong>
-                    {' '}și pentru verificarea condițiilor tranzacției anterioare.
+                    Nu refaci actul de la zero. Îl <strong className="text-primary-500">recuperezi din dosarul de
+                    la OCPI</strong>, cu părțile, descrierea imobilului, prețul și{' '}
+                    <strong>clauzele exact cum au fost semnate</strong>.
                   </p>
                 </div>
 
@@ -188,10 +187,10 @@ export default async function CopieContractVanzarePage() {
                   </p>
                   <ul className="mt-3 space-y-1.5 text-white/85 text-sm">
                     {[
-                      'Introduci numărul de carte funciară sau cadastral',
-                      'Confirmi județul și localitatea',
-                      'Plătești securizat (taxe OCPI incluse)',
-                      'Primești copia contractului pe email',
+                      'Ne dai numărul de CF sau pe cel cadastral',
+                      'Spui în ce județ și localitate se află imobilul',
+                      'Verificăm dacă cererea poate fi onorată',
+                      'Îți trimitem contractul scanat, pe email',
                     ].map((step) => (
                       <li key={step} className="flex items-center gap-2">
                         <CheckCircle className="w-4 h-4 text-primary-500 flex-shrink-0" />
@@ -307,73 +306,86 @@ export default async function CopieContractVanzarePage() {
         <section className="py-12 lg:py-16 bg-neutral-50">
           <div className="container mx-auto px-4 max-w-[820px]">
             <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-5">
-              Ce este copia contractului de vânzare-cumpărare și când o ceri
+              Contractul e în dosarul de la cadastru, chiar dacă al tău s-a pierdut
             </h2>
             <div className="space-y-4 text-neutral-700 leading-relaxed">
               <p>
-                <strong>Contractul de vânzare-cumpărare</strong> este actul prin care s-a transmis dreptul de
-                proprietate asupra imobilului și în baza căruia s-a făcut <strong>intabularea</strong> în cartea
-                funciară. La momentul tranzacției, exemplarul a fost depus și păstrat în <strong>arhiva Oficiului
-                de Cadastru și Publicitate Imobiliară (OCPI / ANCPI)</strong>, împreună cu documentația care a stat
-                la baza înscrierii proprietarului. Prin eGhișeul obții o <strong>copie a acestui contract din
-                arhivă</strong>, fără să te deplasezi la ghișeul OCPI.
+                Ca proprietatea să fie înscrisă în cartea funciară, contractul autentificat la notar a fost depus
+                la Oficiul de Cadastru și Publicitate Imobiliară, împreună cu restul documentației. Exemplarul acela
+                a rămas acolo. Nu se aruncă și nu expiră. Prin serviciul de față îți aducem o copie a lui, din
+                dosarul imobilului.
               </p>
               <p>
-                Serviciul este util mai ales atunci când <strong>proprietarul nu mai are exemplarul propriu</strong> —
-                fie că a fost pierdut, deteriorat sau rătăcit în urma unei mutări. În loc să refaci actul de la
-                zero, ceri copia contractului așa cum a fost depus la cadastru, cu toate datele tranzacției:
-                părțile, descrierea imobilului, prețul și clauzele convenite.
+                Pe copie se văd părțile, descrierea imobilului așa cum era la data vânzării, prețul, clauzele
+                convenite și eventualele servituți sau obligații asumate atunci. E documentul la care te întorci
+                când discuția nu mai e despre cine deține imobilul, ci despre ce anume s-a semnat.
               </p>
 
               <h3 className="text-xl font-bold text-secondary-900 pt-2">
-                Când ai nevoie de o copie a contractului
+                De obicei, cererea vine dintr-una din trei situații
               </h3>
               <p>
-                Cele mai frecvente situații sunt <strong>pierderea sau deteriorarea contractului</strong>,
-                <strong> succesiunile</strong> (când moștenitorii trebuie să dovedească cum a dobândit defunctul
-                imobilul), <strong>litigiile</strong> și dosarele aflate pe rolul instanțelor, precum și
-                <strong> dosarele la bancă sau la notar</strong> — de exemplu pentru un credit ipotecar, o
-                refinanțare sau autentificarea unui nou act. Copia este utilă și pentru
-                <strong> verificarea condițiilor tranzacției anterioare</strong>: prețul declarat, suprafața,
-                eventualele servituți sau clauze speciale.
-              </p>
-              <p>
-                Spre deosebire de extrasul de carte funciară — care arată situația juridică actualizată
-                (proprietar, suprafață, sarcini) — copia contractului îți arată chiar <strong>actul-sursă</strong>
-                {' '}al dreptului de proprietate, exact așa cum a fost semnat și depus la cadastru. Pentru multe
-                proceduri ai nevoie de ambele documente.
+                Prima, și cea mai des întâlnită: <strong>actul pur și simplu nu se mai găsește</strong>. S-a rătăcit
+                la o mutare, l-a luat apa în subsol, a rămas la cineva care nu îl mai dă. A doua:{' '}
+                <strong>a murit proprietarul</strong>, iar moștenitorii trebuie să arate notarului cum a dobândit
+                defunctul imobilul, dar prin casă nu găsesc nimic. A treia:{' '}
+                <strong>cineva contestă sau verifică tranzacția</strong> — un litigiu, o refinanțare, un cumpărător
+                atent care vrea să vadă ce scria în actul anterior, nu doar ce s-a înscris în registru.
               </p>
 
-              <div className="rounded-2xl border border-neutral-200 bg-white p-5">
+              <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5">
                 <h3 className="font-bold text-secondary-900 mb-2">
-                  Notă importantă: verificarea eligibilității
+                  De ce nu putem promite copia din prima
                 </h3>
                 <p className="text-sm text-neutral-700">
-                  Pentru că un contract de vânzare-cumpărare conține <strong>date cu caracter personal</strong>,
-                  eliberarea unei copii poate necesita calitatea de <strong>proprietar</strong> sau o
-                  <strong> împuternicire</strong> din partea acestuia. După plasarea comenzii, echipa noastră
-                  verifică eligibilitatea cererii și te contactează dacă sunt necesare documente suplimentare.
-                  Dacă cererea nu poate fi onorată, îți returnăm contravaloarea.
+                  Un contract de vânzare conține <strong>date cu caracter personal</strong> ale ambelor părți, așa
+                  că instituția nu dă copia oricui. De regulă se cere calitatea de{' '}
+                  <strong>proprietar</strong> sau o <strong>împuternicire</strong> de la acesta, iar moștenitorii
+                  își dovedesc calitatea cu actele de succesiune. După ce plasezi comanda verificăm dacă cererea
+                  poate fi onorată și îți spunem ce mai e nevoie. Dacă nu se poate, îți returnăm banii.
                 </p>
               </div>
 
               <h3 className="text-xl font-bold text-secondary-900 pt-2">
-                De ce să o obții online prin eGhișeul
+                Ce nu îți dă copia din arhivă
               </h3>
               <p>
-                Nu ai nevoie de cont ANCPI și nu te deplasezi la ghișeu. Introduci <strong>numărul de carte
-                funciară sau numărul cadastral</strong>, confirmi județul și localitatea, plătești securizat —
-                iar noi ne ocupăm de cererea către arhiva OCPI. Taxele OCPI sunt deja
-                <strong> incluse în preț</strong>, fără costuri ascunse, iar copia contractului îți este livrată
-                pe email în {formatEstimatedDays(service)}.
+                Nu e un duplicat notarial. Notarul care a autentificat actul păstrează la rândul lui un exemplar și
+                poate elibera un duplicat cu propriul regim; ce primești de la noi este o copie a exemplarului aflat
+                în dosarul cadastral. Dacă cineva îți cere expres „duplicat de la notar”, acolo trebuie să mergi.
               </p>
               <p>
-                Dacă nu cunoști numărul de carte funciară sau cadastral, îl putem afla după adresă prin serviciul
-                de{' '}
+                Copia nu îți spune nici cum stau lucrurile acum. Contractul descrie imobilul la data vânzării, cu
+                suprafața și vecinătățile de atunci; între timp terenul poate fi dezmembrat, iar proprietarul
+                schimbat de două ori. Pentru situația curentă ai nevoie de{' '}
+                <Link href={serviceUrl('extras-carte-funciara')} className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
+                  extrasul de carte funciară
+                </Link>
+                . Iar dacă te interesează doar momentul în care s-a făcut înscrierea, îți ajunge{' '}
+                <Link href={serviceUrl('copie-intabulare')} className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
+                  copia încheierii de intabulare
+                </Link>
+                , care se obține mai simplu.
+              </p>
+              <p>
+                Ne trebuie numărul de carte funciară sau cel cadastral și localitatea. Dacă nu mai ai niciunul,
+                pornim de la adresă prin serviciul de{' '}
                 <Link href={serviceUrl('identificare-imobil')} className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
                   identificare imobil
                 </Link>
-                , apoi îți obținem copia contractului pentru imobilul găsit.
+                .
+              </p>
+              <h3 className="text-xl font-bold text-secondary-900 pt-2">
+                Cum scurtezi verificarea
+              </h3>
+              <p>
+                Verificarea eligibilității merge mai repede dacă ne trimiți din prima ce ai. Un extras de carte
+                funciară, chiar vechi, ne arată pe cine e înscris imobilul. Certificatul de moștenitor rezolvă
+                cazul succesiunii fără alte întrebări. O împuternicire de la proprietar, dacă nu ești tu
+                titularul, scutește un schimb întreg de mesaje. Iar dacă știi anul aproximativ al vânzării,
+                spune-ni-l: la imobilele care au trecut prin mai multe transferuri, ne ajută să identificăm actul
+                corect din dosar. Nimic din toate astea nu e obligatoriu ca să plasezi comanda, dar fiecare
+                scurtează drumul.
               </p>
             </div>
           </div>
@@ -387,10 +399,10 @@ export default async function CopieContractVanzarePage() {
                 Ce îți trebuie
               </span>
               <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-3">
-                Cum identifici imobilul pentru copia contractului
+                Datele cu care ajungem la dosar
               </h2>
               <p className="text-neutral-600 max-w-2xl mx-auto">
-                Ai nevoie de un singur identificator. Dacă nu îl știi, îl putem afla după adresă.
+                Un singur număr, plus localitatea. Restul verificărilor le facem noi.
               </p>
             </div>
 
@@ -409,11 +421,11 @@ export default async function CopieContractVanzarePage() {
             <div className="mt-6 p-5 bg-primary-50 rounded-2xl border border-primary-200 max-w-2xl mx-auto flex items-start gap-3">
               <Search className="w-5 h-5 text-primary-600 flex-shrink-0 mt-0.5" />
               <p className="text-sm text-secondary-700">
-                <strong>Nu știi numărul de carte funciară?</strong> Îl putem afla după adresă prin serviciul de{' '}
+                <strong>Nu ți-a rămas niciun număr?</strong> Pornim de la adresă, cu serviciul de{' '}
                 <Link href={serviceUrl('identificare-imobil')} className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
                   Identificare Imobil
                 </Link>
-                , apoi îți obținem copia contractului.
+, și abia apoi cerem contractul.
               </p>
             </div>
           </div>
@@ -427,7 +439,7 @@ export default async function CopieContractVanzarePage() {
                 Când ai nevoie
               </span>
               <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-3">
-                Când Ai Nevoie de Copia Contractului?
+                Cum ajung oamenii să ne ceară contractul
               </h2>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -462,15 +474,15 @@ export default async function CopieContractVanzarePage() {
                 Proces simplu
               </span>
               <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white mb-3">Cum Funcționează?</h2>
-              <p className="text-white/70 max-w-2xl mx-auto">Obții copia contractului în 4 pași, 100% online</p>
+              <p className="text-white/70 max-w-2xl mx-auto">Cu o verificare de eligibilitate în plus față de restul documentelor</p>
             </div>
             <div className="relative grid sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-6">
               <div className="hidden lg:block absolute top-8 left-[12.5%] right-[12.5%] h-0.5 bg-gradient-to-r from-primary-500/0 via-primary-500/50 to-primary-500/0" aria-hidden="true" />
               {[
-                { step: 1, title: 'Identifici Imobilul', desc: 'Introduci numărul de carte funciară sau cadastral.', icon: KeyRound },
-                { step: 2, title: 'Confirmi Localitatea', desc: 'Alegi județul și localitatea. Verificăm eligibilitatea cererii.', icon: MapPin },
-                { step: 3, title: 'Plătești Securizat', desc: 'Card, Apple Pay, Google Pay — taxele OCPI sunt incluse.', icon: Shield },
-                { step: 4, title: 'Primești Copia', desc: `În ${formatEstimatedDays(service)} primești copia contractului pe email.`, icon: CheckCircle },
+                { step: 1, title: 'Datele imobilului', desc: 'Numărul de carte funciară sau cel cadastral.', icon: KeyRound },
+                { step: 2, title: 'Verificarea cererii', desc: 'Ne uităm dacă poate fi onorată și îți cerem ce mai lipsește.', icon: MapPin },
+                { step: 3, title: 'Plata', desc: 'Dacă la verificare rezultă că cererea nu merge, îți returnăm suma.', icon: Shield },
+                { step: 4, title: 'Contractul scanat', desc: `Îți ajunge pe email în ${formatEstimatedDays(service)}.`, icon: CheckCircle },
               ].map((item) => (
                 <div key={item.step} className="relative text-center">
                   <div className="relative z-10 mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-400 to-primary-600 text-secondary-900 shadow-[0_8px_24px_rgba(236,185,95,0.35)]">
@@ -491,7 +503,7 @@ export default async function CopieContractVanzarePage() {
         <section className="py-12 lg:py-16 bg-white">
           <div className="container mx-auto px-4 max-w-[900px]">
             <h2 className="text-xl sm:text-2xl font-bold text-secondary-900 mb-6 text-center">
-              Servicii pentru imobile
+              Ce se cere de obicei împreună cu contractul
             </h2>
             <div className="grid sm:grid-cols-2 gap-4">
               <Link
@@ -533,16 +545,15 @@ export default async function CopieContractVanzarePage() {
 
         {/* FAQ */}
         <ServiceFAQ
-          title="Întrebări Frecvente — Copie Contract Vânzare-Cumpărare"
+          title="Întrebări despre contractul scos din arhivă"
           faqs={[
-            { q: 'Ce conține copia contractului de vânzare-cumpărare?', a: 'Copia reproduce contractul așa cum a fost depus în arhiva OCPI/ANCPI: părțile (vânzător și cumpărător), descrierea imobilului, suprafața, prețul tranzacției și clauzele convenite — actul în baza căruia s-a intabulat dreptul de proprietate.' },
-            { q: 'Cine poate cere o copie a contractului?', a: 'De regulă, proprietarul imobilului sau o persoană împuternicită de acesta. Pentru că documentul conține date cu caracter personal, echipa noastră verifică eligibilitatea cererii după plasarea comenzii și te contactează dacă sunt necesare documente suplimentare.' },
-            { q: 'Ce fac dacă nu sunt proprietarul imobilului?', a: 'Ai nevoie de o împuternicire din partea proprietarului sau de o altă calitate care îți dă dreptul la document (de exemplu, moștenitor într-un dosar de succesiune). Plasează comanda, iar noi îți confirmăm exact ce documente sunt necesare; dacă cererea nu poate fi onorată, îți returnăm contravaloarea.' },
-            { q: 'Cât durează eliberarea?', a: `${formatEstimatedDays(service)}. Cererea este procesată de un operator și copia contractului îți este livrată pe email.` },
-            { q: 'Cât costă copia contractului?', a: `${service.base_price} RON, cu taxele OCPI incluse. Fără costuri ascunse.` },
-            { q: 'Nu știu numărul de carte funciară sau cadastral. Ce fac?', a: 'Îl putem afla după adresă prin serviciul de Identificare Imobil, apoi îți obținem copia contractului pentru imobilul găsit.' },
-            { q: 'Am nevoie de cont ANCPI?', a: 'Nu. Ne ocupăm noi de întregul proces de solicitare către arhiva OCPI; tu ai nevoie doar de numărul de carte funciară sau cadastral.' },
-            { q: 'Care este valabilitatea copiei contractului?', a: 'Copia contractului nu are termen de expirare — reproduce un act istoric din arhivă. Pentru situația juridică actualizată a imobilului (proprietar, sarcini) este recomandat un extras de carte funciară recent.' },
+            { q: 'Oricine poate cere copia contractului?', a: 'Nu. Actul conține datele personale ale ambelor părți, așa că de regulă se cere calitatea de proprietar sau o împuternicire de la el. Moștenitorii își dovedesc calitatea cu actele de succesiune. După comandă verificăm dacă cererea poate fi onorată și îți spunem exact ce mai trebuie.' },
+            { q: 'Nu sunt proprietarul. Se mai poate face ceva?', a: 'Uneori da, dacă ai un interes pe care îl poți dovedi cu acte: ești moștenitor, ai o hotărâre judecătorească, ai împuternicire. Scrie-ne care e situația înainte să comanzi și îți spunem dacă are rost.' },
+            { q: 'Copia din arhivă e același lucru cu duplicatul de la notar?', a: 'Nu. Notarul care a autentificat actul păstrează propriul exemplar și poate elibera un duplicat, cu regimul lui. Noi îți aducem o copie a exemplarului aflat în dosarul cadastral. Dacă ți s-a cerut expres duplicat notarial, la notar trebuie mers.' },
+            { q: 'Ce se vede pe contract?', a: 'Părțile, descrierea imobilului așa cum era la data vânzării, prețul, clauzele convenite și eventualele servituți sau obligații asumate atunci. Adică fix ce s-a semnat, nu ce s-a schimbat de atunci.' },
+            { q: 'Suprafața din contract diferă de cea de azi. E o greșeală?', a: 'De obicei nu. Contractul descrie imobilul la momentul vânzării. Dacă între timp s-a făcut o dezmembrare, o alipire sau o măsurătoare nouă, suprafața înscrisă acum poate fi alta. Situația curentă se citește în cartea funciară.' },
+            { q: 'Imobilul a fost cumpărat prin donație sau moștenit. Tot merge?', a: 'Serviciul acoperă actul în baza căruia s-a făcut înscrierea, oricare ar fi el. Dacă titlul este un certificat de moștenitor sau un contract de donație, aceea este piesa pe care o cerem din dosar. Spune-ne ce știi despre modul de dobândire.' },
+            { q: 'Cât costă, și ce se întâmplă dacă nu se poate?', a: `${service.base_price} RON. Dacă la verificare rezultă că cererea nu poate fi onorată, primești banii înapoi. Dacă se poate, copia scanată ajunge pe email în ${formatEstimatedDays(service)} de la confirmare.` },
           ]}
         />
 
@@ -560,10 +571,10 @@ export default async function CopieContractVanzarePage() {
           <div className="relative container mx-auto px-4 max-w-[900px]">
             <div className="text-center">
               <h2 className="text-2xl lg:text-4xl font-extrabold text-white mb-4">
-                Gata să obții Copia Contractului?
+                Nu îți mai găsești contractul?
               </h2>
               <p className="text-lg text-white/80 mb-8 max-w-xl mx-auto">
-                Ai nevoie doar de numărul de carte funciară sau cadastral. Primești documentul în {formatEstimatedDays(service)}.
+                Ne ajunge un număr de CF sau unul cadastral. Verificăm cererea, iar copia ajunge pe email în {formatEstimatedDays(service)}.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
                 <OrderButton href={`/comanda/${SERVICE_SLUG}`}>Comandă Acum</OrderButton>

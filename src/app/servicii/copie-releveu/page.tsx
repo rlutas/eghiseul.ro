@@ -190,7 +190,7 @@ export default async function CopieReleveuPage() {
                     {[
                       'Ne dai numărul unității individuale sau numărul de CF',
                       'Spui în ce localitate se află blocul',
-                      'Achiți o singură sumă, taxa OCPI e inclusă',
+                      'Plătești din browser sau direct din telefon',
                       'Planșa îți vine pe email, în format electronic',
                     ].map((step) => (
                       <li key={step} className="flex items-center gap-2">
@@ -481,7 +481,7 @@ export default async function CopieReleveuPage() {
               {[
                 { step: 1, title: 'Numărul unității', desc: 'Numărul apartamentului din evidență sau CF-ul lui.', icon: KeyRound },
                 { step: 2, title: 'Unde e blocul', desc: 'Județul și localitatea. Le potrivim cu evidența înainte de depunere.', icon: MapPin },
-                { step: 3, title: 'Plata', desc: 'Card, Apple Pay sau Google Pay, cu taxa OCPI deja inclusă.', icon: Shield },
+                { step: 3, title: 'Plata', desc: 'Card sau plată din telefon, totul într-o singură tranșă.', icon: Shield },
                 { step: 4, title: 'Planșa pe email', desc: `Îți ajunge în ${formatEstimatedDays(service)}, în format electronic.`, icon: CheckCircle },
               ].map((item) => (
                 <div key={item.step} className="relative text-center">
@@ -553,8 +553,7 @@ export default async function CopieReleveuPage() {
             { q: 'Îmi trebuie releveu sau plan cadastral?', a: 'Dacă întrebarea ta este cum arată apartamentul pe dinăuntru, releveu. Dacă întrebarea este unde se află imobilul pe hartă și ce contur are, plan cadastral. Pentru un apartament de bloc, planul cadastral îți dă poziția blocului, ceea ce rareori ajută la un dosar de credit.' },
             { q: 'Numărul apartamentului arată 12783-C1-U4. E corect scris așa?', a: 'Da, așa se identifică o unitate individuală: numărul terenului, apoi construcția (C1), apoi unitatea (U4). Trimite-l exact în forma în care apare pe extras sau în contract, cu tot cu liniuțe.' },
             { q: 'Ce se întâmplă dacă în arhivă nu există releveu pentru apartament?', a: 'Se întâmplă la imobile din cărți funciare vechi, unde dosarul nu conține o planșă avizată. În cazul ăsta îți spunem exact ce am găsit în dosarul cadastral înainte să continuăm, ca să decizi tu dacă mai are rost comanda.' },
-            { q: 'Cât costă copia planșei?', a: `${service.base_price} RON, cu taxa OCPI inclusă.` },
-            { q: 'Sub ce formă îmi ajunge?', a: `În format electronic, pe email, în ${formatEstimatedDays(service)}. O poți tipări și atașa la dosarul de la bancă sau la cel notarial.` },
+            { q: 'Cât costă și sub ce formă îmi ajunge?', a: `${service.base_price} RON, cu tot cu ce achită operatorul la instituție. Planșa vine electronic, pe email, în ${formatEstimatedDays(service)}, gata de tipărit pentru dosarul de la bancă sau pentru cel notarial.` },
           ]}
         />
 

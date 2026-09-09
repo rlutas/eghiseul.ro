@@ -248,7 +248,7 @@ export default function VerificareRovinietaPage() {
               <p>
                 Ultima e capcana. Un drum național care intră în oraș rămâne drum național, dar pe
                 porțiunea din interiorul municipiului nu se cere rovinietă. Problema e că tot el iese
-                din oraș, iar acolo se cere din nou — motiv pentru care „am mers doar prin oraș" nu
+                din oraș, iar acolo se cere din nou — motiv pentru care „am mers doar prin oraș” nu
                 ține la control dacă ai fost prins pe centură sau la ieșire.
               </p>
 

@@ -106,15 +106,15 @@ export default async function PlanAmplasamentDelimitarePage() {
 
   // Ways to identify the property
   const identifiers = [
-    { icon: KeyRound, title: 'Număr cadastral', desc: 'Identificatorul unic al imobilului (ex: 12783).' },
-    { icon: ScrollText, title: 'Număr de carte funciară', desc: 'Numărul CF asociat proprietății din localitate.' },
+    { icon: KeyRound, title: 'Numărul cadastral', desc: 'Cel al parcelei pentru care vrei planul, așa cum apare în evidență.' },
+    { icon: ScrollText, title: 'Numărul de carte funciară', desc: 'Funcționează la fel, dacă numărul cadastral nu ți-a rămas nicăieri.' },
   ];
 
   const useCases = [
-    { icon: ScrollText, title: 'Vânzare teren', items: ['Dosar notarial', 'Verificarea suprafeței', 'Anexă la contract'] },
-    { icon: Layers, title: 'Dezmembrare și alipire', items: ['Documentație cadastrală', 'Operațiuni de carte funciară', 'Repoziționarea limitelor'] },
-    { icon: Home, title: 'Construcții și avize', items: ['Autorizație de construire', 'Certificat de urbanism', 'Racorduri la utilități'] },
-    { icon: Ruler, title: 'Verifici limitele', items: ['Lungimile laturilor', 'Suprafața măsurată', 'Vecinătățile parcelei'] },
+    { icon: ScrollText, title: 'Vinzi un teren', items: ['Cumpărătorul vrea conturul', 'Suprafața măsurată', 'Anexă la dosarul notarial'] },
+    { icon: Layers, title: 'Împarți sau unești parcele', items: ['Punctul de pornire al expertului', 'Loturi recalculate', 'Documentația nouă'] },
+    { icon: Ruler, title: 'Nu mai știi pe unde e hotarul', items: ['Lungimile laturilor', 'Vecinul de pe fiecare latură', 'Cifre de comparat cu terenul'] },
+    { icon: Home, title: 'Pregătești o construcție', items: ['Retrageri față de limite', 'Anexă la dosarul de autorizare', 'Suport pentru proiectant'] },
   ];
 
   return (
@@ -169,17 +169,17 @@ export default async function PlanAmplasamentDelimitarePage() {
                 </h1>
 
                 <p className="text-lg sm:text-xl text-white/85 leading-relaxed mb-6">
-                  Planul tehnic care arată cum a fost măsurat și delimitat imobilul la recepția cadastrală:
-                  conturul parcelei, lungimile laturilor, suprafața măsurată și vecinătățile. Copie din arhiva OCPI.
+                  Planșa care spune cât are fiecare latură și cine e vecinul pe fiecare dintre ele. Copie din
+                  dosarul de la OCPI, așa cum a fost recepționată.
                 </p>
 
                 {/* USP */}
                 <div className="flex items-start gap-3 rounded-xl bg-primary-500/15 border border-primary-500/40 p-4 mb-6">
                   <Ruler className="h-5 w-5 text-primary-500 flex-shrink-0 mt-0.5" />
                   <p className="text-white/95 text-sm sm:text-base leading-relaxed">
-                    Ai într-un singur plan <strong className="text-primary-500">conturul, laturile și suprafața</strong> imobilului,
-                    așa cum sunt necesare la <strong>vânzare, dezmembrare sau alipire</strong> și la dosarul pentru
-                    autorizația de construire.
+                    E singurul document care scrie{' '}
+                    <strong className="text-primary-500">vecinul de pe fiecare latură</strong>. De asta îl cer
+                    cumpărătorii, <strong>expertii care împart un teren</strong> și cine are o discuție de hotar.
                   </p>
                 </div>
 
@@ -189,10 +189,10 @@ export default async function PlanAmplasamentDelimitarePage() {
                   </p>
                   <ul className="mt-3 space-y-1.5 text-white/85 text-sm">
                     {[
-                      'Introduci numărul de carte funciară sau cadastral',
-                      'Confirmi județul și localitatea',
-                      'Plătești securizat (taxe OCPI incluse)',
-                      'Primești planul de amplasament pe email',
+                      'Ne dai numărul cadastral sau pe cel de CF',
+                      'Ne spui județul și localitatea parcelei',
+                      'Achiți o dată; la depunere nu mai adaugi nimic',
+                      'Îți trimitem planșa scanată, pe email',
                     ].map((step) => (
                       <li key={step} className="flex items-center gap-2">
                         <CheckCircle className="w-4 h-4 text-primary-500 flex-shrink-0" />
@@ -308,77 +308,92 @@ export default async function PlanAmplasamentDelimitarePage() {
         <section className="py-12 lg:py-16 bg-neutral-50">
           <div className="container mx-auto px-4 max-w-[820px]">
             <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-5">
-              Ce este planul de amplasament și delimitare și la ce folosește
+              Planșa care spune cât are fiecare latură și cine e vecinul
             </h2>
             <div className="space-y-4 text-neutral-700 leading-relaxed">
               <p>
-                <strong>Planul de amplasament și delimitare (PAD)</strong> este planul care{' '}
-                <strong>delimitează imobilul</strong>, întocmit la recepția cadastrală și înregistrat la Oficiul de
-                Cadastru și Publicitate Imobiliară (<strong>OCPI / ANCPI</strong>). El conține{' '}
-                <strong>conturul parcelei</strong>, <strong>dimensiunile laturilor</strong>, <strong>suprafața
-                măsurată</strong> și <strong>vecinătățile</strong> — adică reprezentarea exactă a limitelor terenului
-                așa cum au fost ele măsurate de inginerul cadastral și recepționate de OCPI.
+                Când un teren a fost măsurat și înscris în cadastru, inginerul a desenat conturul lui la scară
+                mare și a trecut pe fiecare latură lungimea și numele sau numărul cadastral al vecinului. Desenul
+                acela, <strong>planul de amplasament și delimitare</strong>, a trecut prin recepție la Oficiul de
+                Cadastru și Publicitate Imobiliară și a rămas în dosarul imobilului. Copia lui e ce îți aducem noi.
               </p>
               <p>
-                Prin eGhișeul îți obținem o <strong>copie din arhiva OCPI</strong> a planului de amplasament și
-                delimitare al imobilului tău, 100% online, fără cont ANCPI și fără deplasare la ghișeul OCPI. Comanda
-                este preluată de un operator, care identifică planul în arhivă după datele imobilului și ți-l trimite
-                pe email.
+                Ce se citește pe el: forma parcelei, lungimile laturilor, suprafața rezultată din măsurătoare,
+                vecinătățile pe fiecare latură, numărul cadastral și datele de identificare ale imobilului. Nicio
+                altă piesă din dosar nu le adună pe toate la un loc, și de asta ajunge cel mai des cerut dintre
+                planuri.
               </p>
+
+              <h3 className="text-xl font-bold text-secondary-900 pt-2">
+                Aici apare discuția despre suprafață
+              </h3>
+              <p>
+                Suprafața de pe planșă este cea <strong>măsurată</strong>. Suprafața din actul vechi de proprietate
+                este cea <strong>din acte</strong>, moștenită uneori din titluri făcute cu decenii în urmă. Cele
+                două nu coincid aproape niciodată, iar diferența poate ajunge la zeci de metri pătrați. Nu e o
+                greșeală a nimănui: o măsurătoare făcută cu aparat modern nu are cum să dea exact ce scria într-un
+                titlu de proprietate din anii nouăzeci. Când vinzi, cumpărătorul se uită la cifra măsurată, fiindcă
+                aia corespunde cu terenul.
+              </p>
+
+              <h3 className="text-xl font-bold text-secondary-900 pt-2">
+                Cine îl cere
+              </h3>
+              <p>
+                Cumpărătorii, înaintea unei tranzacții cu teren, ca să vadă forma și vecinii. Experții cadastrali,
+                când urmează o dezmembrare sau o alipire și au nevoie de conturul de la care pornesc. Proprietarii
+                aflați într-o discuție de hotar, fiindcă vecinătățile scrise pe planșă sunt un punct de referință
+                greu de contestat. Și proiectanții, care calculează retragerile față de limite pornind de la ce
+                arată planul.
+              </p>
+
               <div className="rounded-2xl border border-neutral-200 bg-white p-5">
                 <h3 className="font-bold text-secondary-900 mb-2">
-                  Ce conține planul de amplasament și delimitare
+                  Nu e același lucru cu „a face cadastru”
                 </h3>
-                <ul className="space-y-1.5 text-sm text-neutral-700">
-                  {[
-                    'Conturul parcelei și forma terenului',
-                    'Dimensiunile (lungimile) fiecărei laturi',
-                    'Suprafața măsurată a imobilului',
-                    'Vecinătățile (pe fiecare latură: nume sau număr cadastral)',
-                    'Numărul cadastral și datele de identificare ale imobilului',
-                  ].map((it) => (
-                    <li key={it} className="flex items-start gap-2">
-                      <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
-                      {it}
-                    </li>
-                  ))}
-                </ul>
+                <p className="text-sm text-neutral-700">
+                  Oamenii sună des cerând plan de amplasament când, de fapt, terenul lor nu e încă înscris în
+                  cadastru. Dacă imobilul nu are număr cadastral, nu există nicio planșă de copiat: trebuie
+                  întocmită o documentație nouă, de un expert autorizat care iese pe teren și măsoară. Ce facem noi
+                  e să scoatem din arhivă planul unei lucrări deja recepționate.
+                </p>
               </div>
 
               <h3 className="text-xl font-bold text-secondary-900 pt-2">
-                Plan de amplasament vs. extras de plan cadastral pe ortofotoplan
+                Ce nu îți rezolvă planul
               </h3>
               <p>
-                Cele două planuri se confundă des, dar arată lucruri diferite. <strong>Extrasul de plan cadastral
-                pe ortofotoplan</strong> suprapune conturul imobilului peste o imagine aeriană georeferențiată — este
-                util pentru a localiza terenul pe hartă. <strong>Planul de amplasament și delimitare</strong> este
-                planul tehnic întocmit la recepția cadastrală: arată <strong>cotele și dimensiunile măsurate</strong>{' '}
-                ale laturilor, suprafața și vecinătățile, fără fundalul aerian.
+                Nu stabilește hotarul în caz de conflict. Arată ce s-a măsurat și ce s-a recepționat atunci; dacă
+                vecinul contestă, discuția se mută în altă parte, cu expertiză și, la nevoie, cu instanță. Nu
+                autorizează nicio construcție, ci e doar o piesă din dosarul cu care ceri autorizația. Și nu ține
+                cont de ce s-a schimbat după recepție: dacă parcela a fost între timp dezmembrată, fiecare lot nou
+                are propriul plan.
               </p>
               <p>
-                Pe scurt: planul pe ortofotoplan răspunde la „unde se află terenul pe hartă”, iar planul de
-                amplasament și delimitare răspunde la „cum a fost măsurat și delimitat terenul”. Pentru o vânzare,
-                o dezmembrare sau o autorizație de construire, ai de obicei nevoie de PAD; dacă vrei doar localizarea
-                pe hartă, comanzi{' '}
+                Dacă vrei doar să localizezi terenul pe hartă, îți ajunge{' '}
                 <Link href={serviceUrl('extras-plan-cadastral')} className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
                   extrasul de plan cadastral pe ortofotoplan
                 </Link>
+                . Dacă îți trebuie valorile numerice ale colțurilor, pentru trasare, ceri separat{' '}
+                <Link href={serviceUrl('copie-inventar-coordonate')} className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
+                  inventarul de coordonate
+                </Link>
+                . Iar dacă nu cunoști numărul cadastral, îl aflăm după adresă cu serviciul de{' '}
+                <Link href={serviceUrl('identificare-imobil')} className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
+                  identificare imobil
+                </Link>
                 .
               </p>
+              <h3 className="text-xl font-bold text-secondary-900 pt-2">
+                Ce merită comparat când îl primești
+              </h3>
               <p>
-                Dacă ai nevoie și de coordonatele punctelor de contur ale parcelei (lista de coordonate Stereo 70),
-                poți cere separat{' '}
-                <Link href={serviceUrl('copie-inventar-coordonate')} className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
-                  copia inventarului de coordonate
-                </Link>
-                . Pentru situația juridică a imobilului (proprietar, suprafață, sarcini) ai nevoie de extrasul de
-                carte funciară — sunt documente complementare.
-              </p>
-              <p>
-                Ai nevoie de un singur identificator ca să îți găsim planul în arhivă: <strong>numărul
-                cadastral</strong> sau <strong>numărul de carte funciară</strong>, plus județul și localitatea. Dacă
-                nu cunoști numărul cadastral, îl putem afla mai întâi după adresă, apoi îți obținem planul de
-                amplasament și delimitare.
+                Trei lucruri, în ordinea asta. Întâi suprafața de pe planșă față de cea din actul de proprietate,
+                fiindcă acolo apar cele mai multe surprize. Apoi vecinătățile: dacă pe o latură scrie un nume care
+                nu îți spune nimic, înseamnă că proprietarul de acolo s-a schimbat de la recepție încoace, ceea ce
+                e normal, dar bine de știut înainte de o discuție. La final, forma parcelei față de cum arată pe
+                teren. Dacă gardul taie un colț sau dacă o latură pare mai scurtă decât scrie, ai un motiv concret
+                să chemi un topograf, nu doar o bănuială.
               </p>
             </div>
           </div>
@@ -392,10 +407,10 @@ export default async function PlanAmplasamentDelimitarePage() {
                 Ce îți trebuie
               </span>
               <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-3">
-                Cum identifici imobilul pentru planul de amplasament
+                Ce ne trebuie ca să scoatem planșa
               </h2>
               <p className="text-neutral-600 max-w-2xl mx-auto">
-                Ai nevoie de un singur identificator. Dacă nu îl știi, îl putem afla după adresă.
+                Un număr al parcelei și localitatea în care se află.
               </p>
             </div>
 
@@ -414,7 +429,7 @@ export default async function PlanAmplasamentDelimitarePage() {
             <div className="mt-6 p-5 bg-primary-50 rounded-2xl border border-primary-200 max-w-2xl mx-auto flex items-start gap-3">
               <Search className="w-5 h-5 text-primary-600 flex-shrink-0 mt-0.5" />
               <p className="text-sm text-secondary-700">
-                <strong>Nu știi numărul cadastral?</strong> Îl putem afla după adresă prin serviciul de{' '}
+                <strong>Nu găsești numărul nicăieri?</strong> Îl scoatem după adresă, cu serviciul de{' '}
                 <Link href={serviceUrl('identificare-imobil')} className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
                   Identificare Imobil
                 </Link>
@@ -432,7 +447,7 @@ export default async function PlanAmplasamentDelimitarePage() {
                 Când ai nevoie
               </span>
               <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-3">
-                Când Ai Nevoie de Plan de Amplasament și Delimitare?
+                Cine se uită pe planșă și de ce
               </h2>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -467,15 +482,15 @@ export default async function PlanAmplasamentDelimitarePage() {
                 Proces simplu
               </span>
               <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white mb-3">Cum Funcționează?</h2>
-              <p className="text-white/70 max-w-2xl mx-auto">Obții planul de amplasament în 4 pași, 100% online</p>
+              <p className="text-white/70 max-w-2xl mx-auto">Mergem noi la biroul teritorial unde e dosarul</p>
             </div>
             <div className="relative grid sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-6">
               <div className="hidden lg:block absolute top-8 left-[12.5%] right-[12.5%] h-0.5 bg-gradient-to-r from-primary-500/0 via-primary-500/50 to-primary-500/0" aria-hidden="true" />
               {[
-                { step: 1, title: 'Identifici Imobilul', desc: 'Introduci numărul cadastral sau de carte funciară.', icon: KeyRound },
-                { step: 2, title: 'Confirmi Localitatea', desc: 'Alegi județul și localitatea. Verificăm datele înainte de depunere.', icon: MapPin },
-                { step: 3, title: 'Plătești Securizat', desc: 'Card, Apple Pay, Google Pay — taxele OCPI sunt incluse.', icon: Shield },
-                { step: 4, title: 'Primești Planul', desc: `În ${formatEstimatedDays(service)} primești planul de amplasament pe email.`, icon: CheckCircle },
+                { step: 1, title: 'Numărul parcelei', desc: 'Cu el găsim planșa recepționată pentru terenul tău.', icon: KeyRound },
+                { step: 2, title: 'Județ și localitate', desc: 'Ne arată la ce birou teritorial se află dosarul.', icon: MapPin },
+                { step: 3, title: 'Plata', desc: 'Un singur pas. Tariful pe care îl achită operatorul e deja acoperit.', icon: Shield },
+                { step: 4, title: 'Planșa scanată', desc: `Cu laturi, suprafață și vecini, pe email în ${formatEstimatedDays(service)}.`, icon: CheckCircle },
               ].map((item) => (
                 <div key={item.step} className="relative text-center">
                   <div className="relative z-10 mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-400 to-primary-600 text-secondary-900 shadow-[0_8px_24px_rgba(236,185,95,0.35)]">
@@ -496,7 +511,7 @@ export default async function PlanAmplasamentDelimitarePage() {
         <section className="py-12 lg:py-16 bg-white">
           <div className="container mx-auto px-4 max-w-[900px]">
             <h2 className="text-xl sm:text-2xl font-bold text-secondary-900 mb-6 text-center">
-              Servicii pentru imobile
+              Ce se mai scoate pentru aceeași parcelă
             </h2>
             <div className="grid sm:grid-cols-2 gap-4">
               <Link
@@ -549,17 +564,15 @@ export default async function PlanAmplasamentDelimitarePage() {
 
         {/* FAQ */}
         <ServiceFAQ
-          title="Întrebări Frecvente — Plan de Amplasament și Delimitare"
+          title="Întrebări despre planul de amplasament și delimitare"
           faqs={[
-            { q: 'Ce este planul de amplasament și delimitare?', a: 'Este planul care delimitează imobilul, întocmit la recepția cadastrală și înregistrat la OCPI/ANCPI. Conține conturul parcelei, dimensiunile laturilor, suprafața măsurată și vecinătățile. Noi îți obținem o copie din arhiva OCPI.' },
-            { q: 'Ce conține planul de amplasament și delimitare?', a: 'Conturul și forma parcelei, dimensiunile (lungimile) fiecărei laturi, suprafața măsurată, vecinătățile pe fiecare latură și numărul cadastral al imobilului.' },
-            { q: 'Cu ce diferă de extrasul de plan cadastral pe ortofotoplan?', a: 'Extrasul de plan cadastral suprapune imobilul peste o imagine aeriană (ortofotoplan) și e util pentru localizarea pe hartă. Planul de amplasament și delimitare este planul tehnic de la recepția cadastrală, cu dimensiunile măsurate ale laturilor, suprafața și vecinătățile, fără fundal aerian. Pentru vânzare, dezmembrare sau autorizație de construire ai de obicei nevoie de planul de amplasament.' },
-            { q: 'Cât durează eliberarea?', a: `${formatEstimatedDays(service)}. Comanda este preluată de un operator care identifică planul în arhiva OCPI și ți-l trimite pe email.` },
-            { q: 'Cât costă planul de amplasament și delimitare?', a: `${service.base_price} RON, cu taxele OCPI incluse. Fără costuri ascunse.` },
-            { q: 'Nu știu numărul cadastral. Ce fac?', a: 'Îl putem afla după adresă prin serviciul de Identificare Imobil, apoi îți obținem planul de amplasament și delimitare.' },
-            { q: 'Am nevoie de cont ANCPI?', a: 'Nu. Ne ocupăm noi de tot procesul; tu ai nevoie doar de numărul cadastral sau de carte funciară și de județul/localitatea imobilului.' },
-            { q: 'Planul este valabil pentru o autorizație de construire?', a: 'Planul de amplasament și delimitare din arhiva OCPI reflectă imobilul așa cum a fost recepționat cadastral și este folosit ca piesă în documentațiile de urbanism. Pentru autorizația de construire, proiectantul îți va spune dacă este suficientă copia din arhivă sau dacă e nevoie de o documentație cadastrală actualizată.' },
-            { q: 'Pot folosi planul la vânzarea terenului?', a: 'Da. Planul de amplasament și delimitare se folosește frecvent la dosarul notarial pentru a confirma conturul, suprafața și vecinătățile imobilului care se vinde.' },
+            { q: 'Suprafața de pe planșă diferă de cea din actul meu. Care e bună?', a: 'Planșa arată suprafața măsurată, actul vechi arată suprafața din titlu. Diferența e obișnuită și vine din faptul că măsurătorile moderne sunt mult mai precise decât cele pe baza cărora s-au întocmit titlurile vechi. La o vânzare, cumpărătorul se raportează la cifra măsurată, fiindcă ea corespunde cu terenul.' },
+            { q: 'Terenul meu nu are număr cadastral. Îmi puteți da planul?', a: 'Nu, fiindcă nu există. Dacă imobilul nu e înscris în cadastru, nu s-a depus niciodată o planșă care să poată fi copiată. Îți trebuie o documentație cadastrală nouă, întocmită de un expert autorizat care iese pe teren și măsoară.' },
+            { q: 'Vecinul spune că gardul e pe terenul lui. Planul rezolvă?', a: 'Ajută, dar nu tranșează. Pe planșă scrie ce s-a măsurat și cine era vecinul pe fiecare latură la data recepției. Dacă el contestă, urmează o expertiză și, dacă nu vă înțelegeți, instanța. Planul e piesa de la care pleacă discuția, nu decizia finală.' },
+            { q: 'Ce înseamnă vecinătățile trecute pe laturi?', a: 'Pe fiecare latură a parcelei este notat cu ce se învecinează: un nume, un număr cadastral, un drum, un canal. E singurul document din dosar care le scrie explicit, motiv pentru care se cere în discuțiile de hotar.' },
+            { q: 'Îmi ține loc de autorizație de construire?', a: 'Nu. Este una dintre piesele pe care le depui ca să obții autorizația. Ce ai voie să construiești rezultă din certificatul de urbanism și din avizele cerute de primărie, nu din planșă.' },
+            { q: 'Am dezmembrat terenul anul trecut. Ce primesc?', a: 'Primești planul care corespunde numărului cadastral pe care ni-l dai. După dezmembrare, fiecare lot nou are propriul număr și propria planșă. Spune-ne toate numerele pe care le ai și verificăm care e activ.' },
+            { q: 'Cât costă și cât se așteaptă?', a: `${service.base_price} RON, sumă care acoperă și tariful instituției. Un operator identifică planul în arhiva biroului teritorial și ți-l trimite scanat, pe email, în ${formatEstimatedDays(service)}.` },
           ]}
         />
 
@@ -577,10 +590,10 @@ export default async function PlanAmplasamentDelimitarePage() {
           <div className="relative container mx-auto px-4 max-w-[900px]">
             <div className="text-center">
               <h2 className="text-2xl lg:text-4xl font-extrabold text-white mb-4">
-                Gata să obții Planul de Amplasament și Delimitare?
+                Vrei laturile, suprafața și vecinii, negru pe alb?
               </h2>
               <p className="text-lg text-white/80 mb-8 max-w-xl mx-auto">
-                Ai nevoie doar de numărul cadastral sau de carte funciară. Primești documentul în {formatEstimatedDays(service)}.
+                Un număr al parcelei și localitatea. Planșa îți vine pe email în {formatEstimatedDays(service)}.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
                 <OrderButton href={`/comanda/${SERVICE_SLUG}`}>Comandă Acum</OrderButton>

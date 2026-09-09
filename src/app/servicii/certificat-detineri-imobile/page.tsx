@@ -106,16 +106,16 @@ export default async function CertificatDetineriImobilePage() {
 
   // What we need to identify the PERSON (search is by person, not by cadastral number)
   const identifiers = [
-    { icon: UserSearch, title: 'Nume complet', desc: 'Numele și prenumele persoanei pentru care se face verificarea.' },
-    { icon: KeyRound, title: 'CNP sau CUI', desc: 'Codul numeric personal (persoană fizică) ori CUI-ul (persoană juridică).' },
-    { icon: MapPin, title: 'Județul / localitatea', desc: 'Unitatea administrativ-teritorială pe care vrei să fie acoperită verificarea.' },
+    { icon: UserSearch, title: 'Numele, așa cum e în buletin', desc: 'Inclusiv numele de dinaintea căsătoriei, dacă proprietățile au fost dobândite atunci.' },
+    { icon: KeyRound, title: 'CNP-ul sau CUI-ul', desc: 'Fără el, căutarea după nume dă rezultate care nu îți folosesc la dosar.' },
+    { icon: MapPin, title: 'Unde se caută', desc: 'Localitatea sau județul. De asta depinde ce acoperă certificatul.' },
   ];
 
   const useCases = [
-    { icon: Home, title: 'Dosare de locuință', items: ['Locuință ANL', 'Locuință socială', 'Dovada că nu deții o altă locuință'] },
-    { icon: ScrollText, title: 'Ajutoare & subvenții', items: ['Dosare de ajutor social', 'Burse pentru elevi sau studenți', 'Dosare bancare'] },
-    { icon: Building2, title: 'Succesiuni & notariat', items: ['Succesiuni și partaj', 'Masă succesorală', 'Litigii cu imobile'] },
-    { icon: Shield, title: 'Dovada (ne)deținerii', items: ['Confirmi că deții imobile', 'Sau că nu deții niciunul', 'Acceptat la instituții'] },
+    { icon: Home, title: 'Dosar de locuință ANL sau socială', items: ['Condiție de eligibilitate', 'Se cere la depunere', 'Uneori și la reînnoire'] },
+    { icon: ScrollText, title: 'Ajutor, subvenție sau bursă', items: ['Comisia verifică patrimoniul', 'Documentul intră la dosar', 'Cerut și pentru membrii familiei'] },
+    { icon: Building2, title: 'Succesiune sau partaj', items: ['Ce imobile a lăsat defunctul', 'Masa succesorală', 'Verificare între moștenitori'] },
+    { icon: Shield, title: 'Ți-l cere o instituție', items: ['Confirmarea patrimoniului', 'Dosare bancare', 'Situații de conflict de interese'] },
   ];
 
   return (
@@ -170,17 +170,17 @@ export default async function CertificatDetineriImobilePage() {
                 </h1>
 
                 <p className="text-lg sm:text-xl text-white/85 leading-relaxed mb-6">
-                  Documentul OCPI/ANCPI care arată dacă o persoană <strong>figurează sau nu</strong> cu proprietăți
-                  imobiliare în evidențele de cadastru și carte funciară, pe o localitate sau pe un județ întreg.
+                  Singurul document de pe site care pornește de la un om, nu de la un imobil. Spune dacă persoana
+                  respectivă figurează cu proprietăți în zona verificată.
                 </p>
 
                 {/* USP */}
                 <div className="flex items-start gap-3 rounded-xl bg-primary-500/15 border border-primary-500/40 p-4 mb-6">
                   <UserSearch className="h-5 w-5 text-primary-500 flex-shrink-0 mt-0.5" />
                   <p className="text-white/95 text-sm sm:text-base leading-relaxed">
-                    Verificarea se face <strong className="text-primary-500">după persoană</strong> (nume + CNP/CUI),
-                    nu după numărul cadastral. Primești <strong>dovada deținerii sau a nedeținerii</strong> de imobile,
-                    cu taxele OCPI incluse — fără cont ANCPI și fără drum la ghișeu.
+                    E documentul cerut în dosarele de <strong className="text-primary-500">locuință ANL sau
+                    socială</strong>, acolo unde trebuie să arăți că{' '}
+                    <strong>nu deții deja o locuință</strong>. Se cere după nume și CNP, nu după număr cadastral.
                   </p>
                 </div>
 
@@ -190,10 +190,10 @@ export default async function CertificatDetineriImobilePage() {
                   </p>
                   <ul className="mt-3 space-y-1.5 text-white/85 text-sm">
                     {[
-                      'Completezi datele persoanei (nume + CNP/CUI)',
-                      'Alegi județul/localitatea pentru verificare',
-                      'Plătești securizat (taxe OCPI incluse)',
-                      'Primești certificatul pe email',
+                      'Ne dai numele și CNP-ul persoanei verificate',
+                      'Stabilim împreună pe ce zonă se caută',
+                      'Achiți online, într-o singură plată',
+                      'Îți trimitem certificatul pe email',
                     ].map((step) => (
                       <li key={step} className="flex items-center gap-2">
                         <CheckCircle className="w-4 h-4 text-primary-500 flex-shrink-0" />
@@ -306,84 +306,91 @@ export default async function CertificatDetineriImobilePage() {
         <section className="py-12 lg:py-16 bg-neutral-50">
           <div className="container mx-auto px-4 max-w-[820px]">
             <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-5">
-              Ce este certificatul privind deținerea de imobile
+              Documentul care pornește de la om, nu de la imobil
             </h2>
             <div className="space-y-4 text-neutral-700 leading-relaxed">
               <p>
-                <strong>Certificatul privind deținerea (sau nedeținerea) de imobile</strong> este eliberat și semnat
-                electronic de Oficiul de Cadastru și Publicitate Imobiliară (<strong>OCPI / ANCPI</strong>). El arată
-                dacă, la data interogării, o persoană <strong>figurează sau nu ca proprietar</strong> de imobile în
-                evidențele integrate de cadastru și carte funciară. Verificarea se face pe o unitate
-                administrativ-teritorială (localitate, sector sau județ), iar rezultatul confirmă fie că persoana are
-                imobile înscrise, fie că nu are niciunul.
+                Toate celelalte documente de aici pleacă de la o parcelă sau de la un apartament. Ăsta pleacă de la
+                o persoană și răspunde la o singură întrebare: figurează sau nu, în evidențele de cadastru și carte
+                funciară, cu imobile pe raza verificată? Îl eliberează și îl semnează electronic Oficiul de Cadastru
+                și Publicitate Imobiliară.
               </p>
               <p>
-                Extrasul de carte funciară descrie un singur imobil, identificat printr-un număr cadastral. Acest
-                certificat pleacă de la <strong>persoană</strong> și răspunde la altă întrebare: „are această persoană
-                proprietăți pe raza UAT-ului verificat?”. Tocmai de aceea ajunge des să fie folosit ca
-                <strong> dovadă a deținerii sau a nedeținerii unei locuințe</strong>, în dosarele unde eligibilitatea
-                ține de patrimoniul imobiliar al solicitantului.
+                Răspunsul vine în două feluri. Dacă persoana are imobile înscrise, certificatul confirmă deținerea
+                și, în funcție de tipul documentului, poate cuprinde și lista lor. Dacă nu are niciunul,
+                certificatul atestă nedeținerea, adică exact „adeverința că nu am casă sau teren” pe care ți-o cere
+                comisia.
               </p>
 
-              <div className="rounded-2xl border border-neutral-200 bg-white p-5">
+              <h3 className="text-xl font-bold text-secondary-900 pt-2">
+                De unde vine, aproape mereu, cererea
+              </h3>
+              <p>
+                Din <strong>dosarele de locuință</strong>. Ca să primești o locuință ANL, socială sau de necesitate,
+                trebuie să arăți că nu deții deja una în proprietate, iar comisia vrea o confirmare de la
+                instituția care ține evidența, nu o declarație pe propria răspundere. Vin apoi{' '}
+                <strong>dosarele de ajutoare, subvenții și burse</strong>, unde eligibilitatea ține de patrimoniu,
+                și <strong>succesiunile</strong>, unde notarul sau moștenitorii vor să vadă ce imobile a lăsat
+                defunctul într-o anumită localitate.
+              </p>
+
+              <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5">
                 <h3 className="font-bold text-secondary-900 mb-2">
-                  Căutare după persoană, nu după numărul cadastral
+                  Zona verificată e partea în care se greșește cel mai des
                 </h3>
                 <p className="text-sm text-neutral-700">
-                  Pentru a elibera certificatul avem nevoie de <strong>datele persoanei</strong> — nume complet și
-                  <strong> CNP</strong> (pentru persoane fizice) sau <strong>CUI</strong> (pentru persoane juridice) —
-                  plus <strong>județul sau localitatea</strong> unde vrei să fie făcută verificarea. Nu este nevoie de
-                  niciun număr cadastral sau de carte funciară: tocmai ce încercăm să aflăm este dacă persoana deține
-                  imobile, nu detaliile unui imobil deja cunoscut.
+                  Verificarea se face pe o unitate administrativ-teritorială: o localitate, un sector sau un județ.
+                  Un certificat scos pe Cluj-Napoca nu spune nimic despre un teren din Bihor. Dacă în cerința de la
+                  dosar scrie „la nivel de județ” iar tu comanzi pe localitate, documentul e respins și ai plătit
+                  degeaba. Spune-ne ce scrie exact în cerință și îți confirmăm acoperirea potrivită înainte să
+                  depunem.
                 </p>
               </div>
 
               <h3 className="text-xl font-bold text-secondary-900 pt-2">
-                Deținere vs. nedeținere: ce poate să arate certificatul
+                Ce nu vede certificatul
               </h3>
               <p>
-                Rezultatul vine în două variante. Dacă persoana <strong>are imobile</strong> înscrise în evidențe,
-                certificatul confirmă deținerea și, în funcție de tipul documentului, poate include și lista imobilelor
-                de pe raza UAT-ului verificat. Dacă persoana <strong>nu are niciun imobil</strong> înscris, certificatul
-                atestă nedeținerea, adică tocmai „adeverința că nu am casă sau teren” cerută în dosarele de locuință și
-                de ajutoare.
+                Vede numai ce e înscris în evidențele de cadastru și carte funciară. Un teren moștenit și
+                neintabulat, o casă dintr-o carte funciară veche care nu a fost încă digitizată sau o proprietate
+                aflată în alt județ nu apar acolo. Asta nu e o scăpare a documentului, ci limita evidenței din care
+                se extrage. De aceea certificatul de nedeținere nu înseamnă „persoana asta nu are nimic în
+                România”, ci „în zona verificată nu figurează nimic pe numele ei”.
               </p>
               <p>
-                Un detaliu de reținut: certificatul reflectă starea înscrisă la data interogării, în
-                <strong> evidențele de cadastru și carte funciară</strong> de pe UAT-ul ales. Proprietățile
-                neintabulate, cele din cărți funciare vechi încă nedigitizate sau cele aflate pe raza altor localități
-                ori județe nu apar aici. De aceea îți confirmăm dinainte ce acoperire teritorială alegi, ca documentul
-                să corespundă cu cerința din dosarul tău.
-              </p>
-
-              <h3 className="text-xl font-bold text-secondary-900 pt-2">
-                La ce dosare îți este cerut
-              </h3>
-              <p>
-                Cel mai des, certificatul este cerut la <strong>dosarele de locuință</strong> (locuințe ANL, locuințe
-                sociale sau de necesitate), unde trebuie să arăți că nu deții deja o locuință în proprietate. Apare apoi
-                în <strong>dosarele de ajutoare și subvenții</strong>, la acordarea unor burse, în
-                <strong> succesiuni, partaje și litigii</strong> cu imobile, în dosarele bancare, precum și ori de câte
-                ori o instituție îți cere o confirmare privind patrimoniul imobiliar. Prin eGhișeul îl obții 100%
-                online: ne dai datele persoanei, noi facem verificarea la OCPI și îți trimitem certificatul pe email.
+                Nu îl confunda nici cu adeverințele de la primărie. <strong>Direcția de taxe și impozite</strong>
+                {' '}eliberează o adeverință despre bunurile pe care le are în rol fiscal, care e alt document, cu
+                altă bază de date. Unele comisii le cer pe amândouă tocmai pentru că nu se suprapun.
               </p>
 
               <div className="rounded-2xl border border-neutral-200 bg-white p-5">
                 <h3 className="font-bold text-secondary-900 mb-2">
-                  Ai nevoie de un imobil anume, nu de un certificat pe persoană?
+                  Cauți un imobil anume, nu o persoană?
                 </h3>
                 <p className="text-sm text-neutral-700">
-                  Dacă vrei situația juridică a unui imobil identificat (proprietar, suprafață, sarcini), comandă{' '}
+                  Atunci ai nevoie de{' '}
                   <Link href={serviceUrl('extras-carte-funciara')} className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
                     extrasul de carte funciară
                   </Link>
-                  . Dacă ai doar adresa și vrei să afli numărul cadastral, folosește serviciul de{' '}
+                  , care descrie un singur imobil identificat prin număr cadastral. Iar dacă ai adresa și îți
+                  lipsește numărul, pornește de la{' '}
                   <Link href={serviceUrl('identificare-imobil')} className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
                     identificare imobil
                   </Link>
                   .
                 </p>
               </div>
+              <h3 className="text-xl font-bold text-secondary-900 pt-2">
+                Când familia are proprietăți în mai multe județe
+              </h3>
+              <p>
+                Situația apare des la succesiuni și la dosarele în care se verifică o familie întreagă. Fiindcă
+                fiecare certificat acoperă o singură unitate administrativ-teritorială, un om cu o casă în
+                Ilfov și un teren în Vrancea are nevoie de două verificări separate. Nu există o interogare
+                națională pe care să o cerem în locul lor. Ce facem, practic, e să pornim de la locurile în care
+                persoana a locuit sau a moștenit, fiindcă acolo sunt și proprietățile. Dacă nu știi de unde să
+                începi, spune-ne ce știi despre traseul ei și stabilim împreună ordinea verificărilor.
+              </p>
             </div>
           </div>
         </section>
@@ -396,10 +403,10 @@ export default async function CertificatDetineriImobilePage() {
                 Ce îți trebuie
               </span>
               <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-3">
-                Ce date sunt necesare pentru verificare
+                Datele persoanei și zona de căutat
               </h2>
               <p className="text-neutral-600 max-w-2xl mx-auto">
-                Verificarea pornește de la persoană. Ai nevoie de datele de identificare și de zona de verificat.
+                Niciun număr cadastral. Tocmai asta încercăm să aflăm: dacă există vreunul pe numele ei.
               </p>
             </div>
 
@@ -418,8 +425,9 @@ export default async function CertificatDetineriImobilePage() {
             <div className="mt-6 p-5 bg-primary-50 rounded-2xl border border-primary-200 max-w-3xl mx-auto flex items-start gap-3">
               <Search className="w-5 h-5 text-primary-600 flex-shrink-0 mt-0.5" />
               <p className="text-sm text-secondary-700">
-                <strong>Nu ești sigur de acoperirea teritorială?</strong> Verificarea se face pe localitate sau județ.
-                Spune-ne unde a locuit sau a deținut proprietăți persoana și îți confirmăm zona potrivită pentru dosarul tău.
+                <strong>Citește cerința de la dosar înainte să comanzi.</strong> Dacă scrie „pe județ” iar
+                certificatul e scos pe localitate, comisia îl respinge. Trimite-ne textul cerinței și îți spunem
+                ce acoperire să alegi.
               </p>
             </div>
           </div>
@@ -433,7 +441,7 @@ export default async function CertificatDetineriImobilePage() {
                 Când ai nevoie
               </span>
               <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-3">
-                Când Ai Nevoie de Certificatul de (Ne)deținere?
+                Dosarele în care ți se cere
               </h2>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -468,15 +476,15 @@ export default async function CertificatDetineriImobilePage() {
                 Proces simplu
               </span>
               <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white mb-3">Cum Funcționează?</h2>
-              <p className="text-white/70 max-w-2xl mx-auto">Obții certificatul în 4 pași, 100% online</p>
+              <p className="text-white/70 max-w-2xl mx-auto">Verificarea o face un operator, la biroul teritorial</p>
             </div>
             <div className="relative grid sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-6">
               <div className="hidden lg:block absolute top-8 left-[12.5%] right-[12.5%] h-0.5 bg-gradient-to-r from-primary-500/0 via-primary-500/50 to-primary-500/0" aria-hidden="true" />
               {[
-                { step: 1, title: 'Datele persoanei', desc: 'Completezi numele și CNP-ul (sau CUI-ul) persoanei verificate.', icon: UserSearch },
-                { step: 2, title: 'Alegi zona', desc: 'Selectezi județul/localitatea. Un operator face verificarea la OCPI.', icon: MapPin },
-                { step: 3, title: 'Plătești Securizat', desc: 'Card, Apple Pay, Google Pay — taxele OCPI sunt incluse.', icon: Shield },
-                { step: 4, title: 'Primești certificatul', desc: `În ${formatEstimatedDays(service)} primești certificatul de (ne)deținere pe email.`, icon: CheckCircle },
+                { step: 1, title: 'Cine se verifică', desc: 'Numele și CNP-ul, sau CUI-ul, dacă e vorba de o firmă.', icon: UserSearch },
+                { step: 2, title: 'Pe ce zonă', desc: 'Localitate, sector sau județ. Confirmăm acoperirea cerută la dosar.', icon: MapPin },
+                { step: 3, title: 'Plata', desc: 'Din browser sau din telefon, într-o singură tranșă.', icon: Shield },
+                { step: 4, title: 'Răspunsul', desc: `Deținere sau nedeținere, pe email, în ${formatEstimatedDays(service)}.`, icon: CheckCircle },
               ].map((item) => (
                 <div key={item.step} className="relative text-center">
                   <div className="relative z-10 mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-400 to-primary-600 text-secondary-900 shadow-[0_8px_24px_rgba(236,185,95,0.35)]">
@@ -497,7 +505,7 @@ export default async function CertificatDetineriImobilePage() {
         <section className="py-12 lg:py-16 bg-white">
           <div className="container mx-auto px-4 max-w-[900px]">
             <h2 className="text-xl sm:text-2xl font-bold text-secondary-900 mb-6 text-center">
-              Servicii pentru imobile
+              Dacă întrebarea ta e despre un imobil anume
             </h2>
             <div className="grid sm:grid-cols-3 gap-4">
               <Link
@@ -539,17 +547,15 @@ export default async function CertificatDetineriImobilePage() {
 
         {/* FAQ */}
         <ServiceFAQ
-          title="Întrebări Frecvente — Certificat privind Deținerea de Imobile"
+          title="Întrebări despre verificarea pe persoană"
           faqs={[
-            { q: 'Ce atestă certificatul privind deținerea de imobile?', a: 'Arată dacă, la data interogării, o persoană figurează sau nu ca proprietar de imobile în evidențele integrate de cadastru și carte funciară, pe raza unității administrativ-teritoriale verificate (localitate, sector sau județ). Este eliberat și semnat electronic de OCPI/ANCPI.' },
-            { q: 'Care e diferența dintre certificatul de deținere și cel de nedeținere?', a: 'Este același document, doar rezultatul diferă. Dacă persoana are imobile, certificatul confirmă deținerea (uneori cu lista imobilelor). Dacă nu are niciunul, atestă nedeținerea, adică dovada că persoana nu figurează cu casă sau teren în zona verificată.' },
-            { q: 'Ce date îmi trebuie pentru a comanda?', a: 'Numele complet al persoanei și CNP-ul (pentru persoană fizică) sau CUI-ul (pentru persoană juridică), plus județul, sectorul sau localitatea unde vrei să fie făcută verificarea. Nu ai nevoie de niciun număr cadastral.' },
-            { q: 'Pe ce zonă se face verificarea?', a: 'Verificarea se face la nivel de unitate administrativ-teritorială: o localitate, un sector sau un județ. Proprietățile de pe raza altor localități sau județe nu apar automat, așa că îți confirmăm acoperirea înainte de a face verificarea.' },
-            { q: 'Apar și imobilele neintabulate sau din cărți funciare vechi?', a: 'Nu întotdeauna. Certificatul reflectă starea înscrisă în evidențele de cadastru și carte funciară la data interogării. Proprietățile neintabulate sau cele din cărți funciare vechi, încă nedigitizate, pot să nu figureze în aceste evidențe.' },
-            { q: 'Cât costă?', a: `${service.base_price} RON, cu taxele OCPI incluse. Fără costuri ascunse.` },
-            { q: 'Cât durează eliberarea?', a: `${formatEstimatedDays(service)}. Verificarea este făcută de un operator, fiindcă presupune o căutare la OCPI după datele persoanei.` },
-            { q: 'La ce dosare este cerut?', a: 'Apare des la dosarele de locuință (ANL, locuință socială), la ajutoare și subvenții, la acordarea unor burse, în succesiuni, partaje și litigii cu imobile, în dosarele bancare, precum și ori de câte ori o instituție cere o confirmare privind patrimoniul imobiliar.' },
-            { q: 'Am nevoie de cont ANCPI?', a: 'Nu. Ne ocupăm noi de tot procesul. Tu ne dai datele persoanei și zona de verificat, iar certificatul îl primești pe email.' },
+            { q: 'Certificatul acoperă toată România?', a: 'Nu. Verificarea se face pe o unitate administrativ-teritorială: o localitate, un sector sau un județ. Un certificat scos pe un județ nu spune nimic despre un imobil aflat în altul. Alege acoperirea după cum e formulată cerința din dosarul tău.' },
+            { q: 'Apar și imobilele neintabulate?', a: 'Nu. Se vede doar ce este înscris în evidențele de cadastru și carte funciară. Un teren moștenit și neintabulat sau o casă dintr-o carte funciară veche, încă nedigitizată, rămân în afara verificării.' },
+            { q: 'E același lucru cu adeverința de la primărie?', a: 'Nu. Direcția de taxe și impozite a primăriei eliberează o adeverință despre bunurile din rolul fiscal, care este o altă bază de date. Unele comisii le cer pe amândouă tocmai fiindcă nu se suprapun. Verifică ce scrie exact în cerință.' },
+            { q: 'Pot cere certificatul pentru altcineva?', a: 'Documentul privește datele personale ale persoanei verificate, așa că se cere de regulă pentru tine sau pe baza unei împuterniciri. În succesiuni, moștenitorii își justifică interesul cu actele dosarului. Scrie-ne care e situația și îți spunem ce e nevoie.' },
+            { q: 'Ce date trebuie să trimit?', a: 'Numele complet așa cum apare în actul de identitate, CNP-ul, iar pentru firme CUI-ul. Dacă proprietățile ar fi putut fi dobândite sub numele de dinaintea căsătoriei, spune-ne și numele acela.' },
+            { q: 'Certificatul include și lista imobilelor?', a: 'Când persoana are proprietăți înscrise, documentul confirmă deținerea și, în funcție de forma eliberată, poate cuprinde și imobilele de pe raza verificată. Când nu are niciunul, atestă nedeținerea.' },
+            { q: 'Cât costă o verificare și cât durează?', a: `${service.base_price} RON pentru o zonă verificată, cu tariful instituției cuprins în sumă. Un operator face verificarea la biroul teritorial și îți trimite certificatul pe email în ${formatEstimatedDays(service)}.` },
           ]}
         />
 
@@ -567,10 +573,10 @@ export default async function CertificatDetineriImobilePage() {
           <div className="relative container mx-auto px-4 max-w-[900px]">
             <div className="text-center">
               <h2 className="text-2xl lg:text-4xl font-extrabold text-white mb-4">
-                Ai nevoie de dovada că deții (sau nu) imobile?
+                Ți se cere dovada că nu deții o locuință?
               </h2>
               <p className="text-lg text-white/80 mb-8 max-w-xl mx-auto">
-                Ai nevoie doar de datele persoanei și de zona de verificat. Primești certificatul în {formatEstimatedDays(service)}.
+                Nume, CNP și zona pe care se face căutarea. Răspunsul îți vine pe email în {formatEstimatedDays(service)}.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
                 <OrderButton href={`/comanda/${SERVICE_SLUG}`}>Comandă Acum</OrderButton>
