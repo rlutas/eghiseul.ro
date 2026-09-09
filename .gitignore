@@ -69,3 +69,6 @@ docs/legacy/
 # Local Claude Code settings (may contain secrets in Bash permission rules)
 .claude/settings.local.json
 docs/archive/exporturi-wpforms/entries/
+
+# CodeGraph local index (38 MB SQLite, regenerate with `codegraph init`)
+.codegraph/

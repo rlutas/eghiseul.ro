@@ -287,8 +287,8 @@ export default function VerificareRovinietaPage() {
               </table>
               <p className="text-sm text-neutral-500">
                 Pentru categoriile de marfă și transport persoane peste 3,5 t (C-H), tariful crește în funcție de masă
-                și numărul de axe. <strong>Atenție:</strong> de la 1 iulie 2026
-                tarifele se schimbă, diferențiate pe norma de poluare (Euro). Vezi prețul exact la finalizarea comenzii.
+                și numărul de axe. <strong>Atenție:</strong> un ordin MTI aflat în consultare publică propune
+                tarife diferențiate pe norma de poluare (Euro), fără dată de intrare în vigoare stabilită. Vezi prețul exact la finalizarea comenzii.
               </p>
             </div>
           </div>
