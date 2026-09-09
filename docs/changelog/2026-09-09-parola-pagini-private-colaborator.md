@@ -48,7 +48,42 @@ indiferent cine a lucrat. Dacă angajatul pleacă, Mircea își schimbă parola 
 login (și Raul pe cea internă). Varianta corectă rămâne contul de angajat legat
 de colaborator (`profiles.collaborator_parent_id`) — amânată, jumătate de zi.
 
-## Pași pentru Raul
+## Stare: ACTIV din 09.09.2026, 16:58
 
-1. `/admin/colaboratori` → Mircea → „Setează parola" (min. 6 caractere).
-2. Parola i se transmite lui Mircea pe alt canal decât contul partajat.
+Raul a setat parola pe contul lui Mircea (`mirceadumitrean@yahoo.com`) din
+`/admin/colaboratori`. Verificat în DB (`admin_settings.collaborator_private_passwords`
+are un singur rând, al lui) și pe producție (`/api/collaborator/unlock/` dă 401
+fără login). Parola nu e scrisă nicăieri — dacă Mircea o uită, Raul setează alta.
+
+## Cum funcționează în practică (de explicat lui Mircea)
+
+Deblocarea trăiește într-un **cookie din browserul în care s-a pus parola**, nu
+pe cont. Deci:
+
+| Situație | Ce vede angajatul |
+|---|---|
+| Angajatul intră de pe alt calculator sau telefon (cazul normal) | formularul de parolă; comenzile merg normal |
+| Angajatul folosește același calculator și același browser ca Mircea | pagina, cât e deblocată (max. 8 ore) |
+
+Regula pentru Mircea: pe calculatorul lui deblochează liniștit. Pe un calculator
+comun apasă **„Blochează"** din bannerul galben când termină, sau se
+deloghează (logout-ul șterge cookie-ul).
+
+Preview-ul de admin („Vezi ce vede colaboratorul", `?as=`) **nu arată gardul**
+— e ocolit intenționat, adminul vede oricum decontul din `/admin/colaboratori`.
+Testul real se face doar logat pe contul lui Mircea.
+
+## Verificare
+
+- `tests/unit/lib/collaborator-private-gate.test.ts`: token valid, alt
+  colaborator, expirat, expirare falsificată, token gunoi, salt diferit per hash.
+- `tsc`, `eslint`, CI verde, deploy Vercel `Ready` (commit `b86fe97`).
+
+## Backlog
+
+- Cookie de sesiune (moare la închiderea browserului, pe lângă cele 8 ore) —
+  2 linii în `unlockCookieOptions`, dacă disciplina „Blochează" nu ține.
+- Cont de angajat legat de colaborator (`profiles.collaborator_parent_id`):
+  vede lucrările lui Mircea, 403 pe decont/prețuri, urmă proprie în
+  `order_history`. Jumătate de zi. Vezi backlog-ul din
+  `DEVELOPMENT_MASTER_PLAN.md`.

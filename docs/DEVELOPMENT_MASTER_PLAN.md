@@ -625,6 +625,22 @@
 
 Features planned but not yet scheduled for a specific sprint.
 
+#### 👤 Cont de angajat legat de colaborator (amânat 2026-09-09)
+
+Azi angajatul lui Mircea lucrează pe contul lui, cu parolă internă pe
+Decont/Serviciile mele ([changelog](changelog/2026-09-09-parola-pagini-private-colaborator.md)).
+Varianta corectă, ~½ zi:
+
+1. migrare `profiles.collaborator_parent_id` (null = titular); rolul rămâne `collaborator`;
+2. helper server: id-ul efectiv = părintele → `requireCollaboratorForOrder`,
+   lista de comenzi, cererile OCPI și `assigned_collaborator_id` se rezolvă pe Mircea;
+3. `earnings` + `services` → 403 pentru orice cont cu părinte; layout ascunde
+   „Decont lunar" și „Serviciile mele";
+4. `/admin/colaboratori`: „Adaugă angajat" pe cardul colaboratorului (invitație pe email).
+
+Câștig față de azi: `order_history.changed_by` arată cine a lucrat; acces
+revocabil fără să atingi contul lui Mircea; fără cookie de reținut.
+
 #### 💰 Grila de urgență la serviciile prin topograf (audit 2026-08-14)
 
 Audit complet: [`services/2026-08-14-audit-preturi-cfunciara.md`](services/2026-08-14-audit-preturi-cfunciara.md).
