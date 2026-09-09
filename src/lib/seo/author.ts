@@ -24,13 +24,13 @@ export const SITE_AUTHOR = {
    * Profil public, pentru `sameAs`. Gol = nu se emite nimic în schema; NU pune
    * un URL pe care nu l-ai verificat că există și că e al persoanei.
    */
-  linkedin: '',
+  linkedin: 'https://www.linkedin.com/in/raul-lutas-579045145',
   /**
    * Poză de profil, din `public/`. Gol = pagina afișează monograma cu inițiale.
    * Nu punem un avatar generic: o poză de stoc pe o pagină de autor e exact
    * semnalul artificial pe care îl scoatem de pe site.
    */
-  photo: '',
+  photo: '/images/echipa/raul-lutas.webp',
   initials: 'RL',
   get url(): string {
     return `${BASE_URL}${this.path}`;
