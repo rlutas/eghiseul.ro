@@ -1025,6 +1025,12 @@ export interface OblioInvoiceInput {
   // `src/lib/oblio/invoice.ts` does the split; all callers (webhook,
   // verify-payment, reissue-invoice) join `services(lawyer_fee_ron)` and pass it.
   //
+  // ⚠️ `lawyer_fee_ron` trebuie ținut sincron cu lista de servicii prin avocat
+  // (`LAWYER_SERVICE_SLUGS` + `CAZIER_SLUGS` din `avocat-decont.ts`). Cazierul
+  // auto a stat pe 0 până la migrarea 153 (09.09.2026): avocata era plătită
+  // 15 RON/comandă în decont, dar factura ieșea cu o singură linie, spre
+  // deosebire de toate celelalte servicii prin avocat.
+  //
   // ⚠️ Invoice series: env `OBLIO_SERIES_NAME=EGI2024` is the SHARED LIVE series
   // (company EDIGITALIZARE / CIF RO49278701, also used by sister projects).
   // eghiseul should get its OWN series before issuing real customer invoices, so

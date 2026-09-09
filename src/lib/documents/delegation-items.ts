@@ -48,9 +48,40 @@ export const DELEGATION_REQUIRING_OPTION_CODES: ReadonlySet<string> = new Set([
   'addon_certificat_nastere',
   'addon_certificat_casatorie',
   'addon_certificat_celibat',
+  'addon_cazier_judiciar',
   'addon_cazier_fiscal',
   'cazier_secundar',
 ]);
+
+/**
+ * Add-on codes whose service depends on the MAIN service of the order, so the
+ * delegation key can't be the bare code: `certificat_pachet` on a comandă de
+ * extras multilingv de naștere is a certificat de NAȘTERE, on one de căsătorie
+ * a certificat de CĂSĂTORIE. The resolved value is the secondary service's
+ * SLUG — same key space as the main service's delegation, which keeps
+ * `DELEGATION_INSTITUTIE_MAP`/`INSTITUTIE_MAP`/`CIVIL_STATUS_DOCUMENT_MAP`
+ * lookups working without a per-code entry (see generator.ts).
+ *
+ * Mirrors the pairs `computeCerereItems` already resolves — both documents
+ * (cerere + împuternicire) belong to the SAME secondary service, and having
+ * only the cerere is exactly the bug this fixes (E-260907-EJZM7: cerere de
+ * certificat de naștere generată, împuternicirea făcută de mână).
+ */
+export function resolveComposedDelegationSlug(
+  optionCode: string,
+  mainSlug: string
+): string | null {
+  if (
+    optionCode === 'extras_multilingv' &&
+    (mainSlug === 'certificat-nastere' || mainSlug === 'certificat-casatorie')
+  ) {
+    return `extras-multilingv-${mainSlug}`;
+  }
+  if (optionCode === 'certificat_pachet' && mainSlug.startsWith('extras-multilingv-')) {
+    return mainSlug.replace('extras-multilingv-', '');
+  }
+  return null;
+}
 
 /**
  * Returns the list of (serviceType, label) tuples for which a delegation
@@ -64,10 +95,11 @@ export function computeDelegationItems(
   order: OrderForDelegations
 ): DelegationItem[] {
   const items: DelegationItem[] = [];
+  const mainSlug = order.services?.slug || '';
 
   // Main service — always.
   items.push({
-    serviceType: order.services?.slug || order.services?.name || 'main',
+    serviceType: mainSlug || order.services?.name || 'main',
     label: order.services?.name || 'Serviciu principal',
   });
 
@@ -90,11 +122,25 @@ export function computeDelegationItems(
       bundledMeta?.bundled_service_slug || bundledMeta?.bundledServiceSlug;
 
     const optionCode = directCode || bundledCode || '';
-    if (!DELEGATION_REQUIRING_OPTION_CODES.has(optionCode)) continue;
+    // Composed add-ons (certificat_pachet / extras_multilingv) key on the
+    // secondary service's slug, not on the code — the code alone doesn't say
+    // WHICH document. Only top-level options can be composed; a bundled child
+    // already carries its own slug in the bundled key.
+    const composedSlug = bundledCode
+      ? null
+      : resolveComposedDelegationSlug(optionCode, mainSlug);
 
-    const serviceType = bundledCode
+    if (!composedSlug && !DELEGATION_REQUIRING_OPTION_CODES.has(optionCode)) continue;
+
+    const serviceType = composedSlug
+      ? composedSlug
+      : bundledCode
       ? `bundled:${bundledParentId || 'unknown'}:${bundledServiceSlug || 'unknown'}:${bundledCode}`
       : optionCode;
+
+    // A composed slug can collide with the main service (or with a second
+    // option resolving the same way) — one delegation per document, never two.
+    if (items.some((i) => i.serviceType === serviceType)) continue;
 
     items.push({
       serviceType,

@@ -526,6 +526,38 @@ describe('buildActivitatiStareCivila — care căsătorie', () => {
   });
 });
 
+describe('buildActivitatiStareCivila — delegația serviciului secundar (E-260907-EJZM7)', () => {
+  it('împuternicirea pachetului spune certificatul, nu extrasul multilingv', () => {
+    expect(
+      buildActivitatiStareCivila(
+        'extras-multilingv-certificat-nastere',
+        undefined,
+        'certificat-nastere'
+      )
+    ).toBe('Să obțină Certificatul de Naștere');
+  });
+
+  it('împuternicirea principală rămâne pe documentul serviciului principal', () => {
+    expect(
+      buildActivitatiStareCivila(
+        'extras-multilingv-certificat-nastere',
+        undefined,
+        'extras-multilingv-certificat-nastere'
+      )
+    ).toBe('Să obțină Extrasul Multilingv de Naștere');
+  });
+
+  it('detaliile căsătoriei urmează documentul delegației, nu serviciul principal', () => {
+    expect(
+      buildActivitatiStareCivila(
+        'extras-multilingv-certificat-casatorie',
+        { spouseName: 'MUSAT DUMITRU' },
+        'certificat-casatorie'
+      )
+    ).toBe('Să obțină Certificatul de Căsătorie încheiată cu MUSAT DUMITRU.');
+  });
+});
+
 describe('buildActivitatiStareCivila — delegația de apostilă (E-260802-B5VNY)', () => {
   it('spune apostila, nu actul de bază, pe împuternicirea delegației de apostilă', () => {
     expect(buildActivitatiStareCivila('certificat-celibat', undefined, 'apostila_haga')).toBe(

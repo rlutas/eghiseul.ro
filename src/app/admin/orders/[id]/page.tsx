@@ -1463,11 +1463,43 @@ export default function AdminOrderDetailPage() {
               const topLevel = opts.filter(
                 (o) => !(o.bundled_for?.parent_option_id ?? o.bundledFor?.parentOptionId)
               );
+              // Un al doilea DOCUMENT în aceeași comandă (add-on de serviciu,
+              // pachet de certificat, extras multilingv) — nu o simplă opțiune.
+              // Verificat pe cod, nu pe „are copii": pe E-260908-JQW3M clientul
+              // a luat „Certificat Integritate (add-on)" FĂRĂ sub-opțiuni, deci
+              // apărea ca un rând oarecare lângă apostilă/traducere și echipa
+              // nu mai putea spune pentru CARE document sunt (raport 09.09).
+              const isSecondaryServiceOption = (code?: string | null) =>
+                !!code &&
+                (code.startsWith('addon_') ||
+                  code === 'certificat_pachet' ||
+                  code === 'extras_multilingv' ||
+                  code === 'cazier_secundar');
+              // Opțiuni care se aplică PE un document anume — trebuie spus pe
+              // care, când în comandă sunt două documente.
+              const PER_DOCUMENT_CODES = new Set([
+                'apostila_haga',
+                'traducere',
+                'legalizare',
+                'apostila_notari',
+              ]);
+              const hasSecondaryService = topLevel.some(
+                (o) =>
+                  isSecondaryServiceOption(o.code) ||
+                  (o.option_id && (childrenByParent.get(o.option_id)?.length ?? 0) > 0)
+              );
+              const mainServiceLabel = order.services?.name
+                ? stripEntitySuffix(order.services.name)
+                : 'serviciul principal';
               const directAddons = topLevel.filter(
-                (o) => !(o.option_id && (childrenByParent.get(o.option_id)?.length ?? 0) > 0)
+                (o) =>
+                  !isSecondaryServiceOption(o.code) &&
+                  !(o.option_id && (childrenByParent.get(o.option_id)?.length ?? 0) > 0)
               );
               const subServices = topLevel.filter(
-                (o) => o.option_id && (childrenByParent.get(o.option_id)?.length ?? 0) > 0
+                (o) =>
+                  isSecondaryServiceOption(o.code) ||
+                  (o.option_id && (childrenByParent.get(o.option_id)?.length ?? 0) > 0)
               );
               const renderRow = (opt: (typeof opts)[number], indented = false) => (
                 <div
@@ -1492,6 +1524,16 @@ export default function AdminOrderDetailPage() {
                     {opt.metadata?.language && (
                       <p className="text-xs text-muted-foreground">
                         Limba: <span className="font-medium text-foreground">{opt.metadata.language}</span>
+                      </p>
+                    )}
+                    {/* Comandă cu DOUĂ documente: opțiunile de la nivelul de
+                        sus sunt ale serviciului principal (cele ale serviciului
+                        secundar sunt indentate sub el). Fără eticheta asta nu
+                        se putea spune pentru care document e apostila/traducerea
+                        (E-260908-JQW3M). */}
+                    {!indented && hasSecondaryService && PER_DOCUMENT_CODES.has(opt.code ?? '') && (
+                      <p className="text-xs text-muted-foreground">
+                        Pentru: <span className="font-medium text-foreground">{mainServiceLabel}</span>
                       </p>
                     )}
                   </div>

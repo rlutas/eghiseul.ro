@@ -270,6 +270,47 @@ Pereche pe cazierjudiciaronline.com / ecazier: `src/lib/cerere-required.ts`
 (`orderNeedsCerere`) — ascunde tot cardul „Cerere" din admin și blochează
 `POST /api/admin/cerere`, cu aceeași excepție (integritate + `cazier_judiciar`).
 
+### Împuterniciri pe serviciile SECUNDARE ale unei comenzi (2026-09-09)
+
+O comandă poate conține **două documente oficiale**: serviciul principal + un
+add-on. Politica Baroului cere câte o împuternicire (deci câte un număr de
+delegație) pentru **fiecare** document ridicat în numele clientului — lista se
+calculează în `computeDelegationItems()`
+(`src/lib/documents/delegation-items.ts`).
+
+Lista de coduri era incompletă: `addon_cazier_judiciar`, `certificat_pachet` și
+`extras_multilingv` lipseau, deși `computeCerereItems` genera deja **cererea**
+serviciului secundar. Rezultat: comanda avea cererea, dar nu și împuternicirea —
+echipa le făcea de mână (E-260907-AMV62 cazier judiciar pe integritate,
+E-260907-EJZM7 certificat de naștere pe extrasul multilingv).
+
+Două forme de cheie (`number_registry.service_type`):
+
+| Formă | Când | Exemplu |
+|-------|------|---------|
+| codul opțiunii | add-on care numește singur serviciul | `addon_cazier_judiciar`, `addon_certificat_integritate` |
+| slug-ul serviciului secundar | add-on **compus**, al cărui serviciu depinde de serviciul principal | `certificat_pachet` pe `extras-multilingv-certificat-nastere` → `certificat-nastere` |
+
+Codurile compuse se rezolvă cu `resolveComposedDelegationSlug(code, mainSlug)` —
+aceleași perechi pe care le rezolvă și `computeCerereItems`. Slug-ul ca cheie ține
+lookup-urile din `generator.ts` funcționale fără intrări noi
+(`INSTITUTIE_MAP` / `CIVIL_STATUS_DOCUMENT_MAP`), iar dedup-ul pe `serviceType`
+garantează că un document nu primește niciodată două delegații.
+
+Textul împuternicirii urmează delegația, nu serviciul principal:
+`buildActivitatiStareCivila()` folosește documentul din
+`delegation_service_type` când acela e un serviciu de stare civilă (altfel ieșeau
+două împuterniciri identice „Să obțină Extrasul Multilingv de Naștere", cu numere
+diferite), iar `DELEGATION_INSTITUTIE_MAP` are acum și `addon_cazier_judiciar`.
+
+Teste: `tests/unit/lib/documents/delegation-items.test.ts` +
+`generator.test.ts` („delegația serviciului secundar").
+
+> ⚠️ Comenzile mai vechi nu se re-alocă singure (`barou_numbers_allocated_at` e
+> deja setat). Ele arată de acum rândul de împuternicire lipsă în „Documente
+> generate" — **nu-l apăsa** dacă documentul a fost deja făcut manual, ar arde un
+> număr de Barou în plus.
+
 ### ⚠️ Rezoluția template-urilor: `shared/` este calea REALĂ (2026-08-14)
 
 `loadTemplate()` (`generator.ts`) caută `src/templates/<service-slug>/<template>.docx`

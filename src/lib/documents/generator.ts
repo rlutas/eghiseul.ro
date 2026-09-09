@@ -481,6 +481,10 @@ const DELEGATION_INSTITUTIE_MAP: Record<
   addon_certificat_casatorie: INSTITUTIE_MAP['certificat-casatorie'],
   addon_certificat_celibat: INSTITUTIE_MAP['certificat-celibat'],
   addon_cazier_fiscal: INSTITUTIE_MAP['cazier-fiscal'],
+  // Cazierul judiciar adăugat pe o comandă de certificat de integritate — fără
+  // el, împuternicirea add-on-ului ieșea cu textul integrității (E-260907-AMV62,
+  // făcută de mână de echipă).
+  addon_cazier_judiciar: INSTITUTIE_MAP['cazier-judiciar'],
   cazier_secundar: INSTITUTIE_MAP['cazier-judiciar'],
   apostila_haga: {
     authority: 'INSTITUȚIA PREFECTULUI - JUDEȚUL SATU MARE',
@@ -766,7 +770,18 @@ export function buildActivitatiStareCivila(
   },
   delegationServiceType?: string | null
 ): string {
-  const doc = CIVIL_STATUS_DOCUMENT_MAP[serviceSlug || ''];
+  // Delegația unui add-on de stare civilă (certificat_pachet / extras_multilingv
+  // — vezi resolveComposedDelegationSlug) poartă SLUG-ul serviciului secundar,
+  // deci textul trebuie să fie al ACELUI document, nu al serviciului principal:
+  // altfel comanda de extras multilingv cu certificatul la pachet primea două
+  // împuterniciri identice „Să obțină Extrasul Multilingv de Naștere"
+  // (E-260907-EJZM7).
+  const delegationSlug = extractDelegationCode(delegationServiceType);
+  const effectiveSlug = CIVIL_STATUS_DOCUMENT_MAP[delegationSlug]
+    ? delegationSlug
+    : serviceSlug || '';
+
+  const doc = CIVIL_STATUS_DOCUMENT_MAP[effectiveSlug];
   if (!doc) return '';
 
   // Împuternicirea delegației de APOSTILĂ pe un serviciu de stare civilă
@@ -780,8 +795,8 @@ export function buildActivitatiStareCivila(
   }
 
   const isMarriageDoc =
-    serviceSlug === 'certificat-casatorie' ||
-    serviceSlug === 'extras-multilingv-certificat-casatorie';
+    effectiveSlug === 'certificat-casatorie' ||
+    effectiveSlug === 'extras-multilingv-certificat-casatorie';
   if (!isMarriageDoc) return `Să obțină ${doc}`;
 
   const spouse = (marriage?.spouseName || '').trim();
