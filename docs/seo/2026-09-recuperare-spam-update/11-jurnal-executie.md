@@ -218,10 +218,10 @@ pentru fiecare cifră, humanizer, verificare tsc + build + teste, apoi UN commit
 | 11 | `/servicii/plan-amplasament-delimitare` | ✅ livrat (pasul 3) | `4b9f392` |
 | 12 | `/servicii/actualizare-adresa-cf` | ✅ livrat (pasul 3) | `4b9f392` |
 | 13 | `/servicii/certificat-urbanism-informare` | ✅ livrat (pasul 3) | `4b9f392` |
-| 14 | `/rolul-si-atributiile-onrc-romania` | 🔄 lot 2A (umbrelă ONRC: radiere, sediu, suspendare) | în lucru |
-| 15 | `/eliberare-certificat-constatator-onrc-ghid` | 🔄 lot 2A (backlink start-up.ro, URL neatins) | în lucru |
-| 16 | `/cazier-fiscal-fara-spv` | 🔄 lot 2A (umbrelă fiscal: PF, verificare, firmă) | în lucru |
-| 17 | `/cat-costa-cadastrul-si-intabularea` | 🔄 lot 2A | în lucru |
+| 14 | `/rolul-si-atributiile-onrc-romania` | ✅ livrat (umbrelă ONRC pe L. 265/2022: radiere, sediu, suspendare; 368→2.600 cuv.) | lot 2A |
+| 15 | `/eliberare-certificat-constatator-onrc-ghid` | ✅ livrat (URL neatins; tarif 30 lei, nu 60–95; „30 de zile” e regulă de instituție, nu lege; 505→1.556) | lot 2A |
+| 16 | `/cazier-fiscal-fara-spv` | ✅ livrat (umbrelă fiscal pe OG 39/2015; formularele 502/504 erau inversate; termenele de radiere corectate; 1.318→2.790) | lot 2A |
+| 17 | `/cat-costa-cadastrul-si-intabularea` | ✅ livrat (taxa ANCPI la prima înregistrare e 0 din 7.04.2025, Ordin 441/2025; termene pe Ordin 1622/2025; 1.125→2.311) | lot 2A |
 | 18 | `/acte-necesare-certificat-de-nastere` | ✅ livrat (umbrelă naștere: 6 articole; 447→1.687 cuv.) | lot 2B, `8de12ed` |
 | 19 | `/acte-necesare-casatorie` | ✅ livrat (umbrelă căsătorie; certificat medical 30 zile, NU 14; 1.005→1.836) | lot 2B |
 | 20 | `/tva-9-locuinte-31-iulie-2026` | ✅ livrat (era înghețată la votul Senatului; acum L. 161/2026, termen 30.09.2026; TODO OPANAF restituire după 01.10) | lot 2B |
@@ -238,7 +238,7 @@ pentru fiecare cifră, humanizer, verificare tsc + build + teste, apoi UN commit
 | 31 | `/servicii/certificat-de-integritate-comportamentala` | ⬜ lot 4 | 0 clicuri post-update |
 | 32 | `/servicii/certificat-constatator-online` | ⬜ lot 4 | 3 backlinkuri dofollow; 14,3→21,2 |
 
-**Bilanț (09.09, 13:40):** 16 livrate, 4 în lucru (lot 2A), 12 rămase (lot 3: 3 pagini de alt
+**Bilanț (09.09, 13:55):** 20 livrate, 0 în lucru, 12 rămase (lot 3: 3 pagini de alt
 tip; lot 4: 9 pagini `/servicii/`, șablonul de serviciu cu wizard, preț,
 `ReviewsSection`; se lucrează diferit de articole, cu grijă la componentele
 partajate).
@@ -247,6 +247,17 @@ partajate).
 `src/config/articles.ts`, `/servicii/` (când face articole), nu rulează
 `npm run build`, nu face commit. La final: build + `vitest run tests/unit` +
 registrul last-modified + `articles.ts` + acest jurnal → un commit, un push.
+
+**Lot 2A, erori de fond găsite:** cazierul fiscal avea formularele inversate
+(502 e cererea, 504 e certificatul), „5 zile lucrătoare la ghișeu” (OG 39/2015
+art. 9 al. 8: de îndată) și termenele de radiere greșite; constatatorul era
+„60–95 RON” (tariful ONRC e 30 lei) cu „valabil 30 de zile” prezentat ca lege;
+pagina ONRC cita Legea 26/1990, abrogată din 26.11.2022; cadastrul afișa „120 lei
+taxă ANCPI la prima înregistrare”, scutită necondiționat din 7.04.2025 (Ordin
+441/2025). **Contradicții rămase, de reparat separat:**
+`/calculator/cost-cadastru-intabulare` (8 apariții „120 lei”) și
+`public/downloads/checklist-cadastru-intabulare.pdf`; `servicii/cazier-fiscal-online`
+de verificat la „5 zile” / „administrația de domiciliu”.
 
 **Lot 2B, erori de fond găsite:** certificatul medical prenupțial e valabil
 30 de zile (HG 255/2024 art. 64), pagina zicea 14; „după un an mergi în instanță”

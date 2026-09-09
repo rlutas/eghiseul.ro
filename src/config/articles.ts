@@ -52,8 +52,8 @@ export const ARTICLES: ArticleMeta[] = [
   },
   {
     slug: 'cat-costa-cadastrul-si-intabularea',
-    title: 'Cât Costă Cadastrul și Intabularea în 2026? Prețuri reale + acte necesare',
-    excerpt: 'Apartament 820–1.220 lei, casă cu teren 1.520–2.620 lei, intabulare după cumpărare 0,15% din preț. Taxele ANCPI exacte, actele pe scenarii + checklist descărcabil.',
+    title: 'Cât costă cadastrul și intabularea în 2026: tarifele ANCPI reale',
+    excerpt: 'Taxa ANCPI pentru prima înregistrare a dispărut din 7 aprilie 2025 (Ordin 441/2025). Intabularea la cumpărare rămâne 0,15% din valoare, urgența costă de 4 ori tariful, onorariul topografului e preț de piață. Termenele pe Ordinul 1622/2025.',
     category: 'Cadastru & imobiliare',
   },
   {
@@ -76,9 +76,9 @@ export const ARTICLES: ArticleMeta[] = [
   },
   {
     slug: 'cazier-fiscal-fara-spv',
-    title: 'Cazier fiscal din SPV: cum îl ceri online și ce faci fără cont',
+    title: 'Cazier fiscal: ce conține, cine îl cere și cum îl obții (2026)',
     excerpt:
-      'Pașii din Spațiul Privat Virtual, formularele 502 și 504, și alternativele când nu poți trece de activarea contului.',
+      'Ghidul pe OG 39/2015: ce fapte se înscriu și ce nu, cât rămân (o lună, 5 ani, la reactivare), PF vs firmă, de ce nu poți verifica cazierul altcuiva, formularele 502 și 504 și cele trei căi: SPV, orice ghișeu ANAF, împuternicit.',
     category: 'Documente fiscale',
   },
   {
@@ -119,8 +119,8 @@ export const ARTICLES: ArticleMeta[] = [
   },
   {
     slug: 'eliberare-certificat-constatator-onrc-ghid',
-    title: 'Eliberare Certificat Constatator de la ONRC: Ghid Complet',
-    excerpt: 'Actele necesare, procedura, ce informații conține și valabilitatea certificatului constatator.',
+    title: 'Certificat constatator ONRC: tipuri, conținut, valabilitate',
+    excerpt: 'De bază, pentru fonduri IMM și pentru insolvență: ce scrie în fiecare, ce nu dovedește, de ce băncile cer 30 de zile deși legea nu o face, și cum îl ceri de la ONRC cu 30 lei.',
     category: 'Comercial / ONRC',
   },
   {
@@ -149,8 +149,8 @@ export const ARTICLES: ArticleMeta[] = [
   },
   {
     slug: 'rolul-si-atributiile-onrc-romania',
-    title: 'Ce face ONRC, de fapt',
-    excerpt: 'Registrul Comerțului, înmatriculările, mențiunile și certificatul constatator — pe scurt.',
+    title: 'Ce face ONRC: registrul, radierea, sediul și suspendarea firmei',
+    excerpt: 'Ce ține ONRC în registrul comerțului (Legea 265/2022), ce se plătește și ce nu, și cum se fac concret radierea unui SRL, schimbarea sediului și suspendarea activității: acte, termene, capcane.',
     category: 'Comercial / ONRC',
   },
   {

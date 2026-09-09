@@ -3,20 +3,23 @@ import { buildPageMetadata, serviceUrl } from '@/lib/seo';
 import { ArticleLayout } from '@/components/articole/article-layout';
 
 const SLUG = 'eliberare-certificat-constatator-onrc-ghid';
-const TITLE = 'Eliberare Certificat Constatator de la ONRC: Ghid Complet';
+const TITLE = 'Certificatul constatator ONRC: cele trei tipuri, ce dovedește fiecare și cât e acceptat în practică';
+// Titlul din SERP e mai scurt decât H1-ul: peste ~65 de caractere Google îl rescrie.
+const META_TITLE = 'Certificat constatator ONRC: tipuri, conținut, valabilitate';
 const DESCRIPTION =
-  'Ghid complet pentru eliberarea certificatului constatator de la Registrul Comerțului (ONRC): ' +
-  'actele necesare, procedura, ce informații conține, valabilitatea de 30 de zile și cum îl obții online.';
+  'Certificatul constatator de bază, pentru fonduri IMM și pentru insolvență: ce scrie în fiecare, ce nu ' +
+  'dovedește, ce înseamnă „la zi”, de ce băncile și licitațiile cer 30 de zile deși legea nu o face, ' +
+  'și cum îl ceri de la ONRC cu 30 lei.';
 // Data la care articolul e verificabil la acest URL (migrarea din WordPress).
 // Înainte aici scria '2024-01-01' — un placeholder identic pe 12 articole, adică
 // o dată inventată în schema. Dacă apare dovada datei reale de pe WP, se corectează.
 const DATE_PUBLISHED = '2026-06-16';
-const DATE_MODIFIED = '2026-06-16';
+const DATE_MODIFIED = '2026-09-09';
 
 export const revalidate = 86400;
 
 export const metadata = buildPageMetadata({
-  title: `${TITLE}`,
+  title: META_TITLE,
   description: DESCRIPTION,
   path: `/${SLUG}/`,
   ogImage: `/images/articole/${SLUG}.webp`,
@@ -32,127 +35,254 @@ export default function Page() {
       datePublished={DATE_PUBLISHED}
       dateModified={DATE_MODIFIED}
       publishedLabel="ianuarie 2024"
-      updatedLabel="16 iunie 2026"
+      updatedLabel="9 septembrie 2026"
       relatedServices={[
         {
           slug: 'certificat-constatator',
           label: 'Certificat Constatator ONRC',
-          desc: 'Obține certificatul constatator online.',
+          desc: 'Îl obținem noi din registrul comerțului, semnat electronic, fără cont pe portal.',
         },
         {
           href: '/cele-4-tipuri-de-certificat-constatator-online/',
-          label: 'Cele 4 tipuri de certificat constatator',
-          desc: 'Ce tip de certificat constatator îți trebuie.',
+          label: 'Care tip îți trebuie',
+          desc: 'Comparația pe situații: bancă, licitație, fonduri, notar, angajare.',
+        },
+        {
+          href: '/rolul-si-atributiile-onrc-romania/',
+          label: 'Ce face ONRC',
+          desc: 'Registrul comerțului, mențiunile, radierea, sediul și suspendarea firmei.',
         },
       ]}
       faqs={[
         {
-          q: 'Care este valabilitatea certificatului constatator?',
-          a: 'Certificatul constatator este valabil doar 30 de zile de la data emiterii sale. Este important de menționat că acest document atestă starea juridică a unei persoane fizice sau juridice la momentul emiterii și nu poate fi utilizat pentru a face dovada unui drept sau a unei situații juridice ulterioare.',
+          q: 'Cât costă certificatul constatator la ONRC?',
+          a: '30 lei, indiferent de tip, potrivit Ordinului ministrului justiției nr. 380/C/2024, în vigoare din 20 martie 2024. Raportul istoric al firmei costă 250 lei, iar furnizarea de informații (doar datele de identificare) 9 lei pe firmă. Dacă îl ceri printr-un intermediar, diferența față de 30 lei este onorariul acestuia.',
         },
         {
-          q: 'Ce trebuie să fac în cazul în care informațiile din certificatul constatator sunt inexacte?',
-          a: 'În cazul în care informațiile din certificatul constatator sunt inexacte sau neactualizate, este necesar să depuneți o cerere specială la Registrul Comerțului (ONRC) pentru corectarea sau actualizarea acestora.',
+          q: 'Cât este valabil certificatul constatator?',
+          a: 'Legea 265/2022 nu fixează un termen de valabilitate: certificatul atestă ce era înscris în registru la data generării lui. Termenul de 30 de zile pe care îl cer băncile, notarii sau autoritățile contractante este o regulă a instituției care îl primește, nu a ONRC. La achiziții publice, normele cer ca informațiile din certificat să fie reale și actuale la data prezentării.',
         },
         {
-          q: 'Pot solicita un certificat constatator online?',
-          a: 'Da, există posibilitatea de a solicita un certificat constatator online prin intermediul platformei noastre. Acest lucru simplifică procesul și economisește timpul necesar pentru deplasarea la sediul Registrului Comerțului.',
+          q: 'Cine poate cere certificatul constatator al unei firme?',
+          a: 'Oricine. Registrul comerțului este public (Legea 265/2022 art. 11), iar certificatul se eliberează la cererea și pe cheltuiala persoanei interesate. Nu trebuie să fii administrator sau asociat. Îți trebuie doar CUI-ul sau denumirea firmei.',
         },
         {
-          q: 'Cât timp durează obținerea certificatului constatator?',
-          a: 'De obicei, obținerea certificatului constatator poate dura doar câteva ore sau chiar mai puțin, în funcție de fluxul de lucru al Registrului Comerțului din regiunea dumneavoastră. În unele cazuri, acesta poate fi eliberat chiar în aceeași zi în care a fost depusă cererea.',
+          q: 'Care este diferența dintre certificatul de bază și cel pentru fonduri IMM?',
+          a: 'Amândouă pornesc de la aceleași date de identificare, sediu, capital, asociați, administratori și activități. Varianta pentru fonduri IMM adaugă indicatorii din situațiile financiare anuale depuse: cifra de afaceri, profitul brut și net și numărul mediu de salariați, adică exact cifrele după care se judecă încadrarea în categoria IMM la finanțări nerambursabile.',
         },
         {
-          q: 'Care sunt costurile implicate în obținerea certificatului constatator?',
-          a: 'Costurile pentru obținerea certificatului constatator pot varia în funcție de tipul de certificat solicitat, prețurile sunt între 60 RON și 95 RON. Este recomandat să verificați tarifele actuale înainte de a depune cererea. De asemenea, este posibil să existe și taxe suplimentare pentru servicii de urgență sau alte solicitări speciale.',
+          q: 'Ce dovedește certificatul constatator pentru insolvență?',
+          a: 'Că în registrul comerțului este sau nu este înscrisă vreo mențiune privind insolvența, reorganizarea, falimentul, dizolvarea sau lichidarea firmei. Legea 265/2022 art. 11 prevede expres certificatele care atestă că un anumit act sau fapt nu este înregistrat. Îl cer de regulă instanțele, notarii și autoritățile contractante.',
+        },
+        {
+          q: 'Certificatul constatator arată datoriile firmei?',
+          a: 'Nu. Registrul comerțului nu ține evidența datoriilor la buget sau la furnizori. Pentru datoriile fiscale există certificatul de atestare fiscală de la ANAF, pentru sancțiunile fiscale cazierul fiscal, iar pentru gajuri și ipoteci mobiliare Registrul Național de Publicitate Mobiliară. Certificatul constatator arată doar ce este înscris în registrul comerțului.',
+        },
+        {
+          q: 'Certificatul constatator în format PDF este acceptat?',
+          a: 'Da. Legea 265/2022 art. 11 alin. (3) prevede eliberarea în formă electronică, semnată cu semnătură sau sigiliu electronic calificat al ONRC. Instituția care îl primește verifică semnătura la deschiderea fișierului. Copia tipărită a unui PDF nu mai poartă semnătura, deci se transmite fișierul, nu scanul lui.',
+        },
+        {
+          q: 'Ce fac dacă informațiile din certificat sunt greșite?',
+          a: 'Certificatul reproduce registrul. Dacă registrul e în urmă, de exemplu pentru că o schimbare de administrator nu a fost înregistrată, se depune mențiunea la ONRC, în termenul de 15 zile de la actul modificator prevăzut de Legea 265/2022 art. 43, și se cere un certificat nou după înregistrare. Dacă eroarea este a registrului, se cere îndreptarea ei la oficiul care a făcut înscrierea.',
         },
       ]}
     >
       <p>
-        Atunci când vine vorba despre desfășurarea activităților comerciale în România, obținerea unor documente
-        legale este esențială. Unul dintre aceste documente importante este certificatul constatator eliberat de la
-        Registrul Comerțului. Acest articol oferă o analiză detaliată a actelor necesare pentru obținerea acestui
-        certificat și a procedurii implicate.
+        Certificatul constatator e documentul pe care îl cere banca la deschiderea contului,
+        finanțatorul la dosarul de fonduri, notarul la vânzarea unui imobil al firmei și
+        autoritatea contractantă la licitație. Toți îl numesc la fel și fiecare vrea, de fapt,
+        altceva din el. Mai jos: ce este, ce variante există, ce dovedește și ce nu, și de ce
+        „valabil 30 de zile” nu scrie nicăieri în lege, dar îl cer toți.
       </p>
 
-      <h2>Opțiunea de obținere online a certificatului constatator</h2>
+      <h2>Ce este, în termenii legii</h2>
       <p>
-        Pentru a simplifica procesul, există opțiunea de a obține certificatul constatator online. Acest lucru poate
-        fi realizat prin intermediul platformei noastre online, unde este necesar doar să furnizați CUI-ul firmei și
-        să completați un formular simplu. Vezi serviciul de{' '}
-        <Link href={serviceUrl('certificat-constatator')}>certificat constatator ONRC</Link>.
+        Registrul comerțului este public. Legea 265/2022 art. 11 alin. (1) spune că oficiul
+        eliberează, la cererea și pe cheltuiala persoanei interesate, informații și certificate
+        constatatoare despre datele înregistrate, precum și certificate constatatoare că un anumit
+        act sau fapt nu este înregistrat. Din această frază vin toate cele trei tipuri: primele
+        două atestă ce scrie în registru, al treilea atestă o absență.
+      </p>
+      <p>
+        Certificatul nu este o evaluare și nu conține opinia nimănui. E o fotografie a
+        înregistrărilor din registru la momentul generării, semnată electronic de ONRC. Pe
+        document scrie „Raport generat în data de”, iar ONRC îl descrie ca prezentând starea la
+        zi a firmei. Tot ce urmează pleacă de la această idee: certificatul e exact atât de bun
+        cât e registrul, și exact atât de proaspăt cât e data generării.
       </p>
 
-      <h2>Actele necesare pentru eliberarea certificatului constatator de la Registrul Comerțului</h2>
+      <h2>Ce conține certificatul de bază</h2>
       <p>
-        Pentru a obține un certificat constatator de la Registrul Comerțului, trebuie să fiți pregătit cu următoarele
-        documente:
+        Conform descrierii ONRC, certificatul constatator pe firmă cuprinde denumirea, numărul
+        de ordine în registrul comerțului, CUI-ul, identificatorul unic la nivel european (EUID),
+        forma juridică, durata de funcționare, starea firmei, activitatea principală, capitalul
+        social, administratorii, asociații sau acționarii, activitățile secundare, activitățile
+        autorizate, sediile secundare cu reprezentanții lor, cenzorii, cinci indicatori din
+        situațiile financiare anuale disponibile și alte informații, după caz.
+      </p>
+      <p>
+        Două rubrici sunt citite mai rar și spun cel mai mult. Prima e „Stare firmă”: în
+        funcțiune, întrerupere temporară de activitate, dizolvare, insolvență, radiată. A doua e
+        secțiunea sediului, care arată actul de sediu, data de început și data expirării dovezii
+        de sediu. Un contract de comodat expirat se vede aici înainte să devină problemă la ANAF,
+        iar banca sau finanțatorul care citește rubrica o va observa înaintea ta.
+      </p>
+      <p>
+        Ce nu conține: datorii, litigii, salariați nominal, contracte, conturi bancare.
+        Registrul comerțului nu ține evidența niciunuia dintre ele. Cine vrea datoriile la buget
+        cere certificatul de atestare fiscală, cine vrea sancțiunile fiscale cere{' '}
+        <Link href="/cazier-fiscal-fara-spv/">cazierul fiscal</Link>, iar cine vrea garanțiile
+        mobiliare consultă Registrul Național de Publicitate Mobiliară. Un certificat constatator
+        impecabil poate aparține unei firme cu datorii la zi; documentul nu a promis niciodată
+        altceva.
       </p>
 
-      <h3>1. Cerere de eliberare</h3>
+      <h2>Cele trei tipuri pe firmă</h2>
       <p>
-        Primul pas este completarea și semnarea unei cereri de eliberare a certificatului constatator. Această cerere
-        trebuie să fie completată cu atenție, iar informațiile furnizate să fie corecte și actualizate.
+        ONRC publică specimene pentru trei variante eliberate prin InfoCert: de bază, pentru
+        fonduri IMM și pentru insolvență. Toate trei costă la fel, 30 lei, și toate pornesc de la
+        aceleași date de identificare. Diferă ce au în plus și cine le cere.
+      </p>
+      <h3>De bază</h3>
+      <p>
+        E varianta pe care o vor băncile, partenerii de afaceri și cei mai mulți notari. Arată
+        cine deține și cine administrează firma, unde are sediul, ce poate face legal (codurile
+        CAEN autorizate, nu doar cele declarate) și în ce stare e. Când cineva spune „adu un
+        certificat constatator” fără alte precizări, despre acesta vorbește.
+      </p>
+      <h3>Pentru fonduri IMM</h3>
+      <p>
+        Adaugă, pe fiecare exercițiu financiar depus, cifra de afaceri, profitul brut, profitul
+        net și numărul mediu de salariați. Sunt cifrele de care depinde încadrarea în categoria
+        microîntreprindere, întreprindere mică sau mijlocie (Legea 346/2004), deci eligibilitatea
+        la programe de finanțare pentru IMM. Autoritățile de management îl cer ca să nu se bazeze
+        pe declarația solicitantului. Dacă firma nu a depus situații financiare, rubrica e goală
+        și certificatul spune asta, ceea ce e, în sine, o informație.
+      </p>
+      <h3>Pentru insolvență</h3>
+      <p>
+        Atestă dacă în registru există sau nu mențiuni privind insolvența, reorganizarea
+        judiciară, falimentul, dizolvarea sau lichidarea. Este certificatul „că un anumit act sau
+        fapt nu este înregistrat” din art. 11. Îl cer instanțele, notarii la tranzacții cu active
+        ale firmei și autoritățile contractante, pentru care Legea 98/2016 face din insolvență un
+        motiv de excludere. Un detaliu care contează: hotărârile privind insolvența ajung în
+        registru pe baza comunicării făcute de instanță (Legea 265/2022 art. 45), deci
+        certificatul reflectă ce s-a înregistrat, nu dosarul de la tribunal din ziua respectivă.
+        Pentru o verificare la zi a unei proceduri în curs, Buletinul Procedurilor de Insolvență
+        rămâne sursa.
       </p>
 
-      <h3>2. Copie xerox a actului de identitate</h3>
+      <h2>Certificatul pe persoană fizică</h2>
       <p>
-        Al doilea document necesar este o copie xerox a actului de identitate al solicitantului. Acest lucru este
-        esențial pentru confirmarea identității persoanei care solicită certificatul.
+        Se cere pe CNP, nu pe CUI, și arată ce calități a avut sau are persoana în firme
+        înregistrate: asociat, acționar, administrator, cenzor. ONRC îl menționează în legătură
+        cu casele de asigurări de sănătate, care verifică dacă o persoană a deținut funcții în
+        entități profesionale în ultimii 5 ani, și e cerut în aceleași condiții de alte instituții
+        care acordă indemnizații sau ajutoare condiționate de lipsa unei afaceri. Costă tot 30 lei.
       </p>
 
-      <h3>3. Taxa de eliberare</h3>
+      <h2>Raportul istoric</h2>
       <p>
-        Înainte de a depune cererea, este important să achitați taxa de eliberare a certificatului constatator. Taxa
-        poate varia în funcție de regiunea sau de tipul de certificat solicitat, deci asigurați-vă că verificați
-        costurile relevante înainte de a proceda.
+        Nu e, tehnic, un certificat constatator, deși toată lumea îl numește „certificat cu
+        istoric”. Este un raport cu toate înregistrările din viața firmei: asociații care au
+        intrat și au ieșit, administratorii succesivi, sediile, modificările de capital, fiecare
+        mențiune cu data ei. Costă 250 lei pe firmă (Ordinul MJ 380/C/2024) și se cere la
+        due diligence, în litigii și la dosare de fonduri unde finanțatorul vrea să vadă
+        legăturile dintre firme. Pentru 95% din situații e prea mult; pentru restul e singurul
+        document care răspunde la întrebare.
       </p>
 
-      <h3>4. Acte pentru persoane juridice</h3>
+      <h2>Ce înseamnă „la zi” și de ce contează data</h2>
       <p>
-        În cazul în care solicitantul este o persoană juridică, va trebui să prezinte și documente suplimentare care
-        atestă dreptul acesteia de a solicita certificatul. Aceste documente pot include o procură specială sau o
-        hotărâre de consiliu de administrație.
+        Pe certificat nu scrie „valabil până la”. Scrie data la care a fost generat, iar
+        conținutul reflectă registrul la acea dată. De aceea o instituție care vrea siguranță nu
+        poate face altceva decât să ceară un document recent, și de aici vine regula de 30 de
+        zile: nu din Legea 265/2022, ci din procedurile interne ale băncilor, din ghidurile
+        finanțatorilor și din practica notarială. Unele proceduri cer termene și mai scurte,
+        altele acceptă orice certificat cu condiția ca datele să fie actuale.
+      </p>
+      <p>
+        La achiziții publice formularea e precisă: normele de aplicare a Legii 98/2016 (HG
+        395/2016) cer ca informațiile din certificatul constatator să fie reale și actuale la
+        data prezentării. Un certificat vechi de două luni, dar care reflectă încă exact
+        registrul, e în regulă pe litera normei; un certificat de ieri, emis înaintea unei
+        schimbări de administrator înregistrate azi, nu e. În practică, comisiile cer un document
+        emis cu cel mult 30 de zile înainte de termenul de depunere, ca să nu aibă de verificat
+        nimic.
+      </p>
+      <p>
+        Aici intervine și opozabilitatea: Legea 265/2022 art. 46 spune că mențiunile sunt
+        opozabile terților de la înregistrare și că, la neconcordanță între registru și actele din
+        dosar, prevalează registrul. O hotărâre AGA semnată, dar neînregistrată, nu există pentru
+        bancă. Asta e bine pentru cine citește certificatul și rău pentru cine a uitat să depună
+        mențiunea.
       </p>
 
-      <h2>Procedura de obținere a certificatului constatator</h2>
+      <h2>Cum îl obții</h2>
       <p>
-        Procedura de obținere a certificatului constatator implică completarea și depunerea cererii la oficiul
-        Registrului Comerțului din localitatea în care este înregistrată firma sau persoana juridică. După depunerea
-        cererii, certificatul constatator este de obicei eliberat în aceeași zi.
+        Cererea se poate depune la ghișeul oricărui oficiu, prin poștă sau electronic (art. 11
+        alin. (2)), iar documentul se eliberează electronic, cu semnătură sau sigiliu electronic
+        calificat, ori pe hârtie (alin. (3)). Trei căi concrete:
+      </p>
+      <ul>
+        <li>
+          InfoCert, serviciul online al ONRC: nu cere semnătură electronică, plata se face doar
+          cu cardul, iar documentul vine semnat electronic. Îți trebuie CUI-ul sau denumirea.
+        </li>
+        <li>
+          Portalul de servicii online myportal.onrc.ro: cere cont și semnătură electronică
+          calificată pentru cereri, dar acceptă și plata prin ordin de plată.
+        </li>
+        <li>
+          Ghișeul: cererea tip, actul de identitate, 30 lei. Pentru livrare prin poștă ONRC
+          adaugă un tarif auxiliar de 9,78 lei.
+        </li>
+      </ul>
+      <p>
+        Sau printr-un intermediar. Noi{' '}
+        <Link href={serviceUrl('certificat-constatator')}>obținem certificatul constatator</Link>{' '}
+        din registrul comerțului și îl trimitem pe email, iar ce plătești peste tariful ONRC de 30
+        lei este munca și verificarea datelor, nu documentul. Are sens dacă nu ai card, nu vrei
+        cont pe portal, ai nevoie de mai multe certificate odată sau ceri pentru o firmă în
+        insolvență și vrei să știi ce cere exact instanța. Dacă ai 5 minute și un card, InfoCert
+        e suficient.
+      </p>
+      <p>
+        Timpul de eliberare: documentul de bază vine, de regulă, în câteva minute de la plată.
+        Din experiența noastră, variantele pentru fonduri IMM și pentru insolvență trec printr-un
+        pas de verificare la ONRC și pot întârzia până în ziua lucrătoare următoare. Dacă ai un
+        termen de depunere, nu le ceri în ultima zi.
       </p>
 
-      <h2>Informații conținute în certificatul constatator</h2>
+      <h2>Când informațiile din certificat nu sunt cele așteptate</h2>
       <p>
-        Certificatul constatator conține informații esențiale precum numele și adresa persoanei sau firmei, numărul
-        de înregistrare la Registrul Comerțului, data înregistrării, informații despre obiectul de activitate al
-        firmei și despre administratorii acesteia. În funcție de scopul tău, poate fi util să vezi{' '}
-        <Link href="/cele-4-tipuri-de-certificat-constatator-online/">
-          cele 4 tipuri de certificat constatator
-        </Link>{' '}
-        și să alegi tipul potrivit.
+        Cel mai frecvent caz nu e o eroare a registrului, ci o mențiune nedepusă. Administratorul
+        a fost schimbat prin hotărâre, sediul s-a mutat, un asociat a cesionat părțile, dar
+        nimeni nu a depus cererea la ONRC în termenul de 15 zile de la actul modificator (art.
+        43). Certificatul arată corect un registru rămas în urmă. Remediul e mențiunea, apoi un
+        certificat nou; registratorul soluționează în termen de o zi lucrătoare (art. 105).
+        Procedura pentru mențiunile uzuale e în{' '}
+        <Link href="/rolul-si-atributiile-onrc-romania/">ghidul despre ONRC</Link>.
+      </p>
+      <p>
+        Când eroarea este a registrului, de exemplu un nume scris greșit la operare, se cere
+        îndreptarea la oficiul care a făcut înscrierea, cu actul din dosar care dovedește forma
+        corectă. Art. 46 alin. (6) prevede că, dacă neconcordanța nu e imputabilă firmei, oficiul
+        corectează pe cheltuiala sa.
       </p>
 
-      <h2>Corectarea sau contestarea certificatului constatator</h2>
+      <h2>Două lucruri de știut înainte să îl trimiți mai departe</h2>
       <p>
-        În cazul în care informațiile conținute în certificatul constatator sunt inexacte sau neactualizate, acesta
-        poate fi contestat sau corectat prin intermediul unei cereri speciale adresate Registrului Comerțului (ONRC).
+        Pe fiecare certificat scrie că folosirea lui în alte scopuri decât cele pentru care a fost
+        solicitat, contrafacerea sau multiplicarea constituie infracțiune. Asta înseamnă că pentru
+        două dosare diferite se cer două certificate, nu o copie a primului.
       </p>
-
-      <h2>Recomandări pentru obținerea certificatului constatator</h2>
       <p>
-        Este recomandat să obțineți un certificat constatator atunci când începeți o colaborare cu o altă persoană
-        sau companie, când doriți să faceți dovada existenței unei firme sau când solicitați servicii sau credite de
-        la instituții financiare. Pentru a economisi timp, poți solicita un{' '}
-        <Link href="/servicii/certificat-constatator-online/">certificat constatator online</Link> direct de pe
-        platforma noastră.
-      </p>
-
-      <h2>Concluzie</h2>
-      <p>
-        Eliberarea certificatului constatator de la Registrul Comerțului implică un proces bine definit și necesită
-        pregătirea adecvată a documentelor. Acest document este esențial pentru desfășurarea activităților comerciale
-        în mod legal și este important să fie obținut și utilizat corect.
+        Și PDF-ul se transmite ca fișier. Semnătura electronică a ONRC e în fișier, nu pe hârtie;
+        printat și scanat, documentul devine o imagine fără semnătură validă, iar instituțiile
+        care lucrează electronic îl refuză. Cine vrea hârtie cere varianta pe hârtie de la
+        început.
       </p>
     </ArticleLayout>
   );
