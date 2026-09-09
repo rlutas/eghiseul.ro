@@ -2,18 +2,17 @@ import Link from 'next/link';
 import { buildPageMetadata } from '@/lib/seo';
 import { ArticleLayout } from '@/components/articole/article-layout';
 import { SystemStatus } from '@/components/services/system-status';
-import { OutageAlertSignup } from '@/components/articole/outage-alert-signup';
 
 const SLUG = 'tva-9-locuinte-31-iulie-2026';
 const TITLE =
-  'TVA 9% la locuințe: Senatul a votat prelungirea până pe 30 septembrie 2026. Ce e sigur și ce nu';
-const META_TITLE = 'TVA 9% Locuințe — Prelungire 30 Septembrie 2026 (vot Senat)';
+  'TVA 9% la locuințe: termenul de livrare este 30 septembrie 2026, prin Legea 161/2026. Cine mai intră, cine nu';
+const META_TITLE = 'TVA 9% Locuințe: Termen 30 Septembrie 2026 (Legea 161/2026)';
 const DESCRIPTION =
-  'Senatul a adoptat pe 27 iulie prelungirea termenului de livrare cu TVA 9% de la 31 iulie la 30 septembrie 2026, din cauza blocajului ANCPI. Nu e încă lege: urmează Camera Deputaților și Monitorul Oficial. Condițiile rămân neschimbate, iar antecontractul trebuia încheiat până la 1 august 2025.';
+  'Legea 161/2026 (M. Of. 642 din 4 august 2026, în vigoare din 7 august) a mutat termenul de livrare cu TVA 9% de la 31 iulie la 30 septembrie 2026. Condițiile nu s-au schimbat: antecontract până la 1 august 2025, 120 mp, 600.000 lei fără TVA. Cine a semnat la 21% între 1 și 6 august 2026 poate cere diferența înapoi din 1 octombrie.';
 const DATE_PUBLISHED = '2026-07-20';
-const DATE_MODIFIED = '2026-07-29';
+const DATE_MODIFIED = '2026-09-09';
 
-export const revalidate = 3600; // subiect cu termen — se poate schimba oricând
+export const revalidate = 3600; // subiect cu termen fix; ordinul ANAF de restituire poate apărea oricând
 
 export const metadata = buildPageMetadata({
   title: META_TITLE,
@@ -31,23 +30,23 @@ export default function Page() {
       datePublished={DATE_PUBLISHED}
       dateModified={DATE_MODIFIED}
       publishedLabel="20 iulie 2026"
-      updatedLabel="29 iulie 2026"
-      imageAlt="Termen fiscal 31 iulie 2026 pentru cota redusă de TVA la locuințe"
+      updatedLabel="9 septembrie 2026"
+      imageAlt="Termen fiscal 30 septembrie 2026 pentru cota redusă de TVA la locuințe"
       relatedServices={[
         {
           slug: 'extras-carte-funciara',
           label: 'Extras de Carte Funciară',
-          desc: 'Necesar la notar pentru autentificare. Comanda intră în coadă și se eliberează automat la revenirea ANCPI.',
+          desc: 'Extrasul de informare, obținut prin partener autorizat, în 2 zile lucrătoare.',
         },
         {
           href: '/ancpi-nu-functioneaza/',
           label: 'Starea sistemelor ANCPI',
-          desc: 'Cronologia blocajului, actualizată la fiecare comunicat oficial.',
+          desc: 'Ce merge și ce nu după atacul din iulie, actualizat la fiecare comunicat.',
         },
         {
           href: '/calculator/tva/',
           label: 'Calculator TVA',
-          desc: 'Calculează diferența exactă între 9% și 21% pentru locuința ta.',
+          desc: 'Diferența exactă între 9% și 21% pentru prețul locuinței tale.',
         },
         {
           href: '/calculator/valabilitate-documente/',
@@ -57,63 +56,59 @@ export default function Page() {
       ]}
       faqs={[
         {
-          q: 'Pot semna acum un antecontract ca să prind TVA de 9%?',
-          a: 'Nu. Aceasta este cea mai frecventă confuzie. Termenul pentru încheierea actului juridic de plată în avans (antecontractul) a fost 1 august 2025 — a expirat acum aproape un an. Termenul de 31 iulie 2026 se referă la altceva: la LIVRAREA locuinței. Cine nu avea antecontract la 1 august 2025 nu mai poate intra în regimul de 9%, indiferent ce semnează acum.',
+          q: 'Până când se mai poate cumpăra o locuință cu TVA 9%?',
+          a: 'Livrarea trebuie să aibă loc cel târziu pe 30 septembrie 2026 inclusiv (Legea 161/2026 art. I alin. (1) lit. b)). Termenul inițial, 31 iulie 2026, fusese stabilit prin art. III din Legea 141/2025. De la 1 octombrie 2026 livrările de locuințe se taxează cu cota standard de 21%.',
         },
         {
-          q: 'Ce trebuie să se întâmple până pe 31 iulie 2026, mai exact?',
-          a: 'Livrarea locuinței — adică transferul dreptului de proprietate prin act autentic la notar, iar locuința să poată fi locuită ca atare. Faptul generator al TVA la imobile este transferul proprietății, deci practic actul autentic trebuie semnat cel târziu pe 31 iulie 2026 inclusiv. Înscrierea ulterioară în cartea funciară nu mai schimbă cota aplicată.',
+          q: 'Pot semna acum un antecontract ca să prind 9%?',
+          a: 'Nu. Condiția d) din art. I al Legii 161/2026 cere un act juridic de plată în avans încheiat până la 1 august 2025. Prelungirea din august 2026 a mutat doar data livrării, nu și data antecontractului. Cine nu avea antecontract la 1 august 2025 nu intră în regim, indiferent ce semnează acum.',
         },
         {
-          q: 'Care sunt condițiile complete pentru cota de 9%?',
-          a: 'Cumulativ: (a) suprafață utilă maximum 120 mp, exclusiv anexele, și valoare maximum 600.000 lei fără TVA, inclusiv terenul; (b) livrare până la 31 iulie 2026, locuibilă ca atare; (c) să nu fi achiziționat altă locuință cu cotă redusă începând cu 1 ianuarie 2023 (se verifică în „Registrul achizițiilor de locuințe cu cota redusă de TVA"); (d) act juridic de plată în avans încheiat până la 1 august 2025. Pentru actele încheiate între 3 și 31 iulie 2025 există o condiție suplimentară: dovada plății unui avans de 20% din valoarea fără TVA, achitat integral până la 31 iulie 2025.',
+          q: 'Care sunt condițiile, exact?',
+          a: 'Cumulativ: suprafață utilă de maximum 120 mp fără anexe gospodărești și valoare de maximum 600.000 lei fără TVA, inclusiv terenul; locuința să poată fi locuită ca atare la livrare, cel târziu pe 30 septembrie 2026; cumpărătorul să nu fi achiziționat altă locuință cu cotă redusă de la 1 ianuarie 2023, verificat în Registrul achizițiilor de locuințe cu cota redusă de TVA; antecontract încheiat până la 1 august 2025. Pentru antecontractele din 3 până în 31 iulie 2025 se cere în plus dovada unui avans de 20% din valoarea fără TVA, plătit integral până la 31 iulie 2025 (art. I alin. (2)).',
         },
         {
-          q: 'Cât pierd concret dacă ratez termenul?',
-          a: 'La o locuință de 400.000 lei fără TVA: 36.000 lei TVA la 9% față de 84.000 lei la 21% — diferență de 48.000 lei (aproximativ 9.400 euro). La plafonul maxim de 600.000 lei fără TVA: 54.000 față de 126.000 lei — diferență de 72.000 lei (aproximativ 14.000 euro).',
+          q: 'Am semnat actul la 21% pe 3 august 2026, când legea nu era încă în vigoare. Ce fac?',
+          a: 'Ceri restituirea diferenței dintre 21% și 9%. Art. II din Legea 161/2026 acoperă exact livrările făcute cu cota standard între 1 august 2026 și 6 august 2026, ultima zi dinaintea intrării în vigoare, dacă îndeplinești toate condițiile. Cererile se pot depune începând cu 1 octombrie 2026, după procedura aprobată prin ordin al președintelui ANAF. Restituirea se acordă pentru o singură locuință.',
         },
         {
-          q: 'ANCPI e picat și notarul nu poate autentifica. Se prelungește termenul?',
-          a: 'Foarte probabil da. Senatul a adoptat pe 27 iulie 2026, cu 126 de voturi la 1, prelungirea termenului de livrare de la 31 iulie la 30 septembrie 2026, exact din cauza blocajului ANCPI; ministrul Finanțelor a susținut măsura. Proiectul prevede și restituirea diferenței de TVA pentru cei nevoiți să plătească 21% înainte de intrarea în vigoare. Atenție însă: nu e încă lege — urmează votul decisiv în Camera Deputaților, promulgarea și publicarea în Monitorul Oficial. Până la publicare, termenul legal în vigoare rămâne 31 iulie 2026.',
+          q: 'A apărut procedura ANAF de restituire?',
+          a: 'Legea dă ANAF 30 de zile de la 7 august 2026 ca să aprobe procedura prin ordin publicat în Monitorul Oficial. La data actualizării acestui articol, 9 septembrie 2026, nu am găsit ordinul publicat. Până apare, păstrează factura, actul autentic și dovada plății; cererea se depune oricum abia de la 1 octombrie.',
         },
         {
-          q: 'Am antecontract din iunie 2025 fără avans de 20%. Mai am dreptul la 9%?',
-          a: 'Da. Condiția avansului de 20% se aplică doar actelor juridice încheiate în perioada 3–31 iulie 2025. Pentru antecontractele anterioare datei de 3 iulie 2025 nu există această cerință — rămân valabile celelalte condiții (suprafață, plafon de preț, livrare până la 31 iulie 2026, să nu fi mai beneficiat din 2023).',
+          q: 'Ce înseamnă „livrare”: actul la notar sau înscrierea în cartea funciară?',
+          a: 'Actul la notar. Codul fiscal art. 281 alin. (6) spune că pentru bunuri imobile data livrării este data la care intervine transferul dreptului de a dispune de bun ca proprietar, adică actul autentic de vânzare. Înscrierea în cartea funciară vine după și nu schimbă cota. Practic însă, notarul nu autentifică fără extras de carte funciară pentru autentificare, iar acela vine de la ANCPI.',
         },
         {
           q: 'Locuința costă 620.000 lei fără TVA. Se aplică 9% până la plafon și 21% peste?',
-          a: 'Nu. Plafonul de 600.000 lei este un prag, nu o tranșă: dacă valoarea îl depășește, se pierde integral dreptul la cota redusă și se aplică 21% la întreaga valoare. Aceeași logică pentru suprafața de 120 mp.',
+          a: 'Nu. Condiția a) cere ca valoarea să nu depășească 600.000 lei fără TVA. Dacă o depășește, cota redusă se pierde pentru întreaga valoare, nu doar pentru ce trece de prag. La fel pentru suprafața de 120 mp.',
         },
         {
-          q: 'Contează data actului autentic sau data înscrierii în cartea funciară?',
-          a: 'Data livrării, adică a actului autentic prin care se transferă proprietatea. Înscrierea în cartea funciară este ulterioară și are rol de opozabilitate față de terți — nu determină cota de TVA aplicabilă. Practic însă, notarul nu autentifică fără extras de carte funciară de autentificare, ceea ce leagă indirect operațiunea de funcționarea sistemelor ANCPI.',
+          q: 'Cât pierd dacă ratez termenul de 30 septembrie?',
+          a: 'Diferența dintre 21% și 9% din prețul fără TVA. La 400.000 lei: 84.000 lei față de 36.000 lei, adică 48.000 lei în plus. La plafonul de 600.000 lei: 126.000 lei față de 54.000 lei, adică 72.000 lei în plus.',
         },
         {
-          q: 'Cine suportă diferența dacă dezvoltatorul întârzie livrarea?',
-          a: 'Depinde de ce scrie în antecontract — de regulă există clauze despre termenul de finalizare și consecințele întârzierii. Dacă întârzierea e imputabilă dezvoltatorului, diferența de TVA poate fi un prejudiciu pe care îl poți invoca. Verifică antecontractul cu un avocat înainte să accepți semnarea la un preț recalculat.',
+          q: 'Cine suportă diferența dacă dezvoltatorul nu livrează la timp?',
+          a: 'Depinde de antecontract. Dacă întârzierea e imputabilă dezvoltatorului, diferența de TVA e un prejudiciu pe care îl poți invoca, dar temeiul stă în clauzele semnate, nu în legea fiscală. Verifică termenul de finalizare și consecințele întârzierii cu un avocat înainte să accepți o recalculare a prețului.',
         },
         {
-          q: 'Cum obțin extras de carte funciară cât timp e-Terra e picat?',
-          a: 'Momentan nu se poate, din nicio sursă — nici la ghișeu, nici online, pentru că toate folosesc aceleași sisteme centrale. Poți plasa comanda acum, intră în coadă și se eliberează automat, cu prioritate, în momentul revenirii sistemelor. Urmărim starea ANCPI la fiecare 15 minute.',
+          q: 'ANCPI funcționează? Se pot obține extrase pentru autentificare?',
+          a: 'Aplicația e-Terra a fost repornită etapizat din 11 august 2026 pentru personalul ANCPI, oficiile de cadastru și notari, deci extrasele pentru autentificare se pot cere din nou. Platformele online pentru public au rămas oprite mai mult timp, iar oficiile lucrează cu restanțe. Starea la zi, cu cronologia completă, e în articolul despre ANCPI.',
         },
       ]}
     >
       <p>
-        <strong>Actualizare 29 iulie:</strong> Senatul a adoptat pe 27 iulie, cu 126 de voturi la
-        1, prelungirea termenului de livrare cu TVA 9% <strong>de la 31 iulie la 30 septembrie
-        2026</strong> — reacție directă la blocajul ANCPI, care ține notarii fără extrase de
-        autentificare din 13 iulie. Ministrul Finanțelor, Alexandru Nazare, a susținut public
-        măsura: românii afectați de blocaj „să nu suporte costuri suplimentare&rdquo;. Un singur lucru
-        lipsește, și e cel decisiv: <strong>nu e încă lege</strong> — proiectul merge la Camera
-        Deputaților (camera decizională), apoi la promulgare și în Monitorul Oficial. Până la
-        publicare, termenul legal în vigoare rămâne 31 iulie, iar diferența pe o singură locuință
-        rămâne <strong>48.000–72.000 lei</strong>.
+        <strong>Ce s-a schimbat de la ultima actualizare.</strong> Prelungirea votată de Senat pe 27
+        iulie a devenit lege: <strong>Legea 161/2026</strong> privind unele măsuri fiscal-bugetare,
+        promulgată prin Decretul 712 din 4 august 2026, publicată în Monitorul Oficial nr. 642 din
+        aceeași zi și în vigoare de pe <strong>7 august 2026</strong>. Termenul de livrare cu TVA 9%
+        nu mai este 31 iulie, ci <strong>30 septembrie 2026 inclusiv</strong>. Condițiile au rămas
+        identice, iar cine a fost nevoit să semneze la 21% în cele șase zile dintre 1 și 6 august
+        are un mecanism de restituire.
       </p>
 
-      {/* Bloc de sinteză auto-conținut, ~150 cuvinte: răspunde complet la cele
-          două întrebări cu volum („când expiră" și „se prelungește") fără să
-          ceară context din restul paginii. Formă extractibilă pentru AI
-          Overviews și motoarele conversaționale. */}
+      {/* Bloc de sinteză auto-conținut: răspunde la „când expiră” și „ce condiții”
+          fără context din restul paginii. Formă extractibilă pentru AI Overviews. */}
       <div className="not-prose my-6 rounded-xl border border-neutral-300 bg-neutral-50 p-5">
         <p className="mb-2 text-sm font-bold uppercase tracking-wide text-neutral-500">
           Pe scurt
@@ -122,89 +117,177 @@ export default function Page() {
           <div>
             <dt className="inline font-semibold">Când expiră TVA de 9% la locuințe? </dt>
             <dd className="inline">
-              Pe 31 iulie 2026 inclusiv. Locuința trebuie livrată (act autentic semnat la notar)
-              până la această dată. Peste termen se aplică 21%.
+              Livrarea, adică actul autentic la notar, trebuie făcută până pe 30 septembrie 2026
+              inclusiv (Legea 161/2026 art. I). De la 1 octombrie 2026 se aplică 21%.
             </dd>
           </div>
           <div>
-            <dt className="inline font-semibold">Se prelungește termenul? </dt>
+            <dt className="inline font-semibold">Mai pot intra acum în regimul de 9%? </dt>
             <dd className="inline">
-              Foarte probabil, până la 30 septembrie 2026: Senatul a adoptat proiectul pe 27 iulie
-              (126 la 1), cu susținerea ministrului Finanțelor. Dar nu e încă lege — urmează votul
-              decisiv în Camera Deputaților, promulgarea și Monitorul Oficial. Până la publicare,
-              termenul legal rămâne 31 iulie 2026.
+              Nu. Antecontractul trebuia încheiat până la 1 august 2025. Prelungirea a mutat doar
+              data livrării.
             </dd>
           </div>
           <div>
-            <dt className="inline font-semibold">Mai pot semna acum ca să prind 9%? </dt>
+            <dt className="inline font-semibold">Am plătit 21% între 1 și 6 august 2026. </dt>
             <dd className="inline">
-              Nu. Antecontractul trebuia încheiat până la 1 august 2025.
+              Ceri diferența înapoi, pentru o singură locuință, din 1 octombrie 2026, după
+              procedura ANAF (art. II).
             </dd>
           </div>
           <div>
-            <dt className="inline font-semibold">Cât costă dacă ratez termenul? </dt>
+            <dt className="inline font-semibold">Cât costă ratarea termenului? </dt>
             <dd className="inline">
-              Între 48.000 și 72.000 lei în plus, pentru o locuință de 400.000–600.000 lei fără
-              TVA.
+              Între 48.000 și 72.000 lei în plus, pentru o locuință de 400.000 până la 600.000 lei
+              fără TVA.
             </dd>
           </div>
         </dl>
       </div>
 
-      {/* Corecția care contează cel mai mult. Circulă masiv ideea că „trebuie să
-          semnezi contractul până la sfârșitul lunii ca să prinzi 9%" — fals, și
-          îi face pe oameni să semneze acte care nu le dau niciun drept. */}
-      <div className="not-prose my-8 rounded-2xl border-2 border-amber-300 bg-amber-50 p-6">
-        <p className="mb-2 text-lg font-bold text-amber-950">
-          Cea mai frecventă confuzie: nu poți „intra&rdquo; acum în cota de 9%
-        </p>
-        <p className="text-sm leading-relaxed text-amber-950/85">
-          Termenul pentru <strong>încheierea antecontractului</strong> (actul juridic de plată în
-          avans) a fost <strong>1 august 2025</strong>, deci a expirat acum aproape un an. Data de{' '}
-          <strong>31 iulie 2026</strong> se referă la <strong>livrarea locuinței</strong>, nu la
-          semnarea unui contract nou.
-        </p>
-        <p className="mt-2 text-sm leading-relaxed text-amber-950/85">
-          Dacă nu aveai antecontract la 1 august 2025, nu mai poți beneficia de 9%, indiferent ce
-          semnezi acum. Articolul acesta se adresează celor care{' '}
-          <strong>au deja antecontract din 2025</strong> și așteaptă finalizarea.
-        </p>
-      </div>
-
-      <h2>Care sunt condițiile pentru TVA de 9%?</h2>
+      <h2>Cum s-a ajuns aici: cotele la locuințe, în ordine</h2>
       <p>
-        Regimul e o excepție tranzitorie: facilitatea generală a fost eliminată prin{' '}
-        <strong>Legea nr. 141/2025</strong>, iar cota standard e 21%. Persoana fizică poate
-        achiziționa <strong>o singură locuință</strong> cu 9%, în perioada 1 august 2025 – 31 iulie
-        2026, dacă îndeplinește <strong>cumulativ</strong>:
+        Regimul de acum e ultimul rest al unei facilități care s-a strâns în trei pași, și fiecare
+        pas a lăsat în urmă un articol de tranziție. Ca să înțelegi de ce „9%” mai există într-un
+        Cod fiscal care nu îl mai prevede, trebuie citite în ordine.
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>Perioadă</th>
+            <th>Cota la locuințe (≤120 mp, ≤600.000 lei)</th>
+            <th>Actul</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>până la 31 decembrie 2023</td>
+            <td>5%</td>
+            <td>Codul fiscal art. 291 alin. (3) lit. c), forma de atunci</td>
+          </tr>
+          <tr>
+            <td>1 ianuarie 2024 – 31 iulie 2025</td>
+            <td>9%, o singură locuință de persoană</td>
+            <td>Legea 296/2023, care a mutat locuințele la art. 291 alin. (2) lit. m) pct. 3</td>
+          </tr>
+          <tr>
+            <td>de la 1 august 2025</td>
+            <td>21% (cota standard); 9% doar tranzitoriu, cu antecontract până la 1 august 2025 și livrare până la 31 iulie 2026</td>
+            <td>Legea 141/2025 art. II pct. 42–43 și art. III</td>
+          </tr>
+          <tr>
+            <td>7 august – 30 septembrie 2026</td>
+            <td>9% tranzitoriu, aceleași condiții, livrare până la 30 septembrie 2026</td>
+            <td>Legea 161/2026 art. I</td>
+          </tr>
+          <tr>
+            <td>de la 1 octombrie 2026</td>
+            <td>21%</td>
+            <td>Codul fiscal art. 291 alin. (1)</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        Detaliul care contează pentru cine citește Codul fiscal direct: Legea 141/2025 a rescris
+        art. 291 alin. (1) și (2) cu cotele de 21% și 11% și a abrogat alin. (3), unde stăteau
+        locuințele. Cota de 9% la locuințe nu mai e în Cod, ci într-un articol de tranziție de sine
+        stătător, art. III din Legea 141/2025, pe care Legea 161/2026 l-a preluat cu un termen nou.
+        Dacă cauți „9%” în art. 291 și nu îl găsești, nu înseamnă că facilitatea a dispărut; înseamnă
+        că e în altă parte.
+      </p>
+
+      <h2>Condițiile, așa cum sunt scrise în Legea 161/2026</h2>
+      <p>
+        Art. I alin. (1): persoana fizică, singură sau împreună cu alte persoane fizice, poate
+        cumpăra <strong>o singură locuință</strong> cu 9% în perioada dintre 7 august și 30 septembrie
+        2026 inclusiv, dacă îndeplinește cumulativ:
       </p>
       <ul>
         <li>
-          <strong>suprafață utilă maximum 120 mp</strong>, exclusiv anexele gospodărești, și{' '}
-          <strong>valoare maximum 600.000 lei fără TVA</strong>, inclusiv terenul;
+          suprafață utilă de maximum 120 mp, exclusiv anexele gospodărești, și valoare de maximum
+          600.000 lei fără TVA, inclusiv terenul pe care e construită; suprafața utilă e cea din
+          Legea locuinței 114/1996, anexele cele din Legea 50/1991;
         </li>
         <li>
-          <strong>livrare până la 31 iulie 2026</strong>, iar locuința să poată fi locuită ca atare;
+          locuința să poată fi locuită ca atare la livrare, care nu poate depăși 30 septembrie 2026,
+          conform condițiilor în vigoare la data antecontractului;
         </li>
         <li>
-          <strong>să nu fi achiziționat altă locuință cu cotă redusă din 1 ianuarie 2023</strong> —
-          se verifică în „Registrul achizițiilor de locuințe cu cota redusă de TVA&rdquo;;
+          să nu fi cumpărat altă locuință cu cotă redusă începând cu 1 ianuarie 2023, potrivit
+          Registrului achizițiilor de locuințe cu cota redusă de TVA;
         </li>
         <li>
-          <strong>act juridic de plată în avans încheiat până la 1 august 2025</strong>.
+          să fi încheiat până la 1 august 2025 un act juridic între vii care are ca obiect plata în
+          avans pentru locuință.
         </li>
       </ul>
       <p>
-        Condiție suplimentară pentru actele încheiate <strong>între 3 și 31 iulie 2025</strong>: la
-        livrare trebuie dovedită plata unui <strong>avans de 20%</strong> din valoarea fără TVA,
-        achitat integral până la 31 iulie 2025.
+        Alin. (2) adaugă condiția specială pentru antecontractele semnate <strong>între 3 și 31 iulie
+        2025</strong>, în ultimele săptămâni dinaintea schimbării: la livrare trebuie dovedit un avans
+        de 20% din valoarea fără TVA, plătit integral până la 31 iulie 2025. Pentru un antecontract din
+        iunie 2025 sau mai vechi, condiția asta nu există.
       </p>
-      <p className="text-sm text-neutral-600">
-        Sursa: comunicat oficial ANAF — DGRFP Cluj-Napoca nr. CJR_DEC 12532/05.08.2025, „Cote de TVA
-        pentru livrarea de locuințe, începând cu data de 01 august 2025&rdquo;.
+      <p>
+        Alin. (3) pune notarii în rolul de filtru. Înainte de autentificare, ei consultă registrul;
+        dacă persoana a mai cumpărat cu cotă redusă din 2023, autentifică numai cu 21%. Completează
+        registrul la autentificare și înscriu în act cota aplicată. Nu e o verificare pe care o poți
+        ocoli sau negocia.
       </p>
 
-      <h2>Cât pierzi dacă ratezi termenul de 31 iulie?</h2>
+      <h2>Ce înseamnă „livrare” și de ce contează notarul, nu cartea funciară</h2>
+      <p>
+        Codul fiscal art. 281 alin. (6): pentru bunuri imobile, data livrării este data la care
+        intervine transferul dreptului de a dispune de bun ca proprietar. Asta e data actului autentic
+        de vânzare. Înscrierea în cartea funciară e ulterioară și nu mută cota.
+      </p>
+      <p>
+        Legătura cu ANCPI e indirectă, dar reală: la autentificarea unui act prin care se transferă
+        un drept imobiliar, notarul cere extrasul de carte funciară pentru autentificare, valabil 10
+        zile lucrătoare, timp în care nu se mai face nicio altă înscriere pe imobil (Legea 7/1996 art.
+        35 alin. (3)). Fără extras nu există act autentic; fără act autentic nu există livrare. Exact
+        așa a ajuns blocajul din iulie să pună în pericol cota de 9% pentru oameni care își
+        îndepliniseră toate condițiile.
+      </p>
+
+      <h2>Cine nu intră, oricât ar vrea</h2>
+      <ul>
+        <li>
+          cine a semnat antecontractul pe 1 august 2025 sau după: legea cere „până la data de 1
+          august 2025”, iar prelungirea din 2026 nu a atins această dată;
+        </li>
+        <li>
+          cine a semnat între 3 și 31 iulie 2025 fără să fi plătit 20% avans până la 31 iulie 2025;
+        </li>
+        <li>
+          cine a cumpărat deja o locuință cu 5% sau 9% de la 1 ianuarie 2023 încoace, singur sau în
+          comun;
+        </li>
+        <li>
+          locuința care trece de 600.000 lei fără TVA sau de 120 mp utili: pragul nu e tranșă, se
+          pierde tot.
+        </li>
+      </ul>
+
+      <h2>Restituirea pentru cei prinși în golul 1–6 august 2026</h2>
+      <p>
+        Între expirarea termenului vechi, 31 iulie, și intrarea în vigoare a legii noi, 7 august, au
+        fost șase zile în care unii au semnat la 21% pentru că nu mai puteau amâna. Art. II din Legea
+        161/2026 e scris pentru ei: persoana fizică ce a cumpărat cu cota standard în perioada dintre
+        1 august 2026 și data intrării în vigoare poate cere restituirea diferenței dintre 21% și 9%,
+        pentru o singură locuință, dacă îndeplinește aceleași condiții a)–d) și, după caz, condiția
+        avansului de 20%. Dacă a cumpărat mai multe locuințe eligibile în intervalul ăsta, se
+        restituie diferența doar pentru cea al cărei fapt generator a intervenit primul (alin. (3)).
+      </p>
+      <p>
+        Cererile se pot depune începând cu <strong>1 octombrie 2026</strong>, potrivit procedurii
+        aprobate prin ordin al președintelui ANAF în termen de 30 de zile de la intrarea în vigoare,
+        deci până în jurul datei de 6 septembrie, cu publicare în Monitorul Oficial (alin. (5)). La 9
+        septembrie 2026, când am actualizat pagina, nu am găsit ordinul publicat. Verificăm și
+        completăm când apare. Până atunci: actul autentic, factura cu TVA 21% și dovada plății sunt
+        documentele de păstrat.
+      </p>
+
+      <h2>Cât pierzi dacă livrarea alunecă în octombrie</h2>
       <div className="not-prose my-6 overflow-x-auto">
         <table className="w-full border-collapse text-sm">
           <thead>
@@ -238,157 +321,58 @@ export default function Page() {
         </table>
       </div>
       <p>
-        Atenție la plafon: <strong>600.000 lei este prag, nu tranșă</strong>. O locuință de 620.000
-        lei fără TVA nu primește 9% pe primii 600.000 și 21% pe rest, ci pierde integral cota
-        redusă.
-      </p>
-      <p>
-        Pentru suma ta exactă, folosește{' '}
-        <Link href="/calculator/tva/">calculatorul de TVA</Link> — adaugi sau scoți TVA din orice
-        valoare, la 21% sau la cotele reduse.
+        Pentru suma ta exactă, <Link href="/calculator/tva/">calculatorul de TVA</Link> adaugă sau
+        scoate TVA din orice valoare, la 21% sau la cotele reduse.
       </p>
 
-      <h2>Problema care a declanșat totul: ANCPI, blocat de un atac ransomware</h2>
+      <h2>ANCPI, la zi</h2>
       <p>
-        Din <strong>13 iulie 2026</strong>, sistemele ANCPI sunt indisponibile la nivel național.
-        Pe 27 iulie, Guvernul a confirmat natura atacului — <strong>ransomware</strong>, cu o parte
-        din infrastructura de virtualizare criptată și ștearsă — și a anunțat că{' '}
-        <strong>nu poate da o dată fermă de repornire</strong>. Pentru cine are termen fiscal,
-        consecința e directă: <strong>extrasul de carte funciară de autentificare nu se poate
-        obține</strong>, iar fără el <strong>notarul nu poate autentifica actul de vânzare</strong>.
+        Motivul prelungirii a fost blocajul sistemelor ANCPI, indisponibile la nivel național din
+        13–14 iulie 2026 după un atac informatic. Aplicația e-Terra a fost repornită etapizat pe{' '}
+        <strong>11 august</strong> pentru personalul ANCPI, oficiile de cadastru și notari, iar din 12
+        august pentru topografi, experți și executori. Asta înseamnă că notarii pot cere din nou
+        extrase pentru autentificare, cu timpi de răspuns mai mari cât se recuperează restanțele.
+        Platformele online pentru public au revenit mai încet. Cronologia completă, cu fiecare
+        comunicat, e în <Link href="/ancpi-nu-functioneaza/">articolul despre ANCPI</Link>.
       </p>
-      <p>
-        Adică oameni cu antecontract valabil din 2025, care au plătit avansul și au respectat toate
-        condițiile, riscă să piardă cota redusă{' '}
-        <strong>dintr-un motiv care nu ține de ei</strong>. Nu au ce să facă diferit; așteaptă un
-        sistem informatic.
-      </p>
-
       <div className="not-prose my-6">
         <SystemStatus service="ancpi" />
       </div>
-
-      {/* CTA imediat sub status: cine vede indicatorul roșu are exact atunci
-          întrebarea „și ce fac?". Mesajul e specific termenului fiscal, nu
-          generic — miza aici e diferența de zeci de mii de lei, nu comoditatea. */}
-      <div className="not-prose my-8 rounded-2xl border-2 border-primary-500 bg-primary-50 p-6">
-        <p className="mb-1 text-lg font-bold text-secondary-900">
-          Extrasul CF îl scoatem noi, în secunda în care revine ANCPI
-        </p>
-        <p className="mb-4 text-sm leading-relaxed text-secondary-900/80">
-          Cu termenul pe 31 iulie, ordinea în coadă poate face diferența. Plasezi comanda acum,
-          intră în coadă, iar platforma noastră o eliberează <strong>automat</strong> imediat ce
-          sistemele răspund — nu aștepți să afli tu că a revenit și nu reiei comanda.
-        </p>
-        <ul className="mb-4 space-y-1.5 text-sm text-secondary-900/80">
-          <li className="flex gap-2">
-            <span aria-hidden className="text-primary-600">✓</span>
-            <span>
-              <strong>Se procesează în ordinea plasării</strong> — cine comandă azi e servit
-              înaintea celor care așteaptă revenirea ca să comande.
-            </span>
-          </li>
-          <li className="flex gap-2">
-            <span aria-hidden className="text-primary-600">✓</span>
-            <span>
-              <strong>Dacă nu livrăm, primești banii înapoi</strong> — integral.
-            </span>
-          </li>
-          <li className="flex gap-2">
-            <span aria-hidden className="text-primary-600">✓</span>
-            <span>
-              Monitorizăm ANCPI la <strong>15 minute</strong> — am detectat căderea cu ~10 ore
-              înaintea primului comunicat oficial.
-            </span>
-          </li>
-        </ul>
-        <Link
-          href="/comanda/extras-carte-funciara/"
-          className="inline-flex items-center rounded-xl bg-primary-500 px-5 py-3 text-sm font-bold text-secondary-900 shadow-[0_6px_14px_rgba(236,185,95,0.35)] transition-all hover:bg-primary-600 hover:shadow-[0_10px_20px_rgba(236,185,95,0.45)]"
-        >
-          Comandă extras CF — prioritate la revenire →
-        </Link>
-      </div>
-
-      <h2>Se prelungește termenul pentru TVA de 9%? Statusul la zi</h2>
       <p>
-        <strong>Da, prelungirea e pe drum — dar nu e încă în vigoare.</strong> Cronologia:
-      </p>
-      <ul>
-        <li>
-          <strong>21 iulie:</strong> primele inițiative parlamentare cer prelungirea, invocând
-          explicit blocajul ANCPI — cumpărători cu antecontracte valabile riscau să piardă cota
-          redusă dintr-un motiv care nu ține de ei.
-        </li>
-        <li>
-          <strong>27 iulie:</strong> <strong>Senatul adoptă proiectul cu 126 de voturi la 1</strong>:
-          termenul de livrare se prelungește de la 31 iulie la <strong>30 septembrie 2026</strong>.
-          Ministrul Finanțelor, Alexandru Nazare, susține măsura: „nu am creat o nouă facilitate
-          fiscală, ci am propus prelungirea termenului cu o perioadă rezonabilă&rdquo; (
-          <a
-            href="https://startupcafe.ro/termenul-pentru-tva-de-9-la-locuinte-prelungit-pana-la-30-septembrie-senatul-a-adoptat-proiectul-romanii-afectati-de-blocajul-ancpi-sa-nu-suporte-costuri-suplimentare-ministru-104015"
-            target="_blank"
-            rel="nofollow noopener"
-          >
-            StartupCafe
-          </a>
-          ).
-        </li>
-        <li>
-          <strong>Ce mai lipsește:</strong> votul decisiv în <strong>Camera Deputaților</strong>,
-          promulgarea prin decret prezidențial și publicarea în <strong>Monitorul Oficial</strong>.
-          Abia atunci prelungirea devine drept aplicabil.
-        </li>
-      </ul>
-      <p>Ce prevede proiectul adoptat de Senat, pe lângă noul termen:</p>
-      <ul>
-        <li>
-          <strong>restituirea diferenței de TVA</strong> pentru cumpărătorii nevoiți să plătească
-          21% înainte de intrarea în vigoare a prelungirii;
-        </li>
-        <li>
-          <strong>restul condițiilor rămân neschimbate</strong>: 120 mp, 600.000 lei fără TVA,
-          antecontract până la 1 august 2025, o singură achiziție cu cotă redusă din 2023 — deci
-          prelungirea <strong>nu deschide ușa unor cumpărători noi</strong>, doar dă timp celor
-          prinși de blocaj.
-        </li>
-      </ul>
-      <p>
-        <strong>Recomandarea practică până la publicarea în Monitorul Oficial:</strong> nu semna
-        nimic la 21% fără să discuți cu notarul clauza de ajustare — dacă legea intră în vigoare cu
-        prevederea de restituire, diferența se recuperează, dar drumul cel mai simplu rămâne să nu
-        o plătești deloc. Și nu amâna livrarea mizând pe 30 septembrie înainte ca legea să fie
-        publicată: dacă proiectul se modifică la Camera Deputaților, termenul aplicabil rămâne cel
-        din legea în vigoare.
+        Dacă ai nevoie de un extras de carte funciară de informare, ca să verifici sarcinile
+        înainte de semnare sau ca să îl dai băncii, îl obținem prin{' '}
+        <Link href="/comanda/extras-carte-funciara/">partener autorizat, în 2 zile lucrătoare</Link>.
+        Extrasul pentru autentificare îl cere numai notarul, în numele lui; nu îl poate comanda
+        nimeni altcineva în locul lui.
       </p>
 
-      <h2>Ce faci concret, dacă ai antecontract și termenul se apropie</h2>
+      <h2>Ce faci concret până pe 30 septembrie</h2>
       <div className="not-prose my-6 space-y-3">
         {[
           {
-            step: '1. Vorbește azi cu notarul',
+            step: '1. Fixează data la notar acum',
             detail:
-              'Întreabă explicit dacă poate programa autentificarea în ipoteza revenirii ANCPI în ultimele zile și ce documente poate pregăti în avans. Notarii cunosc situația și mulți țin liste de așteptare pentru reprogramare rapidă.',
+              'Ultimele două săptămâni din septembrie vor fi aglomerate, pentru că toți cei prinși de blocaj au același termen. Notarul trebuie să ceară extrasul de autentificare cu cele 10 zile lucrătoare de valabilitate în minte; întreabă-l când îl solicită.',
           },
           {
-            step: '2. Vorbește cu dezvoltatorul, în scris',
+            step: '2. Cere dezvoltatorului confirmarea în scris',
             detail:
-              'Cere confirmarea în scris că locuința e gata de livrare și că poate semna până pe 31 iulie. Dacă întârzierea e din partea lui, corespondența scrisă îți folosește ulterior — diferența de TVA poate fi un prejudiciu invocabil.',
+              'Că locuința e finalizată, poate fi locuită ca atare și că semnează până pe 30 septembrie. Dacă întârzierea vine de la el, corespondența scrisă e ce vei avea în mână la o discuție despre cine suportă diferența.',
           },
           {
-            step: '3. Plasează comanda de extras CF acum',
+            step: '3. Verifică-ți încadrarea înainte de ziua semnării',
             detail:
-              'Comenzile se procesează în ordinea plasării. Cine comandă azi primește documentul înaintea celor care așteaptă revenirea ca să comande — iar în ultimele zile înainte de termen, ordinea în coadă poate decide.',
+              'Data antecontractului (până la 1 august 2025), avansul de 20% dacă ai semnat în iulie 2025, suprafața utilă din documentația cadastrală, prețul fără TVA sub 600.000 lei. Notarul verifică registrul în ziua actului; mai bine afli tu înainte.',
           },
           {
-            step: '4. Verifică dacă ai deja un extras valabil',
+            step: '4. Dacă ai semnat la 21% între 1 și 6 august',
             detail:
-              'Extrasul de autentificare e valabil 10 zile lucrătoare. Dacă ai obținut unul chiar înainte de 13 iulie, s-ar putea să mai fie în termen — verifică înainte să presupui că trebuie altul.',
+              'Pregătește dosarul de restituire: act autentic, factură, dovada plății, antecontractul și dovada avansului. Cererea se depune de la 1 octombrie 2026, după ordinul ANAF.',
           },
           {
             step: '5. Dacă ratezi termenul, nu semna în grabă la 21%',
             detail:
-              'Consultă un avocat înainte. În funcție de clauzele antecontractului și de cauza întârzierii, poți avea temei să ceri suportarea diferenței de către dezvoltator sau renegocierea prețului.',
+              'Citește clauzele antecontractului despre termenul de finalizare și consecințele întârzierii, cu un avocat. Diferența de zeci de mii de lei merită o oră de consultanță înainte de semnătură.',
           },
         ].map((row, i) => (
           <div key={i} className="rounded-xl border border-neutral-200 bg-white p-4">
@@ -398,20 +382,20 @@ export default function Page() {
         ))}
       </div>
 
-      <OutageAlertSignup service="ancpi" serviceLabel="ANCPI" sourcePage={`/${SLUG}/`} />
-
-      <h2>Ce urmărim și actualizăm</h2>
+      <h2>Ce urmărim</h2>
       <p>
-        Subiectul are termen fix și două necunoscute: dacă ANCPI revine la timp și dacă apare o
-        prelungire. Actualizăm articolul la fiecare act normativ publicat sau comunicat oficial.
-        Starea sistemelor ANCPI, cu cronologia completă a incidentului, e în{' '}
-        <Link href="/ancpi-nu-functioneaza/">articolul dedicat</Link>.
+        Două lucruri pot schimba pagina asta: ordinul ANAF cu procedura de restituire și o eventuală
+        nouă prelungire, despre care la 9 septembrie nu există niciun proiect depus pe care să îl fi
+        găsit. Actualizăm la fiecare act publicat în Monitorul Oficial, nu la fiecare declarație.
       </p>
 
       <p className="text-sm text-neutral-600">
-        <strong>Precizare:</strong> articolul are scop informativ și nu constituie consultanță
-        fiscală sau juridică. Pentru situația ta concretă — clauzele antecontractului, calculul
-        exact al TVA, opțiunile în caz de întârziere — consultă notarul, contabilul sau un avocat.
+        <strong>Surse:</strong> Legea 161/2026, M. Of. nr. 642 din 4 august 2026 (textul integral pe
+        static.anaf.ro); Legea 141/2025, M. Of. nr. 699 din 25 iulie 2025, art. II pct. 42–43 și art.
+        III; Legea 296/2023, sinteza ANAF; Legea 227/2015 privind Codul fiscal, art. 281 și 291;
+        Legea 7/1996 art. 35. <strong>Precizare:</strong> articolul are scop informativ și nu
+        constituie consultanță fiscală sau juridică. Pentru clauzele antecontractului, calculul exact
+        al TVA și opțiunile în caz de întârziere, consultă notarul, contabilul sau un avocat.
       </p>
     </ArticleLayout>
   );

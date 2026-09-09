@@ -27,9 +27,9 @@ export const ARTICLES: ArticleMeta[] = [
   },
   {
     slug: 'tva-9-locuinte-31-iulie-2026',
-    title: 'TVA 9% la locuințe: Senatul a votat prelungirea până pe 30 septembrie 2026',
+    title: 'TVA 9% Locuințe: Termen 30 Septembrie 2026 (Legea 161/2026)',
     excerpt:
-      'Vot 126 la 1 pe 27 iulie, din cauza blocajului ANCPI — dar nu e încă lege: urmează Camera Deputaților și Monitorul Oficial. Condițiile rămân neschimbate; antecontractul trebuia încheiat până la 1 august 2025.',
+      'Legea 161/2026 (M. Of. 642/4.08.2026) a mutat termenul de livrare cu TVA 9% la 30 septembrie 2026. Condițiile nu s-au schimbat: antecontract până la 1 august 2025, 120 mp, 600.000 lei. Cine a plătit 21% între 1 și 6 august poate cere diferența din 1 octombrie.',
     category: 'Cadastru & imobiliare',
   },
   {
@@ -162,15 +162,15 @@ export const ARTICLES: ArticleMeta[] = [
   },
   {
     slug: 'acte-necesare-certificat-de-nastere',
-    title: 'Acte Necesare Certificat de Naștere: Listă pe Situații',
-    excerpt: 'Ce acte îți trebuie pentru duplicat, pentru un nou-născut și pentru eliberarea prin împuternicire.',
+    title: 'Certificatul de Naștere: Ghid Complet pe Situații',
+    excerpt: 'Înregistrarea nou-născutului și ce se întâmplă după termen, exemplar nou după pierdere, copilul născut în străinătate și unde ți se cere certificatul. Cu articolele din Legea 119/1996 și HG 255/2024.',
     category: 'Stare civilă',
     image: '/og/services/certificat-nastere.png',
   },
   {
     slug: 'acte-necesare-casatorie',
-    title: 'Acte Necesare Căsătorie: Dosarul Complet la Starea Civilă',
-    excerpt: 'Declarația cu 10 zile înainte, certificatele medicale (valabile 14 zile) și restul actelor. Vezi lista completă.',
+    title: 'Acte Necesare Căsătorie: Dosarul, Termenele și Certificatul',
+    excerpt: 'Dosarul de căsătorie (certificatul medical e valabil 30 de zile, nu 14), cum curg cele 10 zile de publicare, martorii, minorii, soțul străin. Plus duplicatul și transcrierea unei căsătorii din străinătate.',
     category: 'Stare civilă',
     image: '/og/services/certificat-casatorie.png',
   },

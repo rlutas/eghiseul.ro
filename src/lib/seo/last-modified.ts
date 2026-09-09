@@ -20,8 +20,8 @@
  * Generat inițial din cele 48 de pagini existente, 28.07.2026.
  */
 export const PAGE_LAST_MODIFIED: Record<string, string> = {
-  'acte-necesare-casatorie': '2026-06-22',
-  'acte-necesare-certificat-de-nastere': '2026-06-19',
+  'acte-necesare-casatorie': '2026-09-09',
+  'acte-necesare-certificat-de-nastere': '2026-09-09',
   'amenda-rovinieta-2025-tarife-plata-online-ghid-complet': '2026-09-09',
   'cazier-fiscal-fara-spv': '2026-08-07',
   'ancpi-nu-functioneaza': '2026-08-21',
@@ -42,7 +42,7 @@ export const PAGE_LAST_MODIFIED: Record<string, string> = {
   'tabel-varsta-pensionare-anticipata-femei': '2026-06-16',
   'taxa-cazier-judiciar': '2026-08-24',
   'totul-despre-cartea-funciara-colectiva': '2026-08-24',
-  'tva-9-locuinte-31-iulie-2026': '2026-07-29',
+  'tva-9-locuinte-31-iulie-2026': '2026-09-09',
   'valabilitate-extras-de-carte-funciara': '2026-06-16',
   'verificare-proprietar-imobil': '2026-08-28',
 };

@@ -222,9 +222,9 @@ pentru fiecare cifră, humanizer, verificare tsc + build + teste, apoi UN commit
 | 15 | `/eliberare-certificat-constatator-onrc-ghid` | 🔄 lot 2A (backlink start-up.ro, URL neatins) | în lucru |
 | 16 | `/cazier-fiscal-fara-spv` | 🔄 lot 2A (umbrelă fiscal: PF, verificare, firmă) | în lucru |
 | 17 | `/cat-costa-cadastrul-si-intabularea` | 🔄 lot 2A | în lucru |
-| 18 | `/acte-necesare-certificat-de-nastere` | 🔄 lot 2B (umbrelă naștere: 6 articole) | în lucru |
-| 19 | `/acte-necesare-casatorie` | 🔄 lot 2B (umbrelă căsătorie: 3 articole) | în lucru |
-| 20 | `/tva-9-locuinte-31-iulie-2026` | 🔄 lot 2B (fiscal datat, ⚠️ citit de owner înainte de push) | în lucru |
+| 18 | `/acte-necesare-certificat-de-nastere` | ✅ livrat (umbrelă naștere: 6 articole; 447→1.687 cuv.) | lot 2B, `8de12ed` |
+| 19 | `/acte-necesare-casatorie` | ✅ livrat (umbrelă căsătorie; certificat medical 30 zile, NU 14; 1.005→1.836) | lot 2B |
+| 20 | `/tva-9-locuinte-31-iulie-2026` | ✅ livrat (era înghețată la votul Senatului; acum L. 161/2026, termen 30.09.2026; TODO OPANAF restituire după 01.10) | lot 2B |
 | 21 | `/` (homepage) | ⬜ lot 3 | AI 14,4; poziție 9,27→23,91 |
 | 22 | `/curs-valutar` | ⬜ lot 3 | 487 cuv. pe 186k expuneri |
 | 23 | `/servicii/rovinieta-online` | ⬜ lot 3 | 759 cuv., singura pagină de serviciu sub 800 |
@@ -238,7 +238,7 @@ pentru fiecare cifră, humanizer, verificare tsc + build + teste, apoi UN commit
 | 31 | `/servicii/certificat-de-integritate-comportamentala` | ⬜ lot 4 | 0 clicuri post-update |
 | 32 | `/servicii/certificat-constatator-online` | ⬜ lot 4 | 3 backlinkuri dofollow; 14,3→21,2 |
 
-**Bilanț:** 13 livrate, 7 în lucru (lot 2), 12 rămase (lot 3: 3 pagini de alt
+**Bilanț (09.09, 13:40):** 16 livrate, 4 în lucru (lot 2A), 12 rămase (lot 3: 3 pagini de alt
 tip; lot 4: 9 pagini `/servicii/`, șablonul de serviciu cu wizard, preț,
 `ReviewsSection`; se lucrează diferit de articole, cu grijă la componentele
 partajate).
@@ -247,6 +247,13 @@ partajate).
 `src/config/articles.ts`, `/servicii/` (când face articole), nu rulează
 `npm run build`, nu face commit. La final: build + `vitest run tests/unit` +
 registrul last-modified + `articles.ts` + acest jurnal → un commit, un push.
+
+**Lot 2B, erori de fond găsite:** certificatul medical prenupțial e valabil
+30 de zile (HG 255/2024 art. 64), pagina zicea 14; „după un an mergi în instanță”
+e fals din L. 105/2022; pagina de TVA era înghețată la votul Senatului, deși
+L. 161/2026 era în M. Of. din 4.08. Pentru lotul 4: `servicii/eliberare-certificat-de-nastere`
+zice în 4 locuri „primăria din localitatea de naștere”, contrazice ghidul
+(orice SPCLEP, HG 255/2024 art. 158).
 
 **Semnal păstrat din plan:** Faza 3 zicea 1–2 pagini/săptămână, ca să poată fi
 citite de un om. Ownerul a ales loturi; compensăm cu surse primare pe fiecare
