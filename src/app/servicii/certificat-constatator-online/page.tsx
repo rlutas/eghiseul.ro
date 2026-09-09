@@ -802,7 +802,7 @@ export default async function CertificatConstatatorPage() {
             { q: 'Ce tipuri de certificat constatator pot comanda?', a: 'Trei: pe firmă (situația la zi a societății), pe persoană fizică (dacă o persoană deține calitatea de asociat/administrator în firme) și cu istoric (toate modificările firmei de la înființare până în prezent).' },
             { q: 'Certificatul constatator este la zi?', a: 'Da. Certificatul reflectă situația firmei din ziua eliberării, cu toate mențiunile actualizate înscrise la ONRC până la acel moment.' },
             { q: 'Cum verific dacă o persoană este asociat sau administrator într-o firmă?', a: 'Comanzi un certificat constatator pe persoană fizică. Pe baza datelor persoanei, ONRC indică firmele în care aceasta deține calitatea de asociat sau administrator. Costă 89 RON cu TVA, taxe ONRC incluse.' },
-            { q: 'Cât durează eliberarea?', a: 'De obicei câteva minute — depunem cererea automat, 24/7, iar ONRC emite certificatul. În cazuri rare (procesare ONRC mai lentă) poate dura mai mult.' },
+            { q: 'În cât timp am certificatul constatator?', a: 'De obicei câteva minute — depunem cererea automat, 24/7, iar ONRC emite certificatul. În cazuri rare (procesare ONRC mai lentă) poate dura mai mult.' },
             { q: 'Cât costă un certificat constatator?', a: `De la ${service.base_price} RON cu taxele ONRC incluse (pe firmă sau pe persoană fizică); varianta cu istoric este 487 RON cu TVA. Fără costuri ascunse.` },
             { q: 'De unde obțin certificatul constatator?', a: 'De la Oficiul Național al Registrului Comerțului (ONRC). Prin eGhișeul îl obții 100% online, fără cont RECOM și fără drum la ghișeu — îl primești pe email.' },
             { q: 'Care e diferența dintre certificatul de bază și cel extins?', a: 'Sunt denumiri folosite uzual pentru certificatul pe firmă: „de bază" = situația la zi a societății, iar „extins" = aceleași date plus mențiuni și detalii suplimentare. La noi îl comanzi ca certificat constatator pe firmă, care include datele complete.' },
@@ -813,7 +813,7 @@ export default async function CertificatConstatatorPage() {
             { q: 'Pot obține certificat pentru orice firmă?', a: 'Da, pentru orice persoană juridică sau entitate înregistrată la Registrul Comerțului: SRL, SA, PFA, II sau IF. Ai nevoie doar de CUI-ul firmei.' },
             { q: 'Este valabil pentru licitații publice?', a: 'Da. Certificatul constatator este unul dintre documentele acceptate la licitațiile publice din SEAP/SICAP pentru a dovedi eligibilitatea și datele de identificare ale ofertantului.' },
             { q: 'Cât este valabil certificatul constatator?', a: 'Reflectă situația din ziua eliberării. În practică, autoritățile și partenerii cer un certificat emis în ultimele 30 de zile; la licitații se acceptă de regulă unul nu mai vechi de 30 de zile.' },
-            { q: 'Cum primesc documentul?', a: 'Pe email, ca PDF semnat electronic de ONRC, cu autenticitate verificabilă la Registrul Comerțului.' },
+            { q: 'Certificatul e semnat electronic de ONRC?', a: 'Pe email, ca PDF semnat electronic de ONRC, cu autenticitate verificabilă la Registrul Comerțului.' },
           ]}
         />
 

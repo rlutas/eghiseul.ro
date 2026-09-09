@@ -555,7 +555,7 @@ export default async function IdentificareImobilPage() {
             { q: 'Cât durează?', a: `${formatEstimatedDays(service)}. Verificarea este făcută de un operator, pentru că presupune căutarea imobilului după adresă.` },
             { q: 'Funcționează pentru apartamente?', a: 'Da, dar apartamentele pot necesita verificări suplimentare (bloc, scară, etaj) și uneori date din actul de proprietate. Te ținem la curent.' },
             { q: 'Ce se întâmplă dacă imobilul nu poate fi identificat?', a: 'Dacă imobilul nu este înscris în cartea funciară (neintabulat / fără cadastru), identificarea poate să nu reușească. În acest caz căutăm date utile prin alte surse oficiale și îți comunicăm rezultatul.' },
-            { q: 'Am nevoie de cont ANCPI?', a: 'Nu. Ne ocupăm noi de tot procesul; tu trebuie doar să ne dai adresa imobilului.' },
+            { q: 'Trebuie să am cont ANCPI ca să cer identificarea?', a: 'Nu. Ne ocupăm noi de tot procesul; tu trebuie doar să ne dai adresa imobilului.' },
             { q: 'Pot identifica imobilul și după proprietar?', a: 'Căutarea standard este după adresă. Dacă ai doar numele proprietarului, contactează-ne și verificăm ce opțiuni sunt disponibile pentru cazul tău.' },
           ]}
         />

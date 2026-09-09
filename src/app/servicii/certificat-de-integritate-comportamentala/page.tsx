@@ -590,14 +590,14 @@ export default async function CertificatIntegritatePage() {
             { q: 'Ce este certificatul de integritate comportamentală?', a: 'Este documentul eliberat de IGPR (Poliția Română) care atestă că persoana nu a fost sancționată pentru infracțiuni împotriva unor categorii vulnerabile, în special minori. A fost introdus prin Legea 118/2019.' },
             { q: 'Care este diferența față de cazierul judiciar?', a: 'Nu sunt același document. Cazierul judiciar arată toate condamnările penale, pe când certificatul de integritate comportamentală are un scop mult mai restrâns — atestă strict lipsa sancțiunilor pentru infracțiuni asupra minorilor și a persoanelor vulnerabile.' },
             { q: 'Când este obligatoriu?', a: 'Conform Legii 118/2019, este cerut la angajarea în roluri care presupun contact direct cu minori sau cu persoane vulnerabile: școli, creșe, after-school, cluburi sportive de copii, voluntariat și medii sensibile precum cel medical sau social.' },
-            { q: 'Cât durează eliberarea?', a: `${formatEstimatedDays(service)} în mod standard. Există și opțiunea Urgent, în ${formatUrgentDays(service)}.` },
+            { q: 'În cât timp primesc certificatul de integritate?', a: `${formatEstimatedDays(service)} în mod standard. Există și opțiunea Urgent, în ${formatUrgentDays(service)}.` },
             { q: 'Cât este valabil certificatul?', a: 'De regulă aproximativ 6 luni de la eliberare, însă valabilitatea efectivă depinde de cerințele instituției sau angajatorului care îl solicită. Verifică termenul cerut înainte de depunere.' },
             { q: 'De ce aveți nevoie de datele mele personale?', a: 'Datele personale și actul de identitate sunt necesare pentru a depune cererea la IGPR în numele tău și pentru verificarea de identitate (KYC), cerută de procedura oficială. Datele sunt prelucrate securizat.' },
             { q: 'Pot obține certificatul de integritate comportamentală online, fără să merg la Poliție?', a: 'Da. Întregul proces este online: completezi formularul, faci verificarea de identitate și plătești, iar noi depunem cererea la IGPR. Primești certificatul pe email, fără deplasare și fără cont pe platforma oficială.' },
             { q: 'Certificatul de integritate comportamentală este gratuit?', a: 'Nu. IGPR percepe o taxă oficială pentru eliberare. Prin eGhișeul plătești prețul afișat, cu taxa oficială inclusă, fără costuri suplimentare.' },
             { q: 'Pot obține certificatul în Cluj, București sau alt oraș?', a: 'Da. Pentru că serviciul este 100% online, îl poți obține din orice județ — București, Cluj, Iași, Timișoara, Constanța sau oriunde te afli — fără să te deplasezi la un sediu IGPR local.' },
             { q: '„Adeverința de integritate comportamentală” este același lucru cu certificatul?', a: 'Da. Unele instituții folosesc denumirea de adeverință, dar se referă la același document emis de IGPR conform Legii 118/2019.' },
-            { q: 'Cum primesc documentul?', a: 'Pe email, ca PDF semnat electronic de IGPR. La cerere, certificatul poate fi livrat și prin curier.' },
+            { q: 'Certificatul vine pe email sau pe hârtie?', a: 'Pe email, ca PDF semnat electronic de IGPR. La cerere, certificatul poate fi livrat și prin curier.' },
           ]}
         />
 

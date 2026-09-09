@@ -546,7 +546,7 @@ export default async function IdentificareImobileProprietarPage() {
             { q: 'Cât durează?', a: `${formatEstimatedDays(service)}. Căutarea este făcută de un operator, pentru că presupune verificarea eligibilității și identificarea imobilelor după proprietar.` },
             { q: 'Cât costă serviciul?', a: `${service.base_price} RON, cu taxele OCPI incluse. Fără costuri ascunse.` },
             { q: 'Este legal? Cum respectați protecția datelor (GDPR)?', a: 'Căutarea după proprietar prelucrează date cu caracter personal și este permisă doar pe baza unui interes legitim (de exemplu calitatea de moștenitor, creditor sau parte într-un litigiu). Înainte de procesare verificăm eligibilitatea cererii; dacă nu sunt îndeplinite condițiile, nu efectuăm căutarea.' },
-            { q: 'Am nevoie de cont ANCPI?', a: 'Nu. Ne ocupăm noi de tot procesul; tu trebuie doar să ne dai numele proprietarului și zona în care să căutăm.' },
+            { q: 'Pot cere căutarea fără cont pe portalul ANCPI?', a: 'Nu. Ne ocupăm noi de tot procesul; tu trebuie doar să ne dai numele proprietarului și zona în care să căutăm.' },
           ]}
         />
 

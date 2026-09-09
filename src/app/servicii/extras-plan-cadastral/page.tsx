@@ -560,9 +560,9 @@ export default async function ExtrasPlanCadastralPage() {
             { q: 'Pot vedea cadastrul online pentru un imobil?', a: 'Da. Harta cadastrală o poți consulta informativ pe geoportalul ANCPI. Dacă ai nevoie de documentul care arată imobilul pe ortofotoplan, comanzi extrasul de plan cadastral și îl primești pe email, fără cont ANCPI și fără deplasare.' },
             { q: 'Cum verific dacă un teren este înscris în cadastru?', a: 'Dacă ai numărul cadastral sau de carte funciară, îți obținem planul cadastral care confirmă înscrierea și poziția imobilului. Dacă nu cunoști numărul, îl aflăm după adresă prin serviciul de identificare imobil.' },
             { q: 'Cât costă planul cadastral?', a: `${service.base_price} RON, cu taxele ANCPI incluse. Fără costuri ascunse.` },
-            { q: 'Cât durează eliberarea?', a: `${formatEstimatedDays(service)}. Documentul este procesat de un operator și livrat pe email.` },
-            { q: 'Nu știu numărul cadastral. Ce fac?', a: 'Îl putem afla după adresă prin serviciul de Identificare Imobil, apoi îți obținem planul cadastral.' },
-            { q: 'Am nevoie de cont ANCPI?', a: 'Nu. Ne ocupăm noi de tot procesul; tu ai nevoie doar de numărul cadastral sau de carte funciară.' },
+            { q: 'În cât timp am extrasul de plan cadastral?', a: `${formatEstimatedDays(service)}. Documentul este procesat de un operator și livrat pe email.` },
+            { q: 'Am doar adresa terenului, nu și numărul cadastral. Se poate?', a: 'Îl putem afla după adresă prin serviciul de Identificare Imobil, apoi îți obținem planul cadastral.' },
+            { q: 'Trebuie să-mi fac cont pe portalul ANCPI ca să comand?', a: 'Nu. Ne ocupăm noi de tot procesul; tu ai nevoie doar de numărul cadastral sau de carte funciară.' },
           ]}
         />
 

@@ -69,6 +69,11 @@ const SVC = {
   identificareImobil: { href: '/servicii/identificare-imobil/', label: 'Identificare imobil', desc: 'Afli numărul de CF și cadastral când ai doar date vechi.' },
   copieCF: { href: '/servicii/copie-carte-funciara/', label: 'Copie carte funciară', desc: 'Copia CF-ului vechi, cu istoricul înscrierilor.' },
   urbanism: { href: '/servicii/certificat-urbanism-informare/', label: 'Certificat de urbanism pentru informare', desc: 'Afli ce se poate construi pe teren ÎNAINTE să cumperi — restricții, POT/CUT, interdicții.' },
+  // Tool gratuit, nu serviciu — dar e pagina cu cele mai multe clicuri de pe site
+  // (32.589 pe trei luni) și avea DOUĂ linkuri interne. Poziția i-a căzut de la
+  // 5,95 la 31,92 după update (audit 09.09.2026).
+  rovinietaTool: { href: '/tools/verificare-rovinieta-online/', label: 'Verificare rovinietă', desc: 'Vezi gratuit dacă mașina are rovinieta valabilă și până când.' },
+  rovinieta: { href: '/servicii/rovinieta-online/', label: 'Rovinietă online', desc: 'Cumperi rovinieta în câteva minute, cu confirmare pe email.' },
 } satisfies Record<string, RelatedService>;
 
 const DEFAULT_RELATED: RelatedService[] = [SVC.cazier, SVC.extrasCF, SVC.constatator];
@@ -183,8 +188,8 @@ const RELATED_BY_SLUG: Record<string, RelatedService[]> = {
   'termene-judiciare': [SVC.cazier, SVC.extrasCF],
   'taxa-judiciara-de-timbru': [SVC.cazier, SVC.extrasCF],
   // Auto
-  'amenda-circulatie': [SVC.cazierAuto, SVC.cazier],
-  'calculator-impozit-auto': [SVC.cazierAuto, SVC.constatator],
+  'amenda-circulatie': [SVC.rovinietaTool, SVC.cazierAuto, SVC.cazier],
+  'calculator-impozit-auto': [SVC.rovinietaTool, SVC.rovinieta, SVC.cazierAuto],
   // Muncă / angajare → cazier
   'salariu': [SVC.cazier, SVC.cazierFiscal],
   'spor-salarial': [SVC.cazier, SVC.constatator],
