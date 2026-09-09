@@ -200,7 +200,7 @@ describe('articleNode', () => {
 });
 
 describe('buildArticlePageGraph', () => {
-  it('wraps a 4-node @graph (Org + Website + Breadcrumb + Article)', () => {
+  it('wraps a 5-node @graph (Org + Website + Breadcrumb + Article + Person)', () => {
     const graph = buildArticlePageGraph({
       slug: 'taxa-cazier-judiciar',
       headline: 'Taxa Cazier Judiciar 2026',
@@ -210,7 +210,8 @@ describe('buildArticlePageGraph', () => {
     });
 
     const types = graph['@graph'].map((n) => n['@type']);
-    expect(types).toEqual(['Organization', 'WebSite', 'BreadcrumbList', 'Article']);
+    // Person = autorul real, cu pagină proprie (seo/author.ts), adăugat 09.09.2026.
+    expect(types).toEqual(['Organization', 'WebSite', 'BreadcrumbList', 'Article', 'Person']);
   });
 });
 

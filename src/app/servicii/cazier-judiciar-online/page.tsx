@@ -1158,7 +1158,7 @@ export default function CazierJudiciarHubPage() {
               <div>
                 <p>
                   <span className="font-semibold text-secondary-900">
-                    Conținut revizuit de Departamentul Juridic eGhișeul.ro
+                    Conținut verificat de Luțaș Raul Cătălin, fondator eGhișeul.ro
                   </span>{' '}
                   &mdash; specialiști drept administrativ, eDigitalizare SRL.
                 </p>

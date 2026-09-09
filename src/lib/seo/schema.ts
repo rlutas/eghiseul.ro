@@ -14,6 +14,7 @@
  * - HowTo (rich results removed Sept 2023)
  */
 
+import { authorNode } from './author';
 import { BASE_URL, ORGANIZATION } from './constants';
 
 export interface BreadcrumbItem {
@@ -295,6 +296,8 @@ export function buildArticlePageGraph(input: ArticleSchemaInput) {
       websiteNode(),
       breadcrumbNode(input.breadcrumb),
       articleNode(input),
+      // Autorul e o persoană reală, cu pagină proprie — vezi seo/author.ts.
+      authorNode(),
     ],
   };
 }

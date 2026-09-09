@@ -33,6 +33,9 @@ const STATIC_PAGES: SitemapEntry[] = [
   { url: `${BASE_URL}/calculator/`, changeFrequency: 'weekly', priority: 0.8 },
   { url: `${BASE_URL}/tools/`, changeFrequency: 'weekly', priority: 0.7 },
   { url: `${BASE_URL}/blog/`, changeFrequency: 'weekly', priority: 0.7 },
+  // Cine suntem și cine răspunde de conținut (E-E-A-T) — pagini noi, 09.09.2026.
+  { url: `${BASE_URL}/despre-noi/`, changeFrequency: 'monthly', priority: 0.6 },
+  { url: `${BASE_URL}/despre-noi/raul-lutas/`, changeFrequency: 'monthly', priority: 0.5 },
   { url: `${BASE_URL}/curs-valutar/`, changeFrequency: 'daily', priority: 0.7 },
   { url: `${BASE_URL}/contact/`, changeFrequency: 'monthly', priority: 0.6 },
   { url: `${BASE_URL}/termeni-si-conditii/`, changeFrequency: 'yearly', priority: 0.3 },

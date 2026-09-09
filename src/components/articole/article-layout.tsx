@@ -1,10 +1,10 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { ChevronRight, CalendarDays, RefreshCw, ArrowRight, Phone } from 'lucide-react';
+import { ChevronRight, CalendarDays, RefreshCw, ArrowRight, Phone, PenLine } from 'lucide-react';
 import { Footer } from '@/components/home/footer';
 import { Button } from '@/components/ui/button';
 import { ServiceFAQ } from '@/components/services/service-faq';
-import { buildArticlePageGraph, serviceUrl, BASE_URL } from '@/lib/seo';
+import { buildArticlePageGraph, serviceUrl, BASE_URL, SITE_AUTHOR } from '@/lib/seo';
 
 export interface RelatedService {
   /** DB service slug — resolved through serviceUrl(). Ignored if `href` is set. */
@@ -30,6 +30,12 @@ export interface ArticleLayoutProps {
   imageAlt?: string;
   relatedServices?: RelatedService[];
   faqs?: { q: string; a: string }[];
+  /**
+   * Autorul articolului. Implicit `SITE_AUTHOR` — până pe 09.09.2026 prop-ul
+   * ăsta nu exista deloc, deci pe 243 de pagini era o singură semnătură
+   * vizibilă, iar în schema `author` cădea pe Organization.
+   */
+  author?: { name: string; url: string };
   children: React.ReactNode;
 }
 
@@ -46,6 +52,7 @@ export function ArticleLayout({
   imageAlt,
   relatedServices = [],
   faqs,
+  author = { name: SITE_AUTHOR.name, url: SITE_AUTHOR.url },
   children,
 }: ArticleLayoutProps) {
   // Featured image: derive from slug by convention unless explicitly passed.
@@ -57,6 +64,7 @@ export function ArticleLayout({
     description,
     datePublished,
     dateModified,
+    author,
     image: featuredImage.startsWith('http') ? featuredImage : `${BASE_URL}${featuredImage}`,
     breadcrumb: [
       { name: 'Acasă', url: `${BASE_URL}/` },
@@ -103,6 +111,13 @@ export function ArticleLayout({
             <p className="text-lg text-white/85 leading-relaxed mb-6">{description}</p>
 
             <div className="flex flex-wrap items-center gap-4 text-sm text-white/60">
+              <span className="inline-flex items-center gap-1.5">
+                <PenLine className="h-4 w-4" aria-hidden="true" />
+                Scris de{' '}
+                <Link href={author.url} className="underline underline-offset-2 hover:text-white">
+                  {author.name}
+                </Link>
+              </span>
               {publishedLabel && (
                 <span className="inline-flex items-center gap-1.5">
                   <CalendarDays className="h-4 w-4" aria-hidden="true" />
