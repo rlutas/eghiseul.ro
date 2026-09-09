@@ -99,9 +99,9 @@ export async function PATCH(
 
 // ──────────────────────────────────────────────────────────────
 // DELETE /api/admin/settings/number-registry/[id]
-// Ștergere DEFINITIVĂ (pentru intrări greșite / test). Pentru numere
-// consumate real folosiți ANULAREA (void) — ștergerea eliberează numărul
-// doar dacă micșorați manual next_number pe interval.
+// ELIBERARE (UI: „Eliberează"): scoate rândul din jurnal și pune numărul în
+// released_numbers, de unde allocate_number îl reconsumă la următoarea
+// alocare. Pentru contracte reale anulate folosiți ANULAREA (void).
 // ──────────────────────────────────────────────────────────────
 export async function DELETE(
   request: NextRequest,

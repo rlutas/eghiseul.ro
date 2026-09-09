@@ -123,6 +123,15 @@ export default function AdminRegistruPage() {
             La comenzile neplătite NU se emit numere; la regenerare de documente numărul se refolosește (nu se irosește).
           </li>
           <li>
+            <strong>Ai greșit ceva?</strong> Trei situații, trei butoane:
+            <span className="block pl-3">
+              ✏️ <strong>Editează</strong> — client greșit, dată greșită: corectezi datele, numărul rămâne la client.<br />
+              🗑 <strong>Anulează</strong> — contract real anulat (refund): numărul rămâne consumat, cu mențiune. Lasă un gol justificat.<br />
+              🗑 → <strong>Eliberează</strong> — număr luat din greșeală, pe niciun document: dispare din jurnal și se refolosește
+              <em> automat la următoarea alocare</em>, de pe oricare platformă. Registrul rămâne fără goluri.
+            </span>
+          </li>
+          <li>
             Dacă o alocare eșuează (registru indisponibil), comanda se procesează normal și numărul se alocă
             automat la următoarea rulare a cronului orar — vezi nota de pe comandă.
           </li>
@@ -167,6 +176,9 @@ function NumberRegistryContent() {
   const [voidDialogOpen, setVoidDialogOpen] = useState(false);
   const [voidEntryId, setVoidEntryId] = useState<string | null>(null);
   const [voidReason, setVoidReason] = useState('');
+  /** 'void' = contract real anulat (numărul rămâne consumat, cu mențiune);
+   *  'release' = alocare greșită (numărul se refolosește la următoarea alocare). */
+  const [voidMode, setVoidMode] = useState<'void' | 'release'>('void');
 
   // Forms
   const [newRange, setNewRange] = useState({
@@ -268,7 +280,7 @@ function NumberRegistryContent() {
     contractNumber: number | null;
     contractEntryId: string | null;
     contractDocS3Key: string | null;
-    delegationNumbers: { number: number; series: string | null; id: string; s3Key: string | null; serviceType: string | null }[];
+    delegationNumbers: { number: number; series: string | null; id: string; s3Key: string | null; serviceType: string | null; clientName: string }[];
     date: string;
     clientName: string;
     clientCnp: string | null;
@@ -327,6 +339,13 @@ function NumberRegistryContent() {
       if (entry.type === 'contract') {
         group.contractNumber = entry.number;
         group.contractEntryId = entry.id;
+        // Numele grupului vine din rândul de CONTRACT, nu din primul rând
+        // întâlnit (lista e sortată descrescător după număr, deci delegația
+        // ar câștiga). Dacă delegația a fost editată pe alt client, numele
+        // ei se arată lângă numărul ei — nu înlocuiește contractul.
+        group.clientName = entry.client_name;
+        group.clientCnp = entry.client_cnp;
+        group.clientCui = entry.client_cui;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         group.contractDocS3Key = (entry as any).document_s3_key || null;
       } else {
@@ -337,6 +356,7 @@ function NumberRegistryContent() {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           s3Key: (entry as any).document_s3_key || null,
           serviceType: entry.service_type,
+          clientName: entry.client_name,
         });
       }
       if (entry.voided_at) {
@@ -528,12 +548,12 @@ function NumberRegistryContent() {
   };
 
   const handleDeletePermanent = async (entryId: string, label: string) => {
-    if (!window.confirm(`Stergi DEFINITIV ${label} din registru? Pentru numere consumate real folositi Anulare (numarul nu se refoloseste). Stergerea e pentru intrari gresite/test.`)) return;
+    if (!window.confirm(`Eliberezi ${label}? Randul dispare din jurnal, iar numarul se refoloseste AUTOMAT la urmatoarea alocare (manuala sau de pe oricare platforma). Folositi doar daca numarul NU apare pe niciun document emis.`)) return;
     try {
       const res = await fetch(`/api/admin/settings/number-registry/${entryId}`, { method: 'DELETE' });
       const json = await res.json();
       if (json.success) {
-        toast.success('Inregistrare stearsa definitiv');
+        toast.success('Numar eliberat — se refoloseste la urmatoarea alocare');
         fetchRegistry(pagination.page);
       } else {
         toast.error(json.error || 'Eroare la stergere');
@@ -545,17 +565,22 @@ function NumberRegistryContent() {
     if (!voidEntryId) return;
     setSaving(true);
     try {
-      const res = await fetch(`/api/admin/settings/number-registry/${voidEntryId}/void`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reason: voidReason }),
-      });
+      const res = voidMode === 'release'
+        ? await fetch(`/api/admin/settings/number-registry/${voidEntryId}`, { method: 'DELETE' })
+        : await fetch(`/api/admin/settings/number-registry/${voidEntryId}/void`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ reason: voidReason }),
+          });
       const json = await res.json();
       if (json.success) {
-        toast.success('Numar anulat cu succes');
+        toast.success(voidMode === 'release'
+          ? 'Numar eliberat — se refoloseste automat la urmatoarea alocare'
+          : 'Numar anulat — ramane consumat, cu mentiune in registru');
         setVoidDialogOpen(false);
         setVoidEntryId(null);
         setVoidReason('');
+        setVoidMode('void');
         fetchRegistry();
       } else {
         toast.error(json.error || 'Eroare la anularea numarului');
@@ -904,6 +929,14 @@ function NumberRegistryContent() {
                                           : d.serviceType.startsWith('bundled:')
                                             ? d.serviceType.split(':').pop()
                                             : d.serviceType}
+                                      </span>
+                                    )}
+                                    {d.clientName !== group.clientName && (
+                                      <span
+                                        className="ml-1 font-sans text-[10px] text-amber-700"
+                                        title="Delegația e pe alt client decât contractul din același grup"
+                                      >
+                                        ({d.clientName})
                                       </span>
                                     )}
                                     {d.s3Key && (
@@ -1288,22 +1321,45 @@ function NumberRegistryContent() {
       <Dialog open={voidDialogOpen} onOpenChange={setVoidDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Anulare Numar</DialogTitle>
+            <DialogTitle>Ce faci cu numărul?</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4">
-            <p className="text-sm text-muted-foreground">
-              Numarul anulat nu va putea fi reutilizat. Aceasta actiune este ireversibila.
+          <div className="space-y-3">
+            <label className={`flex gap-3 rounded-lg border p-3 cursor-pointer ${voidMode === 'void' ? 'border-red-400 bg-red-50' : ''}`}>
+              <input type="radio" name="void-mode" className="mt-1" checked={voidMode === 'void'} onChange={() => setVoidMode('void')} />
+              <span className="text-sm">
+                <span className="font-semibold">Anulează — contractul a existat și s-a anulat</span>
+                <span className="block text-muted-foreground">
+                  Numărul rămâne consumat, cu mențiunea „anulat” în registru (așa cere evidența Baroului).
+                  Nu se refolosește niciodată. Folosește pentru refund sau contract semnat și apoi anulat.
+                </span>
+              </span>
+            </label>
+            <label className={`flex gap-3 rounded-lg border p-3 cursor-pointer ${voidMode === 'release' ? 'border-amber-400 bg-amber-50' : ''}`}>
+              <input type="radio" name="void-mode" className="mt-1" checked={voidMode === 'release'} onChange={() => setVoidMode('release')} />
+              <span className="text-sm">
+                <span className="font-semibold">Eliberează — numărul a fost luat din greșeală</span>
+                <span className="block text-muted-foreground">
+                  Rândul dispare din jurnal, iar numărul se refolosește <strong>automat la următoarea alocare</strong>
+                  (manuală sau de pe oricare platformă). Registrul rămâne fără gol. Folosește DOAR dacă numărul
+                  nu apare pe niciun document emis.
+                </span>
+              </span>
+            </label>
+            <p className="text-xs text-muted-foreground">
+              Ai pus numărul pe clientul greșit? Nu anula: folosește <strong>Editează</strong> (creionul) și corectează numele — numărul rămâne al lui.
             </p>
-            <div>
-              <Label>Motiv anulare</Label>
-              <Textarea value={voidReason} onChange={e => setVoidReason(e.target.value)} placeholder="Ex: Comanda anulata de client" />
-            </div>
+            {voidMode === 'void' && (
+              <div>
+                <Label>Motiv anulare</Label>
+                <Textarea value={voidReason} onChange={e => setVoidReason(e.target.value)} placeholder="Ex: Comanda anulata de client" />
+              </div>
+            )}
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => { setVoidDialogOpen(false); setVoidEntryId(null); setVoidReason(''); }}>Anuleaza</Button>
+            <Button variant="outline" onClick={() => { setVoidDialogOpen(false); setVoidEntryId(null); setVoidReason(''); setVoidMode('void'); }}>Renunță</Button>
             <Button variant="destructive" onClick={handleVoid} disabled={saving}>
               {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-              Anuleaza numarul
+              {voidMode === 'release' ? 'Eliberează numărul' : 'Anulează numărul'}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -1378,7 +1434,7 @@ function NumberRegistryContent() {
 }
 
 /** Acțiuni per intrare de registru: editare, anulare (void), iar pe cele
- *  anulate — restaurare sau ștergere definitivă. */
+ *  anulate — restaurare sau eliberare (numărul intră la refolosire). */
 function EntryActions({
   entryId,
   label,
@@ -1412,7 +1468,7 @@ function EntryActions({
         <button
           onClick={() => onVoid(entryId)}
           className="p-1 text-red-600 hover:text-red-800"
-          title={`Anuleaza ${label} (numarul nu se refoloseste)`}
+          title={`Anuleaza sau elibereaza ${label}`}
         >
           <Trash2 className="h-3.5 w-3.5" />
         </button>
@@ -1428,7 +1484,7 @@ function EntryActions({
           <button
             onClick={() => onDelete(entryId, label)}
             className="p-1 text-red-600 hover:text-red-800"
-            title={`Sterge DEFINITIV ${label}`}
+            title={`Elibereaza ${label} (dispare din jurnal, numarul se refoloseste la urmatoarea alocare)`}
           >
             <X className="h-3.5 w-3.5" />
           </button>

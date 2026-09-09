@@ -212,9 +212,17 @@ Orice add-on nou care primește delegație trebuie adăugat ȘI în
   `date_from=2026-07-01`): evidența ianuarie–iunie e în fișierele vechi de pe
   Drive (era Google Sheets) și nu se dublează; anii următori se exportă complet.
 - Acțiuni per număr: ✏️ Editare (număr/serie/client/serviciu/descriere/sumă/
-  dată — duplicatele respinse de UNIQUE), 🗑 Anulare (void, numărul NU se
-  refolosește), pe anulate: ↩️ Restaurare, ❌ Ștergere definitivă (doar pentru
-  intrări greșite/test).
+  dată — duplicatele respinse de UNIQUE; merge și pe anulate), 🗑 deschide
+  dialogul cu DOUĂ opțiuni (2026-09-09): **Anulează** (void, numărul rămâne
+  consumat cu mențiune) sau **Eliberează** (release, numărul se refolosește
+  automat la următoarea alocare); pe anulate: ↩️ Restaurare, ❌ Eliberează.
+  Incidentul care a cerut dialogul: echipa a „anulat" 006214 (MIHUT VALER)
+  așteptând refolosirea; void nu refolosește prin design, iar textul vechi
+  („ștergerea e pentru intrări greșite/test") descuraja exact pasul corect.
+- Numele grupului (contract + delegații pe același `order_ref`) vine din
+  rândul de CONTRACT; o delegație editată pe alt client își arată numele
+  lângă numărul ei (2026-09-09 — înainte lua primul rând din listă, adică
+  delegația, și „SC FREMAN SRL" apărea cu contractul lui MIHUT VALER).
 
 ### Numere ELIBERATE (fără goluri în registru) — 2026-08-12
 
@@ -267,8 +275,11 @@ neatins).
 - **Adaugi interval nou** (numere noi de la Barou): `/admin/registru` →
   Intervale → Adaugă. Contract = fără serie; Delegație = serie (ex. SM).
   ⚠️ Înainte de 1 ianuarie trebuie să existe interval activ pe anul nou.
-- **Anulezi un număr** (refund / greșeală): jurnal → Anulează (void). Numărul
-  rămâne consumat, nu se refolosește niciodată.
+- **Ai greșit ceva**: client greșit → ✏️ Editează (numărul rămâne). Contract
+  real anulat (refund) → 🗑 Anulează (void; consumat, cu mențiune). Număr luat
+  din greșeală, pe niciun act → 🗑 Eliberează (release; se refolosește
+  automat la următoarea alocare, de pe ORICE platformă — nu se poate țintí
+  un client anume).
 - **Interval epuizat**: comenzile se procesează normal, alocarea rămâne pe
   retry (cron) + notă pe comandă; adaugi interval și cron-ul recuperează.
 - **Intrare manuală** (cazuri personale avocat): jurnal → Adaugă manual
