@@ -289,18 +289,29 @@ export default async function ExtrasMultilingvNasterePage() {
             </h2>
             <div className="space-y-4 text-neutral-700 leading-relaxed">
               <p>
-                <strong>Extrasul multilingv de pe certificatul de naștere</strong> este un formular standard
-                multilingv introdus prin <strong>Regulamentul (UE) 2016/1191</strong>. El însoțește
-                certificatul de naștere și redă datele acestuia în limbile oficiale ale statelor membre,
-                astfel încât actul tău este acceptat de autoritățile din <strong>toate statele Uniunii
-                Europene fără traducere autorizată și fără apostilă</strong>.
+                Extrasul multilingv este formularul standard introdus prin{' '}
+                <strong>Regulamentul (UE) 2016/1191</strong>, care însoțește certificatul de naștere și
+                redă aceleași date în limbile oficiale ale statelor membre. Autoritatea din alt stat UE
+                îl citește direct, fără traducere autorizată și fără apostilă.
               </p>
               <p>
-                Documentul se eliberează de <strong>serviciul de stare civilă al primăriei care deține actul
-                de naștere</strong>. Prin eGhișeul nu trebuie să te deplasezi: completezi datele online,
-                semnezi electronic împuternicirea direct în formular, iar <strong>avocatul nostru
-                partener</strong> depune cererea la primăria competentă. Primești extrasul electronic și/sau
-                prin curier, inclusiv internațional prin DHL — util mai ales dacă ești deja plecat din țară.
+                Un lucru care încurcă des lumea: extrasul <strong>nu înlocuiește</strong> certificatul de
+                naștere. Merge alături de el. Dacă nu mai ai certificatul sau e deteriorat, ai nevoie
+                întâi de un duplicat, altfel extrasul rămâne fără actul pe care îl traduce.
+              </p>
+              <p>
+                Cererea se depune la <strong>primăria care deține actul de naștere</strong>, adică
+                acolo unde s-a înregistrat nașterea. Pentru majoritatea oamenilor plecați din țară,
+                aceea nu e primăria din orașul unde locuiesc acum, ci cea din localitatea natală. De-aia
+                serviciul are sens: completezi datele online, semnezi electronic împuternicirea în
+                formular, iar avocatul partener depune cererea la primăria competentă. Primești extrasul
+                pe email și, dacă vrei, originalul prin curier, inclusiv în afara țării.
+              </p>
+              <p>
+                Dacă nașterea a avut loc în străinătate, actul românesc există abia după{' '}
+                <strong>transcrierea certificatului străin</strong> în registrele de stare civilă din
+                România. Fără transcriere nu are cine să elibereze extrasul, fiindcă nu există act
+                românesc de naștere. Verifică asta înainte de comandă.
               </p>
               <p>
                 Dacă nu mai ai certificatul de naștere sau ai nevoie și de un exemplar nou, poți comanda în
@@ -548,7 +559,14 @@ export default async function ExtrasMultilingvNasterePage() {
                 </div>
               </div>
               <div>
-                <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-4">Cum arată extrasul multilingv</h2>
+                <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-4">Ce scrie în extrasul de naștere</h2>
+                <p className="text-neutral-700 leading-relaxed mb-4">
+                  Rubricile sunt numerotate identic în toate statele membre, ca funcționarul străin să
+                  le găsească fără să știe română: numele și prenumele titularului, data și locul
+                  nașterii, sexul, plus <strong>numele complet al mamei și al tatălui</strong>. Filiația
+                  e partea pentru care se cere cel mai des documentul, în dosarele de cetățenie prin
+                  descendență și la înscrierea copilului într-o instituție din altă țară.
+                </p>
                 <p className="text-neutral-700 leading-relaxed mb-3">
                   Formularul standard multilingv are un format unic în toată Uniunea Europeană: rubricile sunt
                   numerotate și traduse în limbile oficiale ale statelor membre, astfel încât autoritatea din
@@ -579,7 +597,8 @@ export default async function ExtrasMultilingvNasterePage() {
                     'Act de identitate valabil (CI sau pașaport) — îl scanezi direct în formular',
                     'Selfie cu actul de identitate, pentru verificarea identității',
                     'Datele actului de naștere: data, locul înregistrării, numele părinților',
-                    'Atât — împuternicirea o semnezi electronic, direct în wizard',
+                    'Dacă cererea e pentru un copil minor: actul tău de identitate ca părinte',
+                    'Împuternicirea o semnezi electronic, direct în wizard',
                   ].map((row) => (
                     <li key={row} className="flex items-start gap-2">
                       <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
@@ -620,6 +639,10 @@ export default async function ExtrasMultilingvNasterePage() {
             { q: 'De unde se eliberează și cine depune cererea?', a: 'Se eliberează de serviciul de stare civilă al primăriei care deține actul de naștere. Prin eGhișeul, avocatul nostru partener depune cererea prin împuternicire — pe care o semnezi electronic direct în formular — fără să te deplasezi la ghișeu.' },
             { q: 'Cât durează și cum primesc documentul?', a: `Termenul standard este de ${formatEstimatedDays(service)}, în funcție de oficiul stării civile care deține actul. Primești extrasul electronic pe email și/sau în original prin curier, inclusiv internațional prin DHL, oriunde în lume.` },
             { q: 'Ce acte îmi trebuie ca să comand?', a: 'Doar actul de identitate (îl scanezi în formular), un selfie cu actul pentru verificarea identității și datele actului de naștere: data, locul înregistrării și numele părinților. Wizard-ul online te ghidează pas cu pas.' },
+            { q: 'Extrasul multilingv înlocuiește certificatul de naștere?', a: 'Nu. Extrasul însoțește certificatul, nu îl înlocuiește. Dacă nu mai ai certificatul sau e deteriorat, ai nevoie și de un duplicat — altfel rămâi cu formularul multilingv fără actul pe care îl traduce.' },
+            { q: 'Copilul s-a născut în străinătate. Pot cere extrasul multilingv?', a: 'Nu direct. Actul de naștere românesc există abia după transcrierea certificatului străin în registrele de stare civilă din România. Până la transcriere nu are cine elibera extrasul, fiindcă nu există act românesc de naștere. Transcrierea se face la primăria de domiciliu sau prin misiunea diplomatică.' },
+            { q: 'La ce primărie se depune cererea?', a: 'La primăria care deține actul de naștere, adică cea din localitatea unde s-a înregistrat nașterea — nu cea unde locuiești acum. Pentru cine e plecat din țară, asta e de obicei localitatea natală, la câteva sute de kilometri distanță.' },
+            { q: 'Îmi trebuie extrasul de naștere sau cel de căsătorie?', a: 'Depinde ce dovedești. Extrasul de naștere dovedește data, locul nașterii și filiația (numele părinților) — se cere la înscrierea copilului la școală, la alocații, la dosarele de cetățenie prin descendență. Extrasul de căsătorie dovedește căsătoria și numele purtat după căsătorie. Sunt documente distincte; unele dosare le cer pe amândouă.' },
           ]}
         />
 

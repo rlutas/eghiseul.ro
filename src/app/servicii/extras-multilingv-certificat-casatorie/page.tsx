@@ -289,18 +289,33 @@ export default async function ExtrasMultilingvCasatoriePage() {
             </h2>
             <div className="space-y-4 text-neutral-700 leading-relaxed">
               <p>
-                <strong>Extrasul multilingv de pe certificatul de căsătorie</strong> este un formular standard
-                multilingv introdus prin <strong>Regulamentul (UE) 2016/1191</strong>. El însoțește
-                certificatul de căsătorie și redă datele acestuia în limbile oficiale ale statelor membre,
-                astfel încât actul tău este acceptat de autoritățile din <strong>toate statele Uniunii
-                Europene fără traducere autorizată și fără apostilă</strong>.
+                Extrasul multilingv este formularul standard introdus prin{' '}
+                <strong>Regulamentul (UE) 2016/1191</strong>, care însoțește certificatul de căsătorie și
+                redă aceleași date în limbile oficiale ale statelor membre. Autoritatea din alt stat UE
+                îl citește direct, fără traducere autorizată și fără apostilă.
               </p>
               <p>
-                Documentul se eliberează de <strong>serviciul de stare civilă al primăriei care deține actul
-                de căsătorie</strong>. Prin eGhișeul nu trebuie să te deplasezi: completezi datele online,
-                semnezi electronic împuternicirea direct în formular, iar <strong>avocatul nostru
-                partener</strong> depune cererea la primăria competentă. Primești extrasul electronic și/sau
-                prin curier, inclusiv internațional prin DHL — util mai ales dacă locuiești deja în alt stat UE.
+                Confuzia cea mai frecventă, și cea mai costisitoare: extrasul de căsătorie dovedește o
+                căsătorie care <strong>există deja</strong>. Dacă vrei să te căsătorești în altă țară,
+                ofițerul de stare civilă de acolo îți cere certificatul de celibat, care spune exact
+                opusul. Sunt două documente diferite, pentru două momente diferite.
+              </p>
+              <p>
+                Pe lângă numele soților și data căsătoriei, extrasul arată și{' '}
+                <strong>numele purtat de fiecare soț după căsătorie</strong>. Ăsta e, în practică,
+                motivul pentru care e cerut cel mai des: e dovada oficială care leagă numele vechi de cel
+                nou, când îți schimbi numele în actele, la banca sau la angajatorul din altă țară.
+              </p>
+              <p>
+                Cererea se depune la <strong>primăria care deține actul de căsătorie</strong>, adică
+                acolo unde s-a încheiat căsătoria. Completezi datele online, semnezi electronic
+                împuternicirea în formular, iar avocatul partener depune cererea la primăria competentă.
+                Primești extrasul pe email și, dacă vrei, originalul prin curier, inclusiv în afara țării.
+              </p>
+              <p>
+                Dacă v-ați căsătorit în străinătate, actul românesc există abia după{' '}
+                <strong>transcrierea certificatului străin</strong> în registrele de stare civilă din
+                România. Fără transcriere nu are cine elibera extrasul.
               </p>
               <p>
                 Dacă nu mai ai certificatul de căsătorie sau ai nevoie și de un exemplar nou, poți comanda în
@@ -548,7 +563,14 @@ export default async function ExtrasMultilingvCasatoriePage() {
                 </div>
               </div>
               <div>
-                <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-4">Cum arată extrasul multilingv</h2>
+                <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-4">Ce scrie în extrasul de căsătorie</h2>
+                <p className="text-neutral-700 leading-relaxed mb-4">
+                  Rubricile sunt numerotate identic în toate statele membre, ca funcționarul străin să
+                  le găsească fără să știe română: numele fiecărui soț înainte de căsătorie, data și
+                  locul încheierii căsătoriei și <strong>numele purtat după căsătorie</strong>. Ultima
+                  rubrică e cea care contează în practică, fiindcă ea leagă oficial numele vechi de cel
+                  nou în fața unei bănci, a unui angajator sau a unui registru din altă țară.
+                </p>
                 <p className="text-neutral-700 leading-relaxed mb-3">
                   Formularul standard multilingv are un format unic în toată Uniunea Europeană: rubricile sunt
                   numerotate și traduse în limbile oficiale ale statelor membre, astfel încât autoritatea din
@@ -578,8 +600,9 @@ export default async function ExtrasMultilingvCasatoriePage() {
                   {[
                     'Act de identitate valabil (CI sau pașaport) — îl scanezi direct în formular',
                     'Selfie cu actul de identitate, pentru verificarea identității',
-                    'Datele actului de căsătorie: data, locul înregistrării, numele soților',
-                    'Atât — împuternicirea o semnezi electronic, direct în wizard',
+                    'Datele actului de căsătorie: data, locul înregistrării, numele ambilor soți',
+                    'Numele purtat de fiecare soț după căsătorie, dacă s-a schimbat',
+                    'Împuternicirea o semnezi electronic, direct în wizard',
                   ].map((row) => (
                     <li key={row} className="flex items-start gap-2">
                       <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
@@ -620,6 +643,11 @@ export default async function ExtrasMultilingvCasatoriePage() {
             { q: 'De unde se eliberează și cine depune cererea?', a: 'Se eliberează de serviciul de stare civilă al primăriei care deține actul de căsătorie. Prin eGhișeul, avocatul nostru partener depune cererea prin împuternicire — pe care o semnezi electronic direct în formular — fără să te deplasezi la ghișeu.' },
             { q: 'Cât durează și cum primesc documentul?', a: `Termenul standard este de ${formatEstimatedDays(service)}, în funcție de oficiul stării civile care deține actul. Primești extrasul electronic pe email și/sau în original prin curier, inclusiv internațional prin DHL, oriunde în lume.` },
             { q: 'Ce acte îmi trebuie ca să comand?', a: 'Doar actul de identitate (îl scanezi în formular), un selfie cu actul pentru verificarea identității și datele actului de căsătorie: data, locul înregistrării și numele soților. Wizard-ul online te ghidează pas cu pas.' },
+            { q: 'Mă căsătoresc în străinătate. Îmi trebuie extrasul ăsta?', a: 'Nu. Extrasul de căsătorie dovedește o căsătorie deja încheiată. Pentru o căsătorie viitoare, ofițerul de stare civilă din străinătate cere certificatul de celibat (dovada că nu ești căsătorit). Sunt două documente opuse ca sens.' },
+            { q: 'Ce scrie, mai exact, în extras?', a: 'Numele soților înainte și după căsătorie, data și locul încheierii căsătoriei, plus datele de identificare ale fiecărui soț. Rubrica cu numele purtat după căsătorie e cea mai importantă în practică: e dovada care leagă numele vechi de cel nou.' },
+            { q: 'Îmi ajunge pentru schimbarea numelui în alt stat UE?', a: 'Pentru registrele civile și pentru majoritatea instituțiilor din UE, da — asta e exact scopul formularului standard. Băncile și angajatorii privați își pot cere propriile documente suplimentare; verifică lista lor înainte, ca să nu comanzi de două ori.' },
+            { q: 'Ne-am căsătorit în străinătate. Pot cere extrasul din România?', a: 'Doar după transcrierea certificatului străin de căsătorie în registrele de stare civilă din România. Fără act românesc de căsătorie nu există ce extras să se elibereze.' },
+            { q: 'Am divorțat. Mai pot cere extrasul de căsătorie?', a: 'Da. Actul de căsătorie rămâne în registre și după divorț, iar extrasul se poate elibera în continuare — e util, de exemplu, când trebuie să dovedești numele purtat într-o anumită perioadă. Mențiunea de divorț se regăsește pe certificatul de căsătorie.' },
           ]}
         />
 
