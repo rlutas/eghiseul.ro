@@ -48,6 +48,30 @@
       "sourceType": "github",
       "skillPath": "higgsfield-youtube-thumbnail/SKILL.md",
       "computedHash": "aade6ad4febf121bfd20feefb21c4e838043ac3d08edb33ea9e2574569d4b381"
+    },
+    "remotion-best-practices": {
+      "source": "remotion-dev/skills",
+      "sourceType": "github",
+      "skillPath": "skills/remotion-best-practices/SKILL.md",
+      "computedHash": "abaebe300e512c1bb412a8bfde7650467a8a7a63111554f40b6637b5454cc1a7"
+    },
+    "remotion-captions": {
+      "source": "remotion-dev/skills",
+      "sourceType": "github",
+      "skillPath": "skills/remotion-captions/SKILL.md",
+      "computedHash": "91cb42a29d990d0fd11edd6b61c5d660b07280408afaa3f2998ddf8b09d38a16"
+    },
+    "remotion-create": {
+      "source": "remotion-dev/skills",
+      "sourceType": "github",
+      "skillPath": "skills/remotion-create/SKILL.md",
+      "computedHash": "0b0edb8688a4ca249bf70965656f69b5121333195a8d1b16c48c72af98fe163c"
+    },
+    "remotion-render": {
+      "source": "remotion-dev/skills",
+      "sourceType": "github",
+      "skillPath": "skills/remotion-render/SKILL.md",
+      "computedHash": "696d68ebf0cc830bbbebe132b965a8a3ed56ea6751f3a68738035d2677506b10"
     }
   }
 }
