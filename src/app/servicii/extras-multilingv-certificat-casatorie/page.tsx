@@ -401,7 +401,8 @@ export default async function ExtrasMultilingvCasatoriePage() {
                   Înlocuiește traducerea și apostila?
                 </h2>
                 <p className="text-neutral-600 max-w-2xl mx-auto">
-                  Da — dar numai în interiorul Uniunii Europene. Iată exact ce acoperă formularul standard multilingv.
+                  Da, în interiorul Uniunii Europene. Pentru un dosar depus în afara ei, schimbarea
+                  numelui cere din nou traducere și apostilă.
                 </p>
               </div>
               <div className="grid md:grid-cols-2 gap-5">
@@ -412,10 +413,10 @@ export default async function ExtrasMultilingvCasatoriePage() {
                   </div>
                   <ul className="space-y-2.5 text-sm text-neutral-700">
                     {[
-                      'Certificatul + extrasul multilingv sunt acceptate direct',
-                      'NU ai nevoie de traducere autorizată',
-                      'NU ai nevoie de apostilă',
-                      'Formularul redă datele în limbile oficiale ale statelor membre',
+                      'Certificatul de căsătorie + extrasul se depun ca atare',
+                      'Numele de dinainte și cel de după se citesc fără traducător',
+                      'Nu-ți mai trebuie apostilă de la prefectură',
+                      'Aceeași numerotare a rubricilor în toate statele membre',
                     ].map((row) => (
                       <li key={row} className="flex items-start gap-2">
                         <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
@@ -579,15 +580,51 @@ export default async function ExtrasMultilingvCasatoriePage() {
                   nou în fața unei bănci, a unui angajator sau a unui registru din altă țară.
                 </p>
                 <p className="text-neutral-700 leading-relaxed mb-3">
-                  Formularul standard multilingv are un format unic în toată Uniunea Europeană: rubricile sunt
-                  numerotate și traduse în limbile oficiale ale statelor membre, astfel încât autoritatea din
-                  străinătate citește documentul direct, fără traducător.
+                  Cine îl cere, în practică: registrul de evidență a populației din statul unde
+                  locuiți, când îți schimbi numele după căsătorie; oficiul de imigrări, la permisul de
+                  ședere pentru soț sau soție; notarul, la o achiziție imobiliară în doi, ca să știe
+                  regimul matrimonial; casa de asigurări, la drepturile de soț supraviețuitor.
                 </p>
                 <p className="text-neutral-700 leading-relaxed">
-                  Documentul este emis de starea civilă împreună cu certificatul și are aceeași valoare
-                  juridică în orice stat UE.
+                  Ce NU dovedește: nu spune nimic despre copii, despre domiciliu sau despre bunuri. Și
+                  nu ține loc de certificat de celibat — dimpotrivă, spune exact opusul, că ești
+                  căsătorit.
                 </p>
               </div>
+            </div>
+          </div>
+        </section>
+
+
+        {/* Secțiune proprie: schimbarea numelui. Nu are corespondent pe pagina de
+            naștere — e situația în care documentul ăsta e cerut cel mai des. */}
+        <section className="py-12 lg:py-16 bg-white border-t border-neutral-200">
+          <div className="container mx-auto px-4 max-w-[820px]">
+            <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-3">
+              Schimbarea numelui după căsătorie, în alt stat
+            </h2>
+            <p className="text-neutral-600 mb-6">
+              Motivul numărul unu pentru care e cerut extrasul, și locul unde se blochează dosarele.
+            </p>
+            <div className="space-y-4 text-neutral-700 leading-relaxed">
+              <p>
+                Ai luat numele soțului sau al soției, iar în țara unde locuiești apari în continuare
+                cu cel vechi. Ca să-l schimbi, fiecare instituție de acolo îți cere{' '}
+                <strong>dovada oficială că cele două nume aparțin aceleiași persoane</strong>. Exact
+                asta face rubrica de „nume purtat după căsătorie” din extras.
+              </p>
+              <p>
+                Ordinea în care le iei contează, fiindcă unele se sprijină pe celelalte: întâi
+                registrul de evidență a populației sau primăria locală, apoi actul de identitate emis
+                acolo, apoi banca, angajatorul și casa de asigurări — care aproape toate cer să vadă
+                deja actul nou.
+              </p>
+              <p>
+                Două lucruri de știut înainte: instituțiile publice din UE acceptă formularul
+                standard ca atare, dar <strong>băncile și angajatorii privați își pot cere propriile
+                documente</strong>, iar dacă v-ați căsătorit în străinătate actul românesc există abia
+                după transcriere. Cere lista lor înainte, ca să nu comanzi de două ori.
+              </p>
             </div>
           </div>
         </section>

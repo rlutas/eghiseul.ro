@@ -397,7 +397,8 @@ export default async function ExtrasMultilingvNasterePage() {
                   Înlocuiește traducerea și apostila?
                 </h2>
                 <p className="text-neutral-600 max-w-2xl mx-auto">
-                  Da — dar numai în interiorul Uniunii Europene. Iată exact ce acoperă formularul standard multilingv.
+                  Da, în interiorul Uniunii Europene. În afara ei, dosarul de cetățenie sau de
+                  școală cere alt set de acte.
                 </p>
               </div>
               <div className="grid md:grid-cols-2 gap-5">
@@ -408,10 +409,10 @@ export default async function ExtrasMultilingvNasterePage() {
                   </div>
                   <ul className="space-y-2.5 text-sm text-neutral-700">
                     {[
-                      'Certificatul + extrasul multilingv sunt acceptate direct',
-                      'NU ai nevoie de traducere autorizată',
-                      'NU ai nevoie de apostilă',
-                      'Formularul redă datele în limbile oficiale ale statelor membre',
+                      'Certificatul de naștere + extrasul sunt acceptate direct la ghișeu',
+                      'Nu-ți mai trebuie traducător autorizat pentru filiație',
+                      'Nu-ți mai trebuie apostilă de la prefectură',
+                      'Funcționarul citește rubricile numerotate, fără să știe română',
                     ].map((row) => (
                       <li key={row} className="flex items-start gap-2">
                         <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
@@ -575,15 +576,55 @@ export default async function ExtrasMultilingvNasterePage() {
                   descendență și la înscrierea copilului într-o instituție din altă țară.
                 </p>
                 <p className="text-neutral-700 leading-relaxed mb-3">
-                  Formularul standard multilingv are un format unic în toată Uniunea Europeană: rubricile sunt
-                  numerotate și traduse în limbile oficiale ale statelor membre, astfel încât autoritatea din
-                  străinătate citește documentul direct, fără traducător.
+                  Cine îl cere, în practică: școala sau grădinița la înscrierea copilului, casa de
+                  asigurări la alocație și la medicul de familie, consulatul altui stat în dosarele de
+                  cetățenie prin descendență, și ofițerul de stare civilă străin când te căsătorești
+                  acolo — acolo merge împreună cu certificatul de celibat.
                 </p>
                 <p className="text-neutral-700 leading-relaxed">
-                  Documentul este emis de starea civilă împreună cu certificatul și are aceeași valoare
-                  juridică în orice stat UE.
+                  Ce NU dovedește: nu spune dacă ești căsătorit, nu ține loc de act de identitate și nu
+                  înlocuiește certificatul de naștere. E o filă care traduce oficial certificatul, nu un
+                  document de sine stătător.
                 </p>
               </div>
+            </div>
+          </div>
+        </section>
+
+
+        {/* Secțiune proprie: copil născut în străinătate. Nu are corespondent pe
+            pagina de căsătorie — sunt situații diferite, cu ordine diferită. */}
+        <section className="py-12 lg:py-16 bg-white border-t border-neutral-200">
+          <div className="container mx-auto px-4 max-w-[820px]">
+            <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-3">
+              Copil născut în străinătate: ordinea contează
+            </h2>
+            <p className="text-neutral-600 mb-6">
+              Cea mai frecventă comandă respinsă din motive care se puteau evita.
+            </p>
+            <div className="space-y-4 text-neutral-700 leading-relaxed">
+              <p>
+                Dacă nașterea a fost înregistrată în altă țară, în registrele românești nu există
+                niciun act de naștere până la <strong>transcriere</strong>. Iar fără act românesc nu
+                are cine elibera extrasul multilingv — nu e o chestiune de termen, pur și simplu nu
+                există documentul din care s-ar extrage datele.
+              </p>
+              <p>Ordinea corectă, pe scurt:</p>
+              <ol className="space-y-2 pl-5 list-decimal marker:text-primary-600 marker:font-semibold">
+                <li>
+                  certificatul străin de naștere, apostilat sau supralegalizat, după țara emitentă;
+                </li>
+                <li>
+                  transcrierea la primăria de domiciliu a părinților sau prin misiunea diplomatică —
+                  aici se naște actul românesc;
+                </li>
+                <li>abia apoi certificatul de naștere românesc și extrasul multilingv de pe el.</li>
+              </ol>
+              <p>
+                Dacă ai deja certificatul de naștere românesc în mână, transcrierea s-a făcut și poți
+                comanda direct. Dacă nu ești sigur, întreabă-ne înainte de plată: verificăm gratuit
+                dacă actul există în registre.
+              </p>
             </div>
           </div>
         </section>

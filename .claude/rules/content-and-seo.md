@@ -6,14 +6,33 @@ din comenzi. Analiza completă: `docs/seo/2026-09-recuperare-spam-update/`.
 ## 1. Nicio pagină din șablon fără date proprii
 
 Testul, înainte de a publica o pagină generată dintr-un template (locație,
-variantă, tip de document):
+variantă, tip de document): măsoară similaritatea între pagini surori (Jaccard pe
+shingles de 5–6 cuvinte, pe textul din `<main>`), o dată normal și o dată cu
+**numele proprii mascate** — orașul, județul, tipul de act.
 
-> Maschează numele propriu (orașul, județul, tipul de act). Dacă pagina sună la
-> fel ca surorile ei, nu se publică.
+**Pragurile:**
 
-E test literal, nu metaforă: pe cele 90 de pagini de locație șterse, mascarea
-numelor proprii **creștea** similaritatea (0,66 → 0,72). Singurul lucru care le
-diferenția era numele locului.
+| Măsurătoare | Prag | Ce înseamnă |
+|---|---|---|
+| Jaccard mascat | **> 0,65** | pagina nu se publică: fără nume, e aceeași pagină |
+| Saltul la mascare | **> +0,12** | idem: diferența stă aproape numai în nume |
+| Jaccard normal | > 0,45 | de reparat, chiar dacă trece celelalte două |
+
+> ⚠️ **Corecție, 09.09.2026.** Prima versiune a regulii spunea „dacă la mascare
+> similaritatea CREȘTE, pagina nu se publică". E un test imposibil de trecut, iar
+> asta e aritmetică, nu opinie: mascarea înlocuiește tokenul X din pagina A și
+> tokenul Y din pagina B cu același token M, deci un shingle din A ajunge să se
+> potrivească cu unul din B. Mascarea **creează** potriviri și nu are cum să le
+> distrugă — metrica urcă prin construcție.
+>
+> Verificat pe toate cele patru seturi măsurate: orașe 0,66 → 0,72; județe
+> 0,56 → 0,71; extras multilingv înainte 0,549 → 0,629, după rescriere
+> 0,421 → 0,514. Urcă și la paginile șterse ca doorway, și la cele rescrise în
+> profunzime. Direcția nu spune nimic; **mărimea** spune.
+
+Semnalul real e cât de mult rămâne identic DUPĂ ce scoți numele. Pe cele 90 de
+pagini de locație șterse: 0,72 mascat, adică aproape trei sferturi din pagină era
+aceeași — de-aia erau doorway.
 
 Corolar: nu construi pagini la o granularitate pe care instituția nu o are.
 Cazierul se emite la nivel de IPJ **județean** — 48 de pagini de oraș erau, prin
