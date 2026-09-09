@@ -441,7 +441,7 @@ export default async function CertificatConstatatorPage() {
                 (sediu, asociați, administratori, capital, obiect de activitate). Nu plătești în plus pentru „extins”:
                 îl comanzi ca certificat constatator pe firmă, <strong>{basePrice} RON cu TVA</strong>. Pentru evoluția completă
                 a firmei, de la înființare până azi, alege varianta <strong>cu istoric</strong> —{' '}
-                <Link href="/certificat-constatator-cu-istoric/" className="font-semibold text-primary-700 underline">
+                <Link href="/cele-4-tipuri-de-certificat-constatator-online/" className="font-semibold text-primary-700 underline">
                   vezi ghidul: ce conține și când ai nevoie de istoric
                 </Link>.
               </p>
@@ -476,7 +476,7 @@ export default async function CertificatConstatatorPage() {
                   <tbody className="text-neutral-700">
                     <tr className="border-t border-neutral-100">
                       <th scope="row" className="p-4 font-semibold text-secondary-900 align-top">
-                        <Link href="/certificat-constatator-de-baza/" className="text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
+                        <Link href="/cele-4-tipuri-de-certificat-constatator-online/" className="text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
                           De bază
                         </Link>
                       </th>
@@ -496,7 +496,7 @@ export default async function CertificatConstatatorPage() {
                     </tr>
                     <tr className="border-t border-neutral-100">
                       <th scope="row" className="p-4 font-semibold text-secondary-900 align-top">
-                        <Link href="/certificat-constatator-insolventa/" className="text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
+                        <Link href="/cele-4-tipuri-de-certificat-constatator-online/" className="text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
                           Insolvență
                         </Link>
                       </th>
@@ -510,7 +510,7 @@ export default async function CertificatConstatatorPage() {
               <p className="mt-4 text-sm text-neutral-600 text-center">
                 Toate variantele costă <strong>{basePrice} RON cu TVA</strong>, taxe ONRC incluse. Ai
                 PFA, II sau IF? Primești certificat pe persoană fizică, pe CNP-ul titularului —{' '}
-                <Link href="/certificat-constatator-pfa/" className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
+                <Link href="/cele-4-tipuri-de-certificat-constatator-online/" className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
                   vezi ghidul pentru PFA
                 </Link>
                 .

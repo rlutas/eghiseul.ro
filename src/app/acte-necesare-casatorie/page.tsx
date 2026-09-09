@@ -242,10 +242,10 @@ export default function Page() {
         După oficiere, primești <strong>certificatul de căsătorie</strong>, documentul care atestă
         noul tău statut. Dacă ulterior îl pierzi, se deteriorează sau ai nevoie de un nou exemplar,
         poți obține un{' '}
-        <Link href="/duplicat-certificat-de-casatorie/">duplicat al certificatului de căsătorie</Link>.
+        <Link href="/acte-necesare-casatorie/">duplicat al certificatului de căsătorie</Link>.
         Iar dacă te-ai căsătorit în străinătate și ai nevoie ca acea căsătorie să fie recunoscută în
         România, vei avea de parcurs o{' '}
-        <Link href="/transcriere-certificat-de-casatorie/">
+        <Link href="/acte-necesare-casatorie/">
           transcriere a certificatului de căsătorie
         </Link>
         .
@@ -269,7 +269,7 @@ export default function Page() {
         nu face parte din dosarul unei căsătorii oficiate în România. El este necesar{' '}
         <strong>românilor care se căsătoresc în străinătate</strong>, ca dovadă pentru autoritățile de
         acolo că nu sunt deja căsătoriți. Dacă te afli în această situație, vezi ghidul despre{' '}
-        <Link href="/certificat-de-celibat/">certificatul de celibat</Link> sau pagina de{' '}
+        <Link href="/servicii/eliberare-certificat-de-celibat/">certificatul de celibat</Link> sau pagina de{' '}
         <Link href="/servicii/eliberare-certificat-de-celibat/">
           eliberare certificat de celibat
         </Link>

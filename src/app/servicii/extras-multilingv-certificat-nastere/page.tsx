@@ -425,11 +425,11 @@ export default async function ExtrasMultilingvNasterePage() {
               <p className="text-sm text-neutral-600 text-center mt-6 max-w-2xl mx-auto">
                 Extrasul multilingv nu circulă singur — el <strong>însoțește certificatul de naștere</strong>.
                 Dacă actul tău e pierdut sau deteriorat, vezi ghidul despre{' '}
-                <Link href="/duplicat-certificat-de-nastere/" className="text-primary-600 font-medium hover:underline">
+                <Link href="/acte-necesare-certificat-de-nastere/" className="text-primary-600 font-medium hover:underline">
                   duplicatul certificatului de naștere
                 </Link>
                 , iar dacă te-ai născut în străinătate și actul nu e încă înregistrat în România, citește despre{' '}
-                <Link href="/transcriere-certificat-de-nastere/" className="text-primary-600 font-medium hover:underline">
+                <Link href="/acte-necesare-certificat-de-nastere/" className="text-primary-600 font-medium hover:underline">
                   transcrierea certificatului de naștere
                 </Link>
                 .

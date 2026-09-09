@@ -425,11 +425,11 @@ export default async function ExtrasMultilingvCasatoriePage() {
               <p className="text-sm text-neutral-600 text-center mt-6 max-w-2xl mx-auto">
                 Extrasul multilingv nu circulă singur — el <strong>însoțește certificatul de căsătorie</strong>.
                 Dacă actul tău e pierdut sau deteriorat, vezi ghidul despre{' '}
-                <Link href="/duplicat-certificat-de-casatorie/" className="text-primary-600 font-medium hover:underline">
+                <Link href="/acte-necesare-casatorie/" className="text-primary-600 font-medium hover:underline">
                   duplicatul certificatului de căsătorie
                 </Link>
                 , iar dacă te-ai căsătorit în străinătate și actul nu e încă înregistrat în România, citește despre{' '}
-                <Link href="/transcriere-certificat-de-casatorie/" className="text-primary-600 font-medium hover:underline">
+                <Link href="/acte-necesare-casatorie/" className="text-primary-600 font-medium hover:underline">
                   transcrierea certificatului de căsătorie
                 </Link>
                 .

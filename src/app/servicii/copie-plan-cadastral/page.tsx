@@ -313,7 +313,7 @@ export default async function CopiePlanCadastralPage() {
                 copia documentului care a stat la baza înscrierii imobilului în sistemul de cadastru: conturul, limitele
                 și datele tehnice <strong>așa cum au fost recepționate și arhivate</strong> de OCPI. Planul este
                 întocmit la scară (de regulă 1:500 sau 1:1000 în intravilan și 1:2000 sau 1:5000 în extravilan). Vezi pe larg{' '}
-                <Link href="/ce-este-planul-cadastral/" className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
+                <Link href="/servicii/extras-plan-cadastral/" className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
                   ce este planul cadastral
                 </Link>
                 .

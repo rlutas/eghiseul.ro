@@ -24,8 +24,6 @@ import {
   HARDCODED_ARTICLE_SLUGS,
 } from '@/lib/seo/constants';
 import { pageLastModified } from '@/lib/seo/last-modified';
-import { allCitySlugs, isCityIndexable } from '@/lib/seo/locations';
-import { allOcpiSlugs } from '@/lib/seo/locations/ocpi';
 
 type SitemapEntry = MetadataRoute.Sitemap[number];
 
@@ -97,27 +95,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     });
   }
 
-  // 4b. Location pages (cazier judiciar pe oraș) — segmentate ca să poți
-  // diagnostica indexarea per-tip în GSC. Vezi src/lib/seo/locations.
-  // Doar orașele indexabile — restul sunt `noindex, follow` (Google le-a refuzat
-  // ca doorway pages), iar un sitemap care insistă pe URL-uri noindex e semnal
-  // contradictoriu. Vezi INDEXABLE_CITY_SLUGS pentru date și criteriu de promovare.
-  for (const oras of allCitySlugs().filter(isCityIndexable)) {
-    entries.push({
-      url: `${BASE_URL}/servicii/cazier-judiciar-online/${oras}/`,
-      changeFrequency: 'monthly',
-      priority: 0.7,
-    });
-  }
-
-  // 4c. Location pages (extras carte funciară pe județ) — date OCPI reale.
-  for (const judet of allOcpiSlugs()) {
-    entries.push({
-      url: `${BASE_URL}/servicii/extras-de-carte-funciara/${judet}/`,
-      changeFrequency: 'monthly',
-      priority: 0.7,
-    });
-  }
+  // 4b/4c. Paginile de locație (cazier pe oraș, extras CF pe județ) au fost
+  // ȘTERSE pe 09.09.2026 — 90 de pagini care, pe trei luni, au adus 208 clicuri
+  // în total (0,1% din trafic), cu 37–43% din text identic pe tot setul, iar
+  // mascarea numelor proprii CREȘTEA similaritatea între ele. Datele OCPI reale
+  // au rămas, ca tabel, pe hub-ul de extras CF.
+  // Vezi docs/seo/2026-09-recuperare-spam-update/PLAN-RECUPERARE.md.
 
   // 5. Dynamic DB services (skip any already hardcoded above)
   // We map DB slugs to WP-style URLs via a lookup. For now we only include

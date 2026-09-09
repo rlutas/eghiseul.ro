@@ -237,7 +237,7 @@ export default function Page() {
       <p>
         Pașii administrativi de dinaintea dosarului — de la maternitate până la certificatul de naștere —
         sunt descriși pe larg în ghidul nostru despre{' '}
-        <Link href="/inregistrare-nastere-copil-nou-nascut/">înregistrarea nașterii unui copil nou-născut</Link>.
+        <Link href="/acte-necesare-certificat-de-nastere/">înregistrarea nașterii unui copil nou-născut</Link>.
       </p>
 
       <h2>Context legal și actualizări</h2>

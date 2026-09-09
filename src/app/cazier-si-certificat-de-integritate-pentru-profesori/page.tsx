@@ -43,7 +43,7 @@ export default function Page() {
           desc: 'Document IGPR, livrat rapid pe email.',
         },
         {
-          href: '/cazier-judiciar-online-gratuit/',
+          href: '/servicii/cazier-judiciar-online/',
           label: 'Cazierul judiciar gratuit, pas cu pas',
           desc: 'Cum îl scoți singur prin ghiseul.ro sau HUB MAI.',
         },
@@ -175,7 +175,7 @@ export default function Page() {
         <li>
           <strong>Cazierul judiciar</strong> — online, prin ghiseul.ro sau HUB MAI, pentru cetățenii români cu
           cont validat. Pașii exacți și situațiile în care ruta gratuită nu funcționează i-am descris în{' '}
-          <Link href="/cazier-judiciar-online-gratuit/">ghidul despre cazierul judiciar gratuit</Link>. La ghișeu,
+          <Link href="/servicii/cazier-judiciar-online/">ghidul despre cazierul judiciar gratuit</Link>. La ghișeu,
           se eliberează pe loc la orice unitate de poliție cu ghișeu de cazier.
         </li>
         <li>

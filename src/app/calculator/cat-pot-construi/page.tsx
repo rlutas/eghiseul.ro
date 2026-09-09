@@ -189,7 +189,7 @@ export default function Page() {
       </p>
       <p>
         Vrei tot contextul — exemple pe cifre, retrageri, ce faci pas cu pas înainte de proiect? L-am pus
-        în ghidul <Link href="/cat-poti-construi-pe-teren/">Cât poți construi pe terenul tău: POT și CUT
+        în ghidul <Link href="/calculator/cat-pot-construi/">Cât poți construi pe terenul tău: POT și CUT
         explicate simplu</Link>.
       </p>
     </CalculatorLayout>

@@ -417,11 +417,11 @@ export default async function CertificatCasatoriePage() {
                   extrasul multilingv de pe certificatul de căsătorie
                 </Link>
                 , recunoscut în toate statele UE fără traducere și fără apostilă. Te-ai căsătorit în străinătate? Vezi ghidul de{' '}
-                <Link href="/transcriere-certificat-de-casatorie/" className="text-primary-600 font-medium hover:underline">
+                <Link href="/acte-necesare-casatorie/" className="text-primary-600 font-medium hover:underline">
                   transcriere a certificatului de căsătorie
                 </Link>
                 , iar dacă vrei să vezi{' '}
-                <Link href="/model-certificat-de-casatorie/" className="text-primary-600 font-medium hover:underline">
+                <Link href="/acte-necesare-casatorie/" className="text-primary-600 font-medium hover:underline">
                   cum arată modelul certificatului
                 </Link>
                 , avem un ghid dedicat. Vezi și{' '}

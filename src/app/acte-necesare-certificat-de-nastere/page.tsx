@@ -68,7 +68,7 @@ export default function Page() {
 
       <h2>Acte necesare pentru un duplicat de certificat de naștere</h2>
       <p>
-        Se aplică atunci când ai <Link href="/certificat-de-nastere-pierdut/">pierdut certificatul</Link>{' '}
+        Se aplică atunci când ai <Link href="/acte-necesare-certificat-de-nastere/">pierdut certificatul</Link>{' '}
         sau vrei să-l <Link href="/schimbare-certificat-de-nastere-vechi/">înlocuiești pe modelul actual</Link>:
       </p>
       <ul>

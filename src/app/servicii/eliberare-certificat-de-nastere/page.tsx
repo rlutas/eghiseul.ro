@@ -422,7 +422,7 @@ export default async function CertificatNasterePage() {
                   certificat de celibat
                 </Link>
                 ? Le poți comanda la fel de simplu. Dacă{' '}
-                <Link href="/certificat-de-nastere-pierdut/" className="text-primary-600 font-medium hover:underline">
+                <Link href="/acte-necesare-certificat-de-nastere/" className="text-primary-600 font-medium hover:underline">
                   ai pierdut certificatul de naștere
                 </Link>
                 , vezi pașii și actele necesare pentru eliberarea duplicatului. Iar dacă ai un{' '}
@@ -623,15 +623,15 @@ export default async function CertificatNasterePage() {
                 actele necesare
               </Link>{' '}
               sau cum procedezi dacă ai{' '}
-              <Link href="/certificat-de-nastere-pierdut/" className="text-primary-600 font-medium hover:underline">
+              <Link href="/acte-necesare-certificat-de-nastere/" className="text-primary-600 font-medium hover:underline">
                 pierdut certificatul
               </Link>
               . Găsești ghiduri separate și pentru{' '}
-              <Link href="/duplicat-certificat-de-nastere/" className="text-primary-600 font-medium hover:underline">
+              <Link href="/acte-necesare-certificat-de-nastere/" className="text-primary-600 font-medium hover:underline">
                 obținerea unui duplicat de la orice primărie
               </Link>{' '}
               și pentru{' '}
-              <Link href="/transcriere-certificat-de-nastere/" className="text-primary-600 font-medium hover:underline">
+              <Link href="/acte-necesare-certificat-de-nastere/" className="text-primary-600 font-medium hover:underline">
                 transcrierea certificatului obținut în străinătate
               </Link>
               .

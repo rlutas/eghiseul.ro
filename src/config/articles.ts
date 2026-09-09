@@ -19,53 +19,11 @@ export interface ArticleMeta {
 
 export const ARTICLES: ArticleMeta[] = [
   {
-    slug: 'apostila-de-la-haga-ghid-acte-obtinere',
-    title: 'Apostila de la Haga: pe ce acte se aplică, unde o obții și cât costă',
-    excerpt:
-      'Prefectură, tribunal sau Camera Notarilor — cine apostilează ce, în ce ordine față de traducere și situațiile în care nu ai nevoie de apostilă deloc (UE, extrase multilingve).',
-    category: 'Documente pentru străinătate',
-  },
-  {
-    slug: 'schimbare-sediu-social-srl-ghid',
-    title: 'Schimbarea sediului social la SRL: acte, pași la ONRC și ce urmează după',
-    excerpt:
-      'Actele în ordinea corectă, diferența dintre mutarea în același județ și în alt județ, capcanele care întorc dosarul și instituțiile de anunțat după înregistrare.',
-    category: 'Firme & ONRC',
-  },
-  {
-    slug: 'suspendare-activitate-firma-ghid',
-    title: 'Suspendarea activității firmei: procedură, acte și ce obligații rămân',
-    excerpt:
-      'Pauza oficială de maximum 3 ani: mențiunea la ONRC, pasul uitat de la ANAF, obligațiile care NU dispar în suspendare și cum alegi între suspendare și radiere.',
-    category: 'Firme & ONRC',
-  },
-  {
-    slug: 'radiere-firma-srl-ghid',
-    title: 'Radierea unei firme (SRL): etape, acte, durată și greșeli de evitat',
-    excerpt:
-      'Dizolvare, lichidare, radiere — cele trei etape pas cu pas, termenul de opoziție de 30 de zile, certificatul fiscal fără datorii și greșelile care lungesc procesul cu luni.',
-    category: 'Firme & ONRC',
-  },
-  {
-    slug: 'cazier-judiciar-online-gratuit',
-    title: 'Cazier judiciar online gratuit: cum îl scoți prin ghiseul.ro sau HUB MAI',
-    excerpt:
-      'Certificatul e gratuit online pentru persoane fizice cu cetățenie română și cont validat. Cum îl scoți singur, ce înseamnă „cont validat” și cele șase situații în care ruta gratuită nu se aplică deloc.',
-    category: 'Cazier judiciar',
-  },
-  {
     slug: 'cazier-si-certificat-de-integritate-pentru-profesori',
     title: 'Cazier și certificat de integritate pentru profesori: ghid pentru începutul anului școlar',
     excerpt:
       'Cine trebuie să le prezinte la angajarea în învățământ, de ce nu se depun din nou la fiecare 6 luni și când să le ceri ca să le ai la 1 septembrie. Plus rutele gratuite.',
     category: 'Juridice',
-  },
-  {
-    slug: 'certificat-de-nastere-din-strainatate',
-    title: 'Certificat de naștere când ești plecat din țară: duplicat, extras multilingv sau apostilă',
-    excerpt:
-      'Cele trei rute reale (consulat, împuternicit, intermediar), diferența dintre duplicat și extrasul multilingv, și în ce state extrasul circulă fără traducere și fără apostilă.',
-    category: 'Stare civilă',
   },
   {
     slug: 'tva-9-locuinte-31-iulie-2026',
@@ -99,22 +57,10 @@ export const ARTICLES: ArticleMeta[] = [
     category: 'Cadastru & imobiliare',
   },
   {
-    slug: 'cat-poti-construi-pe-teren',
-    title: 'Cât Poți Construi pe Terenul Tău? POT și CUT explicate simplu',
-    excerpt: 'Formula: teren × POT / 100 = suprafața maximă la sol. De unde iei POT-ul, valorile legale pe zone, greșelile frecvente + calculator interactiv.',
-    category: 'Cadastru & imobiliare',
-  },
-  {
     slug: 'extras-carte-funciara-gratuit',
     title: 'Extras de Carte Funciară Gratuit prin MyTerra — Ghid + Limite',
     excerpt: 'Cum obții gratuit extrasul de informare prin MyTerra (ANCPI), ce condiții sunt și când are sens varianta plătită, eliberată instant.',
     category: 'Cadastru & imobiliare',
-  },
-  {
-    slug: 'certificat-constatator-cu-istoric',
-    title: 'Certificat Constatator cu Istoric — Ce Conține, Preț, Cum Îl Obții',
-    excerpt: 'Toate modificările firmei de la înființare: asociați, sedii, capital. Când ai nevoie de istoric și când ajunge certificatul de bază.',
-    category: 'Firme & ONRC',
   },
   {
     slug: 'tabel-varsta-pensionare-anticipata-femei',
@@ -129,39 +75,11 @@ export const ARTICLES: ArticleMeta[] = [
     category: 'Cadastru & imobiliare',
   },
   {
-    slug: 'cazier-fiscal-persoana-fizica',
-    title: 'Cazier fiscal pentru persoană fizică: ce este și cum îl obții',
-    excerpt:
-      'Ce fapte se înscriu, când se radiază, de ce nu se confundă cu atestarea fiscală și cum îl obții fără cont SPV.',
-    category: 'Documente fiscale',
-  },
-  {
-    slug: 'cazier-fiscal-firma',
-    title: 'Cazier fiscal pentru firmă: când se cere și cine îl semnează',
-    excerpt:
-      'Cazierul societății vs. cel al asociaților, ce verifică Registrul Comerțului la înmatriculare și ce se schimbă la firma inactivă.',
-    category: 'Firme & ONRC',
-  },
-  {
     slug: 'cazier-fiscal-fara-spv',
     title: 'Cazier fiscal din SPV: cum îl ceri online și ce faci fără cont',
     excerpt:
       'Pașii din Spațiul Privat Virtual, formularele 502 și 504, și alternativele când nu poți trece de activarea contului.',
     category: 'Documente fiscale',
-  },
-  {
-    slug: 'verificare-cazier-fiscal',
-    title: 'Verificare cazier fiscal: ce ai înscris și cât mai e valabil',
-    excerpt:
-      'Cum afli dacă ai fapte înscrise, cum verifici autenticitatea certificatului și de ce nu poți interoga cazierul unui partener.',
-    category: 'Documente fiscale',
-  },
-  {
-    slug: 'certificat-de-nastere-pentru-buletin-pasaport',
-    title: 'Certificat de naștere pentru buletin sau pașaport: când se cere',
-    excerpt:
-      'Unde se cere în original și unde ajunge o copie, plus cum ieși din cercul în care ai pierdut și buletinul, și certificatul.',
-    category: 'Stare civilă',
   },
   {
     slug: 'anii-lucrati-in-strainatate-se-pun-la-pensie-in-romania',
@@ -230,23 +148,10 @@ export const ARTICLES: ArticleMeta[] = [
     category: 'Juridice',
   },
   {
-    slug: 'extras-de-carte-funciara-pentru-casa-verde',
-    title: 'Extras de Carte Funciară pentru Casa Verde',
-    excerpt: 'De ce ai nevoie de extrasul CF la dosarul Casa Verde, ce condiții îndeplinește și cum îl obții rapid.',
-    category: 'Cadastru & imobiliare',
-  },
-  {
     slug: 'rolul-si-atributiile-onrc-romania',
     title: 'Ce face ONRC, de fapt',
     excerpt: 'Registrul Comerțului, înmatriculările, mențiunile și certificatul constatator — pe scurt.',
     category: 'Comercial / ONRC',
-  },
-  {
-    slug: 'certificat-de-nastere-pierdut',
-    title: 'Certificat de Naștere Pierdut: Ce Faci și Cum Obții Duplicatul',
-    excerpt: 'Acte necesare, în cât timp se eliberează duplicatul, cât costă și ce faci dacă ai pierdut și buletinul.',
-    category: 'Stare civilă',
-    image: '/og/services/certificat-nastere.png',
   },
   {
     slug: 'schimbare-certificat-de-nastere-vechi',
@@ -263,138 +168,10 @@ export const ARTICLES: ArticleMeta[] = [
     image: '/og/services/certificat-nastere.png',
   },
   {
-    slug: 'transcriere-certificat-de-casatorie',
-    title: 'Transcriere Certificat de Căsătorie din Străinătate',
-    excerpt: 'Ce este transcrierea, ce acte îți trebuie (apostilă, traducere) și unde se depune cererea.',
-    category: 'Stare civilă',
-    image: '/og/services/certificat-casatorie.png',
-  },
-  {
-    slug: 'model-certificat-de-casatorie',
-    title: 'Model Certificat de Căsătorie: Cum Arată și Ce Conține',
-    excerpt: 'Cum arată modelul actual, ce date conține și cum obții un exemplar oficial (duplicat).',
-    category: 'Stare civilă',
-    image: '/og/services/certificat-casatorie.png',
-  },
-  {
-    slug: 'certificat-constatator-de-baza',
-    title: 'Certificat Constatator de Bază — Preț, Ce Conține, Eliberare în Minute',
-    excerpt: 'Tariful oficial ONRC e 30 lei (cu cont pe portal); la noi 89 lei cu tot cu taxe, emis automat în câteva minute, 24/7, doar cu CUI-ul. Ce conține și unde ți-l cer.',
-    category: 'Comercial / ONRC',
-    image: '/og/services/certificat-constatator.png',
-  },
-  {
-    slug: 'certificat-constatator-insolventa',
-    title: 'Certificat Constatator pentru Insolvență — Preț și Eliberare Online',
-    excerpt: 'Atestă oficial dacă firma e în insolvență, faliment sau reorganizare. Cerut la licitații, notar și tribunal. 89 lei, maximum 24 de ore lucrătoare.',
-    category: 'Comercial / ONRC',
-    image: '/og/services/certificat-constatator.png',
-  },
-  {
-    slug: 'certificat-constatator-pfa',
-    title: 'Certificat Constatator PFA — Cum Îl Obții Online, Preț, Ce Conține',
-    excerpt: 'PFA, II și IF primesc certificat pe persoană fizică, pe CNP-ul titularului — nu pe CUI. 89 lei cu taxe incluse, emis automat în câteva minute.',
-    category: 'Comercial / ONRC',
-    image: '/og/services/certificat-constatator.png',
-  },
-  {
-    slug: 'certificat-constatator-pentru-banca',
-    title: 'Certificat Constatator pentru Bancă: De Ce Îl Cere și Cum Îl Obții',
-    excerpt: 'Banca cere un certificat emis în ultimele 30 de zile. Vezi ce versiune îți trebuie și cum îl obții online.',
-    category: 'Comercial / ONRC',
-    image: '/og/services/certificat-constatator.png',
-  },
-  {
-    slug: 'certificat-constatator-pentru-licitatie',
-    title: 'Certificat Constatator pentru Licitație (SEAP/SICAP): Ghid Complet',
-    excerpt: 'PDF-ul e-semnat este original și acceptat în SEAP. Atenție la termenul de 30 de zile, altfel rămâi descalificat.',
-    category: 'Comercial / ONRC',
-    image: '/og/services/certificat-constatator.png',
-  },
-  {
-    slug: 'certificat-constatator-pentru-notar',
-    title: 'Certificat Constatator pentru Notar: Ce Tip Îți Cere și Cum Îl Obții',
-    excerpt: 'La cesiune de părți sociale, vânzare firmă sau acte imobiliare, notarul cere un certificat recent. Vezi care.',
-    category: 'Comercial / ONRC',
-    image: '/og/services/certificat-constatator.png',
-  },
-  {
-    slug: 'certificat-constatator-pentru-fonduri-europene',
-    title: 'Certificat Constatator pentru Fonduri Europene și APIA: Ghid Complet',
-    excerpt: 'Necesar la dosarele de finanțare IMM și AFIR/APIA. Dovedește înregistrarea firmei și codul CAEN finanțat.',
-    category: 'Comercial / ONRC',
-    image: '/og/services/certificat-constatator.png',
-  },
-  {
-    slug: 'certificat-de-celibat',
-    title: 'Certificat de Celibat (Anexa 9): Ce Este și Cum Îl Obții',
-    excerpt: 'Documentul legal e Anexa 9 (dovada de celibat). Vezi actele necesare, modelul și cum îl obții.',
-    category: 'Stare civilă',
-    image: '/og/services/certificat-celibat.png',
-  },
-  {
-    slug: 'valabilitate-certificat-de-celibat',
-    title: 'Valabilitate Certificat de Celibat: 6 Luni în România, 90 de Zile în Străinătate',
-    excerpt: 'Două valori corecte, pentru contexte diferite. Vezi care se aplică la căsătoria în țară vs în străinătate.',
-    category: 'Stare civilă',
-    image: '/og/services/certificat-celibat.png',
-  },
-  {
-    slug: 'certificat-de-celibat-pentru-casatorie-in-strainatate',
-    title: 'Certificat de Celibat pentru Căsătorie în Străinătate: Apostilă și Traducere',
-    excerpt: 'Pașii pentru diaspora: Anexa 9, apostilă de la Prefectură și traducere legalizată. Valabilitate 90 de zile.',
-    category: 'Stare civilă',
-    image: '/og/services/certificat-celibat.png',
-  },
-  {
-    slug: 'duplicat-certificat-de-nastere',
-    title: 'Duplicat Certificat de Naștere: Cum Îl Obții de la Orice Primărie',
-    excerpt: 'Din 2023 se eliberează la orice primărie, în circa 30 de zile, adesea gratuit. Vezi actele necesare.',
-    category: 'Stare civilă',
-    image: '/og/services/certificat-nastere.png',
-  },
-  {
-    slug: 'transcriere-certificat-de-nastere',
-    title: 'Transcriere Certificat de Naștere din Străinătate: Ghid Complet',
-    excerpt: 'Copilul născut în străinătate are nevoie de transcriere pentru CNP și act de identitate. Vezi pașii.',
-    category: 'Stare civilă',
-    image: '/og/services/certificat-nastere.png',
-  },
-  {
-    slug: 'duplicat-certificat-de-casatorie',
-    title: 'Duplicat Certificat de Căsătorie: Acte, Cost și Cum Îl Obții',
-    excerpt: 'La pierdere, deteriorare sau schimbare de nume. Se obține de la starea civilă, online prin împuternicit.',
-    category: 'Stare civilă',
-    image: '/og/services/certificat-casatorie.png',
-  },
-  {
     slug: 'acte-necesare-casatorie',
     title: 'Acte Necesare Căsătorie: Dosarul Complet la Starea Civilă',
     excerpt: 'Declarația cu 10 zile înainte, certificatele medicale (valabile 14 zile) și restul actelor. Vezi lista completă.',
     category: 'Stare civilă',
     image: '/og/services/certificat-casatorie.png',
-  },
-  {
-    slug: 'inregistrare-nastere-copil-nou-nascut',
-    title: 'Înregistrarea Nașterii Copilului: Termen, Acte și Primul Certificat',
-    excerpt: 'Termen legal de 30 de zile, actele necesare și cum obții primul certificat de naștere (gratuit) + CNP-ul.',
-    category: 'Stare civilă',
-    image: '/og/services/certificat-nastere.png',
-  },
-  {
-    slug: 'ce-este-planul-cadastral',
-    image: '/og/services/extras-cf.png',
-    title: 'Ce este planul cadastral (și diferența față de releveu și extras CF)',
-    excerpt:
-      'Ce arată planul cadastral, prin ce se deosebește de releveu și de extrasul de carte funciară, și în ce situații ți se cere fiecare dintre ele.',
-    category: 'Cadastru & imobiliare',
-  },
-  {
-    slug: 'ce-este-un-releveu',
-    image: '/og/services/extras-cf.png',
-    title: 'Ce este un releveu și cum îl obții (apartament, casă)',
-    excerpt:
-      'Planul interior al locuinței, cu camerele și suprafețele lor: la ce folosește, cine îl întocmește și cum obții o copie din arhiva OCPI.',
-    category: 'Cadastru & imobiliare',
   },
 ];

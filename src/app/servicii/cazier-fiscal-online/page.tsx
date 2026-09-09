@@ -293,7 +293,7 @@ export default async function CazierFiscalOnlinePage() {
                 buget se dovedesc cu certificatul de atestare fiscală, document separat. Cazierul fiscal este
                 unul dintre cele mai cerute acte la <strong>înființarea unei firme</strong> sau la numirea ca
                 asociat ori administrator. Am detaliat ce fapte se înscriu, când se radiază și cine îl cere în{' '}
-                <Link href="/cazier-fiscal-persoana-fizica/">
+                <Link href="/cazier-fiscal-fara-spv/">
                   ghidul despre cazierul fiscal al persoanei fizice
                 </Link>
                 .

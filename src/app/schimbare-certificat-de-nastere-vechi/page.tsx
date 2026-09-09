@@ -82,7 +82,7 @@ export default function Page() {
         <strong>duplicat</strong>, adică un certificat de naștere nou și original, pe modelul actual,
         în baza actului de naștere care există deja în registrele Stării Civile. Valoarea juridică
         este identică; diferă doar forma documentului. Dacă ai și{' '}
-        <Link href="/certificat-de-nastere-pierdut/">pierdut certificatul</Link>, demersul este
+        <Link href="/acte-necesare-certificat-de-nastere/">pierdut certificatul</Link>, demersul este
         același — un duplicat.
       </p>
 
@@ -130,7 +130,7 @@ export default function Page() {
         străinătate. Soluția este aceeași: soliciți un <strong>duplicat tipărit pe modelul actual</strong>,
         cu toate datele preluate din registrele Stării Civile. Dacă între timp documentul s-a și pierdut,
         vezi pașii pentru un{' '}
-        <Link href="/certificat-de-nastere-pierdut/">certificat de naștere pierdut</Link>.
+        <Link href="/acte-necesare-certificat-de-nastere/">certificat de naștere pierdut</Link>.
       </p>
 
       <h2>Concluzie</h2>

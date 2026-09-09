@@ -34,7 +34,10 @@ describe('PAGE_LAST_MODIFIED — sincronizare cu paginile', () => {
   const fromPages = datesFromPages();
 
   it('găsește pagini cu DATE_MODIFIED (altfel testul e inutil)', () => {
-    expect(Object.keys(fromPages).length).toBeGreaterThan(30);
+    // Pragul a scăzut de la 30 la 20 pe 09.09.2026, când 32 de articole satelit
+    // au fost consolidate prin 301 (vezi next.config.ts). Testul păzește tot
+    // desincronizarea registrului, nu numărul de articole.
+    expect(Object.keys(fromPages).length).toBeGreaterThan(20);
   });
 
   it('fiecare pagină cu DATE_MODIFIED are intrare în registru, cu aceeași dată', () => {

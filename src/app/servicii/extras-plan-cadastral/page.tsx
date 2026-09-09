@@ -309,7 +309,7 @@ export default async function ExtrasPlanCadastralPage() {
                 și Publicitate Imobiliară (<strong>OCPI / ANCPI</strong>). Spre deosebire de extrasul de carte
                 funciară — care arată situația juridică — planul cadastral arată <strong>poziția, conturul și
                 vecinătățile</strong> imobilului pe hartă. Vezi pe larg{' '}
-                <Link href="/ce-este-planul-cadastral/" className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
+                <Link href="/servicii/extras-plan-cadastral/" className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
                   ce este planul cadastral
                 </Link>
                 .

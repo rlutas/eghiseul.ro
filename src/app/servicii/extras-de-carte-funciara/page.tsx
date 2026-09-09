@@ -936,7 +936,7 @@ export default async function ExtrasCarteFunciaraPage() {
                   proprietatea nu este (încă) intabulată cadastral, iar pentru tranzacții va fi nevoie de o
                   documentație cadastrală întocmită de un expert autorizat — vezi{' '}
                   <Link
-                    href="/ce-este-planul-cadastral/"
+                    href="/servicii/extras-plan-cadastral/"
                     className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
                   >
                     ce este planul cadastral
@@ -1070,23 +1070,42 @@ export default async function ExtrasCarteFunciaraPage() {
           </div>
         </section>
 
-        {/* Extras carte funciară pe județe */}
+        {/* Birourile OCPI, pe județe.
+            Înainte, aici erau 42 de „chip"-uri către 42 de pagini de județ —
+            pagini care, pe trei luni, au adus 111 clicuri în total și pe care
+            43% din text era identic pe toate. Datele OCPI sunt reale și utile;
+            paginile nu erau. Le-am consolidat într-un singur tabel, aici
+            (09.09.2026, vezi docs/seo/2026-09-recuperare-spam-update/). */}
         <section className="py-12 bg-neutral-50 border-t border-neutral-100">
-          <div className="container mx-auto px-4 max-w-[820px]">
-            <h2 className="text-xl font-bold text-secondary-900 mb-2">Extras carte funciară pe județe</h2>
+          <div className="container mx-auto px-4 max-w-[900px]">
+            <h2 className="text-xl font-bold text-secondary-900 mb-2">Birourile OCPI, pe județe</h2>
             <p className="text-neutral-600 mb-5 text-sm">
-              Vezi cum obții extrasul de carte funciară în județul tău, cu datele biroului OCPI local și pașii pentru comanda online.
+              Extrasul de carte funciară se eliberează de Oficiul de Cadastru și Publicitate
+              Imobiliară al județului în care se află imobilul. Mai jos sunt datele de contact ale
+              fiecărui birou, dacă vrei să mergi direct. Prin noi, comanda se face online, indiferent
+              de județ.
             </p>
-            <div className="flex flex-wrap gap-2">
-              {OCPI_COUNTIES.map((c) => (
-                <Link
-                  key={c.slug}
-                  href={`/servicii/extras-de-carte-funciara/${c.slug}/`}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-neutral-200 bg-white px-4 py-2 text-sm text-neutral-700 hover:border-primary-300 hover:text-primary-600 transition-colors"
-                >
-                  {c.judet}
-                </Link>
-              ))}
+            <div className="overflow-x-auto rounded-xl border border-neutral-200 bg-white">
+              <table className="w-full text-sm">
+                <thead className="bg-neutral-50 text-left text-neutral-600">
+                  <tr>
+                    <th className="px-4 py-3 font-semibold">Județ</th>
+                    <th className="px-4 py-3 font-semibold">Birou OCPI</th>
+                    <th className="px-4 py-3 font-semibold">Adresă</th>
+                    <th className="px-4 py-3 font-semibold">Telefon</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {OCPI_COUNTIES.map((c) => (
+                    <tr key={c.slug} className="border-t border-neutral-100 align-top">
+                      <td className="px-4 py-3 font-medium text-secondary-900 whitespace-nowrap">{c.judet}</td>
+                      <td className="px-4 py-3 text-neutral-700">{c.office}</td>
+                      <td className="px-4 py-3 text-neutral-600">{c.address}</td>
+                      <td className="px-4 py-3 text-neutral-600 whitespace-nowrap">{c.phone}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
         </section>

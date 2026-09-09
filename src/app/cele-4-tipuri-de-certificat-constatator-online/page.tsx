@@ -84,7 +84,7 @@ export default function Page() {
         Administrația Finanțelor Publice, înregistrare în scopuri de TVA, Registrul Operatorilor Intracomunitari,
         autorizare, ARR, RAR, vamă, CNAS, Casa de Pensii, OCPI, primărie, informare și altele.
         Se emite automat, de obicei în câteva minute, 24/7, inclusiv noaptea și în weekend. Detalii
-        complete: <Link href="/certificat-constatator-de-baza/">certificatul constatator de bază</Link>.
+        complete: <Link href="/cele-4-tipuri-de-certificat-constatator-online/">certificatul constatator de bază</Link>.
       </p>
       <p>
           <Link
@@ -115,7 +115,7 @@ export default function Page() {
       <h3>3. Certificat constatator pentru insolvență (pe firmă): 73,55 lei + TVA</h3>
       <p>
         Necesar în procedurile de insolvență. Scopuri acceptate: licitație, birou notar public, tribunal. Include, pe lângă informațiile de bază, situațiile financiare anuale (cifră de afaceri,
-        profit/pierderi). Se eliberează prin backoffice-ul ONRC, de regulă în maximum 24 de ore lucrătoare. Detalii complete: <Link href="/certificat-constatator-insolventa/">certificatul pentru insolvență</Link>.
+        profit/pierderi). Se eliberează prin backoffice-ul ONRC, de regulă în maximum 24 de ore lucrătoare. Detalii complete: <Link href="/cele-4-tipuri-de-certificat-constatator-online/">certificatul pentru insolvență</Link>.
       </p>
       <p>
           <Link
@@ -132,7 +132,7 @@ export default function Page() {
         firme înregistrate la Registrul Comerțului. Scopuri acceptate: informare, ANAF / Administrația
         Finanțelor Publice, înregistrare în scopuri de TVA, eliberare cazier judiciar, poliție, autorizare, AFIR,
         primărie și altele. Se emite automat, în câteva minute, 24/7. Detalii complete:
-        <Link href="/certificat-constatator-pfa/"> certificatul pentru PFA / persoană fizică</Link>.
+        <Link href="/cele-4-tipuri-de-certificat-constatator-online/"> certificatul pentru PFA / persoană fizică</Link>.
       </p>
       <p>
           <Link
@@ -148,7 +148,7 @@ export default function Page() {
         Include istoricul modificărilor firmei, de la înființare până în prezent sau pe o perioadă
         aleasă de tine. Util în litigii, due diligence, succesiuni sau verificări amănunțite ale unui partener de
         afaceri. Se emite automat, în câteva minute, 24/7. Am scris și un{' '}
-        <Link href="/certificat-constatator-cu-istoric/">ghid dedicat certificatului constatator cu istoric</Link>:
+        <Link href="/cele-4-tipuri-de-certificat-constatator-online/">ghid dedicat certificatului constatator cu istoric</Link>:
         ce conține exact și când merită diferența de preț.
       </p>
       <p>
@@ -254,9 +254,9 @@ export default function Page() {
       <p>
         Constatatorul apare aproape întotdeauna în mijlocul unei proceduri mai mari la Registrul
         Comerțului. Dacă fix asta pregătești, avem ghiduri separate pentru{' '}
-        <Link href="/schimbare-sediu-social-srl-ghid/">schimbarea sediului social</Link>,{' '}
-        <Link href="/suspendare-activitate-firma-ghid/">suspendarea activității firmei</Link> și{' '}
-        <Link href="/radiere-firma-srl-ghid/">radierea unui SRL</Link>, cu actele, termenele și
+        <Link href="/rolul-si-atributiile-onrc-romania/">schimbarea sediului social</Link>,{' '}
+        <Link href="/rolul-si-atributiile-onrc-romania/">suspendarea activității firmei</Link> și{' '}
+        <Link href="/rolul-si-atributiile-onrc-romania/">radierea unui SRL</Link>, cu actele, termenele și
         greșelile care întorc dosarele.
       </p>
     </ArticleLayout>

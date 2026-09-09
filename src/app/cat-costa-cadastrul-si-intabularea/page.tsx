@@ -301,7 +301,7 @@ export default function Page() {
         interesează sunt POT-ul și CUT-ul parcelei.{' '}
         <Link href="/calculator/cat-pot-construi/">Calculatorul „Cât pot construi”</Link> îți dă
         amprenta maximă a casei pe cifrele tale, iar ghidul{' '}
-        <Link href="/cat-poti-construi-pe-teren/">Cât poți construi pe terenul tău</Link> explică de
+        <Link href="/calculator/cat-pot-construi/">Cât poți construi pe terenul tău</Link> explică de
         unde iei valorile și ce greșeli de calcul să eviți. Ordinea corectă rămâne aceeași ca la
         cadastru: întâi documentele, apoi banii.
       </p>

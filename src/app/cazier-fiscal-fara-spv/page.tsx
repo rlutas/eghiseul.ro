@@ -107,7 +107,7 @@ export default function Page() {
         ai rutei electronice, blocajele care apar cel mai des și ce rămâne de făcut când SPV-ul nu
         merge. Dacă vrei mai întâi noțiunile de bază, ce este cazierul fiscal și ce fapte se înscriu în
         el, sunt explicate în ghidul despre{' '}
-        <Link href="/cazier-fiscal-persoana-fizica/">cazierul fiscal al persoanei fizice</Link>.
+        <Link href="/cazier-fiscal-fara-spv/">cazierul fiscal al persoanei fizice</Link>.
       </p>
 
       <h2>Ce este SPV și de ce este ruta gratuită</h2>
