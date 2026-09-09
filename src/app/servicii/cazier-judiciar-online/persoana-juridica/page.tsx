@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { createPublicClient } from '@/lib/supabase/public';
-import { buildPageMetadata, buildServicePageGraph, BASE_URL, SERVICE_AGGREGATE_RATING } from '@/lib/seo';
+import { buildPageMetadata, buildServicePageGraph, BASE_URL } from '@/lib/seo';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -97,11 +97,6 @@ const jsonLdGraph = buildServicePageGraph({
   serviceType: 'Document Processing — Legal',
   datePublished: DATE_PUBLISHED,
   dateModified: DATE_MODIFIED,
-  reviewedBy: {
-    name: 'Departamentul Juridic eGhișeul.ro',
-    jobTitle: 'Echipă de specialiști drept administrativ',
-    organizationName: 'eDigitalizare SRL',
-  },
   breadcrumb: [
     { name: 'Acasă', url: `${BASE_URL}/` },
     { name: 'Servicii', url: `${BASE_URL}/servicii/` },
@@ -112,7 +107,6 @@ const jsonLdGraph = buildServicePageGraph({
     { name: 'Cazier Judiciar Persoană Juridică (Standard 3-5 zile)', price: 198, url: `${BASE_URL}${PAGE_PATH}` },
     { name: 'Cazier Judiciar Persoană Juridică (Urgent 1-2 zile)', price: 278, url: `${BASE_URL}${PAGE_PATH}` },
   ],
-  aggregateRating: SERVICE_AGGREGATE_RATING,
 });
 
 export default async function CazierJudiciarPJPage() {

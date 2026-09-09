@@ -28,9 +28,10 @@ import { WhatsAppButton } from '@/components/services/whatsapp-button';
 import { GoogleReviewsBadge } from '@/components/services/google-reviews-badge';
 import { OrderButton } from '@/components/services/order-button';
 import { SystemStatus } from '@/components/services/system-status';
-import { buildPageMetadata, buildServicePageGraph, BASE_URL, serviceUrl, SERVICE_AGGREGATE_RATING } from '@/lib/seo';
+import { buildPageMetadata, buildServicePageGraph, BASE_URL, serviceUrl } from '@/lib/seo';
 import { getImobiliareServices } from '@/lib/services/imobiliare';
 import { ServiceSwitcher } from '@/components/services/service-switcher';
+import { PrivateServiceNotice } from '@/components/services/private-service-notice';
 
 // New service — no WP legacy URL, so the folder name matches the DB slug and
 // serviceUrl() resolves to this page with no redirect/override needed.
@@ -78,11 +79,6 @@ const buildJsonLd = (basePrice: number) => buildServicePageGraph({
   serviceType: 'Document Processing — Real Estate',
   datePublished: DATE_PUBLISHED,
   dateModified: DATE_MODIFIED,
-  reviewedBy: {
-    name: 'Departamentul Juridic eGhișeul.ro',
-    jobTitle: 'Echipă de specialiști drept administrativ',
-    organizationName: 'eDigitalizare SRL',
-  },
   breadcrumb: [
     { name: 'Acasă', url: `${BASE_URL}/` },
     { name: 'Servicii', url: `${BASE_URL}/servicii/` },
@@ -91,7 +87,6 @@ const buildJsonLd = (basePrice: number) => buildServicePageGraph({
   offers: [
     { name: 'Copie după Releveu', price: basePrice, url: `${BASE_URL}${PAGE_PATH}` },
   ],
-  aggregateRating: SERVICE_AGGREGATE_RATING,
 });
 
 export default async function CopieReleveuPage() {
@@ -173,7 +168,7 @@ export default async function CopieReleveuPage() {
 
                 <p className="text-lg sm:text-xl text-white/85 leading-relaxed mb-6">
                   Releveul este planul apartamentului: dispunerea camerelor, suprafețele utile per încăpere
-                  și dimensiunile interioare. Îți eliberăm copia certificată din arhiva OCPI, 100% online.
+                  și dimensiunile interioare. Îți obținem copia certificată din arhiva OCPI, 100% online.
                 </p>
 
                 {/* USP */}
@@ -269,6 +264,12 @@ export default async function CopieReleveuPage() {
             </div>
           </div>
         </section>
+
+        <PrivateServiceNotice
+          institutionLabel="direct la OCPI/ANCPI"
+          institutionUrl="https://www.ancpi.ro/"
+        />
+
 
         {/* Trust strip */}
         <section className="bg-white border-b border-neutral-200">
@@ -401,7 +402,7 @@ export default async function CopieReleveuPage() {
                 <Link href={serviceUrl('identificare-imobil')} className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
                   Identificare Imobil
                 </Link>
-                , apoi îți eliberăm copia după releveu.
+                , apoi îți obținem copia după releveu.
               </p>
             </div>
           </div>
@@ -530,7 +531,7 @@ export default async function CopieReleveuPage() {
             { q: 'Cu ce diferă releveul de planul cadastral?', a: 'Planul cadastral arată poziția imobilului pe ortofotoplan, la nivel de teren și contur exterior. Releveul coboară în interior și arată compartimentarea apartamentului și suprafețele pe camere. Sunt planșe complementare.' },
             { q: 'Cât costă copia după releveu?', a: `${service.base_price} RON, cu taxele OCPI incluse. Fără costuri ascunse.` },
             { q: 'Cât durează eliberarea?', a: `${formatEstimatedDays(service)}. Documentul este procesat de un operator și livrat pe email.` },
-            { q: 'Nu știu numărul cadastral al apartamentului. Ce fac?', a: 'Îl putem afla după adresă prin serviciul de Identificare Imobil, apoi îți eliberăm copia după releveu.' },
+            { q: 'Nu știu numărul cadastral al apartamentului. Ce fac?', a: 'Îl putem afla după adresă prin serviciul de Identificare Imobil, apoi îți obținem copia după releveu.' },
             { q: 'Am nevoie de cont ANCPI? În ce format primesc releveul?', a: 'Nu ai nevoie de cont ANCPI — ne ocupăm noi de tot procesul; tu ai nevoie doar de numărul cadastral sau de carte funciară. Releveul se livrează în format electronic, pe email.' },
           ]}
         />

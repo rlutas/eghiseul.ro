@@ -27,9 +27,10 @@ import { MobileStickyCTA } from '@/components/services/mobile-sticky-cta';
 import { WhatsAppButton } from '@/components/services/whatsapp-button';
 import { GoogleReviewsBadge } from '@/components/services/google-reviews-badge';
 import { OrderButton } from '@/components/services/order-button';
-import { buildPageMetadata, buildServicePageGraph, BASE_URL, serviceUrl, SERVICE_AGGREGATE_RATING } from '@/lib/seo';
+import { buildPageMetadata, buildServicePageGraph, BASE_URL, serviceUrl } from '@/lib/seo';
 import { getImobiliareServices } from '@/lib/services/imobiliare';
 import { ServiceSwitcher } from '@/components/services/service-switcher';
+import { PrivateServiceNotice } from '@/components/services/private-service-notice';
 
 // New service — no WP legacy URL, so the folder name matches the DB slug and
 // serviceUrl() resolves to this page with no redirect/override needed.
@@ -77,11 +78,6 @@ const jsonLdGraph = buildServicePageGraph({
   serviceType: 'Document Processing — Real Estate',
   datePublished: DATE_PUBLISHED,
   dateModified: DATE_MODIFIED,
-  reviewedBy: {
-    name: 'Departamentul Juridic eGhișeul.ro',
-    jobTitle: 'Echipă de specialiști drept administrativ',
-    organizationName: 'eDigitalizare SRL',
-  },
   breadcrumb: [
     { name: 'Acasă', url: `${BASE_URL}/` },
     { name: 'Servicii', url: `${BASE_URL}/servicii/` },
@@ -90,7 +86,6 @@ const jsonLdGraph = buildServicePageGraph({
   offers: [
     { name: 'Extras de Plan Cadastral', price: 79.99, url: `${BASE_URL}${PAGE_PATH}` },
   ],
-  aggregateRating: SERVICE_AGGREGATE_RATING,
 });
 
 export default async function ExtrasPlanCadastralPage() {
@@ -264,6 +259,12 @@ export default async function ExtrasPlanCadastralPage() {
           </div>
         </section>
 
+        <PrivateServiceNotice
+          institutionLabel="direct la OCPI/ANCPI"
+          institutionUrl="https://www.ancpi.ro/"
+        />
+
+
         {/* Trust strip */}
         <section className="bg-white border-b border-neutral-200">
           <div className="container mx-auto px-4 max-w-[1100px] py-6 lg:py-8">
@@ -343,7 +344,7 @@ export default async function ExtrasPlanCadastralPage() {
                 {' '}și datele afișate au caracter informativ.
               </p>
               <p>
-                <strong>Extrasul de plan cadastral</strong> pe care ți-l eliberăm noi este un{' '}
+                <strong>Extrasul de plan cadastral</strong> pe care ți-l obținem noi este un{' '}
                 <strong>document OCPI / ANCPI</strong> (în format electronic, livrat pe email): conține
                 reprezentarea grafică exactă a imobilului pe ortofotoplan, cu conturul parcelei, vecinătățile și
                 numărul cadastral — exact ce ai nevoie pentru documentații tehnice, autorizații sau dosare. Nu este
@@ -356,7 +357,7 @@ export default async function ExtrasPlanCadastralPage() {
                 <Link href={serviceUrl('identificare-imobil')} className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
                   identificare imobil
                 </Link>
-                , apoi îți eliberăm planul cadastral pentru terenul găsit.
+                , apoi îți obținem planul cadastral pentru terenul găsit.
               </p>
             </div>
           </div>
@@ -396,7 +397,7 @@ export default async function ExtrasPlanCadastralPage() {
                 <Link href={serviceUrl('identificare-imobil')} className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
                   Identificare Imobil
                 </Link>
-                , apoi îți eliberăm planul cadastral.
+                , apoi îți obținem planul cadastral.
               </p>
             </div>
           </div>
@@ -554,12 +555,12 @@ export default async function ExtrasPlanCadastralPage() {
             { q: 'Ce este extrasul de plan cadastral?', a: 'Este reprezentarea grafică a imobilului pe ortofotoplan, eliberată de OCPI/ANCPI. Arată poziția, conturul și vecinătățile parcelei pe hartă.' },
             { q: 'Cu ce diferă de extrasul de carte funciară?', a: 'Planul cadastral arată harta (poziția grafică a imobilului), iar extrasul de carte funciară arată situația juridică (proprietar, suprafață, sarcini). Sunt documente complementare.' },
             { q: 'Cum localizez terenul după numărul cadastral?', a: 'Introduci numărul cadastral, iar planul cadastral pe ortofotoplan îți arată exact unde se află terenul și care este conturul lui.' },
-            { q: 'Care e diferența între harta cadastrală online de pe geoportalul ANCPI și extrasul de plan cadastral?', a: 'Pe geoportalul ANCPI poți consulta gratuit harta cadastrală interactivă cu poziția aproximativă a parcelelor, dar cu caracter strict informativ, fără document. Extrasul de plan cadastral pe care ți-l eliberăm noi este documentul OCPI/ANCPI, cu reprezentarea grafică exactă a imobilului pe ortofotoplan, valabil pentru autorizații, documentații și dosare.' },
+            { q: 'Care e diferența între harta cadastrală online de pe geoportalul ANCPI și extrasul de plan cadastral?', a: 'Pe geoportalul ANCPI poți consulta gratuit harta cadastrală interactivă cu poziția aproximativă a parcelelor, dar cu caracter strict informativ, fără document. Extrasul de plan cadastral pe care ți-l obținem noi este documentul OCPI/ANCPI, cu reprezentarea grafică exactă a imobilului pe ortofotoplan, valabil pentru autorizații, documentații și dosare.' },
             { q: 'Pot vedea cadastrul online pentru un imobil?', a: 'Da. Harta cadastrală o poți consulta informativ pe geoportalul ANCPI. Dacă ai nevoie de documentul care arată imobilul pe ortofotoplan, comanzi extrasul de plan cadastral și îl primești pe email, fără cont ANCPI și fără deplasare.' },
-            { q: 'Cum verific dacă un teren este înscris în cadastru?', a: 'Dacă ai numărul cadastral sau de carte funciară, îți eliberăm planul cadastral care confirmă înscrierea și poziția imobilului. Dacă nu cunoști numărul, îl aflăm după adresă prin serviciul de identificare imobil.' },
+            { q: 'Cum verific dacă un teren este înscris în cadastru?', a: 'Dacă ai numărul cadastral sau de carte funciară, îți obținem planul cadastral care confirmă înscrierea și poziția imobilului. Dacă nu cunoști numărul, îl aflăm după adresă prin serviciul de identificare imobil.' },
             { q: 'Cât costă planul cadastral?', a: `${service.base_price} RON, cu taxele ANCPI incluse. Fără costuri ascunse.` },
             { q: 'Cât durează eliberarea?', a: `${formatEstimatedDays(service)}. Documentul este procesat de un operator și livrat pe email.` },
-            { q: 'Nu știu numărul cadastral. Ce fac?', a: 'Îl putem afla după adresă prin serviciul de Identificare Imobil, apoi îți eliberăm planul cadastral.' },
+            { q: 'Nu știu numărul cadastral. Ce fac?', a: 'Îl putem afla după adresă prin serviciul de Identificare Imobil, apoi îți obținem planul cadastral.' },
             { q: 'Am nevoie de cont ANCPI?', a: 'Nu. Ne ocupăm noi de tot procesul; tu ai nevoie doar de numărul cadastral sau de carte funciară.' },
           ]}
         />

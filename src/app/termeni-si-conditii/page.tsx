@@ -227,8 +227,10 @@ export default function Page() {
         <p>
           Acești termeni sunt guvernați de legea română. Litigiile se soluționează amiabil; în caz contrar, de
           instanțele competente din România. Consumatorii pot apela la{' '}
-          <a href="https://anpc.ro/ce-este-sal/" target="_blank" rel="noopener noreferrer">ANPC — SAL</a> sau la platforma{' '}
-          <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener noreferrer">SOL (ODR)</a>.
+          <a href="https://anpc.ro/ce-este-sal/" target="_blank" rel="noopener noreferrer">ANPC — SAL</a>.
+          Platforma europeană SOL/ODR a fost închisă de Comisia Europeană; informații despre
+          căile de atac disponibile în UE găsiți pe{' '}
+          <a href="https://consumer-redress.ec.europa.eu/" target="_blank" rel="noopener noreferrer">consumer-redress.ec.europa.eu</a>.
         </p>
 
         <h2>18. Contact</h2>

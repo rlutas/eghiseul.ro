@@ -27,9 +27,10 @@ import { WhatsAppButton } from '@/components/services/whatsapp-button';
 import { GoogleReviewsBadge } from '@/components/services/google-reviews-badge';
 import { OrderButton } from '@/components/services/order-button';
 import { SystemStatus } from '@/components/services/system-status';
-import { buildPageMetadata, buildServicePageGraph, BASE_URL, serviceUrl, SERVICE_AGGREGATE_RATING } from '@/lib/seo';
+import { buildPageMetadata, buildServicePageGraph, BASE_URL, serviceUrl } from '@/lib/seo';
 import { getImobiliareServices } from '@/lib/services/imobiliare';
 import { ServiceSwitcher } from '@/components/services/service-switcher';
+import { PrivateServiceNotice } from '@/components/services/private-service-notice';
 
 // New service — no WP legacy URL, so the folder name matches the DB slug and
 // serviceUrl() resolves to this page with no redirect/override needed.
@@ -77,11 +78,6 @@ const buildJsonLd = (basePrice: number) => buildServicePageGraph({
   serviceType: 'Document Processing — Real Estate',
   datePublished: DATE_PUBLISHED,
   dateModified: DATE_MODIFIED,
-  reviewedBy: {
-    name: 'Departamentul Juridic eGhișeul.ro',
-    jobTitle: 'Echipă de specialiști drept administrativ',
-    organizationName: 'eDigitalizare SRL',
-  },
   breadcrumb: [
     { name: 'Acasă', url: `${BASE_URL}/` },
     { name: 'Servicii', url: `${BASE_URL}/servicii/` },
@@ -90,7 +86,6 @@ const buildJsonLd = (basePrice: number) => buildServicePageGraph({
   offers: [
     { name: 'Copie Inventar de Coordonate Stereo 70', price: basePrice, url: `${BASE_URL}${PAGE_PATH}` },
   ],
-  aggregateRating: SERVICE_AGGREGATE_RATING,
 });
 
 export default async function CopieInventarCoordonatePage() {
@@ -270,6 +265,12 @@ export default async function CopieInventarCoordonatePage() {
           </div>
         </section>
 
+        <PrivateServiceNotice
+          institutionLabel="direct la OCPI/ANCPI"
+          institutionUrl="https://www.ancpi.ro/"
+        />
+
+
         {/* Trust strip */}
         <section className="bg-white border-b border-neutral-200">
           <div className="container mx-auto px-4 max-w-[1100px] py-6 lg:py-8">
@@ -372,7 +373,7 @@ export default async function CopieInventarCoordonatePage() {
                 <Link href={serviceUrl('identificare-imobil')} className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
                   identificare imobil
                 </Link>
-                , apoi îți eliberăm copia inventarului de coordonate pentru parcela găsită.
+                , apoi îți obținem copia inventarului de coordonate pentru parcela găsită.
               </p>
             </div>
           </div>
@@ -412,7 +413,7 @@ export default async function CopieInventarCoordonatePage() {
                 <Link href={serviceUrl('identificare-imobil')} className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
                   Identificare Imobil
                 </Link>
-                , apoi îți eliberăm inventarul de coordonate.
+                , apoi îți obținem inventarul de coordonate.
               </p>
             </div>
           </div>
@@ -540,7 +541,7 @@ export default async function CopieInventarCoordonatePage() {
             { q: 'Cu ce diferă de planul de amplasament și delimitare?', a: 'Inventarul de coordonate conține valorile numerice X/Y ale punctelor de hotar (pentru trasare și calcul), iar planul de amplasament și delimitare este reprezentarea grafică a aceleiași parcele, la scară, cu vecinătăți. Sunt complementare.' },
             { q: 'Cât costă copia inventarului de coordonate?', a: `${service.base_price} RON, cu taxele OCPI incluse. Fără costuri ascunse.` },
             { q: 'Cât durează eliberarea?', a: `${formatEstimatedDays(service)}. Cererea este procesată de un operator, iar inventarul de coordonate este livrat pe email.` },
-            { q: 'Nu știu numărul cadastral. Ce fac?', a: 'Îl putem afla după adresă prin serviciul de Identificare Imobil, apoi îți eliberăm copia inventarului de coordonate.' },
+            { q: 'Nu știu numărul cadastral. Ce fac?', a: 'Îl putem afla după adresă prin serviciul de Identificare Imobil, apoi îți obținem copia inventarului de coordonate.' },
             { q: 'Am nevoie de cont ANCPI?', a: 'Nu. Ne ocupăm noi de tot procesul; tu ai nevoie doar de numărul cadastral sau de numărul de carte funciară.' },
             { q: 'În ce format primesc inventarul de coordonate?', a: 'În format electronic, pe email — fără deplasare la ghișeul OCPI. Tabelul cu punctele de hotar și coordonatele X/Y poate fi încărcat direct în stația totală sau în software-ul de topografie.' },
           ]}

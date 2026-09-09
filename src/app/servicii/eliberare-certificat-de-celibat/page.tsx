@@ -30,7 +30,7 @@ import { GoogleReviewsBadge } from '@/components/services/google-reviews-badge';
 import { OrderButton } from '@/components/services/order-button';
 import { ServiceFAQ } from '@/components/services/service-faq';
 import { ReviewsSection } from '@/components/services/reviews-section';
-import { buildPageMetadata, buildServicePageGraph, BASE_URL, SERVICE_AGGREGATE_RATING } from '@/lib/seo';
+import { buildPageMetadata, buildServicePageGraph, BASE_URL } from '@/lib/seo';
 import { ServicePrice } from '@/components/services/service-price';
 
 // Database slug (order pipeline identifier). URL path uses the SEO-friendly
@@ -85,11 +85,6 @@ const buildJsonLd = (basePrice: number) => buildServicePageGraph({
   serviceType: 'Document Processing — Civil Status',
   datePublished: DATE_PUBLISHED,
   dateModified: DATE_MODIFIED,
-  reviewedBy: {
-    name: 'Departamentul Juridic eGhișeul.ro',
-    jobTitle: 'Echipă de specialiști drept administrativ',
-    organizationName: 'eDigitalizare SRL',
-  },
   breadcrumb: [
     { name: 'Acasă', url: `${BASE_URL}/` },
     { name: 'Servicii', url: `${BASE_URL}/servicii/` },
@@ -98,7 +93,6 @@ const buildJsonLd = (basePrice: number) => buildServicePageGraph({
   offers: [
     { name: 'Certificat de Celibat (Standard)', price: basePrice, url: `${BASE_URL}${PAGE_PATH}` },
   ],
-  aggregateRating: SERVICE_AGGREGATE_RATING,
 });
 
 export default async function CertificatCelibatPage() {

@@ -26,10 +26,11 @@ import { WhatsAppButton } from '@/components/services/whatsapp-button';
 import { GoogleReviewsBadge } from '@/components/services/google-reviews-badge';
 import { ReviewsSection } from '@/components/services/reviews-section';
 import { OrderButton } from '@/components/services/order-button';
-import { buildPageMetadata, buildServicePageGraph, BASE_URL, serviceUrl, SERVICE_AGGREGATE_RATING } from '@/lib/seo';
+import { buildPageMetadata, buildServicePageGraph, BASE_URL, serviceUrl } from '@/lib/seo';
 import { getImobiliareServices } from '@/lib/services/imobiliare';
 import { ServiceSwitcher } from '@/components/services/service-switcher';
 import { SystemStatus } from '@/components/services/system-status';
+import { PrivateServiceNotice } from '@/components/services/private-service-notice';
 
 // New service — no WP legacy URL, so the folder name matches the DB slug and
 // serviceUrl() resolves to this page with no redirect/override needed.
@@ -77,11 +78,6 @@ const jsonLdGraph = buildServicePageGraph({
   serviceType: 'Document Processing — Real Estate',
   datePublished: DATE_PUBLISHED,
   dateModified: DATE_MODIFIED,
-  reviewedBy: {
-    name: 'Departamentul Juridic eGhișeul.ro',
-    jobTitle: 'Echipă de specialiști drept administrativ',
-    organizationName: 'eDigitalizare SRL',
-  },
   breadcrumb: [
     { name: 'Acasă', url: `${BASE_URL}/` },
     { name: 'Servicii', url: `${BASE_URL}/servicii/` },
@@ -90,7 +86,6 @@ const jsonLdGraph = buildServicePageGraph({
   offers: [
     { name: 'Identificare Imobil după Adresă', price: 198, url: `${BASE_URL}${PAGE_PATH}` },
   ],
-  aggregateRating: SERVICE_AGGREGATE_RATING,
 });
 
 export default async function IdentificareImobilPage() {
@@ -270,6 +265,12 @@ export default async function IdentificareImobilPage() {
           </div>
         </section>
 
+        <PrivateServiceNotice
+          institutionLabel="direct la OCPI/ANCPI"
+          institutionUrl="https://www.ancpi.ro/"
+        />
+
+
         {/* Trust strip */}
         <section className="bg-white border-b border-neutral-200">
           <div className="container mx-auto px-4 max-w-[1100px] py-6 lg:py-8">
@@ -344,7 +345,7 @@ export default async function IdentificareImobilPage() {
                   confirmăm parcela în sistemul ANCPI și îți spunem cui aparține și ce situație juridică are.
                 </p>
                 <p className="text-sm sm:text-base text-neutral-700 leading-relaxed">
-                  Rezultatul nu este o simplă căutare pe hartă: îți eliberăm și <strong>extrasul oficial de
+                  Rezultatul nu este o simplă căutare pe hartă: îți obținem și <strong>extrasul oficial de
                   carte funciară</strong>, documentul care confirmă proprietarul, suprafața și eventualele
                   sarcini (ipoteci, interdicții, litigii) — exact ce ai nevoie înainte de o tranzacție.
                 </p>
@@ -546,7 +547,7 @@ export default async function IdentificareImobilPage() {
           faqs={[
             { q: 'Cum aflu numărul cadastral după adresă?', a: 'Ne dai adresa completă a imobilului, iar noi localizăm parcela/construcția în sistemul ANCPI și identificăm numărul cadastral și de carte funciară. Primești rezultatul pe email, împreună cu extrasul CF.' },
             { q: 'Cum aflu numărul de carte funciară după adresă?', a: 'La fel ca pentru numărul cadastral: pornind de la adresă, identificăm imobilul în sistemul ANCPI și îți comunicăm numărul de carte funciară. Primești și extrasul CF aferent, pe email.' },
-            { q: 'Pot localiza un teren după numărul cadastral?', a: 'Da. Dacă ai deja numărul cadastral, confirmăm parcela în sistemul ANCPI, îți spunem proprietarul și situația juridică și îți eliberăm extrasul de carte funciară. Funcționează și invers, după adresă.' },
+            { q: 'Pot localiza un teren după numărul cadastral?', a: 'Da. Dacă ai deja numărul cadastral, confirmăm parcela în sistemul ANCPI, îți spunem proprietarul și situația juridică și îți obținem extrasul de carte funciară. Funcționează și invers, după adresă.' },
             { q: 'Cum fac o verificare de cadastru online?', a: 'Ne trimiți adresa sau numărul cadastral, iar noi facem verificarea în sistemul oficial ANCPI și îți returnăm extrasul de carte funciară — proprietar, suprafață și eventuale sarcini. Totul 100% online, fără cont ANCPI.' },
             { q: 'Ce primesc concret?', a: 'Numărul cadastral și/sau de carte funciară al imobilului identificat și extrasul de carte funciară aferent, livrate pe email.' },
             { q: 'Cât costă identificarea imobilului?', a: `${service.base_price} RON, cu taxele ANCPI și extrasul CF incluse. Fără costuri ascunse.` },

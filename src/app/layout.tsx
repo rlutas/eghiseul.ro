@@ -20,15 +20,9 @@ export const metadata: Metadata = {
   },
   description:
     "Obține cazier judiciar, cazier fiscal, certificat constatator, extras de carte funciară și alte documente online — rapid, legal, fără cozi. Livrare pe email sau curier în 24-48 ore.",
-  keywords: [
-    "cazier judiciar online",
-    "cazier fiscal",
-    "certificat constatator",
-    "extras carte funciară",
-    "certificat de integritate comportamentală",
-    "documente online",
-    "acte online România",
-  ],
+  // `keywords` scos (09.09.2026): Google îl ignoră de ~15 ani, iar la noi era
+  // IDENTIC pe 231 din 233 de pagini — inclusiv pe /gdpr/ și pe calculatoare.
+  // Ca semnal nu valora nimic; ca amprentă era semnătura de generare la scară.
   authors: [{ name: "eGhiseul.ro" }],
   creator: "eGhiseul.ro",
   alternates: { canonical: "https://eghiseul.ro/" },

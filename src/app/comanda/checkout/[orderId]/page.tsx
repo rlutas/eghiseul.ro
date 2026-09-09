@@ -22,6 +22,7 @@ import { SystemStatus } from '@/components/services/system-status';
 import { instantPlatformProvider, platformStatusProvider } from '@/lib/services/platform-services';
 import { estimateFromSelectedOptions } from '@/lib/delivery-calculator';
 import { cn } from '@/lib/utils';
+import { OrderFlowDisclosure } from '@/components/legal/order-flow-disclosure';
 
 interface OrderData {
   id: string;
@@ -625,6 +626,7 @@ export default function CheckoutPage() {
           </Button>
         </div>
       </div>
+      <OrderFlowDisclosure />
     </div>
   );
 }

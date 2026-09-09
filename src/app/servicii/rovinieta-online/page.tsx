@@ -54,13 +54,6 @@ const jsonLdGraph = {
       image: `${BASE_URL}/og/default.png`,
       url: PAGE_URL,
       brand: { '@type': 'Brand', name: 'eGhișeul.ro' },
-      aggregateRating: {
-        '@type': 'AggregateRating',
-        ratingValue: 4.8,
-        reviewCount: 89,
-        bestRating: 5,
-        worstRating: 1,
-      },
     },
   ],
 };

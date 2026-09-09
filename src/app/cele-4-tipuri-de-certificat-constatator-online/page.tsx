@@ -7,7 +7,10 @@ const TITLE = 'Tipurile de certificat constatator online: ghid actualizat';
 const DESCRIPTION =
   'Cele cinci rapoarte care se numesc toate „certificat constatator”: pe firmă (de bază, fonduri IMM, insolvență), ' +
   'pe persoană fizică și cu istoric. Ce conține fiecare, la ce ți-l cer instituțiile, cât costă și când merită luat direct de la ONRC prin InfoCert.';
-const DATE_PUBLISHED = '2024-01-01';
+// Data la care articolul e verificabil la acest URL (migrarea din WordPress).
+// Înainte aici scria '2024-01-01' — un placeholder identic pe 12 articole, adică
+// o dată inventată în schema. Dacă apare dovada datei reale de pe WP, se corectează.
+const DATE_PUBLISHED = '2026-06-16';
 const DATE_MODIFIED = '2026-08-28';
 
 export const revalidate = 86400;

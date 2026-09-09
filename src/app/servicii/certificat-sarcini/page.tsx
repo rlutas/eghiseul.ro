@@ -26,9 +26,10 @@ import { WhatsAppButton } from '@/components/services/whatsapp-button';
 import { GoogleReviewsBadge } from '@/components/services/google-reviews-badge';
 import { OrderButton } from '@/components/services/order-button';
 import { SystemStatus } from '@/components/services/system-status';
-import { buildPageMetadata, buildServicePageGraph, BASE_URL, serviceUrl, SERVICE_AGGREGATE_RATING } from '@/lib/seo';
+import { buildPageMetadata, buildServicePageGraph, BASE_URL, serviceUrl } from '@/lib/seo';
 import { getImobiliareServices } from '@/lib/services/imobiliare';
 import { ServiceSwitcher } from '@/components/services/service-switcher';
+import { PrivateServiceNotice } from '@/components/services/private-service-notice';
 
 // New service — no WP legacy URL, so the folder name matches the DB slug and
 // serviceUrl() resolves to this page with no redirect/override needed.
@@ -76,11 +77,6 @@ const buildJsonLd = (basePrice: number) => buildServicePageGraph({
   serviceType: 'Document Processing — Real Estate',
   datePublished: DATE_PUBLISHED,
   dateModified: DATE_MODIFIED,
-  reviewedBy: {
-    name: 'Departamentul Juridic eGhișeul.ro',
-    jobTitle: 'Echipă de specialiști drept administrativ',
-    organizationName: 'eDigitalizare SRL',
-  },
   breadcrumb: [
     { name: 'Acasă', url: `${BASE_URL}/` },
     { name: 'Servicii', url: `${BASE_URL}/servicii/` },
@@ -89,7 +85,6 @@ const buildJsonLd = (basePrice: number) => buildServicePageGraph({
   offers: [
     { name: 'Certificat de Sarcini', price: basePrice, url: `${BASE_URL}${PAGE_PATH}` },
   ],
-  aggregateRating: SERVICE_AGGREGATE_RATING,
 });
 
 export default async function CertificatSarciniPage() {
@@ -269,6 +264,12 @@ export default async function CertificatSarciniPage() {
           </div>
         </section>
 
+        <PrivateServiceNotice
+          institutionLabel="direct la OCPI/ANCPI"
+          institutionUrl="https://www.ancpi.ro/"
+        />
+
+
         {/* Trust strip */}
         <section className="bg-white border-b border-neutral-200">
           <div className="container mx-auto px-4 max-w-[1100px] py-6 lg:py-8">
@@ -369,7 +370,7 @@ export default async function CertificatSarciniPage() {
                 <Link href={serviceUrl('identificare-imobil')} className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
                   identificare imobil
                 </Link>
-                , iar apoi îți eliberăm certificatul de sarcini pentru proprietatea găsită.
+                , iar apoi îți obținem certificatul de sarcini pentru proprietatea găsită.
               </p>
             </div>
           </div>
@@ -409,7 +410,7 @@ export default async function CertificatSarciniPage() {
                 <Link href={serviceUrl('identificare-imobil')} className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
                   Identificare Imobil
                 </Link>
-                , apoi îți eliberăm certificatul de sarcini.
+                , apoi îți obținem certificatul de sarcini.
               </p>
             </div>
           </div>
@@ -536,7 +537,7 @@ export default async function CertificatSarciniPage() {
             { q: 'Cu ce diferă de extrasul de carte funciară?', a: 'Extrasul de carte funciară complet conține întreaga situație a imobilului, inclusiv proprietarii, suprafața și sarcinile. Certificatul de sarcini este focusat strict pe partea de grevări (ipoteci, interdicții, litigii). Dacă vrei imaginea juridică completă, alegi extrasul; dacă te interesează doar sarcinile, certificatul este mai direct.' },
             { q: 'Cât durează eliberarea certificatului de sarcini?', a: `${formatEstimatedDays(service)}. Documentul este procesat de un operator și livrat pe email.` },
             { q: 'Cât costă certificatul de sarcini?', a: `${service.base_price} RON, cu taxele OCPI incluse. Fără costuri ascunse.` },
-            { q: 'Nu știu numărul cadastral. Ce fac?', a: 'Îl putem afla după adresă prin serviciul de Identificare Imobil, apoi îți eliberăm certificatul de sarcini pentru proprietatea găsită.' },
+            { q: 'Nu știu numărul cadastral. Ce fac?', a: 'Îl putem afla după adresă prin serviciul de Identificare Imobil, apoi îți obținem certificatul de sarcini pentru proprietatea găsită.' },
             { q: 'Am nevoie de cont ANCPI?', a: 'Nu. Ne ocupăm noi de tot procesul; tu ai nevoie doar de numărul cadastral sau de carte funciară și de localitate.' },
             { q: 'Certificatul de sarcini este valabil la notar și la bancă?', a: 'Da. Certificatul de sarcini este documentul OCPI/ANCPI emis din cartea funciară și este folosit în mod curent în dosarele notariale și de credit ipotecar pentru a dovedi situația grevărilor imobilului.' },
             { q: 'Cine poate cere un certificat de sarcini?', a: 'Îl poate cere orice persoană fizică sau juridică interesată de situația imobilului, nu doar proprietarul. Ai nevoie de numărul cadastral sau de carte funciară și de localitate, iar un operator se ocupă de cererea către OCPI.' },

@@ -22,11 +22,28 @@ export interface CalculatorLayoutProps {
   faqs?: { q: string; a: string }[];
   /** Răspuns direct, 1-2 propoziții (TL;DR) — afișat sub widget, pentru AI Overviews. */
   tldr?: string;
+  /**
+   * Data reală a ultimei actualizări a ACESTUI calculator (`YYYY-MM-DD`).
+   * Fără ea, toate cele 41 de calculatoare raportau aceeași dată în schema —
+   * corect în iunie, tot mai fals cu fiecare lună (audit 09.09.2026).
+   */
+  dateModified?: string;
 }
 
-// Toate calculatoarele au fost verificate/actualizate în iunie 2026 (rate 2026).
-const DATE_MODIFIED = '2026-06-22';
-const ACTUALIZAT = 'iunie 2026';
+// Verificarea de bază a tuturor calculatoarelor (rate 2026). Fiecare calculator
+// atins ulterior își trece data lui prin prop-ul `dateModified`.
+const DATE_MODIFIED_DEFAULT = '2026-06-22';
+
+const LUNI_RO = [
+  'ianuarie', 'februarie', 'martie', 'aprilie', 'mai', 'iunie',
+  'iulie', 'august', 'septembrie', 'octombrie', 'noiembrie', 'decembrie',
+] as const;
+
+/** „2026-07-31" → „iulie 2026", pentru textul vizibil din pagină. */
+function lunaAnul(iso: string): string {
+  const [an, luna] = iso.split('-');
+  return `${LUNI_RO[Number(luna) - 1] ?? ''} ${an}`.trim();
+}
 
 /**
  * Internal linking calculatoare → pagini de servicii (money pages).
@@ -114,8 +131,11 @@ export function CalculatorLayout({
   children,
   faqs,
   tldr,
+  dateModified,
 }: CalculatorLayoutProps) {
   const url = `${BASE_URL}/calculator/${slug}/`;
+  const dataActualizarii = dateModified ?? DATE_MODIFIED_DEFAULT;
+  const actualizat = lunaAnul(dataActualizarii);
   const jsonLd = {
     '@context': 'https://schema.org',
     '@graph': [
@@ -139,7 +159,7 @@ export function CalculatorLayout({
         inLanguage: 'ro-RO',
         isAccessibleForFree: true,
         description,
-        dateModified: DATE_MODIFIED,
+        dateModified: dataActualizarii,
         offers: { '@type': 'Offer', price: '0', priceCurrency: 'RON' },
         provider: { '@id': `${BASE_URL}/#organization` },
       },
@@ -149,8 +169,8 @@ export function CalculatorLayout({
         url,
         name: title,
         inLanguage: 'ro-RO',
-        dateModified: DATE_MODIFIED,
-        lastReviewed: DATE_MODIFIED,
+        dateModified: dataActualizarii,
+        lastReviewed: dataActualizarii,
         reviewedBy: { '@id': `${BASE_URL}/#organization` },
         breadcrumb: { '@id': `${url}#breadcrumb` },
         publisher: { '@id': `${BASE_URL}/#organization` },
@@ -189,7 +209,7 @@ export function CalculatorLayout({
               {heading}
             </h1>
             <p className="text-lg text-white/85 leading-relaxed">{description}</p>
-            <p className="mt-3 text-sm text-white/55">Verificat de Echipa eGhișeul.ro · actualizat {ACTUALIZAT} · rate și praguri 2026</p>
+            <p className="mt-3 text-sm text-white/55">Verificat de Echipa eGhișeul.ro · actualizat {actualizat} · rate și praguri 2026</p>
           </div>
         </header>
 

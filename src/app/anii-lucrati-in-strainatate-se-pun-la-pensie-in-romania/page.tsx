@@ -6,7 +6,10 @@ const TITLE = 'Anii lucrați în străinătate se pun la pensie în România?';
 const DESCRIPTION =
   'Da, anii lucrați în străinătate (UE/SEE/Elveția) se iau în calcul la pensia din România. ' +
   'Vezi procedura de solicitare, totalizarea perioadelor de asigurare, calculul pro rata temporis și plata pensiei.';
-const DATE_PUBLISHED = '2024-01-01';
+// Data la care articolul e verificabil la acest URL (migrarea din WordPress).
+// Înainte aici scria '2024-01-01' — un placeholder identic pe 12 articole, adică
+// o dată inventată în schema. Dacă apare dovada datei reale de pe WP, se corectează.
+const DATE_PUBLISHED = '2026-06-16';
 const DATE_MODIFIED = '2026-08-28';
 
 export const revalidate = 86400;

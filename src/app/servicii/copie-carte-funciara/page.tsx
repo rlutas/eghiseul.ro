@@ -26,9 +26,10 @@ import { MobileStickyCTA } from '@/components/services/mobile-sticky-cta';
 import { WhatsAppButton } from '@/components/services/whatsapp-button';
 import { GoogleReviewsBadge } from '@/components/services/google-reviews-badge';
 import { OrderButton } from '@/components/services/order-button';
-import { buildPageMetadata, buildServicePageGraph, BASE_URL, serviceUrl, SERVICE_AGGREGATE_RATING } from '@/lib/seo';
+import { buildPageMetadata, buildServicePageGraph, BASE_URL, serviceUrl } from '@/lib/seo';
 import { getImobiliareServices } from '@/lib/services/imobiliare';
 import { ServiceSwitcher } from '@/components/services/service-switcher';
+import { PrivateServiceNotice } from '@/components/services/private-service-notice';
 
 // New service — no WP legacy URL, so the folder name matches the DB slug and
 // serviceUrl() resolves to this page with no redirect/override needed.
@@ -76,11 +77,6 @@ const buildJsonLd = (basePrice: number) => buildServicePageGraph({
   serviceType: 'Document Processing — Real Estate',
   datePublished: DATE_PUBLISHED,
   dateModified: DATE_MODIFIED,
-  reviewedBy: {
-    name: 'Departamentul Juridic eGhișeul.ro',
-    jobTitle: 'Echipă de specialiști drept administrativ',
-    organizationName: 'eDigitalizare SRL',
-  },
   breadcrumb: [
     { name: 'Acasă', url: `${BASE_URL}/` },
     { name: 'Servicii', url: `${BASE_URL}/servicii/` },
@@ -89,7 +85,6 @@ const buildJsonLd = (basePrice: number) => buildServicePageGraph({
   offers: [
     { name: 'Copie Carte Funciară (in extenso)', price: basePrice, url: `${BASE_URL}${PAGE_PATH}` },
   ],
-  aggregateRating: SERVICE_AGGREGATE_RATING,
 });
 
 export default async function CopieCarteFunciaraPage() {
@@ -266,6 +261,12 @@ export default async function CopieCarteFunciaraPage() {
           </div>
         </section>
 
+        <PrivateServiceNotice
+          institutionLabel="direct la OCPI/ANCPI"
+          institutionUrl="https://www.ancpi.ro/"
+        />
+
+
         {/* Trust strip */}
         <section className="bg-white border-b border-neutral-200">
           <div className="container mx-auto px-4 max-w-[1100px] py-6 lg:py-8">
@@ -358,7 +359,7 @@ export default async function CopieCarteFunciaraPage() {
                 <Link href={serviceUrl('identificare-imobil')} className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
                   identificare imobil
                 </Link>
-                , apoi îți eliberăm copia integrală a cărții funciare pentru imobilul găsit.
+                , apoi îți obținem copia integrală a cărții funciare pentru imobilul găsit.
               </p>
             </div>
           </div>
@@ -398,7 +399,7 @@ export default async function CopieCarteFunciaraPage() {
                 <Link href={serviceUrl('identificare-imobil')} className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
                   Identificare Imobil
                 </Link>
-                , apoi îți eliberăm copia integrală.
+                , apoi îți obținem copia integrală.
               </p>
             </div>
           </div>
@@ -560,7 +561,7 @@ export default async function CopieCarteFunciaraPage() {
             { q: 'Cine poate cere copia in extenso?', a: 'Oricine poate comanda copia in extenso a unei cărți funciare, nu doar proprietarul. Persoanele juridice trec CUI-ul firmei pentru factură. Nu îți trebuie cont ANCPI; ne ocupăm noi de cerere.' },
             { q: 'Cât durează eliberarea?', a: `${formatEstimatedDays(service)}. Cererea este procesată de un operator, care achită taxele OCPI și îți livrează copia certificată pe email.` },
             { q: 'Cât costă copia cărții funciare in extenso?', a: `${service.base_price} RON, cu taxele OCPI incluse. Fără costuri ascunse.` },
-            { q: 'Nu știu numărul cadastral sau de carte funciară. Ce fac?', a: 'Le aflăm după adresă prin serviciul de Identificare Imobil, apoi îți eliberăm copia integrală a cărții funciare.' },
+            { q: 'Nu știu numărul cadastral sau de carte funciară. Ce fac?', a: 'Le aflăm după adresă prin serviciul de Identificare Imobil, apoi îți obținem copia integrală a cărții funciare.' },
             { q: 'Ce valabilitate are copia in extenso?', a: 'Copia reflectă conținutul cărții funciare la data eliberării. Dacă o procedură cere o copie recentă (instanță, notar), obține-o cu puțin timp înainte de depunere, ca să cuprindă cele mai noi înscrieri.' },
           ]}
         />

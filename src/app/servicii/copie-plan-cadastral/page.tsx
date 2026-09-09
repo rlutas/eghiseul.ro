@@ -27,9 +27,10 @@ import { MobileStickyCTA } from '@/components/services/mobile-sticky-cta';
 import { WhatsAppButton } from '@/components/services/whatsapp-button';
 import { GoogleReviewsBadge } from '@/components/services/google-reviews-badge';
 import { OrderButton } from '@/components/services/order-button';
-import { buildPageMetadata, buildServicePageGraph, BASE_URL, serviceUrl, SERVICE_AGGREGATE_RATING } from '@/lib/seo';
+import { buildPageMetadata, buildServicePageGraph, BASE_URL, serviceUrl } from '@/lib/seo';
 import { getImobiliareServices } from '@/lib/services/imobiliare';
 import { ServiceSwitcher } from '@/components/services/service-switcher';
+import { PrivateServiceNotice } from '@/components/services/private-service-notice';
 
 // New service — no WP legacy URL, so the folder name matches the DB slug and
 // serviceUrl() resolves to this page with no redirect/override needed.
@@ -78,11 +79,6 @@ const buildJsonLd = (basePrice: number) => buildServicePageGraph({
   serviceType: 'Document Processing — Real Estate',
   datePublished: DATE_PUBLISHED,
   dateModified: DATE_MODIFIED,
-  reviewedBy: {
-    name: 'Departamentul Juridic eGhișeul.ro',
-    jobTitle: 'Echipă de specialiști drept administrativ',
-    organizationName: 'eDigitalizare SRL',
-  },
   breadcrumb: [
     { name: 'Acasă', url: `${BASE_URL}/` },
     { name: 'Servicii', url: `${BASE_URL}/servicii/` },
@@ -91,7 +87,6 @@ const buildJsonLd = (basePrice: number) => buildServicePageGraph({
   offers: [
     { name: 'Copie Plan Cadastral', price: basePrice, url: `${BASE_URL}${PAGE_PATH}` },
   ],
-  aggregateRating: SERVICE_AGGREGATE_RATING,
 });
 
 export default async function CopiePlanCadastralPage() {
@@ -267,6 +262,12 @@ export default async function CopiePlanCadastralPage() {
           </div>
         </section>
 
+        <PrivateServiceNotice
+          institutionLabel="direct la OCPI/ANCPI"
+          institutionUrl="https://www.ancpi.ro/"
+        />
+
+
         {/* Trust strip */}
         <section className="bg-white border-b border-neutral-200">
           <div className="container mx-auto px-4 max-w-[1100px] py-6 lg:py-8">
@@ -364,7 +365,7 @@ export default async function CopiePlanCadastralPage() {
                 <Link href={serviceUrl('identificare-imobil')} className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
                   identificare imobil
                 </Link>
-                , apoi îți eliberăm copia planului cadastral pentru terenul găsit.
+                , apoi îți obținem copia planului cadastral pentru terenul găsit.
               </p>
             </div>
           </div>
@@ -404,7 +405,7 @@ export default async function CopiePlanCadastralPage() {
                 <Link href={serviceUrl('identificare-imobil')} className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
                   Identificare Imobil
                 </Link>
-                , apoi îți eliberăm copia planului cadastral.
+                , apoi îți obținem copia planului cadastral.
               </p>
             </div>
           </div>
@@ -543,7 +544,7 @@ export default async function CopiePlanCadastralPage() {
             { q: 'La ce îmi folosește?', a: 'La documentații tehnice, dosare notariale, certificate de urbanism, autorizații de construire sau demolare, racordări la utilități și proiectare. Tot cu el compari situația din arhivă cu cea din teren.' },
             { q: 'Cât costă copia planului cadastral?', a: `${service.base_price} RON, cu taxele OCPI incluse. Fără costuri ascunse.` },
             { q: 'Cât durează eliberarea?', a: `${formatEstimatedDays(service)}. Cererea este depusă și procesată de un operator, iar documentul ajunge la tine pe email.` },
-            { q: 'Nu știu numărul cadastral. Ce fac?', a: 'Îl aflăm noi după adresă, prin serviciul de Identificare Imobil, apoi îți eliberăm copia planului cadastral pentru terenul găsit.' },
+            { q: 'Nu știu numărul cadastral. Ce fac?', a: 'Îl aflăm noi după adresă, prin serviciul de Identificare Imobil, apoi îți obținem copia planului cadastral pentru terenul găsit.' },
             { q: 'Am nevoie de cont ANCPI?', a: 'Nu. Ne ocupăm noi de tot procesul. Tu ne dai numărul cadastral sau de carte funciară.' },
             { q: 'Cât timp este valabilă copia?', a: 'Copia reflectă situația din arhivă la momentul eliberării. Dacă imobilul a suferit modificări (dezmembrare, alipire sau actualizări), s-ar putea să ai nevoie de un document mai recent. Pentru poziția la zi îți recomandăm extrasul de plan cadastral pe ortofotoplan.' },
           ]}

@@ -8,6 +8,7 @@ import { Service, ServiceOption } from '@/types/services';
 import { Loader2 } from 'lucide-react';
 import { getImobiliareServices } from '@/lib/services/imobiliare';
 import { ServiceSwitcher } from '@/components/services/service-switcher';
+import { OrderFlowDisclosure } from '@/components/legal/order-flow-disclosure';
 
 // Fetch service by slug
 async function getService(slug: string): Promise<{ service: Service; options: ServiceOption[] } | null> {
@@ -117,6 +118,7 @@ export default async function OrderPage({ params }: OrderPageProps) {
           />
         </ModularWizardProvider>
       </Suspense>
+      <OrderFlowDisclosure />
     </main>
   );
 }

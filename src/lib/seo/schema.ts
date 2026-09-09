@@ -35,7 +35,6 @@ export interface ServiceSchemaInput {
   description: string;
   serviceType?: string;
   offers: ServiceOfferInput[];
-  aggregateRating?: { ratingValue: number; reviewCount: number };
   breadcrumb: BreadcrumbItem[];
   /**
    * Optional editorial review metadata — boosts E-E-A-T signal (Author/Reviewer)
@@ -130,11 +129,17 @@ export function serviceNode(input: ServiceSchemaInput) {
 }
 
 /**
- * Product node carrying the aggregateRating. Google review snippets do NOT
- * support `Service` as parent type (GSC error: "Tip de obiect nevalid pentru
- * <parent_node>", 2026-07-13) — supported types are Product, LocalBusiness,
- * etc. LocalBusiness/Organization self-ratings are "self-serving" and also
- * invalid, so the rating lives on a Product describing the offered service.
+ * Product node: preț + condiții de livrare/retur. NU poartă `aggregateRating`.
+ *
+ * ⚠️ Nu re-adăuga ratingul aici. Cele 464 de recenzii (4,9) sunt despre FIRMĂ,
+ * strânse pe Google — nu despre fiecare dintre cele 31 de servicii. Marcajul de
+ * recenzii pe un Product cere recenzii pentru ACEL produs, vizibile pe pagină;
+ * pe Organization/LocalBusiness e „self-serving" și la fel de neeligibil. Am
+ * avut ambele forme greșite simultan (4,8/64 pe 29 de servicii, 4,8/89 pe
+ * rovinietă, 4,9/457 nefolosit) — scoase pe 09.09.2026.
+ *
+ * Dovada socială reală se afișează VIZIBIL în pagină, cu link către profilul
+ * Google — `SOCIAL_PROOF` din `constants.ts`.
  */
 /**
  * Merchant-listing fields Google flags as missing on Product offers (GSC email
@@ -158,7 +163,7 @@ export const OFFER_SHIPPING_DETAILS = {
 } as const;
 
 export function productNode(input: ServiceSchemaInput) {
-  if (!input.aggregateRating) return null;
+  if (input.offers.length === 0) return null;
   const url = `${BASE_URL}/servicii/${input.slug}/`;
   const prices = input.offers.map((o) => o.price);
   return {
@@ -179,13 +184,6 @@ export function productNode(input: ServiceSchemaInput) {
       url,
       hasMerchantReturnPolicy: MERCHANT_RETURN_POLICY,
       shippingDetails: OFFER_SHIPPING_DETAILS,
-    },
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: input.aggregateRating.ratingValue,
-      reviewCount: input.aggregateRating.reviewCount,
-      bestRating: 5,
-      worstRating: 1,
     },
   };
 }

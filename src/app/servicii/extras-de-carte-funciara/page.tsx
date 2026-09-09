@@ -31,9 +31,10 @@ import { WhatsAppButton } from '@/components/services/whatsapp-button';
 import { GoogleReviewsBadge } from '@/components/services/google-reviews-badge';
 import { ReviewsSection } from '@/components/services/reviews-section';
 import { GOOGLE_RATING, GOOGLE_REVIEW_COUNT_LABEL } from '@/config/contact';
-import { buildPageMetadata, buildServicePageGraph, BASE_URL, serviceUrl, SERVICE_AGGREGATE_RATING } from '@/lib/seo';
+import { buildPageMetadata, buildServicePageGraph, BASE_URL, serviceUrl } from '@/lib/seo';
 import { getImobiliareServices } from '@/lib/services/imobiliare';
 import { ServiceSwitcher } from '@/components/services/service-switcher';
+import { PrivateServiceNotice } from '@/components/services/private-service-notice';
 
 // Database slug (order pipeline identifier). URL path uses the WP slug
 // (extras-DE-carte-funciara) to preserve the indexed URL + backlinks.
@@ -88,11 +89,6 @@ const jsonLdGraph = buildServicePageGraph({
   serviceType: 'Document Processing — Real Estate',
   datePublished: DATE_PUBLISHED,
   dateModified: DATE_MODIFIED,
-  reviewedBy: {
-    name: 'Departamentul Juridic eGhișeul.ro',
-    jobTitle: 'Echipă de specialiști drept administrativ',
-    organizationName: 'eDigitalizare SRL',
-  },
   breadcrumb: [
     { name: 'Acasă', url: `${BASE_URL}/` },
     { name: 'Servicii', url: `${BASE_URL}/servicii/` },
@@ -101,7 +97,6 @@ const jsonLdGraph = buildServicePageGraph({
   offers: [
     { name: 'Extras de Carte Funciară (Standard)', price: 89, url: `${BASE_URL}${PAGE_PATH}` },
   ],
-  aggregateRating: SERVICE_AGGREGATE_RATING,
 });
 
 export default async function ExtrasCarteFunciaraPage() {
@@ -285,6 +280,12 @@ export default async function ExtrasCarteFunciaraPage() {
           </div>
         </section>
 
+        <PrivateServiceNotice
+          institutionLabel="direct la OCPI/ANCPI"
+          institutionUrl="https://www.ancpi.ro/"
+        />
+
+
         {/* Trust strip */}
         <section className="bg-white border-b border-neutral-200">
           <div className="container mx-auto px-4 max-w-[1100px] py-6 lg:py-8">
@@ -449,7 +450,7 @@ export default async function ExtrasCarteFunciaraPage() {
                 >
                   Identificare Imobil
                 </Link>
-                , apoi îți eliberăm extrasul.
+                , apoi îți obținem extrasul.
               </p>
             </div>
           </div>
@@ -740,8 +741,11 @@ export default async function ExtrasCarteFunciaraPage() {
                     <CheckCircle className="h-4 w-4 text-green-600" aria-hidden="true" />
                     Acceptat de notari, bănci și instituții
                   </span>
+                  {/* Pagina veche de verificare (ancpi.ro/verificare/dc_index.php) dă 404,
+                      iar portalul ePay nu rezolvă deloc (verificat 09.09.2026 — e picat
+                      din 13 iulie). Trimitem către site-ul oficial, care răspunde. */}
                   <a
-                    href="https://www.ancpi.ro/verificare/dc_index.php"
+                    href="https://www.ancpi.ro/"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 rounded-xl border border-neutral-300 px-4 py-2.5 text-sm font-semibold text-secondary-800 hover:border-primary-400 hover:text-primary-700 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
@@ -889,7 +893,7 @@ export default async function ExtrasCarteFunciaraPage() {
               </p>
               <ul className="space-y-2.5">
                 {[
-                  ['După adresă, prin noi', 'Identificăm imobilul (parcela/construcția și nr. CF) după adresă și îți eliberăm direct extrasul de carte funciară.'],
+                  ['După adresă, prin noi', 'Identificăm imobilul (parcela/construcția și nr. CF) după adresă și îți obținem direct extrasul de carte funciară.'],
                   ['Din actul de proprietate', 'Verifică contractul, certificatul de moștenitor sau documentația de intabulare.'],
                   ['Dintr-un extras mai vechi', 'Orice extras CF anterior conține numărul cadastral al imobilului.'],
                 ].map(([title, desc]) => (
@@ -958,7 +962,7 @@ export default async function ExtrasCarteFunciaraPage() {
             { q: 'Cât costă un extras de carte funciară?', a: `La noi ${service.base_price} RON, cu taxele ANCPI incluse și procesare urgentă gratuită. OCPI percepe o taxă oficială pentru fiecare extras de carte funciară, indiferent de unde îl soliciți.` },
             { q: 'Se poate obține gratuit extrasul de carte funciară?', a: 'ANCPI oferă o variantă gratuită prin platforma MyeTerra (myeterra.ancpi.ro), dar necesită cont ROeID, semnătură electronică calificată sau verificare la birou în până la 72 de ore. Prin eGhișeul îl primești imediat, fără cont și fără deplasare.' },
             { q: 'Am nevoie de numărul cadastral?', a: 'Ai nevoie de un identificator al imobilului: număr cadastral, număr de carte funciară, număr topografic sau identificator electronic ANCPI. Dacă nu îl știi, îl putem căuta după adresă sau proprietar.' },
-            { q: 'Cum aflu numărul cadastral după adresă?', a: 'Numărul cadastral apare în actul de proprietate sau într-un extras CF mai vechi. Dacă ai doar adresa, prin serviciul nostru de Identificare Imobil aflăm noi numărul cadastral și de carte funciară și îți eliberăm extrasul.' },
+            { q: 'Cum aflu numărul cadastral după adresă?', a: 'Numărul cadastral apare în actul de proprietate sau într-un extras CF mai vechi. Dacă ai doar adresa, prin serviciul nostru de Identificare Imobil aflăm noi numărul cadastral și de carte funciară și îți obținem extrasul.' },
             { q: 'Cât este valabil extrasul de carte funciară?', a: 'Extrasul de informare reflectă situația din ziua eliberării; notarii și băncile cer de obicei unul din ultimele 30 de zile. Extrasul de autentificare (pentru vânzare) e valabil ~10 zile lucrătoare.' },
             { q: 'Cât durează eliberarea?', a: `${formatEstimatedDays(service)} în mod standard. Procesarea urgentă este inclusă gratuit — sistemul depune și emite automat, 24/7. Pentru imobile nedigitalizate poate dura puțin mai mult, în programul de lucru.` },
             { q: 'Este necesar pentru vânzarea unui imobil?', a: 'Da. Notarul are nevoie de un extras de carte funciară pentru autentificare, ca să verifice proprietarul și eventualele sarcini sau ipoteci.' },

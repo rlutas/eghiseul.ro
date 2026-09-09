@@ -20,6 +20,7 @@ export const metadata = buildPageMetadata({
 export default function Page() {
   return (
     <CalculatorLayout
+      dateModified="2026-07-13"
       slug={SLUG}
       title={TITLE}
       heading="Calculator Salariu Net/Brut 2026"

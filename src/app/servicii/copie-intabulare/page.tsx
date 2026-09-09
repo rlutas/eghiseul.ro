@@ -27,9 +27,10 @@ import { WhatsAppButton } from '@/components/services/whatsapp-button';
 import { GoogleReviewsBadge } from '@/components/services/google-reviews-badge';
 import { OrderButton } from '@/components/services/order-button';
 import { SystemStatus } from '@/components/services/system-status';
-import { buildPageMetadata, buildServicePageGraph, BASE_URL, serviceUrl, SERVICE_AGGREGATE_RATING } from '@/lib/seo';
+import { buildPageMetadata, buildServicePageGraph, BASE_URL, serviceUrl } from '@/lib/seo';
 import { getImobiliareServices } from '@/lib/services/imobiliare';
 import { ServiceSwitcher } from '@/components/services/service-switcher';
+import { PrivateServiceNotice } from '@/components/services/private-service-notice';
 
 // New service — no WP legacy URL, so the folder name matches the DB slug and
 // serviceUrl() resolves to this page with no redirect/override needed.
@@ -77,11 +78,6 @@ const buildJsonLd = (basePrice: number) => buildServicePageGraph({
   serviceType: 'Document Processing — Real Estate',
   datePublished: DATE_PUBLISHED,
   dateModified: DATE_MODIFIED,
-  reviewedBy: {
-    name: 'Departamentul Juridic eGhișeul.ro',
-    jobTitle: 'Echipă de specialiști drept administrativ',
-    organizationName: 'eDigitalizare SRL',
-  },
   breadcrumb: [
     { name: 'Acasă', url: `${BASE_URL}/` },
     { name: 'Servicii', url: `${BASE_URL}/servicii/` },
@@ -90,7 +86,6 @@ const buildJsonLd = (basePrice: number) => buildServicePageGraph({
   offers: [
     { name: 'Copie Intabulare', price: basePrice, url: `${BASE_URL}${PAGE_PATH}` },
   ],
-  aggregateRating: SERVICE_AGGREGATE_RATING,
 });
 
 export default async function CopieIntabularePage() {
@@ -270,6 +265,12 @@ export default async function CopieIntabularePage() {
           </div>
         </section>
 
+        <PrivateServiceNotice
+          institutionLabel="direct la OCPI/ANCPI"
+          institutionUrl="https://www.ancpi.ro/"
+        />
+
+
         {/* Trust strip */}
         <section className="bg-white border-b border-neutral-200">
           <div className="container mx-auto px-4 max-w-[1100px] py-6 lg:py-8">
@@ -367,7 +368,7 @@ export default async function CopieIntabularePage() {
                 <Link href={serviceUrl('identificare-imobil')} className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
                   identificare imobil
                 </Link>
-                , apoi îți eliberăm copia de intabulare pentru imobilul găsit.
+                , apoi îți obținem copia de intabulare pentru imobilul găsit.
               </p>
             </div>
           </div>
@@ -407,7 +408,7 @@ export default async function CopieIntabularePage() {
                 <Link href={serviceUrl('identificare-imobil')} className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
                   Identificare Imobil
                 </Link>
-                , apoi îți eliberăm copia de intabulare.
+                , apoi îți obținem copia de intabulare.
               </p>
             </div>
           </div>
@@ -546,7 +547,7 @@ export default async function CopieIntabularePage() {
             { q: 'La ce îmi folosește copia de intabulare?', a: 'Este dovada că dreptul tău a fost înscris în cartea funciară. Este cerută frecvent de bancă la credit ipotecar, de notar în dosare de vânzare sau succesiune, în litigii privind proprietatea sau pentru reconstituirea actelor pierdute.' },
             { q: 'Cât durează eliberarea?', a: `${formatEstimatedDays(service)}. Cererea este depusă la OCPI și procesată manual de un operator, iar copia îți este livrată pe email.` },
             { q: 'Cât costă copia de intabulare?', a: `${service.base_price} RON, cu taxele OCPI incluse. Fără costuri ascunse.` },
-            { q: 'Nu știu numărul de carte funciară. Ce fac?', a: 'Îl putem afla după adresă prin serviciul de Identificare Imobil, apoi îți eliberăm copia de intabulare pentru imobilul găsit.' },
+            { q: 'Nu știu numărul de carte funciară. Ce fac?', a: 'Îl putem afla după adresă prin serviciul de Identificare Imobil, apoi îți obținem copia de intabulare pentru imobilul găsit.' },
             { q: 'Am nevoie de cont ANCPI?', a: 'Nu. Ne ocupăm noi de tot procesul; tu ai nevoie doar de numărul de carte funciară sau cadastral și de localitate.' },
             { q: 'Este valabilă la notar și la bancă?', a: 'Da. Copia de intabulare provine din arhiva OCPI și servește ca dovadă a înscrierii dreptului în cartea funciară pentru dosare notariale și pentru bancă. Dacă instituția cere un anumit format sau o anumită vechime, confirmă cerința înainte de a comanda.' },
           ]}

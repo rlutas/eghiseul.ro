@@ -17,16 +17,9 @@ export const metadata: Metadata = {
   title: 'Servicii | Documente online pentru România',
   description:
     'Catalogul complet al serviciilor eGhișeul.ro: cazier judiciar, cazier fiscal, certificat constatator, extras carte funciară, acte cadastrale, rovinietă și altele. 100% online.',
-  keywords: [
-    'servicii online',
-    'documente',
-    'cazier judiciar',
-    'cazier fiscal',
-    'certificat constatator',
-    'extras carte funciară',
-    'rovinietă',
-    'eghiseul',
-  ],
+  // `keywords` scos (09.09.2026): Google îl ignoră de ~15 ani, iar la noi era
+  // IDENTIC pe 231 din 233 de pagini — inclusiv pe /gdpr/ și pe calculatoare.
+  // Ca semnal nu valora nimic; ca amprentă era semnătura de generare la scară.
   openGraph: {
     title: 'Servicii | Documente online',
     description:

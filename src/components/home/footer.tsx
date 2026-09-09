@@ -229,7 +229,13 @@ export function Footer() {
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src="/images/footer/anpc-sal.svg" alt="ANPC SAL — Soluționarea Alternativă a Litigiilor" width={250} height={50} className="h-9 w-auto rounded" loading="lazy" />
                 </a>
-                <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="nofollow noopener" aria-label="ANPC — Soluționarea Online a Litigiilor (UE)">
+                {/* Platforma ODR/SOL a Comisiei Europene este ÎNCHISĂ (confirmat pe
+                    consumer-redress.ec.europa.eu: „The Online dispute resolution (ODR)
+                    platform is now closed"). Linkul vechi ducea la un redirect către
+                    anunțul de închidere, de pe 233 de pagini. Trimitem acum către pagina
+                    UE care chiar funcționează. ⚠️ Textul legal (T&C) trebuie revizuit de
+                    cine îl întreține — noi am schimbat doar destinația, nu obligația. */}
+                <a href="https://consumer-redress.ec.europa.eu/" target="_blank" rel="nofollow noopener" aria-label="Soluționarea litigiilor de consum în UE">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src="/images/footer/anpc-sol.svg" alt="ANPC SOL — Soluționarea Online a Litigiilor" width={250} height={50} className="h-9 w-auto rounded" loading="lazy" />
                 </a>

@@ -28,9 +28,10 @@ import { WhatsAppButton } from '@/components/services/whatsapp-button';
 import { GoogleReviewsBadge } from '@/components/services/google-reviews-badge';
 import { OrderButton } from '@/components/services/order-button';
 import { SystemStatus } from '@/components/services/system-status';
-import { buildPageMetadata, buildServicePageGraph, BASE_URL, serviceUrl, SERVICE_AGGREGATE_RATING } from '@/lib/seo';
+import { buildPageMetadata, buildServicePageGraph, BASE_URL, serviceUrl } from '@/lib/seo';
 import { getImobiliareServices } from '@/lib/services/imobiliare';
 import { ServiceSwitcher } from '@/components/services/service-switcher';
+import { PrivateServiceNotice } from '@/components/services/private-service-notice';
 
 // New service — no WP legacy URL, so the folder name matches the DB slug and
 // serviceUrl() resolves to this page with no redirect/override needed.
@@ -79,11 +80,6 @@ const buildJsonLd = (basePrice: number) => buildServicePageGraph({
   serviceType: 'Document Processing — Real Estate',
   datePublished: DATE_PUBLISHED,
   dateModified: DATE_MODIFIED,
-  reviewedBy: {
-    name: 'Departamentul Juridic eGhișeul.ro',
-    jobTitle: 'Echipă de specialiști drept administrativ',
-    organizationName: 'eDigitalizare SRL',
-  },
   breadcrumb: [
     { name: 'Acasă', url: `${BASE_URL}/` },
     { name: 'Servicii', url: `${BASE_URL}/servicii/` },
@@ -92,7 +88,6 @@ const buildJsonLd = (basePrice: number) => buildServicePageGraph({
   offers: [
     { name: 'Plan de Amplasament și Delimitare', price: basePrice, url: `${BASE_URL}${PAGE_PATH}` },
   ],
-  aggregateRating: SERVICE_AGGREGATE_RATING,
 });
 
 export default async function PlanAmplasamentDelimitarePage() {
@@ -271,6 +266,12 @@ export default async function PlanAmplasamentDelimitarePage() {
           </div>
         </section>
 
+        <PrivateServiceNotice
+          institutionLabel="direct la OCPI/ANCPI"
+          institutionUrl="https://www.ancpi.ro/"
+        />
+
+
         {/* Trust strip */}
         <section className="bg-white border-b border-neutral-200">
           <div className="container mx-auto px-4 max-w-[1100px] py-6 lg:py-8">
@@ -318,7 +319,7 @@ export default async function PlanAmplasamentDelimitarePage() {
                 așa cum au fost ele măsurate de inginerul cadastral și recepționate de OCPI.
               </p>
               <p>
-                Prin eGhișeul îți eliberăm o <strong>copie din arhiva OCPI</strong> a planului de amplasament și
+                Prin eGhișeul îți obținem o <strong>copie din arhiva OCPI</strong> a planului de amplasament și
                 delimitare al imobilului tău, 100% online, fără cont ANCPI și fără deplasare la ghișeul OCPI. Comanda
                 este preluată de un operator, care identifică planul în arhivă după datele imobilului și ți-l trimite
                 pe email.
@@ -375,7 +376,7 @@ export default async function PlanAmplasamentDelimitarePage() {
               <p>
                 Ai nevoie de un singur identificator ca să îți găsim planul în arhivă: <strong>numărul
                 cadastral</strong> sau <strong>numărul de carte funciară</strong>, plus județul și localitatea. Dacă
-                nu cunoști numărul cadastral, îl putem afla mai întâi după adresă, apoi îți eliberăm planul de
+                nu cunoști numărul cadastral, îl putem afla mai întâi după adresă, apoi îți obținem planul de
                 amplasament și delimitare.
               </p>
             </div>
@@ -416,7 +417,7 @@ export default async function PlanAmplasamentDelimitarePage() {
                 <Link href={serviceUrl('identificare-imobil')} className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
                   Identificare Imobil
                 </Link>
-                , apoi îți eliberăm planul de amplasament și delimitare.
+                , apoi îți obținem planul de amplasament și delimitare.
               </p>
             </div>
           </div>
@@ -549,12 +550,12 @@ export default async function PlanAmplasamentDelimitarePage() {
         <ServiceFAQ
           title="Întrebări Frecvente — Plan de Amplasament și Delimitare"
           faqs={[
-            { q: 'Ce este planul de amplasament și delimitare?', a: 'Este planul care delimitează imobilul, întocmit la recepția cadastrală și înregistrat la OCPI/ANCPI. Conține conturul parcelei, dimensiunile laturilor, suprafața măsurată și vecinătățile. Noi îți eliberăm o copie din arhiva OCPI.' },
+            { q: 'Ce este planul de amplasament și delimitare?', a: 'Este planul care delimitează imobilul, întocmit la recepția cadastrală și înregistrat la OCPI/ANCPI. Conține conturul parcelei, dimensiunile laturilor, suprafața măsurată și vecinătățile. Noi îți obținem o copie din arhiva OCPI.' },
             { q: 'Ce conține planul de amplasament și delimitare?', a: 'Conturul și forma parcelei, dimensiunile (lungimile) fiecărei laturi, suprafața măsurată, vecinătățile pe fiecare latură și numărul cadastral al imobilului.' },
             { q: 'Cu ce diferă de extrasul de plan cadastral pe ortofotoplan?', a: 'Extrasul de plan cadastral suprapune imobilul peste o imagine aeriană (ortofotoplan) și e util pentru localizarea pe hartă. Planul de amplasament și delimitare este planul tehnic de la recepția cadastrală, cu dimensiunile măsurate ale laturilor, suprafața și vecinătățile, fără fundal aerian. Pentru vânzare, dezmembrare sau autorizație de construire ai de obicei nevoie de planul de amplasament.' },
             { q: 'Cât durează eliberarea?', a: `${formatEstimatedDays(service)}. Comanda este preluată de un operator care identifică planul în arhiva OCPI și ți-l trimite pe email.` },
             { q: 'Cât costă planul de amplasament și delimitare?', a: `${service.base_price} RON, cu taxele OCPI incluse. Fără costuri ascunse.` },
-            { q: 'Nu știu numărul cadastral. Ce fac?', a: 'Îl putem afla după adresă prin serviciul de Identificare Imobil, apoi îți eliberăm planul de amplasament și delimitare.' },
+            { q: 'Nu știu numărul cadastral. Ce fac?', a: 'Îl putem afla după adresă prin serviciul de Identificare Imobil, apoi îți obținem planul de amplasament și delimitare.' },
             { q: 'Am nevoie de cont ANCPI?', a: 'Nu. Ne ocupăm noi de tot procesul; tu ai nevoie doar de numărul cadastral sau de carte funciară și de județul/localitatea imobilului.' },
             { q: 'Planul este valabil pentru o autorizație de construire?', a: 'Planul de amplasament și delimitare din arhiva OCPI reflectă imobilul așa cum a fost recepționat cadastral și este folosit ca piesă în documentațiile de urbanism. Pentru autorizația de construire, proiectantul îți va spune dacă este suficientă copia din arhivă sau dacă e nevoie de o documentație cadastrală actualizată.' },
             { q: 'Pot folosi planul la vânzarea terenului?', a: 'Da. Planul de amplasament și delimitare se folosește frecvent la dosarul notarial pentru a confirma conturul, suprafața și vecinătățile imobilului care se vinde.' },

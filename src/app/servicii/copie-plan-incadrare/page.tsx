@@ -27,9 +27,10 @@ import { WhatsAppButton } from '@/components/services/whatsapp-button';
 import { GoogleReviewsBadge } from '@/components/services/google-reviews-badge';
 import { OrderButton } from '@/components/services/order-button';
 import { SystemStatus } from '@/components/services/system-status';
-import { buildPageMetadata, buildServicePageGraph, BASE_URL, serviceUrl, SERVICE_AGGREGATE_RATING } from '@/lib/seo';
+import { buildPageMetadata, buildServicePageGraph, BASE_URL, serviceUrl } from '@/lib/seo';
 import { getImobiliareServices } from '@/lib/services/imobiliare';
 import { ServiceSwitcher } from '@/components/services/service-switcher';
+import { PrivateServiceNotice } from '@/components/services/private-service-notice';
 
 // New service — no WP legacy URL, so the folder name matches the DB slug and
 // serviceUrl() resolves to this page with no redirect/override needed.
@@ -78,11 +79,6 @@ const buildJsonLd = (basePrice: number) => buildServicePageGraph({
   serviceType: 'Document Processing — Real Estate',
   datePublished: DATE_PUBLISHED,
   dateModified: DATE_MODIFIED,
-  reviewedBy: {
-    name: 'Departamentul Juridic eGhișeul.ro',
-    jobTitle: 'Echipă de specialiști drept administrativ',
-    organizationName: 'eDigitalizare SRL',
-  },
   breadcrumb: [
     { name: 'Acasă', url: `${BASE_URL}/` },
     { name: 'Servicii', url: `${BASE_URL}/servicii/` },
@@ -91,7 +87,6 @@ const buildJsonLd = (basePrice: number) => buildServicePageGraph({
   offers: [
     { name: 'Copie Plan de Încadrare', price: basePrice, url: `${BASE_URL}${PAGE_PATH}` },
   ],
-  aggregateRating: SERVICE_AGGREGATE_RATING,
 });
 
 export default async function CopiePlanIncadrarePage() {
@@ -270,6 +265,12 @@ export default async function CopiePlanIncadrarePage() {
           </div>
         </section>
 
+        <PrivateServiceNotice
+          institutionLabel="direct la OCPI/ANCPI"
+          institutionUrl="https://www.ancpi.ro/"
+        />
+
+
         {/* Trust strip */}
         <section className="bg-white border-b border-neutral-200">
           <div className="container mx-auto px-4 max-w-[1100px] py-6 lg:py-8">
@@ -352,7 +353,7 @@ export default async function CopiePlanIncadrarePage() {
               <p>
                 Pentru a-l comanda ai nevoie de un singur identificator: <strong>numărul cadastral</strong>{' '}
                 sau <strong>numărul de carte funciară</strong>, plus județul și localitatea. Dacă nu cunoști
-                numărul cadastral, îl putem afla după adresă, apoi îți eliberăm copia planului de încadrare din
+                numărul cadastral, îl putem afla după adresă, apoi îți obținem copia planului de încadrare din
                 arhiva OCPI.
               </p>
               <p>
@@ -361,7 +362,7 @@ export default async function CopiePlanIncadrarePage() {
                 <Link href={serviceUrl('identificare-imobil')} className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
                   identificare imobil
                 </Link>
-                , apoi îți eliberăm planul de încadrare pentru terenul găsit.
+                , apoi îți obținem planul de încadrare pentru terenul găsit.
               </p>
             </div>
           </div>
@@ -401,7 +402,7 @@ export default async function CopiePlanIncadrarePage() {
                 <Link href={serviceUrl('identificare-imobil')} className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
                   Identificare Imobil
                 </Link>
-                , apoi îți eliberăm planul de încadrare.
+                , apoi îți obținem planul de încadrare.
               </p>
             </div>
           </div>
@@ -529,7 +530,7 @@ export default async function CopiePlanIncadrarePage() {
             { q: 'La ce îmi folosește planul de încadrare?', a: 'Este cerut frecvent pentru documentații tehnice, certificat de urbanism, autorizație de construire și în fazele de proiectare, pentru a confirma localizarea imobilului în zonă.' },
             { q: 'Cât costă copia planului de încadrare?', a: `${service.base_price} RON, cu taxele OCPI incluse. Fără costuri ascunse.` },
             { q: 'Cât durează eliberarea?', a: `${formatEstimatedDays(service)}. Documentul este procesat de un operator și livrat pe email.` },
-            { q: 'Nu știu numărul cadastral. Ce fac?', a: 'Îl putem afla după adresă prin serviciul de Identificare Imobil, apoi îți eliberăm copia planului de încadrare.' },
+            { q: 'Nu știu numărul cadastral. Ce fac?', a: 'Îl putem afla după adresă prin serviciul de Identificare Imobil, apoi îți obținem copia planului de încadrare.' },
             { q: 'Am nevoie de cont ANCPI?', a: 'Nu. Ne ocupăm noi de tot procesul; tu ai nevoie doar de numărul cadastral sau de carte funciară.' },
             { q: 'În ce format primesc planul de încadrare?', a: 'Primești copia în format electronic (PDF) pe email, gata de tipărit și de atașat la dosarul tău.' },
           ]}

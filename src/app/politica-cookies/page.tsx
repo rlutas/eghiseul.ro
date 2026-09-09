@@ -41,16 +41,19 @@ export default function Page() {
             pagini ajută și ce trebuie îmbunătățit.
           </li>
           <li>
-            <strong>Cu acordul tău (marketing):</strong> măsurarea campaniilor Google Ads (dacă ai
-            ajuns la noi dintr-o reclamă și ai comandat). Fără acord, măsurarea se face agregat, fără
-            cookie-uri.
+            <strong>Cu acordul tău (marketing):</strong> măsurarea campaniilor de publicitate — Google
+            Ads, Meta (Facebook/Instagram) și OpenAI/ChatGPT Ads — dacă ai ajuns la noi dintr-o
+            reclamă și ai comandat. Aceste instrumente se încarcă doar după ce accepți categoria de
+            marketing. Fără acord, măsurarea se face agregat, pe server, fără cookie-uri.
           </li>
         </ul>
 
         <h2>Ce NU urmărim</h2>
         <ul>
           <li>NU vindem și NU închiriem date către terți.</li>
-          <li>NU folosim cookie-uri de retargetare proprii (Facebook Pixel, TikTok etc. — nu există pe site).</li>
+          {/* Aici scria că Facebook Pixel „nu există pe site", deși Meta Pixel e
+              integrat din 03.09.2026 (docs/ads/meta/). Corectat pe 09.09.2026. */}
+          <li>NU folosim cookie-uri de retargetare TikTok sau LinkedIn.</li>
           <li>NU stocăm datele cardului — plata se procesează integral de Stripe.</li>
           <li>NU urmărim nimic analitic înainte să apeși „Accept” — fără consimțământ, Google Analytics nici măcar nu se încarcă.</li>
         </ul>
@@ -94,6 +97,20 @@ export default function Page() {
               <td>Statistici de utilizare (agregate)</td>
               <td>până la 2 ani</td>
               <td>Analiză — doar cu acord</td>
+            </tr>
+            <tr>
+              <td><code>_gcl_au</code></td>
+              <td>Google Ads</td>
+              <td>Măsurarea conversiilor din reclame</td>
+              <td>90 de zile</td>
+              <td>Marketing — doar cu acord</td>
+            </tr>
+            <tr>
+              <td><code>_fbp</code></td>
+              <td>Meta (Facebook/Instagram)</td>
+              <td>Măsurarea conversiilor din reclamele Meta</td>
+              <td>90 de zile</td>
+              <td>Marketing — doar cu acord</td>
             </tr>
           </tbody>
         </table>

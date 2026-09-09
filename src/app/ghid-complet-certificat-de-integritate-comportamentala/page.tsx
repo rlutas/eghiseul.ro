@@ -7,7 +7,10 @@ const TITLE = 'Certificat de Integritate Comportamentală: Ghid Complet';
 const DESCRIPTION =
   'Ce este certificatul de integritate comportamentală, în ce diferă de cazierul judiciar, cine are nevoie de el ' +
   '(inclusiv pentru lucrul cu minori) și cum îl obții online. Ghid complet + perioada de valabilitate.';
-const DATE_PUBLISHED = '2024-01-01';
+// Data la care articolul e verificabil la acest URL (migrarea din WordPress).
+// Înainte aici scria '2024-01-01' — un placeholder identic pe 12 articole, adică
+// o dată inventată în schema. Dacă apare dovada datei reale de pe WP, se corectează.
+const DATE_PUBLISHED = '2026-06-16';
 const DATE_MODIFIED = '2026-07-29';
 
 export const revalidate = 86400;

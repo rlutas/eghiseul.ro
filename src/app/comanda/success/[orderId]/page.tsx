@@ -20,6 +20,7 @@ import { Separator } from '@/components/ui/separator';
 import { OrderSummaryCard } from '@/components/payment';
 import { estimateFromSelectedOptions } from '@/lib/delivery-calculator';
 import { suggestEmailCorrection } from '@/lib/email-typo';
+import { OrderFlowDisclosure } from '@/components/legal/order-flow-disclosure';
 
 interface SelectedOption {
   optionName?: string;
@@ -704,6 +705,7 @@ export default function SuccessPage() {
           </CardContent>
         </Card>
       </div>
+      <OrderFlowDisclosure />
     </div>
   );
 }

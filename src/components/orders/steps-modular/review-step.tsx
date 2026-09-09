@@ -599,11 +599,17 @@ export function ReviewStepModular({ onValidChange }: ReviewStepProps) {
           </label>
         </div>
 
+        {/* Textul de aici promitea „30 de zile, fără întrebări" la câteva rânduri de
+            checkboxul prin care clientul renunță la dreptul de retragere de 14 zile,
+            în timp ce politica reală (T&C §8) e anulare în primele 30 de minute, cu
+            rambursare 70%. O promisiune comercială care contrazice contractul, pe
+            ecranul de plată — corectată pe 09.09.2026. */}
         <div className="flex items-start gap-2 p-3 bg-green-50 rounded-lg border border-green-100">
           <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
           <div className="text-sm text-green-800">
-            <strong>Garanție rambursare:</strong> Dacă nu ești mulțumit de serviciu,
-            îți returnăm banii în 30 de zile, fără întrebări.
+            <strong>Anulare:</strong> poți anula comanda în primele <strong>30 de minute</strong> de
+            la plată, direct din pagina de status, și primești înapoi 70% din sumă. După acest
+            interval cererea e deja depusă la autoritate.
           </div>
         </div>
       </div>

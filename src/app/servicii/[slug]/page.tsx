@@ -124,13 +124,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title,
     description,
-    keywords: [
-      service.name.toLowerCase(),
-      `${service.name.toLowerCase()} online`,
-      'documente',
-      'eghiseul',
-      categoryLabels[service.category]?.toLowerCase() ?? 'servicii',
-    ],
+    // `keywords` scos (09.09.2026): Google îl ignoră de ~15 ani, iar la noi era
+    // IDENTIC pe 231 din 233 de pagini — inclusiv pe /gdpr/ și pe calculatoare.
+    // Ca semnal nu valora nimic; ca amprentă era semnătura de generare la scară.
     alternates: {
       canonical: url,
     },
@@ -262,13 +258,6 @@ export default async function ServiceDetailPage({ params }: PageProps) {
       url: `https://eghiseul.ro/servicii/${service.slug}`,
       hasMerchantReturnPolicy: MERCHANT_RETURN_POLICY,
       shippingDetails: OFFER_SHIPPING_DETAILS,
-    },
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: 4.8,
-      reviewCount: 64,
-      bestRating: 5,
-      worstRating: 1,
     },
   };
 

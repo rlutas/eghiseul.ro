@@ -23,6 +23,7 @@ const fmtMp = new Intl.NumberFormat('ro-RO', { maximumFractionDigits: 4 });
 export default function Page() {
   return (
     <CalculatorLayout
+      dateModified="2026-07-14"
       slug={SLUG}
       title={TITLE}
       heading="Convertor Jugăr și Stânjen în Metri Pătrați"

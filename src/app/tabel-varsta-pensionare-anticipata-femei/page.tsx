@@ -7,7 +7,10 @@ const TITLE = 'Tabel Vârstă Pensionare Anticipată Femei (actualizat)';
 const DESCRIPTION =
   'Tabelul complet cu vârsta de pensionare anticipată pentru femei, conform Legii 360/2023: ' +
   'luna și anul nașterii, stagiul complet de cotizare, luna pensionării anticipate și vârsta la ieșirea la pensie.';
-const DATE_PUBLISHED = '2024-01-01';
+// Data la care articolul e verificabil la acest URL (migrarea din WordPress).
+// Înainte aici scria '2024-01-01' — un placeholder identic pe 12 articole, adică
+// o dată inventată în schema. Dacă apare dovada datei reale de pe WP, se corectează.
+const DATE_PUBLISHED = '2026-06-16';
 const DATE_MODIFIED = '2026-06-16';
 
 export const revalidate = 86400;

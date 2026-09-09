@@ -9,7 +9,7 @@ import { PrivateServiceNotice } from '@/components/services/private-service-noti
 import { ServiceFAQ, type FAQ } from '@/components/services/service-faq';
 import { ReviewsSection } from '@/components/services/reviews-section';
 import { GoogleReviewsBadge } from '@/components/services/google-reviews-badge';
-import { buildPageMetadata, buildServicePageGraph, BASE_URL, SERVICE_AGGREGATE_RATING } from '@/lib/seo';
+import { buildPageMetadata, buildServicePageGraph, BASE_URL } from '@/lib/seo';
 import { CITIES as CAZIER_CITIES } from '@/lib/seo/locations';
 import { cn } from '@/lib/utils';
 import {
@@ -70,11 +70,6 @@ const jsonLdGraph = buildServicePageGraph({
   serviceType: 'Document Processing — Legal',
   datePublished: DATE_PUBLISHED,
   dateModified: DATE_MODIFIED,
-  reviewedBy: {
-    name: 'Departamentul Juridic eGhișeul.ro',
-    jobTitle: 'Echipă de specialiști drept administrativ',
-    organizationName: 'eDigitalizare SRL',
-  },
   breadcrumb: [
     { name: 'Acasă', url: `${BASE_URL}/` },
     { name: 'Servicii', url: `${BASE_URL}/servicii/` },
@@ -103,7 +98,6 @@ const jsonLdGraph = buildServicePageGraph({
     },
   ],
   // 450+ recenzii pozitive 4.9★ — agregate din Google Business Profile + Trustpilot
-  aggregateRating: SERVICE_AGGREGATE_RATING,
 });
 
 // =============================================================================

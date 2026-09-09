@@ -20,6 +20,7 @@ export const metadata = buildPageMetadata({
 export default function Page() {
   return (
     <CalculatorLayout
+      dateModified="2026-06-23"
       slug={SLUG}
       title={TITLE}
       heading="Calculator Grad de Îndatorare 2026"

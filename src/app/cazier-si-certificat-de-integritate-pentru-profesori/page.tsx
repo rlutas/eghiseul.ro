@@ -223,9 +223,10 @@ export default function Page() {
         <li>
           <strong>lăsat pe ultima sută:</strong> în prima săptămână de septembrie, ghișeele de cazier au cel mai
           mare volum din an — iar contul{' '}
-          <a href="https://hub.mai.gov.ro/serviciu/view?id=90" target="_blank" rel="noopener noreferrer">
-            HUB MAI
-          </a>{' '}
+          {/* Linkul direct către hub.mai.gov.ro dădea 502 (verificat 09.09.2026, și
+              deep-link-ul, și rădăcina). Am scos ancora ca să nu trimitem oamenii
+              într-o eroare; numele platformei rămâne, ca să știe ce să caute. */}
+          <strong>HUB MAI</strong>{' '}
           nevalidat nu se rezolvă în ziua depunerii dosarului;
         </li>
         <li>

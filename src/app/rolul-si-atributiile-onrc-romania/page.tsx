@@ -7,7 +7,10 @@ const TITLE = 'Ce face ONRC, de fapt: registrul, înmatriculările și certifica
 const DESCRIPTION =
   'ONRC ține Registrul Comerțului: acolo se înmatriculează firmele, se înscriu modificările și de acolo ies ' +
   'certificatele constatatoare. Ce atribuții are instituția și ce documente eliberează.';
-const DATE_PUBLISHED = '2024-01-01';
+// Data la care articolul e verificabil la acest URL (migrarea din WordPress).
+// Înainte aici scria '2024-01-01' — un placeholder identic pe 12 articole, adică
+// o dată inventată în schema. Dacă apare dovada datei reale de pe WP, se corectează.
+const DATE_PUBLISHED = '2026-06-16';
 const DATE_MODIFIED = '2026-08-24';
 
 export const revalidate = 86400;

@@ -7,7 +7,10 @@ const TITLE = 'Valabilitate Extras de Carte Funciară: Cât Este Valabil';
 const DESCRIPTION =
   'Cât este valabil extrasul de carte funciară emis de ANCPI: în general 30 de zile. ' +
   'Cum verifici valabilitatea online, ce faci când expiră și cât ține un extras pentru informare.';
-const DATE_PUBLISHED = '2024-01-01';
+// Data la care articolul e verificabil la acest URL (migrarea din WordPress).
+// Înainte aici scria '2024-01-01' — un placeholder identic pe 12 articole, adică
+// o dată inventată în schema. Dacă apare dovada datei reale de pe WP, se corectează.
+const DATE_PUBLISHED = '2026-06-16';
 const DATE_MODIFIED = '2026-06-16';
 
 export const revalidate = 86400;

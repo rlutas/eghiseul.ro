@@ -275,19 +275,22 @@ export const ORGANIZATION = {
  * citește de AICI.
  *
  * ⚠️ Actualizare: cere numărul curent din profilul Google și schimbă DOAR aici.
- * Ultima verificare: 28.07.2026 (Raul, din profil).
+ * Ultima verificare: 09.09.2026 (Raul, captură din profilul Google: 4,9 / 464).
  */
 export const SOCIAL_PROOF = {
   ratingValue: 4.9,
-  reviewCount: 457,
+  reviewCount: 464,
   /** Formă „peste 450" — rotunjit în jos la zeci, ca să rămână adevărat între actualizări. */
   get roundedDown(): number {
     return Math.floor(this.reviewCount / 10) * 10;
   },
 } as const;
 
-/** Nodul `aggregateRating` pentru schema paginilor de servicii. */
-export const SERVICE_AGGREGATE_RATING = {
-  ratingValue: SOCIAL_PROOF.ratingValue,
-  reviewCount: SOCIAL_PROOF.reviewCount,
-} as const;
+/**
+ * ⚠️ `SERVICE_AGGREGATE_RATING` a fost ȘTERS pe 09.09.2026.
+ *
+ * Recenziile sunt despre FIRMĂ (profilul Google), nu despre fiecare serviciu în
+ * parte — deci nu au ce căuta ca `aggregateRating` pe 31 de noduri `Product`.
+ * Vezi nota din `schema.ts` (`productNode`). Dovada socială se afișează vizibil
+ * în pagină din `SOCIAL_PROOF`, cu link către profilul Google.
+ */

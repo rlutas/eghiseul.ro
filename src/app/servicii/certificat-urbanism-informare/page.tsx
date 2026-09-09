@@ -29,7 +29,8 @@ import { ServiceFAQ } from '@/components/services/service-faq';
 import { ReviewsSection } from '@/components/services/reviews-section';
 import { ServiceOptionsSection } from '@/components/services/service-options-section';
 import { ServicePrice } from '@/components/services/service-price';
-import { buildPageMetadata, buildServicePageGraph, BASE_URL, SERVICE_AGGREGATE_RATING } from '@/lib/seo';
+import { buildPageMetadata, buildServicePageGraph, BASE_URL } from '@/lib/seo';
+import { PrivateServiceNotice } from '@/components/services/private-service-notice';
 
 // Slug DB = segmentul URL (7 pagini interne + footer-ul leagă deja aici).
 const SERVICE_SLUG = 'certificat-urbanism-informare';
@@ -58,11 +59,6 @@ const buildJsonLd = (basePrice: number) =>
     serviceType: 'Document Processing — Urbanism',
     datePublished: DATE_PUBLISHED,
     dateModified: DATE_MODIFIED,
-    reviewedBy: {
-      name: 'Departamentul Juridic eGhișeul.ro',
-      jobTitle: 'Echipă de specialiști drept administrativ',
-      organizationName: 'eDigitalizare SRL',
-    },
     breadcrumb: [
       { name: 'Acasă', url: `${BASE_URL}/` },
       { name: 'Servicii', url: `${BASE_URL}/servicii/` },
@@ -75,7 +71,6 @@ const buildJsonLd = (basePrice: number) =>
         url: `${BASE_URL}${PAGE_PATH}`,
       },
     ],
-    aggregateRating: SERVICE_AGGREGATE_RATING,
   });
 
 async function getService(): Promise<{ service: Service; options: ServiceOption[] } | null> {
@@ -345,6 +340,12 @@ export default async function CertificatUrbanismPage() {
             </div>
           </div>
         </section>
+
+        <PrivateServiceNotice
+          institutionLabel="direct la OCPI/ANCPI"
+          institutionUrl="https://www.ancpi.ro/"
+        />
+
 
         {/* Trust strip */}
         <section className="bg-white border-b border-neutral-200">

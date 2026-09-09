@@ -1,7 +1,29 @@
-import { type NextRequest } from 'next/server'
+import { NextResponse, type NextRequest } from 'next/server'
 import { updateSession } from '@/lib/supabase/middleware'
 
+/**
+ * Cadavrele de WordPress: `/wp-admin/*`, `/wp-content/*`, `/wp-includes/*`,
+ * `/wp-login.php`, `/xmlrpc.php`.
+ *
+ * După cutover-ul din iunie 2026 nu mai există nimic acolo, dar Google le ține
+ * în index: 32 de URL-uri legacy încă primeau expuneri în GSC la 09.09.2026,
+ * între care 6 PDF-uri de contract din `/wp-content/uploads/` (65 de expuneri
+ * doar pe `/wp-admin/*`). Serverul răspundea **403** — semnalul greșit: „există,
+ * dar n-ai voie", deci crawlerul revine. **410 Gone** e afirmația corectă și
+ * scoate URL-ul din index mult mai repede.
+ *
+ * Verificat pe 09.09.2026: PDF-urile NU sunt accesibile public (nicio scurgere
+ * de date), doar prost semnalizate.
+ */
+const WORDPRESS_GONE = /^\/(wp-admin|wp-content|wp-includes|wp-json)(\/|$)|^\/(wp-login\.php|xmlrpc\.php|wp-cron\.php)$/
+
 export async function proxy(request: NextRequest) {
+  if (WORDPRESS_GONE.test(request.nextUrl.pathname)) {
+    return new NextResponse(null, {
+      status: 410,
+      headers: { 'X-Robots-Tag': 'noindex' },
+    })
+  }
   return await updateSession(request)
 }
 
@@ -37,5 +59,13 @@ export const config = {
     '/completare/:path*',
     '/reincarca-poza/:path*',
     '/api/:path*',
+    // Rutele moarte de WordPress — prinse ca să răspundă 410, nu 403.
+    '/wp-admin/:path*',
+    '/wp-content/:path*',
+    '/wp-includes/:path*',
+    '/wp-json/:path*',
+    '/wp-login.php',
+    '/xmlrpc.php',
+    '/wp-cron.php',
   ],
 }
