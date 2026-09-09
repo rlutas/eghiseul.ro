@@ -7,7 +7,7 @@ const TITLE = 'Schimbare Certificat de Naștere Vechi cu Unul Nou: Ghid Complet'
 const DESCRIPTION =
   "Schimbă certificatul de naștere vechi sau deteriorat cu modelul actual: ce acte îți trebuie, cât durează și cum obții duplicatul online.";
 const DATE_PUBLISHED = '2026-06-19';
-const DATE_MODIFIED = '2026-06-19';
+const DATE_MODIFIED = '2026-09-09';
 
 export const revalidate = 86400;
 
@@ -54,7 +54,7 @@ export default function Page() {
         },
         {
           q: 'Pot schimba certificatul vechi dacă locuiesc în altă localitate sau în străinătate?',
-          a: 'Da. Cererea se depune la primăria din localitatea de naștere, dar nu trebuie să te deplasezi. Depunem cererea prin împuternicire și îți trimitem documentul prin curier oriunde te afli.',
+          a: 'Da. Din 2024 cererea se poate depune la orice primărie din țară, nu doar la cea a localității de naștere (HG 255/2024 art. 158), și oricum nu trebuie să te deplasezi. Depunem cererea prin împuternicire și îți trimitem documentul prin curier oriunde te afli.',
         },
       ]}
     >
@@ -113,7 +113,7 @@ export default function Page() {
       <ul>
         <li>completezi datele titularului în formularul online (2–3 minute);</li>
         <li>semnezi împuternicirea în aplicație și achiți cu cardul;</li>
-        <li>depunem cererea la Starea Civilă din localitatea de naștere, în numele tău;</li>
+        <li>depunem cererea la Starea Civilă, în numele tău (din 2024 se poate depune la orice primărie, HG 255/2024 art. 158);</li>
         <li>primești duplicatul pe modelul nou, prin curier, cu tracking pe email.</li>
       </ul>
       <p>

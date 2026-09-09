@@ -8,10 +8,11 @@ import { Label } from '@/components/ui/label';
 /**
  * Cadastru + intabulare cost calculator. Two scenarios:
  *
- * A. Prima înregistrare (imobil fără cadastru): taxă ANCPI FIXĂ 120 lei/imobil
- *    (recepție + înființare CF, cod 2.1.1, Ordin ANCPI 16/2019) — urgență
- *    120 + 4×120 = 600 lei — PLUS onorariul topografului autorizat (piață
- *    liberă, intervale orientative pe tip de imobil).
+ * A. Prima înregistrare (imobil fără cadastru): taxa ANCPI este 0 lei din
+ *    7.04.2025 — Ordinul ANCPI 441/2025 a rescris art. 8 alin. (1) lit. a) din
+ *    Ordinul 16/2019 și scutește necondiționat codurile 2.1.1–2.1.4 (inclusiv
+ *    în regim de urgență, suplimentul fiind 4× un tarif de 0). Rămâne DOAR
+ *    onorariul topografului autorizat (piață liberă, intervale orientative).
  *
  * B. Intabulare după cumpărare (documentația cadastrală există): taxă ANCPI
  *    procentuală — 0,15% din preț pentru PF (cod 2.3.2) / 0,50% pentru PJ
@@ -24,7 +25,7 @@ type Context = 'prima-inregistrare' | 'intabulare-cumparare';
 type Cumparator = 'pf' | 'pj';
 type Regim = 'normal' | 'urgenta';
 
-const TAXA_PRIMA_INREGISTRARE = 120; // lei, cod 2.1.1
+const TAXA_PRIMA_INREGISTRARE = 0; // lei, cod 2.1.1 — scutit din 7.04.2025 (Ordin ANCPI 441/2025)
 const URGENTA_MULTIPLU = 4; // supliment = 4× tariful normal
 const PLAFON_SUPLIMENT_URGENTA = 5000; // lei, plafon supliment (Ordin 16/2019)
 const TAXA_INTABULARE_MIN = 60; // lei/imobil
@@ -55,7 +56,7 @@ export function CadastruCostCalculator() {
     if (context === 'prima-inregistrare') {
       const taxaNormala = TAXA_PRIMA_INREGISTRARE;
       const supliment = urgent ? URGENTA_MULTIPLU * taxaNormala : 0;
-      const taxaAncpi = taxaNormala + supliment; // 120 sau 600 lei
+      const taxaAncpi = taxaNormala + supliment; // 0 lei (scutire 441/2025), indiferent de regim
       const onorariu = ONORARIU_TOPOGRAF[tipImobil];
       return {
         scenario: 'prima' as const,
@@ -183,8 +184,8 @@ export function CadastruCostCalculator() {
         <div className="rounded-xl bg-primary-50 p-4 space-y-2">
           <div className="flex items-baseline justify-between gap-4 text-sm">
             <span className="text-secondary-700">
-              Taxă ANCPI (recepție + înființare CF, cod 2.1.1)
-              {result.urgent && ' — urgență: 120 + 4×120'}
+              Taxă ANCPI (recepție + înființare CF, cod 2.1.1) — scutită din 7.04.2025, Ordin 441/2025
+              {result.urgent && '; urgența nu schimbă nimic la un tarif de 0'}
             </span>
             <span className="font-semibold text-secondary-900 whitespace-nowrap">
               {nf.format(result.taxaAncpi)} lei

@@ -6,7 +6,7 @@ import { CadastruCostCalculator } from '@/components/calculators/cadastru-cost-c
 const SLUG = 'cost-cadastru-intabulare';
 const TITLE = 'Cât Costă Cadastrul și Intabularea? Calculator 2026';
 const DESCRIPTION =
-  'Calculează pe loc cât te costă cadastrul și intabularea: taxa ANCPI exactă (120 lei la prima înregistrare, 0,15% din preț la cumpărare) + onorariul topografului, pe tip de imobil. Gratuit.';
+  'Calculează pe loc cât te costă cadastrul și intabularea: taxa ANCPI exactă (0 lei la prima înregistrare din 7 aprilie 2025, 0,15% din preț la cumpărare) + onorariul topografului, pe tip de imobil. Gratuit.';
 
 export const revalidate = 86400;
 
@@ -25,16 +25,16 @@ export default function Page() {
       title={TITLE}
       heading="Cât costă cadastrul și intabularea?"
       description="Alege tipul imobilului și situația ta — primă înregistrare sau intabulare după cumpărare — și afli pe loc taxa ANCPI exactă, intervalul de onorariu al topografului și totalul estimat, în regim normal sau de urgență."
-      tldr="La prima înregistrare în cartea funciară plătești taxa ANCPI fixă de 120 lei/imobil plus onorariul topografului autorizat: 700–1.100 lei la apartament, 1.400–2.500 lei la casă cu teren. Dacă imobilul are deja cadastru și doar îl intabulezi după cumpărare, taxa ANCPI e 0,15% din preț pentru persoane fizice (0,50% pentru firme), minim 60 lei — fără topograf."
+      tldr="La prima înregistrare în cartea funciară taxa ANCPI este 0 lei din 7 aprilie 2025 (Ordinul ANCPI 441/2025); plătești doar onorariul topografului autorizat, preț de piață, orientativ 700–1.100 lei la apartament și 1.400–2.500 lei la casă cu teren. Dacă imobilul are deja cadastru și doar îl intabulezi după cumpărare, taxa ANCPI e 0,15% din preț pentru persoane fizice (0,50% pentru firme), minim 60 lei — fără topograf."
       widget={<CadastruCostCalculator />}
       faqs={[
         {
           q: 'Cât costă cadastrul pentru un apartament?',
-          a: 'Taxa ANCPI e fixă: 120 lei (recepție + înființare carte funciară, cod 2.1.1 din Ordinul ANCPI 16/2019). La ea se adaugă onorariul topografului autorizat, de regulă 700–1.100 lei pentru un apartament. Total orientativ: 820–1.220 lei.',
+          a: 'Taxa ANCPI e 0 lei: Ordinul ANCPI 441/2025 (M. Of. 281/31.03.2025, în vigoare din 7 aprilie 2025) scutește recepția și înființarea cărții funciare (codurile 2.1.1–2.1.4 din Ordinul 16/2019). Rămâne onorariul topografului autorizat, preț de piață, orientativ 700–1.100 lei pentru un apartament. Total orientativ: 700–1.100 lei.',
         },
         {
           q: 'Cât costă cadastrul și intabularea pentru o casă cu teren?',
-          a: 'Aceeași taxă ANCPI de 120 lei, dar onorariul topografului e mai mare — 1.400–2.500 lei, pentru că se măsoară și terenul, se întocmește planul de amplasament și delimitare (PAD) și documentația e mai complexă. Total orientativ: 1.520–2.620 lei.',
+          a: 'Taxa ANCPI e tot 0 lei, dar onorariul topografului e mai mare, orientativ 1.400–2.500 lei, pentru că se măsoară și terenul, se întocmește planul de amplasament și delimitare (PAD) și documentația e mai complexă. Total orientativ: 1.400–2.500 lei.',
         },
         {
           q: 'Cât costă intabularea după cumpărarea unui imobil?',
@@ -66,16 +66,17 @@ export default function Page() {
         },
         {
           q: 'Taxa ANCPI diferă de la un județ la altul?',
-          a: 'Nu. Tarifele ANCPI sunt naționale, stabilite prin Ordinul 16/2019 — 120 lei e 120 lei și la Satu Mare, și la București. Ce diferă pe județe e doar onorariul topografului, care e negociat liber.',
+          a: 'Nu. Tarifele ANCPI sunt naționale, stabilite prin Ordinul 16/2019 cu modificările lui (441/2025 a scutit prima înregistrare peste tot, și la Satu Mare, și la București). Ce diferă pe județe e doar onorariul topografului, care e negociat liber.',
         },
       ]}
     >
       <h2>Din ce se compune costul cadastrului și intabulării</h2>
       <p>
         Două componente, cu naturi complet diferite. Prima e <strong>taxa ANCPI</strong> — reglementată
-        prin Ordinul ANCPI 16/2019, identică în toată țara: 120 lei fix la prima înregistrare a unui
-        imobil, respectiv un procent din preț (0,15% pentru persoane fizice, 0,50% pentru firme) la
-        intabularea dreptului de proprietate după o cumpărare.
+        prin Ordinul ANCPI 16/2019, identică în toată țara: 0 lei la prima înregistrare a unui imobil
+        (scutire introdusă prin Ordinul 441/2025, din 7 aprilie 2025), respectiv un procent din preț
+        (0,15% pentru persoane fizice, 0,50% pentru firme) la intabularea dreptului de proprietate
+        după o cumpărare.
       </p>
       <p>
         A doua e <strong>onorariul topografului autorizat</strong> — piață liberă, nereglementat. El
@@ -110,8 +111,8 @@ export default function Page() {
           <tr>
             <td>2.1.1</td>
             <td>Recepție + înființare carte funciară (primă înregistrare)</td>
-            <td>120 lei/imobil</td>
-            <td>600 lei</td>
+            <td>0 lei (scutit din 7.04.2025, Ordin 441/2025)</td>
+            <td>0 lei</td>
           </tr>
           <tr>
             <td>2.1.2</td>
@@ -200,7 +201,7 @@ export default function Page() {
         </li>
         <li>
           Dacă imobilul nu are cadastru: contractezi un topograf autorizat, el măsoară și întocmește
-          documentația (inclusiv PAD-ul), o depune la OCPI cu taxa de 120 lei.
+          documentația (inclusiv PAD-ul) și o depune la OCPI; taxa ANCPI la această etapă e 0 lei din 7 aprilie 2025.
         </li>
         <li>OCPI recepționează documentația, alocă număr cadastral și înființează cartea funciară.</li>
         <li>

@@ -43,7 +43,7 @@ const DESCRIPTION =
   'Duplicat certificat de naștere online de la Starea Civilă, 998 RON, fără deplasare. ' +
   'Pentru act pierdut, din altă localitate sau diaspora. Email + curier.';
 const DATE_PUBLISHED = '2026-06-14';
-const DATE_MODIFIED = '2026-08-31';
+const DATE_MODIFIED = '2026-09-09';
 
 export const revalidate = 3600;
 
@@ -380,7 +380,7 @@ export default async function CertificatNasterePage() {
                   {
                     icon: Landmark,
                     title: 'Din altă localitate, fără deplasare',
-                    desc: 'Certificatul se eliberează de primăria din localitatea unde a fost înregistrată nașterea, dar nu trebuie să mergi acolo. Depunem cererea prin împuternicire la primăria competentă și îți trimitem certificatul prin curier — fără programare.',
+                    desc: 'Din 2024 certificatul se poate cere de la orice primărie din țară, nu doar de la cea unde a fost înregistrată nașterea (HG 255/2024 art. 158), și oricum nu trebuie să mergi tu. Depunem cererea prin împuternicire și îți trimitem certificatul prin curier, fără programare.',
                   },
                   {
                     icon: User,
@@ -484,7 +484,7 @@ export default async function CertificatNasterePage() {
               </h2>
               <p className="text-neutral-600 max-w-2xl mx-auto">
                 Documentul pe care îl primești este un duplicat original, cu antetul Stării Civile,
-                emis de primăria din localitatea de naștere.
+                emis de serviciul de stare civilă competent.
               </p>
             </div>
 
@@ -519,7 +519,7 @@ export default async function CertificatNasterePage() {
                 </p>
                 <ul className="space-y-4">
                   {[
-                    { icon: Landmark, title: 'Antet oficial Stare Civilă', desc: 'Emis de Serviciul de Stare Civilă al primăriei din localitatea de naștere.' },
+                    { icon: Landmark, title: 'Antet oficial Stare Civilă', desc: 'Emis de Serviciul de Stare Civilă al primăriei, pe modelul nou, cu filigran și cod unic.' },
                     { icon: FileText, title: 'Document original, nu copie', desc: 'Primești un duplicat original al certificatului, nu o simplă fotocopie.' },
                     { icon: Scale, title: 'Valabil legal', desc: 'Îl folosești la notar, la căsătorie, pentru pașaport sau pentru dosare de cetățenie.' },
                     { icon: Mail, title: 'Livrat prin curier', desc: 'Originalul ajunge la tine prin curier în zile lucrătoare, cu tracking pe email.' },
@@ -645,13 +645,13 @@ export default async function CertificatNasterePage() {
           faqs={[
             { q: 'Ce este certificatul de naștere?', a: 'Este actul de stare civilă care atestă identitatea, data și locul nașterii unei persoane, precum și numele părinților. Se eliberează de Serviciul de Stare Civilă din localitatea unde a fost înregistrată nașterea.' },
             { q: 'Care e diferența dintre duplicat și copie legalizată?', a: 'Duplicatul este un certificat de naștere nou, original, emis de Starea Civilă atunci când ai pierdut sau ai deteriorat documentul. Copia legalizată este o fotocopie certificată conform cu originalul de un notar. Pentru cele mai multe dosare se cere duplicatul (originalul).' },
-            { q: 'Cum obțin un certificat de naștere pierdut?', a: 'Soliciți un duplicat de la Starea Civilă din localitatea de naștere. Prin eGhișeul completezi datele online, noi depunem cererea și plătim taxele, iar tu primești noul certificat fără să te deplasezi.' },
-            { q: 'Pot obține certificatul din altă localitate sau din străinătate?', a: 'Da. Certificatul se eliberează de primăria din localitatea de naștere, dar nu trebuie să mergi acolo. Depunem cererea prin împuternicire în numele tău, util mai ales pentru românii din diaspora.' },
+            { q: 'Cum obțin un certificat de naștere pierdut?', a: 'Soliciți un nou exemplar de la Starea Civilă; din 2024 se poate cere de la orice primărie, nu doar de la cea a localității de naștere (HG 255/2024 art. 158). Prin eGhișeul completezi datele online, noi depunem cererea și plătim taxele, iar tu primești noul certificat fără să te deplasezi.' },
+            { q: 'Pot obține certificatul din altă localitate sau din străinătate?', a: 'Da. Certificatul se poate cere de la orice primărie din țară (HG 255/2024 art. 158), iar oricum nu trebuie să mergi tu. Depunem cererea prin împuternicire în numele tău, util mai ales pentru românii din diaspora.' },
             { q: 'În cât timp ajunge duplicatul certificatului de naștere?', a: `${formatEstimatedDays(service)} în mod standard, în funcție de primăria din localitatea de naștere. Pentru cereri din diaspora termenul poate fi puțin mai lung. Există și opțiunea Urgent.` },
             { q: 'Cât timp este valabil certificatul de naștere?', a: 'Certificatul de naștere nu expiră — este valabil pe toată durata vieții. Unele instituții pot cere însă o copie legalizată recentă, emisă în ultimele luni, pentru anumite dosare.' },
             { q: 'Certificatul original ajunge prin curier?', a: 'Documentul original îl primești prin curier la adresa indicată, iar confirmarea și datele de tracking pe email. Te ținem la curent pe tot parcursul procesării.' },
             { q: 'Pot cere certificatul pentru altcineva?', a: 'Da, pe baza unei împuterniciri. Poți solicita certificatul de naștere pentru un membru al familiei sau o altă persoană, atâta timp cât ai acordul și împuternicirea necesară pentru depunerea cererii.' },
-            { q: 'Pot obține certificatul de naștere dintr-o altă localitate, fără să mă deplasez?', a: 'Da. Certificatul se eliberează de primăria din localitatea unde a fost înregistrată nașterea — de exemplu Galați, Timișoara sau orice alt oraș — dar nu trebuie să mergi acolo. Depunem cererea prin împuternicire la primăria competentă și îți trimitem documentul prin curier, oriunde te-ai afla.' },
+            { q: 'Pot obține certificatul de naștere dintr-o altă localitate, fără să mă deplasez?', a: 'Da. Nașterea poate fi înregistrată la Galați, Timișoara sau oriunde altundeva; din 2024 certificatul se poate cere de la orice primărie din țară (HG 255/2024 art. 158). Depunem cererea prin împuternicire și îți trimitem documentul prin curier, oriunde te-ai afla.' },
             { q: 'Trebuie să fac programare pentru eliberarea duplicatului?', a: 'Nu. Prin eGhișeul nu ai nevoie de programare la ghișeul Stării Civile și nu stai la coadă. Completezi cererea online, iar noi depunem documentația la primărie în numele tău.' },
             { q: 'Ce acte îmi trebuie pentru un duplicat de certificat de naștere?', a: 'Ai nevoie de un act de identitate valabil și de datele de naștere ale titularului: nume complet, CNP, data și localitatea nașterii și numele părinților așa cum apar în actul de naștere. Pentru cereri în numele altei persoane sau din diaspora se adaugă o împuternicire.' },
             { q: 'Sunt cetățean român plecat din țară — pot cere certificatul din diaspora?', a: 'Da. Românii din diaspora pot obține duplicatul fără să revină în țară. Depunem cererea prin împuternicire la primăria de naștere și îți trimitem documentul prin curier, util pentru dosare de cetățenie, pașaport sau acte la autoritățile străine.' },

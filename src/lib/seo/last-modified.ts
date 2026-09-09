@@ -37,7 +37,7 @@ export const PAGE_LAST_MODIFIED: Record<string, string> = {
   'ghid-complet-certificat-de-integritate-comportamentala': '2026-09-09',
   'informatii-cazier-auto-online': '2026-09-09',
   'rolul-si-atributiile-onrc-romania': '2026-09-09',
-  'schimbare-certificat-de-nastere-vechi': '2026-06-19',
+  'schimbare-certificat-de-nastere-vechi': '2026-09-09',
   'sms-fals-amenda-ghiseul-ro': '2026-08-28',
   'tabel-varsta-pensionare-anticipata-femei': '2026-06-16',
   'taxa-cazier-judiciar': '2026-08-24',
