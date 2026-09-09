@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { getCollaboratorServices } from '@/lib/admin/permissions';
 import { resolveCollaboratorContext } from '@/lib/admin/collaborator-context';
+import { requirePrivateUnlock } from '@/lib/collaborator/private-gate';
 
 /**
  * The collaborator's assigned services with the client price and THEIR
@@ -19,10 +20,13 @@ export async function GET(request: NextRequest) {
 
     let collaboratorId: string;
     try {
-      ({ collaboratorId } = await resolveCollaboratorContext(
+      let preview: boolean;
+      ({ collaboratorId, preview } = await resolveCollaboratorContext(
         user.id,
         request.nextUrl.searchParams.get('as')
       ));
+      // Prețurile sunt pagină privată: cere parola internă (cookie) dacă e setată.
+      if (!preview) await requirePrivateUnlock(collaboratorId);
     } catch (e) {
       if (e instanceof Response) return e;
       throw e;

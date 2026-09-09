@@ -179,6 +179,7 @@ The `employee` role has been replaced by specialized roles. See [Workflow Design
 | Tarife ANCPI (referință Ordin 16/2019, taxe + urgență) | `/admin/tarife-ancpi` | `orders.view` | Implemented (2026-07-14; aceeași listă la `/colaborator/tarife`) |
 | Colaboratori (comenzi + onorarii, tab avocat) | `/admin/colaboratori` | `orders.view` | Implemented |
 | Previzualizare portal colaborator (`/colaborator/*?as=<id>`, read-only) | buton în `/admin/colaboratori` | `users.manage` | Implemented (2026-08-17) |
+| Parolă pagini private colaborator (Decont + Serviciile mele cer parolă internă; gard pe server) | panou în `/admin/colaboratori` | `users.manage` | Implemented (2026-09-09; [changelog](../changelog/2026-09-09-parola-pagini-private-colaborator.md)) |
 
 ---
 

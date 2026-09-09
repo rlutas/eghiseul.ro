@@ -53,6 +53,7 @@ Index al documentației. Aceasta e o **hartă**, nu un jurnal — pentru jurnalu
 - **ANCPI automation:** [`technical/specs/ancpi-automation-plan.md`](technical/specs/ancpi-automation-plan.md)
 - **Cereri OCPI pentru topograf (extras CF, cât e ANCPI picat):** [`technical/specs/cereri-ocpi-colaborator.md`](technical/specs/cereri-ocpi-colaborator.md)
 - **Decont avocată colaboratoare (eghiseul + CJO, tab admin):** [`admin/decont-avocat-colaborator.md`](admin/decont-avocat-colaborator.md)
+- **Parolă internă pe Decont/Serviciile mele în portalul de colaborator (cont partajat cu angajat):** [`changelog/2026-09-09-parola-pagini-private-colaborator.md`](changelog/2026-09-09-parola-pagini-private-colaborator.md)
 - **Decont Mircea — regularizarea din 07.09 (stare curentă, model cumulativ, ce rămâne de reglat):** [`operations/decont-mircea-2026-09-07-regularizare.md`](operations/decont-mircea-2026-09-07-regularizare.md)
 - **Decont Mircea (topograf) — primul calcul + cutoff:** [`operations/decont-mircea-2026-08-26.md`](operations/decont-mircea-2026-08-26.md)
 - **Cookie consent (GDPR, banner + consent receipts):** [`technical/specs/cookie-consent.md`](technical/specs/cookie-consent.md)

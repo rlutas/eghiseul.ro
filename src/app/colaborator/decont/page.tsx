@@ -5,6 +5,7 @@ import { usePreviewAs, withPreview } from '@/lib/collaborator/preview';
 import Link from 'next/link';
 import { Wallet, ClipboardList, Scale } from 'lucide-react';
 import { findStatusLabel } from '@/lib/admin/status-options';
+import { PrivateGate } from '@/components/collaborator/private-gate';
 
 interface EarningOrder {
   id: string;
@@ -72,7 +73,16 @@ function monthOptions(): { value: string; label: string }[] {
 
 const lei = (n: number) => `${n.toFixed(2)} RON`;
 
+/** Decontul e pagină privată: parola internă (dacă e setată) o știe doar titularul. */
 export default function CollaboratorDecontPage() {
+  return (
+    <PrivateGate>
+      <CollaboratorDecontInner />
+    </PrivateGate>
+  );
+}
+
+function CollaboratorDecontInner() {
   const previewAs = usePreviewAs();
   const months = useMemo(monthOptions, []);
   const [month, setMonth] = useState(months[0]!.value);

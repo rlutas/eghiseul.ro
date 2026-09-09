@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Layers } from 'lucide-react';
 import { usePreviewAs, withPreview } from '@/lib/collaborator/preview';
+import { PrivateGate } from '@/components/collaborator/private-gate';
 
 interface CollabService {
   id: string;
@@ -13,7 +14,16 @@ interface CollabService {
   ancpiCost?: number | null;
 }
 
+/** Prețurile și onorariile sunt pagină privată — vezi PrivateGate. */
 export default function CollaboratorServicesPage() {
+  return (
+    <PrivateGate>
+      <CollaboratorServicesInner />
+    </PrivateGate>
+  );
+}
+
+function CollaboratorServicesInner() {
   const previewAs = usePreviewAs();
   const [services, setServices] = useState<CollabService[]>([]);
   const [loading, setLoading] = useState(true);

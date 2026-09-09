@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { requirePermission } from '@/lib/admin/permissions';
+import { collaboratorsWithPrivatePassword } from '@/lib/collaborator/private-gate';
 
 /**
  * Lists collaborators (topographs etc.) with their assigned services, for the
@@ -43,12 +44,14 @@ export async function GET() {
       });
     }
 
+    const withPassword = await collaboratorsWithPrivatePassword();
     const collaborators = (profiles || []).map((p: { id: string; first_name?: string; last_name?: string; email?: string }) => ({
       id: p.id,
       name: [p.first_name, p.last_name].filter(Boolean).join(' ') || p.email || 'Colaborator',
       email: p.email || '',
       feeLabel: 'Onorariu topograf',
       services: byCollab[p.id] || [],
+      privatePasswordSet: withPassword.has(p.id),
     }));
 
     // Synthetic "Avocat" entry — not a collaborator account, but the lawyer fee
@@ -69,6 +72,7 @@ export async function GET() {
         name: `${lawyerName} (avocat)`,
         email: '',
         feeLabel: 'Onorariu avocat',
+        privatePasswordSet: false,
         services: lawyerSvcs.map((s: { id: string; name: string; slug: string }) => ({ service_id: s.id, name: s.name, slug: s.slug })),
       });
     }

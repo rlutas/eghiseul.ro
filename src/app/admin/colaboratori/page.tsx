@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { Download, Users, ClipboardList, Wallet, Receipt, ListChecks, Eye, FileSpreadsheet, Plus, X, Loader2 } from 'lucide-react';
+import { Download, Users, ClipboardList, Wallet, Receipt, ListChecks, Eye, FileSpreadsheet, Plus, X, Loader2, Lock } from 'lucide-react';
 import { useAdminPermissions } from '@/hooks/use-admin-permissions';
 import { findStatusLabel } from '@/lib/admin/status-options';
 
@@ -11,6 +11,8 @@ interface Collaborator {
   email: string;
   feeLabel: string;
   services: { service_id: string; name: string; slug: string }[];
+  /** Parola internă a paginilor private (Decont, Serviciile mele) e setată. */
+  privatePasswordSet: boolean;
 }
 interface CollabOrder {
   id: string;
@@ -168,6 +170,114 @@ const ADVANCE_METHODS: [string, string][] = [
   ['numerar', 'Numerar'],
   ['alt', 'Altfel'],
 ];
+
+/**
+ * Parola internă a paginilor private din portal (Decont lunar, Serviciile
+ * mele). Colaboratorul își împarte contul cu un angajat: angajatul lucrează
+ * comenzile, dar decontul și prețurile se deschid doar cu parola asta.
+ * Se păstrează doar hash-ul — nu se poate afișa înapoi, doar înlocui.
+ */
+function PrivatePasswordPanel({ collaboratorId, isSet, onChanged }: { collaboratorId: string; isSet: boolean; onChanged: () => void }) {
+  const [open, setOpen] = useState(false);
+  const [password, setPassword] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
+
+  const save = async () => {
+    setBusy(true); setMsg(null);
+    try {
+      const res = await fetch('/api/admin/collaborators/private-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ collaboratorId, password }),
+      });
+      const json = await res.json();
+      if (!json.success) throw new Error(json.error || 'Eroare');
+      setPassword(''); setOpen(false);
+      setMsg({ ok: true, text: 'Parola a fost setată. Transmite-o doar titularului.' });
+      onChanged();
+    } catch (e) {
+      setMsg({ ok: false, text: e instanceof Error ? e.message : 'Eroare' });
+    } finally { setBusy(false); }
+  };
+
+  const remove = async () => {
+    setBusy(true); setMsg(null);
+    try {
+      const res = await fetch('/api/admin/collaborators/private-password', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ collaboratorId }),
+      });
+      const json = await res.json();
+      if (!json.success) throw new Error(json.error || 'Eroare');
+      setMsg({ ok: true, text: 'Gardul a fost scos — paginile se deschid fără parolă.' });
+      onChanged();
+    } catch (e) {
+      setMsg({ ok: false, text: e instanceof Error ? e.message : 'Eroare' });
+    } finally { setBusy(false); }
+  };
+
+  return (
+    <div className="mb-6 rounded-xl border border-slate-200 bg-white p-5">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <div className="flex items-center gap-2 text-slate-700">
+            <Lock className="h-4 w-4" />
+            <span className="text-sm font-semibold">Parolă pagini private (Decont, Serviciile mele)</span>
+            <span className={`rounded-full px-2 py-0.5 text-xs ${isSet ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-600'}`}>
+              {isSet ? 'setată' : 'nesetată'}
+            </span>
+          </div>
+          <p className="mt-1 text-xs text-slate-500">
+            Când e setată, comenzile se lucrează normal din cont, dar decontul și prețurile
+            cer parola asta. O știe doar titularul, nu angajații lui.
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => { setOpen((v) => !v); setMsg(null); }}
+            className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
+          >
+            {isSet ? 'Schimbă parola' : 'Setează parola'}
+          </button>
+          {isSet && (
+            <button
+              type="button"
+              disabled={busy}
+              onClick={remove}
+              className="rounded-lg border border-red-200 bg-white px-3 py-1.5 text-sm font-medium text-red-700 hover:bg-red-50 disabled:opacity-50"
+            >
+              Scoate gardul
+            </button>
+          )}
+        </div>
+      </div>
+      {open && (
+        <div className="mt-4 flex flex-wrap items-center gap-2">
+          <input
+            type="text"
+            autoComplete="off"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Parolă nouă (min. 6 caractere)"
+            className="w-64 rounded-lg border border-slate-300 px-3 py-1.5 text-sm"
+          />
+          <button
+            type="button"
+            disabled={busy || password.trim().length < 6}
+            onClick={save}
+            className="rounded-lg bg-slate-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-50"
+          >
+            {busy ? 'Se salvează...' : 'Salvează'}
+          </button>
+        </div>
+      )}
+      {msg && <p className={`mt-3 text-sm ${msg.ok ? 'text-emerald-700' : 'text-red-600'}`}>{msg.text}</p>}
+    </div>
+  );
+}
 
 function AdvancesPanel({ collaboratorId }: { collaboratorId: string }) {
   const [advances, setAdvances] = useState<Advance[]>([]);
@@ -867,6 +977,14 @@ export default function CollaboratorsAdminPage() {
           {/* Service assignments — users.manage only */}
           {hasPermission('users.manage') && selectedId && (
             <ServiceAssignments collaboratorId={selectedId} onChanged={() => reloadCollaborators(true)} />
+          )}
+
+          {hasPermission('users.manage') && selectedId && selectedId !== '__avocat__' && (
+            <PrivatePasswordPanel
+              collaboratorId={selectedId}
+              isSet={collaborators.find((c) => c.id === selectedId)?.privatePasswordSet ?? false}
+              onChanged={() => reloadCollaborators(true)}
+            />
           )}
 
           {selectedId && selectedId !== '__avocat__' && <AdvancesPanel collaboratorId={selectedId} />}

@@ -90,6 +90,8 @@ export default function CollaboratorLayout({ children }: { children: React.React
   }, [router, previewAs]);
 
   const handleLogout = async () => {
+    // Blochează și paginile private (cookie-ul de deblocare) la logout.
+    await fetch('/api/collaborator/unlock', { method: 'DELETE' }).catch(() => {});
     const supabase = createClient();
     await supabase.auth.signOut();
     router.replace('/auth/login');
