@@ -93,8 +93,8 @@ export default function DespreNoiPage() {
               </li>
               <li>
                 <strong>Nu suntem instituție publică și nu suntem afiliați cu vreuna.</strong> Numele
-                „eGhișeul.ro" descrie ce facem — ghișeul vine la tine — nu o legătură cu vreun portal
-                de stat.
+                „eGhișeul.ro&rdquo; descrie ce facem: ghișeul vine la tine. Nu e o legătură cu vreun
+                portal de stat.
               </li>
               <li>
                 <strong>Nu suntem singura cale.</strong> Poți obține fiecare document și direct, pe

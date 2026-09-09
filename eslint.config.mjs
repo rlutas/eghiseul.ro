@@ -18,6 +18,13 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Scripturi de analiză și artefacte de cercetare — se rulează pe Node, la
+    // mână, nu intră în bundle. Un `require()` lăsat acolo pica build-ul în CI
+    // (s-a întâmplat pe 03.09.2026, 4 build-uri roșii la rând).
+    "docs/**",
+    // Skill-uri instalate, cod terț.
+    ".agents/**",
+    ".claude/skills/**",
   ]),
 ]);
 
