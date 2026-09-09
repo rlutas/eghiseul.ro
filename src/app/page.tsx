@@ -1,6 +1,5 @@
-import { Suspense } from 'react';
 import { HeroSection } from '@/components/home/hero-section';
-import { FeaturedServices, FeaturedServicesSkeleton } from '@/components/home/featured-services';
+import { FeaturedServices } from '@/components/home/featured-services';
 import { WhyUsSection } from '@/components/home/why-us-section';
 import { UseCasesSection } from '@/components/home/use-cases-section';
 import { HowItWorksSection } from '@/components/home/how-it-works-section';
@@ -14,7 +13,7 @@ import { buildHomepageGraph } from '@/lib/seo/homepage-schema';
 
 export default function HomePage() {
   return (
-    <main className="min-h-screen">
+    <main id="main-content" className="min-h-screen">
       {/* Site-wide JSON-LD: Organization + WebSite + WebPage + ItemList + FAQPage */}
       <script
         type="application/ld+json"
@@ -29,9 +28,7 @@ export default function HomePage() {
 
       {/* 3. Featured Services */}
       <section id="servicii">
-        <Suspense fallback={<FeaturedServicesSkeleton />}>
-          <FeaturedServices />
-        </Suspense>
+        <FeaturedServices />
       </section>
 
       {/* 4. De ce eGhișeul — trust & diferențiere */}

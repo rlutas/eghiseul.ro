@@ -826,7 +826,7 @@ function OrderStatusContent() {
 // layout renders only the Header; each page brings its own Footer.
 export default function OrderStatusPage() {
   return (
-    <>
+    <main id="main-content">
       <Suspense
         fallback={
           <div className="container mx-auto px-4 py-8 max-w-2xl flex items-center justify-center min-h-[400px]">
@@ -837,6 +837,6 @@ export default function OrderStatusPage() {
         <OrderStatusContent />
       </Suspense>
       <Footer />
-    </>
+    </main>
   );
 }
