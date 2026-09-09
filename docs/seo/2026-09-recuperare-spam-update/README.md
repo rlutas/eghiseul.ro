@@ -8,6 +8,10 @@ Dosarul complet al analizei și al planului. Start: **[`PLAN-RECUPERARE.md`](PLA
 2. [`00-decizii-owner.md`](00-decizii-owner.md) — deciziile luate de Raul (D1–D6)
 3. [`07-date-gsc-analytics-business.md`](07-date-gsc-analytics-business.md) — impactul măsurat: GSC, GA4, comenzi din DB
 
+## Verificare
+
+- [`10-verificare-post-executie.md`](10-verificare-post-executie.md) — audit independent, adversarial, cu build și server real: fiecare redirect chemat cu curl, tot JSON-LD-ul parsat. Verdict: se poate face deploy. Cele 5 probleme găsite sunt reparate.
+
 ## Analize (8 agenți, 09.09.2026)
 
 | Doc | Ce conține |

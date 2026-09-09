@@ -20,7 +20,15 @@
 | 4 — E-E-A-T | ✅ livrat | `fd83802` |
 | 5 — prevenție | ✅ livrat (`.claude/rules/content-and-seo.md`) | |
 
-**Nepushat.** Toate fazele au build verde și 1597 de teste care trec.
+**LIVE din 09.09.2026, ora 11:20** (commit `36b6d8f`). Verificat pe producție după
+deploy: cele 90 de pagini de locație și cele 32 de articole dau 308 către țintele
+corecte, `/persoana-fizica/` și `/persoana-juridica/` răspund 200, rutele
+WordPress dau 410, sitemap 111 URL-uri, zero `aggregateRating`, zero
+`meta keywords`, un singur nod `Person` pe articol, paginile de autor și
+„Despre noi" indexabile.
+
+Verificarea independentă dinainte de deploy: `10-verificare-post-executie.md`.
+Cele 5 probleme găsite acolo sunt reparate în `d974e23` și `36b6d8f`.
 
 ### Ce s-a schimbat față de plan la execuție
 
