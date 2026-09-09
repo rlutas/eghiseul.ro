@@ -7,9 +7,9 @@ Fazele 0–5 sunt LIVE din 09.09.2026 (vezi `PLAN-RECUPERARE.md`). Documentul ă
 |---|---|---|---|
 | 1 | Soft 404 pe `/servicii/<orice>/` | ✅ livrat | `a3ea1c8` |
 | 2 | Întrebări duplicate în FAQ + `llms.txt` + inlinkuri `/tools/` | ✅ parțial (partea necadastrală) | `c279e26` |
-| 3 | Diferențierea celor 13 pagini cadastrale | 🔄 în lucru | |
-| 4 | D3 refăcută (`extras-multilingv-*`) | ⏳ | |
-| 5 | Cele 32 de pagini REWRITE, în loturi de 5–6 | ⏳ | |
+| 3 | Diferențierea celor 13 pagini cadastrale | ✅ livrat — 62/78 → **0/78** perechi | `4b9f392` |
+| 4 | D3 refăcută (`extras-multilingv-*`) | ✅ livrat — 0,549 → 0,421; regula de mascare corectată | `5bd2583` |
+| 5 | Cele 32 de pagini REWRITE, în loturi de 5–6 | 🔄 1/29 livrat (rovinietă `63f8f20`); lot de 5 în lucru | |
 | 6 | Cele 29 KEEP + FIX | ⏳ | |
 
 ---
@@ -101,3 +101,68 @@ Cele 48 de pagini erau construite pentru o cerere care nu există.
 local). E singurul caz de pagini de locație defensibil de pe site. Dar nu acum —
 regula din `.claude/rules/content-and-seo.md` §1 spune că nu se construiește
 până nu e dovedită recuperarea.
+
+---
+
+## 3. Cele 13 pagini cadastrale — diferențiate pe fond
+
+Analiza le propunea consolidării (20 de clicuri pe toate, scrise în același
+commit). Ownerul le-a păstrat: sunt servicii reale, cu venit. Deci trebuiau să
+arate a 13 pagini, nu a una copiată de 13 ori.
+
+**Cum s-a diferențiat.** Nu prin sinonime, ci prin ce e fiecare document de fapt,
+cine îl cere, ce NU dovedește și cu ce e confundat. Perechile de confuzie sunt
+reale și verificabile: releveu vs plan cadastral; copie in extenso vs extras de
+informare (ipoteca radiată supraviețuiește în una, dispare din cealaltă);
+încheiere de intabulare vs contract; certificat de sarcini vs datoriile la
+întreținere (care NU sunt sarcini — cea mai scumpă neînțelegere de pe pagina
+aia); actualizare adresă e o operațiune, nu o copie.
+
+**FAQ.** 100 de întrebări, toate unice. Setul stampilat pe 13 pagini a dispărut.
+
+**Măsurat** (HTML prerandat, shingles de 6, aceeași metodă ca la audit):
+
+| | înainte | după |
+|---|---:|---:|
+| perechi peste 0,25 | 62 / 78 | **0 / 78** |
+| cea mai rea pereche | 0,344 | 0,233 |
+| mediană Jaccard | 0,266 | 0,221 |
+| cuvinte, mediană | 1.714 | 1.772 |
+| test de mascare (medie) | urcă +0,020 | **scade −0,002** |
+
+Planșeul de ~0,20 care rămâne e cromul comun tuturor paginilor de serviciu:
+`ReviewsSection` (~40% din text), `PrivateServiceNotice`, cardul de preț. Nu se
+coboară sub el prin copywriting.
+
+---
+
+## 4. D3 — și corecția regulii de mascare
+
+Perechea `extras-multilingv-*`: 0,751 la audit → 0,549 → **0,421**. Secțiuni care
+există pe o pagină și nu pe cealaltă: „Copil născut în străinătate: ordinea
+contează" (naștere) și „Schimbarea numelui după căsătorie, în alt stat"
+(căsătorie).
+
+**Regula §1 era greșită și am corectat-o.** Prima versiune spunea „dacă la mascare
+similaritatea crește, pagina nu se publică". E imposibil de trecut: mascarea
+înlocuiește tokenul X din A și tokenul Y din B cu același M, deci creează
+potriviri și nu le poate distruge. Verificat pe toate cele patru seturi
+măsurate — urcă și la paginile șterse ca doorway, și la cele rescrise în
+profunzime. Regula are acum praguri de mărime: mascat > 0,65 sau salt > +0,12 =
+nu se publică.
+
+---
+
+## 5. Rescrierile — lotul 1
+
+**Livrat:** tool-ul de verificare rovinietă (`63f8f20`) — 32.589 de clicuri,
+demotat de la 5,95 la 31,92. Umplutura care descria ecranul („procesul e simplu
+și rapid") a fost înlocuită cu ce întreabă lumea: rovinieta urmează numărul, nu
+proprietarul; categoria greșită = inexistentă la control; plata nu apare
+instantaneu, nu cumpăra a doua oară; capcana drumului național prin municipiu.
+
+**În lucru (agent, 5 pagini):** amendă rovinietă (scor 20,0, cel mai prost de pe
+site), cum aflăm nr. cadastral (4.041 clicuri), ghid integritate (subțire),
+info cazier auto (subțire), documente stare civilă 2025.
+
+Din 32: 3 erau cadastrale (făcute la pasul 3), 1 livrată, 5 în lucru → rămân 23.
