@@ -123,12 +123,13 @@ export default function AdminRegistruPage() {
             La comenzile neplătite NU se emit numere; la regenerare de documente numărul se refolosește (nu se irosește).
           </li>
           <li>
-            <strong>Ai greșit ceva?</strong> Trei situații, trei butoane:
+            <strong>Ai greșit ceva?</strong> Regula: numerele NU se pierd.
             <span className="block pl-3">
               ✏️ <strong>Editează</strong> — client greșit, dată greșită: corectezi datele, numărul rămâne la client.<br />
-              🗑 <strong>Anulează</strong> — contract real anulat (refund): numărul rămâne consumat, cu mențiune. Lasă un gol justificat.<br />
-              🗑 → <strong>Eliberează</strong> — număr luat din greșeală, pe niciun document: dispare din jurnal și se refolosește
-              <em> automat la următoarea alocare</em>, de pe oricare platformă. Registrul rămâne fără goluri.
+              🗑 <strong>Eliberează</strong> — clientul a anulat, refund, s-a răzgândit, număr luat din greșeală: dispare din jurnal
+              și se refolosește <em>automat la următoarea alocare</em>, de pe oricare platformă. Fără goluri.<br />
+              🗑 <strong>Anulează cu mențiune</strong> — excepție: actul cu acest număr e deja depus la instituție. Numărul rămâne
+              consumat, marcat „anulat”.
             </span>
           </li>
           <li>
@@ -176,9 +177,10 @@ function NumberRegistryContent() {
   const [voidDialogOpen, setVoidDialogOpen] = useState(false);
   const [voidEntryId, setVoidEntryId] = useState<string | null>(null);
   const [voidReason, setVoidReason] = useState('');
-  /** 'void' = contract real anulat (numărul rămâne consumat, cu mențiune);
-   *  'release' = alocare greșită (numărul se refolosește la următoarea alocare). */
-  const [voidMode, setVoidMode] = useState<'void' | 'release'>('void');
+  /** 'release' (implicit) = numărul se refolosește la următoarea alocare — regula
+   *  cabinetului (09.09.2026): anulare, refund, răzgândire, greșeală = fără gol;
+   *  'void' = excepție, doar când actul e deja depus la instituție. */
+  const [voidMode, setVoidMode] = useState<'void' | 'release'>('release');
 
   // Forms
   const [newRange, setNewRange] = useState({
@@ -580,7 +582,7 @@ function NumberRegistryContent() {
         setVoidDialogOpen(false);
         setVoidEntryId(null);
         setVoidReason('');
-        setVoidMode('void');
+        setVoidMode('release');
         fetchRegistry();
       } else {
         toast.error(json.error || 'Eroare la anularea numarului');
@@ -1324,24 +1326,23 @@ function NumberRegistryContent() {
             <DialogTitle>Ce faci cu numărul?</DialogTitle>
           </DialogHeader>
           <div className="space-y-3">
-            <label className={`flex gap-3 rounded-lg border p-3 cursor-pointer ${voidMode === 'void' ? 'border-red-400 bg-red-50' : ''}`}>
-              <input type="radio" name="void-mode" className="mt-1" checked={voidMode === 'void'} onChange={() => setVoidMode('void')} />
-              <span className="text-sm">
-                <span className="font-semibold">Anulează — contractul a existat și s-a anulat</span>
-                <span className="block text-muted-foreground">
-                  Numărul rămâne consumat, cu mențiunea „anulat” în registru (așa cere evidența Baroului).
-                  Nu se refolosește niciodată. Folosește pentru refund sau contract semnat și apoi anulat.
-                </span>
-              </span>
-            </label>
             <label className={`flex gap-3 rounded-lg border p-3 cursor-pointer ${voidMode === 'release' ? 'border-amber-400 bg-amber-50' : ''}`}>
               <input type="radio" name="void-mode" className="mt-1" checked={voidMode === 'release'} onChange={() => setVoidMode('release')} />
               <span className="text-sm">
-                <span className="font-semibold">Eliberează — numărul a fost luat din greșeală</span>
+                <span className="font-semibold">Eliberează — clientul a anulat, refund, răzgândit, greșeală</span>
                 <span className="block text-muted-foreground">
                   Rândul dispare din jurnal, iar numărul se refolosește <strong>automat la următoarea alocare</strong>
-                  (manuală sau de pe oricare platformă). Registrul rămâne fără gol. Folosește DOAR dacă numărul
-                  nu apare pe niciun document emis.
+                  (manuală sau de pe oricare platformă). Registrul rămâne fără goluri. Asta e regula: numerele nu se pierd.
+                </span>
+              </span>
+            </label>
+            <label className={`flex gap-3 rounded-lg border p-3 cursor-pointer ${voidMode === 'void' ? 'border-red-400 bg-red-50' : ''}`}>
+              <input type="radio" name="void-mode" className="mt-1" checked={voidMode === 'void'} onChange={() => setVoidMode('void')} />
+              <span className="text-sm">
+                <span className="font-semibold">Anulează cu mențiune — actul e deja depus la instituție</span>
+                <span className="block text-muted-foreground">
+                  Numărul rămâne consumat, marcat „anulat” în registru, și nu se mai dă nimănui. Doar când documentul
+                  cu acest număr a fost depus și nu mai poate fi retras. Excepție, nu regulă.
                 </span>
               </span>
             </label>
@@ -1356,7 +1357,7 @@ function NumberRegistryContent() {
             )}
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => { setVoidDialogOpen(false); setVoidEntryId(null); setVoidReason(''); setVoidMode('void'); }}>Renunță</Button>
+            <Button variant="outline" onClick={() => { setVoidDialogOpen(false); setVoidEntryId(null); setVoidReason(''); setVoidMode('release'); }}>Renunță</Button>
             <Button variant="destructive" onClick={handleVoid} disabled={saving}>
               {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
               {voidMode === 'release' ? 'Eliberează numărul' : 'Anulează numărul'}

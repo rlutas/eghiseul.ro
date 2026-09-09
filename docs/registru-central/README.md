@@ -275,11 +275,13 @@ neatins).
 - **Adaugi interval nou** (numere noi de la Barou): `/admin/registru` →
   Intervale → Adaugă. Contract = fără serie; Delegație = serie (ex. SM).
   ⚠️ Înainte de 1 ianuarie trebuie să existe interval activ pe anul nou.
-- **Ai greșit ceva**: client greșit → ✏️ Editează (numărul rămâne). Contract
-  real anulat (refund) → 🗑 Anulează (void; consumat, cu mențiune). Număr luat
-  din greșeală, pe niciun act → 🗑 Eliberează (release; se refolosește
-  automat la următoarea alocare, de pe ORICE platformă — nu se poate țintí
-  un client anume).
+- **Ai greșit ceva** — regula cabinetului (Raul, 09.09.2026): **numerele nu
+  se pierd**. Client greșit → ✏️ Editează (numărul rămâne). Anulare, refund,
+  răzgândire, greșeală → 🗑 Eliberează (release, opțiunea implicită; se
+  refolosește automat la următoarea alocare, de pe ORICE platformă — nu se
+  poate ținti un client anume). 🗑 Anulează cu mențiune (void) = EXCEPȚIE,
+  doar când actul cu numărul e deja depus la instituție și nu mai poate fi
+  retras.
 - **Interval epuizat**: comenzile se procesează normal, alocarea rămâne pe
   retry (cron) + notă pe comandă; adaugi interval și cron-ul recuperează.
 - **Intrare manuală** (cazuri personale avocat): jurnal → Adaugă manual
@@ -292,7 +294,7 @@ neatins).
 | Registru central picat la webhook | Plata se procesează normal; alocarea se reia automat (cron orar, 14 zile) |
 | Webhook dublu / Stripe retry | RPC idempotent → același număr, zero duplicate |
 | Regenerare document | Refolosește numărul existent (`reused=true`) |
-| Refund | Numărul rămâne alocat; void manual din admin |
+| Refund | Numărul rămâne alocat până îl eliberează echipa din admin (🗑 Eliberează) — se refolosește, fără gol |
 | Comandă neplătită | NU primește niciodată număr (gating și în admin) |
 
 ---

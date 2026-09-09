@@ -36,19 +36,20 @@ numărul contractului de asistență, seria SM și fiecare delegație pe rândul
 ei, cu ce s-a făcut pe ea. Cele mai recente sunt primele. Se vede tot ce
 s-a emis, pentru fiecare client, cu numerele exact ca pe acte.
 
-**Dacă s-a greșit ceva — trei situații, trei butoane:**
+**Dacă s-a greșit ceva — regula e simplă: numerele nu se pierd.**
 - **Client greșit sau dată greșită** → creionul (Editează). Corectați numele
-  și gata: numărul rămâne al clientului, nu se pierde nimic.
-- **Contract real, dar anulat** (clientul a renunțat, refund) → coșul roșu →
-  „Anulează". Numărul rămâne consumat, cu mențiunea „anulat", exact ca la
-  registrul pe hârtie. Nu se mai dă nimănui.
-- **Număr luat din greșeală**, care nu apare pe niciun act → coșul roșu →
-  „Eliberează". Numărul dispare din jurnal și **se refolosește singur la
-  următoarea alocare**, de pe site-uri sau manuală. Registrul rămâne fără
-  goluri. Atenție: nu puteți alege cui îi revine — îl ia primul care alocă.
+  și gata: numărul rămâne al clientului.
+- **Clientul a anulat, a primit banii înapoi, s-a răzgândit, sau numărul a
+  fost luat din greșeală** → coșul roșu → „Eliberează" (e opțiunea deja
+  bifată). Numărul dispare din jurnal și **se refolosește singur la următoarea
+  alocare**, de pe site-uri sau manuală. Registrul rămâne fără goluri.
+  Atenție: nu puteți alege cui îi revine — îl ia primul care alocă.
+- **Excepție:** actul cu numărul acela a fost deja depus la instituție și nu
+  mai poate fi retras → coșul roșu → „Anulează cu mențiune". Numărul rămâne
+  în evidență ca anulat, ca la registrul pe hârtie, și nu se mai dă nimănui.
 
-Un număr anulat se poate readuce (săgeata verde „Restaurare") sau elibera
-ulterior (X-ul roșu). Un număr eliberat nu mai poate fi editat — nu mai
-există în jurnal.
+Un număr anulat cu mențiune se poate readuce (săgeata verde „Restaurare") sau
+elibera ulterior (X-ul roșu). Un număr eliberat nu mai poate fi editat — nu
+mai există în jurnal.
 
 Dacă ceva nu e clar sau nu merge, un mesaj și rezolvăm! 😊
