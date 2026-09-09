@@ -20,6 +20,18 @@ export const SITE_AUTHOR = {
   /** Calificarea, exact cum e — fără înflorituri. */
   credential: 'BSc Computing Technologies, University of Roehampton',
   path: '/despre-noi/raul-lutas/',
+  /**
+   * Profil public, pentru `sameAs`. Gol = nu se emite nimic în schema; NU pune
+   * un URL pe care nu l-ai verificat că există și că e al persoanei.
+   */
+  linkedin: '',
+  /**
+   * Poză de profil, din `public/`. Gol = pagina afișează monograma cu inițiale.
+   * Nu punem un avatar generic: o poză de stoc pe o pagină de autor e exact
+   * semnalul artificial pe care îl scoatem de pe site.
+   */
+  photo: '',
+  initials: 'RL',
   get url(): string {
     return `${BASE_URL}${this.path}`;
   },

@@ -226,9 +226,29 @@ export const ORGANIZATION = {
   // No standalone square logo asset yet — use the branded OG image (valid 200)
   // instead of /logo.png which 404s and invalidates the Organization node.
   logo: `${BASE_URL}/og/default.png`,
+  /**
+   * SEDIUL SOCIAL, cel din Registrul Comerțului. Rămâne așa peste tot unde
+   * contează juridic: termeni și condiții, politica de confidențialitate,
+   * identificarea firmei în footer, nodul `Organization`.
+   */
   address: {
     street: 'Str. Salcâmilor nr. 2',
     locality: 'Com. Odoreu',
+    region: 'Jud. Satu Mare',
+    country: 'RO',
+  },
+  /**
+   * PUNCTUL DE LUCRU — biroul unde se lucrează efectiv și cel care apare pe
+   * profilul Google (4,9 din 464 de recenzii, „Information services in Satu
+   * Mare"). Se folosește acolo unde omul întreabă „unde vă găsesc", nu acolo
+   * unde se identifică firma.
+   *
+   * ⚠️ Sunt DOUĂ adrese diferite, intenționat. Nu le amesteca: sediul social e
+   * cel care trebuie să apară pe facturi și în contracte.
+   */
+  office: {
+    street: 'Str. Constantin Brâncoveanu nr. 18',
+    locality: 'Satu Mare',
     region: 'Jud. Satu Mare',
     country: 'RO',
   },

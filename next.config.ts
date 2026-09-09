@@ -8,6 +8,10 @@ const nextConfig: NextConfig = {
 
   async redirects() {
     return [
+      // Variante de URL pe care le încearcă lumea pentru pagina „Despre noi".
+      { source: '/despre/', destination: '/despre-noi/', permanent: true },
+      { source: '/echipa/', destination: '/despre-noi/', permanent: true },
+      { source: '/about/', destination: '/despre-noi/', permanent: true },
       // ─────────────────────────────────────────────────────────────────
       // Cleanup pagini de locație (09.09.2026) — August 2026 Spam Update.
       //

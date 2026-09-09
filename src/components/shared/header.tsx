@@ -29,6 +29,7 @@ const navLinks: NavLink[] = [
   { href: '/servicii/', label: 'Servicii', type: 'route' },
   { href: '/calculator/', label: 'Calculatoare', type: 'route' },
   { href: '/blog/', label: 'Blog', type: 'route' },
+  { href: '/despre-noi/', label: 'Despre noi', type: 'route' },
   { href: '/comanda/status/', label: 'Status comandă', type: 'route' },
   { href: '/contact/', label: 'Contact', type: 'route' },
 ];

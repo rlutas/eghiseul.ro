@@ -105,15 +105,15 @@ export default async function CopieReleveuPage() {
 
   // Ways to identify the property
   const identifiers = [
-    { icon: KeyRound, title: 'Număr cadastral', desc: 'Identificatorul unic al unității individuale — apartamentul sau spațiul (ex: 12783-C1-U4).' },
-    { icon: ScrollText, title: 'Număr de carte funciară', desc: 'Numărul CF asociat apartamentului din localitate, plus județul și localitatea.' },
+    { icon: KeyRound, title: 'Numărul unității individuale', desc: 'La apartamente are formă compusă, de tipul 12783-C1-U4: teren, construcție, unitate.' },
+    { icon: ScrollText, title: 'Numărul de carte funciară', desc: 'CF-ul apartamentului, nu cel al blocului. Îl găsești pe extrasul tău sau în contract.' },
   ];
 
   const useCases = [
-    { icon: Home, title: 'Vânzare apartament', items: ['Dosar notarial', 'Anexă la antecontract', 'Structura reală a imobilului'] },
-    { icon: Landmark, title: 'Credit ipotecar', items: ['Dosar pentru bancă', 'Evaluare imobil', 'Garanție ipotecară'] },
-    { icon: Ruler, title: 'Verificare suprafață utilă', items: ['Suprafețe per cameră', 'Dimensiuni interioare', 'Recapitulația suprafețelor'] },
-    { icon: Layers, title: 'Autorizații și succesiune', items: ['Autorizație de construire sau demolare', 'Certificat de urbanism', 'Dosar de succesiune'] },
+    { icon: Landmark, title: 'Credit ipotecar', items: ['Cerut de bancă la dosar', 'Baza raportului de evaluare', 'Locuința adusă în garanție'] },
+    { icon: Ruler, title: 'Recompartimentare', items: ['Arhitectul pleacă de la el', 'Pereți portanți și despărțitori', 'Situația de dinainte de lucrări'] },
+    { icon: Home, title: 'Vânzare de apartament', items: ['Anexă la dosarul notarial', 'Suprafața utilă, pe camere', 'Cumpărătorul vede structura'] },
+    { icon: Layers, title: 'Partaj sau ieșire din indiviziune', items: ['Împărțeală între moștenitori', 'Separare după divorț', 'Discuție pe camere, nu pe vorbe'] },
   ];
 
   return (
@@ -168,17 +168,17 @@ export default async function CopieReleveuPage() {
                 </h1>
 
                 <p className="text-lg sm:text-xl text-white/85 leading-relaxed mb-6">
-                  Releveul este planul apartamentului: dispunerea camerelor, suprafețele utile per încăpere
-                  și dimensiunile interioare. Îți obținem copia certificată din arhiva OCPI, 100% online.
+                  Singurul plan care intră în apartament: pereții, camerele și câți metri pătrați are fiecare.
+                  Îl scoatem pentru tine din dosarul depus la OCPI, fără să te deplasezi.
                 </p>
 
                 {/* USP */}
                 <div className="flex items-start gap-3 rounded-xl bg-primary-500/15 border border-primary-500/40 p-4 mb-6">
                   <Ruler className="h-5 w-5 text-primary-500 flex-shrink-0 mt-0.5" />
                   <p className="text-white/95 text-sm sm:text-base leading-relaxed">
-                    Vezi exact <strong className="text-primary-500">cum sunt dispuse camerele și ce suprafață</strong> are
-                    fiecare. Releveul îți folosește la <strong>vânzare, credit ipotecar</strong>, autorizații de
-                    construire și dosare de succesiune.
+                    Banca și evaluatorul cer releveul aproape de fiecare dată la un credit ipotecar. Tot pe el
+                    lucrează arhitectul înainte de o recompartimentare și tot el arată{' '}
+                    <strong className="text-primary-500">suprafața utilă reală</strong> a locuinței.
                   </p>
                 </div>
 
@@ -188,10 +188,10 @@ export default async function CopieReleveuPage() {
                   </p>
                   <ul className="mt-3 space-y-1.5 text-white/85 text-sm">
                     {[
-                      'Introduci numărul cadastral sau de carte funciară al apartamentului',
-                      'Confirmi județul și localitatea',
-                      'Plătești securizat (taxe OCPI incluse)',
-                      'Primești releveul pe email',
+                      'Ne dai numărul unității individuale sau numărul de CF',
+                      'Spui în ce localitate se află blocul',
+                      'Achiți o singură sumă, taxa OCPI e inclusă',
+                      'Planșa îți vine pe email, în format electronic',
                     ].map((step) => (
                       <li key={step} className="flex items-center gap-2">
                         <CheckCircle className="w-4 h-4 text-primary-500 flex-shrink-0" />
@@ -307,61 +307,83 @@ export default async function CopieReleveuPage() {
         <section className="py-12 lg:py-16 bg-neutral-50">
           <div className="container mx-auto px-4 max-w-[820px]">
             <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-5">
-              Ce este releveul și la ce folosește copia după el
+              Releveul e singurul plan care intră în apartament
             </h2>
             <div className="space-y-4 text-neutral-700 leading-relaxed">
               <p>
-                <strong>Releveul</strong> este reprezentarea grafică a unei unități individuale, de regulă un apartament,
-                un spațiu comercial sau o construcție. Arată <strong>cum sunt dispuse camerele</strong> și ce
-                <strong> suprafață utilă</strong> are fiecare: camera de zi, dormitoarele, bucătăria, baia, holul,
-                balconul, plus dimensiunile interioare. Mulți proprietari îi spun pe scurt schița apartamentului. Planșa
-                a fost măsurată și depusă la Oficiul de Cadastru și Publicitate Imobiliară (<strong>OCPI / ANCPI</strong>)
-                la avizarea documentației cadastrale. Vezi pe larg{' '}
-                <Link href="/servicii/extras-plan-cadastral/" className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
-                  ce este un releveu
-                </Link>
-                .
+                Toate celelalte planșe cadastrale se opresc la conturul exterior al imobilului. Releveul trece de el
+                și desenează interiorul unei unități individuale: apartament, spațiu comercial, mansardă. Vezi pereții,
+                camerele și câți metri pătrați are fiecare. Planșa a fost măsurată de inginerul cadastral la
+                întocmirea documentației și a rămas în dosarul de la Oficiul de Cadastru și Publicitate Imobiliară
+                (<strong>OCPI / ANCPI</strong>). Noi îți aducem o copie a ei.
               </p>
               <p>
-                O <strong>copie după releveu</strong> este copia certificată a acestei planșe, scoasă din arhiva OCPI a
-                imobilului. Spre deosebire de planul cadastral, care arată poziția imobilului pe ortofotoplan, releveul
-                te duce în interior și îți arată împărțirea spațiului cu suprafața fiecărei încăperi. Prin eGhișeul o
-                primești online, fără cont ANCPI și fără drum la ghișeul OCPI.
+                Pe planșă apar conturul fiecărei încăperi cu denumirea ei, suprafața utilă în metri pătrați pentru
+                fiecare, dimensiunile interioare și, la final, un tabel cu recapitulația suprafețelor. Sus sunt
+                adresa imobilului, numărul de carte funciară și numărul unității. Mulți proprietari îi spun pur și
+                simplu schița apartamentului.
               </p>
+
+              <h3 className="text-xl font-bold text-secondary-900 pt-2">
+                Cine îl cere, în ordinea în care ni se cere nouă
+              </h3>
+              <p>
+                Prima poziție o ocupă <strong>banca</strong>. La un credit ipotecar, evaluatorul lucrează pe releveu
+                ca să confirme structura și suprafața locuinței aduse în garanție, iar dosarul stă în loc până apare.
+                Pe locul doi vine <strong>arhitectul sau proiectantul</strong>, înainte de o recompartimentare: are
+                nevoie să vadă cum arăta apartamentul în forma lui înregistrată. Apoi{' '}
+                <strong>notarul</strong>, ca anexă la un dosar de vânzare, și{' '}
+                <strong>partajele</strong> — moștenitori care împart un apartament sau foști soți care ies din
+                indiviziune, unde discuția devine mult mai scurtă când există un desen cu camerele pe el.
+              </p>
+
               <div className="rounded-2xl border border-neutral-200 bg-white p-5">
                 <h3 className="font-bold text-secondary-900 mb-2">
-                  Ce conține releveul
+                  Confuzia numărul unu: releveu sau plan cadastral
                 </h3>
                 <p className="text-sm text-neutral-700">
-                  Releveul include <strong>conturul fiecărei încăperi</strong> și denumirea camerelor,
-                  <strong> suprafețele utile</strong> exprimate în metri pătrați, dimensiunile interioare și
-                  <strong> recapitulația suprafețelor per cameră</strong>. Pe planșă apar și adresa completă a imobilului,
-                  numărul de carte funciară și numărul cadastral. Este desenul la care se raportează notarul, banca sau
-                  evaluatorul când au nevoie de structura reală a apartamentului.
+                  Sunt planșe din același dosar, dar răspund la întrebări diferite.{' '}
+                  <strong>Planul cadastral</strong> arată unde stă imobilul pe hartă și ce contur exterior are.{' '}
+                  <strong>Releveul</strong> arată cum e împărțit pe dinăuntru. Pentru un apartament de bloc, planul
+                  cadastral îți dă poziția blocului și a terenului de sub el, ceea ce în general nu ajută pe nimeni
+                  la un credit; releveul e cel cerut.{' '}
+                  <Link href={serviceUrl('copie-plan-cadastral')} className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
+                    Vezi copia planului cadastral
+                  </Link>
+                  .
                 </p>
               </div>
 
               <h3 className="text-xl font-bold text-secondary-900 pt-2">
-                Când ai nevoie de copie după releveu
+                Ce nu dovedește releveul
               </h3>
               <p>
-                Releveul se cere des la <strong>vânzarea unui apartament</strong>, ca anexă în dosarul notarial, și la
-                <strong> creditul ipotecar</strong>, pentru că banca și evaluatorul verifică structura și suprafața utilă
-                a imobilului adus în garanție. Tot el intră în dosarele de <strong>autorizație de construire sau
-                demolare</strong>, în certificatul de urbanism și în <strong>procedurile de succesiune</strong>. Îți este
-                util și când vrei doar să recuperezi planșa pierdută sau să verifici suprafața utilă reală a locuinței.
+                Nu spune cine este proprietarul și nu ține loc de act de proprietate. Nu autorizează nicio lucrare:
+                dacă vrei să muți un perete, releveul e punctul de plecare al proiectului, nu aprobarea lui. Și,
+                cel mai important, arată apartamentul <strong>așa cum a fost măsurat atunci</strong>. Dacă ai
+                desființat o debara acum patru ani, planșa din arhivă nu știe. Ca desenul să prindă modificarea, ea
+                trebuie mai întâi înscrisă printr-o documentație cadastrală nouă.
               </p>
               <p>
-                Există și situații în care arhiva nu are un releveu avizat. La imobilele înscrise în cărți funciare mai
-                vechi, deschise încă din perioada Imperiului Austro-Ungar, planșa poate lipsi. În astfel de cazuri îți
-                spunem ce date găsim în dosarul cadastral înainte să continui comanda.
+                Merită știut și de ce cifrele nu se potrivesc cu anunțul imobiliar. Releveul lucrează cu{' '}
+                <strong>suprafața utilă</strong>, măsurată între pereți, în timp ce anunțurile folosesc de obicei
+                suprafața construită, care include pereții și cotele din părțile comune. Diferența de câțiva metri
+                pătrați între cele două nu este o greșeală, ci două convenții de măsurare diferite.
               </p>
               <p>
-                Releveul completează celelalte planșe cadastrale ale imobilului: <strong>planul cadastral</strong> pe
-                ortofotoplan, cu poziția pe hartă, și <strong>extrasul de carte funciară</strong>, cu situația juridică
-                (proprietar, suprafață, sarcini). Pentru vânzare și pentru credit sunt cerute de obicei împreună.{' '}
+                Mai există și cazul în care planșa lipsește. La imobile înscrise în cărți funciare vechi, deschise
+                încă din perioada austro-ungară, dosarul poate să nu conțină un releveu avizat. Când dăm de o
+                asemenea situație îți spunem ce am găsit în dosar înainte să mergem mai departe cu comanda.
+              </p>
+              <p>
+                Ne trebuie numărul unității individuale sau numărul de carte funciară al apartamentului, plus
+                localitatea. Dacă ai numai adresa, îl scoatem întâi prin serviciul de{' '}
+                <Link href={serviceUrl('identificare-imobil')} className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
+                  identificare imobil
+                </Link>
+                . Iar dacă ai nevoie și de situația juridică a locuinței, ea vine separat, prin{' '}
                 <Link href={serviceUrl('extras-carte-funciara')} className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
-                  Vezi extrasul de carte funciară
+                  extrasul de carte funciară
                 </Link>
                 .
               </p>
@@ -377,10 +399,10 @@ export default async function CopieReleveuPage() {
                 Ce îți trebuie
               </span>
               <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-3">
-                Cum identifici apartamentul pentru releveu
+                Datele apartamentului de care avem nevoie
               </h2>
               <p className="text-neutral-600 max-w-2xl mx-auto">
-                Ai nevoie de un singur identificator al unității individuale. Dacă nu îl știi, îl putem afla după adresă.
+                Ne interesează unitatea, nu blocul. Un singur număr ne este de ajuns.
               </p>
             </div>
 
@@ -399,11 +421,11 @@ export default async function CopieReleveuPage() {
             <div className="mt-6 p-5 bg-primary-50 rounded-2xl border border-primary-200 max-w-2xl mx-auto flex items-start gap-3">
               <Search className="w-5 h-5 text-primary-600 flex-shrink-0 mt-0.5" />
               <p className="text-sm text-secondary-700">
-                <strong>Nu știi numărul cadastral?</strong> Îl putem afla după adresă prin serviciul de{' '}
+                <strong>Ai numai adresa și etajul?</strong> Scoatem întâi numărul unității prin serviciul de{' '}
                 <Link href={serviceUrl('identificare-imobil')} className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
                   Identificare Imobil
                 </Link>
-                , apoi îți obținem copia după releveu.
+                , apoi cerem planșa.
               </p>
             </div>
           </div>
@@ -417,7 +439,7 @@ export default async function CopieReleveuPage() {
                 Când ai nevoie
               </span>
               <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-3">
-                Când Ai Nevoie de Copie după Releveu?
+                Patru dosare în care planșa e cerută explicit
               </h2>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -452,15 +474,15 @@ export default async function CopieReleveuPage() {
                 Proces simplu
               </span>
               <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white mb-3">Cum Funcționează?</h2>
-              <p className="text-white/70 max-w-2xl mx-auto">Obții copia după releveu în 4 pași, 100% online</p>
+              <p className="text-white/70 max-w-2xl mx-auto">Patru pași, fără drum la ghișeul OCPI</p>
             </div>
             <div className="relative grid sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-6">
               <div className="hidden lg:block absolute top-8 left-[12.5%] right-[12.5%] h-0.5 bg-gradient-to-r from-primary-500/0 via-primary-500/50 to-primary-500/0" aria-hidden="true" />
               {[
-                { step: 1, title: 'Identifici Apartamentul', desc: 'Introduci numărul cadastral sau de carte funciară al unității individuale.', icon: KeyRound },
-                { step: 2, title: 'Confirmi Localitatea', desc: 'Alegi județul și localitatea. Verificăm datele înainte de depunere.', icon: MapPin },
-                { step: 3, title: 'Plătești Securizat', desc: 'Card, Apple Pay, Google Pay — taxele OCPI sunt incluse.', icon: Shield },
-                { step: 4, title: 'Primești Releveul', desc: `În ${formatEstimatedDays(service)} primești planul de nivel pe email.`, icon: CheckCircle },
+                { step: 1, title: 'Numărul unității', desc: 'Numărul apartamentului din evidență sau CF-ul lui.', icon: KeyRound },
+                { step: 2, title: 'Unde e blocul', desc: 'Județul și localitatea. Le potrivim cu evidența înainte de depunere.', icon: MapPin },
+                { step: 3, title: 'Plata', desc: 'Card, Apple Pay sau Google Pay, cu taxa OCPI deja inclusă.', icon: Shield },
+                { step: 4, title: 'Planșa pe email', desc: `Îți ajunge în ${formatEstimatedDays(service)}, în format electronic.`, icon: CheckCircle },
               ].map((item) => (
                 <div key={item.step} className="relative text-center">
                   <div className="relative z-10 mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-400 to-primary-600 text-secondary-900 shadow-[0_8px_24px_rgba(236,185,95,0.35)]">
@@ -481,7 +503,7 @@ export default async function CopieReleveuPage() {
         <section className="py-12 lg:py-16 bg-white">
           <div className="container mx-auto px-4 max-w-[1100px]">
             <h2 className="text-xl sm:text-2xl font-bold text-secondary-900 mb-6 text-center">
-              Servicii pentru imobile
+              Ce se mai cere împreună cu releveul
             </h2>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <Link
@@ -523,17 +545,16 @@ export default async function CopieReleveuPage() {
 
         {/* FAQ */}
         <ServiceFAQ
-          title="Întrebări Frecvente — Copie după Releveu"
+          title="Ce ne întreabă lumea despre releveu"
           faqs={[
-            { q: 'Ce este releveul unui apartament?', a: 'Releveul este planul de nivel al apartamentului — desenul care arată compartimentarea interioară: camerele, holurile, băile, balcoanele, dimensiunile interioare și suprafețele utile. Este planșa depusă la OCPI la momentul intabulării.' },
-            { q: 'Ce conține copia după releveu?', a: 'Conține conturul fiecărei încăperi, denumirea camerelor, suprafețele utile în metri pătrați, dimensiunile interioare și, de regulă, un tabel cu totalul suprafeței utile a apartamentului.' },
-            { q: 'La ce folosește releveul la vânzarea unui apartament?', a: 'La vânzare, releveul se anexează frecvent în dosarul notarial pentru a arăta structura reală a apartamentului. Cumpărătorul, notarul și banca verifică pe el compartimentarea și suprafața utilă a imobilului.' },
-            { q: 'Am nevoie de releveu pentru creditul ipotecar?', a: 'Da, de cele mai multe ori. Banca și evaluatorul verifică structura și suprafața utilă a apartamentului adus în garanție, iar releveul este planșa la care se raportează.' },
-            { q: 'Cu ce diferă releveul de planul cadastral?', a: 'Planul cadastral arată poziția imobilului pe ortofotoplan, la nivel de teren și contur exterior. Releveul coboară în interior și arată compartimentarea apartamentului și suprafețele pe camere. Sunt planșe complementare.' },
-            { q: 'Cât costă copia după releveu?', a: `${service.base_price} RON, cu taxele OCPI incluse. Fără costuri ascunse.` },
-            { q: 'Cât durează eliberarea?', a: `${formatEstimatedDays(service)}. Documentul este procesat de un operator și livrat pe email.` },
-            { q: 'Nu știu numărul cadastral al apartamentului. Ce fac?', a: 'Îl putem afla după adresă prin serviciul de Identificare Imobil, apoi îți obținem copia după releveu.' },
-            { q: 'Am nevoie de cont ANCPI? În ce format primesc releveul?', a: 'Nu ai nevoie de cont ANCPI — ne ocupăm noi de tot procesul; tu ai nevoie doar de numărul cadastral sau de carte funciară. Releveul se livrează în format electronic, pe email.' },
+            { q: 'De ce îmi cere banca releveul la creditul ipotecar?', a: 'Pentru că evaluatorul are nevoie de compartimentarea și de suprafața utilă a locuinței pe care o iei în garanție, iar releveul este singura planșă din dosarul cadastral care le arată. Fără el, raportul de evaluare nu se poate încheia, și dosarul stă.' },
+            { q: 'Suprafața din releveu nu se potrivește cu cea din anunț. Care e greșită?', a: 'Niciuna. Releveul măsoară suprafața utilă, adică ce este între pereți. Anunțurile imobiliare folosesc de obicei suprafața construită, care include grosimea pereților și cotele din părțile comune. De aici diferența de câțiva metri pătrați.' },
+            { q: 'Am scos un perete acum câțiva ani. Releveul din arhivă arată situația de acum?', a: 'Nu. Planșa arată apartamentul așa cum a fost măsurat la data documentației. Modificările intră în evidență doar dacă au fost înscrise printr-o documentație cadastrală nouă. Dacă nu s-a făcut, primești desenul dinaintea lucrărilor.' },
+            { q: 'Îmi trebuie releveu sau plan cadastral?', a: 'Dacă întrebarea ta este cum arată apartamentul pe dinăuntru, releveu. Dacă întrebarea este unde se află imobilul pe hartă și ce contur are, plan cadastral. Pentru un apartament de bloc, planul cadastral îți dă poziția blocului, ceea ce rareori ajută la un dosar de credit.' },
+            { q: 'Numărul apartamentului arată 12783-C1-U4. E corect scris așa?', a: 'Da, așa se identifică o unitate individuală: numărul terenului, apoi construcția (C1), apoi unitatea (U4). Trimite-l exact în forma în care apare pe extras sau în contract, cu tot cu liniuțe.' },
+            { q: 'Ce se întâmplă dacă în arhivă nu există releveu pentru apartament?', a: 'Se întâmplă la imobile din cărți funciare vechi, unde dosarul nu conține o planșă avizată. În cazul ăsta îți spunem exact ce am găsit în dosarul cadastral înainte să continuăm, ca să decizi tu dacă mai are rost comanda.' },
+            { q: 'Cât costă copia planșei?', a: `${service.base_price} RON, cu taxa OCPI inclusă.` },
+            { q: 'Sub ce formă îmi ajunge?', a: `În format electronic, pe email, în ${formatEstimatedDays(service)}. O poți tipări și atașa la dosarul de la bancă sau la cel notarial.` },
           ]}
         />
 
@@ -551,10 +572,10 @@ export default async function CopieReleveuPage() {
           <div className="relative container mx-auto px-4 max-w-[900px]">
             <div className="text-center">
               <h2 className="text-2xl lg:text-4xl font-extrabold text-white mb-4">
-                Gata să obții Copia după Releveu?
+                Ai nevoie de planul apartamentului?
               </h2>
               <p className="text-lg text-white/80 mb-8 max-w-xl mx-auto">
-                Ai nevoie doar de numărul cadastral sau de carte funciară al apartamentului. Primești documentul în {formatEstimatedDays(service)}.
+                Ne trebuie numărul unității sau CF-ul ei, plus localitatea. Planșa ajunge pe email în {formatEstimatedDays(service)}.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
                 <OrderButton href={`/comanda/${SERVICE_SLUG}`}>Comandă Acum</OrderButton>

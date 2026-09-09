@@ -118,7 +118,13 @@ export default function ContactPage() {
                   <li><strong>{ORGANIZATION.legalName}</strong></li>
                   <li>CUI: {ORGANIZATION.cui}</li>
                   <li>Reg. Com.: {ORGANIZATION.regCom}</li>
-                  <li>{ORGANIZATION.address.street}, {ORGANIZATION.address.locality}, {ORGANIZATION.address.region}</li>
+                  <li>
+                    {ORGANIZATION.office.street}, {ORGANIZATION.office.locality}, {ORGANIZATION.office.region}
+                  </li>
+                  <li className="text-xs opacity-80">
+                    Sediu social: {ORGANIZATION.address.street}, {ORGANIZATION.address.locality},{' '}
+                    {ORGANIZATION.address.region}
+                  </li>
                 </ul>
               </div>
             </div>
