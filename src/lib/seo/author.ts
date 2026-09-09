@@ -28,14 +28,43 @@ export const SITE_AUTHOR = {
   },
 } as const;
 
+export interface AuthorRef {
+  name: string;
+  url?: string;
+}
+
+/**
+ * `@id`-ul nodului `Person` pentru un autor. Autorul site-ului își păstrează
+ * id-ul stabil; oricine altcineva primește unul derivat din nume, ca nodul din
+ * graf și referința din `Article.author` să indice mereu același lucru.
+ */
+export function authorSchemaId(author?: AuthorRef): string {
+  if (!author || author.name === SITE_AUTHOR.name) return SITE_AUTHOR.schemaId;
+  const slug = author.name
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+  return `${BASE_URL}/#autor-${slug}`;
+}
+
 /** Nodul `Person` pentru schema — legat de pagina de autor, care chiar există. */
-export function authorNode() {
+export function authorNode(author?: AuthorRef) {
+  if (!author || author.name === SITE_AUTHOR.name) {
+    return {
+      '@type': 'Person',
+      '@id': SITE_AUTHOR.schemaId,
+      name: SITE_AUTHOR.name,
+      jobTitle: SITE_AUTHOR.jobTitle,
+      url: SITE_AUTHOR.url,
+      worksFor: { '@id': `${BASE_URL}/#organization` },
+    };
+  }
   return {
     '@type': 'Person',
-    '@id': SITE_AUTHOR.schemaId,
-    name: SITE_AUTHOR.name,
-    jobTitle: SITE_AUTHOR.jobTitle,
-    url: SITE_AUTHOR.url,
-    worksFor: { '@id': `${BASE_URL}/#organization` },
+    '@id': authorSchemaId(author),
+    name: author.name,
+    ...(author.url ? { url: author.url } : {}),
   };
 }

@@ -14,7 +14,7 @@
  * - HowTo (rich results removed Sept 2023)
  */
 
-import { authorNode, SITE_AUTHOR } from './author';
+import { authorNode, authorSchemaId } from './author';
 import { BASE_URL, ORGANIZATION } from './constants';
 
 export interface BreadcrumbItem {
@@ -279,7 +279,9 @@ export function articleNode(input: ArticleSchemaInput) {
     // Referință către nodul `Person` din graf, NU un al doilea Person inline.
     // Scris inline, ieșeau două noduri deconectate pentru aceeași persoană — și
     // exact legătura asta e tot rostul paginii de autor (verificare 09.09.2026).
-    author: input.author ? { '@id': SITE_AUTHOR.schemaId } : { '@id': `${BASE_URL}/#organization` },
+    author: input.author
+      ? { '@id': authorSchemaId(input.author) }
+      : { '@id': `${BASE_URL}/#organization` },
     publisher: { '@id': `${BASE_URL}/#organization` },
     mainEntityOfPage: { '@type': 'WebPage', '@id': url },
   };
@@ -294,7 +296,9 @@ export function buildArticlePageGraph(input: ArticleSchemaInput) {
       breadcrumbNode(input.breadcrumb),
       articleNode(input),
       // Autorul e o persoană reală, cu pagină proprie — vezi seo/author.ts.
-      authorNode(),
+      // Același `@id` pe care îl referă `Article.author`, ca să nu iasă două
+      // noduri Person deconectate pentru aceeași persoană.
+      authorNode(input.author),
     ],
   };
 }

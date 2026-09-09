@@ -182,7 +182,7 @@ describe('articleNode', () => {
     expect(node.author).toEqual({ '@id': `${BASE_URL}/#organization` });
   });
 
-  it('uses Person author when provided', () => {
+  it('referă nodul Person al autorului, nu unul inline', () => {
     const node = articleNode({
       slug: 'x',
       headline: 'X',
@@ -191,11 +191,9 @@ describe('articleNode', () => {
       author: { name: 'Av. Ion Popescu', url: 'https://linkedin.com/in/ion' },
       breadcrumb: [],
     });
-    expect(node.author).toEqual({
-      '@type': 'Person',
-      name: 'Av. Ion Popescu',
-      url: 'https://linkedin.com/in/ion',
-    });
+    // Referință prin `@id`: nodul Person complet e emis o singură dată în graf,
+    // de `buildArticlePageGraph`. Inline ieșeau două noduri deconectate.
+    expect(node.author).toEqual({ '@id': `${BASE_URL}/#autor-av-ion-popescu` });
   });
 });
 
