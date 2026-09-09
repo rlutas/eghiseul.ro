@@ -23,6 +23,7 @@ Platforma digitala pentru Romania - servicii publice digitalizate (9 servicii ac
 | **Index complet docs** | `docs/README.md` |
 | **Changelog (ce s-a livrat, pe sesiuni)** | `docs/changelog/` |
 | **SEO (location pages, clustere, keywords, GSC)** | `docs/seo/README.md` |
+| **🔴 Recuperare după spam update (plan + reguli)** | `docs/seo/2026-09-recuperare-spam-update/` + `.claude/rules/content-and-seo.md` |
 | **WebMCP (tools pentru agenți AI)** | `docs/technical/webmcp.md` |
 | **Cum adaug serviciu nou** | `docs/technical/specs/modular-wizard-guide.md` |
 | **API endpoints** | `docs/technical/api/` + `docs/README.md` (summary) |

@@ -1,11 +1,41 @@
 # Plan de recuperare — Google August 2026 Spam Update
 
-**Data:** 2026-09-09 · **Stare:** aprobat pentru scriere, **neexecutat**
+**Data:** 2026-09-09 · **Stare:** Fazele 0, 1, 2, 4 și 5 **EXECUTATE**; Faza 3 parțial
 **Bază:** 9 documente de analiză (8 agenți) + exporturi GSC + crawl Screaming Frog + DB producție
 
 > Regula acestui plan: fiecare acțiune are o **dovadă măsurată** în spate. Ce n-are, e
 > marcat ca ipoteză. Am mai pierdut o lună pe o ipoteză nemăsurată (backlinkurile);
 > nu repetăm.
+
+---
+
+## 0. Stadiul execuției (09.09.2026)
+
+| Faza | Stare | Commit |
+|---|---|---|
+| 0 — igienă și adevăr | ✅ livrat | `24f07ed` |
+| 1 — tăierea amprentei | ✅ livrat | `8c0534c` |
+| 2 — coeziune internă | ✅ livrat | `a9c23c0` |
+| 3 — adâncime | ⚠️ **parțial**: perechea `extras-multilingv-*` (D3) livrată în `3a28be1`. **Rămân**: cele 32 de pagini REWRITE și diferențierea celor 9 clone cadastrale | |
+| 4 — E-E-A-T | ✅ livrat | `fd83802` |
+| 5 — prevenție | ✅ livrat (`.claude/rules/content-and-seo.md`) | |
+
+**Nepushat.** Toate fazele au build verde și 1597 de teste care trec.
+
+### Ce s-a schimbat față de plan la execuție
+
+1. **Cele 11 pagini de serviciu propuse pentru consolidare NU au fost
+   consolidate** (decizie owner: sunt servicii reale, cu venit). Trec la
+   diferențiere, în Faza 3.
+2. **`aggregateRating` a fost scos complet**, nu mutat pe `Organization`: pe
+   `Product` cere recenzii pentru acel produs, vizibile în pagină; pe
+   `Organization` e self-serving. Ambele forme erau neeligibile. Product-ul
+   rămâne, cu prețul. Dovada socială (4,9 / 464) se afișează vizibil.
+3. **Descoperit la execuție:** `ServiceSwitcher` e un `<select>` cu
+   `router.push()` — zero linkuri crawlabile. Asta explică de ce paginile
+   cadastrale aveau ≤3 inlinkuri deși „erau legate între ele".
+4. **Descoperit la execuție:** platforma europeană SOL/ODR e **închisă**, iar noi
+   o linkam din footer de pe 233 de pagini.
 
 ---
 
