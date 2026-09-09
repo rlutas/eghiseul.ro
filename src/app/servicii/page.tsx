@@ -87,7 +87,7 @@ export default async function ServiciiPage() {
         }}
       />
 
-      <main className="min-h-screen bg-neutral-50 -mt-16 lg:-mt-[112px]">
+      <main id="main-content" className="min-h-screen bg-neutral-50 -mt-16 lg:-mt-[112px]">
         {/* Hero Section */}
         <section className="relative overflow-hidden bg-gradient-to-b from-secondary-900 to-[#0C1A2F] pt-24 lg:pt-36 pb-16 lg:pb-24">
           <div className="absolute inset-0 opacity-5">
