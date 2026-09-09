@@ -150,3 +150,24 @@ Nu e o eroare axe (contextul vizual e valid), dar e exact riscul de „ambiguita
 Nimic din research nu a fost aplicat ca fix în acest pas — e strict cercetare + audit, conform cerinței inițiale.
 
 **Legături:** [[webmcp-decision]] (decizie anterioară despre tooling pentru agenți AI, relevantă pentru punctul P0).
+
+---
+
+## 5. Fix aplicat + verificare pe producție (09.09.2026, PR #5, commit `64a9257`)
+
+Aplicat: șters `src/app/loading.tsx` din root (mutat doar pe `/admin/` și `/comanda/`, deja `Disallow` în robots.txt), scos `<Suspense>` inutil peste `FeaturedServices` (componentă sincronă, zero fetch), adăugat `id="main-content"` pe `<main>` din homepage + `/servicii/`, adăugat `<main id="main-content">` pe `/comanda/status/`.
+
+**Verificat direct pe `https://eghiseul.ro` după deploy** (curl, fără JS — exact ce vede GPTBot/ClaudeBot/PerplexityBot):
+
+| Pagină | Înainte (text vizibil fără JS) | După |
+|---|---|---|
+| `/` | 1.060 caractere (fix, doar header+footer) | **18.839** caractere |
+| `/servicii/` | 1.060 | **8.042** |
+| `/servicii/cazier-judiciar-online/` | 1.060 | **33.224** |
+| `/blog/` | 1.060 | **8.873** |
+| `/calculator/salariu/` | 1.060 | **9.468** |
+| `/contact/` | 1.060 | **4.139** |
+
+Pe toate: zero `<div hidden id="S:...">`, zero `$RC`, un singur `<main>`. Skip-link (`#main-content`) verificat funcțional pe `/`, `/servicii/`, `/comanda/status/` — cele 3 rute unde era ancoră moartă înainte.
+
+Conținutul real al fiecărei pagini e acum prezent integral în răspunsul HTTP brut, indiferent dacă cine citește execută JavaScript sau nu.
