@@ -161,8 +161,40 @@ demotat de la 5,95 la 31,92. Umplutura care descria ecranul („procesul e simpl
 proprietarul; categoria greșită = inexistentă la control; plata nu apare
 instantaneu, nu cumpăra a doua oară; capcana drumului național prin municipiu.
 
-**În lucru (agent, 5 pagini):** amendă rovinietă (scor 20,0, cel mai prost de pe
-site), cum aflăm nr. cadastral (4.041 clicuri), ghid integritate (subțire),
-info cazier auto (subțire), documente stare civilă 2025.
+**Livrat (`65a3700`, 09.09, 5 pagini):** amendă rovinietă (scor 20,0, cel mai
+prost de pe site), cum aflăm nr. cadastral (4.041 clicuri), ghid integritate,
+info cazier auto, documente stare civilă 2025.
 
-Din 32: 3 erau cadastrale (făcute la pasul 3), 1 livrată, 5 în lucru → rămân 23.
+Trei din cinci erau **greșite pe fond**, nu doar scrise prost. Le-am corectat
+pe surse primare (legislatie.just.ro, CNAIR, ASF, DGEP):
+
+| pagina | ce spunea | ce e adevărat |
+|---|---|---|
+| integritate | „acoperă conduită care nu e neapărat infracțiune" | doar registrul infracțiunilor sexuale (L. 118/2019 art. 3, 16); reabilitarea NU îl curăță (art. 10 al. 5); L. 38/2026 face infracțiune neobținerea lui |
+| cazier auto | retenție 6–12 luni; afectează RCA | 5 ani (Ordin MAI 141/2014 art. 4); punctele expiră la 6 luni separat; bonus-malus se calculează doar pe daune plătite (Norma ASF 20/2017) |
+| stare civilă | certificate electronice, descărcabile online | 95–99 % fizice în primul an SIIEASC; noutatea reală = cerere la orice primărie |
+| rovinietă | coloană „Redus 50 % (max)" | OG 2/2001 art. 28 dă jumătate din **minim**; coloana scoasă |
+
+Adăugat ce lipsea și se caută: RIL 4/2018 (mașina vândută netranscrisă),
+leasing, cele 4 termene, plângerea suspendă executarea; numărul topografic și
+faptul că niciun număr cadastral nu e unic național; filigranul și codul unic
+de pe certificatele noi.
+
+| pagina | cuvinte înainte | după | AI-tells înainte | după |
+|---|---:|---:|---:|---:|
+| amendă rovinietă | 854 | 3.126 | 20,0 | 0,00 |
+| nr. cadastral / CF | 1.590 | 2.322 | 13,3 | 0,86 |
+| integritate | 690 | 1.718 | 11,7 | 0,00 |
+| cazier auto | 785 | 1.686 | 19,9 | 0,00 |
+| stare civilă 2025 | 1.010 | 1.664 | — | 0,00 |
+
+În același commit: tool-ul rovinietă afirma „de la 1 iulie 2026 tarife pe
+norma Euro" — e doar proiect MTI în consultare, fără dată; corectat.
+`articles.ts` aliniat cu titlurile și descrierile noi (`Amendă Rovinietă 2026`).
+
+**⏰ TODO datat, 01.10.2026:** OG 15/2002 expiră pe 30.09; L. 226/2023 preia
+de la 1.10 și amenda nu mai e sumă fixă (2–4× rovinieta pe 12 luni, indexată
+cu IPC). Pagina de amendă spune asta, dar tabelul de cuantumuri trebuie refăcut
+după ce apar cifrele CNAIR. Nu înainte.
+
+Din 32: 3 erau cadastrale (făcute la pasul 3), 6 livrate → rămân 23.

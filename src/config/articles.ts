@@ -70,8 +70,8 @@ export const ARTICLES: ArticleMeta[] = [
   },
   {
     slug: 'cum-aflam-numarul-carte-functionara-si-nr-cadastral',
-    title: 'Cum Afli Numărul de Carte Funciară și Numărul Cadastral',
-    excerpt: 'Din actul de proprietate, dintr-un extras vechi sau după adresă — unde apar aceste numere și cum le obții.',
+    title: 'Numărul cadastral și numărul de carte funciară: cum le afli',
+    excerpt: 'Din actul de proprietate, dintr-un extras vechi sau după adresă. De ce niciun număr nu e unic la nivel național și cum localizezi terenul pe hartă.',
     category: 'Cadastru & imobiliare',
   },
   {
@@ -90,25 +90,25 @@ export const ARTICLES: ArticleMeta[] = [
   {
     slug: 'ghid-complet-certificat-de-integritate-comportamentala',
     title: 'Certificat de Integritate Comportamentală: Ghid Complet',
-    excerpt: 'Ce este, în ce diferă de cazierul judiciar, cine are nevoie de el (lucrul cu minori) și cum îl obții.',
+    excerpt: 'Ce verifică efectiv (Legea 118/2019), de ce reabilitarea nu îl curăță, ce a schimbat Legea 38/2026 pentru angajatori și cum îl obții gratuit.',
     category: 'Juridice',
   },
   {
     slug: 'informatii-cazier-auto-online',
     title: 'Cazier Auto Online: Tot Ce Trebuie Să Știi',
-    excerpt: 'Ce conține cazierul auto, cât se păstrează în evidență și cum îl obții online.',
+    excerpt: 'Cum se numește oficial, ce conține, cât rămân sancțiunile în evidență (5 ani, nu 6 luni) și de ce nu îți schimbă prima RCA.',
     category: 'Auto',
   },
   {
     slug: 'amenda-rovinieta-2025-tarife-plata-online-ghid-complet',
-    title: 'Amendă Rovinietă 2025: Tarife, Plată Online și Contestație',
-    excerpt: 'Cuantumul amenzii pe categorii de vehicule, reducerea de 50% și modalitățile de plată online.',
+    title: 'Amendă Rovinietă 2026: Tarife, Plată Online și Contestație',
+    excerpt: 'Cuantumul pe categorii, de când curg cele 15 zile pentru jumătate din minim, cine răspunde la mașina vândută sau în leasing și ce se schimbă de la 1 octombrie 2026.',
     category: 'Auto',
   },
   {
     slug: 'cum-vor-arata-documentele-de-stare-civila-2025',
-    title: 'Cum Vor Arăta Noile Documente de Stare Civilă',
-    excerpt: 'Certificatele de naștere, căsătorie și deces în format electronic prin sistemul SIIEASC.',
+    title: 'Cum Arată Noile Documente de Stare Civilă (din 2025)',
+    excerpt: 'Culorile, filigranul și codul unic de pe noile certificate, plus schimbarea care contează după SIIEASC: le poți cere de la orice primărie din țară.',
     category: 'Stare civilă',
   },
   {
