@@ -35,6 +35,7 @@ import { buildPageMetadata, buildServicePageGraph, BASE_URL, serviceUrl } from '
 import { getImobiliareServices } from '@/lib/services/imobiliare';
 import { ServiceSwitcher } from '@/components/services/service-switcher';
 import { PrivateServiceNotice } from '@/components/services/private-service-notice';
+import { RelatedServicesLinks } from '@/components/services/related-services-links';
 
 // Database slug (order pipeline identifier). URL path uses the WP slug
 // (extras-DE-carte-funciara) to preserve the indexed URL + backlinks.
@@ -1109,6 +1110,8 @@ export default async function ExtrasCarteFunciaraPage() {
             </div>
           </div>
         </section>
+        <RelatedServicesLinks services={switcherServices} currentSlug={SERVICE_SLUG} />
+
       </main>
 
       <MobileStickyCTA href={`/comanda/${SERVICE_SLUG}`} basePrice={service.base_price} />

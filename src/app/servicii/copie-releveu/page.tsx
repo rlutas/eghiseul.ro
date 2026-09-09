@@ -32,6 +32,7 @@ import { buildPageMetadata, buildServicePageGraph, BASE_URL, serviceUrl } from '
 import { getImobiliareServices } from '@/lib/services/imobiliare';
 import { ServiceSwitcher } from '@/components/services/service-switcher';
 import { PrivateServiceNotice } from '@/components/services/private-service-notice';
+import { RelatedServicesLinks } from '@/components/services/related-services-links';
 
 // New service — no WP legacy URL, so the folder name matches the DB slug and
 // serviceUrl() resolves to this page with no redirect/override needed.
@@ -562,6 +563,8 @@ export default async function CopieReleveuPage() {
             </div>
           </div>
         </section>
+        <RelatedServicesLinks services={switcherServices} currentSlug={SERVICE_SLUG} />
+
       </main>
 
       <MobileStickyCTA href={`/comanda/${SERVICE_SLUG}`} basePrice={service.base_price} />

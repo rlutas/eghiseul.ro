@@ -31,6 +31,7 @@ import { getImobiliareServices } from '@/lib/services/imobiliare';
 import { ServiceSwitcher } from '@/components/services/service-switcher';
 import { SystemStatus } from '@/components/services/system-status';
 import { PrivateServiceNotice } from '@/components/services/private-service-notice';
+import { RelatedServicesLinks } from '@/components/services/related-services-links';
 
 // New service — no WP legacy URL, so the folder name matches the DB slug and
 // serviceUrl() resolves to this page with no redirect/override needed.
@@ -575,6 +576,8 @@ export default async function IdentificareImobileProprietarPage() {
             </div>
           </div>
         </section>
+        <RelatedServicesLinks services={switcherServices} currentSlug={SERVICE_SLUG} />
+
       </main>
 
       <MobileStickyCTA href={`/comanda/${SERVICE_SLUG}`} basePrice={service.base_price} />

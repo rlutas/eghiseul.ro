@@ -73,6 +73,92 @@ const SVC = {
 
 const DEFAULT_RELATED: RelatedService[] = [SVC.cazier, SVC.extrasCF, SVC.constatator];
 
+/**
+ * Calculatoare înrudite — coeziune internă, unde e traficul.
+ *
+ * Calculatoarele aduc 54% din clicurile site-ului, dar erau aproape izolate în
+ * graful de linkuri: `/calculator/pensie-invaliditate/` are 7.201 clicuri pe trei
+ * luni și DOUĂ linkuri interne, `/calculator/calculator-indemnizatie-crestere-copil/`
+ * are 8.877 de clicuri și trei. Autoritatea intra în site și se oprea acolo.
+ * (Audit 09.09.2026 — coeziunea internă e a doua cauză din analiza demotării.)
+ *
+ * Grupate pe intenția reală a utilizatorului, nu pe categorie administrativă:
+ * cine calculează vârsta de pensionare vrea și estimarea pensiei, nu TVA.
+ */
+const CALC_CLUSTERS: string[][] = [
+  // Pensii
+  ['varsta-pensionare', 'estimare-pensie', 'pensie-invaliditate', 'impozit-pensie', 'vechime-in-munca'],
+  // Familie, concedii, indemnizații
+  ['calculator-indemnizatie-crestere-copil', 'concediu-maternitate', 'concediu-paternal',
+   'concediu-medical', 'zile-concediu-odihna', 'indemnizatie-somaj', 'pensie-alimentara'],
+  // Salariu și venituri
+  ['salariu', 'spor-salarial', 'diurna', 'contributii-pfa', 'dividende', 'taxe-srl'],
+  // Auto
+  ['calculator-impozit-auto', 'amenda-circulatie'],
+  // Imobiliare și construcții
+  ['cost-cadastru-intabulare', 'cat-pot-construi', 'impozit-casa', 'impozit-chirie',
+   'jugar-stanjen-in-mp', 'taxe-notariale'],
+  // Bani, credite, taxe
+  ['credit-ipotecar', 'grad-indatorare', 'rambursare-anticipata', 'dobanda-legala',
+   'inflatie', 'tva', 'penalitati-anaf'],
+  // Juridic și termene
+  ['termene-judiciare', 'taxa-judiciara-de-timbru', 'reabilitare', 'valabilitate-documente',
+   'zile-lucratoare', 'calculator-data'],
+];
+
+const CALC_LABELS: Record<string, string> = {
+  'amenda-circulatie': 'Calculator amendă de circulație',
+  'calculator-data': 'Calculator de date',
+  'calculator-impozit-auto': 'Calculator impozit auto',
+  'calculator-indemnizatie-crestere-copil': 'Calculator indemnizație creștere copil',
+  'calculator-procente': 'Calculator de procente',
+  'cat-pot-construi': 'Cât pot construi (POT și CUT)',
+  'concediu-maternitate': 'Calculator concediu de maternitate',
+  'concediu-medical': 'Calculator concediu medical',
+  'concediu-paternal': 'Calculator concediu paternal',
+  'contributii-pfa': 'Calculator contribuții PFA',
+  'cost-cadastru-intabulare': 'Calculator cost cadastru și intabulare',
+  'credit-ipotecar': 'Calculator credit ipotecar',
+  diurna: 'Calculator diurnă',
+  dividende: 'Calculator impozit pe dividende',
+  'dobanda-legala': 'Calculator dobândă legală',
+  'estimare-pensie': 'Calculator estimare pensie',
+  'grad-indatorare': 'Calculator grad de îndatorare',
+  'impozit-casa': 'Calculator impozit pe casă',
+  'impozit-chirie': 'Calculator impozit pe chirie',
+  'impozit-pensie': 'Calculator impozit pe pensie',
+  'indemnizatie-somaj': 'Calculator indemnizație de șomaj',
+  inflatie: 'Calculator inflație',
+  'jugar-stanjen-in-mp': 'Convertor jugăr și stânjen în m²',
+  'penalitati-anaf': 'Calculator penalități ANAF',
+  'pensie-alimentara': 'Calculator pensie alimentară',
+  'pensie-invaliditate': 'Calculator pensie de invaliditate',
+  'rambursare-anticipata': 'Calculator rambursare anticipată',
+  reabilitare: 'Calculator reabilitare judiciară',
+  salariu: 'Calculator salariu net',
+  'spor-salarial': 'Calculator spor salarial',
+  'taxa-judiciara-de-timbru': 'Calculator taxă judiciară de timbru',
+  'taxe-notariale': 'Calculator taxe notariale',
+  'taxe-srl': 'Calculator taxe SRL',
+  'termene-judiciare': 'Calculator termene judiciare',
+  tva: 'Calculator TVA',
+  'valabilitate-documente': 'Calculator valabilitate documente',
+  'varsta-pensionare': 'Calculator vârstă de pensionare',
+  'vechime-in-munca': 'Calculator vechime în muncă',
+  'zile-concediu-odihna': 'Calculator zile de concediu de odihnă',
+  'zile-lucratoare': 'Calculator zile lucrătoare',
+};
+
+/** Până la 5 calculatoare din același cluster, fără cel curent. */
+function relatedCalculators(slug: string): { href: string; label: string }[] {
+  const cluster = CALC_CLUSTERS.find((c) => c.includes(slug));
+  if (!cluster) return [];
+  return cluster
+    .filter((s) => s !== slug && CALC_LABELS[s])
+    .slice(0, 5)
+    .map((s) => ({ href: `/calculator/${s}/`, label: CALC_LABELS[s] }));
+}
+
 const RELATED_BY_SLUG: Record<string, RelatedService[]> = {
   // Imobiliare & credit → extras CF
   'taxe-notariale': [SVC.extrasCF, SVC.cazier, SVC.constatator],
@@ -135,6 +221,7 @@ export function CalculatorLayout({
 }: CalculatorLayoutProps) {
   const url = `${BASE_URL}/calculator/${slug}/`;
   const dataActualizarii = dateModified ?? DATE_MODIFIED_DEFAULT;
+  const relatedCalcs = relatedCalculators(slug);
   const actualizat = lunaAnul(dataActualizarii);
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -273,6 +360,28 @@ export function CalculatorLayout({
             </div>
           </div>
         </section>
+
+        {/* Calculatoare înrudite — vezi nota de la CALC_CLUSTERS. */}
+        {relatedCalcs.length > 0 && (
+          <section className="py-10 bg-white border-t border-neutral-200">
+            <div className="container mx-auto px-4 max-w-[820px]">
+              <h2 className="text-lg lg:text-xl font-bold text-secondary-900 mb-4">
+                Calculatoare înrudite
+              </h2>
+              <div className="flex flex-wrap gap-2">
+                {relatedCalcs.map((c) => (
+                  <Link
+                    key={c.href}
+                    href={c.href}
+                    className="inline-flex items-center gap-1.5 rounded-full border border-neutral-200 bg-neutral-50 px-4 py-2 text-sm text-neutral-700 hover:border-primary-300 hover:text-primary-700 transition-colors"
+                  >
+                    {c.label}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
 
         {/* CTA */}
         <section className="relative py-14 lg:py-20 bg-gradient-to-b from-secondary-900 to-[#0C1A2F] overflow-hidden">
