@@ -31,6 +31,7 @@ import { ServiceFAQ } from '@/components/services/service-faq';
 import { ReviewsSection } from '@/components/services/reviews-section';
 import { buildPageMetadata, buildServicePageGraph, BASE_URL } from '@/lib/seo';
 import { ServicePrice } from '@/components/services/service-price';
+import { PrivateServiceNotice } from '@/components/services/private-service-notice';
 
 const SERVICE_SLUG = 'extras-multilingv-certificat-nastere';
 const PAGE_PATH = '/servicii/extras-multilingv-certificat-nastere/';
@@ -258,6 +259,12 @@ export default async function ExtrasMultilingvNasterePage() {
             </div>
           </div>
         </section>
+
+        <PrivateServiceNotice
+          institutionLabel="direct la Starea Civilă a primăriei care deține actul"
+          institutionUrl="https://www.mai.gov.ro/"
+        />
+
 
         {/* Trust strip */}
         <section className="bg-white border-b border-neutral-200">

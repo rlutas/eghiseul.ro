@@ -86,11 +86,11 @@ export function EmbeddedCheckoutBlock({ clientSecret }: EmbeddedCheckoutBlockPro
 
       <p className="text-[11px] leading-relaxed text-center text-neutral-500">
         Prin finalizarea plății confirmi că ai citit{' '}
-        <a href="/termeni" target="_blank" rel="noopener" className="underline hover:text-primary-600">
+        <a href="/termeni-si-conditii/" target="_blank" rel="noopener" className="underline hover:text-primary-600">
           Termenii și Condițiile
         </a>
         {' '}și{' '}
-        <a href="/confidentialitate" target="_blank" rel="noopener" className="underline hover:text-primary-600">
+        <a href="/politica-de-confidentialitate/" target="_blank" rel="noopener" className="underline hover:text-primary-600">
           Politica de Confidențialitate
         </a>
         , și soliciți executarea imediată a serviciului — renunțând la dreptul de retragere de 14 zile (OUG 34/2014, art. 16 lit. a). Semnătura electronică aplicată anterior are valoare juridică conform Legii nr. 214/2024 și Regulamentului UE 910/2014 (eIDAS).

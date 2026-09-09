@@ -71,7 +71,7 @@ export function TestimonialsSection() {
                 </span>
                 <span className="min-w-0">
                   <strong className="block truncate text-sm font-semibold text-white">{r.name}</strong>
-                  <span className="text-xs text-white/50">{r.when} · Google</span>
+                  <span className="text-xs text-white/50">Google</span>
                 </span>
               </div>
             </div>

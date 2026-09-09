@@ -573,7 +573,7 @@ export function ReviewStepModular({ onValidChange }: ReviewStepProps) {
             <span className="text-sm leading-relaxed text-neutral-700 group-hover:text-neutral-900">
               <span className="text-red-500">*</span> Am citit și sunt de acord cu{' '}
               <a
-                href="/termeni"
+                href="/termeni-si-conditii/"
                 target="_blank"
                 rel="noopener"
                 className="text-primary-600 hover:underline font-medium"
@@ -582,7 +582,7 @@ export function ReviewStepModular({ onValidChange }: ReviewStepProps) {
               </a>
               {' '}și{' '}
               <a
-                href="/confidentialitate"
+                href="/politica-de-confidentialitate/"
                 target="_blank"
                 rel="noopener"
                 className="text-primary-600 hover:underline font-medium"

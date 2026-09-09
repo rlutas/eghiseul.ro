@@ -4,7 +4,15 @@
  * recente" (4,9 ★ / 451 recenzii, 2026-06-16). Curated to recent positive 5★,
  * diverse across services. Light diacritic/typo cleanup only. Refresh by
  * re-scraping the GBP (sort by newest).
+ *
+ * ⚠️ `when` e timpul RELATIV afișat de Google la momentul culegerii (16.06.2026),
+ * deci îngheață și devine fals: „acum 4 zile" se afișa în septembrie pentru un
+ * text de acum trei luni. NU îl mai afișăm — vezi `REVIEWS_COLLECTED_LABEL`.
+ * Câmpul rămâne ca metadata de proveniență.
  */
+
+/** Când au fost culese recenziile de mai jos, pentru nota de sub listă. */
+export const REVIEWS_COLLECTED_LABEL = 'iunie 2026';
 
 export interface Review {
   name: string;

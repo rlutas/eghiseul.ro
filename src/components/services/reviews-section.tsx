@@ -41,7 +41,7 @@ function ReviewCard({ r, i }: { r: Review; i: number }) {
         </span>
         <span className="min-w-0">
           <span className="block text-sm font-semibold text-secondary-900 truncate">{r.name}</span>
-          <span className="block text-xs text-neutral-500">{r.when}</span>
+          <span className="block text-xs text-neutral-500">Google</span>
         </span>
       </figcaption>
     </figure>

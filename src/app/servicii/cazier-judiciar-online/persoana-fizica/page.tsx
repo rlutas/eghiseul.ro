@@ -31,6 +31,7 @@ import { OrderButton } from '@/components/services/order-button';
 import { ServiceFAQ } from '@/components/services/service-faq';
 import { ServicePrice } from '@/components/services/service-price';
 import { ReviewsSection } from '@/components/services/reviews-section';
+import { PrivateServiceNotice } from '@/components/services/private-service-notice';
 
 // Database slug for this service (order pipeline identifier)
 const SERVICE_SLUG = 'cazier-judiciar-persoana-fizica';
@@ -326,6 +327,12 @@ export default async function CazierJudiciarPFPage() {
             </div>
           </div>
         </section>
+
+        <PrivateServiceNotice
+          institutionLabel="gratuit, la ghișeul IPJ sau online pe hub.mai.gov.ro"
+          institutionUrl="https://hub.mai.gov.ro"
+        />
+
 
         {/* Trust strip */}
         <section className="bg-white border-b border-neutral-200">

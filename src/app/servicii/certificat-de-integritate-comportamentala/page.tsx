@@ -32,6 +32,7 @@ import { ServiceFAQ } from '@/components/services/service-faq';
 import { ReviewsSection } from '@/components/services/reviews-section';
 import { buildPageMetadata, buildServicePageGraph, BASE_URL } from '@/lib/seo';
 import { ServicePrice } from '@/components/services/service-price';
+import { PrivateServiceNotice } from '@/components/services/private-service-notice';
 
 // Database slug (order pipeline identifier). URL path uses the WP-parity slug
 // (certificat-DE-integritate-comportamentala) to preserve indexed URL + backlinks.
@@ -275,6 +276,12 @@ export default async function CertificatIntegritatePage() {
             </div>
           </div>
         </section>
+
+        <PrivateServiceNotice
+          institutionLabel="gratuit, la ghișeul IPJ sau online pe hub.mai.gov.ro"
+          institutionUrl="https://hub.mai.gov.ro"
+        />
+
 
         {/* Trust strip */}
         <section className="bg-white border-b border-neutral-200">

@@ -30,6 +30,7 @@ import { WhatsAppButton } from '@/components/services/whatsapp-button';
 import { GoogleReviewsBadge } from '@/components/services/google-reviews-badge';
 import { ReviewsSection } from '@/components/services/reviews-section';
 import { ServiceFAQ } from '@/components/services/service-faq';
+import { PrivateServiceNotice } from '@/components/services/private-service-notice';
 
 // Database slug for this service (order pipeline identifier)
 const SERVICE_SLUG = 'cazier-judiciar-persoana-juridica';
@@ -365,6 +366,12 @@ export default async function CazierJudiciarPJPage() {
             </div>
           </div>
         </section>
+
+        <PrivateServiceNotice
+          institutionLabel="gratuit, la ghișeul IPJ sau online pe hub.mai.gov.ro"
+          institutionUrl="https://hub.mai.gov.ro"
+        />
+
 
         {/* Trust strip */}
         <section className="bg-white border-b border-neutral-200">

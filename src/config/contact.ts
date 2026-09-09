@@ -1,3 +1,4 @@
+import { SOCIAL_PROOF } from '@/lib/seo/constants';
 /**
  * Central contact / social-proof config used by CTAs and badges site-wide.
  * WhatsApp is the preferred support channel (faster than phone).
@@ -31,6 +32,14 @@ export const GOOGLE_REVIEWS_URL = 'https://share.google/stngA2rQbVPY2l57p';
 /** Direct "write a review" link (Google g.page). */
 export const GOOGLE_REVIEW_WRITE_URL = 'https://g.page/r/CSfYKsVLbx7PEBM/review';
 
-export const GOOGLE_RATING = 4.9;
-/** Display label — kept as "peste 450" so we never have to update an exact count. */
-export const GOOGLE_REVIEW_COUNT_LABEL = 'peste 450';
+/**
+ * Rating și număr de recenzii — reexportate din `SOCIAL_PROOF`, sursa unică.
+ *
+ * Erau declarate separat aici, deci existau trei surse paralele pe site. Exact
+ * mecanismul care a produs „4,8 / 64" hardcodat pe 29 de pagini de serviciu, în
+ * timp ce cifra reală stătea nefolosită (verificare 09.09.2026). Se actualizează
+ * DOAR în `src/lib/seo/constants.ts`.
+ */
+export const GOOGLE_RATING = SOCIAL_PROOF.ratingValue;
+/** Etichetă rotunjită în jos la zeci, ca să rămână adevărată între actualizări. */
+export const GOOGLE_REVIEW_COUNT_LABEL = `peste ${SOCIAL_PROOF.roundedDown}`;

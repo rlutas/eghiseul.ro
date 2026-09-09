@@ -32,6 +32,7 @@ import { ServiceFAQ } from '@/components/services/service-faq';
 import { ReviewsSection } from '@/components/services/reviews-section';
 import { buildPageMetadata, buildServicePageGraph, BASE_URL } from '@/lib/seo';
 import { ServicePrice } from '@/components/services/service-price';
+import { PrivateServiceNotice } from '@/components/services/private-service-notice';
 
 // Database slug (order pipeline identifier). URL path uses an SEO slug
 // (cazier-auto-online) targeting the primary search query.
@@ -266,6 +267,12 @@ export default async function CazierAutoOnlinePage() {
             </div>
           </div>
         </section>
+
+        <PrivateServiceNotice
+          institutionLabel="direct la ghișeul Poliției Rutiere"
+          institutionUrl="https://www.politiaromana.ro/"
+        />
+
 
         {/* Trust strip */}
         <section className="bg-white border-b border-neutral-200">

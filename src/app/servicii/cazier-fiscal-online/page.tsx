@@ -33,6 +33,7 @@ import { ServiceFAQ } from '@/components/services/service-faq';
 import { ReviewsSection } from '@/components/services/reviews-section';
 import { buildPageMetadata, buildServicePageGraph, BASE_URL } from '@/lib/seo';
 import { ServicePrice } from '@/components/services/service-price';
+import { PrivateServiceNotice } from '@/components/services/private-service-notice';
 
 // Database slug (order pipeline identifier). URL path uses the WP slug
 // (cazier-fiscal-ONLINE) to preserve the indexed URL + backlinks.
@@ -255,6 +256,12 @@ export default async function CazierFiscalOnlinePage() {
             </div>
           </div>
         </section>
+
+        <PrivateServiceNotice
+          institutionLabel="direct la ANAF sau prin SPV"
+          institutionUrl="https://www.anaf.ro/"
+        />
+
 
         {/* Trust strip */}
         <section className="bg-white border-b border-neutral-200">

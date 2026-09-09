@@ -325,7 +325,7 @@ export function SaveDataModal({
               >
                 Sunt de acord cu{' '}
                 <a
-                  href="/termeni"
+                  href="/termeni-si-conditii/"
                   className="text-primary underline hover:no-underline"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -348,7 +348,7 @@ export function SaveDataModal({
               >
                 Sunt de acord cu{' '}
                 <a
-                  href="/confidentialitate"
+                  href="/politica-de-confidentialitate/"
                   className="text-primary underline hover:no-underline"
                   target="_blank"
                   rel="noopener noreferrer"

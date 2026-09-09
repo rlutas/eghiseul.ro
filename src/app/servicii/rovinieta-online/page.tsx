@@ -5,6 +5,7 @@ import { ServiceFAQ } from '@/components/services/service-faq';
 import { RovinietaPurchaseForm } from '@/components/rovinieta/rovinieta-purchase-form';
 import { buildPageMetadata, BASE_URL } from '@/lib/seo';
 import { organizationNode, websiteNode, breadcrumbNode } from '@/lib/seo/schema';
+import { PrivateServiceNotice } from '@/components/services/private-service-notice';
 
 const PAGE_PATH = '/servicii/rovinieta-online/';
 const TITLE = 'Rovinieta Online 2026 — Cumpără și Plătește în 2 Minute';
@@ -43,17 +44,6 @@ const jsonLdGraph = {
       areaServed: { '@type': 'Country', name: 'România' },
       description: DESCRIPTION,
       provider: { '@id': `${BASE_URL}/#organization` },
-    },
-    // Rating on a Product node — Google review snippets don't accept Service
-    // as parent type (see src/lib/seo/schema.ts productNode).
-    {
-      '@type': 'Product',
-      '@id': `${PAGE_URL}#product`,
-      name: 'Rovinieta Online',
-      description: DESCRIPTION,
-      image: `${BASE_URL}/og/default.png`,
-      url: PAGE_URL,
-      brand: { '@type': 'Brand', name: 'eGhișeul.ro' },
     },
   ],
 };
@@ -139,6 +129,12 @@ export default function RovinietaOnlinePage() {
             </div>
           </div>
         </section>
+
+        <PrivateServiceNotice
+          institutionLabel="direct pe roviniete.ro, site-ul CNAIR"
+          institutionUrl="https://www.roviniete.ro/"
+        />
+
 
         {/* De ce de aici */}
         <section className="py-12 lg:py-16 bg-white">

@@ -14,7 +14,7 @@
  * - HowTo (rich results removed Sept 2023)
  */
 
-import { authorNode } from './author';
+import { authorNode, SITE_AUTHOR } from './author';
 import { BASE_URL, ORGANIZATION } from './constants';
 
 export interface BreadcrumbItem {
@@ -276,13 +276,10 @@ export function articleNode(input: ArticleSchemaInput) {
     datePublished: input.datePublished,
     dateModified: input.dateModified ?? input.datePublished,
     ...(input.image ? { image: input.image } : {}),
-    author: input.author
-      ? {
-          '@type': 'Person',
-          name: input.author.name,
-          ...(input.author.url ? { url: input.author.url } : {}),
-        }
-      : { '@id': `${BASE_URL}/#organization` },
+    // Referință către nodul `Person` din graf, NU un al doilea Person inline.
+    // Scris inline, ieșeau două noduri deconectate pentru aceeași persoană — și
+    // exact legătura asta e tot rostul paginii de autor (verificare 09.09.2026).
+    author: input.author ? { '@id': SITE_AUTHOR.schemaId } : { '@id': `${BASE_URL}/#organization` },
     publisher: { '@id': `${BASE_URL}/#organization` },
     mainEntityOfPage: { '@type': 'WebPage', '@id': url },
   };
