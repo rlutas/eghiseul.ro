@@ -21,6 +21,36 @@ export interface BankEntry {
   counterparty: string | null;
   needs_invoice: boolean;
   matched_payout_id: string | null;
+  /** Comanda plătită prin transfer bancar, când linia a putut fi potrivită. */
+  matched_order_id: string | null;
+}
+
+/**
+ * Numele plătitorului dintr-o linie de încasare BT. Formatul e o listă separată
+ * de `;` în care numele stă chiar înaintea IBAN-ului:
+ *   `C.I.F.:45250538;Plata fact EGH 0278...;2026;6;IULIANA FUNERAR SRL;RO39BTRL...`
+ * Fără IBAN sau fără segment înaintea lui, întoarce null — mai bine gol decât
+ * un nume ghicit.
+ */
+export function payerFromDescription(desc: string): string | null {
+  const parts = desc.split(';').map((p) => p.trim());
+  const ibanAt = parts.findIndex((p) => IBAN_RE.test(p.replace(/\s+/g, '')));
+  if (ibanAt < 1) return null;
+  const name = parts[ibanAt - 1];
+  return name && !IBAN_RE.test(name.replace(/\s+/g, '')) ? name.slice(0, 60) : null;
+}
+
+const IBAN_RE = /\bRO\d{2}[A-Z]{4}[A-Z0-9]{16}\b/;
+
+/**
+ * Numerele de comandă menționate în descrierea plății. Clientul e instruit în
+ * emailul cu datele contului să treacă numărul comenzii la „detalii plată",
+ * deci ăsta e semnalul de potrivire cel mai sigur.
+ */
+export function orderNumbersInDescription(desc: string): string[] {
+  return (desc.toUpperCase().match(/E-\d{6}-[A-Z0-9]{5}/g) ?? []).filter(
+    (v, i, a) => a.indexOf(v) === i
+  );
 }
 
 /** Categorization rules — first match wins. Extend as new counterparties appear. */
@@ -62,6 +92,16 @@ const RULES: Array<{
   {
     test: (d) => /aport propriu|Restituire aport/i.test(d),
     category: 'aport',
+  },
+  {
+    // Încasare de la client prin transfer bancar (ordin de plată în cont).
+    // Semnătura BT: linie de CREDIT care poartă IBAN-ul plătitorului. Regula
+    // stă DUPĂ `aport` (care are și el IBAN) și după Stripe, deci prinde doar
+    // banii veniți de la terți. Fără ea, plățile prin IBAN cădeau pe „altele"
+    // și nu se lega nimic de comandă (10.09.2026, E-260905-DMUZA).
+    test: (d, _t, c) => c && /\bRO\d{2}[A-Z]{4}[A-Z0-9]{16}\b/.test(d.replace(/\s+/g, '')),
+    category: 'incasare_client',
+    counterparty: (d) => payerFromDescription(d),
   },
   {
     test: (d) => /ANCPI/i.test(d),
@@ -182,6 +222,7 @@ export function parseBtCsv(content: string): { account: string; entries: BankEnt
       counterparty,
       needs_invoice: needsInvoice,
       matched_payout_id: null,
+      matched_order_id: null,
     });
   }
   return { account, entries };
@@ -191,6 +232,10 @@ export interface BankImportResult {
   imported: number;
   payoutsMatched: number;
   unmatchedStripeCredits: number;
+  /** Încasări prin transfer bancar legate de o comandă neconfirmată. */
+  clientPaymentsMatched: number;
+  /** Încasări de la clienți pe care nu le-am putut lega de nicio comandă. */
+  unmatchedClientCredits: number;
   summary: Record<string, { count: number; debit_bani: number; credit_bani: number }>;
 }
 
@@ -226,6 +271,11 @@ export async function importBankStatement(content: string): Promise<BankImportRe
     }
   }
 
+  // Încasări de la clienți → comenzi plătite prin transfer bancar care încă
+  // așteaptă confirmarea. Odată legate, operatorul deschide comanda direct din
+  // extras, cu referința tranzacției deja completată.
+  const { clientPaymentsMatched, unmatchedClientCredits } = await matchClientPayments(entries);
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { error } = await (admin as any).from('bank_statement_entries').upsert(entries);
   if (error) throw new Error(error.message);
@@ -246,5 +296,97 @@ export async function importBankStatement(content: string): Promise<BankImportRe
     s.debit_bani += e.debit_bani;
     s.credit_bani += e.credit_bani;
   }
-  return { imported: entries.length, payoutsMatched, unmatchedStripeCredits: unmatchedStripe, summary };
+  return {
+    imported: entries.length,
+    payoutsMatched,
+    unmatchedStripeCredits: unmatchedStripe,
+    clientPaymentsMatched,
+    unmatchedClientCredits,
+    summary,
+  };
+}
+
+/** Fereastra în care căutăm comanda pentru o încasare fără număr de comandă. */
+const AMOUNT_MATCH_WINDOW_DAYS = 90;
+
+/**
+ * Leagă liniile `incasare_client` de comenzile care așteaptă confirmarea plății.
+ *
+ * Două semnale, în ordinea încrederii:
+ *  1. **numărul comenzii în descriere** — clientul e instruit prin email să-l
+ *     treacă la „detalii plată", deci e potrivire directă;
+ *  2. **suma exactă**, dar DOAR dacă o singură comandă neconfirmată din
+ *     ultimele 90 de zile are exact suma aia. Când sunt mai multe (două cazieri
+ *     de 89 lei în aceeași săptămână), nu ghicim — linia rămâne nelegată și o
+ *     rezolvă omul.
+ *
+ * Mutarea comenzii pe „plătită" NU se face aici: încasarea o confirmă un
+ * operator, cu factură și emailuri, din pagina comenzii.
+ */
+async function matchClientPayments(
+  entries: BankEntry[]
+): Promise<{ clientPaymentsMatched: number; unmatchedClientCredits: number }> {
+  const credits = entries.filter((e) => e.category === 'incasare_client' && e.credit_bani > 0);
+  if (credits.length === 0) return { clientPaymentsMatched: 0, unmatchedClientCredits: 0 };
+
+  const admin = createAdminClient();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: orders } = await (admin as any)
+    .from('orders')
+    .select('id, friendly_order_id, order_number, total_price, created_at, payment_status')
+    .neq('payment_status', 'paid')
+    .neq('payment_status', 'refunded')
+    .gte(
+      'created_at',
+      new Date(Date.now() - AMOUNT_MATCH_WINDOW_DAYS * 86400000).toISOString()
+    );
+
+  type Row = {
+    id: string;
+    friendly_order_id: string | null;
+    order_number: string | null;
+    total_price: string | number | null;
+    created_at: string;
+  };
+  const rows: Row[] = orders ?? [];
+  const byNumber = new Map<string, Row>();
+  for (const o of rows) {
+    for (const key of [o.friendly_order_id, o.order_number]) {
+      if (key) byNumber.set(key.toUpperCase(), o);
+    }
+  }
+
+  const used = new Set<string>();
+  let matched = 0;
+  let unmatched = 0;
+
+  for (const e of credits) {
+    let hit: Row | undefined;
+
+    for (const num of orderNumbersInDescription(e.description ?? '')) {
+      const o = byNumber.get(num);
+      if (o && !used.has(o.id)) { hit = o; break; }
+    }
+
+    if (!hit) {
+      const txMs = new Date(e.tx_date).getTime();
+      const sameAmount = rows.filter(
+        (o) =>
+          !used.has(o.id) &&
+          Math.round(Number(o.total_price ?? 0) * 100) === e.credit_bani &&
+          new Date(o.created_at).getTime() <= txMs
+      );
+      if (sameAmount.length === 1) hit = sameAmount[0];
+    }
+
+    if (hit) {
+      e.matched_order_id = hit.id;
+      used.add(hit.id);
+      matched++;
+    } else {
+      unmatched++;
+    }
+  }
+
+  return { clientPaymentsMatched: matched, unmatchedClientCredits: unmatched };
 }

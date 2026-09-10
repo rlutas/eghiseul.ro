@@ -59,14 +59,35 @@ Din acel moment pornește **exact același lanț ca la plata cu cardul**:
 Dacă banii nu vin deloc, în același panou există **„Banii nu au venit —
 abandonează"**, care mută comanda la abandonuri.
 
+## Legătura cu decontările (Extras bancă)
+
+`/admin/decontari/banca` importă extrasul BT în CSV. Din 10.09.2026 recunoaște
+și **încasările de la clienți**, nu doar decontările Stripe:
+
+- orice linie de **credit** care poartă IBAN-ul plătitorului primește categoria
+  **„Încasare client"** (aportul propriu și Stripe rămân pe categoriile lor);
+- linia se leagă automat de comandă, după numărul comenzii din „detalii plată";
+- dacă numărul lipsește, se încearcă **suma exactă**, dar numai când o singură
+  comandă neconfirmată din ultimele 90 de zile are exact suma aia. Când sunt
+  două comenzi de 89 lei în aceeași săptămână nu ghicește nimic — rămâne un
+  triunghi galben și o rezolvi tu;
+- pe linia potrivită apare **„Confirmă plata"**, care deschide comanda cu
+  **referința tranzacției deja completată**. Nu mai copiezi nimic de mână.
+
+Fluxul recomandat, o dată pe zi sau pe săptămână: exporți extrasul din BT, îl
+urci în „Extras bancă", apoi confirmi din coloana „Comandă". Importul **nu**
+marchează nimic ca plătit singur — confirmarea rămâne decizia unui om.
+
 ## ⚠️ De reținut
 
 - **Nu muta comanda pe „Plătită" din dropdown-ul de status.** Ar sări peste
   factură, peste emailul de confirmare și peste alocarea numerelor de Barou.
   Singura cale corectă e butonul „Confirmă plata".
-- **Confirmă plata înainte de a avansa statusul de lucru.** Confirmarea aduce
-  comanda pe `paid`; dacă ai pus-o deja pe „În procesare", o dă înapoi și
-  trebuie să reavansezi.
+- **Comanda nu se mai trage înapoi.** Dacă ai început deja lucrul, confirmarea
+  plății îi păstrează statusul de lucru și schimbă doar starea plății.
+- **Bannerul roșu „Comandă în lucru, dar plata NU e confirmată"** apare pe orice
+  comandă avansată în flux fără plată confirmată. Când îl vezi, nu s-a emis
+  factura și clientul nu a primit confirmarea — rezolvă înainte de livrare.
 - Referința e obligatorie tocmai ca încasarea să poată fi găsită mai târziu în
   extras, la reconciliere.
 - Cel mai devreme moment în care banii pot apărea e a doua zi lucrătoare;

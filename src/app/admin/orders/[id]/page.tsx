@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
-import { useRouter, useParams } from 'next/navigation';
+import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { toast } from 'sonner';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -1234,6 +1234,11 @@ export default function AdminOrderDetailPage() {
       {/* Transfer bancar ales de client din checkout: echipa compară extrasul
           și confirmă încasarea aici (10.09.2026). */}
       <BankTransferActions order={order} onChanged={refreshSilent} />
+
+      {/* Comandă lucrată fără plată confirmată = fără factură. E-260905-DMUZA a
+          ajuns „În procesare" cu payment_status necurățat, deci nu s-a emis
+          nimic și nimeni nu a observat. Bannerul face starea imposibil de ratat. */}
+      <UnpaidWorkWarning order={order} />
 
       {/* Standby banner — shown when SLA is paused. Reminds operators that
           the deadline isn't ticking down. */}
@@ -2973,10 +2978,46 @@ interface ExtraBillingEntry {
  * factură Oblio cu colectare „Transfer bancar", contact, email de confirmare
  * către client, joburi ONRC/ANCPI și documentele Barou.
  */
+/**
+ * Comandă avansată în fluxul de lucru fără ca plata să fie confirmată. Fără
+ * `payment_status='paid'` nu se emite factura, nu pleacă emailul de confirmare
+ * și comanda nu intră în decontări — dar în lista de comenzi arată perfect
+ * normal, fiindcă statusul de lucru e cel afișat.
+ */
+function UnpaidWorkWarning({ order }: { order: OrderDetail }) {
+  const WORK_STATUSES = [
+    'processing', 'documents_generated', 'submitted_to_institution', 'document_received',
+    'extras_in_progress', 'la_tradus', 'la_legalizat', 'la_apostila_notari',
+    'eliberat_apostila_haga', 'in_progress', 'document_ready', 'shipped', 'delivered',
+    'completed', 'standby', 'on_hold_institution',
+  ];
+  if (order.payment_status === 'paid') return null;
+  if (!WORK_STATUSES.includes(order.status || '')) return null;
+
+  return (
+    <div className="rounded-lg border-2 border-red-400 bg-red-50 p-4">
+      <p className="text-sm font-semibold text-red-900">
+        ⚠️ Comandă în lucru, dar plata NU e confirmată
+      </p>
+      <p className="mt-1 text-xs text-red-800">
+        Statusul de plată e{' '}
+        <span className="font-mono font-semibold">{order.payment_status || 'necunoscut'}</span>, deci
+        nu s-a emis factura, clientul nu a primit emailul de confirmare și comanda nu apare în
+        decontări. Confirmă încasarea (panoul de mai sus, sau „Marchează plătită manual” la
+        comenzile telefonice) înainte de a livra documentul.
+      </p>
+    </div>
+  );
+}
+
 function BankTransferActions({ order, onChanged }: { order: OrderDetail; onChanged: () => void }) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const o = order as any;
-  const [markRef, setMarkRef] = useState('');
+  // `?ref=` vine din „Extras bancă": linia de încasare potrivită cu comanda
+  // trimite aici referința tranzacției, ca operatorul să nu o retasteze din
+  // extras (și să nu o poată greși).
+  const searchParams = useSearchParams();
+  const [markRef, setMarkRef] = useState(searchParams.get('ref') ?? '');
   const [marking, setMarking] = useState(false);
   const [rejecting, setRejecting] = useState(false);
 

@@ -25,6 +25,7 @@ interface Entry {
   counterparty: string | null;
   needs_invoice: boolean;
   matched_payout_id: string | null;
+  matched_order_id: string | null;
 }
 
 const ron = (bani: number) =>
@@ -39,6 +40,7 @@ const CATEGORY_LABEL: Record<string, { label: string; cls: string }> = {
   salarii: { label: 'Salarii', cls: 'bg-green-100 text-green-800' },
   taxe_anaf: { label: 'ANAF/Trezorerie', cls: 'bg-orange-100 text-orange-800' },
   aport: { label: 'Aport propriu', cls: 'bg-neutral-200 text-neutral-700' },
+  incasare_client: { label: 'Încasare client', cls: 'bg-emerald-100 text-emerald-800' },
   taxe_ancpi: { label: 'Taxe ANCPI', cls: 'bg-amber-100 text-amber-800' },
   combustibil: { label: 'Combustibil', cls: 'bg-neutral-100 text-neutral-600' },
   leasing_auto: { label: 'Leasing/asigurări auto', cls: 'bg-neutral-100 text-neutral-600' },
@@ -73,7 +75,11 @@ export default function BancaPage() {
       const res = await fetch('/api/admin/decontari/bank-import', { method: 'POST', body: form });
       const json = await res.json();
       if (!json.success) throw new Error(json.error);
-      const { imported, payoutsMatched, unmatchedStripeCredits } = json.data;
+      const { imported, payoutsMatched, unmatchedStripeCredits, clientPaymentsMatched, unmatchedClientCredits } = json.data;
+      if (clientPaymentsMatched > 0)
+        toast.success(`${clientPaymentsMatched} încasări prin transfer legate de comenzi — confirmă-le din coloana „Comandă”`);
+      if (unmatchedClientCredits > 0)
+        toast.warning(`${unmatchedClientCredits} încasări de la clienți fără comandă pereche — verifică-le manual`);
       toast.success(`Import: ${imported} mișcări · ${payoutsMatched} decontări confirmate în bancă`);
       if (unmatchedStripeCredits > 0) toast.warning(`${unmatchedStripeCredits} încasări Stripe fără payout pereche (probabil în afara ferestrei sincronizate)`);
       await load();
@@ -167,6 +173,7 @@ export default function BancaPage() {
                   <th className="px-3 py-2 font-medium text-right">Debit</th>
                   <th className="px-3 py-2 font-medium text-right">Credit</th>
                   <th className="px-3 py-2 font-medium text-center">Payout</th>
+                  <th className="px-3 py-2 font-medium text-center">Comandă</th>
                 </tr>
               </thead>
               <tbody>
@@ -189,6 +196,25 @@ export default function BancaPage() {
                             </Link>
                           ) : (
                             <AlertTriangle className="h-4 w-4 text-amber-500 inline" />
+                          )
+                        ) : null}
+                      </td>
+                      {/* Încasare prin transfer legată de comandă: link cu
+                          referința tranzacției în URL, ca „Confirmă plata" din
+                          pagina comenzii să vină deja completată. */}
+                      <td className="px-3 py-2 text-center">
+                        {e.category === 'incasare_client' ? (
+                          e.matched_order_id ? (
+                            <Link
+                              href={`/admin/orders/${e.matched_order_id}?ref=${encodeURIComponent(e.reference)}`}
+                              className="text-emerald-700 underline whitespace-nowrap"
+                            >
+                              Confirmă plata
+                            </Link>
+                          ) : (
+                            <span title="Nicio comandă neconfirmată cu suma asta — caut-o manual">
+                              <AlertTriangle className="h-4 w-4 text-amber-500 inline" />
+                            </span>
                           )
                         ) : null}
                       </td>

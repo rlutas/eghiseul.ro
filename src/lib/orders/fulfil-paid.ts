@@ -15,6 +15,17 @@ import { computeEstimatedCompletionISOForOrder } from '@/lib/orders/order-estima
  * the hourly crons. The webhook itself is deliberately NOT refactored to call
  * this (live payment path stays untouched).
  */
+/**
+ * Statusuri dinaintea plății. O comandă aflată în oricare dintre ele merge pe
+ * `paid` la confirmare; una deja avansată în flux își păstrează statusul.
+ */
+const PRE_PAYMENT_STATUSES = new Set([
+  'draft',
+  'pending',
+  'awaiting_payment',
+  'abandoned',
+]);
+
 export async function fulfilManuallyPaidOrder(
   orderId: string,
   opts: {
@@ -58,11 +69,20 @@ export async function fulfilManuallyPaidOrder(
   );
 
   const paidAtNow = new Date().toISOString();
+  // Nu trage comanda înapoi. Se poate ca echipa să fi început deja lucrul pe o
+  // comandă neplătită (E-260905-DMUZA era pe „În procesare" când s-a confirmat
+  // transferul); punând-o necondiționat pe `paid` i-am fi șters progresul din
+  // fluxul de lucru. Statusul de plată se schimbă oricum — el e cel care
+  // contează pentru factură și pentru emailuri.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const currentStatus = (order as any).status as string | null;
+  const alreadyInProgress =
+    !!currentStatus && !PRE_PAYMENT_STATUSES.has(currentStatus) && currentStatus !== 'paid';
   const { error: updateError } = await supabaseAdmin
     .from('orders')
     .update({
       payment_status: 'paid',
-      status: 'paid',
+      status: alreadyInProgress ? currentStatus : 'paid',
       updated_at: paidAtNow,
       paid_at: paidAtNow,
       payment_method: opts.collect === 'Cash' ? 'cash' : 'transfer',
@@ -79,7 +99,9 @@ export async function fulfilManuallyPaidOrder(
   await supabaseAdmin.from('order_history').insert({
     order_id: orderId,
     event_type: 'payment_confirmed',
-    notes: `Plată manuală confirmată de admin (${opts.collect}) · referință: ${opts.reference}`,
+    notes:
+      `Plată manuală confirmată de admin (${opts.collect}) · referință: ${opts.reference}` +
+      (alreadyInProgress ? ` · status de lucru păstrat: ${currentStatus}` : ''),
     changed_by: opts.adminId,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } as any);
