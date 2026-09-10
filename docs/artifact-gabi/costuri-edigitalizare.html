@@ -1,0 +1,515 @@
+<title>Costurile eDigitalizare</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Source+Sans+3:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+  :root {
+    --paper: #eef0ea;
+    --surface: #ffffff;
+    --surface-2: #e4e7de;
+    --ink: #182420;
+    --ink-soft: #4d5951;
+    --ink-faint: #7c887f;
+    --line: #cdd3c4;
+    --line-strong: #aab3a1;
+    --venit: #0f7a54;
+    --venit-bg: #e3f1ea;
+    --cost: #a3781f;
+    --cost-bg: #f4ecd8;
+    --flag: #9c3b2e;
+    --flag-bg: #f6e6e2;
+    --excl: #6b6558;
+    --excl-bg: #ecebe3;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #101c17;
+      --surface: #172520;
+      --surface-2: #1e2f28;
+      --ink: #eef1ec;
+      --ink-soft: #a9b6ae;
+      --ink-faint: #7c8d83;
+      --line: #2b3a33;
+      --line-strong: #3c4d44;
+      --venit: #2aa47a;
+      --venit-bg: #16332a;
+      --cost: #b3832a;
+      --cost-bg: #362c17;
+      --flag: #d97a68;
+      --flag-bg: #3a251f;
+      --excl: #9aa298;
+      --excl-bg: #1c2721;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #101c17;
+    --surface: #172520;
+    --surface-2: #1e2f28;
+    --ink: #eef1ec;
+    --ink-soft: #a9b6ae;
+    --ink-faint: #7c8d83;
+    --line: #2b3a33;
+    --line-strong: #3c4d44;
+    --venit: #2aa47a;
+    --venit-bg: #16332a;
+    --cost: #b3832a;
+    --cost-bg: #362c17;
+    --flag: #d97a68;
+    --flag-bg: #3a251f;
+    --excl: #9aa298;
+    --excl-bg: #1c2721;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Source Sans 3', ui-sans-serif, system-ui, sans-serif;
+    line-height: 1.5;
+  }
+  .page {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 56px 24px 80px;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+  }
+  .num, .amount, table td.num, .tick, .legend-val {
+    font-family: 'IBM Plex Mono', ui-monospace, monospace;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* header */
+  .eyebrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+  h1 {
+    font-family: 'Fraunces', Georgia, serif;
+    font-weight: 600;
+    font-size: 42px;
+    line-height: 1.08;
+    margin: 8px 0 6px;
+    text-wrap: balance;
+    color: var(--ink);
+  }
+  .subtitle {
+    font-size: 16px;
+    color: var(--ink-soft);
+    max-width: 62ch;
+  }
+  header.doc {
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 28px;
+  }
+
+  /* summary tiles */
+  .tiles {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .tile {
+    background: var(--surface);
+    padding: 22px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .tile .label {
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+  .tile .value {
+    font-size: 28px;
+    font-weight: 600;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  .tile .value.venit { color: var(--venit); }
+  .tile .value.cost { color: var(--cost); }
+  .tile .sub { font-size: 13px; color: var(--ink-soft); }
+
+  /* section */
+  section { display: flex; flex-direction: column; gap: 16px; }
+  h2 {
+    font-family: 'Fraunces', Georgia, serif;
+    font-weight: 600;
+    font-size: 22px;
+    margin: 0;
+    color: var(--ink);
+  }
+  h3 {
+    font-family: 'Source Sans 3', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin: 0;
+  }
+  p { margin: 0; color: var(--ink-soft); }
+  .section-intro { max-width: 68ch; }
+
+  /* chart */
+  .chart-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 24px 24px 12px;
+  }
+  .chart-legend {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 4px;
+    font-size: 13px;
+    color: var(--ink-soft);
+  }
+  .chart-legend .item { display: flex; align-items: center; gap: 7px; }
+  .chart-legend .swatch { width: 10px; height: 10px; border-radius: 2px; }
+  .bar-value {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    fill: var(--ink-soft);
+  }
+  .axis-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    fill: var(--ink-faint);
+  }
+  .month-label {
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    fill: var(--ink);
+  }
+  .gridline { stroke: var(--line); stroke-width: 1; }
+
+  /* tables */
+  .cat-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .cat-table caption {
+    text-align: left;
+    padding: 14px 18px 10px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--ink);
+    border-bottom: 1px solid var(--line);
+    background: var(--surface-2);
+  }
+  .cat-table th, .cat-table td {
+    padding: 10px 18px;
+    text-align: right;
+    border-bottom: 1px solid var(--line);
+    font-size: 14px;
+  }
+  .cat-table th:first-child, .cat-table td:first-child {
+    text-align: left;
+    color: var(--ink);
+  }
+  .cat-table thead th {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    font-weight: 500;
+    background: var(--surface-2);
+  }
+  .cat-table td.num { color: var(--ink-soft); }
+  .cat-table tbody tr:last-child td { border-bottom: none; }
+  .cat-table tr.subtotal td {
+    font-weight: 700;
+    color: var(--ink);
+    background: var(--surface-2);
+    border-top: 1px solid var(--line-strong);
+    border-bottom: 1px solid var(--line-strong);
+  }
+  .cat-table tr.grandtotal td {
+    font-weight: 700;
+    color: var(--ink);
+    background: var(--surface-2);
+    font-size: 15px;
+    border-top: 2px solid var(--line-strong);
+  }
+  .table-scroll { overflow-x: auto; }
+  .tag {
+    display: inline-block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10.5px;
+    padding: 1px 6px;
+    border-radius: 4px;
+    margin-left: 6px;
+    vertical-align: 1px;
+  }
+  .tag.manual { background: var(--cost-bg); color: var(--cost); }
+
+  /* callouts */
+  .callout {
+    border-radius: 10px;
+    padding: 20px 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    border: 1px solid var(--line);
+  }
+  .callout.tva { background: var(--cost-bg); border-color: color-mix(in srgb, var(--cost) 30%, var(--line)); }
+  .callout.avocat { background: var(--venit-bg); border-color: color-mix(in srgb, var(--venit) 30%, var(--line)); }
+  .callout .k { font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.05em; text-transform: uppercase; }
+  .callout.tva .k { color: var(--cost); }
+  .callout.avocat .k { color: var(--venit); }
+  .callout .big { font-family: 'IBM Plex Mono', monospace; font-size: 26px; font-weight: 600; color: var(--ink); }
+  .callout .desc { font-size: 14px; color: var(--ink-soft); }
+  .callout .row { display: flex; gap: 28px; flex-wrap: wrap; }
+
+  .note-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 620px) { .note-grid { grid-template-columns: 1fr; } .tiles { grid-template-columns: 1fr; } }
+  .note {
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    padding: 18px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    font-size: 14px;
+  }
+  .note.excl { background: var(--excl-bg); }
+  .note.flag { background: var(--flag-bg); border-color: color-mix(in srgb, var(--flag) 25%, var(--line)); }
+  .note h3 { color: inherit; }
+  .note.excl h3 { color: var(--excl); }
+  .note.flag h3 { color: var(--flag); }
+  .note ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; color: var(--ink-soft); }
+  .note li strong { color: var(--ink); font-family: 'IBM Plex Mono', monospace; font-weight: 600; }
+
+  footer {
+    border-top: 1px solid var(--line);
+    padding-top: 20px;
+    font-size: 12.5px;
+    color: var(--ink-faint);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+</style>
+
+<div class="page">
+
+  <header class="doc">
+    <div class="eyebrow">Document intern &middot; eDigitalizare S.R.L.</div>
+    <h1>Costurile eDigitalizare</h1>
+    <p class="subtitle">Analiză cheltuieli iunie&ndash;august 2026, pe baza celor 3 extrase de cont BT, pregătită ca bază de discuție privind onorariul colaborării cu Cabinet de Avocat Tarța Ana-Gabriela.</p>
+  </header>
+
+  <section>
+    <div class="tiles">
+      <div class="tile">
+        <span class="label">Încasări (3 luni)</span>
+        <span class="value venit num">248.311,14 lei</span>
+        <span class="sub">Stripe (net de comisionul lor) + alte încasări, medie 82.770,38 lei/lună</span>
+      </div>
+      <div class="tile">
+        <span class="label">Venit real (după TVA)</span>
+        <span class="value num">205.215,82 lei</span>
+        <span class="sub">Informativ &mdash; cât rămâne din încasări dacă scazi ~21% TVA, înainte de costuri</span>
+      </div>
+      <div class="tile">
+        <span class="label">Costuri totale (3 luni)</span>
+        <span class="value cost num">172.647,61 lei</span>
+        <span class="sub">Fără rată leasing auto și asigurare. Include TVA la 21% din fiecare lună, nu doar plata din august</span>
+      </div>
+      <div class="tile">
+        <span class="label">Marjă rămasă (3 luni)</span>
+        <span class="value num">75.663,53 lei</span>
+        <span class="sub">30,5% din încasările brute, după ce TVA a fost deja scăzut ca și cost mai sus</span>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="note flag">
+      <h3>De reținut despre încasări &mdash; situația nu e roz</h3>
+      <ul>
+        <li>Din start, <strong>~21%</strong> din orice sumă încasată e TVA care nu e venit al firmei, ci se virează la stat. Din cele 248.311,14 lei încasați în 3 luni, <strong>43.095,33 lei</strong> sunt de fapt TVA (rândul din tabelul A de mai jos, calculat lunar) &mdash; de-aici venitul real de 205.215,82 lei din tile-ul de sus. Plata efectivă din cont a fost doar 12.784 lei, în august pentru iulie; restul e obligație acumulată lunar, nu (încă) plătită separat.</li>
+        <li>Încasările nu vin doar din dosare lucrate cu Cabinet de Avocat Tarța Ana-Gabriela &mdash; o parte sunt traduceri, legalizări, livrare și alte servicii lucrate cu alți colaboratori, care au propriile costuri suplimentare, necalculate în acest document. E un overview general al ultimelor 3 luni, nu un calcul exhaustiv pe fiecare linie de business.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <h2>Încasări vs. costuri, pe lună</h2>
+    <div class="chart-card">
+      <div class="chart-legend">
+        <span class="item"><span class="swatch" style="background:var(--venit)"></span>Încasări</span>
+        <span class="item"><span class="swatch" style="background:var(--cost)"></span>Costuri totale</span>
+      </div>
+      <svg viewBox="0 0 720 300" width="100%" role="img" aria-label="Grafic încasări versus costuri pentru iunie, iulie și august 2026">
+        <!-- gridlines + y labels: scale 0-100000, step 25000 -->
+        <g>
+          <line x1="70" y1="230" x2="700" y2="230" class="gridline" />
+          <line x1="70" y1="175" x2="700" y2="175" class="gridline" />
+          <line x1="70" y1="120" x2="700" y2="120" class="gridline" />
+          <line x1="70" y1="65" x2="700" y2="65" class="gridline" />
+          <line x1="70" y1="10" x2="700" y2="10" class="gridline" />
+          <text x="60" y="234" text-anchor="end" class="axis-label">0</text>
+          <text x="60" y="179" text-anchor="end" class="axis-label">25k</text>
+          <text x="60" y="124" text-anchor="end" class="axis-label">50k</text>
+          <text x="60" y="69" text-anchor="end" class="axis-label">75k</text>
+          <text x="60" y="14" text-anchor="end" class="axis-label">100k</text>
+        </g>
+        <!-- baseline -->
+        <line x1="70" y1="230" x2="700" y2="230" stroke="var(--line-strong)" stroke-width="1.5" />
+
+        <!-- IUNIE: venit 72594.40 -> h=159.1, cost 51735.36 -> h=113.8 -->
+        <g>
+          <rect x="120" y="70.9" width="34" height="159.1" rx="4" fill="var(--venit)" />
+          <rect x="160" y="116.2" width="34" height="113.8" rx="4" fill="var(--cost)" />
+          <text x="137" y="63" text-anchor="middle" class="bar-value">72.594</text>
+          <text x="177" y="108.2" text-anchor="middle" class="bar-value">51.735</text>
+          <text x="157" y="254" text-anchor="middle" class="month-label">Iunie</text>
+        </g>
+
+        <!-- IULIE: venit 98640.46 -> h=216.3, cost 63356.36 -> h=139.4 -->
+        <g>
+          <rect x="323" y="13.7" width="34" height="216.3" rx="4" fill="var(--venit)" />
+          <rect x="363" y="90.6" width="34" height="139.4" rx="4" fill="var(--cost)" />
+          <text x="340" y="6" text-anchor="middle" class="bar-value">98.640</text>
+          <text x="380" y="82.6" text-anchor="middle" class="bar-value">63.356</text>
+          <text x="360" y="254" text-anchor="middle" class="month-label">Iulie</text>
+        </g>
+
+        <!-- AUGUST: venit 77076.28 -> h=169.0, cost 57555.89 -> h=126.6 -->
+        <g>
+          <rect x="526" y="61" width="34" height="169.0" rx="4" fill="var(--venit)" />
+          <rect x="566" y="103.4" width="34" height="126.6" rx="4" fill="var(--cost)" />
+          <text x="543" y="53" text-anchor="middle" class="bar-value">77.076</text>
+          <text x="583" y="95.4" text-anchor="middle" class="bar-value">57.556</text>
+          <text x="563" y="254" text-anchor="middle" class="month-label">August</text>
+        </g>
+      </svg>
+    </div>
+    <p class="section-intro" style="font-size:13px">Valori în lei. Costurile din iulie sunt cele mai mari din cauza TVA (17.119 lei, calculat la vânzările lunii cele mai mari) &mdash; plata efectivă din cont pentru TVA a fost 12.784 lei, făcută în august.</p>
+  </section>
+
+  <section>
+    <h2>Detaliu pe categorii</h2>
+    <p class="section-intro">Grupat în trei blocuri: echipă și obligații fiscale (inclusiv taxa pe dividende), costuri fixe de funcționare și costuri operaționale variabile. Rândurile marcate <span class="tag manual">declarat</span> sau <span class="tag manual">estimat</span> nu apar ca atare în extrasul eDigitalizare &mdash; sunt cifre date de tine, explicate mai jos.</p>
+
+    <div class="table-scroll">
+      <table class="cat-table">
+        <caption>A. Echipă &amp; obligații fiscale</caption>
+        <thead>
+          <tr><th>Categorie</th><th>Iunie</th><th>Iulie</th><th>August</th><th>Total 3 luni</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Carla &mdash; 4.500 brut + 1.500 cash<span class="tag manual">declarat</span></td><td class="num">6.000,00</td><td class="num">6.000,00</td><td class="num">6.000,00</td><td class="num">18.000,00</td></tr>
+          <tr><td>Maria &mdash; 4.500 brut + 1.000 cash<span class="tag manual">declarat</span></td><td class="num">5.500,00</td><td class="num">5.500,00</td><td class="num">5.500,00</td><td class="num">16.500,00</td></tr>
+          <tr><td>Angela &mdash; 4.325 brut + 500 cash<span class="tag manual">declarat</span></td><td class="num">4.825,00</td><td class="num">4.825,00</td><td class="num">4.825,00</td><td class="num">14.475,00</td></tr>
+          <tr><td>Impozit pe profit (16%)</td><td class="num">7.331,00</td><td class="num">7.331,00</td><td class="num">7.618,00</td><td class="num">22.280,00</td></tr>
+          <tr><td>TVA (21% din vânzările lunii)</td><td class="num">12.599,03</td><td class="num">17.119,42</td><td class="num">13.376,88</td><td class="num">43.095,33</td></tr>
+          <tr><td>Comisioane bancare OP</td><td class="num">79,00</td><td class="num">74,00</td><td class="num">69,00</td><td class="num">222,00</td></tr>
+          <tr><td>Taxă angajat BMR Digital (păstrare statut micro)<span class="tag manual">declarat</span></td><td class="num">2.500,00</td><td class="num">2.500,00</td><td class="num">2.500,00</td><td class="num">7.500,00</td></tr>
+          <tr><td>Impozit dividende 16% (retrageri asociat)</td><td class="num">2.400,00</td><td class="num">3.200,00</td><td class="num">6.720,00</td><td class="num">12.320,00</td></tr>
+          <tr class="subtotal"><td>Subtotal A</td><td class="num">41.234,03</td><td class="num">46.549,42</td><td class="num">46.608,88</td><td class="num">134.392,33</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size:13px">Salariile de mai sus sunt sume brute + parte cash, cu tot cu taxe &mdash; CAM e deja cuprins aici, nu se mai adaugă separat. TVA e calculat la 21% din vânzările fiecărei luni (obligație acumulată); plata reală făcută din cont a fost de <strong>12.784 lei</strong>, în august, pentru iulie &mdash; vezi și nota de mai jos. Retragerile de asociat (77.000 lei/3 luni, vezi mai jos) sunt tratate ca dividende, impozitate 16%.</p>
+
+    <div class="table-scroll">
+      <table class="cat-table">
+        <caption>B. Costuri fixe de funcționare</caption>
+        <thead>
+          <tr><th>Categorie</th><th>Iunie</th><th>Iulie</th><th>August</th><th>Total 3 luni</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Tools &amp; SaaS (Google Cloud, Vercel, Anthropic, Supabase, Resend, Railway, Zoho)</td><td class="num">1.330,26</td><td class="num">1.784,42</td><td class="num">1.990,38</td><td class="num">5.105,06</td></tr>
+          <tr><td>Telefonie/internet (Orange)</td><td class="num">214,42</td><td class="num">228,36</td><td class="num">0,00</td><td class="num">442,78</td></tr>
+          <tr><td>Contabilitate (eDigitalizare + BMR Digital)<span class="tag manual">estimat</span></td><td class="num">2.000,00</td><td class="num">2.000,00</td><td class="num">2.000,00</td><td class="num">6.000,00</td></tr>
+          <tr><td>Chirie sediu (~700 €, medie cu tot cu utilități, curs orientativ 5,07)<span class="tag manual">estimat</span></td><td class="num">3.549,00</td><td class="num">3.549,00</td><td class="num">3.549,00</td><td class="num">10.647,00</td></tr>
+          <tr><td>Comision Stripe (reținut automat din plăți card)<span class="tag manual">declarat</span></td><td class="num">1.740,98</td><td class="num">1.740,98</td><td class="num">1.740,97</td><td class="num">5.222,93</td></tr>
+          <tr class="subtotal"><td>Subtotal B</td><td class="num">8.834,66</td><td class="num">9.302,76</td><td class="num">9.280,35</td><td class="num">27.417,77</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="table-scroll">
+      <table class="cat-table">
+        <caption>C. Costuri operaționale variabile</caption>
+        <thead>
+          <tr><th>Categorie</th><th>Iunie</th><th>Iulie</th><th>August</th><th>Total 3 luni</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Colaboratori &amp; furnizori (Matchteam Soft)</td><td class="num">0,00</td><td class="num">5.837,51</td><td class="num">0,00</td><td class="num">5.837,51</td></tr>
+          <tr><td>Consumabile birou<span class="tag manual">estimat</span></td><td class="num">1.666,67</td><td class="num">1.666,67</td><td class="num">1.666,66</td><td class="num">5.000,00</td></tr>
+          <tr class="subtotal"><td>Subtotal C</td><td class="num">1.666,67</td><td class="num">7.504,18</td><td class="num">1.666,66</td><td class="num">10.837,51</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="table-scroll">
+      <table class="cat-table">
+        <tbody>
+          <tr class="grandtotal"><td>TOTAL GENERAL (A+B+C)</td><td class="num">51.735,36</td><td class="num">63.356,36</td><td class="num">57.555,89</td><td class="num">172.647,61</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <div class="callout tva">
+      <span class="k">Plată recentă</span>
+      <span class="big num">12.784,00 lei &mdash; TVA iulie</span>
+      <span class="desc">Achitat pe 24 august către bugetul de stat, alături de impozitul pe profit (7.618 lei) și CAM (430 lei) pe aceeași lună. E cea mai mare plată singulară din cele 3 extrase. Cotă TVA aplicată vânzărilor: 21%.</span>
+    </div>
+  </section>
+
+  <section>
+    <h2>Excluderi &amp; tratamente speciale</h2>
+    <div class="note-grid">
+      <div class="note excl">
+        <h3>Exclus &mdash; rată auto &amp; asigurare</h3>
+        <ul>
+          <li>Rată leasing Porsche + asigurare RCA/CASCO: <strong>26.485,04 lei</strong> pe 3 luni (10.188,76 / 8.138,60 / 8.157,68)</li>
+          <li>Cerut explicit exclus din acest calcul de costuri operaționale</li>
+        </ul>
+      </div>
+      <div class="note excl">
+        <h3>Tratat ca dividende, nu exclus</h3>
+        <ul>
+          <li>Retrageri asociat: 15.000 (iunie) + 20.000 (iulie) + 42.000 (august) = <strong>77.000 lei</strong></li>
+          <li>Impozitate 16% = 12.320 lei, deja incluse în Subtotal A de mai sus</li>
+        </ul>
+      </div>
+      <div class="note excl" style="grid-column:1 / -1">
+        <h3>Exclus &mdash; plăți instituții &amp; colaboratori de comandă</h3>
+        <ul>
+          <li>Plăți ONRC, plăți ANCPI, plăți traducător, plăți colaborator topograf, plăți notari, plăți curieri (DHL, Fan Courier, Sameday etc.) și alte plăți similare legate de comenzi</li>
+          <li>Nu țin de colaborarea cu Cabinet de Avocat Tarța Ana-Gabriela, de-aia sunt excluse din acest calcul</li>
+          <li><strong>Total încasări</strong> de mai sus conține însă TOATE încasările &mdash; inclusiv banii din care urmează să fie plătite aceste sume &mdash; nu doar cele legate de dosarele cu dvs.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <span>Sursă: 3 extrase de cont BT eDigitalizare S.R.L. (iunie&ndash;august 2026) + cifre furnizate manual pentru chirie, contabilitate și taxe BMR Digital.</span>
+    <span>Generat 10.09.2026, uz intern</span>
+  </footer>
+
+</div>

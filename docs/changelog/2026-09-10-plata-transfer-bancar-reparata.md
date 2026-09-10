@@ -99,6 +99,39 @@ Comandă de test (ștearsă după), pe server local cu `RESEND_API_KEY` gol:
   înapoi pe `pending` cu `created_at` vechi de 3 ore;
 - `tsc --noEmit`, `eslint` și `next build` curate.
 
+## Ce a primit efectiv clientul din `E-260905-DMUZA`
+
+Verificat în baza de date, pe stampilele de trimitere (codul lasă stampila NULL
+când trimiterea eșuează, deci o stampilă completată = email plecat):
+
+| Email | Stare |
+|---|---|
+| Confirmare comandă | **niciodată trimis** (`confirmation_email_sent_at` NULL) |
+| Factură | **inexistentă** (`invoice_number` NULL, `paid_at` NULL) |
+| Datele contului / instrucțiuni de plată | nu existau în platformă la acea dată |
+| Recuperare coș abandonat, cupon `RECOVERY-UJ8AUU3G` (−10%, 48h) | **trimis** 05.09 la 14:15 ora României |
+
+Adică singurul email primit de client a fost cel prin care i se sugera că a
+renunțat la comandă — după ce plătise 1.646,00 RON.
+
+## Câți bani s-au mai pierdut așa
+
+Extrasele Banca Transilvania iunie–august 2026 (`docs/artifact-gabi/`, contul
+`RO82BTRLRONCRT0CP9350501`) au **68 de linii de încasare**, din care doar **5 nu
+vin de la Stripe**. Dintre acelea, una singură e plată de la un client:
+
+- **22.08.2026, 726,00 RON, IULIANA FUNERAR SRL**, cu descrierea „Plata fact EGH
+  0278 din data 05.08" — deci factura exista deja, banii sunt contabilizați,
+  nicio comandă blocată.
+
+Restul sunt aport propriu și rambursări de la Vercel/Amazon. Prin urmare, în
+iunie–august **nu s-a pierdut niciun ban** pe calea asta; cele 67 de comenzi
+abandonate din august sunt abandonuri reale.
+
+Extrasul pe septembrie nu era în folder la momentul verificării, deci
+`E-260905-DMUZA` rămâne singurul caz confirmat. Merită trecut extrasul pe
+septembrie prin aceeași verificare când e disponibil.
+
 ## ⚠️ De făcut manual
 
 `E-260905-DMUZA` a fost mutată din `abandoned` pe **„Așteptare plată"**, cu
@@ -107,6 +140,9 @@ deschide comanda în admin și apasă **„Confirmă plata"** cu numărul tranza
 din extras. Abia atunci pleacă factura Oblio și emailul de confirmare către
 client.
 
-Merită verificate și celelalte comenzi din tabul „Neplătite" contra extrasului
-de cont: oricine a plătit prin IBAN între lansare și 10.09.2026 a căzut în
-aceeași groapă.
+Restul comenzilor din „Neplătite" au fost verificate contra extraselor
+iunie–august: sunt abandonuri reale. De repetat verificarea pe extrasul din
+septembrie când apare.
+
+Instrucțiunile de lucru pentru echipă:
+[docs/admin/plata-transfer-bancar.md](../admin/plata-transfer-bancar.md).

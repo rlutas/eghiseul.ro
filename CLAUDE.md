@@ -29,6 +29,7 @@ Platforma digitala pentru Romania - servicii publice digitalizate (9 servicii ac
 | **API endpoints** | `docs/technical/api/` + `docs/README.md` (summary) |
 | **Admin panel** | `docs/admin/README.md` |
 | **Comenzi telefonice (admin A→Z, link plată, link completare)** | `docs/admin/comenzi-telefonice/README.md` |
+| **Plată prin transfer bancar (IBAN, „Așteptare plată", confirmare încasare)** | `docs/admin/plata-transfer-bancar.md` |
 | **RBAC & permisiuni** | `docs/admin/rbac-permissions.md` |
 | **Document generation** | `docs/technical/specs/admin-document-system.md` |
 | **KYC identity & face matching** | `docs/technical/specs/kyc-identity-verification.md` |
@@ -79,6 +80,10 @@ Vezi `.claude/rules/database.md` pentru reguli detaliate. Ghid complet: `docs/de
 ```
 paid → processing → documents_generated → submitted_to_institution → document_received → extras_in_progress/document_ready → shipped → completed
 ```
+Plata prin transfer bancar intră înainte de `paid`: `awaiting_payment` (+
+`payment_status='awaiting_verification'`) — comanda așteaptă banii, cronul
+auto-abandon nu o atinge, iar ieșirea se face DOAR prin butonul „Confirmă plata"
+din admin, nu din dropdown-ul de status.
 Tranzitii valide enforce-uite server-side in `/api/admin/orders/[id]/process`.
 
 ### Contract Legal Validity
