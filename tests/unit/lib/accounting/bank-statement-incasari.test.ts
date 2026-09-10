@@ -3,6 +3,7 @@ import {
   parseBtCsv,
   payerFromDescription,
   orderNumbersInDescription,
+  referenceCandidates,
 } from '@/lib/accounting/bank-statement';
 
 // Încasările prin transfer bancar de la clienți cădeau pe categoria „altele" și
@@ -70,5 +71,28 @@ describe('orderNumbersInDescription', () => {
 
   it('fără număr de comandă întoarce listă goală', () => {
     expect(orderNumbersInDescription('Plata factura EGH 0278')).toEqual([]);
+  });
+});
+
+describe('referenceCandidates', () => {
+  it('ia referința din coloană și din „REF:" din descriere', () => {
+    expect(
+      referenceCandidates({
+        reference: 'C31IZ56250292001',
+        description: 'Incasare SEPA;E-260905-DMUZA;CURS 5.2508 RON ;REF: C31ZEXA26251016D',
+      })
+    ).toEqual(['C31IZ56250292001', 'C31ZEXA26251016D']);
+  });
+
+  it('curăță sufixul de duplicat pe care îl punem la import', () => {
+    expect(referenceCandidates({ reference: 'C31IZ56250292001#2', description: null })).toEqual([
+      'C31IZ56250292001',
+    ]);
+  });
+
+  it('nu repetă aceeași referință', () => {
+    expect(
+      referenceCandidates({ reference: 'ABC123456', description: 'REF: ABC123456' })
+    ).toEqual(['ABC123456']);
   });
 });

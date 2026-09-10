@@ -306,6 +306,19 @@ export async function importBankStatement(content: string): Promise<BankImportRe
   };
 }
 
+/**
+ * Referințele posibile ale unei linii de extras: coloana `Referinta` (curățată
+ * de sufixul `#2` pe care îl adăugăm la duplicate) plus orice `REF: XXX` din
+ * descriere. Toate normalizate cu majuscule.
+ */
+export function referenceCandidates(e: Pick<BankEntry, 'reference' | 'description'>): string[] {
+  const out = [e.reference.split('#')[0].trim().toUpperCase()];
+  for (const m of (e.description ?? '').toUpperCase().matchAll(/REF:\s*([A-Z0-9]{6,})/g)) {
+    out.push(m[1]);
+  }
+  return out.filter((v, i, a) => v.length > 0 && a.indexOf(v) === i);
+}
+
 /** Fereastra în care căutăm comanda pentru o încasare fără număr de comandă. */
 const AMOUNT_MATCH_WINDOW_DAYS = 90;
 
@@ -330,11 +343,17 @@ async function matchClientPayments(
   if (credits.length === 0) return { clientPaymentsMatched: 0, unmatchedClientCredits: 0 };
 
   const admin = createAdminClient();
+  // Fereastra acoperă și comenzile DEJA confirmate: extrasul se importă de
+  // regulă după ce operatorul a apăsat „Confirmă plata", iar o linie care
+  // rămâne nelegată taman pe comanda rezolvată e exact opusul scopului. O
+  // comandă plătită se potrivește pe numărul de comandă sau pe referința
+  // tranzacției — niciodată pe sumă, ca să nu fure linia altei comenzi.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data: orders } = await (admin as any)
     .from('orders')
-    .select('id, friendly_order_id, order_number, total_price, created_at, payment_status')
-    .neq('payment_status', 'paid')
+    .select(
+      'id, friendly_order_id, order_number, total_price, created_at, payment_status, payment_reference'
+    )
     .neq('payment_status', 'refunded')
     .gte(
       'created_at',
@@ -347,13 +366,17 @@ async function matchClientPayments(
     order_number: string | null;
     total_price: string | number | null;
     created_at: string;
+    payment_status: string | null;
+    payment_reference: string | null;
   };
   const rows: Row[] = orders ?? [];
   const byNumber = new Map<string, Row>();
+  const byReference = new Map<string, Row>();
   for (const o of rows) {
     for (const key of [o.friendly_order_id, o.order_number]) {
       if (key) byNumber.set(key.toUpperCase(), o);
     }
+    if (o.payment_reference) byReference.set(o.payment_reference.trim().toUpperCase(), o);
   }
 
   const used = new Set<string>();
@@ -368,11 +391,25 @@ async function matchClientPayments(
       if (o && !used.has(o.id)) { hit = o; break; }
     }
 
+    // Referința tranzacției, așa cum a fost trecută de operator la confirmare.
+    // Apare atât în coloana `Referinta` a extrasului, cât și în descriere
+    // („;REF: C31ZEXA26251016D").
+    if (!hit) {
+      for (const cand of referenceCandidates(e)) {
+        const o = byReference.get(cand);
+        if (o && !used.has(o.id)) { hit = o; break; }
+      }
+    }
+
+    // Suma exactă e ultimul resort și se aplică DOAR comenzilor neconfirmate:
+    // pe una deja plătită nu avem ce confirma, iar o potrivire pe sumă ar putea
+    // fura linia comenzii care chiar așteaptă banii.
     if (!hit) {
       const txMs = new Date(e.tx_date).getTime();
       const sameAmount = rows.filter(
         (o) =>
           !used.has(o.id) &&
+          o.payment_status !== 'paid' &&
           Math.round(Number(o.total_price ?? 0) * 100) === e.credit_bani &&
           new Date(o.created_at).getTime() <= txMs
       );

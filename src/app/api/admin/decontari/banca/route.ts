@@ -38,7 +38,24 @@ export async function GET(request: NextRequest) {
     const { data, error } = await query;
     if (error) throw new Error(error.message);
 
-    return NextResponse.json({ success: true, data: { entries: data ?? [] } });
+    // Comenzile legate de liniile de încasare — numărul, starea plății și
+    // factura, ca operatorul să vadă din extras dacă mai are ceva de făcut
+    // (10.09.2026). Fără ele, coloana „Comandă" ar fi doar un UUID.
+    const entries = (data ?? []) as Array<Record<string, unknown> & { matched_order_id?: string | null }>;
+    const orderIds = [...new Set(entries.map((e) => e.matched_order_id).filter(Boolean))] as string[];
+    if (orderIds.length > 0) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: orders } = await (admin as any)
+        .from('orders')
+        .select('id, friendly_order_id, order_number, payment_status, invoice_number, invoice_url')
+        .in('id', orderIds);
+      const byId = new Map<string, unknown>((orders ?? []).map((o: { id: string }) => [o.id, o]));
+      for (const e of entries) {
+        if (e.matched_order_id) e.matched_order = byId.get(e.matched_order_id) ?? null;
+      }
+    }
+
+    return NextResponse.json({ success: true, data: { entries } });
   } catch (err) {
     console.error('[admin/decontari] banca list failed', err);
     return NextResponse.json(

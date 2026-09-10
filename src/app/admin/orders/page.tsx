@@ -38,6 +38,7 @@ import {
   FileText,
 } from 'lucide-react';
 import { STATUS_TABS, type OrdersCounts } from '@/lib/admin/orders-tabs';
+import { paymentMethodShortLabel } from '@/lib/admin/payment-method';
 import { formatRelative } from '@/lib/relative-time';
 import { stepLabel } from '@/lib/admin/wizard-steps';
 import {
@@ -986,7 +987,7 @@ function PaymentBadge({ status, method }: { status: string | null; method: strin
   if (status === 'paid' || status === 'succeeded') {
     return (
       <Badge variant="default" className="bg-green-600 text-white">
-        {method === 'bank_transfer' ? 'Transfer' : 'Card'}
+        {paymentMethodShortLabel({ method, paidWithoutMethod: true })}
       </Badge>
     );
   }

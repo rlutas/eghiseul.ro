@@ -26,6 +26,13 @@ interface Entry {
   needs_invoice: boolean;
   matched_payout_id: string | null;
   matched_order_id: string | null;
+  matched_order: {
+    friendly_order_id: string | null;
+    order_number: string | null;
+    payment_status: string | null;
+    invoice_number: string | null;
+    invoice_url: string | null;
+  } | null;
 }
 
 const ron = (bani: number) =>
@@ -205,12 +212,20 @@ export default function BancaPage() {
                       <td className="px-3 py-2 text-center">
                         {e.category === 'incasare_client' ? (
                           e.matched_order_id ? (
-                            <Link
-                              href={`/admin/orders/${e.matched_order_id}?ref=${encodeURIComponent(e.reference)}`}
-                              className="text-emerald-700 underline whitespace-nowrap"
-                            >
-                              Confirmă plata
-                            </Link>
+                            (() => {
+                              const o = e.matched_order;
+                              const num = o?.friendly_order_id || o?.order_number || 'comandă';
+                              const settled = o?.payment_status === 'paid';
+                              return (
+                                <Link
+                                  href={`/admin/orders/${e.matched_order_id}?ref=${encodeURIComponent(e.reference)}`}
+                                  className={`underline whitespace-nowrap ${settled ? 'text-neutral-600' : 'text-emerald-700 font-medium'}`}
+                                  title={settled ? `Încasare confirmată · factura ${o?.invoice_number ?? '—'}` : 'Plata nu e confirmată — deschide comanda'}
+                                >
+                                  {settled ? `${num} ✓` : `${num} · confirmă`}
+                                </Link>
+                              );
+                            })()
                           ) : (
                             <span title="Nicio comandă neconfirmată cu suma asta — caut-o manual">
                               <AlertTriangle className="h-4 w-4 text-amber-500 inline" />

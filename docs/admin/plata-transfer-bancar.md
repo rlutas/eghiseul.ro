@@ -78,6 +78,23 @@ Fluxul recomandat, o dată pe zi sau pe săptămână: exporți extrasul din BT,
 urci în „Extras bancă", apoi confirmi din coloana „Comandă". Importul **nu**
 marchează nimic ca plătit singur — confirmarea rămâne decizia unui om.
 
+Comenzile deja confirmate se leagă și ele, ca linia să nu rămână orfană când
+urci extrasul după ce ai apăsat butonul. Acolo coloana arată numărul comenzii cu
+o bifă, iar la hover vezi numărul facturii. Potrivirea lor se face **doar** pe
+numărul comenzii sau pe referința tranzacției, niciodată pe sumă — o comandă
+plătită nu are voie să fure linia uneia care chiar așteaptă banii.
+
+### Plățile din străinătate
+
+La un transfer SEPA în euro suma din extras **nu** e egală cu totalul comenzii:
+banca face conversia la cursul ei. Cazul real din 08.09.2026 — 324,66 EUR la
+curs 5,2508 pentru o comandă de 1.646,00 RON. De aceea potrivirea pe sumă nu are
+nicio șansă acolo, și de aceea contează ca numărul comenzii să ajungă în
+„detalii plată": e singurul lucru care traversează conversia neschimbat.
+
+Factura se emite pe **totalul comenzii în lei**, nu pe echivalentul încasat.
+Diferența de curs e chestiune de contabilitate, nu de facturare.
+
 ## ⚠️ De reținut
 
 - **Nu muta comanda pe „Plătită" din dropdown-ul de status.** Ar sări peste

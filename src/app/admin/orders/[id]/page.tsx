@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { toast } from 'sonner';
+import { paymentMethodKind, paymentMethodLabel } from '@/lib/admin/payment-method';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -2642,25 +2643,29 @@ export default function AdminOrderDetailPage() {
                 Metoda plata
               </span>
               <span className="flex items-center gap-1.5">
-                {order.payment_method === 'bank_transfer' ? (
-                  'Transfer bancar'
-                ) : order.payment_method === 'card' || order.payment_method === 'stripe' ? (
-                  <>
-                    <CreditCard className="h-3.5 w-3.5 text-indigo-600" />
-                    Stripe (card)
-                  </>
-                ) : order.payment_method ? (
-                  order.payment_method
-                ) : order.stripe_payment_intent_id || order.stripe_checkout_session_id ? (
-                  <>
-                    <CreditCard className="h-3.5 w-3.5 text-indigo-600" />
-                    Stripe (card)
-                  </>
-                ) : order.payment_status === 'paid' || order.payment_status === 'succeeded' ? (
-                  'Platita'
-                ) : (
-                  'Nespecificata'
-                )}
+                {(() => {
+                  // Etichetă din sursa unică: `payment_method` poate fi
+                  // „bank_transfer" (ales în checkout) SAU „transfer" (scris de
+                  // confirmarea manuală), plus NULL pe plățile cu cardul.
+                  const kind = paymentMethodKind({
+                    method: order.payment_method,
+                    hasStripeIds: !!(order.stripe_payment_intent_id || order.stripe_checkout_session_id),
+                  });
+                  if (kind === 'card') {
+                    return (
+                      <>
+                        <CreditCard className="h-3.5 w-3.5 text-indigo-600" />
+                        Stripe (card)
+                      </>
+                    );
+                  }
+                  if (kind !== 'unknown') {
+                    return paymentMethodLabel({ method: order.payment_method });
+                  }
+                  const paid =
+                    order.payment_status === 'paid' || order.payment_status === 'succeeded';
+                  return paid ? 'Platita' : 'Nespecificata';
+                })()}
               </span>
             </div>
             <div className="flex items-center justify-between">

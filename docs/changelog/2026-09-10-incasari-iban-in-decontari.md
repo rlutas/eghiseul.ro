@@ -69,15 +69,37 @@ client, aport propriu, decontare Stripe și un debit cu IBAN (plată către
 furnizor, nu încasare). Plus extragerea numelui și a numărului de comandă. Suita
 completă: 1614 teste trecute.
 
+**6. Eticheta metodei de plată.** `orders.payment_method` primește valori din
+trei locuri: checkout-ul scrie `bank_transfer`, confirmarea manuală o
+**suprascrie** cu `transfer`/`cash`, iar webhook-ul Stripe nu atinge coloana
+deloc. Lista de comenzi testa doar `=== 'bank_transfer'`, deci un transfer
+confirmat apărea drept **„Card"** — la fel și cash-ul. Sursă unică nouă în
+`src/lib/admin/payment-method.ts`, folosită de listă și de pagina comenzii.
+
+## E-260905-DMUZA — rezolvată
+
+Echipa a apăsat „Confirmă plata" pe 10.09.2026 la 11:39, cu referința reală din
+extras. Rezultatul:
+
+| | |
+|---|---|
+| Referință | `C31ZEXA26251016D` |
+| Factură | **EGH-0647**, emisă în Oblio |
+| Email de confirmare | trimis clientului la 11:39:59 |
+| Status | `submitted_to_institution` |
+
+Plata a venit ca **încasare SEPA din Germania: 324,66 EUR la curs 5,2508**,
+pentru o comandă de 1.646,00 RON. Detaliile transferului conțineau numărul
+comenzii, deci la importul extrasului pe septembrie linia se va lega singură —
+verificat pe datele reale: potrivirea reușește atât pe numărul comenzii, cât și
+pe referință. Pe sumă NU ar fi mers, fiindcă echivalentul în lei al încasării
+diferă de totalul comenzii. Ăsta e și motivul pentru care numărul comenzii în
+„detalii plată" nu e un moft: e singurul lucru care traversează conversia
+valutară neschimbat.
+
 ## ⚠️ Rămâne de făcut
 
-`E-260905-DMUZA` **încă nu are factură**. Îi lipsește referința tranzacției din
-extras, iar extrasul pe septembrie nu era importat (datele se opresc la
-31.08.2026). Două căi, ambele duc în același loc:
-
-1. exportă extrasul pe septembrie din BT și urcă-l în „Extras bancă" — linia se
-   leagă singură de comandă, apoi apeși „Confirmă plata" cu referința
-   precompletată;
-2. sau deschide comanda direct și scrii numărul tranzacției de mână.
-
-Abia atunci se emite factura Oblio și pleacă emailul de confirmare către client.
+Extrasul pe septembrie nu e încă importat (datele din `bank_statement_entries` se
+opresc la 31.08.2026). Când îl urci în „Extras bancă", încasarea de 08.09 se
+leagă de comandă și apare cu bifă lângă factura EGH-0647. Nu e urgent — comanda
+e deja rezolvată — dar închide reconcilierea pe septembrie.
