@@ -68,6 +68,18 @@ describe('resolveStatusFilter', () => {
     expect(resolveStatusFilter('abandoned').eq).toBeUndefined();
   });
 
+  // Transferul bancar: comanda așteaptă banii, NU e un coș abandonat. Tabul ei
+  // filtrează exact pe status, iar `awaiting_payment` trebuie să rămână VIZIBIL
+  // în „Toate" — altfel ar dispărea din operațional exact ca înainte de fix
+  // (10.09.2026, E-260905-DMUZA).
+  it('awaiting_payment → eq pe status', () => {
+    expect(resolveStatusFilter('awaiting_payment').eq).toBe('awaiting_payment');
+  });
+
+  it('awaiting_payment NU e ascuns din tabul „Toate"', () => {
+    expect(HIDDEN_FROM_DEFAULT).not.toContain('awaiting_payment');
+  });
+
   it('debug statuses pass through as eq', () => {
     expect(resolveStatusFilter('draft').eq).toBe('draft');
     expect(resolveStatusFilter('pending').eq).toBe('pending');
@@ -83,9 +95,12 @@ describe('resolveStatusFilter', () => {
 });
 
 describe('STATUS_TABS', () => {
-  it('exposes the 8 tabs in the canonical order', () => {
+  it('exposes the 9 tabs in the canonical order', () => {
     expect(STATUS_TABS.map((t) => t.value)).toEqual([
       'all',
+      // Transfer bancar ales, încasare neconfirmată — tab adăugat 10.09.2026,
+      // imediat după „Toate": e o coadă de lucru zilnică (extras vs comenzi).
+      'awaiting_payment',
       'paid',
       'processing',
       'shipped',
