@@ -132,13 +132,22 @@ Extrasul pe septembrie nu era în folder la momentul verificării, deci
 `E-260905-DMUZA` rămâne singurul caz confirmat. Merită trecut extrasul pe
 septembrie prin aceeași verificare când e disponibil.
 
-## ⚠️ De făcut manual
+## ✅ E-260905-DMUZA, deznodământ
 
-`E-260905-DMUZA` a fost mutată din `abandoned` pe **„Așteptare plată"**, cu
-rândul de corecție în istoric. Banii sunt încasați, dar factura NU s-a emis:
-deschide comanda în admin și apasă **„Confirmă plata"** cu numărul tranzacției
-din extras. Abia atunci pleacă factura Oblio și emailul de confirmare către
-client.
+Comanda a fost mutată din `abandoned` pe **„Așteptare plată"**, cu rândul de
+corecție în istoric. Echipa a apăsat **„Confirmă plata"** în aceeași zi, la
+11:39, cu referința reală din extras — primul caz real trecut prin butonul nou:
+
+| | |
+|---|---|
+| Referință | `C31ZEXA26251016D` |
+| Factură | **EGH-0647**, emisă în Oblio |
+| Email de confirmare | trimis clientului la 11:39:59 |
+| Status | `submitted_to_institution` |
+
+Plata venise ca **încasare SEPA din Germania: 324,66 EUR la curs 5,2508**, pentru
+o comandă de 1.646,00 RON. Detaliile mai sunt în
+[partea a doua](2026-09-10-incasari-iban-in-decontari.md).
 
 Restul comenzilor din „Neplătite" au fost verificate contra extraselor
 iunie–august: sunt abandonuri reale. De repetat verificarea pe extrasul din

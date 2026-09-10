@@ -25,6 +25,14 @@ Acest document detaliază implementarea completă a fluxului de plată Stripe ș
 |--------|------|------------|-----------|
 | **Card (Stripe)** | Instant, automat | Webhook | Automată |
 | **Transfer Bancar (IBAN)** | Manual, 1-3 zile | Admin verifică | După confirmare |
+
+> ⚠️ **Fluxul de transfer bancar a fost rescris pe 10.09.2026** — descrierea de
+> mai jos era cea din proiectarea inițială, în care dovada de plată era
+> obligatorie. Nu mai e. Sursa de adevăr pentru cum funcționează acum:
+> [`docs/admin/plata-transfer-bancar.md`](../../admin/plata-transfer-bancar.md)
+> (procedura echipei) și
+> [changelog-ul reparației](../../changelog/2026-09-10-plata-transfer-bancar-reparata.md)
+> (de ce nu funcționase niciodată).
 | **Apple Pay / Google Pay** | Instant, via Stripe | Webhook | Automată |
 
 ---
@@ -58,18 +66,29 @@ Acest document detaliază implementarea completă a fluxului de plată Stripe ș
 └─────────────────────────────────────────────────────────────────────────────┘
 
 ┌──────────────┐     ┌──────────────┐     ┌──────────────┐     ┌──────────────┐
-│   Review     │────▶│  Select IBAN │────▶│  Show Bank   │────▶│   Upload     │
-│    Step      │     │   Payment    │     │   Details    │     │   Proof      │
+│   Review     │────▶│  Select IBAN │────▶│  Show Bank   │────▶│  Confirmă    │
+│    Step      │     │   Payment    │     │   Details    │     │  (fără dovadă)│
 └──────────────┘     └──────────────┘     └──────────────┘     └──────────────┘
                                                                        │
                                                                        ▼
 ┌──────────────┐     ┌──────────────┐     ┌──────────────┐     ┌──────────────┐
-│   Email      │◀────│   Oblio      │◀────│   Admin      │◀────│  Pending     │
-│   Sent       │     │   Invoice    │     │   Confirms   │     │   Review     │
+│  Email cu    │────▶│  Așteptare   │────▶│   Extras     │────▶│   Admin      │
+│  IBAN + nr.  │     │    plată     │     │   bancă      │     │  Confirmă    │
+│  comandă     │     │  (tab admin) │     │  (potrivire) │     │   plata      │
 └──────────────┘     └──────────────┘     └──────────────┘     └──────────────┘
+                                                                       │
+                                                                       ▼
+                                          ┌──────────────┐     ┌──────────────┐
+                                          │  Email de    │◀────│   Oblio      │
+                                          │ confirmare   │     │   Invoice    │
+                                          └──────────────┘     └──────────────┘
 
-Status Flow: pending_payment → awaiting_verification → paid → processing
+Status:  pending → awaiting_payment → paid (sau statusul de lucru, dacă e deja avansat)
+Plată:   unpaid  → awaiting_verification → paid
 ```
+
+Dovada de plată e **opțională**: clientul poate să o încarce, dar comanda se
+înregistrează și fără ea. Cronul auto-abandon nu atinge `awaiting_payment`.
 
 ### Detalii Flow
 
@@ -248,13 +267,22 @@ STRIPE_WEBHOOK_SECRET=whsec_...  # From Stripe Dashboard > Webhooks
 
 ### 1b.1 Overview
 
+> Secțiunea asta descrie proiectarea inițială. Comportamentul REAL, din
+> 10.09.2026, e cel de mai jos; codul de exemplu care urmează a rămas ca
+> referință istorică.
+
 Pentru clienții care preferă transfer bancar:
 1. Selectează "Transfer Bancar" ca metodă de plată
-2. Vede detaliile contului bancar + referința unică
-3. Face transferul din banca lor
-4. Încarcă dovada plății (screenshot/PDF)
-5. Așteaptă verificarea de către admin
-6. Primește factura după confirmare
+2. Vede detaliile contului bancar + numărul comenzii, de trecut la „detalii plată"
+3. Apasă „Confirm plata prin transfer bancar" — comanda trece pe
+   `awaiting_payment`, tab de admin „Așteptare plată"
+4. Primește pe email IBAN-ul, suma și numărul comenzii; **dovada de plată e
+   opțională**, nu blochează nimic
+5. Face transferul din banca lui, când vrea — comanda nu expiră
+6. Operatorul găsește încasarea în extras (potrivire automată în „Extras
+   bancă") și apasă „Confirmă plata" cu referința tranzacției
+7. Se emit factura Oblio (colectare „Transfer bancar"), emailul de confirmare,
+   documentele și numerele de Barou
 
 ### 1b.2 Payment Method Selection UI
 
