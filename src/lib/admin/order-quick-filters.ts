@@ -26,6 +26,7 @@ const TERMINAL_OR_INACTIVE = [
   'on_hold_institution',
   'draft',
   'pending',
+  'awaiting_payment',
 ] as const;
 
 export type QuickFilter = 'overdue' | 'deadline_soon' | 'with_coupon' | 'extra_pending';

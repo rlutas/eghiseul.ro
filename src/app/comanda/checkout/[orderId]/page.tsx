@@ -261,13 +261,14 @@ export default function CheckoutPage() {
     }
   }, [order, orderId, isRedirecting]);
 
-  // Handle bank transfer submission
+  // Handle bank transfer submission.
+  //
+  // Dovada de plată e OPȚIONALĂ (10.09.2026). Înainte butonul era blocat până
+  // la încărcarea unui ordin de plată, deci clientul care pleca să plătească
+  // din aplicația băncii nu înregistra nimic: comanda rămânea `pending`, cronul
+  // auto-abandon o îngropa în 30 de minute și nu pleca niciun email
+  // (E-260905-DMUZA — bani încasați pe o comandă marcată „abandonată").
   const handleBankTransferSubmit = async () => {
-    if (!bankTransferProofKey) {
-      setError('Te rugăm să încarci dovada plății');
-      return;
-    }
-
     setIsSubmittingBankTransfer(true);
     setError(null);
 
@@ -471,15 +472,33 @@ export default function CheckoutPage() {
 
                     <Separator />
 
-                    <PaymentProofUpload
-                      orderId={orderId}
-                      onUploadComplete={(key) => setBankTransferProofKey(key)}
-                      onUploadError={(err) => setError(err)}
-                    />
+                    <div className="rounded-lg border border-amber-200 bg-amber-50/60 p-4 text-sm text-amber-900">
+                      <p className="font-medium leading-tight">
+                        Nu trebuie să plătești acum
+                      </p>
+                      <p className="mt-1 text-xs leading-snug text-amber-800">
+                        Apasă butonul de mai jos ca să îți rezervăm comanda. Îți
+                        trimitem pe email datele contului și numărul comenzii,
+                        iar tu faci transferul când vrei, din aplicația băncii.
+                        Punem comanda în lucru imediat ce banii intră în cont.
+                      </p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <p className="text-xs text-neutral-500 leading-snug">
+                        Ai deja ordinul de plată? Încarcă-l aici și confirmăm mai
+                        repede. Pasul e opțional.
+                      </p>
+                      <PaymentProofUpload
+                        orderId={orderId}
+                        onUploadComplete={(key) => setBankTransferProofKey(key)}
+                        onUploadError={(err) => setError(err)}
+                      />
+                    </div>
 
                     <Button
                       onClick={handleBankTransferSubmit}
-                      disabled={!bankTransferProofKey || isSubmittingBankTransfer}
+                      disabled={isSubmittingBankTransfer}
                       className="w-full h-12 bg-primary-500 hover:bg-primary-600 text-secondary-900"
                     >
                       {isSubmittingBankTransfer ? (
@@ -487,8 +506,10 @@ export default function CheckoutPage() {
                           <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                           Se trimite...
                         </>
+                      ) : bankTransferProofKey ? (
+                        'Trimite dovada și confirmă comanda'
                       ) : (
-                        'Confirmă Plata prin Transfer'
+                        'Confirm plata prin transfer bancar'
                       )}
                     </Button>
                   </div>

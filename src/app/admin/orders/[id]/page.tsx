@@ -302,6 +302,7 @@ const STATUS_CONFIG: Record<string, { label: string; variant: 'default' | 'secon
   cancellation_requested: { label: 'Anulare solicitata', variant: 'default', className: 'bg-red-500 text-white' },
   delivered: { label: 'Livrata', variant: 'default', className: 'bg-emerald-600 text-white' },
   abandoned: { label: 'Abandonata', variant: 'secondary' },
+  awaiting_payment: { label: 'Asteptare plata', variant: 'default', className: 'bg-amber-600 text-white' },
 };
 
 // ---------- Helpers ----------
@@ -1229,6 +1230,10 @@ export default function AdminOrderDetailPage() {
       {/* Comenzi telefonice: card de plată (link / manual) cât timp e neplătită
           + trimiterea link-ului de completare (acte + semnătură) după plată. */}
       <PhoneOrderActions order={order} onChanged={refreshSilent} />
+
+      {/* Transfer bancar ales de client din checkout: echipa compară extrasul
+          și confirmă încasarea aici (10.09.2026). */}
+      <BankTransferActions order={order} onChanged={refreshSilent} />
 
       {/* Standby banner — shown when SLA is paused. Reminds operators that
           the deadline isn't ticking down. */}
@@ -2954,6 +2959,125 @@ interface ExtraBillingEntry {
  * admin): plata (link Stripe emailat / marcare manuală cu referință) și, după
  * plată, link-ul de completare — clientul încarcă actele + semnează.
  */
+/**
+ * Transfer bancar (IBAN) ales de client în checkout — comanda stă pe
+ * `awaiting_payment` / `payment_status='awaiting_verification'` până când
+ * cineva compară extrasul și confirmă încasarea.
+ *
+ * Până în 10.09.2026 marcarea manuală a plății exista DOAR pentru comenzile
+ * telefonice (`PhoneOrderActions` iese devreme dacă `channel !== 'phone'`),
+ * deci o comandă web plătită prin bancă nu avea niciun buton de confirmare —
+ * banii intrau, comanda rămânea „abandonată" (E-260905-DMUZA).
+ *
+ * „Confirmă plata" cheamă același /mark-paid ca la comenzile telefonice:
+ * factură Oblio cu colectare „Transfer bancar", contact, email de confirmare
+ * către client, joburi ONRC/ANCPI și documentele Barou.
+ */
+function BankTransferActions({ order, onChanged }: { order: OrderDetail; onChanged: () => void }) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const o = order as any;
+  const [markRef, setMarkRef] = useState('');
+  const [marking, setMarking] = useState(false);
+  const [rejecting, setRejecting] = useState(false);
+
+  const unpaid = order.payment_status !== 'paid';
+  const isBankTransfer =
+    o.payment_method === 'bank_transfer' || order.status === 'awaiting_payment';
+  // Comenzile telefonice au deja panoul lor de plată — nu-l dublăm.
+  if (!isBankTransfer || !unpaid || o.channel === 'phone') return null;
+
+  const confirmPayment = async () => {
+    if (!markRef.trim()) {
+      toast.error('Referința plății e obligatorie (nr. tranzacție din extras)');
+      return;
+    }
+    setMarking(true);
+    try {
+      const res = await fetch(`/api/admin/orders/${order.id}/mark-paid`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ method: 'transfer', reference: markRef.trim() }),
+      });
+      const json = await res.json();
+      if (json.success) {
+        toast.success('Plata confirmată — factura, documentele și emailul pleacă automat');
+        onChanged();
+      } else {
+        toast.error(json.error || 'Eroare');
+      }
+    } catch {
+      toast.error('Eroare de rețea');
+    } finally {
+      setMarking(false);
+    }
+  };
+
+  const markAbandoned = async () => {
+    setRejecting(true);
+    try {
+      const res = await fetch(`/api/admin/orders/${order.id}/status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'abandoned', note: 'Transfer bancar neîncasat — închis de operator' }),
+      });
+      const json = await res.json();
+      if (json.success) {
+        toast.success('Comanda a fost marcată ca abandonată');
+        onChanged();
+      } else {
+        toast.error(json.error || 'Eroare');
+      }
+    } catch {
+      toast.error('Eroare de rețea');
+    } finally {
+      setRejecting(false);
+    }
+  };
+
+  return (
+    <div className="rounded-lg border-2 border-amber-300 bg-amber-50 p-4 space-y-3">
+      <div>
+        <p className="text-sm font-semibold text-amber-900">
+          🏦 Plată prin transfer bancar — așteaptă confirmarea încasării
+        </p>
+        <p className="mt-1 text-xs text-amber-800">
+          Clientul a ales IBAN-ul. Caută în extras suma{' '}
+          <span className="font-mono font-semibold">
+            {Number(order.total_price ?? 0).toFixed(2)} RON
+          </span>{' '}
+          cu detaliile de plată{' '}
+          <span className="font-mono font-semibold">
+            {order.friendly_order_id || order.order_number}
+          </span>
+          . {o.payment_proof_url ? 'Clientul a atașat o dovadă de plată.' : 'Fără dovadă atașată de client.'}
+        </p>
+      </div>
+
+      <div className="rounded-lg border border-amber-200 bg-white p-3 space-y-2">
+        <Input
+          value={markRef}
+          onChange={(e) => setMarkRef(e.target.value)}
+          placeholder="Referință obligatorie: nr. tranzacție din extras"
+        />
+        <div className="flex flex-wrap gap-2">
+          <Button size="sm" onClick={confirmPayment} disabled={marking || !markRef.trim()}>
+            {marking ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : null}
+            Confirmă plata
+          </Button>
+          <Button size="sm" variant="outline" onClick={markAbandoned} disabled={rejecting}>
+            {rejecting ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : null}
+            Banii nu au venit — abandonează
+          </Button>
+        </div>
+        <p className="text-xs text-amber-800">
+          La confirmare se emite factura Oblio (colectare &bdquo;Transfer bancar&rdquo;), pleacă
+          emailul de confirmare către client și pornesc documentele/joburile.
+        </p>
+      </div>
+    </div>
+  );
+}
+
 function PhoneOrderActions({ order, onChanged }: { order: OrderDetail; onChanged: () => void }) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const o = order as any;

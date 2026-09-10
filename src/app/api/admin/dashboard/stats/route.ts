@@ -158,12 +158,14 @@ export async function GET() {
         .select('id', { count: 'exact', head: true })
         .eq('status', 'document_ready'),
 
-      // Pending payments (pending + bank_transfer)
+      // Pending payments — transfer bancar ales, încasare neconfirmată.
+      // Ancorat pe `payment_status` (10.09.2026): filtrul vechi cerea
+      // `status='pending'` + `payment_method='bank_transfer'`, combinație care
+      // nu exista niciodată, deci cifra era mereu 0.
       adminClient
         .from('orders')
         .select('id', { count: 'exact', head: true })
-        .eq('status', 'pending')
-        .eq('payment_method', 'bank_transfer'),
+        .eq('payment_status', 'awaiting_verification'),
 
       // Total orders (excludes everything hidden from the default list + test).
       adminClient

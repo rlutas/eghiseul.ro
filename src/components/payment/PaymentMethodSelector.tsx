@@ -102,7 +102,7 @@ export function PaymentMethodSelector({
         <div className="flex-1">
           <p className="font-medium text-secondary-900">Transfer Bancar</p>
           <p className="text-sm text-neutral-500">
-            IBAN · Verificare în 1-3 zile lucrătoare
+            IBAN · Plătești din aplicația băncii, în 1-3 zile lucrătoare
           </p>
         </div>
       </label>

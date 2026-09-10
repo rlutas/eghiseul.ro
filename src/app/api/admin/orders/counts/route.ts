@@ -76,7 +76,7 @@ export async function GET(request: NextRequest) {
     };
 
     const [
-      allRes, paidRes, processingRes, shippedRes, completedRes, abandonedRes, standbyRes, onHoldRes, testOnlyRes,
+      allRes, awaitingPaymentRes, paidRes, processingRes, shippedRes, completedRes, abandonedRes, standbyRes, onHoldRes, testOnlyRes,
       overdueRes, deadlineSoonRes, withCouponRes, extraPendingRes,
       stageDocsRes, stageSubmittedRes, stageReceivedRes,
       stageTradusRes, stageLegalizatRes, stageApostilaNotariRes, stageApostilaHagaRes,
@@ -84,6 +84,8 @@ export async function GET(request: NextRequest) {
     ] =
       await Promise.all([
         buildQuery().not('status', 'in', hiddenList),
+        // „Așteptare plată" — transfer bancar ales, încasare neconfirmată.
+        buildQuery().eq('status', 'awaiting_payment'),
         buildQuery().eq('status', 'paid'),
         buildQuery().filter('status', 'in', processingList),
         buildQuery().filter('status', 'in', shippedList),
@@ -120,6 +122,7 @@ export async function GET(request: NextRequest) {
 
     const counts: OrdersCounts = {
       all: allRes.count || 0,
+      awaiting_payment: awaitingPaymentRes.count || 0,
       paid: paidRes.count || 0,
       processing: processingRes.count || 0,
       shipped: shippedRes.count || 0,

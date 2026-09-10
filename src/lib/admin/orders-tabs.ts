@@ -39,6 +39,7 @@ export const HIDDEN_FROM_DEFAULT = ['draft', 'pending', 'abandoned'] as const;
 
 export type StatusTabValue =
   | 'all'
+  | 'awaiting_payment'
   | 'paid'
   | 'processing'
   | 'shipped'
@@ -55,6 +56,11 @@ export interface StatusTab {
 
 export const STATUS_TABS: StatusTab[] = [
   { value: 'all', label: 'Toate', countKey: 'all' },
+  // Transfer bancar ales de client, banii încă neconfirmați de echipă. Tab
+  // propriu pentru că e o coadă de lucru zilnică: cineva compară extrasul cu
+  // lista asta și apasă „Confirmă plata" (10.09.2026). Comenzile apar și în
+  // „Toate" — NU sunt coșuri abandonate.
+  { value: 'awaiting_payment', label: 'Așteptare plată', countKey: 'awaiting_payment' },
   { value: 'paid', label: 'Plătite', countKey: 'paid' },
   { value: 'processing', label: 'În procesare', countKey: 'processing' },
   { value: 'shipped', label: 'Expediate', countKey: 'shipped' },
@@ -76,6 +82,7 @@ export const STATUS_TABS: StatusTab[] = [
 
 export interface OrdersCounts {
   all: number;
+  awaiting_payment: number;
   paid: number;
   processing: number;
   shipped: number;
@@ -121,6 +128,8 @@ export interface StatusFilterShape {
 
 export function resolveStatusFilter(tab: string | null | undefined): StatusFilterShape {
   switch (tab) {
+    case 'awaiting_payment':
+      return { eq: 'awaiting_payment' };
     case 'paid':
       return { eq: 'paid' };
     case 'processing':

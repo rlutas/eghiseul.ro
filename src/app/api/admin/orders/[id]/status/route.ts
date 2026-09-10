@@ -29,6 +29,7 @@ import { enterStandby, exitStandby } from '@/lib/orders/standby';
 const VALID_STATUSES = new Set([
   'draft',
   'pending',
+  'awaiting_payment',
   'abandoned',
   'paid',
   'processing',

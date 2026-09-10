@@ -29,6 +29,11 @@ export const STATUS_OPTIONS: StatusOption[] = [
   { value: 'delivered', label: 'Livrată', group: 'normal' },
   { value: 'completed', label: 'Finalizată', group: 'normal' },
   // Special states — pause / customer-initiated cancel
+  // Transfer bancar ales de client, încasare neconfirmată. Setabil manual ca
+  // operatorul să poată muta aici o comandă la care clientul spune la telefon
+  // că plătește prin bancă. Ieșirea din status se face prin „Confirmă plata",
+  // NU prin dropdown — altfel comanda ar deveni „plătită" fără factură.
+  { value: 'awaiting_payment', label: 'Așteptare plată (transfer bancar)', group: 'special' },
   { value: 'standby', label: 'În așteptare client (SLA pauzat)', group: 'special' },
   // Blocat de instituție (ANCPI picat, registru inaccesibil) — pauză care NU
   // e din vina clientului; SLA pauzat la fel ca la standby. Setabil și de

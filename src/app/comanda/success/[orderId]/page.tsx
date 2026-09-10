@@ -426,7 +426,8 @@ export default function SuccessPage() {
                 Plată în așteptare
               </h1>
               <p className="text-neutral-600 mb-6">
-                Comanda ta a fost înregistrată și așteaptă verificarea plății.
+                Comanda ta a fost înregistrată și așteaptă plata prin transfer
+                bancar. Ți-am trimis pe email datele contului și numărul comenzii.
               </p>
 
               {/* Order Number */}
@@ -448,7 +449,9 @@ export default function SuccessPage() {
                       <span className="text-sm font-medium text-amber-700">1</span>
                     </div>
                     <p className="text-neutral-600">
-                      Verificăm dovada de plată încărcată (1-3 zile lucrătoare)
+                      Faci transferul din aplicația băncii, trecând numărul
+                      comenzii la „detalii plată”. Verificăm încasarea în 1-3
+                      zile lucrătoare.
                     </p>
                   </div>
                   <div className="flex items-start gap-3">

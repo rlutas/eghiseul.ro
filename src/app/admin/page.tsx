@@ -410,9 +410,9 @@ export default function AdminDashboardPage() {
           </Card>
         </Link>
 
-        {/* Card 4: Plăți de verificat (click → orders filtered) */}
+        {/* Card 4: Plăți de verificat (click → tabul „Așteptare plată") */}
         <Link
-          href="/admin/orders?status=pending"
+          href="/admin/orders?status=awaiting_payment"
           className="rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
         >
           <Card className="h-full py-4 cursor-pointer transition-all hover:border-primary-300 hover:shadow-md">

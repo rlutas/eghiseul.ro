@@ -57,6 +57,12 @@ export async function POST(request: NextRequest) {
     .from('orders')
     .select('id, order_number, friendly_order_id, created_at, customer_data')
     .eq('status', 'pending')
+    // Centură de siguranță pentru transferul bancar: acolo plata durează 1-3
+    // zile lucrătoare, deci pragul de 30 de minute nu are ce căuta. Ruta
+    // /api/orders/[id]/bank-transfer mută deja comanda pe `awaiting_payment`,
+    // dar dacă update-ul de status eșuează parțial, filtrul ăsta o ține în
+    // viață (10.09.2026 — E-260905-DMUZA, bani încasați pe „abandonată").
+    .neq('payment_status', 'awaiting_verification')
     .lt('created_at', cutoffIso)
     .limit(500); // safety cap so a runaway cron doesn't lock the table
 
@@ -140,6 +146,7 @@ export async function GET(request: NextRequest) {
     .from('orders')
     .select('id, order_number, status, created_at')
     .eq('status', 'pending')
+    .neq('payment_status', 'awaiting_verification')
     .lt('created_at', cutoffIso);
   return NextResponse.json({
     success: true,

@@ -18,6 +18,7 @@ export interface StatusBadge {
 export const STATUS_BADGES: Record<string, StatusBadge> = {
   draft: { label: 'Ciornă', variant: 'secondary' },
   pending: { label: 'În așteptare', variant: 'outline' },
+  awaiting_payment: { label: 'Așteptare plată', variant: 'outline', className: 'border-amber-500 text-amber-900 bg-amber-50' },
   abandoned: { label: 'Abandonată', variant: 'secondary', className: 'bg-neutral-200 text-neutral-700' },
   paid: { label: 'Plătită', variant: 'default', className: 'bg-green-600 text-white' },
   processing: { label: 'În procesare', variant: 'default', className: 'bg-blue-600 text-white' },

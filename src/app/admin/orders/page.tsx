@@ -615,7 +615,7 @@ export default function AdminOrdersPage() {
                     <StatusBadge status={order.status || 'draft'} />
                     {/* Pt comenzile neterminate: pasul la care s-a oprit clientul
                         — ca echipa să vadă unde s-a blocat. */}
-                    {['draft', 'pending', 'abandoned'].includes(order.status || '') && order.current_step && (
+                    {['draft', 'pending', 'abandoned', 'awaiting_payment'].includes(order.status || '') && order.current_step && (
                       <div className="mt-0.5 text-[10px] text-muted-foreground whitespace-nowrap">
                         pas: {stepLabel(order.current_step)}
                       </div>
@@ -866,6 +866,7 @@ function DeadlineCell({
   const now = new Date();
   const inactive = [
     'completed', 'refunded', 'cancelled', 'abandoned', 'cancellation_requested', 'standby', 'on_hold_institution', 'draft', 'pending',
+    'awaiting_payment',
   ].includes(status || '');
   const ms = d.getTime() - now.getTime();
   const days = Math.round(ms / 86_400_000);
