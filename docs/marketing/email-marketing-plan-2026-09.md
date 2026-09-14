@@ -101,7 +101,7 @@ Vezi `docs/technical/specs/phone-recovery-abandoned-carts.md` + ghidul de echip�
 - Echipa bifează "sunat" + notă liberă, dă cupon custom (nu 10% fix) prin `/admin/coupons` extins cu `system_kind='phone_recovery'`.
 - Cercetare: apel în primele 2h >> după 24h; discount discreționar la telefon convertește mai bine decât cupon automat generic; multi-canal (telefon + email păstrat activ) = +45% recuperare vs un singur canal — **nu opri emailul automat când suni**, cele două se completează.
 
-### 4.4 Warm-up email pe registrul de 72k — **LIVRAT 2026-09-14 (implicit OPRIT)** ✅
+### 4.4 Warm-up email pe registrul de 72k — **LIVRAT + PORNIT 2026-09-14 (25/zi)** ✅
 
 Cron `/api/cron/warmup-campaign` (zilnic, 07:00 UTC), trimite email de
 reactivare o singură dată per contact, ordine FIFO după `first_seen_at`.
@@ -136,7 +136,7 @@ trimise, rămase, dezabonați).
 2. **Săpt. 1-2** — Echipa folosește `/admin/recuperare-telefonica` zilnic pe segmentul tier maxim (deja live, ghid PDF distribuit).
 3. ~~**Săpt. 2-4** — Rescriere secvență recovery email~~ **LIVRAT 2026-09-14** (3 pași, cupon doar la al treilea) — vezi 4.1.
 4. **Continuu** — creștere treptată a volumului zilnic de warm-up pe măsură ce bounce/spam rate rămân sub control (monitorizare manuală Resend).
-5. ~~**Lunar, continuu** — win-back cross-sell la 90 zile inactivitate~~ **LIVRAT 2026-09-14** ca email automat de cross-sell la 30–60 zile după finalizare (+ recenzie Google la comenzi în termen, reminder de expirare a documentului). Toate oprite implicit — se pornesc din `/admin/marketing`. Vezi `docs/technical/specs/lifecycle-emails.md`.
+5. ~~**Lunar, continuu** — win-back cross-sell la 90 zile inactivitate~~ **LIVRAT 2026-09-14** ca email automat de cross-sell la 30–60 zile după finalizare (+ recenzie Google la comenzi în termen, reminder de expirare a documentului). **Pornite toate trei în 14.09**, după preview-uri. KPI (trimise/comenzi/venit per canal) în cardul „KPI marketing" din `/admin/marketing`. Vezi `docs/technical/specs/lifecycle-emails.md`.
 6. **Newsletter (4.3)** — editorul de campanii e livrat (`/admin/marketing` → „Campanii"): scrii, testezi pe adresa ta, pornești, cronul trimite tranșe zilnice. Prima campanie recomandată: „ce s-a schimbat + 2 servicii noi (rovinietă, celibat) + 1 articol", segment „Clienți", 100/zi.
 
 ---

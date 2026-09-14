@@ -798,14 +798,14 @@ de 1,4% pe cuponul automat 10%. Migrația 156. Vezi
 `docs/technical/specs/phone-recovery-abandoned-carts.md` +
 `docs/marketing/email-marketing-plan-2026-09.md`.
 
-#### ✅ Warm-up email pe registrul de 72k contacte — LIVRAT 2026-09-14 (implicit oprit)
+#### ✅ Warm-up email pe registrul de 72k contacte — LIVRAT + PORNIT 2026-09-14 (25/zi)
 
 Decizie de business (Raul): contactele au consimțământ de pe eghiseul.ro
 vechi, se trimite la toate 72.278, dar treptat (switch + volum/zi editabil în
-`/admin/marketing`, implicit OPRIT până la revizuirea conținutului). Migrația
+`/admin/marketing`; pornit în aceeași seară la 25/zi după preview-uri). Migrația
 157. Vezi `docs/technical/specs/warmup-email-campaign.md`.
 
-#### ✅ Emailuri de lifecycle + campanii manuale — LIVRAT 2026-09-14 (implicit oprit)
+#### ✅ Emailuri de lifecycle + campanii manuale — LIVRAT + PORNITE 2026-09-14 (recenzie, expirare, cross-sell; KPI în admin)
 
 Trei emailuri automate către clienți (cerere recenzie Google doar la comenzi în
 termen; reminder expirare cazier 6 luni / fiscal, auto, constatator 30 zile;

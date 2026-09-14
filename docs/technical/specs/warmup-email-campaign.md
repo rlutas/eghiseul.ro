@@ -1,9 +1,9 @@
 # Warm-up email — registrul de 72k contacte
 
-**Status:** ✅ LIVRAT 2026-09-14 · migrațiile 157 + 158 · **implicit OPRIT** (switch în `/admin/marketing`)
+**Status:** ✅ LIVRAT 2026-09-14 · migrațiile 157 + 158 · implicit oprit la deploy, **PORNIT în aceeași seară la 25/zi** (Raul a văzut preview-urile; prag de oprire: dezabonări >0,5% din trimiși, vizibil în cardul „KPI marketing")
 **Context:** decizie de business (Raul) — contactele din `contacts` (72.278, majoritatea import WPForms de pe eghiseul.ro vechi) sunt foști clienți/lead-uri cu consimțământ acordat pe platforma veche. Se trimite email de reactivare la toți, dar treptat. Detalii complete + cercetare în `docs/marketing/email-marketing-plan-2026-09.md`.
 
-## De ce implicit oprit
+## De ce implicit oprit (la deploy)
 
 Trimiterea reală către mii de persoane e o acțiune cu impact greu de reversat
 (reputație de sender, plângeri, imagine). Feature-ul e complet funcțional dar
