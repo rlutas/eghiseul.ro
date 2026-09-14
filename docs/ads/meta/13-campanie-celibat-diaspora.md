@@ -269,3 +269,79 @@ server-side. Nu e o îmbunătățire de performanță, e măsurare care înainte
 3. La ziua 7 citim: distribuția spend-ului între creative, cost per InitiateCheckout, hook rate,
    CTR outbound, LPV ÷ Outbound Clicks.
 4. **Decizia rămasă:** constatatorul rulează în paralel, deci total 150 lei/zi.
+
+---
+
+## VERIFICARE 14.09 (ziua 6) — prin Meta Ads MCP
+
+Cifre lifetime la 14.09: spend **482,45 lei**, 18.711 impresii, 10.184 reach, CTR outbound
+**1,17%**, 4 InitiateCheckout la **120,61 lei/buc** (sub pragul de 250, dar volum mic). **0 erori**
+de livrare, **0 anomalii** (fără auction overlap, fatigue sau audiență prea îngustă).
+
+Două probleme găsite, ambele deja semnalate mai sus dar încă nerezolvate 6 zile mai târziu:
+
+1. **LPV ÷ Outbound Clicks = 53/219 = 24%.** Sub pragul Loomer de 70% din `11-research-...` —
+   semnal de problemă pe landing page, nu pe creativ. De verificat viteză/erori pe
+   `/servicii/eliberare-certificat-de-celibat/`.
+2. **Tot un singur anunț rulează** (`C1 Conversatie - video 9x16`). C2–C5 (staticele 4:5) tot
+   nu sunt urcate.
+
+### Lookalike din pagina unui concurent — nu se poate
+
+Raul a întrebat dacă se poate face Lookalike din followerii paginii **Centrul de Vize și
+Legalizări T&B** (`facebook.com/CentrulDeVize`, page_id `976626705861066`, găsită prin Ad Library
+căutând „Centrul de Vize"; un singur anunț istoric, 2024, „Procură auto Turcia"). **Nu.** Meta
+Lookalike acceptă ca sursă DOAR o audiență deținută de contul tău (pixel, listă clienți, engagement
+pe propria pagină) — nu poți selecta pagina altcuiva, indiferent cât de suprapus e publicul.
+
+### Audiențe create în loc (14.09)
+
+Contul nu avea NICIO audiență custom (`ads_get_ad_account_custom_audiences` → gol). Create patru,
+pe pixelul `eghiseul.ro web` (dataset `2319629835442431`):
+
+| Nume | Tip | ID | Sursă |
+|---|---|---|---|
+| WCA - Vizitatori eghiseul.ro (180 zile) | WEBSITE | `120252513878570556` | toți vizitatorii, `ALL_VISITORS`, retenție 180 zile |
+| WCA - Cumparatori eghiseul.ro (Purchase, 180 zile) | WEBSITE | `120252513878830556` | eveniment `Purchase` (pixel + CAPI), retenție 180 zile |
+| LAL 1% - Vizitatori eghiseul.ro | LOOKALIKE | `120252513880060556` | origine: audiența de vizitatori de mai sus |
+| LAL 1% - Cumparatori eghiseul.ro | LOOKALIKE | `120252513880260556` | origine: audiența de cumpărători de mai sus |
+
+Blocaj la prima încercare: `Terms of service has not been accepted` (eroare 2663) — Raul a acceptat
+TOS-ul de Custom Audiences pe `facebook.com/customaudiences/app/tos/?act=1562160259035101`, apoi
+creare reușită.
+
+Verificat pe pixel (`ads_get_dataset_stats`, 7 zile): `Purchase` chiar are volum (~20 evenimente),
+deci audiența de cumpărători nu e goală, dar e mică — populația-sursă a unui Lookalike de
+cumpărători pe un singur serviciu (698 lei, 6 comenzi/90 zile) va fi subțire. Cea de vizitatori are
+bază mult mai mare (sute de PageView/oră, deși doar cele cu consimțământ de cookie intră pe pixel).
+
+**Ce lipsește ca lookalike-urile să fie gata de folosit:** niciun ad set nu le targetează încă.
+Următorul pas e fie un ad set nou în campania de celibat cu aceste audiențe (posibil RO în loc de
+diaspora, pentru că sursa e majoritar trafic domestic), fie test separat. Decizie rămasă pentru
+Raul: pe ce campanie/serviciu le folosim întâi.
+
+### AG2 pornit în campania de celibat (14.09)
+
+Raul a ales: le punem pe campania de celibat, să vedem cum merge. Ad set nou, **ACTIVE**:
+
+| | |
+|---|---|
+| Ad set | `AG2 Lookalike - Vizitatori+Cumparatori RO` — `120252513897690556` |
+| Targetare | România, 18-65, **custom_audiences** = LAL Vizitatori (`120252513880060556`) + LAL Cumpărători (`120252513880260556`), unite (OR) |
+| Advantage+ Audience | **OFF** (`targeting_automation.advantage_audience: 0`) — targetare strict pe cele 2 audiențe, fără expandare automată Meta |
+| Plasamente | manuale, aceleași ca AG1: Facebook feed/Reels/Stories/Marketplace, IG feed/Reels/Stories/Explore, fără Audience Network/Messenger |
+| Optimizare | `OFFSITE_CONVERSIONS` → `INITIATED_CHECKOUT`, pixel `2319629835442431` (același eveniment ca AG1) |
+| Anunț | `C1 Conversatie - video 9x16 (LAL RO)` — `120252513901390556`, aceeași creativă (`creative_id 1065201412919067`) ca AG1, nu una nouă |
+| Advertiser (DSA) | EDIGITALIZARE SRL |
+
+⚠️ **Riscul asumat:** campania e CBO (buget 75 lei/zi la nivel de campanie, „Highest volume").
+Cu AG2 activ, bugetul se împarte automat între AG1 (broad diaspora, în plină fază de învățare,
+ziua 6) și AG2 (nou, 0 date). Regula din `11-research-learning-phase.md` — orice schimbare
+resetează învățarea — vizează schimbări PE ACELAȘI ad set; adăugarea unui ad set frate într-o
+campanie CBO nu resetează AG1, dar îi poate tăia din livrare cât timp Meta explorează AG2. De
+urmărit: dacă AG1 pierde brusc spend/impresii față de trendul de până acum.
+
+**Ce urmărim la AG2:** dacă vreuna din cele 2 audiențe (vizitatori vs. cumpărători, sunt unite
+acum într-un singur ad set, deci nu se văd separat decât dacă se împart ulterior în 2 ad seturi)
+produce InitiateCheckout mai ieftin decât cei 120,61 lei de pe AG1 broad. Fără atingeri 7 zile,
+la fel ca AG1.
