@@ -26,7 +26,9 @@ import { createCjoClient } from '@/lib/supabase/cjo';
 import {
   extraInvoiceForRow,
   parseOblioProformaDesc,
+  pickInvoiceForProforma,
   type ExtraBillingEntry,
+  type OblioDocLite,
 } from '@/lib/accounting/extra-invoice-match';
 
 /** Order-number regex: E-260710-F3AYS, EJC-..., CJO-20260710-86615, CAO-, CFO-, CIC- */
@@ -206,8 +208,10 @@ async function enrichCjo(rows: TxRow[], errors: string[]) {
  * payment link (success_url oblio.eu, session metadata = Oblio's numeric
  * orderId — no app order exists). The Checkout line item reads
  * "Plata cu card-ul pentru Proforma EGIP 0319"; we parse the proforma ref,
- * then find the fiscal invoice Oblio issued at collection by scanning the
- * invoice list around the payment date for an exact total + email match.
+ * fetch the PROFORMA (its client is the invoiced party — the cardholder is
+ * often a relative or an accountant), then find the fiscal invoice Oblio
+ * issued at collection: same client + exact total, issued from the proforma
+ * date onward. See `pickInvoiceForProforma`.
  *
  * Only runs on still-unmatched charge rows whose metadata orderId is purely
  * numeric (Oblio's signature) — WP-era rows (no metadata) are untouched.
@@ -236,8 +240,25 @@ async function attachOblioProformaInvoices(rows: TxRow[], errors: string[]) {
   }
 
   let token: string | null = null;
-  // Invoice list cache per sync run — one fetch covers all candidates.
-  let invoiceList: Array<Record<string, unknown>> | null = null;
+  const oblioGet = async (path: string): Promise<OblioDocLite[]> => {
+    if (!token) {
+      const tokRes = await fetch('https://www.oblio.eu/api/authorize/token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ client_id: clientId, client_secret: clientSecret }),
+      });
+      token = ((await tokRes.json()) as { access_token?: string }).access_token ?? null;
+      if (!token) throw new Error('token Oblio indisponibil');
+    }
+    const res = await fetch(`https://www.oblio.eu/api/docs/${path}&cif=${encodeURIComponent(cif)}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return ((await res.json()) as { data?: OblioDocLite[] }).data ?? [];
+  };
+  // Invoice list cache per sync run, keyed by the month the proforma was
+  // issued in (WP-era payouts get re-synced months later — a "last 45 days"
+  // window missed them entirely).
+  const invoicesByWindow = new Map<string, OblioDocLite[]>();
 
   for (const r of candidates) {
     try {
@@ -256,41 +277,41 @@ async function attachOblioProformaInvoices(rows: TxRow[], errors: string[]) {
       if (ref) r.service_name = r.service_name ?? `Proformă Oblio ${ref.series} ${ref.number}`;
       else r.service_name = r.service_name ?? 'Plată proformă Oblio';
 
-      // 2. Find the invoice Oblio issued at collection: exact total + email.
-      if (!token) {
-        const tokRes = await fetch('https://www.oblio.eu/api/authorize/token', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ client_id: clientId, client_secret: clientSecret }),
-        });
-        token = ((await tokRes.json()) as { access_token?: string }).access_token ?? null;
-        if (!token) {
-          errors.push('Oblio-proforma matching: token indisponibil');
-          return;
+      // 2. The proforma itself — by series+number from the line item, else by
+      // Oblio's numeric id (= session metadata.orderId). Its client is the
+      // person invoiced; the Stripe payer is often someone else.
+      const proformaQuery = ref
+        ? `proforma/list?seriesName=${encodeURIComponent(ref.series)}&number=${encodeURIComponent(ref.number)}`
+        : `proforma/list?id=${encodeURIComponent(r._orderId!)}`;
+      const proforma = (await oblioGet(proformaQuery))[0];
+      if (!proforma) continue;
+      // The proforma client is the invoiced party — show them, not the cardholder.
+      if (proforma.client?.name) r.client_name = proforma.client.name;
+      if (proforma.client?.email) r.client_email = proforma.client.email;
+
+      // 3. The invoice Oblio issued at collection: issued from the proforma
+      // date onward (Oblio collects same-day; 30 days covers late manual
+      // issuing), same client + exact total.
+      const issuedAfter = proforma.issueDate ?? r.available_on ?? new Date().toISOString().slice(0, 10);
+      const issuedBefore = new Date(new Date(issuedAfter).getTime() + 30 * 24 * 3600 * 1000)
+        .toISOString()
+        .slice(0, 10);
+      const windowKey = `${issuedAfter}..${issuedBefore}`;
+      let invoices = invoicesByWindow.get(windowKey);
+      if (!invoices) {
+        invoices = [];
+        for (let offset = 0; offset < 2000; offset += 100) {
+          const page = await oblioGet(
+            `invoice/list?issuedAfter=${issuedAfter}&issuedBefore=${issuedBefore}&limitPerPage=100&offset=${offset}&orderBy=id&orderDir=ASC`
+          );
+          invoices.push(...page);
+          if (page.length < 100) break;
         }
-      }
-      if (!invoiceList) {
-        // Look back far enough to cover the payout window (payments settle
-        // ~2-7 days before the payout).
-        const after = new Date(Date.now() - 45 * 24 * 3600 * 1000).toISOString().slice(0, 10);
-        const listRes = await fetch(
-          `https://www.oblio.eu/api/docs/invoice/list?cif=${encodeURIComponent(cif)}&issuedAfter=${after}&limitPerPage=100&orderBy=id&orderDir=DESC`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        const listJson = (await listRes.json()) as { data?: Array<Record<string, unknown>> };
-        invoiceList = listJson.data ?? [];
+        invoicesByWindow.set(windowKey, invoices);
       }
 
-      const grossRon = r.gross_bani / 100;
-      const email = (r.client_email ?? sess.customer_details?.email ?? '').toLowerCase();
-      const matches = invoiceList.filter((d) => {
-        if (Number(d.total) !== grossRon) return false;
-        if (String(d.canceled ?? '0') === '1') return false;
-        const client = d.client as { email?: string } | undefined;
-        return !email || (client?.email ?? '').toLowerCase() === email;
-      });
-      if (matches.length === 1) {
-        const inv = matches[0] as { seriesName?: string; number?: string; link?: string };
+      const inv = pickInvoiceForProforma(proforma, invoices);
+      if (inv) {
         r.invoice_number = `${inv.seriesName ?? ''}-${inv.number ?? ''}`.replace(/^-/, '');
         r.invoice_url = inv.link ?? null;
       }

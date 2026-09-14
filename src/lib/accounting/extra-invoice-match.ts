@@ -110,3 +110,58 @@ export function parseOblioProformaDesc(desc: string | null | undefined): OblioPr
   if (!m) return null;
   return { series: m[1].toUpperCase(), number: m[2] };
 }
+
+/** Minimal shape of an Oblio document (proforma or invoice) from the docs list API. */
+export interface OblioDocLite {
+  seriesName?: string | null;
+  number?: string | null;
+  issueDate?: string | null;
+  total?: string | number | null;
+  canceled?: string | number | null;
+  link?: string | null;
+  client?: { name?: string | null; email?: string | null } | null;
+}
+
+const normEmail = (s: unknown) => String(s ?? '').trim().toLowerCase();
+const normName = (s: unknown) =>
+  String(s ?? '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .toLowerCase();
+
+/**
+ * Pick the fiscal invoice Oblio issued when a PROFORMA was paid by card.
+ *
+ * Match on the proforma's own client (email, else name) + exact total, among
+ * non-canceled invoices issued on/after the proforma date. The Stripe payer
+ * (billing_details) is NOT a reliable key: the card holder is often someone
+ * else (a relative, an accountant) — EGIP 0315 was paid from
+ * abuhouf01@gmail.com while the proforma + invoice EGI2024-24180 carry
+ * yosef.sa99@gmail.com, so the payer-email match left the row "nefacturat"
+ * for 3 months (payouts po_1Tlel5…, po_1Tjpss…; 2026-09-14).
+ *
+ * Returns null on 0 or >1 candidates — ambiguity is left to the operator.
+ */
+export function pickInvoiceForProforma(
+  proforma: OblioDocLite,
+  invoices: OblioDocLite[],
+): OblioDocLite | null {
+  const total = Number(proforma.total);
+  if (!Number.isFinite(total)) return null;
+  const email = normEmail(proforma.client?.email);
+  const name = normName(proforma.client?.name);
+  const from = proforma.issueDate ?? '';
+
+  const candidates = invoices.filter((inv) => {
+    if (String(inv.canceled ?? '0') === '1') return false;
+    if (Number(inv.total) !== total) return false;
+    if (from && inv.issueDate && inv.issueDate < from) return false;
+    const invEmail = normEmail(inv.client?.email);
+    const invName = normName(inv.client?.name);
+    if (email && invEmail) return invEmail === email;
+    return !!name && invName === name;
+  });
+  return candidates.length === 1 ? candidates[0] : null;
+}

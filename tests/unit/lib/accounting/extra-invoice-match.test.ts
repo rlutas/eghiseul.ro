@@ -2,7 +2,9 @@ import { describe, expect, it } from 'vitest';
 import {
   extraInvoiceForRow,
   parseOblioProformaDesc,
+  pickInvoiceForProforma,
   type ExtraBillingEntry,
+  type OblioDocLite,
 } from '@/lib/accounting/extra-invoice-match';
 
 // Regression guards (2026-07-23): decontări never read extra_billing, so
@@ -81,5 +83,58 @@ describe('parseOblioProformaDesc', () => {
     expect(parseOblioProformaDesc('Extra E-260722-XYZ: adăugat apostilă')).toBe(null);
     expect(parseOblioProformaDesc(null)).toBe(null);
     expect(parseOblioProformaDesc('')).toBe(null);
+  });
+});
+
+// Regression guards (2026-09-14): Oblio-proforma card payments were matched
+// on the STRIPE PAYER email, but the cardholder is often not the invoiced
+// client — EGIP 0315 (Abu Hof Fadi, yosef.sa99@) was paid from
+// abuhouf01@gmail.com, so payouts po_1Tlel5… / po_1Tjpss… stayed 17/18 and
+// 4/5 for three months. Match on the proforma's own client instead.
+describe('pickInvoiceForProforma', () => {
+  const proforma: OblioDocLite = {
+    seriesName: 'EGIP',
+    number: '0315',
+    issueDate: '2026-06-22',
+    total: '250.0000',
+    client: { name: 'Abu Hof Fadi', email: 'yosef.sa99@gmail.com' },
+  };
+  const target: OblioDocLite = {
+    seriesName: 'EGI2024',
+    number: '24180',
+    issueDate: '2026-06-22',
+    total: '250.0000',
+    canceled: '0',
+    link: 'https://oblio.eu/f/24180',
+    client: { name: 'Abu Hof Fadi', email: 'yosef.sa99@gmail.com' },
+  };
+  const sameDaySameTotalOther: OblioDocLite = {
+    seriesName: 'EGI2024',
+    number: '24177',
+    issueDate: '2026-06-22',
+    total: '250.0000',
+    canceled: '0',
+    client: { name: 'Yadira Martinez Padron', email: 'yadivali@yahoo.com' },
+  };
+
+  it('matches by the proforma client email, ignoring same-total invoices of other clients', () => {
+    expect(pickInvoiceForProforma(proforma, [sameDaySameTotalOther, target])).toBe(target);
+  });
+
+  it('falls back to the client name when the proforma has no email', () => {
+    const noEmail = { ...proforma, client: { name: 'Abu  Hof Fadi', email: '' } };
+    const named = { ...target, client: { name: 'ABU HOF FADI', email: 'other@x.ro' } };
+    expect(pickInvoiceForProforma(noEmail, [sameDaySameTotalOther, named])).toBe(named);
+  });
+
+  it('ignores canceled invoices, other totals and invoices issued before the proforma', () => {
+    const canceled = { ...target, canceled: '1' };
+    const wrongTotal = { ...target, total: '200.0000' };
+    const earlier = { ...target, issueDate: '2026-06-10' };
+    expect(pickInvoiceForProforma(proforma, [canceled, wrongTotal, earlier])).toBeNull();
+  });
+
+  it('returns null when more than one invoice fits (never guesses)', () => {
+    expect(pickInvoiceForProforma(proforma, [target, { ...target, number: '24181' }])).toBeNull();
   });
 });
