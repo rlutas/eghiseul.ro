@@ -1,4 +1,5 @@
 # 14.09.2026 — Transfer bancar: lucrul pornește pe dovada de plată, nu pe bani
+<!-- categorie: plati -->
 
 ## Pentru echipă
 

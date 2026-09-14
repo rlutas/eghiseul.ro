@@ -23,6 +23,7 @@ So every changelog detail file MUST start with:
 
 ```markdown
 # DD.MM.YYYY — Titlu
+<!-- categorie: plati -->
 
 ## Pentru echipă
 
@@ -35,7 +36,14 @@ I press, what I stop doing. Link the procedure in docs/admin/ if one exists.>
 ```
 
 Rules:
-- `## Pentru echipă` is the FIRST section after the H1. The card in admin shows
+- NOT optional: a feature/fix without a changelog row + detail file is
+  invisible to the team. Write it in the same commit as the code.
+- `<!-- categorie: X -->` right under the H1 pins the business category shown
+  as a filter chip in admin. X ∈ comenzi · plati · livrare · documente ·
+  automatizari · clienti · seo · admin · infrastructura. Without it the entry
+  is auto-classified by keywords (`src/lib/knowledge/categories.ts`) — pin it
+  whenever the topic is mixed.
+- `## Pentru echipă` is the FIRST section after the H1 (after the category comment). The card in admin shows
   it; the technical row from the table is folded under „Rezumat tehnic".
 - No file paths, migration numbers or function names inside `## Pentru echipă`.
 - Table row in `docs/changelog/README.md`: `| YYYY-MM-DD | <emoji> **Titlu** — rezumat tehnic | [file](file) |`.
@@ -45,3 +53,6 @@ Rules:
   procedure doc is written.
 - Relative links between docs are rewritten to `/admin/ghid/<path>/`; links to
   non-markdown files (png, csv, pdf) render as plain text in admin.
+- Full-text search covers EVERY `.md` under `docs/` (except `EXPORT/`,
+  `SCREAMINGFROG/`), so a doc's H1 is its search title — always give docs a
+  real `# Title`, in Romanian for team-facing docs.

@@ -10,6 +10,7 @@ const nextConfig: NextConfig = {
     '/admin/ghid': ['./docs/**/*.md'],
     '/admin/ghid/[...slug]': ['./docs/**/*.md'],
     '/api/admin/knowledge/feed': ['./docs/changelog/**/*.md'],
+    '/api/admin/knowledge/search': ['./docs/**/*.md'],
   },
   env: {
     // Momentul build-ului, afișat în Knowledge Center lângă versiune.

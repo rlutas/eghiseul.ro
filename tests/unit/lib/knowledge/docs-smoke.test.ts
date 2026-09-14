@@ -1,5 +1,14 @@
 import { describe, expect, it } from 'vitest';
-import { CURATED_GUIDES, loadAllTeamDocs, loadChangelog, loadPlatformVersion, resolveDoc } from '@/lib/knowledge/docs';
+import {
+  CURATED_GUIDES,
+  listDirectory,
+  loadAllTeamDocs,
+  loadChangelog,
+  loadPlatformVersion,
+  loadTopFolders,
+  resolveDoc,
+  searchDocs,
+} from '@/lib/knowledge/docs';
 import { renderMarkdown } from '@/lib/knowledge/render';
 
 // Smoke test pe docs/ REAL (fără rețea): dacă cineva strică formatul tabelului
@@ -41,5 +50,25 @@ describe('Knowledge Center peste docs/ real', () => {
 
   it('nu servește nimic din afara docs/', async () => {
     expect(await resolveDoc('../package')).toBeNull();
+  });
+
+  it('căutarea acoperă tot docs/ și găsește fără diacritice', async () => {
+    const folders = await loadTopFolders();
+    const total = folders.reduce((s, f) => s + f.count, 0);
+    expect(total).toBeGreaterThan(400);
+    expect(folders.map((f) => f.name)).toEqual(expect.arrayContaining(['changelog', 'admin', 'technical', 'seo']));
+
+    const r = await searchDocs('asteptare plata');
+    expect(r.length).toBeGreaterThan(0);
+    expect(r.some((x) => x.slug === 'admin/plata-transfer-bancar')).toBe(true);
+    expect(r[0].snippetHtml).toContain('<mark>');
+  });
+
+  it('folderul changelog se listează cu fișierele cele mai noi primele', async () => {
+    const dir = await listDirectory('changelog');
+    expect(dir).not.toBeNull();
+    expect(dir!.files.length).toBeGreaterThan(100);
+    expect(dir!.files[0].relPath >= dir!.files[1].relPath).toBe(true);
+    expect(await listDirectory('admin/plata-transfer-bancar')).toBeNull();
   });
 });

@@ -1,4 +1,5 @@
 # 14.09.2026 — Knowledge Center în admin: „Ghid & noutăți”
+<!-- categorie: admin -->
 
 ## Pentru echipă
 
@@ -15,6 +16,21 @@
 Când apare ceva nou, itemul din meniu primește un **badge cu numărul de livrări
 pe care nu le-ai văzut**. Dispare când deschizi pagina. Nu mai trebuie să
 aștepți mesaj pe WhatsApp la fiecare schimbare: intri acolo și citești.
+
+**Căutare** în toată documentația (peste 500 de documente), din caseta de sus:
+scrii „transfer bancar”, „AWB”, „storno”, „ONRC” și primești documentele cu
+fragmentul în care apare cuvântul. Merge și fără diacritice („asteptare plata”
+găsește „Așteptare plată”). Linkul cu căutarea se poate trimite unui coleg.
+
+**Pe categorii**: deasupra listei ai filtre — Plăți & facturare, Livrare &
+curieri, Documente & Barou, Automatizări ONRC/ANCPI/topograf, Clienți & email,
+SEO & site, Comenzi & wizard, Admin & echipă, Infrastructură. Un click și vezi
+tot istoricul acelei categorii, nu doar ultimele livrări. Procedurile din
+dreapta sunt grupate la fel.
+
+**Toată documentația**, pe foldere, în coloana din dreapta: changelog,
+proceduri admin, specificații tehnice, SEO, reclame, deploy, securitate. Orice
+folder se deschide și listează fișierele din el.
 
 ---
 
@@ -53,6 +69,37 @@ livrări>` (azi `v137 · 14.09.2026`), plus `VERCEL_GIT_COMMIT_SHA` și mesajul
 commitului deployat, plus momentul build-ului (`NEXT_PUBLIC_BUILD_TIME`, setat
 în `next.config.ts`).
 
+### Categorii de business
+
+`src/lib/knowledge/categories.ts` (pur, 10 teste): 9 categorii cu
+cuvinte-cheie normalizate; scor = potriviri în tot textul + potriviri în
+primele 120 de caractere (titlul cântărește dublu); la egalitate câștigă
+ordinea din listă (plăți înaintea comenzilor — „comandă" e peste tot, semnal
+slab). Override explicit: `<!-- categorie: plati -->` sub H1 în fișierul
+detaliat (invizibil la randare). Pagina: chip-uri cu număr de livrări, `?cat=`
+filtrează pe TOT jurnalul (până la 200), ghidurile curatoriate grupate pe
+categorie. Regula de scriere: `.claude/rules/documentation.md` + secțiune nouă
+în `CLAUDE.md`.
+
+### Căutare full-text pe tot `docs/`
+
+`GET /api/admin/knowledge/search?q=` — index în memorie peste toate fișierele
+markdown din `docs/` (fără `EXPORT/`, `SCREAMINGFROG/`), construit o dată per
+instanță (`loadSearchIndex`, ~7 MB). Text normalizat fără diacritice pe ambele
+părți (comma-below și cedilla legacy → litera de bază), toate cuvintele
+obligatorii, scor: titlu 50 + apariții (max 20) + bonus 5 pe `admin/` și
+`changelog/`. Fragmentul e din textul original, HTML escapat, termenii în
+`<mark>`, aliniat prin avans paralel original/normalizat (NFD schimbă
+lungimea). Pur în `src/lib/knowledge/search.ts` (9 teste); UI client în
+`src/app/admin/ghid/search.tsx` cu debounce 250 ms și `?q=` în URL.
+
+### Navigare pe foldere
+
+Coloana „Toată documentația" arată folderele de nivel 1 cu numărul de
+documente. Viewerul, când calea e un folder, randează README-ul (dacă există)
+și sub el fișierele și subfolderele (`listDirectory`); fișierele datate ies
+cele mai noi primele. Breadcrumb clicabil pe fiecare segment.
+
 ### Badge „noutăți” în meniu
 
 `GET /api/admin/knowledge/feed` întoarce datele ultimelor livrări; itemul din
@@ -81,4 +128,3 @@ server.
 ## Rămâne
 
 - Intrările vechi nu au `## Pentru echipă`; se adaugă când se atinge fișierul.
-- Căutare în ghid (nu există încă; lista e scurtă).

@@ -56,6 +56,15 @@ Platforma digitala pentru Romania - servicii publice digitalizate (9 servicii ac
 
 ## Reguli & Conventii
 
+### Knowledge Center (echipa citește în admin, nu pe WhatsApp)
+
+Orice livrare (feature, fix, schimbare) → rând în `docs/changelog/README.md` +
+fișier `docs/changelog/YYYY-MM-DD-<slug>.md` care începe cu
+`<!-- categorie: … -->` și `## Pentru echipă`, ÎN ACELAȘI COMMIT cu codul.
+`/admin/ghid` randează exact aceste fișiere (categorii, căutare, versiune).
+Procedură nouă pentru echipă → `docs/admin/<slug>.md` + `CURATED_GUIDES` în
+`src/lib/knowledge/docs.ts`. Detalii: `.claude/rules/documentation.md`.
+
 ### Database Operations
 Vezi `.claude/rules/database.md` pentru reguli detaliate. Ghid complet: `docs/deployment/DATABASE_MIGRATIONS.md`
 

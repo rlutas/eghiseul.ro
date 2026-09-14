@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import { BookOpen, GitCommitHorizontal, Newspaper, Sparkles, Wrench } from 'lucide-react';
+import { Suspense } from 'react';
+import { BookOpen, FolderOpen, GitCommitHorizontal, Newspaper, Sparkles, Wrench } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdmin } from '@/lib/admin/permissions';
 import { Badge } from '@/components/ui/badge';
@@ -10,10 +11,13 @@ import {
   loadAllTeamDocs,
   loadChangelog,
   loadPlatformVersion,
+  loadTopFolders,
 } from '@/lib/knowledge/docs';
 import { renderInline, renderMarkdown } from '@/lib/knowledge/render';
 import { formatRoDate, type ChangelogKind } from '@/lib/knowledge/parse';
+import { CATEGORIES, CATEGORY_LABEL, isCategoryId, type CategoryId } from '@/lib/knowledge/categories';
 import { MarkGhidSeen } from './mark-seen';
+import { GhidSearch } from './search';
 
 export const dynamic = 'force-dynamic';
 
@@ -34,7 +38,14 @@ const KIND_LABEL: Record<ChangelogKind, { label: string; className: string }> = 
 
 const RECENT_LIMIT = 40;
 
-export default async function GhidPage() {
+export default async function GhidPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ cat?: string; q?: string }>;
+}) {
+  const sp = await searchParams;
+  const activeCat: CategoryId | null = isCategoryId(sp.cat) ? sp.cat : null;
+
   const supabase = await createClient();
   const {
     data: { user },
@@ -46,11 +57,22 @@ export default async function GhidPage() {
     redirect('/admin');
   }
 
-  const [entries, version, allDocs] = await Promise.all([
-    loadChangelog({ limit: RECENT_LIMIT }),
+  const [allEntries, version, allDocs, folders] = await Promise.all([
+    loadChangelog(),
     loadPlatformVersion(),
     loadAllTeamDocs(),
+    loadTopFolders(),
   ]);
+  const totalDocs = folders.reduce((s, f) => s + f.count, 0);
+
+  // Filtrul pe categorie se aplică pe TOT changelog-ul; fără filtru, ultimele
+  // RECENT_LIMIT livrări.
+  const catCounts = new Map<CategoryId, number>();
+  for (const e of allEntries) catCounts.set(e.category, (catCounts.get(e.category) ?? 0) + 1);
+  const entries = (activeCat ? allEntries.filter((e) => e.category === activeCat) : allEntries).slice(
+    0,
+    activeCat ? 200 : RECENT_LIMIT
+  );
 
   // Grupăm pe zi — mai multe livrări în aceeași zi stau sub o singură dată.
   const byDate = new Map<string, typeof entries>();
@@ -103,13 +125,44 @@ export default async function GhidPage() {
         </Card>
       </div>
 
+      <Suspense fallback={null}>
+        <GhidSearch />
+      </Suspense>
+
       <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px]">
         {/* Noutăți */}
         <section className="space-y-6 min-w-0">
           <h2 className="text-lg font-semibold flex items-center gap-2">
             <Newspaper className="h-5 w-5" />
             Ce s-a livrat
+            {activeCat && (
+              <span className="text-sm font-normal text-muted-foreground">· {CATEGORY_LABEL[activeCat]}</span>
+            )}
           </h2>
+          {/* Categorii: filtru pe tot jurnalul, cu număr de livrări. */}
+          <div className="flex flex-wrap gap-1.5">
+            <Link
+              href="/admin/ghid/"
+              className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
+                activeCat ? 'bg-white text-neutral-700 hover:bg-neutral-100' : 'bg-slate-900 text-white border-slate-900'
+              }`}
+            >
+              Toate · {allEntries.length}
+            </Link>
+            {[...CATEGORIES.map((c) => c.id), 'altele' as CategoryId]
+              .filter((id) => (catCounts.get(id) ?? 0) > 0)
+              .map((id) => (
+                <Link
+                  key={id}
+                  href={`/admin/ghid/?cat=${id}`}
+                  className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
+                    activeCat === id ? 'bg-slate-900 text-white border-slate-900' : 'bg-white text-neutral-700 hover:bg-neutral-100'
+                  }`}
+                >
+                  {CATEGORY_LABEL[id]} · {catCounts.get(id)}
+                </Link>
+              ))}
+          </div>
           {Array.from(byDate.entries()).map(([date, list]) => (
             <div key={date} className="space-y-3">
               <h3 className="text-sm font-semibold text-neutral-700 sticky top-0 bg-gray-50 py-1">
@@ -127,6 +180,12 @@ export default async function GhidPage() {
                         <Badge variant="outline" className={`shrink-0 ${kind.className}`}>
                           {kind.label}
                         </Badge>
+                        <Link
+                          href={`/admin/ghid/?cat=${e.category}`}
+                          className="text-[11px] text-neutral-500 hover:underline self-center"
+                        >
+                          {CATEGORY_LABEL[e.category]}
+                        </Link>
                         {href && (
                           <Link href={href} className="ml-auto text-xs text-primary-700 hover:underline shrink-0">
                             Detalii →
@@ -166,7 +225,9 @@ export default async function GhidPage() {
             </div>
           ))}
           <p className="text-xs text-muted-foreground">
-            Sunt afișate ultimele {RECENT_LIMIT} livrări.{' '}
+            {activeCat
+              ? `${entries.length} livrări în categoria „${CATEGORY_LABEL[activeCat]}”.`
+              : `Sunt afișate ultimele ${RECENT_LIMIT} livrări din ${allEntries.length}. Alege o categorie ca să vezi tot istoricul ei.`}{' '}
             <Link href="/admin/ghid/changelog/" className="underline">
               Vezi tot jurnalul
             </Link>
@@ -181,25 +242,47 @@ export default async function GhidPage() {
               <Sparkles className="h-5 w-5" />
               Proceduri pentru echipă
             </h2>
-            <div className="space-y-2">
-              {CURATED_GUIDES.map((g) => (
-                <Link
-                  key={g.slug}
-                  href={`/admin/ghid/${g.slug}/`}
-                  className="block rounded-lg border bg-white p-3 hover:border-primary-400 hover:bg-primary-50/40 transition-colors"
-                >
-                  <p className="text-sm font-semibold leading-tight">{g.title}</p>
-                  <p className="text-xs text-muted-foreground mt-1 leading-snug">{g.description}</p>
-                </Link>
+            <div className="space-y-3">
+              {CATEGORIES.filter((c) => CURATED_GUIDES.some((g) => g.category === c.id)).map((c) => (
+                <div key={c.id} className="space-y-1.5">
+                  <p className="text-[11px] uppercase tracking-wide text-neutral-500 font-semibold">{c.label}</p>
+                  {CURATED_GUIDES.filter((g) => g.category === c.id).map((g) => (
+                    <Link
+                      key={g.slug}
+                      href={`/admin/ghid/${g.slug}/`}
+                      className="block rounded-lg border bg-white p-3 hover:border-primary-400 hover:bg-primary-50/40 transition-colors"
+                    >
+                      <p className="text-sm font-semibold leading-tight">{g.title}</p>
+                      <p className="text-xs text-muted-foreground mt-1 leading-snug">{g.description}</p>
+                    </Link>
+                  ))}
+                </div>
               ))}
             </div>
+          </section>
+
+          <section className="space-y-2">
+            <h2 className="text-sm font-semibold flex items-center gap-2 text-neutral-700">
+              <FolderOpen className="h-4 w-4" />
+              Toată documentația ({totalDocs} documente)
+            </h2>
+            <ul className="text-sm space-y-1">
+              {folders.map((f) => (
+                <li key={f.name} className="flex items-baseline justify-between gap-2">
+                  <Link href={`/admin/ghid/${f.slug}/`} className="text-primary-700 hover:underline">
+                    {f.label}
+                  </Link>
+                  <span className="text-xs text-neutral-400 font-mono">{f.count}</span>
+                </li>
+              ))}
+            </ul>
           </section>
 
           {otherDocs.length > 0 && (
             <section className="space-y-2">
               <h2 className="text-sm font-semibold flex items-center gap-2 text-neutral-700">
                 <Wrench className="h-4 w-4" />
-                Toată documentația de admin
+                Alte documente de admin
               </h2>
               <ul className="text-sm space-y-1">
                 {otherDocs.map((d) => (
