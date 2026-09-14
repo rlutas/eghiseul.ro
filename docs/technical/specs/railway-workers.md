@@ -25,7 +25,7 @@ Avem **2 workeri persistenți pe Railway**, în **repo-uri separate** (NU în ac
 | **Repo** | `github.com/rlutas/worker-onrc` (privat) | `~/Projects/worker-ancpi` |
 | **Auth** | REST API ONRC (cont + credit) | login OpenAM (Struts), seed `storageState.json` |
 | **Coadă în eghiseul.ro** | `onrc_jobs` (migrare 056) | `ancpi_jobs` |
-| **API** | `/api/onrc/{pending,result}` (throttle 3 min) | `/api/ancpi/{pending,result}` |
+| **API** | `/api/onrc/{pending,result}` (retrieve la 1 min în primele 15 min, apoi 3 min) | `/api/ancpi/{pending,result}` |
 | **🚀 DEPLOY** | **`git push`** (NU „Redeploy" Railway) | **`railway up`** din `~/Projects/worker-ancpi` (CLI) |
 | **Status** | ✅ Live (firmă) | ✅ Live A→Z (2026-06-16) |
 
