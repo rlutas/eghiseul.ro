@@ -4,9 +4,8 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { ArrowLeft, Loader2, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Separator } from '@/components/ui/separator';
 import {
   PaymentMethodSelector,
   PaymentMethod,
@@ -18,8 +17,7 @@ import {
 // (redirect-based). Keeping the component file for now in case we ever revisit
 // the embedded UX for a different flow.
 import { OrderSidebar } from '@/components/orders/order-sidebar';
-import { SystemStatus } from '@/components/services/system-status';
-import { instantPlatformProvider, platformStatusProvider } from '@/lib/services/platform-services';
+import { whatsappUrl } from '@/config/contact';
 import { estimateFromSelectedOptions } from '@/lib/delivery-calculator';
 import { cn } from '@/lib/utils';
 import { OrderFlowDisclosure } from '@/components/legal/order-flow-disclosure';
@@ -347,11 +345,16 @@ export default function CheckoutPage() {
             Finalizare Comandă
           </h1>
         </div>
+        {/* Pagina de plată redusă la esențial (Raul, 14.09.2026, capturi de pe
+            telefon): 1) metoda de plată + cuponul, 2) rezumatul comenzii.
+            Atât. Au dispărut: caseta de stare a portalului ANCPI/ONRC (clientul
+            a decis deja — pe wizard rămâne), cardul „Detalii Card" (text
+            despre Stripe + un al doilea buton, când bara lipită de jos are
+            deja „Plătește cu cardul") și butonul plutitor WhatsApp (stătea
+            peste bară). Pe desktop nu există bară lipită, deci butonul de
+            plată apare inline, sub metoda de plată. */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
-          {/* Payment Section — on mobile it comes AFTER the summary + coupon
-              (order-2) so the customer sees what they pay + can apply a coupon
-              before choosing how to pay. Desktop keeps it in the left columns. */}
-          <div className="lg:col-span-2 space-y-6 order-2 lg:order-1">
+          <div className="lg:col-span-2 space-y-4 order-1">
             {/* Error Alert */}
             {error && (
               <Alert variant="destructive">
@@ -360,87 +363,26 @@ export default function CheckoutPage() {
               </Alert>
             )}
 
-            {/* Payment Method Selection */}
-            <Card>
-              <CardContent className="p-6">
+            {/* Payment method + (desktop) pay button in the SAME card */}
+            <Card id="payment-form-anchor" className="scroll-mt-4">
+              <CardContent className="p-4 sm:p-6 space-y-4">
                 <PaymentMethodSelector
                   selected={paymentMethod}
                   onChange={(method) => {
                     setPaymentMethod(method);
                     setError(null);
-                    // Guide the customer to the matching details section after
-                    // they pick a method (smooth scroll once it re-renders).
-                    setTimeout(() => {
-                      document
-                        .querySelector<HTMLElement>('#payment-form-anchor')
-                        ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    }, 80);
                   }}
                 />
-              </CardContent>
-            </Card>
 
-            {/* Coupon — right under the payment method so the customer applies
-                any discount before paying. */}
-            <CouponInput
-              orderId={order.id}
-              appliedCode={order.coupon_code}
-              appliedDiscount={order.discount_amount}
-              onChange={handleCouponChange}
-            />
-
-            {/* Payment Form based on selected method */}
-            <Card id="payment-form-anchor" className="scroll-mt-4">
-              <CardHeader>
-                <CardTitle className="text-lg">
-                  {paymentMethod === 'card'
-                    ? 'Detalii Card'
-                    : 'Transfer Bancar'}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
                 {paymentMethod === 'card' ? (
                   // Hosted Stripe Checkout — on click, we create a session
-                  // server-side and redirect the customer to
-                  // checkout.stripe.com. Cleaner UX than the embedded
-                  // iframe which felt cramped. Customer returns via
-                  // successUrl after paying.
-                  <div className="space-y-4">
-                    <div className="rounded-lg border border-blue-200 bg-blue-50/50 p-4">
-                      <div className="flex gap-3">
-                        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-100 flex-shrink-0">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            className="h-4 w-4 text-blue-700"
-                          >
-                            <rect x="3" y="6" width="18" height="13" rx="2" />
-                            <path d="M3 10h18" />
-                            <path d="M7 15h2" />
-                          </svg>
-                        </div>
-                        <div className="text-sm text-blue-900">
-                          <p className="font-medium leading-tight">
-                            Plată securizată prin Stripe
-                          </p>
-                          <p className="text-xs text-blue-800 mt-1 leading-snug">
-                            Vei fi redirecționat către pagina de plată Stripe.
-                            Acceptăm Visa, Mastercard, Apple Pay, Google Pay
-                            și Link. Datele cardului nu sunt salvate de noi.
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-
+                  // server-side and redirect the customer to checkout.stripe.com.
+                  // On mobile the sticky bar owns the button; here it's desktop-only.
+                  <div className="space-y-2">
                     <Button
                       onClick={handleCardCheckout}
                       disabled={isRedirecting}
-                      className="w-full h-12 bg-primary-500 hover:bg-primary-600 text-secondary-900 text-base font-semibold"
+                      className="hidden lg:flex w-full h-12 bg-primary-500 hover:bg-primary-600 text-secondary-900 text-base font-semibold"
                     >
                       {isRedirecting ? (
                         <>
@@ -453,24 +395,23 @@ export default function CheckoutPage() {
                         </>
                       )}
                     </Button>
-
                     <p className="text-xs text-neutral-500 text-center leading-snug">
                       Apăsând „Plătește” accepți{' '}
                       <a href="/termeni-si-conditii/" className="underline hover:text-neutral-700">
                         termenii și condițiile
                       </a>
-                      . Plata se procesează prin Stripe (SSL 256-bit).
+                      . Plata se face pe pagina securizată Stripe; nu vedem și nu
+                      păstrăm datele cardului.
                     </p>
                   </div>
                 ) : (
-                  // Bank Transfer Form
-                  <div className="space-y-6">
+                  // Bank Transfer — details + confirm button (there's no
+                  // sticky action for this method; the bar just scrolls here).
+                  <div className="space-y-4">
                     <BankTransferDetails
                       orderNumber={orderNumber}
                       amount={order.total_price}
                     />
-
-                    <Separator />
 
                     <div className="rounded-lg border border-amber-200 bg-amber-50/60 p-4 text-sm text-amber-900">
                       <p className="font-medium leading-tight">
@@ -516,23 +457,19 @@ export default function CheckoutPage() {
                 )}
               </CardContent>
             </Card>
+
+            {/* Coupon — under the payment method, before the summary. */}
+            <CouponInput
+              orderId={order.id}
+              appliedCode={order.coupon_code}
+              appliedDiscount={order.discount_amount}
+              onChange={handleCouponChange}
+            />
           </div>
 
-          {/* Order Summary Sidebar — uses the same <OrderSidebar> as the
-              wizard. On mobile it's FIRST (order-1) with the coupon, so the
-              customer reviews + discounts before paying. Desktop = sticky right. */}
-          <div className="space-y-4 order-1 lg:order-2 lg:sticky lg:top-4 lg:self-start">
-            {/* Starea portalului, chiar înainte de plată. Coloana asta e prima
-                pe mobil, deci badge-ul se vede pe telefon fără să derulezi.
-                Lipsea complet aici — clientul îl vedea în wizard (doar pe
-                desktop) și îl pierdea exact în ecranul unde dă banii. */}
-            {platformStatusProvider(order.service_slug) && (
-              <SystemStatus
-                service={platformStatusProvider(order.service_slug)!}
-                autoIssued={!!instantPlatformProvider(order.service_slug)}
-                termDays={order.service_estimated_days || 2}
-              />
-            )}
+          {/* Order Summary — same <OrderSidebar> as the wizard. Mobile: after
+              payment + coupon. Desktop: sticky right column. */}
+          <div className="space-y-4 order-2 lg:sticky lg:top-4 lg:self-start">
             {(() => {
               // Compute delivery estimate from raw options (need `code` +
               // `bundledFor` which the UI-shaped list doesn't carry).
@@ -587,6 +524,20 @@ export default function CheckoutPage() {
                 />
               );
             })()}
+
+            {/* Inline help — replaces the floating WhatsApp button, which sat
+                on top of the sticky pay bar on phones. */}
+            <p className="text-xs text-neutral-500 text-center leading-snug">
+              Ai nevoie de ajutor?{' '}
+              <a
+                href={whatsappUrl(`Bună! Am nevoie de ajutor cu plata comenzii ${orderNumber} (eghiseul.ro).`)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-semibold text-[#128C7E] underline"
+              >
+                Scrie-ne pe WhatsApp
+              </a>
+            </p>
           </div>
         </div>
       </div>

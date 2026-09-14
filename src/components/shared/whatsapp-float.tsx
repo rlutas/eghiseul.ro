@@ -6,17 +6,18 @@ const WHATSAPP =
   'https://wa.me/40757708181?text=' +
   encodeURIComponent('Bună ziua! Aș dori informații despre serviciile eGhișeul.ro.');
 
-/** Routes under /comanda/ that are NOT the order wizard (they keep the float). */
-const NON_WIZARD_ORDER_ROUTES = ['/comanda/checkout', '/comanda/status', '/comanda/success'];
+/** Routes under /comanda/ that keep the float (status has its own help card
+ *  but no sticky bar; success has nothing to cover). The wizard
+ *  (/comanda/<serviciu>) and the checkout hide it. */
+const NON_WIZARD_ORDER_ROUTES = ['/comanda/status', '/comanda/success'];
 
 /** Fixed WhatsApp button, bottom-right, site-wide — hidden on the admin and
  *  collaborator portals (internal tools; it overlapped admin action buttons)
- *  and on the order WIZARD (/comanda/<serviciu>): even lifted above the
- *  summary bar it landed on „Plătește" on phones (team screenshots,
- *  14.09.2026). The wizard has its own inline „Ai nevoie de ajutor? → WhatsApp"
- *  box under the form instead. On checkout/status/success mobile has fixed
- *  bottom bars — lift the button above them; those bars disappear on lg,
- *  where bottom-5 returns. */
+ *  and on the order WIZARD + CHECKOUT: even lifted above the summary bar it
+ *  landed on „Plătește" on phones (team screenshots, 14.09.2026). Both
+ *  screens have an inline „Ai nevoie de ajutor? → WhatsApp" link instead.
+ *  On status/success mobile may have fixed bottom bars — lift the button
+ *  above them; those bars disappear on lg, where bottom-5 returns. */
 export function WhatsAppFloat() {
   const pathname = usePathname();
   if (pathname.startsWith('/admin') || pathname.startsWith('/colaborator')) {

@@ -56,6 +56,27 @@ ajuns în același loc mort. Bug-ul afectează **orice** client care folosește
   pașii, nu doar după ce există cod. Pe checkout/status/success butonul
   plutitor rămâne.
 
+## Runda 2 (aceeași zi): pagina de plată redusă la esențial + fără „Motiv solicitare"
+
+Capturi Raul de pe `/comanda/checkout/<id>` (Identificare imobil, 198 lei):
+caseta ANCPI „Funcționare cu întârzieri" ocupa tot primul ecran, „Detalii
+Card" repeta un buton de plată pe care bara lipită îl are deja, iar butonul
+plutitor WhatsApp stătea peste bară. Pagina e comună tuturor serviciilor, deci
+schimbarea e pentru toate:
+
+1. **Metoda de plată + cuponul, primele.** Butonul „Plătește cu cardul" inline
+   apare DOAR pe desktop (`hidden lg:flex`), unde nu există bară lipită. Pe
+   telefon plătești din bară. Transferul bancar își păstrează detaliile și
+   butonul de confirmare (bara doar derulează acolo).
+2. **Rezumat comandă** imediat sub.
+3. Scoase: caseta de stare a portalului (rămâne pe pașii 1–2 din wizard și în
+   sidebarul de desktop), cardul „Detalii Card" cu textul despre Stripe,
+   butonul plutitor WhatsApp (înlocuit cu un rând „Ai nevoie de ajutor? →
+   WhatsApp" sub rezumat, cu codul comenzii în mesaj).
+4. **„Motiv solicitare" scos de pe toate serviciile de cadastru** (era deja
+   ascuns pe Extras CF). Câmpul `property.motiv` rămâne în tip pentru
+   comenzile vechi; nimic nu-l consumă în afară de afișarea din status.
+
 ## Pentru echipă (clientul din B8SM9)
 
 Clientul nu are nicio comandă de identificare pe server — datele tastate

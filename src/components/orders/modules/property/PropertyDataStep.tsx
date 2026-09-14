@@ -751,27 +751,10 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
       </Card>
       )}
 
-      {/* Purpose/Reason (optional). Hidden on Extras CF — ANCPI never asks for
-          a motive on the automated extras flow (the worker sends only
-          CF/cadastral + județ/UAT), so the field was pure noise there. */}
-      {state.serviceSlug !== 'extras-carte-funciara' && (
-      <Card className="py-4 gap-4 sm:py-6 sm:gap-6">
-        <CardHeader className="px-4 sm:px-6">
-          <CardTitle>Motiv Solicitare</CardTitle>
-          <CardDescription>
-            Pentru ce aveți nevoie de acest document? (opțional)
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="px-4 sm:px-6">
-          <Textarea
-            value={property.motiv || ''}
-            onChange={(e) => updateProperty?.({ motiv: e.target.value })}
-            placeholder="Ex: Tranzacție imobiliară, Obținere credit ipotecar, Verificare sarcini, etc."
-            rows={2}
-          />
-        </CardContent>
-      </Card>
-      )}
+      {/* „Motiv solicitare" a fost scos de pe TOATE serviciile de cadastru
+          (Raul, 14.09.2026): nimeni nu-l citea, OCPI nu-l cere, și era încă
+          o casetă între client și „Continuă". `property.motiv` rămâne în tip
+          pentru comenzile vechi care l-au completat. */}
 
       {/* Date pentru convenția cu topograful (angajamentul de execuție).
           Apar DOAR pe serviciile fulfilate de colaboratorul topograf, unde
