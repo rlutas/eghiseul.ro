@@ -24,7 +24,16 @@ import { autoGenerateOrderDocuments } from '@/lib/documents/auto-generate';
 import { isNoLawyerService } from '@/lib/documents/no-lawyer-services';
 
 export async function ensureBarouDocumentsForPaidOrder(
-  orderId: string
+  orderId: string,
+  opts: {
+    /**
+     * Transfer bancar cu dovadă verificată de operator (14.09.2026): lucrul
+     * pornește înainte de încasare, deci numerele se alocă pe
+     * `proof_verified_at`, nu pe `payment_status='paid'`. Dacă banii nu vin,
+     * numerele se ELIBEREAZĂ în registrul central (release, nu void).
+     */
+    allowVerifiedProof?: boolean;
+  } = {}
 ): Promise<{ ok: boolean; skipped?: string }> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const adminClient = createAdminClient() as any;
@@ -32,7 +41,7 @@ export async function ensureBarouDocumentsForPaidOrder(
   try {
     const { data: order, error } = await adminClient
       .from('orders')
-      .select('id, payment_status, barou_numbers_allocated_at, services(slug)')
+      .select('id, payment_status, proof_verified_at, barou_numbers_allocated_at, services(slug)')
       .eq('id', orderId)
       .single();
 
@@ -44,7 +53,8 @@ export async function ensureBarouDocumentsForPaidOrder(
     if (order.barou_numbers_allocated_at) {
       return { ok: true, skipped: 'already-allocated' };
     }
-    if (order.payment_status !== 'paid') {
+    const proofVerified = !!opts.allowVerifiedProof && !!order.proof_verified_at;
+    if (order.payment_status !== 'paid' && !proofVerified) {
       return { ok: true, skipped: 'not-paid' };
     }
     const serviceSlug = order.services?.slug || '';

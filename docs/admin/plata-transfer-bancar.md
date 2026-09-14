@@ -12,6 +12,13 @@ O comandă plătită prin IBAN **nu mai apare la abandonuri**. Are tab propriu �
 comanda și apeși **„Confirmă plata"**. Fără apăsarea aia nu se emite factura și
 clientul nu primește confirmarea.
 
+**Din 14.09.2026 nu mai aștepți banii ca să începi lucrul.** Dacă ai văzut
+dovada plății (ordinul de plată încărcat în checkout, trimis pe email sau pe
+WhatsApp), apeși **„Dovadă verificată — pornește lucrul"** în același panou.
+Comanda trece pe „În procesare", se generează contractul de asistență,
+împuternicirea și cererea, și poți depune la instituție. „Confirmă plata" rămâne
+de apăsat când intră banii — atunci pleacă factura și emailul de confirmare.
+
 ---
 
 ## Ce se întâmplă la client
@@ -30,9 +37,9 @@ clientul nu primește confirmarea.
 
 | | |
 |---|---|
-| Statusul comenzii | `awaiting_payment` — badge portocaliu „Așteptare plată" |
-| Starea plății | `awaiting_verification` |
-| Tab admin | **„Așteptare plată"**, cu badge de număr; comanda apare și în „Toate" |
+| Statusul comenzii | `awaiting_payment` — badge portocaliu „Așteptare plată" (sau `processing`, dacă lucrul a pornit pe dovadă) |
+| Starea plății | `awaiting_verification` — rămâne așa până la „Confirmă plata", chiar dacă lucrul a pornit |
+| Tab admin | **„Așteptare plată"** = toate comenzile cu `payment_status='awaiting_verification'`, inclusiv cele deja în lucru; badge de număr; comanda apare și în „Toate" |
 | Dashboard | cardul „Plăți de verificat" numără exact aceste comenzi și duce în tab |
 | Cron auto-abandon | **nu o atinge** |
 | Email către echipă | heads-up pe `contact@eghiseul.ro` la fiecare comandă nouă cu IBAN |
@@ -58,6 +65,43 @@ Din acel moment pornește **exact același lanț ca la plata cu cardul**:
 
 Dacă banii nu vin deloc, în același panou există **„Banii nu au venit —
 abandonează"**, care mută comanda la abandonuri.
+
+## Lucrul pornește pe dovadă, nu pe bani (14.09.2026)
+
+Transferul ajunge în cont a doua zi lucrătoare, uneori la două zile. Comanda
+`E-260912-5SNRM` (certificat de căsătorie, 1.248 lei) a stat blocată din 12.09
+deși clientul trimisese ordinul de plată: fluxul de procesare pornea doar din
+„Plătită", iar documentele Barou se generau exclusiv după plată.
+
+Panoul portocaliu are acum un al doilea buton, **„Dovadă verificată — pornește
+lucrul"**, vizibil doar pe comenzile de pe „Așteptare plată":
+
+1. Deschide dovada (linkul „deschide dovada" din panou, dacă a fost încărcată
+   în checkout; altfel emailul sau WhatsApp-ul clientului).
+2. Apasă butonul și confirmă. Comanda trece pe **„În procesare"**, se alocă
+   numerele de Barou și se generează contractul de asistență, împuternicirea
+   și cererea — exact ca după plată.
+3. Lucrezi normal: depui, ridici, treci prin statusuri.
+4. Când banii apar în extras, apeși **„Confirmă plata"** ca de obicei. Abia
+   atunci se emite factura Oblio și pleacă emailul de confirmare către client.
+   Statusul de lucru nu se pierde.
+
+Ce **nu** se întâmplă la „pornește lucrul": factura, emailul de confirmare a
+plății, joburile automate ONRC/ANCPI (acelea costă bani reali la instituție și
+pornesc doar la confirmarea încasării). Pe comanda pornită pe dovadă bannerul e
+**galben** („În lucru pe dovada de transfer — încasarea NU e confirmată încă"),
+ca să se deosebească de roșul unei comenzi avansate din greșeală fără plată.
+
+Comanda **rămâne în tabul „Așteptare plată"** până la „Confirmă plata" — tabul
+filtrează după starea plății, nu după statusul de lucru — deci coada de
+confirmat nu pierde nimic. Apare în paralel și în „În procesare".
+
+Dacă banii nu mai vin deloc după ce lucrul a pornit, numerele de Barou consumate
+se **eliberează** din registrul central (nu se anulează), ca la orice comandă
+neîncasată — vezi `docs/registru-central/`.
+
+Butonul nu cere dovadă încărcată în checkout: `E-260912-5SNRM` nu avea fișier
+atașat, ordinul de plată a venit pe alt canal. Decizia e a operatorului.
 
 ## Legătura cu decontările (Extras bancă)
 
@@ -102,9 +146,14 @@ Diferența de curs e chestiune de contabilitate, nu de facturare.
   Singura cale corectă e butonul „Confirmă plata".
 - **Comanda nu se mai trage înapoi.** Dacă ai început deja lucrul, confirmarea
   plății îi păstrează statusul de lucru și schimbă doar starea plății.
+- **Ca să începi lucrul înainte de bani folosește „Dovadă verificată — pornește
+  lucrul", nu dropdown-ul de status.** Dropdown-ul mută statusul, dar nu
+  generează documentele Barou și lasă comanda cu banner roșu.
 - **Bannerul roșu „Comandă în lucru, dar plata NU e confirmată"** apare pe orice
-  comandă avansată în flux fără plată confirmată. Când îl vezi, nu s-a emis
-  factura și clientul nu a primit confirmarea — rezolvă înainte de livrare.
+  comandă avansată în flux fără plată confirmată și fără „pornește lucrul". Când
+  îl vezi, nu s-a emis factura și clientul nu a primit confirmarea — rezolvă
+  înainte de livrare. Varianta **galbenă** înseamnă lucru pornit deliberat pe
+  dovadă: confirmă încasarea când intră banii, tot înainte de livrare.
 - Referința e obligatorie tocmai ca încasarea să poată fi găsită mai târziu în
   extras, la reconciliere.
 - Cel mai devreme moment în care banii pot apărea e a doua zi lucrătoare;

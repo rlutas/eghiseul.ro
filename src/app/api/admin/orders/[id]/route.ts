@@ -171,6 +171,19 @@ export async function GET(
       }
     }
 
+    // Dovada de transfer bancar încărcată în checkout (cheie S3) — link
+    // semnat, ca operatorul să o poată deschide înainte de „Dovadă verificată
+    // — pornește lucrul" (14.09.2026).
+    let paymentProofUrl: string | undefined;
+    const proofKey = (order as unknown as { payment_proof_url?: string | null }).payment_proof_url;
+    if (proofKey) {
+      try {
+        paymentProofUrl = await getDownloadUrl(proofKey, 3600);
+      } catch {
+        // Proof not available from S3
+      }
+    }
+
     return NextResponse.json({
       success: true,
       data: {
@@ -181,6 +194,7 @@ export async function GET(
         option_statuses: optionStatuses || [],
         reupload_request: reuploadRequest,
         ...(signatureUrl ? { signature_url: signatureUrl } : {}),
+        ...(paymentProofUrl ? { payment_proof_signed_url: paymentProofUrl } : {}),
       },
     });
   } catch (error) {

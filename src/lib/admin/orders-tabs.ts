@@ -124,12 +124,39 @@ export interface StatusFilterShape {
   in?: readonly string[];
   // Exclusion on status — when this is set, the query uses .not('status','in',...)
   notIn?: readonly string[];
+  // Equality on payment_status — combinable with `notIn` (tabul „Așteptare
+  // plată" = neîncasate, indiferent de statusul de lucru, minus cele moarte).
+  paymentStatusEq?: string;
+}
+
+// Comenzi pe care nimeni nu mai așteaptă bani: transferul „abandonat" de
+// operator (banii nu au venit), anulările și rambursările.
+export const DEAD_FOR_PAYMENT = ['draft', 'abandoned', 'cancelled', 'refunded'] as const;
+
+/**
+ * Aplică o formă de filtru pe un builder Supabase pentru `orders`. Un singur
+ * loc pentru list / export / counts, ca lista să nu se desincronizeze de badge.
+ * Builder-ul e `any` — cele trei rute au tipuri de select diferite.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function applyStatusFilter<Q = any>(query: Q, shape: StatusFilterShape): Q {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let q: any = query;
+  const list = (xs: readonly string[]) => `(${xs.map((s) => `"${s}"`).join(',')})`;
+  if (shape.eq) q = q.eq('status', shape.eq);
+  else if (shape.in) q = q.filter('status', 'in', list(shape.in));
+  else if (shape.notIn) q = q.not('status', 'in', list(shape.notIn));
+  if (shape.paymentStatusEq) q = q.eq('payment_status', shape.paymentStatusEq);
+  return q as Q;
 }
 
 export function resolveStatusFilter(tab: string | null | undefined): StatusFilterShape {
   switch (tab) {
     case 'awaiting_payment':
-      return { eq: 'awaiting_payment' };
+      // Pe PLATĂ, nu pe status (14.09.2026): o comandă pornită pe dovadă
+      // („Dovadă verificată — pornește lucrul") e deja „În procesare", dar
+      // banii încă nu sunt confirmați — rămâne aici până la „Confirmă plata".
+      return { paymentStatusEq: 'awaiting_verification', notIn: DEAD_FOR_PAYMENT };
     case 'paid':
       return { eq: 'paid' };
     case 'processing':

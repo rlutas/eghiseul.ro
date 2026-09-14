@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { requirePermission, getUserPermissions } from '@/lib/admin/permissions';
-import { parseTestFilter, resolveStatusFilter } from '@/lib/admin/orders-tabs';
+import { applyStatusFilter, parseTestFilter, resolveStatusFilter } from '@/lib/admin/orders-tabs';
 import { LAWYER_SERVICE_SLUGS } from '@/lib/documents/no-lawyer-services';
 import { applyQuickOrStage } from '@/lib/admin/order-quick-filters';
 import { getOpenOutages } from '@/lib/services/platform-services';
@@ -100,14 +100,7 @@ export async function GET(request: NextRequest) {
     // Apply status filter via the shared resolver — supports tab values
     // (paid/processing/shipped/completed/abandoned) plus the all + debug
     // statuses (draft/pending/etc).
-    const statusShape = resolveStatusFilter(status);
-    if (statusShape.eq) {
-      query = query.eq('status', statusShape.eq);
-    } else if (statusShape.in) {
-      query = query.filter('status', 'in', `(${statusShape.in.map((s) => `"${s}"`).join(',')})`);
-    } else if (statusShape.notIn) {
-      query = query.not('status', 'in', `(${statusShape.notIn.map((s) => `"${s}"`).join(',')})`);
-    }
+    query = applyStatusFilter(query, resolveStatusFilter(status));
 
     // Sandbox/test filter — three-state chip group: hide | only | all.
     if (testFilter === 'only') {

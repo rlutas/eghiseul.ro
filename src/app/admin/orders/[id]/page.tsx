@@ -85,6 +85,7 @@ import {
 } from 'lucide-react';
 import { formatPersonName, cleanNamePart } from '@/lib/format/person-name';
 import { hasDeliveryAddressData, isEmailOnlyDelivery } from '@/lib/delivery/address';
+import { assessStartWorkOnProof } from '@/lib/orders/start-work-on-proof';
 import { SupplierCostsDialog } from '@/components/admin/supplier-costs-dialog';
 import {
   SUPPLIER_CATEGORIES,
@@ -142,6 +143,11 @@ interface OrderDetail {
   is_test?: boolean | null;
   estimated_completion_date?: string | null;
   paid_at: string | null;
+  /** Transfer bancar: cheia S3 a dovezii încărcate în checkout (poate lipsi). */
+  payment_proof_url?: string | null;
+  /** Transfer bancar: lucrul a pornit pe dovadă, înainte de încasare (14.09.2026). */
+  proof_verified_at?: string | null;
+  proof_verified_by?: string | null;
   invoice_number: string | null;
   invoice_url: string | null;
   invoice_issued_at: string | null;
@@ -651,6 +657,8 @@ export default function AdminOrderDetailPage() {
   const [orderDocuments, setOrderDocuments] = useState<OrderDocument[]>([]);
   const [optionStatuses, setOptionStatuses] = useState<OrderOptionStatus[]>([]);
   const [reuploadRequest, setReuploadRequest] = useState<ReuploadRequestInfo | null>(null);
+  // Link semnat (1h) către dovada de transfer bancar din S3, dacă există.
+  const [paymentProofUrl, setPaymentProofUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -731,6 +739,7 @@ export default function AdminOrderDetailPage() {
       setOrderDocuments((json.data.documents || []) as OrderDocument[]);
       setOptionStatuses((json.data.option_statuses || []) as OrderOptionStatus[]);
       setReuploadRequest((json.data.reupload_request || null) as ReuploadRequestInfo | null);
+      setPaymentProofUrl((json.data.payment_proof_signed_url as string | undefined) || null);
     } catch (err) {
       console.error('Error fetching order:', err);
       setError('A aparut o eroare la incarcarea comenzii.');
@@ -1233,8 +1242,9 @@ export default function AdminOrderDetailPage() {
       <PhoneOrderActions order={order} onChanged={refreshSilent} />
 
       {/* Transfer bancar ales de client din checkout: echipa compară extrasul
-          și confirmă încasarea aici (10.09.2026). */}
-      <BankTransferActions order={order} onChanged={refreshSilent} />
+          și confirmă încasarea aici (10.09.2026). Din 14.09.2026 poate și
+          porni lucrul pe dovada de plată, înainte să intre banii. */}
+      <BankTransferActions order={order} proofUrl={paymentProofUrl} onChanged={refreshSilent} />
 
       {/* Comandă lucrată fără plată confirmată = fără factură. E-260905-DMUZA a
           ajuns „În procesare" cu payment_status necurățat, deci nu s-a emis
@@ -2999,6 +3009,25 @@ function UnpaidWorkWarning({ order }: { order: OrderDetail }) {
   if (order.payment_status === 'paid') return null;
   if (!WORK_STATUSES.includes(order.status || '')) return null;
 
+  // Lucru pornit DELIBERAT pe dovada de transfer (14.09.2026): nu e greșeală,
+  // e decizia operatorului — galben, nu roșu. Factura și confirmarea pleacă
+  // tot la „Confirmă plata" (panoul de mai sus), când banii apar în extras.
+  if (order.proof_verified_at) {
+    return (
+      <div className="rounded-lg border-2 border-amber-400 bg-amber-50 p-4">
+        <p className="text-sm font-semibold text-amber-900">
+          🏦 În lucru pe dovada de transfer — încasarea NU e confirmată încă
+        </p>
+        <p className="mt-1 text-xs text-amber-800">
+          Lucrul a pornit pe {new Date(order.proof_verified_at).toLocaleString('ro-RO')}, pe baza
+          dovezii de plată verificate de operator. Când banii apar în extras, apasă &bdquo;Confirmă
+          plata&rdquo; în panoul de mai sus — atunci se emite factura Oblio și pleacă emailul de
+          confirmare către client. Nu livra documentul înainte.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="rounded-lg border-2 border-red-400 bg-red-50 p-4">
       <p className="text-sm font-semibold text-red-900">
@@ -3015,7 +3044,16 @@ function UnpaidWorkWarning({ order }: { order: OrderDetail }) {
   );
 }
 
-function BankTransferActions({ order, onChanged }: { order: OrderDetail; onChanged: () => void }) {
+function BankTransferActions({
+  order,
+  proofUrl,
+  onChanged,
+}: {
+  order: OrderDetail;
+  /** Link semnat către dovada încărcată de client în checkout, dacă există. */
+  proofUrl: string | null;
+  onChanged: () => void;
+}) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const o = order as any;
   // `?ref=` vine din „Extras bancă": linia de încasare potrivită cu comanda
@@ -3025,12 +3063,57 @@ function BankTransferActions({ order, onChanged }: { order: OrderDetail; onChang
   const [markRef, setMarkRef] = useState(searchParams.get('ref') ?? '');
   const [marking, setMarking] = useState(false);
   const [rejecting, setRejecting] = useState(false);
+  const [starting, setStarting] = useState(false);
 
   const unpaid = order.payment_status !== 'paid';
   const isBankTransfer =
     o.payment_method === 'bank_transfer' || order.status === 'awaiting_payment';
   // Comenzile telefonice au deja panoul lor de plată — nu-l dublăm.
   if (!isBankTransfer || !unpaid || o.channel === 'phone') return null;
+
+  // „Dovadă verificată — pornește lucrul" (14.09.2026, E-260912-5SNRM): banii
+  // prin bancă vin la 1-2 zile după ordinul de plată; până atunci comanda stătea
+  // blocată. Aceeași gardă ca pe server — vezi start-work-on-proof.ts.
+  const canStartWork = assessStartWorkOnProof({
+    status: order.status,
+    payment_status: order.payment_status,
+    payment_method: o.payment_method,
+    proof_verified_at: order.proof_verified_at,
+  }).ok;
+  const workStarted = !!order.proof_verified_at;
+
+  const startWork = async () => {
+    const ok = window.confirm(
+      'Ai verificat dovada de plată (ordinul de plată / confirmarea din aplicația băncii)?\n\n' +
+        'Comanda trece pe „În procesare" și se generează documentele (contract asistență, ' +
+        'împuternicire, cerere). Factura și emailul de confirmare pleacă ABIA la „Confirmă plata", ' +
+        'când banii apar în extras.'
+    );
+    if (!ok) return;
+    setStarting(true);
+    try {
+      const res = await fetch(`/api/admin/orders/${order.id}/start-work`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({}),
+      });
+      const json = await res.json();
+      if (json.success) {
+        toast.success(
+          json.data?.barou === 'failed'
+            ? 'Lucrul a pornit — documentele Barou NU s-au generat, vezi istoricul comenzii'
+            : 'Lucrul a pornit — comanda e „În procesare", documentele se generează'
+        );
+        onChanged();
+      } else {
+        toast.error(json.error || 'Eroare');
+      }
+    } catch {
+      toast.error('Eroare de rețea');
+    } finally {
+      setStarting(false);
+    }
+  };
 
   const confirmPayment = async () => {
     if (!markRef.trim()) {
@@ -3095,9 +3178,54 @@ function BankTransferActions({ order, onChanged }: { order: OrderDetail; onChang
           <span className="font-mono font-semibold">
             {order.friendly_order_id || order.order_number}
           </span>
-          . {o.payment_proof_url ? 'Clientul a atașat o dovadă de plată.' : 'Fără dovadă atașată de client.'}
+          .{' '}
+          {proofUrl ? (
+            <>
+              Clientul a atașat o dovadă de plată:{' '}
+              <a
+                href={proofUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-semibold underline underline-offset-2"
+              >
+                deschide dovada
+              </a>
+              .
+            </>
+          ) : o.payment_proof_url ? (
+            'Clientul a atașat o dovadă de plată (fișierul nu s-a putut încărca din S3).'
+          ) : (
+            'Fără dovadă atașată în checkout — poate a venit pe email sau WhatsApp.'
+          )}
         </p>
       </div>
+
+      {canStartWork && (
+        <div className="rounded-lg border border-amber-200 bg-white p-3 space-y-2">
+          <p className="text-sm font-semibold text-neutral-900">
+            Ai dovada plății? Nu aștepta banii — pornește lucrul.
+          </p>
+          <p className="text-xs text-neutral-600">
+            Transferul ajunge în cont la 1-2 zile lucrătoare după ordinul de plată. Dacă ai văzut
+            dovada (upload, email, WhatsApp), comanda poate intra în procesare acum: se generează
+            contractul de asistență, împuternicirea și cererea, iar echipa poate depune la
+            instituție. Factura și emailul de confirmare pleacă la &bdquo;Confirmă plata&rdquo;, când banii
+            apar în extras.
+          </p>
+          <Button size="sm" variant="secondary" onClick={startWork} disabled={starting}>
+            {starting ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : null}
+            Dovadă verificată — pornește lucrul
+          </Button>
+        </div>
+      )}
+
+      {workStarted && (
+        <p className="text-xs text-amber-900">
+          ✅ Lucrul a pornit pe dovadă la{' '}
+          {new Date(order.proof_verified_at as string).toLocaleString('ro-RO')}. Mai jos confirmi
+          încasarea când banii apar în extras.
+        </p>
+      )}
 
       <div className="rounded-lg border border-amber-200 bg-white p-3 space-y-2">
         <Input

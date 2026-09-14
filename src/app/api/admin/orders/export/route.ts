@@ -28,7 +28,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { requirePermission } from '@/lib/admin/permissions';
-import { parseTestFilter, resolveStatusFilter } from '@/lib/admin/orders-tabs';
+import { applyStatusFilter, parseTestFilter, resolveStatusFilter } from '@/lib/admin/orders-tabs';
 import { formatPersonName } from '@/lib/format/person-name';
 
 const MAX_EXPORT_ROWS = 10_000;
@@ -116,14 +116,7 @@ export async function GET(request: NextRequest) {
         `order_number.ilike.%${search}%,friendly_order_id.ilike.%${search}%,delivery_tracking_number.ilike.%${search}%,customer_data->contact->>email.ilike.%${search}%`
       );
     }
-    const statusFilter = resolveStatusFilter(statusParam);
-    if (statusFilter.eq) {
-      query = query.eq('status', statusFilter.eq);
-    } else if (statusFilter.in) {
-      query = query.in('status', statusFilter.in as string[]);
-    } else if (statusFilter.notIn) {
-      query = query.not('status', 'in', `(${statusFilter.notIn.join(',')})`);
-    }
+    query = applyStatusFilter(query, resolveStatusFilter(statusParam));
     if (testFilter === 'only') {
       query = query.eq('is_test', true);
     } else if (testFilter === 'hide') {

@@ -68,12 +68,22 @@ describe('resolveStatusFilter', () => {
     expect(resolveStatusFilter('abandoned').eq).toBeUndefined();
   });
 
-  // Transferul bancar: comanda așteaptă banii, NU e un coș abandonat. Tabul ei
-  // filtrează exact pe status, iar `awaiting_payment` trebuie să rămână VIZIBIL
-  // în „Toate" — altfel ar dispărea din operațional exact ca înainte de fix
-  // (10.09.2026, E-260905-DMUZA).
-  it('awaiting_payment → eq pe status', () => {
-    expect(resolveStatusFilter('awaiting_payment').eq).toBe('awaiting_payment');
+  // Transferul bancar: comanda așteaptă banii, NU e un coș abandonat.
+  // `awaiting_payment` trebuie să rămână VIZIBIL în „Toate" — altfel ar
+  // dispărea din operațional exact ca înainte de fix (10.09.2026,
+  // E-260905-DMUZA).
+  //
+  // Din 14.09.2026 tabul filtrează pe PLATĂ, nu pe status: o comandă pornită
+  // pe dovadă („Dovadă verificată — pornește lucrul", E-260912-5SNRM) e „În
+  // procesare" dar încă neîncasată, deci trebuie să rămână în coada de
+  // confirmare până apasă cineva „Confirmă plata".
+  it('awaiting_payment → payment_status awaiting_verification, fără comenzile moarte', () => {
+    const f = resolveStatusFilter('awaiting_payment');
+    expect(f.paymentStatusEq).toBe('awaiting_verification');
+    expect(f.eq).toBeUndefined();
+    expect(f.in).toBeUndefined();
+    // Un transfer „abandonat" de operator (banii nu au venit) nu mai e de confirmat.
+    expect(f.notIn).toEqual(expect.arrayContaining(['abandoned', 'cancelled', 'refunded']));
   });
 
   it('awaiting_payment NU e ascuns din tabul „Toate"', () => {

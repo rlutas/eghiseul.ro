@@ -6,7 +6,9 @@ import {
   HIDDEN_FROM_DEFAULT,
   PROCESSING_GROUP,
   SHIPPED_GROUP,
+  applyStatusFilter,
   parseTestFilter,
+  resolveStatusFilter,
   type OrdersCounts,
 } from '@/lib/admin/orders-tabs';
 import { applyQuickOrStage } from '@/lib/admin/order-quick-filters';
@@ -84,8 +86,9 @@ export async function GET(request: NextRequest) {
     ] =
       await Promise.all([
         buildQuery().not('status', 'in', hiddenList),
-        // „Așteptare plată" — transfer bancar ales, încasare neconfirmată.
-        buildQuery().eq('status', 'awaiting_payment'),
+        // „Așteptare plată" — transfer bancar ales, încasare neconfirmată
+        // (inclusiv comenzile pornite pe dovadă, deja „În procesare").
+        applyStatusFilter(buildQuery(), resolveStatusFilter('awaiting_payment')),
         buildQuery().eq('status', 'paid'),
         buildQuery().filter('status', 'in', processingList),
         buildQuery().filter('status', 'in', shippedList),
