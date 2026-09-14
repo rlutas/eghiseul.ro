@@ -82,6 +82,9 @@ export default function RecuperareTelefonicaPage() {
   const [conversion, setConversion] = useState<{ contactedTotal: number; contactedConverted: number } | null>(null);
   const [contactTarget, setContactTarget] = useState<PriorityRow | null>(null);
   const [notes, setNotes] = useState('');
+  const [discountPercent, setDiscountPercent] = useState('');
+  const [existingCoupon, setExistingCoupon] = useState('');
+  const [sendFollowup, setSendFollowup] = useState(true);
   const [saving, setSaving] = useState(false);
 
   const fetchRows = useCallback(async () => {
@@ -108,20 +111,46 @@ export default function RecuperareTelefonicaPage() {
     fetchRows();
   }, [fetchRows]);
 
+  const closeDialog = () => {
+    setContactTarget(null);
+    setNotes('');
+    setDiscountPercent('');
+    setExistingCoupon('');
+    setSendFollowup(true);
+  };
+
   const submitContact = async () => {
     if (!contactTarget) return;
+    const pct = discountPercent.trim() ? Number(discountPercent) : null;
+    if (pct !== null && (!Number.isInteger(pct) || pct < 1 || pct > 50)) {
+      toast.error('Reducerea trebuie să fie un număr întreg între 1 și 50');
+      return;
+    }
     setSaving(true);
     try {
       const res = await fetch(`/api/admin/orders/${contactTarget.id}/phone-contact`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ notes }),
+        body: JSON.stringify({
+          notes,
+          ...(pct ? { discountPercent: pct } : {}),
+          ...(existingCoupon.trim() ? { couponCode: existingCoupon.trim() } : {}),
+          sendEmail: sendFollowup,
+        }),
       });
       const json = await res.json();
       if (json.success) {
-        toast.success('Marcat ca sunat');
-        setContactTarget(null);
-        setNotes('');
+        const d = json.data;
+        if (d.coupon) {
+          toast.success(
+            `Marcat ca sunat · cupon ${d.coupon.code} (${d.coupon.discountLabel})${d.emailStatus === 'sent' ? ' · email trimis clientului' : ''}`,
+            { duration: 8000 }
+          );
+          if (d.warning) toast.warning(d.warning, { duration: 10000 });
+        } else {
+          toast.success('Marcat ca sunat');
+        }
+        closeDialog();
         fetchRows();
       } else {
         toast.error(json.error?.message || 'Eroare la salvare');
@@ -285,7 +314,7 @@ export default function RecuperareTelefonicaPage() {
         </table>
       </div>
 
-      <Dialog open={!!contactTarget} onOpenChange={(o) => !o && setContactTarget(null)}>
+      <Dialog open={!!contactTarget} onOpenChange={(o) => !o && closeDialog()}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Bifează contactat telefonic</DialogTitle>
@@ -304,8 +333,46 @@ export default function RecuperareTelefonicaPage() {
             placeholder="Ce a spus clientul, ce ai stabilit (ex: a promis plată mâine, a cerut cupon 15%, nu a răspuns)..."
             rows={4}
           />
+          <div className="rounded-lg border bg-slate-50 p-3 space-y-2">
+            <div className="text-xs font-medium text-slate-700">Ai oferit o reducere la telefon?</div>
+            <div className="flex flex-wrap items-center gap-2">
+              <label className="flex items-center gap-1 text-sm">
+                <input
+                  type="number"
+                  min={1}
+                  max={50}
+                  value={discountPercent}
+                  onChange={(e) => {
+                    setDiscountPercent(e.target.value);
+                    if (e.target.value) setExistingCoupon('');
+                  }}
+                  placeholder="10"
+                  className="h-8 w-16 rounded-md border bg-white px-2 text-sm"
+                />
+                <span className="text-slate-600">% reducere (cupon nou, 7 zile)</span>
+              </label>
+              <span className="text-xs text-muted-foreground">sau</span>
+              <input
+                type="text"
+                value={existingCoupon}
+                onChange={(e) => {
+                  setExistingCoupon(e.target.value.toUpperCase());
+                  if (e.target.value) setDiscountPercent('');
+                }}
+                placeholder="cod existent, ex. TEL-ABC123"
+                className="h-8 w-44 rounded-md border bg-white px-2 font-mono text-xs"
+              />
+            </div>
+            <label className="flex items-center gap-2 text-sm text-slate-700">
+              <input type="checkbox" checked={sendFollowup} onChange={(e) => setSendFollowup(e.target.checked)} className="h-4 w-4" />
+              Trimite clientului emailul de follow-up („ai vorbit cu …, ai X% reducere, reia comanda din link” — cuponul se aplică automat)
+            </label>
+            {contactTarget && !contactTarget.email && (
+              <div className="text-xs text-amber-700">Comanda nu are email — cuponul se creează, dar codul îl dai prin telefon/WhatsApp.</div>
+            )}
+          </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setContactTarget(null)} disabled={saving}>
+            <Button variant="outline" onClick={closeDialog} disabled={saving}>
               Anulează
             </Button>
             <Button onClick={submitContact} disabled={saving}>

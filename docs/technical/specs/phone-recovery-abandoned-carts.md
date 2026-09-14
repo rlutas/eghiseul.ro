@@ -88,6 +88,25 @@ clientului, convertește mai bine decât un procent fix generic dat de sistem.
 Tabelul de cupoane arată badge „Telefonic" (albastru) vs „Auto" (galben,
 `system_kind='recovery'`) pentru distincție rapidă.
 
+## Cupon + email de follow-up direct din „Bifează sunat" (14.09, a doua rundă)
+
+Dialogul „Bifează sunat" are acum și „Ai oferit o reducere la telefon?":
+- **% reducere** → `POST /api/admin/orders/[id]/phone-contact` creează cuponul
+  `TEL-XXXXXXXX` (`system_kind='phone_recovery'`, `max_uses=1`, valabil 7 zile,
+  `created_by` = agentul); **sau** un **cod existent** (validat: există + activ).
+- **Email de follow-up** (bifat implicit): `templates/phone-followup.ts` —
+  „Mulțumim pentru discuția cu <prenumele agentului din `profiles`>, ai X%
+  reducere cu codul …, reia comanda din link". Link-ul e `buildResumeUrl(...)`
+  cu `?coupon=` → **se aplică automat la aterizare** (checkout POST-ează codul
+  la `/api/orders/[id]/coupon` după load; review-step-ul din wizard îl citește
+  din URL). Nu trebuie să-l dicteze nimeni pe telefon.
+- Comandă fără email valid: cuponul se creează, emailul se sare, UI arată
+  avertisment — codul se dă pe WhatsApp.
+- Audit: `order_history.phone_contact_logged` cu `new_value { coupon_code,
+  discount, email_status }`.
+- Butonul „Cupon" (→ `/admin/coupons` precompletat) rămâne pentru cupoane
+  fixe (sumă) sau cu altă valabilitate.
+
 ## UI — `/admin/recuperare-telefonica`
 
 Tabel cu prioritate/client/telefon/serviciu/valoare/vechime/status apel +

@@ -41,6 +41,7 @@ import { buildRecoveryStep1, buildRecoveryStep2 } from '@/lib/email/templates/ab
 import { generateRecoveryCouponCode } from '@/lib/coupons/recovery-code';
 import { hasProgressBeyondContact } from '@/lib/orders/abandoned-progress';
 import { TEST_EMAILS, isUndeliverable } from '@/lib/email/deliverability';
+import { buildResumeUrl } from '@/lib/orders/resume-url';
 
 const MIN_AGE_MS = 30 * 60 * 1000;
 const MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
@@ -56,30 +57,6 @@ const FINAL_STEP = 3;
 
 const DISCOUNT_PERCENT = 10;
 const COUPON_VALIDITY_HOURS = 48;
-
-function appBase(): string {
-  return process.env.NEXT_PUBLIC_APP_URL ?? 'https://eghiseul.ro';
-}
-
-// Abandoned (post-submit) → checkout; draft → înapoi în wizard prin restore-ul
-// cross-device (`?order=&email=`, emailul e gardă anti-IDOR pe guest drafts).
-// `?coupon=` se aplică automat la aterizare (checkout + review-step).
-function buildResumeUrl(order: {
-  id: string;
-  status: string;
-  friendly_order_id: string | null;
-  serviceSlug: string | null;
-  email: string;
-  couponCode: string | null;
-}): string {
-  if (order.status === 'draft' && order.serviceSlug && order.friendly_order_id) {
-    const qs = new URLSearchParams({ order: order.friendly_order_id, email: order.email });
-    if (order.couponCode) qs.set('coupon', order.couponCode);
-    return `${appBase()}/comanda/${order.serviceSlug}?${qs.toString()}`;
-  }
-  const base = `${appBase()}/comanda/checkout/${order.id}`;
-  return order.couponCode ? `${base}?coupon=${encodeURIComponent(order.couponCode)}` : base;
-}
 
 export async function POST(request: NextRequest) {
   const authHeader = request.headers.get('authorization');

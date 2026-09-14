@@ -21,7 +21,7 @@ for (const line of readFileSync(resolve(process.cwd(), '.env.local'), 'utf8').sp
 
 const [, , to, onlyArg] = process.argv;
 if (!to || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(to)) {
-  console.error('Usage: npx tsx scripts/email-previews.ts <email> [warmup,review,expiry,expired,crosssell,campaign,recovery1,recovery2,recovery3]');
+  console.error('Usage: npx tsx scripts/email-previews.ts <email> [warmup,review,expiry,expired,crosssell,campaign,recovery1,recovery2,recovery3,phone]');
   process.exit(1);
 }
 const only = onlyArg ? new Set(onlyArg.split(',')) : null;
@@ -35,6 +35,7 @@ async function main() {
   const { renderCampaignEmail } = await import('../src/lib/email/templates/campaign');
   const { buildRecoveryStep1, buildRecoveryStep2 } = await import('../src/lib/email/templates/abandoned-recovery-sequence');
   const { buildRecoverySubject, buildRecoveryHtml, buildRecoveryText } = await import('../src/lib/email/templates/abandoned-recovery');
+  const { renderPhoneFollowupEmail } = await import('../src/lib/email/templates/phone-followup');
   const { GOOGLE_REVIEW_WRITE_URL } = await import('../src/config/contact');
 
   const unsubscribeUrl = 'https://eghiseul.ro/api/contacts/unsubscribe?token=preview';
@@ -122,6 +123,18 @@ async function main() {
         resumeUrl: 'https://eghiseul.ro/comanda/checkout/preview',
         orderNumber: 'E-260914-TEST4',
         estimatedDaysDisplay: '3-5 zile lucrătoare',
+      }),
+    phone: () =>
+      renderPhoneFollowupEmail({
+        customerFirstName: firstName,
+        agentName: 'Andreea',
+        serviceName: 'Certificat de Naștere',
+        orderNumber: 'E-260914-TEST5',
+        totalRon: 349,
+        couponCode: 'TEL-PREVIEW1',
+        discountLabel: '15%',
+        couponValidUntil: new Date(Date.now() + 7 * day),
+        resumeUrl: 'https://eghiseul.ro/comanda/checkout/preview?coupon=TEL-PREVIEW1',
       }),
     recovery3: () => {
       const p = {

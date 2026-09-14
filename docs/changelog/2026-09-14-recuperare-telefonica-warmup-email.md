@@ -96,6 +96,15 @@ terminați. Extrasul CF intră și el la reminderul de expirare (30 zile, decizi
 Script de preview pentru toate șabloanele: `scripts/email-previews.ts`.
 Detalii: `docs/admin/abandoned-carts.md` Layer 2.
 
+## 6. Cupon + email de follow-up direct din „Bifează sunat" (idee Raul)
+
+În `/admin/recuperare-telefonica`, dialogul „Bifează sunat" creează cuponul
+`TEL-XXXXXXXX` (procent ales de agent, 7 zile, unică folosință) sau validează un
+cod existent și trimite clientului emailul „ai vorbit cu <prenumele agentului>,
+ai X% reducere, reia comanda din link" — link-ul poartă `?coupon=`, care se
+aplică automat la aterizare (checkout + wizard). Fără email valid: cuponul se
+creează, emailul se sare, agentul dă codul pe WhatsApp.
+
 ## Fișiere
 
 - `supabase/migrations/156_phone_recovery_tracking.sql`, `157_contacts_warmup_campaign.sql`, `158_contacts_warmup_skip.sql` — toate aplicate live

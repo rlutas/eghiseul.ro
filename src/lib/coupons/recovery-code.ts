@@ -21,11 +21,16 @@ const BODY_LENGTH = 8;
 export const RECOVERY_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
 
 export function generateRecoveryCouponCode(rng: () => number = Math.random): string {
+  return generateCouponCode(PREFIX, BODY_LENGTH, rng);
+}
+
+/** Același alfabet, alt prefix — ex. `TEL-` pentru cupoanele date la telefon. */
+export function generateCouponCode(prefix: string, bodyLength = BODY_LENGTH, rng: () => number = Math.random): string {
   let body = '';
-  for (let i = 0; i < BODY_LENGTH; i++) {
+  for (let i = 0; i < bodyLength; i++) {
     body += RECOVERY_ALPHABET[Math.floor(rng() * RECOVERY_ALPHABET.length)];
   }
-  return PREFIX + body;
+  return prefix + body;
 }
 
 /** Matches a recovery coupon emitted by this generator. Used by audit /

@@ -98,7 +98,7 @@ export function buildRecoveryStep2(input: RecoveryStepInput): { subject: string;
             )
             .join('')}
         </table>
-        <p style="margin:0 0 16px;color:#475569;font-size:14px;line-height:1.6;">Suntem eDigitalizare SRL, o echipă din Cluj — serviciu privat, nu instituție. ${escHtml(proof)}. Dacă ceva nu e clar, răspunde la acest email sau scrie-ne pe WhatsApp înainte să plătești.</p>
+        <p style="margin:0 0 16px;color:#475569;font-size:14px;line-height:1.6;">Suntem eDigitalizare SRL, o echipă din Satu Mare — serviciu privat, nu instituție. ${escHtml(proof)}. Dacă ceva nu e clar, răspunde la acest email sau scrie-ne pe WhatsApp înainte să plătești.</p>
         ${ctaButton('Reia comanda', input.resumeUrl)}
         <p style="margin:12px 0 0;text-align:center;font-size:12px;color:#9ca3af;">Total: ${input.totalRon.toFixed(2)} RON</p>
         <p style="margin:14px 0 0;font-size:11px;color:#9ca3af;line-height:1.5;">${NOTE}</p>`,
@@ -112,7 +112,7 @@ export function buildRecoveryStep2(input: RecoveryStepInput): { subject: string;
     `Ce se întâmplă după ce plătești ${svc}:`,
     ...steps.map(([t, d], i) => `${i + 1}. ${t} — ${d}`),
     '',
-    `Suntem eDigitalizare SRL, o echipă din Cluj — serviciu privat, nu instituție. ${proof}.`,
+    `Suntem eDigitalizare SRL, o echipă din Satu Mare — serviciu privat, nu instituție. ${proof}.`,
     'Întrebări înainte să plătești? Răspunde la acest email sau scrie-ne pe WhatsApp.',
     '',
     `Reia comanda: ${input.resumeUrl}`,
