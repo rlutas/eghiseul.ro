@@ -1,6 +1,21 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
+  // Knowledge Center (/admin/ghid) citește markdown-ul din `docs/` la runtime.
+  // Vercel împachetează în funcție DOAR fișierele urmărite static, iar
+  // `fs.readdir` pe un director nu e urmăribil — fără includerea explicită
+  // pagina merge local și dă 404 pe orice document în producție. Doar `.md`
+  // (~7 MB), nu tot `docs/` (49 MB cu exporturi și imagini).
+  outputFileTracingIncludes: {
+    '/admin/ghid': ['./docs/**/*.md'],
+    '/admin/ghid/[...slug]': ['./docs/**/*.md'],
+    '/api/admin/knowledge/feed': ['./docs/changelog/**/*.md'],
+  },
+  env: {
+    // Momentul build-ului, afișat în Knowledge Center lângă versiune.
+    NEXT_PUBLIC_BUILD_TIME: new Date().toISOString(),
+  },
+
   // Match WordPress URL convention — preserves backlinks at migration cutover.
   // GSC has indexed all eghiseul.ro URLs with trailing slash; flipping this
   // post-launch would invalidate ~26M impressions of cached results.

@@ -24,6 +24,7 @@ import {
   Banknote,
   Coins,
   Phone,
+  GraduationCap,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -34,6 +35,7 @@ import {
   type AdminUser,
 } from '@/hooks/use-admin-permissions';
 import type { Permission } from '@/lib/admin/permissions';
+import { GhidNavBadge } from '@/components/admin/ghid-nav-badge';
 
 // ──────────────────────────────────────────────────────────────
 // Navigation items with permission requirements
@@ -72,6 +74,9 @@ const NAV_ITEMS: NavItem[] = [
   { href: '/admin/clienti', label: 'Clienți', icon: Users, permission: 'users.manage' },
   { href: '/admin/users', label: 'Utilizatori', icon: Users, permission: 'users.manage' },
   { href: '/admin/settings', label: 'Setari', icon: Settings, permission: 'settings.manage' },
+  // Knowledge Center (14.09.2026): ce s-a livrat + procedurile echipei, citite
+  // din docs/. Vizibil pentru orice rol de admin; badge cu livrările nevăzute.
+  { href: '/admin/ghid', label: 'Ghid & noutăți', icon: GraduationCap },
 ];
 
 // ──────────────────────────────────────────────────────────────
@@ -272,6 +277,7 @@ export default function AdminLayout({
                 >
                   <item.icon className="h-5 w-5 shrink-0" />
                   {item.label}
+                  {item.href === '/admin/ghid' && <GhidNavBadge />}
                 </Link>
               );
             })}

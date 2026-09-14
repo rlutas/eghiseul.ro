@@ -21,7 +21,7 @@ Platforma digitala pentru Romania - servicii publice digitalizate (9 servicii ac
 | **Status proiect & sprint** | `docs/DEVELOPMENT_MASTER_PLAN.md` |
 | **Status curent (ce merge, probleme, testare)** | `docs/STATUS_CURRENT.md` |
 | **Index complet docs** | `docs/README.md` |
-| **Changelog (ce s-a livrat, pe sesiuni)** | `docs/changelog/` |
+| **Changelog (ce s-a livrat, pe sesiuni)** | `docs/changelog/` — randat echipei în admin la `/admin/ghid` (Knowledge Center); fiecare intrare începe cu `## Pentru echipă`, vezi `.claude/rules/documentation.md` |
 | **SEO (location pages, clustere, keywords, GSC)** | `docs/seo/README.md` |
 | **🔴 Recuperare după spam update (plan + reguli)** | `docs/seo/2026-09-recuperare-spam-update/` + `.claude/rules/content-and-seo.md` |
 | **WebMCP (tools pentru agenți AI)** | `docs/technical/webmcp.md` |

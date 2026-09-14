@@ -1,5 +1,25 @@
 # 14.09.2026 — Transfer bancar: lucrul pornește pe dovada de plată, nu pe bani
 
+## Pentru echipă
+
+Când un client plătește prin transfer bancar și ne trimite dovada (ordinul de
+plată din aplicația băncii, pe email sau pe WhatsApp, ori încărcat în checkout),
+**nu mai aștepți să intre banii**. Deschizi comanda din tabul „Așteptare plată”
+și apeși **„Dovadă verificată — pornește lucrul”**: comanda trece pe „În
+procesare”, se generează contractul de asistență, împuternicirea și cererea, și
+poți depune la instituție.
+
+Când banii apar în extras, apeși **„Confirmă plata”** ca până acum (cu
+referința tranzacției). Abia atunci se emite factura și pleacă emailul de
+confirmare către client. Comanda rămâne în „Așteptare plată” până atunci, cu
+banner galben, ca să nu uităm de încasare.
+
+Nu folosi dropdown-ul de status pentru niciuna din cele două: nu generează
+documentele și nu emite factura. Procedura completă:
+[Plata prin transfer bancar](../admin/plata-transfer-bancar.md).
+
+---
+
 **Declanșator:** comanda `E-260912-5SNRM` (certificat de căsătorie, 1.248,00
 RON). Clientul a ales IBAN-ul pe 12.09 la 14:15 și a trimis ordinul de plată.
 Pe 14.09 comanda era tot pe **„Așteptare plată"**: fluxul de procesare pornește

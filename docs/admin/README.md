@@ -18,6 +18,7 @@
 | [Workflow Design](./workflow-design.md) | Order processing workflow: status flow, document generation, DOCX templates, template separation, company/lawyer settings, RBAC roles, processing_config, notifications | Design Complete (v1.1) |
 | [Plată prin transfer bancar (IBAN)](./plata-transfer-bancar.md) | Cum ajunge o comandă pe „Așteptare plată", ce primește clientul pe email, cum pornește lucrul pe dovada de plată înainte de încasare („Dovadă verificată — pornește lucrul") și cum confirmă operatorul încasarea din extras (buton „Confirmă plata", referință obligatorie) | Implemented (2026-09-10, extins 2026-09-14) |
 | [Comenzi telefonice](./comenzi-telefonice/README.md) | Comenzi create de admin A→Z: wizard în mod telefonic, link plată / plată manuală cu referință, link personalizat de completare (acte + semnătură, gate email) | Implemented (2026-07-15) |
+| Knowledge Center „Ghid & noutăți” (`/admin/ghid`) | Randează în admin `docs/changelog/` (ce s-a livrat, versiunea platformei) și `docs/admin/` (proceduri); orice doc la `/admin/ghid/<cale>/`; badge în meniu cu livrările nevăzute. Convenție `## Pentru echipă` în `.claude/rules/documentation.md` | Implemented (2026-09-14; [changelog](../changelog/2026-09-14-knowledge-center-admin-ghid.md)) |
 | [Modifică comandă plătită](./modify-order.md) | Adaugă/scoate opțiuni pe comenzi plătite cu reconciliere bani (refund automat / link plată extra Hosted Checkout): limbă traducere + țară apostilă, termen extins automat, expirare link 24h cu reminder cron + buton „Generează link nou", chip listă „Plată extra în așteptare" | Implemented (major update 2026-07-23) |
 
 ---
@@ -181,6 +182,7 @@ The `employee` role has been replaced by specialized roles. See [Workflow Design
 | Colaboratori (comenzi + onorarii, tab avocat) | `/admin/colaboratori` | `orders.view` | Implemented |
 | Previzualizare portal colaborator (`/colaborator/*?as=<id>`, read-only) | buton în `/admin/colaboratori` | `users.manage` | Implemented (2026-08-17) |
 | Parolă pagini private colaborator (Decont + Serviciile mele cer parolă internă; gard pe server) | panou în `/admin/colaboratori` | `users.manage` | Implemented (2026-09-09; [changelog](../changelog/2026-09-09-parola-pagini-private-colaborator.md)) |
+| Ghid & noutăți (Knowledge Center: changelog + proceduri + versiune) | `/admin/ghid`, `/admin/ghid/[...cale]` | Any admin role | Implemented (2026-09-14) |
 
 ---
 
