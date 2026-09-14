@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import {
   Table,
   TableBody,
@@ -72,6 +73,7 @@ interface Coupon {
   created_by: string | null;
   created_at: string;
   updated_at: string;
+  system_kind: 'recovery' | 'phone_recovery' | null;
 }
 
 interface Pagination {
@@ -121,6 +123,8 @@ function isoToLocal(iso: string | null): string {
 
 export default function AdminCouponsPage() {
   const { hasPermission } = useAdminPermissions();
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [coupons, setCoupons] = useState<Coupon[]>([]);
   const [pagination, setPagination] = useState<Pagination | null>(null);
   const [loading, setLoading] = useState(true);
@@ -130,7 +134,26 @@ export default function AdminCouponsPage() {
   const [editing, setEditing] = useState<Coupon | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Coupon | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [prefill, setPrefill] = useState<{ description: string; systemKind: 'phone_recovery' } | null>(null);
   const PAGE_LIMIT = 50;
+
+  // Deschidere prefilled din pagina "Recuperare telefonică": link cu
+  // ?order=<friendly_id>&system_kind=phone_recovery deschide direct formularul
+  // de cupon custom, descriere completată, gata de trimis echipei la telefon.
+  useEffect(() => {
+    const orderRef = searchParams.get('order');
+    const systemKind = searchParams.get('system_kind');
+    if (orderRef && systemKind === 'phone_recovery') {
+      setPrefill({
+        description: `Cupon telefonic — comanda ${orderRef}`,
+        systemKind: 'phone_recovery',
+      });
+      setEditing(null);
+      setFormOpen(true);
+      router.replace('/admin/coupons');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const fetchCoupons = useCallback(async () => {
     setLoading(true);
@@ -299,9 +322,21 @@ export default function AdminCouponsPage() {
                   return (
                     <TableRow key={c.id}>
                       <TableCell>
-                        <code className="rounded bg-muted px-1.5 py-0.5 text-sm font-bold">
-                          {c.code}
-                        </code>
+                        <div className="flex items-center gap-1.5">
+                          <code className="rounded bg-muted px-1.5 py-0.5 text-sm font-bold">
+                            {c.code}
+                          </code>
+                          {c.system_kind === 'phone_recovery' && (
+                            <span className="rounded bg-blue-50 px-1.5 py-0.5 text-[10px] font-medium text-blue-700">
+                              Telefonic
+                            </span>
+                          )}
+                          {c.system_kind === 'recovery' && (
+                            <span className="rounded bg-amber-50 px-1.5 py-0.5 text-[10px] font-medium text-amber-700">
+                              Auto
+                            </span>
+                          )}
+                        </div>
                       </TableCell>
                       <TableCell className="text-sm">
                         {c.discount_type === 'percentage' ? 'Procentual' : 'Fix'}
@@ -407,13 +442,16 @@ export default function AdminCouponsPage() {
       <CouponFormDialog
         open={formOpen}
         editing={editing}
+        prefill={prefill}
         onClose={() => {
           setFormOpen(false);
           setEditing(null);
+          setPrefill(null);
         }}
         onSaved={() => {
           setFormOpen(false);
           setEditing(null);
+          setPrefill(null);
           fetchCoupons();
         }}
       />
@@ -454,11 +492,12 @@ export default function AdminCouponsPage() {
 interface FormProps {
   open: boolean;
   editing: Coupon | null;
+  prefill?: { description: string; systemKind: 'phone_recovery' } | null;
   onClose: () => void;
   onSaved: () => void;
 }
 
-function CouponFormDialog({ open, editing, onClose, onSaved }: FormProps) {
+function CouponFormDialog({ open, editing, prefill, onClose, onSaved }: FormProps) {
   const [code, setCode] = useState('');
   const [description, setDescription] = useState('');
   const [discountType, setDiscountType] = useState<'percentage' | 'fixed'>('percentage');
@@ -485,18 +524,18 @@ function CouponFormDialog({ open, editing, onClose, onSaved }: FormProps) {
       setValidUntil(isoToLocal(editing.valid_until));
       setIsActive(editing.is_active);
     } else {
-      setCode('');
-      setDescription('');
+      setCode(prefill ? `TEL-${Math.random().toString(36).slice(2, 8).toUpperCase()}` : '');
+      setDescription(prefill?.description ?? '');
       setDiscountType('percentage');
       setDiscountValue('');
       setMinAmount('0');
-      setMaxUses('');
+      setMaxUses(prefill ? '1' : '');
       setValidFrom('');
       setValidUntil('');
       setIsActive(true);
     }
     setError(null);
-  }, [open, editing]);
+  }, [open, editing, prefill]);
 
   const handleSubmit = async () => {
     setError(null);
@@ -543,6 +582,7 @@ function CouponFormDialog({ open, editing, onClose, onSaved }: FormProps) {
       valid_from: localToIso(validFrom),
       valid_until: localToIso(validUntil),
       is_active: isActive,
+      system_kind: !editing && prefill ? prefill.systemKind : undefined,
     };
 
     setSaving(true);
@@ -576,7 +616,9 @@ function CouponFormDialog({ open, editing, onClose, onSaved }: FormProps) {
           <DialogDescription>
             {editing
               ? 'Modifica detaliile cuponului. Codul poate fi schimbat (atentie la comenzile existente).'
-              : 'Creeaza un cod de reducere pentru clienti.'}
+              : prefill
+                ? 'Cupon discreționar pentru un caz discutat la telefon. Alege tu procentul/suma potrivit(ă) obiecției clientului.'
+                : 'Creeaza un cod de reducere pentru clienti.'}
           </DialogDescription>
         </DialogHeader>
 

@@ -789,6 +789,30 @@ Add-on `extras_multilingv` (399 lei) pe certificat-nastere + certificat-casatori
 
 3 tiers (București/sectoare 15-30, oficii rapide 5-7, rest 7-15), lista de oficii rapide editabilă din `/admin/settings` → „Termene stare civilă". `registrationPlace` convertit la dropdown structurat. Migrația 079 + `src/lib/civil-status/delivery-terms.ts`. Vezi changelog + `docs/plans/2026-06-23-civil-status-dynamic-terms-design.md`.
 
+#### ✅ Recuperare telefonică comenzi abandonate — LIVRAT 2026-09-14
+
+Pagină `/admin/recuperare-telefonica`: coadă prioritizată (telefon străin +
+serviciu stare civilă = tier maxim), bifă „sunat" + notă, cupon custom prin
+`/admin/coupons` (`system_kind='phone_recovery'`). Motivat de redemption real
+de 1,4% pe cuponul automat 10%. Migrația 156. Vezi
+`docs/technical/specs/phone-recovery-abandoned-carts.md` +
+`docs/marketing/email-marketing-plan-2026-09.md`.
+
+#### ✅ Warm-up email pe registrul de 72k contacte — LIVRAT 2026-09-14 (implicit oprit)
+
+Decizie de business (Raul): contactele au consimțământ de pe eghiseul.ro
+vechi, se trimite la toate 72.278, dar treptat (switch + volum/zi editabil în
+`/admin/marketing`, implicit OPRIT până la revizuirea conținutului). Migrația
+157. Vezi `docs/technical/specs/warmup-email-campaign.md`.
+
+#### Plan email marketing A–Z — restul roadmap-ului (analiză 2026-09-14)
+
+**Ce lipsește încă** (vezi `docs/marketing/email-marketing-plan-2026-09.md`
+secțiunea 6 pentru roadmap complet):
+1. Rescriere secvență `recovery-emails` cron: 3 atingeri (30-60min/24h/24-48h),
+   discount doar la ultima, nu imediat.
+2. Win-back cross-sell la 90 zile inactivitate pe clienții reali.
+
 #### Specimene PNG vechi pe 4 pagini servicii
 
 **Problem:** Paginile integritate / cazier-auto / cazier-fiscal / constatator folosesc specimene PNG vechi (17.06), fără versiuni WebP 2025 în `public/images/specimens/`. Restul certificatelor au WebP 2025.

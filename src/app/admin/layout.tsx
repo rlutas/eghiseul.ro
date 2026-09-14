@@ -23,6 +23,7 @@ import {
   Mail,
   Banknote,
   Coins,
+  Phone,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -56,6 +57,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard, hideForRoles: ['avocat'] },
   { href: '/admin/orders', label: 'Comenzi', icon: ClipboardList, permission: 'orders.view' },
   { href: '/admin/orders?status=abandoned', label: 'Abandonuri', icon: UserX, permission: 'orders.view', hideForRoles: ['avocat'] },
+  { href: '/admin/recuperare-telefonica', label: 'Recuperare telefonică', icon: Phone, permission: 'orders.view', hideForRoles: ['avocat'] },
   { href: '/admin/registru', label: 'Registru', icon: BookOpen, permission: 'registry.manage' },
   { href: '/admin/onrc', label: 'ONRC', icon: Landmark, permission: 'orders.view', hideForRoles: ['avocat'] },
   { href: '/admin/ancpi', label: 'ANCPI', icon: Landmark, permission: 'orders.view', hideForRoles: ['avocat'] },

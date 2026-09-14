@@ -14,8 +14,11 @@ import {
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Switch } from '@/components/ui/switch';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Mail, Download, RefreshCw, Search } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Mail, Download, RefreshCw, Search, Send } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface Subscriber {
   id: string;
@@ -25,6 +28,154 @@ interface Subscriber {
   consent_text: string | null;
   created_at: string | null;
   unsubscribed_at: string | null;
+}
+
+interface WarmupStats {
+  total: number;
+  sent: number;
+  skipped: number;
+  remaining: number;
+  unsubscribed: number;
+}
+
+interface WarmupSettings {
+  enabled: boolean;
+  dailyBatchSize: number;
+}
+
+function WarmupCampaignCard() {
+  const [stats, setStats] = useState<WarmupStats | null>(null);
+  const [settings, setSettings] = useState<WarmupSettings>({ enabled: false, dailyBatchSize: 25 });
+  const [batchInput, setBatchInput] = useState('25');
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    try {
+      const [statsRes, settingsRes] = await Promise.all([
+        fetch('/api/admin/marketing/warmup-stats'),
+        fetch('/api/admin/settings'),
+      ]);
+      const statsJson = await statsRes.json();
+      const settingsJson = await settingsRes.json();
+      if (statsJson.success) setStats(statsJson.data);
+      const s: WarmupSettings = settingsJson.data?.warmup_campaign ?? { enabled: false, dailyBatchSize: 25 };
+      setSettings(s);
+      setBatchInput(String(s.dailyBatchSize));
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  const save = async (next: WarmupSettings) => {
+    setSaving(true);
+    try {
+      const res = await fetch('/api/admin/settings', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key: 'warmup_campaign', value: next }),
+      });
+      const json = await res.json();
+      if (json.success) {
+        setSettings(next);
+        toast.success('Salvat');
+      } else {
+        toast.error(json.error || 'Eroare la salvare');
+      }
+    } catch {
+      toast.error('Eroare de rețea');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const pct = stats && stats.total > 0 ? Math.round((stats.sent / stats.total) * 100) : 0;
+
+  return (
+    <Card>
+      <CardContent className="space-y-4 p-5">
+        <div className="flex items-center justify-between">
+          <h2 className="flex items-center gap-2 text-lg font-semibold text-slate-900">
+            <Send className="h-5 w-5" />
+            Campanie warm-up (registru 72k contacte)
+          </h2>
+          <Button variant="outline" size="sm" onClick={load} disabled={loading}>
+            <RefreshCw className={`mr-1 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+            Reîncarcă
+          </Button>
+        </div>
+        <p className="text-sm text-muted-foreground">
+          Trimite câte un email de reactivare, o singură dată per contact, din registrul intern
+          (<a href="/admin/clienti" className="text-primary-700 underline">/admin/clienti</a>) — treptat,
+          nu într-un singur val. Detalii: <code>docs/marketing/email-marketing-plan-2026-09.md</code>.
+        </p>
+
+        {stats && (
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
+            <div className="rounded-lg border bg-slate-50 p-3">
+              <div className="text-xs text-muted-foreground">Total contacte</div>
+              <div className="text-xl font-bold text-slate-900">{stats.total.toLocaleString('ro-RO')}</div>
+            </div>
+            <div className="rounded-lg border bg-slate-50 p-3">
+              <div className="text-xs text-muted-foreground">Deja trimise</div>
+              <div className="text-xl font-bold text-green-700">{stats.sent.toLocaleString('ro-RO')} ({pct}%)</div>
+            </div>
+            <div className="rounded-lg border bg-slate-50 p-3">
+              <div className="text-xs text-muted-foreground">Rămase</div>
+              <div className="text-xl font-bold text-slate-900">{stats.remaining.toLocaleString('ro-RO')}</div>
+            </div>
+            <div className="rounded-lg border bg-slate-50 p-3" title="Fără email valid / domeniu nelivrabil / respinse de Resend">
+              <div className="text-xs text-muted-foreground">Sărite</div>
+              <div className="text-xl font-bold text-slate-500">{stats.skipped.toLocaleString('ro-RO')}</div>
+            </div>
+            <div className="rounded-lg border bg-slate-50 p-3">
+              <div className="text-xs text-muted-foreground">Dezabonați</div>
+              <div className="text-xl font-bold text-red-700">{stats.unsubscribed.toLocaleString('ro-RO')}</div>
+            </div>
+          </div>
+        )}
+
+        <div className="flex flex-wrap items-center gap-4 border-t pt-4">
+          <div className="flex items-center gap-2">
+            <Switch
+              checked={settings.enabled}
+              onCheckedChange={(checked) => save({ ...settings, enabled: checked })}
+              disabled={saving}
+            />
+            <span className="text-sm font-medium">
+              {settings.enabled ? 'Activă — cronul trimite zilnic' : 'Oprită — implicit, nimic nu se trimite'}
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <label htmlFor="warmup-batch" className="text-sm text-muted-foreground">Pe zi:</label>
+            <Input
+              id="warmup-batch"
+              type="number"
+              min={1}
+              max={2000}
+              value={batchInput}
+              onChange={(e) => setBatchInput(e.target.value)}
+              onBlur={() => {
+                const n = parseInt(batchInput, 10);
+                if (Number.isInteger(n) && n >= 1 && n <= 2000 && n !== settings.dailyBatchSize) {
+                  save({ ...settings, dailyBatchSize: n });
+                } else {
+                  setBatchInput(String(settings.dailyBatchSize));
+                }
+              }}
+              className="w-24"
+              disabled={saving}
+            />
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
 }
 
 export default function AdminMarketingPage() {
@@ -73,6 +224,8 @@ export default function AdminMarketingPage() {
 
   return (
     <div className="space-y-5">
+      <WarmupCampaignCard />
+
       <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className="flex items-center gap-2 text-2xl font-bold text-slate-900">

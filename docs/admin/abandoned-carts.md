@@ -1,6 +1,13 @@
 # Coșuri Abandonate — Sistemul complet
 
-**Status:** ✅ Aplicat 2026-05-27 · ⚠️ MORT în producție până 2026-07-20 (vezi incident mai jos) · ✅ Reparat + extins la drafts 2026-07-20
+**Status:** ✅ Aplicat 2026-05-27 · ⚠️ MORT în producție până 2026-07-20 (vezi incident mai jos) · ✅ Reparat + extins la drafts 2026-07-20 · ✅ Completat cu recuperare telefonică 2026-09-14
+
+> **2026-09-14:** cuponul automat de mai jos are **1,4% redemption** (20 din
+> 1.444 cupoane create) — analiza completă în
+> `docs/marketing/email-marketing-plan-2026-09.md`. Layer nou, uman:
+> `docs/technical/specs/phone-recovery-abandoned-carts.md` (pagina
+> `/admin/recuperare-telefonica`) — echipa sună prioritizat (telefon străin +
+> stare civilă întâi) și dă cupoane discreționare, nu fixe.
 **Inspirat din:** `cazierjudiciaronline.com/api/cron/abandonment` (cazierjudiciaronline foloseste un singur cron; noi am separat în două pentru claritate operațională)
 
 ## ⚠️ Incident: cron-urile nu au rulat NICIODATĂ (până la 2026-07-20)

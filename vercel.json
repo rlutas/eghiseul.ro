@@ -32,6 +32,10 @@
     {
       "path": "/api/cron/extra-payment-reminders/",
       "schedule": "15 * * * *"
+    },
+    {
+      "path": "/api/cron/warmup-campaign/",
+      "schedule": "0 7 * * *"
     }
   ]
 }

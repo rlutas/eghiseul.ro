@@ -38,6 +38,8 @@ import {
   type RecoveryEmailInput,
 } from '@/lib/email/templates/abandoned-recovery';
 import { generateRecoveryCouponCode } from '@/lib/coupons/recovery-code';
+import { hasProgressBeyondContact } from '@/lib/orders/abandoned-progress';
+import { TEST_EMAILS, isUndeliverable } from '@/lib/email/deliverability';
 
 // Window: orders abandoned between 30 min (allow auto-abandon cron to flip them
 // first) and 7 days (older = customer is gone, recovery effort wasted).
@@ -49,34 +51,6 @@ const MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
 // activity (updated_at) for this long. 2h clears lunch breaks and slow KYC
 // uploads without mailing someone who's still mid-session.
 const DRAFT_MIN_IDLE_MS = 2 * 60 * 60 * 1000;
-
-// Internal test traffic — never send recovery to these.
-const TEST_EMAILS = new Set(['serviciiseonethut@gmail.com']);
-
-// Reserved/undeliverable domains (RFC 2606 + local dev). Mailing them always
-// fails, and because a failed send deliberately leaves `recovery_email_sent_at`
-// NULL for a retry, the order would be re-picked every 15 min and burn a fresh
-// coupon each run. Skip them outright.
-const UNDELIVERABLE_DOMAINS = new Set([
-  'example.com',
-  'example.org',
-  'example.net',
-  'test.com',
-  'localhost',
-]);
-
-function isUndeliverable(email: string): boolean {
-  const at = email.lastIndexOf('@');
-  if (at < 1 || at === email.length - 1) return true; // no local part or no domain
-  const domain = email.slice(at + 1).toLowerCase();
-  return (
-    UNDELIVERABLE_DOMAINS.has(domain) ||
-    domain.endsWith('.test') ||
-    domain.endsWith('.invalid') ||
-    domain.endsWith('.local') ||
-    !domain.includes('.')
-  );
-}
 
 const DISCOUNT_PERCENT = 10;
 const COUPON_VALIDITY_HOURS = 48;
@@ -107,34 +81,6 @@ function buildResumeUrl(order: {
     return `${appBase()}/comanda/${order.serviceSlug}?${qs.toString()}`;
   }
   return `${appBase()}/comanda/checkout/${order.id}?coupon=${encodeURIComponent(order.couponCode)}`;
-}
-
-// True when the customer typed something real beyond the contact step.
-// `contact` is step 1 (always present) and `billing` is auto-initialized with
-// defaults, so neither counts. Any other section counts if it holds at least
-// one non-empty string, number, `true`, or non-empty array — empty-string
-// scaffolding like {"plateNumber":""} does not qualify.
-function hasProgressBeyondContact(customerData: unknown): boolean {
-  if (!customerData || typeof customerData !== 'object') return false;
-  const sections = customerData as Record<string, unknown>;
-  const hasMeaningfulValue = (value: unknown): boolean => {
-    if (typeof value === 'string') return value.trim().length > 0;
-    if (typeof value === 'number') return true;
-    if (value === true) return true;
-    if (Array.isArray(value)) return value.length > 0;
-    if (value && typeof value === 'object') {
-      return Object.values(value).some(hasMeaningfulValue);
-    }
-    return false;
-  };
-  return Object.entries(sections).some(
-    ([key, value]) =>
-      key !== 'contact' &&
-      key !== 'billing' &&
-      value !== null &&
-      typeof value === 'object' &&
-      hasMeaningfulValue(value)
-  );
 }
 
 export async function POST(request: NextRequest) {

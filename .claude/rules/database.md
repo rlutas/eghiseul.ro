@@ -57,3 +57,14 @@ paths:
   for correctness (locks, flags) MUST degrade gracefully — see
   `lib/oblio/ensure-invoice.ts` (creates the invoice even if the lock column is
   briefly invisible, re-checking first to avoid duplicates).
+
+## supabase-js: never reuse a `from()` builder after a query
+- `admin.from('t')` returns a builder whose **URL object is mutated** by every
+  `.select()/.eq()/.is()/.order()/.limit()` call (postgrest-js 2.x, no clone).
+  Reusing it for a second SELECT or an UPDATE **stacks the filters**:
+  `id=eq.A&id=eq.B` → 0 rows, silently. Caught 2026-09-14 in three routes
+  (warmup cron marked only the first contact; stats showed the same number
+  in every box; conversion counter was always 0/0).
+- Rule: `const t = admin.from('t')` may be used for **exactly one** query.
+  Every query gets its own `admin.from('t')` — including counts built inside
+  `Promise.all`. Regression test pattern: `tests/unit/api/cron-warmup-campaign.test.ts`.

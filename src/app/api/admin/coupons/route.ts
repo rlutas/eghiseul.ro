@@ -23,6 +23,7 @@ const createCouponSchema = z.object({
   valid_from: z.string().datetime().optional().nullable(),
   valid_until: z.string().datetime().optional().nullable(),
   is_active: z.boolean().default(true),
+  system_kind: z.enum(['recovery', 'phone_recovery']).optional().nullable(),
 });
 
 // ──────────────────────────────────────────────────────────────
@@ -164,6 +165,7 @@ export async function POST(request: NextRequest) {
         valid_until: payload.valid_until ?? null,
         is_active: payload.is_active,
         created_by: user.id,
+        system_kind: payload.system_kind ?? null,
       })
       .select()
       .single();

@@ -21,6 +21,7 @@ Index al documentației. Aceasta e o **hartă**, nu un jurnal — pentru jurnalu
 | **SEO** | [`seo/`](seo/) | location pages (CF/cazier), clustere (ONRC/stare civilă/rovinietă), keywords, GSC, planuri, [tooling pe date reale](seo/TOOLING-claude-seo.md) (GSC API/CrUX/PageSpeed) |
 | **Servicii** | [`services/`](services/) | catalog viu, folder-per-serviciu |
 | **Admin** | [`admin/`](admin/) | RBAC, handbook-uri operaționale (storno, modifică comandă, coșuri abandonate) |
+| **Marketing** | [`marketing/`](marketing/) | plan email marketing A–Z, recuperare telefonică comenzi abandonate |
 | **Deployment** | [`deployment/`](deployment/) | Vercel + Stripe webhook, S3, migrări DB, email Zoho+Resend, deploy checklist |
 | **Securitate** | [`security/`](security/) | audit securitate, incidente |
 | **Design** | [`design/`](design/) | sistem de design, ghiduri vizuale |
@@ -58,6 +59,9 @@ Index al documentației. Aceasta e o **hartă**, nu un jurnal — pentru jurnalu
 - **Decont Mircea — regularizarea din 07.09 (stare curentă, model cumulativ, ce rămâne de reglat):** [`operations/decont-mircea-2026-09-07-regularizare.md`](operations/decont-mircea-2026-09-07-regularizare.md)
 - **Decont Mircea (topograf) — primul calcul + cutoff:** [`operations/decont-mircea-2026-08-26.md`](operations/decont-mircea-2026-08-26.md)
 - **Cookie consent (GDPR, banner + consent receipts):** [`technical/specs/cookie-consent.md`](technical/specs/cookie-consent.md)
+- **Plan email marketing A–Z (72k contacte, GDPR, roadmap):** [`marketing/email-marketing-plan-2026-09.md`](marketing/email-marketing-plan-2026-09.md)
+- **Recuperare telefonică comenzi abandonate (coadă priorizare + cupoane custom):** [`technical/specs/phone-recovery-abandoned-carts.md`](technical/specs/phone-recovery-abandoned-carts.md)
+- **Warm-up email pe registrul de 72k contacte (implicit oprit):** [`technical/specs/warmup-email-campaign.md`](technical/specs/warmup-email-campaign.md)
 - **Deploy:** [`deployment/VERCEL_DEPLOYMENT.md`](deployment/VERCEL_DEPLOYMENT.md)
 - **Email (Resend + Zoho) setup:** [`deployment/EMAIL_RESEND_ZOHO_SETUP.md`](deployment/EMAIL_RESEND_ZOHO_SETUP.md)
 

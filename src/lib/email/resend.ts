@@ -22,6 +22,24 @@ export interface SendEmailInput {
   replyTo?: string;
   /** Idempotency key — Resend dedupes within ~24h on the same key. */
   idempotencyKey?: string;
+  /**
+   * Extra message headers (e.g. `List-Unsubscribe` for bulk/marketing mail —
+   * Gmail/Yahoo bulk-sender rules want one-click unsubscribe in the header,
+   * not only a link in the body).
+   */
+  headers?: Record<string, string>;
+}
+
+/** Thrown when Resend rejects the request; `status` lets callers tell a bad
+ *  recipient (4xx, permanent) from rate limit / outage (429/5xx, retry). */
+export class ResendError extends Error {
+  constructor(
+    public readonly status: number,
+    body: string
+  ) {
+    super(`Resend ${status}: ${body.slice(0, 200)}`);
+    this.name = 'ResendError';
+  }
 }
 
 export interface SendEmailResult {
@@ -47,6 +65,7 @@ export async function sendEmail(input: SendEmailInput): Promise<SendEmailResult>
     html: input.html,
     ...(input.text ? { text: input.text } : {}),
     reply_to: input.replyTo ?? REPLY_TO_DEFAULT,
+    ...(input.headers ? { headers: input.headers } : {}),
   };
 
   const headers: Record<string, string> = {
@@ -64,7 +83,7 @@ export async function sendEmail(input: SendEmailInput): Promise<SendEmailResult>
   });
   if (!res.ok) {
     const text = await res.text();
-    throw new Error(`Resend ${res.status}: ${text.slice(0, 200)}`);
+    throw new ResendError(res.status, text);
   }
   const data = (await res.json()) as { id?: string };
   return { id: data.id ?? null, skipped: false };

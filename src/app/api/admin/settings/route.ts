@@ -122,6 +122,8 @@ export async function PATCH(request: NextRequest) {
       'suppliers',
       // Predarea coletelor Sameday în easybox (primul kilometru OOH).
       'sameday_dropoff',
+      // Campania de warm-up pe registrul de contacte (docs/marketing/).
+      'warmup_campaign',
     ];
 
     if (!ALLOWED_KEYS.includes(key)) {
@@ -137,6 +139,23 @@ export async function PATCH(request: NextRequest) {
       const err = validateTranslationPriceList(value);
       if (err) {
         return NextResponse.json({ success: false, error: err }, { status: 400 });
+      }
+    }
+    if (key === 'warmup_campaign') {
+      const v = value as { enabled?: unknown; dailyBatchSize?: unknown } | null;
+      if (
+        !v ||
+        typeof v !== 'object' ||
+        typeof v.enabled !== 'boolean' ||
+        typeof v.dailyBatchSize !== 'number' ||
+        !Number.isInteger(v.dailyBatchSize) ||
+        v.dailyBatchSize < 1 ||
+        v.dailyBatchSize > 2000
+      ) {
+        return NextResponse.json(
+          { success: false, error: 'Setare invalidă: { enabled: boolean, dailyBatchSize: 1-2000 }' },
+          { status: 400 }
+        );
       }
     }
     if (key === 'suppliers') {
