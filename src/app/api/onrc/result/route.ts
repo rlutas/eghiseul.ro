@@ -132,7 +132,10 @@ export async function POST(req: NextRequest) {
       updated_at: now,
     };
     if (firstTime) patch.awaiting_since = now; // mark first time it parks
-    if (body.requestId) patch.onrc_request_id = body.requestId;
+    // Older workers sent String(undefined) while ONRC hadn't registered the
+    // request yet (Id cerere shows up minutes after payment) — the admin then
+    // displayed a literal "undefined" link. Only store a real id.
+    if (body.requestId && !/^(undefined|null)$/i.test(body.requestId)) patch.onrc_request_id = body.requestId;
     if (body.draftId) patch.onrc_draft_id = body.draftId;
     if (body.registrationNumber) patch.registration_number = body.registrationNumber;
     if (body.calculationNote) patch.onrc_calc_note = body.calculationNote;
