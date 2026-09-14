@@ -21,6 +21,7 @@ import { TEST_EMAILS, isUndeliverable } from '@/lib/email/deliverability';
 import { listUnsubscribeHeaders } from '@/lib/email/templates/marketing-footer';
 import { renderCampaignEmail } from '@/lib/email/templates/campaign';
 import { appBase } from '@/lib/lifecycle/contacts';
+import { campaignUtmKey, withUtm } from '@/lib/email/utm';
 
 export const maxDuration = 300;
 const SEND_SPACING_MS = 600;
@@ -127,7 +128,7 @@ export async function POST(request: NextRequest) {
           preheader: c.preheader,
           bodyText: c.body_text,
           ctaLabel: c.cta_label,
-          ctaUrl: c.cta_url,
+          ctaUrl: c.cta_url ? withUtm(c.cta_url, 'campaign', campaignUtmKey(c.id)) : null,
           firstName: contact.first_name,
           unsubscribeUrl,
         });

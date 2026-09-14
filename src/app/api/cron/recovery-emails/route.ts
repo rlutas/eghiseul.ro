@@ -42,6 +42,7 @@ import { generateRecoveryCouponCode } from '@/lib/coupons/recovery-code';
 import { hasProgressBeyondContact } from '@/lib/orders/abandoned-progress';
 import { TEST_EMAILS, isSuspiciousEmail, isUndeliverable } from '@/lib/email/deliverability';
 import { buildResumeUrl } from '@/lib/orders/resume-url';
+import { withUtm } from '@/lib/email/utm';
 
 const MIN_AGE_MS = 30 * 60 * 1000;
 const MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
@@ -178,14 +179,18 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const resumeUrl = buildResumeUrl({
-      id: order.id,
-      status: order.status,
-      friendly_order_id: order.friendly_order_id ?? null,
-      serviceSlug,
-      email,
-      couponCode,
-    });
+    const resumeUrl = withUtm(
+      buildResumeUrl({
+        id: order.id,
+        status: order.status,
+        friendly_order_id: order.friendly_order_id ?? null,
+        serviceSlug,
+        email,
+        couponCode,
+      }),
+      'recovery',
+      `recovery-step${step}`
+    );
 
     let mail: { subject: string; html: string; text: string };
     if (step === 1) {

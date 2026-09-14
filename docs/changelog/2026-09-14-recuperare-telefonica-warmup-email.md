@@ -117,6 +117,15 @@ implicit doar active (chips Active/Expirate/Toate, badge „Expirat"), iar cronu
 Drafturi: cronul `auto-abandon` șterge drafturile >30 zile cu doar contactul
 completat (61 azi). Nicio migrare.
 
+## 8. Activare + KPI (a cincea rundă)
+
+Raul: „hai să activăm campaniile care crezi că o să meargă". Pornite: recenzie,
+expirare, cross-sell (`lifecycle_emails`) și warm-up la 25/zi. Recovery-ul în 3 pași
+era deja activ. Campaniile manuale rămân la latitudinea echipei (editorul e gata).
+Card nou **„KPI marketing"** în `/admin/marketing` (7/30/90 zile): trimise, comenzi,
+venit per canal, din `orders.attribution.last` (UTM pe toate linkurile din emailuri,
+`lib/email/utm.ts`) + legături directe (recovery step, bifa telefonică, cupoane).
+
 ## Fișiere
 
 - `supabase/migrations/156_phone_recovery_tracking.sql`, `157_contacts_warmup_campaign.sql`, `158_contacts_warmup_skip.sql` — toate aplicate live

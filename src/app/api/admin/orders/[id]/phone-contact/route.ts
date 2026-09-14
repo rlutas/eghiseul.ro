@@ -26,6 +26,7 @@ import { renderPhoneFollowupEmail } from '@/lib/email/templates/phone-followup';
 import { generateCouponCode } from '@/lib/coupons/recovery-code';
 import { buildResumeUrl } from '@/lib/orders/resume-url';
 import { TEST_EMAILS, isUndeliverable } from '@/lib/email/deliverability';
+import { withUtm } from '@/lib/email/utm';
 
 const MAX_NOTES_LENGTH = 2000;
 const DEFAULT_COUPON_VALID_DAYS = 7;
@@ -167,14 +168,18 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     const cd = (order.customer_data ?? {}) as any;
     const email = String(cd.contact?.email ?? '').trim();
     const serviceSlug = (order.services?.slug ?? null) as string | null;
-    resumeUrl = buildResumeUrl({
-      id: order.id,
-      status: order.status,
-      friendly_order_id: order.friendly_order_id ?? null,
-      serviceSlug,
-      email,
-      couponCode: coupon.code,
-    });
+    resumeUrl = withUtm(
+      buildResumeUrl({
+        id: order.id,
+        status: order.status,
+        friendly_order_id: order.friendly_order_id ?? null,
+        serviceSlug,
+        email,
+        couponCode: coupon.code,
+      }),
+      'phone',
+      'phone-followup'
+    );
     if (!email || TEST_EMAILS.has(email.toLowerCase()) || isUndeliverable(email)) {
       emailStatus = 'skipped';
       couponWarning = 'Comanda nu are un email valid — cuponul există, dar trimite-i codul pe alt canal.';

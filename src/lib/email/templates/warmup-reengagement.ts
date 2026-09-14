@@ -10,6 +10,10 @@
  */
 
 import { brandedEmailHtml, ctaButton } from './branded-layout';
+import { withUtm } from '../utm';
+
+/** Cu UTM ca /admin/marketing să poată lega comenzile de warm-up. */
+const WARMUP_CTA_URL = withUtm('https://eghiseul.ro/servicii/', 'warmup', 'warmup');
 
 export interface WarmupEmailInput {
   firstName?: string | null;
@@ -34,7 +38,7 @@ export function buildWarmupHtml(input: WarmupEmailInput): string {
         <h1 style="margin:0 0 12px;color:#0B1B33;font-size:20px;">${greeting}</h1>
         ${context}
         <p style="margin:0 0 16px;color:#475569;font-size:14px;line-height:1.6;">Acum poți comanda online, plăti direct în platformă și primești actul prin curier, fără drumuri la ghișeu. Obținem documentul pentru tine — cazier judiciar, extras carte funciară, certificate de stare civilă și altele.</p>
-        ${ctaButton('Vezi serviciile disponibile', 'https://eghiseul.ro/servicii')}
+        ${ctaButton('Vezi serviciile disponibile', WARMUP_CTA_URL)}
         <p style="margin:16px 0 0;font-size:12px;color:#9ca3af;line-height:1.6;">Primești acest email pentru că ai fost în contact cu eGhișeul.ro. Dacă nu te mai interesează, te poți dezabona oricând — <a href="${escapeAttr(input.unsubscribeUrl)}" style="color:#0B1B33;">un singur click</a>.</p>`,
   });
 }
@@ -50,7 +54,7 @@ export function buildWarmupText(input: WarmupEmailInput): string {
     '',
     'Acum poți comanda online, plăti direct și primești actul prin curier, fără drumuri la ghișeu.',
     '',
-    'Vezi serviciile: https://eghiseul.ro/servicii',
+    `Vezi serviciile: ${WARMUP_CTA_URL}`,
     '',
     `Dezabonare: ${input.unsubscribeUrl}`,
     '',

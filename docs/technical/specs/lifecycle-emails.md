@@ -1,6 +1,6 @@
 # Emailuri de lifecycle + campanii manuale
 
-**Status:** ✅ LIVRAT 2026-09-14 · migrația 159 · **toate comutatoarele implicit OPRITE**
+**Status:** ✅ LIVRAT 2026-09-14 · migrația 159 · comutatoare implicit OPRITE la deploy, **ACTIVATE toate trei în aceeași zi** (vezi „Activare")
 **Unde:** `/admin/marketing` — cardurile „Emailuri automate după comandă" și „Campanii"
 **Context:** `docs/marketing/email-marketing-plan-2026-09.md` (analiză + cercetare). Completează
 warm-up-ul (`warmup-email-campaign.md`, către lead-uri) cu emailuri către **clienți** (au cumpărat).
@@ -81,6 +81,29 @@ Linie goală = paragraf · `- text` = listă · `## Titlu` = subtitlu · `**bold
 `[text](https://…)` · URL liber = link · `{{prenume}}` (fără prenume: dispare cu tot cu
 spațiul din față, „Salut {{prenume}}," → „Salut,"). Tot restul e escapat — nu se poate
 injecta HTML. Implementare: `src/lib/email/markdown-lite.ts`.
+
+## KPI — `GET /api/admin/marketing/kpis?days=30` + cardul din `/admin/marketing`
+
+Per canal, pe 7/30/90 zile: trimise · comenzi · venit. Atribuire:
+- **UTM** pe fiecare link din emailuri (`lib/email/utm.ts`: `utm_source=email`,
+  `utm_medium=lifecycle|warmup|campaign|recovery|phone`, `utm_campaign=expiry|cross_sell|
+  review|warmup|camp-<id8>|recovery-stepN|phone-followup`) → `orders.attribution.last`
+  (captat de `lib/analytics/attribution.ts` la aterizare, atașat la comandă).
+- **Legătură directă** unde e mai bună decât UTM-ul: recovery = comanda plătită a primit
+  ≥1 email (`recovery_email_step > 0`); telefon = bifa `phone_contacted_at`; cupoane
+  `RECOVERY-`/`TEL-` = `orders.coupon_code`.
+- Recenzia Google nu are KPI măsurabil în DB — se numără manual pe profilul Google.
+- Warm-up: dezabonați dintre cei trimiși; **peste 0,5% = oprește și revizuiește textul**.
+
+Nu măsurăm deschideri (Apple Mail Privacy Protection le umflă).
+
+## Activare (14.09.2026, decizie Raul: „hai să activăm")
+
+- `lifecycle_emails`: toate trei **pornite** (recenzie, expirare, cross-sell).
+- `warmup_campaign`: **pornit**, 25/zi.
+- Cohorte la activare: 21 comenzi în fereastra de recenzie, 191 în cea de expirare
+  (112 extras CF, 50 constatator, 17 fiscal, 12 auto — cap 150/rulare, deci 2 zile),
+  125 clienți în cea de cross-sell. Primele trimiteri: 15.09 la 07:00–07:20 UTC.
 
 ## Procedura echipei
 

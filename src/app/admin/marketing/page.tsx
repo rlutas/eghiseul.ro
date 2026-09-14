@@ -21,6 +21,7 @@ import { Mail, Download, RefreshCw, Search, Send } from 'lucide-react';
 import { toast } from 'sonner';
 import { LifecycleEmailsCard } from './lifecycle-card';
 import { CampaignsCard } from './campaigns-card';
+import { MarketingKpisCard } from './kpis-card';
 
 interface Subscriber {
   id: string;
@@ -226,6 +227,7 @@ export default function AdminMarketingPage() {
 
   return (
     <div className="space-y-5">
+      <MarketingKpisCard />
       <LifecycleEmailsCard />
       <CampaignsCard />
       <WarmupCampaignCard />
