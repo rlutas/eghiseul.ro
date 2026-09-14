@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<title>Ghid echipă — Recuperare comenzi abandonate</title>
+<!--
+  Sursa PDF-ului ghid-echipa-recuperare-telefonica.pdf. Regenerare:
+    node -e "const {chromium}=require('playwright');(async()=>{const b=await chromium.launch();const p=await b.newPage();await p.goto('file://'+process.cwd()+'/docs/marketing/ghid-echipa-recuperare-telefonica.html');await p.pdf({path:'docs/marketing/ghid-echipa-recuperare-telefonica.pdf',format:'A4',margin:{top:'18mm',bottom:'18mm',left:'16mm',right:'16mm'},printBackground:true});await b.close();})()"
+-->
+<style>
+  body{font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:#0f172a;font-size:12.5px;line-height:1.55;margin:0}
+  h1{font-size:22px;margin:0 0 4px}
+  .sub{color:#64748b;font-size:11.5px;margin:0 0 22px}
+  h2{font-size:15px;margin:26px 0 8px;padding-bottom:4px;border-bottom:2px solid #ECB95F}
+  h3{font-size:13px;margin:16px 0 6px}
+  p{margin:0 0 8px}
+  code{font-family:Menlo,Consolas,monospace;font-size:11px;background:#f1f5f9;padding:1px 5px;border-radius:4px}
+  table{border-collapse:collapse;width:100%;margin:6px 0 10px;font-size:12px}
+  th,td{border:1px solid #e2e8f0;padding:6px 8px;text-align:left;vertical-align:top}
+  th{background:#f8fafc}
+  .tag{display:inline-block;padding:2px 7px;border-radius:5px;font-size:11px;font-weight:600}
+  .t2{background:#fee2e2;color:#b91c1c}.t1{background:#fef3c7;color:#b45309}.t0{background:#f1f5f9;color:#475569}
+  .box{border:1px solid #e2e8f0;background:#f8fafc;border-radius:8px;padding:10px 12px;margin:10px 0}
+  .warn{border-color:#f59e0b;background:#fffbeb}
+  .step{border-left:3px solid #ECB95F;padding:6px 12px;margin:8px 0}
+  ol,ul{margin:4px 0 8px 20px;padding:0}
+  li{margin:3px 0}
+  .foot{margin-top:30px;padding-top:8px;border-top:1px solid #e2e8f0;color:#94a3b8;font-size:10.5px}
+  .green{color:#15803d;font-weight:600}
+</style>
+</head>
+<body>
+
+<h1>Ghid echipă — Recuperare comenzi abandonate</h1>
+<p class="sub">eGhișeul.ro · versiunea 2, 14 septembrie 2026 (înlocuiește versiunea de dimineață) · întrebări → Raul</p>
+
+<h2>1. Ce s-a schimbat</h2>
+<p>Până acum, comenzile abandonate primeau <strong>doar</strong> un email automat cu 10% reducere. Rezultat real: din 1.444 cupoane trimise, doar <strong>20 au fost folosite (1,4%)</strong>.</p>
+<p>De acum:</p>
+<ul>
+  <li><strong>Emailul automat merge în 3 pași</strong>, fără să faceți voi nimic: la 30 min „reia de unde ai rămas" (fără reducere), a doua zi „ce se întâmplă după plată" (fără reducere), a treia zi cuponul 10%. Reducerea nu mai e prima armă.</li>
+  <li><strong>Echipa sună</strong> clienții cu șanse mari, dintr-o coadă gata sortată. Apelul + o reducere gândită pentru cazul concret convertesc mult mai bine decât un cod generic.</li>
+  <li><strong>Cuponul și emailul de confirmare pleacă direct din butonul „Bifează sunat"</strong> — nu mai umblați prin pagina de cupoane (secțiunea 4).</li>
+</ul>
+
+<h2>2. Unde lucrăm: <code>/admin/recuperare-telefonica</code></h2>
+<p>Pagină în admin, lângă „Abandonuri" în meniul din stânga. Un tabel cu clienții de sunat, deja sortați — <strong>nu trebuie să alegeți voi pe cine sunați, sistemul a făcut asta.</strong></p>
+
+<h3>Cum e sortată coada (de sus în jos = cei mai importanți)</h3>
+<table>
+<tr><th style="width:24%">Etichetă</th><th>Ce înseamnă</th><th>De ce sună primii</th></tr>
+<tr><td><span class="tag t2">Prioritate maximă</span></td><td>Telefon din străinătate <strong>ȘI</strong> comandă de certificat naștere/căsătorie</td><td>Diaspora, de multe ori cu termen real (ambasadă, oficiu stare civilă) — cea mai mare șansă de conversie și cea mai mare urgență</td></tr>
+<tr><td><span class="tag t1">Prioritate</span></td><td>Telefon din străinătate <strong>SAU</strong> certificat naștere/căsătorie (una din două)</td><td>Merită apel, dar mai puțin urgent decât combinația</td></tr>
+<tr><td><span class="tag t0">Normal</span></td><td>Restul (extras carte funciară, cazier — telefon românesc)</td><td>Sunați-i după ce terminați primele două categorii</td></tr>
+</table>
+<p>În fiecare categorie, <strong>cei proaspeți sunt primii</strong>: comenzile din ultimele 24 h au vechimea scrisă cu <span class="green">verde</span> — sunați-i pe ei întâi, șansa scade mult după o zi. Apoi cele de sub 3 zile, apoi restul. La aceeași vechime, cine a completat mai mult din formular e mai sus (a mers mai departe, nu a abandonat „din prima").</p>
+
+<div class="box">
+  <strong>Un rând = un client.</strong> Dacă cineva a început 3 comenzi de pe același email, îl vedeți o singură dată, pe cea mai recentă, cu semnul <strong>×3</strong> lângă email. Sunați o dată, nu de trei ori.<br><br>
+  <strong>Cine NU apare în coadă</strong> — și e corect așa: cei fără niciun nume (doar email/telefon prins din greșeală) și cei cu adrese inventate (gen „sssssss@yahoo.com", „test@…"). Nu pierdem timp pe cineva neidentificat; cine are date reale primește oricum emailurile automate.
+</div>
+
+<h3>Ce faceți pe fiecare rând</h3>
+<ol>
+  <li>Apăsați pe numărul de telefon (se deschide direct apelul) sau formați manual.</li>
+  <li>După apel, apăsați <strong>„Bifează sunat"</strong> și scrieți pe scurt ce s-a discutat (ex: „a promis plată mâine", „nu a răspuns, revin mâine").</li>
+  <li>Dacă ați oferit o reducere, <strong>în același dialog</strong> puneți procentul (ex: 15) și lăsați bifat „Trimite clientului emailul de follow-up". Apăsați „Salvează". Gata — cuponul e creat și clientul are deja emailul în inbox.</li>
+</ol>
+
+<h2>3. Ce spunem la telefon</h2>
+<p>Nu citim un script fix — ascultăm ce spune clientul și răspundem la motivul lui real. Structura de mai jos e ghid, nu literă de lege.</p>
+<div class="step"><strong>1. Deschidere</strong> — spunem cine suntem și <strong>numim exact documentul</strong>, nu „comanda dumneavoastră":<br><em>„Bună ziua, sunt [nume] de la eGhișeul.ro. Am observat că ați început o comandă pentru [certificat de naștere / cazier judiciar / extras carte funciară] și nu ați finalizat-o. Vă pot ajuta cu ceva?"</em></div>
+<div class="step"><strong>2. Aflăm motivul real</strong> — întrebăm direct, nu presupunem:<br><em>„Ce v-a oprit — a fost o problemă cu plata, prețul, v-ați răzgândit, sau vă mai trebuie timp să adunați actele?"</em></div>
+<div class="step"><strong>3. Verificăm urgența</strong> (mai ales la certificate naștere/căsătorie pentru străinătate):<br><em>„Aveți vreun termen — programare la ambasadă, consulat, oficiu stare civilă? Dacă e urgent, putem grăbi procesarea."</em><br>O urgență reală justifică prioritizare, uneori mai bine decât o reducere.</div>
+
+<h3>Răspuns pe obiecție (nu ofertă generică pentru toată lumea)</h3>
+<table>
+<tr><th style="width:30%">Ce spune clientul</th><th>Ce facem</th></tr>
+<tr><td>„E prea scump"</td><td>Reducere <strong>discreționară</strong>, potrivită cu valoarea comenzii — nu automat 10% pentru toți. Voi decideți procentul potrivit conversației.</td></tr>
+<tr><td>„Nu am încredere / nu sunteți instituția statului"</td><td>Explicăm clar: suntem serviciu privat din Satu Mare (eDigitalizare SRL), <strong>obținem</strong> documentul, nu îl eliberăm noi. Putem trimite contractul/datele firmei înainte de plată.</td></tr>
+<tr><td>„M-am blocat la upload/completare"</td><td>Îl ajutăm live, la telefon, să termine — nu are nevoie de reducere, are nevoie de ajutor tehnic.</td></tr>
+<tr><td>„Am găsit mai ieftin în altă parte"</td><td>Nu intrăm în război de preț — subliniem curier + apostilă/traducere incluse și termenul garantat.</td></tr>
+<tr><td>Nu răspunde</td><td>Lăsăm mesaj/SMS care menționează documentul concret, nu un mesaj generic „ați uitat ceva". Bifați „sunat" cu nota „nu a răspuns" ca să știe colegii.</td></tr>
+</table>
+<div class="step"><strong>4. Închidere</strong> — spunem exact ce urmează: <em>„Vă trimit acum pe email linkul să continuați, cu reducerea deja aplicată. Dacă nu-l găsiți, e posibil să fie în Promoții sau Spam."</em></div>
+
+<h2>4. Reducerea la telefon — cum se dă și ce primește clientul</h2>
+<div class="box warn">Nu mai dăm automat 10%. Voi alegeți procentul <strong>potrivit motivului real</strong> spus de client. O reducere gândită pe loc convertește mai bine decât un cod generic.</div>
+<ul>
+  <li>Obiecție de preț mică → 5–10% e suficient de multe ori.</li>
+  <li>Client valoros (comandă mare, urgență, diaspora) care ezită serios → poate merita 15–20%.</li>
+  <li>Nu confuzie tehnică sau lipsă de încredere → <strong>nu</strong> dați reducere, rezolvați problema reală (ajutor la completare, explicații).</li>
+</ul>
+<h3>Ce se întâmplă când apăsați „Salvează" cu un procent</h3>
+<ol>
+  <li>Sistemul creează cuponul (cod de forma <code>TEL-XXXXXXXX</code>), valabil <strong>7 zile</strong>, de unică folosință, pe numele vostru.</li>
+  <li>Clientul primește pe loc un email: <em>„Mulțumim pentru discuția de azi cu [prenumele vostru] din echipa eGhișeul.ro. Cum am stabilit, ai 15% reducere la [document]…"</em> cu butonul „Reia comanda cu reducerea".</li>
+  <li>Când apasă butonul, <strong>cuponul se aplică singur</strong> — nu trebuie să-l dicteze nimeni pe telefon, nu trebuie să-l tasteze nimeni.</li>
+</ol>
+<p>Dacă comanda nu are email valid, sistemul vă avertizează: cuponul există, dar codul îl dați voi pe WhatsApp/SMS. Aveți deja un cod creat înainte? Îl puneți în câmpul „cod existent" în loc de procent.</p>
+<div class="box"><strong>Important:</strong> verificați că aveți <strong>prenumele completat în profilul de admin</strong>. Emailul spune „ai vorbit cu Andreea"; fără prenume spune doar „cu echipa".</div>
+
+<h2>5. Emailurile automate — ce trebuie să știți (nu e treaba voastră să le trimiteți)</h2>
+<ul>
+  <li><strong>Recovery în 3 pași</strong> (secțiunea 1) pleacă oricum, și la cei pe care i-ați sunat. Cele două canale se completează — nu opriți nimic.</li>
+  <li><strong>Warm-up</strong>: pornim treptat un email de reactivare către ~72.000 de contacte din registrul vechi (persoane care ne-au scris pe site-ul vechi). Câțiva pe zi, o singură dată, cu dezabonare dintr-un click.</li>
+  <li><strong>După comandă</strong> (când Raul le pornește): cerere de recenzie Google la 3–10 zile după o comandă livrată în termen; reminder când cazierul/extrasul expiră; sugestii de alte documente la 1–2 luni.</li>
+</ul>
+<div class="box">Dacă un client vă spune „am primit un email ciudat de la voi" — e unul dintre emailurile de mai sus, e legitim, explicați-i pe scurt și, dacă cere, dezabonați-l (linkul de dezabonare e în email) sau spuneți-i lui Raul.</div>
+
+<h2>6. Ce urmărim (rezultate)</h2>
+<p>În capul paginii <code>/admin/recuperare-telefonica</code> vedeți rata de conversie curentă — câți dintre cei sunați au dus comanda mai departe. Notele voastre din „Bifează sunat" contează pentru asta — scrieți pe scurt și clar ce s-a întâmplat la fiecare apel.</p>
+
+<p class="foot">Document generat 2026-09-14 (v2) · eGhișeul.ro este serviciu privat de asistență la obținerea de documente, nu instituție de stat · Întrebări despre acest ghid → Raul</p>
+</body>
+</html>

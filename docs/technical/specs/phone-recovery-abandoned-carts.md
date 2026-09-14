@@ -14,7 +14,8 @@ Rafinare pe baza feedback-ului lui Raul:
   identificabil (doar email/telefon) sunt excluse din coadă complet, indiferent
   de tier. Nu merită efortul unui apel; email-ul automat le acoperă oricum.
 - Ghid tipărit pentru echipă: `docs/marketing/ghid-echipa-recuperare-telefonica.pdf`
-  (generat din HTML cu Chromium headless, nu pandoc — fără LaTeX pe mașină).
+  (v2 la 14.09 după rundele 3–4; sursa `.html` alături, regenerare cu Playwright
+  Chromium — comanda e în comentariul din HTML).
 
 ## Decizii de design (brainstorming 2026-09-14)
 
