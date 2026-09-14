@@ -130,6 +130,7 @@ export default function AdminCouponsPage() {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState<'active' | 'expired' | 'all'>('active');
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<Coupon | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Coupon | null>(null);
@@ -162,6 +163,7 @@ export default function AdminCouponsPage() {
       params.set('page', String(page));
       params.set('limit', String(PAGE_LIMIT));
       if (search.trim()) params.set('search', search.trim());
+      params.set('status', statusFilter);
 
       const res = await fetch(`/api/admin/coupons?${params.toString()}`);
       const json = await res.json();
@@ -177,7 +179,7 @@ export default function AdminCouponsPage() {
     } finally {
       setLoading(false);
     }
-  }, [page, search]);
+  }, [page, search, statusFilter]);
 
   useEffect(() => {
     fetchCoupons();
@@ -271,6 +273,31 @@ export default function AdminCouponsPage() {
           }}
           className="max-w-xs"
         />
+        <div className="flex items-center gap-1">
+          {(
+            [
+              ['active', 'Active'],
+              ['expired', 'Expirate'],
+              ['all', 'Toate'],
+            ] as const
+          ).map(([v, label]) => (
+            <button
+              key={v}
+              type="button"
+              onClick={() => {
+                setStatusFilter(v);
+                setPage(1);
+              }}
+              className={`rounded-md border px-2.5 py-1 text-xs font-medium transition-colors ${
+                statusFilter === v
+                  ? 'border-slate-400 bg-slate-100 text-slate-900'
+                  : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
         <Button variant="outline" size="sm" onClick={fetchCoupons} disabled={loading}>
           <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
           Reincarca
@@ -334,6 +361,11 @@ export default function AdminCouponsPage() {
                           {c.system_kind === 'recovery' && (
                             <span className="rounded bg-amber-50 px-1.5 py-0.5 text-[10px] font-medium text-amber-700">
                               Auto
+                            </span>
+                          )}
+                          {c.valid_until && new Date(c.valid_until).getTime() < Date.now() && (
+                            <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-medium text-slate-500">
+                              Expirat
                             </span>
                           )}
                         </div>

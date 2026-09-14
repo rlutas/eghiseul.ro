@@ -11,14 +11,16 @@
  *   tier 1 — telefon străin SAU serviciu de stare civilă
  *   tier 0 — restul
  *
- * Comenzile fără nume identificabil (doar email/telefon, nimic altceva) NU
- * intră în coadă — nu merită efortul unui apel, primesc oricum emailul
- * automat din `recovery-emails`.
+ * Comenzile fără nume identificabil (personal/billing/contact) sau cu email
+ * inventat („sssssssim@…", „test@…") NU intră în coadă — nu merită efortul
+ * unui apel. Același client cu mai multe încercări (19 emailuri cu 44 de
+ * comenzi în 30 de zile, audit 14.09) apare O dată, pe cea mai recentă, cu
+ * contorul „×N".
  *
- * În fiecare tier, scor de profunzime mai mare primul (cine a completat mult
- * din wizard nu a abandonat "din prima" — e mai aproape de a cumpăra), apoi
- * cele mai recente abandonuri (fereastra utilă de apel se închide rapid —
- * cercetare: conversie scade mult după 24h).
+ * Ordinea în fiecare tier (cerere Raul 14.09 — „văd doar de-astea super
+ * vechi"): întâi cele PROASPETE (<24 h, apoi <72 h — cercetare: conversia
+ * scade mult după 24 h), în interiorul lor scorul de profunzime (cine a
+ * completat mult nu a abandonat din prima), apoi cea mai recentă.
  *
  * Authentication: requires `orders.view` permission.
  * Query: `?includeContacted=1` arată și comenzile deja sunate (implicit ascunse).
@@ -32,8 +34,9 @@ import {
   hasProgressBeyondContact,
   isForeignPhone,
   dataDepthScore,
-  hasIdentifiableName,
+  identifiableName,
 } from '@/lib/orders/abandoned-progress';
+import { isSuspiciousEmail, isUndeliverable } from '@/lib/email/deliverability';
 
 const MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000;
 
@@ -66,6 +69,16 @@ interface PriorityRow {
   phoneContactedAt: string | null;
   phoneContactedBy: string | null;
   phoneContactNotes: string | null;
+  /** Câte comenzi draft/abandonate are același email în fereastră (1 = doar aceasta). */
+  duplicateCount: number;
+  /** 0 = <24 h, 1 = <72 h, 2 = mai vechi. */
+  freshness: 0 | 1 | 2;
+}
+
+const DAY = 86_400_000;
+function freshnessOf(createdAt: string, now: number): 0 | 1 | 2 {
+  const age = now - new Date(createdAt).getTime();
+  return age < DAY ? 0 : age < 3 * DAY ? 1 : 2;
 }
 
 export async function GET(request: NextRequest) {
@@ -125,11 +138,15 @@ export async function GET(request: NextRequest) {
     if (order.status === 'draft' && !hasProgressBeyondContact(order.customer_data)) {
       continue; // window-shopper — nimic real de discutat la telefon
     }
-    if (!hasIdentifiableName(order.customer_data)) {
+    const name = identifiableName(order.customer_data);
+    if (!name) {
       continue; // nici nume nu avem — nu merită apel, oricum primește email
     }
 
-    const email = (cd.contact?.email ?? null) as string | null;
+    const email = ((cd.contact?.email ?? '') as string).trim().toLowerCase() || null;
+    if (email && (isUndeliverable(email) || isSuspiciousEmail(email))) {
+      continue; // adresă inventată — apelul ar fi pe un „client" fictiv
+    }
     const phone = (cd.contact?.phone ?? null) as string | null;
     const foreign = isForeignPhone(phone);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -152,8 +169,8 @@ export async function GET(request: NextRequest) {
       serviceSlug: slug,
       email,
       phone,
-      firstName: (cd.personal?.firstName ?? cd.contact?.firstName ?? null) as string | null,
-      lastName: (cd.personal?.lastName ?? cd.contact?.lastName ?? null) as string | null,
+      firstName: name.firstName || null,
+      lastName: name.lastName || null,
       isForeignPhone: foreign,
       isCivilStatus: civilStatus,
       depthScore,
@@ -161,14 +178,38 @@ export async function GET(request: NextRequest) {
       phoneContactedAt: order.phone_contacted_at ?? null,
       phoneContactedBy: order.phone_contacted_by ?? null,
       phoneContactNotes: order.phone_contact_notes ?? null,
+      duplicateCount: 1,
+      freshness: freshnessOf(order.created_at, Date.now()),
     });
   }
 
-  rows.sort((a, b) => {
+  // Un rând per email: cea mai recentă comandă (query-ul vine desc după
+  // created_at, deci prima întâlnită), cu contorul celorlalte încercări.
+  const byEmail = new Map<string, PriorityRow>();
+  const deduped: PriorityRow[] = [];
+  for (const r of rows) {
+    if (!r.email) {
+      deduped.push(r);
+      continue;
+    }
+    const seen = byEmail.get(r.email);
+    if (seen) {
+      seen.duplicateCount += 1;
+      if (r.depthScore > seen.depthScore) seen.depthScore = r.depthScore;
+      continue;
+    }
+    byEmail.set(r.email, r);
+    deduped.push(r);
+  }
+
+  deduped.sort((a, b) => {
     if (a.tier !== b.tier) return b.tier - a.tier;
+    if (a.freshness !== b.freshness) return a.freshness - b.freshness;
     if (a.depthScore !== b.depthScore) return b.depthScore - a.depthScore;
     return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
   });
+  rows.length = 0;
+  rows.push(...deduped);
 
   // Conversie: din toate comenzile sunate vreodată (orice vechime, orice
   // status), câte au ieșit din draft/abandoned = au dus comanda mai departe.

@@ -56,6 +56,12 @@ Răspuns: `{ success: true, data: { abandonedCount: N, processedAt, ids } }`.
 - Audit insert failure nu blochează update-ul (rare, dar nu pierdem state-ul de status)
 - `GET` handler disponibil în non-production pentru dry-run debugging
 
+**Curățenie (2026-09-14):** la fiecare rulare, drafturile mai vechi de 30 de zile în care
+clientul a lăsat DOAR contactul (nimic dincolo de pasul 1, `hasProgressBeyondContact = false`)
+se **șterg** (max 200/rulare, cascadă pe `order_history` etc.). Nu intră nicăieri (coadă
+telefonică, recovery, rapoarte) — doar umflau tabela (61 la data fix-ului). Drafturile CU
+progres rămân ca analytics. Răspunsul cronului raportează `purgedDrafts`.
+
 ### Layer 2: Recovery email în 3 pași (cron 15 min) — rescris 2026-09-14
 
 **Endpoint:** `POST /api/cron/recovery-emails`
@@ -97,6 +103,15 @@ primește în continuare secvența (multi-canal +45% vs un singur canal).
 pasul 3 se creează oricum.
 
 **Cap pe rulare:** 100 comenzi. Test: `tests/unit/api/cron-recovery-emails.test.ts`.
+
+**Adrese inventate** (`isSuspiciousEmail`: „sssssssim@…", „test@…", „asdf…") se sar — domeniul
+e real, dar trimiterea bounce-uiește și strică reputația.
+
+**Curățenie cupoane (2026-09-14):** la fiecare rulare, cupoanele de sistem (`RECOVERY-`, `TEL-`)
+expirate de peste 7 zile și **nefolosite** (`times_used = 0`) se șterg — lista din
+`/admin/coupons` ajunsese la 1.423 de rânduri moarte. Cele folosite rămân (dovada reducerii
+pe comandă), cupoanele manuale nu se ating. `/admin/coupons` arată implicit doar cupoanele
+**active** (filtre: Active / Expirate / Toate) și badge „Expirat".
 
 ### Layer 3: Vizibilitate admin
 

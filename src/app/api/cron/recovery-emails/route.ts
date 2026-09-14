@@ -40,7 +40,7 @@ import {
 import { buildRecoveryStep1, buildRecoveryStep2 } from '@/lib/email/templates/abandoned-recovery-sequence';
 import { generateRecoveryCouponCode } from '@/lib/coupons/recovery-code';
 import { hasProgressBeyondContact } from '@/lib/orders/abandoned-progress';
-import { TEST_EMAILS, isUndeliverable } from '@/lib/email/deliverability';
+import { TEST_EMAILS, isSuspiciousEmail, isUndeliverable } from '@/lib/email/deliverability';
 import { buildResumeUrl } from '@/lib/orders/resume-url';
 
 const MIN_AGE_MS = 30 * 60 * 1000;
@@ -90,10 +90,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: false, error: fetchError.message }, { status: 500 });
   }
 
+  // Curățenia rulează indiferent dacă există candidați (rulează la 15 min).
+  const cleanedCoupons = await cleanupExpiredSystemCoupons(supabase, now);
+
   if (!candidates || candidates.length === 0) {
     return NextResponse.json({
       success: true,
-      data: { sentCount: 0, skippedCount: 0, processedAt: new Date().toISOString() },
+      data: { sentCount: 0, skippedCount: 0, cleanedCoupons, processedAt: new Date().toISOString() },
     });
   }
 
@@ -111,8 +114,8 @@ export async function POST(request: NextRequest) {
       results.push({ orderId: order.id, status: 'skipped', reason: 'test email' });
       continue;
     }
-    if (isUndeliverable(email)) {
-      results.push({ orderId: order.id, status: 'skipped', reason: 'undeliverable domain' });
+    if (isUndeliverable(email) || isSuspiciousEmail(email)) {
+      results.push({ orderId: order.id, status: 'skipped', reason: 'undeliverable or suspicious email' });
       continue;
     }
     if (order.status === 'draft') {
@@ -258,9 +261,32 @@ export async function POST(request: NextRequest) {
         3: results.filter((r) => r.status === 'sent' && r.step === 3).length,
       },
       processedAt: new Date().toISOString(),
+      cleanedCoupons,
       results,
     },
   });
+}
+
+// Cupoanele de sistem (RECOVERY-/TEL-) expirate de peste 7 zile și nefolosite
+// nu mai au nicio valoare — nici pentru client (expirat), nici pentru raport
+// (times_used = 0). Fără curățenie, lista din /admin/coupons ajunsese la
+// 1.423 de rânduri moarte (14.09). Cele FOLOSITE rămân (dovada reducerii pe
+// comandă); cupoanele manuale nu se ating niciodată.
+const COUPON_CLEANUP_AFTER_MS = 7 * 24 * 60 * 60 * 1000;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function cleanupExpiredSystemCoupons(supabase: any, now: number): Promise<number> {
+  const { data, error } = await supabase
+    .from('coupons')
+    .delete()
+    .in('system_kind', ['recovery', 'phone_recovery'])
+    .eq('times_used', 0)
+    .lt('valid_until', new Date(now - COUPON_CLEANUP_AFTER_MS).toISOString())
+    .select('id');
+  if (error) {
+    console.warn('[recovery-emails] coupon cleanup failed:', error.message);
+    return 0;
+  }
+  return data?.length ?? 0;
 }
 
 // Vercel Cron invocă rutele cu GET — fără passthrough programarea nu ar porni.

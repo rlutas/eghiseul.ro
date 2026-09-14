@@ -5,7 +5,7 @@ import { NextRequest } from 'next/server';
 type Row = Record<string, unknown>;
 interface Call {
   table: string;
-  op: 'select' | 'insert' | 'update';
+  op: 'select' | 'insert' | 'update' | 'delete';
   values: Row | null;
   filters: string[];
 }
@@ -18,12 +18,18 @@ function chain(table: string) {
   c.select = () => c;
   c.insert = (v: Row) => ((local.op = 'insert'), (local.values = v), c);
   c.update = (v: Row) => ((local.op = 'update'), (local.values = v), c);
+  c.delete = () => ((local.op = 'delete'), c);
   for (const m of ['eq', 'in', 'lt', 'gte', 'lte', 'order', 'limit', 'is']) {
     c[m] = (...args: unknown[]) => (local.filters.push(`${m}:${args.map(String).join(',')}`), c);
   }
   c.then = (ok: (v: unknown) => unknown, err?: (e: unknown) => unknown) => {
     state.calls.push(local);
-    const res = local.op === 'select' && table === 'orders' ? { data: state.candidates, error: null } : { data: null, error: null };
+    const res =
+      local.op === 'select' && table === 'orders'
+        ? { data: state.candidates, error: null }
+        : local.op === 'delete' && table === 'coupons'
+          ? { data: [{ id: 'old1' }, { id: 'old2' }], error: null }
+          : { data: null, error: null };
     return Promise.resolve(res).then(ok, err);
   };
   return c;
@@ -149,6 +155,22 @@ describe('secvența de recovery în 3 pași', () => {
     expect(sendEmail).not.toHaveBeenCalled();
     expect(orderUpdates()).toHaveLength(0);
     expect(body.data.results.map((r: Row) => r.reason)).toEqual(['draft still active', 'contact-only draft']);
+  });
+
+  it('curăță cupoanele de sistem expirate de >7 zile și nefolosite (nu pe cele manuale)', async () => {
+    const body = await (await POST(makeReq())).json();
+    const del = state.calls.find((c) => c.table === 'coupons' && c.op === 'delete')!;
+    expect(del.filters).toContain('in:system_kind,recovery,phone_recovery');
+    expect(del.filters).toContain('eq:times_used,0');
+    expect(del.filters.some((f) => f.startsWith('lt:valid_until,'))).toBe(true);
+    expect(body.data.cleanedCoupons).toBe(2);
+  });
+
+  it('email inventat (sssssss@…) → sărit, nu-l trimitem la Resend', async () => {
+    state.candidates = [order('fake', 0, null, { customer_data: { contact: { email: 'sssssssim@yahoo.com' }, personal: { firstName: 'X' } } })];
+    const body = await (await POST(makeReq())).json();
+    expect(sendEmail).not.toHaveBeenCalled();
+    expect(body.data.results[0].reason).toBe('undeliverable or suspicious email');
   });
 
   it('Resend neconfigurat → pasul NU avansează (retry la rularea următoare)', async () => {

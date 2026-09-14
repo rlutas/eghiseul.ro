@@ -70,6 +70,16 @@ export async function GET(request: NextRequest) {
       query = query.ilike('code', `%${search}%`);
     }
 
+    // ?status=active (implicit) | expired | all — lista avea 1.400+ cupoane
+    // RECOVERY expirate și nefolosite (14.09), imposibil de folosit operațional.
+    const status = searchParams.get('status') ?? 'active';
+    const nowIso = new Date().toISOString();
+    if (status === 'active') {
+      query = query.eq('is_active', true).or(`valid_until.is.null,valid_until.gt.${nowIso}`);
+    } else if (status === 'expired') {
+      query = query.lt('valid_until', nowIso);
+    }
+
     const { data, count, error } = await query;
 
     if (error) {

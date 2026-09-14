@@ -24,8 +24,39 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { hasProgressBeyondContact } from '@/lib/orders/abandoned-progress';
 
 const ABANDON_AFTER_MINUTES = 30;
+
+// Drafturile în care clientul a lăsat DOAR emailul/telefonul (nimic dincolo
+// de pasul de contact) și au peste 30 de zile nu mai servesc la nimic: nu
+// intră în coada telefonică, nu primesc recovery, nu apar în rapoarte — doar
+// umflă tabela (61 la 14.09). Se șterg (cascadă pe order_history etc.).
+// Drafturile CU progres rămân — sunt analytics despre unde se blochează wizardul.
+const PURGE_CONTACT_ONLY_DRAFTS_AFTER_DAYS = 30;
+const PURGE_BATCH = 200;
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function purgeContactOnlyDrafts(supabase: any): Promise<number> {
+  const cutoff = new Date(Date.now() - PURGE_CONTACT_ONLY_DRAFTS_AFTER_DAYS * 86_400_000).toISOString();
+  const { data, error } = await supabase
+    .from('orders')
+    .select('id, customer_data')
+    .eq('status', 'draft')
+    .is('paid_at', null)
+    .lt('created_at', cutoff)
+    .order('created_at', { ascending: true })
+    .limit(PURGE_BATCH);
+  if (error || !data?.length) return 0;
+  const ids = data.filter((o: { customer_data: unknown }) => !hasProgressBeyondContact(o.customer_data)).map((o: { id: string }) => o.id);
+  if (ids.length === 0) return 0;
+  const { error: delError } = await supabase.from('orders').delete().in('id', ids);
+  if (delError) {
+    console.warn('[auto-abandon] purge failed:', delError.message);
+    return 0;
+  }
+  return ids.length;
+}
 
 export async function POST(request: NextRequest) {
   // 1. Auth
@@ -74,10 +105,12 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  const purgedDrafts = await purgeContactOnlyDrafts(supabase);
+
   if (!candidates || candidates.length === 0) {
     return NextResponse.json({
       success: true,
-      data: { abandonedCount: 0, processedAt: new Date().toISOString() },
+      data: { abandonedCount: 0, purgedDrafts, processedAt: new Date().toISOString() },
     });
   }
 
@@ -120,6 +153,7 @@ export async function POST(request: NextRequest) {
     success: true,
     data: {
       abandonedCount: ids.length,
+      purgedDrafts,
       processedAt: new Date().toISOString(),
       ids,
     },

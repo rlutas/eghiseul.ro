@@ -3,6 +3,18 @@ import { NextRequest } from 'next/server';
 
 const persistentFrom = vi.fn();
 const persistentClient = { from: persistentFrom };
+
+// Lanț care acceptă orice filtru (order/range/ilike/eq/or/lt) și rezolvă cu `result`
+// — lista aplică acum și filtrul de status (?status=active implicit).
+function listChain(result: { data: unknown[]; count: number; error: null }, onIlike?: (val: string) => void) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const c: any = {};
+  for (const m of ['select', 'order', 'range', 'eq', 'or', 'lt']) c[m] = vi.fn(() => c);
+  c.ilike = vi.fn((_f: string, val: string) => (onIlike?.(val), c));
+  c.then = (ok: (v: unknown) => unknown, err?: (e: unknown) => unknown) => Promise.resolve(result).then(ok, err);
+  return c;
+}
+
 const { getUser } = vi.hoisted(() => ({ getUser: vi.fn() }));
 
 vi.mock('@/lib/supabase/server', () => ({
@@ -55,30 +67,14 @@ describe('GET /api/admin/coupons', () => {
   });
 
   it('uses settings.manage (NOT orders.manage — coupons are settings)', async () => {
-    persistentFrom.mockReturnValue({
-      select: vi.fn().mockReturnValue({
-        order: vi.fn().mockReturnValue({
-          range: vi.fn().mockResolvedValue({ data: [], count: 0, error: null }),
-        }),
-      }),
-    });
+    persistentFrom.mockReturnValue(listChain({ data: [], count: 0, error: null }));
 
     await listGet(makeReq());
     expect(requirePermission).toHaveBeenCalledWith('admin-1', 'settings.manage');
   });
 
   it('returns paginated list', async () => {
-    persistentFrom.mockReturnValue({
-      select: vi.fn().mockReturnValue({
-        order: vi.fn().mockReturnValue({
-          range: vi.fn().mockResolvedValue({
-            data: [{ id: 'c1', code: 'SAVE10' }],
-            count: 1,
-            error: null,
-          }),
-        }),
-      }),
-    });
+    persistentFrom.mockReturnValue(listChain({ data: [{ id: 'c1', code: 'SAVE10' }], count: 1, error: null }));
 
     const res = await listGet(makeReq({ page: '1', limit: '50' }));
     expect(res.status).toBe(200);

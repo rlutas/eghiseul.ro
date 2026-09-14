@@ -105,6 +105,18 @@ ai X% reducere, reia comanda din link" — link-ul poartă `?coupon=`, care se
 aplică automat la aterizare (checkout + wizard). Fără email valid: cuponul se
 creează, emailul se sare, agentul dă codul pe WhatsApp.
 
+## 7. Coada telefonică reparată + curățenie cupoane și drafturi (a patra rundă)
+
+Raul: „la abandonuri cam mică lista și-s numa de-ăștia super vechi". Audit pe 901
+comenzi: coada arăta 37. **162 erau excluse ca „fără nume"** pentru că numele stătea
+în `billing` (extras CF / proprietate), nu în `personal`. Reparat + ordine nouă
+(cele sub 24 h primele, verde), un rând per email cu „×N", adrese inventate excluse.
+Cupoane: 1.423 RECOVERY expirate și nefolosite în listă → `/admin/coupons` arată
+implicit doar active (chips Active/Expirate/Toate, badge „Expirat"), iar cronul
+`recovery-emails` șterge cupoanele de sistem expirate >7 zile și nefolosite.
+Drafturi: cronul `auto-abandon` șterge drafturile >30 zile cu doar contactul
+completat (61 azi). Nicio migrare.
+
 ## Fișiere
 
 - `supabase/migrations/156_phone_recovery_tracking.sql`, `157_contacts_warmup_campaign.sql`, `158_contacts_warmup_skip.sql` — toate aplicate live

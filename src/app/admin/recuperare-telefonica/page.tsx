@@ -47,6 +47,8 @@ interface PriorityRow {
   phoneContactedAt: string | null;
   phoneContactedBy: string | null;
   phoneContactNotes: string | null;
+  duplicateCount: number;
+  freshness: 0 | 1 | 2;
 }
 
 function timeAgo(iso: string): string {
@@ -176,8 +178,8 @@ export default function RecuperareTelefonicaPage() {
             Recuperare telefonică
           </h1>
           <p className="mt-0.5 text-sm text-slate-500">
-            {rows.length} {rows.length === 1 ? 'comandă' : 'comenzi'} de sunat · sortate după prioritate
-            (telefon străin + certificat naștere/căsătorie primele) și apoi cele mai recente.
+            {rows.length} {rows.length === 1 ? 'client' : 'clienți'} de sunat (ultimele 30 zile, un rând per email) · prioritate:
+            telefon străin + stare civilă, apoi cele din ultimele 24 h, apoi cine a completat mai mult.
             {conversionPct !== null && (
               <> · conversie după apel: <strong>{conversionPct}%</strong> ({conversion?.contactedConverted}/{conversion?.contactedTotal})</>
             )}
@@ -242,6 +244,11 @@ export default function RecuperareTelefonicaPage() {
                       )}
                       {r.isForeignPhone && <span className="text-blue-600">(străin)</span>}
                       {r.email && <span>{r.email}</span>}
+                      {r.duplicateCount > 1 && (
+                        <span className="rounded bg-slate-100 px-1 py-0.5 text-[10px] font-medium text-slate-600" title={`${r.duplicateCount} comenzi începute de pe acest email`}>
+                          ×{r.duplicateCount}
+                        </span>
+                      )}
                     </div>
                   </td>
                   <td className="px-3 py-2">
@@ -256,7 +263,9 @@ export default function RecuperareTelefonicaPage() {
                     </div>
                   </td>
                   <td className="px-3 py-2 font-medium">{r.totalRon.toFixed(0)} RON</td>
-                  <td className="px-3 py-2 text-muted-foreground">{timeAgo(r.createdAt)}</td>
+                  <td className="px-3 py-2 text-muted-foreground">
+                    {r.freshness === 0 ? <span className="font-medium text-green-700">{timeAgo(r.createdAt)}</span> : timeAgo(r.createdAt)}
+                  </td>
                   <td className="px-3 py-2">
                     {r.phoneContactedAt ? (
                       <span className="inline-flex items-center gap-1 text-xs text-green-700">

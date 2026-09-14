@@ -61,8 +61,8 @@ partajat acum cu cronul) și o sortează pentru un om, nu pentru un cron:
 - **tier 1** — telefon străin SAU serviciu de stare civilă (unul din două).
 - **tier 0** — restul.
 
-În fiecare tier, cele mai recente abandonuri primele (fereastra utilă de apel
-se închide rapid — cercetare: conversie scade mult după 24h de la abandon).
+În fiecare tier: prospețime (<24 h, <72 h, restul) → profunzimea datelor →
+recență — vezi „Coada, a treia rundă" mai jos pentru motivație.
 
 `?includeContacted=1` arată și comenzile deja sunate (implicit ascunse).
 Răspunsul include `conversion: { contactedTotal, contactedConverted }` —
@@ -87,6 +87,20 @@ nu sunt fixate. Cercetare: discount discreționar, potrivit obiecției reale a
 clientului, convertește mai bine decât un procent fix generic dat de sistem.
 Tabelul de cupoane arată badge „Telefonic" (albastru) vs „Auto" (galben,
 `system_kind='recovery'`) pentru distincție rapidă.
+
+## Coada, a treia rundă (14.09) — „văd doar de-astea super vechi"
+
+Audit pe 901 comenzi draft/abandonate: coada arăta 37, dintre care cele vechi sus.
+Trei cauze, reparate:
+- **162 excluse ca „fără nume"** — `hasIdentifiableName` citea doar `personal`/`contact`;
+  la extras CF și serviciile pe proprietate numele stă în **`billing`**. Acum caută
+  personal → billing → contact (`identifiableName`).
+- **Ordinea**: tier → profunzime → recență punea comenzile vechi cu multe date deasupra
+  celor de acum 2 ore. Acum: tier → **prospețime** (<24 h, apoi <72 h — conversia scade
+  mult după 24 h; rândurile sub 24 h au vechimea verde) → profunzime → recență.
+- **Un rând per email**, pe cea mai recentă comandă, cu contorul „×N" (19 emailuri aveau
+  44 de comenzi în 30 de zile). Adresele inventate (`isSuspiciousEmail`: „sssssssim@…",
+  „test@…") nu intră în coadă deloc.
 
 ## Cupon + email de follow-up direct din „Bifează sunat" (14.09, a doua rundă)
 

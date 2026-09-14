@@ -18,6 +18,20 @@ const UNDELIVERABLE_DOMAINS = new Set([
   'localhost',
 ]);
 
+/**
+ * Adrese inventate la tastat („sssssssim@yahoo.com", „asdf@gmail.com",
+ * „test@…"): domeniul e real, deci `isUndeliverable` nu le prinde, dar
+ * trimiterea bounce-uiește și strică reputația. Heuristic, deliberat prudent:
+ * 5+ același caracter la rând, sau local-part-ul e un cuvânt de test.
+ */
+const SUSPICIOUS_LOCAL_PARTS = /^(test|teste|testing|asdf|asdfg|qwerty|qwe|abc|aaa|xxx|zzz|nume|email|mail|nimic|fals|nu|na)\d*$/i;
+export function isSuspiciousEmail(email: string): boolean {
+  const at = email.lastIndexOf('@');
+  if (at < 1) return true;
+  const local = email.slice(0, at).toLowerCase();
+  return /(.)\1{4,}/.test(local) || SUSPICIOUS_LOCAL_PARTS.test(local);
+}
+
 export function isUndeliverable(email: string): boolean {
   const at = email.lastIndexOf('@');
   if (at < 1 || at === email.length - 1) return true; // no local part or no domain

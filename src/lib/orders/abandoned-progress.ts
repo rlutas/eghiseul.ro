@@ -57,15 +57,27 @@ export function dataDepthScore(customerData: unknown): number {
   );
 }
 
-/** True dacă avem un nume real (nu doar email/telefon) — merită sunat. */
+/**
+ * True dacă avem un nume real (nu doar email/telefon) — merită sunat.
+ * Caută în `personal`, `billing` ȘI `contact`: la extras CF / servicii pe
+ * proprietate numele stă doar în `billing` (audit 14.09: 162 de comenzi
+ * ascunse din coadă pentru că se citea doar personal/contact).
+ */
 export function hasIdentifiableName(customerData: unknown): boolean {
-  if (!customerData || typeof customerData !== 'object') return false;
+  return identifiableName(customerData) !== null;
+}
+
+/** Primul (prenume, nume) găsit în personal → billing → contact, sau null. */
+export function identifiableName(customerData: unknown): { firstName: string; lastName: string } | null {
+  if (!customerData || typeof customerData !== 'object') return null;
   const sections = customerData as Record<string, { firstName?: unknown; lastName?: unknown } | undefined>;
-  const contact = sections.contact;
-  const personal = sections.personal;
-  const first = (personal?.firstName ?? contact?.firstName ?? '').toString().trim();
-  const last = (personal?.lastName ?? contact?.lastName ?? '').toString().trim();
-  return first.length > 0 || last.length > 0;
+  for (const key of ['personal', 'billing', 'contact']) {
+    const s = sections[key];
+    const first = (s?.firstName ?? '').toString().trim();
+    const last = (s?.lastName ?? '').toString().trim();
+    if (first.length > 0 || last.length > 0) return { firstName: first, lastName: last };
+  }
+  return null;
 }
 
 // Romanian mobile numbers: optional +40/0040/0 prefix, then 7 + 8 digits.

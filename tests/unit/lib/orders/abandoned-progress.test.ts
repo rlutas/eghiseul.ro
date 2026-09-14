@@ -101,6 +101,14 @@ describe('hasIdentifiableName', () => {
     expect(hasIdentifiableName({ contact: { firstName: 'Ion' } })).toBe(true);
   });
 
+  it('găsește numele și în billing (extras CF / servicii pe proprietate — audit 14.09: 162 ascunse)', () => {
+    expect(hasIdentifiableName({ contact: { email: 'a@b.ro' }, billing: { firstName: 'Mihaela Laura' }, property: { county: 'Cluj' } })).toBe(true);
+  });
+
+  it('nume gol ("") nu contează ca nume', () => {
+    expect(hasIdentifiableName({ personal: { firstName: '', lastName: '' }, contact: { email: 'a@b.ro' } })).toBe(false);
+  });
+
   it('returns false when no name anywhere', () => {
     expect(hasIdentifiableName({ contact: { email: 'a@b.com', phone: '0722' } })).toBe(false);
   });
