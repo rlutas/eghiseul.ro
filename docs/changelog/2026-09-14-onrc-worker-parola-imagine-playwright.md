@@ -70,9 +70,19 @@ Ultimul job reușit: `E-260910-JG5A9` (10.09). Ultimul deploy al worker-ului:
 3. Verifică: `curl -X POST https://sso.onrc.ro/realms/onrc/protocol/openid-connect/token -d grant_type=password -d client_id=frontoffice-app -d username=… -d password=…` → trebuie `access_token`.
 4. `/admin/onrc` → „↻ Reîncearcă automat" pe joburile eșuate.
 
-## Rămâne
+## Rezolvare (13:45)
 
-- Parola nouă de pus în Railway (Raul o are; la momentul scrierii grant-ul
-  încă răspunde `Invalid user credentials`).
-- Cele 2 comenzi: după pasul de mai sus, „Reîncearcă automat" — sau manual +
-  „Încarcă PDF" dacă clientul nu mai poate aștepta.
+Raul a resetat parola pe portal și a pus-o în Railway. Grant-ul tot dădea
+`Invalid user credentials` — dar login-ul în browser cu aceeași parolă mergea.
+Cauza: **`ONRC_USERNAME` din Railway avea un spațiu la final** (28 de
+caractere în loc de 27). Worker-ul îl taie (`required()` face `trim()`), deci
+pe el nu-l afecta; testele mele citeau variabila brută. Capcană de notat:
+orice script care testează credențialele din `railway variables --json`
+trebuie să facă `trim()`. Variabila a fost corectată oricum.
+
+Diferența de cod de eroare spune și ea povestea: worker-ul primea **400**
+(cont cu acțiune obligatorie — resetare parolă), testele de după resetare
+**401** (credențiale greșite, din cauza spațiului).
+
+Cele 2 comenzi au fost repuse în coadă (`PENDING`, `retry_count 0`) după
+redeploy; niciuna nu avea `onrc_draft_id`, deci nu exista risc de dublă plată.
