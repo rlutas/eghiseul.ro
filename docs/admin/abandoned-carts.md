@@ -56,50 +56,47 @@ Răspuns: `{ success: true, data: { abandonedCount: N, processedAt, ids } }`.
 - Audit insert failure nu blochează update-ul (rare, dar nu pierdem state-ul de status)
 - `GET` handler disponibil în non-production pentru dry-run debugging
 
-### Layer 2: Recovery email + cupon (cron 15 min)
+### Layer 2: Recovery email în 3 pași (cron 15 min) — rescris 2026-09-14
 
 **Endpoint:** `POST /api/cron/recovery-emails`
 **Frecvență:** la fiecare 15 min (rulează după auto-abandon)
 **Auth:** `Authorization: Bearer ${CRON_SECRET}`
 
-Două pool-uri de candidați din ultimele 7 zile, cu email valid și fără recovery trimis (`recovery_email_sent_at IS NULL`):
+> **De ce 3 pași:** emailul unic cu cupon 10% avea **1,4% redemption** (20 din 1.444).
+> Cercetarea (`docs/marketing/email-marketing-plan-2026-09.md` §4.1): reducerea NU e
+> prima armă — antrenează abandonul pentru cupon; secvențele de 3 atingeri recuperează
+> 15–25% din coșuri. Migrarea 160: `recovery_email_step` (0–3) +
+> `recovery_email_last_sent_at`; cine primise deja emailul vechi cu cupon e marcat pas 3.
 
-- **`status='abandoned'`** — comportamentul original.
+| Pas | Când | Conținut | Șablon |
+|---|---|---|---|
+| **1** | ≥30 min de la creare (draft: ≥2 h idle) | „Am păstrat tot ce ai completat — reia de unde ai rămas". FĂRĂ cupon. | `abandoned-recovery-sequence.ts` → `buildRecoveryStep1` |
+| **2** | ≥24 h după pasul 1 | Încredere: cei 3 pași după plată, echipă reală (eDigitalizare SRL, Cluj), rating Google real din `SOCIAL_PROOF`, WhatsApp. FĂRĂ cupon. | `buildRecoveryStep2` |
+| **3** | ≥48 h după pasul 2 (~72 h) | Cupon `RECOVERY-XXXXXXXX` 10% / 48 h / unică folosință, `system_kind='recovery'`. | `abandoned-recovery.ts` (șablonul vechi) |
+
+Două pool-uri de candidați din ultimele 7 zile, cu email valid și `recovery_email_step < 3`:
+
+- **`status='abandoned'`** — link la `/comanda/checkout/<orderId>` (pasul 3 adaugă `?coupon=`).
 - **`status='draft'`** (2026-07-20) — cu DOUĂ filtre suplimentare:
-  - **idle ≥ 2h** (`updated_at`) — nu trimitem cuiva care e încă în sesiune (pauză de masă, upload KYC lent);
-  - **progres dincolo de contact** (`hasProgressBeyondContact`) — draftul trebuie să aibă cel puțin o
-    secțiune în afara `contact`/`billing` cu o valoare reală (string non-gol, număr, `true`, array non-gol).
-    `{"plateNumber":""}` NU se califică (schelet inițializat); `{"county":"Prahova"}` DA. Cine a lăsat
-    doar emailul e window-shopper — nu-i ardem reputația de sender.
+  - **idle ≥ 2h** (`updated_at`) — nu trimitem cuiva care e încă în sesiune;
+  - **progres dincolo de contact** (`hasProgressBeyondContact`, `lib/orders/abandoned-progress.ts`).
+  Link înapoi în wizard: `/comanda/<slug>?order=<friendlyId>&email=<email>[&coupon=]` (resume
+  cross-device; emailul e gardă anti-IDOR pe guest drafts). `?coupon=` se aplică automat la aterizare.
 
-**Excludere trafic intern:** `TEST_EMAILS` în rută (`serviciiseonethut@gmail.com`) — skip necondiționat.
+**Excludere trafic intern:** `TEST_EMAILS` (`lib/email/deliverability.ts`) — skip necondiționat.
 
-Pentru fiecare candidat:
+**Marcare:** după fiecare trimitere reușită `recovery_email_step = pas`,
+`recovery_email_last_sent_at = now()`; la pasul 1 și `recovery_email_sent_at = now()` (dashboardul
+îl citește ca „a primit recovery"). Audit: `event_type='recovery_email_sent'`,
+`new_value: { step, coupon_code? }`. Idempotency key la Resend: `recovery-<orderId>-step<n>`.
 
-1. **Generează cupon unic**: `RECOVERY-XXXXXXXX` (8 caractere din alfabet curat fără 0/O/1/I/L). Retry o dată dacă collision UNIQUE (extrem de rar).
-   - `discount_type: percentage`, `discount_value: 10`
-   - `max_uses: 1`, `valid_until: now + 48h`
-   - `system_kind: 'recovery'` (filtru pentru tab Recovery în /admin/coupons)
-2. **Trimite email** via Resend (subject + HTML + text plain):
-   - Subject: „Ionel, ai uitat Cazier Judiciar — reducere 10% pe 48h"
-   - Card cu codul cuponului (font mare, dashed border galben)
-   - Buton mare „Continuă comanda", link diferit pe pool:
-     - `abandoned` → `/comanda/checkout/<orderId>?coupon=RECOVERY-XXX`
-     - `draft` → `/comanda/<serviceSlug>?order=<friendlyId>&email=<email>&coupon=RECOVERY-XXX`
-       (resume-ul cross-device pe care wizard-ul îl suportă deja; emailul e gate-ul anti-IDOR pentru guest drafts)
-   - **`?coupon=` se aplică AUTOMAT la aterizare** (2026-07-20): checkout page îl POST-ează la
-     `/api/orders/[id]/coupon` după load; în wizard, review-step îl citește din URL (parametrii străini
-     supraviețuiesc sincronizării de URL între pași) și îl validează singur. Dacă aplicarea eșuează
-     (expirat/folosit), inputul manual rămâne prefill-uit cu codul.
-3. **Marchează** `orders.recovery_email_sent_at = now()` pentru a nu re-trimite la următoarea rulare
-4. **Audit log**: `event_type='recovery_email_sent'`, `notes: 'Email recovery trimis cu cupon RECOVERY-XXX (-10%, 48h)'`
+**Telefon + email merg în paralel:** o comandă bifată „sunată" în `/admin/recuperare-telefonica`
+primește în continuare secvența (multi-canal +45% vs un singur canal).
 
-**Comportament când Resend nu e configurat** (`RESEND_API_KEY` lipsește):
-- Cupon **este creat** (testabil)
-- Email **nu se trimite** (skipped log)
-- `recovery_email_sent_at` **NU se setează** → o rulare ulterioară cu Resend configurat va trimite
+**Când Resend nu e configurat:** pasul NU avansează (retry la următoarea rulare); cuponul de la
+pasul 3 se creează oricum.
 
-**Cap pe rulare:** 100 comenzi (evită burst pe Resend rate limit).
+**Cap pe rulare:** 100 comenzi. Test: `tests/unit/api/cron-recovery-emails.test.ts`.
 
 ### Layer 3: Vizibilitate admin
 

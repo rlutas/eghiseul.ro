@@ -18,10 +18,10 @@
  *   cazier fiscal        30 zile  OG 39/2015, art. 11
  *   certificat constatator 30 zile uzanță ONRC / cerință licitații și bănci
  *   cazier auto          30 zile  cerință DRPCIV / angajatori
+ *   extras CF (informare, colectiv) 30 zile  cerință notari/bănci/instituții
+ *                                  (decizie Raul 14.09: „la fel, 30 zile")
  *
- * Extrasul CF nu are termen legal (cerut „recent" de notari/bănci) și e de
- * regulă cumpărat pentru o singură tranzacție — NU primește reminder, doar
- * cross-sell. Certificatele de stare civilă nu expiră.
+ * Certificatele de stare civilă nu expiră.
  */
 export const DOCUMENT_VALIDITY_DAYS: Record<string, number> = {
   'cazier-judiciar': 180,
@@ -31,6 +31,8 @@ export const DOCUMENT_VALIDITY_DAYS: Record<string, number> = {
   'cazier-fiscal': 30,
   'certificat-constatator': 30,
   'cazier-auto': 30,
+  'extras-carte-funciara': 30,
+  'extras-cf-colectiv': 30,
 };
 
 /** Reminderul pleacă în fereastra [expirare − 14 zile, expirare + 30 zile]. */

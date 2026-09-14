@@ -814,6 +814,12 @@ articole, servicii noi; markdown-lite, test pe adresa proprie, tranșe zilnice).
 `orders.completed_at` nou cu trigger + backfill. Migrația 159. Vezi
 `docs/technical/specs/lifecycle-emails.md`.
 
+#### ✅ Recovery coșuri abandonate în 3 pași — LIVRAT 2026-09-14
+
+Cronul `recovery-emails`: pasul 1 la 30 min fără cupon, pasul 2 la +24 h
+(încredere), pasul 3 la +48 h cu cuponul 10%/48 h. Migrația 160. Vezi
+`docs/admin/abandoned-carts.md` Layer 2.
+
 #### Plan email marketing A–Z — restul roadmap-ului (analiză 2026-09-14)
 
 **Ce lipsește încă** (vezi `docs/marketing/email-marketing-plan-2026-09.md`

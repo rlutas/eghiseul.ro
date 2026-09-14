@@ -11,11 +11,12 @@ import {
 const d = (iso: string) => new Date(iso);
 
 describe('expiry window', () => {
-  it('cazier judiciar = 180 zile; extras CF / stare civilă nu expiră', () => {
+  it('cazier judiciar = 180 zile; extras CF = 30; stare civilă nu expiră', () => {
     expect(DOCUMENT_VALIDITY_DAYS['cazier-judiciar-persoana-fizica']).toBe(180);
+    expect(DOCUMENT_VALIDITY_DAYS['extras-carte-funciara']).toBe(30);
     expect(expiryDate(d('2026-01-01T00:00:00Z'), 'cazier-fiscal')?.toISOString()).toBe('2026-01-31T00:00:00.000Z');
-    expect(expiryDate(d('2026-01-01T00:00:00Z'), 'extras-carte-funciara')).toBeNull();
     expect(expiryDate(d('2026-01-01T00:00:00Z'), 'certificat-nastere')).toBeNull();
+    expect(expiryDate(d('2026-01-01T00:00:00Z'), 'certificat-casatorie')).toBeNull();
   });
 
   it('fereastra: [expirare − 14 zile, expirare + 30 zile]', () => {

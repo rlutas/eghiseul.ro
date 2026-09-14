@@ -28,10 +28,10 @@ trimiteri (Resend 2 req/s), `maxDuration = 300`.
 | cazier fiscal | 30 | OG 39/2015 art. 11 |
 | certificat constatator | 30 | uzanță ONRC / licitații / bănci |
 | cazier auto | 30 | cerință DRPCIV / angajatori |
+| extras CF (informare, colectiv) | 30 | cerință notari / bănci / instituții (decizie Raul 14.09) |
 
-Extrasul CF **nu** primește reminder (fără termen legal, cumpărat pentru o tranzacție) —
-doar cross-sell. Stare civilă nu expiră. Data e aproximativă (copy-ul spune „în jurul
-datei de") — calculăm de la finalizarea comenzii, nu de la emitere.
+Stare civilă nu expiră. Data e aproximativă (copy-ul spune „în jurul datei de") —
+calculăm de la finalizarea comenzii, nu de la emitere.
 
 ### „În termen" (`wasOnTime`)
 
@@ -109,4 +109,6 @@ injecta HTML. Implementare: `src/lib/email/markdown-lite.ts`.
 - Nu urmărește deschideri/clicuri (Apple MPP umflă open rate; judecăm după comenzi cu
   `utm_campaign=expiry|cross_sell` în GA4 și după recenziile noi pe Google).
 - Nu are A/B pe subiect. Nu segmentează cross-sell-ul după valoare comandă.
-- Recovery-ul în 3 pași (email-marketing-plan §4.1) rămâne separat, neimplementat.
+- Recovery-ul în 3 pași e separat, în cronul `recovery-emails` (livrat tot 14.09) — vezi
+  `docs/admin/abandoned-carts.md` Layer 2.
+- Preview fizic al tuturor șabloanelor pe o adresă: `npx tsx scripts/email-previews.ts <email>`.

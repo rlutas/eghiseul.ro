@@ -205,12 +205,12 @@ describe('expiry_reminder', () => {
     state.settings = { reviewRequest: false, expiryReminder: true, crossSell: false };
   });
 
-  it('cazier (180 zile): pleacă în fereastră, nu în afara ei, nu la extras CF, nu dacă a recomandat deja', async () => {
+  it('cazier (180 zile): pleacă în fereastră, nu în afara ei, nu la stare civilă, nu dacă a recomandat deja', async () => {
     state.orders = [
       order('soon', 'cazier-judiciar-persoana-fizica', 170), // expiră în 10 zile → în fereastră
       order('early', 'cazier-judiciar-persoana-fizica', 100), // expiră în 80 zile → nu
       order('expired', 'cazier-fiscal', 45), // 30 zile + 15 grație → în fereastră, deja expirat
-      order('cf', 'extras-carte-funciara', 170), // nu expiră
+      order('cf', 'certificat-nastere', 170), // nu expiră
       order('reordered', 'cazier-judiciar-persoana-fizica', 172),
     ];
     state.laterOrders = [{ paid_at: daysAgo(3), customer_data: { contact: { email: 'reordered@gmail.com' } }, services: { slug: 'cazier-judiciar-persoana-fizica' } }];

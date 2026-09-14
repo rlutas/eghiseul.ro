@@ -88,7 +88,7 @@ Cronul actual (`/api/cron/recovery-emails`, `docs/admin/abandoned-carts.md`) tri
 - **Reducerea NU e prima armă** — antrenează clienții să abandoneze special pentru cupon. Email #2 = încredere/valoare (recenzii, clarificări despre ce urmează), reducerea abia la #3, doar pentru cei care tot n-au reacționat.
 - Emailuri trimise în prima oră: 5-6% conversie/email; o secvență de 3 emailuri bine făcută recuperează 15-25% din coșurile abandonate (vs. 1,4% acum).
 
-**Backlog tehnic** (nu implementat în această sesiune — scope separat de research): extins `recovery-emails` cron la 3 trimiteri per comandă, cu discount doar pe a 3-a. Necesită coloană nouă de tracking (`recovery_email_sequence_step`) și 2 șabloane noi în `src/lib/email/templates/`.
+**✅ LIVRAT 2026-09-14 (a treia rundă):** cronul `recovery-emails` trimite 3 pași — 30 min „reia de unde ai rămas" (fără cupon), +24 h încredere (pași după plată, echipă, rating Google real, WhatsApp; fără cupon), +48 h cuponul 10%/48 h. Migrarea 160 (`recovery_email_step`, `recovery_email_last_sent_at`). Detalii: `docs/admin/abandoned-carts.md` Layer 2.
 
 ### 4.2 Recuperare telefonică — **LIVRAT 2026-09-14** ✅
 
@@ -134,7 +134,7 @@ trimise, rămase, dezabonați).
 
 1. **Acum** — Raul/echipa revizuiesc conținutul emailului de warm-up (`src/lib/email/templates/warmup-reengagement.ts`) și pornesc switch-ul din `/admin/marketing` cu un volum mic (implicit 25/zi, ajustabil).
 2. **Săpt. 1-2** — Echipa folosește `/admin/recuperare-telefonica` zilnic pe segmentul tier maxim (deja live, ghid PDF distribuit).
-3. **Săpt. 2-4** — Rescriere secvență recovery email (3 atingeri, discount la final) — vezi 4.1. Nescris încă.
+3. ~~**Săpt. 2-4** — Rescriere secvență recovery email~~ **LIVRAT 2026-09-14** (3 pași, cupon doar la al treilea) — vezi 4.1.
 4. **Continuu** — creștere treptată a volumului zilnic de warm-up pe măsură ce bounce/spam rate rămân sub control (monitorizare manuală Resend).
 5. ~~**Lunar, continuu** — win-back cross-sell la 90 zile inactivitate~~ **LIVRAT 2026-09-14** ca email automat de cross-sell la 30–60 zile după finalizare (+ recenzie Google la comenzi în termen, reminder de expirare a documentului). Toate oprite implicit — se pornesc din `/admin/marketing`. Vezi `docs/technical/specs/lifecycle-emails.md`.
 6. **Newsletter (4.3)** — editorul de campanii e livrat (`/admin/marketing` → „Campanii"): scrii, testezi pe adresa ta, pornești, cronul trimite tranșe zilnice. Prima campanie recomandată: „ce s-a schimbat + 2 servicii noi (rovinietă, celibat) + 1 articol", segment „Clienți", 100/zi.

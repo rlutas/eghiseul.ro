@@ -34,7 +34,7 @@ const ROWS: Array<{ key: keyof Settings; kind: Kind; label: string; hint: string
     key: 'expiryReminder',
     kind: 'expiry_reminder',
     label: 'Reminder expirare document',
-    hint: 'Cazier judiciar și integritate: 6 luni. Cazier fiscal, auto, constatator: 30 zile. Pleacă cu 14 zile înainte, o dată per comandă.',
+    hint: 'Cazier judiciar și integritate: 6 luni. Cazier fiscal, auto, constatator, extras CF: 30 zile. Pleacă cu 14 zile înainte, o dată per comandă.',
   },
   {
     key: 'crossSell',

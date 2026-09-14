@@ -85,6 +85,17 @@ Propunerea acceptată de Raul („hai să facem propunerea"): emailuri către **
 Toate comutatoarele sunt **oprite**; se pornesc din admin după citirea șabloanelor.
 Spec: `docs/technical/specs/lifecycle-emails.md`.
 
+## 5. Recovery în 3 pași (migrarea 160) — a treia rundă, aceeași zi
+
+Cronul `recovery-emails` (la 15 min) nu mai trimite un singur email cu cupon (1,4%
+redemption), ci: **pasul 1** la 30 min (draft: 2 h idle) „reia de unde ai rămas", fără
+cupon; **pasul 2** la +24 h încredere (cei 3 pași după plată, echipă reală, rating Google
+real, WhatsApp), fără cupon; **pasul 3** la +48 h cuponul 10%/48 h. Progres pe comandă
+(`recovery_email_step` 0–3); cei 774 care primiseră deja emailul vechi sunt marcați
+terminați. Extrasul CF intră și el la reminderul de expirare (30 zile, decizie Raul).
+Script de preview pentru toate șabloanele: `scripts/email-previews.ts`.
+Detalii: `docs/admin/abandoned-carts.md` Layer 2.
+
 ## Fișiere
 
 - `supabase/migrations/156_phone_recovery_tracking.sql`, `157_contacts_warmup_campaign.sql`, `158_contacts_warmup_skip.sql` — toate aplicate live
