@@ -1,6 +1,6 @@
 # Plan Email Marketing A–Z — eGhișeul.ro
 
-**Data:** 2026-09-14 · **Status:** plan, neimplementat (execuția e în `DEVELOPMENT_MASTER_PLAN.md` → BACKLOG)
+**Data:** 2026-09-14 · **Status:** plan EXECUTAT în aceeași zi — 4.1 recovery 3 pași, 4.2 telefonic, 4.3 editor campanii, 4.4 warm-up (pornit 25/zi), lifecycle (pornit); KPI în `/admin/marketing`
 **Scop:** monetizarea bazei de 72k contacte + recuperarea reală a comenzilor abandonate (email + telefonic).
 
 ---
