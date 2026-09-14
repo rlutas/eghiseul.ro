@@ -2,6 +2,8 @@
 
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
+import Link from 'next/link';
+import { onrcAutomationBadge } from '@/lib/onrc/automation-badge';
 import {
   Table,
   TableBody,
@@ -66,6 +68,9 @@ interface OrderRow {
   delivery_tracking_number: string | null;
   /** Nr. contract asistență + delegație (din order_documents) — paritate CJO. */
   barou?: { contract: string | null; delegation: string | null } | null;
+  /** Job-ul de automatizare ONRC (constatator), dacă există — pentru badge-ul
+   *  „ONRC automat eșuat — manual". */
+  onrc?: { status: string; error_message: string | null } | null;
   delivery_method: string | null;
   selected_options?: Array<{ code?: string | null; option_name?: string | null }> | null;
   customer_data: {
@@ -554,6 +559,27 @@ export default function AdminOrdersPage() {
                         {formatRelative(order.paid_at || order.created_at!)}
                       </div>
                     )}
+                    {/* Automatizare ONRC: roșu = botul n-a livrat, se face MANUAL
+                        (deschide /admin/onrc pentru eroare + upload PDF). */}
+                    {(() => {
+                      const b = onrcAutomationBadge(order.onrc);
+                      if (!b) return null;
+                      return (
+                        <Link
+                          href="/admin/onrc"
+                          onClick={(e) => e.stopPropagation()}
+                          title={b.title}
+                          className={
+                            b.tone === 'error'
+                              ? 'mt-0.5 inline-flex items-center gap-0.5 rounded border border-red-300 bg-red-50 px-1 py-0 text-[9px] font-semibold uppercase tracking-wide text-red-700 hover:bg-red-100'
+                              : 'mt-0.5 inline-flex items-center gap-0.5 rounded border border-blue-200 bg-blue-50 px-1 py-0 text-[9px] font-semibold uppercase tracking-wide text-blue-700 hover:bg-blue-100'
+                          }
+                        >
+                          {b.tone === 'error' && <AlertTriangle className="h-2.5 w-2.5" />}
+                          {b.label}
+                        </Link>
+                      );
+                    })()}
                     {/* Nr. contract asistență · delegație — sub nr. comandă, ca pe CJO */}
                     {(order.barou?.contract || order.barou?.delegation) && (
                       <div

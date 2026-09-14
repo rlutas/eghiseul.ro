@@ -13,6 +13,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { RefreshButton } from '@/components/admin/refresh-button';
 import { OnrcManualUpload } from './OnrcManualUpload';
+import { OnrcRetryButton } from './OnrcRetryButton';
 
 export const dynamic = 'force-dynamic';
 
@@ -202,7 +203,10 @@ export default async function AdminOnrcPage() {
                   </TableCell>
                   <TableCell className="min-w-[150px]">
                     {(job.status === 'NEEDS_OPERATOR' || job.status === 'FAILED') ? (
-                      <OnrcManualUpload orderId={job.order_id} />
+                      <div className="space-y-1.5">
+                        <OnrcRetryButton orderId={job.order_id} disabled={!!job.onrc_draft_id} />
+                        <OnrcManualUpload orderId={job.order_id} />
+                      </div>
                     ) : (
                       <span className="text-xs text-neutral-400">—</span>
                     )}

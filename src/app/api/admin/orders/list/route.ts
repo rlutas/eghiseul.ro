@@ -213,6 +213,23 @@ export async function GET(request: NextRequest) {
       }
     }
 
+    // Starea automatizării ONRC per comandă (constatator) — lista arată un badge
+    // roșu când botul a eșuat, ca echipa să știe că trebuie făcut manual fără
+    // să deschidă /admin/onrc (incident 14.09.2026: 2 comenzi plătite, eșuate
+    // tăcut). Un job per comandă; dacă sunt mai multe, îl luăm pe cel mai nou.
+    const onrcByOrder: Record<string, { status: string; error_message: string | null }> = {};
+    if (orderRows.length) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: onrcJobs } = await (adminClient as any)
+        .from('onrc_jobs')
+        .select('order_id, status, error_message, created_at')
+        .in('order_id', orderRows.map((o) => o.id))
+        .order('created_at', { ascending: false });
+      for (const j of (onrcJobs ?? []) as { order_id: string; status: string; error_message: string | null }[]) {
+        if (!onrcByOrder[j.order_id]) onrcByOrder[j.order_id] = { status: j.status, error_message: j.error_message };
+      }
+    }
+
     // Open ANCPI/ONRC outage windows — the list UI shows instant services
     // (extras CF / plan cadastral / constatator) as "on hold" instead of a
     // deadline while the backing platform is down.
@@ -224,6 +241,7 @@ export async function GET(request: NextRequest) {
         ...o,
         note_count: noteCounts[o.id] || 0,
         barou: barouByOrder[o.id] ?? null,
+        onrc: onrcByOrder[o.id] ?? null,
       })),
       total: count || 0,
       openOutages,
