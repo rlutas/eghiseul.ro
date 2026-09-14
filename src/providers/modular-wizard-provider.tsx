@@ -49,6 +49,7 @@ import {
   renumberSteps,
 } from '@/lib/verification-modules/step-builder';
 import { generateOrderId, getDraftStorageKey, validateOrderId } from '@/lib/order-id';
+import { HANDOFF_STORAGE_KEY, handoffActions } from '@/lib/orders/wizard-handoff';
 import { getAttribution } from '@/lib/analytics/attribution';
 import { trackMeta } from '@/lib/analytics/meta-pixel';
 
@@ -1069,33 +1070,19 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
       // Set by in-wizard service jumps (e.g. extras CF „Nu știu" → identificare
       // imobil) so the client doesn't retype email/phone. sessionStorage, not
       // URL params — no PII in URLs. Consumed once, max 10 min old.
+      // The rules (TTL, email required, friendly id) live in the pure helper —
+      // the id is what the handoff was missing (E-260914-B8SM9): without it the
+      // autosave gate never created a server draft on the new service and
+      // „Plătește" stayed dead. The property block (collective-CF button) is
+      // carried over by the same helper.
       try {
-        const raw = sessionStorage.getItem('wizard_contact_handoff');
+        const raw = sessionStorage.getItem(HANDOFF_STORAGE_KEY);
         if (raw) {
-          sessionStorage.removeItem('wizard_contact_handoff');
-          const handoff = JSON.parse(raw) as {
-            email?: string; phone?: string; preferredContact?: string; ts?: number;
-            property?: { county?: string; locality?: string; carteFunciara?: string; cadastral?: string; topografic?: string };
-          };
-          if (handoff.ts && Date.now() - handoff.ts < 10 * 60_000 && handoff.email) {
+          sessionStorage.removeItem(HANDOFF_STORAGE_KEY);
+          const actions = handoffActions(raw, Date.now(), generateOrderId);
+          if (actions.length > 0) {
             handoffAppliedRef.current = true;
-            dispatch({
-              type: 'UPDATE_CONTACT',
-              payload: {
-                email: handoff.email,
-                phone: handoff.phone || '',
-                ...(handoff.preferredContact
-                  ? { preferredContact: handoff.preferredContact as 'email' | 'phone' | 'whatsapp' }
-                  : {}),
-              },
-            });
-            // Cross-service jumps can also carry the property block (e.g. the
-            // collective-CF button on Extras CF → Extras CF Colectiv keeps the
-            // number/county the client already typed).
-            if (handoff.property && typeof handoff.property === 'object') {
-              dispatch({ type: 'UPDATE_PROPERTY', payload: handoff.property });
-            }
-            dispatch({ type: 'MARK_INITIALIZED' });
+            for (const action of actions) dispatch(action);
             return; // fresh order on the new service, contact carried over
           }
         }

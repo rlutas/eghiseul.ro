@@ -10,7 +10,8 @@
 
 import { useEffect, useState, Suspense, useCallback, useRef } from 'react';
 import { toast } from 'sonner';
-import { ArrowLeft, ArrowRight, Loader2, AlertTriangle, CheckCircle, ChevronUp, X } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Loader2, AlertTriangle, CheckCircle, ChevronUp, X, MessageCircle } from 'lucide-react';
+import { whatsappUrl } from '@/config/contact';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -518,8 +519,11 @@ export function ModularOrderWizard({ initialService, initialOptions, headerExtra
               vadă că e-Terra e picat, apoi scriau ca să întrebe de ce întârzie
               (raportat de echipă 12.08.2026). Se randează pe toate serviciile
               dependente de platformă — vezi PLATFORM_DEPENDENT_SERVICES — și
-              dispare singur când portalul e funcțional. */}
-          {statusProvider && (
+              dispare singur când portalul e funcțional. NU pe ultimul pas
+              (facturare + „Plătește"): acolo clientul a decis deja, iar caseta
+              roșie de deasupra formularului îl făcea să ezite (raport echipă
+              14.09.2026). */}
+          {statusProvider && !isLastStep && (
             <div className="lg:hidden mb-4">
               <SystemStatus service={statusProvider} autoIssued={isInstantService} />
             </div>
@@ -614,18 +618,38 @@ export function ModularOrderWizard({ initialService, initialOptions, headerExtra
             </div>
           </Card>
 
-          {/* Support Message */}
-          {state.friendlyOrderId && (
-            <div className="mt-4 p-4 bg-blue-50 border border-blue-100 rounded-lg">
-              <p className="text-sm text-blue-800">
-                <strong>Ai nevoie de ajutor?</strong> Contactează-ne și
-                menționează codul comenzii tale:{' '}
-                <code className="bg-blue-100 px-1.5 py-0.5 rounded font-mono font-semibold">
-                  {state.friendlyOrderId}
-                </code>
-              </p>
-            </div>
-          )}
+          {/* Support Message — the ONLY WhatsApp entry point on the wizard.
+              The site-wide floating button is hidden on /comanda/<serviciu>
+              because on mobile it sat right on top of „Plătește" and the
+              order summary bar (screenshots from the team, 14.09.2026). */}
+          <div className="mt-4 p-4 bg-blue-50 border border-blue-100 rounded-lg flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-sm text-blue-800">
+              <strong>Ai nevoie de ajutor?</strong>{' '}
+              {state.friendlyOrderId ? (
+                <>
+                  Scrie-ne și menționează codul comenzii:{' '}
+                  <code className="bg-blue-100 px-1.5 py-0.5 rounded font-mono font-semibold">
+                    {state.friendlyOrderId}
+                  </code>
+                </>
+              ) : (
+                'Scrie-ne pe WhatsApp și te ajutăm să finalizezi comanda.'
+              )}
+            </p>
+            <a
+              href={whatsappUrl(
+                state.friendlyOrderId
+                  ? `Bună! Am nevoie de ajutor cu comanda ${state.friendlyOrderId} (eghiseul.ro).`
+                  : 'Bună! Am nevoie de ajutor să finalizez o comandă pe eghiseul.ro.'
+              )}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex shrink-0 items-center gap-1.5 rounded-md bg-[#25D366] px-3 py-2 text-sm font-semibold text-white hover:bg-[#20bd5a]"
+            >
+              <MessageCircle className="h-4 w-4" />
+              Scrie-ne pe WhatsApp
+            </a>
+          </div>
 
           {/* Mobile only: estimated time + trust badges. The price summary
               itself lives in the sticky-bar dropdown; these "extras" stay here

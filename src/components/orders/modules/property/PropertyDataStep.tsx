@@ -34,6 +34,7 @@ import { validateCNP } from '@/lib/validations/cnp';
 import { normalizeJudet } from '@/lib/ancpi/judete';
 import uatNomenclator from '@/lib/ancpi/uat-nomenclator.json';
 import { checkCf, normalizeCf } from '@/lib/ancpi/cf-format';
+import { HANDOFF_STORAGE_KEY } from '@/lib/orders/wizard-handoff';
 import {
   Tooltip,
   TooltipContent,
@@ -173,7 +174,7 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
   // in the URL) and landing directly on its step 2 (Date Imobil).
   const jumpToService = useCallback((slug: string, carryProperty?: Record<string, string | undefined>) => {
     try {
-      sessionStorage.setItem('wizard_contact_handoff', JSON.stringify({
+      sessionStorage.setItem(HANDOFF_STORAGE_KEY, JSON.stringify({
         email: state.contact.email,
         phone: state.contact.phone,
         preferredContact: state.contact.preferredContact,
