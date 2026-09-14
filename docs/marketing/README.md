@@ -7,6 +7,7 @@
 Legat de acest domeniu, dar documentat separat pentru că e feature de admin:
 - [`../technical/specs/phone-recovery-abandoned-carts.md`](../technical/specs/phone-recovery-abandoned-carts.md) — recuperare telefonică pentru comenzi abandonate (coadă de priorizare + cupoane custom)
 - [`../technical/specs/warmup-email-campaign.md`](../technical/specs/warmup-email-campaign.md) — email de reactivare pe registrul de 72k contacte (implicit oprit, switch în `/admin/marketing`)
+- [`../technical/specs/lifecycle-emails.md`](../technical/specs/lifecycle-emails.md) — emailuri automate către clienți (recenzie Google la comenzi în termen, expirare document, cross-sell) + campanii manuale (noutăți/articole) scrise în `/admin/marketing`
 - [`../admin/abandoned-carts.md`](../admin/abandoned-carts.md) — sistemul existent de recovery automat (email + cupon 10%)
 - [`ghid-echipa-recuperare-telefonica.pdf`](ghid-echipa-recuperare-telefonica.pdf) — ghid tipărit pentru echipă: ce s-a schimbat, cum se sortează coada, ce se spune la telefon
 - `/admin/marketing` (pagină admin) — lista de abonați GDPR (opt-in explicit) + controlul campaniei de warm-up, separată de registrul de contacte

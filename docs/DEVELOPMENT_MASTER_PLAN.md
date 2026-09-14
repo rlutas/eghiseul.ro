@@ -805,6 +805,15 @@ vechi, se trimite la toate 72.278, dar treptat (switch + volum/zi editabil în
 `/admin/marketing`, implicit OPRIT până la revizuirea conținutului). Migrația
 157. Vezi `docs/technical/specs/warmup-email-campaign.md`.
 
+#### ✅ Emailuri de lifecycle + campanii manuale — LIVRAT 2026-09-14 (implicit oprit)
+
+Trei emailuri automate către clienți (cerere recenzie Google doar la comenzi în
+termen; reminder expirare cazier 6 luni / fiscal, auto, constatator 30 zile;
+cross-sell la 30–60 zile) + editor de campanii în `/admin/marketing` (noutăți,
+articole, servicii noi; markdown-lite, test pe adresa proprie, tranșe zilnice).
+`orders.completed_at` nou cu trigger + backfill. Migrația 159. Vezi
+`docs/technical/specs/lifecycle-emails.md`.
+
 #### Plan email marketing A–Z — restul roadmap-ului (analiză 2026-09-14)
 
 **Ce lipsește încă** (vezi `docs/marketing/email-marketing-plan-2026-09.md`

@@ -136,7 +136,8 @@ trimise, rămase, dezabonați).
 2. **Săpt. 1-2** — Echipa folosește `/admin/recuperare-telefonica` zilnic pe segmentul tier maxim (deja live, ghid PDF distribuit).
 3. **Săpt. 2-4** — Rescriere secvență recovery email (3 atingeri, discount la final) — vezi 4.1. Nescris încă.
 4. **Continuu** — creștere treptată a volumului zilnic de warm-up pe măsură ce bounce/spam rate rămân sub control (monitorizare manuală Resend).
-5. **Lunar, continuu** — win-back cross-sell la 90 zile inactivitate, pe segmentul de clienți reali (381 + ce se adaugă).
+5. ~~**Lunar, continuu** — win-back cross-sell la 90 zile inactivitate~~ **LIVRAT 2026-09-14** ca email automat de cross-sell la 30–60 zile după finalizare (+ recenzie Google la comenzi în termen, reminder de expirare a documentului). Toate oprite implicit — se pornesc din `/admin/marketing`. Vezi `docs/technical/specs/lifecycle-emails.md`.
+6. **Newsletter (4.3)** — editorul de campanii e livrat (`/admin/marketing` → „Campanii"): scrii, testezi pe adresa ta, pornești, cronul trimite tranșe zilnice. Prima campanie recomandată: „ce s-a schimbat + 2 servicii noi (rovinietă, celibat) + 1 articol", segment „Clienți", 100/zi.
 
 ---
 

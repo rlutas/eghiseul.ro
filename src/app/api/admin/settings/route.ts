@@ -124,6 +124,8 @@ export async function PATCH(request: NextRequest) {
       'sameday_dropoff',
       // Campania de warm-up pe registrul de contacte (docs/marketing/).
       'warmup_campaign',
+      // Emailuri automate post-comandă: recenzie / expirare / cross-sell.
+      'lifecycle_emails',
     ];
 
     if (!ALLOWED_KEYS.includes(key)) {
@@ -154,6 +156,16 @@ export async function PATCH(request: NextRequest) {
       ) {
         return NextResponse.json(
           { success: false, error: 'Setare invalidă: { enabled: boolean, dailyBatchSize: 1-2000 }' },
+          { status: 400 }
+        );
+      }
+    }
+    if (key === 'lifecycle_emails') {
+      const v = value as Record<string, unknown> | null;
+      const keys = ['reviewRequest', 'expiryReminder', 'crossSell'];
+      if (!v || typeof v !== 'object' || keys.some((k) => typeof v[k] !== 'boolean')) {
+        return NextResponse.json(
+          { success: false, error: 'Setare invalidă: { reviewRequest, expiryReminder, crossSell: boolean }' },
           { status: 400 }
         );
       }

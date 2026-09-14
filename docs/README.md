@@ -62,6 +62,7 @@ Index al documentației. Aceasta e o **hartă**, nu un jurnal — pentru jurnalu
 - **Plan email marketing A–Z (72k contacte, GDPR, roadmap):** [`marketing/email-marketing-plan-2026-09.md`](marketing/email-marketing-plan-2026-09.md)
 - **Recuperare telefonică comenzi abandonate (coadă priorizare + cupoane custom):** [`technical/specs/phone-recovery-abandoned-carts.md`](technical/specs/phone-recovery-abandoned-carts.md)
 - **Warm-up email pe registrul de 72k contacte (implicit oprit):** [`technical/specs/warmup-email-campaign.md`](technical/specs/warmup-email-campaign.md)
+- **Emailuri de lifecycle (recenzie / expirare document / cross-sell) + campanii manuale din admin:** [`technical/specs/lifecycle-emails.md`](technical/specs/lifecycle-emails.md)
 - **Deploy:** [`deployment/VERCEL_DEPLOYMENT.md`](deployment/VERCEL_DEPLOYMENT.md)
 - **Email (Resend + Zoho) setup:** [`deployment/EMAIL_RESEND_ZOHO_SETUP.md`](deployment/EMAIL_RESEND_ZOHO_SETUP.md)
 

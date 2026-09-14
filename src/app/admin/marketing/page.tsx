@@ -19,6 +19,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent } from '@/components/ui/card';
 import { Mail, Download, RefreshCw, Search, Send } from 'lucide-react';
 import { toast } from 'sonner';
+import { LifecycleEmailsCard } from './lifecycle-card';
+import { CampaignsCard } from './campaigns-card';
 
 interface Subscriber {
   id: string;
@@ -224,6 +226,8 @@ export default function AdminMarketingPage() {
 
   return (
     <div className="space-y-5">
+      <LifecycleEmailsCard />
+      <CampaignsCard />
       <WarmupCampaignCard />
 
       <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">

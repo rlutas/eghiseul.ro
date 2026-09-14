@@ -36,6 +36,14 @@
     {
       "path": "/api/cron/warmup-campaign/",
       "schedule": "0 7 * * *"
+    },
+    {
+      "path": "/api/cron/lifecycle-emails/",
+      "schedule": "20 7 * * *"
+    },
+    {
+      "path": "/api/cron/email-campaigns/",
+      "schedule": "40 7 * * *"
     }
   ]
 }

@@ -62,6 +62,29 @@ de 2 cereri/s); `POST` pe dezabonare pentru one-click RFC 8058.
 Test nou: `tests/unit/api/cron-warmup-campaign.test.ts` (verifică inclusiv că
 fiecare UPDATE folosește un `from()` nou).
 
+## 4. Emailuri de lifecycle + campanii manuale (migrarea 159) — a doua rundă, aceeași zi
+
+Propunerea acceptată de Raul („hai să facem propunerea"): emailuri către **clienți**
+(au cumpărat), nu doar către lead-uri.
+
+- **Cerere de recenzie Google** la 3–10 zile după finalizare — DOAR comenzile livrate în
+  termen și fără pauze/reîncărcări (`wasOnTime`). Un client căruia i-a mers prost nu e
+  rugat să scrie recenzie.
+- **Reminder de expirare**: cazier judiciar + integritate 6 luni, cazier fiscal / auto /
+  constatator 30 zile; pleacă cu 14 zile înainte (până la 30 zile după), o dată per
+  comandă, nu dacă a recomandat deja. Extrasul CF nu primește (n-are termen legal).
+- **Cross-sell** la 30–60 zile: 2–3 documente înrudite, active, necumpărate; un email per
+  client la 6 luni.
+- **Campanii manuale** în `/admin/marketing`: subiect + corp markdown-lite + buton,
+  segment (clienți / abonați / tot registrul), tranșe zilnice, „Test" pe adresa proprie,
+  Pornește / Pauză. Cronul parcurge registrul cu cursor keyset.
+- `orders.completed_at` **nu exista** (`actual_completion_date` NULL pe toate cele 389) —
+  coloană nouă, backfill din `order_history`, trigger pentru viitor.
+- Claim atomic prin UNIQUE `(order_id, kind)` inserat înainte de trimitere.
+
+Toate comutatoarele sunt **oprite**; se pornesc din admin după citirea șabloanelor.
+Spec: `docs/technical/specs/lifecycle-emails.md`.
+
 ## Fișiere
 
 - `supabase/migrations/156_phone_recovery_tracking.sql`, `157_contacts_warmup_campaign.sql`, `158_contacts_warmup_skip.sql` — toate aplicate live
