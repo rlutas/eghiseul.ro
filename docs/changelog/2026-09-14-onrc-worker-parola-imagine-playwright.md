@@ -86,3 +86,23 @@ Diferența de cod de eroare spune și ea povestea: worker-ul primea **400**
 
 Cele 2 comenzi au fost repuse în coadă (`PENDING`, `retry_count 0`) după
 redeploy; niciuna nu avea `onrc_draft_id`, deci nu exista risc de dublă plată.
+**Rezultat (13:58–13:59):** ambele depuse + plătite (30 lei fiecare din
+wallet), `RC 3709474` / `RC 3709504`, PDF atașat, `document_ready`, email
+trimis, cost ONRC înregistrat automat.
+
+## Două lucruri observate la reluare, reparate
+
+**1. „undefined" la Id cerere.** Worker-ul citește summary-ul la 2 secunde
+după plată. Azi ONRC a înregistrat cererile abia după 9 minute
+(`creationDate 13:54`, plata 13:45; între timp `status: READY` fără `number`),
+iar worker-ul trimitea `String(undefined)`, pe care admin-ul îl afișa ca link
+„undefined". Se completa singur la următoarea verificare, dar arăta a depunere
+ratată. Acum: worker-ul așteaptă până la 40 s (4 × 10 s) după numărul cererii
+înainte să parcheze jobul (`059ee87` + următorul commit din worker), iar `/api/onrc/result` refuză
+să stocheze „undefined"/„null".
+
+**2. Documentul era gata, worker-ul l-a luat după ~3 minute.** Verificarea
+(retrieve) era limitată la o dată la 3 minute per job, plus tick-ul de 30 s al
+worker-ului. Pentru „de bază" (emis în minute) e mult: clientul așteaptă.
+Acum `/api/onrc/pending` verifică **la 1 minut în primele 15 minute** de la
+depunere, apoi revine la 3 minute (IMM/insolvență trec prin backoffice, ore).

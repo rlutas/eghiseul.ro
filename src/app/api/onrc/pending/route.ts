@@ -41,10 +41,18 @@ export async function GET(req: NextRequest) {
   if (portalStatus) void recordPortalStatus(supabase, 'onrc', portalStatus);
 
   // Don't re-poll a request that's still generating more often than this.
+  // "De bază" is issued within minutes, so poll FAST right after submission
+  // (the client is waiting) and back off once it's clearly not instant
+  // (IMM/insolvență go through the ONRC backoffice, hours). 14.09.2026: the
+  // 3-min throttle alone made a ready PDF wait up to 3.5 min for pickup.
+  const RETRIEVE_THROTTLE_FAST_MIN = 1;
+  const RETRIEVE_FAST_WINDOW_MIN = 15; // after awaiting_since
   const RETRIEVE_THROTTLE_MIN = 3;
   const STALE_PROCESSING_MIN = 10; // a PROCESSING job locked longer than this = crashed worker
   const MAX_RETRIES = 4; // auto-retry a FAILED (unpaid) submit up to this many times
+  const throttleFastBefore = new Date(Date.now() - RETRIEVE_THROTTLE_FAST_MIN * 60_000).toISOString();
   const throttleBefore = new Date(Date.now() - RETRIEVE_THROTTLE_MIN * 60_000).toISOString();
+  const fastWindowStart = Date.now() - RETRIEVE_FAST_WINDOW_MIN * 60_000;
   const SELECT_COLS = 'id, order_id, document_type, cui, company_name, detail, status, onrc_draft_id, onrc_request_id';
 
   // Atomic claim helper — flips a specific row from `fromStatus` -> PROCESSING.
@@ -79,14 +87,18 @@ export async function GET(req: NextRequest) {
   // 2) Otherwise pick up an AWAITING_DOCUMENT job whose last poll was long
   //    enough ago (retrieve phase — already paid, waiting on the PDF).
   if (!claimed) {
-    const { data: awaitingCand } = await supabase
+    const { data: awaitingRows } = await supabase
       .from('onrc_jobs')
-      .select('id')
+      .select('id, last_attempt_at, awaiting_since')
       .eq('status', 'AWAITING_DOCUMENT')
-      .lt('last_attempt_at', throttleBefore)
+      .lt('last_attempt_at', throttleFastBefore)
       .order('last_attempt_at', { ascending: true })
-      .limit(1)
-      .maybeSingle();
+      .limit(20);
+    const awaitingCand = ((awaitingRows ?? []) as { id: string; last_attempt_at: string | null; awaiting_since: string | null }[]).find((j) => {
+      const since = j.awaiting_since ? new Date(j.awaiting_since).getTime() : 0;
+      const inFastWindow = since > fastWindowStart;
+      return inFastWindow || !j.last_attempt_at || j.last_attempt_at < throttleBefore;
+    });
     if (awaitingCand) claimed = await claim(awaitingCand.id, 'AWAITING_DOCUMENT');
   }
 
