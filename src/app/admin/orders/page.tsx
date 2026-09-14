@@ -301,13 +301,16 @@ export default function AdminOrdersPage() {
         </div>
       </div>
 
-      {/* Tabs + Service dropdown + Search */}
-      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+      {/* Tabs, apoi pe rândul următor serviciu + căutare. Erau pe un singur
+          rând la lg+, dar 9 taburi cu contoare + select + input nu încap:
+          căutarea ieșea din ecran în dreapta (14.09.2026). */}
+      <div className="flex flex-col gap-3">
         <Tabs
           value={urlStatus}
           onValueChange={(v) => {
             if (typeof v === 'string') updateParams({ status: v });
           }}
+          className="max-w-full overflow-x-auto"
         >
           <TabsList>
             {STATUS_TABS.map((tab) => {
@@ -326,7 +329,7 @@ export default function AdminOrdersPage() {
           </TabsList>
         </Tabs>
 
-        <div className="flex flex-1 gap-2 lg:justify-end">
+        <div className="flex flex-wrap gap-2">
           <select
             aria-label="Filtrare după serviciu"
             value={urlService}
@@ -340,7 +343,7 @@ export default function AdminOrdersPage() {
               </option>
             ))}
           </select>
-          <div className="relative w-full max-w-xs lg:w-64">
+          <div className="relative w-full sm:w-80">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               placeholder="Caută nr. comandă, email, telefon…"
