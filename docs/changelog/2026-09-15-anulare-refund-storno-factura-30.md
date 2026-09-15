@@ -18,9 +18,13 @@
   lucrată degeaba la 2 minute după cererea de anulare).
 - Contabilul: rambursările din Decontări se leagă de comandă și poartă numărul
   stornoului.
-- Cele trei anulări vechi sunt curățate (15.09, cu „Reconciliază"): E-260915-M4A4V
-  → EGH-0681; E-260819-BWB6G → EGH-0682 (stornoul EGH-0474 era făcut manual);
-  CAO-20260915-26899 (CJO) → storno EGH-0683 + EGH-0684. Procedura completă:
+- Anulările vechi sunt curățate (15.09, cu „Reconciliază"): E-260915-M4A4V
+  → EGH-0681; CAO-20260915-26899 (CJO) → storno EGH-0683 + EGH-0684;
+  E-260819-BWB6G avea deja storno (EGH-0474) și factura de 30% (EGH-0475) făcute
+  manual — legate în comandă. ⚠️ EGH-0682 (emisă azi pe BWB6G) e duplicat și
+  trebuie **anulată din Oblio**; butonul verifică de acum dacă factura de 30%
+  există deja înainte să emită alta. Legate și anulările din iulie–august
+  (TDXDU, J6EEX, CJO-23113, CJO-15831). Procedura completă:
   [Anulare: refund 70% + factura de 30%](../admin/anulare-refund-70.md).
 
 ---
@@ -72,6 +76,7 @@ din sesiunea Checkout; SmartBill istoric → doar mesaj), bannerele din admin.
 
 **Verificat pe Oblio API (după reconciliere):** EGH-0679 `stornoed=1`,
 `collects=[]` (încasarea de 198 ștearsă de `refund:1`, deci fără credit fantomă);
-EGH-0683 = −198 `storno=1`; EGH-0681/0682/0684 = 59,40, `collected=1` pe PI-ul
-comenzii, toate cu e-Factura. Refundurile legate din Stripe: `re_…1sW0r8Lb`,
+EGH-0683 = −198 `storno=1`; EGH-0681/0684 = 59,40, `collected=1` pe PI-ul
+comenzii. Gardă nouă `findExistingInvoiceForClient` (client + sumă, 60 zile)
+în ambele module fiscale după duplicatul EGH-0682. Refundurile legate din Stripe: `re_…1sW0r8Lb`,
 `re_…0ObFAPAv`, `re_…0RJiohBt`.

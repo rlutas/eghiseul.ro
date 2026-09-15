@@ -53,11 +53,17 @@ până nu apeși „Reconciliază".
 | Platformă | Comandă | Refund (Stripe) | Storno | Factura de 30% |
 |---|---|---|---|---|
 | eghiseul | E-260915-M4A4V | `re_…1sW0r8Lb`, 138,60 (automat) | — (factura nu se emisese la plată) | EGH-0681 (59,40) |
-| eghiseul | E-260819-BWB6G | `re_…0ObFAPAv`, 138,60 (automat) | EGH-0474 (manual, 19.08) | EGH-0682 (59,40) |
+| eghiseul | E-260819-BWB6G | `re_…0ObFAPAv`, 138,60 (automat) | EGH-0474 (manual, 19.08) | EGH-0475 (manual, 19.08) — ⚠️ EGH-0682 emisă azi la reconciliere e DUPLICAT, de anulat din Oblio |
+| eghiseul | E-260802-TDXDU | 138,60 (03.08) | EGH-0245 (manual) | EGH-0246 (manual) — legate acum |
+| eghiseul | E-260708-J6EEX | 1.497 integral (08.07) | EGH-0008 (manual) | — (refund integral) |
+| CJO | CJO-20260811-23113 | 138,60 (12.08) | EGH-0377 (manual) | EGH-0378 (manual) — legate acum |
+| CJO | CJO-20260804-15831 | 25 (Modifică, 06.08) | EGH-0288 pe factura suplimentară EGH-0287 | — |
 | CJO | CAO-20260915-26899 | `re_…0RJiohBt`, 138,60 (manual din dashboard) | EGH-0683 (−198, încasarea inițială ștearsă) | EGH-0684 (59,40) |
 
-Toate cele trei facturi de 59,40 sunt încasate cu cardul (pe PaymentIntent-ul
-comenzii) și au plecat în SPV. Pe EGH-0679 (CJO) nu a rămas nicio încasare
+Facturile de 59,40 emise azi (EGH-0681, EGH-0684) sunt încasate cu cardul pe
+PaymentIntent-ul comenzii. De atunci butonul verifică întâi în Oblio dacă există
+deja o factură pe același client cu aceeași sumă (emisă manual) și o leagă în
+loc să emită alta. Pe EGH-0679 (CJO) nu a rămas nicio încasare
 nealocată — nu apare credit fantomă pe client.
 
 Vezi și: [Storno + Reemite factură](storno-reemite.md) (corecturi de facturi,

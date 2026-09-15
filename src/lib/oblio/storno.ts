@@ -87,3 +87,42 @@ export async function createStornoInvoice(
     },
   });
 }
+
+/**
+ * Caută o factură deja emisă (ne-anulată) pentru același client și aceeași
+ * sumă, de la `issuedAfter` încoace. Gardă anti-duplicat pentru factura
+ * taxei de anulare: E-260819-BWB6G avea EGH-0475 (59,40, emisă manual pe
+ * 19.08) și reconcilierea a mai emis una (EGH-0682) — de anulat.
+ */
+export async function findExistingInvoiceForClient(params: {
+  clientName: string;
+  totalRon: number;
+  issuedAfter: string; // YYYY-MM-DD
+}): Promise<{ seriesName: string; number: string; link: string | null } | null> {
+  const config = getOblioConfig();
+  const fold = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]/gi, '').toLowerCase();
+  const wanted = fold(params.clientName);
+  if (!wanted) return null;
+  for (let page = 0; page < 10; page++) {
+    const qs = new URLSearchParams({
+      cif: config.companyCif,
+      seriesName: config.seriesName,
+      issuedAfter: params.issuedAfter,
+      limitPerPage: '100',
+      offset: String(page * 100),
+    });
+    const rows = await oblioRequest<Array<OblioListRow & { client?: { name?: string }; link?: string; seriesName?: string }>>({
+      endpoint: `/docs/invoice/list?${qs.toString()}`,
+      method: 'GET',
+    });
+    const list = Array.isArray(rows) ? rows : [];
+    for (const r of list) {
+      if (flag(r.canceled) || flag(r.storno)) continue;
+      if (Math.abs(Number(r.total ?? 0) - params.totalRon) > 0.005) continue;
+      if (fold(r.client?.name ?? '') !== wanted) continue;
+      return { seriesName: r.seriesName ?? config.seriesName, number: String(r.number ?? ''), link: r.link ?? null };
+    }
+    if (list.length < 100) break;
+  }
+  return null;
+}

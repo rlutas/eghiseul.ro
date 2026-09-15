@@ -14,7 +14,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import { getOblioConfig } from '@/lib/oblio/client';
 import { buildOblioClient, createInvoice, formatInvoiceNumber } from '@/lib/oblio/invoice';
 import { parseInvoiceNumber } from '@/lib/oblio/parse-number';
-import { createStornoInvoice, getInvoiceFlags } from '@/lib/oblio/storno';
+import { createStornoInvoice, findExistingInvoiceForClient, getInvoiceFlags } from '@/lib/oblio/storno';
 import { isInvoicingEnabled } from '@/lib/oblio/invoicing-enabled';
 import { buildCancelFeeInvoiceInput, computeCancelFeeAmount } from './cancel-fee-invoice';
 
@@ -126,6 +126,20 @@ export async function settleCancellationInvoicing(
     try {
       const config = getOblioConfig();
       const client = buildOblioClient((o.customer_data ?? {}) as Parameters<typeof buildOblioClient>[0]);
+      // Anti-duplicat: echipa poate să fi emis deja manual factura de 30%
+      // (E-260819-BWB6G: EGH-0475 din 19.08, iar reconcilierea a emis încă una).
+      const sinceIso = new Date(Date.now() - 60 * 86_400_000).toISOString().slice(0, 10);
+      const existing = await findExistingInvoiceForClient({ clientName: client.name, totalRon: feeRon, issuedAfter: sinceIso }).catch(() => null);
+      if (existing) {
+        const feeNumber = formatInvoiceNumber(existing.seriesName, existing.number);
+        await admin
+          .from('orders')
+          .update({ cancel_fee_invoice_number: feeNumber, cancel_fee_invoice_url: existing.link })
+          .eq('id', orderId);
+        result.feeInvoice = { number: feeNumber, url: existing.link, status: 'already' };
+        await note(`Factura taxei de anulare exista deja (${feeNumber}, ${feeRon.toFixed(2)} RON, emisă manual) — legată de comandă, nu s-a emis alta.`);
+        return result;
+      }
       const input = buildCancelFeeInvoiceInput({
         cif: config.companyCif,
         seriesName: config.seriesName,
