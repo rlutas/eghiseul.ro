@@ -79,10 +79,13 @@ lucrul"**, vizibil doar pe comenzile de pe „Așteptare plată":
 1. Deschide dovada (linkul „deschide dovada" din panou, dacă a fost încărcată
    în checkout; altfel emailul sau WhatsApp-ul clientului).
 2. Apasă butonul și confirmă. Comanda trece pe **„În procesare"**, se alocă
-   numerele de Barou și se generează contractul de asistență, împuternicirea
-   și cererea — exact ca după plată.
-3. Lucrezi normal: depui, ridici, treci prin statusuri.
-4. Când banii apar în extras, apeși **„Confirmă plata"** ca de obicei. Abia
+   numerele de Barou și se generează automat contractul de asistență — exact
+   ca după plată.
+3. Împuternicirea și cererea le generezi ca de obicei, din panoul Documente
+   („Generează"). Din 15.09.2026 butonul merge și pe comenzile pornite pe
+   dovadă; înainte răspundea „Numerele Barou se alocă doar după plată".
+4. Lucrezi normal: depui, ridici, treci prin statusuri.
+5. Când banii apar în extras, apeși **„Confirmă plata"** ca de obicei. Abia
    atunci se emite factura Oblio și pleacă emailul de confirmare către client.
    Statusul de lucru nu se pierde.
 

@@ -8,6 +8,7 @@ import { allocateNumber, findExistingNumber, getRegistryClient } from '@/lib/reg
 import { isPJForDocumentGeneration } from '@/lib/documents/delegation-items';
 import { computeCerereItems } from '@/lib/documents/cerere-items';
 import { isNoLawyerService } from '@/lib/documents/no-lawyer-services';
+import { canAllocateBarouNumbers } from '@/lib/documents/barou-allocation-gate';
 import { formatPersonName } from '@/lib/format/person-name';
 
 /**
@@ -295,9 +296,15 @@ export async function POST(
     const registryOrderRef: string = order.friendly_order_id || orderId;
     const needsBarouNumber = ['contract-asistenta', 'contract-complet', 'imputernicire'].includes(template);
 
-    if (needsBarouNumber && order.payment_status !== 'paid') {
+    // Transfer bancar cu dovadă verificată (proof_verified_at) contează ca
+    // plătit — vezi barou-allocation-gate.ts.
+    if (needsBarouNumber && !canAllocateBarouNumbers(order)) {
       return NextResponse.json(
-        { success: false, error: 'Numerele Barou se alocă doar după plată. Comanda nu este plătită.' },
+        {
+          success: false,
+          error:
+            'Numerele Barou se alocă doar după plată sau după „Dovadă verificată — pornește lucrul" (transfer bancar). Comanda nu este plătită.',
+        },
         { status: 400 }
       );
     }

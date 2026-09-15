@@ -22,6 +22,7 @@
 import { createAdminClient } from '@/lib/supabase/admin';
 import { autoGenerateOrderDocuments } from '@/lib/documents/auto-generate';
 import { isNoLawyerService } from '@/lib/documents/no-lawyer-services';
+import { canAllocateBarouNumbers } from '@/lib/documents/barou-allocation-gate';
 
 export async function ensureBarouDocumentsForPaidOrder(
   orderId: string,
@@ -53,8 +54,11 @@ export async function ensureBarouDocumentsForPaidOrder(
     if (order.barou_numbers_allocated_at) {
       return { ok: true, skipped: 'already-allocated' };
     }
-    const proofVerified = !!opts.allowVerifiedProof && !!order.proof_verified_at;
-    if (order.payment_status !== 'paid' && !proofVerified) {
+    const gateOrder = {
+      payment_status: order.payment_status,
+      proof_verified_at: opts.allowVerifiedProof ? order.proof_verified_at : null,
+    };
+    if (!canAllocateBarouNumbers(gateOrder)) {
       return { ok: true, skipped: 'not-paid' };
     }
     const serviceSlug = order.services?.slug || '';
