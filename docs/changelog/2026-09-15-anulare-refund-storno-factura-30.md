@@ -21,9 +21,9 @@
 - Anulările vechi sunt curățate (15.09, cu „Reconciliază"): E-260915-M4A4V
   → EGH-0681; CAO-20260915-26899 (CJO) → storno EGH-0683 + EGH-0684;
   E-260819-BWB6G avea deja storno (EGH-0474) și factura de 30% (EGH-0475) făcute
-  manual — legate în comandă. ⚠️ EGH-0682 (emisă azi pe BWB6G) e duplicat și
-  trebuie **anulată din Oblio**; butonul verifică de acum dacă factura de 30%
-  există deja înainte să emită alta. Legate și anulările din iulie–august
+  manual — legate în comandă; duplicatul EGH-0682 emis la reconciliere a fost
+  șters din Oblio, iar butonul verifică de acum dacă factura de 30% există deja
+  înainte să emită alta. Legate și anulările din iulie–august
   (TDXDU, J6EEX, CJO-23113, CJO-15831). Procedura completă:
   [Anulare: refund 70% + factura de 30%](../admin/anulare-refund-70.md).
 

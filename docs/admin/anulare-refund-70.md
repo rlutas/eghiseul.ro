@@ -53,7 +53,7 @@ până nu apeși „Reconciliază".
 | Platformă | Comandă | Refund (Stripe) | Storno | Factura de 30% |
 |---|---|---|---|---|
 | eghiseul | E-260915-M4A4V | `re_…1sW0r8Lb`, 138,60 (automat) | — (factura nu se emisese la plată) | EGH-0681 (59,40) |
-| eghiseul | E-260819-BWB6G | `re_…0ObFAPAv`, 138,60 (automat) | EGH-0474 (manual, 19.08) | EGH-0475 (manual, 19.08) — ⚠️ EGH-0682 emisă azi la reconciliere e DUPLICAT, de anulat din Oblio |
+| eghiseul | E-260819-BWB6G | `re_…0ObFAPAv`, 138,60 (automat) | EGH-0474 (manual, 19.08) | EGH-0475 (manual, 19.08); duplicatul EGH-0682 emis la reconciliere a fost șters din Oblio |
 | eghiseul | E-260802-TDXDU | 138,60 (03.08) | EGH-0245 (manual) | EGH-0246 (manual) — legate acum |
 | eghiseul | E-260708-J6EEX | 1.497 integral (08.07) | EGH-0008 (manual) | — (refund integral) |
 | CJO | CJO-20260811-23113 | 138,60 (12.08) | EGH-0377 (manual) | EGH-0378 (manual) — legate acum |
