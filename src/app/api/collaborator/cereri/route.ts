@@ -15,6 +15,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { COLLAB_HIDDEN_STATUSES } from '@/lib/collaborator/hidden-statuses';
 import PizZip from 'pizzip';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -62,7 +63,7 @@ export async function GET(request: NextRequest) {
       .or(scopeFilter)
       .eq('payment_status', 'paid')
       .in('services.slug', [...Object.keys(CERERE_SLUGS), ...IDENTIFICARE_SLUGS])
-      .not('status', 'in', `(${CERERE_DONE_STATUSES.join(',')})`)
+      .not('status', 'in', `(${[...CERERE_DONE_STATUSES, ...COLLAB_HIDDEN_STATUSES].join(',')})`)
       // urgent first, then oldest: the client who complained, then the one who
       // has been waiting longest
       .order('priority', { ascending: false })

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { COLLAB_HIDDEN_STATUSES } from '@/lib/collaborator/hidden-statuses';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { getCollaboratorServices } from '@/lib/admin/permissions';
@@ -49,6 +50,10 @@ export async function GET(request: NextRequest) {
       .or(scopeFilter)
       // Doar comenzi plătite: draft/pending/abandoned = coșuri neplătite, nu lucrări.
       .eq('payment_status', 'paid')
+      // Anulările nu sunt lucrări: E-260915-M4A4V a apărut la topograf DUPĂ ce
+      // clientul ceruse anularea (payment_status rămâne 'paid' până la refund),
+      // iar el a lucrat-o degeaba. Scoase din listă și din pagina de detaliu.
+      .not('status', 'in', `(${COLLAB_HIDDEN_STATUSES.join(',')})`)
       // Marcate urgent întâi (client nemulțumit), apoi cea mai veche: clientul
       // care așteaptă de o lună are prioritate, iar colaboratorul lucrează de
       // sus în jos fără să caute prin listă.

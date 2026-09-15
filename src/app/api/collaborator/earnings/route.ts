@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { COLLAB_HIDDEN_STATUSES } from '@/lib/collaborator/hidden-statuses';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { getCollaboratorServices } from '@/lib/admin/permissions';
@@ -77,7 +78,7 @@ export async function GET(request: NextRequest) {
       .select('id, friendly_order_id, order_number, status, paid_at, is_test, total_price, customer_data, services:service_id(name, slug, lawyer_fee_ron)')
       .or(scopeFilter)
       .eq('payment_status', 'paid')
-      .neq('status', 'cancelled')
+      .not('status', 'in', `(${COLLAB_HIDDEN_STATUSES.join(',')})`)
       .is('refunded_at', null)
       .gte('paid_at', start)
       .order('paid_at', { ascending: false });

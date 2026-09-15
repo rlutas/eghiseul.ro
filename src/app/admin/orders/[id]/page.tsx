@@ -151,6 +151,15 @@ interface OrderDetail {
   invoice_number: string | null;
   invoice_url: string | null;
   invoice_issued_at: string | null;
+  /** Anulare în 30 min (refund 70%): rezultatul refundului + fiscalul (migrarea 162). */
+  refunded_amount?: number | string | null;
+  refund_stripe_id?: string | null;
+  refund_status?: 'succeeded' | 'failed' | 'manual' | null;
+  refund_error?: string | null;
+  refund_processed_at?: string | null;
+  storno_invoice_number?: string | null;
+  cancel_fee_invoice_number?: string | null;
+  cancel_fee_invoice_url?: string | null;
   courier_provider: string | null;
   courier_service: string | null;
   courier_quote: AnyObj | null;
@@ -1224,6 +1233,11 @@ export default function AdminOrderDetailPage() {
           click processes the Stripe refund (70%) and flips to 'refunded'. */}
       {order.status === 'cancellation_requested' && (
         <CancellationRequestedBanner order={order} onProcessed={refreshSilent} />
+      )}
+      {/* După refund: echipa vede dacă banii au plecat automat prin Stripe
+          sau manual, plus stornoul și factura de 30% — sau ce lipsește. */}
+      {order.status === 'refunded' && (
+        <RefundOutcomeBanner order={order} onChanged={refreshSilent} />
       )}
 
       {/* „Unde s-a blocat clientul" — pt comenzile neterminate (draft/pending/
@@ -3870,35 +3884,68 @@ function CancellationRequestedBanner({
   const [processing, setProcessing] = useState(false);
   const totalRon = Number(order.total_price || 0);
   const refundAmountRon = Math.round(totalRon * 0.7 * 100) / 100;
+  const feeRon = Math.round((totalRon - refundAmountRon) * 100) / 100;
+  const refundFailed = order.refund_status === 'failed';
+  const stripeBase = order.is_test ? 'https://dashboard.stripe.com/test' : 'https://dashboard.stripe.com';
 
-  const processRefund = async () => {
-    if (
-      !confirm(
-        `Procesezi refund 70% (${refundAmountRon.toFixed(
-          2
-        )} RON din ${totalRon.toFixed(2)} RON) și marchezi comanda ca 'refunded'?\n\nOperația trimite cererea automat la Stripe.`
-      )
-    ) {
-      return;
-    }
+  const describeFiscal = (fiscal: CancellationFiscal | { error: string } | undefined): string => {
+    if (!fiscal) return '';
+    if ('error' in fiscal) return ` Fiscal: EROARE (${fiscal.error}).`;
+    const parts: string[] = [];
+    if (fiscal.storno.status === 'issued') parts.push(`storno ${fiscal.storno.number}`);
+    if (fiscal.storno.status === 'error') parts.push(`storno EȘUAT`);
+    if (fiscal.feeInvoice.status === 'issued') parts.push(`factură 30% ${fiscal.feeInvoice.number}`);
+    if (fiscal.feeInvoice.status === 'error') parts.push(`factura 30% EȘUATĂ`);
+    if (fiscal.feeInvoice.status === 'disabled') parts.push(`facturarea Oblio e oprită`);
+    return parts.length ? ` Fiscal: ${parts.join(', ')}.` : '';
+  };
+
+  const call = async (body: Record<string, unknown>) => {
     setProcessing(true);
     try {
       const res = await fetch(`/api/admin/orders/${order.id}/process-cancellation`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
       });
       const json = await res.json();
       if (!res.ok || !json.success) {
         toast.error(json.error || 'Refund eșuat');
+        onProcessed();
         return;
       }
-      toast.success(`Refund procesat: ${json.refundAmountRon.toFixed(2)} RON (${json.refundId})`);
+      const fiscalMsg = describeFiscal(json.fiscal);
+      toast.success(
+        json.refundStatus === 'manual'
+          ? `Refund manual notat.${fiscalMsg}`
+          : `Refund Stripe reușit: ${json.refundAmountRon.toFixed(2)} RON (${json.refundId}).${fiscalMsg}`
+      );
       onProcessed();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Eroare rețea');
     } finally {
       setProcessing(false);
     }
+  };
+
+  const processRefund = async () => {
+    if (
+      !confirm(
+        `Procesezi refund 70% (${refundAmountRon.toFixed(2)} RON din ${totalRon.toFixed(2)} RON) și marchezi comanda ca 'refunded'?\n\nOperația trimite cererea automat la Stripe, apoi stornează factura și emite factura taxei de anulare (${feeRon.toFixed(2)} RON).`
+      )
+    ) {
+      return;
+    }
+    await call({ mode: 'auto' });
+  };
+
+  const markManual = async () => {
+    const refundId = prompt(
+      `Confirmi că ai dat manual refundul de ${refundAmountRon.toFixed(2)} RON din Stripe?\n\nLipește id-ul refundului (re_…) dacă îl ai — poate rămâne gol.`,
+      ''
+    );
+    if (refundId === null) return;
+    await call({ mode: 'manual', refundId });
   };
 
   return (
@@ -3910,24 +3957,187 @@ function CancellationRequestedBanner({
             Cerere de anulare — refund 70% în așteptare
           </div>
           <p className="mt-1 text-sm text-red-800">
-            Clientul a solicitat anularea în termenul de 30 minute. Procesarea acestui buton va
-            iniția refund-ul Stripe ({refundAmountRon.toFixed(2)} RON din {totalRon.toFixed(2)}{' '}
-            RON) și va marca comanda ca <code>refunded</code>.
+            Clientul a solicitat anularea în termenul de 30 minute. Butonul trimite refund-ul la Stripe
+            ({refundAmountRon.toFixed(2)} RON din {totalRon.toFixed(2)} RON), marchează comanda{' '}
+            <code>refunded</code>, stornează factura inițială și emite factura taxei de anulare
+            ({feeRon.toFixed(2)} RON, 30% reținut per Termeni).
           </p>
-          <p className="mt-1 text-xs text-red-700">
-            Diferența de 30% (~{(totalRon - refundAmountRon).toFixed(2)} RON) rămâne reținută per
-            policy (acoperă comisioanele Stripe + procesarea începută).
-          </p>
+          {refundFailed && (
+            <div className="mt-2 rounded border border-red-300 bg-white p-2 text-xs text-red-900">
+              <div className="font-semibold">⚠️ Refundul automat prin Stripe a EȘUAT</div>
+              <div className="mt-0.5 font-mono break-all">{order.refund_error || 'fără detalii'}</div>
+              <div className="mt-1">
+                Dă banii înapoi manual din{' '}
+                {order.stripe_payment_intent_id ? (
+                  <a
+                    href={`${stripeBase}/payments/${order.stripe_payment_intent_id}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline"
+                  >
+                    Stripe (plata comenzii) ↗
+                  </a>
+                ) : (
+                  'Stripe / transfer bancar'
+                )}{' '}
+                — exact {refundAmountRon.toFixed(2)} RON — apoi apasă „Am refundat manual”. Poți și reîncerca automat.
+              </div>
+            </div>
+          )}
         </div>
-        <Button
-          variant="destructive"
-          size="sm"
-          onClick={processRefund}
-          disabled={processing}
-          className="shrink-0 text-white"
-        >
-          {processing ? 'Se procesează…' : `Procesează refund ${refundAmountRon.toFixed(2)} RON`}
-        </Button>
+        <div className="flex shrink-0 flex-col gap-2">
+          <Button
+            variant="destructive"
+            size="sm"
+            onClick={processRefund}
+            disabled={processing}
+            className="text-white"
+          >
+            {processing ? 'Se procesează…' : refundFailed ? `Reîncearcă refund ${refundAmountRon.toFixed(2)} RON` : `Procesează refund ${refundAmountRon.toFixed(2)} RON`}
+          </Button>
+          <Button variant="outline" size="sm" onClick={markManual} disabled={processing}>
+            Am refundat manual
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+interface CancellationFiscal {
+  originalInvoice: string | null;
+  storno: { number: string | null; status: 'issued' | 'already' | 'none' | 'error'; error?: string };
+  feeInvoice: { number: string | null; url: string | null; status: 'issued' | 'already' | 'disabled' | 'error'; error?: string };
+  feeRon: number;
+}
+
+/**
+ * Comandă `refunded`: ce s-a întâmplat cu banii (Stripe automat / manual /
+ * necunoscut) și cu fiscalul (storno + factura de 30%). Când lipsește ceva,
+ * „Reconciliază" caută refundul în Stripe și emite documentele lipsă.
+ */
+function RefundOutcomeBanner({ order, onChanged }: { order: OrderDetail; onChanged: () => void }) {
+  const [working, setWorking] = useState(false);
+  const totalRon = Number(order.total_price || 0);
+  const refundedRon = Number(order.refunded_amount ?? 0);
+  const feeRon = Math.round((totalRon - Math.round(totalRon * 0.7 * 100) / 100) * 100) / 100;
+  const stripeBase = order.is_test ? 'https://dashboard.stripe.com/test' : 'https://dashboard.stripe.com';
+  const missingRefundId = !order.refund_stripe_id;
+  const missingStorno = !!order.invoice_number && !order.storno_invoice_number;
+  const missingFee = !order.cancel_fee_invoice_number;
+  const incomplete = missingRefundId || missingStorno || missingFee;
+
+  const reconcile = async () => {
+    setWorking(true);
+    try {
+      const res = await fetch(`/api/admin/orders/${order.id}/process-cancellation`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mode: 'reconcile' }),
+      });
+      const json = await res.json();
+      if (!res.ok || !json.success) {
+        toast.error(json.error || 'Reconcilierea a eșuat');
+        return;
+      }
+      const f = json.fiscal as CancellationFiscal | { error: string } | undefined;
+      const bits: string[] = [];
+      if (json.refundId) bits.push(`refund ${json.refundId}`);
+      if (json.refundLookup) bits.push(json.refundLookup);
+      if (f && !('error' in f)) {
+        if (f.storno.status === 'issued') bits.push(`storno ${f.storno.number}`);
+        if (f.storno.status === 'error') bits.push(`storno EȘUAT: ${f.storno.error}`);
+        if (f.feeInvoice.status === 'issued') bits.push(`factură 30% ${f.feeInvoice.number}`);
+        if (f.feeInvoice.status === 'error') bits.push(`factura 30% EȘUATĂ: ${f.feeInvoice.error}`);
+        if (f.feeInvoice.status === 'disabled') bits.push('facturarea Oblio e oprită');
+      } else if (f && 'error' in f) {
+        bits.push(`fiscal: ${f.error}`);
+      }
+      toast.success(`Reconciliere: ${bits.join(' · ') || 'nimic de făcut'}`);
+      onChanged();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Eroare rețea');
+    } finally {
+      setWorking(false);
+    }
+  };
+
+  const refundLine = (() => {
+    if (order.refund_status === 'succeeded') {
+      return `✅ Refund dat AUTOMAT prin Stripe: ${refundedRon.toFixed(2)} RON din ${totalRon.toFixed(2)} RON`;
+    }
+    if (order.refund_status === 'manual') {
+      return `✅ Refund dat MANUAL din Stripe de echipă: ${refundedRon.toFixed(2)} RON din ${totalRon.toFixed(2)} RON`;
+    }
+    return `Refund: ${refundedRon.toFixed(2)} RON din ${totalRon.toFixed(2)} RON — mod necunoscut (înainte de urmărire); apasă „Reconciliază" ca să-l cauți în Stripe`;
+  })();
+
+  return (
+    <div className={`rounded-lg border-2 p-4 ${incomplete ? 'border-amber-300 bg-amber-50' : 'border-emerald-200 bg-emerald-50'}`}>
+      <div className="flex items-start justify-between gap-4">
+        <div className="space-y-1 text-sm">
+          <div className={`flex items-center gap-2 font-semibold ${incomplete ? 'text-amber-900' : 'text-emerald-900'}`}>
+            <AlertCircle className="h-5 w-5" />
+            Comandă anulată — refund 70%
+          </div>
+          <p className={incomplete ? 'text-amber-900' : 'text-emerald-900'}>
+            {refundLine}
+            {order.refund_stripe_id && (
+              <>
+                {' '}
+                ·{' '}
+                <a
+                  href={`${stripeBase}/payments/${order.stripe_payment_intent_id ?? ''}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-mono underline"
+                >
+                  {order.refund_stripe_id} ↗
+                </a>
+              </>
+            )}
+            {order.refund_processed_at && (
+              <span className="text-xs opacity-80"> · {new Date(order.refund_processed_at).toLocaleString('ro-RO')}</span>
+            )}
+          </p>
+          <p className={incomplete ? 'text-amber-900' : 'text-emerald-900'}>
+            {order.invoice_number ? (
+              <>
+                Factura inițială <span className="font-mono">{order.invoice_number}</span>:{' '}
+                {order.storno_invoice_number ? (
+                  <>stornată prin <span className="font-mono">{order.storno_invoice_number}</span></>
+                ) : (
+                  <span className="font-semibold">NEstornată încă</span>
+                )}
+              </>
+            ) : (
+              <>Fără factură inițială (nu s-a emis la plată).</>
+            )}
+            {' · '}
+            Factura taxei de anulare ({feeRon.toFixed(2)} RON, 30% reținut):{' '}
+            {order.cancel_fee_invoice_number ? (
+              order.cancel_fee_invoice_url ? (
+                <a href={order.cancel_fee_invoice_url} target="_blank" rel="noopener noreferrer" className="font-mono underline">
+                  {order.cancel_fee_invoice_number} ↗
+                </a>
+              ) : (
+                <span className="font-mono">{order.cancel_fee_invoice_number}</span>
+              )
+            ) : (
+              <span className="font-semibold">NEemisă</span>
+            )}
+          </p>
+          {incomplete && (
+            <p className="text-xs text-amber-800">
+              Contabilul vede în Decontări rambursarea legată de storno doar după ce ambele documente există.
+            </p>
+          )}
+        </div>
+        {incomplete && (
+          <Button variant="outline" size="sm" onClick={reconcile} disabled={working} className="shrink-0">
+            {working ? 'Se reconciliază…' : 'Reconciliază (Stripe + facturi)'}
+          </Button>
+        )}
       </div>
     </div>
   );

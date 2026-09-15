@@ -126,6 +126,13 @@ export interface GuideLink {
  */
 export const CURATED_GUIDES: GuideLink[] = [
   {
+    title: 'Anulare în 30 min: refund 70% + factura de 30%',
+    slug: 'admin/anulare-refund-70',
+    category: 'plati',
+    description:
+      '„Procesează refund" face refundul Stripe, stornoul și factura taxei de anulare; „Am refundat manual" când Stripe refuză; „Reconciliază" când lipsește ceva.',
+  },
+  {
     title: 'Plata prin transfer bancar (IBAN)',
     slug: 'admin/plata-transfer-bancar',
     category: 'plati',

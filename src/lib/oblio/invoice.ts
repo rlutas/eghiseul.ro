@@ -592,8 +592,14 @@ export async function getInvoicePdfUrl(
 // ============================================================================
 
 /**
- * Cancel (storno) an invoice
- * Creates a cancellation invoice
+ * ANULEAZĂ o factură în Oblio (`canceled=1`). NU e storno: factura dispare
+ * din evidență ca și cum n-ar fi existat, ceea ce ANAF acceptă doar dacă n-a
+ * plecat în SPV. Pentru o factură deja transmisă (cazul nostru standard —
+ * Oblio o trimite automat) folosește `createStornoInvoice` din ./storno.
+ *
+ * Endpoint corect per documentația Oblio: PUT /docs/invoice/cancel (vechiul
+ * POST /docs/cancel nu există — ruta de reemitere nu a fost folosită
+ * niciodată în producție, deci nu a picat nimeni pe el).
  */
 export async function cancelInvoice(
   seriesName: string,
@@ -602,8 +608,8 @@ export async function cancelInvoice(
   const config = getOblioConfig();
 
   return oblioRequest<OblioInvoiceResponse['data']>({
-    endpoint: '/docs/cancel',
-    method: 'POST',
+    endpoint: '/docs/invoice/cancel',
+    method: 'PUT',
     body: {
       cif: config.companyCif,
       seriesName,

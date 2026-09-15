@@ -98,6 +98,19 @@ export interface OblioInvoiceInput {
   // Discounts
   discountValue?: number;
   discountType?: 'valoric' | 'procentual';
+
+  /**
+   * Storno: referința către factura stornată. Cu `refund: 1` Oblio generează
+   * singur liniile negative ale întregii facturi și șterge încasarea atașată
+   * (fără el încasarea rămânea „credit client" fantomă — vezi
+   * docs/changelog/2026-08-03-oblio-credit-fantoma-storno.md).
+   */
+  referenceDocument?: {
+    type: 'Factura';
+    seriesName: string;
+    number: string;
+    refund?: 0 | 1;
+  };
 }
 
 export interface OblioCollect {

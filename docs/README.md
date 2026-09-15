@@ -47,6 +47,7 @@ Index al documentației. Aceasta e o **hartă**, nu un jurnal — pentru jurnalu
 - **Solicită documente (cerere de la client + standby):** [`technical/specs/document-request-system.md`](technical/specs/document-request-system.md)
 - **RBAC & permisiuni:** [`admin/rbac-permissions.md`](admin/rbac-permissions.md)
 - **Plăți & facturare:** [`technical/specs/stripe-oblio-payment-invoicing.md`](technical/specs/stripe-oblio-payment-invoicing.md)
+- **Anulare în 30 min (refund 70% + factura de 30%):** [`admin/anulare-refund-70.md`](admin/anulare-refund-70.md) — procedura echipei: „Procesează refund" (Stripe + storno + factura taxei de anulare), „Am refundat manual", „Reconciliază", ce vede contabilul în Decontări
 - **Plată prin transfer bancar (IBAN):** [`admin/plata-transfer-bancar.md`](admin/plata-transfer-bancar.md) — procedura echipei: tab „Așteptare plată", confirmarea încasării din extras, legătura cu decontările
 - **Meta Conversions API (tracking server-side):** [`technical/specs/meta-capi-tracking.md`](technical/specs/meta-capi-tracking.md)
 - **Webhook Resend (bounce → banner admin + alertă):** [`technical/specs/resend-bounce-webhook.md`](technical/specs/resend-bounce-webhook.md)

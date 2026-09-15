@@ -13,7 +13,7 @@
 
 > Dacă factura este deja emisă în Oblio, modificarea comenzii necesită **anulare (storno) + emitere nouă**. Operațiunea ajunge automat în SPV — operatorul **trebuie să confirme** înainte.
 
-La noi cu Oblio API există endpoint dedicat `/docs/cancel` care creează storno automat (diferit de SmartBill care cere factură nouă cu cantitate negativă). Combinăm cu `createInvoiceFromOrder` pe rândul curent al order-ului (deja conține line items per addon + linia de cupon din migration 040+041).
+⚠️ Corecție 15.09.2026: Oblio NU are un endpoint „storno". `PUT /docs/invoice/cancel` **anulează** factura (canceled=1, nu ajunge la ANAF); stornarea corectă pentru o factură deja transmisă în SPV e o factură nouă cu `referenceDocument{type:'Factura', seriesName, number, refund:1}` — vezi `src/lib/oblio/storno.ts` (`createStornoInvoice`), folosit de fluxul de anulare ([anulare-refund-70.md](anulare-refund-70.md)). Ruta de reemitere de mai jos folosește încă `cancelInvoice` (anulare) și n-a fost rulată niciodată în producție (`OBLIO_REISSUE_ENABLED` e oprit). Combinăm cu `createInvoiceFromOrder` pe rândul curent al order-ului (deja conține line items per addon + linia de cupon din migration 040+041).
 
 ---
 

@@ -23,6 +23,7 @@ import Stripe from 'stripe';
 import { stripe } from '@/lib/stripe';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createCjoClient } from '@/lib/supabase/cjo';
+import { REFUND_TYPES, resolveRefundReference } from '@/lib/accounting/refund-tx';
 import {
   extraInvoiceForRow,
   parseOblioProformaDesc,
@@ -91,7 +92,7 @@ async function enrichEghiseul(rows: TxRow[]) {
   const orderNumbers = [...new Set(rows.map((r) => r.order_number).filter(Boolean))] as string[];
   const orderIds = [...new Set(rows.filter((r) => !r.order_number && r._orderId).map((r) => r._orderId))] as string[];
   if (!orderNumbers.length && !orderIds.length) return;
-  const select = 'id, friendly_order_id, order_number, invoice_number, invoice_url, customer_data, extra_billing, stripe_payment_intent_id, services(name)';
+  const select = 'id, friendly_order_id, order_number, invoice_number, invoice_url, storno_invoice_number, cancel_fee_invoice_number, customer_data, extra_billing, stripe_payment_intent_id, services(name)';
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const numberQuery = orderNumbers.length
     ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -132,7 +133,12 @@ async function enrichEghiseul(rows: TxRow[]) {
       anyO.extra_billing as ExtraBillingEntry[] | null,
       { payment_intent_id: r.payment_intent_id, gross_bani: r.gross_bani }
     );
-    if (extra && r.payment_intent_id !== (anyO as { stripe_payment_intent_id?: string }).stripe_payment_intent_id) {
+    if (REFUND_TYPES.has(r.type)) {
+      // Documentul fiscal al unei rambursări e STORNOUL, nu factura inițială
+      // (care rămâne pe rândul încasării). Lipsă = anulare nefacturată încă.
+      r.invoice_number = anyO.storno_invoice_number ?? r.invoice_number;
+      r.invoice_url = anyO.storno_invoice_number ? null : r.invoice_url;
+    } else if (extra && r.payment_intent_id !== (anyO as { stripe_payment_intent_id?: string }).stripe_payment_intent_id) {
       r.invoice_number = extra.invoiceNumber;
       r.invoice_url = extra.invoiceUrl;
     } else {
@@ -170,7 +176,7 @@ async function enrichCjo(rows: TxRow[], errors: string[]) {
   if (!orderNumbers.length) return;
   const { data: orders, error } = await cjo
     .from('orders')
-    .select('order_number, prenume, nume, email, service_type, oblio_invoice_number, oblio_invoice_link, invoice_series, invoice_number, invoice_url, extra_billing, stripe_payment_intent_id')
+    .select('order_number, prenume, nume, email, service_type, oblio_invoice_number, oblio_invoice_link, invoice_series, invoice_number, invoice_url, storno_invoice_number, extra_billing, stripe_payment_intent_id')
     .in('order_number', orderNumbers);
   if (error) {
     errors.push(`CJO lookup: ${error.message}`);
@@ -187,7 +193,11 @@ async function enrichCjo(rows: TxRow[], errors: string[]) {
       o.extra_billing as ExtraBillingEntry[] | null,
       { payment_intent_id: r.payment_intent_id, gross_bani: r.gross_bani }
     );
-    if (extra && r.payment_intent_id !== o.stripe_payment_intent_id) {
+    if (REFUND_TYPES.has(r.type)) {
+      const storno = (o as { storno_invoice_number?: string | null }).storno_invoice_number ?? null;
+      r.invoice_number = storno ?? r.invoice_number;
+      r.invoice_url = storno ? null : r.invoice_url;
+    } else if (extra && r.payment_intent_id !== o.stripe_payment_intent_id) {
       r.invoice_number = extra.invoiceNumber;
       r.invoice_url = extra.invoiceUrl;
     } else {
@@ -353,26 +363,40 @@ export async function syncPayouts(opts: { sinceDays?: number } = {}): Promise<Pa
         });
         for (const tx of page.data) {
           if (tx.type === 'payout') continue; // the payout line itself
-          const source = (typeof tx.source === 'object' ? tx.source : null) as Stripe.Charge | null;
-          const isCharge = source && source.object === 'charge' ? source : null;
+          const rawSource = typeof tx.source === 'object' ? tx.source : null;
+          // Rambursare: sursa e obiectul Refund — comanda vine din metadata
+          // refundului (process-cancellation / Modifică) sau, la refundurile
+          // date din dashboard, din charge-ul rambursat (adus mai jos).
+          const refund = rawSource && (rawSource as { object?: string }).object === 'refund' ? (rawSource as Stripe.Refund) : null;
+          let isCharge = rawSource && (rawSource as { object?: string }).object === 'charge' ? (rawSource as Stripe.Charge) : null;
+          const refundRef = refund ? resolveRefundReference(refund) : null;
+          if (refund && refundRef?.chargeId && !refundRef.orderNumber && !refundRef.orderId) {
+            try {
+              isCharge = await stripe.charges.retrieve(refundRef.chargeId);
+            } catch {
+              /* best-effort: rândul rămâne pe descriere */
+            }
+          }
           const description = tx.description ?? isCharge?.description ?? null;
-          const orderNumber = extractOrderNumber(isCharge, description);
+          const orderNumber = refundRef?.orderNumber ?? extractOrderNumber(isCharge, description);
           let platform: string =
-            isCharge?.metadata?.app_id === 'cjo' ? 'cjo' : platformFromOrderNumber(orderNumber);
-          if (platform === 'necunoscut' && isCharge?.metadata?.orderId) platform = 'eghiseul';
+            isCharge?.metadata?.app_id === 'cjo' || refundRef?.platformHint === 'cjo'
+              ? 'cjo'
+              : platformFromOrderNumber(orderNumber);
+          if (platform === 'necunoscut' && (isCharge?.metadata?.orderId || refundRef?.orderId)) platform = 'eghiseul';
           rows.push({
-            _orderId: (isCharge?.metadata?.orderId as string | undefined) ?? null,
+            _orderId: (isCharge?.metadata?.orderId as string | undefined) ?? refundRef?.orderId ?? null,
             id: tx.id,
             payout_id: payout.id,
             type: tx.type,
             gross_bani: tx.amount,
             fee_bani: tx.fee,
             net_bani: tx.net,
-            charge_id: isCharge?.id ?? null,
+            charge_id: isCharge?.id ?? refundRef?.chargeId ?? null,
             payment_intent_id:
-              typeof isCharge?.payment_intent === 'string'
+              (typeof isCharge?.payment_intent === 'string'
                 ? isCharge.payment_intent
-                : isCharge?.payment_intent?.id ?? null,
+                : isCharge?.payment_intent?.id ?? null) ?? refundRef?.paymentIntentId ?? null,
             description,
             available_on: tx.available_on ? new Date(tx.available_on * 1000).toISOString().slice(0, 10) : null,
             platform,

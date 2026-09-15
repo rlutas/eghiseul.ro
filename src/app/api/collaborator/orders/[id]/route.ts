@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { isHiddenFromCollaborator } from '@/lib/collaborator/hidden-statuses';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { requireCollaboratorForOrder } from '@/lib/admin/permissions';
@@ -51,7 +52,7 @@ export async function GET(
 
     // Coșurile neplătite (draft/pending/abandonate) nu sunt lucrări: nici prin
     // link direct nu trebuie să ajungă la colaborator.
-    if (order.payment_status !== 'paid') {
+    if (order.payment_status !== 'paid' || isHiddenFromCollaborator(order.status)) {
       return NextResponse.json({ success: false, error: 'Comanda nu a fost găsită' }, { status: 404 });
     }
 
