@@ -18,8 +18,10 @@
   lucrată degeaba la 2 minute după cererea de anulare).
 - Contabilul: rambursările din Decontări se leagă de comandă și poartă numărul
   stornoului.
-- De curățat cu „Reconciliază": E-260915-M4A4V, E-260819-BWB6G (eghiseul),
-  CAO-20260915-26899 (CJO). Procedura: [Anulare: refund 70% + factura de 30%](../admin/anulare-refund-70.md).
+- Cele trei anulări vechi sunt curățate (15.09, cu „Reconciliază"): E-260915-M4A4V
+  → EGH-0681; E-260819-BWB6G → EGH-0682 (stornoul EGH-0474 era făcut manual);
+  CAO-20260915-26899 (CJO) → storno EGH-0683 + EGH-0684. Procedura completă:
+  [Anulare: refund 70% + factura de 30%](../admin/anulare-refund-70.md).
 
 ---
 
@@ -68,5 +70,8 @@ Pe CJO butonul „Proceseaza refund 70%" doar PATCH-uia statusul.
 `process-cancellation` (Stripe pe `orders.stripe_account`, PI din comandă sau
 din sesiunea Checkout; SmartBill istoric → doar mesaj), bannerele din admin.
 
-**Verificat pe Oblio API:** EGH-0471 stornată manual (EGH-0474, −198),
-EGH-0679 (CJO) neatinsă, `collected=1`.
+**Verificat pe Oblio API (după reconciliere):** EGH-0679 `stornoed=1`,
+`collects=[]` (încasarea de 198 ștearsă de `refund:1`, deci fără credit fantomă);
+EGH-0683 = −198 `storno=1`; EGH-0681/0682/0684 = 59,40, `collected=1` pe PI-ul
+comenzii, toate cu e-Factura. Refundurile legate din Stripe: `re_…1sW0r8Lb`,
+`re_…0ObFAPAv`, `re_…0RJiohBt`.

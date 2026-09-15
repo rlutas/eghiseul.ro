@@ -48,13 +48,17 @@ iar factura de 30% e pe pagina comenzii. Refundurile date din dashboardul
 Stripe (fără buton) se leagă tot de comandă la următorul sync, dar nu au storno
 până nu apeși „Reconciliază".
 
-## Cazuri istorice de curățat (15.09.2026)
+## Cazuri istorice — curățate pe 15.09.2026 cu „Reconciliază"
 
-| Platformă | Comandă | Situație | Ce faci |
-|---|---|---|---|
-| eghiseul | E-260915-M4A4V | refund 138,60 dat automat; factura nu s-a emis la plată (Oblio a picat), deci nici cei 59,40 n-au document | „Reconciliază" → leagă refundul + emite factura de 59,40 |
-| eghiseul | E-260819-BWB6G | EGH-0471 stornată manual (EGH-0474) pe 19.08; 59,40 fără factură | „Reconciliază" → factura de 59,40 |
-| CJO | CAO-20260915-26899 | refund 138,60 dat manual din Stripe; EGH-0679 (198) NEstornată; 59,40 fără factură | „Reconciliază" → storno + factura de 59,40 |
+| Platformă | Comandă | Refund (Stripe) | Storno | Factura de 30% |
+|---|---|---|---|---|
+| eghiseul | E-260915-M4A4V | `re_…1sW0r8Lb`, 138,60 (automat) | — (factura nu se emisese la plată) | EGH-0681 (59,40) |
+| eghiseul | E-260819-BWB6G | `re_…0ObFAPAv`, 138,60 (automat) | EGH-0474 (manual, 19.08) | EGH-0682 (59,40) |
+| CJO | CAO-20260915-26899 | `re_…0RJiohBt`, 138,60 (manual din dashboard) | EGH-0683 (−198, încasarea inițială ștearsă) | EGH-0684 (59,40) |
+
+Toate cele trei facturi de 59,40 sunt încasate cu cardul (pe PaymentIntent-ul
+comenzii) și au plecat în SPV. Pe EGH-0679 (CJO) nu a rămas nicio încasare
+nealocată — nu apare credit fantomă pe client.
 
 Vezi și: [Storno + Reemite factură](storno-reemite.md) (corecturi de facturi,
 nu anulări) și `../changelog/2026-08-03-oblio-credit-fantoma-storno.md` (de ce
