@@ -143,7 +143,14 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     // VAT rate is 21%, included in the total price
     const VAT_RATE = 0.21
     const totalAmount = parseFloat(String(order.total_price))
-    const basePrice = order.services ? parseFloat(String(order.services.base_price)) : 0
+    // The price the customer actually PAID, from the order row — not
+    // `services.base_price`, which is today's catalogue price. Using the
+    // catalogue meant a price change after the order made the customer's own
+    // summary stop adding up. Fall back to the catalogue only for rows old
+    // enough to have no base_price of their own.
+    const orderBasePrice = order.base_price == null ? null : parseFloat(String(order.base_price))
+    const basePrice =
+      orderBasePrice ?? (order.services ? parseFloat(String(order.services.base_price)) : 0)
     const optionsPrice = parseFloat(String(order.options_price || 0))
     const deliveryPrice = parseFloat(String(order.delivery_price || 0))
     const orderRow = order as typeof order & { coupon_code?: string | null }

@@ -10,6 +10,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { customerStatus, STATUS_TONE_CLASSES, type StatusTone } from '@/lib/orders/customer-status';
 import {
   Package,
   Loader2,
@@ -20,7 +21,6 @@ import {
   CheckCircle,
   XCircle,
   RefreshCw,
-  FileText,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -38,13 +38,12 @@ interface OrdersTabProps {
   className?: string;
 }
 
-const STATUS_CONFIG: Record<string, { label: string; color: string; icon: typeof Clock }> = {
-  pending: { label: 'În așteptare', color: 'text-yellow-600 bg-yellow-100', icon: Clock },
-  pending_payment: { label: 'Așteaptă plata', color: 'text-orange-600 bg-orange-100', icon: Clock },
-  processing: { label: 'În procesare', color: 'text-blue-600 bg-blue-100', icon: RefreshCw },
-  completed: { label: 'Finalizată', color: 'text-green-600 bg-green-100', icon: CheckCircle },
-  cancelled: { label: 'Anulată', color: 'text-red-600 bg-red-100', icon: XCircle },
-  draft: { label: 'Ciornă', color: 'text-neutral-600 bg-neutral-100', icon: FileText },
+/** Icon per tone — the wording itself comes from lib/orders/customer-status. */
+const TONE_ICON: Record<StatusTone, typeof Clock> = {
+  waiting: Clock,
+  progress: RefreshCw,
+  done: CheckCircle,
+  problem: XCircle,
 };
 
 export default function OrdersTab({ initialOrders, className }: OrdersTabProps) {
@@ -102,9 +101,7 @@ export default function OrdersTab({ initialOrders, className }: OrdersTabProps) 
     }
   };
 
-  const getStatusConfig = (status: string) => {
-    return STATUS_CONFIG[status] || STATUS_CONFIG.pending;
-  };
+
 
   if (isLoading) {
     return (
@@ -148,8 +145,9 @@ export default function OrdersTab({ initialOrders, className }: OrdersTabProps) 
         <div className="bg-white rounded-2xl border border-neutral-200 overflow-hidden">
           <div className="divide-y divide-neutral-100">
             {orders.map((order) => {
-              const statusConfig = getStatusConfig(order.status);
-              const StatusIcon = statusConfig.icon;
+              const status = customerStatus(order.status);
+              const tone = STATUS_TONE_CLASSES[status.tone];
+              const StatusIcon = TONE_ICON[status.tone];
 
               return (
                 <Link
@@ -158,22 +156,16 @@ export default function OrdersTab({ initialOrders, className }: OrdersTabProps) 
                   className="flex items-center justify-between p-4 hover:bg-neutral-50 transition-colors"
                 >
                   <div className="flex items-center gap-4">
-                    <div className={cn(
-                      'w-10 h-10 rounded-lg flex items-center justify-center',
-                      statusConfig.color.split(' ')[1]
-                    )}>
-                      <StatusIcon className={cn('w-5 h-5', statusConfig.color.split(' ')[0])} />
+                    <div className={cn('w-10 h-10 rounded-lg flex items-center justify-center', tone.bg)}>
+                      <StatusIcon className={cn('w-5 h-5', tone.text)} />
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
                         <p className="font-mono font-semibold text-secondary-900">
                           {order.friendlyOrderId}
                         </p>
-                        <span className={cn(
-                          'text-xs px-2 py-0.5 rounded-full',
-                          statusConfig.color
-                        )}>
-                          {statusConfig.label}
+                        <span className={cn('text-xs px-2 py-0.5 rounded-full font-medium', tone.bg, tone.text)}>
+                          {status.label}
                         </span>
                       </div>
                       <p className="text-sm text-neutral-500">

@@ -30,6 +30,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { cn } from '@/lib/utils';
+import { customerStatus, STATUS_TONE_CLASSES, type StatusTone } from '@/lib/orders/customer-status';
 import TrackingTimeline from '@/components/orders/tracking-timeline';
 
 interface OrderDocument {
@@ -65,11 +66,19 @@ interface OrderData {
   status: string;
   totalAmount: number;
   currency: string;
+  // Mirrors what GET /api/orders/[id] actually returns. It used to declare
+  // `optionsTotal`/`subtotal`/`tax`, names the API never sent, so the options
+  // line silently never rendered — TypeScript could not catch it because this
+  // interface was the only description of the payload.
   breakdown: {
     basePrice: number;
-    optionsTotal: number;
-    subtotal: number;
-    tax: number;
+    optionsPrice: number;
+    deliveryPrice: number;
+    discountAmount: number;
+    couponCode: string | null;
+    subtotalWithoutVat: number;
+    vatAmount: number;
+    vatRate: number;
     total: number;
   };
   selectedOptions: Array<{
@@ -151,16 +160,12 @@ interface OrderData {
   internalNotes: string | null;
 }
 
-const STATUS_CONFIG: Record<string, { label: string; color: string; bgColor: string; icon: typeof Clock }> = {
-  draft: { label: 'Ciornă', color: 'text-neutral-600', bgColor: 'bg-neutral-100', icon: FileText },
-  pending: { label: 'În așteptare', color: 'text-yellow-600', bgColor: 'bg-yellow-100', icon: Clock },
-  pending_payment: { label: 'Așteaptă plata', color: 'text-orange-600', bgColor: 'bg-orange-100', icon: Clock },
-  processing: { label: 'În procesare', color: 'text-blue-600', bgColor: 'bg-blue-100', icon: RefreshCw },
-  document_ready: { label: 'Document gata', color: 'text-green-600', bgColor: 'bg-green-100', icon: CheckCircle },
-  delivered: { label: 'Livrat', color: 'text-green-600', bgColor: 'bg-green-100', icon: CheckCircle },
-  completed: { label: 'Finalizată', color: 'text-green-600', bgColor: 'bg-green-100', icon: CheckCircle },
-  rejected: { label: 'Respins', color: 'text-red-600', bgColor: 'bg-red-100', icon: XCircle },
-  cancelled: { label: 'Anulată', color: 'text-red-600', bgColor: 'bg-red-100', icon: XCircle },
+/** Icon per tone; the wording lives in lib/orders/customer-status. */
+const TONE_ICON: Record<StatusTone, typeof Clock> = {
+  waiting: Clock,
+  progress: RefreshCw,
+  done: CheckCircle,
+  problem: XCircle,
 };
 
 const PAYMENT_STATUS_CONFIG: Record<string, { label: string; color: string; bgColor: string }> = {
@@ -315,8 +320,9 @@ export default function OrderDetailPage() {
     );
   }
 
-  const statusConfig = STATUS_CONFIG[order.status] || STATUS_CONFIG.pending;
-  const StatusIcon = statusConfig.icon;
+  const status = customerStatus(order.status);
+  const statusTone = STATUS_TONE_CLASSES[status.tone];
+  const StatusIcon = TONE_ICON[status.tone];
   const paymentConfig = PAYMENT_STATUS_CONFIG[order.paymentStatus] || PAYMENT_STATUS_CONFIG.unpaid;
 
   const customerName = order.customerData?.company?.companyName
@@ -349,13 +355,18 @@ export default function OrderDetailPage() {
                 </p>
               </div>
             </div>
-            <div className={cn(
-              'flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium self-start sm:self-auto',
-              statusConfig.bgColor,
-              statusConfig.color
-            )}>
-              <StatusIcon className="w-4 h-4" />
-              {statusConfig.label}
+            <div className="self-start sm:self-auto sm:text-right">
+              <div className={cn(
+                'inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium',
+                statusTone.bg,
+                statusTone.text
+              )}>
+                <StatusIcon className="w-4 h-4" />
+                {status.label}
+              </div>
+              {status.hint && (
+                <p className="text-white/70 text-xs mt-2 max-w-xs">{status.hint}</p>
+              )}
             </div>
           </div>
         </div>
@@ -768,16 +779,29 @@ export default function OrderDetailPage() {
                 <span className="text-neutral-500">Serviciu</span>
                 <span className="text-secondary-900">{formatPrice(order.breakdown.basePrice)} RON</span>
               </div>
-              {order.breakdown.optionsTotal > 0 && (
+              {order.breakdown.optionsPrice > 0 && (
                 <div className="flex justify-between text-sm">
                   <span className="text-neutral-500">Opțiuni</span>
-                  <span className="text-secondary-900">+{formatPrice(order.breakdown.optionsTotal)} RON</span>
+                  <span className="text-secondary-900">+{formatPrice(order.breakdown.optionsPrice)} RON</span>
                 </div>
               )}
-              {order.deliveryMethod?.price && order.deliveryMethod.price > 0 && (
+              {/* From the order row, not from `deliveryMethod.price`: the
+                  method blob is missing on phone orders and on anything
+                  imported, while `delivery_price` is always set — so the
+                  delivery line used to vanish and the summary stopped adding
+                  up to the total. */}
+              {order.breakdown.deliveryPrice > 0 && (
                 <div className="flex justify-between text-sm">
                   <span className="text-neutral-500">Livrare</span>
-                  <span className="text-secondary-900">+{formatPrice(order.deliveryMethod.price)} RON</span>
+                  <span className="text-secondary-900">+{formatPrice(order.breakdown.deliveryPrice)} RON</span>
+                </div>
+              )}
+              {order.breakdown.discountAmount > 0 && (
+                <div className="flex justify-between text-sm">
+                  <span className="text-neutral-500">
+                    Reducere{order.breakdown.couponCode ? ` (${order.breakdown.couponCode})` : ''}
+                  </span>
+                  <span className="text-green-600">−{formatPrice(order.breakdown.discountAmount)} RON</span>
                 </div>
               )}
               <div className="pt-3 border-t border-neutral-100 flex justify-between">

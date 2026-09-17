@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { Suspense } from 'react'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { LogoutButton } from '@/components/shared/logout-button'
 import { AccountTabs } from '@/components/account'
 import type { Database } from '@/types/supabase'
@@ -25,6 +26,24 @@ export default async function AccountPage() {
 
   if (!user) {
     redirect('/auth/login')
+  }
+
+  // Pull in orders this customer placed before they had an account. Runs on
+  // every visit rather than once at sign-up, so it also picks up orders placed
+  // later while logged out, and heals the accounts that existed before this
+  // shipped. The UPDATE touches nothing once everything is claimed.
+  // Gated on a confirmed email: that is the same proof of mailbox control the
+  // public order-status page already accepts.
+  if (user.email && user.email_confirmed_at) {
+    const admin = createAdminClient()
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error: claimError } = await (admin as any).rpc('claim_guest_orders', {
+      p_user_id: user.id,
+      p_email: user.email,
+    })
+    // Never block the account on this — worst case the customer sees the same
+    // list as before and we try again on the next visit.
+    if (claimError) console.error('claim_guest_orders failed:', claimError.message)
   }
 
   const { data: profile } = await supabase
