@@ -102,19 +102,18 @@ export function Footer() {
             contact. Pe mobil/tabletă brandul ocupă rândul întreg. */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-[1.6fr_1fr_1fr_0.95fr_1.25fr_1.05fr] gap-8 lg:gap-10">
           <div className="col-span-2 md:col-span-3 lg:col-span-1 space-y-4">
-            <Link href="/" className="flex items-center gap-3">
+            {/* The real lockup, same as the header, with the lettering in white
+                for this dark background — the wordmark is uppercase and carries
+                no diacritics, which hand-set text got wrong. */}
+            <Link href="/" className="flex items-center">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="/images/brand/icon.webp"
-                alt=""
-                aria-hidden="true"
-                width={500}
-                height={500}
-                className="h-12 w-12 rounded-xl"
+                src="/images/brand/logo-wide-white.webp"
+                alt="eGhișeul.ro"
+                width={330}
+                height={80}
+                className="h-11 w-auto"
               />
-              <span className="text-xl font-extrabold text-white leading-tight">
-                eGhișeul<span className="text-primary-500">.ro</span>
-              </span>
             </Link>
             <p className="text-sm text-white/70 leading-relaxed">
               Ne dedicăm simplificării proceselor birocratice pentru românii de pretutindeni: acces rapid și sigur la

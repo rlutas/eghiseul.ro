@@ -2,29 +2,24 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 /**
- * Wordmark for the auth screens, which all sit on the dark navy gradient.
+ * The brand lockup for screens with a dark background.
  *
- * It is the shield asset plus white lettering rather than one of the logo
- * files: `logo.webp`, `logo-wide.webp` and `icon.webp` all have dark text baked
- * in, so the wide logo simply vanishes on this background. Before 2026-09-17
- * these pages worked around that with a gold square containing the letters
- * "eG", which read as a placeholder.
+ * It is the real logo, not a hand-set imitation: the wordmark is uppercase
+ * "eGHISEUL" without diacritics, and writing it as HTML text got both wrong.
+ * `logo-wide-white.webp` is the same file as the header's, with only the
+ * lettering repainted white — see `scripts/build-white-logo.mjs`.
  */
 export function AuthLogo({ size = 'sm' }: { size?: 'sm' | 'lg' }) {
-  const large = size === 'lg';
   return (
-    <Link href="/" className={`inline-flex items-center ${large ? 'gap-3' : 'gap-2.5'}`}>
+    <Link href="/" className="inline-flex items-center" aria-label="eGhișeul.ro — acasă">
       <Image
-        src="/images/brand/icon.webp"
-        alt=""
-        width={96}
-        height={96}
-        className={large ? 'h-12 w-auto drop-shadow-lg' : 'h-10 w-auto'}
+        src="/images/brand/logo-wide-white.webp"
+        alt="eGhișeul.ro"
+        width={330}
+        height={80}
+        className={size === 'lg' ? 'h-11 w-auto' : 'h-9 w-auto'}
         priority
       />
-      <span className={`font-bold text-white ${large ? 'text-2xl' : 'text-xl'}`}>
-        eGhișeul<span className="text-primary-500">.ro</span>
-      </span>
     </Link>
   );
 }

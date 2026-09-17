@@ -68,10 +68,7 @@ function shell({ preheader, glyph, title, lead, cta, note }: ShellInput): string
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:560px;background:#ffffff;border:1px solid ${LINE};border-radius:18px;overflow:hidden;box-shadow:0 1px 3px rgba(15,23,42,0.06);">
 
     <tr><td style="background:${NAVY};padding:20px 28px;">
-      <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
-        <td style="vertical-align:middle;padding-right:10px;"><img src="https://eghiseul.ro/icon.png" alt="" width="30" height="30" style="display:block;border:0;border-radius:8px;"></td>
-        <td style="vertical-align:middle;"><span style="color:#ffffff;font-size:18px;font-weight:800;letter-spacing:-0.2px;">eGhișeul<span style="color:${GOLD};">.ro</span></span></td>
-      </tr></table>
+      <img src="https://eghiseul.ro/images/brand/logo-wide-white.png" alt="eGhiseul.ro" width="165" height="40" style="display:block;border:0;height:40px;width:auto;">
     </td></tr>
 
     <tr><td style="padding:34px 28px 0;" align="center">
