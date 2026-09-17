@@ -87,6 +87,16 @@ export default function PayoutDetailPage() {
             <Link href={`/admin/orders?search=${encodeURIComponent(t.order_number)}`} className="text-primary-700 hover:underline print:text-black print:no-underline">
               {t.order_number}
             </Link>
+          ) : t.platform === 'cjo' ? (
+            <a
+              href={`https://cazierjudiciaronline.com/admin/orders?q=${encodeURIComponent(t.order_number)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary-700 hover:underline print:text-black print:no-underline"
+              title="Deschide în admin CJO — de acolo poți emite factura lipsă"
+            >
+              {t.order_number}
+            </a>
           ) : (
             t.order_number
           )

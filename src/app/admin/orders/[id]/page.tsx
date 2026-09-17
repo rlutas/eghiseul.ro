@@ -686,6 +686,7 @@ export default function AdminOrderDetailPage() {
   const [awbError, setAwbError] = useState<string | null>(null);
   const [cancelling, setCancelling] = useState(false);
   const [downloading, setDownloading] = useState(false);
+  const [emittingInvoice, setEmittingInvoice] = useState(false);
 
   const fetchOrder = useCallback(async (opts?: { silent?: boolean }) => {
     // Silent refresh: inline actions (generate document, add note, update
@@ -763,6 +764,29 @@ export default function AdminOrderDetailPage() {
   useEffect(() => {
     if (orderId) fetchOrder();
   }, [orderId, fetchOrder]);
+
+  // Self-serve fix for a paid order that never got an Oblio invoice (webhook
+  // failure, token expiry, etc.) — same chokepoint the webhook/cron use, so
+  // it dedups against an existing invoice instead of double-issuing.
+  const emitInvoice = useCallback(async () => {
+    if (!order) return;
+    setEmittingInvoice(true);
+    try {
+      const res = await fetch(`/api/admin/orders/${order.id}/emit-invoice`, { method: 'POST' });
+      const json = await res.json();
+      if (!json.success) throw new Error(json.error?.message ?? json.error ?? 'Eroare la emiterea facturii');
+      toast.success(
+        json.data?.already
+          ? `Factura există deja: ${json.data.invoiceNumber ?? ''}`
+          : `Factură emisă: ${json.data.invoiceNumber}`
+      );
+      await refreshSilent();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Eroare la emiterea facturii');
+    } finally {
+      setEmittingInvoice(false);
+    }
+  }, [order, refreshSilent]);
 
   // ---------- AWB Handlers ----------
 
@@ -2284,6 +2308,24 @@ export default function AdminOrderDetailPage() {
                     </div>
                   ) : order.invoice_number ? (
                     <InfoRow label="Nr. factură Oblio" value={order.invoice_number} mono />
+                  ) : order.payment_status === 'paid' ? (
+                    <div className="flex items-center justify-between gap-4 text-sm border-b border-border/60 py-1.5 last:border-b-0">
+                      <span className="text-muted-foreground">Nr. factură Oblio</span>
+                      <div className="flex items-center gap-1.5">
+                        <span className="rounded bg-red-50 px-1.5 py-0.5 text-xs font-semibold text-red-700">
+                          ⚠ Neemisă
+                        </span>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-6 px-2 text-[11px]"
+                          disabled={emittingInvoice}
+                          onClick={emitInvoice}
+                        >
+                          {emittingInvoice ? 'Emit…' : 'Emite acum'}
+                        </Button>
+                      </div>
+                    </div>
                   ) : (
                     <InfoRow label="Nr. factură Oblio" value="—" />
                   )}
