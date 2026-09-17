@@ -6,7 +6,10 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { LogoutButton } from '@/components/shared/logout-button'
 import { AccountTabs } from '@/components/account'
 import { ProfileChecklist } from '@/components/account/ProfileChecklist'
-import { profileCompleteness } from '@/lib/account/profile-completeness'
+import { profileCompleteness, hasIdentityDocuments } from '@/lib/account/profile-completeness'
+import { serviceRequirements, serviceReadiness } from '@/lib/account/service-readiness'
+import { createPublicClient } from '@/lib/supabase/public'
+import type { AccountServiceRow } from '@/components/account/ServicesTab'
 import type { Database } from '@/types/supabase'
 import {
   Mail,
@@ -96,6 +99,55 @@ export default async function AccountPage() {
     savedAddressCount: savedAddressCount ?? 0,
     billingProfileCount: billingProfileCount ?? 0,
   })
+
+  // The catalogue, with what each service will still ask this customer for.
+  // Computed here rather than in the browser so the tab renders complete on
+  // first paint. `createPublicClient` because services are public data and this
+  // needs no user context.
+  // Cazier Judiciar PF/PJ are left out for the same reason /servicii leaves them
+  // out: the hub service covers both.
+  const HIDDEN_SLUGS = new Set(['cazier-judiciar-persoana-fizica', 'cazier-judiciar-persoana-juridica'])
+  const GROUP_TITLES: Record<string, string> = {
+    imobiliare: 'Carte Funciară & Cadastru',
+    juridice: 'Caziere & Integritate',
+    comerciale: 'Firme',
+    fiscale: 'Fiscal',
+    personale: 'Stare Civilă',
+    auto: 'Auto',
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: serviceRows } = await (createPublicClient() as any)
+    .from('services')
+    .select('slug, name, short_description, description, base_price, category, verification_config')
+    .eq('is_active', true)
+    .order('display_order', { ascending: true })
+
+  const accountData = {
+    hasPersonalData: !!(profile?.first_name && profile?.last_name && profile?.cnp),
+    hasIdentityDocuments: hasIdentityDocuments(docTypes),
+    // company_* exist on `profiles` in the database; the generated types are stale.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    hasCompanyData: !!(profile as any)?.company_cui,
+    hasAddress: (savedAddressCount ?? 0) > 0,
+    hasBilling: (billingProfileCount ?? 0) > 0,
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const accountServices: AccountServiceRow[] = ((serviceRows ?? []) as any[])
+    .filter((row) => !HIDDEN_SLUGS.has(row.slug))
+    .map((row) => {
+      const readiness = serviceReadiness(serviceRequirements(row.verification_config), accountData)
+      return {
+        slug: row.slug,
+        name: row.name,
+        description: row.short_description ?? row.description ?? null,
+        price: row.base_price == null ? null : Number(row.base_price),
+        group: GROUP_TITLES[row.category as string] ?? 'Alte servicii',
+        ready: readiness.ready,
+        missing: readiness.missing,
+      }
+    })
 
   const firstName = profile?.first_name || user.user_metadata?.first_name || ''
   const lastName = profile?.last_name || user.user_metadata?.last_name || ''
@@ -203,7 +255,7 @@ export default async function AccountPage() {
                 <Loader2 className="w-8 h-8 text-primary-500 animate-spin" />
               </div>
             }>
-              <AccountTabs />
+              <AccountTabs services={accountServices} />
             </Suspense>
           </div>
 

@@ -4,7 +4,7 @@
  * AccountTabs Component
  *
  * Tab navigation for account page.
- * Tabs: Profil | KYC | Adrese | Facturare | Comenzi
+ * Tabs: Servicii | Comenzi | Profil | KYC | Adrese | Mașini | Facturare
  */
 
 import { useState, useCallback, useEffect, useRef } from 'react';
@@ -16,6 +16,7 @@ import {
   CreditCard,
   Package,
   Car,
+  LayoutGrid,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import ProfileTab from './ProfileTab';
@@ -24,8 +25,9 @@ import AddressesTab from './AddressesTab';
 import BillingTab from './BillingTab';
 import OrdersTab from './OrdersTab';
 import VehiclesTab from './VehiclesTab';
+import ServicesTab, { type AccountServiceRow } from './ServicesTab';
 
-type TabId = 'profile' | 'kyc' | 'addresses' | 'vehicles' | 'billing' | 'orders';
+type TabId = 'services' | 'orders' | 'profile' | 'kyc' | 'addresses' | 'vehicles' | 'billing';
 
 interface Tab {
   id: TabId;
@@ -34,21 +36,27 @@ interface Tab {
   icon: typeof User;
 }
 
+// Order matters: the tab strip scrolls horizontally on a phone, so the two
+// things a customer actually comes for — ordering something and checking an
+// order — must be reachable without scrolling it.
 const TABS: Tab[] = [
+  { id: 'services', label: 'Ce pot comanda', labelShort: 'Servicii', icon: LayoutGrid },
+  { id: 'orders', label: 'Comenzi', labelShort: 'Comenzi', icon: Package },
   { id: 'profile', label: 'Profil', labelShort: 'Profil', icon: User },
   { id: 'kyc', label: 'Verificare KYC', labelShort: 'KYC', icon: Shield },
   { id: 'addresses', label: 'Adrese', labelShort: 'Adrese', icon: MapPin },
   { id: 'vehicles', label: 'Mașinile mele', labelShort: 'Mașini', icon: Car },
   { id: 'billing', label: 'Facturare', labelShort: 'Facturare', icon: CreditCard },
-  { id: 'orders', label: 'Comenzi', labelShort: 'Comenzi', icon: Package },
 ];
 
 interface AccountTabsProps {
   initialTab?: TabId;
   className?: string;
+  /** Catalogue with per-customer readiness, computed on the server. */
+  services?: AccountServiceRow[];
 }
 
-export default function AccountTabs({ initialTab = 'profile', className }: AccountTabsProps) {
+export default function AccountTabs({ initialTab = 'services', className, services = [] }: AccountTabsProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const tabFromUrl = searchParams.get('tab') as TabId | null;
@@ -82,6 +90,8 @@ export default function AccountTabs({ initialTab = 'profile', className }: Accou
   // Render active tab content
   const renderTabContent = () => {
     switch (activeTab) {
+      case 'services':
+        return <ServicesTab services={services} />;
       case 'profile':
         return <ProfileTab autoEdit={autoEdit} />;
       case 'kyc':
@@ -95,7 +105,7 @@ export default function AccountTabs({ initialTab = 'profile', className }: Accou
       case 'orders':
         return <OrdersTab />;
       default:
-        return <ProfileTab />;
+        return <ServicesTab services={services} />;
     }
   };
 
