@@ -63,13 +63,26 @@ zice „mi-am făcut cont acum ceva timp și nu mă lasă", ăsta e cazul.
 
 ## Pentru Raul — reparația de fond
 
-Blocajul nu dispare din cod. Conturile noi se pot crea automat abia după:
+Gata, aplicat pe 17.09: `site_url` mutat de pe `http://localhost:3000` pe
+`https://eghiseul.ro` (linkul din emailul de confirmare ducea în gol chiar și
+când emailul ajungea), lista de redirecturi permise completată, parola minimă
+urcată de la 6 la 8 caractere și verificarea HaveIBeenPwned pornită.
 
-1. Supabase Dashboard → **Authentication** → **Emails** → **SMTP Settings** →
-   SMTP custom pe Resend (domeniul e deja verificat, cheia e în
-   `RESEND_API_KEY`).
-2. Apoi **Authentication** → **Rate Limits** → „Rate limit for sending emails",
-   care rămâne la valoarea mică chiar și după ce pui SMTP propriu.
+**Rămas de făcut, un singur ecran.** Supabase Dashboard → **Authentication** →
+**Emails** → **SMTP Settings** → activezi „Enable Custom SMTP":
+
+| Câmp | Valoare |
+|---|---|
+| Host | `smtp.resend.com` |
+| Port | `587` |
+| Username | `resend` |
+| Password | `RESEND_API_KEY` din `.env.local` |
+| Sender email | `comenzi@eghiseul.ro` |
+| Sender name | `eGhiseul.ro` |
+
+Apoi, **în ordinea asta**, **Authentication** → **Rate Limits** → „Rate limit for
+sending emails" → 100. Supabase refuză valoarea cât timp nu există SMTP custom
+(`Custom SMTP required to configure RATE_LIMIT_EMAIL_SENT`), deci întâi SMTP-ul.
 
 Detalii tehnice și cum s-a diagnosticat:
 [17.09.2026 — Conturile de client erau blocate de 39 de zile](../changelog/2026-09-17-conturi-client-blocate-si-verso-buletin.md).

@@ -114,6 +114,15 @@ de plată extra rămân nepotrivite în Decontări — exact clasa de simptome d
 - **`pg_trgm` în schema `public`**: mutarea ar invalida indexurile trigram.
 - **`auth_rls_initplan` pe celelalte 47 de politici**: preexistente, de curățat
   când se atinge fiecare zonă.
-- **Leaked password protection (HaveIBeenPwned) și `password_min_length = 6`**:
-  se schimbă din configurația de Auth, nu din DB. Vezi documentul despre
-  conturile blocate.
+### Rezolvat între timp, din configurația de Auth (nu din DB)
+
+- `password_hibp_enabled` → `true` (verificare HaveIBeenPwned la înregistrare);
+- `password_min_length` 6 → 8, cât cere deja formularul;
+- `site_url` `http://localhost:3000` → `https://eghiseul.ro` și `uri_allow_list`
+  completată — vezi documentul despre conturile blocate, era a doua cauză a
+  conturilor neconfirmate.
+
+Advisorul de securitate, după toate astea: `rls_disabled_in_public` 1 → 0,
+`function_search_path_mutable` 28 → 0, funcții SECURITY DEFINER expuse 15 → 5
+(cele 5 intenționate), `auth_leaked_password_protection` rezolvat. Rămân doar
+findings-urile documentate mai sus ca acceptate conștient.

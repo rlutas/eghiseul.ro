@@ -98,12 +98,49 @@ Confirmare în date, ultimele 60 de zile: `ci_front` 121 fără verso (ruta scan
 vs. `act_identitate` 63 / `act_identitate_back` 64 (ruta manuală — versoul apărea
 practic întotdeauna, pentru că nu te lăsa altfel).
 
+### A doua cauză, găsită mai târziu: `site_url` era pe localhost
+
+Citind configurația de Auth prin Management API (după ce Raul a pus un token nou):
+
+```
+smtp_host             = null                      → SMTP implicit Supabase
+rate_limit_email_sent = 2                         → 2 emailuri/oră pe tot proiectul
+site_url              = "http://localhost:3000"   🔴
+uri_allow_list        = ""                        🔴
+```
+
+`site_url` este baza linkului din emailul de confirmare. Cu `localhost:3000`
+acolo, **și emailurile care chiar au plecat duceau într-o pagină inexistentă pe
+calculatorul clientului.** Asta explică cele 38 de conturi neconfirmate mai bine
+decât 404-ul de pe `/auth/verify-email`: erau două fundături una după alta.
+
+`uri_allow_list` gol înseamnă că niciun `emailRedirectTo` nu era acceptat, deci
+nici redirectul de după confirmare (`register-from-order/route.ts:157`) nu avea
+cum să funcționeze.
+
+Corectat prin Management API:
+
+| Setare | Înainte | Acum |
+|---|---|---|
+| `site_url` | `http://localhost:3000` | `https://eghiseul.ro` |
+| `uri_allow_list` | `""` | `https://eghiseul.ro/**,https://www.eghiseul.ro/**` |
+| `password_min_length` | 6 | 8 (cât cere și formularul) |
+| `password_hibp_enabled` | false | true (verificare HaveIBeenPwned) |
+
 ## Rămâne de făcut
 
-1. **SMTP custom (Resend) în Supabase** → Authentication → Emails → SMTP Settings,
-   apoi Rate Limits → „Rate limit for sending emails". Fără asta conturile noi tot
-   nu se pot crea. `SUPABASE_ACCESS_TOKEN` din `.env.local` e expirat (401 pe
-   Management API), deci trebuie făcut din dashboard.
+1. **SMTP custom (Resend) în Supabase** → Authentication → Emails → SMTP Settings.
+   Singurul lucru care nu s-a putut face din afara dashboardului: cererea ar fi
+   trimis cheia `RESEND_API_KEY` către API-ul Supabase, iar asta e blocată.
+   Valori: host `smtp.resend.com`, port `587`, user `resend`, parola =
+   `RESEND_API_KEY` din `.env.local`, sender `comenzi@eghiseul.ro`, nume
+   `eGhiseul.ro`. Domeniul `eghiseul.ro` e deja `verified` în Resend (verificat
+   prin API-ul lor).
+   Imediat după, **Authentication → Rate Limits → „Rate limit for sending emails"**
+   urcat la 100/oră: Supabase refuză să accepte valoarea cât timp nu există SMTP
+   custom (`"Custom SMTP required to configure RATE_LIMIT_EMAIL_SENT"`), deci
+   ordinea contează.
+   Fără pasul ăsta conturile noi tot nu se pot crea.
 2. **Legarea comenzilor de guest la cont.** `orders.user_id` e singura legătură;
    nu există potrivire pe email nicăieri (`api/orders/route.ts:252`). 439 de
    comenzi plătite în 90 de zile, zero cu `user_id`.
