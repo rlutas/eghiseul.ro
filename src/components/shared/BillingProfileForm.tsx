@@ -12,11 +12,20 @@
  * - Order wizard (billing step)
  */
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { COUNTIES, canonicalCountyName } from '@/lib/data/romania-counties';
+import { billingLocalityOptions } from '@/lib/orders/billing-locality';
 import {
   Building2,
   User,
@@ -36,11 +45,21 @@ export interface BillingData {
   type: BillingType;
   isDefault?: boolean;
 
-  // Persoană Fizică fields
+  // Persoană Fizică fields.
+  // The address is kept STRUCTURED because Oblio sends street, locality and
+  // county as separate fields — a profile without `city` + `county` can never
+  // satisfy isPfBillingComplete, so the customer would retype everything at
+  // checkout (see src/lib/orders/billing-validation.ts).
   firstName?: string;
   lastName?: string;
   cnp?: string;
+  /** Street line: „Str. X nr. 10, bl. A2, ap. 5". */
   address?: string;
+  /** Localitate; „Sector N" when the county is București (SPV requirement). */
+  city?: string;
+  /** Canonical county name, matching an option of the dropdown. */
+  county?: string;
+  postalCode?: string;
 
   // Persoană Juridică fields
   companyName?: string;
@@ -92,6 +111,23 @@ export default function BillingProfileForm({
       label: value.label || '',
       type: value.type || 'persoana_fizica',
       [field]: fieldValue,
+    } as BillingData);
+  }, [value, onChange]);
+
+  // Canonical county, so a value stored as a code („SM") or without diacritics
+  // („Timis") still matches an option of the dropdown.
+  const selectedCounty = canonicalCountyName(value.county) ?? '';
+  const localities = useMemo(() => billingLocalityOptions(selectedCounty), [selectedCounty]);
+
+  // County change drops the locality when it no longer belongs to the new county.
+  const handleCountyChange = useCallback((countyName: string) => {
+    const stillValid = billingLocalityOptions(countyName).includes(value.city || '');
+    onChange({
+      ...value,
+      label: value.label || '',
+      type: value.type || 'persoana_fizica',
+      county: countyName,
+      city: stillValid ? value.city : '',
     } as BillingData);
   }, [value, onChange]);
 
@@ -260,7 +296,7 @@ export default function BillingProfileForm({
           value={value.label || ''}
           onChange={(e) => updateField('label', e.target.value)}
           placeholder={billingType === 'persoana_fizica' ? 'ex: Personal' : 'ex: Firma mea SRL'}
-          className="bg-white"
+          className="bg-white h-11"
         />
       </div>
 
@@ -291,7 +327,7 @@ export default function BillingProfileForm({
                 value={value.lastName || ''}
                 onChange={(e) => updateField('lastName', e.target.value)}
                 placeholder="ex: Popescu"
-                className="bg-white"
+                className="bg-white h-11"
               />
             </div>
             <div className="space-y-2">
@@ -304,7 +340,7 @@ export default function BillingProfileForm({
                 value={value.firstName || ''}
                 onChange={(e) => updateField('firstName', e.target.value)}
                 placeholder="ex: Ion"
-                className="bg-white"
+                className="bg-white h-11"
               />
             </div>
           </div>
@@ -320,21 +356,84 @@ export default function BillingProfileForm({
               value={value.cnp || ''}
               onChange={(e) => updateField('cnp', e.target.value.replace(/\D/g, ''))}
               placeholder="1234567890123"
-              className="bg-white font-mono"
+              className="bg-white font-mono h-11"
             />
           </div>
 
+          {/* Structured billing address — Oblio sends street, locality and
+              county separately, so a single free-text line is not enough for
+              the profile to be reusable at checkout. */}
           <div className="space-y-2">
             <Label htmlFor="address" className="text-secondary-900 font-medium">
-              Adresă facturare
+              Stradă, număr, bloc, ap. <span className="text-red-500">*</span>
             </Label>
             <Input
               id="address"
               type="text"
               value={value.address || ''}
               onChange={(e) => updateField('address', e.target.value)}
-              placeholder="Strada, număr, localitate, județ"
-              className="bg-white"
+              placeholder="ex: Str. Mihai Viteazu nr. 10, bl. A2, ap. 5"
+              className="bg-white h-11"
+            />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="county" className="text-secondary-900 font-medium">
+                Județ <span className="text-red-500">*</span>
+              </Label>
+              <Select value={selectedCounty} onValueChange={handleCountyChange}>
+                <SelectTrigger id="county" className="w-full min-w-0 bg-white h-11">
+                  <SelectValue placeholder="Alege județul" />
+                </SelectTrigger>
+                <SelectContent>
+                  {COUNTIES.map((c) => (
+                    <SelectItem key={c.code} value={c.name}>
+                      {c.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="city" className="text-secondary-900 font-medium">
+                Localitate <span className="text-red-500">*</span>
+              </Label>
+              <Select
+                value={value.city || ''}
+                onValueChange={(v) => updateField('city', v)}
+                disabled={!selectedCounty}
+              >
+                <SelectTrigger id="city" className="w-full min-w-0 bg-white h-11">
+                  <SelectValue
+                    placeholder={selectedCounty ? 'Alege localitatea' : 'Alege întâi județul'}
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  {localities.map((loc) => (
+                    <SelectItem key={loc} value={loc}>
+                      {loc}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="postalCode" className="text-secondary-900 font-medium">
+              Cod poștal <span className="text-xs font-normal text-neutral-500">(opțional)</span>
+            </Label>
+            <Input
+              id="postalCode"
+              type="text"
+              inputMode="numeric"
+              maxLength={6}
+              value={value.postalCode || ''}
+              onChange={(e) => updateField('postalCode', e.target.value.replace(/\D/g, ''))}
+              placeholder="ex: 900001"
+              className="bg-white h-11"
             />
           </div>
         </>
@@ -360,7 +459,7 @@ export default function BillingProfileForm({
                 }}
                 placeholder="ex: RO12345678"
                 className={cn(
-                  'bg-white font-mono flex-1',
+                  'bg-white font-mono flex-1 h-11',
                   cuiSuccess && 'border-green-500',
                   cuiError && 'border-red-500'
                 )}
@@ -370,7 +469,7 @@ export default function BillingProfileForm({
                 variant="outline"
                 onClick={validateCUI}
                 disabled={cuiLoading || !value.cui}
-                className="shrink-0"
+                className="shrink-0 h-11"
               >
                 {cuiLoading ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -406,7 +505,7 @@ export default function BillingProfileForm({
               value={value.companyName || ''}
               onChange={(e) => updateField('companyName', e.target.value)}
               placeholder="SC Firma Mea SRL"
-              className="bg-white"
+              className="bg-white h-11"
             />
           </div>
 
@@ -420,7 +519,7 @@ export default function BillingProfileForm({
               value={value.regCom || ''}
               onChange={(e) => updateField('regCom', e.target.value)}
               placeholder="J40/1234/2020"
-              className="bg-white"
+              className="bg-white h-11"
             />
           </div>
 
@@ -434,7 +533,7 @@ export default function BillingProfileForm({
               value={value.companyAddress || ''}
               onChange={(e) => updateField('companyAddress', e.target.value)}
               placeholder="Strada, număr, localitate, județ"
-              className="bg-white"
+              className="bg-white h-11"
             />
           </div>
 
@@ -450,7 +549,7 @@ export default function BillingProfileForm({
                 value={value.bankName || ''}
                 onChange={(e) => updateField('bankName', e.target.value)}
                 placeholder="ex: BCR"
-                className="bg-white"
+                className="bg-white h-11"
               />
             </div>
             <div className="space-y-2">
@@ -463,7 +562,7 @@ export default function BillingProfileForm({
                 value={value.bankIban || ''}
                 onChange={(e) => updateField('bankIban', e.target.value.toUpperCase())}
                 placeholder="RO49AAAA1B31007593840000"
-                className="bg-white font-mono text-sm"
+                className="bg-white font-mono text-sm h-11"
               />
             </div>
           </div>

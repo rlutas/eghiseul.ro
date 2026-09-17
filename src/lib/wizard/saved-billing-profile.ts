@@ -7,10 +7,12 @@
  * services with no ID scan (imobiliare) that meant a saved profile did nothing
  * at all.
  *
- * A saved PF profile carries the fields of BillingProfileForm (name, CNP and a
- * single free-text address line). County/locality/postal code are read when
- * present but are usually empty — the customer completes them, because Oblio
- * needs the locality and county separately.
+ * A saved PF profile carries the fields of BillingProfileForm: name, CNP, the
+ * street line, plus localitate/județ/cod poștal. Those last three were missing
+ * from the account form until Faza 0, so a saved profile could never satisfy
+ * isPfBillingComplete and the customer retyped everything at checkout. They are
+ * still read defensively — rows saved before the fix have them empty, and the
+ * customer completes them once.
  */
 
 import { canonicalCountyName } from '@/lib/data/romania-counties';

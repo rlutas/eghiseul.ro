@@ -213,7 +213,11 @@ export default function BillingTab({ className, prefillFromId, autoEdit = false 
                         {profile.cnp && <span className="text-neutral-500"> • CNP: {profile.cnp}</span>}
                       </p>
                       {profile.address && (
-                        <p className="text-sm text-neutral-500 mt-1">{profile.address}</p>
+                        <p className="text-sm text-neutral-500 mt-1">
+                          {[profile.address, profile.city, profile.county, profile.postalCode]
+                            .filter(Boolean)
+                            .join(', ')}
+                        </p>
                       )}
                     </div>
                   ) : (

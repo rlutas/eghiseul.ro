@@ -96,8 +96,10 @@ Probleme verificate în cod și în date:
    fapt urmează 5 câmpuri de convenție. **E bug-ul meu, de azi, și intră în plan
    ca reparație, nu ca funcție nouă.**
 
-7. **`user_saved_vehicles` are 0 rânduri**, iar formularul nu expune
-   `driving_license` — singurul câmp de care are nevoie cazierul auto.
+7. **`user_saved_vehicles` are 0 rânduri.** (Corecție: formularul expune
+   `driving_license` din 25.06.2026 — afirmația inițială că lipsește era greșită.
+   Tabela e goală pentru că nimeni n-a ajuns să salveze o mașină, nu pentru că
+   n-ar avea unde.)
 
 8. **`preferredContact` nu se citește niciodată.** `prefill-data` caută
    `preferred_contact` (snake_case), datele sunt salvate ca `preferredContact`
@@ -185,7 +187,7 @@ Fără astea, orice ecran nou e decor. Nu schimbă niciun pixel.
 | 0.2 | `KYCTab` acceptă toate tipurile pe care le cere wizardul | CI nou și pașaport nu pot fi pre-salvate |
 | 0.3 | Formularul de facturare PF primește `city`, `county`, `postalCode` | altfel profilul salvat nu e valid niciodată |
 | 0.4 | `serviceReadiness` citește toate cele 7 module | indicatorul de azi minte pe 20 de servicii |
-| 0.5 | Formularul de vehicul expune `driving_license` | cazierul auto îl cere, pickerul îl citește |
+| ~~0.5~~ | ~~Formularul de vehicul expune `driving_license`~~ | **greșit — era deja livrat** pe 25.06.2026 (`daf12f8`); `VehiclesTab.tsx:191` are câmpul, plus cele trei expirări. Afirmația a venit din audit și am preluat-o fără s-o verific |
 | 0.6 | `preferredContact` — aliniat camelCase | nu s-a propagat niciodată |
 
 ### Faza 1 — contul se creează la final și absoarbe comanda

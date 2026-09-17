@@ -34,10 +34,11 @@ import {
 } from '@/components/ui/select';
 import { useModularWizard, isPhoneOrderMode } from '@/providers/modular-wizard-provider';
 import { cn } from '@/lib/utils';
-import { COUNTIES, getLocalitiesForCounty, findCounty } from '@/lib/data/romania-counties';
+import { COUNTIES, findCounty } from '@/lib/data/romania-counties';
 import { isPfBillingComplete, isForeignBillingCountry } from '@/lib/orders/billing-validation';
+import { billingLocalityOptions } from '@/lib/orders/billing-locality';
 import { savedPfBillingPrefill } from '@/lib/wizard/saved-billing-profile';
-import { isBucharestCounty, formatSector, BUCHAREST_SECTORS_BILLING } from '@/lib/oblio/address';
+import { isBucharestCounty, formatSector } from '@/lib/oblio/address';
 import { COUNTRIES as WORLD_COUNTRIES } from '@/config/countries';
 import { SearchableSelect } from '@/components/shared/SearchableSelect';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -477,10 +478,11 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
       setCuiError(null);
     } else if (source === 'other_pf') {
       // Prefill from the saved PF profile exactly like `company` uses the saved
-      // PJ one — but only where this card means the customer themselves. The
-      // profile carries name/CNP/street; localitate + județ (required by Oblio)
-      // are almost never stored, so the step stays invalid until the customer
-      // completes them. Everything remains editable.
+      // PJ one — but only where this card means the customer themselves. Since
+      // Faza 0 the profile also carries localitate + județ + cod poștal, so a
+      // complete profile validates the step outright; older rows saved without
+      // them keep it invalid until the customer fills them. All fields stay
+      // editable.
       const pf = pfOptionIsCustomer ? savedPfPrefill : null;
       const pfFields = {
         firstName: pf?.firstName || '',
@@ -540,7 +542,10 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
         companyName: companyKyc?.companyName || pjData?.companyName || billing?.companyName || '',
         cui: companyKyc?.cui || pjData?.cui || billing?.cui || '',
         regCom: companyKyc?.registrationNumber || pjData?.regCom || billing?.regCom || '',
-        companyAddress: companyKycAddr || pjData?.address || billing?.companyAddress || '',
+        // BillingProfileForm saves the registered office under `companyAddress`;
+        // reading only `address` meant a saved PJ profile never prefilled it.
+        companyAddress:
+          companyKycAddr || pjData?.companyAddress || pjData?.address || billing?.companyAddress || '',
         cuiVerified: !!(hasCompanyKyc && companyKyc?.validationStatus === 'valid') || !!hasSavedPj,
         isValid: !!(hasCompanyKyc && companyKyc?.validationStatus === 'valid') || !!hasSavedPj,
       });
@@ -585,17 +590,13 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
     }
   }, [updateBilling]);
 
-  // Localitățile județului selectat (dropdown dependent).
-  //
-  // București: ANAF refuză exportul e-Factura când Localitatea nu e „Sector N"
-  // („Pentru ca judetul clientului este Bucuresti, modifica campul Localitate
-  // de forma Sector 1, Sector 2, etc." — factura EGH-0048). Lista brută de
-  // localități conține „Municipiul Bucuresti" + „Sectorul 1..6", deci
-  // înlocuim cu exact cele 6 valori acceptate.
-  const localitiesFor = useCallback((county?: string | null): string[] => {
-    if (isBucharestCounty(county)) return BUCHAREST_SECTORS_BILLING;
-    return getLocalitiesForCounty(county);
-  }, []);
+  // Localitățile județului selectat (dropdown dependent). Regula București
+  // („Sector N", cerută de SPV) stă în billingLocalityOptions, partajată cu
+  // formularul de profil din cont ca să salveze aceleași valori.
+  const localitiesFor = useCallback(
+    (county?: string | null): string[] => billingLocalityOptions(county),
+    [],
+  );
 
   // County → reset locality when it no longer belongs to the new county.
   const handleCountyChange = useCallback((countyName: string) => {
