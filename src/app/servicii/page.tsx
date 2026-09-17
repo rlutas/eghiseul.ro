@@ -6,6 +6,7 @@ import { Clock, FileText, CheckCircle, Shield } from 'lucide-react';
 import type { Service } from '@/types/services';
 import { serviceUrl } from '@/lib/seo/constants';
 import { ServicesFilter } from '@/components/servicii/services-filter';
+import { ProfileReadinessBanner } from '@/components/servicii/profile-readiness-banner';
 
 // Cazier Judiciar PF/PJ are surfaced via the hub page, not as separate cards.
 const HIDDEN_FROM_INDEX = new Set([
@@ -145,7 +146,10 @@ export default async function ServiciiPage() {
                 </p>
               </div>
             ) : (
-              <ServicesFilter services={services} />
+              <>
+                <ProfileReadinessBanner />
+                <ServicesFilter services={services} />
+              </>
             )}
           </div>
         </section>

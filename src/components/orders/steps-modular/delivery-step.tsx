@@ -37,8 +37,13 @@ import {
 } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { SearchableSelect } from '@/components/shared/SearchableSelect';
+import { SavedAddressPicker } from './SavedAddressPicker';
 import { useModularWizard } from '@/providers/modular-wizard-provider';
 import { cn } from '@/lib/utils';
+import {
+  toDeliveryAddressFormValues,
+  type SavedDeliveryAddress,
+} from '@/lib/delivery/saved-address';
 import {
   internationalAddressSchema,
   type InternationalAddressFormData,
@@ -279,6 +284,11 @@ export function DeliveryStepModular({ onValidChange }: DeliveryStepProps) {
 
   // Track initial mount to avoid resetting restored form values
   const isInitialMount = useRef(true);
+  // Same idea, for one tick: a saved address fills județ + localitate + stradă
+  // together, and the cascade effects below would wipe everything under the
+  // county the moment it changes. Set while applying, cleared on the next
+  // macrotask — by then the effects have run.
+  const isApplyingSavedAddress = useRef(false);
   // Store saved locker ID for auto-selection after lockers load on remount
   const savedLockerIdRef = useRef<string | null>(delivery.courierQuote?.lockerId ?? null);
 
@@ -703,8 +713,9 @@ export function DeliveryStepModular({ onValidChange }: DeliveryStepProps) {
   useEffect(() => {
     if (physicalRegion === 'romania' && watchedCounty) {
       fetchLocalities(watchedCounty);
-      // Reset dependent fields when county changes (not on initial mount)
-      if (!isInitialMount.current) {
+      // Reset dependent fields when county changes (not on initial mount, and
+      // not while a saved address is filling the whole chain at once)
+      if (!isInitialMount.current && !isApplyingSavedAddress.current) {
         form.setValue('city', '', { shouldValidate: false });
         form.setValue('street', '', { shouldValidate: false });
         form.setValue('number', '', { shouldValidate: false });
@@ -727,8 +738,10 @@ export function DeliveryStepModular({ onValidChange }: DeliveryStepProps) {
   useEffect(() => {
     if (physicalRegion === 'romania' && watchedCounty && watchedCity) {
       fetchStreets(watchedCounty, watchedCity);
-      // Reset dependent fields when city changes (not on initial mount)
-      if (!isInitialMount.current) {
+      // Reset dependent fields when city changes (not on initial mount, and not
+      // while a saved address is filling the whole chain at once — its own
+      // street/number/postal code would be overwritten)
+      if (!isInitialMount.current && !isApplyingSavedAddress.current) {
         form.setValue('street', '', { shouldValidate: false });
         form.setValue('number', '', { shouldValidate: false });
         form.setValue('building', '', { shouldValidate: false });

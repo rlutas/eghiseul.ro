@@ -5,10 +5,11 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { LogoutButton } from '@/components/shared/logout-button'
 import { AccountTabs } from '@/components/account'
+import { ProfileChecklist } from '@/components/account/ProfileChecklist'
+import { profileCompleteness } from '@/lib/account/profile-completeness'
 import type { Database } from '@/types/supabase'
 import {
   Mail,
-  Shield,
   CheckCircle,
   Clock,
   Plus,
@@ -66,12 +67,35 @@ export default async function AccountPage() {
     .eq('user_id', user.id)
     .neq('status', 'draft')
 
+  // Counted for the checklist below. Each query gets its own `from()` — reusing
+  // a builder stacks the filters and silently returns nothing.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { count: savedAddressCount } = await (supabase as any)
+    .from('user_saved_data')
+    .select('id', { count: 'exact', head: true })
+    .eq('user_id', user.id)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { count: billingProfileCount } = await (supabase as any)
+    .from('billing_profiles')
+    .select('id', { count: 'exact', head: true })
+    .eq('user_id', user.id)
+
   // Calculate actual KYC status (requires BOTH front ID AND selfie)
   const docTypes = kycDocs?.map((d: { document_type: string }) => d.document_type) || []
   const hasFrontId = docTypes.some((t: string) => t === 'ci_front' || t === 'ci_nou_front')
   const hasSelfie = docTypes.some((t: string) => t === 'selfie' || t === 'selfie_with_id')
   const isKycComplete = hasFrontId && hasSelfie
   const isKycPartial = (hasFrontId || hasSelfie) && !isKycComplete
+
+  const completeness = profileCompleteness({
+    firstName: profile?.first_name,
+    lastName: profile?.last_name,
+    cnp: profile?.cnp,
+    phone: profile?.phone,
+    kycDocumentTypes: docTypes,
+    savedAddressCount: savedAddressCount ?? 0,
+    billingProfileCount: billingProfileCount ?? 0,
+  })
 
   const firstName = profile?.first_name || user.user_metadata?.first_name || ''
   const lastName = profile?.last_name || user.user_metadata?.last_name || ''
@@ -108,7 +132,7 @@ export default async function AccountPage() {
               </div>
               <div className="text-center">
                 <p className="text-3xl font-bold text-primary-500">{kycDocs?.length || 0}</p>
-                <p className="text-sm text-white/60">Documente</p>
+                <p className="text-sm text-white/60">Acte salvate</p>
               </div>
               <div className="text-center">
                 <div className={`text-3xl font-bold ${isKycComplete ? 'text-green-400' : isKycPartial ? 'text-amber-400' : 'text-yellow-400'}`}>
@@ -123,10 +147,12 @@ export default async function AccountPage() {
 
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8 max-w-6xl">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-8">
 
-          {/* Sidebar */}
-          <div className="lg:col-span-1 space-y-4">
+          {/* Sidebar. On a phone it renders AFTER the tabs (order-2): the
+              customer opened the account to see their orders, not to find
+              "Comandă nouă" — which pushed the actual content below the fold. */}
+          <div className="order-2 lg:order-1 lg:col-span-1 space-y-4">
             {/* Quick Actions Card */}
             <div className="bg-white rounded-2xl shadow-sm border border-neutral-100 overflow-hidden">
               <div className="p-4 border-b border-neutral-100 bg-neutral-50">
@@ -148,7 +174,7 @@ export default async function AccountPage() {
                 </Link>
 
                 <Link
-                  href="/account/"
+                  href="/account/settings/"
                   className="flex items-center gap-3 p-3 rounded-xl hover:bg-neutral-50 transition-colors group"
                 >
                   <div className="w-10 h-10 rounded-xl bg-neutral-100 flex items-center justify-center">
@@ -156,7 +182,7 @@ export default async function AccountPage() {
                   </div>
                   <div className="flex-1">
                     <p className="font-medium text-secondary-900">Setări cont</p>
-                    <p className="text-xs text-neutral-500">Parolă, notificări</p>
+                    <p className="text-xs text-neutral-500">Parolă, email, sesiuni</p>
                   </div>
                   <ChevronRight className="w-5 h-5 text-neutral-400" />
                 </Link>
@@ -167,64 +193,11 @@ export default async function AccountPage() {
               </div>
             </div>
 
-            {/* KYC Status Badge */}
-            <div className={`rounded-2xl p-4 ${
-              isKycComplete
-                ? 'bg-green-50 border border-green-200'
-                : isKycPartial
-                  ? 'bg-amber-50 border border-amber-200'
-                  : 'bg-yellow-50 border border-yellow-200'
-            }`}>
-              <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-                  isKycComplete
-                    ? 'bg-green-100'
-                    : isKycPartial
-                      ? 'bg-amber-100'
-                      : 'bg-yellow-100'
-                }`}>
-                  <Shield className={`w-5 h-5 ${
-                    isKycComplete
-                      ? 'text-green-600'
-                      : isKycPartial
-                        ? 'text-amber-600'
-                        : 'text-yellow-600'
-                  }`} />
-                </div>
-                <div>
-                  <p className={`font-semibold ${
-                    isKycComplete
-                      ? 'text-green-800'
-                      : isKycPartial
-                        ? 'text-amber-800'
-                        : 'text-yellow-800'
-                  }`}>
-                    {isKycComplete
-                      ? 'KYC Verificat'
-                      : isKycPartial
-                        ? 'KYC Incomplet'
-                        : 'KYC Neverificat'}
-                  </p>
-                  <p className={`text-xs ${
-                    isKycComplete
-                      ? 'text-green-600'
-                      : isKycPartial
-                        ? 'text-amber-600'
-                        : 'text-yellow-600'
-                  }`}>
-                    {isKycComplete
-                      ? 'Identitate confirmată'
-                      : isKycPartial
-                        ? `Lipsește ${!hasFrontId ? 'actul de identitate' : 'selfie-ul'}`
-                        : 'Scanează actul în tab-ul KYC'}
-                  </p>
-                </div>
-              </div>
-            </div>
           </div>
 
           {/* Main Content Area - Tabs */}
-          <div className="lg:col-span-3">
+          <div className="order-1 lg:order-2 lg:col-span-3 space-y-6">
+            <ProfileChecklist completeness={completeness} />
             <Suspense fallback={
               <div className="flex items-center justify-center py-12">
                 <Loader2 className="w-8 h-8 text-primary-500 animate-spin" />
