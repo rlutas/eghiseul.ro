@@ -44,7 +44,7 @@ export async function POST(_request: NextRequest, { params }: RouteParams) {
   const admin = createAdminClient();
   const { data: order, error: fetchErr } = await admin
     .from('orders')
-    .select('id, payment_status, invoice_number')
+    .select('id, payment_status, invoice_number, payment_method')
     .eq('id', id)
     .single();
   if (fetchErr || !order) {
@@ -68,8 +68,15 @@ export async function POST(_request: NextRequest, { params }: RouteParams) {
     );
   }
 
+  // Oblio "collect" type must match how the order was actually paid —
+  // bank-transfer / cash orders (confirmed manually via fulfil-paid) store
+  // 'transfer' | 'bank_transfer' | 'cash'; everything else is a Stripe card.
+  const pm = String(o.payment_method ?? '').toLowerCase();
+  const collect: 'Card' | 'Transfer bancar' | 'Cash' =
+    pm === 'cash' ? 'Cash' : pm === 'transfer' || pm === 'bank_transfer' ? 'Transfer bancar' : 'Card';
+
   const adminEmail = user.email ?? 'admin';
-  const res = await ensureInvoiceForPaidOrder(id, 'Card', {
+  const res = await ensureInvoiceForPaidOrder(id, collect, {
     historyNote: `Factură emisă manual de ${adminEmail} (retry din admin — comandă rămasă nefacturată).`,
   });
 

@@ -69,7 +69,9 @@ curentă, înainte să redeschidem fereastra cron-ului peste 30 de zile.
 
 ## De reținut
 
-Butonul „Emite acum" (eghiseul) refuză singur comenzile SmartBill (ecazier,
-pre-migrare 08.2026) — acelea se emit manual din SmartBill/ANAF, nu prin
-Oblio. Pe CJO, folosește doar emiterea manuală directă (nu există încă buton
-de admin) până se reface corect fix-ul de mai sus.
+Butonul „Emite acum" (eghiseul) apare doar la comenzi cu plata confirmată și
+fără număr de factură; emite cu metoda de încasare reală a comenzii (card /
+transfer bancar / numerar), nu „Card" implicit. Pe eghiseul nu există comenzi
+SmartBill — acelea sunt doar pe ecazier (CJO, pre-migrare 08.2026) și se emit
+manual din SmartBill/ANAF. Pe CJO, folosește doar emiterea manuală directă (nu
+există încă buton de admin) până se reface corect fix-ul de mai sus.
