@@ -16,8 +16,12 @@ import { Footer } from '@/components/home/footer';
  * existed — every customer who managed to create an account landed on a 404 and
  * never learned they had to confirm their email. That is why 38 of 73 accounts
  * sat unconfirmed. Created 2026-09-17.
+ *
+ * Only the `?email=` part is inside Suspense: `useSearchParams` opts its subtree
+ * out of server rendering, and wrapping the whole page in it shipped an empty
+ * document — the instructions must be readable before the JS lands.
  */
-function VerifyEmailContent() {
+function ResendSection() {
   const searchParams = useSearchParams();
   const email = searchParams.get('email') || '';
 
@@ -61,6 +65,49 @@ function VerifyEmailContent() {
     }
   };
 
+  if (!email) return null;
+
+  return (
+    <>
+      <p className="text-neutral-600 text-center -mt-4 mb-6">
+        Am trimis mesajul la <span className="font-semibold text-secondary-900">{email}</span>.
+      </p>
+
+      {sent && (
+        <div className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-xl text-sm mb-4 flex gap-2">
+          <CheckCircle className="h-5 w-5 flex-shrink-0" />
+          <span>Am retrimis emailul de confirmare.</span>
+        </div>
+      )}
+
+      {error && (
+        <div className="bg-error-100 border border-error-500 text-error-700 px-4 py-3 rounded-xl text-sm mb-4">
+          {error}
+        </div>
+      )}
+
+      <Button
+        onClick={handleResend}
+        disabled={isSending || cooldown > 0}
+        variant="outline"
+        className="w-full h-12 rounded-xl font-semibold"
+      >
+        {isSending ? (
+          <span className="flex items-center gap-2">
+            <Loader2 className="h-5 w-5 animate-spin" />
+            Se trimite...
+          </span>
+        ) : cooldown > 0 ? (
+          `Retrimite emailul (${cooldown}s)`
+        ) : (
+          'Retrimite emailul de confirmare'
+        )}
+      </Button>
+    </>
+  );
+}
+
+export default function VerifyEmailPage() {
   return (
     <div className="flex flex-col -mt-16 lg:-mt-[112px]">
       <div className="min-h-screen bg-gradient-to-b from-secondary-900 to-[#0C1A2F] flex items-center justify-center p-6">
@@ -85,13 +132,8 @@ function VerifyEmailContent() {
                 Confirmă-ți adresa de email
               </h1>
               <p className="text-neutral-600 mt-3">
-                Ți-am trimis un email
-                {email ? (
-                  <>
-                    {' '}la <span className="font-semibold text-secondary-900">{email}</span>
-                  </>
-                ) : null}
-                . Deschide-l și apasă pe linkul de confirmare ca să-ți activezi contul.
+                Ți-am trimis un email. Deschide-l și apasă pe linkul de confirmare ca să-ți
+                activezi contul.
               </p>
             </div>
 
@@ -108,38 +150,9 @@ function VerifyEmailContent() {
               </div>
             </div>
 
-            {sent && (
-              <div className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-xl text-sm mb-4 flex gap-2">
-                <CheckCircle className="h-5 w-5 flex-shrink-0" />
-                <span>Am retrimis emailul de confirmare.</span>
-              </div>
-            )}
-
-            {error && (
-              <div className="bg-error-100 border border-error-500 text-error-700 px-4 py-3 rounded-xl text-sm mb-4">
-                {error}
-              </div>
-            )}
-
-            {email && (
-              <Button
-                onClick={handleResend}
-                disabled={isSending || cooldown > 0}
-                variant="outline"
-                className="w-full h-12 rounded-xl font-semibold"
-              >
-                {isSending ? (
-                  <span className="flex items-center gap-2">
-                    <Loader2 className="h-5 w-5 animate-spin" />
-                    Se trimite...
-                  </span>
-                ) : cooldown > 0 ? (
-                  `Retrimite emailul (${cooldown}s)`
-                ) : (
-                  'Retrimite emailul de confirmare'
-                )}
-              </Button>
-            )}
+            <Suspense fallback={null}>
+              <ResendSection />
+            </Suspense>
 
             <Link href="/auth/login">
               <Button className="w-full h-12 mt-3 bg-primary-500 hover:bg-primary-600 text-secondary-900 font-bold rounded-xl">
@@ -174,13 +187,5 @@ function VerifyEmailContent() {
       </div>
       <Footer />
     </div>
-  );
-}
-
-export default function VerifyEmailPage() {
-  return (
-    <Suspense fallback={null}>
-      <VerifyEmailContent />
-    </Suspense>
   );
 }
