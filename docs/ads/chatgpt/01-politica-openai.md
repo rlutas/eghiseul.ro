@@ -1,7 +1,15 @@
-# Politica OpenAI Ads — ce contează pentru noi (verificat 02.09.2026)
+# Politica OpenAI Ads — ce contează pentru noi (verificat 02.09.2026, recitit 17.09.2026)
 
 Sursa: https://openai.com/policies/ad-policies/ — **v1.5, „Updated: 31 August 2026"**. Citit direct în browser
 (site-ul dă 403 la fetch automat). Citatele de mai jos sunt exacte.
+
+> 🔄 **Recitit integral pe 17.09.2026: politica e acum v1.6, „Updated: 10 September 2026".**
+> Tot ce e citat mai jos a rămas neschimbat, inclusiv interdicția pe legal services în afara SUA.
+> Singurul adaos din changelog: *„v1.6 (September 2026): Updated to clarify our right to decline
+> ads where they conflict with our advertising principles, business interests, or competitive
+> position."* Adică pot refuza o reclamă și pe motiv de **poziție competitivă**, fără să invoce
+> o categorie. De reținut la orice respingere viitoare fără motiv de politică. Verdictul pe
+> serviciile noastre, pe versiunea asta: `08-eligibilitate-rovinieta-si-stare-civila.md`.
 
 ## 1. Categoriile permise acum
 

@@ -15,8 +15,15 @@ oficiale (https://developers.openai.com/ads/measurement-pixel , https://develope
 
 ## Cum funcționează pe site
 
+> ⚠️ **`oppref` e parametru REZERVAT în Ads Manager** (verificat 17.09: salvarea lui în
+> „Tracking parameters" e respinsă cu `Reserved query parameters are not supported: olref,
+> oppref.`). OpenAI îl pune singur pe URL-ul de aterizare; advertiserul nu îl poate scrie.
+> Ca să avem și o copie sub control propriu, anunțul trimite în plus `oai_ref={oppref}`, iar
+> `attribution.ts` acceptă ambele nume. Un draft cu `oai_ref` dar fără `oppref` înseamnă că
+> adăugarea automată nu ajunge la noi.
+
 ```
-click în ChatGPT → landing ?utm_source=chatgpt&…&oppref=<id OpenAI>
+click în ChatGPT → landing ?utm_source=chatgpt&…&oppref=<id OpenAI>&oai_ref=<același id>
    │
    ├─ attribution.ts (localStorage, fără consimțământ — first-party, fără terți)
    │     salvează utm_* + oppref în first/last → ajunge în orders.attribution la draft
@@ -36,7 +43,7 @@ primul, ignoră restul (inclusiv refresh pe pagina de succes și cele două webh
 
 | Fișier | Ce face |
 |---|---|
-| `src/lib/analytics/attribution.ts` | `TouchPoint.oppref` capturat din `?oppref=`; contează ca sursă |
+| `src/lib/analytics/attribution.ts` | `TouchPoint.oppref` capturat din `?oppref=` **sau** `?oai_ref=`; contează ca sursă |
 | `src/components/consent/cookie-consent.tsx` | `loadOpenAiPixel()` la consimțământ marketing (snippet oficial, `NEXT_PUBLIC_OPENAI_ADS_PIXEL_ID`) |
 | `src/app/comanda/success/[orderId]/page.tsx` | `oaiq('measure','order_created')` cu sumă în bani (minor units), RON, `event_id` |
 | `src/lib/analytics/openai-conversions.ts` | senderul server-side (hash email/telefon după regulile OpenAI, timeout 5s, niciodată nu aruncă) |

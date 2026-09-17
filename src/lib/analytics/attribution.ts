@@ -76,7 +76,14 @@ function readCurrentTouch(): TouchPoint {
   // OpenAI (ChatGPT Ads) pune `oppref` pe URL-ul de aterizare. Îl păstrăm
   // separat de click_id: nu e un click id clasic, ci cheia de atribuire pentru
   // Conversions API, și poate coexista cu UTM-urile noastre.
-  const oppref = params.get('oppref');
+  //
+  // `oai_ref` e aceeași valoare, trimisă de noi prin macro-ul `{oppref}` din
+  // câmpul „Tracking parameters" al anunțului. E nevoie de el fiindcă `oppref`
+  // e parametru REZERVAT în Ads Manager — nu poate fi scris de advertiser, iar
+  // dacă adăugarea automată a OpenAI nu ajunge până la noi, `oppref` rămâne gol
+  // fără să aflăm de ce. Cu ambele, un draft care are `oai_ref` dar nu `oppref`
+  // ne spune exact unde se pierde.
+  const oppref = params.get('oppref') || params.get('oai_ref');
   if (oppref) touch.oppref = oppref.slice(0, 500);
 
   // Referrer intern nu e o sursă nouă — ne interesează doar de unde a venit
