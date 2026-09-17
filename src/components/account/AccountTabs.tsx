@@ -27,6 +27,7 @@ import BillingTab from './BillingTab';
 import OrdersTab from './OrdersTab';
 import VehiclesTab from './VehiclesTab';
 import ServicesTab, { type AccountServiceRow } from './ServicesTab';
+import type { InterestId } from '@/lib/account/service-interests';
 
 type TabId = AccountTabId;
 
@@ -51,9 +52,12 @@ interface AccountTabsProps {
   className?: string;
   /** Catalogue with per-customer readiness, computed on the server. */
   services?: AccountServiceRow[];
+  /** The onboarding answer, so the identity tab does not ask for a document the
+   *  customer's own services never require. */
+  serviceInterests?: InterestId[];
 }
 
-export default function AccountTabs({ initialTab = 'services', className, services = [] }: AccountTabsProps) {
+export default function AccountTabs({ initialTab = 'services', className, services = [], serviceInterests }: AccountTabsProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const tabFromUrl = searchParams.get('tab') as TabId | null;
@@ -92,7 +96,7 @@ export default function AccountTabs({ initialTab = 'services', className, servic
       case 'profile':
         return <ProfileTab autoEdit={autoEdit} />;
       case 'kyc':
-        return <KYCTab />;
+        return <KYCTab serviceInterests={serviceInterests} />;
       case 'addresses':
         return <AddressesTab autoEdit={autoEdit} />;
       case 'vehicles':

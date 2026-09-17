@@ -10,6 +10,8 @@
  * the same function instead of each deciding for itself what "complete" means.
  */
 
+import { interestsRequireIdentity, type InterestId } from '@/lib/account/service-interests';
+
 export type ProfileStepId = 'contact' | 'personal' | 'identity' | 'address' | 'billing';
 
 export interface ProfileInput {
@@ -22,6 +24,17 @@ export interface ProfileInput {
   kycDocumentTypes?: string[];
   savedAddressCount?: number;
   billingProfileCount?: number;
+  /**
+   * The answer to the account's onboarding question, when there is one.
+   *
+   * `undefined`/`null` means the question has not been answered — the identity
+   * step stays, exactly as before. An explicit answer that covers only services
+   * which never ask for an identity document REMOVES that step: a customer who
+   * comes for an extras de carte funciară or a certificat constatator should not
+   * be told their profile is 80% complete because of a document nobody will ever
+   * ask them for. We do not hand an identity document to ONRC either.
+   */
+  serviceInterests?: InterestId[] | null;
 }
 
 export interface ProfileStep {
@@ -65,6 +78,7 @@ function filled(value?: string | null): boolean {
 
 export function profileCompleteness(input: ProfileInput): ProfileCompleteness {
   const kyc = input.kycDocumentTypes ?? [];
+  const needsIdentity = interestsRequireIdentity(input.serviceInterests);
 
   const steps: ProfileStep[] = [
     {
@@ -104,15 +118,22 @@ export function profileCompleteness(input: ProfileInput): ProfileCompleteness {
     },
   ];
 
-  const doneCount = steps.filter((s) => s.done).length;
-  const totalCount = steps.length;
+  // An identity document already on file is never hidden — it is real, it is
+  // shown as done, and it keeps counting. Only the *request* for one goes away.
+  const visibleSteps =
+    needsIdentity === false
+      ? steps.filter((s) => s.id !== 'identity' || s.done)
+      : steps;
+
+  const doneCount = visibleSteps.filter((s) => s.done).length;
+  const totalCount = visibleSteps.length;
 
   return {
-    steps,
+    steps: visibleSteps,
     doneCount,
     totalCount,
     percent: Math.round((doneCount / totalCount) * 100),
     isComplete: doneCount === totalCount,
-    nextStep: steps.find((s) => !s.done) ?? null,
+    nextStep: visibleSteps.find((s) => !s.done) ?? null,
   };
 }

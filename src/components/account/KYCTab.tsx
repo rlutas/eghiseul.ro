@@ -40,6 +40,7 @@ import {
   ChevronUp,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { interestsRequireIdentity, type InterestId } from '@/lib/account/service-interests';
 import {
   DocumentTypePicker,
   type IdDocumentType,
@@ -66,6 +67,15 @@ import { runFaceMatch, fetchImageAsBase64 } from '@/lib/kyc/face-match';
 
 interface KYCTabProps {
   className?: string;
+  /**
+   * The answer to the account's onboarding question. When it covers only
+   * services that never ask for an identity document, this tab says so instead
+   * of quietly presenting an uploader the customer will never need — 20 of the
+   * 31 active services do not ask for one, and we do not hand an identity
+   * document to ONRC or ANCPI either. Uploading stays possible: the answer is a
+   * preference, not a restriction.
+   */
+  serviceInterests?: InterestId[];
 }
 
 // Document type configuration. Keys are the names the row is STORED under —
@@ -148,7 +158,8 @@ const COMPANY_DOCUMENT_TYPES = {
 
 type CompanyDocTypeKey = keyof typeof COMPANY_DOCUMENT_TYPES;
 
-export default function KYCTab({ className }: KYCTabProps) {
+export default function KYCTab({ className, serviceInterests }: KYCTabProps) {
+  const identityIsOptional = interestsRequireIdentity(serviceInterests ?? null) === false;
   const {
     expiresAt,
     daysUntilExpiry,
@@ -960,6 +971,20 @@ export default function KYCTab({ className }: KYCTabProps) {
 
   return (
     <div className={cn('space-y-6', className)}>
+      {/* The customer told us they come here for property or company documents,
+          and nothing on file contradicts it. Say what that means before showing
+          an uploader. */}
+      {identityIsOptional && documents.length === 0 && (
+        <div className="rounded-2xl border border-neutral-200 bg-neutral-50 p-4 sm:p-5">
+          <p className="text-sm leading-relaxed text-neutral-700">
+            <strong className="text-secondary-900">Nu-ți cerem act de identitate.</strong>{' '}
+            Pentru serviciile care te interesează nu e nevoie de unul — nici noi nu
+            depunem act la ONRC sau la ANCPI. Îl poți încărca oricând mai jos, dacă
+            vrei să comanzi și un cazier sau un act de stare civilă.
+          </p>
+        </div>
+      )}
+
       {/* Overall Status Card */}
       <div className="bg-white rounded-2xl border border-neutral-200 p-6">
         <div className="flex items-center justify-between mb-4">

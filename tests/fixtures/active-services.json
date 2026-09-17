@@ -1,0 +1,192 @@
+{
+  "capturedAt": "2026-09-17",
+  "note": "Snapshot of the active catalogue (slug, category, personalKyc.enabled) taken from production. Regenerate when services change.",
+  "services": [
+    {
+      "slug": "cazier-auto",
+      "name": "Cazier Auto",
+      "category": "auto",
+      "personalKyc": true
+    },
+    {
+      "slug": "rovinieta",
+      "name": "Rovinieta Online",
+      "category": "auto",
+      "personalKyc": false
+    },
+    {
+      "slug": "certificat-constatator",
+      "name": "Certificat Constatator",
+      "category": "comerciale",
+      "personalKyc": false
+    },
+    {
+      "slug": "cazier-fiscal",
+      "name": "Cazier Fiscal Persoană Fizică",
+      "category": "fiscale",
+      "personalKyc": true
+    },
+    {
+      "slug": "actualizare-adresa-cf",
+      "name": "Actualizare Adresă în Cartea Funciară",
+      "category": "imobiliare",
+      "personalKyc": false
+    },
+    {
+      "slug": "certificat-detineri-imobile",
+      "name": "Certificat privind Deținerea de Imobile",
+      "category": "imobiliare",
+      "personalKyc": false
+    },
+    {
+      "slug": "certificat-sarcini",
+      "name": "Certificat de Sarcini",
+      "category": "imobiliare",
+      "personalKyc": false
+    },
+    {
+      "slug": "certificat-urbanism-informare",
+      "name": "Certificat de Urbanism pentru Informare",
+      "category": "imobiliare",
+      "personalKyc": false
+    },
+    {
+      "slug": "copie-arhiva-ocpi",
+      "name": "Copie certificată din arhiva OCPI",
+      "category": "imobiliare",
+      "personalKyc": false
+    },
+    {
+      "slug": "copie-carte-funciara",
+      "name": "Copie Carte Funciară (in extenso)",
+      "category": "imobiliare",
+      "personalKyc": false
+    },
+    {
+      "slug": "copie-contract-vanzare",
+      "name": "Copie Contract Vânzare-Cumpărare",
+      "category": "imobiliare",
+      "personalKyc": false
+    },
+    {
+      "slug": "copie-intabulare",
+      "name": "Copie Intabulare",
+      "category": "imobiliare",
+      "personalKyc": false
+    },
+    {
+      "slug": "copie-inventar-coordonate",
+      "name": "Copie Inventar de Coordonate Stereo 70",
+      "category": "imobiliare",
+      "personalKyc": false
+    },
+    {
+      "slug": "copie-plan-cadastral",
+      "name": "Copie Plan Cadastral",
+      "category": "imobiliare",
+      "personalKyc": false
+    },
+    {
+      "slug": "copie-plan-incadrare",
+      "name": "Copie Plan de Încadrare",
+      "category": "imobiliare",
+      "personalKyc": false
+    },
+    {
+      "slug": "copie-releveu",
+      "name": "Copie după Releveu",
+      "category": "imobiliare",
+      "personalKyc": false
+    },
+    {
+      "slug": "extras-carte-funciara",
+      "name": "Extras Carte Funciară",
+      "category": "imobiliare",
+      "personalKyc": false
+    },
+    {
+      "slug": "extras-cf-colectiv",
+      "name": "Extras de Carte Funciară Colectivă",
+      "category": "imobiliare",
+      "personalKyc": false
+    },
+    {
+      "slug": "extras-plan-cadastral",
+      "name": "Extras de Plan Cadastral",
+      "category": "imobiliare",
+      "personalKyc": false
+    },
+    {
+      "slug": "identificare-imobil",
+      "name": "Identificare Imobil după Adresă",
+      "category": "imobiliare",
+      "personalKyc": false
+    },
+    {
+      "slug": "identificare-imobile-proprietar",
+      "name": "Identificare Imobile după Proprietar",
+      "category": "imobiliare",
+      "personalKyc": false
+    },
+    {
+      "slug": "plan-amplasament-delimitare",
+      "name": "Plan de Amplasament și Delimitare",
+      "category": "imobiliare",
+      "personalKyc": false
+    },
+    {
+      "slug": "cazier-judiciar",
+      "name": "Cazier Judiciar",
+      "category": "juridice",
+      "personalKyc": true
+    },
+    {
+      "slug": "cazier-judiciar-persoana-fizica",
+      "name": "Cazier Judiciar Persoană Fizică",
+      "category": "juridice",
+      "personalKyc": true
+    },
+    {
+      "slug": "cazier-judiciar-persoana-juridica",
+      "name": "Cazier Judiciar Persoană Juridică",
+      "category": "juridice",
+      "personalKyc": true
+    },
+    {
+      "slug": "certificat-integritate",
+      "name": "Certificat de Integritate Comportamentală",
+      "category": "juridice",
+      "personalKyc": true
+    },
+    {
+      "slug": "certificat-casatorie",
+      "name": "Certificat de Căsătorie",
+      "category": "personale",
+      "personalKyc": true
+    },
+    {
+      "slug": "certificat-celibat",
+      "name": "Certificat de Celibat",
+      "category": "personale",
+      "personalKyc": true
+    },
+    {
+      "slug": "certificat-nastere",
+      "name": "Certificat de Naștere",
+      "category": "personale",
+      "personalKyc": true
+    },
+    {
+      "slug": "extras-multilingv-certificat-casatorie",
+      "name": "Extras Multilingv Certificat de Căsătorie",
+      "category": "personale",
+      "personalKyc": true
+    },
+    {
+      "slug": "extras-multilingv-certificat-nastere",
+      "name": "Extras Multilingv Certificat de Naștere",
+      "category": "personale",
+      "personalKyc": true
+    }
+  ]
+}

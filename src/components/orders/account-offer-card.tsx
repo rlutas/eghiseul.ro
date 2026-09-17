@@ -31,6 +31,8 @@ interface AccountOfferCardProps {
   serviceSlug?: string;
   /** True when the order is already linked to a user — nothing to offer. */
   alreadyLinked?: boolean;
+  /** True when the order actually carries a scanned identity document. */
+  hasIdentityDocuments?: boolean;
 }
 
 const MIN_PASSWORD_LENGTH = 8;
@@ -52,6 +54,7 @@ export function AccountOfferCard({
   email,
   serviceSlug,
   alreadyLinked = false,
+  hasIdentityDocuments = false,
 }: AccountOfferCardProps) {
   // null = still checking the session; we render nothing until we know, so the
   // offer never flashes in front of a signed-in customer.
@@ -237,7 +240,12 @@ export function AccountOfferCard({
     },
     {
       icon: Zap,
-      text: 'La o comandă viitoare datele sunt deja completate: nume, adresă, date de facturare, actul scanat.',
+      // „actul scanat" only where one was actually scanned: 20 of the 31
+      // services never ask for an identity document, and promising to keep one
+      // to someone who ordered a certificat constatator is simply false.
+      text: hasIdentityDocuments
+        ? 'La o comandă viitoare datele sunt deja completate: nume, adresă, date de facturare și actul scanat.'
+        : 'La o comandă viitoare datele sunt deja completate: nume, adresă, date de facturare.',
     },
   ];
   if (validityDays) {

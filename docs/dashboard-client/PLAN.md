@@ -244,6 +244,19 @@ clientului care vrea doar constatator sau extras CF.
 nu-ți mai cere actul de identitate". Dacă omul sare peste întrebare, contul nu
 cere nimic în plus și rămâne pe ce a adus comanda.
 
+**Livrat pe 17.09.2026** —
+[changelog](../changelog/2026-09-17-onboarding-o-intrebare.md). Patru răspunsuri
+(caziere / stare civilă / imobile / firmă) în
+`src/lib/account/service-interests.ts`, verificate față de un instantaneu al
+catalogului real, ca un serviciu care-și schimbă `personalKyc` să pice testul, nu
+să mintă întrebarea. Migrarea 173.
+
+Distincția pe care o ține codul: `NULL` = neîntrebat, `{}` = a sărit peste
+întrebare. `interestsRequireIdentity()` întoarce `null` pentru amândouă — „nu
+știm nimic despre omul ăsta" nu e „ne-a spus că nu-i trebuie act". Doar un
+răspuns explicit scoate cererea, iar un act deja încărcat rămâne mereu vizibil:
+cade cererea, nu documentul.
+
 ### Faza 3 — datele din act se refolosesc, cu acordul clientului
 
 După ce actul e scanat în cont, clientul poate alege ca **aceleași date să fie

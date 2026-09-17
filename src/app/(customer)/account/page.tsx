@@ -6,7 +6,9 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { LogoutButton } from '@/components/shared/logout-button'
 import { AccountTabs } from '@/components/account'
 import { ProfileChecklist } from '@/components/account/ProfileChecklist'
+import { OnboardingQuestion } from '@/components/account/OnboardingQuestion'
 import { profileCompleteness, hasIdentityDocuments } from '@/lib/account/profile-completeness'
+import { parseInterests, sortByInterest } from '@/lib/account/service-interests'
 import { serviceRequirements, serviceReadiness } from '@/lib/account/service-readiness'
 import { createPublicClient } from '@/lib/supabase/public'
 import type { AccountServiceRow } from '@/components/account/ServicesTab'
@@ -88,6 +90,16 @@ export default async function AccountPage() {
   // Calculate actual KYC status (requires BOTH front ID AND selfie)
   const docTypes = kycDocs?.map((d: { document_type: string }) => d.document_type) || []
 
+  // The answer to the account's single onboarding question. Read off the profile
+  // row we already have — `service_interests` and `onboarding_completed_at` exist
+  // in the database (migration 173); the generated types are stale.
+  // NULL means never asked, `{}` means asked and skipped: both leave the account
+  // asking exactly what it asked before, and only the first one shows the card.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const serviceInterests = parseInterests((profile as any)?.service_interests)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const hasAnsweredOnboarding = !!(profile as any)?.onboarding_completed_at
+
   const completeness = profileCompleteness({
     firstName: profile?.first_name,
     lastName: profile?.last_name,
@@ -96,6 +108,7 @@ export default async function AccountPage() {
     kycDocumentTypes: docTypes,
     savedAddressCount: savedAddressCount ?? 0,
     billingProfileCount: billingProfileCount ?? 0,
+    serviceInterests,
   })
 
   // The catalogue, with what each service will still ask this customer for.
@@ -132,8 +145,13 @@ export default async function AccountPage() {
     hasVehicle: (savedVehicleCount ?? 0) > 0,
   }
 
+  // Ordered by what this customer said they came for, before the rows lose their
+  // `category` in the mapping below. Stable, so everything else keeps the
+  // catalogue's own `display_order`; with no answer it is a no-op.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const accountServices: AccountServiceRow[] = ((serviceRows ?? []) as any[])
+  const sortedServiceRows = sortByInterest((serviceRows ?? []) as any[], serviceInterests)
+
+  const accountServices: AccountServiceRow[] = sortedServiceRows
     .filter((row) => !HIDDEN_SLUGS.has(row.slug))
     .map((row) => {
       const readiness = serviceReadiness(serviceRequirements(row.verification_config), accountData)
@@ -193,6 +211,10 @@ export default async function AccountPage() {
 
       <div className="container mx-auto max-w-6xl px-4 py-6 lg:py-8">
         <div className="space-y-6">
+          {/* Asked once, on the first visit, and never again: the answer decides
+              whether the checklist below asks for an identity document at all. */}
+          {!hasAnsweredOnboarding && <OnboardingQuestion />}
+
           {/* Before anything else, because it is the thing a new account should
               act on — and it removes itself once complete. */}
           <ProfileChecklist completeness={completeness} />
@@ -204,7 +226,7 @@ export default async function AccountPage() {
               </div>
             }
           >
-            <AccountTabs services={accountServices} />
+            <AccountTabs services={accountServices} serviceInterests={serviceInterests} />
           </Suspense>
 
           {/* Account-level actions, deliberately last and visually quieter than

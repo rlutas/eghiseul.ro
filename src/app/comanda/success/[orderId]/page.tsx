@@ -22,6 +22,7 @@ import { estimateFromSelectedOptions } from '@/lib/delivery-calculator';
 import { suggestEmailCorrection } from '@/lib/email-typo';
 import { OrderFlowDisclosure } from '@/components/legal/order-flow-disclosure';
 import { AccountOfferCard } from '@/components/orders/account-offer-card';
+import { isIdentityDocumentType } from '@/lib/kyc/identity-documents';
 
 interface SelectedOption {
   optionName?: string;
@@ -92,7 +93,11 @@ interface OrderData {
     contact?: {
       email?: string;
     };
-    personal?: { cnp?: string };
+    personal?: {
+      cnp?: string;
+      /** What the wizard scanned, used only to word the account offer honestly. */
+      uploadedDocuments?: Array<{ type?: string }>;
+    };
     company?: { cui?: string };
   };
 }
@@ -198,7 +203,11 @@ export default function SuccessPage() {
 
         // Transform API response to expected format
         const cd = (apiOrder.customerData ?? {}) as {
-          personal?: { cnp?: string };
+          personal?: {
+      cnp?: string;
+      /** What the wizard scanned, used only to word the account offer honestly. */
+      uploadedDocuments?: Array<{ type?: string }>;
+    };
           company?: { cui?: string };
           client_type?: string;
         };
@@ -723,6 +732,9 @@ export default function SuccessPage() {
           email={email}
           serviceSlug={order.service_slug}
           alreadyLinked={!!order.user_id}
+          hasIdentityDocuments={(order.customer_data?.personal?.uploadedDocuments ?? []).some(
+            (doc) => isIdentityDocumentType(doc?.type ?? '')
+          )}
         />
       </div>
       <OrderFlowDisclosure />
