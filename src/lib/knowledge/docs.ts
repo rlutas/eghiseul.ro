@@ -152,6 +152,13 @@ export const CURATED_GUIDES: GuideLink[] = [
     description: 'Ce faci când clientul nu poate termina comanda sau a trimis acte greșite.',
   },
   {
+    title: 'Clientul nu își poate face cont',
+    slug: 'admin/cont-client-blocat',
+    category: 'clienti',
+    description:
+      'Îi dai linkul de urmărire fără cont, apoi îi creezi contul din Supabase cu „Auto Confirm User"; pentru conturile vechi neconfirmate, butonul „Confirm email".',
+  },
+  {
     title: 'Modifică o comandă plătită',
     slug: 'admin/modify-order',
     category: 'comenzi',

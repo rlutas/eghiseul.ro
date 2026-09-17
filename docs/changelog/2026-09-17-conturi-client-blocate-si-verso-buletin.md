@@ -16,6 +16,9 @@ Doi clienți au reclamat două lucruri diferite. Amândoi aveau dreptate, iar î
 - dacă vrea neapărat cont, îl creezi tu din panoul Supabase (Authentication → Users → Add user, cu „Auto Confirm User" bifat) și îi dai parola;
 - dacă are deja cont dar zice că n-a primit emailul de confirmare, îl confirmi tu din același loc, cu butonul „Confirm email".
 
+Procedura pas cu pas, cu ce îi spui și ce NU îi spui:
+[Clientul nu își poate face cont](../admin/cont-client-blocat.md).
+
 **2. Buletinul vechi nu mai cere poză pe spate.** Clientul avea dreptate: pe buletinul vechi spatele e gol, nu are ce să fotografieze. Cerința apărea doar la clienții care aleg „Completez manual" datele, și la comenzile telefonice. Acum scrie „opțional" și explică limpede că e nevoie doar la cartea de identitate nouă, electronică. Dacă un client te întreabă: la buletinul vechi, fața e suficientă.
 
 **3. Atenție la ce vede clientul în contul lui.** Rămâne nereparat, dar e bine să știi când sună: comenzile făcute fără cont NU apar în contul pe care și-l face după aceea, chiar dacă folosește același email. Și statusul afișat e greșit pentru majoritatea comenzilor — o comandă plătită și trimisă la instituție îi apare clientului ca „În așteptare". Nu-l contrazice: verifică tu în admin și spune-i unde e de fapt.
