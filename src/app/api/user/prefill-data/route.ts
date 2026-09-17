@@ -184,7 +184,13 @@ export async function GET() {
         contact: {
           email: profileAny?.email || user.email || '',
           phone: profileAny?.phone || '',
-          preferredContact: defaultContact?.data?.preferred_contact || 'email',
+          // The stored key is camelCase — `preferred_contact` was read here and
+          // always came back undefined, so the customer's choice never left the
+          // account. Snake_case kept as a fallback for any legacy row.
+          preferredContact:
+            defaultContact?.data?.preferredContact ||
+            defaultContact?.data?.preferred_contact ||
+            'email',
         },
         // All saved addresses
         // eslint-disable-next-line @typescript-eslint/no-explicit-any

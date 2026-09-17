@@ -79,6 +79,11 @@ export default async function AccountPage() {
     .from('billing_profiles')
     .select('id', { count: 'exact', head: true })
     .eq('user_id', user.id)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { count: savedVehicleCount } = await (supabase as any)
+    .from('user_saved_vehicles')
+    .select('id', { count: 'exact', head: true })
+    .eq('user_id', user.id)
 
   // Calculate actual KYC status (requires BOTH front ID AND selfie)
   const docTypes = kycDocs?.map((d: { document_type: string }) => d.document_type) || []
@@ -124,6 +129,7 @@ export default async function AccountPage() {
     hasCompanyData: !!(profile as any)?.company_cui,
     hasAddress: (savedAddressCount ?? 0) > 0,
     hasBilling: (billingProfileCount ?? 0) > 0,
+    hasVehicle: (savedVehicleCount ?? 0) > 0,
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
