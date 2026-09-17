@@ -1,0 +1,331 @@
+# Dashboard client — plan de refacere
+
+Scris 17.09.2026. Acoperă **contul clientului**: ecranul de intrare, onboardingul care
+duce în cont, dashboardul propriu-zis și felul în care apar serviciile acolo.
+Wizardul de comandă e în afara scopului, cu excepția locurilor unde contul îl
+alimentează sau e alimentat de el.
+
+Nimic din ce urmează nu e implementat. Documentul se termină cu deciziile care
+trebuie luate înainte de prima linie de cod.
+
+---
+
+## 1. Ce am măsurat
+
+Toate cifrele sunt interogate din producție pe 17.09.2026, nu estimate.
+
+### Contul aproape nu există
+
+| | |
+|---|---|
+| Clienți plătitori, ultimele 12 luni | 398 |
+| Dintre ei, cu cont | **3** |
+| Conturi totale în `auth.users` | 74 |
+| Conturi care nu s-au autentificat niciodată | 59 din 73 |
+| Conturi cu emailul neconfirmat | 38 din 73 |
+
+Contextul contează: crearea de cont a fost **complet blocată** între 09.08 și
+17.09.2026, fiindcă Supabase restricționase trimiterea de email pe proiect. Deci
+cifrele de mai sus măsoară un produs pe care oamenii n-au putut să-l folosească,
+nu unul pe care l-au refuzat. Reparat azi (SMTP custom pe Resend).
+
+### Clientul revine rar
+
+| | |
+|---|---|
+| Clienți plătitori cu **o singură** comandă | 362 din 398 (91%) |
+| Clienți care revin | 36 (9%), maximum 4 comenzi |
+
+**Consecința pentru plan:** un cont vândut ca „îți salvează timp data viitoare"
+se amortizează pentru 1 om din 11. Valoarea trebuie să fie în comanda curentă.
+
+### Livrarea documentelor funcționează deja — fără cont
+
+| | |
+|---|---|
+| Documente marcate vizibile clientului | 822, pe 555 de comenzi |
+| Deschise vreodată de client | 367 (44,6%), 663 vizualizări |
+| Comenzi plătite / 90 zile | 439, toate cu factură |
+| Comenzi cu AWB | 42 |
+| Durată medie plată → finalizare | ~237 ore (≈10 zile) |
+
+Cum doar 3 clienți au cont, practic **toate** vizualizările astea vin prin pagina
+publică `/comanda/status?order=…&email=…`. Ăla e dashboardul real de azi.
+
+---
+
+## 2. De ce contul pare inutil — cauza nu e vizuală
+
+Am refăcut azi navigația, antetul și checklistul. Nu e suficient, fiindcă
+problema e mecanică, nu estetică: **contul nu poate fi completat, iar ce se
+completează nu e folosit.**
+
+Probleme verificate în cod și în date:
+
+1. **Telefonul cerut la înregistrare se pierde.** Trigger-ul `handle_new_user()`
+   inserează doar `id, email, first_name, last_name`; `phone` din
+   `raw_user_meta_data` nu e copiat niciodată. Din 71 de profiluri de client,
+   **5 au telefon**. Cerem un câmp obligatoriu și îl aruncăm.
+
+2. **Tabul „Act de identitate" acceptă 3 tipuri de document; wizardul cere 9+.**
+   `KYCTab` știe `ci_front`, `ci_back`, `selfie`. Wizardul lucrează cu
+   `ci_nou_back`, `passport_opened`, `ro_cei_reader_pdf`, `certificat_domiciliu`,
+   `residence_permit`, `permis_fata`. Un client cu **CI nou sau pașaport nu-și
+   poate pregăti contul**, oricât ar vrea.
+
+3. **Profilul de facturare PF nu poate fi complet niciodată.** Formularul are
+   nume, prenume, CNP, adresă. Validarea comenzii cere în plus `city` și
+   `county`. Deci profilul salvat nu satisface niciodată cerința, iar clientul
+   recompletează la fiecare comandă — exact lucrul pe care contul promite să-l
+   evite.
+
+4. **20 de servicii imobiliare cer 5 câmpuri pe care contul le are deja.**
+   Convenția topograf cere nume, adresă, CNP, serie și număr act ale
+   beneficiarului. Toate există în `profiles` + `kyc_verifications`. Niciunul nu
+   e trecut mai departe.
+
+5. **Wizardul nu scrie nimic înapoi în cont.** Singura excepție e un backfill la
+   submit, doar pe câmpurile goale din `profiles`. Adresa scanată din act, actul
+   însuși, vehiculul, profilul de facturare din comandă — niciunul nu ajunge în
+   cont. Un om care a comandat de trei ori are contul la fel de gol ca în prima zi.
+
+6. **Indicatorul „ce pot comanda" pe care l-am livrat azi e înșelător.**
+   `serviceReadiness` citește doar `personalKyc` și `companyKyc`; ignoră
+   `propertyVerification`, `civilStatus`, `vehicleVerification` și `constatator`.
+   Pentru cele 20 de servicii imobiliare scrie „avem toate datele tale" când de
+   fapt urmează 5 câmpuri de convenție. **E bug-ul meu, de azi, și intră în plan
+   ca reparație, nu ca funcție nouă.**
+
+7. **`user_saved_vehicles` are 0 rânduri**, iar formularul nu expune
+   `driving_license` — singurul câmp de care are nevoie cazierul auto.
+
+8. **`preferredContact` nu se citește niciodată.** `prefill-data` caută
+   `preferred_contact` (snake_case), datele sunt salvate ca `preferredContact`
+   (camelCase). Cade mereu pe `email`.
+
+---
+
+## 2b. Contextul de piață — nimeni nu are cont
+
+Din ~12 concurenți români vii, deschiși și parcurși pe 17.09.2026: **zero au un
+cont de client real.** Tiparul universal e:
+
+> comandă ca invitat → plată → pagină „verifică statusul" deblocată cu un cod, nu cu o parolă.
+
+Inclusiv platformele noastre surori: `ecazier.ro` are „Urmărește comanda";
+`cazierjudiciaronline.com` cere număr comandă + email și n-are nicio rută de cont.
+
+**Consecința:** dacă introducem un cont, suntem singurii din piață care cer asta.
+Deci contul nu are voie să fie o taxă înainte de comandă — trebuie să se plătească
+singur, după.
+
+Alte observații care schimbă decizii:
+
+- **Pe imobiliare și ONRC, concurența cere 6 câmpuri pe un ecran și NICIUN act de
+  identitate, la 49–89 lei** (`funciara.com` 49, `efunciara.ro` 69, `depus.ro`
+  89). Orice pas de KYC pe serviciile astea e necompetitiv prin construcție.
+- **Cel mai bun concurent pe cazier** (`cazierul-judiciar-online.ro`, 149 lei) face
+  trei lucruri pe care le putem copia: prețul e în eticheta fiecărei opțiuni, nu
+  într-un total; costul de curier e scris cu ambele variante (30 lei oraș / 70 lei
+  sat) **înainte** de a alege; iar uploadul buletinului e **opt-out** — „comanzi
+  acum, trimiți buletinul după, pe WhatsApp".
+- **Același concurent își pune singur alternativa gratuită lângă preț:** „Vrei
+  varianta gratuită? Cazierul se eliberează gratuit dacă te prezinți personal la
+  ghișeele Poliției." E cea mai bună apărare din piață împotriva acuzației
+  publice a ministrului Digitalizării din 2023 („niște băieți foarte creativi…
+  nimic ilegal… costă 300–500 de lei"), care e premisa cu care intră pe site
+  oricine a citit știrea.
+- **Abandonul documentat public** (forum avocatnet): *„am încercat dar îmi dă
+  plata la curier și este 210 Ron"* — omul a completat tot și a văzut costul real
+  abia la livrare. Punctul de abandon nu e prețul, e **momentul** în care apare.
+- **Nu mizăm pe SSO de stat.** Adopția eID în România: 10,09% în 2025, 4,67%
+  pentru servicii publice, în scădere (Eurostat).
+- **Documentul digital chiar a fost refuzat instituțional** — un cetățean cu
+  cazier luat de pe ghiseul.ro a fost respins la Instituția Prefectului Brașov
+  (2023). Livrarea fizică nu e upsell, e răspuns la un risc real.
+- **Valoarea contului, formulată de piață prin absență:** nimeni nu poate spune
+  „cazierul tău expiră în 180 de zile" sau „actul tău e deja validat, a doua
+  comandă e un clic". Aia e diferența, nu „îți vezi comenzile".
+
+---
+
+## 3. Principii, din cercetare
+
+Surse în §7. Reguli pe care le propun ca fiind obligatorii pentru orice ecran din
+plan:
+
+1. **Urmărirea comenzii rămâne accesibilă fără autentificare.** NN/g o cere
+   explicit (ghidul 13). La noi e și mai apăsat: se poate comanda fără cont, iar
+   linkul public e singura cale pentru 99% dintre clienți. Contul adaugă
+   comoditate, nu devine poartă.
+
+2. **Ecranul de start = starea comenzilor, nu un „bun venit" și nu catalogul.**
+   Monzo a refăcut Home-ul pe trei acțiuni reale după ce prima versiune a fost
+   descrisă de utilizatori drept „overwhelming and confusing" — același cuvânt
+   folosit și aici.
+
+3. **Un singur status vizibil, în română de om, plus istoric datat.** Fără
+   `documents_generated` sau `submitted_to_institution` în fața clientului.
+   Dicționar unic status intern → propoziție. (Există deja parțial:
+   `src/lib/orders/customer-status.ts`.)
+
+4. **Contul se creează la sfârșit, nu la început.** Baymard: 18% dintre
+   abandonurile de coș au drept cauză contul obligatoriu, iar 42% dintre site-uri
+   îl cer prea devreme; recomandarea testată e crearea pe pagina de confirmare,
+   unde mai rămâne de completat doar o parolă.
+
+5. **Checklist, nu wizard forțat.** Rata medie de completare a unui checklist de
+   onboarding e 19,2% (mediană 10,1%) pe 188 de companii. Proiectăm pentru ~20%:
+   nicio funcție importantă nu are voie să depindă de profil complet.
+
+6. **Fiecare întrebare din onboarding trebuie să schimbe ceva vizibil.** Testul:
+   scrie propoziția „pentru că ai răspuns X, acum vezi/faci Y". Dacă nu poți,
+   taie întrebarea. E și minimizare GDPR, nu doar UX.
+
+7. **Nu cere ce ai deja.** Confirmarea („astea sunt datele tale din ultima
+   comandă — corect?") e mult mai ieftină decât introducerea.
+
+---
+
+## 4. Ce propun
+
+### Faza 0 — reparații care fac contul completabil
+
+Fără astea, orice ecran nou e decor. Nu schimbă niciun pixel.
+
+| # | Reparație | De ce |
+|---|---|---|
+| 0.1 | `handle_new_user()` copiază și `phone` | îl cerem obligatoriu și îl pierdem |
+| 0.2 | `KYCTab` acceptă toate tipurile pe care le cere wizardul | CI nou și pașaport nu pot fi pre-salvate |
+| 0.3 | Formularul de facturare PF primește `city`, `county`, `postalCode` | altfel profilul salvat nu e valid niciodată |
+| 0.4 | `serviceReadiness` citește toate cele 7 module | indicatorul de azi minte pe 20 de servicii |
+| 0.5 | Formularul de vehicul expune `driving_license` | cazierul auto îl cere, pickerul îl citește |
+| 0.6 | `preferredContact` — aliniat camelCase | nu s-a propagat niciodată |
+
+### Faza 1 — dashboardul propriu-zis
+
+**Ecranul de start devine „comenzile mele", nu catalogul.** Pentru fiecare
+comandă activă, un card care răspunde la trei întrebări, în ordinea asta:
+
+1. **Unde e?** — statusul în română, plus o linie „ce urmează și cine face"
+   (noi / instituția / tu), cu termenul estimat. Modelul VA.gov.
+2. **Trebuie să fac eu ceva?** — dacă da, e singurul lucru accentuat pe card.
+3. **Unde-mi sunt documentele?** — descărcare directă, plus factura.
+
+Sub ele, comenzile încheiate, colapsate. Catalogul de servicii coboară pe locul
+doi — rămâne în cont, dar nu mai e primul lucru.
+
+**Contul gol nu arată un dashboard gol.** Dacă omul n-are nicio comandă (cazul
+majorității, imediat după înregistrare), ecranul de start e catalogul + o linie
+care explică ce va apărea aici după prima comandă.
+
+### Faza 2 — onboarding
+
+Nu un wizard. Trei momente, în ordinea în care clientul chiar are nevoie:
+
+1. **La finalul comenzii** (pagina de succes): „Pune-ți o parolă ca să urmărești
+   comanda" — un singur câmp, restul datelor sunt deja introduse. Aici se creează
+   contul, cu datele comenzii turnate în profil.
+2. **La prima intrare în cont**, checklistul — dar pre-completat din ultima
+   comandă, deci majoritatea pașilor sunt deja bifați și clientul doar confirmă.
+3. **Niciodată înainte de prima comandă.**
+
+Întrebări noi în onboarding: doar cele care trec testul de la §3.6. Candidatele
+pe care le propun spre discuție sunt în decizia D5.
+
+### Faza 3 — serviciile în cont
+
+Catalogul rămâne, dar cu indicatorul reparat la 0.4: „îți vom cere în formular
+X și Y" trebuie să fie adevărat pentru toate cele 31 de servicii, nu doar pentru
+cele 11 cu KYC.
+
+### Faza 4 — ce scrie comanda înapoi în cont
+
+Fiecare comandă finalizată completează profilul cu ce a introdus clientul, cu
+confirmare, nu tăcut. Asta face ca a doua comandă să fie scurtă fără ca nimeni să
+fi completat vreun formular de profil.
+
+---
+
+## 5. Ce NU propun
+
+- **Nu mutăm KYC-ul după plată.** Datele spun că nu acolo se pierd oamenii: pasul
+  `kyc-documents` are 1,5% din abandonuri. (Notă: măsurătoarea ține de wizard,
+  care e în afara scopului — o las aici doar ca să nu se propună mutarea pe baza
+  unei presupuneri.)
+- **Nu facem 2FA acum.** Coloana `two_factor_enabled` există și n-are consumator;
+  poate rămâne așa.
+- **Nu gamificăm profilul.** „100% complet" nu e un scop dacă nu deblochează
+  nimic concret.
+- **Nu cerem cont înainte de comandă, pe niciun serviciu.** Suntem singurii din
+  piață cu cont; orice zid înainte de plată e fricțiune fără precedent competitiv.
+- **Nu mizăm pe „loghează-te cu ROeID".** 4,67% adopție pentru servicii publice.
+
+---
+
+## 6. Deciziile tale
+
+| # | Decizia | De ce contează |
+|---|---|---|
+| **D1** | Linkul public de urmărire rămâne complet funcțional fără cont? | Dacă da, contul trebuie să adauge altceva decât acces la aceleași date — și trebuie să știm ce, înainte să-l construim. Dacă nu, îi forțăm pe oameni într-un cont pe care 91% nu-l vor folosi a doua oară. |
+| **D2** | Ecranul de start: comenzile sau catalogul? | Propun comenzile, cu catalogul pe doi și inversarea pentru contul gol. |
+| **D3** | Contul se creează pe pagina de succes (doar parolă)? | E recomandarea testată Baymard. Presupune că pagina de succes se schimbă — atinge wizardul. |
+| **D4** | Câte stări vede clientul? Azi sunt 17 interne, mapate în 24 de propoziții. | Prea multe stări = zgomot; prea puține = „în așteptare" pentru tot, ce aveam înainte. |
+| **D5** | Ce întrebăm în onboarding? | Fiecare candidat trebuie să treacă testul „pentru că ai răspuns X, vezi Y". Propun să discutăm lista concret. |
+| **D6** | Facem Faza 0 înainte de orice ecran nou? | Recomand da. Altfel repetăm ce s-a întâmplat azi: ecrane noi peste date care nu se pot salva. |
+
+---
+
+## 7. Surse
+
+Cercetare externă, 17.09.2026:
+
+- Monzo — [How we built the new Home screen](https://monzo.com/blog/how-we-built-the-new-home-screen): >1.000 clienți, 4+2 experimente în 7 luni; prima variantă „overwhelming and confusing"
+- NN/g — [Status Trackers and Progress Updates: 16 Design Guidelines](https://www.nngroup.com/articles/status-tracker-progress-update/): ghidurile 3 (limbaj uman), 9 (actualizări dese), 11 (istoric datat), 13 (link fără login), 15 (fără notificări duplicate), 16 (consistență tracker/email/suport)
+- VA.gov — [Stay informed of their application status](https://design.va.gov/patterns/help-users-to/stay-informed-of-their-application-status): 4 stări cu definiție în limbaj comun, secțiunea „What to expect"
+- Baymard — [Delayed Account Creation](https://baymard.com/blog/delayed-account-creation): 42% cer contul prea devreme; cont = doar parolă pe confirmare; 57% fără beneficii convingătoare
+- Baymard — [Cart Abandonment Rate](https://baymard.com/lists/cart-abandonment-rate): 18% abandonează din cauza contului obligatoriu
+- Baymard — [Mobile Checkout](https://baymard.com/blog/mobile-checkout): 60% dintre subiecți nu găsesc opțiunea de guest pe mobil
+- Userpilot — [Onboarding checklist completion benchmarks](https://userpilot.com/blog/onboarding-checklist-completion-rate-benchmarks/): 19,2% medie / 10,1% mediană pe 188 companii
+- GOV.UK One Login — [Users create an account to save progress](https://www.sign-in.service.gov.uk/users-create-an-account-to-save-progress-pdf-february-2023): contul apare la „salvează și continuă mai târziu", nu la intrare
+- GOV.UK Design System — [Task list](https://design-system.service.gov.uk/components/task-list/): evidențiază ce NU e gata
+- Stripe — [Customer portal](https://docs.stripe.com/customer-management): portalul ca set de treburi de făcut, nu pagină de prezentare
+
+**Cifre pe care le-am respins ca nesigure:** „fiecare câmp în plus = −3-5%
+completare", „progressive profiling +20% (McKinsey)", ratele de abandon KYC de
+60-80% — toate circulă în bloguri comerciale fără sursă primară, iar cele de KYC
+vin exclusiv de la vânzători de verificare. Nu le folosim ca argument.
+
+---
+
+## 8. Ce lipsește din acest document
+
+- Machetele efective. Le fac după D1–D6, nu înainte: forma ecranului depinde de
+  ce răspunzi la D1 și D2.
+- Ce NU s-a putut verifica în cercetare, declarat ca atare: Reddit (inaccesibil),
+  forum.softpedia (403), ghiseul.ro (403 — tot ce ține de el e second-hand),
+  Trustpilot pentru eghiseul.ro și ecazier.ro (nu există pagină), reclamații
+  publice despre livrare/refund la vreun intermediar (zero dovezi găsite — risc
+  necunoscut, nu zonă curată).
+
+---
+
+## 9. Două lucruri urgente, în afara dashboardului
+
+Ies din cercetare și n-au legătură cu contul, dar au termen.
+
+**9.1 Ordinul ANPC 505/2026**, publicat în Monitorul Oficial nr. 749 din
+**4 septembrie 2026**, în vigoare de atunci — deci de 13 zile. Cere link vizibil
+către pagina oficială ANPC pe prima pagină a oricărui site care preia comenzi
+online, și a înlocuit anexele cu datele comisariatelor județene și machetele de
+afișare. `OrderFlowDisclosure` și footerul trebuie verificate față de anexa
+curentă, nu cea de anul trecut. **De verificat, nu constatat** — n-am comparat eu
+machetele.
+
+**9.2 Expunere GDPR pe selfie + copie act.** ANSPDCP a sancționat un operator
+exact pentru combinația copie CI + selfie, ca depășind scopul legitim. Doi
+concurenți (`obtinecazier.ro`, `eliberarecazier.ro`) cer „poză ținând buletinul în
+mână" — noi avem `selfieRequired = true` pe **toate** cele 11 servicii cu KYC.
+Ecranul trebuie să spună temeiul juridic și retenția, nu „pentru verificare".
+Pe extras CF și certificat constatator, unde concurența nu cere niciun act la
+49–89 lei, cerința e și necompetitivă.
