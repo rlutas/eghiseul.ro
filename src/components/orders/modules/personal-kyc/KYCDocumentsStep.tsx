@@ -123,11 +123,11 @@ const DOCUMENT_CONFIG: Record<
     ],
   },
   act_identitate_back: {
-    title: 'Act de Identitate — spate (obligatoriu)',
-    description: 'Poză cu spatele cărții de identitate (CI).',
+    title: 'Act de Identitate — spate (opțional)',
+    description: 'Doar dacă ai cartea de identitate nouă, electronică, care are date pe spate. Pe buletinul vechi spatele nu conține date — sari peste acest pas.',
     icon: CreditCard,
     tips: [
-      'Fotografiază versoul CI-ului complet',
+      'Necesar doar la CI-ul electronic (cel nou, tip card)',
       'Datele clare, fără reflexii sau umbre',
     ],
   },
@@ -276,10 +276,12 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
     if (!isForeign) {
       const hasScanId = personalKyc.uploadedDocuments.some((d) => SCAN_ID_TYPES.includes(d.type));
       if (!hasScanId) {
-        // Ruta manuală (n-a scanat la pasul 2): cere față + spate ale actului aici.
+        // Ruta manuală (n-a scanat la pasul 2): cere fața actului aici.
+        // Versoul rămâne OPȚIONAL — pe buletinul vechi spatele nu conține date,
+        // iar serverul (api/orders/[id]/submit) cere doar fața. Aici nu rulează
+        // OCR, deci versoul nu aduce nicio informație.
         const hasFront = personalKyc.uploadedDocuments.some((d) => d.type === 'act_identitate');
-        const hasBack = personalKyc.uploadedDocuments.some((d) => d.type === 'act_identitate_back');
-        if (!hasFront || !hasBack) return false;
+        if (!hasFront) return false;
       }
     }
 
@@ -323,7 +325,6 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
       const hasScanId = personalKyc.uploadedDocuments.some((d) => SCAN_ID_TYPES.includes(d.type));
       if (!hasScanId) {
         if (!has('act_identitate')) m.push('Act de identitate — față');
-        if (!has('act_identitate_back')) m.push('Act de identitate — spate');
       }
     }
     if (!isForeign && personalKyc.requiresAddressCertificate && config.requireAddressCertificate !== 'never' && !has('certificat_domiciliu')) {

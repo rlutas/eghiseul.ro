@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { authErrorToRomanian } from '@/lib/auth/error-messages';
 import { NextResponse } from 'next/server';
 
 /**
@@ -182,12 +183,17 @@ export async function POST(request: Request) {
         );
       }
 
+      // Everything else, including Supabase rate limits, used to leak the raw
+      // English GoTrue message with a 400. Translate it and keep the real status
+      // so the client can tell "try later" apart from "you did something wrong".
+      const info = authErrorToRomanian(authError.message, authError.code);
       return NextResponse.json(
         {
           error: 'Registration failed',
-          message: authError.message || 'Înregistrarea a eșuat',
+          message: info.message,
+          retryAfterSeconds: info.retryAfterSeconds,
         },
-        { status: 400 }
+        { status: info.isRateLimit ? 429 : 400 }
       );
     }
 

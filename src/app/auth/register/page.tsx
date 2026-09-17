@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { createClient } from '@/lib/supabase/client';
+import { authErrorToRomanian } from '@/lib/auth/error-messages';
 import { Footer } from '@/components/home/footer';
 
 export default function RegisterPage() {
@@ -70,7 +71,7 @@ export default function RegisterPage() {
       });
 
       if (error) {
-        setError(error.message);
+        setError(authErrorToRomanian(error.message, error.code).message);
       } else {
         router.push('/auth/verify-email?email=' + encodeURIComponent(formData.email));
       }

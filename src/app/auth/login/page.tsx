@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { createClient } from '@/lib/supabase/client';
+import { authErrorToRomanian } from '@/lib/auth/error-messages';
 import { Footer } from '@/components/home/footer';
 
 function LoginForm() {
@@ -15,9 +16,16 @@ function LoginForm() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  // ?error=auth comes from /auth/callback when the link could not be exchanged
+  // for a session (expired or already used).
+  const [error, setError] = useState<string | null>(
+    searchParams.get('error') === 'auth'
+      ? 'Linkul a expirat sau a fost deja folosit. Autentifică-te cu emailul și parola, sau cere un link nou.'
+      : null
+  );
 
   // Get redirect URL from query params (set by middleware)
   const redirectTo = searchParams.get('redirect') || '/account';
@@ -35,7 +43,7 @@ function LoginForm() {
       });
 
       if (error) {
-        setError(error.message);
+        setError(authErrorToRomanian(error.message, error.code).message);
       } else {
         // Land each role on its home: collaborators on their portal, admin
         // roles on /admin (which routes avocat to Registru), customers on

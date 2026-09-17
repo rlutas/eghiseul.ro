@@ -37,6 +37,7 @@ export async function GET(request: Request) {
     }
   }
 
-  // Return the user to an error page with instructions
-  return NextResponse.redirect(`${origin}/login?error=auth`)
+  // Return the user to the login page with instructions. NOTE: the real route is
+  // /auth/login — this used to point at /login, which is a 404.
+  return NextResponse.redirect(`${origin}/auth/login?error=auth`)
 }

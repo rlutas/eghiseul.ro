@@ -7,6 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Loader2, ArrowLeft } from 'lucide-react'
 
 import { createClient } from '@/lib/supabase/client'
+import { authErrorToRomanian } from '@/lib/auth/error-messages'
 import { forgotPasswordSchema, type ForgotPasswordFormData } from '@/lib/validations/auth'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -41,12 +42,12 @@ export default function ForgotPasswordPage() {
     const { error: resetError } = await supabase.auth.resetPasswordForEmail(
       data.email,
       {
-        redirectTo: `${window.location.origin}/reset-password`,
+        redirectTo: `${window.location.origin}/auth/reset-password`,
       }
     )
 
     if (resetError) {
-      setError(resetError.message)
+      setError(authErrorToRomanian(resetError.message, resetError.code).message)
       setIsLoading(false)
       return
     }

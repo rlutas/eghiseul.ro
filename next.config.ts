@@ -24,6 +24,11 @@ const nextConfig: NextConfig = {
 
   async redirects() {
     return [
+      // Rute de auth care au fost trimise în emailuri, dar n-au existat niciodată
+      // ca pagini (404 până pe 17.09.2026). Le ținem redirectate temporar pentru
+      // linkurile deja ajunse în inboxul clienților.
+      { source: '/reset-password/', destination: '/auth/reset-password/', permanent: false },
+      { source: '/login/', destination: '/auth/login/', permanent: false },
       // Variante de URL pe care le încearcă lumea pentru pagina „Despre noi".
       { source: '/despre/', destination: '/despre-noi/', permanent: true },
       { source: '/echipa/', destination: '/despre-noi/', permanent: true },
