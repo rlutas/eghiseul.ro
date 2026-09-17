@@ -13,7 +13,8 @@ Google Ads (blocat pe politica documentelor guvernamentale, vezi `../README.md`)
 | [06-conversii-pixel-capi.md](06-conversii-pixel-capi.md) | **conversii**: pixel (data source) + eveniment `order_created` în Ads Manager, implementarea pe site (pixel consent-gated, pagina de succes, Conversions API din webhook-ul Stripe, `oppref` în atribuire), env-uri, verificare |
 | [07-noutati-platforma-2026-09.md](07-noutati-platforma-2026-09.md) | noutățile OpenAI Ads din 17.09 (facturare pe afișări, ferestre de atribuire, targetare pe platformă, Event Quality Score, Sponsored Agents) și verdictul pentru contul nostru |
 | [08-eligibilitate-rovinieta-si-stare-civila.md](08-eligibilitate-rovinieta-si-stare-civila.md) | **ce mai putem urca pe canal**, pe politica v1.6 citită 17.09: de ce certificatul de naștere e blocat, de ce rovinieta e bună ca politică dar nepregătită ca produs (afiliere spre erovinieta.net, comision nescris, „Oficial CNAIR" pe landing), și de ce următorul candidat real e extrasul de carte funciară |
-| `assets/` | logo 512×512 + favicon 128×128 pentru Ads Manager |
+| [09-campanie-extras-carte-funciara.md](09-campanie-extras-carte-funciara.md) | **a doua campanie, gata de introdus**: aritmetica marjei (prag CPA ~50 lei), structura pe 3 ad groups, context hints, titluri/descrieri cu număr de caractere, imagine, UTM, licitare, măsurare, criterii de decizie — plus 🔴 blocantul: automatizarea ANCPI e moartă din 20.08, gazdele `epay`/`oassl`/`myeterra.ancpi.ro` sunt NXDOMAIN, iar pagina promite „câteva minute, automat, 24/7" |
+| `assets/` | logo 512×512 + favicon 128×128 + imaginile de anunț (`ad-constatator-1024.png`, `ad-extras-cf-1024.png`) |
 
 ## Reguli fixe pe canalul ăsta
 
