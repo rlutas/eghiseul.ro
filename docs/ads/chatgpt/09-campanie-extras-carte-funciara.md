@@ -302,6 +302,70 @@ manuală e respinsă cu `Reserved query parameters are not supported: olref, opp
 Domeniul e `eghiseul.ro`, fără `www`, cu slash final. Verificat: URL-ul întoarce 200 fără
 redirect; varianta fără slash dă 308 care păstrează query-ul.
 
+## H2. Unde aterizează omul, și pasul în plus din pâlnie
+
+Ambele anunțuri duc pe **pagina de serviciu**, `/servicii/extras-de-carte-funciara/`. De acolo
+clientul trebuie să apese „Comandă" ca să ajungă în formular, la
+`/comanda/extras-carte-funciara/`. Deci pâlnia are un pas în plus:
+
+```
+card în ChatGPT → pagina de serviciu → clic pe „Comandă" → formular → plată
+```
+
+La constatator e la fel. Pasul ăla costă: fiecare ecran intermediar pierde oameni, iar la
+7 clicuri pe zi nu ne permitem pierderi.
+
+### Varianta scurtă, de testat: anunț direct pe formular
+
+Ideea lui Raul, 17.09: după câteva zile, dacă rezultatul nu e bun, facem **un al doilea anunț
+care duce direct pe `https://eghiseul.ro/comanda/extras-carte-funciara/`** și comparăm. E un
+test bun, pâlnia scurtă e adesea mai eficientă la produse ieftine și clare.
+
+🔴 **Dar nu se poate porni așa cum e acum. Două blocaje, ambele verificate pe 17.09.**
+
+**1. `robots.txt` interzice `/comanda/` tuturor roboților.** Regula apare în toate cele cinci
+blocuri din `robots.txt`, inclusiv în `User-Agent: *`, deci și pentru `OAI-AdsBot/1.0`.
+Troubleshooting-ul OpenAI spune explicit că anunțurile sau paginile de destinație care nu pot fi
+evaluate de sistemele lor **nu sunt eligibile să ruleze**. Probabil anunțul ar fi respins sau
+n-ar difuza niciodată, iar motivul ar fi greu de diagnosticat.
+
+**2. Formularul nu are conținut pentru un cititor fără JavaScript.** Am cerut pagina cu
+user-agentul lor: întoarce HTTP 200 și 109 KB, dar textul din HTML-ul inițial e **doar meniul de
+navigație și footerul**. Wizardul e randat în client. Concret, ce ar citi modelul care face
+reviewul: nicio denumire de serviciu, **niciun preț**, nicio descriere a ofertei. Asta cade
+direct sub „Destination integrity: landing pages must accurately represent the advertiser,
+product, or service described in the ad" — anunțul ar promite extras de carte funciară la 89 de
+lei, iar destinația n-ar conține niciunul dintre cele două.
+
+✅ Partea bună: `OrderFlowDisclosure` **este** randat pe server, „serviciu privat" apare de trei
+ori în HTML-ul brut. Deci neafilierea, care e cerința cea mai sensibilă, e deja acoperită.
+
+### Ce trebuie făcut înainte de testul cu pâlnia scurtă
+
+1. **Permite `OAI-AdsBot` pe `/comanda/`**, fără să deschizi pentru motoarele de căutare.
+   Paginile de comandă trebuie să rămână neindexate, altfel intrăm peste regulile de conținut
+   de după spam update. Adică un bloc dedicat în `robots.txt`:
+   ```
+   User-Agent: OAI-AdsBot
+   Allow: /
+   Disallow: /admin/
+   Disallow: /api/
+   Disallow: /auth/
+   Disallow: /account/
+   Disallow: /orders/
+   ```
+   (fără `Disallow: /comanda/`, restul rămâne)
+2. **Randează pe server, pe `/comanda/[service]/`, minimul pe care un reviewer trebuie să-l
+   vadă**: denumirea serviciului, prețul cu taxele incluse, o frază despre ce primește clientul
+   și termenul real. Nu e doar pentru reclamă — e aceeași problemă semnalată în auditul de
+   accesibilitate din 09.09 pentru GPTBot și ClaudeBot, care nu execută JavaScript.
+3. Abia apoi creezi anunțul, ca **ad nou în același ad group**, cu
+   `utm_content=ag1-verificare` păstrat și `utm_term=direct-formular`, ca să se compare corect
+   cu cele două existente în `scripts/check-chatgpt-ads.mjs`.
+
+**Ordinea rămâne cea agreată:** întâi câteva zile pe varianta actuală, ca să avem cu ce compara.
+Un test A/B fără linie de bază nu spune nimic.
+
 ## I. Licitare și buget
 
 - Obiectiv **Clicks**, bid **Manual**, ca pe constatator. NU „Conversion optimization with
@@ -408,3 +472,4 @@ site. Dacă și la noi e așa, CPC-ul real pe vizitator nu e 0,57 € ci 1,6–4
 | 17.09 13:50 | **PORNITĂ.** Raul a confirmat termenul real (maximum 2 zile lucrătoare, de regulă aceeași zi) și a dat undă verde. Landingul corectat în 19 locuri, plus descrierea serviciului din DB. Campania creată în Ads Manager: `OAI_Click_ExtrasCF_2026-09`, Standard, obiectiv **Clicks**, România, toate cele 5 platforme, **€20/zi**, fără dată de final, eveniment de conversie `Order CreatedPurchase` legat de la creare. Un singur ad group, `AG1 Verificare proprietate`, **Max CPC €1,95** cu indicator „Strong Delivery", hint-ul din secțiunea E cu adaosul despre notar și bancă. **Două anunțuri**, ambele cu imaginea noastră: `Ad1 T3-D2 proprietar` („Cine e proprietarul imobilului?") și `Ad2 T4-D4 brand primul` („eGhișeul: extras carte funciară"), diferențiate în DB prin `utm_term=t3d2-intrebare` și `t4d4-brand`. Status la creare: **`Not serving` cu UN SINGUR motiv, „Ad is in review"** — spre deosebire de constatator, care avea patru motive și a stat 14 zile; contul e deja trecut prin brand review. |
 | | ⚠️ **Două lucruri de reținut din procesul de creare.** (1) Obiectivul implicit era **Conversions cu facturare pe afișări**, adică exact oCPM pe care research-ul îl descrie ca prematur la zero conversii; a trebuit schimbat manual pe Clicks. (2) Formularul a **pre-populat automat anunțul** din pagina de destinație, inclusiv cu o imagine trasă de pe landing care era **specimenul real de extras cu antet ANCPI**. Aia e fix „Scams & fraud: impersonate official entities". Am scos-o și am urcat imaginea noastră stilizată. Bugetul implicit era €65/zi, iar Text customization pornit. **Nimic din ce propune platforma implicit nu era ce voiam.** |
 | | Confirmat la creare, cu cifrele lor: la €20/zi, „maximum daily spend is €40.00, maximum seven-day spend is €140.00" — exact 2× și 7×, cum spune research-ul. |
+| 17.09 14:10 | Notat pasul în plus din pâlnie și varianta de testat cu aterizare directă pe formular (secțiunea H2). Verificat pe loc de ce nu se poate porni azi: `robots.txt` interzice `/comanda/` în toate cele cinci blocuri, inclusiv pentru `OAI-AdsBot`, iar HTML-ul inițial al formularului nu conține nici denumirea serviciului, nici prețul — doar meniu și footer. `OrderFlowDisclosure` însă e randat pe server. Testul rămâne programat după câteva zile de linie de bază. |
