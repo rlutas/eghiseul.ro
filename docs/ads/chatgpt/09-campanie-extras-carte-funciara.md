@@ -1,7 +1,27 @@
-# Campania extras de carte funciară — gata de introdus
+# Campania extras de carte funciară
 
-Scrisă 17.09.2026, pe politica OpenAI **v1.6 (10.09)**. Campania de constatator e în
-`04-campanie-constatator.md`; aici se repetă doar ce diferă.
+Scrisă și **pornită 17.09.2026**, pe politica OpenAI **v1.6 (10.09)**. Campania de constatator
+e în `04-campanie-constatator.md`; aici se repetă doar ce diferă.
+
+---
+
+## ⏱️ Verificarea de fiecare zi — începe de aici
+
+1. **Ads Manager → Campaigns**: notează, pentru `OAI_Click_ExtrasCF_2026-09`, **clicurile** și
+   **cheltuiala**. Dacă statusul e încă `Not serving`, singurul motiv acceptabil e
+   „Ad is in review"; orice alt motiv se scrie în jurnalul de la secțiunea M.
+2. **Rulează**, cu cifrele de mai sus:
+   ```bash
+   node scripts/check-chatgpt-ads.mjs --spend-eur <cheltuiala> --clicks <clicuri>
+   ```
+   Îți dă comenzile atribuite pe anunț, CPC-ul efectiv, conversia clic → comandă și CPA-ul,
+   comparat automat cu ținta de 20 de lei și cu pragul de rentabilitate de 50.
+3. **Vercel Analytics**, ultimele 24 de ore, filtru pe referrer `chatgpt.com`: compară numărul
+   de sesiuni cu clicurile facturate. 🔴 **Peste 30% diferență = oprește campania**, indiferent
+   ce arată restul. Vezi secțiunea K și `10-research-practicieni-2026-09.md`, secțiunea 6.
+
+Pragurile de decizie și criteriile de oprire sunt în secțiunea K. Nu improviza peste ele:
+sunt scrise ca să oprească devreme, cu pierderea maximă plafonată la €100.
 
 ---
 
