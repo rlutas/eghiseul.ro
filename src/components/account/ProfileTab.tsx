@@ -35,6 +35,9 @@ import { validateCNP } from '@/lib/validations/cnp';
 import IdScanner, { type ExtractedIdData, type UploadedDocument, type OcrResult } from '@/components/shared/IdScanner';
 import { useKycStatus } from '@/hooks/useKycStatus';
 import CompanyProfileSection, { type CompanyProfile } from './CompanyProfileSection';
+import { isoDate, isoFromRomanianDate } from '@/components/account/profile-steps/personal-fields';
+import { uploadToS3 } from '@/lib/aws/upload-client';
+import { base64ToFile } from '@/lib/images/compress';
 
 interface ProfileData {
   id: string;
@@ -183,8 +186,10 @@ export default function ProfileTab({ initialData, className, autoEdit = false }:
     if (cleanCNP.length === 13) {
       const result = validateCNP(cleanCNP);
       if (result.valid && result.data) {
-        const birthDate = result.data.birthDate.toISOString().split('T')[0];
-        setEditData(prev => ({ ...prev, birthDate }));
+        // NOT `toISOString()`: `validateCNP` returns a local midnight, and
+        // converting that to UTC from Romania (+02/+03) lands on the previous
+        // day — a CNP of 920702 filled in 1 July 1992.
+        setEditData(prev => ({ ...prev, birthDate: isoDate(result.data!.birthDate) }));
       }
     }
   }, []);
@@ -203,18 +208,45 @@ export default function ProfileTab({ initialData, className, autoEdit = false }:
       firstName: extractedData.firstName || prev.firstName,
       lastName: extractedData.lastName || prev.lastName,
       cnp: extractedData.cnp || prev.cnp,
-      birthDate: extractedData.birthDate || prev.birthDate,
+      // The OCR returns „02.07.1992"; `<input type="date">` accepts only
+      // `YYYY-MM-DD` and drops anything else without a word.
+      birthDate: isoFromRomanianDate(extractedData.birthDate) || prev.birthDate,
       birthPlace: extractedData.birthPlace || prev.birthPlace,
     }));
 
-    // Save documents to KYC
+    // Save documents to KYC. The image goes to S3, exactly as the identity tab
+    // does it — writing `data:image/jpeg;base64,…` into `file_url` puts the
+    // whole picture in a Postgres row, and those rows are then inconsistent with
+    // every other document in the account. The data URL stays only as a fallback
+    // for when S3 is unavailable, same as in KYCTab.
     try {
       for (const doc of documents) {
+        const verificationId = crypto.randomUUID();
+        const mimeType = doc.mimeType || 'image/jpeg';
+        let fileUrl = `data:${mimeType};base64,${doc.base64}`;
+        let fileKey: string | undefined;
+
+        try {
+          const uploaded = await uploadToS3({
+            category: 'kyc',
+            file: base64ToFile(doc.base64, mimeType, `${doc.type}.jpg`),
+            // The scanner's types are the same strings `KycDocumentType`
+            // lists; the scanner just declares them as `string`.
+            documentType: doc.type as Parameters<typeof uploadToS3>[0]['documentType'],
+            verificationId,
+          });
+          fileUrl = uploaded.url;
+          fileKey = uploaded.key;
+        } catch (s3Error) {
+          console.warn('S3 upload failed for scanned document, using data URL:', s3Error);
+        }
+
         await saveDocument({
           documentType: doc.type,
-          fileUrl: `data:${doc.mimeType};base64,${doc.base64}`,
+          fileUrl,
+          fileKey,
           fileSize: doc.fileSize,
-          mimeType: doc.mimeType,
+          mimeType,
           extractedData: extractedData,
           documentExpiry: extractedData.documentExpiry,
         });

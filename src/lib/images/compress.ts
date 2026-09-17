@@ -147,6 +147,17 @@ export function compressedToFile(compressed: CompressedImage, originalFile: File
   return new File([blob], `${stem}.jpg`, { type: 'image/jpeg', lastModified: Date.now() });
 }
 
+/**
+ * A raw base64 payload back into a `File`, so it can be uploaded to S3 like any
+ * other picked file. Needed wherever a flow already holds the image as base64
+ * (the ID scanner hands its result over that way) and the image must not end up
+ * stored inline in the database.
+ */
+export function base64ToFile(base64: string, mimeType: string, filename: string): File {
+  const blob = base64ToBlob(base64, mimeType);
+  return new File([blob], filename, { type: mimeType, lastModified: Date.now() });
+}
+
 function base64ToBlob(base64: string, mimeType: string): Blob {
   const byteString = atob(base64);
   const len = byteString.length;
