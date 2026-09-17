@@ -12,6 +12,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { createClient } from '@/lib/supabase/client';
 import { authErrorToRomanian } from '@/lib/auth/error-messages';
 import { Footer } from '@/components/home/footer';
+import { normalizePhone } from '@/lib/format/normalize-phone';
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -66,7 +67,10 @@ export default function RegisterPage() {
           data: {
             first_name: formData.firstName,
             last_name: formData.lastName,
-            phone: formData.phone,
+            // Same shape as everywhere else: `handle_new_user()` copies this
+            // straight into `profiles.phone`, which the order wizard reads back
+            // to prefill its phone field.
+            phone: normalizePhone(formData.phone),
           },
           // Without this the confirmation link falls back to site_url and drops
           // the customer on the homepage, still logged out, with nothing saying
