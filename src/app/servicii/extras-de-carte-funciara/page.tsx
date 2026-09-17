@@ -42,9 +42,9 @@ import { RelatedServicesLinks } from '@/components/services/related-services-lin
 const SERVICE_SLUG = 'extras-carte-funciara';
 const PAGE_PATH = '/servicii/extras-de-carte-funciara/';
 const SCHEMA_SLUG = 'extras-de-carte-funciara';
-const TITLE = 'Extras Carte Funciară Online în 5 Minute — Automat, 24/7';
+const TITLE = 'Extras Carte Funciară Online — pe Email în Max. 2 Zile Lucrătoare';
 const DESCRIPTION =
-  'Extras de carte funciară ANCPI eliberat automat, pe email, în câteva minute — 24/7, ' +
+  'Extras de carte funciară de la ANCPI, obținut de noi și trimis pe email, de obicei în aceeași zi lucrătoare, maximum 2 zile lucrătoare. ' +
   'inclusiv noaptea și în weekend. Fără cont ANCPI, fără taxă de urgență. 4.9★ din 450+ recenzii.';
 const DATE_PUBLISHED = '2026-06-13';
 const DATE_MODIFIED = '2026-07-13';
@@ -85,7 +85,7 @@ const jsonLdGraph = buildServicePageGraph({
   name: 'Extras de Carte Funciară Online',
   description:
     'Serviciu de obținere a Extrasului de Carte Funciară (CF) de la ANCPI, eliberat automat în ' +
-    'câteva minute, 24/7. Document cu situația juridică a imobilului: proprietar, suprafață, ' +
+    'de obicei în aceeași zi lucrătoare, maximum 2. Document cu situația juridică a imobilului: proprietar, suprafață, ' +
     'sarcini și ipoteci. 100% online, fără cont ANCPI, fără taxă de urgență, livrare pe email.',
   serviceType: 'Document Processing — Real Estate',
   datePublished: DATE_PUBLISHED,
@@ -170,7 +170,7 @@ export default async function ExtrasCarteFunciaraPage() {
                   </Badge>
                   <Badge className="bg-green-600 text-white font-bold px-3 py-1">
                     <Zap className="h-3.5 w-3.5 mr-1" />
-                    Eliberare în câteva minute
+                    Pe email în max. 2 zile lucrătoare
                   </Badge>
                   <Badge variant="outline" className="text-white/80 border-white/30 px-3 py-1">
                     <Landmark className="h-3.5 w-3.5 mr-1" />
@@ -192,7 +192,7 @@ export default async function ExtrasCarteFunciaraPage() {
                   <Zap className="h-5 w-5 text-primary-500 flex-shrink-0 mt-0.5" />
                   <p className="text-white/95 text-sm sm:text-base leading-relaxed">
                     <strong className="text-primary-500">Singurii din România</strong> care îți eliberează extrasul de
-                    carte funciară <strong>în câteva minute, automat, 24/7</strong> — fără taxă de urgență, fără cont
+                    carte funciară <strong>de obicei în aceeași zi lucrătoare, garantat în maximum 2</strong> — fără taxă de urgență, fără cont
                     ANCPI și fără drum la ghișeu.
                   </p>
                 </div>
@@ -207,7 +207,7 @@ export default async function ExtrasCarteFunciaraPage() {
                       'Completezi numărul de carte funciară sau cadastral',
                       'Verificăm și depunem cererea automat la ANCPI',
                       'Plătești securizat (taxe ANCPI incluse)',
-                      'Primești extrasul CF pe email în câteva minute',
+                      'Primești extrasul CF pe email, de regulă în aceeași zi lucrătoare',
                     ].map((step) => (
                       <li key={step} className="flex items-center gap-2">
                         <CheckCircle className="w-4 h-4 text-primary-500 flex-shrink-0" />
@@ -243,8 +243,8 @@ export default async function ExtrasCarteFunciaraPage() {
                         <Clock className="h-5 w-5 text-green-600" />
                       </div>
                       <div>
-                        <p className="font-semibold text-secondary-900 text-sm">Livrare în câteva minute</p>
-                        <p className="text-xs text-neutral-500">24/7, dacă sistemul ANCPI e operațional</p>
+                        <p className="font-semibold text-secondary-900 text-sm">Livrare în max. 2 zile lucrătoare</p>
+                        <p className="text-xs text-neutral-500">Comanzi oricând; de regulă în aceeași zi lucrătoare</p>
                       </div>
                     </div>
 
@@ -292,7 +292,7 @@ export default async function ExtrasCarteFunciaraPage() {
           <div className="container mx-auto px-4 max-w-[1100px] py-6 lg:py-8">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
               {[
-                { icon: Zap, value: 'Câteva minute', label: 'Eliberare automată 24/7' },
+                { icon: Zap, value: 'Max. 2 zile', label: 'Zile lucrătoare, de regulă mai repede' },
                 { icon: Landmark, value: 'ANCPI', label: 'Document OCPI' },
                 { icon: Shield, value: 'Taxe incluse', label: 'Fără cont, fără cozi' },
                 { icon: CheckCircle, value: '4.9/5', label: 'Peste 450 recenzii' },
@@ -498,7 +498,7 @@ export default async function ExtrasCarteFunciaraPage() {
                 </div>
                 <h3 className="text-lg font-bold text-secondary-900 mb-1.5">Procesare urgentă</h3>
                 <p className="text-sm text-neutral-600 leading-relaxed mb-5 flex-1">
-                  Sistemul nostru depune și emite cererile <strong>automat, 24/7</strong>. La alți operatori, urgența
+                  Depunem cererea fără taxă de urgență. La alți operatori, urgența
                   costă în plus (~19 lei + TVA).
                 </p>
                 <div className="flex items-baseline gap-2 mb-1">
@@ -624,7 +624,7 @@ export default async function ExtrasCarteFunciaraPage() {
                   <h3 className="font-bold text-secondary-900 mb-1.5">Fără taxă de urgență</h3>
                   <p className="text-sm text-neutral-700 leading-relaxed">
                     Am <strong>eliminat taxa de urgență</strong> — nu o mai percepem. Sistemul nostru depune și
-                    emite cererile <strong>automat, 24/7</strong>, deci primești extrasul cât mai repede posibil,
+                    depunem cererea fără costuri suplimentare, deci primești extrasul cât mai repede posibil,
                     fără costuri suplimentare.
                   </p>
                 </div>
@@ -659,7 +659,7 @@ export default async function ExtrasCarteFunciaraPage() {
                 </p>
                 <p>
                   Pe scurt: extrasul „gratuit” cere cont, semnătură și răbdare. Prin eGhișeul plătești{' '}
-                  <strong>{service.base_price} RON cu taxele ANCPI incluse</strong> și primești același document <strong>pe email, în câteva minute, fără cont și fără semnătură electronică</strong>.
+                  <strong>{service.base_price} RON cu taxele ANCPI incluse</strong> și primești același document <strong>pe email, fără cont și fără semnătură electronică</strong>.
                   Documentul este identic — plătești pentru timp și pentru lipsa pașilor tehnici.
                 </p>
                 <p>
@@ -723,8 +723,8 @@ export default async function ExtrasCarteFunciaraPage() {
                   {[
                     { icon: Landmark, title: 'Antet oficial ANCPI / OCPI', desc: 'Emis de Oficiul de Cadastru și Publicitate Imobiliară, cu seria și codul de înregistrare.' },
                     { icon: Shield, title: 'Semnătură electronică eIDAS', desc: 'Are aceeași valoare legală ca varianta cu ștampilă — îl folosești la notar, bancă sau în instanță.' },
-                    { icon: Search, title: 'Cod de verificare unic', desc: 'Oricine îi poate verifica autenticitatea pe portalul ANCPI (epay.ancpi.ro).' },
-                    { icon: Mail, title: 'Livrat pe email, în PDF', desc: 'Gata de printat sau trimis mai departe, în câteva minute de la plată.' },
+                    { icon: Search, title: 'Cod de verificare unic', desc: 'Are cod de verificare, iar autenticitatea se poate confirma la OCPI.' },
+                    { icon: Mail, title: 'Livrat pe email, în PDF', desc: 'Gata de printat sau trimis mai departe, imediat ce ajunge de la OCPI.' },
                   ].map((f) => (
                     <li key={f.title} className="flex items-start gap-3.5">
                       <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary-100 to-primary-200">
@@ -825,7 +825,7 @@ export default async function ExtrasCarteFunciaraPage() {
                 {[
                   ['Timp de obținere', 'Câteva minute', 'În program de lucru', 'Drum + așteptare', 'Cont + semnătură'],
                   ['Taxă de urgență', '0 RON', '~19 lei', '—', '—'],
-                  ['Disponibil 24/7', true, false, false, true],
+                  ['Comanzi oricând, inclusiv noaptea', true, false, false, true],
                   ['Cont ANCPI necesar', false, false, '—', true],
                   ['Deplasare la ghișeu', false, false, true, false],
                   ['Taxe ANCPI incluse', true, 'Variabil', 'Separat', 'Separat'],
@@ -954,7 +954,7 @@ export default async function ExtrasCarteFunciaraPage() {
         <ServiceFAQ
           title="Întrebări Frecvente — Extras de Carte Funciară"
           faqs={[
-            { q: 'Pot obține extrasul de carte funciară noaptea sau în weekend?', a: 'Da. Sistemul eGhișeul eliberează extrasul automat, 24/7 — inclusiv noaptea, sâmbăta, duminica și de sărbători. Nu depinzi de programul de lucru al vreunui operator: comanzi oricând și primești documentul pe email în câteva minute.' },
+            { q: 'Pot obține extrasul de carte funciară noaptea sau în weekend?', a: 'Comanda o poți plasa oricând — inclusiv noaptea, în weekend sau de sărbători. Cererea se depune la OCPI în prima zi lucrătoare, iar documentul ajunge pe email de regulă în aceeași zi lucrătoare, în maximum 2.' },
             { q: 'Ce este Extrasul de Carte Funciară?', a: 'Este documentul OCPI care arată situația juridică a unui imobil: proprietarul actual, suprafața, sarcinile și ipotecile. Cartea funciară este registrul public al proprietăților.' },
             { q: 'Ce înseamnă extras de carte funciară?', a: 'Extras de carte funciară înseamnă documentul care atestă situația juridică actuală a unui imobil — proprietar, suprafață, vecinătăți, sarcini și ipoteci — extras din cartea funciară ținută de OCPI/ANCPI.' },
             { q: 'De unde se scoate extrasul de carte funciară?', a: 'De la Oficiul de Cadastru și Publicitate Imobiliară (OCPI), parte din ANCPI. Prin eGhișeul îl scoți online, fără să mergi la ghișeu și fără cont ANCPI.' },
@@ -965,15 +965,15 @@ export default async function ExtrasCarteFunciaraPage() {
             { q: 'Am nevoie de numărul cadastral?', a: 'Ai nevoie de un identificator al imobilului: număr cadastral, număr de carte funciară, număr topografic sau identificator electronic ANCPI. Dacă nu îl știi, îl putem căuta după adresă sau proprietar.' },
             { q: 'Cum aflu numărul cadastral după adresă?', a: 'Numărul cadastral apare în actul de proprietate sau într-un extras CF mai vechi. Dacă ai doar adresa, prin serviciul nostru de Identificare Imobil aflăm noi numărul cadastral și de carte funciară și îți obținem extrasul.' },
             { q: 'Cât este valabil extrasul de carte funciară?', a: 'Extrasul de informare reflectă situația din ziua eliberării; notarii și băncile cer de obicei unul din ultimele 30 de zile. Extrasul de autentificare (pentru vânzare) e valabil ~10 zile lucrătoare.' },
-            { q: 'În cât timp am extrasul de carte funciară?', a: `${formatEstimatedDays(service)} în mod standard. Procesarea urgentă este inclusă gratuit — sistemul depune și emite automat, 24/7. Pentru imobile nedigitalizate poate dura puțin mai mult, în programul de lucru.` },
+            { q: 'În cât timp am extrasul de carte funciară?', a: `${formatEstimatedDays(service)} în mod standard, iar de regulă ajunge în aceeași zi lucrătoare. Procesarea urgentă este inclusă în preț, fără taxă suplimentară. Pentru imobile nedigitalizate poate dura mai mult.` },
             { q: 'Este necesar pentru vânzarea unui imobil?', a: 'Da. Notarul are nevoie de un extras de carte funciară pentru autentificare, ca să verifice proprietarul și eventualele sarcini sau ipoteci.' },
             { q: 'Cum verific dacă ipoteca a fost radiată din cartea funciară?', a: 'În Partea a III-a a extrasului (sarcini) apar ipotecile și interdicțiile. Dacă ipoteca a fost radiată, acolo este notată radierea; dacă încă figurează activă, înseamnă că nu a fost stinsă. Pentru siguranță, cere un extras emis recent.' },
             { q: 'Pentru reînnoirea cărții de identitate am nevoie de extras de carte funciară?', a: 'În anumite situații, extrasul de carte funciară poate fi cerut ca dovadă a dreptului de folosință a locuinței la schimbarea/reînnoirea actului de identitate. Verifică cerințele exacte la SPCLEP-ul local.' },
             { q: 'Ce este programul Casa Verde și ce extras îmi trebuie?', a: 'Casa Verde (Rabla pentru sisteme fotovoltaice) cere, în dosar, un extras de carte funciară recent al imobilului. Detalii în ghidul nostru dedicat: extras de carte funciară pentru Casa Verde.' },
             { q: 'Extrasul de carte funciară se actualizează automat?', a: 'Nu. Extrasul reflectă situația din ziua eliberării și nu se actualizează singur. Pentru o situație la zi, soliciți un extras nou; pentru modificări/rectificări, proprietarul se adresează biroului teritorial OCPI.' },
             { q: 'Cum verific că extrasul primit e autentic?', a: 'Pe email, ca PDF semnat electronic de OCPI, cu autenticitate verificabilă pe portalul ANCPI.' },
-            { q: 'Pot verifica intabularea unui imobil online?', a: 'Da. Cel mai simplu mod de a verifica dacă un imobil este intabulat este să soliciți un extras de carte funciară: dacă imobilul are număr cadastral și proprietar înscris, este intabulat. Prin eGhișeul primești extrasul online, în câteva minute, fără cont ANCPI.' },
-            { q: 'Care e diferența dintre extrasul gratuit de la ANCPI și cel de la eGhișeul?', a: 'Documentul este identic — același extras oficial OCPI. Diferă modul de obținere: varianta gratuită prin MyeTerra cere cont ROeID și semnătură electronică calificată (sau verificare la birou, până la 72 de ore), iar prin eGhișeul îl primești pe email în câteva minute, fără cont și fără semnătură.' },
+            { q: 'Pot verifica intabularea unui imobil online?', a: 'Da. Cel mai simplu mod de a verifica dacă un imobil este intabulat este să soliciți un extras de carte funciară: dacă imobilul are număr cadastral și proprietar înscris, este intabulat. Prin eGhișeul primești extrasul online, fără cont ANCPI.' },
+            { q: 'Care e diferența dintre extrasul gratuit de la ANCPI și cel de la eGhișeul?', a: 'Documentul este identic — același extras oficial OCPI. Diferă modul de obținere: varianta gratuită prin MyeTerra cere cont ROeID și semnătură electronică calificată (sau verificare la birou, până la 72 de ore), iar prin eGhișeul îl primești pe email în maximum 2 zile lucrătoare, fără cont și fără semnătură.' },
             { q: 'Pot obține extrasul pentru un imobil din alt județ?', a: 'Da. Obținem extrase de carte funciară pentru imobile din orice județ — ai nevoie doar de numărul cadastral sau de carte funciară și de localitate. Totul se face online.' },
             { q: 'Extrasul de carte funciară este același lucru cu cadastrul?', a: 'Nu. Cadastrul descrie tehnic imobilul (poziție, suprafață, limite), iar cartea funciară înscrie drepturile asupra lui (proprietar, sarcini, ipoteci). Extrasul CF reflectă partea juridică; ambele numere identifică același imobil.' },
           ]}

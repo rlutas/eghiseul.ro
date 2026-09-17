@@ -29,19 +29,51 @@ de zile Bing a adus 8 comenzi plătite, iar ChatGPT organic 2, fără să plăti
 | Procesare card (≈1,4% + 1 leu) | −2,25 |
 | **Marjă brută pe comandă** | **≈ 50,60** |
 
-Deci **pragul de rentabilitate e un CPA de ~50 lei, adică ~€9,90** la 5,1 lei/euro. Mai
-larg decât la constatator (≈40 lei), dar tot îngust.
+Pragul de **rentabilitate** e un CPA de ~50 lei. Dar rentabil nu înseamnă util: la 50 de lei
+reclamă pe comandă nu ne rămâne nimic.
 
-Ce înseamnă asta în clicuri, la cele două CPC-uri pe care le-am văzut pe constatator:
+🎯 **Ținta stabilită de Raul (17.09): CPA maximum 20 lei.** Adică **€3,92** la 5,1 lei/euro,
+și ne rămân ~30 de lei pe comandă. Ăsta e numărul după care se judecă totul mai jos, nu cei 50.
 
-| CPC | Clicuri per 50 lei | Conversie clic → comandă plătită necesară |
+Ce înseamnă în clicuri, la cele trei CPC-uri relevante:
+
+| CPC | Clicuri per 20 lei | Conversie clic → comandă plătită necesară |
 |---|---|---|
-| €0,57 (cheltuială ÷ clicuri) | 17,4 | **5,7%** |
-| €1,47 (Avg CPC afișat de platformă) | 6,7 | **14,9%** |
+| €0,57 (cheltuială ÷ clicuri, observat la noi) | 6,9 | **14,5%** |
+| €1,47 (Avg CPC afișat de platformă) | 2,7 | **37,5%** |
+| €3,00 (media raportată în SUA) | 1,3 | **76,5%** |
 
 Cifra de 29,7% din tabelul de sus e conversie **draft → plată**, nu clic → plată, deci nu se
 compară direct. Clic → comandă începută e necunoscuta pe care campania asta o măsoară.
 La 23 de clicuri pe constatator am avut 0 drafturi, deci nu avem încă nicio estimare.
+
+**Cum arată asta față de restul lumii.** Cea mai bună rată de conversie raportată de cineva pe
+canalul ăsta e **2,35%**, la un magazin online care a cheltuit 60.000 $. Patru teste
+independente pe servicii și lead-gen au raportat **zero** conversii. La 2,35% și un CPC de 3 $,
+o comandă ne-ar costa 115 EUR pentru 18 EUR venit. Detaliile și sursele sunt în
+`10-research-practicieni-2026-09.md`.
+
+Singurul lucru care ține aritmetica deschisă e că **noi nu plătim prețurile alea**. Pe
+constatator am plătit 13,19 € pentru 23 de clicuri, adică **0,57 € efectiv**, de cinci ori mai
+ieftin decât cei 2,77–3,50 $ raportați în SUA. România e inventar ieftin. Asta nu garantează
+nimic, dar mută pragul din „imposibil" în „de măsurat".
+
+### Verdictul onest, înainte de a cheltui un leu
+
+La CPA 20 de lei avem nevoie de **14,5% conversie din clic în comandă plătită**, și doar dacă
+CPC-ul rămâne la 0,57 €. Cea mai bună conversie raportată vreodată pe canalul ăsta e 2,35%.
+Cerem de șase ori mai mult decât recordul, pe un buget de 20 € pe zi, într-o piață fără date.
+
+Dacă CPC-ul urcă la valoarea afișată de platformă, 1,47 €, ținta devine 37,5%, ceea ce nu
+există în publicitate plătită la produse de 89 de lei.
+
+**Deci mergem cu așteptarea că pierdem bani, și cu pierderea dimensionată dinainte.** Rezultatul
+util al testului nu e un plan de scalare, ci un **nu ieftin și rapid**. Vezi criteriile de
+oprire de la secțiunea K — sunt scrise ca să oprească devreme, nu ca să justifice continuarea.
+
+Un singur lucru ar schimba calculul complet: dacă se confirmă că platforma ne facturează
+clicuri care nu ajung pe site (vezi secțiunea J), atunci CPC-ul real pe vizitator e mult mai
+mare decât 0,57 € și canalul e închis din start. Asta se află în primele 3 zile.
 
 ⚠️ Nu porni cu așteptarea că se face profit pe prima comandă. **Recurența e slabă**: din 138 de
 clienți de extras CF în 180 de zile, doar 5 au revenit, adică 3,6%. Nu e produs de abonament,
@@ -102,26 +134,28 @@ dimineață, la 946–1176 de minute. Tiparul e de om care lucrează în program
    minute" primește documentul dimineața.
 3. Costul intern crește. La marjă de 50 de lei, fiecare comandă procesată manual mănâncă din ea.
 
-**Recomandarea mea: varianta B, și campania pornește azi pe textul corectat.** Varianta A nu
-depinde de noi, iar avaria durează de 66 de zile. Cele 27 de comenzi livrate manual arată că
-serviciul funcționează; doar promisiunea e greșită.
+### ✅ Rezolvat, 17.09 — blocantul e ridicat
 
-**Decizia rămâne a lui Raul. Cele două variante:**
+Raul a confirmat termenul real: **nu se mai eliberează automat, dar documentul ajunge în
+maximum 2 zile lucrătoare, de regulă chiar în aceeași zi lucrătoare.** Asta se potrivește cu
+măsurătoarea din baza de date, și era deja adevărul din DB: `services.estimated_days = 2`,
+`estimated_days_display = "2 zile lucrătoare"`. Doar pagina de marketing rămăsese în urmă.
 
-- **Varianta A, reparăm robotul.** Nu depinde de noi: gazdele nu există în DNS. Singurele căi
-  sunt să aflăm de la ANCPI noua adresă a portalului pentru profesioniști, sau să mutăm robotul
-  pe ruta manuală pe care echipa o folosește deja de 27 de comenzi. Până atunci, varianta A nu
-  e disponibilă.
-- **Varianta B, spunem adevărul.** Înlocuim „în câteva minute, automat, 24/7" cu termenul real,
-  de tipul „de obicei în aceeași zi lucrătoare". Pierdem un argument de vânzare, dar câștigăm
-  o pagină care trece reviewul și un client care nu se simte păcălit.
+Corectate pe `/servicii/extras-de-carte-funciara/`, 19 locuri:
 
-Anunțurile din secțiunea E sunt scrise deliberat **fără nicio promisiune de timp**, ca să fie
-valabile în ambele variante.
+- titlul paginii, „Online în 5 Minute — Automat, 24/7" → „pe Email în Max. 2 Zile Lucrătoare";
+- meta description, descrierea din schema, eroul, lista de pași, cardul de livrare, statistica
+  „Câteva minute / Eliberare automată 24/7", secțiunea de urgență, comparativul, 3 întrebări
+  din FAQ;
+- „**Eliberăm** extrase de carte funciară" → „**Obținem**". Noi obținem, instituția eliberează;
+- „verifică autenticitatea pe portalul ANCPI (epay.ancpi.ro)" → formulare fără domeniul mort.
 
-> ✅ Reparat deja, 17.09: întrebarea din FAQ „Pot obține extrasul pentru un imobil din alt
-> județ?" începea cu „**Eliberăm** extrase de carte funciară". Noi obținem, instituția
-> eliberează. Schimbat în „Obținem".
+Rămân de curățat separat, în afara campaniei: referințele la `myeterra.ancpi.ro` din pagina de
+serviciu și din `/extras-carte-funciara-gratuit/`. Domeniul nu mai există, deci descriem o
+alternativă gratuită care nu mai e accesibilă.
+
+Anunțurile din secțiunea F rămân **fără nicio promisiune de timp**: dacă robotul revine,
+textele nu trebuie rescrise.
 
 ## D. Structura
 
@@ -175,25 +209,39 @@ are șanse mari să nu plătească 89 de lei. Se pornește ultimul și se judec�
 
 ## F. Anunțuri
 
-Titlu ≤ 50 caractere, descriere ≤ 100, esențialul în primele 24 respectiv 48.
+Limitele tehnice sunt 50 de caractere la titlu și 100 la descriere, **dar cardul taie mult mai
+devreme: pe la 24, respectiv 48**. Vezi `10-research-practicieni-2026-09.md`, secțiunea 3 — e
+cea mai ieftină îmbunătățire raportată pe canal, un practician raportează dublarea CTR-ului
+doar din rescrierea textului ca să încapă înainte de tăietură.
+
+Deci coloana care contează e „ce se vede", nu numărul total de caractere. Textele de mai jos
+sunt construite invers: mesajul se termină înainte de caracterul 24, restul e bonus.
+
 **Niciunul nu promite un termen de livrare**, din motivul de la secțiunea C.
 
-| # | Titlu | Caractere |
-|---|---|---|
-| T1 | Extras de carte funciară pe email | 33 |
-| T2 | Extras carte funciară, 89 lei | 29 |
-| T3 | Cine e proprietarul? Extras CF | 30 |
-| T4 | Verifici un imobil? Extras CF online | 36 |
-| T5 | Extras CF fără cont ANCPI | 25 |
-| T6 | Extras de carte funciară online | 31 |
+| # | Titlu | Total | Ce se vede realist |
+|---|---|---|---|
+| T1 | Extras carte funciară online | 28 | „Extras carte funciară on" |
+| T2 | Extras CF, 89 lei, pe email | 27 | „Extras CF, 89 lei, pe em" |
+| T3 | Cine e proprietarul imobilului? | 31 | „Cine e proprietarul imob" |
+| T4 | eGhișeul: extras carte funciară | 31 | „eGhișeul: extras carte f" |
+| T5 | Extras CF fără cont ANCPI | 25 | „Extras CF fără cont ANCP" |
+| T6 | 89 lei: extras carte funciară | 29 | „89 lei: extras carte fun" |
 
-| # | Descriere | Caractere |
-|---|---|---|
-| D1 | Completezi numărul cadastral, plătești, primești extrasul pe email. Taxe ANCPI incluse. | 87 |
-| D2 | Proprietar, suprafață, sarcini și ipoteci. 89 lei, taxe incluse. Serviciu privat. | 81 |
-| D3 | Fără cont ANCPI, fără semnătură electronică, fără drum la ghișeu. 89 lei, pe email. | 83 |
-| D4 | Ai nevoie de numărul cadastral sau CF și localitatea. Restul îl facem noi. 89 lei. | 82 |
-| D5 | Pentru notar, bancă sau vânzare. Extrasul CF pe email, 89 lei cu taxele incluse. | 80 |
+T4 e acolo ca test deliberat: în singurul test controlat publicat, titlul care începe cu
+numele brandului a bătut varianta fără brand, 1,1% față de 1,0% CTR, la un CPC mai mic. E
+invers față de obiceiul din Google Search, deci merită verificat pe noi.
+
+| # | Descriere | Total | Ce se vede realist |
+|---|---|---|---|
+| D1 | Numărul cadastral, plata, extrasul pe email. Taxe ANCPI incluse, 89 lei. | 72 | „Numărul cadastral, plata, extrasul pe email. Tax" |
+| D2 | Proprietar, suprafață, sarcini, ipoteci. 89 lei, taxe ANCPI incluse. | 68 | „Proprietar, suprafață, sarcini, ipoteci. 89 lei," |
+| D3 | Fără cont ANCPI și fără drum la ghișeu. 89 lei, taxele incluse. Serviciu privat. | 80 | „Fără cont ANCPI și fără drum la ghișeu. 89 lei, " |
+| D4 | Pentru notar, bancă sau vânzare. 89 lei, taxe incluse, documentul pe email. | 75 | „Pentru notar, bancă sau vânzare. 89 lei, taxe in" |
+| D5 | Ai doar numărul cadastral? Ajunge. 89 lei, taxe ANCPI incluse, pe email. | 72 | „Ai doar numărul cadastral? Ajunge. 89 lei, taxe " |
+
+Numărătoarea e verificată programatic, pe caractere Unicode, nu din ochi: diacriticele contează
+ca un caracter, dar în română 24 de caractere înseamnă trei cuvinte.
 
 Nume advertiser: **eGhișeul.ro**.
 
@@ -242,7 +290,16 @@ redirect; varianta fără slash dă 308 care păstrează query-ul.
   plătim tot inventarul.
 - Bid de pornire **€1,95**. Sub ~€1,95 Ads Manager a arătat „May not deliver" pe constatator, iar
   CPC-ul real a ieșit oricum mult sub bid (€13,19 pe 23 de clicuri = €0,57 efectiv).
+  ⚠️ Practicienii din SUA descriu un prag de livrare pe la 3 $ sub care afișările dispar tăcut,
+  iar un practician din UE spune că a avut o afișare pe zi până a urcat biduri de 8 ori. **Pe noi
+  nu s-a confirmat**: la €1,95 livrăm, și plătim o treime din bid. Dacă extrasul CF nu livrează
+  în 3 zile, prima mișcare e bidul, nu textul.
 - Buget **€20/zi**, fără dată de final. Nu se crește în primele 7 zile, indiferent de rezultate.
+  ⚠️ **Bugetul zilnic e o medie pe 7 zile, nu un plafon.** Poate lua **2× într-o zi și 7× într-o
+  săptămână**, deci €40 mâine și €140 săptămâna asta. Explică parțial de ce pe constatator
+  cardul a fost debitat cu €15 plus un sold de €10,63 în timp ce raportul arăta €13,19.
+  Și **nu** pune buget total pe campanie ca metodă de frânare: e limită de cheltuială, nu de
+  ritm, iar un advertiser din SUA a consumat 500 $ de buget total în circa o oră.
 - Fereastra de atribuire pe coloane: **30 de zile clic, 0 zile view**, ca să se potrivească cu
   evenimentul `order_created` care e deja configurat pe 30 de zile.
 
@@ -261,13 +318,18 @@ where attribution::text ilike '%extras-cf-2026-09%'
 order by created_at desc;
 ```
 
-Trei lucruri se urmăresc, în ordine:
+Patru lucruri se urmăresc, în ordine:
 
-1. **Apar drafturi?** Pe constatator, 23 de clicuri au dat 0 drafturi. Primul semn că
-   extrasul e altfel e un draft cu `utm_campaign=extras-cf-2026-09`. Până acolo, nu discutăm CPA.
-2. **Vine `oppref`?** Dacă un draft are `oai_ref` dar nu `oppref`, adăugarea automată a OpenAI
+1. 🔴 **Clicurile facturate ajung pe site?** Zilnic, de la prima zi: numărul de clicuri din
+   Ads Manager față de sesiunile cu referrer `chatgpt.com` din Vercel Analytics. Două conturi
+   independente din SUA au găsit că doar 13%, respectiv ~35% din clicurile facturate ajungeau
+   la ei. Dacă diferența trece de 30%, oprim. Asta explică și cele 23 de clicuri fără niciun
+   draft de pe constatator, mult mai bine decât „n-a vrut nimeni să comande".
+2. **Apar drafturi?** Primul semn că extrasul e altfel e un draft cu
+   `utm_campaign=extras-cf-2026-09`. Până acolo, nu discutăm CPA.
+3. **Vine `oppref`?** Dacă un draft are `oai_ref` dar nu `oppref`, adăugarea automată a OpenAI
    nu ajunge la noi și atribuirea lor pe clic nu se va închide niciodată.
-3. **CPA real**, abia după primele comenzi plătite.
+4. **CPA real**, abia după primele comenzi plătite, comparat cu ținta de 20 de lei.
 
 ⚠️ Cifrele din platformă nu se iau de bune în primele zile. Pe constatator, „Spend" arăta €13,19
 în timp ce cardul fusese debitat cu €15 plus un sold de €10,63, iar „Avg CPC" arăta €1,47 deși
@@ -282,18 +344,32 @@ aplicațiile și rămânem pe web.
 
 Se evaluează la **ziua 14**, sau mai devreme dacă se atinge un prag.
 
+Pierderea maximă acceptată pentru tot testul: **€100**, adică 5 zile la €20. Nu se depășește
+fără o comandă plătită atribuită.
+
 | Situație | Acțiune |
 |---|---|
-| CPA ≤ 35 lei | scalăm: buget €40/zi, pornim AG2 și AG3 |
-| CPA 35–50 lei | ținem €20/zi încă 14 zile, adăugăm AG2 (notar/bancă, intenție mai comercială) |
-| CPA > 50 lei | sub pragul de rentabilitate: oprim AG-ul respectiv |
-| ≥ 150 clicuri și 0 comenzi plătite | oprim campania și scriem concluzia aici; înseamnă că traficul din ChatGPT nu cumpără documente la 89 de lei, ceea ce e un răspuns valoros și pentru constatator |
-| 0 afișări după 3 zile | urcăm bidul la €3 pentru 3 zile; dacă tot nimic, notăm „nu se livrează la marja noastră" |
+| CPA ≤ 20 lei | ținta e atinsă: buget €40/zi, pornim AG2 |
+| CPA 20–35 lei | rentabil dar sub țintă: ținem €20/zi încă 7 zile și tăiem din CPC (bid mai mic, text pe trunchiere) |
+| CPA 35–50 lei | mai bine decât nimic, dar nu e afacere: doar dacă restul semnalelor sunt bune |
+| CPA > 50 lei | sub pragul de rentabilitate: oprim AG-ul |
+| **100 clicuri și 0 comenzi plătite** | **oprim.** La 14,5% țintă, 100 de clicuri fără nicio comandă închid discuția statistic |
+| **Clicurile facturate depășesc sesiunile verificate cu peste 30%** | **oprim imediat.** Plătim trafic care nu ajunge la noi; niciun text nu repară asta |
+| 0 afișări după 3 zile | urcăm bidul la €3 pentru 3 zile; dacă tot nimic, notăm „nu se livrează la marja noastră" și oprim |
+
+Al doilea criteriu e cel mai important și cel mai ușor de ratat. Două conturi independente din
+SUA au măsurat că doar **13%**, respectiv **~35%** din clicurile facturate au ajuns efectiv pe
+site. Dacă și la noi e așa, CPC-ul real pe vizitator nu e 0,57 € ci 1,6–4,4 €, iar canalul e
+închis indiferent ce scriem în anunț.
 
 ## L. Checklist înainte de pornire
 
-- [ ] 🔴 Decizia de la secțiunea C: reparăm robotul ANCPI **sau** corectăm promisiunea de timp
-- [ ] Verifică `ancpi_jobs` — dacă tot `NEEDS_OPERATOR`, varianta B e obligatorie
+- [x] Promisiunea de timp corectată pe landing (secțiunea C)
+- [x] `OAI-AdsBot/1.0` nu e blocat — testat 17.09, întoarce HTTP 200 pe pagina de serviciu, cu
+      același conținut ca un browser. `robots.txt` nu are regulă pe el, deci intră pe `User-Agent: *`
+      care permite `/servicii/`. De reverificat dacă se adaugă vreodată WAF sau rate-limiting
+- [x] Imaginea 1024×1024 generată, fără însemne ANCPI
+- [x] Textele scrise pe pragul de trunchiere, nu pe limita de caractere
 - [ ] Creează campania `OAI_Click_ExtrasCF_2026-09`, Clicks, România, €20/zi
 - [ ] Text customization **Off** (altfel platforma rescrie anunțul fără reviewul nostru)
 - [ ] AG1 cu hint-ul din D, `Link` + `Tracking parameters` din H
