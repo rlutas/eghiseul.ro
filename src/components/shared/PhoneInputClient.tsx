@@ -2,6 +2,7 @@
 
 import { PhoneInput as ReactPhoneInput } from 'react-international-phone';
 import 'react-international-phone/style.css';
+import { stripTrunkZero } from '@/lib/format/phone-trunk-zero';
 
 interface Props {
   value: string;
@@ -25,7 +26,11 @@ export function PhoneInputClient({ value, onChange }: Props) {
         'ch',
       ]}
       value={value}
-      onChange={onChange}
+      // The field already shows „+40 ", and people type their number the way
+      // they say it: 0712 345 678. The library keeps that zero, so what we
+      // store is +400712345678 — a number that reaches nobody when the courier
+      // dials it. Dropped here, once, for every form that uses this field.
+      onChange={(phone) => onChange(stripTrunkZero(phone))}
       forceDialCode
       disableDialCodePrefill
       className="!flex !gap-0"

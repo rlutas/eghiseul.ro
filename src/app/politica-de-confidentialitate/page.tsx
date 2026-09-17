@@ -59,7 +59,14 @@ export default function Page() {
         <h3>c) Documente și imagini</h3>
         <ul>
           <li>Copie/scan act de identitate (CI/pașaport).</li>
-          <li>Fotografie de verificare (selfie cu actul) — acolo unde verificarea identității este necesară.</li>
+          <li>
+            Fotografie de verificare (selfie cu actul) — acolo unde verificarea identității este
+            necesară. Este o <strong>dată biometrică</strong>, categorie specială de date
+            (art. 9 GDPR): o folosim exclusiv ca să confirmăm că cel care comandă este titularul
+            actului, o comparăm cu fotografia de pe act și nu o folosim pentru identificare
+            automată în alt scop. În contul clientului comparația este făcută automat de Google
+            (Gemini); la comenzile plasate prin formular, comparația o face un angajat al nostru.
+          </li>
           <li>Documente justificative ale firmei sau ale imobilului, după caz.</li>
         </ul>
         <h3>d) Semnătura electronică</h3>
@@ -140,7 +147,15 @@ export default function Page() {
         <ul>
           <li><strong>Date contractuale și ale comenzilor:</strong> pe durata executării contractului + 3 ani de arhivare (termene de prescripție).</li>
           <li><strong>Documente fiscale (facturi):</strong> 5 ani, conform legislației fiscale.</li>
-          <li><strong>Documente încărcate (act de identitate, fotografie de verificare):</strong> se șterg în termen de 30 de zile de la livrarea documentului solicitat.</li>
+          <li>
+            <strong>Documente încărcate (act de identitate, fotografie de verificare):</strong>{' '}
+            pe durata executării contractului + 3 ani de la finalizarea comenzii, împreună cu
+            dosarul comenzii. Le păstrăm pentru că trebuie să putem dovedi, la cererea instituțiilor
+            sau a organelor de control, că am verificat identitatea persoanei pentru care am depus
+            cererea, și pentru apărarea unui drept în instanță (art. 17 alin. 3 lit. b și e GDPR).
+            Poți cere ștergerea oricând, iar dacă niciuna dintre obligațiile de mai sus nu se mai
+            aplică, o facem.
+          </li>
           <li><strong>Contracte semnate electronic:</strong> 3 ani de la finalizarea comenzii.</li>
           <li><strong>Date analitice:</strong> până la 14 luni.</li>
         </ul>

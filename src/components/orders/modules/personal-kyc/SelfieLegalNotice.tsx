@@ -13,11 +13,18 @@
  *  - 90 days is `KYC_VALIDITY_DAYS` (src/lib/kyc/constants.ts). It is how long
  *    a stored document is REUSED without asking again — it is NOT a deletion
  *    deadline, and this text must not present it as one. Nothing in the
- *    codebase deletes a selfie on a timer: `deleteKycVerification`
- *    (src/lib/aws/s3.ts) has zero callers, `anonymize_expired_drafts`
- *    (migration 009) only touches UNPAID drafts and runs only when an admin
- *    presses the button in Settings, and no cron in `vercel.json` covers it.
- *    Do not write "we delete it after N days" until such a mechanism exists.
+ *    application code deletes a selfie on a timer: `deleteKycVerification`
+ *    (src/lib/aws/s3.ts) has zero callers and `anonymize_expired_drafts`
+ *    (migration 009) only touches UNPAID drafts, on a manual button.
+ *
+ *  - The three years come from the retention decided on 17.09.2026 and written
+ *    into the privacy policy: the order file, including the identity document
+ *    and the selfie, is kept for the duration of the contract plus three years,
+ *    because we have to be able to prove to a control body that we verified the
+ *    identity of the person whose request we filed (GDPR art. 17(3)(b) and (e)).
+ *    Enforcement is the S3 lifecycle rule on the `kyc/` prefix
+ *    (`docs/deployment/AWS_S3_SETUP.md`, 1095 days) — if that rule is ever
+ *    removed from the bucket, this sentence stops being true.
  *
  *  - `matching` is not decoration. The ACCOUNT compares the two faces through
  *    Gemini (KYCTab → `runFaceMatch` → `/api/kyc/validate` →
@@ -102,8 +109,9 @@ export function SelfieLegalNotice({ matching, className }: SelfieLegalNoticeProp
             <span className="font-medium text-secondary-900">Cât o păstrăm.</span>{' '}
             90 de zile o refolosim, ca să nu ți-o cerem din nou la o comandă
             următoare. După 90 de zile îți cerem una nouă. Poza rămâne la dosarul
-            comenzii, împreună cu celelalte documente ale ei, iar ștergerea o poți
-            cere oricând la{' '}
+            comenzii 3 ani de la finalizarea ei, fiindcă trebuie să putem dovedi la
+            control că am verificat identitatea persoanei pentru care am depus
+            cererea. Ștergerea o poți cere oricând la{' '}
             <a
               href="mailto:contact@eghiseul.ro"
               className="font-medium text-primary-600 underline underline-offset-2 hover:text-primary-700"
