@@ -7,7 +7,7 @@
  * Tabs: Profil | KYC | Adrese | Facturare | Comenzi
  */
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import {
   User,
@@ -54,12 +54,28 @@ export default function AccountTabs({ initialTab = 'profile', className }: Accou
   const tabFromUrl = searchParams.get('tab') as TabId | null;
   const [activeTab, setActiveTab] = useState<TabId>(tabFromUrl || initialTab);
 
+  // `?edit=1` means the customer arrived from the profile checklist, which asks
+  // for one specific thing. Landing them on a read-only tab with the form still
+  // behind an "Editează"/"Adaugă" button makes the checklist row look broken —
+  // it was the first thing reported after it shipped. The tab opens straight
+  // into the form instead.
+  const autoEdit = searchParams.get('edit') === '1';
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // …and the tabs sit BELOW the checklist, so without this the page does not
+  // visibly move when a row is tapped, on a phone especially.
+  useEffect(() => {
+    if (!autoEdit) return;
+    containerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, [autoEdit, activeTab]);
+
   // Handle tab change
   const handleTabChange = useCallback((tabId: TabId) => {
     setActiveTab(tabId);
     // Update URL without full navigation
     const params = new URLSearchParams(searchParams.toString());
     params.set('tab', tabId);
+    params.delete('edit');
     router.replace(`/account?${params.toString()}`, { scroll: false });
   }, [router, searchParams]);
 
@@ -67,15 +83,15 @@ export default function AccountTabs({ initialTab = 'profile', className }: Accou
   const renderTabContent = () => {
     switch (activeTab) {
       case 'profile':
-        return <ProfileTab />;
+        return <ProfileTab autoEdit={autoEdit} />;
       case 'kyc':
         return <KYCTab />;
       case 'addresses':
-        return <AddressesTab />;
+        return <AddressesTab autoEdit={autoEdit} />;
       case 'vehicles':
         return <VehiclesTab />;
       case 'billing':
-        return <BillingTab />;
+        return <BillingTab autoEdit={autoEdit} />;
       case 'orders':
         return <OrdersTab />;
       default:
@@ -84,7 +100,7 @@ export default function AccountTabs({ initialTab = 'profile', className }: Accou
   };
 
   return (
-    <div className={cn('space-y-6', className)}>
+    <div ref={containerRef} className={cn('space-y-6', className)}>
       {/* Tab Navigation */}
       <div className="bg-white rounded-2xl border border-neutral-200 p-1.5">
         <nav className="flex gap-1 overflow-x-auto">

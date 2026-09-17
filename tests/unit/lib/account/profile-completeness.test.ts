@@ -59,6 +59,16 @@ describe('profileCompleteness', () => {
     }
   });
 
+  it('opens the form directly on the tabs that hide it behind a button', () => {
+    // Landing on a read-only tab makes the checklist row look broken — reported
+    // as soon as it shipped. KYC is exempt: that tab IS the uploader.
+    const steps = profileCompleteness(EMPTY).steps;
+    for (const id of ['contact', 'personal', 'address', 'billing']) {
+      expect(steps.find((s) => s.id === id)?.href, id).toContain('edit=1');
+    }
+    expect(steps.find((s) => s.id === 'identity')?.href).not.toContain('edit=1');
+  });
+
   it('phrases the benefit for the customer, never as a restriction', () => {
     for (const step of profileCompleteness(EMPTY).steps) {
       expect(step.benefit, step.id).not.toMatch(/nu po[țt]i|obligatoriu|necesar pentru a comanda/i);

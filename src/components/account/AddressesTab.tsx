@@ -24,10 +24,16 @@ import AddressForm, { type AddressData } from '@/components/shared/AddressForm';
 import { useAddresses } from '@/hooks/useAddresses';
 
 interface AddressesTabProps {
+  /**
+   * Arrived from the profile checklist, which asks for one specific thing —
+   * open the form straight away instead of behind another button.
+   */
+  autoEdit?: boolean;
+
   className?: string;
 }
 
-export default function AddressesTab({ className }: AddressesTabProps) {
+export default function AddressesTab({ className, autoEdit = false }: AddressesTabProps) {
   const {
     addresses,
     isLoading,
@@ -38,7 +44,7 @@ export default function AddressesTab({ className }: AddressesTabProps) {
     setDefault,
   } = useAddresses();
 
-  const [showForm, setShowForm] = useState(false);
+  const [showForm, setShowForm] = useState(autoEdit);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState<Partial<AddressData>>({
     country: 'RO',

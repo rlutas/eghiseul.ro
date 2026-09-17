@@ -72,35 +72,35 @@ export function profileCompleteness(input: ProfileInput): ProfileCompleteness {
       label: 'Telefon de contact',
       benefit: 'Te sunăm doar dacă apare ceva de lămurit la comandă.',
       done: filled(input.phone),
-      href: '/account/?tab=profile',
+      href: '/account/?tab=profile&edit=1',
     },
     {
       id: 'personal',
       label: 'Date personale',
       benefit: 'Nume, CNP și data nașterii — completate automat la fiecare comandă.',
       done: filled(input.firstName) && filled(input.lastName) && filled(input.cnp),
-      href: '/account/?tab=profile',
+      href: '/account/?tab=profile&edit=1',
     },
     {
       id: 'identity',
       label: 'Act de identitate',
       benefit: 'Nu mai încarci actul la fiecare comandă.',
       done: hasIdentityDocuments(kyc),
-      href: '/account/?tab=kyc',
+      href: '/account/?tab=kyc',  // the KYC tab is its own uploader, already open
     },
     {
       id: 'address',
       label: 'Adresă de livrare',
       benefit: 'Alegi adresa dintr-o listă, în loc să o scrii de fiecare dată.',
       done: (input.savedAddressCount ?? 0) > 0,
-      href: '/account/?tab=addresses',
+      href: '/account/?tab=addresses&edit=1',
     },
     {
       id: 'billing',
       label: 'Date de facturare',
       benefit: 'Factura se emite pe datele salvate, fără să le mai introduci.',
       done: (input.billingProfileCount ?? 0) > 0,
-      href: '/account/?tab=billing',
+      href: '/account/?tab=billing&edit=1',
     },
   ];
 

@@ -58,14 +58,20 @@ interface ProfileData {
 type ProfileSubTab = 'pf' | 'pj';
 
 interface ProfileTabProps {
+  /**
+   * Arrived from the profile checklist, which asks for one specific thing —
+   * open the form straight away instead of behind another button.
+   */
+  autoEdit?: boolean;
+
   initialData?: ProfileData;
   className?: string;
 }
 
-export default function ProfileTab({ initialData, className }: ProfileTabProps) {
+export default function ProfileTab({ initialData, className, autoEdit = false }: ProfileTabProps) {
   const [profile, setProfile] = useState<ProfileData | null>(initialData || null);
   const [isLoading, setIsLoading] = useState(!initialData);
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditing, setIsEditing] = useState(autoEdit);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);

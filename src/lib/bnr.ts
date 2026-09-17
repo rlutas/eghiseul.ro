@@ -18,9 +18,26 @@ export interface BnrData {
 
 const FALLBACK_EUR = 5.07;
 
+/**
+ * Both calls go to bnr.ro, which we do not control, and they run at BUILD time
+ * (`export const revalidate = 3600` on /curs-valutar). `fetch` has no default
+ * timeout, so a hung connection is not an error the catch block below can see —
+ * it just sits there until Next's 60-second per-page budget expires. That is
+ * what failed the deploy on 2026-09-17: three 60s attempts on /curs-valutar,
+ * then `Export encountered an error … exiting the build`, four minutes gone and
+ * nothing shipped, over a page showing exchange rates.
+ *
+ * With a timeout the fetch rejects, the catch returns the fallback, and the page
+ * builds with stale-but-present data instead of taking the whole deploy down.
+ */
+const BNR_TIMEOUT_MS = 8000;
+
 export async function getBnrRates(): Promise<BnrData> {
   try {
-    const res = await fetch('https://www.bnr.ro/nbrfxrates.xml', { next: { revalidate: 3600 } });
+    const res = await fetch('https://www.bnr.ro/nbrfxrates.xml', {
+      next: { revalidate: 3600 },
+      signal: AbortSignal.timeout(BNR_TIMEOUT_MS),
+    });
     if (!res.ok) throw new Error(`bnr ${res.status}`);
     const xml = await res.text();
     const date = xml.match(/<Cube date="([\d-]+)">/)?.[1] ?? null;
@@ -36,7 +53,8 @@ export async function getBnrRates(): Promise<BnrData> {
     }
     const eur = rates.find((r) => r.currency === 'EUR')?.value ?? FALLBACK_EUR;
     return { date, rates, eur };
-  } catch {
+  } catch (err) {
+    console.error('BNR rates unavailable, using fallback:', err instanceof Error ? err.message : err);
     return { date: null, rates: [], eur: FALLBACK_EUR };
   }
 }
@@ -49,7 +67,10 @@ export interface BnrHistory {
 /** Istoricul pe 10 zile (bnr.ro/nbrfxrates10days.xml) pentru variație + grafice. */
 export async function getBnrHistory(): Promise<BnrHistory> {
   try {
-    const res = await fetch('https://www.bnr.ro/nbrfxrates10days.xml', { next: { revalidate: 3600 } });
+    const res = await fetch('https://www.bnr.ro/nbrfxrates10days.xml', {
+      next: { revalidate: 3600 },
+      signal: AbortSignal.timeout(BNR_TIMEOUT_MS),
+    });
     if (!res.ok) throw new Error(`bnr ${res.status}`);
     const xml = await res.text();
     const cubeRe = /<Cube date="([\d-]+)">([\s\S]*?)<\/Cube>/g;
@@ -70,7 +91,8 @@ export async function getBnrHistory(): Promise<BnrHistory> {
       }
     }
     return { dates, series };
-  } catch {
+  } catch (err) {
+    console.error('BNR history unavailable:', err instanceof Error ? err.message : err);
     return { dates: [], series: {} };
   }
 }

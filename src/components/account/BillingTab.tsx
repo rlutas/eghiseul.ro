@@ -26,6 +26,12 @@ import BillingProfileForm, { type BillingData } from '@/components/shared/Billin
 import { useBillingProfiles } from '@/hooks/useBillingProfiles';
 
 interface BillingTabProps {
+  /**
+   * Arrived from the profile checklist, which asks for one specific thing —
+   * open the form straight away instead of behind another button.
+   */
+  autoEdit?: boolean;
+
   className?: string;
   prefillFromId?: {
     firstName?: string;
@@ -35,7 +41,7 @@ interface BillingTabProps {
   };
 }
 
-export default function BillingTab({ className, prefillFromId }: BillingTabProps) {
+export default function BillingTab({ className, prefillFromId, autoEdit = false }: BillingTabProps) {
   const {
     profiles,
     isLoading,
@@ -46,7 +52,7 @@ export default function BillingTab({ className, prefillFromId }: BillingTabProps
     setDefault,
   } = useBillingProfiles();
 
-  const [showForm, setShowForm] = useState(false);
+  const [showForm, setShowForm] = useState(autoEdit);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState<Partial<BillingData>>({
     type: 'persoana_fizica',
