@@ -1,0 +1,4 @@
+# CodeGraph local index + daemon unix socket. `vercel --prod` (CLI upload)
+# walks the tree and dies on the socket: "Unknown system error -102, open
+# .codegraph/daemon.sock" (2026-09-17). Git-based deploys never saw it.
+.codegraph/
