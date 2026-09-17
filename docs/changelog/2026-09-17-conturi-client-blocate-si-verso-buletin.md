@@ -171,12 +171,30 @@ link: .../auth/v1/verify?...&redirect_to=https://eghiseul.ro   ← nu mai e loca
 Bounce-ul de la adresa de test e normal: `test.cont.…@eghiseul.ro` nu e cutie
 poștală reală.
 
-### Șabloanele de email, rescrise în română
+### Șabloanele de email, rescrise în română și cu design propriu
 
-Confirmare cont, resetare parolă și schimbare adresă folosesc acum aceeași
-identitate vizuală ca restul emailurilor (`src/lib/email/templates/branded-layout.ts`:
-antet bleumarin cu sigla, buton auriu, subsol cu datele firmei și mențiunea de
-neafiliere), cu text în română și explicația că nu e nevoie de cont ca să comanzi.
+Cinci șabloane (confirmare cont, resetare parolă, schimbare adresă, magic link,
+invitație) în `src/lib/email/templates/supabase-auth.ts`: antet bleumarin cu
+sigla, pastilă rotundă cu pictogramă, titlu și explicație în română, buton auriu,
+linkul repetat ca text copiabil (unele aplicații de mail taie butoanele), casetă
+cu dungă aurie pentru valabilitate și „dacă nu ai cerut tu", subsol cu datele
+firmei, ANPC/SOL și mențiunea de neafiliere. Layout pe tabele, stiluri inline,
+verificat până la 380px. Sincronizate cu
+`npx tsx scripts/sync-supabase-auth-templates.ts` (`--check` raportează derapaje
+față de sursă).
+
+🔴 **Capcană, ne-a costat ~15 minute de diagnostic greșit:** un PATCH pe
+Management API **stochează** șabloanele dar **nu le activează**. GoTrue continuă
+să trimită variantele vechi, iar dashboardul arată conținutul nou cu „Save
+changes" dezactivat — adică stocat, nu aplicat. Nouă minute și cinci trimiteri de
+test după un PATCH reușit, emailurile erau tot cele englezești implicite.
+
+Soluția: în dashboard → Authentication → Emails → Templates → orice șablon, faci o
+modificare minimă (un spațiu în Subject ajunge), apeși **Save changes**, apoi o
+anulezi și salvezi din nou. Acea salvare reîncarcă **toată** configurația de
+auth, deci o singură salvare aplică toate șabloanele — confirmat: un email de
+resetare parolă a preluat subiectul nou imediat după o salvare făcută pe șablonul
+de confirmare.
 
 ## Rămâne de făcut
 

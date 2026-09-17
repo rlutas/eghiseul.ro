@@ -8,8 +8,20 @@
  * https://supabase.com/dashboard/account/tokens — they expire, so a 401 here
  * usually means "generate a new one", not "wrong project").
  *
- * GoTrue does not pick the change up instantly; allow a few minutes before
- * judging a send by the old template.
+ * ⚠️ A PATCH here STORES the templates but does NOT make them live. GoTrue keeps
+ * serving the previous ones until the auth config is reloaded, and the
+ * Management API does not trigger that reload. Measured on 2026-09-17: nine
+ * minutes and five test sends after a successful PATCH, mails still used the old
+ * English defaults, while the dashboard showed the new content with "Save
+ * changes" disabled — i.e. stored, not applied.
+ *
+ * After running this, open
+ *   https://supabase.com/dashboard/project/<ref>/auth/templates/confirm-sign-up
+ * make any edit (a trailing space in Subject is enough), click **Save changes**,
+ * then undo it and save again. That save reloads the whole auth config, so ONE
+ * of them applies every template at once — no need to repeat it per template.
+ * Confirmed by a password-reset mail picking up its new subject right after a
+ * save made on the confirmation template.
  */
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
