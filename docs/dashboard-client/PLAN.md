@@ -289,6 +289,18 @@ Ce poate spune contul și nu poate spune nimeni altcineva: **„cazierul tău ex
 în 180 de zile"**, „actul tău e deja validat", „a doua comandă e un clic".
 Infrastructura de expirări există deja (`lifecycle-emails-live`).
 
+**Livrat pe 17.09.2026** —
+[changelog](../changelog/2026-09-17-dashboard-comenzi-card.md). Ce s-a găsit
+făcând-o: cardul putea să-și calculeze singur termenul din `estimated_days`, în
+timp ce pagina comenzii îl calculează prin calculatorul cu sărbători, urgență și
+tampon — două date diferite pentru aceeași comandă. Lista folosește acum aceeași
+sursă. Iar la orice eroare de API, lista de comenzi afișa clientului
+„[object Object]".
+
+Rămâne din Faza 4 mesajul de expirare din cont („cazierul tău expiră în 180 de
+zile"): infrastructura există în `lifecycle-emails-live`, dar nu e adusă în
+ecran.
+
 ## 5. Ce NU propun
 
 - **Nu mutăm KYC-ul după plată.** Datele spun că nu acolo se pierd oamenii: pasul
@@ -320,12 +332,32 @@ Infrastructura de expirări există deja (`lifecycle-emails-live`).
 | D6 | Facem Faza 0 înainte de orice ecran nou? | **Da.** |
 | D7 | Selfie-ul rămâne? | **Da** — e verificarea că cel care înregistrează contul sau aplică e chiar clientul. Rămâne doar pe cele 11 servicii care îl cer, nu în cont pentru toți. |
 | D8 | Datele din act se pot folosi la facturare? | **Da**, la alegerea clientului, cu un comutator. Implicit oprit. |
+| D4 | Câte stări vede clientul din cele interne? | **Toate**, dar nu toate la fel. Vezi mai jos. |
 
-### Rămase
+### D4, luată pe 17.09.2026
 
-| # | Decizia | De ce contează |
-|---|---|---|
-| D4 | Câte stări vede clientul din cele 17 interne? | Prea multe = zgomot; prea puține = „în așteptare" pentru tot, ce aveam înainte. De stabilit când ajungem la cardul de comandă. |
+Clientul vede **eticheta reală a fiecărui status**, nu o mulțime redusă. Motivul
+e că munca de traducere s-a făcut deja: `customer-status.ts` scrie toate cele 24
+de stări în limbajul clientului (20 în lista operatorului, plus cele patru de
+dinainte de plată), iar ascunderea lor ne întoarce exact la ce
+aveam înainte — „În așteptare" pentru o comandă plătită, depusă la instituție și
+expediată deopotrivă.
+
+Ce se reduce nu e lista, ci **accentul**. Cardul răspunde la trei întrebări, iar
+a doua are voie să strige:
+
+1. *Unde e?* — eticheta + cine ține comanda acum (noi / instituția / tu) +
+   termenul ca dată. `on_hold_institution` spune că termenul e pe pauză, nu
+   inventează o dată.
+2. *Trebuie să fac ceva?* — accentuat doar când chiar blochează lucrul. Sunt
+   patru stări din 22, și una singură dintre ele e „vie": `standby`, unde stau
+   azi 15 comenzi.
+3. *Unde-mi sunt documentele?* — descărcare directă, plus factura.
+
+Termenul are două surse, în ordinea asta: data pusă de echipă pe comandă
+(`estimated_completion_date`, prezentă pe 234 din 439 de comenzi plătite în 120
+de zile) și, în lipsa ei, plata + termenul serviciului. Când nu se poate calcula
+nimic onest, nu se afișează nicio dată.
 
 ## 7. Surse
 

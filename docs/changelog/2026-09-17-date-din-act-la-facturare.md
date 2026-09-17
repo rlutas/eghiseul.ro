@@ -73,4 +73,4 @@ Build verde, 1902 de teste.
 
 Faza 4: dashboardul propriu-zis — comenzile pe prima poziție, cu trei întrebări
 pe card: unde e, trebuie să fac ceva, unde-mi sunt documentele. Decizia D4 (câte
-stări vede clientul din cele 17 interne) se ia acolo.
+stări vede clientul) se ia acolo.

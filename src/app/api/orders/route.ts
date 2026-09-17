@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { z } from 'zod'
+import { calculateEstimatedCompletion } from '@/lib/delivery-calculator'
 
 // Validation schema for creating an order
 const createOrderSchema = z.object({
@@ -246,7 +247,9 @@ export async function GET(request: NextRequest) {
           id,
           slug,
           name,
-          category
+          category,
+          estimated_days,
+          urgent_days
         )
       `, { count: 'exact' })
       .eq('user_id', user.id)
@@ -273,6 +276,45 @@ export async function GET(request: NextRequest) {
       )
     }
 
+    // The completion date for an order that has none stored, computed exactly
+    // as `api/orders/[id]` computes it: the service term (halved, or
+    // `urgent_days`, when the customer bought urgency) plus a two-day buffer,
+    // through the calculator that knows about weekends, holidays and the daily
+    // cutoff.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const fallbackEstimate = (order: any): string | null => {
+      const baseDays = order.services?.estimated_days
+      if (!baseDays) return null
+      const hasUrgent = ((order.selected_options as Array<{ option_name?: string; optionName?: string }>) || [])
+        .some(opt => (opt.optionName || opt.option_name || '').toLowerCase().includes('urgent'))
+      const processingDays = hasUrgent
+        ? (order.services?.urgent_days || Math.max(2, Math.ceil(baseDays / 2)))
+        : baseDays
+      const { maxDate } = calculateEstimatedCompletion({
+        baseDays: processingDays + 2,
+        includeCourierLeg: false,
+        orderDate: order.created_at ? new Date(order.created_at) : new Date(),
+      })
+      return maxDate ? `${maxDate}T16:00:00Z` : null
+    }
+
+    // How many documents this customer can already download, per order. One
+    // query for the whole page rather than one per card, and only the rows
+    // marked visible to the client — 646 of the 1468 documents are internal.
+    const orderIds = (orders ?? []).map(o => o.id)
+    const documentCounts = new Map<string, number>()
+    if (orderIds.length > 0) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: docs } = await (supabase as any)
+        .from('order_documents')
+        .select('order_id')
+        .in('order_id', orderIds)
+        .eq('visible_to_client', true)
+      for (const doc of docs ?? []) {
+        documentCounts.set(doc.order_id, (documentCounts.get(doc.order_id) ?? 0) + 1)
+      }
+    }
+
     // Transform orders
     const transformedOrders = orders?.map(order => {
       const createdDate = order.created_at ? new Date(order.created_at) : new Date()
@@ -296,7 +338,30 @@ export async function GET(request: NextRequest) {
         paymentStatus: order.payment_status,
         createdAt: order.created_at,
         created_at: order.created_at,
-        updatedAt: order.updated_at
+        updatedAt: order.updated_at,
+        // What the account needs to answer "where is it, do I have to do
+        // something, where are my documents" without a second round-trip.
+        paidAt: order.paid_at,
+        // The SAME date the order's own page shows. The card used to be able to
+        // compute its own from `estimated_days`, which would have given the
+        // customer two different promises for one order — the persisted date
+        // when it exists (234 of 439 paid orders in 120 days), otherwise the
+        // same holiday- and cutoff-aware calculation the detail route runs.
+        estimatedCompletionDate: order.estimated_completion_date ?? fallbackEstimate(order),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        estimatedDays: (order.services as any)?.estimated_days ?? null,
+        tracking: order.delivery_tracking_number
+          ? {
+              number: order.delivery_tracking_number,
+              url: order.delivery_tracking_url ?? null,
+              status: order.delivery_tracking_status ?? null,
+            }
+          : null,
+        documentsAvailable: documentCounts.get(order.id) ?? 0,
+        invoiceIssued: !!order.invoice_issued_at,
+        // The invoice PDF, so the card can hand it over directly instead of
+        // sending the customer one page deeper for a file we already have.
+        invoiceUrl: order.invoice_url ?? null,
       }
     }) || []
 
