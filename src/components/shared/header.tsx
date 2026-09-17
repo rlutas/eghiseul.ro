@@ -320,6 +320,31 @@ export function Header() {
                 frame on first paint. */}
             <div className="flex items-center gap-1 xl:hidden">
             <HeaderServiceSearch className="min-h-[44px] min-w-[44px]" />
+            {/* Account, one tap from anywhere. Authentication used to be
+                reachable only after opening the menu and scrolling past
+                everything else. Logged in it goes to the account, logged out to
+                the login page. */}
+            {hydrated && (
+              <Button
+                variant="ghost"
+                size="icon"
+                asChild
+                className="hover:bg-primary-50 min-h-[44px] min-w-[44px]"
+              >
+                <Link
+                  href={user ? '/account' : '/auth/login'}
+                  aria-label={user ? 'Contul meu' : 'Autentificare'}
+                >
+                  {user ? (
+                    <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary-500 text-xs font-bold text-secondary-900">
+                      {userInitials}
+                    </span>
+                  ) : (
+                    <User className="h-6 w-6 text-secondary-900" />
+                  )}
+                </Link>
+              </Button>
+            )}
             {!hydrated && (
               <Button
                 variant="ghost"
@@ -342,7 +367,10 @@ export function Header() {
                   <Menu className="h-6 w-6 text-secondary-900" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-full max-w-sm p-0">
+              {/* showCloseButton={false}: the menu header below already has a
+                  proper close button with a 44px tap target and a Romanian
+                  label. Without this the sheet stacked its own tiny X on top. */}
+              <SheetContent side="right" showCloseButton={false} className="w-full max-w-sm p-0">
                 <div className="flex flex-col h-full">
                   {/* Mobile Header */}
                   <div className="flex items-center justify-between p-5 border-b border-neutral-100 bg-neutral-50">
@@ -498,8 +526,12 @@ export function Header() {
                     )}
                   </nav>
 
-                  {/* Mobile Contact + order status */}
-                  <div className="px-4 py-4 border-t border-neutral-100 bg-neutral-50 space-y-3">
+                  {/* Order status. The phone card that used to sit next to it
+                      was removed on 2026-09-17: together they pushed the nav
+                      links off-screen, so the menu could not be read in full on
+                      a phone. The number stays reachable from Contact and from
+                      the footer. */}
+                  <div className="px-4 py-4 border-t border-neutral-100 bg-neutral-50">
                     <Link
                       href="/comanda/status/"
                       onClick={() => setIsMobileMenuOpen(false)}
@@ -513,18 +545,6 @@ export function Header() {
                         <p className="text-sm font-bold text-secondary-900">Verifică statusul comenzii</p>
                       </div>
                     </Link>
-                    <a
-                      href="tel:+40757708181"
-                      className="flex items-center gap-3 p-3 bg-white rounded-xl border border-neutral-200 hover:border-primary-300 transition-colors"
-                    >
-                      <div className="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center">
-                        <Phone className="w-5 h-5 text-primary-600" />
-                      </div>
-                      <div>
-                        <p className="text-xs text-neutral-500">Sună-ne acum</p>
-                        <p className="text-sm font-bold text-secondary-900">+40 757 708 181</p>
-                      </div>
-                    </a>
                   </div>
 
                   {/* Mobile Auth Buttons / User Info */}
@@ -565,18 +585,9 @@ export function Header() {
                       </>
                     ) : (
                       <>
-                        <Button
-                          variant="outline"
-                          asChild
-                          className="w-full border-2 border-neutral-200 h-12 text-secondary-700 font-semibold rounded-xl hover:bg-neutral-50"
-                        >
-                          <Link
-                            href="/auth/login"
-                            onClick={() => setIsMobileMenuOpen(false)}
-                          >
-                            Autentificare
-                          </Link>
-                        </Button>
+                        {/* No "Autentificare" button here any more — it is the
+                            user icon in the header bar now, which costs no
+                            vertical space in a menu that was overflowing. */}
                         <Button
                           asChild
                           className="w-full bg-primary-500 hover:bg-primary-600 text-secondary-900 font-bold h-12 rounded-xl shadow-[0_6px_14px_rgba(236,185,95,0.35)]"

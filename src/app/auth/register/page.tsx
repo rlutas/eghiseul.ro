@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { AuthLogo } from '@/components/auth/auth-logo';
 import { useRouter } from 'next/navigation';
 import { Eye, EyeOff, Mail, Lock, User, Phone, ArrowRight, Shield, Clock, CheckCircle, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -93,14 +94,9 @@ export default function RegisterPage() {
       {/* Left Side - Benefits */}
       <div className="hidden lg:flex lg:w-1/2 flex-col justify-center px-12 xl:px-20">
         <div className="max-w-md">
-          <Link href="/" className="flex items-center gap-2 mb-12">
-            <div className="w-12 h-12 bg-primary-500 rounded-xl flex items-center justify-center shadow-lg">
-              <span className="text-secondary-900 font-bold text-lg">eG</span>
-            </div>
-            <span className="text-2xl font-bold text-white">
-              eGhișeul<span className="text-primary-500">.ro</span>
-            </span>
-          </Link>
+          <div className="mb-12">
+            <AuthLogo size="lg" />
+          </div>
 
           <h1 className="text-3xl xl:text-4xl font-extrabold text-white mb-6 leading-tight">
             Creează-ți contul gratuit
@@ -150,14 +146,7 @@ export default function RegisterPage() {
         <div className="w-full max-w-md">
           {/* Mobile Logo */}
           <div className="lg:hidden mb-8 text-center">
-            <Link href="/" className="inline-flex items-center gap-2">
-              <div className="w-10 h-10 bg-primary-500 rounded-xl flex items-center justify-center">
-                <span className="text-secondary-900 font-bold">eG</span>
-              </div>
-              <span className="text-xl font-bold text-white">
-                eGhișeul<span className="text-primary-500">.ro</span>
-              </span>
-            </Link>
+            <AuthLogo />
           </div>
 
           <div className="bg-white rounded-2xl p-8 shadow-2xl">

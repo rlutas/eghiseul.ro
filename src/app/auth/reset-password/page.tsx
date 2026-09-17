@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { AuthLogo } from '@/components/auth/auth-logo';
 import { useRouter } from 'next/navigation';
 import { Eye, EyeOff, Lock, ArrowRight, Loader2, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -81,14 +82,7 @@ export default function ResetPasswordPage() {
       <div className="min-h-screen bg-gradient-to-b from-secondary-900 to-[#0C1A2F] flex items-center justify-center p-6">
         <div className="w-full max-w-md">
           <div className="mb-8 text-center">
-            <Link href="/" className="inline-flex items-center gap-2">
-              <div className="w-10 h-10 bg-primary-500 rounded-xl flex items-center justify-center">
-                <span className="text-secondary-900 font-bold">eG</span>
-              </div>
-              <span className="text-xl font-bold text-white">
-                eGhișeul<span className="text-primary-500">.ro</span>
-              </span>
-            </Link>
+            <AuthLogo />
           </div>
 
           <div className="bg-white rounded-2xl p-8 shadow-2xl">
