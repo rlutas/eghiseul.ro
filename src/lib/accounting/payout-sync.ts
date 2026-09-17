@@ -61,6 +61,15 @@ function extractOrderNumber(source: Stripe.Charge | null, description: string | 
   return m ? m[0].toUpperCase() : null;
 }
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/** `orders.id` is a uuid. Stripe `metadata.orderId` is not always one — a
+ *  payment through an Oblio proforma link carries the numeric proforma id
+ *  there. Only a real uuid may reach a PostgREST filter on `id`. */
+export function isOrderUuid(value: string | null | undefined): value is string {
+  return !!value && UUID_RE.test(value);
+}
+
 interface TxRow {
   /** Transient: charge metadata.orderId (extra charges lack orderNumber). */
   _orderId?: string | null;
@@ -90,7 +99,20 @@ interface TxRow {
 async function enrichEghiseul(rows: TxRow[]) {
   const admin = createAdminClient();
   const orderNumbers = [...new Set(rows.map((r) => r.order_number).filter(Boolean))] as string[];
-  const orderIds = [...new Set(rows.filter((r) => !r.order_number && r._orderId).map((r) => r._orderId))] as string[];
+  // `metadata.orderId` is NOT always an order UUID: payments made through an
+  // Oblio proforma link carry the numeric proforma id there (see the
+  // /^\d+$/ branch further down). Feeding one of those to .in('id', …) makes
+  // PostgREST reject the whole query with 400 "invalid input syntax for uuid",
+  // and the entire id-based enrichment for that batch is lost — every
+  // extra-charge row in it then shows up as unmatched in Decontări.
+  // Observed 2026-09-17: two 400s on the 05:30 payout-sync cron, id=in.(125455150).
+  const orderIds = [
+    ...new Set(
+      rows
+        .filter((r) => !r.order_number && r._orderId && isOrderUuid(r._orderId))
+        .map((r) => r._orderId)
+    ),
+  ] as string[];
   if (!orderNumbers.length && !orderIds.length) return;
   const select = 'id, friendly_order_id, order_number, invoice_number, invoice_url, storno_invoice_number, cancel_fee_invoice_number, customer_data, extra_billing, stripe_payment_intent_id, services(name)';
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
