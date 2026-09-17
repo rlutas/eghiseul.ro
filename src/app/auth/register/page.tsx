@@ -67,6 +67,11 @@ export default function RegisterPage() {
             last_name: formData.lastName,
             phone: formData.phone,
           },
+          // Without this the confirmation link falls back to site_url and drops
+          // the customer on the homepage, still logged out, with nothing saying
+          // the account is now active. Route it through the callback so the code
+          // is exchanged for a session and they land in their account.
+          emailRedirectTo: `${window.location.origin}/auth/callback?next=/account`,
         },
       });
 

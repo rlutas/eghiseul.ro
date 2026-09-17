@@ -98,7 +98,26 @@ Confirmare în date, ultimele 60 de zile: `ci_front` 121 fără verso (ruta scan
 vs. `act_identitate` 63 / `act_identitate_back` 64 (ruta manuală — versoul apărea
 practic întotdeauna, pentru că nu te lăsa altfel).
 
-### A doua cauză, găsită mai târziu: `site_url` era pe localhost
+### Cauza rădăcină, vizibilă doar în dashboard: proiectul era RESTRICȚIONAT
+
+Notificarea din Supabase Dashboard, pe care API-ul nu o expune deloc:
+
+> **Email sending privileges restricted due to spam complaints** — Aug 09, 2026
+> „Your project has been restricted due to high spam rates. Please use a custom
+> SMTP provider instead."
+
+**9 august = exact data ultimului cont creat.** Nu era doar plafonul de 2/oră:
+Supabase a oprit trimiterea pe proiect din cauza ratei de reclamații de spam și
+a bounce-urilor (există și o a doua notificare, „Email sending privileges at
+risk due to bounce backs", și o perioadă de grație începută pe 03.07). De-aia
+signup-ul întorcea 429 din PRIMA încercare, la orice oră, de pe orice IP.
+
+Contribuie și forma emailului: șablonul implicit Supabase e în engleză și fără
+niciun element de brand — „Confirm your signup / Follow this link to confirm your
+user" — trimis unor clienți români de la o adresă pe care n-o recunosc. Exact
+tiparul care adună reclamații de spam. Rescris (vezi mai jos).
+
+### A doua cauză: `site_url` era pe localhost
 
 Citind configurația de Auth prin Management API (după ce Raul a pus un token nou):
 
@@ -127,20 +146,48 @@ Corectat prin Management API:
 | `password_min_length` | 6 | 8 (cât cere și formularul) |
 | `password_hibp_enabled` | false | true (verificare HaveIBeenPwned) |
 
+### SMTP custom pe Resend — aplicat
+
+| Setare | Valoare |
+|---|---|
+| Host / port | `smtp.resend.com` / `587` |
+| Username | `resend` |
+| Sender | `comenzi@eghiseul.ro`, nume `eGhiseul.ro` |
+| `rate_limit_email_sent` | 2 → 30 (automat la activare) → **100** |
+
+Domeniul `eghiseul.ro` era deja `verified` în Resend. Ordinea contează: Supabase
+refuză `rate_limit_email_sent` cât timp nu există SMTP custom
+(`Custom SMTP required to configure RATE_LIMIT_EMAIL_SENT`).
+
+**Testat pe producție, cap-coadă:**
+
+```
+POST /auth/v1/signup → HTTP 200   (primul cont creat după 09.08)
+profiles: rând creat de handle_new_user, rol `customer`
+Resend: "Confirm Your Signup", de la eGhiseul.ro <comenzi@eghiseul.ro>
+link: .../auth/v1/verify?...&redirect_to=https://eghiseul.ro   ← nu mai e localhost
+```
+
+Bounce-ul de la adresa de test e normal: `test.cont.…@eghiseul.ro` nu e cutie
+poștală reală.
+
+### Șabloanele de email, rescrise în română
+
+Confirmare cont, resetare parolă și schimbare adresă folosesc acum aceeași
+identitate vizuală ca restul emailurilor (`src/lib/email/templates/branded-layout.ts`:
+antet bleumarin cu sigla, buton auriu, subsol cu datele firmei și mențiunea de
+neafiliere), cu text în română și explicația că nu e nevoie de cont ca să comanzi.
+
 ## Rămâne de făcut
 
-1. **SMTP custom (Resend) în Supabase** → Authentication → Emails → SMTP Settings.
-   Singurul lucru care nu s-a putut face din afara dashboardului: cererea ar fi
-   trimis cheia `RESEND_API_KEY` către API-ul Supabase, iar asta e blocată.
-   Valori: host `smtp.resend.com`, port `587`, user `resend`, parola =
-   `RESEND_API_KEY` din `.env.local`, sender `comenzi@eghiseul.ro`, nume
-   `eGhiseul.ro`. Domeniul `eghiseul.ro` e deja `verified` în Resend (verificat
-   prin API-ul lor).
-   Imediat după, **Authentication → Rate Limits → „Rate limit for sending emails"**
-   urcat la 100/oră: Supabase refuză să accepte valoarea cât timp nu există SMTP
-   custom (`"Custom SMTP required to configure RATE_LIMIT_EMAIL_SENT"`), deci
-   ordinea contează.
-   Fără pasul ăsta conturile noi tot nu se pot crea.
+1. **Cere ridicarea restricției de la Supabase.** SMTP-ul custom scoate trimiterea
+   de sub infrastructura lor, deci conturile merg — dar notificarea de restricție
+   rămâne pe proiect. Merită un ticket, cu mențiunea că sursa reclamațiilor
+   (șablon englezesc generic) a fost eliminată.
+2. **Ține bounce-urile sub control în Resend.** Restricția a venit din rata de
+   spam și bounce; lista de contacte e mare, iar campaniile pleacă tot prin
+   Resend. Dacă rata urcă, de data asta se restricționează domeniul, nu doar
+   proiectul Supabase.
 2. **Legarea comenzilor de guest la cont.** `orders.user_id` e singura legătură;
    nu există potrivire pe email nicăieri (`api/orders/route.ts:252`). 439 de
    comenzi plătite în 90 de zile, zero cu `user_id`.
