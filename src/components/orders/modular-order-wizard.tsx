@@ -20,7 +20,6 @@ import { WizardProgress } from './wizard-progress-modular';
 import { PriceSidebarModular } from './price-sidebar-modular';
 import { SaveStatus } from './save-status';
 import { OrderIdDisplay, OrderIdBadge } from './order-id-display';
-import { SaveDataModal } from './save-data-modal';
 import { Service, ServiceOption } from '@/types/services';
 import { MODULE_LOADERS, hasModuleLoader } from '@/lib/verification-modules/registry';
 import { scrollToFirstWizardError } from '@/lib/wizard/scroll-to-first-error';
@@ -104,7 +103,6 @@ export function ModularOrderWizard({ initialService, initialOptions, headerExtra
   }, []);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [orderComplete, setOrderComplete] = useState(false);
-  const [showSaveModal, setShowSaveModal] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null); // null = loading
   const [summaryOpen, setSummaryOpen] = useState(false); // mobile sticky summary dropdown
 
@@ -419,18 +417,8 @@ export function ModularOrderWizard({ initialService, initialOptions, headerExtra
             </div>
           </CardContent>
         </Card>
-
-        {/* Save Data Modal for guest users */}
-        <SaveDataModal
-          isOpen={showSaveModal}
-          onClose={() => setShowSaveModal(false)}
-          orderId={state.orderId || ''}
-          email={state.contact.email}
-          onSuccess={() => {
-            // User created account successfully
-            console.log('Account created successfully');
-          }}
-        />
+        {/* The account offer lives on /comanda/success/[orderId] now
+            (AccountOfferCard) — the old modal here was never opened. */}
       </div>
     );
   }

@@ -207,6 +207,23 @@ Ce se salvează automat în cont din comanda tocmai plătită:
 Asta face ca a doua comandă să fie scurtă fără ca nimeni să fi completat vreodată
 un formular de profil.
 
+**Livrat pe 17.09.2026** —
+[changelog](../changelog/2026-09-17-cont-dupa-plata-faza-1.md). Ce s-a aflat pe
+parcurs:
+
+- oferta de cont **exista deja** în `modular-order-wizard.tsx` și nu se putea
+  deschide: `setShowSaveModal` nu era apelat nicăieri. Explică 3 conturi la 398
+  de clienți plătitori mai bine decât orice ipoteză de design;
+- `register-from-order` citea `doc.base64`, dar comanda păstrează `s3Key` — deci
+  din cele 183 de comenzi plătite cu documente, niciuna nu a pus vreodată actul
+  în cont. Documentul se copiază acum server-side între chei S3;
+- 🔴 `migrate_order_to_profile()` ridica `kyc_verified` pe orice comandă, iar
+  `/submit` onorează flagul ca bypass al pasului de identitate: un cont născut
+  dintr-un constatator putea comanda un cazier fără act. Migrarea 172;
+- vehiculul NU se salvează încă din comandă — `user_saved_vehicles` se
+  alimentează doar din `VehiclesTab`. Rămâne pentru Faza 4, unde oricum se
+  atinge zona de mașini.
+
 ### Faza 2 — onboarding condiționat de servicii
 
 La prima intrare în cont, **o singură întrebare**: *ce servicii te interesează?*

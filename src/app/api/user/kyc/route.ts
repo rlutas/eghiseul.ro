@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { hasDocument } from '@/lib/kyc/identity-documents';
+import { KYC_VALIDITY_DAYS } from '@/lib/kyc/constants';
 
 // KYC validity period in days
-const KYC_VALIDITY_DAYS = 90;
 
 /**
  * GET /api/user/kyc

@@ -21,6 +21,7 @@ import { OrderSummaryCard } from '@/components/payment';
 import { estimateFromSelectedOptions } from '@/lib/delivery-calculator';
 import { suggestEmailCorrection } from '@/lib/email-typo';
 import { OrderFlowDisclosure } from '@/components/legal/order-flow-disclosure';
+import { AccountOfferCard } from '@/components/orders/account-offer-card';
 
 interface SelectedOption {
   optionName?: string;
@@ -51,8 +52,12 @@ interface OrderData {
   id: string;
   order_number: string;
   friendly_order_id: string;
+  /** Set when the order already belongs to an account — suppresses the
+   *  account offer so nobody is invited to make a second one. */
+  user_id?: string | null;
   service_name: string;
   service_id?: string;
+  service_slug?: string;
   service_category?: string;
   total_price: number;
   payment_status: string;
@@ -205,8 +210,10 @@ export default function SuccessPage() {
           id: apiOrder.id,
           order_number: apiOrder.orderNumber,
           friendly_order_id: apiOrder.orderNumber,
+          user_id: apiOrder.userId ?? null,
           service_name: apiOrder.service?.name || 'Serviciu',
           service_id: apiOrder.service?.id,
+          service_slug: apiOrder.service?.slug,
           service_category: apiOrder.service?.category,
           service_estimated_days:
             apiOrder.service?.estimatedDays ?? apiOrder.service?.estimated_days,
@@ -707,6 +714,16 @@ export default function SuccessPage() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Account offer — an offer, not a wall: it renders nothing for a
+            signed-in visitor or an order already linked to an account, and
+            the buttons above keep working either way. */}
+        <AccountOfferCard
+          orderId={order.id}
+          email={email}
+          serviceSlug={order.service_slug}
+          alreadyLinked={!!order.user_id}
+        />
       </div>
       <OrderFlowDisclosure />
     </div>

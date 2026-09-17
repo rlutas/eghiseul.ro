@@ -8,9 +8,7 @@ import {
   isIdentityDocumentType,
   fillsProfileFromOcr,
 } from '@/lib/kyc/identity-documents';
-
-// KYC validity period in days
-const KYC_VALIDITY_DAYS = 90;
+import { KYC_VALIDITY_DAYS } from '@/lib/kyc/constants';
 
 /**
  * POST /api/user/kyc/save
