@@ -45,6 +45,7 @@ import {
   DocumentTypePicker,
   type IdDocumentType,
 } from '@/components/orders/modules/personal-kyc/DocumentTypePicker';
+import { SelfieLegalNotice } from '@/components/orders/modules/personal-kyc/SelfieLegalNotice';
 import {
   type AccountKycDocumentType,
   OPTIONAL_DOCUMENT_TYPES,
@@ -1127,6 +1128,16 @@ export default function KYCTab({ className, serviceInterests }: KYCTabProps) {
             <div>
               {requiredDocumentsFor(idType).map(type => renderDocumentRow(type, true))}
             </div>
+            {/* The selfie is always part of `requiredDocumentsFor`, so the
+                purpose/retention notice belongs right under the list, where the
+                photo is actually asked for — a face photo is biometric data
+                (GDPR art. 9) and the reason + duration cannot live only in the
+                privacy policy (PLAN.md §9.2). `matching="automated"` because
+                THIS surface really does send both images to Gemini
+                (`runFaceMatch` in `handleUpload`). */}
+            <div className="border-t border-neutral-100 p-4">
+              <SelfieLegalNotice matching="automated" />
+            </div>
           </>
         )}
       </div>
@@ -1182,12 +1193,16 @@ export default function KYCTab({ className, serviceInterests }: KYCTabProps) {
         <div className="flex gap-3">
           <Shield className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
           <div className="text-sm text-blue-800">
-            <p className="font-medium mb-1">De ce este necesară verificarea?</p>
+            <p className="font-medium mb-1">Ce se întâmplă cu documentele</p>
             <ul className="list-disc list-inside space-y-1 text-blue-700">
-              <li>Verificarea identității este obligatorie pentru serviciile publice</li>
-              <li>Documentele sunt criptate și stocate securizat</li>
-              <li>Valabilitatea de 90 de zile permite comenzi rapide</li>
-              <li>La scanare se creează automat profilul de facturare și adresa</li>
+              <li>Sunt cerute doar de serviciile care au nevoie de actul de identitate</li>
+              <li>Sunt criptate și stocate securizat, cu acces limitat la echipă</li>
+              <li>Le refolosim 90 de zile, ca să nu le încarci la fiecare comandă</li>
+              {/* The billing profile is created only when the customer ticks
+                  the box above (Faza 3 / D8) — the old copy promised it
+                  happened on every scan, which stopped being true. The address
+                  IS still created from the scan (`autoCreateUserData`). */}
+              <li>Adresa din act intră automat în cont; facturarea, doar dacă bifezi mai sus</li>
             </ul>
           </div>
         </div>

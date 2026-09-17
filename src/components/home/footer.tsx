@@ -202,6 +202,22 @@ export function Footer() {
                 <Link key={l.name} href={l.href} prefetch={false} className="hover:text-primary-500 transition-colors">{l.name}</Link>
               ))}
               <CookieSettingsLink className="hover:text-primary-500 transition-colors" />
+              {/* Ordinul ANPC 72/2010 art. 2 (anexele înlocuite prin Ordinul ANPC
+                  505/2026, MO 749/04.09.2026): orice site care preia comenzi
+                  online trebuie să prezinte PE PRIMA PAGINĂ un link vizibil către
+                  adresa oficială a ANPC, denumit exact „PROTECȚIA CONSUMATORILOR -
+                  A.N.P.C.". Badge-urile SAL/SOL de mai jos acoperă altă obligație
+                  (SAL/ODR, Legea 363/2007 + OG 38/2015) și NU țin locul acestui
+                  link — de aceea e text, nu imagine, și duce în rădăcina anpc.ro,
+                  nu într-o subpagină. */}
+              <a
+                href="https://anpc.ro/"
+                target="_blank"
+                rel="nofollow noopener"
+                className="hover:text-primary-500 transition-colors"
+              >
+                PROTECȚIA CONSUMATORILOR - A.N.P.C.
+              </a>
             </nav>
             <div className="flex items-center gap-1.5">
               {[...Array(5)].map((_, i) => (
@@ -221,6 +237,16 @@ export function Footer() {
                 <p className="text-white/60 text-sm">© {new Date().getFullYear()} eGhișeul.ro. Toate drepturile rezervate.</p>
                 <p className="text-white/40 text-[11px] mt-1">
                   eDigitalizare SRL · CUI RO49278701 · Reg. Com. J2023001097301 · Jud. Satu Mare, Com. Odoreu, Str. Salcâmilor nr. 2
+                </p>
+                {/* Ordinul ANPC 72/2010 art. 1: numărul „Telefonul Consumatorului"
+                    și adresa site-ului ANPC. Nu sunt datele comisariatului
+                    județean — anexa 1 a fost înlocuită de Ordinul 505/2026 și nu
+                    punem contacte pe care nu le-am citit în anexa nouă. */}
+                <p className="text-white/40 text-[11px] mt-1">
+                  Telefonul Consumatorului:{' '}
+                  <a href="tel:0219551" className="hover:text-primary-500 transition-colors">021 9551</a>
+                  {' '}·{' '}
+                  <a href="https://anpc.ro/" target="_blank" rel="nofollow noopener" className="hover:text-primary-500 transition-colors">anpc.ro</a>
                 </p>
               </div>
               {/* Badge-uri ANPC — dreapta, sub recenzii */}

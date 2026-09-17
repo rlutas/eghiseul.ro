@@ -118,11 +118,24 @@ export default function AccountTabs({ initialTab = 'services', className, servic
       ref={containerRef}
       className={cn('grid grid-cols-1 gap-6 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-8', className)}
     >
+      {/* From lg the whole navigation is the left column. On a phone it is
+          split around the content: the switch above, the profile data below —
+          otherwise a returning customer's first screen is five settings links
+          and no order. */}
       <AccountNav
         primary={PRIMARY_ITEMS}
         secondary={SECONDARY_ITEMS}
         active={activeTab}
         onSelect={handleTabChange}
+        className="hidden lg:block"
+      />
+      <AccountNav
+        primary={PRIMARY_ITEMS}
+        secondary={SECONDARY_ITEMS}
+        active={activeTab}
+        onSelect={handleTabChange}
+        only="primary"
+        className="lg:hidden"
       />
 
       <div>
@@ -133,6 +146,15 @@ export default function AccountTabs({ initialTab = 'services', className, servic
           {activeLabel}
         </h2>
         {renderTabContent()}
+
+        <AccountNav
+          primary={PRIMARY_ITEMS}
+          secondary={SECONDARY_ITEMS}
+          active={activeTab}
+          onSelect={handleTabChange}
+          only="secondary"
+          className="mt-6 lg:hidden"
+        />
       </div>
     </div>
   );

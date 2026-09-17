@@ -27,6 +27,13 @@ interface AccountNavProps {
   active: AccountTabId;
   onSelect: (id: AccountTabId) => void;
   className?: string;
+  /**
+   * Render only one half. On a phone the two are split around the content: the
+   * primary switch above it, the profile data below. Both halves above meant
+   * that on a 390px screen the first thing a returning customer saw was a grid
+   * of five settings links, with their order pushed off the bottom.
+   */
+  only?: 'primary' | 'secondary';
 }
 
 /**
@@ -43,33 +50,57 @@ interface AccountNavProps {
  * least 44px and every item carries icon AND text, since an icon alone is not
  * discoverable.
  */
-export function AccountNav({ primary, secondary, active, onSelect, className }: AccountNavProps) {
+export function AccountNav({
+  primary,
+  secondary,
+  active,
+  onSelect,
+  className,
+  only,
+}: AccountNavProps) {
+  const showPrimary = only !== 'secondary';
+  const showSecondary = only !== 'primary';
+
   return (
-    <nav className={cn('lg:sticky lg:top-24', className)} aria-label="Navigare cont">
-      {/* Primary: the two reasons someone opens this page. */}
-      <div className="grid grid-cols-2 gap-2 lg:grid-cols-1">
-        {primary.map((item) => (
-          <NavButton
-            key={item.id}
-            item={item}
-            isActive={active === item.id}
-            onSelect={onSelect}
-            emphasis
-          />
-        ))}
-      </div>
+    <nav
+      className={cn('lg:sticky lg:top-24', className)}
+      aria-label={only === 'secondary' ? 'Datele mele' : 'Navigare cont'}
+    >
+      {showPrimary && (
+        /* Primary: the two reasons someone opens this page. */
+        <div className="grid grid-cols-2 gap-2 lg:grid-cols-1">
+          {primary.map((item) => (
+            <NavButton
+              key={item.id}
+              item={item}
+              isActive={active === item.id}
+              onSelect={onSelect}
+              emphasis
+            />
+          ))}
+        </div>
+      )}
 
-      <p className="mt-5 mb-2 px-1 text-xs font-bold uppercase tracking-wider text-neutral-400">
-        Datele mele
-      </p>
+      {showSecondary && (
+        <>
+          <p
+            className={cn(
+              'mb-2 px-1 text-xs font-bold uppercase tracking-wider text-neutral-400',
+              showPrimary ? 'mt-5' : 'mt-0'
+            )}
+          >
+            Datele mele
+          </p>
 
-      {/* Secondary: reference data, reached occasionally. Two columns on a
-          phone so all five stay visible without scrolling anything. */}
-      <div className="grid grid-cols-2 gap-2 lg:grid-cols-1">
-        {secondary.map((item) => (
-          <NavButton key={item.id} item={item} isActive={active === item.id} onSelect={onSelect} />
-        ))}
-      </div>
+          {/* Secondary: reference data, reached occasionally. Two columns on a
+              phone so all five stay visible without scrolling anything. */}
+          <div className="grid grid-cols-2 gap-2 lg:grid-cols-1">
+            {secondary.map((item) => (
+              <NavButton key={item.id} item={item} isActive={active === item.id} onSelect={onSelect} />
+            ))}
+          </div>
+        </>
+      )}
     </nav>
   );
 }

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { z } from 'zod'
 import { calculateEstimatedCompletion } from '@/lib/delivery-calculator'
+import { STATUS_OPTIONS } from '@/lib/admin/status-options'
 
 // Validation schema for creating an order
 const createOrderSchema = z.object({
@@ -231,12 +232,12 @@ export async function GET(request: NextRequest) {
     const limit = Math.min(parseInt(searchParams.get('limit') || '20'), 50)
     const offset = parseInt(searchParams.get('offset') || '0')
 
-    // Validate status if provided
-    type OrderStatus = 'pending' | 'pending_payment' | 'processing' | 'document_ready' | 'delivered' | 'completed' | 'rejected' | 'cancelled'
-    const validStatuses: OrderStatus[] = ['pending', 'pending_payment', 'processing', 'document_ready', 'delivered', 'completed', 'rejected', 'cancelled']
-    const status = statusParam && validStatuses.includes(statusParam as OrderStatus)
-      ? statusParam as OrderStatus
-      : null
+    // A `?status=` we do not recognise is dropped, and the whole list comes back
+    // unfiltered — which looks like the filter worked and returned everything.
+    // The list of what exists is the operator's own, so `standby`, `paid`,
+    // `shipped` and the rest stop being silently ignored here.
+    const knownStatuses = new Set(STATUS_OPTIONS.map(option => option.value))
+    const status = statusParam && knownStatuses.has(statusParam) ? statusParam : null
 
     // Build query
     let query = supabase
@@ -362,6 +363,14 @@ export async function GET(request: NextRequest) {
         // The invoice PDF, so the card can hand it over directly instead of
         // sending the customer one page deeper for a file we already have.
         invoiceUrl: order.invoice_url ?? null,
+        // When the order was finished, which is what the document's validity is
+        // counted from (`src/lib/lifecycle/rules.ts`). The account is the only
+        // place that can say "your cazier expires on the 3rd of March" while the
+        // customer is looking at the order it came from.
+        // `completed_at` exists in the database (trigger from migration 159);
+        // the generated types are stale.
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        completedAt: (order as any).completed_at ?? null,
       }
     }) || []
 

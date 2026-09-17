@@ -39,6 +39,7 @@ import { cn } from '@/lib/utils';
 import type { PersonalKYCConfig, DocumentType, UploadedDocumentState } from '@/types/verification-modules';
 import { compressImage } from '@/lib/images/compress';
 import { randomId } from '@/lib/random-id';
+import { SelfieLegalNotice } from './SelfieLegalNotice';
 
 interface KYCDocumentsStepProps {
   config: PersonalKYCConfig;
@@ -954,8 +955,19 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
       {/* Passport Section — foreign citizens (replaces CI scan from step 2) */}
       {showPassport && (!hasValidAccountKyc || showReuploadOption) && renderUploadCard('passport')}
 
-      {/* Selfie Section - only show if reupload selected or no valid KYC */}
-      {showSelfie && (!hasValidAccountKyc || showReuploadOption) && renderUploadCard('selfie')}
+      {/* Selfie Section - only show if reupload selected or no valid KYC.
+          The purpose/retention notice sits directly under the uploader: a face
+          photo is biometric data (GDPR art. 9) and the reason + duration have
+          to be readable WHERE the photo is asked for (PLAN.md §9.2), not only
+          in the privacy policy. `matching="human"` because this surface does
+          NOT run automatic face matching — see the comment at the selfie
+          branch of `handleUpload`. */}
+      {showSelfie && (!hasValidAccountKyc || showReuploadOption) && (
+        <>
+          {renderUploadCard('selfie')}
+          <SelfieLegalNotice matching="human" />
+        </>
+      )}
 
       {/* Certificate Section - only show if reupload selected or no valid KYC */}
       {showCertificate && (!hasValidAccountKyc || showReuploadOption) && renderUploadCard('certificat_domiciliu')}

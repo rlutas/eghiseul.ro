@@ -100,6 +100,8 @@ export default async function AccountPage() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const hasAnsweredOnboarding = !!(profile as any)?.onboarding_completed_at
 
+  const hasOrders = (orders?.length ?? 0) > 0
+
   const completeness = profileCompleteness({
     firstName: profile?.first_name,
     lastName: profile?.last_name,
@@ -215,9 +217,12 @@ export default async function AccountPage() {
               whether the checklist below asks for an identity document at all. */}
           {!hasAnsweredOnboarding && <OnboardingQuestion />}
 
-          {/* Before anything else, because it is the thing a new account should
-              act on — and it removes itself once complete. */}
-          <ProfileChecklist completeness={completeness} />
+          {/* An account with no orders has nothing else to act on, so the
+              checklist leads. An account WITH orders came here to see an order:
+              on a phone the checklist filled the first screen and pushed the
+              orders below the fold, which is the opposite of decizia D2. It
+              moves under the list instead — still there, no longer first. */}
+          {!hasOrders && <ProfileChecklist completeness={completeness} />}
 
           <Suspense
             fallback={
@@ -226,8 +231,18 @@ export default async function AccountPage() {
               </div>
             }
           >
-            <AccountTabs services={accountServices} serviceInterests={serviceInterests} />
+            {/* Decizia D2 din PLAN.md: ecranul de start e lista de comenzi
+                pentru cine are comenzi, și catalogul pentru cine n-are. Până
+                acum toată lumea ateriza pe catalog, deci clientul care venea
+                exact ca să vadă unde e comanda lui trebuia să o caute. */}
+            <AccountTabs
+              initialTab={hasOrders ? 'orders' : 'services'}
+              services={accountServices}
+              serviceInterests={serviceInterests}
+            />
           </Suspense>
+
+          {hasOrders && <ProfileChecklist completeness={completeness} />}
 
           {/* Account-level actions, deliberately last and visually quieter than
               the navigation: signing out is not something to put next to the

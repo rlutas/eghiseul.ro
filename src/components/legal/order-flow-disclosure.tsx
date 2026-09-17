@@ -39,6 +39,20 @@ export function OrderFlowDisclosure() {
             className="underline underline-offset-2 hover:text-neutral-700"
           >
             ANPC — SAL
+          </a>{' '}
+          ·{' '}
+          {/* Ordinul ANPC 72/2010 art. 2 (anexe înlocuite prin Ordinul 505/2026,
+              MO 749/04.09.2026) cere linkul denumit exact așa, către adresa
+              oficială a ANPC. Linkul „ANPC — SAL" de mai sus e altă obligație
+              (SAL) și duce într-o subpagină, deci nu îl acoperă. Aici pentru că
+              ecranele de comandă nu au footer. */}
+          <a
+            href="https://anpc.ro/"
+            target="_blank"
+            rel="nofollow noopener"
+            className="underline underline-offset-2 hover:text-neutral-700"
+          >
+            PROTECȚIA CONSUMATORILOR - A.N.P.C.
           </a>
         </p>
       </div>

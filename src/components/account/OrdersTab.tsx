@@ -19,7 +19,7 @@
  * than on the order page.
  */
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -30,6 +30,7 @@ import {
   formatReadyDate,
   type Actor,
 } from '@/lib/orders/customer-next-step';
+import { documentValidity, validityLabel } from '@/lib/orders/document-validity';
 import {
   Package,
   Loader2,
@@ -48,6 +49,9 @@ import {
   Building2,
   Hand,
   Wrench,
+  ShieldCheck,
+  ShieldAlert,
+  RotateCcw,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -70,6 +74,8 @@ export interface Order {
   invoiceIssued: boolean;
   /** The invoice PDF itself, when Oblio has issued one. */
   invoiceUrl: string | null;
+  /** When the order was finished — what the document's validity counts from. */
+  completedAt: string | null;
 }
 
 interface OrdersTabProps {
@@ -123,6 +129,7 @@ interface ApiOrder {
   documentsAvailable?: number;
   invoiceIssued?: boolean;
   invoiceUrl?: string | null;
+  completedAt?: string | null;
   service?: { name?: string; slug?: string } | null;
   services?: { name?: string; slug?: string } | null;
 }
@@ -145,6 +152,7 @@ function toOrder(row: ApiOrder): Order {
     documentsAvailable: row.documentsAvailable ?? 0,
     invoiceIssued: row.invoiceIssued ?? false,
     invoiceUrl: row.invoiceUrl ?? null,
+    completedAt: row.completedAt ?? null,
   };
 }
 
@@ -172,30 +180,50 @@ function actionHref(order: Order, kind: 'pay' | 'resume' | 'contact' | 'track'):
   }
 }
 
+/** `GET /api/orders` pages at 20; the list asks for the next page on demand. */
+const PAGE_SIZE = 20;
+
 export default function OrdersTab({ initialOrders, className }: OrdersTabProps) {
   const [orders, setOrders] = useState<Order[]>(initialOrders || []);
   const [isLoading, setIsLoading] = useState(!initialOrders);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  /**
+   * One page of orders. The route has always paged at 20 and the list never
+   * asked for more, so a customer with 21 orders simply could not see the
+   * oldest — silently, with nothing on screen to suggest anything was missing.
+   */
+  const loadPage = useCallback(async (offset: number): Promise<{ rows: Order[]; hasMore: boolean }> => {
+    const response = await fetch(`/api/orders?limit=${PAGE_SIZE}&offset=${offset}`);
+    const result = await response.json();
+
+    if (!response.ok) {
+      // The route answers with `error: { code, message }`, so the old
+      // `throw new Error(result.error)` printed "[object Object]" to the customer.
+      throw new Error(result?.error?.message || 'Failed to fetch orders');
+    }
+
+    const rows: ApiOrder[] = result.data?.orders || result.data || [];
+    return { rows: rows.map(toOrder), hasMore: !!result.data?.pagination?.hasMore };
+  }, []);
 
   useEffect(() => {
     if (initialOrders) return;
 
     let cancelled = false;
 
-    const fetchOrders = async () => {
+    const fetchFirstPage = async () => {
       try {
         setIsLoading(true);
         setError(null);
 
-        const response = await fetch('/api/orders');
-        const result = await response.json();
-
-        if (!response.ok) {
-          throw new Error(result.error || 'Failed to fetch orders');
+        const page = await loadPage(0);
+        if (!cancelled) {
+          setOrders(page.rows);
+          setHasMore(page.hasMore);
         }
-
-        const rows: ApiOrder[] = result.data?.orders || result.data || [];
-        if (!cancelled) setOrders(rows.map(toOrder));
       } catch (err) {
         console.error('Error fetching orders:', err);
         if (!cancelled) setError('Nu am putut încărca comenzile. Reîncarcă pagina.');
@@ -204,11 +232,26 @@ export default function OrdersTab({ initialOrders, className }: OrdersTabProps) 
       }
     };
 
-    fetchOrders();
+    fetchFirstPage();
     return () => {
       cancelled = true;
     };
-  }, [initialOrders]);
+  }, [initialOrders, loadPage]);
+
+  const loadMore = async () => {
+    setIsLoadingMore(true);
+    setError(null);
+    try {
+      const page = await loadPage(orders.length);
+      setOrders((current) => [...current, ...page.rows]);
+      setHasMore(page.hasMore);
+    } catch (err) {
+      console.error('Error fetching more orders:', err);
+      setError('Nu am putut încărca restul comenzilor. Încearcă din nou.');
+    } finally {
+      setIsLoadingMore(false);
+    }
+  };
 
   /**
    * Anything that needs the customer goes to the top, whatever its date — the
@@ -258,6 +301,24 @@ export default function OrdersTab({ initialOrders, className }: OrdersTabProps) 
           {sortedOrders.map((order) => (
             <OrderCard key={order.id} order={order} />
           ))}
+
+          {hasMore && (
+            <Button
+              variant="outline"
+              onClick={loadMore}
+              disabled={isLoadingMore}
+              className="min-h-[44px] w-full"
+            >
+              {isLoadingMore ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Se încarcă...
+                </>
+              ) : (
+                'Vezi comenzile mai vechi'
+              )}
+            </Button>
+          )}
         </div>
       ) : (
         <EmptyOrders />
@@ -286,6 +347,12 @@ function OrderCard({ order }: { order: Order }) {
     estimatedDays: order.estimatedDays,
   });
   const pausedReason = !estimate ? CLOCK_PAUSED_REASON[order.status] : undefined;
+
+  // What the customer got, and for how long it is still worth something. The
+  // account is the only place that can say this next to the order it came from —
+  // the validity table and its legal basis live in lib/lifecycle/rules.
+  const validity = documentValidity(order.serviceSlug, order.completedAt);
+  const ValidityIcon = validity?.state === 'valid' ? ShieldCheck : ShieldAlert;
 
   const trackingUrl = order.tracking?.url ?? null;
   // The `track` action and the tracking link are the same button. Rendered once,
@@ -383,6 +450,39 @@ function OrderCard({ order }: { order: Order }) {
               <ChevronRight className="ml-1 h-4 w-4" />
             </Link>
           </Button>
+        </div>
+      )}
+
+      {/* Valabilitatea documentului primit */}
+      {validity && (
+        <div
+          className={cn(
+            'mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 rounded-xl px-3 py-2 text-sm',
+            validity.state === 'valid'
+              ? 'bg-neutral-50 text-neutral-700'
+              : validity.state === 'expiring'
+                ? 'bg-amber-50 text-amber-900'
+                : 'bg-neutral-100 text-neutral-700'
+          )}
+        >
+          <span className="flex items-center gap-2">
+            <ValidityIcon
+              className={cn(
+                'h-4 w-4 flex-shrink-0',
+                validity.state === 'valid' ? 'text-green-600' : 'text-amber-600'
+              )}
+            />
+            {validityLabel(validity)}
+          </span>
+          {validity.state !== 'valid' && order.serviceSlug && (
+            <Link
+              href={`/comanda/${order.serviceSlug}/`}
+              className="inline-flex min-h-[44px] items-center gap-1.5 font-medium text-primary-700 underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 rounded"
+            >
+              <RotateCcw className="h-4 w-4 flex-shrink-0" />
+              Comandă din nou
+            </Link>
+          )}
         </div>
       )}
 
