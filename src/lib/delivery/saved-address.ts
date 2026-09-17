@@ -11,7 +11,7 @@
  * the component stays a thin shell.
  */
 
-import { findCounty } from '@/lib/data/romania-counties';
+import { canonicalCountyName } from '@/lib/data/romania-counties';
 
 /** One row of GET /api/user/addresses (AddressData flattened over the row). */
 export interface SavedDeliveryAddress {
@@ -74,13 +74,13 @@ export function usableSavedAddresses(
       isRomanianSavedAddress(address) &&
       !!text(address.street) &&
       !!text(address.city) &&
-      !!findCounty(text(address.county)),
+      !!canonicalCountyName(address.county),
   );
 }
 
 /**
  * Map a saved address onto the delivery form. The county is canonicalised
- * through `findCounty` so it matches an option of the county dropdown even
+ * so it matches an option of the county dropdown even
  * when it was stored as a code ("SM") or with different diacritics.
  */
 export function toDeliveryAddressFormValues(
@@ -94,7 +94,7 @@ export function toDeliveryAddressFormValues(
     floor: text(address.floor),
     apartment: text(address.apartment),
     city: text(address.city),
-    county: findCounty(text(address.county))?.name ?? '',
+    county: canonicalCountyName(address.county) ?? '',
     // 6 digits or nothing — a half-typed code would fail the form's regex and
     // show an error on a field the customer never touched.
     postalCode: /^\d{6}$/.test(text(address.postalCode)) ? text(address.postalCode) : '',

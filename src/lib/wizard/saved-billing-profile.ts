@@ -13,7 +13,7 @@
  * needs the locality and county separately.
  */
 
-import { findCounty } from '@/lib/data/romania-counties';
+import { canonicalCountyName } from '@/lib/data/romania-counties';
 import { isForeignBillingCountry } from '@/lib/orders/billing-validation';
 
 export interface SavedPfBillingPrefill {
@@ -54,7 +54,7 @@ export function savedPfBillingPrefill(
     // region is free text (Oblio accepts it as-is).
     county: isForeignBillingCountry(country)
       ? rawCounty
-      : findCounty(rawCounty)?.name ?? '',
+      : canonicalCountyName(rawCounty) ?? '',
     postalCode: text(billingData.postalCode),
     country,
   };

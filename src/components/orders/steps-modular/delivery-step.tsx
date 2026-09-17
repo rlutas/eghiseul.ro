@@ -1013,6 +1013,21 @@ export function DeliveryStepModular({ onValidChange }: DeliveryStepProps) {
     setPhysicalRegion(region);
   };
 
+  // Apply one of the customer's saved addresses to the form. Explicit action
+  // only (the picker never applies anything by itself) and every field stays
+  // editable afterwards, so this is a suggestion and not a lock.
+  const handleSavedAddressPick = useCallback((saved: SavedDeliveryAddress) => {
+    const values = toDeliveryAddressFormValues(saved);
+    isApplyingSavedAddress.current = true;
+    (Object.keys(values) as (keyof typeof values)[]).forEach((field) => {
+      form.setValue(field, values[field], { shouldValidate: true, shouldDirty: true });
+    });
+    // Cleared after this render's effects (the county/city cascades) have run.
+    setTimeout(() => {
+      isApplyingSavedAddress.current = false;
+    }, 0);
+  }, [form]);
+
   // Go back to delivery type selection
   const handleBackToTypes = () => {
     if (isCivilStatus) return; // civil: o singură metodă, fără back la picker
@@ -1359,6 +1374,10 @@ export function DeliveryStepModular({ onValidChange }: DeliveryStepProps) {
               <MapPin className="h-4 w-4 text-primary-500" />
               Adresa de Livrare
             </h4>
+
+            {/* Adresele salvate în cont — sugestie deasupra formularului, ca
+                mașinile salvate la cazier auto (SavedVehiclePicker). */}
+            <SavedAddressPicker onPick={handleSavedAddressPick} />
 
             <Form {...form}>
               <form className="grid grid-cols-2 gap-3 sm:gap-4">

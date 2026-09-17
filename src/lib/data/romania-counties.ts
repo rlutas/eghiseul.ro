@@ -105,6 +105,26 @@ export function findCounty(input: string | undefined | null): County | null {
 }
 
 /**
+ * Canonical county name, additionally tolerant of missing diacritics
+ * ("Bucuresti", "Timis", "Valcea"). `findCounty` compares literally, so a value
+ * typed or imported without diacritics finds nothing — which matters when the
+ * result has to match an option of a county dropdown.
+ * Returns null when no county matches.
+ */
+export function canonicalCountyName(input: string | undefined | null): string | null {
+  const exact = findCounty(input);
+  if (exact) return exact.name;
+
+  const stripDiacritics = (value: string) =>
+    value.trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+
+  const needle = stripDiacritics(input || '');
+  if (!needle) return null;
+
+  return COUNTIES.find(c => stripDiacritics(c.name) === needle)?.name ?? null;
+}
+
+/**
  * Get county name from code or abbreviation
  */
 export function getCountyName(codeOrName: string | undefined | null): string {

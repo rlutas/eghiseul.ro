@@ -32,10 +32,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useModularWizard } from '@/providers/modular-wizard-provider';
+import { useModularWizard, isPhoneOrderMode } from '@/providers/modular-wizard-provider';
 import { cn } from '@/lib/utils';
 import { COUNTIES, getLocalitiesForCounty, findCounty } from '@/lib/data/romania-counties';
 import { isPfBillingComplete, isForeignBillingCountry } from '@/lib/orders/billing-validation';
+import { savedPfBillingPrefill } from '@/lib/wizard/saved-billing-profile';
 import { isBucharestCounty, formatSector, BUCHAREST_SECTORS_BILLING } from '@/lib/oblio/address';
 import { COUNTRIES as WORLD_COUNTRIES } from '@/config/countries';
 import { SearchableSelect } from '@/components/shared/SearchableSelect';
@@ -190,6 +191,27 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
   const isCarteFunciara = NO_ID_SCAN_PROPERTY_SLUGS.has(serviceSlug || '');
   const companyFirst = isPJOrder || isConstatatorFirm;
 
+  // CF/cadastral: no implicit default (chooser first). Legacy drafts saved with
+  // source 'self' (not a CF option — its fields render disabled and can never be
+  // filled) fall back to the editable manual-PF variant.
+  const selectedSource = isCarteFunciara
+    ? (billing?.source === 'self' ? 'other_pf' : billing?.source)
+    : (billing?.source || (companyFirst ? 'company' : 'self'));
+  const billingOptions = isCarteFunciara
+    ? CF_BILLING_OPTIONS
+    : isConstatatorFirm
+      ? CONSTATATOR_BILLING_OPTIONS
+      : isConstatatorPf
+        ? CONSTATATOR_PF_BILLING_OPTIONS
+        : isPJOrder
+          ? PJ_BILLING_OPTIONS
+          : PF_BILLING_OPTIONS;
+  // The PF card means the CUSTOMER only when the option set has no separate
+  // „Facturează pe mine" (imobiliare, comenzi PJ, constatator pe firmă). Where
+  // that card exists, „Altă persoană fizică" really is another person, so the
+  // customer's own saved profile has no business there.
+  const pfOptionIsCustomer = !billingOptions.some((o) => o.source === 'self');
+
   // CUI validation state
   const [cuiLoading, setCuiLoading] = useState(false);
   const [cuiError, setCuiError] = useState<string | null>(null);
@@ -200,10 +222,25 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
   // UI-only; both still submit as source === 'company'.
   const [companyMode, setCompanyMode] = useState<'request' | 'other'>('request');
 
-  // Check for saved PJ billing profile to auto-fill
-  const savedPjProfile = prefillData?.billing_profiles?.find(
-    (bp: { type: string; billing_data?: Record<string, unknown> }) => bp.type === 'persoana_juridica'
+  // Profilurile de facturare salvate în cont. Mod telefonic: contul logat e al
+  // operatorului, comanda e a clientului de la telefon — nu precompletăm nimic
+  // din el (aceeași regulă ca PREFILL_FROM_PROFILE din provider).
+  const savedProfiles = useMemo(
+    () => (isPhoneOrderMode() ? [] : prefillData?.billing_profiles ?? []),
+    [prefillData]
   );
+  // Check for saved PJ billing profile to auto-fill
+  const savedPjProfile = savedProfiles.find((bp) => bp.type === 'persoana_juridica');
+  // Same, for persoană fizică — the "Facturare" tab saves both types but only
+  // the PJ one was ever read back, so a saved PF profile did nothing.
+  const savedPfProfile = savedProfiles.find((bp) => bp.type === 'persoana_fizica');
+  const savedPfPrefill = useMemo(
+    () => savedPfBillingPrefill(savedPfProfile?.billing_data),
+    [savedPfProfile]
+  );
+  // Whether the PF fields currently on screen came from that saved profile
+  // (drives the same green notice the PJ branch shows).
+  const [usedSavedPfProfile, setUsedSavedPfProfile] = useState(false);
 
   // Get prefill data from personal KYC (memoized to avoid new object refs each render).
   // Address is kept STRUCTURED — Oblio needs street/locality/county separately.
@@ -397,6 +434,13 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
 
   // Handle source selection
   const handleSourceSelect = useCallback((source: BillingSource) => {
+    // Re-tapping the PF card that is already selected must not wipe what the
+    // customer typed there (nor drop a foreign address they picked).
+    const pfHasInput = Boolean(
+      billing?.firstName || billing?.lastName || billing?.cnp || billing?.address
+    );
+    if (source === 'other_pf' && billing?.source === 'other_pf' && pfHasInput) return;
+
     // Every source switch starts from a domestic (RO) address form.
     setForeignToggle(false);
     if (source === 'self') {
@@ -428,32 +472,45 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
           county: prefillFromId?.county,
         }),
       });
+      setUsedSavedPfProfile(false);
       setCuiSuccess(false);
       setCuiError(null);
     } else if (source === 'other_pf') {
-      // Clear all and let user enter manually
+      // Prefill from the saved PF profile exactly like `company` uses the saved
+      // PJ one — but only where this card means the customer themselves. The
+      // profile carries name/CNP/street; localitate + județ (required by Oblio)
+      // are almost never stored, so the step stays invalid until the customer
+      // completes them. Everything remains editable.
+      const pf = pfOptionIsCustomer ? savedPfPrefill : null;
+      const pfFields = {
+        firstName: pf?.firstName || '',
+        lastName: pf?.lastName || '',
+        cnp: pf?.cnp || '',
+        address: pf?.address || '',
+        city: pf?.city || '',
+        county: pf?.county || '',
+        postalCode: pf?.postalCode || '',
+        country: pf?.country || 'Romania',
+      };
       updateBilling({
         source,
         type: 'persoana_fizica',
-        firstName: '',
-        lastName: '',
-        cnp: '',
-        address: '',
-        city: '',
-        county: '',
-        postalCode: '',
-        country: 'Romania',
+        ...pfFields,
         // Clear company fields
         companyName: undefined,
         cui: undefined,
         regCom: undefined,
         companyAddress: undefined,
         cuiVerified: undefined,
-        isValid: false,
+        isValid: pf
+          ? isPfBillingComplete(pfFields, { cnpOptional: isCarteFunciara })
+          : false,
       });
+      setUsedSavedPfProfile(!!pf);
       setCuiSuccess(false);
       setCuiError(null);
     } else if (source === 'company') {
+      setUsedSavedPfProfile(false);
       // Switch to company mode
       // Priority: 1) companyKyc from wizard step 3, 2) saved PJ profile, 3) empty
       const pjData = savedPjProfile?.billing_data as Record<string, string> | undefined;
@@ -493,8 +550,7 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
         setCuiError(null);
       }
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [billing, prefillFromId, companyKyc, updateBilling]);
+  }, [billing, prefillFromId, companyKyc, updateBilling, savedPfPrefill, pfOptionIsCustomer, isCarteFunciara, savedPjProfile]);
 
   // Constatator: maps the 3 billing cards (firma din certificat / altă firmă /
   // persoană fizică) onto the underlying sources. Both firm cards use source
@@ -641,22 +697,6 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [validationAttempt]);
 
-  // CF/cadastral: no implicit default (chooser first). Legacy drafts saved with
-  // source 'self' (not a CF option — its fields render disabled and can never be
-  // filled) fall back to the editable manual-PF variant.
-  const selectedSource = isCarteFunciara
-    ? (billing?.source === 'self' ? 'other_pf' : billing?.source)
-    : (billing?.source || (companyFirst ? 'company' : 'self'));
-  const billingOptions = isCarteFunciara
-    ? CF_BILLING_OPTIONS
-    : isConstatatorFirm
-      ? CONSTATATOR_BILLING_OPTIONS
-      : isConstatatorPf
-        ? CONSTATATOR_PF_BILLING_OPTIONS
-        : isPJOrder
-          ? PJ_BILLING_OPTIONS
-          : PF_BILLING_OPTIONS;
-
   return (
     <div className="space-y-8">
       {/* Billing Source Selection */}
@@ -736,6 +776,16 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
             <div className="flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded-lg text-sm text-green-700">
               <CheckCircle className="w-4 h-4 shrink-0" />
               Date preluate automat din actul de identitate scanat
+            </div>
+          )}
+
+          {selectedSource === 'other_pf' && usedSavedPfProfile && (
+            <div className="flex items-start gap-2 p-3 bg-green-50 border border-green-200 rounded-lg text-sm text-green-700">
+              <CheckCircle className="w-4 h-4 shrink-0 mt-0.5" />
+              <span>
+                Date preluate din profilul de facturare salvat în contul tău.
+                Le poți modifica oricând mai jos.
+              </span>
             </div>
           )}
 
