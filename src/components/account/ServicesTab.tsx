@@ -41,13 +41,13 @@ export default function ServicesTab({ services }: { services: AccountServiceRow[
 
   return (
     <div className="space-y-6">
-      <div>
-        <h3 className="text-lg font-semibold text-secondary-900">Ce poți comanda</h3>
-        <p className="text-sm text-neutral-500">
-          Poți comanda orice serviciu. Sub fiecare scrie ce îți mai cerem în formular — restul
-          se completează din contul tău.
-        </p>
-      </div>
+      {/* No heading here: the panel around this already names itself
+          ("Ce pot comanda"), and two headings saying the same thing read as a
+          mistake. */}
+      <p className="text-sm text-neutral-600">
+        Poți comanda orice serviciu. Sub fiecare scrie ce îți mai cerem în formular — restul se
+        completează din contul tău.
+      </p>
 
       {Object.entries(groups).map(([group, rows]) => (
         <section key={group}>

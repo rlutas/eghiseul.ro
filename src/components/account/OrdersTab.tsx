@@ -114,13 +114,10 @@ export default function OrdersTab({ initialOrders, className }: OrdersTabProps) 
   return (
     <div className={cn('space-y-6', className)}>
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h3 className="text-lg font-semibold text-secondary-900">Comenzile Mele</h3>
-          <p className="text-sm text-neutral-500">
-            Istoricul comenzilor și statusul lor
-          </p>
-        </div>
+      {/* No heading: the panel around this already says "Comenzile mele", and
+          repeating it reads as a mistake. */}
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-sm text-neutral-600">Istoricul comenzilor și statusul lor</p>
         <Button
           asChild
           className="bg-primary-500 hover:bg-primary-600 text-secondary-900"

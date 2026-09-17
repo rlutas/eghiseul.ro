@@ -13,9 +13,6 @@ import type { AccountServiceRow } from '@/components/account/ServicesTab'
 import type { Database } from '@/types/supabase'
 import {
   Mail,
-  CheckCircle,
-  Clock,
-  Plus,
   Settings,
   ChevronRight,
   Loader2,
@@ -85,10 +82,6 @@ export default async function AccountPage() {
 
   // Calculate actual KYC status (requires BOTH front ID AND selfie)
   const docTypes = kycDocs?.map((d: { document_type: string }) => d.document_type) || []
-  const hasFrontId = docTypes.some((t: string) => t === 'ci_front' || t === 'ci_nou_front')
-  const hasSelfie = docTypes.some((t: string) => t === 'selfie' || t === 'selfie_with_id')
-  const isKycComplete = hasFrontId && hasSelfie
-  const isKycPartial = (hasFrontId || hasSelfie) && !isKycComplete
 
   const completeness = profileCompleteness({
     firstName: profile?.first_name,
@@ -154,111 +147,74 @@ export default async function AccountPage() {
   const initials = `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase() || 'U'
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-neutral-50 to-white -mt-16 xl:-mt-[112px]">
-      {/* Hero Header — bleed up under the fixed global header (elimină banda
-          albă a spacer-ului dintre header și „Salut, nume"). */}
-      <div className="bg-gradient-to-r from-secondary-900 via-secondary-800 to-secondary-900 text-white pt-16 xl:pt-[112px]">
-        <div className="container mx-auto px-4 py-8 max-w-6xl">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-            {/* User Info */}
-            <div className="flex items-center gap-4">
-              <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-primary-500 flex items-center justify-center shadow-lg">
-                <span className="text-2xl md:text-3xl font-bold text-secondary-900">{initials}</span>
-              </div>
-              <div>
-                <h1 className="text-2xl md:text-3xl font-bold">
-                  {firstName ? `Salut, ${firstName}!` : 'Contul meu'}
-                </h1>
-                <p className="text-white/70 flex items-center gap-2 mt-1">
-                  <Mail className="w-4 h-4" />
-                  {user.email}
-                </p>
-              </div>
+    <div className="min-h-screen bg-neutral-50 -mt-16 xl:-mt-[112px]">
+      {/* Header. Compact on purpose: it used to be a full hero with three big
+          stat columns, which on a phone meant the content started below the
+          fold. The KYC stat is gone — the checklist below already tracks it and
+          the header should not be the third place saying the same thing. */}
+      <div className="bg-secondary-900 text-white pt-16 xl:pt-[112px]">
+        <div className="container mx-auto px-4 pt-6 pb-7 max-w-6xl">
+          <div className="flex items-center gap-4">
+            <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-primary-500 sm:h-14 sm:w-14">
+              <span className="text-lg font-bold text-secondary-900 sm:text-xl">{initials}</span>
             </div>
 
-            {/* Quick Stats */}
-            <div className="flex gap-4 md:gap-6">
-              <div className="text-center">
-                <p className="text-3xl font-bold text-primary-500">{orders?.length || 0}</p>
-                <p className="text-sm text-white/60">Comenzi</p>
+            <div className="min-w-0 flex-1">
+              <h1 className="truncate text-xl font-bold sm:text-2xl">
+                {firstName ? `Salut, ${firstName}!` : 'Contul meu'}
+              </h1>
+              <p className="mt-0.5 flex items-center gap-1.5 text-sm text-white/60">
+                <Mail className="h-3.5 w-3.5 flex-shrink-0" />
+                <span className="truncate">{user.email}</span>
+              </p>
+            </div>
+
+            {/* Counts, not a scoreboard: small, aligned right, tabular so they
+                do not jiggle as they change. */}
+            <div className="hidden flex-shrink-0 gap-6 sm:flex">
+              <div className="text-right">
+                <p className="text-2xl font-bold tabular-nums text-primary-500">{orders?.length || 0}</p>
+                <p className="text-xs text-white/50">Comenzi</p>
               </div>
-              <div className="text-center">
-                <p className="text-3xl font-bold text-primary-500">{kycDocs?.length || 0}</p>
-                <p className="text-sm text-white/60">Acte salvate</p>
-              </div>
-              <div className="text-center">
-                <div className={`text-3xl font-bold ${isKycComplete ? 'text-green-400' : isKycPartial ? 'text-amber-400' : 'text-yellow-400'}`}>
-                  {isKycComplete ? <CheckCircle className="w-8 h-8" /> : <Clock className="w-8 h-8" />}
-                </div>
-                <p className="text-sm text-white/60">KYC</p>
+              <div className="text-right">
+                <p className="text-2xl font-bold tabular-nums text-primary-500">{kycDocs?.length || 0}</p>
+                <p className="text-xs text-white/50">Acte salvate</p>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="container mx-auto px-4 py-8 max-w-6xl">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-8">
+      <div className="container mx-auto max-w-6xl px-4 py-6 lg:py-8">
+        <div className="space-y-6">
+          {/* Before anything else, because it is the thing a new account should
+              act on — and it removes itself once complete. */}
+          <ProfileChecklist completeness={completeness} />
 
-          {/* Sidebar. On a phone it renders AFTER the tabs (order-2): the
-              customer opened the account to see their orders, not to find
-              "Comandă nouă" — which pushed the actual content below the fold. */}
-          <div className="order-2 lg:order-1 lg:col-span-1 space-y-4">
-            {/* Quick Actions Card */}
-            <div className="bg-white rounded-2xl shadow-sm border border-neutral-100 overflow-hidden">
-              <div className="p-4 border-b border-neutral-100 bg-neutral-50">
-                <h3 className="font-semibold text-secondary-900">Acțiuni rapide</h3>
-              </div>
-              <div className="p-2">
-                <Link
-                  href="/servicii"
-                  className="flex items-center gap-3 p-3 rounded-xl hover:bg-primary-50 transition-colors group"
-                >
-                  <div className="w-10 h-10 rounded-xl bg-primary-100 flex items-center justify-center group-hover:bg-primary-200 transition-colors">
-                    <Plus className="w-5 h-5 text-primary-600" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="font-medium text-secondary-900">Comandă nouă</p>
-                    <p className="text-xs text-neutral-500">Cazier, certificate, etc.</p>
-                  </div>
-                  <ChevronRight className="w-5 h-5 text-neutral-400" />
-                </Link>
-
-                <Link
-                  href="/account/settings/"
-                  className="flex items-center gap-3 p-3 rounded-xl hover:bg-neutral-50 transition-colors group"
-                >
-                  <div className="w-10 h-10 rounded-xl bg-neutral-100 flex items-center justify-center">
-                    <Settings className="w-5 h-5 text-neutral-600" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="font-medium text-secondary-900">Setări cont</p>
-                    <p className="text-xs text-neutral-500">Parolă, email, sesiuni</p>
-                  </div>
-                  <ChevronRight className="w-5 h-5 text-neutral-400" />
-                </Link>
-
-                <div className="px-3 pt-3">
-                  <LogoutButton />
-                </div>
-              </div>
-            </div>
-
-          </div>
-
-          {/* Main Content Area - Tabs */}
-          <div className="order-1 lg:order-2 lg:col-span-3 space-y-6">
-            <ProfileChecklist completeness={completeness} />
-            <Suspense fallback={
+          <Suspense
+            fallback={
               <div className="flex items-center justify-center py-12">
-                <Loader2 className="w-8 h-8 text-primary-500 animate-spin" />
+                <Loader2 className="h-8 w-8 animate-spin text-primary-500" />
               </div>
-            }>
-              <AccountTabs services={accountServices} />
-            </Suspense>
-          </div>
+            }
+          >
+            <AccountTabs services={accountServices} />
+          </Suspense>
 
+          {/* Account-level actions, deliberately last and visually quieter than
+              the navigation: signing out is not something to put next to the
+              destinations someone is trying to reach. */}
+          <div className="flex flex-col gap-2 border-t border-neutral-200 pt-6 sm:flex-row sm:items-center sm:justify-between">
+            <Link
+              href="/account/settings/"
+              className="inline-flex min-h-[44px] items-center gap-2 rounded-xl px-3 text-sm font-medium text-neutral-600 transition-colors hover:bg-white hover:text-secondary-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
+            >
+              <Settings className="h-4 w-4" />
+              Setări cont — parolă, email, sesiuni
+              <ChevronRight className="h-4 w-4 text-neutral-400" />
+            </Link>
+            <LogoutButton />
+          </div>
         </div>
       </div>
     </div>

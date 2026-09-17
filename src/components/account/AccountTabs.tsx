@@ -19,6 +19,7 @@ import {
   LayoutGrid,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { AccountNav, type AccountNavItem, type AccountTabId } from './AccountNav';
 import ProfileTab from './ProfileTab';
 import KYCTab from './KYCTab';
 import AddressesTab from './AddressesTab';
@@ -27,26 +28,22 @@ import OrdersTab from './OrdersTab';
 import VehiclesTab from './VehiclesTab';
 import ServicesTab, { type AccountServiceRow } from './ServicesTab';
 
-type TabId = 'services' | 'orders' | 'profile' | 'kyc' | 'addresses' | 'vehicles' | 'billing';
+type TabId = AccountTabId;
 
-interface Tab {
-  id: TabId;
-  label: string;
-  labelShort: string;
-  icon: typeof User;
-}
+// The two destinations someone actually opens the account for.
+const PRIMARY_ITEMS: AccountNavItem[] = [
+  { id: 'services', label: 'Ce pot comanda', labelShort: 'Comandă', icon: LayoutGrid },
+  { id: 'orders', label: 'Comenzile mele', labelShort: 'Comenzi', icon: Package },
+];
 
-// Order matters: the tab strip scrolls horizontally on a phone, so the two
-// things a customer actually comes for — ordering something and checking an
-// order — must be reachable without scrolling it.
-const TABS: Tab[] = [
-  { id: 'services', label: 'Ce pot comanda', labelShort: 'Servicii', icon: LayoutGrid },
-  { id: 'orders', label: 'Comenzi', labelShort: 'Comenzi', icon: Package },
-  { id: 'profile', label: 'Profil', labelShort: 'Profil', icon: User },
-  { id: 'kyc', label: 'Verificare KYC', labelShort: 'KYC', icon: Shield },
+// Reference data, reached occasionally — kept one level down instead of
+// competing with the two above.
+const SECONDARY_ITEMS: AccountNavItem[] = [
+  { id: 'profile', label: 'Date personale', labelShort: 'Date personale', icon: User },
+  { id: 'kyc', label: 'Act de identitate', labelShort: 'Act identitate', icon: Shield },
   { id: 'addresses', label: 'Adrese', labelShort: 'Adrese', icon: MapPin },
-  { id: 'vehicles', label: 'Mașinile mele', labelShort: 'Mașini', icon: Car },
   { id: 'billing', label: 'Facturare', labelShort: 'Facturare', icon: CreditCard },
+  { id: 'vehicles', label: 'Mașinile mele', labelShort: 'Mașini', icon: Car },
 ];
 
 interface AccountTabsProps {
@@ -109,40 +106,28 @@ export default function AccountTabs({ initialTab = 'services', className, servic
     }
   };
 
+  const activeLabel =
+    [...PRIMARY_ITEMS, ...SECONDARY_ITEMS].find((i) => i.id === activeTab)?.label ?? '';
+
   return (
-    <div ref={containerRef} className={cn('space-y-6', className)}>
-      {/* Tab Navigation */}
-      <div className="bg-white rounded-2xl border border-neutral-200 p-1.5">
-        <nav className="flex gap-1 overflow-x-auto">
-          {TABS.map((tab) => {
-            const Icon = tab.icon;
-            const isActive = activeTab === tab.id;
+    <div
+      ref={containerRef}
+      className={cn('grid grid-cols-1 gap-6 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-8', className)}
+    >
+      <AccountNav
+        primary={PRIMARY_ITEMS}
+        secondary={SECONDARY_ITEMS}
+        active={activeTab}
+        onSelect={handleTabChange}
+      />
 
-            return (
-              <button
-                key={tab.id}
-                onClick={() => handleTabChange(tab.id)}
-                className={cn(
-                  'flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium text-sm transition-all whitespace-nowrap flex-1 justify-center',
-                  isActive
-                    ? 'bg-primary-500 text-secondary-900 shadow-sm'
-                    : 'text-neutral-600 hover:bg-neutral-100 hover:text-secondary-900'
-                )}
-              >
-                <Icon className={cn(
-                  'w-4 h-4',
-                  isActive ? 'text-secondary-900' : 'text-neutral-400'
-                )} />
-                <span className="hidden sm:inline">{tab.label}</span>
-                <span className="sm:hidden">{tab.labelShort}</span>
-              </button>
-            );
-          })}
-        </nav>
-      </div>
-
-      {/* Tab Content */}
       <div>
+        {/* The panel names itself: on a phone the nav scrolls out of view, so
+            without a heading there is nothing saying what you are looking at.
+            Also gives screen readers the h2 the section was missing. */}
+        <h2 className="mb-3 text-lg font-bold text-secondary-900 lg:mb-4 lg:text-xl">
+          {activeLabel}
+        </h2>
         {renderTabContent()}
       </div>
     </div>
