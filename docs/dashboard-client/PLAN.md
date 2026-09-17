@@ -105,54 +105,31 @@ Probleme verificate în cod și în date:
 
 ---
 
-## 2b. Contextul de piață — nimeni nu are cont
+## 2b. Contextul de piață — un singur fapt util
 
-Din ~12 concurenți români vii, deschiși și parcurși pe 17.09.2026: **zero au un
-cont de client real.** Tiparul universal e:
+Din ~12 concurenți români vii, deschiși unul câte unul pe 17.09.2026: **zero au
+cont de client.** Toată categoria e comandă ca invitat → plată → pagină de status
+deblocată cu un cod. Inclusiv platformele surori (`ecazier.ro`,
+`cazierjudiciaronline.com`).
 
-> comandă ca invitat → plată → pagină „verifică statusul" deblocată cu un cod, nu cu o parolă.
+Asta e singura concluzie pe care o luăm din concurență, și e una de poziționare,
+nu de design: **nu există model de imitat.** Nimeni nu are un cont, nimeni nu are
+platformă multi-serviciu, deci nu putem copia forma de la nimeni. Construim din
+ce știm despre clienții noștri și despre ce cer serviciile noastre.
 
-Inclusiv platformele noastre surori: `ecazier.ro` are „Urmărește comanda";
-`cazierjudiciaronline.com` cere număr comandă + email și n-are nicio rută de cont.
+Un al doilea fapt, tot de poziționare: pe imobiliare și ONRC concurența vinde la
+49–89 lei cu 6 câmpuri pe un ecran. Acolo, orice pas în plus costă — inclusiv în
+cont.
 
-**Consecința:** dacă introducem un cont, suntem singurii din piață care cer asta.
-Deci contul nu are voie să fie o taxă înainte de comandă — trebuie să se plătească
-singur, după.
-
-Alte observații care schimbă decizii:
-
-- **Pe imobiliare și ONRC, concurența cere 6 câmpuri pe un ecran și NICIUN act de
-  identitate, la 49–89 lei** (`funciara.com` 49, `efunciara.ro` 69, `depus.ro`
-  89). Orice pas de KYC pe serviciile astea e necompetitiv prin construcție.
-- **Cel mai bun concurent pe cazier** (`cazierul-judiciar-online.ro`, 149 lei) face
-  trei lucruri pe care le putem copia: prețul e în eticheta fiecărei opțiuni, nu
-  într-un total; costul de curier e scris cu ambele variante (30 lei oraș / 70 lei
-  sat) **înainte** de a alege; iar uploadul buletinului e **opt-out** — „comanzi
-  acum, trimiți buletinul după, pe WhatsApp".
-- **Același concurent își pune singur alternativa gratuită lângă preț:** „Vrei
-  varianta gratuită? Cazierul se eliberează gratuit dacă te prezinți personal la
-  ghișeele Poliției." E cea mai bună apărare din piață împotriva acuzației
-  publice a ministrului Digitalizării din 2023 („niște băieți foarte creativi…
-  nimic ilegal… costă 300–500 de lei"), care e premisa cu care intră pe site
-  oricine a citit știrea.
-- **Abandonul documentat public** (forum avocatnet): *„am încercat dar îmi dă
-  plata la curier și este 210 Ron"* — omul a completat tot și a văzut costul real
-  abia la livrare. Punctul de abandon nu e prețul, e **momentul** în care apare.
-- **Nu mizăm pe SSO de stat.** Adopția eID în România: 10,09% în 2025, 4,67%
-  pentru servicii publice, în scădere (Eurostat).
-- **Documentul digital chiar a fost refuzat instituțional** — un cetățean cu
-  cazier luat de pe ghiseul.ro a fost respins la Instituția Prefectului Brașov
-  (2023). Livrarea fizică nu e upsell, e răspuns la un risc real.
-- **Valoarea contului, formulată de piață prin absență:** nimeni nu poate spune
-  „cazierul tău expiră în 180 de zile" sau „actul tău e deja validat, a doua
-  comandă e un clic". Aia e diferența, nu „îți vezi comenzile".
+Restul cercetării de piață e în `RESEARCH.md`, ca arhivă. Nu conduce designul.
 
 ---
 
 ## 3. Principii, din cercetare
 
-Surse în §7. Reguli pe care le propun ca fiind obligatorii pentru orice ecran din
-plan:
+Surse în §7. Reguli obligatorii pentru orice ecran din plan. Nu sunt copiate de
+la un concurent — n-are niciunul cont; vin din cercetare pe produse care chiar au
+rezolvat problema asta (Monzo, GOV.UK, VA.gov, Stripe, Baymard, NN/g).
 
 1. **Urmărirea comenzii rămâne accesibilă fără autentificare.** NN/g o cere
    explicit (ghidul 13). La noi e și mai apăsat: se poate comanda fără cont, iar
@@ -187,7 +164,16 @@ plan:
 
 ---
 
-## 4. Ce propun
+## 4. Ce construim
+
+Deciziile de mai jos sunt **luate** (17.09.2026), nu propuneri.
+
+### Regula care le leagă: contul nu cere, contul primește
+
+Comanda rămâne posibilă complet fără cont, iar linkul public de urmărire rămâne
+funcțional. Contul apare **după plată**, pe pagina de succes, și se umple singur
+din comanda tocmai făcută. Clientul nu completează un profil; îi este oferit unul
+deja completat.
 
 ### Faza 0 — reparații care fac contul completabil
 
@@ -202,50 +188,64 @@ Fără astea, orice ecran nou e decor. Nu schimbă niciun pixel.
 | 0.5 | Formularul de vehicul expune `driving_license` | cazierul auto îl cere, pickerul îl citește |
 | 0.6 | `preferredContact` — aliniat camelCase | nu s-a propagat niciodată |
 
-### Faza 1 — dashboardul propriu-zis
+### Faza 1 — contul se creează la final și absoarbe comanda
 
-**Ecranul de start devine „comenzile mele", nu catalogul.** Pentru fiecare
-comandă activă, un card care răspunde la trei întrebări, în ordinea asta:
+Pe pagina de succes, după plată: **o parolă**, atât. Restul datelor sunt deja
+introduse în comandă.
 
-1. **Unde e?** — statusul în română, plus o linie „ce urmează și cine face"
-   (noi / instituția / tu), cu termenul estimat. Modelul VA.gov.
-2. **Trebuie să fac eu ceva?** — dacă da, e singurul lucru accentuat pe card.
+Ce se salvează automat în cont din comanda tocmai plătită:
+
+- datele personale (nume, CNP, data și locul nașterii);
+- **actul de identitate și selfie-ul**, dacă serviciul le-a cerut — rămân
+  valabile pentru comenzile viitoare;
+- adresa de livrare;
+- datele de facturare;
+- vehiculul, unde e cazul.
+
+Asta face ca a doua comandă să fie scurtă fără ca nimeni să fi completat vreodată
+un formular de profil.
+
+### Faza 2 — onboarding condiționat de servicii
+
+La prima intrare în cont, **o singură întrebare**: *ce servicii te interesează?*
+(sau „la ce crezi că vei aplica"), cu răspunsuri multiple și opțiunea de a sări.
+
+Răspunsul schimbă imediat și vizibil ce cere contul:
+
+| Alege | Contul cere | Contul NU cere |
+|---|---|---|
+| Cazier judiciar / fiscal / auto, certificat integritate, stare civilă (**11 servicii**) | act de identitate + selfie, date personale, adresă, facturare | — |
+| Certificat constatator, extras CF, acte cadastrale, urbanism (**20 de servicii**) | date de facturare, adresă | **act de identitate, selfie** |
+
+Confirmat în producție: din 31 de servicii active, **11 au `personalKyc.enabled`,
+20 nu**. Nici noi nu depunem act de identitate la ONRC — deci nu-l cerem nici
+clientului care vrea doar constatator sau extras CF.
+
+Întrebarea trece testul de la §3.6: „pentru că ai răspuns *constatator*, contul
+nu-ți mai cere actul de identitate". Dacă omul sare peste întrebare, contul nu
+cere nimic în plus și rămâne pe ce a adus comanda.
+
+### Faza 3 — datele din act se refolosesc, cu acordul clientului
+
+După ce actul e scanat în cont, clientul poate alege ca **aceleași date să fie
+folosite și la facturare** — nume, CNP, adresa din act — cu un singur comutator,
+nu prin recompletare. Implicit oprit; clientul decide.
+
+### Faza 4 — dashboardul propriu-zis
+
+Ecranul de start = comenzile. Pentru fiecare comandă activă, un card care
+răspunde la trei întrebări, în ordinea asta:
+
+1. **Unde e?** — status în română, plus „ce urmează și cine face" (noi /
+   instituția / tu), cu termen estimat ca dată, nu ca interval.
+2. **Trebuie să fac eu ceva?** — dacă da, e singurul lucru accentuat.
 3. **Unde-mi sunt documentele?** — descărcare directă, plus factura.
 
-Sub ele, comenzile încheiate, colapsate. Catalogul de servicii coboară pe locul
-doi — rămâne în cont, dar nu mai e primul lucru.
+Contul fără nicio comandă arată catalogul, nu un dashboard gol.
 
-**Contul gol nu arată un dashboard gol.** Dacă omul n-are nicio comandă (cazul
-majorității, imediat după înregistrare), ecranul de start e catalogul + o linie
-care explică ce va apărea aici după prima comandă.
-
-### Faza 2 — onboarding
-
-Nu un wizard. Trei momente, în ordinea în care clientul chiar are nevoie:
-
-1. **La finalul comenzii** (pagina de succes): „Pune-ți o parolă ca să urmărești
-   comanda" — un singur câmp, restul datelor sunt deja introduse. Aici se creează
-   contul, cu datele comenzii turnate în profil.
-2. **La prima intrare în cont**, checklistul — dar pre-completat din ultima
-   comandă, deci majoritatea pașilor sunt deja bifați și clientul doar confirmă.
-3. **Niciodată înainte de prima comandă.**
-
-Întrebări noi în onboarding: doar cele care trec testul de la §3.6. Candidatele
-pe care le propun spre discuție sunt în decizia D5.
-
-### Faza 3 — serviciile în cont
-
-Catalogul rămâne, dar cu indicatorul reparat la 0.4: „îți vom cere în formular
-X și Y" trebuie să fie adevărat pentru toate cele 31 de servicii, nu doar pentru
-cele 11 cu KYC.
-
-### Faza 4 — ce scrie comanda înapoi în cont
-
-Fiecare comandă finalizată completează profilul cu ce a introdus clientul, cu
-confirmare, nu tăcut. Asta face ca a doua comandă să fie scurtă fără ca nimeni să
-fi completat vreun formular de profil.
-
----
+Ce poate spune contul și nu poate spune nimeni altcineva: **„cazierul tău expiră
+în 180 de zile"**, „actul tău e deja validat", „a doua comandă e un clic".
+Infrastructura de expirări există deja (`lifecycle-emails-live`).
 
 ## 5. Ce NU propun
 
@@ -257,24 +257,33 @@ fi completat vreun formular de profil.
   poate rămâne așa.
 - **Nu gamificăm profilul.** „100% complet" nu e un scop dacă nu deblochează
   nimic concret.
-- **Nu cerem cont înainte de comandă, pe niciun serviciu.** Suntem singurii din
-  piață cu cont; orice zid înainte de plată e fricțiune fără precedent competitiv.
+- **Nu cerem cont înainte de comandă, pe niciun serviciu.** Decizia D1.
+- **Nu cerem act de identitate în cont celor care nu comandă servicii care îl cer.**
+  20 din 31 de servicii nu au `personalKyc.enabled`; nici noi nu depunem act la
+  ONRC. Decizia D5.
 - **Nu mizăm pe „loghează-te cu ROeID".** 4,67% adopție pentru servicii publice.
 
 ---
 
-## 6. Deciziile tale
+## 6. Decizii
+
+### Luate (17.09.2026)
+
+| # | Decizia | Răspuns |
+|---|---|---|
+| D1 | Linkul public de urmărire rămâne funcțional fără cont? | **Da.** Comanda fără cont rămâne posibilă complet. |
+| D2 | Ecranul de start: comenzile sau catalogul? | **Comenzile**; catalogul pentru contul fără comenzi. |
+| D3 | Contul se creează pe pagina de succes, doar cu parolă? | **Da**, și absoarbe tot din comanda plătită, inclusiv KYC. |
+| D5 | Ce întrebăm în onboarding? | **O întrebare:** ce servicii te interesează. Răspunsul decide dacă se cere act de identitate. |
+| D6 | Facem Faza 0 înainte de orice ecran nou? | **Da.** |
+| D7 | Selfie-ul rămâne? | **Da** — e verificarea că cel care înregistrează contul sau aplică e chiar clientul. Rămâne doar pe cele 11 servicii care îl cer, nu în cont pentru toți. |
+| D8 | Datele din act se pot folosi la facturare? | **Da**, la alegerea clientului, cu un comutator. Implicit oprit. |
+
+### Rămase
 
 | # | Decizia | De ce contează |
 |---|---|---|
-| **D1** | Linkul public de urmărire rămâne complet funcțional fără cont? | Dacă da, contul trebuie să adauge altceva decât acces la aceleași date — și trebuie să știm ce, înainte să-l construim. Dacă nu, îi forțăm pe oameni într-un cont pe care 91% nu-l vor folosi a doua oară. |
-| **D2** | Ecranul de start: comenzile sau catalogul? | Propun comenzile, cu catalogul pe doi și inversarea pentru contul gol. |
-| **D3** | Contul se creează pe pagina de succes (doar parolă)? | E recomandarea testată Baymard. Presupune că pagina de succes se schimbă — atinge wizardul. |
-| **D4** | Câte stări vede clientul? Azi sunt 17 interne, mapate în 24 de propoziții. | Prea multe stări = zgomot; prea puține = „în așteptare" pentru tot, ce aveam înainte. |
-| **D5** | Ce întrebăm în onboarding? | Fiecare candidat trebuie să treacă testul „pentru că ai răspuns X, vezi Y". Propun să discutăm lista concret. |
-| **D6** | Facem Faza 0 înainte de orice ecran nou? | Recomand da. Altfel repetăm ce s-a întâmplat azi: ecrane noi peste date care nu se pot salva. |
-
----
+| D4 | Câte stări vede clientul din cele 17 interne? | Prea multe = zgomot; prea puține = „în așteptare" pentru tot, ce aveam înainte. De stabilit când ajungem la cardul de comandă. |
 
 ## 7. Surse
 
@@ -322,10 +331,13 @@ afișare. `OrderFlowDisclosure` și footerul trebuie verificate față de anexa
 curentă, nu cea de anul trecut. **De verificat, nu constatat** — n-am comparat eu
 machetele.
 
-**9.2 Expunere GDPR pe selfie + copie act.** ANSPDCP a sancționat un operator
-exact pentru combinația copie CI + selfie, ca depășind scopul legitim. Doi
-concurenți (`obtinecazier.ro`, `eliberarecazier.ro`) cer „poză ținând buletinul în
-mână" — noi avem `selfieRequired = true` pe **toate** cele 11 servicii cu KYC.
-Ecranul trebuie să spună temeiul juridic și retenția, nu „pentru verificare".
-Pe extras CF și certificat constatator, unde concurența nu cere niciun act la
-49–89 lei, cerința e și necompetitivă.
+**9.2 Temeiul și retenția pentru selfie, scrise în UI.** Selfie-ul rămâne
+(decizia D7): e verificarea că persoana care înregistrează contul sau depune
+cererea e chiar clientul, iar avocatul care depune în numele lui are nevoie de
+asta. Ce lipsește nu e justificarea, ci **scrierea ei**: ANSPDCP a sancționat un
+operator pentru combinația copie CI + selfie colectată „pentru identificare",
+fără temei și scop documentate. Ecranul trebuie să spună cine cere, de ce, și cât
+păstrăm — nu „pentru verificare".
+
+Rămâne valabil și restul: `selfieRequired = true` doar pe cele 11 servicii care au
+`personalKyc.enabled`. Pe celelalte 20 nu se cere nici în comandă, nici în cont.
