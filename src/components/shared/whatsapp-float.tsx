@@ -12,15 +12,22 @@ const WHATSAPP =
 const NON_WIZARD_ORDER_ROUTES = ['/comanda/status', '/comanda/success'];
 
 /** Fixed WhatsApp button, bottom-right, site-wide — hidden on the admin and
- *  collaborator portals (internal tools; it overlapped admin action buttons)
- *  and on the order WIZARD + CHECKOUT: even lifted above the summary bar it
- *  landed on „Plătește" on phones (team screenshots, 14.09.2026). Both
- *  screens have an inline „Ai nevoie de ajutor? → WhatsApp" link instead.
+ *  collaborator portals (internal tools; it overlapped admin action buttons),
+ *  on the order WIZARD + CHECKOUT (even lifted above the summary bar it landed
+ *  on „Plătește" on phones — team screenshots, 14.09.2026) and in the CUSTOMER
+ *  ACCOUNT, where the same thing happens to an order card's own button: the
+ *  card action is full width on a phone and „Vezi ce lipsește" sat under the
+ *  bubble. The account has its own contact routes, and the footer keeps the
+ *  WhatsApp link.
  *  On status/success mobile may have fixed bottom bars — lift the button
  *  above them; those bars disappear on lg, where bottom-5 returns. */
 export function WhatsAppFloat() {
   const pathname = usePathname();
-  if (pathname.startsWith('/admin') || pathname.startsWith('/colaborator')) {
+  if (
+    pathname.startsWith('/admin') ||
+    pathname.startsWith('/colaborator') ||
+    pathname.startsWith('/account')
+  ) {
     return null;
   }
   const isOrderFlow = pathname.startsWith('/comanda');

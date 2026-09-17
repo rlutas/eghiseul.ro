@@ -114,5 +114,25 @@ Nu am ales eu între „construim ștergerea" și „schimbăm textul politicii"
 variantă înseamnă să ștergem dovezi la 30 de zile după livrare, inclusiv pe
 comenzile cu litigiu sau retur, și e o decizie de business, nu de cod.
 
-Build verde, 1926 de teste. Verificat pe telefon (390px) cu cont de test, șters
-după.
+### Curățenie vizuală pe telefon
+
+Verificat la 390px, cu cont de test:
+
+- **întrebarea de onboarding intra pe un ecran și jumătate** — paragraful de sub
+  întrebare avea trei rânduri, iar butoanele „Salvează"/„Sari peste" cădeau sub
+  fold, deci o întrebare de o singură dată arăta ca un formular. Textul e acum un
+  rând, cardurile mai strânse: întrebarea, cele patru răspunsuri și ambele butoane
+  intră pe primul ecran.
+- **butonul flotant de WhatsApp stătea peste butonul comenzii.** Pe telefon
+  acțiunea cardului e pe toată lățimea, deci bula acoperea capătul lui „Vezi ce
+  lipsește". Ascuns în tot `/account`, pentru același motiv pentru care e ascuns
+  pe wizard și pe checkout din 14.09 (acolo cădea peste „Plătește"). Contul are
+  propriile căi de contact, iar footerul păstrează linkul de WhatsApp.
+
+⚠️ Corecție la ce am raportat înainte: „bula de chat" din colțul dreapta-jos de
+pe capturile de dezvoltare **nu e un widget de chat** și nu există în producție —
+sunt React Query Devtools, randate doar când `NODE_ENV === 'development'`
+(`src/providers/query-provider.tsx`). La fel și cercul întunecat din stânga-jos:
+indicatorul de dezvoltare al Next.
+
+Build verde, 1926 de teste.

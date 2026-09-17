@@ -145,9 +145,11 @@ export function OnboardingQuestion() {
         <h2 id="onboarding-intrebare-titlu" className="font-bold text-secondary-900">
           Ce servicii te interesează?
         </h2>
-        <p id="onboarding-intrebare-descriere" className="mt-1 text-sm leading-relaxed text-neutral-600">
-          Folosim răspunsul ca să nu-ți cerem acte de care n-ai nevoie. Alege câte vrei — poți
-          comanda orice serviciu, indiferent ce răspunzi aici.
+        {/* One line, not three: on a 390px screen the old paragraph pushed the
+            answers and both buttons off the first screen, which made a one-time
+            question look like a form. */}
+        <p id="onboarding-intrebare-descriere" className="mt-1 text-sm leading-snug text-neutral-600">
+          Ca să nu-ți cerem acte de care n-ai nevoie. Alege câte vrei.
         </p>
 
         {/* A labelled group rather than a fieldset: the heading is already the
@@ -156,7 +158,7 @@ export function OnboardingQuestion() {
           role="group"
           aria-labelledby="onboarding-intrebare-titlu"
           aria-describedby="onboarding-intrebare-descriere"
-          className="mt-4 grid gap-2 sm:grid-cols-2"
+          className="mt-3 grid gap-1.5 sm:grid-cols-2"
         >
           {INTEREST_GROUPS.map((group) => {
             const isSelected = selected.includes(group.id);
@@ -164,7 +166,7 @@ export function OnboardingQuestion() {
               <label
                 key={group.id}
                 className={cn(
-                  'flex min-h-[56px] cursor-pointer items-start gap-3 rounded-xl border-2 p-3',
+                  'flex min-h-[56px] cursor-pointer items-center gap-3 rounded-xl border-2 px-3 py-2.5',
                   'transition-colors duration-200 motion-reduce:transition-none',
                   'has-[:focus-visible]:outline-none has-[:focus-visible]:ring-2',
                   'has-[:focus-visible]:ring-primary-500 has-[:focus-visible]:ring-offset-2',
@@ -185,7 +187,7 @@ export function OnboardingQuestion() {
                 <span
                   aria-hidden="true"
                   className={cn(
-                    'mt-0.5 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-md border-2',
+                    'flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-md border-2',
                     isSelected
                       ? 'border-primary-500 bg-primary-500 text-secondary-900'
                       : 'border-neutral-300 bg-white'
@@ -197,7 +199,7 @@ export function OnboardingQuestion() {
                   <span className="block text-sm font-semibold text-secondary-900">
                     {group.label}
                   </span>
-                  <span className="mt-0.5 block text-xs leading-relaxed text-neutral-500">
+                  <span className="mt-0.5 block text-xs leading-snug text-neutral-500">
                     {group.examples}
                   </span>
                 </span>
@@ -215,7 +217,7 @@ export function OnboardingQuestion() {
           </p>
         )}
 
-        <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center">
+        <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center">
           <button
             type="button"
             onClick={() => save(selected)}
