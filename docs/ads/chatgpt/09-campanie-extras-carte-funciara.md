@@ -370,18 +370,21 @@ site. Dacă și la noi e așa, CPC-ul real pe vizitator nu e 0,57 € ci 1,6–4
       care permite `/servicii/`. De reverificat dacă se adaugă vreodată WAF sau rate-limiting
 - [x] Imaginea 1024×1024 generată, fără însemne ANCPI
 - [x] Textele scrise pe pragul de trunchiere, nu pe limita de caractere
-- [ ] Creează campania `OAI_Click_ExtrasCF_2026-09`, Clicks, România, €20/zi
-- [ ] Text customization **Off** (altfel platforma rescrie anunțul fără reviewul nostru)
-- [ ] AG1 cu hint-ul din D, `Link` + `Tracking parameters` din H
-- [ ] Anunț T3 + D2, imagine `ad-extras-cf-1024.png`
-- [ ] Leagă evenimentul `Order CreatedPurchase` de campanie
+- [x] Creată campania `OAI_Click_ExtrasCF_2026-09`, Clicks, România, €20/zi
+- [x] Text customization **Off** (era pornit implicit)
+- [x] AG1 cu hint-ul din D, `Link` + `Tracking parameters` din H, Max CPC €1,95
+- [x] Două anunțuri, imagine `ad-extras-cf-1024.png`
+- [x] Evenimentul `Order CreatedPurchase` legat de campanie la creare
 - [ ] Setează coloanele pe 30 de zile clic / 0 view
 - [ ] Test în incognito pe URL-ul cu UTM: verifică în `/admin/orders` că draftul are
       `attribution.last.utm_campaign = extras-cf-2026-09`
-- [ ] Notează în jurnalul de mai jos data și ora pornirii
+- [ ] Zilnic: clicuri din Ads Manager față de sesiuni `chatgpt.com` în Vercel Analytics
 
 ## M. Jurnal
 
 | Data | Ce s-a întâmplat |
 |---|---|
 | 17.09 | Campania scrisă. Imaginea generată. FAQ-ul cu „Eliberăm" corectat. Descoperit blocantul: automatizarea ANCPI e moartă din 20.08, 27 de comenzi livrate manual, iar pagina promite „câteva minute, automat, 24/7". Campania NU s-a pornit; așteaptă decizia de la secțiunea C. |
+| 17.09 13:50 | **PORNITĂ.** Raul a confirmat termenul real (maximum 2 zile lucrătoare, de regulă aceeași zi) și a dat undă verde. Landingul corectat în 19 locuri, plus descrierea serviciului din DB. Campania creată în Ads Manager: `OAI_Click_ExtrasCF_2026-09`, Standard, obiectiv **Clicks**, România, toate cele 5 platforme, **€20/zi**, fără dată de final, eveniment de conversie `Order CreatedPurchase` legat de la creare. Un singur ad group, `AG1 Verificare proprietate`, **Max CPC €1,95** cu indicator „Strong Delivery", hint-ul din secțiunea E cu adaosul despre notar și bancă. **Două anunțuri**, ambele cu imaginea noastră: `Ad1 T3-D2 proprietar` („Cine e proprietarul imobilului?") și `Ad2 T4-D4 brand primul` („eGhișeul: extras carte funciară"), diferențiate în DB prin `utm_term=t3d2-intrebare` și `t4d4-brand`. Status la creare: **`Not serving` cu UN SINGUR motiv, „Ad is in review"** — spre deosebire de constatator, care avea patru motive și a stat 14 zile; contul e deja trecut prin brand review. |
+| | ⚠️ **Două lucruri de reținut din procesul de creare.** (1) Obiectivul implicit era **Conversions cu facturare pe afișări**, adică exact oCPM pe care research-ul îl descrie ca prematur la zero conversii; a trebuit schimbat manual pe Clicks. (2) Formularul a **pre-populat automat anunțul** din pagina de destinație, inclusiv cu o imagine trasă de pe landing care era **specimenul real de extras cu antet ANCPI**. Aia e fix „Scams & fraud: impersonate official entities". Am scos-o și am urcat imaginea noastră stilizată. Bugetul implicit era €65/zi, iar Text customization pornit. **Nimic din ce propune platforma implicit nu era ce voiam.** |
+| | Confirmat la creare, cu cifrele lor: la €20/zi, „maximum daily spend is €40.00, maximum seven-day spend is €140.00" — exact 2× și 7×, cum spune research-ul. |
