@@ -9,6 +9,7 @@ import {
   fillsProfileFromOcr,
 } from '@/lib/kyc/identity-documents';
 import { KYC_VALIDITY_DAYS } from '@/lib/kyc/constants';
+import { billingProfileFromIdData, hasUsableAddress } from '@/lib/account/id-data-to-profile';
 
 /**
  * POST /api/user/kyc/save
@@ -46,6 +47,11 @@ export async function POST(request: Request) {
       extractedData,
       validationResult,
       documentExpiry,
+      // Faza 3 / decision D8: reusing the document's data for invoicing is the
+      // customer's choice and is OFF unless they asked for it. It used to happen
+      // on every scan, silently, and it overwrote a billing profile they may
+      // have typed by hand.
+      useIdDataForBilling = false,
     } = body;
 
     // Validate required fields
@@ -136,14 +142,14 @@ export async function POST(request: Request) {
         .eq('id', user.id);
     }
 
-    // Auto-create address and billing profile from the OCR of a document that
-    // carries personal data (CI front, passport data page, new-CI back for the
-    // address). Each field below is written only when present, so a document
-    // that carries just the address never blanks the name.
+    // What the scan may fill in, from a document that carries personal data
+    // (CI front, passport data page, new-CI back for the address). Each write
+    // below is either additive or explicitly asked for — a scan must never
+    // quietly replace something the customer entered.
     if (fillsProfileFromOcr(documentType) && extractedData) {
-      // Auto-create address if we have address data
-      if (extractedData.address) {
-        // Check if we already have an address from act (to avoid duplicates)
+      // The address from the document, kept under its own label so it is
+      // distinguishable from one the customer wrote.
+      if (hasUsableAddress(extractedData.address)) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const { data: existingAddress } = await (supabase as any)
           .from('user_saved_data')
@@ -154,17 +160,24 @@ export async function POST(request: Request) {
           .maybeSingle();
 
         if (existingAddress) {
-          // Update existing address instead of creating duplicate
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           await (supabase as any)
             .from('user_saved_data')
-            .update({
-              data: extractedData.address,
-              updated_at: now.toISOString(),
-            })
+            .update({ data: extractedData.address, updated_at: now.toISOString() })
             .eq('id', existingAddress.id);
         } else {
-          // Create new address
+          // Its own `from()`: reusing the builder above would stack the filters
+          // and return nothing, silently.
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const { count: addressCount } = await (supabase as any)
+            .from('user_saved_data')
+            .select('id', { count: 'exact', head: true })
+            .eq('user_id', user.id)
+            .eq('data_type', 'address');
+
+          // Default only when there is nothing else to be default. Scanning a
+          // document must not silently move the delivery address the customer
+          // chose.
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           await (supabase as any)
             .from('user_saved_data')
@@ -173,66 +186,46 @@ export async function POST(request: Request) {
               data_type: 'address',
               label: 'Adresă din act',
               data: extractedData.address,
-              is_default: true,
-            })
-            .select()
-            .maybeSingle();
+              is_default: (addressCount ?? 0) === 0,
+            });
         }
       }
 
-      // Auto-create PF billing profile
-      if (extractedData.firstName || extractedData.lastName || extractedData.cnp) {
-        // Check if we already have a PF billing profile (by type or by label)
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { data: existingProfile } = await (supabase as any)
-          .from('billing_profiles')
-          .select('id')
-          .eq('user_id', user.id)
-          .eq('type', 'persoana_fizica')
-          .maybeSingle();
+      // The billing profile: only when the customer asked for it, and only when
+      // they do not already have one. An existing profile is never touched —
+      // they may have corrected it by hand, and the OCR is not more right than
+      // the person reading their own invoice.
+      if (useIdDataForBilling) {
+        const profileFromId = billingProfileFromIdData(extractedData);
 
-        // Format address string
-        const addr = extractedData.address || {};
-        const addressParts = [
-          addr.street,
-          addr.number ? `Nr. ${addr.number}` : null,
-          addr.building ? `Bl. ${addr.building}` : null,
-          addr.staircase ? `Sc. ${addr.staircase}` : null,
-          addr.apartment ? `Ap. ${addr.apartment}` : null,
-          addr.city,
-          addr.county,
-        ].filter(Boolean);
-
-        const billingData = {
-          firstName: extractedData.firstName,
-          lastName: extractedData.lastName,
-          cnp: extractedData.cnp,
-          address: addressParts.join(', '),
-        };
-
-        if (existingProfile) {
-          // Update existing billing profile instead of creating duplicate
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          await (supabase as any)
-            .from('billing_profiles')
-            .update({
-              billing_data: billingData,
-              updated_at: now.toISOString(),
-            })
-            .eq('id', existingProfile.id);
+        if (!profileFromId) {
+          console.warn(
+            `kyc/save: ${documentType} does not carry a complete enough address for a billing profile`
+          );
         } else {
-          // Create new billing profile
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          await (supabase as any)
+          const { data: existingProfile } = await (supabase as any)
             .from('billing_profiles')
-            .insert({
-              user_id: user.id,
-              type: 'persoana_fizica',
-              label: 'Profil personal',
-              billing_data: billingData,
-              is_default: true,
-            })
+            .select('id')
+            .eq('user_id', user.id)
+            .eq('type', 'persoana_fizica')
             .maybeSingle();
+
+          if (!existingProfile) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const { error: billingError } = await (supabase as any)
+              .from('billing_profiles')
+              .insert({
+                user_id: user.id,
+                type: 'persoana_fizica',
+                label: profileFromId.label,
+                billing_data: profileFromId,
+                is_default: true,
+              });
+            if (billingError) {
+              console.error('kyc/save: billing profile from document not saved:', billingError.message);
+            }
+          }
         }
       }
 

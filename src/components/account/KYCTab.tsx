@@ -174,7 +174,7 @@ export default function KYCTab({ className, serviceInterests }: KYCTabProps) {
   } = useKycStatus();
 
   const { addresses, create: createAddress, update: updateAddress } = useAddresses();
-  const { profiles, createFromIdData: createBillingFromId, update: updateBillingProfile } = useBillingProfiles();
+  const { profiles, createFromIdData: createBillingFromId } = useBillingProfiles();
 
   const [uploadingType, setUploadingType] = useState<DocumentTypeKey | CompanyDocTypeKey | null>(null);
   const [processingOcr, setProcessingOcr] = useState<DocumentTypeKey | null>(null);
@@ -183,6 +183,11 @@ export default function KYCTab({ className, serviceInterests }: KYCTabProps) {
   const [idType, setIdType] = useState<IdDocumentType | null>(null);
   const [isPickingIdType, setIsPickingIdType] = useState(false);
   const [showOptionalDocs, setShowOptionalDocs] = useState(false);
+  // Faza 3 / decision D8: the data read off the document may also be used for
+  // invoicing — the customer's choice, off by default. It used to happen on
+  // every scan, silently, and it overwrote a profile they may have corrected by
+  // hand with a flat address the next order would refuse.
+  const [reuseIdForBilling, setReuseIdForBilling] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [expandedDoc, setExpandedDoc] = useState<string | null>(null);
@@ -391,6 +396,7 @@ export default function KYCTab({ className, serviceInterests }: KYCTabProps) {
           extractedData: ocr.extractedData,
           validationResult: { confidence: ocr.confidence, issues: ocr.issues },
           documentExpiry: ocr.extractedData?.expiryDate,
+          useIdDataForBilling: reuseIdForBilling,
         });
 
         // Auto-create address and billing profile from whatever the document
@@ -582,35 +588,18 @@ export default function KYCTab({ className, serviceInterests }: KYCTabProps) {
         }
       }
 
-      // Create PF billing profile
-      if (extractedData.firstName || extractedData.lastName || extractedData.cnp) {
-        const existingProfile = profiles.find(p => p.cnp === extractedData.cnp);
-
-        if (existingProfile) {
-          const addr = extractedData.address || {};
-          const addressParts = [
-            addr.street,
-            addr.number ? `Nr. ${addr.number}` : null,
-            addr.building ? `Bl. ${addr.building}` : null,
-            addr.apartment ? `Ap. ${addr.apartment}` : null,
-            addr.city,
-            addr.county,
-          ].filter(Boolean);
-
-          await updateBillingProfile(existingProfile.id, {
-            firstName: extractedData.firstName || existingProfile.firstName,
-            lastName: extractedData.lastName || existingProfile.lastName,
-            address: addressParts.join(', ') || existingProfile.address,
-          });
-        } else {
-          await createBillingFromId(extractedData);
-        }
+      // The billing profile, only if the customer asked for it and only when
+      // they have none. An existing profile is never rewritten from the scan:
+      // they may have corrected it themselves, and the OCR is not more right
+      // than the person who reads their own invoice.
+      if (reuseIdForBilling && profiles.length === 0) {
+        await createBillingFromId(extractedData);
       }
     } catch (err) {
       console.error('Auto-create user data error:', err);
       // Non-blocking error
     }
-  }, [addresses, profiles, createAddress, updateAddress, createBillingFromId, updateBillingProfile]);
+  }, [addresses, profiles, createAddress, updateAddress, createBillingFromId, reuseIdForBilling]);
 
   // What the chosen identity document still needs. Drives the badge and the
   // "Necesar" markers — `hasAllRequired` from the API only knows about a front
@@ -1066,6 +1055,32 @@ export default function KYCTab({ className, serviceInterests }: KYCTabProps) {
           <AlertTriangle className="h-4 w-4" />
           <AlertDescription>{uploadError || kycError}</AlertDescription>
         </Alert>
+      )}
+
+      {/* The one choice about what the scan may be used for. Off by default and
+          shown before the upload, so it is a decision and not something the
+          customer discovers afterwards on an invoice. Hidden once a billing
+          profile exists — we would not touch it anyway. */}
+      {profiles.length === 0 && (
+        <label className="flex min-h-[56px] cursor-pointer items-start gap-3 rounded-2xl border border-neutral-200 bg-white p-4">
+          <input
+            type="checkbox"
+            checked={reuseIdForBilling}
+            onChange={(e) => setReuseIdForBilling(e.target.checked)}
+            className="mt-0.5 h-5 w-5 flex-shrink-0 rounded border-neutral-300 accent-primary-500"
+          />
+          <span className="min-w-0 flex-1">
+            <span className="block text-sm font-semibold text-secondary-900">
+              Folosește datele din act și la facturare
+            </span>
+            <span className="mt-0.5 block text-xs leading-relaxed text-neutral-500">
+              Numele, CNP-ul și adresa din document intră și în profilul de
+              facturare, ca să nu le mai scrii la comandă. Le poți schimba
+              oricând din secțiunea de facturare. Dacă nu bifezi, actul rămâne folosit doar
+              pentru verificarea identității.
+            </span>
+          </span>
+        </label>
       )}
 
       {/* Identity documents — driven by the document the customer says they hold */}

@@ -48,6 +48,12 @@ interface UseKycStatusReturn {
     extractedData: ExtractedIdData;
     validationResult?: Record<string, unknown>;
     documentExpiry?: string;
+    /**
+     * Whether the data read off this document may also be used for invoicing.
+     * The customer's choice, off unless they ticked it (decision D8) — the
+     * server defaults it to false too.
+     */
+    useIdDataForBilling?: boolean;
   }) => Promise<KycDocument | null>;
 }
 
@@ -120,6 +126,12 @@ export function useKycStatus(): UseKycStatusReturn {
     extractedData: ExtractedIdData;
     validationResult?: Record<string, unknown>;
     documentExpiry?: string;
+    /**
+     * Whether the data read off this document may also be used for invoicing.
+     * The customer's choice, off unless they ticked it (decision D8) — the
+     * server defaults it to false too.
+     */
+    useIdDataForBilling?: boolean;
   }): Promise<KycDocument | null> => {
     try {
       setError(null);

@@ -263,6 +263,16 @@ După ce actul e scanat în cont, clientul poate alege ca **aceleași date să f
 folosite și la facturare** — nume, CNP, adresa din act — cu un singur comutator,
 nu prin recompletare. Implicit oprit; clientul decide.
 
+**Livrat pe 17.09.2026** —
+[changelog](../changelog/2026-09-17-date-din-act-la-facturare.md). Ce s-a găsit
+făcând-o: comportamentul exista deja, dar pe dos. `api/user/kyc/save` crea SAU
+actualiza profilul de facturare la fiecare scanare, fără să întrebe, și
+suprascria un profil completat manual cu forma plată pe care
+`isPfBillingComplete` o respinge — adică o scanare putea strica un profil
+funcțional. Acum e o alegere (implicit oprită), nu se atinge niciodată un profil
+existent, iar maparea plată din trei locuri s-a redus la
+`src/lib/account/id-data-to-profile.ts`.
+
 ### Faza 4 — dashboardul propriu-zis
 
 Ecranul de start = comenzile. Pentru fiecare comandă activă, un card care

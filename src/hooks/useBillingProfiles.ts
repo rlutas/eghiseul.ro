@@ -10,6 +10,7 @@ import { useState, useEffect, useCallback } from 'react';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { BillingData, BillingType } from '@/components/shared/BillingProfileForm';
 import type { ExtractedIdData } from '@/components/shared/IdScanner';
+import { billingProfileFromIdData } from '@/lib/account/id-data-to-profile';
 
 interface SavedBillingProfile extends BillingData {
   id: string;
@@ -152,31 +153,19 @@ export function useBillingProfiles(): UseBillingProfilesReturn {
     return (await update(id, { isDefault: true })) !== null;
   }, [update]);
 
-  // Create PF billing profile from scanned ID data
+  // Create a PF billing profile from a scanned document.
+  //
+  // Structured on purpose: it used to fold the locality and the county into the
+  // single address string, which is exactly the shape `isPfBillingComplete`
+  // rejects — the profile looked saved in the account and the next order asked
+  // for everything again. `billingProfileFromIdData` returns null when the
+  // document does not carry enough, and null is better than a profile that
+  // cannot be used.
   const createFromIdData = useCallback(async (idData: ExtractedIdData): Promise<SavedBillingProfile | null> => {
-    // Format address string
-    const addr = idData.address || {};
-    const addressParts = [
-      addr.street,
-      addr.number ? `Nr. ${addr.number}` : null,
-      addr.building ? `Bl. ${addr.building}` : null,
-      addr.staircase ? `Sc. ${addr.staircase}` : null,
-      addr.apartment ? `Ap. ${addr.apartment}` : null,
-      addr.city,
-      addr.county,
-    ].filter(Boolean);
+    const data = billingProfileFromIdData(idData);
+    if (!data) return null;
 
-    const data: BillingData = {
-      label: 'Profil din act',
-      type: 'persoana_fizica',
-      firstName: idData.firstName,
-      lastName: idData.lastName,
-      cnp: idData.cnp,
-      address: addressParts.join(', '),
-      isDefault: profiles.length === 0, // Set as default if first profile
-    };
-
-    return create(data);
+    return create({ ...data, isDefault: profiles.length === 0 });
   }, [create, profiles.length]);
 
   return {
