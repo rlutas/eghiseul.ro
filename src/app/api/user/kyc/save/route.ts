@@ -1,6 +1,13 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
+import {
+  STORABLE_KYC_DOCUMENT_TYPES,
+  isStorableKycDocumentType,
+  isCompanyDocumentType,
+  isIdentityDocumentType,
+  fillsProfileFromOcr,
+} from '@/lib/kyc/identity-documents';
 
 // KYC validity period in days
 const KYC_VALIDITY_DAYS = 90;
@@ -10,7 +17,8 @@ const KYC_VALIDITY_DAYS = 90;
  * Save a new KYC document verification
  *
  * Body:
- * - documentType: 'ci_front' | 'ci_back' | 'selfie' | 'passport' | 'address_certificate'
+ * - documentType: any of STORABLE_KYC_DOCUMENT_TYPES (kept in sync with the
+ *   DB CHECK — migration 171 — and with what the order wizard produces)
  * - fileUrl: S3 URL or data URL
  * - fileKey?: S3 key for deletion
  * - extractedData: OCR extracted data
@@ -50,10 +58,9 @@ export async function POST(request: Request) {
       );
     }
 
-    const validTypes = ['ci_front', 'ci_back', 'selfie', 'passport', 'address_certificate', 'ci_nou_front', 'ci_nou_back', 'company_registration_cert', 'company_statement_cert'];
-    if (!validTypes.includes(documentType)) {
+    if (!isStorableKycDocumentType(documentType)) {
       return NextResponse.json(
-        { error: 'Invalid document type' },
+        { error: `Invalid document type. Allowed: ${STORABLE_KYC_DOCUMENT_TYPES.join(', ')}` },
         { status: 400 }
       );
     }
@@ -110,8 +117,7 @@ export async function POST(request: Request) {
     const adminClient = createAdminClient();
 
     // For company documents, set company_verified flag
-    const isCompanyDoc = documentType === 'company_registration_cert' || documentType === 'company_statement_cert';
-    if (isCompanyDoc) {
+    if (isCompanyDocumentType(documentType)) {
       await adminClient
         .from('profiles')
         .update({
@@ -119,8 +125,10 @@ export async function POST(request: Request) {
           updated_at: now.toISOString(),
         })
         .eq('id', user.id);
-    } else {
-      // For personal documents, set kyc_verified flag
+    } else if (isIdentityDocumentType(documentType)) {
+      // Only documents that establish WHO the person is flip kyc_verified. A
+      // driving licence or a residence permit is useful to an order but says
+      // nothing about the identity check having been done.
       await adminClient
         .from('profiles')
         .update({
@@ -130,8 +138,11 @@ export async function POST(request: Request) {
         .eq('id', user.id);
     }
 
-    // Auto-create address and billing profile from extracted data if this is a front ID
-    if ((documentType === 'ci_front' || documentType === 'ci_nou_front' || documentType === 'passport') && extractedData) {
+    // Auto-create address and billing profile from the OCR of a document that
+    // carries personal data (CI front, passport data page, new-CI back for the
+    // address). Each field below is written only when present, so a document
+    // that carries just the address never blanks the name.
+    if (fillsProfileFromOcr(documentType) && extractedData) {
       // Auto-create address if we have address data
       if (extractedData.address) {
         // Check if we already have an address from act (to avoid duplicates)

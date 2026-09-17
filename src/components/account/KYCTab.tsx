@@ -4,11 +4,19 @@
 /**
  * KYCTab Component
  *
- * Displays KYC verification status with individual document cards.
- * Each document type (ID front, ID back, Selfie) shown separately.
+ * The account's identity tab. The customer first says WHICH identity document
+ * they hold — the same three choices the order wizard offers
+ * (`DocumentTypePicker`) — and the tab then asks only for what that choice
+ * needs: the front of an old CI, front + back of a new one, or the passport's
+ * data page. A selfie is always asked for, and a short list of documents that
+ * only some services need is offered as optional.
+ *
+ * Which document each choice needs lives in `@/lib/kyc/identity-documents`,
+ * shared with `POST /api/user/kyc/save`, so the account and an order write the
+ * same row types.
  */
 
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import {
@@ -26,8 +34,27 @@ import {
   RefreshCw,
   Building2,
   FileText,
+  BookOpen,
+  Pencil,
+  ChevronDown,
+  ChevronUp,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import {
+  DocumentTypePicker,
+  type IdDocumentType,
+} from '@/components/orders/modules/personal-kyc/DocumentTypePicker';
+import {
+  type AccountKycDocumentType,
+  OPTIONAL_DOCUMENT_TYPES,
+  requiredDocumentsFor,
+  missingDocumentsFor,
+  detectIdDocumentType,
+  documentTypeAliases,
+  hasDocument,
+  ocrDocumentTypeFor,
+  isOcrResultUsable,
+} from '@/lib/kyc/identity-documents';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { useKycStatus, type KycStatus } from '@/hooks/useKycStatus';
 import { useAddresses } from '@/hooks/useAddresses';
@@ -41,35 +68,65 @@ interface KYCTabProps {
   className?: string;
 }
 
-// Document type configuration
-const DOCUMENT_TYPES = {
+// Document type configuration. Keys are the names the row is STORED under —
+// the same ones the wizard writes (see @/lib/kyc/identity-documents).
+const DOCUMENT_TYPES: Record<
+  AccountKycDocumentType,
+  {
+    label: string;
+    description: string;
+    icon: typeof CreditCard;
+  }
+> = {
   ci_front: {
-    label: 'Act Identitate - Față',
-    shortLabel: 'CI Față',
-    description: 'CNP, nume, prenume',
+    label: 'Act de identitate — față',
+    description: 'CNP, nume și prenume. Le citim automat din poză.',
     icon: CreditCard,
-    color: 'amber',
-    requiredForKyc: true,
   },
-  ci_back: {
-    label: 'Act Identitate - Verso',
-    shortLabel: 'CI Verso',
-    description: 'Adresă (CI noi)',
+  ci_nou_back: {
+    label: 'CI nou — verso',
+    description: 'Spatele CI-ului electronic, unde este trecut domiciliul.',
     icon: CreditCard,
-    color: 'amber',
-    requiredForKyc: false,
+  },
+  passport_opened: {
+    label: 'Pașaport — pagina cu date',
+    description: 'Pașaportul deschis, cu fotografia și datele vizibile.',
+    icon: BookOpen,
   },
   selfie: {
-    label: 'Selfie cu Actul',
-    shortLabel: 'Selfie',
-    description: 'Verificare identitate',
+    label: 'Selfie cu actul',
+    description: 'Ține actul lângă față. Confirmă că tu ești titularul.',
     icon: User,
-    color: 'blue',
-    requiredForKyc: true,
   },
-} as const;
+  certificat_domiciliu: {
+    label: 'Certificat de atestare a domiciliului',
+    description: 'Dovada adresei, când actul nu o conține.',
+    icon: FileText,
+  },
+  residence_permit: {
+    label: 'Permis de ședere / certificat fiscal',
+    description: 'Pentru cetățenii străini.',
+    icon: FileText,
+  },
+  permis_fata: {
+    label: 'Permis de conducere — față',
+    description: 'Necesar la cazierul auto.',
+    icon: CreditCard,
+  },
+};
 
-type DocumentTypeKey = keyof typeof DOCUMENT_TYPES;
+type DocumentTypeKey = AccountKycDocumentType;
+
+// Same wording as the picker's cards, so the summary line reads like the choice.
+const ID_TYPE_LABELS: Record<IdDocumentType, string> = {
+  ci_vechi: 'Buletin / CI vechi',
+  ci_nou: 'CI nou electronic',
+  passport: 'Pașaport',
+};
+
+// Remembers the choice between visits, so a customer who uploaded only the
+// front of a new CI is not greeted by a checklist for the old one.
+const ID_TYPE_STORAGE_KEY = 'eghiseul:account:id-document-type';
 
 // Company document types
 const COMPANY_DOCUMENT_TYPES = {
@@ -98,10 +155,6 @@ export default function KYCTab({ className }: KYCTabProps) {
     isVerified,
     isExpiring,
     isExpired,
-    isPartial,
-    hasFrontId,
-    hasSelfie,
-    hasAllRequired,
     documents,
     isLoading: kycLoading,
     error: kycError,
@@ -114,6 +167,11 @@ export default function KYCTab({ className }: KYCTabProps) {
 
   const [uploadingType, setUploadingType] = useState<DocumentTypeKey | CompanyDocTypeKey | null>(null);
   const [processingOcr, setProcessingOcr] = useState<DocumentTypeKey | null>(null);
+  // Which identity document the customer says they hold. Null = not chosen and
+  // nothing on file yet, so we show the picker.
+  const [idType, setIdType] = useState<IdDocumentType | null>(null);
+  const [isPickingIdType, setIsPickingIdType] = useState(false);
+  const [showOptionalDocs, setShowOptionalDocs] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [expandedDoc, setExpandedDoc] = useState<string | null>(null);
@@ -166,14 +224,55 @@ export default function KYCTab({ className }: KYCTabProps) {
     }
   }, [resolvedUrls]);
 
-  // Get document by type (handle aliases like ci_nou_front -> ci_front)
+  // Every stored document type the user currently has on file.
+  const storedTypes = useMemo(() => documents.map(d => d.documentType), [documents]);
+
+  // Pick up the remembered choice, else infer it from what is already on file.
+  // Runs once documents are loaded; a later upload must not reset a choice the
+  // customer made in this session, hence the "only when still null" guard.
+  useEffect(() => {
+    if (kycLoading) return;
+    setIdType(prev => {
+      if (prev) return prev;
+      let remembered: string | null = null;
+      try {
+        remembered = window.localStorage.getItem(ID_TYPE_STORAGE_KEY);
+      } catch {
+        // Private mode / blocked storage — fall back to detection.
+      }
+      if (remembered === 'ci_vechi' || remembered === 'ci_nou' || remembered === 'passport') {
+        return remembered;
+      }
+      return detectIdDocumentType(storedTypes);
+    });
+  }, [kycLoading, storedTypes]);
+
+  // Open the optional section on first load when something is already there,
+  // once — so collapsing it afterwards sticks.
+  const optionalDefaultApplied = useRef(false);
+  useEffect(() => {
+    if (kycLoading || optionalDefaultApplied.current) return;
+    optionalDefaultApplied.current = true;
+    if (OPTIONAL_DOCUMENT_TYPES.some(type => hasDocument(type, storedTypes))) {
+      setShowOptionalDocs(true);
+    }
+  }, [kycLoading, storedTypes]);
+
+  const handlePickIdType = useCallback((picked: IdDocumentType) => {
+    setIdType(picked);
+    setIsPickingIdType(false);
+    setUploadError(null);
+    try {
+      window.localStorage.setItem(ID_TYPE_STORAGE_KEY, picked);
+    } catch {
+      // Not remembering the choice is harmless — detection takes over.
+    }
+  }, []);
+
+  // Get document by type, accepting the legacy and wizard names for the same
+  // physical document (e.g. a `ci_nou_front` row satisfies `ci_front`).
   const getDocumentByType = useCallback((type: DocumentTypeKey) => {
-    const typeAliases: Record<string, string[]> = {
-      ci_front: ['ci_front', 'ci_nou_front'],
-      ci_back: ['ci_back', 'ci_nou_back'],
-      selfie: ['selfie', 'selfie_with_id'],
-    };
-    const aliases = typeAliases[type] || [type];
+    const aliases = documentTypeAliases(type);
     return documents.find(d => aliases.includes(d.documentType));
   }, [documents]);
 
@@ -231,13 +330,17 @@ export default function KYCTab({ className }: KYCTabProps) {
       const finalSize = compressed?.sizeAfter ?? file.size;
       const finalMime = compressed?.mimeType ?? file.type;
 
-      // Cache CI front for in-session face match against subsequent selfie upload
-      if (type === 'ci_front' && compressed) {
+      // Cache the identity document for an in-session face match against a
+      // selfie uploaded right after it.
+      const isIdentityFront = type === 'ci_front' || type === 'passport_opened';
+      if (isIdentityFront && compressed) {
         ciFrontCacheRef.current = { base64: compressed.base64, mimeType: compressed.mimeType };
       }
 
-      // For ID documents (front/back), run OCR
-      if (type === 'ci_front' || type === 'ci_back') {
+      const ocrType = ocrDocumentTypeFor(type);
+
+      // For identity documents, run OCR
+      if (ocrType) {
         setProcessingOcr(type);
 
         // Call OCR API (still uses base64 for processing)
@@ -248,7 +351,7 @@ export default function KYCTab({ className }: KYCTabProps) {
             mode: 'specific',
             imageBase64: base64,
             mimeType: finalMime,
-            documentType: type,
+            documentType: ocrType,
           }),
         });
 
@@ -260,8 +363,11 @@ export default function KYCTab({ className }: KYCTabProps) {
         const ocrResult = await ocrResponse.json();
         const ocr = ocrResult.data?.ocr;
 
-        if (!ocr?.success || ocr.confidence < 50) {
-          throw new Error(`Nu am putut citi documentul. Asigură-te că imaginea este clară.`);
+        // Gemini's confidence is unreliable (it returns 0 on documents it read
+        // perfectly), so we judge the DATA, not the score — same rule the
+        // wizard applies.
+        if (!isOcrResultUsable(ocr)) {
+          throw new Error('Nu am putut citi documentul. Asigură-te că imaginea este clară și că se vede tot actul.');
         }
 
         // Save KYC document with S3 URL
@@ -276,10 +382,22 @@ export default function KYCTab({ className }: KYCTabProps) {
           documentExpiry: ocr.extractedData?.expiryDate,
         });
 
-        // Auto-create address and billing profile from front ID
-        if (type === 'ci_front' && ocr.extractedData) {
+        // Auto-create address and billing profile from whatever the document
+        // carried (name + CNP on a front/passport, address on a new-CI back).
+        if (ocr.extractedData) {
           await autoCreateUserData(ocr.extractedData);
         }
+      } else if (type !== 'selfie') {
+        // Documents nobody needs to read automatically (address certificate,
+        // residence permit, driving licence) — stored for the team to review.
+        await saveDocument({
+          documentType: type,
+          fileUrl,
+          fileKey,
+          fileSize: finalSize,
+          mimeType: finalMime,
+          extractedData: {},
+        });
       } else {
         // For selfie: face match against the user's CI front before saving.
         // Use the in-session cache if available, else fall back to the stored
@@ -289,9 +407,17 @@ export default function KYCTab({ className }: KYCTabProps) {
 
         let reference = ciFrontCacheRef.current;
         if (!reference) {
-          const ciDoc = documents.find((d) => d.documentType === 'ci_front' || d.documentType === 'ci_nou_front');
+          const idAliases = [
+            ...documentTypeAliases('ci_front'),
+            ...documentTypeAliases('passport_opened'),
+          ];
+          const ciDoc = documents.find((d) => idAliases.includes(d.documentType));
           if (ciDoc?.fileUrl) {
-            const resolved = isS3Url(ciDoc.fileUrl) ? await getS3DownloadUrl(ciDoc.fileUrl) : ciDoc.fileUrl;
+            // getS3DownloadUrl takes a KEY, not a URL — passing the whole URL
+            // made the cross-session face match fail silently.
+            const resolved = isS3Url(ciDoc.fileUrl)
+              ? await getS3DownloadUrl(new URL(ciDoc.fileUrl).pathname.substring(1))
+              : ciDoc.fileUrl;
             reference = await fetchImageAsBase64(resolved);
           }
         }
@@ -313,7 +439,7 @@ export default function KYCTab({ className }: KYCTabProps) {
               issues: faceMatch.issues,
             };
             if (!faceMatch.matched) {
-              setUploadError('Fața din selfie nu corespunde cu cea de pe cartea de identitate. Te rugăm să încerci o selfie clară, ținând CI-ul lângă față.');
+              setUploadError('Fața din selfie nu corespunde cu cea din actul de identitate încărcat. Te rugăm să încerci o selfie clară, ținând actul lângă față.');
             }
           } else {
             console.warn('[KYC] face match unavailable:', faceMatch.error);
@@ -475,6 +601,12 @@ export default function KYCTab({ className }: KYCTabProps) {
     }
   }, [addresses, profiles, createAddress, updateAddress, createBillingFromId, updateBillingProfile]);
 
+  // What the chosen identity document still needs. Drives the badge and the
+  // "Necesar" markers — `hasAllRequired` from the API only knows about a front
+  // and a selfie, so it would call a new CI complete without its back.
+  const missingDocs = idType ? missingDocumentsFor(idType, storedTypes) : [];
+  const isComplete = !!idType && missingDocs.length === 0;
+
   // Get overall KYC status badge
   const getOverallStatusBadge = () => {
     if (isExpired) {
@@ -485,7 +617,7 @@ export default function KYCTab({ className }: KYCTabProps) {
         </span>
       );
     }
-    if (isExpiring && hasAllRequired) {
+    if (isExpiring && isComplete) {
       return (
         <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-yellow-100 text-yellow-700 text-sm font-medium">
           <Clock className="w-4 h-4" />
@@ -493,7 +625,7 @@ export default function KYCTab({ className }: KYCTabProps) {
         </span>
       );
     }
-    if (hasAllRequired && isVerified) {
+    if (isComplete && isVerified) {
       return (
         <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-100 text-green-700 text-sm font-medium">
           <CheckCircle className="w-4 h-4" />
@@ -501,15 +633,11 @@ export default function KYCTab({ className }: KYCTabProps) {
         </span>
       );
     }
-    if (hasFrontId || hasSelfie) {
-      // Show what's missing
-      const missing = [];
-      if (!hasFrontId) missing.push('act identitate');
-      if (!hasSelfie) missing.push('selfie');
+    if (documents.length > 0 && missingDocs.length > 0) {
       return (
         <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100 text-amber-700 text-sm font-medium">
           <Clock className="w-4 h-4" />
-          Incomplet - lipsește {missing.join(', ')}
+          Incomplet — lipsește {missingDocs.map(t => DOCUMENT_TYPES[t].label.toLowerCase()).join(', ')}
         </span>
       );
     }
@@ -521,8 +649,10 @@ export default function KYCTab({ className }: KYCTabProps) {
     );
   };
 
-  // Render compact document row
-  const renderDocumentRow = (type: DocumentTypeKey) => {
+  // Render compact document row. `required` comes from the chosen identity
+  // document, so the same row can be mandatory in one flow and optional in
+  // another (the back of a CI: required for the new one, never for a buletin).
+  const renderDocumentRow = (type: DocumentTypeKey, required: boolean) => {
     const config = DOCUMENT_TYPES[type];
     const doc = getDocumentByType(type);
     const isUploading = uploadingType === type;
@@ -531,13 +661,32 @@ export default function KYCTab({ className }: KYCTabProps) {
     const IconComponent = config.icon;
     const isDocExpired = doc?.expiresAt && new Date(doc.expiresAt) < new Date();
 
+    // Hidden input + ref.click() — a styled <label> does not open the picker
+    // reliably on macOS Safari.
+    const hiddenInput = (
+      <input
+        type="file"
+        ref={el => { fileInputRefs.current[type] = el; }}
+        accept="image/jpeg,image/jpg,image/png"
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) {
+            setUploadingType(type);
+            handleFileUpload(type, file);
+          }
+          e.target.value = '';
+        }}
+        className="sr-only"
+      />
+    );
+
     return (
       <div key={type} className="border-b border-neutral-100 last:border-b-0">
-        {/* Main row - compact */}
-        <div className="flex items-center gap-3 p-3">
+        {/* Main row — wraps to a second line on narrow phones instead of squeezing */}
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-2 p-3">
           {/* Icon */}
           <div className={cn(
-            'w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0',
+            'w-11 h-11 rounded-lg flex items-center justify-center flex-shrink-0',
             doc
               ? isDocExpired ? 'bg-red-100' : 'bg-green-100'
               : 'bg-neutral-100'
@@ -556,18 +705,21 @@ export default function KYCTab({ className }: KYCTabProps) {
           </div>
 
           {/* Title & Description */}
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2">
+          <div className="flex-1 min-w-[10rem]">
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
               <span className="font-medium text-secondary-900 text-sm">{config.label}</span>
-              {config.requiredForKyc && !doc && (
+              {required && !doc && (
                 <span className="text-[10px] bg-red-100 text-red-600 px-1.5 py-0.5 rounded">Necesar</span>
+              )}
+              {!required && (
+                <span className="text-[10px] bg-neutral-100 text-neutral-500 px-1.5 py-0.5 rounded">Opțional</span>
               )}
             </div>
             <p className="text-xs text-neutral-500">{config.description}</p>
           </div>
 
           {/* Status & Actions */}
-          <div className="flex items-center gap-2 flex-shrink-0">
+          <div className="flex items-center gap-1.5 flex-shrink-0 ml-auto">
             {doc ? (
               <>
                 <span className={cn(
@@ -577,71 +729,48 @@ export default function KYCTab({ className }: KYCTabProps) {
                   {isDocExpired ? 'Expirat' : 'OK'}
                 </span>
                 <Button
+                  type="button"
                   variant="ghost"
                   size="sm"
+                  aria-label={isExpanded ? 'Ascunde documentul' : 'Vezi documentul'}
                   onClick={() => {
                     if (!isExpanded && doc.fileUrl) {
                       resolveDocumentUrl(doc.id, doc.fileUrl);
                     }
                     setExpandedDoc(isExpanded ? null : doc.id);
                   }}
-                  className="h-8 w-8 p-0"
+                  className="h-11 w-11 p-0"
                 >
                   {isExpanded ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </Button>
-                <input
-                  type="file"
-                  ref={el => { fileInputRefs.current[type] = el; }}
-                  accept="image/jpeg,image/jpg,image/png"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) {
-                      setUploadingType(type);
-                      handleFileUpload(type, file);
-                    }
-                    e.target.value = '';
-                  }}
-                  className="sr-only"
-                />
+                {hiddenInput}
                 <Button
                   type="button"
                   variant="ghost"
                   size="sm"
+                  aria-label="Înlocuiește documentul"
                   onClick={() => fileInputRefs.current[type]?.click()}
                   disabled={isUploading || isProcessing}
-                  className="h-8 w-8 p-0"
+                  className="h-11 w-11 p-0"
                 >
                   <RefreshCw className="w-4 h-4" />
                 </Button>
               </>
             ) : (
               <>
-                <input
-                  type="file"
-                  ref={el => { fileInputRefs.current[type] = el; }}
-                  accept="image/jpeg,image/jpg,image/png"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) {
-                      setUploadingType(type);
-                      handleFileUpload(type, file);
-                    }
-                    e.target.value = '';
-                  }}
-                  className="sr-only"
-                />
+                {hiddenInput}
                 <Button
                   type="button"
                   variant="outline"
                   size="sm"
                   onClick={() => fileInputRefs.current[type]?.click()}
                   disabled={isUploading || isProcessing}
-                  className="h-8 text-xs"
+                  className="h-11 px-4 text-xs"
                 >
                   {isUploading || isProcessing ? (
                     <>
                       <Loader2 className="w-3 h-3 mr-1 animate-spin" />
-                      {isProcessing ? 'OCR...' : '...'}
+                      {isProcessing ? 'Citim actul...' : 'Se încarcă...'}
                     </>
                   ) : (
                     <>
@@ -731,9 +860,9 @@ export default function KYCTab({ className }: KYCTabProps) {
 
     return (
       <div key={type} className="border-b border-neutral-100 last:border-b-0">
-        <div className="flex items-center gap-3 p-3">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-2 p-3">
           <div className={cn(
-            'w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0',
+            'w-11 h-11 rounded-lg flex items-center justify-center flex-shrink-0',
             doc ? 'bg-green-100' : 'bg-neutral-100'
           )}>
             {isUploading ? (
@@ -745,14 +874,14 @@ export default function KYCTab({ className }: KYCTabProps) {
             )}
           </div>
 
-          <div className="flex-1 min-w-0">
+          <div className="flex-1 min-w-[10rem]">
             <div className="flex items-center gap-2">
               <span className="font-medium text-secondary-900 text-sm">{config.label}</span>
             </div>
             <p className="text-xs text-neutral-500">{config.description}</p>
           </div>
 
-          <div className="flex items-center gap-2 flex-shrink-0">
+          <div className="flex items-center gap-1.5 flex-shrink-0 ml-auto">
             {doc ? (
               <>
                 <span className="text-xs font-medium px-2 py-1 rounded bg-green-100 text-green-700">
@@ -775,7 +904,7 @@ export default function KYCTab({ className }: KYCTabProps) {
                   size="sm"
                   onClick={() => fileInputRefs.current[type]?.click()}
                   disabled={isUploading}
-                  className="h-8 w-8 p-0"
+                  className="h-11 w-11 p-0"
                 >
                   <RefreshCw className="w-4 h-4" />
                 </Button>
@@ -799,7 +928,7 @@ export default function KYCTab({ className }: KYCTabProps) {
                   size="sm"
                   onClick={() => fileInputRefs.current[type]?.click()}
                   disabled={isUploading}
-                  className="h-8 text-xs"
+                  className="h-11 px-4 text-xs"
                 >
                   {isUploading ? (
                     <>
@@ -837,21 +966,23 @@ export default function KYCTab({ className }: KYCTabProps) {
           <div className="flex items-center gap-3">
             <div className={cn(
               'w-12 h-12 rounded-xl flex items-center justify-center',
-              isVerified && hasAllRequired ? 'bg-green-100' : isExpired ? 'bg-red-100' : isPartial ? 'bg-amber-100' : 'bg-neutral-100'
+              isVerified && isComplete ? 'bg-green-100' : isExpired ? 'bg-red-100' : documents.length > 0 ? 'bg-amber-100' : 'bg-neutral-100'
             )}>
               <Shield className={cn(
                 'w-6 h-6',
-                isVerified && hasAllRequired ? 'text-green-600' : isExpired ? 'text-red-600' : isPartial ? 'text-amber-600' : 'text-neutral-500'
+                isVerified && isComplete ? 'text-green-600' : isExpired ? 'text-red-600' : documents.length > 0 ? 'text-amber-600' : 'text-neutral-500'
               )} />
             </div>
             <div>
-              <h3 className="font-semibold text-secondary-900">Verificare KYC</h3>
+              <h3 className="font-semibold text-secondary-900">Verificare identitate</h3>
               <p className="text-sm text-neutral-500">
-                {isVerified && hasAllRequired
+                {isVerified && isComplete
                   ? 'Poți plasa comenzi rapid'
-                  : isPartial
-                  ? 'Adaugă selfie cu actul pentru verificare completă'
-                  : 'Adaugă documentele pentru verificare'}
+                  : !idType
+                  ? 'Alege actul de identitate pe care îl deții'
+                  : missingDocs.length > 0
+                  ? `Mai ai de încărcat: ${missingDocs.map(t => DOCUMENT_TYPES[t].label.toLowerCase()).join(', ')}`
+                  : 'Documentele sunt încărcate'}
               </p>
             </div>
           </div>
@@ -912,19 +1043,79 @@ export default function KYCTab({ className }: KYCTabProps) {
         </Alert>
       )}
 
-      {/* Documents List - Compact */}
+      {/* Identity documents — driven by the document the customer says they hold */}
       <div className="bg-white rounded-2xl border border-neutral-200 overflow-hidden">
         <div className="px-4 py-3 border-b border-neutral-100 bg-neutral-50">
           <h4 className="font-semibold text-secondary-900 flex items-center gap-2 text-sm">
             <Scan className="w-4 h-4 text-primary-500" />
-            Documente de Verificare
+            Documente de verificare
           </h4>
         </div>
-        <div>
-          {renderDocumentRow('ci_front')}
-          {renderDocumentRow('ci_back')}
-          {renderDocumentRow('selfie')}
-        </div>
+
+        {!idType || isPickingIdType ? (
+          <div className="p-4 space-y-3">
+            <DocumentTypePicker onPick={handlePickIdType} />
+            {isPickingIdType && (
+              <div className="flex justify-center">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={() => setIsPickingIdType(false)}
+                  className="h-11 px-4 text-xs"
+                >
+                  Anulează
+                </Button>
+              </div>
+            )}
+          </div>
+        ) : (
+          <>
+            <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-2 border-b border-neutral-100">
+              <p className="text-xs text-neutral-500">
+                Actul tău: <span className="font-medium text-secondary-900">{ID_TYPE_LABELS[idType]}</span>
+              </p>
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => setIsPickingIdType(true)}
+                className="h-11 px-3 text-xs"
+              >
+                <Pencil className="w-3.5 h-3.5 mr-1.5" />
+                Schimbă actul
+              </Button>
+            </div>
+            <div>
+              {requiredDocumentsFor(idType).map(type => renderDocumentRow(type, true))}
+            </div>
+          </>
+        )}
+      </div>
+
+      {/* Optional documents — only some services ask for these */}
+      <div className="bg-white rounded-2xl border border-neutral-200 overflow-hidden">
+        <button
+          type="button"
+          onClick={() => setShowOptionalDocs(v => !v)}
+          className="w-full flex items-center justify-between gap-3 px-4 py-3 min-h-11 bg-neutral-50 text-left hover:bg-neutral-100 transition-colors"
+        >
+          <span>
+            <span className="font-semibold text-secondary-900 flex items-center gap-2 text-sm">
+              <FileText className="w-4 h-4 text-primary-500" />
+              Alte documente (opțional)
+            </span>
+            <span className="block text-xs text-neutral-500 mt-0.5">
+              Dovada domiciliului, permis de ședere, permis de conducere
+            </span>
+          </span>
+          {showOptionalDocs
+            ? <ChevronUp className="w-4 h-4 text-neutral-500 flex-shrink-0" />
+            : <ChevronDown className="w-4 h-4 text-neutral-500 flex-shrink-0" />}
+        </button>
+        {showOptionalDocs && (
+          <div>
+            {OPTIONAL_DOCUMENT_TYPES.map(type => renderDocumentRow(type, false))}
+          </div>
+        )}
       </div>
 
       {/* Company Documents Section (only if user has company profile) */}

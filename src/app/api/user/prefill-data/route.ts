@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
+import { isIdentityDocumentType } from '@/lib/kyc/identity-documents';
 
 /**
  * GET /api/user/prefill-data
@@ -138,7 +139,14 @@ export async function GET() {
     let documentType: string | null = null;
 
     // Find the front ID document (ci_front or ci_nou_front)
-    const frontIdDoc = kycDocuments['ci_front'] || kycDocuments['ci_nou_front'] || kycDocuments['passport'];
+    // `passport_opened` is what the account and the wizard actually store for a
+    // passport; without it, a passport-only account prefilled no document
+    // series or number.
+    const frontIdDoc =
+      kycDocuments['ci_front'] ||
+      kycDocuments['ci_nou_front'] ||
+      kycDocuments['passport_opened'] ||
+      kycDocuments['passport'];
     if (frontIdDoc && frontIdDoc.extracted_data) {
       const extracted = frontIdDoc.extracted_data as Record<string, unknown>;
       documentSeries = (extracted.series as string) || '';
@@ -211,8 +219,16 @@ export async function GET() {
         // KYC documents
         kyc_documents: kycDocuments,
         kyc_verified: profileAny?.kyc_verified || false,
+        // Only an IDENTITY document counts. This used to be "anything that is
+        // not a selfie", which was harmless while the account could store just
+        // three types — but the account now accepts a driving licence, a
+        // residence permit and an address certificate too, and any of those
+        // would have flipped this to true. The wizard reads it to skip its KYC
+        // step (KYCDocumentsStep.tsx) and the server honours the same bypass via
+        // profiles.kyc_verified, so a customer could have ordered a cazier with
+        // no identity document on file at all.
         has_valid_kyc: Object.entries(kycDocuments).some(
-          ([docType, doc]) => !doc.is_expired && docType !== 'selfie'
+          ([docType, doc]) => !doc.is_expired && isIdentityDocumentType(docType)
         ),
         // Billing profiles
          

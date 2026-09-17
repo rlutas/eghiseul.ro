@@ -46,14 +46,26 @@ export type DocumentCategory =
   | 'signatures'    // Company/lawyer signatures and stamps
   | 'temp';         // Temporary files (auto-deleted)
 
+// Only used to name the S3 object (kyc/{user}/{verification}/{docType}.{ext}).
+// Keep it a superset of what the wizard and the account can produce, otherwise
+// a perfectly valid document cannot even be uploaded.
 export type KycDocumentType =
   | 'ci_front'      // ID card front
   | 'ci_back'       // ID card back
   | 'ci_nou_front'  // New ID card front
   | 'ci_nou_back'   // New ID card back
+  | 'ci_vechi'      // Old ID card (buletin), front only
+  | 'act_identitate'      // ID card front, manual route
+  | 'act_identitate_back' // ID card back, manual route
   | 'passport'      // Passport
+  | 'passport_opened' // Passport, data page spread
   | 'selfie'        // Selfie alone
   | 'selfie_with_id' // Selfie holding ID
+  | 'certificat_domiciliu' // Certificat de atestare a domiciliului
+  | 'address_certificate'  // Legacy name for the above
+  | 'residence_permit'     // Permis de sedere / certificat fiscal
+  | 'permis_fata'   // Driving licence front (cazier auto)
+  | 'permis_verso'  // Driving licence back (cazier auto)
   | 'company_registration_cert'  // Certificat de Inregistrare
   | 'company_statement_cert';    // Certificat Constatator
 

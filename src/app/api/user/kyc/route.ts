@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { hasDocument } from '@/lib/kyc/identity-documents';
 
 // KYC validity period in days
 const KYC_VALIDITY_DAYS = 90;
@@ -46,10 +47,14 @@ export async function GET() {
     let expiresAt: string | null = null;
     let daysUntilExpiry: number | null = null;
 
-    // Check for required documents (ci_front AND selfie are both required)
+    // Check for required documents (an identity document AND a selfie).
+    // The identity document is whichever one the customer holds: a CI front, a
+    // passport data page or a manually-uploaded act de identitate. Before this,
+    // only a CI counted, so a passport holder could never become verified.
     const docTypes = documents?.map((d: { document_type: string }) => d.document_type) || [];
-    const hasFrontId = docTypes.some((t: string) => t === 'ci_front' || t === 'ci_nou_front');
-    const hasSelfie = docTypes.some((t: string) => t === 'selfie' || t === 'selfie_with_id');
+    const hasFrontId =
+      hasDocument('ci_front', docTypes) || hasDocument('passport_opened', docTypes);
+    const hasSelfie = hasDocument('selfie', docTypes);
     const hasAllRequired = hasFrontId && hasSelfie;
 
     if (documents && documents.length > 0) {
