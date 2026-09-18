@@ -756,3 +756,13 @@ WHERE customer_data->'personal'->>'first_name' ILIKE 'ion%'
 
 **File:** `/Users/raullutas/eghiseul.ro/docs/technical/database-quick-reference.md`
 **Created:** 2025-12-16
+
+## payment_proof_events (migrarea 180, 18.09.2026)
+
+O linie per dovadă de plată atașată unei comenzi, cheia = digest-ul
+conținutului (ETag S3). Scrisă doar de `attach_payment_proof(order, key,
+digest, changed_by)` (tranzacție: `orders.payment_proof_url` + `order_history`
++ eveniment; `unchanged` la replay, `not_awaiting` dacă nu e transfer bancar în
+`awaiting_payment`). `mark_payment_proof_notified(event)` = heads-up trimis.
+`count_proof_presign(order, max)` = bugetul de presign-uri (5/oră) în
+`orders.proof_presign_count/window_start`. Fără drepturi pentru anon/authenticated.

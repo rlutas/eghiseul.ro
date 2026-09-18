@@ -181,6 +181,10 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
 
   // Check if user has valid KYC from their account
   const hasValidAccountKyc = isPrefilled && prefillData?.has_valid_kyc;
+  // The identity document comes from the account (step 2 showed it instead
+  // of a scan); only the selfie + the service's extra documents are asked
+  // here. `/submit` copies the account document into the order.
+  const hasIdentityFromAccount = !!state.accountKyc?.identity && personalKyc?.useOtherDocument !== true;
   const [showReuploadOption, setShowReuploadOption] = useState(false);
 
   const [uploads, setUploads] = useState<Record<KYCDocType, UploadState>>({
@@ -276,7 +280,7 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
     // amâna actul la pasul KYC, dar nu-l cerea niciodată → se comanda fără act.
     if (!isForeign) {
       const hasScanId = personalKyc.uploadedDocuments.some((d) => SCAN_ID_TYPES.includes(d.type));
-      if (!hasScanId) {
+      if (!hasScanId && !hasIdentityFromAccount) {
         // Ruta manuală (n-a scanat la pasul 2): cere fața actului aici.
         // Versoul rămâne OPȚIONAL — pe buletinul vechi spatele nu conține date,
         // iar serverul (api/orders/[id]/submit) cere doar fața. Aici nu rulează
@@ -303,7 +307,7 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
     }
 
     return true;
-  }, [personalKyc, config, hasValidAccountKyc, showReuploadOption, extraDocs]);
+  }, [personalKyc, config, hasValidAccountKyc, showReuploadOption, extraDocs, hasIdentityFromAccount]);
 
   // Notify parent of validation changes
   useEffect(() => {
@@ -324,7 +328,7 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
     if ((config.selfieRequired || isForeign) && !has('selfie')) m.push('Selfie cu actul de identitate');
     if (!isForeign) {
       const hasScanId = personalKyc.uploadedDocuments.some((d) => SCAN_ID_TYPES.includes(d.type));
-      if (!hasScanId) {
+      if (!hasScanId && !hasIdentityFromAccount) {
         if (!has('act_identitate')) m.push('Act de identitate — față');
       }
     }
@@ -333,7 +337,7 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
     }
     if (isForeign && !has('residence_permit')) m.push('Permis de rezidență / certificat fiscal');
     return m;
-  }, [personalKyc, config, hasValidAccountKyc, showReuploadOption, extraDocs]);
+  }, [personalKyc, config, hasValidAccountKyc, showReuploadOption, extraDocs, hasIdentityFromAccount]);
 
   const [showErrors, setShowErrors] = useState(false);
   const errorRef = useRef<HTMLDivElement>(null);
@@ -785,7 +789,7 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
   // Act de identitate — pentru români care au ales completarea manuală la pasul 2
   // (nu au scanat actul). Dacă actul e deja scanat la pasul 2, nu mai apare aici.
   const hasScanIdDoc = personalKyc.uploadedDocuments.some((d) => SCAN_ID_TYPES.includes(d.type));
-  const showActIdentitate = !isForeignCitizen && !hasScanIdDoc;
+  const showActIdentitate = !isForeignCitizen && !hasScanIdDoc && !hasIdentityFromAccount;
 
   // Count uploaded documents (from Step 3)
   const idDocsCount = personalKyc.uploadedDocuments.filter(d =>
@@ -980,22 +984,9 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
           de cont. */}
       {extraDocs.map((t) => renderUploadCard(t))}
 
-      {/* Info Banner — not for an account whose documents are already on
-          file; there is nothing to explain and nothing to upload. */}
-      {!hasValidAccountKyc && (
-      <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-        <div className="flex gap-3">
-          <Info className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
-          <div className="text-sm text-blue-800">
-            <p className="font-medium mb-1">De ce avem nevoie de aceste documente?</p>
-            <p className="text-blue-700">
-              Verificarea identității este necesară pentru a procesa cererea ta în mod legal.
-              Documentele sunt criptate și stocate securizat conform GDPR.
-            </p>
-          </div>
-        </div>
-      </div>
-      )}
+      {/* The „De ce avem nevoie" banner is gone: one reassurance line stays
+          (below), the selfie notice folds into its summary (feedback
+          18.09.2026, #23). */}
 
       {/* Progress Summary — only when there are 2+ documents. A stepper for a
           single doc (e.g. just the selfie) is meaningless, so we hide it. */}

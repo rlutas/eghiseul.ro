@@ -57,19 +57,32 @@ interface SelfieLegalNoticeProps {
 
 export function SelfieLegalNotice({ matching, className }: SelfieLegalNoticeProps) {
   return (
-    <section
+    <details
       aria-label="Temeiul și durata de păstrare a fotografiei de verificare"
       className={cn(
-        'rounded-xl border border-neutral-200 bg-neutral-50/70 p-4',
+        'group rounded-xl border border-neutral-200 bg-neutral-50/70 p-4',
         className,
       )}
     >
-      <div className="flex gap-3">
+      {/* The summary IS the disclosure — purpose, who compares, retention —
+          readable where the photo is asked for; the full text is one tap
+          away on the same surface (feedback 18.09.2026, #23). Every figure
+          below is backed by the notes at the top of this file. */}
+      <summary className="flex cursor-pointer list-none gap-3 [&::-webkit-details-marker]:hidden">
         <ShieldCheck className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary-500" />
-        <div className="min-w-0 space-y-2 text-xs leading-relaxed text-neutral-600">
-          <p className="text-sm font-semibold text-secondary-900">
+        <span className="min-w-0 text-xs leading-relaxed text-neutral-600">
+          <span className="block text-sm font-semibold text-secondary-900">
             De ce cerem selfie-ul și cât îl păstrăm
-          </p>
+          </span>
+          Confirmă că tu ești titularul actului;{' '}
+          {matching === 'automated' ? 'comparația o face un serviciu Google (Gemini)' : 'o compară un coleg, nu un algoritm'};
+          o refolosim 90 de zile și rămâne la dosarul comenzii 3 ani.
+          <span className="ml-1 font-medium text-primary-600 group-open:hidden">Citește tot</span>
+        </span>
+      </summary>
+      <div className="flex gap-3 pt-3">
+        <span className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
+        <div className="min-w-0 space-y-2 text-xs leading-relaxed text-neutral-600">
 
           <p>
             <span className="font-medium text-secondary-900">De ce.</span>{' '}
@@ -142,7 +155,7 @@ export function SelfieLegalNotice({ matching, className }: SelfieLegalNoticeProp
           </p>
         </div>
       </div>
-    </section>
+    </details>
   );
 }
 

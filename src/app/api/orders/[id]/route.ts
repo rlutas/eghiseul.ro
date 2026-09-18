@@ -5,6 +5,7 @@ import { normalizeOrderOptions } from '@/lib/orders/normalize'
 import { calculateEstimatedCompletion } from '@/lib/delivery-calculator'
 import { customerTimeline, timelineLabel, type RawHistoryRow } from '@/lib/orders/customer-timeline'
 import { getDownloadUrl, isOrderUploadKey } from '@/lib/aws/s3'
+import { issuePaymentProofToken } from '@/lib/orders/payment-proof-token'
 
 interface RouteParams {
   params: Promise<{ id: string }>
@@ -267,6 +268,12 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       // A short-lived link to the proof the customer uploaded, so the order
       // page can show it back (owner-only route; same signing as the admin).
       paymentProofUrl,
+      // Presign-only bearer for the bank-transfer proof upload, for the caller
+      // this route has just authorized, while the order is unpaid.
+      proofToken:
+        order.payment_status !== 'paid' && ['pending', 'awaiting_payment'].includes(order.status ?? '')
+          ? issuePaymentProofToken(String(order.id))
+          : null,
       paymentIntentId: order.stripe_payment_intent_id,
       deliveryTrackingNumber: order.delivery_tracking_number || null,
       contractUrl: order.contract_url,

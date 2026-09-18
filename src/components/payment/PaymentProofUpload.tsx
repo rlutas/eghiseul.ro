@@ -9,6 +9,8 @@ interface PaymentProofUploadProps {
   orderId: string;
   onUploadComplete: (fileKey: string) => void;
   onUploadError?: (error: string) => void;
+  /** From the status/order API — lets a guest upload without a session. */
+  proofToken?: string | null;
 }
 
 const ALLOWED_TYPES = [
@@ -23,6 +25,7 @@ export function PaymentProofUpload({
   orderId,
   onUploadComplete,
   onUploadError,
+  proofToken,
 }: PaymentProofUploadProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadedFile, setUploadedFile] = useState<{
@@ -56,10 +59,13 @@ export function PaymentProofUpload({
       setError(null);
 
       try {
+        // The dedicated branch: server-named key, ≤ 10 MB, owner session OR
+        // the order-scoped token (guests on the status/checkout page).
         const result = await uploadToS3({
-          category: 'orders',
+          category: 'payment-proof',
           file,
           orderId,
+          proofToken,
         });
 
         setUploadedFile({
@@ -68,16 +74,17 @@ export function PaymentProofUpload({
           type: file.type,
         });
         onUploadComplete(result.key);
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (err) {
-        const message = 'Eroare la încărcare. Te rugăm să încerci din nou.';
+        const message = err instanceof Error && err.message && err.message !== 'Failed to get upload URL'
+          ? err.message
+          : 'Eroare la încărcare. Te rugăm să încerci din nou.';
         setError(message);
         onUploadError?.(message);
       } finally {
         setIsUploading(false);
       }
     },
-    [orderId, onUploadComplete, onUploadError]
+    [orderId, onUploadComplete, onUploadError, proofToken]
   );
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {

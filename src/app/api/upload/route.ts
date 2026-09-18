@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
+import { verifyPaymentProofToken } from '@/lib/orders/payment-proof-token';
 import {
   getUploadUrl,
   generateKycKey,
@@ -27,6 +29,8 @@ interface UploadRequest {
   orderId?: string;
   // For signature uploads
   signatureType?: string;
+  // For payment-proof uploads by a guest (issued by the status/order API)
+  proofToken?: string;
 }
 
 /**
@@ -49,14 +53,7 @@ export async function POST(request: NextRequest) {
     const supabase = await createClient();
 
     // Check authentication
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
-
+    const { data: { user: sessionUser } } = await supabase.auth.getUser();
     const body: UploadRequest = await request.json();
     const {
       category,
@@ -67,7 +64,66 @@ export async function POST(request: NextRequest) {
       verificationId,
       orderId,
       signatureType,
+      proofToken,
     } = body;
+
+    // Payment proof for a bank-transfer order — the one branch a GUEST may
+    // use, with the order-scoped token from the status/order API. Server
+    // names the key; ≤ 5 presigns per order per hour, counted in the DB.
+    if (category === 'payment-proof') {
+      if (!orderId || !/^[A-Za-z0-9-]+$/.test(orderId)) {
+        return NextResponse.json({ error: 'orderId is required' }, { status: 400 });
+      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const admin = createAdminClient() as any;
+      const { data: order } = await admin
+        .from('orders')
+        .select('id, user_id, status, payment_status')
+        .eq('id', orderId)
+        .maybeSingle();
+      if (!order) return NextResponse.json({ error: 'Order not found' }, { status: 404 });
+      const authorized = order.user_id
+        ? !!sessionUser && sessionUser.id === order.user_id
+        : verifyPaymentProofToken(proofToken, orderId);
+      if (!authorized) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      if (order.payment_status === 'paid' || !['pending', 'awaiting_payment'].includes(order.status)) {
+        return NextResponse.json({ error: 'Comanda nu așteaptă o dovadă de plată' }, { status: 400 });
+      }
+      if (!contentType || !isAllowedFileType(contentType, ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'])) {
+        return NextResponse.json({ error: 'Acceptăm JPG, PNG, WebP sau PDF' }, { status: 400 });
+      }
+      if (!fileSize || fileSize <= 0 || fileSize > MAX_FILE_SIZE) {
+        return NextResponse.json({ error: 'Fișierul trebuie să aibă între 1 byte și 10 MB' }, { status: 400 });
+      }
+      const { data: withinBudget } = await admin.rpc('count_proof_presign', { p_order_id: orderId, p_max: 5 });
+      if (withinBudget !== true) {
+        return NextResponse.json({ error: 'Prea multe încercări. Așteaptă o oră și încearcă din nou.' }, { status: 429 });
+      }
+      const ext = getExtensionFromContentType(contentType);
+      const key = generateOrderKey(orderId, `proof-${Date.now()}-${generateFileId()}.${ext}`);
+      const result = await getUploadUrl(key, {
+        contentType,
+        metadata: {
+          'user-id': sessionUser?.id ?? 'guest',
+          'original-filename': filename || 'unknown',
+          'uploaded-at': new Date().toISOString(),
+        },
+        expiresIn: 900,
+      });
+      return NextResponse.json({
+        success: true,
+        data: { uploadUrl: result.url, key: result.key, bucket: result.bucket, expiresIn: 900 },
+      });
+    }
+
+    // Everything else needs a session.
+    if (!sessionUser) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+    const user = sessionUser;
 
     // Validate category
     if (!category || !['kyc', 'orders', 'temp', 'signatures', 'templates'].includes(category)) {
@@ -139,6 +195,22 @@ export async function POST(request: NextRequest) {
             { error: 'orderId is required for order uploads' },
             { status: 400 }
           );
+        }
+        // Only the order's owner may write into its namespace (a guest order
+        // counts as owned when its contact email is the session's).
+        {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const admin = createAdminClient() as any;
+          const { data: ord } = await admin
+            .from('orders')
+            .select('id, user_id, customer_data')
+            .eq('id', orderId)
+            .maybeSingle();
+          const ordEmail = ((ord?.customer_data as { contact?: { email?: string } } | null)?.contact?.email || '').toLowerCase();
+          const owns = !!ord && (ord.user_id ? ord.user_id === user.id : !!user.email && ordEmail === user.email.toLowerCase());
+          if (!owns) {
+            return NextResponse.json({ error: 'You do not have access to this order' }, { status: 403 });
+          }
         }
         const orderFilename = filename || `${generateFileId()}.${extension}`;
         key = generateOrderKey(orderId, orderFilename);

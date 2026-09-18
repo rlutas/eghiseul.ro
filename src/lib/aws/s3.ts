@@ -39,6 +39,7 @@ const BUCKET = process.env.AWS_S3_BUCKET_DOCUMENTS || 'eghiseul-documents';
 export type DocumentCategory =
   | 'kyc'           // KYC verification documents
   | 'orders'        // Order-related uploads
+  | 'payment-proof' // A bank-transfer proof (guest-capable, token-authorized)
   | 'contracts'     // Generated contracts
   | 'invoices'      // Generated invoices
   | 'final'         // Final delivered documents
@@ -87,6 +88,8 @@ export interface FileInfo {
   lastModified: Date;
   contentType?: string;
   metadata?: Record<string, string>;
+  /** S3 ETag without quotes — the content digest for a single-part upload. */
+  etag?: string;
 }
 
 // ============================================================================
@@ -119,6 +122,25 @@ export function generateOrderKey(
   const year = now.getFullYear();
   const month = String(now.getMonth() + 1).padStart(2, '0');
   return `orders/${year}/${month}/${orderId}/${subFolder}/${filename}`;
+}
+
+/**
+ * The immutable home of an attached payment proof:
+ * `orders/<yyyy>/<mm>/<orderId>/proof/<etag>.<ext>`. Never presigned — the
+ * customer's upload key can be overwritten until its presign expires, so the
+ * attached proof is a COPY named after its content digest.
+ */
+export function generateProofFinalKey(orderId: string, etag: string, extension: string): string {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  return `orders/${year}/${month}/${orderId}/proof/${etag}.${extension}`;
+}
+
+/** Is `key` an attached proof's immutable key for this order? */
+export function isProofFinalKey(key: string, orderId: string): boolean {
+  if (!/^[A-Za-z0-9-]+$/.test(orderId)) return false;
+  return new RegExp(`^orders/\\d{4}/\\d{2}/${orderId}/proof/[a-f0-9-]+\\.[a-z0-9]+$`).test(key);
 }
 
 /**
@@ -379,6 +401,7 @@ export async function getFileInfo(key: string): Promise<FileInfo> {
     lastModified: response.LastModified || new Date(),
     contentType: response.ContentType,
     metadata: response.Metadata,
+    etag: response.ETag ? response.ETag.replace(/"/g, '') : undefined,
   };
 }
 

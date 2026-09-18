@@ -274,3 +274,13 @@ const IDENTITY_FRONT_TYPES: readonly string[] = [
 export function isIdentityFrontType(stored: string): boolean {
   return IDENTITY_FRONT_TYPES.includes(stored);
 }
+
+/** Every stored name that is a passport's data page (`passport`, `passport_opened`). */
+export function isPassportType(stored: string): boolean {
+  return DOCUMENT_TYPE_ALIASES.passport_opened.includes(stored);
+}
+
+/** Stored names of an identity FRONT — exported for server-side row lookups. */
+export function identityFrontTypes(): readonly string[] {
+  return IDENTITY_FRONT_TYPES;
+}

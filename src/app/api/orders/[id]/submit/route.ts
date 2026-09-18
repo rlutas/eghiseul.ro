@@ -2,13 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { logAudit, getAuditContext } from '@/lib/security/audit-logger';
-import { createHash } from 'crypto';
+import { createHash, timingSafeEqual } from 'crypto';
 import { autoGenerateOrderDocuments } from '@/lib/documents/auto-generate';
-import { uploadOrderSignature, uploadBase64 } from '@/lib/aws/s3';
+import { uploadOrderSignature, uploadBase64, copyFile, getFileInfo } from '@/lib/aws/s3';
 import { computeEstimatedCompletionISOForOrder, hasForeignDrivingLicense } from '@/lib/orders/order-estimate';
 import { getMissingInvoiceClientFields } from '@/lib/oblio/invoice';
 import { emailDomainAcceptsMail } from '@/lib/email-mx';
-import { hasCompleteKyc } from '@/lib/kyc/identity-documents';
+import { isIdentityFrontType, isPassportType, isSelfieType, identityFrontTypes } from '@/lib/kyc/identity-documents';
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -54,18 +54,32 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    // Verify ownership or allow guest orders
-    if (order.user_id && user && order.user_id !== user.id) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: {
-            code: 'FORBIDDEN',
-            message: 'You do not have permission to submit this order',
+    // Ownership. A linked order is submitted by its owner — or, for a phone
+    // order the operator started, by the customer through the admin-issued
+    // continuation link (`resume_token`, sent in the body). A guest request
+    // without that token is refused BEFORE anything is read or copied
+    // (Codex REV2-SEC-002).
+    if (order.user_id) {
+      const isOwner = !!user && order.user_id === user.id;
+      const resumeToken = typeof body?.resumeToken === 'string' ? body.resumeToken : '';
+      const storedToken = typeof order.resume_token === 'string' ? order.resume_token : '';
+      const tokenLive =
+        !!resumeToken && !!storedToken &&
+        resumeToken.length === storedToken.length &&
+        timingSafeEqual(Buffer.from(resumeToken), Buffer.from(storedToken)) &&
+        !!order.resume_token_expires_at && new Date(order.resume_token_expires_at).getTime() > Date.now();
+      if (!isOwner && !tokenLive) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: {
+              code: 'FORBIDDEN',
+              message: 'You do not have permission to submit this order',
+            },
           },
-        },
-        { status: 403 }
-      );
+          { status: 403 }
+        );
+      }
     }
 
     // Only allow submitting draft orders
@@ -87,85 +101,121 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     // draft-resume flows or back-navigation can bypass the KYC step entirely
     // (real case: E-260708-AJ5M8 reached checkout without a selfie). Enforce
     // the same minimal requirements here so no client path can skip them.
-    try {
+    //
+    // Order of operations (Codex rounds 2–3): (1) the trusted service config,
+    // failing CLOSED on a read error; (2) for a signed-in account whose
+    // identity document is on file, copy it into the order — server-side,
+    // from the account's own row, never from client input; (3) the guard on
+    // the persisted order-local set.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let pk: any = null;
+    {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data: svcCfg } = await (adminClient as any)
+      const { data: svcCfg, error: cfgError } = await (adminClient as any)
         .from('services')
         .select('verification_config')
         .eq('id', order.service_id)
         .single();
+      if (cfgError) {
+        console.error('[submit] KYC guard config lookup failed:', cfgError.message);
+        return NextResponse.json(
+          { success: false, error: { code: 'CONFIG_UNAVAILABLE', message: 'Nu am putut verifica cerințele serviciului. Reîncearcă în câteva secunde.' } },
+          { status: 503 }
+        );
+      }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const pk = (svcCfg?.verification_config as any)?.personalKyc;
-      if (pk?.enabled) {
+      pk = (svcCfg?.verification_config as any)?.personalKyc ?? null;
+    }
+    if (pk?.enabled) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const cd = order.customer_data as any;
+      const personalKey = cd?.personal ? 'personal' : cd?.personalData ? 'personalData' : 'personal';
+      const personal = cd?.[personalKey] || (cd[personalKey] = {});
+      const docs: Array<{ type?: string; s3Key?: string; base64?: string }> = personal.uploadedDocuments || (personal.uploadedDocuments = []);
+      const citizenship = personal.citizenship || 'romanian';
+      const isForeign = citizenship !== 'romanian';
+
+      // (2) Identity from the account (feedback 18.09.2026, #20): the step
+      // showed the account's document instead of asking for a scan, so the
+      // order carries no front yet. Copy the account row's object into the
+      // order's own namespace so admin/documents see it — unless the
+      // customer explicitly chose another document (`useOtherDocument`).
+      const hasFrontOnOrder = docs.some((d) => isIdentityFrontType(d.type || ''));
+      if (order.user_id && !hasFrontOnOrder && personal.useOtherDocument !== true) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const cd = order.customer_data as any;
-        const personal = cd?.personal || cd?.personalData || {};
-        const docs: Array<{ type?: string; s3Key?: string; base64?: string }> = personal.uploadedDocuments || [];
-        // One object cannot stand in for two documents: a „selfie" that is the
-        // same file as the identity document is no selfie (REV3-KYC-001).
-        const objectOf = (d: { s3Key?: string; base64?: string }) =>
-          d.s3Key || (d.base64 ? `b64:${d.base64.length}:${d.base64.slice(-80)}` : '');
-        const selfieDoc = docs.find((d) => d.type === 'selfie' || d.type === 'selfie_with_id');
-        const selfieIsAnotherDoc =
-          !!selfieDoc && !!objectOf(selfieDoc) &&
-          docs.some((d) => d !== selfieDoc && d.type !== 'selfie' && d.type !== 'selfie_with_id' && objectOf(d) === objectOf(selfieDoc));
-        const has = (t: string) =>
-          docs.some((d) => d.type === t) && !((t === 'selfie' || t === 'selfie_with_id') && selfieIsAnotherDoc);
-        const citizenship = personal.citizenship || 'romanian';
-        const isForeign = citizenship !== 'romanian';
-
-        // Verified account-KYC is a legitimate bypass (documents live on the
-        // customer's profile, re-used across orders).
-        // The rows decide, exactly as the wizard's prefill decided to hide
-        // the step: an identity document AND a selfie, active and unexpired.
-        // Not the denormalised `profiles.kyc_verified` — a stale flag hid the
-        // only upload step and then rejected the order here (REV3-KYC-002).
-        let accountKycOk = false;
-        if (order.user_id) {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const { data: activeDocs } = await (adminClient as any)
-            .from('kyc_verifications')
-            .select('document_type, expires_at')
-            .eq('user_id', order.user_id)
-            .eq('is_active', true);
-          const nowMs = Date.now();
-          const liveTypes = ((activeDocs ?? []) as Array<{ document_type: string; expires_at: string | null }>)
-            .filter((d) => !d.expires_at || Date.parse(d.expires_at) > nowMs)
-            .map((d) => d.document_type);
-          accountKycOk = hasCompleteKyc(liveTypes);
+        const { data: rows, error: rowsError } = await (adminClient as any)
+          .from('kyc_verifications')
+          .select('document_type, file_key, expires_at, verified_at')
+          .eq('user_id', order.user_id)
+          .eq('is_active', true)
+          .in('document_type', [...identityFrontTypes()])
+          .order('verified_at', { ascending: false });
+        if (rowsError) {
+          console.error('[submit] account identity lookup failed:', rowsError.message);
+          return NextResponse.json(
+            { success: false, error: { code: 'ACCOUNT_KYC_UNAVAILABLE', message: 'Nu am putut citi actul din contul tău. Reîncearcă în câteva secunde.' } },
+            { status: 503 }
+          );
         }
-
-        if (!accountKycOk) {
-          const SCAN_ID_TYPES = ['ci_front', 'ci_nou_front', 'ci_nou_back', 'ci_vechi', 'passport_opened'];
-          const missing: string[] = [];
-          if (isForeign) {
-            if (!has('passport')) missing.push('pașaportul');
-            if (!has('selfie')) missing.push('selfie cu actul de identitate');
-            if (!has('residence_permit')) missing.push('permisul de rezidență / certificatul fiscal');
-          } else {
-            const hasScanId = docs.some((d) => SCAN_ID_TYPES.includes(d.type || ''));
-            const hasManualId = has('act_identitate');
-            if (!hasScanId && !hasManualId) missing.push('actul de identitate');
-            if (pk.selfieRequired && !has('selfie')) missing.push('selfie cu actul de identitate');
-          }
-          if (missing.length > 0) {
+        const nowMs = Date.now();
+        const row = ((rows ?? []) as Array<{ document_type: string; file_key: string | null; expires_at: string | null }>)
+          .find((r) => !!r.file_key && (!r.expires_at || Date.parse(r.expires_at) > nowMs));
+        if (row && row.file_key && row.file_key.startsWith(`kyc/${order.user_id}/`)) {
+          try {
+            const info = await getFileInfo(row.file_key);
+            if (!(info.size > 0)) throw new Error('empty object');
+            const ext = /\.([a-z0-9]+)$/i.exec(row.file_key)?.[1]?.toLowerCase() || 'jpg';
+            const s3Key = `kyc/${id}/${row.document_type}.${ext}`;
+            await copyFile(row.file_key, s3Key);
+            docs.push({ type: row.document_type, s3Key, fromAccount: true, uploadedAt: new Date().toISOString() } as { type: string; s3Key: string });
+            const { error: persistError } = await adminClient
+              .from('orders')
+              .update({ customer_data: cd, updated_at: new Date().toISOString() })
+              .eq('id', id);
+            if (persistError) throw new Error(persistError.message);
+          } catch (copyErr) {
+            console.error('[submit] account identity copy failed:', copyErr instanceof Error ? copyErr.message : copyErr);
             return NextResponse.json(
-              {
-                success: false,
-                error: {
-                  code: 'KYC_INCOMPLETE',
-                  message: `Lipsesc documente obligatorii: ${missing.join(', ')}. Te rugăm să revii la pasul de verificare a identității.`,
-                },
-              },
-              { status: 400 }
+              { success: false, error: { code: 'ACCOUNT_KYC_COPY_FAILED', message: 'Nu am putut prelua actul din contul tău. Reîncearcă sau încarcă actul în pasul de verificare.' } },
+              { status: 500 }
             );
           }
         }
       }
-    } catch (guardErr) {
-      // Config lookup failure must not block legitimate orders — the guard
-      // fails open on infrastructure errors, never on missing documents.
-      console.error('[submit] KYC guard config lookup failed (continuing):', guardErr instanceof Error ? guardErr.message : guardErr);
+
+      // (3) The guard, on the order's own documents only. One object cannot
+      // stand in for two documents: a „selfie" that is the same file as the
+      // identity document is no selfie (REV3-KYC-001).
+      const objectOf = (d: { s3Key?: string; base64?: string }) =>
+        d.s3Key || (d.base64 ? `b64:${d.base64.length}:${d.base64.slice(-80)}` : '');
+      const selfieDoc = docs.find((d) => isSelfieType(d.type || ''));
+      const selfieIsAnotherDoc =
+        !!selfieDoc && !!objectOf(selfieDoc) &&
+        docs.some((d) => d !== selfieDoc && !isSelfieType(d.type || '') && objectOf(d) === objectOf(selfieDoc));
+      const hasSelfie = !!selfieDoc && !selfieIsAnotherDoc;
+      const has = (t: string) => docs.some((d) => d.type === t);
+
+      const missing: string[] = [];
+      if (isForeign) {
+        if (!docs.some((d) => isPassportType(d.type || ''))) missing.push('pașaportul');
+        if (!hasSelfie) missing.push('selfie cu actul de identitate');
+        if (!has('residence_permit')) missing.push('permisul de rezidență / certificatul fiscal');
+      } else {
+        if (!docs.some((d) => isIdentityFrontType(d.type || ''))) missing.push('actul de identitate');
+        if (pk.selfieRequired && !hasSelfie) missing.push('selfie cu actul de identitate');
+      }
+      if (missing.length > 0) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: {
+              code: 'KYC_INCOMPLETE',
+              message: `Lipsesc documente obligatorii: ${missing.join(', ')}. Te rugăm să revii la pasul de verificare a identității.`,
+            },
+          },
+          { status: 400 }
+        );
+      }
     }
 
     // ── Server-side billing completeness guard ──────────────────────────
@@ -339,6 +389,9 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       status: 'pending',
       updated_at: now,
       submitted_at: now,
+      // The continuation link has done its job; it must not outlive the draft.
+      resume_token: null,
+      resume_token_expires_at: null,
       contract_signed_at: now,
       ...(estimatedCompletionISO ? { estimated_completion_date: estimatedCompletionISO } : {}),
     };

@@ -16,9 +16,9 @@ import {
   Lock,
   Layers,
   CheckCircle,
-  Check,
-} from 'lucide-react';
+  Check, HelpCircle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { formatUrgentDays } from '@/types/services';
 import { useModularWizard } from '@/providers/modular-wizard-provider';
 import { ServiceOption } from '@/types/services';
 import type { SelectedOptionState } from '@/types/verification-modules';
@@ -98,8 +98,11 @@ function formatPrice(value: number): string {
 // ════════════════════════════════════════════════════════════════════════════
 
 export function OptionsStepModular({ onValidChange }: OptionsStepProps) {
-  const { state, updateOptions, priceBreakdown, serviceOptions, goToStep } = useModularWizard();
+  const { state, updateOptions, priceBreakdown, serviceOptions, goToStep, service } = useModularWizard();
   const { selectedOptions } = state;
+  // „Gata în N zile lucrătoare" on the urgent card, from the service's own
+  // urgent term (the option's DB description repeated it in prose).
+  const urgentTerm = service ? formatUrgentDays(service) : null;
 
   // Service name — used in the extras header (e.g. "Opțiuni suplimentare Certificat Nastere").
   const serviceDisplayName = useMemo(() => {
@@ -465,6 +468,10 @@ export function OptionsStepModular({ onValidChange }: OptionsStepProps) {
 
   return (
     <div className="space-y-8">
+      <h3 className="text-base font-semibold text-secondary-900">
+        Apasă și selectează opțiunile suplimentare dorite
+      </h3>
+
       {/* ────────────────────────────────────────────────────────────── */}
       {/* Procesare Rapidă — urgența (hidden when cetatean_strain)       */}
       {/* ────────────────────────────────────────────────────────────── */}
@@ -482,6 +489,9 @@ export function OptionsStepModular({ onValidChange }: OptionsStepProps) {
             price={urgenta.price}
             selected={isCodeSelected(urgenta.code)}
             onClick={() => toggleByCode(urgenta)}
+            variant="primary"
+            badge="Recomandat"
+            term={urgentTerm ? `Gata în ${urgentTerm}` : null}
           />
         </section>
       )}
@@ -821,21 +831,15 @@ interface SectionHeaderProps {
   subtitle?: string;
 }
 
-function SectionHeader({ icon: Icon, title, subtitle }: SectionHeaderProps) {
+// A group label, not a heading: the step has ONE heading (the instruction
+// line at the top) and the explanations live behind „?" (feedback 18.09.2026,
+// #21). `subtitle` is accepted for call-site compatibility and not rendered.
+function SectionHeader({ icon: Icon, title }: SectionHeaderProps) {
   return (
-    <div className="flex items-start gap-3 border-b border-neutral-100 pb-2.5">
-      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary-50 shrink-0">
-        <Icon className="h-4.5 w-4.5 text-primary-600" />
-      </div>
-      <div className="flex-1 min-w-0 pt-0.5">
-        <h3 className="text-base font-semibold text-secondary-900 leading-tight">
-          {title}
-        </h3>
-        {subtitle && (
-          <p className="text-xs text-neutral-500 mt-0.5">{subtitle}</p>
-        )}
-      </div>
-    </div>
+    <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-neutral-500">
+      <Icon className="h-3.5 w-3.5 text-neutral-400" />
+      {title}
+    </p>
   );
 }
 
@@ -847,6 +851,11 @@ interface OptionCardProps {
   selected: boolean;
   disabled?: boolean;
   onClick: () => void;
+  /** `primary`: the upsell that must catch the eye (urgent processing). */
+  variant?: 'default' | 'primary';
+  badge?: string;
+  /** Concrete promise shown on the card, e.g. „Gata în 2 zile lucrătoare". */
+  term?: string | null;
 }
 
 function OptionCard({
@@ -857,49 +866,80 @@ function OptionCard({
   selected,
   disabled = false,
   onClick,
+  variant = 'default',
+  badge,
+  term,
 }: OptionCardProps) {
+  // The explanation is one tap away, never expanded by default.
+  const [hintOpen, setHintOpen] = useState(false);
+  const primary = variant === 'primary';
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={disabled}
-      aria-pressed={selected}
+    <div
       className={cn(
-        'group flex w-full cursor-pointer items-center gap-3 rounded-xl border-2 p-4 text-left transition-all duration-200',
+        'relative rounded-xl border-2 transition-all duration-200',
         disabled
-          ? 'opacity-50 cursor-not-allowed border-neutral-200 bg-neutral-50/40'
+          ? 'opacity-50 border-neutral-200 bg-neutral-50/40'
           : selected
           ? 'border-primary-500 bg-primary-50 shadow-sm'
+          : primary
+          ? 'border-primary-300 bg-primary-50/30 hover:border-primary-500 shadow-sm'
           : 'border-neutral-200 bg-white hover:border-primary-300 hover:bg-primary-50/30'
       )}
     >
-      <div
-        className={cn(
-          'flex h-11 w-11 items-center justify-center rounded-xl shrink-0 transition-colors',
-          disabled
-            ? 'bg-neutral-100'
-            : selected
-            ? 'bg-primary-100'
-            : 'bg-neutral-100 group-hover:bg-primary-100/60'
-        )}
+      {badge && !disabled && (
+        <span className="absolute -top-2.5 left-4 rounded-full bg-primary-500 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-secondary-900">
+          {badge}
+        </span>
+      )}
+      <button
+        type="button"
+        onClick={onClick}
+        disabled={disabled}
+        aria-pressed={selected}
+        className="group flex w-full cursor-pointer items-center gap-3 p-4 text-left disabled:cursor-not-allowed"
       >
-        <Icon
+        <span
           className={cn(
-            'h-5 w-5 transition-colors',
-            disabled
-              ? 'text-neutral-400'
-              : selected
-              ? 'text-primary-600'
-              : 'text-neutral-500 group-hover:text-primary-600'
+            'flex h-5 w-5 shrink-0 items-center justify-center rounded border-2 transition-colors',
+            selected ? 'border-primary-600 bg-primary-600 text-white' : 'border-neutral-300 bg-white'
           )}
-        />
-      </div>
-      <div className="flex-1 min-w-0">
-        <p className="text-sm font-semibold text-secondary-900 leading-tight">{name}</p>
-        <p className="text-xs text-neutral-500 mt-0.5 leading-snug">{hint}</p>
-      </div>
-      <PriceChip price={price} selected={selected} disabled={disabled} />
-    </button>
+          aria-hidden="true"
+        >
+          {selected && <Check className="h-3.5 w-3.5" />}
+        </span>
+        <span
+          className={cn(
+            'flex h-10 w-10 items-center justify-center rounded-xl shrink-0 transition-colors',
+            selected || primary ? 'bg-primary-100' : 'bg-neutral-100 group-hover:bg-primary-100/60'
+          )}
+        >
+          <Icon className={cn('h-5 w-5', selected || primary ? 'text-primary-600' : 'text-neutral-500')} />
+        </span>
+        <span className="flex-1 min-w-0">
+          <span className={cn('block leading-tight', primary ? 'text-base font-bold text-secondary-900' : 'text-sm font-semibold text-secondary-900')}>
+            {name}
+          </span>
+          {term && (
+            <span className="mt-0.5 block text-xs font-medium text-primary-700">⚡ {term}</span>
+          )}
+        </span>
+        <PriceChip price={price} selected={selected} disabled={disabled} />
+      </button>
+      {hint && (
+        <div className="px-4 pb-3 -mt-1">
+          <button
+            type="button"
+            onClick={() => setHintOpen((v) => !v)}
+            aria-expanded={hintOpen}
+            className="inline-flex items-center gap-1 text-xs font-medium text-neutral-500 hover:text-primary-700"
+          >
+            <HelpCircle className="h-3.5 w-3.5" />
+            {hintOpen ? 'Ascunde detaliile' : 'Ce înseamnă?'}
+          </button>
+          {hintOpen && <p className="mt-1 text-xs leading-snug text-neutral-600">{hint}</p>}
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -1179,6 +1219,15 @@ function CrossServiceAddonCard({
         className="w-full p-4 text-left cursor-pointer"
       >
         <div className="flex items-center gap-3">
+          <span
+            className={cn(
+              'flex h-5 w-5 shrink-0 items-center justify-center rounded border-2 transition-colors',
+              isSelected ? 'border-primary-600 bg-primary-600 text-white' : 'border-neutral-300 bg-white'
+            )}
+            aria-hidden="true"
+          >
+            {isSelected && <Check className="h-3.5 w-3.5" />}
+          </span>
           <div
             className={cn(
               'flex h-11 w-11 items-center justify-center rounded-xl shrink-0 transition-colors',
@@ -1201,11 +1250,8 @@ function CrossServiceAddonCard({
             <p className="text-sm font-semibold text-secondary-900 leading-tight">
               {option.name.replace(/\s*\(adaugă în aceeași comandă\)\s*$/i, '').trim()}
             </p>
-            <Badge className="mt-1 bg-primary-500 text-white hover:bg-primary-500">
-              Serviciu secundar
-            </Badge>
-            <p className="text-xs text-neutral-500 mt-1 leading-snug">
-              {option.description || 'Serviciu suplimentar bundluit în aceeași comandă'}
+            <p className="text-xs text-neutral-500 mt-0.5 leading-snug">
+              În aceeași comandă, cu o singură plată
             </p>
           </div>
           <PriceChip price={option.price} selected={isSelected} />

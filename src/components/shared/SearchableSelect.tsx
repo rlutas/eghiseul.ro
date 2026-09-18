@@ -24,6 +24,12 @@ interface SearchableSelectProps {
   placeholder?: string;
   error?: string;
   className?: string;
+  /**
+   * `down`: never flip above the field — when the viewport is short, the
+   * page scrolls so the list fits below (a list opening upward hid the
+   * field on phones, feedback 18.09.2026 #19). Default: auto.
+   */
+  preferDirection?: 'auto' | 'down';
 }
 
 export function SearchableSelect({
@@ -33,6 +39,7 @@ export function SearchableSelect({
   placeholder = 'Cauta...',
   error,
   className,
+  preferDirection = 'auto',
 }: SearchableSelectProps) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState(value);
@@ -80,7 +87,13 @@ export function SearchableSelect({
     const spaceAbove = rect.top;
     const dropdownHeight = 280; // matches max-h-64 (~256px) + a small buffer
     const direction: 'down' | 'up' =
-      spaceBelow < dropdownHeight && spaceAbove > spaceBelow ? 'up' : 'down';
+      preferDirection === 'down'
+        ? 'down'
+        : spaceBelow < dropdownHeight && spaceAbove > spaceBelow ? 'up' : 'down';
+    if (preferDirection === 'down' && spaceBelow < dropdownHeight) {
+      // Make room below instead of flipping: scroll the field up the screen.
+      window.scrollBy({ top: dropdownHeight - spaceBelow + 16, behavior: 'smooth' });
+    }
 
     setPosition({
       top: direction === 'down' ? rect.bottom + 4 : rect.top - 4,
@@ -88,7 +101,7 @@ export function SearchableSelect({
       width: rect.width,
       direction,
     });
-  }, []);
+  }, [preferDirection]);
 
   useLayoutEffect(() => {
     if (!open) return;

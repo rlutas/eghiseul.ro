@@ -164,7 +164,7 @@ export default function ContractPreview() {
             <>
               <style>{contractPreviewStyles}</style>
               <div
-                className="contract-preview max-h-[300px] sm:max-h-[500px] overflow-y-auto border rounded-lg p-3 sm:p-6 bg-white"
+                className="contract-preview max-h-[300px] sm:max-h-[500px] overflow-y-auto overflow-x-hidden border rounded-lg p-3 sm:p-6 bg-white"
                 dangerouslySetInnerHTML={{ __html: displayHtml }}
               />
             </>
@@ -181,6 +181,22 @@ const contractPreviewStyles = `
     font-size: 13px;
     line-height: 1.6;
     color: #1a1a1a;
+    /* Vertical scroll only: a wide table or image made the whole preview
+       drift sideways while dragging on a phone (feedback 18.09.2026, #24). */
+    overscroll-behavior-x: none;
+    touch-action: pan-y;
+    overflow-wrap: anywhere;
+  }
+  .contract-preview * {
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+  .contract-preview img {
+    height: auto;
+  }
+  .contract-preview table {
+    table-layout: fixed;
+    word-break: break-word;
   }
 
   .contract-preview p {

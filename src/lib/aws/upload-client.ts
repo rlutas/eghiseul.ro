@@ -20,6 +20,8 @@ export interface UploadOptions {
   verificationId?: string;
   // For order uploads
   orderId?: string;
+  /** Payment-proof uploads by a guest: the token from the status/order API. */
+  proofToken?: string | null;
   // Progress callback
   onProgress?: (progress: number) => void;
 }
@@ -34,7 +36,7 @@ export interface UploadResult {
  * Upload a file to S3 via presigned URL
  */
 export async function uploadToS3(options: UploadOptions): Promise<UploadResult> {
-  const { category, file, documentType, verificationId, orderId, onProgress } = options;
+  const { category, file, documentType, verificationId, orderId, proofToken, onProgress } = options;
 
   // Step 1: Get presigned URL from our API
   const presignedResponse = await fetch('/api/upload', {
@@ -48,6 +50,7 @@ export async function uploadToS3(options: UploadOptions): Promise<UploadResult> 
       documentType,
       verificationId,
       orderId,
+      proofToken: proofToken || undefined,
     }),
   });
 

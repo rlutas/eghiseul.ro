@@ -2,6 +2,7 @@ import { createClient as createServiceClient } from '@supabase/supabase-js';
 import { normalizeOrderOptions } from '@/lib/orders/normalize';
 import { instantPlatformProvider, getOpenOutages, PROVIDER_LABEL } from '@/lib/services/platform-services';
 import { NextRequest, NextResponse } from 'next/server';
+import { issuePaymentProofToken } from '@/lib/orders/payment-proof-token';
 import { reuploadDocLabel } from '@/lib/reupload/doc-types';
 import { isPJForDocumentGeneration } from '@/lib/documents/delegation-items';
 
@@ -69,6 +70,7 @@ export async function GET(request: NextRequest) {
         delivery_price,
         total_price,
         payment_status,
+        payment_method,
         invoice_number,
         invoice_url,
         extra_billing,
@@ -395,6 +397,14 @@ export async function GET(request: NextRequest) {
         purpose,
         status: order.status,
         paymentStatus: order.payment_status,
+        paymentMethod: order.payment_method ?? null,
+        // Lets the customer attach a proof from this page without a session
+        // (order code + email were just verified above). Only while the
+        // order waits for the transfer.
+        proofToken:
+          order.status === 'awaiting_payment' && order.payment_status === 'awaiting_verification'
+            ? issuePaymentProofToken(order.id)
+            : null,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         invoiceNumber: (order as any).invoice_number as string | null,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -260,6 +260,7 @@ export function ModularOrderWizard({ initialService, initialOptions, headerExtra
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           total_price: priceBreakdown.totalPrice,
+          resumeToken: state.resumeToken || undefined,
           signature_base64: state.signature?.signatureBase64 || null,
           consent: {
             termsAccepted: state.consent.termsAccepted,
@@ -719,6 +720,21 @@ export function ModularOrderWizard({ initialService, initialOptions, headerExtra
               {Number(priceBreakdown.totalPrice).toFixed(2)} RON
             </span>
           </button>
+          {/* The step's action, always in reach on a phone: the KYC step
+              needed a long scroll to find „Continuă" (feedback 18.09.2026,
+              #23). Same handler and same guard as the button in the card. */}
+          {!isLastStep && (
+            <div className="px-4 pb-3">
+              <Button
+                onClick={handleNext}
+                disabled={isSubmitting}
+                className="w-full h-11 gap-2 bg-primary-500 hover:bg-primary-600 text-secondary-900 font-semibold"
+              >
+                Continuă
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </div>

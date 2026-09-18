@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { timingSafeEqual } from 'crypto';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { generateOrderId, validateOrderId } from '@/lib/order-id';
@@ -117,8 +118,9 @@ function mergeCustomerData(
  */
 function canUpdateDraft(
   user: { id: string; email?: string } | null,
-  order: { user_id: string | null; customer_data: unknown },
-  requestEmail: string | undefined
+  order: { user_id: string | null; customer_data: unknown; resume_token?: string | null; resume_token_expires_at?: string | null },
+  requestEmail: string | undefined,
+  resumeToken?: string
 ): boolean {
   const existingEmail = (
     (order.customer_data as { contact?: { email?: string } } | null)?.contact?.email || ''
@@ -126,6 +128,14 @@ function canUpdateDraft(
   const sessionEmail = user?.email?.toLowerCase();
 
   if (user && order.user_id === user.id) return true;
+  // The admin-issued continuation link: the customer finishes, as a guest, a
+  // draft the operator started (which carries the operator's user_id).
+  if (order.user_id && resumeToken && order.resume_token) {
+    const a = Buffer.from(resumeToken);
+    const b = Buffer.from(order.resume_token);
+    const live = !!order.resume_token_expires_at && new Date(order.resume_token_expires_at).getTime() > Date.now();
+    if (live && a.length === b.length && timingSafeEqual(a, b)) return true;
+  }
   if (order.user_id && order.user_id !== (user?.id ?? null)) return false;
   if (!order.user_id) {
     if (!existingEmail) return true; // first contact entry on a fresh draft
@@ -237,7 +247,7 @@ export async function POST(request: NextRequest) {
         const postRequestEmail = (
           (data.customer_data as { contact?: { email?: string } } | undefined)?.contact?.email || ''
         ).toLowerCase() || undefined;
-        if (!canUpdateDraft(user, existingOrder, postRequestEmail)) {
+        if (!canUpdateDraft(user, existingOrder, postRequestEmail, typeof (data as { resumeToken?: unknown }).resumeToken === 'string' ? (data as { resumeToken?: string }).resumeToken : undefined)) {
           console.warn(`Draft POST-update denied for order ${existingOrder.friendly_order_id}`);
           return NextResponse.json(
             {
@@ -320,6 +330,13 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    const phoneOrder = (data as { phoneOrder?: unknown }).phoneOrder === true;
+    if (phoneOrder) {
+      const cdPhone = (data.customer_data || {}) as Record<string, unknown>;
+      cdPhone.phone_order = true;
+      data.customer_data = cdPhone as typeof data.customer_data;
+    }
+
     // Create the draft order (only if it doesn't exist)
     // Use friendly_order_id as order_number for drafts (unique)
 
@@ -328,7 +345,9 @@ export async function POST(request: NextRequest) {
     const insertData: any = {
       order_number: friendlyOrderId, // Use friendly ID as order_number for uniqueness
       friendly_order_id: friendlyOrderId,
-      user_id: user?.id || null,
+      // A phone order is the CUSTOMER's, not the signed-in operator's: it is
+      // finished as a guest through the continuation link.
+      user_id: phoneOrder ? null : (user?.id || null),
       service_id: data.service_id,
       status: 'draft',
       customer_data: data.customer_data || {},
@@ -400,7 +419,7 @@ export async function POST(request: NextRequest) {
         const retryInsertData: any = {
           order_number: newFriendlyOrderId, // Use new friendly ID as order_number
           friendly_order_id: newFriendlyOrderId,
-          user_id: user?.id || null,
+          user_id: phoneOrder ? null : (user?.id || null),
           service_id: data.service_id,
           status: 'draft',
           customer_data: data.customer_data || {},
@@ -574,7 +593,7 @@ export async function PATCH(request: NextRequest) {
     // Incident E-260710-2S5EH: a logged-in session could previously claim and
     // overwrite ANY unclaimed guest draft. Now a claim requires the stored
     // contact email to match the session/request email (same rule as guests).
-    const canUpdate = canUpdateDraft(user, existingOrder, requestEmail);
+    const canUpdate = canUpdateDraft(user, existingOrder, requestEmail, typeof body.resumeToken === 'string' ? body.resumeToken : undefined);
     if (!canUpdate) {
       console.warn(`Draft update denied for order ${existingOrder.friendly_order_id}`);
     }

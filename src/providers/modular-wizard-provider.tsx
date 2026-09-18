@@ -250,6 +250,7 @@ type ModularWizardAction =
   | { type: 'MARK_DIRTY' }
   | { type: 'MARK_INITIALIZED' }
   | { type: 'RESTORE_FROM_CACHE'; payload: ModularDraftCache }
+  | { type: 'SET_RESUME_TOKEN'; payload: string | null }
   | { type: 'PREFILL_FROM_PROFILE'; payload: UserPrefillData }
   | { type: 'RESET' }
   | { type: 'START_NEW_ORDER'; payload: { friendlyOrderId: string } };
@@ -738,10 +739,13 @@ function modularWizardReducer(
         // What the account has already verified: the kyc-documents step is
         // hidden for a complete account (front + selfie) when the service
         // asks for nothing more.
-        accountKyc: { valid: !!prefill.has_valid_kyc },
+        accountKyc: { valid: !!prefill.has_valid_kyc, identity: prefill.identity_document ?? null },
         // Don't mark as dirty - this is initial load, not user edit
       };
     }
+
+    case 'SET_RESUME_TOKEN':
+      return { ...state, resumeToken: action.payload };
 
     case 'RESET':
       return initialState;
@@ -1084,6 +1088,9 @@ export function ModularWizardProvider({
         // Token de continuare emis de admin (?resume=) — hidratează draftul
         // indiferent de email (clienți blocați înainte de pasul contact).
         const resumeParam = urlParams.get('resume');
+        // Kept in memory for the draft autosaves and the submit of a linked
+        // (phone) draft — never persisted (Codex REV2R3-RESUME-001).
+        if (resumeParam) dispatch({ type: 'SET_RESUME_TOKEN', payload: resumeParam });
         if (resumeParam || (orderParam && validateOrderId(orderParam))) {
           const qs = resumeParam
             ? new URLSearchParams({ resume: resumeParam })
@@ -1496,6 +1503,10 @@ export function ModularWizardProvider({
           friendly_order_id: state.friendlyOrderId,
           service_id: state.serviceId,
           current_step: state.currentStepId,
+          // A phone order belongs to the customer, not to the signed-in
+          // operator; the continuation token authorizes the customer's edits.
+          phoneOrder: isPhoneOrderMode() || undefined,
+          resumeToken: state.resumeToken || undefined,
           // De unde a venit clientul. Serverul îl scrie o singură dată, la
           // crearea draftului — un PATCH ulterior nu-l rescrie, ca sursa
           // originală să nu fie pierdută pe parcursul completării.

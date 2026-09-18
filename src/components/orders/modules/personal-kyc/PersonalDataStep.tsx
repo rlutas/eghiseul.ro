@@ -164,6 +164,12 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
 
   // Check if we have valid KYC from user's account
   const hasValidKycFromAccount = isPrefilled && prefillData?.has_valid_kyc;
+  // The account holds an unexpired identity document (front / passport page)
+  // even when the selfie is missing: show THAT instead of asking for a scan
+  // (feedback 18.09.2026, #20). „Folosește alt act" reveals the picker + scan.
+  const accountIdentity = state.accountKyc?.identity ?? null;
+  const hasIdentityFromAccount = !!accountIdentity && personalKyc?.useOtherDocument !== true;
+  const skipsIdScan = hasValidKycFromAccount || hasIdentityFromAccount;
 
   const ciFrontInputRef = useRef<HTMLInputElement>(null);
   const ciBackInputRef = useRef<HTMLInputElement>(null);
@@ -768,14 +774,14 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
     // Mod manual: la fel, actul se încarcă la pasul KYC (promisiunea din UI),
     // nu aici — altfel „Completez manual" rămâne blocat pe scanare.
     const skipDocsHere = phoneMode || mode === 'manual';
-    if (!skipDocsHere && acceptedDocs.length > 0 && uploadedDocs.length === 0 && !hasValidKycFromAccount) {
+    if (!skipDocsHere && acceptedDocs.length > 0 && uploadedDocs.length === 0 && !skipsIdScan) {
       return false;
     }
 
     // Scan mode: cere SETUL COMPLET de scanări pentru tipul de act ales — nu doar
     // „≥1 poză". Previne: a ales CI nou dar a urcat doar fața (sau aceeași poză de
     // 2 ori) → ne lipsesc date. CI nou cere și dovada de domiciliu (RO CEI PDF).
-    if (!skipDocsHere && !hasValidKycFromAccount && personalKyc.idDocumentType && !isForeignCitizen) {
+    if (!skipDocsHere && !skipsIdScan && personalKyc.idDocumentType && !isForeignCitizen) {
       const has = (t: string) => uploadedDocs.some((d) => d.type === t);
       if (personalKyc.idDocumentType === 'ci_vechi') {
         if (!has('ci_front')) return false;
@@ -821,7 +827,7 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
     }
 
     return true;
-  }, [personalKyc, config, hasValidKycFromAccount, phoneMode, mode]);
+  }, [personalKyc, config, skipsIdScan, phoneMode, mode]);
 
   // Notify parent when validity changes
   useEffect(() => {
@@ -841,7 +847,7 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
     if (!personalKyc.birthDate) m.push('Data nașterii');
     const acceptedDocs = config?.acceptedDocuments ?? [];
     const docs = personalKyc.uploadedDocuments ?? [];
-    if (!phoneMode && mode !== 'manual' && acceptedDocs.length > 0 && !hasValidKycFromAccount) {
+    if (!phoneMode && mode !== 'manual' && acceptedDocs.length > 0 && !skipsIdScan) {
       const has = (t: string) => docs.some((d) => d.type === t);
       if (personalKyc.idDocumentType && !isForeign) {
         if (personalKyc.idDocumentType === 'ci_vechi' && !has('ci_front')) m.push('Scanarea CI (față)');
@@ -864,7 +870,7 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
       } else if (!personalKyc.foreignData?.foreignAddress?.trim()) m.push('Adresa din străinătate');
     }
     return m;
-  }, [personalKyc, config, hasValidKycFromAccount, phoneMode, mode]);
+  }, [personalKyc, config, skipsIdScan, phoneMode, mode]);
 
   const [showErrors, setShowErrors] = useState(false);
   const errorRef = useRef<HTMLDivElement>(null);
@@ -1259,8 +1265,48 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
         </div>
       )}
 
+      {/* The identity document already in the account (feedback 18.09.2026, #20) */}
+      {hasIdentityFromAccount && accountIdentity && (
+        <div className="rounded-xl border-2 border-primary-500 bg-primary-50/40 p-4">
+          <div className="flex items-start gap-3">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary-100">
+              <FileCheck className="h-5 w-5 text-primary-600" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-semibold text-secondary-900">Actul tău din cont</p>
+              <p className="mt-0.5 text-sm text-neutral-700">
+                {accountIdentity.type.startsWith('passport') ? 'Pașaport' : 'Carte de identitate'}
+                {accountIdentity.series || accountIdentity.number
+                  ? ` — seria ${accountIdentity.series || '—'} nr. ${accountIdentity.number || '—'}`
+                  : ''}
+              </p>
+              {accountIdentity.verifiedAt && (
+                <p className="mt-0.5 text-xs text-neutral-500">
+                  verificat la {new Date(accountIdentity.verifiedAt).toLocaleDateString('ro-RO')}
+                  {accountIdentity.expiresAt ? ` · valabil până la ${new Date(accountIdentity.expiresAt).toLocaleDateString('ro-RO')}` : ''}
+                </p>
+              )}
+              <p className="mt-2 text-xs text-neutral-600">
+                Îl folosim pentru această comandă. Selfie-ul cu actul îl faci la pasul următor.
+              </p>
+              <button
+                type="button"
+                onClick={() => {
+                  updatePersonalKyc({ useOtherDocument: true, idDocumentType: null });
+                  setMode('scan');
+                  setShowScanSection(true);
+                }}
+                className="mt-2 text-xs font-medium text-primary-600 underline underline-offset-2 hover:text-primary-700"
+              >
+                Folosește alt act
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Mode picker landing — shown only when user hasn't picked yet */}
-      {mode === 'choice' && (
+      {mode === 'choice' && !hasIdentityFromAccount && (
         <div className="space-y-4">
           <div className="text-center space-y-1">
             <h3 className="text-lg font-semibold text-secondary-900">
@@ -1369,7 +1415,7 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
       )}
 
       {/* ID Scan Section — picker + conditional scan zones per document type */}
-      {mode === 'scan' && showScanSection && !isForeignCitizen && (
+      {mode === 'scan' && showScanSection && !isForeignCitizen && !hasIdentityFromAccount && (
         <div className="space-y-4">
           {/* Step 1: pick document type (if not picked yet). Not for an
               account whose document is already on file — the question read

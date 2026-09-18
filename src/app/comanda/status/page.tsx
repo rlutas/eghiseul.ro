@@ -15,6 +15,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { SelfCancelCard } from '@/components/orders/self-cancel-card';
 import { HelpContactCard } from '@/components/orders/help-contact-card';
+import { BankTransferDetails, PaymentProofUpload } from '@/components/payment';
 import {
   Loader2,
   Search,
@@ -122,6 +123,9 @@ interface OrderData {
   purpose?: string | null;
   status: string;
   paymentStatus: string;
+  paymentMethod?: string | null;
+  /** Lets this page attach a payment proof without a session. */
+  proofToken?: string | null;
   invoiceNumber?: string | null;
   invoiceUrl?: string | null;
   /** Fiscal invoices for extra payments (admin Modify flow). */
@@ -194,6 +198,29 @@ function OrderStatusContent() {
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const [proofMessage, setProofMessage] = useState<{ ok: boolean; text: string } | null>(null);
+  // The uploaded proof is attached through the same workflow as at checkout;
+  // the page then re-reads the order so the badge and timeline update.
+  const attachProof = async (id: string, key: string, token: string | null | undefined) => {
+    setProofMessage(null);
+    try {
+      const res = await fetch(`/api/orders/${id}/bank-transfer`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ paymentProofKey: key, proofOnly: true, proofToken: token ?? undefined }),
+      });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok || !json.success) {
+        setProofMessage({ ok: false, text: json.error || 'Nu am putut salva dovada. Încearcă din nou.' });
+        return;
+      }
+      setProofMessage({ ok: true, text: 'Dovada a fost salvată. O verificăm în cel mai scurt timp.' });
+      await handleSearch();
+    } catch {
+      setProofMessage({ ok: false, text: 'Nu am putut salva dovada. Încearcă din nou.' });
+    }
+  };
 
   const handleSearch = async (code?: string, emailAddr?: string) => {
     const searchCode = code || orderCode;
@@ -619,6 +646,46 @@ function OrderStatusContent() {
               </div>
             </CardContent>
           </Card>
+
+          {/* Transfer bancar: instrucțiunile complete + dovada, aici, nu doar
+              pe email (feedback 18.09.2026, #25). */}
+          {orderData.paymentStatus === 'awaiting_verification' && (
+            <Card className={orderData.hasPaymentProof ? 'border-green-300' : 'border-amber-300 bg-amber-50/40'}>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <CreditCard className="h-5 w-5" />
+                  Plata prin transfer bancar
+                </CardTitle>
+                <CardDescription className={orderData.hasPaymentProof ? 'text-green-800' : 'text-amber-900 font-medium'}>
+                  {orderData.hasPaymentProof
+                    ? 'Am primit dovada plății. O verificăm și pornim lucrul — nu mai ai nimic de făcut.'
+                    : 'Trebuie să efectuezi plata și să încarci dovada plății. Datele de mai jos sunt și pe email.'}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {!orderData.hasPaymentProof && (
+                  <BankTransferDetails
+                    orderNumber={orderData.orderCode}
+                    amount={Number(orderData.pricing?.totalPrice ?? 0)}
+                  />
+                )}
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-secondary-900">
+                    {orderData.hasPaymentProof ? 'Ai altă dovadă? O poți încărca aici.' : 'Încarcă dovada plății'}
+                  </p>
+                  {proofMessage && (
+                    <p className={`text-sm ${proofMessage.ok ? 'text-green-700' : 'text-red-600'}`}>{proofMessage.text}</p>
+                  )}
+                  <PaymentProofUpload
+                    orderId={orderData.id}
+                    proofToken={orderData.proofToken}
+                    onUploadComplete={(key) => attachProof(orderData.id, key, orderData.proofToken)}
+                    onUploadError={(err) => setProofMessage({ ok: false, text: err })}
+                  />
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Timeline */}
           {orderData.timeline.length > 0 && (

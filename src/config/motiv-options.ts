@@ -297,3 +297,21 @@ export type MotivIntegritate = typeof MOTIV_INTEGRITATE_OPTIONS[number];
 export type MotivCazierFiscal = typeof MOTIV_CAZIER_FISCAL_OPTIONS[number];
 export type MotivCazierAuto = typeof MOTIV_CAZIER_AUTO_OPTIONS[number];
 export type LimbaTraducere = typeof LIMBA_TRADUCERE_OPTIONS[number];
+
+/**
+ * The reasons customers pick most, per service — shown FIRST in the
+ * dropdown, before the full official list (feedback 18.09.2026, #19). Every
+ * value is an EXACT member of its list; `motiv-options.test.ts` proves it.
+ */
+export const PINNED_MOTIVE = {
+  cazier: ['ANGAJARE', 'CONCURS/EXAMEN', 'LICITAȚIE', 'PERMIS PORT ARMĂ', 'OBȚINERE CETĂȚENIE ROMÂNĂ', 'ADOPȚIE', 'ALTE MOTIVE'],
+  cazierFiscal: ['Angajare', 'Înscriere Examen / Concurs', 'Obținere autorizație / Licență', 'Dosar', 'Alte motive'],
+  cazierAuto: ['LOCUL DE MUNCĂ', 'ÎNSCRIERE CONCURS', 'ÎNSCRIERE CURS', 'ALTE MOTIVE'],
+  integritate: ['ANGAJARE', 'CONCURS', 'ADOPȚIE', 'DOSAR'],
+} as const;
+
+/** The list with the pinned values first (in the given order), then the rest unchanged. */
+export function pinnedFirst(list: readonly string[], pinned: readonly string[]): readonly string[] {
+  const head = pinned.filter((p) => list.includes(p));
+  return [...head, ...list.filter((o) => !head.includes(o))];
+}

@@ -168,3 +168,13 @@ Diferența de curs e chestiune de contabilitate, nu de facturare.
   [comenzi-telefonice](comenzi-telefonice/README.md)
 - Facturare și decontări:
   [stripe-oblio-payment-invoicing](../technical/specs/stripe-oblio-payment-invoicing.md)
+
+## Dovada plății de pe pagina comenzii (18.09.2026)
+
+Clientul poate încărca dovada și mai târziu, din pagina comenzii
+(`/comanda/status`, cu codul comenzii și emailul), fără cont. Cardul „Plata
+prin transfer bancar" îi arată IBAN-ul, suma și referința și are butonul
+„Încarcă dovada plății". Voi primiți un email o singură dată pentru fiecare
+dovadă nouă; în istoricul comenzii „dovadă primită" apare doar când există
+o dovadă, iar alegerea transferului apare ca „Așteptăm plata prin transfer
+bancar".

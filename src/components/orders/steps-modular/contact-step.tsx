@@ -12,8 +12,7 @@ import {
   User,
   Building2,
   Globe,
-  Check,
-} from 'lucide-react';
+  Check, AlertCircle } from 'lucide-react';
 import {
   Form,
   FormControl,
@@ -38,15 +37,17 @@ import {
   MOTIV_CAZIER_FISCAL_OPTIONS,
   MOTIV_CAZIER_AUTO_OPTIONS,
   MOTIV_INTEGRITATE_OPTIONS,
+  PINNED_MOTIVE,
+  pinnedFirst,
 } from '@/config/motiv-options';
 
-/** Map service slug → which "Motiv" list to surface (if any). */
+/** Map service slug → which "Motiv" list to surface (if any), most common reasons first. */
 function getPurposeOptionsForService(slug: string | null): readonly string[] | null {
   if (!slug) return null;
-  if (slug.includes('cazier-judiciar')) return MOTIV_CAZIER_OPTIONS;
-  if (slug.includes('cazier-fiscal')) return MOTIV_CAZIER_FISCAL_OPTIONS;
-  if (slug.includes('cazier-auto')) return MOTIV_CAZIER_AUTO_OPTIONS;
-  if (slug.includes('integritate')) return MOTIV_INTEGRITATE_OPTIONS;
+  if (slug.includes('cazier-judiciar')) return pinnedFirst(MOTIV_CAZIER_OPTIONS, PINNED_MOTIVE.cazier);
+  if (slug.includes('cazier-fiscal')) return pinnedFirst(MOTIV_CAZIER_FISCAL_OPTIONS, PINNED_MOTIVE.cazierFiscal);
+  if (slug.includes('cazier-auto')) return pinnedFirst(MOTIV_CAZIER_AUTO_OPTIONS, PINNED_MOTIVE.cazierAuto);
+  if (slug.includes('integritate')) return pinnedFirst(MOTIV_INTEGRITATE_OPTIONS, PINNED_MOTIVE.integritate);
   return null;
 }
 
@@ -361,6 +362,7 @@ export function ContactStepModular({ onValidChange }: ContactStepProps) {
             options={purposeOptions}
             value={purpose}
             onChange={(v) => updateContact({ purpose: v })}
+            error={showStepErrors && !purpose ? 'Alege motivul — apare scris pe document.' : undefined}
           />
         )}
 
@@ -510,6 +512,7 @@ export function ContactStepModular({ onValidChange }: ContactStepProps) {
             options={purposeOptions}
             value={purpose}
             onChange={(v) => updateContact({ purpose: v })}
+            error={showStepErrors && !purpose ? 'Alege motivul — apare scris pe document.' : undefined}
           />
         )}
 
@@ -674,29 +677,40 @@ interface PurposeSelectProps {
   options: readonly string[];
   value: string;
   onChange: (value: string) => void;
+  /** Shown under the field once the customer tried to continue without a value. */
+  error?: string;
 }
 
 function PurposeSelect({
   options,
   value,
   onChange,
+  error,
 }: PurposeSelectProps) {
   return (
-    <div className="space-y-2">
+    <div className="space-y-2" data-wizard-error={error ? true : undefined}>
       <div>
-        <p className="text-secondary-900 font-medium text-sm">
+        <label htmlFor="purpose-select" className="text-secondary-900 font-medium text-sm">
           Motivul solicitării <span className="text-red-500">*</span>
-        </p>
+        </label>
         <p className="text-xs text-neutral-500 mt-0.5 leading-snug">
-          Acest motiv apare scris pe documentul eliberat. Caută sau alege din listă.
+          Apare scris pe document. Cele mai folosite sunt primele; scrie ca să cauți în listă.
         </p>
       </div>
       <SearchableSelect
         options={options}
         value={value}
         onChange={onChange}
-        placeholder="Selectează motivul (ex: Angajare, Adopție, Vize)"
+        placeholder="ex. angajare, concurs, licitație"
+        preferDirection="down"
+        error={error}
       />
+      {error && (
+        <p className="text-sm text-red-500 flex items-center gap-1">
+          <AlertCircle className="h-4 w-4 shrink-0" />
+          {error}
+        </p>
+      )}
     </div>
   );
 }

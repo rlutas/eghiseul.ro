@@ -36,6 +36,9 @@ const EVENT_LABELS: Record<string, string> = {
   document_generated: 'Documente pregătite',
   documents_generated: 'Documente pregătite',
   payment_proof_submitted: 'Dovadă de plată primită — o verificăm',
+  // The customer chose the bank transfer: the order waits for the money. Not
+  // a proof — that has its own event above.
+  bank_transfer_submitted: 'Așteptăm plata prin transfer bancar',
   payment_confirmed: 'Plată confirmată',
   payment_received: 'Plată confirmată',
   payment_verified: 'Plată confirmată',

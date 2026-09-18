@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from '@/lib/email/resend';
-import { getFileInfo, isOrderUploadKey } from '@/lib/aws/s3';
+import { attachPaymentProof } from '@/lib/orders/attach-payment-proof';
+import { verifyPaymentProofToken } from '@/lib/orders/payment-proof-token';
 import {
   buildBankTransferPendingSubject,
   buildBankTransferPendingHtml,
@@ -36,7 +37,9 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
   try {
     const { id } = await params;
     const body = await request.json().catch(() => ({}));
-    const rawProofKey: string | null = typeof body?.paymentProofKey === 'string' ? body.paymentProofKey : null;
+    const rawProofKey: string | null = typeof body?.paymentProofKey === 'string' && body.paymentProofKey ? body.paymentProofKey : null;
+    const proofOnly = body?.proofOnly === true;
+    const proofToken: unknown = body?.proofToken;
 
     const supabase = await createClient();
     // Citirea și scrierea merg pe clientul de serviciu, ca la
@@ -56,132 +59,107 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     // Fetch order
     const { data: order, error: orderError } = await adminClient
       .from('orders')
-      .select('id, user_id, status, payment_status')
+      .select('id, user_id, status, payment_status, payment_method')
       .eq('id', id)
       .single();
 
-    // The proof key is caller-supplied and later signed for the customer:
-    // accept only this order's own upload namespace (what `/api/upload`
-    // generates) and only an object that exists (REV3-PROOF-001).
-    let paymentProofKey: string | null = null;
-    if (rawProofKey) {
-      if (!isOrderUploadKey(rawProofKey, id)) {
-        return NextResponse.json({ success: false, error: 'Dovada plății nu aparține acestei comenzi.' }, { status: 400 });
-      }
-      try {
-        const info = await getFileInfo(rawProofKey);
-        if (!info || !(info.size > 0)) throw new Error('empty object');
-      } catch {
-        return NextResponse.json({ success: false, error: 'Dovada plății nu a fost găsită. Încarcă fișierul din nou.' }, { status: 400 });
-      }
-      paymentProofKey = rawProofKey;
-    }
-
     if (orderError || !order) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: 'Order not found',
-        },
-        { status: 404 }
-      );
+      return NextResponse.json({ success: false, error: 'Order not found' }, { status: 404 });
     }
 
-    // Verify ownership for logged-in users
-    if (user && order.user_id && order.user_id !== user.id) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: 'You do not have access to this order',
-        },
-        { status: 403 }
-      );
+    // Authorization. A linked order belongs to its owner and nobody else. A
+    // guest order: the checkout registration keeps today's rule (the UUID is
+    // the bearer), but attaching a proof LATER needs the order-scoped token
+    // issued by the status API / order API — a session alone must never let
+    // a stranger mutate an unowned order (Codex REV2R2-SEC-002).
+    if (order.user_id) {
+      if (!user || order.user_id !== user.id) {
+        return NextResponse.json({ success: false, error: 'You do not have access to this order' }, { status: 403 });
+      }
+    } else if (proofOnly && !verifyPaymentProofToken(proofToken, id)) {
+      return NextResponse.json({ success: false, error: 'Linkul a expirat. Reîncarcă pagina comenzii și încearcă din nou.' }, { status: 403 });
     }
 
-    // Check if order is already paid
     if (order.payment_status === 'paid') {
-      return NextResponse.json(
-        {
-          success: false,
-          error: 'This order has already been paid',
-        },
-        { status: 400 }
-      );
+      return NextResponse.json({ success: false, error: 'This order has already been paid' }, { status: 400 });
     }
 
-    // Al doilea apel (clientul revine și încarcă dovada după ce a ales IBAN)
-    // doar completează dovada — nu retrimite emailurile.
-    const alreadyRegistered = order.payment_status === 'awaiting_verification';
+    const alreadyRegistered = order.payment_status === 'awaiting_verification' && order.status === 'awaiting_payment';
 
-    // Update order with bank transfer info
-    const { error: updateError } = await adminClient
-      .from('orders')
-      .update({
-        payment_method: 'bank_transfer',
-        payment_status: 'awaiting_verification',
-        // Status dedicat: comanda intră în lista de comenzi pe „Așteptare
-        // plată", nu în coșurile abandonate.
-        status: 'awaiting_payment',
-        ...(paymentProofKey ? { payment_proof_url: paymentProofKey } : {}),
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', id);
-
-    if (updateError) {
-      console.error('Failed to update order:', updateError);
-      return NextResponse.json(
-        {
-          success: false,
-          error: 'Failed to update order',
+    if (proofOnly) {
+      if (!rawProofKey) {
+        return NextResponse.json({ success: false, error: 'Lipsește dovada plății.' }, { status: 400 });
+      }
+      if (!alreadyRegistered) {
+        return NextResponse.json({ success: false, error: 'Comanda nu așteaptă o plată prin transfer bancar.' }, { status: 400 });
+      }
+    } else if (!alreadyRegistered) {
+      // Registration: the customer chose the bank transfer at checkout.
+      const { error: updateError } = await adminClient
+        .from('orders')
+        .update({
+          payment_method: 'bank_transfer',
+          payment_status: 'awaiting_verification',
+          // Status dedicat: comanda intră în lista de comenzi pe „Așteptare
+          // plată", nu în coșurile abandonate.
+          status: 'awaiting_payment',
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', id);
+      if (updateError) {
+        console.error('Failed to update order:', updateError);
+        return NextResponse.json({ success: false, error: 'Failed to update order' }, { status: 500 });
+      }
+      // The registration is its own event; a proof, when there is one, gets
+      // `payment_proof_submitted` from the attach workflow below — the
+      // timeline used to show „dovadă primită" for an order with no proof.
+      await adminClient.from('order_history').insert({
+        order_id: id,
+        event_type: 'bank_transfer_submitted',
+        notes: 'Client a ales plata prin transfer bancar — așteptăm încasarea',
+        new_value: {
+          payment_method: 'bank_transfer',
+          payment_status: 'awaiting_verification',
+          status: 'awaiting_payment',
         },
-        { status: 500 }
-      );
-    }
-
-    // Add to order history
-    await adminClient.from('order_history').insert({
-      order_id: id,
-      event_type: 'payment_proof_submitted',
-      notes: paymentProofKey
-        ? 'Client a ales transferul bancar și a încărcat dovada de plată'
-        : 'Client a ales plata prin transfer bancar — așteptăm încasarea',
-      // `new_value` e jsonb: scrie OBIECTUL, nu JSON.stringify — altfel
-      // timeline-ul nu poate citi `new_value.status`.
-      new_value: {
-        payment_method: 'bank_transfer',
-        payment_status: 'awaiting_verification',
-        status: 'awaiting_payment',
-        payment_proof_url: paymentProofKey,
-      },
-      changed_by: user?.id || null,
-    });
-
-    // Emailuri (client + echipă). Fail-soft: dacă Resend cade, comanda rămâne
-    // corect înregistrată — nu întoarcem eroare clientului pentru asta.
-    if (!alreadyRegistered) {
+        changed_by: user?.id || null,
+      });
+      // Emailuri (client + echipă). Fail-soft: dacă Resend cade, comanda rămâne
+      // corect înregistrată — nu întoarcem eroare clientului pentru asta.
       try {
-        await sendBankTransferEmails(id, !!paymentProofKey);
+        await sendBankTransferEmails(id, !!rawProofKey);
       } catch (e) {
-        console.error(
-          `[bank-transfer] emails failed for order ${id} (non-fatal):`,
-          e instanceof Error ? e.message : e
-        );
+        console.error(`[bank-transfer] emails failed for order ${id} (non-fatal):`, e instanceof Error ? e.message : e);
+      }
+    }
+
+    // The proof — same workflow whether it came with the registration or later.
+    let proofOutcome: string | null = null;
+    if (rawProofKey) {
+      const attached = await attachPaymentProof({ orderId: id, uploadKey: rawProofKey, changedBy: user?.id || null });
+      proofOutcome = attached.outcome;
+      const refused: Record<string, string> = {
+        invalid_key: 'Dovada plății nu aparține acestei comenzi.',
+        missing_object: 'Dovada plății nu a fost găsită. Încarcă fișierul din nou.',
+        too_large: 'Fișierul depășește 10 MB. Încarcă o poză mai mică sau un PDF.',
+        not_awaiting: 'Comanda nu așteaptă o plată prin transfer bancar.',
+        error: 'Nu am putut salva dovada. Încearcă din nou în câteva secunde.',
+      };
+      if (attached.outcome !== 'attached' && attached.outcome !== 'unchanged') {
+        return NextResponse.json({ success: false, error: refused[attached.outcome] ?? refused.error }, { status: attached.outcome === 'error' ? 500 : 400 });
       }
     }
 
     return NextResponse.json({
       success: true,
-      message: 'Comanda a fost înregistrată. Ți-am trimis pe email datele de plată.',
+      message: proofOnly
+        ? 'Am primit dovada plății. O verificăm și pornim lucrul.'
+        : 'Comanda a fost înregistrată. Ți-am trimis pe email datele de plată.',
+      data: { proof: proofOutcome },
     });
   } catch (error) {
     console.error('Bank transfer submission error:', error);
-    return NextResponse.json(
-      {
-        success: false,
-        error: 'Internal server error',
-      },
-      { status: 500 }
-    );
+    return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
   }
 }
 

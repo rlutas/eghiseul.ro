@@ -53,6 +53,8 @@ interface OrderData {
   vat_amount?: number;
   coupon_code?: string | null;
   discount_amount?: number;
+  /** Presign-only bearer for the proof upload (guests have no session here). */
+  proof_token?: string | null;
   customer_data?: {
     contact?: {
       email?: string;
@@ -176,6 +178,7 @@ export default function CheckoutPage() {
         coupon_code: apiOrder.breakdown?.couponCode || null,
         discount_amount: apiOrder.breakdown?.discountAmount || 0,
         customer_data: apiOrder.customerData,
+        proof_token: apiOrder.proofToken ?? null,
       };
 
       setOrder(orderData);
@@ -455,6 +458,7 @@ export default function CheckoutPage() {
                       )}
                       <PaymentProofUpload
                         orderId={orderId}
+                        proofToken={order.proof_token}
                         onUploadComplete={(key) => setBankTransferProofKey(key)}
                         onUploadError={(err) => setError(err)}
                       />

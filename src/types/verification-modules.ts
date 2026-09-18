@@ -383,6 +383,13 @@ export interface PersonalKYCState {
   // null = user hasn't picked yet (show DocumentTypePicker)
   idDocumentType: 'ci_vechi' | 'ci_nou' | 'passport' | null;
 
+  /**
+   * The customer chose „Folosește alt act" over the identity document on
+   * file in the account: the picker + scan are shown and `/submit` does NOT
+   * copy the account's document into the order.
+   */
+  useOtherDocument?: boolean;
+
   // Document info (OCR-detected, populated after scan)
   documentType: DocumentType | null;
   documentSeries: string;
@@ -750,7 +757,22 @@ export interface ModularWizardState {
   isInitialized: boolean;
 
   /** From the signed-in account: identity document + selfie on file, unexpired. */
-  accountKyc?: { valid: boolean } | null;
+  accountKyc?: {
+    valid: boolean;
+    /** The unexpired identity document on file (front / passport page), when there is one. */
+    identity?: AccountIdentityDocument | null;
+  } | null;
+
+  /** Admin-issued continuation token (`?resume=`), kept in memory only. */
+  resumeToken?: string | null;
+}
+
+export interface AccountIdentityDocument {
+  type: string;
+  series: string;
+  number: string;
+  verifiedAt: string | null;
+  expiresAt: string | null;
 }
 
 /**

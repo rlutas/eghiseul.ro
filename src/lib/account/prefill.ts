@@ -8,7 +8,7 @@
 
 import type { SupabaseClient, User } from '@supabase/supabase-js';
 import type { AddressState } from '@/types/verification-modules';
-import { hasCompleteKyc } from '@/lib/kyc/identity-documents';
+import { hasCompleteKyc, isIdentityFrontType } from '@/lib/kyc/identity-documents';
 
 export interface UserPrefillData {
   personal: {
@@ -58,6 +58,14 @@ export interface UserPrefillData {
   }>;
   kyc_verified: boolean;
   has_valid_kyc: boolean;
+  /** The unexpired identity front / passport page on file, or null. */
+  identity_document: {
+    type: string;
+    series: string;
+    number: string;
+    verifiedAt: string | null;
+    expiresAt: string | null;
+  } | null;
 }
 
 
@@ -263,6 +271,20 @@ const data: UserPrefillData & Record<string, unknown> = {
     // no identity document on file at all.
     // Document AND selfie, both unexpired — the same predicate as
     // `profiles.kyc_verified` and the submit bypass.
+    identity_document: (() => {
+      const nowMs = Date.now();
+      const front = ((kycDocs ?? []) as Array<{ document_type: string; verified_at: string | null; expires_at: string | null; extracted_data: Record<string, unknown> | null }>)
+        .find((d) => isIdentityFrontType(d.document_type) && (!d.expires_at || Date.parse(d.expires_at) > nowMs));
+      if (!front) return null;
+      const ex = (front.extracted_data ?? {}) as Record<string, unknown>;
+      return {
+        type: front.document_type,
+        series: typeof ex.series === 'string' ? ex.series : '',
+        number: typeof ex.number === 'string' ? ex.number : '',
+        verifiedAt: front.verified_at ?? null,
+        expiresAt: front.expires_at ?? null,
+      };
+    })(),
     has_valid_kyc: hasCompleteKyc(
       Object.entries(kycDocuments)
         .filter(([, doc]) => !doc.is_expired)
