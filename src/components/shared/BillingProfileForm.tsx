@@ -75,6 +75,15 @@ export interface BillingProfileFormProps {
   onChange: (data: BillingData) => void;
   onSubmit?: () => void;
   onCancel?: () => void;
+  /**
+   * Per-field messages, rendered under the field they belong to.
+   *
+   * Optional and empty by default, so every existing caller keeps behaving
+   * exactly as before. The profile checklist dialog validates on blur and on a
+   * failed submit and passes what it found in here, rather than duplicating the
+   * PF/PJ form and its ANAF lookup just to own its own error lines.
+   */
+  errors?: Partial<Record<keyof BillingData, string>>;
   prefillFromId?: {
     firstName?: string;
     lastName?: string;
@@ -87,17 +96,33 @@ export interface BillingProfileFormProps {
   className?: string;
 }
 
+/** The message for one field, under that field. Renders nothing without one. */
+function FieldError({ field, message }: { field: string; message?: string | null }) {
+  if (!message) return null;
+  return (
+    <p id={`${field}-error`} role="alert" className="text-xs font-medium text-red-600">
+      {message}
+    </p>
+  );
+}
+
 export default function BillingProfileForm({
   value,
   onChange,
   onSubmit,
   onCancel,
+  errors,
   prefillFromId,
   submitLabel = 'Salvează',
   cancelLabel = 'Anulează',
   loading = false,
   className,
 }: BillingProfileFormProps) {
+  // The message sits under its own field, so it is obvious which one is wrong.
+  const fieldError = (field: keyof BillingData) => (errors?.[field] as string | undefined) || null;
+  const errorProps = (field: keyof BillingData) =>
+    fieldError(field) ? { 'aria-invalid': true as const, 'aria-describedby': `${field}-error` } : {};
+
   const [cuiLoading, setCuiLoading] = useState(false);
   const [cuiError, setCuiError] = useState<string | null>(null);
   const [cuiSuccess, setCuiSuccess] = useState(false);
@@ -297,7 +322,9 @@ export default function BillingProfileForm({
           onChange={(e) => updateField('label', e.target.value)}
           placeholder={billingType === 'persoana_fizica' ? 'ex: Personal' : 'ex: Firma mea SRL'}
           className="bg-white h-11"
+          {...errorProps('label')}
         />
+        <FieldError field="label" message={fieldError('label')} />
       </div>
 
       {/* Persoană Fizică Fields */}
@@ -328,7 +355,9 @@ export default function BillingProfileForm({
                 onChange={(e) => updateField('lastName', e.target.value)}
                 placeholder="ex: Popescu"
                 className="bg-white h-11"
+                {...errorProps('lastName')}
               />
+              <FieldError field="lastName" message={fieldError('lastName')} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="firstName" className="text-secondary-900 font-medium">
@@ -341,7 +370,9 @@ export default function BillingProfileForm({
                 onChange={(e) => updateField('firstName', e.target.value)}
                 placeholder="ex: Ion"
                 className="bg-white h-11"
+                {...errorProps('firstName')}
               />
+              <FieldError field="firstName" message={fieldError('firstName')} />
             </div>
           </div>
 
@@ -357,7 +388,10 @@ export default function BillingProfileForm({
               onChange={(e) => updateField('cnp', e.target.value.replace(/\D/g, ''))}
               placeholder="1234567890123"
               className="bg-white font-mono h-11"
+              inputMode="numeric"
+              {...errorProps('cnp')}
             />
+            <FieldError field="cnp" message={fieldError('cnp')} />
           </div>
 
           {/* Structured billing address — Oblio sends street, locality and
@@ -374,7 +408,9 @@ export default function BillingProfileForm({
               onChange={(e) => updateField('address', e.target.value)}
               placeholder="ex: Str. Mihai Viteazu nr. 10, bl. A2, ap. 5"
               className="bg-white h-11"
+              {...errorProps('address')}
             />
+            <FieldError field="address" message={fieldError('address')} />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -383,7 +419,11 @@ export default function BillingProfileForm({
                 Județ <span className="text-red-500">*</span>
               </Label>
               <Select value={selectedCounty} onValueChange={handleCountyChange}>
-                <SelectTrigger id="county" className="w-full min-w-0 bg-white h-11">
+                <SelectTrigger
+                  id="county"
+                  className="w-full min-w-0 bg-white h-11"
+                  {...errorProps('county')}
+                >
                   <SelectValue placeholder="Alege județul" />
                 </SelectTrigger>
                 <SelectContent>
@@ -394,6 +434,7 @@ export default function BillingProfileForm({
                   ))}
                 </SelectContent>
               </Select>
+              <FieldError field="county" message={fieldError('county')} />
             </div>
 
             <div className="space-y-2">
@@ -405,7 +446,11 @@ export default function BillingProfileForm({
                 onValueChange={(v) => updateField('city', v)}
                 disabled={!selectedCounty}
               >
-                <SelectTrigger id="city" className="w-full min-w-0 bg-white h-11">
+                <SelectTrigger
+                  id="city"
+                  className="w-full min-w-0 bg-white h-11"
+                  {...errorProps('city')}
+                >
                   <SelectValue
                     placeholder={selectedCounty ? 'Alege localitatea' : 'Alege întâi județul'}
                   />
@@ -418,6 +463,7 @@ export default function BillingProfileForm({
                   ))}
                 </SelectContent>
               </Select>
+              <FieldError field="city" message={fieldError('city')} />
             </div>
           </div>
 
@@ -463,6 +509,7 @@ export default function BillingProfileForm({
                   cuiSuccess && 'border-green-500',
                   cuiError && 'border-red-500'
                 )}
+                {...errorProps('cui')}
               />
               <Button
                 type="button"
@@ -493,6 +540,7 @@ export default function BillingProfileForm({
                 CUI valid - date completate automat
               </p>
             )}
+            {!cuiError && <FieldError field="cui" message={fieldError('cui')} />}
           </div>
 
           <div className="space-y-2">
@@ -506,7 +554,9 @@ export default function BillingProfileForm({
               onChange={(e) => updateField('companyName', e.target.value)}
               placeholder="SC Firma Mea SRL"
               className="bg-white h-11"
+              {...errorProps('companyName')}
             />
+            <FieldError field="companyName" message={fieldError('companyName')} />
           </div>
 
           <div className="space-y-2">
@@ -534,7 +584,9 @@ export default function BillingProfileForm({
               onChange={(e) => updateField('companyAddress', e.target.value)}
               placeholder="Strada, număr, localitate, județ"
               className="bg-white h-11"
+              {...errorProps('companyAddress')}
             />
+            <FieldError field="companyAddress" message={fieldError('companyAddress')} />
           </div>
 
           {/* Bank Details (optional) */}

@@ -48,6 +48,15 @@ export interface AddressFormProps {
   onChange: (data: AddressData) => void;
   onSubmit?: () => void;
   onCancel?: () => void;
+  /**
+   * Per-field messages, rendered under the field they belong to.
+   *
+   * Optional and empty by default, so every existing caller keeps behaving
+   * exactly as before. The profile checklist dialog validates on blur and on a
+   * failed submit and passes what it found in here, instead of duplicating the
+   * whole county/locality form just to own its own error lines.
+   */
+  errors?: Partial<Record<keyof AddressData, string>>;
   showLabel?: boolean;
   showIsDefault?: boolean;
   showCountrySelect?: boolean;
@@ -76,11 +85,22 @@ const COUNTRIES = [
   { code: 'OTHER', name: 'Altă țară' },
 ];
 
+/** The message for one field, under that field. Renders nothing without one. */
+function FieldError({ id, message }: { id: string; message?: string | null }) {
+  if (!message) return null;
+  return (
+    <p id={`${id}-error`} role="alert" className="text-xs font-medium text-red-600">
+      {message}
+    </p>
+  );
+}
+
 export default function AddressForm({
   value,
   onChange,
   onSubmit,
   onCancel,
+  errors,
   showLabel = true,
   showIsDefault = true,
   showCountrySelect = true,
@@ -91,6 +111,13 @@ export default function AddressForm({
 }: AddressFormProps) {
   const [localities, setLocalities] = useState<string[]>([]);
   const isRomania = value.country === 'RO' || !value.country;
+
+  // The message sits under its own field, so it is obvious which one is wrong.
+  const fieldError = (field: keyof AddressData) => errors?.[field] || null;
+  const errorProps = (field: keyof AddressData, id: string) =>
+    fieldError(field)
+      ? { 'aria-invalid': true as const, 'aria-describedby': `${id}-error` }
+      : {};
 
   // Helper function to clean locality names from prefixes
   const cleanLocalityName = useCallback((name: string): string => {
@@ -249,7 +276,7 @@ export default function AddressForm({
                 value={value.county || ''}
                 onValueChange={handleCountyChange}
               >
-                <SelectTrigger id="county" className="bg-white">
+                <SelectTrigger id="county" className="bg-white" {...errorProps('county', 'county')}>
                   <SelectValue placeholder="— Selectează județul —" />
                 </SelectTrigger>
                 <SelectContent className="max-h-[300px]">
@@ -260,6 +287,7 @@ export default function AddressForm({
                   ))}
                 </SelectContent>
               </Select>
+              <FieldError id="county" message={fieldError('county')} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="city" className="text-secondary-900 font-medium">
@@ -270,7 +298,7 @@ export default function AddressForm({
                   value={value.city || ''}
                   onValueChange={(val) => updateField('city', val)}
                 >
-                  <SelectTrigger id="city" className="bg-white">
+                  <SelectTrigger id="city" className="bg-white" {...errorProps('city', 'city')}>
                     <SelectValue placeholder="— Selectează localitatea —" />
                   </SelectTrigger>
                   <SelectContent className="max-h-[300px]">
@@ -290,8 +318,10 @@ export default function AddressForm({
                   placeholder="Selectează mai întâi județul"
                   className="bg-white"
                   disabled={!value.county}
+                  {...errorProps('city', 'city')}
                 />
               )}
+              <FieldError id="city" message={fieldError('city')} />
             </div>
           </div>
 
@@ -307,7 +337,9 @@ export default function AddressForm({
                 onChange={(e) => updateField('street', e.target.value)}
                 placeholder="ex: Strada Victoriei"
                 className="bg-white"
+                {...errorProps('street', 'street')}
               />
+              <FieldError id="street" message={fieldError('street')} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="number" className="text-secondary-900 font-medium">
@@ -320,7 +352,9 @@ export default function AddressForm({
                 onChange={(e) => updateField('number', e.target.value)}
                 placeholder="ex: 10"
                 className="bg-white"
+                {...errorProps('number', 'number')}
               />
+              <FieldError id="number" message={fieldError('number')} />
             </div>
           </div>
 
@@ -409,7 +443,9 @@ export default function AddressForm({
               onChange={(e) => updateField('city', e.target.value)}
               placeholder="Numele orașului"
               className="bg-white"
+              {...errorProps('city', 'city')}
             />
+            <FieldError id="city" message={fieldError('city')} />
           </div>
 
           <div className="space-y-2">
@@ -423,7 +459,9 @@ export default function AddressForm({
               onChange={(e) => updateField('street', e.target.value)}
               placeholder="Strada, număr, bloc, apartament"
               className="bg-white"
+              {...errorProps('street', 'street')}
             />
+            <FieldError id="street" message={fieldError('street')} />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -438,7 +476,9 @@ export default function AddressForm({
                 onChange={(e) => updateField('number', e.target.value)}
                 placeholder="ex: 10"
                 className="bg-white"
+                {...errorProps('number', 'number')}
               />
+              <FieldError id="number" message={fieldError('number')} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="postalCode" className="text-secondary-900 font-medium">

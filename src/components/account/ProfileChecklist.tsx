@@ -1,7 +1,10 @@
-import Link from 'next/link';
+'use client';
+
+import { useRef, useState } from 'react';
 import { Check, ChevronRight } from 'lucide-react';
-import type { ProfileCompleteness } from '@/lib/account/profile-completeness';
+import type { ProfileCompleteness, ProfileStepId } from '@/lib/account/profile-completeness';
 import { cn } from '@/lib/utils';
+import { ProfileStepDialog } from './ProfileStepDialog';
 
 /**
  * "Fewer steps next time" — the profile-completion nudge at the top of the
@@ -17,8 +20,20 @@ import { cn } from '@/lib/utils';
  * ones collapsed into a quiet summary rather than five struck-through lines of
  * noise. Rows are 56px tall so they are comfortable to tap, and the whole thing
  * is one card rather than a banner stacked on a list.
+ *
+ * A row opens the step in a dialog, right here. It used to be a link into
+ * another tab with `?edit=1`: the customer lost the list, the percentage and
+ * their place on the page in order to type one phone number.
  */
 export function ProfileChecklist({ completeness }: { completeness: ProfileCompleteness }) {
+  const [openStep, setOpenStep] = useState<ProfileStepId | null>(null);
+  // Radix gives the focus back to a `DialogTrigger`, and these rows are not
+  // one: closing has to be told where to put it. Back to the row that opened
+  // the step — or, when a save has just taken that row out of the list, to the
+  // title above it.
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  const rowRef = useRef<HTMLButtonElement | null>(null);
+
   if (completeness.isComplete) return null;
 
   const { steps, doneCount, totalCount, percent } = completeness;
@@ -33,7 +48,12 @@ export function ProfileChecklist({ completeness }: { completeness: ProfileComple
       <div className="border-b border-neutral-100 p-4 sm:p-5">
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
-            <h2 id="profil-checklist-titlu" className="font-bold text-secondary-900">
+            <h2
+              id="profil-checklist-titlu"
+              ref={headingRef}
+              tabIndex={-1}
+              className="font-bold text-secondary-900 focus:outline-none"
+            >
               Comandă mai repede data viitoare
             </h2>
             <p className="mt-1 text-sm leading-relaxed text-neutral-600">
@@ -70,10 +90,14 @@ export function ProfileChecklist({ completeness }: { completeness: ProfileComple
       <ul className="divide-y divide-neutral-100">
         {remaining.map((step) => (
           <li key={step.id}>
-            <Link
-              href={step.href}
+            <button
+              type="button"
+              onClick={(event) => {
+                rowRef.current = event.currentTarget;
+                setOpenStep(step.id);
+              }}
               className={cn(
-                'flex min-h-[56px] items-center gap-3 px-4 py-3 sm:px-5',
+                'flex w-full min-h-[56px] items-center gap-3 px-4 py-3 text-left sm:px-5',
                 'transition-colors duration-200 motion-reduce:transition-none',
                 'hover:bg-primary-50/60 focus-visible:outline-none focus-visible:ring-2',
                 'focus-visible:ring-inset focus-visible:ring-primary-500'
@@ -90,7 +114,7 @@ export function ProfileChecklist({ completeness }: { completeness: ProfileComple
                 </span>
               </span>
               <ChevronRight className="h-4 w-4 flex-shrink-0 text-neutral-400" aria-hidden="true" />
-            </Link>
+            </button>
           </li>
         ))}
       </ul>
@@ -107,6 +131,13 @@ export function ProfileChecklist({ completeness }: { completeness: ProfileComple
           </span>
         </p>
       )}
+
+      <ProfileStepDialog
+        step={openStep}
+        onClose={() => setOpenStep(null)}
+        triggerRef={rowRef}
+        returnFocusRef={headingRef}
+      />
     </section>
   );
 }

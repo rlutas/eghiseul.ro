@@ -61,7 +61,15 @@ export default function AccountTabs({ initialTab = 'services', className, servic
   const router = useRouter();
   const searchParams = useSearchParams();
   const tabFromUrl = searchParams.get('tab') as TabId | null;
-  const [activeTab, setActiveTab] = useState<TabId>(tabFromUrl || initialTab);
+  // The URL wins whenever it names a tab, and `handleTabChange` always writes
+  // one — so this is the tab except before the first switch.
+  //
+  // It used to be `useState(tabFromUrl || initialTab)`, read once at mount: a
+  // client-side navigation to `/account/?tab=kyc` re-rendered the page without
+  // remounting this component, so the URL changed and the panel did not. Every
+  // link into a tab from elsewhere on the page was silently doing nothing.
+  const [fallbackTab, setFallbackTab] = useState<TabId>(initialTab);
+  const activeTab = tabFromUrl || fallbackTab;
 
   // `?edit=1` means the customer arrived from the profile checklist, which asks
   // for one specific thing. Landing them on a read-only tab with the form still
@@ -80,7 +88,7 @@ export default function AccountTabs({ initialTab = 'services', className, servic
 
   // Handle tab change
   const handleTabChange = useCallback((tabId: TabId) => {
-    setActiveTab(tabId);
+    setFallbackTab(tabId);
     // Update URL without full navigation
     const params = new URLSearchParams(searchParams.toString());
     params.set('tab', tabId);
