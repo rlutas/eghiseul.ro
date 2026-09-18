@@ -3,7 +3,7 @@
 > **⚡ Header stale (2026-06-10).** Pentru starea reală vezi [`STATUS_CURRENT.md`](STATUS_CURRENT.md) + [`changelog/`](changelog/). De atunci: ONRC + ANCPI live, 36 calculatoare, expansiune SEO (CF/cazier/ONRC/stare civilă), rovinietă, /tools/.
 
 **Version:** 4.8
-**Last Updated:** 2026-06-10
+**Last Updated:** 2026-09-18
 **Status:** Sprint 4 In Progress (98%) | Sprint 5 In Progress (98%) | Admin Workflow ✅ | Document Generation ✅ | Multi-Signature ✅ | Contract Preview ✅ | Contract Legal Validity ✅ | Client Downloads ✅ | Extended RBAC ✅ | Number Registry ✅ | Gemini 2.5 Flash ✅ | KYC S3 Upload ✅ | Admin UI Polish ✅ | Review Step Pricing ✅ | Registry Own Page ✅ | User Invite ✅ | Template Placeholders ✅ | CLIENT_DETAILS_BLOCK Legal Format ✅ | KYC Confidence Tracking ✅
 
 ---
@@ -1309,6 +1309,18 @@ curl http://localhost:3000/api/kyc/validate     # KYC health check
 ---
 
 ## SESSION LOG
+
+### Session: 2026-09-18 - Testul A→Z al contului + comenzii (25 puncte), inspecție Codex
+
+**Completed This Session:**
+1. ✅ Feedback 1–18 (două tranșe): KYC = act + selfie peste tot; IBAN vizibil în admin; tip solicitant din wizard; prefill la prima randare; pasul de acte sărit la cont verificat; facturare din profiluri salvate; timeline client fără dubluri; dovada plății pe comandă; catalog sortat + specimen; oferta de cont cu beneficii.
+2. ✅ Feedback 19–25: motivul solicitării (pins, dropdown în jos, eroare inline); actul din cont la pasul 2 + `/submit` cu proprietate strictă, `resumeToken`, materializare din `kyc_verifications`; opțiuni (ierarhie, urgent primar, checkbox); KYC `<details>` + „Continuă" în bara mobilă; contract fără scroll orizontal; transfer bancar pe pagina de status cu token `payment-proof`, `attach_payment_proof` (migrarea 180).
+3. ✅ Inspecție Codex (claudex-loop): 3 runde pe cod (28 constatări), 5 runde pe planul tranșei 19–25, inspecție pe codul ei — dispoziții în changelog-uri.
+4. ✅ Admin: `orders.is_closed` (migrarea 179) — finalizatele sub cele vii. Analiză abandonuri + emailuri în `docs/marketing/`.
+5. ✅ Curățenie: 9 comenzi de test (r.lutas) șterse.
+
+**Open:** preț easybox (Sameday locker fallback); rezervarea cuponului la checkout; OCR/face-match server-side înainte de `kyc_verified`; tracking Resend (decizie Raul).
+
 
 ### Session: 2026-01-06 - User Data Persistence Planning
 
