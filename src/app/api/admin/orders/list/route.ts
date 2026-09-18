@@ -97,6 +97,11 @@ export async function GET(request: NextRequest) {
       // with the proof uploaded, E-260918-SJCQY) has paid_at NULL — with
       // NULLS LAST it sank under every paid order onto the final page of
       // „Toate" and looked lost. Drafts/pending are already out of this list.
+      // Closed orders (completed / cancelled / refunded — `is_closed`, a
+      // generated column, migration 179) sink under the live ones: they need
+      // nothing from the team, and „Toate" is read from the top (Raul,
+      // 18.09.2026). Inside each half the recency order below still applies.
+      .order('is_closed', { ascending: true })
       .order('paid_at', { ascending: false, nullsFirst: true })
       .order('created_at', { ascending: false })
       .range(page * limit, (page + 1) * limit - 1);
