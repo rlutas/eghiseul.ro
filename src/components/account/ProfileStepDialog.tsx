@@ -27,7 +27,6 @@ import { Button } from '@/components/ui/button';
 import type { ProfileStepId } from '@/lib/account/profile-completeness';
 import { ContactStepForm } from './profile-steps/ContactStepForm';
 import { PersonalStepForm } from './profile-steps/PersonalStepForm';
-import { IdentityStepPanel } from './profile-steps/IdentityStepPanel';
 import { AddressStepForm } from './profile-steps/AddressStepForm';
 import { BillingStepForm } from './profile-steps/BillingStepForm';
 
@@ -39,10 +38,6 @@ const COPY: Record<ProfileStepId, { title: string; description: string }> = {
   personal: {
     title: 'Date personale',
     description: 'Nume, CNP și data nașterii — completate automat la fiecare comandă.',
-  },
-  identity: {
-    title: 'Act de identitate',
-    description: 'Actul și un selfie, o singură dată, în pagina dedicată.',
   },
   address: {
     title: 'Adresă de livrare',
@@ -208,7 +203,6 @@ export function ProfileStepDialog({
           <div className={confirming ? 'hidden' : undefined}>
             {step === 'contact' && <ContactStepForm {...formProps} />}
             {step === 'personal' && <PersonalStepForm {...formProps} />}
-            {step === 'identity' && <IdentityStepPanel onRequestClose={requestClose} />}
             {step === 'address' && <AddressStepForm {...formProps} />}
             {step === 'billing' && <BillingStepForm {...formProps} />}
           </div>

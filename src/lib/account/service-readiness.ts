@@ -85,7 +85,9 @@ export function serviceReadiness(
   // Things the account CAN hold — listed only when it does not hold them.
   if (requirements.needsIdentity) {
     if (!account.hasPersonalData) missing.push('datele tale personale');
-    if (!account.hasIdentityDocuments) missing.push('actul de identitate');
+    // Collected by the order form, not by the account (18.09.2026): the row
+    // says so, because a customer cannot tick it off from here.
+    if (!account.hasIdentityDocuments) missing.push('actul de identitate și un selfie, la comandă');
   }
   if (requirements.needsCompany && !account.hasCompanyData) {
     missing.push('datele firmei');

@@ -107,10 +107,8 @@ export default async function AccountPage() {
     lastName: profile?.last_name,
     cnp: profile?.cnp,
     phone: profile?.phone,
-    kycDocumentTypes: docTypes,
     savedAddressCount: savedAddressCount ?? 0,
     billingProfileCount: billingProfileCount ?? 0,
-    serviceInterests,
   })
 
   // The catalogue, with what each service will still ask this customer for.

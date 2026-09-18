@@ -116,7 +116,7 @@ export function interestConsequence(interests: InterestId[]): string | null {
   const needsIdentity = interestsRequireIdentity(interests);
   if (needsIdentity === null) return null;
   if (needsIdentity) {
-    return 'Pentru ce ai ales, instituția cere actul de identitate — îl încarci o dată și rămâne salvat pentru comenzile următoare.';
+    return 'Pentru ce ai ales, instituția cere actul de identitate — îl fotografiezi direct în comandă, ca să fie mereu actual.';
   }
   return 'Pentru ce ai ales nu e nevoie de act de identitate, așa că nu ți-l cerem. Nici noi nu depunem act la ONRC sau la ANCPI.';
 }

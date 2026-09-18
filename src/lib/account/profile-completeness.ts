@@ -10,9 +10,14 @@
  * the same function instead of each deciding for itself what "complete" means.
  */
 
-import { interestsRequireIdentity, type InterestId } from '@/lib/account/service-interests';
-
-export type ProfileStepId = 'contact' | 'personal' | 'identity' | 'address' | 'billing';
+/**
+ * The identity document is not a step of the account any more (18.09.2026).
+ * Uploading it here meant a second ask right after the personal-data scan, and
+ * a document that would be months old by the time an order needed it. The
+ * order form asks for the document and the selfie itself, only for services
+ * that need them, so what reaches the institution is always fresh.
+ */
+export type ProfileStepId = 'contact' | 'personal' | 'address' | 'billing';
 
 export interface ProfileInput {
   firstName?: string | null;
@@ -20,21 +25,8 @@ export interface ProfileInput {
   cnp?: string | null;
   phone?: string | null;
   birthDate?: string | null;
-  /** `document_type` of every active KYC document. */
-  kycDocumentTypes?: string[];
   savedAddressCount?: number;
   billingProfileCount?: number;
-  /**
-   * The answer to the account's onboarding question, when there is one.
-   *
-   * `undefined`/`null` means the question has not been answered — the identity
-   * step stays, exactly as before. An explicit answer that covers only services
-   * which never ask for an identity document REMOVES that step: a customer who
-   * comes for an extras de carte funciară or a certificat constatator should not
-   * be told their profile is 80% complete because of a document nobody will ever
-   * ask them for. We do not hand an identity document to ONRC either.
-   */
-  serviceInterests?: InterestId[] | null;
 }
 
 export interface ProfileStep {
@@ -77,9 +69,6 @@ function filled(value?: string | null): boolean {
 }
 
 export function profileCompleteness(input: ProfileInput): ProfileCompleteness {
-  const kyc = input.kycDocumentTypes ?? [];
-  const needsIdentity = interestsRequireIdentity(input.serviceInterests);
-
   const steps: ProfileStep[] = [
     {
       id: 'contact',
@@ -94,13 +83,6 @@ export function profileCompleteness(input: ProfileInput): ProfileCompleteness {
       benefit: 'Nume, CNP și data nașterii — completate automat la fiecare comandă.',
       done: filled(input.firstName) && filled(input.lastName) && filled(input.cnp),
       href: '/account/?tab=profile&edit=1',
-    },
-    {
-      id: 'identity',
-      label: 'Act de identitate',
-      benefit: 'Nu mai încarci actul la fiecare comandă.',
-      done: hasIdentityDocuments(kyc),
-      href: '/account/?tab=kyc',  // the KYC tab is its own uploader, already open
     },
     {
       id: 'address',
@@ -118,22 +100,15 @@ export function profileCompleteness(input: ProfileInput): ProfileCompleteness {
     },
   ];
 
-  // An identity document already on file is never hidden — it is real, it is
-  // shown as done, and it keeps counting. Only the *request* for one goes away.
-  const visibleSteps =
-    needsIdentity === false
-      ? steps.filter((s) => s.id !== 'identity' || s.done)
-      : steps;
-
-  const doneCount = visibleSteps.filter((s) => s.done).length;
-  const totalCount = visibleSteps.length;
+  const doneCount = steps.filter((s) => s.done).length;
+  const totalCount = steps.length;
 
   return {
-    steps: visibleSteps,
+    steps,
     doneCount,
     totalCount,
     percent: Math.round((doneCount / totalCount) * 100),
     isComplete: doneCount === totalCount,
-    nextStep: visibleSteps.find((s) => !s.done) ?? null,
+    nextStep: steps.find((s) => !s.done) ?? null,
   };
 }

@@ -37,7 +37,6 @@ export function ProfileReadinessBanner() {
             lastName: d.personal?.lastName,
             cnp: d.personal?.cnp,
             phone: d.personal?.phone || d.contact?.phone,
-            kycDocumentTypes: Object.keys(d.kyc_documents ?? {}),
             savedAddressCount: d.savedAddresses?.length ?? 0,
             billingProfileCount: d.billing_profiles?.length ?? 0,
           })

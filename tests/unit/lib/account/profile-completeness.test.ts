@@ -13,7 +13,6 @@ const FULL: ProfileInput = {
   cnp: '1900101410011',
   phone: '0722333444',
   birthDate: '1990-01-01',
-  kycDocumentTypes: ['ci_front', 'selfie'],
   savedAddressCount: 1,
   billingProfileCount: 1,
 };
@@ -61,12 +60,11 @@ describe('profileCompleteness', () => {
 
   it('opens the form directly on the tabs that hide it behind a button', () => {
     // Landing on a read-only tab makes the checklist row look broken — reported
-    // as soon as it shipped. KYC is exempt: that tab IS the uploader.
+    // as soon as it shipped.
     const steps = profileCompleteness(EMPTY).steps;
     for (const id of ['contact', 'personal', 'address', 'billing']) {
       expect(steps.find((s) => s.id === id)?.href, id).toContain('edit=1');
     }
-    expect(steps.find((s) => s.id === 'identity')?.href).not.toContain('edit=1');
   });
 
   it('phrases the benefit for the customer, never as a restriction', () => {
@@ -76,15 +74,14 @@ describe('profileCompleteness', () => {
   });
 
   it('percent is a whole number between 0 and 100', () => {
-    for (const n of [0, 1, 2, 3, 4, 5]) {
+    for (const n of [0, 1, 2, 3, 4]) {
       const r = profileCompleteness({
         phone: n > 0 ? '07' : null,
         firstName: n > 1 ? 'A' : null,
         lastName: n > 1 ? 'B' : null,
         cnp: n > 1 ? '1' : null,
-        kycDocumentTypes: n > 2 ? ['ci_front', 'selfie'] : [],
-        savedAddressCount: n > 3 ? 1 : 0,
-        billingProfileCount: n > 4 ? 1 : 0,
+        savedAddressCount: n > 2 ? 1 : 0,
+        billingProfileCount: n > 3 ? 1 : 0,
       });
       expect(r.doneCount).toBe(n);
       expect(Number.isInteger(r.percent)).toBe(true);
@@ -119,7 +116,10 @@ describe('hasIdentityDocuments', () => {
   });
 });
 
-describe('the identity step follows the onboarding answer', () => {
+describe('the identity document is not a step of the account', () => {
+  // Uploading it in the account meant a second ask right after the personal
+  // data scan, and a document months old by the time an order needed it. The
+  // order form asks for it, fresh, only for the services that need it.
   const base = {
     firstName: 'Ion',
     lastName: 'Popescu',
@@ -129,43 +129,11 @@ describe('the identity step follows the onboarding answer', () => {
     billingProfileCount: 1,
   };
 
-  it('stays while the question has not been answered', () => {
-    // NULL means we know nothing about this person yet, which is not the same
-    // as "answered, and no document needed".
-    for (const interests of [undefined, null, []]) {
-      const result = profileCompleteness({ ...base, serviceInterests: interests });
-      expect(result.steps.map((s) => s.id)).toContain('identity');
-      expect(result.isComplete).toBe(false);
-    }
-  });
-
-  it('disappears for a customer who only wants property or company documents', () => {
-    // 20 of the 31 active services never ask for an identity document, and we
-    // do not hand one to ONRC either. Telling this customer their profile is
-    // 80% complete because of a document nobody will ask for is a lie.
-    const result = profileCompleteness({ ...base, serviceInterests: ['imobile', 'firma'] });
-    expect(result.steps.map((s) => s.id)).not.toContain('identity');
+  it('is never asked for, whatever the customer came for', () => {
+    const result = profileCompleteness(base);
+    expect(result.steps.map((s) => s.id)).toEqual(['contact', 'personal', 'address', 'billing']);
     expect(result.totalCount).toBe(4);
     expect(result.percent).toBe(100);
     expect(result.isComplete).toBe(true);
-  });
-
-  it('stays for a customer who wants a cazier', () => {
-    const result = profileCompleteness({ ...base, serviceInterests: ['imobile', 'caziere'] });
-    expect(result.steps.map((s) => s.id)).toContain('identity');
-    expect(result.isComplete).toBe(false);
-  });
-
-  it('never hides a document that is already on file', () => {
-    // The request goes away; the document does not. It is real, it is shown as
-    // done, and it keeps counting.
-    const result = profileCompleteness({
-      ...base,
-      kycDocumentTypes: ['ci_front', 'selfie'],
-      serviceInterests: ['imobile'],
-    });
-    const identity = result.steps.find((s) => s.id === 'identity');
-    expect(identity?.done).toBe(true);
-    expect(result.totalCount).toBe(5);
   });
 });

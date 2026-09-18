@@ -334,6 +334,13 @@ ecran.
 | D8 | Datele din act se pot folosi la facturare? | **Da**, la alegerea clientului, cu un comutator. Implicit oprit. |
 | D4 | Câte stări vede clientul din cele interne? | **Toate**, dar nu toate la fel. Vezi mai jos. |
 
+### Luate (18.09.2026)
+
+| # | Decizia | Răspuns |
+|---|---|---|
+| D9 | Actul de identitate rămâne pas în contul clientului? | **Nu.** După scanarea din „Date personale", pasul „Act de identitate" cerea aceeași poză a doua oară, iar un act încărcat în cont ar fi vechi la momentul comenzii. Actul și selfie-ul se cer **doar în formularul de comandă**, pentru serviciile care le cer, deci sunt mereu proaspete. Tabul „Act de identitate" rămâne pentru documentele venite din comenzi. Înlocuiește partea din D5 despre act. |
+| D10 | Popup-ul de facturare pornește cu datele din act? | **Da.** Când profilul are nume + CNP, întreabă „le folosim și pe factură?" cu preview; „Da" salvează direct dacă există adresă de livrare din România, altfel deschide formularul cu numele și CNP-ul completate și cere doar adresa; „Nu" duce la formularul PF/PJ (CUI → ANAF). Rafinează D8. |
+
 ### D4, luată pe 17.09.2026
 
 Clientul vede **eticheta reală a fiecărui status**, nu o mulțime redusă. Motivul

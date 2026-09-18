@@ -131,7 +131,7 @@ describe('serviceReadiness', () => {
       { ...NO_MODULES, needsIdentity: true, needsProperty: true },
       EMPTY_ACCOUNT
     );
-    expect(r.missing.indexOf('actul de identitate')).toBeLessThan(
+    expect(r.missing.indexOf('actul de identitate și un selfie, la comandă')).toBeLessThan(
       r.missing.indexOf('datele imobilului (număr carte funciară sau cadastral)')
     );
   });
