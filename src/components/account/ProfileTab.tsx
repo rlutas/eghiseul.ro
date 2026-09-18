@@ -235,37 +235,33 @@ export default function ProfileTab({ initialData, className, autoEdit = false }:
       for (const doc of documents) {
         const verificationId = crypto.randomUUID();
         const mimeType = doc.mimeType || 'image/jpeg';
-        let fileUrl = `data:${mimeType};base64,${doc.base64}`;
-        let fileKey: string | undefined;
+        // S3 or nothing: the server accepts only this account's own object
+        // (no data-URL rows any more), so a failed upload is a failed save,
+        // said out loud — not a green tick over an empty table.
+        const uploaded = await uploadToS3({
+          category: 'kyc',
+          file: base64ToFile(doc.base64, mimeType, `${doc.type}.jpg`),
+          // The scanner's types are the same strings `KycDocumentType`
+          // lists; the scanner just declares them as `string`.
+          documentType: doc.type as Parameters<typeof uploadToS3>[0]['documentType'],
+          verificationId,
+        });
 
-        try {
-          const uploaded = await uploadToS3({
-            category: 'kyc',
-            file: base64ToFile(doc.base64, mimeType, `${doc.type}.jpg`),
-            // The scanner's types are the same strings `KycDocumentType`
-            // lists; the scanner just declares them as `string`.
-            documentType: doc.type as Parameters<typeof uploadToS3>[0]['documentType'],
-            verificationId,
-          });
-          fileUrl = uploaded.url;
-          fileKey = uploaded.key;
-        } catch (s3Error) {
-          console.warn('S3 upload failed for scanned document, using data URL:', s3Error);
-        }
-
-        await saveDocument({
+        const saved = await saveDocument({
           documentType: doc.type,
-          fileUrl,
-          fileKey,
+          fileUrl: uploaded.url,
+          fileKey: uploaded.key,
           fileSize: doc.fileSize,
           mimeType,
           extractedData: extractedData,
           documentExpiry: extractedData.documentExpiry,
         });
+        if (!saved) throw new Error('Documentul nu s-a putut salva. Încearcă din nou.');
       }
       setScanSuccess(true);
     } catch (err) {
       console.error('Error saving KYC document from profile:', err);
+      setError('Datele au fost citite, dar actul nu s-a putut salva în cont. Încearcă din nou scanarea.');
     }
 
     setShowScanner(false);

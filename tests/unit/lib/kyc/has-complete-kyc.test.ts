@@ -9,6 +9,9 @@ describe('hasCompleteKyc', () => {
     expect(hasCompleteKyc(['selfie'])).toBe(false);
     expect(hasCompleteKyc(['ci_front', 'selfie'])).toBe(true);
     expect(hasCompleteKyc(['passport', 'selfie_with_id'])).toBe(true);
+    // The back of a new CI carries the address, not the person.
+    expect(hasCompleteKyc(['ci_nou_back', 'selfie'])).toBe(false);
+    expect(hasCompleteKyc(['act_identitate_back', 'selfie'])).toBe(false);
   });
 
   it('does not count documents that prove nothing about identity', () => {

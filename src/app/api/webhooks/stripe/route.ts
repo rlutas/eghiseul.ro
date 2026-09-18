@@ -5,6 +5,7 @@ import Stripe from 'stripe'
 import { ensureInvoiceForPaidOrder } from '@/lib/oblio'
 import { upsertContactForPaidOrder } from '@/lib/contacts/upsert'
 import { syncPaidOrderToAccount } from '@/lib/account/sync-paid-order'
+import { redeemCouponForOrder } from '@/lib/coupons/redeem'
 import { ensureOnrcJobForPaidOrder } from '@/lib/onrc/ensure-onrc-job'
 import { ensureAncpiJobForPaidOrder } from '@/lib/ancpi/ensure-ancpi-job'
 import { computeEstimatedCompletionISOForOrder } from '@/lib/orders/order-estimate'
@@ -395,32 +396,9 @@ async function handlePaymentSucceeded(paymentIntent: Stripe.PaymentIntent) {
     console.error(`Order ${orderId}: meta conversion failed (non-fatal):`, e instanceof Error ? e.message : e)
   }
 
-  // 2b. Increment coupon usage if one was applied.
-  // Idempotency is provided by the early return on line 135 (checks invoice_number):
-  // coupon increment only runs when invoice_number is null (i.e. first-time payment webhook).
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const couponCode = (order as any).coupon_code as string | null
-  if (couponCode) {
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data: coupon } = await (supabaseAdmin as any)
-        .from('coupons')
-        .select('id, times_used')
-        .ilike('code', couponCode.trim())
-        .maybeSingle()
-      if (coupon) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        await (supabaseAdmin as any)
-          .from('coupons')
-          .update({ times_used: (coupon.times_used || 0) + 1 })
-          .eq('id', coupon.id)
-        console.log(`Incremented usage for coupon ${couponCode} (order ${orderId})`)
-      }
-    } catch (couponErr) {
-      // Don't fail the payment flow if coupon tracking fails
-      console.error('Failed to increment coupon usage:', couponErr)
-    }
-  }
+  // 2b. Count the coupon's use — once per order, atomically, through the
+  // same RPC every other payment path calls.
+  await redeemCouponForOrder(orderId)
 
   // 3. Create Oblio invoice via the shared chokepoint.
   //

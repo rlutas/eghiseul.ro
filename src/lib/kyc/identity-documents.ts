@@ -258,5 +258,19 @@ export function fillsProfileFromOcr(stored: string): boolean {
  * (E-260918-SJCQY, 18.09.2026).
  */
 export function hasCompleteKyc(storedTypes: readonly string[]): boolean {
-  return storedTypes.some(isIdentityDocumentType) && storedTypes.some(isSelfieType);
+  return storedTypes.some(isIdentityFrontType) && storedTypes.some(isSelfieType);
+}
+
+/**
+ * The side of the document that carries the person: a CI front or a
+ * passport's data page. The back of a new CI carries the address and proves
+ * nothing about identity, so „verso + selfie" must not count as complete.
+ */
+const IDENTITY_FRONT_TYPES: readonly string[] = [
+  ...DOCUMENT_TYPE_ALIASES.ci_front,
+  ...DOCUMENT_TYPE_ALIASES.passport_opened,
+];
+
+export function isIdentityFrontType(stored: string): boolean {
+  return IDENTITY_FRONT_TYPES.includes(stored);
 }

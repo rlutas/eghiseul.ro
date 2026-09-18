@@ -61,13 +61,16 @@ export async function copyOrderKycDocumentsToAccount(
   adminClient: SupabaseClient<any>,
   input: {
     userId: string;
+    /** The order the documents came from — only keys under `kyc/<orderId>/` are copied. */
+    orderId: string;
     uploadedDocuments: OrderUploadedDocument[];
     ocrResults: OrderOcrResult[];
     /** Prefix for the log lines, so a failure says which path it came from. */
     logPrefix: string;
   }
 ): Promise<CopyOrderKycResult> {
-  const { userId, uploadedDocuments, ocrResults, logPrefix } = input;
+  const { userId, orderId, uploadedDocuments, ocrResults, logPrefix } = input;
+  const allowedPrefix = `kyc/${orderId}/`;
   let copied = 0;
   let identityCopied = false;
 
@@ -90,6 +93,14 @@ export async function copyOrderKycDocumentsToAccount(
       parsedExpiry && !Number.isNaN(parsedExpiry.getTime()) && parsedExpiry > new Date()
         ? parsedExpiry
         : new Date(Date.now() + KYC_VALIDITY_DAYS * 24 * 60 * 60 * 1000);
+
+    // `customer_data` is written from the browser: a key that is not the
+    // submit route's own `kyc/<orderId>/…` could point at somebody else's
+    // object, and this copy runs with service-role S3 access.
+    if (doc.s3Key && !doc.s3Key.startsWith(allowedPrefix)) {
+      console.warn(`${logPrefix}: ${doc.type} key outside the order's prefix, skipped`);
+      continue;
+    }
 
     let fileKey: string;
     try {

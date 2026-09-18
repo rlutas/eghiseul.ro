@@ -388,7 +388,7 @@ export default function KYCTab({ className, serviceInterests }: KYCTabProps) {
         }
 
         // Save KYC document with S3 URL
-        await saveDocument({
+        const savedDoc = await saveDocument({
           documentType: type,
           fileUrl,
           fileKey,
@@ -399,6 +399,7 @@ export default function KYCTab({ className, serviceInterests }: KYCTabProps) {
           documentExpiry: ocr.extractedData?.expiryDate,
           useIdDataForBilling: reuseIdForBilling,
         });
+        if (!savedDoc) throw new Error('Documentul nu s-a putut salva. Încearcă din nou.');
 
         // Auto-create address and billing profile from whatever the document
         // carried (name + CNP on a front/passport, address on a new-CI back).
@@ -408,7 +409,7 @@ export default function KYCTab({ className, serviceInterests }: KYCTabProps) {
       } else if (type !== 'selfie') {
         // Documents nobody needs to read automatically (address certificate,
         // residence permit, driving licence) — stored for the team to review.
-        await saveDocument({
+        const savedDoc = await saveDocument({
           documentType: type,
           fileUrl,
           fileKey,
@@ -416,6 +417,7 @@ export default function KYCTab({ className, serviceInterests }: KYCTabProps) {
           mimeType: finalMime,
           extractedData: {},
         });
+        if (!savedDoc) throw new Error('Documentul nu s-a putut salva. Încearcă din nou.');
       } else {
         // For selfie: face match against the user's CI front before saving.
         // Use the in-session cache if available, else fall back to the stored
@@ -464,7 +466,7 @@ export default function KYCTab({ className, serviceInterests }: KYCTabProps) {
           }
         }
 
-        await saveDocument({
+        const savedDoc = await saveDocument({
           documentType: 'selfie',
           fileUrl,
           fileKey,
@@ -473,6 +475,7 @@ export default function KYCTab({ className, serviceInterests }: KYCTabProps) {
           extractedData: faceMatchValidation,
           validationResult: faceMatchValidation,
         });
+        if (!savedDoc) throw new Error('Documentul nu s-a putut salva. Încearcă din nou.');
       }
 
       setSaveSuccess(true);
@@ -513,18 +516,13 @@ export default function KYCTab({ className, serviceInterests }: KYCTabProps) {
         fileUrl = s3Result.url;
         fileKey = s3Result.key;
       } catch {
-        // Fallback to data URL
-        const reader = new FileReader();
-        const dataUrlPromise = new Promise<string>((resolve, reject) => {
-          reader.onload = () => resolve(reader.result as string);
-          reader.onerror = reject;
-        });
-        reader.readAsDataURL(file);
-        fileUrl = await dataUrlPromise;
+        // No data-URL fallback: the server keeps only this account's own S3
+        // object, so without the upload there is nothing to save.
+        throw new Error('Încărcarea a eșuat. Verifică conexiunea și încearcă din nou.');
       }
 
       // Save to KYC verifications (no OCR, manual review)
-      await saveDocument({
+      const savedDoc = await saveDocument({
         documentType: type,
         fileUrl,
         fileKey,
@@ -532,6 +530,7 @@ export default function KYCTab({ className, serviceInterests }: KYCTabProps) {
         mimeType: file.type,
         extractedData: {},
       });
+      if (!savedDoc) throw new Error('Documentul nu s-a putut salva. Încearcă din nou.');
 
       setSaveSuccess(true);
       await refreshKyc();

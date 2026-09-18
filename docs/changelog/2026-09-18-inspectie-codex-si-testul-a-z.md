@@ -48,6 +48,19 @@ Reparate acum, toate live:
   iar pagina de succes și cea de status spun „Dovadă primită, în verificare".
 - Pagina de status: capul comenzii pe rânduri, nu înghesuit în dreapta.
 
+**Runda 2 Codex (după reparațiile de mai sus): REVISE, 11 constatări, reparate și ele**
+- KYC: doar **fața** actului (sau pagina pașaportului) + selfie contează;
+  versoul CI-ului nou nu mai poate „completa" verificarea. Salvarea unui act
+  în cont verifică în S3 că fișierul există, că e al contului și că e de
+  tipul declarat; un act expirat nu mai ține contul „verificat".
+- Cuponul se consumă o singură dată per comandă, atomic, pe orice cale de
+  plată (card, transfer, marcare manuală, sync Stripe) — înainte doar la card.
+  Un cupon respins la plată nu mai ajunge în Stripe ca reducere. Un draft de
+  guest poate fi legat de cont prin cupon doar dacă e pe emailul contului.
+- Copierea actelor din comandă în cont acceptă doar fișierele comenzii.
+- Fără fallback „poză în baza de date": dacă upload-ul pică, clientul vede
+  eroarea, nu o bifă verde.
+
 **Prețuri curier (Odoreu):** FAN 25 lei = pragul minim; Sameday 41 lei = tariful
 lor rural; easybox 35 lei = 85% din tariful rural, fiindcă estimarea de locker
 la Sameday pică (lipsește `oohLastMile`) și cade pe fallback. Nereparat încă —
@@ -93,7 +106,25 @@ specimen per serviciu, simplificarea formularului de facturare.
 - Livrare: `saved-address.ts` acceptă codul poștal cu spații; efect nou în
   `delivery-step.tsx` completează codul din localitate când câmpul e gol.
 
+### Inspecția Codex runda 2 (REVISE, 11) — dispoziții
+| ID | Disp. | Ce s-a făcut |
+|---|---|---|
+| REV2-KYC-001 (high) | acceptat | `kyc/save`: cheie canonică `kyc/<uid>/<verificationId>/<documentType>.<ext>` + `getFileInfo` (HeadObject, dimensiune > 0). |
+| REV2-KYC-002 (high) | acceptat | `isIdentityFrontType` (ci_front + pașaport); `hasCompleteKyc` folosește fronturile; migrarea **177** rescrie `migrate_order_to_profile` cu lista de fronturi + demarcare; testul de paritate SQL citește 177. |
+| REV2-KYC-003 (high) | acceptat | `copyOrderKycDocumentsToAccount` primește `orderId` și copiază doar chei sub `kyc/<orderId>/`. |
+| REV2-COUPON-001 (high) | acceptat | `payment/route.ts` golește `order.coupon_code/discount_amount/total_price` după respingere, înainte de Stripe. |
+| REV2-COUPON-002 (high) | acceptat | `redeem_coupon(uuid)` RPC (lock pe comandă + cupon, `orders.coupon_redeemed_at`, migrarea 177) apelat din webhook, `fulfil-paid`, `confirm-payment`, `verify-payment`, `sync-stripe` prin `lib/coupons/redeem.ts`. |
+| REV2-COUPON-003 (high) | acceptat | `coupon/route.ts`: draftul de guest se leagă doar dacă `customer_data.contact.email` = emailul confirmat al sesiunii. |
+| REV2-SYNC-001 (medium) | acceptat | Erorile de citire (profil, adrese, facturare, acte) → `failed`, fără marker. |
+| REV2-ADDRESS-001 (medium) | acceptat parțial | Bloc/scară/etaj/ap. comparate când AMBELE părți le au (un scan fără apartament încă se potrivește cu rândul salvat — intenționat). |
+| REV2-REMINDER-001 (medium) | acceptat | Paginare completă (500/pagină, ordonat pe `id`), nu fereastra „cele mai vechi 1000". |
+| REV2-KYC-004 (medium) | acceptat | `ProfileTab` / `KYCTab`: fără data-URL; `saveDocument` null = eroare afișată. |
+| REV2-KYC-005 (medium) | acceptat | `/api/user/kyc` numără doar rândurile neexpirate; `kyc/save` recalculează `kyc_verified` în ambele sensuri din rândurile neexpirate. |
+
+Bugetul de inspecție (2 runde) e consumat: reparațiile din runda 2 **nu au
+mai fost inspectate** de Codex. O rundă 3 se face la cerere.
+
 ### Teste
-`has-complete-kyc.test.ts` nou; `user-kyc-save.test.ts` (cheie proprie +
+`has-complete-kyc.test.ts` (inclusiv verso + selfie = incomplet); `user-kyc-save.test.ts` (cheie proprie +
 mock S3), `sync-paid-order.test.ts` (cratime, județ). Suita: 158 fișiere,
-1966 teste verzi.
+1967 teste verzi.

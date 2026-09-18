@@ -125,11 +125,12 @@ export async function syncPaidOrderToAccount(orderId: string): Promise<SyncPaidO
 
     // 1. Profile: fill what is empty, touch nothing that is set.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: profile } = await (admin as any)
+    const { data: profile, error: profileReadError } = await (admin as any)
       .from('profiles')
       .select('id, phone, first_name, last_name, cnp, birth_date, birth_place')
       .eq('id', userId)
       .maybeSingle();
+    if (profileReadError) failed = true;
     if (profile) {
       const updates: Unknowns = {};
       const phone = normalizePhone(contact.phone);
@@ -155,14 +156,16 @@ export async function syncPaidOrderToAccount(orderId: string): Promise<SyncPaidO
     const address = savedAddressFromDelivery(order.delivery_address as Unknowns | null);
     if (address) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data: saved } = await (admin as any)
+      const { data: saved, error: savedReadError } = await (admin as any)
         .from('user_saved_data')
         .select('id, data')
         .eq('user_id', userId)
         .eq('data_type', 'address');
       const rows = (saved ?? []) as Array<{ id: string; data: Unknowns }>;
       const exists = rows.some((row) => sameAddress(row.data, address));
-      if (!exists) {
+      // A failed read must not look like „no address yet": skip and retry.
+      if (savedReadError) failed = true;
+      else if (!exists) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const { error: addressError } = await (admin as any).from('user_saved_data').insert({
           user_id: userId,
@@ -188,10 +191,11 @@ export async function syncPaidOrderToAccount(orderId: string): Promise<SyncPaidO
         });
     if (candidate) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data: profiles } = await (admin as any)
+      const { data: profiles, error: billingReadError } = await (admin as any)
         .from('billing_profiles')
         .select('id, type, billing_data')
         .eq('user_id', userId);
+      if (billingReadError) failed = true;
       const rows = (profiles ?? []) as Array<{ id: string; type: string; billing_data: Unknowns }>;
       const exists = rows.some((row) =>
         sameBillingProfile(
@@ -199,7 +203,7 @@ export async function syncPaidOrderToAccount(orderId: string): Promise<SyncPaidO
           candidate
         )
       );
-      if (!exists) {
+      if (!billingReadError && !exists) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const { error: billingError } = await (admin as any).from('billing_profiles').insert({
           user_id: userId,
@@ -220,19 +224,21 @@ export async function syncPaidOrderToAccount(orderId: string): Promise<SyncPaidO
     const uploadedDocuments = (personal.uploadedDocuments ?? []) as Array<{ type: string; s3Key?: string; base64?: string; mimeType?: string; fileSize?: number }>;
     if (uploadedDocuments.length > 0) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data: existingDocs } = await (admin as any)
+      const { data: existingDocs, error: docsReadError } = await (admin as any)
         .from('kyc_verifications')
         .select('document_type')
         .eq('user_id', userId)
         .eq('is_active', true);
+      if (docsReadError) failed = true;
       // Copy unless the account already holds the complete set (document AND
       // selfie): an account with only a front still needs the order's selfie.
       const complete = hasCompleteKyc(
         ((existingDocs ?? []) as Array<{ document_type: string }>).map((d) => d.document_type)
       );
-      if (!complete) {
+      if (!docsReadError && !complete) {
         const result = await copyOrderKycDocumentsToAccount(admin, {
           userId,
+          orderId,
           uploadedDocuments,
           ocrResults: (personal.ocrResults ?? []) as Array<{ documentType: string; extractedData: Record<string, unknown>; confidence: number }>,
           logPrefix: `${LOG} ${order.friendly_order_id}`,

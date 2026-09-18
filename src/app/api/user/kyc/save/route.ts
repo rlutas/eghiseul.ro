@@ -9,7 +9,7 @@ import {
   fillsProfileFromOcr,
   hasCompleteKyc,
 } from '@/lib/kyc/identity-documents';
-import { getDownloadUrl } from '@/lib/aws/s3';
+import { getDownloadUrl, getFileInfo } from '@/lib/aws/s3';
 import { KYC_VALIDITY_DAYS } from '@/lib/kyc/constants';
 import { billingProfileFromIdData, hasUsableAddress } from '@/lib/account/id-data-to-profile';
 import { findSameAddress } from '@/lib/account/same-address';
@@ -73,11 +73,23 @@ export async function POST(request: Request) {
     // The object must be the caller's own upload: a key under `kyc/<userId>/`.
     // The URL is not trusted at all — it is re-derived from the key here, so a
     // row can never point at somebody else's object or an arbitrary address.
-    if (typeof fileKey !== 'string' || !fileKey.startsWith(`kyc/${user.id}/`)) {
+    // …and the key must be the canonical shape the upload route mints for
+    // this account and this document type, and the object must exist: a
+    // fabricated key or a front reused as „selfie" is refused.
+    const keyPattern = new RegExp(`^kyc/${user.id}/[A-Za-z0-9-]+/${documentType}\\.(jpg|jpeg|png|webp)$`);
+    if (typeof fileKey !== 'string' || !keyPattern.test(fileKey)) {
       return NextResponse.json(
-        { error: 'fileKey must be an upload of the signed-in account (kyc/<userId>/…)' },
+        { error: 'fileKey must be this account\'s own upload for this document type' },
         { status: 400 }
       );
+    }
+    let objectSize = 0;
+    try {
+      const info = await getFileInfo(fileKey);
+      objectSize = info.size;
+      if (!objectSize) throw new Error('empty object');
+    } catch {
+      return NextResponse.json({ error: 'Fișierul nu a fost găsit. Încarcă din nou documentul.' }, { status: 400 });
     }
     const trustedFileUrl = await getDownloadUrl(fileKey);
 
@@ -119,7 +131,7 @@ export async function POST(request: Request) {
         document_type: documentType,
         file_url: trustedFileUrl,
         file_key: fileKey,
-        file_size: fileSize || null,
+        file_size: objectSize || fileSize || null,
         mime_type: mimeType || null,
         extracted_data: extractedData || {},
         validation_result: validationResult || {},
@@ -157,16 +169,18 @@ export async function POST(request: Request) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { data: activeRows } = await (adminClient as any)
         .from('kyc_verifications')
-        .select('document_type')
+        .select('document_type, expires_at')
         .eq('user_id', user.id)
         .eq('is_active', true);
-      const activeTypes = ((activeRows ?? []) as Array<{ document_type: string }>).map((r) => r.document_type);
-      if (hasCompleteKyc(activeTypes)) {
-        await adminClient
-          .from('profiles')
-          .update({ kyc_verified: true, updated_at: now.toISOString() })
-          .eq('id', user.id);
-      }
+      const liveTypes = ((activeRows ?? []) as Array<{ document_type: string; expires_at: string | null }>)
+        .filter((r) => !r.expires_at || Date.parse(r.expires_at) > now.getTime())
+        .map((r) => r.document_type);
+      // Set in both directions: a document that replaced an expired one can
+      // complete the set, and a set that is no longer complete stops counting.
+      await adminClient
+        .from('profiles')
+        .update({ kyc_verified: hasCompleteKyc(liveTypes), updated_at: now.toISOString() })
+        .eq('id', user.id);
     }
 
     // What the scan may fill in, from a document that carries personal data

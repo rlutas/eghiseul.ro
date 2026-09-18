@@ -86,21 +86,26 @@ async function run(request: NextRequest) {
   // then applies the exact window and the „once per date" rule.
   const from = new Date(now.getTime() - 30 * 86_400_000).toISOString().slice(0, 10);
   const to = new Date(now.getTime() + 14 * 86_400_000).toISOString().slice(0, 10);
-  const { data: vehicles, error } = await admin
-    .from('user_saved_vehicles')
-    .select('id, user_id, label, plate_number, itp_expiry, insurance_expiry, rovinieta_expiry, itp_reminded_for, insurance_reminded_for, rovinieta_reminded_for')
-    .or(
-      `and(rovinieta_expiry.gte.${from},rovinieta_expiry.lte.${to}),and(itp_expiry.gte.${from},itp_expiry.lte.${to}),and(insurance_expiry.gte.${from},insurance_expiry.lte.${to})`
-    )
-    // Oldest first, so a backlog larger than one run drains in order instead
-    // of returning the same arbitrary subset every day.
-    .order('updated_at', { ascending: true })
-    .limit(1000);
-  if (error) {
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  // Page through EVERY candidate: a fixed „oldest 1000" window fills up with
+  // terminal skips (unsubscribed, no email) and hides newer vehicles.
+  const PAGE = 500;
+  const rows: VehicleRow[] = [];
+  for (let from_i = 0; from_i < 20_000; from_i += PAGE) {
+    const { data: page, error } = await admin
+      .from('user_saved_vehicles')
+      .select('id, user_id, label, plate_number, itp_expiry, insurance_expiry, rovinieta_expiry, itp_reminded_for, insurance_reminded_for, rovinieta_reminded_for')
+      .or(
+        `and(rovinieta_expiry.gte.${from},rovinieta_expiry.lte.${to}),and(itp_expiry.gte.${from},itp_expiry.lte.${to}),and(insurance_expiry.gte.${from},insurance_expiry.lte.${to})`
+      )
+      .order('id', { ascending: true })
+      .range(from_i, from_i + PAGE - 1);
+    if (error) {
+      return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    }
+    rows.push(...((page ?? []) as VehicleRow[]));
+    if (!page || page.length < PAGE) break;
   }
 
-  const rows = (vehicles ?? []) as VehicleRow[];
   const due = rows.flatMap((v) => vehicleRemindersDue(v, now).map((r) => ({ vehicle: v, reminder: r })));
   if (dry) {
     return NextResponse.json({

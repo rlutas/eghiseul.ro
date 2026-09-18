@@ -57,6 +57,15 @@ describe('sameAddress', () => {
     expect(sameAddress(saved, { street: 'Str. Eroilor', number: '12', city: 'Cluj-Napoca' })).toBe(false);
     expect(sameAddress(null, saved)).toBe(false);
   });
+
+  it('keeps two flats in the same building apart, but matches a bare scan to its row', () => {
+    const flat5 = { street: 'Str. Memorandumului', number: '12', city: 'Cluj-Napoca', apartment: '5' };
+    expect(sameAddress(flat5, { ...flat5, apartment: '12' })).toBe(false);
+    expect(sameAddress({ ...flat5, staircase: 'A' }, { ...flat5, staircase: 'B' })).toBe(false);
+    // The OCR read no apartment: still the row the customer already saved.
+    expect(sameAddress(flat5, { street: 'Salcamilor', number: '12', city: 'Cluj Napoca' })).toBe(false);
+    expect(sameAddress(flat5, { street: 'Str. Memorandumului', number: '12', city: 'Cluj-Napoca' })).toBe(true);
+  });
 });
 
 describe('sameBillingProfile', () => {

@@ -80,7 +80,7 @@ export async function POST(req: NextRequest, { params }: RouteParams) {
   const { data: orderData, error: orderErr } = await admin
     .from('orders')
     .select(
-      'id, user_id, base_price, options_price, delivery_price, total_price, payment_status, stripe_payment_intent_id'
+      'id, user_id, base_price, options_price, delivery_price, total_price, payment_status, stripe_payment_intent_id, customer_data'
     )
     .eq('id', id)
     .maybeSingle();
@@ -137,14 +137,26 @@ export async function POST(req: NextRequest, { params }: RouteParams) {
     const orderOwner = (order as OrderRow & { user_id?: string | null }).user_id ?? null;
     if (orderOwner !== coupon.owner_user_id) {
       let signedIn: string | null = null;
+      let signedInEmail: string | null = null;
       try {
         const supabase = await createClient();
         const { data: { user } } = await supabase.auth.getUser();
         signedIn = user?.id ?? null;
+        signedInEmail = user?.email_confirmed_at ? (user.email ?? '').trim().toLowerCase() : null;
       } catch {
         signedIn = null;
       }
-      if (orderOwner !== null || signedIn !== coupon.owner_user_id) {
+      // A guest draft is claimed only when it was placed with the account's
+      // own (confirmed) email — a UUID alone must not hand an order over.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const guestEmail = String(((order as any).customer_data?.contact?.email ?? '')).trim().toLowerCase();
+      if (
+        orderOwner !== null ||
+        signedIn !== coupon.owner_user_id ||
+        !signedInEmail ||
+        !guestEmail ||
+        guestEmail !== signedInEmail
+      ) {
         return NextResponse.json(
           { success: false, error: 'Cuponul este personal și se poate folosi doar pe comenzile contului căruia i-a fost oferit' },
           { status: 400 }

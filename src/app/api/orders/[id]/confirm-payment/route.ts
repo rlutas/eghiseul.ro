@@ -7,6 +7,7 @@ import { upsertContactForPaidOrder } from '@/lib/contacts/upsert';
 import { syncPaidOrderToAccount } from '@/lib/account/sync-paid-order';
 import { ensureOnrcJobForPaidOrder } from '@/lib/onrc/ensure-onrc-job';
 import { ensureAncpiJobForPaidOrder } from '@/lib/ancpi/ensure-ancpi-job';
+import { redeemCouponForOrder } from '@/lib/coupons/redeem';
 
 // Service role client for bypassing RLS
 const supabaseAdmin = createClient(
@@ -199,6 +200,8 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
     // Address, billing profile and documents back into the customer's account.
     await syncPaidOrderToAccount(orderId);
+    // The coupon's single use is counted here too, not only in the webhook.
+    await redeemCouponForOrder(orderId);
 
     // Emit the Oblio invoice. This path is the Hosted-Checkout fallback used
     // when the Stripe webhook is slow/misses, so without this the order would

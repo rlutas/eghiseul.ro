@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { requirePermission } from '@/lib/admin/permissions';
 import { createInvoiceFromOrder, findInvoiceTotalsMismatch } from '@/lib/oblio';
 import { syncPaidOrderToAccount } from '@/lib/account/sync-paid-order';
+import { redeemCouponForOrder } from '@/lib/coupons/redeem';
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -200,6 +201,8 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
     // Address, billing profile and documents back into the customer's account.
     await syncPaidOrderToAccount(id);
+    // The coupon's single use is counted here too, not only in the webhook.
+    await redeemCouponForOrder(id);
 
     // Add to order history
     await supabase.from('order_history').insert({

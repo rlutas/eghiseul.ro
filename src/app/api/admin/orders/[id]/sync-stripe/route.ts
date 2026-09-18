@@ -35,6 +35,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { requirePermission } from '@/lib/admin/permissions';
 import { syncPaidOrderToAccount } from '@/lib/account/sync-paid-order';
+import { redeemCouponForOrder } from '@/lib/coupons/redeem';
 
 export const runtime = 'nodejs';
 
@@ -130,6 +131,8 @@ export async function POST(
 
     // Address, billing profile and documents back into the customer's account.
     await syncPaidOrderToAccount(orderId);
+    // The coupon's single use is counted here too, not only in the webhook.
+    await redeemCouponForOrder(orderId);
 
     // Audit — use the actual admin user id so the timeline shows who clicked sync.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

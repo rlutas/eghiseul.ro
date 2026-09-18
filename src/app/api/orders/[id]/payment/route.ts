@@ -230,6 +230,11 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
           })
           .eq('id', id)
         console.warn(`Coupon ${order.coupon_code} rejected at payment for order ${id}`)
+        // Everything below (Stripe metadata, description, line items) reads
+        // `order`; a rejected code must not travel to Stripe as if granted.
+        order.coupon_code = null
+        ;(order as { discount_amount?: number | null }).discount_amount = 0
+        ;(order as { total_price?: number | string }).total_price = finalTotalPrice
       }
     }
 

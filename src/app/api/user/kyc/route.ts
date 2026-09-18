@@ -51,7 +51,12 @@ export async function GET() {
     // The identity document is whichever one the customer holds: a CI front, a
     // passport data page or a manually-uploaded act de identitate. Before this,
     // only a CI counted, so a passport holder could never become verified.
-    const docTypes = documents?.map((d: { document_type: string }) => d.document_type) || [];
+    // Only rows still in date count: an expired ID plus a fresh selfie is
+    // not a verified identity.
+    const docTypes =
+      documents
+        ?.filter((d: { expires_at: string | null }) => !d.expires_at || new Date(d.expires_at) > now)
+        .map((d: { document_type: string }) => d.document_type) || [];
     const hasFrontId =
       hasDocument('ci_front', docTypes) || hasDocument('passport_opened', docTypes);
     const hasSelfie = hasDocument('selfie', docTypes);

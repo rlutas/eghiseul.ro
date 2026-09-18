@@ -34,11 +34,21 @@ export function sameAddress(a: object | null | undefined, b: object | null | und
   if (cx && cy && cx !== cy) return false;
   const kx = addressToken(x.country), ky = addressToken(y.country);
   if (kx && ky && kx !== ky) return false;
-  return (
-    addressToken(x.street) === addressToken(y.street) &&
-    addressToken(x.number) === addressToken(y.number) &&
-    addressToken(x.city) === addressToken(y.city)
-  );
+  if (
+    addressToken(x.street) !== addressToken(y.street) ||
+    addressToken(x.number) !== addressToken(y.number) ||
+    addressToken(x.city) !== addressToken(y.city)
+  ) {
+    return false;
+  }
+  // Same building, different flat: two places. Compared when BOTH sides name
+  // the part — a bare OCR address (no apartment read) still matches the row
+  // the customer saved with one, instead of becoming a second row.
+  for (const part of ['building', 'staircase', 'floor', 'apartment'] as const) {
+    const px = addressToken(x[part]), py = addressToken(y[part]);
+    if (px && py && px !== py) return false;
+  }
+  return true;
 }
 
 /** The first saved row that is the same place, or `null`. */

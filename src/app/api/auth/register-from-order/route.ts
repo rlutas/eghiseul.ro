@@ -253,6 +253,7 @@ export async function POST(request: Request) {
         // the sync that runs for an EXISTING account after payment.
         await copyOrderKycDocumentsToAccount(adminClient, {
           userId: authData.user.id,
+          orderId,
           uploadedDocuments: (personalData?.uploadedDocuments || []) as OrderUploadedDocument[],
           ocrResults: (personalData?.ocrResults || []) as OrderOcrResult[],
           logPrefix: 'register-from-order',
