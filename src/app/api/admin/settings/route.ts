@@ -162,10 +162,10 @@ export async function PATCH(request: NextRequest) {
     }
     if (key === 'lifecycle_emails') {
       const v = value as Record<string, unknown> | null;
-      const keys = ['reviewRequest', 'expiryReminder', 'crossSell'];
+      const keys = ['reviewRequest', 'expiryReminder', 'crossSell', 'vehicleReminder'];
       if (!v || typeof v !== 'object' || keys.some((k) => typeof v[k] !== 'boolean')) {
         return NextResponse.json(
-          { success: false, error: 'Setare invalidă: { reviewRequest, expiryReminder, crossSell: boolean }' },
+          { success: false, error: 'Setare invalidă: { reviewRequest, expiryReminder, crossSell, vehicleReminder: boolean }' },
           { status: 400 }
         );
       }

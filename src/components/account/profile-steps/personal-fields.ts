@@ -51,10 +51,7 @@ export function isoDate(date: Date): string {
 }
 
 /** „02.07.1992" as the OCR returns it → „1992-07-02" for a date input. */
-export function isoFromRomanianDate(value?: string | null): string {
-  const match = /^(\d{2})[.\-/](\d{2})[.\-/](\d{4})$/.exec((value ?? '').trim());
-  return match ? `${match[3]}-${match[2]}-${match[1]}` : '';
-}
+export { isoFromRomanianDate } from '@/lib/format/romanian-date';
 
 /** The date of birth a CNP carries, or '' when the CNP is not a valid one. */
 export function birthDateFromCnp(cnp: string): string {

@@ -36,6 +36,7 @@ import {
   FileText,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { formatPersonName } from '@/lib/format/person-name';
 
 export type BillingType = 'persoana_fizica' | 'persoana_juridica';
 
@@ -308,23 +309,6 @@ export default function BillingProfileForm({
             </div>
           </button>
         </div>
-      </div>
-
-      {/* Label */}
-      <div className="space-y-2">
-        <Label htmlFor="label" className="text-secondary-900 font-medium">
-          Etichetă profil <span className="text-red-500">*</span>
-        </Label>
-        <Input
-          id="label"
-          type="text"
-          value={value.label || ''}
-          onChange={(e) => updateField('label', e.target.value)}
-          placeholder={billingType === 'persoana_fizica' ? 'ex: Personal' : 'ex: Firma mea SRL'}
-          className="bg-white h-11"
-          {...errorProps('label')}
-        />
-        <FieldError field="label" message={fieldError('label')} />
       </div>
 
       {/* Persoană Fizică Fields */}
@@ -662,6 +646,34 @@ export default function BillingProfileForm({
           )}
         </div>
       )}
+      {/* The name of the profile, last (Raul, 18.09.2026): for a company the
+          CUI comes first and ANAF fills the rest, so the name is known by the
+          time this is reached — it is filled in automatically and only needs
+          a look. Same for a person once the name fields are typed. */}
+      <div className="space-y-2">
+        <Label htmlFor="label" className="text-secondary-900 font-medium">
+          Etichetă profil <span className="text-red-500">*</span>
+        </Label>
+        <Input
+          id="label"
+          type="text"
+          value={value.label || ''}
+          onChange={(e) => updateField('label', e.target.value)}
+          placeholder={billingType === 'persoana_fizica' ? 'ex: Personal' : 'ex: Firma mea SRL'}
+          onFocus={() => {
+            if (value.label) return;
+            const suggested =
+              billingType === 'persoana_juridica'
+                ? value.companyName || ''
+                : formatPersonName(value.lastName, value.firstName);
+            if (suggested) updateField('label', suggested);
+          }}
+          className="bg-white h-11"
+          {...errorProps('label')}
+        />
+        <FieldError field="label" message={fieldError('label')} />
+      </div>
+
     </div>
   );
 }

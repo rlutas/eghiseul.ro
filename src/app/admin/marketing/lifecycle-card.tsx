@@ -13,15 +13,17 @@ import { Card, CardContent } from '@/components/ui/card';
 import { RefreshCw, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 
-type Kind = 'review_request' | 'expiry_reminder' | 'cross_sell';
+type Kind = 'review_request' | 'expiry_reminder' | 'cross_sell' | 'vehicle_reminder';
 interface Settings {
   reviewRequest: boolean;
   expiryReminder: boolean;
   crossSell: boolean;
+  /** Rovinietă / ITP / RCA pentru mașinile din cont. Pornit implicit (Raul, 18.09.2026). */
+  vehicleReminder: boolean;
 }
-type Stats = Record<Kind, { sent: number; sent30d: number; failed: number }>;
+type Stats = Partial<Record<Kind, { sent: number; sent30d: number; failed: number }>>;
 
-const DEFAULTS: Settings = { reviewRequest: false, expiryReminder: false, crossSell: false };
+const DEFAULTS: Settings = { reviewRequest: false, expiryReminder: false, crossSell: false, vehicleReminder: true };
 
 const ROWS: Array<{ key: keyof Settings; kind: Kind; label: string; hint: string }> = [
   {
@@ -41,6 +43,12 @@ const ROWS: Array<{ key: keyof Settings; kind: Kind; label: string; hint: string
     kind: 'cross_sell',
     label: 'Cross-sell (documente înrudite)',
     hint: 'La 30–60 zile după finalizare, 2 documente care au sens după cel cumpărat. Maxim un email per client la 6 luni.',
+  },
+  {
+    key: 'vehicleReminder',
+    kind: 'vehicle_reminder',
+    label: 'Reminder mașini (rovinietă / ITP / RCA)',
+    hint: 'Pentru mașinile salvate în cont: cu 14 zile înainte de expirare (și până la 30 după), o dată per dată de expirare. Rovinieta trimite pe erovinieta.net cu numărul completat.',
   },
 ];
 

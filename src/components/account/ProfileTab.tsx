@@ -40,6 +40,7 @@ import { uploadToS3 } from '@/lib/aws/upload-client';
 import { base64ToFile } from '@/lib/images/compress';
 import { PhoneInput } from '@/components/shared/PhoneInput';
 import { validatePhone } from '@/lib/format/validate-phone';
+import { formatRoDateLoose } from '@/lib/format/romanian-date';
 
 interface ProfileData {
   id: string;
@@ -695,11 +696,7 @@ export default function ProfileTab({ initialData, className, autoEdit = false }:
                     <div className="flex-1">
                       <p className="text-sm text-neutral-500">Valabil Până La</p>
                       <p className="font-medium text-secondary-900">
-                        {new Date(profile.documentExpiry).toLocaleDateString('ro-RO', {
-                          day: 'numeric',
-                          month: 'long',
-                          year: 'numeric',
-                        })}
+                        {formatRoDateLoose(profile.documentExpiry)}
                       </p>
                     </div>
                   </div>

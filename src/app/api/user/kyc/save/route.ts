@@ -10,6 +10,8 @@ import {
 } from '@/lib/kyc/identity-documents';
 import { KYC_VALIDITY_DAYS } from '@/lib/kyc/constants';
 import { billingProfileFromIdData, hasUsableAddress } from '@/lib/account/id-data-to-profile';
+import { findSameAddress } from '@/lib/account/same-address';
+import { toIsoDate } from '@/lib/format/romanian-date';
 
 /**
  * POST /api/user/kyc/save
@@ -81,9 +83,11 @@ export async function POST(request: Request) {
     const now = new Date();
     let expiresAt: string;
 
-    if (documentExpiry) {
-      // Use document expiry date
-      expiresAt = new Date(documentExpiry).toISOString();
+    const documentExpiryIso = toIsoDate(typeof documentExpiry === 'string' ? documentExpiry : null);
+    if (documentExpiryIso) {
+      // The document's own date („02.07.2029" as printed, or ISO) — read
+      // tolerantly; `new Date('02.07.2029')` is Invalid Date and threw here.
+      expiresAt = new Date(`${documentExpiryIso}T00:00:00Z`).toISOString();
     } else {
       // Use KYC validity period
       expiresAt = new Date(now.getTime() + KYC_VALIDITY_DAYS * 24 * 60 * 60 * 1000).toISOString();
@@ -150,14 +154,18 @@ export async function POST(request: Request) {
       // The address from the document, kept under its own label so it is
       // distinguishable from one the customer wrote.
       if (hasUsableAddress(extractedData.address)) {
+        // The same place under any label counts as existing — the personal
+        // step's own save and this one used to produce two „Adresă din act".
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { data: existingAddress } = await (supabase as any)
+        const { data: savedAddresses } = await (supabase as any)
           .from('user_saved_data')
-          .select('id')
+          .select('id, label, data')
           .eq('user_id', user.id)
-          .eq('data_type', 'address')
-          .eq('label', 'Adresă din act')
-          .maybeSingle();
+          .eq('data_type', 'address');
+        const existingAddress = findSameAddress(
+          (savedAddresses ?? []) as Array<{ id: string; label: string; data: Record<string, unknown> }>,
+          extractedData.address as Record<string, unknown>
+        );
 
         if (existingAddress) {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { normalizePhone } from '@/lib/format/normalize-phone';
 import { validatePhone } from '@/lib/format/validate-phone';
+import { toIsoDate } from '@/lib/format/romanian-date';
 
 /**
  * PATCH /api/user/profile
@@ -235,7 +236,9 @@ export async function GET() {
                      kycDoc.document_type === 'passport' ? 'Pașaport' :
                      extractedData.documentType || 'Document Identitate';
 
-      documentExpiry = extractedData.expiryDate || kycDoc.expires_at || null;
+      // As printed on the document („02.07.2029") or as stored — always ISO
+      // out, so the tab never renders „Invalid Date".
+      documentExpiry = toIsoDate(extractedData.expiryDate) || toIsoDate(kycDoc.expires_at) || null;
     }
 
     // Cast to any for columns not in generated types (birth_date, birth_place from migration 015)

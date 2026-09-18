@@ -145,6 +145,49 @@ describe('POST /api/user/addresses', () => {
     expect(res.status).toBe(401);
   });
 
+  it('returns the existing row instead of saving the same place twice', async () => {
+    // The scan in „Date personale" and the document save both saved „Adresă
+    // din act" (18.09.2026). The same street + number + locality, however it
+    // is spelled, now comes back as the row that already exists.
+    const insert = vi.fn();
+    fromMock.mockReturnValue({
+      select: vi.fn().mockReturnValue({
+        eq: vi.fn().mockReturnValue({
+          eq: vi.fn().mockResolvedValue({
+            data: [
+              {
+                id: 'addr-existing',
+                label: 'Adresă din act',
+                data: { street: 'Strada Salcâmilor', number: '2', city: 'Odoreu', county: 'Satu Mare' },
+                is_default: true,
+                created_at: '2026-09-18T07:00:00Z',
+                updated_at: '2026-09-18T07:00:00Z',
+              },
+            ],
+            error: null,
+          }),
+        }),
+      }),
+      insert,
+    });
+
+    const res = await POST(makeReq({
+      label: 'Adresă din act',
+      street: 'Salcamilor',
+      number: 'Nr. 2',
+      city: 'ODOREU',
+      county: 'Satu Mare',
+      isDefault: true,
+    }));
+
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.success).toBe(true);
+    expect(body.deduplicated).toBe(true);
+    expect(body.data.id).toBe('addr-existing');
+    expect(insert).not.toHaveBeenCalled();
+  });
+
   it('creates address and returns 201 with flattened response shape', async () => {
     fromMock.mockReturnValue({
       insert: vi.fn().mockReturnValue({

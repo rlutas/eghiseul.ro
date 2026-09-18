@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { findSameAddress } from '@/lib/account/same-address';
 import { createClient } from '@/lib/supabase/server';
 
 /**
@@ -81,6 +82,46 @@ export async function POST(request: Request) {
 
     const body = await request.json();
     const { label, isDefault, ...addressData } = body;
+
+    // The same place saved twice — by the scan in „Date personale" and by
+    // the document save, or typed once more — used to become two rows, both
+    // „Adresă din act". Now the existing row is returned (and made default
+    // when asked), so every caller is idempotent without knowing it.
+    type SavedRow = { id: string; label: string; data: Record<string, unknown>; is_default: boolean; created_at: string; updated_at: string };
+    let existingRows: SavedRow[] = [];
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data } = await (supabase as any)
+        .from('user_saved_data')
+        .select('id, label, data, is_default, created_at, updated_at')
+        .eq('user_id', user.id)
+        .eq('data_type', 'address');
+      existingRows = (data ?? []) as SavedRow[];
+    } catch (lookupError) {
+      // A failed lookup must not block saving; worst case is the old duplicate.
+      console.error('Address dedupe lookup failed:', lookupError);
+    }
+    const duplicate = findSameAddress(existingRows, addressData);
+    if (duplicate) {
+      if (isDefault && !duplicate.is_default) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await (supabase as any).from('user_saved_data').update({ is_default: false }).eq('user_id', user.id).eq('data_type', 'address');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await (supabase as any).from('user_saved_data').update({ is_default: true }).eq('id', duplicate.id);
+      }
+      return NextResponse.json({
+        success: true,
+        data: {
+          id: duplicate.id,
+          label: duplicate.label,
+          ...duplicate.data,
+          isDefault: isDefault ? true : duplicate.is_default,
+          createdAt: duplicate.created_at,
+          updatedAt: duplicate.updated_at,
+        },
+        deduplicated: true,
+      });
+    }
 
     // If setting as default, unset other defaults first
     if (isDefault) {

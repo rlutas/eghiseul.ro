@@ -38,6 +38,7 @@ import {
 } from '@/lib/account/order-to-billing-profile';
 import { isIdentityDocumentType } from '@/lib/kyc/identity-documents';
 import { normalizePhone } from '@/lib/format/normalize-phone';
+import { sameAddress } from '@/lib/account/same-address';
 import type { AddressData } from '@/components/shared/AddressForm';
 import type { BillingData } from '@/components/shared/BillingProfileForm';
 
@@ -45,18 +46,6 @@ const LOG = '[account-sync]';
 
 type Unknowns = Record<string, unknown>;
 const str = (v: unknown): string => (typeof v === 'string' ? v.trim() : '');
-
-/** Lower-case, no diacritics, one space — so „Str. Memorandumului" = „str memorandumului". */
-function addressToken(value: unknown): string {
-  return str(value)
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .replace(/[.,;]/g, ' ')
-    .replace(/\b(str|strada|nr|numarul|bl|bloc|ap|apartament|sc|scara|et|etaj)\b/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
-}
 
 /**
  * The saved-address row an order's `delivery_address` becomes, or `null` when
@@ -83,20 +72,8 @@ export function savedAddressFromDelivery(delivery: Unknowns | null | undefined):
   };
 }
 
-/** Same place, whatever the spelling: street + number + locality. */
-export function sameAddress(
-  a: Partial<AddressData> | Unknowns | null | undefined,
-  b: Partial<AddressData> | Unknowns | null | undefined
-): boolean {
-  if (!a || !b) return false;
-  const x = a as Unknowns;
-  const y = b as Unknowns;
-  return (
-    addressToken(x.street) === addressToken(y.street) &&
-    addressToken(x.number) === addressToken(y.number) &&
-    addressToken(x.city) === addressToken(y.city)
-  );
-}
+/** Same place, whatever the spelling — shared with the address API and the KYC save. */
+export { sameAddress };
 
 /** Same person (CNP) or the same company (CUI) already has a profile. */
 export function sameBillingProfile(

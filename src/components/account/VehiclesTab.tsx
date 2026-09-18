@@ -11,7 +11,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Car, Plus, Pencil, Trash2, Star, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { Car, Plus, Pencil, Trash2, Star, AlertTriangle, CheckCircle2, Search } from 'lucide-react';
+import { ErovinietaEmbed } from '@/components/tools/erovinieta-embed';
 import { toast } from 'sonner';
 import { expiryStatus } from '@/lib/vehicles/expiry';
 
@@ -72,7 +73,8 @@ export default function VehiclesTab() {
 
   useEffect(() => { load(); }, [load]);
 
-  const startAdd = () => { setForm(EMPTY); setEditingId(null); setShowForm(true); };
+  const [showCheck, setShowCheck] = useState(false);
+  const startAdd = () => { setForm(EMPTY); setEditingId(null); setShowForm(true); setShowCheck(false); };
   const startEdit = (v: SavedVehicle) => { setForm(v); setEditingId(v.id); setShowForm(true); };
 
   const save = async () => {
@@ -114,7 +116,7 @@ export default function VehiclesTab() {
     <div className="space-y-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm text-neutral-500">
-          Salvează mașinile + termenele ITP/asigurare/rovinietă — le refolosești la comandă și vezi când expiră.
+          Salvează mașina și termenele: te anunțăm pe email cu 14 zile înainte să expire rovinieta, ITP-ul sau RCA-ul.
         </p>
         <Button onClick={startAdd} className="min-h-[44px] w-full sm:w-auto">
           <Plus className="h-4 w-4" /> Adaugă mașină
@@ -161,55 +163,77 @@ export default function VehiclesTab() {
       {showForm && (
         <div className="rounded-xl border border-neutral-200 bg-neutral-50/50 p-4 space-y-3">
           <p className="font-semibold text-secondary-900">{editingId ? 'Editează mașina' : 'Mașină nouă'}</p>
+          {/* What matters for the account (Raul, 18.09.2026): the plate, the
+              three dates we can remind about, and just enough to tell two cars
+              apart. VIN, year and the licence number are gone from the form —
+              nothing in the account or the order needs them. */}
           <div className="grid gap-3 sm:grid-cols-2">
             <div className="space-y-1.5">
-              <Label>Nr. înmatriculare *</Label>
-              <Input value={form.plate_number ?? ''} onChange={(e) => field('plate_number', e.target.value.toUpperCase())} placeholder="SM 12 ABC" />
+              <Label htmlFor="vehicle-plate">Nr. înmatriculare *</Label>
+              <Input id="vehicle-plate" value={form.plate_number ?? ''} onChange={(e) => field('plate_number', e.target.value.toUpperCase())} placeholder="SM 12 ABC" className="h-11" />
             </div>
             <div className="space-y-1.5">
-              <Label>Etichetă</Label>
-              <Input value={form.label ?? ''} onChange={(e) => field('label', e.target.value)} placeholder="ex: Golf alb" />
+              <Label htmlFor="vehicle-label">Cum îi spui (opțional)</Label>
+              <Input id="vehicle-label" value={form.label ?? ''} onChange={(e) => field('label', e.target.value)} placeholder="ex: Golf alb" className="h-11" />
             </div>
             <div className="space-y-1.5">
-              <Label>Marcă</Label>
-              <Input value={form.brand ?? ''} onChange={(e) => field('brand', e.target.value)} placeholder="Volkswagen" />
+              <Label htmlFor="vehicle-brand">Marcă</Label>
+              <Input id="vehicle-brand" value={form.brand ?? ''} onChange={(e) => field('brand', e.target.value)} placeholder="Volkswagen" className="h-11" />
             </div>
             <div className="space-y-1.5">
-              <Label>Model</Label>
-              <Input value={form.model ?? ''} onChange={(e) => field('model', e.target.value)} placeholder="Golf" />
+              <Label htmlFor="vehicle-model">Model</Label>
+              <Input id="vehicle-model" value={form.model ?? ''} onChange={(e) => field('model', e.target.value)} placeholder="Golf" className="h-11" />
             </div>
-            <div className="space-y-1.5">
-              <Label>An</Label>
-              <Input type="number" value={form.year ?? ''} onChange={(e) => field('year', e.target.value ? Number(e.target.value) : null)} placeholder="2020" />
+          </div>
+
+          <div className="rounded-xl border border-neutral-200 bg-white p-3 sm:p-4">
+            <p className="text-sm font-semibold text-secondary-900">Termene — te anunțăm pe email când expiră</p>
+            <p className="mt-0.5 text-xs leading-relaxed text-neutral-500">
+              Cu 14 zile înainte. Pentru rovinietă primești și linkul de cumpărare, cu numărul completat.
+            </p>
+            <div className="mt-3 grid gap-3 sm:grid-cols-3">
+              <div className="space-y-1.5">
+                <Label htmlFor="vehicle-rovinieta">Expirare rovinietă</Label>
+                <Input id="vehicle-rovinieta" type="date" value={form.rovinieta_expiry ?? ''} onChange={(e) => field('rovinieta_expiry', e.target.value)} className="h-11" />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="vehicle-itp">Expirare ITP</Label>
+                <Input id="vehicle-itp" type="date" value={form.itp_expiry ?? ''} onChange={(e) => field('itp_expiry', e.target.value)} className="h-11" />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="vehicle-rca">Expirare RCA</Label>
+                <Input id="vehicle-rca" type="date" value={form.insurance_expiry ?? ''} onChange={(e) => field('insurance_expiry', e.target.value)} className="h-11" />
+              </div>
             </div>
-            <div className="space-y-1.5">
-              <Label>Serie șasiu (VIN)</Label>
-              <Input value={form.vin ?? ''} onChange={(e) => field('vin', e.target.value.toUpperCase())} placeholder="WVWZZZ..." />
-            </div>
-            <div className="space-y-1.5">
-              <Label>Nr. permis conducere</Label>
-              <Input value={form.driving_license ?? ''} onChange={(e) => field('driving_license', e.target.value)} />
-            </div>
-            <div className="space-y-1.5">
-              <Label>Expirare ITP</Label>
-              <Input type="date" value={form.itp_expiry ?? ''} onChange={(e) => field('itp_expiry', e.target.value)} />
-            </div>
-            <div className="space-y-1.5">
-              <Label>Expirare asigurare (RCA)</Label>
-              <Input type="date" value={form.insurance_expiry ?? ''} onChange={(e) => field('insurance_expiry', e.target.value)} />
-            </div>
-            <div className="space-y-1.5">
-              <Label>Expirare rovinietă</Label>
-              <Input type="date" value={form.rovinieta_expiry ?? ''} onChange={(e) => field('rovinieta_expiry', e.target.value)} />
-            </div>
+
+            {/* The rovinietă check is erovinieta.net's own widget, embedded. It
+                shows the validity; it does not hand the date back to us, so the
+                customer copies it into the field above. */}
+            <button
+              type="button"
+              onClick={() => setShowCheck((v) => !v)}
+              aria-expanded={showCheck}
+              className="mt-3 inline-flex min-h-[44px] items-center gap-2 rounded-xl border border-primary-300 bg-primary-50 px-3 text-sm font-semibold text-secondary-900 hover:bg-primary-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
+            >
+              <Search className="h-4 w-4" aria-hidden="true" />
+              {showCheck ? 'Ascunde verificarea rovinietei' : 'Nu știi până când e valabilă rovinieta? Verifică aici'}
+            </button>
+            {showCheck && (
+              <div className="mt-3 overflow-hidden rounded-xl border border-neutral-200">
+                <ErovinietaEmbed />
+                <p className="border-t border-neutral-100 bg-neutral-50 px-3 py-2 text-xs text-neutral-500">
+                  Scrie data afișată în câmpul „Expirare rovinietă&quot; de mai sus.
+                </p>
+              </div>
+            )}
           </div>
           <label className="flex items-center gap-2 text-sm cursor-pointer">
             <input type="checkbox" checked={!!form.is_default} onChange={(e) => field('is_default', e.target.checked)} />
             Mașină implicită
           </label>
           <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={() => setShowForm(false)}>Anulează</Button>
-            <Button onClick={save} disabled={saving}>{saving ? 'Se salvează...' : 'Salvează'}</Button>
+            <Button variant="outline" onClick={() => setShowForm(false)} className="min-h-[44px]">Anulează</Button>
+            <Button onClick={save} disabled={saving} className="min-h-[44px]">{saving ? 'Se salvează...' : 'Salvează'}</Button>
           </div>
         </div>
       )}
