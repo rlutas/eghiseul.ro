@@ -32,9 +32,16 @@ A patra tranșă din testele lui Raul. Ce se schimbă pentru client:
   de plată și cardul de transfer dispar; badge-ul devine „Dovadă verificată".
   Cardul cu IBAN + upload apare doar cât comanda e pe „Așteptare plată".
 
-Nimic nou pentru voi în admin. Punctele 26–34 sunt reparate fără inspecție
-Codex separată (bugetul buclei anterioare e consumat); dacă vrei o rundă,
-spune.
+Nimic nou pentru voi în admin.
+
+**Inspecția Codex pe aceste puncte (sesiune nouă): 4 constatări, reparate**
+- Easybox chiar nu se estima nici după primul fix: Sameday cere județ +
+  localitate și la locker (verificat live: Odoreu 21,13 lei net față de 25,33
+  din fallback și 29,80 la adresă). Reparat; iar după ce clientul alege
+  lockerul, prețul se re-estimează pentru lockerul lui.
+- Facturarea: alegerea PF/PJ se calculează din datele comenzii la fiecare
+  afișare (o comandă PJ nu mai poate arăta „Pe mine" lângă factura pe firmă);
+  la imobiliare, „Pe mine" folosește numele/CNP-ul din pasul de imobil.
 
 ---
 
@@ -61,6 +68,14 @@ spune.
   preselecție la mount (firma din comandă → firma din cont → „pe mine");
   `PickRow` în locul `SavedProfileCard`; grila veche cu 3 carduri eliminată.
 - **33** checkout: `shrink-0 whitespace-nowrap` pe butonul din bara sticky.
+- **Inspecție Codex (REVISE, 4)**: REV-BILL-001 — `pick` derivat cu `useMemo`
+  din `billing` + context (`manualPick` doar pentru clicul explicit fără date),
+  preselecție într-un efect pe `pick`; REV-BILL-002 — `propertyRequester` din
+  `state.property.ownerName/ownerCnpCui` în `meAvailable`/`applyMe`;
+  REV-SD-001 — `awbRecipient` cu `county/city/address` și la locker +
+  `oohLastMile` (fără `lockerId`), verificat live cu `SamedayProvider`;
+  REV-SD-002 — `delivery-step` re-estimează cu `locker_id` la alegerea
+  lockerului și actualizează cotația în loc.
 - **34** status: cardul de transfer doar la `status='awaiting_payment'`; badge
   „Dovadă verificată" când `payment_status='awaiting_verification'` și statusul
   a trecut mai departe (`work_started_on_proof`).

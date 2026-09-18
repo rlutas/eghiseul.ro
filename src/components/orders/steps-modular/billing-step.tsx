@@ -313,39 +313,51 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
   // account), the saved firm, the firm from the request, or „altă persoană /
   // altă firmă" with fields. What the account holds is preselected; the
   // fields open only on request or when the preselected data is incomplete.
+  //
+  // `pick` is DERIVED from the shared billing state every render (Codex
+  // REV-BILL-001): a fresh wizard starts with `source='self'` and no data, and
+  // the PJ auto-default effect below rewrites the source to `company` after
+  // mount — a one-time state would show „Pe mine" next to a company invoice.
+  // `manualPick` only remembers the customer's last explicit click where the
+  // data alone cannot tell („Pe mine" with no data yet vs „Altă persoană").
   const savedPjData = savedPjProfile?.billing_data as Record<string, string> | undefined;
   const hasSavedPj = !!(savedPjData?.cui && savedPjData?.companyName);
   const selfOptionExists = billingOptions.some((o) => o.source === 'self');
-  const meAvailable = selfOptionExists || !!savedPfPrefill || (pfOptionIsCustomer && !!prefillFromId);
+  // Property services collect the requester on the property step, not a
+  // scanned ID (REV-BILL-002): „Pe mine" uses that name/CNP.
+  const propertyRequester = useMemo(() => {
+    const name = (state.property?.ownerName || '').trim();
+    const cnp = (state.property?.ownerCnpCui || '').replace(/\D/g, '');
+    if (!name) return null;
+    const parts = name.split(/\s+/);
+    return { lastName: parts[0] || '', firstName: parts.slice(1).join(' '), cnp: cnp.length === 13 ? cnp : '' };
+  }, [state.property?.ownerName, state.property?.ownerCnpCui]);
+  const meAvailable = selfOptionExists || !!savedPfPrefill || !!propertyRequester || (pfOptionIsCustomer && !!prefillFromId);
   const requestPjAvailable = !!companyKyc?.cui && !!companyKyc?.companyName;
   type BillingPick = 'me' | 'other_pf' | 'saved_pj' | 'request_pj' | 'other_pj';
-  const [pick, setPick] = useState<BillingPick | null>(() => {
-    // A restored draft: recognise what it carries.
+  const [manualPick, setManualPick] = useState<'me' | 'other_pf' | 'other_pj' | null>(null);
+  const [editing, setEditing] = useState(false);
+  const pick = useMemo<BillingPick | null>(() => {
     const b = billing;
     if (!b?.source) return null;
     const digits = (v?: string | null) => (v || '').replace(/\D/g, '');
-    if (b.source === 'self') return 'me';
+    if (b.source === 'company') {
+      if (savedPjData?.cui && digits(b.cui) && digits(b.cui) === digits(savedPjData.cui)) return 'saved_pj';
+      if (companyKyc?.cui && digits(b.cui) && digits(b.cui) === digits(companyKyc.cui)) return 'request_pj';
+      return b.companyName || b.cui || manualPick === 'other_pj' ? 'other_pj' : null;
+    }
+    if (b.source === 'self') return b.firstName || b.cnp || manualPick === 'me' ? 'me' : null;
     if (b.source === 'other_pf') {
+      if (manualPick === 'other_pf') return 'other_pf';
+      if (manualPick === 'me' || usedSavedPfProfile) return 'me';
       if (savedPfPrefill?.cnp && b.cnp === savedPfPrefill.cnp) return 'me';
+      if (propertyRequester?.cnp && b.cnp === propertyRequester.cnp) return 'me';
       if (!selfOptionExists && pfOptionIsCustomer && prefillFromId?.cnp && b.cnp === prefillFromId.cnp) return 'me';
       return b.firstName || b.lastName || b.cnp ? 'other_pf' : null;
     }
-    if (b.source === 'company') {
-      if (savedPjData?.cui && digits(b.cui) === digits(savedPjData.cui)) return 'saved_pj';
-      if (companyKyc?.cui && digits(b.cui) === digits(companyKyc.cui)) return 'request_pj';
-      return b.companyName || b.cui ? 'other_pj' : null;
-    }
     return null;
-  });
-  const [editing, setEditing] = useState(false);
+  }, [billing, savedPjData, companyKyc?.cui, manualPick, usedSavedPfProfile, savedPfPrefill, propertyRequester, selfOptionExists, pfOptionIsCustomer, prefillFromId]);
   const top: 'PF' | 'PJ' | null = pick === null ? null : pick === 'me' || pick === 'other_pf' ? 'PF' : 'PJ';
-  // Data written by the wizard itself before this step mounted (PJ order →
-  // the firm from the request) is recognised the same way.
-  useEffect(() => {
-    if (pick !== null || !billing?.source) return;
-    if (billing.source === 'company' && billing.companyName) setPick(requestPjAvailable ? 'request_pj' : 'other_pj');
-    else if (billing.source === 'self' && billing.firstName) setPick('me');
-  }, [pick, billing?.source, billing?.companyName, billing?.firstName, requestPjAvailable]);
   const prefilledPick = pick === 'me' || pick === 'saved_pj' || pick === 'request_pj';
   const showForm = !!pick && (editing || !prefilledPick || !billing?.isValid);
 
@@ -654,7 +666,7 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
   // PJ counts as verified — the profile was saved from an ANAF lookup.
   const applySavedPf = useCallback(() => {
     if (!savedPfPrefill) return;
-    setPick('me');
+    setManualPick('me');
     setEditing(false);
     setForeignToggle(false);
     setCompanyMode('request');
@@ -683,7 +695,7 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
 
   const applySavedPj = useCallback(() => {
     if (!savedPjData?.cui || !savedPjData?.companyName) return;
-    setPick('saved_pj');
+    setManualPick(null);
     setEditing(false);
     setForeignToggle(false);
     setCompanyMode('request');
@@ -708,15 +720,23 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
   // profile, else the requester's own data (imobiliare).
   const applyMe = useCallback(() => {
     setEditing(false);
-    setPick('me');
+    setManualPick('me');
     if (selfOptionExists) handleSourceSelect('self');
     else if (savedPfPrefill) applySavedPf();
-    else handleSourceSelect('other_pf');
-  }, [selfOptionExists, savedPfPrefill, applySavedPf, handleSourceSelect]);
+    else if (propertyRequester) {
+      const pfFields = { firstName: propertyRequester.firstName, lastName: propertyRequester.lastName, cnp: propertyRequester.cnp, address: '', city: '', county: '', postalCode: '', country: 'Romania' };
+      updateBilling({
+        source: 'other_pf', type: 'persoana_fizica', ...pfFields,
+        companyName: undefined, cui: undefined, regCom: undefined, companyAddress: undefined, cuiVerified: undefined,
+        isValid: false, // the address is still to be typed
+      });
+      setUsedSavedPfProfile(false);
+    } else handleSourceSelect('other_pf');
+  }, [selfOptionExists, savedPfPrefill, applySavedPf, handleSourceSelect, propertyRequester, updateBilling]);
   // „Altă persoană": empty fields, whatever the profile holds.
   const applyOtherPf = useCallback(() => {
     setEditing(true);
-    setPick('other_pf');
+    setManualPick('other_pf');
     setForeignToggle(false);
     setCompanyMode('request');
     updateBilling({
@@ -732,27 +752,30 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
   // The firm from the request (PJ order / constatator pe firmă).
   const applyRequestPj = useCallback(() => {
     setEditing(false);
-    setPick('request_pj');
+    setManualPick(null);
     setCompanyMode('request');
     handleSourceSelect('company');
   }, [handleSourceSelect]);
   // „Altă firmă": CUI to type, verified at ANAF.
   const applyOtherPj = useCallback(() => {
     setEditing(true);
-    setPick('other_pj');
+    setManualPick('other_pj');
     handleOptionClick({ source: 'company', id: 'other_company', label: '', description: '', icon: Building2 });
   }, [handleOptionClick]);
 
-  // Preselection for a fresh step: the request's firm, the saved firm, or „pe mine".
+  // Preselection for a fresh step (nothing derivable yet): the request's firm
+  // is written by the PJ auto-default effect above; otherwise the saved firm
+  // (PJ-first services) or „pe mine". Once.
   const preselectedRef = useRef(false);
   useEffect(() => {
-    if (preselectedRef.current || pick !== null || billing?.source) return;
-    preselectedRef.current = true;
-    if (companyFirst && requestPjAvailable) applyRequestPj();
-    else if (companyFirst && hasSavedPj) applySavedPj();
-    else if (meAvailable && (selfOptionExists || savedPfPrefill)) applyMe();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    if (preselectedRef.current) return;
+    if (pick !== null) { preselectedRef.current = true; return; }
+    if (companyFirst) {
+      if (!requestPjAvailable && hasSavedPj) { preselectedRef.current = true; applySavedPj(); }
+      return;
+    }
+    if (meAvailable) { preselectedRef.current = true; applyMe(); }
+  }, [pick, companyFirst, requestPjAvailable, hasSavedPj, meAvailable, applyMe, applySavedPj]);
 
   // Update field
   const updateField = useCallback((field: keyof BillingState, value: string) => {
@@ -920,7 +943,9 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
                     ? 'datele din actul de identitate'
                     : savedPfPrefill
                       ? `${[savedPfPrefill.lastName, savedPfPrefill.firstName].filter(Boolean).join(' ')}${savedPfPrefill.cnp ? ` · CNP ${savedPfPrefill.cnp}` : ''}`
-                      : 'datele tale din comandă'
+                      : propertyRequester
+                        ? `${[propertyRequester.lastName, propertyRequester.firstName].filter(Boolean).join(' ')}${propertyRequester.cnp ? ` · CNP ${propertyRequester.cnp}` : ''} — completezi adresa`
+                        : 'datele tale din comandă'
                 }
                 onClick={applyMe}
               />

@@ -871,6 +871,48 @@ export function DeliveryStepModular({ onValidChange }: DeliveryStepProps) {
     }
   }, [lockers, selectedLocker]);
 
+  // The locker price is per zone, but the estimate was made for SOME locker
+  // in the city; once the customer picks theirs, re-estimate that one and
+  // update the quote in place (no reset of the selection) — Codex REV-SD-002.
+  const requotedLockerRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!selectedLocker || !selectedQuote || !isLockerQuote(selectedQuote) || selectedQuote.provider !== 'sameday') return;
+    if (requotedLockerRef.current === selectedLocker.id) return;
+    requotedLockerRef.current = selectedLocker.id;
+    const county = watchedCounty;
+    const city = watchedCity;
+    if (!county || !city) return;
+    let cancelled = false;
+    const params = new URLSearchParams({
+      senderCounty: SENDER_LOCATION.county,
+      senderCity: SENDER_LOCATION.city,
+      recipientCounty: county,
+      recipientCity: city,
+      weight: '0.5',
+      provider: 'sameday',
+      locker_id: selectedLocker.id,
+    });
+    fetch(`/api/courier/quote?${params}`)
+      .then((r) => r.json())
+      .then((data) => {
+        if (cancelled || !data?.success) return;
+        const fresh = (data.data?.quotes as CourierQuote[] | undefined)?.find((q) => q.service === selectedQuote.service);
+        if (!fresh) return;
+        const updated = {
+          ...selectedQuote,
+          originalPrice: fresh.price,
+          originalPriceWithVAT: fresh.priceWithVAT,
+          price: Math.max(applyMarkup(fresh.price), MIN_DELIVERY_PRICE),
+          priceWithVAT: Math.max(applyMarkup(fresh.priceWithVAT), MIN_DELIVERY_PRICE_WITH_VAT),
+        } as CourierQuote;
+        setQuotes((prev) => prev.map((q) => (q.service === updated.service && q.provider === updated.provider ? updated : q)));
+        setSelectedQuote(updated);
+      })
+      .catch(() => { /* keep the zone estimate */ });
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedLocker?.id, selectedQuote?.service]);
+
   // Validate step
   const selectedLockerId = selectedLocker?.id ?? null;
   const selectedQuoteService = selectedQuote?.service ?? null;

@@ -591,18 +591,19 @@ export class SamedayProvider implements CourierProvider {
         cashOnDelivery: request.cod ? String(request.cod) : '0',
         insuredValue: '0',
         thirdPartyPickup: '0',
+        // estimate-cost validates county + city on the recipient for EVERY
+        // service, locker included („You should send either county or
+        // countyString…", verified live 18.09.2026); the locker itself goes
+        // in `oohLastMile` below.
         awbRecipient: {
           name: 'Estimare',
           phoneNumber: '0700000000',
           personType: '0',
-          ...(isLocker
-            ? { email: '' }
-            : {
-                county: String(countyId),
-                city: String(cityId),
-                address: 'Estimare',
-                postalCode: request.recipient.postalCode || '',
-              }),
+          county: String(countyId),
+          city: String(cityId),
+          address: 'Estimare',
+          postalCode: request.recipient.postalCode || '',
+          ...(isLocker ? { email: 'estimare@eghiseul.ro' } : {}),
         },
         parcels: request.packages.map((p) => ({
           weight: String(p.weight),
@@ -617,7 +618,6 @@ export class SamedayProvider implements CourierProvider {
       // tariff — 35 lei for Odoreu with a locker next door (feedback 18.09.2026, #30).
       if (isLocker && lockerId) {
         body.oohLastMile = lockerId;
-        body.lockerId = lockerId;
       }
       // Sameday estimate-cost returns { amount, currency, time } — `amount` is
       // the net tariff in RON (verified live 2026-06-24).
