@@ -9,6 +9,8 @@ import { ProfileChecklist } from '@/components/account/ProfileChecklist'
 import { profileCompleteness, hasIdentityDocuments } from '@/lib/account/profile-completeness'
 import { formatPersonName } from '@/lib/format/person-name'
 import { syncUnsyncedPaidOrdersForUser } from '@/lib/account/sync-paid-order'
+import { ensureWelcomeCouponForUser } from '@/lib/coupons/welcome'
+import { WelcomeCouponCard } from '@/components/account/WelcomeCouponCard'
 import { parseInterests, sortByInterest } from '@/lib/account/service-interests'
 import { serviceRequirements, serviceReadiness } from '@/lib/account/service-readiness'
 import { createPublicClient } from '@/lib/supabase/public'
@@ -126,6 +128,10 @@ export default async function AccountPage() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const serviceInterests = parseInterests((profile as any)?.service_interests)
   const hasOrders = (orders?.length ?? 0) > 0
+
+  // One welcome coupon per account, minted on the first visit and shown while
+  // it can still be used; every service link below carries it.
+  const welcomeCoupon = await ensureWelcomeCouponForUser(user.id)
 
   const completeness = profileCompleteness({
     firstName: profile?.first_name,
@@ -245,6 +251,8 @@ export default async function AccountPage() {
               it no longer pushes an order list off the first screen. */}
           <ProfileChecklist completeness={completeness} />
 
+          {welcomeCoupon && <WelcomeCouponCard coupon={welcomeCoupon} />}
+
           {/* The onboarding question („Ce servicii te interesează?") is gone
               (Raul, 18.09.2026): it existed to decide whether the account asks
               for an identity document, and the account no longer asks for one
@@ -265,6 +273,7 @@ export default async function AccountPage() {
               initialTab={hasOrders ? 'orders' : 'services'}
               services={accountServices}
               serviceInterests={serviceInterests}
+              couponCode={welcomeCoupon?.code ?? null}
             />
           </Suspense>
 

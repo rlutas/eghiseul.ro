@@ -76,6 +76,7 @@ export function ContactStepModular({ onValidChange }: ContactStepProps) {
     updatePersonalKyc,
     setClientType,
     isPrefilled,
+    prefillData,
     priceBreakdown,
     validationAttempt,
   } = useModularWizard();
@@ -116,13 +117,6 @@ export function ContactStepModular({ onValidChange }: ContactStepProps) {
       { value: 'PJ' as const, label: 'Persoană Juridică', description: 'Pentru companii și firme' },
     ];
 
-  const hasValidPrefilledData =
-    isPrefilled &&
-    state.contact.email &&
-    state.contact.email.includes('@') &&
-    typeof state.contact.phone === 'string' &&
-    state.contact.phone.replace(/\s+/g, '').length >= 8;
-
   const form = useForm<ContactFormData>({
     resolver: zodResolver(contactSchema),
     defaultValues: {
@@ -132,7 +126,24 @@ export function ContactStepModular({ onValidChange }: ContactStepProps) {
     mode: 'onChange',
   });
 
-  const { isValid: formIsValid } = form.formState;
+  const { isValid: formIsValid, isDirty: formIsDirty } = form.formState;
+
+  // The read-only „Date preluate din contul tău" card is shown only for data
+  // that actually came from the PROFILE, and never once the customer has
+  // started typing. It used to look at `state.contact` — what is being typed
+  // — with a loose `length >= 8`: the profile request landed mid-typing for
+  // an account without a phone, „+4074585" passed the check, the card replaced
+  // the form and the rest of the number was lost. Step 1 then advanced
+  // without minting an order code, and „Plătește" had nothing to save
+  // (found 18.09.2026, same failure as the „Nu știu" handoff of 14.09).
+  const profileEmail = prefillData?.contact?.email ?? '';
+  const profilePhone = (prefillData?.contact?.phone || prefillData?.personal?.phone || '').replace(/\s+/g, '');
+  const hasValidPrefilledData =
+    isPrefilled &&
+    !formIsDirty &&
+    profileEmail.includes('@') &&
+    !!profilePhone &&
+    isValidPhoneNumber(profilePhone);
 
   // Draft resume: react-hook-form only applies defaultValues at mount, so when
   // a saved draft is restored asynchronously AFTER this form mounted (server

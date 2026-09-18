@@ -56,9 +56,11 @@ interface AccountTabsProps {
   /** The onboarding answer, so the identity tab does not ask for a document the
    *  customer's own services never require. */
   serviceInterests?: InterestId[];
+  /** The account's welcome coupon, carried on every service link. */
+  couponCode?: string | null;
 }
 
-export default function AccountTabs({ initialTab = 'services', className, services = [], serviceInterests }: AccountTabsProps) {
+export default function AccountTabs({ initialTab = 'services', className, services = [], serviceInterests, couponCode = null }: AccountTabsProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const tabFromUrl = searchParams.get('tab') as TabId | null;
@@ -116,7 +118,7 @@ export default function AccountTabs({ initialTab = 'services', className, servic
   const renderTabContent = () => {
     switch (activeTab) {
       case 'services':
-        return <ServicesTab services={services} />;
+        return <ServicesTab services={services} couponCode={couponCode} />;
       case 'profile':
         return <ProfileTab autoEdit={autoEdit} />;
       case 'kyc':
@@ -130,7 +132,7 @@ export default function AccountTabs({ initialTab = 'services', className, servic
       case 'orders':
         return <OrdersTab />;
       default:
-        return <ServicesTab services={services} />;
+        return <ServicesTab services={services} couponCode={couponCode} />;
     }
   };
 

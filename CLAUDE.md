@@ -29,6 +29,7 @@ Platforma digitala pentru Romania - servicii publice digitalizate (9 servicii ac
 | **API endpoints** | `docs/technical/api/` + `docs/README.md` (summary) |
 | **Admin panel** | `docs/admin/README.md` |
 | **Comenzi telefonice (admin A→Z, link plată, link completare)** | `docs/admin/comenzi-telefonice/README.md` |
+| **Contul clientului (ce vede, cupon de bun-venit, ce se leagă cu comanda)** | `docs/admin/contul-clientului.md` + decizii în `docs/dashboard-client/PLAN.md` §6 |
 | **Plată prin transfer bancar (IBAN, „Așteptare plată", confirmare încasare)** | `docs/admin/plata-transfer-bancar.md` |
 | **RBAC & permisiuni** | `docs/admin/rbac-permissions.md` |
 | **Document generation** | `docs/technical/specs/admin-document-system.md` |
@@ -107,5 +108,5 @@ Tranzitii valide enforce-uite server-side in `/api/admin/orders/[id]/process`.
 
 ---
 
-**Last Updated:** 2026-06-22
-**Version:** 5.1 (docs reorganizate: root cu 3 docuri vii, `changelog/` nou, foldere index per zonă, istoric în `archive/`)
+**Last Updated:** 2026-09-18
+**Version:** 5.2 (contul clientului: ghid echipă + decizii D9–D13; 5.1 = docs reorganizate: root cu 3 docuri vii, `changelog/` nou, foldere index per zonă, istoric în `archive/`)

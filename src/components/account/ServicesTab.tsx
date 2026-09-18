@@ -25,7 +25,16 @@ export interface AccountServiceRow {
  *
  * Nothing is disabled: every row is orderable regardless of what is missing.
  */
-export default function ServicesTab({ services }: { services: AccountServiceRow[] }) {
+export default function ServicesTab({
+  services,
+  couponCode = null,
+}: {
+  services: AccountServiceRow[];
+  /** Welcome coupon: carried on every link, applied by the order form itself. */
+  couponCode?: string | null;
+}) {
+  const orderHref = (slug: string) =>
+    couponCode ? `/comanda/${slug}/?coupon=${encodeURIComponent(couponCode)}` : `/comanda/${slug}/`;
   if (services.length === 0) {
     return (
       <div className="bg-white rounded-2xl border border-neutral-200 p-8 text-center">
@@ -58,7 +67,7 @@ export default function ServicesTab({ services }: { services: AccountServiceRow[
             {rows.map((service) => (
               <Link
                 key={service.slug}
-                href={`/comanda/${service.slug}/`}
+                href={orderHref(service.slug)}
                 className="flex items-start gap-3 p-4 min-h-[64px] hover:bg-neutral-50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
               >
                 <span

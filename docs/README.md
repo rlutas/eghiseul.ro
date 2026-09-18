@@ -46,6 +46,7 @@ Index al documentației. Aceasta e o **hartă**, nu un jurnal — pentru jurnalu
 - **Convenția cu topograful (angajament de execuție):** [`technical/specs/conventie-topograf.md`](technical/specs/conventie-topograf.md)
 - **Solicită documente (cerere de la client + standby):** [`technical/specs/document-request-system.md`](technical/specs/document-request-system.md)
 - **RBAC & permisiuni:** [`admin/rbac-permissions.md`](admin/rbac-permissions.md)
+- **Contul clientului (ce vede clientul, cupon de bun-venit, ce se leagă automat cu comanda):** [`admin/contul-clientului.md`](admin/contul-clientului.md)
 - **Plăți & facturare:** [`technical/specs/stripe-oblio-payment-invoicing.md`](technical/specs/stripe-oblio-payment-invoicing.md)
 - **Anulare în 30 min (refund 70% + factura de 30%):** [`admin/anulare-refund-70.md`](admin/anulare-refund-70.md) — procedura echipei: „Procesează refund" (Stripe + storno + factura taxei de anulare), „Am refundat manual", „Reconciliază", ce vede contabilul în Decontări
 - **Plată prin transfer bancar (IBAN):** [`admin/plata-transfer-bancar.md`](admin/plata-transfer-bancar.md) — procedura echipei: tab „Așteptare plată", confirmarea încasării din extras, legătura cu decontările

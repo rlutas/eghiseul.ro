@@ -90,9 +90,18 @@ export function AccountNav({
 
           {/* Secondary: reference data, reached occasionally. Two columns on a
               phone so all five stay visible without scrolling anything. */}
+          {/* Same buttons as the two above (Raul, 18.09.2026): bordered, on
+              white — the quiet text-only variant read as labels, not as
+              things to tap. */}
           <div className="grid grid-cols-2 gap-2 lg:grid-cols-1">
             {secondary.map((item) => (
-              <NavButton key={item.id} item={item} isActive={active === item.id} onSelect={onSelect} />
+              <NavButton
+                key={item.id}
+                item={item}
+                isActive={active === item.id}
+                onSelect={onSelect}
+                emphasis
+              />
             ))}
           </div>
         </>

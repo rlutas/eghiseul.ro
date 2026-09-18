@@ -621,6 +621,23 @@
 
 ---
 
+### CONTUL CLIENTULUI — livrat 17–18.09.2026
+
+Rebuild-ul contului (`/account`) după planul din `docs/dashboard-client/PLAN.md`:
+Faza 0–4 (17.09) + a doua zi de retușuri din testul pe telefon (18.09). Stare:
+- ✅ cont după plată cu o parolă, comenzi de guest legate pe email, onboarding
+  scos (D12), act de identitate cerut doar în comandă (D9);
+- ✅ meniul „Datele mele" în vârful paginii, popup-uri pentru ce lipsește,
+  facturare din datele scanate (D10), tab reîncărcat după salvare;
+- ✅ comanda plătită alimentează contul existent (D13, `sync-paid-order.ts`);
+- ✅ cupon de bun-venit per cont (D11, migrarea 174);
+- ✅ telefon cu selector de țară + validare pe țară, în cont și la înregistrare;
+- 🔴 reparate pe drum: linkurile checklistului (tab citit doar la montare),
+  pasul 1 al comenzii pierdea telefonul la prefill mid-typing.
+Ghid echipă: `docs/admin/contul-clientului.md`. Changelog: `docs/changelog/2026-09-18-*.md`.
+Rămas: testul A→Z pe mobil de către Raul; emailul cu cuponul de bun-venit
+(„eventual") nu se trimite încă — codul se vede doar în cont.
+
 ### BACKLOG / FUTURE FEATURES
 
 Features planned but not yet scheduled for a specific sprint.

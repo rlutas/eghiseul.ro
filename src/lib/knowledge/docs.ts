@@ -126,6 +126,13 @@ export interface GuideLink {
  */
 export const CURATED_GUIDES: GuideLink[] = [
   {
+    title: 'Contul clientului: ce vede clientul, ce se leagă automat',
+    slug: 'admin/contul-clientului',
+    category: 'clienti',
+    description:
+      'Meniul „Datele mele", popup-urile, cuponul de bun-venit, actul cerut doar la comandă, ce trece din comandă în cont și invers, ce spuneți la telefon.',
+  },
+  {
     title: 'Anulare în 30 min: refund 70% + factura de 30%',
     slug: 'admin/anulare-refund-70',
     category: 'plati',

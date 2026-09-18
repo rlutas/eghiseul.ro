@@ -11,6 +11,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { createClient } from '@/lib/supabase/server';
 import { stripe } from '@/lib/stripe';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -19,6 +20,8 @@ type AnyClient = any;
 interface CouponRow {
   id: string;
   code: string;
+  /** Set on personal coupons (welcome): only that account's orders may use it. */
+  owner_user_id?: string | null;
   discount_type: 'percentage' | 'fixed';
   discount_value: number;
   min_amount: number;
@@ -77,7 +80,7 @@ export async function POST(req: NextRequest, { params }: RouteParams) {
   const { data: orderData, error: orderErr } = await admin
     .from('orders')
     .select(
-      'id, base_price, options_price, delivery_price, total_price, payment_status, stripe_payment_intent_id'
+      'id, user_id, base_price, options_price, delivery_price, total_price, payment_status, stripe_payment_intent_id'
     )
     .eq('id', id)
     .maybeSingle();
@@ -124,6 +127,27 @@ export async function POST(req: NextRequest, { params }: RouteParams) {
       { success: false, error: 'Cupon invalid' },
       { status: 404 }
     );
+  }
+
+  // A personal coupon (welcome) is bound to an account: the code is shown in
+  // that account and can be copied, but it only ever discounts the owner's
+  // orders — theirs by `user_id`, or a guest draft they are signed in over.
+  if (coupon.owner_user_id) {
+    const orderOwner = (order as OrderRow & { user_id?: string | null }).user_id ?? null;
+    let signedIn: string | null = null;
+    try {
+      const supabase = await createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      signedIn = user?.id ?? null;
+    } catch {
+      signedIn = null;
+    }
+    if (orderOwner !== coupon.owner_user_id && signedIn !== coupon.owner_user_id) {
+      return NextResponse.json(
+        { success: false, error: 'Cuponul este personal și se poate folosi doar din contul căruia i-a fost oferit' },
+        { status: 400 }
+      );
+    }
   }
 
   const now = new Date();

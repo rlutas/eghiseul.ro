@@ -340,6 +340,9 @@ ecran.
 |---|---|---|
 | D9 | Actul de identitate rămâne pas în contul clientului? | **Nu.** După scanarea din „Date personale", pasul „Act de identitate" cerea aceeași poză a doua oară, iar un act încărcat în cont ar fi vechi la momentul comenzii. Actul și selfie-ul se cer **doar în formularul de comandă**, pentru serviciile care le cer, deci sunt mereu proaspete. Tabul „Act de identitate" rămâne pentru documentele venite din comenzi. Înlocuiește partea din D5 despre act. |
 | D10 | Popup-ul de facturare pornește cu datele din act? | **Da.** Când profilul are nume + CNP, întreabă „le folosim și pe factură?" cu preview; „Da" salvează direct dacă există adresă de livrare din România, altfel deschide formularul cu numele și CNP-ul completate și cere doar adresa; „Nu" duce la formularul PF/PJ (CUI → ANAF). Rafinează D8. |
+| D11 | Contul primește un cupon? | **Da.** Un cupon de bun-venit per cont (10%, 30 de zile, o folosire, legat de cont prin `owner_user_id`), creat la prima încărcare a contului și purtat pe linkurile din „Ce pot comanda", ca să se aplice singur. Nu se reemite. |
+| D12 | Întrebarea de onboarding rămâne? | **Nu.** Exista ca să decidă cererea de act (D5); după D9 nu mai decide nimic. Răspunsurile stocate încă sortează catalogul. |
+| D13 | Comanda plătită alimentează contul existent? | **Da.** Adresă, profil de facturare, acte — la fiecare confirmare de plată și ca backlog la încărcarea contului; profilul doar se umple, nu se suprascrie. |
 
 ### D4, luată pe 17.09.2026
 
