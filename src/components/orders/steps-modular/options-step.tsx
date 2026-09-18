@@ -501,34 +501,15 @@ export function OptionsStepModular({ onValidChange }: OptionsStepProps) {
       {/* ────────────────────────────────────────────────────────────── */}
       {hasCetateanStrain && (
         <section className="space-y-3">
-          <div className="flex items-start gap-3 border-b border-amber-100 pb-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-amber-100 shrink-0">
-              <Globe className="h-4.5 w-4.5 text-amber-700" />
-            </div>
-            <div className="flex-1 min-w-0 pt-0.5">
-              <h3 className="text-base font-semibold text-secondary-900 leading-tight">
-                Cetățean Străin — Procesare 7-15 zile lucrătoare
-              </h3>
-              <p className="text-xs text-neutral-500 mt-0.5">
-                Procesarea urgentă nu este disponibilă pentru cetățeni străini
-              </p>
-            </div>
-          </div>
-          <div className="rounded-xl border-2 border-amber-300 bg-amber-50 p-4">
-            <div className="flex gap-3">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-amber-100">
-                <Globe className="h-5 w-5 text-amber-700" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm text-amber-800">
-                  Comanda dumneavoastră necesită verificări suplimentare la I.G.I.
-                </p>
-                <p className="text-xs text-amber-600 mt-1">
-                  Termenul standard este de 7-15 zile lucrătoare.
-                </p>
-              </div>
-            </div>
-          </div>
+          <SectionHeader icon={Globe} title="Cetățean străin — 7-15 zile lucrătoare" />
+          <details className="rounded-xl border-2 border-amber-300 bg-amber-50 p-4">
+            <summary className="cursor-pointer list-none text-sm font-medium text-amber-900 [&::-webkit-details-marker]:hidden">
+              Procesarea urgentă nu e disponibilă pentru cetățeni străini. <span className="text-xs font-normal text-amber-700">De ce?</span>
+            </summary>
+            <p className="mt-2 text-xs text-amber-800">
+              Comanda necesită verificări suplimentare la I.G.I.; termenul standard este de 7-15 zile lucrătoare.
+            </p>
+          </details>
         </section>
       )}
 
@@ -537,27 +518,18 @@ export function OptionsStepModular({ onValidChange }: OptionsStepProps) {
       {/* ────────────────────────────────────────────────────────────── */}
       {hasForeignLicense && (
         <section className="space-y-3">
-          <div className="flex items-start gap-3 border-b border-amber-100 pb-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-amber-100 shrink-0">
-              <Globe className="h-4.5 w-4.5 text-amber-700" />
-            </div>
-            <div className="flex-1 min-w-0 pt-0.5">
-              <h3 className="text-base font-semibold text-secondary-900 leading-tight">
-                Permis din străinătate — procesare{' '}
-                {foreignLicenseCfg?.daysDisplay ||
-                  `${foreignLicenseCfg?.minDays}-${foreignLicenseCfg?.maxDays} zile lucrătoare`}
-              </h3>
-              <p className="text-xs text-neutral-500 mt-0.5">
-                Procesarea urgentă nu este disponibilă pentru permisele emise în străinătate
-              </p>
-            </div>
-          </div>
-          <div className="rounded-xl border-2 border-amber-300 bg-amber-50 p-4">
-            <p className="text-sm text-amber-800">
-              Fișa conducătorului auto se solicită autorității care a emis permisul,
-              iar termenul depinde de ea — nu poate fi scurtat.
+          <SectionHeader
+            icon={Globe}
+            title={`Permis din străinătate — ${foreignLicenseCfg?.daysDisplay || `${foreignLicenseCfg?.minDays}-${foreignLicenseCfg?.maxDays} zile lucrătoare`}`}
+          />
+          <details className="rounded-xl border-2 border-amber-300 bg-amber-50 p-4">
+            <summary className="cursor-pointer list-none text-sm font-medium text-amber-900 [&::-webkit-details-marker]:hidden">
+              Procesarea urgentă nu e disponibilă pentru permisele emise în străinătate. <span className="text-xs font-normal text-amber-700">De ce?</span>
+            </summary>
+            <p className="mt-2 text-xs text-amber-800">
+              Fișa conducătorului auto se solicită autorității care a emis permisul, iar termenul depinde de ea — nu poate fi scurtat.
             </p>
-          </div>
+          </details>
         </section>
       )}
 
@@ -566,19 +538,7 @@ export function OptionsStepModular({ onValidChange }: OptionsStepProps) {
       {/* ────────────────────────────────────────────────────────────── */}
       {autoAppliedSelections.length > 0 && (
         <section className="space-y-3">
-          <div className="flex items-start gap-3 border-b border-amber-100 pb-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-amber-100 shrink-0">
-              <Globe className="h-4.5 w-4.5 text-amber-700" />
-            </div>
-            <div className="flex-1 min-w-0 pt-0.5">
-              <h3 className="text-base font-semibold text-secondary-900 leading-tight">
-                Cetățean Străin
-              </h3>
-              <p className="text-xs text-neutral-500 mt-0.5">
-                Verificare suplimentară aplicată automat
-              </p>
-            </div>
-          </div>
+          <SectionHeader icon={Globe} title="Cetățean străin — aplicat automat" />
           <div className="space-y-3">
             {autoAppliedSelections.map((opt) => (
               <div
@@ -591,14 +551,17 @@ export function OptionsStepModular({ onValidChange }: OptionsStepProps) {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
-                      <h4 className="font-semibold text-amber-900">{opt.optionName}</h4>
+                      <p className="font-semibold text-amber-900">{opt.optionName}</p>
                       <Badge className="bg-amber-500 text-white hover:bg-amber-500">
                         <Lock className="mr-1 h-3 w-3" />
                         Aplicat automat
                       </Badge>
                     </div>
                     {opt.optionDescription && (
-                      <p className="mt-1 text-sm text-amber-800">{opt.optionDescription}</p>
+                      <details className="mt-1">
+                        <summary className="cursor-pointer list-none text-xs font-medium text-amber-800 [&::-webkit-details-marker]:hidden">Ce înseamnă?</summary>
+                        <p className="mt-1 text-sm text-amber-800">{opt.optionDescription}</p>
+                      </details>
                     )}
                     <div className="mt-2 flex flex-wrap items-center gap-2">
                       <span className="rounded-lg bg-amber-200 px-2.5 py-1 text-sm font-bold text-amber-900 tabular-nums">

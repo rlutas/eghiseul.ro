@@ -114,7 +114,7 @@ async function enrichEghiseul(rows: TxRow[]) {
     ),
   ] as string[];
   if (!orderNumbers.length && !orderIds.length) return;
-  const select = 'id, friendly_order_id, order_number, invoice_number, invoice_url, storno_invoice_number, cancel_fee_invoice_number, customer_data, extra_billing, stripe_payment_intent_id, services(name)';
+  const select = 'id, friendly_order_id, order_number, invoice_number, invoice_url, storno_invoice_number, cancel_fee_invoice_number, cancel_fee_invoice_url, refunded_amount, customer_data, extra_billing, stripe_payment_intent_id, services(name)';
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const numberQuery = orderNumbers.length
     ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -167,6 +167,16 @@ async function enrichEghiseul(rows: TxRow[]) {
       r.invoice_number = anyO.invoice_number ?? r.invoice_number;
       r.invoice_url = anyO.invoice_url ?? r.invoice_url;
     }
+    // Anulare 70% pe o comandă a cărei factură inițială n-a apucat să fie
+    // emisă (Oblio 401 la plată, refund înainte de retry): nu există nici
+    // factură, nici storno — documentul fiscal al încasării RĂMASE e factura
+    // taxei de anulare. Legăm încasarea și refundul de ea, ca să nu apară
+    // „nefacturat" (po_1UGTTLHGb8JBHhclSJd80vUX, 18.09.2026).
+    if (!r.invoice_number && !anyO.invoice_number && anyO.cancel_fee_invoice_number && Number(anyO.refunded_amount) > 0) {
+      r.invoice_number = anyO.cancel_fee_invoice_number;
+      r.invoice_url = anyO.cancel_fee_invoice_url ?? null;
+      r.description = `${r.description ?? ''} · taxă anulare 30%, fără factură inițială`.trim();
+    }
     r.service_name = anyO.services?.name ?? r.service_name;
     const contact = anyO.customer_data?.contact ?? {};
     const personal = anyO.customer_data?.personal ?? {};
@@ -198,7 +208,7 @@ async function enrichCjo(rows: TxRow[], errors: string[]) {
   if (!orderNumbers.length) return;
   const { data: orders, error } = await cjo
     .from('orders')
-    .select('order_number, prenume, nume, email, service_type, oblio_invoice_number, oblio_invoice_link, invoice_series, invoice_number, invoice_url, storno_invoice_number, extra_billing, stripe_payment_intent_id')
+    .select('order_number, prenume, nume, email, service_type, oblio_invoice_number, oblio_invoice_link, invoice_series, invoice_number, invoice_url, storno_invoice_number, cancel_fee_invoice_number, cancel_fee_invoice_url, refunded_amount_bani, extra_billing, stripe_payment_intent_id')
     .in('order_number', orderNumbers);
   if (error) {
     errors.push(`CJO lookup: ${error.message}`);
@@ -228,6 +238,17 @@ async function enrichCjo(rows: TxRow[], errors: string[]) {
         (o.invoice_series && o.invoice_number ? `${o.invoice_series}-${o.invoice_number}` : o.invoice_number) ||
         r.invoice_number;
       r.invoice_url = o.oblio_invoice_link || o.invoice_url || r.invoice_url;
+    }
+    // Same rule as on eghiseul: refunded before any invoice → the cancel-fee
+    // invoice is the fiscal document of what was kept.
+    {
+      const oc = o as { cancel_fee_invoice_number?: string | null; cancel_fee_invoice_url?: string | null; refunded_amount_bani?: number | null };
+      const hadInvoice = !!(o.oblio_invoice_number || o.invoice_number);
+      if (!r.invoice_number && !hadInvoice && oc.cancel_fee_invoice_number && Number(oc.refunded_amount_bani) > 0) {
+        r.invoice_number = oc.cancel_fee_invoice_number;
+        r.invoice_url = oc.cancel_fee_invoice_url ?? null;
+        r.description = `${r.description ?? ''} · taxă anulare 30%, fără factură inițială`.trim();
+      }
     }
     r.service_name = o.service_type ?? r.service_name;
     r.client_name = [o.prenume, o.nume].filter(Boolean).join(' ') || r.client_name;

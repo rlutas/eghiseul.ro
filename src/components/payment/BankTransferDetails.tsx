@@ -114,13 +114,16 @@ export function BankTransferDetails({
     return <p className="text-sm text-neutral-500">Se încarcă datele bancare...</p>;
   }
 
-  const canPayEur = !!details.ibanEur && !!eurRate;
+  // The EUR account is shown whenever it is configured; the BNR rate only
+  // adds the orientative EUR amount (without it the RON amount stays, and
+  // the customer's bank converts) — Codex REV2-CODE-004.
+  const canPayEur = !!details.ibanEur;
   const payingEur = currency === 'EUR' && canPayEur;
   const iban = payingEur ? details.ibanEur : details.ibanRon;
   // Suma în euro e orientativă: banca aplică propriul curs la conversie.
   const eurAmount = eurRate ? Math.ceil((amount / eurRate.value) * 100) / 100 : null;
   const displayAmount = payingEur && eurAmount ? eurAmount : amount;
-  const displayCurrency = payingEur ? 'EUR' : 'RON';
+  const displayCurrency = payingEur && eurAmount ? 'EUR' : 'RON';
 
   return (
     <div className="space-y-4">

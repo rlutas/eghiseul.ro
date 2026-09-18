@@ -704,9 +704,11 @@ function PurposeSelect({
         placeholder="ex. angajare, concurs, licitație"
         preferDirection="down"
         error={error}
+        id="purpose-select"
+        describedBy="purpose-select-error"
       />
       {error && (
-        <p className="text-sm text-red-500 flex items-center gap-1">
+        <p id="purpose-select-error" className="text-sm text-red-500 flex items-center gap-1">
           <AlertCircle className="h-4 w-4 shrink-0" />
           {error}
         </p>

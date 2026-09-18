@@ -30,6 +30,10 @@ interface SearchableSelectProps {
    * field on phones, feedback 18.09.2026 #19). Default: auto.
    */
   preferDirection?: 'auto' | 'down';
+  /** Input id, so a `<label htmlFor>` focuses the field. */
+  id?: string;
+  /** id of the element that describes the error, for `aria-describedby`. */
+  describedBy?: string;
 }
 
 export function SearchableSelect({
@@ -40,6 +44,8 @@ export function SearchableSelect({
   error,
   className,
   preferDirection = 'auto',
+  id,
+  describedBy,
 }: SearchableSelectProps) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState(value);
@@ -245,8 +251,11 @@ export function SearchableSelect({
         placeholder={placeholder}
         className={baseClassName}
         autoComplete="off"
+        id={id}
         role="combobox"
         aria-expanded={open}
+        aria-invalid={error ? true : undefined}
+        aria-describedby={error && describedBy ? describedBy : undefined}
         aria-autocomplete="list"
       />
       <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />

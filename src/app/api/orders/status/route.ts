@@ -71,6 +71,7 @@ export async function GET(request: NextRequest) {
         total_price,
         payment_status,
         payment_method,
+        payment_proof_url,
         invoice_number,
         invoice_url,
         extra_billing,

@@ -124,17 +124,13 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         },
         changed_by: user?.id || null,
       });
-      // Emailuri (client + echipă). Fail-soft: dacă Resend cade, comanda rămâne
-      // corect înregistrată — nu întoarcem eroare clientului pentru asta.
-      try {
-        await sendBankTransferEmails(id, !!rawProofKey);
-      } catch (e) {
-        console.error(`[bank-transfer] emails failed for order ${id} (non-fatal):`, e instanceof Error ? e.message : e);
-      }
     }
 
-    // The proof — same workflow whether it came with the registration or later.
+    // The proof — same workflow whether it came with the registration or
+    // later. Attached BEFORE the e-mails, so „am primit dovada" is only said
+    // when it is true (Codex REV2-CODE-003).
     let proofOutcome: string | null = null;
+    let proofError: { message: string; status: number } | null = null;
     if (rawProofKey) {
       const attached = await attachPaymentProof({ orderId: id, uploadKey: rawProofKey, changedBy: user?.id || null });
       proofOutcome = attached.outcome;
@@ -146,8 +142,34 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         error: 'Nu am putut salva dovada. Încearcă din nou în câteva secunde.',
       };
       if (attached.outcome !== 'attached' && attached.outcome !== 'unchanged') {
-        return NextResponse.json({ success: false, error: refused[attached.outcome] ?? refused.error }, { status: attached.outcome === 'error' ? 500 : 400 });
+        proofError = { message: refused[attached.outcome] ?? refused.error, status: attached.outcome === 'error' ? 500 : 400 };
       }
+    }
+    const proofAttached = proofOutcome === 'attached' || proofOutcome === 'unchanged';
+
+    if (!proofOnly && !alreadyRegistered) {
+      // Emailuri (client + echipă). Fail-soft: dacă Resend cade, comanda rămâne
+      // corect înregistrată — nu întoarcem eroare clientului pentru asta.
+      try {
+        await sendBankTransferEmails(id, proofAttached);
+      } catch (e) {
+        console.error(`[bank-transfer] emails failed for order ${id} (non-fatal):`, e instanceof Error ? e.message : e);
+      }
+    }
+
+    if (proofError) {
+      // The registration (if any) stands — the customer has the IBAN by
+      // e-mail and can attach the proof again from the order page.
+      return NextResponse.json(
+        {
+          success: false,
+          error: proofOnly
+            ? proofError.message
+            : `Comanda e înregistrată pentru transfer bancar, dar dovada nu s-a salvat: ${proofError.message} O poți încărca din pagina comenzii.`,
+          data: { registered: !proofOnly, proof: proofOutcome },
+        },
+        { status: proofError.status }
+      );
     }
 
     return NextResponse.json({

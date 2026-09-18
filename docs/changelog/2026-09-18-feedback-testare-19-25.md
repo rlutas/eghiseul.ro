@@ -96,5 +96,17 @@ inspectat separat (rundă nouă, vezi jos).
   Pagina de status: card cu `BankTransferDetails` + `PaymentProofUpload`
   (`proofToken`) → POST proof-only → refetch. Checkout: `proof_token` din
   `GET /api/orders/[id]`.
+- **Inspecția Codex pe cod (rundă nouă, base 74d89ac): REVISE, 7 constatări, toate reparate**
+
+| ID | Disp. | Ce s-a făcut |
+|---|---|---|
+| REV2-CODE-001 (high) | acceptat | `/submit`: imaginile inline se urcă în `kyc/<orderId>/` ÎNAINTE de guard (base64 validat, ≥ 2 KB), iar guard-ul numără doar obiectele din namespace-ul comenzii confirmate cu HeadObject — un `s3Key` inventat sau un marker base64 nu mai contează. |
+| REV2-CODE-002 (high) | acceptat | `/api/orders/status` selectează `payment_proof_url` (altfel `hasPaymentProof` era mereu false). |
+| REV2-CODE-003 (medium) | acceptat | `bank-transfer`: dovada se atașează înainte de emailuri; emailul de înregistrare spune „am primit dovada" doar la `attached`/`unchanged`; la eșec, înregistrarea rămâne și răspunsul spune că dovada nu s-a salvat. |
+| REV2-CODE-004 (medium) | acceptat | Pagina de status ține datele de transfer și după dovadă; `BankTransferDetails` arată IBAN-ul EUR indiferent de cursul BNR (cursul doar convertește suma). |
+| REV2-CODE-005 (medium) | acceptat | Ramurile cetățean străin / permis străin / aplicat automat folosesc aceeași etichetă de grup și `<details>` pentru explicații — un singur heading pe pas. |
+| REV2-CODE-006 (medium) | acceptat | `notifyTeamOfProof` marchează `team_notified_at` doar când Resend a trimis (nu la `skipped`). |
+| REV2-CODE-007 (low) | acceptat | `SearchableSelect` primește `id` + `aria-invalid` + `aria-describedby`; eticheta „Motivul solicitării" focusează câmpul. |
+
 - Teste noi: `payment-proof-token`, `motiv-options`, `attach-payment-proof`.
   Suita: 164 fișiere, 1984 verzi.

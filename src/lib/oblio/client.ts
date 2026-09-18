@@ -112,30 +112,36 @@ export async function oblioRequest<T>(
 ): Promise<T> {
   const { endpoint, method = 'GET', body } = options;
 
-  const token = await getOblioToken();
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const config = getConfig();
-
   const url = `${OBLIO_BASE_URL}${endpoint}`;
+  const send = async () => {
+    const token = await getOblioToken();
+    return fetch(url, {
+      method,
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: body ? JSON.stringify(body) : undefined,
+    });
+  };
 
-  const response = await fetch(url, {
-    method,
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json',
-    },
-    body: body ? JSON.stringify(body) : undefined,
-  });
+  let response = await send();
+
+  // „The access token provided has expired": the cached token outlived
+  // Oblio's clock. 16 invoices in 60 days hit this at payment time and
+  // waited for the retry cron; one (E-260915-M4A4V) was refunded before it
+  // and never got its invoice. Take a fresh token and retry ONCE, now.
+  if (response.status === 401) {
+    const firstError = await response.text();
+    console.warn('Oblio 401, refreshing the token and retrying once:', firstError.slice(0, 200));
+    clearTokenCache();
+    response = await send();
+  }
 
   if (!response.ok) {
     const errorText = await response.text();
     console.error('Oblio API error:', response.status, errorText);
-
-    // Clear token cache on 401 (might be expired)
-    if (response.status === 401) {
-      clearTokenCache();
-    }
-
+    if (response.status === 401) clearTokenCache();
     throw new Error(`Oblio API error: ${response.status} - ${errorText}`);
   }
 

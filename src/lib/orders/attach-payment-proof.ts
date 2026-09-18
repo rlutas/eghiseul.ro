@@ -118,13 +118,19 @@ async function notifyTeamOfProof(orderId: string, eventId: string, digest: strin
     adminUrl: `${base}/admin/orders/${orderId}`,
   };
   try {
-    await sendEmail({
+    const sent = await sendEmail({
       to: process.env.ADMIN_NOTIFY_EMAIL || 'contact@eghiseul.ro',
       subject: buildBankTransferAdminSubject(adminInput),
       html: buildBankTransferAdminHtml(adminInput),
       text: buildBankTransferAdminText(adminInput),
       idempotencyKey: `bank-transfer-proof-${orderId}-${digest.slice(0, 16)}`,
     });
+    // A skipped send (no RESEND_API_KEY) is not a send: leave the event
+    // unmarked so the next retry delivers it (Codex REV2-CODE-006).
+    if (sent.skipped) {
+      console.warn(`[payment-proof] team email skipped for ${orderId}: ${sent.reason ?? 'unknown'}`);
+      return;
+    }
     await admin.rpc('mark_payment_proof_notified', { p_event_id: eventId });
   } catch (e) {
     // Not marked → the next retry (checkout or status page) sends it.

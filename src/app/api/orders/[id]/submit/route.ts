@@ -131,9 +131,46 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       const cd = order.customer_data as any;
       const personalKey = cd?.personal ? 'personal' : cd?.personalData ? 'personalData' : 'personal';
       const personal = cd?.[personalKey] || (cd[personalKey] = {});
-      const docs: Array<{ type?: string; s3Key?: string; base64?: string }> = personal.uploadedDocuments || (personal.uploadedDocuments = []);
+      const docs: Array<{ type?: string; s3Key?: string; base64?: string; mimeType?: string }> = personal.uploadedDocuments || (personal.uploadedDocuments = []);
       const citizenship = personal.citizenship || 'romanian';
       const isForeign = citizenship !== 'romanian';
+
+      // `customer_data` is client-writable: a declared `type` proves nothing
+      // (Codex REV2-CODE-001). Inline images are uploaded into the order's
+      // own namespace NOW (not after the guard), and the guard below counts
+      // only objects that exist under `kyc/<orderId>/`.
+      let uploadedInline = false;
+      for (const doc of docs) {
+        if (!doc.base64 || doc.s3Key || !doc.type) continue;
+        const raw = doc.base64.replace(/^data:[^;]+;base64,/, '');
+        const bytes = Buffer.from(raw, 'base64');
+        if (bytes.length < 2048 || !/^[A-Za-z0-9+/=\s]+$/.test(raw)) {
+          // Not an image — drop the claim, do not upload garbage.
+          delete doc.base64;
+          continue;
+        }
+        try {
+          const ext = doc.mimeType?.includes('png') ? 'png' : doc.mimeType?.includes('webp') ? 'webp' : 'jpg';
+          const s3Key = `kyc/${id}/${String(doc.type).replace(/[^a-z0-9_]/gi, '')}.${ext}`;
+          await uploadBase64(s3Key, doc.base64, doc.mimeType || 'image/jpeg', {
+            'order-id': id,
+            'document-type': String(doc.type),
+            'uploaded-at': new Date().toISOString(),
+          });
+          doc.s3Key = s3Key;
+          delete doc.base64;
+          uploadedInline = true;
+        } catch (uploadErr) {
+          console.error('[submit] inline document upload failed:', uploadErr instanceof Error ? uploadErr.message : uploadErr);
+        }
+      }
+      if (uploadedInline) {
+        const { error: persistInlineError } = await adminClient
+          .from('orders')
+          .update({ customer_data: cd, updated_at: new Date().toISOString() })
+          .eq('id', id);
+        if (persistInlineError) console.error('[submit] could not persist uploaded documents:', persistInlineError.message);
+      }
 
       // (2) Identity from the account (feedback 18.09.2026, #20): the step
       // showed the account's document instead of asking for a scan, so the
@@ -183,25 +220,39 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         }
       }
 
-      // (3) The guard, on the order's own documents only. One object cannot
-      // stand in for two documents: a „selfie" that is the same file as the
-      // identity document is no selfie (REV3-KYC-001).
-      const objectOf = (d: { s3Key?: string; base64?: string }) =>
-        d.s3Key || (d.base64 ? `b64:${d.base64.length}:${d.base64.slice(-80)}` : '');
-      const selfieDoc = docs.find((d) => isSelfieType(d.type || ''));
+      // (3) The guard, on VERIFIED documents only: a key inside
+      // `kyc/<orderId>/` whose object exists (HeadObject). A fabricated key
+      // or a leftover base64 marker counts for nothing. One object cannot
+      // stand in for two documents either: a „selfie" that is the same file
+      // as the identity document is no selfie (REV3-KYC-001).
+      const headCache = new Map<string, boolean>();
+      const verifiedDocs: typeof docs = [];
+      for (const d of docs) {
+        if (!d.s3Key || !d.s3Key.startsWith(`kyc/${id}/`)) continue;
+        if (!headCache.has(d.s3Key)) {
+          try {
+            const info = await getFileInfo(d.s3Key);
+            headCache.set(d.s3Key, info.size > 0);
+          } catch {
+            headCache.set(d.s3Key, false);
+          }
+        }
+        if (headCache.get(d.s3Key)) verifiedDocs.push(d);
+      }
+      const selfieDoc = verifiedDocs.find((d) => isSelfieType(d.type || ''));
       const selfieIsAnotherDoc =
-        !!selfieDoc && !!objectOf(selfieDoc) &&
-        docs.some((d) => d !== selfieDoc && !isSelfieType(d.type || '') && objectOf(d) === objectOf(selfieDoc));
+        !!selfieDoc &&
+        verifiedDocs.some((d) => d !== selfieDoc && !isSelfieType(d.type || '') && d.s3Key === selfieDoc.s3Key);
       const hasSelfie = !!selfieDoc && !selfieIsAnotherDoc;
-      const has = (t: string) => docs.some((d) => d.type === t);
+      const has = (t: string) => verifiedDocs.some((d) => d.type === t);
 
       const missing: string[] = [];
       if (isForeign) {
-        if (!docs.some((d) => isPassportType(d.type || ''))) missing.push('pașaportul');
+        if (!verifiedDocs.some((d) => isPassportType(d.type || ''))) missing.push('pașaportul');
         if (!hasSelfie) missing.push('selfie cu actul de identitate');
         if (!has('residence_permit')) missing.push('permisul de rezidență / certificatul fiscal');
       } else {
-        if (!docs.some((d) => isIdentityFrontType(d.type || ''))) missing.push('actul de identitate');
+        if (!verifiedDocs.some((d) => isIdentityFrontType(d.type || ''))) missing.push('actul de identitate');
         if (pk.selfieRequired && !hasSelfie) missing.push('selfie cu actul de identitate');
       }
       if (missing.length > 0) {

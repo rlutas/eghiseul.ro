@@ -663,12 +663,10 @@ function OrderStatusContent() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                {!orderData.hasPaymentProof && (
-                  <BankTransferDetails
-                    orderNumber={orderData.orderCode}
-                    amount={Number(orderData.pricing?.totalPrice ?? 0)}
-                  />
-                )}
+                <BankTransferDetails
+                  orderNumber={orderData.orderCode}
+                  amount={Number(orderData.pricing?.totalPrice ?? 0)}
+                />
                 <div className="space-y-2">
                   <p className="text-sm font-medium text-secondary-900">
                     {orderData.hasPaymentProof ? 'Ai altă dovadă? O poți încărca aici.' : 'Încarcă dovada plății'}
