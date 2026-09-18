@@ -16,7 +16,7 @@
 
 import { createHash } from 'crypto';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { copyFile, deleteFile, generateProofFinalKey, getFileInfo, isOrderUploadKey, isProofFinalKey } from '@/lib/aws/s3';
+import { deleteFile, downloadFile, generateProofFinalKey, getFileInfo, isOrderUploadKey, isProofFinalKey, uploadFile } from '@/lib/aws/s3';
 import { sendEmail } from '@/lib/email/resend';
 import {
   buildBankTransferAdminSubject,
@@ -35,6 +35,16 @@ function extensionOf(key: string, contentType?: string): string {
   if (contentType?.includes('png')) return 'png';
   if (contentType?.includes('webp')) return 'webp';
   return 'jpg';
+}
+
+/** JPEG, PNG, WebP or PDF by magic bytes — anything else is not a proof. */
+function looksLikeProof(b: Buffer): boolean {
+  if (b.length < 12) return false;
+  if (b[0] === 0xff && b[1] === 0xd8 && b[2] === 0xff) return true; // JPEG
+  if (b[0] === 0x89 && b[1] === 0x50 && b[2] === 0x4e && b[3] === 0x47) return true; // PNG
+  if (b.subarray(0, 4).toString('ascii') === 'RIFF' && b.subarray(8, 12).toString('ascii') === 'WEBP') return true;
+  if (b.subarray(0, 5).toString('ascii') === '%PDF-') return true;
+  return false;
 }
 
 export async function attachPaymentProof(input: {
@@ -56,10 +66,28 @@ export async function attachPaymentProof(input: {
       try { await deleteFile(uploadKey); } catch { /* best effort */ }
       return { outcome: 'too_large' };
     }
-    digest = info.etag || createHash('sha256').update(`${uploadKey}:${info.size}:${info.lastModified.toISOString()}`).digest('hex');
+    // The bytes we hash are the bytes we store: the presigned source can be
+    // overwritten until its URL expires, so a HeadObject-then-CopyObject
+    // could attach one object and record another (Codex REV2-CODE-009).
+    // ≤ 10 MB, read once, SHA-256, written under that digest's name.
+    const bytes = await downloadFile(uploadKey);
+    if (bytes.length === 0) return { outcome: 'missing_object' };
+    if (bytes.length > PAYMENT_PROOF_MAX_BYTES) {
+      try { await deleteFile(uploadKey); } catch { /* best effort */ }
+      return { outcome: 'too_large' };
+    }
+    if (!looksLikeProof(bytes)) {
+      try { await deleteFile(uploadKey); } catch { /* best effort */ }
+      return { outcome: 'invalid_key' };
+    }
+    digest = createHash('sha256').update(bytes).digest('hex');
     if (!isFinal) {
-      finalKey = generateProofFinalKey(orderId, digest.replace(/[^a-f0-9-]/gi, ''), extensionOf(uploadKey, info.contentType));
-      await copyFile(uploadKey, finalKey);
+      finalKey = generateProofFinalKey(orderId, digest, extensionOf(uploadKey, info.contentType));
+      await uploadFile(finalKey, bytes, info.contentType || 'application/octet-stream', {
+        'order-id': orderId,
+        'source-key': uploadKey,
+        'sha256': digest,
+      });
     }
   } catch (err) {
     const code = (err as { name?: string })?.name;

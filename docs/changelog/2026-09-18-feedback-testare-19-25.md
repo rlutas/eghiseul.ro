@@ -108,5 +108,15 @@ inspectat separat (rundă nouă, vezi jos).
 | REV2-CODE-006 (medium) | acceptat | `notifyTeamOfProof` marchează `team_notified_at` doar când Resend a trimis (nu la `skipped`). |
 | REV2-CODE-007 (low) | acceptat | `SearchableSelect` primește `id` + `aria-invalid` + `aria-describedby`; eticheta „Motivul solicitării" focusează câmpul. |
 
-- Teste noi: `payment-proof-token`, `motiv-options`, `attach-payment-proof`.
-  Suita: 164 fișiere, 1984 verzi.
+- **Inspecția Codex, a doua rundă (ultima din buget): REVISE, 5 constatări, toate reparate — reparațiile NEINSPECTATE**
+
+| ID | Disp. | Ce s-a făcut |
+|---|---|---|
+| REV2-CODE-008 (high) | acceptat | `/submit`: imaginile inline trebuie să fie JPEG/PNG/WebP după magic bytes, ≤ 12 MB; selfie-ul trebuie să fie ALTĂ poză decât actul, comparat pe SHA-256 al obiectelor stocate (eșec la citire = neacceptat). |
+| REV2-CODE-009 (high) | acceptat | `attach-payment-proof`: obiectul se CITEȘTE (≤ 10 MB), se verifică magic bytes (JPEG/PNG/WebP/PDF), se calculează SHA-256 și se scriu exact acei octeți sub `proof/<sha256>.<ext>` — fără Head-then-Copy, fără ETag. |
+| REV2-CODE-010 (medium) | acceptat | `GET /api/orders/[id]` semnează și cheia imutabilă (`isProofFinalKey`), deci pagina comenzii din cont vede din nou dovada. |
+| REV2-CODE-011 (medium) | acceptat | `BankTransferDetails`: suma EUR doar cu curs BNR valid; fără curs, contul EUR apare ca informație, nu ca opțiune de plată cu sumă în RON. |
+| REV2-CODE-012 (medium) | acceptat | `PaymentProofUpload` așteaptă `onUploadComplete` (atașarea) înainte de starea verde; pagina de status aruncă la eșec, deci widgetul rămâne în starea de reîncercare. |
+
+- Teste: `attach-payment-proof` (8, incl. octeți non-imagine și email sărit).
+  Suita: 164 fișiere, 1987 verzi.

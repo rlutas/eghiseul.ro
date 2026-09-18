@@ -4,7 +4,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { logAudit, getAuditContext } from '@/lib/security/audit-logger';
 import { createHash, timingSafeEqual } from 'crypto';
 import { autoGenerateOrderDocuments } from '@/lib/documents/auto-generate';
-import { uploadOrderSignature, uploadBase64, copyFile, getFileInfo } from '@/lib/aws/s3';
+import { uploadOrderSignature, uploadBase64, copyFile, getFileInfo, downloadFile } from '@/lib/aws/s3';
 import { computeEstimatedCompletionISOForOrder, hasForeignDrivingLicense } from '@/lib/orders/order-estimate';
 import { getMissingInvoiceClientFields } from '@/lib/oblio/invoice';
 import { emailDomainAcceptsMail } from '@/lib/email-mx';
@@ -21,6 +21,14 @@ interface RouteParams {
  * Links the order to the authenticated user if not already linked.
  * Uses admin client to bypass RLS for reliable database operations.
  */
+/** JPEG / PNG / WebP by magic bytes — what the wizard's scan and camera produce. */
+function isImageBytes(b: Buffer): boolean {
+  if (b.length < 12) return false;
+  if (b[0] === 0xff && b[1] === 0xd8 && b[2] === 0xff) return true;
+  if (b[0] === 0x89 && b[1] === 0x50 && b[2] === 0x4e && b[3] === 0x47) return true;
+  return b.subarray(0, 4).toString('ascii') === 'RIFF' && b.subarray(8, 12).toString('ascii') === 'WEBP';
+}
+
 export async function POST(request: NextRequest, { params }: RouteParams) {
   try {
     const { id } = await params;
@@ -144,8 +152,8 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         if (!doc.base64 || doc.s3Key || !doc.type) continue;
         const raw = doc.base64.replace(/^data:[^;]+;base64,/, '');
         const bytes = Buffer.from(raw, 'base64');
-        if (bytes.length < 2048 || !/^[A-Za-z0-9+/=\s]+$/.test(raw)) {
-          // Not an image — drop the claim, do not upload garbage.
+        if (bytes.length < 2048 || bytes.length > 12 * 1024 * 1024 || !isImageBytes(bytes)) {
+          // Not an image (or absurdly large) — drop the claim, do not upload garbage.
           delete doc.base64;
           continue;
         }
@@ -239,10 +247,23 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         }
         if (headCache.get(d.s3Key)) verifiedDocs.push(d);
       }
+      // The selfie must be a DIFFERENT picture from the identity document —
+      // compared by content (SHA-256 of the stored object), not by key.
+      const digestOf = async (key: string) => createHash('sha256').update(await downloadFile(key)).digest('hex');
       const selfieDoc = verifiedDocs.find((d) => isSelfieType(d.type || ''));
-      const selfieIsAnotherDoc =
-        !!selfieDoc &&
-        verifiedDocs.some((d) => d !== selfieDoc && !isSelfieType(d.type || '') && d.s3Key === selfieDoc.s3Key);
+      let selfieIsAnotherDoc = false;
+      if (selfieDoc?.s3Key) {
+        try {
+          const selfieDigest = await digestOf(selfieDoc.s3Key);
+          for (const d of verifiedDocs) {
+            if (d === selfieDoc || isSelfieType(d.type || '') || !d.s3Key) continue;
+            if (d.s3Key === selfieDoc.s3Key || (await digestOf(d.s3Key)) === selfieDigest) { selfieIsAnotherDoc = true; break; }
+          }
+        } catch (digestErr) {
+          console.error('[submit] document digest failed:', digestErr instanceof Error ? digestErr.message : digestErr);
+          selfieIsAnotherDoc = true; // cannot prove it is a different picture → not accepted
+        }
+      }
       const hasSelfie = !!selfieDoc && !selfieIsAnotherDoc;
       const has = (t: string) => verifiedDocs.some((d) => d.type === t);
 

@@ -2,13 +2,18 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 const s3 = vi.hoisted(() => ({
   getFileInfo: vi.fn<(key: string) => Promise<Record<string, unknown>>>(),
-  copyFile: vi.fn<(src: string, dest: string) => Promise<string>>(),
+  downloadFile: vi.fn<(key: string) => Promise<Buffer>>(),
+  uploadFile: vi.fn<(key: string, body: Buffer | string, contentType: string, metadata?: Record<string, string>) => Promise<string>>(),
   deleteFile: vi.fn<(key: string) => Promise<void>>(),
 }));
 vi.mock('@/lib/aws/s3', async (orig) => {
   const real = await orig<typeof import('@/lib/aws/s3')>();
-  return { ...real, getFileInfo: s3.getFileInfo, copyFile: s3.copyFile, deleteFile: s3.deleteFile };
+  return { ...real, getFileInfo: s3.getFileInfo, downloadFile: s3.downloadFile, uploadFile: s3.uploadFile, deleteFile: s3.deleteFile };
 });
+// A minimal JPEG: SOI marker + padding — enough for the magic-byte check.
+const JPEG = Buffer.concat([Buffer.from([0xff, 0xd8, 0xff, 0xe0]), Buffer.alloc(64, 1)]);
+const { createHash } = await import('crypto');
+const JPEG_SHA = createHash('sha256').update(JPEG).digest('hex');
 
 const db = vi.hoisted(() => ({
   rpc: vi.fn<(name: string, args?: Record<string, unknown>) => Promise<{ data: unknown; error: null }>>(),
@@ -43,8 +48,9 @@ const UPLOAD = `orders/2026/09/${ORDER}/uploads/proof-1.jpg`;
 beforeEach(() => {
   vi.clearAllMocks();
   db.event = { id: 'evt-1', team_notified_at: null };
-  s3.getFileInfo.mockResolvedValue({ key: UPLOAD, size: 1234, lastModified: new Date(), contentType: 'image/jpeg', etag: 'abc123' });
-  s3.copyFile.mockResolvedValue('ok');
+  s3.getFileInfo.mockResolvedValue({ key: UPLOAD, size: JPEG.length, lastModified: new Date(), contentType: 'image/jpeg', etag: 'abc123' });
+  s3.downloadFile.mockResolvedValue(JPEG);
+  s3.uploadFile.mockResolvedValue('ok');
   db.rpc.mockImplementation(async (name: string) => {
     if (name === 'attach_payment_proof') return { data: { outcome: 'attached', event_id: 'evt-1', history_id: 'h1' }, error: null };
     return { data: true, error: null };
@@ -59,23 +65,38 @@ describe('attachPaymentProof', () => {
   });
 
   it('deletes and refuses an object over 10 MB', async () => {
-    s3.getFileInfo.mockResolvedValue({ key: UPLOAD, size: 11 * 1024 * 1024, lastModified: new Date(), etag: 'big' });
+    s3.getFileInfo.mockResolvedValue({ key: UPLOAD, size: 11 * 1024 * 1024, lastModified: new Date(), contentType: 'image/jpeg', etag: 'big' });
     const r = await attachPaymentProof({ orderId: ORDER, uploadKey: UPLOAD, changedBy: null });
     expect(r.outcome).toBe('too_large');
     expect(s3.deleteFile).toHaveBeenCalledWith(UPLOAD);
     expect(db.rpc).not.toHaveBeenCalled();
   });
 
-  it('copies to an immutable key named after the ETag, attaches, notifies the team once', async () => {
+  it('stores the bytes it hashed under an immutable SHA-256 key, attaches, notifies the team once', async () => {
     const r = await attachPaymentProof({ orderId: ORDER, uploadKey: UPLOAD, changedBy: 'u1' });
     expect(r.outcome).toBe('attached');
-    expect(s3.copyFile).toHaveBeenCalledTimes(1);
-    const finalKey = s3.copyFile.mock.calls[0][1] as string;
-    expect(finalKey).toMatch(new RegExp(`^orders/\\d{4}/\\d{2}/${ORDER}/proof/abc123\\.jpg$`));
-    expect(db.rpc).toHaveBeenCalledWith('attach_payment_proof', expect.objectContaining({ p_key: finalKey, p_digest: 'abc123' }));
+    expect(s3.uploadFile).toHaveBeenCalledTimes(1);
+    const finalKey = s3.uploadFile.mock.calls[0][0];
+    expect(finalKey).toMatch(new RegExp(`^orders/\\d{4}/\\d{2}/${ORDER}/proof/${JPEG_SHA}\\.jpg$`));
+    expect(s3.uploadFile.mock.calls[0][1]).toBe(JPEG);
+    expect(db.rpc).toHaveBeenCalledWith('attach_payment_proof', expect.objectContaining({ p_key: finalKey, p_digest: JPEG_SHA }));
     expect(mail.sendEmail).toHaveBeenCalledTimes(1);
-    expect(mail.sendEmail.mock.calls[0][0]).toMatchObject({ idempotencyKey: `bank-transfer-proof-${ORDER}-abc123` });
+    expect(mail.sendEmail.mock.calls[0][0]).toMatchObject({ idempotencyKey: `bank-transfer-proof-${ORDER}-${JPEG_SHA.slice(0, 16)}` });
     expect(db.rpc).toHaveBeenCalledWith('mark_payment_proof_notified', { p_event_id: 'evt-1' });
+  });
+
+  it('refuses bytes that are not an image or a PDF', async () => {
+    s3.downloadFile.mockResolvedValue(Buffer.alloc(4096, 0x41));
+    const r = await attachPaymentProof({ orderId: ORDER, uploadKey: UPLOAD, changedBy: null });
+    expect(r.outcome).toBe('invalid_key');
+    expect(s3.deleteFile).toHaveBeenCalledWith(UPLOAD);
+    expect(db.rpc).not.toHaveBeenCalled();
+  });
+
+  it('does not mark the event notified when the e-mail was skipped', async () => {
+    mail.sendEmail.mockResolvedValueOnce({ id: null, skipped: true } as unknown as { id: string });
+    await attachPaymentProof({ orderId: ORDER, uploadKey: UPLOAD, changedBy: null });
+    expect(db.rpc).not.toHaveBeenCalledWith('mark_payment_proof_notified', expect.anything());
   });
 
   it('a replay is unchanged and does not e-mail again once notified', async () => {

@@ -212,13 +212,17 @@ function OrderStatusContent() {
       });
       const json = await res.json().catch(() => ({}));
       if (!res.ok || !json.success) {
-        setProofMessage({ ok: false, text: json.error || 'Nu am putut salva dovada. Încearcă din nou.' });
-        return;
+        const text = json.error || 'Nu am putut salva dovada. Încearcă din nou.';
+        setProofMessage({ ok: false, text });
+        throw new Error(text);
       }
       setProofMessage({ ok: true, text: 'Dovada a fost salvată. O verificăm în cel mai scurt timp.' });
       await handleSearch();
-    } catch {
-      setProofMessage({ ok: false, text: 'Nu am putut salva dovada. Încearcă din nou.' });
+    } catch (err) {
+      const text = err instanceof Error ? err.message : 'Nu am putut salva dovada. Încearcă din nou.';
+      setProofMessage({ ok: false, text });
+      // Rethrown so the upload widget stays in its retry state, not green.
+      throw new Error(text);
     }
   };
 

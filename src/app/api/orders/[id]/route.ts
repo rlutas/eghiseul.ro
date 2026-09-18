@@ -4,7 +4,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { normalizeOrderOptions } from '@/lib/orders/normalize'
 import { calculateEstimatedCompletion } from '@/lib/delivery-calculator'
 import { customerTimeline, timelineLabel, type RawHistoryRow } from '@/lib/orders/customer-timeline'
-import { getDownloadUrl, isOrderUploadKey } from '@/lib/aws/s3'
+import { getDownloadUrl, isOrderUploadKey, isProofFinalKey } from '@/lib/aws/s3'
 import { issuePaymentProofToken } from '@/lib/orders/payment-proof-token'
 
 interface RouteParams {
@@ -110,7 +110,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     let paymentProofUrl: string | null = null
     // Signed only inside this order's own upload namespace: the key column is
     // written from a customer request (REV3-PROOF-001).
-    if (proofKey && isOrderUploadKey(proofKey, id)) {
+    if (proofKey && (isOrderUploadKey(proofKey, id) || isProofFinalKey(proofKey, id))) {
       try {
         paymentProofUrl = await getDownloadUrl(proofKey, 3600)
       } catch (proofError) {

@@ -117,13 +117,17 @@ export function BankTransferDetails({
   // The EUR account is shown whenever it is configured; the BNR rate only
   // adds the orientative EUR amount (without it the RON amount stays, and
   // the customer's bank converts) — Codex REV2-CODE-004.
-  const canPayEur = !!details.ibanEur;
+  // A payable EUR amount needs the BNR rate; without it the EUR account is
+  // still listed below as information (the customer's bank converts) —
+  // never a RON figure next to a EUR IBAN (Codex REV2-CODE-004/011).
+  const canPayEur = !!details.ibanEur && !!eurRate && eurRate.value > 0;
   const payingEur = currency === 'EUR' && canPayEur;
   const iban = payingEur ? details.ibanEur : details.ibanRon;
   // Suma în euro e orientativă: banca aplică propriul curs la conversie.
-  const eurAmount = eurRate ? Math.ceil((amount / eurRate.value) * 100) / 100 : null;
+  const eurAmount = eurRate && eurRate.value > 0 ? Math.ceil((amount / eurRate.value) * 100) / 100 : null;
   const displayAmount = payingEur && eurAmount ? eurAmount : amount;
   const displayCurrency = payingEur && eurAmount ? 'EUR' : 'RON';
+  const eurIbanInfoOnly = !!details.ibanEur && !canPayEur;
 
   return (
     <div className="space-y-4">
@@ -145,6 +149,13 @@ export function BankTransferDetails({
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
+          {eurIbanInfoOnly && (
+            <p className="text-xs text-neutral-500">
+              Cont EUR (suma se convertește de banca ta):{' '}
+              <span className="font-mono text-secondary-900">{details.ibanEur}</span>
+            </p>
+          )}
+
           {/* Currency switch — doar dacă avem cont în euro ȘI curs BNR */}
           {canPayEur && (
             <div className="flex gap-2">

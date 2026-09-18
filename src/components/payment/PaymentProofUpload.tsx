@@ -7,7 +7,8 @@ import { uploadToS3 } from '@/lib/aws/upload-client';
 
 interface PaymentProofUploadProps {
   orderId: string;
-  onUploadComplete: (fileKey: string) => void;
+  /** May attach the proof to the order; the component shows success only after it resolves. */
+  onUploadComplete: (fileKey: string) => void | Promise<void>;
   onUploadError?: (error: string) => void;
   /** From the status/order API — lets a guest upload without a session. */
   proofToken?: string | null;
@@ -68,12 +69,14 @@ export function PaymentProofUpload({
           proofToken,
         });
 
+        // Uploaded to storage ≠ attached to the order: the parent may still
+        // refuse it (Codex REV2-CODE-012). Green only once it resolved.
+        await onUploadComplete(result.key);
         setUploadedFile({
           name: file.name,
           key: result.key,
           type: file.type,
         });
-        onUploadComplete(result.key);
       } catch (err) {
         const message = err instanceof Error && err.message && err.message !== 'Failed to get upload URL'
           ? err.message
