@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { normalizePhone } from '@/lib/format/normalize-phone';
+import { validatePhone } from '@/lib/format/validate-phone';
 
 /**
  * PATCH /api/user/profile
@@ -52,7 +53,16 @@ export async function PATCH(request: Request) {
     // One shape in the column, whatever the form was: the wizard prefills the
     // contact step from here, and its phone field cannot make sense of
     // „0712 345 678".
-    if (phone !== undefined) updates.phone = normalizePhone(phone);
+    if (phone !== undefined) {
+      // The forms check this already; the server checks it again so nothing
+      // that bypasses them can store a number the team cannot dial. An empty
+      // phone is allowed — clearing it is not the same as getting it wrong.
+      const phoneMessage = typeof phone === 'string' && phone.trim() ? validatePhone(phone) : null;
+      if (phoneMessage) {
+        return NextResponse.json({ success: false, error: phoneMessage }, { status: 400 });
+      }
+      updates.phone = normalizePhone(phone);
+    }
 
     // Company fields
     if (companyCui !== undefined) updates.company_cui = companyCui;

@@ -38,6 +38,8 @@ import CompanyProfileSection, { type CompanyProfile } from './CompanyProfileSect
 import { isoDate, isoFromRomanianDate } from '@/components/account/profile-steps/personal-fields';
 import { uploadToS3 } from '@/lib/aws/upload-client';
 import { base64ToFile } from '@/lib/images/compress';
+import { PhoneInput } from '@/components/shared/PhoneInput';
+import { validatePhone } from '@/lib/format/validate-phone';
 
 interface ProfileData {
   id: string;
@@ -82,6 +84,7 @@ export default function ProfileTab({ initialData, className, autoEdit = false }:
   const [showScanner, setShowScanner] = useState(false);
   const [scanSuccess, setScanSuccess] = useState(false);
   const [activeSubTab, setActiveSubTab] = useState<ProfileSubTab>('pf');
+  const [phoneError, setPhoneError] = useState<string | null>(null);
 
   const {
     saveDocument,
@@ -144,10 +147,20 @@ export default function ProfileTab({ initialData, className, autoEdit = false }:
     setEditData({});
     setIsEditing(false);
     setError(null);
+    setPhoneError(null);
   }, []);
 
   // Save profile
   const handleSave = useCallback(async () => {
+    // A phone we cannot dial is a customer we cannot reach: refused here, with
+    // the message under the field, and refused again by the server.
+    const phoneMessage = validatePhone(editData.phone || '');
+    if (phoneMessage) {
+      setPhoneError(phoneMessage);
+      document.getElementById('phone')?.focus();
+      return;
+    }
+
     setIsSaving(true);
     setError(null);
     setSuccess(false);
@@ -546,12 +559,19 @@ export default function ProfileTab({ initialData, className, autoEdit = false }:
 
             <div className="space-y-2">
               <Label htmlFor="phone">Telefon</Label>
-              <Input
+              {/* The order form's field — country picker, dial code, number
+                  checked per country — so what is saved here is a number the
+                  wizard accepts and the team can dial. */}
+              <PhoneInput
                 id="phone"
-                type="tel"
                 value={editData.phone || ''}
-                onChange={(e) => setEditData(prev => ({ ...prev, phone: e.target.value }))}
-                placeholder="0712345678"
+                onChange={(phone) => {
+                  setEditData(prev => ({ ...prev, phone }));
+                  setPhoneError(null);
+                }}
+                onBlur={() => setPhoneError(validatePhone(editData.phone || ''))}
+                error={phoneError ?? undefined}
+                aria-invalid={phoneError ? true : undefined}
               />
             </div>
           </div>

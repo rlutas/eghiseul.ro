@@ -7,6 +7,13 @@ interface PhoneInputProps {
   onChange: (phone: string) => void;
   error?: string;
   className?: string;
+  /** Forwarded to the `<input>`, so a `<label htmlFor>` can point at it. */
+  id?: string;
+  onBlur?: () => void;
+  /** Marks the input for the profile dialogs, which focus `[data-autofocus]`. */
+  autoFocus?: boolean;
+  'aria-invalid'?: boolean;
+  'aria-describedby'?: string;
 }
 
 // Lazy-load to avoid SSR/hydration mismatch.
@@ -24,10 +31,10 @@ const PhoneInputInner = dynamic(
   }
 );
 
-export function PhoneInput({ value, onChange, error, className }: PhoneInputProps) {
+export function PhoneInput({ value, onChange, error, className, ...inputProps }: PhoneInputProps) {
   return (
     <div className={className}>
-      <PhoneInputInner value={value} onChange={onChange} />
+      <PhoneInputInner value={value} onChange={onChange} {...inputProps} />
       {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
     </div>
   );

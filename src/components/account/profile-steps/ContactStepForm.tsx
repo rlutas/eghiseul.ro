@@ -8,18 +8,18 @@
  */
 
 import { useCallback, useEffect, useState } from 'react';
-import { Input } from '@/components/ui/input';
+import { PhoneInput } from '@/components/shared/PhoneInput';
+import { hasTypedPhone } from '@/lib/format/validate-phone';
 import {
   describedBy,
   Field,
   FormError,
-  INPUT_CLASS,
   StepFormFooter,
   validatePhone,
   type ProfileStepFormProps,
 } from './step-form-kit';
 
-const PHONE_HINT = 'Te sunăm doar dacă apare ceva de lămurit la o comandă.';
+const PHONE_HINT = 'Alege țara și scrie numărul fără zeroul din față — te sunăm doar dacă apare ceva de lămurit la o comandă.';
 
 export function ContactStepForm({ onDirtyChange, onSaved, onRequestClose }: ProfileStepFormProps) {
   const [phone, setPhone] = useState('');
@@ -29,7 +29,9 @@ export function ContactStepForm({ onDirtyChange, onSaved, onRequestClose }: Prof
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    onDirtyChange(phone.trim().length > 0);
+    // The field reports „+40" before anything is typed — that is not work to
+    // protect with a confirmation.
+    onDirtyChange(hasTypedPhone(phone));
   }, [phone, onDirtyChange]);
 
   const handleBlur = useCallback(() => {
@@ -82,19 +84,16 @@ export function ContactStepForm({ onDirtyChange, onSaved, onRequestClose }: Prof
         error={shownError}
         hint={PHONE_HINT}
       >
-        <Input
+        {/* The order form's field: country picker, dial code, the trunk zero
+            dropped, the number checked per country before it is saved. */}
+        <PhoneInput
           id="checklist-phone"
-          data-autofocus="true"
-          type="tel"
-          inputMode="tel"
-          autoComplete="tel"
+          autoFocus
           value={phone}
-          onChange={(e) => setPhone(e.target.value)}
+          onChange={setPhone}
           onBlur={handleBlur}
           aria-invalid={shownError ? true : undefined}
           aria-describedby={describedBy('checklist-phone', shownError, PHONE_HINT)}
-          placeholder="0722 123 456"
-          className={INPUT_CLASS}
         />
       </Field>
 

@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { AuthLogo } from '@/components/auth/auth-logo';
 import { useRouter } from 'next/navigation';
-import { Eye, EyeOff, Mail, Lock, User, Phone, ArrowRight, Shield, Clock, CheckCircle, FileText } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, User, ArrowRight, Shield, Clock, CheckCircle, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -13,6 +13,8 @@ import { createClient } from '@/lib/supabase/client';
 import { authErrorToRomanian } from '@/lib/auth/error-messages';
 import { Footer } from '@/components/home/footer';
 import { normalizePhone } from '@/lib/format/normalize-phone';
+import { validatePhone } from '@/lib/format/validate-phone';
+import { PhoneInput } from '@/components/shared/PhoneInput';
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -53,6 +55,15 @@ export default function RegisterPage() {
 
     if (!agreeTerms) {
       setError('Trebuie să accepți termenii și condițiile.');
+      return;
+    }
+
+    // Same check as the order form: a number we cannot dial would sit in
+    // `profiles.phone` and prefill every future order with it.
+    const phoneMessage = validatePhone(formData.phone);
+    if (phoneMessage) {
+      setError(phoneMessage);
+      document.getElementById('phone')?.focus();
       return;
     }
 
@@ -226,19 +237,13 @@ export default function RegisterPage() {
                 <Label htmlFor="phone" className="text-secondary-900 font-medium">
                   Telefon
                 </Label>
-                <div className="relative">
-                  <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400" />
-                  <Input
-                    id="phone"
-                    name="phone"
-                    type="tel"
-                    placeholder="07XX XXX XXX"
-                    value={formData.phone}
-                    onChange={handleChange}
-                    className="pl-12 h-12 rounded-xl border-neutral-200 focus:border-primary-500 focus:ring-primary-500"
-                    required
-                  />
-                </div>
+                {/* The order form's field: country picker, dial code, the
+                    number checked per country before the account is created. */}
+                <PhoneInput
+                  id="phone"
+                  value={formData.phone}
+                  onChange={(phone) => setFormData((prev) => ({ ...prev, phone }))}
+                />
               </div>
 
               <div className="space-y-2">

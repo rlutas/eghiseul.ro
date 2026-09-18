@@ -7,9 +7,22 @@ import { stripTrunkZero } from '@/lib/format/phone-trunk-zero';
 interface Props {
   value: string;
   onChange: (phone: string) => void;
+  id?: string;
+  onBlur?: () => void;
+  autoFocus?: boolean;
+  'aria-invalid'?: boolean;
+  'aria-describedby'?: string;
 }
 
-export function PhoneInputClient({ value, onChange }: Props) {
+export function PhoneInputClient({
+  value,
+  onChange,
+  id,
+  onBlur,
+  autoFocus,
+  'aria-invalid': ariaInvalid,
+  'aria-describedby': ariaDescribedBy,
+}: Props) {
   return (
     <ReactPhoneInput
       defaultCountry="ro"
@@ -40,8 +53,15 @@ export function PhoneInputClient({ value, onChange }: Props) {
           '!h-11 !rounded-l-lg !rounded-r-none !border !border-neutral-300 !bg-white !px-3 hover:!bg-neutral-50',
       }}
       inputProps={{
+        id,
+        onBlur,
         inputMode: 'tel',
         autoComplete: 'tel',
+        'aria-invalid': ariaInvalid,
+        'aria-describedby': ariaDescribedBy,
+        // Not the `autoFocus` attribute: the profile dialogs decide themselves
+        // what to focus on open, and look for this marker.
+        ...(autoFocus ? { 'data-autofocus': 'true' } : {}),
         // Accessible name so screen readers announce the field and tests can
         // target it (react-international-phone renders a bare <input> otherwise).
         'aria-label': 'Telefon',

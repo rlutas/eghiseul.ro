@@ -184,22 +184,8 @@ export function focusFirstInvalid(
 }
 
 /**
- * Phone numbers, checked loosely on purpose: we call the customer, we do not
- * dial a format. Romanian numbers start with 0, foreign ones with +, and
- * anything with too few digits to be a phone number is refused.
+ * The same check the order form makes — per-country length and pattern through
+ * libphonenumber-js — so a number the account accepts is a number the wizard
+ * accepts, and one the team can dial.
  */
-export function validatePhone(raw: string): string | null {
-  const value = raw.trim();
-  if (!value) return 'Scrie numărul la care te putem suna.';
-  const compact = value.replace(/[\s().-]/g, '');
-  if (!/^\+?\d+$/.test(compact)) {
-    return 'Folosește doar cifre, spații și, eventual, „+" la început.';
-  }
-  const digits = compact.replace(/\D/g, '');
-  if (!compact.startsWith('+') && !compact.startsWith('0')) {
-    return 'Numerele din România încep cu 0, cele din străinătate cu +.';
-  }
-  if (digits.length < 9) return 'Numărul pare prea scurt. Exemplu: 0722 123 456.';
-  if (digits.length > 15) return 'Numărul pare prea lung.';
-  return null;
-}
+export { validatePhone } from '@/lib/format/validate-phone';
