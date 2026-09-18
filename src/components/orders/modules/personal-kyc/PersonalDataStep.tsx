@@ -164,7 +164,7 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
   }, [personalKyc]);
 
   // Check if we have valid KYC from user's account
-  const hasValidKycFromAccount = isPrefilled && prefillData?.has_valid_kyc;
+  const hasValidKycFromAccount = isPrefilled && !!prefillData?.has_valid_kyc && personalKyc?.useOtherDocument !== true;
   // The account holds an unexpired identity document (front / passport page)
   // even when the selfie is missing: show THAT instead of asking for a scan
   // (feedback 18.09.2026, #20). „Folosește alt act" reveals the picker + scan.
@@ -1284,10 +1284,14 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
                 <button
                   type="button"
                   onClick={() => {
+                    // Changed identity data cannot ride on the account's old
+                    // document: the act + selfie are asked again (KYC-ALT-001).
+                    updatePersonalKyc({ useOtherDocument: true });
                     setMode('manual');
                     setShowScanSection(false);
                   }}
                   className="text-primary-600 underline underline-offset-2 hover:text-primary-700"
+                  title="Datele modificate cer actul și selfie-ul din nou la pasul următor"
                 >
                   Modifică datele
                 </button>

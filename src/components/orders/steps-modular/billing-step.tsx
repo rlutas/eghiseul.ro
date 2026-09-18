@@ -323,16 +323,11 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
   const savedPjData = savedPjProfile?.billing_data as Record<string, string> | undefined;
   const hasSavedPj = !!(savedPjData?.cui && savedPjData?.companyName);
   const selfOptionExists = billingOptions.some((o) => o.source === 'self');
-  // Property services collect the requester on the property step, not a
-  // scanned ID (REV-BILL-002): „Pe mine" uses that name/CNP.
-  const propertyRequester = useMemo(() => {
-    const name = (state.property?.ownerName || '').trim();
-    const cnp = (state.property?.ownerCnpCui || '').replace(/\D/g, '');
-    if (!name) return null;
-    const parts = name.split(/\s+/);
-    return { lastName: parts[0] || '', firstName: parts.slice(1).join(' '), cnp: cnp.length === 13 ? cnp : '' };
-  }, [state.property?.ownerName, state.property?.ownerCnpCui]);
-  const meAvailable = selfOptionExists || !!savedPfPrefill || !!propertyRequester || (pfOptionIsCustomer && !!prefillFromId);
+  // Property services: the owner on the property step is the OWNER, not the
+  // payer (they often differ, and the identifier may be a CUI) — never
+  // inferred as the invoice customer (Codex BILL-OWNER-001). „Pe mine" there
+  // opens the PF form empty unless a saved PF profile exists.
+  const meAvailable = selfOptionExists || !!savedPfPrefill || pfOptionIsCustomer;
   const requestPjAvailable = !!companyKyc?.cui && !!companyKyc?.companyName;
   type BillingPick = 'me' | 'other_pf' | 'saved_pj' | 'request_pj' | 'other_pj';
   const [manualPick, setManualPick] = useState<'me' | 'other_pf' | 'other_pj' | null>(null);
@@ -351,12 +346,11 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
       if (manualPick === 'other_pf') return 'other_pf';
       if (manualPick === 'me' || usedSavedPfProfile) return 'me';
       if (savedPfPrefill?.cnp && b.cnp === savedPfPrefill.cnp) return 'me';
-      if (propertyRequester?.cnp && b.cnp === propertyRequester.cnp) return 'me';
       if (!selfOptionExists && pfOptionIsCustomer && prefillFromId?.cnp && b.cnp === prefillFromId.cnp) return 'me';
       return b.firstName || b.lastName || b.cnp ? 'other_pf' : null;
     }
     return null;
-  }, [billing, savedPjData, companyKyc?.cui, manualPick, usedSavedPfProfile, savedPfPrefill, propertyRequester, selfOptionExists, pfOptionIsCustomer, prefillFromId]);
+  }, [billing, savedPjData, companyKyc?.cui, manualPick, usedSavedPfProfile, savedPfPrefill, selfOptionExists, pfOptionIsCustomer, prefillFromId]);
   const top: 'PF' | 'PJ' | null = pick === null ? null : pick === 'me' || pick === 'other_pf' ? 'PF' : 'PJ';
   const prefilledPick = pick === 'me' || pick === 'saved_pj' || pick === 'request_pj';
   const showForm = !!pick && (editing || !prefilledPick || !billing?.isValid);
@@ -723,16 +717,8 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
     setManualPick('me');
     if (selfOptionExists) handleSourceSelect('self');
     else if (savedPfPrefill) applySavedPf();
-    else if (propertyRequester) {
-      const pfFields = { firstName: propertyRequester.firstName, lastName: propertyRequester.lastName, cnp: propertyRequester.cnp, address: '', city: '', county: '', postalCode: '', country: 'Romania' };
-      updateBilling({
-        source: 'other_pf', type: 'persoana_fizica', ...pfFields,
-        companyName: undefined, cui: undefined, regCom: undefined, companyAddress: undefined, cuiVerified: undefined,
-        isValid: false, // the address is still to be typed
-      });
-      setUsedSavedPfProfile(false);
-    } else handleSourceSelect('other_pf');
-  }, [selfOptionExists, savedPfPrefill, applySavedPf, handleSourceSelect, propertyRequester, updateBilling]);
+    else handleSourceSelect('other_pf');
+  }, [selfOptionExists, savedPfPrefill, applySavedPf, handleSourceSelect]);
   // „Altă persoană": empty fields, whatever the profile holds.
   const applyOtherPf = useCallback(() => {
     setEditing(true);
@@ -943,9 +929,7 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
                     ? 'datele din actul de identitate'
                     : savedPfPrefill
                       ? `${[savedPfPrefill.lastName, savedPfPrefill.firstName].filter(Boolean).join(' ')}${savedPfPrefill.cnp ? ` · CNP ${savedPfPrefill.cnp}` : ''}`
-                      : propertyRequester
-                        ? `${[propertyRequester.lastName, propertyRequester.firstName].filter(Boolean).join(' ')}${propertyRequester.cnp ? ` · CNP ${propertyRequester.cnp}` : ''} — completezi adresa`
-                        : 'datele tale din comandă'
+                      : 'completezi datele tale'
                 }
                 onClick={applyMe}
               />

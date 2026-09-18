@@ -293,7 +293,9 @@ export function buildWizardSteps(
     const extraDocs = verificationConfig.personalKyc.extraDocuments ?? [];
     kycStep.condition = (state: ModularWizardState) => {
       if (baseCondition && !baseCondition(state)) return false;
-      if (state.accountKyc?.valid && extraDocs.length === 0) return false;
+      // „Folosește alt act" / edited identity data: the account's document no
+      // longer stands for this order, the step is back (Codex KYC-ALT-001).
+      if (state.accountKyc?.valid && extraDocs.length === 0 && state.personalKyc?.useOtherDocument !== true) return false;
       return true;
     };
 

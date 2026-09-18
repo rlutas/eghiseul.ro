@@ -888,7 +888,7 @@ function OptionCard({
         </span>
         {/* On a phone the price sits on its own row under the name, aligned
             with the text (feedback 18.09.2026, #28); inline from sm up. */}
-        <span className="basis-full pl-[4.25rem] sm:basis-auto sm:pl-0">
+        <span className="basis-full pl-[5.25rem] sm:basis-auto sm:pl-0">
           <PriceChip price={price} selected={selected} disabled={disabled} size={primary ? 'md' : 'md'} />
         </span>
       </button>

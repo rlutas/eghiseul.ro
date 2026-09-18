@@ -181,7 +181,7 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
   }, [personalKyc]);
 
   // Check if user has valid KYC from their account
-  const hasValidAccountKyc = isPrefilled && prefillData?.has_valid_kyc;
+  const hasValidAccountKyc = isPrefilled && !!prefillData?.has_valid_kyc && personalKyc?.useOtherDocument !== true;
   // The identity document comes from the account (step 2 showed it instead
   // of a scan); only the selfie + the service's extra documents are asked
   // here. `/submit` copies the account document into the order.

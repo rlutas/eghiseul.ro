@@ -72,6 +72,7 @@ export async function GET(request: NextRequest) {
         payment_status,
         payment_method,
         payment_proof_url,
+        proof_verified_at,
         invoice_number,
         invoice_url,
         extra_billing,
@@ -399,6 +400,10 @@ export async function GET(request: NextRequest) {
         status: order.status,
         paymentStatus: order.payment_status,
         paymentMethod: order.payment_method ?? null,
+        // The team pressed „Dovadă verificată — pornește lucrul": the page
+        // stops talking about the transfer (canonical field, not the status).
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        proofVerifiedAt: (order as any).proof_verified_at ?? null,
         // Lets the customer attach a proof from this page without a session
         // (order code + email were just verified above). Only while the
         // order waits for the transfer.

@@ -1145,11 +1145,27 @@ export class SamedayProvider implements CourierProvider {
       const allLockers: ServicePoint[] = first.data.map(mapLocker);
 
       if (totalPages > 1) {
-        const restPages = await Promise.all(
+        // One failed page must not throw away the others (Codex SD-COLD-001):
+        // keep what arrived, log what did not, and do not cache a partial
+        // list for 24 h.
+        const restPages = await Promise.allSettled(
           Array.from({ length: totalPages - 1 }, (_, i) => fetchPage(i + 2))
         );
-        for (const pageData of restPages) {
-          for (const locker of pageData.data) allLockers.push(mapLocker(locker));
+        let failedPages = 0;
+        for (const r of restPages) {
+          if (r.status === 'fulfilled') {
+            for (const locker of r.value.data) allLockers.push(mapLocker(locker));
+          } else {
+            failedPages += 1;
+          }
+        }
+        if (failedPages > 0) {
+          console.warn(`[Sameday] ooh-locations: ${failedPages}/${totalPages - 1} pages failed, using ${allLockers.length} lockers uncached`);
+          return allLockers.filter((point) => {
+            const matchesCity = city === '*' || normalizeForMatch(point.city).includes(normalizeForMatch(city));
+            const matchesCounty = !county || normalizeForMatch(point.county || '').includes(normalizeForMatch(county)) || normalizeForMatch(county).includes(normalizeForMatch(point.county || ''));
+            return matchesCity && matchesCounty;
+          });
         }
       }
 

@@ -40,8 +40,18 @@ Nimic nou pentru voi în admin.
   din fallback și 29,80 la adresă). Reparat; iar după ce clientul alege
   lockerul, prețul se re-estimează pentru lockerul lui.
 - Facturarea: alegerea PF/PJ se calculează din datele comenzii la fiecare
-  afișare (o comandă PJ nu mai poate arăta „Pe mine" lângă factura pe firmă);
-  la imobiliare, „Pe mine" folosește numele/CNP-ul din pasul de imobil.
+  afișare (o comandă PJ nu mai poate arăta „Pe mine" lângă factura pe firmă).
+
+**A doua inspecție (ultima din buget): 5 constatări, reparate, nereinspectate**
+- „Modifică datele" sau „Folosește alt act" la pasul 2 înseamnă act + selfie
+  din nou la pasul următor (datele schimbate nu pot merge pe actul vechi).
+- La imobiliare, proprietarul din pasul de imobil NU e presupus plătitor:
+  „Pe mine" deschide formularul gol (sau profilul salvat din cont).
+- Pagina comenzii folosește marcajul real „dovadă verificată" pus de echipă,
+  nu statusul comenzii (o comandă mutată pe standby nu mai arată fals
+  „Dovadă verificată").
+- Lista de lockere Sameday: dacă o pagină pică, se folosesc celelalte.
+- Prețul opțiunii, pe mobil, aliniat exact cu numele.
 
 ---
 
@@ -76,6 +86,13 @@ Nimic nou pentru voi în admin.
   `oohLastMile` (fără `lockerId`), verificat live cu `SamedayProvider`;
   REV-SD-002 — `delivery-step` re-estimează cu `locker_id` la alegerea
   lockerului și actualizează cotația în loc.
-- **34** status: cardul de transfer doar la `status='awaiting_payment'`; badge
-  „Dovadă verificată" când `payment_status='awaiting_verification'` și statusul
-  a trecut mai departe (`work_started_on_proof`).
+- **34** status: cardul de transfer cât `payment_status='awaiting_verification'`
+  și `proof_verified_at` e null; badge „Dovadă verificată" pe
+  `proofVerifiedAt` (expus de `/api/orders/status`).
+- **Inspecție 2 (REVISE, 5)**: KYC-ALT-001 — `useOtherDocument` anulează
+  scurtătura de cont în `step-builder`, `KYCDocumentsStep`,
+  `PersonalDataStep`; „Modifică datele" setează și el flagul.
+  BILL-OWNER-001 — `propertyRequester` eliminat; `meAvailable` =
+  self/saved/`pfOptionIsCustomer`. STATUS-PROOF-001 — `proof_verified_at`
+  canonic. SD-COLD-001 — `Promise.allSettled` pe paginile ooh-locations,
+  listă parțială neîncachetată. OPT-ALIGN-001 — `pl-[5.25rem]`.

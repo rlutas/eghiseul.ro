@@ -124,6 +124,8 @@ interface OrderData {
   status: string;
   paymentStatus: string;
   paymentMethod?: string | null;
+  /** Set when an operator verified the proof and started work. */
+  proofVerifiedAt?: string | null;
   /** Lets this page attach a payment proof without a session. */
   proofToken?: string | null;
   invoiceNumber?: string | null;
@@ -444,7 +446,7 @@ function OrderStatusContent() {
                   ) : orderData.paymentStatus === 'awaiting_verification' ? (
                     <div className="px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 flex items-center gap-1">
                       <Clock className="h-3 w-3" />
-                      {orderData.status !== 'awaiting_payment'
+                      {orderData.proofVerifiedAt
                         ? 'Dovadă verificată'
                         : orderData.hasPaymentProof
                           ? 'Dovadă primită, în verificare'
@@ -657,7 +659,7 @@ function OrderStatusContent() {
 
           {/* Transfer bancar: instrucțiunile complete + dovada, aici, nu doar
               pe email (feedback 18.09.2026, #25). */}
-          {orderData.paymentStatus === 'awaiting_verification' && orderData.status === 'awaiting_payment' && (
+          {orderData.paymentStatus === 'awaiting_verification' && !orderData.proofVerifiedAt && (
             <Card className={orderData.hasPaymentProof ? 'border-green-300' : 'border-amber-300 bg-amber-50/40'}>
               <CardHeader className="pb-3">
                 <CardTitle className="text-lg flex items-center gap-2">
