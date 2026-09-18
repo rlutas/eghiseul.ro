@@ -25,6 +25,7 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import type { ProfileStepId } from '@/lib/account/profile-completeness';
+import { ACCOUNT_DATA_SAVED_EVENT } from './account-events';
 import { ContactStepForm } from './profile-steps/ContactStepForm';
 import { PersonalStepForm } from './profile-steps/PersonalStepForm';
 import { AddressStepForm } from './profile-steps/AddressStepForm';
@@ -123,7 +124,12 @@ export function ProfileStepDialog({
     // The checklist and its percentage are rendered on the server from the
     // database, so the row only disappears once the page data is re-read.
     router.refresh();
-  }, [close, router]);
+    // The tabs are client components that fetch on mount, and `refresh()` does
+    // not remount them: a customer sitting on „Facturare" who saved a billing
+    // profile from this dialog still saw an empty list. The tabs listen for
+    // this and reload their content.
+    window.dispatchEvent(new CustomEvent(ACCOUNT_DATA_SAVED_EVENT, { detail: { step } }));
+  }, [close, router, step]);
 
   const formProps = {
     onDirtyChange: setDirty,

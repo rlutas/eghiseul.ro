@@ -28,6 +28,7 @@ import OrdersTab from './OrdersTab';
 import VehiclesTab from './VehiclesTab';
 import ServicesTab, { type AccountServiceRow } from './ServicesTab';
 import type { InterestId } from '@/lib/account/service-interests';
+import { ACCOUNT_DATA_SAVED_EVENT } from './account-events';
 
 type TabId = AccountTabId;
 
@@ -78,6 +79,17 @@ export default function AccountTabs({ initialTab = 'services', className, servic
   // into the form instead.
   const autoEdit = searchParams.get('edit') === '1';
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // Every tab fetches on mount and nothing else re-reads it. When a profile
+  // dialog saves, the open tab is remounted so it shows what was just saved —
+  // the customer on „Facturare" who filled the billing dialog saw an empty
+  // list otherwise.
+  const [contentVersion, setContentVersion] = useState(0);
+  useEffect(() => {
+    const bump = () => setContentVersion((v) => v + 1);
+    window.addEventListener(ACCOUNT_DATA_SAVED_EVENT, bump);
+    return () => window.removeEventListener(ACCOUNT_DATA_SAVED_EVENT, bump);
+  }, []);
 
   // …and the tabs sit BELOW the checklist, so without this the page does not
   // visibly move when a row is tapped, on a phone especially.
@@ -153,7 +165,7 @@ export default function AccountTabs({ initialTab = 'services', className, servic
         <h2 className="mb-3 text-lg font-bold text-secondary-900 lg:mb-4 lg:text-xl">
           {activeLabel}
         </h2>
-        {renderTabContent()}
+        <div key={contentVersion}>{renderTabContent()}</div>
 
         <AccountNav
           primary={PRIMARY_ITEMS}

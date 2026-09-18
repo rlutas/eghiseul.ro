@@ -8,6 +8,7 @@ import { AccountTabs } from '@/components/account'
 import { ProfileChecklist } from '@/components/account/ProfileChecklist'
 import { OnboardingQuestion } from '@/components/account/OnboardingQuestion'
 import { profileCompleteness, hasIdentityDocuments } from '@/lib/account/profile-completeness'
+import { formatPersonName } from '@/lib/format/person-name'
 import { parseInterests, sortByInterest } from '@/lib/account/service-interests'
 import { serviceRequirements, serviceReadiness } from '@/lib/account/service-readiness'
 import { createPublicClient } from '@/lib/supabase/public'
@@ -81,6 +82,28 @@ export default async function AccountPage() {
     .from('billing_profiles')
     .select('id', { count: 'exact', head: true })
     .eq('user_id', user.id)
+  // The default address and billing profile, one line each, for the done rows
+  // of the checklist — a row that says „Adresă de livrare ✓" and nothing else
+  // makes the customer open the tab to find out which one.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: defaultAddressRow } = await (supabase as any)
+    .from('user_saved_data')
+    .select('data')
+    .eq('user_id', user.id)
+    .eq('data_type', 'address')
+    .order('is_default', { ascending: false })
+    .order('created_at', { ascending: true })
+    .limit(1)
+    .maybeSingle()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: defaultBillingRow } = await (supabase as any)
+    .from('billing_profiles')
+    .select('label, type, billing_data')
+    .eq('user_id', user.id)
+    .order('is_default', { ascending: false })
+    .order('created_at', { ascending: true })
+    .limit(1)
+    .maybeSingle()
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { count: savedVehicleCount } = await (supabase as any)
     .from('user_saved_vehicles')
@@ -109,6 +132,8 @@ export default async function AccountPage() {
     phone: profile?.phone,
     savedAddressCount: savedAddressCount ?? 0,
     billingProfileCount: billingProfileCount ?? 0,
+    addressSummary: addressSummaryLine(defaultAddressRow?.data),
+    billingSummary: billingSummaryLine(defaultBillingRow),
   })
 
   // The catalogue, with what each service will still ask this customer for.
@@ -211,16 +236,16 @@ export default async function AccountPage() {
 
       <div className="container mx-auto max-w-6xl px-4 py-6 lg:py-8">
         <div className="space-y-6">
-          {/* Asked once, on the first visit, and never again: the answer decides
-              whether the checklist below asks for an identity document at all. */}
-          {!hasAnsweredOnboarding && <OnboardingQuestion />}
+          {/* First thing on the page, for everyone (Raul, 18.09.2026): the
+              customer's own data as a compact menu — what is saved, what is
+              not, one tap to fill in or to open. It used to move under the
+              orders for a customer who had any (D2), but at four rows of 52px
+              it no longer pushes an order list off the first screen. */}
+          <ProfileChecklist completeness={completeness} />
 
-          {/* An account with no orders has nothing else to act on, so the
-              checklist leads. An account WITH orders came here to see an order:
-              on a phone the checklist filled the first screen and pushed the
-              orders below the fold, which is the opposite of decizia D2. It
-              moves under the list instead — still there, no longer first. */}
-          {!hasOrders && <ProfileChecklist completeness={completeness} />}
+          {/* Asked once, on the first visit, and never again: the answer sorts
+              the catalogue by what the customer came for. */}
+          {!hasAnsweredOnboarding && <OnboardingQuestion />}
 
           <Suspense
             fallback={
@@ -240,8 +265,6 @@ export default async function AccountPage() {
             />
           </Suspense>
 
-          {hasOrders && <ProfileChecklist completeness={completeness} />}
-
           {/* Account-level actions, deliberately last and visually quieter than
               the navigation: signing out is not something to put next to the
               destinations someone is trying to reach. */}
@@ -260,4 +283,24 @@ export default async function AccountPage() {
       </div>
     </div>
   )
+}
+
+/** „Str. Memorandumului 12, Cluj-Napoca" from a saved address row. */
+function addressSummaryLine(data: Record<string, unknown> | null | undefined): string | null {
+  if (!data) return null
+  const str = (v: unknown) => (typeof v === 'string' ? v.trim() : '')
+  const street = [str(data.street), str(data.number)].filter(Boolean).join(' ')
+  const line = [street, str(data.city)].filter(Boolean).join(', ')
+  return line || str(data.label) || null
+}
+
+/** The person or the company a default billing profile invoices. */
+function billingSummaryLine(
+  row: { label?: string | null; type?: string | null; billing_data?: Record<string, unknown> | null } | null | undefined
+): string | null {
+  if (!row) return null
+  const d = row.billing_data ?? {}
+  const str = (v: unknown) => (typeof v === 'string' ? v.trim() : '')
+  if (row.type === 'persoana_juridica') return str(d.companyName) || str(row.label) || null
+  return formatPersonName(str(d.lastName), str(d.firstName)) || str(row.label) || null
 }

@@ -137,3 +137,30 @@ describe('the identity document is not a step of the account', () => {
     expect(result.isComplete).toBe(true);
   });
 });
+
+describe('done rows say what is saved', () => {
+  it('shows the value on a done row and the benefit on the rest', () => {
+    const result = profileCompleteness({
+      firstName: 'Ion',
+      lastName: 'Popescu',
+      cnp: '1960910123456',
+      phone: '+40712345678',
+      savedAddressCount: 1,
+      addressSummary: 'Str. Memorandumului 12, Cluj-Napoca',
+      billingProfileCount: 0,
+    });
+    const by = Object.fromEntries(result.steps.map((s) => [s.id, s]));
+    expect(by.contact.summary).toBe('+40712345678');
+    // Family name first, the Romanian way — never `${first} ${last}`.
+    expect(by.personal.summary).toBe('Popescu Ion');
+    expect(by.address.summary).toBe('Str. Memorandumului 12, Cluj-Napoca');
+    expect(by.billing.done).toBe(false);
+    expect(by.billing.summary).toBeNull();
+  });
+
+  it('has no summary for a row that is not done, even if a value leaks in', () => {
+    const result = profileCompleteness({ phone: null, addressSummary: 'x', savedAddressCount: 0 });
+    expect(result.steps.find((s) => s.id === 'address')?.summary).toBe('x');
+    expect(result.steps.find((s) => s.id === 'address')?.done).toBe(false);
+  });
+});

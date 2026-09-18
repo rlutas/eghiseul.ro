@@ -10,6 +10,8 @@
  * the same function instead of each deciding for itself what "complete" means.
  */
 
+import { formatPersonName } from '@/lib/format/person-name';
+
 /**
  * The identity document is not a step of the account any more (18.09.2026).
  * Uploading it here meant a second ask right after the personal-data scan, and
@@ -27,6 +29,10 @@ export interface ProfileInput {
   birthDate?: string | null;
   savedAddressCount?: number;
   billingProfileCount?: number;
+  /** „Str. Memorandumului 12, Cluj-Napoca" — the default saved address, in one line. */
+  addressSummary?: string | null;
+  /** „Popescu Ion" or the company name — the default billing profile, in one line. */
+  billingSummary?: string | null;
 }
 
 export interface ProfileStep {
@@ -36,6 +42,8 @@ export interface ProfileStep {
   /** What the customer gains, in their words. */
   benefit: string;
   done: boolean;
+  /** What is saved, in one line — shown on a done row instead of the benefit. */
+  summary: string | null;
   /** Tab of /account that completes it. */
   href: string;
 }
@@ -75,6 +83,7 @@ export function profileCompleteness(input: ProfileInput): ProfileCompleteness {
       label: 'Telefon de contact',
       benefit: 'Te sunăm doar dacă apare ceva de lămurit la comandă.',
       done: filled(input.phone),
+      summary: filled(input.phone) ? (input.phone as string).trim() : null,
       href: '/account/?tab=profile&edit=1',
     },
     {
@@ -82,6 +91,10 @@ export function profileCompleteness(input: ProfileInput): ProfileCompleteness {
       label: 'Date personale',
       benefit: 'Nume, CNP și data nașterii — completate automat la fiecare comandă.',
       done: filled(input.firstName) && filled(input.lastName) && filled(input.cnp),
+      summary:
+        filled(input.firstName) && filled(input.lastName)
+          ? formatPersonName(input.lastName, input.firstName)
+          : null,
       href: '/account/?tab=profile&edit=1',
     },
     {
@@ -89,6 +102,7 @@ export function profileCompleteness(input: ProfileInput): ProfileCompleteness {
       label: 'Adresă de livrare',
       benefit: 'Alegi adresa dintr-o listă, în loc să o scrii de fiecare dată.',
       done: (input.savedAddressCount ?? 0) > 0,
+      summary: filled(input.addressSummary) ? (input.addressSummary as string).trim() : null,
       href: '/account/?tab=addresses&edit=1',
     },
     {
@@ -96,6 +110,7 @@ export function profileCompleteness(input: ProfileInput): ProfileCompleteness {
       label: 'Date de facturare',
       benefit: 'Factura se emite pe datele salvate, fără să le mai introduci.',
       done: (input.billingProfileCount ?? 0) > 0,
+      summary: filled(input.billingSummary) ? (input.billingSummary as string).trim() : null,
       href: '/account/?tab=billing&edit=1',
     },
   ];
