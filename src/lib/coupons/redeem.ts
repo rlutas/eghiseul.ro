@@ -11,7 +11,7 @@
 
 import { createAdminClient } from '@/lib/supabase/admin';
 
-export type RedeemOutcome = 'redeemed' | 'already_redeemed' | 'no_coupon' | 'coupon_not_found' | 'order_not_found' | 'error';
+export type RedeemOutcome = 'redeemed' | 'redeemed_over_cap' | 'already_redeemed' | 'no_coupon' | 'coupon_not_found' | 'order_not_found' | 'error';
 
 export async function redeemCouponForOrder(orderId: string): Promise<RedeemOutcome> {
   try {
@@ -21,7 +21,14 @@ export async function redeemCouponForOrder(orderId: string): Promise<RedeemOutco
       console.error(`[coupon] redeem failed for ${orderId}:`, error.message);
       return 'error';
     }
-    return (data as RedeemOutcome) ?? 'error';
+    const outcome = (data as RedeemOutcome) ?? 'error';
+    if (outcome === 'redeemed_over_cap') {
+      // Two orders were granted the last use before either paid (eligibility
+      // is checked before payment, without a reservation). The discount was
+      // already taken; counted truthfully, flagged for the team.
+      console.warn(`[coupon] ${orderId}: coupon redeemed past its max_uses (race between two checkouts)`);
+    }
+    return outcome;
   } catch (err) {
     console.error(`[coupon] redeem threw for ${orderId}:`, err instanceof Error ? err.message : err);
     return 'error';

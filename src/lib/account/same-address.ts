@@ -51,6 +51,22 @@ export function sameAddress(a: object | null | undefined, b: object | null | und
   return true;
 }
 
+/**
+ * For two addresses that are the same place: the details the candidate has
+ * and the saved row lacks (flat, block, floor, postal code, county, country),
+ * or `null` when there is nothing to add. Deduplication kept the OLD row and
+ * dropped „ap. 12" typed later (REV3-ADDRESS-001); the caller merges these in.
+ */
+export function missingAddressDetails(existing: object, candidate: object): Record<string, string> | null {
+  const x = existing as Unknowns;
+  const y = candidate as Unknowns;
+  const out: Record<string, string> = {};
+  for (const part of ['building', 'staircase', 'floor', 'apartment', 'postalCode', 'county', 'country'] as const) {
+    if (!str(x[part]) && str(y[part])) out[part] = str(y[part]);
+  }
+  return Object.keys(out).length > 0 ? out : null;
+}
+
 /** The first saved row that is the same place, or `null`. */
 export function findSameAddress<T extends { data: object }>(rows: T[], candidate: object): T | null {
   return rows.find((row) => sameAddress(row.data, candidate)) ?? null;

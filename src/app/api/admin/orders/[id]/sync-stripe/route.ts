@@ -79,6 +79,9 @@ export async function POST(
 
     // Idempotency: if already paid, return current state without re-writing.
     if (o.payment_status === 'paid') {
+      // Idempotent catch-up for a run that stopped between „paid" and these.
+      await redeemCouponForOrder(orderId);
+      await syncPaidOrderToAccount(orderId);
       return NextResponse.json({
         success: true,
         data: {

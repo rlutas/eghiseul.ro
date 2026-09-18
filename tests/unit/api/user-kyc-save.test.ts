@@ -56,7 +56,7 @@ function setupChain(insertResult: { data: unknown; error: unknown } = { data: { 
   fromMock.mockImplementation(() => ({
     update: vi.fn().mockReturnValue({
       eq: vi.fn().mockReturnValue({
-        eq: vi.fn().mockResolvedValue({ error: null }),
+        eq: vi.fn().mockReturnValue({ neq: vi.fn().mockResolvedValue({ error: null }) }),
       }),
     }),
     insert: vi.fn().mockReturnValue({
@@ -109,26 +109,33 @@ describe('POST /api/user/kyc/save — auth + validation', () => {
   });
 });
 
-describe('POST /api/user/kyc/save — versioning (deactivate previous)', () => {
-  it('deactivates existing documents of same type before inserting new', async () => {
+describe('POST /api/user/kyc/save — versioning (retire previous)', () => {
+  it('inserts the replacement FIRST, then retires the predecessors of the same type (never the new row)', async () => {
     let updateCalled = false;
     let insertCalled = false;
     let updatePayload: Record<string, unknown> = {};
+    let excludedId: unknown = null;
 
     fromMock.mockImplementation(() => ({
       update: vi.fn((row) => {
+        // Deactivating before the insert left the account with NO active
+        // document when the insert failed (REV3-KYC-003).
+        expect(insertCalled).toBe(true);
         updateCalled = true;
         updatePayload = row;
         return {
           eq: vi.fn().mockReturnValue({
-            eq: vi.fn().mockResolvedValue({ error: null }),
+            eq: vi.fn().mockReturnValue({
+              neq: vi.fn((_col: string, id: unknown) => {
+                excludedId = id;
+                return Promise.resolve({ error: null });
+              }),
+            }),
           }),
         };
       }),
       insert: vi.fn((row) => {
         insertCalled = true;
-        // The update for is_active=false MUST happen before insert
-        expect(updateCalled).toBe(true);
         return {
           select: vi.fn().mockReturnValue({
             single: vi.fn().mockResolvedValue({
@@ -149,6 +156,7 @@ describe('POST /api/user/kyc/save — versioning (deactivate previous)', () => {
     expect(updateCalled).toBe(true);
     expect(insertCalled).toBe(true);
     expect(updatePayload.is_active).toBe(false);
+    expect(excludedId).toBe('kyc-1');
   });
 });
 
@@ -158,7 +166,7 @@ describe('POST /api/user/kyc/save — expiry date logic', () => {
     fromMock.mockImplementation(() => ({
       update: vi.fn().mockReturnValue({
         eq: vi.fn().mockReturnValue({
-          eq: vi.fn().mockResolvedValue({ error: null }),
+          eq: vi.fn().mockReturnValue({ neq: vi.fn().mockResolvedValue({ error: null }) }),
         }),
       }),
       insert: vi.fn((row) => {
@@ -190,7 +198,7 @@ describe('POST /api/user/kyc/save — expiry date logic', () => {
     fromMock.mockImplementation(() => ({
       update: vi.fn().mockReturnValue({
         eq: vi.fn().mockReturnValue({
-          eq: vi.fn().mockResolvedValue({ error: null }),
+          eq: vi.fn().mockReturnValue({ neq: vi.fn().mockResolvedValue({ error: null }) }),
         }),
       }),
       insert: vi.fn((row) => {

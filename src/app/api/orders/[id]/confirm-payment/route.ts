@@ -77,6 +77,9 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       } catch (e) {
         console.error(`[confirm-payment] ensureBarouDocuments failed (non-fatal):`, e instanceof Error ? e.message : e);
       }
+      // Both idempotent — a retry after a crash must not skip them.
+      await redeemCouponForOrder(orderId);
+      await syncPaidOrderToAccount(orderId);
       return NextResponse.json({
         success: true,
         message: 'Order already marked as paid',

@@ -37,6 +37,8 @@ import {
   personProfileFromOrder,
 } from '@/lib/account/order-to-billing-profile';
 import { hasCompleteKyc } from '@/lib/kyc/identity-documents';
+import { redeemCouponForOrder } from '@/lib/coupons/redeem';
+import { missingAddressDetails } from '@/lib/account/same-address';
 import { normalizePhone } from '@/lib/format/normalize-phone';
 import { sameAddress } from '@/lib/account/same-address';
 import type { AddressData } from '@/components/shared/AddressForm';
@@ -162,10 +164,23 @@ export async function syncPaidOrderToAccount(orderId: string): Promise<SyncPaidO
         .eq('user_id', userId)
         .eq('data_type', 'address');
       const rows = (saved ?? []) as Array<{ id: string; data: Unknowns }>;
-      const exists = rows.some((row) => sameAddress(row.data, address));
+      const same = rows.find((row) => sameAddress(row.data, address)) ?? null;
+      const exists = !!same;
       // A failed read must not look like „no address yet": skip and retry.
       if (savedReadError) failed = true;
-      else if (!exists) {
+      else if (same) {
+        // Same place, but the order carries the flat/block/postal code the
+        // saved row lacks: complete it instead of dropping the detail.
+        const details = missingAddressDetails(same.data, address);
+        if (details) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const { error: mergeError } = await (admin as any)
+            .from('user_saved_data')
+            .update({ data: { ...same.data, ...details }, updated_at: new Date().toISOString() })
+            .eq('id', same.id);
+          if (mergeError) failed = true;
+        }
+      } else if (!exists) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const { error: addressError } = await (admin as any).from('user_saved_data').insert({
           user_id: userId,
@@ -226,14 +241,18 @@ export async function syncPaidOrderToAccount(orderId: string): Promise<SyncPaidO
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { data: existingDocs, error: docsReadError } = await (admin as any)
         .from('kyc_verifications')
-        .select('document_type')
+        .select('document_type, expires_at')
         .eq('user_id', userId)
         .eq('is_active', true);
       if (docsReadError) failed = true;
       // Copy unless the account already holds the complete set (document AND
-      // selfie): an account with only a front still needs the order's selfie.
+      // selfie, unexpired): an account with only a front — or an expired
+      // set — still needs the order's fresh documents.
+      const nowMs = Date.now();
       const complete = hasCompleteKyc(
-        ((existingDocs ?? []) as Array<{ document_type: string }>).map((d) => d.document_type)
+        ((existingDocs ?? []) as Array<{ document_type: string; expires_at: string | null }>)
+          .filter((d) => !d.expires_at || Date.parse(d.expires_at) > nowMs)
+          .map((d) => d.document_type)
       );
       if (!docsReadError && !complete) {
         const result = await copyOrderKycDocumentsToAccount(admin, {
@@ -283,12 +302,19 @@ export async function syncUnsyncedPaidOrdersForUser(userId: string, limit = 5): 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data } = await (admin as any)
       .from('orders')
-      .select('id, customer_data')
+      .select('id, customer_data, coupon_code, coupon_redeemed_at')
       .eq('user_id', userId)
       .eq('payment_status', 'paid')
       .order('paid_at', { ascending: false, nullsFirst: false })
       .limit(limit * 4);
-    const pending = ((data ?? []) as Array<{ id: string; customer_data: Unknowns | null }>)
+    type Row = { id: string; customer_data: Unknowns | null; coupon_code: string | null; coupon_redeemed_at: string | null };
+    const rows = (data ?? []) as Row[];
+    // A paid order whose coupon was never counted (a crash between „paid" and
+    // redeem_coupon): the only reconciliation there is (REV3-PAID-001).
+    for (const row of rows) {
+      if (row.coupon_code && !row.coupon_redeemed_at) await redeemCouponForOrder(row.id);
+    }
+    const pending = rows
       .filter((row) => (row.customer_data?.account_sync as { userId?: string } | undefined)?.userId !== userId)
       .slice(0, limit);
     let ran = 0;

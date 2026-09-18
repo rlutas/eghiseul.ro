@@ -100,14 +100,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // Deactivate previous documents of the same type
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (supabase as any)
-      .from('kyc_verifications')
-      .update({ is_active: false })
-      .eq('user_id', user.id)
-      .eq('document_type', documentType);
-
     // Calculate expiry date (use document expiry if available, otherwise KYC validity period)
     const now = new Date();
     let expiresAt: string;
@@ -148,6 +140,22 @@ export async function POST(request: Request) {
         { error: 'Failed to save KYC document' },
         { status: 500 }
       );
+    }
+
+    // Predecessors of the same type go inactive only now that the
+    // replacement exists — deactivating first and failing the insert left the
+    // account with no active document at all (REV3-KYC-003).
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error: retireError } = await (supabase as any)
+      .from('kyc_verifications')
+      .update({ is_active: false })
+      .eq('user_id', user.id)
+      .eq('document_type', documentType)
+      .neq('id', data.id);
+    if (retireError) {
+      // Two active rows of one type is harmless (the newest wins on read);
+      // logged so it does not pass silently.
+      console.error('KYC predecessor deactivation failed:', retireError);
     }
 
     // Update profile flags (use admin client to bypass RLS)

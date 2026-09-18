@@ -686,39 +686,47 @@ function modularWizardReducer(
         preferredContact: state.contact.preferredContact || (prefill.contact.preferredContact as 'email' | 'phone' | 'whatsapp'),
       };
 
-      // Build personal KYC data if module is active
+      // Build personal KYC data if module is active. EXISTING values win here
+      // too: PREFILL_FROM_PROFILE is dispatched again after a draft is
+      // restored (server prefill re-applied once the modules exist), and it
+      // must only fill gaps — never replace a name, CNP or address the
+      // customer edited in the draft (REV3-PREFILL-001).
       let newPersonalKyc = state.personalKyc;
       if (state.personalKyc) {
+        const pk = state.personalKyc;
         newPersonalKyc = {
-          ...state.personalKyc,
-          firstName: prefill.personal.firstName || state.personalKyc.firstName,
-          lastName: prefill.personal.lastName || state.personalKyc.lastName,
-          cnp: prefill.personal.cnp || state.personalKyc.cnp,
-          birthDate: prefill.personal.birthDate || state.personalKyc.birthDate,
-          birthPlace: prefill.personal.birthPlace || state.personalKyc.birthPlace,
-          address: prefill.personal.address || state.personalKyc.address,
+          ...pk,
+          firstName: pk.firstName || prefill.personal.firstName,
+          lastName: pk.lastName || prefill.personal.lastName,
+          cnp: pk.cnp || prefill.personal.cnp,
+          birthDate: pk.birthDate || prefill.personal.birthDate,
+          birthPlace: pk.birthPlace || prefill.personal.birthPlace,
+          address: pk.address || prefill.personal.address,
           // Document info from KYC
-          documentSeries: prefill.personal.documentSeries || state.personalKyc.documentSeries,
-          documentNumber: prefill.personal.documentNumber || state.personalKyc.documentNumber,
-          documentExpiry: prefill.personal.documentExpiry || state.personalKyc.documentExpiry,
-          documentType: (prefill.personal.documentType as PersonalKYCState['documentType']) || state.personalKyc.documentType,
+          documentSeries: pk.documentSeries || prefill.personal.documentSeries || '',
+          documentNumber: pk.documentNumber || prefill.personal.documentNumber || '',
+          documentExpiry: pk.documentExpiry || prefill.personal.documentExpiry || '',
+          documentType: pk.documentType || (prefill.personal.documentType as PersonalKYCState['documentType']),
         };
       }
 
       // Build company KYC data if module is active and company data available
       let newCompanyKyc = state.companyKyc;
       if (state.companyKyc && prefill.company) {
+        const ck = state.companyKyc;
         newCompanyKyc = {
-          ...state.companyKyc,
-          cui: prefill.company.cui || state.companyKyc.cui,
-          companyName: prefill.company.name || state.companyKyc.companyName,
-          companyType: prefill.company.type || state.companyKyc.companyType,
-          registrationNumber: prefill.company.registrationNumber || state.companyKyc.registrationNumber,
-          isActive: prefill.company.isActive,
-          validationStatus: prefill.company.verified ? 'valid' : state.companyKyc.validationStatus,
-          address: prefill.company.address
-            ? { ...state.companyKyc.address, street: prefill.company.address }
-            : state.companyKyc.address,
+          ...ck,
+          cui: ck.cui || prefill.company.cui,
+          companyName: ck.companyName || prefill.company.name,
+          companyType: ck.companyType || prefill.company.type,
+          registrationNumber: ck.registrationNumber || prefill.company.registrationNumber,
+          isActive: ck.cui ? ck.isActive : prefill.company.isActive,
+          validationStatus: ck.cui ? ck.validationStatus : (prefill.company.verified ? 'valid' : ck.validationStatus),
+          address: ck.address?.street
+            ? ck.address
+            : prefill.company.address
+              ? { ...ck.address, street: prefill.company.address }
+              : ck.address,
         };
       }
 

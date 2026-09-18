@@ -309,6 +309,9 @@ async function handlePaymentSucceeded(paymentIntent: Stripe.PaymentIntent) {
   // Check idempotency - don't process if already paid
   if (order.payment_status === 'paid' && order.invoice_number) {
     console.log(`Order ${orderId} already processed, skipping`)
+    // A retry after a crash between „paid" and these two: both idempotent.
+    await redeemCouponForOrder(orderId)
+    await syncPaidOrderToAccount(orderId)
     return
   }
 

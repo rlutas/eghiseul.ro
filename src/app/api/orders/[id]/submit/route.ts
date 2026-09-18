@@ -100,36 +100,39 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const cd = order.customer_data as any;
         const personal = cd?.personal || cd?.personalData || {};
-        const docs: Array<{ type?: string }> = personal.uploadedDocuments || [];
-        const has = (t: string) => docs.some((d) => d.type === t);
+        const docs: Array<{ type?: string; s3Key?: string; base64?: string }> = personal.uploadedDocuments || [];
+        // One object cannot stand in for two documents: a „selfie" that is the
+        // same file as the identity document is no selfie (REV3-KYC-001).
+        const objectOf = (d: { s3Key?: string; base64?: string }) =>
+          d.s3Key || (d.base64 ? `b64:${d.base64.length}:${d.base64.slice(-80)}` : '');
+        const selfieDoc = docs.find((d) => d.type === 'selfie' || d.type === 'selfie_with_id');
+        const selfieIsAnotherDoc =
+          !!selfieDoc && !!objectOf(selfieDoc) &&
+          docs.some((d) => d !== selfieDoc && d.type !== 'selfie' && d.type !== 'selfie_with_id' && objectOf(d) === objectOf(selfieDoc));
+        const has = (t: string) =>
+          docs.some((d) => d.type === t) && !((t === 'selfie' || t === 'selfie_with_id') && selfieIsAnotherDoc);
         const citizenship = personal.citizenship || 'romanian';
         const isForeign = citizenship !== 'romanian';
 
         // Verified account-KYC is a legitimate bypass (documents live on the
         // customer's profile, re-used across orders).
+        // The rows decide, exactly as the wizard's prefill decided to hide
+        // the step: an identity document AND a selfie, active and unexpired.
+        // Not the denormalised `profiles.kyc_verified` — a stale flag hid the
+        // only upload step and then rejected the order here (REV3-KYC-002).
         let accountKycOk = false;
         if (order.user_id) {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const { data: prof } = await (adminClient as any)
-            .from('profiles')
-            .select('kyc_verified')
-            .eq('id', order.user_id)
-            .single();
-          // The flag alone is not enough: it is re-checked against the rows,
-          // and the rows must hold an identity document AND a selfie.
-          if (prof?.kyc_verified) {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const { data: activeDocs } = await (adminClient as any)
-              .from('kyc_verifications')
-              .select('document_type, expires_at')
-              .eq('user_id', order.user_id)
-              .eq('is_active', true);
-            const nowMs = Date.now();
-            const liveTypes = ((activeDocs ?? []) as Array<{ document_type: string; expires_at: string | null }>)
-              .filter((d) => !d.expires_at || Date.parse(d.expires_at) > nowMs)
-              .map((d) => d.document_type);
-            accountKycOk = hasCompleteKyc(liveTypes);
-          }
+          const { data: activeDocs } = await (adminClient as any)
+            .from('kyc_verifications')
+            .select('document_type, expires_at')
+            .eq('user_id', order.user_id)
+            .eq('is_active', true);
+          const nowMs = Date.now();
+          const liveTypes = ((activeDocs ?? []) as Array<{ document_type: string; expires_at: string | null }>)
+            .filter((d) => !d.expires_at || Date.parse(d.expires_at) > nowMs)
+            .map((d) => d.document_type);
+          accountKycOk = hasCompleteKyc(liveTypes);
         }
 
         if (!accountKycOk) {

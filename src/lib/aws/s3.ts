@@ -122,6 +122,16 @@ export function generateOrderKey(
 }
 
 /**
+ * Is `key` inside the order's own upload namespace
+ * (`orders/<yyyy>/<mm>/<orderId>/uploads/<file>`)? Used before a caller-supplied
+ * key is stored on the order and later signed for the customer.
+ */
+export function isOrderUploadKey(key: string, orderId: string): boolean {
+  if (!/^[A-Za-z0-9-]+$/.test(orderId)) return false;
+  return new RegExp(`^orders/\\d{4}/\\d{2}/${orderId}/uploads/[^/]+$`).test(key);
+}
+
+/**
  * Generate S3 key for contracts (legacy)
  * Pattern: contracts/{year}/{month}/{contract_number}/{filename}
  * @deprecated Use generateDocumentKey() for new documents

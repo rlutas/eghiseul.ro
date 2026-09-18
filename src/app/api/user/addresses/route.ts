@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { findSameAddress } from '@/lib/account/same-address';
+import { findSameAddress, missingAddressDetails } from '@/lib/account/same-address';
 import { createClient } from '@/lib/supabase/server';
 
 /**
@@ -103,6 +103,19 @@ export async function POST(request: Request) {
     }
     const duplicate = findSameAddress(existingRows, addressData);
     if (duplicate) {
+      // Same place with more detail than the saved row (an apartment, the
+      // postal code): complete the row rather than lose what was typed.
+      const details = missingAddressDetails(duplicate.data, addressData);
+      if (details) {
+        const mergedData = { ...duplicate.data, ...details };
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { error: mergeError } = await (supabase as any)
+          .from('user_saved_data')
+          .update({ data: mergedData, updated_at: new Date().toISOString() })
+          .eq('id', duplicate.id);
+        if (mergeError) console.error('Address merge failed:', mergeError);
+        else duplicate.data = mergedData;
+      }
       if (isDefault && !duplicate.is_default) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         await (supabase as any).from('user_saved_data').update({ is_default: false }).eq('user_id', user.id).eq('data_type', 'address');

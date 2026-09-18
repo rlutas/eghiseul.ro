@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from '@/lib/email/resend';
+import { getFileInfo, isOrderUploadKey } from '@/lib/aws/s3';
 import {
   buildBankTransferPendingSubject,
   buildBankTransferPendingHtml,
@@ -35,7 +36,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
   try {
     const { id } = await params;
     const body = await request.json().catch(() => ({}));
-    const paymentProofKey: string | null = body?.paymentProofKey || null;
+    const rawProofKey: string | null = typeof body?.paymentProofKey === 'string' ? body.paymentProofKey : null;
 
     const supabase = await createClient();
     // Citirea și scrierea merg pe clientul de serviciu, ca la
@@ -58,6 +59,23 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       .select('id, user_id, status, payment_status')
       .eq('id', id)
       .single();
+
+    // The proof key is caller-supplied and later signed for the customer:
+    // accept only this order's own upload namespace (what `/api/upload`
+    // generates) and only an object that exists (REV3-PROOF-001).
+    let paymentProofKey: string | null = null;
+    if (rawProofKey) {
+      if (!isOrderUploadKey(rawProofKey, id)) {
+        return NextResponse.json({ success: false, error: 'Dovada plății nu aparține acestei comenzi.' }, { status: 400 });
+      }
+      try {
+        const info = await getFileInfo(rawProofKey);
+        if (!info || !(info.size > 0)) throw new Error('empty object');
+      } catch {
+        return NextResponse.json({ success: false, error: 'Dovada plății nu a fost găsită. Încarcă fișierul din nou.' }, { status: 400 });
+      }
+      paymentProofKey = rawProofKey;
+    }
 
     if (orderError || !order) {
       return NextResponse.json(

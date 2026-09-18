@@ -54,6 +54,9 @@ export async function fulfilManuallyPaidOrder(
   // Idempotent: second click / double-submit is a no-op.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   if ((order as any).payment_status === 'paid') {
+    // Idempotent catch-up for a run that stopped between „paid" and these.
+    await redeemCouponForOrder(orderId);
+    await syncPaidOrderToAccount(orderId);
     return { ok: true, alreadyPaid: true };
   }
 

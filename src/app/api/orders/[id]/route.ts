@@ -4,7 +4,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { normalizeOrderOptions } from '@/lib/orders/normalize'
 import { calculateEstimatedCompletion } from '@/lib/delivery-calculator'
 import { customerTimeline, timelineLabel, type RawHistoryRow } from '@/lib/orders/customer-timeline'
-import { getDownloadUrl } from '@/lib/aws/s3'
+import { getDownloadUrl, isOrderUploadKey } from '@/lib/aws/s3'
 
 interface RouteParams {
   params: Promise<{ id: string }>
@@ -107,7 +107,9 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const proofKey = (order as any).payment_proof_url as string | null
     let paymentProofUrl: string | null = null
-    if (proofKey && proofKey.startsWith('orders/')) {
+    // Signed only inside this order's own upload namespace: the key column is
+    // written from a customer request (REV3-PROOF-001).
+    if (proofKey && isOrderUploadKey(proofKey, id)) {
       try {
         paymentProofUrl = await getDownloadUrl(proofKey, 3600)
       } catch (proofError) {
