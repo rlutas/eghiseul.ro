@@ -89,8 +89,6 @@ export default function ProfileTab({ initialData, className, autoEdit = false }:
   const {
     saveDocument,
     isVerified: kycIsVerified,
-    isPartial: kycIsPartial,
-    hasSelfie,
     hasFrontId,
     documents: kycDocuments
   } = useKycStatus();
@@ -361,7 +359,7 @@ export default function ProfileTab({ initialData, className, autoEdit = false }:
       {/* PF Tab - Personal Profile (existing content) */}
       {activeSubTab === 'pf' && <>
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h3 className="text-lg font-semibold text-secondary-900">Informații Profil</h3>
           <p className="text-sm text-neutral-500">
@@ -712,43 +710,46 @@ export default function ProfileTab({ initialData, className, autoEdit = false }:
         )}
       </div>
 
-      {/* KYC Status */}
+      {/* Identity line. Not a warning any more: the account does not ask for
+          the document (D9, 18.09.2026) — the order form does, with the selfie,
+          for the services that need them. A saved document is good news; none
+          is simply a fact. */}
       <div className={cn(
         'rounded-xl p-4 flex items-center gap-4',
-        kycIsVerified
+        kycIsVerified || hasFrontId
           ? 'bg-green-50 border border-green-200'
-          : kycIsPartial
-          ? 'bg-amber-50 border border-amber-200'
-          : 'bg-yellow-50 border border-yellow-200'
+          : 'bg-neutral-50 border border-neutral-200'
       )}>
         <div className={cn(
-          'w-10 h-10 rounded-lg flex items-center justify-center',
-          kycIsVerified ? 'bg-green-100' : kycIsPartial ? 'bg-amber-100' : 'bg-yellow-100'
+          'w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0',
+          kycIsVerified || hasFrontId ? 'bg-green-100' : 'bg-neutral-100'
         )}>
-          {kycIsVerified ? (
+          {kycIsVerified || hasFrontId ? (
             <CheckCircle className="w-5 h-5 text-green-600" />
           ) : (
-            <AlertTriangle className={cn('w-5 h-5', kycIsPartial ? 'text-amber-600' : 'text-yellow-600')} />
+            <Scan className="w-5 h-5 text-neutral-500" />
           )}
         </div>
         <div>
           <p className={cn(
             'font-medium',
-            kycIsVerified ? 'text-green-800' : kycIsPartial ? 'text-amber-800' : 'text-yellow-800'
+            kycIsVerified || hasFrontId ? 'text-green-800' : 'text-secondary-900'
           )}>
-            {kycIsVerified ? 'Identitate verificată complet' : kycIsPartial ? 'Verificare incompletă' : 'Identitate neverificată'}
+            {kycIsVerified
+              ? 'Identitate verificată complet'
+              : hasFrontId
+              ? 'Act de identitate salvat'
+              : 'Niciun act de identitate în cont'}
           </p>
           <p className={cn(
             'text-sm',
-            kycIsVerified ? 'text-green-600' : kycIsPartial ? 'text-amber-600' : 'text-yellow-600'
+            kycIsVerified || hasFrontId ? 'text-green-700' : 'text-neutral-600'
           )}>
             {kycIsVerified
               ? 'Documentele tale au fost verificate cu succes. Datele profilului sunt sincronizate.'
-              : kycIsPartial && !hasSelfie
-              ? 'Lipsește selfie-ul cu actul de identitate. Mergi la secțiunea Documente Verificate.'
               : hasFrontId
-              ? 'Act identitate încărcat. Adaugă selfie-ul în secțiunea Documente Verificate.'
-              : 'Scanează actul de identitate în secțiunea Documente Verificate pentru verificare.'}
+              ? 'Selfie-ul de verificare îl faci direct în comandă, la serviciile care îl cer.'
+              : 'Îl fotografiezi direct în comandă, la serviciile care îl cer — sau îl adaugi acum din „Act de identitate”.'}
           </p>
         </div>
       </div>

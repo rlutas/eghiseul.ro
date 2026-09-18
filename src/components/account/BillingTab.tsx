@@ -22,6 +22,7 @@ import {
   Building2,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { formatPersonName } from '@/lib/format/person-name';
 import BillingProfileForm, { type BillingData } from '@/components/shared/BillingProfileForm';
 import { useBillingProfiles } from '@/hooks/useBillingProfiles';
 
@@ -107,20 +108,20 @@ export default function BillingTab({ className, prefillFromId, autoEdit = false 
   return (
     <div className={cn('space-y-6', className)}>
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h3 className="text-lg font-semibold text-secondary-900">Profile de Facturare</h3>
-          <p className="text-sm text-neutral-500">
-            Gestionează datele pentru facturare (persoană fizică sau juridică)
-          </p>
-        </div>
+      {/* The panel is already titled „Facturare" — a third title here read as
+          a repeat. On a phone the button goes under the text: side by side
+          they shared one line and the text wrapped into the button. */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <p className="text-sm text-neutral-500">
+          Gestionează datele pentru facturare (persoană fizică sau juridică)
+        </p>
         <Button
           onClick={() => {
             setEditingId(null);
             setFormData({ type: 'persoana_fizica', label: '' });
             setShowForm(true);
           }}
-          className="bg-primary-500 hover:bg-primary-600 text-secondary-900"
+          className="min-h-[44px] w-full bg-primary-500 text-secondary-900 hover:bg-primary-600 sm:w-auto"
         >
           <Plus className="w-4 h-4 mr-2" />
           Adaugă profil
@@ -176,7 +177,7 @@ export default function BillingTab({ className, prefillFromId, autoEdit = false 
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
+                  <div className="mb-2 flex flex-wrap items-center gap-2">
                     <div className={cn(
                       'w-8 h-8 rounded-lg flex items-center justify-center',
                       profile.type === 'persoana_fizica' ? 'bg-blue-100' : 'bg-purple-100'
@@ -209,7 +210,7 @@ export default function BillingTab({ className, prefillFromId, autoEdit = false 
                   {profile.type === 'persoana_fizica' ? (
                     <div className="text-neutral-600">
                       <p>
-                        {profile.firstName} {profile.lastName}
+                        {formatPersonName(profile.lastName, profile.firstName)}
                         {profile.cnp && <span className="text-neutral-500"> • CNP: {profile.cnp}</span>}
                       </p>
                       {profile.address && (

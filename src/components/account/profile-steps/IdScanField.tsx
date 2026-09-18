@@ -17,6 +17,10 @@
 
 import { useCallback, useRef, useState } from 'react';
 import { Camera, Loader2, ScanLine } from 'lucide-react';
+import { uploadToS3 } from '@/lib/aws/upload-client';
+import { base64ToFile } from '@/lib/images/compress';
+import { useKycStatus } from '@/hooks/useKycStatus';
+import { ACCOUNT_DATA_SAVED_EVENT } from '../account-events';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { compressImage, ImageCompressionError } from '@/lib/images/compress';
@@ -64,6 +68,41 @@ export function IdScanField({ onExtracted }: { onExtracted: (data: ExtractedIdDa
   const [choice, setChoice] = useState<ScanChoice>('ci');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { saveDocument } = useKycStatus();
+
+  /**
+   * The scanned document goes into the account too (Raul, 18.09.2026): the
+   * customer had just photographed their ID here and the „Act de identitate"
+   * tab asked for it again. Same path as the profile tab's scanner — S3 first,
+   * then the row; no data-URL fallback, a copy we cannot store in S3 is not
+   * stored at all. Never blocks the fields: a failed save is logged and the
+   * customer can still save what the OCR read.
+   */
+  const storeDocument = useCallback(
+    async (documentType: 'ci_front' | 'passport_opened', base64: string, mimeType: string, extracted: ExtractedIdData) => {
+      try {
+        const verificationId = crypto.randomUUID();
+        const uploaded = await uploadToS3({
+          category: 'kyc',
+          file: base64ToFile(base64, mimeType, `${documentType}.jpg`),
+          documentType,
+          verificationId,
+        });
+        const saved = await saveDocument({
+          documentType,
+          fileUrl: uploaded.url,
+          fileKey: uploaded.key,
+          mimeType,
+          extractedData: extracted,
+          documentExpiry: extracted.documentExpiry,
+        });
+        if (saved) window.dispatchEvent(new CustomEvent(ACCOUNT_DATA_SAVED_EVENT, { detail: { step: 'identity' } }));
+      } catch (err) {
+        console.error('Personal data scan: document not stored in the account:', err);
+      }
+    },
+    [saveDocument]
+  );
 
   const handleFile = useCallback(
     async (file: File) => {
@@ -71,9 +110,8 @@ export function IdScanField({ onExtracted }: { onExtracted: (data: ExtractedIdDa
       setBusy(true);
       try {
         const { base64, mimeType } = await readForOcr(file);
-        const documentType = ocrDocumentTypeFor(
-          CHOICES.find((c) => c.id === choice)!.ocrType
-        );
+        const storedType = CHOICES.find((c) => c.id === choice)!.ocrType;
+        const documentType = ocrDocumentTypeFor(storedType);
 
         const response = await fetch('/api/ocr/extract', {
           method: 'POST',
@@ -91,6 +129,7 @@ export function IdScanField({ onExtracted }: { onExtracted: (data: ExtractedIdDa
           return;
         }
         onExtracted(ocr.extractedData as ExtractedIdData);
+        await storeDocument(storedType, base64, mimeType, ocr.extractedData as ExtractedIdData);
       } catch (err) {
         console.error('Personal data scan failed:', err);
         setError(err instanceof ImageCompressionError ? err.message : UNREADABLE);
@@ -98,15 +137,16 @@ export function IdScanField({ onExtracted }: { onExtracted: (data: ExtractedIdDa
         setBusy(false);
       }
     },
-    [choice, onExtracted]
+    [choice, onExtracted, storeDocument]
   );
 
   return (
     <div className="rounded-xl border border-neutral-200 bg-neutral-50 p-4">
       <p className="text-sm font-semibold text-secondary-900">Completează din act</p>
       <p className="mt-1 text-xs leading-relaxed text-neutral-500">
-        Fotografiază actul și îți completăm câmpurile de mai jos. Poza nu se salvează, iar
-        datele rămân editabile. Poți sări peste și scrie totul de mână.
+        Fotografiază actul și îți completăm câmpurile de mai jos. Poza se salvează în contul tău,
+        la „Act de identitate&quot;, ca să nu o mai încarci la comandă. Datele rămân editabile; poți
+        sări peste și scrie totul de mână.
       </p>
 
       <fieldset className="mt-3" disabled={busy}>

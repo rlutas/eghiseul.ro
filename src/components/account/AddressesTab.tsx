@@ -98,20 +98,19 @@ export default function AddressesTab({ className, autoEdit = false }: AddressesT
   return (
     <div className={cn('space-y-6', className)}>
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h3 className="text-lg font-semibold text-secondary-900">Adrese de Livrare</h3>
-          <p className="text-sm text-neutral-500">
-            Gestionează adresele pentru livrarea documentelor
-          </p>
-        </div>
+      {/* The panel is already titled „Adrese"; on a phone the button goes
+          under the text instead of sharing its line. */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <p className="text-sm text-neutral-500">
+          Gestionează adresele pentru livrarea documentelor
+        </p>
         <Button
           onClick={() => {
             setEditingId(null);
             setFormData({ country: 'RO' });
             setShowForm(true);
           }}
-          className="bg-primary-500 hover:bg-primary-600 text-secondary-900"
+          className="min-h-[44px] w-full bg-primary-500 text-secondary-900 hover:bg-primary-600 sm:w-auto"
         >
           <Plus className="w-4 h-4 mr-2" />
           Adaugă adresă
@@ -169,7 +168,7 @@ export default function AddressesTab({ className, autoEdit = false }: AddressesT
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
+                  <div className="mb-2 flex flex-wrap items-center gap-2">
                     <MapPin className={cn(
                       'w-5 h-5',
                       address.isDefault ? 'text-primary-600' : 'text-neutral-400'

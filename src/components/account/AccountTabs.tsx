@@ -41,7 +41,7 @@ const PRIMARY_ITEMS: AccountNavItem[] = [
 // Reference data, reached occasionally — kept one level down instead of
 // competing with the two above.
 const SECONDARY_ITEMS: AccountNavItem[] = [
-  { id: 'profile', label: 'Date personale', labelShort: 'Date personale', icon: User },
+  { id: 'profile', label: 'Date personale', labelShort: 'Profil', icon: User },
   { id: 'kyc', label: 'Act de identitate', labelShort: 'Act identitate', icon: Shield },
   { id: 'addresses', label: 'Adrese', labelShort: 'Adrese', icon: MapPin },
   { id: 'billing', label: 'Facturare', labelShort: 'Facturare', icon: CreditCard },
@@ -106,6 +106,10 @@ export default function AccountTabs({ initialTab = 'services', className, servic
     params.set('tab', tabId);
     params.delete('edit');
     router.replace(`/account?${params.toString()}`, { scroll: false });
+    // Up to the navigation, so the menu and the panel it just switched are the
+    // first thing on screen — not the middle of the page (Raul, 18.09.2026).
+    const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    containerRef.current?.scrollIntoView({ behavior: still ? 'auto' : 'smooth', block: 'start' });
   }, [router, searchParams]);
 
   // Render active tab content
@@ -136,7 +140,12 @@ export default function AccountTabs({ initialTab = 'services', className, servic
   return (
     <div
       ref={containerRef}
-      className={cn('grid grid-cols-1 gap-6 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-8', className)}
+      // `scroll-mt`: the site header is sticky, so a scroll to this element
+      // has to stop under it, not behind it.
+      className={cn(
+        'scroll-mt-20 xl:scroll-mt-[120px] grid grid-cols-1 gap-6 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-8',
+        className
+      )}
     >
       {/* From lg the whole navigation is the left column. On a phone it is
           split around the content: the switch above, the profile data below —
@@ -149,12 +158,15 @@ export default function AccountTabs({ initialTab = 'services', className, servic
         onSelect={handleTabChange}
         className="hidden lg:block"
       />
+      {/* On a phone the whole navigation sits above the content, „Datele mele"
+          included (Raul, 18.09.2026 — it used to be split, with the profile
+          links under the content, and a tap down there changed a panel the
+          customer could not see). */}
       <AccountNav
         primary={PRIMARY_ITEMS}
         secondary={SECONDARY_ITEMS}
         active={activeTab}
         onSelect={handleTabChange}
-        only="primary"
         className="lg:hidden"
       />
 
@@ -166,15 +178,6 @@ export default function AccountTabs({ initialTab = 'services', className, servic
           {activeLabel}
         </h2>
         <div key={contentVersion}>{renderTabContent()}</div>
-
-        <AccountNav
-          primary={PRIMARY_ITEMS}
-          secondary={SECONDARY_ITEMS}
-          active={activeTab}
-          onSelect={handleTabChange}
-          only="secondary"
-          className="mt-6 lg:hidden"
-        />
       </div>
     </div>
   );

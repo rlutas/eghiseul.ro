@@ -111,12 +111,12 @@ export default function VehiclesTab() {
   const field = (k: keyof FormState, v: unknown) => setForm((f) => ({ ...f, [k]: v }));
 
   return (
-    <div className="space-y-4 mt-4">
-      <div className="flex items-center justify-between">
+    <div className="space-y-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm text-neutral-500">
           Salvează mașinile + termenele ITP/asigurare/rovinietă — le refolosești la comandă și vezi când expiră.
         </p>
-        <Button onClick={startAdd} size="sm">
+        <Button onClick={startAdd} className="min-h-[44px] w-full sm:w-auto">
           <Plus className="h-4 w-4" /> Adaugă mașină
         </Button>
       </div>

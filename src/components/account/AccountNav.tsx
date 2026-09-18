@@ -27,12 +27,8 @@ interface AccountNavProps {
   active: AccountTabId;
   onSelect: (id: AccountTabId) => void;
   className?: string;
-  /**
-   * Render only one half. On a phone the two are split around the content: the
-   * primary switch above it, the profile data below. Both halves above meant
-   * that on a 390px screen the first thing a returning customer saw was a grid
-   * of five settings links, with their order pushed off the bottom.
-   */
+  /** Render only one half. Unused since 18.09.2026 — both halves sit above
+   *  the content on every screen — kept for a caller that wants the split. */
   only?: 'primary' | 'secondary';
 }
 

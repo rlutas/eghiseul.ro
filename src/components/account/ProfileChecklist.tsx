@@ -23,7 +23,8 @@ import { ProfileStepDialog } from './ProfileStepDialog';
  *
  * It used to hide itself once complete and to collapse the finished rows into
  * one line. Raul, 18.09.2026: it should be the first thing on the page and read
- * like a menu — where the data is, one tap away, whether it is done or not.
+ * like a menu — where the data is, one tap away. Once everything is done it
+ * shrinks to a single line saying so.
  */
 
 const ICONS: Record<ProfileStepId, typeof Phone> = {
@@ -51,6 +52,37 @@ export function ProfileChecklist({ completeness }: { completeness: ProfileComple
 
   const { steps, doneCount, totalCount, percent, isComplete } = completeness;
 
+  // Complete: one quiet line, not four rows of things that are done (Raul,
+  // 18.09.2026). The data itself is one tap away in the menu below.
+  if (isComplete) {
+    return (
+      <section
+        aria-labelledby="profil-checklist-titlu"
+        className="flex items-center gap-3 rounded-2xl border border-green-200 bg-green-50 px-4 py-3 sm:px-5"
+      >
+        <span
+          aria-hidden="true"
+          className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-green-100 text-green-700"
+        >
+          <Check className="h-4 w-4" />
+        </span>
+        <span className="min-w-0 flex-1">
+          <h2
+            id="profil-checklist-titlu"
+            ref={headingRef}
+            tabIndex={-1}
+            className="text-sm font-bold text-secondary-900 focus:outline-none"
+          >
+            Profilul tău e complet 100%
+          </h2>
+          <span className="block text-xs leading-relaxed text-neutral-600">
+            Datele se completează singure la comandă. Le modifici din „Datele mele&quot;, mai jos.
+          </span>
+        </span>
+      </section>
+    );
+  }
+
   return (
     <section
       aria-labelledby="profil-checklist-titlu"
@@ -65,42 +97,37 @@ export function ProfileChecklist({ completeness }: { completeness: ProfileComple
               tabIndex={-1}
               className="font-bold text-secondary-900 focus:outline-none"
             >
-              {isComplete ? 'Datele tale' : 'Comandă mai repede data viitoare'}
+              Comandă mai repede data viitoare
             </h2>
             <p className="mt-1 text-sm leading-relaxed text-neutral-600">
-              {isComplete
-                ? 'Tot ce e salvat aici se completează singur în formularul de comandă.'
-                : 'Ce salvezi aici nu-ți mai este cerut în formular. Poți comanda oricând, chiar cu profilul necompletat.'}
+              Ce salvezi aici nu-ți mai este cerut în formular. Poți comanda oricând, chiar cu
+              profilul necompletat.
             </p>
           </div>
-          {!isComplete && (
-            <span className="flex-shrink-0 text-right">
-              <span className="block text-2xl font-bold tabular-nums text-secondary-900">
-                {percent}%
-              </span>
-              <span className="block text-xs text-neutral-500 tabular-nums">
-                {doneCount}/{totalCount}
-              </span>
+          <span className="flex-shrink-0 text-right">
+            <span className="block text-2xl font-bold tabular-nums text-secondary-900">
+              {percent}%
             </span>
-          )}
+            <span className="block text-xs text-neutral-500 tabular-nums">
+              {doneCount}/{totalCount}
+            </span>
+          </span>
         </div>
 
-        {!isComplete && (
+        <div
+          className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-neutral-100"
+          role="progressbar"
+          aria-valuenow={percent}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuetext={`${doneCount} din ${totalCount} completate`}
+          aria-labelledby="profil-checklist-titlu"
+        >
           <div
-            className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-neutral-100"
-            role="progressbar"
-            aria-valuenow={percent}
-            aria-valuemin={0}
-            aria-valuemax={100}
-            aria-valuetext={`${doneCount} din ${totalCount} completate`}
-            aria-labelledby="profil-checklist-titlu"
-          >
-            <div
-              className="h-full rounded-full bg-primary-500 transition-[width] duration-500 motion-reduce:transition-none"
-              style={{ width: `${percent}%` }}
-            />
-          </div>
-        )}
+            className="h-full rounded-full bg-primary-500 transition-[width] duration-500 motion-reduce:transition-none"
+            style={{ width: `${percent}%` }}
+          />
+        </div>
       </div>
 
       <ul className="divide-y divide-neutral-100">

@@ -6,7 +6,6 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { LogoutButton } from '@/components/shared/logout-button'
 import { AccountTabs } from '@/components/account'
 import { ProfileChecklist } from '@/components/account/ProfileChecklist'
-import { OnboardingQuestion } from '@/components/account/OnboardingQuestion'
 import { profileCompleteness, hasIdentityDocuments } from '@/lib/account/profile-completeness'
 import { formatPersonName } from '@/lib/format/person-name'
 import { syncUnsyncedPaidOrdersForUser } from '@/lib/account/sync-paid-order'
@@ -126,9 +125,6 @@ export default async function AccountPage() {
   // asking exactly what it asked before, and only the first one shows the card.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const serviceInterests = parseInterests((profile as any)?.service_interests)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const hasAnsweredOnboarding = !!(profile as any)?.onboarding_completed_at
-
   const hasOrders = (orders?.length ?? 0) > 0
 
   const completeness = profileCompleteness({
@@ -249,9 +245,10 @@ export default async function AccountPage() {
               it no longer pushes an order list off the first screen. */}
           <ProfileChecklist completeness={completeness} />
 
-          {/* Asked once, on the first visit, and never again: the answer sorts
-              the catalogue by what the customer came for. */}
-          {!hasAnsweredOnboarding && <OnboardingQuestion />}
+          {/* The onboarding question („Ce servicii te interesează?") is gone
+              (Raul, 18.09.2026): it existed to decide whether the account asks
+              for an identity document, and the account no longer asks for one
+              at all (D9). A stored answer still sorts the catalogue. */}
 
           <Suspense
             fallback={
