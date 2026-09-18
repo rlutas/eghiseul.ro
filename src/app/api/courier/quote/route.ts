@@ -72,6 +72,7 @@ export async function GET(request: NextRequest) {
         },
       ],
       cod,
+      lockerId: searchParams.get('locker_id') || undefined,
     };
 
     let quotes;

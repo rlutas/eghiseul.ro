@@ -43,6 +43,7 @@ import {
 import type { PersonalKYCConfig, DocumentType, KYCValidationResults } from '@/types/verification-modules';
 import { getCountriesForForeignType } from '@/config/countries';
 import { DocumentTypePicker } from './DocumentTypePicker';
+import { DataSafetyNote } from './DataSafetyNote';
 import { validateCNP, summarizeCNP } from '@/lib/validations/cnp';
 import { cn } from '@/lib/utils';
 import { COUNTY_NAMES, getLocalitiesForCounty, getCountyName, findCounty } from '@/lib/data/romania-counties';
@@ -1239,67 +1240,71 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
         </div>
       )}
 
-      {/* Prefilled Data Banner */}
+      {/* Signed-in customer: ONE card — the data from the account and the
+          document on file, with „Modifică" / „Folosește alt act". The green
+          banner, the separate document card and the „Date extrase" summary
+          were three near-identical blocks (feedback 18.09.2026, #26). */}
       {isPrefilled && (personalKyc?.firstName || personalKyc?.cnp) && (
-        <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-4">
-          <div className="flex gap-3">
-            <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center flex-shrink-0">
-              <CheckCircle className="h-5 w-5 text-green-600" />
-            </div>
-            <div className="flex-1">
-              <p className="font-semibold text-green-800">
-                Date preluate din contul tău
-              </p>
-              <p className="text-sm text-green-700 mt-1">
-                Am completat automat datele din profilul tău salvat.
-                {hasValidKycFromAccount && ' Documentele KYC sunt deja verificate!'}
-              </p>
-              {hasValidKycFromAccount && (
-                <div className="flex items-center gap-2 mt-2 text-xs text-green-600">
-                  <FileCheck className="w-4 h-4" />
-                  KYC verificat - poți sări peste pasul de scanare
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* The identity document already in the account (feedback 18.09.2026, #20) */}
-      {hasIdentityFromAccount && accountIdentity && (
         <div className="rounded-xl border-2 border-primary-500 bg-primary-50/40 p-4">
           <div className="flex items-start gap-3">
             <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary-100">
               <FileCheck className="h-5 w-5 text-primary-600" />
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-sm font-semibold text-secondary-900">Actul tău din cont</p>
-              <p className="mt-0.5 text-sm text-neutral-700">
-                {accountIdentity.type.startsWith('passport') ? 'Pașaport' : 'Carte de identitate'}
-                {accountIdentity.series || accountIdentity.number
-                  ? ` — seria ${accountIdentity.series || '—'} nr. ${accountIdentity.number || '—'}`
-                  : ''}
-              </p>
-              {accountIdentity.verifiedAt && (
-                <p className="mt-0.5 text-xs text-neutral-500">
-                  verificat la {new Date(accountIdentity.verifiedAt).toLocaleDateString('ro-RO')}
-                  {accountIdentity.expiresAt ? ` · valabil până la ${new Date(accountIdentity.expiresAt).toLocaleDateString('ro-RO')}` : ''}
+              <p className="text-sm font-semibold text-secondary-900">Datele tale din cont</p>
+              {(personalKyc?.lastName || personalKyc?.firstName) && (
+                <p className="mt-0.5 text-base font-semibold leading-tight text-secondary-900">
+                  {[personalKyc?.lastName, personalKyc?.firstName].filter(Boolean).join(' ')}
                 </p>
               )}
-              <p className="mt-2 text-xs text-neutral-600">
-                Îl folosim pentru această comandă. Selfie-ul cu actul îl faci la pasul următor.
-              </p>
-              <button
-                type="button"
-                onClick={() => {
-                  updatePersonalKyc({ useOtherDocument: true, idDocumentType: null });
-                  setMode('scan');
-                  setShowScanSection(true);
-                }}
-                className="mt-2 text-xs font-medium text-primary-600 underline underline-offset-2 hover:text-primary-700"
-              >
-                Folosește alt act
-              </button>
+              {(() => {
+                const summary = personalKyc?.cnp && personalKyc.cnp.length === 13 ? summarizeCNP(personalKyc.cnp) : null;
+                return (
+                  <p className="mt-0.5 text-sm text-neutral-700">
+                    {personalKyc?.cnp ? `CNP ${personalKyc.cnp}` : ''}
+                    {summary ? ` · ${summary.birthDate} · ${summary.gender}` : ''}
+                    {summary?.county ? ` · jud. ${summary.county}` : ''}
+                  </p>
+                );
+              })()}
+              {hasIdentityFromAccount && accountIdentity ? (
+                <p className="mt-1 text-sm text-neutral-700">
+                  {accountIdentity.type.startsWith('passport') ? 'Pașaport' : 'Carte de identitate'}
+                  {accountIdentity.series || accountIdentity.number
+                    ? ` — seria ${accountIdentity.series || '—'} nr. ${accountIdentity.number || '—'}`
+                    : ''}
+                  {accountIdentity.verifiedAt
+                    ? ` · verificat la ${new Date(accountIdentity.verifiedAt).toLocaleDateString('ro-RO')}`
+                    : ''}
+                </p>
+              ) : hasValidKycFromAccount ? (
+                <p className="mt-1 text-xs text-green-700">Actul și selfie-ul sunt deja în cont.</p>
+              ) : null}
+              <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs font-medium">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMode('manual');
+                    setShowScanSection(false);
+                  }}
+                  className="text-primary-600 underline underline-offset-2 hover:text-primary-700"
+                >
+                  Modifică datele
+                </button>
+                {hasIdentityFromAccount && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      updatePersonalKyc({ useOtherDocument: true, idDocumentType: null });
+                      setMode('scan');
+                      setShowScanSection(true);
+                    }}
+                    className="text-primary-600 underline underline-offset-2 hover:text-primary-700"
+                  >
+                    Folosește alt act
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -1704,7 +1709,7 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
             appears after a successful scan as the SOLE proof to the customer
             that their data was captured. */}
         <div className="space-y-2">
-          {cnpValidation.valid && personalKyc.cnp.length === 13 && (() => {
+          {!(isPrefilled && mode === 'scan') && cnpValidation.valid && personalKyc.cnp.length === 13 && (() => {
             const summary = summarizeCNP(personalKyc.cnp);
             if (!summary) {
               return (
@@ -2315,19 +2320,8 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
       )}
       {/* /Address Section */}
 
-      {/* Security Info Box */}
-      <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-        <div className="flex gap-3">
-          <Info className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
-          <div className="text-sm text-blue-800">
-            <p className="font-medium mb-1">Datele tale sunt în siguranță</p>
-            <p className="text-blue-700">
-              Informațiile personale sunt criptate și folosite exclusiv pentru procesarea comenzii.
-              Nu le distribuim către terți.
-            </p>
-          </div>
-        </div>
-      </div>
+      {/* Reassurance — the shared folded note, and only for a guest. */}
+      {!isPrefilled && <DataSafetyNote />}
 
       </>}
       {/* /Form fields conditional */}

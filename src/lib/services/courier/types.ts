@@ -151,6 +151,8 @@ export interface QuoteRequest {
   service?: string;
   cod?: number;
   insurance?: boolean;
+  /** The locker the customer picked — the out-of-home estimate needs one. */
+  lockerId?: string;
 }
 
 // ============================================================================

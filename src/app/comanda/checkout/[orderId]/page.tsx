@@ -608,7 +608,7 @@ export default function CheckoutPage() {
                 anchor?.scrollIntoView({ behavior: 'smooth', block: 'start' });
               }
             }}
-            className="h-11 px-5 bg-primary-500 hover:bg-primary-600 text-secondary-900 font-semibold"
+            className="h-11 shrink-0 whitespace-nowrap px-5 bg-primary-500 hover:bg-primary-600 text-secondary-900 font-semibold"
           >
             {paymentMethod === 'card' ? (
               isRedirecting ? (

@@ -174,46 +174,31 @@ const CF_BILLING_OPTIONS: BillingOption[] = [
   },
 ];
 
-/** One saved billing profile (or „Alte date") as a selectable card. */
-function SavedProfileCard({
-  selected,
-  icon: Icon,
-  title,
-  lines,
-  onClick,
-}: {
-  selected: boolean;
-  icon: React.ComponentType<{ className?: string }>;
-  title: string;
-  lines: Array<string | null>;
-  onClick: () => void;
-}) {
+/** One choice of the second level: a radio-like row. */
+function PickRow({ selected, title, detail, onClick }: { selected: boolean; title: string; detail?: string; onClick: () => void }) {
   return (
     <button
       type="button"
       onClick={onClick}
+      aria-pressed={selected}
       className={cn(
-        'relative text-left p-3 sm:p-4 rounded-xl border-2 transition-all bg-white',
-        selected ? 'border-primary-500 bg-primary-50 shadow-md' : 'border-neutral-200 hover:border-primary-300'
+        'flex w-full items-center gap-3 rounded-xl border-2 px-3 py-2.5 text-left transition-all',
+        selected ? 'border-primary-500 bg-primary-50' : 'border-neutral-200 bg-white hover:border-primary-300'
       )}
     >
-      {selected && (
-        <CheckCircle className="absolute top-2 right-2 sm:top-3 sm:right-3 w-5 h-5 text-primary-600" />
-      )}
-      <div className="flex items-start gap-3">
-        <div className={cn(
-          'w-10 h-10 rounded-full flex items-center justify-center shrink-0',
-          selected ? 'bg-primary-200' : 'bg-neutral-100'
-        )}>
-          <Icon className={cn('w-5 h-5', selected ? 'text-primary-700' : 'text-neutral-600')} />
-        </div>
-        <div className="min-w-0 pr-6">
-          <p className="font-semibold text-secondary-900 text-sm truncate">{title}</p>
-          {lines.filter(Boolean).map((line) => (
-            <p key={line as string} className="text-xs text-neutral-500 mt-0.5 truncate">{line}</p>
-          ))}
-        </div>
-      </div>
+      <span
+        className={cn(
+          'flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full border-2',
+          selected ? 'border-primary-600' : 'border-neutral-300'
+        )}
+        aria-hidden="true"
+      >
+        {selected && <span className="h-2 w-2 rounded-full bg-primary-600" />}
+      </span>
+      <span className="min-w-0">
+        <span className="block text-sm font-semibold text-secondary-900">{title}</span>
+        {detail && <span className="block truncate text-xs text-neutral-500">{detail}</span>}
+      </span>
     </button>
   );
 }
@@ -287,35 +272,6 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
   // (drives the same green notice the PJ branch shows).
   const [usedSavedPfProfile, setUsedSavedPfProfile] = useState(false);
 
-  // Saved-profile chooser (feedback 18.09.2026, #7). A customer whose account
-  // already holds billing data sees ONLY those profiles plus „Alte date", and
-  // a chosen profile shows as a one-line summary — not the three source cards
-  // and a form of disabled fields. Nothing changes for guests or phone mode
-  // (no saved profiles → the classic chooser).
-  const savedPjData = savedPjProfile?.billing_data as Record<string, string> | undefined;
-  const hasSavedPj = !!(savedPjData?.cui && savedPjData?.companyName);
-  const hasSavedPf = !!savedPfPrefill;
-  const hasSavedProfiles = hasSavedPf || hasSavedPj;
-  type SavedChoice = 'pf' | 'pj' | 'other' | null;
-  const [savedChoice, setSavedChoice] = useState<SavedChoice>(() => {
-    // A restored draft: recognise which profile it carries, if any.
-    if (!hasSavedProfiles) return 'other';
-    if (billing?.source === 'company' && billing?.cui && savedPjData?.cui &&
-        billing.cui.replace(/\D/g, '') === savedPjData.cui.replace(/\D/g, '')) return 'pj';
-    if ((billing?.source === 'self' || billing?.source === 'other_pf') && billing?.cnp &&
-        savedPfPrefill?.cnp && billing.cnp === savedPfPrefill.cnp) return 'pf';
-    if (billing?.source && (billing?.companyName || billing?.firstName || billing?.lastName)) return 'other';
-    return null;
-  });
-  // Data written by the wizard itself (PJ order → the firm from the request,
-  // constatator → the firm from the certificate) is „alte date", not a saved
-  // profile: keep the classic chooser visible for it.
-  useEffect(() => {
-    if (savedChoice === null && billing?.source && (billing?.companyName || billing?.firstName)) {
-      setSavedChoice('other');
-    }
-  }, [savedChoice, billing?.source, billing?.companyName, billing?.firstName]);
-  const showChooser = !hasSavedProfiles || savedChoice === 'other';
 
   // Get prefill data from personal KYC (memoized to avoid new object refs each render).
   // Address is kept STRUCTURED — Oblio needs street/locality/county separately.
@@ -351,6 +307,47 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
     personalKyc?.address?.city, personalKyc?.address?.county,
     personalKyc?.address?.postalCode,
   ]);
+
+  // Two-level chooser (feedback 18.09.2026, #32): first „Persoană fizică" /
+  // „Persoană juridică", then WHO — „Pe mine" (the data from the order or the
+  // account), the saved firm, the firm from the request, or „altă persoană /
+  // altă firmă" with fields. What the account holds is preselected; the
+  // fields open only on request or when the preselected data is incomplete.
+  const savedPjData = savedPjProfile?.billing_data as Record<string, string> | undefined;
+  const hasSavedPj = !!(savedPjData?.cui && savedPjData?.companyName);
+  const selfOptionExists = billingOptions.some((o) => o.source === 'self');
+  const meAvailable = selfOptionExists || !!savedPfPrefill || (pfOptionIsCustomer && !!prefillFromId);
+  const requestPjAvailable = !!companyKyc?.cui && !!companyKyc?.companyName;
+  type BillingPick = 'me' | 'other_pf' | 'saved_pj' | 'request_pj' | 'other_pj';
+  const [pick, setPick] = useState<BillingPick | null>(() => {
+    // A restored draft: recognise what it carries.
+    const b = billing;
+    if (!b?.source) return null;
+    const digits = (v?: string | null) => (v || '').replace(/\D/g, '');
+    if (b.source === 'self') return 'me';
+    if (b.source === 'other_pf') {
+      if (savedPfPrefill?.cnp && b.cnp === savedPfPrefill.cnp) return 'me';
+      if (!selfOptionExists && pfOptionIsCustomer && prefillFromId?.cnp && b.cnp === prefillFromId.cnp) return 'me';
+      return b.firstName || b.lastName || b.cnp ? 'other_pf' : null;
+    }
+    if (b.source === 'company') {
+      if (savedPjData?.cui && digits(b.cui) === digits(savedPjData.cui)) return 'saved_pj';
+      if (companyKyc?.cui && digits(b.cui) === digits(companyKyc.cui)) return 'request_pj';
+      return b.companyName || b.cui ? 'other_pj' : null;
+    }
+    return null;
+  });
+  const [editing, setEditing] = useState(false);
+  const top: 'PF' | 'PJ' | null = pick === null ? null : pick === 'me' || pick === 'other_pf' ? 'PF' : 'PJ';
+  // Data written by the wizard itself before this step mounted (PJ order →
+  // the firm from the request) is recognised the same way.
+  useEffect(() => {
+    if (pick !== null || !billing?.source) return;
+    if (billing.source === 'company' && billing.companyName) setPick(requestPjAvailable ? 'request_pj' : 'other_pj');
+    else if (billing.source === 'self' && billing.firstName) setPick('me');
+  }, [pick, billing?.source, billing?.companyName, billing?.firstName, requestPjAvailable]);
+  const prefilledPick = pick === 'me' || pick === 'saved_pj' || pick === 'request_pj';
+  const showForm = !!pick && (editing || !prefilledPick || !billing?.isValid);
 
   // For PJ orders: auto-default to 'company' billing and prefill from companyKyc
   const companyKycCui = companyKyc?.cui;
@@ -657,7 +654,8 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
   // PJ counts as verified — the profile was saved from an ANAF lookup.
   const applySavedPf = useCallback(() => {
     if (!savedPfPrefill) return;
-    setSavedChoice('pf');
+    setPick('me');
+    setEditing(false);
     setForeignToggle(false);
     setCompanyMode('request');
     const pfFields = {
@@ -685,7 +683,8 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
 
   const applySavedPj = useCallback(() => {
     if (!savedPjData?.cui || !savedPjData?.companyName) return;
-    setSavedChoice('pj');
+    setPick('saved_pj');
+    setEditing(false);
     setForeignToggle(false);
     setCompanyMode('request');
     updateBilling({
@@ -704,6 +703,56 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
     setCuiSuccess(true);
     setCuiError(null);
   }, [savedPjData, updateBilling]);
+
+  // „Pe mine": the ID data where the service scans one, else the saved PF
+  // profile, else the requester's own data (imobiliare).
+  const applyMe = useCallback(() => {
+    setEditing(false);
+    setPick('me');
+    if (selfOptionExists) handleSourceSelect('self');
+    else if (savedPfPrefill) applySavedPf();
+    else handleSourceSelect('other_pf');
+  }, [selfOptionExists, savedPfPrefill, applySavedPf, handleSourceSelect]);
+  // „Altă persoană": empty fields, whatever the profile holds.
+  const applyOtherPf = useCallback(() => {
+    setEditing(true);
+    setPick('other_pf');
+    setForeignToggle(false);
+    setCompanyMode('request');
+    updateBilling({
+      source: 'other_pf', type: 'persoana_fizica',
+      firstName: '', lastName: '', cnp: '', address: '', city: '', county: '', postalCode: '', country: 'Romania',
+      companyName: undefined, cui: undefined, regCom: undefined, companyAddress: undefined, cuiVerified: undefined,
+      isValid: false,
+    });
+    setUsedSavedPfProfile(false);
+    setCuiSuccess(false);
+    setCuiError(null);
+  }, [updateBilling]);
+  // The firm from the request (PJ order / constatator pe firmă).
+  const applyRequestPj = useCallback(() => {
+    setEditing(false);
+    setPick('request_pj');
+    setCompanyMode('request');
+    handleSourceSelect('company');
+  }, [handleSourceSelect]);
+  // „Altă firmă": CUI to type, verified at ANAF.
+  const applyOtherPj = useCallback(() => {
+    setEditing(true);
+    setPick('other_pj');
+    handleOptionClick({ source: 'company', id: 'other_company', label: '', description: '', icon: Building2 });
+  }, [handleOptionClick]);
+
+  // Preselection for a fresh step: the request's firm, the saved firm, or „pe mine".
+  const preselectedRef = useRef(false);
+  useEffect(() => {
+    if (preselectedRef.current || pick !== null || billing?.source) return;
+    preselectedRef.current = true;
+    if (companyFirst && requestPjAvailable) applyRequestPj();
+    else if (companyFirst && hasSavedPj) applySavedPj();
+    else if (meAvailable && (selfOptionExists || savedPfPrefill)) applyMe();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Update field
   const updateField = useCallback((field: keyof BillingState, value: string) => {
@@ -833,107 +882,90 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
           Date pentru facturare
         </h3>
 
-        {hasSavedProfiles && (
-          <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-3">
-            {hasSavedPf && savedPfPrefill && (
-              <SavedProfileCard
-                selected={savedChoice === 'pf'}
-                icon={User}
-                title={[savedPfPrefill.lastName, savedPfPrefill.firstName].filter(Boolean).join(' ') || 'Persoană fizică'}
-                lines={[
-                  savedPfPrefill.cnp ? `CNP ${savedPfPrefill.cnp}` : null,
-                  [savedPfPrefill.city, savedPfPrefill.county].filter(Boolean).join(', ') || null,
-                ]}
-                onClick={applySavedPf}
+        {/* Level 1: who gets the invoice */}
+        <div className="grid grid-cols-2 gap-3">
+          {([
+            { key: 'PF' as const, label: 'Persoană fizică', icon: User, onPick: () => (meAvailable ? applyMe() : applyOtherPf()) },
+            { key: 'PJ' as const, label: 'Persoană juridică', icon: Building2, onPick: () => (requestPjAvailable && companyFirst ? applyRequestPj() : hasSavedPj ? applySavedPj() : requestPjAvailable ? applyRequestPj() : applyOtherPj()) },
+          ]).map((t) => {
+            const Icon = t.icon;
+            const active = top === t.key;
+            return (
+              <button
+                key={t.key}
+                type="button"
+                onClick={t.onPick}
+                aria-pressed={active}
+                className={cn(
+                  'flex items-center justify-center gap-2 rounded-xl border-2 px-3 py-3 text-sm font-semibold transition-all',
+                  active ? 'border-primary-500 bg-primary-50 text-secondary-900 shadow-sm' : 'border-neutral-200 bg-white text-secondary-900 hover:border-primary-300'
+                )}
+              >
+                <Icon className={cn('h-4 w-4', active ? 'text-primary-600' : 'text-neutral-500')} />
+                {t.label}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Level 2: which person / which firm */}
+        {top === 'PF' && (
+          <div className="space-y-2">
+            {meAvailable && (
+              <PickRow
+                selected={pick === 'me'}
+                title="Pe mine"
+                detail={
+                  selfOptionExists
+                    ? 'datele din actul de identitate'
+                    : savedPfPrefill
+                      ? `${[savedPfPrefill.lastName, savedPfPrefill.firstName].filter(Boolean).join(' ')}${savedPfPrefill.cnp ? ` · CNP ${savedPfPrefill.cnp}` : ''}`
+                      : 'datele tale din comandă'
+                }
+                onClick={applyMe}
+              />
+            )}
+            <PickRow selected={pick === 'other_pf'} title="Altă persoană fizică" detail="completezi datele ei" onClick={applyOtherPf} />
+          </div>
+        )}
+        {top === 'PJ' && (
+          <div className="space-y-2">
+            {requestPjAvailable && (
+              <PickRow
+                selected={pick === 'request_pj'}
+                title={isConstatatorFirm ? 'Firma din certificat' : 'Firma din comandă'}
+                detail={`${companyKyc?.companyName ?? ''}${companyKyc?.cui ? ` · CUI ${companyKyc.cui}` : ''}`}
+                onClick={applyRequestPj}
               />
             )}
             {hasSavedPj && savedPjData && (
-              <SavedProfileCard
-                selected={savedChoice === 'pj'}
-                icon={Building2}
-                title={savedPjData.companyName}
-                lines={[`CUI ${savedPjData.cui}`, savedPjData.companyAddress || savedPjData.address || null]}
-                onClick={applySavedPj}
-              />
+              <PickRow selected={pick === 'saved_pj'} title="Firma din cont" detail={`${savedPjData.companyName} · CUI ${savedPjData.cui}`} onClick={applySavedPj} />
             )}
-            <SavedProfileCard
-              selected={savedChoice === 'other'}
-              icon={Users}
-              title="Alte date"
-              lines={['Altă persoană sau altă firmă']}
-              onClick={() => setSavedChoice('other')}
-            />
+            <PickRow selected={pick === 'other_pj'} title="Altă firmă" detail="introduci CUI-ul, luăm datele de la ANAF" onClick={applyOtherPj} />
           </div>
         )}
 
-        {hasSavedProfiles && (savedChoice === 'pf' || savedChoice === 'pj') && billing?.isValid && (
+        {/* Preselected and complete: one line, „Modifică" opens the fields. */}
+        {prefilledPick && billing?.isValid && !editing && (
           <div className="flex items-start gap-2 p-3 bg-green-50 border border-green-200 rounded-lg text-sm text-green-700">
             <CheckCircle className="w-4 h-4 shrink-0 mt-0.5" />
             <span>
-              Factura se emite pe datele salvate în contul tău.{' '}
-              <button
-                type="button"
-                onClick={() => setSavedChoice('other')}
-                className="underline underline-offset-2 font-medium"
-              >
+              Factura se emite pe{' '}
+              <strong>
+                {selectedSource === 'company'
+                  ? billing?.companyName
+                  : [billing?.lastName, billing?.firstName].filter(Boolean).join(' ')}
+              </strong>
+              {selectedSource === 'company' && billing?.cui ? ` (CUI ${billing.cui})` : ''}
+              {selectedSource !== 'company' && billing?.city ? `, ${billing.city}` : ''}.{' '}
+              <button type="button" onClick={() => setEditing(true)} className="underline underline-offset-2 font-medium">
                 Modifică
               </button>
             </span>
           </div>
         )}
 
-        {showChooser && <div className={cn(
-          'grid gap-3 sm:gap-4',
-          billingOptions.length === 2 ? 'grid-cols-2' : 'grid-cols-1 sm:grid-cols-3'
-        )}>
-          {billingOptions.map((option) => {
-            const Icon = option.icon;
-            const isSelected = option.id
-              ? selectedSource === 'company' && companyMode === (option.id === 'request_firm' ? 'request' : 'other')
-              : selectedSource === option.source;
-
-            return (
-              <div
-                key={option.id ?? option.source}
-                onClick={() => handleOptionClick(option)}
-                className={cn(
-                  'relative p-3 sm:p-4 rounded-xl border-2 cursor-pointer transition-all',
-                  isSelected
-                    ? 'border-primary-500 bg-primary-50 shadow-md'
-                    : 'border-neutral-200 hover:border-primary-300'
-                )}
-              >
-                {/* Selection Indicator */}
-                {isSelected && (
-                  <div className="absolute top-2 right-2 sm:top-3 sm:right-3">
-                    <CheckCircle className="w-5 h-5 text-primary-600" />
-                  </div>
-                )}
-
-                <div className="flex flex-col items-center text-center">
-                  <div
-                    className={cn(
-                      'w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center mb-2 sm:mb-3',
-                      isSelected ? 'bg-primary-200' : 'bg-neutral-100'
-                    )}
-                  >
-                    <Icon
-                      className={cn(
-                        'w-5 h-5 sm:w-6 sm:h-6',
-                        isSelected ? 'text-primary-700' : 'text-neutral-600'
-                      )}
-                    />
-                  </div>
-
-                  <h4 className="font-semibold text-secondary-900 text-sm sm:text-base">{option.label}</h4>
-                  <p className="text-xs text-neutral-500 mt-1">{option.description}</p>
-                </div>
-              </div>
-            );
-          })}
-        </div>}
-
-        {showStepErrors && !selectedSource && (
+        {showStepErrors && !pick && (
           <p data-wizard-error className="text-sm text-red-500 flex items-center gap-1">
             <AlertCircle className="h-4 w-4 shrink-0" />
             Alege pe cine emitem factura: persoană fizică sau firmă.
@@ -944,7 +976,7 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
       {/* Persoană Fizică Fields (self or other_pf). A chosen saved profile that
           is still incomplete (rows saved before localitate/județ existed) keeps
           the form open so the customer fills in what is missing. */}
-      {(showChooser || !billing?.isValid) && (selectedSource === 'self' || selectedSource === 'other_pf') && (
+      {showForm && (selectedSource === 'self' || selectedSource === 'other_pf') && (
         <div className="space-y-4 p-4 bg-neutral-50 rounded-xl">
           <h4 className="font-medium text-secondary-900">
             {selectedSource === 'self' && !isCarteFunciara ? 'Date facturare (din act)' : 'Date facturare (persoană fizică)'}
@@ -1176,7 +1208,7 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
       )}
 
       {/* Persoană Juridică Fields */}
-      {(showChooser || !billing?.isValid) && selectedSource === 'company' && (
+      {showForm && selectedSource === 'company' && (
         <div className="space-y-4 p-4 bg-neutral-50 rounded-xl">
           <h4 className="font-medium text-secondary-900">Date facturare (persoană juridică)</h4>
 

@@ -580,7 +580,7 @@ export class SamedayProvider implements CourierProvider {
     const totalParcels = request.packages.reduce((s, p) => s + p.quantity, 0);
     const round2 = (n: number) => Math.round(n * 100) / 100;
 
-    const estimate = async (serviceId: number, isLocker: boolean): Promise<number> => {
+    const estimate = async (serviceId: number, isLocker: boolean, lockerId?: string): Promise<number> => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const body: Record<string, any> = {
         packageType: totalWeight <= 1 ? '1' : '0',
@@ -612,6 +612,13 @@ export class SamedayProvider implements CourierProvider {
         })),
       };
       if (pickupPointId) body.pickupPoint = pickupPointId;
+      // Out-of-home: the location IS the locker. Without it the estimate
+      // failed silently and the locker price fell back to 85% of the home
+      // tariff — 35 lei for Odoreu with a locker next door (feedback 18.09.2026, #30).
+      if (isLocker && lockerId) {
+        body.oohLastMile = lockerId;
+        body.lockerId = lockerId;
+      }
       // Sameday estimate-cost returns { amount, currency, time } — `amount` is
       // the net tariff in RON (verified live 2026-06-24).
       const data = await this.apiRequest<{ amount: number; currency?: string; time?: number }>(
@@ -632,11 +639,21 @@ export class SamedayProvider implements CourierProvider {
       vat: round2(stdCost * 0.21), currency: 'RON', estimatedDays: 1, pickupAvailable: true,
     });
 
-    // EasyBox locker — estimate; if it fails, derive from standard (~15% less).
+    // EasyBox locker — estimated for the chosen locker, else for a locker in
+    // the customer's city/county (the tariff is per zone, not per box); if
+    // that still fails, derive from standard (~15% less) and say so in the log.
     let lockerCost: number;
     try {
-      lockerCost = await estimate(SAMEDAY_SERVICES.LOCKER_NEXTDAY, true);
-    } catch {
+      let lockerId = request.lockerId;
+      if (!lockerId) {
+        const points = await this.getServicePoints(request.recipient.city, request.recipient.county).catch(() => []);
+        const inCounty = points.length ? points : await this.getServicePoints('*', request.recipient.county).catch(() => []);
+        const locker = inCounty.find((pt) => pt.type === 'locker') ?? inCounty[0];
+        lockerId = locker ? String(locker.id) : undefined;
+      }
+      lockerCost = await estimate(SAMEDAY_SERVICES.LOCKER_NEXTDAY, true, lockerId);
+    } catch (lockerErr) {
+      console.warn('[Sameday] locker estimate failed, deriving from standard:', lockerErr instanceof Error ? lockerErr.message : lockerErr);
       lockerCost = round2(stdCost * 0.85);
     }
     quotes.push({

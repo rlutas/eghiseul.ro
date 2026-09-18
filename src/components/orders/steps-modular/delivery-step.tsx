@@ -1912,19 +1912,18 @@ export function DeliveryStepModular({ onValidChange }: DeliveryStepProps) {
                   )}
 
                   {/* Delivery Timing Note */}
-                  <div className="p-3 rounded-lg bg-amber-50 border border-amber-200 text-xs text-amber-800">
-                    <div className="flex items-start gap-2">
-                      <Info className="w-3.5 h-3.5 mt-0.5 flex-shrink-0 text-amber-600" />
-                      <div>
-                        <p className="font-medium mb-1">Informații despre termenul de livrare</p>
-                        <ul className="space-y-0.5 text-amber-700">
-                          <li>Livrarea se efectuează doar după eliberarea documentelor.</li>
-                          <li>Termenul de livrare se calculează începând cu a 2-a zi lucrătoare de la eliberarea documentului.</li>
-                          <li>Documentele eliberate vineri sau în weekend vor fi expediate luni.</li>
-                        </ul>
-                      </div>
-                    </div>
-                  </div>
+                  <details className="group p-3 rounded-lg bg-amber-50 border border-amber-200 text-xs text-amber-800">
+                    <summary className="flex cursor-pointer list-none items-center gap-2 font-medium [&::-webkit-details-marker]:hidden">
+                      <Info className="w-3.5 h-3.5 flex-shrink-0 text-amber-600" />
+                      Informații despre termenul de livrare
+                      <span className="ml-auto font-normal text-amber-600 group-open:hidden">Vezi</span>
+                    </summary>
+                    <ul className="mt-2 space-y-0.5 pl-5 text-amber-700">
+                      <li>Livrarea se efectuează doar după eliberarea documentelor.</li>
+                      <li>Termenul de livrare se calculează începând cu a 2-a zi lucrătoare de la eliberarea documentului.</li>
+                      <li>Documentele eliberate vineri sau în weekend vor fi expediate luni.</li>
+                    </ul>
+                  </details>
                 </div>
               )}
             </div>

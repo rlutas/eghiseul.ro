@@ -40,6 +40,7 @@ import type { PersonalKYCConfig, DocumentType, UploadedDocumentState } from '@/t
 import { compressImage } from '@/lib/images/compress';
 import { randomId } from '@/lib/random-id';
 import { SelfieLegalNotice } from './SelfieLegalNotice';
+import { DataSafetyNote } from './DataSafetyNote';
 
 interface KYCDocumentsStepProps {
   config: PersonalKYCConfig;
@@ -1034,14 +1035,11 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
         );
       })()}
 
-      {/* Security reassurance — calm, trustworthy, not an alert. */}
-      <div className="flex items-start gap-2.5 rounded-xl border border-green-100 bg-green-50/60 px-3.5 py-3">
-        <ShieldCheck className="w-4 h-4 text-green-600 shrink-0 mt-0.5" />
-        <p className="text-xs leading-relaxed text-neutral-600">
-          <span className="font-medium text-secondary-900">Datele tale sunt în siguranță.</span>{' '}
-          Documentele sunt criptate și stocate securizat, folosite exclusiv pentru verificarea identității.
-        </p>
-      </div>
+      {/* The selfie notice above is the step's one reassurance; a second
+          „Datele tale sunt în siguranță" block (styled differently from step
+          2) is gone — feedback 18.09.2026, #29. Guests without a selfie
+          upload on this step still get the shared note. */}
+      {!showSelfie && !isPrefilled && <DataSafetyNote />}
 
       {/* Preview Modal */}
       {previewModal.open && previewModal.url && (

@@ -859,7 +859,7 @@ function OptionCard({
         onClick={onClick}
         disabled={disabled}
         aria-pressed={selected}
-        className="group flex w-full cursor-pointer items-center gap-3 p-4 text-left disabled:cursor-not-allowed"
+        className="group flex w-full cursor-pointer flex-wrap items-center gap-x-3 gap-y-2 p-4 text-left disabled:cursor-not-allowed sm:flex-nowrap"
       >
         <span
           className={cn(
@@ -878,7 +878,7 @@ function OptionCard({
         >
           <Icon className={cn('h-5 w-5', selected || primary ? 'text-primary-600' : 'text-neutral-500')} />
         </span>
-        <span className="flex-1 min-w-0">
+        <span className="min-w-0 flex-1 basis-[calc(100%-5.5rem)] sm:basis-auto">
           <span className={cn('block leading-tight', primary ? 'text-base font-bold text-secondary-900' : 'text-sm font-semibold text-secondary-900')}>
             {name}
           </span>
@@ -886,7 +886,11 @@ function OptionCard({
             <span className="mt-0.5 block text-xs font-medium text-primary-700">⚡ {term}</span>
           )}
         </span>
-        <PriceChip price={price} selected={selected} disabled={disabled} />
+        {/* On a phone the price sits on its own row under the name, aligned
+            with the text (feedback 18.09.2026, #28); inline from sm up. */}
+        <span className="basis-full pl-[4.25rem] sm:basis-auto sm:pl-0">
+          <PriceChip price={price} selected={selected} disabled={disabled} size={primary ? 'md' : 'md'} />
+        </span>
       </button>
       {hint && (
         <div className="px-4 pb-3 -mt-1">

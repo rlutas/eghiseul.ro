@@ -444,7 +444,11 @@ function OrderStatusContent() {
                   ) : orderData.paymentStatus === 'awaiting_verification' ? (
                     <div className="px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 flex items-center gap-1">
                       <Clock className="h-3 w-3" />
-                      {orderData.hasPaymentProof ? 'Dovadă primită, în verificare' : 'Așteptăm plata'}
+                      {orderData.status !== 'awaiting_payment'
+                        ? 'Dovadă verificată'
+                        : orderData.hasPaymentProof
+                          ? 'Dovadă primită, în verificare'
+                          : 'Așteptăm plata'}
                     </div>
                   ) : orderData.paymentStatus !== 'paid' && (
                     <div className="px-3 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800 flex items-center gap-1">
@@ -653,7 +657,7 @@ function OrderStatusContent() {
 
           {/* Transfer bancar: instrucțiunile complete + dovada, aici, nu doar
               pe email (feedback 18.09.2026, #25). */}
-          {orderData.paymentStatus === 'awaiting_verification' && (
+          {orderData.paymentStatus === 'awaiting_verification' && orderData.status === 'awaiting_payment' && (
             <Card className={orderData.hasPaymentProof ? 'border-green-300' : 'border-amber-300 bg-amber-50/40'}>
               <CardHeader className="pb-3">
                 <CardTitle className="text-lg flex items-center gap-2">
