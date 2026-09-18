@@ -1,17 +1,11 @@
-import { randomUUID } from 'node:crypto';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { authErrorToRomanian } from '@/lib/auth/error-messages';
-import { isStorableKycDocumentType, isIdentityDocumentType } from '@/lib/kyc/identity-documents';
 import {
-  copyFile,
-  generateKycKey,
-  getDownloadUrl,
-  getExtensionFromContentType,
-  uploadKycDocument,
-  type KycDocumentType,
-} from '@/lib/aws/s3';
-import { KYC_VALIDITY_DAYS } from '@/lib/kyc/constants';
+  copyOrderKycDocumentsToAccount,
+  type OrderUploadedDocument,
+  type OrderOcrResult,
+} from '@/lib/account/copy-order-kyc';
 import {
   isCompanyBilling,
   companyProfileFromOrder,
@@ -255,134 +249,14 @@ export async function POST(request: Request) {
       try {
         // Extract KYC data from order
         const personalData = customerData?.personal as Record<string, unknown> | undefined;
-        const uploadedDocuments = (personalData?.uploadedDocuments || []) as Array<{
-          id: string;
-          type: string;
-          /** Where the wizard put the image. Present on every recent order. */
-          s3Key?: string;
-          /** Legacy: an inline image, with no S3 object behind it. */
-          base64?: string;
-          mimeType?: string;
-          fileSize?: number;
-        }>;
-        const ocrResults = (personalData?.ocrResults || []) as Array<{
-          documentType: string;
-          extractedData: Record<string, unknown>;
-          confidence: number;
-        }>;
-
-        // Copy each scanned document from the order into the account.
-        //
-        // The order's documents are ALREADY in S3, at `kyc/<orderId>/<type>.jpg`
-        // — `customer_data.personal.uploadedDocuments` carries `s3Key`, never
-        // `base64`. This loop used to read `doc.base64` and write it into
-        // `file_url` as a `data:` URL, so it saved nothing for any of the 183
-        // paid orders that have documents; the 5 base64 rows in the table came
-        // from an older path.
-        //
-        // The copy is server-side (CopyObject), so no image is downloaded or
-        // re-uploaded. It has to happen: `/api/upload/download` presigns a
-        // `kyc/` key only when the key contains the caller's user id, so a row
-        // pointing at the order's key would be unreadable from the account.
-        //
-        // Every insert is checked. Before migration 171 the CHECK on
-        // `document_type` rejected `act_identitate`, `passport_opened` and the
-        // rest, and this loop failed on every document without anyone knowing,
-        // because the result was never read.
-        for (const doc of uploadedDocuments) {
-          if (!isStorableKycDocumentType(doc.type)) {
-            console.warn(`register-from-order: skipping unknown document type ${doc.type}`);
-            continue;
-          }
-
-          const ocrResult = ocrResults.find(r => r.documentType === doc.type);
-          const mimeType = doc.mimeType || 'image/jpeg';
-          const verificationId = randomUUID();
-          // The document's own expiry when the OCR read one and it is still in
-          // the future; otherwise the standard validity of a stored scan. Same
-          // rule as `api/user/kyc/save`, so a document copied from an order does
-          // not outlive one uploaded in the account.
-          const ocrExpiry = ocrResult?.extractedData?.expiryDate;
-          const parsedExpiry = typeof ocrExpiry === 'string' ? new Date(ocrExpiry) : null;
-          const expiresAt =
-            parsedExpiry && !Number.isNaN(parsedExpiry.getTime()) && parsedExpiry > new Date()
-              ? parsedExpiry
-              : new Date(Date.now() + KYC_VALIDITY_DAYS * 24 * 60 * 60 * 1000);
-
-          let fileKey: string;
-          try {
-            if (doc.s3Key) {
-              fileKey = generateKycKey(
-                authData.user.id,
-                verificationId,
-                doc.type as KycDocumentType,
-                getExtensionFromContentType(mimeType)
-              );
-              await copyFile(doc.s3Key, fileKey);
-            } else if (doc.base64) {
-              // Legacy shape: an inline image with no S3 object behind it.
-              const uploaded = await uploadKycDocument(
-                authData.user.id,
-                verificationId,
-                doc.type as KycDocumentType,
-                doc.base64,
-                mimeType
-              );
-              fileKey = uploaded.key;
-            } else {
-              console.warn(`register-from-order: ${doc.type} has neither s3Key nor base64`);
-              continue;
-            }
-          } catch (copyError) {
-            // A failed copy must not cost the customer their account: the rest
-            // of the profile is still worth saving, and the document can be
-            // uploaded again from the account.
-            console.error(`register-from-order: could not copy ${doc.type} into the account:`, copyError);
-            continue;
-          }
-
-          const fileUrl = await getDownloadUrl(fileKey);
-
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const { error: kycInsertError } = await (adminClient as any)
-            .from('kyc_verifications')
-            .insert({
-              id: verificationId,
-              user_id: authData.user.id,
-              document_type: doc.type,
-              file_url: fileUrl,
-              file_key: fileKey,
-              file_size: doc.fileSize || null,
-              mime_type: mimeType,
-              extracted_data: ocrResult?.extractedData || {},
-              validation_result: { confidence: ocrResult?.confidence || 0 },
-              verified_at: new Date().toISOString(),
-              expires_at: expiresAt.toISOString(),
-              is_active: true,
-            });
-
-          if (kycInsertError) {
-            console.error(
-              `register-from-order: could not save ${doc.type} to kyc_verifications:`,
-              kycInsertError.message
-            );
-            continue;
-          }
-
-          // `kyc_verified` is what the wizard and `/submit` read to skip the
-          // identity step next time. Only an identity document may set it — a
-          // selfie or a driving licence proves nothing on its own.
-          if (isIdentityDocumentType(doc.type)) {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const { error: flagError } = await (adminClient as any)
-              .from('profiles')
-              .update({ kyc_verified: true, updated_at: new Date().toISOString() })
-              .eq('id', authData.user.id);
-            if (flagError) {
-              console.error('register-from-order: kyc_verified not set:', flagError.message);
-            }
-          }
-        }
+        // The copy itself lives in `lib/account/copy-order-kyc.ts`, shared with
+        // the sync that runs for an EXISTING account after payment.
+        await copyOrderKycDocumentsToAccount(adminClient, {
+          userId: authData.user.id,
+          uploadedDocuments: (personalData?.uploadedDocuments || []) as OrderUploadedDocument[],
+          ocrResults: (personalData?.ocrResults || []) as OrderOcrResult[],
+          logPrefix: 'register-from-order',
+        });
 
         // Billing profile, from the order that was just paid. The mapping and
         // the reason a half-filled profile is not saved at all are in

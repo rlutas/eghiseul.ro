@@ -4,6 +4,7 @@ import { createClient } from '@supabase/supabase-js'
 import Stripe from 'stripe'
 import { ensureInvoiceForPaidOrder } from '@/lib/oblio'
 import { upsertContactForPaidOrder } from '@/lib/contacts/upsert'
+import { syncPaidOrderToAccount } from '@/lib/account/sync-paid-order'
 import { ensureOnrcJobForPaidOrder } from '@/lib/onrc/ensure-onrc-job'
 import { ensureAncpiJobForPaidOrder } from '@/lib/ancpi/ensure-ancpi-job'
 import { computeEstimatedCompletionISOForOrder } from '@/lib/orders/order-estimate'
@@ -437,6 +438,10 @@ async function handlePaymentSucceeded(paymentIntent: Stripe.PaymentIntent) {
 
   // Contact registry: exactly once per order (invoice lock winner).
   if (result.status === 'created') await upsertContactForPaidOrder(orderId)
+
+  // What the order gives back to the account that placed it (address, billing
+  // profile, documents). Idempotent and never throws.
+  await syncPaidOrderToAccount(orderId)
   if (result.status === 'failed') {
     console.error(`Order ${orderId}: invoice creation failed:`, result.error)
   } else if (result.status === 'locked') {

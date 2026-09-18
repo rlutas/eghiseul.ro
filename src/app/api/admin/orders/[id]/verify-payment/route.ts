@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requirePermission } from '@/lib/admin/permissions';
 import { createInvoiceFromOrder, findInvoiceTotalsMismatch } from '@/lib/oblio';
+import { syncPaidOrderToAccount } from '@/lib/account/sync-paid-order';
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -196,6 +197,9 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       console.error('Failed to create invoice:', err);
       invoiceError = err instanceof Error ? err.message : 'Invoice creation failed';
     }
+
+    // Address, billing profile and documents back into the customer's account.
+    await syncPaidOrderToAccount(id);
 
     // Add to order history
     await supabase.from('order_history').insert({

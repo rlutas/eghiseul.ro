@@ -34,6 +34,7 @@ import Stripe from 'stripe';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { requirePermission } from '@/lib/admin/permissions';
+import { syncPaidOrderToAccount } from '@/lib/account/sync-paid-order';
 
 export const runtime = 'nodejs';
 
@@ -126,6 +127,9 @@ export async function POST(
       console.error('[sync-stripe] update failed:', updateErr);
       return NextResponse.json({ success: false, error: 'Failed to update order' }, { status: 500 });
     }
+
+    // Address, billing profile and documents back into the customer's account.
+    await syncPaidOrderToAccount(orderId);
 
     // Audit — use the actual admin user id so the timeline shows who clicked sync.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

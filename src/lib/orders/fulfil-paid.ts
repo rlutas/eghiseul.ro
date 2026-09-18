@@ -4,6 +4,7 @@ import { upsertContactForPaidOrder } from '@/lib/contacts/upsert';
 import { ensureOnrcJobForPaidOrder } from '@/lib/onrc/ensure-onrc-job';
 import { ensureAncpiJobForPaidOrder } from '@/lib/ancpi/ensure-ancpi-job';
 import { computeEstimatedCompletionISOForOrder } from '@/lib/orders/order-estimate';
+import { syncPaidOrderToAccount } from '@/lib/account/sync-paid-order';
 
 /**
  * Post-payment fulfilment chain for MANUALLY-collected payments (comenzi
@@ -138,6 +139,10 @@ export async function fulfilManuallyPaidOrder(
   } catch (e) {
     console.error(`[fulfil-paid] Order ${orderId}: ensureBarouDocuments failed (non-fatal):`, e instanceof Error ? e.message : e);
   }
+
+  // Address, billing profile and documents back into the customer's account.
+  // Idempotent and never throws.
+  await syncPaidOrderToAccount(orderId);
 
   return { ok: true };
 }

@@ -4,6 +4,7 @@ import { stripe } from '@/lib/stripe';
 import { computeEstimatedCompletionISOForOrder } from '@/lib/orders/order-estimate';
 import { ensureInvoiceForPaidOrder } from '@/lib/oblio';
 import { upsertContactForPaidOrder } from '@/lib/contacts/upsert';
+import { syncPaidOrderToAccount } from '@/lib/account/sync-paid-order';
 import { ensureOnrcJobForPaidOrder } from '@/lib/onrc/ensure-onrc-job';
 import { ensureAncpiJobForPaidOrder } from '@/lib/ancpi/ensure-ancpi-job';
 
@@ -195,6 +196,9 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     });
 
     console.log(`[confirm-payment] Order ${orderId} marked as paid`);
+
+    // Address, billing profile and documents back into the customer's account.
+    await syncPaidOrderToAccount(orderId);
 
     // Emit the Oblio invoice. This path is the Hosted-Checkout fallback used
     // when the Stripe webhook is slow/misses, so without this the order would

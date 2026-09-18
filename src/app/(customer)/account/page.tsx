@@ -9,6 +9,7 @@ import { ProfileChecklist } from '@/components/account/ProfileChecklist'
 import { OnboardingQuestion } from '@/components/account/OnboardingQuestion'
 import { profileCompleteness, hasIdentityDocuments } from '@/lib/account/profile-completeness'
 import { formatPersonName } from '@/lib/format/person-name'
+import { syncUnsyncedPaidOrdersForUser } from '@/lib/account/sync-paid-order'
 import { parseInterests, sortByInterest } from '@/lib/account/service-interests'
 import { serviceRequirements, serviceReadiness } from '@/lib/account/service-readiness'
 import { createPublicClient } from '@/lib/supabase/public'
@@ -48,6 +49,11 @@ export default async function AccountPage() {
     // Never block the account on this — worst case the customer sees the same
     // list as before and we try again on the next visit.
     if (claimError) console.error('claim_guest_orders failed:', claimError.message)
+
+    // Paid orders that have not yet given the account their address, billing
+    // profile and documents — normally done at payment; this catches a path
+    // that missed it. Bounded and non-fatal.
+    await syncUnsyncedPaidOrdersForUser(user.id)
   }
 
   const { data: profile } = await supabase
