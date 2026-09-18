@@ -12,6 +12,10 @@ vi.mock('@/lib/supabase/server', () => ({
     from: fromMock,
   }),
 }));
+vi.mock('@/lib/aws/s3', () => ({
+  getDownloadUrl: vi.fn().mockResolvedValue('https://s3.example/signed'),
+}));
+
 vi.mock('@/lib/supabase/admin', () => ({
   createAdminClient: vi.fn(() => ({ from: adminFromMock })),
 }));
@@ -19,6 +23,10 @@ vi.mock('@/lib/supabase/admin', () => ({
 const { POST } = await import('@/app/api/user/kyc/save/route');
 
 const MOCK_USER = { id: 'user-1', email: 'a@b.com' };
+// The route refuses any object that is not the caller's own upload and
+// re-derives the URL from the key (18.09.2026), so every valid request
+// carries a key under `kyc/<userId>/`.
+const OWN_KEY = `kyc/${MOCK_USER.id}/ver-1/ci_front.jpg`;
 
 function makeReq(body: unknown): Request {
   return new Request('http://localhost:3000/api/user/kyc/save', {
@@ -65,7 +73,7 @@ function setupChain(insertResult: { data: unknown; error: unknown } = { data: { 
 describe('POST /api/user/kyc/save — auth + validation', () => {
   it('returns 401 when not authenticated', async () => {
     getUser.mockResolvedValue({ data: { user: null }, error: null });
-    const res = await POST(makeReq({ documentType: 'ci_front', fileUrl: 'x' }));
+    const res = await POST(makeReq({ documentType: 'ci_front', fileUrl: 'x', fileKey: OWN_KEY }));
     expect(res.status).toBe(401);
   });
 
@@ -87,13 +95,13 @@ describe('POST /api/user/kyc/save — auth + validation', () => {
     'company_registration_cert', 'company_statement_cert',
   ])('accepts valid documentType "%s"', async (type) => {
     setupChain();
-    const res = await POST(makeReq({ documentType: type, fileUrl: 'http://example.com/x' }));
+    const res = await POST(makeReq({ documentType: type, fileUrl: 'http://example.com/x', fileKey: OWN_KEY }));
     expect(res.status).not.toBe(400);
   });
 
   it('returns 400 for invalid documentType', async () => {
     setupChain();
-    const res = await POST(makeReq({ documentType: 'random_doc', fileUrl: 'x' }));
+    const res = await POST(makeReq({ documentType: 'random_doc', fileUrl: 'x', fileKey: OWN_KEY }));
     expect(res.status).toBe(400);
   });
 });
@@ -133,7 +141,7 @@ describe('POST /api/user/kyc/save — versioning (deactivate previous)', () => {
       insert: vi.fn().mockResolvedValue({ error: null }),
     }));
 
-    await POST(makeReq({ documentType: 'ci_front', fileUrl: 'http://example.com/new.jpg' }));
+    await POST(makeReq({ documentType: 'ci_front', fileUrl: 'http://example.com/new.jpg', fileKey: OWN_KEY }));
 
     expect(updateCalled).toBe(true);
     expect(insertCalled).toBe(true);
@@ -167,6 +175,7 @@ describe('POST /api/user/kyc/save — expiry date logic', () => {
     await POST(makeReq({
       documentType: 'ci_front',
       fileUrl: 'x',
+      fileKey: OWN_KEY,
       documentExpiry: '2031-08-03',
     }));
 
@@ -195,7 +204,7 @@ describe('POST /api/user/kyc/save — expiry date logic', () => {
       insert: vi.fn().mockResolvedValue({ error: null }),
     }));
 
-    await POST(makeReq({ documentType: 'ci_front', fileUrl: 'x' }));
+    await POST(makeReq({ documentType: 'ci_front', fileUrl: 'x', fileKey: OWN_KEY }));
 
     const expiresAt = new Date(captured.expires_at as string);
     const ninetyDaysFromNow = Date.now() + 90 * 24 * 60 * 60 * 1000;
@@ -208,7 +217,7 @@ describe('POST /api/user/kyc/save — error handling', () => {
   it('returns 500 on insert error', async () => {
     setupChain({ data: null, error: { message: 'unique violation' } });
 
-    const res = await POST(makeReq({ documentType: 'ci_front', fileUrl: 'x' }));
+    const res = await POST(makeReq({ documentType: 'ci_front', fileUrl: 'x', fileKey: OWN_KEY }));
     expect(res.status).toBe(500);
   });
 });

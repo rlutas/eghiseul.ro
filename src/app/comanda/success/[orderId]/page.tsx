@@ -63,6 +63,7 @@ interface OrderData {
   total_price: number;
   payment_status: string;
   payment_method?: string;
+  hasPaymentProof?: boolean;
   status: string;
   invoice_number?: string;
   invoice_url?: string;
@@ -138,6 +139,9 @@ export default function SuccessPage() {
   // Determine payment status
   const isBankTransfer = paymentMethodFromUrl === 'bank_transfer' || order?.payment_method === 'bank_transfer';
   const isPending = isBankTransfer && order?.payment_status === 'awaiting_verification';
+  // The proof is already with us: the page must not send the customer to pay.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const hasProof = !!(order as any)?.hasPaymentProof || !!(order as any)?.payment_proof_url;
   const isPaid = order?.payment_status === 'paid' || redirectStatus === 'succeeded';
 
   // Fetch order data and confirm payment if needed
@@ -229,6 +233,7 @@ export default function SuccessPage() {
           client_type: inferredClientType,
           total_price: apiOrder.totalAmount,
           payment_status: apiOrder.paymentStatus || 'unpaid',
+          hasPaymentProof: !!apiOrder.hasPaymentProof,
           payment_method: apiOrder.paymentMethod,
           status: apiOrder.status || 'draft',
           invoice_number: apiOrder.invoiceNumber,
@@ -439,11 +444,12 @@ export default function SuccessPage() {
 
               {/* Title */}
               <h1 className="text-2xl font-bold text-secondary-900 mb-2">
-                Plată în așteptare
+                {hasProof ? 'Dovada plății a fost primită' : 'Plată în așteptare'}
               </h1>
               <p className="text-neutral-600 mb-6">
-                Comanda ta a fost înregistrată și așteaptă plata prin transfer
-                bancar. Ți-am trimis pe email datele contului și numărul comenzii.
+                {hasProof
+                  ? 'Comanda ta e înregistrată, iar dovada transferului e la noi. O verificăm și pornim lucrul; nu mai ai nimic de făcut.'
+                  : 'Comanda ta a fost înregistrată și așteaptă plata prin transfer bancar. Ți-am trimis pe email datele contului și numărul comenzii.'}
               </p>
 
               {/* Order Number */}
@@ -465,9 +471,9 @@ export default function SuccessPage() {
                       <span className="text-sm font-medium text-amber-700">1</span>
                     </div>
                     <p className="text-neutral-600">
-                      Faci transferul din aplicația băncii, trecând numărul
-                      comenzii la „detalii plată”. Verificăm încasarea în 1-3
-                      zile lucrătoare.
+                      {hasProof
+                        ? 'Verificăm dovada trimisă — de regulă în aceeași zi lucrătoare.'
+                        : 'Faci transferul din aplicația băncii, trecând numărul comenzii la „detalii plată”. Verificăm încasarea în 1-3 zile lucrătoare.'}
                     </p>
                   </div>
                   <div className="flex items-start gap-3">

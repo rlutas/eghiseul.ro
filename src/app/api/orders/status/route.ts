@@ -3,6 +3,7 @@ import { normalizeOrderOptions } from '@/lib/orders/normalize';
 import { instantPlatformProvider, getOpenOutages, PROVIDER_LABEL } from '@/lib/services/platform-services';
 import { NextRequest, NextResponse } from 'next/server';
 import { reuploadDocLabel } from '@/lib/reupload/doc-types';
+import { isPJForDocumentGeneration } from '@/lib/documents/delegation-items';
 
 // Service role client to bypass RLS for public order status lookup
 const getServiceClient = () => createServiceClient(
@@ -272,9 +273,14 @@ export async function GET(request: NextRequest) {
 
     // Client identity for the status card (requester already proved
     // order_code + email ownership). PF name from billing/personal; PJ = firm.
+    // The APPLICANT, not the invoice: a person ordering their own cazier and
+    // billing it to their company is still a person (E-260918-SJCQY showed
+    // „Persoană juridică — EDIGITALIZARE"). Same rule as the admin and the
+    // document generation.
     const isPJ =
-      cdAny?.billing?.type === 'persoana_juridica' || cdAny?.billing?.type === 'company' ||
-      cdAny?.billing?.source === 'company' || !!firmName;
+      cdAny?.clientType === 'pj' || cdAny?.clientType === 'PJ' ||
+      isPJForDocumentGeneration(cdAny as Record<string, unknown>) ||
+      !!(cdAny?.constatator?.companyName || cdAny?.companyData?.companyName || cdAny?.company?.companyName);
     const pfName = [
       cdAny?.billing?.firstName || cdAny?.personal?.firstName,
       cdAny?.billing?.lastName || cdAny?.personal?.lastName,
@@ -382,6 +388,10 @@ export async function GET(request: NextRequest) {
         clientType: isPJ ? 'PJ' : 'PF',
         clientName: isPJ ? null : pfName,
         companyName: isPJ ? firmName : null,
+        /** The company on the invoice, when the applicant is a person. */
+        billingCompanyName: !isPJ && cdAny?.billing?.type === 'persoana_juridica' ? (cdAny?.billing?.companyName ?? null) : null,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        hasPaymentProof: !!(order as any).payment_proof_url,
         purpose,
         status: order.status,
         paymentStatus: order.payment_status,

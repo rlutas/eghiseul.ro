@@ -36,7 +36,7 @@ import {
   companyProfileFromOrder,
   personProfileFromOrder,
 } from '@/lib/account/order-to-billing-profile';
-import { isIdentityDocumentType } from '@/lib/kyc/identity-documents';
+import { hasCompleteKyc } from '@/lib/kyc/identity-documents';
 import { normalizePhone } from '@/lib/format/normalize-phone';
 import { sameAddress } from '@/lib/account/same-address';
 import type { AddressData } from '@/components/shared/AddressForm';
@@ -116,6 +116,9 @@ export async function syncPaidOrderToAccount(orderId: string): Promise<SyncPaidO
     if (marker?.userId === order.user_id) return { ran: false, reason: 'already synced' };
 
     const userId = order.user_id as string;
+    // Any failed step leaves the marker unwritten, so the next payment path
+    // or the account-page backlog retries it instead of treating it as done.
+    let failed = false;
     const contact = (customerData.contact ?? {}) as Unknowns;
     const personal = (customerData.personal ?? customerData.personalKyc ?? {}) as Unknowns;
     const billing = (customerData.billing ?? {}) as Unknowns;
@@ -140,7 +143,10 @@ export async function syncPaidOrderToAccount(orderId: string): Promise<SyncPaidO
         updates.updated_at = new Date().toISOString();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const { error: profileError } = await (admin as any).from('profiles').update(updates).eq('id', userId);
-        if (profileError) console.error(`${LOG} ${order.friendly_order_id}: profile not filled:`, profileError.message);
+        if (profileError) {
+          failed = true;
+          console.error(`${LOG} ${order.friendly_order_id}: profile not filled:`, profileError.message);
+        }
       }
     }
 
@@ -165,8 +171,10 @@ export async function syncPaidOrderToAccount(orderId: string): Promise<SyncPaidO
           data: address,
           is_default: rows.length === 0,
         });
-        if (addressError) console.error(`${LOG} ${order.friendly_order_id}: address not saved:`, addressError.message);
-        else addressSaved = true;
+        if (addressError) {
+          failed = true;
+          console.error(`${LOG} ${order.friendly_order_id}: address not saved:`, addressError.message);
+        } else addressSaved = true;
       }
     }
 
@@ -200,8 +208,10 @@ export async function syncPaidOrderToAccount(orderId: string): Promise<SyncPaidO
           billing_data: candidate,
           is_default: rows.length === 0,
         });
-        if (billingError) console.error(`${LOG} ${order.friendly_order_id}: billing profile not saved:`, billingError.message);
-        else billingSaved = true;
+        if (billingError) {
+          failed = true;
+          console.error(`${LOG} ${order.friendly_order_id}: billing profile not saved:`, billingError.message);
+        } else billingSaved = true;
       }
     }
 
@@ -215,10 +225,12 @@ export async function syncPaidOrderToAccount(orderId: string): Promise<SyncPaidO
         .select('document_type')
         .eq('user_id', userId)
         .eq('is_active', true);
-      const hasIdentity = ((existingDocs ?? []) as Array<{ document_type: string }>).some((d) =>
-        isIdentityDocumentType(d.document_type)
+      // Copy unless the account already holds the complete set (document AND
+      // selfie): an account with only a front still needs the order's selfie.
+      const complete = hasCompleteKyc(
+        ((existingDocs ?? []) as Array<{ document_type: string }>).map((d) => d.document_type)
       );
-      if (!hasIdentity) {
+      if (!complete) {
         const result = await copyOrderKycDocumentsToAccount(admin, {
           userId,
           uploadedDocuments,
@@ -226,24 +238,28 @@ export async function syncPaidOrderToAccount(orderId: string): Promise<SyncPaidO
           logPrefix: `${LOG} ${order.friendly_order_id}`,
         });
         documentsCopied = result.copied;
+        if (result.copied < uploadedDocuments.length) failed = true;
       }
     }
 
-    // 5. Marker, so this never runs twice for the same account.
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error: markError } = await (admin as any)
-      .from('orders')
-      .update({
-        customer_data: {
-          ...customerData,
-          account_sync: { userId, at: new Date().toISOString(), addressSaved, billingSaved, documentsCopied },
-        },
-      })
-      .eq('id', orderId);
-    if (markError) console.error(`${LOG} ${order.friendly_order_id}: marker not written:`, markError.message);
+    // 5. Marker, so this never runs twice for the same account — written
+    // through `mark_account_sync` (migration 176), which merges the one key
+    // into `customer_data` in the database instead of replacing the whole
+    // JSON with the copy read at the top (a concurrent writer's changes would
+    // have been erased). Not written when a step failed: the retry is the fix.
+    if (failed) {
+      console.warn(`${LOG} ${order.friendly_order_id}: a step failed, marker not written — will retry`);
+    } else {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error: markError } = await (admin as any).rpc('mark_account_sync', {
+        p_order_id: orderId,
+        p_payload: { userId, at: new Date().toISOString(), addressSaved, billingSaved, documentsCopied },
+      });
+      if (markError) console.error(`${LOG} ${order.friendly_order_id}: marker not written:`, markError.message);
+    }
 
     console.log(`${LOG} ${order.friendly_order_id}: address=${addressSaved} billing=${billingSaved} documents=${documentsCopied}`);
-    return { ran: true, addressSaved, billingSaved, documentsCopied };
+    return { ran: !failed, reason: failed ? 'a step failed; will retry' : undefined, addressSaved, billingSaved, documentsCopied };
   } catch (err) {
     console.error(`${LOG} ${orderId}: failed (non-fatal):`, err instanceof Error ? err.message : err);
     return { ran: false, reason: err instanceof Error ? err.message : 'unknown' };

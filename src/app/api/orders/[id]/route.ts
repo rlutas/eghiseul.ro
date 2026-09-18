@@ -246,6 +246,9 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       deliveryAddress: order.delivery_address,
       paymentStatus: order.payment_status,
       paymentMethod: order.payment_method,
+      // The proof itself stays private; whether one exists decides the copy.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      hasPaymentProof: !!(order as any).payment_proof_url,
       paymentIntentId: order.stripe_payment_intent_id,
       deliveryTrackingNumber: order.delivery_tracking_number || null,
       contractUrl: order.contract_url,

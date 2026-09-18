@@ -1371,8 +1371,10 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
       {/* ID Scan Section — picker + conditional scan zones per document type */}
       {mode === 'scan' && showScanSection && !isForeignCitizen && (
         <div className="space-y-4">
-          {/* Step 1: pick document type (if not picked yet) */}
-          {!personalKyc.idDocumentType && (
+          {/* Step 1: pick document type (if not picked yet). Not for an
+              account whose document is already on file — the question read
+              as „scan it again" (Raul, 18.09.2026). */}
+          {!personalKyc.idDocumentType && !hasValidKycFromAccount && (
             <DocumentTypePicker
               onPick={(type) => updatePersonalKyc({ idDocumentType: type })}
             />

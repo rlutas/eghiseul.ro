@@ -762,6 +762,21 @@ export function DeliveryStepModular({ onValidChange }: DeliveryStepProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [watchedCity, watchedCounty, physicalRegion]);
 
+  // A saved address arrives with the postal code the customer stored — often
+  // none (the ID has no postal code). The cascade above is skipped for it on
+  // purpose, so it never got the locality's code either: „000000" (the
+  // placeholder) stayed on screen. Once the locality list is here, fill the
+  // empty field the same way a hand-picked city is filled.
+  useEffect(() => {
+    if (physicalRegion !== 'romania' || !watchedCity) return;
+    if (form.getValues('postalCode')) return;
+    const selected = localities.find((l) => l.name === watchedCity);
+    if (selected?.postalCode) {
+      form.setValue('postalCode', selected.postalCode, { shouldValidate: true, shouldDirty: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [localities, watchedCity]);
+
   // Fetch quotes when county and city are filled
   useEffect(() => {
     if (physicalRegion === 'romania' && watchedCounty && watchedCity && watchedCity.length >= 2) {

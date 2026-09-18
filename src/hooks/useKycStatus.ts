@@ -54,6 +54,7 @@ interface UseKycStatusReturn {
      * server defaults it to false too.
      */
     useIdDataForBilling?: boolean;
+      storeOnly?: boolean;
   }) => Promise<KycDocument | null>;
 }
 
@@ -132,6 +133,8 @@ export function useKycStatus(): UseKycStatusReturn {
      * server defaults it to false too.
      */
     useIdDataForBilling?: boolean;
+    /** Store the picture only — no profile/address/billing writes (personal-data dialog). */
+    storeOnly?: boolean;
   }): Promise<KycDocument | null> => {
     try {
       setError(null);

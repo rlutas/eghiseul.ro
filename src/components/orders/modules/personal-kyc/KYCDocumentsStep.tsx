@@ -980,7 +980,9 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
           de cont. */}
       {extraDocs.map((t) => renderUploadCard(t))}
 
-      {/* Info Banner */}
+      {/* Info Banner — not for an account whose documents are already on
+          file; there is nothing to explain and nothing to upload. */}
+      {!hasValidAccountKyc && (
       <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
         <div className="flex gap-3">
           <Info className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
@@ -993,6 +995,7 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
           </div>
         </div>
       </div>
+      )}
 
       {/* Progress Summary — only when there are 2+ documents. A stepper for a
           single doc (e.g. just the selfie) is meaningless, so we hide it. */}

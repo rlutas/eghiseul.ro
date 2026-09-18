@@ -21,7 +21,7 @@
 
 import { randomUUID } from 'node:crypto';
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { isStorableKycDocumentType, isIdentityDocumentType } from '@/lib/kyc/identity-documents';
+import { isStorableKycDocumentType, isIdentityDocumentType, hasCompleteKyc } from '@/lib/kyc/identity-documents';
 import {
   copyFile,
   generateKycKey,
@@ -152,15 +152,23 @@ export async function copyOrderKycDocumentsToAccount(
   }
 
   // `kyc_verified` is what the wizard and `/submit` read to skip the identity
-  // step next time. Only an identity document may set it — a selfie or a
-  // driving licence proves nothing on its own. Only ever raised.
-  if (identityCopied) {
-    const { error: flagError } = await adminClient
-      .from('profiles')
-      .update({ kyc_verified: true, updated_at: new Date().toISOString() })
-      .eq('id', userId);
-    if (flagError) {
-      console.error(`${logPrefix}: kyc_verified not set:`, flagError.message);
+  // step next time. Set only when the account now holds an identity document
+  // AND the selfie — either alone proves nothing. Only ever raised.
+  if (copied > 0) {
+    const { data: activeRows } = await adminClient
+      .from('kyc_verifications')
+      .select('document_type')
+      .eq('user_id', userId)
+      .eq('is_active', true);
+    const activeTypes = ((activeRows ?? []) as Array<{ document_type: string }>).map((r) => r.document_type);
+    if (hasCompleteKyc(activeTypes)) {
+      const { error: flagError } = await adminClient
+        .from('profiles')
+        .update({ kyc_verified: true, updated_at: new Date().toISOString() })
+        .eq('id', userId);
+      if (flagError) {
+        console.error(`${logPrefix}: kyc_verified not set:`, flagError.message);
+      }
     }
   }
 

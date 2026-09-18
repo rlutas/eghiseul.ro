@@ -126,7 +126,13 @@ export function ContactStepModular({ onValidChange }: ContactStepProps) {
     mode: 'onChange',
   });
 
-  const { isValid: formIsValid, isDirty: formIsDirty } = form.formState;
+  const { isValid: formIsValid } = form.formState;
+
+  // Once the customer has typed into this form, the read-only card never
+  // replaces it (a `form.reset` clears `isDirty`, so `isDirty` alone could be
+  // fooled by the draft-restore reset below).
+  const [userTyped, setUserTyped] = useState(false);
+  const resettingRef = useRef(false);
 
   // The read-only „Date preluate din contul tău" card is shown only for data
   // that actually came from the PROFILE, and never once the customer has
@@ -140,7 +146,7 @@ export function ContactStepModular({ onValidChange }: ContactStepProps) {
   const profilePhone = (prefillData?.contact?.phone || prefillData?.personal?.phone || '').replace(/\s+/g, '');
   const hasValidPrefilledData =
     isPrefilled &&
-    !formIsDirty &&
+    !userTyped &&
     profileEmail.includes('@') &&
     !!profilePhone &&
     isValidPhoneNumber(profilePhone);
@@ -156,7 +162,9 @@ export function ContactStepModular({ onValidChange }: ContactStepProps) {
     const phone = state.contact.phone;
     if (email || (phone && phone !== '+40')) {
       contactSyncedRef.current = true;
+      resettingRef.current = true;
       form.reset({ email: email || '', phone: phone || '+40' });
+      resettingRef.current = false;
     }
   }, [state.contact.email, state.contact.phone, form]);
 
@@ -197,7 +205,9 @@ export function ContactStepModular({ onValidChange }: ContactStepProps) {
 
   // Sync form changes back to wizard state.
   useEffect(() => {
-    const subscription = form.watch((value) => {
+    const subscription = form.watch((value, info) => {
+      // `info.name` is set for a keystroke and absent for a programmatic reset.
+      if (info?.name && !resettingRef.current) setUserTyped(true);
       updateContact({
         email: value.email,
         phone: value.phone,

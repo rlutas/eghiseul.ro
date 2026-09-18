@@ -129,24 +129,37 @@ export async function POST(req: NextRequest, { params }: RouteParams) {
     );
   }
 
-  // A personal coupon (welcome) is bound to an account: the code is shown in
-  // that account and can be copied, but it only ever discounts the owner's
-  // orders — theirs by `user_id`, or a guest draft they are signed in over.
+  // A personal coupon (welcome) discounts the owner's orders only. A guest
+  // draft the owner is signed in over is claimed for them first, so the order
+  // and the coupon end up under the same account; an order that belongs to a
+  // different account is refused whoever is signed in.
   if (coupon.owner_user_id) {
     const orderOwner = (order as OrderRow & { user_id?: string | null }).user_id ?? null;
-    let signedIn: string | null = null;
-    try {
-      const supabase = await createClient();
-      const { data: { user } } = await supabase.auth.getUser();
-      signedIn = user?.id ?? null;
-    } catch {
-      signedIn = null;
-    }
-    if (orderOwner !== coupon.owner_user_id && signedIn !== coupon.owner_user_id) {
-      return NextResponse.json(
-        { success: false, error: 'Cuponul este personal și se poate folosi doar din contul căruia i-a fost oferit' },
-        { status: 400 }
-      );
+    if (orderOwner !== coupon.owner_user_id) {
+      let signedIn: string | null = null;
+      try {
+        const supabase = await createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        signedIn = user?.id ?? null;
+      } catch {
+        signedIn = null;
+      }
+      if (orderOwner !== null || signedIn !== coupon.owner_user_id) {
+        return NextResponse.json(
+          { success: false, error: 'Cuponul este personal și se poate folosi doar pe comenzile contului căruia i-a fost oferit' },
+          { status: 400 }
+        );
+      }
+      const { data: claimed } = await admin
+        .from('orders')
+        .update({ user_id: coupon.owner_user_id })
+        .eq('id', id)
+        .is('user_id', null)
+        .select('id')
+        .maybeSingle();
+      if (!claimed) {
+        return NextResponse.json({ success: false, error: 'Comanda nu a putut fi legată de contul tău' }, { status: 409 });
+      }
     }
   }
 

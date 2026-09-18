@@ -1477,6 +1477,11 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
       const customerData: Record<string, unknown> = {
         contact: state.contact,
       };
+      // The applicant type, as chosen — lowercase, the shape the admin page,
+      // the document generation and the status page already read. It lived
+      // only in localStorage before, so „PJ" had to be inferred from company
+      // data or, wrongly, from the invoice (18.09.2026).
+      if (state.clientType) customerData.clientType = state.clientType.toLowerCase();
       if (state.personalKyc) customerData.personal = state.personalKyc;
       if (state.civilStatus) customerData.civil_status = state.civilStatus;
       if (state.constatator) customerData.constatator = state.constatator;

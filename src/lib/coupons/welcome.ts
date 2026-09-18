@@ -94,10 +94,24 @@ export async function ensureWelcomeCouponForUser(userId: string): Promise<Welcom
       if (!insertError) {
         return { code, discountPercent: WELCOME_DISCOUNT_PERCENT, validUntil };
       }
-      // 23505 = unique_violation on the code: mint another and try once more.
       if (!String(insertError.code ?? '').startsWith('23505')) {
         console.error('[welcome-coupon] insert failed:', insertError.message);
         return null;
+      }
+      // 23505 on the owner index (migration 176): another render of the same
+      // account won the race — return its coupon. On the code: mint again.
+      if (String(insertError.message ?? '').includes('coupons_one_welcome_per_owner')) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { data: won } = await (admin as any)
+          .from('coupons')
+          .select('code, discount_value, valid_until, is_active, max_uses, times_used')
+          .eq('owner_user_id', userId)
+          .eq('system_kind', 'welcome')
+          .maybeSingle();
+        const row = won as WelcomeCouponRow | null;
+        return row && welcomeCouponIsUsable(row)
+          ? { code: row.code, discountPercent: Number(row.discount_value), validUntil: row.valid_until as string }
+          : null;
       }
       code = generateCouponCode(PREFIX);
     }

@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
-import { isIdentityDocumentType } from '@/lib/kyc/identity-documents';
+import { hasCompleteKyc } from '@/lib/kyc/identity-documents';
 
 /**
  * GET /api/user/prefill-data
@@ -227,8 +227,12 @@ export async function GET() {
         // step (KYCDocumentsStep.tsx) and the server honours the same bypass via
         // profiles.kyc_verified, so a customer could have ordered a cazier with
         // no identity document on file at all.
-        has_valid_kyc: Object.entries(kycDocuments).some(
-          ([docType, doc]) => !doc.is_expired && isIdentityDocumentType(docType)
+        // Document AND selfie, both unexpired — the same predicate as
+        // `profiles.kyc_verified` and the submit bypass.
+        has_valid_kyc: hasCompleteKyc(
+          Object.entries(kycDocuments)
+            .filter(([, doc]) => !doc.is_expired)
+            .map(([docType]) => docType)
         ),
         // Billing profiles
          

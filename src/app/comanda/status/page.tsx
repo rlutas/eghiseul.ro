@@ -66,7 +66,7 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; icon: typeof
   standby: { label: 'Așteptăm documente de la tine', color: 'bg-orange-100 text-orange-800', icon: Upload },
   // Paused because the issuing institution is unavailable (e.g. ANCPI outage)
   on_hold_institution: { label: 'În așteptare — instituția emitentă e momentan indisponibilă', color: 'bg-amber-100 text-amber-800', icon: Clock },
-  awaiting_payment: { label: 'Așteptăm plata prin transfer bancar', color: 'bg-amber-100 text-amber-800', icon: Clock },
+  awaiting_payment: { label: 'Plată prin transfer bancar', color: 'bg-amber-100 text-amber-800', icon: Clock },
 
   // Final statuses
   completed: { label: 'Finalizat', color: 'bg-green-100 text-green-800', icon: CheckCircle },
@@ -115,6 +115,8 @@ interface OrderData {
   id: string;
   orderCode: string;
   clientType?: 'PF' | 'PJ';
+  hasPaymentProof?: boolean;
+  billingCompanyName?: string | null;
   clientName?: string | null;
   companyName?: string | null;
   purpose?: string | null;
@@ -391,14 +393,17 @@ function OrderStatusContent() {
           {/* Status Card */}
           <Card>
             <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
+              {/* Stacked on a phone: the code, then the two badges in a row,
+                  then the document button full width — side by side they
+                  squeezed into half the screen (Raul, 18.09.2026). */}
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div>
                   <CardDescription>Comanda</CardDescription>
                   <CardTitle className="text-xl font-mono">
                     {orderData.orderCode}
                   </CardTitle>
                 </div>
-                <div className="flex flex-col items-end gap-2">
+                <div className="flex flex-wrap items-center gap-2 sm:flex-col sm:items-end">
                   {/* Payment Status Badge */}
                   {orderData.paymentStatus === 'paid' ? (
                     <div className="px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 flex items-center gap-1">
@@ -408,7 +413,7 @@ function OrderStatusContent() {
                   ) : orderData.paymentStatus === 'awaiting_verification' ? (
                     <div className="px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 flex items-center gap-1">
                       <Clock className="h-3 w-3" />
-                      Verificare plată
+                      {orderData.hasPaymentProof ? 'Dovadă primită, în verificare' : 'Așteptăm plata'}
                     </div>
                   ) : orderData.paymentStatus !== 'paid' && (
                     <div className="px-3 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800 flex items-center gap-1">
@@ -428,7 +433,7 @@ function OrderStatusContent() {
                       onClick={() =>
                         document.getElementById('documente')?.scrollIntoView({ behavior: 'smooth' })
                       }
-                      className="inline-flex items-center gap-1.5 rounded-full bg-primary-500 px-3 py-1.5 text-sm font-bold text-secondary-900 shadow-sm transition-colors hover:bg-primary-600"
+                      className="inline-flex w-full items-center justify-center gap-1.5 rounded-full bg-primary-500 px-3 py-1.5 text-sm font-bold text-secondary-900 shadow-sm transition-colors hover:bg-primary-600 sm:w-auto"
                     >
                       <FileText className="h-4 w-4" />
                       Vezi documentul

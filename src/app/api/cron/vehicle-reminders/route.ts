@@ -92,6 +92,9 @@ async function run(request: NextRequest) {
     .or(
       `and(rovinieta_expiry.gte.${from},rovinieta_expiry.lte.${to}),and(itp_expiry.gte.${from},itp_expiry.lte.${to}),and(insurance_expiry.gte.${from},insurance_expiry.lte.${to})`
     )
+    // Oldest first, so a backlog larger than one run drains in order instead
+    // of returning the same arbitrary subset every day.
+    .order('updated_at', { ascending: true })
     .limit(1000);
   if (error) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
@@ -180,12 +183,18 @@ async function run(request: NextRequest) {
       }
       // Marked AFTER the send: a crash before this line means a second email
       // tomorrow, which is the failure we prefer over a reminder never sent.
-      await admin
+      const { error: markError } = await admin
         .from('user_saved_vehicles')
         .update({ [remindedColumn(reminder.kind)]: reminder.expiry, updated_at: now.toISOString() })
         .eq('id', vehicle.id);
       sent += 1;
-      results.push({ vehicleId: vehicle.id, kind: reminder.kind, status: 'sent' });
+      if (markError) {
+        // Sent but not recorded: say so, so the log explains a repeat tomorrow.
+        console.error(`[vehicle-reminders] ${vehicle.plate_number} ${reminder.kind}: sent but marker failed:`, markError.message);
+        results.push({ vehicleId: vehicle.id, kind: reminder.kind, status: 'error', reason: `sent, marker failed: ${markError.message}`.slice(0, 200) });
+      } else {
+        results.push({ vehicleId: vehicle.id, kind: reminder.kind, status: 'sent' });
+      }
       await new Promise((r) => setTimeout(r, SEND_SPACING_MS));
     } catch (err) {
       const message = err instanceof Error ? err.message : 'send failed';

@@ -88,10 +88,24 @@ export default function AccountTabs({ initialTab = 'services', className, servic
   // list otherwise.
   const [contentVersion, setContentVersion] = useState(0);
   useEffect(() => {
-    const bump = () => setContentVersion((v) => v + 1);
+    // Only the tab that owns the saved step is remounted; a phone saved from
+    // the checklist must not reload the orders list underneath.
+    const TAB_FOR_STEP: Record<string, TabId[]> = {
+      contact: ['profile'],
+      personal: ['profile'],
+      identity: ['kyc', 'profile'],
+      address: ['addresses'],
+      billing: ['billing'],
+    };
+    const bump = (event: Event) => {
+      const step = (event as CustomEvent<{ step?: string }>).detail?.step;
+      const owners = step ? TAB_FOR_STEP[step] : undefined;
+      if (owners && !owners.includes(activeTab)) return;
+      setContentVersion((v) => v + 1);
+    };
     window.addEventListener(ACCOUNT_DATA_SAVED_EVENT, bump);
     return () => window.removeEventListener(ACCOUNT_DATA_SAVED_EVENT, bump);
-  }, []);
+  }, [activeTab]);
 
   // …and the tabs sit BELOW the checklist, so without this the page does not
   // visibly move when a row is tapped, on a phone especially.
@@ -107,12 +121,16 @@ export default function AccountTabs({ initialTab = 'services', className, servic
     const params = new URLSearchParams(searchParams.toString());
     params.set('tab', tabId);
     params.delete('edit');
-    router.replace(`/account?${params.toString()}`, { scroll: false });
+    // `history.replaceState`, not `router.replace`: the page is dynamic, so
+    // a router navigation re-ran every query on the server for each tab tap
+    // (~1 s of lag on a phone). Next's router picks the new search params up
+    // from the history entry; nothing is fetched.
+    window.history.replaceState(window.history.state, '', `/account/?${params.toString()}`);
     // Up to the navigation, so the menu and the panel it just switched are the
     // first thing on screen — not the middle of the page (Raul, 18.09.2026).
     const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     containerRef.current?.scrollIntoView({ behavior: still ? 'auto' : 'smooth', block: 'start' });
-  }, [router, searchParams]);
+  }, [searchParams]);
 
   // Render active tab content
   const renderTabContent = () => {

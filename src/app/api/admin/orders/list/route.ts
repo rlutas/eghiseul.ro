@@ -93,7 +93,11 @@ export async function GET(request: NextRequest) {
       // să apară în top AZI (echipa se uită la capul listei) — sortarea pe
       // created_at o îngropa printre comenzile de ieri (caz real E-260714-773QA).
       // Neplătitele (paid_at null) cad pe created_at.
-      .order('paid_at', { ascending: false, nullsFirst: false })
+      // `nullsFirst`: an order that is live but not yet paid (transfer bancar
+      // with the proof uploaded, E-260918-SJCQY) has paid_at NULL — with
+      // NULLS LAST it sank under every paid order onto the final page of
+      // „Toate" and looked lost. Drafts/pending are already out of this list.
+      .order('paid_at', { ascending: false, nullsFirst: true })
       .order('created_at', { ascending: false })
       .range(page * limit, (page + 1) * limit - 1);
 

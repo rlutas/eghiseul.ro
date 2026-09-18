@@ -248,3 +248,15 @@ const PROFILE_SOURCE_DOCUMENT_TYPES: readonly string[] = [
 export function fillsProfileFromOcr(stored: string): boolean {
   return PROFILE_SOURCE_DOCUMENT_TYPES.includes(stored);
 }
+
+/**
+ * „KYC verificat" = an identity document AND the selfie holding it. Either one
+ * alone proves nothing: the document could be anyone's, the selfie shows a
+ * face with no name. This is the one predicate behind `profiles.kyc_verified`,
+ * `has_valid_kyc` in prefill and the order-submit bypass — they used to
+ * disagree, and a scanned front alone let a cazier order skip its documents
+ * (E-260918-SJCQY, 18.09.2026).
+ */
+export function hasCompleteKyc(storedTypes: readonly string[]): boolean {
+  return storedTypes.some(isIdentityDocumentType) && storedTypes.some(isSelfieType);
+}

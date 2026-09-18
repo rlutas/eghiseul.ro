@@ -45,7 +45,10 @@ describe('sameAddress', () => {
   it('matches the same place however it was spelled', () => {
     const saved = { street: 'Str. Memorandumului', number: '12', city: 'Cluj-Napoca' };
     expect(sameAddress(saved, { street: 'strada memorandumului', number: 'nr. 12', city: 'CLUJ-NAPOCA' })).toBe(true);
-    expect(sameAddress(saved, { street: 'Str. Memorandumului', number: '12', city: 'Cluj Napoca' })).toBe(false);
+    // A hyphen is punctuation too: „Cluj-Napoca" and „Cluj Napoca" are one place.
+    expect(sameAddress(saved, { street: 'Str. Memorandumului', number: '12', city: 'Cluj Napoca' })).toBe(true);
+    // A different county with the same street and number is not.
+    expect(sameAddress({ ...saved, county: 'Cluj' }, { ...saved, county: 'Bihor' })).toBe(false);
   });
 
   it('does not match a different number or street', () => {

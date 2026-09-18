@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { Suspense } from 'react'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { after } from 'next/server'
 import { LogoutButton } from '@/components/shared/logout-button'
 import { AccountTabs } from '@/components/account'
 import { ProfileChecklist } from '@/components/account/ProfileChecklist'
@@ -40,82 +41,74 @@ export default async function AccountPage() {
   // shipped. The UPDATE touches nothing once everything is claimed.
   // Gated on a confirmed email: that is the same proof of mailbox control the
   // public order-status page already accepts.
+  // Upkeep that does not need to finish before the page renders: claiming
+  // guest orders by email and the paid-order → account backlog. Both ran in
+  // line before and cost every visit a few hundred milliseconds. `after()`
+  // runs them once the response is sent; the next visit shows their result.
   if (user.email && user.email_confirmed_at) {
-    const admin = createAdminClient()
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error: claimError } = await (admin as any).rpc('claim_guest_orders', {
-      p_user_id: user.id,
-      p_email: user.email,
+    const email = user.email
+    after(async () => {
+      const admin = createAdminClient()
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error: claimError } = await (admin as any).rpc('claim_guest_orders', {
+        p_user_id: user.id,
+        p_email: email,
+      })
+      if (claimError) console.error('claim_guest_orders failed:', claimError.message)
+      await syncUnsyncedPaidOrdersForUser(user.id)
     })
-    // Never block the account on this — worst case the customer sees the same
-    // list as before and we try again on the next visit.
-    if (claimError) console.error('claim_guest_orders failed:', claimError.message)
-
-    // Paid orders that have not yet given the account their address, billing
-    // profile and documents — normally done at payment; this catches a path
-    // that missed it. Bounded and non-fatal.
-    await syncUnsyncedPaidOrdersForUser(user.id)
   }
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', user.id)
-    .single() as { data: Profile | null }
-
-  // Fetch stats for header
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: kycDocs } = await (supabase as any)
-    .from('kyc_verifications')
-    .select('id, document_type')
-    .eq('user_id', user.id)
-    .eq('is_active', true)
-
-  const { data: orders } = await supabase
-    .from('orders')
-    .select('id')
-    .eq('user_id', user.id)
-    .neq('status', 'draft')
-
-  // Counted for the checklist below. Each query gets its own `from()` — reusing
-  // a builder stacks the filters and silently returns nothing.
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { count: savedAddressCount } = await (supabase as any)
-    .from('user_saved_data')
-    .select('id', { count: 'exact', head: true })
-    .eq('user_id', user.id)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { count: billingProfileCount } = await (supabase as any)
-    .from('billing_profiles')
-    .select('id', { count: 'exact', head: true })
-    .eq('user_id', user.id)
-  // The default address and billing profile, one line each, for the done rows
-  // of the checklist — a row that says „Adresă de livrare ✓" and nothing else
-  // makes the customer open the tab to find out which one.
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: defaultAddressRow } = await (supabase as any)
-    .from('user_saved_data')
-    .select('data')
-    .eq('user_id', user.id)
-    .eq('data_type', 'address')
-    .order('is_default', { ascending: false })
-    .order('created_at', { ascending: true })
-    .limit(1)
-    .maybeSingle()
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: defaultBillingRow } = await (supabase as any)
-    .from('billing_profiles')
-    .select('label, type, billing_data')
-    .eq('user_id', user.id)
-    .order('is_default', { ascending: false })
-    .order('created_at', { ascending: true })
-    .limit(1)
-    .maybeSingle()
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { count: savedVehicleCount } = await (supabase as any)
-    .from('user_saved_vehicles')
-    .select('id', { count: 'exact', head: true })
-    .eq('user_id', user.id)
+  // Every read below is independent of the others: one round trip's worth of
+  // latency instead of ten in a row (the page took ~1 s on a phone).
+  const [
+    { data: profile },
+    { data: kycDocs },
+    { data: orders },
+    { count: savedAddressCount },
+    { count: billingProfileCount },
+    { data: defaultAddressRow },
+    { data: defaultBillingRow },
+    { count: savedVehicleCount },
+    welcomeCoupon,
+  ] = await Promise.all([
+    supabase.from('profiles').select('*').eq('id', user.id).single() as unknown as Promise<{ data: Profile | null }>,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (supabase as any).from('kyc_verifications').select('id, document_type').eq('user_id', user.id).eq('is_active', true),
+    supabase.from('orders').select('id').eq('user_id', user.id).neq('status', 'draft'),
+    // Counted for the checklist below. Each query gets its own `from()` — reusing
+    // a builder stacks the filters and silently returns nothing.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (supabase as any).from('user_saved_data').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (supabase as any).from('billing_profiles').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
+    // The default address and billing profile, one line each, for the done rows
+    // of the checklist.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (supabase as any)
+      .from('user_saved_data')
+      .select('data')
+      .eq('user_id', user.id)
+      .eq('data_type', 'address')
+      .order('is_default', { ascending: false })
+      .order('created_at', { ascending: true })
+      .limit(1)
+      .maybeSingle(),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (supabase as any)
+      .from('billing_profiles')
+      .select('label, type, billing_data')
+      .eq('user_id', user.id)
+      .order('is_default', { ascending: false })
+      .order('created_at', { ascending: true })
+      .limit(1)
+      .maybeSingle(),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (supabase as any).from('user_saved_vehicles').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
+    // One welcome coupon per account, minted on the first visit and shown while
+    // it can still be used; every service link below carries it.
+    ensureWelcomeCouponForUser(user.id),
+  ])
 
   // Calculate actual KYC status (requires BOTH front ID AND selfie)
   const docTypes = kycDocs?.map((d: { document_type: string }) => d.document_type) || []
@@ -128,10 +121,6 @@ export default async function AccountPage() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const serviceInterests = parseInterests((profile as any)?.service_interests)
   const hasOrders = (orders?.length ?? 0) > 0
-
-  // One welcome coupon per account, minted on the first visit and shown while
-  // it can still be used; every service link below carries it.
-  const welcomeCoupon = await ensureWelcomeCouponForUser(user.id)
 
   const completeness = profileCompleteness({
     firstName: profile?.first_name,

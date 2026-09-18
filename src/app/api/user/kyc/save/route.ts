@@ -7,7 +7,9 @@ import {
   isCompanyDocumentType,
   isIdentityDocumentType,
   fillsProfileFromOcr,
+  hasCompleteKyc,
 } from '@/lib/kyc/identity-documents';
+import { getDownloadUrl } from '@/lib/aws/s3';
 import { KYC_VALIDITY_DAYS } from '@/lib/kyc/constants';
 import { billingProfileFromIdData, hasUsableAddress } from '@/lib/account/id-data-to-profile';
 import { findSameAddress } from '@/lib/account/same-address';
@@ -54,6 +56,10 @@ export async function POST(request: Request) {
       // on every scan, silently, and it overwrote a billing profile they may
       // have typed by hand.
       useIdDataForBilling = false,
+      // The personal-data dialog stores the picture and nothing else: the
+      // customer is still editing the fields it read and may cancel. Profile,
+      // address and billing writes are that form's job, after „Salvează".
+      storeOnly = false,
     } = body;
 
     // Validate required fields
@@ -63,6 +69,17 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
+
+    // The object must be the caller's own upload: a key under `kyc/<userId>/`.
+    // The URL is not trusted at all — it is re-derived from the key here, so a
+    // row can never point at somebody else's object or an arbitrary address.
+    if (typeof fileKey !== 'string' || !fileKey.startsWith(`kyc/${user.id}/`)) {
+      return NextResponse.json(
+        { error: 'fileKey must be an upload of the signed-in account (kyc/<userId>/…)' },
+        { status: 400 }
+      );
+    }
+    const trustedFileUrl = await getDownloadUrl(fileKey);
 
     if (!isStorableKycDocumentType(documentType)) {
       return NextResponse.json(
@@ -100,8 +117,8 @@ export async function POST(request: Request) {
       .insert({
         user_id: user.id,
         document_type: documentType,
-        file_url: fileUrl,
-        file_key: fileKey || null,
+        file_url: trustedFileUrl,
+        file_key: fileKey,
         file_size: fileSize || null,
         mime_type: mimeType || null,
         extracted_data: extractedData || {},
@@ -133,24 +150,30 @@ export async function POST(request: Request) {
           updated_at: now.toISOString(),
         })
         .eq('id', user.id);
-    } else if (isIdentityDocumentType(documentType)) {
-      // Only documents that establish WHO the person is flip kyc_verified. A
-      // driving licence or a residence permit is useful to an order but says
-      // nothing about the identity check having been done.
-      await adminClient
-        .from('profiles')
-        .update({
-          kyc_verified: true,
-          updated_at: now.toISOString(),
-        })
-        .eq('id', user.id);
+    } else if (isIdentityDocumentType(documentType) || documentType === 'selfie') {
+      // `kyc_verified` means the account holds an identity document AND the
+      // selfie with it — never one alone. Recomputed from the active rows,
+      // whichever of the two arrived last.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: activeRows } = await (adminClient as any)
+        .from('kyc_verifications')
+        .select('document_type')
+        .eq('user_id', user.id)
+        .eq('is_active', true);
+      const activeTypes = ((activeRows ?? []) as Array<{ document_type: string }>).map((r) => r.document_type);
+      if (hasCompleteKyc(activeTypes)) {
+        await adminClient
+          .from('profiles')
+          .update({ kyc_verified: true, updated_at: now.toISOString() })
+          .eq('id', user.id);
+      }
     }
 
     // What the scan may fill in, from a document that carries personal data
     // (CI front, passport data page, new-CI back for the address). Each write
     // below is either additive or explicitly asked for — a scan must never
     // quietly replace something the customer entered.
-    if (fillsProfileFromOcr(documentType) && extractedData) {
+    if (!storeOnly && fillsProfileFromOcr(documentType) && extractedData) {
       // The address from the document, kept under its own label so it is
       // distinguishable from one the customer wrote.
       if (hasUsableAddress(extractedData.address)) {
@@ -168,10 +191,17 @@ export async function POST(request: Request) {
         );
 
         if (existingAddress) {
+          // Fill only what the saved row lacks: the customer's corrections and
+          // richer fields (apartment, postal code) must survive a re-scan.
+          const merged: Record<string, unknown> = { ...existingAddress.data };
+          for (const [key, value] of Object.entries(extractedData.address as Record<string, unknown>)) {
+            const current = merged[key];
+            if ((current === undefined || current === null || current === '') && value) merged[key] = value;
+          }
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           await (supabase as any)
             .from('user_saved_data')
-            .update({ data: extractedData.address, updated_at: now.toISOString() })
+            .update({ data: merged, updated_at: now.toISOString() })
             .eq('id', existingAddress.id);
         } else {
           // Its own `from()`: reusing the builder above would stack the filters

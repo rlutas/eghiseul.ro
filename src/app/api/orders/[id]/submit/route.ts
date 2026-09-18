@@ -8,6 +8,7 @@ import { uploadOrderSignature, uploadBase64 } from '@/lib/aws/s3';
 import { computeEstimatedCompletionISOForOrder, hasForeignDrivingLicense } from '@/lib/orders/order-estimate';
 import { getMissingInvoiceClientFields } from '@/lib/oblio/invoice';
 import { emailDomainAcceptsMail } from '@/lib/email-mx';
+import { hasCompleteKyc } from '@/lib/kyc/identity-documents';
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -114,7 +115,21 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
             .select('kyc_verified')
             .eq('id', order.user_id)
             .single();
-          accountKycOk = !!prof?.kyc_verified;
+          // The flag alone is not enough: it is re-checked against the rows,
+          // and the rows must hold an identity document AND a selfie.
+          if (prof?.kyc_verified) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const { data: activeDocs } = await (adminClient as any)
+              .from('kyc_verifications')
+              .select('document_type, expires_at')
+              .eq('user_id', order.user_id)
+              .eq('is_active', true);
+            const nowMs = Date.now();
+            const liveTypes = ((activeDocs ?? []) as Array<{ document_type: string; expires_at: string | null }>)
+              .filter((d) => !d.expires_at || Date.parse(d.expires_at) > nowMs)
+              .map((d) => d.document_type);
+            accountKycOk = hasCompleteKyc(liveTypes);
+          }
         }
 
         if (!accountKycOk) {

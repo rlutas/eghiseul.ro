@@ -363,6 +363,17 @@ export default function CheckoutPage() {
               </Alert>
             )}
 
+            {/* Coupon BEFORE the payment method: with bank transfer the card
+                below grows (IBAN, upload, button) and the coupon fell under
+                the fold — the customer saw the amount to transfer before any
+                chance to reduce it (Raul, 18.09.2026). */}
+            <CouponInput
+              orderId={order.id}
+              appliedCode={order.coupon_code}
+              appliedDiscount={order.discount_amount}
+              onChange={handleCouponChange}
+            />
+
             {/* Payment method + (desktop) pay button in the SAME card */}
             <Card id="payment-form-anchor" className="scroll-mt-4">
               <CardContent className="p-4 sm:p-6 space-y-4">
@@ -413,23 +424,35 @@ export default function CheckoutPage() {
                       amount={order.total_price}
                     />
 
-                    <div className="rounded-lg border border-amber-200 bg-amber-50/60 p-4 text-sm text-amber-900">
-                      <p className="font-medium leading-tight">
-                        Nu trebuie să plătești acum
-                      </p>
-                      <p className="mt-1 text-xs leading-snug text-amber-800">
-                        Apasă butonul de mai jos ca să îți rezervăm comanda. Îți
-                        trimitem pe email datele contului și numărul comenzii,
-                        iar tu faci transferul când vrei, din aplicația băncii.
-                        Punem comanda în lucru imediat ce banii intră în cont.
-                      </p>
-                    </div>
+                    {bankTransferProofKey ? (
+                      <div className="rounded-lg border border-green-200 bg-green-50/70 p-4 text-sm text-green-900">
+                        <p className="font-medium leading-tight">Am primit dovada plății</p>
+                        <p className="mt-1 text-xs leading-snug text-green-800">
+                          Apasă „Plasează comanda&quot; și o verificăm; pornim lucrul de
+                          îndată ce e confirmată, fără să așteptăm banii în cont.
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="rounded-lg border border-amber-200 bg-amber-50/60 p-4 text-sm text-amber-900">
+                        <p className="font-medium leading-tight">
+                          Nu trebuie să plătești acum
+                        </p>
+                        <p className="mt-1 text-xs leading-snug text-amber-800">
+                          Apasă butonul de mai jos ca să îți rezervăm comanda. Îți
+                          trimitem pe email datele contului și numărul comenzii,
+                          iar tu faci transferul când vrei, din aplicația băncii.
+                          Punem comanda în lucru imediat ce banii intră în cont.
+                        </p>
+                      </div>
+                    )}
 
                     <div className="space-y-2">
-                      <p className="text-xs text-neutral-500 leading-snug">
-                        Ai deja ordinul de plată? Încarcă-l aici și confirmăm mai
-                        repede. Pasul e opțional.
-                      </p>
+                      {!bankTransferProofKey && (
+                        <p className="text-xs text-neutral-500 leading-snug">
+                          Ai deja ordinul de plată? Încarcă-l aici și confirmăm mai
+                          repede. Pasul e opțional.
+                        </p>
+                      )}
                       <PaymentProofUpload
                         orderId={orderId}
                         onUploadComplete={(key) => setBankTransferProofKey(key)}
@@ -448,9 +471,9 @@ export default function CheckoutPage() {
                           Se trimite...
                         </>
                       ) : bankTransferProofKey ? (
-                        'Trimite dovada și confirmă comanda'
+                        'Plasează comanda'
                       ) : (
-                        'Confirm plata prin transfer bancar'
+                        'Plasează comanda — plătesc prin transfer'
                       )}
                     </Button>
                   </div>
@@ -458,13 +481,6 @@ export default function CheckoutPage() {
               </CardContent>
             </Card>
 
-            {/* Coupon — under the payment method, before the summary. */}
-            <CouponInput
-              orderId={order.id}
-              appliedCode={order.coupon_code}
-              appliedDiscount={order.discount_amount}
-              onChange={handleCouponChange}
-            />
           </div>
 
           {/* Order Summary — same <OrderSidebar> as the wizard. Mobile: after
@@ -569,16 +585,23 @@ export default function CheckoutPage() {
           </div>
           <Button
             type="button"
-            disabled={paymentMethod === 'card' && isRedirecting}
+            disabled={(paymentMethod === 'card' && isRedirecting) || (paymentMethod !== 'card' && isSubmittingBankTransfer)}
             onClick={() => {
-              // Card: pay directly (don't make the user hunt for a second
-              // button). Bank transfer: scroll to the details/instructions.
+              // Card: pay directly. Bank transfer: the first tap brings the
+              // IBAN into view; once the details are on screen (or the proof
+              // is uploaded) the bar places the order — „Vezi detalii" on a
+              // customer who already uploaded the proof read as a dead end.
               if (paymentMethod === 'card') {
                 handleCardCheckout();
+                return;
+              }
+              const anchor = document.querySelector<HTMLElement>('#payment-form-anchor');
+              const rect = anchor?.getBoundingClientRect();
+              const detailsOnScreen = !!rect && rect.top < window.innerHeight * 0.6 && rect.bottom > 0;
+              if (bankTransferProofKey || detailsOnScreen) {
+                handleBankTransferSubmit();
               } else {
-                document
-                  .querySelector<HTMLElement>('#payment-form-anchor')
-                  ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                anchor?.scrollIntoView({ behavior: 'smooth', block: 'start' });
               }
             }}
             className="h-11 px-5 bg-primary-500 hover:bg-primary-600 text-secondary-900 font-semibold"
@@ -592,8 +615,15 @@ export default function CheckoutPage() {
               ) : (
                 'Plătește cu cardul'
               )
+            ) : isSubmittingBankTransfer ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Se trimite...
+              </>
+            ) : bankTransferProofKey ? (
+              'Plasează comanda'
             ) : (
-              'Vezi detalii'
+              'Plasează comanda'
             )}
           </Button>
         </div>

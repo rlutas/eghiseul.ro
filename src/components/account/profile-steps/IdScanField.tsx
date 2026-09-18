@@ -95,6 +95,9 @@ export function IdScanField({ onExtracted }: { onExtracted: (data: ExtractedIdDa
           mimeType,
           extractedData: extracted,
           documentExpiry: extracted.documentExpiry,
+          // The fields are still being edited in this dialog; the profile and
+          // the address are written when the customer presses „Salvează".
+          storeOnly: true,
         });
         if (saved) window.dispatchEvent(new CustomEvent(ACCOUNT_DATA_SAVED_EVENT, { detail: { step: 'identity' } }));
       } catch (err) {

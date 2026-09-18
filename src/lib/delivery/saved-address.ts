@@ -97,7 +97,11 @@ export function toDeliveryAddressFormValues(
     county: canonicalCountyName(address.county) ?? '',
     // 6 digits or nothing — a half-typed code would fail the form's regex and
     // show an error on a field the customer never touched.
-    postalCode: /^\d{6}$/.test(text(address.postalCode)) ? text(address.postalCode) : '',
+    postalCode: (() => {
+      // „447 220" typed in the account is still a postal code.
+      const digits = text(address.postalCode).replace(/\D/g, '');
+      return digits.length === 6 ? digits : '';
+    })(),
   };
 }
 

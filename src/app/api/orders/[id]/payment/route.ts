@@ -190,6 +190,9 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       const now = new Date()
       const isValid =
         !!coupon &&
+        // A personal coupon on somebody else's order (a code typed into a draft
+        // straight from the client) is stripped here, before charging.
+        (!coupon.owner_user_id || coupon.owner_user_id === order.user_id) &&
         (coupon.max_uses === null || coupon.times_used < coupon.max_uses) &&
         (!coupon.valid_from || new Date(coupon.valid_from) <= now) &&
         (!coupon.valid_until || new Date(coupon.valid_until) >= now) &&
