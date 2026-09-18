@@ -14,7 +14,7 @@ Index al documentației. Aceasta e o **hartă**, nu un jurnal — pentru jurnalu
 ## 🗂️ Navigare pe domenii
 | Domeniu | Folder | Conținut |
 |---|---|---|
-| **Tehnic** | [`technical/`](technical/) | `specs/` (arhitecturi servicii), `api/`, `webmcp.md` |
+| **Tehnic** | [`technical/`](technical/) | `specs/` (arhitecturi servicii), `api/` (incl. [contul în wizard + dovada plății](technical/api/orders-account-payment-proof-api.md)), `webmcp.md` |
 | **Google Ads** | [`ads/`](ads/) | starea contului, economia pe serviciu (CPA maxim), analize de concurenta pe serviciu, reguli de politica |
 | **ChatGPT Ads (OpenAI)** | [`ads/chatgpt/`](ads/chatgpt/) | politica OpenAI citată, eligibilitate servicii (avocat = legal services), audit landing, campania constatator, roadmap |
 | **Meta Ads** | [`ads/meta/`](ads/meta/) | cercetare US/UK + Ad Library live, mecanica Meta 2026/UE, playbook, plan de test constatator |

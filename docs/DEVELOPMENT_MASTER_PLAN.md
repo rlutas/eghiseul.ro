@@ -1318,8 +1318,10 @@ curl http://localhost:3000/api/kyc/validate     # KYC health check
 3. ✅ Inspecție Codex (claudex-loop): 3 runde pe cod (28 constatări), 5 runde pe planul tranșei 19–25, inspecție pe codul ei — dispoziții în changelog-uri.
 4. ✅ Admin: `orders.is_closed` (migrarea 179) — finalizatele sub cele vii. Analiză abandonuri + emailuri în `docs/marketing/`.
 5. ✅ Curățenie: 9 comenzi de test (r.lutas) șterse.
+6. ✅ Feedback 26–34: card unic din cont la pasul 2, `DataSafetyNote`, preț sub opțiune, easybox estimat cu locker real (`oohLastMile` + județ/localitate), facturare pe două niveluri (`pick` derivat), status pe `proof_verified_at`; 2 inspecții Codex (9 constatări reparate).
+7. ✅ Decontări: charge + refund fără factură inițială → factura de taxă de anulare; Oblio retry la 401. API doc nou: `technical/api/orders-account-payment-proof-api.md`.
 
-**Open:** preț easybox (Sameday locker fallback); rezervarea cuponului la checkout; OCR/face-match server-side înainte de `kyc_verified`; tracking Resend (decizie Raul).
+**Open:** rezervarea cuponului la checkout; facturare CJO la plată; OCR/face-match server-side înainte de `kyc_verified`; tracking Resend (decizie Raul).
 
 
 ### Session: 2026-01-06 - User Data Persistence Planning

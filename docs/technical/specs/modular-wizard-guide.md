@@ -212,6 +212,26 @@ Response: { success: true, html: "<div>..." }
 - `src/lib/documents/signature-inserter.ts` - Inserare imagini semnatura in DOCX (DrawingML)
 - `src/types/verification-modules.ts` - SignatureConfig, SignatureState
 
+### Contul clientului în wizard (18.09.2026)
+
+- Prefill la prima randare: pagina `/comanda/[service]` citește sesiunea și
+  dă `initialPrefill` providerului; `PREFILL_FROM_PROFILE` completează DOAR
+  golurile (draftul restaurat câștigă pe toate câmpurile).
+- `state.accountKyc = { valid, identity }`: `valid` = act + selfie neexpirate
+  (pasul `kyc-documents` e ascuns când e `true` și serviciul n-are
+  `extraDocuments`); `identity` = actul front din cont, arătat la pasul 2 ca
+  „Datele tale din cont". `personalKyc.useOtherDocument = true` („Folosește
+  alt act" / „Modifică datele") anulează scurtătura peste tot: pasul de acte
+  revine, `/submit` nu mai copiază actul din cont.
+- `state.resumeToken` (din `?resume=`): în memorie, trimis la autosave și
+  submit pentru drafturile telefonice (create cu `user_id: null`).
+- Facturare: alegerea e derivată din `billing` la fiecare randare
+  (`pick` = `me | other_pf | saved_pj | request_pj | other_pj`); ce e în
+  cont/comandă e preselectat, câmpurile se deschid la „altă…" sau când datele
+  sunt incomplete. Proprietarul din pasul de imobil NU e presupus plătitor.
+- Reasigurare: `DataSafetyNote` (pliat, doar pentru guest) + `SelfieLegalNotice`
+  (pliat, rezumatul = scop, cine compară, 90 zile / 3 ani).
+
 ## Cum Adaugi un Serviciu Nou
 
 ### Pasul 1: Definește verification_config în Supabase
