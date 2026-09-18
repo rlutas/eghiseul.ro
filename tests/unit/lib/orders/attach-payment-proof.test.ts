@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 const s3 = vi.hoisted(() => ({
-  getFileInfo: vi.fn(),
-  copyFile: vi.fn(),
-  deleteFile: vi.fn(),
+  getFileInfo: vi.fn<(key: string) => Promise<Record<string, unknown>>>(),
+  copyFile: vi.fn<(src: string, dest: string) => Promise<string>>(),
+  deleteFile: vi.fn<(key: string) => Promise<void>>(),
 }));
 vi.mock('@/lib/aws/s3', async (orig) => {
   const real = await orig<typeof import('@/lib/aws/s3')>();
@@ -11,7 +11,7 @@ vi.mock('@/lib/aws/s3', async (orig) => {
 });
 
 const db = vi.hoisted(() => ({
-  rpc: vi.fn(),
+  rpc: vi.fn<(name: string, args?: Record<string, unknown>) => Promise<{ data: unknown; error: null }>>(),
   event: { id: 'evt-1', team_notified_at: null as string | null },
 }));
 vi.mock('@/lib/supabase/admin', () => ({
@@ -30,7 +30,9 @@ vi.mock('@/lib/supabase/admin', () => ({
   }),
 }));
 
-const mail = vi.hoisted(() => ({ sendEmail: vi.fn(async () => ({ id: 'm1' })) }));
+const mail = vi.hoisted(() => ({
+  sendEmail: vi.fn<(input: { idempotencyKey?: string }) => Promise<{ id: string }>>(async () => ({ id: 'm1' })),
+}));
 vi.mock('@/lib/email/resend', () => ({ sendEmail: mail.sendEmail }));
 
 import { attachPaymentProof } from '@/lib/orders/attach-payment-proof';
